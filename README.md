@@ -46,6 +46,8 @@ Before each new science stage, run:
 ./scripts/update_rec_bianchi_lock.sh
 ```
 
+See [`external/REC_BIANCHI_MONITORING_POLICY.md`](external/REC_BIANCHI_MONITORING_POLICY.md) for the per-stage and weekly-CI policy.
+
 The reionization project must not implement or silently substitute the recombination module.
 
 ## Verification

@@ -1,0 +1,56 @@
+name: Monitor rec_bianchi dependency
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Monday 09:15 Asia/Seoul = Monday 00:15 UTC
+    - cron: '15 0 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require read-only dependency token
+        env:
+          TOKEN: ${{ secrets.REC_BIANCHI_READ_TOKEN }}
+        run: |
+          test -n "$TOKEN" || {
+            echo 'REC_BIANCHI_READ_TOKEN is not configured.' >&2
+            exit 2
+          }
+      - name: Query private rec_bianchi HEAD
+        env:
+          TOKEN: ${{ secrets.REC_BIANCHI_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          AUTH=$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)
+          REMOTE=https://github.com/cosmosapjw-quantum/rec_bianchi.git
+          HEAD_LINE=$(git -c http.extraHeader="AUTHORIZATION: basic $AUTH" \
+            ls-remote "$REMOTE" HEAD)
+          SHA=${HEAD_LINE%%[[:space:]]*}
+          python - "$SHA" <<'PY'
+          import datetime, json, sys
+          from pathlib import Path
+          sha = sys.argv[1]
+          committed = json.loads(Path('external/rec_bianchi.lock.json').read_text())
+          receipt = {
+              'repository': 'https://github.com/cosmosapjw-quantum/rec_bianchi',
+              'checked_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              'remote_head_sha': sha,
+              'committed_head_sha': committed.get('head_sha'),
+              'changed_since_committed_lock': committed.get('head_sha') not in (None, sha),
+          }
+          Path('rec_bianchi_monitor_receipt.json').write_text(json.dumps(receipt, indent=2))
+          print(json.dumps(receipt, indent=2))
+          if receipt['changed_since_committed_lock']:
+              raise SystemExit('rec_bianchi HEAD changed; review and update the lock intentionally')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rec-bianchi-monitor-receipt
+          path: rec_bianchi_monitor_receipt.json

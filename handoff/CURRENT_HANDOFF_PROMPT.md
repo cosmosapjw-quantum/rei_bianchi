@@ -23,6 +23,7 @@ Before science work:
 1. Read `PROJECT_STATE.json`, `docs/science/current_00_READ_FIRST.md`, `docs/provenance/DURABLE_STAGE_LEDGER.csv`, `external/rec_bianchi.lock.json`, and this file.
 2. Run `python scripts/verify_repo.py`.
 3. Run `scripts/update_rec_bianchi_lock.sh`; record the exact remote HEAD or an explicit unavailable status. Do not implement a recombination surrogate.
+   Also read `external/REC_BIANCHI_MONITORING_POLICY.md`; an updated remote SHA requires deliberate adapter/input-lock review.
 4. Verify all canonical artifact hashes used by the next stage.
 5. Create a new durable stage directory, input lock, stage state, receipts, manifest, and SHA256SUMS before calculation.
 
