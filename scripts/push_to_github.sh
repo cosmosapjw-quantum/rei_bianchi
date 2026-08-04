@@ -11,6 +11,14 @@ fi
 
 git ls-remote origin HEAD >/dev/null
 LOCAL_MAIN=$(git rev-parse main)
+if ! git show-ref --verify --quiet refs/heads/archive/full-history; then
+  if git show-ref --verify --quiet refs/remotes/origin/archive/full-history; then
+    git branch archive/full-history refs/remotes/origin/archive/full-history
+  else
+    echo "archive/full-history is absent. Restore from rei_bianchi_full_mirror.git.tar; the main-only bundle is insufficient for a complete archive push." >&2
+    exit 3
+  fi
+fi
 LOCAL_ARCHIVE=$(git rev-parse archive/full-history)
 
 git push -u origin main
