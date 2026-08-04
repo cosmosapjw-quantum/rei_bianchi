@@ -44,7 +44,7 @@ python scripts/verify_repo.py
 To inspect or restore the archive branch:
 
 ```bash
-git switch archive/full-history
+git switch -c archive/full-history origin/archive/full-history
 python scripts/reassemble_artifact.py \
   artifacts/archive/<artifact>.parts.json /target/directory
 ```
