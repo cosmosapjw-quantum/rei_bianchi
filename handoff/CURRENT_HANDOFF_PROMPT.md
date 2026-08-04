@@ -22,10 +22,9 @@ Before science work:
 
 1. Read `PROJECT_STATE.json`, `docs/science/current_00_READ_FIRST.md`, `docs/provenance/DURABLE_STAGE_LEDGER.csv`, `external/rec_bianchi.lock.json`, and this file.
 2. Run `python scripts/verify_repo.py`.
-3. Run `scripts/update_rec_bianchi_lock.sh`; record the exact remote HEAD or an explicit unavailable status. Do not implement a recombination surrogate.
-   Also read `external/REC_BIANCHI_MONITORING_POLICY.md`; an updated remote SHA requires deliberate adapter/input-lock review.
-4. Verify all canonical artifact hashes used by the next stage.
-5. Create a new durable stage directory, input lock, stage state, receipts, manifest, and SHA256SUMS before calculation.
+3. Run `scripts/update_rec_bianchi_lock.sh`; record the exact remote HEAD or an explicit unavailable status. Do not implement a recombination surrogate. Read `external/REC_BIANCHI_MONITORING_POLICY.md`; a changed remote SHA requires deliberate adapter/input-lock review.
+4. Verify every canonical artifact hash used by the next stage.
+5. Create the next durable stage directory, input lock, stage state, receipts, manifest, and SHA256SUMS before calculation.
 
 Project objective:
 
@@ -34,23 +33,47 @@ Derive and implement the equations needed to extend homogeneous reionization and
 Current durable verdict:
 
 ```text
-P0.5-B2C2B0C-R1-NODE-RESOLVED-JOINT-CHEMISTRY-SINK-HISTORY-LOCK
-DURABLE_FAIL_CLOSED_QUASISTATIC_MACRO_CLOUD_OPACITY_MASS_DIVERGENCE
+P0.5-B2C2B0C-R2A-GLOBAL-MOMENT-CONSTRAINED-MACRO-SINK-DISTRIBUTION-LOCK
+DURABLE_PASS_R2A_CORE_MACRO_DISTRIBUTION_LOCK_TAU10_FEASIBILITY_WITNESS_R2B_AUTHORIZED
+R2B authorization: true
 B2C2B authorization: false
 ```
 
-The latest R1 trial represented 46,080 diffuse parcels and 18 macro sink states. Photon and nuclei identities closed, but the independently quasi-static macro cloud closure failed: cloud mass diverges as x_HII,sink -> 1 at fixed opacity; the first-interval sink fraction changes by a factor 4.503 between dt and dt/2; dt/4 and dt/8 are infeasible. Do not promote any diagnostic node history to production.
+R2A locked all 10 validated global reduced-DAE substeps over all three B2C2B0A shape priors. All 30 macro constrained-KL problems are strict-feasible identity projections with analytic zero-dual KKT certificates; 540 macro rows close the mass, opacity, current-Gamma, transfer, volume, and cycling gates. G2b/G3 effective-HI and primary HeII/G3 channels remain exact zero. R1 node diagnostics remain fail-closed and unpromoted.
+
+Finite-relaxation auditor:
+
+- tau=10 Myr: 30/30 absolute and shape-only cases feasible;
+- tau=100 Myr: 12/30 absolute, 18/30 shape-only;
+- tau=300 Myr: 6/30 absolute, 12/30 shape-only.
+
+The 10 Myr result is an existence witness, not a calibrated timescale. The slow-lane failures must remain visible in R2B.
 
 Next exact execution instruction:
 
-@Web+Wolfram Stage P0.5-B2C2B0C-R2A-GLOBAL-MOMENT-CONSTRAINED-MACRO-SINK-DISTRIBUTION-LOCK를 실행해줘.\n\nB2C2B0C의 validated global reduced DAE history, B2C2B0A fixed macro/micro weights, R1 current-Gamma total opacity와 exact photon ledger, B2C2B0C-R1의 fail-closed node diagnostics를 정본으로 유지한다.\n\n이번 단계에서는 macro별 cloud abundance를 independently quasi-static하게 풀지 마. B2C2B0C reduced DAE의 global sink moments를 hard constraints로 두고 macro distribution operator만 잠가줘.\n\n1. 새 durable R2A directory, input lock, stage state, receipts, manifest와 SHA256SUMS를 계산 전에 생성해줘.\n2. 각 reduced-DAE substep에서 다음 global moments를 lock해줘.\n   - N_H,sink^global, x_HII,sink^global, T_sink^global\n   - kappa_sink,g^global와 J_sink,g^global\n   - diffuse/sink mass-transfer rate\n3. 각 shape lane의 B2C2B0A macro allocation을 prior p_m으로 사용하되, macro sink H mass M_m와 group opacity kappa_mg를 constrained KL projection으로 계산해줘.\n4. Hard constraints:\n   Sum_m M_m=N_H,sink^global,\n   Sum_m kappa_mg=kappa_sink,g^global,\n   0<=M_m<=N_H^c f_m^macro,\n   0<=volume_filling_m<=1,\n   macro photo/recombination cycling capacity >= assigned J_sink,m.\n5. Infeasible하면 clipping하지 말고 dual certificate와 violated macro constraints를 저장해줘.\n6. LOCAL_NEUTRAL_HAZARD, RECOMBINATION_WEIGHTED, SCRIPT_SELF_SHIELDING 세 priors를 모두 투영하고 KL/TV envelope를 저장해줘.\n7. Single-size Jeans cloud는 prior geometry auditor로만 유지하고, opacity moment를 만족시키기 위해 cloud mass를 재정의하지 마.\n8. finite relaxation tau={10,100,300} Myr constraints를 별도 feasibility auditor로 만들어줘.\n9. Wolfram으로 moment sums, mass/opacity conservation, KKT complementarity와 exact-zero G3/HeII를 검증해줘. Native runtime이 없으면 .wl script와 exact fallback을 남겨줘.\n10. 이번 R2A에서는 node chemistry history, unresolved subtraction, front/Q_M, source/fesc, recombination 구현, Bianchi feedback을 시작하지 마.\n\n세 shape prior 모두에서 feasible macro distribution과 dual/KKT gate가 닫힌 뒤에만 R2B MOMENT-CONSTRAINED-NODE-LIFT-HISTORY를 승인해줘.\n
+@Web+Wolfram Stage `P0.5-B2C2B0C-R2B-MOMENT-CONSTRAINED-NODE-LIFT-HISTORY`를 실행해줘.
+
+R2A의 `data/global_moment_lock.csv`, `data/macro_projection.csv`, `data/dual_kkt_certificates.jsonl`, `data/finite_relaxation_feasibility.csv`, exact-zero lock, B2C2B0A fixed macro/micro measure, B2C2B0C exact photon ledger를 정본으로 유지한다.
+
+1. 계산 전에 새 durable R2B directory, input lock, stage state, receipts, manifest와 SHA256SUMS를 생성해줘.
+2. 각 substep/shape lane에서 R2A의 macro `M_m`, `kappa_mg`, `J_mg`, mass-transfer moment와 global moments를 hard constraints로 잠가줘.
+3. B2C2B0A의 fixed micro-node weights를 conditional prior로 사용해 macro-to-node lift를 constrained KL/IPF 또는 동등한 convex operator로 계산해줘.
+4. 모든 node 합이 각 macro mass/opacity/current-Gamma/cycling constraints와 global photon/nuclei moments를 동시에 닫아야 한다.
+5. independently quasi-static cloud abundance를 풀거나 opacity로 node/macro mass를 재정의하지 마.
+6. infeasible하면 clipping하지 말고 macro/node dual certificate와 violated constraints를 저장해줘.
+7. 세 shape lane의 node-level KL/TV envelope를 모두 저장해줘.
+8. tau=10 Myr all-case witness는 유지하되 물리적 calibration으로 선언하지 마. tau=100/300 Myr failures는 sensitivity gates로 보존해줘.
+9. Wolfram으로 nested moment sums, KKT complementarity, current-Gamma relation과 exact-zero G3/HeII를 검증해줘. Native runtime이 없으면 `.wl`과 exact fallback을 남겨줘.
+10. 이번 R2B에서도 unresolved subtraction, front/Q_M, source/fesc, primordial recombination, Bianchi feedback을 시작하지 마.
+
+모든 macro와 global moments가 세 shape lane에서 닫히고 node-level dual/KKT gate가 통과한 뒤에만 후속 history/chemistry coupling 단계를 승인해줘.
 
 Repository/update policy:
 
 - Save every accepted or fail-closed stage under `stages/` or as a compact bundle under `artifacts/compact/`.
 - Update `PROJECT_STATE.json`, `handoff/CURRENT_HANDOFF_PROMPT.md`, `artifacts/registry/ARTIFACT_REGISTRY.json`, and `docs/provenance/DURABLE_STAGE_LEDGER.csv` in the same commit.
-- Commit each durable stage. Tag major locks.
-- Never claim a push unless `git ls-remote origin` and `git push` succeed and the remote commit SHA is recorded.
+- Commit each durable stage and tag major locks.
+- Never claim a push unless `git ls-remote origin` and `git push` both succeed and the remote commit SHA is recorded.
 - Preserve failed attempts separately; never overwrite them with later success.
 
 ---
