@@ -14,6 +14,7 @@ from positive_multirate_cone import (  # noqa: E402
     active_set_nnls_kkt_certificate,
     build_equilibrium_problem,
     certify_exponential_slack,
+    certify_exponential_slack_taylor,
     one_mode_equilibrium,
     relative_kkt_stationarity_residual,
     solve_equilibrium_problem,
@@ -96,6 +97,41 @@ def test_interval_slack_certificate_fails_real_negative_region() -> None:
     assert not cert["pass"]
     assert cert["minimum_sampled_slack"] < 0.0
 
+
+
+def test_taylor_certificate_resolves_large_near_cancellation_without_branch_explosion() -> None:
+    cert = certify_exponential_slack_taylor(
+        constant=np.array([0.0]),
+        amplitudes=np.array([[1.0e30, -1.0e30]]),
+        rates_myr_inv=np.array([0.1, 0.1000000000001]),
+        dt_myr=10.0,
+        relative_tolerance=1.0e-11,
+        max_depth=24,
+        taylor_order=4,
+        max_interval_evaluations=64,
+    )
+    assert cert["pass"]
+    assert cert["status"] == "CERTIFIED"
+    assert cert["certification_method"] == "CENTERED_TAYLOR_LAGRANGE_DYADIC"
+    assert cert["interval_evaluation_count"] <= 64
+    assert cert["unresolved_interval_count"] == 0
+
+
+def test_taylor_certificate_fails_closed_when_work_budget_is_exhausted() -> None:
+    cert = certify_exponential_slack_taylor(
+        constant=np.array([0.0]),
+        amplitudes=np.array([[1.0, -1.0]]),
+        rates_myr_inv=np.array([0.1, 0.2]),
+        dt_myr=10.0,
+        relative_tolerance=0.0,
+        max_depth=24,
+        taylor_order=2,
+        max_interval_evaluations=1,
+    )
+    assert not cert["pass"]
+    assert cert["status"] == "CERTIFICATION_WORK_LIMIT"
+    assert cert["unresolved_interval_count"] >= 1
+    assert cert["interval_evaluation_count"] == 1
 
 def test_two_mode_weight_reproduces_locked_attenuation() -> None:
     dt = 10.0

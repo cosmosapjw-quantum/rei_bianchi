@@ -495,6 +495,179 @@ def solve_equilibrium_problem(problem: EquilibriumProblem) -> dict[str, Any]:
     }
 
 
+def certify_exponential_slack_taylor(
+    *,
+    constant: Any,
+    amplitudes: Any,
+    rates_myr_inv: Any,
+    dt_myr: float,
+    relative_tolerance: float = 1e-11,
+    max_depth: int = 24,
+    taylor_order: int = 4,
+    max_interval_evaluations: int = 200_000,
+) -> dict[str, Any]:
+    """Certify a positive exponential-polynomial slack on ``[0, dt]``.
+
+    Each dyadic interval is enclosed by a Taylor expansion about its midpoint.
+    Derivatives are combined *before* taking absolute values, which preserves
+    cancellation between nearly equal exponential modes.  The omitted tail is
+    bounded term by term with the Lagrange remainder
+
+        |a_j| exp(-k_j lo) (k_j r)^(p+1) / (p+1)!,
+
+    where ``r=(hi-lo)/2``.  A deterministic work budget makes unresolved
+    cases fail closed rather than allowing exponential branch growth.
+    """
+    const = np.asarray(constant, dtype=float)
+    amps = np.asarray(amplitudes, dtype=float)
+    rates = np.asarray(rates_myr_inv, dtype=float)
+    if (
+        const.ndim != 1
+        or amps.ndim != 2
+        or amps.shape[0] != const.size
+        or amps.shape[1] != rates.size
+    ):
+        raise ValueError("invalid exponential slack shapes")
+    if (
+        np.any(~np.isfinite(const))
+        or np.any(~np.isfinite(amps))
+        or np.any(~np.isfinite(rates))
+        or np.any(rates <= 0.0)
+    ):
+        raise ValueError("slack inputs must be finite and rates positive")
+    dt = float(dt_myr)
+    rel_tol = float(relative_tolerance)
+    depth_limit = int(max_depth)
+    order = int(taylor_order)
+    work_limit = int(max_interval_evaluations)
+    if not math.isfinite(dt) or dt <= 0.0:
+        raise ValueError("dt_myr must be positive and finite")
+    if not math.isfinite(rel_tol) or rel_tol < 0.0:
+        raise ValueError("relative_tolerance must be nonnegative and finite")
+    if depth_limit < 0:
+        raise ValueError("max_depth must be nonnegative")
+    if order < 1:
+        raise ValueError("taylor_order must be at least one")
+    if work_limit < 1:
+        raise ValueError("max_interval_evaluations must be positive")
+
+    scale = max(float(np.sum(np.abs(const)) + np.sum(np.abs(amps))), 1.0)
+    tol = rel_tol * scale
+    factorials = np.asarray([math.factorial(n) for n in range(order + 2)], dtype=float)
+    queue: list[tuple[float, float, int]] = [(0.0, dt, 0)]
+    certified = 0
+    unresolved = 0
+    evaluations = 0
+    minimum_sampled = math.inf
+    minimum_encountered_lower = math.inf
+    minimum_certified_lower = math.inf
+    max_used_depth = 0
+    max_roundoff_guard = 0.0
+    minimum_sample_time: float | None = None
+    minimum_sample_row: int | None = None
+
+    def result(status: str, passed: bool) -> dict[str, Any]:
+        sampled = minimum_sampled
+        if not math.isfinite(sampled):
+            samples = (
+                const + amps @ np.ones(rates.size),
+                const + amps @ np.exp(-rates * dt),
+            )
+            sampled = float(min(np.min(value) for value in samples))
+        reported_lower = (
+            minimum_certified_lower
+            if math.isfinite(minimum_certified_lower)
+            else minimum_encountered_lower
+        )
+        return {
+            "pass": bool(passed),
+            "status": status,
+            "certification_method": "CENTERED_TAYLOR_LAGRANGE_DYADIC",
+            "taylor_order": order,
+            "maximum_interval_evaluations": work_limit,
+            "interval_evaluation_count": evaluations,
+            "minimum_sampled_slack": sampled,
+            "minimum_sampled_time_Myr": minimum_sample_time,
+            "minimum_sampled_row": minimum_sample_row,
+            "minimum_interval_lower_bound": reported_lower,
+            "minimum_encountered_interval_lower_bound": minimum_encountered_lower,
+            "minimum_certified_interval_lower_bound": minimum_certified_lower,
+            "relative_minimum_sampled": sampled / scale,
+            "relative_tolerance": rel_tol,
+            "absolute_tolerance": tol,
+            "slack_scale": scale,
+            "maximum_roundoff_guard": max_roundoff_guard,
+            "certified_interval_count": certified,
+            "unresolved_interval_count": unresolved,
+            "maximum_depth_used": max_used_depth,
+        }
+
+    while queue:
+        if evaluations >= work_limit:
+            unresolved += len(queue)
+            return result("CERTIFICATION_WORK_LIMIT", False)
+
+        lo, hi, depth = queue.pop()
+        evaluations += 1
+        max_used_depth = max(max_used_depth, depth)
+        mid = 0.5 * (lo + hi)
+        radius = 0.5 * (hi - lo)
+        exp_mid = np.exp(-rates * mid)
+        base = const + amps @ exp_mid
+
+        polynomial_penalty = np.zeros_like(const)
+        for derivative_order in range(1, order + 1):
+            derivative = amps @ (exp_mid * ((-rates) ** derivative_order))
+            polynomial_penalty += (
+                np.abs(derivative)
+                * (radius ** derivative_order)
+                / factorials[derivative_order]
+            )
+
+        remainder_weights = (
+            np.exp(-rates * lo)
+            * ((rates * radius) ** (order + 1))
+            / factorials[order + 1]
+        )
+        remainder = np.abs(amps) @ remainder_weights
+        roundoff_guard = 64.0 * np.finfo(float).eps * (
+            np.abs(base) + polynomial_penalty + remainder + scale
+        )
+        max_roundoff_guard = max(max_roundoff_guard, float(np.max(roundoff_guard)))
+        lower = base - polynomial_penalty - remainder - roundoff_guard
+        min_lower = float(np.min(lower))
+        minimum_encountered_lower = min(minimum_encountered_lower, min_lower)
+
+        if min_lower >= -tol:
+            certified += 1
+            minimum_certified_lower = min(minimum_certified_lower, min_lower)
+            continue
+
+        for time_value in (lo, mid, hi):
+            value = const + amps @ np.exp(-rates * time_value)
+            row = int(np.argmin(value))
+            sample = float(value[row])
+            if sample < minimum_sampled:
+                minimum_sampled = sample
+                minimum_sample_time = float(time_value)
+                minimum_sample_row = row
+        if minimum_sampled < -tol:
+            return result("REAL_NEGATIVE_SLACK", False)
+
+        if depth >= depth_limit:
+            unresolved += 1
+            continue
+
+        queue.append((lo, mid, depth + 1))
+        queue.append((mid, hi, depth + 1))
+
+    passed = unresolved == 0
+    return result(
+        "CERTIFIED" if passed else "CERTIFICATION_AMBIGUOUS_DEPTH_LIMIT",
+        passed,
+    )
+
+
 def certify_exponential_slack(
     *,
     constant: Any,
@@ -503,68 +676,20 @@ def certify_exponential_slack(
     dt_myr: float,
     relative_tolerance: float = 1e-11,
     max_depth: int = 24,
+    taylor_order: int = 4,
+    max_interval_evaluations: int = 200_000,
 ) -> dict[str, Any]:
-    const = np.asarray(constant, dtype=float)
-    amps = np.asarray(amplitudes, dtype=float)
-    rates = np.asarray(rates_myr_inv, dtype=float)
-    if const.ndim != 1 or amps.ndim != 2 or amps.shape[0] != const.size or amps.shape[1] != rates.size:
-        raise ValueError("invalid exponential slack shapes")
-    if np.any(~np.isfinite(const)) or np.any(~np.isfinite(amps)) or np.any(~np.isfinite(rates)) or np.any(rates <= 0.0):
-        raise ValueError("slack inputs must be finite and rates positive")
-    dt = float(dt_myr)
-    scale = max(float(np.sum(np.abs(const)) + np.sum(np.abs(amps))), 1.0)
-    tol = float(relative_tolerance) * scale
-    queue: list[tuple[float, float, int]] = [(0.0, dt, 0)]
-    certified = 0
-    unresolved = 0
-    minimum_sampled = math.inf
-    minimum_lower = math.inf
-    max_used_depth = 0
-    while queue:
-        lo, hi, depth = queue.pop()
-        max_used_depth = max(max_used_depth, depth)
-        elo = np.exp(-rates * lo)
-        ehi = np.exp(-rates * hi)
-        term_lower = np.where(amps >= 0.0, amps * ehi[None, :], amps * elo[None, :])
-        lower = const + np.sum(term_lower, axis=1)
-        min_lower = float(np.min(lower))
-        minimum_lower = min(minimum_lower, min_lower)
-        if min_lower >= -tol:
-            certified += 1
-            continue
-        mid = 0.5 * (lo + hi)
-        for time in (lo, mid, hi):
-            value = const + amps @ np.exp(-rates * time)
-            minimum_sampled = min(minimum_sampled, float(np.min(value)))
-        if minimum_sampled < -tol:
-            return {
-                "pass": False,
-                "status": "REAL_NEGATIVE_SLACK",
-                "minimum_sampled_slack": minimum_sampled,
-                "minimum_interval_lower_bound": minimum_lower,
-                "relative_minimum_sampled": minimum_sampled / scale,
-                "certified_interval_count": certified,
-                "unresolved_interval_count": unresolved,
-                "maximum_depth_used": max_used_depth,
-            }
-        if depth >= int(max_depth):
-            unresolved += 1
-            continue
-        queue.append((lo, mid, depth + 1))
-        queue.append((mid, hi, depth + 1))
-    passed = unresolved == 0
-    if minimum_sampled is math.inf:
-        minimum_sampled = float(np.min(const + amps @ np.ones(rates.size)))
-    return {
-        "pass": passed,
-        "status": "CERTIFIED" if passed else "CERTIFICATION_AMBIGUOUS",
-        "minimum_sampled_slack": minimum_sampled,
-        "minimum_interval_lower_bound": minimum_lower,
-        "relative_minimum_sampled": minimum_sampled / scale,
-        "certified_interval_count": certified,
-        "unresolved_interval_count": unresolved,
-        "maximum_depth_used": max_used_depth,
-    }
+    """Compatibility wrapper for the locked Taylor--Lagrange auditor."""
+    return certify_exponential_slack_taylor(
+        constant=constant,
+        amplitudes=amplitudes,
+        rates_myr_inv=rates_myr_inv,
+        dt_myr=dt_myr,
+        relative_tolerance=relative_tolerance,
+        max_depth=max_depth,
+        taylor_order=taylor_order,
+        max_interval_evaluations=max_interval_evaluations,
+    )
 
 
 def two_mode_weight_for_attenuation(k_effective: float, k_lower: float, k_upper: float, dt_myr: float) -> float:
