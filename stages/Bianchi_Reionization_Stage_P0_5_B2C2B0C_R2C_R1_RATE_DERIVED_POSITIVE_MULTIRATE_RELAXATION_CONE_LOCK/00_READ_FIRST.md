@@ -1,7 +1,34 @@
-# R2C-R1 — read first
+# R2C-R1 macro-shared multirate cone lock — read first
 
-This durable stage tests whether the R2B fixed-node endpoints can be joined by a **rate-derived positive multirate relaxation family** without leaving the physical cone. It is a model-adequacy preflight, not a production chemistry history.
+Current durable stage:
 
-Canonical inheritance is R2A global/macro moments, R2B fixed node support and endpoints, the R2C initial-current projection, exact photon/H/He ledgers, and the R2C fail-closed certificates. No failed R2C trajectory is promoted.
+```text
+P0.5-B2C2B0C-R2C-R1-RATE-DERIVED-POSITIVE-MULTIRATE-RELAXATION-CONE-LOCK
+DURABLE_FAIL_CLOSED_R2C_R1_MACRO_SHARED_COMMON_EQUILIBRIUM_MULTIRATE_CONE_NOT_ALL_LANES_REACHABLE
+```
 
-The stage uses macro-shared rate families for `M`, `I=M x_HII`, `U=(3/2) k_B M T`, `C`, and `J_G1,J_G2a`. Node-wise free rate fitting is forbidden. A one-mode kernel is tested first. A two-mode completely monotone kernel is permitted only after a locked one-mode failure and only within the predeclared rate envelope.
+This stage tested a deliberately bounded model class: for each macro and each
+family `M,I,U,C,J_G1,J_G2a`, one positive rate is shared by all 2,560 fixed
+micro nodes. Rates lie in intervals frozen before feasibility from inherited
+secants and explicit process-rate evidence. One exponential mode was mandatory
+first; a two-mode completely monotone mixture was allowed only after one-mode
+trajectory failure and added no new endpoint attenuation freedom.
+
+The result is fail-closed. Of 540 macro cases, 43 had an equilibrium inside the
+locked cone, 43 had an analytically certified one- or two-mode trajectory, and
+27 passed the full `dt/2,dt/4,dt/8` refinement gate. No shape lane passed all
+180 macro cases. The other 497 cases have independently replayed Farkas
+certificates: 209 cycling-capacity, 125 G1-current, 157 G2a-current, and six
+macro-mass-cap obstructions.
+
+This is a no-go only for the **macro-shared, common-equilibrium, locked-rate-box
+model class**. It does not rule out deterministic node-local physical rate
+fields, non-autonomous forcing, or a physics-derived coupled positive
+generator. It does rule out repairing the 497 equilibrium no-go cases merely
+by adding more positive exponential modes while retaining the same common
+equilibrium and rate box.
+
+Production node chemistry, R2C-R2, and B2C2B remain unauthorized. The next
+bounded task is the node-local physics-derived rate-field identifiability and
+cone preflight in `NEXT_STAGE_PROMPT.md`; rate intervals must not be widened
+from the post-result dual diagnostic.
