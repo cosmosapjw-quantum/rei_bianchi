@@ -1,5 +1,20 @@
-# R2B upload-recovery v2
+# R2C finite-relaxation audit — current durable science state
 
-This is a reconstructed Git-delivery stage created after `part-0003` of the previous reconstructed incremental bundle failed upload-status processing and was not retained.
+Current stage:
 
-The R2B operator was rerun from the verified R2A base and canonical locked inputs. The regenerated logical outputs are not byte-identical to the previous gzip streams, so they have new SHA-256 values and new Git commit identities. Independent all-row validation and 16 tests pass. This delivery reconstruction does not change the R2B scientific verdict or authorize production node chemistry.
+```text
+P0.5-B2C2B0C-R2C-MOMENT-CONSTRAINED-NODE-CHEMISTRY-RELAXATION-AUDIT
+DURABLE_FAIL_CLOSED_R2C_CONSTANT_EQUILIBRIUM_RELAXATION_NOT_ALL_LANES_REACHABLE
+```
+
+The R2B static node lift remains a valid constrained endpoint lock, but it is
+not a production chemistry history. After a macro-local initial current KL
+projection removed a boundary-only capacity inconsistency, every physically
+feasible case converged under `dt`, `dt/2`, and `dt/4`. The one-rate,
+one-constant-equilibrium model was feasible in only 18/30, 10/30, and 6/30
+cases for tau=10, 100, and 300 Myr. The remaining obstruction is physical-cone
+extrapolation, dominated at tau=10 Myr by node cycling-capacity deficits.
+
+Production node chemistry and B2C2B are unauthorized. The next authorized
+work is the rate-derived positive multirate relaxation-cone model-adequacy
+lock; it must not generate a production history.

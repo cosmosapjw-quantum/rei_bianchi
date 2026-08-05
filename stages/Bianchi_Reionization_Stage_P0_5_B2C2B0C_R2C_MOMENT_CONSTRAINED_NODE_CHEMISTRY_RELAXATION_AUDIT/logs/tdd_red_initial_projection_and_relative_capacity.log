@@ -1,0 +1,43 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_initial_endpoint_projects_current_into_scaled_capacity_cone _______
+
+    def test_initial_endpoint_projects_current_into_scaled_capacity_cone() -> None:
+        first = NodeEndpoint(
+            mass=np.array([2.0, 2.0]),
+            x_hii=np.array([0.8, 0.8]),
+            temperature_k=np.array([10_000.0, 10_000.0]),
+            capacity=np.array([2.0, 4.0]),
+            current=np.array([[1.7, 0.5], [0.5, 0.5]]),
+            phi=np.array([2.0, 3.0]),
+            n_h_cm3=np.array([1.0e-4, 1.0e-4]),
+            p_mass=np.array([0.5, 0.5]),
+            z=6.0,
+        )
+        expected_totals = first.current.sum(axis=0)
+>       initial = construct_initial_endpoint(
+            first,
+            InitialGlobalState(n_h_sink=3.0, x_hii_sink=0.8, temperature_sink_k=10_000.0, z=6.1),
+            nodes_per_macro=2,
+        )
+E       TypeError: construct_initial_endpoint() got an unexpected keyword argument 'nodes_per_macro'
+
+mnt/data/r2c_work/repo/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_MOMENT_CONSTRAINED_NODE_CHEMISTRY_RELAXATION_AUDIT/tests/test_relaxation_audit_core.py:114: TypeError
+____________ test_projection_reports_scale_free_capacity_violation _____________
+
+    def test_projection_reports_scale_free_capacity_violation() -> None:
+        scale = 1.0e49
+        prior = scale * np.array([[0.9, 0.7], [0.1, 0.3]], dtype=float)
+        totals = scale * np.array([1.0, 1.0])
+        capacities = scale * np.array([1.0, 1.2])
+        projected, cert = project_currents(prior, totals, capacities)
+        assert projected is not None
+        assert cert["pass"] is True
+>       assert "max_capacity_relative_violation" in cert
+E       AssertionError: assert 'max_capacity_relative_violation' in {'active_lambda_max': 1.522261218861712, 'active_lambda_min': 1.522261218861712, 'active_row_count': 1, 'active_set_count': 1, ...}
+
+mnt/data/r2c_work/repo/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_MOMENT_CONSTRAINED_NODE_CHEMISTRY_RELAXATION_AUDIT/tests/test_relaxation_projection.py:44: AssertionError
+=========================== short test summary info ============================
+FAILED mnt/data/r2c_work/repo/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_MOMENT_CONSTRAINED_NODE_CHEMISTRY_RELAXATION_AUDIT/tests/test_relaxation_audit_core.py::test_initial_endpoint_projects_current_into_scaled_capacity_cone - TypeError: construct_initial_endpoint() got an unexpected keyword argument 'nodes_per_macro'
+FAILED mnt/data/r2c_work/repo/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_MOMENT_CONSTRAINED_NODE_CHEMISTRY_RELAXATION_AUDIT/tests/test_relaxation_projection.py::test_projection_reports_scale_free_capacity_violation - AssertionError: assert 'max_capacity_relative_violation' in {'active_lambda_max': 1.522261218861712, 'active_lambda_min': 1.522261218861712, 'active_row_count': 1, 'active_set_count': 1, ...}
+2 failed in 0.33s

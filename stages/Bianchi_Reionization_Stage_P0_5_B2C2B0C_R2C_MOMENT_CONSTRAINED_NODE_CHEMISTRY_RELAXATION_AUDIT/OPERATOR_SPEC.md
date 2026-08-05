@@ -1,0 +1,5 @@
+# R2C operator specification — pre-calculation design lock
+
+For each consecutive R2B endpoint, infer a constant first-order relaxation equilibrium from the exact exponential map at tau=10/100/300 Myr. Evolve the same equilibrium with backward Euler at refinement factors 1, 2, and 4. Extensive variables are H nuclei mass M, ionized-H measure I=M x_HII, and thermal measure U=(3/2) k_B M T. Active-group photon currents are evolved as nonnegative measures and subjected to the inherited row-capacity constrained KL projection. Current-Gamma opacity is kappa=J/Phi using the locked positive flux.
+
+The raw integrator is audited before endpoint projection. The exact R2B endpoint is then restored only as a recorded Bregman endpoint projection, never by clipping. Feasibility requires bounded inferred equilibria, physical intermediate states, feasible capacity projections, exact endpoint/moment ledgers, and decreasing dt->dt/2->dt/4 raw errors. Passing tau=10 Myr is only an existence witness. Production authorization requires all requested tau and shape lanes to pass.
