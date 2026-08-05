@@ -105,3 +105,86 @@ def test_two_mode_weight_reproduces_locked_attenuation() -> None:
     mixture = weight * math.exp(-k_lo * dt) + (1.0 - weight) * math.exp(-k_hi * dt)
     assert 0.0 <= weight <= 1.0
     assert math.isclose(mixture, target_decay, rel_tol=2e-15, abs_tol=2e-15)
+
+
+def test_solver_uses_physical_row_scaling_for_wide_rate_boxes() -> None:
+    previous = {
+        "M": np.array([10.0]),
+        "I": np.array([5.0]),
+        "U": np.array([1.0]),
+        "C": np.array([1.0]),
+        "J_G1": np.array([0.4]),
+        "J_G2a": np.array([0.4]),
+    }
+    target = {
+        "M": np.array([10.0]),
+        "I": np.array([5.0]),
+        "U": np.array([1.0]),
+        "C": np.array([1.1]),
+        "J_G1": np.array([0.42]),
+        "J_G2a": np.array([0.42]),
+    }
+    bounds = {
+        "M": (0.1, 0.2),
+        "I": (0.1, 0.2),
+        "U": (0.1, 0.2),
+        "C": (1.0e-4, 2.0),
+        "J_G1": (1.0e-16, 1.0e-2),
+        "J_G2a": (1.0e-16, 1.0e-2),
+    }
+    result = solve_equilibrium_problem(
+        build_equilibrium_problem(
+            previous,
+            target,
+            bounds,
+            dt_myr=10.0,
+            macro_mass_cap=20.0,
+            macro_volume_cap=20.0,
+        )
+    )
+    assert result["pass"]
+    eq = one_mode_equilibrium(previous, target, result["rates_Myr_inv"], 10.0)
+    scale = max(
+        float(np.sum(np.abs(eq["C"])))
+        + float(np.sum(np.abs(eq["J_G1"])))
+        + float(np.sum(np.abs(eq["J_G2a"]))),
+        1.0,
+    )
+    assert float(np.min(eq["C"] - eq["J_G1"] - eq["J_G2a"])) >= -1.0e-11 * scale
+    assert result["minimum_physical_scaled_primal_slack"] >= -1.0e-11
+
+
+def test_solver_returns_exact_locked_rate_at_active_boundary() -> None:
+    previous, _, _ = synthetic_endpoints()
+    target = {family: values.copy() for family, values in previous.items()}
+    bounds = {family: (1.0e-4, 2.0) for family in FAMILY_ORDER}
+    result = solve_equilibrium_problem(
+        build_equilibrium_problem(
+            previous,
+            target,
+            bounds,
+            dt_myr=10.0,
+            macro_mass_cap=20.0,
+            macro_volume_cap=20.0,
+        )
+    )
+    assert result["pass"]
+    for family in FAMILY_ORDER:
+        assert result["rates_Myr_inv"][family] == bounds[family][1]
+
+
+def test_solver_reports_correct_kkt_stationarity_signs() -> None:
+    previous, target, bounds = synthetic_endpoints()
+    result = solve_equilibrium_problem(
+        build_equilibrium_problem(
+            previous,
+            target,
+            bounds,
+            dt_myr=10.0,
+            macro_mass_cap=20.0,
+            macro_volume_cap=20.0,
+        )
+    )
+    assert result["pass"]
+    assert result["max_stationarity_residual"] <= 1.0e-8
+    assert result["max_complementarity_residual"] <= 1.0e-8
