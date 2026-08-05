@@ -263,6 +263,22 @@ def _farkas_certificate(A: np.ndarray, b: np.ndarray, labels: list[dict[str, Any
     }
 
 
+def relative_kkt_stationarity_residual(
+    objective: Any,
+    inequality_marginal_term: Any,
+    lower_marginals: Any,
+    upper_marginals: Any,
+) -> float:
+    """Return a cancellation-safe componentwise relative KKT residual."""
+    c = np.asarray(objective, dtype=float)
+    a_term = np.asarray(inequality_marginal_term, dtype=float)
+    lower = np.asarray(lower_marginals, dtype=float)
+    upper = np.asarray(upper_marginals, dtype=float)
+    stationarity = c - a_term - lower - upper
+    scale = np.maximum(1.0, np.abs(c) + np.abs(a_term) + np.abs(lower) + np.abs(upper))
+    return float(np.max(np.abs(stationarity) / scale))
+
+
 def one_mode_equilibrium(
     previous: Mapping[str, Any],
     target: Mapping[str, Any],
@@ -332,15 +348,19 @@ def solve_equilibrium_problem(problem: EquilibriumProblem) -> dict[str, Any]:
     # right-hand sides/bounds.  Hence inequality multipliers are
     # -ineqlin.marginals, lower multipliers are lower.marginals, and upper
     # multipliers are -upper.marginals.
-    stationarity = c - problem.A_ub.T @ y_ineq - y_lower - y_upper
+    inequality_marginal_term = problem.A_ub.T @ y_ineq
+    stationarity = c - inequality_marginal_term - y_lower - y_upper
     comp_ineq = y_ineq * slack
     comp_lower = y_lower * z
     comp_upper = y_upper * (z - 1.0)
     active_rows = np.flatnonzero(slack <= 1e-11)
     max_stationarity = float(np.max(np.abs(stationarity)))
+    max_relative_stationarity = relative_kkt_stationarity_residual(
+        c, inequality_marginal_term, y_lower, y_upper
+    )
     max_complementarity = float(max(np.max(np.abs(comp_ineq)), np.max(np.abs(comp_lower)), np.max(np.abs(comp_upper))))
     primal_pass = bool(np.min(slack) >= -1e-11)
-    kkt_pass = bool(max_stationarity <= 1e-9 and max_complementarity <= 1e-9)
+    kkt_pass = bool(max_relative_stationarity <= 1e-11 and max_complementarity <= 1e-11)
     return {
         "pass": bool(primal_pass and kkt_pass),
         "solver_status": int(result.status),
@@ -355,6 +375,7 @@ def solve_equilibrium_problem(problem: EquilibriumProblem) -> dict[str, Any]:
         "primal_gate_pass": primal_pass,
         "kkt_gate_pass": kkt_pass,
         "max_stationarity_residual": max_stationarity,
+        "max_relative_stationarity_residual": max_relative_stationarity,
         "max_complementarity_residual": max_complementarity,
         "active_constraint_count": int(active_rows.size),
         "active_constraints": [problem.labels[int(i)] for i in active_rows[:200]],

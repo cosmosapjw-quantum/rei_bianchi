@@ -14,6 +14,7 @@ from positive_multirate_cone import (  # noqa: E402
     build_equilibrium_problem,
     certify_exponential_slack,
     one_mode_equilibrium,
+    relative_kkt_stationarity_residual,
     solve_equilibrium_problem,
     two_mode_weight_for_attenuation,
 )
@@ -188,3 +189,14 @@ def test_solver_reports_correct_kkt_stationarity_signs() -> None:
     assert result["pass"]
     assert result["max_stationarity_residual"] <= 1.0e-8
     assert result["max_complementarity_residual"] <= 1.0e-8
+
+
+def test_relative_kkt_stationarity_accepts_large_dual_cancellation() -> None:
+    c = np.array([1.0])
+    inequality_term = np.array([0.0])
+    lower_marginal = np.array([1.0e11])
+    upper_marginal = np.array([-1.0e11 + 1.0 - 1.0e-7])
+    residual = relative_kkt_stationarity_residual(
+        c, inequality_term, lower_marginal, upper_marginal
+    )
+    assert residual <= 1.0e-11
