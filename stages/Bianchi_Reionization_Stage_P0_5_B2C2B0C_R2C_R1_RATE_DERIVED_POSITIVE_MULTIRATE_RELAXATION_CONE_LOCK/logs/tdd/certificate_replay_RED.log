@@ -1,0 +1,47 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________________ test_infeasible_box_returns_farkas_certificate ________________
+
+    def test_infeasible_box_returns_farkas_certificate() -> None:
+        previous, target, bounds = synthetic_endpoints()
+        target["J_G1"] = np.array([20.0, 20.0])
+        target["J_G2a"] = np.array([20.0, 20.0])
+        target["C"] = np.array([1.0, 1.0])
+        problem = build_equilibrium_problem(
+            previous, target, bounds, dt_myr=10.0, macro_mass_cap=20.0, macro_volume_cap=20.0
+        )
+        result = solve_equilibrium_problem(problem)
+        assert not result["pass"]
+        certificate = result["farkas_certificate"]
+        assert certificate["pass"]
+        assert certificate["h_dot_y"] < 0.0
+>       coefficients = np.asarray(certificate["violated_row_coefficients"], dtype=float)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'violated_row_coefficients'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1_RATE_DERIVED_POSITIVE_MULTIRATE_RELAXATION_CONE_LOCK/tests/test_positive_multirate_cone.py:89: KeyError
+_________ test_active_set_nnls_kkt_certificate_closes_primal_dual_gap __________
+
+    def test_active_set_nnls_kkt_certificate_closes_primal_dual_gap() -> None:
+        # min x0+x1 subject to x0>=1/2 and 0<=x<=1.
+        A_ub = np.array([[-1.0, 0.0]])
+        b_ub = np.array([-0.5])
+        z = np.array([0.5, 0.0])
+        objective = np.ones(2)
+        slack = b_ub - A_ub @ z
+        cert = active_set_nnls_kkt_certificate(A_ub, b_ub, z, objective, slack)
+        assert cert["pass"]
+        assert cert["relative_stationarity_residual"] <= 1.0e-11
+        assert cert["relative_duality_gap"] <= 1.0e-11
+        assert cert["max_complementarity_residual"] <= 1.0e-11
+        assert math.isclose(cert["primal_objective"], 0.5, rel_tol=0.0, abs_tol=1.0e-14)
+        assert math.isclose(cert["dual_objective"], 0.5, rel_tol=0.0, abs_tol=1.0e-14)
+>       objective = np.asarray(cert["objective_vector"], dtype=float)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'objective_vector'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1_RATE_DERIVED_POSITIVE_MULTIRATE_RELAXATION_CONE_LOCK/tests/test_positive_multirate_cone.py:287: KeyError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1_RATE_DERIVED_POSITIVE_MULTIRATE_RELAXATION_CONE_LOCK/tests/test_positive_multirate_cone.py::test_infeasible_box_returns_farkas_certificate - KeyError: 'violated_row_coefficients'
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1_RATE_DERIVED_POSITIVE_MULTIRATE_RELAXATION_CONE_LOCK/tests/test_positive_multirate_cone.py::test_active_set_nnls_kkt_certificate_closes_primal_dual_gap - KeyError: 'objective_vector'
+2 failed, 11 deselected in 0.52s

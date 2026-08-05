@@ -208,16 +208,40 @@ def _farkas_certificate(A: np.ndarray, b: np.ndarray, labels: list[dict[str, Any
     if gaps[idx] < -1.0e-10:
         g = A[idx]
         weights = [1.0]
-        terms = [{"index": idx, "weight": 1.0, **labels[idx]}]
+        terms = [{
+            "index": idx,
+            "weight": 1.0,
+            "column": g.tolist(),
+            "rhs": float(b[idx]),
+            **labels[idx],
+        }]
         hdot = float(b[idx])
         for j, value in enumerate(g):
             if value > 0.0:
+                column = np.zeros(nvar, dtype=float)
+                column[j] = -1.0
                 weights.append(float(value))
-                terms.append({"index": int(A.shape[0] + j), "weight": float(value), "constraint": "LOWER_BOUND", "family": FAMILY_ORDER[j]})
+                terms.append({
+                    "index": int(A.shape[0] + j),
+                    "weight": float(value),
+                    "column": column.tolist(),
+                    "rhs": 0.0,
+                    "constraint": "LOWER_BOUND",
+                    "family": FAMILY_ORDER[j],
+                })
             elif value < 0.0:
+                column = np.zeros(nvar, dtype=float)
+                column[j] = 1.0
                 weights.append(float(-value))
                 hdot += float(-value)
-                terms.append({"index": int(A.shape[0] + nvar + j), "weight": float(-value), "constraint": "UPPER_BOUND", "family": FAMILY_ORDER[j]})
+                terms.append({
+                    "index": int(A.shape[0] + nvar + j),
+                    "weight": float(-value),
+                    "column": column.tolist(),
+                    "rhs": 1.0,
+                    "constraint": "UPPER_BOUND",
+                    "family": FAMILY_ORDER[j],
+                })
         norm = float(sum(weights))
         for term in terms:
             term["weight"] /= norm
@@ -229,6 +253,12 @@ def _farkas_certificate(A: np.ndarray, b: np.ndarray, labels: list[dict[str, Any
             "normalization_residual": 0.0,
             "active_term_count": len(terms),
             "active_terms": terms,
+            "violated_row_index": idx,
+            "violated_row_coefficients": g.tolist(),
+            "violated_row_rhs": float(b[idx]),
+            "violated_row_box_minimum": float(row_min[idx]),
+            "certificate_normalization": norm,
+            "unnormalized_h_dot_y": hdot,
             "violated_row_minimum_minus_rhs": float(row_min[idx] - b[idx]),
         }
     G = np.vstack([A, -np.eye(nvar), np.eye(nvar)])
@@ -250,7 +280,13 @@ def _farkas_certificate(A: np.ndarray, b: np.ndarray, labels: list[dict[str, Any
             label = {"constraint": "LOWER_BOUND", "family": FAMILY_ORDER[int(idx - len(labels))]}
         else:
             label = {"constraint": "UPPER_BOUND", "family": FAMILY_ORDER[int(idx - len(labels) - nvar)]}
-        terms.append({"index": int(idx), "weight": float(y[idx]), **label})
+        terms.append({
+            "index": int(idx),
+            "weight": float(y[idx]),
+            "column": G[int(idx)].tolist(),
+            "rhs": float(h[int(idx)]),
+            **label,
+        })
     return {
         "pass": bool(hdot < -1e-10 and residual <= 2e-9),
         "h_dot_y": hdot,
@@ -353,11 +389,39 @@ def active_set_nnls_kkt_certificate(
         max((float(np.max(term)) for term in complementarity_terms if term.size), default=0.0)
     )
     nonzero = np.flatnonzero(weights > 1.0e-14)
-    strongest = nonzero[np.argsort(weights[nonzero])[::-1][:200]] if nonzero.size else nonzero
-    terms = [
-        {**term_labels[int(index)], "weight": float(weights[int(index)])}
-        for index in strongest
-    ]
+    ordered_nonzero = (
+        nonzero[np.argsort(weights[nonzero])[::-1]] if nonzero.size else nonzero
+    )
+
+    def dual_term_payload(term_index: int) -> dict[str, Any]:
+        label = term_labels[int(term_index)]
+        term_type = str(label["type"])
+        source_index = int(label["index"])
+        if term_type == "INEQUALITY":
+            column = A[source_index]
+            rhs = float(b[source_index])
+            primal_slack = float(s[source_index])
+        elif term_type == "LOWER_BOUND":
+            column = np.zeros(x.size, dtype=float)
+            column[source_index] = -1.0
+            rhs = 0.0
+            primal_slack = float(x[source_index])
+        elif term_type == "UPPER_BOUND":
+            column = np.zeros(x.size, dtype=float)
+            column[source_index] = 1.0
+            rhs = 1.0
+            primal_slack = float(1.0 - x[source_index])
+        else:  # pragma: no cover - locked registry
+            raise AssertionError(f"unexpected dual term type {term_type}")
+        return {
+            **label,
+            "weight": float(weights[int(term_index)]),
+            "column": column.tolist(),
+            "rhs": rhs,
+            "primal_slack": primal_slack,
+        }
+
+    dual_terms = [dual_term_payload(int(index)) for index in ordered_nonzero]
     passed = bool(
         relative_stationarity <= 1.0e-11
         and relative_gap <= 1.0e-11
@@ -377,7 +441,10 @@ def active_set_nnls_kkt_certificate(
         "dual_objective": dual_objective,
         "relative_duality_gap": relative_gap,
         "max_complementarity_residual": max_complementarity,
-        "strongest_terms": terms,
+        "objective_vector": c.tolist(),
+        "primal_variables": x.tolist(),
+        "dual_terms": dual_terms,
+        "strongest_terms": dual_terms[:200],
     }
 
 

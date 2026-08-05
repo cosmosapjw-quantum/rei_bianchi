@@ -83,8 +83,24 @@ def test_infeasible_box_returns_farkas_certificate() -> None:
     )
     result = solve_equilibrium_problem(problem)
     assert not result["pass"]
-    assert result["farkas_certificate"]["pass"]
-    assert result["farkas_certificate"]["h_dot_y"] < 0.0
+    certificate = result["farkas_certificate"]
+    assert certificate["pass"]
+    assert certificate["h_dot_y"] < 0.0
+    coefficients = np.asarray(certificate["violated_row_coefficients"], dtype=float)
+    rhs = float(certificate["violated_row_rhs"])
+    row_minimum = float(np.sum(np.minimum(coefficients, 0.0)))
+    assert math.isclose(row_minimum, certificate["violated_row_box_minimum"], rel_tol=0.0, abs_tol=1.0e-14)
+    assert row_minimum - rhs > 1.0e-10
+    dual_column = sum(
+        float(term["weight"]) * np.asarray(term["column"], dtype=float)
+        for term in certificate["active_terms"]
+    )
+    dual_rhs = sum(
+        float(term["weight"]) * float(term["rhs"])
+        for term in certificate["active_terms"]
+    )
+    assert np.max(np.abs(dual_column)) <= 1.0e-14
+    assert math.isclose(dual_rhs, certificate["h_dot_y"], rel_tol=1.0e-13, abs_tol=1.0e-15)
 
 
 def test_interval_slack_certificate_passes_positive_exponential_sum() -> None:
@@ -268,3 +284,21 @@ def test_active_set_nnls_kkt_certificate_closes_primal_dual_gap() -> None:
     assert cert["max_complementarity_residual"] <= 1.0e-11
     assert math.isclose(cert["primal_objective"], 0.5, rel_tol=0.0, abs_tol=1.0e-14)
     assert math.isclose(cert["dual_objective"], 0.5, rel_tol=0.0, abs_tol=1.0e-14)
+    objective = np.asarray(cert["objective_vector"], dtype=float)
+    primal = np.asarray(cert["primal_variables"], dtype=float)
+    dual_terms = cert["dual_terms"]
+    stationarity = objective + sum(
+        float(term["weight"]) * np.asarray(term["column"], dtype=float)
+        for term in dual_terms
+    )
+    dual_objective = -sum(
+        float(term["weight"]) * float(term["rhs"])
+        for term in dual_terms
+    )
+    complementarity = max(
+        abs(float(term["weight"]) * (float(term["rhs"]) - np.dot(np.asarray(term["column"], dtype=float), primal)))
+        for term in dual_terms
+    )
+    assert np.max(np.abs(stationarity)) <= 1.0e-12
+    assert math.isclose(dual_objective, cert["dual_objective"], rel_tol=0.0, abs_tol=1.0e-14)
+    assert complementarity <= 1.0e-12
