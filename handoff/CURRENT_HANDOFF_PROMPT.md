@@ -22,8 +22,8 @@ Before science work:
 
 1. Read `PROJECT_STATE.json`, `docs/science/current_00_READ_FIRST.md`, `docs/provenance/DURABLE_STAGE_LEDGER.csv`, `external/rec_bianchi.lock.json`, and this file.
 2. Run `python scripts/verify_repo.py`.
-3. Run `scripts/update_rec_bianchi_lock.sh`; record the exact remote HEAD or an explicit unavailable status. Do not implement a recombination surrogate. Read `external/REC_BIANCHI_MONITORING_POLICY.md`; a changed remote SHA requires deliberate adapter/input-lock review.
-4. Verify every canonical artifact hash used by the next stage.
+3. Run `scripts/update_rec_bianchi_lock.sh`; record the exact native remote HEAD or an explicit unavailable status. Also query the authenticated connector when available. Do not implement a recombination surrogate. Read `external/REC_BIANCHI_MONITORING_POLICY.md`; a changed remote SHA requires deliberate adapter/input-lock review.
+4. Verify every canonical artifact and split logical-output hash used by the next stage.
 5. Create the next durable stage directory, input lock, stage state, receipts, manifest, and SHA256SUMS before calculation.
 
 Project objective:
@@ -33,40 +33,34 @@ Derive and implement the equations needed to extend homogeneous reionization and
 Current durable verdict:
 
 ```text
-P0.5-B2C2B0C-R2A-GLOBAL-MOMENT-CONSTRAINED-MACRO-SINK-DISTRIBUTION-LOCK
-DURABLE_PASS_R2A_CORE_MACRO_DISTRIBUTION_LOCK_TAU10_FEASIBILITY_WITNESS_R2B_AUTHORIZED
-R2B authorization: true
+P0.5-B2C2B0C-R2B-MOMENT-CONSTRAINED-NODE-LIFT-HISTORY-UPLOAD-RECOVERY-V2
+DURABLE_PASS_R2B_SCIENTIFIC_EQUIVALENCE_RECONSTRUCTED_GIT_DELIVERY_R2C_AUTHORIZED
+R2C relaxation-audit authorization: true
+Production node chemistry authorization: false
 B2C2B authorization: false
 ```
 
-R2A locked all 10 validated global reduced-DAE substeps over all three B2C2B0A shape priors. All 30 macro constrained-KL problems are strict-feasible identity projections with analytic zero-dual KKT certificates; 540 macro rows close the mass, opacity, current-Gamma, transfer, volume, and cycling gates. G2b/G3 effective-HI and primary HeII/G3 channels remain exact zero. R1 node diagnostics remain fail-closed and unpromoted.
+R2B lifted all 30 shape/substep cases and 540 macro states onto 1,382,400 fixed micro-node states and 2,764,800 active photon-group rows. Independent file-reloaded validation closed every macro/global mass, ionization, temperature, transfer, cycling-capacity, current-Gamma, opacity, KKT, ordering, physical-bound, exact-zero, and inherited finite-relaxation gate. The largest global opacity residual was `7.1603e-14`; no capacity violation exceeded the `1e-12` relative tolerance.
 
-Finite-relaxation auditor:
-
-- tau=10 Myr: 30/30 absolute and shape-only cases feasible;
-- tau=100 Myr: 12/30 absolute, 18/30 shape-only;
-- tau=300 Myr: 6/30 absolute, 12/30 shape-only.
-
-The 10 Myr result is an existence witness, not a calibrated timescale. The slow-lane failures must remain visible in R2B.
+The static lift is not a production chemistry history. Its maximum photon-prior TV distortions are `0.8948` (G1) and `0.9194` (G2a), so temporal realizability must be audited before any history is promoted. R1 diagnostic histories remain fail-closed. `rec_bianchi/main` is connector-locked at `0d24bf7fc6b2643f0bf5fd7f693a6ebc3889958d`; no adapter review or surrogate has started.
 
 Next exact execution instruction:
 
-@Web+Wolfram Stage `P0.5-B2C2B0C-R2B-MOMENT-CONSTRAINED-NODE-LIFT-HISTORY`를 실행해줘.
+# Authorized next stage — R2C constrained node-chemistry relaxation audit
 
-R2A의 `data/global_moment_lock.csv`, `data/macro_projection.csv`, `data/dual_kkt_certificates.jsonl`, `data/finite_relaxation_feasibility.csv`, exact-zero lock, B2C2B0A fixed macro/micro measure, B2C2B0C exact photon ledger를 정본으로 유지한다.
+Execute `P0.5-B2C2B0C-R2C-MOMENT-CONSTRAINED-NODE-CHEMISTRY-RELAXATION-AUDIT` from the R2B lock.
 
-1. 계산 전에 새 durable R2B directory, input lock, stage state, receipts, manifest와 SHA256SUMS를 생성해줘.
-2. 각 substep/shape lane에서 R2A의 macro `M_m`, `kappa_mg`, `J_mg`, mass-transfer moment와 global moments를 hard constraints로 잠가줘.
-3. B2C2B0A의 fixed micro-node weights를 conditional prior로 사용해 macro-to-node lift를 constrained KL/IPF 또는 동등한 convex operator로 계산해줘.
-4. 모든 node 합이 각 macro mass/opacity/current-Gamma/cycling constraints와 global photon/nuclei moments를 동시에 닫아야 한다.
-5. independently quasi-static cloud abundance를 풀거나 opacity로 node/macro mass를 재정의하지 마.
-6. infeasible하면 clipping하지 말고 macro/node dual certificate와 violated constraints를 저장해줘.
-7. 세 shape lane의 node-level KL/TV envelope를 모두 저장해줘.
-8. tau=10 Myr all-case witness는 유지하되 물리적 calibration으로 선언하지 마. tau=100/300 Myr failures는 sensitivity gates로 보존해줘.
-9. Wolfram으로 nested moment sums, KKT complementarity, current-Gamma relation과 exact-zero G3/HeII를 검증해줘. Native runtime이 없으면 `.wl`과 exact fallback을 남겨줘.
-10. 이번 R2B에서도 unresolved subtraction, front/Q_M, source/fesc, primordial recombination, Bianchi feedback을 시작하지 마.
+1. Create a new durable directory, input lock, stage state, receipts, manifest, and SHA256SUMS before calculation.
+2. Treat the R2B node distributions and all R2A macro/global moments as hard endpoint constraints; do not independently solve cloud abundance or derive mass from opacity.
+3. Test whether the large node-level photon redistribution is dynamically reachable using finite-relaxation chemistry lanes and timestep refinement. Preserve tau=10/100/300 Myr results separately.
+4. Require dt, dt/2, and dt/4 convergence of node mass/ionization/temperature/current moments before promoting any history.
+5. Record projection work, KL/TV drift, active capacity sets, photon and H/He nuclei ledgers, and dual certificates at every substep.
+6. Infeasible lanes must fail closed without clipping; tau=10 Myr remains an existence witness, not calibrated physics.
+7. Keep G2b/G3 effective-HI and primary HeII/G3 exact zeros unless a separately authorized species-support stage changes them.
+8. Do not begin unresolved subtraction, front/Q_M, source/fesc, recombination adapter/surrogate, CAMB transfer, or Bianchi feedback.
+9. `rec_bianchi/main` is locked at `0d24bf7fc6b2643f0bf5fd7f693a6ebc3889958d`; any use requires a deliberate adapter/input-lock review first.
 
-모든 macro와 global moments가 세 shape lane에서 닫히고 node-level dual/KKT gate가 통과한 뒤에만 후속 history/chemistry coupling 단계를 승인해줘.
+Only a convergent all-lane relaxation audit may authorize a production moment-constrained node chemistry history.
 
 Repository/update policy:
 
