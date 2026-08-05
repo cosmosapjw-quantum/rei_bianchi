@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 HERE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HERE / "src"))
@@ -21,6 +22,8 @@ from positive_multirate_cone import (  # noqa: E402
     two_mode_weight_for_attenuation,
 )
 
+
+from run_positive_multirate_cone import pass_statistics  # noqa: E402
 
 def synthetic_endpoints():
     previous = {
@@ -42,6 +45,18 @@ def synthetic_endpoints():
     bounds = {family: (0.05, 0.5) for family in FAMILY_ORDER}
     return previous, target, bounds
 
+
+
+def test_pass_statistics_distinguishes_macro_cases_from_complete_lanes() -> None:
+    results = pd.DataFrame({
+        "shape_lane": ["A", "A", "B", "B"],
+        "overall_pass": [True, False, True, True],
+    })
+    stats = pass_statistics(results, expected_lanes=("A", "B", "C"))
+    assert stats["macro_pass_count"] == 3
+    assert stats["whole_lane_pass_count"] == 1
+    assert stats["whole_lane_pass"] == {"A": False, "B": True, "C": False}
+    assert not stats["all_lanes_pass"]
 
 def test_equilibrium_lp_finds_macro_shared_rates() -> None:
     previous, target, bounds = synthetic_endpoints()

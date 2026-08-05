@@ -36,6 +36,35 @@ REFINEMENTS = (2, 4, 8)
 REL_TOL = 1.0e-11
 
 
+def pass_statistics(
+    results: pd.DataFrame,
+    *,
+    expected_lanes: tuple[str, ...] = SHAPE_LANES,
+) -> dict[str, Any]:
+    """Separate passing macro cases from fully passing shape lanes."""
+    required = {"shape_lane", "overall_pass"}
+    missing = required.difference(results.columns)
+    if missing:
+        raise ValueError(f"results missing required columns: {sorted(missing)}")
+    observed = (
+        results.assign(overall_pass=results["overall_pass"].astype(bool))
+        .groupby("shape_lane", sort=False)["overall_pass"]
+        .all()
+        .to_dict()
+    )
+    whole_lane_pass = {lane: bool(observed.get(lane, False)) for lane in expected_lanes}
+    macro_pass_count = int(results["overall_pass"].astype(bool).sum())
+    whole_lane_pass_count = int(sum(whole_lane_pass.values()))
+    return {
+        "macro_case_count": int(len(results)),
+        "macro_pass_count": macro_pass_count,
+        "failed_macro_cases": int(len(results) - macro_pass_count),
+        "whole_lane_pass": whole_lane_pass,
+        "whole_lane_pass_count": whole_lane_pass_count,
+        "all_lanes_pass": bool(whole_lane_pass and all(whole_lane_pass.values())),
+    }
+
+
 def to_builtin(value: Any) -> Any:
     if isinstance(value, np.ndarray): return value.tolist()
     if isinstance(value, np.generic): return value.item()
@@ -226,8 +255,55 @@ def main() -> int:
         print(f"completed lane {lane}",flush=True)
     results=pd.DataFrame(result_rows); rates_df=pd.DataFrame(rate_rows); ref_df=pd.DataFrame(refinement_rows); viol=pd.DataFrame(violation_rows); zeros=pd.DataFrame(zero_rows)
     results.to_csv(data_dir/'macro_case_results.csv',index=False,float_format='%.17e'); rates_df.to_csv(data_dir/'selected_rate_solutions.csv',index=False,float_format='%.17e'); ref_df.to_csv(data_dir/'refinement_audit.csv',index=False,float_format='%.17e'); viol.to_csv(data_dir/'violated_cases.csv',index=False,float_format='%.17e'); zeros.to_csv(data_dir/'exact_zero_audit.csv',index=False,float_format='%.17e')
-    pass_count=int(results.overall_pass.sum()); one_count=int((results.selected_model=='ONE_MODE').sum()); two_count=int((results.selected_model=='TWO_MODE').sum()); fail_count=len(results)-pass_count
-    summary={"classification":"R2C_R1_MULTIRATE_CONE_RESULT","generated_utc":dt.datetime.now(dt.timezone.utc).isoformat(),"macro_case_count":len(results),"all_lane_pass_count":pass_count,"failed_macro_cases":fail_count,"one_mode_selected":one_count,"two_mode_selected":two_count,"two_mode_tested":int(results.two_mode_tested.sum()),"lp_feasible":int(results.lp_pass.sum()),"refinement_pass":int(results.refinement_pass.sum()),"all_cases_pass":bool(pass_count==len(results)),"R2C_R2_authorized":bool(pass_count==len(results)),"B2C2B_authorized":False,"production_node_chemistry_authorized":False,"node_rate_fitting_used":False,"clipping_used":False,"KL_projection_used_during_dynamics":False,"max_endpoint_relative_residual":float(results.max_endpoint_relative_residual.max()),"max_current_Gamma_relative_residual":float(results.max_current_Gamma_relative_residual.max()),"max_lp_absolute_stationarity":float(results.lp_max_stationarity.max()),"max_lp_relative_stationarity":float(results.lp_max_relative_stationarity.max()),"max_lp_complementarity":float(results.lp_max_complementarity.max()),"minimum_refinement_order":float(np.nanmin(np.concatenate([results.refinement_order_2_to_4.to_numpy(float),results.refinement_order_4_to_8.to_numpy(float)]))) if pass_count else math.nan,"exact_zero_rows":len(zeros),"elapsed_s":time.time()-started}
+    pass_stats = pass_statistics(results)
+    pass_count = int(pass_stats["macro_pass_count"])
+    one_count = int((results.selected_model == "ONE_MODE").sum())
+    two_count = int((results.selected_model == "TWO_MODE").sum())
+    all_cases_pass = bool(pass_count == len(results))
+    summary = {
+        "classification": "R2C_R1_MULTIRATE_CONE_RESULT",
+        "generated_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "macro_case_count": int(len(results)),
+        "macro_case_pass_count": pass_count,
+        "all_lane_pass_count": int(pass_stats["whole_lane_pass_count"]),
+        "whole_lane_pass": pass_stats["whole_lane_pass"],
+        "all_lanes_pass": bool(pass_stats["all_lanes_pass"]),
+        "failed_macro_cases": int(pass_stats["failed_macro_cases"]),
+        "one_mode_selected": one_count,
+        "two_mode_selected": two_count,
+        "two_mode_tested": int(results.two_mode_tested.sum()),
+        "analytic_trajectory_pass": int((results.selected_model != "NONE").sum()),
+        "lp_feasible": int(results.lp_pass.sum()),
+        "equilibrium_infeasible": int((~results.lp_pass.astype(bool)).sum()),
+        "refinement_pass": int(results.refinement_pass.sum()),
+        "refinement_failed_after_trajectory": int(
+            ((results.selected_model != "NONE") & (~results.refinement_pass.astype(bool))).sum()
+        ),
+        "all_cases_pass": all_cases_pass,
+        "R2C_R2_authorized": all_cases_pass,
+        "B2C2B_authorized": False,
+        "production_node_chemistry_authorized": False,
+        "node_rate_fitting_used": False,
+        "clipping_used": False,
+        "KL_projection_used_during_dynamics": False,
+        "max_endpoint_relative_residual": float(results.max_endpoint_relative_residual.max()),
+        "max_current_Gamma_relative_residual": float(results.max_current_Gamma_relative_residual.max()),
+        "max_lp_absolute_stationarity": float(results.lp_max_stationarity.max()),
+        "max_lp_relative_stationarity": float(results.lp_max_relative_stationarity.max()),
+        "max_lp_complementarity": float(results.lp_max_complementarity.max()),
+        "minimum_refinement_order": float(
+            np.nanmin(
+                np.concatenate(
+                    [
+                        results.refinement_order_2_to_4.to_numpy(float),
+                        results.refinement_order_4_to_8.to_numpy(float),
+                    ]
+                )
+            )
+        ) if pass_count else math.nan,
+        "exact_zero_rows": int(len(zeros)),
+        "elapsed_s": time.time() - started,
+    }
     (data_dir/'summary.json').write_text(json.dumps(to_builtin(summary),indent=2)+'\n')
     print(json.dumps(to_builtin(summary),indent=2)); return 0
 
