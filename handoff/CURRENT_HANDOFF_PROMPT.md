@@ -24,101 +24,131 @@ Before science work:
 
 1. Read `PROJECT_STATE.json`, `docs/science/current_00_READ_FIRST.md`,
    `docs/provenance/DURABLE_STAGE_LEDGER.csv`, `external/rec_bianchi.lock.json`,
-   and this file.
-2. Run `python scripts/verify_repo.py`.
-3. Run `scripts/update_rec_bianchi_lock.sh`; record the exact native remote
-   HEAD or an explicit unavailable status. Also query the authenticated
-   connector when available. Do not implement a recombination surrogate. Read
-   `external/REC_BIANCHI_MONITORING_POLICY.md`; a changed remote SHA requires
-   deliberate adapter/input-lock review.
+   this file, and the latest stage `00_READ_FIRST.md`.
+2. Run `python scripts/verify_repo.py` and verify the latest stage
+   `SHA256SUMS`.
+3. Run `scripts/update_rec_bianchi_lock.sh`; record an exact remote SHA or
+   explicit unavailable status. Query the authenticated GitHub connector when
+   exposed. Read `external/REC_BIANCHI_MONITORING_POLICY.md`. A changed SHA
+   requires deliberate adapter/input-lock review; never implement a
+   recombination surrogate.
 4. Verify every canonical artifact and logical-output hash used by the next
    stage.
 5. Create the next durable stage directory, input lock, stage state, receipts,
-   manifest, and SHA256SUMS before calculation.
+   manifest, and `SHA256SUMS` before calculation.
 
 Project objective:
 
 Derive and implement the equations needed to extend homogeneous reionization
 and CAMB-level CMB transfer to all 11 Bianchi types with nonlinear large shear
 and finite tilt, using tetrad and 1+3 formalisms. Metric signature is
-`(-,+,+,+)`, epsilon_123=+1, and c, hbar, k_B remain explicit unless a stage
-declares otherwise.
+`(-,+,+,+)`, `epsilon_123=+1`, and `c`, `hbar`, `k_B` remain explicit unless a
+stage declares otherwise.
 
 Current durable verdict:
 
 ```text
-P0.5-B2C2B0C-R2C-MOMENT-CONSTRAINED-NODE-CHEMISTRY-RELAXATION-AUDIT
-DURABLE_FAIL_CLOSED_R2C_CONSTANT_EQUILIBRIUM_RELAXATION_NOT_ALL_LANES_REACHABLE
+P0.5-B2C2B0C-R2C-R1-RATE-DERIVED-POSITIVE-MULTIRATE-RELAXATION-CONE-LOCK
+DURABLE_FAIL_CLOSED_R2C_R1_MACRO_SHARED_COMMON_EQUILIBRIUM_MULTIRATE_CONE_NOT_ALL_LANES_REACHABLE
 Production node chemistry authorization: false
+R2C-R2 authorization: false
 B2C2B authorization: false
-R2C-R1 model-adequacy authorization: true
+R2C-R1A preflight authorization: true
 ```
 
-R2C audited 90 shape/tau/substep cases and 1,620 macro equilibria. After a
-macro-local initial KL projection put the constructed z=6 boundary inside the
-node capacity cone without changing macro G1/G2a totals, all equilibrium-
-feasible cases converged under dt, dt/2, and dt/4. Feasible/convergent counts
-were 18/30, 10/30, and 6/30 for tau=10, 100, and 300 Myr. At tau=10 Myr, all
-12 failures were node cycling-capacity deficits; one SCRIPT case also had nine
-negative inferred photon currents. Thus the R2A tau=10 global/macro witness
-does not survive the node-level gate.
+R2C-R1 froze 3,240 rate-interval rows before feasibility. It tested 540 macro
+cases. Forty-three equilibrium boxes were feasible, all 43 had certified
+analytic paths, and 27 passed the complete refinement gate; no shape lane
+passed all 180 cases. The 497 equilibrium no-go cases have self-contained and
+independently replayed Farkas certificates: 209 cycling-capacity, 125 G1,
+157 G2a, and six macro-mass-cap rows. Maximum replayed KKT relative
+stationarity was `2.03e-16`; endpoint and current-Gamma residuals were
+`5.71e-17` and `9.14e-16`; 540 structural-zero rows remained exact. No node
+rate fitting, clipping, dynamic KL repair, or inter-macro moment transport was
+used.
 
-The largest projection column residual was `4.57e-16`, relative capacity
-violation `3.13e-17`, KKT stationarity `2.22e-16`, current-Gamma residual
-`1.95e-16`, and H/He nuclei residuals were exactly zero. No clipping was used.
-Native Wolfram was unavailable; the included `.wl` script and independent
-SymPy/90-digit Decimal fallback passed. `rec_bianchi/main` remains connector-
-locked at `0d24bf7fc6b2643f0bf5fd7f693a6ebc3889958d`; no adapter review or
-surrogate has started.
+The mode-count theorem in the stage proves that adding more positive
+exponential modes cannot enlarge the endpoint equilibrium box while the same
+common equilibrium and locked rate interval are retained. The result is
+conditional on macro-shared rates. Deterministic node-local rates derived from
+local density, temperature, opacity, current, and transfer fields remain an
+open, simpler alternative and must be tested before a coupled generator is
+introduced.
+
+Native Wolfram and the requested special-function plugin were not exposed in
+the R2C-R1 runtime. The executable `.wl` script and independent SymPy,
+90-digit Decimal, and 100-digit mpmath fallback passed; no plugin execution is
+claimed. The final native Git read probes for both private repositories failed
+because `github.com` DNS resolution was unavailable. The last connector-known
+`rec_bianchi/main` SHA is `0d24bf7fc6b2643f0bf5fd7f693a6ebc3889958d`, not a
+fresh R2C-R1 verification. No push was attempted; the owner performs the local
+push.
 
 Next exact execution instruction:
 
-# R2C-R1 rate-derived positive multirate relaxation-cone lock
+# R2C-R1A node-local physics-derived rate-field cone preflight
 
 Execute
-`P0.5-B2C2B0C-R2C-R1-RATE-DERIVED-POSITIVE-MULTIRATE-RELAXATION-CONE-LOCK`.
+`P0.5-B2C2B0C-R2C-R1A-NODE-LOCAL-PHYSICS-DERIVED-RATE-FIELD-CONE-PREFLIGHT`.
 
-1. Create the durable R2C-R1 directory, input lock, stage state, receipts,
-   manifest and SHA256SUMS before calculation.
-2. Keep all R2A macro/global endpoints, R2B node support/endpoints, R2C
-   initialization projection, exact ledgers, and fail-closed certificates
-   canonical. This is a model-adequacy preflight, not a production history.
-3. Define positive, separately auditable rate families for `M`, `I`, `U`, `C`,
-   and `J_g`. Do not fit an unconstrained independent rate to every node.
-4. Derive admissible rate intervals from reduced-DAE secants and available
-   photoionization/recombination/heating/cooling/cycling terms. Unidentified
-   rates remain interval nuisance parameters, not calibrated physics.
-5. Test a one-mode positive kernel first. Only after a locked failure may a
-   bounded two-mode completely monotone mixture be tested. Prelock all rate
-   bounds and mode counts.
-6. Require the analytic trajectory to remain inside the full mass,
-   ionization, thermal, current, macro mass/volume, and node capacity cone.
-   Check analytic extrema or a prelocked certified collocation rule.
-7. Preserve macro/group/global endpoint moments exactly. KL projection is an
-   algebraic cone operator with KKT certificates only; no clipping, cloud-mass
-   inversion, or moment transport between macros.
-8. Store primal feasibility, dual/Farkas certificates, rate-identifiability
-   intervals, active sets, kernel weights, KL/TV work, and exact photon/H/He
-   ledgers for all three priors.
-9. Prelock absolute/relative integration tolerances and use at least dt/2,
-   dt/4, dt/8 for candidates passing the analytic cone gate.
-10. Keep G2b/G3 effective-HI and primary HeII/G3 exact zero. Do not begin
-    unresolved subtraction, front/Q_M, source/fesc, primordial recombination
-    adapter/surrogate, CAMB transfer, or Bianchi feedback.
+1. Create the durable R2C-R1A directory, input lock, stage state, receipts,
+   manifest, and `SHA256SUMS` before calculation.
+2. Keep every R2A/R2B/R2C endpoint, projection, photon/H/He ledger, and every
+   R2C-R1 rate/Farkas/KKT/trajectory certificate canonical. Do not widen a rate
+   bound from `dual_single_bound_extension_diagnostic.csv`; it is
+   non-authorizing.
+3. Derive node-local positive rate evidence from explicit local physical
+   fields at both inherited endpoints: gross mass transfer for `M`; local
+   photoionization/recombination/collisional/transfer activity for `I`; local
+   heating/cooling/expansion/thermal transfer for `U`; and
+   `c(1+z) kappa_ig/Mpc` plus explicit group-boundary/source terms for `J_g`.
+   Derive `C` only from an independent local cycling/recombination law. If no
+   such law exists, mark `UNIDENTIFIABLE_REQUIRED_RATE` rather than insert a
+   nuisance value.
+4. Node dependence must be deterministic from physical inputs. Do not optimize
+   an unconstrained independent rate per node. Any uncertainty scaling must use
+   a small predeclared macro-shared hyperparameter vector whose bounds are
+   locked before cone feasibility.
+5. Audit tiny-support tails without discarding them. Record zero-support,
+   floor-sensitive, finite, and unidentifiable rows separately. Keep all units
+   explicit until the final `Myr^-1` conversion.
+6. Commit the node-local rate-field lock before examining feasibility. Its
+   weighted macro reduction must reproduce inherited macro process evidence
+   within a prelocked tolerance or fail closed.
+7. Test one-mode endpoint/equilibrium and analytic cone feasibility with the
+   fixed local field or macro-shared hyperparameters. Do not add another mode;
+   R2C-R1 showed that mode count is not the first missing freedom.
+8. Preserve macro/group/global endpoint moments, current-Gamma, H/He nuclei,
+   mass/volume caps, and `J_G1+J_G2a<=C`. No clipping, cloud-mass inversion,
+   dynamic KL repair, or inter-macro transport.
+9. Emit self-contained KKT/Farkas certificates and Wolfram checks of local-rate
+   formulas, dimensions, endpoint identities, and exact zeros. If Wolfram is
+   unavailable, retain the `.wl` script and independent high-precision
+   fallback.
+10. Do not start production node chemistry, unresolved subtraction, front/Q_M,
+    source/fesc calibration, primordial recombination adapter/surrogate, CAMB
+    transfer, or Bianchi feedback.
 
-Only an all-lane positive-kernel cone pass may authorize a later R2C-R2
-rate-derived node-chemistry history. Otherwise preserve the no-go with a dual
-certificate identifying the missing physical degree of freedom.
+Decision rule:
+
+- all-lane deterministic local-rate pass: authorize a bounded finite-history
+  audit;
+- identifiable local-rate failure in coupled current/capacity or mass cones:
+  authorize a separately prelocked Metzler-generator stage in
+  `q_gamma=(C-J_G1-J_G2a,J_G1,J_G2a)` and `q_M=(M,M_cap-M)`;
+- unidentifiable required local rate: fail closed and report the missing
+  physical source/operator term, without fitting a surrogate.
 
 Repository/update policy:
 
-- Save every accepted or fail-closed stage under `stages/` or as a compact
-  bundle under `artifacts/compact/`.
+- Save every accepted or fail-closed stage under `stages/` and/or
+  `artifacts/compact/`.
 - Update `PROJECT_STATE.json`, this handoff, the artifact registry, and durable
-  ledger in the same commit.
+  ledger in the same durable-stage commit.
 - Commit each durable stage and tag major locks.
-- Never claim a push unless `git ls-remote origin` and `git push` succeed and
-  the remote commit SHA is recorded.
-- Preserve failed attempts separately; never overwrite them with later success.
+- Never claim a push unless `git push` and subsequent `git ls-remote` both
+  succeed and the remote SHA is recorded.
+- Preserve failed attempts separately; never overwrite them with later
+  success.
 
 ---

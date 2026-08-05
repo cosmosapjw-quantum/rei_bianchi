@@ -1,0 +1,83 @@
+{
+  "classification": "PRESERVED_FAILED_ATTEMPT",
+  "attempt": "ATTEMPT_1_TWO_MODE_BOUND_ROUNDOFF_ABORT",
+  "recorded_utc": "2026-08-05T15:50:40.170752+00:00",
+  "exit_status": 1,
+  "observed_error": "ValueError: rates must satisfy 0<lower<=effective<=upper",
+  "failure_location": "two_mode_weight_for_attenuation during first macro case",
+  "initial_evidence": {
+    "shape_lane": "LOCAL_NEUTRAL_HAZARD_PRIMARY",
+    "interval_index": 0,
+    "substep": 1,
+    "macro_index": 0,
+    "C_selected_rate_Myr_inv": 2.0190570664605385,
+    "C_locked_upper_Myr_inv": 2.01905706438181,
+    "absolute_excess_Myr_inv": 2.078728300824561e-09,
+    "lp_z_C": 0.0,
+    "lp_a_C": 1.0000000013439572
+  },
+  "fix_applied": true,
+  "files": [
+    {
+      "path": "dual_farkas_kkt_certificates.jsonl",
+      "size_bytes": 19998,
+      "sha256": "93447f7902d302e66d82df78bc3a3a3cdcf616277d88e3864c3845438c0ea494"
+    },
+    {
+      "path": "full_run.stdout.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "full_run.time.stderr.log",
+      "size_bytes": 2315,
+      "sha256": "d1d5382eb33cb75c2ccdb326673b580470a7586e6fc02989b04bbfe76159c338"
+    },
+    {
+      "path": "positive_multirate_cone.py",
+      "size_bytes": 15285,
+      "sha256": "fbee121226709093151713f8bde35f4510a59c52942cfb18a64a9bfcbe5c9c29"
+    },
+    {
+      "path": "run_positive_multirate_cone.py",
+      "size_bytes": 17154,
+      "sha256": "3ff00b2629144353847262afdc6491eb036141a24fcc1ff766f913d7fb49e057"
+    },
+    {
+      "path": "trajectory_certificates.jsonl",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "uncommitted_diff.patch",
+      "size_bytes": 2444,
+      "sha256": "bce363c1d021ff77cd316bd8e66cec2e02ce9c3ee30385bccc1f4cff5ebc7593"
+    }
+  ],
+  "root_cause_status": "VERIFIED",
+  "root_causes": [
+    "Rows were normalized by the largest full attenuation-box coefficient. Very wide weak-rate boxes therefore converted a physically significant cycling-capacity violation into a normalized residual below the HiGHS feasibility tolerance.",
+    "The floating a-to-k inversion lost boundary precision when a-1 was of order 1e-9, making an exact z=0 upper-bound solution appear 2.08e-9 Myr^-1 above the locked C-rate upper bound.",
+    "SciPy linprog marginals were inserted with the wrong sign in the stationarity equation; the correct relation is c-A^T*m_ineq-m_lower-m_upper=0."
+  ],
+  "fix_policy": [
+    "Scale inequalities by their start/end physical state, while retaining z in [0,1] and the prelocked normalized-equilibrium objective.",
+    "Preserve exact locked rates at active z=0 or z=1 boundaries; use LP attenuation inverse directly for endpoint equilibrium and two-mode weights.",
+    "Correct KKT marginal signs and require physical-scaled primal and KKT gates.",
+    "No clipping, no bound expansion, no node-rate fitting, and no change to locked rate intervals."
+  ],
+  "verification": {
+    "red_test_log": "logs/tdd_regression_red.stdout.log",
+    "red_failures": 3,
+    "green_test_log": "logs/tdd_regression_green.stdout.log",
+    "green_tests_passed": 14,
+    "first_case_postfix": {
+      "physical_scaled_primal_slack": -4.52589354882349e-15,
+      "kkt_stationarity_residual": 0.0,
+      "kkt_complementarity_residual": 0.0,
+      "locked_rate_box_pass": true,
+      "selected_C_z": 0.0072464019132768105
+    }
+  },
+  "updated_utc": "2026-08-05T15:59:50.275965+00:00"
+}

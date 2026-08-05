@@ -1,20 +1,29 @@
-# R2C finite-relaxation audit — current durable science state
+# R2C-R1 macro-shared multirate cone lock — current durable science state
 
 Current stage:
 
 ```text
-P0.5-B2C2B0C-R2C-MOMENT-CONSTRAINED-NODE-CHEMISTRY-RELAXATION-AUDIT
-DURABLE_FAIL_CLOSED_R2C_CONSTANT_EQUILIBRIUM_RELAXATION_NOT_ALL_LANES_REACHABLE
+P0.5-B2C2B0C-R2C-R1-RATE-DERIVED-POSITIVE-MULTIRATE-RELAXATION-CONE-LOCK
+DURABLE_FAIL_CLOSED_R2C_R1_MACRO_SHARED_COMMON_EQUILIBRIUM_MULTIRATE_CONE_NOT_ALL_LANES_REACHABLE
 ```
 
-The R2B static node lift remains a valid constrained endpoint lock, but it is
-not a production chemistry history. After a macro-local initial current KL
-projection removed a boundary-only capacity inconsistency, every physically
-feasible case converged under `dt`, `dt/2`, and `dt/4`. The one-rate,
-one-constant-equilibrium model was feasible in only 18/30, 10/30, and 6/30
-cases for tau=10, 100, and 300 Myr. The remaining obstruction is physical-cone
-extrapolation, dominated at tau=10 Myr by node cycling-capacity deficits.
+R2C-R1 froze 3,240 macro-shared physical/nuisance rate intervals before
+feasibility and tested 540 macro cases over all three shape priors and ten
+reduced-DAE substeps. Only 43 equilibrium boxes were feasible. All 43 obtained
+an analytically certified one- or two-mode path, but only 27 passed the full
+`dt/2,dt/4,dt/8` gate and no shape lane passed all 180 macro cases. The other
+497 cases have independently replayed Farkas certificates: 209 cycling, 125
+G1-current, 157 G2a-current, and six macro-mass-cap no-go rows.
 
-Production node chemistry and B2C2B are unauthorized. The next authorized
-work is the rate-derived positive multirate relaxation-cone model-adequacy
-lock; it must not generate a production history.
+Adding more positive exponential modes cannot repair those 497 failures while
+the same common equilibrium and rate box are retained; mode count changes
+interior path shape, not the endpoint equilibrium box. This is not a no-go for
+deterministic node-local physical rate fields or a coupled/non-autonomous
+positive operator.
+
+Production node chemistry, R2C-R2, and B2C2B remain unauthorized. The next
+bounded stage is
+`P0.5-B2C2B0C-R2C-R1A-NODE-LOCAL-PHYSICS-DERIVED-RATE-FIELD-CONE-PREFLIGHT`.
+It must derive node dependence from explicit local physics rather than fit one
+free rate per node, and it must not widen R2C-R1 bounds from the post-result
+dual diagnostic.

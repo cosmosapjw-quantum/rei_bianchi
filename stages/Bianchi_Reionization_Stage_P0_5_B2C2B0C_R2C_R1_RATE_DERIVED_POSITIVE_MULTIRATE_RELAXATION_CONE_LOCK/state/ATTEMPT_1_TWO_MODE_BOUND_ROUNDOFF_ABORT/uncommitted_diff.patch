@@ -1,0 +1,43 @@
+diff --git a/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1_RATE_DERIVED_POSITIVE_MULTIRATE_RELAXATION_CONE_LOCK/src/positive_multirate_cone.py b/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1_RATE_DERIVED_POSITIVE_MULTIRATE_RELAXATION_CONE_LOCK/src/positive_multirate_cone.py
+index 152e2ef..dcc821c 100644
+--- a/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1_RATE_DERIVED_POSITIVE_MULTIRATE_RELAXATION_CONE_LOCK/src/positive_multirate_cone.py
++++ b/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1_RATE_DERIVED_POSITIVE_MULTIRATE_RELAXATION_CONE_LOCK/src/positive_multirate_cone.py
+@@ -134,6 +134,38 @@ def build_equilibrium_problem(
+ 
+ def _farkas_certificate(A: np.ndarray, b: np.ndarray, labels: list[dict[str, Any]]) -> dict[str, Any]:
+     nvar = A.shape[1]
++    # First seek an exact single-row/box certificate.  For z in [0,1],
++    # min(A_i z)=sum_{A_ij<0} A_ij.  If this exceeds b_i, the row plus
++    # the corresponding bound inequalities is already a Farkas ray.
++    row_min = np.sum(np.minimum(A, 0.0), axis=1)
++    gaps = b - row_min
++    idx = int(np.argmin(gaps))
++    if gaps[idx] < -1.0e-10:
++        g = A[idx]
++        weights = [1.0]
++        terms = [{"index": idx, "weight": 1.0, **labels[idx]}]
++        hdot = float(b[idx])
++        for j, value in enumerate(g):
++            if value > 0.0:
++                weights.append(float(value))
++                terms.append({"index": int(A.shape[0] + j), "weight": float(value), "constraint": "LOWER_BOUND", "family": FAMILY_ORDER[j]})
++            elif value < 0.0:
++                weights.append(float(-value))
++                hdot += float(-value)
++                terms.append({"index": int(A.shape[0] + nvar + j), "weight": float(-value), "constraint": "UPPER_BOUND", "family": FAMILY_ORDER[j]})
++        norm = float(sum(weights))
++        for term in terms:
++            term["weight"] /= norm
++        return {
++            "pass": True,
++            "type": "SINGLE_ROW_BOX_FARKAS",
++            "h_dot_y": hdot / norm,
++            "dual_residual_inf": 0.0,
++            "normalization_residual": 0.0,
++            "active_term_count": len(terms),
++            "active_terms": terms,
++            "violated_row_minimum_minus_rhs": float(row_min[idx] - b[idx]),
++        }
+     G = np.vstack([A, -np.eye(nvar), np.eye(nvar)])
+     h = np.concatenate([b, np.zeros(nvar), np.ones(nvar)])
+     Aeq = np.vstack([G.T, np.ones(G.shape[0])])
