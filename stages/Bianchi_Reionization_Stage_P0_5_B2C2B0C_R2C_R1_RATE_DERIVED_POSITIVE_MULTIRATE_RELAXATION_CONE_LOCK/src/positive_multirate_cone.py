@@ -6,7 +6,7 @@ import math
 from typing import Any, Mapping
 
 import numpy as np
-from scipy.optimize import linprog
+from scipy.optimize import linprog, nnls
 
 from rate_interval_model import family_attenuation_inverse
 
@@ -279,6 +279,108 @@ def relative_kkt_stationarity_residual(
     return float(np.max(np.abs(stationarity) / scale))
 
 
+def active_set_nnls_kkt_certificate(
+    A_ub: Any,
+    b_ub: Any,
+    z: Any,
+    objective: Any,
+    slack: Any,
+    *,
+    active_tolerance: float = 1.0e-10,
+    bound_tolerance: float = 8.0 * np.finfo(float).eps,
+) -> dict[str, Any]:
+    """Construct an independent nonnegative active-set KKT certificate.
+
+    The primal has ``A_ub z <= b_ub`` and ``0 <= z <= 1``.  Active
+    inequality, lower-bound, and upper-bound columns are assembled in the
+    stationarity cone and solved with nonnegative least squares after
+    componentwise row scaling.  This avoids accepting inaccurate HiGHS
+    marginals while preserving the prelocked primal solution and objective.
+    """
+    A = np.asarray(A_ub, dtype=float)
+    b = np.asarray(b_ub, dtype=float)
+    x = np.asarray(z, dtype=float)
+    c = np.asarray(objective, dtype=float)
+    s = np.asarray(slack, dtype=float)
+    if A.ndim != 2 or b.shape != (A.shape[0],) or x.shape != (A.shape[1],) or c.shape != x.shape or s.shape != b.shape:
+        raise ValueError("invalid KKT certificate shapes")
+    active = np.flatnonzero(s <= float(active_tolerance))
+    lower = np.flatnonzero(x <= float(bound_tolerance))
+    upper = np.flatnonzero((1.0 - x) <= float(bound_tolerance))
+    parts: list[np.ndarray] = [A[active].T]
+    term_labels: list[dict[str, Any]] = [
+        {"type": "INEQUALITY", "index": int(index)} for index in active
+    ]
+    for index in lower:
+        column = np.zeros((x.size, 1), dtype=float)
+        column[int(index), 0] = -1.0
+        parts.append(column)
+        term_labels.append({"type": "LOWER_BOUND", "index": int(index)})
+    for index in upper:
+        column = np.zeros((x.size, 1), dtype=float)
+        column[int(index), 0] = 1.0
+        parts.append(column)
+        term_labels.append({"type": "UPPER_BOUND", "index": int(index)})
+    B = np.concatenate(parts, axis=1)
+    row_scale = np.maximum(1.0, np.max(np.abs(B), axis=1))
+    scaled_B = B / row_scale[:, None]
+    scaled_rhs = -c / row_scale
+    weights, scaled_residual_norm = nnls(
+        scaled_B,
+        scaled_rhs,
+        maxiter=max(10_000, 10 * B.shape[1]),
+    )
+    stationarity = c + B @ weights
+    stationarity_scale = np.maximum(1.0, np.abs(c) + np.abs(B) @ weights)
+    relative_stationarity = float(np.max(np.abs(stationarity) / stationarity_scale))
+    n_ineq = active.size
+    n_lower = lower.size
+    mu = weights[:n_ineq]
+    lam = weights[n_ineq:n_ineq + n_lower]
+    nu = weights[n_ineq + n_lower:]
+    primal_objective = float(c @ x)
+    dual_objective = float(-b[active] @ mu - np.sum(nu))
+    relative_gap = float(
+        abs(primal_objective - dual_objective)
+        / max(1.0, abs(primal_objective), abs(dual_objective))
+    )
+    complementarity_terms = [
+        np.abs(mu * s[active]),
+        np.abs(lam * x[lower]),
+        np.abs(nu * (1.0 - x[upper])),
+    ]
+    max_complementarity = float(
+        max((float(np.max(term)) for term in complementarity_terms if term.size), default=0.0)
+    )
+    nonzero = np.flatnonzero(weights > 1.0e-14)
+    strongest = nonzero[np.argsort(weights[nonzero])[::-1][:200]] if nonzero.size else nonzero
+    terms = [
+        {**term_labels[int(index)], "weight": float(weights[int(index)])}
+        for index in strongest
+    ]
+    passed = bool(
+        relative_stationarity <= 1.0e-11
+        and relative_gap <= 1.0e-11
+        and max_complementarity <= 1.0e-11
+    )
+    return {
+        "pass": passed,
+        "method": "ACTIVE_SET_NNLS",
+        "active_inequality_count": int(active.size),
+        "active_lower_bound_count": int(lower.size),
+        "active_upper_bound_count": int(upper.size),
+        "nonzero_dual_term_count": int(nonzero.size),
+        "scaled_nnls_residual_norm": float(scaled_residual_norm),
+        "absolute_stationarity_residual": float(np.max(np.abs(stationarity))),
+        "relative_stationarity_residual": relative_stationarity,
+        "primal_objective": primal_objective,
+        "dual_objective": dual_objective,
+        "relative_duality_gap": relative_gap,
+        "max_complementarity_residual": max_complementarity,
+        "strongest_terms": terms,
+    }
+
+
 def one_mode_equilibrium(
     previous: Mapping[str, Any],
     target: Mapping[str, Any],
@@ -355,12 +457,17 @@ def solve_equilibrium_problem(problem: EquilibriumProblem) -> dict[str, Any]:
     comp_upper = y_upper * (z - 1.0)
     active_rows = np.flatnonzero(slack <= 1e-11)
     max_stationarity = float(np.max(np.abs(stationarity)))
-    max_relative_stationarity = relative_kkt_stationarity_residual(
+    highs_relative_stationarity = relative_kkt_stationarity_residual(
         c, inequality_marginal_term, y_lower, y_upper
     )
-    max_complementarity = float(max(np.max(np.abs(comp_ineq)), np.max(np.abs(comp_lower)), np.max(np.abs(comp_upper))))
+    highs_complementarity = float(max(np.max(np.abs(comp_ineq)), np.max(np.abs(comp_lower)), np.max(np.abs(comp_upper))))
+    independent_dual = active_set_nnls_kkt_certificate(
+        problem.A_ub, problem.b_ub, z, c, slack
+    )
+    max_relative_stationarity = float(independent_dual["relative_stationarity_residual"])
+    max_complementarity = float(independent_dual["max_complementarity_residual"])
     primal_pass = bool(np.min(slack) >= -1e-11)
-    kkt_pass = bool(max_relative_stationarity <= 1e-11 and max_complementarity <= 1e-11)
+    kkt_pass = bool(independent_dual["pass"])
     return {
         "pass": bool(primal_pass and kkt_pass),
         "solver_status": int(result.status),
@@ -375,8 +482,11 @@ def solve_equilibrium_problem(problem: EquilibriumProblem) -> dict[str, Any]:
         "primal_gate_pass": primal_pass,
         "kkt_gate_pass": kkt_pass,
         "max_stationarity_residual": max_stationarity,
+        "highs_marginal_relative_stationarity_residual": highs_relative_stationarity,
+        "highs_marginal_complementarity_residual": highs_complementarity,
         "max_relative_stationarity_residual": max_relative_stationarity,
         "max_complementarity_residual": max_complementarity,
+        "active_set_dual_certificate": independent_dual,
         "active_constraint_count": int(active_rows.size),
         "active_constraints": [problem.labels[int(i)] for i in active_rows[:200]],
         "equilibrium_checks": eq_checks,

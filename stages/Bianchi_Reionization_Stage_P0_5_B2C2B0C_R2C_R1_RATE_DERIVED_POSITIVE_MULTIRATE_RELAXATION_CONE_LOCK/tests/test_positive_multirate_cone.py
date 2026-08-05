@@ -11,6 +11,7 @@ sys.path.insert(0, str(HERE / "src"))
 
 from positive_multirate_cone import (  # noqa: E402
     FAMILY_ORDER,
+    active_set_nnls_kkt_certificate,
     build_equilibrium_problem,
     certify_exponential_slack,
     one_mode_equilibrium,
@@ -200,3 +201,19 @@ def test_relative_kkt_stationarity_accepts_large_dual_cancellation() -> None:
         c, inequality_term, lower_marginal, upper_marginal
     )
     assert residual <= 1.0e-11
+
+
+def test_active_set_nnls_kkt_certificate_closes_primal_dual_gap() -> None:
+    # min x0+x1 subject to x0>=1/2 and 0<=x<=1.
+    A_ub = np.array([[-1.0, 0.0]])
+    b_ub = np.array([-0.5])
+    z = np.array([0.5, 0.0])
+    objective = np.ones(2)
+    slack = b_ub - A_ub @ z
+    cert = active_set_nnls_kkt_certificate(A_ub, b_ub, z, objective, slack)
+    assert cert["pass"]
+    assert cert["relative_stationarity_residual"] <= 1.0e-11
+    assert cert["relative_duality_gap"] <= 1.0e-11
+    assert cert["max_complementarity_residual"] <= 1.0e-11
+    assert math.isclose(cert["primal_objective"], 0.5, rel_tol=0.0, abs_tol=1.0e-14)
+    assert math.isclose(cert["dual_objective"], 0.5, rel_tol=0.0, abs_tol=1.0e-14)
