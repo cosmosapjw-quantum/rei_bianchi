@@ -1,29 +1,47 @@
-# R2C-R1 macro-shared multirate cone lock — current durable science state
+# R2C-R1A state–flux–budget reclassification — current durable science state
 
 Current stage:
 
 ```text
-P0.5-B2C2B0C-R2C-R1-RATE-DERIVED-POSITIVE-MULTIRATE-RELAXATION-CONE-LOCK
-DURABLE_FAIL_CLOSED_R2C_R1_MACRO_SHARED_COMMON_EQUILIBRIUM_MULTIRATE_CONE_NOT_ALL_LANES_REACHABLE
+P0.5-B2C2B0C-R2C-R1A-NODE-LOCAL-PHYSICS-DERIVED-RATE-FIELD-CONE-PREFLIGHT
+DURABLE_PASS_R2C_R1A_STATE_FLUX_BUDGET_RECLASSIFICATION_RESOLVES_FARKAS_BLOCKER_R1B_AUTHORIZED
 ```
 
-R2C-R1 froze 3,240 macro-shared physical/nuisance rate intervals before
-feasibility and tested 540 macro cases over all three shape priors and ten
-reduced-DAE substeps. Only 43 equilibrium boxes were feasible. All 43 obtained
-an analytically certified one- or two-mode path, but only 27 passed the full
-`dt/2,dt/4,dt/8` gate and no shape lane passed all 180 macro cases. The other
-497 cases have independently replayed Farkas certificates: 209 cycling, 125
-G1-current, 157 G2a-current, and six macro-mass-cap no-go rows.
+R2C-R1A resolves the previous 497-certificate blocker narrowly but
+decisively. The certificates remain valid against the rejected macro-shared
+common-equilibrium surrogate; they are not no-go theorems for physical node
+histories.
 
-Adding more positive exponential modes cannot repair those 497 failures while
-the same common equilibrium and rate box are retained; mode count changes
-interior path shape, not the endpoint equilibrium box. This is not a no-go for
-deterministic node-local physical rate fields or a coupled/non-autonomous
-positive operator.
+The corrected taxonomy is:
 
-Production node chemistry, R2C-R2, and B2C2B remain unauthorized. The next
-bounded stage is
-`P0.5-B2C2B0C-R2C-R1A-NODE-LOCAL-PHYSICS-DERIVED-RATE-FIELD-CONE-PREFLIGHT`.
-It must derive node dependence from explicit local physics rather than fit one
-free rate per node, and it must not widen R2C-R1 bounds from the post-result
-dual diagnostic.
+- material states: `M=N_HI+N_HII`, `N_HI`, `N_HII`, and a separately audited
+  thermal variable;
+- algebraic radiation/reaction fluxes: `J_g`, `Gamma_g`, `kappa_g`, `Phi_g`;
+- interval budget, not state:
+  `C_Delta t=N_HI,start/Delta t+R_rec,average`;
+- conservation law: absorbed photons close through the cumulative neutral-H
+  ledger rather than the artificial pointwise cone `sum_g J_g<=C(t)`.
+
+The full audit covered 1,382,400 node states,
+2,764,800 active group rows, and 540
+macro cases. Endpoint state/sign/finiteness failures were zero; the maximum
+current–Gamma and locked-moment residuals were
+`9.143e-16` and
+`3.541e-14`. All
+540 endpoint pairs lie in a convex state/mass-cap
+segment, including the six former mass-cap Farkas cases.
+
+This is not a production-history pass. The interior radiation forcing,
+cumulative photon ledger, and genuine thermal equation remain unconstructed.
+Production node chemistry, R2C-R2, and B2C2B remain unauthorized.
+
+Next stage:
+
+```text
+P0.5-B2C2B0C-R2C-R1B-PHOTON-CONSERVING-CUMULATIVE-BUDGET-NONAUTONOMOUS-RT-FORCING-LOCK
+```
+
+R2C-R1B must remove `C` from the state vector, build a prelocked
+photon-conserving nonautonomous RT/chemistry fixed point, close node/macro/global
+photon and H/He ledgers under `dt,dt/2,dt/4,dt/8`, and retain a stricter
+optical-depth-dependent thermal gate.

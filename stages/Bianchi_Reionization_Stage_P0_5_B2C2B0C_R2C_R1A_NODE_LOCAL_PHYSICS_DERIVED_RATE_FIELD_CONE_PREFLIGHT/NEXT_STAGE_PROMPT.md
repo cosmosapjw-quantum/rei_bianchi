@@ -1,34 +1,3 @@
-# CURRENT HANDOFF PROMPT — rei_bianchi
-
-The private repository is the sole durable source. Do not inherit
-transcript-only numerical claims.
-
-Canonical repository:
-
-```text
-https://github.com/cosmosapjw-quantum/rei_bianchi
-```
-
-External primordial-recombination repository:
-
-```text
-https://github.com/cosmosapjw-quantum/rec_bianchi
-```
-
-Current durable state:
-
-```text
-P0.5-B2C2B0C-R2C-R1A-NODE-LOCAL-PHYSICS-DERIVED-RATE-FIELD-CONE-PREFLIGHT
-DURABLE_PASS_R2C_R1A_STATE_FLUX_BUDGET_RECLASSIFICATION_RESOLVES_FARKAS_BLOCKER_R1B_AUTHORIZED
-```
-
-R2C-R1A established that the previous 497 Farkas certificates reject the old
-common-equilibrium surrogate, not the corrected material-state and cumulative
-photon-ledger problem. It did not promote any interior chemistry or thermal
-history.
-
----
-
 # Exact next-stage instruction — R2C-R1B
 
 @Web+Wolfram Treat this as a durable continuation of the private
