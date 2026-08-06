@@ -1,47 +1,43 @@
-# R2C-R1A state–flux–budget reclassification — current durable science state
+# R2C-R1B forcing-identifiability audit — current durable science state
 
 Current stage:
 
 ```text
-P0.5-B2C2B0C-R2C-R1A-NODE-LOCAL-PHYSICS-DERIVED-RATE-FIELD-CONE-PREFLIGHT
-DURABLE_PASS_R2C_R1A_STATE_FLUX_BUDGET_RECLASSIFICATION_RESOLVES_FARKAS_BLOCKER_R1B_AUTHORIZED
+P0.5-B2C2B0C-R2C-R1B-PHOTON-CONSERVING-CUMULATIVE-BUDGET-NONAUTONOMOUS-RT-FORCING-LOCK
+DURABLE_FAIL_CLOSED_R2C_R1B_ENDPOINT_AND_GLOBAL_LEDGER_DO_NOT_IDENTIFY_NODE_GROUP_FORCING_DYNAMIC_OPACITY_OR_THERMAL_HISTORY
 ```
 
-R2C-R1A resolves the previous 497-certificate blocker narrowly but
-decisively. The certificates remain valid against the rejected macro-shared
-common-equilibrium surrogate; they are not no-go theorems for physical node
-histories.
+R2C-R1B did not find a physical or numerical inconsistency. It found that the
+currently durable inputs do not identify the operator that a production
+photon-conserving history would need.
 
-The corrected taxonomy is:
+- The global direct ledger is interval averaged and global.
+- The R2A sink current is only `0.43616--0.54641` of global G1+G2a absorption.
+- R2B node currents/opacities are endpoint projections; `kappa=J/Phi` is not a
+  state-derived dynamic-opacity law.
+- Endpoint-plus-integral histories have a positive temporal null family.
+- Even a pointwise macro/group total has a positive node-partition null family.
+- At `N=46080`, `K=8`, the latter nullity is `276474` per group/case.
+- The primary `E^-2.5` spectrum is locked, but thin/thick absorbed-energy
+  moments change the global atomic-HI heating auditor by `14.75--18.60%`.
 
-- material states: `M=N_HI+N_HII`, `N_HI`, `N_HII`, and a separately audited
-  thermal variable;
-- algebraic radiation/reaction fluxes: `J_g`, `Gamma_g`, `kappa_g`, `Phi_g`;
-- interval budget, not state:
-  `C_Delta t=N_HI,start/Delta t+R_rec,average`;
-- conservation law: absorbed photons close through the cumulative neutral-H
-  ledger rather than the artificial pointwise cone `sum_g J_g<=C(t)`.
+The all-row endpoint audit remains clean: 1,382,400 state rows and 2,764,800
+group rows have zero sign/cone failures, and `J=kappa Phi` closes to
+`9.14e-16`. Global photon bookkeeping remains canonical. No production
+history was integrated or promoted.
 
-The full audit covered 1,382,400 node states,
-2,764,800 active group rows, and 540
-macro cases. Endpoint state/sign/finiteness failures were zero; the maximum
-current–Gamma and locked-moment residuals were
-`9.143e-16` and
-`3.541e-14`. All
-540 endpoint pairs lie in a convex state/mass-cap
-segment, including the six former mass-cap Farkas cases.
+Authorization remains narrow:
 
-This is not a production-history pass. The interior radiation forcing,
-cumulative photon ledger, and genuine thermal equation remain unconstructed.
-Production node chemistry, R2C-R2, and B2C2B remain unauthorized.
+- `R2C_R1B_R1_authorized = true`;
+- production node chemistry, `R2C_R2`, and `B2C2B` remain false.
 
 Next stage:
 
 ```text
-P0.5-B2C2B0C-R2C-R1B-PHOTON-CONSERVING-CUMULATIVE-BUDGET-NONAUTONOMOUS-RT-FORCING-LOCK
+P0.5-B2C2B0C-R2C-R1B-R1-CANONICAL-TIME-RESOLVED-GROUP-BOUNDARY-FLUX-DYNAMIC-OPACITY-AND-HEATING-MOMENT-EXTRACTION-LOCK
 ```
 
-R2C-R1B must remove `C` from the state vector, build a prelocked
-photon-conserving nonautonomous RT/chemistry fixed point, close node/macro/global
-photon and H/He ledgers under `dt,dt/2,dt/4,dt/8`, and retain a stricter
-optical-depth-dependent thermal gate.
+It must extract and lock time-resolved group boundary/source forcing, a
+state-derived dynamic-opacity/optical-depth operator, a canonical partition,
+and optical-depth-dependent heating moments before any nonautonomous fixed
+point is attempted.
