@@ -78,3 +78,11 @@ Repository policy:
 - do not push from this runtime; the user will push locally;
 - never report a remote push without a successful `git push` and subsequent
   `git ls-remote` verification.
+
+## R1B-R1 upload-recovery notice (2026-08-06T10:44:44Z)
+
+The subsequent R1B-R1 run lost its incremental bundle and Git objects during
+upload-status processing. Only two Markdown documents survived. The reported
+R1B-R1 numerical pass is therefore transcript-only and has not superseded this
+R1B durable state. See `stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R1_UPLOAD_RECOVERY/00_READ_FIRST.md`. The exact
+R1B-R1 stage must be rerun before R1B-R2 authorization.
