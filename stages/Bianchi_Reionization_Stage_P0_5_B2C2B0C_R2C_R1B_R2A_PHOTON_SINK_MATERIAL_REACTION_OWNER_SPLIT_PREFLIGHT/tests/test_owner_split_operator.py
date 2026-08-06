@@ -77,3 +77,28 @@ def test_node_disintegration_is_nonnegative_and_conservative():
     assert np.all(q >= 0)
     assert q[2] == 0.0
     assert q.sum() == pytest.approx(7.0, abs=1e-14)
+
+
+def test_conditional_component_normalization_uses_authoritative_total_without_changing_ratios():
+    raw = {
+        "EFFECTIVE_HI_SUBGRID": 8.0,
+        "EXPLICIT_HI_ATOMIC": 1.0,
+        "EXPLICIT_HEI_ATOMIC": 1.0,
+        "EXPLICIT_HEII_ATOMIC": 0.0,
+    }
+    conditioned = module.condition_component_opacities(
+        authoritative_total_kappa=12.0,
+        raw_component_kappa=raw,
+    )
+    assert sum(conditioned.values()) == pytest.approx(12.0, rel=0, abs=1e-14)
+    assert conditioned["EFFECTIVE_HI_SUBGRID"] / conditioned["EXPLICIT_HI_ATOMIC"] == pytest.approx(8.0)
+    assert conditioned["EXPLICIT_HEI_ATOMIC"] / conditioned["EXPLICIT_HI_ATOMIC"] == pytest.approx(1.0)
+    assert conditioned["EXPLICIT_HEII_ATOMIC"] == 0.0
+
+
+def test_conditional_component_normalization_rejects_nonzero_target_on_zero_support():
+    with pytest.raises(ValueError, match="zero raw component support"):
+        module.condition_component_opacities(
+            authoritative_total_kappa=1.0,
+            raw_component_kappa={name: 0.0 for name in module.COMPONENT_OWNER},
+        )

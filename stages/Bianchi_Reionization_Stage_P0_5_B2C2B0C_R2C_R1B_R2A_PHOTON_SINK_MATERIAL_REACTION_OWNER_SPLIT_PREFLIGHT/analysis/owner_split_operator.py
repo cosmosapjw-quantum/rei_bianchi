@@ -66,6 +66,41 @@ def resolved_source_coefficients(component: str) -> dict[str, int]:
     return dict(SOURCE_COEFFICIENTS[component])
 
 
+def condition_component_opacities(
+    *,
+    authoritative_total_kappa: float,
+    raw_component_kappa: Mapping[str, float],
+) -> dict[str, float]:
+    """Condition component ratios onto the authoritative group opacity.
+
+    The raw component model is used only as a non-negative competing-hazard
+    measure.  Its overall amplitude is not allowed to override the canonical
+    time-resolved total opacity.  Structural zero support is preserved exactly.
+    """
+    total = float(authoritative_total_kappa)
+    if not math.isfinite(total) or total < 0.0:
+        raise ValueError("authoritative total opacity must be finite and nonnegative")
+    unknown = set(raw_component_kappa) - set(COMPONENT_OWNER)
+    if unknown:
+        raise KeyError(f"unknown components: {sorted(unknown)}")
+    raw = {name: float(raw_component_kappa.get(name, 0.0)) for name in COMPONENT_OWNER}
+    if any((not math.isfinite(value)) or value < 0.0 for value in raw.values()):
+        raise ValueError("raw component opacity must be finite and nonnegative")
+    support = math.fsum(raw.values())
+    if support == 0.0:
+        if total != 0.0:
+            raise ValueError("nonzero authoritative total on zero raw component support")
+        return {name: 0.0 for name in COMPONENT_OWNER}
+    if total == 0.0:
+        return {name: 0.0 for name in COMPONENT_OWNER}
+
+    conditioned = {name: total * value / support for name, value in raw.items()}
+    positive = [name for name, value in raw.items() if value > 0.0]
+    last = positive[-1]
+    conditioned[last] += total - math.fsum(conditioned.values())
+    return conditioned
+
+
 def split_group_by_owner(
     *,
     total_kappa: float,
