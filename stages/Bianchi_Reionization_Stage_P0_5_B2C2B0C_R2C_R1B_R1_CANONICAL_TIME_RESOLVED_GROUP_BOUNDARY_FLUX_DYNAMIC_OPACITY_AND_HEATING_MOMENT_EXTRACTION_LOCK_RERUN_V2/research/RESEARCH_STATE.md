@@ -1,5 +1,3 @@
 # Research state
 
-Phase: research contract complete; pre-calculation lock closed.
-
-Active hypotheses: H1/H2/H3 from RESEARCH_CONTRACT.md.
+Phase: closeout. H1 selected with bounded caveats. Verdict: `DURABLE_PASS_R2C_R1B_R1_CANONICAL_BDF_DENSE_FORCING_STATE_DERIVED_CONDITIONAL_OPACITY_AND_BDF_CALIBRATED_HEATING_LOCK_R1B_R2_AUTHORIZED`.

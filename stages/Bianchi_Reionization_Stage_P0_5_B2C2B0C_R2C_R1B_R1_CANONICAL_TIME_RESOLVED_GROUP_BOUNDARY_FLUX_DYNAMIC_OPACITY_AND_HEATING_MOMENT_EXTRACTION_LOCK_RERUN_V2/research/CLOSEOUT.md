@@ -1,3 +1,3 @@
 # Closeout
 
-Pending.
+H1 selected. `DURABLE_PASS_R2C_R1B_R1_CANONICAL_BDF_DENSE_FORCING_STATE_DERIVED_CONDITIONAL_OPACITY_AND_BDF_CALIBRATED_HEATING_LOCK_R1B_R2_AUTHORIZED`. R1B-R2 authorized; all broader production authorizations remain false.

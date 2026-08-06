@@ -1,5 +1,10 @@
 # Negative results
 
-No calculation has started. Failed attempts will be appended without overwriting.
-
-- `ATTEMPT_PRECALC_COMMIT_MISSING_GIT_IDENTITY`: initial pre-calculation commit was blocked because the recovered bundle did not carry local Git author configuration. No science calculation had started; the repository-local identity was restored from the last durable recovery commit and the lock was recommitted.
+- Precalculation commit initially lacked Git identity; no calculation had started.
+- Naive compact-tree SHA verification misclassified intentionally omitted nested members; all present members matched.
+- The first BDF replay hit a thermal helper import boundary after producing replay tables; no result from that attempt was promoted.
+- Direct Vandermonde inversion is ill-conditioned/singular at N=33 and was rejected.
+- The foreground dynamic-opacity run exceeded the tool limit; the monitored identical run completed.
+- The first Wolfram symbolic call used an invalid symbolic array dimension and was rejected.
+- N=9 fails both dense and nested gates.
+- The inherited photon ledger misses the 1e-10 engineering target.
