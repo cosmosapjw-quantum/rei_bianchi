@@ -1,2 +1,7 @@
 # Decision log
-- 2026-08-06T23:13:50Z: `REOPEN` at the smallest owner-split preflight; do not rerun the invalid monolithic update.
+
+- Preserve canonical total opacity/current; use component reconstruction only for conditional owner fractions.
+- Treat `EFFECTIVE_HI_SUBGRID` as photon removal with exact zero resolved material/thermal source.
+- Terminate rejected comparison trajectories at the first capacity failure.
+- Retain historical shape priors as auditors, not selectable production lanes.
+- Promote only the owner-split preflight; defer chemistry and thermal histories.

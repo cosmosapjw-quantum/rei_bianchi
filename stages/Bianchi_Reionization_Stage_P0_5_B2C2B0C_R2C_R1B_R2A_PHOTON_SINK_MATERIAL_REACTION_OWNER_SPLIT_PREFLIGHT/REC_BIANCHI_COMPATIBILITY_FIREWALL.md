@@ -1,7 +1,15 @@
 # rec_bianchi compatibility firewall
 
-Read-only head: `5fb7aec1cf1cfcd65e40ffeb097c8c1237cfe19c`. PR-04 is closed at the source-conditioned split-domain operator-contract level and PR-05A begins typed state/feedback and one-owner replacement work.
+Final read-only head: `c3d246ca9911b392da8c955ee0cf9a90073f7317`.
 
-Imported semantics only: one owner per term; pure representation crossing has zero atomic source; no compressed term is removed before an explicit replacement appears in the same residual and ledger.
+The external recombination project is at **PR-05B2 / v0.60**, where the source-identical causal characteristic-history block passes and PR-05B3 is next. Its current architecture locks immutable accepted history, transaction-safe append/reject/rollback/restart, fixed-stencil analytic JVP, photon-number conservation per H, redshift-energy work, and zero atom source for free characteristic propagation.
 
-No recombination history, rates, native radiation state, adapter, or surrogate is imported.
+Imported semantics only:
+
+- exactly one owner for every term; zero or duplicate owners fail closed;
+- proposed/rejected steps do not mutate accepted history;
+- a discrete stencil/owner switch is an event requiring localization/restart;
+- pure representation/characteristic transport has zero atom source;
+- no canonical term is removed before its replacement residual, JVP, ledger, and rollback contract close together.
+
+Not imported: recombination rates, accepted history bytes, native radiation state, atomic populations, scalar `Dfplus` feedback, interface packets, adapters, or any recombination surrogate. The reionization owner split remains numerically independent. A deliberate adapter/input-lock review is still required before any primordial-to-reionization/CMB splice claim.
