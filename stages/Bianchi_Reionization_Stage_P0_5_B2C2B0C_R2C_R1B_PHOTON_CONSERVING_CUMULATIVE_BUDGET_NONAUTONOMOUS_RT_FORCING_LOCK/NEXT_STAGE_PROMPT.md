@@ -1,56 +1,3 @@
-# CURRENT HANDOFF PROMPT — rei_bianchi
-
-The private repository is the sole durable source. Do not inherit
-transcript-only numerical claims.
-
-Canonical repository:
-
-```text
-https://github.com/cosmosapjw-quantum/rei_bianchi
-```
-
-External primordial-recombination repository:
-
-```text
-https://github.com/cosmosapjw-quantum/rec_bianchi
-```
-
-Before science work, read `PROJECT_STATE.json`,
-`docs/science/current_00_READ_FIRST.md`,
-`docs/provenance/DURABLE_STAGE_LEDGER.csv`,
-`external/rec_bianchi.lock.json`,
-`external/REC_BIANCHI_MONITORING_POLICY.md`, and this file; run
-`python scripts/verify_repo.py`; update the read-only remote receipts; and
-create the next durable input lock before calculation.
-
-Current durable state:
-
-```text
-P0.5-B2C2B0C-R2C-R1B-PHOTON-CONSERVING-CUMULATIVE-BUDGET-NONAUTONOMOUS-RT-FORCING-LOCK
-DURABLE_FAIL_CLOSED_R2C_R1B_ENDPOINT_AND_GLOBAL_LEDGER_DO_NOT_IDENTIFY_NODE_GROUP_FORCING_DYNAMIC_OPACITY_OR_THERMAL_HISTORY
-```
-
-R2C-R1B is a constructive input-identifiability fail-closed result. It does
-not revoke endpoint feasibility or global photon conservation and does not
-prove that a physical history is absent. It forbids promotion of an arbitrary
-endpoint interpolation, node partition, endpoint `J/Phi` opacity, or thermal
-prior.
-
-Current connector-verified remote heads at the stage lock:
-
-```text
-rei_bianchi/main = 8be5775371f0b1b403a460efd47091ccf975b0d0
-rec_bianchi/main = ad316eb60878ff6c92e5f2326b539ad850c62dc9
-```
-
-The `rec_bianchi` SHA changed. Record it, but do not start or claim a
-primordial-recombination adapter/input-lock review without a separate
-deliberate stage. No recombination surrogate is allowed.
-
----
-
-# Exact next-stage instruction
-
 @Web+Wolfram Stage P0.5-B2C2B0C-R2C-R1B-R1-CANONICAL-TIME-RESOLVED-GROUP-BOUNDARY-FLUX-DYNAMIC-OPACITY-AND-HEATING-MOMENT-EXTRACTION-LOCK를 실행해줘.
 
 R1A의 state/flux/budget taxonomy와 R1B의 constructive identifiability no-go를 정본으로 유지한다. 현재 endpoint interpolation이나 node-wise fitting으로 production history를 만들지 마.
@@ -67,14 +14,3 @@ R1A의 state/flux/budget taxonomy와 R1B의 constructive identifiability no-go�
 10. 이번 R1B-R1에서는 production node chemistry integration, unresolved subtraction, front/Q_M, source/fesc calibration, primordial recombination adapter/surrogate, CAMB transfer, Bianchi feedback을 시작하지 마.
 
 Time-resolved forcing, dynamic opacity, canonical partition, and thermal moment locks가 모두 닫힌 뒤에만 R1B-R2 PHOTON-CONSERVING NONAUTONOMOUS FIXED-POINT HISTORY를 승인해줘.
-
-
-Repository policy:
-
-- preserve every failed attempt separately;
-- update project state, read-first, handoff, artifact registry, and durable
-  ledger in the same durable commit;
-- tag the major lock;
-- do not push from this runtime; the user will push locally;
-- never report a remote push without a successful `git push` and subsequent
-  `git ls-remote` verification.

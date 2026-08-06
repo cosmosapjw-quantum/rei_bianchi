@@ -1,17 +1,41 @@
-# Hypothesis graph — R2C-R1B (precalculation)
+# Hypothesis graph — R2C-R1B
 
-## H1 — identifiable endpoint-anchored forcing
+## H1: identifiable endpoint-anchored forcing
 
-Requires endpoint and ledger constraints to remove all positive interior null modes without node-wise fitted coefficients.
+**Prediction:** endpoints plus global ledger and a predeclared interpolation
+select a unique node/group forcing.
 
-## H2 — chemistry identified, thermal underidentified
+**Discriminator:** exact rank and constructive positive null family.
 
-Requires a unique photon-count allocation to node/group histories, while energy-weighted absorption remains unconstrained.
+**Decision:** REJECT.  Temporal nullity is nonzero and actual positive
+witnesses preserve endpoints and integrals.
 
-## H3 — RT and thermal histories both underidentified
+## H2: chemistry forcing identifiable, thermal underidentified
 
-Predicts nonzero nullity and constructive positive histories with equal endpoint/global observables but different local absorbed counts or heating.
+**Prediction:** photon/ionization forcing is fixed even if energy deposition is
+not.
 
-## H4 — immediate coupled radiation-state enlargement
+**Discriminator:** global-to-sink and macro-to-node partition plus dynamic
+opacity audit.
 
-Held unless a fully specified nonautonomous algebraic forcing is first shown inadequate rather than merely unidentified.
+**Decision:** REJECT.  The global ledger is not a sink/node boundary condition,
+and node forcing has a large exact null space.  Thermal closure is also
+underidentified.
+
+## H3: node/group RT and thermal histories both underidentified
+
+**Prediction:** currently locked constraints admit positive null families and
+lack a dynamic opacity/heating input.
+
+**Discriminator:** constructive witnesses, source inspection, thin/thick
+energy audit.
+
+**Decision:** PROMOTE.  All discriminators pass.
+
+## H4: immediate larger coupled radiation-state generator
+
+**Prediction:** no nonautonomous algebraic-forcing closure can work even after
+canonical input extraction.
+
+**Decision:** HOLD / NOT AUTHORIZED.  Current evidence proves missing
+identification, not failure of a fully specified nonautonomous closure.
