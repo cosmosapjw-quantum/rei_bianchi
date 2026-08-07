@@ -6,3 +6,5 @@
 - SUNDIALS ARKODE documentation. Independent design reference for implicit nonlinear solvers and temporal root finding.
 
 No external source supplies numerical state, rate, history, or fitted closure to this stage.
+
+- `rec_bianchi` PR-05C1/v0.62 (`ee54cb44838409f021d6c5fdb502450a11779ec4`), read-only semantic compatibility review. Used only for full-versus-two-half trial acceptance, immutable rejected attempts, event rollback, and exactly-once endpoint commit semantics. No numerical recombination input was imported.

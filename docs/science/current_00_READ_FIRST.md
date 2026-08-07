@@ -13,4 +13,4 @@ An internal interval/256 microstep converged to residual `4.9730886075849412e-11
 
 Next stage: `P0.5-B2C2B0C-R2C-R1B-R2B-R2A-ADAPTIVE-INTERNAL-MICROSTEP-ACCEPTANCE-AND-GLOBALIZATION-LOCK`. Production node chemistry, R2C-R2, B2C2B, recombination splice, CAMB and Bianchi feedback remain unauthorized.
 
-`rec_bianchi/main` is connector-verified at PR-05B3/v0.61 (`796eabf6339b9a13355ccc61907a5314b9cd9196`). Only XOR ownership and accepted-step/rollback semantics are referenced; no numerical recombination input is imported.
+`rec_bianchi/main` is connector-verified at PR-05C1/v0.62 (`ee54cb44838409f021d6c5fdb502450a11779ec4`). Its one-full/two-half adaptive trial contract, immutable rejection/event rollback and exactly-once macro-endpoint commit were deliberately reviewed and are compatible with the next adaptive stage. Only semantics are referenced; no numerical recombination input is imported and adapter/splice review remains blocked.

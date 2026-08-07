@@ -35,3 +35,8 @@ The same first interval with an internal subdivision of 256 (`dt=0.0790423403 My
 ## Next blocker
 
 The missing object is a predeclared adaptive internal-microstep/globalization policy that can bisect rejected slabs, enforce local error and fixed-point gates, commit accepted states exactly once, and stop at a locked minimum step without relaxing the hard nodewise residual.
+
+
+## Final rec_bianchi compatibility review
+
+At final delivery close, `rec_bianchi/main` advanced from `796eabf6339b9a13355ccc61907a5314b9cd9196` to `ee54cb44838409f021d6c5fdb502450a11779ec4` (`PR-05C1/v0.62`). Its canonical-macro controller uses one full backward-Euler trial and two half trials, requires every trial to pass its own gates, leaves accepted history unchanged on rejection or event rollback, and commits exactly once at a successful macro endpoint. Those transaction and acceptance semantics are compatible with the authorized R2B-R2A stage and sharpen its contract. No recombination rate, state, history, adapter, splice, or surrogate was imported, and the present fail-closed verdict is unchanged. See `receipts/REC_BIANCHI_V062_COMPATIBILITY_REVIEW.json`.
