@@ -10,6 +10,19 @@ workspace was recreated from the durable R1B-R2A pass
 (`47df6c5d`, tag `checkpoint-b2c2b0c-r2c-r1b-r2a-owner-split-pass`) and the
 input lock regenerated from files present at `e11dcb56`.
 
+This determination is **independently corroborated upstream**.
+`R1B_R2B_INTERRUPTION_RECOVERY.zip`, delivered after the rebuild, records a
+runtime-interruption sweep targeting `d60c7f7` and `47df6c5d` that returned
+`candidate_count: 0`, `candidates: []`, `selected_repo: null`. Two independent
+searches agree the workspace does not exist. The archive is preserved verbatim
+in `receipts/upstream_interruption_recovery/`; see
+`receipts/CASE_C_CORROBORATION.md`.
+
+It follows that no competing upstream R1B-R2B implementation exists: the
+upstream run was interrupted before producing one, `main` carries no R1B-R2B
+stage directory, and no other remote branch holds one. This stage merges into
+`origin/main` with no conflict.
+
 The implementation below was authored in-session under RED–GREEN, not produced
 by the upstream research pipeline. It is offered for external cross-validation,
 not as an independently validated result.
