@@ -6,8 +6,8 @@ _____________ test_initial_state_uses_exact_direct_history_z6_row ______________
 >       state = build()
                 ^^^^^^^
 
-stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:29: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:29:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:25: in build
     return load_module().build_initial_material_state(r1_root=R1, r2a_root=R2A)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -24,7 +24,7 @@ stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /opt/pyvenv/lib/python3.13/site-packages/pandas/io/parsers/readers.py:1880: in _make_engine
     self.handles = get_handle(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 path_or_buf = PosixPath('/tmp/rei_bianchi_r2b_followup/worktree/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R1_CANONICAL_TIME_RE...Y_FLUX_DYNAMIC_OPACITY_AND_HEATING_MOMENT_EXTRACTION_LOCK_RERUN_V2/data/bdf_replay/canonical_bdf_replayed_history.csv')
 mode = 'r'
@@ -43,7 +43,7 @@ mode = 'r'
     ) -> IOHandles[str] | IOHandles[bytes]:
         """
         Get file handle for given path/buffer and mode.
-    
+
         Parameters
         ----------
         path_or_buf : str or file handle
@@ -53,16 +53,16 @@ mode = 'r'
         encoding : str or None
             Encoding to use.
         {compression_options}
-    
+
                May be a dict with key 'method' as compression mode
                and other keys as compression options if compression
                mode is 'zip'.
-    
+
                Passing compression options as keys in dict is
                supported for compression modes 'gzip', 'bz2', 'zstd' and 'zip'.
-    
+
             .. versionchanged:: 1.4.0 Zstandard support.
-    
+
         memory_map : bool, default False
             See parsers._parser_params for more information. Only used by read_csv.
         is_text : bool, default True
@@ -75,23 +75,23 @@ mode = 'r'
             of options.
         storage_options: StorageOptions = None
             Passed to _get_filepath_or_buffer
-    
+
         Returns the dataclass IOHandles
         """
         # Windows does not default to utf-8. Set to utf-8 for a consistent behavior
         encoding = encoding or "utf-8"
-    
+
         errors = errors or "strict"
-    
+
         # read_csv does not know whether the buffer is opened in binary/text mode
         if _is_binary_mode(path_or_buf, mode) and "b" not in mode:
             mode += "b"
-    
+
         # validate encoding and errors
         codecs.lookup(encoding)
         if isinstance(errors, str):
             codecs.lookup_error(errors)
-    
+
         # open URLs
         ioargs = _get_filepath_or_buffer(
             path_or_buf,
@@ -100,22 +100,22 @@ mode = 'r'
             mode=mode,
             storage_options=storage_options,
         )
-    
+
         handle = ioargs.filepath_or_buffer
         handles: list[BaseBuffer]
-    
+
         # memory mapping needs to be the first step
         # only used for read_csv
         handle, memory_map, handles = _maybe_memory_map(handle, memory_map)
-    
+
         is_path = isinstance(handle, str)
         compression_args = dict(ioargs.compression)
         compression = compression_args.pop("method")
-    
+
         # Only for write methods
         if "r" not in mode and is_path:
             check_parent_directory(str(handle))
-    
+
         if compression:
             if compression != "zstd":
                 # compression libraries do not like an explicit text-mode
@@ -124,7 +124,7 @@ mode = 'r'
                 # python-zstandard defaults to text mode, but we always expect
                 # compression libraries to use binary mode.
                 ioargs.mode += "b"
-    
+
             # GZ Compression
             if compression == "gzip":
                 if isinstance(handle, str):
@@ -143,7 +143,7 @@ mode = 'r'
                         mode=ioargs.mode,
                         **compression_args,
                     )
-    
+
             # BZ Compression
             elif compression == "bz2":
                 # Overload of "BZ2File" to handle pickle protocol 5
@@ -153,7 +153,7 @@ mode = 'r'
                     mode=ioargs.mode,
                     **compression_args,
                 )
-    
+
             # ZIP Compression
             elif compression == "zip":
                 # error: Argument 1 to "_BytesZipFile" has incompatible type
@@ -174,7 +174,7 @@ mode = 'r'
                             "Multiple files found in ZIP file. "
                             f"Only one file per ZIP: {zip_names}"
                         )
-    
+
             # TAR Encoding
             elif compression == "tar":
                 compression_args.setdefault("mode", ioargs.mode)
@@ -202,7 +202,7 @@ mode = 'r'
                             "Multiple files found in TAR archive. "
                             f"Only one file per TAR archive: {files}"
                         )
-    
+
             # XZ Compression
             elif compression == "xz":
                 # error: Argument 1 to "LZMAFile" has incompatible type "Union[str,
@@ -211,7 +211,7 @@ mode = 'r'
                 handle = get_lzma_file()(
                     handle, ioargs.mode, **compression_args  # type: ignore[arg-type]
                 )
-    
+
             # Zstd Compression
             elif compression == "zstd":
                 zstd = import_optional_dependency("zstandard")
@@ -224,15 +224,15 @@ mode = 'r'
                     mode=ioargs.mode,
                     **open_args,
                 )
-    
+
             # Unrecognized Compression
             else:
                 msg = f"Unrecognized compression type: {compression}"
                 raise ValueError(msg)
-    
+
             assert not isinstance(handle, str)
             handles.append(handle)
-    
+
         elif isinstance(handle, str):
             # Check whether the filename is to be opened in binary mode.
             # Binary mode does not support 'encoding' and 'newline'.
@@ -254,8 +254,8 @@ ________ test_initial_state_closes_h_and_he_nuclei_and_species_moments _________
 >       state = build()
                 ^^^^^^^
 
-stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:36: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:36:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:25: in build
     return load_module().build_initial_material_state(r1_root=R1, r2a_root=R2A)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -272,7 +272,7 @@ stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /opt/pyvenv/lib/python3.13/site-packages/pandas/io/parsers/readers.py:1880: in _make_engine
     self.handles = get_handle(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 path_or_buf = PosixPath('/tmp/rei_bianchi_r2b_followup/worktree/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R1_CANONICAL_TIME_RE...Y_FLUX_DYNAMIC_OPACITY_AND_HEATING_MOMENT_EXTRACTION_LOCK_RERUN_V2/data/bdf_replay/canonical_bdf_replayed_history.csv')
 mode = 'r'
@@ -291,7 +291,7 @@ mode = 'r'
     ) -> IOHandles[str] | IOHandles[bytes]:
         """
         Get file handle for given path/buffer and mode.
-    
+
         Parameters
         ----------
         path_or_buf : str or file handle
@@ -301,16 +301,16 @@ mode = 'r'
         encoding : str or None
             Encoding to use.
         {compression_options}
-    
+
                May be a dict with key 'method' as compression mode
                and other keys as compression options if compression
                mode is 'zip'.
-    
+
                Passing compression options as keys in dict is
                supported for compression modes 'gzip', 'bz2', 'zstd' and 'zip'.
-    
+
             .. versionchanged:: 1.4.0 Zstandard support.
-    
+
         memory_map : bool, default False
             See parsers._parser_params for more information. Only used by read_csv.
         is_text : bool, default True
@@ -323,23 +323,23 @@ mode = 'r'
             of options.
         storage_options: StorageOptions = None
             Passed to _get_filepath_or_buffer
-    
+
         Returns the dataclass IOHandles
         """
         # Windows does not default to utf-8. Set to utf-8 for a consistent behavior
         encoding = encoding or "utf-8"
-    
+
         errors = errors or "strict"
-    
+
         # read_csv does not know whether the buffer is opened in binary/text mode
         if _is_binary_mode(path_or_buf, mode) and "b" not in mode:
             mode += "b"
-    
+
         # validate encoding and errors
         codecs.lookup(encoding)
         if isinstance(errors, str):
             codecs.lookup_error(errors)
-    
+
         # open URLs
         ioargs = _get_filepath_or_buffer(
             path_or_buf,
@@ -348,22 +348,22 @@ mode = 'r'
             mode=mode,
             storage_options=storage_options,
         )
-    
+
         handle = ioargs.filepath_or_buffer
         handles: list[BaseBuffer]
-    
+
         # memory mapping needs to be the first step
         # only used for read_csv
         handle, memory_map, handles = _maybe_memory_map(handle, memory_map)
-    
+
         is_path = isinstance(handle, str)
         compression_args = dict(ioargs.compression)
         compression = compression_args.pop("method")
-    
+
         # Only for write methods
         if "r" not in mode and is_path:
             check_parent_directory(str(handle))
-    
+
         if compression:
             if compression != "zstd":
                 # compression libraries do not like an explicit text-mode
@@ -372,7 +372,7 @@ mode = 'r'
                 # python-zstandard defaults to text mode, but we always expect
                 # compression libraries to use binary mode.
                 ioargs.mode += "b"
-    
+
             # GZ Compression
             if compression == "gzip":
                 if isinstance(handle, str):
@@ -391,7 +391,7 @@ mode = 'r'
                         mode=ioargs.mode,
                         **compression_args,
                     )
-    
+
             # BZ Compression
             elif compression == "bz2":
                 # Overload of "BZ2File" to handle pickle protocol 5
@@ -401,7 +401,7 @@ mode = 'r'
                     mode=ioargs.mode,
                     **compression_args,
                 )
-    
+
             # ZIP Compression
             elif compression == "zip":
                 # error: Argument 1 to "_BytesZipFile" has incompatible type
@@ -422,7 +422,7 @@ mode = 'r'
                             "Multiple files found in ZIP file. "
                             f"Only one file per ZIP: {zip_names}"
                         )
-    
+
             # TAR Encoding
             elif compression == "tar":
                 compression_args.setdefault("mode", ioargs.mode)
@@ -450,7 +450,7 @@ mode = 'r'
                             "Multiple files found in TAR archive. "
                             f"Only one file per TAR archive: {files}"
                         )
-    
+
             # XZ Compression
             elif compression == "xz":
                 # error: Argument 1 to "LZMAFile" has incompatible type "Union[str,
@@ -459,7 +459,7 @@ mode = 'r'
                 handle = get_lzma_file()(
                     handle, ioargs.mode, **compression_args  # type: ignore[arg-type]
                 )
-    
+
             # Zstd Compression
             elif compression == "zstd":
                 zstd = import_optional_dependency("zstandard")
@@ -472,15 +472,15 @@ mode = 'r'
                     mode=ioargs.mode,
                     **open_args,
                 )
-    
+
             # Unrecognized Compression
             else:
                 msg = f"Unrecognized compression type: {compression}"
                 raise ValueError(msg)
-    
+
             assert not isinstance(handle, str)
             handles.append(handle)
-    
+
         elif isinstance(handle, str):
             # Check whether the filename is to be opened in binary mode.
             # Binary mode does not support 'encoding' and 'newline'.
@@ -502,8 +502,8 @@ _____ test_initial_state_closes_canonical_internal_energy_without_clipping _____
 >       state = build()
                 ^^^^^^^
 
-stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:49: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:49:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:25: in build
     return load_module().build_initial_material_state(r1_root=R1, r2a_root=R2A)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -520,7 +520,7 @@ stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /opt/pyvenv/lib/python3.13/site-packages/pandas/io/parsers/readers.py:1880: in _make_engine
     self.handles = get_handle(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 path_or_buf = PosixPath('/tmp/rei_bianchi_r2b_followup/worktree/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R1_CANONICAL_TIME_RE...Y_FLUX_DYNAMIC_OPACITY_AND_HEATING_MOMENT_EXTRACTION_LOCK_RERUN_V2/data/bdf_replay/canonical_bdf_replayed_history.csv')
 mode = 'r'
@@ -539,7 +539,7 @@ mode = 'r'
     ) -> IOHandles[str] | IOHandles[bytes]:
         """
         Get file handle for given path/buffer and mode.
-    
+
         Parameters
         ----------
         path_or_buf : str or file handle
@@ -549,16 +549,16 @@ mode = 'r'
         encoding : str or None
             Encoding to use.
         {compression_options}
-    
+
                May be a dict with key 'method' as compression mode
                and other keys as compression options if compression
                mode is 'zip'.
-    
+
                Passing compression options as keys in dict is
                supported for compression modes 'gzip', 'bz2', 'zstd' and 'zip'.
-    
+
             .. versionchanged:: 1.4.0 Zstandard support.
-    
+
         memory_map : bool, default False
             See parsers._parser_params for more information. Only used by read_csv.
         is_text : bool, default True
@@ -571,23 +571,23 @@ mode = 'r'
             of options.
         storage_options: StorageOptions = None
             Passed to _get_filepath_or_buffer
-    
+
         Returns the dataclass IOHandles
         """
         # Windows does not default to utf-8. Set to utf-8 for a consistent behavior
         encoding = encoding or "utf-8"
-    
+
         errors = errors or "strict"
-    
+
         # read_csv does not know whether the buffer is opened in binary/text mode
         if _is_binary_mode(path_or_buf, mode) and "b" not in mode:
             mode += "b"
-    
+
         # validate encoding and errors
         codecs.lookup(encoding)
         if isinstance(errors, str):
             codecs.lookup_error(errors)
-    
+
         # open URLs
         ioargs = _get_filepath_or_buffer(
             path_or_buf,
@@ -596,22 +596,22 @@ mode = 'r'
             mode=mode,
             storage_options=storage_options,
         )
-    
+
         handle = ioargs.filepath_or_buffer
         handles: list[BaseBuffer]
-    
+
         # memory mapping needs to be the first step
         # only used for read_csv
         handle, memory_map, handles = _maybe_memory_map(handle, memory_map)
-    
+
         is_path = isinstance(handle, str)
         compression_args = dict(ioargs.compression)
         compression = compression_args.pop("method")
-    
+
         # Only for write methods
         if "r" not in mode and is_path:
             check_parent_directory(str(handle))
-    
+
         if compression:
             if compression != "zstd":
                 # compression libraries do not like an explicit text-mode
@@ -620,7 +620,7 @@ mode = 'r'
                 # python-zstandard defaults to text mode, but we always expect
                 # compression libraries to use binary mode.
                 ioargs.mode += "b"
-    
+
             # GZ Compression
             if compression == "gzip":
                 if isinstance(handle, str):
@@ -639,7 +639,7 @@ mode = 'r'
                         mode=ioargs.mode,
                         **compression_args,
                     )
-    
+
             # BZ Compression
             elif compression == "bz2":
                 # Overload of "BZ2File" to handle pickle protocol 5
@@ -649,7 +649,7 @@ mode = 'r'
                     mode=ioargs.mode,
                     **compression_args,
                 )
-    
+
             # ZIP Compression
             elif compression == "zip":
                 # error: Argument 1 to "_BytesZipFile" has incompatible type
@@ -670,7 +670,7 @@ mode = 'r'
                             "Multiple files found in ZIP file. "
                             f"Only one file per ZIP: {zip_names}"
                         )
-    
+
             # TAR Encoding
             elif compression == "tar":
                 compression_args.setdefault("mode", ioargs.mode)
@@ -698,7 +698,7 @@ mode = 'r'
                             "Multiple files found in TAR archive. "
                             f"Only one file per TAR archive: {files}"
                         )
-    
+
             # XZ Compression
             elif compression == "xz":
                 # error: Argument 1 to "LZMAFile" has incompatible type "Union[str,
@@ -707,7 +707,7 @@ mode = 'r'
                 handle = get_lzma_file()(
                     handle, ioargs.mode, **compression_args  # type: ignore[arg-type]
                 )
-    
+
             # Zstd Compression
             elif compression == "zstd":
                 zstd = import_optional_dependency("zstandard")
@@ -720,15 +720,15 @@ mode = 'r'
                     mode=ioargs.mode,
                     **open_args,
                 )
-    
+
             # Unrecognized Compression
             else:
                 msg = f"Unrecognized compression type: {compression}"
                 raise ValueError(msg)
-    
+
             assert not isinstance(handle, str)
             handles.append(handle)
-    
+
         elif isinstance(handle, str):
             # Check whether the filename is to be opened in binary mode.
             # Binary mode does not support 'encoding' and 'newline'.
@@ -750,8 +750,8 @@ ___________ test_temperature_is_recovered_from_u_and_particle_counts ___________
 >       state = build()
                 ^^^^^^^
 
-stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:60: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:60:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:25: in build
     return load_module().build_initial_material_state(r1_root=R1, r2a_root=R2A)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -768,7 +768,7 @@ stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /opt/pyvenv/lib/python3.13/site-packages/pandas/io/parsers/readers.py:1880: in _make_engine
     self.handles = get_handle(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 path_or_buf = PosixPath('/tmp/rei_bianchi_r2b_followup/worktree/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R1_CANONICAL_TIME_RE...Y_FLUX_DYNAMIC_OPACITY_AND_HEATING_MOMENT_EXTRACTION_LOCK_RERUN_V2/data/bdf_replay/canonical_bdf_replayed_history.csv')
 mode = 'r'
@@ -787,7 +787,7 @@ mode = 'r'
     ) -> IOHandles[str] | IOHandles[bytes]:
         """
         Get file handle for given path/buffer and mode.
-    
+
         Parameters
         ----------
         path_or_buf : str or file handle
@@ -797,16 +797,16 @@ mode = 'r'
         encoding : str or None
             Encoding to use.
         {compression_options}
-    
+
                May be a dict with key 'method' as compression mode
                and other keys as compression options if compression
                mode is 'zip'.
-    
+
                Passing compression options as keys in dict is
                supported for compression modes 'gzip', 'bz2', 'zstd' and 'zip'.
-    
+
             .. versionchanged:: 1.4.0 Zstandard support.
-    
+
         memory_map : bool, default False
             See parsers._parser_params for more information. Only used by read_csv.
         is_text : bool, default True
@@ -819,23 +819,23 @@ mode = 'r'
             of options.
         storage_options: StorageOptions = None
             Passed to _get_filepath_or_buffer
-    
+
         Returns the dataclass IOHandles
         """
         # Windows does not default to utf-8. Set to utf-8 for a consistent behavior
         encoding = encoding or "utf-8"
-    
+
         errors = errors or "strict"
-    
+
         # read_csv does not know whether the buffer is opened in binary/text mode
         if _is_binary_mode(path_or_buf, mode) and "b" not in mode:
             mode += "b"
-    
+
         # validate encoding and errors
         codecs.lookup(encoding)
         if isinstance(errors, str):
             codecs.lookup_error(errors)
-    
+
         # open URLs
         ioargs = _get_filepath_or_buffer(
             path_or_buf,
@@ -844,22 +844,22 @@ mode = 'r'
             mode=mode,
             storage_options=storage_options,
         )
-    
+
         handle = ioargs.filepath_or_buffer
         handles: list[BaseBuffer]
-    
+
         # memory mapping needs to be the first step
         # only used for read_csv
         handle, memory_map, handles = _maybe_memory_map(handle, memory_map)
-    
+
         is_path = isinstance(handle, str)
         compression_args = dict(ioargs.compression)
         compression = compression_args.pop("method")
-    
+
         # Only for write methods
         if "r" not in mode and is_path:
             check_parent_directory(str(handle))
-    
+
         if compression:
             if compression != "zstd":
                 # compression libraries do not like an explicit text-mode
@@ -868,7 +868,7 @@ mode = 'r'
                 # python-zstandard defaults to text mode, but we always expect
                 # compression libraries to use binary mode.
                 ioargs.mode += "b"
-    
+
             # GZ Compression
             if compression == "gzip":
                 if isinstance(handle, str):
@@ -887,7 +887,7 @@ mode = 'r'
                         mode=ioargs.mode,
                         **compression_args,
                     )
-    
+
             # BZ Compression
             elif compression == "bz2":
                 # Overload of "BZ2File" to handle pickle protocol 5
@@ -897,7 +897,7 @@ mode = 'r'
                     mode=ioargs.mode,
                     **compression_args,
                 )
-    
+
             # ZIP Compression
             elif compression == "zip":
                 # error: Argument 1 to "_BytesZipFile" has incompatible type
@@ -918,7 +918,7 @@ mode = 'r'
                             "Multiple files found in ZIP file. "
                             f"Only one file per ZIP: {zip_names}"
                         )
-    
+
             # TAR Encoding
             elif compression == "tar":
                 compression_args.setdefault("mode", ioargs.mode)
@@ -946,7 +946,7 @@ mode = 'r'
                             "Multiple files found in TAR archive. "
                             f"Only one file per TAR archive: {files}"
                         )
-    
+
             # XZ Compression
             elif compression == "xz":
                 # error: Argument 1 to "LZMAFile" has incompatible type "Union[str,
@@ -955,7 +955,7 @@ mode = 'r'
                 handle = get_lzma_file()(
                     handle, ioargs.mode, **compression_args  # type: ignore[arg-type]
                 )
-    
+
             # Zstd Compression
             elif compression == "zstd":
                 zstd = import_optional_dependency("zstandard")
@@ -968,15 +968,15 @@ mode = 'r'
                     mode=ioargs.mode,
                     **open_args,
                 )
-    
+
             # Unrecognized Compression
             else:
                 msg = f"Unrecognized compression type: {compression}"
                 raise ValueError(msg)
-    
+
             assert not isinstance(handle, str)
             handles.append(handle)
-    
+
         elif isinstance(handle, str):
             # Check whether the filename is to be opened in binary mode.
             # Binary mode does not support 'encoding' and 'newline'.
@@ -998,8 +998,8 @@ ___________ test_initial_state_is_byte_deterministic_at_array_level ____________
 >       a = build()
             ^^^^^^^
 
-stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:69: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:69:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:25: in build
     return load_module().build_initial_material_state(r1_root=R1, r2a_root=R2A)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1016,7 +1016,7 @@ stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /opt/pyvenv/lib/python3.13/site-packages/pandas/io/parsers/readers.py:1880: in _make_engine
     self.handles = get_handle(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 path_or_buf = PosixPath('/tmp/rei_bianchi_r2b_followup/worktree/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R1_CANONICAL_TIME_RE...Y_FLUX_DYNAMIC_OPACITY_AND_HEATING_MOMENT_EXTRACTION_LOCK_RERUN_V2/data/bdf_replay/canonical_bdf_replayed_history.csv')
 mode = 'r'
@@ -1035,7 +1035,7 @@ mode = 'r'
     ) -> IOHandles[str] | IOHandles[bytes]:
         """
         Get file handle for given path/buffer and mode.
-    
+
         Parameters
         ----------
         path_or_buf : str or file handle
@@ -1045,16 +1045,16 @@ mode = 'r'
         encoding : str or None
             Encoding to use.
         {compression_options}
-    
+
                May be a dict with key 'method' as compression mode
                and other keys as compression options if compression
                mode is 'zip'.
-    
+
                Passing compression options as keys in dict is
                supported for compression modes 'gzip', 'bz2', 'zstd' and 'zip'.
-    
+
             .. versionchanged:: 1.4.0 Zstandard support.
-    
+
         memory_map : bool, default False
             See parsers._parser_params for more information. Only used by read_csv.
         is_text : bool, default True
@@ -1067,23 +1067,23 @@ mode = 'r'
             of options.
         storage_options: StorageOptions = None
             Passed to _get_filepath_or_buffer
-    
+
         Returns the dataclass IOHandles
         """
         # Windows does not default to utf-8. Set to utf-8 for a consistent behavior
         encoding = encoding or "utf-8"
-    
+
         errors = errors or "strict"
-    
+
         # read_csv does not know whether the buffer is opened in binary/text mode
         if _is_binary_mode(path_or_buf, mode) and "b" not in mode:
             mode += "b"
-    
+
         # validate encoding and errors
         codecs.lookup(encoding)
         if isinstance(errors, str):
             codecs.lookup_error(errors)
-    
+
         # open URLs
         ioargs = _get_filepath_or_buffer(
             path_or_buf,
@@ -1092,22 +1092,22 @@ mode = 'r'
             mode=mode,
             storage_options=storage_options,
         )
-    
+
         handle = ioargs.filepath_or_buffer
         handles: list[BaseBuffer]
-    
+
         # memory mapping needs to be the first step
         # only used for read_csv
         handle, memory_map, handles = _maybe_memory_map(handle, memory_map)
-    
+
         is_path = isinstance(handle, str)
         compression_args = dict(ioargs.compression)
         compression = compression_args.pop("method")
-    
+
         # Only for write methods
         if "r" not in mode and is_path:
             check_parent_directory(str(handle))
-    
+
         if compression:
             if compression != "zstd":
                 # compression libraries do not like an explicit text-mode
@@ -1116,7 +1116,7 @@ mode = 'r'
                 # python-zstandard defaults to text mode, but we always expect
                 # compression libraries to use binary mode.
                 ioargs.mode += "b"
-    
+
             # GZ Compression
             if compression == "gzip":
                 if isinstance(handle, str):
@@ -1135,7 +1135,7 @@ mode = 'r'
                         mode=ioargs.mode,
                         **compression_args,
                     )
-    
+
             # BZ Compression
             elif compression == "bz2":
                 # Overload of "BZ2File" to handle pickle protocol 5
@@ -1145,7 +1145,7 @@ mode = 'r'
                     mode=ioargs.mode,
                     **compression_args,
                 )
-    
+
             # ZIP Compression
             elif compression == "zip":
                 # error: Argument 1 to "_BytesZipFile" has incompatible type
@@ -1166,7 +1166,7 @@ mode = 'r'
                             "Multiple files found in ZIP file. "
                             f"Only one file per ZIP: {zip_names}"
                         )
-    
+
             # TAR Encoding
             elif compression == "tar":
                 compression_args.setdefault("mode", ioargs.mode)
@@ -1194,7 +1194,7 @@ mode = 'r'
                             "Multiple files found in TAR archive. "
                             f"Only one file per TAR archive: {files}"
                         )
-    
+
             # XZ Compression
             elif compression == "xz":
                 # error: Argument 1 to "LZMAFile" has incompatible type "Union[str,
@@ -1203,7 +1203,7 @@ mode = 'r'
                 handle = get_lzma_file()(
                     handle, ioargs.mode, **compression_args  # type: ignore[arg-type]
                 )
-    
+
             # Zstd Compression
             elif compression == "zstd":
                 zstd = import_optional_dependency("zstandard")
@@ -1216,15 +1216,15 @@ mode = 'r'
                     mode=ioargs.mode,
                     **open_args,
                 )
-    
+
             # Unrecognized Compression
             else:
                 msg = f"Unrecognized compression type: {compression}"
                 raise ValueError(msg)
-    
+
             assert not isinstance(handle, str)
             handles.append(handle)
-    
+
         elif isinstance(handle, str):
             # Check whether the filename is to be opened in binary mode.
             # Binary mode does not support 'encoding' and 'newline'.
@@ -1246,8 +1246,8 @@ _________ test_owner_law_closes_total_opacity_current_and_common_flux __________
 >       _, state, model, forcing = fixtures()
                                    ^^^^^^^^^^
 
-stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:35: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:35:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:28: in fixtures
     state = initial_mod.build_initial_material_state(r1_root=R1, r2a_root=R2A)
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1264,7 +1264,7 @@ stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /opt/pyvenv/lib/python3.13/site-packages/pandas/io/parsers/readers.py:1880: in _make_engine
     self.handles = get_handle(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 path_or_buf = PosixPath('/tmp/rei_bianchi_r2b_followup/worktree/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R1_CANONICAL_TIME_RE...Y_FLUX_DYNAMIC_OPACITY_AND_HEATING_MOMENT_EXTRACTION_LOCK_RERUN_V2/data/bdf_replay/canonical_bdf_replayed_history.csv')
 mode = 'r'
@@ -1283,7 +1283,7 @@ mode = 'r'
     ) -> IOHandles[str] | IOHandles[bytes]:
         """
         Get file handle for given path/buffer and mode.
-    
+
         Parameters
         ----------
         path_or_buf : str or file handle
@@ -1293,16 +1293,16 @@ mode = 'r'
         encoding : str or None
             Encoding to use.
         {compression_options}
-    
+
                May be a dict with key 'method' as compression mode
                and other keys as compression options if compression
                mode is 'zip'.
-    
+
                Passing compression options as keys in dict is
                supported for compression modes 'gzip', 'bz2', 'zstd' and 'zip'.
-    
+
             .. versionchanged:: 1.4.0 Zstandard support.
-    
+
         memory_map : bool, default False
             See parsers._parser_params for more information. Only used by read_csv.
         is_text : bool, default True
@@ -1315,23 +1315,23 @@ mode = 'r'
             of options.
         storage_options: StorageOptions = None
             Passed to _get_filepath_or_buffer
-    
+
         Returns the dataclass IOHandles
         """
         # Windows does not default to utf-8. Set to utf-8 for a consistent behavior
         encoding = encoding or "utf-8"
-    
+
         errors = errors or "strict"
-    
+
         # read_csv does not know whether the buffer is opened in binary/text mode
         if _is_binary_mode(path_or_buf, mode) and "b" not in mode:
             mode += "b"
-    
+
         # validate encoding and errors
         codecs.lookup(encoding)
         if isinstance(errors, str):
             codecs.lookup_error(errors)
-    
+
         # open URLs
         ioargs = _get_filepath_or_buffer(
             path_or_buf,
@@ -1340,22 +1340,22 @@ mode = 'r'
             mode=mode,
             storage_options=storage_options,
         )
-    
+
         handle = ioargs.filepath_or_buffer
         handles: list[BaseBuffer]
-    
+
         # memory mapping needs to be the first step
         # only used for read_csv
         handle, memory_map, handles = _maybe_memory_map(handle, memory_map)
-    
+
         is_path = isinstance(handle, str)
         compression_args = dict(ioargs.compression)
         compression = compression_args.pop("method")
-    
+
         # Only for write methods
         if "r" not in mode and is_path:
             check_parent_directory(str(handle))
-    
+
         if compression:
             if compression != "zstd":
                 # compression libraries do not like an explicit text-mode
@@ -1364,7 +1364,7 @@ mode = 'r'
                 # python-zstandard defaults to text mode, but we always expect
                 # compression libraries to use binary mode.
                 ioargs.mode += "b"
-    
+
             # GZ Compression
             if compression == "gzip":
                 if isinstance(handle, str):
@@ -1383,7 +1383,7 @@ mode = 'r'
                         mode=ioargs.mode,
                         **compression_args,
                     )
-    
+
             # BZ Compression
             elif compression == "bz2":
                 # Overload of "BZ2File" to handle pickle protocol 5
@@ -1393,7 +1393,7 @@ mode = 'r'
                     mode=ioargs.mode,
                     **compression_args,
                 )
-    
+
             # ZIP Compression
             elif compression == "zip":
                 # error: Argument 1 to "_BytesZipFile" has incompatible type
@@ -1414,7 +1414,7 @@ mode = 'r'
                             "Multiple files found in ZIP file. "
                             f"Only one file per ZIP: {zip_names}"
                         )
-    
+
             # TAR Encoding
             elif compression == "tar":
                 compression_args.setdefault("mode", ioargs.mode)
@@ -1442,7 +1442,7 @@ mode = 'r'
                             "Multiple files found in TAR archive. "
                             f"Only one file per TAR archive: {files}"
                         )
-    
+
             # XZ Compression
             elif compression == "xz":
                 # error: Argument 1 to "LZMAFile" has incompatible type "Union[str,
@@ -1451,7 +1451,7 @@ mode = 'r'
                 handle = get_lzma_file()(
                     handle, ioargs.mode, **compression_args  # type: ignore[arg-type]
                 )
-    
+
             # Zstd Compression
             elif compression == "zstd":
                 zstd = import_optional_dependency("zstandard")
@@ -1464,15 +1464,15 @@ mode = 'r'
                     mode=ioargs.mode,
                     **open_args,
                 )
-    
+
             # Unrecognized Compression
             else:
                 msg = f"Unrecognized compression type: {compression}"
                 raise ValueError(msg)
-    
+
             assert not isinstance(handle, str)
             handles.append(handle)
-    
+
         elif isinstance(handle, str):
             # Check whether the filename is to be opened in binary mode.
             # Binary mode does not support 'encoding' and 'newline'.
@@ -1494,8 +1494,8 @@ ________ test_structural_support_and_subgrid_resolved_sources_are_exact ________
 >       law_mod, state, model, forcing = fixtures()
                                          ^^^^^^^^^^
 
-stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:48: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:48:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:28: in fixtures
     state = initial_mod.build_initial_material_state(r1_root=R1, r2a_root=R2A)
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1512,7 +1512,7 @@ stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /opt/pyvenv/lib/python3.13/site-packages/pandas/io/parsers/readers.py:1880: in _make_engine
     self.handles = get_handle(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 path_or_buf = PosixPath('/tmp/rei_bianchi_r2b_followup/worktree/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R1_CANONICAL_TIME_RE...Y_FLUX_DYNAMIC_OPACITY_AND_HEATING_MOMENT_EXTRACTION_LOCK_RERUN_V2/data/bdf_replay/canonical_bdf_replayed_history.csv')
 mode = 'r'
@@ -1531,7 +1531,7 @@ mode = 'r'
     ) -> IOHandles[str] | IOHandles[bytes]:
         """
         Get file handle for given path/buffer and mode.
-    
+
         Parameters
         ----------
         path_or_buf : str or file handle
@@ -1541,16 +1541,16 @@ mode = 'r'
         encoding : str or None
             Encoding to use.
         {compression_options}
-    
+
                May be a dict with key 'method' as compression mode
                and other keys as compression options if compression
                mode is 'zip'.
-    
+
                Passing compression options as keys in dict is
                supported for compression modes 'gzip', 'bz2', 'zstd' and 'zip'.
-    
+
             .. versionchanged:: 1.4.0 Zstandard support.
-    
+
         memory_map : bool, default False
             See parsers._parser_params for more information. Only used by read_csv.
         is_text : bool, default True
@@ -1563,23 +1563,23 @@ mode = 'r'
             of options.
         storage_options: StorageOptions = None
             Passed to _get_filepath_or_buffer
-    
+
         Returns the dataclass IOHandles
         """
         # Windows does not default to utf-8. Set to utf-8 for a consistent behavior
         encoding = encoding or "utf-8"
-    
+
         errors = errors or "strict"
-    
+
         # read_csv does not know whether the buffer is opened in binary/text mode
         if _is_binary_mode(path_or_buf, mode) and "b" not in mode:
             mode += "b"
-    
+
         # validate encoding and errors
         codecs.lookup(encoding)
         if isinstance(errors, str):
             codecs.lookup_error(errors)
-    
+
         # open URLs
         ioargs = _get_filepath_or_buffer(
             path_or_buf,
@@ -1588,22 +1588,22 @@ mode = 'r'
             mode=mode,
             storage_options=storage_options,
         )
-    
+
         handle = ioargs.filepath_or_buffer
         handles: list[BaseBuffer]
-    
+
         # memory mapping needs to be the first step
         # only used for read_csv
         handle, memory_map, handles = _maybe_memory_map(handle, memory_map)
-    
+
         is_path = isinstance(handle, str)
         compression_args = dict(ioargs.compression)
         compression = compression_args.pop("method")
-    
+
         # Only for write methods
         if "r" not in mode and is_path:
             check_parent_directory(str(handle))
-    
+
         if compression:
             if compression != "zstd":
                 # compression libraries do not like an explicit text-mode
@@ -1612,7 +1612,7 @@ mode = 'r'
                 # python-zstandard defaults to text mode, but we always expect
                 # compression libraries to use binary mode.
                 ioargs.mode += "b"
-    
+
             # GZ Compression
             if compression == "gzip":
                 if isinstance(handle, str):
@@ -1631,7 +1631,7 @@ mode = 'r'
                         mode=ioargs.mode,
                         **compression_args,
                     )
-    
+
             # BZ Compression
             elif compression == "bz2":
                 # Overload of "BZ2File" to handle pickle protocol 5
@@ -1641,7 +1641,7 @@ mode = 'r'
                     mode=ioargs.mode,
                     **compression_args,
                 )
-    
+
             # ZIP Compression
             elif compression == "zip":
                 # error: Argument 1 to "_BytesZipFile" has incompatible type
@@ -1662,7 +1662,7 @@ mode = 'r'
                             "Multiple files found in ZIP file. "
                             f"Only one file per ZIP: {zip_names}"
                         )
-    
+
             # TAR Encoding
             elif compression == "tar":
                 compression_args.setdefault("mode", ioargs.mode)
@@ -1690,7 +1690,7 @@ mode = 'r'
                             "Multiple files found in TAR archive. "
                             f"Only one file per TAR archive: {files}"
                         )
-    
+
             # XZ Compression
             elif compression == "xz":
                 # error: Argument 1 to "LZMAFile" has incompatible type "Union[str,
@@ -1699,7 +1699,7 @@ mode = 'r'
                 handle = get_lzma_file()(
                     handle, ioargs.mode, **compression_args  # type: ignore[arg-type]
                 )
-    
+
             # Zstd Compression
             elif compression == "zstd":
                 zstd = import_optional_dependency("zstandard")
@@ -1712,15 +1712,15 @@ mode = 'r'
                     mode=ioargs.mode,
                     **open_args,
                 )
-    
+
             # Unrecognized Compression
             else:
                 msg = f"Unrecognized compression type: {compression}"
                 raise ValueError(msg)
-    
+
             assert not isinstance(handle, str)
             handles.append(handle)
-    
+
         elif isinstance(handle, str):
             # Check whether the filename is to be opened in binary mode.
             # Binary mode does not support 'encoding' and 'newline'.
@@ -1742,8 +1742,8 @@ ____________ test_owner_and_node_law_is_state_sensitive_not_frozen _____________
 >       _, state, model, forcing = fixtures()
                                    ^^^^^^^^^^
 
-stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:59: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:59:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:28: in fixtures
     state = initial_mod.build_initial_material_state(r1_root=R1, r2a_root=R2A)
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1760,7 +1760,7 @@ stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /opt/pyvenv/lib/python3.13/site-packages/pandas/io/parsers/readers.py:1880: in _make_engine
     self.handles = get_handle(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 path_or_buf = PosixPath('/tmp/rei_bianchi_r2b_followup/worktree/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R1_CANONICAL_TIME_RE...Y_FLUX_DYNAMIC_OPACITY_AND_HEATING_MOMENT_EXTRACTION_LOCK_RERUN_V2/data/bdf_replay/canonical_bdf_replayed_history.csv')
 mode = 'r'
@@ -1779,7 +1779,7 @@ mode = 'r'
     ) -> IOHandles[str] | IOHandles[bytes]:
         """
         Get file handle for given path/buffer and mode.
-    
+
         Parameters
         ----------
         path_or_buf : str or file handle
@@ -1789,16 +1789,16 @@ mode = 'r'
         encoding : str or None
             Encoding to use.
         {compression_options}
-    
+
                May be a dict with key 'method' as compression mode
                and other keys as compression options if compression
                mode is 'zip'.
-    
+
                Passing compression options as keys in dict is
                supported for compression modes 'gzip', 'bz2', 'zstd' and 'zip'.
-    
+
             .. versionchanged:: 1.4.0 Zstandard support.
-    
+
         memory_map : bool, default False
             See parsers._parser_params for more information. Only used by read_csv.
         is_text : bool, default True
@@ -1811,23 +1811,23 @@ mode = 'r'
             of options.
         storage_options: StorageOptions = None
             Passed to _get_filepath_or_buffer
-    
+
         Returns the dataclass IOHandles
         """
         # Windows does not default to utf-8. Set to utf-8 for a consistent behavior
         encoding = encoding or "utf-8"
-    
+
         errors = errors or "strict"
-    
+
         # read_csv does not know whether the buffer is opened in binary/text mode
         if _is_binary_mode(path_or_buf, mode) and "b" not in mode:
             mode += "b"
-    
+
         # validate encoding and errors
         codecs.lookup(encoding)
         if isinstance(errors, str):
             codecs.lookup_error(errors)
-    
+
         # open URLs
         ioargs = _get_filepath_or_buffer(
             path_or_buf,
@@ -1836,22 +1836,22 @@ mode = 'r'
             mode=mode,
             storage_options=storage_options,
         )
-    
+
         handle = ioargs.filepath_or_buffer
         handles: list[BaseBuffer]
-    
+
         # memory mapping needs to be the first step
         # only used for read_csv
         handle, memory_map, handles = _maybe_memory_map(handle, memory_map)
-    
+
         is_path = isinstance(handle, str)
         compression_args = dict(ioargs.compression)
         compression = compression_args.pop("method")
-    
+
         # Only for write methods
         if "r" not in mode and is_path:
             check_parent_directory(str(handle))
-    
+
         if compression:
             if compression != "zstd":
                 # compression libraries do not like an explicit text-mode
@@ -1860,7 +1860,7 @@ mode = 'r'
                 # python-zstandard defaults to text mode, but we always expect
                 # compression libraries to use binary mode.
                 ioargs.mode += "b"
-    
+
             # GZ Compression
             if compression == "gzip":
                 if isinstance(handle, str):
@@ -1879,7 +1879,7 @@ mode = 'r'
                         mode=ioargs.mode,
                         **compression_args,
                     )
-    
+
             # BZ Compression
             elif compression == "bz2":
                 # Overload of "BZ2File" to handle pickle protocol 5
@@ -1889,7 +1889,7 @@ mode = 'r'
                     mode=ioargs.mode,
                     **compression_args,
                 )
-    
+
             # ZIP Compression
             elif compression == "zip":
                 # error: Argument 1 to "_BytesZipFile" has incompatible type
@@ -1910,7 +1910,7 @@ mode = 'r'
                             "Multiple files found in ZIP file. "
                             f"Only one file per ZIP: {zip_names}"
                         )
-    
+
             # TAR Encoding
             elif compression == "tar":
                 compression_args.setdefault("mode", ioargs.mode)
@@ -1938,7 +1938,7 @@ mode = 'r'
                             "Multiple files found in TAR archive. "
                             f"Only one file per TAR archive: {files}"
                         )
-    
+
             # XZ Compression
             elif compression == "xz":
                 # error: Argument 1 to "LZMAFile" has incompatible type "Union[str,
@@ -1947,7 +1947,7 @@ mode = 'r'
                 handle = get_lzma_file()(
                     handle, ioargs.mode, **compression_args  # type: ignore[arg-type]
                 )
-    
+
             # Zstd Compression
             elif compression == "zstd":
                 zstd = import_optional_dependency("zstandard")
@@ -1960,15 +1960,15 @@ mode = 'r'
                     mode=ioargs.mode,
                     **open_args,
                 )
-    
+
             # Unrecognized Compression
             else:
                 msg = f"Unrecognized compression type: {compression}"
                 raise ValueError(msg)
-    
+
             assert not isinstance(handle, str)
             handles.append(handle)
-    
+
         elif isinstance(handle, str):
             # Check whether the filename is to be opened in binary mode.
             # Binary mode does not support 'encoding' and 'newline'.
@@ -1990,8 +1990,8 @@ ____ test_primary_subgrid_law_is_predeclared_and_auditors_are_not_promoted _____
 >       _, state, model, forcing = fixtures()
                                    ^^^^^^^^^^
 
-stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:73: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:73:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:28: in fixtures
     state = initial_mod.build_initial_material_state(r1_root=R1, r2a_root=R2A)
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2008,7 +2008,7 @@ stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /opt/pyvenv/lib/python3.13/site-packages/pandas/io/parsers/readers.py:1880: in _make_engine
     self.handles = get_handle(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 path_or_buf = PosixPath('/tmp/rei_bianchi_r2b_followup/worktree/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R1_CANONICAL_TIME_RE...Y_FLUX_DYNAMIC_OPACITY_AND_HEATING_MOMENT_EXTRACTION_LOCK_RERUN_V2/data/bdf_replay/canonical_bdf_replayed_history.csv')
 mode = 'r'
@@ -2027,7 +2027,7 @@ mode = 'r'
     ) -> IOHandles[str] | IOHandles[bytes]:
         """
         Get file handle for given path/buffer and mode.
-    
+
         Parameters
         ----------
         path_or_buf : str or file handle
@@ -2037,16 +2037,16 @@ mode = 'r'
         encoding : str or None
             Encoding to use.
         {compression_options}
-    
+
                May be a dict with key 'method' as compression mode
                and other keys as compression options if compression
                mode is 'zip'.
-    
+
                Passing compression options as keys in dict is
                supported for compression modes 'gzip', 'bz2', 'zstd' and 'zip'.
-    
+
             .. versionchanged:: 1.4.0 Zstandard support.
-    
+
         memory_map : bool, default False
             See parsers._parser_params for more information. Only used by read_csv.
         is_text : bool, default True
@@ -2059,23 +2059,23 @@ mode = 'r'
             of options.
         storage_options: StorageOptions = None
             Passed to _get_filepath_or_buffer
-    
+
         Returns the dataclass IOHandles
         """
         # Windows does not default to utf-8. Set to utf-8 for a consistent behavior
         encoding = encoding or "utf-8"
-    
+
         errors = errors or "strict"
-    
+
         # read_csv does not know whether the buffer is opened in binary/text mode
         if _is_binary_mode(path_or_buf, mode) and "b" not in mode:
             mode += "b"
-    
+
         # validate encoding and errors
         codecs.lookup(encoding)
         if isinstance(errors, str):
             codecs.lookup_error(errors)
-    
+
         # open URLs
         ioargs = _get_filepath_or_buffer(
             path_or_buf,
@@ -2084,22 +2084,22 @@ mode = 'r'
             mode=mode,
             storage_options=storage_options,
         )
-    
+
         handle = ioargs.filepath_or_buffer
         handles: list[BaseBuffer]
-    
+
         # memory mapping needs to be the first step
         # only used for read_csv
         handle, memory_map, handles = _maybe_memory_map(handle, memory_map)
-    
+
         is_path = isinstance(handle, str)
         compression_args = dict(ioargs.compression)
         compression = compression_args.pop("method")
-    
+
         # Only for write methods
         if "r" not in mode and is_path:
             check_parent_directory(str(handle))
-    
+
         if compression:
             if compression != "zstd":
                 # compression libraries do not like an explicit text-mode
@@ -2108,7 +2108,7 @@ mode = 'r'
                 # python-zstandard defaults to text mode, but we always expect
                 # compression libraries to use binary mode.
                 ioargs.mode += "b"
-    
+
             # GZ Compression
             if compression == "gzip":
                 if isinstance(handle, str):
@@ -2127,7 +2127,7 @@ mode = 'r'
                         mode=ioargs.mode,
                         **compression_args,
                     )
-    
+
             # BZ Compression
             elif compression == "bz2":
                 # Overload of "BZ2File" to handle pickle protocol 5
@@ -2137,7 +2137,7 @@ mode = 'r'
                     mode=ioargs.mode,
                     **compression_args,
                 )
-    
+
             # ZIP Compression
             elif compression == "zip":
                 # error: Argument 1 to "_BytesZipFile" has incompatible type
@@ -2158,7 +2158,7 @@ mode = 'r'
                             "Multiple files found in ZIP file. "
                             f"Only one file per ZIP: {zip_names}"
                         )
-    
+
             # TAR Encoding
             elif compression == "tar":
                 compression_args.setdefault("mode", ioargs.mode)
@@ -2186,7 +2186,7 @@ mode = 'r'
                             "Multiple files found in TAR archive. "
                             f"Only one file per TAR archive: {files}"
                         )
-    
+
             # XZ Compression
             elif compression == "xz":
                 # error: Argument 1 to "LZMAFile" has incompatible type "Union[str,
@@ -2195,7 +2195,7 @@ mode = 'r'
                 handle = get_lzma_file()(
                     handle, ioargs.mode, **compression_args  # type: ignore[arg-type]
                 )
-    
+
             # Zstd Compression
             elif compression == "zstd":
                 zstd = import_optional_dependency("zstandard")
@@ -2208,15 +2208,15 @@ mode = 'r'
                     mode=ioargs.mode,
                     **open_args,
                 )
-    
+
             # Unrecognized Compression
             else:
                 msg = f"Unrecognized compression type: {compression}"
                 raise ValueError(msg)
-    
+
             assert not isinstance(handle, str)
             handles.append(handle)
-    
+
         elif isinstance(handle, str):
             # Check whether the filename is to be opened in binary mode.
             # Binary mode does not support 'encoding' and 'newline'.
@@ -2238,8 +2238,8 @@ ___ test_node_allocations_are_nonnegative_conservative_and_zero_support_safe ___
 >       _, state, model, forcing = fixtures()
                                    ^^^^^^^^^^
 
-stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:81: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:81:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_state_derived_owner_law.py:28: in fixtures
     state = initial_mod.build_initial_material_state(r1_root=R1, r2a_root=R2A)
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2256,7 +2256,7 @@ stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /opt/pyvenv/lib/python3.13/site-packages/pandas/io/parsers/readers.py:1880: in _make_engine
     self.handles = get_handle(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 path_or_buf = PosixPath('/tmp/rei_bianchi_r2b_followup/worktree/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R1_CANONICAL_TIME_RE...Y_FLUX_DYNAMIC_OPACITY_AND_HEATING_MOMENT_EXTRACTION_LOCK_RERUN_V2/data/bdf_replay/canonical_bdf_replayed_history.csv')
 mode = 'r'
@@ -2275,7 +2275,7 @@ mode = 'r'
     ) -> IOHandles[str] | IOHandles[bytes]:
         """
         Get file handle for given path/buffer and mode.
-    
+
         Parameters
         ----------
         path_or_buf : str or file handle
@@ -2285,16 +2285,16 @@ mode = 'r'
         encoding : str or None
             Encoding to use.
         {compression_options}
-    
+
                May be a dict with key 'method' as compression mode
                and other keys as compression options if compression
                mode is 'zip'.
-    
+
                Passing compression options as keys in dict is
                supported for compression modes 'gzip', 'bz2', 'zstd' and 'zip'.
-    
+
             .. versionchanged:: 1.4.0 Zstandard support.
-    
+
         memory_map : bool, default False
             See parsers._parser_params for more information. Only used by read_csv.
         is_text : bool, default True
@@ -2307,23 +2307,23 @@ mode = 'r'
             of options.
         storage_options: StorageOptions = None
             Passed to _get_filepath_or_buffer
-    
+
         Returns the dataclass IOHandles
         """
         # Windows does not default to utf-8. Set to utf-8 for a consistent behavior
         encoding = encoding or "utf-8"
-    
+
         errors = errors or "strict"
-    
+
         # read_csv does not know whether the buffer is opened in binary/text mode
         if _is_binary_mode(path_or_buf, mode) and "b" not in mode:
             mode += "b"
-    
+
         # validate encoding and errors
         codecs.lookup(encoding)
         if isinstance(errors, str):
             codecs.lookup_error(errors)
-    
+
         # open URLs
         ioargs = _get_filepath_or_buffer(
             path_or_buf,
@@ -2332,22 +2332,22 @@ mode = 'r'
             mode=mode,
             storage_options=storage_options,
         )
-    
+
         handle = ioargs.filepath_or_buffer
         handles: list[BaseBuffer]
-    
+
         # memory mapping needs to be the first step
         # only used for read_csv
         handle, memory_map, handles = _maybe_memory_map(handle, memory_map)
-    
+
         is_path = isinstance(handle, str)
         compression_args = dict(ioargs.compression)
         compression = compression_args.pop("method")
-    
+
         # Only for write methods
         if "r" not in mode and is_path:
             check_parent_directory(str(handle))
-    
+
         if compression:
             if compression != "zstd":
                 # compression libraries do not like an explicit text-mode
@@ -2356,7 +2356,7 @@ mode = 'r'
                 # python-zstandard defaults to text mode, but we always expect
                 # compression libraries to use binary mode.
                 ioargs.mode += "b"
-    
+
             # GZ Compression
             if compression == "gzip":
                 if isinstance(handle, str):
@@ -2375,7 +2375,7 @@ mode = 'r'
                         mode=ioargs.mode,
                         **compression_args,
                     )
-    
+
             # BZ Compression
             elif compression == "bz2":
                 # Overload of "BZ2File" to handle pickle protocol 5
@@ -2385,7 +2385,7 @@ mode = 'r'
                     mode=ioargs.mode,
                     **compression_args,
                 )
-    
+
             # ZIP Compression
             elif compression == "zip":
                 # error: Argument 1 to "_BytesZipFile" has incompatible type
@@ -2406,7 +2406,7 @@ mode = 'r'
                             "Multiple files found in ZIP file. "
                             f"Only one file per ZIP: {zip_names}"
                         )
-    
+
             # TAR Encoding
             elif compression == "tar":
                 compression_args.setdefault("mode", ioargs.mode)
@@ -2434,7 +2434,7 @@ mode = 'r'
                             "Multiple files found in TAR archive. "
                             f"Only one file per TAR archive: {files}"
                         )
-    
+
             # XZ Compression
             elif compression == "xz":
                 # error: Argument 1 to "LZMAFile" has incompatible type "Union[str,
@@ -2443,7 +2443,7 @@ mode = 'r'
                 handle = get_lzma_file()(
                     handle, ioargs.mode, **compression_args  # type: ignore[arg-type]
                 )
-    
+
             # Zstd Compression
             elif compression == "zstd":
                 zstd = import_optional_dependency("zstandard")
@@ -2456,15 +2456,15 @@ mode = 'r'
                     mode=ioargs.mode,
                     **open_args,
                 )
-    
+
             # Unrecognized Compression
             else:
                 msg = f"Unrecognized compression type: {compression}"
                 raise ValueError(msg)
-    
+
             assert not isinstance(handle, str)
             handles.append(handle)
-    
+
         elif isinstance(handle, str):
             # Check whether the filename is to be opened in binary mode.
             # Binary mode does not support 'encoding' and 'newline'.

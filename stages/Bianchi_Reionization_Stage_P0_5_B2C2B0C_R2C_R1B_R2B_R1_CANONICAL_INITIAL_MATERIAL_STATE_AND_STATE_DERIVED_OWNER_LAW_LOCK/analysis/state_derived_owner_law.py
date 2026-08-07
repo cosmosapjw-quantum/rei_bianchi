@@ -143,6 +143,8 @@ class StateDerivedOwnerLaw:
         if str(source_dir.resolve()) not in sys.path:
             sys.path.insert(0, str(source_dir.resolve()))
         self.b2c1a = __import__("hi_transmission_kernel_b2c1a")
+        self.b2c0 = __import__("phase_space_kernel_b2c0")
+        self._chi_cache: dict[tuple[float, float], float] = {}
 
     @staticmethod
     def _row_key(rec: Mapping[str, Any]) -> tuple[int, int]:
@@ -227,7 +229,12 @@ class StateDerivedOwnerLaw:
         sigma = self.sigma[("HI", group)]
         gamma_hi = float(rec["Gamma_HI_s-1"])
         gray_sigma = float(self.b2c1a.gray_sigma_hi()[0])
-        chi = float(self.b2c1a.calibrate_chi_jeans(z, gamma_hi, gray_sigma)["chi_J"])
+        chi_key = (z, gamma_hi)
+        if chi_key not in self._chi_cache:
+            self._chi_cache[chi_key] = float(
+                self.b2c1a.calibrate_chi_jeans(z, gamma_hi, gray_sigma)["chi_J"]
+            )
+        chi = self._chi_cache[chi_key]
         n_h_phys = np.divide(n_h_total, volume, out=np.zeros_like(n_h_total), where=volume > 0.0)
         length = chi * self.b2c1a.jeans_length_cm(
             n_h_phys,
@@ -236,9 +243,54 @@ class StateDerivedOwnerLaw:
             x_heii,
             x_heiii,
         )
-        transmission = np.exp(-0.5 * np.clip(n_hi * sigma * length, 0.0, 745.0))
+        optical_depth = n_hi * sigma * length
+        if np.any(~np.isfinite(optical_depth)) or np.any(optical_depth < 0.0):
+            raise ValueError("subgrid optical depth must be finite and nonnegative")
+        # Large positive optical depths may underflow exp(-tau/2) to exact zero;
+        # this is the mathematical limiting value, not state or flux clipping.
+        with np.errstate(under="ignore"):
+            transmission = np.exp(-0.5 * optical_depth)
         # W_node converts the local hazard into the fixed comoving measure.
         return w * n_hi * sigma * transmission
+
+
+    def subgrid_lane_measures(
+        self, *, forcing_row: Mapping[str, Any], state_frame: pd.DataFrame, group: str
+    ) -> dict[str, np.ndarray]:
+        """Return the predeclared primary and two non-production auditor measures."""
+        state = state_frame
+        primary = self._subgrid_measure(forcing_row, state, group)
+        if group not in {"G1", "G2a"}:
+            zeros = np.zeros(len(state), dtype=float)
+            return {
+                "LOCAL_NEUTRAL_HAZARD_PRIMARY": zeros.copy(),
+                "RECOMBINATION_WEIGHTED_AUDITOR": zeros.copy(),
+                "SCRIPT_SELF_SHIELDING_AUDITOR": zeros.copy(),
+            }
+        z = float(forcing_row["z_mid"])
+        w = state["W_node"].to_numpy(dtype=float)
+        volume = w * MPC_CM**3 / (1.0 + z) ** 3
+        n_h_total_count = (state["N_HI"] + state["N_HII"]).to_numpy(dtype=float)
+        n_he_total_count = (state["N_HeI"] + state["N_HeII"] + state["N_HeIII"]).to_numpy(dtype=float)
+        n_h = np.divide(n_h_total_count, volume, out=np.zeros_like(n_h_total_count), where=volume > 0.0)
+        n_he = np.divide(n_he_total_count, volume, out=np.zeros_like(n_he_total_count), where=volume > 0.0)
+        n_hi = np.divide(state["N_HI"].to_numpy(dtype=float), volume, out=np.zeros_like(n_h), where=volume > 0.0)
+        n_hii = np.divide(state["N_HII"].to_numpy(dtype=float), volume, out=np.zeros_like(n_h), where=volume > 0.0)
+        n_heii = np.divide(state["N_HeII"].to_numpy(dtype=float), volume, out=np.zeros_like(n_he), where=volume > 0.0)
+        n_heiii = np.divide(state["N_HeIII"].to_numpy(dtype=float), volume, out=np.zeros_like(n_he), where=volume > 0.0)
+        ne = n_hii + n_heii + 2.0 * n_heiii
+        temperature = state["T_K"].to_numpy(dtype=float)
+        sigma = self.sigma[("HI", group)]
+        recombination = w * self.b2c0.alpha_b_hii(temperature) * ne * n_hii
+        gray_sigma = float(self.b2c1a.gray_sigma_hi()[0])
+        nss = self.b2c1a.self_shielding_density_cm3(temperature, float(forcing_row["Gamma_HI_s-1"]), gray_sigma)
+        attenuation = 1.0 - self.b2c1a.rahmati_gamma_ratio(n_h, nss)
+        self_shielding = w * n_hi * sigma * np.maximum(attenuation, 1.0e-12)
+        return {
+            "LOCAL_NEUTRAL_HAZARD_PRIMARY": primary,
+            "RECOMBINATION_WEIGHTED_AUDITOR": recombination,
+            "SCRIPT_SELF_SHIELDING_AUDITOR": self_shielding,
+        }
 
     def _node_measure(self, rec: Mapping[str, Any], state: pd.DataFrame, group: str, component: str) -> np.ndarray:
         if (component, group) not in SUPPORT:

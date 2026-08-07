@@ -87,3 +87,21 @@ def test_node_allocations_are_nonnegative_conservative_and_zero_support_safe():
         assert allocation.sum() == pytest.approx(row.owner_current_s_inv_cMpc3, rel=1e-13, abs=1e-30)
         support = result.node_support[key]
         assert np.count_nonzero((~support) & (allocation != 0.0)) == 0
+
+
+def test_explicit_heii_global_response_uses_helium_fraction_not_hydrogen_denominator():
+    law_mod, state, model, forcing = fixtures()
+    raw = model._global_raw(forcing, state.frame, "G3")
+    n_he = float((state.frame.N_HeI + state.frame.N_HeII + state.frame.N_HeIII).sum())
+    x_heii = float(state.frame.N_HeII.sum()) / n_he
+    z = float(forcing["z_mid"])
+    a = 1.0 / (1.0 + z)
+    n_he_phys = law_mod.YHE * law_mod.NH0_CM3 * (1.0 + z) ** 3
+    expected = (
+        a
+        * n_he_phys
+        * x_heii
+        * model.sigma[("HeII", "G3")]
+        * law_mod.MPC_CM
+    )
+    assert raw["EXPLICIT_HEII_ATOMIC"] == pytest.approx(expected, rel=2e-15)

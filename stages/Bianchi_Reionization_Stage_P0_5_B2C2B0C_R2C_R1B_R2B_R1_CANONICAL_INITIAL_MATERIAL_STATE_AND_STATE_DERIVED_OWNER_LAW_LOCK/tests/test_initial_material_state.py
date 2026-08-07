@@ -70,3 +70,26 @@ def test_initial_state_is_byte_deterministic_at_array_level():
     b = build()
     assert a.array_hashes == b.array_hashes
     assert set(a.array_hashes) >= {"N_HI", "N_HII", "N_HeI", "N_HeII", "N_HeIII", "U_resolved", "T_K"}
+
+
+def test_canonical_snapshot_builder_closes_dense_forcing_state():
+    mod = load_module()
+    r1_root = mod._normalize_stage_root(R1)
+    forcing_path = r1_root / "data" / "bdf_replay" / "canonical_time_resolved_forcing_nodes.csv"
+    import pandas as pd
+    forcing = pd.read_csv(forcing_path)
+    row = forcing[(forcing.interval_index == 0) & (forcing.node_index == 8)].iloc[0].to_dict()
+    snapshot = mod.build_material_snapshot_from_forcing_row(
+        forcing_row=row, r1_root=R1, r2a_root=R2A
+    )
+    f = snapshot.frame
+    h = float((f.N_HI + f.N_HII).sum())
+    he = float((f.N_HeI + f.N_HeII + f.N_HeIII).sum())
+    assert float(f.N_HII.sum() / h) == pytest.approx(row["xHII"], rel=1e-13)
+    assert float(f.N_HeI.sum() / he) == pytest.approx(row["xHeI"], rel=1e-13)
+    assert float(f.N_HeII.sum() / he) == pytest.approx(row["xHeII"], rel=1e-13)
+    assert float(f.N_HeIII.sum() / he) == pytest.approx(row["xHeIII"], rel=1e-13)
+    assert float(f.U_resolved.sum()) == pytest.approx(
+        snapshot.metadata["global_U_resolved_erg_cMpc-3"], rel=1e-13
+    )
+    assert snapshot.metadata["source_history_kind"] == "CANONICAL_BDF_DENSE_FORCING"

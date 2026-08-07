@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_canonical_snapshot_builder_closes_dense_forcing_state __________
+
+    def test_canonical_snapshot_builder_closes_dense_forcing_state():
+        mod = load_module()
+        r1_root = mod._normalize_stage_root(R1)
+        forcing_path = r1_root / "data" / "bdf_replay" / "canonical_time_resolved_forcing_nodes.csv"
+        import pandas as pd
+        forcing = pd.read_csv(forcing_path)
+        row = forcing[(forcing.interval_index == 0) & (forcing.node_index == 8)].iloc[0].to_dict()
+>       snapshot = mod.build_material_snapshot_from_forcing_row(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            forcing_row=row, r1_root=R1, r2a_root=R2A
+        )
+E       AttributeError: module 'r2b_r1_initial_material_state' has no attribute 'build_material_snapshot_from_forcing_row'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py:82: AttributeError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R1_CANONICAL_INITIAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK/tests/test_initial_material_state.py::test_canonical_snapshot_builder_closes_dense_forcing_state - AttributeError: module 'r2b_r1_initial_material_state' has no attribute 'build_material_snapshot_from_forcing_row'
+1 failed in 0.07s
