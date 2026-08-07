@@ -1,0 +1,41 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0 -- /opt/pyvenv/bin/python3
+cachedir: .pytest_cache
+metadata: {'Python': '3.13.5', 'Platform': 'Linux-6.18.35-x86_64-with-glibc2.41', 'Packages': {'pytest': '9.0.2', 'pluggy': '1.6.0'}, 'Plugins': {'cov': '7.0.0', 'json-report': '1.5.0', 'metadata': '3.1.1', 'Faker': '40.1.2', 'ddtrace': '4.4.0', 'anyio': '4.13.0', 'asyncio': '1.3.0'}, 'PLATFORM': 'linux/amd64', 'CI': 'true'}
+rootdir: /tmp/rei_r2b_r2_run
+configfile: pyproject.toml
+plugins: cov-7.0.0, json-report-1.5.0, metadata-3.1.1, Faker-40.1.2, ddtrace-4.4.0, anyio-4.13.0, asyncio-1.3.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 1 item
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py::test_large_expansion_step_uses_positive_implicit_thermal_root FAILED [100%]
+
+=================================== FAILURES ===================================
+________ test_large_expansion_step_uses_positive_implicit_thermal_root _________
+
+    def test_large_expansion_step_uses_positive_implicit_thermal_root():
+        micro = _load("microphysics")
+        parent = _parent(micro)
+        volume = np.full(parent.size, 1.0e120)
+        photo = micro.PhotoInputs.zeros(parent.size)
+        updated = micro.linearly_implicit_update(
+            parent=parent,
+            coefficient_state=parent,
+            proper_volume_cm3=volume,
+            photo=photo,
+            hubble_s_inv=1.0e-16,
+            dt_seconds=1.0e17,
+        )
+>       assert updated.feasible.all()
+E       assert np.False_
+E        +  where np.False_ = <built-in method all of numpy.ndarray object at 0x7fd71d7f9650>()
+E        +    where <built-in method all of numpy.ndarray object at 0x7fd71d7f9650> = array([False, False, False, False]).all
+E        +      where array([False, False, False, False]) = LinearizedUpdate(state=MaterialBatch(N_HI=array([8.00000000e+56, 5.36666667e+57, 2.73333333e+58, 1.00000000e+58]), N_HII=array([2.00000000e+56, 4.63333333e+57, 7.26666667e+58, 9.90000000e+59]), N_HeI=array([1.58e+55, 1.58e+56, 1.58e+57, 1.58e+58]), N_HeII=array([5.53e+55, 5.53e+56, 5.53e+57, 5.53e+58]), N_HeIII=array([7.9e+54, 7.9e+55, 7.9e+56, 7.9e+57]), U_resolved=array([-4.24995241e+46, -7.61834110e+47, -1.18156715e+49, -1.68419435e+50]), T_K=array([-152000., -228000., -304000., -380000.])), feasible=array([False, False, False, False]), minimum_species=array([7.9e+54, 7.9e+55, 7.9e+56, 7.9e+57]), hydrogen_residual=array([0., 0., 0., 0.]), helium_residual=array([0., 0., 0., 0.]), thermal_rhs_erg_s=array([-4.47363412e+29, -8.01930643e+30, -1.24375489e+32, -1.77283615e+33])).feasible
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py:176: AssertionError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py::test_large_expansion_step_uses_positive_implicit_thermal_root - assert np.False_
+ +  where np.False_ = <built-in method all of numpy.ndarray object at 0x7fd71d7f9650>()
+ +    where <built-in method all of numpy.ndarray object at 0x7fd71d7f9650> = array([False, False, False, False]).all
+ +      where array([False, False, False, False]) = LinearizedUpdate(state=MaterialBatch(N_HI=array([8.00000000e+56, 5.36666667e+57, 2.73333333e+58, 1.00000000e+58]), N_HII=array([2.00000000e+56, 4.63333333e+57, 7.26666667e+58, 9.90000000e+59]), N_HeI=array([1.58e+55, 1.58e+56, 1.58e+57, 1.58e+58]), N_HeII=array([5.53e+55, 5.53e+56, 5.53e+57, 5.53e+58]), N_HeIII=array([7.9e+54, 7.9e+55, 7.9e+56, 7.9e+57]), U_resolved=array([-4.24995241e+46, -7.61834110e+47, -1.18156715e+49, -1.68419435e+50]), T_K=array([-152000., -228000., -304000., -380000.])), feasible=array([False, False, False, False]), minimum_species=array([7.9e+54, 7.9e+55, 7.9e+56, 7.9e+57]), hydrogen_residual=array([0., 0., 0., 0.]), helium_residual=array([0., 0., 0., 0.]), thermal_rhs_erg_s=array([-4.47363412e+29, -8.01930643e+30, -1.24375489e+32, -1.77283615e+33])).feasible
+============================== 1 failed in 0.81s ===============================
