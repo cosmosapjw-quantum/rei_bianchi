@@ -1,0 +1,22 @@
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+___ test_physical_map_closes_on_small_internal_step_without_subgrid_leakage ____
+
+    def test_physical_map_closes_on_small_internal_step_without_subgrid_leakage():
+        p=_load('r2b_r2a_physical_trial',STAGE/'analysis/physical_trial.py')
+        solver=p.PhysicalTrialSolver.from_repo(repo_root=REPO,lane='LOCAL_NEUTRAL_HAZARD_PRIMARY')
+        duration=solver.forcing.duration_seconds(0)
+        trial=solver.solve_trial(
+            solver.inputs.state0,0.0,duration/1024,1024,'FULL'
+        )
+>       assert trial.result.converged
+E       AssertionError: assert False
+E        +  where False = TrialResult(state=ArrayState(values=array([[3.00390905e-124, 9.92937826e-124, 2.86239995e-123, ...,\n        3.33897362...cation': 'FIXED_POINT_NONCONVERGENCE', 'residual': 1.7482939540514053e-09, 'iterations': 9, 'damping_exhausted': True}).converged
+E        +    where TrialResult(state=ArrayState(values=array([[3.00390905e-124, 9.92937826e-124, 2.86239995e-123, ...,\n        3.33897362...cation': 'FIXED_POINT_NONCONVERGENCE', 'residual': 1.7482939540514053e-09, 'iterations': 9, 'damping_exhausted': True}) = MicroTrial(result=TrialResult(state=ArrayState(values=array([[3.00390905e-124, 9.92937826e-124, 2.86239995e-123, ...,\n...otoheating': 0.0, 'unresolved_absorbed_energy': 0.0, 'cooling': 0.0, 'expansion_work': 0.0, 'mass_transfer_work': 0.0}).result
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_physical_trial.py:26: AssertionError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_physical_trial.py::test_physical_map_closes_on_small_internal_step_without_subgrid_leakage - AssertionError: assert False
+ +  where False = TrialResult(state=ArrayState(values=array([[3.00390905e-124, 9.92937826e-124, 2.86239995e-123, ...,\n        3.33897362...cation': 'FIXED_POINT_NONCONVERGENCE', 'residual': 1.7482939540514053e-09, 'iterations': 9, 'damping_exhausted': True}).converged
+ +    where TrialResult(state=ArrayState(values=array([[3.00390905e-124, 9.92937826e-124, 2.86239995e-123, ...,\n        3.33897362...cation': 'FIXED_POINT_NONCONVERGENCE', 'residual': 1.7482939540514053e-09, 'iterations': 9, 'damping_exhausted': True}) = MicroTrial(result=TrialResult(state=ArrayState(values=array([[3.00390905e-124, 9.92937826e-124, 2.86239995e-123, ...,\n...otoheating': 0.0, 'unresolved_absorbed_energy': 0.0, 'cooling': 0.0, 'expansion_work': 0.0, 'mass_transfer_work': 0.0}).result
+1 failed, 2 passed in 8.50s

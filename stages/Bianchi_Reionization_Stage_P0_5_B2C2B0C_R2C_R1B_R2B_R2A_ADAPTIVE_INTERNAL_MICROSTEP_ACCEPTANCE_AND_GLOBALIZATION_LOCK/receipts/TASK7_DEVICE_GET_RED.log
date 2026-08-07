@@ -1,0 +1,19 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_jax_root_uses_one_synchronous_device_get_per_solve ____________
+
+    def test_jax_root_uses_one_synchronous_device_get_per_solve():
+     m=_load('r2b_r2a_thermal_backends_device_get',STAGE/'analysis/thermal_backends.py')
+     _logT,pop,volume,heat,H,U0,dt=_batch(); T0=np.exp(_logT)
+     backend=m.JaxThermalBackend.from_repo(REPO)
+     for factor in (1.0,.5,.25):
+      backend.solve(populations=pop,parent_energy=U0,parent_temperature=T0,
+                    volume=volume,photoheat=heat,hubble=H,dt=dt*factor)
+>    assert backend.device_get_count == 3
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+E    AttributeError: 'JaxThermalBackend' object has no attribute 'device_get_count'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_backend_parity.py:90: AttributeError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_backend_parity.py::test_jax_root_uses_one_synchronous_device_get_per_solve - AttributeError: 'JaxThermalBackend' object has no attribute 'device_get_count'
+1 failed in 0.65s

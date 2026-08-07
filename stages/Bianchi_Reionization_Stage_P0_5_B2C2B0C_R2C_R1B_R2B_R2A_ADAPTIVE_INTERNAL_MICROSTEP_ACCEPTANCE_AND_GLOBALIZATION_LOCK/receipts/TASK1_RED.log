@@ -1,0 +1,60 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_precalculation_lock_declares_exact_adaptive_policy ____________
+
+    def test_precalculation_lock_declares_exact_adaptive_policy():
+>       lock = json.loads((STAGE / "INPUT_LOCK.json").read_text())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_stage_scaffold.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/mnt/data/rei_bianchi_r2b_r2a_feature/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/INPUT_LOCK.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/mnt/data/rei_bianchi_r2b_r2a_feature/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/INPUT_LOCK.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+________________ test_stage_contracts_and_harness_receipt_exist ________________
+
+    def test_stage_contracts_and_harness_receipt_exist():
+        for name in (
+            "SCIENTIFIC_CONTRACT.md",
+            "RESEARCH_CONTRACT.md",
+            "STAGE_STATE.json",
+            "receipts/HARNESS_RECEIPT.json",
+            "receipts/BASELINE_RECEIPT.json",
+            "inputs/APPROVED_DESIGN.md",
+            "inputs/PERFORMANCE_BENCHMARK_SPEC.json",
+        ):
+>           assert (STAGE / name).is_file(), name
+E           AssertionError: SCIENTIFIC_CONTRACT.md
+E           assert False
+E            +  where False = is_file()
+E            +    where is_file = (PosixPath('/mnt/data/rei_bianchi_r2b_r2a_feature/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK') / 'SCIENTIFIC_CONTRACT.md').is_file
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_stage_scaffold.py:37: AssertionError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_stage_scaffold.py::test_precalculation_lock_declares_exact_adaptive_policy - FileNotFoundError: [Errno 2] No such file or directory: '/mnt/data/rei_bianchi_r2b_r2a_feature/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/INPUT_LOCK.json'
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_stage_scaffold.py::test_stage_contracts_and_harness_receipt_exist - AssertionError: SCIENTIFIC_CONTRACT.md
+assert False
+ +  where False = is_file()
+ +    where is_file = (PosixPath('/mnt/data/rei_bianchi_r2b_r2a_feature/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK') / 'SCIENTIFIC_CONTRACT.md').is_file
+2 failed in 0.07s
