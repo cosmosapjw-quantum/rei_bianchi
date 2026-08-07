@@ -1,0 +1,103 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+____ test_linearized_implicit_event_step_preserves_nuclei_and_positive_cone ____
+
+    def test_linearized_implicit_event_step_preserves_nuclei_and_positive_cone():
+        micro = _load("microphysics")
+        parent = _parent(micro)
+        volume = np.geomspace(1e64, 1e67, parent.size)
+        photo = micro.PhotoInputs(
+            HI=np.geomspace(1e35, 1e42, parent.size),
+            HeI=np.geomspace(1e34, 1e41, parent.size),
+            HeII=np.geomspace(1e33, 1e40, parent.size),
+            heating_erg_s=np.geomspace(1e25, 1e32, parent.size),
+        )
+>       updated = micro.linearly_implicit_update(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            parent=parent,
+            coefficient_state=parent,
+            proper_volume_cm3=volume,
+            photo=photo,
+            hubble_s_inv=2e-17,
+            dt_seconds=1e8,
+        )
+E       AttributeError: module 'r2b_r2_microphysics' has no attribute 'linearly_implicit_update'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py:49: AttributeError
+__________ test_transaction_rejection_and_rollback_are_byte_identical __________
+
+    def test_transaction_rejection_and_rollback_are_byte_identical():
+        micro = _load("microphysics")
+>       transaction = _load("transaction")
+                      ^^^^^^^^^^^^^^^^^^^^
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py:21: in _load
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:1022: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1159: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x7f19f6f09490>
+path = '/tmp/rei_r2b_r2_run/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/analysis/transaction.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/rei_r2b_r2_run/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/analysis/transaction.py'
+
+<frozen importlib._bootstrap_external>:1217: FileNotFoundError
+__ test_successful_transaction_commits_exactly_once_and_restart_is_identical ___
+
+    def test_successful_transaction_commits_exactly_once_and_restart_is_identical():
+        micro = _load("microphysics")
+        transaction = _load("transaction")
+>       history = transaction.AcceptedHistory(state=_parent(micro), ledgers={"photon": 0.0})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'r2b_r2_transaction' has no attribute 'AcceptedHistory'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py:84: AttributeError
+_______ test_picard_fixed_point_converges_with_state_dependent_photo_law _______
+
+    def test_picard_fixed_point_converges_with_state_dependent_photo_law():
+        micro = _load("microphysics")
+>       fixed = _load("fixed_point")
+                ^^^^^^^^^^^^^^^^^^^^
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py:21: in _load
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:1022: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1159: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x7f19f583f2f0>
+path = '/tmp/rei_r2b_r2_run/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/analysis/fixed_point.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/rei_r2b_r2_run/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/analysis/fixed_point.py'
+
+<frozen importlib._bootstrap_external>:1217: FileNotFoundError
+_____ test_picard_nonconvergence_preserves_parent_and_earliest_certificate _____
+
+    def test_picard_nonconvergence_preserves_parent_and_earliest_certificate():
+        micro = _load("microphysics")
+        fixed = _load("fixed_point")
+        transaction = _load("transaction")
+        parent = _parent(micro)
+>       history = transaction.AcceptedHistory(state=parent, ledgers={"resolved": 0.0})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'r2b_r2_transaction' has no attribute 'AcceptedHistory'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py:134: AttributeError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py::test_linearized_implicit_event_step_preserves_nuclei_and_positive_cone - AttributeError: module 'r2b_r2_microphysics' has no attribute 'linearly_implicit_update'
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py::test_transaction_rejection_and_rollback_are_byte_identical - FileNotFoundError: [Errno 2] No such file or directory: '/tmp/rei_r2b_r2_run/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/analysis/transaction.py'
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py::test_successful_transaction_commits_exactly_once_and_restart_is_identical - AttributeError: module 'r2b_r2_transaction' has no attribute 'AcceptedHistory'
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py::test_picard_fixed_point_converges_with_state_dependent_photo_law - FileNotFoundError: [Errno 2] No such file or directory: '/tmp/rei_r2b_r2_run/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/analysis/fixed_point.py'
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2_OWNER_CORRECT_PHOTON_CONSERVING_NONAUTONOMOUS_FIXED_POINT_HISTORY_RERUN/tests/test_transaction_fixed_point.py::test_picard_nonconvergence_preserves_parent_and_earliest_certificate - AttributeError: module 'r2b_r2_transaction' has no attribute 'AcceptedHistory'
+5 failed in 0.30s
