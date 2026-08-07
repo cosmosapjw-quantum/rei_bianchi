@@ -1,43 +1,16 @@
 # Current science state — rei_bianchi
 
-The latest durable local stage is
+Current durable stage:
 
 ```text
-P0.5-B2C2B0C-R2C-R1B-R2B-R1-
-CANONICAL-INITIAL-MATERIAL-STATE-AND-STATE-DERIVED-OWNER-LAW-LOCK
-
-DURABLE_PASS_R2C_R1B_R2B_R1_
-CANONICAL_MATERIAL_STATE_AND_STATE_DERIVED_OWNER_LAW_LOCK_
-R2B_R2_AUTHORIZED
+P0.5-B2C2B0C-R2C-R1B-R2B-R2-OWNER-CORRECT-PHOTON-CONSERVING-NONAUTONOMOUS-FIXED-POINT-HISTORY-RERUN
+DURABLE_FAIL_CLOSED_R2C_R1B_R2B_R2_NOMINAL_DT_TO_DT8_FIRST_SLAB_FIXED_POINT_NONCONVERGENCE_INTERNAL_DT256_EXISTENCE_WITNESS_ADAPTIVE_MICROSTEP_LOCK_AUTHORIZED
 ```
 
-The merged R1B-R2B operator stage had correctly failed closed because the
-canonical inputs did not yet contain a locked initial material state or an
-identified nonautonomous owner law. R2B-R1 now supplies both inputs under
-explicit locked assumptions:
+The R2B-R1 46,080-node material state and state-conditioned four-owner law were coupled to the owner-correct implicit H/He/thermal operator. At the first canonical BDF slab, all required macro refinements `dt,dt/2,dt/4,dt/8` failed the locked hard maximum Picard convergence gate after 40 iterations, with residuals `{'1': 0.13302637807989015, '2': 0.1469936199885531, '4': 0.10784482370613802, '8': 0.1186895886857986}`. H and He nuclei residuals remained below `8e-16`; no material-capacity or thermal-cone failure occurred, and rejected attempts preserved the parent byte image.
 
-- a deterministic positive 46,080-node material state at `z=6`, derived from
-  the exact direct-history row, the fixed two-scale hierarchy, and one global
-  thermal normalization;
-- a deterministic four-owner law using authoritative canonical total
-  `kappa_g,J_g`, state-derived explicit H/He responses, an externally locked
-  effective-HI global amplitude, and state-conditioned owner/node measures.
+An internal interval/256 microstep converged to residual `4.9730886075849412e-11` in 25 iterations. This is an existence witness, not a production history. It rules out a physical-history no-go and identifies the missing object as a predeclared adaptive internal-microstep/globalization policy.
 
-The 85-row full forcing audit has no negative allocation, no zero-support
-violation, no structural-zero violation, and no failed predeclared state
-sensitivity gate. The largest load-bearing closure residual is `6.421e-12`,
-below the `1e-11` hard gate.
+Next stage: `P0.5-B2C2B0C-R2C-R1B-R2B-R2A-ADAPTIVE-INTERNAL-MICROSTEP-ACCEPTANCE-AND-GLOBALIZATION-LOCK`. Production node chemistry, R2C-R2, B2C2B, recombination splice, CAMB and Bianchi feedback remain unauthorized.
 
-This is an input/operator lock only. No production history is integrated.
-Production node chemistry, R2C-R2, B2C2B, primordial-recombination splice,
-CAMB transfer, and Bianchi feedback remain unauthorized.
-
-Next stage:
-
-```text
-P0.5-B2C2B0C-R2C-R1B-R2B-R2-
-OWNER-CORRECT-PHOTON-CONSERVING-
-NONAUTONOMOUS-FIXED-POINT-HISTORY-RERUN
-```
-
-Start with `handoff/CURRENT_HANDOFF_PROMPT.md` and the R2B-R1 stage directory.
+`rec_bianchi/main` is connector-verified at PR-05B3/v0.61 (`796eabf6339b9a13355ccc61907a5314b9cd9196`). Only XOR ownership and accepted-step/rollback semantics are referenced; no numerical recombination input is imported.

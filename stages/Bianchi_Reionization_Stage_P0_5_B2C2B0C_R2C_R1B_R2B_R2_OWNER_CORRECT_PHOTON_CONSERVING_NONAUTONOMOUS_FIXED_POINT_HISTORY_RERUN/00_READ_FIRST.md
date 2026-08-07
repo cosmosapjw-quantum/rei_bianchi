@@ -1,9 +1,25 @@
 # R2B-R2 owner-correct fixed-point history rerun — read first
 
-This stage executes the first full owner-correct, photon-conserving, nonautonomous H/He/thermal history from the durable R2B-R1 input/operator lock.
+This durable stage is a **fail-closed numerical-policy result**, not a production history.
 
-The authoritative global group opacity/current remains the canonical B2C2A-R1 forcing. The current accepted material state determines conditional owner fractions and owner-internal node allocations. `EFFECTIVE_HI_SUBGRID` removes photons and accumulates unresolved absorbed energy only; its resolved H, He, and thermal sources are structurally exact zero.
+```text
+P0.5-B2C2B0C-R2C-R1B-R2B-R2-
+OWNER-CORRECT-PHOTON-CONSERVING-NONAUTONOMOUS-FIXED-POINT-HISTORY-RERUN
 
-The calculation must fail closed without clipping, owner reassignment, `kappa=J/Phi` constitutive inversion, cloud/geometry inversion, post-hoc lane selection, or a recombination surrogate. Accepted-step commit and rejected-step rollback are transactional and byte-audited.
+DURABLE_FAIL_CLOSED_R2C_R1B_R2B_R2_
+NOMINAL_DT_TO_DT8_FIRST_SLAB_FIXED_POINT_NONCONVERGENCE_
+INTERNAL_DT256_EXISTENCE_WITNESS_ADAPTIVE_MICROSTEP_LOCK_AUTHORIZED
+```
 
-The stage begins from the exact 46,080-node z=6 material state and the 85-row canonical BDF forcing locked by R2B-R1. Primary and two auditor subgrid lanes are all evaluated. Production node chemistry is authorized only if all primary scientific gates close; auditors quantify systematic sensitivity and are never selected after seeing outcomes.
+The exact 46,080-node R2B-R1 material state, state-conditioned owner law, 17-node canonical BDF forcing and positive implicit H/He/thermal map were exercised at the first canonical slab. All required macro refinements `dt,dt/2,dt/4,dt/8` failed only the prelocked hard maximum Picard convergence gate after 40 iterations. H and He nuclei residuals stayed below `8e-16`, species and temperature remained positive, and rejected solves preserved the parent byte image.
+
+A much smaller internal step, interval/256, converged below the same `1e-10` hard residual. This is an existence witness only: it excludes a physical-history no-go but does not define an accepted adaptive controller or promote node chemistry.
+
+The next stage is:
+
+```text
+P0.5-B2C2B0C-R2C-R1B-R2B-R2A-
+ADAPTIVE-INTERNAL-MICROSTEP-ACCEPTANCE-AND-GLOBALIZATION-LOCK
+```
+
+Production node chemistry, R2C-R2, B2C2B, recombination splice, CAMB transfer and Bianchi feedback remain unauthorized.
