@@ -3,14 +3,25 @@
 Current durable stage:
 
 ```text
-P0.5-B2C2B0C-R2C-R1B-R1-CANONICAL-TIME-RESOLVED-GROUP-BOUNDARY-FLUX-DYNAMIC-OPACITY-AND-HEATING-MOMENT-EXTRACTION-LOCK
-DURABLE_PASS_R2C_R1B_R1_CANONICAL_BDF_DENSE_FORCING_STATE_DERIVED_CONDITIONAL_OPACITY_AND_BDF_CALIBRATED_HEATING_LOCK_R1B_R2_AUTHORIZED
+P0.5-B2C2B0C-R2C-R1B-R2A-PHOTON-SINK-MATERIAL-REACTION-OWNER-SPLIT-PREFLIGHT
+DURABLE_PASS_R2C_R1B_R2A_OWNER_SPLIT_REMOVES_FALSE_CAPACITY_BLOCKER_OWNER_CORRECT_R1B_R2B_AUTHORIZED
 ```
 
-The R1B-R1 rerun was reconstructed from canonical bytes after the original upload failure. It locks a 17-node representation of the canonical BDF dense forcing, Verner H/He group moments, a conditionally unique state-derived macro/node opacity-current distribution, and separate thermal forcing/heating moments. The pass is an input/operator lock only.
+The first R1B-R2 full attempt is preserved as invalid because total low-group absorption was assigned both to `EFFECTIVE_HI_SUBGRID` and to resolved material/thermal updates. R1B-R2A splits the canonical group current by mutually exclusive opacity owners before chemistry.
 
-Inherited caveat: the photon ledger residual is 2.931e-10. It passes the hard 1e-8 gate but misses the 1e-10 engineering target.
+Complete preflight audit:
 
-Absolute global opacity normalization remains inherited from B2C2A-R1; the state determines its conditional distribution under the four locked axioms. No old shape prior is promoted.
+- 85 canonical forcing rows, 340 group cases, 1,360 owner rows;
+- 225/225 owner-correct H/He capacity cases pass;
+- 20/20 reachable unsplit first-substep comparisons fail as expected;
+- maximum assigned/capacity ratio `0.219974`;
+- minimum slack fraction `0.780026`;
+- owner opacity/current closure at approximately `2e-16`;
+- exact zero resolved H/He/thermal source for the subgrid owner;
+- no clipping, owner reassignment or cross-macro transport.
 
-Next stage: `P0.5-B2C2B0C-R2C-R1B-R2-PHOTON-CONSERVING-NONAUTONOMOUS-FIXED-POINT-HISTORY`. Coding harness use begins there. Production node chemistry, R2C-R2, B2C2B, recombination splice, CAMB and Bianchi feedback remain unauthorized.
+The raw component-opacity amplitude differs from the authoritative total by up to `0.00116979` and is therefore used only for conditional fractions. No chemistry or temperature history was integrated.
+
+Next stage: `P0.5-B2C2B0C-R2C-R1B-R2B-OWNER-CORRECT-PHOTON-CONSERVING-NONAUTONOMOUS-FIXED-POINT-HISTORY`. Production node chemistry, R2C-R2, B2C2B, recombination splice, CAMB and Bianchi feedback remain unauthorized.
+
+`rec_bianchi` is at PR-05B2/v0.60 (`c3d246ca9911b392da8c955ee0cf9a90073f7317`), with causal accepted history locked and PR-05B3 ownership swap next. It is a read-only semantic compatibility reference, not a numerical input.
