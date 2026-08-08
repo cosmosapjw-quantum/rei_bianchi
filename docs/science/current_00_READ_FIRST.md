@@ -3,12 +3,12 @@
 Current durable stage:
 
 ```text
-P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-VALIDATED-CONTINUOUS-BRANCH-DIFFERENTIAL-INCLUSION-ENCLOSURE-LOCK
-DURABLE_FAIL_CLOSED_R2_R1A_R1_CONSTANT_ORTHANT_EXCLUDED_COMPONENTWISE_BOX_WRAPPING_CROSSES_SOURCE_TABLE_BOUNDARY_AFFINE_TAYLOR_MODEL_LOCK_AUTHORIZED
+P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-AFFINE-SET-PARAMETERIZED-TAYLOR-MODEL-CONTINUOUS-BRANCH-ENCLOSURE-LOCK
+DURABLE_FAIL_CLOSED_R2_R1A_R1_R1_SOURCE_SAFE_PARAMETER_RANK_NOT_REPRESENTED_COHERENT_GLOBAL_TAYLOR_AUDITOR_NARROW_SPARSE_LOCAL_GENERATOR_LOCK_AUTHORIZED
 ```
 
-The continuous branch family is not yet certified. Constant diagonal orthant monotonicity is excluded by a robust Jacobian sign reversal. The tested outward-rounded componentwise Picard boxes pass a scalar control but suffer dependency/wrapping on the project RHS and cross a forbidden Hummer--Seaton table boundary for partitions 16, 32 and 64. This is not physical nonexistence.
+The source-safe branch family permits independent node-local `(v_i,f_i)` values. Exact event-level sensitivity analysis gives tangent-rank lower bound `92003`, while the tested coherent global Taylor model has rank `2`. Its narrow widths and withheld-point residuals are therefore conditional auditor evidence, not a source-safe continuous-family certificate.
 
-The previous 24 numerical realization endpoints remain narrow regression evidence. Production history, production node chemistry, `R2C-R2`, `B2C2B`, recombination splice, CAMB transfer and Bianchi feedback remain unauthorized.
+This is a representation no-go, not physical nonexistence. Production history, production node chemistry, `R2C-R2`, `B2C2B`, recombination splice, CAMB transfer and Bianchi feedback remain unauthorized.
 
-Next stage: `P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-AFFINE-SET-PARAMETERIZED-TAYLOR-MODEL-CONTINUOUS-BRANCH-ENCLOSURE-LOCK`.
+Next stage: `P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-SPARSE-LOCAL-GENERATOR-AFFINE-TAYLOR-MODEL-ENCLOSURE-LOCK`.

@@ -38,3 +38,8 @@ Two node-local sign-selected adversarial trajectories remain inside the global c
 ## Claim boundary
 
 The stage proves that the authorized two-generator affine/Taylor ansatz is dimensionally insufficient for the source-safe node-local branch family.  It does not prove that the physical continuous family is wide or that an uncertainty-qualified history does not exist.
+
+
+## Verification boundary
+
+Fresh file-isolated regression covers `61` test files and `249` tests with zero failures. The stage tests report `8 passed`, the independent validator reports `PASS`, and the research harness validator reports `PASS`.
