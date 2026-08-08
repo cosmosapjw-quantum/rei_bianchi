@@ -1,67 +1,68 @@
-# R2B-R2A-R2-R1A Four-Corner OTS Propagation Design
+# R2B-R2A-R2-R1A Four-Corner Propagation Design
 
 ## Goal
 
-Propagate the source-locked Hummer--Seaton branch uncertainty and unresolved OTS energy uncertainty through the accepted MPRK22(1)+Alexander-SDIRK2 first-canonical-interval operator without post-hoc lane selection, while preserving population, photon, resolved-energy, unresolved-energy, escaped-energy, and augmented total-energy ledgers at every microstep.
+Execute the authorized physics preflight
+`P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-FOUR-CORNER-BRANCH-AND-UNRESOLVED-OTS-ENERGY-PROPAGATION-PREFLIGHT`
+without inventing a continuous source kernel, selecting a branch lane after seeing results, or promoting unresolved OTS energy to resolved heat.
 
-## Locked inputs
+## Fixed inputs
 
-- prerequisite commit `893d2e06f6a32015603087881933e4763f00d2cb`;
-- 46,080-node initial material state and three fixed shape lanes;
-- 26-event full-OTS registry;
-- Hummer--Seaton nodal `v` table and nodewise cell endpoints;
-- `f in [0.1,1]` only;
-- exact He II Ly-alpha packet energy `40.813320 eV`;
-- locked two-photon first-moment bounds;
-- MPRK22(1), Alexander-SDIRK2, analytic safeguarded root backend, owner law, and existing ledgers.
+The following remain immutable: the 26-event registry, 46,080-node material state, owner law, canonical BDF forcing, MPRK22(1), Alexander L-stable SDIRK2, analytic safeguarded thermal root, exact He II Ly-alpha packet energy, and the separate photon/resolved-energy/unresolved-energy/escape ledgers.
 
-## Uncertainty lanes
+## Branch lanes
 
-Use four global `v` policies, two `f` endpoints, two OTS-energy policies, and all three shape lanes:
+For each node, let `f in [0.1,1]`.
 
-1. `CELL_LOWER_STRICT`: table-cell lower endpoint; below-table nodes use `v=0`.
-2. `CELL_UPPER_STRICT`: table-cell upper endpoint; below-table nodes use `v=1`.
-3. `ADAPTER_TABLE_LOW_STRICT`: named log-linear adapter inside the table; below-table nodes use `v=0`.
-4. `ADAPTER_TABLE_HIGH_STRICT`: named log-linear adapter inside the table; below-table nodes use `v=1`.
+- If `T < 10^4 K`, propagate the four strict source-safe corners `(v,f) in {0,1} x {0.1,1}`. No continuous `v(T)` adapter is permitted.
+- If `10^4 K <= T <= 10^5 K`, find the bracketing Hummer-Seaton table cell and propagate the four endpoint corners `(v,f) in {v_left,v_right} x {0.1,1}`.
+- In the table domain only, also propagate two explicitly noncanonical adapter lanes `(v_loglinear(T),0.1)` and `(v_loglinear(T),1)`.
+- Preserve lane identities even when a node lies exactly on a table knot and numerical values coincide.
 
-For each, use `f=0.1` and `f=1`.  For energy:
+The four corners are load-bearing envelope lanes. The two log-linear lanes are named adapter auditors and cannot narrow the load-bearing envelope.
 
-- `UNRESOLVED_ONLY`: only exact He II Ly-alpha excess is resolved; all other OTS packet energy stays in `E_OTS_unres`.
-- `TWO_PHOTON_BOUND_EXTREME`: propagate the locked lower/upper two-photon excess-energy endpoint while free-bound, Balmer, and case-B first moments remain unresolved.
+## Event-resolved population operator
 
-The implementation represents the two energy endpoints as `ENERGY_LOWER` and `ENERGY_UPPER`, giving 16 uncertainty policies per shape lane and 48 global runs.
+The branch-aware population RHS is reconstructed from the locked event graph, not from the legacy sigmoid/exponential `v(T), f(x_HI)` functions. All photoionization, collisional ionization, recombination, and OTS cascade contributions are represented as nonnegative event fluxes and then supplied to the existing MPRK22 production-destruction update.
 
-## Numerical scope
+The event sum must reproduce the branch-parameterized population RHS at relative residual below `1e-13`; H and He nuclei residuals must remain below `1e-11`; no direct He I to He III event is allowed.
 
-Run the first canonical interval with partition 2048.  This is an uncertainty-propagation preflight, not an accepted production history.  Each microstep is transactional; a failed lane leaves its parent state and ledgers unchanged.
+## Energy ownership
 
-## Acceptance gates
+- He II Ly-alpha absorption uses exactly `40.813320 eV`; its H I and He I excess energies enter resolved heating exactly once.
+- Two-photon H-capable and He-I-capable first moments use the locked lower/upper bounds as explicit energy auditor lanes. They do not become a unique spectrum.
+- Free-bound, Balmer, and case-B packet energy remains in `E_OTS_unresolved` unless a source-locked first moment exists.
+- Escaped Ly-alpha energy enters the escaped-radiation ledger.
+- Every event must have exactly one energy owner. Duplicate and unowned energy counts must both be zero.
 
-Every lane must satisfy:
+## Numerical preflight
 
-- strict material positivity without clipping;
-- H and He nuclei residuals `<1e-11`;
-- owner and group photon closure `<1e-11`;
-- thermal/root residual `<1e-10`;
-- augmented total-energy residual `<1e-10`;
-- exact-zero unsupported support and exact-zero subgrid resolved source;
-- no negative branch multiplicity or branch-domain escape.
+Run the first accepted microstep at the already validated partition `2048`. For each of the three shape lanes, compute one full step and two half steps for every load-bearing branch corner. Table-domain log-linear lanes are run as auditors.
 
-Predeclare the uncertainty qualification gate as ten times the numerical local-error gate:
+Hard numerical gates:
 
-- `max width(x_HII,x_HeI,x_HeII,x_HeIII) <= 2e-3`;
-- `max width(log T) <= 2e-3`.
+- fixed-point/thermal roots converge;
+- strict species positivity;
+- H and He nuclei residuals `<=1e-11`;
+- owner closure `<=1e-11`;
+- photon closure `<=1e-8`;
+- resolved thermal balance `<=1e-10`;
+- total energy closure including unresolved and escaped ledgers `<=1e-10`;
+- event reconstruction `<=1e-13`;
+- full/two-half local error `<2e-4` for each lane.
 
-This gate is a project research budget, not a literature-derived universal tolerance.  Failure does not invalidate the event graph; it routes the project to source-extension calibration.
+## Predeclared uncertainty gate
 
-## Outputs
+At the end of the microstep, use only the load-bearing corners to form nodewise enclosures. The stage authorizes an uncertainty-qualified first canonical interval only if, in all three shape lanes,
 
-- per-lane and per-microstep ledger tables;
-- final nodewise interval enclosures;
-- lane failure certificates;
-- exact symbolic and Decimal replay receipts;
-- durable stage state, input lock, manifest, hashes, compact bundle, registry and handoff updates.
+- `max width(x_HII) < 2e-4`,
+- `max width(x_HeII) < 2e-4`,
+- `max width(x_HeIII) < 2e-4`,
+- `max width(log T) < 2e-4`,
+- and all hard numerical gates pass for every corner.
 
-## Claim boundary
+These thresholds intentionally match the existing local-error contract: source-model uncertainty may not exceed the accepted numerical truncation scale. Failure does not imply physical nonexistence; it routes to a source-extension/calibration stage for low-temperature `v`, `f`, or packet spectra.
 
-A pass authorizes only a first-canonical-interval uncertainty-qualified history stage.  It does not authorize production node chemistry, R2C-R2, B2C2B, recombination splice, CAMB transfer, front/Q_M, source/fesc fitting, or Bianchi feedback.
+## Transaction and evidence
+
+A rejected branch lane must not mutate the parent state or accepted ledgers. The stage records per-lane certificates, nodewise enclosure summaries, exact/Wolfram identities, Decimal replay, research-harness phase documents, manifests, SHA-256 sums, and a compact immutable bundle. Production history remains unauthorized unless the predeclared uncertainty gate closes.
