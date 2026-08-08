@@ -1,0 +1,46 @@
+FF...FF                                                                  [100%]
+=================================== FAILURES ===================================
+_______ test_registry_has_eight_branch_policies_and_no_fake_energy_axis ________
+
+    def test_registry_has_eight_branch_policies_and_no_fake_energy_axis():
+        m=load_module(); policies=m.policy_registry()
+>       assert len(policies)==8
+E       AssertionError: assert 16 == 8
+E        +  where 16 = len((UncertaintyPolicy(policy_id='CELL_LOWER_STRICT__F_0P1__ENERGY_LOWER', v_policy='CELL_LOWER_STRICT', f_value=0.1, ener...CELL_UPPER_STRICT__F_0P1__ENERGY_UPPER', v_policy='CELL_UPPER_STRICT', f_value=0.1, energy_policy='ENERGY_UPPER'), ...))
+
+mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_uncertainty_policy.py:26: AssertionError
+_____________ test_only_source_safe_cell_corners_are_load_bearing ______________
+
+    def test_only_source_safe_cell_corners_are_load_bearing():
+        m=load_module(); policies=m.policy_registry()
+>       load=[p for p in policies if p.load_bearing]
+                                     ^^^^^^^^^^^^^^
+E       AttributeError: 'UncertaintyPolicy' object has no attribute 'load_bearing'
+
+mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_uncertainty_policy.py:34: AttributeError
+__ test_temperature_driven_policy_uses_table_cells_and_strict_subtable_bounds __
+
+    def test_temperature_driven_policy_uses_table_cells_and_strict_subtable_bounds():
+        m=load_module()
+        T=np.array([5000.0,10000.0,15000.0,10**4.5,70000.0])
+>       low=m.build_v_field_from_temperature('CELL_LOWER_STRICT',T)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'uncertainty_policy' has no attribute 'build_v_field_from_temperature'
+
+mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_uncertainty_policy.py:65: AttributeError
+_______________ test_temperature_above_source_table_fails_closed _______________
+
+    def test_temperature_above_source_table_fails_closed():
+        m=load_module()
+>       try: m.build_v_field_from_temperature('CELL_UPPER_STRICT',np.array([100001.0]))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'uncertainty_policy' has no attribute 'build_v_field_from_temperature'
+
+mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_uncertainty_policy.py:77: AttributeError
+=========================== short test summary info ============================
+FAILED mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_uncertainty_policy.py::test_registry_has_eight_branch_policies_and_no_fake_energy_axis - AssertionError: assert 16 == 8
+ +  where 16 = len((UncertaintyPolicy(policy_id='CELL_LOWER_STRICT__F_0P1__ENERGY_LOWER', v_policy='CELL_LOWER_STRICT', f_value=0.1, ener...CELL_UPPER_STRICT__F_0P1__ENERGY_UPPER', v_policy='CELL_UPPER_STRICT', f_value=0.1, energy_policy='ENERGY_UPPER'), ...))
+FAILED mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_uncertainty_policy.py::test_only_source_safe_cell_corners_are_load_bearing - AttributeError: 'UncertaintyPolicy' object has no attribute 'load_bearing'
+FAILED mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_uncertainty_policy.py::test_temperature_driven_policy_uses_table_cells_and_strict_subtable_bounds - AttributeError: module 'uncertainty_policy' has no attribute 'build_v_field_from_temperature'
+FAILED mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_uncertainty_policy.py::test_temperature_above_source_table_fails_closed - AttributeError: module 'uncertainty_policy' has no attribute 'build_v_field_from_temperature'
+4 failed, 3 passed in 0.07s
