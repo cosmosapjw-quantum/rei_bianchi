@@ -57,9 +57,9 @@
 
 **Interfaces:**
 - Consumes: material state, proper volume, owner-correct photo events, per-node `v,f`, and locked atomic rate functions.
-- Produces: nonnegative event flux tensor, reconstructed five-species RHS, resolved Ly-alpha heating, unresolved OTS energy bounds, escaped energy, and owner certificates.
+- Produces: nonnegative event flux tensor, reconstructed five-species RHS, resolved Ly-alpha heating, unresolved OTS energy, escaped energy, and owner certificates.
 
-- [ ] Write failing tests for event-sum parity, H/He invariants, no direct He I to He III event, exact Ly-alpha ownership, two-photon bound ordering, and zero duplicate/unowned energy owners.
+- [ ] Write failing tests for event-sum parity, H/He invariants, no direct He I to He III event, exact Ly-alpha ownership, unresolved two-photon ownership, and zero duplicate/unowned energy owners.
 - [ ] Run focused tests and confirm RED.
 - [ ] Implement the six parent recombination channels and existing ionization channels with the locked 26-event topology.
 - [ ] Implement exact Ly-alpha energy ownership and unresolved-energy bookkeeping.

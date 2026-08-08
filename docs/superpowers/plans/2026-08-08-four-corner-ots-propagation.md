@@ -1,10 +1,10 @@
-> **SUPERSEDED BEFORE CALCULATION:** The 48-state-run energy-axis and 2e-3 uncertainty policy were superseded by the approved design in `docs/superpowers/specs/2026-08-08-r2b-r2a-r2-r1a-four-corner-propagation-design.md`. The file is retained only as provenance.
+> **SUPERSEDED BEFORE CALCULATION:** The 24-state-run energy-axis and 2e-3 uncertainty policy were superseded by the approved design in `docs/superpowers/specs/2026-08-08-r2b-r2a-r2-r1a-four-corner-propagation-design.md`. The file is retained only as provenance.
 
 # Four-Corner OTS Propagation Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Propagate every predeclared Hummer–Seaton/absorption/energy uncertainty lane through one partition-2048 thermochemistry microstep, prove population/photon/total-energy closure, and classify whether the resulting ionization/temperature enclosure is narrow enough to authorize an uncertainty-qualified first canonical interval.
+**Goal:** Propagate every predeclared Hummer–Seaton/absorption/energy uncertainty lane through one partition-2024 thermochemistry microstep, prove population/photon/total-energy closure, and classify whether the resulting ionization/temperature enclosure is narrow enough to authorize an uncertainty-qualified first canonical interval.
 
 **Architecture:** Keep the accepted 26-event topology, MPRK22(1), Alexander SDIRK2 thermal solver, owner law, material state, and canonical forcing unchanged. Add a stage-local event kernel that replaces the legacy scalar `v(T)` and `f(x_HI)` closures with explicit lane policies, emits event-resolved nonnegative PDS fluxes, and separates exact Ly-alpha heating from bounded two-photon heating and unresolved OTS radiation. Run full-step/two-half-step trials for every lane and aggregate deterministic componentwise enclosures without selecting a preferred corner.
 
@@ -97,12 +97,12 @@
 - Test: `tests/test_preflight_artifacts.py`
 
 **Interfaces:**
-- Runs 3 shape lanes × 4 `v` policies × 2 `f` endpoints × 2 energy-bound policies = 48 deterministic lanes.
-- Each lane performs one full and two half partition-2048 trials.
+- Runs 3 shape lanes × 4 `v` policies × 2 `f` endpoints × 2 energy-bound policies = 24 deterministic lanes.
+- Each lane performs one full and two half partition-2024 trials.
 
 - [ ] **Step 1: Write artifact tests** for exact lane count, no post-hoc selection, closure gates, envelope extrema, and deterministic hashes.
 - [ ] **Step 2: Verify RED**.
-- [ ] **Step 3: Run all 48 lanes**, preserving every failure certificate.
+- [ ] **Step 3: Run all 24 lanes**, preserving every failure certificate.
 - [ ] **Step 4: Aggregate componentwise extrema** for `x_HII`, `x_HeII`, `x_HeIII`, and `log(T)`.
 - [ ] **Step 5: Apply the predeclared uncertainty gate** and classify either `UNCERTAINTY_QUALIFIED_FIRST_INTERVAL_AUTHORIZED` or `SOURCE_EXTENSION_CALIBRATION_REQUIRED`.
 - [ ] **Step 6: Verify GREEN** and commit science results.

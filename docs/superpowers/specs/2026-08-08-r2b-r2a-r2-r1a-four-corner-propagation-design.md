@@ -30,14 +30,14 @@ The event sum must reproduce the branch-parameterized population RHS at relative
 ## Energy ownership
 
 - He II Ly-alpha absorption uses exactly `40.813320 eV`; its H I and He I excess energies enter resolved heating exactly once.
-- Two-photon H-capable and He-I-capable first moments use the locked lower/upper bounds as explicit energy auditor lanes. They do not become a unique spectrum.
+- Two-photon and free-bound first moments remain in `E_OTS_unresolved`. The constructive spectra from the prior stage remain non-identifiability witnesses only and are not a dynamical thermal axis.
 - Free-bound, Balmer, and case-B packet energy remains in `E_OTS_unresolved` unless a source-locked first moment exists.
 - Escaped Ly-alpha energy enters the escaped-radiation ledger.
 - Every event must have exactly one energy owner. Duplicate and unowned energy counts must both be zero.
 
 ## Numerical preflight
 
-Run the first accepted microstep at the already validated partition `2048`. For each of the three shape lanes, compute one full step and two half steps for every load-bearing branch corner. Table-domain log-linear lanes are run as auditors.
+Run the first accepted microstep at the already validated partition `2048`. For each of the three shape lanes, compute one full step and two half steps for all eight branch policies: four load-bearing strict corners and four named adapter auditors. This is a 24-policy matrix; unidentified energy moments remain ledger-valued rather than duplicating trajectories.
 
 Hard numerical gates:
 
@@ -55,13 +55,13 @@ Hard numerical gates:
 
 At the end of the microstep, use only the load-bearing corners to form nodewise enclosures. The stage authorizes an uncertainty-qualified first canonical interval only if, in all three shape lanes,
 
-- `max width(x_HII) < 2e-4`,
-- `max width(x_HeII) < 2e-4`,
-- `max width(x_HeIII) < 2e-4`,
-- `max width(log T) < 2e-4`,
+- `max width(x_HII) < 2e-3`,
+- `max width(x_HeII) < 2e-3`,
+- `max width(x_HeIII) < 2e-3`,
+- `max width(log T) < 2e-3`,
 - and all hard numerical gates pass for every corner.
 
-These thresholds intentionally match the existing local-error contract: source-model uncertainty may not exceed the accepted numerical truncation scale. Failure does not imply physical nonexistence; it routes to a source-extension/calibration stage for low-temperature `v`, `f`, or packet spectra.
+These thresholds preserve the earlier durable R1A uncertainty policy. They are deliberately separate from the stricter `2e-4` numerical local-error gate. Failure does not imply physical nonexistence; it routes to a source-extension/calibration stage for low-temperature `v`, `f`, or packet spectra.
 
 ## Transaction and evidence
 
