@@ -1,22 +1,41 @@
 # CURRENT HANDOFF PROMPT — rei_bianchi
 
-Treat the repository, locked hashes, and receipts as authoritative. Transcript-only claims are not evidence.
+Treat this as a durable continuation of the private `rei_bianchi` project.  Repository bytes, hashes and receipts are authoritative; transcript claims are not evidence.
+
+## Before calculation
+
+1. Read `PROJECT_STATE.json`, `docs/science/current_00_READ_FIRST.md`, this file, `docs/provenance/DURABLE_STAGE_LEDGER.csv`, `external/rec_bianchi.lock.json`, and `external/REC_BIANCHI_MONITORING_POLICY.md`.
+2. Run `python scripts/verify_repo.py` and file-isolated pytest if the monolithic JAX process is nondeterministic.
+3. Run `scripts/update_rec_bianchi_lock.sh`; record exact remote HEAD or explicit unavailable status.  A changed SHA requires deliberate semantic and adapter review.
+4. Verify every next-stage input hash and create its durable directory, input lock, state, receipts, manifest and `SHA256SUMS` before calculation.
+
+## Conventions
+
+Metric `(-,+,+,+)`, `epsilon_123=+1`; explicit `c,hbar,k_B`; homogeneous background; tetrad and 1+3; all 11 Bianchi types ultimately; finite tilt and nonlinear large shear.
 
 ## Current verdict
 
 ```text
-P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-EVENT-RESOLVED-FULL-OTS-PDS-OWNERSHIP-LOCK
-DURABLE_PASS_R2C_R1B_R2B_R2A_R2_EVENT_TOPOLOGY_AND_PHOTON_OWNERSHIP_LOCK_TOTAL_ENERGY_CLOSED_WITH_UNRESOLVED_OTS_LEDGER_SOURCE_IDENTICAL_BRANCH_KERNEL_AND_RESOLVED_OTS_HEATING_FAIL_CLOSED_R2_R1_AUTHORIZED
+P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1-SOURCE-BRANCH-KERNEL-AND-OTS-ENERGY-MOMENT-LOCK
+DURABLE_PASS_R2C_R1B_R2B_R2A_R2_R1_HUMMER_SEATON_NODAL_V_TABLE_LOCK_F_INTERVAL_ONLY_AND_FOUR_CORNER_BRANCH_ENVELOPE_EXACT_HEII_LYA_ENERGY_LOCK_TWO_PHOTON_AND_FREE_BOUND_FIRST_MOMENTS_UNRESOLVED_BOUNDED_KERNEL_PROPAGATION_PREFLIGHT_AUTHORIZED
 ```
 
-Promoted: source-conditioned event topology, photon-number ownership, H/He invariants, total-energy identity with an explicit unresolved OTS ledger, hydrogen-frame Bianchi thermal work `p Theta_H V`, and the covariant Thomson optical-depth interface.
+The source-identical objects are the five Hummer--Seaton nodal `v` values and the He II Ly-alpha line energy.  The continuous `v(T)` adapter, `f(x_HI)` and non-Ly-alpha first energy moments are not source-identical.  Keep all unresolved energy in `E_OTS^unres` and never clamp the 21,600 sub-table-temperature nodes.
 
-Fail-closed: source-identical `v(T)` and `f(x_HI)`, fully resolved OTS excess-energy moments, directional OTS four-force, first canonical interval, production node chemistry, R2C-R2, B2C2B, recombination splice, CAMB transfer, and Bianchi feedback.
-
-The last exact `rec_bianchi/main` SHA remains `61e9f672a7aeebd2cf3f361cdb02b4764207bae2`; PR #23/v0.64 (`ea813f0d6ec2452ac02eec29050fe864932de427` feature head) was subsequently observed merged, but the connector did not return the exact post-merge main SHA. Treat v0.64 only as read-only evidence that its angular/thermodynamic closure is explicit and noncanonical; import no numerical rates, state, or history.
+`rec_bianchi/main` was connector-verified at `2d777b1c7e56dcdf1e17feb1f728410ea0792df8` (PR05C2C0/v0.65).  Import only scalar-isotropy, ownership, transaction and bounded-no-go semantics.  Do not import numerical rates, states, accepted history or create a surrogate.
 
 ## Next exact stage
 
-Execute `P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1-SOURCE-BRANCH-KERNEL-AND-OTS-ENERGY-MOMENT-LOCK` according to the stage `NEXT_STAGE_PROMPT.md`. Source-lock the cited `v(T)` and `f` kernels over the full state domain, then source-lock OTS packet excess-energy moments. Do not silently extrapolate, fit per node, set unresolved energy to zero, or start production history before population, photon, and energy parity all close.
+Execute:
 
-Repository policy: preserve failed attempts, update state/registry/ledger in one durable commit, and never claim push without a successful push and post-push `git ls-remote` verification.
+```text
+P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-FOUR-CORNER-BRANCH-AND-UNRESOLVED-OTS-ENERGY-PROPAGATION-PREFLIGHT
+```
+
+Propagate every predeclared `(v,f)` corner and every locked unresolved-energy extremum through the accepted MPRK22/SDIRK2 operator.  Do not post-hoc select a lane.  Use exact Ly-alpha heating.  Close population, photon and augmented total-energy ledgers at each microstep.  This is an uncertainty-propagation preflight, not production history.
+
+## Prohibited
+
+No clipping, source-table extrapolation, owner reassignment, `kappa=J/Phi` inversion, cloud/geometry inversion, per-node fitting, post-hoc lane selection, recombination surrogate, unresolved subtraction, front/Q_M, source/fesc fitting, CAMB transfer or Bianchi feedback.
+
+The user performs remote push.  Never claim a push without successful `git push` and subsequent `git ls-remote` verification.
