@@ -99,13 +99,13 @@ For the 46,080-node `z=6` material state,
 The node counts are
 
 \[
-N(T<10^4\,{m K})=21600,
+N(T<10^4\,{\rm K})=21600,
 \]
 \[
-N(10^4\,{m K}\le T\le10^5\,{m K})=24480,
+N(10^4\,{\rm K}\le T\le10^5\,{\rm K})=24480,
 \]
 \[
-N(T>10^5\,{m K})=0.
+N(T>10^5\,{\rm K})=0.
 \]
 
 Thus 46.875% of the canonical nodes lie below the source table.  Any production use of a single `v(T)` across the full state would require a new source, a declared physical extension, or an uncertainty lane.
