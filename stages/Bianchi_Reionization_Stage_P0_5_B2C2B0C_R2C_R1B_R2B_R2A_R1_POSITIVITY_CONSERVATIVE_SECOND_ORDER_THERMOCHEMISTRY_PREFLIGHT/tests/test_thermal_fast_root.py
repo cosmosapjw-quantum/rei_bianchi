@@ -113,6 +113,39 @@ def test_fast_sdirk_root_matches_bisection_reference():
     assert np.max(np.abs(new.final.energy / old.final.energy - 1.0)) < 1.0e-10
 
 
+
+def test_fast_backward_euler_root_matches_bisection_reference():
+    fast = load('r2b_fast_be_solver', ANALYSIS / 'thermal_fast_root.py')
+    reference = load('r2b_fast_be_reference', ANALYSIS / 'thermal_trapezoid.py')
+    oracle = load('r2b_fast_be_rhs_oracle', R2A_ANALYSIS / 'thermal_backends.py')
+    pop, temperature, volume, heat, hubble = fixture(32)
+    parent_energy = reference.energy_from_temperature(pop, temperature)
+    dt = np.full(32, 2.5e11)
+    old = reference.solve_backward_euler(
+        populations=pop,
+        parent_energy=parent_energy,
+        parent_temperature=temperature,
+        volume=volume,
+        photoheat=heat,
+        hubble=hubble,
+        dt=dt,
+        rhs_function=oracle._thermal_rhs_numpy,
+    )
+    new = fast.solve_backward_euler_fast(
+        populations=pop,
+        parent_energy=parent_energy,
+        parent_temperature=temperature,
+        volume=volume,
+        photoheat=heat,
+        hubble=hubble,
+        dt=dt,
+    )
+    assert np.all(new.bracketed)
+    assert np.max(new.relative_residual) < 1.0e-10
+    assert np.max(np.abs(new.temperature / old.temperature - 1.0)) < 1.0e-10
+    assert np.max(np.abs(new.energy / old.energy - 1.0)) < 1.0e-10
+    assert new.iterations < 20
+
 def test_fast_root_rejects_nonpositive_input():
     fast = load('r2b_fast_thermal_invalid', ANALYSIS / 'thermal_fast_root.py')
     pop, temperature, volume, heat, hubble = fixture(4)

@@ -284,6 +284,30 @@ def _root(
     )
 
 
+
+def solve_backward_euler_fast(
+    *, populations: np.ndarray, parent_energy, parent_temperature, volume,
+    photoheat, hubble, dt,
+    relative_tolerance: float = 1.0e-12,
+) -> FastThermalResult:
+    """Solve the positive backward-Euler thermal predictor with the fast root.
+
+    This is the same balance as ``thermal_trapezoid.solve_backward_euler``;
+    only the nonlinear root algorithm changes.
+    """
+    pop = _pop(populations)
+    n = pop.shape[0]
+    context = ThermalContext.build(pop, volume, photoheat, hubble)
+    return _root(
+        context=context,
+        parent_energy=parent_energy,
+        parent_temperature=parent_temperature,
+        step=dt,
+        constant_rhs=np.zeros(n, dtype=np.float64),
+        rhs_weight=1.0,
+        relative_tolerance=relative_tolerance,
+    )
+
 def solve_sdirk2_fast(
     *, parent_populations, stage_populations, final_populations,
     parent_energy, parent_temperature, stage_volume, final_volume,

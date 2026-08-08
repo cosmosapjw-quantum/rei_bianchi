@@ -25,10 +25,10 @@ class SecondOrderSDIRKFastTrial(base.SecondOrderPhysicalTrial):
             step=self.forcing.step(interval=0,t0_s=t0,t1_s=t1)
             o0=self._owner(parent,p0); rhs0,f0,photo0,v0,r0=self._rhs_flux(parent,o0,p0)
             predictor_pop=base.mprk.patankar_euler(y0=y0,flux=f0,dt=dt)
-            thermal_predictor=base.thermal2.solve_backward_euler(
+            thermal_predictor=sdirk.solve_backward_euler_fast(
                 populations=predictor_pop,parent_energy=parent.values[5],parent_temperature=parent.temperature_K,
                 volume=v0,photoheat=photo0.heating,hubble=np.full(parent.node_count,p0.hubble_s_inv),
-                dt=np.full(parent.node_count,dt),rhs_function=self.thermal_parent._thermal_rhs_numpy)
+                dt=np.full(parent.node_count,dt))
             if not np.all(thermal_predictor.bracketed):raise FloatingPointError('THERMAL_PREDICTOR')
             pred_values=np.ascontiguousarray(np.vstack([predictor_pop.T,thermal_predictor.energy]))
             predictor_state=self.tensor.ArrayState(pred_values,np.ascontiguousarray(thermal_predictor.temperature))
@@ -88,7 +88,7 @@ class SecondOrderSDIRKFastTrial(base.SecondOrderPhysicalTrial):
                 True,final,predictor_state,ledgers,hres,heres,owner_res,photon,
                 float(max(np.max(thermal.stage.relative_residual),np.max(thermal.final.relative_residual))),
                 max(r0,r1),float(np.min(corrector_pop)),float(time.perf_counter()-started),
-                {'classification':'PASS','partition':int(partition),'trial_kind':str(trial_kind),'thermal_method':'ALEXANDER_SDIRK2','thermal_root':'ANALYTIC_NEWTON_BISECTION','thermal_stage_iterations':int(thermal.stage.iterations),'thermal_final_iterations':int(thermal.final.iterations)})
+                {'classification':'PASS','partition':int(partition),'trial_kind':str(trial_kind),'thermal_method':'ALEXANDER_SDIRK2','thermal_root':'ANALYTIC_NEWTON_BISECTION','thermal_stage_iterations':int(thermal.stage.iterations),'thermal_final_iterations':int(thermal.final.iterations),'thermal_predictor_root':'ANALYTIC_NEWTON_BISECTION','thermal_predictor_iterations':int(thermal_predictor.iterations)})
         except Exception as exc:
             return base.SecondOrderTrialResult(
                 False,None,None,ledgers,math.inf,math.inf,math.inf,math.inf,math.inf,math.inf,0.0,

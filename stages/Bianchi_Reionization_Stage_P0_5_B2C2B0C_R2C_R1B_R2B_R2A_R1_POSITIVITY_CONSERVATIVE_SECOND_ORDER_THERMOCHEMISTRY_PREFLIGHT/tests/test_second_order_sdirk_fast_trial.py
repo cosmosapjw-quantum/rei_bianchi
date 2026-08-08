@@ -44,3 +44,5 @@ def test_fast_physical_trial_matches_reference_and_closes_gates():
     assert np.max(np.abs(got.state.values / expected.state.values - 1.0)) < 1.0e-10
     assert np.max(np.abs(got.state.temperature_K / expected.state.temperature_K - 1.0)) < 1.0e-10
     assert got.certificate['thermal_root'] == 'ANALYTIC_NEWTON_BISECTION'
+    assert got.certificate['thermal_predictor_root'] == 'ANALYTIC_NEWTON_BISECTION'
+    assert got.certificate['thermal_predictor_iterations'] < 20
