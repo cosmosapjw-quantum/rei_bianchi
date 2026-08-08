@@ -1,0 +1,19 @@
+{
+  "classification": "DURABLE_SEAL_TRANSIENT_BYTECODE_EXCLUSION_REPAIR",
+  "root_cause": "The first compact-stage sealer recursively included ignored __pycache__/*.pyc files. Git did not transport those bytes, and fresh test interpreters regenerated environment-dependent bytecode, so post-test SHA256 verification failed despite a clean tracked worktree.",
+  "science_outputs_affected": false,
+  "source_or_numerical_evidence_changed": false,
+  "repair": {
+    "excluded_patterns": [
+      "**/__pycache__/**",
+      "**/*.pyc",
+      "**/*.pyo",
+      "**/.pytest_cache/**"
+    ],
+    "manifest_and_compact_rebuilt": true,
+    "old_transient_entries_removed": 10,
+    "attempt_preserved": "attempts/ATTEMPT_5_MANIFEST_INCLUDED_IGNORED_BYTECODE.md"
+  },
+  "required_regression_gate": "stage SHA256 must pass before and after running stage tests in a prerequisite-only fresh checkout",
+  "remote_write_attempted": false
+}

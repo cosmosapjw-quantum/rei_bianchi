@@ -31,4 +31,4 @@ The token needs read-only access to `cosmosapjw-quantum/rec_bianchi`. The workfl
 
 ## Current status
 
-The package runtime had neither GitHub DNS nor credentials, so the current lock is explicitly unverified. This blocks the end-to-end primordial-recombination claim, but not the post-handoff reionization subsystem work.
+The managed GitHub connector currently verifies `rec_bianchi/main` exactly, while a native `git ls-remote` may still be unavailable in an individual runtime. This permits read-only semantic monitoring but does not authorize an adapter, numerical-state import, surrogate, or primordial-to-CMB splice.

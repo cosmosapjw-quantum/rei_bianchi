@@ -1,0 +1,66 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+__________________ test_quadratic_fit_supports_tensor_outputs __________________
+
+    def test_quadratic_fit_supports_tensor_outputs():
+     m=load();pts=np.asarray([[-1,-1],[-1,0],[-1,1],[0,-1],[0,0],[0,1],[1,-1],[1,0],[1,1]],float)
+     scalar=np.asarray([1+a+2*b+3*a*b for a,b in pts]);values=np.stack([scalar,2*scalar],axis=1)[:,:,None]
+>    fit=m.QuadraticEndpointFit.fit(pts,values)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_AFFINE_SET_PARAMETERIZED_TAYLOR_MODEL_CONTINUOUS_BRANCH_ENCLOSURE_LOCK/tests/test_quadratic_fit.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_AFFINE_SET_PARAMETERIZED_TAYLOR_MODEL_CONTINUOUS_BRANCH_ENCLOSURE_LOCK/analysis/quadratic_fit.py:24: in fit
+    coef,*_=np.linalg.lstsq(x,y,rcond=None)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/pyvenv/lib/python3.13/site-packages/numpy/linalg/_linalg.py:2544: in lstsq
+    _assert_2d(a, b)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+arrays = (array([[ 1., -1., -1.,  1.,  1.,  1.],
+       [ 1., -1.,  0.,  1., -0.,  0.],
+       [ 1., -1.,  1.,  1., -1.,  1.],
+... 3.],
+        [ 6.]],
+
+       [[-3.],
+        [-6.]],
+
+       [[ 2.],
+        [ 4.]],
+
+       [[ 7.],
+        [14.]]]))
+a = array([[[ 1.],
+        [ 2.]],
+
+       [[ 0.],
+        [ 0.]],
+
+       [[-1.],
+        [-2.]],
+
+       [[-1.],
+       ...[ 3.],
+        [ 6.]],
+
+       [[-3.],
+        [-6.]],
+
+       [[ 2.],
+        [ 4.]],
+
+       [[ 7.],
+        [14.]]])
+
+    def _assert_2d(*arrays):
+        for a in arrays:
+            if a.ndim != 2:
+>               raise LinAlgError('%d-dimensional array given. Array must be '
+                        'two-dimensional' % a.ndim)
+E               numpy.linalg.LinAlgError: 3-dimensional array given. Array must be two-dimensional
+
+/opt/pyvenv/lib/python3.13/site-packages/numpy/linalg/_linalg.py:247: LinAlgError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_AFFINE_SET_PARAMETERIZED_TAYLOR_MODEL_CONTINUOUS_BRANCH_ENCLOSURE_LOCK/tests/test_quadratic_fit.py::test_quadratic_fit_supports_tensor_outputs - numpy.linalg.LinAlgError: 3-dimensional array given. Array must be two-dimensional
+1 failed, 1 passed in 0.07s
