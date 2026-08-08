@@ -1,6 +1,7 @@
 from __future__ import annotations
 import importlib.util,sys
 from pathlib import Path
+import numpy as np
 
 HERE=Path(__file__).resolve().parent
 STAGE=HERE.parent
@@ -105,3 +106,24 @@ def test_csv_schema_includes_every_run_policy_field(tmp_path):
     m._write_csv(output,[row])
     header=output.read_text(encoding='utf-8').splitlines()[0].split(',')
     assert tuple(header)==m.CSV_FIELDS
+
+
+def test_lane_worker_artifacts_round_trip(tmp_path):
+    m=load_module()
+    lane=m.LANES[0]
+    payload={'lane':lane,'rows':[{'policy_id':'P'}],'widths':{'x_HII':1e-4},'endpoint_hashes':{}}
+    arrays={'x_HII_lower':np.array([0.1,0.2]),'x_HII_upper':np.array([0.2,0.3])}
+    hashes=m.write_lane_worker_artifacts(output_dir=tmp_path,lane=lane,payload=payload,arrays=arrays)
+    loaded,loaded_arrays=m.read_lane_worker_artifacts(output_dir=tmp_path,lane=lane)
+    assert loaded==payload
+    assert np.array_equal(loaded_arrays['x_HII_lower'],arrays['x_HII_lower'])
+    assert set(hashes)=={'json','npz'}
+    assert all(len(value)==64 for value in hashes.values())
+
+
+def test_lane_workers_pin_process_and_blas_state():
+    m=load_module();env=m._worker_environment()
+    assert env['PYTHONUNBUFFERED']=='1'
+    assert env['PYTEST_DISABLE_PLUGIN_AUTOLOAD']=='1'
+    for name in ('OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS','NUMEXPR_NUM_THREADS','VECLIB_MAXIMUM_THREADS','BLIS_NUM_THREADS'):
+        assert env[name]=='1'

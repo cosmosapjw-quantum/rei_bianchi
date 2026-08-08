@@ -2,8 +2,11 @@
 """Run the locked four-corner branch propagation preflight."""
 from __future__ import annotations
 
+import argparse
 import csv
 import hashlib
+import os
+import subprocess
 import importlib.util
 import json
 import math
@@ -149,29 +152,95 @@ def _write_csv(path: Path,rows: list[dict[str,Any]]) -> None:
             writer.writerow(out)
 
 
+def _lane_token(lane: str) -> str:
+    if lane not in LANES:
+        raise KeyError(lane)
+    return lane.lower()
+
+
+def lane_worker_paths(output_dir: Path, lane: str) -> dict[str, Path]:
+    token=_lane_token(lane)
+    root=Path(output_dir)
+    return {
+        'json':root/f'{token}.json',
+        'npz':root/f'{token}.npz',
+        'log':root/f'{token}.log',
+    }
+
+
+def write_lane_worker_artifacts(*,output_dir: Path,lane: str,payload: dict[str,Any],arrays: Mapping[str,np.ndarray]) -> dict[str,str]:
+    paths=lane_worker_paths(output_dir,lane)
+    Path(output_dir).mkdir(parents=True,exist_ok=True)
+    paths['json'].write_text(json.dumps(payload,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+    np.savez_compressed(paths['npz'],**{name:np.asarray(value,dtype=np.float64) for name,value in arrays.items()})
+    return {name:hashlib.sha256(path.read_bytes()).hexdigest() for name,path in paths.items() if name!='log'}
+
+
+def read_lane_worker_artifacts(*,output_dir: Path,lane: str) -> tuple[dict[str,Any],dict[str,np.ndarray]]:
+    paths=lane_worker_paths(output_dir,lane)
+    payload=json.loads(paths['json'].read_text(encoding='utf-8'))
+    with np.load(paths['npz'],allow_pickle=False) as data:
+        arrays={name:np.array(data[name],copy=True) for name in data.files}
+    return payload,arrays
+
+
+def run_lane(lane: str) -> tuple[dict[str,Any],dict[str,np.ndarray]]:
+    if lane not in LANES: raise KeyError(lane)
+    base_solver=trial_mod.fast.base.physical.PhysicalTrialSolver.from_repo(repo_root=REPO,lane=lane)
+    rows=[];strict_states=[];endpoint_hashes={}
+    started=time.perf_counter()
+    for policy in policy_mod.policy_registry():
+        row,state=run_policy(base_solver=base_solver,lane=lane,policy=policy)
+        rows.append(row);endpoint_hashes[policy.policy_id]=row['endpoint_sha256']
+        if policy.load_bearing and state is not None and row['hard_gates_pass']:
+            strict_states.append(state_observables(state))
+        print(json.dumps({'lane':lane,'policy_id':policy.policy_id,'hard_gates_pass':row['hard_gates_pass'],'elapsed_s':row['elapsed_s']}),flush=True)
+    arrays={};widths={field:math.inf for field in ('x_HII','x_HeII','x_HeIII','log_T')}
+    if len(strict_states)==4:
+        for field in ('x_HII','x_HeII','x_HeIII','log_T'):
+            stack=np.stack([item[field] for item in strict_states],axis=0)
+            lower=np.min(stack,axis=0);upper=np.max(stack,axis=0)
+            arrays[f'{field}_lower']=lower;arrays[f'{field}_upper']=upper
+            widths[field]=float(np.max(upper-lower))
+    payload={
+        'lane':lane,'rows':rows,'widths':widths,'endpoint_hashes':endpoint_hashes,
+        'strict_endpoint_count':len(strict_states),'elapsed_s':float(time.perf_counter()-started),
+    }
+    return payload,arrays
+
+
+def _worker_environment() -> dict[str,str]:
+    env=dict(os.environ)
+    env['PYTHONUNBUFFERED']='1'
+    env['PYTEST_DISABLE_PLUGIN_AUTOLOAD']='1'
+    for name in ('OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS','NUMEXPR_NUM_THREADS','VECLIB_MAXIMUM_THREADS','BLIS_NUM_THREADS'):
+        env[name]='1'
+    return env
+
+
+def _execute_lane_worker(*,lane: str,output_dir: Path,timeout_s: float=300.0) -> tuple[dict[str,Any],dict[str,np.ndarray]]:
+    paths=lane_worker_paths(output_dir,lane)
+    Path(output_dir).mkdir(parents=True,exist_ok=True)
+    command=[sys.executable,str(Path(__file__).resolve()),'--lane-worker',lane,'--worker-output',str(output_dir)]
+    with paths['log'].open('w',encoding='utf-8') as log:
+        result=subprocess.run(command,cwd=REPO,env=_worker_environment(),stdout=log,stderr=subprocess.STDOUT,text=True,timeout=timeout_s,check=False)
+    if result.returncode:
+        raise RuntimeError(f'lane worker failed: {lane}; exit={result.returncode}; log={paths["log"]}')
+    return read_lane_worker_artifacts(output_dir=output_dir,lane=lane)
+
+
 def run_all() -> dict[str,Any]:
     DATA.mkdir(parents=True,exist_ok=True)
+    worker_dir=DATA/'lane_workers'
+    worker_dir.mkdir(parents=True,exist_ok=True)
     rows=[];strict_envelopes={};lane_widths={};endpoint_hashes={}
     started=time.perf_counter()
     for lane in LANES:
-        base_solver=trial_mod.fast.base.physical.PhysicalTrialSolver.from_repo(repo_root=REPO,lane=lane)
-        strict_states=[]
-        for policy in policy_mod.policy_registry():
-            row,state=run_policy(base_solver=base_solver,lane=lane,policy=policy)
-            rows.append(row);endpoint_hashes[f'{lane}/{policy.policy_id}']=row['endpoint_sha256']
-            if policy.load_bearing and state is not None and row['hard_gates_pass']:
-                strict_states.append(state_observables(state))
-        if len(strict_states)==4:
-            lane_arrays={}
-            widths={}
-            for field in ('x_HII','x_HeII','x_HeIII','log_T'):
-                stack=np.stack([item[field] for item in strict_states],axis=0)
-                lower=np.min(stack,axis=0);upper=np.max(stack,axis=0)
-                lane_arrays[f'{field}_lower']=lower;lane_arrays[f'{field}_upper']=upper
-                widths[field]=float(np.max(upper-lower))
-            strict_envelopes[lane]=lane_arrays;lane_widths[lane]=widths
-        else:
-            lane_widths[lane]={field:math.inf for field in ('x_HII','x_HeII','x_HeIII','log_T')}
+        payload,lane_arrays=_execute_lane_worker(lane=lane,output_dir=worker_dir)
+        rows.extend(payload['rows'])
+        lane_widths[lane]={name:float(value) for name,value in payload['widths'].items()}
+        endpoint_hashes.update({f'{lane}/{key}':value for key,value in payload['endpoint_hashes'].items()})
+        if lane_arrays: strict_envelopes[lane]=lane_arrays
     _write_csv(DATA/'policy_trial_summary.csv',rows)
     npz={}
     for lane,lane_arrays in strict_envelopes.items():
@@ -215,5 +284,19 @@ def run_all() -> dict[str,Any]:
     return results
 
 
+def main() -> int:
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--lane-worker',choices=LANES)
+    parser.add_argument('--worker-output',type=Path,default=DATA/'lane_workers')
+    args=parser.parse_args()
+    if args.lane_worker:
+        payload,arrays=run_lane(args.lane_worker)
+        hashes=write_lane_worker_artifacts(output_dir=args.worker_output,lane=args.lane_worker,payload=payload,arrays=arrays)
+        print(json.dumps({'lane':args.lane_worker,'artifact_sha256':hashes},sort_keys=True),flush=True)
+        return 0
+    print(json.dumps(run_all(),indent=2,sort_keys=True),flush=True)
+    return 0
+
+
 if __name__=='__main__':
-    print(json.dumps(run_all(),indent=2,sort_keys=True))
+    raise SystemExit(main())
