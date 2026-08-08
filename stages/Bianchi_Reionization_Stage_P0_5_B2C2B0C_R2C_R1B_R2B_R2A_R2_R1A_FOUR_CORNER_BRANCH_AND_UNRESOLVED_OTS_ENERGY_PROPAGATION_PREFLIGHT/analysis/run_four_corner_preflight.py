@@ -131,16 +131,19 @@ def run_policy(*,base_solver,lane: str,policy) -> tuple[dict[str,Any],Any|None]:
     return row,endpoint
 
 
+CSV_FIELDS=(
+    'lane','policy_id','v_policy','f_value','load_bearing','full_converged',
+    'first_half_converged','second_half_converged','local_error','local_error_gate',
+    'hard_gates_pass','max_H_residual','max_He_residual','max_owner_residual',
+    'max_photon_residual','max_thermal_residual','max_PDS_residual',
+    'max_OTS_energy_residual','minimum_species','elapsed_s','endpoint_sha256',
+    'failure_classifications',
+)
+
+
 def _write_csv(path: Path,rows: list[dict[str,Any]]) -> None:
-    keys=[
-        'lane','policy_id','v_policy','f_value','load_bearing','full_converged',
-        'first_half_converged','second_half_converged','local_error','hard_gates_pass',
-        'max_H_residual','max_He_residual','max_owner_residual','max_photon_residual',
-        'max_thermal_residual','max_PDS_residual','max_OTS_energy_residual',
-        'minimum_species','elapsed_s','endpoint_sha256','failure_classifications',
-    ]
     with path.open('w',newline='',encoding='utf-8') as handle:
-        writer=csv.DictWriter(handle,fieldnames=keys);writer.writeheader()
+        writer=csv.DictWriter(handle,fieldnames=CSV_FIELDS);writer.writeheader()
         for row in rows:
             out=dict(row);out['failure_classifications']=json.dumps(out['failure_classifications'])
             writer.writerow(out)
