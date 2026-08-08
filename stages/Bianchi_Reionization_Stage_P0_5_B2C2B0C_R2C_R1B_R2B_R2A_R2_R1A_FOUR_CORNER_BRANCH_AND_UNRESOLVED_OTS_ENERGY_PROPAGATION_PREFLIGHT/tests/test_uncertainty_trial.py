@@ -51,3 +51,5 @@ def test_branch_trial_closes_population_and_augmented_energy_ledgers():
     assert result.certificate['max_augmented_energy_residual'] <= 1e-10
     assert result.certificate['branch_domain_failure_count'] == 0
     assert result.certificate['legacy_rhs_calls'] == 0
+    assert result.certificate['thermal_event_outer_residual'] <= 1e-10
+    assert result.certificate['thermal_event_outer_iterations'] >= 1

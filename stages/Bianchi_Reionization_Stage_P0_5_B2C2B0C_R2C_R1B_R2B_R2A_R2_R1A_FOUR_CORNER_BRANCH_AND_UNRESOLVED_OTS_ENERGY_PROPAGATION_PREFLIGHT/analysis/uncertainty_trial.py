@@ -128,29 +128,50 @@ class UncertaintySecondOrderTrial(fast.SecondOrderSDIRKFastTrial):
                 y0=y0,predictor=predictor_pop,stage_flux=f0,final_flux=f1,dt=dt)
 
             gamma_pop=fast.base.mprk.patankar_euler(y0=y0,flux=f0,dt=fast.sdirk.GAMMA*dt)
-            gamma_energy=fast.sdirk.energy_from_temperature(gamma_pop,parent.temperature_K)
-            gamma_state=self.tensor.ArrayState(
-                np.ascontiguousarray(np.vstack([gamma_pop.T,gamma_energy])),parent.temperature_K.copy())
-            og=self._owner(gamma_state,pg)
-            eg,photog,vg=self._event_evaluation(gamma_state,og,pg)
+            stage_temperature=parent.temperature_K.copy()
+            final_temperature=thermal_predictor.temperature.copy()
+            thermal=None;eg=None;ef=None;og=None;of=None
+            thermal_event_outer_residual=math.inf
+            outer_iteration=-1
+            for outer_iteration in range(24):
+                gamma_energy=fast.sdirk.energy_from_temperature(gamma_pop,stage_temperature)
+                gamma_state=self.tensor.ArrayState(
+                    np.ascontiguousarray(np.vstack([gamma_pop.T,gamma_energy])),
+                    np.ascontiguousarray(stage_temperature))
+                og=self._owner(gamma_state,pg)
+                eg,photog,vg=self._event_evaluation(gamma_state,og,pg)
 
-            final_provisional_energy=fast.sdirk.energy_from_temperature(corrector_pop,thermal_predictor.temperature)
-            final_provisional=self.tensor.ArrayState(
-                np.ascontiguousarray(np.vstack([corrector_pop.T,final_provisional_energy])),
-                thermal_predictor.temperature.copy())
-            of=self._owner(final_provisional,p1)
-            ef,photof,vf=self._event_evaluation(final_provisional,of,p1)
+                final_provisional_energy=fast.sdirk.energy_from_temperature(corrector_pop,final_temperature)
+                final_provisional=self.tensor.ArrayState(
+                    np.ascontiguousarray(np.vstack([corrector_pop.T,final_provisional_energy])),
+                    np.ascontiguousarray(final_temperature))
+                of=self._owner(final_provisional,p1)
+                ef,photof,vf=self._event_evaluation(final_provisional,of,p1)
 
-            thermal=fast.sdirk.solve_sdirk2_fast(
-                parent_populations=y0,stage_populations=gamma_pop,final_populations=corrector_pop,
-                parent_energy=parent.values[5],parent_temperature=parent.temperature_K,
-                stage_volume=vg,final_volume=vf,
-                stage_photoheat=photog.heating,final_photoheat=photof.heating,
-                stage_hubble=np.full(parent.node_count,pg.hubble_s_inv),
-                final_hubble=np.full(parent.node_count,p1.hubble_s_inv),
-                dt=np.full(parent.node_count,dt))
-            if (not np.all(thermal.stage.bracketed) or not np.all(thermal.final.bracketed)
-                or np.max(thermal.stage.relative_residual)>1e-10 or np.max(thermal.final.relative_residual)>1e-10):
+                thermal=fast.sdirk.solve_sdirk2_fast(
+                    parent_populations=y0,stage_populations=gamma_pop,final_populations=corrector_pop,
+                    parent_energy=parent.values[5],parent_temperature=parent.temperature_K,
+                    stage_volume=vg,final_volume=vf,
+                    stage_photoheat=photog.heating,final_photoheat=photof.heating,
+                    stage_hubble=np.full(parent.node_count,pg.hubble_s_inv),
+                    final_hubble=np.full(parent.node_count,p1.hubble_s_inv),
+                    dt=np.full(parent.node_count,dt))
+                if not np.all(thermal.stage.bracketed) or not np.all(thermal.final.bracketed):
+                    raise FloatingPointError('THERMAL_SDIRK2')
+                thermal_event_outer_residual=float(max(
+                    np.max(np.abs(np.log(thermal.stage.temperature)-np.log(stage_temperature))),
+                    np.max(np.abs(np.log(thermal.final.temperature)-np.log(final_temperature))),
+                ))
+                stage_temperature=np.ascontiguousarray(thermal.stage.temperature)
+                final_temperature=np.ascontiguousarray(thermal.final.temperature)
+                if thermal_event_outer_residual<=1e-10:
+                    break
+            if thermal is None or eg is None or ef is None or og is None or of is None:
+                raise FloatingPointError('THERMAL_EVENT_COUPLING')
+            if thermal_event_outer_residual>1e-10:
+                raise FloatingPointError('THERMAL_EVENT_FIXED_POINT')
+            if (np.max(thermal.stage.relative_residual)>1e-10
+                or np.max(thermal.final.relative_residual)>1e-10):
                 raise FloatingPointError('THERMAL_SDIRK2')
             final=self.tensor.ArrayState(
                 np.ascontiguousarray(np.vstack([corrector_pop.T,thermal.final.energy])),
@@ -201,7 +222,9 @@ class UncertaintySecondOrderTrial(fast.SecondOrderSDIRKFastTrial):
                  'max_augmented_energy_residual':float(energy_res),
                  'max_photon_branch_identity_residual':float(photon_branch),
                  'branch_domain_failure_count':int(branch_fail),'legacy_rhs_calls':int(self.legacy_rhs_calls),
-                 'source_rhs_calls':int(self.source_rhs_calls),'thermal_method':'ALEXANDER_SDIRK2'})
+                 'source_rhs_calls':int(self.source_rhs_calls),'thermal_method':'ALEXANDER_SDIRK2',
+                 'thermal_event_outer_residual':float(thermal_event_outer_residual),
+                 'thermal_event_outer_iterations':int(outer_iteration+1)})
         except Exception as exc:
             return fast.base.SecondOrderTrialResult(
                 False,None,None,ledgers,math.inf,math.inf,math.inf,math.inf,math.inf,math.inf,0.0,

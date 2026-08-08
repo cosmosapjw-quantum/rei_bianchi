@@ -1,0 +1,28 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_branch_trial_closes_population_and_augmented_energy_ledgers _______
+
+    def test_branch_trial_closes_population_and_augmented_energy_ledgers():
+        s=solver(); parent=s.inputs.state0.mutable_copy(); duration=s.forcing.duration_seconds(0); dt=duration/2048
+        result=s.solve(state=parent,t0=0.0,t1=dt,partition=2048,trial_kind='FULL')
+        assert result.converged, result.certificate
+        assert result.hydrogen_residual <= 1e-11
+        assert result.helium_residual <= 1e-11
+        assert result.owner_residual <= 1e-11
+        assert result.photon_residual <= 1e-8
+        assert result.thermal_residual <= 1e-10
+        assert result.pds_reconstruction_residual <= 1e-11
+        assert result.minimum_species > 0
+        for name in ('ots_resolved_heating','ots_unresolved_energy','ots_escaped_energy','ots_chemical_energy'):
+            assert name in result.ledger_delta
+        assert result.certificate['max_augmented_energy_residual'] <= 1e-10
+        assert result.certificate['branch_domain_failure_count'] == 0
+        assert result.certificate['legacy_rhs_calls'] == 0
+>       assert result.certificate['thermal_event_outer_residual'] <= 1e-10
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'thermal_event_outer_residual'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_uncertainty_trial.py:54: KeyError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_uncertainty_trial.py::test_branch_trial_closes_population_and_augmented_energy_ledgers - KeyError: 'thermal_event_outer_residual'
+1 failed, 1 passed in 1.60s
