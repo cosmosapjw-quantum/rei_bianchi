@@ -229,14 +229,21 @@ def _execute_lane_worker(*,lane: str,output_dir: Path,timeout_s: float=300.0) ->
     return read_lane_worker_artifacts(output_dir=output_dir,lane=lane)
 
 
-def run_all() -> dict[str,Any]:
+def run_all(*,execute_workers: bool=True) -> dict[str,Any]:
     DATA.mkdir(parents=True,exist_ok=True)
     worker_dir=DATA/'lane_workers'
     worker_dir.mkdir(parents=True,exist_ok=True)
     rows=[];strict_envelopes={};lane_widths={};endpoint_hashes={}
     started=time.perf_counter()
     for lane in LANES:
-        payload,lane_arrays=_execute_lane_worker(lane=lane,output_dir=worker_dir)
+        if execute_workers:
+            payload,lane_arrays=_execute_lane_worker(lane=lane,output_dir=worker_dir)
+        else:
+            payload,lane_arrays=read_lane_worker_artifacts(output_dir=worker_dir,lane=lane)
+        expected={policy.policy_id for policy in policy_mod.policy_registry()}
+        observed={str(row['policy_id']) for row in payload['rows']}
+        if payload.get('lane')!=lane or observed!=expected or int(payload.get('strict_endpoint_count',-1))!=4:
+            raise RuntimeError(f'invalid or incomplete lane artifact: {lane}')
         rows.extend(payload['rows'])
         lane_widths[lane]={name:float(value) for name,value in payload['widths'].items()}
         endpoint_hashes.update({f'{lane}/{key}':value for key,value in payload['endpoint_hashes'].items()})
@@ -288,13 +295,14 @@ def main() -> int:
     parser=argparse.ArgumentParser()
     parser.add_argument('--lane-worker',choices=LANES)
     parser.add_argument('--worker-output',type=Path,default=DATA/'lane_workers')
+    parser.add_argument('--merge-workers',action='store_true')
     args=parser.parse_args()
     if args.lane_worker:
         payload,arrays=run_lane(args.lane_worker)
         hashes=write_lane_worker_artifacts(output_dir=args.worker_output,lane=args.lane_worker,payload=payload,arrays=arrays)
         print(json.dumps({'lane':args.lane_worker,'artifact_sha256':hashes},sort_keys=True),flush=True)
         return 0
-    print(json.dumps(run_all(),indent=2,sort_keys=True),flush=True)
+    print(json.dumps(run_all(execute_workers=not args.merge_workers),indent=2,sort_keys=True),flush=True)
     return 0
 
 

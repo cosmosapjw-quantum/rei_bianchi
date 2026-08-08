@@ -127,3 +127,14 @@ def test_lane_workers_pin_process_and_blas_state():
     assert env['PYTEST_DISABLE_PLUGIN_AUTOLOAD']=='1'
     for name in ('OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS','NUMEXPR_NUM_THREADS','VECLIB_MAXIMUM_THREADS','BLIS_NUM_THREADS'):
         assert env[name]=='1'
+
+
+def test_merge_mode_rejects_incomplete_lane_artifact(tmp_path):
+    m=load_module();lane=m.LANES[0]
+    payload={'lane':lane,'rows':[],'widths':{},'endpoint_hashes':{},'strict_endpoint_count':0}
+    m.write_lane_worker_artifacts(output_dir=tmp_path,lane=lane,payload=payload,arrays={})
+    loaded,_=m.read_lane_worker_artifacts(output_dir=tmp_path,lane=lane)
+    expected={policy.policy_id for policy in m.policy_mod.policy_registry()}
+    observed={str(row['policy_id']) for row in loaded['rows']}
+    assert observed!=expected
+    assert loaded['strict_endpoint_count']!=4
