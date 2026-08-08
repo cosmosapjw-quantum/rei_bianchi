@@ -3,12 +3,32 @@
 Current durable stage:
 
 ```text
-P0.5-B2C2B0C-R2C-R1B-R2B-R2A-ADAPTIVE-INTERNAL-MICROSTEP-ACCEPTANCE-AND-GLOBALIZATION-LOCK
-DURABLE_FAIL_CLOSED_R2C_R1B_R2B_R2A_DT1024_LOCAL_ERROR_FAILURE_FIXED_POINT_AND_CONSERVATION_GATES_PASS_DEEPER_DT4096_AUDITOR_PASS
+P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R1-POSITIVITY-CONSERVATIVE-SECOND-ORDER-THERMOCHEMISTRY-PREFLIGHT
+DURABLE_PASS_R2C_R1B_R2B_R2A_R1_MPRK22_ALPHA1_LSTABLE_SDIRK2_CLOSE_ALL_LANES_AT_PARTITION_2048_FAST_ROOT_BACKEND_PROMOTED_EVENT_RESOLVED_PDS_LOCK_REQUIRED
 ```
 
-The adaptive/globalization blocker is removed through recursive bisection and safeguarded damped Picard. All fixed-point, positivity, owner/photon, H/He nuclei and thermal-ledger gates close at the locked minimum `dt/1024`, but the full-versus-two-half hard maximum local error is `8.398655919990006e-4`, above `2e-4`. A post-lock auditor passes at `dt/4096`; it is not production-promoted.
+The original MPRK22(1)+implicit-trapezoid attempt failed.  A separately locked
+Alexander L-stable SDIRK2 thermal attempt closes the local-error gate in all
+three lanes at partition 2048:
 
-The array-native owner hot path is promoted (`31.84x` benchmark speedup); JAX remains diagnostic and NumPy is the stable production oracle. No microstep was accepted, no production node history exists, and `R2C-R2`, `B2C2B`, recombination splice, CAMB and Bianchi feedback remain unauthorized.
+```text
+local error:       6.392782e-05
+H residual:        4.397361e-16
+He residual:       4.504562e-16
+owner residual:    1.953502e-16
+photon residual:   1.449900e-16
+thermal residual:  9.999943e-13
+minimum species:   1.408422e-154
+```
 
-Next stage: `P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R1-POSITIVITY-CONSERVATIVE-SECOND-ORDER-THERMOCHEMISTRY-PREFLIGHT`.
+The analytic safeguarded root backend passes science parity and the predeclared
+performance gate with `10.126360x`
+matched-accuracy warm speedup.  No memory reduction is claimed.
+
+This is not a production-history pass.  The current PDS flux tensor is a
+deterministic decomposition of the net H/He RHS, but event-level helium reaction
+and energy ownership is nonunique.  The exact counterexample and Wolfram proof
+are in the stage receipts.
+
+Next stage: `P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-EVENT-RESOLVED-FULL-OTS-PDS-OWNERSHIP-LOCK`.  Production node chemistry, R2C-R2, B2C2B,
+recombination splice, CAMB transfer and Bianchi feedback remain unauthorized.
