@@ -1,0 +1,35 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_degenerate_interval_rhs_contains_floating_source_at_canonical_state ___
+
+    def test_degenerate_interval_rhs_contains_floating_source_at_canonical_state():
+        mod = load("reduced_interval_rhs")
+        model = mod.ReducedIntervalModel.from_repo(REPO)
+        coordinates = model.initial_coordinates()
+        v = model.source_v_point(coordinates[3])
+        rhs_iv = model.rhs_interval(
+            coordinates=model.point_box(coordinates),
+            time_lower_s=0.0,
+            time_upper_s=0.0,
+            v_interval=model.point_box(v),
+            f_interval=model.scalar_interval(0.1),
+        )
+        reference = model.floating_reference_rhs(
+            coordinates=coordinates,
+            time_s=0.0,
+            v=v,
+            f=0.1,
+        )
+>       assert np.all(rhs_iv.lo <= reference)
+E       assert np.False_
+E        +  where np.False_ = <function all at 0x7f66dbba7ef0>(array([[-2.76231525e-19, -2.71803813e-19, -2.64176457e-19, ...,\n         3.68306941e-15,  4.09978346e-15,  4.33874584e...5783827e-17, -4.17836954e-17, ...,\n        -2.37706364e-14, -2.65162605e-14, -2.82227763e-14]],\n      shape=(4, 46080)) <= array([[-2.76231525e-19, -2.71803813e-19, -2.64176457e-19, ...,\n         3.68306941e-15,  4.09978346e-15,  4.33874584e...5783827e-17, -4.17836954e-17, ...,\n        -2.37706364e-14, -2.65162605e-14, -2.82227763e-14]],\n      shape=(4, 46080)))
+E        +    where <function all at 0x7f66dbba7ef0> = np.all
+E        +    and   array([[-2.76231525e-19, -2.71803813e-19, -2.64176457e-19, ...,\n         3.68306941e-15,  4.09978346e-15,  4.33874584e...5783827e-17, -4.17836954e-17, ...,\n        -2.37706364e-14, -2.65162605e-14, -2.82227763e-14]],\n      shape=(4, 46080)) = Interval(lo=array([[-2.76231525e-19, -2.71803813e-19, -2.64176457e-19, ...,\n         3.68306941e-15,  4.09978346e-15, ...783827e-17, -4.17836954e-17, ...,\n        -2.37706364e-14, -2.65162605e-14, -2.82227763e-14]],\n      shape=(4, 46080))).lo
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_VALIDATED_CONTINUOUS_BRANCH_DIFFERENTIAL_INCLUSION_ENCLOSURE_LOCK/tests/test_reduced_interval_rhs.py:36: AssertionError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_VALIDATED_CONTINUOUS_BRANCH_DIFFERENTIAL_INCLUSION_ENCLOSURE_LOCK/tests/test_reduced_interval_rhs.py::test_degenerate_interval_rhs_contains_floating_source_at_canonical_state - assert np.False_
+ +  where np.False_ = <function all at 0x7f66dbba7ef0>(array([[-2.76231525e-19, -2.71803813e-19, -2.64176457e-19, ...,\n         3.68306941e-15,  4.09978346e-15,  4.33874584e...5783827e-17, -4.17836954e-17, ...,\n        -2.37706364e-14, -2.65162605e-14, -2.82227763e-14]],\n      shape=(4, 46080)) <= array([[-2.76231525e-19, -2.71803813e-19, -2.64176457e-19, ...,\n         3.68306941e-15,  4.09978346e-15,  4.33874584e...5783827e-17, -4.17836954e-17, ...,\n        -2.37706364e-14, -2.65162605e-14, -2.82227763e-14]],\n      shape=(4, 46080)))
+ +    where <function all at 0x7f66dbba7ef0> = np.all
+ +    and   array([[-2.76231525e-19, -2.71803813e-19, -2.64176457e-19, ...,\n         3.68306941e-15,  4.09978346e-15,  4.33874584e...5783827e-17, -4.17836954e-17, ...,\n        -2.37706364e-14, -2.65162605e-14, -2.82227763e-14]],\n      shape=(4, 46080)) = Interval(lo=array([[-2.76231525e-19, -2.71803813e-19, -2.64176457e-19, ...,\n         3.68306941e-15,  4.09978346e-15, ...783827e-17, -4.17836954e-17, ...,\n        -2.37706364e-14, -2.65162605e-14, -2.82227763e-14]],\n      shape=(4, 46080))).lo
+1 failed, 1 passed in 1.01s
