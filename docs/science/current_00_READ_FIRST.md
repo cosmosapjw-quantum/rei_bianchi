@@ -3,10 +3,12 @@
 Current durable stage:
 
 ```text
-P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1-SOURCE-BRANCH-KERNEL-AND-OTS-ENERGY-MOMENT-LOCK
-DURABLE_PASS_R2C_R1B_R2B_R2A_R2_R1_HUMMER_SEATON_NODAL_V_TABLE_LOCK_F_INTERVAL_ONLY_AND_FOUR_CORNER_BRANCH_ENVELOPE_EXACT_HEII_LYA_ENERGY_LOCK_TWO_PHOTON_AND_FREE_BOUND_FIRST_MOMENTS_UNRESOLVED_BOUNDED_KERNEL_PROPAGATION_PREFLIGHT_AUTHORIZED
+P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-FOUR-CORNER-BRANCH-AND-UNRESOLVED-OTS-ENERGY-PROPAGATION-PREFLIGHT
+DURABLE_FAIL_CLOSED_R2_R1A_CORNERS_NARROW_BUT_CONTINUOUS_PARAMETER_ENCLOSURE_UNCERTIFIED
 ```
 
-The Hummer--Seaton nodal two-photon table is recovered, but no source-identical continuous interpolation is identified.  The canonical state has 21,600/46,080 nodes below the table domain.  The He II Ly-alpha first energy moment is exact; two-photon, free-bound, Balmer and case-B first moments remain unresolved and are retained in the OTS radiation-energy ledger.
+The three locked shape lanes and eight branch policies per lane give 24/24 numerical and ledger passes. The maximum full/two-half local error is `0.000112228944415094` against the `2e-4` gate. Strict-corner endpoint widths are `x_HII=2.38896467164018e-06`, `x_HeII=7.31201493386902e-06`, `x_HeIII=5.37277474593756e-09`, and `logT=3.39994195339699e-05`, all below `2e-3`.
 
-Next stage: `P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-FOUR-CORNER-BRANCH-AND-UNRESOLVED-OTS-ENERGY-PROPAGATION-PREFLIGHT`.  Production node chemistry, first canonical history, R2C-R2, B2C2B, recombination splice, CAMB transfer and Bianchi feedback remain unauthorized.
+This does not certify the continuous nonlinear `(v,f)` family. Production node chemistry, first canonical history, R2C-R2, B2C2B, recombination splice, CAMB transfer and Bianchi feedback remain unauthorized.
+
+Next stage: `P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-VALIDATED-CONTINUOUS-BRANCH-DIFFERENTIAL-INCLUSION-ENCLOSURE-LOCK`.

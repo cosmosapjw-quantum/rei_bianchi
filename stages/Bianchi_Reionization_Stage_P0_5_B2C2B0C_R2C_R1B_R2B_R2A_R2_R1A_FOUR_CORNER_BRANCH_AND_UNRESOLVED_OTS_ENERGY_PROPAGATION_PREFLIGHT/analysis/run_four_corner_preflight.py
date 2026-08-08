@@ -146,7 +146,7 @@ CSV_FIELDS=(
 
 def _write_csv(path: Path,rows: list[dict[str,Any]]) -> None:
     with path.open('w',newline='',encoding='utf-8') as handle:
-        writer=csv.DictWriter(handle,fieldnames=CSV_FIELDS);writer.writeheader()
+        writer=csv.DictWriter(handle,fieldnames=CSV_FIELDS,lineterminator='\n');writer.writeheader()
         for row in rows:
             out=dict(row);out['failure_classifications']=json.dumps(out['failure_classifications'])
             writer.writerow(out)

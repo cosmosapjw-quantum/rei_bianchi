@@ -87,6 +87,7 @@ def test_policy_csv_schema_accepts_locked_local_error_gate(tmp_path):
     target=tmp_path/'policy.csv'
     m._write_csv(target,[row])
     assert 'local_error_gate' in target.read_text(encoding='utf-8').splitlines()[0]
+    assert b'\r\n' not in target.read_bytes()
 
 
 def test_numerical_and_source_uncertainty_gates_are_distinct():
@@ -138,3 +139,17 @@ def test_merge_mode_rejects_incomplete_lane_artifact(tmp_path):
     observed={str(row['policy_id']) for row in loaded['rows']}
     assert observed!=expected
     assert loaded['strict_endpoint_count']!=4
+
+
+def test_independent_validator_replays_locked_result():
+    path=STAGE/'analysis/validate_preflight.py'
+    spec=importlib.util.spec_from_file_location('validate_preflight',path)
+    assert spec and spec.loader
+    module=importlib.util.module_from_spec(spec);sys.modules[spec.name]=module;spec.loader.exec_module(module)
+    receipt=module.validate()
+    assert receipt['status']=='PASS'
+    assert receipt['policy_row_count']==24
+    assert receipt['load_bearing_row_count']==12
+    assert receipt['unique_endpoint_count']==8
+    assert receipt['all_hard_gates_pass'] is True
+    assert receipt['continuous_parameter_certificate_present'] is False

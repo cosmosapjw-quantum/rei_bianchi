@@ -1,0 +1,46 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_policy_csv_schema_accepts_locked_local_error_gate ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-18/test_policy_csv_schema_accepts0')
+
+    def test_policy_csv_schema_accepts_locked_local_error_gate(tmp_path):
+        m=load_module()
+        row={
+            'lane':'LOCAL_NEUTRAL_HAZARD_PRIMARY',
+            'policy_id':'CELL_LOWER_STRICT_F010',
+            'v_policy':'CELL_LOWER_STRICT',
+            'f_value':0.1,
+            'load_bearing':True,
+            'full_converged':True,
+            'first_half_converged':True,
+            'second_half_converged':True,
+            'local_error':1.0e-5,
+            'local_error_gate':m.LOCAL_ERROR_GATE,
+            'hard_gates_pass':True,
+            'max_H_residual':0.0,
+            'max_He_residual':0.0,
+            'max_owner_residual':0.0,
+            'max_photon_residual':0.0,
+            'max_thermal_residual':0.0,
+            'max_PDS_residual':0.0,
+            'max_OTS_energy_residual':0.0,
+            'minimum_species':1.0,
+            'elapsed_s':0.1,
+            'endpoint_sha256':'0'*64,
+            'failure_classifications':[],
+        }
+        target=tmp_path/'policy.csv'
+        m._write_csv(target,[row])
+        assert 'local_error_gate' in target.read_text(encoding='utf-8').splitlines()[0]
+>       assert b'\r\n' not in target.read_bytes()
+E       AssertionError: assert b'\r\n' not in b'lane,policy_id,v_policy,f_value,load_bearing,full_converged,first_half_converged,second_half_converged,local_error,l....0002,True,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.1,0000000000000000000000000000000000000000000000000000000000000000,[]\r\n'
+E        +  where b'lane,policy_id,v_policy,f_value,load_bearing,full_converged,first_half_converged,second_half_converged,local_error,l....0002,True,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.1,0000000000000000000000000000000000000000000000000000000000000000,[]\r\n' = read_bytes()
+E        +    where read_bytes = PosixPath('/tmp/pytest-of-root/pytest-18/test_policy_csv_schema_accepts0/policy.csv').read_bytes
+
+mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_propagation_runner.py:90: AssertionError
+=========================== short test summary info ============================
+FAILED mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_propagation_runner.py::test_policy_csv_schema_accepts_locked_local_error_gate - AssertionError: assert b'\r\n' not in b'lane,policy_id,v_policy,f_value,load_bearing,full_converged,first_half_converged,second_half_converged,local_error,l....0002,True,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.1,0000000000000000000000000000000000000000000000000000000000000000,[]\r\n'
+ +  where b'lane,policy_id,v_policy,f_value,load_bearing,full_converged,first_half_converged,second_half_converged,local_error,l....0002,True,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.1,0000000000000000000000000000000000000000000000000000000000000000,[]\r\n' = read_bytes()
+ +    where read_bytes = PosixPath('/tmp/pytest-of-root/pytest-18/test_policy_csv_schema_accepts0/policy.csv').read_bytes
+1 failed in 0.07s
