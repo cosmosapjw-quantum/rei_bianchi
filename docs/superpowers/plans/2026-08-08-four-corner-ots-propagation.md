@@ -20,7 +20,7 @@
 - Exact He II Ly-alpha packet energy is `40.813320 eV`.
 - Unidentified packet energy is never set to zero; it remains in `E_OTS_unres` or an explicit interval bound.
 - Numerical hard gates: nuclei/owner/PDS `1e-11`, photon `1e-8`, thermal root `1e-10`, local error `2e-4`.
-- Predeclared uncertainty-qualified gate: maximum absolute width of each ion fraction `<=2e-3`, maximum `log(T)` width `<=2e-2`.
+- Predeclared uncertainty-qualified gate: maximum absolute width of each ion fraction `<=2e-3`, maximum `log(T)` width `<=2e-3`.
 
 ---
 
