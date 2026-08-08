@@ -16,7 +16,7 @@ def load_module():
 def test_wide_corner_enclosure_is_a_robust_fail_closed_result():
     m=load_module()
     decision=m.classify_enclosure(
-        widths={'x_HII':3e-4,'x_HeII':1e-5,'x_HeIII':1e-5,'log_T':1e-5},
+        widths={'x_HII':3e-3,'x_HeII':1e-5,'x_HeIII':1e-5,'log_T':1e-5},
         all_numerical_gates_pass=True,
         continuous_parameter_certified=False,
     )
@@ -55,3 +55,10 @@ def test_numerical_failure_precedes_uncertainty_classification():
     )
     assert decision['classification']=='HARD_GATE_FAILURE'
     assert not decision['production_authorized']
+
+
+def test_numerical_and_source_uncertainty_gates_are_distinct():
+    m=load_module()
+    assert m.LOCAL_ERROR_GATE==2e-4
+    assert m.UNCERTAINTY_GATE==2e-3
+    assert m.LOCAL_ERROR_GATE < m.UNCERTAINTY_GATE

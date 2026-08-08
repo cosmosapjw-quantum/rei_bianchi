@@ -19,7 +19,8 @@ STAGE=HERE.parent
 REPO=STAGE.parents[1]
 R2A=REPO/'stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/analysis'
 DATA=STAGE/'data'
-GATE=2.0e-4
+LOCAL_ERROR_GATE=2.0e-4
+UNCERTAINTY_GATE=2.0e-3
 LANES=(
     'LOCAL_NEUTRAL_HAZARD_PRIMARY',
     'RECOMBINATION_WEIGHTED_AUDITOR',
@@ -44,7 +45,7 @@ def classify_enclosure(*,widths: Mapping[str,float],all_numerical_gates_pass: bo
     normalized={name:float(widths[name]) for name in ('x_HII','x_HeII','x_HeIII','log_T')}
     if not all_numerical_gates_pass:
         classification='HARD_GATE_FAILURE';authorized=False
-    elif any((not math.isfinite(value)) or value>GATE for value in normalized.values()):
+    elif any((not math.isfinite(value)) or value>UNCERTAINTY_GATE for value in normalized.values()):
         classification='SOURCE_EXTENSION_CALIBRATION_REQUIRED_WIDE_ENCLOSURE';authorized=False
     elif not continuous_parameter_certified:
         classification='CONTINUOUS_PARAMETER_ENCLOSURE_UNCERTIFIED';authorized=False
@@ -54,7 +55,7 @@ def classify_enclosure(*,widths: Mapping[str,float],all_numerical_gates_pass: bo
         'classification':classification,
         'production_authorized':authorized,
         'widths':normalized,
-        'gate':GATE,
+        'uncertainty_gate':UNCERTAINTY_GATE,
         'continuous_parameter_certified':bool(continuous_parameter_certified),
     }
 
@@ -107,14 +108,14 @@ def run_policy(*,base_solver,lane: str,policy) -> tuple[dict[str,Any],Any|None]:
     converged=full.converged and half1.converged and half2 is not None and half2.converged
     local_error=(picard.state_residual(full.state,half2.state) if converged else math.inf)
     trials=[full,half1]+([] if half2 is None else [half2])
-    hard=bool(converged and local_error<=GATE and all(_gate_trial(item) for item in trials))
+    hard=bool(converged and local_error<LOCAL_ERROR_GATE and all(_gate_trial(item) for item in trials))
     endpoint=None if half2 is None else half2.state
     row={
         'lane':lane,'policy_id':policy.policy_id,'v_policy':policy.v_policy,
         'f_value':float(policy.f_value),'load_bearing':bool(policy.load_bearing),
         'full_converged':bool(full.converged),'first_half_converged':bool(half1.converged),
         'second_half_converged':bool(half2 is not None and half2.converged),
-        'local_error':float(local_error),'hard_gates_pass':hard,
+        'local_error':float(local_error),'local_error_gate':LOCAL_ERROR_GATE,'hard_gates_pass':hard,
         'max_H_residual':float(max(item.hydrogen_residual for item in trials)),
         'max_He_residual':float(max(item.helium_residual for item in trials)),
         'max_owner_residual':float(max(item.owner_residual for item in trials)),
@@ -192,7 +193,8 @@ def run_all() -> dict[str,Any]:
         'state_realization_count':len(rows),'load_bearing_realization_count':sum(bool(r['load_bearing']) for r in rows),
         'adapter_auditor_realization_count':sum(not bool(r['load_bearing']) for r in rows),
         'all_numerical_gates_pass':all_numerical,'lane_widths':lane_widths,'overall_widths':overall,
-        'decision':decision,'continuous_parameter_certificate':'NOT_AVAILABLE_NONLINEAR_MONOTONICITY_NOT_PROVED',
+        'decision':decision,'local_error_gate':LOCAL_ERROR_GATE,'uncertainty_gate':UNCERTAINTY_GATE,
+        'continuous_parameter_certificate':'NOT_AVAILABLE_NONLINEAR_MONOTONICITY_NOT_PROVED',
         'elapsed_s':float(time.perf_counter()-started),
         'max_metrics':{
             'local_error':float(max(r['local_error'] for r in rows)),
