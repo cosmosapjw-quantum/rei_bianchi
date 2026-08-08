@@ -1,0 +1,105 @@
+{
+  "benchmark_pair": {
+    "both_below_local_error_gate_2e-4": true,
+    "candidate": "MPRK22_ALPHA1_PLUS_ALEXANDER_SDIRK2_FAST_BE_AND_SDIRK_ROOT_PARTITION_2048",
+    "candidate_local_error": 6.392782357700355e-05,
+    "reference": "BACKWARD_EULER_PARTITION_4096",
+    "reference_local_error": 7.872276255582733e-05
+  },
+  "candidate_runs": [
+    {
+      "backend": "FAST_SDIRK2_CLEAN",
+      "converged": true,
+      "elapsed_s": 0.7917048360000081,
+      "local_error": 6.392782357700355e-05,
+      "maxrss_kib": 537748
+    },
+    {
+      "backend": "FAST_SDIRK2_CLEAN",
+      "converged": true,
+      "elapsed_s": 0.8012134430000515,
+      "local_error": 6.392782357700355e-05,
+      "maxrss_kib": 521968
+    },
+    {
+      "backend": "FAST_SDIRK2_CLEAN",
+      "converged": true,
+      "elapsed_s": 0.7834754190002968,
+      "local_error": 6.392782357700355e-05,
+      "maxrss_kib": 546728
+    },
+    {
+      "backend": "FAST_SDIRK2_CLEAN",
+      "converged": true,
+      "elapsed_s": 0.8010355830001572,
+      "local_error": 6.392782357700355e-05,
+      "maxrss_kib": 560412
+    },
+    {
+      "backend": "FAST_SDIRK2_CLEAN",
+      "converged": true,
+      "elapsed_s": 0.7756598239998311,
+      "local_error": 6.392782357700355e-05,
+      "maxrss_kib": 542208
+    }
+  ],
+  "classification": "R2B_R2A_R1_MATCHED_ACCURACY_WARM_SUBPROCESS_BENCHMARK",
+  "decision": "PROMOTE_FAST_ANALYTIC_BE_AND_SDIRK_ROOT_BACKEND",
+  "generated_utc": "2026-08-08T00:37:02.961375+00:00",
+  "medians": {
+    "candidate_elapsed_s": 0.7917048360000081,
+    "candidate_maxrss_kib": 542208,
+    "reference_elapsed_s": 8.017087968999931,
+    "reference_maxrss_kib": 494316
+  },
+  "memory_reduction_fraction": -0.09688539314932143,
+  "notes": [
+    "The primary 5x speed gate is load-bearing and passes; memory reduction is not needed for promotion.",
+    "Peak RSS is higher for the candidate because it includes all imported science kernels and warmup; no memory-reduction claim is made.",
+    "Science parity is verified separately against the locked 80-bisection SDIRK reference."
+  ],
+  "optimization_ablation": {
+    "phase1_sdirk_only_median_s": 1.734179192999818,
+    "phase2_be_and_sdirk_median_s": 0.7917048360000081,
+    "predictor_optimization_speedup": 2.1904365290498244,
+    "reference_bisection_sdirk_science_median_s": 3.5299992989998827,
+    "total_root_optimization_speedup": 4.458731510135485
+  },
+  "performance_promotion_pass": true,
+  "predeclared_gates": {
+    "alternative_memory_reduction_min": 0.5,
+    "alternative_speedup_min": 3.0,
+    "speedup_min": 5.0
+  },
+  "protocol": {
+    "candidate_repetitions": 5,
+    "independent_python_process_per_repetition": true,
+    "peak_rss_includes_import_and_warmup": true,
+    "reference_repetitions": 3,
+    "warmup_excluded_from_timed_region": true
+  },
+  "reference_runs": [
+    {
+      "backend": "BACKWARD_EULER",
+      "converged": true,
+      "elapsed_s": 8.017087968999931,
+      "local_error": 7.872276255582733e-05,
+      "maxrss_kib": 494316
+    },
+    {
+      "backend": "BACKWARD_EULER",
+      "converged": true,
+      "elapsed_s": 7.982994760999645,
+      "local_error": 7.872276255582733e-05,
+      "maxrss_kib": 479252
+    },
+    {
+      "backend": "BACKWARD_EULER",
+      "converged": true,
+      "elapsed_s": 8.040547273999891,
+      "local_error": 7.872276255582733e-05,
+      "maxrss_kib": 504292
+    }
+  ],
+  "speedup": 10.126359729599844
+}

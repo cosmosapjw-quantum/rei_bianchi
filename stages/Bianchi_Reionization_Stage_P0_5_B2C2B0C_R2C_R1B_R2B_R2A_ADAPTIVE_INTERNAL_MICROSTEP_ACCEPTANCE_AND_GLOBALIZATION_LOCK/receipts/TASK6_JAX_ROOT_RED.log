@@ -1,0 +1,30 @@
+...FF                                                                    [100%]
+=================================== FAILURES ===================================
+______________ test_jax_compiled_positive_root_matches_numpy_root ______________
+
+    def test_jax_compiled_positive_root_matches_numpy_root():
+     m=_load('r2b_r2a_thermal_backends_compiled_root',STAGE/'analysis/thermal_backends.py')
+     _logT,pop,volume,heat,H,U0,dt=_batch(); T0=np.exp(_logT)
+     np_result=m.NumpyThermalBackend().solve(populations=pop,parent_energy=U0,parent_temperature=T0,volume=volume,photoheat=heat,hubble=H,dt=dt)
+     jax_backend=m.JaxThermalBackend.from_repo(REPO)
+>    got=jax_backend.solve(populations=pop,parent_energy=U0,parent_temperature=T0,volume=volume,photoheat=heat,hubble=H,dt=dt)
+         ^^^^^^^^^^^^^^^^^
+E    AttributeError: 'JaxThermalBackend' object has no attribute 'solve'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_backend_parity.py:59: AttributeError
+_________________ test_jax_root_variable_dt_does_not_recompile _________________
+
+    def test_jax_root_variable_dt_does_not_recompile():
+     m=_load('r2b_r2a_thermal_backends_root_dt',STAGE/'analysis/thermal_backends.py')
+     _logT,pop,volume,heat,H,U0,dt=_batch(); T0=np.exp(_logT)
+     backend=m.JaxThermalBackend.from_repo(REPO)
+     for factor in (1.0,.5,.25,.125,.0625):
+>     backend.solve(populations=pop,parent_energy=U0,parent_temperature=T0,volume=volume,photoheat=heat,hubble=H,dt=dt*factor)
+      ^^^^^^^^^^^^^
+E     AttributeError: 'JaxThermalBackend' object has no attribute 'solve'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_backend_parity.py:73: AttributeError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_backend_parity.py::test_jax_compiled_positive_root_matches_numpy_root - AttributeError: 'JaxThermalBackend' object has no attribute 'solve'
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_backend_parity.py::test_jax_root_variable_dt_does_not_recompile - AttributeError: 'JaxThermalBackend' object has no attribute 'solve'
+2 failed, 3 passed in 0.64s

@@ -1,0 +1,28 @@
+...F..                                                                   [100%]
+=================================== FAILURES ===================================
+______________ test_jax_compiled_positive_root_matches_numpy_root ______________
+
+    def test_jax_compiled_positive_root_matches_numpy_root():
+     m=_load('r2b_r2a_thermal_backends_compiled_root',STAGE/'analysis/thermal_backends.py')
+     _logT,pop,volume,heat,H,U0,dt=_batch(); T0=np.exp(_logT)
+     np_result=m.NumpyThermalBackend().solve(populations=pop,parent_energy=U0,parent_temperature=T0,volume=volume,photoheat=heat,hubble=H,dt=dt)
+     jax_backend=m.JaxThermalBackend.from_repo(REPO)
+     got=jax_backend.solve(populations=pop,parent_energy=U0,parent_temperature=T0,volume=volume,photoheat=heat,hubble=H,dt=dt)
+     assert np.array_equal(got.bracketed,np_result.bracketed)
+     for a,b in ((got.energy,np_result.energy),(got.temperature,np_result.temperature),(got.rhs,np_result.rhs)):
+      scale=np.maximum.reduce([np.abs(a),np.abs(b),np.ones_like(a)])
+>     assert np.max(np.abs(a-b)/scale) < 1e-11
+E     AssertionError: assert np.float64(1.6608923011431727e-11) < 1e-11
+E      +  where np.float64(1.6608923011431727e-11) = <function max at 0x7f69edb14030>((array([1.64477569e-08, 3.03039087e-08, 2.59947228e-08, 2.93734956e-08,\n       1.68338374e-08, 4.22382982e-08, 3.669492...1.18358003e-07, 1.18358003e-07, 1.18358003e-07,\n       1.18358003e-07, 1.18358003e-07, 1.18358003e-07, 1.18358003e-07]) / array([ 2096.71729076,  2142.89617137,  2226.50918876,  2349.86767595,\n        2517.34753657,  2735.16953838,  3011.26...30732.7669169 , 30732.7669169 , 30732.7669169 ,\n       30732.7669169 , 30732.7669169 , 30732.7669169 , 30732.7669169 ])))
+E      +    where <function max at 0x7f69edb14030> = np.max
+E      +    and   array([1.64477569e-08, 3.03039087e-08, 2.59947228e-08, 2.93734956e-08,\n       1.68338374e-08, 4.22382982e-08, 3.669492...1.18358003e-07, 1.18358003e-07, 1.18358003e-07,\n       1.18358003e-07, 1.18358003e-07, 1.18358003e-07, 1.18358003e-07]) = <ufunc 'absolute'>((array([ 2096.71729076,  2142.89617137,  2226.50918874,  2349.86767592,\n        2517.34753657,  2735.16953838,  3011.26...30732.7669169 , 30732.7669169 , 30732.7669169 ,\n       30732.7669169 , 30732.7669169 , 30732.7669169 , 30732.7669169 ]) - array([ 2096.71729074,  2142.89617134,  2226.50918876,  2349.86767595,\n        2517.34753656,  2735.16953833,  3011.26...30732.76691678, 30732.76691678, 30732.76691678,\n       30732.76691678, 30732.76691678, 30732.76691678, 30732.76691678])))
+E      +      where <ufunc 'absolute'> = np.abs
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_backend_parity.py:63: AssertionError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_backend_parity.py::test_jax_compiled_positive_root_matches_numpy_root - AssertionError: assert np.float64(1.6608923011431727e-11) < 1e-11
+ +  where np.float64(1.6608923011431727e-11) = <function max at 0x7f69edb14030>((array([1.64477569e-08, 3.03039087e-08, 2.59947228e-08, 2.93734956e-08,\n       1.68338374e-08, 4.22382982e-08, 3.669492...1.18358003e-07, 1.18358003e-07, 1.18358003e-07,\n       1.18358003e-07, 1.18358003e-07, 1.18358003e-07, 1.18358003e-07]) / array([ 2096.71729076,  2142.89617137,  2226.50918876,  2349.86767595,\n        2517.34753657,  2735.16953838,  3011.26...30732.7669169 , 30732.7669169 , 30732.7669169 ,\n       30732.7669169 , 30732.7669169 , 30732.7669169 , 30732.7669169 ])))
+ +    where <function max at 0x7f69edb14030> = np.max
+ +    and   array([1.64477569e-08, 3.03039087e-08, 2.59947228e-08, 2.93734956e-08,\n       1.68338374e-08, 4.22382982e-08, 3.669492...1.18358003e-07, 1.18358003e-07, 1.18358003e-07,\n       1.18358003e-07, 1.18358003e-07, 1.18358003e-07, 1.18358003e-07]) = <ufunc 'absolute'>((array([ 2096.71729076,  2142.89617137,  2226.50918874,  2349.86767592,\n        2517.34753657,  2735.16953838,  3011.26...30732.7669169 , 30732.7669169 , 30732.7669169 ,\n       30732.7669169 , 30732.7669169 , 30732.7669169 , 30732.7669169 ]) - array([ 2096.71729074,  2142.89617134,  2226.50918876,  2349.86767595,\n        2517.34753656,  2735.16953833,  3011.26...30732.76691678, 30732.76691678, 30732.76691678,\n       30732.76691678, 30732.76691678, 30732.76691678, 30732.76691678])))
+ +      where <ufunc 'absolute'> = np.abs
+1 failed, 5 passed in 1.40s

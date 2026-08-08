@@ -1,0 +1,40 @@
+{
+  "classification": "R2B_R2A_PREDECLARED_PERFORMANCE_AND_PARITY_SPEC",
+  "warmup_excluded": true,
+  "benchmarks": [
+    {"name": "owner_law", "repetitions": 100},
+    {"name": "thermal_root", "repetitions": 100},
+    {"name": "picard_iteration", "repetitions": 20},
+    {"name": "first_slab_dt256", "repetitions": 3},
+    {"name": "first_canonical_interval_adaptive", "repetitions": 1}
+  ],
+  "parity_tolerances": {
+    "owner_and_nuclei_relative": 1e-11,
+    "photon_relative": 1e-8,
+    "thermal_blockwise_relative": 2e-4,
+    "structural_zero": 0.0
+  },
+  "adaptive": {
+    "initial_partition": 8,
+    "minimum_partition": 1024,
+    "fixed_point_tolerance": 1e-10,
+    "local_error_tolerance": 2e-4,
+    "damping_candidates": [1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625]
+  },
+  "performance_acceptance": {
+    "speedup_primary": 5.0,
+    "speedup_alternative": 3.0,
+    "peak_memory_reduction_alternative": 0.5
+  },
+  "forbidden": [
+    "clipping",
+    "projection",
+    "owner_reassignment",
+    "kappa_equals_J_over_Phi_constitutive_inversion",
+    "cloud_mass_inversion",
+    "geometry_inversion",
+    "per_node_fitting",
+    "recombination_surrogate",
+    "post_hoc_lane_selection"
+  ]
+}

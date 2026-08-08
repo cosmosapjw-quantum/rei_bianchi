@@ -1,0 +1,71 @@
+{
+  "calculation_started": false,
+  "classification": "R2B_R2A_R1_ATTEMPT_3_PRECALCULATION_PERFORMANCE_LOCK",
+  "created_utc": "2026-08-08T00:22:58.993450+00:00",
+  "forbidden": [
+    "changing SDIRK coefficients",
+    "changing MPRK alpha",
+    "changing science partitions",
+    "relaxing residual tolerance",
+    "clipping",
+    "owner reassignment"
+  ],
+  "hypothesis": "Thermal runtime is dominated by repeated invariant population algebra and fixed 80-step bisection. Hoisting invariant coefficients and using an exact analytic dR/dlnT inside a safeguarded positive bracket will preserve the SDIRK2 equation while reducing runtime.",
+  "inputs": [
+    {
+      "path": "analysis/thermal_sdirk2.py",
+      "sha256": "7238632cc8840216720e9d5e13ec1ff265fcad07a04e5570ca787a530b78d8ae",
+      "size_bytes": 2776
+    },
+    {
+      "path": "analysis/thermal_trapezoid.py",
+      "sha256": "10bc6488dd92102995e15d8d531925a3a5bf2d4d68926733ffc2853df7b85759",
+      "size_bytes": 5408
+    },
+    {
+      "path": "analysis/second_order_sdirk_trial.py",
+      "sha256": "284b4b215635dfb78ded2a90daba6175bfaeadd69f339fc9bc7eed459e084155",
+      "size_bytes": 7494
+    },
+    {
+      "path": "attempts/ATTEMPT_1_MPRK22_ALPHA1_LSTABLE_SDIRK2_THERMAL/results.json",
+      "sha256": "d306433f42a78e7ebbb7dbe458e25ab3737859e0c7ec943378040050b04e6413",
+      "size_bytes": 11786
+    },
+    {
+      "path": "receipts/CANDIDATE_CPROFILE.txt",
+      "sha256": "ca15681d5e2b47e581a59c45728d612e66dc33eca50265e88907edb49c7a25c2",
+      "size_bytes": 12521
+    },
+    {
+      "path": "receipts/BE4096_SINGLE_RUN.log",
+      "sha256": "e49926739cab56d195147262d639eb58ab50e5d91037dd16c1ae463a9a5b9d25",
+      "size_bytes": 518
+    }
+  ],
+  "parity_gates": {
+    "dlogT_derivative_relative": 2e-06,
+    "energy_relative": 1e-10,
+    "rhs_relative": 1e-12,
+    "science_local_error_difference": 1e-10,
+    "temperature_relative": 1e-10
+  },
+  "performance_gates": {
+    "and_peak_memory_reduction_min": 0.5,
+    "or_speedup_min": 3.0,
+    "whole_candidate_vs_BE4096_speedup_min": 5.0
+  },
+  "physics_method_unchanged": {
+    "chemistry": "NONAUTONOMOUS_MPRK22_ALPHA1",
+    "root_equation": "IDENTICAL_STAGE_AND_FINAL_ENERGY_BALANCES",
+    "thermal": "ALEXANDER_SDIRK2_GAMMA_1_MINUS_1_OVER_SQRT2"
+  },
+  "root_policy": {
+    "coordinate": "log_temperature",
+    "fallback_bisection_iterations": 48,
+    "newton_max_iterations": 16,
+    "outside_bracket_action": "MIDPOINT_NOT_CLIPPING",
+    "positive_bracket": "required",
+    "relative_residual": 1e-10
+  }
+}

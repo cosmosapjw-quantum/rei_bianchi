@@ -1,0 +1,42 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_roundoff_closure_is_assigned_to_largest_support_not_tiny_tail ______
+
+    def test_roundoff_closure_is_assigned_to_largest_support_not_tiny_tail():
+        owner = _load('r2b_r2a_array_owner_roundoff', STAGE/'analysis/array_owner_kernel.py')
+        h=np.array([3769531.2919941754,0.019905772835280652,1.5733767554744014e-154])
+        total=7.0
+        q,current=owner._allocate(total,h)
+        uncorrected=total*h/np.sum(h,dtype=np.float64)
+        changed=np.flatnonzero(current != uncorrected)
+>       assert changed.tolist() == [int(np.argmax(h))]
+E       assert [1, 2] == [0]
+E         
+E         At index 0 diff: 1 != 0
+E         Left contains one more item: 2
+E         
+E         Full diff:
+E           [
+E         -     0,
+E         ?     ^
+E         +     1,
+E         ?     ^
+E         +     2,
+E           ]
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_owner_kernel_parity.py:109: AssertionError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_owner_kernel_parity.py::test_roundoff_closure_is_assigned_to_largest_support_not_tiny_tail - assert [1, 2] == [0]
+  
+  At index 0 diff: 1 != 0
+  Left contains one more item: 2
+  
+  Full diff:
+    [
+  -     0,
+  ?     ^
+  +     1,
+  ?     ^
+  +     2,
+    ]
+1 failed in 0.06s

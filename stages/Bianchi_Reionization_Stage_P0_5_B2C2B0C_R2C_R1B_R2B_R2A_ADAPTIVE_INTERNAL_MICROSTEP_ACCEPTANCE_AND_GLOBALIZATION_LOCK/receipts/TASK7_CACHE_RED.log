@@ -1,0 +1,30 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_accepted_candidate_map_is_reused_on_next_iteration ____________
+
+    def test_accepted_candidate_map_is_reused_on_next_iteration():
+        tensor, picard = _mods()
+        parent = _state(tensor, 0.2)
+        calls = {"n": 0}
+    
+        def contraction(iterate):
+            calls["n"] += 1
+            x = float(np.mean(iterate.values[1] / (iterate.values[0] + iterate.values[1])))
+            x_new = 0.3 + 0.25 * (x - 0.3)
+            return picard.MapEvaluation(state=_mapped_state(tensor, parent, x_new))
+    
+        result = picard.GlobalizedPicard(max_iterations=80).solve(
+            parent=parent, map_state=contraction
+        )
+        assert result.converged
+>       assert result.map_calls == result.iterations
+E       assert 31 == 16
+E        +  where 31 = TrialResult(state=ArrayState(values=array([[7.00000000e-01, 1.40000000e+00, 2.10000000e+00],\n       [3.00000000e-01, 6....0, max_helium_residual=0.0, max_owner_residual=0.0, max_photon_residual=0.0, max_thermal_residual=0.0, certificate={}).map_calls
+E        +  and   16 = TrialResult(state=ArrayState(values=array([[7.00000000e-01, 1.40000000e+00, 2.10000000e+00],\n       [3.00000000e-01, 6....0, max_helium_residual=0.0, max_owner_residual=0.0, max_photon_residual=0.0, max_thermal_residual=0.0, certificate={}).iterations
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_globalized_picard.py:137: AssertionError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_ADAPTIVE_INTERNAL_MICROSTEP_ACCEPTANCE_AND_GLOBALIZATION_LOCK/tests/test_globalized_picard.py::test_accepted_candidate_map_is_reused_on_next_iteration - assert 31 == 16
+ +  where 31 = TrialResult(state=ArrayState(values=array([[7.00000000e-01, 1.40000000e+00, 2.10000000e+00],\n       [3.00000000e-01, 6....0, max_helium_residual=0.0, max_owner_residual=0.0, max_photon_residual=0.0, max_thermal_residual=0.0, certificate={}).map_calls
+ +  and   16 = TrialResult(state=ArrayState(values=array([[7.00000000e-01, 1.40000000e+00, 2.10000000e+00],\n       [3.00000000e-01, 6....0, max_helium_residual=0.0, max_owner_residual=0.0, max_photon_residual=0.0, max_thermal_residual=0.0, certificate={}).iterations
+1 failed in 0.06s
