@@ -1,0 +1,178 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+___ test_event_operator_matches_legacy_source_rhs_when_given_legacy_branches ___
+
+    def test_event_operator_matches_legacy_source_rhs_when_given_legacy_branches():
+        op=load('event_uncertainty_operator',STAGE/'analysis/event_uncertainty_operator.py')
+        micro=load('event_uncertainty_micro_oracle',MICRO)
+        pop,temp,volume,photo=sample()
+        nh=pop[:,0]+pop[:,1]; nhe=np.sum(pop[:,2:5],axis=1)
+        xh=pop[:,1]/nh; he=pop[:,2:5]/nhe[:,None]
+        q=np.column_stack([np.log(xh)-np.log1p(-xh),np.log(he[:,1])-np.log(he[:,0]),np.log(he[:,2])-np.log(he[:,0]),np.log(temp)])
+        v=1.0/(1.0+np.exp(-(temp-2.0e4)/4.0e3))
+        f=1.0-np.exp(-100.0*pop[:,0]/nh)
+>       result=evaluate(op,pop=pop,temp=temp,volume=volume,photo=photo,v=v,f=f)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+op = <module 'event_uncertainty_operator' from '/mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stage..._R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/analysis/event_uncertainty_operator.py'>
+
+    def evaluate(op, *, pop, temp, volume, photo, v, f):
+>       return op.evaluate_event_flux(
+            populations=pop,
+            temperature_K=temp,
+            proper_volume_cm3=volume,
+            photo_hi=photo[:,0],
+            photo_hei=photo[:,1],
+            photo_heii=photo[:,2],
+            v=v,
+            f=f,
+        )
+E       TypeError: evaluate_event_flux() missing 2 required keyword-only arguments: 'energy_policy' and 'witness_path'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py:31: TypeError
+__ test_event_flux_is_nonnegative_conservative_and_has_no_direct_hei_to_heiii __
+
+    def test_event_flux_is_nonnegative_conservative_and_has_no_direct_hei_to_heiii():
+        op=load('event_uncertainty_operator2',STAGE/'analysis/event_uncertainty_operator.py')
+        pop,temp,volume,photo=sample()
+>       result=evaluate(op,pop=pop,temp=temp,volume=volume,photo=photo,
+            v=np.array([0.0,0.33,1.0]),f=np.array([0.1,1.0,0.1]))
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+op = <module 'event_uncertainty_operator2' from '/mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stag..._R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/analysis/event_uncertainty_operator.py'>
+
+    def evaluate(op, *, pop, temp, volume, photo, v, f):
+>       return op.evaluate_event_flux(
+            populations=pop,
+            temperature_K=temp,
+            proper_volume_cm3=volume,
+            photo_hi=photo[:,0],
+            photo_hei=photo[:,1],
+            photo_heii=photo[:,2],
+            v=v,
+            f=f,
+        )
+E       TypeError: evaluate_event_flux() missing 2 required keyword-only arguments: 'energy_policy' and 'witness_path'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py:31: TypeError
+_ test_augmented_binding_energy_identity_closes_without_a_fake_energy_state_axis _
+
+    def test_augmented_binding_energy_identity_closes_without_a_fake_energy_state_axis():
+        op=load('event_uncertainty_operator3',STAGE/'analysis/event_uncertainty_operator.py')
+        pop,temp,volume,photo=sample()
+>       result=evaluate(op,pop=pop,temp=temp,volume=volume,photo=photo,
+            v=np.array([0.0,0.5,1.0]),f=np.array([0.1,1.0,0.4]))
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+op = <module 'event_uncertainty_operator3' from '/mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stag..._R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/analysis/event_uncertainty_operator.py'>
+
+    def evaluate(op, *, pop, temp, volume, photo, v, f):
+>       return op.evaluate_event_flux(
+            populations=pop,
+            temperature_K=temp,
+            proper_volume_cm3=volume,
+            photo_hi=photo[:,0],
+            photo_hei=photo[:,1],
+            photo_heii=photo[:,2],
+            v=v,
+            f=f,
+        )
+E       TypeError: evaluate_event_flux() missing 2 required keyword-only arguments: 'energy_policy' and 'witness_path'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py:31: TypeError
+_______ test_two_photon_first_moment_is_never_promoted_to_resolved_heat ________
+
+    def test_two_photon_first_moment_is_never_promoted_to_resolved_heat():
+        op=load('event_uncertainty_operator4',STAGE/'analysis/event_uncertainty_operator.py')
+        pop,temp,volume,photo=sample()
+>       result=evaluate(op,pop=pop,temp=temp,volume=volume,photo=photo,
+            v=np.ones(3),f=np.ones(3))
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+op = <module 'event_uncertainty_operator4' from '/mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stag..._R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/analysis/event_uncertainty_operator.py'>
+
+    def evaluate(op, *, pop, temp, volume, photo, v, f):
+>       return op.evaluate_event_flux(
+            populations=pop,
+            temperature_K=temp,
+            proper_volume_cm3=volume,
+            photo_hi=photo[:,0],
+            photo_hei=photo[:,1],
+            photo_heii=photo[:,2],
+            v=v,
+            f=f,
+        )
+E       TypeError: evaluate_event_flux() missing 2 required keyword-only arguments: 'energy_policy' and 'witness_path'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py:31: TypeError
+_________ test_exact_heii_lya_absorption_is_the_only_resolved_ots_heat _________
+
+    def test_exact_heii_lya_absorption_is_the_only_resolved_ots_heat():
+        op=load('event_uncertainty_operator5',STAGE/'analysis/event_uncertainty_operator.py')
+        pop,temp,volume,photo=sample()
+>       result=evaluate(op,pop=pop,temp=temp,volume=volume,photo=photo,
+            v=np.zeros(3),f=np.ones(3))
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+op = <module 'event_uncertainty_operator5' from '/mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stag..._R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/analysis/event_uncertainty_operator.py'>
+
+    def evaluate(op, *, pop, temp, volume, photo, v, f):
+>       return op.evaluate_event_flux(
+            populations=pop,
+            temperature_K=temp,
+            proper_volume_cm3=volume,
+            photo_hi=photo[:,0],
+            photo_hei=photo[:,1],
+            photo_heii=photo[:,2],
+            v=v,
+            f=f,
+        )
+E       TypeError: evaluate_event_flux() missing 2 required keyword-only arguments: 'energy_policy' and 'witness_path'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py:31: TypeError
+_______________ test_photon_branch_identity_is_exact_to_roundoff _______________
+
+    def test_photon_branch_identity_is_exact_to_roundoff():
+        op=load('event_uncertainty_operator6',STAGE/'analysis/event_uncertainty_operator.py')
+        pop,temp,volume,photo=sample()
+>       result=evaluate(op,pop=pop,temp=temp,volume=volume,photo=photo,
+            v=np.array([0.0,0.5,1.0]),f=np.array([0.1,1.0,0.4]))
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+op = <module 'event_uncertainty_operator6' from '/mnt/data/rei_bianchi_r2b_r2a_r2_r1a_work/stages/Bianchi_Reionization_Stag..._R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/analysis/event_uncertainty_operator.py'>
+
+    def evaluate(op, *, pop, temp, volume, photo, v, f):
+>       return op.evaluate_event_flux(
+            populations=pop,
+            temperature_K=temp,
+            proper_volume_cm3=volume,
+            photo_hi=photo[:,0],
+            photo_hei=photo[:,1],
+            photo_heii=photo[:,2],
+            v=v,
+            f=f,
+        )
+E       TypeError: evaluate_event_flux() missing 2 required keyword-only arguments: 'energy_policy' and 'witness_path'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py:31: TypeError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py::test_event_operator_matches_legacy_source_rhs_when_given_legacy_branches - TypeError: evaluate_event_flux() missing 2 required keyword-only arguments: 'energy_policy' and 'witness_path'
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py::test_event_flux_is_nonnegative_conservative_and_has_no_direct_hei_to_heiii - TypeError: evaluate_event_flux() missing 2 required keyword-only arguments: 'energy_policy' and 'witness_path'
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py::test_augmented_binding_energy_identity_closes_without_a_fake_energy_state_axis - TypeError: evaluate_event_flux() missing 2 required keyword-only arguments: 'energy_policy' and 'witness_path'
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py::test_two_photon_first_moment_is_never_promoted_to_resolved_heat - TypeError: evaluate_event_flux() missing 2 required keyword-only arguments: 'energy_policy' and 'witness_path'
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py::test_exact_heii_lya_absorption_is_the_only_resolved_ots_heat - TypeError: evaluate_event_flux() missing 2 required keyword-only arguments: 'energy_policy' and 'witness_path'
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_event_uncertainty_operator.py::test_photon_branch_identity_is_exact_to_roundoff - TypeError: evaluate_event_flux() missing 2 required keyword-only arguments: 'energy_policy' and 'witness_path'
+6 failed in 0.32s

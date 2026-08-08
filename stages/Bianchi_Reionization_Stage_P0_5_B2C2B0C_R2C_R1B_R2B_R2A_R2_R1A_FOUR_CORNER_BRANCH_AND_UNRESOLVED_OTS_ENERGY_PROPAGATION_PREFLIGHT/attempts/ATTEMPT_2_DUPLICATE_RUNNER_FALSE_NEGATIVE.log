@@ -1,0 +1,31 @@
+..........F..........                                                    [100%]
+=================================== FAILURES ===================================
+__________ test_block_errors_are_fraction_and_log_temperature_errors ___________
+
+    def test_block_errors_are_fraction_and_log_temperature_errors():
+        m=load_module()
+        a=np.array([[8.,4.],[2.,6.],[7.,6.],[2.,3.],[1.,1.],[1.,1.]])
+        b=a.copy();b[1,0]+=0.1;b[0,0]-=0.1;b[3,1]+=0.05;b[2,1]-=0.05
+        e=m.block_errors(State(a,[100.,200.]),State(b,[101.,198.]))
+        assert e['x_HII']>0 and e['x_HeII']>0 and e['x_HeIII']==0
+>       assert e['log_T']==max(abs(np.log(100/101)),abs(np.log(200/198)))
+E       AssertionError: assert 0.010050335853501124 == np.float64(0.010050335853501506)
+E        +  where np.float64(0.010050335853501506) = max(np.float64(0.009950330853168092), np.float64(0.010050335853501506))
+E        +    where np.float64(0.009950330853168092) = abs(np.float64(-0.009950330853168092))
+E        +      where np.float64(-0.009950330853168092) = <ufunc 'log'>((100 / 101))
+E        +        where <ufunc 'log'> = np.log
+E        +    and   np.float64(0.010050335853501506) = abs(np.float64(0.010050335853501506))
+E        +      where np.float64(0.010050335853501506) = <ufunc 'log'>((200 / 198))
+E        +        where <ufunc 'log'> = np.log
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_run_preflight.py:26: AssertionError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_FOUR_CORNER_BRANCH_AND_UNRESOLVED_OTS_ENERGY_PROPAGATION_PREFLIGHT/tests/test_run_preflight.py::test_block_errors_are_fraction_and_log_temperature_errors - AssertionError: assert 0.010050335853501124 == np.float64(0.010050335853501506)
+ +  where np.float64(0.010050335853501506) = max(np.float64(0.009950330853168092), np.float64(0.010050335853501506))
+ +    where np.float64(0.009950330853168092) = abs(np.float64(-0.009950330853168092))
+ +      where np.float64(-0.009950330853168092) = <ufunc 'log'>((100 / 101))
+ +        where <ufunc 'log'> = np.log
+ +    and   np.float64(0.010050335853501506) = abs(np.float64(0.010050335853501506))
+ +      where np.float64(0.010050335853501506) = <ufunc 'log'>((200 / 198))
+ +        where <ufunc 'log'> = np.log
+1 failed, 20 passed in 2.63s
