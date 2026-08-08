@@ -77,3 +77,12 @@ def test_nonpositive_parent_fails_closed():
     m=load()
     with pytest.raises(ValueError):
         m.mprk22_step(y0=np.array([[1.0,0.0]]),t0=0.0,dt=1.0,flux_function=two_state_flux)
+
+def test_public_corrector_matches_combined_step():
+    m=load(); y0=np.array([[0.9,0.1]]); dt=0.2
+    flux0=two_state_flux(0.0,y0)
+    pred=m.patankar_euler(y0=y0,flux=flux0,dt=dt)
+    flux1=two_state_flux(dt,pred)
+    direct=m.mprk22_corrector(y0=y0,predictor=pred,stage_flux=flux0,final_flux=flux1,dt=dt)
+    combined=m.mprk22_step(y0=y0,t0=0.0,dt=dt,flux_function=two_state_flux).corrector
+    np.testing.assert_allclose(direct,combined,rtol=0.0,atol=0.0)

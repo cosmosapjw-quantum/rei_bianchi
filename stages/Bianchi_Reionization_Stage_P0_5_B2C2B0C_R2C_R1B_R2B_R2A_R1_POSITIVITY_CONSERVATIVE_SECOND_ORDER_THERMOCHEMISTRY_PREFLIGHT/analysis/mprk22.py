@@ -85,6 +85,20 @@ def patankar_euler(*, y0: np.ndarray, flux: np.ndarray, dt: float) -> np.ndarray
     return _solve(parent,flux,parent,dt)
 
 
+
+
+def mprk22_corrector(
+    *, y0: np.ndarray, predictor: np.ndarray, stage_flux: np.ndarray,
+    final_flux: np.ndarray, dt: float,
+) -> np.ndarray:
+    parent=_state(y0); stage=_state(predictor)
+    if stage.shape!=parent.shape:
+        raise ValueError('predictor shape mismatch')
+    f0=_flux(stage_flux,(parent.shape[0],parent.shape[1]))
+    f1=_flux(final_flux,(parent.shape[0],parent.shape[1]))
+    return _solve(parent,0.5*(f0+f1),stage,dt)
+
+
 def mprk22_step(*, y0: np.ndarray, t0: float, dt: float, flux_function: FluxFunction) -> MPRK22Result:
     parent=_state(y0); start=float(t0); step=float(dt)
     if not math.isfinite(start) or not math.isfinite(step) or step<0.0:
@@ -93,8 +107,9 @@ def mprk22_step(*, y0: np.ndarray, t0: float, dt: float, flux_function: FluxFunc
     predictor=patankar_euler(y0=parent,flux=flux0,dt=step)
     flux1=_flux(flux_function(start+step,predictor),(parent.shape[0],parent.shape[1]))
     # MPRK22(alpha=1): b1=b2=1/2 and sigma_i=y_i^(2).
-    average_flux=0.5*(flux0+flux1)
-    corrector=_solve(parent,average_flux,predictor,step)
+    corrector=mprk22_corrector(
+        y0=parent,predictor=predictor,stage_flux=flux0,final_flux=flux1,dt=step
+    )
     total0=np.sum(parent,axis=1,dtype=np.float64)
     total1=np.sum(corrector,axis=1,dtype=np.float64)
     scale=np.maximum(np.abs(total0),1.0)
