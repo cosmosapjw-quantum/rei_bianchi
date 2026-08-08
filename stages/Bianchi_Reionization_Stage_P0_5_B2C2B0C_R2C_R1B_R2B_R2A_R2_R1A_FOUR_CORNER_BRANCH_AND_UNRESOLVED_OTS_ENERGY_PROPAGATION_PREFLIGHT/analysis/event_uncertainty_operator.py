@@ -2,8 +2,6 @@
 """Event-resolved full-OTS population and augmented-energy uncertainty operator."""
 from __future__ import annotations
 
-import json
-from pathlib import Path
 from typing import NamedTuple
 import numpy as np
 
@@ -75,14 +73,6 @@ def flux_rhs(flux: np.ndarray) -> np.ndarray:
     return np.sum(flux,axis=2,dtype=np.float64)-np.sum(flux,axis=1,dtype=np.float64)
 
 
-def _witness(path,policy: str) -> tuple[float,float,float]:
-    payload=json.loads(Path(path).read_text())
-    if policy=='ENERGY_LOWER': key='constructive_witness_high'
-    elif policy=='ENERGY_UPPER': key='constructive_witness_low'
-    else: raise KeyError(policy)
-    row=payload[key]
-    return float(row['energy_H_capable_eV']),float(row['energy_HeI_capable_eV']),float(row['total_pair_energy_eV'])
-
 
 def _add(flux: np.ndarray,dest: int,source: int,rate: np.ndarray) -> None:
     values=np.asarray(rate,dtype=np.float64)
@@ -92,7 +82,7 @@ def _add(flux: np.ndarray,dest: int,source: int,rate: np.ndarray) -> None:
 
 
 def evaluate_event_flux(*,populations,temperature_K,proper_volume_cm3,photo_hi,photo_hei,photo_heii,
-                        v,f,energy_policy: str,witness_path) -> EventFluxResult:
+                        v,f) -> EventFluxResult:
     pop=np.asarray(populations,dtype=np.float64); T=np.asarray(temperature_K,dtype=np.float64)
     volume=np.asarray(proper_volume_cm3,dtype=np.float64)
     phi=np.asarray(photo_hi,dtype=np.float64); phe=np.asarray(photo_hei,dtype=np.float64); phe2=np.asarray(photo_heii,dtype=np.float64)
@@ -146,14 +136,11 @@ def evaluate_event_flux(*,populations,temperature_K,proper_volume_cm3,photo_hi,p
     recon_scale=np.maximum(np.max(np.abs(rhs),axis=1),1.0)
     pds_res=float(np.max(np.max(np.abs(flux_rhs(flux)-rhs),axis=1)/recon_scale))
 
-    E_Hcap,E_HeIcap,E_pair=_witness(witness_path,energy_policy)
-    E_H_abs=E_Hcap-(1.0-y)*E_HeIcap
-    E_He_abs=(1.0-y)*E_HeIcap
-    heat_two=vv*((E_H_abs-w*CHI_H_EV)+(E_He_abs-M_CAS*(1.0-y)*CHI_HEI_EV))
-    unresolved_two=vv*(E_pair-E_Hcap)
+    # Only the monoenergetic He II Ly-alpha packet has a source-locked first
+    # energy moment.  The two-photon and free-bound/cascade first moments remain
+    # unresolved and therefore never modify the resolved thermal state.
     heat_lya=(1.0-vv)*ff*(z*(HEII_LYA_EV-CHI_H_EV)+(1.0-z)*(HEII_LYA_EV-CHI_HEI_EV))
     escape_lya=(1.0-vv)*(1.0-ff)*HEII_LYA_EV
-    unresolved_cascade=(CHI_HEII_EV-HEII_LYA_EV)+unresolved_two
 
     chemical=(
         r_hb*(-CHI_H_EV)
@@ -164,16 +151,13 @@ def evaluate_event_flux(*,populations,temperature_K,proper_volume_cm3,photo_hi,p
         +r_he3cas*(-CHI_HEII_EV+vv*(w*CHI_H_EV+M_CAS*(1.0-y)*CHI_HEI_EV)
                     +(1.0-vv)*ff*(z*CHI_H_EV+(1.0-z)*CHI_HEI_EV))
     )*EV_ERG
-    resolved=r_he3cas*(heat_two+heat_lya)*EV_ERG
+    resolved=r_he3cas*heat_lya*EV_ERG
     escaped=r_he3cas*escape_lya*EV_ERG
-    unresolved=(
-        r_hb*CHI_H_EV
-        +r_he2g*(CHI_HEI_EV-(y*CHI_H_EV+(1.0-y)*CHI_HEI_EV))
-        +r_he2b*(CHI_HEI_EV-P_EXC*CHI_H_EV)
-        +r_he3g*(CHI_HEII_EV-((1.0-y2a-y2b)*CHI_H_EV+y2b*CHI_HEI_EV+y2a*CHI_HEII_EV))
-        +r_he3n2*(CHI_HEII_EV-CHI_H_EV)
-        +r_he3cas*unresolved_cascade
-    )*EV_ERG
+    # The unidentified packet spectrum is retained as an explicit radiation
+    # reservoir.  This is the unique nonnegative binding-energy remainder once
+    # the population event graph, exact Ly-alpha heat, and escape owner are
+    # fixed.  It is not a fitted or midpoint energy moment.
+    unresolved=-chemical-resolved-escaped
     energy_res=chemical+resolved+unresolved+escaped
     energy_scale=np.maximum.reduce([np.abs(chemical),resolved,unresolved,escaped,np.ones(n)])
     max_energy=float(np.max(np.abs(energy_res)/energy_scale))
