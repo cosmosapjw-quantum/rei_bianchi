@@ -1,3 +1,5 @@
+> **SUPERSEDED BEFORE CALCULATION:** The 48-state-run energy-axis and 2e-3 uncertainty policy were superseded by the approved design in `docs/superpowers/specs/2026-08-08-r2b-r2a-r2-r1a-four-corner-propagation-design.md`. The file is retained only as provenance.
+
 # Four-Corner OTS Propagation Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
