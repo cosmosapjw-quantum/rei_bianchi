@@ -53,6 +53,9 @@ class TemporalControlAudit:
     outside_node_count: int
     maximum_outside_absolute: float
     maximum_outside_fraction_of_static_width: float
+    maximum_outside_by_coordinate: tuple[float, ...]
+    outside_node_count_by_coordinate: tuple[int, ...]
+    maximum_outside_fraction_by_coordinate: tuple[float, ...]
     static_parameter_enclosure_certified: bool
     stagewise_control_generators_required: bool
     source_regularization_assumed: bool
@@ -221,6 +224,9 @@ def run_temporal_control_audit(
         outside_node_count=count,
         maximum_outside_absolute=float(outside[coordinate, node]),
         maximum_outside_fraction_of_static_width=float(np.max(relative)),
+        maximum_outside_by_coordinate=tuple(float(np.max(outside[index])) for index in range(len(COORDINATES))),
+        outside_node_count_by_coordinate=tuple(int(np.count_nonzero(significant[index])) for index in range(len(COORDINATES))),
+        maximum_outside_fraction_by_coordinate=tuple(float(np.max(relative[index])) for index in range(len(COORDINATES))),
         static_parameter_enclosure_certified=False,
         stagewise_control_generators_required=True,
         source_regularization_assumed=False,

@@ -1,0 +1,30 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_stagewise_branch_schedule_is_admissible_but_escapes_static_corner_hull __
+
+    def test_stagewise_branch_schedule_is_admissible_but_escapes_static_corner_hull() -> None:
+        mod = _load("sparse_temporal_control", STAGE / "analysis/temporal_control_audit.py")
+        audit = mod.run_temporal_control_audit(REPO, lane="LOCAL_NEUTRAL_HAZARD_PRIMARY")
+        assert audit.full_converged and audit.first_half_converged and audit.second_half_converged
+        assert audit.all_trial_hard_gates_pass
+        assert audit.local_error < 2.0e-4
+        assert audit.maximum_hydrogen_residual < 1.0e-11
+        assert audit.maximum_helium_residual < 1.0e-11
+        assert audit.maximum_owner_residual < 1.0e-11
+        assert audit.maximum_photon_residual < 1.0e-8
+        assert audit.maximum_thermal_residual < 1.0e-10
+        assert audit.maximum_ots_energy_residual < 1.0e-10
+        assert audit.outside_coordinate == "x_HeIII"
+        assert audit.outside_node_count > 5000
+        assert audit.maximum_outside_absolute > 1.0e-12
+        assert audit.maximum_outside_fraction_of_static_width > 0.02
+        assert audit.static_parameter_enclosure_certified is False
+        assert audit.stagewise_control_generators_required is True
+>       assert len(audit.maximum_outside_by_coordinate) == 4
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'TemporalControlAudit' object has no attribute 'maximum_outside_by_coordinate'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_SPARSE_LOCAL_GENERATOR_AFFINE_TAYLOR_MODEL_ENCLOSURE_LOCK/tests/test_temporal_control_audit.py:40: AttributeError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_SPARSE_LOCAL_GENERATOR_AFFINE_TAYLOR_MODEL_ENCLOSURE_LOCK/tests/test_temporal_control_audit.py::test_stagewise_branch_schedule_is_admissible_but_escapes_static_corner_hull - AttributeError: 'TemporalControlAudit' object has no attribute 'maximum_outside_by_coordinate'
+1 failed in 7.01s

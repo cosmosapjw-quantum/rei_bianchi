@@ -37,3 +37,7 @@ def test_stagewise_branch_schedule_is_admissible_but_escapes_static_corner_hull(
     assert audit.maximum_outside_fraction_of_static_width > 0.02
     assert audit.static_parameter_enclosure_certified is False
     assert audit.stagewise_control_generators_required is True
+    assert len(audit.maximum_outside_by_coordinate) == 4
+    assert audit.maximum_outside_by_coordinate[2] > 1.0e-12
+    assert max(audit.maximum_outside_by_coordinate[0], audit.maximum_outside_by_coordinate[1], audit.maximum_outside_by_coordinate[3]) < 1.0e-14
+    assert audit.outside_node_count_by_coordinate[2] > 5000
