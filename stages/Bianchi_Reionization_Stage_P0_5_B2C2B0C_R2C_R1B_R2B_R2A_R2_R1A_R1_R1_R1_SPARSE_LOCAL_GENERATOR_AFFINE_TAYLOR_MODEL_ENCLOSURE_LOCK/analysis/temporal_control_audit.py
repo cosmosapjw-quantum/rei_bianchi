@@ -36,6 +36,7 @@ def _load(name: str, path: Path):
 class TemporalControlAudit:
     lane: str
     schedule: str
+    endpoint_sha256: str
     full_converged: bool
     first_half_converged: bool
     second_half_converged: bool
@@ -202,6 +203,7 @@ def run_temporal_control_audit(
     return TemporalControlAudit(
         lane=lane,
         schedule=schedule,
+        endpoint_sha256=field.state_sha256(second.state),
         full_converged=bool(full.converged),
         first_half_converged=bool(first.converged),
         second_half_converged=bool(second.converged),

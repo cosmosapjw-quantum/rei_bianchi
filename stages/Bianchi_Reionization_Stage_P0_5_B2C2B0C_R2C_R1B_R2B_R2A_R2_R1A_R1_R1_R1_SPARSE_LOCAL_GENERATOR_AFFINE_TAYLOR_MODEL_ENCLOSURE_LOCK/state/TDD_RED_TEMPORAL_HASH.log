@@ -1,0 +1,16 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_stagewise_branch_schedule_is_admissible_but_escapes_static_corner_hull __
+
+    def test_stagewise_branch_schedule_is_admissible_but_escapes_static_corner_hull() -> None:
+        mod = _load("sparse_temporal_control", STAGE / "analysis/temporal_control_audit.py")
+        audit = mod.run_temporal_control_audit(REPO, lane="LOCAL_NEUTRAL_HAZARD_PRIMARY")
+        assert audit.full_converged and audit.first_half_converged and audit.second_half_converged
+>       assert len(audit.endpoint_sha256) == 64
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'TemporalControlAudit' object has no attribute 'endpoint_sha256'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_SPARSE_LOCAL_GENERATOR_AFFINE_TAYLOR_MODEL_ENCLOSURE_LOCK/tests/test_temporal_control_audit.py:26: AttributeError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_SPARSE_LOCAL_GENERATOR_AFFINE_TAYLOR_MODEL_ENCLOSURE_LOCK/tests/test_temporal_control_audit.py::test_stagewise_branch_schedule_is_admissible_but_escapes_static_corner_hull - AttributeError: 'TemporalControlAudit' object has no attribute 'endpoint_sha256'
+1 failed in 7.10s

@@ -23,6 +23,7 @@ def test_stagewise_branch_schedule_is_admissible_but_escapes_static_corner_hull(
     mod = _load("sparse_temporal_control", STAGE / "analysis/temporal_control_audit.py")
     audit = mod.run_temporal_control_audit(REPO, lane="LOCAL_NEUTRAL_HAZARD_PRIMARY")
     assert audit.full_converged and audit.first_half_converged and audit.second_half_converged
+    assert len(audit.endpoint_sha256) == 64
     assert audit.all_trial_hard_gates_pass
     assert audit.local_error < 2.0e-4
     assert audit.maximum_hydrogen_residual < 1.0e-11
