@@ -22,3 +22,9 @@ maximum ULP     0
 The measured speedup applies only to this bounds kernel. The Rust result is not
 load-bearing because the scientific authority remains the Python implementation
 and because the discrete-map validated remainder is still open.
+
+The supplied BASS Rust source archive, Rust 1.94.1 toolchain archive, environment
+script, and both physmath harnesses are SHA-256 locked in
+`receipts/BASS_SOURCE_PROVENANCE.json`. The Rust API uses stable
+`f64::next_down`/`next_up`; it does not claim a complete Taylor-model arithmetic
+or validated discrete-map solver.

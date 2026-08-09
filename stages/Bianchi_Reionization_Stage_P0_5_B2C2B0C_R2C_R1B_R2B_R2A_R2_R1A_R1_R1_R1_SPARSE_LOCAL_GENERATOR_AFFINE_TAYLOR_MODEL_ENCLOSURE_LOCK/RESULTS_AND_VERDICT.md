@@ -101,3 +101,20 @@ R2C-R2                                      false
 B2C2B                                       false
 next stage                                  authorized
 ```
+
+## Verification boundary
+
+- Stage tests: `18 passed` before seal.
+- Full file-isolated assertion coverage: `69` test files and `267` tests with
+  zero assertion failures. `68` file processes exited zero. The inherited
+  `test_physical_trial.py` printed the complete `4 passed` pytest summary and
+  then reproduced its known extension-module teardown stall; the supervisor
+  terminated only after the pass summary. This is recorded distinctly and is
+  not relabelled an exit-zero process.
+- SymPy exact validator: branch bilinear expansion, H/He generator invariants,
+  normalized-measure JVP sum, four-site rank and storage arithmetic all pass.
+- Native Wolfram executable: unavailable in this container. An executable `.wl`
+  script is retained; no native Wolfram execution is claimed.
+- Both pinned physmath research/coding harness validators pass.
+- BASS Rust archive/toolchain hashes and the optional accelerator build are
+  recorded in `receipts/BASS_SOURCE_PROVENANCE.json`.
