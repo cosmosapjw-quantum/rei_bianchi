@@ -280,3 +280,28 @@ def rhs_derivative_interval(context, log_temperature_lower, log_temperature_uppe
     expansion = _mul(_point(context.expansion_coefficient), T)
     derivative = _sub(_neg(dcooling), expansion)
     return derivative.lower, derivative.upper
+
+
+def root_derivative_interval(context, log_temperature_lower, log_temperature_upper, weighted_step):
+    """Outward interval for ``d[U-U0-weighted_step*R]/d log(T)``.
+
+    ``weighted_step`` is the nonnegative coefficient multiplying the local
+    thermal RHS in the scalar root, e.g. ``gamma*dt`` for each Alexander-SDIRK2
+    implicit stage.  All nonlocal/stage RHS terms are held fixed.
+    """
+    xlo = np.asarray(log_temperature_lower, dtype=np.float64)
+    xhi = np.asarray(log_temperature_upper, dtype=np.float64)
+    shape = np.asarray(context.photoheat).shape
+    w = np.broadcast_to(np.asarray(weighted_step, dtype=np.float64), shape)
+    if xlo.shape != shape or xhi.shape != shape:
+        raise ValueError("log-temperature interval must have the context shape")
+    if np.any(~np.isfinite(w)) or np.any(w < 0.0):
+        raise ValueError("weighted_step must be finite and nonnegative")
+    drlo, drhi = rhs_derivative_interval(context, xlo, xhi)
+    Tlo = np.maximum(_down(np.exp(xlo)), 0.0)
+    Thi = _up(np.exp(xhi))
+    elo = _down(np.asarray(context.energy_coefficient, dtype=np.float64) * Tlo)
+    ehi = _up(np.asarray(context.energy_coefficient, dtype=np.float64) * Thi)
+    lower = _down(elo - _up(w * drhi))
+    upper = _up(ehi - _down(w * drlo))
+    return lower, upper
