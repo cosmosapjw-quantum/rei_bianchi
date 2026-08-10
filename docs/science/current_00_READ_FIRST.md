@@ -3,28 +3,29 @@
 Current durable stage:
 
 ```text
-P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-SPARSE-LOCAL-GENERATOR-AFFINE-TAYLOR-MODEL-ENCLOSURE-LOCK
-DURABLE_FAIL_CLOSED_R2_R1A_R1_R1_R1_SPARSE_LOCAL_SOURCE_AND_LOW_RANK_GLOBAL_COUPLING_PASS_STATIC_SUBSTEP_CONTROL_ESCAPED_BY_ADMISSIBLE_STAGEWISE_SCHEDULE_VALIDATED_DISCRETE_MAP_REMAINDER_NOT_CLOSED
+P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-R1-EVALUATION-SITE-SPARSE-GENERATOR-VALIDATED-MPRK22-SDIRK2-DISCRETE-MAP-ENCLOSURE-LOCK
+DURABLE_FAIL_CLOSED_R2_R1A_R1_R1_R1_R1_FOUR_SITE_PRIMAL_PARITY_AND_LOCAL_IMPLICIT_CERTIFICATES_PASS_CROSS_SITE_STATE_FEEDBACK_REMAINDER_EVENT_RESTART_AND_SET_LEDGER_UNCLOSED
 ```
 
-The previous two-global-coordinate rank defect is resolved at a single source
-evaluation site. The 46,080-node source keeps two local linear generators and
-one local mixed generator per node, preserving the source-safe tangent-rank
-lower bound `92003`; owner amplitudes and the eight supported owner/group
-normalizations add at most eleven named global modes.
+The four explicit source-evaluation sites reproduce the inherited lower-corner
+46,080-node trial exactly in all three shape lanes. All `552960` frozen-state
+H/He population blocks and `276480` fixed-heating scalar thermal roots have
+Krawczyk certificates. The maximum population row-sum bound is
+`0.031102095838177812` and the maximum
+thermal Krawczyk image/tube ratio is
+`9.9706373090339612e-05`.
 
-This is not yet a continuous discrete-map certificate. MPRK22/SDIRK2 evaluates
-the uncertain source at four distinct states. An admissible upper-to-lower
-stagewise branch schedule passes all hard physics and numerical gates but exits
-the static substep four-corner hull in `x_HeIII` by
-`6.9791494632098772e-12` (`0.033079776479960625` of that local static width). The absolute shift is tiny, but set containment is binary.
+This does not close the continuous four-site map. An admissible stagewise
+upper-to-lower schedule passes every hard gate yet escapes the inherited static
+hull in `x_HeIII`. Cross-site/state-feedback remainder, Hummer-Seaton event
+restart and set-valued photon/energy ledgers remain unclosed. This is a
+representation/certificate blocker, not a physical no-solution result.
 
-The optional BASS Rust 1.94.1 bounds kernel is a differential accelerator only:
-it encloses the Python oracle with maximum ULP distance zero and measures
-`1.73049x` speedup on this kernel. It is not the
-validated thermochemistry authority.
+Production history, node chemistry, `R2C-R2`, `B2C2B`, recombination splice,
+CAMB transfer and Bianchi feedback remain unauthorized.
 
-Production history, production node chemistry, `R2C-R2`, `B2C2B`, recombination
-splice, CAMB transfer and Bianchi feedback remain unauthorized.
+Next stage:
 
-Next stage: `P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-R1-EVALUATION-SITE-SPARSE-GENERATOR-VALIDATED-MPRK22-SDIRK2-DISCRETE-MAP-ENCLOSURE-LOCK`.
+```text
+P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-R1-R1-CROSS-SITE-STATE-FEEDBACK-REMAINDER-AND-TABLE-EVENT-LOCK
+```
