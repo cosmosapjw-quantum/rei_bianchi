@@ -80,9 +80,12 @@ def run_lane(lane):
     lower_A=A2[0];upper_A=A2[-1];indices=np.linspace(0,parent.node_count-1,256,dtype=int)
     A=lower_A[indices];z=np.linalg.solve(A,y0[indices,...,None])[...,0]
     dA=0.5*(upper_A[indices]-lower_A[indices]);db=np.zeros_like(z)
-    dz=cert.implicit_linear_tangent(A,z,dA,db);eps=2.0e-6
-    zp=np.linalg.solve(A+eps*dA,y0[indices,...,None])[...,0];zm=np.linalg.solve(A-eps*dA,y0[indices,...,None])[...,0]
-    tangent_error=float(np.max(np.abs(dz-(zp-zm)/(2*eps))/np.maximum(np.abs(dz),1.0)))
+    dz=cert.implicit_linear_tangent(A,z,dA,db)
+    # Complex-step avoids catastrophic cancellation for cMpc^-3 populations.
+    eps=1.0e-30
+    zc=np.linalg.solve(A.astype(np.complex128)+1j*eps*dA,y0[indices,...,None].astype(np.complex128))[...,0]
+    oracle=np.imag(zc)/eps
+    tangent_error=float(np.max(np.abs(dz-oracle)/np.maximum(np.abs(dz),np.maximum(np.abs(oracle),1.0))))
 
     # Reproduce the lower-corner coupled thermal fixed point and audit root denominators.
     solver=solvers[0];predictor=predictors[0];tp=thermal_predictors[0];corrector=lower_corrector
