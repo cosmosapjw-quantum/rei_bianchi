@@ -21,6 +21,7 @@ def load(name,path):
 r1a=next(REPO.glob('stages/*R2_R1A_FOUR_CORNER*'))
 trial=load('evalsite_local_parent_trial',r1a/'analysis/uncertainty_trial.py')
 cert=load('evalsite_local_certificates',HERE/'implicit_certificates.py')
+thermal_iv=load('evalsite_thermal_interval',HERE/'thermal_interval.py')
 mprk=trial.fast.base.mprk;sdirk=trial.fast.sdirk
 
 def lhs_from_flux(flux,denominator,dt):
@@ -116,6 +117,24 @@ def run_lane(lane):
     denom_g=dEg-sdirk.GAMMA*dt*drg;denom_f=dEf-sdirk.GAMMA*dt*drf
     res_g=sdirk.energy_from_temperature(gamma_pop,thermal.stage.temperature)-parent.values[5]-sdirk.GAMMA*dt*rg
     res_f=sdirk.energy_from_temperature(corrector,thermal.final.temperature)-parent.values[5]-dt*((1-sdirk.GAMMA)*rg+sdirk.GAMMA*rf)
+    # Certify each scalar root in a fixed-state +/- 1e-8 log-temperature tube.
+    # The interval derivative mirrors the complete cooling and expansion formula;
+    # stage coupling and uncertain material state remain frozen by construction.
+    xg=np.log(thermal.stage.temperature);xf=np.log(thermal.final.temperature)
+    root_radius_g=np.full(parent.node_count,1.0e-8,dtype=np.float64)
+    root_radius_f=np.full(parent.node_count,1.0e-8,dtype=np.float64)
+    dglo,dghi=thermal_iv.root_derivative_interval(
+        ctxg,xg-root_radius_g,xg+root_radius_g,np.full(parent.node_count,sdirk.GAMMA*dt))
+    dflo,dfhi=thermal_iv.root_derivative_interval(
+        ctxf,xf-root_radius_f,xf+root_radius_f,np.full(parent.node_count,sdirk.GAMMA*dt))
+    kg=cert.scalar_root_krawczyk(
+        center=xg,residual=res_g,derivative_lower=dglo,derivative_upper=dghi,
+        initial_radius=root_radius_g,max_inflations=1)
+    kf=cert.scalar_root_krawczyk(
+        center=xf,residual=res_f,derivative_lower=dflo,derivative_upper=dfhi,
+        initial_radius=root_radius_f,max_inflations=1)
+    stage_ratio=kg.krawczyk_radius/root_radius_g
+    final_ratio=kf.krawczyk_radius/root_radius_f
     thermal_audit={
       'stage_denominator_min_abs':float(np.min(np.abs(denom_g))),
       'final_denominator_min_abs':float(np.min(np.abs(denom_f))),
@@ -126,8 +145,23 @@ def run_lane(lane):
       'stage_balance_max_relative':float(np.max(np.abs(res_g)/np.maximum(np.abs(parent.values[5]),1.0))),
       'final_balance_max_relative':float(np.max(np.abs(res_f)/np.maximum(np.abs(parent.values[5]),1.0))),
       'outer_iterations':int(outer+1),
-      'interval_derivative_certificate':False,
-      'claim':'POINT_TRAJECTORY_DENOMINATOR_MARGIN_ONLY',
+      'root_logT_radius':1.0e-8,
+      'stage_interval_derivative_lower_min':float(np.min(dglo)),
+      'stage_interval_derivative_upper_min':float(np.min(dghi)),
+      'final_interval_derivative_lower_min':float(np.min(dflo)),
+      'final_interval_derivative_upper_min':float(np.min(dfhi)),
+      'stage_denominator_contains_zero_count':int(np.count_nonzero(kg.denominator_contains_zero)),
+      'final_denominator_contains_zero_count':int(np.count_nonzero(kf.denominator_contains_zero)),
+      'stage_certified_count':int(np.count_nonzero(kg.certified)),
+      'final_certified_count':int(np.count_nonzero(kf.certified)),
+      'stage_all_certified':bool(np.all(kg.certified)),
+      'final_all_certified':bool(np.all(kf.certified)),
+      'stage_max_contraction_bound':float(np.max(kg.contraction_bound)),
+      'final_max_contraction_bound':float(np.max(kf.contraction_bound)),
+      'stage_max_krawczyk_radius_ratio':float(np.max(stage_ratio)),
+      'final_max_krawczyk_radius_ratio':float(np.max(final_ratio)),
+      'interval_derivative_certificate':bool(np.all(kg.certified) and np.all(kf.certified)),
+      'claim':'FROZEN_STATE_FIXED_HEATING_SCALAR_ROOT_EXISTENCE_AND_UNIQUENESS_ONLY',
     }
     return {
       'lane':lane,'node_count':parent.node_count,'partition':2048,'dt_s':dt,
@@ -141,12 +175,12 @@ def main():
     started=time.perf_counter();rows=[run_lane(x) for x in LANES]
     result={'classification':'FROZEN_STATE_LOCAL_IMPLICIT_CERTIFICATE_AUDIT','rows':rows,
       'all_lanes_population_pass':all(r['all_local_population_blocks_certified'] for r in rows),
-      'thermal_interval_certificate_closed':False,
+      'thermal_interval_certificate_closed':all(r['thermal']['interval_derivative_certificate'] for r in rows),
       'full_discrete_map_enclosure_closed':False,
-      'claim_boundary':'Population Krawczyk hulls freeze each site material state; thermal results are point-trajectory denominator margins. Cross-site/state-feedback remainder remains unclosed.',
+      'claim_boundary':'Population Krawczyk hulls and scalar thermal-root Krawczyk tubes freeze each site material state and heating. Cross-site/state-feedback remainder, event localization and set-valued ledgers remain unclosed.',
       'elapsed_s':time.perf_counter()-started}
     (STAGE/'data/LOCAL_IMPLICIT_AUDIT.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
-    print(json.dumps({'population_pass':result['all_lanes_population_pass'],'thermal_interval':False,'elapsed_s':result['elapsed_s'],
-      'rows':[{'lane':r['lane'],'s1H':r['stage1_H']['max_row_sum_bound'],'s1He':r['stage1_He']['max_row_sum_bound'],'s2H':r['stage2_H']['max_row_sum_bound'],'s2He':r['stage2_He']['max_row_sum_bound'],'tangent':r['implicit_tangent_max_relative_error'],'thermal_stage_rel_margin':r['thermal']['stage_denominator_min_relative_to_dE'],'thermal_final_rel_margin':r['thermal']['final_denominator_min_relative_to_dE']} for r in rows]},indent=2))
-    return 0 if result['all_lanes_population_pass'] else 1
+    print(json.dumps({'population_pass':result['all_lanes_population_pass'],'thermal_interval':result['thermal_interval_certificate_closed'],'elapsed_s':result['elapsed_s'],
+      'rows':[{'lane':r['lane'],'s1H':r['stage1_H']['max_row_sum_bound'],'s1He':r['stage1_He']['max_row_sum_bound'],'s2H':r['stage2_H']['max_row_sum_bound'],'s2He':r['stage2_He']['max_row_sum_bound'],'tangent':r['implicit_tangent_max_relative_error'],'thermal_stage_rel_margin':r['thermal']['stage_denominator_min_relative_to_dE'],'thermal_final_rel_margin':r['thermal']['final_denominator_min_relative_to_dE'],'thermal_stage_krawczyk':r['thermal']['stage_max_krawczyk_radius_ratio'],'thermal_final_krawczyk':r['thermal']['final_max_krawczyk_radius_ratio']} for r in rows]},indent=2))
+    return 0 if result['all_lanes_population_pass'] and result['thermal_interval_certificate_closed'] else 1
 if __name__=='__main__':raise SystemExit(main())
