@@ -29,3 +29,17 @@ def test_nonzero_log_temperature_box_contains_samples():
  x=np.log(np.array([14000.0]));r=np.array([1e-3]);lo,hi=iv.rhs_derivative_interval(ctx,x-r,x+r)
  for t in np.linspace(x[0]-r[0],x[0]+r[0],101):
   _,d=ctx.rhs_and_derivative(np.array([t]));assert lo[0]<=d[0]<=hi[0]
+
+def test_root_derivative_interval_contains_exact_samples():
+ iv=load('evalsite_thermal_interval_test3',ANALYSIS/'thermal_interval.py')
+ root=Path(__file__).resolve().parents[3]
+ parent=next(root.glob('stages/*R2A_R1_POSITIVITY_CONSERVATIVE_SECOND_ORDER_THERMOCHEMISTRY_PREFLIGHT'))/'analysis/thermal_fast_root.py'
+ th=load('evalsite_thermal_parent_test3',parent)
+ pop=np.array([[2.0,1.0,0.5,0.2,0.1]])
+ ctx=th.ThermalContext.build(pop,np.array([1e62]),np.array([1e45]),np.array([2e-17]))
+ x=np.log(np.array([14000.0]));r=np.array([2e-3]);weighted_step=np.array([3.25e10])
+ lo,hi=iv.root_derivative_interval(ctx,x-r,x+r,weighted_step)
+ for t in np.linspace(x[0]-r[0],x[0]+r[0],101):
+  _,dr=ctx.rhs_and_derivative(np.array([t]))
+  exact=ctx.energy_coefficient*np.exp(t)-weighted_step*dr
+  assert lo[0]<=exact[0]<=hi[0]
