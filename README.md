@@ -6,22 +6,27 @@ reionization and CMB transfer to nonlinear, finite-tilt Bianchi cosmologies.
 ## Current scientific state
 
 ```text
-P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-R1-EVALUATION-SITE-SPARSE-GENERATOR-VALIDATED-MPRK22-SDIRK2-DISCRETE-MAP-ENCLOSURE-LOCK
-DURABLE_FAIL_CLOSED_R2_R1A_R1_R1_R1_R1_FOUR_SITE_PRIMAL_PARITY_AND_LOCAL_IMPLICIT_CERTIFICATES_PASS_CROSS_SITE_STATE_FEEDBACK_REMAINDER_EVENT_RESTART_AND_SET_LEDGER_UNCLOSED
+P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-R1-R1-CROSS-SITE-STATE-FEEDBACK-REMAINDER-AND-TABLE-EVENT-LOCK
+DURABLE_PASS_R2_R1A_R1_R1_R1_R1_R1_FOUR_SITE_MICROSTEP_ENCLOSURE_LOCAL_ERROR_CONTAINMENT_TABLE_RESTART_AND_STRUCTURAL_LEDGER_PASS_FIRST_CANONICAL_INTERVAL_AUTHORIZED
 ```
 
-The current code reproduces the inherited four-site lower-corner trial exactly
-and certifies all frozen-state local MPRK22 population blocks and fixed-heating
-SDIRK2 roots over 46,080 nodes in all three shape lanes. The remaining blocker
-is the outward nonlinear composition across independent evaluation-site
-controls, state-dependent owner normalization, Hummer-Seaton topology events
-and set-valued photon/energy ledgers. Production history and node chemistry are
-not authorized.
+The current code certifies one four-site FLRW thermochemistry microstep at
+partition `2048` in all three shape lanes. The maximum public uncertainty width
+is `4.52488656108585e-05 < 2e-3`; the validated full-step/two-half-step local
+error is `1.1621773858117024e-04 < 2e-4`. The new image contains the inherited
+static trajectories, interior samples, and the stagewise-switch witness that
+escaped the old static hull. Exact structural nuclei, photon-owner, and
+augmented-energy identities close, and table-event restart semantics preserve
+parent bytes.
+
+This is not the complete first canonical interval or production history.
+Production node chemistry, `R2C-R2`, `B2C2B`, recombination splice, CAMB
+transfer, and Bianchi feedback remain unauthorized.
 
 Next:
 
 ```text
-P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-R1-R1-CROSS-SITE-STATE-FEEDBACK-REMAINDER-AND-TABLE-EVENT-LOCK
+P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-R1-R1-R1-UNCERTAINTY-QUALIFIED-FIRST-CANONICAL-INTERVAL-ADAPTIVE-HISTORY
 ```
 
 Read in order:
@@ -33,13 +38,15 @@ Read in order:
 
 ## Branch and artifact policy
 
-- `main`: resumable source, compact authoritative artifacts, manifests and handoff.
+- `main`: resumable source, compact authoritative artifacts, manifests, handoff,
+  and tooling.
 - `archive/full-history`: historical bundles and verified chunks.
 - Failed attempts remain separate and are never overwritten by later success.
 
 ## External recombination dependency
 
-Primordial recombination remains in `https://github.com/cosmosapjw-quantum/rec_bianchi`.
+Primordial recombination remains a separate project:
+`https://github.com/cosmosapjw-quantum/rec_bianchi`.
 Run `./scripts/update_rec_bianchi_lock.sh` before a new science stage and follow
 `external/REC_BIANCHI_MONITORING_POLICY.md`. No surrogate or silent replacement
 is allowed.
@@ -53,6 +60,6 @@ python scripts/verify_repo.py
 
 ## Remote status
 
-The repository is public. In the runtime that sealed the current stage, native
-Git and API DNS resolution failed, so no remote write, PR or merge is claimed.
-Use the stage Git bundle from an authenticated network and verify post-push SHAs.
+This checkout contains the durable local stage and Git delivery objects. A
+remote write is claimed only after `git ls-remote`, branch/tag pushes, and a
+post-push SHA comparison all succeed.

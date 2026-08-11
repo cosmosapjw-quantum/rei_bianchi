@@ -14,7 +14,7 @@ The resulting `external/rec_bianchi.lock.json` must be included in the stage inp
 
 2. Weekly CI check:
 
-`.github/workflows/rec-bianchi-monitor.yml` checks the private remote HEAD every Monday at 09:15 KST and on manual dispatch. Configure repository secret:
+`.github/workflows/rec-bianchi-monitor.yml` checks the remote HEAD every Monday at 09:15 KST and on manual dispatch. Configure repository secret:
 
 ```text
 REC_BIANCHI_READ_TOKEN
@@ -31,4 +31,4 @@ The token needs read-only access to `cosmosapjw-quantum/rec_bianchi`. The workfl
 
 ## Current status
 
-The managed GitHub connector currently verifies `rec_bianchi/main` exactly, while a native `git ls-remote` may still be unavailable in an individual runtime. This permits read-only semantic monitoring but does not authorize an adapter, numerical-state import, surrogate, or primordial-to-CMB splice.
+The last exact connector-verified SHA remains recorded in `rec_bianchi.lock.json`. A newer public-page stage observation without an exact current-main SHA is monitoring evidence only and requires deliberate review. Neither public visibility nor semantic monitoring authorizes an adapter, numerical-state import, surrogate, or primordial-to-CMB splice.

@@ -1,0 +1,38 @@
+.....FF                                                                  [100%]
+=================================== FAILURES ===================================
+_________ test_path_hull_event_detector_catches_between_site_crossing __________
+
+    def test_path_hull_event_detector_catches_between_site_crossing():
+        m=load()
+        knot=float(np.log(10.0**4.25))
+        left=m.IntervalVector(np.array([knot-2e-4]),np.array([knot-1e-4]))
+        right=m.IntervalVector(np.array([knot+1e-4]),np.array([knot+2e-4]))
+>       audit=m.detect_path_table_events(left,right)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'cross_site_discrete_map_test' has no attribute 'detect_path_table_events'. Did you mean: 'detect_table_events'?
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_CROSS_SITE_STATE_FEEDBACK_REMAINDER_AND_TABLE_EVENT_LOCK/tests/test_cross_site_discrete_map.py:72: AttributeError
+______ test_transactional_monotone_event_localizer_preserves_parent_bytes ______
+
+    def test_transactional_monotone_event_localizer_preserves_parent_bytes():
+        m=load()
+        knot=float(np.log(10.0**4.5))
+        state=b'parent-state-v1'
+        ledger=b'parent-ledger-v1'
+        slope=0.4
+        t_cross=0.375
+        def value(t:float)->float:
+            return knot+slope*(t-t_cross)
+>       result=m.localize_monotone_table_event(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            t0=0.0,t1=1.0,knot=knot,value_at=value,
+            parent_state_bytes=state,parent_ledger_bytes=ledger,
+            time_tolerance=2.0**-30,
+        )
+E       AttributeError: module 'cross_site_discrete_map_test' has no attribute 'localize_monotone_table_event'
+
+stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_CROSS_SITE_STATE_FEEDBACK_REMAINDER_AND_TABLE_EVENT_LOCK/tests/test_cross_site_discrete_map.py:87: AttributeError
+=========================== short test summary info ============================
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_CROSS_SITE_STATE_FEEDBACK_REMAINDER_AND_TABLE_EVENT_LOCK/tests/test_cross_site_discrete_map.py::test_path_hull_event_detector_catches_between_site_crossing - AttributeError: module 'cross_site_discrete_map_test' has no attribute 'detect_path_table_events'. Did you mean: 'detect_table_events'?
+FAILED stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_CROSS_SITE_STATE_FEEDBACK_REMAINDER_AND_TABLE_EVENT_LOCK/tests/test_cross_site_discrete_map.py::test_transactional_monotone_event_localizer_preserves_parent_bytes - AttributeError: module 'cross_site_discrete_map_test' has no attribute 'localize_monotone_table_event'
+2 failed, 5 passed in 1.06s
