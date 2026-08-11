@@ -17,3 +17,14 @@ and Wolfram. Use stdlib `unittest`; record unavailable optional validation.
 The predecessor exposes detection and a synthetic localizer, but no certified
 actual-step callback or source-cell rebuild API. Stop, preserve parent, and
 package the receipt; implement the missing scientific primitive separately.
+
+## Supervisor cleanup sentinel failure during implementation
+
+An initial controller test replaced a temporary-directory variable with
+`Path()` after commit; the `finally` block interpreted `.` as a cleanup target.
+The disposable clean clone was removed and restored byte-for-byte from remote
+main at `ae3402713c4b6530ab2b27f008f5f5d5c6a999ed`; no user result existed and no
+external data was affected. This rules out truthy path sentinels. The corrected
+implementation uses `None` and `_safe_rmtree`, which permits only a direct child
+of an explicit generation/snapshot root. Unit tests then passed against the
+restored repository.

@@ -11,8 +11,12 @@ The complete 2048-segment calculation is intentionally not run here. Follow
 `LOCAL_RUN_GUIDE.md` locally and push the compact candidate bundle for audit.
 All outputs remain `CANDIDATE_UNSEALED_LOCAL_EXECUTION`.
 
-The runtime fails closed on non-finite values, invalid worker envelopes, hash
-mismatch, missing/duplicate lanes, minimum-step exhaustion, and table events.
+The runtime fails closed on dependency/runtime drift, non-finite values, invalid
+worker envelopes, hash or journal mismatch, missing/duplicate lanes,
+minimum-step exhaustion, concurrent run/package access, and table events. A
+persistent `.RUN.lock`, immutable transition journal, exact runtime contract,
+and journal-bound receipts make resume and packaging validate the same owned
+checkpoint before any repair or publication.
 The predecessor exposes no production continuous event callback/topology
 rebuild, so an event preserves the parent and reports
 `TABLE_EVENT_RESTART_IMPLEMENTATION_REQUIRED`.
