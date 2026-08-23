@@ -1,0 +1,15 @@
+# FAILURE_LOG.md
+
+| ID | Stage | Observation | Classification | Disposition |
+|---|---|---|---|---|
+| F-001 | M-02 | Current signed interval sum excludes the exact result for `[-5e-324, 5e-324]`. | numerical false containment | Open blocker; future verified-arithmetic patch must reproduce red then pass exact/property checks. |
+| F-002 | M-02 | Current Krawczyk path reports `certified=True` while excluding known exact solutions in two preregistered systems. | false certificate / unsafe admission | Open blocker; certificate consumers must fail closed until theorem-matched enclosure and independent residual checks pass. |
+| F-003 | M-02 | Live NumPy/pandas versions differ from the bound runtime contract. | reproducibility/runtime identity | Open blocker for parity/authority; diagnostic tests remain usable only at a lower claim tier. |
+| F-004 | M-02 | He II coefficient witness differs from the number-density expression by a factor `YHE`. | formula/binding defect | Open blocker; requires an explicit convention-derived test and corrected-science lineage rather than silently altering history. |
+| F-005 | M-03 | Generic SciPy documentation resolved to 1.18 rather than bound 1.17. | source-version drift | Closed research dead end: rejected generic page and used explicit SciPy 1.17 URL. |
+| F-006 | M-03 | Direct retrieval of some primary PDFs/DOI landing pages failed or timed out. | evidence acquisition limit | Closed with claim reduction: retain bibliographic contracts only; no inaccessible theorem text treated as inspected evidence. |
+| F-007 | Scope | Harness implementation phases conflict with this work unit's research-only user authorization. | authorization boundary, not code failure | `CANCELLED_OUT_OF_SCOPE`; no target edit or execution was performed. |
+| F-008 | M-05 | Independent review found the original H2 wording internally inconsistent with immutable forensic stages and too strong on readiness. | design-review partial confirmation | Closed for this research loop by the sole repair round: explicit N successor, conditional status, D-gates, admission/FSM table, corrected coverage semantics, and ABI/review custody. No second verdict inferred. |
+| F-009 | M-01/M-05 | `A/INPUT_LOCK.json` and `external/rec_bianchi.lock.json` identify different rec_bianchi commits. | provenance ambiguity | Open hard gate D-06. No driver was run, so which identity was numerically consumed is not asserted. |
+| F-010 | M-06 | Verified backend, exact-boundary physics, error theorem/reconstruction, QoIs/budgets, event completeness/priority, exact ABI, and N implementation identity remain owner-unresolved. | pre-implementation decision blockers | Design decision `HOLD`; implementation is not ready or authorized. |
+| F-011 | M-06 | First aggregate closeout command invoked temporary-harness validation from the target repository, so relative `tools/validate_harness.py` was not found. | operator working-directory error | One allowed same-failure retry consumed; rerun from the temporary harness with target Git checks using `git -C`. No target state changed. |
