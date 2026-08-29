@@ -1,4 +1,4 @@
-import json,tempfile,unittest
+import json,tempfile,time,unittest
 from pathlib import Path
 from unittest import mock
 from helpers import load
@@ -135,6 +135,17 @@ class Tests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as r:
    self.assertEqual(self.c(r,'TIMEOUT',timeout=.1).run(max_accepted=1)['status'],'BLOCKED_TRANSPORT');receipt=next(Path(r,'receipts').glob('*.json'));self.assertIn('partial timeout output',receipt.read_text())
    coordinator=self.c(r,resume=True);self.assertEqual(coordinator._env()['OPENBLAS_NUM_THREADS'],'1')
+ def test_worker_timeout_terminates_ordinary_descendants(self):
+  with tempfile.TemporaryDirectory() as r:
+   coordinator=self.c(r,'DESCENDANT_TIMEOUT',timeout=.1);lane=m.policy.LANE_ORDER[1];directory=Path(r,'work','capture-compatibility');directory.mkdir();job=coordinator._job(lane,coordinator.cursor.current)
+   result_path=directory/f'{lane}.result.json';release=Path(str(result_path)+'.release');pid_path=Path(str(result_path)+'.descendant-pid')
+   try:
+    row=coordinator._worker(lane,directory,job);self.assertEqual(row['process_status'],'TIMEOUT');self.assertIn('ordinary descendant started',row['stdout'])
+    self.assertTrue(pid_path.is_file(),'worker descendant did not start');pid=int(pid_path.read_text());deadline=time.monotonic()+.5
+    while Path(f'/proc/{pid}').exists() and time.monotonic()<deadline:time.sleep(.01)
+    self.assertFalse(Path(f'/proc/{pid}').exists(),'worker timeout orphaned a descendant')
+   finally:
+    release.write_text('release');coordinator.close()
  def test_malformed_state_and_envelope_never_commit(self):
   for mode in ('MALFORMED_STATE','MALFORMED_ENVELOPE'):
    with tempfile.TemporaryDirectory() as r:
