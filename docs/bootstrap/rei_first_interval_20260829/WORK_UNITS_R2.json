@@ -1,0 +1,83 @@
+{
+  "schema": "rei-bianchi-first-interval-work-units/v2",
+  "package_id": "REI-BIANCHI-FIRST-INTERVAL-BOOTSTRAP-20260829-R2",
+  "exact_next_action": "REI-AUDIT-COMPAT-00_THEN_REI-INTERVAL-02",
+  "work_units": [
+    {
+      "id": "REI-AUDIT-COMPAT-00",
+      "kind": "BOUNDED_ACTIVE_CODE_APPLICABILITY",
+      "objective": "Reproduce the 8/23 ODE-shadow findings only against dependencies actually used by the first canonical interval.",
+      "rules": [
+        "Do not copy the test-only candidate wholesale.",
+        "Fix only an active defect reproduced by a targeted assertion.",
+        "One compatibility pass plus at most one repair is the complete audit scope.",
+        "If no blocking active defect remains, continue to REI-INTERVAL-02 in the same run."
+      ],
+      "terminal": [
+        "PASS_REI_ACTIVE_ODE_COMPATIBILITY",
+        "BLOCKED_REPRODUCED_ACTIVE_ODE_DEFECT"
+      ]
+    },
+    {
+      "id": "REI-REC-LOCK-01",
+      "kind": "READ_ONLY_DEPENDENCY_BINDING",
+      "objective": "Bind exact rec package metadata without importing source-bound verifiers, rates, populations or histories.",
+      "rec_package_commit": "47e19df30a5e71e536d3d5167ffa3b78638a59c5",
+      "rec_package_tree": "e7400fda8511e582f5bc4944b96183977412f4f3",
+      "terminal": "PASS_REC_MONITORING_LOCK_NO_NUMERICAL_IMPORT"
+    },
+    {
+      "id": "REI-INTERVAL-02",
+      "kind": "FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY",
+      "requirements": [
+        "Start from the certified partition-2048 microstep.",
+        "Run all three lanes without favorable post-hoc selection.",
+        "For each attempt compute one full image and two half images.",
+        "Apply the existing implicit, positivity, width, structural-ledger and local-error gates.",
+        "Bisect only a failed attempted step to the already locked minimum.",
+        "Localize every Hummer-Stebbins/Hummer-Seaton table knot before commit.",
+        "Failed attempts preserve parent state and ledger bytes transactionally.",
+        "Close all seven ledgers over the complete interval."
+      ],
+      "forbidden": [
+        "clipping",
+        "table extrapolation",
+        "new minimum step",
+        "rec numerical import",
+        "Bianchi-family sweep"
+      ]
+    },
+    {
+      "id": "REI-INTERVAL-03",
+      "kind": "INDEPENDENT_SCIENTIFIC_PROOF",
+      "required_checks": [
+        "Independent replay of states and target observables.",
+        "Full-versus-two-half local error for every accepted step.",
+        "Width and positivity margins.",
+        "Exact structural ledgers.",
+        "Event transaction and restart invariance.",
+        "Convergence under refinement without an error-of-error gate.",
+        "Hostile event, lane, ledger and owner mutations."
+      ]
+    },
+    {
+      "id": "REI-DELIVER-04",
+      "kind": "BOUNDED_REVIEW_EVIDENCE_DRAFT_PR",
+      "objective": "Run PHYS-MATH then PHYS-MATH-CODE once, repair at most one reproduced P0/P1 defect, ordinary-push one draft PR and read back exact remote identity.",
+      "terminal": [
+        "PASS_REI_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY_FLRW_THERMOCHEMISTRY",
+        "BLOCKED_REI_FIRST_INTERVAL_DEFECT"
+      ]
+    }
+  ],
+  "future_join": {
+    "id": "REI-REC-ADAPTER-JOIN",
+    "current_state": "NOT_AUTHORIZED",
+    "requires": [
+      "rec split-domain terminal checkpoint",
+      "rei first-interval terminal checkpoint",
+      "deliberate adapter/input-lock review",
+      "splice tests for populations, x_e, T_m, derivatives, provenance and interpolation uncertainty"
+    ]
+  }
+}
