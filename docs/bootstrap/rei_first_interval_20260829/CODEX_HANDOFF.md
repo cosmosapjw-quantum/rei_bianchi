@@ -26,28 +26,6 @@ Read:
 5. `external/REC_BIANCHI_MONITORING_POLICY.md`
 6. this package
 
-## Exact rec package checkpoint
-
-```text
-branch:
-agent/plans/rec-split-domain-bootstrap-20260829-r1
-
-immutable package commit:
-c82fecc0a44230c60408c144e030a7c05f0da3d7
-
-immutable package tree:
-b908f7c808fee379d89a5df12f189be994a52af1
-
-publication receipt:
-419b0c2fb4a4275af5a3a7d2e1ac5062e22f6e05
-tree c1bea2fe138fb61e4c4c83fbbfd233d1a73d9bb5
-
-draft PR:
-#31 OPEN / DRAFT / UNMERGED
-```
-
-Verify these Git objects before starting. Consume them as dependency metadata only. Do not import source-bound validators, rates, populations, histories, or a recombination surrogate.
-
 ## Audit compatibility — bounded
 
 Do not copy the 8/23 additive ODE candidate into the active route. Reproduce
@@ -56,8 +34,7 @@ actually reproduced active defect. The compatibility pass plus at most one
 repair is the complete audit scope. If it closes, immediately continue to the
 interval in this same run.
 
-Update the rec monitoring lock to exact rec main `5a09f3797210284f83a1a1adb0e0092d1ac48475` and audit
-checkpoint `4cd2c7bff00ca91c57997d7e6e1ff4c67f7fccd3`. This is metadata/checkpoint consumption only.
+Update the rec monitoring lock to exact rec main `5a09f3797210284f83a1a1adb0e0092d1ac48475`, audit checkpoint `4cd2c7bff00ca91c57997d7e6e1ff4c67f7fccd3`, and bootstrap package `47e19df30a5e71e536d3d5167ffa3b78638a59c5` / tree `e7400fda8511e582f5bc4944b96183977412f4f3` (PR #31). This is metadata/checkpoint consumption only.
 Do not import rates, populations, histories, source-bound verifiers or a
 surrogate.
 
