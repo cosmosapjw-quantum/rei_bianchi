@@ -1,0 +1,96 @@
+{
+  "audit_source": {
+    "candidate_stage_suffix": "LCV_ODE_CORRECTED_SCIENCE_V2_CANDIDATE",
+    "review": "INDEPENDENT_AUDIT_REVIEW.md",
+    "review_verdict": "PARTIALLY_CONFIRMED",
+    "source_branch": "audit/ode-four-loop-external-20260823",
+    "source_commit": "ace7d91af35bfefcc3a9bd7e83076aa8f8bf557e",
+    "source_tree": "c8167922076f52628b1f7243c9ebd8b40ebe7508"
+  },
+  "candidate_code_imported": false,
+  "compatibility_pass": "REI-AUDIT-COMPAT-00",
+  "findings": [
+    {
+      "active_disposition": "INACTIVE_NOT_APPLICABLE",
+      "active_evidence": [
+        "The active worker loads the sealed interval_discrete_map.py directly.",
+        "The resolved active dependency closure contains no verified_backend import and no EXACT_RESOURCE_LIMIT contract.",
+        "All powers in the active interval map use fixed model exponents over binary64 interval values; the shadow Decimal parser and arbitrary integer-power API are absent."
+      ],
+      "candidate_evidence": [
+        "analysis/verified_backend.py decimal parsing before its exact-resource ceiling",
+        "analysis/verified_backend.py integer exponentiation before its result-size ceiling"
+      ],
+      "finding_id": "RESOURCE_CEILING_BEFORE_PARSE_OR_EXPONENTIATION",
+      "repair": "NONE"
+    },
+    {
+      "active_disposition": "ACTIVE_REPRODUCED_REPAIRED",
+      "active_evidence": [
+        "analysis/attempt_worker.py calls runtime_contract.verify, whose active probes spawn ordinary child processes.",
+        "The source-base supervisor used subprocess.run timeout handling that terminated only the direct worker.",
+        "The focused red test observed the descendant PID still present after the worker returned TIMEOUT."
+      ],
+      "candidate_evidence": [
+        "tools/capture_audit_run.py process-group termination lacked a bounded post-kill drain for escaped descendants"
+      ],
+      "finding_id": "DESCENDANT_CAPTURE_BOUND",
+      "repair": {
+        "changed_production_path": "analysis/run_adaptive_history.py",
+        "description": "Launch each exact worker in a fresh session, kill its ordinary descendant process group on timeout, and impose a bounded post-kill pipe drain before returning a typed TIMEOUT receipt.",
+        "focused_green": "python3 -m unittest -v test_controller.Tests.test_worker_timeout_terminates_ordinary_descendants test_controller.Tests.test_timeout_partial_output_is_durable_and_caps_are_reserved",
+        "focused_green_result": "2 tests passed",
+        "focused_red_result": "1 test failed because the timed-out worker orphaned an ordinary descendant",
+        "regression_path": "tests/test_controller.py::Tests.test_worker_timeout_terminates_ordinary_descendants",
+        "test_worker_path": "tests/fake_attempt_worker.py"
+      },
+      "scope_narrowing": "The active exact worker does not start a new session for its children. A deliberately escaped new-session descendant remains outside this active-path repair and is not represented as closed."
+    },
+    {
+      "active_disposition": "INACTIVE_ALREADY_SATISFIED_BY_DIFFERENT_ACTIVE_MECHANISM",
+      "active_evidence": [
+        "analysis/runtime_contract.py hashes INPUT_LOCK.json and every active worker, supervisor, policy, state, guard, and runtime-contract source file.",
+        "Every job, worker envelope, state, record, transition, and result binds runtime_contract_sha256.",
+        "Production construction rejects a non-default worker or an unclean tracked worktree."
+      ],
+      "candidate_evidence": [
+        "Per-run audit manifests did not hash the untracked tools/capture_audit_run.py recorder preimage."
+      ],
+      "finding_id": "RECORDER_SOURCE_PREIMAGE_NOT_BOUND",
+      "repair": "NONE"
+    },
+    {
+      "active_disposition": "INACTIVE_NOT_APPLICABLE",
+      "active_evidence": [
+        "The shadow atomic_opacity_per_h helper is absent from the active dependency closure.",
+        "The sealed active map enforces positive H/He species boxes and exact per-node H and He inventory sums before certification.",
+        "This disposition does not promote those checks into a claim of complete physical-domain validation beyond the active map."
+      ],
+      "candidate_evidence": [
+        "analysis/corrected_physics.py atomic_opacity_per_h could accept absorber counts above a separately declared total inventory."
+      ],
+      "finding_id": "ABSORBER_INVENTORY_BOUNDS",
+      "repair": "NONE"
+    },
+    {
+      "active_disposition": "INACTIVE_NOT_APPLICABLE",
+      "active_evidence": [
+        "The shadow independent_exact_oracle and its certificate.dimension and certificate.residual_exact_zero fields are absent from the active dependency closure.",
+        "The active sealed map consumes its predecessor implicit-certificate object directly and rejects uncertified steps; it does not claim replay of the shadow certificate schema.",
+        "REI-INTERVAL-02 independent replay must validate every field in the new replay schema and return a typed failure for malformed evidence."
+      ],
+      "candidate_evidence": [
+        "validation/independent_exact_oracle.py ignored redundant dimension and residual_exact_zero fields and could raise on malformed bounds."
+      ],
+      "finding_id": "CERTIFICATE_REPLAY_REDUNDANT_FIELDS",
+      "repair": "NONE"
+    }
+  ],
+  "repair_budget": {
+    "allowed": 1,
+    "used": 1
+  },
+  "schema": "rei-active-ode-compatibility/v1",
+  "terminal": "PASS_REI_ACTIVE_ODE_COMPATIBILITY",
+  "wholesale_shadow_import": "FORBIDDEN_AND_NOT_PERFORMED"
+}

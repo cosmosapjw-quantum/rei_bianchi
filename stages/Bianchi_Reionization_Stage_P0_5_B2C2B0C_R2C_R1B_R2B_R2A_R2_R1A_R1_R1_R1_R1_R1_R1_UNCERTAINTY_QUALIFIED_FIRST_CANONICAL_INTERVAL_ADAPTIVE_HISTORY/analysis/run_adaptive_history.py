@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import secrets
 import shutil
+import signal
 import stat
 import struct
 import subprocess
@@ -1643,23 +1644,58 @@ class Coordinator:
             str(state_path),
         ]
         try:
-            result = subprocess.run(
+            process = subprocess.Popen(
                 command,
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True,
-                timeout=self.worker_timeout,
                 env=self._env(),
-                check=False,
                 close_fds=True,
+                start_new_session=True,
             )
-        except subprocess.TimeoutExpired as error:
-            return {
-                "lane": lane,
-                "process_status": "TIMEOUT",
-                "returncode": None,
-                "stderr": _bounded_text(error.stderr),
-                "stdout": _bounded_text(error.stdout),
-            }
+            try:
+                stdout, stderr = process.communicate(timeout=self.worker_timeout)
+            except subprocess.TimeoutExpired as error:
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                except OSError:
+                    if process.poll() is None:
+                        process.kill()
+                try:
+                    stdout, stderr = process.communicate(
+                        timeout=min(1.0, max(0.1, self.worker_timeout))
+                    )
+                except subprocess.TimeoutExpired as drain_error:
+                    stdout = (
+                        drain_error.stdout
+                        if drain_error.stdout is not None
+                        else error.stdout
+                    )
+                    stderr = (
+                        drain_error.stderr
+                        if drain_error.stderr is not None
+                        else error.stderr
+                    )
+                    for stream in (process.stdout, process.stderr):
+                        if stream is not None:
+                            try:
+                                stream.close()
+                            except OSError:
+                                pass
+                    try:
+                        process.wait(timeout=0.1)
+                    except subprocess.TimeoutExpired:
+                        process.kill()
+                        process.wait()
+                return {
+                    "lane": lane,
+                    "process_status": "TIMEOUT",
+                    "returncode": None,
+                    "stderr": _bounded_text(stderr),
+                    "stdout": _bounded_text(stdout),
+                }
         except OSError as error:
             return {
                 "error": f"{type(error).__name__}: {error}",
@@ -1672,11 +1708,11 @@ class Coordinator:
         row = {
             "lane": lane,
             "process_status": "EXITED",
-            "returncode": result.returncode,
-            "stdout": _bounded_text(result.stdout),
-            "stderr": _bounded_text(result.stderr),
+            "returncode": process.returncode,
+            "stdout": _bounded_text(stdout),
+            "stderr": _bounded_text(stderr),
         }
-        if result.returncode != 0:
+        if process.returncode != 0:
             return row
         if result_path.is_symlink() or not result_path.is_file():
             row["process_status"] = "MISSING_RESULT"

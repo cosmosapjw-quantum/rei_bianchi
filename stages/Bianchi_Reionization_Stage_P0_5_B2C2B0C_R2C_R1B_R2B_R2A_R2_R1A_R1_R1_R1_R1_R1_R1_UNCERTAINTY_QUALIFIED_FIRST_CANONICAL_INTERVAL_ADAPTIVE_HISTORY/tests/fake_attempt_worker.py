@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse,array,hashlib,json,os,struct,time
+import argparse,array,hashlib,json,os,struct,subprocess,sys,time
 from pathlib import Path
 
 LANES=('LOCAL_NEUTRAL_HAZARD_PRIMARY','RECOMBINATION_WEIGHTED_AUDITOR','SCRIPT_SELF_SHIELDING_AUDITOR')
@@ -19,6 +19,13 @@ def main():
  if mode=='CRASH' and lane=='RECOMBINATION_WEIGHTED_AUDITOR':return 7
  if mode=='TIMEOUT' and lane=='RECOMBINATION_WEIGHTED_AUDITOR':
   print('partial timeout output',flush=True);time.sleep(2);return 0
+ if mode=='DESCENDANT_TIMEOUT' and lane=='RECOMBINATION_WEIGHTED_AUDITOR':
+  release=Path(str(args.result)+'.release');pid_path=Path(str(args.result)+'.descendant-pid')
+  program=('import os,sys,time; from pathlib import Path; '
+   'release=Path(sys.argv[1]); pid_path=Path(sys.argv[2]); pid_path.write_text(str(os.getpid())); '
+   'deadline=time.monotonic()+3; exec("while not release.exists() and time.monotonic()<deadline:\\n time.sleep(0.01)")')
+  subprocess.Popen([sys.executable,'-c',program,str(release),str(pid_path)])
+  print('ordinary descendant started',flush=True);time.sleep(2);return 0
  event=mode=='EVENT' and lane=='SCRIPT_SELF_SHIELDING_AUDITOR' and interval['left_tick']==0
  reject=mode=='REJECT_BASE_ZERO' and lane=='RECOMBINATION_WEIGHTED_AUDITOR' and interval['left_tick']==0 and interval['right_tick']==64
  accepted=not(event or reject);classification='TABLE_EVENT_REQUIRES_RESTART' if event else 'PUBLIC_WIDTH_GATE_FAILURE' if reject else 'PASS';candidate=None
