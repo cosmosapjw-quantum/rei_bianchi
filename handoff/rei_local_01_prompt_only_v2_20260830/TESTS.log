@@ -1,0 +1,50 @@
+REI-LOCAL-01 prompt-only bootstrap V2 verification
+Date: 2026-08-30 UTC
+
+TDD RED
+Command:
+  python3 -m unittest -v handoff/rei_local_01_prompt_only_v2_20260830/tests/test_prompt_only_bootstrap_v2.py
+Observed:
+  Ran 5 tests
+  FAILED (errors=5)
+  Expected cause: LOCAL_EXECUTION_PROMPT_V2.md did not yet exist.
+
+TDD GREEN
+Command:
+  python3 -m unittest -v handoff/rei_local_01_prompt_only_v2_20260830/tests/test_prompt_only_bootstrap_v2.py
+Observed after hardening:
+  Ran 9 tests
+  OK
+
+Assertions covered:
+  - actual prompt bootstrap block is executed by Bash
+  - exact locator bytes and mode 0500 are published outside the checkout
+  - locator byte mutation fails before final-name publication
+  - post-fetch object-store growth fails closed
+  - an existing target is never overwritten
+  - exact SHA is attempted before the pinned no-ref transport fallback
+  - unsupported Git CLI lazy-fetch option is absent
+  - hostile Git routing/config environment is scrubbed
+  - delivery terminal/tree, locator path/blob/digest, and PR URL are literal
+  - original unbound publication placeholders are absent
+  - all linked worktree/common Git directory roots reject nested pin roots
+  - HUP/INT/TERM abort nonzero and clean the unpublished candidate
+  - terminal/base/PR14 tree and locator-blob identity mismatches reject
+
+REVIEW REPAIRS
+  - added the previously omitted PR14 source commit/tree locator pins
+  - added explicit PR19 payload -> PR18 terminal ancestry/tree checks
+  - made the transport fence independently fail-fast
+  - added automatic normal-result and destination-binding JSON gates
+
+FINAL STATIC CHECKS
+  - 3/3 Bash fences parse with bash -n
+  - CONTRACT.json parses with the Python stdlib JSON parser
+  - independent prompt review: no open P0/P1/P2 after repairs
+  - independent code review: Git 2.43 partial-clone synthetic fixture PASS;
+    refs unchanged, FETCH_HEAD absent, object closure complete
+
+LIMITATION
+  - an actual Git 2.43 partial-clone fetch was not available in this executor;
+    Git process-boundary behavior is deterministic and the published GitHub
+    objects are independently read back before release
