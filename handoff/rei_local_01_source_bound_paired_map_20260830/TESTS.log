@@ -1,0 +1,128 @@
+REI-LOCAL-01 bootstrap/spec handoff verification record
+Date: 2026-08-30 UTC
+Base: 1893f12d14b212eb4b6bd637332824f692e6f4b3
+
+BASELINE
+command: python research/continuation_20260830/verify_payload.py --root . --repo .
+exit: 0
+result: PASS_PAYLOAD_ONLY; files=13; source_objects=CHECKED; claim=NO_PASS_FIRST_CANONICAL_INTERVAL
+
+UPSTREAM TEST ENVIRONMENT DISCLOSURE
+command: python -m pytest -q research/continuation_20260830/tests
+exit: 1
+result: pytest unavailable in this execution environment (No module named pytest)
+interpretation: dependency absence only; no upstream test pass is inferred
+
+TDD RED 1
+command: python -m unittest -v handoff/rei_local_01_source_bound_paired_map_20260830/tests/test_fetch_and_validate.py
+exit: 1
+result: required locator module missing; expected pre-implementation RED
+
+TDD GREEN 1
+command: python -m unittest -v handoff/rei_local_01_source_bound_paired_map_20260830/tests/test_fetch_and_validate.py
+exit: 0
+result: 10 tests passed
+
+TDD RED 2
+command: python -m unittest -v handoff.rei_local_01_source_bound_paired_map_20260830.tests.test_fetch_and_validate.LocatorBehaviorTests.test_validator_cannot_add_unmanifested_materialized_files
+exit: 1
+result: LocatorError not raised; unexpected validator-created file exposed a materialization-closure gap
+
+TDD GREEN 2
+command: python -m unittest -v handoff.rei_local_01_source_bound_paired_map_20260830.tests.test_fetch_and_validate.LocatorBehaviorTests.test_validator_cannot_add_unmanifested_materialized_files
+exit: 0
+result: 1 focused test passed
+
+LOCATOR REGRESSION
+command: python -m unittest -v handoff/rei_local_01_source_bound_paired_map_20260830/tests/test_fetch_and_validate.py
+exit: 0
+result: historical pre-audit checkpoint; 11 tests passed
+
+ADVERSARIAL AUDIT RED 3
+command: python -m unittest -v handoff/rei_local_01_source_bound_paired_map_20260830/tests/test_fetch_and_validate.py
+exit: 1
+result: 18-test attack expansion exposed ambient Git routing, blobless closure, validator path TOCTOU, dangling symlink, metadata/directory closure, and publication no-clobber gaps (5 failures, 3 errors)
+
+ADVERSARIAL AUDIT GREEN 3
+command: python -m unittest -v handoff/rei_local_01_source_bound_paired_map_20260830/tests/test_fetch_and_validate.py
+exit: 0
+result: 18 tests passed after Git-environment scrub, no-filter refetch, authenticated-stdin validator, exact path closure, and target no-clobber changes
+
+ADVERSARIAL AUDIT RED 4
+command: python -m unittest -v <root-mode> <stage-source-substitution> <receipt-source-substitution> <pre-receipt-repository-drift>
+exit: 1
+result: four focused attacks reproduced root-mode escape, PASS publication from substituted stage/receipt source names, and a PASS-looking receipt left after final snapshot drift
+
+ADVERSARIAL AUDIT GREEN 4
+command: python -m unittest -v <same four focused test identifiers>
+exit: 0
+result: 4 focused tests passed after staging-root identity binding/post-rename rehash, anonymous O_TMPFILE receipt authority, and pre-receipt final repository snapshot
+
+ADVERSARIAL AUDIT RED 5
+command: python -m unittest -v <retained-stage> <proc-fd-link> <post-link-failure> <pre-link-destination-swap> <final-link-destination-swap>
+exit: 1
+result: 5 focused tests produced 2 failures and 3 errors, reproducing pathname stage deletion, privileged AT_EMPTY_PATH dependence, a lingering PASS receipt after post-link failure, and unbound destination-swap windows
+
+ADVERSARIAL AUDIT GREEN 5
+command: python -m unittest -v <same five focused test identifiers>
+exit: 0
+result: 5 focused tests passed after no-delete private-stage retention, capability-free proc-fd linking, fully preauthenticated anonymous receipt publication, expected-vs-fd closure binding, out-of-band receipt hashing, and fresh consumer verification
+
+ADVERSARIAL AUDIT RED 6
+command: python -m unittest -v handoff.rei_local_01_source_bound_paired_map_20260830.tests.test_fetch_and_validate.LocatorBehaviorTests.test_validator_cannot_add_empty_directories_or_chmod_metadata
+exit: 1
+result: malicious validator chmod of the retained staging root left mode 0777, contradicting the private-stage policy
+
+ADVERSARIAL AUDIT GREEN 6
+command: python -m unittest -v <root-mode-retention> <privacy-restore-failure> <substituted-stage-reporting>
+exit: 0
+result: 3 focused tests passed after continuously held stage-fd mode restoration, explicit STAGE_PRIVACY_FAILURE, and device/inode-gated pathname reporting
+
+ADVERSARIAL AUDIT RED 7
+command: python -m unittest -v handoff.rei_local_01_source_bound_paired_map_20260830.tests.test_fetch_and_validate.LocatorBehaviorTests.test_stage_privacy_failure_dominates_and_reports_repository_drift
+exit: 1
+result: simultaneous stage-mode restore failure and repository drift returned only REPOSITORY_MUTATED, hiding the unsafe retained mode
+
+ADVERSARIAL AUDIT GREEN 7
+command: python -m unittest -v <same focused test identifier>
+exit: 0
+result: STAGE_PRIVACY_FAILURE now dominates while preserving concurrent repository-drift detail
+
+ADVERSARIAL AUDIT GREEN 8
+command: python -m unittest -v <rehashed-forged-receipt-contract> <pure-receipt-eexist-race>
+exit: 0
+result: 2 focused tests permanently cover six strict receipt contract fields even with an attacker-supplied recomputed hash, plus the final-link RECEIPT_EXISTS branch with owner receipt and authenticated destination preserved
+
+FINAL LOCATOR REGRESSION
+command: python -m unittest -v handoff/rei_local_01_source_bound_paired_map_20260830/tests/test_fetch_and_validate.py
+exit: 0
+result: 38 tests passed; includes blobless and shallow policy, hostile Git environment, authenticated validator failure/path race, CRLF/NUL raw bytes, exact root/descendant closure, target/source races, fd-restored private error stages, dual-failure precedence, and substitution-safe reporting, expected-vs-observed fd closure, destination swaps before and at the receipt-link boundary, pure receipt EEXIST, out-of-band receipt SHA enforcement, strict forged-contract and post-success destination/receipt mutation rejection, nonsemantic post-link close failures, CLI mapping, and pre-receipt snapshot ordering
+
+INDEPENDENT PRODUCTION-PIN MUTATION AUDIT
+command: independent 24-field production ObjectPins mutation matrix against the locator verifier
+exit: 0
+result: 24/24 source/helper/payload/terminal parent, tree, subtree, blob, raw SHA-256, archive-size, branch, and PR-field mutations failed closed
+
+REAL PINNED GRAPH SMOKE
+command: python handoff/rei_local_01_source_bound_paired_map_20260830/FETCH_AND_VALIDATE.py --repo . --destination <new-external-path> --receipt <new-external-receipt>
+exit: 0
+result: PASS_IMMUTABLE_PAYLOAD_ONLY; remote_ref_status=MATCH; scientific_validation=NOT_RUN; canonical_adapter=NOT_RUN; pilot_46080x3=NOT_RUN; first_interval=NO_PASS; PR14 disposition recorded blocked minimum step
+manifest_sha256: c06748e5347445b243f52558cf73046b199ad1434d30d817be99a122ef8db51c
+publication_sha256: 575aa68525bc22d8f556a0a857ad3c12714dc4baa44dab04c138e4dffa79e845
+materialized_files: 15
+materialized_root_mode: 0700
+receipt_mode: 0644
+receipt_schema: rei-local-immutable-payload-locator-receipt/v2
+receipt_authority: ANONYMOUS_O_TMPFILE_PROC_FD_LINKAT_AT_SYMLINK_FOLLOW_NOREPLACE
+receipt_sha256_from_stdout: 8071461339034d3cf0abeca7dd06a63ed534dd1870e10711749f5fdbce674e66
+consumer_verification: PASS_DESTINATION_BINDING
+consumer_closure_sha256: da63be9958b22f5e057b2b5dc0e41df178618436812248501441bca79b49828c
+consumer_directories: 5
+repository_head_after: 1893f12d14b212eb4b6bd637332824f692e6f4b3
+repository_tree_after: 773fcdc4d1ab115fa0542d26ba67af5c086f450b
+
+NOT RUN
+- canonical source-bound adapter
+- 46080-node x 3-lane pilot
+- first canonical interval
+- production chemistry or performance benchmark
