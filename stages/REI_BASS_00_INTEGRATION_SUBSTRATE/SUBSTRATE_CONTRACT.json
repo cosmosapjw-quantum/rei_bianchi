@@ -1,0 +1,138 @@
+{
+  "acceptance": {
+    "authority_namespace_pre_post_guarded": true,
+    "common_scope_lazy_config_rejected": true,
+    "descriptor_bound_publication": true,
+    "event_parent_namespaces_prepinned": true,
+    "exact_bass_rec_authorities_required": true,
+    "mutation_and_rollback_tests": "33_PASS",
+    "no_pathname_swap_gap": true,
+    "plain_wire_receipt_claim_bearing": false,
+    "promisor_pack_markers_rejected": true,
+    "publication_mode_reverified": true,
+    "publication_parent_namespace_bound": true,
+    "raw_certificate_payload_admitted": false,
+    "reference_graph_only": true,
+    "serialized_graph_wire_validation_claim_bearing": false,
+    "worktree_origin_override_rejected": true,
+    "worktree_scope_lazy_config_rejected": true
+  },
+  "authority_inputs": {
+    "BASS": {
+      "required": [
+        "repository_url",
+        "commit_oid",
+        "tree_oid",
+        "load_bearing_blob_path_oid_pairs"
+      ],
+      "status": "ABSENT_TYPED_BLOCKER"
+    },
+    "REC": {
+      "required": [
+        "repository_url",
+        "commit_oid",
+        "tree_oid",
+        "load_bearing_blob_path_oid_pairs"
+      ],
+      "status": "ABSENT_TYPED_BLOCKER"
+    }
+  },
+  "base_identity": {
+    "commit": "1893f12d14b212eb4b6bd637332824f692e6f4b3",
+    "origin": "https://github.com/cosmosapjw-quantum/rei_bianchi.git",
+    "tree": "773fcdc4d1ab115fa0542d26ba67af5c086f450b"
+  },
+  "classification": "REFERENCE_SUBSTRATE_ONLY_STOP_INVALID",
+  "closed_findings": [
+    {
+      "code": "BASS_CUSTODY_WORKTREE_CONFIG_NOT_REJECTED",
+      "closure": "common and git-dir config.worktree snapshots are both inspected before object access",
+      "severity": "P1"
+    },
+    {
+      "code": "BASS_PUBLISH_TEMP_SWAP_NOT_REVERIFIED",
+      "closure": "unnamed O_TMPFILE inode is validated, reopened read-only, and linked by descriptor",
+      "severity": "P1"
+    },
+    {
+      "code": "BASS_CUSTODY_RECEIPT_SELF_ATTESTED_GRAPH_ADMISSION",
+      "closure": "plain GitCustodyReceipt is wire-only; graph construction requires a process-local capability minted by exact local Git validation",
+      "severity": "P1"
+    },
+    {
+      "code": "BASS_EVENT_ROLLBACK_PATH_AND_STAT_UNLINK_RACE",
+      "closure": "transaction retains the original directory descriptor and atomically quarantines entries without automatic inode unlink",
+      "severity": "P1"
+    },
+    {
+      "code": "BASS_CUSTODY_ALTERNATES_TOCTOU",
+      "closure": "repository, Git/common directories, config, object stores, alternates, and promisor-marker state are descriptor-pinned and compared around every exact read",
+      "severity": "P1"
+    },
+    {
+      "code": "BASS_CUSTODY_PROMISOR_PACK_MARKER_UNCHECKED",
+      "closure": "common and worktree Git-directory pack namespaces are scanned no-follow for promisor markers before and after exact reads",
+      "severity": "P1"
+    },
+    {
+      "code": "BASS_CUSTODY_WORKTREE_ORIGIN_OVERRIDE",
+      "closure": "worktree-scoped remote.origin.url is rejected instead of shadowing the pinned common authority",
+      "severity": "P1"
+    },
+    {
+      "code": "BASS_DESCRIPTOR_MODE_MUTATION_AFTER_VALIDATION",
+      "closure": "exact 0444 regular-file mode is reverified after the callback and on the linked inode",
+      "severity": "P1"
+    },
+    {
+      "code": "BASS_PUBLICATION_PARENT_NAMESPACE_DRIFT",
+      "closure": "single publication rechecks lexical parent identity and event publication pre-pins every unique parent before the first item",
+      "severity": "P1"
+    }
+  ],
+  "forbidden_claims": [
+    "NUMERICAL_BASS_LOCK",
+    "PRODUCTION_OPERATOR_CERTIFIED",
+    "PASS_FIRST_CANONICAL_INTERVAL",
+    "CANONICAL_PILOT_RUN"
+  ],
+  "known_limits": [
+    {
+      "code": "BASS_REC_EXACT_AUTHORITY_MISSING",
+      "effect": "no authoritative BASS/REC custody receipt or live integration graph can be created",
+      "severity": "P0"
+    },
+    {
+      "code": "REFERENCE_GRAPH_ONLY_NO_REPLAY_AUTHORITY",
+      "effect": "raw certificate bytes and numerical replay remain outside this representation",
+      "severity": "P2"
+    },
+    {
+      "code": "MULTI_NAME_ATOMIC_COMMIT_NOT_CLAIMED",
+      "effect": "event sets use identity-checked compensating rollback",
+      "severity": "DISCLOSURE"
+    },
+    {
+      "code": "ROLLBACK_QUARANTINE_REQUIRES_AUDITED_CLEANUP",
+      "effect": "automatic rollback removes names from the visible event namespace but retains quarantine tombstones rather than risking deletion of unrelated inodes",
+      "severity": "DISCLOSURE"
+    }
+  ],
+  "publication": {
+    "destination_policy": "CREATE_ONLY_NO_OVERWRITE",
+    "method": "LINUX_O_TMPFILE_DESCRIPTOR_HARDLINK_V1",
+    "post_link_checks": [
+      "directory_fsync",
+      "destination_no_follow_open",
+      "device_inode_identity",
+      "exact_0444_mode",
+      "lexical_parent_directory_identity",
+      "sha256_and_size_replay"
+    ],
+    "rollback": "ORIGINAL_DIRFD_ATOMIC_QUARANTINE_NO_AUTOMATIC_INODE_UNLINK",
+    "unsupported_platform_behavior": "TYPED_STOP_NO_PATHNAME_FALLBACK"
+  },
+  "schema": "REI_BASS_INTEGRATION_SUBSTRATE_CONTRACT_V1",
+  "scientific_status": "NO_PASS_FIRST_CANONICAL_INTERVAL",
+  "stage": "REI_BASS_00_INTEGRATION_SUBSTRATE"
+}
