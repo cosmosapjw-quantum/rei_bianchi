@@ -417,3 +417,81 @@ summary-reported pass is context, not current evidence.
   `first_interval=NO_PASS_FIRST_CANONICAL_INTERVAL`,
   `scientific_pass=NOT_CLAIMED`, and
   `scientific_publication=NOT_RUN`.
+
+## Standalone-host Rust runtime bridge validation — 2026-09-01
+
+- task layer: `validate`; no production bridge, Rust source, lock, test,
+  scientific contract, or stale Git administration metadata was modified.
+- release authority: branch
+  `agent/implementation/rei-runtime-bridge-host-context-repair-handoff-20260901-r1`,
+  externally supplied head `751e2a207e464fe8b35c9469f314e9bd3220461a`
+  and tree `b4d052ee3e944290e1ab443611fb27ef48699ac7`.
+  The exact immutable predecessor is
+  `723882d80d57ee8a919bc52ab74633b743447d0c` / tree
+  `3fe6f79d210085d1f44de14cca53d9ed1cff347e`.
+- standalone clone: normal full clone at
+  `/tmp/rei-runtime-bridge-host-context-validation.oTiigMrF/repo` inside
+  mode-private session root
+  `/tmp/rei-runtime-bridge-host-context-validation.oTiigMrF`.
+  `FETCH_HEAD`, detached checkout, and the created continuation branch all
+  began at the supplied handoff head/tree.  `.git` is a real directory and the
+  exact private common directory; Git reports one existing root and no
+  `prunable` record.  The clone is non-bare, non-shallow, SHA-1, non-promisor,
+  non-partial, has no alternates, and `git fsck --full --no-progress`, clean
+  status, and `git diff --check` all passed.
+- package integrity:
+  `handoff/rei_runtime_bridge_host_context_repair_20260901/MANIFEST.sha256`
+  raw SHA-256
+  `2e7d945107b3d23eb985c2a3efc4eeefa3f3587ca6a81d4235a972fb2212e8a8`;
+  closed manifest `5/5 PASS`.  `CONTRACT.json`, `README.md`,
+  `LOCAL_CODEX_RUNTIME_PROMPT.md`, and `MANIFEST.sha256` were read after the
+  Git preflight and before repository Python import.
+- machine inputs: the existing regular non-symlink Section-0 receipt
+  `/tmp/rei-stdlib-section0-repair.fIQLkLWy/section0-fresh-replay.json` has raw
+  SHA-256
+  `470fec225675a62a3c0121abcc4c568d345b088dd541a49fb18d91d6eacf104b`
+  and status `PASS_IMMUTABLE_SECTION_0`.  The explicit repaired-host compiler
+  locator
+  `/home/cosmosapjw/.rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin/rustc`
+  is a regular executable, not a shim or symlink, with SHA-256
+  `ef6d716e5d1c6c93def277c0afa037c21e7a74f7de3aed4ee0700646c3301b1d`;
+  it was not executed during preflight.
+- first focused command:
+  `PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -I -S -B handoff/rei_runtime_bridge_host_context_repair_20260901/test_runtime_bridge_runner.py`
+  — exit `0`, `10/10 PASS`.
+- sole runner command: `env -i LANG=C LC_ALL=C PATH=/usr/bin:/bin TZ=UTC PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -I -S -B handoff/rei_runtime_bridge_host_context_repair_20260901/runtime_bridge_runner.py --repo /tmp/rei-runtime-bridge-host-context-validation.oTiigMrF/repo --section0-receipt /tmp/rei-stdlib-section0-repair.fIQLkLWy/section0-fresh-replay.json --rustc /home/cosmosapjw/.rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin/rustc --evidence-root /tmp/rei-runtime-bridge-host-context-validation-log.XlPyIEsR/runtime-evidence`.
+  It was invoked exactly once and exited `65`; it was not retried.
+- permanent attempt evidence:
+  `/tmp/rei-runtime-bridge-host-context-repair-20260901.native-attempt.json`,
+  schema `rei-runtime-host-context-attempt-claim/v1`, status
+  `NATIVE_ATTEMPT_CLAIMED`, SHA-256
+  `d4d19ca3c22943f57472327ad9692225532605e4ee50de30af2f723d59f2ccf1`.
+  The claim was absent immediately before invocation and is retained.
+- external log root:
+  `/tmp/rei-runtime-bridge-host-context-validation-log.XlPyIEsR`.
+  `runner.stdout` is empty with SHA-256
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
+  `runner.stderr` SHA-256 is
+  `e340b3b8cb6385d6b787aaaa534dd853a4acc99ebf4a127d94bde3255e88e177`;
+  `runner.exit` contains `65` and has SHA-256
+  `979b894f2d91bf199766571d58024f020d1a44a417da5f48e1fa1cdf554a14f5`.
+  The evidence root exists but is empty; no native artifact or
+  `runtime_bridge_receipt.json` was created, so there is no receipt SHA-256.
+- first typed blocker, verbatim:
+  `STOP_INVALID: UNEXPECTED_RUNTIME_BRIDGE_EXCEPTION: RuntimeClosureError: UNDECLARED_IMPORT: ntpath`.
+  This is an observed runtime-closure failure, not a scientific-integrity
+  result; validate-only scope forbids repair or another native attempt.
+- second focused command after this documentation-only edit: the same exact
+  package command exited `0`, `10/10 PASS`; the package itself is unchanged.
+- intentionally not run: BASS/REC admission, Task 6/four-site computation,
+  node 38382, REIAFF1, formal systems, PHYS-MATH/PHYS-MATH-CODE, the
+  46,080-by-3 canonical pilot, and scientific publication.  JAX and JAXLIB
+  were not used.
+- terminal state remains
+  `runtime_bridge=STOP_INVALID`,
+  `process_boundary=RUST_BACKEND_CAPABILITY_PROCESS_BOUNDARY_MISSING`,
+  `prestart_runtime=BLOCKED_PRESTART_ELF_INTERPRETER_IDENTITY_NOT_ESTABLISHED`,
+  `production_parser=PRUNABLE_WORKTREE_ENUMERATION_UNHANDLED`,
+  `adapter=STOP_INVALID`, `canonical_pilot=NOT_RUN`,
+  `first_interval=NO_PASS_FIRST_CANONICAL_INTERVAL`,
+  `scientific_pass=NOT_CLAIMED`, and `scientific_publication=NOT_RUN`.
