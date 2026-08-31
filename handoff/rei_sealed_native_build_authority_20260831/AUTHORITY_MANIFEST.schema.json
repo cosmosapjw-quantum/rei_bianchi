@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/rei/sealed-native-build-authority-bundle-v1.schema.json",
+  "title": "REI sealed native build authority bundle manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "classification",
+    "identity_class",
+    "closure_claim",
+    "runtime_boundary",
+    "build",
+    "native_tests",
+    "adapter",
+    "canonical_pilot",
+    "first_interval",
+    "scientific_pass",
+    "scientific_publication",
+    "entries",
+    "source_packages",
+    "notes"
+  ],
+  "properties": {
+    "schema": {
+      "const": "rei-sealed-native-build-authority-bundle/v1"
+    },
+    "classification": {
+      "const": "BYTE_IDENTITY_NON_SCIENTIFIC_AUTHORITY_SUPPLEMENT"
+    },
+    "identity_class": {
+      "const": "BYTE_IDENTITY"
+    },
+    "closure_claim": {
+      "const": "PACKAGED_MEMBERS_ONLY_NO_RUNTIME_COMPLETENESS_CLAIM"
+    },
+    "runtime_boundary": {
+      "const": "NOT_RUN"
+    },
+    "build": {
+      "const": "NOT_RUN"
+    },
+    "native_tests": {
+      "const": "NOT_RUN"
+    },
+    "adapter": {
+      "const": "STOP_INVALID"
+    },
+    "canonical_pilot": {
+      "const": "NOT_RUN"
+    },
+    "first_interval": {
+      "const": "NO_PASS_FIRST_CANONICAL_INTERVAL"
+    },
+    "scientific_pass": {
+      "const": "NOT_CLAIMED"
+    },
+    "scientific_publication": {
+      "const": "NOT_RUN"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/regularFile"
+          },
+          {
+            "$ref": "#/$defs/symbolicLink"
+          }
+        ]
+      }
+    },
+    "source_packages": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "rootfsPath": {
+      "type": "string",
+      "pattern": "^/(?!(?:\\.{1,2})(?:/|$))[^/\\\\\\u0000]+(?:/(?!(?:\\.{1,2})(?:/|$))[^/\\\\\\u0000]+)*$"
+    },
+    "regularFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "type",
+        "sha256",
+        "size",
+        "mode",
+        "role"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/rootfsPath"
+        },
+        "type": {
+          "const": "file"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "pattern": "^0[0-7]{3}$"
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "symbolicLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "type",
+        "target",
+        "role"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/rootfsPath"
+        },
+        "type": {
+          "const": "symlink"
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
