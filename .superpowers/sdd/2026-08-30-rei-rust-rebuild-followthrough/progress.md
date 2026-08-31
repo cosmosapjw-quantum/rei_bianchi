@@ -260,3 +260,61 @@ summary-reported pass is context, not current evidence.
 - Package integrity — the non-code research manifest passed `7/7`, the BASS
   handoff manifest passed `7/7`, and the root host-bound handoff manifest
   passed `2/2` after its final runtime-stop clarification and reseal.
+
+## Exact Rust stdlib closure host repair — 2026-08-31
+
+- immutable handoff: draft PR `#27` head
+  `d639b55b958145ff623bb036896ec4ebf80d558c`, tree
+  `c6eeabd6535702a8810cc7193489085df11711fd`.  `git fsck --full` passed;
+  the parent host, Git-small, sealed-native, and stdlib-repair manifests all
+  passed before the repair prompt was interpreted.
+- isolated continuation:
+  `agent/implementation/rei-stdlib-section0-host-repair-20260831-r1` in
+  `/home/cosmosapjw/worktrees/rei-stdlib-section0-host-repair-20260831-r1`.
+  Existing worktrees, receipts, untracked archives, and branches were not
+  reset, cleaned, stashed, overwritten, or rebased.
+- exact admitted archive:
+  `/tmp/rei-git-small-intake.I3i6PsZd/authority/project_sources/08-rust-1.94.1-x86_64-unknown-linux-gnu.tar.xz`,
+  size `192287020`, SHA-256
+  `294b3d81fa72e62581276290c60c81eb8b58498d333d422ca1dfc432877d0c40`.
+  Repair evidence root:
+  `/tmp/rei-stdlib-section0-repair.fIQLkLWy`.
+- read-only RED confirmation exited `65` as required: archive/direct-directory
+  member comparison `PASS` at `62/62`, Python and shell legacy closure both
+  `7aae7f6cffe33365096e9f837378c9a26de46efd7d109eccd446d45703eee6c0`,
+  first gate `RUST_STDLIB_CLOSURE_SHA256_MISMATCH_CONFIRMED`.  Receipt SHA-256:
+  `dd1d12a2ffd72b70510153cbdea99be5767dd82f571907ec1f0a111b494f2347`.
+- exact dry-run status `REPAIR_READY_DRY_RUN`; it reported only the two
+  `REPAIR_CONTRACT.json` targets missing, retained the 62-file directory, and
+  wrote no stdlib member.  Receipt SHA-256:
+  `a7e3aac22cb36b7dc93fd08cc94497aa500ab0716c613737b367e75027d69031`.
+- create-only apply status `APPLIED_EXACT_SUPPLEMENTS_DIAGNOSTIC_ONLY`.
+  It added only `libLLVM.so.21.1-rust-1.94.1-stable` and
+  `libLLVM-21-rust-1.94.1-stable.so`, both mode `0444` with contract sizes and
+  hashes.  The post-repair member count is `64` and the original locked
+  closure is
+  `1d6d31c8f1c99b69b120c91fcff14220bbfcf0e8f976096f0c4992b7e2edc799`.
+  Apply receipt SHA-256:
+  `fb7acb39bf5187c944ce5a44bd5aa21903db252b43e3b843a2fc3a9a46da42ca`.
+- the exact prior Section-0 hash block was recovered from its original Codex
+  execution transcript and run unchanged in a fresh Bash child with the
+  original workdir.  Exit was `0`, stderr was empty, and rustc, rustc driver,
+  LLVM, 64-file stdlib closure, sealed GCC, GNU ld, MPFR, and GMP all matched.
+  Local-observation receipt status `PASS_IMMUTABLE_SECTION_0`, SHA-256
+  `470fec225675a62a3c0121abcc4c568d345b088dd541a49fb18d91d6eacf104b`;
+  raw stdout/stderr SHA-256 values are
+  `12d6710bc0034669bded412c7a098fa407a3ac5d431a5997ac6ee38baf801ff5`
+  and `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+  `build_and_test.sh`, `rustc`, Cargo, repository numerical code, JAX, and
+  archive members were not executed in this repair path.
+- focused handoff verification:
+  `PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -I -S -B -m unittest discover -v -s handoff/rei_stdlib_closure_audit_20260831 -p 'test_*.py'`
+  — exit `0`, `11/11` passed.  One independent read-only package audit found
+  no P0/P1 defect; no repair-loop budget was consumed.
+- repair-work-unit first failing gate: none after the expected pre-repair RED.
+  The next runtime-boundary gate and all BASS/REC, four-site, node-38382,
+  REIAFF1, formal, audit, and canonical-pilot successors are intentionally
+  `NOT_RUN` in this bounded handoff.
+- claim ceiling remains `adapter=STOP_INVALID`, `canonical_pilot=NOT_RUN`,
+  `first_interval=NO_PASS_FIRST_CANONICAL_INTERVAL`,
+  `scientific_pass=NOT_CLAIMED`, and `scientific_publication=NOT_RUN`.
