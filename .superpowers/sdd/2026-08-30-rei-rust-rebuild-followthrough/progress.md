@@ -47,6 +47,46 @@ Recovery classification: `RECOVERED_FROM_SUMMARY_NOT_BYTE_IDENTICAL`
   `first_interval=NO_PASS_FIRST_CANONICAL_INTERVAL`,
   `scientific_pass=NOT_CLAIMED`, and `scientific_publication=NOT_RUN`.
 
+## Git-small authority intake checkpoint — 2026-08-31
+
+- continuation base: `70b97bffeea69221074623dc16e89efb43b466ca` /
+  `a95d6d0294a8600b9b642751dfc021e55384ba6f` from
+  `agent/implementation/rei-git-authority-transport-20260831-r1`.
+- external authority root: `/tmp/rei-git-small-intake.I3i6PsZd`; the exact
+  four Git-resident small inputs and the exact 192287020-byte Rust archive
+  passed mixed-source materialization, canonical create-only materialization,
+  and an identical idempotent replay.
+- receipts: mixed-source SHA-256
+  `57c38fd4d8c47fb4422990a74b578936f7e1e67102d482e9a54abbb2035a9baf`;
+  canonical materialization SHA-256
+  `a75f72f6aa5ceef01a709bd9ada3d856077491694a0d09c352577bda0f3aad37`;
+  all-36 INPUT_LOCK replay SHA-256
+  `9647556aaa47c5482e8f78676e32e7c78326740befd839e4aa8a7c485dcc5ff6`.
+- sealed-native intake: supplied safe extraction and opaque verification
+  passed the externally pinned archive/manifest; verification receipt SHA-256
+  `cf8db0761bb802e7a9aa62ea0959485095d9598ba9b6c068974fc1c035e58d79`
+  covers 2,191 regular files and 57 symlinks without member execution.
+- first failing gate: `RUST_STDLIB_CLOSURE_SHA256_MISMATCH`.  The locked
+  aggregate is
+  `1d6d31c8f1c99b69b120c91fcff14220bbfcf0e8f976096f0c4992b7e2edc799`;
+  the exact locked algorithm observes
+  `7aae7f6cffe33365096e9f837378c9a26de46efd7d109eccd446d45703eee6c0`.
+  Rustc, rustc_driver, LLVM, GCC, GNU ld, MPFR, and GMP hashes all match.
+  A bounded archive comparison found the same 62 stdlib filenames and matching
+  per-file bytes, so this is an aggregate closure-evidence mismatch rather
+  than an observed individual stdlib-byte mismatch.
+- durable external evidence:
+  `/tmp/rei-git-small-authority-intake-20260831-state.md`, SHA-256
+  `372dd420645509dc82c3061a242e4802d8acd3ce332608fcba1c2543ce9b1431`
+  at checkpoint preparation.
+- successors intentionally not run: runtime-boundary construction,
+  repository/native imports, BASS/REC, four-site operator, node 38382 replay,
+  REIAFF1 restart, formal systems, PHYS-MATH/PHYS-MATH-CODE audits, canonical
+  pilot, and scientific publication.
+- claim ceiling: `adapter=STOP_INVALID`, `canonical_pilot=NOT_RUN`,
+  `first_interval=NO_PASS_FIRST_CANONICAL_INTERVAL`,
+  `scientific_pass=NOT_CLAIMED`, and `scientific_publication=NOT_RUN`.
+
 ## Material deltas
 
 1. `OBSERVED`: exact base commit/tree and both supplied harness archive hashes.
