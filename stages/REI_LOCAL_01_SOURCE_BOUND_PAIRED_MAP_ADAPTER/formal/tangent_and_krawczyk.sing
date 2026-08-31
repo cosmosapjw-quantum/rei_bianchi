@@ -1,0 +1,17 @@
+// Exact rational algebra cross-check; interval corners are checked by Sage/Wolfram.
+ring r = 0,(z1,z2,dz1,dz2),dp;
+ideal locked = 2*z1+z2-1, z1+3*z2-2;
+ideal tangent = 2*dz1+dz2-(1-z1), dz1+3*dz2-(-1+z2);
+ideal all = locked,tangent;
+ideal g = std(all);
+reduce(5*z1-1,g);
+reduce(5*z2-3,g);
+reduce(25*dz1-14,g);
+reduce(25*dz2+8,g);
+if (reduce(5*z1-1,g) != 0 || reduce(5*z2-3,g) != 0 ||
+    reduce(25*dz1-14,g) != 0 || reduce(25*dz2+8,g) != 0)
+{
+  ERROR("FAIL exact tangent ideal");
+}
+print("PASS exact tangent ideal");
+exit;
