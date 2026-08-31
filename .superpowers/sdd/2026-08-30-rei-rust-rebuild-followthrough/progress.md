@@ -318,3 +318,54 @@ summary-reported pass is context, not current evidence.
 - claim ceiling remains `adapter=STOP_INVALID`, `canonical_pilot=NOT_RUN`,
   `first_interval=NO_PASS_FIRST_CANONICAL_INTERVAL`,
   `scientific_pass=NOT_CLAIMED`, and `scientific_publication=NOT_RUN`.
+
+## Bounded Rust runtime-bridge validation — 2026-09-01
+
+- task layer: `validate`; no bridge, production source, test, lock, contract,
+  or scientific-state repair was authorized or made.
+- immutable handoff: remote branch
+  `agent/implementation/rei-runtime-bridge-execution-handoff-20260831-r1`,
+  head `89c2672cdc41e87a6a9418470c1091b722214bc3`, tree
+  `a46f8c4a0a93e5b3b9d4ce8b51927d71b1ad13bf`.  The head is a descendant of
+  the required Section-0 repair commit
+  `7c0a57878fd565599019a0743ffb796e00bdd101`.
+- isolated continuation:
+  `agent/implementation/rei-runtime-bridge-validation-20260901-r1` in
+  `/home/cosmosapjw/worktrees/rei-runtime-bridge-validation-20260901-r1`.
+  The worktree was clean before execution.  `git fsck --full --no-progress`
+  exited `0` with dangling-object notices only, and no missing or corrupt
+  object was reported.
+- package integrity: `MANIFEST.sha256` raw SHA-256
+  `5a16a85569bc824dfa956e535d012ea13ed528b9b55ff51f52e271600caeff7a`;
+  all `5/5` covered files passed after manifest syntax and relative-path
+  validation.  `CONTRACT.json`, `README.md`, and `MANIFEST.sha256` were read
+  before execution.
+- prior receipt: the existing regular non-symlink file
+  `/tmp/rei-stdlib-section0-repair.fIQLkLWy/section0-fresh-replay.json` was
+  passed directly to the runner.  Its raw SHA-256 is
+  `470fec225675a62a3c0121abcc4c568d345b088dd541a49fb18d91d6eacf104b`
+  and its JSON `status` is exactly `PASS_IMMUTABLE_SECTION_0`.
+- focused pre-execution command:
+  `PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -I -S -B handoff/rei_runtime_bridge_execution_20260831/test_runtime_bridge_runner.py`
+  — exit `0`, `4/4` passed.
+- the permitted native runner was invoked exactly once with the prescribed
+  empty environment and arguments, using the previously nonexistent evidence
+  root `/tmp/rei-runtime-bridge-validation-20260901-r1`.  It exited `65` with
+  the first and only terminal blocker:
+  `STOP_INVALID: UNEXPECTED_RUNTIME_BRIDGE_EXCEPTION: FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-cosmosapjw-Dropbox-bianchi-rei-bianchi-rei-bianchi'`.
+- fail-closed classification: Git's worktree inventory included that absent
+  path as a prunable historical worktree.  The locked bridge function
+  `_worktree_roots` applies `resolve(strict=True)` to every reported worktree,
+  so the run stopped during evidence-root validation before the evidence root,
+  native build artifacts, or `runtime_bridge_receipt.json` were created.
+  The requested external evidence root remains absent; therefore no external
+  runtime receipt or receipt SHA-256 exists to report.
+- the runner was not retried and the bridge was not repaired or redesigned.
+  BASS/REC admission, the four-site operator, node 38382, REIAFF1, formal
+  systems, PHYS-MATH/PHYS-MATH-CODE, the 46,080-by-3 canonical pilot, and
+  scientific publication remain intentionally `NOT_RUN`; JAX and JAXLIB were
+  not used.
+- terminal state: `runtime_bridge=STOP_INVALID`,
+  `adapter=STOP_INVALID`, `canonical_pilot=NOT_RUN`,
+  `first_interval=NO_PASS_FIRST_CANONICAL_INTERVAL`,
+  `scientific_pass=NOT_CLAIMED`, and `scientific_publication=NOT_RUN`.
