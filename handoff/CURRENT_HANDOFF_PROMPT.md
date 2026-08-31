@@ -1,5 +1,12 @@
 # CURRENT HANDOFF PROMPT — rei_bianchi / BASS
 
+> **Active bounded REI-LOCAL-01 continuation:** for the Rust host-authority
+> intake added after draft PR #22, begin with
+> `handoff/rei_local_01_host_authority_20260831/LOCAL_CODEX_JOB_PROMPT.md`.
+> It supersedes only the local adapter continuation. The stage narrative below
+> remains historical and cannot promote the current
+> `STOP_INVALID / NO_PASS_FIRST_CANONICAL_INTERVAL` claim ceiling.
+
 Treat this as a durable continuation of the public `rei_bianchi` repository
 inside BASS. Repository bytes, hashes, ledgers and receipts are authoritative;
 transcript claims are not evidence.

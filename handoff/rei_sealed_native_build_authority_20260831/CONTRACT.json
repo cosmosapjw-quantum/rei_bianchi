@@ -1,0 +1,112 @@
+{
+  "schema": "rei-sealed-native-build-authority-supplement-contract/v1",
+  "classification": "BYTE_IDENTITY_NON_SCIENTIFIC_AUTHORITY_SUPPLEMENT",
+  "document_recovery_classification": "RECOVERED_FROM_SUMMARY_NOT_BYTE_IDENTICAL",
+  "identity_algorithm": "SHA-256",
+  "bundle": {
+    "manifest_path": "AUTHORITY_MANIFEST.json",
+    "manifest_schema_path": "AUTHORITY_MANIFEST.schema.json",
+    "manifest_schema_role": "INFORMATIONAL_STRUCTURAL_REFERENCE_VERIFIER_IS_NORMATIVE",
+    "manifest_schema": "rei-sealed-native-build-authority-bundle/v1",
+    "rootfs_directory": "rootfs",
+    "manifest_digest_must_be_supplied_externally": true,
+    "reject_undeclared_files_and_symlinks": true,
+    "reject_special_files": true,
+    "require_declared_symlink_terminal": true,
+    "require_sorted_entries": true
+  },
+  "required_status": {
+    "classification": "BYTE_IDENTITY_NON_SCIENTIFIC_AUTHORITY_SUPPLEMENT",
+    "identity_class": "BYTE_IDENTITY",
+    "closure_claim": "PACKAGED_MEMBERS_ONLY_NO_RUNTIME_COMPLETENESS_CLAIM",
+    "runtime_boundary": "NOT_RUN",
+    "build": "NOT_RUN",
+    "native_tests": "NOT_RUN",
+    "adapter": "STOP_INVALID",
+    "canonical_pilot": "NOT_RUN",
+    "first_interval": "NO_PASS_FIRST_CANONICAL_INTERVAL",
+    "scientific_pass": "NOT_CLAIMED",
+    "scientific_publication": "NOT_RUN"
+  },
+  "required_files": [
+    {
+      "path": "/usr/bin/x86_64-linux-gnu-gcc-13",
+      "sha256": "6117c52522997d2aaccb2b52b3c6bf42c0a6c5edb1d718431fed6b2fc5fec234",
+      "size": 1023032,
+      "mode": "0755",
+      "role": "SEALED_COMPILER_DRIVER"
+    },
+    {
+      "path": "/usr/bin/x86_64-linux-gnu-ld.bfd",
+      "sha256": "5b674ea1d7017c2929f3c52c43487478bb240ecdd7197a25cce3813a70329a5c",
+      "size": 1359128,
+      "mode": "0755",
+      "role": "SEALED_LINK_EDITOR"
+    },
+    {
+      "path": "/usr/lib/x86_64-linux-gnu/libmpfr.so.6.2.1",
+      "sha256": "2156351fa3dedd04a7381c6ac7a8a26efa2d6fb08b80f8a2d644ccdd653710ae",
+      "size": 760464,
+      "mode": "0644",
+      "role": "SEALED_MPFR_4_2_1"
+    },
+    {
+      "path": "/usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0",
+      "sha256": "0ccdfb6d6f5c039465f6d002cf7e4c072d48ac6a2cffc8dd6c748dec31592804",
+      "size": 534896,
+      "mode": "0644",
+      "role": "SEALED_GMP_6_3_0"
+    }
+  ],
+  "required_symlinks": [
+    {
+      "path": "/usr/bin/cc",
+      "target": "/etc/alternatives/cc"
+    },
+    {
+      "path": "/etc/alternatives/cc",
+      "target": "/usr/bin/gcc"
+    },
+    {
+      "path": "/usr/bin/gcc",
+      "target": "gcc-13"
+    },
+    {
+      "path": "/usr/bin/gcc-13",
+      "target": "x86_64-linux-gnu-gcc-13"
+    },
+    {
+      "path": "/usr/bin/x86_64-linux-gnu-gcc",
+      "target": "x86_64-linux-gnu-gcc-13"
+    },
+    {
+      "path": "/usr/bin/ld",
+      "target": "x86_64-linux-gnu-ld"
+    },
+    {
+      "path": "/usr/bin/x86_64-linux-gnu-ld",
+      "target": "x86_64-linux-gnu-ld.bfd"
+    },
+    {
+      "path": "/usr/lib/x86_64-linux-gnu/libmpfr.so.6",
+      "target": "libmpfr.so.6.2.1"
+    },
+    {
+      "path": "/usr/lib/x86_64-linux-gnu/libgmp.so.10",
+      "target": "libgmp.so.10.5.0"
+    }
+  ],
+  "claim_boundary": {
+    "establishes": [
+      "the SHA-256 byte identity of every declared regular-file member",
+      "the exact rootfs-relative location and target text of every declared symbolic link",
+      "the exact two build-driver anchors and the locked MPFR/GMP anchors"
+    ],
+    "does_not_establish": [
+      "that the packaged native dependency closure is complete",
+      "that any member executes on the destination host",
+      "a kernel-enforced fresh-process read or execute allowlist",
+      "a successful Rust build, native test, operator replay, or scientific result"
+    ]
+  }
+}
