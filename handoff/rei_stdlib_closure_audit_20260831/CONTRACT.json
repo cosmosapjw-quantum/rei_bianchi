@@ -1,0 +1,75 @@
+{
+  "schema": "rei-rust-stdlib-closure-forensic-audit-contract/v1",
+  "classification": "FAIL_CLOSED_SECTION_0_COMPONENT_CLOSURE_REPAIR_HANDOFF",
+  "repository": "cosmosapjw-quantum/rei_bianchi",
+  "immutable_parent": {
+    "branch": "agent/implementation/rei-git-small-authority-intake-20260831-r1",
+    "commit": "507f7ce36d54d9879b8bdf4c2ed49994162ad16d",
+    "tree": "ae747a8e28beaa1dda18f4eccc955b153950142d",
+    "pull_request": 26
+  },
+  "locked_gate": {
+    "code": "RUST_STDLIB_CLOSURE_SHA256_MISMATCH",
+    "expected_sha256": "1d6d31c8f1c99b69b120c91fcff14220bbfcf0e8f976096f0c4992b7e2edc799",
+    "reported_observed_sha256": "7aae7f6cffe33365096e9f837378c9a26de46efd7d109eccd446d45703eee6c0",
+    "legacy_driver": "stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/rust/build_and_test.sh",
+    "legacy_algorithm": "cd RUST_STDLIB && find . -maxdepth 1 -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | awk '{print $1}'",
+    "legacy_path": "RUST_SYSROOT/lib/rustlib/x86_64-unknown-linux-gnu/lib"
+  },
+  "rust_archive": {
+    "path_role": "EXACT_ALREADY_ADMITTED_EXTERNAL_INPUT",
+    "file_name": "08-rust-1.94.1-x86_64-unknown-linux-gnu.tar.xz",
+    "size_bytes": 192287020,
+    "sha256": "294b3d81fa72e62581276290c60c81eb8b58498d333d422ca1dfc432877d0c40",
+    "stdlib_archive_prefix": "rust-1.94.1-x86_64-unknown-linux-gnu/rust-std-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/"
+  },
+  "admitted_preconditions": {
+    "mixed_source_materialization": "PASS",
+    "canonical_materialization_idempotent_replay": "PASS",
+    "input_lock": "PASS_36_OF_36",
+    "sealed_native_safe_extraction": "PASS",
+    "sealed_native_opaque_verification": "PASS",
+    "individual_stdlib_member_names_and_bytes": "USER_REPORTED_MATCH_62_OF_62"
+  },
+  "resolved_aggregate_evidence": {
+    "method": "the locked build driver hashes the exact GNU sha256sum text transcript of immediate regular files under RUST_STDLIB",
+    "base_rust_std_member_count": 62,
+    "base_rust_std_legacy_closure_sha256": "7aae7f6cffe33365096e9f837378c9a26de46efd7d109eccd446d45703eee6c0",
+    "base_rust_std_matches_reported_observed": true,
+    "locked_full_sysroot_member_count": 64,
+    "locked_full_sysroot_legacy_closure_sha256": "1d6d31c8f1c99b69b120c91fcff14220bbfcf0e8f976096f0c4992b7e2edc799",
+    "required_supplement_contract": "REPAIR_CONTRACT.json",
+    "interpretation": "The lock is a 64-member closure. The supplied rust-std component supplies the matching 62-member base; the two exact llvm-tools-preview members named by REPAIR_CONTRACT.json complete the locked closure."
+  },
+  "allowed_actions": [
+    "read exact admitted Rust archive members without extracting or executing them",
+    "read direct regular files under the already-admitted stdlib directory",
+    "invoke only find, sort, xargs, and sha256sum to replay the legacy aggregate transcript",
+    "record binary hashes and locale inputs for those host utilities",
+    "run materialize_missing_components.py first in dry-run mode and then, only on an exact dry-run result, create-only materialize the two REPAIR_CONTRACT.json members",
+    "write create-only receipts and a durable checkpoint",
+    "replay the entire immutable Section 0 in a fresh process after the repair receipt reports the locked digest"
+  ],
+  "forbidden_actions": [
+    "modifying the locked closure digest or build driver",
+    "running rustc, cargo, repository Python, JAX, jaxlib, or any archive member",
+    "native build, runtime boundary, BASS or REC admission, four-site operator, node replay, restart, formal audit, canonical pilot, or scientific publication",
+    "substituting a component, archive, target file, or digest not named by REPAIR_CONTRACT.json",
+    "treating this repair receipt as a Section 0 or scientific pass"
+  ],
+  "decision_rules": {
+    "archive_member_mismatch": "STOP_INVALID; retain member-level evidence",
+    "legacy_shell_python_divergence": "STOP_INVALID; retain raw transcript hashes, utility bytes, and locale evidence",
+    "base_62_digest_matches_reported_observed": "Run only the REPAIR_CONTRACT.json dry run; do not alter the locked driver or closure digest.",
+    "repair_dry_run_exact": "Apply only the exact declared supplements create-only, then verify the returned 64-member closure digest.",
+    "repair_result_matches_locked": "Run a fresh complete immutable Section 0 replay before considering any successor.",
+    "any_repair_failure_or_conflict": "STOP_INVALID; preserve receipts and do not substitute bytes."
+  },
+  "claim_ceiling": {
+    "adapter": "STOP_INVALID",
+    "canonical_pilot": "NOT_RUN",
+    "first_interval": "NO_PASS_FIRST_CANONICAL_INTERVAL",
+    "scientific_pass": "NOT_CLAIMED",
+    "scientific_publication": "NOT_RUN"
+  }
+}
