@@ -1,4 +1,4 @@
-# Local Codex job — REI Rust host-authority continuation
+# Local Codex job — REI Rust host-authority Git-small continuation
 
 You are the single root local Codex job responsible for continuing
 `cosmosapjw-quantum/rei_bianchi`. Perform every remaining action that requires
@@ -9,14 +9,21 @@ absolute locator or an OS/GitHub approval that cannot be obtained by the job.
 ## Immutable authority
 
 - remote branch:
-  `agent/implementation/rei-rust-host-authority-intake-20260831-r2`
-- reconstruction base: commit
+  `agent/implementation/rei-git-authority-transport-20260831-r1`
+- stack parent: commit
+  `d549c91fe078b2e9f567c09f2be50df95fb28d79`, tree
+  `53f69801e733f045b4925cb9d4d4b21d6c1f71c3`
+- historical reconstruction base: commit
   `59c3c9d135860cf3d359a0b70c370eb65b918898`, tree
   `c6ee7d9959c5f5ffe1aa87f056b8c90cd1dd9653`
 - user-reported checkpoint `c7792c854fb00ba6bbed31baa9c2e3da13ceee9e`
   is not a usable base unless its exact object later materializes and is
   independently admitted
 - external-input contract: `CONTRACT.json`
+- Git-resident small-input manifest:
+  `git_authority_transport/SMALL_INPUTS_MANIFEST.json`
+- Git-resident small-input directory:
+  `git_authority_transport/small_inputs/`
 - technical intake procedure: `LOCAL_EXECUTION_PROMPT.md`
 - sealed-native procedure:
   `../rei_sealed_native_build_authority_20260831/LOCAL_EXECUTION_PROMPT.md`
@@ -31,7 +38,9 @@ to its older branch after beginning this continuation.
 First fetch read-only refs, resolve the remote branch to an exact commit/tree,
 and create a new isolated worktree and continuation branch. Preserve every
 existing dirty/untracked checkout and worktree. Verify all handoff manifests
-before interpreting their contents. Never substitute semantically similar
+including `MANIFEST.sha256` and
+`git_authority_transport/MANIFEST.sha256` before interpreting their contents.
+Never substitute semantically similar
 archives, toolchains, commits, locators, receipts, or host binaries for locked
 bytes.
 
@@ -66,15 +75,36 @@ exact commit/tree, Git object integrity, clone configuration, and Git-resident
 handoff manifests in a new isolated worktree. Reject shallow, promisor,
 partial-clone, alternates, lazy-object, and worktree-config state.
 
-### 1. Exact external intake
+### 1. Git-small plus exact Rust external intake
 
-Use `materialize_authority.py` with the canonical `CONTRACT.json` to install
-the five exact files into a new external authority root. The source and
-destination roots must be distinct, real, non-symlink directories. Preserve
-the byte-bound receipt and require an identical idempotent second invocation.
-Do not execute the archives or source the environment script. Run in an
-exclusive authority tree with no concurrent writer: this receipt is
-point-in-time byte evidence, not kernel-enforced pathname immutability.
+The four small contract inputs are already Git-resident under
+`git_authority_transport/small_inputs/`; verify them against both
+`SMALL_INPUTS_MANIFEST.json` and `CONTRACT.json`. Do not ask the user to
+download those four files. Ask only for one absolute, real non-symlink source
+directory containing:
+
+```text
+08-rust-1.94.1-x86_64-unknown-linux-gnu.tar.xz
+size        192287020
+SHA-256     294b3d81fa72e62581276290c60c81eb8b58498d333d422ca1dfc432877d0c40
+```
+
+If that locator is unavailable, record exactly
+`RUST_ARCHIVE_SOURCE_MISSING`, push a durable stacked draft checkpoint, and
+stop all successors. Do not broaden the search or substitute a similar Rust
+archive.
+
+Use `git_authority_transport/materialize_small_plus_rust.py` to construct a
+new staged source root and a byte-bound mixed-source receipt. It must run
+after Git manifest verification but before repository numerical/native imports
+and must not execute, extract, or source any input member. Then use the
+existing `materialize_authority.py` with that staged source root to install all
+five exact files into a new external authority root. The final production
+materializer's source and destination roots must be distinct, real,
+non-symlink directories; preserve its byte-bound receipt and require an
+identical idempotent second invocation. Run in an exclusive authority tree
+with no concurrent writer: either receipt is point-in-time byte evidence, not
+kernel-enforced pathname immutability.
 
 Now verify all 36 `INPUT_LOCK.json` path descriptors against the materialized
 bytes and preserve the result. This verification and step 0 must pass before

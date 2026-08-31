@@ -1,11 +1,21 @@
 {
-  "schema": "rei-local-01-host-authority-continuation/v1",
+  "schema": "rei-local-01-host-authority-continuation/v2",
   "classification": "HOST_AUTHORITY_INTAKE_ONLY_STOP_INVALID",
   "repository": "cosmosapjw-quantum/rei_bianchi",
-  "continuation_branch": "agent/implementation/rei-rust-host-authority-intake-20260831-r2",
-  "continuation_base": {
+  "continuation_branch": "agent/implementation/rei-git-authority-transport-20260831-r1",
+  "stack_parent": {
+    "commit": "d549c91fe078b2e9f567c09f2be50df95fb28d79",
+    "tree": "53f69801e733f045b4925cb9d4d4b21d6c1f71c3",
+    "classification": "IMMUTABLE_GIT_PARENT"
+  },
+  "historical_reconstruction_base": {
     "commit": "59c3c9d135860cf3d359a0b70c370eb65b918898",
     "tree": "c6ee7d9959c5f5ffe1aa87f056b8c90cd1dd9653"
+  },
+  "continuation_base": {
+    "commit": "59c3c9d135860cf3d359a0b70c370eb65b918898",
+    "tree": "c6ee7d9959c5f5ffe1aa87f056b8c90cd1dd9653",
+    "compatibility_role": "HISTORICAL_RECONSTRUCTION_BASE_ONLY"
   },
   "reported_checkpoint": {
     "commit": "c7792c854fb00ba6bbed31baa9c2e3da13ceee9e",
@@ -17,13 +27,50 @@
   },
   "external_input_contract": "CONTRACT.json",
   "local_codex_job_prompt": "LOCAL_CODEX_JOB_PROMPT.md",
+  "git_small_inputs": {
+    "directory": "git_authority_transport/small_inputs",
+    "manifest": "git_authority_transport/SMALL_INPUTS_MANIFEST.json",
+    "transport_manifest": "git_authority_transport/MANIFEST.sha256",
+    "record": "git_authority_transport/GIT_SMALL_INPUTS_RECORD.json",
+    "classification": "BYTE_IDENTITY_DIRECT_GIT_BLOBS",
+    "user_host_assembly": "NOT_RUN",
+    "files": [
+      {
+        "name": "01-physmath-research-harness-gpt56.zip",
+        "size": 32648,
+        "sha256": "9adde688f8020e7feb2c1c0304b3204dbe70dd01e2d87e64a5c4eb357c019934"
+      },
+      {
+        "name": "02-physmath-coding-harness-gpt56.zip",
+        "size": 25533,
+        "sha256": "6e67e999a0c19f6ed9de7c339067cc11691d5cf5cb662a11756d8fc393c849b4"
+      },
+      {
+        "name": "04-rust-1.94.1-x86_64-unknown-linux-gnu.tar.xz.asc",
+        "size": 801,
+        "sha256": "942bc6926af6a2130d70e77933e3df09d39beeedafad77710259e6df7eadee08"
+      },
+      {
+        "name": "05-rust_1_94_1_env.sh",
+        "size": 240,
+        "sha256": "8e84fa4b09a0e7e50f05302f4e3b3373442fdbd4f3ddb725713e082d9776b64b"
+      }
+    ]
+  },
+  "external_rust_archive": {
+    "name": "08-rust-1.94.1-x86_64-unknown-linux-gnu.tar.xz",
+    "size": 192287020,
+    "sha256": "294b3d81fa72e62581276290c60c81eb8b58498d333d422ca1dfc432877d0c40",
+    "git_residency": "EXCLUDED_BY_USER_DECISION",
+    "source_locator": "REQUIRED_ON_USER_HOST"
+  },
   "downstream_handoff_supersession": {
     "path": "../rei_local_01_rust_rebuild_20260830/LOCAL_EXECUTION_PROMPT.md",
     "normative_sections": "1_through_7_only",
     "superseded": "opening_branch_and_base_requirement",
     "active_lineage": "this continuation branch and its exact pushed head/tree"
   },
-  "external_input_status": "PASS_EXTERNAL_BYTE_IDENTITY_ONLY",
+  "external_input_status": "GIT_SMALL_INPUTS_AVAILABLE_RUST_ARCHIVE_REQUIRED",
   "production_destination_materialization": "NOT_RUN_ON_USER_HOST",
   "sealed_native_authority": {
     "file_name": "REI_SEALED_BUILD_DRIVER_AUTHORITY_20260831.v2.tar.xz",
@@ -41,7 +88,9 @@
   },
   "dependency_order": [
     "verify the exact Git checkout and Git-resident handoff manifests",
-    "materialize five exact project_sources bytes",
+    "verify the four Git-resident small inputs against the canonical contract",
+    "materialize those four inputs with the one exact external Rust archive into a fresh staged source root",
+    "materialize the five exact project_sources bytes through materialize_authority.py and require its idempotent replay",
     "verify all 36 INPUT_LOCK path descriptors",
     "verify and safely extract the sealed native authority supplement",
     "complete the native immutable Section 0 identity closure",

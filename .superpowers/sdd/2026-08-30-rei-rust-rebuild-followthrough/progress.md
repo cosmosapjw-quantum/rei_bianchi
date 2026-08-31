@@ -120,6 +120,52 @@ No blocker may receive more than one diagnostic retry without a material delta.
 Exact commands and exit codes are appended only after fresh execution.  A
 summary-reported pass is context, not current evidence.
 
+## Git-resident small authority-input delivery — 2026-08-31 (current-executor complete)
+
+- task layer: `implement`.
+- requested material delta: deliver the four exact small members of
+  `handoff/rei_local_01_host_authority_20260831/CONTRACT.json` as Git-tracked
+  bytes, while retaining the 192,287,020-byte Rust archive as the only
+  user-host external input at this gate.
+- invariant: this is a `BYTE_IDENTITY` delivery only after the checked-in
+  files, `SMALL_INPUTS_MANIFEST.json`, and the canonical contract agree on
+  names, sizes, and SHA-256 values.  It does not turn a Git checkout into a
+  user-host `EXTERNAL_INTAKE_RECEIPT`.
+- pre-implementation RED evidence:
+  `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v handoff.rei_local_01_host_authority_20260831.git_authority_transport.test_materialize_small_plus_rust`
+  — exit `1`; the three focused tests failed because
+  `materialize_small_plus_rust.py` did not exist.  No repository numerical,
+  native, JAX, or canonical-pilot path was executed.
+- implemented: `git_authority_transport/materialize_small_plus_rust.py`, a
+  Python-standard-library-only, descriptor-bound, create-only staged-source
+  materializer. It validates the canonical contract and the separate
+  four-file Git manifest before it creates any destination entry; it does not
+  extract, execute, source, import, or run a payload.
+- implemented: Git-tracked direct byte copies for the four small inputs,
+  their exact small-input manifest, a recursive transport manifest, a scoped
+  current-executor record, and a local-Codex resume prompt. The 192,287,020
+  byte Rust archive was deliberately not added to Git.
+- focused verification:
+  `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v handoff.rei_local_01_host_authority_20260831.test_materialize_authority handoff.rei_local_01_host_authority_20260831.git_authority_transport.test_materialize_small_plus_rust`
+  — exit `0`; `26/26` passed. This includes the four-plus-one exact copy,
+  tampered Rust rejection before destination creation, symlink rejection,
+  Git-source/destination-overlap rejection, canonical materializer
+  compatibility, and both handoff manifests.
+- integration verification: the standalone staging tool was run against the
+  four Git bytes and the supplied exact Rust archive, then the canonical
+  materializer was run twice against the staged source root. Both five-file
+  receipts verified `5/5`, every destination was mode `0444`, and the second
+  canonical materializer invocation was idempotent. After the overlap repair,
+  the staging path was freshly repeated with the actual archive and again
+  verified `5/5` exact, mode-`0444` outputs. This is current-executor evidence
+  only; no user-host receipt, repository Python/native route, JAX, sealed
+  supplement, runtime boundary, BASS/REC, node replay, restart, formal gate,
+  or canonical pilot was run.
+- next bounded local action: local Codex verifies the pushed Git manifests and
+  supplies only an absolute real non-symlink source directory for the one
+  Rust archive. If it is absent, it must record
+  `RUST_ARCHIVE_SOURCE_MISSING`, push a stacked draft checkpoint, and stop.
+
 - `PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:. python3 -m unittest -v stages.REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER.tests.test_universal_policy stages.REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER.tests.test_runtime_input_closure`
   — final exit `0`; `22/22` passed (`8` universal-policy and `14`
   automatic runtime-observer tests).

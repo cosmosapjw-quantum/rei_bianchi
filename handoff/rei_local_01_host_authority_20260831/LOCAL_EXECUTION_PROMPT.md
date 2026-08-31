@@ -6,9 +6,11 @@ not ask the user to reconstruct this procedure as a sequence of manual shell
 commands.
 
 Resume from the pushed head of
-`agent/implementation/rei-rust-host-authority-intake-20260831-r2`. The base
-for this reconstruction is PR #22 head `59c3c9d135860cf3d359a0b70c370eb65b918898`,
-tree `c6ee7d9959c5f5ffe1aa87f056b8c90cd1dd9653`. The user-reported local
+`agent/implementation/rei-git-authority-transport-20260831-r1`. Its immutable
+stack parent is commit `d549c91fe078b2e9f567c09f2be50df95fb28d79`, tree
+`53f69801e733f045b4925cb9d4d4b21d6c1f71c3`. The historical reconstruction
+base is PR #22 head `59c3c9d135860cf3d359a0b70c370eb65b918898`, tree
+`c6ee7d9959c5f5ffe1aa87f056b8c90cd1dd9653`. The user-reported local
 checkpoint `c7792c854f...` was unavailable on this executor and GitHub; do not
 claim this branch is its byte-identical reconstruction.
 
@@ -17,20 +19,62 @@ claim this branch is its byte-identical reconstruction.
 Resolve the pushed branch to an exact commit/tree, create an isolated
 worktree, run `git fsck --full`, and reject shallow, promisor, partial-clone,
 alternates, lazy-object, and worktree-config state. Verify the Git-resident
-handoff manifests before interpreting this handoff. Do not inspect or use the
-sealed supplement yet.
+handoff manifests before interpreting this handoff: both
+`handoff/rei_local_01_host_authority_20260831/MANIFEST.sha256` and
+`handoff/rei_local_01_host_authority_20260831/git_authority_transport/MANIFEST.sha256`
+must pass. Do not inspect or use the sealed supplement yet.
 
-## B. Materialize and verify the five exact external inputs
+## B. Assemble four Git-resident small inputs with one external Rust archive
 
-Place the five supplied files under one non-symlink source directory using
-the exact basenames in `CONTRACT.json`. Select a new external authority root;
-do not place the 192 MB Rust archive in Git. Run:
+The four exact small inputs are already committed at:
+
+```text
+handoff/rei_local_01_host_authority_20260831/git_authority_transport/small_inputs/
+```
+
+Verify them against both `SMALL_INPUTS_MANIFEST.json` and `CONTRACT.json`; do
+not ask the user to download them again. Obtain only the exact Rust archive
+under one real non-symlink external source directory:
+
+```text
+08-rust-1.94.1-x86_64-unknown-linux-gnu.tar.xz
+size        192287020
+SHA-256     294b3d81fa72e62581276290c60c81eb8b58498d333d422ca1dfc432877d0c40
+```
+
+If the locator or bytes are unavailable, record
+`RUST_ARCHIVE_SOURCE_MISSING` (or the observed exact-byte failure), push a
+durable draft checkpoint, and stop before `materialize_authority.py`, the
+sealed supplement, or any repository runtime/import path. Do not substitute a
+semantic equivalent.
+
+Select a fresh staging root and run:
+
+```bash
+/usr/bin/python3 -I -S -B \
+  handoff/rei_local_01_host_authority_20260831/git_authority_transport/materialize_small_plus_rust.py \
+  --git-small-root handoff/rei_local_01_host_authority_20260831/git_authority_transport/small_inputs \
+  --rust-source-root /absolute/rust-archive-source \
+  --contract handoff/rei_local_01_host_authority_20260831/CONTRACT.json \
+  --small-manifest handoff/rei_local_01_host_authority_20260831/git_authority_transport/SMALL_INPUTS_MANIFEST.json \
+  --destination-root /absolute/authority/staged-project_sources \
+  --receipt /absolute/evidence/git-small-plus-rust-receipt.json
+```
+
+The staging tool preflights every member, uses file descriptors and
+create-only publication, writes mode `0444`, and never executes an archive or
+sources the environment script. Its receipt records the distinct Git and
+external origins; it is not yet the final external-intake receipt.
+
+## C. Materialize and verify the five exact staged inputs
+
+Pass the freshly created staged root to the canonical materializer:
 
 ```bash
 /usr/bin/python3 -I -S -B \
   handoff/rei_local_01_host_authority_20260831/materialize_authority.py \
   --contract handoff/rei_local_01_host_authority_20260831/CONTRACT.json \
-  --source-root /absolute/downloaded/project_sources \
+  --source-root /absolute/authority/staged-project_sources \
   --destination-root /absolute/authority/project_sources \
   --receipt /absolute/evidence/project_sources_materialization.json
 ```
@@ -46,7 +90,7 @@ This is point-in-time byte evidence, not a kernel lock. Run in an exclusive
 authority tree with no concurrent writer. Then verify all 36 `INPUT_LOCK.json`
 path descriptors and preserve that receipt before admitting the supplement.
 
-## C. Admit the sealed native authority supplement
+## D. Admit the sealed native authority supplement
 
 Obtain `REI_SEALED_BUILD_DRIVER_AUTHORITY_20260831.v2.tar.xz` and record these
 values outside the archive before extraction:
@@ -65,7 +109,7 @@ writers; pathname immutability is not kernel-enforced until the later process
 boundary. Rendered `bwrap` arguments are a non-executable fragment with
 unresolved fields, not permission to launch.
 
-## D. Complete immutable Section 0
+## E. Complete immutable Section 0
 
 Pin the repository head/tree, run `git fsck --full`, reject shallow/promisor/
 partial-clone/alternates/lazy-object/worktree-config state, and verify the two
@@ -75,7 +119,7 @@ Recheck the compiler driver, GNU linker, Rust, LLVM, stdlib, MPFR, and GMP
 identities from the isolated authority. Do not import repository Python, JAX,
 or `jaxlib` during immutable intake.
 
-## E. Stop before runtime until the process policy is complete
+## F. Stop before runtime until the process policy is complete
 
 The supplement deliberately does not pin a complete `bwrap`/child/mount/
 `/proc`/`/dev` access policy. Compile and independently audit that policy

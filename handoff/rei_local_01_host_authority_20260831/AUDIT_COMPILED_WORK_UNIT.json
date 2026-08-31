@@ -1,15 +1,23 @@
 {
   "schema": "rei-host-authority-audit-compiled-work-unit/v1",
-  "classification": "PRE_RUNTIME_AUTHORITY_DELIVERY_ONLY",
-  "continuation_base": "59c3c9d135860cf3d359a0b70c370eb65b918898",
+  "classification": "PRE_RUNTIME_GIT_SMALL_AUTHORITY_DELIVERY_ONLY",
+  "continuation_base": "d549c91fe078b2e9f567c09f2be50df95fb28d79",
   "claims": [
+    {
+      "id": "C-HOST-GIT-SMALL-INPUTS",
+      "invariant": "the four Git-resident small members are exactly the matching canonical-contract bytes",
+      "gate": "raw SHA-256 and size comparison of Git blobs, SMALL_INPUTS_MANIFEST.json, and CONTRACT.json",
+      "expected": "4/4 exact; no authority member executed",
+      "evidence": "git_authority_transport/GIT_SMALL_INPUTS_RECORD.json, SMALL_INPUTS_MANIFEST.json, and focused materializer tests",
+      "status": "PASS_CURRENT_EXECUTOR_GIT_BYTE_IDENTITY_ONLY"
+    },
     {
       "id": "C-HOST-EXTERNAL-INTAKE",
       "invariant": "all five formerly missing inputs are the exact INPUT_LOCK bytes",
-      "gate": "production contract comparison, SHA-256, size, and container checks",
+      "gate": "mixed staged-source assembly followed by production contract comparison, SHA-256, size, and container checks",
       "expected": "5/5 exact; no authority member executed",
-      "evidence": "EXTERNAL_INTAKE_RECEIPT.json and materializer tests",
-      "status": "PASS_EXTERNAL_BYTE_IDENTITY_ONLY"
+      "evidence": "requires a user-host mixed-source receipt plus EXTERNAL_INTAKE_RECEIPT.json and materializer tests",
+      "status": "NOT_RUN_ON_USER_HOST"
     },
     {
       "id": "C-HOST-SECTION-0-PATHS",
