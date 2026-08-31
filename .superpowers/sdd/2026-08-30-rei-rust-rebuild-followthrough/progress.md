@@ -21,6 +21,32 @@ Recovery classification: `RECOVERED_FROM_SUMMARY_NOT_BYTE_IDENTICAL`
 - recovery note: the previous transient worktree was unavailable; this branch
   is a new reconstruction and does not claim byte identity with it.
 
+## Host-authority continuation checkpoint — 2026-08-31
+
+- continuation base: `fd3ff60fcb4f356ce81d7a48a4c1aec8f8b8b06e` /
+  `1e5e5fad64c01fe0cdb9c6e3cb366b0f5661d4b4` (remote
+  `agent/implementation/rei-rust-host-authority-intake-20260831-r2`), with
+  immutable parent `59c3c9d135860cf3d359a0b70c370eb65b918898` /
+  `c6ee7d9959c5f5ffe1aa87f056b8c90cd1dd9653`.
+- status: `STOP_INVALID` at `EXTERNAL_AUTHORITY_SOURCE_ROOT_MISSING`.
+- observed: the remote exact head/tree, non-shallow non-promisor SHA-1 object
+  store, isolated continuation worktree, and all four Git-resident handoff
+  manifests passed.  The host did not materialize any of the five exact
+  `CONTRACT.json` input files from a real source root.
+- bounded discovery: exact filename-only searches of the user home, declared
+  shared/upload roots, and all mounted user filesystems found zero paths.  This
+  is not evidence that another undisclosed host location lacks the files.
+- durable external evidence: `/tmp/rei-rust-host-authority-20260831-state.md`,
+  SHA-256 `7962e14790bec89a98a5802387938c8e71fa6d5c9efaf9aa8089268c7b349de5` at
+  checkpoint creation; it records commands, exit statuses, observations, and
+  intentionally unrun successors.
+- next executable action: supply one absolute, real non-symlink directory
+  containing all five exact contract-bound files.  Do not substitute archives,
+  toolchains, receipts, or reconstructed bytes.
+- claim ceiling: `adapter=STOP_INVALID`, `canonical_pilot=NOT_RUN`,
+  `first_interval=NO_PASS_FIRST_CANONICAL_INTERVAL`,
+  `scientific_pass=NOT_CLAIMED`, and `scientific_publication=NOT_RUN`.
+
 ## Material deltas
 
 1. `OBSERVED`: exact base commit/tree and both supplied harness archive hashes.
