@@ -369,3 +369,51 @@ summary-reported pass is context, not current evidence.
   `adapter=STOP_INVALID`, `canonical_pilot=NOT_RUN`,
   `first_interval=NO_PASS_FIRST_CANONICAL_INTERVAL`,
   `scientific_pass=NOT_CLAIMED`, and `scientific_publication=NOT_RUN`.
+
+## Standalone host-context repair handoff — 2026-09-01
+
+- task layers: `research -> design -> implement -> validate -> review`;
+  this checkpoint contains no Rust/native/scientific execution.
+- immutable predecessor: draft PR #30 head
+  `723882d80d57ee8a919bc52ab74633b743447d0c`, tree
+  `3fe6f79d210085d1f44de14cca53d9ed1cff347e`.
+- observed failure classification: the absent `prunable` linked-worktree record
+  is Git execution metadata, not a scientific input or numerical result.  The
+  exception occurred before evidence-root creation, Rust build, interval
+  division, BASS/REC, Task 6, or node replay, so it changes no PHYS-MATH claim.
+- bounded research decision: `PROMOTE` a fresh standalone clone plus explicit
+  authenticated Rust locator; `HOLD` the production prunable-aware parser
+  because it changes locked bytes and requires Section 0 rebinding; `REJECT`
+  `git worktree prune` because it mutates shared administration metadata.
+- policy compilation: the four Universal directives are represented by one
+  replacement execution assumption, typed byte/metadata identity, one
+  mechanical detector per observed/predicted P0/P1, one create-only native
+  attempt claim, one fresh review, and zero recursive reviews.  Their full prose
+  is not duplicated into a new repository policy layer.
+- new handoff package:
+  `handoff/rei_runtime_bridge_host_context_repair_20260901/`.  It preserves
+  the locked bridge/Rust/INPUT_LOCK/amendment/source hashes, requires a private
+  non-shallow standalone clone with exactly one existing nonprunable root and
+  no alternates, and requires absolute `--rustc` delivery while the existing
+  bridge remains compiler-byte authority.
+- attempt control: runner entry creates
+  `/tmp/rei-runtime-bridge-host-context-repair-20260901.native-attempt.json`
+  with `O_EXCL`; a second invocation fails before dispatch with
+  `RUNTIME_ATTEMPT_ALREADY_CLAIMED`.
+- focused verification: package tests `10/10 PASS`; closed manifest `5/5
+  PASS`; JSON parse PASS; a real temporary standalone Git clone passed the
+  private-common-dir/single-root context check; post-repair independent review
+  found no remaining reproducible P0/P1.
+- intentionally not run: the local installed Rust compiler, native build,
+  interval division, BASS/REC, four-site operator, node 38382, REIAFF1, formal
+  systems, PHYS-MATH/PHYS-MATH-CODE, the 46,080-by-3 pilot, publication, JAX,
+  and JAXLIB.
+- next executable action: local Codex follows the published package prompt,
+  supplies the exact release head/tree from delivery readback, the existing
+  Section 0 receipt, and the repaired-host absolute Rust locator, then invokes
+  the runner once and checkpoints the first result.
+- claim ceiling remains `adapter=STOP_INVALID`,
+  `canonical_pilot=NOT_RUN`,
+  `first_interval=NO_PASS_FIRST_CANONICAL_INTERVAL`,
+  `scientific_pass=NOT_CLAIMED`, and
+  `scientific_publication=NOT_RUN`.
