@@ -445,6 +445,19 @@ def main(argv: list[str] | None = None) -> int:
             "scientific_pass": "NOT_CLAIMED",
         }
         exit_code = 65
+    except Exception as exc:
+        result = {
+            "schema": SCHEMA,
+            "classification": "FAIL_CLOSED_SECTION_0_DIAGNOSTIC_ONLY",
+            "status": "STOP_INVALID",
+            "first_failing_gate": "UNEXPECTED_AUDIT_INTERNAL_ERROR",
+            "detail": f"{type(exc).__name__}: {exc}",
+            "runtime_boundary": "NOT_RUN",
+            "repository_or_native_execution": "NOT_RUN",
+            "canonical_pilot": "NOT_RUN",
+            "scientific_pass": "NOT_CLAIMED",
+        }
+        exit_code = 65
     try:
         _write_create_only(args.receipt, result)
     except AuditError as exc:
