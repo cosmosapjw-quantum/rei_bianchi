@@ -56,7 +56,9 @@ jobs:
           cache: maven
       - name: Download JAS 2.7.200 and run exact rational polynomial oracle
         run: |
+          mvn -q -f research/external_cas/rei_xcas_01/jas/pom.xml dependency:copy-dependencies -DincludeScope=runtime
           mvn -q -f research/external_cas/rei_xcas_01/jas/pom.xml -DskipTests package
+          test -f research/external_cas/rei_xcas_01/jas/target/dependency/jas-2.7.200.jar
           java -cp 'research/external_cas/rei_xcas_01/jas/target/classes:research/external_cas/rei_xcas_01/jas/target/dependency/*' ReiXcasOracle
       - uses: actions/upload-artifact@v4
         with:
