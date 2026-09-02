@@ -13,12 +13,16 @@ on:
 permissions:
   contents: read
 
+env:
+  EXACT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+
 jobs:
   contract:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ env.EXACT_HEAD }}
           fetch-depth: 0
       - name: Verify exact REI source binding and changed-path closure
         run: python3 research/external_cas/rei_xcas_01/verify_contract.py
@@ -32,6 +36,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXACT_HEAD }}
       - name: Install GNU Octave
         run: |
           sudo apt-get update
@@ -49,6 +55,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXACT_HEAD }}
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -70,6 +78,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXACT_HEAD }}
       - uses: julia-actions/setup-julia@v2
         with:
           version: '1.12.6'
@@ -88,6 +98,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXACT_HEAD }}
       - uses: actions/download-artifact@v4
         with:
           pattern: rei-xcas-*-receipt
