@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "stage_id": "REI-XCAS-01_THIRD_RED",
+  "workflow_run": 33676819479,
+  "head": "73224e1a8484a3664163d651d54e6aa240832c08",
+  "status": "EXPECTED_REPAIRABLE_JULIA_SUBSTITUTION_EVALUATION_FAILURE",
+  "exact_head_checkout": "PASS",
+  "passed_axes": {
+    "contract": "PASS",
+    "gnu_octave_8_4_0": "PASS_512_SAMPLES",
+    "jas_2_7_200": "PASS_29_EXACT_CHECKS",
+    "julia_environment": "PASS_JULIA_1_12_6_SYMBOLICS_7_31_0",
+    "julia_bigfloat": {
+      "status": "PASS_256_SAMPLES",
+      "max_residual": "6.045317988566111237770446303960279699781200255105396969516592429118014262213699e-77",
+      "tolerance": "1e-50"
+    }
+  },
+  "julia_symbolic": {
+    "status": "FAIL_ONE_COMPOUND_ASSERTION",
+    "passed_checks": 9,
+    "failed_check": "transmission_origin_and_thin_derivative",
+    "diagnosis": "Symbolics 7 substitution defaults to fold=Val(false), so a numerically closed substituted expression need not be evaluated automatically",
+    "formula_failure": false
+  },
+  "authorized_repair": [
+    "use Symbolics.substitute with fold=Val(true) for numerical origin evaluation",
+    "split transmission origin, transmission derivative and absorption derivative into separate checks",
+    "preserve the resolved Julia Manifest.toml in the workflow artifact",
+    "render numerical residual-to-tolerance margins from actual receipts"
+  ],
+  "forbidden_repair": [
+    "change REI production formulas",
+    "relax the 1e-50 Julia BigFloat tolerance",
+    "remove hostile controls",
+    "promote runtime, interval, provider or science claims"
+  ]
+}

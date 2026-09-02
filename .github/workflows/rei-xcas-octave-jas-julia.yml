@@ -1,0 +1,121 @@
+name: rei-xcas-octave-jas-julia
+
+on:
+  push:
+    branches:
+      - audit/rei-xcas-octave-jas-julia-20260903-r1
+  pull_request:
+    paths:
+      - research/external_cas/rei_xcas_01/**
+      - .github/workflows/rei-xcas-octave-jas-julia.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  EXACT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXACT_HEAD }}
+          fetch-depth: 0
+      - name: Verify exact REI source binding and changed-path closure
+        run: python3 research/external_cas/rei_xcas_01/verify_contract.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rei-xcas-contract-receipt
+          path: research/external_cas/rei_xcas_01/receipts/contract_receipt.json
+
+  octave:
+    needs: contract
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXACT_HEAD }}
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends octave
+          octave --version | head -n 2
+      - name: Run deterministic numerical and hostile-mutation oracle
+        run: octave --quiet --no-gui --eval "addpath('research/external_cas/rei_xcas_01/octave'); verify_rei_xcas_octave"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rei-xcas-octave-receipt
+          path: research/external_cas/rei_xcas_01/receipts/octave_receipt.json
+
+  jas:
+    needs: contract
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXACT_HEAD }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Download JAS 2.7.200 and run exact rational polynomial oracle
+        run: |
+          mvn -q -f research/external_cas/rei_xcas_01/jas/pom.xml dependency:copy-dependencies -DincludeScope=runtime
+          mvn -q -f research/external_cas/rei_xcas_01/jas/pom.xml -DskipTests package
+          test -f research/external_cas/rei_xcas_01/jas/target/dependency/jas-2.7.200.jar
+          java -cp 'research/external_cas/rei_xcas_01/jas/target/classes:research/external_cas/rei_xcas_01/jas/target/dependency/*' ReiXcasOracle
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rei-xcas-jas-receipt
+          path: research/external_cas/rei_xcas_01/receipts/jas_receipt.json
+
+  julia:
+    needs: contract
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXACT_HEAD }}
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.12.6'
+      - uses: julia-actions/cache@v2
+      - name: Resolve exact Symbolics environment
+        run: julia --project=research/external_cas/rei_xcas_01/julia -e 'using Pkg; Pkg.instantiate(); Pkg.status()'
+      - name: Run symbolic, derivative, BigFloat and hostile-mutation oracle
+        run: julia --project=research/external_cas/rei_xcas_01/julia research/external_cas/rei_xcas_01/julia/verify_rei_xcas_julia.jl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rei-xcas-julia-receipt
+          path: |
+            research/external_cas/rei_xcas_01/receipts/julia_receipt.json
+            research/external_cas/rei_xcas_01/julia/Manifest.toml
+
+  aggregate:
+    needs: [contract, octave, jas, julia]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXACT_HEAD }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rei-xcas-*-receipt
+          path: external-receipts
+          merge-multiple: true
+      - name: Render plots and aggregate machine-readable receipt
+        run: |
+          python3 -m pip install --quiet matplotlib
+          python3 research/external_cas/rei_xcas_01/render_crosscheck_plot.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rei-xcas-aggregate-evidence
+          path: |
+            research/external_cas/rei_xcas_01/receipts/aggregate_receipt.json
+            research/external_cas/rei_xcas_01/plots/external_cas_check_coverage.png
+            research/external_cas/rei_xcas_01/plots/numerical_residual_margins.png
+            research/external_cas/rei_xcas_01/plots/numerical_residual_margins.csv

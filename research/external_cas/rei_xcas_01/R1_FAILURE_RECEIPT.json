@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "stage_id": "REI-XCAS-01_INITIAL_RED",
+  "workflow_run": 33675518373,
+  "head": "696fb148cb2da3f190eac6be45af62ca4fb2fd6f",
+  "status": "EXPECTED_REPAIRABLE_VERIFIER_FAILURES",
+  "contract_job": "PASS",
+  "jas": {
+    "status": "FAIL_RUNTIME_CLASSPATH",
+    "failure": "NoClassDefFoundError: edu/jas/structure/RingFactory",
+    "cause": "Maven resolved JAS for compilation but runtime dependencies were not copied to target/dependency",
+    "formula_execution_started": false
+  },
+  "octave": {
+    "status": "FAIL_HOSTILE_THRESHOLD_POLICY",
+    "tool_version": "8.4.0",
+    "clean_properties": "PASS",
+    "samples": 512,
+    "max_clean_residual": 1.1102230246251566e-15,
+    "failed_check": "hostile_mutations_detected",
+    "cause": "a randomized physically nonzero HeIII mutation signal reached 2.6022323657004659e-14 below a fixed 1e-13 detection floor",
+    "formula_failure": false
+  },
+  "authorized_repair": [
+    "copy exact JAS runtime dependencies before execution",
+    "replace stochastic hostile-amplitude threshold with deterministic fixed probes"
+  ],
+  "forbidden_repair": [
+    "change REI production formula",
+    "relax clean residual tolerance",
+    "remove hostile controls",
+    "promote runtime or provider claims"
+  ]
+}

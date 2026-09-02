@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0.0",
+  "stage_id": "REI-XCAS-01_SECOND_RED",
+  "workflow_run": 33675977778,
+  "head": "52d3c1591060c67f85ffce4c2ca80971ce38089d",
+  "status": "EXPECTED_REPAIRABLE_VERIFIER_AND_PROVENANCE_FAILURES",
+  "passed_axes": {
+    "contract": "PASS",
+    "gnu_octave_8_4_0": {
+      "status": "PASS",
+      "samples": 512,
+      "max_clean_residual": 1.1102230246251566e-15,
+      "tolerance": 2.0e-11,
+      "minimum_hostile_signal": 0.1
+    },
+    "jas_2_7_200": {
+      "status": "PASS",
+      "exact_checks": 29
+    }
+  },
+  "julia": {
+    "status": "FAIL_VERIFIER_SOFT_SCOPE",
+    "julia_version": "1.12.6",
+    "symbolics_version": "7.31.0",
+    "environment_resolution": "PASS",
+    "formula_receipt_emitted": false,
+    "failure": "UndefVarError: max_residual not defined in local scope",
+    "cause": "top-level loop assignment triggered Julia soft-scope shadowing for max_residual and numeric_ok",
+    "formula_failure": false
+  },
+  "provenance": {
+    "status": "FAIL_EXACT_HEAD_CHECKOUT",
+    "observed_checkout": "synthetic pull-request merge commit 186a801b87ca1df028824ef3db51b9c9f613f638",
+    "required_checkout": "exact pull-request head commit",
+    "cause": "actions/checkout default PR-event behavior"
+  },
+  "authorized_repair": [
+    "wrap the Julia verifier in a main function to create hard local scope",
+    "set every workflow checkout ref to github.event.pull_request.head.sha with github.sha fallback"
+  ],
+  "forbidden_repair": [
+    "change a REI production formula",
+    "relax a clean numerical tolerance",
+    "delete a hostile control",
+    "promote runtime, first-interval, provider or science claims"
+  ]
+}
