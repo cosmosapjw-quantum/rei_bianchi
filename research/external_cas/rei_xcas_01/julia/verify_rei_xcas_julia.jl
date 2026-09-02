@@ -4,7 +4,11 @@ using Pkg
 
 function zeroq(expr)
     reduced = Symbolics.simplify(expr; expand=true)
-    return isequal(reduced, 0) || string(reduced) == "0"
+    return (reduced isa Number && iszero(reduced)) || isequal(reduced, 0) || string(reduced) in ("0", "0.0")
+end
+
+function substitute_fold(expr, rules)
+    return Symbolics.substitute(expr, rules; fold=Val(true))
 end
 
 function main()
@@ -42,9 +46,12 @@ function main()
 
     trans = exp(-tau)
     absorb = 1-exp(-tau)
-    dtrans0 = Symbolics.substitute(Symbolics.expand_derivatives(Differential(tau)(trans)), Dict(tau=>0))
-    dabs0 = Symbolics.substitute(Symbolics.expand_derivatives(Differential(tau)(absorb)), Dict(tau=>0))
-    checks["transmission_origin_and_thin_derivative"] = zeroq(Symbolics.substitute(trans, Dict(tau=>0))-1) && zeroq(dtrans0+1) && zeroq(dabs0-1)
+    trans0 = substitute_fold(trans, Dict(tau=>0))
+    dtrans0 = substitute_fold(Symbolics.expand_derivatives(Differential(tau)(trans)), Dict(tau=>0))
+    dabs0 = substitute_fold(Symbolics.expand_derivatives(Differential(tau)(absorb)), Dict(tau=>0))
+    checks["transmission_origin"] = zeroq(trans0-1)
+    checks["transmission_derivative_at_origin"] = zeroq(dtrans0+1)
+    checks["absorption_derivative_at_origin"] = zeroq(dabs0-1)
     checks["allocation_numerator_partition"] = zeroq((t1+t2+t3)-(t1+t2+t3))
 
     @variables y pe a b ah ahe
@@ -63,6 +70,7 @@ function main()
 
     Random.seed!(20260903)
     setprecision(BigFloat, 256)
+    bigfloat_tolerance = big"1e-50"
     max_residual = BigFloat(0)
     numeric_ok = true
     for _ in 1:256
@@ -79,7 +87,7 @@ function main()
         allocation = numerators ./ absorbed
         partition = abs(sum(allocation)-1)
         max_residual = max(max_residual, complement, partition)
-        numeric_ok &= (0 <= F <= 1) && (0 <= absorbed <= 1) && complement < big"1e-50" && all(allocation .>= 0) && partition < big"1e-50"
+        numeric_ok &= (0 <= F <= 1) && (0 <= absorbed <= 1) && complement < bigfloat_tolerance && all(allocation .>= 0) && partition < bigfloat_tolerance
     end
     checks["bigfloat_transmission_allocation_256"] = numeric_ok
 
@@ -87,7 +95,7 @@ function main()
         "missing_redshift_inflow" => !zeroq((-r0*n0) + (-r1*n1+r2*n2) + (-r2*n2+r3*n3) - r3*n3 + r0*n0),
         "wrong_HeIII_factor" => !zeroq((nH*xH+nHe*(x2+x3))-ne),
         "wrong_expansion_coefficient" => !zeroq(4*h*p-3*h*p),
-        "wrong_transmission_sign" => !zeroq(Symbolics.substitute(Symbolics.expand_derivatives(Differential(tau)(exp(tau))), Dict(tau=>0))+1),
+        "wrong_transmission_sign" => !zeroq(substitute_fold(Symbolics.expand_derivatives(Differential(tau)(exp(tau))), Dict(tau=>0))+1),
         "missing_allocation_species" => !zeroq((t1+t2)-(t1+t2+t3)),
     )
     checks["hostile_mutations_detected"] = all(values(hostile))
@@ -106,6 +114,8 @@ function main()
         "  \"julia_version\": \"$(VERSION)\",\n" *
         "  \"symbolics_version\": \"$(symver)\",\n" *
         "  \"oracle_class\": \"SYMBOLIC_TRANSCENDENTAL_AND_256_BIT_NUMERICAL\",\n" *
+        "  \"bigfloat_samples\": 256,\n" *
+        "  \"bigfloat_tolerance\": \"$(bigfloat_tolerance)\",\n" *
         "  \"max_bigfloat_residual\": \"$(max_residual)\",\n" *
         "  \"checks\": {$(check_json)},\n" *
         "  \"claim_boundary\": \"BOUNDED_REI_FORMULA_ORACLE_ONLY\"\n" *

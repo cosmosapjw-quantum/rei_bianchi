@@ -91,7 +91,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: rei-xcas-julia-receipt
-          path: research/external_cas/rei_xcas_01/receipts/julia_receipt.json
+          path: |
+            research/external_cas/rei_xcas_01/receipts/julia_receipt.json
+            research/external_cas/rei_xcas_01/julia/Manifest.toml
 
   aggregate:
     needs: [contract, octave, jas, julia]
@@ -105,7 +107,7 @@ jobs:
           pattern: rei-xcas-*-receipt
           path: external-receipts
           merge-multiple: true
-      - name: Render plot and aggregate machine-readable receipt
+      - name: Render plots and aggregate machine-readable receipt
         run: |
           python3 -m pip install --quiet matplotlib
           python3 research/external_cas/rei_xcas_01/render_crosscheck_plot.py
@@ -115,3 +117,5 @@ jobs:
           path: |
             research/external_cas/rei_xcas_01/receipts/aggregate_receipt.json
             research/external_cas/rei_xcas_01/plots/external_cas_check_coverage.png
+            research/external_cas/rei_xcas_01/plots/numerical_residual_margins.png
+            research/external_cas/rei_xcas_01/plots/numerical_residual_margins.csv
