@@ -1,0 +1,72 @@
+{
+  "schema": "rei-runtime-bridge-03a3r2-admin-ruleset-handoff/v1",
+  "classification": "FAIL_CLOSED_ADMIN_ONLY_RULESET_APPLY_AND_EXACT_READBACK",
+  "repository": "cosmosapjw-quantum/rei_bianchi",
+  "parent": {
+    "pull_request": 49,
+    "commit": "771363866d5de436c3218be56d81a310b091874b",
+    "tree": "5e4396640c7c4c50b16130b5741195220aec5030",
+    "tested_payload": "34293f44e278426d60c83104d006ebdd127e0a0b"
+  },
+  "ruleset": {
+    "name": "REI immutable attempt-ledger refs v1",
+    "target": "branch",
+    "enforcement": "active",
+    "target_pattern": "refs/heads/attempt-ledger/**",
+    "required_rules": [
+      "update",
+      "deletion",
+      "non_fast_forward"
+    ],
+    "creation_rule_forbidden": true,
+    "bypass_actors": []
+  },
+  "global_attempt_ref": "refs/heads/attempt-ledger/rei-runtime-bridge-ntpath-rebind-20260903-attempt-3",
+  "fixed_authority": {
+    "scheme": "https",
+    "api_host": "api.github.com",
+    "repository": "cosmosapjw-quantum/rei_bianchi",
+    "api_version": "2022-11-28"
+  },
+  "operation_order": [
+    "GET repository rulesets",
+    "POST exact ruleset only when absent and --apply is explicit",
+    "GET exact ruleset details",
+    "GET prospective branch effective rules",
+    "GET exact global attempt ref and require HTTP 404",
+    "write ADMIN_MUTATION_RECEIPT",
+    "write GET-only SOURCE_PROTECTION_RECEIPT with mutation_effect NONE"
+  ],
+  "forbidden_operations": [
+    "create update or delete the global attempt ref",
+    "create a persistent local attempt lease",
+    "write a dispatch intent",
+    "import the REI production bridge",
+    "run the native worker",
+    "start the first canonical interval",
+    "admit a provider",
+    "merge or mark a pull request ready"
+  ],
+  "source_protection_receipt": {
+    "schema": "rei-runtime-attempt-ref-protection-receipt/v1",
+    "status": "PASS_ATTEMPT_REF_SERVER_PROTECTION",
+    "maximum_lifetime_seconds": 300,
+    "mutation_effect": "NONE",
+    "authorization_effect": "NONE"
+  },
+  "claim_ceiling": {
+    "freshness_live_readback_source": "PASS",
+    "admin_handoff_source": "CANDIDATE_PENDING_EXACT_HEAD_CI",
+    "repository_ruleset": "NOT_CREATED_BY_THIS_SOURCE_COMMIT",
+    "target_host_static_preflight": "NOT_RUN",
+    "global_attempt_ref": "ABSENT",
+    "persistent_local_lease": "NOT_CREATED",
+    "dispatch_intent": "NOT_CREATED",
+    "remaining_native_attempts": 1,
+    "native_runtime": "NOT_RUN",
+    "runtime_result_audit": "BLOCKED",
+    "first_canonical_interval": "NO_PASS_FIRST_CANONICAL_INTERVAL",
+    "provider_export": "NOT_AUTHORIZED",
+    "scientific_pass": "NOT_CLAIMED"
+  }
+}

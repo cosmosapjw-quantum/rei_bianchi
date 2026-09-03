@@ -1,0 +1,108 @@
+name: rei-runtime-attempt-ref-server-ruleset-handoff
+
+on:
+  push:
+    branches:
+      - admin/rei-runtime-attempt-ref-server-ruleset-20260904-r1
+  pull_request:
+    paths:
+      - "docs/rei_runtime_bridge_03a3r2_admin_ruleset/**"
+      - "tests/governance/test_rei_runtime_attempt_ref_server_ruleset_handoff.py"
+      - ".github/workflows/rei-runtime-attempt-ref-server-ruleset-handoff.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+
+jobs:
+  verify-admin-handoff-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert exact PR49 ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor \
+            771363866d5de436c3218be56d81a310b091874b HEAD
+
+      - name: Compile admin-only source
+        run: |
+          python -m py_compile \
+            docs/rei_runtime_bridge_03a3r2_admin_ruleset/apply_and_attest_ruleset.py \
+            docs/rei_runtime_bridge_03a3r2_admin_ruleset/verify_source_index.py \
+            tests/governance/test_rei_runtime_attempt_ref_server_ruleset_handoff.py
+
+      - name: Run offline admin-handoff contract tests
+        run: |
+          python -m unittest -v \
+            tests.governance.test_rei_runtime_attempt_ref_server_ruleset_handoff
+
+      - name: Run fail-closed self-test without credentials
+        run: |
+          python \
+            docs/rei_runtime_bridge_03a3r2_admin_ruleset/apply_and_attest_ruleset.py \
+            --self-test
+
+      - name: Verify exact source index against HEAD
+        run: |
+          python \
+            docs/rei_runtime_bridge_03a3r2_admin_ruleset/verify_source_index.py
+
+      - name: Read exact global attempt ref without mutation
+        run: |
+          python - <<'PY'
+          import json
+          import urllib.error
+          import urllib.request
+
+          url = (
+              "https://api.github.com/repos/cosmosapjw-quantum/rei_bianchi/"
+              "git/ref/heads/attempt-ledger/"
+              "rei-runtime-bridge-ntpath-rebind-20260903-attempt-3"
+          )
+          request = urllib.request.Request(
+              url,
+              method="GET",
+              headers={
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+                  "User-Agent": "rei-runtime-admin-handoff-ci/v1",
+              },
+          )
+          try:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  status = response.status
+          except urllib.error.HTTPError as exc:
+              status = exc.code
+          if status != 404:
+              raise SystemExit(f"STOP_INVALID: GLOBAL_ATTEMPT_REF_HTTP_{status}")
+          print(json.dumps({
+              "global_attempt_ref": "ABSENT_404",
+              "authorization_effect": "NONE",
+              "mutation_effect": "NONE",
+              "native_runtime": "NOT_RUN",
+          }, sort_keys=True))
+          PY
+
+      - name: Assert no attempt or runtime state was created
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e \
+            /tmp/rei-runtime-bridge-ntpath-rebind-20260903.native-attempt.json
+          test ! -e \
+            docs/rei_runtime_bridge_03a3r2_admin_ruleset/SOURCE_PROTECTION_RECEIPT.json
+          ! find "$GITHUB_WORKSPACE" -type f \
+            \( -name 'GLOBAL_ATTEMPT_LEASE.json' \
+               -o -name 'LOCAL_ATTEMPT_LEASE.json' \
+               -o -name 'DISPATCH_INTENT.json' \
+               -o -name 'NATIVE_OUTCOME.json' \) \
+            -print -quit | grep -q .
