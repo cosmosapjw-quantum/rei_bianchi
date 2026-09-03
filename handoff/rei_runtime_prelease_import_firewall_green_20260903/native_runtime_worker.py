@@ -12,11 +12,10 @@ import sys
 from typing import Any, Mapping
 
 try:
-    from .common import (
+    from .common_v2 import (
         FirewallError,
         git_blob_sha1,
         load_contract,
-        load_json_file,
         sha256_file,
         validate_attempt_receipts as validate_receipt_files,
         validate_preflight_receipt,
@@ -26,11 +25,10 @@ try:
         write_o_excl,
     )
 except ImportError:
-    from common import (  # type: ignore
+    from common_v2 import (  # type: ignore
         FirewallError,
         git_blob_sha1,
         load_contract,
-        load_json_file,
         sha256_file,
         validate_attempt_receipts as validate_receipt_files,
         validate_preflight_receipt,
