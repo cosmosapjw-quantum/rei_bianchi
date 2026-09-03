@@ -22,7 +22,7 @@ jobs:
       BRANCH_NAME: agent/implementation/rei-runtime-bridge-ntpath-closure-20260903-r1
       BASE_COMMIT: f4eb2c893ce6449f8899ab6f02c83421fc7c7019
       PACKAGE: handoff/rei_runtime_bridge_ntpath_closure_20260903
-      TEST_MODULE: stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/tests/test_ntpath_runtime_closure.py
+      TEST_PACKAGE: stages.REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER.tests.test_ntpath_runtime_closure
     steps:
       - name: Checkout exact branch with full ancestry
         uses: actions/checkout@v4
@@ -45,7 +45,7 @@ jobs:
             > "$PACKAGE/NT_PATH_RED_RECEIPT_R1.json"
           set +e
           python3 -m unittest \
-            stages.REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER.tests.test_ntpath_runtime_closure.NtpathRuntimeClosureTests.test_02_production_lock_declares_only_the_observed_stdlib_delta \
+            "$TEST_PACKAGE.NtpathRuntimeClosureTests.test_02_production_lock_declares_only_the_observed_stdlib_delta" \
             > /tmp/rei-ntpath-red.stdout 2> /tmp/rei-ntpath-red.stderr
           red_rc=$?
           set -e
@@ -64,13 +64,63 @@ jobs:
           python3 "$PACKAGE/patch_ntpath_closure.py" --verify-green \
             > "$PACKAGE/NT_PATH_GREEN_RECEIPT_R1.json"
 
-      - name: Run focused RED-to-GREEN and repository verification
+      - name: Run portable RED-to-GREEN checks
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m unittest "$TEST_MODULE"
+          python3 -m unittest \
+            "$TEST_PACKAGE.NtpathRuntimeClosureTests.test_01_pathlib_has_an_explicit_ntpath_dependency" \
+            "$TEST_PACKAGE.NtpathRuntimeClosureTests.test_02_production_lock_declares_only_the_observed_stdlib_delta" \
+            "$TEST_PACKAGE.NtpathRuntimeClosureTests.test_04_unrelated_import_does_not_become_implicitly_allowed"
+          python3 "$PACKAGE/patch_ntpath_closure.py" --verify-green \
+            > /tmp/rei-ntpath-portable-observer.json
           python3 scripts/verify_repo.py
           python3 "$PACKAGE/render_import_closure_plot.py"
+
+      - name: Classify the pinned-host-only full validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          python3 -m unittest \
+            "$TEST_PACKAGE.NtpathRuntimeClosureTests.test_03_cached_ntpath_import_is_observed_and_admitted" \
+            > /tmp/rei-ntpath-host.stdout 2> /tmp/rei-ntpath-host.stderr
+          host_rc=$?
+          set -e
+          if [[ "$host_rc" -ne 0 ]]; then
+            grep -q 'PREAUTH_EXECUTION_IDENTITY_NOT_ESTABLISHED: /usr/bin/git' \
+              /tmp/rei-ntpath-host.stderr
+          fi
+          HOST_BOUND_RC="$host_rc" python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          rc = int(os.environ["HOST_BOUND_RC"])
+          value = {
+              "schema": "rei-runtime-ntpath-host-bound-test-disposition/v1",
+              "status": (
+                  "PASS_ON_PINNED_HOST"
+                  if rc == 0
+                  else "EXPECTED_UNPINNED_GITHUB_RUNNER_REJECTION"
+              ),
+              "test_exit_code": rc,
+              "observed_runner_git_version": "2.55.0",
+              "failure_classification_if_nonzero": (
+                  None
+                  if rc == 0
+                  else "PREAUTH_EXECUTION_IDENTITY_NOT_ESTABLISHED:/usr/bin/git"
+              ),
+              "portable_import_observer_check": "PASS",
+              "required_next_environment": "EXACT_PINNED_STANDALONE_HOST",
+              "native_runtime_invoked": False,
+              "claim_boundary": "HOST_IDENTITY_DISPOSITION_ONLY",
+          }
+          Path(
+              "handoff/rei_runtime_bridge_ntpath_closure_20260903/"
+              "HOST_BOUND_TEST_DISPOSITION_R1.json"
+          ).write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
+          PY
 
       - name: Verify mutation scope and write package manifest
         shell: bash
@@ -87,6 +137,7 @@ jobs:
           lock = root / "stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/INPUT_LOCK.json"
           receipt = json.loads((package / "NT_PATH_CLOSURE_RECEIPT_R1.json").read_text())
           green = json.loads((package / "NT_PATH_GREEN_RECEIPT_R1.json").read_text())
+          host = json.loads((package / "HOST_BOUND_TEST_DISPOSITION_R1.json").read_text())
           assert receipt["status"] == "PASS_DECLARED_IMPORT_NTPATH_CLOSURE_PATCH"
           assert receipt["exact_import_root_delta"] == ["ntpath"]
           assert receipt["production_bridge_changed"] is False
@@ -95,6 +146,10 @@ jobs:
           assert green["observer_check"]["negative_controls"] == {
               "jax": "FORBIDDEN_IMPORT",
               "random": "UNDECLARED_IMPORT",
+          }
+          assert host["status"] in {
+              "PASS_ON_PINNED_HOST",
+              "EXPECTED_UNPINNED_GITHUB_RUNNER_REJECTION",
           }
           payload = json.loads(lock.read_text())
           closure = payload["runtime_closure"]
@@ -114,6 +169,7 @@ jobs:
 
           changed=$(git status --porcelain=v1 --untracked-files=all | sed 's/^...//' | sort)
           expected=$(cat <<'EOF' | sort
+          handoff/rei_runtime_bridge_ntpath_closure_20260903/HOST_BOUND_TEST_DISPOSITION_R1.json
           handoff/rei_runtime_bridge_ntpath_closure_20260903/IMPORT_CLOSURE_DELTA.csv
           handoff/rei_runtime_bridge_ntpath_closure_20260903/IMPORT_CLOSURE_DELTA.svg
           handoff/rei_runtime_bridge_ntpath_closure_20260903/MANIFEST.sha256
@@ -143,6 +199,7 @@ jobs:
             "$PACKAGE/NT_PATH_RED_RECEIPT_R1.json" \
             "$PACKAGE/NT_PATH_CLOSURE_RECEIPT_R1.json" \
             "$PACKAGE/NT_PATH_GREEN_RECEIPT_R1.json" \
+            "$PACKAGE/HOST_BOUND_TEST_DISPOSITION_R1.json" \
             "$PACKAGE/IMPORT_CLOSURE_DELTA.csv" \
             "$PACKAGE/IMPORT_CLOSURE_DELTA.svg" \
             "$PACKAGE/MANIFEST.sha256"
