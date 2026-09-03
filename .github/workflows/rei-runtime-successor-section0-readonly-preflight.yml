@@ -1,0 +1,118 @@
+name: rei-runtime-successor-section0-readonly-preflight
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/rei-runtime-successor-section0-readonly-preflight.yml"
+      - "tests/governance/test_rei_runtime_successor_section0_preflight.py"
+      - "handoff/rei_runtime_successor_section0_preflight_20260903/**"
+      - "docs/runtime_bridge_successor_section0_preflight_20260903/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-read-only-preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact pull-request head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Verify PR42 ancestry and bounded changed paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=eb1c05f3ea2bda910ddf85ef7f3bab08c73eca13
+          BASE_TREE=0aa13dd9cb8630f208307342a933a8c68abf62c8
+          test "$(git rev-parse "${BASE}^{tree}")" = "$BASE_TREE"
+          git merge-base --is-ancestor "$BASE" HEAD
+          git diff --name-only "$BASE"...HEAD > /tmp/rei-successor-preflight-paths.txt
+          python3 - <<'PY'
+          from pathlib import Path
+
+          allowed_exact = {
+              ".github/workflows/rei-runtime-successor-section0-readonly-preflight.yml",
+              "tests/governance/test_rei_runtime_successor_section0_preflight.py",
+              "docs/runtime_bridge_successor_section0_preflight_20260903/REMOTE_PUBLICATION.json",
+          }
+          allowed_prefix = "handoff/rei_runtime_successor_section0_preflight_20260903/"
+          paths = [
+              line for line in Path("/tmp/rei-successor-preflight-paths.txt")
+              .read_text(encoding="utf-8").splitlines()
+              if line
+          ]
+          unexpected = [
+              path for path in paths
+              if path not in allowed_exact and not path.startswith(allowed_prefix)
+          ]
+          if not paths:
+              raise SystemExit("SUCCESSOR_PREFLIGHT_EMPTY_CHANGESET")
+          if unexpected:
+              raise SystemExit("SUCCESSOR_PREFLIGHT_CHANGED_PATH_ESCAPE:" + ",".join(unexpected))
+          print({"changed_paths": len(paths), "unexpected": 0})
+          PY
+
+      - name: Run fail-closed preflight contract tests
+        shell: bash
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+          REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+        run: |
+          /usr/bin/python3 -I -S -B \
+            tests/governance/test_rei_runtime_successor_section0_preflight.py
+
+      - name: Independent package verifier
+        shell: bash
+        run: |
+          /usr/bin/python3 -I -S -B \
+            handoff/rei_runtime_successor_section0_preflight_20260903/verify_preflight_package.py
+
+      - name: Observe global attempt ref read-only
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          /usr/bin/python3 -I -S -B - <<'PY'
+          from __future__ import annotations
+          import importlib.util
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path("handoff/rei_runtime_successor_section0_preflight_20260903/successor_section0_preflight.py")
+          spec = importlib.util.spec_from_file_location("rei_preflight_live_observer", path)
+          if spec is None or spec.loader is None:
+              raise SystemExit("LIVE_OBSERVER_IMPORT_SPEC_MISSING")
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          contract = module.load_contract()
+          result = module.observe_global_ref_read_only(
+              ref=contract["attempt_state"]["global_ref"],
+              expected_target=contract["executable_release"]["commit"],
+              token=os.environ.get("GITHUB_TOKEN", ""),
+          )
+          if result["status"] != "GLOBAL_ATTEMPT_REF_ABSENT_OBSERVED":
+              raise SystemExit("GLOBAL_REF_NOT_ABSENT")
+          if result["authorization_effect"] != "NONE" or result["global_lease_acquired"]:
+              raise SystemExit("READ_ONLY_OBSERVATION_PROMOTED_TO_AUTHORIZATION")
+          print(json.dumps(result, sort_keys=True))
+          PY
+
+      - name: Confirm no attempt was reserved or dispatched
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e /tmp/rei-runtime-bridge-ntpath-rebind-20260903.native-attempt.json
+          test ! -e /tmp/attempt-3.global-lease.json
+          test ! -e /tmp/attempt-3.local-lease.json
+          echo READ_ONLY_PREFLIGHT_NO_ATTEMPT_STATE
+
+      - name: Repository verifier
+        shell: bash
+        run: |
+          python3 scripts/verify_repo.py
+          git diff --check
