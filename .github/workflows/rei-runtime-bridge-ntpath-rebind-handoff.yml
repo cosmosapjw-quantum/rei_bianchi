@@ -1,0 +1,87 @@
+name: rei-runtime-bridge-ntpath-rebind-handoff
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/rei-runtime-bridge-ntpath-rebind-handoff.yml"
+      - "handoff/rei_runtime_bridge_ntpath_rebind_20260903/**"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-handoff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact pull-request head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Verify exact ancestry and bounded changed paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=5b6957237bbe8edfdfe3c980910cba690d23775c
+          BASE_TREE=805e92779ba6e7d956d5ac936f0934f5879fd3a1
+          test "$(git rev-parse "${BASE}^{tree}")" = "$BASE_TREE"
+          git merge-base --is-ancestor "$BASE" HEAD
+          git diff --name-only "$BASE"...HEAD > /tmp/rei-rebind-paths.txt
+          python3 - <<'PY'
+          from pathlib import Path
+
+          allowed_workflow = ".github/workflows/rei-runtime-bridge-ntpath-rebind-handoff.yml"
+          allowed_prefix = "handoff/rei_runtime_bridge_ntpath_rebind_20260903/"
+          paths = [line for line in Path("/tmp/rei-rebind-paths.txt").read_text().splitlines() if line]
+          if not paths:
+              raise SystemExit("REI_REBIND_EMPTY_CHANGESET")
+          unexpected = [
+              path for path in paths
+              if path != allowed_workflow and not path.startswith(allowed_prefix)
+          ]
+          if unexpected:
+              raise SystemExit("REI_REBIND_CHANGED_PATH_ESCAPE:" + ",".join(unexpected))
+          print({"changed_paths": len(paths), "unexpected": 0})
+          PY
+
+      - name: Run stdlib-only handoff tests
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          /usr/bin/python3 -I -S -B \
+            handoff/rei_runtime_bridge_ntpath_rebind_20260903/test_runtime_bridge_runner.py
+
+      - name: Verify generated handoff-state plot
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          /usr/bin/python3 -I -S -B \
+            handoff/rei_runtime_bridge_ntpath_rebind_20260903/render_handoff_state.py \
+            --verify
+
+      - name: Parse closed JSON records
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("handoff/rei_runtime_bridge_ntpath_rebind_20260903")
+          for name in (
+              "CONTRACT.json",
+              "PACKAGE_INDEX.json",
+              "WOLFRAM_CONTEXT_RECEIPT.json",
+          ):
+              json.loads((root / name).read_text(encoding="utf-8"))
+          print("JSON_PARSE_PASS")
+          PY
+
+      - name: Repository verifier and whitespace check
+        run: |
+          python3 scripts/verify_repo.py
+          git diff --check
+
+      - name: Confirm no native attempt was invoked in CI
+        run: |
+          test ! -e /tmp/rei-runtime-bridge-ntpath-rebind-20260903.native-attempt.json
+          echo NATIVE_RUNTIME_NOT_RUN
