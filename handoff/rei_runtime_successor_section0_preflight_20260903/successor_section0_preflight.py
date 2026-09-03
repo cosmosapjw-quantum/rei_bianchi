@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """READ_ONLY_PREFLIGHT for a successor-host REI Section-0 receipt.
 
-This module verifies and records every pre-lease input.  It can create a new
-successor-host Section-0 receipt, but it cannot reserve the global attempt,
-create a local attempt lease, or invoke the native runtime.
+This module verifies every pre-lease input and may create a fresh successor
+Section-0 evidence receipt.  It cannot reserve an attempt or invoke native
+code.
 """
 
 from __future__ import annotations
@@ -15,10 +15,9 @@ import importlib.util
 import json
 import os
 from pathlib import Path, PurePosixPath
-import stat
 import subprocess
 import sys
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, Mapping
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -53,9 +52,8 @@ def sha256_file(path: Path) -> str:
 
 def git_blob_sha1(path: Path) -> str:
     payload = path.read_bytes()
-    return hashlib.sha1(
-        f"blob {len(payload)}\0".encode("ascii") + payload
-    ).hexdigest()
+    header = f"blob {len(payload)}\0".encode("ascii")
+    return hashlib.sha1(header + payload).hexdigest()
 
 
 def write_o_excl(path: Path, value: Mapping[str, Any]) -> None:
@@ -140,6 +138,7 @@ def verify_package_index(
         or not isinstance(index.get("entries"), list)
     ):
         raise PreflightError("PREFLIGHT_PACKAGE_INDEX_INVALID")
+
     expected: dict[Path, str] = {}
     for row in index["entries"]:
         if not isinstance(row, dict) or set(row) != {"path", "blob_sha", "role"}:
@@ -173,8 +172,8 @@ def verify_package_index(
     if set(expected) != actual:
         raise PreflightError("PREFLIGHT_PACKAGE_SCOPE_MISMATCH")
     for relative, blob in expected.items():
-        path = package_root / relative
-        if not path.is_file() or git_blob_sha1(path) != blob:
+        target = package_root / relative
+        if not target.is_file() or git_blob_sha1(target) != blob:
             raise PreflightError(
                 f"PREFLIGHT_PACKAGE_BLOB_MISMATCH:{relative.as_posix()}"
             )
@@ -190,7 +189,9 @@ def _is_under(path: Path, root: Path) -> bool:
 
 def inspect_attempt_state(root: Path) -> list[str]:
     candidate = Path(root).resolve(strict=True)
-    return sorted(path.relative_to(candidate).as_posix() for path in candidate.rglob("*"))
+    return sorted(
+        path.relative_to(candidate).as_posix() for path in candidate.rglob("*")
+    )
 
 
 def validate_attempt_state_root(path: Path, *, repo: Path) -> Path:
@@ -259,7 +260,7 @@ def observe_global_ref_read_only(
         headers["Authorization"] = f"Bearer {token}"
     request = urllib.request.Request(endpoint, method="GET", headers=headers)
     try:
-        with opener(request, 30) as response:
+        with opener(request, timeout=30) as response:
             status = response.status
             payload = json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
@@ -301,8 +302,8 @@ def validate_successor_receipt_mapping(
         != rule["semantic_toolchain_lock_sha256"]
     ):
         raise PreflightError("SUCCESSOR_SECTION0_LOCK_MISMATCH")
-    expected_toolchain = rule.get("semantic_toolchain_lock")
-    if expected_toolchain is not None and value.get("observed_toolchain") != expected_toolchain:
+    expected = rule.get("semantic_toolchain_lock")
+    if expected is not None and value.get("observed_toolchain") != expected:
         raise PreflightError("SUCCESSOR_SECTION0_FIELD_MISMATCH")
     return value
 
@@ -372,10 +373,15 @@ def _git_text(repo: Path, *arguments: str) -> str:
     return completed.stdout.strip()
 
 
-def _verify_blob(repo: Path, release: Mapping[str, Any], path_key: str, blob_key: str) -> Path:
-    relative = release[path_key]
+def _verify_blob(
+    repo: Path,
+    record: Mapping[str, Any],
+    path_key: str,
+    blob_key: str,
+) -> Path:
+    relative = record[path_key]
     observed = _git_text(repo, "rev-parse", f"HEAD:{relative}")
-    if observed != release[blob_key]:
+    if observed != record[blob_key]:
         raise PreflightError(f"EXECUTABLE_RELEASE_BLOB_MISMATCH:{relative}")
     candidate = repo / relative
     if candidate.is_symlink() or not candidate.is_file():
@@ -396,6 +402,7 @@ def verify_exact_release_and_inputs(
         raise PreflightError("EXECUTABLE_RELEASE_HEAD_MISMATCH")
     if _git_text(root, "rev-parse", "HEAD^{tree}") != release["tree"]:
         raise PreflightError("EXECUTABLE_RELEASE_TREE_MISMATCH")
+
     runner_path = _verify_blob(root, release, "runner_path", "runner_blob_sha1")
     runtime_contract_path = _verify_blob(
         root, release, "contract_path", "contract_blob_sha1"
@@ -414,9 +421,10 @@ def verify_exact_release_and_inputs(
     runner.verify_source_inputs(root, runtime_contract)
     base = runner._load_base_runner(root, runtime_contract)
     bridge = base.load_bridge(
-        root, runtime_contract["source_handoff"]["production_bridge_path"]
+        root,
+        runtime_contract["source_handoff"]["production_bridge_path"],
     )
-    standalone_roots = base.verify_standalone_repository_context(bridge, root)
+    base.verify_standalone_repository_context(bridge, root)
     pinned = lambda *args: base.git_checked(bridge, root, *args).strip()
     runner.verify_exact_release_identity(
         root,
@@ -449,16 +457,14 @@ def run_successor_emitter(
     output: Path,
 ) -> str:
     record = contract["successor_section0"]
-    emitter = repo / record["emitter_path"]
-    policy = repo / record["policy_path"]
     command = [
         str(python),
         "-I",
         "-S",
         "-B",
-        str(emitter),
+        str(repo / record["emitter_path"]),
         "--policy",
-        str(policy),
+        str(repo / record["policy_path"]),
         "--rustc",
         str(rustc),
         "--python",
@@ -507,7 +513,6 @@ def run_read_only_preflight(
     contract = load_contract()
     root = Path(repo).resolve(strict=True)
     state = validate_attempt_state_root(attempt_state_root, repo=root)
-    output = validate_output_root(output_root, repo=root, state_root=state)
     runner, runtime_contract, _, _ = verify_exact_release_and_inputs(root, contract)
 
     attempt = contract["attempt_state"]
@@ -518,6 +523,7 @@ def run_read_only_preflight(
         token=token,
         api_base=api_base,
     )
+    output = validate_output_root(output_root, repo=root, state_root=state)
     section0_path = output / "successor-section0.json"
     emitter_stdout = run_successor_emitter(
         repo=root,
@@ -538,7 +544,8 @@ def run_read_only_preflight(
         section0,
         runtime_contract["successor_section0"],
     )
-    if sha256_file(section0_path) == contract["successor_section0"]["historical_receipt_sha256"]:
+    historical = contract["successor_section0"]["historical_receipt_sha256"]
+    if sha256_file(section0_path) == historical:
         raise PreflightError("HISTORICAL_SECTION0_RECEIPT_REUSE_FORBIDDEN")
     runner.load_successor_section0_receipt(section0_path, runtime_contract)
 
