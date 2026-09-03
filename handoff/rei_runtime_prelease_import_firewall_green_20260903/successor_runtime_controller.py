@@ -13,7 +13,7 @@ import sys
 from typing import Any, Callable, Mapping
 
 try:
-    from .common import (
+    from .common_v2 import (
         FirewallError,
         acquire_global_lease,
         create_dispatch_intent,
@@ -29,7 +29,7 @@ try:
         write_o_excl,
     )
 except ImportError:
-    from common import (  # type: ignore
+    from common_v2 import (  # type: ignore
         FirewallError,
         acquire_global_lease,
         create_dispatch_intent,
@@ -103,21 +103,48 @@ def _validate_evidence_root(
     return resolved
 
 
-def _validate_python(path: Path, expected_sha256: str) -> Path:
+def _validate_locked_executable(
+    path: Path,
+    expected_sha256: str,
+    *,
+    not_absolute: str,
+    unavailable: str,
+    mismatch: str,
+) -> Path:
     candidate = Path(path)
     if not candidate.is_absolute():
-        raise ControllerError("WORKER_PYTHON_NOT_ABSOLUTE")
+        raise ControllerError(not_absolute)
     try:
         resolved = candidate.resolve(strict=True)
     except (OSError, RuntimeError) as exc:
-        raise ControllerError("WORKER_PYTHON_UNAVAILABLE") from exc
+        raise ControllerError(unavailable) from exc
     if (
         not resolved.is_file()
         or not os.access(resolved, os.X_OK)
         or sha256_file(resolved) != expected_sha256
     ):
-        raise ControllerError("WORKER_PYTHON_IDENTITY_MISMATCH")
+        raise ControllerError(mismatch)
     return resolved
+
+
+def _validate_python(path: Path, expected_sha256: str) -> Path:
+    return _validate_locked_executable(
+        path,
+        expected_sha256,
+        not_absolute="WORKER_PYTHON_NOT_ABSOLUTE",
+        unavailable="WORKER_PYTHON_UNAVAILABLE",
+        mismatch="WORKER_PYTHON_IDENTITY_MISMATCH",
+    )
+
+
+def _validate_rustc(path: Path, expected_sha256: str) -> Path:
+    return _validate_locked_executable(
+        path,
+        expected_sha256,
+        not_absolute="RUSTC_LOCATOR_NOT_ABSOLUTE",
+        unavailable="RUSTC_LOCATOR_UNAVAILABLE",
+        mismatch="RUSTC_LOCATOR_IDENTITY_MISMATCH",
+    )
 
 
 def run_worker_process(
@@ -209,18 +236,18 @@ def run_controller(
         expected_head=expected_release_head,
         expected_tree=expected_release_tree,
     )
-    successor = validate_successor_receipt(successor_section0_receipt, contract)
+    validate_successor_receipt(successor_section0_receipt, contract)
     successor_sha = sha256_file(successor_section0_receipt)
-    preflight = validate_preflight_receipt(
+    validate_preflight_receipt(
         static_preflight_receipt,
         expected_head=expected_release_head,
         expected_tree=expected_release_tree,
         successor_receipt_sha256=successor_sha,
     )
     preflight_sha = sha256_file(static_preflight_receipt)
-    python_path = _validate_python(
-        python, contract["successor_section0"]["semantic_toolchain_lock"]["python_sha256"]
-    )
+    toolchain = contract["successor_section0"]["semantic_toolchain_lock"]
+    python_path = _validate_python(python, toolchain["python_sha256"])
+    rustc_path = _validate_rustc(rustc, toolchain["rustc_sha256"])
     evidence = _validate_evidence_root(
         evidence_root,
         repo=root,
@@ -287,7 +314,7 @@ def run_controller(
             repo=root,
             expected_release_head=expected_release_head,
             expected_release_tree=expected_release_tree,
-            rustc=rustc,
+            rustc=rustc_path,
             evidence_root=evidence,
             attempt_state_root=state,
             dispatch_intent=dispatch_path,
