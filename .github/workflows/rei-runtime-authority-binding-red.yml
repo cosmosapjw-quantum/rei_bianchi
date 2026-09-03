@@ -1,0 +1,33 @@
+name: rei-runtime-authority-binding-red
+
+on:
+  pull_request:
+    paths:
+      - "handoff/rei_runtime_prelease_import_firewall_green_20260903/**"
+      - "tests/governance/test_rei_runtime_authority_binding_red.py"
+      - ".github/workflows/rei-runtime-authority-binding-red.yml"
+      - "docs/rei_runtime_bridge_03a2/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  expected-red:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert exact PR45 parent ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor \
+            6e9f590d945843495df0a03b293469947750f783 HEAD
+
+      - name: Run intentional authority-binding RED
+        run: |
+          python tests/governance/test_rei_runtime_authority_binding_red.py -v
