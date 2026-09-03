@@ -30,6 +30,12 @@ except ModuleNotFoundError:
 # object so FirewallError and all typed classes have one identity.
 sys.modules.setdefault("common_v2", old_common)
 
+# PR #47 intentionally hides private helpers from its compatibility wildcard.
+# Re-export the exact sealed helper rather than duplicating the hex contract in
+# this successor package.
+if not hasattr(old_common, "_valid_hex"):
+    old_common._valid_hex = old_common._impl._base._valid_hex  # type: ignore[attr-defined]
+
 
 def load_old_module(filename: str, module_name: str) -> ModuleType:
     path = OLD_PACKAGE / filename
