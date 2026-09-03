@@ -31,14 +31,17 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
 
-          allowed_workflow = ".github/workflows/rei-runtime-bridge-ntpath-rebind-handoff.yml"
+          allowed_workflows = {
+              ".github/workflows/rei-runtime-bridge-ntpath-rebind-handoff.yml",
+              ".github/workflows/rei-runtime-bridge-pr38-source-packet.yml",
+          }
           allowed_prefix = "handoff/rei_runtime_bridge_ntpath_rebind_20260903/"
           paths = [line for line in Path("/tmp/rei-rebind-paths.txt").read_text().splitlines() if line]
           if not paths:
               raise SystemExit("REI_REBIND_EMPTY_CHANGESET")
           unexpected = [
               path for path in paths
-              if path != allowed_workflow and not path.startswith(allowed_prefix)
+              if path not in allowed_workflows and not path.startswith(allowed_prefix)
           ]
           if unexpected:
               raise SystemExit("REI_REBIND_CHANGED_PATH_ESCAPE:" + ",".join(unexpected))
