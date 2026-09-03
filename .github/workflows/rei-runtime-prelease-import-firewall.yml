@@ -4,11 +4,12 @@ on:
   push:
     branches:
       - "audit/rei-runtime-prelease-import-firewall-20260903-r1"
+      - "fix/rei-runtime-prelease-import-firewall-green-20260903-r1"
   pull_request:
     paths:
       - "handoff/rei_runtime_bridge_successor_host_20260903/**"
       - "handoff/rei_runtime_successor_section0_preflight_20260903/**"
-      - "handoff/rei_runtime_prelease_import_firewall_20260903/**"
+      - "handoff/rei_runtime_prelease_import_firewall_green_20260903/**"
       - "tests/governance/test_rei_runtime_prelease_import_firewall.py"
       - ".github/workflows/rei-runtime-prelease-import-firewall.yml"
   workflow_dispatch:
@@ -30,8 +31,15 @@ jobs:
         run: |
           python3 -m unittest \
             tests/governance/test_rei_runtime_prelease_import_firewall.py -v
-      - name: Verify no global attempt ref was created by this workflow
+      - name: Verify closed GREEN package when present
+        run: |
+          package=handoff/rei_runtime_prelease_import_firewall_green_20260903
+          if test -f "$package/verify_package.py"; then
+            python3 "$package/verify_package.py"
+          fi
+      - name: Verify no attempt-state files were created by this workflow
         run: |
           test ! -e attempt-3.global-lease.json
           test ! -e attempt-3.local-lease.json
+          test ! -e attempt-3.dispatch-intent.json
           test ! -e attempt-3.outcome.json
