@@ -1,0 +1,72 @@
+name: rei-runtime-bridge-successor-host-handoff
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/rei-runtime-bridge-successor-host-handoff.yml"
+      - "tests/governance/test_rei_runtime_successor_host_handoff.py"
+      - "handoff/rei_runtime_bridge_successor_host_20260903/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+
+jobs:
+  verify-successor-handoff:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact pull-request head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Verify exact governance ancestry and bounded paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=ad4b3854cb52bc735b28fc828c09de1a3302bb0a
+          BASE_TREE=ed11f66ff25e1fa132644cad97594838a2f02044
+          test "$(git rev-parse "${BASE}^{tree}")" = "$BASE_TREE"
+          git merge-base --is-ancestor "$BASE" HEAD
+          git diff --name-only "$BASE"...HEAD > /tmp/rei-successor-handoff-paths.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          allowed = (
+              ".github/workflows/rei-runtime-bridge-successor-host-handoff.yml",
+              "tests/governance/test_rei_runtime_successor_host_handoff.py",
+              "handoff/rei_runtime_bridge_successor_host_20260903/",
+          )
+          paths = [x for x in Path("/tmp/rei-successor-handoff-paths.txt").read_text().splitlines() if x]
+          unexpected = [x for x in paths if not x.startswith(allowed)]
+          if unexpected:
+              raise SystemExit(f"SUCCESSOR_HANDOFF_CHANGED_PATH_ESCAPE:{unexpected!r}")
+          print({"changed_paths": len(paths), "unexpected": 0})
+          PY
+
+      - name: Run successor handoff contract tests
+        run: python3 -m unittest -v tests/governance/test_rei_runtime_successor_host_handoff.py
+
+      - name: Run independent handoff verifier
+        run: python3 handoff/rei_runtime_bridge_successor_host_20260903/verify_successor_handoff.py
+
+      - name: Regenerate state figure byte-for-byte
+        shell: bash
+        run: |
+          set -euo pipefail
+          TMP="$RUNNER_TEMP/HANDOFF_STATE.svg"
+          python3 handoff/rei_runtime_bridge_successor_host_20260903/render_handoff_state.py \
+            handoff/rei_runtime_bridge_successor_host_20260903/HANDOFF_STATE.csv \
+            "$TMP"
+          cmp "$TMP" handoff/rei_runtime_bridge_successor_host_20260903/HANDOFF_STATE.svg
+
+      - name: Verify hosted CI cannot consume the native attempt
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$REI_NATIVE_DISPATCH_FORBIDDEN" = "1"
+          test ! -e /tmp/rei-runtime-bridge-ntpath-rebind-20260903.native-attempt.json
+          echo NATIVE_RUNTIME_NOT_RUN
