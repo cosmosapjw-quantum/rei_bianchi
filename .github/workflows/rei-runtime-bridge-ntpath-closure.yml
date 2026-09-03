@@ -1,0 +1,157 @@
+name: rei-runtime-bridge-ntpath-closure
+
+on:
+  push:
+    branches:
+      - agent/implementation/rei-runtime-bridge-ntpath-closure-20260903-r1
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rei-runtime-bridge-ntpath-closure-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  close-declared-import:
+    runs-on: ubuntu-24.04
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      BRANCH_NAME: agent/implementation/rei-runtime-bridge-ntpath-closure-20260903-r1
+      BASE_COMMIT: f4eb2c893ce6449f8899ab6f02c83421fc7c7019
+      PACKAGE: handoff/rei_runtime_bridge_ntpath_closure_20260903
+      TEST_MODULE: stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/tests/test_ntpath_runtime_closure.py
+    steps:
+      - name: Checkout exact branch with full ancestry
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.BRANCH_NAME }}
+
+      - name: Use CPython 3.12.3
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.3"
+
+      - name: Verify ancestry and clean starting state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$BASE_COMMIT" HEAD
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+          python3 "$PACKAGE/patch_ntpath_closure.py" --assert-red \
+            > "$PACKAGE/NT_PATH_RED_RECEIPT_R1.json"
+          set +e
+          python3 -m unittest \
+            stages.REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER.tests.test_ntpath_runtime_closure.NtpathRuntimeClosureTests.test_02_production_lock_declares_only_the_observed_stdlib_delta \
+            > /tmp/rei-ntpath-red.stdout 2> /tmp/rei-ntpath-red.stderr
+          red_rc=$?
+          set -e
+          if [[ "$red_rc" -eq 0 ]]; then
+            echo "Expected the test-only RED to fail before patching" >&2
+            exit 1
+          fi
+          grep -q "ntpath" /tmp/rei-ntpath-red.stderr
+
+      - name: Apply the exact one-root closure delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PACKAGE/patch_ntpath_closure.py" --apply \
+            > /tmp/rei-ntpath-apply.json
+          python3 "$PACKAGE/patch_ntpath_closure.py" --verify-green \
+            > "$PACKAGE/NT_PATH_GREEN_RECEIPT_R1.json"
+
+      - name: Run focused RED-to-GREEN and repository verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest "$TEST_MODULE"
+          python3 scripts/verify_repo.py
+          python3 "$PACKAGE/render_import_closure_plot.py"
+
+      - name: Verify mutation scope and write package manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from __future__ import annotations
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path.cwd()
+          package = root / "handoff/rei_runtime_bridge_ntpath_closure_20260903"
+          lock = root / "stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/INPUT_LOCK.json"
+          receipt = json.loads((package / "NT_PATH_CLOSURE_RECEIPT_R1.json").read_text())
+          green = json.loads((package / "NT_PATH_GREEN_RECEIPT_R1.json").read_text())
+          assert receipt["status"] == "PASS_DECLARED_IMPORT_NTPATH_CLOSURE_PATCH"
+          assert receipt["exact_import_root_delta"] == ["ntpath"]
+          assert receipt["production_bridge_changed"] is False
+          assert receipt["native_runtime_invoked"] is False
+          assert green["status"] == "PASS"
+          assert green["observer_check"]["negative_controls"] == {
+              "jax": "FORBIDDEN_IMPORT",
+              "random": "UNDECLARED_IMPORT",
+          }
+          payload = json.loads(lock.read_text())
+          closure = payload["runtime_closure"]
+          assert closure["declared_import_roots"] == sorted(set(closure["declared_import_roots"]))
+          assert "ntpath" in closure["declared_import_roots"]
+          assert closure["forbidden_import_roots"] == ["jax", "jaxlib"]
+          assert len(closure["declared_paths"]) == 17
+
+          rows = []
+          for path in sorted(package.rglob("*")):
+              if not path.is_file() or path.name == "MANIFEST.sha256":
+                  continue
+              digest = hashlib.sha256(path.read_bytes()).hexdigest()
+              rows.append(f"{digest}  {path.relative_to(package).as_posix()}")
+          (package / "MANIFEST.sha256").write_text("\n".join(rows) + "\n")
+          PY
+
+          changed=$(git status --porcelain=v1 --untracked-files=all | sed 's/^...//' | sort)
+          expected=$(cat <<'EOF' | sort
+          handoff/rei_runtime_bridge_ntpath_closure_20260903/IMPORT_CLOSURE_DELTA.csv
+          handoff/rei_runtime_bridge_ntpath_closure_20260903/IMPORT_CLOSURE_DELTA.svg
+          handoff/rei_runtime_bridge_ntpath_closure_20260903/MANIFEST.sha256
+          handoff/rei_runtime_bridge_ntpath_closure_20260903/NT_PATH_CLOSURE_RECEIPT_R1.json
+          handoff/rei_runtime_bridge_ntpath_closure_20260903/NT_PATH_GREEN_RECEIPT_R1.json
+          handoff/rei_runtime_bridge_ntpath_closure_20260903/NT_PATH_RED_RECEIPT_R1.json
+          stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/INPUT_LOCK.json
+          EOF
+          )
+          if [[ "$changed" != "$expected" ]]; then
+            echo "Unexpected mutation scope" >&2
+            echo "Observed:" >&2
+            printf '%s\n' "$changed" >&2
+            echo "Expected:" >&2
+            printf '%s\n' "$expected" >&2
+            exit 1
+          fi
+
+      - name: Commit and push the bounded closure patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/INPUT_LOCK.json \
+            "$PACKAGE/NT_PATH_RED_RECEIPT_R1.json" \
+            "$PACKAGE/NT_PATH_CLOSURE_RECEIPT_R1.json" \
+            "$PACKAGE/NT_PATH_GREEN_RECEIPT_R1.json" \
+            "$PACKAGE/IMPORT_CLOSURE_DELTA.csv" \
+            "$PACKAGE/IMPORT_CLOSURE_DELTA.svg" \
+            "$PACKAGE/MANIFEST.sha256"
+          git commit -m "fix(rei-runtime): declare pathlib ntpath closure"
+          git push origin "HEAD:$BRANCH_NAME"
+
+      - name: Final claim-boundary check
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'STOP_INVALID_UNTIL_FRESH_RERUN' "$PACKAGE/NT_PATH_CLOSURE_RECEIPT_R1.json"
+          grep -q 'NO_PASS_FIRST_CANONICAL_INTERVAL' "$PACKAGE/NT_PATH_CLOSURE_RECEIPT_R1.json"
+          grep -q 'NOT_AUTHORIZED' "$PACKAGE/NT_PATH_CLOSURE_RECEIPT_R1.json"
