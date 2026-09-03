@@ -7,7 +7,9 @@ path and authority arguments on the v2 execution path.
 
 Load-bearing implementation tokens retained for source/AST auditing:
 ``EXECUTING_PACKAGE_OUTSIDE_VERIFIED_RELEASE``,
-``EXECUTING_PACKAGE_BLOB_MISMATCH``, and ``HEAD:``.
+``EXECUTING_PACKAGE_BLOB_MISMATCH``, ``HEAD:``,
+``READ_ONLY_PREFLIGHT_FRESHNESS_INVALID``, and
+``ATTEMPT_REF_PROTECTION_RECEIPT_MISMATCH``.
 """
 
 from __future__ import annotations
@@ -29,6 +31,8 @@ _SOURCE_AUDIT_GUARDS = (
     "EXECUTING_PACKAGE_OUTSIDE_VERIFIED_RELEASE",
     "EXECUTING_PACKAGE_BLOB_MISMATCH",
     "HEAD:",
+    "READ_ONLY_PREFLIGHT_FRESHNESS_INVALID",
+    "ATTEMPT_REF_PROTECTION_RECEIPT_MISMATCH",
 )
 
 
