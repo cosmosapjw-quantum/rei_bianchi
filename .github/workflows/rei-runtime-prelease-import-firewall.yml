@@ -1,0 +1,34 @@
+name: rei-runtime-prelease-import-firewall
+
+on:
+  pull_request:
+    paths:
+      - "handoff/rei_runtime_bridge_successor_host_20260903/**"
+      - "handoff/rei_runtime_successor_section0_preflight_20260903/**"
+      - "handoff/rei_runtime_prelease_import_firewall_20260903/**"
+      - "tests/governance/test_rei_runtime_prelease_import_firewall.py"
+      - ".github/workflows/rei-runtime-prelease-import-firewall.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-import-firewall:
+    runs-on: ubuntu-latest
+    env:
+      REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - name: Verify production bridge is not imported before both attempt leases
+        run: |
+          python3 -m unittest \
+            tests/governance/test_rei_runtime_prelease_import_firewall.py -v
+      - name: Verify no global attempt ref was created by this workflow
+        run: |
+          test ! -e attempt-3.global-lease.json
+          test ! -e attempt-3.local-lease.json
+          test ! -e attempt-3.outcome.json
