@@ -68,13 +68,39 @@ jobs:
       - name: Independent package verifier
         shell: bash
         run: |
-          if test -f handoff/rei_runtime_successor_section0_preflight_20260903/verify_preflight_package.py; then
-            /usr/bin/python3 -I -S -B \
-              handoff/rei_runtime_successor_section0_preflight_20260903/verify_preflight_package.py
-          else
-            echo EXPECTED_RED_INDEPENDENT_VERIFIER_ABSENT >&2
-            exit 1
-          fi
+          /usr/bin/python3 -I -S -B \
+            handoff/rei_runtime_successor_section0_preflight_20260903/verify_preflight_package.py
+
+      - name: Observe global attempt ref read-only
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          /usr/bin/python3 -I -S -B - <<'PY'
+          from __future__ import annotations
+          import importlib.util
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path("handoff/rei_runtime_successor_section0_preflight_20260903/successor_section0_preflight.py")
+          spec = importlib.util.spec_from_file_location("rei_preflight_live_observer", path)
+          if spec is None or spec.loader is None:
+              raise SystemExit("LIVE_OBSERVER_IMPORT_SPEC_MISSING")
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          contract = module.load_contract()
+          result = module.observe_global_ref_read_only(
+              ref=contract["attempt_state"]["global_ref"],
+              expected_target=contract["executable_release"]["commit"],
+              token=os.environ.get("GITHUB_TOKEN", ""),
+          )
+          if result["status"] != "GLOBAL_ATTEMPT_REF_ABSENT_OBSERVED":
+              raise SystemExit("GLOBAL_REF_NOT_ABSENT")
+          if result["authorization_effect"] != "NONE" or result["global_lease_acquired"]:
+              raise SystemExit("READ_ONLY_OBSERVATION_PROMOTED_TO_AUTHORIZATION")
+          print(json.dumps(result, sort_keys=True))
+          PY
 
       - name: Confirm no attempt was reserved or dispatched
         shell: bash
