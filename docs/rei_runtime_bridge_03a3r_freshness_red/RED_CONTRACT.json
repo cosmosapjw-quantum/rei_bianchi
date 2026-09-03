@@ -1,0 +1,26 @@
+{
+  "schema": "rei-runtime-attempt-ref-protection-freshness-red/v1",
+  "status": "EXPECTED_RED",
+  "repository": "cosmosapjw-quantum/rei_bianchi",
+  "parent": {
+    "pull_request": 47,
+    "commit": "b7d591da8554bb17cf395d5388a5f0649ebf754f",
+    "tree": "72928434a62749f284d023821a9900f1eb0be80f"
+  },
+  "defect": "A structurally valid server-protection receipt has no freshness gate and is not followed by a live effective-rules readback immediately before the global ref POST.",
+  "required_green": [
+    "reject stale or unbounded protection receipts",
+    "perform fixed-authority GET-only live revalidation after toolchain revalidation",
+    "complete live revalidation before marking global reservation indeterminate",
+    "bind the live snapshot hash into the global lease receipt",
+    "preserve one attempt, no retry, and no production import before both leases"
+  ],
+  "forbidden": [
+    "create or modify repository rulesets",
+    "create the global attempt ref",
+    "run target-host preflight",
+    "load the production bridge",
+    "run the native worker",
+    "promote first-interval, provider, or scientific claims"
+  ]
+}

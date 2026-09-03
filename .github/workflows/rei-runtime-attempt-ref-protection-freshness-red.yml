@@ -1,0 +1,44 @@
+name: rei-runtime-attempt-ref-protection-freshness-red
+
+on:
+  push:
+    branches:
+      - audit/rei-runtime-attempt-ref-protection-freshness-red-20260904-r1
+
+permissions:
+  contents: read
+
+jobs:
+  observe-expected-red:
+    runs-on: ubuntu-24.04
+    env:
+      REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Observe exact expected RED
+        shell: bash
+        run: |
+          set +e
+          python -m unittest \
+            tests.governance.test_rei_runtime_attempt_ref_protection_freshness_red \
+            -v > /tmp/rei-protection-freshness-red.log 2>&1
+          rc=$?
+          cat /tmp/rei-protection-freshness-red.log
+          test "$rc" -ne 0
+          grep -Eq \
+            'ModuleNotFoundError|FileNotFoundError|AssertionError' \
+            /tmp/rei-protection-freshness-red.log
+          grep -Eq 'FAILED \(failures=|FAILED \(errors=' \
+            /tmp/rei-protection-freshness-red.log
+      - name: Confirm no attempt state was created
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(find . -type f \( \
+            -name 'attempt-3.global-lease.json' -o \
+            -name 'attempt-3.local-lease.json' -o \
+            -name 'attempt-3.dispatch-intent.json' -o \
+            -name 'attempt-3.outcome.json' \
+          \) -print -quit)"
