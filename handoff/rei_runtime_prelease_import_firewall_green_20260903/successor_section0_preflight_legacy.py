@@ -1,105 +1,79 @@
 #!/usr/bin/env python3
-"""Fixed-authority successor Section-0 preflight without production import."""
+"""Static successor Section-0 preflight with no production-module import."""
 
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+import subprocess
 import sys
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 import urllib.error
 import urllib.parse
 import urllib.request
 
 try:
-    from . import common_v2 as _authority
-    from .common_v2 import (
+    from .common import (
         FirewallError,
         load_contract,
         sha256_file,
         validate_attempt_state_root,
         validate_new_output_root,
         validate_successor_receipt,
-        verify_executing_package_binding,
         verify_package_index,
         verify_static_release,
         write_o_excl,
     )
-    from . import successor_section0_preflight_legacy as _legacy
 except ImportError:
-    import common_v2 as _authority  # type: ignore
-    from common_v2 import (  # type: ignore
+    from common import (  # type: ignore
         FirewallError,
         load_contract,
         sha256_file,
         validate_attempt_state_root,
         validate_new_output_root,
         validate_successor_receipt,
-        verify_executing_package_binding,
         verify_package_index,
         verify_static_release,
         write_o_excl,
     )
-    import successor_section0_preflight_legacy as _legacy  # type: ignore
-
-
-GITHUB_API_BASE = "https://api.github.com"
-GITHUB_API_HOST = "api.github.com"
-GITHUB_API_VERSION = "2022-11-28"
-GITHUB_REPOSITORY = "cosmosapjw-quantum/rei_bianchi"
-GITHUB_AUTHORITY: dict[str, str] = {
-    "scheme": "https",
-    "api_host": GITHUB_API_HOST,
-    "repository": GITHUB_REPOSITORY,
-    "api_version": GITHUB_API_VERSION,
-}
-PREFLIGHT_TTL_SECONDS = 1800
-if (
-    GITHUB_API_BASE != _authority.GITHUB_API_BASE
-    or GITHUB_REPOSITORY != _authority.GITHUB_REPOSITORY
-    or GITHUB_AUTHORITY != _authority.GITHUB_AUTHORITY
-):
-    raise RuntimeError("FIXED_GITHUB_AUTHORITY_CONSTANT_DRIFT")
 
 
 def observe_global_ref_read_only(
     *,
     ref: str,
     expected_target: str,
-    ordinal: int,
     token: str = "",
+    api_base: str = "https://api.github.com",
+    opener: Callable[..., Any] = urllib.request.urlopen,
 ) -> dict[str, Any]:
-    if not ref.startswith("refs/") or ordinal not in {1, 2}:
-        raise FirewallError("GLOBAL_REF_OBSERVATION_INPUT_INVALID")
+    if not ref.startswith("refs/"):
+        raise FirewallError("GLOBAL_REF_INVALID")
     relative = urllib.parse.quote(ref.removeprefix("refs/"), safe="/")
     endpoint = (
-        f"{GITHUB_API_BASE}/repos/{GITHUB_REPOSITORY}/git/ref/{relative}"
+        api_base.rstrip("/")
+        + "/repos/cosmosapjw-quantum/rei_bianchi/git/ref/"
+        + relative
     )
     headers = {
         "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": GITHUB_API_VERSION,
-        "User-Agent": "rei-runtime-authority-binding-preflight/v2",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "rei-runtime-prelease-import-firewall-preflight/v1",
     }
     if token:
         headers["Authorization"] = f"Bearer {token}"
     request = urllib.request.Request(endpoint, method="GET", headers=headers)
     try:
-        with urllib.request.urlopen(request, timeout=30) as response:
+        with opener(request, timeout=30) as response:
             status = response.status
             payload = json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         if exc.code == 404:
             return {
                 "status": "GLOBAL_ATTEMPT_REF_ABSENT_OBSERVED",
-                "ordinal": ordinal,
-                "method": "GET",
                 "http_status": 404,
-                "authority": GITHUB_AUTHORITY,
-                "api_host": GITHUB_API_HOST,
-                "repository": GITHUB_REPOSITORY,
                 "ref": ref,
                 "expected_target": expected_target,
                 "authorization_effect": "NONE",
@@ -119,12 +93,100 @@ def observe_global_ref_read_only(
     )
 
 
+def _require_absolute_executable(path: Path, classification: str) -> Path:
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        raise FirewallError(classification)
+    try:
+        resolved = candidate.resolve(strict=True)
+    except (OSError, RuntimeError) as exc:
+        raise FirewallError(classification) from exc
+    if not resolved.is_file() or not os.access(resolved, os.X_OK):
+        raise FirewallError(classification)
+    return resolved
+
+
+def _require_absolute_file(path: Path, classification: str) -> Path:
+    candidate = Path(path)
+    if not candidate.is_absolute() or candidate.is_symlink():
+        raise FirewallError(classification)
+    try:
+        resolved = candidate.resolve(strict=True)
+    except (OSError, RuntimeError) as exc:
+        raise FirewallError(classification) from exc
+    if not resolved.is_file():
+        raise FirewallError(classification)
+    return resolved
+
+
+def run_successor_emitter(
+    *,
+    repo: Path,
+    contract: Mapping[str, Any],
+    rustc: Path,
+    python: Path,
+    mpfr: Path,
+    gmp: Path,
+    cc: Path,
+    ld: Path,
+    output: Path,
+) -> str:
+    rule = contract["successor_section0"]
+    python_path = _require_absolute_executable(
+        python, "SUCCESSOR_PYTHON_UNAVAILABLE"
+    )
+    rustc_path = _require_absolute_executable(
+        rustc, "SUCCESSOR_RUSTC_UNAVAILABLE"
+    )
+    cc_path = _require_absolute_executable(cc, "SUCCESSOR_CC_UNAVAILABLE")
+    ld_path = _require_absolute_executable(ld, "SUCCESSOR_LD_UNAVAILABLE")
+    mpfr_path = _require_absolute_file(mpfr, "SUCCESSOR_MPFR_UNAVAILABLE")
+    gmp_path = _require_absolute_file(gmp, "SUCCESSOR_GMP_UNAVAILABLE")
+    emitter = (Path(repo) / rule["emitter_path"]).resolve(strict=True)
+    policy = (Path(repo) / rule["policy_path"]).resolve(strict=True)
+    command = [
+        str(python_path),
+        "-I",
+        "-S",
+        "-B",
+        str(emitter),
+        "--policy",
+        str(policy),
+        "--rustc",
+        str(rustc_path),
+        "--python",
+        str(python_path),
+        "--mpfr",
+        str(mpfr_path),
+        "--gmp",
+        str(gmp_path),
+        "--cc",
+        str(cc_path),
+        "--ld",
+        str(ld_path),
+        "--output",
+        str(output),
+    ]
+    completed = subprocess.run(
+        command,
+        check=False,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env={"PATH": "/usr/bin:/bin", "LC_ALL": "C", "LANG": "C"},
+    )
+    if completed.returncode != 0:
+        detail = completed.stderr.strip() or completed.stdout.strip()
+        raise FirewallError("SUCCESSOR_SECTION0_REATTESTATION_FAILED:" + detail)
+    return completed.stdout.strip()
+
+
 def build_preflight_receipt(
     *,
     release_head: str,
     release_tree: str,
     successor_receipt_sha256: str,
-    successor_receipt_path: Path,
     successor_receipt: Mapping[str, Any],
     first_ref_observation: Mapping[str, Any],
     second_ref_observation: Mapping[str, Any],
@@ -132,24 +194,11 @@ def build_preflight_receipt(
     output_root: Path,
     emitter_stdout: str,
 ) -> dict[str, Any]:
-    generated = datetime.now(timezone.utc)
     return {
-        "schema": "rei-runtime-prelease-import-firewall-preflight-receipt/v2",
+        "schema": "rei-runtime-prelease-import-firewall-preflight-receipt/v1",
         "status": "PASS_READ_ONLY_STATIC_PREFLIGHT",
-        "generated_at_utc": generated.isoformat(),
-        "expires_at_utc": (
-            generated + timedelta(seconds=PREFLIGHT_TTL_SECONDS)
-        ).isoformat(),
-        "authority": {
-            "scheme": "https",
-            "api_host": GITHUB_API_HOST,
-            "repository": GITHUB_REPOSITORY,
-            "api_version": GITHUB_API_VERSION,
-        },
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "firewall_release": {"commit": release_head, "tree": release_tree},
-        "successor_section0_receipt": str(
-            Path(successor_receipt_path).resolve(strict=True)
-        ),
         "successor_section0_receipt_sha256": successor_receipt_sha256,
         "successor_section0": {
             "schema": successor_receipt["schema"],
@@ -178,12 +227,11 @@ def build_preflight_receipt(
             "standalone_clone_verified": True,
             "pinned_source_bytes_verified": True,
             "closed_runtime_package_verified": True,
-            "executing_package_bound_to_head": True,
         },
-        "attempt_state_root": str(Path(state_root).resolve(strict=True)),
-        "output_root": str(Path(output_root).resolve(strict=True)),
+        "attempt_state_root": str(state_root),
+        "output_root": str(output_root),
         "native_runtime": "NOT_RUN",
-        "next_node": "ATTEMPT_REF_PROTECTION_THEN_ATOMIC_LEASE",
+        "next_node": "ATOMIC_GLOBAL_LOCAL_LEASE_AND_SEPARATE_WORKER",
     }
 
 
@@ -201,6 +249,7 @@ def run_read_only_preflight(
     attempt_state_root: Path,
     output_root: Path,
     token: str = "",
+    api_base: str = "https://api.github.com",
 ) -> tuple[dict[str, Any], Path, Path]:
     verify_package_index()
     contract = load_contract()
@@ -212,13 +261,12 @@ def run_read_only_preflight(
         expected_head=expected_release_head,
         expected_tree=expected_release_tree,
     )
-    verify_executing_package_binding(root, contract)
     ref = contract["attempt_budget"]["global_lease_ref"]
     first = observe_global_ref_read_only(
         ref=ref,
         expected_target=expected_release_head,
-        ordinal=1,
         token=token,
+        api_base=api_base,
     )
     output = validate_new_output_root(
         output_root,
@@ -226,7 +274,7 @@ def run_read_only_preflight(
         state_root=state,
     )
     successor_path = output / "successor-section0.json"
-    emitter_stdout = _legacy.run_successor_emitter(
+    emitter_stdout = run_successor_emitter(
         repo=root,
         contract=contract,
         rustc=rustc,
@@ -241,8 +289,8 @@ def run_read_only_preflight(
     second = observe_global_ref_read_only(
         ref=ref,
         expected_target=expected_release_head,
-        ordinal=2,
         token=token,
+        api_base=api_base,
     )
     if any(state.iterdir()):
         raise FirewallError("READ_ONLY_PREFLIGHT_MUTATED_ATTEMPT_STATE")
@@ -250,7 +298,6 @@ def run_read_only_preflight(
         release_head=expected_release_head,
         release_tree=expected_release_tree,
         successor_receipt_sha256=sha256_file(successor_path),
-        successor_receipt_path=successor_path,
         successor_receipt=successor,
         first_ref_observation=first,
         second_ref_observation=second,
@@ -276,6 +323,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--ld", type=Path, required=True)
     parser.add_argument("--attempt-state-root", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument("--api-base", default="https://api.github.com")
     parser.add_argument("--token-env", default="GITHUB_TOKEN")
     options = parser.parse_args(argv)
     try:
@@ -292,6 +340,7 @@ def main(argv: list[str] | None = None) -> int:
             attempt_state_root=options.attempt_state_root,
             output_root=options.output_root,
             token=os.environ.get(options.token_env, ""),
+            api_base=options.api_base,
         )
     except FirewallError as exc:
         print(f"STOP_INVALID: {exc}", file=sys.stderr)

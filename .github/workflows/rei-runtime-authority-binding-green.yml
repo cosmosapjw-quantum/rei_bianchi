@@ -1,0 +1,65 @@
+name: rei-runtime-authority-binding-green
+
+on:
+  pull_request:
+    paths:
+      - "handoff/rei_runtime_prelease_import_firewall_green_20260903/**"
+      - "tests/governance/test_rei_runtime_authority_binding_red.py"
+      - "tests/governance/test_rei_runtime_authority_binding_green.py"
+      - ".github/workflows/rei-runtime-authority-binding-green.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+
+jobs:
+  verify-authority-binding:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert exact RED parent ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 2a2767a19b2b4f962d17cdc1fd93ae1815f53613 HEAD
+
+      - name: Run import and authority governance tests
+        run: |
+          python -m unittest \
+            tests.governance.test_rei_runtime_prelease_import_firewall \
+            tests.governance.test_rei_runtime_prelease_import_firewall_hardening \
+            tests.governance.test_rei_runtime_authority_binding_red \
+            tests.governance.test_rei_runtime_authority_binding_green \
+            -v
+
+      - name: Run independent closed-package verifier
+        run: |
+          python \
+            handoff/rei_runtime_prelease_import_firewall_green_20260903/verify_package.py
+
+      - name: Confirm fixed global attempt ref remains absent
+        shell: bash
+        run: |
+          set -euo pipefail
+          ref='attempt-ledger/rei-runtime-bridge-ntpath-rebind-20260903-attempt-3'
+          code="$(curl -sS -o /tmp/attempt-ref.json -w '%{http_code}' \
+            "https://api.github.com/repos/cosmosapjw-quantum/rei_bianchi/git/ref/${ref}")"
+          test "$code" = 404
+
+      - name: Confirm no attempt or native evidence was created in CI
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(find . -type f \( \
+            -name 'attempt-3.global-lease.json' -o \
+            -name 'attempt-3.local-lease.json' -o \
+            -name 'attempt-3.dispatch-intent.json' -o \
+            -name 'attempt-3.outcome.json' \
+          \) -print -quit)"

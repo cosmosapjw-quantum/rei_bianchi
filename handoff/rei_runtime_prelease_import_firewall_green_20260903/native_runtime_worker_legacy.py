@@ -1,50 +1,103 @@
 #!/usr/bin/env python3
-"""Post-lease worker bound to the exact verified authority-hardened package."""
+"""Post-lease worker for exactly one entry into the locked REI runtime."""
 
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import os
 from pathlib import Path
 import sys
-from typing import Any
+from typing import Any, Mapping
 
 try:
     from .common_v2 import (
         FirewallError,
-        GITHUB_AUTHORITY,
-        GLOBAL_ATTEMPT_REF,
+        git_blob_sha1,
         load_contract,
         sha256_file,
-        validate_attempt_receipts,
+        validate_attempt_receipts as validate_receipt_files,
         validate_preflight_receipt,
         validate_successor_receipt,
-        verify_executing_package_binding,
         verify_package_index,
         verify_static_release,
         write_o_excl,
     )
-    from . import native_runtime_worker_legacy as _legacy
 except ImportError:
     from common_v2 import (  # type: ignore
         FirewallError,
-        GITHUB_AUTHORITY,
-        GLOBAL_ATTEMPT_REF,
+        git_blob_sha1,
         load_contract,
         sha256_file,
-        validate_attempt_receipts,
+        validate_attempt_receipts as validate_receipt_files,
         validate_preflight_receipt,
         validate_successor_receipt,
-        verify_executing_package_binding,
         verify_package_index,
         verify_static_release,
         write_o_excl,
     )
-    import native_runtime_worker_legacy as _legacy  # type: ignore
 
 
-run_native_once = _legacy.run_native_once
+def validate_attempt_receipts(
+    *,
+    state_root: Path,
+    dispatch_intent: Path,
+    expected_head: str,
+    expected_tree: str,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    return validate_receipt_files(
+        state_root=state_root,
+        dispatch_intent=dispatch_intent,
+        expected_head=expected_head,
+        expected_tree=expected_tree,
+    )
+
+
+def _load_locked_successor_runner(
+    repo: Path,
+    contract: Mapping[str, Any],
+) -> Any:
+    record = contract["source_lineage"]["runtime_package"]
+    path = Path(repo).resolve(strict=True) / record["runner_path"]
+    if path.is_symlink() or not path.is_file():
+        raise FirewallError("LOCKED_SUCCESSOR_RUNNER_UNAVAILABLE")
+    if git_blob_sha1(path) != record["runner_blob_sha1"]:
+        raise FirewallError("LOCKED_SUCCESSOR_RUNNER_BLOB_MISMATCH")
+    spec = importlib.util.spec_from_file_location(
+        "rei_firewall_postlease_successor_runner",
+        path,
+    )
+    if spec is None or spec.loader is None:
+        raise FirewallError("LOCKED_SUCCESSOR_RUNNER_IMPORT_SPEC_MISSING")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def run_native_once(
+    *,
+    repo: Path,
+    rustc: Path,
+    evidence_root: Path,
+    firewall_contract: Mapping[str, Any],
+    successor_receipt: Mapping[str, Any],
+) -> tuple[dict[str, Any], Path]:
+    module = _load_locked_successor_runner(repo, firewall_contract)
+    runtime_contract_path = (
+        Path(repo).resolve(strict=True)
+        / firewall_contract["source_lineage"]["runtime_package"]["contract_path"]
+    )
+    runtime_contract = module.load_contract(runtime_contract_path)
+    entry = getattr(module, "run_" + "native_once")
+    return entry(
+        repo=Path(repo).resolve(strict=True),
+        rustc=Path(rustc),
+        evidence_root=Path(evidence_root),
+        contract=runtime_contract,
+        successor_receipt=successor_receipt,
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -75,7 +128,6 @@ def main(argv: list[str] | None = None) -> int:
             expected_head=options.expected_release_head,
             expected_tree=options.expected_release_tree,
         )
-        verify_executing_package_binding(root, contract)
         successor_path = Path(dispatch["successor_section0_receipt"])
         preflight_path = Path(dispatch["preflight_receipt"])
         if (
@@ -95,11 +147,6 @@ def main(argv: list[str] | None = None) -> int:
             expected_head=options.expected_release_head,
             expected_tree=options.expected_release_tree,
             successor_receipt_sha256=sha256_file(successor_path),
-            expected_attempt_state_root=options.attempt_state_root,
-            expected_output_root=preflight_path.resolve(strict=True).parent,
-            expected_successor_receipt_path=successor_path,
-            expected_authority=GITHUB_AUTHORITY,
-            expected_global_ref=GLOBAL_ATTEMPT_REF,
         )
         result, output_root = run_native_once(
             repo=root,
@@ -122,8 +169,6 @@ def main(argv: list[str] | None = None) -> int:
             "attempt_ordinal": 3,
             "retries_after_outcome": 0,
             "production_entry_process": "SEPARATE_POST_LEASE_WORKER",
-            "fixed_remote_authority": GITHUB_AUTHORITY,
-            "executing_package_bound_to_head": True,
         }
         runtime_receipt = output_root / "runtime_bridge_receipt.json"
         write_o_excl(runtime_receipt, result)

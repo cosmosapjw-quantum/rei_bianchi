@@ -1,6 +1,6 @@
 {
-  "schema": "rei-runtime-prelease-import-firewall/v1",
-  "classification": "FAIL_CLOSED_STATIC_PREFLIGHT_AND_POST_LEASE_PRODUCTION_IMPORT",
+  "schema": "rei-runtime-prelease-import-firewall/v2",
+  "classification": "FAIL_CLOSED_FIXED_GITHUB_AUTHORITY_EXACT_EXECUTING_BYTES_AND_POST_LEASE_PRODUCTION_IMPORT",
   "repository": "cosmosapjw-quantum/rei_bianchi",
   "immutable_parent": {
     "pull_request": 44,
@@ -98,6 +98,26 @@
     "dispatch_operation": "CREATE_ONLY_INTENT_AFTER_LOCAL_LEASE",
     "worker_operation": "SEPARATE_PROCESS_AFTER_DISPATCH_INTENT"
   },
+  "attempt_ref_protection": {
+    "required_before_global_reservation": true,
+    "required_schema": "rei-runtime-attempt-ref-protection-receipt/v1",
+    "required_status": "PASS_ATTEMPT_REF_SERVER_PROTECTION",
+    "authority": {
+      "scheme": "https",
+      "api_host": "api.github.com",
+      "repository": "cosmosapjw-quantum/rei_bianchi",
+      "api_version": "2022-11-28"
+    },
+    "repository": "cosmosapjw-quantum/rei_bianchi",
+    "global_ref": "refs/heads/attempt-ledger/rei-runtime-bridge-ntpath-rebind-20260903-attempt-3",
+    "target_pattern": "refs/heads/attempt-ledger/**",
+    "required_rules": [
+      "update",
+      "deletion",
+      "non_fast_forward"
+    ],
+    "prospective_branch_rules_readback_required": true
+  },
   "execution_context": {
     "repository_mode": "FRESH_STANDALONE_CLONE",
     "private_git_common_directory_required": true,
@@ -109,22 +129,33 @@
     "controller_production_import_forbidden": true,
     "preflight_production_import_forbidden": true,
     "production_import_first_allowed_in": "POST_LEASE_NATIVE_WORKER",
+    "fixed_remote_authority": "https://api.github.com/repos/cosmosapjw-quantum/rei_bianchi",
+    "executing_package_must_equal_verified_head_path": true,
+    "preflight_receipt_ttl_seconds": 1800,
     "hosted_ci_native_dispatch_forbidden_env": "REI_NATIVE_DISPATCH_FORBIDDEN"
   },
   "required_operations": [
     "verify this package by Git blob identity",
+    "bind the executing package path and every indexed byte to the exact verified HEAD",
     "perform exact standalone-clone, ancestry, source-byte and package checks without loading the production bridge",
     "emit and audit a fresh successor Section-0 receipt",
-    "observe the global attempt ref twice by read-only GET in preflight",
-    "validate the static preflight receipt before mutation",
+    "observe the fixed GitHub global attempt ref twice by read-only GET in preflight",
+    "bind both observations to authority method repository ref target status and ordinal",
+    "bind the preflight receipt to the exact attempt-state root output root and successor receipt path",
+    "validate a separate server-side attempt-ref protection receipt before mutation",
+    "re-attest all thirteen successor toolchain fields immediately before global reservation",
     "atomically create the fixed global ref targeting the exact firewall release head",
     "create a persistent local O_EXCL lease only after global acquisition",
     "write a create-only dispatch intent only after the local lease",
     "start one separate worker process with no retry",
-    "validate all three attempt receipts in the worker before entering the unchanged runtime source",
+    "validate all attempt receipts in the worker before entering the unchanged runtime source",
     "preserve the first worker outcome and require a separate runtime-result audit"
   ],
   "forbidden_operations": [
+    "accept a caller-selected GitHub API base or repository authority",
+    "execute a copied package outside the exact verified standalone checkout",
+    "accept stale or path-underbound preflight evidence",
+    "reserve the final attempt without server-side ref update and deletion protection",
     "load or execute the production bridge in static preflight",
     "load or execute the production bridge in the controller",
     "pass a preloaded production module into the worker",
@@ -141,6 +172,8 @@
   ],
   "claim_ceiling": {
     "firewall_source": "PASS_PRELEASE_IMPORT_FIREWALL_SOURCE",
+    "authority_binding_source": "PASS_AUTHORITY_BINDING_SOURCE",
+    "attempt_ref_server_protection": "NOT_YET_ATTESTED",
     "target_host_static_preflight": "NOT_RUN",
     "global_attempt_lease": "NOT_ACQUIRED",
     "persistent_local_lease": "NOT_CREATED",
@@ -152,6 +185,6 @@
     "scientific_pass": "NOT_CLAIMED",
     "scientific_publication": "NOT_RUN"
   },
-  "success_status": "PASS_PRELEASE_IMPORT_FIREWALL_SOURCE",
+  "success_status": "PASS_AUTHORITY_BINDING_SOURCE",
   "failure_status": "STOP_INVALID"
 }

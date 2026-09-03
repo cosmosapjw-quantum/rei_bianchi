@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fixed-authority lease controller; production bridge import remains forbidden."""
+"""Lease-owning controller that never imports the production bridge."""
 
 from __future__ import annotations
 
@@ -8,71 +8,206 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+import subprocess
 import sys
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 try:
-    from . import common_v2 as _authority
     from .common_v2 import (
         FirewallError,
-        GITHUB_AUTHORITY,
-        GLOBAL_ATTEMPT_REF,
         acquire_global_lease,
         create_dispatch_intent,
         create_local_lease,
         load_contract,
         remaining_attempts_after_stop,
-        revalidate_successor_toolchain,
         sha256_file,
-        validate_attempt_ref_protection,
         validate_attempt_state_root,
         validate_preflight_receipt,
         validate_successor_receipt,
-        verify_executing_package_binding,
         verify_package_index,
         verify_static_release,
         write_o_excl,
     )
-    from . import successor_runtime_controller_legacy as _legacy
 except ImportError:
-    import common_v2 as _authority  # type: ignore
     from common_v2 import (  # type: ignore
         FirewallError,
-        GITHUB_AUTHORITY,
-        GLOBAL_ATTEMPT_REF,
         acquire_global_lease,
         create_dispatch_intent,
         create_local_lease,
         load_contract,
         remaining_attempts_after_stop,
-        revalidate_successor_toolchain,
         sha256_file,
-        validate_attempt_ref_protection,
         validate_attempt_state_root,
         validate_preflight_receipt,
         validate_successor_receipt,
-        verify_executing_package_binding,
         verify_package_index,
         verify_static_release,
         write_o_excl,
     )
-    import successor_runtime_controller_legacy as _legacy  # type: ignore
 
 
-GITHUB_API_BASE = "https://api.github.com"
-GITHUB_REPOSITORY = "cosmosapjw-quantum/rei_bianchi"
-if (
-    GITHUB_API_BASE != _authority.GITHUB_API_BASE
-    or GITHUB_REPOSITORY != _authority.GITHUB_REPOSITORY
-):
-    raise RuntimeError("FIXED_GITHUB_AUTHORITY_CONSTANT_DRIFT")
+PACKAGE = Path(__file__).resolve().parent
+WORKER = PACKAGE / "native_runtime_worker.py"
 
-ControllerError = _legacy.ControllerError
-orchestrate_attempt = _legacy.orchestrate_attempt
-_validate_evidence_root = _legacy._validate_evidence_root
-_validate_python = _legacy._validate_python
-_validate_rustc = _legacy._validate_rustc
-run_worker_process = _legacy.run_worker_process
+
+class ControllerError(FirewallError):
+    """Typed controller error."""
+
+
+def orchestrate_attempt(
+    *,
+    acquire_global: Callable[[], Mapping[str, Any]],
+    create_local: Callable[[Mapping[str, Any]], Mapping[str, Any]],
+    write_dispatch: Callable[
+        [Mapping[str, Any], Mapping[str, Any]], Mapping[str, Any]
+    ],
+    run_worker: Callable[[Mapping[str, Any]], Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    """Execute exactly one global -> local -> intent -> worker chain."""
+
+    global_record = acquire_global()
+    if global_record.get("status") != "GLOBAL_ATTEMPT_RESERVED":
+        raise ControllerError("GLOBAL_LEASE_NOT_RESERVED")
+    local_record = create_local(global_record)
+    if local_record.get("status") != "LOCAL_ATTEMPT_RESERVED":
+        raise ControllerError("LOCAL_LEASE_NOT_RESERVED")
+    dispatch_record = write_dispatch(global_record, local_record)
+    if dispatch_record.get("status") != "DISPATCH_INTENT_WRITTEN":
+        raise ControllerError("DISPATCH_INTENT_NOT_WRITTEN")
+    return run_worker(dispatch_record)
+
+
+def _validate_evidence_root(
+    path: Path,
+    *,
+    repo: Path,
+    state_root: Path,
+) -> Path:
+    candidate = Path(path)
+    if not candidate.is_absolute() or candidate.is_symlink():
+        raise ControllerError("EVIDENCE_ROOT_INVALID")
+    resolved = candidate.resolve(strict=False)
+    repository = Path(repo).resolve(strict=True)
+    state = Path(state_root).resolve(strict=True)
+    tmp = Path("/tmp").resolve(strict=True)
+    for root in (repository, state, tmp):
+        try:
+            resolved.relative_to(root)
+        except ValueError:
+            continue
+        raise ControllerError("EVIDENCE_ROOT_FORBIDDEN")
+    if resolved.exists() or resolved.is_symlink():
+        raise ControllerError("EVIDENCE_ROOT_PREEXISTS")
+    if not resolved.parent.is_dir():
+        raise ControllerError("EVIDENCE_ROOT_PARENT_UNAVAILABLE")
+    return resolved
+
+
+def _validate_locked_executable(
+    path: Path,
+    expected_sha256: str,
+    *,
+    not_absolute: str,
+    unavailable: str,
+    mismatch: str,
+) -> Path:
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        raise ControllerError(not_absolute)
+    try:
+        resolved = candidate.resolve(strict=True)
+    except (OSError, RuntimeError) as exc:
+        raise ControllerError(unavailable) from exc
+    if (
+        not resolved.is_file()
+        or not os.access(resolved, os.X_OK)
+        or sha256_file(resolved) != expected_sha256
+    ):
+        raise ControllerError(mismatch)
+    return resolved
+
+
+def _validate_python(path: Path, expected_sha256: str) -> Path:
+    return _validate_locked_executable(
+        path,
+        expected_sha256,
+        not_absolute="WORKER_PYTHON_NOT_ABSOLUTE",
+        unavailable="WORKER_PYTHON_UNAVAILABLE",
+        mismatch="WORKER_PYTHON_IDENTITY_MISMATCH",
+    )
+
+
+def _validate_rustc(path: Path, expected_sha256: str) -> Path:
+    return _validate_locked_executable(
+        path,
+        expected_sha256,
+        not_absolute="RUSTC_LOCATOR_NOT_ABSOLUTE",
+        unavailable="RUSTC_LOCATOR_UNAVAILABLE",
+        mismatch="RUSTC_LOCATOR_IDENTITY_MISMATCH",
+    )
+
+
+def run_worker_process(
+    *,
+    python: Path,
+    repo: Path,
+    expected_release_head: str,
+    expected_release_tree: str,
+    rustc: Path,
+    evidence_root: Path,
+    attempt_state_root: Path,
+    dispatch_intent: Path,
+) -> dict[str, Any]:
+    command = [
+        str(python),
+        "-I",
+        "-S",
+        "-B",
+        str(WORKER),
+        "--repo",
+        str(repo),
+        "--expected-release-head",
+        expected_release_head,
+        "--expected-release-tree",
+        expected_release_tree,
+        "--rustc",
+        str(rustc),
+        "--evidence-root",
+        str(evidence_root),
+        "--attempt-state-root",
+        str(attempt_state_root),
+        "--dispatch-intent",
+        str(dispatch_intent),
+    ]
+    completed = subprocess.run(
+        command,
+        check=False,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env={
+            "PATH": "/usr/bin:/bin",
+            "LC_ALL": "C",
+            "LANG": "C",
+            "REI_NATIVE_DISPATCH_FORBIDDEN": "0",
+        },
+    )
+    if completed.returncode != 0:
+        detail = completed.stderr.strip() or completed.stdout.strip()
+        raise ControllerError(
+            f"WORKER_EXIT_NONZERO:{completed.returncode}:{detail}"
+        )
+    lines = [line for line in completed.stdout.splitlines() if line.strip()]
+    if not lines:
+        raise ControllerError("WORKER_SUCCESS_RECEIPT_MISSING")
+    try:
+        payload = json.loads(lines[-1])
+    except json.JSONDecodeError as exc:
+        raise ControllerError("WORKER_SUCCESS_RECEIPT_INVALID") from exc
+    if not isinstance(payload, dict) or payload.get("status") != "WORKER_EXIT_0":
+        raise ControllerError("WORKER_SUCCESS_RECEIPT_INVALID")
+    return payload
 
 
 def run_controller(
@@ -82,16 +217,12 @@ def run_controller(
     expected_release_tree: str,
     successor_section0_receipt: Path,
     static_preflight_receipt: Path,
-    attempt_ref_protection_receipt: Path,
     rustc: Path,
     python: Path,
-    mpfr: Path,
-    gmp: Path,
-    cc: Path,
-    ld: Path,
     evidence_root: Path,
     attempt_state_root: Path,
     token: str,
+    api_base: str = "https://api.github.com",
 ) -> tuple[Mapping[str, Any], Path]:
     if os.environ.get("REI_NATIVE_DISPATCH_FORBIDDEN") == "1":
         raise ControllerError("HOSTED_CI_NATIVE_DISPATCH_FORBIDDEN")
@@ -105,34 +236,15 @@ def run_controller(
         expected_head=expected_release_head,
         expected_tree=expected_release_tree,
     )
-    verify_executing_package_binding(root, contract)
     validate_successor_receipt(successor_section0_receipt, contract)
-    successor_path = Path(successor_section0_receipt).resolve(strict=True)
-    successor_sha = sha256_file(successor_path)
-    preflight_path = Path(static_preflight_receipt).resolve(strict=True)
-    preflight_output_root = preflight_path.parent
+    successor_sha = sha256_file(successor_section0_receipt)
     validate_preflight_receipt(
-        preflight_path,
+        static_preflight_receipt,
         expected_head=expected_release_head,
         expected_tree=expected_release_tree,
         successor_receipt_sha256=successor_sha,
-        expected_attempt_state_root=state,
-        expected_output_root=preflight_output_root,
-        expected_successor_receipt_path=successor_path,
-        expected_authority=GITHUB_AUTHORITY,
-        expected_global_ref=GLOBAL_ATTEMPT_REF,
     )
-    preflight_sha = sha256_file(preflight_path)
-    protection_path = Path(attempt_ref_protection_receipt).resolve(strict=True)
-    validate_attempt_ref_protection(
-        protection_path,
-        contract=contract,
-        expected_global_ref=GLOBAL_ATTEMPT_REF,
-    )
-    protection_sha = sha256_file(protection_path)
-    if not token:
-        raise ControllerError("GLOBAL_LEASE_TOKEN_UNAVAILABLE")
-
+    preflight_sha = sha256_file(static_preflight_receipt)
     toolchain = contract["successor_section0"]["semantic_toolchain_lock"]
     python_path = _validate_python(python, toolchain["python_sha256"])
     rustc_path = _validate_rustc(rustc, toolchain["rustc_sha256"])
@@ -141,22 +253,8 @@ def run_controller(
         repo=root,
         state_root=state,
     )
-    revalidation_output = (
-        preflight_output_root / "prelease-toolchain-revalidation.json"
-    )
-    revalidation = revalidate_successor_toolchain(
-        repo=root,
-        contract=contract,
-        rustc=rustc_path,
-        python=python_path,
-        mpfr=mpfr,
-        gmp=gmp,
-        cc=cc,
-        ld=ld,
-        original_successor_receipt=successor_path,
-        output=revalidation_output,
-    )
-    revalidation_sha = revalidation["receipt_sha256"]
+    if not token:
+        raise ControllerError("GLOBAL_LEASE_TOKEN_UNAVAILABLE")
 
     global_path = state / "attempt-3.global-lease.json"
     local_path = state / "attempt-3.local-lease.json"
@@ -173,10 +271,9 @@ def run_controller(
             release_head=expected_release_head,
             successor_receipt_sha256=successor_sha,
             preflight_receipt_sha256=preflight_sha,
-            attempt_ref_protection_receipt_sha256=protection_sha,
-            prelease_toolchain_revalidation_sha256=revalidation_sha,
             token=token,
             output=global_path,
+            api_base=api_base,
         )
 
     def reserve_local(global_record: Mapping[str, Any]) -> Mapping[str, Any]:
@@ -202,8 +299,8 @@ def run_controller(
             release_tree=expected_release_tree,
             global_record=global_record,
             local_record=local_record,
-            successor_receipt=successor_path,
-            preflight_receipt=preflight_path,
+            successor_receipt=successor_section0_receipt,
+            preflight_receipt=static_preflight_receipt,
             evidence_root=evidence,
         )
 
@@ -231,15 +328,13 @@ def run_controller(
             run_worker=execute_worker,
         )
         outcome = {
-            "schema": "rei-runtime-firewall-attempt-outcome/v2",
+            "schema": "rei-runtime-firewall-attempt-outcome/v1",
             "status": "WORKER_COMPLETED",
             "created_at_utc": datetime.now(timezone.utc).isoformat(),
             "dispatch_started": True,
             "worker_status": worker_result["status"],
             "runtime_receipt": worker_result["runtime_receipt"],
             "runtime_receipt_sha256": worker_result["runtime_receipt_sha256"],
-            "attempt_ref_protection_receipt_sha256": protection_sha,
-            "prelease_toolchain_revalidation_sha256": revalidation_sha,
             "retries_remaining": 0,
             "next_gate": "RUNTIME_RESULT_AUDIT",
         }
@@ -251,7 +346,7 @@ def run_controller(
                 write_o_excl(
                     outcome_path,
                     {
-                        "schema": "rei-runtime-firewall-attempt-outcome/v2",
+                        "schema": "rei-runtime-firewall-attempt-outcome/v1",
                         "status": "STOP_INVALID",
                         "created_at_utc": datetime.now(timezone.utc).isoformat(),
                         "dispatch_started": dispatch_started,
@@ -259,8 +354,6 @@ def run_controller(
                         "global_reservation_or_indeterminate": (
                             reservation_may_have_occurred
                         ),
-                        "attempt_ref_protection_receipt_sha256": protection_sha,
-                        "prelease_toolchain_revalidation_sha256": revalidation_sha,
                         "retries_remaining": remaining_attempts_after_stop(
                             global_acquired=reservation_may_have_occurred
                         ),
@@ -278,17 +371,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--expected-release-tree", required=True)
     parser.add_argument("--successor-section0-receipt", type=Path, required=True)
     parser.add_argument("--static-preflight-receipt", type=Path, required=True)
-    parser.add_argument(
-        "--attempt-ref-protection-receipt", type=Path, required=True
-    )
     parser.add_argument("--rustc", type=Path, required=True)
     parser.add_argument("--python", type=Path, required=True)
-    parser.add_argument("--mpfr", type=Path, required=True)
-    parser.add_argument("--gmp", type=Path, required=True)
-    parser.add_argument("--cc", type=Path, required=True)
-    parser.add_argument("--ld", type=Path, required=True)
     parser.add_argument("--evidence-root", type=Path, required=True)
     parser.add_argument("--attempt-state-root", type=Path, required=True)
+    parser.add_argument("--api-base", default="https://api.github.com")
     parser.add_argument("--token-env", default="GITHUB_TOKEN")
     options = parser.parse_args(argv)
     try:
@@ -298,18 +385,12 @@ def main(argv: list[str] | None = None) -> int:
             expected_release_tree=options.expected_release_tree,
             successor_section0_receipt=options.successor_section0_receipt,
             static_preflight_receipt=options.static_preflight_receipt,
-            attempt_ref_protection_receipt=(
-                options.attempt_ref_protection_receipt
-            ),
             rustc=options.rustc,
             python=options.python,
-            mpfr=options.mpfr,
-            gmp=options.gmp,
-            cc=options.cc,
-            ld=options.ld,
             evidence_root=options.evidence_root,
             attempt_state_root=options.attempt_state_root,
             token=os.environ.get(options.token_env, ""),
+            api_base=options.api_base,
         )
     except FirewallError as exc:
         print(f"STOP_INVALID: {exc}", file=sys.stderr)
