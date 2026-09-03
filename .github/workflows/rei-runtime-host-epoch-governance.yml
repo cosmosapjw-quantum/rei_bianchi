@@ -1,0 +1,69 @@
+name: rei-runtime-host-epoch-governance
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/rei-runtime-host-epoch-governance.yml"
+      - "tests/governance/test_rei_runtime_host_epoch_governance.py"
+      - "docs/runtime_bridge_host_epoch_governance_20260903/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-governance:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact pull-request head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Verify backup ancestry and bounded changed paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=74f511f3bcd1cd5ee6b76fff892d796d5ce819a8
+          BASE_TREE=3f62e432d44ecfa107c47714df9d2bfe8bd65d8a
+          test "$(git rev-parse "${BASE}^{tree}")" = "$BASE_TREE"
+          git merge-base --is-ancestor "$BASE" HEAD
+          git diff --name-only "$BASE"...HEAD > /tmp/rei-governance-paths.txt
+          python3 - <<'PY'
+          from pathlib import Path
+
+          allowed_prefixes = (
+              "docs/runtime_bridge_host_epoch_governance_20260903/",
+              "tests/governance/test_rei_runtime_host_epoch_governance.py",
+              ".github/workflows/rei-runtime-host-epoch-governance.yml",
+          )
+          paths = [line for line in Path("/tmp/rei-governance-paths.txt").read_text().splitlines() if line]
+          unexpected = [path for path in paths if not path.startswith(allowed_prefixes)]
+          if unexpected:
+              raise SystemExit(f"GOVERNANCE_CHANGED_PATH_ESCAPE:{unexpected!r}")
+          print({"changed_paths": len(paths), "unexpected": 0})
+          PY
+
+      - name: Run governance contract tests
+        run: python3 -m unittest -v tests/governance/test_rei_runtime_host_epoch_governance.py
+
+      - name: Run independent governance verifier
+        run: python3 docs/runtime_bridge_host_epoch_governance_20260903/verify_governance_patch.py
+
+      - name: Regenerate state figure byte-for-byte
+        shell: bash
+        run: |
+          set -euo pipefail
+          TMP="$RUNNER_TEMP/GOVERNANCE_STATE.svg"
+          python3 docs/runtime_bridge_host_epoch_governance_20260903/render_governance_state.py \
+            docs/runtime_bridge_host_epoch_governance_20260903/GOVERNANCE_STATE.csv \
+            "$TMP"
+          cmp "$TMP" docs/runtime_bridge_host_epoch_governance_20260903/GOVERNANCE_STATE.svg
+
+      - name: Verify no native attempt was consumed
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e /tmp/rei-runtime-bridge-ntpath-rebind-20260903.native-attempt.json
+          echo NATIVE_RUNTIME_NOT_RUN
