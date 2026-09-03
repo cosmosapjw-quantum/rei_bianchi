@@ -27,9 +27,10 @@ REQUIRED = {
     "render_governance_state.py",
     "RUST_1_94_1_ENV.sh",
     "TDD_RED_RECEIPT.json",
+    "HASH_METHOD_CORRECTION_RECEIPT.json",
 }
 
-SEMANTIC_LOCK_ID = "d6702ccb6b66d0ac4324185a6eb43b0cbf5f58fee143c45771cf2d424aef87a7"
+SEMANTIC_LOCK_ID = "a3da50241ed6423212ab40c79f7810b5eaad042acdff29eb40f330aa39d2d4fa"
 OLD_SECTION0_SHA = "470fec225675a62a3c0121abcc4c568d345b088dd541a49fb18d91d6eacf104b"
 SOURCE_HEAD = "3169d1b0554193ababfb568406764d53df29649d"
 SOURCE_TREE = "1fa2da1a818bb311bf6cec42f76ff05693ed0903"
@@ -58,6 +59,7 @@ class HostEpochGovernanceContractTests(unittest.TestCase):
         successor = policy["successor_environment_epoch"]
         self.assertEqual(successor["required_status"], "PASS_EQUIVALENT_SECTION_0_SUCCESSOR")
         self.assertEqual(successor["semantic_toolchain_lock_sha256"], SEMANTIC_LOCK_ID)
+        self.assertEqual(successor["semantic_toolchain_lock_hash_method"], "SHA256_CANONICAL_UTF8_JSON_BYTES")
         self.assertEqual(successor["raw_receipt_relation"], "NEW_IDENTITY_REQUIRED")
         self.assertEqual(successor["host_identity_relation"], "DISTINCT_HOST_EPOCH_ALLOWED")
         self.assertGreaterEqual(len(successor["load_bearing_fields"]), 10)
@@ -143,6 +145,13 @@ class HostEpochGovernanceContractTests(unittest.TestCase):
         self.assertTrue(receipt["forbidden_bypass_edges_absent"])
         self.assertEqual(receipt["semantic_toolchain_lock_sha256"], SEMANTIC_LOCK_ID)
         self.assertEqual(receipt["authority_effect"], "NONE")
+
+    def test_hash_method_correction_is_explicit(self) -> None:
+        receipt = load("HASH_METHOD_CORRECTION_RECEIPT.json")
+        self.assertEqual(receipt["status"], "CORRECTED_TO_RAW_CANONICAL_BYTES")
+        self.assertEqual(receipt["correct_raw_utf8_sha256"], SEMANTIC_LOCK_ID)
+        self.assertNotEqual(receipt["incorrect_wolfram_expression_hash"], SEMANTIC_LOCK_ID)
+        self.assertEqual(receipt["scientific_effect"], "NONE")
 
     def test_rust_environment_helper_is_locator_only(self) -> None:
         helper = (GOV / "RUST_1_94_1_ENV.sh").read_text(encoding="utf-8")

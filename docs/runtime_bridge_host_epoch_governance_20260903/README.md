@@ -37,7 +37,9 @@ exact semantic toolchain lock
   == required on both admitted epochs
 ```
 
-The old Section-0 SHA `470fec...104b` remains historical. A successor receipt must use status `PASS_EQUIVALENT_SECTION_0_SUCCESSOR`, have a new raw SHA, and reproduce the semantic lock SHA `d670...87a7` field-by-field.
+The old Section-0 SHA `470fec...104b` remains historical. A successor receipt must use status `PASS_EQUIVALENT_SECTION_0_SUCCESSOR`, have a new raw SHA, and reproduce the canonical-byte semantic lock SHA `a3da...d4fa` field-by-field.
+
+The previously recorded `d670...87a7` value was a Wolfram expression hash of a character-code list, not the raw canonical JSON SHA-256. It is preserved only as superseded audit evidence; no toolchain field or physics formula changed.
 
 ## Attempt protocol
 

@@ -1,4 +1,4 @@
-Module[{nodes, edges, g, paths, requiredPath, bypassEdges, lock, lockJSON, lockHash},
+Module[{nodes, edges, g, paths, requiredPath, bypassEdges, lock, lockJSON, stream, file, lockHash},
  nodes = {"HistoricalAttemptLedger", "SourcePacketBackup", "Section0Successor", "GlobalLease", "LocalLease", "NativeAttempt", "RuntimeResultAudit", "FirstIntervalEligibility", "ProviderReview"};
  edges = {
    "HistoricalAttemptLedger" -> "Section0Successor",
@@ -34,7 +34,12 @@ Module[{nodes, edges, g, paths, requiredPath, bypassEdges, lock, lockJSON, lockH
    "rounding_policy" -> "MPFR_RNDD_RNDU"
  |>;
  lockJSON = ExportString[KeySort[lock], "RawJSON", "Compact" -> True];
- lockHash = IntegerString[Hash[ToCharacterCode[lockJSON, "UTF8"], "SHA256"], 16, 64];
+ file = CreateTemporary[];
+ stream = OpenWrite[file, BinaryFormat -> True];
+ BinaryWrite[stream, ToCharacterCode[lockJSON, "UTF8"]];
+ Close[stream];
+ lockHash = IntegerString[FileHash[file, "SHA256"], 16, 64];
+ DeleteFile[file];
  ExportString[<|
    "status" -> If[And[AcyclicGraphQ[g], Length[paths] == 1, First[paths] === requiredPath,
       And @@ (MemberQ[#, "Section0Successor"] & /@ paths),
@@ -47,6 +52,8 @@ Module[{nodes, edges, g, paths, requiredPath, bypassEdges, lock, lockJSON, lockH
    "all_paths_through_global_lease" -> And @@ (MemberQ[#, "GlobalLease"] & /@ paths),
    "all_paths_through_runtime_audit" -> And @@ (MemberQ[#, "RuntimeResultAudit"] & /@ paths),
    "forbidden_bypass_edges_absent" -> (Intersection[EdgeList[g], bypassEdges] === {}),
-   "semantic_toolchain_lock_sha256" -> lockHash, "authority_effect" -> "NONE"
+   "semantic_toolchain_lock_sha256" -> lockHash,
+   "semantic_toolchain_lock_hash_method" -> "SHA256_CANONICAL_UTF8_JSON_BYTES",
+   "authority_effect" -> "NONE"
  |>, "RawJSON"]
 ]

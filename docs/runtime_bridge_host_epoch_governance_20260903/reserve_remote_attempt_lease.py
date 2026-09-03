@@ -19,6 +19,7 @@ from typing import Any
 HERE = Path(__file__).resolve().parent
 DEFAULT_PROTOCOL = HERE / "GLOBAL_ATTEMPT_LEASE_PROTOCOL.json"
 ATTEMPT_REF_PREFIX = "refs/heads/attempt-ledger/"
+SEMANTIC_LOCK_SHA256 = "a3da50241ed6423212ab40c79f7810b5eaad042acdff29eb40f330aa39d2d4fa"
 
 
 def canonical_bytes(value: Any) -> bytes:
@@ -51,7 +52,7 @@ def main() -> int:
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     if receipt.get("status") != "PASS_EQUIVALENT_SECTION_0_SUCCESSOR":
         raise SystemExit("SUCCESSOR_SECTION0_NOT_PASSED")
-    if receipt.get("semantic_toolchain_lock_sha256") != "d6702ccb6b66d0ac4324185a6eb43b0cbf5f58fee143c45771cf2d424aef87a7":
+    if receipt.get("semantic_toolchain_lock_sha256") != SEMANTIC_LOCK_SHA256:
         raise SystemExit("SUCCESSOR_SECTION0_LOCK_MISMATCH")
 
     ref = protocol["lease_ref"]

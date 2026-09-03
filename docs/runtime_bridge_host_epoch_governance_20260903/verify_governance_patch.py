@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-EXPECTED_LOCK = "d6702ccb6b66d0ac4324185a6eb43b0cbf5f58fee143c45771cf2d424aef87a7"
+EXPECTED_LOCK = "a3da50241ed6423212ab40c79f7810b5eaad042acdff29eb40f330aa39d2d4fa"
 
 
 def load(name: str) -> dict:
@@ -45,11 +45,16 @@ def main() -> int:
     lease = load("GLOBAL_ATTEMPT_LEASE_PROTOCOL.json")
     recovery = load("RUNTIME_RECOVERY_INPUTS.json")
     wolfram = load("WOLFRAM_DAG_RECEIPT.json")
+    correction = load("HASH_METHOD_CORRECTION_RECEIPT.json")
 
     successor = policy["successor_environment_epoch"]
     actual_lock = hashlib.sha256(canonical(successor["semantic_toolchain_lock"])).hexdigest()
     if actual_lock != EXPECTED_LOCK or actual_lock != successor["semantic_toolchain_lock_sha256"]:
         raise SystemExit("SEMANTIC_TOOLCHAIN_LOCK_MISMATCH")
+    if successor["semantic_toolchain_lock_hash_method"] != "SHA256_CANONICAL_UTF8_JSON_BYTES":
+        raise SystemExit("SEMANTIC_TOOLCHAIN_LOCK_METHOD_MISMATCH")
+    if correction["correct_raw_utf8_sha256"] != actual_lock:
+        raise SystemExit("HASH_CORRECTION_RECEIPT_MISMATCH")
     if not acyclic(policy["dag"]["nodes"], policy["dag"]["edges"]):
         raise SystemExit("GOVERNANCE_DAG_CYCLE_OR_CLOSURE_FAILURE")
     if policy["historical_environment_epoch"]["may_be_reconstructed"]:
