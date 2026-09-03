@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Hostile-audit hardening layer for the REI firewall primitives.
 
-The original GREEN primitives remain preserved in ``common.py``.  This module
+The original GREEN primitives remain preserved in ``common.py``. This module
 adds strict semantic receipt checks and exact cross-receipt binding without
 introducing any production-module import.
 """
@@ -136,6 +136,19 @@ def validate_attempt_receipts(
     ):
         raise _base.FirewallError("GLOBAL_LEASE_RECEIPT_MISMATCH")
 
+    cross_successor = {
+        successor_sha,
+        local_record.get("successor_section0_receipt_sha256"),
+        dispatch_record.get("successor_section0_receipt_sha256"),
+    }
+    cross_preflight = {
+        preflight_sha,
+        local_record.get("preflight_receipt_sha256"),
+        dispatch_record.get("preflight_receipt_sha256"),
+    }
+    if len(cross_successor) != 1 or len(cross_preflight) != 1:
+        raise _base.FirewallError("ATTEMPT_RECEIPT_CROSS_HASH_MISMATCH")
+
     if (
         local_record.get("status") != "LOCAL_ATTEMPT_RESERVED"
         or local_record.get("firewall_release_head") != expected_head
@@ -154,18 +167,5 @@ def validate_attempt_receipts(
         or dispatch_record.get("retries_after_outcome") != 0
     ):
         raise _base.FirewallError("DISPATCH_INTENT_RECEIPT_MISMATCH")
-
-    cross_successor = {
-        successor_sha,
-        local_record.get("successor_section0_receipt_sha256"),
-        dispatch_record.get("successor_section0_receipt_sha256"),
-    }
-    cross_preflight = {
-        preflight_sha,
-        local_record.get("preflight_receipt_sha256"),
-        dispatch_record.get("preflight_receipt_sha256"),
-    }
-    if len(cross_successor) != 1 or len(cross_preflight) != 1:
-        raise _base.FirewallError("ATTEMPT_RECEIPT_CROSS_HASH_MISMATCH")
 
     return global_record, local_record, dispatch_record
