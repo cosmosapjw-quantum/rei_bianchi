@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - ".github/workflows/rei-runtime-bridge-successor-host-handoff.yml"
-      - "tests/governance/test_rei_runtime_successor_host_handoff.py"
+      - "tests/governance/test_rei_runtime_successor_host_handoff*.py"
       - "handoff/rei_runtime_bridge_successor_host_20260903/**"
   workflow_dispatch:
 
@@ -37,7 +37,7 @@ jobs:
           from pathlib import Path
           allowed = (
               ".github/workflows/rei-runtime-bridge-successor-host-handoff.yml",
-              "tests/governance/test_rei_runtime_successor_host_handoff.py",
+              "tests/governance/test_rei_runtime_successor_host_handoff",
               "handoff/rei_runtime_bridge_successor_host_20260903/",
           )
           paths = [x for x in Path("/tmp/rei-successor-handoff-paths.txt").read_text().splitlines() if x]
@@ -48,7 +48,10 @@ jobs:
           PY
 
       - name: Run successor handoff contract tests
-        run: python3 -m unittest -v tests/governance/test_rei_runtime_successor_host_handoff.py
+        run: |
+          python3 -m unittest discover -v \
+            -s tests/governance \
+            -p 'test_rei_runtime_successor_host_handoff*.py'
 
       - name: Run independent handoff verifier
         run: python3 handoff/rei_runtime_bridge_successor_host_20260903/verify_successor_handoff.py
