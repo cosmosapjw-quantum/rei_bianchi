@@ -1,0 +1,92 @@
+name: rei-runtime-attempt-ref-protection-freshness-green
+
+on:
+  push:
+    branches:
+      - fix/rei-runtime-attempt-ref-protection-freshness-green-20260904-r1
+  pull_request:
+    paths:
+      - "handoff/rei_runtime_attempt_ref_protection_freshness_20260904/**"
+      - "tests/governance/test_rei_runtime_attempt_ref_protection_freshness_red.py"
+      - "tests/governance/test_rei_runtime_attempt_ref_protection_freshness_green.py"
+      - ".github/workflows/rei-runtime-attempt-ref-protection-freshness-green.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+
+jobs:
+  verify-freshness-and-live-readback:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert exact RED parent ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor b8cd8b828c2517c537860f856792cae53f72b967 HEAD
+
+      - name: Compile successor package and tests
+        run: |
+          python -m py_compile \
+            handoff/rei_runtime_attempt_ref_protection_freshness_20260904/*.py \
+            tests/governance/test_rei_runtime_attempt_ref_protection_freshness_green.py
+
+      - name: Turn the six-method intentional RED contract GREEN
+        run: |
+          python -m unittest \
+            tests.governance.test_rei_runtime_attempt_ref_protection_freshness_red \
+            -v
+
+      - name: Run live-readback behavior and hostile tests
+        run: |
+          python -m unittest \
+            tests.governance.test_rei_runtime_attempt_ref_protection_freshness_green \
+            -v
+
+      - name: Re-run inherited import and authority governance tests
+        run: |
+          python -m unittest \
+            tests.governance.test_rei_runtime_prelease_import_firewall \
+            tests.governance.test_rei_runtime_prelease_import_firewall_hardening \
+            tests.governance.test_rei_runtime_authority_binding_red \
+            tests.governance.test_rei_runtime_authority_binding_green \
+            -v
+
+      - name: Run independent exact-head package verifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          head="$(git rev-parse HEAD)"
+          python \
+            handoff/rei_runtime_attempt_ref_protection_freshness_20260904/verify_package.py \
+            --repo . \
+            --expected-head "$head"
+
+      - name: Confirm global attempt ref remains absent by read-only GET
+        shell: bash
+        run: |
+          set -euo pipefail
+          ref='attempt-ledger/rei-runtime-bridge-ntpath-rebind-20260903-attempt-3'
+          code="$(curl -sS -o /tmp/attempt-ref.json -w '%{http_code}' \
+            "https://api.github.com/repos/cosmosapjw-quantum/rei_bianchi/git/ref/${ref}")"
+          test "$code" = 404
+
+      - name: Confirm no attempt or native evidence was created in CI
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(find . -type f \( \
+            -name 'attempt-3.global-lease.json' -o \
+            -name 'attempt-3.local-lease.json' -o \
+            -name 'attempt-3.dispatch-intent.json' -o \
+            -name 'attempt-3.outcome.json' -o \
+            -name 'attempt-3.live-protection-readback.json' \
+          \) -print -quit)"
