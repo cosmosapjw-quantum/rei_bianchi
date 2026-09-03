@@ -11,6 +11,7 @@ on:
       - "handoff/rei_runtime_successor_section0_preflight_20260903/**"
       - "handoff/rei_runtime_prelease_import_firewall_green_20260903/**"
       - "tests/governance/test_rei_runtime_prelease_import_firewall.py"
+      - "tests/governance/test_rei_runtime_prelease_import_firewall_hardening.py"
       - ".github/workflows/rei-runtime-prelease-import-firewall.yml"
   workflow_dispatch:
 
@@ -29,13 +30,15 @@ jobs:
           fetch-depth: 0
       - name: Verify production bridge is not imported before both attempt leases
         run: |
-          python3 -m unittest \
-            tests/governance/test_rei_runtime_prelease_import_firewall.py -v
+          python3 -B -m unittest \
+            tests/governance/test_rei_runtime_prelease_import_firewall.py \
+            tests/governance/test_rei_runtime_prelease_import_firewall_hardening.py \
+            -v
       - name: Verify closed GREEN package when present
         run: |
           package=handoff/rei_runtime_prelease_import_firewall_green_20260903
           if test -f "$package/verify_package.py"; then
-            python3 "$package/verify_package.py"
+            python3 -B "$package/verify_package.py"
           fi
       - name: Verify no attempt-state files were created by this workflow
         run: |
