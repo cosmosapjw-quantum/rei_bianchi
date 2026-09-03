@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fixed-authority successor preflight with explicitly bound receipt facts."""
+"""Fixed-authority successor Section-0 preflight without production import."""
 
 from __future__ import annotations
 
@@ -10,18 +10,12 @@ import os
 from pathlib import Path
 import sys
 from typing import Any, Mapping
+import urllib.error
+import urllib.parse
+import urllib.request
 
 try:
-    from . import successor_section0_preflight_impl as _impl
-    from .successor_section0_preflight_impl import (  # noqa: F401
-        GITHUB_API_BASE,
-        GITHUB_API_HOST,
-        GITHUB_API_VERSION,
-        GITHUB_REPOSITORY,
-        GITHUB_AUTHORITY,
-        PREFLIGHT_TTL_SECONDS,
-        observe_global_ref_read_only,
-    )
+    from . import common_v2 as _authority
     from .common_v2 import (
         FirewallError,
         load_contract,
@@ -36,16 +30,7 @@ try:
     )
     from . import successor_section0_preflight_legacy as _legacy
 except ImportError:
-    import successor_section0_preflight_impl as _impl  # type: ignore
-    from successor_section0_preflight_impl import (  # type: ignore # noqa: F401
-        GITHUB_API_BASE,
-        GITHUB_API_HOST,
-        GITHUB_API_VERSION,
-        GITHUB_REPOSITORY,
-        GITHUB_AUTHORITY,
-        PREFLIGHT_TTL_SECONDS,
-        observe_global_ref_read_only,
-    )
+    import common_v2 as _authority  # type: ignore
     from common_v2 import (  # type: ignore
         FirewallError,
         load_contract,
@@ -61,32 +46,77 @@ except ImportError:
     import successor_section0_preflight_legacy as _legacy  # type: ignore
 
 
-def _bound_observation(
-    source: Mapping[str, Any],
-    *,
-    ordinal: int,
-    release_head: str,
-) -> dict[str, Any]:
-    """Reconstruct a closed observation instead of copying arbitrary keys."""
+GITHUB_API_BASE = "https://api.github.com"
+GITHUB_API_HOST = "api.github.com"
+GITHUB_API_VERSION = "2022-11-28"
+GITHUB_REPOSITORY = "cosmosapjw-quantum/rei_bianchi"
+GITHUB_AUTHORITY: dict[str, str] = {
+    "scheme": "https",
+    "api_host": GITHUB_API_HOST,
+    "repository": GITHUB_REPOSITORY,
+    "api_version": GITHUB_API_VERSION,
+}
+PREFLIGHT_TTL_SECONDS = 1800
+if (
+    GITHUB_API_BASE != _authority.GITHUB_API_BASE
+    or GITHUB_REPOSITORY != _authority.GITHUB_REPOSITORY
+    or GITHUB_AUTHORITY != _authority.GITHUB_AUTHORITY
+):
+    raise RuntimeError("FIXED_GITHUB_AUTHORITY_CONSTANT_DRIFT")
 
-    return {
-        "status": source["status"],
-        "ordinal": ordinal,
-        "method": "GET",
-        "http_status": 404,
-        "authority": {
-            "scheme": "https",
-            "api_host": GITHUB_API_HOST,
-            "repository": GITHUB_REPOSITORY,
-            "api_version": GITHUB_API_VERSION,
-        },
-        "api_host": GITHUB_API_HOST,
-        "repository": GITHUB_REPOSITORY,
-        "ref": source["ref"],
-        "expected_target": release_head,
-        "authorization_effect": "NONE",
-        "global_lease_acquired": False,
+
+def observe_global_ref_read_only(
+    *,
+    ref: str,
+    expected_target: str,
+    ordinal: int,
+    token: str = "",
+) -> dict[str, Any]:
+    if not ref.startswith("refs/") or ordinal not in {1, 2}:
+        raise FirewallError("GLOBAL_REF_OBSERVATION_INPUT_INVALID")
+    relative = urllib.parse.quote(ref.removeprefix("refs/"), safe="/")
+    endpoint = (
+        f"{GITHUB_API_BASE}/repos/{GITHUB_REPOSITORY}/git/ref/{relative}"
+    )
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": GITHUB_API_VERSION,
+        "User-Agent": "rei-runtime-authority-binding-preflight/v2",
     }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(endpoint, method="GET", headers=headers)
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            status = response.status
+            payload = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return {
+                "status": "GLOBAL_ATTEMPT_REF_ABSENT_OBSERVED",
+                "ordinal": ordinal,
+                "method": "GET",
+                "http_status": 404,
+                "authority": GITHUB_AUTHORITY,
+                "api_host": GITHUB_API_HOST,
+                "repository": GITHUB_REPOSITORY,
+                "ref": ref,
+                "expected_target": expected_target,
+                "authorization_effect": "NONE",
+                "global_lease_acquired": False,
+            }
+        raise FirewallError(
+            f"GLOBAL_REF_READ_ONLY_OBSERVATION_FAILED:HTTP_{exc.code}"
+        ) from exc
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise FirewallError("GLOBAL_REF_READ_ONLY_OBSERVATION_FAILED") from exc
+    if status != 200 or not isinstance(payload, dict):
+        raise FirewallError("GLOBAL_REF_READ_ONLY_OBSERVATION_FAILED")
+    raise FirewallError(
+        "STOP_ATTEMPT_ALREADY_RESERVED:"
+        f"ref={payload.get('ref')!r}:"
+        f"target={payload.get('object', {}).get('sha')!r}"
+    )
 
 
 def build_preflight_receipt(
@@ -103,32 +133,6 @@ def build_preflight_receipt(
     emitter_stdout: str,
 ) -> dict[str, Any]:
     generated = datetime.now(timezone.utc)
-    first = {
-        "status": first_ref_observation["status"],
-        "ordinal": 1,
-        "method": "GET",
-        "http_status": 404,
-        "authority": GITHUB_AUTHORITY,
-        "api_host": GITHUB_API_HOST,
-        "repository": GITHUB_REPOSITORY,
-        "ref": first_ref_observation["ref"],
-        "expected_target": release_head,
-        "authorization_effect": "NONE",
-        "global_lease_acquired": False,
-    }
-    second = {
-        "status": second_ref_observation["status"],
-        "ordinal": 2,
-        "method": "GET",
-        "http_status": 404,
-        "authority": GITHUB_AUTHORITY,
-        "api_host": GITHUB_API_HOST,
-        "repository": GITHUB_REPOSITORY,
-        "ref": second_ref_observation["ref"],
-        "expected_target": release_head,
-        "authorization_effect": "NONE",
-        "global_lease_acquired": False,
-    }
     return {
         "schema": "rei-runtime-prelease-import-firewall-preflight-receipt/v2",
         "status": "PASS_READ_ONLY_STATIC_PREFLIGHT",
@@ -136,7 +140,12 @@ def build_preflight_receipt(
         "expires_at_utc": (
             generated + timedelta(seconds=PREFLIGHT_TTL_SECONDS)
         ).isoformat(),
-        "authority": GITHUB_AUTHORITY,
+        "authority": {
+            "scheme": "https",
+            "api_host": GITHUB_API_HOST,
+            "repository": GITHUB_REPOSITORY,
+            "api_version": GITHUB_API_VERSION,
+        },
         "firewall_release": {"commit": release_head, "tree": release_tree},
         "successor_section0_receipt": str(
             Path(successor_receipt_path).resolve(strict=True)
@@ -153,7 +162,10 @@ def build_preflight_receipt(
             ],
             "emitter_stdout": emitter_stdout,
         },
-        "global_ref_observations": [first, second],
+        "global_ref_observations": [
+            dict(first_ref_observation),
+            dict(second_ref_observation),
+        ],
         "attempt_state": {
             "global_lease_acquired": False,
             "local_lease_created": False,

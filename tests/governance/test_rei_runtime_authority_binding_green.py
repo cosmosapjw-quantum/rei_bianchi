@@ -61,8 +61,30 @@ class AuthorityBindingGreenTests(unittest.TestCase):
 
     def test_executing_package_is_the_package_in_checked_out_head(self) -> None:
         common, _, _ = load_modules()
-        bound = common.verify_executing_package_binding(ROOT, common.load_contract())
-        self.assertEqual(bound, (ROOT / common.FIREWALL_PACKAGE_RELATIVE).resolve())
+
+        def portable_read_only_git_text(repo: Path, *arguments: str) -> str:
+            self.assertEqual(arguments[0], "rev-parse")
+            specification = arguments[1]
+            self.assertTrue(specification.startswith("HEAD:"))
+            relative = specification.removeprefix("HEAD:")
+            return common.git_blob_sha1(Path(repo) / relative)
+
+        # The production path keeps the pinned-Git preauthentication gate.  This
+        # hosted-CI test substitutes only a read-only HEAD:<path> resolver so it
+        # can exercise the cross-binding logic without claiming host admission.
+        with mock.patch.object(
+            common._impl._base,
+            "git_text",
+            portable_read_only_git_text,
+        ):
+            bound = common.verify_executing_package_binding(
+                ROOT,
+                common.load_contract(),
+            )
+        self.assertEqual(
+            bound,
+            (ROOT / common.FIREWALL_PACKAGE_RELATIVE).resolve(),
+        )
 
     def test_fixed_global_lease_endpoint_and_evidence_hashes(self) -> None:
         common, _, _ = load_modules()
