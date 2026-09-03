@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - ".github/workflows/rei-runtime-bridge-pr38-source-packet.yml"
+      - ".github/workflows/rei-runtime-bridge-ntpath-rebind-handoff.yml"
       - "handoff/rei_runtime_bridge_ntpath_rebind_20260903/SOURCE_PACKET_CONTRACT.json"
       - "handoff/rei_runtime_bridge_ntpath_rebind_20260903/SOURCE_PACKET_README.md"
   workflow_dispatch:
@@ -35,6 +36,7 @@ jobs:
 
           allowed = {
               ".github/workflows/rei-runtime-bridge-pr38-source-packet.yml",
+              ".github/workflows/rei-runtime-bridge-ntpath-rebind-handoff.yml",
               "handoff/rei_runtime_bridge_ntpath_rebind_20260903/SOURCE_PACKET_CONTRACT.json",
               "handoff/rei_runtime_bridge_ntpath_rebind_20260903/SOURCE_PACKET_README.md",
           }
@@ -44,25 +46,31 @@ jobs:
           print({"changed_paths": len(paths), "unexpected": 0})
           PY
 
-      - name: Build and verify exact source packet
+      - name: Build and verify compact exact source packet
         shell: bash
         run: |
           set -euo pipefail
           SOURCE=3169d1b0554193ababfb568406764d53df29649d
           SOURCE_TREE=1fa2da1a818bb311bf6cec42f76ff05693ed0903
-          OUT="$RUNNER_TEMP/rei-pr38-source-packet"
-          EXTRACT="$RUNNER_TEMP/rei-pr38-source-extract"
+          OUT="$RUNNER_TEMP/rei-pr38-compact-source-packet"
+          EXTRACT="$RUNNER_TEMP/rei-pr38-compact-source-extract"
+          ARCHIVE="$OUT/rei_runtime_bridge_pr38_compact_inspection.tar.gz"
           mkdir -p "$OUT" "$EXTRACT"
 
-          git archive --format=tar --prefix=rei_bianchi-pr38-source/ "$SOURCE" \
-            | gzip -n -9 > "$OUT/rei_bianchi-pr38-source.tar.gz"
-          git archive --format=tar --prefix=rei_runtime_bridge_ntpath_rebind-pr38/ "$SOURCE" \
+          git archive --format=tar --prefix=rei_bianchi-pr38-compact/ "$SOURCE" \
             handoff/rei_runtime_bridge_ntpath_rebind_20260903 \
-            | gzip -n -9 > "$OUT/rei_runtime_bridge_ntpath_rebind-pr38.tar.gz"
+            stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/INPUT_LOCK.json \
+            stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/analysis/rust_source_bound_thermal.py \
+            stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/rust/source_bound_thermal.rs \
+            stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/rust/BUILD_RECEIPT.json \
+            stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/RUST_IMPLEMENTATION_AMENDMENT.json \
+            | gzip -n -9 > "$ARCHIVE"
 
-          tar -xzf "$OUT/rei_bianchi-pr38-source.tar.gz" -C "$EXTRACT"
-          ROOT="$EXTRACT/rei_bianchi-pr38-source"
-          test -d "$ROOT/.github"
+          cp handoff/rei_runtime_bridge_ntpath_rebind_20260903/SOURCE_PACKET_CONTRACT.json "$OUT/"
+          cp handoff/rei_runtime_bridge_ntpath_rebind_20260903/SOURCE_PACKET_README.md "$OUT/"
+
+          tar -xzf "$ARCHIVE" -C "$EXTRACT"
+          ROOT="$EXTRACT/rei_bianchi-pr38-compact"
           test -d "$ROOT/handoff/rei_runtime_bridge_ntpath_rebind_20260903"
 
           test "$(sha256sum "$ROOT/stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/INPUT_LOCK.json" | cut -d' ' -f1)" \
@@ -78,6 +86,8 @@ jobs:
               handoff/rei_runtime_bridge_ntpath_rebind_20260903/test_runtime_bridge_runner.py
           )
 
+          test "$(stat -c %s "$ARCHIVE")" -lt 536870912
+
           python3 - "$OUT" "$SOURCE" "$SOURCE_TREE" <<'PY'
           from __future__ import annotations
 
@@ -90,19 +100,30 @@ jobs:
           source = sys.argv[2]
           source_tree = sys.argv[3]
           files = {}
-          for path in sorted(out.iterdir()):
-              if path.is_file():
-                  files[path.name] = {
-                      "bytes": path.stat().st_size,
-                      "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-                  }
+          for name in (
+              "rei_runtime_bridge_pr38_compact_inspection.tar.gz",
+              "SOURCE_PACKET_CONTRACT.json",
+              "SOURCE_PACKET_README.md",
+          ):
+              path = out / name
+              files[name] = {
+                  "bytes": path.stat().st_size,
+                  "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+              }
           receipt = {
-              "schema": "rei-runtime-bridge-source-packet-receipt/v1",
-              "status": "PASS_EXACT_SOURCE_PACKET",
+              "schema": "rei-runtime-bridge-compact-source-packet-receipt/v2",
+              "status": "PASS_COMPACT_EXACT_SOURCE_PACKET",
               "source_commit": source,
               "source_tree": source_tree,
               "files": files,
               "portable_handoff_tests": {"passed": 10, "failed": 0},
+              "key_source_hashes": "PASS",
+              "artifact_below_512_mib": True,
+              "oversized_predecessor_artifact": {
+                  "artifact_id": 9877661352,
+                  "bytes": 1294322295,
+                  "sha256": "dade8db6731f780dc90e8e8d066c62c27ea6bb009e99373366f63ec8c7c56369"
+              },
               "native_runtime": "NOT_RUN",
               "section0_receipt": "NOT_INCLUDED_HOST_BOUND_INPUT",
               "rust_toolchain": "NOT_INCLUDED_HOST_BOUND_INPUT",
@@ -122,8 +143,9 @@ jobs:
           (
             cd "$OUT"
             sha256sum \
-              rei_bianchi-pr38-source.tar.gz \
-              rei_runtime_bridge_ntpath_rebind-pr38.tar.gz \
+              rei_runtime_bridge_pr38_compact_inspection.tar.gz \
+              SOURCE_PACKET_CONTRACT.json \
+              SOURCE_PACKET_README.md \
               SOURCE_PACKET_RECEIPT.json \
               > SHA256SUMS
             sha256sum -c SHA256SUMS
@@ -132,10 +154,10 @@ jobs:
           test ! -e /tmp/rei-runtime-bridge-ntpath-rebind-20260903.native-attempt.json
           echo NATIVE_RUNTIME_NOT_RUN
 
-      - name: Upload exact PR38 source packet
+      - name: Upload compact PR38 source packet
         uses: actions/upload-artifact@v4
         with:
-          name: rei-runtime-bridge-pr38-source-packet
-          path: ${{ runner.temp }}/rei-pr38-source-packet/*
+          name: rei-runtime-bridge-pr38-compact-source-packet
+          path: ${{ runner.temp }}/rei-pr38-compact-source-packet/*
           if-no-files-found: error
           retention-days: 90
