@@ -1,0 +1,43 @@
+{
+  "schema": "rei-runtime-global-attempt-lease-protocol/v1",
+  "status": "DESIGNED_NOT_ACQUIRED",
+  "repository": "cosmosapjw-quantum/rei_bianchi",
+  "lease_ref": "refs/heads/attempt-ledger/rei-runtime-bridge-ntpath-rebind-20260903-attempt-3",
+  "lease_target_commit": "3169d1b0554193ababfb568406764d53df29649d",
+  "acquisition": {
+    "operation": "GITHUB_CREATE_REF",
+    "http_method": "POST",
+    "endpoint": "/repos/cosmosapjw-quantum/rei_bianchi/git/refs",
+    "required_http_status": 201,
+    "on_existing_ref": "STOP_ATTEMPT_ALREADY_RESERVED",
+    "preflight_get_is_authoritative": false
+  },
+  "mutation_policy": {
+    "create_allowed_once": true,
+    "update_allowed": false,
+    "force_update_allowed": false,
+    "delete_allowed": false,
+    "ref_is_append_only_evidence": true
+  },
+  "ordering": [
+    "VERIFY_SOURCE_PACKET",
+    "PASS_SUCCESSOR_SECTION0",
+    "ACQUIRE_GLOBAL_LEASE",
+    "CREATE_LOCAL_O_EXCL_LEASE",
+    "NATIVE_DISPATCH_ONCE",
+    "RUNTIME_RESULT_AUDIT"
+  ],
+  "local_lease": {
+    "required_after_global_lease": true,
+    "operation": "O_EXCL_CREATE",
+    "recommended_parent": "USER_SELECTED_PERSISTENT_EVIDENCE_ROOT",
+    "tmp_is_forbidden_for_durable_history": true
+  },
+  "failure_rules": {
+    "network_or_auth_failure": "STOP_WITHOUT_LOCAL_LEASE_OR_NATIVE_DISPATCH",
+    "ref_already_exists": "STOP_ATTEMPT_ALREADY_RESERVED",
+    "response_ref_or_target_mismatch": "STOP_REMOTE_LEASE_RESPONSE_MISMATCH",
+    "local_lease_conflict": "STOP_LOCAL_ATTEMPT_ALREADY_RESERVED"
+  },
+  "claim_boundary": "LEASE_PROTOCOL_ONLY_NATIVE_RUNTIME_NOT_RUN"
+}
