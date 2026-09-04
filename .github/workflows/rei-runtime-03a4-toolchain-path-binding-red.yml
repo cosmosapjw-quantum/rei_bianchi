@@ -1,0 +1,88 @@
+name: rei-runtime-03a4-toolchain-path-binding-red
+
+on:
+  push:
+    branches:
+      - audit/rei-runtime-03a4-toolchain-path-binding-red-20260904-r1
+    paths:
+      - "tests/governance/test_rei_runtime_03a4_toolchain_path_binding_red.py"
+      - ".github/workflows/rei-runtime-03a4-toolchain-path-binding-red.yml"
+      - "docs/rei_runtime_bridge_03a4_toolchain_path_binding/**"
+  pull_request:
+    paths:
+      - "handoff/rei_runtime_prelease_import_firewall_green_20260903/**"
+      - "stages/REI_LOCAL_01_SOURCE_BOUND_PAIRED_MAP_ADAPTER/analysis/rust_source_bound_thermal.py"
+      - "tests/governance/test_rei_runtime_03a4_toolchain_path_binding_red.py"
+      - ".github/workflows/rei-runtime-03a4-toolchain-path-binding-red.yml"
+      - "docs/rei_runtime_bridge_03a4_toolchain_path_binding/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  expected-red:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert exact PR54 ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor \
+            9ecaa45d4794b2c7f2a430acff4e3ac7f213a2fc HEAD
+
+      - name: Compile static RED contract
+        run: |
+          python -m py_compile \
+            tests/governance/test_rei_runtime_03a4_toolchain_path_binding_red.py
+
+      - name: Observe six-failure toolchain path-binding RED
+        shell: bash
+        run: |
+          set +e
+          set +u
+          set +o pipefail 2>/dev/null || true
+
+          python -m unittest -v \
+            tests.governance.test_rei_runtime_03a4_toolchain_path_binding_red \
+            2>&1 | tee toolchain-path-binding-red.log
+          rc=${PIPESTATUS[0]}
+
+          test "$rc" -ne 0
+          grep -q 'Ran 6 tests' toolchain-path-binding-red.log
+          grep -Eq 'FAILED \(failures=6\)' toolchain-path-binding-red.log
+          grep -q 'P0_RUNTIME_TOOLCHAIN_PATH_BINDING_ABSENT' \
+            toolchain-path-binding-red.log
+          grep -q 'P0_PREFLIGHT_ACCEPTS_CALLER_SELECTED_TOOLCHAIN_WITNESS_PATHS' \
+            toolchain-path-binding-red.log
+          grep -q 'P0_PRELEASE_REVALIDATION_ACCEPTS_ALTERNATE_HASH_COPY' \
+            toolchain-path-binding-red.log
+          grep -q 'P0_PREFLIGHT_RUNTIME_PATH_RECEIPT_FIELD_ABSENT' \
+            toolchain-path-binding-red.log
+          grep -q 'P0_RUNTIME_PATH_SNAPSHOT_NOT_PROPAGATED' \
+            toolchain-path-binding-red.log
+          grep -q 'P0_ALTERNATE_EXACT_HASH_COPY_REJECTION_ABSENT' \
+            toolchain-path-binding-red.log
+
+          printf '%s\n' \
+            'classification=PASS_EXPECTED_03A4_TOOLCHAIN_PATH_BINDING_RED'
+
+      - name: Assert no attempt or native state was created
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(find "$GITHUB_WORKSPACE" -type f \( \
+            -name 'successor-section0.json' -o \
+            -name 'read-only-static-preflight-receipt.json' -o \
+            -name 'attempt-3.global-lease.json' -o \
+            -name 'attempt-3.local-lease.json' -o \
+            -name 'attempt-3.dispatch-intent.json' -o \
+            -name 'attempt-3.outcome.json' \
+          \) -print -quit)"
