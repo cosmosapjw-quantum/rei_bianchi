@@ -15,7 +15,9 @@ INDEX = PACKAGE / "SOURCE_INDEX.json"
 EXTERNAL = {
     ".github/workflows/rei-runtime-attempt-ref-ruleset-readback-red.yml",
     ".github/workflows/rei-runtime-attempt-ref-ruleset-readback-green.yml",
+    ".github/workflows/rei-runtime-independent-readback-get-normalization.yml",
     "tests/governance/test_rei_runtime_attempt_ref_ruleset_independent_readback_red.py",
+    "tests/governance/test_rei_runtime_independent_readback_get_normalization.py",
 }
 
 
@@ -50,7 +52,7 @@ def main() -> int:
     ):
         print("STOP_INVALID: SOURCE_INDEX_SCHEMA", file=sys.stderr)
         return 65
-    indexed: set[str] = set()
+    indexed = set()
     for row in value["entries"]:
         if not isinstance(row, dict) or set(row) != {"path", "blob_sha", "role"}:
             print("STOP_INVALID: SOURCE_INDEX_ROW", file=sys.stderr)
