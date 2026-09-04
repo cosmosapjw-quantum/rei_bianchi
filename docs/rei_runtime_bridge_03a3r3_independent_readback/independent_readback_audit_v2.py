@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """Active semantic repair for independent REI ruleset readback auditing.
 
-The v1 module remains the byte-pinned implementation donor.  This active
-surface changes only the temporal semantics of retrospective provenance:
-the original source-protection receipt need not still be fresh when audited,
-but the original administrative operation must have completed before that
-receipt expired.  Current authorization is established only by new live GETs
-and the newly emitted protection receipt.
+The v1 module remains the byte-pinned implementation donor. This active
+surface separates historical receipt validity from current authorization and
+also accepts GitHub's normalized GET representation of an active update rule,
+which may omit request-only parameters. The locally owned creation payload
+remains strict in the byte-pinned administrator client.
 """
 
 from __future__ import annotations
@@ -20,6 +19,7 @@ from pathlib import Path
 import subprocess
 import sys
 from typing import Any, Mapping
+from urllib.parse import quote
 
 
 PACKAGE = Path(__file__).resolve().parent
@@ -56,23 +56,120 @@ FUTURE_CLOCK_SKEW_SECONDS = _v1.FUTURE_CLOCK_SKEW_SECONDS
 AUTHORITY = _v1.AUTHORITY
 RULESET_PAYLOAD = _v1.RULESET_PAYLOAD
 PARENT_ADMIN_RELATIVE = _v1.PARENT_ADMIN_RELATIVE
-PARENT_ADMIN_BLOB = _v1.PARENT_ADMIN_BLOB
+PARENT_ADMIN_BLOB = "0b1b56d6dcaf2bc4ed68ba938ad20feeaeab0ecf"
 
 ReadbackAuditError = _v1.ReadbackAuditError
 canonical_bytes = _v1.canonical_bytes
 sha256_bytes = _v1.sha256_bytes
 sha256_file = _v1.sha256_file
 _parse_utc = _v1._parse_utc
-valid_admin_receipt = _v1.validate_admin_receipt
+_mapping = _v1._mapping
+_valid_hex = _v1._valid_hex
 validate_admin_receipt = _v1.validate_admin_receipt
 validate_source_protection_receipt = _v1.validate_source_protection_receipt
-validate_ruleset_details = _v1.validate_ruleset_details
 find_named_ruleset = _v1.find_named_ruleset
-validate_live_snapshot = _v1.validate_live_snapshot
 build_fresh_source_protection_receipt = (
     _v1.build_fresh_source_protection_receipt
 )
 request_json = _v1.request_json
+
+
+def validate_update_rule(details: Mapping[str, Any]) -> str:
+    """Validate GitHub's active update-rule GET representation.
+
+    GitHub currently returns either the explicit request-like representation
+    or the normalized ``{"type":"update"}`` representation. Omission is
+    accepted only here, on the fixed-authority GET-only independent readback
+    surface. Explicit malformed or permissive parameters remain rejected.
+    """
+
+    rows = details.get("rules")
+    if not isinstance(rows, list):
+        raise ReadbackAuditError("LIVE_RULESET_RULES_INVALID")
+    updates = [
+        row
+        for row in rows
+        if isinstance(row, dict) and row.get("type") == "update"
+    ]
+    if len(updates) != 1:
+        raise ReadbackAuditError("LIVE_RULESET_UPDATE_POLICY_MISMATCH")
+    update = updates[0]
+    if "parameters" not in update:
+        if set(update) != {"type"}:
+            raise ReadbackAuditError("LIVE_RULESET_UPDATE_POLICY_MISMATCH")
+        return "GITHUB_GET_NORMALIZED_PARAMETERS_OMITTED"
+    parameters = update["parameters"]
+    if (
+        not isinstance(parameters, Mapping)
+        or set(parameters) != {"update_allows_fetch_and_merge"}
+        or parameters.get("update_allows_fetch_and_merge") is not False
+    ):
+        raise ReadbackAuditError("LIVE_RULESET_UPDATE_POLICY_MISMATCH")
+    return "EXPLICIT_FALSE"
+
+
+def validate_ruleset_details(details: Mapping[str, Any]) -> int:
+    value = _mapping(details, "LIVE_RULESET_DETAILS_NOT_OBJECT")
+    condition = value.get("conditions", {}).get("ref_name", {})
+    types = _v1._rule_types(value)
+    if (
+        value.get("name") != RULESET_NAME
+        or value.get("target") != "branch"
+        or value.get("enforcement") != "active"
+        or value.get("bypass_actors", []) != []
+        or condition.get("include") != [TARGET_PATTERN]
+        or condition.get("exclude", []) != []
+        or types != REQUIRED_RULES
+        or "creation" in types
+    ):
+        raise ReadbackAuditError("LIVE_RULESET_DETAILS_MISMATCH")
+    validate_update_rule(value)
+    ruleset_id = value.get("id")
+    if not isinstance(ruleset_id, int) or ruleset_id <= 0:
+        raise ReadbackAuditError("LIVE_RULESET_ID_INVALID")
+    return ruleset_id
+
+
+def validate_live_snapshot(
+    *,
+    ruleset_list: Any,
+    ruleset_details: Mapping[str, Any],
+    effective_rules: Any,
+    ref_http_status: int,
+    expected_ruleset_id: int,
+) -> dict[str, Any]:
+    named = find_named_ruleset(ruleset_list)
+    if named is None or named.get("id") != expected_ruleset_id:
+        raise ReadbackAuditError("LIVE_NAMED_RULESET_MISSING_OR_REPLACED")
+    ruleset_id = validate_ruleset_details(ruleset_details)
+    if ruleset_id != expected_ruleset_id:
+        raise ReadbackAuditError("LIVE_RULESET_ID_DRIFT")
+    if not isinstance(effective_rules, list):
+        raise ReadbackAuditError("LIVE_EFFECTIVE_RULES_INVALID")
+    supplied = set()
+    all_types = set()
+    for row in effective_rules:
+        if not isinstance(row, dict) or not isinstance(row.get("type"), str):
+            raise ReadbackAuditError("LIVE_EFFECTIVE_RULE_INVALID")
+        kind = row["type"]
+        all_types.add(kind)
+        if kind in REQUIRED_RULES and row.get("ruleset_id") == ruleset_id:
+            supplied.add(kind)
+    if "creation" in all_types:
+        raise ReadbackAuditError("LIVE_CREATION_RULE_FORBIDDEN")
+    if supplied != REQUIRED_RULES:
+        raise ReadbackAuditError("LIVE_REQUIRED_RULES_MISSING")
+    if ref_http_status != 404:
+        raise ReadbackAuditError(
+            f"LIVE_GLOBAL_ATTEMPT_REF_NOT_ABSENT_HTTP_{ref_http_status}"
+        )
+    return {
+        "status": "PASS_INDEPENDENT_LIVE_RULESET_SNAPSHOT",
+        "ruleset_id": ruleset_id,
+        "update_rule_readback": validate_update_rule(ruleset_details),
+        "all_effective_rule_types": sorted(all_types),
+        "global_ref_absent": True,
+    }
 
 
 def validate_operation_evidence(
@@ -179,13 +276,13 @@ def verify_executing_release(
     expected_head: str,
     expected_tree: str,
 ) -> Path:
-    """Bind the active surface, donor and source index to exact HEAD."""
+    """Bind the active surface, donor, admin generator, and index to HEAD."""
 
     root = Path(repo).resolve(strict=True)
     if (
         not root.is_dir()
-        or not _v1._valid_hex(expected_head, 40)
-        or not _v1._valid_hex(expected_tree, 40)
+        or not _valid_hex(expected_head, 40)
+        or not _valid_hex(expected_tree, 40)
     ):
         raise ReadbackAuditError("RELEASE_IDENTITY_ARGUMENT_INVALID")
     expected_script = (root / SCRIPT_RELATIVE).resolve(strict=True)
@@ -240,6 +337,55 @@ def verify_executing_release(
     return root
 
 
+def _live_readback(
+    *, token: str, expected_ruleset_id: int
+) -> tuple[dict[str, Any], dict[str, bytes]]:
+    """Perform the fixed-authority GET-only live readback."""
+
+    prefix = f"/repos/{OWNER}/{REPO}"
+    list_status, list_raw, listed = request_json(
+        "GET", f"{prefix}/rulesets", token=token
+    )
+    if list_status != 200:
+        raise ReadbackAuditError(f"LIVE_RULESET_LIST_HTTP_{list_status}")
+    named = find_named_ruleset(listed)
+    if named is None or named.get("id") != expected_ruleset_id:
+        raise ReadbackAuditError("LIVE_NAMED_RULESET_MISSING_OR_REPLACED")
+    details_status, details_raw, details = request_json(
+        "GET", f"{prefix}/rulesets/{expected_ruleset_id}", token=token
+    )
+    if details_status != 200 or not isinstance(details, dict):
+        raise ReadbackAuditError(f"LIVE_RULESET_DETAILS_HTTP_{details_status}")
+    encoded_branch = quote(ATTEMPT_BRANCH, safe="")
+    effective_status, effective_raw, effective = request_json(
+        "GET",
+        f"{prefix}/rules/branches/{encoded_branch}",
+        token=token,
+    )
+    if effective_status != 200:
+        raise ReadbackAuditError(
+            f"LIVE_PROSPECTIVE_RULES_HTTP_{effective_status}"
+        )
+    ref_path = quote("heads/" + ATTEMPT_BRANCH, safe="/")
+    ref_status, ref_raw, _ = request_json(
+        "GET", f"{prefix}/git/ref/{ref_path}", token=token
+    )
+    snapshot = validate_live_snapshot(
+        ruleset_list=listed,
+        ruleset_details=details,
+        effective_rules=effective,
+        ref_http_status=ref_status,
+        expected_ruleset_id=expected_ruleset_id,
+    )
+    raw = {
+        "ruleset_list": list_raw,
+        "ruleset_details": details_raw,
+        "effective_rules": effective_raw,
+        "global_ref": ref_raw,
+    }
+    return snapshot, raw
+
+
 def run_audit(
     *,
     repo: Path,
@@ -264,7 +410,7 @@ def run_audit(
         evidence_path=operation_evidence,
     )
     ruleset_id = bundle["admin"]["ruleset_id"]
-    snapshot, raw = _v1._live_readback(
+    snapshot, raw = _live_readback(
         token=token, expected_ruleset_id=ruleset_id
     )
     now = datetime.now(timezone.utc)
@@ -334,6 +480,7 @@ def run_audit(
         ),
         "historical_receipt_current_freshness_required": False,
         "fresh_live_readback_completed": True,
+        "update_rule_readback": snapshot["update_rule_readback"],
         "global_ref": "ABSENT_404",
         "native_runtime": "NOT_RUN",
     }
@@ -341,9 +488,14 @@ def run_audit(
 
 def _self_test() -> dict[str, Any]:
     result = dict(_v1._self_test())
+    normalized = json.loads(json.dumps(RULESET_PAYLOAD))
+    normalized["id"] = 42
+    normalized["rules"][0] = {"type": "update"}
     result["status"] = "PASS_INDEPENDENT_READBACK_V2_SELF_TEST"
     result["historical_receipt_current_freshness_required"] = False
     result["original_operation_must_finish_before_expiry"] = True
+    result["normalized_update_get"] = validate_update_rule(normalized)
+    result["parent_admin_blob"] = PARENT_ADMIN_BLOB
     return result
 
 
