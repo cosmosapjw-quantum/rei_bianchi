@@ -151,6 +151,7 @@ printf 'builder_authority_effect=NONE\n'
 printf '===== NETWORKED DISPOSABLE BOOTSTRAP =====\n'
 set +e
 docker run --rm \
+  --interactive \
   --network=bridge \
   --security-opt=no-new-privileges \
   --env DEBIAN_FRONTEND=noninteractive \

@@ -100,6 +100,7 @@ class HostEpochDockerBootstrapExpectedRed(unittest.TestCase):
             "REI_HOST_EPOCH_ROOT",
             "ATTEMPT_STATE_ROOT",
             "tar --numeric-owner",
+            "--interactive",
         )
         self.assertTrue(
             all(token in source for token in required),
