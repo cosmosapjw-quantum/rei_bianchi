@@ -1,0 +1,55 @@
+name: rei-runtime-attempt-ref-ruleset-readback-red
+
+on:
+  push:
+    branches:
+      - audit/rei-runtime-attempt-ref-ruleset-readback-red-20260904-r1
+
+permissions:
+  contents: read
+
+env:
+  REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+
+jobs:
+  observe-independent-readback-red:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert exact PR50 ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor \
+            a24f4710a1a105443da4c1bc5c7191ca1a4e33a5 HEAD
+
+      - name: Observe exact intentional RED
+        shell: bash
+        run: |
+          set +e
+          python -m unittest -v \
+            tests.governance.test_rei_runtime_attempt_ref_ruleset_independent_readback_red \
+            > /tmp/rei-ruleset-readback-red.log 2>&1
+          rc=$?
+          cat /tmp/rei-ruleset-readback-red.log
+          test "$rc" -ne 0
+          grep -q 'FileNotFoundError' /tmp/rei-ruleset-readback-red.log
+          grep -q 'FAILED (errors=9)' /tmp/rei-ruleset-readback-red.log
+          test ! -e \
+            docs/rei_runtime_bridge_03a3r3_independent_readback/independent_readback_audit.py
+
+      - name: Confirm no server or attempt mutation surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(find . -type f \( \
+            -name 'attempt-3.global-lease.json' -o \
+            -name 'attempt-3.local-lease.json' -o \
+            -name 'attempt-3.dispatch-intent.json' -o \
+            -name 'attempt-3.outcome.json' -o \
+            -name 'AUDITED_FRESH_SOURCE_PROTECTION_RECEIPT.json' \
+          \) -print -quit)"
