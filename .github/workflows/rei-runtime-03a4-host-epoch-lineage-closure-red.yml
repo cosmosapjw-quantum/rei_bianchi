@@ -1,0 +1,103 @@
+name: rei-runtime-03a4-host-epoch-lineage-closure-red
+
+on:
+  push:
+    branches:
+      - audit/rei-runtime-03a4-host-epoch-lineage-closure-red-20260904-r1
+    paths:
+      - "tests/governance/test_rei_runtime_03a4_host_epoch_lineage_closure_red.py"
+      - "docs/rei_runtime_bridge_03a4_host_epoch_docker_bootstrap/**"
+      - ".github/workflows/rei-runtime-03a4-host-epoch-lineage-closure-red.yml"
+  pull_request:
+    paths:
+      - "handoff/rei_runtime_host_epoch_docker_bootstrap_20260904/**"
+      - "tests/governance/test_rei_runtime_03a4_host_epoch_lineage_closure_red.py"
+      - "docs/rei_runtime_bridge_03a4_host_epoch_docker_bootstrap/**"
+      - ".github/workflows/rei-runtime-03a4-host-epoch-lineage-closure-red.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+
+jobs:
+  expected-red:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert exact PR58 ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor \
+            673083e59b4c869421847cb750093f564d00fa03 HEAD
+
+      - name: Compile adversarial RED contract
+        run: |
+          python -m py_compile \
+            tests/governance/test_rei_runtime_03a4_host_epoch_lineage_closure_red.py
+
+      - name: Observe eleven-failure lineage and closure RED
+        shell: bash
+        run: |
+          set +e
+          set +u
+          set +o pipefail 2>/dev/null || true
+
+          python -m unittest -v \
+            tests.governance.test_rei_runtime_03a4_host_epoch_lineage_closure_red \
+            2>&1 | tee host-epoch-lineage-closure-red.log
+          rc=${PIPESTATUS[0]}
+
+          test "$rc" -ne 0
+          grep -q 'Ran 11 tests' host-epoch-lineage-closure-red.log
+          grep -Eq 'FAILED \(failures=11\)' host-epoch-lineage-closure-red.log
+          grep -q 'P0_H1B_GREEN_PACKAGE_ABSENT' host-epoch-lineage-closure-red.log
+          grep -q 'P0_H1A_DURABLE_CHAIN_UNBOUND' host-epoch-lineage-closure-red.log
+          grep -q 'P1_H1A_VERIFIER_PROVENANCE_LIMIT_NOT_TYPED' host-epoch-lineage-closure-red.log
+          grep -q 'P0_DOCKER_DAEMON_LOCALITY_UNBOUND' host-epoch-lineage-closure-red.log
+          grep -q 'P0_IMMUTABLE_H1A_SEED_NOT_ENFORCED' host-epoch-lineage-closure-red.log
+          grep -q 'P0_BUILDER_HOST_BOUNDARY_UNDERBOUND' host-epoch-lineage-closure-red.log
+          grep -q 'P0_SIGNED_SNAPSHOT_METADATA_UNBOUND' host-epoch-lineage-closure-red.log
+          grep -q 'P0_PRESTART_RUNTIME_CLOSURE_INCOMPLETE' host-epoch-lineage-closure-red.log
+          grep -q 'P1_PACKAGE_AND_CANONICAL_PATH_PROVENANCE_INCOMPLETE' host-epoch-lineage-closure-red.log
+          grep -q 'P1_ROOTFS_ARCHIVE_AND_CONTENT_IDENTITY_UNBOUND' host-epoch-lineage-closure-red.log
+          grep -q 'P0_RUNTIME_AND_PHYSICS_NONAUTHORITY_UNDERBOUND' host-epoch-lineage-closure-red.log
+
+          printf '%s\n' \
+            'classification=PASS_EXPECTED_03A4_HOST_EPOCH_LINEAGE_CLOSURE_RED'
+
+      - name: Re-run original PR58 RED contract
+        shell: bash
+        run: |
+          set +e
+          set +u
+          set +o pipefail 2>/dev/null || true
+
+          python -m unittest -v \
+            tests.governance.test_rei_runtime_03a4_host_epoch_docker_bootstrap_red \
+            2>&1 | tee original-docker-bootstrap-red.log
+          rc=${PIPESTATUS[0]}
+
+          test "$rc" -ne 0
+          grep -q 'Ran 8 tests' original-docker-bootstrap-red.log
+          grep -Eq 'FAILED \(failures=8\)' original-docker-bootstrap-red.log
+
+      - name: Assert no execution or attempt state
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(find "$GITHUB_WORKSPACE" -type f \( \
+            -name 'successor-section0.json' -o \
+            -name 'read-only-static-preflight-receipt.json' -o \
+            -name 'attempt-3.global-lease.json' -o \
+            -name 'attempt-3.local-lease.json' -o \
+            -name 'attempt-3.dispatch-intent.json' -o \
+            -name 'attempt-3.outcome.json' \
+          \) -print -quit)"
