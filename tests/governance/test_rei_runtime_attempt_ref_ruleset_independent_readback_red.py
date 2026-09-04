@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Intentional RED for independent ruleset mutation/readback auditing."""
+"""Contract tests for independent ruleset mutation/readback auditing."""
 
 from __future__ import annotations
 
@@ -85,7 +85,14 @@ def _records(module):
         "native_runtime_permitted": False,
         "steps": [
             {"operation": "GET_RULESET_LIST", "http_status": 200, "response_sha256": "a" * 64},
-            {"operation": "POST_CREATE_RULESET", "http_status": 201, "request_sha256": "b" * 64, "response_sha256": "c" * 64},
+            {
+                "operation": "POST_CREATE_RULESET",
+                "http_status": 201,
+                "request_sha256": module.sha256_bytes(
+                    module.canonical_bytes(module.RULESET_PAYLOAD)
+                ),
+                "response_sha256": "c" * 64,
+            },
             {"operation": "GET_RULESET_DETAILS", "http_status": 200, "ruleset_id": 42, "response_sha256": "1" * 64},
             {"operation": "GET_PROSPECTIVE_BRANCH_RULES", "http_status": 200, "response_sha256": "2" * 64},
             {"operation": "GET_EXACT_GLOBAL_ATTEMPT_REF", "http_status": 404, "response_sha256": "3" * 64},
