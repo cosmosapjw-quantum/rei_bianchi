@@ -1,9 +1,9 @@
-name: rei-math-m1-spatial-curvature-red
+name: rei-math-m1-spatial-curvature-green
 
 on:
   push:
     branches:
-      - research/rei-math-m1-spatial-curvature-red-20260904-r1
+      - research/rei-math-m1-spatial-curvature-green-20260904-r1
     paths:
       - "tests/research/test_rei_math_m1_spatial_curvature_red.py"
       - "research/rei_math_m1_generic_background/**"
@@ -22,47 +22,65 @@ env:
   REI_NATIVE_DISPATCH_FORBIDDEN: "1"
 
 jobs:
-  expected-red:
+  symbolic-green:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Assert exact PR57 ancestry
+      - name: Assert executed RED ancestry
         shell: bash
         run: |
           set -euo pipefail
           git merge-base --is-ancestor \
-            ab1ea23fd8e3ebe17f46d13d5496bb1db3eba08b HEAD
+            5736882a3007109fab74a640fab71ff4df85db58 HEAD
 
-      - name: Compile intentional RED test
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned symbolic oracle dependency
+        run: |
+          python -m pip install --disable-pip-version-check \
+            'sympy==1.13.3'
+
+      - name: Compile oracle and former RED suite
         run: |
           python -m py_compile \
+            research/rei_math_m1_generic_background/derive_spatial_curvature.py \
             tests/research/test_rei_math_m1_spatial_curvature_red.py
 
-      - name: Observe eight-failure implementation-absent RED
+      - name: Run former RED as GREEN
+        run: |
+          python -m unittest -v \
+            tests.research.test_rei_math_m1_spatial_curvature_red
+
+      - name: Run generic symbolic audit
         shell: bash
         run: |
-          set +e
-          set +u
-          set +o pipefail 2>/dev/null || true
+          set -euo pipefail
+          python \
+            research/rei_math_m1_generic_background/derive_spatial_curvature.py \
+            | tee spatial-curvature-audit.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
 
-          python -m unittest -v \
-            tests.research.test_rei_math_m1_spatial_curvature_red \
-            2>&1 | tee rei-math-m1-spatial-curvature-red.log
-          rc=${PIPESTATUS[0]}
+          record = json.loads(Path('spatial-curvature-audit.json').read_text())
+          audit = record['symbolic_audit']
+          assert audit['ricci_residuals_mod_jacobi'] == [['0'] * 3 for _ in range(3)]
+          assert audit['scalar_residual_mod_jacobi'] == '0'
+          assert audit['codazzi_divergence_residuals'] == ['0', '0', '0']
+          assert record['sentinels']['I']['scalar'] == '0'
+          assert record['sentinels']['V']['scalar'] == '-6*A**2'
+          assert record['sentinels']['IX']['scalar'] == '3*N**2/2'
+          assert audit['native_runtime'] == 'NOT_RUN'
+          print('classification=PASS_REI_MATH_M1_GENERIC_SPATIAL_CURVATURE_SYMBOLIC_AUDIT')
+          PY
 
-          test "$rc" -ne 0
-          grep -q 'Ran 8 tests' rei-math-m1-spatial-curvature-red.log
-          grep -Eq 'FAILED \(failures=8\)' rei-math-m1-spatial-curvature-red.log
-          grep -q 'M1_CURVATURE_ORACLE_ABSENT' rei-math-m1-spatial-curvature-red.log
-
-          printf '%s\n' \
-            'classification=PASS_EXPECTED_REI_MATH_M1_SPATIAL_CURVATURE_RED'
-
-      - name: Assert no runtime or attempt artifacts
+      - name: Assert runtime lane remained untouched
         shell: bash
         run: |
           set -euo pipefail
