@@ -48,6 +48,27 @@ class AdminRulesetHandoffTests(unittest.TestCase):
     def test_exact_ruleset_details_pass(self) -> None:
         self.assertEqual(MOD.validate_ruleset_details(exact_details()), 42)
 
+    def test_github_normalized_get_may_omit_update_parameters(self) -> None:
+        value = exact_details()
+        value["rules"][0] = {"type": "update"}
+        self.assertEqual(MOD.validate_ruleset_details(value), 42)
+        self.assertEqual(
+            MOD.validate_update_rule(
+                value,
+                allow_omitted_parameters=True,
+            ),
+            "GITHUB_GET_NORMALIZED_PARAMETERS_OMITTED",
+        )
+
+    def test_creation_payload_still_requires_explicit_false_parameter(self) -> None:
+        value = exact_details()
+        value["rules"][0] = {"type": "update"}
+        with self.assertRaisesRegex(MOD.AdminRulesetError, "UPDATE_POLICY"):
+            MOD.validate_ruleset_details(
+                value,
+                allow_omitted_update_parameters=False,
+            )
+
     def test_disabled_or_bypassed_ruleset_is_rejected(self) -> None:
         disabled = exact_details()
         disabled["enforcement"] = "disabled"
