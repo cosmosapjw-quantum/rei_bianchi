@@ -1,0 +1,32 @@
+// Singular Groebner-basis witness for the REI 03A4 predecessor chain.
+// Methodology only; no repository or runtime mutation.
+
+ring r = 0,(g0,g1,g2,g3,g4,g5,g6,g7,g8,g9),dp;
+ideal base =
+  g0^2-g0,g1^2-g1,g2^2-g2,g3^2-g3,g4^2-g4,
+  g5^2-g5,g6^2-g6,g7^2-g7,g8^2-g8,g9^2-g9,
+  g1*(1-g0),g2*(1-g1),g3*(1-g2),g4*(1-g3),
+  g5*(1-g4),g6*(1-g5),g7*(1-g6),g8*(1-g7),g9*(1-g8);
+
+ideal c0 = base,g9-1,g0;
+ideal c1 = base,g9-1,g1;
+ideal c2 = base,g9-1,g2;
+ideal c3 = base,g9-1,g3;
+ideal c4 = base,g9-1,g4;
+ideal c5 = base,g9-1,g5;
+ideal c6 = base,g9-1,g6;
+ideal c7 = base,g9-1,g7;
+ideal c8 = base,g9-1,g8;
+
+if (reduce(1,std(c0)) != 0) { ERROR("provider may bypass g0"); }
+if (reduce(1,std(c1)) != 0) { ERROR("provider may bypass g1"); }
+if (reduce(1,std(c2)) != 0) { ERROR("provider may bypass g2"); }
+if (reduce(1,std(c3)) != 0) { ERROR("provider may bypass g3"); }
+if (reduce(1,std(c4)) != 0) { ERROR("provider may bypass g4"); }
+if (reduce(1,std(c5)) != 0) { ERROR("provider may bypass g5"); }
+if (reduce(1,std(c6)) != 0) { ERROR("provider may bypass g6"); }
+if (reduce(1,std(c7)) != 0) { ERROR("provider may bypass g7"); }
+if (reduce(1,std(c8)) != 0) { ERROR("provider may bypass g8"); }
+
+print("{\"adjacent_implication_relations\":9,\"authority_effect\":\"NONE\",\"boolean_relations\":10,\"native_runtime\":\"NOT_RUN\",\"provider_predecessors_proved\":9,\"status\":\"PASS_SINGULAR_BOOLEAN_IDEAL_WITNESS\"}");
+quit;

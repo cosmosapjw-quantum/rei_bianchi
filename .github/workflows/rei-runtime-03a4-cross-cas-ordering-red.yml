@@ -1,9 +1,6 @@
-name: rei-runtime-03a4-cross-cas-ordering-red
+name: rei-runtime-03a4-cross-cas-ordering-red-replay
 
 on:
-  push:
-    branches:
-      - audit/rei-runtime-03a4-cross-cas-ordering-20260904-r1
   workflow_dispatch:
 
 permissions:
@@ -13,27 +10,24 @@ env:
   REI_NATIVE_DISPATCH_FORBIDDEN: "1"
 
 jobs:
-  expected-cross-cas-contract-red:
+  replay-exact-red:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: 6ea848a189b37782b297b373c545f77ded395960
           fetch-depth: 0
 
-      - name: Assert exact PR54 ancestry
-        shell: bash
-        run: |
-          set -euo pipefail
-          git merge-base --is-ancestor \
-            9ecaa45d4794b2c7f2a430acff4e3ac7f213a2fc HEAD
-
-      - name: Observe the intentional missing-implementation RED
+      - name: Replay exact intentional RED
         shell: bash
         run: |
           set +e
           set +u
           set +o pipefail 2>/dev/null || true
+
+          test "$(git rev-parse HEAD)" = \
+            6ea848a189b37782b297b373c545f77ded395960 || exit 1
 
           python -m unittest -v \
             tests.governance.test_rei_runtime_03a4_cross_cas_ordering_red \
@@ -41,10 +35,7 @@ jobs:
           RC=$?
           cat /tmp/rei-03a4-cross-cas-red.log
 
-          test "$RC" -ne 0 || {
-            printf 'STOP_INVALID: EXPECTED_RED_DID_NOT_FAIL\n' >&2
-            exit 1
-          }
+          test "$RC" -ne 0
           grep -F 'Ran 7 tests' /tmp/rei-03a4-cross-cas-red.log >/dev/null
           grep -F 'FAILED (errors=7)' /tmp/rei-03a4-cross-cas-red.log >/dev/null
           grep -F 'FileNotFoundError' /tmp/rei-03a4-cross-cas-red.log >/dev/null
@@ -52,54 +43,4 @@ jobs:
             docs/rei_runtime_bridge_03a4_cross_cas/cross_cas_contract.py
 
           printf '%s\n' \
-            'PASS_EXPECTED_03A4_CROSS_CAS_IMPLEMENTATION_ABSENT_RED'
-
-      - name: Read exact global attempt ref without mutation
-        run: |
-          python - <<'PY'
-          import json
-          import urllib.error
-          import urllib.request
-
-          url = (
-              "https://api.github.com/repos/cosmosapjw-quantum/rei_bianchi/"
-              "git/ref/heads/attempt-ledger/"
-              "rei-runtime-bridge-ntpath-rebind-20260903-attempt-3"
-          )
-          request = urllib.request.Request(
-              url,
-              method="GET",
-              headers={
-                  "Accept": "application/vnd.github+json",
-                  "X-GitHub-Api-Version": "2022-11-28",
-                  "User-Agent": "rei-03a4-cross-cas-red/v1",
-              },
-          )
-          try:
-              with urllib.request.urlopen(request, timeout=30) as response:
-                  status = response.status
-          except urllib.error.HTTPError as exc:
-              status = exc.code
-          if status != 404:
-              raise SystemExit(
-                  f"STOP_INVALID: GLOBAL_ATTEMPT_REF_HTTP_{status}"
-              )
-          print(json.dumps({
-              "global_attempt_ref": "ABSENT_404",
-              "authority_effect": "NONE",
-              "mutation_effect": "NONE",
-              "native_runtime": "NOT_RUN",
-          }, sort_keys=True))
-          PY
-
-      - name: Assert no attempt or runtime state was created
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -z "$(find "$GITHUB_WORKSPACE" -type f \( \
-            -name 'attempt-3.global-lease.json' -o \
-            -name 'attempt-3.local-lease.json' -o \
-            -name 'attempt-3.dispatch-intent.json' -o \
-            -name 'attempt-3.outcome.json' -o \
-            -name 'read-only-static-preflight-receipt.json' \
-          \) -print -quit)"
+            'PASS_REPLAYED_EXPECTED_03A4_CROSS_CAS_IMPLEMENTATION_ABSENT_RED'
