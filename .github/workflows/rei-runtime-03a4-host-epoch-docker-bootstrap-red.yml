@@ -1,10 +1,11 @@
-name: rei-runtime-03a4-host-epoch-docker-bootstrap-red
+name: rei-runtime-03a4-host-epoch-docker-bootstrap-green
 
 on:
   push:
     branches:
-      - audit/rei-runtime-03a4-host-epoch-docker-bootstrap-red-20260904-r1
+      - fix/rei-runtime-03a4-host-epoch-docker-bootstrap-green-20260904-r1
     paths:
+      - "handoff/rei_runtime_host_epoch_docker_bootstrap_20260904/**"
       - "tests/governance/test_rei_runtime_03a4_host_epoch_docker_bootstrap_red.py"
       - "docs/rei_runtime_bridge_03a4_host_epoch_docker_bootstrap/**"
       - ".github/workflows/rei-runtime-03a4-host-epoch-docker-bootstrap-red.yml"
@@ -23,52 +24,60 @@ env:
   REI_NATIVE_DISPATCH_FORBIDDEN: "1"
 
 jobs:
-  expected-red:
+  verify-source-contract:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Assert exact PR57 ancestry
+      - name: Assert exact RED and PR57 ancestry
         shell: bash
         run: |
           set -euo pipefail
           git merge-base --is-ancestor \
+            673083e59b4c869421847cb750093f564d00fa03 HEAD
+          git merge-base --is-ancestor \
             ab1ea23fd8e3ebe17f46d13d5496bb1db3eba08b HEAD
 
-      - name: Compile static RED contract
-        run: |
-          python -m py_compile \
-            tests/governance/test_rei_runtime_03a4_host_epoch_docker_bootstrap_red.py
-
-      - name: Observe eight-failure Docker-bootstrap RED
+      - name: Compile and parse sources
         shell: bash
         run: |
-          set +e
-          set +u
-          set +o pipefail 2>/dev/null || true
+          set -euo pipefail
+          bash -n \
+            handoff/rei_runtime_host_epoch_docker_bootstrap_20260904/build_host_epoch_candidate.sh
+          python -m py_compile \
+            handoff/rei_runtime_host_epoch_docker_bootstrap_20260904/verify_candidate.py \
+            handoff/rei_runtime_host_epoch_docker_bootstrap_20260904/verify_package.py \
+            tests/governance/test_rei_runtime_03a4_host_epoch_docker_bootstrap_red.py
 
+      - name: Turn all eight RED obligations GREEN
+        run: |
           python -m unittest -v \
-            tests.governance.test_rei_runtime_03a4_host_epoch_docker_bootstrap_red \
-            2>&1 | tee host-epoch-docker-bootstrap-red.log
-          rc=${PIPESTATUS[0]}
+            tests.governance.test_rei_runtime_03a4_host_epoch_docker_bootstrap_red
 
-          test "$rc" -ne 0
-          grep -q 'Ran 8 tests' host-epoch-docker-bootstrap-red.log
-          grep -Eq 'FAILED \(failures=8\)' host-epoch-docker-bootstrap-red.log
-          grep -q 'P0_DOCKER_BOOTSTRAP_PACKAGE_ABSENT' host-epoch-docker-bootstrap-red.log
-          grep -q 'P0_SNAPSHOT_AND_RELEASE_IDENTITY_UNBOUND' host-epoch-docker-bootstrap-red.log
-          grep -q 'P0_DOCKER_FALLBACK_NOT_TYPED' host-epoch-docker-bootstrap-red.log
-          grep -q 'P0_HOST_MUTATION_SURFACE_NOT_FORBIDDEN' host-epoch-docker-bootstrap-red.log
-          grep -q 'P0_ROOTFS_STREAM_AND_CANONICAL_PATH_BUILD_ABSENT' host-epoch-docker-bootstrap-red.log
-          grep -q 'P0_OFFLINE_READ_ONLY_VERIFICATION_ABSENT' host-epoch-docker-bootstrap-red.log
-          grep -q 'P0_H2_HASH_AND_PACKAGE_VALIDATOR_ABSENT' host-epoch-docker-bootstrap-red.log
-          grep -q 'P0_RUNTIME_ATTEMPT_NONAUTHORITY_ABSENT' host-epoch-docker-bootstrap-red.log
+      - name: Verify exact package identity
+        run: |
+          python \
+            handoff/rei_runtime_host_epoch_docker_bootstrap_20260904/verify_package.py
 
-          printf '%s\n' \
-            'classification=PASS_EXPECTED_03A4_HOST_EPOCH_DOCKER_BOOTSTRAP_RED'
+      - name: Verify non-mutating execution plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          plan="$(bash \
+            handoff/rei_runtime_host_epoch_docker_bootstrap_20260904/build_host_epoch_candidate.sh \
+            --plan)"
+          printf '%s\n' "$plan"
+          grep -q 'classification=PASS_03A4_HOST_EPOCH_DOCKER_BOOTSTRAP_SOURCE_PLAN' \
+            <<<"$plan"
+          grep -q 'verification_network=NONE' <<<"$plan"
+          grep -q 'verification_rootfs=READ_ONLY' <<<"$plan"
+          grep -q 'verification_capabilities=DROP_ALL' <<<"$plan"
+          grep -q 'builder_authority_effect=NONE' <<<"$plan"
+          grep -q 'GLOBAL_ATTEMPT_REF_FORBIDDEN=1' <<<"$plan"
+          grep -q 'NATIVE_RUNTIME_FORBIDDEN=1' <<<"$plan"
 
       - name: Assert no execution state
         shell: bash
@@ -82,3 +91,87 @@ jobs:
             -name 'attempt-3.dispatch-intent.json' -o \
             -name 'attempt-3.outcome.json' \
           \) -print -quit)"
+          printf '%s\n' \
+            'classification=PASS_03A4_HOST_EPOCH_DOCKER_BOOTSTRAP_SOURCE'
+
+  build-and-verify-reference-root:
+    needs: verify-source-contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Record Docker capability
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker version
+          docker info --format '{{json .ServerVersion}}'
+
+      - name: Build Snapshot root and verify offline
+        shell: bash
+        env:
+          REI_HOST_EPOCH_ROOT: ${{ runner.temp }}/rei-03a4-host-epochs
+          RECEIPT_ROOT: ${{ runner.temp }}/rei-03a4-receipts
+          ATTEMPT_STATE_ROOT: ${{ runner.temp }}/rei-03a4-attempt-state-forbidden
+        run: |
+          set -euo pipefail
+          mkdir -p "$ATTEMPT_STATE_ROOT"
+          bash \
+            handoff/rei_runtime_host_epoch_docker_bootstrap_20260904/build_host_epoch_candidate.sh \
+            --build | tee "$RUNNER_TEMP/H1_H2_RESULT.txt"
+          grep -q \
+            'classification=PASS_03A4_HOST_EPOCH_H1_H2_DOCKER_CANDIDATE' \
+            "$RUNNER_TEMP/H1_H2_RESULT.txt"
+          grep -q 'authorization_effect=H1_H2_CANDIDATE_ONLY' \
+            "$RUNNER_TEMP/H1_H2_RESULT.txt"
+          grep -q 'H3_RUST_CLOSURE_NOT_RUN=1' \
+            "$RUNNER_TEMP/H1_H2_RESULT.txt"
+          grep -q 'SECTION0_NOT_RUN=1' \
+            "$RUNNER_TEMP/H1_H2_RESULT.txt"
+          grep -q 'remaining_native_attempts=1' \
+            "$RUNNER_TEMP/H1_H2_RESULT.txt"
+
+      - name: Stage compact reference evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          receipt_dir="$(sed -n 's/^receipt_dir=//p' \
+            "$RUNNER_TEMP/H1_H2_RESULT.txt" | tail -1)"
+          test -n "$receipt_dir"
+          test -d "$receipt_dir"
+          mkdir -p "$RUNNER_TEMP/H1_H2_REFERENCE_EVIDENCE"
+          cp -a "$receipt_dir"/. \
+            "$RUNNER_TEMP/H1_H2_REFERENCE_EVIDENCE/"
+          cp "$RUNNER_TEMP/H1_H2_RESULT.txt" \
+            "$RUNNER_TEMP/H1_H2_REFERENCE_EVIDENCE/"
+          grep -q \
+            '"status": "PASS_03A4_HOST_EPOCH_H1_H2_DOCKER_CANDIDATE"' \
+            "$RUNNER_TEMP/H1_H2_REFERENCE_EVIDENCE/H1_H2_CANDIDATE_RECEIPT.json"
+
+      - name: Confirm final attempt remains unconsumed
+        shell: bash
+        run: |
+          set -euo pipefail
+          ref='attempt-ledger/rei-runtime-bridge-ntpath-rebind-20260903-attempt-3'
+          code="$(curl -sS -o "$RUNNER_TEMP/attempt-ref.json" -w '%{http_code}' \
+            "https://api.github.com/repos/cosmosapjw-quantum/rei_bianchi/git/ref/${ref}")"
+          test "$code" = 404
+          test -z "$(find "$GITHUB_WORKSPACE" -type f \( \
+            -name 'successor-section0.json' -o \
+            -name 'read-only-static-preflight-receipt.json' -o \
+            -name 'attempt-3.global-lease.json' -o \
+            -name 'attempt-3.local-lease.json' -o \
+            -name 'attempt-3.dispatch-intent.json' -o \
+            -name 'attempt-3.outcome.json' \
+          \) -print -quit)"
+
+      - name: Upload compact H1/H2 reference evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-03a4-h1-h2-docker-reference-evidence
+          path: ${{ runner.temp }}/H1_H2_REFERENCE_EVIDENCE
+          if-no-files-found: error
+          retention-days: 30
