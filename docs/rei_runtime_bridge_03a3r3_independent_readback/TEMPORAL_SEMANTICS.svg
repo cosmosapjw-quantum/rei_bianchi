@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="430" viewBox="0 0 1180 430" role="img" aria-labelledby="title desc">
+  <title id="title">Historical provenance versus current authorization</title>
+  <desc id="desc">The original operation must complete before its source receipt expires. A later independent audit may occur after that expiry and establishes current state through new GET-only reads and a new receipt.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#111"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1180" height="430" fill="#fff"/>
+  <text x="590" y="34" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="700">Historical provenance is not current authorization</text>
+  <text x="590" y="60" text-anchor="middle" font-family="sans-serif" font-size="14">The original receipt validates the original operation; fresh GETs validate the later server state.</text>
+
+  <line x1="90" y1="205" x2="1090" y2="205" stroke="#111" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g font-family="sans-serif" fill="#111" stroke="#111">
+    <line x1="150" y1="185" x2="150" y2="225" stroke-width="2"/>
+    <circle cx="150" cy="205" r="6" fill="#111"/>
+    <text x="150" y="155" text-anchor="middle" font-size="14" font-weight="700">t0</text>
+    <text x="150" y="175" text-anchor="middle" font-size="12">operation start</text>
+
+    <line x1="285" y1="185" x2="285" y2="225" stroke-width="2"/>
+    <circle cx="285" cy="205" r="6" fill="#111"/>
+    <text x="285" y="248" text-anchor="middle" font-size="14" font-weight="700">t1</text>
+    <text x="285" y="267" text-anchor="middle" font-size="12">admin receipt</text>
+
+    <line x1="420" y1="185" x2="420" y2="225" stroke-width="2"/>
+    <circle cx="420" cy="205" r="6" fill="#111"/>
+    <text x="420" y="155" text-anchor="middle" font-size="14" font-weight="700">t2</text>
+    <text x="420" y="175" text-anchor="middle" font-size="12">source receipt</text>
+
+    <line x1="555" y1="185" x2="555" y2="225" stroke-width="2"/>
+    <circle cx="555" cy="205" r="6" fill="#111"/>
+    <text x="555" y="248" text-anchor="middle" font-size="14" font-weight="700">t3</text>
+    <text x="555" y="267" text-anchor="middle" font-size="12">operation complete</text>
+
+    <line x1="690" y1="185" x2="690" y2="225" stroke-width="2"/>
+    <circle cx="690" cy="205" r="6" fill="#111"/>
+    <text x="690" y="155" text-anchor="middle" font-size="14" font-weight="700">t4</text>
+    <text x="690" y="175" text-anchor="middle" font-size="12">original expiry</text>
+
+    <line x1="865" y1="185" x2="865" y2="225" stroke-width="2"/>
+    <circle cx="865" cy="205" r="6" fill="#111"/>
+    <text x="865" y="248" text-anchor="middle" font-size="14" font-weight="700">t5</text>
+    <text x="865" y="267" text-anchor="middle" font-size="12">independent live GETs</text>
+
+    <line x1="1025" y1="185" x2="1025" y2="225" stroke-width="2"/>
+    <circle cx="1025" cy="205" r="6" fill="#111"/>
+    <text x="1025" y="155" text-anchor="middle" font-size="14" font-weight="700">t6</text>
+    <text x="1025" y="175" text-anchor="middle" font-size="12">new expiry</text>
+  </g>
+
+  <rect x="130" y="295" width="580" height="54" fill="#f3f3f3" stroke="#111"/>
+  <text x="420" y="318" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700">Retrospective validity</text>
+  <text x="420" y="338" text-anchor="middle" font-family="sans-serif" font-size="13">t0 ≤ t1 ≤ t2 ≤ t3 ≤ t4; no requirement that t5 ≤ t4</text>
+
+  <rect x="795" y="295" width="270" height="54" fill="#fff" stroke="#111" stroke-width="2"/>
+  <text x="930" y="318" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700">Current validity</text>
+  <text x="930" y="338" text-anchor="middle" font-family="sans-serif" font-size="13">fresh GETs at t5; t6=t5+300 s</text>
+
+  <text x="590" y="392" text-anchor="middle" font-family="sans-serif" font-size="13">Forbidden inference: expired historical receipt ⇒ current server authorization.</text>
+  <text x="590" y="414" text-anchor="middle" font-family="sans-serif" font-size="13">Required inference: original operation coherent ∧ fresh live state coherent ⇒ new bounded receipt.</text>
+</svg>

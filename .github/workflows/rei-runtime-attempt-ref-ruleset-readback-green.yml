@@ -37,18 +37,19 @@ jobs:
         run: |
           python -m py_compile \
             docs/rei_runtime_bridge_03a3r3_independent_readback/independent_readback_audit.py \
+            docs/rei_runtime_bridge_03a3r3_independent_readback/independent_readback_audit_v2.py \
             docs/rei_runtime_bridge_03a3r3_independent_readback/verify_source_index.py \
             tests/governance/test_rei_runtime_attempt_ref_ruleset_independent_readback_red.py
 
-      - name: Run nine-method GREEN contract suite
+      - name: Run eleven-method GREEN contract suite
         run: |
           python -m unittest -v \
             tests.governance.test_rei_runtime_attempt_ref_ruleset_independent_readback_red
 
-      - name: Run credential-free self-test
+      - name: Run credential-free active-surface self-test
         run: |
           python \
-            docs/rei_runtime_bridge_03a3r3_independent_readback/independent_readback_audit.py \
+            docs/rei_runtime_bridge_03a3r3_independent_readback/independent_readback_audit_v2.py \
             --self-test
 
       - name: Verify exact source index against HEAD
@@ -66,7 +67,7 @@ jobs:
           headers = {
               "Accept": "application/vnd.github+json",
               "X-GitHub-Api-Version": "2022-11-28",
-              "User-Agent": "rei-runtime-readback-green-ci/v1",
+              "User-Agent": "rei-runtime-readback-green-ci/v2",
           }
           ruleset_request = urllib.request.Request(
               "https://api.github.com/repos/cosmosapjw-quantum/rei_bianchi/rulesets",

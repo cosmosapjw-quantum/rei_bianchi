@@ -16,7 +16,7 @@ SCRIPT = (
     ROOT
     / "docs"
     / "rei_runtime_bridge_03a3r3_independent_readback"
-    / "independent_readback_audit.py"
+    / "independent_readback_audit_v2.py"
 )
 
 
@@ -180,6 +180,11 @@ class IndependentRulesetReadbackExpectedRed(unittest.TestCase):
                 now=t0 + timedelta(hours=1),
             )
             self.assertEqual(bundle["status"], "PASS_RETROSPECTIVE_ADMIN_BUNDLE")
+            self.assertTrue(
+                bundle["temporal_semantics"][
+                    "historical_receipt_may_be_expired_now"
+                ]
+            )
 
     def test_original_operation_must_finish_before_source_receipt_expiry(self) -> None:
         module = _load_future()

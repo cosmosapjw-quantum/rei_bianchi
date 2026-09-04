@@ -1,0 +1,8 @@
+event,time_relation,evidence_role,current_authority
+operation_start,t0,historical execution boundary,false
+admin_receipt,t1 >= t0,historical mutation record,false
+original_source_receipt,t2 >= t1,historical GET-only record,false after expiry
+operation_complete,t3 >= t2 and t3 <= t4,historical completion,false
+original_receipt_expiry,t4 >= t3,ends original current validity,false after t4
+independent_live_audit,t5 unrestricted relative to t4,current GET-only observation,true only after live checks
+new_source_receipt_expiry,t6 = t5 + 300 s,ends new current validity,true until t6
