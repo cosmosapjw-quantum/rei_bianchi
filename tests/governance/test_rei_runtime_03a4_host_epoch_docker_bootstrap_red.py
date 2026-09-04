@@ -121,18 +121,19 @@ class HostEpochDockerBootstrapExpectedRed(unittest.TestCase):
         )
 
     def test_isolated_verifier_checks_paths_hashes_packages_and_write_block(self) -> None:
-        source = _text(VERIFIER)
-        required = (
+        verifier_source = _text(VERIFIER)
+        contract_source = _text(CONTRACT)
+        verifier_required = (
             "Path.resolve",
             "sha256_file",
-            "gcc-13-x86-64-linux-gnu",
             "RUNTIME_TOOLCHAIN_PATH_MISMATCH",
             "RUNTIME_TOOLCHAIN_HASH_MISMATCH",
             "ROOT_FILESYSTEM_NOT_READ_ONLY",
             "NON_LOOPBACK_NETWORK_INTERFACE_PRESENT",
         )
         self.assertTrue(
-            all(token in source for token in required),
+            all(token in verifier_source for token in verifier_required)
+            and "gcc-13-x86-64-linux-gnu" in contract_source,
             "P0_H2_HASH_AND_PACKAGE_VALIDATOR_ABSENT",
         )
 
