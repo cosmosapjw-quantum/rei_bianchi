@@ -1,0 +1,76 @@
+name: rei-math-m1-spatial-curvature-red
+
+on:
+  push:
+    branches:
+      - research/rei-math-m1-spatial-curvature-red-20260904-r1
+    paths:
+      - "tests/research/test_rei_math_m1_spatial_curvature_red.py"
+      - "research/rei_math_m1_generic_background/**"
+      - ".github/workflows/rei-math-m1-spatial-curvature-red.yml"
+  pull_request:
+    paths:
+      - "tests/research/test_rei_math_m1_spatial_curvature_red.py"
+      - "research/rei_math_m1_generic_background/**"
+      - ".github/workflows/rei-math-m1-spatial-curvature-red.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+
+jobs:
+  expected-red:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert exact PR57 ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor \
+            ab1ea23fd8e3ebe17f46d13d5496bb1db3eba08b HEAD
+
+      - name: Compile intentional RED test
+        run: |
+          python -m py_compile \
+            tests/research/test_rei_math_m1_spatial_curvature_red.py
+
+      - name: Observe eight-failure implementation-absent RED
+        shell: bash
+        run: |
+          set +e
+          set +u
+          set +o pipefail 2>/dev/null || true
+
+          python -m unittest -v \
+            tests.research.test_rei_math_m1_spatial_curvature_red \
+            2>&1 | tee rei-math-m1-spatial-curvature-red.log
+          rc=${PIPESTATUS[0]}
+
+          test "$rc" -ne 0
+          grep -q 'Ran 8 tests' rei-math-m1-spatial-curvature-red.log
+          grep -Eq 'FAILED \(failures=8\)' rei-math-m1-spatial-curvature-red.log
+          grep -q 'M1_CURVATURE_ORACLE_ABSENT' rei-math-m1-spatial-curvature-red.log
+
+          printf '%s\n' \
+            'classification=PASS_EXPECTED_REI_MATH_M1_SPATIAL_CURVATURE_RED'
+
+      - name: Assert no runtime or attempt artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(find "$GITHUB_WORKSPACE" -type f \( \
+            -name 'successor-section0.json' -o \
+            -name 'read-only-static-preflight-receipt.json' -o \
+            -name 'attempt-3.global-lease.json' -o \
+            -name 'attempt-3.local-lease.json' -o \
+            -name 'attempt-3.dispatch-intent.json' -o \
+            -name 'attempt-3.outcome.json' \
+          \) -print -quit)"
