@@ -1,0 +1,46 @@
+name: rei-runtime-03a4-cross-cas-ordering-red-replay
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+
+jobs:
+  replay-exact-red:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 6ea848a189b37782b297b373c545f77ded395960
+          fetch-depth: 0
+
+      - name: Replay exact intentional RED
+        shell: bash
+        run: |
+          set +e
+          set +u
+          set +o pipefail 2>/dev/null || true
+
+          test "$(git rev-parse HEAD)" = \
+            6ea848a189b37782b297b373c545f77ded395960 || exit 1
+
+          python -m unittest -v \
+            tests.governance.test_rei_runtime_03a4_cross_cas_ordering_red \
+            >/tmp/rei-03a4-cross-cas-red.log 2>&1
+          RC=$?
+          cat /tmp/rei-03a4-cross-cas-red.log
+
+          test "$RC" -ne 0
+          grep -F 'Ran 7 tests' /tmp/rei-03a4-cross-cas-red.log >/dev/null
+          grep -F 'FAILED (errors=7)' /tmp/rei-03a4-cross-cas-red.log >/dev/null
+          grep -F 'FileNotFoundError' /tmp/rei-03a4-cross-cas-red.log >/dev/null
+          test ! -e \
+            docs/rei_runtime_bridge_03a4_cross_cas/cross_cas_contract.py
+
+          printf '%s\n' \
+            'PASS_REPLAYED_EXPECTED_03A4_CROSS_CAS_IMPLEMENTATION_ABSENT_RED'
