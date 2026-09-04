@@ -6,11 +6,13 @@ on:
       - research/rei-math-m1-spatial-curvature-green-20260904-r1
     paths:
       - "tests/research/test_rei_math_m1_spatial_curvature_red.py"
+      - "tests/research/test_rei_math_m1_spatial_curvature_adversarial.py"
       - "research/rei_math_m1_generic_background/**"
       - ".github/workflows/rei-math-m1-spatial-curvature-red.yml"
   pull_request:
     paths:
       - "tests/research/test_rei_math_m1_spatial_curvature_red.py"
+      - "tests/research/test_rei_math_m1_spatial_curvature_adversarial.py"
       - "research/rei_math_m1_generic_background/**"
       - ".github/workflows/rei-math-m1-spatial-curvature-red.yml"
   workflow_dispatch:
@@ -20,6 +22,7 @@ permissions:
 
 env:
   REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+  MPLBACKEND: "Agg"
 
 jobs:
   symbolic-green:
@@ -41,23 +44,27 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install pinned symbolic oracle dependency
+      - name: Install pinned symbolic and plotting dependencies
         run: |
           python -m pip install --disable-pip-version-check \
-            'sympy==1.13.3'
+            'sympy==1.13.3' \
+            'matplotlib==3.9.2'
 
-      - name: Compile oracle and former RED suite
+      - name: Compile oracle, adversarial generator, and tests
         run: |
           python -m py_compile \
             research/rei_math_m1_generic_background/derive_spatial_curvature.py \
-            tests/research/test_rei_math_m1_spatial_curvature_red.py
+            research/rei_math_m1_generic_background/adversarial_curvature_residuals.py \
+            tests/research/test_rei_math_m1_spatial_curvature_red.py \
+            tests/research/test_rei_math_m1_spatial_curvature_adversarial.py
 
-      - name: Run former RED as GREEN
+      - name: Run former RED and adversarial suites as GREEN
         run: |
           python -m unittest -v \
-            tests.research.test_rei_math_m1_spatial_curvature_red
+            tests.research.test_rei_math_m1_spatial_curvature_red \
+            tests.research.test_rei_math_m1_spatial_curvature_adversarial
 
-      - name: Run generic symbolic audit
+      - name: Run generic exact symbolic audit
         shell: bash
         run: |
           set -euo pipefail
@@ -79,6 +86,44 @@ jobs:
           assert audit['native_runtime'] == 'NOT_RUN'
           print('classification=PASS_REI_MATH_M1_GENERIC_SPATIAL_CURVATURE_SYMBOLIC_AUDIT')
           PY
+
+      - name: Generate plot-driven sign-mutation audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p plot-artifact
+          python \
+            research/rei_math_m1_generic_background/adversarial_curvature_residuals.py \
+            --output-dir plot-artifact \
+            | tee plot-artifact/console-summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          record = json.loads(
+              Path('plot-artifact/spatial_curvature_adversarial_summary.json').read_text()
+          )
+          assert record['samples'] == 8
+          assert record['correct_formula_exact_zero_count'] == 8
+          assert record['jacobi_exact_zero_count'] == 8
+          assert record['class_a_mutation_zero_count'] == 4
+          assert record['class_b_mutation_detected_count'] == 4
+          assert record['authority_effect'] == 'NUMERICAL_ADVERSARIAL_REGRESSION_ONLY'
+          assert record['native_runtime'] == 'NOT_RUN'
+          print('classification=PASS_REI_MATH_M1_PLOT_DRIVEN_SIGN_MUTATION_AUDIT')
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rei-math-m1-spatial-curvature-adversarial-plot
+          path: |
+            spatial-curvature-audit.json
+            plot-artifact/spatial_curvature_adversarial_residuals.csv
+            plot-artifact/spatial_curvature_adversarial_residuals.svg
+            plot-artifact/spatial_curvature_adversarial_summary.json
+            plot-artifact/console-summary.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Assert runtime lane remained untouched
         shell: bash
