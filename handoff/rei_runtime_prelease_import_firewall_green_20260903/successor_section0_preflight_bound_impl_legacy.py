@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Fixed-authority successor preflight with runtime-path binding."""
+"""Fixed-authority successor preflight with explicitly bound receipt facts."""
 
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timedelta, timezone
 import json
 import os
 from pathlib import Path
@@ -11,8 +12,8 @@ import sys
 from typing import Any, Mapping
 
 try:
-    from . import successor_section0_preflight_bound_impl_legacy as _legacy
-    from .successor_section0_preflight_bound_impl_legacy import (  # noqa: F401
+    from . import successor_section0_preflight_impl as _impl
+    from .successor_section0_preflight_impl import (  # noqa: F401
         GITHUB_API_BASE,
         GITHUB_API_HOST,
         GITHUB_API_VERSION,
@@ -27,17 +28,16 @@ try:
         sha256_file,
         validate_attempt_state_root,
         validate_new_output_root,
-        validate_runtime_toolchain_witness_paths,
         validate_successor_receipt,
         verify_executing_package_binding,
         verify_package_index,
         verify_static_release,
         write_o_excl,
     )
-    from . import successor_section0_preflight_legacy as _emitter
+    from . import successor_section0_preflight_legacy as _legacy
 except ImportError:
-    import successor_section0_preflight_bound_impl_legacy as _legacy  # type: ignore
-    from successor_section0_preflight_bound_impl_legacy import (  # type: ignore # noqa: F401
+    import successor_section0_preflight_impl as _impl  # type: ignore
+    from successor_section0_preflight_impl import (  # type: ignore # noqa: F401
         GITHUB_API_BASE,
         GITHUB_API_HOST,
         GITHUB_API_VERSION,
@@ -52,14 +52,41 @@ except ImportError:
         sha256_file,
         validate_attempt_state_root,
         validate_new_output_root,
-        validate_runtime_toolchain_witness_paths,
         validate_successor_receipt,
         verify_executing_package_binding,
         verify_package_index,
         verify_static_release,
         write_o_excl,
     )
-    import successor_section0_preflight_legacy as _emitter  # type: ignore
+    import successor_section0_preflight_legacy as _legacy  # type: ignore
+
+
+def _bound_observation(
+    source: Mapping[str, Any],
+    *,
+    ordinal: int,
+    release_head: str,
+) -> dict[str, Any]:
+    """Reconstruct a closed observation instead of copying arbitrary keys."""
+
+    return {
+        "status": source["status"],
+        "ordinal": ordinal,
+        "method": "GET",
+        "http_status": 404,
+        "authority": {
+            "scheme": "https",
+            "api_host": GITHUB_API_HOST,
+            "repository": GITHUB_REPOSITORY,
+            "api_version": GITHUB_API_VERSION,
+        },
+        "api_host": GITHUB_API_HOST,
+        "repository": GITHUB_REPOSITORY,
+        "ref": source["ref"],
+        "expected_target": release_head,
+        "authorization_effect": "NONE",
+        "global_lease_acquired": False,
+    }
 
 
 def build_preflight_receipt(
@@ -74,26 +101,78 @@ def build_preflight_receipt(
     state_root: Path,
     output_root: Path,
     emitter_stdout: str,
-    runtime_toolchain_snapshot: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    receipt = _legacy.build_preflight_receipt(
-        release_head=release_head,
-        release_tree=release_tree,
-        successor_receipt_sha256=successor_receipt_sha256,
-        successor_receipt_path=successor_receipt_path,
-        successor_receipt=successor_receipt,
-        first_ref_observation=first_ref_observation,
-        second_ref_observation=second_ref_observation,
-        state_root=state_root,
-        output_root=output_root,
-        emitter_stdout=emitter_stdout,
-    )
-    if runtime_toolchain_snapshot is not None:
-        receipt["runtime_toolchain_paths"] = runtime_toolchain_snapshot["paths"]
-        receipt["runtime_toolchain_snapshot_sha256"] = (
-            runtime_toolchain_snapshot["sha256"]
-        )
-    return receipt
+    generated = datetime.now(timezone.utc)
+    first = {
+        "status": first_ref_observation["status"],
+        "ordinal": 1,
+        "method": "GET",
+        "http_status": 404,
+        "authority": GITHUB_AUTHORITY,
+        "api_host": GITHUB_API_HOST,
+        "repository": GITHUB_REPOSITORY,
+        "ref": first_ref_observation["ref"],
+        "expected_target": release_head,
+        "authorization_effect": "NONE",
+        "global_lease_acquired": False,
+    }
+    second = {
+        "status": second_ref_observation["status"],
+        "ordinal": 2,
+        "method": "GET",
+        "http_status": 404,
+        "authority": GITHUB_AUTHORITY,
+        "api_host": GITHUB_API_HOST,
+        "repository": GITHUB_REPOSITORY,
+        "ref": second_ref_observation["ref"],
+        "expected_target": release_head,
+        "authorization_effect": "NONE",
+        "global_lease_acquired": False,
+    }
+    return {
+        "schema": "rei-runtime-prelease-import-firewall-preflight-receipt/v2",
+        "status": "PASS_READ_ONLY_STATIC_PREFLIGHT",
+        "generated_at_utc": generated.isoformat(),
+        "expires_at_utc": (
+            generated + timedelta(seconds=PREFLIGHT_TTL_SECONDS)
+        ).isoformat(),
+        "authority": GITHUB_AUTHORITY,
+        "firewall_release": {"commit": release_head, "tree": release_tree},
+        "successor_section0_receipt": str(
+            Path(successor_receipt_path).resolve(strict=True)
+        ),
+        "successor_section0_receipt_sha256": successor_receipt_sha256,
+        "successor_section0": {
+            "schema": successor_receipt["schema"],
+            "status": successor_receipt["status"],
+            "semantic_toolchain_lock_sha256": successor_receipt[
+                "semantic_toolchain_lock_sha256"
+            ],
+            "host_epoch_fingerprint": successor_receipt[
+                "host_epoch_fingerprint"
+            ],
+            "emitter_stdout": emitter_stdout,
+        },
+        "global_ref_observations": [first, second],
+        "attempt_state": {
+            "global_lease_acquired": False,
+            "local_lease_created": False,
+            "dispatch_intent_created": False,
+            "remaining_attempts": 1,
+            "absence_is_authorization": False,
+        },
+        "static_checks": {
+            "production_module_loaded": False,
+            "standalone_clone_verified": True,
+            "pinned_source_bytes_verified": True,
+            "closed_runtime_package_verified": True,
+            "executing_package_bound_to_head": True,
+        },
+        "attempt_state_root": str(Path(state_root).resolve(strict=True)),
+        "output_root": str(Path(output_root).resolve(strict=True)),
+        "native_runtime": "NOT_RUN",
+        "next_node": "ATTEMPT_REF_PROTECTION_THEN_ATOMIC_LEASE",
+    }
 
 
 def run_read_only_preflight(
@@ -134,29 +213,16 @@ def run_read_only_preflight(
         repo=root,
         state_root=state,
     )
-
-    runtime_snapshot = validate_runtime_toolchain_witness_paths(
-        contract,
-        cc=cc,
-        ld=ld,
-        mpfr=mpfr,
-        gmp=gmp,
-    )
-    resolved = {
-        role: Path(runtime_snapshot["paths"][role]["resolved_path"])
-        for role in ("cc", "ld", "mpfr", "gmp")
-    }
-
     successor_path = output / "successor-section0.json"
-    emitter_stdout = _emitter.run_successor_emitter(
+    emitter_stdout = _legacy.run_successor_emitter(
         repo=root,
         contract=contract,
         rustc=rustc,
         python=python,
-        mpfr=resolved["mpfr"],
-        gmp=resolved["gmp"],
-        cc=resolved["cc"],
-        ld=resolved["ld"],
+        mpfr=mpfr,
+        gmp=gmp,
+        cc=cc,
+        ld=ld,
         output=successor_path,
     )
     successor = validate_successor_receipt(successor_path, contract)
@@ -179,7 +245,6 @@ def run_read_only_preflight(
         state_root=state,
         output_root=output,
         emitter_stdout=emitter_stdout,
-        runtime_toolchain_snapshot=runtime_snapshot,
     )
     receipt_path = output / "read-only-static-preflight-receipt.json"
     write_o_excl(receipt_path, receipt)
@@ -230,9 +295,6 @@ def main(argv: list[str] | None = None) -> int:
         json.dumps(
             {
                 "status": receipt["status"],
-                "runtime_toolchain_snapshot_sha256": receipt[
-                    "runtime_toolchain_snapshot_sha256"
-                ],
                 "successor_section0": str(successor_path),
                 "receipt": str(receipt_path),
             },

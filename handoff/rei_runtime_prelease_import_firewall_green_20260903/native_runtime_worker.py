@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Post-lease worker bound to the exact verified authority-hardened package."""
+"""Post-lease worker bound to exact receipts and canonical runtime paths."""
 
 from __future__ import annotations
 
@@ -8,7 +8,6 @@ import json
 import os
 from pathlib import Path
 import sys
-from typing import Any
 
 try:
     from .common_v2 import (
@@ -19,6 +18,7 @@ try:
         sha256_file,
         validate_attempt_receipts,
         validate_preflight_receipt,
+        validate_runtime_toolchain_witness_paths,
         validate_successor_receipt,
         verify_executing_package_binding,
         verify_package_index,
@@ -35,6 +35,7 @@ except ImportError:
         sha256_file,
         validate_attempt_receipts,
         validate_preflight_receipt,
+        validate_runtime_toolchain_witness_paths,
         validate_successor_receipt,
         verify_executing_package_binding,
         verify_package_index,
@@ -60,7 +61,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if os.environ.get("REI_NATIVE_DISPATCH_FORBIDDEN") == "1":
             raise FirewallError("HOSTED_CI_NATIVE_DISPATCH_FORBIDDEN")
-        _, _, dispatch = validate_attempt_receipts(
+        global_record, local_record, dispatch = validate_attempt_receipts(
             state_root=options.attempt_state_root,
             dispatch_intent=options.dispatch_intent,
             expected_head=options.expected_release_head,
@@ -76,6 +77,31 @@ def main(argv: list[str] | None = None) -> int:
             expected_tree=options.expected_release_tree,
         )
         verify_executing_package_binding(root, contract)
+
+        declared = contract["runtime_toolchain_path_binding"]["paths"]
+        resolved = {
+            role: Path(declared[role]).resolve(strict=True)
+            for role in ("cc", "ld", "mpfr", "gmp")
+        }
+        runtime_snapshot = validate_runtime_toolchain_witness_paths(
+            contract,
+            cc=resolved["cc"],
+            ld=resolved["ld"],
+            mpfr=resolved["mpfr"],
+            gmp=resolved["gmp"],
+        )
+        runtime_snapshot_sha = runtime_snapshot["sha256"]
+        for record, classification in (
+            (global_record, "GLOBAL_LEASE_RUNTIME_TOOLCHAIN_MISMATCH"),
+            (local_record, "LOCAL_LEASE_RUNTIME_TOOLCHAIN_MISMATCH"),
+            (dispatch, "DISPATCH_RUNTIME_TOOLCHAIN_MISMATCH"),
+        ):
+            if (
+                record.get("runtime_toolchain_snapshot_sha256")
+                != runtime_snapshot_sha
+            ):
+                raise FirewallError(classification)
+
         successor_path = Path(dispatch["successor_section0_receipt"])
         preflight_path = Path(dispatch["preflight_receipt"])
         if (
@@ -100,7 +126,9 @@ def main(argv: list[str] | None = None) -> int:
             expected_successor_receipt_path=successor_path,
             expected_authority=GITHUB_AUTHORITY,
             expected_global_ref=GLOBAL_ATTEMPT_REF,
+            expected_runtime_toolchain_snapshot=runtime_snapshot,
         )
+
         result, output_root = run_native_once(
             repo=root,
             rustc=options.rustc,
@@ -119,6 +147,7 @@ def main(argv: list[str] | None = None) -> int:
                 state / "attempt-3.local-lease.json"
             ),
             "dispatch_intent_sha256": sha256_file(options.dispatch_intent),
+            "runtime_toolchain_snapshot_sha256": runtime_snapshot_sha,
             "attempt_ordinal": 3,
             "retries_after_outcome": 0,
             "production_entry_process": "SEPARATE_POST_LEASE_WORKER",

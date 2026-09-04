@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """Compatibility surface for the authority-hardened REI firewall.
 
-The full v2 implementation is sealed in ``common_v3_impl.py``.  This active
-surface preserves the pre-existing v1 test contract while requiring all new
-path and authority arguments on the v2 execution path.
+The active implementation is ``common_v3_impl.py``.  Historical v1 receipt
+validation remains available only when every v2/v3 expectation is omitted;
+all authority-bound callers must additionally supply the canonical post-lease
+runtime-toolchain path snapshot.
 
 Load-bearing implementation tokens retained for source/AST auditing:
 ``EXECUTING_PACKAGE_OUTSIDE_VERIFIED_RELEASE``,
 ``EXECUTING_PACKAGE_BLOB_MISMATCH``, ``HEAD:``,
-``READ_ONLY_PREFLIGHT_FRESHNESS_INVALID``, and
-``ATTEMPT_REF_PROTECTION_RECEIPT_MISMATCH``.
+``READ_ONLY_PREFLIGHT_FRESHNESS_INVALID``,
+``ATTEMPT_REF_PROTECTION_RECEIPT_MISMATCH``,
+``RUNTIME_TOOLCHAIN_WITNESS_PATH_MISMATCH``, and
+``runtime_toolchain_snapshot_sha256``.
 """
 
 from __future__ import annotations
@@ -33,6 +36,8 @@ _SOURCE_AUDIT_GUARDS = (
     "HEAD:",
     "READ_ONLY_PREFLIGHT_FRESHNESS_INVALID",
     "ATTEMPT_REF_PROTECTION_RECEIPT_MISMATCH",
+    "RUNTIME_TOOLCHAIN_WITNESS_PATH_MISMATCH",
+    "runtime_toolchain_snapshot_sha256",
 )
 
 
@@ -47,13 +52,9 @@ def validate_preflight_receipt(
     expected_successor_receipt_path: Path | None = None,
     expected_authority: Mapping[str, Any] | None = None,
     expected_global_ref: str | None = None,
+    expected_runtime_toolchain_snapshot: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Validate either the preserved v1 record or the fully bound v2 record.
-
-    Omitting all five v2-only expectations is accepted solely for the
-    historical v1 regression tests.  Partial omission is always fail-closed.
-    Production preflight, controller, and worker callers supply all five.
-    """
+    """Validate preserved v1 or fully authority/path-bound v2 evidence."""
 
     v2_values = (
         expected_attempt_state_root,
@@ -63,6 +64,8 @@ def validate_preflight_receipt(
         expected_global_ref,
     )
     if all(value is None for value in v2_values):
+        if expected_runtime_toolchain_snapshot is not None:
+            raise FirewallError("READ_ONLY_PREFLIGHT_EXPECTATIONS_INCOMPLETE")
         return _legacy.validate_preflight_receipt(
             path,
             expected_head=expected_head,
@@ -71,6 +74,8 @@ def validate_preflight_receipt(
         )
     if any(value is None for value in v2_values):
         raise FirewallError("READ_ONLY_PREFLIGHT_EXPECTATIONS_INCOMPLETE")
+    if expected_runtime_toolchain_snapshot is None:
+        raise FirewallError("READ_ONLY_PREFLIGHT_RUNTIME_TOOLCHAIN_REQUIRED")
     return _impl.validate_preflight_receipt(
         path,
         expected_head=expected_head,
@@ -81,4 +86,7 @@ def validate_preflight_receipt(
         expected_successor_receipt_path=expected_successor_receipt_path,
         expected_authority=expected_authority,
         expected_global_ref=expected_global_ref,
+        expected_runtime_toolchain_snapshot=(
+            expected_runtime_toolchain_snapshot
+        ),
     )

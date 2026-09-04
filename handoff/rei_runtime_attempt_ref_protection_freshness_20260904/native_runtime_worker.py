@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Post-lease worker that revalidates the live protection evidence first."""
+"""Post-lease worker rechecking live protection and actual runtime paths."""
 
 from __future__ import annotations
 
@@ -27,6 +27,9 @@ except ImportError:
 
 _OLD_WORKER = load_old_worker()
 run_native_once = _OLD_WORKER.run_native_once
+validate_runtime_toolchain_witness_paths = (
+    _old.validate_runtime_toolchain_witness_paths
+)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -43,7 +46,7 @@ def main(argv: list[str] | None = None) -> int:
         if os.environ.get("REI_NATIVE_DISPATCH_FORBIDDEN") == "1":
             raise _old.FirewallError("HOSTED_CI_NATIVE_DISPATCH_FORBIDDEN")
         authority_contract = _old.load_contract()
-        global_record, _, dispatch = validate_attempt_receipts_live(
+        global_record, local_record, dispatch = validate_attempt_receipts_live(
             state_root=options.attempt_state_root,
             dispatch_intent=options.dispatch_intent,
             expected_head=options.expected_release_head,
@@ -59,6 +62,31 @@ def main(argv: list[str] | None = None) -> int:
         )
         _old.verify_executing_package_binding(root, authority_contract)
         verify_executing_package_binding(root)
+
+        declared = authority_contract["runtime_toolchain_path_binding"]["paths"]
+        resolved = {
+            role: Path(declared[role]).resolve(strict=True)
+            for role in ("cc", "ld", "mpfr", "gmp")
+        }
+        runtime_snapshot = validate_runtime_toolchain_witness_paths(
+            authority_contract,
+            cc=resolved["cc"],
+            ld=resolved["ld"],
+            mpfr=resolved["mpfr"],
+            gmp=resolved["gmp"],
+        )
+        runtime_snapshot_sha = runtime_snapshot["sha256"]
+        for record, classification in (
+            (global_record, "GLOBAL_LEASE_RUNTIME_TOOLCHAIN_MISMATCH"),
+            (local_record, "LOCAL_LEASE_RUNTIME_TOOLCHAIN_MISMATCH"),
+            (dispatch, "DISPATCH_RUNTIME_TOOLCHAIN_MISMATCH"),
+        ):
+            if (
+                record.get("runtime_toolchain_snapshot_sha256")
+                != runtime_snapshot_sha
+            ):
+                raise _old.FirewallError(classification)
+
         successor_path = Path(dispatch["successor_section0_receipt"])
         preflight_path = Path(dispatch["preflight_receipt"])
         if (
@@ -92,7 +120,9 @@ def main(argv: list[str] | None = None) -> int:
             expected_successor_receipt_path=successor_path,
             expected_authority=_old.GITHUB_AUTHORITY,
             expected_global_ref=GLOBAL_ATTEMPT_REF,
+            expected_runtime_toolchain_snapshot=runtime_snapshot,
         )
+
         result, output_root = run_native_once(
             repo=root,
             rustc=options.rustc,
@@ -119,6 +149,7 @@ def main(argv: list[str] | None = None) -> int:
             "live_attempt_ref_protection_readback_sha256": global_record[
                 "live_attempt_ref_protection_readback_sha256"
             ],
+            "runtime_toolchain_snapshot_sha256": runtime_snapshot_sha,
             "attempt_ordinal": 3,
             "retries_after_outcome": 0,
             "production_entry_process": "SEPARATE_POST_LEASE_WORKER",

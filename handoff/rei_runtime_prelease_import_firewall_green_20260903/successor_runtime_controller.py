@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fixed-authority lease controller; production bridge import remains forbidden."""
+"""Fixed-authority lease controller with canonical runtime-path binding."""
 
 from __future__ import annotations
 
@@ -27,6 +27,7 @@ try:
         validate_attempt_ref_protection,
         validate_attempt_state_root,
         validate_preflight_receipt,
+        validate_runtime_toolchain_witness_paths,
         validate_successor_receipt,
         verify_executing_package_binding,
         verify_package_index,
@@ -50,6 +51,7 @@ except ImportError:
         validate_attempt_ref_protection,
         validate_attempt_state_root,
         validate_preflight_receipt,
+        validate_runtime_toolchain_witness_paths,
         validate_successor_receipt,
         verify_executing_package_binding,
         verify_package_index,
@@ -106,6 +108,16 @@ def run_controller(
         expected_tree=expected_release_tree,
     )
     verify_executing_package_binding(root, contract)
+
+    runtime_snapshot = validate_runtime_toolchain_witness_paths(
+        contract,
+        cc=cc,
+        ld=ld,
+        mpfr=mpfr,
+        gmp=gmp,
+    )
+    runtime_snapshot_sha = runtime_snapshot["sha256"]
+
     validate_successor_receipt(successor_section0_receipt, contract)
     successor_path = Path(successor_section0_receipt).resolve(strict=True)
     successor_sha = sha256_file(successor_path)
@@ -121,8 +133,10 @@ def run_controller(
         expected_successor_receipt_path=successor_path,
         expected_authority=GITHUB_AUTHORITY,
         expected_global_ref=GLOBAL_ATTEMPT_REF,
+        expected_runtime_toolchain_snapshot=runtime_snapshot,
     )
     preflight_sha = sha256_file(preflight_path)
+
     protection_path = Path(attempt_ref_protection_receipt).resolve(strict=True)
     validate_attempt_ref_protection(
         protection_path,
@@ -157,6 +171,13 @@ def run_controller(
         output=revalidation_output,
     )
     revalidation_sha = revalidation["receipt_sha256"]
+    if (
+        revalidation.get("runtime_toolchain_snapshot_sha256")
+        != runtime_snapshot_sha
+        or revalidation.get("runtime_toolchain_paths")
+        != runtime_snapshot["paths"]
+    ):
+        raise ControllerError("PRELEASE_RUNTIME_TOOLCHAIN_SNAPSHOT_DRIFT")
 
     global_path = state / "attempt-3.global-lease.json"
     local_path = state / "attempt-3.local-lease.json"
@@ -175,6 +196,7 @@ def run_controller(
             preflight_receipt_sha256=preflight_sha,
             attempt_ref_protection_receipt_sha256=protection_sha,
             prelease_toolchain_revalidation_sha256=revalidation_sha,
+            runtime_toolchain_snapshot_sha256=runtime_snapshot_sha,
             token=token,
             output=global_path,
         )
@@ -189,6 +211,7 @@ def run_controller(
             global_record=global_record,
             successor_receipt_sha256=successor_sha,
             preflight_receipt_sha256=preflight_sha,
+            runtime_toolchain_snapshot_sha256=runtime_snapshot_sha,
         )
 
     def record_dispatch(
@@ -205,12 +228,18 @@ def run_controller(
             successor_receipt=successor_path,
             preflight_receipt=preflight_path,
             evidence_root=evidence,
+            runtime_toolchain_snapshot_sha256=runtime_snapshot_sha,
         )
 
     def execute_worker(dispatch_record: Mapping[str, Any]) -> Mapping[str, Any]:
         nonlocal dispatch_started
         if dispatch_record.get("status") != "DISPATCH_INTENT_WRITTEN":
             raise ControllerError("DISPATCH_INTENT_NOT_WRITTEN")
+        if (
+            dispatch_record.get("runtime_toolchain_snapshot_sha256")
+            != runtime_snapshot_sha
+        ):
+            raise ControllerError("DISPATCH_RUNTIME_TOOLCHAIN_SNAPSHOT_DRIFT")
         dispatch_started = True
         return run_worker_process(
             python=python_path,
@@ -240,6 +269,7 @@ def run_controller(
             "runtime_receipt_sha256": worker_result["runtime_receipt_sha256"],
             "attempt_ref_protection_receipt_sha256": protection_sha,
             "prelease_toolchain_revalidation_sha256": revalidation_sha,
+            "runtime_toolchain_snapshot_sha256": runtime_snapshot_sha,
             "retries_remaining": 0,
             "next_gate": "RUNTIME_RESULT_AUDIT",
         }
@@ -261,6 +291,7 @@ def run_controller(
                         ),
                         "attempt_ref_protection_receipt_sha256": protection_sha,
                         "prelease_toolchain_revalidation_sha256": revalidation_sha,
+                        "runtime_toolchain_snapshot_sha256": runtime_snapshot_sha,
                         "retries_remaining": remaining_attempts_after_stop(
                             global_acquired=reservation_may_have_occurred
                         ),

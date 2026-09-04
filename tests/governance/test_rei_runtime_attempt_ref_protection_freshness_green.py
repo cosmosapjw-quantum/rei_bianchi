@@ -208,7 +208,7 @@ class FreshnessLiveGreenTests(unittest.TestCase):
                         now=now,
                     )
 
-    def test_global_lease_records_static_and_live_hashes(self) -> None:
+    def test_global_lease_records_static_live_and_runtime_path_hashes(self) -> None:
         _, lease, old = modules()
         captured = []
 
@@ -241,6 +241,7 @@ class FreshnessLiveGreenTests(unittest.TestCase):
                 source_protection_receipt=source,
                 live_protection_receipt=live,
                 prelease_toolchain_revalidation_sha256="5" * 64,
+                runtime_toolchain_snapshot_sha256="6" * 64,
                 token="test-token",
                 output=output,
                 opener=opener,
@@ -251,6 +252,9 @@ class FreshnessLiveGreenTests(unittest.TestCase):
             self.assertEqual(
                 record["live_attempt_ref_protection_readback_sha256"],
                 live_sha,
+            )
+            self.assertEqual(
+                record["runtime_toolchain_snapshot_sha256"], "6" * 64
             )
             self.assertEqual(
                 captured,
@@ -279,11 +283,13 @@ class FreshnessLiveGreenTests(unittest.TestCase):
             controller,
         )
         self.assertIn("source_protection_receipt_sha256", controller)
+        self.assertIn("runtime_toolchain_snapshot_sha256", controller)
         worker = (package / "native_runtime_worker.py").read_text()
         self.assertIn("validate_attempt_receipts_live", worker)
         self.assertIn(
             "live_attempt_ref_protection_readback_sha256", worker
         )
+        self.assertIn("validate_runtime_toolchain_witness_paths", worker)
 
     def test_live_module_is_get_only_and_has_no_production_import(self) -> None:
         source = (

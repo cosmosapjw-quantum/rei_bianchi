@@ -21,6 +21,7 @@ PACKAGE = ROOT / "handoff" / "rei_runtime_prelease_import_firewall_green_2026090
 CONTRACT = PACKAGE / "CONTRACT.json"
 PREFLIGHT = PACKAGE / "successor_section0_preflight_bound_impl.py"
 COMMON = PACKAGE / "common_v3_impl.py"
+LEGACY_COMMON = PACKAGE / "common_v3_impl_legacy.py"
 CONTROLLER = PACKAGE / "successor_runtime_controller.py"
 WORKER = PACKAGE / "native_runtime_worker.py"
 BRIDGE = (
@@ -76,7 +77,15 @@ def _call_lines(path: Path, name: str) -> dict[str, int]:
 
 class ToolchainWitnessPathBindingExpectedRed(unittest.TestCase):
     def setUp(self) -> None:
-        for path in (CONTRACT, PREFLIGHT, COMMON, CONTROLLER, WORKER, BRIDGE):
+        for path in (
+            CONTRACT,
+            PREFLIGHT,
+            COMMON,
+            LEGACY_COMMON,
+            CONTROLLER,
+            WORKER,
+            BRIDGE,
+        ):
             self.assertTrue(path.is_file(), f"REQUIRED_SOURCE_ABSENT:{path}")
 
     def test_contract_declares_exact_postlease_runtime_paths(self) -> None:
@@ -115,7 +124,18 @@ class ToolchainWitnessPathBindingExpectedRed(unittest.TestCase):
             calls,
             "P0_PRELEASE_REVALIDATION_ACCEPTS_ALTERNATE_HASH_COPY",
         )
-        self.assertIn("subprocess", COMMON.read_text(encoding="utf-8"))
+        wrapper = _function_text(COMMON, "revalidate_successor_toolchain")
+        self.assertIn(
+            "_legacy.revalidate_successor_toolchain",
+            wrapper,
+            "P0_PRELEASE_REVALIDATION_PROCESS_DONOR_NOT_BOUND",
+        )
+        donor = _function_text(LEGACY_COMMON, "revalidate_successor_toolchain")
+        self.assertIn(
+            "subprocess.run",
+            donor,
+            "P0_PRELEASE_REVALIDATION_SUBPROCESS_MISSING",
+        )
 
     def test_preflight_receipt_binds_runtime_path_snapshot(self) -> None:
         source = _function_text(PREFLIGHT, "build_preflight_receipt")

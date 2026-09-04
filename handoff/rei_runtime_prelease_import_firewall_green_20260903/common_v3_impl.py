@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-"""Authority-binding hardening for the REI one-attempt firewall.
+"""Runtime-path-bound authority layer for the REI one-attempt firewall.
 
-The production bridge is never imported here.  This layer fixes the remote
-GitHub authority, cross-binds the executing package to the verified Git HEAD,
-validates path- and authority-bound preflight evidence, re-attests the complete
-successor toolchain immediately before reservation, and requires an independent
-server-side ref-protection receipt.
+The complete PR #54 authority implementation is preserved byte-for-byte in
+``common_v3_impl_legacy.py``.  This active layer adds one narrow invariant:
+Section-0, immediate pre-reservation re-attestation, every attempt receipt, and
+the post-lease worker must refer to the same resolved files behind the exact
+paths used by the unchanged production bridge.
 """
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import hashlib
 import json
 import os
-from pathlib import Path, PurePosixPath
-import subprocess
+from pathlib import Path
 from typing import Any, Mapping
 import urllib.error
 import urllib.request
@@ -22,33 +22,23 @@ import urllib.request
 try:
     from . import common as _base
     from .common import *  # noqa: F401,F403
-    from . import common_v2_legacy as _legacy
+    from . import common_v3_impl_legacy as _legacy
+    from .common_v3_impl_legacy import *  # noqa: F401,F403
 except ImportError:
     import common as _base  # type: ignore
     from common import *  # type: ignore # noqa: F401,F403
-    import common_v2_legacy as _legacy  # type: ignore
+    import common_v3_impl_legacy as _legacy  # type: ignore
+    from common_v3_impl_legacy import *  # type: ignore # noqa: F401,F403
 
 
 PACKAGE = Path(__file__).resolve().parent
-FIREWALL_PACKAGE_RELATIVE = (
-    "handoff/rei_runtime_prelease_import_firewall_green_20260903"
-)
-GITHUB_API_BASE = "https://api.github.com"
-GITHUB_API_HOST = "api.github.com"
-GITHUB_API_SCHEME = "https"
-GITHUB_API_VERSION = "2022-11-28"
-GITHUB_REPOSITORY = "cosmosapjw-quantum/rei_bianchi"
-GITHUB_AUTHORITY: dict[str, str] = {
-    "scheme": GITHUB_API_SCHEME,
-    "api_host": GITHUB_API_HOST,
-    "repository": GITHUB_REPOSITORY,
-    "api_version": GITHUB_API_VERSION,
+RUNTIME_TOOLCHAIN_PATHS: dict[str, str] = {
+    "cc": "/usr/bin/x86_64-linux-gnu-gcc",
+    "ld": "/usr/bin/ld",
+    "mpfr": "/usr/lib/x86_64-linux-gnu/libmpfr.so.6.2.1",
+    "gmp": "/usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0",
 }
-GLOBAL_ATTEMPT_REF = (
-    "refs/heads/attempt-ledger/"
-    "rei-runtime-bridge-ntpath-rebind-20260903-attempt-3"
-)
-PREFLIGHT_MAX_AGE_SECONDS = 1800
+RUNTIME_TOOLCHAIN_PATH_AUTHORITY = "POSTLEASE_PRODUCTION_PATHS"
 
 
 def load_contract(path: Path = PACKAGE / "CONTRACT.json") -> dict[str, Any]:
@@ -60,6 +50,7 @@ def load_contract(path: Path = PACKAGE / "CONTRACT.json") -> dict[str, Any]:
         "immutable_parent",
         "source_lineage",
         "successor_section0",
+        "runtime_toolchain_path_binding",
         "attempt_budget",
         "attempt_ref_protection",
         "execution_context",
@@ -77,6 +68,7 @@ def load_contract(path: Path = PACKAGE / "CONTRACT.json") -> dict[str, Any]:
         or value.get("failure_status") != "STOP_INVALID"
     ):
         raise _base.FirewallError("FIREWALL_CONTRACT_SCHEMA_INVALID")
+
     budget = value.get("attempt_budget")
     if (
         not isinstance(budget, dict)
@@ -89,6 +81,7 @@ def load_contract(path: Path = PACKAGE / "CONTRACT.json") -> dict[str, Any]:
         != "EXACT_FIREWALL_RELEASE_HEAD"
     ):
         raise _base.FirewallError("FIREWALL_ATTEMPT_BUDGET_INVALID")
+
     protection = value.get("attempt_ref_protection")
     if (
         not isinstance(protection, dict)
@@ -105,79 +98,130 @@ def load_contract(path: Path = PACKAGE / "CONTRACT.json") -> dict[str, Any]:
         != {"update", "deletion", "non_fast_forward"}
     ):
         raise _base.FirewallError("ATTEMPT_REF_PROTECTION_CONTRACT_INVALID")
+
+    binding = value.get("runtime_toolchain_path_binding")
+    if (
+        not isinstance(binding, dict)
+        or set(binding) != {"authority", "paths"}
+        or binding.get("authority") != RUNTIME_TOOLCHAIN_PATH_AUTHORITY
+        or binding.get("paths") != RUNTIME_TOOLCHAIN_PATHS
+    ):
+        raise _base.FirewallError("RUNTIME_TOOLCHAIN_PATH_BINDING_INVALID")
     return value
 
 
-def verify_executing_package_binding(
-    repo: Path,
-    contract: Mapping[str, Any] | None = None,
-) -> Path:
-    """Require the executing package to be the exact package in verified HEAD."""
+def _snapshot_payload(paths: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "schema": "rei-runtime-toolchain-path-snapshot/v1",
+        "authority": RUNTIME_TOOLCHAIN_PATH_AUTHORITY,
+        "paths": dict(paths),
+    }
 
-    root = Path(repo).resolve(strict=True)
-    expected = (root / FIREWALL_PACKAGE_RELATIVE).resolve(strict=True)
-    actual = PACKAGE.resolve(strict=True)
-    if actual != expected:
-        raise _base.FirewallError(
-            "EXECUTING_PACKAGE_OUTSIDE_VERIFIED_RELEASE"
-        )
-    _base.verify_package_index(actual, actual / "PACKAGE_INDEX.json")
-    index = _base.load_json_file(
-        actual / "PACKAGE_INDEX.json",
-        "FIREWALL_PACKAGE_INDEX_UNREADABLE",
-    )
-    index_relative = f"{FIREWALL_PACKAGE_RELATIVE}/PACKAGE_INDEX.json"
-    if _base.git_text(root, "rev-parse", f"HEAD:{index_relative}") != _base.git_blob_sha1(
-        actual / "PACKAGE_INDEX.json"
+
+def _snapshot_sha256(paths: Mapping[str, Any]) -> str:
+    return hashlib.sha256(
+        _base.canonical_bytes(_snapshot_payload(paths))
+    ).hexdigest()
+
+
+def validate_runtime_toolchain_witness_paths(
+    contract: Mapping[str, Any],
+    *,
+    cc: Path,
+    ld: Path,
+    mpfr: Path,
+    gmp: Path,
+) -> dict[str, Any]:
+    """Bind witness files to the actual resolved post-lease runtime paths."""
+
+    binding = contract.get("runtime_toolchain_path_binding")
+    if (
+        not isinstance(binding, Mapping)
+        or binding.get("authority") != RUNTIME_TOOLCHAIN_PATH_AUTHORITY
+        or not isinstance(binding.get("paths"), Mapping)
     ):
-        raise _base.FirewallError(
-            "EXECUTING_PACKAGE_BLOB_MISMATCH:PACKAGE_INDEX.json"
-        )
-    for row in index.get("entries", []):
-        if not isinstance(row, dict):
-            raise _base.FirewallError("FIREWALL_PACKAGE_INDEX_INVALID")
-        raw = row.get("path")
-        blob = row.get("blob_sha")
-        pure = PurePosixPath(raw) if isinstance(raw, str) else None
-        if (
-            pure is None
-            or pure.is_absolute()
-            or ".." in pure.parts
-            or str(pure) != raw
-            or not _base._valid_hex(blob, 40)
-        ):
-            raise _base.FirewallError("FIREWALL_PACKAGE_INDEX_INVALID")
-        target = (actual / raw).resolve(strict=True)
-        target.relative_to(actual)
-        relative = f"{FIREWALL_PACKAGE_RELATIVE}/{raw}"
-        head_blob = _base.git_text(root, "rev-parse", f"HEAD:{relative}")
-        if head_blob != blob or _base.git_blob_sha1(target) != blob:
+        raise _base.FirewallError("RUNTIME_TOOLCHAIN_PATH_BINDING_INVALID")
+    declared_paths = binding["paths"]
+    lock = contract.get("successor_section0", {}).get(
+        "semantic_toolchain_lock"
+    )
+    if not isinstance(lock, Mapping):
+        raise _base.FirewallError("RUNTIME_TOOLCHAIN_HASH_LOCK_INVALID")
+
+    supplied = {"cc": cc, "ld": ld, "mpfr": mpfr, "gmp": gmp}
+    rows: dict[str, dict[str, Any]] = {}
+    for role in ("cc", "ld", "mpfr", "gmp"):
+        raw_declared = declared_paths.get(role)
+        if not isinstance(raw_declared, str):
             raise _base.FirewallError(
-                f"EXECUTING_PACKAGE_BLOB_MISMATCH:{raw}"
+                f"RUNTIME_TOOLCHAIN_PATH_UNAVAILABLE:{role}"
             )
-    return actual
+        declared = Path(raw_declared)
+        if not declared.is_absolute():
+            raise _base.FirewallError(
+                f"RUNTIME_TOOLCHAIN_PATH_UNAVAILABLE:{role}"
+            )
+        try:
+            resolved = declared.resolve(strict=True)
+        except (OSError, RuntimeError) as exc:
+            raise _base.FirewallError(
+                f"RUNTIME_TOOLCHAIN_PATH_UNAVAILABLE:{role}"
+            ) from exc
+        if not resolved.is_file():
+            raise _base.FirewallError(
+                f"RUNTIME_TOOLCHAIN_PATH_UNAVAILABLE:{role}"
+            )
+        executable = role in {"cc", "ld"}
+        if executable and not os.access(resolved, os.X_OK):
+            raise _base.FirewallError(
+                f"RUNTIME_TOOLCHAIN_PATH_NOT_EXECUTABLE:{role}"
+            )
+
+        witness = Path(supplied[role])
+        if not witness.is_absolute() or witness.is_symlink():
+            raise _base.FirewallError(
+                f"RUNTIME_TOOLCHAIN_WITNESS_PATH_MISMATCH:{role}"
+            )
+        try:
+            witness_resolved = witness.resolve(strict=True)
+        except (OSError, RuntimeError) as exc:
+            raise _base.FirewallError(
+                f"RUNTIME_TOOLCHAIN_WITNESS_PATH_MISMATCH:{role}"
+            ) from exc
+        if witness_resolved != resolved:
+            raise _base.FirewallError(
+                f"RUNTIME_TOOLCHAIN_WITNESS_PATH_MISMATCH:{role}"
+            )
+
+        expected_hash = lock.get(f"{role}_sha256")
+        actual_hash = _base.sha256_file(resolved)
+        if not _base._valid_hex(expected_hash, 64) or actual_hash != expected_hash:
+            raise _base.FirewallError(
+                f"RUNTIME_TOOLCHAIN_WITNESS_HASH_MISMATCH:{role}"
+            )
+        stat_result = resolved.stat()
+        rows[role] = {
+            "declared_path": str(declared),
+            "resolved_path": str(resolved),
+            "sha256": actual_hash,
+            "size_bytes": stat_result.st_size,
+            "executable": executable,
+        }
+
+    payload = _snapshot_payload(rows)
+    return {**payload, "sha256": _snapshot_sha256(rows)}
 
 
-def _parse_utc(value: Any, classification: str) -> datetime:
-    if not isinstance(value, str):
-        raise _base.FirewallError(classification)
-    try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError as exc:
-        raise _base.FirewallError(classification) from exc
-    if parsed.tzinfo is None:
-        raise _base.FirewallError(classification)
-    return parsed.astimezone(timezone.utc)
-
-
-def _canonical_existing(path: Path, classification: str) -> Path:
-    candidate = Path(path)
-    if not candidate.is_absolute() or candidate.is_symlink():
-        raise _base.FirewallError(classification)
-    try:
-        return candidate.resolve(strict=True)
-    except (OSError, RuntimeError) as exc:
-        raise _base.FirewallError(classification) from exc
+def _validate_snapshot_record(snapshot: Mapping[str, Any]) -> None:
+    paths = snapshot.get("paths")
+    if (
+        snapshot.get("schema") != "rei-runtime-toolchain-path-snapshot/v1"
+        or snapshot.get("authority") != RUNTIME_TOOLCHAIN_PATH_AUTHORITY
+        or not isinstance(paths, Mapping)
+        or set(paths) != {"cc", "ld", "mpfr", "gmp"}
+        or snapshot.get("sha256") != _snapshot_sha256(paths)
+    ):
+        raise _base.FirewallError("RUNTIME_TOOLCHAIN_SNAPSHOT_INVALID")
 
 
 def validate_preflight_receipt(
@@ -191,161 +235,31 @@ def validate_preflight_receipt(
     expected_successor_receipt_path: Path,
     expected_authority: Mapping[str, Any],
     expected_global_ref: str,
+    expected_runtime_toolchain_snapshot: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    receipt = _base.load_json_file(
-        path, "READ_ONLY_PREFLIGHT_RECEIPT_UNREADABLE"
+    receipt = _legacy.validate_preflight_receipt(
+        path,
+        expected_head=expected_head,
+        expected_tree=expected_tree,
+        successor_receipt_sha256=successor_receipt_sha256,
+        expected_attempt_state_root=expected_attempt_state_root,
+        expected_output_root=expected_output_root,
+        expected_successor_receipt_path=expected_successor_receipt_path,
+        expected_authority=expected_authority,
+        expected_global_ref=expected_global_ref,
     )
-    state = _canonical_existing(
-        expected_attempt_state_root, "ATTEMPT_STATE_ROOT_UNAVAILABLE"
-    )
-    output = _canonical_existing(
-        expected_output_root, "OUTPUT_ROOT_UNAVAILABLE"
-    )
-    successor = _canonical_existing(
-        expected_successor_receipt_path,
-        "SUCCESSOR_SECTION0_UNREADABLE",
-    )
-    if (
-        receipt.get("schema")
-        != "rei-runtime-prelease-import-firewall-preflight-receipt/v2"
-        or receipt.get("status") != "PASS_READ_ONLY_STATIC_PREFLIGHT"
-        or receipt.get("firewall_release")
-        != {"commit": expected_head, "tree": expected_tree}
-        or receipt.get("successor_section0_receipt_sha256")
-        != successor_receipt_sha256
-        or receipt.get("successor_section0_receipt") != str(successor)
-        or receipt.get("authority") != dict(expected_authority)
-        or receipt.get("attempt_state_root") != str(state)
-        or receipt.get("output_root") != str(output)
-    ):
-        raise _base.FirewallError("READ_ONLY_PREFLIGHT_RECEIPT_MISMATCH")
-    if Path(path).resolve(strict=True).parent != output:
-        raise _base.FirewallError("READ_ONLY_PREFLIGHT_OUTPUT_ROOT_MISMATCH")
-
-    generated = _parse_utc(
-        receipt.get("generated_at_utc"),
-        "READ_ONLY_PREFLIGHT_FRESHNESS_INVALID",
-    )
-    expires = _parse_utc(
-        receipt.get("expires_at_utc"),
-        "READ_ONLY_PREFLIGHT_FRESHNESS_INVALID",
-    )
-    now = datetime.now(timezone.utc)
-    age = (now - generated).total_seconds()
-    lifetime = (expires - generated).total_seconds()
-    if (
-        age < -300
-        or age > PREFLIGHT_MAX_AGE_SECONDS
-        or lifetime <= 0
-        or lifetime > PREFLIGHT_MAX_AGE_SECONDS
-        or now > expires
-    ):
-        raise _base.FirewallError("READ_ONLY_PREFLIGHT_FRESHNESS_INVALID")
-
-    observations = receipt.get("global_ref_observations")
-    if not isinstance(observations, list) or len(observations) != 2:
-        raise _base.FirewallError(
-            "READ_ONLY_PREFLIGHT_REF_OBSERVATIONS_INVALID"
-        )
-    for ordinal, observation in enumerate(observations, start=1):
+    if expected_runtime_toolchain_snapshot is not None:
+        _validate_snapshot_record(expected_runtime_toolchain_snapshot)
         if (
-            not isinstance(observation, dict)
-            or observation.get("status")
-            != "GLOBAL_ATTEMPT_REF_ABSENT_OBSERVED"
-            or observation.get("ordinal") != ordinal
-            or observation.get("method") != "GET"
-            or observation.get("http_status") != 404
-            or observation.get("authority") != dict(expected_authority)
-            or observation.get("api_host")
-            != expected_authority.get("api_host")
-            or observation.get("repository")
-            != expected_authority.get("repository")
-            or observation.get("ref") != expected_global_ref
-            or observation.get("expected_target") != expected_head
-            or observation.get("authorization_effect") != "NONE"
-            or observation.get("global_lease_acquired") is not False
+            receipt.get("runtime_toolchain_paths")
+            != expected_runtime_toolchain_snapshot["paths"]
+            or receipt.get("runtime_toolchain_snapshot_sha256")
+            != expected_runtime_toolchain_snapshot["sha256"]
         ):
             raise _base.FirewallError(
-                "READ_ONLY_PREFLIGHT_REF_OBSERVATIONS_INVALID"
+                "READ_ONLY_PREFLIGHT_RUNTIME_TOOLCHAIN_SNAPSHOT_MISMATCH"
             )
-
-    expected_static_checks = {
-        "production_module_loaded": False,
-        "standalone_clone_verified": True,
-        "pinned_source_bytes_verified": True,
-        "closed_runtime_package_verified": True,
-        "executing_package_bound_to_head": True,
-    }
-    if receipt.get("static_checks") != expected_static_checks:
-        raise _base.FirewallError(
-            "READ_ONLY_PREFLIGHT_STATIC_CHECKS_INVALID"
-        )
-    attempt = receipt.get("attempt_state")
-    if (
-        not isinstance(attempt, dict)
-        or attempt.get("global_lease_acquired") is not False
-        or attempt.get("local_lease_created") is not False
-        or attempt.get("dispatch_intent_created") is not False
-        or attempt.get("remaining_attempts") != 1
-        or attempt.get("absence_is_authorization") is not False
-        or receipt.get("native_runtime") != "NOT_RUN"
-    ):
-        raise _base.FirewallError(
-            "READ_ONLY_PREFLIGHT_ATTEMPT_STATE_INVALID"
-        )
     return receipt
-
-
-def validate_attempt_ref_protection(
-    path: Path,
-    *,
-    contract: Mapping[str, Any],
-    expected_global_ref: str,
-) -> dict[str, Any]:
-    receipt = _base.load_json_file(
-        path, "ATTEMPT_REF_PROTECTION_RECEIPT_UNREADABLE"
-    )
-    rule = contract["attempt_ref_protection"]
-    active = receipt.get("active_rules")
-    if (
-        receipt.get("schema") != rule["required_schema"]
-        or receipt.get("status") != rule["required_status"]
-        or receipt.get("authority") != GITHUB_AUTHORITY
-        or receipt.get("repository") != GITHUB_REPOSITORY
-        or receipt.get("global_ref") != expected_global_ref
-        or receipt.get("target_pattern") != rule["target_pattern"]
-        or receipt.get("prospective_branch_rules_http_status") != 200
-        or not isinstance(active, list)
-        or set(active) != set(rule["required_rules"])
-        or receipt.get("update_forbidden") is not True
-        or receipt.get("deletion_forbidden") is not True
-        or receipt.get("non_fast_forward_forbidden") is not True
-        or receipt.get("bypass_actors") != []
-        or receipt.get("authorization_effect") != "NONE"
-        or receipt.get("mutation_effect") != "NONE"
-    ):
-        raise _base.FirewallError(
-            "ATTEMPT_REF_PROTECTION_RECEIPT_MISMATCH"
-        )
-    return receipt
-
-
-def _require_locked_path(
-    path: Path,
-    *,
-    executable: bool,
-    classification: str,
-) -> Path:
-    candidate = Path(path)
-    if not candidate.is_absolute() or candidate.is_symlink():
-        raise _base.FirewallError(classification)
-    try:
-        resolved = candidate.resolve(strict=True)
-    except (OSError, RuntimeError) as exc:
-        raise _base.FirewallError(classification) from exc
-    if not resolved.is_file() or (executable and not os.access(resolved, os.X_OK)):
-        raise _base.FirewallError(classification)
-    return resolved
 
 
 def revalidate_successor_toolchain(
@@ -361,91 +275,35 @@ def revalidate_successor_toolchain(
     original_successor_receipt: Path,
     output: Path,
 ) -> dict[str, Any]:
-    """Re-run the complete 13-field emitter immediately before reservation."""
+    """Re-attest fields and actual runtime paths immediately pre-reservation."""
 
-    root = Path(repo).resolve(strict=True)
-    python_path = _require_locked_path(
-        python, executable=True, classification="SUCCESSOR_PYTHON_UNAVAILABLE"
+    snapshot = validate_runtime_toolchain_witness_paths(
+        contract,
+        cc=cc,
+        ld=ld,
+        mpfr=mpfr,
+        gmp=gmp,
     )
-    rustc_path = _require_locked_path(
-        rustc, executable=True, classification="SUCCESSOR_RUSTC_UNAVAILABLE"
+    resolved = {
+        role: Path(snapshot["paths"][role]["resolved_path"])
+        for role in ("cc", "ld", "mpfr", "gmp")
+    }
+    result = _legacy.revalidate_successor_toolchain(
+        repo=repo,
+        contract=contract,
+        rustc=rustc,
+        python=python,
+        mpfr=resolved["mpfr"],
+        gmp=resolved["gmp"],
+        cc=resolved["cc"],
+        ld=resolved["ld"],
+        original_successor_receipt=original_successor_receipt,
+        output=output,
     )
-    mpfr_path = _require_locked_path(
-        mpfr, executable=False, classification="SUCCESSOR_MPFR_UNAVAILABLE"
-    )
-    gmp_path = _require_locked_path(
-        gmp, executable=False, classification="SUCCESSOR_GMP_UNAVAILABLE"
-    )
-    cc_path = _require_locked_path(
-        cc, executable=True, classification="SUCCESSOR_CC_UNAVAILABLE"
-    )
-    ld_path = _require_locked_path(
-        ld, executable=True, classification="SUCCESSOR_LD_UNAVAILABLE"
-    )
-    rule = contract["successor_section0"]
-    emitter = (root / rule["emitter_path"]).resolve(strict=True)
-    policy = (root / rule["policy_path"]).resolve(strict=True)
-    target = Path(output)
-    if not target.is_absolute() or target.is_symlink() or target.exists():
-        raise _base.FirewallError(
-            "PRELEASE_TOOLCHAIN_REVALIDATION_OUTPUT_INVALID"
-        )
-    target.parent.resolve(strict=True)
-    command = [
-        str(python_path),
-        "-I",
-        "-S",
-        "-B",
-        str(emitter),
-        "--policy",
-        str(policy),
-        "--rustc",
-        str(rustc_path),
-        "--python",
-        str(python_path),
-        "--mpfr",
-        str(mpfr_path),
-        "--gmp",
-        str(gmp_path),
-        "--cc",
-        str(cc_path),
-        "--ld",
-        str(ld_path),
-        "--output",
-        str(target),
-    ]
-    completed = subprocess.run(
-        command,
-        check=False,
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        env={"PATH": "/usr/bin:/bin", "LC_ALL": "C", "LANG": "C"},
-    )
-    if completed.returncode != 0:
-        detail = completed.stderr.strip() or completed.stdout.strip()
-        raise _base.FirewallError(
-            "PRELEASE_TOOLCHAIN_REVALIDATION_FAILED:" + detail
-        )
-    original = _base.validate_successor_receipt(
-        original_successor_receipt, contract
-    )
-    fresh = _base.validate_successor_receipt(target, contract)
-    if (
-        fresh.get("observed_toolchain") != original.get("observed_toolchain")
-        or fresh.get("host_epoch_fingerprint")
-        != original.get("host_epoch_fingerprint")
-        or fresh.get("host_context") != original.get("host_context")
-    ):
-        raise _base.FirewallError(
-            "PRELEASE_TOOLCHAIN_REVALIDATION_DRIFT"
-        )
     return {
-        "status": "PASS_PRELEASE_TOOLCHAIN_REVALIDATION",
-        "receipt": str(target.resolve(strict=True)),
-        "receipt_sha256": _base.sha256_file(target),
-        "observed_toolchain": fresh["observed_toolchain"],
+        **result,
+        "runtime_toolchain_paths": snapshot["paths"],
+        "runtime_toolchain_snapshot_sha256": snapshot["sha256"],
     }
 
 
@@ -457,10 +315,11 @@ def acquire_global_lease(
     preflight_receipt_sha256: str,
     attempt_ref_protection_receipt_sha256: str,
     prelease_toolchain_revalidation_sha256: str,
+    runtime_toolchain_snapshot_sha256: str,
     token: str,
     output: Path,
 ) -> dict[str, Any]:
-    """Create the fixed GitHub ref; no caller-selected authority is accepted."""
+    """Create the fixed GitHub ref and bind the canonical runtime paths."""
 
     budget = contract["attempt_budget"]
     for value in (
@@ -468,6 +327,7 @@ def acquire_global_lease(
         preflight_receipt_sha256,
         attempt_ref_protection_receipt_sha256,
         prelease_toolchain_revalidation_sha256,
+        runtime_toolchain_snapshot_sha256,
     ):
         if not _base._valid_hex(value, 64):
             raise _base.FirewallError("GLOBAL_LEASE_EVIDENCE_HASH_INVALID")
@@ -475,6 +335,7 @@ def acquire_global_lease(
         raise _base.FirewallError("GLOBAL_LEASE_TOKEN_UNAVAILABLE")
     if not _base._valid_hex(release_head, 40):
         raise _base.FirewallError("FIREWALL_RELEASE_HEAD_INVALID")
+
     ref = budget["global_lease_ref"]
     short_ref = ref.removeprefix("refs/")
     endpoint = f"{GITHUB_API_BASE}/repos/{GITHUB_REPOSITORY}/git/refs"
@@ -487,7 +348,7 @@ def acquire_global_lease(
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
             "X-GitHub-Api-Version": GITHUB_API_VERSION,
-            "User-Agent": "rei-runtime-authority-binding/v2",
+            "User-Agent": "rei-runtime-path-binding/v1",
         },
     )
     try:
@@ -509,6 +370,7 @@ def acquire_global_lease(
         or body.get("object", {}).get("sha") != release_head
     ):
         raise _base.FirewallError("STOP_REMOTE_LEASE_RESPONSE_MISMATCH")
+
     record = {
         "schema": "rei-runtime-global-attempt-lease-receipt/v4",
         "status": "GLOBAL_ATTEMPT_RESERVED",
@@ -525,11 +387,129 @@ def acquire_global_lease(
         "prelease_toolchain_revalidation_sha256": (
             prelease_toolchain_revalidation_sha256
         ),
+        "runtime_toolchain_snapshot_sha256": (
+            runtime_toolchain_snapshot_sha256
+        ),
         "mutation_policy": "CREATE_ONLY_PROTECTED_NO_UPDATE_NO_DELETE",
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "native_runtime": "NOT_RUN",
     }
     _base.write_o_excl(output, record)
+    return record
+
+
+def create_local_lease(
+    *,
+    output: Path,
+    repo: Path,
+    state_root: Path,
+    release_head: str,
+    release_tree: str,
+    global_record: Mapping[str, Any],
+    successor_receipt_sha256: str,
+    preflight_receipt_sha256: str,
+    runtime_toolchain_snapshot_sha256: str,
+) -> dict[str, Any]:
+    target = Path(output)
+    state = Path(state_root).resolve(strict=True)
+    repository = Path(repo).resolve(strict=True)
+    if target.parent.resolve(strict=True) != state:
+        raise _base.FirewallError("LOCAL_LEASE_OUTSIDE_ATTEMPT_STATE_ROOT")
+    if _base._is_under(target, Path("/tmp").resolve(strict=True)) or _base._is_under(
+        target, repository
+    ):
+        raise _base.FirewallError("LOCAL_LEASE_PATH_FORBIDDEN")
+    if global_record.get("status") != "GLOBAL_ATTEMPT_RESERVED":
+        raise _base.FirewallError("GLOBAL_LEASE_NOT_RESERVED")
+    if (
+        not _base._valid_hex(runtime_toolchain_snapshot_sha256, 64)
+        or global_record.get("runtime_toolchain_snapshot_sha256")
+        != runtime_toolchain_snapshot_sha256
+    ):
+        raise _base.FirewallError("LOCAL_LEASE_RUNTIME_TOOLCHAIN_MISMATCH")
+
+    record = {
+        "schema": "rei-runtime-persistent-local-attempt-lease/v2",
+        "status": "LOCAL_ATTEMPT_RESERVED",
+        "ordinal": 3,
+        "firewall_release_head": release_head,
+        "firewall_release_tree": release_tree,
+        "global_lease_ref": global_record["ref"],
+        "global_lease_receipt_sha256": _base.sha256_file(
+            state / "attempt-3.global-lease.json"
+        ),
+        "successor_section0_receipt_sha256": successor_receipt_sha256,
+        "preflight_receipt_sha256": preflight_receipt_sha256,
+        "runtime_toolchain_snapshot_sha256": (
+            runtime_toolchain_snapshot_sha256
+        ),
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "native_runtime": "NOT_RUN",
+    }
+    _base.write_o_excl(target, record)
+    return record
+
+
+def create_dispatch_intent(
+    *,
+    output: Path,
+    state_root: Path,
+    release_head: str,
+    release_tree: str,
+    global_record: Mapping[str, Any],
+    local_record: Mapping[str, Any],
+    successor_receipt: Path,
+    preflight_receipt: Path,
+    evidence_root: Path,
+    runtime_toolchain_snapshot_sha256: str,
+) -> dict[str, Any]:
+    state = Path(state_root).resolve(strict=True)
+    target = Path(output)
+    if target.parent.resolve(strict=True) != state:
+        raise _base.FirewallError("DISPATCH_INTENT_OUTSIDE_ATTEMPT_STATE_ROOT")
+    if global_record.get("status") != "GLOBAL_ATTEMPT_RESERVED":
+        raise _base.FirewallError("GLOBAL_LEASE_NOT_RESERVED")
+    if local_record.get("status") != "LOCAL_ATTEMPT_RESERVED":
+        raise _base.FirewallError("LOCAL_LEASE_NOT_RESERVED")
+    if (
+        not _base._valid_hex(runtime_toolchain_snapshot_sha256, 64)
+        or global_record.get("runtime_toolchain_snapshot_sha256")
+        != runtime_toolchain_snapshot_sha256
+        or local_record.get("runtime_toolchain_snapshot_sha256")
+        != runtime_toolchain_snapshot_sha256
+    ):
+        raise _base.FirewallError("DISPATCH_RUNTIME_TOOLCHAIN_MISMATCH")
+
+    record = {
+        "schema": "rei-runtime-native-dispatch-intent/v1",
+        "status": "DISPATCH_INTENT_WRITTEN",
+        "ordinal": 3,
+        "firewall_release_head": release_head,
+        "firewall_release_tree": release_tree,
+        "global_lease_receipt": str(state / "attempt-3.global-lease.json"),
+        "global_lease_receipt_sha256": _base.sha256_file(
+            state / "attempt-3.global-lease.json"
+        ),
+        "local_lease_receipt": str(state / "attempt-3.local-lease.json"),
+        "local_lease_receipt_sha256": _base.sha256_file(
+            state / "attempt-3.local-lease.json"
+        ),
+        "successor_section0_receipt": str(
+            Path(successor_receipt).resolve(strict=True)
+        ),
+        "successor_section0_receipt_sha256": _base.sha256_file(
+            successor_receipt
+        ),
+        "preflight_receipt": str(Path(preflight_receipt).resolve(strict=True)),
+        "preflight_receipt_sha256": _base.sha256_file(preflight_receipt),
+        "runtime_toolchain_snapshot_sha256": (
+            runtime_toolchain_snapshot_sha256
+        ),
+        "evidence_root": str(Path(evidence_root).resolve(strict=False)),
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "retries_after_outcome": 0,
+    }
+    _base.write_o_excl(target, record)
     return record
 
 
@@ -540,24 +520,23 @@ def validate_attempt_receipts(
     expected_head: str,
     expected_tree: str,
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    global_record, local_record, dispatch_record = (
-        _legacy.validate_attempt_receipts(
-            state_root=state_root,
-            dispatch_intent=dispatch_intent,
-            expected_head=expected_head,
-            expected_tree=expected_tree,
-        )
+    global_record, local_record, dispatch_record = _legacy.validate_attempt_receipts(
+        state_root=state_root,
+        dispatch_intent=dispatch_intent,
+        expected_head=expected_head,
+        expected_tree=expected_tree,
     )
-    if (
-        global_record.get("schema")
-        != "rei-runtime-global-attempt-lease-receipt/v4"
-        or global_record.get("authority") != GITHUB_AUTHORITY
-        or not _base._valid_hex(
-            global_record.get("attempt_ref_protection_receipt_sha256"), 64
-        )
-        or not _base._valid_hex(
-            global_record.get("prelease_toolchain_revalidation_sha256"), 64
-        )
-    ):
-        raise _base.FirewallError("GLOBAL_LEASE_AUTHORITY_BINDING_MISMATCH")
+    snapshots = [
+        global_record.get("runtime_toolchain_snapshot_sha256"),
+        local_record.get("runtime_toolchain_snapshot_sha256"),
+        dispatch_record.get("runtime_toolchain_snapshot_sha256"),
+    ]
+    if any(value is not None for value in snapshots):
+        if (
+            any(not _base._valid_hex(value, 64) for value in snapshots)
+            or len(set(snapshots)) != 1
+        ):
+            raise _base.FirewallError(
+                "ATTEMPT_RUNTIME_TOOLCHAIN_SNAPSHOT_MISMATCH"
+            )
     return global_record, local_record, dispatch_record
