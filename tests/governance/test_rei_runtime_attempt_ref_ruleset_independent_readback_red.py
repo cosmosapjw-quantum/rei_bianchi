@@ -113,6 +113,19 @@ def _live(module):
     return listed, details, effective
 
 
+def _write_bundle(module, root, admin, source, evidence):
+    paths = []
+    for name, value in (
+        ("ADMIN_MUTATION_RECEIPT.json", admin),
+        ("SOURCE_PROTECTION_RECEIPT.json", source),
+        ("RAW_OPERATION_EVIDENCE.json", evidence),
+    ):
+        path = root / name
+        path.write_bytes(module.canonical_bytes(value) + b"\n")
+        paths.append(path)
+    return paths
+
+
 class IndependentRulesetReadbackExpectedRed(unittest.TestCase):
     def test_future_auditor_module_exists(self) -> None:
         module = _load_future()
@@ -141,16 +154,9 @@ class IndependentRulesetReadbackExpectedRed(unittest.TestCase):
         module = _load_future()
         admin, source, evidence, t0 = _records(module)
         with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            paths = []
-            for name, value in (
-                ("ADMIN_MUTATION_RECEIPT.json", admin),
-                ("SOURCE_PROTECTION_RECEIPT.json", source),
-                ("RAW_OPERATION_EVIDENCE.json", evidence),
-            ):
-                path = root / name
-                path.write_bytes(module.canonical_bytes(value) + b"\n")
-                paths.append(path)
+            paths = _write_bundle(
+                module, Path(temporary), admin, source, evidence
+            )
             bundle = module.validate_input_bundle(
                 admin_path=paths[0],
                 source_path=paths[1],
@@ -159,6 +165,30 @@ class IndependentRulesetReadbackExpectedRed(unittest.TestCase):
             )
             self.assertEqual(bundle["status"], "PASS_RETROSPECTIVE_ADMIN_BUNDLE")
             self.assertEqual(len(bundle["input_sha256"]), 3)
+
+    def test_expired_original_receipt_remains_valid_historical_provenance(self) -> None:
+        module = _load_future()
+        admin, source, evidence, t0 = _records(module)
+        with tempfile.TemporaryDirectory() as temporary:
+            paths = _write_bundle(
+                module, Path(temporary), admin, source, evidence
+            )
+            bundle = module.validate_input_bundle(
+                admin_path=paths[0],
+                source_path=paths[1],
+                evidence_path=paths[2],
+                now=t0 + timedelta(hours=1),
+            )
+            self.assertEqual(bundle["status"], "PASS_RETROSPECTIVE_ADMIN_BUNDLE")
+
+    def test_original_operation_must_finish_before_source_receipt_expiry(self) -> None:
+        module = _load_future()
+        admin, source, evidence, t0 = _records(module)
+        evidence["completed_at_utc"] = (t0 + timedelta(seconds=400)).isoformat()
+        with self.assertRaisesRegex(
+            module.ReadbackAuditError, "TIME_ORDER_INVALID"
+        ):
+            module.validate_operation_evidence(evidence, admin, source)
 
     def test_live_snapshot_is_independent_and_exact(self) -> None:
         module = _load_future()
