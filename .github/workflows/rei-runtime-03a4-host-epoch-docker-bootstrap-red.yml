@@ -1,0 +1,84 @@
+name: rei-runtime-03a4-host-epoch-docker-bootstrap-red
+
+on:
+  push:
+    branches:
+      - audit/rei-runtime-03a4-host-epoch-docker-bootstrap-red-20260904-r1
+    paths:
+      - "tests/governance/test_rei_runtime_03a4_host_epoch_docker_bootstrap_red.py"
+      - "docs/rei_runtime_bridge_03a4_host_epoch_docker_bootstrap/**"
+      - ".github/workflows/rei-runtime-03a4-host-epoch-docker-bootstrap-red.yml"
+  pull_request:
+    paths:
+      - "handoff/rei_runtime_host_epoch_docker_bootstrap_20260904/**"
+      - "tests/governance/test_rei_runtime_03a4_host_epoch_docker_bootstrap_red.py"
+      - "docs/rei_runtime_bridge_03a4_host_epoch_docker_bootstrap/**"
+      - ".github/workflows/rei-runtime-03a4-host-epoch-docker-bootstrap-red.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+
+jobs:
+  expected-red:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert exact PR57 ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor \
+            ab1ea23fd8e3ebe17f46d13d5496bb1db3eba08b HEAD
+
+      - name: Compile static RED contract
+        run: |
+          python -m py_compile \
+            tests/governance/test_rei_runtime_03a4_host_epoch_docker_bootstrap_red.py
+
+      - name: Observe eight-failure Docker-bootstrap RED
+        shell: bash
+        run: |
+          set +e
+          set +u
+          set +o pipefail 2>/dev/null || true
+
+          python -m unittest -v \
+            tests.governance.test_rei_runtime_03a4_host_epoch_docker_bootstrap_red \
+            2>&1 | tee host-epoch-docker-bootstrap-red.log
+          rc=${PIPESTATUS[0]}
+
+          test "$rc" -ne 0
+          grep -q 'Ran 8 tests' host-epoch-docker-bootstrap-red.log
+          grep -Eq 'FAILED \(failures=8\)' host-epoch-docker-bootstrap-red.log
+          grep -q 'P0_DOCKER_BOOTSTRAP_PACKAGE_ABSENT' host-epoch-docker-bootstrap-red.log
+          grep -q 'P0_SNAPSHOT_AND_RELEASE_IDENTITY_UNBOUND' host-epoch-docker-bootstrap-red.log
+          grep -q 'P0_DOCKER_FALLBACK_NOT_TYPED' host-epoch-docker-bootstrap-red.log
+          grep -q 'P0_HOST_MUTATION_SURFACE_NOT_FORBIDDEN' host-epoch-docker-bootstrap-red.log
+          grep -q 'P0_ROOTFS_STREAM_AND_CANONICAL_PATH_BUILD_ABSENT' host-epoch-docker-bootstrap-red.log
+          grep -q 'P0_OFFLINE_READ_ONLY_VERIFICATION_ABSENT' host-epoch-docker-bootstrap-red.log
+          grep -q 'P0_H2_HASH_AND_PACKAGE_VALIDATOR_ABSENT' host-epoch-docker-bootstrap-red.log
+          grep -q 'P0_RUNTIME_ATTEMPT_NONAUTHORITY_ABSENT' host-epoch-docker-bootstrap-red.log
+
+          printf '%s\n' \
+            'classification=PASS_EXPECTED_03A4_HOST_EPOCH_DOCKER_BOOTSTRAP_RED'
+
+      - name: Assert no execution state
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(find "$GITHUB_WORKSPACE" -type f \( \
+            -name 'successor-section0.json' -o \
+            -name 'read-only-static-preflight-receipt.json' -o \
+            -name 'attempt-3.global-lease.json' -o \
+            -name 'attempt-3.local-lease.json' -o \
+            -name 'attempt-3.dispatch-intent.json' -o \
+            -name 'attempt-3.outcome.json' \
+          \) -print -quit)"
