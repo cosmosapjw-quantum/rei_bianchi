@@ -1,0 +1,84 @@
+{
+  "schema": "rei-runtime-attempt-ref-ruleset-independent-readback-green/v2",
+  "classification": "FAIL_CLOSED_RETROSPECTIVE_PROVENANCE_PLUS_FRESH_LIVE_AUTHORIZATION_SOURCE",
+  "repository": "cosmosapjw-quantum/rei_bianchi",
+  "lineage": {
+    "admin_source_parent": {
+      "pull_request": 50,
+      "commit": "a24f4710a1a105443da4c1bc5c7191ca1a4e33a5",
+      "tree": "c27eab7b26906129dccd965306ea00ff63875263",
+      "admin_client_blob": "ec51301b06058b47f4e1cb3ba8c2502d954abe19"
+    },
+    "missing_module_red": {
+      "pull_request": 51,
+      "commit": "6827ec513cdee78fbc808e08692cab3b7dfc915e",
+      "tree": "cd0926c3683d569cf0de2541fc2cb8ede23d95b7",
+      "workflow_run": 33823494482,
+      "workflow_job": 100871057154
+    },
+    "first_green_source": {
+      "commit": "7ba95fd50cd641e546ae42ab80b62a4ea4f72772",
+      "tree": "18b351c48211f7006bb20ea73339468917ed4407"
+    },
+    "temporal_semantics_red": {
+      "commit": "07b7c03131f674579937be0368d24772fa524cbb",
+      "tree": "637a8c8ad985244c361079883f4f928274d61db4",
+      "expected_failures": [
+        "expired historical source receipt was incorrectly rejected at audit time",
+        "operation completion after original receipt expiry was incorrectly admitted"
+      ]
+    }
+  },
+  "active_surface": "docs/rei_runtime_bridge_03a3r3_independent_readback/independent_readback_audit_v2.py",
+  "implementation_donor": {
+    "path": "docs/rei_runtime_bridge_03a3r3_independent_readback/independent_readback_audit.py",
+    "blob": "cafacff7090e10a1419a211a564d4da0fd484098",
+    "role": "byte-pinned v1 donor; not the active CLI surface"
+  },
+  "temporal_contract": {
+    "historical_source_receipt_may_be_expired_at_later_audit": true,
+    "historical_operation_must_complete_before_original_receipt_expiry": true,
+    "current_state_must_be_established_by_fresh_independent_gets": true,
+    "new_controller_compatible_receipt_lifetime_seconds": 300
+  },
+  "required_inputs": [
+    "ADMIN_MUTATION_RECEIPT.json",
+    "SOURCE_PROTECTION_RECEIPT.json",
+    "RAW_OPERATION_EVIDENCE.json"
+  ],
+  "required_live_reads": [
+    "repository ruleset list",
+    "exact ruleset details",
+    "prospective branch effective rules",
+    "exact global attempt ref"
+  ],
+  "success_outputs": [
+    "INDEPENDENT_AUDIT_RECEIPT.json",
+    "AUDITED_FRESH_SOURCE_PROTECTION_RECEIPT.json",
+    "SHA256SUMS"
+  ],
+  "network_methods": ["GET"],
+  "contract_tests": 11,
+  "forbidden_operations": [
+    "repository or ruleset mutation",
+    "Git ref mutation",
+    "persistent local lease",
+    "dispatch intent",
+    "production bridge import",
+    "native execution",
+    "first canonical interval",
+    "provider or scientific promotion"
+  ],
+  "claim_ceiling": {
+    "active_source": "CANDIDATE_PENDING_EXACT_HEAD_GREEN",
+    "actual_repository_ruleset": "NOT_CREATED",
+    "independent_live_audit": "NOT_RUN",
+    "global_attempt_ref": "ABSENT",
+    "persistent_local_lease": "NOT_CREATED",
+    "remaining_native_attempts": 1,
+    "native_runtime": "NOT_RUN",
+    "first_canonical_interval": "NO_PASS",
+    "provider_export": "NOT_AUTHORIZED",
+    "scientific_pass": "NOT_CLAIMED"
+  }
+}

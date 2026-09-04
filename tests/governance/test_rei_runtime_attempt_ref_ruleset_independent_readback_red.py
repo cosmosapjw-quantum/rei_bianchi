@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Intentional RED for independent ruleset mutation/readback auditing."""
+"""Contract tests for independent ruleset mutation/readback auditing."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ SCRIPT = (
     ROOT
     / "docs"
     / "rei_runtime_bridge_03a3r3_independent_readback"
-    / "independent_readback_audit.py"
+    / "independent_readback_audit_v2.py"
 )
 
 
@@ -85,7 +85,14 @@ def _records(module):
         "native_runtime_permitted": False,
         "steps": [
             {"operation": "GET_RULESET_LIST", "http_status": 200, "response_sha256": "a" * 64},
-            {"operation": "POST_CREATE_RULESET", "http_status": 201, "request_sha256": "b" * 64, "response_sha256": "c" * 64},
+            {
+                "operation": "POST_CREATE_RULESET",
+                "http_status": 201,
+                "request_sha256": module.sha256_bytes(
+                    module.canonical_bytes(module.RULESET_PAYLOAD)
+                ),
+                "response_sha256": "c" * 64,
+            },
             {"operation": "GET_RULESET_DETAILS", "http_status": 200, "ruleset_id": 42, "response_sha256": "1" * 64},
             {"operation": "GET_PROSPECTIVE_BRANCH_RULES", "http_status": 200, "response_sha256": "2" * 64},
             {"operation": "GET_EXACT_GLOBAL_ATTEMPT_REF", "http_status": 404, "response_sha256": "3" * 64},
@@ -104,6 +111,19 @@ def _live(module):
         {"type": "non_fast_forward", "ruleset_id": 42},
     ]
     return listed, details, effective
+
+
+def _write_bundle(module, root, admin, source, evidence):
+    paths = []
+    for name, value in (
+        ("ADMIN_MUTATION_RECEIPT.json", admin),
+        ("SOURCE_PROTECTION_RECEIPT.json", source),
+        ("RAW_OPERATION_EVIDENCE.json", evidence),
+    ):
+        path = root / name
+        path.write_bytes(module.canonical_bytes(value) + b"\n")
+        paths.append(path)
+    return paths
 
 
 class IndependentRulesetReadbackExpectedRed(unittest.TestCase):
@@ -134,16 +154,9 @@ class IndependentRulesetReadbackExpectedRed(unittest.TestCase):
         module = _load_future()
         admin, source, evidence, t0 = _records(module)
         with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            paths = []
-            for name, value in (
-                ("ADMIN_MUTATION_RECEIPT.json", admin),
-                ("SOURCE_PROTECTION_RECEIPT.json", source),
-                ("RAW_OPERATION_EVIDENCE.json", evidence),
-            ):
-                path = root / name
-                path.write_bytes(module.canonical_bytes(value) + b"\n")
-                paths.append(path)
+            paths = _write_bundle(
+                module, Path(temporary), admin, source, evidence
+            )
             bundle = module.validate_input_bundle(
                 admin_path=paths[0],
                 source_path=paths[1],
@@ -152,6 +165,35 @@ class IndependentRulesetReadbackExpectedRed(unittest.TestCase):
             )
             self.assertEqual(bundle["status"], "PASS_RETROSPECTIVE_ADMIN_BUNDLE")
             self.assertEqual(len(bundle["input_sha256"]), 3)
+
+    def test_expired_original_receipt_remains_valid_historical_provenance(self) -> None:
+        module = _load_future()
+        admin, source, evidence, t0 = _records(module)
+        with tempfile.TemporaryDirectory() as temporary:
+            paths = _write_bundle(
+                module, Path(temporary), admin, source, evidence
+            )
+            bundle = module.validate_input_bundle(
+                admin_path=paths[0],
+                source_path=paths[1],
+                evidence_path=paths[2],
+                now=t0 + timedelta(hours=1),
+            )
+            self.assertEqual(bundle["status"], "PASS_RETROSPECTIVE_ADMIN_BUNDLE")
+            self.assertTrue(
+                bundle["temporal_semantics"][
+                    "historical_receipt_may_be_expired_now"
+                ]
+            )
+
+    def test_original_operation_must_finish_before_source_receipt_expiry(self) -> None:
+        module = _load_future()
+        admin, source, evidence, t0 = _records(module)
+        evidence["completed_at_utc"] = (t0 + timedelta(seconds=400)).isoformat()
+        with self.assertRaisesRegex(
+            module.ReadbackAuditError, "TIME_ORDER_INVALID"
+        ):
+            module.validate_operation_evidence(evidence, admin, source)
 
     def test_live_snapshot_is_independent_and_exact(self) -> None:
         module = _load_future()
