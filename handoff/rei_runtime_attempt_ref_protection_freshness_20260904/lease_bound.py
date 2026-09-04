@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fixed-authority global lease bound to fresh source and live protection."""
+"""Fixed-authority global lease bound to protection and runtime paths."""
 
 from __future__ import annotations
 
@@ -45,11 +45,12 @@ def acquire_global_lease(
     source_protection_receipt: Path,
     live_protection_receipt: Path,
     prelease_toolchain_revalidation_sha256: str,
+    runtime_toolchain_snapshot_sha256: str,
     token: str,
     output: Path,
     opener: Callable[..., Any] | None = None,
 ) -> dict[str, Any]:
-    """Atomically create the fixed ref and bind both protection epochs."""
+    """Atomically create the fixed ref and bind protection plus path epochs."""
 
     for value in (
         successor_receipt_sha256,
@@ -57,6 +58,7 @@ def acquire_global_lease(
         attempt_ref_protection_receipt_sha256,
         source_protection_receipt_sha256,
         prelease_toolchain_revalidation_sha256,
+        runtime_toolchain_snapshot_sha256,
     ):
         if not _old._valid_hex(value, 64):
             raise _old.FirewallError("GLOBAL_LEASE_EVIDENCE_HASH_INVALID")
@@ -85,7 +87,7 @@ def acquire_global_lease(
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
             "X-GitHub-Api-Version": GITHUB_API_VERSION,
-            "User-Agent": "rei-runtime-live-protection/v1",
+            "User-Agent": "rei-runtime-live-protection-path-bound/v1",
         },
     )
     open_request = opener or urllib.request.urlopen
@@ -131,6 +133,9 @@ def acquire_global_lease(
         "prelease_toolchain_revalidation_sha256": (
             prelease_toolchain_revalidation_sha256
         ),
+        "runtime_toolchain_snapshot_sha256": (
+            runtime_toolchain_snapshot_sha256
+        ),
         "mutation_policy": "CREATE_ONLY_PROTECTED_NO_UPDATE_NO_DELETE",
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "native_runtime": "NOT_RUN",
@@ -161,13 +166,19 @@ def validate_attempt_receipts_live(
     live_sha = global_record.get(
         "live_attempt_ref_protection_readback_sha256"
     )
+    runtime_sha = global_record.get("runtime_toolchain_snapshot_sha256")
     if (
         not source_path.is_absolute()
         or not live_path.is_absolute()
         or not _old._valid_hex(source_sha, 64)
         or not _old._valid_hex(live_sha, 64)
+        or not _old._valid_hex(runtime_sha, 64)
         or global_record.get("attempt_ref_protection_receipt_sha256")
         != live_sha
+        or local_record.get("runtime_toolchain_snapshot_sha256")
+        != runtime_sha
+        or dispatch_record.get("runtime_toolchain_snapshot_sha256")
+        != runtime_sha
     ):
         raise _old.FirewallError("GLOBAL_LEASE_LIVE_PROTECTION_BINDING_MISMATCH")
     source_resolved = source_path.resolve(strict=True)

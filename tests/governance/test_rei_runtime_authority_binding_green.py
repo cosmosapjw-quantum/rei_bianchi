@@ -20,6 +20,7 @@ HEAD = "1" * 40
 TREE = "2" * 40
 SHA_A = "3" * 64
 SHA_B = "4" * 64
+SHA_PATHS = "7" * 64
 
 
 def load_modules():
@@ -46,6 +47,25 @@ class FakeResponse:
         return json.dumps(self._payload).encode("utf-8")
 
 
+def synthetic_runtime_snapshot(common) -> dict:
+    rows = {
+        role: {
+            "declared_path": f"/declared/{role}",
+            "resolved_path": f"/resolved/{role}",
+            "sha256": str(index) * 64,
+            "size_bytes": index,
+            "executable": role in {"cc", "ld"},
+        }
+        for index, role in enumerate(("cc", "ld", "mpfr", "gmp"), start=1)
+    }
+    return {
+        "schema": "rei-runtime-toolchain-path-snapshot/v1",
+        "authority": "POSTLEASE_PRODUCTION_PATHS",
+        "paths": rows,
+        "sha256": common._impl._snapshot_sha256(rows),
+    }
+
+
 class AuthorityBindingGreenTests(unittest.TestCase):
     def test_contract_and_fixed_authority_load(self) -> None:
         common, _, _ = load_modules()
@@ -58,6 +78,10 @@ class AuthorityBindingGreenTests(unittest.TestCase):
                 "required_before_global_reservation"
             ]
         )
+        self.assertEqual(
+            contract["runtime_toolchain_path_binding"]["authority"],
+            "POSTLEASE_PRODUCTION_PATHS",
+        )
 
     def test_executing_package_is_the_package_in_checked_out_head(self) -> None:
         common, _, _ = load_modules()
@@ -69,9 +93,6 @@ class AuthorityBindingGreenTests(unittest.TestCase):
             relative = specification.removeprefix("HEAD:")
             return common.git_blob_sha1(Path(repo) / relative)
 
-        # The production path keeps the pinned-Git preauthentication gate.  This
-        # hosted-CI test substitutes only a read-only HEAD:<path> resolver so it
-        # can exercise the cross-binding logic without claiming host admission.
         with mock.patch.object(
             common._impl._base,
             "git_text",
@@ -111,6 +132,7 @@ class AuthorityBindingGreenTests(unittest.TestCase):
                     preflight_receipt_sha256=SHA_B,
                     attempt_ref_protection_receipt_sha256="5" * 64,
                     prelease_toolchain_revalidation_sha256="6" * 64,
+                    runtime_toolchain_snapshot_sha256=SHA_PATHS,
                     token="test-token",
                     output=output,
                 )
@@ -131,6 +153,9 @@ class AuthorityBindingGreenTests(unittest.TestCase):
             )
             self.assertEqual(
                 record["prelease_toolchain_revalidation_sha256"], "6" * 64
+            )
+            self.assertEqual(
+                record["runtime_toolchain_snapshot_sha256"], SHA_PATHS
             )
 
     def test_protection_receipt_requires_all_server_rules(self) -> None:
@@ -176,6 +201,7 @@ class AuthorityBindingGreenTests(unittest.TestCase):
     def test_preflight_receipt_path_and_authority_mutation_is_rejected(self) -> None:
         common, _, _ = load_modules()
         now = datetime.now(timezone.utc)
+        snapshot = synthetic_runtime_snapshot(common)
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             state = root / "state"
@@ -226,6 +252,8 @@ class AuthorityBindingGreenTests(unittest.TestCase):
                 },
                 "attempt_state_root": str(state.resolve()),
                 "output_root": str(output.resolve()),
+                "runtime_toolchain_paths": snapshot["paths"],
+                "runtime_toolchain_snapshot_sha256": snapshot["sha256"],
                 "native_runtime": "NOT_RUN",
             }
             path = output / "preflight.json"
@@ -240,6 +268,7 @@ class AuthorityBindingGreenTests(unittest.TestCase):
                 expected_successor_receipt_path=successor,
                 expected_authority=common.GITHUB_AUTHORITY,
                 expected_global_ref=common.GLOBAL_ATTEMPT_REF,
+                expected_runtime_toolchain_snapshot=snapshot,
             )
             receipt["global_ref_observations"][1]["repository"] = "other/repo"
             path.write_text(json.dumps(receipt) + "\n", encoding="utf-8")
@@ -257,6 +286,7 @@ class AuthorityBindingGreenTests(unittest.TestCase):
                     expected_successor_receipt_path=successor,
                     expected_authority=common.GITHUB_AUTHORITY,
                     expected_global_ref=common.GLOBAL_ATTEMPT_REF,
+                    expected_runtime_toolchain_snapshot=snapshot,
                 )
 
     def test_no_production_entry_is_performed_by_this_suite(self) -> None:

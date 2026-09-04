@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Lease controller with fresh protection and live pre-reservation GETs.
+"""Lease controller with live protection and canonical runtime paths.
 
-The controller never imports the REI production bridge.  It retains the PR #47
-ordering and adds a fresh, fixed-authority protection snapshot immediately
-before the atomic global-ref POST.
+The controller never imports the REI production bridge.  It binds the same
+post-lease runtime-path snapshot in preflight, immediate pre-reservation
+reattestation, the protected global lease, local lease, dispatch intent and the
+separate worker.
 """
 
 from __future__ import annotations
@@ -48,6 +49,9 @@ _validate_evidence_root = _OLD_CONTROLLER._validate_evidence_root
 _validate_python = _OLD_CONTROLLER._validate_python
 _validate_rustc = _OLD_CONTROLLER._validate_rustc
 revalidate_successor_toolchain = _old.revalidate_successor_toolchain
+validate_runtime_toolchain_witness_paths = (
+    _old.validate_runtime_toolchain_witness_paths
+)
 
 
 def run_worker_process(
@@ -145,6 +149,16 @@ def run_controller(
     )
     _old.verify_executing_package_binding(root, authority_contract)
     verify_executing_package_binding(root)
+
+    runtime_snapshot = validate_runtime_toolchain_witness_paths(
+        authority_contract,
+        cc=cc,
+        ld=ld,
+        mpfr=mpfr,
+        gmp=gmp,
+    )
+    runtime_snapshot_sha = runtime_snapshot["sha256"]
+
     _old.validate_successor_receipt(
         successor_section0_receipt, authority_contract
     )
@@ -162,6 +176,7 @@ def run_controller(
         expected_successor_receipt_path=successor_path,
         expected_authority=_old.GITHUB_AUTHORITY,
         expected_global_ref=GLOBAL_ATTEMPT_REF,
+        expected_runtime_toolchain_snapshot=runtime_snapshot,
     )
     preflight_sha = _old.sha256_file(preflight_path)
     source_protection_path = Path(source_protection_receipt).resolve(strict=True)
@@ -202,6 +217,13 @@ def run_controller(
         output=revalidation_output,
     )
     revalidation_sha = revalidation["receipt_sha256"]
+    if (
+        revalidation.get("runtime_toolchain_snapshot_sha256")
+        != runtime_snapshot_sha
+        or revalidation.get("runtime_toolchain_paths")
+        != runtime_snapshot["paths"]
+    ):
+        raise ControllerError("PRELEASE_RUNTIME_TOOLCHAIN_SNAPSHOT_DRIFT")
 
     global_path = state / "attempt-3.global-lease.json"
     local_path = state / "attempt-3.local-lease.json"
@@ -238,6 +260,7 @@ def run_controller(
             source_protection_receipt=source_protection_path,
             live_protection_receipt=live_protection_path,
             prelease_toolchain_revalidation_sha256=revalidation_sha,
+            runtime_toolchain_snapshot_sha256=runtime_snapshot_sha,
             token=token,
             output=global_path,
         )
@@ -252,6 +275,7 @@ def run_controller(
             global_record=global_record,
             successor_receipt_sha256=successor_sha,
             preflight_receipt_sha256=preflight_sha,
+            runtime_toolchain_snapshot_sha256=runtime_snapshot_sha,
         )
 
     def record_dispatch(
@@ -268,12 +292,18 @@ def run_controller(
             successor_receipt=successor_path,
             preflight_receipt=preflight_path,
             evidence_root=evidence,
+            runtime_toolchain_snapshot_sha256=runtime_snapshot_sha,
         )
 
     def execute_worker(dispatch_record: Mapping[str, Any]) -> Mapping[str, Any]:
         nonlocal dispatch_started
         if dispatch_record.get("status") != "DISPATCH_INTENT_WRITTEN":
             raise ControllerError("DISPATCH_INTENT_NOT_WRITTEN")
+        if (
+            dispatch_record.get("runtime_toolchain_snapshot_sha256")
+            != runtime_snapshot_sha
+        ):
+            raise ControllerError("DISPATCH_RUNTIME_TOOLCHAIN_SNAPSHOT_DRIFT")
         dispatch_started = True
         return run_worker_process(
             python=python_path,
@@ -308,6 +338,7 @@ def run_controller(
                 live_protection_sha
             ),
             "prelease_toolchain_revalidation_sha256": revalidation_sha,
+            "runtime_toolchain_snapshot_sha256": runtime_snapshot_sha,
             "retries_remaining": 0,
             "next_gate": "RUNTIME_RESULT_AUDIT",
         }
@@ -335,6 +366,9 @@ def run_controller(
                         ),
                         "prelease_toolchain_revalidation_sha256": (
                             revalidation_sha
+                        ),
+                        "runtime_toolchain_snapshot_sha256": (
+                            runtime_snapshot_sha
                         ),
                         "retries_remaining": _old.remaining_attempts_after_stop(
                             global_acquired=reservation_may_have_occurred
