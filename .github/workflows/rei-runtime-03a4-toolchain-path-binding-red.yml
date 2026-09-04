@@ -7,7 +7,10 @@ on:
     paths:
       - "handoff/rei_runtime_prelease_import_firewall_green_20260903/**"
       - "handoff/rei_runtime_attempt_ref_protection_freshness_20260904/**"
+      - "docs/rei_runtime_bridge_03a4_toolchain_path_binding/**"
       - "tests/governance/test_rei_runtime_03a4_toolchain_path_binding_red.py"
+      - "tests/governance/test_rei_runtime_03a4_toolchain_path_binding_behavior.py"
+      - "tests/governance/test_rei_runtime_03a4_active_freshness_path_binding.py"
       - "tests/governance/test_rei_runtime_authority_binding_green.py"
       - "tests/governance/test_rei_runtime_attempt_ref_protection_freshness_green.py"
       - ".github/workflows/rei-runtime-03a4-toolchain-path-binding-red.yml"
@@ -15,7 +18,10 @@ on:
     paths:
       - "handoff/rei_runtime_prelease_import_firewall_green_20260903/**"
       - "handoff/rei_runtime_attempt_ref_protection_freshness_20260904/**"
+      - "docs/rei_runtime_bridge_03a4_toolchain_path_binding/**"
       - "tests/governance/test_rei_runtime_03a4_toolchain_path_binding_red.py"
+      - "tests/governance/test_rei_runtime_03a4_toolchain_path_binding_behavior.py"
+      - "tests/governance/test_rei_runtime_03a4_active_freshness_path_binding.py"
       - "tests/governance/test_rei_runtime_authority_binding_green.py"
       - "tests/governance/test_rei_runtime_attempt_ref_protection_freshness_green.py"
       - ".github/workflows/rei-runtime-03a4-toolchain-path-binding-red.yml"
@@ -51,13 +57,17 @@ jobs:
             handoff/rei_runtime_prelease_import_firewall_green_20260903/*.py \
             handoff/rei_runtime_attempt_ref_protection_freshness_20260904/*.py \
             tests/governance/test_rei_runtime_03a4_toolchain_path_binding_red.py \
+            tests/governance/test_rei_runtime_03a4_toolchain_path_binding_behavior.py \
+            tests/governance/test_rei_runtime_03a4_active_freshness_path_binding.py \
             tests/governance/test_rei_runtime_authority_binding_green.py \
             tests/governance/test_rei_runtime_attempt_ref_protection_freshness_green.py
 
-      - name: Turn the six-method structural RED GREEN
+      - name: Turn all path-binding RED obligations GREEN
         run: |
           python -m unittest -v \
-            tests.governance.test_rei_runtime_03a4_toolchain_path_binding_red
+            tests.governance.test_rei_runtime_03a4_toolchain_path_binding_red \
+            tests.governance.test_rei_runtime_03a4_toolchain_path_binding_behavior \
+            tests.governance.test_rei_runtime_03a4_active_freshness_path_binding
 
       - name: Run inherited authority and freshness contracts
         run: |
@@ -80,6 +90,37 @@ jobs:
             handoff/rei_runtime_attempt_ref_protection_freshness_20260904/verify_package.py \
             --repo . \
             --expected-head "$head"
+
+      - name: Verify compiler provenance and strict non-authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path(
+              "docs/rei_runtime_bridge_03a4_toolchain_path_binding/"
+              "COMPILER_PROVENANCE_RECEIPT.json"
+          )
+          value = json.loads(path.read_text(encoding="utf-8"))
+          expected = (
+              "6117c52522997d2aaccb2b52b3c6bf42c0a6c5edb1d718431fed6b2fc5fec234"
+          )
+          assert value["target_host_observation"]["locked_compiler_sha256"] == expected
+          assert value["identified_package"]["compiler_sha256"] == expected
+          assert value["identified_package"]["deb_sha256"] == (
+              "7cd398670e8306eabc9e77202f356a3206c440bd9f3dc764680a19be01784776"
+          )
+          assert value["identified_package"]["version"] == (
+              "13.3.0-6ubuntu2~24.04"
+          )
+          assert value["effects"]["target_host_toolchain_reconstituted"] is False
+          assert value["effects"]["authorization_effect"] == "NONE"
+          assert value["effects"]["mutation_effect"] == "NONE"
+          assert value["effects"]["global_attempt_ref"] == "ABSENT_REQUIRED"
+          assert value["effects"]["native_runtime"] == "NOT_RUN"
+          assert value["effects"]["remaining_native_attempts"] == 1
+          print("classification=PASS_COMPILER_PROVENANCE_ONLY_NO_AUTHORITY")
+          PY
 
       - name: Confirm live boundary is still unconsumed
         shell: bash
