@@ -6,6 +6,7 @@ on:
       - fix/rei-runtime-03a4-toolchain-path-binding-green-20260904-r1
     paths:
       - "tests/governance/test_rei_runtime_03a4_toolchain_path_binding_behavior.py"
+      - "tests/governance/test_rei_runtime_03a4_active_freshness_path_binding.py"
       - ".github/workflows/rei-runtime-03a4-toolchain-path-binding-behavior-red.yml"
   workflow_dispatch:
 
@@ -30,12 +31,13 @@ jobs:
           git merge-base --is-ancestor \
             2b2b717283e070c0d07b632e3a7eb99649f2044f HEAD
 
-      - name: Compile behavior contract
+      - name: Compile behavior contracts
         run: |
           python -m py_compile \
-            tests/governance/test_rei_runtime_03a4_toolchain_path_binding_behavior.py
+            tests/governance/test_rei_runtime_03a4_toolchain_path_binding_behavior.py \
+            tests/governance/test_rei_runtime_03a4_active_freshness_path_binding.py
 
-      - name: Observe missing runtime-path validator
+      - name: Observe missing path binding on both execution layers
         shell: bash
         run: |
           set +e
@@ -44,16 +46,25 @@ jobs:
 
           python -m unittest -v \
             tests.governance.test_rei_runtime_03a4_toolchain_path_binding_behavior \
+            tests.governance.test_rei_runtime_03a4_active_freshness_path_binding \
             2>&1 | tee behavior-red.log
           rc=${PIPESTATUS[0]}
 
           test "$rc" -ne 0
-          grep -q 'Ran 6 tests' behavior-red.log
-          grep -Eq 'FAILED \(failures=6\)' behavior-red.log
+          grep -q 'Ran 10 tests' behavior-red.log
+          grep -Eq 'FAILED \(failures=10\)' behavior-red.log
           grep -q 'RUNTIME_TOOLCHAIN_PATH_VALIDATOR_NOT_IMPLEMENTED' \
             behavior-red.log
+          grep -q 'P0_ACTIVE_CONTROLLER_PATH_ATTESTATION_ABSENT' \
+            behavior-red.log
+          grep -q 'P0_ACTIVE_CONTROLLER_SNAPSHOT_BINDING_ABSENT' \
+            behavior-red.log
+          grep -q 'P0_LIVE_GLOBAL_LEASE_SNAPSHOT_ABSENT' \
+            behavior-red.log
+          grep -q 'P0_ACTIVE_WORKER_PATH_RECHECK_ABSENT' \
+            behavior-red.log
           printf '%s\n' \
-            'classification=PASS_EXPECTED_03A4_TOOLCHAIN_PATH_BEHAVIOR_RED'
+            'classification=PASS_EXPECTED_03A4_ACTIVE_PATH_BEHAVIOR_RED'
 
       - name: Assert no execution state
         shell: bash
