@@ -1,0 +1,84 @@
+name: rei-math-m2-spacetime-sign
+on:
+  push:
+    branches: [research/rei-math-m2-sign-reconciliation-20260905-r1]
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  REI_NATIVE_DISPATCH_FORBIDDEN: '1'
+  MPLBACKEND: Agg
+  BASE_COMMIT: 4cb07fa9a8f21db605a950448c08b47f0840331c
+jobs:
+  exact-symbolic-sign-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pin exact head and unchanged dependency scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse "$BASE_COMMIT^{tree}")" = 3949fef9be088950bd3b9876bff81c47c80b5cc6
+          git merge-base --is-ancestor "$BASE_COMMIT" HEAD
+          git diff --check "$BASE_COMMIT..HEAD"
+          while IFS= read -r path; do
+            case "$path" in
+              research/rei_math_m2_spacetime_sign/*|tests/research/test_rei_math_m2_spacetime_sign.py|.github/workflows/rei-math-m2-spacetime-sign.yml) ;;
+              *) echo "UNEXPECTED_CHANGED_PATH:$path"; exit 1;;
+            esac
+          done < <(git diff --name-only "$BASE_COMMIT..HEAD")
+          git diff --exit-code "$BASE_COMMIT" HEAD -- research/rei_math_m1_generic_background src rust stages handoff
+      - name: Install symbolic-oracle dependencies only
+        run: python -m pip install 'sympy==1.13.3' 'mpmath==1.3.0' 'matplotlib==3.9.2'
+      - name: Run exact required tests and classify RED or GREEN
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          python - <<'PY' | tee out/test-result.json
+          import importlib.util,json,pathlib,unittest
+          root=pathlib.Path('research/rei_math_m2_spacetime_sign')
+          contract=json.loads((root/'AUDIT_COMPILED_WORK_UNIT.json').read_text())
+          spec=importlib.util.spec_from_file_location('m2_tests','tests/research/test_rei_math_m2_spacetime_sign.py')
+          tests=importlib.util.module_from_spec(spec);spec.loader.exec_module(tests)
+          names=unittest.defaultTestLoader.getTestCaseNames(tests.SpacetimeSignTests)
+          assert names==contract['required_test_ids'],names
+          suite=unittest.defaultTestLoader.loadTestsFromTestCase(tests.SpacetimeSignTests)
+          result=unittest.TextTestRunner(verbosity=2).run(suite)
+          missing=not (root/'derive_constraint_sign.py').exists()
+          if missing:
+            ok=(result.testsRun==10 and len(result.failures)==10 and not result.errors and not result.skipped and all('M2_IMPLEMENTATION_ABSENT' in text for _,text in result.failures))
+            status='PASS_EXPECTED_M2_IMPLEMENTATION_ABSENT_RED' if ok else 'FAIL_UNEXPECTED_RED'
+          else:
+            ok=(result.testsRun==10 and result.wasSuccessful() and not result.skipped)
+            status='PASS_REI_M2_EXACT_SIGN_DIAGNOSTIC_TESTS' if ok else 'FAIL_M2_SIGN_DIAGNOSTIC'
+          print(json.dumps({'status':status,'tests':result.testsRun,'failures':len(result.failures),'errors':len(result.errors),'skipped':len(result.skipped),'native_runtime':'NOT_RUN'}))
+          raise SystemExit(0 if ok else 1)
+          PY
+      - name: Execute independent symbolic report and mutation plot
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -f research/rei_math_m2_spacetime_sign/derive_constraint_sign.py; then
+            python research/rei_math_m2_spacetime_sign/derive_constraint_sign.py --output-dir out
+          fi
+          git rev-parse HEAD > out/EXECUTED_HEAD.txt
+          git rev-parse HEAD^{tree} > out/EXECUTED_TREE.txt
+          git archive --format=zip -o out/REI_M2_SOURCE_PACKAGE.zip HEAD research/rei_math_m2_spacetime_sign research/rei_math_m1_generic_background/derive_spatial_curvature.py tests/research/test_rei_math_m2_spacetime_sign.py .github/workflows/rei-math-m2-spacetime-sign.yml
+          (cd out && find . -maxdepth 1 -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS && sha256sum -c SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rei-math-m2-sign-diagnostic
+          path: out/
+          if-no-files-found: error
+          retention-days: 30
