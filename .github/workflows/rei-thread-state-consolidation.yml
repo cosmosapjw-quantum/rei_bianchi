@@ -1,0 +1,108 @@
+name: rei-thread-state-consolidation
+
+on:
+  push:
+    branches:
+      - handoff/rei-thread-state-consolidation-20260905-r1
+    paths:
+      - "docs/rei_thread_state_20260905/**"
+      - ".github/workflows/rei-thread-state-consolidation.yml"
+  pull_request:
+    paths:
+      - "docs/rei_thread_state_20260905/**"
+      - ".github/workflows/rei-thread-state-consolidation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+  REI_GLOBAL_ATTEMPT_REF_CREATION_FORBIDDEN: "1"
+  REI_PROVIDER_PROMOTION_FORBIDDEN: "1"
+  BASE_COMMIT: "01fd5ea775795d27758f354971ca478f90701295"
+
+jobs:
+  validate-state-package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Assert exact formula-base ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$BASE_COMMIT" HEAD
+          test "$(git rev-parse "$BASE_COMMIT^{tree}")" = \
+            "d802eed60d98e5f2c32189ca0d358cb4f084df09"
+
+      - name: Compile the fail-closed validator
+        run: |
+          python -m py_compile \
+            docs/rei_thread_state_20260905/validate_package.py
+
+      - name: Validate exact Git-blob package and claim gates
+        run: |
+          python docs/rei_thread_state_20260905/validate_package.py \
+            | tee rei-thread-state-validation.json
+          grep -q 'PASS_REI_THREAD_STATE_CONSOLIDATION_PACKAGE' \
+            rei-thread-state-validation.json
+
+      - name: Assert changed-path closure and text hygiene
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check "$BASE_COMMIT..HEAD"
+          mapfile -t changed < <(git diff --name-only "$BASE_COMMIT..HEAD")
+          test "${#changed[@]}" -gt 0
+          for path in "${changed[@]}"; do
+            case "$path" in
+              docs/rei_thread_state_20260905/*)
+                ;;
+              .github/workflows/rei-thread-state-consolidation.yml)
+                ;;
+              *)
+                printf 'UNEXPECTED_CHANGED_PATH:%s\n' "$path" >&2
+                exit 1
+                ;;
+            esac
+          done
+
+      - name: Assert no attempt runtime or provider surface was added
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e attempt-ledger
+          changed="$(git diff --name-only "$BASE_COMMIT..HEAD")"
+          ! grep -Eq '^(src/|rust/|stages/|handoff/|artifacts/native/)' \
+            <<<"$changed"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.loads(
+              Path('docs/rei_thread_state_20260905/CURRENT_STATE.json').read_text()
+          )
+          auth = state['runtime_authorization']
+          assert auth['remaining_native_attempts'] == 1
+          assert auth['native_runtime'] == 'NOT_RUN'
+          assert auth['global_lease'] == 'NOT_ACQUIRED'
+          assert auth['persistent_local_lease'] == 'NOT_CREATED'
+          assert auth['first_canonical_interval'] == 'NO_PASS_FIRST_CANONICAL_INTERVAL'
+          assert auth['provider_export'] == 'NOT_AUTHORIZED'
+          print('PASS_REI_THREAD_STATE_NO_EXECUTION_OR_PROMOTION')
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rei-thread-state-consolidation-validation
+          path: rei-thread-state-validation.json
+          if-no-files-found: error
+          retention-days: 30
