@@ -1,0 +1,69 @@
+name: rei-runtime-03a4-toolchain-path-binding-behavior-red
+
+on:
+  push:
+    branches:
+      - fix/rei-runtime-03a4-toolchain-path-binding-green-20260904-r1
+    paths:
+      - "tests/governance/test_rei_runtime_03a4_toolchain_path_binding_behavior.py"
+      - ".github/workflows/rei-runtime-03a4-toolchain-path-binding-behavior-red.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  expected-behavior-red:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      REI_NATIVE_DISPATCH_FORBIDDEN: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert exact intentional RED ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor \
+            2b2b717283e070c0d07b632e3a7eb99649f2044f HEAD
+
+      - name: Compile behavior contract
+        run: |
+          python -m py_compile \
+            tests/governance/test_rei_runtime_03a4_toolchain_path_binding_behavior.py
+
+      - name: Observe missing runtime-path validator
+        shell: bash
+        run: |
+          set +e
+          set +u
+          set +o pipefail 2>/dev/null || true
+
+          python -m unittest -v \
+            tests.governance.test_rei_runtime_03a4_toolchain_path_binding_behavior \
+            2>&1 | tee behavior-red.log
+          rc=${PIPESTATUS[0]}
+
+          test "$rc" -ne 0
+          grep -q 'Ran 6 tests' behavior-red.log
+          grep -Eq 'FAILED \(failures=6\)' behavior-red.log
+          grep -q 'RUNTIME_TOOLCHAIN_PATH_VALIDATOR_NOT_IMPLEMENTED' \
+            behavior-red.log
+          printf '%s\n' \
+            'classification=PASS_EXPECTED_03A4_TOOLCHAIN_PATH_BEHAVIOR_RED'
+
+      - name: Assert no execution state
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(find "$GITHUB_WORKSPACE" -type f \( \
+            -name 'successor-section0.json' -o \
+            -name 'read-only-static-preflight-receipt.json' -o \
+            -name 'attempt-3.global-lease.json' -o \
+            -name 'attempt-3.local-lease.json' -o \
+            -name 'attempt-3.dispatch-intent.json' -o \
+            -name 'attempt-3.outcome.json' \
+          \) -print -quit)"
