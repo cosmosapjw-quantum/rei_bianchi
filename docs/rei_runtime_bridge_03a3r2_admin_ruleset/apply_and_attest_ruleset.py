@@ -148,7 +148,7 @@ def rule_types(details: Mapping[str, Any]) -> set[str]:
     rows = details.get("rules")
     if not isinstance(rows, list):
         raise AdminRulesetError("RULESET_RULES_NOT_LIST")
-    result: set[str] = set()
+    result = set()
     for row in rows:
         if not isinstance(row, dict) or not isinstance(row.get("type"), str):
             raise AdminRulesetError("RULESET_RULE_INVALID")
@@ -156,7 +156,47 @@ def rule_types(details: Mapping[str, Any]) -> set[str]:
     return result
 
 
-def validate_ruleset_details(details: Mapping[str, Any]) -> int:
+def validate_update_rule(
+    details: Mapping[str, Any],
+    *,
+    allow_omitted_parameters: bool,
+) -> str:
+    """Validate the update rule across request and GET representations.
+
+    GitHub's create/update request schema carries
+    ``parameters.update_allows_fetch_and_merge``.  The repository ruleset GET
+    response currently normalizes the same active rule to ``{"type":"update"}``
+    and omits the parameters object.  Omission is therefore admitted only for
+    server readback.  The locally owned creation payload remains strict.
+    """
+
+    updates = [
+        row
+        for row in details.get("rules", [])
+        if isinstance(row, dict) and row.get("type") == "update"
+    ]
+    if len(updates) != 1:
+        raise AdminRulesetError("RULESET_UPDATE_POLICY_MISMATCH")
+    update = updates[0]
+    if "parameters" not in update:
+        if allow_omitted_parameters:
+            return "GITHUB_GET_NORMALIZED_PARAMETERS_OMITTED"
+        raise AdminRulesetError("RULESET_UPDATE_POLICY_MISMATCH")
+    parameters = update["parameters"]
+    if (
+        not isinstance(parameters, Mapping)
+        or set(parameters) != {"update_allows_fetch_and_merge"}
+        or parameters.get("update_allows_fetch_and_merge") is not False
+    ):
+        raise AdminRulesetError("RULESET_UPDATE_POLICY_MISMATCH")
+    return "EXPLICIT_FALSE"
+
+
+def validate_ruleset_details(
+    details: Mapping[str, Any],
+    *,
+    allow_omitted_update_parameters: bool = True,
+) -> int:
     condition = details.get("conditions", {}).get("ref_name", {})
     bypass = details.get("bypass_actors", [])
     types = rule_types(details)
@@ -171,19 +211,10 @@ def validate_ruleset_details(details: Mapping[str, Any]) -> int:
         or "creation" in types
     ):
         raise AdminRulesetError("RULESET_DETAILS_MISMATCH")
-    updates = [
-        row
-        for row in details.get("rules", [])
-        if isinstance(row, dict) and row.get("type") == "update"
-    ]
-    if (
-        len(updates) != 1
-        or updates[0].get("parameters", {}).get(
-            "update_allows_fetch_and_merge"
-        )
-        is not False
-    ):
-        raise AdminRulesetError("RULESET_UPDATE_POLICY_MISMATCH")
+    validate_update_rule(
+        details,
+        allow_omitted_parameters=allow_omitted_update_parameters,
+    )
     ruleset_id = details.get("id")
     if not isinstance(ruleset_id, int) or ruleset_id <= 0:
         raise AdminRulesetError("RULESET_ID_INVALID")
@@ -269,9 +300,15 @@ def build_source_protection_receipt(
 
 
 def validate_payload() -> None:
-    synthetic = dict(RULESET_PAYLOAD)
+    synthetic = json.loads(json.dumps(RULESET_PAYLOAD))
     synthetic["id"] = 1
-    if validate_ruleset_details(synthetic) != 1:
+    if (
+        validate_ruleset_details(
+            synthetic,
+            allow_omitted_update_parameters=False,
+        )
+        != 1
+    ):
         raise AdminRulesetError("SELF_TEST_RULESET_DETAILS_FAILED")
 
 
