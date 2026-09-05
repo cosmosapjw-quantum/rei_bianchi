@@ -17,7 +17,9 @@ from datetime import datetime, timezone
 HERE = Path(__file__).resolve().parent
 IMPLEMENTATION = HERE / 'signed_archive_chain.py'
 MISSING = 'MISSING_H1B1_SIGNED_CHAIN_IMPLEMENTATION'
-FAKE_TIME = str(int(datetime(2025, 1, 14, 12, tzinfo=timezone.utc).timestamp()))
+# GnuPG's trailing ! freezes the clock; without it, key generation can advance
+# beyond the time of the next signing process. This affects fixtures only.
+FAKE_TIME = str(int(datetime(2025, 1, 14, 12, tzinfo=timezone.utc).timestamp())) + '!'
 PACKAGE = 'gcc-13-x86-64-linux-gnu'
 VERSION = '13.3.0-6ubuntu2~24.04'
 FILENAME = 'pool/main/g/gcc-13/gcc-13-x86-64-linux-gnu_13.3.0-6ubuntu2~24.04_amd64.deb'
@@ -90,9 +92,11 @@ class SignedChainTests(unittest.TestCase):
         args = list(self.gpg)
         if signing_time is not None:
             args[-1] = signing_time
-        signed = subprocess.run(args + ['--armor', '--digest-algo', 'SHA256', '--clearsign'],
-                                input=release, check=True, capture_output=True, timeout=10).stdout
-        return signed, packed
+        run = subprocess.run(args + ['--armor', '--digest-algo', 'SHA256', '--clearsign'],
+                             input=release, check=False, capture_output=True, timeout=10)
+        if run.returncode:
+            raise RuntimeError('GPG_FIXTURE_SIGNING_FAILED: ' + run.stderr.decode('utf-8', errors='replace'))
+        return run.stdout, packed
 
     def audit(self, signed, packed, **changes):
         args = dict(inrelease=signed, index_bytes=packed, debs={FILENAME: PAYLOAD},

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Bounded H1B1 real-provider probe; no package install or payload execution.
 
-Reuses the exact PR68 signature/index verifier. A real signed provider/member
-result is not an installed-filesystem, H1A, full-census or runtime certificate.
+Reuses the signature/index verifier with a narrowly amended Release-name grammar.
+A provider/member result is not an installed-filesystem or runtime certificate.
 """
 from __future__ import annotations
 
@@ -24,13 +24,14 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
-DONOR_BLOB = 'a530ec095cca5a9347cb419f0ef9cb5632e39ed1'
+DONOR_BLOB = 'dfed33dd8428cd3293a8292088c21ba23f6b2f43'
 BASE = 'https://snapshot.ubuntu.com/ubuntu/20250115T120000Z/'
 IDENTITY = ('gcc-13-x86-64-linux-gnu', '13.3.0-6ubuntu2~24.04', 'amd64')
 DEB_SHA = '7cd398670e8306eabc9e77202f356a3206c440bd9f3dc764680a19be01784776'
 MEMBER = 'usr/bin/x86_64-linux-gnu-gcc-13'
 MEMBER_SHA = '6117c52522997d2aaccb2b52b3c6bf42c0a6c5edb1d718431fed6b2fc5fec234'
 SIGNER = 'F6ECB3762474EDA9D21B7022871920D1991BC93C'
+SAVED_INRELEASE_SHA = '26b3656730b29965e984a5d2319b6870c456ad1bb5362267987bb5b015905372'
 MAX_DEB = 64 * 1024 * 1024
 
 
@@ -214,7 +215,8 @@ def _download(url: str, limit: int, target: Path, events: list) -> bytes:
         raise ProbeError('SNAPSHOT_RETRIEVAL_FAILED:' + type(exc).__name__ + ':' + str(exc)) from exc
 
 
-def run_probe(output: Path, keyring_path: Path, gpgv: Path, dpkg_deb: Path) -> int:
+def run_probe(output: Path, keyring_path: Path, gpgv: Path, dpkg_deb: Path,
+              saved_inrelease: Path | None = None) -> int:
     require(output.is_absolute(), 'OUTPUT_MUST_BE_ABSOLUTE')
     repo = Path(__file__).resolve().parents[2]
     output = output.resolve()
@@ -245,12 +247,23 @@ def run_probe(output: Path, keyring_path: Path, gpgv: Path, dpkg_deb: Path) -> i
             'donor_sha256': sha(Path(__file__).with_name('signed_archive_chain.py').read_bytes()),
             'probe_sha256': sha(Path(__file__).read_bytes()),
             'keyring_source_path': str(ring_path), 'keyring_sha256': sha(ring),
-            'keyring_admission': 'RUNNER_INSTALLED_PUBLIC_RING_DECLARED_POLICY_ONLY',
+            'keyring_admission': 'DECLARED_PUBLIC_RING_POLICY_ONLY_NOT_ORGANIZATIONAL_ADMISSION',
             'signer_reference': 'https://wiki.ubuntu.com/SecurityTeam/FAQ',
             'run_id': os.environ.get('GITHUB_RUN_ID'), 'executed_git_sha': os.environ.get('REI_EXECUTED_HEAD')})
         stage = 'AUTHENTICATE_RELEASE'
         release_url = BASE + 'dists/noble-updates/InRelease'
-        inrelease = _download(release_url, policy.max_inrelease_bytes, output / 'InRelease', events)
+        if saved_inrelease is None:
+            inrelease = _download(release_url, policy.max_inrelease_bytes, output / 'InRelease', events)
+        else:
+            saved = saved_inrelease.resolve(strict=True)
+            require(saved.is_file() and 0 < saved.stat().st_size <= policy.max_inrelease_bytes,
+                    'SAVED_INRELEASE_INPUT_LIMIT')
+            inrelease = saved.read_bytes()
+            require(sha(inrelease) == SAVED_INRELEASE_SHA, 'SAVED_INRELEASE_PIN_MISMATCH')
+            _write(output / 'InRelease', inrelease)
+            events.append({'kind': 'PINNED_SAVED_INRELEASE_REUSED', 'sha256': sha(inrelease),
+                           'original_run': 33954698424, 'original_artifact': 9965968444,
+                           'new_snapshot_request': False})
         release_bytes, signature = chain._authenticated_release(inrelease, ring, policy, gpgv)
         _write(output / 'authenticated-Release', release_bytes)
         _json(output / 'SIGNATURE.json', signature)
@@ -262,6 +275,10 @@ def run_probe(output: Path, keyring_path: Path, gpgv: Path, dpkg_deb: Path) -> i
                 'RELEASE_IDENTITY_MISMATCH')
         entries = chain._release_entries(release)
         require(policy.index_name in entries, 'RELEASE_INDEX_UNLISTED')
+        _json(output / 'RELEASE_ENTRIES.json', {'total': len(entries),
+              'literal_at_sign_names': [key for key in entries if '@' in key],
+              'index': policy.index_name, 'expected_index_sha256': entries[policy.index_name][0],
+              'rows_filtered_or_normalized': False})
         stage = 'AUTHENTICATE_INDEX'
         index = _download(BASE + 'dists/noble-updates/' + policy.index_name,
                           policy.max_compressed_index_bytes, output / 'Packages.xz', events)
@@ -298,7 +315,7 @@ def run_probe(output: Path, keyring_path: Path, gpgv: Path, dpkg_deb: Path) -> i
         exit_code = 65
     state.update(completed_utc=utc(), exit_code=exit_code)
     _json(output / 'RETRIEVAL.json', {'events': events,
-          'provenance_kind': 'THIS_RUN_CLIENT_OBSERVATIONS_NOT_SERVER_ATTESTATION'})
+          'provenance_kind': 'CLIENT_OBSERVATIONS_AND_PINNED_PRIOR_INPUT_NOT_SERVER_ATTESTATION'})
     _json(output / 'PROBE_RESULT.json', state)
     manifest = ''.join(sha(p.read_bytes()) + '  ' + p.name + '\n'
                        for p in sorted(output.iterdir()) if p.is_file())
@@ -313,5 +330,7 @@ if __name__ == '__main__':
     parser.add_argument('--keyring', type=Path, default=Path('/usr/share/keyrings/ubuntu-archive-keyring.gpg'))
     parser.add_argument('--gpgv', type=Path, default=Path('/usr/bin/gpgv'))
     parser.add_argument('--dpkg-deb', type=Path, default=Path('/usr/bin/dpkg-deb'))
+    parser.add_argument('--saved-inrelease', type=Path)
     arguments = parser.parse_args()
-    raise SystemExit(run_probe(arguments.output, arguments.keyring, arguments.gpgv, arguments.dpkg_deb))
+    raise SystemExit(run_probe(arguments.output, arguments.keyring, arguments.gpgv,
+                               arguments.dpkg_deb, arguments.saved_inrelease))
