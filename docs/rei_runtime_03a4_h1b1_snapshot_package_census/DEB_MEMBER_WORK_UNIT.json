@@ -1,0 +1,94 @@
+{
+  "schema": "rei-h1b1-deb-member-work-unit/v1",
+  "work_unit": "REI_H1B1_AUTHENTICATED_DEB_MEMBERS",
+  "contract_revision": 1,
+  "performed_role": "LOCAL_CODEX_SINGLE_SOURCE_WRITER",
+  "task_layers": [
+    "implement",
+    "validate",
+    "review",
+    "document"
+  ],
+  "base_commit": "edec9771c1e725484ec1a7250ba0d340eb13e21b",
+  "base_tree": "d1250dac231688c1a0de7a84c93a15732a9a2660",
+  "protected_blobs": {
+    "signed_archive_chain.py": "a530ec095cca5a9347cb419f0ef9cb5632e39ed1",
+    "test_signed_archive_chain.py": "d47308ca29b7a4fdd8c02ca03060f977d5e7716f"
+  },
+  "new_suite": {
+    "command": "python3 -B /home/cosmosapjw/rei_worktrees/REI-H1B1-DEB-MEMBERS-20260905/docs/rei_runtime_03a4_h1b1_snapshot_package_census/test_deb_member_census.py",
+    "optional_arguments": [
+      "--report PATH (exclusive new JSON)",
+      "--evidence-dir NEW_PATH (public fixtures/results only)"
+    ],
+    "default": "GREEN_ONLY; any failure/error/skip exits nonzero; no --expect-red bypass",
+    "methods": 15,
+    "minimum_obligation_methods": 7,
+    "additional_functional_methods": 4,
+    "resource_methods": 3,
+    "fixture_identity_methods": 1,
+    "expected_red": {
+      "tests": 15,
+      "passed": 1,
+      "failures": 14,
+      "errors": 0,
+      "skipped": 0,
+      "reason": "MISSING_H1B1_DEB_MEMBER_IMPLEMENTATION",
+      "fixture_identity_is_not_feature_missing_red": true
+    },
+    "obligations": {
+      "D01": "real signed DEB and unique regular member pass; unrelated symlink allowed",
+      "D02": "signed non-DEB payload rejected",
+      "D03": "control Package/Version/Architecture matches signed Packages record",
+      "D04": "selected member hash mismatch rejected",
+      "D05": "selected symlink/hardlink/directory/FIFO rejected",
+      "D06": "selected member duplicate after leading-dot normalization rejected",
+      "D07": "tampered Release rejected by actual donor before archive tool invocation",
+      "I01": "fixture signing reused with actual consumer donor ArchivePolicy identity; wrong module identity remains rejected",
+      "E01": "absolute/traversal/empty/dot/backslash member paths rejected; repeated leading ./ accepted",
+      "E02": "missing members, empty/noncanonical/duplicate/unknown-archive requests and bad hashes rejected",
+      "E03": "missing or duplicate control rejected",
+      "E04": "actual installed dpkg-deb none/gzip/xz/zstd reads; unsupported compression rejected",
+      "R01": "decompressed tar subprocess output bounded",
+      "R02": "member sizes/count bounded",
+      "R03": "real subprocess stderr and timeout bounds"
+    }
+  },
+  "implementation_choice": "Reuse actual verify_chain then dpkg-deb --ctrl-tarfile/--fsys-tarfile; stdlib tar reader; no DEB parser, install, maintainer script, extractall, compiler or ldd",
+  "path_policy": "Strip repeated leading ./ only; allow root directory .; reject absolute, empty/internal dot/dotdot segments, backslashes and control bytes; required paths already normalized; selected members must be unique regular files; unrelated ordinary symlinks are not resolved or globally rejected",
+  "planned_limits": {
+    "max_total_deb_bytes": 536870912,
+    "max_debs": 32,
+    "max_requests": 256,
+    "max_control_tar_bytes": 4194304,
+    "max_tar_bytes": 268435456,
+    "max_total_tar_bytes": 536870912,
+    "max_member_bytes": 134217728,
+    "max_members": 100000,
+    "max_stderr_bytes": 65536,
+    "tool_timeout_seconds": 30,
+    "total_timeout_seconds": 120
+  },
+  "fixture_domain": "SYNTHETIC_REAL_GPG_NOT_UBUNTU_ARCHIVE",
+  "gcc_smoke_domain": "EXISTING_DEB_MEMBER_IDENTITY_READBACK_ONLY; not an Ubuntu signed-chain PASS",
+  "review": "One sequential PHYS-MATH provenance/claim review, then one PHYS-MATH-CODE review; one bounded P0/P1 repair at most; same assistant, not an independent reviewer",
+  "authority_effect": "NONE",
+  "installed_files_verified": false,
+  "full_census_complete": false,
+  "forbidden": [
+    "BASS/REC/HTT reads/writes",
+    "existing native calibration",
+    "donor or original tests edits",
+    "broad H1B/H2 RED relabel",
+    "host package install/downgrade",
+    "rootfs build",
+    "Section-0",
+    "attempt refs/ledger",
+    "leases",
+    "production workers",
+    "first interval/provider",
+    "ready/merge/force-push"
+  ],
+  "publication": "One writer and publisher; new REI branch non-force push, Draft PR, append-only BASS-18 comment after actual final result; optional page footer only if needed",
+  "status": "TESTS_PREPARED_IMPLEMENTATION_ABSENT"
+}
