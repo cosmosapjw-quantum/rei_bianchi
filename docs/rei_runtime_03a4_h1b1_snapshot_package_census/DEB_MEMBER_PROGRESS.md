@@ -28,4 +28,16 @@ The existing GCC DEB smoke ran once against the unchanged consumer: DEB SHA-256 
 
 A focused GREEN-only workflow was added because the inherited workflow checks only the donor. It pins the protected donor/test blobs and frozen new test digest, checks out the actual head, runs the two suites separately using existing runner tools, and preserves public fixtures/logs/source with an artifact file manifest. It never treats absent implementation as successful historical RED.
 
-Next: review the exact candidate diff and return archive once, then complete the permitted Draft publication/readback. No next host scope is started.
+## Sequential review and claim boundary
+
+LOCAL_CODEX performed one PHYS-MATH provenance review followed by one PHYS-MATH-CODE review of candidate `42102144a3d8cff4433129e5bd562c17739f96e4` (tree `2b426817fb93de1ea4769297bb96206a606d93cf`), its exact five-file diff and the return candidate ZIP. The 243 actual archive files matched its file manifest. Candidate ZIP SHA-256: `39b9c96ee39486a4be4fa2ccc3624c4e3230e61b41944a65aeded54c7c1c80a2`.
+
+PHYS-MATH: the result establishes member identity conditional on the caller's trust policy and the actual donor signature/index/payload result. Control identity and member content are derived from the same authenticated immutable DEB bytes. Synthetic signing exercises the implementation but establishes no Ubuntu key ownership, Snapshot retrieval, installed-file identity or historical-host completion. The GCC smoke remains a separate existing-file readback. No new physics equation or CAS result is claimed.
+
+PHYS-MATH-CODE: the actual donor call and strict policy class identity, full logical tar scan, unique regular witness rule, control comparison, path rejection, finite archive/tool limits and real negative tests were checked against source and raw results. The frozen test file and protected donor/test blobs remain unchanged. Three workflow shell blocks passed syntax checks; remote workflow execution is a separate publication result. No in-scope P0/P1 finding or implementation repair was required. These are two sequential reviews by the same assistant, not independent review or approval by another WORK_THREAD.
+
+Supported archive formats are those actually demonstrated with installed dpkg-deb: none, gzip, xz and zstd. Unknown compression was rejected. The consumer delegates DEB decoding to dpkg-deb and reads its uncompressed tar stream; it does not claim support for every historical DEB variant. Tool behavior references: [dpkg-deb](https://manpages.debian.org/bookworm/dpkg/dpkg-deb.1.en.html), [deb format](https://manpages.debian.org/bookworm/dpkg-dev/deb.5.en.html).
+
+Limits apply to the added archive path. The protected donor's existing buffered gpgv capture remains inherited; its additional output check is post-return, not an enforced streaming peak-memory cap. This limitation is retained explicitly rather than extending the scope to rewrite the donor. `authority_effect=NONE`, `installed_files_verified=false`, and `full_census_complete=false` remain the claim ceiling; broad H1B/H2 results are unchanged.
+
+The implementation and local acceptance are complete. The single publisher will non-force push this branch and read back its Draft PR, exact remote source and CI artifacts. Final remote identifiers and append-only Atlassian readback belong to the external return manifest so recording them does not create a source-hash cycle. No next host scope is started.
