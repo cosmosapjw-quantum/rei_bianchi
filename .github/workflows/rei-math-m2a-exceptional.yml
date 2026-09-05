@@ -1,0 +1,89 @@
+name: rei-math-m2a-exceptional
+on:
+  push:
+    branches: [research/rei-math-m2a-exceptional-compatibility-20260905-r1]
+  pull_request:
+    paths:
+      - 'research/rei_math_m2a_exceptional/**'
+      - 'tests/research/test_rei_math_m2a_exceptional.py'
+      - '.github/workflows/rei-math-m2a-exceptional.yml'
+permissions:
+  contents: read
+env:
+  REI_NATIVE_DISPATCH_FORBIDDEN: '1'
+  MPLBACKEND: Agg
+  BASE_COMMIT: 3f2f876b219d5c435cfd5d0dc70236a1edc1fd96
+  SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+jobs:
+  exceptional-algebra:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Bind exact source and immutable donor
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git rev-parse "$BASE_COMMIT^{tree}")" = 87a30c114b00a987beefc34d757a0eb736dc54ba
+          git merge-base --is-ancestor "$BASE_COMMIT" HEAD
+          test "$(git hash-object research/rei_math_m2_spacetime_sign/derive_constraint_sign.py)" = bd8c7a639628b7d44b1aaca16cd4f5a466245cda
+          git diff --check "$BASE_COMMIT..HEAD"
+          while IFS= read -r p; do
+            case "$p" in
+              research/rei_math_m2a_exceptional/*|tests/research/test_rei_math_m2a_exceptional.py|.github/workflows/rei-math-m2a-exceptional.yml) ;;
+              *) echo "UNEXPECTED_CHANGED_PATH:$p"; exit 1;;
+            esac
+          done < <(git diff --name-only "$BASE_COMMIT..HEAD")
+          git diff --exit-code "$BASE_COMMIT" HEAD -- research/rei_math_m2_spacetime_sign research/rei_math_m1_generic_background src rust stages handoff
+          git rev-parse HEAD > out/EXECUTED_HEAD.txt
+          git rev-parse HEAD^{tree} > out/EXECUTED_TREE.txt
+      - name: Install research dependencies only
+        run: python -m pip install 'sympy==1.13.3' 'mpmath==1.3.0' 'matplotlib==3.9.2'
+      - name: Frozen RED or GREEN behavior tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' | tee out/TEST_RESULT.json
+          import importlib.util,json,pathlib,unittest
+          root=pathlib.Path('research/rei_math_m2a_exceptional')
+          contract=json.loads((root/'AUDIT_COMPILED_WORK_UNIT.json').read_text())
+          spec=importlib.util.spec_from_file_location('m2a_tests','tests/research/test_rei_math_m2a_exceptional.py')
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          names=unittest.defaultTestLoader.getTestCaseNames(m.ExceptionalMomentumTests)
+          assert names==contract['required_test_ids'],names
+          result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(m.ExceptionalMomentumTests))
+          missing=not (root/'derive_exceptional.py').is_file()
+          if missing:
+            ok=(result.testsRun==10 and len(result.failures)==10 and not result.errors and not result.skipped and all('M2A_IMPLEMENTATION_ABSENT' in s for _,s in result.failures))
+            status='PASS_EXPECTED_M2A_IMPLEMENTATION_ABSENT_RED' if ok else 'FAIL_UNEXPECTED_RED'
+          else:
+            ok=(result.testsRun==10 and result.wasSuccessful() and not result.skipped)
+            status='PASS_REI_M2A_EXCEPTIONAL_COMPATIBILITY_TESTS' if ok else 'FAIL_M2A_TESTS'
+          print(json.dumps({'status':status,'tests':result.testsRun,'failures':len(result.failures),'errors':len(result.errors),'skips':len(result.skipped),'native_runtime':'NOT_RUN'}))
+          raise SystemExit(0 if ok else 1)
+          PY
+      - name: Independent algebra report and numerical condition sweep
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -f research/rei_math_m2a_exceptional/derive_exceptional.py; then
+            python research/rei_math_m2a_exceptional/derive_exceptional.py --output-dir out
+          fi
+          git archive --format=zip -o out/REI_M2A_SOURCE.zip HEAD research/rei_math_m2a_exceptional research/rei_math_m2_spacetime_sign/derive_constraint_sign.py research/rei_math_m1_generic_background/derive_spatial_curvature.py tests/research/test_rei_math_m2a_exceptional.py .github/workflows/rei-math-m2a-exceptional.yml
+          (cd out && find . -maxdepth 1 -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS && sha256sum -c SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rei-math-m2a-exceptional
+          path: out/
+          if-no-files-found: error
+          retention-days: 30
