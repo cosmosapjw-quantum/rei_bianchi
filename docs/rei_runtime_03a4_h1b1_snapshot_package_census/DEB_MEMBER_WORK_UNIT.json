@@ -1,0 +1,138 @@
+{
+  "schema": "rei-h1b1-deb-member-work-unit/v1",
+  "work_unit": "REI_H1B1_AUTHENTICATED_DEB_MEMBERS",
+  "contract_revision": 1,
+  "performed_role": "LOCAL_CODEX_SINGLE_SOURCE_WRITER",
+  "task_layers": [
+    "implement",
+    "validate",
+    "review",
+    "document"
+  ],
+  "base_commit": "edec9771c1e725484ec1a7250ba0d340eb13e21b",
+  "base_tree": "d1250dac231688c1a0de7a84c93a15732a9a2660",
+  "protected_blobs": {
+    "signed_archive_chain.py": "a530ec095cca5a9347cb419f0ef9cb5632e39ed1",
+    "test_signed_archive_chain.py": "d47308ca29b7a4fdd8c02ca03060f977d5e7716f"
+  },
+  "new_suite": {
+    "command": "python3 -B /home/cosmosapjw/rei_worktrees/REI-H1B1-DEB-MEMBERS-20260905/docs/rei_runtime_03a4_h1b1_snapshot_package_census/test_deb_member_census.py",
+    "optional_arguments": [
+      "--report PATH (exclusive new JSON)",
+      "--evidence-dir NEW_PATH (public fixtures/results only)"
+    ],
+    "default": "GREEN_ONLY; any failure/error/skip exits nonzero; no --expect-red bypass",
+    "methods": 15,
+    "minimum_obligation_methods": 7,
+    "additional_functional_methods": 4,
+    "resource_methods": 3,
+    "fixture_identity_methods": 1,
+    "expected_red": {
+      "tests": 15,
+      "passed": 1,
+      "failures": 14,
+      "errors": 0,
+      "skipped": 0,
+      "reason": "MISSING_H1B1_DEB_MEMBER_IMPLEMENTATION",
+      "fixture_identity_is_not_feature_missing_red": true
+    },
+    "obligations": {
+      "D01": "real signed DEB and unique regular member pass; unrelated symlink allowed",
+      "D02": "signed non-DEB payload rejected",
+      "D03": "control Package/Version/Architecture matches signed Packages record",
+      "D04": "selected member hash mismatch rejected",
+      "D05": "selected symlink/hardlink/directory/FIFO rejected",
+      "D06": "selected member duplicate after leading-dot normalization rejected",
+      "D07": "tampered Release rejected by actual donor before archive tool invocation",
+      "I01": "fixture signing reused with actual consumer donor ArchivePolicy identity; wrong module identity remains rejected",
+      "E01": "absolute/traversal/empty/dot/backslash member paths rejected; repeated leading ./ accepted",
+      "E02": "missing members, empty/noncanonical/duplicate/unknown-archive requests and bad hashes rejected",
+      "E03": "missing or duplicate control rejected",
+      "E04": "actual installed dpkg-deb none/gzip/xz/zstd reads; unsupported compression rejected",
+      "R01": "decompressed tar subprocess output bounded",
+      "R02": "member sizes/count bounded",
+      "R03": "real subprocess stderr and timeout bounds"
+    }
+  },
+  "implementation_choice": "Reuse actual verify_chain then dpkg-deb --ctrl-tarfile/--fsys-tarfile; stdlib tar reader; no DEB parser, install, maintainer script, extractall, compiler or ldd",
+  "path_policy": "Strip repeated leading ./ only; allow root directory .; reject absolute, empty/internal dot/dotdot segments, backslashes and control bytes; required paths already normalized; selected members must be unique regular files; unrelated ordinary symlinks are not resolved or globally rejected",
+  "planned_limits": {
+    "max_total_deb_bytes": 536870912,
+    "max_debs": 32,
+    "max_requests": 256,
+    "max_control_tar_bytes": 4194304,
+    "max_tar_bytes": 268435456,
+    "max_total_tar_bytes": 536870912,
+    "max_member_bytes": 134217728,
+    "max_members": 100000,
+    "max_stderr_bytes": 65536,
+    "tool_timeout_seconds": 30,
+    "total_timeout_seconds": 120
+  },
+  "fixture_domain": "SYNTHETIC_REAL_GPG_NOT_UBUNTU_ARCHIVE",
+  "gcc_smoke_domain": "EXISTING_DEB_MEMBER_IDENTITY_READBACK_ONLY; not an Ubuntu signed-chain PASS",
+  "review": "One sequential PHYS-MATH provenance/claim review, then one PHYS-MATH-CODE review; one bounded P0/P1 repair at most; same assistant, not an independent reviewer",
+  "authority_effect": "NONE",
+  "installed_files_verified": false,
+  "full_census_complete": false,
+  "forbidden": [
+    "BASS/REC/HTT reads/writes",
+    "existing native calibration",
+    "donor or original tests edits",
+    "broad H1B/H2 RED relabel",
+    "host package install/downgrade",
+    "rootfs build",
+    "Section-0",
+    "attempt refs/ledger",
+    "leases",
+    "production workers",
+    "first interval/provider",
+    "ready/merge/force-push"
+  ],
+  "publication": "One writer and publisher; new REI branch non-force push, Draft PR, append-only BASS-18 comment after actual final result; optional page footer only if needed",
+  "status": "LOCAL_ACCEPTANCE_AND_SEQUENTIAL_REVIEW_COMPLETE_REMOTE_READBACK_IN_RETURN_MANIFEST",
+  "red_commit": "a264498d50b21a430014c254eb159a3ac38ff387",
+  "red_tree": "ffec48e8e9debd0254a169855274eac1e43db27d",
+  "frozen_test_sha256": "caff1db84874217e934063e49487db75b6f71549f0373fa7d4f55c7bb25aec6f",
+  "executed_implementation_commit": "fe5499a451931e88798e5986fd6ac1c59e6131ef",
+  "executed_implementation_tree": "1393a5819a357814e40569a191422129b1bee2ec",
+  "observed_local_results": {
+    "new_methods": 15,
+    "new_passed": 15,
+    "recorded_subcases": 29,
+    "new_failures": 0,
+    "new_errors": 0,
+    "new_skips": 0,
+    "donor_methods": 18,
+    "donor_passed": 18,
+    "repository_verifier": "PASS_60_MAIN_ARTIFACTS",
+    "gcc_smoke": "PASS_EXISTING_DEB_MEMBER_IDENTITY_READBACK_ONLY",
+    "consumer_source_sha256": "56e4469dcf14b71ce7ee21abde393ded6b9e25b485ac90850ee4d0d014d4d5fa"
+  },
+  "completed_review": {
+    "order": [
+      "PHYS-MATH",
+      "PHYS-MATH-CODE"
+    ],
+    "reviewer": "LOCAL_CODEX same assistant, sequential self-review",
+    "independent_review": false,
+    "external_WORK_THREAD_approval_claimed": false,
+    "candidate_commit": "42102144a3d8cff4433129e5bd562c17739f96e4",
+    "candidate_tree": "2b426817fb93de1ea4769297bb96206a606d93cf",
+    "candidate_zip_sha256": "39b9c96ee39486a4be4fa2ccc3624c4e3230e61b41944a65aeded54c7c1c80a2",
+    "archive_files_verified": 243,
+    "phys_math": "PASS_WITHIN_CALLER_POLICY_PROVENANCE_SCOPE; no physical equations or CAS results",
+    "phys_math_code": "PASS_WITHIN_FROZEN_ACCEPTANCE",
+    "p0_p1_findings": [],
+    "repairs": 0,
+    "limitations": [
+      "Synthetic signed fixtures do not authenticate Ubuntu trust-root ownership or Snapshot retrieval.",
+      "Existing GCC readback has no actual Ubuntu InRelease/keyring verification.",
+      "Protected donor buffered gpgv capture has a post-return readback cap, not a new streaming peak-memory bound.",
+      "Remote CI was not yet run during this local review."
+    ],
+    "authority_effect": "NONE",
+    "installed_files_verified": false,
+    "full_census_complete": false
+  }
+}
