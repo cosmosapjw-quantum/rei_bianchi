@@ -1,7 +1,7 @@
 name: rei-h1b1-deb-member-census
 on:
   push:
-    branches: [implementation/rei-h1b1-deb-member-20260905-r1]
+    branches: [implementation/rei-h1b1-saved-release-member-join-20260905-r1]
   pull_request:
     paths:
       - 'docs/rei_runtime_03a4_h1b1_snapshot_package_census/**'
@@ -25,8 +25,8 @@ jobs:
           set -eu
           test "$(git rev-parse HEAD)" = "$EXPECTED"
           P=docs/rei_runtime_03a4_h1b1_snapshot_package_census
-          test "$(git rev-parse "HEAD:$P/signed_archive_chain.py")" = a530ec095cca5a9347cb419f0ef9cb5632e39ed1
-          test "$(git rev-parse "HEAD:$P/test_signed_archive_chain.py")" = d47308ca29b7a4fdd8c02ca03060f977d5e7716f
+          test "$(git rev-parse "HEAD:$P/signed_archive_chain.py")" = dfed33dd8428cd3293a8292088c21ba23f6b2f43
+          test "$(git rev-parse "HEAD:$P/test_signed_archive_chain.py")" = 085b7311d4b3114ec61ff669ce2763831ec9dc0f
           test -f "$P/deb_member_census.py"
           command -v python3
           command -v gpg
@@ -39,6 +39,9 @@ jobs:
           import hashlib, pathlib
           p = pathlib.Path('docs/rei_runtime_03a4_h1b1_snapshot_package_census/test_deb_member_census.py')
           assert hashlib.sha256(p.read_bytes()).hexdigest() == 'caff1db84874217e934063e49487db75b6f71549f0373fa7d4f55c7bb25aec6f'
+          for name, digest in [('test_release_path_compat.py', '7300b80639f55ea3518b080b6c42be36218711e1911daf392838b8c17627e69e'),
+                               ('test_saved_release_member_join.py', 'ec30d42c52c2514232481f55bb75fc0b25c7929e283b074d7b9d7e0ecbf8749d')]:
+              assert hashlib.sha256((p.parent / name).read_bytes()).hexdigest() == digest
           PY
       - name: Frozen member suite and donor regression
         run: |
@@ -47,6 +50,9 @@ jobs:
           p = pathlib.Path('docs/rei_runtime_03a4_h1b1_snapshot_package_census').resolve()
           out = pathlib.Path(os.environ['RUNNER_TEMP']) / 'rei-deb-member-evidence'
           commands = [
+              ('join-fixture', ['python3', '-B', str(p / 'test_saved_release_member_join.py'), '--fixture-dir', str(out / 'join-fixture'), '--create-fixture']),
+              ('join', ['python3', '-B', str(p / 'test_saved_release_member_join.py'), '--fixture-dir', str(out / 'join-fixture'), '--report', str(out / 'join.json')]),
+              ('compatibility', ['python3', '-B', str(p / 'test_release_path_compat.py'), '--report', str(out / 'compatibility.json')]),
               ('members', ['python3', '-B', str(p / 'test_deb_member_census.py'), '--report', str(out / 'members.json'), '--evidence-dir', str(out / 'public-fixtures')]),
               ('donor', ['python3', '-B', str(p / 'test_signed_archive_chain.py'), '--report', str(out / 'donor.json')]),
               ('repository', ['python3', '-B', 'scripts/verify_repo.py']),
@@ -66,11 +72,15 @@ jobs:
               assert code == 0 and not timed_out, records[-1]
           member = json.loads((out / 'members.json').read_text())
           donor = json.loads((out / 'donor.json').read_text())
+          join = json.loads((out / 'join.json').read_text())
+          compat = json.loads((out / 'compatibility.json').read_text())
+          assert (join['tests'], join['passed'], join['failures'], join['errors'], join['skipped'], join['not_run'], join['unselected_methods']) == (5, 5, 0, 0, 0, 0, 0)
+          assert (compat['tests'], compat['failures'], compat['errors'], compat['skipped']) == (7, 0, 0, 0)
           assert (member['tests'], member['passed'], member['failures'], member['errors'], member['skipped'], member['not_run']) == (15, 15, 0, 0, 0, 0)
           assert member['successful'] and not member['expected_implementation_absent_red']
           assert (donor['tests'], donor['failures'], donor['errors'], donor['skipped']) == (18, 0, 0, 0)
           assert donor['successful'] and not donor['expected_implementation_absent_red']
-          print('PASS: 15 member methods; 18 donor methods separately; repository verifier')
+          print('PASS: 5 join, 7 compatibility, 15 member, 18 donor methods separately; repository verifier')
           PY
       - name: Source and artifact member identities
         if: always()
@@ -89,7 +99,7 @@ jobs:
           (out / 'FILES.json').write_text(json.dumps({'files': files, 'self_excluded': 'FILES.json'}, indent=2) + '\n')
           PY
           fi
-          git diff --check edec9771c1e725484ec1a7250ba0d340eb13e21b HEAD
+          git diff --check c03ff27615cce53a5057d8facbf141b83c89913b HEAD
           test -z "$(git status --porcelain --untracked-files=all)"
       - uses: actions/upload-artifact@v4
         if: always()
