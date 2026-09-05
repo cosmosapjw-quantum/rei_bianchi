@@ -27,23 +27,53 @@ jobs:
         run: |
           set -eu
           test "$(git rev-parse HEAD)" = "$EXPECTED"
-          git merge-base --is-ancestor 00d17c932eb41dbae6467e1e2fdf46818799d6db HEAD
+          git merge-base --is-ancestor aae9d87aabd7609cb547f9ad602835522f08948e HEAD
           command -v python3
           command -v gpg
           command -v gpgv
           mkdir -p "$RUNNER_TEMP/rei-h1b1-evidence"
           git rev-parse HEAD > "$RUNNER_TEMP/rei-h1b1-evidence/HEAD.txt"
           git rev-parse 'HEAD^{tree}' > "$RUNNER_TEMP/rei-h1b1-evidence/TREE.txt"
-      - name: Test-first RED or real-GnuPG GREEN
+          { python3 --version; gpg --version; gpgv --version; } > "$RUNNER_TEMP/rei-h1b1-evidence/TOOL_VERSIONS.txt"
+          P=docs/rei_runtime_03a4_h1b1_snapshot_package_census
+          sha256sum "$P/signed_archive_chain.py" "$P/test_signed_archive_chain.py" \
+            .github/workflows/rei-h1b1-signed-archive-chain.yml > "$RUNNER_TEMP/rei-h1b1-evidence/SOURCE_SHA256SUMS"
+      - name: Real-GnuPG GREEN only
         shell: bash
         run: |
           set -euo pipefail
           P=docs/rei_runtime_03a4_h1b1_snapshot_package_census
-          MODE=()
-          if [ ! -f "$P/signed_archive_chain.py" ]; then MODE=(--expect-red); fi
-          python3 -B "$P/test_signed_archive_chain.py" "${MODE[@]}" \
+          test -f "$P/signed_archive_chain.py"
+          python3 -B "$P/test_signed_archive_chain.py" \
             --report "$RUNNER_TEMP/rei-h1b1-evidence/TEST_RESULT.json" \
             2>&1 | tee "$RUNNER_TEMP/rei-h1b1-evidence/tests.log"
+          python3 -B - <<'PY'
+          import json, pathlib, os
+          r = json.loads((pathlib.Path(os.environ['RUNNER_TEMP']) / 'rei-h1b1-evidence/TEST_RESULT.json').read_text())
+          assert (r['tests'], r['failures'], r['errors'], r['skipped']) == (18, 0, 0, 0)
+          assert r['successful'] and not r['expected_implementation_absent_red']
+          assert r['ubuntu_archive_admitted'] is False
+          PY
+      - name: Reject absent implementation without expected-RED laundering
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B - <<'PY'
+          import json, os, pathlib, shutil, subprocess, tempfile
+          base = pathlib.Path(os.environ['RUNNER_TEMP']) / 'rei-h1b1-evidence'
+          source = pathlib.Path('docs/rei_runtime_03a4_h1b1_snapshot_package_census/test_signed_archive_chain.py')
+          with tempfile.TemporaryDirectory(prefix='rei-missing-implementation-control-') as tmp:
+              probe = pathlib.Path(tmp) / source.name
+              shutil.copyfile(source, probe)
+              p = subprocess.run(['python3', '-B', str(probe), '--report', str(base / 'MISSING_IMPLEMENTATION_CONTROL.json')],
+                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+              (base / 'MISSING_IMPLEMENTATION_CONTROL.log').write_text(p.stdout)
+              r = json.loads((base / 'MISSING_IMPLEMENTATION_CONTROL.json').read_text())
+              assert p.returncode != 0
+              assert (r['tests'], r['failures'], r['errors'], r['skipped']) == (18, 18, 0, 0)
+              assert r['expected_implementation_absent_red'] and not r['successful']
+              print('PASS_MISSING_IMPLEMENTATION_REJECTED_BY_GREEN_INVOCATION')
+          PY
       - name: Preserve broader H1B/H2 expected-RED boundary
         shell: bash
         run: |
