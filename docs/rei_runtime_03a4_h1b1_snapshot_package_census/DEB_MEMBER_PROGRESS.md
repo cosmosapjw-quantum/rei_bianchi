@@ -17,3 +17,15 @@ RED source `a264498d50b21a430014c254eb159a3ac38ff387`, tree `ffec48e8e9debd0254a
 The first consumer implementation now calls the actual donor over one immutable payload mapping before dpkg-deb. It compares all authenticated DEB control identities, scans the full tar member sequence, reads unique regular witnesses and records actual content size/hash. Both new tool pipes, decompressed tar outputs, members, total input/output bytes and elapsed time have finite bounds. The unchanged donor retains its own input/decompression/signature timeout implementation; its buffered gpgv output is additionally checked on return, not claimed as a new streaming memory cap.
 
 No new workflow is required for the local acceptance run. Frozen GREEN, original 18-test regression, repository verification and the optional already-present GCC identity smoke are the next executable actions.
+
+## First GREEN and existing DEB smoke
+
+Implementation source `fe5499a451931e88798e5986fd6ac1c59e6131ef`, tree `1393a5819a357814e40569a191422129b1bee2ec`: the unchanged 15-method suite passed on its first implementation run (29 explicitly recorded subcases), with 0 failures/errors/skips/not-run and exit 0. The original donor suite separately passed 18/18, exit 0; repository verifier passed 60 main artifacts. The two suites are not added to a misleading single obligation count.
+
+Installed dpkg-deb 1.22.6 actually built and read none/gzip/xz/zstd fixtures; a made-up compression member was rejected. No host package was installed. Real output-overflow and timeout subcases passed, as did control identity, regular-file/link, duplicate/path and signature-tamper obligations.
+
+The existing GCC DEB smoke ran once against the unchanged consumer: DEB SHA-256 `7cd398670e8306eabc9e77202f356a3206c440bd9f3dc764680a19be01784776`; member `usr/bin/x86_64-linux-gnu-gcc-13`, 1,023,032 bytes, SHA-256 `6117c52522997d2aaccb2b52b3c6bf42c0a6c5edb1d718431fed6b2fc5fec234`. Control Package/Version/Architecture match the specified GCC identity. This is `PASS_EXISTING_DEB_MEMBER_IDENTITY_READBACK_ONLY`, not Ubuntu signed-chain or installed-file verification. No synthetic re-signing of the GCC DEB was performed.
+
+A focused GREEN-only workflow was added because the inherited workflow checks only the donor. It pins the protected donor/test blobs and frozen new test digest, checks out the actual head, runs the two suites separately using existing runner tools, and preserves public fixtures/logs/source with an artifact file manifest. It never treats absent implementation as successful historical RED.
+
+Next: review the exact candidate diff and return archive once, then complete the permitted Draft publication/readback. No next host scope is started.
