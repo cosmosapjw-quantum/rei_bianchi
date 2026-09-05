@@ -25,3 +25,11 @@ The original saved InRelease was freshly authenticated once by the consumer dono
 Real full chain: `BLOCKED_INDEX_BYTES_UNAVAILABLE`. No matching compressed object was found in the recorded relevant REI receipt/evidence/cache locations. This is a bounded search result, not a whole-machine absence claim. The existing GCC DEB bytes match `7cd398670e8306eabc9e77202f356a3206c440bd9f3dc764680a19be01784776`; fresh real full-chain/member invocations are zero. No Snapshot request, retry or synthetic re-signing of the real DEB occurred. The missing index is the only current real-run input blocker.
 
 Historical parent documents, prior evidence, public member consumer and its tests remain unchanged. Next: the two requested sequential reviews, new-child Draft publication and exact return evidence. WORK_THREAD final coordination review/summary remains a separate later action; no Atlassian/BASS/REC/HTT access is performed here.
+
+## Sequential local reviews
+
+LOCAL_CODEX performed PHYS-MATH provenance/claim review followed by PHYS-MATH-CODE review of exact candidate `aa07c86d7eaa7fde8942f5da19573356afe84176` and its seven-path diff, frozen test results, raw logs and saved-input evidence. These are same-assistant sequential reviews, not independent approval or the receiving WORK_THREAD final review. No in-scope P0/P1 source finding or repair was required.
+
+The Release proof is conditional on the saved declared key policy. It authenticates the original bytes and parses every SHA256 row, but does not fill the missing Packages.xz input or establish a real GCC end-to-end member result. The old/new integrated fixture result proves the compatibility join within its synthetic domain. Key ownership/lifecycle, retrieval provenance, installed-root and full-census claims stay withheld. The inherited buffered gpgv limitation is unchanged.
+
+The bounded local slice is ready for permitted non-force publication as a new Draft child. Final published commit/tree, CI readback, raw evidence and return ZIP identity are recorded outside checkout to avoid source self-reference. WORK_THREAD retains the later final coordination review and append-only summary; no BASS/REC/HTT or Atlassian action is part of this local publication. No next scope is started.
