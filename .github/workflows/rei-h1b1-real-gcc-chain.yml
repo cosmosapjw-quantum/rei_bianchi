@@ -1,0 +1,75 @@
+name: rei-h1b1-real-gcc-chain
+on:
+  push:
+    branches: [research/rei-h1b1-real-gcc-chain-20260905-r1]
+  pull_request:
+    paths:
+      - 'docs/rei_runtime_03a4_h1b1_snapshot_package_census/probe_snapshot_gcc.py'
+      - 'docs/rei_runtime_03a4_h1b1_snapshot_package_census/test_snapshot_gcc_probe.py'
+      - 'docs/rei_runtime_03a4_h1b1_snapshot_package_census/REAL_GCC_*'
+      - '.github/workflows/rei-h1b1-real-gcc-chain.yml'
+permissions:
+  contents: read
+concurrency:
+  group: rei-h1b1-gcc-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  bounded:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Exact inherited verifier and source
+        env:
+          EXPECTED: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -eu
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          git merge-base --is-ancestor edec9771c1e725484ec1a7250ba0d340eb13e21b HEAD
+          P=docs/rei_runtime_03a4_h1b1_snapshot_package_census
+          test "$(git hash-object "$P/signed_archive_chain.py")" = a530ec095cca5a9347cb419f0ef9cb5632e39ed1
+          command -v python3; command -v gpg; command -v gpgv; command -v dpkg-deb
+          mkdir -p "$RUNNER_TEMP/rei-gcc-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/rei-gcc-evidence/HEAD.txt"
+          git rev-parse 'HEAD^{tree}' > "$RUNNER_TEMP/rei-gcc-evidence/TREE.txt"
+          { python3 --version; gpgv --version; dpkg-deb --version; } > "$RUNNER_TEMP/rei-gcc-evidence/TOOL_VERSIONS.txt"
+      - name: Frozen missing-member implementation RED
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=docs/rei_runtime_03a4_h1b1_snapshot_package_census
+          python3 -B "$P/test_snapshot_gcc_probe.py" --expect-missing \
+            --report "$RUNNER_TEMP/rei-gcc-evidence/MEMBER_TESTS.json" \
+            2>&1 | tee "$RUNNER_TEMP/rei-gcc-evidence/member-tests.log"
+      - name: Inherited actual-GnuPG tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=docs/rei_runtime_03a4_h1b1_snapshot_package_census
+          python3 -B "$P/test_signed_archive_chain.py" \
+            --report "$RUNNER_TEMP/rei-gcc-evidence/CHAIN_TESTS.json" \
+            2>&1 | tee "$RUNNER_TEMP/rei-gcc-evidence/chain-tests.log"
+      - name: Repository and byte checks
+        run: |
+          python3 -B scripts/verify_repo.py
+          git diff --check edec9771c1e725484ec1a7250ba0d340eb13e21b HEAD
+          test -z "$(git status --porcelain --untracked-files=all)"
+      - name: Evidence manifest
+        if: always()
+        shell: bash
+        run: |
+          OUT="$RUNNER_TEMP/rei-gcc-evidence"
+          if [ -d "$OUT" ]; then
+            cd "$OUT"
+            find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 -r sha256sum > SHA256SUMS
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rei-h1b1-real-gcc-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.event_name }}
+          path: ${{ runner.temp }}/rei-gcc-evidence/
+          if-no-files-found: error
