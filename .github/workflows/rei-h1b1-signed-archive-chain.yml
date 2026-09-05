@@ -1,0 +1,82 @@
+name: rei-h1b1-signed-archive-chain
+on:
+  push:
+    branches: [research/rei-h1b1-signed-archive-chain-20260905-r1]
+  pull_request:
+    paths:
+      - 'docs/rei_runtime_03a4_h1b1_snapshot_package_census/**'
+      - '.github/workflows/rei-h1b1-signed-archive-chain.yml'
+permissions:
+  contents: read
+concurrency:
+  group: rei-h1b1-signed-chain-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  bounded-cryptographic-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Exact source and prerequisites
+        env:
+          EXPECTED: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -eu
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          git merge-base --is-ancestor 00d17c932eb41dbae6467e1e2fdf46818799d6db HEAD
+          command -v python3
+          command -v gpg
+          command -v gpgv
+          mkdir -p "$RUNNER_TEMP/rei-h1b1-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/rei-h1b1-evidence/HEAD.txt"
+          git rev-parse 'HEAD^{tree}' > "$RUNNER_TEMP/rei-h1b1-evidence/TREE.txt"
+      - name: Test-first RED or real-GnuPG GREEN
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=docs/rei_runtime_03a4_h1b1_snapshot_package_census
+          MODE=()
+          if [ ! -f "$P/signed_archive_chain.py" ]; then MODE=(--expect-red); fi
+          python3 -B "$P/test_signed_archive_chain.py" "${MODE[@]}" \
+            --report "$RUNNER_TEMP/rei-h1b1-evidence/TEST_RESULT.json" \
+            2>&1 | tee "$RUNNER_TEMP/rei-h1b1-evidence/tests.log"
+      - name: Preserve broader H1B/H2 expected-RED boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B - <<'PY'
+          import subprocess, pathlib, os
+          base = pathlib.Path(os.environ['RUNNER_TEMP']) / 'rei-h1b1-evidence'
+          for name, count in [('test_rei_runtime_03a4_host_epoch_lineage_closure_red', 11),
+                              ('test_rei_runtime_03a4_host_epoch_docker_bootstrap_red', 8)]:
+              p = subprocess.run(['python3', '-B', '-m', 'unittest', '-v', 'tests.governance.' + name],
+                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+              (base / (name + '.log')).write_text(p.stdout)
+              print(p.stdout)
+              assert p.returncode != 0 and f'Ran {count} tests' in p.stdout
+              assert f'FAILED (failures={count})' in p.stdout
+          PY
+      - name: Repository and authored-byte checks
+        run: |
+          python3 -B scripts/verify_repo.py
+          git diff --check 00d17c932eb41dbae6467e1e2fdf46818799d6db HEAD
+          test -z "$(git status --porcelain --untracked-files=all)"
+      - name: Evidence manifest
+        if: always()
+        shell: bash
+        run: |
+          OUT="$RUNNER_TEMP/rei-h1b1-evidence"
+          if [ -d "$OUT" ]; then
+            cd "$OUT"
+            find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 -r sha256sum > SHA256SUMS
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rei-h1b1-signed-chain-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.event_name }}
+          path: ${{ runner.temp }}/rei-h1b1-evidence/
+          if-no-files-found: error
