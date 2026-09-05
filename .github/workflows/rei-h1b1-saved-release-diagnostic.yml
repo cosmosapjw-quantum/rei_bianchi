@@ -1,0 +1,62 @@
+name: rei-h1b1-saved-release-diagnostic
+on:
+  push:
+    branches: [research/rei-h1b1-real-gcc-chain-20260905-r1]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  saved-release:
+    if: contains(github.event.head_commit.message, '[release-diagnostic]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: '9965968444'
+          run-id: '33954698424'
+          github-token: ${{ github.token }}
+          repository: cosmosapjw-quantum/rei_bianchi
+          path: ${{ runner.temp }}/saved-gcc-probe
+          merge-multiple: true
+      - name: Reauthenticate saved bytes and identify every rejected Release path
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd "$RUNNER_TEMP/saved-gcc-probe" && sha256sum -c SHA256SUMS)
+          python3 -B - <<'PY'
+          import hashlib, importlib.util, json, os, pathlib, sys
+          source=pathlib.Path('docs/rei_runtime_03a4_h1b1_snapshot_package_census/signed_archive_chain.py')
+          spec=importlib.util.spec_from_file_location('chain_diag',source)
+          m=importlib.util.module_from_spec(spec); sys.modules[spec.name]=m; spec.loader.exec_module(m)
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'saved-gcc-probe/actual'
+          raw=(root/'InRelease').read_bytes(); ring=(root/'public-keyring.gpg').read_bytes()
+          assert hashlib.sha256(raw).hexdigest() == '26b3656730b29965e984a5d2319b6870c456ad1bb5362267987bb5b015905372'
+          assert hashlib.sha256(ring).hexdigest() == '80a36b0a6de2f69f49d2df75ef473ccde121e9e190b9ea01d20a4f63778d5c31'
+          policy=m.ArchivePolicy(keyring_sha256=hashlib.sha256(ring).hexdigest(),allowed_primary_fingerprints=('F6ECB3762474EDA9D21B7022871920D1991BC93C',),suite='noble-updates',codename='noble',architecture='amd64',index_name='main/binary-amd64/Packages.xz',required=(('gcc-13-x86-64-linux-gnu','13.3.0-6ubuntu2~24.04','amd64'),))
+          plain,signature=m._authenticated_release(raw,ring,policy,pathlib.Path('/usr/bin/gpgv'))
+          assert plain == (root/'authenticated-Release').read_bytes()
+          release=m._deb822(plain)[0]
+          rejected=[]; selected=[]; total=0
+          for line in release['sha256'].splitlines():
+              if not line.strip(): continue
+              digest,size,path=line.split(); total+=1
+              if path == policy.index_name: selected.append({'path':path,'sha256':digest,'size':int(size)})
+              try: m._archive_path(path)
+              except m.ChainError as exc: rejected.append({'path':path,'reason':str(exc)})
+          report={'schema':'rei-h1b1-saved-release-path-diagnostic/v1','status':'DIAGNOSTIC_ONLY','original_probe_run':33954698424,'original_probe_head':'0b048a2659966fcaa6a768da39c1eb80801e08c9','inrelease_sha256':hashlib.sha256(raw).hexdigest(),'signature_exit':signature['exit_code'],'signed_date':release.get('date'),'sha256_entries':total,'selected_index':selected,'rejected_paths':rejected,'rejected_count':len(rejected),'new_snapshot_requests':0,'policy_weakened':False,'native_runtime':'NOT_RUN'}
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'RELEASE_PATH_DIAGNOSTIC.json'
+          out.write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          print(out.read_text())
+          assert selected and rejected
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rei-h1b1-release-path-diagnostic-${{ github.sha }}
+          path: ${{ runner.temp }}/RELEASE_PATH_DIAGNOSTIC.json
+          if-no-files-found: error
