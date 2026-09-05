@@ -29,22 +29,50 @@ jobs:
         run: |
           set -eu
           test "$(git rev-parse HEAD)" = "$EXPECTED"
-          git merge-base --is-ancestor edec9771c1e725484ec1a7250ba0d340eb13e21b HEAD
+          git merge-base --is-ancestor 11a90f2c14616280069292cbab7e0a56a1e8881e HEAD
           P=docs/rei_runtime_03a4_h1b1_snapshot_package_census
           test "$(git hash-object "$P/signed_archive_chain.py")" = a530ec095cca5a9347cb419f0ef9cb5632e39ed1
+          test "$(git hash-object "$P/test_snapshot_gcc_probe.py")" = a410d884170522e2f2fc59cf5e7c64e6e5da5b7d
           command -v python3; command -v gpg; command -v gpgv; command -v dpkg-deb
           mkdir -p "$RUNNER_TEMP/rei-gcc-evidence"
           git rev-parse HEAD > "$RUNNER_TEMP/rei-gcc-evidence/HEAD.txt"
           git rev-parse 'HEAD^{tree}' > "$RUNNER_TEMP/rei-gcc-evidence/TREE.txt"
           { python3 --version; gpgv --version; dpkg-deb --version; } > "$RUNNER_TEMP/rei-gcc-evidence/TOOL_VERSIONS.txt"
-      - name: Frozen missing-member implementation RED
+          dpkg-query -W -f='${binary:Package} ${Version}\n' ubuntu-keyring gpgv dpkg > "$RUNNER_TEMP/rei-gcc-evidence/RUNNER_PACKAGE_CONTEXT.txt"
+          sha256sum "$P/signed_archive_chain.py" "$P/probe_snapshot_gcc.py" "$P/test_snapshot_gcc_probe.py" \
+            .github/workflows/rei-h1b1-real-gcc-chain.yml > "$RUNNER_TEMP/rei-gcc-evidence/SOURCE_SHA256SUMS"
+      - name: Frozen DEB member GREEN only
         shell: bash
         run: |
           set -euo pipefail
           P=docs/rei_runtime_03a4_h1b1_snapshot_package_census
-          python3 -B "$P/test_snapshot_gcc_probe.py" --expect-missing \
+          python3 -B "$P/test_snapshot_gcc_probe.py" \
             --report "$RUNNER_TEMP/rei-gcc-evidence/MEMBER_TESTS.json" \
             2>&1 | tee "$RUNNER_TEMP/rei-gcc-evidence/member-tests.log"
+          python3 -B - <<'PY'
+          import json, os, pathlib
+          r=json.loads((pathlib.Path(os.environ['RUNNER_TEMP'])/'rei-gcc-evidence/MEMBER_TESTS.json').read_text())
+          assert (r['tests'],r['failures'],r['errors'],r['skipped']) == (11,0,0,0)
+          assert r['successful'] and not r['expected_missing'] and not r['actual_ubuntu_probe']
+          PY
+      - name: Reject missing implementation in GREEN invocation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B - <<'PY'
+          import json, os, pathlib, shutil, subprocess, tempfile
+          base=pathlib.Path(os.environ['RUNNER_TEMP'])/'rei-gcc-evidence'
+          source=pathlib.Path('docs/rei_runtime_03a4_h1b1_snapshot_package_census/test_snapshot_gcc_probe.py')
+          with tempfile.TemporaryDirectory() as tmp:
+              test=pathlib.Path(tmp)/source.name
+              shutil.copyfile(source,test)
+              p=subprocess.run(['python3','-B',str(test),'--report',str(base/'MISSING_CONTROL.json')],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
+              (base/'MISSING_CONTROL.log').write_text(p.stdout)
+              r=json.loads((base/'MISSING_CONTROL.json').read_text())
+              assert p.returncode != 0 and r['expected_missing'] and not r['successful']
+              assert (r['tests'],r['failures'],r['errors'],r['skipped']) == (11,11,0,0)
+          print('PASS_IMPLEMENTATION_ABSENCE_REJECTED_BY_GREEN')
+          PY
       - name: Inherited actual-GnuPG tests
         shell: bash
         run: |
@@ -53,7 +81,50 @@ jobs:
           python3 -B "$P/test_signed_archive_chain.py" \
             --report "$RUNNER_TEMP/rei-gcc-evidence/CHAIN_TESTS.json" \
             2>&1 | tee "$RUNNER_TEMP/rei-gcc-evidence/chain-tests.log"
+          python3 -B - <<'PY'
+          import json, os, pathlib
+          r=json.loads((pathlib.Path(os.environ['RUNNER_TEMP'])/'rei-gcc-evidence/CHAIN_TESTS.json').read_text())
+          assert (r['tests'],r['failures'],r['errors'],r['skipped']) == (18,0,0,0)
+          assert r['successful']
+          PY
+      - name: Broader H1B H2 remain unimplemented
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B - <<'PY'
+          import pathlib, os, subprocess
+          base=pathlib.Path(os.environ['RUNNER_TEMP'])/'rei-gcc-evidence'
+          for name,count in [('test_rei_runtime_03a4_host_epoch_lineage_closure_red',11),('test_rei_runtime_03a4_host_epoch_docker_bootstrap_red',8)]:
+              p=subprocess.run(['python3','-B','-m','unittest','-v','tests.governance.'+name],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
+              (base/(name+'.log')).write_text(p.stdout)
+              assert p.returncode != 0 and f'Ran {count} tests' in p.stdout and f'FAILED (failures={count})' in p.stdout
+          print('PASS_ORIGINAL_19_MISSING_FULL_CENSUS_BOUNDARIES_PRESERVED')
+          PY
+      - name: Real Ubuntu Snapshot GCC probe once on designated push
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[real-probe]')
+        shell: bash
+        env:
+          REI_EXECUTED_HEAD: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          P=docs/rei_runtime_03a4_h1b1_snapshot_package_census
+          python3 -B "$P/probe_snapshot_gcc.py" --output "$RUNNER_TEMP/rei-gcc-evidence/actual" \
+            2>&1 | tee "$RUNNER_TEMP/rei-gcc-evidence/actual-probe.log"
+      - name: Raw result readback without reinterpretation
+        if: always()
+        shell: bash
+        run: |
+          P="$RUNNER_TEMP/rei-gcc-evidence/actual"
+          if [ -d "$P" ]; then
+            for f in PROBE_RESULT.json SOURCE_INPUTS.json RETRIEVAL.json SIGNATURE.json SELECTED_PROVIDER.json DEB_MEMBER.json; do
+              if [ -f "$P/$f" ]; then echo "===== $f ====="; cat "$P/$f"; fi
+            done
+            if [ -f "$P/SHA256SUMS" ]; then (cd "$P" && sha256sum -c SHA256SUMS); fi
+          else
+            echo 'ACTUAL_ARCHIVE_PROBE_NOT_REQUESTED_OR_NOT_REACHED'
+          fi
       - name: Repository and byte checks
+        if: always()
         run: |
           python3 -B scripts/verify_repo.py
           git diff --check edec9771c1e725484ec1a7250ba0d340eb13e21b HEAD
@@ -65,7 +136,8 @@ jobs:
           OUT="$RUNNER_TEMP/rei-gcc-evidence"
           if [ -d "$OUT" ]; then
             cd "$OUT"
-            find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 -r sha256sum > SHA256SUMS
+            find . -type f ! -path './SHA256SUMS' -print0 | sort -z | xargs -0 -r sha256sum > SHA256SUMS
+            sha256sum -c SHA256SUMS
           fi
       - uses: actions/upload-artifact@v4
         if: always()
