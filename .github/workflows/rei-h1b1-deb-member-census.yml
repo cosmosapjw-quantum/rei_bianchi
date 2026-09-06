@@ -25,7 +25,7 @@ jobs:
           set -eu
           test "$(git rev-parse HEAD)" = "$EXPECTED"
           P=docs/rei_runtime_03a4_h1b1_snapshot_package_census
-          test "$(git rev-parse "HEAD:$P/signed_archive_chain.py")" = dfed33dd8428cd3293a8292088c21ba23f6b2f43
+          test "$(git rev-parse "HEAD:$P/signed_archive_chain.py")" = 0eea840bb4b4f5fbc3d65fbde9675353c76599a9
           test "$(git rev-parse "HEAD:$P/test_signed_archive_chain.py")" = 085b7311d4b3114ec61ff669ce2763831ec9dc0f
           test -f "$P/deb_member_census.py"
           command -v python3
@@ -39,7 +39,8 @@ jobs:
           import hashlib, pathlib
           p = pathlib.Path('docs/rei_runtime_03a4_h1b1_snapshot_package_census/test_deb_member_census.py')
           assert hashlib.sha256(p.read_bytes()).hexdigest() == 'caff1db84874217e934063e49487db75b6f71549f0373fa7d4f55c7bb25aec6f'
-          for name, digest in [('test_release_path_compat.py', '7300b80639f55ea3518b080b6c42be36218711e1911daf392838b8c17627e69e'),
+          for name, digest in [('test_xz_index_compat.py', '3cc24c5b67b8288ee447cfe4b24a915290c53374c15c78e8204921b93554cbd3'),
+                               ('test_release_path_compat.py', '7300b80639f55ea3518b080b6c42be36218711e1911daf392838b8c17627e69e'),
                                ('test_saved_release_member_join.py', 'ec30d42c52c2514232481f55bb75fc0b25c7929e283b074d7b9d7e0ecbf8749d')]:
               assert hashlib.sha256((p.parent / name).read_bytes()).hexdigest() == digest
           PY
@@ -50,6 +51,8 @@ jobs:
           p = pathlib.Path('docs/rei_runtime_03a4_h1b1_snapshot_package_census').resolve()
           out = pathlib.Path(os.environ['RUNNER_TEMP']) / 'rei-deb-member-evidence'
           commands = [
+              ('xz-fixture', ['python3', '-B', str(p / 'test_xz_index_compat.py'), '--fixture-dir', str(out / 'xz-fixture'), '--create-fixture']),
+              ('xz-compatibility', ['python3', '-B', str(p / 'test_xz_index_compat.py'), '--fixture-dir', str(out / 'xz-fixture'), '--report', str(out / 'xz-compatibility.json')]),
               ('join-fixture', ['python3', '-B', str(p / 'test_saved_release_member_join.py'), '--fixture-dir', str(out / 'join-fixture'), '--create-fixture']),
               ('join', ['python3', '-B', str(p / 'test_saved_release_member_join.py'), '--fixture-dir', str(out / 'join-fixture'), '--report', str(out / 'join.json')]),
               ('compatibility', ['python3', '-B', str(p / 'test_release_path_compat.py'), '--report', str(out / 'compatibility.json')]),
@@ -70,6 +73,9 @@ jobs:
                                   timeout_seconds=180, elapsed_seconds=time.monotonic()-start, invocation_count=1))
               (out / 'commands.json').write_text(json.dumps(records, indent=2) + '\n')
               assert code == 0 and not timed_out, records[-1]
+          xz = json.loads((out / 'xz-compatibility.json').read_text())
+          assert (xz['tests'], xz['failures'], xz['errors'], xz['skipped'], xz['not_run']) == (16, 0, 0, 0, 0)
+          assert xz['successful'] and xz['subcase_count'] == 17
           member = json.loads((out / 'members.json').read_text())
           donor = json.loads((out / 'donor.json').read_text())
           join = json.loads((out / 'join.json').read_text())
@@ -80,7 +86,7 @@ jobs:
           assert member['successful'] and not member['expected_implementation_absent_red']
           assert (donor['tests'], donor['failures'], donor['errors'], donor['skipped']) == (18, 0, 0, 0)
           assert donor['successful'] and not donor['expected_implementation_absent_red']
-          print('PASS: 5 join, 7 compatibility, 15 member, 18 donor methods separately; repository verifier')
+          print('PASS: 16 XZ methods (17 subcases separate), 5 join, 7 compatibility, 15 member, 18 donor methods separately; repository verifier')
           PY
       - name: Source and artifact member identities
         if: always()

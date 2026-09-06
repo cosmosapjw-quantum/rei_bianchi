@@ -1,0 +1,67 @@
+{
+  "work_unit": "REI_H1B1_XZ_INDEX_COMPATIBILITY_REPAIR",
+  "role": "LOCAL_CODEX",
+  "return_to": "MAIN_CONVERSATION",
+  "work_thread_required": false,
+  "base_commit": "f632f6fd8c965dcef2435bcdf5d18375d8fbeb9c",
+  "prior_consumed_approval": "REI_H1B1_EXACT_INDEX_ACQUISITION_V1",
+  "new_snapshot_gets": 0,
+  "protected_inputs": "Exact prior InRelease/keyring/policy/index/GCC DEB bytes, no reconstruction/recompression or re-signing",
+  "diagnosis": {
+    "first_stream_eof": true,
+    "first_stream_output_size": 4225206,
+    "unused_bytes": 32,
+    "xz_list_streams": 2,
+    "cause": "Valid final empty XZ stream rejected by old single-stream predicate"
+  },
+  "format_source": "https://tukaani.org/xz/xz-file-format.txt",
+  "format_sections": [
+    "2",
+    "2.2"
+  ],
+  "implementation_scope": "Complete XZ file streams plus aligned null padding; all stream checks and total output cap preserved",
+  "old_donor_blob": "dfed33dd8428cd3293a8292088c21ba23f6b2f43",
+  "new_donor_blob": "0eea840bb4b4f5fbc3d65fbde9675353c76599a9",
+  "consumer_sha256_unchanged": "56e4469dcf14b71ce7ee21abde393ded6b9e25b485ac90850ee4d0d014d4d5fa",
+  "red": {
+    "commit": "6b11c07f0ee575181c3b1e54fbea15f30a315590",
+    "tree": "d6daf59be600d1200993c456621b3272a56cc651",
+    "new_test_sha256": "3cc24c5b67b8288ee447cfe4b24a915290c53374c15c78e8204921b93554cbd3"
+  },
+  "frozen_new_test_sha256": "3cc24c5b67b8288ee447cfe4b24a915290c53374c15c78e8204921b93554cbd3",
+  "protected_test_hashes": {
+    "deb_member_census.py": "56e4469dcf14b71ce7ee21abde393ded6b9e25b485ac90850ee4d0d014d4d5fa",
+    "test_signed_archive_chain.py": "7727d87be4a8de4f22ef575d96294fcc8e6b0c95fa45dd2a7b7bf13a30649da9",
+    "test_deb_member_census.py": "caff1db84874217e934063e49487db75b6f71549f0373fa7d4f55c7bb25aec6f",
+    "test_release_path_compat.py": "7300b80639f55ea3518b080b6c42be36218711e1911daf392838b8c17627e69e",
+    "test_saved_release_member_join.py": "ec30d42c52c2514232481f55bb75fc0b25c7929e283b074d7b9d7e0ecbf8749d"
+  },
+  "criteria": [
+    {
+      "cell": "decode",
+      "evidence": "New frozen tests reproduce valid concatenated-stream rejection in old donor and pass after repair; malformed streams/padding and total output cap reject",
+      "id": "A01"
+    },
+    {
+      "cell": "regression",
+      "evidence": "Existing donor18/member15/join5/compat7 suites and repository verifier pass without assertion changes",
+      "id": "A02"
+    },
+    {
+      "cell": "real",
+      "evidence": "Repaired public consumer validates exact saved tuple offline within 180s; source/input before-after pins recorded",
+      "id": "A03"
+    },
+    {
+      "cell": "closeout",
+      "evidence": "Sequential provenance/code review; REI-only publication readback or exact blocker; CHATGPT_HANDOFF_KO.md, RETURN_STATUS.json and complete return archive",
+      "id": "A04"
+    }
+  ],
+  "new_tests": 16,
+  "new_subcases_separate": 17,
+  "status": "NEW_TESTS_GREEN_REGRESSION_AND_REAL_PENDING",
+  "authority_effect": "NONE",
+  "installed_files_verified": false,
+  "full_census_complete": false
+}

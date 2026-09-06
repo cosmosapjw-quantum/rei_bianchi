@@ -228,14 +228,36 @@ def _release_entries(release: dict[str, str]) -> dict[str, tuple[str, int]]:
 
 
 def _unpack_index(packed: bytes, limit: int) -> bytes:
+    """Decode a complete XZ file, including concatenated Streams and Padding.
+
+    XZ format sections 2/2.2 permit multiple streams and four-byte-aligned
+    null padding. Every stream is decoded/checked; no trailing data is ignored.
+    The output budget applies to the entire file, not independently per stream.
+    Chunked input avoids repeatedly copying the whole remaining file for many
+    small streams. Each decoder retains the existing 128 MiB memory limit.
+    """
+    _require(bool(packed), 'COMPRESSED_INDEX_TRUNCATED_OR_TRAILING')
+    plain = bytearray()
+    offset = 0
     try:
-        decoder = lzma.LZMADecompressor(format=lzma.FORMAT_XZ, memlimit=128 * 1024 * 1024)
-        plain = decoder.decompress(packed, max_length=limit + 1)
-        _require(len(plain) <= limit, 'DECOMPRESSED_INDEX_LIMIT')
-        _require(decoder.eof and not decoder.unused_data, 'COMPRESSED_INDEX_TRUNCATED_OR_TRAILING')
+        while offset < len(packed):
+            decoder = lzma.LZMADecompressor(format=lzma.FORMAT_XZ, memlimit=128 * 1024 * 1024)
+            while not decoder.eof:
+                chunk = b''
+                if decoder.needs_input:
+                    chunk = packed[offset:offset + 65536]
+                    _require(bool(chunk), 'COMPRESSED_INDEX_TRUNCATED_OR_TRAILING')
+                    offset += len(chunk)
+                plain.extend(decoder.decompress(chunk, max_length=min(65536, limit - len(plain) + 1)))
+                _require(len(plain) <= limit, 'DECOMPRESSED_INDEX_LIMIT')
+            offset -= len(decoder.unused_data)
+            padding_start = offset
+            while offset < len(packed) and packed[offset] == 0:
+                offset += 1
+            _require((offset - padding_start) % 4 == 0, 'COMPRESSED_INDEX_TRUNCATED_OR_TRAILING')
     except lzma.LZMAError as exc:
         raise ChainError('COMPRESSED_INDEX_INVALID') from exc
-    return plain
+    return bytes(plain)
 
 
 def verify_chain(*, inrelease: bytes, index_bytes: bytes, debs: Mapping[str, bytes],
