@@ -1,0 +1,160 @@
+{
+  "work_unit": "REI_H1B1_XZ_INDEX_COMPATIBILITY_REPAIR",
+  "role": "LOCAL_CODEX",
+  "return_to": "MAIN_CONVERSATION",
+  "work_thread_required": false,
+  "base_commit": "f632f6fd8c965dcef2435bcdf5d18375d8fbeb9c",
+  "prior_consumed_approval": "REI_H1B1_EXACT_INDEX_ACQUISITION_V1",
+  "new_snapshot_gets": 0,
+  "protected_inputs": "Exact prior InRelease/keyring/policy/index/GCC DEB bytes, no reconstruction/recompression or re-signing",
+  "diagnosis": {
+    "first_stream_eof": true,
+    "first_stream_output_size": 4225206,
+    "unused_bytes": 32,
+    "xz_list_streams": 2,
+    "cause": "Valid final empty XZ stream rejected by old single-stream predicate"
+  },
+  "format_source": "https://tukaani.org/xz/xz-file-format.txt",
+  "format_sections": [
+    "2",
+    "2.2"
+  ],
+  "implementation_scope": "Complete XZ file streams plus aligned null padding; all stream checks and total output cap preserved",
+  "old_donor_blob": "dfed33dd8428cd3293a8292088c21ba23f6b2f43",
+  "new_donor_blob": "0eea840bb4b4f5fbc3d65fbde9675353c76599a9",
+  "consumer_sha256_unchanged": "56e4469dcf14b71ce7ee21abde393ded6b9e25b485ac90850ee4d0d014d4d5fa",
+  "red": {
+    "commit": "6b11c07f0ee575181c3b1e54fbea15f30a315590",
+    "tree": "d6daf59be600d1200993c456621b3272a56cc651",
+    "new_test_sha256": "3cc24c5b67b8288ee447cfe4b24a915290c53374c15c78e8204921b93554cbd3"
+  },
+  "frozen_new_test_sha256": "3cc24c5b67b8288ee447cfe4b24a915290c53374c15c78e8204921b93554cbd3",
+  "protected_test_hashes": {
+    "deb_member_census.py": "56e4469dcf14b71ce7ee21abde393ded6b9e25b485ac90850ee4d0d014d4d5fa",
+    "test_signed_archive_chain.py": "7727d87be4a8de4f22ef575d96294fcc8e6b0c95fa45dd2a7b7bf13a30649da9",
+    "test_deb_member_census.py": "caff1db84874217e934063e49487db75b6f71549f0373fa7d4f55c7bb25aec6f",
+    "test_release_path_compat.py": "7300b80639f55ea3518b080b6c42be36218711e1911daf392838b8c17627e69e",
+    "test_saved_release_member_join.py": "ec30d42c52c2514232481f55bb75fc0b25c7929e283b074d7b9d7e0ecbf8749d"
+  },
+  "criteria": [
+    {
+      "cell": "decode",
+      "evidence": "New frozen tests reproduce valid concatenated-stream rejection in old donor and pass after repair; malformed streams/padding and total output cap reject",
+      "id": "A01"
+    },
+    {
+      "cell": "regression",
+      "evidence": "Existing donor18/member15/join5/compat7 suites and repository verifier pass without assertion changes",
+      "id": "A02"
+    },
+    {
+      "cell": "real",
+      "evidence": "Repaired public consumer validates exact saved tuple offline within 180s; source/input before-after pins recorded",
+      "id": "A03"
+    },
+    {
+      "cell": "closeout",
+      "evidence": "Sequential provenance/code review; REI-only publication readback or exact blocker; CHATGPT_HANDOFF_KO.md, RETURN_STATUS.json and complete return archive",
+      "id": "A04"
+    }
+  ],
+  "new_tests": 16,
+  "new_subcases_separate": 17,
+  "status": "LOCAL_REPAIR_AND_REAL_MEMBER_VALIDATION_PASS",
+  "authority_effect": "NONE",
+  "installed_files_verified": false,
+  "full_census_complete": false,
+  "executed_commit": "744f684367375e546a30ce4d672d39cda50a0e18",
+  "executed_tree": "abc953a7535b1be515fdcbc13ce0406ab6b9d489",
+  "regressions": {
+    "xz-green": {
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "successful": true
+    },
+    "donor": {
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "successful": true
+    },
+    "members": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "successful": true
+    },
+    "join": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "successful": true
+    },
+    "compatibility": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "successful": true
+    }
+  },
+  "repository_verifier_exit": 0,
+  "real_result": {
+    "status": "PASS_H1B1_AUTHENTICATED_DEB_MEMBERS",
+    "signed_chain_status": "PASS_H1B1_SIGNED_ARCHIVE_CHAIN_COMPONENT",
+    "verified_members": [
+      {
+        "member_path": "usr/bin/x86_64-linux-gnu-gcc-13",
+        "sha256": "6117c52522997d2aaccb2b52b3c6bf42c0a6c5edb1d718431fed6b2fc5fec234",
+        "size": 1023032,
+        "archive_filename": "pool/main/g/gcc-13/gcc-13-x86-64-linux-gnu_13.3.0-6ubuntu2~24.04_amd64.deb",
+        "archive_sha256": "7cd398670e8306eabc9e77202f356a3206c440bd9f3dc764680a19be01784776",
+        "expected_sha256": "6117c52522997d2aaccb2b52b3c6bf42c0a6c5edb1d718431fed6b2fc5fec234",
+        "control_identity": {
+          "package": "gcc-13-x86-64-linux-gnu",
+          "version": "13.3.0-6ubuntu2~24.04",
+          "architecture": "amd64"
+        }
+      }
+    ],
+    "input_sha256": {
+      "inrelease": "26b3656730b29965e984a5d2319b6870c456ad1bb5362267987bb5b015905372",
+      "keyring": "80a36b0a6de2f69f49d2df75ef473ccde121e9e190b9ea01d20a4f63778d5c31",
+      "authenticated_release": "c6a4f4810779855c16efe72333c59a30937f7faf472dd30fe32983c6ef338b3a",
+      "compressed_index": "0c8a79ec3c438e311fdde11ec60e2bb9c0d46594501546918345df24a894ffe9",
+      "decompressed_index": "90bfa0693b661056584d62fbcd9a2ec6dac0f1eafbc7824a330e87b30c41a02a"
+    },
+    "signing_primary_fingerprints": [
+      "F6ECB3762474EDA9D21B7022871920D1991BC93C"
+    ],
+    "uncompressed_index_crosscheck": true,
+    "outer_exit": 0,
+    "outer_timed_out": false,
+    "outer_elapsed_seconds": 1.052425669040531,
+    "outer_timeout_seconds": 180,
+    "public_invocations": 1,
+    "actual_return_sha256": "263ac8df056f8cc9beae8162e1a52d2a208c968ec48c697600eafd040854e71b"
+  },
+  "reviews": {
+    "phys_math": "PASS_SCOPED_PROVENANCE_AND_CLAIM_CEILING",
+    "phys_math_code": "PASS_EXACT_DIFF_AND_EXECUTION",
+    "same_assistant_sequential": true,
+    "independent": false,
+    "in_scope_findings": [],
+    "inherited_limitations": [
+      "Buffered gpgv capture in unchanged signature code",
+      "Tar stdout is represented by actual byte count/hash in unchanged public result; raw tar streams are not retained"
+    ]
+  },
+  "old_failure_preserved": true,
+  "old_approval_allowances": {
+    "get_consumed": 1,
+    "consumer_consumed": 1,
+    "rewritten": false
+  }
+}

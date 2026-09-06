@@ -25,6 +25,9 @@ SHA256_RE = re.compile(r'[0-9a-f]{64}\Z')
 FINGERPRINT_RE = re.compile(r'(?:[0-9A-F]{40}|[0-9A-F]{64})\Z')
 FIELD_RE = re.compile(r'[A-Za-z0-9][A-Za-z0-9-]*\Z')
 ARCHIVE_PATH_RE = re.compile(r'[A-Za-z0-9][A-Za-z0-9+._~/-]*\Z')
+# Release lists include signed DEP-11 HiDPI names such as icons-64x64@2.tar.
+# This grammar is NOT used for package payload paths or requested download URLs.
+RELEASE_INDEX_PATH_RE = re.compile(r'[A-Za-z0-9][A-Za-z0-9+._~@/-]*\Z')
 PACKAGE_RE = re.compile(r'[a-z0-9][a-z0-9+.-]*\Z')
 
 
@@ -43,6 +46,15 @@ def _sha(data: bytes) -> str:
 
 def _archive_path(value: str) -> str:
     _require(isinstance(value, str) and bool(ARCHIVE_PATH_RE.fullmatch(value)),
+             'UNSAFE_ARCHIVE_PATH')
+    _require(all(part not in ('', '.', '..') for part in value.split('/')),
+             'UNSAFE_ARCHIVE_PATH')
+    return value
+
+
+def _release_index_path(value: str) -> str:
+    """Canonical literal metadata name; no normalization or row filtering."""
+    _require(isinstance(value, str) and bool(RELEASE_INDEX_PATH_RE.fullmatch(value)),
              'UNSAFE_ARCHIVE_PATH')
     _require(all(part not in ('', '.', '..') for part in value.split('/')),
              'UNSAFE_ARCHIVE_PATH')
@@ -208,7 +220,7 @@ def _release_entries(release: dict[str, str]) -> dict[str, tuple[str, int]]:
         row = line.split()
         _require(len(row) == 3, 'RELEASE_SHA256_ROW_INVALID')
         checksum, count, path = row
-        _archive_path(path)
+        _release_index_path(path)
         _require(path not in entries, 'DUPLICATE_RELEASE_INDEX:' + path)
         _require(bool(SHA256_RE.fullmatch(checksum)), 'RELEASE_SHA256_INVALID')
         entries[path] = (checksum, _size(count))
@@ -216,14 +228,36 @@ def _release_entries(release: dict[str, str]) -> dict[str, tuple[str, int]]:
 
 
 def _unpack_index(packed: bytes, limit: int) -> bytes:
+    """Decode a complete XZ file, including concatenated Streams and Padding.
+
+    XZ format sections 2/2.2 permit multiple streams and four-byte-aligned
+    null padding. Every stream is decoded/checked; no trailing data is ignored.
+    The output budget applies to the entire file, not independently per stream.
+    Chunked input avoids repeatedly copying the whole remaining file for many
+    small streams. Each decoder retains the existing 128 MiB memory limit.
+    """
+    _require(bool(packed), 'COMPRESSED_INDEX_TRUNCATED_OR_TRAILING')
+    plain = bytearray()
+    offset = 0
     try:
-        decoder = lzma.LZMADecompressor(format=lzma.FORMAT_XZ, memlimit=128 * 1024 * 1024)
-        plain = decoder.decompress(packed, max_length=limit + 1)
-        _require(len(plain) <= limit, 'DECOMPRESSED_INDEX_LIMIT')
-        _require(decoder.eof and not decoder.unused_data, 'COMPRESSED_INDEX_TRUNCATED_OR_TRAILING')
+        while offset < len(packed):
+            decoder = lzma.LZMADecompressor(format=lzma.FORMAT_XZ, memlimit=128 * 1024 * 1024)
+            while not decoder.eof:
+                chunk = b''
+                if decoder.needs_input:
+                    chunk = packed[offset:offset + 65536]
+                    _require(bool(chunk), 'COMPRESSED_INDEX_TRUNCATED_OR_TRAILING')
+                    offset += len(chunk)
+                plain.extend(decoder.decompress(chunk, max_length=min(65536, limit - len(plain) + 1)))
+                _require(len(plain) <= limit, 'DECOMPRESSED_INDEX_LIMIT')
+            offset -= len(decoder.unused_data)
+            padding_start = offset
+            while offset < len(packed) and packed[offset] == 0:
+                offset += 1
+            _require((offset - padding_start) % 4 == 0, 'COMPRESSED_INDEX_TRUNCATED_OR_TRAILING')
     except lzma.LZMAError as exc:
         raise ChainError('COMPRESSED_INDEX_INVALID') from exc
-    return plain
+    return bytes(plain)
 
 
 def verify_chain(*, inrelease: bytes, index_bytes: bytes, debs: Mapping[str, bytes],
