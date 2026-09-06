@@ -1,3 +1,21 @@
+# Active delivery routing — owner update 2026-09-06
+
+Read [RESUME_WITHOUT_ATTACHMENTS.md](RESUME_WITHOUT_ATTACHMENTS.md) for current
+main-conversation <-> local-Codex delivery. Publish task handoffs and returns to
+GitHub and exchange immutable file links; WORK_THREAD and manual ZIP re-upload
+are not default prerequisites. Codex performs evidence-driven in-scope repairs
+and returns directly to the main conversation. This is a delivery update only,
+not permission to restart any exhausted acquisition or production attempt.
+
+The exact task-specific handoff linked by the user selects the current work and
+source. The older text below is retained for history, not as an instruction to
+restart REI-LOCAL-01, bootstrap a host, refresh peer locks, rerun all validators or
+begin a first canonical interval. Do not execute its historical next-stage list
+merely because this filename contains CURRENT. This documentation branch does
+not replace the scientific/runtime source anchor or amend its claim ceiling.
+
+---
+
 # CURRENT HANDOFF PROMPT — rei_bianchi / BASS
 
 > **Active bounded REI-LOCAL-01 continuation:** for the Rust host-authority
