@@ -1,5 +1,20 @@
 # Source-bound resolved photon-owner sensitivity
 
+LOCAL UPDATE (2026-09-07): the unchanged candidate at
+`12d64833419651a532451ad4c9a180aa65a0a70b` was executed once locally:
+O01--O10 **10/10 PASS**, exit 0, no timeout, failure, error, or skip.
+This supersedes only the execution status below. See
+[CHATGPT_HANDOFF_KO.md](CHATGPT_HANDOFF_KO.md),
+[RETURN_STATUS.json](RETURN_STATUS.json), and
+[local_evidence/EXECUTION.json](local_evidence/EXECUTION.json).
+The original WORK_UNIT and the two candidate Python files are preserved unchanged;
+their UNEXECUTED text describes the candidate's publication history.
+An existing endpoint enclosure was found, but a complete source-input state/time/
+forcing-direction tube was not established; the physical uniform owner bound
+remains UNKNOWN. The derivation below is still an exact-real, resolved-owner slice.
+
+## Original candidate derivation and pre-execution record
+
 STATUS: DERIVED_EXACT_REAL_LAW__REFERENCE_CODE_UNEXECUTED
 Task: REI_OWNER_CURRENT_JVP_SOURCE_SLICE. Date: 2026-09-07.
 This advances the owner-normalization portion of the unfinished numerator term.
