@@ -1,0 +1,78 @@
+name: rei-denominator-bounds
+on:
+  push:
+    branches: [research/rei-denominator-transport-bound-20260907-r1]
+    paths:
+      - 'research/rei_denominator_transport_bounds_20260907/check_denominator_bounds.py'
+      - 'research/rei_denominator_transport_bounds_20260907/PROOF_AND_BOUND.md'
+      - 'research/rei_denominator_transport_bounds_20260907/WORK_UNIT.json'
+      - '.github/workflows/rei-denominator-bounds.yml'
+permissions:
+  contents: read
+jobs:
+  exact-denominator-bound:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: New exact checks and preserved mutant
+        env:
+          EXPECTED: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          git merge-base --is-ancestor 032b59372e55bdbb86860e8075206bd0026f7be1 HEAD
+          mkdir "$RUNNER_TEMP/rei-denominator-bound"
+          git rev-parse HEAD > "$RUNNER_TEMP/rei-denominator-bound/HEAD.txt"
+          git rev-parse 'HEAD^{tree}' > "$RUNNER_TEMP/rei-denominator-bound/TREE.txt"
+          python3 -B - <<'PY'
+          import json, os, pathlib, subprocess, time
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'rei-denominator-bound'
+          check='research/rei_denominator_transport_bounds_20260907/check_denominator_bounds.py'
+          runs=[('mutant',['python3','-B',check,'--mutant','omit-denominator','--report',str(out/'MUTANT.json')]),
+                ('exact',['python3','-B',check,'--report',str(out/'RESULT.json')]),
+                ('repository',['python3','-B','scripts/verify_repo.py'])]
+          records=[]
+          for label,argv in runs:
+              start=time.monotonic(); timed_out=False; code=None
+              with (out/(label+'.stdout.log')).open('xb') as so, (out/(label+'.stderr.log')).open('xb') as se:
+                  try: code=subprocess.run(argv,stdout=so,stderr=se,timeout=120).returncode
+                  except subprocess.TimeoutExpired: timed_out=True
+              records.append(dict(label=label,argv=argv,exit_code=code,timed_out=timed_out,elapsed_seconds=time.monotonic()-start))
+              (out/'COMMANDS.json').write_text(json.dumps(records,indent=2)+'\n')
+              print(json.dumps(records[-1]),flush=True)
+              print((out/(label+'.stdout.log')).read_text(),flush=True)
+              print((out/(label+'.stderr.log')).read_text(),flush=True)
+              assert not timed_out, records[-1]
+              if label=='mutant':
+                  r=json.loads((out/'MUTANT.json').read_text())
+                  assert code==1 and (r['tests'],r['failures'],r['errors'],r['skipped'])==(1,1,0,0), r
+              else:
+                  assert code==0, records[-1]
+                  if label=='exact':
+                      r=json.loads((out/'RESULT.json').read_text())
+                      assert (r['tests'],r['failures'],r['errors'],r['skipped'])==(12,0,0,0), r
+          PY
+          git diff --check 032b59372e55bdbb86860e8075206bd0026f7be1 HEAD
+          test -z "$(git status --porcelain --untracked-files=all)"
+      - name: Preserve source and execution identity
+        if: always()
+        shell: bash
+        run: |
+          OUT="$RUNNER_TEMP/rei-denominator-bound"
+          if test -d "$OUT"; then
+            git archive --format=zip HEAD research/rei_denominator_transport_bounds_20260907 .github/workflows/rei-denominator-bounds.yml > "$OUT/SOURCE.zip"
+            cd "$OUT"
+            find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 -r sha256sum > SHA256SUMS
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rei-denominator-bound-${{ github.sha }}
+          path: ${{ runner.temp }}/rei-denominator-bound/
+          if-no-files-found: error
