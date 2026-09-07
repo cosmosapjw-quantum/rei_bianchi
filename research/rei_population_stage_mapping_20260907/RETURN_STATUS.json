@@ -1,0 +1,160 @@
+{
+  "status": "STATIC_POPULATION_STAGE_MAPPING_ESTABLISHED",
+  "production_status": "PRODUCTION_FOUR_SITE_REPLAY_UNAVAILABLE",
+  "return_to": "MAIN_CONVERSATION",
+  "work_thread_required": false,
+  "authorship": "HOST_CODEX_SINGLE_WRITER",
+  "tested_source": {
+    "commit": "9605f8f89e35c2a25d60e8dc0098c6d859d38e66",
+    "tree": "2663929364f577cb6f1dd4e09520bb3f56d5a336"
+  },
+  "inspected_implementation": {
+    "commit": "81d54e1210b8654d3c8f545b3621b109d1011fdc",
+    "tree": "3c4227088543c3ac346ce2769fa16df0fd433458",
+    "source_bindings": "SOURCE_BINDINGS.json",
+    "implementation_blobs_equal_fixed_base": true
+  },
+  "prompt_introduced_commit": "019608c2a400423485795696ecb47523361d4c13",
+  "parent_research_pr": 73,
+  "handoff_policy_pr": 72,
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "-B",
+        "research/rei_population_stage_mapping_20260907/check_stage_algebra.py",
+        "--report",
+        "research/rei_population_stage_mapping_20260907/ALGEBRA_RESULT.json"
+      ],
+      "exit_code": 0,
+      "log": "logs/exact-stage-algebra.log"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "scripts/verify_repo.py"
+      ],
+      "exit_code": 0,
+      "log": "logs/repository-verifier.log"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "81d54e1210b8654d3c8f545b3621b109d1011fdc",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "log": "logs/diff-check.log"
+    }
+  ],
+  "local_fixture_invocations": 2,
+  "unique_test_methods": 10,
+  "tests_passed_at_tested_commit": 10,
+  "prior_ci_read": {
+    "run": 34042290101,
+    "job": 101511110133,
+    "tested_commit": "019608c2a400423485795696ecb47523361d4c13",
+    "tests": 10,
+    "passed": 10,
+    "production_mapping_verified": false,
+    "source_log_excerpt": "logs/pr73-exact-ci-excerpt.log",
+    "full_log_local": "/home/cosmosapjw/research_runs/REI-POPULATION-STAGE-MAPPING-20260907/pr73-job-101511110133.log",
+    "rerun": false
+  },
+  "stage_mapping": {
+    "predictor": {
+      "generator": "A(F0,y0)",
+      "step": "h",
+      "rhs": "y0",
+      "frozen_resolvent_hypotheses": "STRUCTURAL_PASS_CONDITIONAL_ON_VALID_INPUT"
+    },
+    "gamma_population": {
+      "generator": "A(F0,y0)",
+      "step": "(1-1/sqrt(2))*h",
+      "rhs": "y0",
+      "frozen_resolvent_hypotheses": "STRUCTURAL_PASS_CONDITIONAL_ON_VALID_INPUT"
+    },
+    "corrector": {
+      "generator": "A((F0+F1)/2,yp)",
+      "step": "h",
+      "rhs": "y0",
+      "frozen_resolvent_hypotheses": "STRUCTURAL_PASS_CONDITIONAL_ON_VALID_INPUT"
+    },
+    "thermal_predictor_and_sdirk": "CLOSED_CONSERVATIVE_GENERATOR_THEOREM_NOT_APPLICABLE",
+    "source_sites": [
+      "population_t0",
+      "population_t1_predictor",
+      "thermal_tgamma",
+      "thermal_t1_final"
+    ],
+    "full_step_backward_euler_substitution": false
+  },
+  "counterexamples": {
+    "corrector_constant_forward_fixture": {
+      "predictor": [
+        "1/2",
+        "3/2"
+      ],
+      "corrector": [
+        "2/5",
+        "8/5"
+      ],
+      "wrong_predictor_rhs": [
+        "1/5",
+        "9/5"
+      ]
+    },
+    "strict_table_branch_jump": {
+      "log10_T_knot": "4.25",
+      "v_left": "57/200",
+      "v_right": "61/200",
+      "isolated_rational_F10_jump": "2013/100000",
+      "actual_physical_trajectory_crossing": "NOT_TESTED"
+    },
+    "isolated_sdirk_expansion": {
+      "2Hh": "4",
+      "energy_ratio": "(5-4*sqrt(2))/(5-2*sqrt(2))^2",
+      "sign": "NEGATIVE",
+      "full_physics_run": false
+    }
+  },
+  "unknown": [
+    "actual_rate_derivative_bounds",
+    "actual_positive_denominator_margins",
+    "actual_full_map_gain",
+    "coupled_thermal_inverse_bound",
+    "outer_residual_to_error_bound",
+    "exact_flow_defect_rho",
+    "full_interval_error_bound"
+  ],
+  "production_replay_missing_code": "RUST_THERMAL_REPLAY_ABI_MISSING",
+  "production_imports": 0,
+  "native_invocations": 0,
+  "old_xz_consumer_invocations": 0,
+  "old_calibration_invocations": 0,
+  "snapshot_gets": 0,
+  "package_installations": 0,
+  "production_changes": [],
+  "runtime_authorization_effect": "NONE",
+  "first_interval_admitted": false,
+  "provider_admitted": false,
+  "review": {
+    "rounds": 1,
+    "physics_math": "same Host Codex",
+    "code": "same Host Codex",
+    "independent": false,
+    "production_defect_confirmed": false
+  },
+  "publication": {
+    "branch": "research/rei-population-stage-mapping-20260907-r1",
+    "base_branch": "research/rei-thermochemistry-error-transport-20260907-r1",
+    "type": "EVIDENCE_ONLY_CHILD_OF_TESTED_SOURCE",
+    "commit": "OBSERVED_AFTER_COMMIT_IN_FINAL_RETURN_AND_PR",
+    "non_force": true,
+    "pr_state_requested": "DRAFT"
+  },
+  "next": "Main conversation selects one bounded event-free derivative or exact-flow remainder obligation from this completed mapping."
+}
