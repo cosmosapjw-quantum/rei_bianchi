@@ -56,8 +56,9 @@ local charged-fraction norm이나 unnormalized population norm이 아니다.
 |---|---|
 | PR #79 입력·수학 parent | commit `4c52886dc101af3ffdb9ee4edee0716bd149b25d`, tree `aef79cc480433f39bcdd3fd8e8ea2d76fe5ec45a` |
 | 실제 scalar TESTED_SOURCE | commit `8f6dca8dbb3cbfd8369e9ef2e25dfb305f834da3`, tree `ac37936d16dfb10c46e96cd7297b7b3f6e4ec24e` |
-| PUBLISHED_HEAD | 이 HANDOFF·결과·로그·그림을 추가한 후속 evidence commit. 고정 Git URL의 SHA가 게시 commit이며 위 tested source와 다르다. |
-| child branch | `research/rei-g2b-endpoint-scalar-evidence-20260907-r1`; PR #79를 base로 하는 새 Draft PR |
+| 수치 evidence commit | `a4f85cf834d83d54c22e3b0d83776e12631c74de`, tree `180258adc42022ec7ac4067050b986e5e1d69c3a` |
+| PUBLISHED_HEAD | 이 HANDOFF의 PR 번호와 범위 설명을 마감한 후속 commit. 고정 Git URL의 SHA가 최종 게시 commit이며 위 tested source와 다르다. |
+| child branch / PR | `research/rei-g2b-endpoint-scalar-evidence-20260907-r1`; PR #79를 base로 하는 [Draft PR #80](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/80) |
 | Public box blob | `8f67740b43c82be04f8efd521990b7b2b185afea` |
 | Initial population blob | `e3a2a55f1187e958276193d7368541ca11197c31` |
 
