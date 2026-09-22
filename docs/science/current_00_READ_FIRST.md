@@ -42,3 +42,6 @@ Next stage:
 ```text
 P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-R1-R1-R1-UNCERTAINTY-QUALIFIED-FIRST-CANONICAL-INTERVAL-ADAPTIVE-HISTORY
 ```
+
+Scoped source-only Rust candidate: [local verification handoff](../forward/rust-20260922/START_HANDOFF_KO.md).
+No scientific-state or production admission change.

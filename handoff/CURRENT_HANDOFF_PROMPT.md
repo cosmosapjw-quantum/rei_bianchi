@@ -87,3 +87,6 @@ hydrogen-frame background adapter
 No clipping, table extrapolation, unsupported parameter correlation, dense full
 Jacobian, favorable lane selection, recombination numerical import/surrogate,
 CAMB transfer, or Bianchi-family sweep in the next stage.
+
+Scoped source-only Rust candidate: [local verification handoff](../docs/forward/rust-20260922/START_HANDOFF_KO.md).
+No scientific-state or production admission change.
