@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "parent_candidate_sha": "02634b078743f3556c569cc30f17322b11f2ce8a",
+  "source_phase": "COMPLETE_FOR_APPROVED_SEVEN_FUNCTIONS",
+  "source_completion_is_not_compilation": true,
+  "functions": [
+    {
+      "function": "transform_z_to_y",
+      "reference": {
+        "module": "monolithic_model_b2a.py",
+        "start_line": 49,
+        "end_line": 65
+      },
+      "rust_path": "rust/rei_microphysics/src/group_rates.rs",
+      "source_port": "PRESENT_STATIC_REVIEWED_NOT_COMPILED",
+      "tests_declared": [
+        "transform_is_max_shifted_without_floors",
+        "transform_preserves_extreme_classifications_without_floor"
+      ],
+      "tests_executed_here": false
+    },
+    {
+      "function": "pchip_eval",
+      "reference": {
+        "module": "monolithic_model_b2a.py",
+        "start_line": 95,
+        "end_line": 104
+      },
+      "rust_path": "rust/rei_microphysics/src/group_rates.rs",
+      "source_port": "PRESENT_STATIC_REVIEWED_NOT_COMPILED",
+      "tests_declared": [
+        "pchip_knots_interior_and_domain",
+        "pchip_uses_right_interval_at_interior_knot",
+        "full_cubic_on_nonuniform_knots_preserves_coefficient_layout",
+        "minimal_table_and_each_invalid_constructor_branch"
+      ],
+      "tests_executed_here": false
+    },
+    {
+      "function": "opacity_cMpc_inv",
+      "reference": {
+        "module": "monolithic_model_b2a.py",
+        "start_line": 107,
+        "end_line": 140
+      },
+      "rust_path": "rust/rei_microphysics/src/group_rates.rs",
+      "source_port": "PRESENT_STATIC_REVIEWED_NOT_COMPILED",
+      "tests_declared": [
+        "opacity_ownership_and_proper_units",
+        "table_errors_propagate_to_opacity_and_photon_rates",
+        "opacity_ignores_photon_count_and_thermal_energy"
+      ],
+      "tests_executed_here": false
+    },
+    {
+      "function": "photon_rates",
+      "reference": {
+        "module": "monolithic_model_b2a.py",
+        "start_line": 143,
+        "end_line": 152
+      },
+      "rust_path": "rust/rei_microphysics/src/group_rates.rs",
+      "source_port": "PRESENT_STATIC_REVIEWED_NOT_COMPILED",
+      "tests_declared": [
+        "isolated_groups_and_no_emissivity",
+        "redshift_internal_transfer_telescopes",
+        "four_site_calls_do_not_share_state",
+        "photon_emission_is_affine_and_not_renormalized"
+      ],
+      "tests_executed_here": false
+    },
+    {
+      "function": "gamma_species",
+      "reference": {
+        "module": "monolithic_model_b2a.py",
+        "start_line": 155,
+        "end_line": 165
+      },
+      "rust_path": "rust/rei_microphysics/src/group_rates.rs",
+      "source_port": "PRESENT_STATIC_REVIEWED_NOT_COMPILED",
+      "tests_declared": [
+        "gamma_has_one_comoving_factor_and_no_table_dependency",
+        "gamma_ignores_all_unused_state_and_thermochemistry_fields"
+      ],
+      "tests_executed_here": false
+    },
+    {
+      "function": "positive_mass_projection",
+      "reference": {
+        "module": "node_lift_operator.py",
+        "start_line": 22,
+        "end_line": 35
+      },
+      "rust_path": "rust/rei_microphysics/src/lift.rs",
+      "source_port": "PRESENT_STATIC_REVIEWED_NOT_COMPILED",
+      "tests_declared": [
+        "specified_mass_and_signed_examples",
+        "zero_support_is_function_specific",
+        "error_precedence_and_nonfinite_inputs",
+        "overflow_is_not_silently_renormalized",
+        "lift_zero_entries_and_signed_decomposition_preserve_locked_totals"
+      ],
+      "tests_executed_here": false
+    },
+    {
+      "function": "signed_transfer_lift",
+      "reference": {
+        "module": "node_lift_operator.py",
+        "start_line": 179,
+        "end_line": 188
+      },
+      "rust_path": "rust/rei_microphysics/src/lift.rs",
+      "source_port": "PRESENT_STATIC_REVIEWED_NOT_COMPILED",
+      "tests_declared": [
+        "specified_mass_and_signed_examples",
+        "zero_support_is_function_specific",
+        "error_precedence_and_nonfinite_inputs",
+        "overflow_is_not_silently_renormalized",
+        "lift_zero_entries_and_signed_decomposition_preserve_locked_totals"
+      ],
+      "tests_executed_here": false
+    }
+  ],
+  "rust_integration_test_declarations": 21,
+  "rust_frontend_test_declarations": 5,
+  "original_frozen_parity_cases": 84,
+  "original_frozen_protocol_cases": 5,
+  "original_python_shape_cases": 2,
+  "kernel_body_changes_in_this_followup": 0,
+  "frontend_change": "A record with an ID but no operation now produces ERR BAD_SHAPE; later records continue.",
+  "remaining_local_checks": [
+    "cargo fmt --check",
+    "cargo test --locked",
+    "actual pinned Python/Rust parity"
+  ],
+  "production_wiring": false,
+  "scientific_state_mutation": false,
+  "external_rec_physical_lock_mutation": false,
+  "scope_expansion": false,
+  "independent_reviewer_used": false,
+  "red_green_rust_observed": false,
+  "toy_grade": "EXACT_RATIONAL_ONLY",
+  "known_residuals": [
+    "uncompiled Rust formatting/type/link/runtime status",
+    "JAX/libm/reduction/subnormal platform differences require actual parity",
+    "CLI full GroupParams decoding requires valid tables even for gamma; library gamma does not evaluate them",
+    "P0 C8 report/receipt locator is still registry-only/unretrieved; it is not a function source"
+  ]
+}

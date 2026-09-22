@@ -135,3 +135,128 @@ fn registry_does_not_admit_missing_physical_sources() {
         assert!(matches!(coverage::require_physical_source(key), Err(ForwardError::MissingAuthority(_))));
     }
 }
+
+// Additional fixed source-closeout witnesses. These do not change the C1 JSON
+// inputs or its f64 tolerance. The cubic below tests evaluation, not fitting.
+#[test]
+fn full_cubic_on_nonuniform_knots_preserves_coefficient_layout() {
+    // p(x)=x^3-2*x^2+x/2+1, expanded about each left knot.
+    let t = PchipTable::new(
+        vec![-2.0, 0.5, 4.0],
+        [vec![1.0, 1.0], vec![-8.0, -0.5], vec![20.5, -0.75], vec![-16.0, 0.875]],
+    ).unwrap();
+    for (x, y) in [(-2.0, -16.0), (-1.0, -2.5), (0.0, 1.0),
+                   (0.5, 0.875), (1.0, 0.5), (2.0, 2.0), (3.0, 11.5), (4.0, 35.0)] {
+        assert_eq!(pchip_eval(&t, x).unwrap(), y);
+    }
+}
+#[test]
+fn minimal_table_and_each_invalid_constructor_branch() {
+    let t = PchipTable::new(
+        vec![0.0, 2.0], [vec![1.0], vec![2.0], vec![3.0], vec![4.0]],
+    ).unwrap();
+    assert_eq!(pchip_eval(&t, 1.0).unwrap(), 10.0);
+    assert_eq!(pchip_eval(&t, 2.0).unwrap(), 26.0);
+    for knots in [vec![], vec![0.0], vec![1.0, 0.0], vec![0.0, f64::INFINITY]] {
+        assert_eq!(PchipTable::new(knots, [vec![0.0], vec![0.0], vec![0.0], vec![0.0]])
+            .unwrap_err().code(), "BAD_TABLE");
+    }
+    assert_eq!(PchipTable::new(vec![0.0, 1.0],
+        [vec![], vec![0.0], vec![0.0], vec![0.0]]).unwrap_err().code(), "BAD_TABLE");
+    assert_eq!(PchipTable::new(vec![0.0, 1.0],
+        [vec![0.0], vec![0.0], vec![f64::NAN], vec![0.0]])
+        .unwrap_err().code(), "BAD_TABLE");
+}
+#[test]
+fn table_errors_propagate_to_opacity_and_photon_rates() {
+    let mut s = state();
+    let p = params();
+    for gamma in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+        s.gamma_hi_per_s = gamma;
+        assert_eq!(opacity_cMpc_inv(&s, &p).unwrap_err().code(), "NONFINITE_X");
+        assert_eq!(photon_rates(&s, &[0.0; 4], &p).unwrap_err().code(), "NONFINITE_X");
+    }
+    for gamma in [1e-100, 1e100] {
+        s.gamma_hi_per_s = gamma;
+        assert_eq!(opacity_cMpc_inv(&s, &p).unwrap_err().code(), "OUTSIDE_TABLE_DOMAIN");
+        assert_eq!(photon_rates(&s, &[0.0; 4], &p).unwrap_err().code(), "OUTSIDE_TABLE_DOMAIN");
+    }
+}
+#[test]
+fn gamma_ignores_all_unused_state_and_thermochemistry_fields() {
+    let mut s = state();
+    let mut p = params();
+    let before = gamma_species(&s, &p);
+    s.x_hii = f64::NAN;
+    s.helium = [f64::NAN; 3];
+    s.u_erg_per_cm3 = f64::NAN;
+    s.gamma_hi_per_s = f64::NAN;
+    p.n_h_proper_per_cm3 = f64::NAN;
+    p.n_he_proper_per_cm3 = f64::NAN;
+    p.hubble_per_s = f64::NAN;
+    p.redshift_coeff = [f64::NAN; 4];
+    p.source_fraction = [f64::NAN; 4];
+    // Construction requires valid tables; gamma must not evaluate either.
+    let unrelated = PchipTable::new(vec![100.0, 200.0],
+        [vec![3.0], vec![4.0], vec![5.0], vec![6.0]]).unwrap();
+    p.lowgroup_log_opacity = [unrelated.clone(), unrelated];
+    let after = gamma_species(&s, &p);
+    assert_eq!(before.hi_per_s, after.hi_per_s);
+    assert_eq!(before.hei_per_s, after.hei_per_s);
+    assert_eq!(before.heii_per_s, after.heii_per_s);
+    assert_eq!(before.group_hi_per_s, after.group_hi_per_s);
+}
+#[test]
+fn opacity_ignores_photon_count_and_thermal_energy() {
+    let mut s = state();
+    let p = params();
+    let before = opacity_cMpc_inv(&s, &p).unwrap();
+    s.n_comoving_per_cmpc3 = [f64::NAN; 4];
+    s.u_erg_per_cm3 = f64::NAN;
+    assert_eq!(before, opacity_cMpc_inv(&s, &p).unwrap());
+}
+#[test]
+fn photon_emission_is_affine_and_not_renormalized() {
+    let s = state();
+    let p = params();
+    let e = [1e-16, 2e-16, 3e-16, 4e-16];
+    let zero = photon_rates(&s, &[0.0; 4], &p).unwrap();
+    let added = photon_rates(&s, &e, &p).unwrap();
+    for g in 0..4 {
+        let expected = zero[g] + e[g] * p.source_fraction[g];
+        let scale = zero[g].abs() + (e[g] * p.source_fraction[g]).abs();
+        assert!((added[g] - expected).abs() <= 5e-13 * scale);
+    }
+}
+#[test]
+fn lift_zero_entries_and_signed_decomposition_preserve_locked_totals() {
+    let p = [0.0, 2.0, 0.0, 6.0];
+    assert_eq!(positive_mass_projection(&p, 16.0).unwrap(), vec![0.0, 4.0, 0.0, 12.0]);
+    for rate in [-8.0, 0.0, 8.0] {
+        let s = signed_transfer_lift(rate, &p).unwrap();
+        assert_eq!(s.signed.iter().sum::<f64>(), rate);
+        for i in 0..p.len() {
+            assert_eq!(s.positive[i] - s.negative[i], s.signed[i]);
+            assert!(s.positive[i] >= 0.0 && s.negative[i] >= 0.0);
+            assert_eq!(s.positive[i] * s.negative[i], 0.0);
+        }
+    }
+}
+#[test]
+fn transform_preserves_extreme_classifications_without_floor() {
+    let mut z = [0.0; 9];
+    z[0] = -1000.0;
+    z[1] = 1000.0;
+    z[4] = f64::NEG_INFINITY;
+    z[5] = f64::NEG_INFINITY;
+    z[6] = f64::NEG_INFINITY;
+    z[7] = -1000.0;
+    z[8] = f64::INFINITY;
+    let s = transform_z_to_y(&z);
+    assert_eq!(s.n_comoving_per_cmpc3[0], 0.0);
+    assert_eq!(s.n_comoving_per_cmpc3[1], f64::INFINITY);
+    assert_eq!(s.x_hii, 0.0);
+    assert_eq!(s.helium, [1.0, 0.0, 0.0]);
+    assert_eq!(s.u_erg_per_cm3, 0.0);
+    assert_eq!(s.gamma_hi_per_s, f64::INFINITY);
+}

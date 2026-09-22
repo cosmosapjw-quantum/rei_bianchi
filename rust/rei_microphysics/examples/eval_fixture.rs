@@ -70,16 +70,72 @@ fn token(v: f64) -> String {
     if v.is_nan() { "NaN".into() } else if v == f64::INFINITY { "Inf".into() }
     else if v == f64::NEG_INFINITY { "-Inf".into() } else { format!("{v:.17e}") }
 }
+/// Convert one complete input record to one reply. A malformed record must
+/// not discard the replies of later records. Blank lines remain ignorable.
+fn response_line(line: &str) -> Option<String> {
+    let mut t = Tokens(line.split_whitespace());
+    let id = t.0.next()?;
+    let result = match t.text() {
+        Ok(op) => evaluate(op, &mut t),
+        Err(error) => Err(error),
+    };
+    Some(match result {
+        Ok(values) => format!(
+            "{} OK {}{}",
+            id,
+            values.len(),
+            values.iter().map(|v| format!(" {}", token(*v))).collect::<String>()
+        ),
+        Err(error) => format!("{} ERR {}", id, error.code()),
+    })
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     for line in io::stdin().lock().lines() {
-        let line = line?;
-        if line.trim().is_empty() { continue; }
-        let mut t = Tokens(line.split_whitespace());
-        let id = t.text()?; let op = t.text()?;
-        match evaluate(op, &mut t) {
-            Ok(values) => println!("{} OK {}{}", id, values.len(), values.iter().map(|v| format!(" {}", token(*v))).collect::<String>()),
-            Err(e) => println!("{} ERR {}", id, e.code()),
+        if let Some(reply) = response_line(&line?) {
+            println!("{reply}");
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::response_line;
+
+    #[test]
+    fn blank_input_produces_no_record() {
+        assert_eq!(response_line(" \t "), None);
+    }
+
+    #[test]
+    fn missing_operation_is_a_per_record_error() {
+        assert_eq!(response_line("missing"), Some("missing ERR BAD_SHAPE".into()));
+    }
+
+    #[test]
+    fn malformed_record_does_not_consume_the_next_record() {
+        let input = "bad\nok mass 8 2 1 3\n";
+        let output: Vec<_> = input.lines().filter_map(response_line).collect();
+        assert_eq!(output.len(), 2);
+        assert_eq!(output[0], "bad ERR BAD_SHAPE");
+        let tokens: Vec<_> = output[1].split_whitespace().collect();
+        assert_eq!(&tokens[..3], &["ok", "OK", "2"]);
+        assert_eq!(tokens[3].parse::<f64>().unwrap(), 2.0);
+        assert_eq!(tokens[4].parse::<f64>().unwrap(), 6.0);
+    }
+
+    #[test]
+    fn malformed_payload_and_trailing_tokens_are_rejected() {
+        for line in ["x mass 0 2 1", "x transform 0", "x mass 0 0 extra"] {
+            assert_eq!(response_line(line), Some("x ERR BAD_SHAPE".into()));
+        }
+        assert_eq!(response_line("x badop"), Some("x ERR BAD_OPERATION".into()));
+    }
+
+    #[test]
+    fn nonfinite_tokens_reach_the_library_error_branch() {
+        assert_eq!(response_line("x mass 0 1 NaN"), Some("x ERR PRIOR_NOT_FINITE".into()));
+        assert_eq!(response_line("x signed Inf 1 1"), Some("x ERR NONFINITE_RATE".into()));
+    }
 }
