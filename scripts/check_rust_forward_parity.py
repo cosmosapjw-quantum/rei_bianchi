@@ -7,6 +7,7 @@ This is an f64 implementation comparison, never an interval proof.
 """
 from __future__ import annotations
 import argparse
+import base64
 import bisect
 import copy
 import hashlib
@@ -343,7 +344,54 @@ def json_safe(x):
     return x
 
 
-def execute(fixture, contract):
+def child_streams(record, stdout, stderr):
+    """Retain raw bytes where supplied, plus readable text for the receipt."""
+    for name, value in [('stdout', stdout), ('stderr', stderr)]:
+        if isinstance(value, bytes):
+            record[name+'_base64'] = base64.b64encode(value).decode('ascii')
+            record[name] = value.decode('utf-8', errors='backslashreplace')
+        else:
+            record[name] = '' if value is None else str(value)
+
+
+def run_rust_batch(command, batch, label, trace):
+    """Record every attempted child, including partial output on timeout.
+
+    Capture bytes before decoding, so invalid UTF-8 cannot destroy the raw log.
+    A timeout is not assigned a made-up exit code. No retries or fallbacks.
+    """
+    payload = ('\n'.join(batch)+'\n').encode('utf-8')
+    record = {'command':list(command), 'cwd':str(ROOT), 'batch':label,
+              'stdin_sha256':digest(payload), 'timeout_seconds':180,
+              'returncode':None, 'status':'ATTEMPTING', 'stdout':'', 'stderr':''}
+    trace['child_runs'].append(record)
+    print('COMMAND', json.dumps(command), flush=True)
+    try:
+        proc = subprocess.run(command, input=payload, capture_output=True,
+                              cwd=ROOT, timeout=180)
+    except subprocess.TimeoutExpired as exc:
+        record['status'] = 'TIMEOUT'; record['error'] = repr(exc)
+        child_streams(record, exc.output, exc.stderr)
+        raise
+    except OSError as exc:
+        record['status'] = 'LAUNCH_ERROR'; record['error'] = repr(exc)
+        raise
+    else:
+        record['returncode'] = proc.returncode
+        record['status'] = 'COMPLETED' if proc.returncode == 0 else 'NONZERO_EXIT'
+        child_streams(record, proc.stdout, proc.stderr)
+    finally:
+        print('CHILD_STATUS', record['status'], flush=True)
+        print('EXIT', record['returncode'], flush=True)
+        print('RUST_STDERR_BEGIN\n'+record['stderr']+'RUST_STDERR_END', flush=True)
+        print('RUST_STDOUT_BEGIN\n'+record['stdout']+'RUST_STDOUT_END', flush=True)
+    require(proc.returncode == 0, 'RUST_EXECUTION_FAILED')
+    return proc.stdout.decode('utf-8') if isinstance(proc.stdout, bytes) else proc.stdout
+
+
+def execute(fixture, contract, trace=None):
+    trace = {} if trace is None else trace
+    trace.update({'phase':'reference_import', 'child_runs':[]})
     os.environ.setdefault('JAX_PLATFORMS','cpu')
     model = load_reference('monolithic_model_b2a.py'); lift = load_reference('node_lift_operator.py')
     import jax
@@ -351,19 +399,23 @@ def execute(fixture, contract):
     import numpy
     import scipy
     require(jax.config.read('jax_enable_x64'), 'REFERENCE_NOT_F64')
+    trace['versions'] = {'python':sys.version, 'jax':jax.__version__,
+                         'numpy':numpy.__version__, 'scipy':scipy.__version__,
+                         'jax_x64':bool(jax.config.read('jax_enable_x64')),
+                         'jax_backend':jax.default_backend()}
     cases = fixture['cases']; lines = [request_line(c,fixture) for c in cases]
     raw = fixture['raw_protocol_cases']; ids = [c['id'] for c in cases]+[c['line'].split()[0] for c in raw]
     command = ['cargo','run','--quiet','--manifest-path',str(CRATE/'Cargo.toml'),'--locked','--example','eval_fixture']
     observed = []
     for batch in [lines+[c['line'] for c in raw],list(reversed(lines))]:
-        proc = subprocess.run(command,input='\n'.join(batch)+'\n',text=True,capture_output=True,cwd=ROOT,timeout=180)
-        print('COMMAND',json.dumps(command)); print('EXIT',proc.returncode)
-        print('RUST_STDERR_BEGIN\n'+proc.stderr+'RUST_STDERR_END')
-        print('RUST_STDOUT_BEGIN\n'+proc.stdout+'RUST_STDOUT_END')
-        require(proc.returncode==0,'RUST_EXECUTION_FAILED')
-        observed.append(parse_replies(proc.stdout, ids if len(observed)==0 else list(reversed([c['id'] for c in cases]))))
+        label = 'forward' if len(observed) == 0 else 'reverse'
+        trace['phase'] = 'rust_'+label
+        stdout = run_rust_batch(command, batch, label, trace)
+        observed.append(parse_replies(stdout, ids if len(observed)==0 else list(reversed([c['id'] for c in cases]))))
     got, reverse = observed; report = []; failures = []
+    trace.update({'phase':'comparison', 'cases':report, 'failures':failures})
     for c in cases:
+        ref = None
         try:
             ref = reference_case(c,fixture,model,lift,jnp); actual = got[c['id']]
             if 'error' in ref:
@@ -377,7 +429,8 @@ def execute(fixture, contract):
                 if 'exact' in c: require(a==vec(c['exact']),'EXACT_ASSERTION_FAILED')
             report.append({'id':c['id'],'status':'PASS','reference':ref,'rust':actual})
         except Exception as e:
-            failures.append({'id':c['id'],'error':repr(e),'rust':got.get(c['id'])})
+            failures.append({'id':c['id'],'error':repr(e),'reference':ref,
+                             'rust':got.get(c['id']),'rust_reverse':reverse.get(c['id'])})
     for c in raw:
         require(got[c['line'].split()[0]].get('error')==c['error'],'PROTOCOL_NEGATIVE_CASE_FAILED')
     for c in fixture['python_shape_cases']:
@@ -389,7 +442,7 @@ def execute(fixture, contract):
     try: inv = invariants(fixture,got)
     except Exception as e: inv=[];failures.append({'id':'independent_invariants','error':repr(e)})
     result = {'grade':'PINNED_FUNCTION_F64_PARITY_ONLY','passed':not failures,'contract':contract,'cases':report,'failures':failures,'invariants':inv,
-        'versions':{'python':sys.version,'jax':jax.__version__,'numpy':numpy.__version__,'scipy':scipy.__version__},'validated_enclosure_replaced':False}
+        'versions':trace['versions'], 'child_runs':trace['child_runs'], 'validated_enclosure_replaced':False}
     print(json.dumps(json_safe(result),indent=2,allow_nan=False))
     return result
 
@@ -398,16 +451,35 @@ def main():
     parser = argparse.ArgumentParser();parser.add_argument('--check-contract',action='store_true')
     parser.add_argument('--output',type=Path,help='New receipt path; existing evidence is never overwritten.')
     args = parser.parse_args()
+    output = None
+    trace = {'phase':'receipt_destination', 'child_runs':[]}
     try:
-        fixture, contract = check_contract()
-        result = contract if args.check_contract else execute(fixture,contract)
-        if args.check_contract: print(json.dumps(result,indent=2))
+        # Reserve the destination before doing any validation or expensive work.
+        # Never reopen/replace an existing evidence file, even on failure.
         if args.output:
-            with args.output.open('x') as f: json.dump(json_safe(result),f,indent=2,allow_nan=False);f.write('\n')
-        return 0 if args.check_contract or result['passed'] else 1
-    except Exception as e:
-        print(json.dumps({'passed':False,'error':repr(e),'classification':'CHECKER_OR_REFERENCE_OR_EXECUTION_FAILURE','fallback_used':False}),file=sys.stderr)
-        return 2
+            output = args.output.open('x', encoding='utf-8')
+        trace['phase'] = 'contract'
+        fixture, contract = check_contract()
+        result = contract if args.check_contract else execute(fixture,contract,trace)
+        if args.check_contract: print(json.dumps(result,indent=2))
+        code = 0 if args.check_contract or result['passed'] else 1
+    except Exception as exc:
+        result = {'passed':False, 'error':repr(exc),
+                  'classification':'CHECKER_OR_REFERENCE_OR_EXECUTION_FAILURE',
+                  'fallback_used':False, **trace}
+        print(json.dumps(json_safe(result),allow_nan=False),file=sys.stderr)
+        code = 2
+    if output is not None:
+        try:
+            with output:
+                json.dump(json_safe(result),output,indent=2,allow_nan=False)
+                output.write('\n'); output.flush(); os.fsync(output.fileno())
+        except Exception as exc:
+            print(json.dumps({'passed':False,'classification':'RECEIPT_WRITE_FAILURE',
+                              'error':repr(exc),'prior_exit_code':code,
+                              'fallback_used':False}),file=sys.stderr)
+            code = 2
+    return code
 
 
 if __name__ == '__main__':

@@ -9,6 +9,12 @@ PRODUCTION_MUTATION=NO
 
 이 후보는 Rust를 컴파일하거나 실행하지 않은 source-first 이식이다. 원문/입력 계약과 작은 독립 toy의 검사는 Rust PASS가 아니다. 실제 candidate SHA는 전달된 remote ref receipt 또는 최초 fetch한 target ref에서 고정한다. 과거 PR #82, 과거 Python primitive 9 tests, pre-existing verify CI를 이 포트의 검증으로 사용하지 않는다.
 
+## 이번 최소 수정: C1a
+
+기준 C1 `dd6253912645a2f3a245f7b68413f8c51f15eec5` 이후 Python checker의 실패 기록만 수리했다. Rust 전체·Cargo pair·84개 frozen 함수 입력·두 원 Python reference·허용치는 C1과 byte-identical이다. C1a는 local C2 검증 완료가 아니다.
+
+`evidence/test_checker_receipts.py`의 10개 검사는 subprocess/reference test double을 사용한 오류 기록 시험이다. 실제 Rust와 JAX를 실행하지 않는다. timeout, nonzero exit, reference import 오류, malformed reply 때도 새 `--output` receipt에 실패와 확보된 child 로그를 남긴다. 이미 존재하는 output이면 작업 시작 전에 실패한다. OS에 의해 checker 자체가 SIGKILL되거나 저장장치가 실패하면 완전한 JSON을 보장하지 않으므로 아래 외부 stdout/stderr 로그도 보존한다.
+
 ## 시작
 
 이미 열려 있는 rei_bianchi checkout에서 origin, branch, AGENTS, dirty state를 먼저 확인한다. 새 worktree를 만들거나 사용자 변경을 reset/stash/clean하지 않는다. 같은 파일의 변경과 충돌할 때만 그 파일을 보류한다. 다음은 읽기/취득 명령이다.
@@ -31,10 +37,22 @@ cargo --version
 python --version
 sha256sum -c docs/forward/rust-20260922/CODE_INPUT_MANIFEST.sha256
 python scripts/check_rust_forward_parity.py --check-contract
+python docs/forward/rust-20260922/evidence/test_checker_receipts.py
 cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml -- --check
 cargo test --manifest-path rust/rei_microphysics/Cargo.toml --locked
-python scripts/check_rust_forward_parity.py
+# 새 run 디렉터리에 원로그/JSON을 동시에 보존한다.
+RUN_DIR=$(mktemp -d "${TMPDIR:-/tmp}/rei-microphysics-parity.XXXXXXXX")
+if python scripts/check_rust_forward_parity.py --output "$RUN_DIR/parity.json" \
+    >"$RUN_DIR/parity.stdout.log" 2>"$RUN_DIR/parity.stderr.log"; then
+    PARITY_EXIT=0
+else
+    PARITY_EXIT=$?
+fi
+printf '%s\n' "$PARITY_EXIT" >"$RUN_DIR/parity.exit"
+printf 'PARITY_EXIT=%s LOG_DIR=%s\n' "$PARITY_EXIT" "$RUN_DIR"
 ```
+
+`PARITY_EXIT`가 0이 아니면 PASS로 진행하지 않는다. 0도 해당 고정 함수 f64 비교만 뜻한다.
 
 각 명령 stdout/stderr/exit를 새 원로그로 보존한다. --check-contract는 JAX/Rust를 실행하지 않는다. 인수 없는 checker는 원 Python을 실제 실행하고 `cargo run --locked --example eval_fixture`를 호출한다. 실패 시 Rust-only 또는 재작성 Python 수식으로 대체하지 않는다. --output은 새 경로만 허용한다.
 
@@ -56,7 +74,7 @@ S3 accepted / S4 partial / S5 gated / G10 open / G11-G13 gated, D86 canonical, P
 
 ## 최종 commit/push/반환
 
-C1의 후보 다음으로 최소 수정과 evidence/status/handoff를 한 C2에 묶는다. C2의 최종 HEAD에서 필수 세 명령과 manifest/diff 검사를 다시 실행하고 이후 계산 입력/source/test/policy를 바꾸지 않는다. 최종 로그와 tested SHA는 repo 밖 return receipt에 기록해 자기 SHA 삽입 commit 반복을 피한다. 모든 필수 검증이 닫힌 경우에만 implementation-verified로 표시한다. 실패가 남으면 PARTIAL/FAIL로 반환하고 보존한다.
+최신 미검증 후보(C1a) 다음으로 local 최소 수정과 evidence/status/handoff를 한 C2에 묶는다. C2의 최종 HEAD에서 필수 세 명령과 manifest/diff 검사를 다시 실행하고 이후 계산 입력/source/test/policy를 바꾸지 않는다. 최종 로그와 tested SHA는 repo 밖 return receipt에 기록해 자기 SHA 삽입 commit 반복을 피한다. 모든 필수 검증이 닫힌 경우에만 implementation-verified로 표시한다. 실패가 남으면 PARTIAL/FAIL로 반환하고 보존한다.
 
 ```bash
 git push origin HEAD:refs/heads/forward/rust-reion-kernels-20260922
