@@ -17,7 +17,9 @@ impl PchipTable {
         if knots.len() < 2
             || knots.iter().any(|x| !x.is_finite())
             || knots.windows(2).any(|w| w[0] >= w[1])
-            || coeffs.iter().any(|c| c.len() != knots.len() - 1 || c.iter().any(|x| !x.is_finite()))
+            || coeffs
+                .iter()
+                .any(|c| c.len() != knots.len() - 1 || c.iter().any(|x| !x.is_finite()))
         {
             return Err(ForwardError::InvalidInput("BAD_TABLE"));
         }
@@ -74,17 +76,27 @@ pub fn opacity_cMpc_inv(state: &State, p: &GroupParams) -> Result<[f64; 4], Forw
     let hi = p.sigma_hi_cm2.map(|s| n_hi * s * factor);
     let hei = p.sigma_hei_cm2.map(|s| n_hei * s * factor);
     let heii = p.sigma_heii_cm2.map(|s| n_heii * s * factor);
-    Ok([low0, low1 + hei[1], hi[2] + hei[2], hi[3] + hei[3] + heii[3]])
+    Ok([
+        low0,
+        low1 + hei[1],
+        hi[2] + hei[2],
+        hi[3] + hei[3] + heii[3],
+    ])
 }
 
 /// Comoving count per cMpc^3 per second. Scalar emissivity broadcasting is an
 /// adapter operation: pass [e; 4], not a newly normalized spectral model.
-pub fn photon_rates(state: &State, emissivity: &[f64; 4], p: &GroupParams) -> Result<[f64; 4], ForwardError> {
+pub fn photon_rates(
+    state: &State,
+    emissivity: &[f64; 4],
+    p: &GroupParams,
+) -> Result<[f64; 4], ForwardError> {
     let kappa = opacity_cMpc_inv(state, p)?;
     let a = kappa.map(|k| C_LIGHT * (1.0 + p.redshift) / MPC_CM * k);
     let r = p.redshift_coeff.map(|v| p.hubble_per_s * v);
     let n = state.n_comoving_per_cmpc3;
-    let mut rhs = std::array::from_fn(|g| emissivity[g] * p.source_fraction[g] - (a[g] + r[g]) * n[g]);
+    let mut rhs =
+        std::array::from_fn(|g| emissivity[g] * p.source_fraction[g] - (a[g] + r[g]) * n[g]);
     for g in 0..3 {
         rhs[g] += r[g + 1] * n[g + 1];
     }
@@ -95,8 +107,16 @@ pub fn photon_rates(state: &State, emissivity: &[f64; 4], p: &GroupParams) -> Re
 /// This function does not query an opacity table or the GammaHI state field.
 pub fn gamma_species(state: &State, p: &GroupParams) -> GammaSpecies {
     let prefactor = C_LIGHT * (1.0 + p.redshift).powi(3) / MPC_CM.powi(3);
-    let hi: [f64; 4] = std::array::from_fn(|g| prefactor * p.sigma_hi_cm2[g] * state.n_comoving_per_cmpc3[g]);
-    let hei: [f64; 4] = std::array::from_fn(|g| prefactor * p.sigma_hei_cm2[g] * state.n_comoving_per_cmpc3[g]);
-    let heii: [f64; 4] = std::array::from_fn(|g| prefactor * p.sigma_heii_cm2[g] * state.n_comoving_per_cmpc3[g]);
-    GammaSpecies { hi_per_s: hi.iter().sum(), hei_per_s: hei.iter().sum(), heii_per_s: heii.iter().sum(), group_hi_per_s: hi }
+    let hi: [f64; 4] =
+        std::array::from_fn(|g| prefactor * p.sigma_hi_cm2[g] * state.n_comoving_per_cmpc3[g]);
+    let hei: [f64; 4] =
+        std::array::from_fn(|g| prefactor * p.sigma_hei_cm2[g] * state.n_comoving_per_cmpc3[g]);
+    let heii: [f64; 4] =
+        std::array::from_fn(|g| prefactor * p.sigma_heii_cm2[g] * state.n_comoving_per_cmpc3[g]);
+    GammaSpecies {
+        hi_per_s: hi.iter().sum(),
+        hei_per_s: hei.iter().sum(),
+        heii_per_s: heii.iter().sum(),
+        group_hi_per_s: hi,
+    }
 }

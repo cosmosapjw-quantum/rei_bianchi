@@ -82,3 +82,7 @@ git ls-remote origin refs/heads/forward/rust-reion-kernels-20260922
 tested HEAD와 원격 SHA가 같으면 종료한다. 새 PR/merge/release/force push/workflow_dispatch 또는 전체 재다운로드는 하지 않는다. 자동 verify CI는 verify_repo.py 범위일 뿐 Rust 검증을 대체하지 않는다.
 
 반환은 base/source-candidate/tested/delivery SHA, tree, branch, 변경 경로, command+exit+원로그, 일곱 함수별 PASS/FAIL/SKIPPED, 잔여 오류·HOLD·원격 ref를 포함한 RETURN_HANDOFF_KO.md 한 번으로 한다. 최종 검증된 delivery만 bass exact-rev 후보로 반환하고 bass repository는 변경하지 않는다.
+
+## 2026-09-29 실행 결과
+
+최종 local 검증의 실제 원로그와 종료 판단은 [RETURN_HANDOFF_KO.md](RETURN_HANDOFF_KO.md)에 있다. Cargo 시험은 통과했지만 고정 `transform_exp_extreme` f64 parity가 subnormal 대 0에서 실패했다. `FORWARD_STATUS.json`의 FAIL을 우선하며 이 문서의 위쪽 미래형 검증 명령을 미실행 상태로 해석하지 않는다. 다음 실행 지점은 port 종료 상태 확인이다: `cat docs/forward/rust-20260922/FORWARD_STATUS.json`. BASS exact-rev integration용 PASS SHA는 없다.

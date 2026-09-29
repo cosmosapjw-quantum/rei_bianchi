@@ -24,7 +24,9 @@ pub fn positive_mass_projection(prior: &[f64], total: f64) -> Result<Vec<f64>, F
 
 pub fn signed_transfer_lift(rate: f64, prior: &[f64]) -> Result<SignedLift, ForwardError> {
     if prior.iter().any(|p| !p.is_finite()) {
-        return Err(ForwardError::InvalidInput("CONDITIONAL_MASS_PRIOR_NOT_FINITE"));
+        return Err(ForwardError::InvalidInput(
+            "CONDITIONAL_MASS_PRIOR_NOT_FINITE",
+        ));
     }
     let s: f64 = prior.iter().sum();
     if prior.iter().any(|p| *p < 0.0) || s <= 0.0 {
@@ -36,5 +38,9 @@ pub fn signed_transfer_lift(rate: f64, prior: &[f64]) -> Result<SignedLift, Forw
     let positive: Vec<_> = prior.iter().map(|p| (p / s) * rate.max(0.0)).collect();
     let negative: Vec<_> = prior.iter().map(|p| (p / s) * (-rate).max(0.0)).collect();
     let signed = positive.iter().zip(&negative).map(|(p, n)| p - n).collect();
-    Ok(SignedLift { positive, negative, signed })
+    Ok(SignedLift {
+        positive,
+        negative,
+        signed,
+    })
 }

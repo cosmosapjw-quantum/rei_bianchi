@@ -8,8 +8,8 @@ mod group_rates;
 mod lift;
 
 pub use group_rates::{
-    gamma_species, opacity_cMpc_inv, pchip_eval, photon_rates, transform_z_to_y,
-    PchipTable, C_LIGHT, MPC_CM,
+    gamma_species, opacity_cMpc_inv, pchip_eval, photon_rates, transform_z_to_y, PchipTable,
+    C_LIGHT, MPC_CM,
 };
 pub use lift::{positive_mass_projection, signed_transfer_lift};
 

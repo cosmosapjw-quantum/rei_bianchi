@@ -1,0 +1,766 @@
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/examples/eval_fixture.rs:9:
+     }
+     fn number(&mut self) -> Result<f64, ForwardError> {
+         match self.text()? {
+-            "NaN" => Ok(f64::NAN), "Inf" => Ok(f64::INFINITY), "-Inf" => Ok(f64::NEG_INFINITY),
+-            s => s.parse().map_err(|_| ForwardError::InvalidInput("BAD_FLOAT")),
++            "NaN" => Ok(f64::NAN),
++            "Inf" => Ok(f64::INFINITY),
++            "-Inf" => Ok(f64::NEG_INFINITY),
++            s => s
++                .parse()
++                .map_err(|_| ForwardError::InvalidInput("BAD_FLOAT")),
+         }
+     }
+     fn count(&mut self) -> Result<usize, ForwardError> {
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/examples/eval_fixture.rs:17:
+-        let n: usize = self.text()?.parse().map_err(|_| ForwardError::InvalidInput("BAD_SHAPE"))?;
+-        if n > 65536 { return Err(ForwardError::InvalidInput("BAD_SHAPE")); }
++        let n: usize = self
++            .text()?
++            .parse()
++            .map_err(|_| ForwardError::InvalidInput("BAD_SHAPE"))?;
++        if n > 65536 {
++            return Err(ForwardError::InvalidInput("BAD_SHAPE"));
++        }
+         Ok(n)
+     }
+     fn vector(&mut self, n: usize) -> Result<Vec<f64>, ForwardError> {
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/examples/eval_fixture.rs:22:
+         (0..n).map(|_| self.number()).collect()
+     }
+     fn array<const N: usize>(&mut self) -> Result<[f64; N], ForwardError> {
+-        self.vector(N)?.try_into().map_err(|_| ForwardError::InvalidInput("BAD_SHAPE"))
++        self.vector(N)?
++            .try_into()
++            .map_err(|_| ForwardError::InvalidInput("BAD_SHAPE"))
+     }
+     fn table(&mut self) -> Result<PchipTable, ForwardError> {
+         let n = self.count()?;
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/examples/eval_fixture.rs:29:
+-        if n < 2 { return Err(ForwardError::InvalidInput("BAD_TABLE")); }
++        if n < 2 {
++            return Err(ForwardError::InvalidInput("BAD_TABLE"));
++        }
+         let knots = self.vector(n)?;
+-        let c = [self.vector(n-1)?, self.vector(n-1)?, self.vector(n-1)?, self.vector(n-1)?];
++        let c = [
++            self.vector(n - 1)?,
++            self.vector(n - 1)?,
++            self.vector(n - 1)?,
++            self.vector(n - 1)?,
++        ];
+         PchipTable::new(knots, c)
+     }
+     fn end(&mut self) -> Result<(), ForwardError> {
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/examples/eval_fixture.rs:35:
+-        if self.0.next().is_some() { Err(ForwardError::InvalidInput("BAD_SHAPE")) } else { Ok(()) }
++        if self.0.next().is_some() {
++            Err(ForwardError::InvalidInput("BAD_SHAPE"))
++        } else {
++            Ok(())
++        }
+     }
+ }
+ fn evaluate(op: &str, t: &mut Tokens<'_>) -> Result<Vec<f64>, ForwardError> {
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/examples/eval_fixture.rs:39:
+     match op {
+         "mass" | "signed" => {
+-            let v = t.number()?; let n = t.count()?; let prior = t.vector(n)?; t.end()?;
+-            if op == "mass" { positive_mass_projection(&prior, v) }
+-            else { let s = signed_transfer_lift(v, &prior)?; Ok([s.positive, s.negative, s.signed].concat()) }
++            let v = t.number()?;
++            let n = t.count()?;
++            let prior = t.vector(n)?;
++            t.end()?;
++            if op == "mass" {
++                positive_mass_projection(&prior, v)
++            } else {
++                let s = signed_transfer_lift(v, &prior)?;
++                Ok([s.positive, s.negative, s.signed].concat())
++            }
+         }
+         "transform" => {
+-            let z = t.array::<9>()?; t.end()?; let s = transform_z_to_y(&z);
+-            let mut out = s.n_comoving_per_cmpc3.to_vec(); out.push(s.x_hii);
+-            out.extend(s.helium); out.extend([s.u_erg_per_cm3, s.gamma_hi_per_s]); Ok(out)
++            let z = t.array::<9>()?;
++            t.end()?;
++            let s = transform_z_to_y(&z);
++            let mut out = s.n_comoving_per_cmpc3.to_vec();
++            out.push(s.x_hii);
++            out.extend(s.helium);
++            out.extend([s.u_erg_per_cm3, s.gamma_hi_per_s]);
++            Ok(out)
+         }
+         "pchip" => {
+-            let x = t.number()?; let table = t.table()?; t.end()?; Ok(vec![pchip_eval(&table, x)?])
++            let x = t.number()?;
++            let table = t.table()?;
++            t.end()?;
++            Ok(vec![pchip_eval(&table, x)?])
+         }
+         "gamma" | "opacity" | "photons" => {
+-            let s = State { n_comoving_per_cmpc3: t.array()?, x_hii: t.number()?, helium: t.array()?, u_erg_per_cm3: t.number()?, gamma_hi_per_s: t.number()? };
+-            let z = t.number()?; let nh = t.number()?; let nhe = t.number()?; let h = t.number()?;
+-            let hi = t.array()?; let hei = t.array()?; let heii = t.array()?;
+-            let red = t.array()?; let fraction = t.array()?; let emission = t.array()?;
+-            let tables = [t.table()?, t.table()?]; t.end()?;
+-            let p = GroupParams { redshift: z, n_h_proper_per_cm3: nh, n_he_proper_per_cm3: nhe,
+-                hubble_per_s: h, sigma_hi_cm2: hi, sigma_hei_cm2: hei, sigma_heii_cm2: heii,
+-                redshift_coeff: red, source_fraction: fraction, lowgroup_log_opacity: tables };
+-            if op == "gamma" { let g = gamma_species(&s, &p); let mut out = vec![g.hi_per_s, g.hei_per_s, g.heii_per_s]; out.extend(g.group_hi_per_s); Ok(out) }
+-            else if op == "opacity" { Ok(opacity_cMpc_inv(&s, &p)?.to_vec()) }
+-            else { Ok(photon_rates(&s, &emission, &p)?.to_vec()) }
++            let s = State {
++                n_comoving_per_cmpc3: t.array()?,
++                x_hii: t.number()?,
++                helium: t.array()?,
++                u_erg_per_cm3: t.number()?,
++                gamma_hi_per_s: t.number()?,
++            };
++            let z = t.number()?;
++            let nh = t.number()?;
++            let nhe = t.number()?;
++            let h = t.number()?;
++            let hi = t.array()?;
++            let hei = t.array()?;
++            let heii = t.array()?;
++            let red = t.array()?;
++            let fraction = t.array()?;
++            let emission = t.array()?;
++            let tables = [t.table()?, t.table()?];
++            t.end()?;
++            let p = GroupParams {
++                redshift: z,
++                n_h_proper_per_cm3: nh,
++                n_he_proper_per_cm3: nhe,
++                hubble_per_s: h,
++                sigma_hi_cm2: hi,
++                sigma_hei_cm2: hei,
++                sigma_heii_cm2: heii,
++                redshift_coeff: red,
++                source_fraction: fraction,
++                lowgroup_log_opacity: tables,
++            };
++            if op == "gamma" {
++                let g = gamma_species(&s, &p);
++                let mut out = vec![g.hi_per_s, g.hei_per_s, g.heii_per_s];
++                out.extend(g.group_hi_per_s);
++                Ok(out)
++            } else if op == "opacity" {
++                Ok(opacity_cMpc_inv(&s, &p)?.to_vec())
++            } else {
++                Ok(photon_rates(&s, &emission, &p)?.to_vec())
++            }
+         }
+         _ => Err(ForwardError::InvalidInput("BAD_OPERATION")),
+     }
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/examples/eval_fixture.rs:68:
+ }
+ fn token(v: f64) -> String {
+-    if v.is_nan() { "NaN".into() } else if v == f64::INFINITY { "Inf".into() }
+-    else if v == f64::NEG_INFINITY { "-Inf".into() } else { format!("{v:.17e}") }
++    if v.is_nan() {
++        "NaN".into()
++    } else if v == f64::INFINITY {
++        "Inf".into()
++    } else if v == f64::NEG_INFINITY {
++        "-Inf".into()
++    } else {
++        format!("{v:.17e}")
++    }
+ }
+ /// Convert one complete input record to one reply. A malformed record must
+ /// not discard the replies of later records. Blank lines remain ignorable.
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/examples/eval_fixture.rs:84:
+             "{} OK {}{}",
+             id,
+             values.len(),
+-            values.iter().map(|v| format!(" {}", token(*v))).collect::<String>()
++            values
++                .iter()
++                .map(|v| format!(" {}", token(*v)))
++                .collect::<String>()
+         ),
+         Err(error) => format!("{} ERR {}", id, error.code()),
+     })
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/examples/eval_fixture.rs:110:
+ 
+     #[test]
+     fn missing_operation_is_a_per_record_error() {
+-        assert_eq!(response_line("missing"), Some("missing ERR BAD_SHAPE".into()));
++        assert_eq!(
++            response_line("missing"),
++            Some("missing ERR BAD_SHAPE".into())
++        );
+     }
+ 
+     #[test]
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/examples/eval_fixture.rs:135:
+ 
+     #[test]
+     fn nonfinite_tokens_reach_the_library_error_branch() {
+-        assert_eq!(response_line("x mass 0 1 NaN"), Some("x ERR PRIOR_NOT_FINITE".into()));
+-        assert_eq!(response_line("x signed Inf 1 1"), Some("x ERR NONFINITE_RATE".into()));
++        assert_eq!(
++            response_line("x mass 0 1 NaN"),
++            Some("x ERR PRIOR_NOT_FINITE".into())
++        );
++        assert_eq!(
++            response_line("x signed Inf 1 1"),
++            Some("x ERR NONFINITE_RATE".into())
++        );
+     }
+ }
+ 
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/coverage.rs:2:
+ use crate::ForwardError;
+ 
+ pub const PORTED_FUNCTIONS: [&str; 7] = [
+-    "transform_z_to_y", "pchip_eval", "opacity_cMpc_inv", "photon_rates",
+-    "gamma_species", "positive_mass_projection", "signed_transfer_lift",
++    "transform_z_to_y",
++    "pchip_eval",
++    "opacity_cMpc_inv",
++    "photon_rates",
++    "gamma_species",
++    "positive_mass_projection",
++    "signed_transfer_lift",
+ ];
+ pub const SOURCE_SITES: [&str; 4] = [
+-    "population_t0", "population_t1_predictor", "thermal_tgamma", "thermal_t1_final",
++    "population_t0",
++    "population_t1_predictor",
++    "thermal_tgamma",
++    "thermal_t1_final",
+ ];
+ pub const EXCLUDED: [&str; 6] = [
+-    "bernoulli_kl_mean_projection", "capacity_constrained_group_projection",
+-    "P0_C8", "C9_CP0", "HOST4_H19", "HH_R10",
++    "bernoulli_kl_mean_projection",
++    "capacity_constrained_group_projection",
++    "P0_C8",
++    "C9_CP0",
++    "HOST4_H19",
++    "HH_R10",
+ ];
+ 
+ /// Fail closed: no external physical rate is admitted by this compatibility port.
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/coverage.rs:17:
+ pub fn require_physical_source(_name: &str) -> Result<(), ForwardError> {
+-    Err(ForwardError::MissingAuthority("NO_EXTERNAL_PHYSICAL_SOURCE_ADMITTED"))
++    Err(ForwardError::MissingAuthority(
++        "NO_EXTERNAL_PHYSICAL_SOURCE_ADMITTED",
++    ))
+ }
+ 
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/group_rates.rs:17:
+         if knots.len() < 2
+             || knots.iter().any(|x| !x.is_finite())
+             || knots.windows(2).any(|w| w[0] >= w[1])
+-            || coeffs.iter().any(|c| c.len() != knots.len() - 1 || c.iter().any(|x| !x.is_finite()))
++            || coeffs
++                .iter()
++                .any(|c| c.len() != knots.len() - 1 || c.iter().any(|x| !x.is_finite()))
+         {
+             return Err(ForwardError::InvalidInput("BAD_TABLE"));
+         }
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/group_rates.rs:74:
+     let hi = p.sigma_hi_cm2.map(|s| n_hi * s * factor);
+     let hei = p.sigma_hei_cm2.map(|s| n_hei * s * factor);
+     let heii = p.sigma_heii_cm2.map(|s| n_heii * s * factor);
+-    Ok([low0, low1 + hei[1], hi[2] + hei[2], hi[3] + hei[3] + heii[3]])
++    Ok([
++        low0,
++        low1 + hei[1],
++        hi[2] + hei[2],
++        hi[3] + hei[3] + heii[3],
++    ])
+ }
+ 
+ /// Comoving count per cMpc^3 per second. Scalar emissivity broadcasting is an
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/group_rates.rs:81:
+ /// adapter operation: pass [e; 4], not a newly normalized spectral model.
+-pub fn photon_rates(state: &State, emissivity: &[f64; 4], p: &GroupParams) -> Result<[f64; 4], ForwardError> {
++pub fn photon_rates(
++    state: &State,
++    emissivity: &[f64; 4],
++    p: &GroupParams,
++) -> Result<[f64; 4], ForwardError> {
+     let kappa = opacity_cMpc_inv(state, p)?;
+     let a = kappa.map(|k| C_LIGHT * (1.0 + p.redshift) / MPC_CM * k);
+     let r = p.redshift_coeff.map(|v| p.hubble_per_s * v);
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/group_rates.rs:86:
+     let n = state.n_comoving_per_cmpc3;
+-    let mut rhs = std::array::from_fn(|g| emissivity[g] * p.source_fraction[g] - (a[g] + r[g]) * n[g]);
++    let mut rhs =
++        std::array::from_fn(|g| emissivity[g] * p.source_fraction[g] - (a[g] + r[g]) * n[g]);
+     for g in 0..3 {
+         rhs[g] += r[g + 1] * n[g + 1];
+     }
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/group_rates.rs:95:
+ /// This function does not query an opacity table or the GammaHI state field.
+ pub fn gamma_species(state: &State, p: &GroupParams) -> GammaSpecies {
+     let prefactor = C_LIGHT * (1.0 + p.redshift).powi(3) / MPC_CM.powi(3);
+-    let hi: [f64; 4] = std::array::from_fn(|g| prefactor * p.sigma_hi_cm2[g] * state.n_comoving_per_cmpc3[g]);
+-    let hei: [f64; 4] = std::array::from_fn(|g| prefactor * p.sigma_hei_cm2[g] * state.n_comoving_per_cmpc3[g]);
+-    let heii: [f64; 4] = std::array::from_fn(|g| prefactor * p.sigma_heii_cm2[g] * state.n_comoving_per_cmpc3[g]);
+-    GammaSpecies { hi_per_s: hi.iter().sum(), hei_per_s: hei.iter().sum(), heii_per_s: heii.iter().sum(), group_hi_per_s: hi }
++    let hi: [f64; 4] =
++        std::array::from_fn(|g| prefactor * p.sigma_hi_cm2[g] * state.n_comoving_per_cmpc3[g]);
++    let hei: [f64; 4] =
++        std::array::from_fn(|g| prefactor * p.sigma_hei_cm2[g] * state.n_comoving_per_cmpc3[g]);
++    let heii: [f64; 4] =
++        std::array::from_fn(|g| prefactor * p.sigma_heii_cm2[g] * state.n_comoving_per_cmpc3[g]);
++    GammaSpecies {
++        hi_per_s: hi.iter().sum(),
++        hei_per_s: hei.iter().sum(),
++        heii_per_s: heii.iter().sum(),
++        group_hi_per_s: hi,
++    }
+ }
+ 
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/lib.rs:8:
+ mod lift;
+ 
+ pub use group_rates::{
+-    gamma_species, opacity_cMpc_inv, pchip_eval, photon_rates, transform_z_to_y,
+-    PchipTable, C_LIGHT, MPC_CM,
++    gamma_species, opacity_cMpc_inv, pchip_eval, photon_rates, transform_z_to_y, PchipTable,
++    C_LIGHT, MPC_CM,
+ };
+ pub use lift::{positive_mass_projection, signed_transfer_lift};
+ 
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/lift.rs:24:
+ 
+ pub fn signed_transfer_lift(rate: f64, prior: &[f64]) -> Result<SignedLift, ForwardError> {
+     if prior.iter().any(|p| !p.is_finite()) {
+-        return Err(ForwardError::InvalidInput("CONDITIONAL_MASS_PRIOR_NOT_FINITE"));
++        return Err(ForwardError::InvalidInput(
++            "CONDITIONAL_MASS_PRIOR_NOT_FINITE",
++        ));
+     }
+     let s: f64 = prior.iter().sum();
+     if prior.iter().any(|p| *p < 0.0) || s <= 0.0 {
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/lift.rs:36:
+     let positive: Vec<_> = prior.iter().map(|p| (p / s) * rate.max(0.0)).collect();
+     let negative: Vec<_> = prior.iter().map(|p| (p / s) * (-rate).max(0.0)).collect();
+     let signed = positive.iter().zip(&negative).map(|(p, n)| p - n).collect();
+-    Ok(SignedLift { positive, negative, signed })
++    Ok(SignedLift {
++        positive,
++        negative,
++        signed,
++    })
+ }
+ 
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:4:
+     assert!((a - b).abs() <= 5e-13 * b.abs(), "{a:e} != {b:e}");
+ }
+ fn table() -> PchipTable {
+-    PchipTable::new(vec![-2.0, 0.0, 2.0], [vec![0.0; 2], vec![0.0; 2], vec![0.25; 2], vec![-3.0, -2.5]]).unwrap()
++    PchipTable::new(
++        vec![-2.0, 0.0, 2.0],
++        [vec![0.0; 2], vec![0.0; 2], vec![0.25; 2], vec![-3.0, -2.5]],
++    )
++    .unwrap()
+ }
+ fn state() -> State {
+-    State { n_comoving_per_cmpc3: [1.0, 2.0, 3.0, 4.0], x_hii: 0.8,
+-        helium: [0.6, 0.3, 0.1], u_erg_per_cm3: 1e-12, gamma_hi_per_s: 1e-12 }
++    State {
++        n_comoving_per_cmpc3: [1.0, 2.0, 3.0, 4.0],
++        x_hii: 0.8,
++        helium: [0.6, 0.3, 0.1],
++        u_erg_per_cm3: 1e-12,
++        gamma_hi_per_s: 1e-12,
++    }
+ }
+ fn params() -> GroupParams {
+-    GroupParams { redshift: 3.0, n_h_proper_per_cm3: 1.2e-5, n_he_proper_per_cm3: 1e-6,
+-        hubble_per_s: 1e-16, sigma_hi_cm2: [6e-18, 2e-18, 1e-18, 2e-19],
+-        sigma_hei_cm2: [0.0, 7e-18, 3e-18, 5e-19], sigma_heii_cm2: [0.0, 0.0, 0.0, 1e-18],
+-        redshift_coeff: [1.0, 2.0, 3.0, 4.0], source_fraction: [0.4, 0.3, 0.2, 0.1],
+-        lowgroup_log_opacity: [table(), table()] }
++    GroupParams {
++        redshift: 3.0,
++        n_h_proper_per_cm3: 1.2e-5,
++        n_he_proper_per_cm3: 1e-6,
++        hubble_per_s: 1e-16,
++        sigma_hi_cm2: [6e-18, 2e-18, 1e-18, 2e-19],
++        sigma_hei_cm2: [0.0, 7e-18, 3e-18, 5e-19],
++        sigma_heii_cm2: [0.0, 0.0, 0.0, 1e-18],
++        redshift_coeff: [1.0, 2.0, 3.0, 4.0],
++        source_fraction: [0.4, 0.3, 0.2, 0.1],
++        lowgroup_log_opacity: [table(), table()],
++    }
+ }
+ #[test]
+ fn specified_mass_and_signed_examples() {
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:22:
+-    assert_eq!(positive_mass_projection(&[1.0, 3.0], 8.0).unwrap(), vec![2.0, 6.0]);
++    assert_eq!(
++        positive_mass_projection(&[1.0, 3.0], 8.0).unwrap(),
++        vec![2.0, 6.0]
++    );
+     let s = signed_transfer_lift(-4.0, &[1.0, 3.0]).unwrap();
+     assert_eq!(s.positive, vec![0.0, 0.0]);
+     assert_eq!(s.negative, vec![1.0, 3.0]);
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:27:
+ }
+ #[test]
+ fn zero_support_is_function_specific() {
+-    assert_eq!(positive_mass_projection(&[0.0, 0.0], 0.0).unwrap(), vec![0.0, 0.0]);
+-    assert_eq!(positive_mass_projection(&[], 0.0).unwrap(), Vec::<f64>::new());
++    assert_eq!(
++        positive_mass_projection(&[0.0, 0.0], 0.0).unwrap(),
++        vec![0.0, 0.0]
++    );
++    assert_eq!(
++        positive_mass_projection(&[], 0.0).unwrap(),
++        Vec::<f64>::new()
++    );
+     assert!(positive_mass_projection(&[], 1.0).is_err());
+     assert!(signed_transfer_lift(0.0, &[0.0, 0.0]).is_err());
+     assert!(signed_transfer_lift(0.0, &[]).is_err());
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:35:
+ }
+ #[test]
+ fn error_precedence_and_nonfinite_inputs() {
+-    assert_eq!(positive_mass_projection(&[f64::NAN], -1.0).unwrap_err().code(), "PRIOR_NOT_FINITE");
+-    assert_eq!(positive_mass_projection(&[-1.0], -1.0).unwrap_err().code(), "INVALID_TOTAL");
+-    assert_eq!(positive_mass_projection(&[-1.0], 0.0).unwrap_err().code(), "NEGATIVE_PRIOR");
+-    assert_eq!(signed_transfer_lift(f64::NAN, &[0.0]).unwrap_err().code(), "INVALID_CONDITIONAL_MASS_PRIOR");
+-    assert_eq!(signed_transfer_lift(f64::INFINITY, &[1.0]).unwrap_err().code(), "NONFINITE_RATE");
++    assert_eq!(
++        positive_mass_projection(&[f64::NAN], -1.0)
++            .unwrap_err()
++            .code(),
++        "PRIOR_NOT_FINITE"
++    );
++    assert_eq!(
++        positive_mass_projection(&[-1.0], -1.0).unwrap_err().code(),
++        "INVALID_TOTAL"
++    );
++    assert_eq!(
++        positive_mass_projection(&[-1.0], 0.0).unwrap_err().code(),
++        "NEGATIVE_PRIOR"
++    );
++    assert_eq!(
++        signed_transfer_lift(f64::NAN, &[0.0]).unwrap_err().code(),
++        "INVALID_CONDITIONAL_MASS_PRIOR"
++    );
++    assert_eq!(
++        signed_transfer_lift(f64::INFINITY, &[1.0])
++            .unwrap_err()
++            .code(),
++        "NONFINITE_RATE"
++    );
+     assert!(positive_mass_projection(&[f64::INFINITY], 0.0).is_err());
+ }
+ #[test]
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:46:
+ fn overflow_is_not_silently_renormalized() {
+-    assert_eq!(positive_mass_projection(&[1e308, 1e308], 1.0).unwrap(), vec![0.0, 0.0]);
+-    assert_eq!(signed_transfer_lift(-4.0, &[1e308, 1e308]).unwrap().signed, vec![0.0, 0.0]);
++    assert_eq!(
++        positive_mass_projection(&[1e308, 1e308], 1.0).unwrap(),
++        vec![0.0, 0.0]
++    );
++    assert_eq!(
++        signed_transfer_lift(-4.0, &[1e308, 1e308]).unwrap().signed,
++        vec![0.0, 0.0]
++    );
+ }
+ #[test]
+ fn pchip_knots_interior_and_domain() {
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:53:
+     for (x, y) in [(-2.0, -3.0), (0.0, -2.5), (2.0, -2.0), (0.5, -2.375)] {
+         assert_eq!(pchip_eval(&t, x).unwrap(), y);
+     }
+-    assert!(matches!(pchip_eval(&t, 2.0 + f64::EPSILON * 2.0), Err(ForwardError::OutsideTableDomain { .. })));
++    assert!(matches!(
++        pchip_eval(&t, 2.0 + f64::EPSILON * 2.0),
++        Err(ForwardError::OutsideTableDomain { .. })
++    ));
+     assert!(pchip_eval(&t, -2.0 - f64::EPSILON * 2.0).is_err());
+     assert!(pchip_eval(&t, f64::NAN).is_err());
+     assert!(PchipTable::new(vec![0.0, 0.0], [vec![0.0], vec![0.0], vec![0.0], vec![0.0]]).is_err());
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:60:
+ }
+ #[test]
+ fn pchip_uses_right_interval_at_interior_knot() {
+-    let t = PchipTable::new(vec![-2.0, 0.0, 2.0], [vec![0.0; 2], vec![0.0; 2], vec![0.0; 2], vec![17.0, 29.0]]).unwrap();
++    let t = PchipTable::new(
++        vec![-2.0, 0.0, 2.0],
++        [vec![0.0; 2], vec![0.0; 2], vec![0.0; 2], vec![17.0, 29.0]],
++    )
++    .unwrap();
+     assert_eq!(pchip_eval(&t, 0.0).unwrap(), 29.0);
+ }
+ #[test]
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:67:
+ fn transform_is_max_shifted_without_floors() {
+-    let mut z = [0.0; 9]; z[5] = 1000.0; z[6] = 999.0;
++    let mut z = [0.0; 9];
++    z[5] = 1000.0;
++    z[6] = 999.0;
+     let s = transform_z_to_y(&z);
+     assert_eq!(s.n_comoving_per_cmpc3, [1.0; 4]);
+     assert_eq!(s.x_hii, 0.5);
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:75:
+ }
+ #[test]
+ fn opacity_ownership_and_proper_units() {
+-    let s = state(); let mut p = params();
++    let s = state();
++    let mut p = params();
+     let a = opacity_cMpc_inv(&s, &p).unwrap();
+-    p.sigma_hi_cm2[0] *= 1e6; p.sigma_hi_cm2[1] *= 1e6;
+-    let b = opacity_cMpc_inv(&s, &p).unwrap(); assert_eq!(a, b);
++    p.sigma_hi_cm2[0] *= 1e6;
++    p.sigma_hi_cm2[1] *= 1e6;
++    let b = opacity_cMpc_inv(&s, &p).unwrap();
++    assert_eq!(a, b);
+     p.sigma_hei_cm2[1] *= 2.0;
+     let c = opacity_cMpc_inv(&s, &p).unwrap();
+-    close(c[1] - b[1], p.n_he_proper_per_cm3 * s.helium[0] * 7e-18 * MPC_CM / 4.0);
++    close(
++        c[1] - b[1],
++        p.n_he_proper_per_cm3 * s.helium[0] * 7e-18 * MPC_CM / 4.0,
++    );
+     let alpha_si = (p.n_h_proper_per_cm3 * 1e6) * (1.0 - s.x_hii) * (p.sigma_hi_cm2[2] / 1e4);
+     let he_si = (p.n_he_proper_per_cm3 * 1e6) * s.helium[0] * (p.sigma_hei_cm2[2] / 1e4);
+     close(a[2], (alpha_si + he_si) * (MPC_CM / 100.0) / 4.0);
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:88:
+ }
+ #[test]
+ fn gamma_has_one_comoving_factor_and_no_table_dependency() {
+-    let mut s = state(); let mut p = params();
++    let mut s = state();
++    let mut p = params();
+     let a = gamma_species(&s, &p);
+-    p.redshift = 0.0; let b = gamma_species(&s, &p); close(a.hi_per_s / b.hi_per_s, 64.0);
++    p.redshift = 0.0;
++    let b = gamma_species(&s, &p);
++    close(a.hi_per_s / b.hi_per_s, 64.0);
+     s.gamma_hi_per_s = 1e-200;
+     assert_eq!(gamma_species(&s, &p).hi_per_s, b.hi_per_s);
+     let si = (C_LIGHT / 100.0) / (MPC_CM / 100.0).powi(3)
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:97:
+-        * p.sigma_hi_cm2.iter().zip(s.n_comoving_per_cmpc3).map(|(sig, n)| sig / 1e4 * n).sum::<f64>();
++        * p.sigma_hi_cm2
++            .iter()
++            .zip(s.n_comoving_per_cmpc3)
++            .map(|(sig, n)| sig / 1e4 * n)
++            .sum::<f64>();
+     close(b.hi_per_s, si);
+ }
+ #[test]
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:101:
+ fn isolated_groups_and_no_emissivity() {
+-    let mut s = state(); let p = params();
++    let mut s = state();
++    let p = params();
+     for g in 0..4 {
+-        s.n_comoving_per_cmpc3 = [0.0; 4]; s.n_comoving_per_cmpc3[g] = 1.0;
++        s.n_comoving_per_cmpc3 = [0.0; 4];
++        s.n_comoving_per_cmpc3[g] = 1.0;
+         let rhs = photon_rates(&s, &[0.0; 4], &p).unwrap();
+         for i in 0..4 {
+-            if i == g { assert!(rhs[i] < 0.0); }
+-            else if i + 1 == g { close(rhs[i], p.hubble_per_s * p.redshift_coeff[g]); }
+-            else { assert_eq!(rhs[i], 0.0); }
++            if i == g {
++                assert!(rhs[i] < 0.0);
++            } else if i + 1 == g {
++                close(rhs[i], p.hubble_per_s * p.redshift_coeff[g]);
++            } else {
++                assert_eq!(rhs[i], 0.0);
++            }
+         }
+     }
+     s.n_comoving_per_cmpc3 = [0.0; 4];
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:113:
+-    assert_eq!(photon_rates(&s, &[10.0; 4], &p).unwrap(), [4.0, 3.0, 2.0, 1.0]);
++    assert_eq!(
++        photon_rates(&s, &[10.0; 4], &p).unwrap(),
++        [4.0, 3.0, 2.0, 1.0]
++    );
+ }
+ #[test]
+ fn redshift_internal_transfer_telescopes() {
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:117:
+-    let s = state(); let mut p = params(); p.hubble_per_s = 0.1;
++    let s = state();
++    let mut p = params();
++    p.hubble_per_s = 0.1;
+     let rhs = photon_rates(&s, &[0.0; 4], &p).unwrap();
+     let k = opacity_cMpc_inv(&s, &p).unwrap();
+-    let total: f64 = (0..4).map(|g| rhs[g] + C_LIGHT * 4.0 / MPC_CM * k[g] * s.n_comoving_per_cmpc3[g]).sum();
++    let total: f64 = (0..4)
++        .map(|g| rhs[g] + C_LIGHT * 4.0 / MPC_CM * k[g] * s.n_comoving_per_cmpc3[g])
++        .sum();
+     close(total, -0.1);
+ }
+ #[test]
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:124:
+ fn four_site_calls_do_not_share_state() {
+-    let p = params(); let mut sites = Vec::new();
+-    for i in 0..4 { let mut s = state(); s.x_hii = 0.1 + 0.2 * i as f64; sites.push(s); }
+-    let first: Vec<_> = sites.iter().map(|s| opacity_cMpc_inv(s, &p).unwrap()).collect();
+-    for i in (0..4).rev() { assert_eq!(opacity_cMpc_inv(&sites[i], &p).unwrap(), first[i]); }
++    let p = params();
++    let mut sites = Vec::new();
++    for i in 0..4 {
++        let mut s = state();
++        s.x_hii = 0.1 + 0.2 * i as f64;
++        sites.push(s);
++    }
++    let first: Vec<_> = sites
++        .iter()
++        .map(|s| opacity_cMpc_inv(s, &p).unwrap())
++        .collect();
++    for i in (0..4).rev() {
++        assert_eq!(opacity_cMpc_inv(&sites[i], &p).unwrap(), first[i]);
++    }
+     assert_ne!(first[0][2], first[3][2]);
+ }
+ #[test]
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:132:
+ fn registry_does_not_admit_missing_physical_sources() {
+     assert_eq!(coverage::PORTED_FUNCTIONS.len(), 7);
+     for key in ["P0_C8", "C9_CP0", "HOST4_H19", "HH_R10"] {
+-        assert!(matches!(coverage::require_physical_source(key), Err(ForwardError::MissingAuthority(_))));
++        assert!(matches!(
++            coverage::require_physical_source(key),
++            Err(ForwardError::MissingAuthority(_))
++        ));
+     }
+ }
+ 
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:143:
+     // p(x)=x^3-2*x^2+x/2+1, expanded about each left knot.
+     let t = PchipTable::new(
+         vec![-2.0, 0.5, 4.0],
+-        [vec![1.0, 1.0], vec![-8.0, -0.5], vec![20.5, -0.75], vec![-16.0, 0.875]],
+-    ).unwrap();
+-    for (x, y) in [(-2.0, -16.0), (-1.0, -2.5), (0.0, 1.0),
+-                   (0.5, 0.875), (1.0, 0.5), (2.0, 2.0), (3.0, 11.5), (4.0, 35.0)] {
++        [
++            vec![1.0, 1.0],
++            vec![-8.0, -0.5],
++            vec![20.5, -0.75],
++            vec![-16.0, 0.875],
++        ],
++    )
++    .unwrap();
++    for (x, y) in [
++        (-2.0, -16.0),
++        (-1.0, -2.5),
++        (0.0, 1.0),
++        (0.5, 0.875),
++        (1.0, 0.5),
++        (2.0, 2.0),
++        (3.0, 11.5),
++        (4.0, 35.0),
++    ] {
+         assert_eq!(pchip_eval(&t, x).unwrap(), y);
+     }
+ }
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:153:
+ #[test]
+ fn minimal_table_and_each_invalid_constructor_branch() {
+-    let t = PchipTable::new(
+-        vec![0.0, 2.0], [vec![1.0], vec![2.0], vec![3.0], vec![4.0]],
+-    ).unwrap();
++    let t = PchipTable::new(vec![0.0, 2.0], [vec![1.0], vec![2.0], vec![3.0], vec![4.0]]).unwrap();
+     assert_eq!(pchip_eval(&t, 1.0).unwrap(), 10.0);
+     assert_eq!(pchip_eval(&t, 2.0).unwrap(), 26.0);
+     for knots in [vec![], vec![0.0], vec![1.0, 0.0], vec![0.0, f64::INFINITY]] {
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:161:
+-        assert_eq!(PchipTable::new(knots, [vec![0.0], vec![0.0], vec![0.0], vec![0.0]])
+-            .unwrap_err().code(), "BAD_TABLE");
++        assert_eq!(
++            PchipTable::new(knots, [vec![0.0], vec![0.0], vec![0.0], vec![0.0]])
++                .unwrap_err()
++                .code(),
++            "BAD_TABLE"
++        );
+     }
+-    assert_eq!(PchipTable::new(vec![0.0, 1.0],
+-        [vec![], vec![0.0], vec![0.0], vec![0.0]]).unwrap_err().code(), "BAD_TABLE");
+-    assert_eq!(PchipTable::new(vec![0.0, 1.0],
+-        [vec![0.0], vec![0.0], vec![f64::NAN], vec![0.0]])
+-        .unwrap_err().code(), "BAD_TABLE");
++    assert_eq!(
++        PchipTable::new(vec![0.0, 1.0], [vec![], vec![0.0], vec![0.0], vec![0.0]])
++            .unwrap_err()
++            .code(),
++        "BAD_TABLE"
++    );
++    assert_eq!(
++        PchipTable::new(
++            vec![0.0, 1.0],
++            [vec![0.0], vec![0.0], vec![f64::NAN], vec![0.0]]
++        )
++        .unwrap_err()
++        .code(),
++        "BAD_TABLE"
++    );
+ }
+ #[test]
+ fn table_errors_propagate_to_opacity_and_photon_rates() {
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:174:
+     for gamma in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+         s.gamma_hi_per_s = gamma;
+         assert_eq!(opacity_cMpc_inv(&s, &p).unwrap_err().code(), "NONFINITE_X");
+-        assert_eq!(photon_rates(&s, &[0.0; 4], &p).unwrap_err().code(), "NONFINITE_X");
++        assert_eq!(
++            photon_rates(&s, &[0.0; 4], &p).unwrap_err().code(),
++            "NONFINITE_X"
++        );
+     }
+     for gamma in [1e-100, 1e100] {
+         s.gamma_hi_per_s = gamma;
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:181:
+-        assert_eq!(opacity_cMpc_inv(&s, &p).unwrap_err().code(), "OUTSIDE_TABLE_DOMAIN");
+-        assert_eq!(photon_rates(&s, &[0.0; 4], &p).unwrap_err().code(), "OUTSIDE_TABLE_DOMAIN");
++        assert_eq!(
++            opacity_cMpc_inv(&s, &p).unwrap_err().code(),
++            "OUTSIDE_TABLE_DOMAIN"
++        );
++        assert_eq!(
++            photon_rates(&s, &[0.0; 4], &p).unwrap_err().code(),
++            "OUTSIDE_TABLE_DOMAIN"
++        );
+     }
+ }
+ #[test]
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:197:
+     p.redshift_coeff = [f64::NAN; 4];
+     p.source_fraction = [f64::NAN; 4];
+     // Construction requires valid tables; gamma must not evaluate either.
+-    let unrelated = PchipTable::new(vec![100.0, 200.0],
+-        [vec![3.0], vec![4.0], vec![5.0], vec![6.0]]).unwrap();
++    let unrelated = PchipTable::new(
++        vec![100.0, 200.0],
++        [vec![3.0], vec![4.0], vec![5.0], vec![6.0]],
++    )
++    .unwrap();
+     p.lowgroup_log_opacity = [unrelated.clone(), unrelated];
+     let after = gamma_species(&s, &p);
+     assert_eq!(before.hi_per_s, after.hi_per_s);
+Diff in /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/tests/forward.rs:231:
+ #[test]
+ fn lift_zero_entries_and_signed_decomposition_preserve_locked_totals() {
+     let p = [0.0, 2.0, 0.0, 6.0];
+-    assert_eq!(positive_mass_projection(&p, 16.0).unwrap(), vec![0.0, 4.0, 0.0, 12.0]);
++    assert_eq!(
++        positive_mass_projection(&p, 16.0).unwrap(),
++        vec![0.0, 4.0, 0.0, 12.0]
++    );
+     for rate in [-8.0, 0.0, 8.0] {
+         let s = signed_transfer_lift(rate, &p).unwrap();
+         assert_eq!(s.signed.iter().sum::<f64>(), rate);
