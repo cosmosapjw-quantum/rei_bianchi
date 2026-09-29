@@ -1,12 +1,12 @@
 # rei_microphysics 최종 반환 — 고정 parity FAIL
 
-원 이론방에 붙여넣을 반환이다. `TESTED_SHA`는 아래 증거 commit을 만든 뒤 채운다. 이 문서는 기존 scientific state의 PASS를 변경하지 않는다.
+원 이론방에 붙여넣을 반환이다. 이 문서는 기존 scientific state의 PASS를 변경하지 않는다.
 
 - Repository: `cosmosapjw-quantum/rei_bianchi`
 - Base `main`: `ae3402713c4b6530ab2b27f008f5f5d5c6a999ed`
 - Source candidate: `5c56c8e905abb360c72603b8a5f7d653a869b159`
-- Tested SHA: `PENDING_C2_COMMIT`
-- Delivery SHA: 최종 원격 ref 확인 receipt에서 확정
+- Tested SHA: `fbce265b8182cc4c9383caa554a71c8524cef8f7`
+- Delivery SHA: 이 파일이 실린 최종 commit (`git rev-parse HEAD`)을 `git ls-remote origin refs/heads/forward/rust-reion-kernels-20260922`와 대조해 확정
 - Branch: `forward/rust-reion-kernels-20260922`
 - 결과: 일곱 함수의 Rust source 이식·컴파일·26개 Cargo 시험 PASS. 고정 f64 parity는 83/84 PASS, `transform_z_to_y`의 `transform_exp_extreme` FAIL. 따라서 전체 pinned-function parity와 BASS exact-rev dependency 후보는 **FAIL / 보류**.
 
@@ -16,7 +16,7 @@ Python 원문 두 blob은 각각 `3d806e1c1d3bb523bb3c339d1a141f67d7f10069`, `6f
 
 ## 명령·exit·원로그
 
-원로그: [`evidence/final_local_20260929/`](evidence/final_local_20260929/). `final-commands.json`에 exact argv와 각 exit가 있다.
+원로그: [`evidence/final_local_20260929/`](evidence/final_local_20260929/). `final-commands.json`에 작업트리 실행 argv/exit, `commit-commands.json`에 위 tested commit의 재실행 argv/exit가 있다. 양쪽에서 fmt/test는 0, parity는 1이다.
 
 | 명령 | exit | 결과 |
 |---|---:|---|

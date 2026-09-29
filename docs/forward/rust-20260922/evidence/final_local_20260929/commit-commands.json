@@ -1,0 +1,58 @@
+{
+  "tested_commit": "fbce265b8182cc4c9383caa554a71c8524cef8f7",
+  "results": [
+    {
+      "name": "commit_manifest",
+      "argv": [
+        "sha256sum",
+        "-c",
+        "docs/forward/rust-20260922/CODE_INPUT_MANIFEST.sha256"
+      ],
+      "exit": 0,
+      "seconds": 0.003
+    },
+    {
+      "name": "commit_fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "rust/rei_microphysics/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "seconds": 0.063
+    },
+    {
+      "name": "commit_test",
+      "argv": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/rei_microphysics/Cargo.toml",
+        "--locked"
+      ],
+      "exit": 0,
+      "seconds": 0.056
+    },
+    {
+      "name": "commit_parity",
+      "argv": [
+        "cuhg-telemetry",
+        "run",
+        "--project",
+        "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+        "--task",
+        "rei-rust-forward-20260929",
+        "--",
+        "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.venv/bin/python",
+        "scripts/check_rust_forward_parity.py",
+        "--output",
+        "/tmp/rei-rust-forward-final-s7db8a44/commit-parity.json"
+      ],
+      "exit": 1,
+      "seconds": 2.361
+    }
+  ]
+}
