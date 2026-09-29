@@ -1,15 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
-ROOT=$(cd "$(dirname "$0")/.." && pwd)
-cd "$ROOT"
-PYTHON=${PYTHON:-python3}
-if [[ ! -d .venv ]]; then "$PYTHON" -m venv .venv; fi
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements-lock.txt
-python -m pip install -e .
-python scripts/verify_repo.py
-printf '
-Sandbox ready. Current handoff:
-%s
-' "$ROOT/handoff/CURRENT_HANDOFF_PROMPT.md"
+printf '%s\n' 'The legacy Python/JAX sandbox is retired for this checkout.' 'For the scoped Rust crate: cargo test --manifest-path rust/rei_microphysics/Cargo.toml --locked' >&2
+exit 2

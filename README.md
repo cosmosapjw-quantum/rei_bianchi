@@ -3,6 +3,17 @@
 Durable development and backup repository for extending homogeneous
 reionization and CMB transfer to nonlinear, finite-tilt Bianchi cosmologies.
 
+## Development runtime
+
+New implementation work uses Rust. The scoped `rei_microphysics` crate lives in
+`rust/rei_microphysics`. The former Python/JAX source and packaging are retained
+byte-for-byte in [`docs/legacy-python/`](docs/legacy-python/); the active
+project virtual environment has been removed. The Rust crate covers seven
+pinned functions and is not a replacement for the full thermochemistry solver
+or its validated enclosure. Its frozen Python–Rust parity run failed one
+extreme subnormal case; see
+[`RETURN_HANDOFF_KO.md`](docs/forward/rust-20260922/RETURN_HANDOFF_KO.md).
+
 ## Current scientific state
 
 ```text
@@ -10,7 +21,7 @@ P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-R1-R1-CROSS-SITE-STATE-FEEDBACK-REM
 DURABLE_PASS_R2_R1A_R1_R1_R1_R1_R1_FOUR_SITE_MICROSTEP_ENCLOSURE_LOCAL_ERROR_CONTAINMENT_TABLE_RESTART_AND_STRUCTURAL_LEDGER_PASS_FIRST_CANONICAL_INTERVAL_AUTHORIZED
 ```
 
-The current code certifies one four-site FLRW thermochemistry microstep at
+The retired Python research code certified one four-site FLRW thermochemistry microstep at
 partition `2048` in all three shape lanes. The maximum public uncertainty width
 is `4.52488656108585e-05 < 2e-3`; the validated full-step/two-half-step local
 error is `1.1621773858117024e-04 < 2e-4`. The new image contains the inherited
@@ -23,7 +34,8 @@ This is not the complete first canonical interval or production history.
 Production node chemistry, `R2C-R2`, `B2C2B`, recombination splice, CAMB
 transfer, and Bianchi feedback remain unauthorized.
 
-Next:
+Historical next science stage (no Rust implementation or execution authority
+is implied):
 
 ```text
 P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-R1-R1-R1-UNCERTAINTY-QUALIFIED-FIRST-CANONICAL-INTERVAL-ADAPTIVE-HISTORY
@@ -54,8 +66,9 @@ is allowed.
 ## Verification
 
 ```bash
-./scripts/bootstrap_sandbox.sh
-python scripts/verify_repo.py
+cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml -- --check
+cargo test --manifest-path rust/rei_microphysics/Cargo.toml --locked
+python scripts/verify_repo.py  # historical artifact identity check only
 ```
 
 ## Remote status
