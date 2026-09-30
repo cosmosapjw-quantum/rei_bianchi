@@ -6,8 +6,9 @@ Rust-only `rei_microphysics` crate. BASS may pin exact revision
 delivery branch is `forward/rust-reion-kernels-20260922`; verify its exact tip
 by `git ls-remote` before intake.
 
-The historical Python/JAX 83/84 result is preserved as a cross-runtime
-divergence. It is no longer an active gate. Rust `exp(-745)` is the positive
+The historical 83/84 cross-runtime result remains in prior raw receipts and
+Git commits. Its executable checker was removed from the current branch and is
+not an active gate. Rust `exp(-745)` is the positive
 minimum subnormal `4.94065645841246544e-324`; no cutoff or flush-to-zero
 adapter was introduced. The tested commit passed 26 Rust integration tests,
 5 frontend tests, fmt, and clippy. The push CI uses Cargo, while the separate

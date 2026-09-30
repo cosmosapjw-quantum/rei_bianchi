@@ -13,12 +13,13 @@ required to build, test, or execute these seven functions.
   `git ls-remote origin refs/heads/forward/rust-reion-kernels-20260922`.
 - [Execution receipt](EXECUTION_RECEIPT.json) has exact commands, exit codes,
   and raw logs under `evidence/`.
-- [API map](RUST_CANONICAL_API.json) and [purge audit](RUST_ONLY_PURGE_AUDIT.json)
-  define the bounded implementation surface.
+- [API map](RUST_CANONICAL_API.json) records the original seven-function
+  implementation surface. The current joint-parent development status is in
+  [the forward note](../RUST_JOINT_PARENT_AND_JAX_RETIREMENT_20260930.md).
 
-The former 83/84 Python/JAX comparison is retained in the
-[legacy adjudication](LEGACY_JAX_PARITY_ADJUDICATION.md) and its original raw
-receipt. It remains a true historical divergence, with no active Rust gate.
+The former 83/84 cross-runtime comparison remains in raw historical receipts
+and prior Git commits. Its executable checker and legacy package are removed
+from the current branch; it is not an active Rust gate.
 Rust `f64` behavior permits positive subnormals; `exp(-745)` is
 `4.94065645841246544e-324` on the tested toolchain. No FTZ shim or cutoff
 was added.

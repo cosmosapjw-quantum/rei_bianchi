@@ -6,13 +6,14 @@ reionization and CMB transfer to nonlinear, finite-tilt Bianchi cosmologies.
 ## Development runtime
 
 New implementation work uses Rust. The scoped `rei_microphysics` crate lives in
-`rust/rei_microphysics`. The former Python/JAX source and packaging are retained
-byte-for-byte in [`docs/legacy-python/`](docs/legacy-python/); the active
-project virtual environment has been removed. The Rust crate covers seven
-pinned functions and is not a replacement for the full thermochemistry solver
-or its validated enclosure. Rust binary64 behavior is canonical for this
-implementation. The former Python–Rust parity run remains historical evidence;
-see [Rust-only forward closeout](docs/forward/rust-only-20260930/00_READ_FIRST.md).
+`rust/rei_microphysics`. Retired Python/JAX package files and the executable
+cross-runtime checker have been removed from this branch. Prior Git commits and
+raw stage receipts remain available for historical analysis; their old commands
+are not active development instructions. The crate covers seven pinned
+fixed-input functions and a shared-parent affine difference primitive. It is
+not a replacement for the full thermochemistry solver or its validated
+enclosure. Rust binary64 behavior is canonical for this implementation. See
+[current Rust development status](docs/forward/RUST_JOINT_PARENT_AND_JAX_RETIREMENT_20260930.md).
 
 ## Current scientific state
 
@@ -68,6 +69,8 @@ is allowed.
 ```bash
 cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check
 cargo test --manifest-path rust/rei_microphysics/Cargo.toml --workspace --locked
+cargo clippy --manifest-path rust/rei_microphysics/Cargo.toml --workspace --all-targets --locked -- -D warnings
+python scripts/verify_repo.py
 ```
 
 ## Remote status
