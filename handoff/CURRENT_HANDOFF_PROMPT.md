@@ -90,3 +90,8 @@ CAMB transfer, or Bianchi-family sweep in the next stage.
 
 Scoped source-only Rust candidate: [local verification handoff](../docs/forward/rust-20260922/START_HANDOFF_KO.md).
 No scientific-state or production admission change.
+
+Rust-only seven-function implementation closeout:
+[current fixed-input handoff](../docs/forward/rust-only-20260930/00_READ_FIRST.md).
+The Python commands above describe the historical scientific continuation,
+not the active Rust build or its acceptance gate.
