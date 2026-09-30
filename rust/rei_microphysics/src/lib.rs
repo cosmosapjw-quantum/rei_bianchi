@@ -1,5 +1,5 @@
-//! Source-first compatibility candidate, not a thermochemistry solver.
-//! No compiled/parity result is asserted by this crate's presence.
+//! Rust-only fixed-input microphysics kernels, not a thermochemistry solver.
+//! f64 tests are implementation evidence, not a validated enclosure.
 //! N is comoving count per cMpc^3; atomic densities are proper cm^-3.
 #![forbid(unsafe_code)]
 

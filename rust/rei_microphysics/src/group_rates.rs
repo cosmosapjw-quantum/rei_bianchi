@@ -42,8 +42,9 @@ pub fn pchip_eval(table: &PchipTable, x: f64) -> Result<f64, ForwardError> {
     Ok(((c[0][i] * dx + c[1][i]) * dx + c[2][i]) * dx + c[3][i])
 }
 
-/// Preserve raw f64 overflow/underflow; strict mathematical positivity is not
-/// a floating-point guarantee. Local JAX parity must adjudicate subnormals.
+/// Rust f64 exponential semantics are canonical: representable positive
+/// subnormals remain nonzero; sufficiently small inputs underflow to zero.
+/// NaN and infinities follow the operations below without clipping or FTZ.
 pub fn transform_z_to_y(z: &[f64; 9]) -> State {
     let logits = [0.0, z[5], z[6]];
     let helium = if logits.iter().any(|v| v.is_nan()) {

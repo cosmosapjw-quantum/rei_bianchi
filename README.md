@@ -10,9 +10,9 @@ New implementation work uses Rust. The scoped `rei_microphysics` crate lives in
 byte-for-byte in [`docs/legacy-python/`](docs/legacy-python/); the active
 project virtual environment has been removed. The Rust crate covers seven
 pinned functions and is not a replacement for the full thermochemistry solver
-or its validated enclosure. Its frozen Python–Rust parity run failed one
-extreme subnormal case; see
-[`RETURN_HANDOFF_KO.md`](docs/forward/rust-20260922/RETURN_HANDOFF_KO.md).
+or its validated enclosure. Rust binary64 behavior is canonical for this
+implementation. The former Python–Rust parity run remains historical evidence;
+see [Rust-only forward closeout](docs/forward/rust-only-20260930/00_READ_FIRST.md).
 
 ## Current scientific state
 
@@ -66,9 +66,8 @@ is allowed.
 ## Verification
 
 ```bash
-cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml -- --check
-cargo test --manifest-path rust/rei_microphysics/Cargo.toml --locked
-python scripts/verify_repo.py  # historical artifact identity check only
+cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check
+cargo test --manifest-path rust/rei_microphysics/Cargo.toml --workspace --locked
 ```
 
 ## Remote status

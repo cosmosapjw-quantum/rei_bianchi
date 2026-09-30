@@ -177,13 +177,13 @@ fn isolated_groups_and_no_emissivity() {
         s.n_comoving_per_cmpc3 = [0.0; 4];
         s.n_comoving_per_cmpc3[g] = 1.0;
         let rhs = photon_rates(&s, &[0.0; 4], &p).unwrap();
-        for i in 0..4 {
+        for (i, value) in rhs.iter().enumerate() {
             if i == g {
-                assert!(rhs[i] < 0.0);
+                assert!(*value < 0.0);
             } else if i + 1 == g {
-                close(rhs[i], p.hubble_per_s * p.redshift_coeff[g]);
+                close(*value, p.hubble_per_s * p.redshift_coeff[g]);
             } else {
-                assert_eq!(rhs[i], 0.0);
+                assert_eq!(*value, 0.0);
             }
         }
     }
@@ -398,4 +398,115 @@ fn transform_preserves_extreme_classifications_without_floor() {
     assert_eq!(s.helium, [1.0, 0.0, 0.0]);
     assert_eq!(s.u_erg_per_cm3, 0.0);
     assert_eq!(s.gamma_hi_per_s, f64::INFINITY);
+}
+
+#[test]
+fn transform_uses_rust_binary64_underflow() {
+    let mut z = [0.0; 9];
+    for (exponent, expected) in [
+        (0.0, 1.0),
+        (-708.0, (-708.0_f64).exp()),
+        (-709.0, (-709.0_f64).exp()),
+        (-745.0, f64::from_bits(1)),
+        (-746.0, 0.0),
+    ] {
+        z[0] = exponent;
+        let actual = transform_z_to_y(&z).n_comoving_per_cmpc3[0];
+        assert_eq!(actual, expected, "exp({exponent})");
+    }
+    z[0] = -708.0;
+    assert!(transform_z_to_y(&z).n_comoving_per_cmpc3[0] >= f64::MIN_POSITIVE);
+    z[0] = -709.0;
+    let subnormal = transform_z_to_y(&z).n_comoving_per_cmpc3[0];
+    assert!(subnormal > 0.0 && subnormal < f64::MIN_POSITIVE);
+    z[0] = -745.0;
+    assert_eq!(transform_z_to_y(&z).n_comoving_per_cmpc3[0].to_bits(), 1);
+}
+
+#[test]
+fn transform_finite_invariants_and_nonfinite_contract() {
+    let z = [0.0, -708.0, -709.0, -745.0, 0.0, 1.0, -2.0, 0.0, -708.0];
+    let s = transform_z_to_y(&z);
+    assert!(s.n_comoving_per_cmpc3.iter().all(|v| *v > 0.0));
+    assert!(s.u_erg_per_cm3 > 0.0 && s.gamma_hi_per_s > 0.0);
+    assert!(s.x_hii > 0.0 && s.x_hii < 1.0);
+    assert!(s.helium.iter().all(|v| *v >= 0.0 && *v <= 1.0));
+    close(s.helium.iter().sum(), 1.0);
+    let mut edge = [0.0; 9];
+    edge[4] = 1000.0;
+    assert_eq!(transform_z_to_y(&edge).x_hii, 1.0);
+    edge[4] = -1000.0;
+    assert_eq!(transform_z_to_y(&edge).x_hii, 0.0);
+    edge[0] = f64::NAN;
+    assert!(transform_z_to_y(&edge).n_comoving_per_cmpc3[0].is_nan());
+    edge[0] = f64::INFINITY;
+    assert_eq!(
+        transform_z_to_y(&edge).n_comoving_per_cmpc3[0],
+        f64::INFINITY
+    );
+    edge[0] = f64::NEG_INFINITY;
+    assert_eq!(transform_z_to_y(&edge).n_comoving_per_cmpc3[0], 0.0);
+    edge[5] = f64::INFINITY;
+    assert!(transform_z_to_y(&edge).helium.iter().all(|v| v.is_nan()));
+}
+
+#[test]
+fn high_group_atomic_owners_remain_explicit() {
+    let s = state();
+    let mut p = params();
+    let before = opacity_cMpc_inv(&s, &p).unwrap();
+    let factor = MPC_CM / (1.0 + p.redshift);
+    p.sigma_hi_cm2[2] += 2e-18;
+    p.sigma_heii_cm2[3] += 3e-18;
+    let after = opacity_cMpc_inv(&s, &p).unwrap();
+    assert_eq!(after[0], before[0]);
+    assert_eq!(after[1], before[1]);
+    close(
+        after[2] - before[2],
+        p.n_h_proper_per_cm3 * (1.0 - s.x_hii) * 2e-18 * factor,
+    );
+    close(
+        after[3] - before[3],
+        p.n_he_proper_per_cm3 * s.helium[1] * 3e-18 * factor,
+    );
+}
+
+#[test]
+fn gamma_group_species_have_separate_atomic_accumulations() {
+    let mut s = state();
+    let mut p = params();
+    p.redshift = 0.0;
+    let prefactor = C_LIGHT / MPC_CM.powi(3);
+    for g in 0..4 {
+        s.n_comoving_per_cmpc3 = [0.0; 4];
+        s.n_comoving_per_cmpc3[g] = 2.0;
+        let rates = gamma_species(&s, &p);
+        close(rates.hi_per_s, prefactor * p.sigma_hi_cm2[g] * 2.0);
+        close(rates.hei_per_s, prefactor * p.sigma_hei_cm2[g] * 2.0);
+        close(rates.heii_per_s, prefactor * p.sigma_heii_cm2[g] * 2.0);
+        for i in 0..4 {
+            if i == g {
+                close(rates.group_hi_per_s[i], rates.hi_per_s);
+            } else {
+                assert_eq!(rates.group_hi_per_s[i], 0.0);
+            }
+        }
+    }
+}
+
+#[test]
+fn finite_projection_totals_and_signed_reconstruction() {
+    let prior = [0.0, 1.0, 2.0, 3.0];
+    for total in [0.0, 6.0, 12.0] {
+        let projected = positive_mass_projection(&prior, total).unwrap();
+        close(projected.iter().sum(), total);
+        assert_eq!(projected[0], 0.0);
+    }
+    for rate in [-12.0, 0.0, 12.0] {
+        let lift = signed_transfer_lift(rate, &prior).unwrap();
+        close(lift.signed.iter().sum(), rate);
+        for i in 0..prior.len() {
+            assert_eq!(lift.positive[i] - lift.negative[i], lift.signed[i]);
+        }
+    }
 }

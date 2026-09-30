@@ -32,23 +32,23 @@ jobs:
           HEAD_LINE=$(git -c http.extraHeader="AUTHORIZATION: basic $AUTH" \
             ls-remote "$REMOTE" HEAD)
           SHA=${HEAD_LINE%%[[:space:]]*}
-          python - "$SHA" <<'PY'
-          import datetime, json, sys
-          from pathlib import Path
-          sha = sys.argv[1]
-          committed = json.loads(Path('external/rec_bianchi.lock.json').read_text())
-          receipt = {
-              'repository': 'https://github.com/cosmosapjw-quantum/rec_bianchi',
-              'checked_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-              'remote_head_sha': sha,
-              'committed_head_sha': committed.get('head_sha'),
-              'changed_since_committed_lock': committed.get('head_sha') not in (None, sha),
-          }
-          Path('rec_bianchi_monitor_receipt.json').write_text(json.dumps(receipt, indent=2))
-          print(json.dumps(receipt, indent=2))
-          if receipt['changed_since_committed_lock']:
-              raise SystemExit('rec_bianchi HEAD changed; review and update the lock intentionally')
-          PY
+          COMMITTED=$(jq -r '.head_sha // empty' external/rec_bianchi.lock.json)
+          CHECKED_UTC=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          jq -n \
+            --arg sha "$SHA" \
+            --arg committed "$COMMITTED" \
+            --arg checked "$CHECKED_UTC" \
+            '{repository: "https://github.com/cosmosapjw-quantum/rec_bianchi",
+              checked_utc: $checked,
+              remote_head_sha: $sha,
+              committed_head_sha: (if $committed == "" then null else $committed end),
+              changed_since_committed_lock: ($committed != "" and $committed != $sha)}' \
+            > rec_bianchi_monitor_receipt.json
+          cat rec_bianchi_monitor_receipt.json
+          if jq -e '.changed_since_committed_lock' rec_bianchi_monitor_receipt.json >/dev/null; then
+            echo 'rec_bianchi HEAD changed; review and update the lock intentionally' >&2
+            exit 1
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
