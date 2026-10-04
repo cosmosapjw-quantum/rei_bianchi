@@ -1,5 +1,12 @@
 # Fastest-track ChatGPT ↔ Codex 동기화
 
+2026-10-05 최신 반환: REI-F06 completed. Bianchi-I exact characteristic/positive packet remap의8 targeted tests,22 direct boundary assertions,수신HeRCT24개를 포함한 merged124tests가PASS다. 독립 리뷰의5P2를Host가 한 번 수리했다. 최종수정bytes의 두 번째독립리뷰는없으며 zero derivative oracle의 binary64 cancellation오차만 명시적으로 고치고 원후보/원tests/red로그를 보존했다. 4/8/16 grid midpoint energy errors4/2/1eV, exactdeposited42eV. 이것은 finite기하/packet 구현이며 F04certificate/coupledhistory/continuum/physicalPASS가아니다. scientificHOLD와 과거limits/실패를 유지한다. CODEX_ONLY,2dispatch,known1408722tokens,금전NOT_MEASURED. 다음readyCodex작업REI-F07을이어간다. 최신수신은752e360a의FLRW04event-energy와41e4592a의opt-inHeRCT다. 공급자독립캠페인은inspected이며재실행하지않았고HeRCTscience활성화도없다. 다음연구작업FLRW05coherent spectral measure. 직접브라우저전달은미완료.
+
+반환: ../atomic_reionization_handoff_20261004_v1/runtime_returns/REI-F06.json
+
+아래앞선기록은역사적범위로보존한다.
+
+
 대상 대화: https://chatgpt.com/c/6ac2217b-3210-83ee-ae3d-d37ba50351b3
 공유 Git 브랜치: `forward/rust-reion-kernels-20260922`.
 

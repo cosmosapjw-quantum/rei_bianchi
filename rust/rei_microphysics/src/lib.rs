@@ -4,7 +4,9 @@
 //! Synthetic three-group H/He photons are proper cm^-3.
 #![forbid(unsafe_code)]
 
+mod angular_photons;
 mod atomic_provider;
+mod bianchi_i;
 pub mod coverage;
 mod ft03_controlled;
 mod ft03_rates;
@@ -17,9 +19,14 @@ mod lift;
 mod microstep;
 mod thermal;
 
+pub use angular_photons::{PhotonBins, PhotonGrid, PhotonPacket, RadiationState};
 pub use atomic_provider::{
     Absorber, AtomicProvider, CoefficientUnits, ObservableKind, RawCoefficient, RawProcess,
     RawRecord, RecombinationCase, SourceFrame, TemperatureDomain,
+};
+pub use bianchi_i::{
+    CharacteristicRay, ConstantHubbleBackground, GeometryBackground, GeometrySnapshot,
+    RayDerivative,
 };
 pub use ft03_controlled::{
     ft03_adaptive_step, ft03_implicit_step, ft03_rhs, ft03_try_step, Ft03Events, Ft03Model,
