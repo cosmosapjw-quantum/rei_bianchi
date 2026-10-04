@@ -1,0 +1,106 @@
+{
+  "task_id": "HE-F2",
+  "state": "BLOCKED_CONSUMER_CONTRACT",
+  "consumer_acceptance_issued": false,
+  "atomic_offer_generated": true,
+  "consumer_model_id": "REI_FT03_HG_RATE_MOMENT_CASE_A_CONTROLLED_V1",
+  "consumer_commit": "64bc3aa0871bb324817afd3d36db018dd34181cf",
+  "external_dependencies": {
+    "REI_SCOPE_LOCK": {
+      "alias": "REI-F00",
+      "resolved": false,
+      "expected_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs",
+      "observation": "404 at consumer commit"
+    },
+    "REI_PROVIDER_CONTRACT": {
+      "alias": "REI-F01",
+      "resolved": false,
+      "expected_path": "rust/rei_microphysics/src/atomic_provider.rs",
+      "observation": "404 at consumer commit; research JSON schema is not an admitted instance"
+    }
+  },
+  "blockers": [
+    "CANONICAL_CONSUMER_CONTRACTS_NOT_RECOVERED",
+    "CURRENT_MODEL_EXPLICITLY_EXCLUDES_CHARGE_EXCHANGE",
+    "GM25_KF96_PAIRED_DOMAIN_DISJOINT_FROM_CURRENT_MODEL",
+    "RCT_ENERGY_PHOTON_CLOSURE_NOT_SELECTED"
+  ],
+  "source_checks": [
+    {
+      "provider_id": "GM25_W82_RCX_CONSTANT_200_10000_K_V1",
+      "consumer_model_id": "REI_FT03_HG_RATE_MOMENT_CASE_A_CONTROLLED_V1",
+      "consumer_commit": "64bc3aa0871bb324817afd3d36db018dd34181cf",
+      "process_policy": "EXPLICITLY_DISABLED_IN_CURRENT_CONSUMER",
+      "source_domain_K": [
+        "200",
+        "10000"
+      ],
+      "consumer_guard_K": [
+        "30000",
+        "110000"
+      ],
+      "source_domain_covers_consumer_guard": false,
+      "overlap_K": null,
+      "blockers": [
+        "MISSING_CANONICAL_REI_SCOPE_AND_PROVIDER_INSTANCE",
+        "RCT_CLOSURE_NOT_SELECTED",
+        "PROCESS_EXPLICITLY_EXCLUDED",
+        "SOURCE_DOMAIN_DOES_NOT_COVER_CONSUMER_GUARD"
+      ],
+      "action": "NO_INJECTION",
+      "replacement_rate": null,
+      "consumer_admission": false,
+      "disabled_is_source_zero": false,
+      "recombination_escape_auto_applies_to_RCT": false
+    },
+    {
+      "provider_id": "KF96_HEIII_HI_RCT_NOMINAL_V1",
+      "consumer_model_id": "REI_FT03_HG_RATE_MOMENT_CASE_A_CONTROLLED_V1",
+      "consumer_commit": "64bc3aa0871bb324817afd3d36db018dd34181cf",
+      "process_policy": "EXPLICITLY_DISABLED_IN_CURRENT_CONSUMER",
+      "source_domain_K": [
+        "1000",
+        "10000000"
+      ],
+      "consumer_guard_K": [
+        "30000",
+        "110000"
+      ],
+      "source_domain_covers_consumer_guard": true,
+      "overlap_K": [
+        "30000",
+        "110000"
+      ],
+      "blockers": [
+        "MISSING_CANONICAL_REI_SCOPE_AND_PROVIDER_INSTANCE",
+        "RCT_CLOSURE_NOT_SELECTED",
+        "PROCESS_EXPLICITLY_EXCLUDED"
+      ],
+      "action": "NO_INJECTION",
+      "replacement_rate": null,
+      "consumer_admission": false,
+      "disabled_is_source_zero": false,
+      "recombination_escape_auto_applies_to_RCT": false
+    }
+  ],
+  "paired_campaign_ready": false,
+  "baseline_may_continue": true,
+  "consumer_changed": false,
+  "source_defaults_changed": false,
+  "legacy_reopen_triggered": false,
+  "energy_model_choice_required_from": "rei_bianchi owner",
+  "next_minimum_input": [
+    "owner-authored scope/model selection and whether RCT is included",
+    "single-source or paired-source domain plus out-of-domain policy",
+    "RCT photon/thermal/escape/absorption closure and ownership",
+    "actual provider instance/runtime adapter identity"
+  ],
+  "possible_owner_decisions": [
+    "keep RCT excluded, explicitly defer optional REI-F09",
+    "create a separate in-domain RCT sensitivity model with its own closure",
+    "provide an independently supported source-domain extension"
+  ],
+  "scientific_PROMOTE": "HOLD",
+  "EOR_THEORY_GATE": "NOT_SATISFIED",
+  "Eq55": "NOT_RUN"
+}

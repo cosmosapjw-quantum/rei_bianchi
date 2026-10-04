@@ -1,0 +1,63 @@
+{
+  "schema": "rei.he-rct-code-seam.v1",
+  "claim": "read-only source inspection; no implementation executed in this intake",
+  "basis_commit": "ccbc15019296b9128a90fa45b9c68c7daddc7b77",
+  "baseline_rct_enabled": false,
+  "baseline_physical_zero_claim": false,
+  "existing_rct_hook": false,
+  "existing_provider_trait": false,
+  "proposed_module": "rust/rei_microphysics/src/he_rct.rs",
+  "minimum_interface": [
+    "Explicit optional source selector (OFF / GM25 / KF96), never summed",
+    "Rate record with source domain, units, density ownership, distribution, source-vs-consumer closure",
+    "Number event RHS using n_HI*n_HeIII once",
+    "Explicit selected closure ledger; escaping number is not current tracked primary number",
+    "Opt-in consumer wrapper preserving original hhe_rhs byte behavior when OFF"
+  ],
+  "already_available_packets": [
+    "GM25_W82_RCX_CONSTANT_200_10000_K_V1",
+    "KF96_HEIII_HI_RCT_NOMINAL_V1"
+  ],
+  "source_pair_common_temperature_K": [
+    1000,
+    10000
+  ],
+  "unresolved_atomic_moments": [
+    "photon_energy",
+    "heat",
+    "recoil",
+    "spectrum",
+    "inverse_rate"
+  ],
+  "integration_caveat": "implicit_hhe_step is hardcoded to original processes; wrapper alone is not integrated RCT",
+  "followup_if_time_integrator_is_requested": [
+    "extend event count ledger",
+    "extend BE residual and positive update",
+    "extend endpoint_thermal closure",
+    "accepted two-half-step event sum",
+    "OFF baseline parity and analytic isolated-RCT solution"
+  ],
+  "non_claims": [
+    "full RCT physical fidelity",
+    "F04 enclosure closure",
+    "full EoR history",
+    "REI-F09 application closeout",
+    "source-conflict resolution"
+  ],
+  "preserve": [
+    "original HE atomic lanes",
+    "historical strict local error failure",
+    "public width gate",
+    "existing RCT-off synthetic baseline",
+    "source null moments"
+  ],
+  "review_target_files": [
+    "src/hhe_events.rs",
+    "src/atomic_provider.rs",
+    "src/microstep.rs",
+    "src/thermal.rs",
+    "tests/hhe_events.rs",
+    "tests/atomic_provider.rs"
+  ],
+  "prior_ft03_guard_applies_to_current_baseline": false
+}
