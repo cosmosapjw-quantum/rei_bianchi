@@ -78,3 +78,5 @@ REI의 새 FLRW06 compiler blocker는 준비된 driver/input/reference와 scient
 CR의 F04D24tests와 event-jet 결과, HE의 후속 receipt/intake 갱신도 수신했다. 이는 새 owner 결과를 읽은 것이며 여기서 해당 원자 계산을 다시 실행한 것이 아니다. 최신 상태·게시 parent는 `publication/atomic_publish/`와 최종 Git receipt가 기록한다.
 
 최종 수신 cutoff는 REI `bda0feefd4957dc59ebf4b068d01690942aa0a2a`다. F05는 실제 static FT03 첫 구간의 3 refinement/7000 accepted/0 rejected와 MPFI200 whole-history PASS를 반환했다. F08은 conditional coupled stage와 140tests PASS를 반환했지만 전체 paired history는 아직 실행하지 않았다. 이 owner 결과는 여기서 재실행하지 않았으며 final-byte 두 번째 독립 review도 수신되지 않았다. 우리의 두 benchmark 루프와는 다른 증거다. FLRW06은 양쪽에서 동시에 native 실행이 끝났으므로 하나의 완료 항목으로 합치며 반복하지 않는다. 후속 source delta는 다음 intake에서 받는다. 상세는 `late_rei_final/FINAL_DELTA.json`.
+
+여섯 저장소의 기존 branch/PR에 실제 게시했고 commit/ref 및 제출 결과를 `publication/GITHUB_PUBLICATION_RECEIPT.json`에 기록했다. HE와 HH에서도 같은 mixed/FLRW06 gate의 동시 실행 반환이 들어와 최신 handoff에 합쳤다. 실행 횟수를 새 과학 milestone으로 중복 집계하지 않는다. 전체 source·raw evidence는 ZIP, 클라우드 전송 상태는 ZIP 밖의 detached 백업 영수증에 있다.
