@@ -1,0 +1,1 @@
+Freeze prescribed scientific input and boundary ownership -> execute schema/Decimal source and geometry screening -> one independent review -> targeted Host closeout -> samebranch publication -> F04 actual parent certification. Scope excludes expensive paired histories, tolerance/source fitting, physical accuracy and re-running completed campaigns.

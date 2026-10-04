@@ -1,5 +1,8 @@
 # Fastest-track ChatGPT ↔ Codex 동기화
 
+2026-10-05 추가완료: REI-F07 prospectiveS0사전등록. source13.7eV/5e-15photon/H/s,IC50000K/정해진분율,meanH1e-14/s,epsilon0.01,구간1e13s를pairedobservable전고정했다. compactsource tailnumber/energy0은정의상정확하며physicalSED오차주장이아니다. CaseAexplicitescape/primary-only/CR-HH-RCT-off의비관측실험이다. 실제binding과Vernercutoff의별도문턱/crossing,진짜FT03Tguard,양의정수grid/normalizedweights,양의상수/EOS를직접검증했다. 독립review2major+2minor를Host한번수리하고12개finalassertionsPASS; 원후보/실패/원screening을보존하며최종수정bytes의재독립리뷰는없다. native1dispatch/known871086tokens/costNOT_MEASURED,CODEX_ONLY. pairedhistory0,physicalaccuracy/secondary/coolingerrorNOT_MEASURED,temperatureguardnotproveninvariant,scientificHOLD. 상세runtime_returns/REI-F07.json. 다음CodexREI-F04의actualparent/root/remainder로계속간다. 최신수신69fd2901의FLRW05N/Uclosure는이론/finite독립reference이며nativeexpanding아니다. 그CONCURRENT_SOURCE_ACK에서F06반환/실제source의연구측수신을확인했다. 다음연구FLRW06native spectral-stage와CodexF06collisionless는별개다. 직접브라우저전달은여전히미완료다.
+
+
 2026-10-05 최신 반환: REI-F06 completed. Bianchi-I exact characteristic/positive packet remap의8 targeted tests,22 direct boundary assertions,수신HeRCT24개를 포함한 merged124tests가PASS다. 독립 리뷰의5P2를Host가 한 번 수리했다. 최종수정bytes의 두 번째독립리뷰는없으며 zero derivative oracle의 binary64 cancellation오차만 명시적으로 고치고 원후보/원tests/red로그를 보존했다. 4/8/16 grid midpoint energy errors4/2/1eV, exactdeposited42eV. 이것은 finite기하/packet 구현이며 F04certificate/coupledhistory/continuum/physicalPASS가아니다. scientificHOLD와 과거limits/실패를 유지한다. CODEX_ONLY,2dispatch,known1408722tokens,금전NOT_MEASURED. 다음readyCodex작업REI-F07을이어간다. 최신수신은752e360a의FLRW04event-energy와41e4592a의opt-inHeRCT다. 공급자독립캠페인은inspected이며재실행하지않았고HeRCTscience활성화도없다. 다음연구작업FLRW05coherent spectral measure. 직접브라우저전달은미완료.
 
 반환: ../atomic_reionization_handoff_20261004_v1/runtime_returns/REI-F06.json
