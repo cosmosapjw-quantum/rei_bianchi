@@ -14,10 +14,10 @@
 
 기준 코드 commit은 `0100b1dfa023928d67602877876b586fea319d13`이다. historical whole-interval FAIL 및 old judge는 변경 금지. 첫 coupled Bianchi history는 F05 first full interval을 통과한 후다. finite tilt/REC splice/CAMB/all11 families는 `LEGACY_LANE.json`의 명시적 reopen 조건에서 호출한다.
 
-반환 JSON 최소형:
+반환은 공통 `../../common/RETURN_CONTRACT.schema.json`을 따른다. 다음은 아직 실행하지 않은 작업을 blocked로 표시한 예시다.
 
 ```json
-{"task_id":"REI-F00","status":"NOT_RUN","base_commit":"0100b1dfa023928d67602877876b586fea319d13","commands":[],"artifacts":[],"scientific_claim":"none","gate_changes":[],"failure_kind":"none","next_ready_task":"REI-F00"}
+{"task_id":"REI-F00","state":"blocked","input_identity":{"source_commit":"0100b1dfa023928d67602877876b586fea319d13"},"changed_paths":[],"commands":[],"artifacts":[],"claim":{"basis":"No runtime executed","ceiling":"planning and finite prework only"},"next_task":null,"blocker":{"kind":"not_started","reason":"Run the ready task and replace this example with observed evidence"}}
 ```
 
-실제로 수행한 값만 바꾼다. `NOT_RUN`을 문서 존재만으로 PASS로 바꾸지 않는다.
+실제로 수행한 값만 반환한다. 성공하지 않은 작업을 문서 존재만으로 completed로 바꾸지 않는다. 명령에는 command·exit_code·evidence_path를 넣고, 미실행 예정 명령은 실행 목록에서 제외한다.
