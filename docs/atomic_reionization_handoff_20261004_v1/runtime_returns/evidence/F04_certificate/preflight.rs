@@ -1,0 +1,3 @@
+use rei_microphysics::{Ft03Model,HHeState,StepControl,ft03_implicit_step};
+fn coords(m:&Ft03Model,s:&HHeState)->[f64;7] { [s.fractions[0],s.fractions[1],s.fractions[2],s.u_erg_cm3/(m.gas.n_h_cm3*m.gas.ev_erg),s.photon_cm3[0]/m.gas.n_h_cm3,s.photon_cm3[1]/m.gas.n_h_cm3,s.photon_cm3[2]/m.gas.n_h_cm3] }
+fn main(){let m=Ft03Model::controlled().unwrap();let s=m.initial_state();let control=StepControl{max_iterations:200,residual_tolerance:1e-13};let f=ft03_implicit_step(&m,&s,1e9,control).unwrap();let h1=ft03_implicit_step(&m,&s,5e8,control).unwrap();let h2=ft03_implicit_step(&m,&h1.state,5e8,control).unwrap();println!("{:?}",[coords(&m,&f.state),coords(&m,&h1.state),coords(&m,&h2.state)]);}

@@ -9,6 +9,7 @@ mod atomic_provider;
 mod bianchi_i;
 pub mod coverage;
 mod ft03_controlled;
+mod ft03_interval;
 mod ft03_rates;
 mod group_rates;
 mod hhe_events;
@@ -34,6 +35,7 @@ pub use ft03_controlled::{
     ft03_adaptive_step, ft03_implicit_step, ft03_rhs, ft03_try_step, Ft03Events, Ft03Model,
     Ft03Rhs, Ft03Step, FT03_MODEL_ID,
 };
+pub use ft03_interval::ft03_interval_rhs;
 pub use ft03_rates::{ft03_coefficients, Ft03Coefficients};
 pub use group_rates::{
     gamma_species, opacity_cMpc_inv, pchip_eval, photon_rates, transform_z_to_y, PchipTable,

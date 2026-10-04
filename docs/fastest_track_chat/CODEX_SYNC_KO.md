@@ -44,3 +44,7 @@ FLRW01의 다음 연구 작업은 `REI-CHAT-FLRW02_SOURCE_BOUND_THREE_EQUATION_R
 ## 2026-10-05 F04 interval prerequisite
 
 실제 FT03 map 인증용 outward interval·7변수 Jet2가 32 MPFI 사례/408 참조 검사/오류 영역4 및 새Rust검사5를 통과했다. 독립 검토의0·1지수 false-rejection을 Host가 수정했고 전체 129개 검사도 통과했다. 최종 수정bytes의2차 독립 검토는 미실시. 실제 초기상태/계수bits를 읽은 prospective mathematical parent를 `runs/rei_fastest_v1/map_certificate/parent_manifest.json`에 고정했다. F04는 partial이며 root/J/H/Taylor/shared-half 인증은 다음 실행이다. native누적 4903284tokens/4dispatches, 비용NOT_MEASURED; 과학HOLD. 별도S0확장 history나 원래46080node/3lane 인증으로 승격하지 않는다.
+
+## 2026-10-05 actual F04 map certificate
+
+실제 FT03 static seven-state map의 prospective parent에서 세 source-site Krawczyk 포함/q<1, implicitJ/H, lnT를 포함한 observableTaylor 및 계수rounding, 원래parent two-half합성이 independentMPFI checker로 통과했다. 최대localbound9.535e-9/publicwidth1.587e-6,3591RustJetwitnesses/132tests PASS. 독립검토 MAJOR계수 사전rounding 결함은 MPFI승격 후 곱셈으로 수정했으며, 이전 checker/certificate/child PASS는 역사기록으로 보존했다. 수정bytes 재독립검토는 미실시. F04 completed는 해당 static numericalmap/domain만이며 물리HOLD, 원래46080node/3lane/[160,161]와 새로운S0확장history에 승격하지 않는다. 누적native6804638tokens/6dispatches, 비용NOT_MEASURED. 다음실행F05 전체첫구간이다.
