@@ -1,15 +1,19 @@
-//! Rust-only fixed-input microphysics kernels, not a thermochemistry solver.
+//! Rust-only fixed-input microphysics kernels and synthetic static H/He microsteps.
 //! f64 tests are implementation evidence, not a validated enclosure.
-//! N is comoving count per cMpc^3; atomic densities are proper cm^-3.
+//! The original four-group N is comoving count per cMpc^3; atomic densities are proper cm^-3.
+//! Synthetic three-group H/He photons are proper cm^-3.
 #![forbid(unsafe_code)]
 
 mod atomic_provider;
 pub mod coverage;
 mod group_rates;
+mod hhe_events;
 mod homogeneous_rates;
 mod hydrogen_step;
 mod joint_affine;
 mod lift;
+mod microstep;
+mod thermal;
 
 pub use atomic_provider::{
     Absorber, AtomicProvider, CoefficientUnits, ObservableKind, RawCoefficient, RawProcess,
@@ -19,6 +23,7 @@ pub use group_rates::{
     gamma_species, opacity_cMpc_inv, pchip_eval, photon_rates, transform_z_to_y, PchipTable,
     C_LIGHT, MPC_CM,
 };
+pub use hhe_events::{hhe_rhs, HHeEvents, HHeModel, HHeRhs, HHeState};
 pub use homogeneous_rates::{
     homogeneous_opacity, homogeneous_photo_rates, HomogeneousPhotoRates, OpacityOwners, PhotonNode,
 };
@@ -27,6 +32,7 @@ pub use joint_affine::{
     below_strict_error_limit, joint_affine_difference, AffineEnclosure, ClosedInterval, JointParent,
 };
 pub use lift::{positive_mass_projection, signed_transfer_lift};
+pub use microstep::{adaptive_hhe_step, implicit_hhe_step, try_hhe_step, HHeStep, StepControl};
 
 #[derive(Debug, Clone)]
 pub struct State {
