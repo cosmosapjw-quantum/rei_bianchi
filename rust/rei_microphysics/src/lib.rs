@@ -3,15 +3,24 @@
 //! N is comoving count per cMpc^3; atomic densities are proper cm^-3.
 #![forbid(unsafe_code)]
 
+mod atomic_provider;
 pub mod coverage;
 mod group_rates;
+mod homogeneous_rates;
 mod hydrogen_step;
 mod joint_affine;
 mod lift;
 
+pub use atomic_provider::{
+    Absorber, AtomicProvider, CoefficientUnits, ObservableKind, RawCoefficient, RawProcess,
+    RawRecord, RecombinationCase, SourceFrame, TemperatureDomain,
+};
 pub use group_rates::{
     gamma_species, opacity_cMpc_inv, pchip_eval, photon_rates, transform_z_to_y, PchipTable,
     C_LIGHT, MPC_CM,
+};
+pub use homogeneous_rates::{
+    homogeneous_opacity, homogeneous_photo_rates, HomogeneousPhotoRates, OpacityOwners, PhotonNode,
 };
 pub use hydrogen_step::{hydrogen_step, HydrogenRates, HydrogenStep};
 pub use joint_affine::{
