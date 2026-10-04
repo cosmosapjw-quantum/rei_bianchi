@@ -4,8 +4,8 @@
 //! Synthetic three-group H/He photons are proper cm^-3.
 #![forbid(unsafe_code)]
 
-mod angular_photons;
 mod adaptive_history;
+mod angular_photons;
 mod atomic_provider;
 mod bianchi_i;
 pub mod coverage;
@@ -23,8 +23,10 @@ mod lift;
 mod microstep;
 mod thermal;
 
+pub use adaptive_history::{
+    certified_ft03_trial, scaled as ft03_scaled, try_certified_ft03_step, CertifiedTrial, RootSite,
+};
 pub use angular_photons::{PhotonBins, PhotonGrid, PhotonPacket, RadiationState};
-pub use adaptive_history::{certified_ft03_trial, try_certified_ft03_step, scaled as ft03_scaled, CertifiedTrial, RootSite};
 pub use atomic_provider::{
     Absorber, AtomicProvider, CoefficientUnits, ObservableKind, RawCoefficient, RawProcess,
     RawRecord, RecombinationCase, SourceFrame, TemperatureDomain,
@@ -123,3 +125,5 @@ impl std::error::Error for ForwardError {}
 pub mod flrw_three_equations;
 
 pub mod he_rct;
+
+pub mod coupled_primary;

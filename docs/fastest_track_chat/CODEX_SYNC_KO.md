@@ -52,3 +52,7 @@ FLRW01의 다음 연구 작업은 `REI-CHAT-FLRW02_SOURCE_BOUND_THREE_EQUATION_R
 ## 2026-10-05 F05 whole first interval
 
 F05 실제staticFT03 0..1e12s의 시간해상도3개가1000+2000+4000=7000 accepted/0rejected로 완료됐고 independentMPFI200 전체검증PASS(2189.066s)다. 각trial 엄격local<2e-4/publicwidth<2e-3 및7장부, 마지막전체장부 최대7.566545317822664e-13<1e-12를 확인했다. 누적장부·단계일정·source/resume·첫checkpoint 결함을Host수리하고 원실패/리뷰를 보존했다. 최종수정bytes 재독립리뷰는없다. native누적5860704tokens/2dispatch, 금전NOT_MEASURED. static한lane만이고 expandingS0/physicalfit/관측/원46080node의 승격은없으며 scientificHOLD다. 반환runtime_returns/REI-F05.json. 다음DAG F08을즉시진행한다. 실제browser연결재확인결과직접대화전달은UNDELIVERED_NO_BROWSER_AVAILABLE이며 Git반환은별도로게시한다.
+
+## 2026-10-05 F08 conditional stage and FLRW06 actual native return
+
+새FLRW06인계를8fd440a2에서수신했고 F04/F07 ACK를확인했다. 원ZIP0796a974...의prepared rustc driver를실제1compile/1process로실행하여167scalar/6errorinputs PASS,최대상대차3.777652226439761e-15를반환한다. 별도U/history/physicalPASS는아니다. F08조건부implicit4gas/packetstep은actualFT03nonphoto+coherentPI/heat/expansion의수정MPFI200K4검증PASS다. 독립리뷰4MAJOR를Host수정하고5회귀검사 및전체crate140검사PASS,원후보/실패보존. native누적2393701tokens/2dispatch 비용NOT_MEASURED,조건부stage만이고paired미실행/physicalHOLD다. F05완료뒤F08전체실행을이어간다. 동시REC/HE추가source는원그대로병합했으며S0 CaseA/RCT-HH-off모형에활성화하지않았다.
