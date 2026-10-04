@@ -36,7 +36,7 @@ HE source anchor 최대 상대차는 2.81e-15다. BASS clock 검산의 tolerance
 
 | 스레드 / repo | 이번에 해소·수신한 항목 | 남는 blocker와 계획 |
 |---|---|---|
-| REI | static FT03 F04 인증 완료를 최신 반환에서 확인. PB 소비자와 HE mixed 검증 추가 | F05 첫 구간 경로는 기존 owner의 임계 작업. 실제 coupled expanding payload와 F08은 별도. 새 PB 결과로 F05를 완료 처리하지 않음 |
+| REI | static FT03 F04 인증 완료를 최신 반환에서 확인. PB 소비자와 HE mixed 검증 추가 | 게시 중 실제 F05 첫 구간 완료 반환 수신. F08 conditional stage 구현·검증 수신, 전체 paired history는 미실행. 기존 REI owner의 다음 임계 경로는 F08 |
 | HE | F2C 국소 RCT RHS 수락, F2D 직접 exposure 상한 수신. mixed-native 실행 완료 | 새 반환에 대한 HE owner ACK, 실제 RCT stepper/stage·energy ledger. FT03와 GM25 온도영역의 교집합 부재 |
 | CR | F04C 온도의존 잔차/J/H와 REI static F04 완료를 연결 | CR_OFF loader/callback 관측. 게시 직전 F04D parent/two-half event jets 완료 반환을 추가 수신. 다음 F04E는 실제 F05 stage·unit·accepted-step binding 필요 |
 | HH | F07 S0 HH-OFF owner 반환 수령 완료. 옛 WAIT_F07은 해당 범위에서 대체 | OFF runtime 관측. optional HH는 parked; source/domain/event·heat owner가 필요한 opt-in 때만 재개 |
@@ -53,7 +53,7 @@ HE source anchor 최대 상대차는 2.81e-15다. BASS clock 검산의 tolerance
 4. **CR F04E receiver binding**: 새 F04D의 parent·two-half event jets와25-output 계약을 실제 REI-F05 state/time/units/accepted-stage에 묶는다. 필요한 receiver가 없으면 그 입력만 대기한다.
 5. **RCT stepper/response 설계**: 새 write reservation 후 실제 implicit stage와 event·thermal·escape 장부를 연결한다. 직접 exposure 상한을 전체 observable 변화 상한으로 바꾸지 않는다.
 
-우선순위는 **기존 F05 경로 유지 + native U/edge 소비자 계약 병행**이다. Spectral native 회귀는 이번 말미에 완료했다. PB–BASS benchmark를 원자 계산 완료 대기로 되돌리지 않는다. HE paired campaign을 위해 현재 온도 guard를 완화하거나 GM25를 자동 외삽하지 않는다.
+우선순위는 **기존 F08 paired-history 경로 유지 + native U/edge 소비자 계약·CR F04E binding 병행**이다. Spectral native 회귀는 이번 말미에 완료했다. PB–BASS benchmark를 원자 계산 완료 대기로 되돌리지 않는다. HE paired campaign을 위해 현재 온도 guard를 완화하거나 GM25를 자동 외삽하지 않는다.
 
 ## 원래 연구 lane과 실패 보존
 
@@ -76,3 +76,5 @@ HH의24/289·265 unbounded·epsilon null·B22 OPEN, CR의 G02 unresolved·captur
 REI의 새 FLRW06 compiler blocker는 준비된 driver/input/reference와 scientific module을 그대로 사용해 해소했다. 1회 compile/1개 native process의18개 command record(11 valid photo+6 error+1 photon),167 scalar를 비교했고 최대 상대차3.777652226439761e-15였다. Git source 취득만 이미 materialize한 동일6blob을 읽는 명시적 adapter로 바꿨다. 원 runner·실패·diff를 보존했으며 full crate/independent U/history admission은 아니다. 결과와 별도 bounded review는 `late_flrw06/` 및 `review/LATE_FLRW06_REVIEW.json`에 있다.
 
 CR의 F04D24tests와 event-jet 결과, HE의 후속 receipt/intake 갱신도 수신했다. 이는 새 owner 결과를 읽은 것이며 여기서 해당 원자 계산을 다시 실행한 것이 아니다. 최신 상태·게시 parent는 `publication/atomic_publish/`와 최종 Git receipt가 기록한다.
+
+최종 수신 cutoff는 REI `bda0feefd4957dc59ebf4b068d01690942aa0a2a`다. F05는 실제 static FT03 첫 구간의 3 refinement/7000 accepted/0 rejected와 MPFI200 whole-history PASS를 반환했다. F08은 conditional coupled stage와 140tests PASS를 반환했지만 전체 paired history는 아직 실행하지 않았다. 이 owner 결과는 여기서 재실행하지 않았으며 final-byte 두 번째 독립 review도 수신되지 않았다. 우리의 두 benchmark 루프와는 다른 증거다. FLRW06은 양쪽에서 동시에 native 실행이 끝났으므로 하나의 완료 항목으로 합치며 반복하지 않는다. 후속 source delta는 다음 intake에서 받는다. 상세는 `late_rei_final/FINAL_DELTA.json`.

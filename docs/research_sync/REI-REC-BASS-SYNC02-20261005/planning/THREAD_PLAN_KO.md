@@ -64,3 +64,7 @@ HE의 현재 FT03 온도창 30,000–110,000 K와 GM25 200–10,000 K는 교집�
 ## 게시 직전 successor overlay
 
 이 파일 앞부분의 intake 시점 후보 목록은 아래 최신 결과로 해당 범위에서 대체한다. FLRW06 native 회귀는 prepared driver/source를 그대로 사용한 actual18records/167scalars로 완료했다. 독립 U 소비자·accepted coupled stage/history는 미완료다. CR-F04D는 새 owner의24tests/parent·two-half event jets 완료 반환을 수신했다(여기서 재실행하지 않음). 다음은 실제 F05 stage/time/units/accepted-step을25-output계약에 묶는 F04E다. 따라서 더 이상 FLRW06 native나 F04D를 새 병렬 미실행 작업으로 선택하지 않는다. 현재 병렬 후보는 native U/edge/work 소비자 계약과 실제입력 조건을 만족한 F04E binding이다. Machine-readable REVISED_DAG가 이 successor 상태를 반영한다.
+
+## 최종 동시 owner 반환을 반영한 현재 실행 순서
+
+앞의 intake 표는 역사 기록이다. 현재 우선순위는 REI F08 전체 paired history다. F05 actual static FT03 interval은3grids/7000accepted/MPFI200PASS로 완료 수신했고, F08 conditional coupled stage도 구현·140tests 검증 수신했다. Full paired history 및 physical admission은 미완료이며 owner 반환을 여기서 재실행하지 않았다. CR F04E는 이제 실제 F05 receipt를 읽어 exact stage/time/unit/25-output binding을 준비할 수 있다. U/edge/work consumer contract와 OFF runtime 관측 설계는 다른 write boundary에서 병렬 가능하다. FLRW06 양쪽 동시 실행은 한 완료 gate이며 다시 실행하지 않는다. cutoff `bda0feefd4957dc59ebf4b068d01690942aa0a2a`; machine-readable DAG의 final_received_overlay가 현재 상태다.
