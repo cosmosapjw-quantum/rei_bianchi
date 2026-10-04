@@ -5,6 +5,7 @@
 #![forbid(unsafe_code)]
 
 mod angular_photons;
+mod adaptive_history;
 mod atomic_provider;
 mod bianchi_i;
 pub mod coverage;
@@ -23,6 +24,7 @@ mod microstep;
 mod thermal;
 
 pub use angular_photons::{PhotonBins, PhotonGrid, PhotonPacket, RadiationState};
+pub use adaptive_history::{certified_ft03_trial, try_certified_ft03_step, scaled as ft03_scaled, CertifiedTrial, RootSite};
 pub use atomic_provider::{
     Absorber, AtomicProvider, CoefficientUnits, ObservableKind, RawCoefficient, RawProcess,
     RawRecord, RecombinationCase, SourceFrame, TemperatureDomain,

@@ -1,0 +1,9 @@
+# REI-F05 decision log
+
+Actual static FT03 whole interval, three predeclared time refinements, one homogeneous lane. Native Sol/high author and separate Astra/xhigh source/mathematical reviewer are actual MATCH observations. The author stop hook first rejected reused pilot output; same child added exact pilot resume and the fixed validator passed. Historical failure remains.
+
+Review found one P1 cumulative/reporting defect and three P2 schedule/source/recovery defects. Host accumulates proper absorption counts and normalizes the endpoint budget once, independently checks per-row and whole ledgers, initial state and step sequence, binds exact compiled source bytes, and writes a durable zero-offset checkpoint before opening trial log. Poisoned report/time/IC and changed-source fixtures are rejected; completed resume preserves exact transaction bytes; actual interruption before the first transaction then exact resume passes. Solver target tightened to1e-15, with all physical parameters, prescribed time schedule and scientific gates unchanged. Final repairs did not receive a second independent review.
+
+Whole production completed7000 accepted steps and0rejections at0..1e12s in all three levels. Independent MPFI200 verification completed with actual exit0, all7000 uniform trial certificates PASS in2189.0662660130183s; exact19 frozen input identities remained unchanged. An intermediate level2 running global photon budget exceeded1e-12, later endpoint7.566545317822664e-13; all per-step budgets and the final endpoint are the prescribed separate tests. No successful level was replayed, no scientific tolerance changed. A separate finite nine-step2e-16 convergence probe was never adopted into the campaign.
+
+Physical fit/error, observed reionization, expanding S0 and inherited46080/allthreehistory lanes remain outside this scoped numerical result. F08 candidate preparation has no paired activation until F05 closes.

@@ -48,3 +48,7 @@ FLRW01의 다음 연구 작업은 `REI-CHAT-FLRW02_SOURCE_BOUND_THREE_EQUATION_R
 ## 2026-10-05 actual F04 map certificate
 
 실제 FT03 static seven-state map의 prospective parent에서 세 source-site Krawczyk 포함/q<1, implicitJ/H, lnT를 포함한 observableTaylor 및 계수rounding, 원래parent two-half합성이 independentMPFI checker로 통과했다. 최대localbound9.535e-9/publicwidth1.587e-6,3591RustJetwitnesses/132tests PASS. 독립검토 MAJOR계수 사전rounding 결함은 MPFI승격 후 곱셈으로 수정했으며, 이전 checker/certificate/child PASS는 역사기록으로 보존했다. 수정bytes 재독립검토는 미실시. F04 completed는 해당 static numericalmap/domain만이며 물리HOLD, 원래46080node/3lane/[160,161]와 새로운S0확장history에 승격하지 않는다. 누적native6804638tokens/6dispatches, 비용NOT_MEASURED. 다음실행F05 전체첫구간이다.
+
+## 2026-10-05 F05 whole first interval
+
+F05 실제staticFT03 0..1e12s의 시간해상도3개가1000+2000+4000=7000 accepted/0rejected로 완료됐고 independentMPFI200 전체검증PASS(2189.066s)다. 각trial 엄격local<2e-4/publicwidth<2e-3 및7장부, 마지막전체장부 최대7.566545317822664e-13<1e-12를 확인했다. 누적장부·단계일정·source/resume·첫checkpoint 결함을Host수리하고 원실패/리뷰를 보존했다. 최종수정bytes 재독립리뷰는없다. native누적5860704tokens/2dispatch, 금전NOT_MEASURED. static한lane만이고 expandingS0/physicalfit/관측/원46080node의 승격은없으며 scientificHOLD다. 반환runtime_returns/REI-F05.json. 다음DAG F08을즉시진행한다. 실제browser연결재확인결과직접대화전달은UNDELIVERED_NO_BROWSER_AVAILABLE이며 Git반환은별도로게시한다.

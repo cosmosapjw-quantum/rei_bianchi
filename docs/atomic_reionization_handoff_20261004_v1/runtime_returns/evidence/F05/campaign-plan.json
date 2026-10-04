@@ -1,0 +1,45 @@
+{
+  "task_id": "REI-F05",
+  "run_id": "REI-F05-20261005",
+  "state": "RUNNING",
+  "input": "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/ft03_first_interval.json",
+  "execution_argv": [
+    "/home/cosmosapjw/.cargo/bin/cargo",
+    "run",
+    "--quiet",
+    "--release",
+    "--manifest-path",
+    "rust/rei_microphysics/Cargo.toml",
+    "--example",
+    "first_interval",
+    "--locked",
+    "--",
+    "--input",
+    "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/ft03_first_interval.json",
+    "--output",
+    "runs/rei_fastest_v1/first_interval"
+  ],
+  "verification_argv": [
+    "/usr/local/bin/sage",
+    "-python",
+    ".cuh/fastest-track/REI-F05/verify_whole_fast.py",
+    "runs/rei_fastest_v1/first_interval",
+    "--receipt",
+    "runs/rei_fastest_v1/first_interval/checker_receipt.json"
+  ],
+  "before_execution": "Nativepilotqualification then oneindependenthigherreview/targetedrepair/finalqualification",
+  "execution_once": "Oninterrupt reconcilePID/checkpointbeforeexactresume; neverreplayfinishedlevel",
+  "model_and_source_scope": "staticFT03 only, no S0/oldhistoricalpromotion",
+  "cost": "NOT_MEASURED",
+  "scientific_admission": "HOLD",
+  "solver_control": {
+    "max_iterations": 200,
+    "residual_tolerance": 1e-15,
+    "change_reason": "tighter nonlinear convergence to support unchanged whole ledger gate; physical model and time/gate inputs untouched"
+  },
+  "independent_review": {
+    "launch_id": "cl_e93ecae26dab56f842ae7f4361e74a40",
+    "findings": "one P1 and three P2 targeted Host fixes/regressions",
+    "final_bytes_independently_reviewed": false
+  }
+}
