@@ -1,0 +1,48 @@
+{
+  "task_id": "REI-F04",
+  "status": "SCOPED_INDEPENDENT_REVIEW_ONE_P2_REPAIRED_BY_HOST",
+  "launch_id": "cl_2e3495385badc03dffa30eb3701ab51d",
+  "child_id": "01a10780-57a1-77f0-9ac2-8c39bec35c55",
+  "observed_profile": {
+    "model": "gpt-6-astra",
+    "effort": "xhigh",
+    "cwd": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+    "turn_id": "01a10780-5804-7de0-a7ef-b33f7ab31047"
+  },
+  "scope_hashes": {
+    "rust/rei_microphysics/src/ft03_rates.rs": "1a97cd7a3555deeb4d8700376cd84580c5102127773bc3a235a29c33b0c1542f",
+    "rust/rei_microphysics/src/ft03_controlled.rs": "e9a7f7aea5d52dc522d7e3834f0292a611838d784826ac2982fe3df1372b3680",
+    "rust/rei_microphysics/src/lib.rs": "1b41c408d302048a7b43dc136f349c84d01ec25fe92da3541844bdd9cf493517",
+    "rust/rei_microphysics/examples/ft03_fixture.rs": "259f661ecaa8795d80ffc5822f89095367780df1f594cfb071368d486de86faf",
+    "rust/rei_microphysics/tests/ft03_controlled.rs": "dea4d4dab4afdc3e80ce3efd20c1cf1e032e0cc67e4b8e430c27c19ecfabfc60",
+    ".cuh/fastest-track/REI-F04/oracle.json": "34f94b8e144f1bf90d858ddaf4576bae0932f0590bfbc9c6600bf02e0fa886c5",
+    ".cuh/fastest-track/REI-F04/verify_candidate.py": "b37a0670e0d6833a29e0062ee9c56741299715e50e8fc06528f3d3afd3ae3a4c"
+  },
+  "findings": [
+    {
+      "severity": "P2",
+      "id": "VOLUMETRIC_EVENT_UNDERFLOW",
+      "source": "ft03_controlled.rs::ft03_rhs",
+      "minimal_input": "Controlled state at T50000, photons0, nH1e-320/nHe8.3e-6 or nH1e-300/nHe8.3e-20",
+      "observed": "dH falsely0; stable fraction expression7.713492975272601e-16 or7.7134929752726e-30; implicit nonconvergence",
+      "fix": "Reject zero products from all nonzero finite factors as FT03_PRODUCT_UNDERFLOW; allow genuine zero factors. No density floor/clipping/tolerance change."
+    }
+  ],
+  "reviewer_direct_checks": [
+    "8 focused frozen tests",
+    "1e14 bisection example",
+    "original/normal Rust probes"
+  ],
+  "full_suite_and_refinement": "INSPECTED_HOST_RECEIPTS_NOT_RERUN_BY_REVIEWER",
+  "host_closeout": [
+    "review-probe-red.log",
+    "review-probe-green.log",
+    "final-candidate.log"
+  ],
+  "boundary_assertions": 14,
+  "frozen_tolerances_unchanged": true,
+  "final_bytes_independently_reviewed": false,
+  "review_rounds": 1,
+  "repair_closeout_rounds": 1,
+  "scientific_admission": "HOLD"
+}

@@ -1,0 +1,1 @@
+REI-F04 controlled successor prerequisite: accepted after one independent P2 review and one Host representability repair with red/green probes and final tests. Final repaired bytes did not receive a second independent review. Mathematical F04 certificate and physical/scientific admission remain HOLD; logical task state is partial.
