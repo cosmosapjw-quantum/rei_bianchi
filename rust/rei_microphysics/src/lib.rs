@@ -97,3 +97,5 @@ impl std::fmt::Display for ForwardError {
     }
 }
 impl std::error::Error for ForwardError {}
+
+pub mod flrw_three_equations;
