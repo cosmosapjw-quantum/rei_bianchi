@@ -40,3 +40,7 @@ FLRW01의 다음 연구 작업은 `REI-CHAT-FLRW02_SOURCE_BOUND_THREE_EQUATION_R
 원 fixture, F00 locks, 기존 고정 tests 및 tolerance를 변경하지 않았다. strict local error<2e-4/public width<2e-3, [160,161] FAIL=2.1245050576368385e-4와 tick160 prefix를 보존한다. full-vs-half point estimator와 refinement는 finite implementation evidence다. uniform site/box nonlinear remainder, root/enclosure certificate, physical atomic accuracy/Bianchi history는 아직 미승인이고 scientific admission은 HOLD다.
 
 직접 대화 상태: `UNDELIVERED_BROWSER_MODULE_MISSING`. 브라우저 연결 구성요소가 없어 본문 직접 읽기/전송은 미완료다. Git 인계/반환과 실제 수신 ACK를 직접 브라우저 전달 성공과 구분한다.
+
+## 2026-10-05 F04 interval prerequisite
+
+실제 FT03 map 인증용 outward interval·7변수 Jet2가 32 MPFI 사례/408 참조 검사/오류 영역4 및 새Rust검사5를 통과했다. 독립 검토의0·1지수 false-rejection을 Host가 수정했고 전체 129개 검사도 통과했다. 최종 수정bytes의2차 독립 검토는 미실시. 실제 초기상태/계수bits를 읽은 prospective mathematical parent를 `runs/rei_fastest_v1/map_certificate/parent_manifest.json`에 고정했다. F04는 partial이며 root/J/H/Taylor/shared-half 인증은 다음 실행이다. native누적 4903284tokens/4dispatches, 비용NOT_MEASURED; 과학HOLD. 별도S0확장 history나 원래46080node/3lane 인증으로 승격하지 않는다.

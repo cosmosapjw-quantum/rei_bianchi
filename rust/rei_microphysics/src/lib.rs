@@ -14,6 +14,8 @@ mod group_rates;
 mod hhe_events;
 mod homogeneous_rates;
 mod hydrogen_step;
+mod interval_ad;
+mod interval_math;
 mod joint_affine;
 mod lift;
 mod microstep;
@@ -42,6 +44,8 @@ pub use homogeneous_rates::{
     homogeneous_opacity, homogeneous_photo_rates, HomogeneousPhotoRates, OpacityOwners, PhotonNode,
 };
 pub use hydrogen_step::{hydrogen_step, HydrogenRates, HydrogenStep};
+pub use interval_ad::Jet;
+pub use interval_math::Interval;
 pub use joint_affine::{
     below_strict_error_limit, joint_affine_difference, AffineEnclosure, ClosedInterval, JointParent,
 };

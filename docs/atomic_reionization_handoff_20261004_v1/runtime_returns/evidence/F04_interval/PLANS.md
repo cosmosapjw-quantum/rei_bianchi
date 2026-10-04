@@ -1,0 +1,1 @@
+Frozen MPFI external scalar extrema/reference and analytic beta derivatives -> narrow native Rust interval/Jet2 candidate -> independent bounded review -> targeted Host repair/validation -> proceed actual FT03 residual/root/JH/Taylor on frozen domain. Do not call primitivequalification fullF04PASS; no method re-selection or science gate relaxation.
