@@ -1,0 +1,195 @@
+{
+  "schema": "research-sync.atomic-delta.v1",
+  "as_of_utc": "2026-10-04T19:50:00.848230+00:00",
+  "refs": [
+    {
+      "repo": "cosmosapjw-quantum/BASS_HE",
+      "branch": "research/shared-c64-crossrepo-20260928",
+      "commit": "28c3da1455915672ff3e41d8ecd06a6deccb9a78",
+      "tree": "1f7f78a7420be8848c118fc7302f8d0124f270dc",
+      "pr": 17,
+      "pr_state": "open",
+      "draft": true,
+      "branches_observed": 18,
+      "branches_pagination_complete": true,
+      "recent_prs_observed": 17,
+      "tree_truncated": false
+    },
+    {
+      "repo": "cosmosapjw-quantum/bass_cr",
+      "branch": "research/r4q-gap-closure-20261001",
+      "commit": "3c7d7d4b811dd5f6eeafe60bafa1308a52dc1cf2",
+      "tree": "fd1d83ccad021817bdede642f3427a00a630a55e",
+      "pr": 23,
+      "pr_state": "open",
+      "draft": true,
+      "branches_observed": 79,
+      "branches_pagination_complete": true,
+      "recent_prs_observed": 20,
+      "tree_truncated": false
+    },
+    {
+      "repo": "cosmosapjw-quantum/WU088_HH",
+      "branch": "research/r31ao-unequal-order-ladder-20260930",
+      "commit": "3b5e7c3dc151b23db434f0ce60af383bb19dd5e7",
+      "tree": "522c3e47a1d013dfe49df0a3d871d33e5c62e985",
+      "pr": 33,
+      "pr_state": "open",
+      "draft": true,
+      "branches_observed": 34,
+      "branches_pagination_complete": true,
+      "recent_prs_observed": 20,
+      "tree_truncated": false
+    }
+  ],
+  "threads": [
+    {
+      "thread": "BASS_HE",
+      "latest_results": [
+        "HE-F2C conditional local RHS accepted",
+        "HE-F2D conditional direct exposure bound, no full response",
+        "HE-FLRW02B native gate PASS in this sync 2 tests 274 comparisons, producer ACK pending"
+      ],
+      "baseline_RCT": "OFF",
+      "blockers": [
+        {
+          "id": "HE-RCT-STEP",
+          "owner": "rei_bianchi",
+          "input": "actual combined_ft03_rhs stepper/stage/residual/underflow/rollback and per-half event ledger",
+          "status": "OWNER_NEXT_NOT_OBSERVED_RUNNING",
+          "baseline_blocker": false
+        },
+        {
+          "id": "HE-F3-DOMAIN",
+          "owner": "rei_bianchi + HE scope owner",
+          "input": "validated common-domain paired model; current FT03 and GM25 domains disjoint",
+          "status": "BLOCKED_MODEL_DOMAIN",
+          "baseline_blocker": false
+        },
+        {
+          "id": "HE-MIXED-ACK",
+          "owner": "BASS_HE",
+          "input": "../loop1/he_mixed/NATIVE_RESULT.json and immutable source/golden/test/log hashes",
+          "status": "RESULT_READY_PENDING_ACK",
+          "baseline_blocker": false
+        }
+      ],
+      "do_not_repeat": [
+        "F2C intake",
+        "F2D bound tightening",
+        "116 old native tests",
+        "9/13 isolated reference tests",
+        "legacy source suite"
+      ],
+      "new_parallel": [
+        {
+          "id": "HE-MIXED-RETURN",
+          "state": "READY_FOR_SCOPED_ACK",
+          "owner": "BASS_HE"
+        },
+        {
+          "id": "HE-RESPONSE-CONTRACT",
+          "state": "OPTIONAL_NEEDS_ACTUAL_BASELINE_STABILITY",
+          "owner": "REI + HE",
+          "scope": "direct exposure to coupled observable transfer, no new active source"
+        }
+      ]
+    },
+    {
+      "thread": "bass_cr",
+      "latest_results": [
+        "F04C 4D temperature-coupled BE residual J/H and RR kinetic sign change",
+        "older LOOP_RETURN 10tests does not replace 23test source report",
+        "latest REI static F04 certification must be consumed separately"
+      ],
+      "CR": "OFF",
+      "blockers": [
+        {
+          "id": "CR-F0",
+          "owner": "rei_bianchi",
+          "input": "actual receiver dispatch pin and source/provider load/callback observations",
+          "status": "WAIT_ACTUAL_DISPATCH_BINDING",
+          "observed_source_loads": null,
+          "observed_provider_loads": null,
+          "observed_callbacks": null
+        },
+        {
+          "id": "CR-F04D",
+          "owner": "bass_cr",
+          "input": "actual parent and two-half dependency contract, mixed parent derivatives",
+          "status": "OWNER_PLANNED_DISPATCH_UNKNOWN",
+          "baseline_blocker": false
+        }
+      ],
+      "new_parallel": [
+        {
+          "id": "CR-OFF-RECEIVER",
+          "owner": "REI",
+          "state": "READY_WHEN_DISPATCH_SEAM_EXISTS",
+          "scope": "record off branch no-source/no-load/no-callback, no CR physical rate run"
+        }
+      ],
+      "preserve": {
+        "G02": "UNRESOLVED",
+        "production": "HOLD",
+        "capture": false,
+        "all_bound": "OPEN",
+        "b_grid": "NO_GO"
+      }
+    },
+    {
+      "thread": "WU088_HH",
+      "latest_results": [
+        "F07 S0 OFF decision received; old WAIT_F07 is historical",
+        "optional HH parked; baseline not blocked"
+      ],
+      "HH": "OFF",
+      "blockers": [
+        {
+          "id": "HH-OFF-RUNTIME",
+          "owner": "rei_bianchi",
+          "input": "actual no-load/no-callback receipt when receiver exists",
+          "status": "NOT_OBSERVED",
+          "baseline_blocker": false
+        },
+        {
+          "id": "HH-OPT-IN",
+          "owner": "owner scope decision + HH",
+          "input": "explicit HH on/domain/provider/distribution/unique event/energy owners and error budget",
+          "status": "OPEN_PARKED",
+          "baseline_blocker": false
+        }
+      ],
+      "new_parallel": [],
+      "no_change_rule": "No fresh HH helper/toy/packet/campaign solely for same OFF decision. Integrate changed cross-repo return through one additive sync record.",
+      "preserve": {
+        "legacy_accepted": 24,
+        "legacy_total": 289,
+        "legacy_unbounded": 265,
+        "epsilon_C": null,
+        "epsilon_R": null,
+        "B22": "OPEN_UNDETERMINED",
+        "physical_admission": false
+      }
+    }
+  ],
+  "source_identity_file": "../survey/atomic/SOURCE_IDENTITY.json",
+  "review_boundary": "This source survey does not confer scientific promotion. Native mixed result is awaiting parent independent review.",
+  "thread_delivery": "Git handoff ready, direct ChatGPT thread delivery not performed",
+  "external_mutations_by_agent": 0,
+  "publication_route": {
+    "branch_strategy": "existing branch non-force append, re-read exact live head before mutation",
+    "existing_PRs": [
+      17,
+      23,
+      33
+    ],
+    "path_template": "docs/atomic_reionization_handoff_20261004_v1/threads/{repo}/consumer_returns/REI-REC-BASS-SYNC01_20261005/",
+    "canonical_state_overwrites": false,
+    "files": [
+      "SYNC_STATE.json",
+      "NEXT_STEP_KO.md",
+      "SOURCE_BINDING.json"
+    ]
+  }
+}
