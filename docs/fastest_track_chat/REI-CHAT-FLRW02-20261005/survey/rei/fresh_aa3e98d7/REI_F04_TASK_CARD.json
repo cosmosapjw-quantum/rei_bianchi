@@ -1,0 +1,59 @@
+{
+  "repository": "cosmosapjw-quantum/rei_bianchi",
+  "ref": "aa3e98d7a4f90105c4ac9712ba71c955f9b53cea",
+  "path": "docs/atomic_reionization_handoff_20261004_v1/threads/rei_bianchi/TASKS.json",
+  "blob_sha": "64643a83f25cc5470044a5f4243680c761798390",
+  "status_rule": "The original task card contains initial CODEX_READY_NOT_EXECUTED statuses; current runtime return and CODEX_SYNC determine execution progress.",
+  "task": {
+    "id": "REI-F04",
+    "title": "실제 공동-parent sparse nonlinear remainder 인증",
+    "lane": "FASTEST",
+    "status": "CODEX_READY_NOT_EXECUTED",
+    "dependencies": [
+      "REI-F03"
+    ],
+    "inputs": [
+      "joint_affine.rs",
+      "historical judge/source identities",
+      "four source-site roles and lane applicability from F00; all3 original shape lanes if inherited NodeHistory",
+      "physical successor map input lock",
+      "PREWORK_KO.md section6.1: fixed implicit Krawczyk/derivative/Taylor/composition recipe"
+    ],
+    "outputs": [
+      "runs/rei_fastest_v1/map_certificate/parent_manifest.json",
+      "runs/rei_fastest_v1/map_certificate/certificate.json",
+      "runs/rei_fastest_v1/map_certificate/checker_receipt.json"
+    ],
+    "proposed_paths": [
+      "rust/rei_microphysics/src/validated_map.rs",
+      "rust/rei_microphysics/src/source_events.rs",
+      "rust/rei_microphysics/tests/validated_map.rs",
+      "rust/rei_microphysics/examples/check_map_certificate.rs"
+    ],
+    "steps": [
+      "Actual successor parent state dimension, topology and full/half1/half2 uncertainty-variable union are frozen; 46080 nodes only for unchanged inherited node-history structure",
+      "근거있는 공유만 coordinate 공유; site-independent uncertainties 유지",
+      "actual implicit map derivative/remainder 및 coefficient rounding 도출",
+      "table branch/floor/event topology split",
+      "independent checker는 production evaluator를 호출하지 않음",
+      "Implement section6.1 formulas on actual residual; no generic method reselection"
+    ],
+    "verification": [
+      "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test validated_map --locked",
+      "cargo run --manifest-path rust/rei_microphysics/Cargo.toml --example check_map_certificate --locked -- runs/rei_fastest_v1/map_certificate/certificate.json"
+    ],
+    "acceptance": [
+      "실제 HHe map certificate에 source/parent/runtime/input identities",
+      "all source-site remainders independently enclosed",
+      "strict <2e-4 local error and <2e-3 public width",
+      "synthetic-only result 불허",
+      "새 homogeneous 인증은 inherited 46080-node whole-history 인증/수락으로 승격되지 않는다"
+    ],
+    "failure_branches": [
+      "UNBOUNDED_REMAINDER: 실패한 node/site/topology만 refine",
+      "UNDERENCLOSURE: no commit, 실패receipt보존",
+      "ROUNDING_GAP: arithmetic enclosure 보완; fitphysical error와분리"
+    ],
+    "claim_ceiling": "인증된 해당 map/해당 domain만; 과거 실패 재판정 아님"
+  }
+}

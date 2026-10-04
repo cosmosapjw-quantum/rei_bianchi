@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0.0",
+  "ledger_id": "FLRW_THREE_EQUATIONS_PRIMARY_SOURCE_LEDGER_V1",
+  "retrieval_context_date": "2026-10-04 UTC; loop label 2026-10-05",
+  "reuse_policy": "Original derivations and independently expressed contracts; no source code copied and no blanket code-license claim inferred from paper availability.",
+  "sources": [
+    {
+      "id": "MHR1999",
+      "authors": "Madau, P.; Haardt, F.; Rees, M. J.",
+      "title": "Radiative Transfer in a Clumpy Universe. III. The Nature of Cosmological Ionizing Sources",
+      "publication_year": 1999,
+      "doi": "10.1086/306975",
+      "arxiv_id": "astro-ph/9809058",
+      "observed_pdf_version": "v1, 1998-09-04 header",
+      "stable_version_url": "https://arxiv.org/pdf/astro-ph/9809058v1",
+      "retrieved_url": "https://arxiv.org/pdf/astro-ph/9809058",
+      "source_type": "primary_research_paper",
+      "read_sections": ["Eq2 cosmological intensity transfer", "Eq9 proper ionizing-photon inventory", "Eq11 effective Case-B clumping recombination", "Eq18 proper bubble volume", "Eq20 volume filling-factor evolution"],
+      "supports": ["FLRW spectral transport and ionizing photon number accounting", "proper bubble volume expansion does not imply an extra dilution term in dimensionless filling factor", "classical source/recombination filling equation under stated IGM and thin-front assumptions"],
+      "scope_limits": ["Uses source/clumping and front assumptions; not a proof that arbitrary XV or XM is geometric QV", "Instant-source-to-front use requires photon storage and loss assumptions", "Effective Case-B ionization balance entails recombination-radiation closure"],
+      "notation_rule": "Its Q_HII in Eq20 is a filling factor of ionized regions; translate only after specifying density and phase assumptions.",
+      "retrieval_evidence_refs": ["turn122view0", "turn126view1"],
+      "code_reused": false
+    },
+    {
+      "id": "HM2012",
+      "authors": "Haardt, F.; Madau, P.",
+      "title": "Radiative Transfer in a Clumpy Universe. IV. New Synthesis Models of the Cosmic UV/X-Ray Background",
+      "publication_year": 2012,
+      "doi": "10.1088/0004-637X/746/2/125",
+      "arxiv_id": "1105.2039",
+      "observed_pdf_version": "v3, 2011-11-26 header",
+      "stable_version_url": "https://arxiv.org/pdf/1105.2039v3",
+      "retrieved_url": "https://arxiv.org/pdf/1105.2039",
+      "source_type": "primary_research_paper",
+      "read_sections": ["Eq1 cosmological spectral-intensity transfer", "Eqs17-19 photoionization rate and recombination/species balance"],
+      "supports": ["proper emissivity and spectral redshift convention", "Gamma_i integral of intensity times cross section divided by photon energy", "recombination density factor uses electron density times the recombining ion density"],
+      "scope_limits": ["Effective inhomogeneous opacity is not identical to a local nHI*sigma without a matching absorber model", "Do not copy an energy-intensity dilution coefficient directly into a spectral number equation"],
+      "retrieval_evidence_refs": ["turn122view1", "turn126view2", "turn125view1"],
+      "code_reused": false
+    },
+    {
+      "id": "C2RAY2006",
+      "authors": "Mellema, G.; Iliev, I. T.; Alvarez, M. A.; Shapiro, P. R.",
+      "title": "C2-Ray: A new method for photon-conserving transport of ionizing radiation",
+      "publication_year": 2006,
+      "doi": "10.1016/j.newast.2005.09.004",
+      "arxiv_id": "astro-ph/0508416",
+      "observed_pdf_version": "v2, 2005-09-29 header",
+      "stable_version_url": "https://arxiv.org/pdf/astro-ph/0508416v2",
+      "retrieved_url": "https://arxiv.org/pdf/astro-ph/0508416",
+      "source_type": "primary_research_paper",
+      "read_sections": ["abstract photon conservation construction", "local photoionization rate Eq2 and transport discussion"],
+      "supports": ["single absorbed-photon accounting linking radiation loss to species source", "photon-conserving numerical implementation as an explicit design constraint"],
+      "scope_limits": ["This contract does not import its ray algorithm", "Paper availability alone does not establish an unrestricted code reuse license"],
+      "retrieval_evidence_refs": ["turn127view0"],
+      "code_reused": false
+    },
+    {
+      "id": "GM2022_NOTATION",
+      "authors": "Gnedin, N. Y.; Madau, P.",
+      "title": "Modeling cosmic reionization",
+      "publication_year": 2022,
+      "doi": "10.1007/s41115-022-00015-5",
+      "retrieved_url": "https://link.springer.com/article/10.1007/s41115-022-00015-5",
+      "source_type": "author_review_supplementary_notation_crosscheck",
+      "version_policy": "Publisher article at retrieval time; equations identified below, not a version-pinned source-code dependency.",
+      "read_sections": ["Eq32 averaged ionization budget and following Q definition", "Eq33 reionization equation", "Eq35 recombination timescale", "Eq36 clumping definition", "Eq39 publisher rendering"],
+      "supports": ["Letter Q is not uniform across literature: this article defines Q=<n_HII>/<n_H>, which is XM in this contract", "Clumping/gas-selection and escape-fraction conventions must refer to a consistent gas inventory"],
+      "known_source_conflict": {
+        "location": "publisher rendered Eq39",
+        "observed_textual_factor": "n_e*n_HI in recombination term",
+        "disposition": "Do not transcribe. Use n_e*n_HII consistent with Eq35, HM2012 species balance and the recombining-ion definition.",
+        "claim_limit": "Marked a rendering/typographic conflict; no upstream correction was requested or made."
+      },
+      "retrieval_evidence_refs": ["turn129view0", "turn130view0"],
+      "code_reused": false
+    }
+  ],
+  "derived_here": [
+    {"item": "Local fraction cancellation, moving gas covariance and open-domain quotient terms", "method": "Direct species-continuity algebra and divergence theorem under common FLRW expansion"},
+    {"item": "Proper/comoving spectral number Jacobian and moving threshold", "method": "Photon-number coordinate transformation and Leibniz rule applied to cosmological transfer"},
+    {"item": "Unified I1/I2 inventory and filling residual D1", "method": "Add matter and photon equations with matched H photoabsorption events"},
+    {"item": "Sharp-phase QV*deltaI relation and admissibility", "method": "Conditional-density partition and differentiated nuclei inventory"},
+    {"item": "Future coupled grey power-law history candidate, not executed in this loop", "method": "Power-law shape invariance under FLRW redshift, frequency-independent absorption and matched power-law injection; actual E3 is a separate collisionless finite-band photon-only special case with explicit upper-tail inflow"},
+    {"item": "Fourteen analytic counterexamples", "method": "Manufactured exact expected values; runtime execution tracked separately"}
+  ],
+  "publication_claim_limits": ["No new atomic theory claimed.", "No standalone PDF openness interpreted as permission to redistribute a code repository.", "No runtime, physical-fit or geometric-front completion implied by a paper citation.", "Current F03 source-bound Case-A and future F04 nonlinear certificate remain separate."]
+}
