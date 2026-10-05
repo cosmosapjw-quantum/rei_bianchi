@@ -1,0 +1,750 @@
+{
+  "task_id": "REI-F08",
+  "state": "completed",
+  "input_identity": {
+    "scenario": "configs/rei_fastest_v1/science_scenario_v1.json",
+    "scenario_sha256": "c83d2d43adda663707f99af2b45576eb4478cd94d3440a21fd21eaed32b5f2c1",
+    "actual_source_registry": "runs/rei_fastest_v1/paired/source_manifest.json",
+    "producer_identities": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/compiled-producer-identities.json"
+  },
+  "changed_paths": [
+    "rust/rei_microphysics/src/paired_runtime.rs",
+    "rust/rei_microphysics/src/coupled_primary.rs",
+    "rust/rei_microphysics/examples/paired_history.rs",
+    "runs/rei_fastest_v1/paired",
+    "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired",
+    "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/REI-F08.json"
+  ],
+  "commands": [
+    {
+      "command": "cargo test --release --manifest-path /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/Cargo.toml --lib --example paired_history",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/packaging-cargo-tests.log"
+    },
+    {
+      "command": "cargo build --release --manifest-path /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/Cargo.toml --example paired_history",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/packaging-build.log"
+    },
+    {
+      "command": "rustc --test --edition 2021 -O /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/native_tests_v2.rs --extern rei_microphysics=/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/deps/librei_microphysics-2db3552c92b16edc.rlib -L dependency=/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/deps -o /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/packaging-api-tests",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/packaging-api-build.log"
+    },
+    {
+      "command": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/packaging-api-tests",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/packaging-api-tests.log"
+    },
+    {
+      "command": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/canonical-packaging-pilot --pilot --only T2_BI",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/packaging-pilot.log"
+    },
+    {
+      "command": "sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/canonical-packaging-pilot/T2_BI",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/packaging-pilot-independent.log"
+    },
+    {
+      "command": "cargo test --release --manifest-path rust/rei_microphysics/Cargo.toml --tests",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/packaging-integration-tests.log"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/T0_BI --full --only T0_BI",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/T0_BI-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/T0_EPS_HALF --full --only T0_EPS_HALF",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/T0_EPS_HALF-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/T1_FLRW --full --only T1_FLRW",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/T1_FLRW-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/T1_BI --full --only T1_BI",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/T1_BI-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/T2_FLRW --full --only T2_FLRW",
+      "exit_code": 2,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/T2_FLRW-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/whole-T2_FLRW/T2_FLRW --stream",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/T2_FLRW-independent-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/whole-T2_FLRW --full --only T2_FLRW --resume",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/T2_FLRW-producer-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/T2_BI --full --only T2_BI",
+      "exit_code": 2,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/T2_BI-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/T2_BI/T2_BI --stream",
+      "exit_code": 241,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/T2_BI-independent-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/whole-T2_BI/T2_BI --stream",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/T2_BI-independent-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/whole-T2_BI --full --only T2_BI --resume",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/T2_BI-producer-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/S0_FLRW --full --only S0_FLRW",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/S0_FLRW-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/S0_FLRW/S0_FLRW --stream",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/S0_FLRW-independent-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/S0_BI --full --only S0_BI",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/S0_BI-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/S0_BI/S0_BI --stream",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/S0_BI-independent-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/S2_FLRW --full --only S2_FLRW",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/S2_FLRW-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/S2_FLRW/S2_FLRW --stream",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/S2_FLRW-independent-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/matched-producer.binary --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/S2_BI --full --only S2_BI --resume",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/S2_BI-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/S2_BI/S2_BI --stream",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/S2_BI-independent-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/matched-producer.binary --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/S2_BI --full --only S2_BI --resume",
+      "exit_code": 1,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/S2_BI-producer-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/A0_FLRW --full --only A0_FLRW",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/A0_FLRW-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/A0_FLRW/A0_FLRW --stream",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/A0_FLRW-independent-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/matched-producer.binary --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/A0_BI --full --only A0_BI --resume",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/A0_BI-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/A0_BI/A0_BI --stream",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/A0_BI-independent-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/matched-producer.binary --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/A0_BI --full --only A0_BI --resume",
+      "exit_code": 1,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/A0_BI-producer-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/matched-producer.binary --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/A2_FLRW --full --only A2_FLRW --resume",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/A2_FLRW-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/A2_FLRW/A2_FLRW --stream",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/A2_FLRW-independent-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/matched-producer.binary --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/A2_FLRW --full --only A2_FLRW --resume",
+      "exit_code": 1,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/A2_FLRW-producer-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/matched-producer.binary --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/A2_BI --full --only A2_BI",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/A2_BI-production-receipt.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/A2_BI/A2_BI --stream",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/A2_BI-independent-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/matched-producer.binary --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/whole-matched/A2_BI --full --only A2_BI",
+      "exit_code": 1,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/A2_BI-producer-resume-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/whole-T2_FLRW --full --only T2_FLRW --resume",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/conservative-candidate/T2_FLRW-repair-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/whole-T2_FLRW/T2_FLRW --stream",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/conservative-candidate/T2_FLRW-repair-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/paired_history --scenario /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json --output /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/whole-T2_BI --full --only T2_BI --resume",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/conservative-candidate/T2_BI-repair-execution.json"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F08 -- sage -python /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/whole-T2_BI/T2_BI --stream",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F08_paired/conservative-candidate/T2_BI-repair-execution.json"
+    },
+    {
+      "command": "python3 .cuh/fastest-track/REI-F08-PAIRED/finish_paired.py",
+      "exit_code": 0,
+      "evidence_path": "runs/rei_fastest_v1/paired/campaign_summary.json"
+    }
+  ],
+  "artifacts": [
+    "runs/rei_fastest_v1/paired/campaign_summary.json",
+    "runs/rei_fastest_v1/paired/paired_history.csv",
+    "runs/rei_fastest_v1/paired/paired_history.png",
+    "runs/rei_fastest_v1/paired/difference_error_ledger.json",
+    "runs/rei_fastest_v1/paired/consumer_inputs/"
+  ],
+  "claim": {
+    "basis": {
+      "status": "PRESCRIBED_DISCRETE_PAIRED_HISTORY_INDEPENDENT_PASS",
+      "runs": 15,
+      "accepted_trials": 248000,
+      "completed_interval_s": [
+        0,
+        10000000000000.0
+      ],
+      "source_registry": "source_manifest.json",
+      "proper_electron_density_inputs": "consumer_inputs/*-electron_density.csv.gz; conditional on actual binary stage density; normal-time seconds; no observer tail assumed",
+      "raw_availability": "Complete original JSONL preserved at local source_manifest paths; compact curves and proof receipts published; raw bytes not in Git",
+      "separate_resolution_effects": "difference_error_ledger.json",
+      "figure": "paired_history.png",
+      "full_proofs": {
+        "T0_FLRW": {
+          "run": "T0_FLRW",
+          "time_s": 10000000000000.0,
+          "accepted": 8000,
+          "rejected": 0,
+          "maxima": {
+            "local": 9.312242543444628e-05,
+            "width": 1.8986428996355396e-08,
+            "q": 3.128808838585968e-11,
+            "point_ledger": 9.942133921692076e-16
+          },
+          "cumulative": [
+            2.581268532253489e-14,
+            1.760925212556176e-13
+          ],
+          "raw_sha256": "cd985bb09c6cce51f0c049421be027399f97c62a257d8a6bc3c9eee0a978d2a3"
+        },
+        "T0_BI": {
+          "run": "T0_BI",
+          "time_s": 10000000000000.0,
+          "accepted": 8000,
+          "rejected": 0,
+          "maxima": {
+            "local": 9.312492025080537e-05,
+            "width": 1.898790923999936e-08,
+            "q": 3.1290075853204465e-11,
+            "point_ledger": 8.708853950489814e-16
+          },
+          "cumulative": [
+            1.7069679003611782e-14,
+            1.792230549668286e-13
+          ],
+          "raw_sha256": "a908fe80eea46bdab2ca1f3b140fe8e03aa3f96ca6351e2dbf70eb9c2c133bd8"
+        },
+        "T0_EPS_HALF": {
+          "run": "T0_EPS_HALF",
+          "time_s": 10000000000000.0,
+          "accepted": 8000,
+          "rejected": 0,
+          "maxima": {
+            "local": 9.312304913853609e-05,
+            "width": 1.8987738722688034e-08,
+            "q": 3.129039019501298e-11,
+            "point_ledger": 1.024842103541923e-15
+          },
+          "cumulative": [
+            1.637578961322106e-14,
+            1.718439397904027e-13
+          ],
+          "raw_sha256": "b4e66a4b9bd9b9356867dea032663765325c0d8e7ca413be0785af6b6246d16b"
+        },
+        "T1_FLRW": {
+          "run": "T1_FLRW",
+          "time_s": 10000000000000.0,
+          "accepted": 16000,
+          "rejected": 0,
+          "maxima": {
+            "local": 2.3304234193580828e-05,
+            "width": 4.009719747558126e-08,
+            "q": 3.1271407307750974e-11,
+            "point_ledger": 5.021488339887044e-16
+          },
+          "cumulative": [
+            1.8735013540549517e-14,
+            1.8347163643204347e-13
+          ],
+          "raw_sha256": "3066a01028a778745f27f69e95164f7fefd6a132924b2e7edd7ff3981cceae77"
+        },
+        "T1_BI": {
+          "run": "T1_BI",
+          "time_s": 10000000000000.0,
+          "accepted": 16000,
+          "rejected": 0,
+          "maxima": {
+            "local": 2.3304858642633522e-05,
+            "width": 4.009832974560907e-08,
+            "q": 3.1270101277082414e-11,
+            "point_ledger": 4.60290824924671e-16
+          },
+          "cumulative": [
+            2.914335439641036e-15,
+            1.8078832182243407e-13
+          ],
+          "raw_sha256": "806e4f92dd38921e444854f65138498d4cd3c2b1c2b67db83e7816038654897e"
+        },
+        "T2_FLRW": {
+          "run": "T2_FLRW",
+          "time_s": 10000000000000.0,
+          "accepted": 32000,
+          "rejected": 0,
+          "maxima": {
+            "local": 5.829016173851281e-06,
+            "width": 9.001498542253394e-08,
+            "q": 3.126050354643038e-11,
+            "point_ledger": 6.818954038576019e-16
+          },
+          "cumulative": [
+            1.1046719095020308e-13,
+            4.472191016015685e-16
+          ],
+          "raw_sha256": "19aaa8518e55c00746fce3fd430deb8193f204e739119027d6808de5df08ce64"
+        },
+        "T2_BI": {
+          "run": "T2_BI",
+          "time_s": 10000000000000.0,
+          "accepted": 32000,
+          "rejected": 0,
+          "maxima": {
+            "local": 5.82917237942333e-06,
+            "width": 9.00251683754786e-08,
+            "q": 3.126294193172305e-11,
+            "point_ledger": 5.204170427930421e-16
+          },
+          "cumulative": [
+            5.4262150328554526e-14,
+            1.1180477540039214e-16
+          ],
+          "raw_sha256": "9ea567c833d55870d4b482820e79c0d7d64f173dae49b0ea556a13694d4152e2"
+        },
+        "S0_FLRW": {
+          "run": "S0_FLRW",
+          "time_s": 10000000000000.0,
+          "accepted": 16000,
+          "rejected": 0,
+          "maxima": {
+            "local": 5.791203434975893e-06,
+            "width": 1.857695146885708e-08,
+            "q": 1.2979809836924897e-11,
+            "point_ledger": 4.829425942495274e-16
+          },
+          "cumulative": [
+            1.762479051592436e-14,
+            1.776577881112231e-13
+          ],
+          "raw_sha256": "a7a4a969d86af501b1ee687faedef8c84981e18ebb183a5b124e6f8e782bf267"
+        },
+        "S0_BI": {
+          "run": "S0_BI",
+          "time_s": 10000000000000.0,
+          "accepted": 16000,
+          "rejected": 0,
+          "maxima": {
+            "local": 5.791359404341079e-06,
+            "width": 1.85780009224282e-08,
+            "q": 1.2980210421482886e-11,
+            "point_ledger": 5.008384396175282e-16
+          },
+          "cumulative": [
+            3.441691376337985e-14,
+            1.773223737850219e-13
+          ],
+          "raw_sha256": "79d2e1c927c33b3216ffbc7331f36450854f1c6120fffd03e80575d5f34bce3f"
+        },
+        "S2_FLRW": {
+          "run": "S2_FLRW",
+          "time_s": 10000000000000.0,
+          "accepted": 16000,
+          "rejected": 0,
+          "maxima": {
+            "local": 9.348107342063178e-05,
+            "width": 8.347763928686979e-08,
+            "q": 7.038714975643194e-11,
+            "point_ledger": 4.58071666317417e-16
+          },
+          "cumulative": [
+            3.1502578323738817e-14,
+            1.7150852546420153e-13
+          ],
+          "raw_sha256": "48c4d6c9d379896d8ac321cd1603c86f9ba17f4c1985318e93337ffe71a69d58"
+        },
+        "S2_BI": {
+          "run": "S2_BI",
+          "time_s": 10000000000000.0,
+          "accepted": 16000,
+          "rejected": 0,
+          "maxima": {
+            "local": 9.348357236003097e-05,
+            "width": 8.347831767491671e-08,
+            "q": 7.038307372126723e-11,
+            "point_ledger": 4.844237216607553e-16
+          },
+          "cumulative": [
+            8.604228440844963e-15,
+            1.8816743699885995e-13
+          ],
+          "raw_sha256": "c9180ea61f75b0ae840e3783ddef1bbbda0513aeeb91f2f119e4dd0fab579cdd"
+        },
+        "A0_FLRW": {
+          "run": "A0_FLRW",
+          "time_s": 10000000000000.0,
+          "accepted": 16000,
+          "rejected": 0,
+          "maxima": {
+            "local": 2.3304234193580828e-05,
+            "width": 4.010624924791722e-08,
+            "q": 3.127996450784662e-11,
+            "point_ledger": 5.250926646618859e-16
+          },
+          "cumulative": [
+            1.7486012637846216e-14,
+            1.832480268812427e-13
+          ],
+          "raw_sha256": "05c64d6b35f7c31ebafe127f633163e3fdda1a5ec0fec6fc4e5f0a26776e8656"
+        },
+        "A0_BI": {
+          "run": "A0_BI",
+          "time_s": 10000000000000.0,
+          "accepted": 16000,
+          "rejected": 0,
+          "maxima": {
+            "local": 2.3304860642763947e-05,
+            "width": 4.010825869701116e-08,
+            "q": 3.127970671787327e-11,
+            "point_ledger": 4.499439015814843e-16
+          },
+          "cumulative": [
+            3.469446951953614e-15,
+            1.7508627827701406e-13
+          ],
+          "raw_sha256": "652e3deff6e00418e4f59a10a137b63f5796ce48af6026eaef7807f3aa96f7a6"
+        },
+        "A2_FLRW": {
+          "run": "A2_FLRW",
+          "time_s": 10000000000000.0,
+          "accepted": 16000,
+          "rejected": 0,
+          "maxima": {
+            "local": 2.3304234193580828e-05,
+            "width": 4.0085359768754765e-08,
+            "q": 3.1263401225689686e-11,
+            "point_ledger": 4.740534215818012e-16
+          },
+          "cumulative": [
+            1.8041124150158794e-14,
+            1.8391885553364504e-13
+          ],
+          "raw_sha256": "ea7dfb776c7e11ebce299f274c4ac043b7c1480a49acfcbef1ed781e2b733c83"
+        },
+        "A2_BI": {
+          "run": "A2_BI",
+          "time_s": 10000000000000.0,
+          "accepted": 16000,
+          "rejected": 0,
+          "maxima": {
+            "local": 2.3304858517710826e-05,
+            "width": 4.008603690431225e-08,
+            "q": 3.126117210905543e-11,
+            "point_ledger": 4.923699096227623e-16
+          },
+          "cumulative": [
+            4.163336342344337e-15,
+            1.802292979454321e-13
+          ],
+          "raw_sha256": "8a4c78df0fb7dba314340ebab268820c9e6043cca57a34279ddc7bf6dbe00527"
+        }
+      },
+      "observational_reionization_claim": false,
+      "physical_fit_error": "NOT_MEASURED",
+      "continuum_error_bound": "NOT_ESTABLISHED",
+      "QV": "NOT_EVALUABLE",
+      "scientific_admission": "HOLD",
+      "failed_candidate_repairs": [
+        {
+          "run": "T2_FLRW",
+          "original_raw_local_path": ".cuh/fastest-track/REI-F08-PAIRED/whole-matched/T2_FLRW/T2_FLRW/trials.jsonl",
+          "original_raw_sha256": "b4163fc91b931b4718885cff650a5f5e97e4d813535fdebc64296c7e1150dcf0",
+          "original_summary": {
+            "status": "COMPLETE_HISTORY_CANDIDATE",
+            "spec": "T2",
+            "geometry": "FLRW",
+            "accepted": 32000,
+            "rejected": 0,
+            "time_s": 10000000000000.0,
+            "fractions": [
+              0.9690539943546266,
+              0.3011578209180257,
+              0.599550187739135
+            ],
+            "temperature_K": 38872.62120817348,
+            "photon_n": 0.04898002976815012,
+            "photon_u_ev_per_h": 0.6285810441242035,
+            "lower_guard_n": 8.748525646970334e-05,
+            "lower_guard_u": 0.0008636998020011171,
+            "gamma_per_s": [
+              4.2931036548244366e-14,
+              0.0,
+              0.0
+            ],
+            "escape_ev_per_h": 0.00428519019121539,
+            "redshift_work_ev_per_h": 0.04423345987264954,
+            "thermal_work_ev_per_h": 2.4386491821769027,
+            "source_n": 0.05,
+            "source_u": 0.6849999999999999,
+            "absorbed_n": 0.05101997023183782,
+            "local_bound": 5.829136174079122e-06,
+            "public_width": 1.6258489778098184e-06,
+            "ledger": 4.848168567068459e-16,
+            "w_ev_per_h": 10.936584069337243,
+            "gas_parent": [
+              [
+                0.9690539867980914,
+                0.9690540019111618
+              ],
+              [
+                0.3011578202182202,
+                0.30115782161783117
+              ],
+              [
+                0.5995501870065995,
+                0.5995501884716706
+              ],
+              [
+                10.936584029164127,
+                10.93658410951036
+              ]
+            ],
+            "cumulative_n_residual": 1.2073675392798577e-13,
+            "cumulative_u_residual": 2.5480308313749365e-12,
+            "scientific_admission": "HOLD"
+          },
+          "repair_execution": {
+            "task": "REI-F08",
+            "run": "T2_FLRW",
+            "producer_exit_code": 0,
+            "independent_exit_code": 0,
+            "producer_argv": [
+              "cuhg-telemetry",
+              "run",
+              "--project",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+              "--task",
+              "REI-F08",
+              "--",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/paired_history",
+              "--scenario",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json",
+              "--output",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/whole-T2_FLRW",
+              "--full",
+              "--only",
+              "T2_FLRW",
+              "--resume"
+            ],
+            "validator_argv": [
+              "cuhg-telemetry",
+              "run",
+              "--project",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+              "--task",
+              "REI-F08",
+              "--",
+              "sage",
+              "-python",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/whole-T2_FLRW/T2_FLRW",
+              "--stream"
+            ],
+            "execution_interrupted_and_durably_resumed": true,
+            "original_production_failure_exit": 2,
+            "scientific_gate": 1e-12,
+            "successful_axes_replayed": false,
+            "scientific_admission": "HOLD"
+          },
+          "original_failure_rewritten": false
+        },
+        {
+          "run": "T2_BI",
+          "original_raw_local_path": ".cuh/fastest-track/REI-F08-PAIRED/whole-matched/T2_BI/T2_BI/trials.jsonl",
+          "original_raw_sha256": "1e01d1eee618675081b6d6478b4d3566098a340ce05561164dd8b79780cc1884",
+          "original_summary": {
+            "status": "COMPLETE_HISTORY_CANDIDATE",
+            "spec": "T2",
+            "geometry": "BI",
+            "accepted": 32000,
+            "rejected": 0,
+            "time_s": 10000000000000.0,
+            "fractions": [
+              0.9690542794520218,
+              0.30115782084628223,
+              0.5995501876349125
+            ],
+            "temperature_K": 38872.61907763265,
+            "photon_n": 0.048979679702553694,
+            "photon_u_ev_per_h": 0.6285760770623396,
+            "lower_guard_n": 8.752930911496692e-05,
+            "lower_guard_u": 0.0008641319569359555,
+            "gamma_per_s": [
+              4.293188863614244e-14,
+              0.0,
+              0.0
+            ],
+            "escape_ev_per_h": 0.004285191598867419,
+            "redshift_work_ev_per_h": 0.04423363254564333,
+            "thermal_work_ev_per_h": 2.438649266120514,
+            "source_n": 0.05,
+            "source_u": 0.6849999999999999,
+            "absorbed_n": 0.05102032029743949,
+            "local_bound": 5.829292536058151e-06,
+            "public_width": 1.625901864810153e-06,
+            "ledger": 4.849066859979232e-16,
+            "w_ev_per_h": 10.936584902326885,
+            "gas_parent": [
+              [
+                0.9690542718947462,
+                0.9690542870092974
+              ],
+              [
+                0.30115782014647635,
+                0.3011578215460881
+              ],
+              [
+                0.5995501869024134,
+                0.5995501883674117
+              ],
+              [
+                10.936584862149934,
+                10.936584942503837
+              ]
+            ],
+            "cumulative_n_residual": 6.827871601444713e-14,
+            "cumulative_u_residual": 2.5328253819204834e-12,
+            "scientific_admission": "HOLD"
+          },
+          "repair_execution": {
+            "task": "REI-F08",
+            "run": "T2_BI",
+            "producer_exit_code": 0,
+            "independent_exit_code": 0,
+            "producer_argv": [
+              "cuhg-telemetry",
+              "run",
+              "--project",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+              "--task",
+              "REI-F08",
+              "--",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/paired_history",
+              "--scenario",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/configs/rei_fastest_v1/science_scenario_v1.json",
+              "--output",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/whole-T2_BI",
+              "--full",
+              "--only",
+              "T2_BI",
+              "--resume"
+            ],
+            "validator_argv": [
+              "cuhg-telemetry",
+              "run",
+              "--project",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+              "--task",
+              "REI-F08",
+              "--",
+              "sage",
+              "-python",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/checker_v5/check_history.py",
+              "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.cuh/fastest-track/REI-F08-PAIRED/conservative-candidate/whole-T2_BI/T2_BI",
+              "--stream"
+            ],
+            "execution_interrupted_and_durably_resumed": true,
+            "original_production_failure_exit": 2,
+            "scientific_gate": 1e-12,
+            "successful_axes_replayed": false,
+            "scientific_admission": "HOLD"
+          },
+          "original_failure_rewritten": false
+        }
+      ],
+      "point_implementation_variants": "Original Picard output and qualified conservative compensated variant; same externally verified nonlinear stage map, fixed model and unchanged scientific gates"
+    },
+    "ceiling": "Full prescribed discrete S0 FLRW/Bianchi/weak-shear15-history numerical component; no physical fit, continuum uncertainty, observational reionization or filling-QV admission"
+  },
+  "next_task": "REI-F09",
+  "native_accounting": {
+    "author_tokens": 6607929,
+    "review_usage": {
+      "input_tokens": 1407795,
+      "cached_input_tokens": 1322496,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 10205,
+      "reasoning_output_tokens": 4994,
+      "total_tokens": 1418000
+    },
+    "stage_tokens": 2393701,
+    "F08_cumulative_tokens": 10419630,
+    "F08_native_dispatches": 4,
+    "cost": "NOT_MEASURED"
+  },
+  "review": "One independent higher reviewer; four targeted Host repairs; conservative floating-point repair separately actualMPFI/recovery validated; final source not independently rereviewed",
+  "scientific_admission": "HOLD",
+  "raw_preservation": "All complete source JSONL including failedT2 candidates preserved at source-registry local paths; compact public curves/receipts/source identities",
+  "direct_chat_delivery": "UNDELIVERED_NO_BROWSER_AVAILABLE"
+}

@@ -1,0 +1,104 @@
+{
+  "schema": "wu088.hh_owner_input_request.v1",
+  "task_id": "HH-F07-INTAKE-20261005",
+  "authority_owner": "rei_bianchi",
+  "status": "DRAFT_SOURCE_BOUND_REQUEST_NOT_AN_OWNER_RECEIPT",
+  "ready_for_HH_F1": false,
+  "selected_consumer_model": null,
+  "selected_consumer_source_seam": null,
+  "activation": {
+    "HH_enable": null,
+    "new_owner_approval_received": false,
+    "physical_admission": false,
+    "production_admission": false
+  },
+  "observed_only_ft03": {
+    "adopted_as_HH_domain": false,
+    "source_id": "FT03_BINDING",
+    "model_id": "REI_FT03_HG_RATE_MOMENT_CASE_A_CONTROLLED_V1",
+    "constructor_nH_cm3": "0.0001",
+    "constructor_nHe_cm3": "8.3e-06",
+    "initial_fraction_decimal": [
+      "0.9",
+      "0.3",
+      "0.6"
+    ],
+    "initial_T_K": 50000,
+    "temperature_call_guard_K": [
+      30000,
+      110000
+    ],
+    "geometry": "H=0 proper/static homogeneous gas rest frame",
+    "time_unit": "s",
+    "coordinates": [
+      "x_HII",
+      "x_HeII",
+      "x_HeIII",
+      "u_erg_cm3",
+      "N0_cm3",
+      "N1_cm3",
+      "N2_cm3"
+    ],
+    "constants_decimal": {
+      "c_cm_s": "29979245800",
+      "kB_erg_K": "1.380649e-16",
+      "eV_erg": "1.602176634e-12",
+      "H_binding_eV": "13.598434599702"
+    },
+    "constant_identity_note": "Declared decimal metadata copied from binding; no claim of exact binary64 real arithmetic.",
+    "HH_channel": "disabled in controlled model; exact-zero model definition, not negligibility",
+    "baseline_rhs": {
+      "path": "rust/rei_microphysics/src/ft03_controlled.rs",
+      "function": "ft03_rhs",
+      "git_blob": "370fd2fa60521f2dc121ee81c7d24013a3b0d1e5"
+    },
+    "actual_source_site": "backward_euler_endpoint for each full/half1/half2",
+    "existing_step_control": {
+      "max_iterations": 80,
+      "residual_tolerance": "1e-14",
+      "strict_local_less_than": "2e-4",
+      "strict_public_width_less_than": "2e-3"
+    },
+    "not_a_new_HH_budget": true
+  },
+  "owner_decisions_required": {
+    "domain_and_scenario": null,
+    "distribution_and_frame": null,
+    "constants_and_geometry_adoption": null,
+    "HH_enable_provider_cutoff_policy": null,
+    "single_process_threshold_thermal_binding_owners": null,
+    "actual_HH_rhs_stepper_residual_event_seam": null,
+    "observable_numeric_and_model_uncertainty_budget": null
+  },
+  "decision_details": {
+    "domain_and_scenario": "Actual T,nH,nHe,time/redshift,SED/IC ranges and source tail/secondary decisions. An existing constructor point is not a box.",
+    "distribution_and_frame": "Explicit distribution, gas frame, shared-temperature assumptions and supported departures.",
+    "constants_and_geometry_adoption": "Versioned source registry, chosen energy units and H=0/expanding status. Existing constants are observations until adopted.",
+    "HH_enable_provider_cutoff_policy": "Explicit off or opt-in; version-pinned LCS/KS selected separately; reject outside domain; no silent floor smoothing, extrapolation or blended providers.",
+    "single_process_threshold_thermal_binding_owners": "Name the unique HH event owner and thermal/binding/threshold owners; preserve no extra 1/2 and chi binding energy.",
+    "actual_HH_rhs_stepper_residual_event_seam": "Exact selected commit/path/blob and signatures, source selector, positive-block update, thermal solve, residual and full/half event accumulation. No HH seam exists merely because RCT composition exists.",
+    "observable_numeric_and_model_uncertainty_budget": "Chosen observables, dimensional scales, numerical tolerances and physical uncertainty interpretation. Unresolved empirical error may be explicitly scenario-only, never promoted to an enclosure."
+  },
+  "conditional_findings": [
+    "If owner adopts the unchanged FT03 call window and certifies every relevant state box inside it, 30000 K > 3000 K excludes the raw HH cutoff in that selected scope. A point guard alone is not trajectory/root enclosure.",
+    "Preserve typed ft03_rhs baseline. Ft03Model.gas has zero legacy alpha/beta, so routing to hhe_rhs(&ft03.gas) would omit FT03 RR/CI/DR.",
+    "Reuse the RCT design distinction baseline/extra event, not its chemistry, electron delta, radiative escape closure or provider admission.",
+    "HH thermal contribution is -chi*R with separate HH event; neither existing electron-CI slots nor RCT photon emission are valid substitutes.",
+    "Return HH-off/no-negligibility scope explicitly when baseline excludes it; this does not complete optional HH-F1/F2 or F09."
+  ],
+  "proposed_owner_return_paths": [
+    "configs/rei_fastest_v1/science_scenario_v1.json",
+    "docs/atomic_reionization_handoff_20261004_v1/science_scenario_decision.md",
+    "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/REI-F07.json"
+  ],
+  "path_status": "first two from canonical F07 task; third suggested same return convention, not observed existing",
+  "return_required": "Owner supplies actual decision values and source identity. A copied draft with null decisions is not admission.",
+  "do_not_change": [
+    "F04 logical status/gates",
+    "F00-F03 controlled fixtures",
+    "canonical TASKS/EXECUTION_STATE without owner action",
+    "legacy HH gates",
+    "He RCT scope"
+  ],
+  "until_return": "No additional generic cutoff helper, synthetic campaign, HH provider integration or full-suite replay."
+}

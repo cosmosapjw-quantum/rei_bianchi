@@ -1,0 +1,8 @@
+extern crate rei_microphysics;
+pub use rei_microphysics::*;
+#[path="/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/paired_runtime.rs"]pub mod paired_runtime;
+use paired_runtime::*;
+fn cfg()->PairedConfig{PairedConfig{spectral_subdivisions:4,n_mu:4,n_phi:8}}
+#[test]fn same_initial_and_strict_trial(){let c=cfg();let s=paired_initial(&c).unwrap();let before=format!("{:?}",s);let a=paired_trial(&c,[1e-14;3],&s,1e9).unwrap();assert_eq!(before,format!("{:?}",s));assert!(a.local_bound<2e-4 && a.public_width<2e-3 && a.max_ledger<=1e-12);assert_eq!(a.state.time_s,1e9);assert_eq!(a.audits.len(),3);assert!(a.state.photons.iter().all(|p|p.is_finite()&&*p>=0.));for (p,b) in a.state.photons.iter().zip(&a.state.photon_boxes){assert!(b.lo<=*p&&*p<=b.hi);}}
+#[test]fn actual_bianchi_and_exact_zero_shear(){let c=cfg();let s=paired_initial(&c).unwrap();let a=paired_trial(&c,[1e-14;3],&s,1e9).unwrap();let z=paired_trial(&c,[1e-14;3],&s,1e9).unwrap();assert_eq!(format!("{:?}",a.state),format!("{:?}",z.state));let b=paired_trial(&c,[1.01e-14,0.99e-14,1e-14],&s,1e9).unwrap();assert!(b.local_bound<2e-4&&b.public_width<2e-3&&b.max_ledger<=1e-12);assert_eq!(a.state.source_photons_per_h,b.state.source_photons_per_h);let v=paired_trial(&c,[1.01e-14,0.99e-14,1e-14],&b.state,1e9).unwrap();assert!(v.local_bound<2e-4);}
+#[test]fn invalid_rejects_without_mutation(){let c=cfg();let s=paired_initial(&c).unwrap();let before=format!("{:?}",s);assert!(paired_trial(&c,[1e-14;3],&s,1e10).is_err());assert!(paired_trial(&c,[-1e-14,1e-14,1e-14],&s,1e9).is_err());assert!(paired_trial(&c,[1e-14;3],&s,-1.).is_err());assert_eq!(before,format!("{:?}",s));assert!(energy_nodes(&PairedConfig{spectral_subdivisions:0,n_mu:4,n_phi:8}).is_err());}
