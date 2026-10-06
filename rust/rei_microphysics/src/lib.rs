@@ -140,3 +140,5 @@ pub mod igm_source;
 pub mod igm_state;
 pub mod igm_step;
 pub mod igm_thermal;
+
+pub mod igm_continuous;

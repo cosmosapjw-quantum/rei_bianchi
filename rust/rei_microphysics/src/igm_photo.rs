@@ -27,6 +27,26 @@ pub fn packet_opacity(
     nh: f64,
     nhe: f64,
 ) -> Result<[f64; 3], ForwardError> {
+    packet_opacity_impl(gas, energy, None, nh, nhe)
+}
+/// Disable specified absorber channels without changing the photon energy.
+/// Active channels retain the atomic provider's original support convention.
+pub fn packet_opacity_masked(
+    gas: &IgmGasState,
+    energy: f64,
+    active: [bool; 3],
+    nh: f64,
+    nhe: f64,
+) -> Result<[f64; 3], ForwardError> {
+    packet_opacity_impl(gas, energy, Some(active), nh, nhe)
+}
+fn packet_opacity_impl(
+    gas: &IgmGasState,
+    energy: f64,
+    active: Option<[bool; 3]>,
+    nh: f64,
+    nhe: f64,
+) -> Result<[f64; 3], ForwardError> {
     gas.eos(nh, nhe)?;
     if !energy.is_normal() || energy <= 0.0 {
         return Err(invalid());
@@ -39,6 +59,9 @@ pub fn packet_opacity(
         .iter()
         .enumerate()
     {
+        if active.is_some_and(|mask| !mask[i]) {
+            continue;
+        }
         let sigma = AtomicProvider::reference().cross_section(*a, energy)?;
         out[i] = c.c_cm_s * n[i] * sigma;
         if !valid(out[i]) || (n[i] > 0.0 && sigma > 0.0 && !out[i].is_normal()) {
@@ -53,19 +76,45 @@ pub fn igm_photo_rates(
     nh: f64,
     nhe: f64,
 ) -> Result<IgmPhotoRates, ForwardError> {
+    igm_photo_rates_impl(gas, packets, None, nh, nhe)
+}
+/// Per-packet, per-absorber support masks shared by gamma, heat and photon owners.
+pub fn igm_photo_rates_masked(
+    gas: &IgmGasState,
+    packets: &[PrimaryPacket],
+    masks: &[[bool; 3]],
+    nh: f64,
+    nhe: f64,
+) -> Result<IgmPhotoRates, ForwardError> {
+    igm_photo_rates_impl(gas, packets, Some(masks), nh, nhe)
+}
+fn igm_photo_rates_impl(
+    gas: &IgmGasState,
+    packets: &[PrimaryPacket],
+    masks: Option<&[[bool; 3]]>,
+    nh: f64,
+    nhe: f64,
+) -> Result<IgmPhotoRates, ForwardError> {
+    if masks.is_some_and(|m| m.len() != packets.len()) {
+        return Err(invalid());
+    }
     gas.eos(nh, nhe)?;
     let c = HHeModel::controlled_fixture();
     let mut out = IgmPhotoRates::default();
-    for p in packets {
+    for (j, p) in packets.iter().enumerate() {
         if !valid(p.per_h) {
             return Err(invalid());
         }
-        let opacity = packet_opacity(gas, p.energy_ev, nh, nhe)?;
+        let active = masks.map(|m| m[j]);
+        let opacity = packet_opacity_impl(gas, p.energy_ev, active, nh, nhe)?;
         let mut owners = [0.0; 3];
         for (i, a) in [Absorber::HI, Absorber::HeI, Absorber::HeII]
             .iter()
             .enumerate()
         {
+            if active.is_some_and(|mask| !mask[i]) {
+                continue;
+            }
             let sigma = AtomicProvider::reference().cross_section(*a, p.energy_ev)?;
             if sigma == 0.0 || p.per_h == 0.0 {
                 continue;

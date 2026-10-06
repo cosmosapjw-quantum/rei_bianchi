@@ -39,7 +39,7 @@ pub struct StepResult {
 }
 
 use crate::{
-    igm_photo::{igm_photo_rates, packet_opacity},
+    igm_photo::{igm_photo_rates, igm_photo_rates_masked, packet_opacity, packet_opacity_masked},
     igm_rates::igm_rates,
     igm_thermal::igm_point_rhs,
 };
@@ -49,6 +49,7 @@ fn invalid() -> ForwardError {
 fn endpoint(
     gas: &IgmGasState,
     old_packets: &[PrimaryPacket],
+    masks: Option<&[[bool; 3]]>,
     b: StepBackground,
     dt: f64,
 ) -> Result<
@@ -60,13 +61,15 @@ fn endpoint(
     ForwardError,
 > {
     let mut photons = Vec::with_capacity(old_packets.len());
-    for p in old_packets {
+    for (j, p) in old_packets.iter().enumerate() {
         if !p.per_h.is_finite() || p.per_h < 0.0 {
             return Err(invalid());
         }
-        let k = packet_opacity(gas, p.energy_ev, b.n_h, b.n_he)?
-            .iter()
-            .sum::<f64>();
+        let opacity = match masks {
+            Some(m) => packet_opacity_masked(gas, p.energy_ev, m[j], b.n_h, b.n_he)?,
+            None => packet_opacity(gas, p.energy_ev, b.n_h, b.n_he)?,
+        };
+        let k = opacity.iter().sum::<f64>();
         let n = p.per_h / (1.0 + dt * k);
         if !n.is_finite() {
             return Err(invalid());
@@ -76,9 +79,20 @@ fn endpoint(
             per_h: n,
         });
     }
-    let photo = igm_photo_rates(gas, &photons, b.n_h, b.n_he)?;
+    let photo = photo_rates_for(gas, &photons, masks, b)?;
     let rhs = igm_point_rhs(gas, b.n_h, b.n_he, b.hubble, b.tcmb, photo.input)?;
     Ok((photons, photo, rhs))
+}
+fn photo_rates_for(
+    gas: &IgmGasState,
+    packets: &[PrimaryPacket],
+    masks: Option<&[[bool; 3]]>,
+    b: StepBackground,
+) -> Result<crate::igm_photo::IgmPhotoRates, ForwardError> {
+    match masks {
+        Some(m) => igm_photo_rates_masked(gas, packets, m, b.n_h, b.n_he),
+        None => igm_photo_rates(gas, packets, b.n_h, b.n_he),
+    }
 }
 fn thermal(
     old: &IgmGasState,
@@ -192,6 +206,19 @@ pub fn implicit_step(
     dt: f64,
     control: StepControl,
 ) -> Result<StepResult, ForwardError> {
+    implicit_step_impl(old, packets, None, b, dt, control)
+}
+fn implicit_step_impl(
+    old: &IgmGasState,
+    packets: &[PrimaryPacket],
+    masks: Option<&[[bool; 3]]>,
+    b: StepBackground,
+    dt: f64,
+    control: StepControl,
+) -> Result<StepResult, ForwardError> {
+    if masks.is_some_and(|m| m.len() != packets.len()) {
+        return Err(invalid());
+    }
     if !dt.is_normal()
         || dt <= 0.0
         || control.max_iterations == 0
@@ -207,10 +234,10 @@ pub fn implicit_step(
     }
     // Preflight actual EOS and incoming packet values before candidate updates.
     igm_point_rhs(old, b.n_h, b.n_he, b.hubble, b.tcmb, Default::default())?;
-    igm_photo_rates(old, packets, b.n_h, b.n_he)?;
+    photo_rates_for(old, packets, masks, b)?;
     let mut gas = *old;
     for iteration in 0..control.max_iterations {
-        let (_, photo, _) = endpoint(&gas, packets, b, dt)?;
+        let (_, photo, _) = endpoint(&gas, packets, masks, b, dt)?;
         let eos = gas.eos(b.n_h, b.n_he)?;
         let rates = igm_rates(eos.temperature_k)?;
         let ne = eos.electron_density_cm3;
@@ -238,9 +265,9 @@ pub fn implicit_step(
             };
         }
         let trial = IgmGasState::new(f, gas.w_erg_per_h)?;
-        let (_, new_photo, _) = endpoint(&trial, packets, b, dt)?;
+        let (_, new_photo, _) = endpoint(&trial, packets, masks, b, dt)?;
         gas = thermal(old, f, new_photo.input, b, dt)?;
-        let (photons, owners, rhs) = endpoint(&gas, packets, b, dt)?;
+        let (photons, owners, rhs) = endpoint(&gas, packets, masks, b, dt)?;
         let mut residual: f64 = 0.0;
         for i in 0..3 {
             let scale = 1e-6_f64
@@ -322,4 +349,148 @@ pub fn implicit_step(
         }
     }
     Err(ForwardError::InvalidInput("IGM_STEP_ITERATION_LIMIT"))
+}
+
+/// Frozen proper-time emissivity, in photons per H per second at packet energies.
+///
+/// Backward Euler gives `N_new = (N_old + dt * S) / (1 + dt * k_new)`.
+/// Forming this numerator before the existing coupled transaction is algebraic,
+/// not a separate source/sink split: its endpoint gas and common photo owners
+/// solve the same BE equations. Energies and the gas closure are unchanged.
+/// Source rates must be finite, nonnegative, and either normal or exactly zero.
+/// Representable subnormal emitted counts are retained; arithmetic underflow is
+/// conservatively bounded alongside the existing photo/packet underflow ledger.
+pub fn implicit_step_with_source(
+    old: &IgmGasState,
+    packets: &[PrimaryPacket],
+    source_rates: &[f64],
+    b: StepBackground,
+    dt: f64,
+    control: StepControl,
+) -> Result<StepResult, ForwardError> {
+    implicit_step_with_source_impl(old, packets, source_rates, None, b, dt, control)
+}
+/// Source-aware BE with explicit per-packet HI/HeI/HeII channel support.
+/// A false mask disables a channel in both opacity and gas/energy ownership;
+/// it never moves or changes the energy stored in the packet or its ledger.
+pub fn implicit_step_with_source_masked(
+    old: &IgmGasState,
+    packets: &[PrimaryPacket],
+    source_rates: &[f64],
+    masks: &[[bool; 3]],
+    b: StepBackground,
+    dt: f64,
+    control: StepControl,
+) -> Result<StepResult, ForwardError> {
+    implicit_step_with_source_impl(old, packets, source_rates, Some(masks), b, dt, control)
+}
+fn implicit_step_with_source_impl(
+    old: &IgmGasState,
+    packets: &[PrimaryPacket],
+    source_rates: &[f64],
+    masks: Option<&[[bool; 3]]>,
+    b: StepBackground,
+    dt: f64,
+    control: StepControl,
+) -> Result<StepResult, ForwardError> {
+    if masks.is_some_and(|m| m.len() != packets.len())
+        || source_rates.len() != packets.len()
+        || !dt.is_normal()
+        || dt <= 0.0
+        || source_rates
+            .iter()
+            .any(|&s| s != 0.0 && (!s.is_normal() || s < 0.0))
+    {
+        return Err(invalid());
+    }
+    if source_rates.iter().all(|&s| s == 0.0) {
+        return implicit_step_impl(old, packets, masks, b, dt, control);
+    }
+    // Validate the original packets too: positive emission cannot repair an
+    // invalid incoming count. The original transaction validates the background.
+    photo_rates_for(old, packets, masks, b)?;
+    let c = crate::HHeModel::controlled_fixture();
+    let mut supplied = Vec::with_capacity(packets.len());
+    let mut source_underflow_n = 0.0;
+    let mut source_underflow_e = 0.0;
+    let mut source_energy = 0.0;
+    let mut available_energy = 0.0;
+    for (p, &rate) in packets.iter().zip(source_rates) {
+        let emitted = dt * rate;
+        let count = p.per_h + emitted;
+        let emitted_energy_ev = emitted * p.energy_ev;
+        let emitted_energy = emitted_energy_ev * c.ev_erg;
+        let energy = count * p.energy_ev * c.ev_erg;
+        if !emitted.is_finite()
+            || !count.is_finite()
+            || !emitted_energy_ev.is_finite()
+            || !emitted_energy.is_finite()
+            || !energy.is_finite()
+        {
+            return Err(invalid());
+        }
+        if rate > 0.0 && !emitted.is_normal() {
+            source_underflow_n += f64::MIN_POSITIVE;
+            // Account for the energy carried by the bounded count error, even
+            // if multiplication rounded the entire source count to zero.
+            source_underflow_e += f64::MIN_POSITIVE * p.energy_ev * c.ev_erg;
+        }
+        if rate > 0.0 && (!emitted_energy_ev.is_normal() || !emitted_energy.is_normal()) {
+            source_underflow_e += f64::MIN_POSITIVE;
+        }
+        source_energy += emitted_energy;
+        available_energy += energy;
+        supplied.push(PrimaryPacket {
+            energy_ev: p.energy_ev,
+            per_h: count,
+        });
+    }
+    if !source_energy.is_finite() || !available_energy.is_finite() {
+        return Err(invalid());
+    }
+    // The unchanged transaction checks each N_old + dt*S - N_new - A ledger
+    // and the material/binding/escape ledger using the same dt*k_new*N_new
+    // owners. It therefore includes source photons in every local count owner.
+    let mut result = implicit_step_impl(old, &supplied, masks, b, dt, control)?;
+    // Independently expose the source energy in the combined local balance:
+    // delta(material + radiation) + reservoirs = sum(E * dt*S).
+    let df: [f64; 3] = std::array::from_fn(|i| result.gas.fractions[i] - old.fractions[i]);
+    let delta_binding = c.ev_erg
+        * (c.threshold_ev[0] * df[0]
+            + b.n_he / b.n_h
+                * (c.threshold_ev[1] * df[1] + (c.threshold_ev[1] + c.threshold_ev[2]) * df[2]));
+    let delta_material = result.gas.w_erg_per_h - old.w_erg_per_h + delta_binding;
+    let delta_radiation = packets
+        .iter()
+        .zip(&result.packets)
+        .map(|(p, q)| (q.per_h - p.per_h) * p.energy_ev * c.ev_erg)
+        .sum::<f64>();
+    let rhs = result.endpoint;
+    let reservoirs = dt / b.n_h
+        * (rhs.escape_erg_cm3_s - rhs.cmb_to_gas_erg_cm3_s + rhs.expansion_work_erg_cm3_s);
+    let scale = available_energy
+        + delta_material.abs()
+        + dt / b.n_h
+            * (rhs.escape_erg_cm3_s
+                + rhs.cmb_to_gas_erg_cm3_s.abs()
+                + rhs.expansion_work_erg_cm3_s);
+    let defect = delta_material + delta_radiation + reservoirs - source_energy;
+    if !defect.is_finite()
+        || !scale.is_finite()
+        || defect.abs() > 1e-10 * scale.max(control.cumulative_energy_scale)
+    {
+        return Err(ForwardError::InvalidInput("IGM_STEP_ENERGY_LEDGER"));
+    }
+    result.underflow_n_bound += source_underflow_n;
+    result.underflow_e_bound += source_underflow_e;
+    if !result.underflow_n_bound.is_finite()
+        || !result.underflow_e_bound.is_finite()
+        || result.underflow_n_bound > 1e-20
+        || result.underflow_e_bound > 1e-30
+    {
+        return Err(ForwardError::InvalidInput(
+            "IGM_UNDERFLOW_BOUND_EXCEEDS_BUDGET",
+        ));
+    }
+    Ok(result)
 }
