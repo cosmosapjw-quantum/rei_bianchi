@@ -101,6 +101,15 @@ pub struct RawRecord {
 #[derive(Debug, Clone, Copy, Default)]
 pub struct AtomicProvider;
 
+/// Exact lower energy support of the existing Verner fit, eV (not binding energy).
+pub fn verner_cutoff_ev(absorber: Absorber) -> f64 {
+    match absorber {
+        Absorber::HI => 13.60,
+        Absorber::HeI => 24.59,
+        Absorber::HeII => 54.42,
+    }
+}
+
 impl AtomicProvider {
     /// Returns a raw reference-value provider; no physical consumer is admitted.
     pub fn reference() -> Self {
@@ -332,12 +341,12 @@ impl AtomicProvider {
         if energy_ev > 50000.0 {
             return Err(ForwardError::InvalidInput("VERNER_ENERGY_DOMAIN"));
         }
-        let (eth, e0, sigma0, ya, p, yw, y0, y1) = match absorber {
-            Absorber::HI => (13.60, 0.4298, 5.475e4, 32.88, 2.963, 0.0, 0.0, 0.0),
-            Absorber::HeI => (24.59, 13.61, 949.2, 1.469, 3.188, 2.039, 0.4434, 2.136),
-            Absorber::HeII => (54.42, 1.720, 1.369e4, 32.88, 2.963, 0.0, 0.0, 0.0),
+        let (e0, sigma0, ya, p, yw, y0, y1) = match absorber {
+            Absorber::HI => (0.4298, 5.475e4, 32.88, 2.963, 0.0, 0.0, 0.0),
+            Absorber::HeI => (13.61, 949.2, 1.469, 3.188, 2.039, 0.4434, 2.136),
+            Absorber::HeII => (1.720, 1.369e4, 32.88, 2.963, 0.0, 0.0, 0.0),
         };
-        if energy_ev < eth {
+        if energy_ev < verner_cutoff_ev(absorber) {
             return Ok(0.0);
         }
         let x = energy_ev / e0 - y0;

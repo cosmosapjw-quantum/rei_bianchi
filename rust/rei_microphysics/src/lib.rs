@@ -128,7 +128,15 @@ pub mod he_rct;
 
 pub mod coupled_primary;
 
+pub use atomic_provider::verner_cutoff_ev;
+
 pub mod igm_background;
-pub mod igm_state;
+pub mod igm_checkpoint;
+pub mod igm_config;
+pub mod igm_history;
+pub mod igm_photo;
 pub mod igm_rates;
+pub mod igm_source;
+pub mod igm_state;
+pub mod igm_step;
 pub mod igm_thermal;
