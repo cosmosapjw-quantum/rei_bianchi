@@ -1,8 +1,8 @@
 # SYNC03 CR: 완료된 photon bridge와 실제 관측량 수신의 연결
 
-[중앙 정본](../../../README_KO.md) · [기계 판독 상태](SYNC_STATE.json). 이 파일은 수신용 additive handoff이며 원 owner CURRENT 상태와 코드는 변경하지 않는다. 게시와 수신자의 실행 ACK는 별개이고, 직접 채팅 전달 및 recipient execution ACK는 아직 완료되지 않았다.
+[중앙 정본](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/c1f905c8fb5855e3cc911e021369e878e4b4c7ff/docs/research_sync/REI-REC-BASS-SYNC03-20261007/README_KO.md) · [기계 판독 상태](SYNC_STATE.json). 이 파일은 수신용 additive handoff이며 원 owner CURRENT 상태와 코드는 변경하지 않는다. 게시와 수신자의 실행 ACK는 별개이고, 직접 채팅 전달 및 recipient execution ACK는 아직 완료되지 않았다.
 
-수신한 원자 source pin은 `c277bb4305ccddf5b5d94f83f59f398e7f6c3b62`, branch `research/r4q-gap-closure-20261001`, PR 23다. 최신 component는 `CR-F0-R1_IGM_PHOTON_BRIDGE`, gate는 `SCOPED_NATIVE_PHOTON_IGM_CR_OFF_BRIDGE_PASS__OWNER_IMPORT_PENDING`다.
+수신한 원자 source pin은 `c277bb4305ccddf5b5d94f83f59f398e7f6c3b62`, branch `research/r4q-gap-closure-20261001`, PR 23다. 초기 수신 이후 최종 최신 pin은 `d9522add1996e5f4fe482dfea6b18a9b79d87346`, component는 `CR-F0-R2_IGM_SOURCE_STEP`, gate는 `CURRENT_SOURCE_TREE_IMPORT_AND_SOURCE_STEP_NATIVE_VERIFIED__COSMOLOGICAL_DRIVER_PENDING`다. 초기 pin은 루프2의 고정 입력으로 보존한다.
 
 ## 새 두 연구 루프의 완료 범위
 
@@ -21,21 +21,15 @@ SYNC02 F04E-next was superseded by completed F04E through F04P and CR-F0-R1. Can
 - current IGM instantaneous photon bridge, 23 unique native tests and six finite points
 - candidate-boundary witness load0/callback0; positive witness controls
 
-## 게시 직전 source-step 코드의 추가
+## 최종 게시 직전 실제 source-step 반환 수신
 
-추가 관측 pin `fabb4bee9401d85d6289590b4d7b4d17f7110754`은 `research/fastest_rejoin_20261007/source_step/RUN_FROM_ARCHIVE.py` 한 파일을 추가했다. CR-F0-R2 sealed archive SHA256 `f3156ba8e07d4cfe263cb793c424a66958fa9730cbe9c1779c96007e10a11434`의 manifest/CRC/경로 검증 및 선택 실행 진입점이다. 이 commit에는 새 수치 결과 반환이나 owner import ACK가 없다. 소스 존재로 source-step 완료를 추정하지 않는다. 다음 실행 전 새 CR-F0-R2 반환이 게시됐는지 읽고, 완료됐다면 결과만 수신하여 중복하지 않는다.
+최종 pin `d9522add1996e5f4fe482dfea6b18a9b79d87346`의 CR-F0-R2 문서를 실제 읽었다. 이전 entrypoint-only 상태는 이 반환으로 대체한다. 현재27개 원 source의 library에 source-fed backward Euler/4변수 damped Newton/full·two-half trial/accepted-only 장부를 연결했다. 고정밀도 제조 상자의3 profile,56macro,168BE solve,112accepted halves가 실제 final science dataset이다. 새 Rust23시험과 새 import 환경의 기존 bridge23시험을 구별한다. 독립 원 C계수 경로의9개 선택 BE root 비교에서 최대 normalized state difference는2.298161660974074e-14다. 이 동기화를 위해 재실행하지 않았다.
+
+이는 source-step 구현 완료이며 cosmological driver 또는 원격 REI import 완료가 아니다. Fixed-box H=0 결과를 FLRW history로 재명명하지 않는다. 최대 누적 normalized energy residual1.95720388296e-10을 그대로 보존하며 point-test 잔차와 혼동하지 않는다. Continuous IVP/interval root/physical 인증 및 global CR counter·owner production ACK는 아직 없다.
 
 ## 기존 owner에게 예약된 다음 단위
 
-`CR-F0-OWNER-IMPORT`: 입력은 3129089fe0f52739961cefc65cda71ccce0a07ab bridge source; prepared receiver_import.patch and five current scientific module hashes; owner source-driven IGM callsite다. 반환은 actual imported entrypoint and source-bound integration return; actual global loader/callback witness receipt if instrumented다.
-
-수락조건:
-
-- no duplicate photoheat
-- integrator owns sourcebirth/redshift/dt/stage weights
-- OFF no load/callback demonstrated at actual call boundary
-- On continues to reject missing authority
-- do not reuse FT03 F04P bounds as IGM certification
+`CR-F0-COSMOLOGICAL-DRIVER-ADOPTION`: 이미 구현된 source-step과 준비된 receiver patch를 현재 owner 작업트리에 채택한다. Cosmological clock에서 nH/nHe/H/Tcmb, sourcebirth, redshift, accepted-stage event와 work를 연결해 bounded 결과를 반환한다. 새 generic stepper를 다시 작성하지 않는다. 원 FT03 인증을 IGM에 이전하지 않고 실제 global counter는 관측 전 null로 유지한다.
 
 ## 겹치지 않고 병렬로 준비할 단위
 
@@ -55,3 +49,5 @@ CR_OFF_FASTEST; precision atomic PARKED; G02 UNRESOLVED; production HOLD; captur
 최종 Git commit과 Drive/Dropbox 실제 완료 영수증은 root publication 후 연결된다. 이 준비 단계 파일은 미완료 게시·백업·recipient ACK를 성공으로 선기록하지 않는다.
 
 게시 직전 두 원자 delta는 중앙 `publication/LATE_ATOMIC_DELTA.json`에 exact fetched source와 blob/SHA identity로 보존했다. Loop2에 사용한 frozen intake/gate는 바꾸지 않았다.
+
+최종 single-file read와 exact source SHA/blob는 중앙 `publication/TERMINAL_ATOMIC_DELTA.json`을 따른다.

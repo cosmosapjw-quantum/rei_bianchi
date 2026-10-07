@@ -1,6 +1,6 @@
 # SYNC03 HE: 새 IGM RCT와 실제 F08 관측량 수신의 연결
 
-[중앙 정본](../../../README_KO.md) · [기계 판독 상태](SYNC_STATE.json). 이 파일은 수신용 additive handoff이며 원 owner CURRENT 상태와 코드는 변경하지 않는다. 게시와 수신자의 실행 ACK는 별개이고, 직접 채팅 전달 및 recipient execution ACK는 아직 완료되지 않았다.
+[중앙 정본](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/c1f905c8fb5855e3cc911e021369e878e4b4c7ff/docs/research_sync/REI-REC-BASS-SYNC03-20261007/README_KO.md) · [기계 판독 상태](SYNC_STATE.json). 이 파일은 수신용 additive handoff이며 원 owner CURRENT 상태와 코드는 변경하지 않는다. 게시와 수신자의 실행 ACK는 별개이고, 직접 채팅 전달 및 recipient execution ACK는 아직 완료되지 않았다.
 
 수신한 원자 source pin은 `eae1d2209fd9a555bea461032f272c7c7c19766e`, branch `research/shared-c64-crossrepo-20260928`, PR 17다. 초기 intake 이후 최신 관측 pin은 `9b46aab79eeafd452a5fb35b1c0fd00eef6f5683`이며 component는 `HE-FAST-IGM-RCT02`, gate는 `BOUNDED_COMMON_DOMAIN_NATIVE_RHS_HISTORY_CHECKED__RECEIVER_INTEGRATION_OPEN`다. 원 intake pin은 루프2의 고정 입력으로 유지한다.
 

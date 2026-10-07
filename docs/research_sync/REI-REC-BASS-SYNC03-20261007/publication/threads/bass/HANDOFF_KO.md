@@ -10,6 +10,6 @@ proper `cm^-3→m^-3` 변환은 한 번, normal-time `q=cσ_T n_e D`의 D도 한
 
 병렬로 준비할 일은 기존 short IGM 표의 단위·normal time·observer 경계를 명시한 read-only export 계약과 기존 slab 결과의 caller-owned tail 민감도다. PR133 gain/core·boosted clock·adaptive 연결은 기존 owner에게 남긴다. 변하지 않은 SYNC02 clock 검산이나 이번 여섯 이력 수신 실행은 반복하지 않는다.
 
-중앙 패킷: ../../..
+중앙 패킷: https://github.com/cosmosapjw-quantum/rei_bianchi/tree/c1f905c8fb5855e3cc911e021369e878e4b4c7ff/docs/research_sync/REI-REC-BASS-SYNC03-20261007
 
 수신 실행과 저장소 게시 ACK는 별도 기록이다. 이 문서는 직접 채팅 thread에 썼다는 증거가 아니며 recipient ACK는 아직 확인되지 않았다.

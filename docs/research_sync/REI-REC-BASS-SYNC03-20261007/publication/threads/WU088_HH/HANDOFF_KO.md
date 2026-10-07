@@ -1,6 +1,6 @@
 # SYNC03 HH: ACTIVE 연구 상태와 조건부 전자밀도 전달의 연결
 
-[중앙 정본](../../../README_KO.md) · [기계 판독 상태](SYNC_STATE.json). 이 파일은 수신용 additive handoff이며 원 owner CURRENT 상태와 코드는 변경하지 않는다. 게시와 수신자의 실행 ACK는 별개이고, 직접 채팅 전달 및 recipient execution ACK는 아직 완료되지 않았다.
+[중앙 정본](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/c1f905c8fb5855e3cc911e021369e878e4b4c7ff/docs/research_sync/REI-REC-BASS-SYNC03-20261007/README_KO.md) · [기계 판독 상태](SYNC_STATE.json). 이 파일은 수신용 additive handoff이며 원 owner CURRENT 상태와 코드는 변경하지 않는다. 게시와 수신자의 실행 ACK는 별개이고, 직접 채팅 전달 및 recipient execution ACK는 아직 완료되지 않았다.
 
 수신한 원자 source pin은 `47accb0b3ac9adca40913dc06c797a509c1a7b49`, branch `research/r31ao-unequal-order-ladder-20260930`, PR 33다. 최신 component는 `HH-TH05-20261007`, gate는 `STRICT_HH_IONIZATION_ORDER_AND_POSITIVE_OPTICAL_MEMORY_ENCLOSED`다.
 

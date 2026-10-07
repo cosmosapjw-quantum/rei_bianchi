@@ -36,14 +36,14 @@ T2 조건부 box 반폭 1.91103e-13는 T2−T1 변화의 약 308.8배다. 더 �
 |---|---|---|
 | REI | F08 완료; 새 SPEC→native cohort 비교; IGM의 선택된 짧은 구간 수송/midpoint 검증. 이번 실제 BASS 수신 추가. | FT_SPEC_BRIDGE02와 IGM 경계/long-history solver 작업은 기존 owner. Long-history·연속 오차·물리 source gate는 별도. |
 | HE | HE-FAST-REJOIN01 point 완료. 게시 전 추가 수신: RCT02 native RHS 기준 이력 23 ODE solve 완료(기준해 scope). | 실제 receiver RCT03 native 연결은 미수행·owner 예약. 새 기준 이력 T≈1939.62–2005.46K. 기존 hot FT03/S0와 구분. |
-| CR | F04E 실제 F05 receiver 이미 완료. CR-F0-R1 point23tests/6points와 scoped OFF 0-callback/load witness. | owner import 및 실제 전체 이력 counters가 아직 null. 최신 CR-F0-R2 아카이브 실행 진입점 추가는 실행 완료 증거가 아님. |
+| CR | F04E 완료. 게시 직전 CR-F0-R2 source-fed BE 단계의 실제 fixed-box 3profiles/56macro/168BE solves 및 독립 C9root 비교 수신. | 현재 source-tree 로컬 import/단계 검증 완료. 실제 cosmological driver 및 원격 REI 채택은 미완료. Global history counter/production ACK는 null. |
 | HH | 연구 lane ACTIVE. ON05B matched histories와 TH05 FT03 짧은 구간 결과. | ON06 일관된 point/thermal/event/interval/root/checkpoint pilot. HII 양의 변화만으로 총 ne 증가를 단정하지 않음. |
 
 위 원자 시험 숫자는 이번에 재실행한 수치가 아니라 고정 upstream evidence의 수신값이다. `intake/*`가 원문과 identity를 보존한다. 오래된 F08 pending, CR F04E next, HH PARKED 표시는 supersession으로 정정하며 원래 실패·gate는 삭제하지 않는다. S0 HH/RCT/CR OFF 기본값도 유지한다.
 
 BASS PR133의 native gain/build owner 작업과 REC의 기존 Peebles/단일온도 전달 결과는 별도 lane이다. 이번에는 정확한 세 BASS 모듈만 새로 컴파일했다. 손상된 runtime의 두 초기 실패와 같은 Rust1.94.1 배포 아카이브에서의 복구를 기록했다. 과학 source 또는 tolerance 변경은 없다.
 
-게시 전 원자 추가 pin: HE `9b46aab79eeafd452a5fb35b1c0fd00eef6f5683`, CR `fabb4bee9401d85d6289590b4d7b4d17f7110754`. 상세는 `publication/LATE_ATOMIC_DELTA.json`에 있으며, 두 루프가 사용한 중간 gate는 변경하지 않았다.
+게시 전 원자 추가 pin: HE `9b46aab79eeafd452a5fb35b1c0fd00eef6f5683`, CR terminal `d9522add1996e5f4fe482dfea6b18a9b79d87346`. 상세는 `publication/LATE_ATOMIC_DELTA.json` 및 `publication/TERMINAL_ATOMIC_DELTA.json`에 있으며, 두 루프가 사용한 중간 gate는 변경하지 않았다.
 
 ## 4. 다음 작업과 병렬성
 

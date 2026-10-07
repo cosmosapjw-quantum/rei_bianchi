@@ -8,6 +8,6 @@ E1C split-domain ownership replacement, He V11 consumer gate I, full coupled his
 
 기존 owner 작업과 겹치지 않는 다음 일은 미래 REC→late-IGM handoff의 epoch·proper nuclei/electron density·종별 fraction·gas/radiation temperature·clock/frame 소유권을 문서 계약으로 고정하는 것이다. 명세만으로 matched physical history가 있다고 주장하지 않으며, one-temperature reference를 임의의 two-temperature 문제로 확장하지 않는다. 기존 source와 공개 reference를 재사용한다.
 
-중앙 패킷: ../../..
+중앙 패킷: https://github.com/cosmosapjw-quantum/rei_bianchi/tree/c1f905c8fb5855e3cc911e021369e878e4b4c7ff/docs/research_sync/REI-REC-BASS-SYNC03-20261007
 
 수신 실행과 저장소 게시 ACK는 별도 기록이다. 이 문서는 직접 채팅 thread에 썼다는 증거가 아니며 recipient ACK는 아직 확인되지 않았다.

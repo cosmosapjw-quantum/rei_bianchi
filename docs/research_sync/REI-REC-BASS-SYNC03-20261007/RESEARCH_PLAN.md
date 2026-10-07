@@ -22,6 +22,8 @@
 
 추가 독립 후보 `P-HE-REFERENCE-OBSERVER`: 새 HE RCT02의 봉인된 23 기준 이력 ZIP을 identity 검증해 읽고, 실제 저장된 ON/OFF ne 이력을 이 observer consumer에 전달한다. Native receiver RCT03를 대신 구현하지 않는다. 저장된 실제 history byte를 확보한 뒤에만 실행하며, 결과는 manufactured reference model scope로 유지한다.
 
+추가 독립 후보 `P-CR-FIXEDBOX-OBSERVER`: CR-F0-R2의 봉인된 196491-byte ZIP에서 실제 3 fixed-box 이력을 읽어 이번 observable consumer로 검산할 수 있다. Source-step 자체를 재작성하거나 이 결과를 FLRW history로 바꾸지 않는다.
+
 ## 기존 owner에게 남기는 경로
 
 | Owner 경로 | 다음 산출물 | 본 작업의 경계 |
@@ -29,7 +31,7 @@
 | REI SPEC | FT_SPEC_BRIDGE02의 기존 F08 schedule/cohort admission | 원 SPEC/native source 및 production core 변경 없음 |
 | REI IGM | continuous boundary와 coupled midpoint의 긴 이력 gate | 공개 branch84 결과를 읽고 export만 수행 가능 |
 | HE | HE-FAST-IGM-RCT03: 실제 receiver native 연결. RCT02 native RHS 기준 이력 23개는 이미 완료 | point 검증 재실행/새 적분기 구현 안 함 |
-| CR | prepared photon bridge owner import·실제 history load/callback counts | F04E 재수행 금지; scoped0과 global null 유지 |
+| CR | CR-F0-R2 source-step의 cosmological driver 채택·실제 history counters. Current-source 로컬 import/3 fixed-box profiles는 이미 완료 | F04E 재수행 금지; scoped0과 global null 유지 |
 | HH | ON06의 일관된 native point/thermal/interval/root/model/checkpoint | OFF certificate를 ON에 붙이지 않음 |
 | BASS PR133 | native boundary gain·현재 build integration | full build 작업 복제 안 함; 이번은 isolated exact modules |
 

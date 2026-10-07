@@ -10,6 +10,6 @@ source snapshot은 PR83 `84afbe7660ec79e5e43822e7aea49a0a9ee8daea`이다. 최신
 
 병렬로 가능한 일은 이 수신 결과·도표를 향후 exporter 변경의 regression reference로 사용하고, 이미 admitted된 short IGM 표에 대한 read-only observable export 계약을 준비하는 것이다. clock/observer mapping이 주어지기 전에는 redshift만으로 normal time이나 실제 observer tail을 만들지 않는다. 현재 spectral/cohort·boundary/midpoint solver를 수정하거나 F08 대형 campaign을 중복 실행하지 않는다. HH/RCT/CR OFF fastest baseline과 원래 원자 정밀 확장 lane은 유지한다.
 
-중앙 패킷: ../../..
+중앙 패킷: https://github.com/cosmosapjw-quantum/rei_bianchi/tree/c1f905c8fb5855e3cc911e021369e878e4b4c7ff/docs/research_sync/REI-REC-BASS-SYNC03-20261007
 
 수신 실행과 저장소 게시 ACK는 별도 기록이다. 이 문서는 직접 채팅 thread에 썼다는 증거가 아니며 recipient ACK는 아직 확인되지 않았다.
