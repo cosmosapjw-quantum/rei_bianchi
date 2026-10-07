@@ -1,0 +1,2 @@
+#[allow(dead_code)] #[path="GEOMETRY_pre_guard.rs"] mod panel;
+fn main(){ let q=f64::from_bits(1);let p=panel::Panel{l:-1.0,r:0.0,beta:0.0,family:panel::Family::RightFront,ln_n:0.0};let v=p.restrict(-2.0*q,-q).unwrap().unwrap();println!("pre_guard_mu={:.17e},exact_limit={:.17e},error={:.17e}",v.normalized_mean,4.0/9.0,(v.normalized_mean-4.0/9.0).abs());assert!((v.normalized_mean-4.0/9.0).abs()<5e-13);}

@@ -1,0 +1,147 @@
+[
+  {
+    "label": "cargo_build_tests",
+    "phase": "compile",
+    "command": [
+      "/workspace/scratch/a5a7937171cb/runtime_recovery/sync03_rust/bin/cargo",
+      "test",
+      "--offline",
+      "--no-run"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.5199112640002568,
+    "cpu_seconds": 1.241486,
+    "children_high_water_rss_KiB": 169656
+  },
+  {
+    "label": "cargo_tests",
+    "phase": "numerical",
+    "command": [
+      "/workspace/scratch/a5a7937171cb/runtime_recovery/sync03_rust/bin/cargo",
+      "test",
+      "--offline"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.06556887499755248,
+    "cpu_seconds": 0.037067999999999934,
+    "children_high_water_rss_KiB": 169656
+  },
+  {
+    "label": "panel_compile",
+    "phase": "compile",
+    "command": [
+      "/workspace/scratch/a5a7937171cb/runtime_recovery/sync03_rust/bin/rustc",
+      "--edition=2021",
+      "-O",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/repo/research/transport_20261007/igm-two-loop/scripts/panel_probe.rs",
+      "-o",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/work/integrated_loop2_first/panel_probe"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.16934684999796445,
+    "cpu_seconds": 0.16093400000000008,
+    "children_high_water_rss_KiB": 169656
+  },
+  {
+    "label": "panel_probe",
+    "phase": "numerical",
+    "command": [
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/work/integrated_loop2_first/panel_probe"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.03314833700278541,
+    "cpu_seconds": 0.020310000000000106,
+    "children_high_water_rss_KiB": 169656
+  },
+  {
+    "label": "panel_oracle",
+    "phase": "numerical",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/repo/research/transport_20261007/igm-two-loop/scripts/check_panel.py",
+      "--input",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/work/integrated_loop2_first/panel.csv",
+      "--output",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/work/integrated_loop2_first/panel_oracle.json"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.7674176809996425,
+    "cpu_seconds": 0.7389219999999997,
+    "children_high_water_rss_KiB": 169656
+  },
+  {
+    "label": "tail_compile",
+    "phase": "compile",
+    "command": [
+      "/workspace/scratch/a5a7937171cb/runtime_recovery/sync03_rust/bin/rustc",
+      "--edition=2021",
+      "-O",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/repo/research/transport_20261007/igm-two-loop/scripts/tail_probe.rs",
+      "-o",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/work/integrated_loop2_first/tail_probe"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.32392040899867425,
+    "cpu_seconds": 0.5032750000000001,
+    "children_high_water_rss_KiB": 169656
+  },
+  {
+    "label": "tail_oracle",
+    "phase": "numerical",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/repo/research/transport_20261007/igm-two-loop/scripts/check_tail.py",
+      "--probe",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/work/integrated_loop2_first/tail_probe",
+      "--output",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/work/integrated_loop2_first/tail_oracle"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 10.204031844001292,
+    "cpu_seconds": 10.194914,
+    "children_high_water_rss_KiB": 169656
+  },
+  {
+    "label": "loop2_compile",
+    "phase": "compile",
+    "command": [
+      "/workspace/scratch/a5a7937171cb/runtime_recovery/sync03_rust/bin/cargo",
+      "build",
+      "--offline",
+      "--release",
+      "--example",
+      "loop2"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.5711939669999992,
+    "cpu_seconds": 0.8853700000000008,
+    "children_high_water_rss_KiB": 169656
+  },
+  {
+    "label": "loop2_candidate",
+    "phase": "numerical",
+    "command": [
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/work/integrated_loop2_first/target/release/examples/loop2"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.008554603002266958,
+    "cpu_seconds": 0.007777000000001588,
+    "children_high_water_rss_KiB": 169656
+  },
+  {
+    "label": "loop2_oracle",
+    "phase": "numerical",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/repo/research/transport_20261007/igm-two-loop/scripts/check_loop2.py",
+      "--input",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/work/integrated_loop2_first/loop2.csv",
+      "--output",
+      "/workspace/scratch/a5a7937171cb/igm_two_loop_20261007/work/integrated_loop2_first/loop2_oracle.json"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.31600018099925364,
+    "cpu_seconds": 0.2939860000000011,
+    "children_high_water_rss_KiB": 169656
+  }
+]
