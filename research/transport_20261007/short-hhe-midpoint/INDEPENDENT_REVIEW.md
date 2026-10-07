@@ -1,0 +1,63 @@
+Publication note: hash declarations in this historical report identify archived original bytes. Relocated publication hashes are recorded in ../PROVENANCE.json. Some historical guard/run artifacts are summarized rather than copied; use ../README.md for the supported replay boundary.
+
+# Independent review: bounded H/He midpoint sibling
+
+Date: 2026-10-07. Review mode: source, contracts, recorded executable evidence, table inspection and independent artifact hashing. The reviewer did not compile, execute tests, integrate histories, rerun comparisons or change scientific source. Only this report and REVIEW_RECEIPT.json were written by the reviewer.
+
+## Verdict and material findings
+
+**PARTIAL overall.** The bounded V1 implementation and its recorded physical/nonlinear/conservation tests are supported. Both Gauss2 and Gauss4 finest 16→32 and 32→64 temporal comparisons pass all 37 original fields. Two required limitations prevent an overall pass:
+
+1. **Original/all-declared temporal acceptance fails (medium severity, high confidence).** In `results/ASSESSMENT.json`, the original phased 4→8 comparison still fails `work_E`, with Gauss4 allowance ratio 9.701890077755381. In `results/REFINEMENT_ASSESSMENT.json`, the separately authorized 8→16 comparison still fails `work_E`, ratio 2.6610075823782613. Coarser and endpoint-only failures also remain recorded. Passing later pairs and fitted orders cannot replace these failed gates. The corrected report preserves this distinction. No remedy or additional refinement is authorized by this review.
+
+2. **Reference peak concurrent-array accounting remains UNVERIFIED (medium severity, high confidence).** The executed wrapper samples direct stack-local NumPy arrays every 128 provider evaluations and at solve returns. It does not traverse solver-object attributes, nested containers or native allocations, and it misses inter-sample peaks. Its 203 observations, 107 observed buffers and 778349 observed eight-byte storage slots therefore do not establish the required complete peak buffer/scalar count. The originally asserted `128+8*max_columns` bound had no complete allocation audit. `REFERENCE_ACCOUNTING_CORRECTION.json` correctly withdraws the 704-vector/1717760-slot claim, while preserving the raw status and executed wrapper. The independently enforced 512 MiB address-space cap is valid evidence for a different requirement; it does not supply missing array counts. The resource accounting gate must remain open.
+
+Two reporting defects found during review were corrected and re-inspected:
+
+- The original 4880 grid-coordinate figure counted used entries, not allocated capacity. A bounded actual grid-capacity test now records 8192 allocated coordinate slots (65536 bytes) for Gauss4. Density storage remains separately reported as three vectors/7320 slots.
+- The top-level maximum energy-budget ratio previously included only m≤8. It now includes refinement: **0.02621096082884493**, at Gauss4 m64 step 95. The original m≤8 maximum 0.001366792170430724 is retained under its own name. The maximum refined scaled nonlinear residual is 0.9869175362991496. Both remain below their unchanged limits.
+
+No additional material scientific implementation defect was found in the inspected scope. This is not production/release approval, a long-history result, or a claim that every diagnostic has order two.
+
+## Artifact boundary and preservation
+
+The final reviewed `REVIEW_INPUT_MANIFEST.json` SHA-256 is `405b2b0d11d9426a746ca241a14e2bb0b1ad541216609e31e12c1c5bd04a484f`; all its named artifact hashes match. REVIEW_RECEIPT.json also binds the additional evidence inspected here, including raw histories, test logs, reference receipts and resource records.
+
+The theory receipt SHA-256 is `f9b18a52aa3da4d2ccc23ceb256de5cba8edebe356d26e8a26b600f722d5fb62`. Its four named theory/review artifacts and its original source-manifest entries match their recorded hashes. The immutable BE contract and event-anchor addendum remain authoritative except for the separately frozen midpoint method and explicit resource/refinement addenda.
+
+All 231 protected input files and all 150 entries of the original `short-hhe-coupling/FINAL_MANIFEST.json` match. The original sibling m≤8 histories match M8_MANIFEST.json; corresponding source/test/config artifacts in `m8_snapshot` match their pre-addendum hashes. The original failed BE evidence, unsuccessful reference attempt, failed temporal comparisons, test-fixture mistakes and mutant failures are retained. The executed reference wrapper is preserved byte-for-byte as `failures/reference_control_unaudited_bound.py`; the current wrapper changes only the accounting claim, without replaying the reference.
+
+## Requirement-to-evidence assessment
+
+| Requirement | Evidence and result |
+| --- | --- |
+| Frozen V1 staging | PASS within inspected scope: `coupled::evaluate` independently admits endpoints, constructs arithmetic fraction/w midpoint with actual midpoint background, and uses one shared zero-photo RHS for residual/nonphoto owners. `characteristic_path` reconstructs affine fraction/w at each actual segment midpoint and uses that background for opacity and proper-time source conversion. |
+| Shared owners and unchanged physics | PASS: unchanged material conversion, provider, CHI/CUTOFF conventions and imported V2 kernel. Photo increments use shared absorbed count/energy owners; endpoint Gamma remains direct. Source normalization and division by H are retained. |
+| Nonlinear and transaction safeguards | PASS: original residual vector, finite-difference sizes, relative pivot rule, 16-iteration cap and 12-trial strict-decrease line search remain. Candidate assembly is private; independent budget rejection occurs before commit. Negative tests preserve old state/ledgers. No clipping, projection, automatic retry or BE fallback was found. |
+| Exact event and energy continuity | PASS for evaluated cases: exact stored-event equality and adjacent-float tests; HI outflow leaves zero continuing active stock. Per-node continuity is checked against the ordinary next-start convention at the original 2e-12 bound. Accepted maximum relative discrepancy is 1.4947884507912392e-15; trial maximum is 1.499642470791244e-15. Bitwise cross-transaction equality is correctly not claimed. |
+| Real test-first evidence | PASS: identical original four-test RED/GREEN command and identical test SHA-256 `3fe85f454d2f00b14c5679b1b2ddc871dcf27d13c5941dc4ffdd3e975e52d4ec`. RED has three real assertion failures against original BE source; GREEN passes. Saved RED source matches the execution receipt. Five real source mutants and the time-lattice RED failure are retained. Compilation/setup failures are not substituted for successful RED evidence. |
+| Final executable checks | PASS for recorded final source: seven midpoint/staging/capacity tests in `accounting_test.stdout` plus 17 unchanged final tests across the other five suites, all exit zero. These cover the actual staging/residual/kernel seams, analytic neutral adiabatic law, sourced/source-free smooth local order, cutoff-local limitation, fixed-event global behavior, stiff/no-root rejection, omission mutants and boundary controls. Synthetic coefficients are explicitly labelled. |
+| Original 37-field contract | PARTIAL: all fields, exact-zero reports and original allowances are retained. Four-phase temporal comparisons use factor 0.1, spectral/reference candidate comparisons factor 1. The original phased and endpoint-only failures are preserved; no diagnostic is silently dropped. |
+| Authorized temporal addendum | Finest comparisons PASS; aggregate PARTIAL: only m16,32,64 with 48,96,192 transactions were added. The original 24-edge-union grid stays fixed; powers-of-two time subdivision preserves original phase coordinates. Gauss4 `work_E` ratios are 2.6610075823782613, 0.6945814572412273 and 0.1763280318131349; Gauss2 gives the same verdicts. Every other field passes each addendum pair. |
+| Physical/nonlinear/number/energy admission | PASS on recorded accepted states, including all refined steps. Combined maximum number ratio is 4.174305018763287e-5 and energy ratio 0.02621096082884493. The near-one refined nonlinear residual is visible, not replaced by extrapolated convergence. |
+| Spectral/kernel controls | PASS: all 128/256/512 Gauss2/Gauss4 frozen component checks pass 1e-6; all requested candidate spectral comparisons pass; the independent 80-digit exact-input kernel oracle passes 121 checks at the original 3e-12 bound. |
+| Independent reference reuse/tightening | Numerical gates PASS: input/config/provider/reference-source hashes, Gauss4 node/weight bytes, output coordinates and saved baseline admission are verified before reuse. The 1e-12/1e-15 companion is admitted, with internal accepted-state number/energy ratios 0.021329408234988613/0.009262098897637214. All 37 pair fields pass factor 0.1; worst ratio 2.8407221904421976e-7. Refined candidates pass against both references. Array-accounting qualification remains separate. |
+| Resource and scope limits | CPU/wall, node cap and recorded process/output bounds supported; complete reference array accounting UNVERIFIED. No full-history interval longer than the original 2e-4, refinement beyond 64, production change or publication is supported or authorized. Larger h values occur only in labelled bounded unit controls. |
+
+## Order, branch and oracle qualifications
+
+The two finest passing Gauss4 comparisons have reported `work_E` observed orders about 1.94 and 1.98. These are trends, not gate replacements. Raw first-phase work values and the unchanged allowance formula also support the table verdicts: m32→m64 changes approximately 2.1371e-22 against an allowance approximately 1.2120e-21, giving ratio approximately 0.1763.
+
+Accepted endpoint temperatures span approximately 30.14–375.71 K. Accepted global/segment stages and nonlinear trial summaries are separate. Their recorded masks show no 5500 K or DR physical jump and do show the HeI CE diagnostic mask change. The fractional-linear reconstructed EOS bound applies to the affine numerical path with constant helium ratio; it does not establish regularity of the unobserved exact trajectory. The discontinuous indicator control correctly demonstrates first-order behavior. No all-diagnostic order-two claim is warranted.
+
+The independent Radau comparison uses a different continuous-time source discretization on matched fixed spectral nodes. Its excellent numerical agreement and admitted tightening pair are valuable independent checks, but neither proves pure-time order or establishes a spectral-refinement-uniform result. Fixed nonlinear/arithmetic tolerances can still impose a refinement floor.
+
+## Resources and review method
+
+At final inspection, the recorded numerical total is **67.561084 CPU seconds and 67.94655746596982 wall seconds**, below 120/180. Largest recorded numerical process RSS is 98392 KiB. The supervisor sets 512 MiB RLIMIT_AS for numerical children; commands are serial/single-threaded with separately timed offline single-job compilation. The recorded task directory is 14330607 bytes; direct inventory before adding this review was 14334724 bytes, below 32 MiB including builds. Raw receipt totals do not include reviewer read-only metadata inspection, which ran no numerical workload.
+
+The largest characteristic set is 2440 distinct nodes. The Rust density wrapper tracks allocation capacities and releases; inspection of its construction/finite-difference/line-search lifetimes supports the observed three-vector/7320-slot candidate high-water. The separate grid-capacity observation prevents used entries from being mistaken for allocated storage. O(1) stage summaries are not full stored histories.
+
+Review commands were read-only `cat`, `sed`, `grep`, `nl`, `find`, `diff`, `sha256sum` and Python standard-library JSON/CSV inventory/hash inspection. A Git-status attempt reported that this delivered directory is not a Git repository; artifact manifests and preserved source snapshots supplied the version boundary instead. No executable test or numerical comparison was independently rerun by this reviewer. The author performed the requested bounded grid-capacity check through the shared supervisor, and its source/command/log receipt was inspected.
+
+**Stopping conclusion:** the authorized bounded experiment is finished with useful finest-pair evidence, retained earlier failures and one explicit resource-accounting gap. Overall specification acceptance remains PARTIAL; exact reference peak-array accounting remains UNVERIFIED. No additional run or broader release follows from this review.

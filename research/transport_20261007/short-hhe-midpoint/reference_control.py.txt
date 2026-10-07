@@ -1,0 +1,108 @@
+"""Bounded invocation of the existing independent continuous-source Radau lane.
+Physical cfg remains immutable. Only the authorized end coordinate is shortened.
+This is a different continuous-time discretization, never a pure-time BE claim.
+"""
+import sys
+sys.dont_write_bytecode=True
+import csv,hashlib,json,math,pathlib,signal,time
+D=pathlib.Path(__file__).resolve().parent;R=D.parent.parent
+sys.path.insert(0,str(R/'baseline-repository/tools'))
+import numpy as np
+import igm_reference as physics
+import igm_continuous_reference as reference
+import igm_compare as compare
+level='companion';rtol,atol=1e-12,1e-15
+config=physics.read_config(R/'archived-research/long-flrw/configs/igm_manufactured_z12_to10.cfg')
+s0=-math.log1p(config['z_start']);s1=s0+config['max_dln_a'];config['z_end']=math.expm1(-s1)
+assert -math.log1p(config['z_end'])==s1
+# Independent closed-form positive Gauss4 on the identical declared edge union.
+lo=s0+math.log(config['energy_min_ev']);hi=s1+math.log(config['energy_max_ev'])
+bounds=[lo+(hi-lo)*i/512 for i in range(513)]
+for i in range(25):
+ s=s0+config['max_dln_a']*i/24
+ for e in [config['energy_min_ev'],config['energy_max_ev'],*physics.CUTOFF]:
+  v=s+math.log(e)
+  if lo<v<hi:bounds.append(v)
+bounds=sorted(set(bounds))
+a=math.sqrt((3-2*math.sqrt(6/5))/7);b=math.sqrt((3+2*math.sqrt(6/5))/7)
+wi=(18+math.sqrt(30))/36;wo=(18-math.sqrt(30))/36
+nodes=[];weights=[]
+for l,r in zip(bounds[:-1],bounds[1:]):
+ for x,w in [(-b,wo),(-a,wi),(a,wi),(b,wo)]:
+  eta=l+(r-l)*.5*(1+x)
+  assert l<eta<r
+  nodes.append(eta);weights.append((r-l)*.5*w)
+assert len(nodes)<=4096
+eta=np.array(nodes);weights=np.array(weights)
+# Input identity is checked before any independent integration.
+import struct
+bits=lambda arr:b''.join(struct.pack('<d',float(v)) for v in arr)
+grid_hash=hashlib.sha256(bits(eta)+bits(weights)).hexdigest()
+old=R/'archived-research/short-hhe-coupling'
+original_manifest=json.loads((old/'INPUTS.json').read_text())
+input_check={p:hashlib.sha256((R/p).read_bytes()).hexdigest()==h for p,h in original_manifest.items()}
+assert all(input_check.values()),'historical input hash mismatch'
+ref_manifest=json.loads((old/'REFERENCE_TIGHTER_INPUTS.json').read_text())
+assert all(hashlib.sha256((R/p).read_bytes()).hexdigest()==h for p,h in ref_manifest.items()),'saved reference input mismatch'
+source=(old/'reference_control.py').read_text();prefix=source[:source.index('status={')]
+saved_argv=sys.argv[:];sys.argv=['reference_control.py','tighter'];namespace={'__file__':str(old/'reference_control.py')};exec(compile(prefix,str(old/'reference_control.py'),'exec'),namespace);sys.argv=saved_argv
+assert bits(eta)==bits(namespace['eta']) and bits(weights)==bits(namespace['weights'])
+rust=list(csv.DictReader((D/'results/grid_bits.csv').open()));assert [int(r['eta_bits'],16) for r in rust]==[struct.unpack('<Q',struct.pack('<d',v))[0] for v in eta];assert [int(r['weight_bits'],16) for r in rust]==[struct.unpack('<Q',struct.pack('<d',v))[0] for v in weights]
+# The imported numerical implementation remains byte-for-byte unchanged.
+reference.spectral_grid=lambda *args,**kwargs:(eta,weights)
+times=np.array([s0+config['max_dln_a']*i/3 for i in range(4)])
+times[0]=s0;times[-1]=s1
+baseline_status=json.loads((old/'results/REFERENCE_TIGHTER_STATUS.json').read_text());assert baseline_status['completed'] and baseline_status['stats']['accepted_number_budget_ratio']<=1 and baseline_status['stats']['accepted_energy_budget_ratio']<=1
+assert baseline_status['output_times']==times.tolist() and bits(times)==bits(namespace['times'])
+import shutil
+shutil.copy2(old/'results/reference_tighter.csv',D/'results/reference_baseline.csv')
+verification={'all_historical_inputs_match':all(input_check.values()),'reference_implementation_inputs_match':True,'grid_hash_float64_eta_then_weight':grid_hash,'rust_grid_bitwise_matches':True,'output_times_bitwise_match':True,'baseline_admitted':True,'baseline_csv_sha256':hashlib.sha256((D/'results/reference_baseline.csv').read_bytes()).hexdigest(),'baseline_status_sha256':hashlib.sha256((old/'results/REFERENCE_TIGHTER_STATUS.json').read_bytes()).hexdigest(),'baseline_rtol':1e-11,'baseline_atol':1e-14}
+(D/'results/REFERENCE_REUSE_VERIFICATION.json').write_text(json.dumps(verification,indent=2)+'\n')
+# Sample actual live NumPy buffers in the independent solver's call stack.
+# Report sampled counts honestly, together with a conservative storage bound.
+import inspect
+memory={'samples':0,'peak_live_numpy_buffers_observed':0,'peak_numpy_scalar_slots_observed':0,'peak_spectral_vector_equivalents_observed':0.,'max_accepted_columns_per_segment':0}
+original_eval=physics.evaluate;calls=0
+
+def record_arrays():
+ buffers={};frame=inspect.currentframe()
+ while frame is not None:
+  for value in list(frame.f_locals.values()):
+   values=value if isinstance(value,(tuple,list)) else [value]
+   for v in values:
+    if isinstance(v,np.ndarray):
+     while isinstance(v.base,np.ndarray):v=v.base
+     buffers[id(v)]=v
+  frame=frame.f_back
+ memory['samples']+=1;memory['peak_live_numpy_buffers_observed']=max(memory['peak_live_numpy_buffers_observed'],len(buffers));slots=sum((v.nbytes+7)//8 for v in buffers.values());memory['peak_numpy_scalar_slots_observed']=max(memory['peak_numpy_scalar_slots_observed'],slots);memory['peak_spectral_vector_equivalents_observed']=max(memory['peak_spectral_vector_equivalents_observed'],slots/len(eta))
+def observed_eval(*args,**kwargs):
+ global calls
+ calls+=1
+ if calls%128==0:record_arrays()
+ return original_eval(*args,**kwargs)
+physics.evaluate=observed_eval
+import scipy.integrate
+original_solve=scipy.integrate.solve_ivp
+def observed_solve(*args,**kwargs):
+ result=original_solve(*args,**kwargs);memory['max_accepted_columns_per_segment']=max(memory['max_accepted_columns_per_segment'],result.y.shape[1]);record_arrays();return result
+scipy.integrate.solve_ivp=observed_solve
+status={'method':'independent existing continuous-source Radau, same fixed eta spectrum','label':level,'rtol':rtol,'atol':atol,'unique_live_spectral_abscissae':len(nodes),'live_sample_interpretation':'distinct spectral quadrature abscissae; solver vectors reuse the same node set','output_times':times.tolist(),'budget_seconds_per_attempt':45,'completed':False}
+# Each attempt is subordinate to the shared frozen 120 CPU / 180 wall supervisor.
+def timeout(*_):raise TimeoutError('45-second independent-reference feasibility bound')
+signal.signal(signal.SIGALRM,timeout);signal.alarm(45)
+start=time.monotonic()
+try:
+ result=reference.solve_history(config,times,spectral_panels=512,order=4,rtol=rtol,atol=atol,method='Radau')
+ signal.alarm(0)
+ with (D/f'results/reference_{level}.csv').open('w') as f:
+  writer=csv.DictWriter(f,fieldnames=list(result['rows'][0]));writer.writeheader();writer.writerows(result['rows'])
+ status.update(completed=True,stats=result['stats'],comparison_with_B_m8_g4=compare.compare_rows(compare.read_csv(D/'results/B_phases_m8_g4.csv'),result['rows']))
+ status['reference_retightening']=compare.compare_rows(compare.read_csv(D/'results/reference_baseline.csv'),result['rows'],allowance_factor=.1)
+
+except Exception as e:status['failure']=repr(e)
+finally:
+ memory['exact_peak_buffer_count']='UNVERIFIED';memory['exact_peak_scalar_slots']='UNVERIFIED';memory['interpretation']='sampled stack-local unique NumPy buffers are lower-bound observations, excluding transient peaks and solver-object/native allocations; no certified all-array peak bound';status['array_accounting']=memory
+ status['wall_seconds']=time.monotonic()-start
+ (D/f'results/REFERENCE_{level.upper()}_STATUS.json').write_text(json.dumps(status,indent=2)+'\n')
+print(json.dumps({k:v for k,v in status.items() if k not in ['comparison_with_B_m8_g4','reference_retightening','stats']}))
+raise SystemExit(0 if status['completed'] else 2)
