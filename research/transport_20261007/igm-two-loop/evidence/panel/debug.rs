@@ -1,0 +1,1 @@
+#[path="debug_panel.rs"] mod panel; fn main(){ for f in [panel::Family::Ordinary,panel::Family::RightFront]{for beta in [-128.0,-1.0,0.0,128.0]{let p=panel::Panel{l:0.0,r:1.0,beta,ln_n:0.0,family:f};println!("{:?}",p.restrict(0.0,1.0));}}}

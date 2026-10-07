@@ -1,0 +1,3 @@
+#[path = "../src/tail.rs"] mod tail;
+use std::io::{self,BufRead};
+fn main(){for line in io::stdin().lock().lines(){let line=line.unwrap();if line.trim().is_empty(){continue;}let x:Vec<f64>=line.split_whitespace().map(|x|x.parse().unwrap()).collect();assert_eq!(x.len(),7);let a=tail::characteristic_to_cutoff(tail::LogPositive::from_log(x[0]).unwrap(),tail::LogPositive::from_log(x[1]).unwrap(),[x[2],x[3],x[4]],x[5],x[6]).unwrap();let o=a.characteristic.owners;let exported=tail::export(o).unwrap().owners;let mut logs=Vec::new();for v in o.as_array().into_iter().chain(exported.as_array()){let (h,l)=v.log_parts();logs.push(format!("{h:.17e},{l:.17e}"));}println!("{:.17e},{:.17e},{:.17e}|{}",a.h,a.unanchored_endpoint_ev,a.energy_anchor_roundtrip_relative,logs.join("|"));}}
