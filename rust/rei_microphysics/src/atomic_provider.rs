@@ -101,7 +101,30 @@ pub struct RawRecord {
 #[derive(Debug, Clone, Copy, Default)]
 pub struct AtomicProvider;
 
+/// Exact lower energy support of the existing Verner fit, eV (not binding energy).
+pub fn verner_cutoff_ev(absorber: Absorber) -> f64 {
+    match absorber {
+        Absorber::HI => 13.60,
+        Absorber::HeI => 24.59,
+        Absorber::HeII => 54.42,
+    }
+}
+
+#[cfg(test)]
+thread_local! {
+    static TEST_SIGMA_CALLS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
 impl AtomicProvider {
+    #[cfg(test)]
+    pub(crate) fn reset_test_sigma_calls() {
+        TEST_SIGMA_CALLS.with(|v| v.set(0));
+    }
+    #[cfg(test)]
+    pub(crate) fn test_sigma_calls() -> usize {
+        TEST_SIGMA_CALLS.with(|v| v.get())
+    }
+
     /// Returns a raw reference-value provider; no physical consumer is admitted.
     pub fn reference() -> Self {
         Self
@@ -326,18 +349,20 @@ impl AtomicProvider {
 
     /// Verner ground-state outer-shell fit. Fit thresholds differ from binding energies.
     pub fn cross_section(&self, absorber: Absorber, energy_ev: f64) -> Result<f64, ForwardError> {
+        #[cfg(test)]
+        TEST_SIGMA_CALLS.with(|v| v.set(v.get() + 1));
         if !energy_ev.is_finite() || energy_ev < 0.0 {
             return Err(ForwardError::InvalidInput("PHOTON_ENERGY_INVALID"));
         }
         if energy_ev > 50000.0 {
             return Err(ForwardError::InvalidInput("VERNER_ENERGY_DOMAIN"));
         }
-        let (eth, e0, sigma0, ya, p, yw, y0, y1) = match absorber {
-            Absorber::HI => (13.60, 0.4298, 5.475e4, 32.88, 2.963, 0.0, 0.0, 0.0),
-            Absorber::HeI => (24.59, 13.61, 949.2, 1.469, 3.188, 2.039, 0.4434, 2.136),
-            Absorber::HeII => (54.42, 1.720, 1.369e4, 32.88, 2.963, 0.0, 0.0, 0.0),
+        let (e0, sigma0, ya, p, yw, y0, y1) = match absorber {
+            Absorber::HI => (0.4298, 5.475e4, 32.88, 2.963, 0.0, 0.0, 0.0),
+            Absorber::HeI => (13.61, 949.2, 1.469, 3.188, 2.039, 0.4434, 2.136),
+            Absorber::HeII => (1.720, 1.369e4, 32.88, 2.963, 0.0, 0.0, 0.0),
         };
-        if energy_ev < eth {
+        if energy_ev < verner_cutoff_ev(absorber) {
             return Ok(0.0);
         }
         let x = energy_ev / e0 - y0;

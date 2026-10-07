@@ -1,0 +1,14 @@
+{
+  "status": "Frozen before DD arithmetic implementation",
+  "purpose": "Conditional compensated-normalization remedy already permitted by V2 contract",
+  "coordinates": "exact binary64 L and R, both in [-32,32]; exact DD width in [1e-7,32]",
+  "moment_lane": "finite normal positive N and M; normalize by common exact power-of-two scale before DD division",
+  "method": "TwoSum/FMA product; three-term corrected DD division; DD exp Taylor on |x|<=1/8 followed by squaring; at most48Taylorterms and9squarings; convert only final mu to f64",
+  "fixed_targets": {
+    "normalized_mean_absolute": 5e-13,
+    "quadrature_relative": 1e-06
+  },
+  "fixtures": "30 inherited exact-input fixtures, plus108 combinations L in[-8,0,2.6100697927420065,16], N in[1e-250,0.7,1e250], nominal width in[1e-7,0.01,1], generating mu in[0.01,0.5,0.99]; oracle always uses exact rounded binary64 input moments, never generating mu",
+  "source_diagnosis": "../continuous-boundary-research/conditioning/DIAGNOSTICS.json",
+  "failure_policy": "reject unsupported domain or nonfinite/intermediate underflow; retain named blocker if independent exact-input target fails; no criterion relaxation"
+}

@@ -1,0 +1,77 @@
+{
+  "schema": "rei_cache_independent_review_v1",
+  "verdict": "ACCEPT_ISOLATED_PROTOTYPE_SCOPED",
+  "blocking_findings": [],
+  "source_design_findings": [
+    {
+      "criterion": "Arithmetic and evaluation order preservation",
+      "decision": "ACCEPT",
+      "locations": [
+        "rust/rei_microphysics/src/igm_photo.rs:119-123",
+        "rust/rei_microphysics/src/igm_photo.rs:185-245",
+        "rust/rei_microphysics/src/igm_step.rs:245-357"
+      ],
+      "finding": "The production diff changes provider lookup plumbing only. Opacity, gamma, heat, ownership, reductions, underflow accounting, material updates, residuals, and conservation gates retain their arithmetic and ordering."
+    },
+    {
+      "criterion": "Exact energy and absorber-channel key",
+      "decision": "ACCEPT",
+      "locations": [
+        "rust/rei_microphysics/src/igm_photo.rs:23-39",
+        "rust/rei_microphysics/src/igm_photo.rs:112-119",
+        "rust/rei_microphysics/src/igm_photo.rs:178-185"
+      ],
+      "finding": "Each packet slot stores three channel values. Energy is compared using to_bits and a changed energy invalidates all channel entries. Both callers use matching HI/HeI/HeII channel order. The reference AtomicProvider is stateless and its production cross-section calculation is unchanged."
+    },
+    {
+      "criterion": "Transaction ownership and source-preflight reuse",
+      "decision": "ACCEPT",
+      "locations": [
+        "rust/rei_microphysics/src/igm_step.rs:213-214",
+        "rust/rei_microphysics/src/igm_step.rs:412-418",
+        "rust/rei_microphysics/src/igm_step.rs:451-461",
+        "rust/rei_microphysics/src/igm_continuous.rs:430"
+      ],
+      "finding": "Each public implicit transaction creates a local cache. Source preflight and its inner transaction share the cache while packet energies and slot count remain aligned. Caches are not stored in continuous/adaptive state and cannot persist across public coarse/half-step transactions."
+    },
+    {
+      "criterion": "Lazy errors and disabled-channel preservation",
+      "decision": "ACCEPT",
+      "locations": [
+        "rust/rei_microphysics/src/igm_photo.rs:48-54",
+        "rust/rei_microphysics/src/igm_photo.rs:104-119",
+        "rust/rei_microphysics/src/igm_photo.rs:163-185"
+      ],
+      "finding": "Only successful sigma values are stored. Validation remains ahead of provider evaluation and disabled channels skip lookup. Cache construction records energy bits without evaluating sigma. No production error-order regression was found."
+    },
+    {
+      "criterion": "API and cache-only scope",
+      "decision": "ACCEPT",
+      "finding": "Public signatures are unchanged and new cache interfaces are crate-private. Production changes are confined to igm_photo.rs and igm_step.rs; atomic_provider.rs changes are cfg(test)-only instrumentation."
+    }
+  ],
+  "non_blocking_gaps": [
+    {
+      "location": "rust/rei_microphysics/src/igm_step.rs:510-541",
+      "finding": "The count fixture covers one all-active packet. A multi-packet mixed-mask fixture would directly protect the general active-channel evaluation bound."
+    },
+    {
+      "location": "rust/rei_microphysics/src/igm_step.rs:213-214,412-414",
+      "finding": "Fresh cache ownership across consecutive public transactions is structurally established but lacks a dedicated provider-count regression test."
+    },
+    {
+      "location": "rust/rei_microphysics/src/igm_photo.rs:291-312",
+      "finding": "The lazy-error test verifies the first failed lookup, but a repeated-failure assertion would directly protect the invariant that errors are never cached."
+    },
+    {
+      "location": "rust/rei_microphysics/src/igm_photo.rs:287,333",
+      "finding": "Equality assertions use Debug serialization. Explicit per-field to_bits comparisons would express the bitwise contract more directly; no current mismatch was found."
+    }
+  ],
+  "claim_limits": [
+    "Corpus and persisted-output equality is not proof for every possible state.",
+    "The healthy history comparisons retain the pre-existing scale-1000 research profile on both sides; default scale-1 failure remains unchanged.",
+    "The 25.9% and 32.9% reductions are local process-CPU microbenchmark observations, not an end-to-end full-trajectory or universal speed claim.",
+    "No tolerance relaxation, arithmetic fix, merge, publication, or new scientific acceptance is established or authorized."
+  ]
+}

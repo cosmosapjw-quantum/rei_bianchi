@@ -1,0 +1,134 @@
+{
+  "status": "FROZEN before numerical runs and implementation",
+  "scope": "Additive pure-radiation analytic prototype; no coupled-history, production, deployment, or convergence acceptance",
+  "inputs": {
+    "baseline-repository/tools/igm_continuous_reference.py": "3fa6a91a3239238bef49f183d906dfcfc9034b60e079f7fd14c144c02293f429",
+    "baseline-repository/tools/igm_reference.py": "0d827afc60f21e23d86c0b0d6b2850a80debf8182fd4f7622978e8ac93039ed6",
+    "baseline-repository/tools/igm_compare.py": "4b7a2f29e1d04f876caaaf24ce0f5f3d98bd1645a5645e6ed38272dda232e062",
+    "baseline-repository/rust/rei_microphysics/src/igm_continuous.rs": "11700e3810ae86808bcdf0896ee77b4bac9df5016701e946584bbaadd34eb34a",
+    "archived-research/long-flrw/pilot-z10/FIELD_SUMMARY.csv": "169ef15aa4fdc8b879b51ba12541070bbbd18fccf78b4f6148810816079eb02a",
+    "archived-research/long-flrw/pilot-z10/OUTFLOW_DIAGNOSTICS.json": "df320e7d7d798ffe4eb41227dff5df335a5de18c21569abcf340b21c9488cb74",
+    "archived-research/long-flrw/pilot-z10/review/AUDIT_RESULTS.json": "c0ff5472a897375cc488a208b350f52ca54d9a4765b7140a8b18e3e20afe532c",
+    "archived-research/continuous-boundary-research/CONTINUOUS_BOUNDARY_DESIGN.md": "2bdc7a6744f42818256c90de07285f5a56c02a3b2a587140a4965e6579959709",
+    "archived-research/continuous-boundary-research/INDEPENDENT_REVIEW.md": "a825d99fa4a6524ed789315789d1c649226c0509bc8af26c49c490d1e21b23de",
+    "archived-research/continuous-boundary-research/BOUNDED_ANALYTIC_PROTOTYPE_PLAN.md": "70f11d3167283c9efba781f9d6194d85c7b1dbd878611b7beae81ea2730909c8",
+    "archived-research/continuous-boundary-research/INITIAL_MOMENT_QUADRATURE_OPTION.md": "a811e730c4fa8b0fb2ac73c7e75e456033bf0c734406fd66312c2eaeb3efb696"
+  },
+  "constants": {
+    "epsilon": 1.602176634e-12,
+    "cutoff_eV": 13.6,
+    "chi_eV": [
+      13.598434599702,
+      24.587389011,
+      54.41776
+    ],
+    "source_Emin_eV": 13.7,
+    "source_Emax_eV": 100.0
+  },
+  "methods": {
+    "kernel": "Frozen nonnegative rates and q per s, analytic elementary integrals with convergent stable series",
+    "initial_quadrature": "Positive interval mass/energy mean quadrature, rebuilt after topology splitting; no persistent atoms",
+    "source_only": "Exact-time q=K*exp(s-eta) per active source segment; positive eta Gauss quadrature shared by state and ledgers",
+    "reconstruction": "Ordinary or front-vanishing (1-y)*exp(beta*y), positive Gauss64 moment evaluation and monotone bracket inversion; width>=1e-7, |beta|<=128 admitted; others reject",
+    "log_tails": "Retain authoritative lnN/lnM; underflowed states cannot be classified empty; tail evolution remains unsupported and rejects",
+    "source_projection": "Front shape and support tested separately; no joined projected source/absorption history claim"
+  },
+  "thresholds": {
+    "kernel_oracle_relative": 3e-12,
+    "kernel_oracle_absolute_floor": 1e-300,
+    "analytic_identity_relative": 2e-12,
+    "analytic_identity_scale_floor": 1e-300,
+    "closure_moment_relative": 5e-12,
+    "closure_mean_scaled_absolute": 5e-13,
+    "zero_initial_N_budget": "1e-10*max(emitted_N,1e-10)",
+    "zero_initial_E_budget": "1e-10*max(emitted_E,1e-20), material terms exactly zero",
+    "source_total_relative": 3e-12,
+    "topology_support_leakage": 0,
+    "negative_owner_admission": 0,
+    "quadrature_refinement_target_relative": 1e-06,
+    "panel_reconstruction_bias_target_relative": 0.001
+  },
+  "resources": {
+    "numeric_total_cpu_seconds": 120,
+    "numeric_total_wall_seconds": 180,
+    "numeric_address_space_bytes": 536870912,
+    "total_output_bytes": 33554432,
+    "max_simultaneous_evaluation_samples": 4096,
+    "numeric_concurrency": 1,
+    "threads": 1,
+    "compilation": "Separate measured process; no dependency downloads; rustc 1.94.1"
+  },
+  "test_sequences": {
+    "kernel_h": [
+      1e-06,
+      0.01,
+      0.5,
+      2.0
+    ],
+    "kernel_lambda_h": [
+      0,
+      1e-12,
+      1e-06,
+      0.1,
+      1,
+      100,
+      1000
+    ],
+    "kernel_initial_source": [
+      [
+        0.7,
+        0
+      ],
+      [
+        0,
+        0.3
+      ],
+      [
+        0.7,
+        0.3
+      ]
+    ],
+    "panels": [
+      4,
+      8,
+      16,
+      32,
+      64
+    ],
+    "quadrature_orders": [
+      4,
+      8,
+      16,
+      32,
+      64
+    ],
+    "time_partitions": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "closure_beta": [
+      -64,
+      -12,
+      0,
+      12,
+      64
+    ],
+    "closure_width": [
+      1e-07,
+      0.01,
+      1.0
+    ],
+    "source_epochs": [
+      0.001,
+      0.02,
+      0.123,
+      0.31,
+      0.8,
+      1.2
+    ]
+  },
+  "acceptance": "Evidence per T1\u2013T7; honest partial/rejection permitted; no threshold relaxation, owner repair, clipping, weight rescaling or promotion"
+}

@@ -1,0 +1,335 @@
+//! Single owner for primary photo events and packet losses, in erg and photons/H.
+use crate::{
+    coupled_primary::PrimaryPacket, igm_state::IgmGasState, igm_thermal::IgmPhotoInput,
+    ForwardError,
+};
+#[derive(Clone, Debug, Default)]
+pub struct IgmPhotoRates {
+    pub input: IgmPhotoInput,
+    pub packet_owner_per_h_s: Vec<[f64; 3]>,
+    pub owner_per_h_s: [f64; 3],
+    pub absorbed_erg_per_h_s: f64,
+    /// Conservative lost-rate bounds from explicitly identified IEEE underflow.
+    pub underflow_count_per_h_s: f64,
+    pub underflow_energy_erg_per_h_s: f64,
+}
+
+use crate::{Absorber, AtomicProvider, HHeModel};
+/// Private, transaction-owned memoization of the immutable reference provider.
+/// Entries are populated lazily at the original lookup point: disabled channels
+/// and invalid earlier inputs retain their original admission/error ordering.
+/// A cache never leaves its implicit transaction; changed energy bits invalidate
+/// a row defensively, so no stage/frame can reuse a stale cross section.
+pub(crate) struct TransactionPhotoCache {
+    energies: Vec<u64>,
+    values: Vec<[Option<f64>; 3]>,
+}
+impl TransactionPhotoCache {
+    pub(crate) fn new(packets: &[PrimaryPacket]) -> Self {
+        Self {
+            energies: packets.iter().map(|p| p.energy_ev.to_bits()).collect(),
+            values: vec![[None; 3]; packets.len()],
+        }
+    }
+    fn row(&mut self, index: usize, energy: f64) -> &mut [Option<f64>; 3] {
+        if self.energies[index] != energy.to_bits() {
+            self.energies[index] = energy.to_bits();
+            self.values[index] = [None; 3];
+        }
+        &mut self.values[index]
+    }
+}
+fn reference_sigma(
+    cached: Option<&mut [Option<f64>; 3]>,
+    index: usize,
+    absorber: Absorber,
+    energy: f64,
+) -> Result<f64, ForwardError> {
+    if let Some(row) = cached {
+        if let Some(value) = row[index] {
+            return Ok(value);
+        }
+        let value = AtomicProvider::reference().cross_section(absorber, energy)?;
+        row[index] = Some(value);
+        Ok(value)
+    } else {
+        AtomicProvider::reference().cross_section(absorber, energy)
+    }
+}
+
+fn invalid() -> ForwardError {
+    ForwardError::InvalidInput("IGM_PHOTO_DOMAIN_OR_ARITHMETIC")
+}
+fn valid(x: f64) -> bool {
+    x.is_finite() && x >= 0.0
+}
+pub fn packet_opacity(
+    gas: &IgmGasState,
+    energy: f64,
+    nh: f64,
+    nhe: f64,
+) -> Result<[f64; 3], ForwardError> {
+    packet_opacity_impl(gas, energy, None, nh, nhe, None)
+}
+/// Disable specified absorber channels without changing the photon energy.
+/// Active channels retain the atomic provider's original support convention.
+pub fn packet_opacity_masked(
+    gas: &IgmGasState,
+    energy: f64,
+    active: [bool; 3],
+    nh: f64,
+    nhe: f64,
+) -> Result<[f64; 3], ForwardError> {
+    packet_opacity_impl(gas, energy, Some(active), nh, nhe, None)
+}
+pub(crate) fn packet_opacity_cached(
+    gas: &IgmGasState,
+    energy: f64,
+    active: Option<[bool; 3]>,
+    nh: f64,
+    nhe: f64,
+    cache: &mut TransactionPhotoCache,
+    index: usize,
+) -> Result<[f64; 3], ForwardError> {
+    packet_opacity_impl(gas, energy, active, nh, nhe, Some(cache.row(index, energy)))
+}
+fn packet_opacity_impl(
+    gas: &IgmGasState,
+    energy: f64,
+    active: Option<[bool; 3]>,
+    nh: f64,
+    nhe: f64,
+    mut cached: Option<&mut [Option<f64>; 3]>,
+) -> Result<[f64; 3], ForwardError> {
+    gas.eos(nh, nhe)?;
+    if !energy.is_normal() || energy <= 0.0 {
+        return Err(invalid());
+    }
+    let [x, y, z] = gas.fractions;
+    let n = [nh * (1.0 - x), nhe * (1.0 - (y + z)), nhe * y];
+    let mut out = [0.0; 3];
+    let c = HHeModel::controlled_fixture();
+    for (i, a) in [Absorber::HI, Absorber::HeI, Absorber::HeII]
+        .iter()
+        .enumerate()
+    {
+        if active.is_some_and(|mask| !mask[i]) {
+            continue;
+        }
+        let sigma = reference_sigma(cached.as_deref_mut(), i, *a, energy)?;
+        out[i] = c.c_cm_s * n[i] * sigma;
+        if !valid(out[i]) || (n[i] > 0.0 && sigma > 0.0 && !out[i].is_normal()) {
+            return Err(invalid());
+        }
+    }
+    Ok(out)
+}
+pub fn igm_photo_rates(
+    gas: &IgmGasState,
+    packets: &[PrimaryPacket],
+    nh: f64,
+    nhe: f64,
+) -> Result<IgmPhotoRates, ForwardError> {
+    igm_photo_rates_impl(gas, packets, None, nh, nhe, None)
+}
+/// Per-packet, per-absorber support masks shared by gamma, heat and photon owners.
+pub fn igm_photo_rates_masked(
+    gas: &IgmGasState,
+    packets: &[PrimaryPacket],
+    masks: &[[bool; 3]],
+    nh: f64,
+    nhe: f64,
+) -> Result<IgmPhotoRates, ForwardError> {
+    igm_photo_rates_impl(gas, packets, Some(masks), nh, nhe, None)
+}
+pub(crate) fn igm_photo_rates_cached(
+    gas: &IgmGasState,
+    packets: &[PrimaryPacket],
+    masks: Option<&[[bool; 3]]>,
+    nh: f64,
+    nhe: f64,
+    cache: &mut TransactionPhotoCache,
+) -> Result<IgmPhotoRates, ForwardError> {
+    igm_photo_rates_impl(gas, packets, masks, nh, nhe, Some(cache))
+}
+fn igm_photo_rates_impl(
+    gas: &IgmGasState,
+    packets: &[PrimaryPacket],
+    masks: Option<&[[bool; 3]]>,
+    nh: f64,
+    nhe: f64,
+    mut cache: Option<&mut TransactionPhotoCache>,
+) -> Result<IgmPhotoRates, ForwardError> {
+    if masks.is_some_and(|m| m.len() != packets.len()) {
+        return Err(invalid());
+    }
+    gas.eos(nh, nhe)?;
+    let c = HHeModel::controlled_fixture();
+    let mut out = IgmPhotoRates::default();
+    for (j, p) in packets.iter().enumerate() {
+        if !valid(p.per_h) {
+            return Err(invalid());
+        }
+        let active = masks.map(|m| m[j]);
+        let mut cached = cache.as_deref_mut().map(|c| c.row(j, p.energy_ev));
+        let opacity =
+            packet_opacity_impl(gas, p.energy_ev, active, nh, nhe, cached.as_deref_mut())?;
+        let mut owners = [0.0; 3];
+        for (i, a) in [Absorber::HI, Absorber::HeI, Absorber::HeII]
+            .iter()
+            .enumerate()
+        {
+            if active.is_some_and(|mask| !mask[i]) {
+                continue;
+            }
+            let sigma = reference_sigma(cached.as_deref_mut(), i, *a, p.energy_ev)?;
+            if sigma == 0.0 || p.per_h == 0.0 {
+                continue;
+            }
+            let gamma = c.c_cm_s * nh * sigma * p.per_h;
+            let heat = gamma * (p.energy_ev - c.threshold_ev[i]) * c.ev_erg;
+            owners[i] = opacity[i] * p.per_h;
+            if !valid(gamma) || !valid(heat) || !valid(owners[i]) {
+                return Err(invalid());
+            }
+            let ratio = [
+                1.0 - gas.fractions[0],
+                nhe / nh * (1.0 - (gas.fractions[1] + gas.fractions[2])),
+                nhe / nh * gas.fractions[1],
+            ][i];
+            if !gamma.is_normal() {
+                out.underflow_count_per_h_s += ratio * f64::MIN_POSITIVE;
+                out.underflow_energy_erg_per_h_s +=
+                    ratio * f64::MIN_POSITIVE * p.energy_ev * c.ev_erg;
+            }
+            if !heat.is_normal() {
+                out.underflow_energy_erg_per_h_s += ratio * f64::MIN_POSITIVE;
+            }
+            if opacity[i] > 0.0 && !owners[i].is_normal() {
+                out.underflow_count_per_h_s += f64::MIN_POSITIVE;
+                out.underflow_energy_erg_per_h_s += f64::MIN_POSITIVE * p.energy_ev * c.ev_erg;
+            }
+            out.input.gamma_s[i] += gamma;
+            out.input.heat_erg_per_absorber_s[i] += heat;
+            out.owner_per_h_s[i] += owners[i];
+            out.absorbed_erg_per_h_s += owners[i] * p.energy_ev * c.ev_erg;
+        }
+        out.packet_owner_per_h_s.push(owners);
+    }
+    // Strict point-provider admission is unchanged. Quantities whose entire
+    // contribution lies below normal arithmetic are rounded only at this numeric
+    // boundary, with dimensional error bounds; packet log weights are retained.
+    let abs = [
+        nh * (1.0 - gas.fractions[0]),
+        nhe * (1.0 - (gas.fractions[1] + gas.fractions[2])),
+        nhe * gas.fractions[1],
+    ];
+    for i in 0..3 {
+        let gamma = out.input.gamma_s[i];
+        let heat = out.input.heat_erg_per_absorber_s[i];
+        let ratio = abs[i] / nh;
+        let gamma_bad = gamma > 0.0
+            && (!gamma.is_normal()
+                || (abs[i] > 0.0 && !(abs[i] * gamma * c.threshold_ev[i] * c.ev_erg).is_normal()));
+        let heat_bad =
+            heat > 0.0 && (!heat.is_normal() || (abs[i] > 0.0 && !(abs[i] * heat).is_normal()));
+        if gamma_bad {
+            out.underflow_count_per_h_s += ratio * gamma + f64::MIN_POSITIVE;
+            out.underflow_energy_erg_per_h_s +=
+                ratio * (gamma * c.threshold_ev[i] * c.ev_erg + heat) + f64::MIN_POSITIVE;
+            out.input.gamma_s[i] = 0.0;
+            out.input.heat_erg_per_absorber_s[i] = 0.0;
+        } else if heat_bad {
+            out.underflow_energy_erg_per_h_s += ratio * heat + f64::MIN_POSITIVE;
+            out.input.heat_erg_per_absorber_s[i] = 0.0;
+        }
+    }
+    for v in out
+        .input
+        .gamma_s
+        .iter()
+        .chain(out.input.heat_erg_per_absorber_s.iter())
+        .chain(out.owner_per_h_s.iter())
+        .chain(std::iter::once(&out.absorbed_erg_per_h_s))
+    {
+        if !valid(*v) {
+            return Err(invalid());
+        }
+    }
+    Ok(out)
+}
+
+#[cfg(test)]
+mod transaction_cache_tests {
+    use super::*;
+    fn gas() -> IgmGasState {
+        IgmGasState::from_temperature([0.2, 0.3, 0.1], 1e-3, 8e-5, 100.0).unwrap()
+    }
+    #[test]
+    fn cached_photo_rates_match_uncached_and_rekey_changed_energy() {
+        let g = gas();
+        let mut packets = [PrimaryPacket {
+            energy_ev: 80.0,
+            per_h: 0.01,
+        }];
+        let mut cache = TransactionPhotoCache::new(&packets);
+        for energy in [
+            80.0,
+            80.0,
+            24.59,
+            f64::from_bits(24.59f64.to_bits() - 1),
+            80.0,
+        ] {
+            packets[0].energy_ev = energy;
+            let expected = igm_photo_rates(&g, &packets, 1e-3, 8e-5).unwrap();
+            let actual =
+                igm_photo_rates_cached(&g, &packets, None, 1e-3, 8e-5, &mut cache).unwrap();
+            assert_eq!(format!("{actual:?}"), format!("{expected:?}"));
+        }
+    }
+    #[test]
+    fn cache_is_lazy_for_disabled_channels_and_bad_prior_inputs() {
+        let g = gas();
+        let p = [PrimaryPacket {
+            energy_ev: 50001.0,
+            per_h: 0.01,
+        }];
+        let mut cache = TransactionPhotoCache::new(&p);
+        AtomicProvider::reset_test_sigma_calls();
+        let actual =
+            igm_photo_rates_cached(&g, &p, Some(&[[false; 3]]), 1e-3, 8e-5, &mut cache).unwrap();
+        assert_eq!(AtomicProvider::test_sigma_calls(), 0);
+        assert_eq!(actual.input.gamma_s, [0.0; 3]);
+        let bad = [PrimaryPacket {
+            energy_ev: 50001.0,
+            per_h: -0.01,
+        }];
+        let err = igm_photo_rates_cached(&g, &bad, None, 1e-3, 8e-5, &mut cache).unwrap_err();
+        assert_eq!(err.code(), "IGM_PHOTO_DOMAIN_OR_ARITHMETIC");
+        assert_eq!(AtomicProvider::test_sigma_calls(), 0);
+        let err = igm_photo_rates_cached(&g, &p, None, 1e-3, 8e-5, &mut cache).unwrap_err();
+        assert_eq!(err.code(), "VERNER_ENERGY_DOMAIN");
+        assert_eq!(AtomicProvider::test_sigma_calls(), 1);
+    }
+    #[test]
+    fn cache_reuses_only_immutable_sigma_when_material_and_counts_change() {
+        let g = gas();
+        let p = [PrimaryPacket {
+            energy_ev: 80.0,
+            per_h: 0.01,
+        }];
+        let mut cache = TransactionPhotoCache::new(&p);
+        AtomicProvider::reset_test_sigma_calls();
+        igm_photo_rates_cached(&g, &p, None, 1e-3, 8e-5, &mut cache).unwrap();
+        assert_eq!(AtomicProvider::test_sigma_calls(), 3);
+        let q = [PrimaryPacket {
+            energy_ev: 80.0,
+            per_h: 0.005,
+        }];
+        let h = IgmGasState::from_temperature([0.6, 0.2, 0.4], 1e-3, 8e-5, 1000.0).unwrap();
+        let actual = igm_photo_rates_cached(&h, &q, None, 1e-3, 8e-5, &mut cache).unwrap();
+        assert_eq!(AtomicProvider::test_sigma_calls(), 3);
+        let expected = igm_photo_rates(&h, &q, 1e-3, 8e-5).unwrap();
+        assert_eq!(format!("{actual:?}"), format!("{expected:?}"));
+    }
+}
