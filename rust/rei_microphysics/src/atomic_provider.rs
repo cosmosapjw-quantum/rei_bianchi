@@ -110,7 +110,21 @@ pub fn verner_cutoff_ev(absorber: Absorber) -> f64 {
     }
 }
 
+#[cfg(test)]
+thread_local! {
+    static TEST_SIGMA_CALLS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
 impl AtomicProvider {
+    #[cfg(test)]
+    pub(crate) fn reset_test_sigma_calls() {
+        TEST_SIGMA_CALLS.with(|v| v.set(0));
+    }
+    #[cfg(test)]
+    pub(crate) fn test_sigma_calls() -> usize {
+        TEST_SIGMA_CALLS.with(|v| v.get())
+    }
+
     /// Returns a raw reference-value provider; no physical consumer is admitted.
     pub fn reference() -> Self {
         Self
@@ -335,6 +349,8 @@ impl AtomicProvider {
 
     /// Verner ground-state outer-shell fit. Fit thresholds differ from binding energies.
     pub fn cross_section(&self, absorber: Absorber, energy_ev: f64) -> Result<f64, ForwardError> {
+        #[cfg(test)]
+        TEST_SIGMA_CALLS.with(|v| v.set(v.get() + 1));
         if !energy_ev.is_finite() || energy_ev < 0.0 {
             return Err(ForwardError::InvalidInput("PHOTON_ENERGY_INVALID"));
         }

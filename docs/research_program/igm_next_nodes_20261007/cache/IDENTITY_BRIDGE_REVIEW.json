@@ -1,0 +1,116 @@
+{
+  "schema": "rei_cache_r1_identity_bridge_independent_review_v1",
+  "reviewed_utc": "2026-10-07T02:54:40.869118+00:00",
+  "verdict": "ACCEPT_SHORT_FIXTURE_IDENTITY_BRIDGE",
+  "contract_verdict": "CONFIRMED",
+  "quality_verdict": "CONFIRMED_WITH_NONBLOCKING_HARNESS_CAVEATS",
+  "scope": "One completed cached replay of the previously accepted manufactured z12-to11.5 R1 fixture: 1024 fixed nodes, union121 outputs. No native/reference trajectory or benchmark rerun during review.",
+  "blocking_findings": [],
+  "scientific_comparisons": [
+    {
+      "label": "1024",
+      "reference": "reference1024-union-retight-v2",
+      "field_count": 37,
+      "row_count": 121,
+      "allowance_factor": 1.0,
+      "all_fields_pass": true,
+      "both_budgets_pass": true,
+      "fresh_comparator_equals_recorded": true,
+      "expanded_payload_equals_accepted": true,
+      "max_field_allowance_ratio": 0.9061686982970222,
+      "Gamma_heii_max_allowance_ratio": 0.003690668904280114,
+      "budgets": {
+        "candidate": {
+          "number_max_allowance_ratio": 0.0020455057040937,
+          "energy_max_allowance_ratio": 0.06374975982500385
+        },
+        "reference": {
+          "number_max_allowance_ratio": 0.18852359858168902,
+          "energy_max_allowance_ratio": 0.0615037321879981
+        }
+      }
+    },
+    {
+      "label": "2048",
+      "reference": "reference2048-union-ultratight",
+      "field_count": 37,
+      "row_count": 121,
+      "allowance_factor": 1.0,
+      "all_fields_pass": true,
+      "both_budgets_pass": true,
+      "fresh_comparator_equals_recorded": true,
+      "expanded_payload_equals_accepted": true,
+      "max_field_allowance_ratio": 0.9064143972337285,
+      "Gamma_heii_max_allowance_ratio": 0.4479077555326974,
+      "budgets": {
+        "candidate": {
+          "number_max_allowance_ratio": 0.0020455057040937,
+          "energy_max_allowance_ratio": 0.06374975982500385
+        },
+        "reference": {
+          "number_max_allowance_ratio": 0.09093493056351395,
+          "energy_max_allowance_ratio": 0.029701441079323074
+        }
+      }
+    },
+    {
+      "label": "2048order4",
+      "reference": "reference2048-order4-union-retight",
+      "field_count": 37,
+      "row_count": 121,
+      "allowance_factor": 1.0,
+      "all_fields_pass": true,
+      "both_budgets_pass": true,
+      "fresh_comparator_equals_recorded": true,
+      "expanded_payload_equals_accepted": true,
+      "max_field_allowance_ratio": 0.9063513497511595,
+      "Gamma_heii_max_allowance_ratio": 0.3928293553211342,
+      "budgets": {
+        "candidate": {
+          "number_max_allowance_ratio": 0.0020455057040937,
+          "energy_max_allowance_ratio": 0.06374975982500385
+        },
+        "reference": {
+          "number_max_allowance_ratio": 0.38197370155452204,
+          "energy_max_allowance_ratio": 0.12468679779462673
+        }
+      }
+    }
+  ],
+  "nonblocking_findings": [
+    {
+      "axis": "quality",
+      "category": "reliability",
+      "severity": "low",
+      "confidence": "high",
+      "location": "run_bridge.py:147-156",
+      "finding": "Wall and aggregate-output stop checks poll every 0.5 seconds. Final acceptance checks independently reject cap overshoot; this completed run is well below caps."
+    },
+    {
+      "axis": "quality",
+      "category": "reliability",
+      "severity": "low",
+      "confidence": "high",
+      "location": "run_bridge.py:167-168",
+      "finding": "Malformed partial status JSON can interrupt receipt construction on a failed replay. This successful replay has valid complete status and a terminal receipt; no such failure occurred."
+    }
+  ],
+  "claim_limits": [
+    "Acceptance inherits only the accepted short finite fixture; no long-history or continuum admission.",
+    "All 32 primary guarded microsteps remain unestimated and not LTE-certified.",
+    "No speedup ratio is inferred from historical shared-load baseline timing.",
+    "No integration, external publication, scientific threshold adjustment, or source-physics change is authorized or established."
+  ],
+  "runtime_evidence_limits": [
+    "CPU and peak RSS use the original runner child-resource receipt, cross-checked against the reviewed accounting code. No second trajectory was executed."
+  ],
+  "assessment_schema_repair": {
+    "verdict": "CONFIRMED_SCHEMA_ONLY_REPAIR",
+    "initial_exit_code": 1,
+    "initial_failure_preserved": true,
+    "original_assessment_source_matches_prelaunch_hash": true,
+    "native_comparator_data_unchanged": true,
+    "only_source_change": "Replace raw payload equality with exact native-plus-derived-annotations equality. Derived worst and failed_fields exactly match archived assess_spectral.py lines 27-30.",
+    "repaired_assessment_sha256": "473bca2f48482c287c364f66a93eb44c849c0d562a49e3f2acdeefb583b3087a"
+  }
+}

@@ -39,7 +39,7 @@ pub struct StepResult {
 }
 
 use crate::{
-    igm_photo::{igm_photo_rates_cached, packet_opacity_cached, TransactionPhotoCache},
+    igm_photo::{igm_photo_rates, igm_photo_rates_masked, packet_opacity, packet_opacity_masked},
     igm_rates::igm_rates,
     igm_thermal::igm_point_rhs,
 };
@@ -52,7 +52,6 @@ fn endpoint(
     masks: Option<&[[bool; 3]]>,
     b: StepBackground,
     dt: f64,
-    cache: &mut TransactionPhotoCache,
 ) -> Result<
     (
         Vec<PrimaryPacket>,
@@ -66,15 +65,10 @@ fn endpoint(
         if !p.per_h.is_finite() || p.per_h < 0.0 {
             return Err(invalid());
         }
-        let opacity = packet_opacity_cached(
-            gas,
-            p.energy_ev,
-            masks.map(|m| m[j]),
-            b.n_h,
-            b.n_he,
-            cache,
-            j,
-        )?;
+        let opacity = match masks {
+            Some(m) => packet_opacity_masked(gas, p.energy_ev, m[j], b.n_h, b.n_he)?,
+            None => packet_opacity(gas, p.energy_ev, b.n_h, b.n_he)?,
+        };
         let k = opacity.iter().sum::<f64>();
         let n = p.per_h / (1.0 + dt * k);
         if !n.is_finite() {
@@ -85,7 +79,7 @@ fn endpoint(
             per_h: n,
         });
     }
-    let photo = photo_rates_for(gas, &photons, masks, b, cache)?;
+    let photo = photo_rates_for(gas, &photons, masks, b)?;
     let rhs = igm_point_rhs(gas, b.n_h, b.n_he, b.hubble, b.tcmb, photo.input)?;
     Ok((photons, photo, rhs))
 }
@@ -94,9 +88,11 @@ fn photo_rates_for(
     packets: &[PrimaryPacket],
     masks: Option<&[[bool; 3]]>,
     b: StepBackground,
-    cache: &mut TransactionPhotoCache,
 ) -> Result<crate::igm_photo::IgmPhotoRates, ForwardError> {
-    igm_photo_rates_cached(gas, packets, masks, b.n_h, b.n_he, cache)
+    match masks {
+        Some(m) => igm_photo_rates_masked(gas, packets, m, b.n_h, b.n_he),
+        None => igm_photo_rates(gas, packets, b.n_h, b.n_he),
+    }
 }
 fn thermal(
     old: &IgmGasState,
@@ -210,8 +206,7 @@ pub fn implicit_step(
     dt: f64,
     control: StepControl,
 ) -> Result<StepResult, ForwardError> {
-    let mut cache = TransactionPhotoCache::new(packets);
-    implicit_step_impl(old, packets, None, b, dt, control, &mut cache)
+    implicit_step_impl(old, packets, None, b, dt, control)
 }
 fn implicit_step_impl(
     old: &IgmGasState,
@@ -220,7 +215,6 @@ fn implicit_step_impl(
     b: StepBackground,
     dt: f64,
     control: StepControl,
-    cache: &mut TransactionPhotoCache,
 ) -> Result<StepResult, ForwardError> {
     if masks.is_some_and(|m| m.len() != packets.len()) {
         return Err(invalid());
@@ -240,10 +234,10 @@ fn implicit_step_impl(
     }
     // Preflight actual EOS and incoming packet values before candidate updates.
     igm_point_rhs(old, b.n_h, b.n_he, b.hubble, b.tcmb, Default::default())?;
-    photo_rates_for(old, packets, masks, b, cache)?;
+    photo_rates_for(old, packets, masks, b)?;
     let mut gas = *old;
     for iteration in 0..control.max_iterations {
-        let (_, photo, _) = endpoint(&gas, packets, masks, b, dt, cache)?;
+        let (_, photo, _) = endpoint(&gas, packets, masks, b, dt)?;
         let eos = gas.eos(b.n_h, b.n_he)?;
         let rates = igm_rates(eos.temperature_k)?;
         let ne = eos.electron_density_cm3;
@@ -271,9 +265,9 @@ fn implicit_step_impl(
             };
         }
         let trial = IgmGasState::new(f, gas.w_erg_per_h)?;
-        let (_, new_photo, _) = endpoint(&trial, packets, masks, b, dt, cache)?;
+        let (_, new_photo, _) = endpoint(&trial, packets, masks, b, dt)?;
         gas = thermal(old, f, new_photo.input, b, dt)?;
-        let (photons, owners, rhs) = endpoint(&gas, packets, masks, b, dt, cache)?;
+        let (photons, owners, rhs) = endpoint(&gas, packets, masks, b, dt)?;
         let mut residual: f64 = 0.0;
         for i in 0..3 {
             let scale = 1e-6_f64
@@ -409,13 +403,12 @@ fn implicit_step_with_source_impl(
     {
         return Err(invalid());
     }
-    let mut cache = TransactionPhotoCache::new(packets);
     if source_rates.iter().all(|&s| s == 0.0) {
-        return implicit_step_impl(old, packets, masks, b, dt, control, &mut cache);
+        return implicit_step_impl(old, packets, masks, b, dt, control);
     }
     // Validate the original packets too: positive emission cannot repair an
     // invalid incoming count. The original transaction validates the background.
-    photo_rates_for(old, packets, masks, b, &mut cache)?;
+    photo_rates_for(old, packets, masks, b)?;
     let c = crate::HHeModel::controlled_fixture();
     let mut supplied = Vec::with_capacity(packets.len());
     let mut source_underflow_n = 0.0;
@@ -458,7 +451,7 @@ fn implicit_step_with_source_impl(
     // The unchanged transaction checks each N_old + dt*S - N_new - A ledger
     // and the material/binding/escape ledger using the same dt*k_new*N_new
     // owners. It therefore includes source photons in every local count owner.
-    let mut result = implicit_step_impl(old, &supplied, masks, b, dt, control, &mut cache)?;
+    let mut result = implicit_step_impl(old, &supplied, masks, b, dt, control)?;
     // Independently expose the source energy in the combined local balance:
     // delta(material + radiation) + reservoirs = sum(E * dt*S).
     let df: [f64; 3] = std::array::from_fn(|i| result.gas.fractions[i] - old.fractions[i]);
@@ -500,44 +493,4 @@ fn implicit_step_with_source_impl(
         ));
     }
     Ok(result)
-}
-
-#[cfg(test)]
-mod sigma_cache_contract_tests {
-    use super::*;
-    use crate::AtomicProvider;
-    #[test]
-    fn transaction_reuses_each_active_sigma_once() {
-        let b = StepBackground {
-            n_h: 4e-4,
-            n_he: 3.16e-5,
-            hubble: 6e-17,
-            tcmb: 35.0,
-        };
-        let g = IgmGasState::from_temperature([2e-4, 0.0, 0.0], b.n_h, b.n_he, 30.0).unwrap();
-        let p = [PrimaryPacket {
-            energy_ev: 80.0,
-            per_h: 0.0,
-        }];
-        AtomicProvider::reset_test_sigma_calls();
-        let r = implicit_step_with_source_masked(
-            &g,
-            &p,
-            &[1e-14],
-            &[[true; 3]],
-            b,
-            1e11,
-            StepControl::default(),
-        )
-        .unwrap();
-        let calls = AtomicProvider::test_sigma_calls();
-        println!(
-            "sigma_count_fixture calls={calls} iterations={} residual={}",
-            r.iterations, r.residual
-        );
-        assert_eq!(
-            calls, 3,
-            "one successful provider evaluation per packet/channel in a transaction"
-        );
-    }
 }
