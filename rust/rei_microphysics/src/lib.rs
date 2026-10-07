@@ -142,3 +142,5 @@ pub mod igm_step;
 pub mod igm_thermal;
 
 pub mod igm_continuous;
+
+pub mod igm_adaptive;

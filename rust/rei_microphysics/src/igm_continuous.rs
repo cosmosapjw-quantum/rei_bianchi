@@ -45,6 +45,19 @@ pub struct ContinuousState {
     pub rejected_steps: usize,
     pub max_residual: f64,
 }
+/// Private-trial diagnostics computed before cumulative-ledger addition.
+/// The fixed driver discards these; its arithmetic/acceptance is unchanged.
+#[derive(Clone, Debug)]
+pub(crate) struct ContinuousTrial {
+    pub state: ContinuousState,
+    pub delta: Ledger,
+    pub proper_dt: f64,
+    pub stage: f64,
+    pub source_rates: Vec<f64>,
+    pub photo_energy: f64,
+    pub fraction_defect: [f64; 3],
+    pub energy_defect: f64,
+}
 #[derive(Clone, Debug)]
 pub struct ContinuousHistory {
     pub config: HistoryConfig,
@@ -350,6 +363,15 @@ impl ContinuousHistory {
         t: f64,
         mid: f64,
     ) -> Result<ContinuousState, ForwardError> {
+        self.trial_with_increment(s, t, mid)
+            .map(|trial| trial.state)
+    }
+    pub(crate) fn trial_with_increment(
+        &self,
+        s: &ContinuousState,
+        t: f64,
+        mid: f64,
+    ) -> Result<ContinuousTrial, ForwardError> {
         let p = self.config.background.at_ln_a(mid)?;
         let dt = (t - s.ln_a) / p.hubble_per_s;
         let photons: Vec<_> = s
@@ -430,6 +452,7 @@ impl ContinuousHistory {
             },
         )?;
         let mut q = s.clone();
+        let mut delta = Ledger::default();
         q.ln_a = t;
         q.gas = step.gas;
         q.max_residual = q.max_residual.max(step.residual);
@@ -446,16 +469,23 @@ impl ContinuousHistory {
             source_n += injected;
             source_e += injected * em * ev;
             q.ledger.emitted_n += all_injected;
+            delta.emitted_n += all_injected;
             q.ledger.emitted_e += all_injected * em * ev;
+            delta.emitted_e += all_injected * em * ev;
             if rates[i] == 0.0 && all_rates[i] > 0.0 {
                 q.ledger.out_n += all_injected;
+                delta.out_n += all_injected;
                 q.ledger.out_e += all_injected * em * ev;
+                delta.out_e += all_injected * em * ev;
             }
             q.ledger.redshift_e += (s.counts[i] * (e0 - em) + n * (em - e1)) * ev;
+            delta.redshift_e += (s.counts[i] * (e0 - em) + n * (em - e1)) * ev;
             let cross = self.nodes[i].eta - cutoff.ln();
             if t == cross {
                 q.ledger.out_n += n;
+                delta.out_n += n;
                 q.ledger.out_e += n * e1 * ev;
+                delta.out_e += n * e1 * ev;
                 q.counts[i] = 0.0;
                 q.log_counts[i] = f64::NEG_INFINITY;
             } else {
@@ -489,19 +519,32 @@ impl ContinuousHistory {
         let vol = dt / p.n_h_cm3;
         for i in 0..3 {
             q.ledger.absorption[i] += step.absorbed_per_h[i];
+            delta.absorption[i] += step.absorbed_per_h[i];
             q.ledger.ci[i] += vol * r.ci_events_cm3_s[i];
+            delta.ci[i] += vol * r.ci_events_cm3_s[i];
             q.ledger.rr[i] += vol * r.rr_events_cm3_s[i];
+            delta.rr[i] += vol * r.rr_events_cm3_s[i];
             q.ledger.floor[i] += vol * r.ci_floor_events_cm3_s[i];
+            delta.floor[i] += vol * r.ci_floor_events_cm3_s[i];
             q.ledger.cap_e[i] += vol * r.ce_cap_cooling_erg_cm3_s[i];
+            delta.cap_e[i] += vol * r.ce_cap_cooling_erg_cm3_s[i];
         }
         q.ledger.dr += vol * r.dr_events_cm3_s;
+        delta.dr += vol * r.dr_events_cm3_s;
         q.ledger.escape_e += vol * r.escape_erg_cm3_s;
+        delta.escape_e += vol * r.escape_erg_cm3_s;
         q.ledger.work_e += vol * r.expansion_work_erg_cm3_s;
+        delta.work_e += vol * r.expansion_work_erg_cm3_s;
         q.ledger.cmb_e -= vol * r.cmb_to_gas_erg_cm3_s;
+        delta.cmb_e -= vol * r.cmb_to_gas_erg_cm3_s;
         q.ledger.cmb_abs_e += vol * r.cmb_to_gas_erg_cm3_s.abs();
+        delta.cmb_abs_e += vol * r.cmb_to_gas_erg_cm3_s.abs();
         q.ledger.excluded_dr_e += vol * r.excluded_dr_cooling_erg_cm3_s;
+        delta.excluded_dr_e += vol * r.excluded_dr_cooling_erg_cm3_s;
         q.ledger.underflow_n_bound += step.underflow_n_bound;
+        delta.underflow_n_bound += step.underflow_n_bound;
         q.ledger.underflow_e_bound += step.underflow_e_bound;
+        delta.underflow_e_bound += step.underflow_e_bound;
         if q.ledger.underflow_n_bound > 1e-20 || q.ledger.underflow_e_bound > 1e-30 {
             return Err(invalid());
         }
@@ -546,7 +589,21 @@ impl ContinuousHistory {
         {
             return Err(invalid());
         }
-        Ok(q)
+        let fraction_defect = std::array::from_fn(|i| {
+            ((q.gas.fractions[i] - s.gas.fractions[i]) - dt * r.fraction_dt[i]).abs()
+        });
+        let energy_defect =
+            ((q.gas.w_erg_per_h - s.gas.w_erg_per_h) - dt * r.w_dt_erg_per_h_s).abs();
+        Ok(ContinuousTrial {
+            state: q,
+            delta,
+            proper_dt: dt,
+            stage: mid,
+            source_rates: rates,
+            photo_energy: vol * r.photo_input_erg_cm3_s,
+            fraction_defect,
+            energy_defect,
+        })
     }
     /// Physical endpoint rates, distinct from interval-average gas ownership.
     pub fn endpoint_photo(
