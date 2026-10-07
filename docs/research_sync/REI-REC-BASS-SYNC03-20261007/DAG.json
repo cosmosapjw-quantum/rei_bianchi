@@ -1,0 +1,147 @@
+{
+  "schema": "sync03.dag.v1",
+  "completed_order": [
+    "L1_RECEIVER",
+    "SYNC_GATE",
+    "L2_TRANSFER"
+  ],
+  "nodes": [
+    {
+      "id": "L1_RECEIVER",
+      "status": "COMPLETE",
+      "owner": "SYNC03",
+      "requires": []
+    },
+    {
+      "id": "SYNC_GATE",
+      "status": "COMPLETE",
+      "owner": "root",
+      "requires": [
+        "L1_RECEIVER"
+      ]
+    },
+    {
+      "id": "L2_TRANSFER",
+      "status": "COMPLETE",
+      "owner": "root",
+      "requires": [
+        "SYNC_GATE"
+      ]
+    },
+    {
+      "id": "P_IGM_EXPORT",
+      "status": "READY",
+      "owner": "independent consumer",
+      "requires": []
+    },
+    {
+      "id": "P_IGM_OBSERVER",
+      "status": "WAIT_INPUT",
+      "owner": "independent consumer",
+      "requires": [
+        "P_IGM_EXPORT",
+        "L1_RECEIVER"
+      ]
+    },
+    {
+      "id": "P_OBSERVER_SURFACE",
+      "status": "READY_THEORY",
+      "owner": "independent theory",
+      "requires": [
+        "L2_TRANSFER"
+      ]
+    },
+    {
+      "id": "P_OPTIONAL_NE",
+      "status": "READY_CONTRACT",
+      "owner": "independent theory",
+      "requires": [
+        "SYNC_GATE"
+      ]
+    },
+    {
+      "id": "P_TIME_ERROR",
+      "status": "READY_AUDIT",
+      "owner": "independent review",
+      "requires": [
+        "L2_TRANSFER"
+      ]
+    },
+    {
+      "id": "P_QV_CLOSURE",
+      "status": "READY_THEORY",
+      "owner": "independent theory",
+      "requires": [
+        "SYNC_GATE"
+      ]
+    },
+    {
+      "id": "HE_RCT03_RECEIVER",
+      "status": "RESERVED_OWNER",
+      "owner": "HE owner",
+      "requires": [],
+      "note": "RCT02 reference histories complete before publication; real receiver still reserved"
+    },
+    {
+      "id": "CR_OWNER_IMPORT",
+      "status": "RESERVED_OWNER",
+      "owner": "CR owner",
+      "requires": []
+    },
+    {
+      "id": "HH_ON06",
+      "status": "RESERVED_OWNER",
+      "owner": "HH owner",
+      "requires": []
+    },
+    {
+      "id": "REI_SPEC02",
+      "status": "RESERVED_OWNER",
+      "owner": "REI SPEC owner",
+      "requires": []
+    },
+    {
+      "id": "REI_IGM_LONG",
+      "status": "RESERVED_OWNER",
+      "owner": "REI IGM owner",
+      "requires": []
+    },
+    {
+      "id": "BASS_NATIVE_BUILD",
+      "status": "RESERVED_OWNER",
+      "owner": "BASS133 owner",
+      "requires": []
+    },
+    {
+      "id": "ATOMIC_LEGACY",
+      "status": "PRESERVED_CALLABLE",
+      "owner": "original atomic owners",
+      "requires": []
+    },
+    {
+      "id": "P_HE_REFERENCE_OBSERVER",
+      "status": "WAIT_PINNED_HISTORY_ARCHIVE",
+      "owner": "independent consumer",
+      "requires": [
+        "L1_RECEIVER"
+      ],
+      "note": "new upstream23 reference histories, not actual receiver integration"
+    }
+  ],
+  "existing_owner_execution_live_status": "not inferred from branch existence; these scopes are reserved from source handoffs",
+  "default_next": [
+    "P_IGM_EXPORT",
+    "P_OBSERVER_SURFACE",
+    "P_OPTIONAL_NE",
+    "P_TIME_ERROR",
+    "P_QV_CLOSURE"
+  ],
+  "automatic_reruns_forbidden": [
+    "F08 full campaign",
+    "CR F04E",
+    "unchanged point suites",
+    "full BASS build",
+    "unjustified T3"
+  ],
+  "legacy_blocks_baseline": false
+}
