@@ -1,0 +1,27 @@
+# Independent diagnostic instrumentation review
+
+**Scoped PASS for one bounded fine26→27→28 diagnostic, no accepted horizon work.** Source/identity/retained-build review only; no reviewer tests/builds/numerical execution/network or product edits. Actual diagnostic outcome remains pending.
+
+Independently all115 DIAGNOSTIC_SOURCE_MANIFEST entries and all six DIAGNOSTIC_BUILD_IDENTITY pins match. Retained compile116 PASS read. Diagnostic attempt absent at source readback. Saved before/ source copies retain original arithmetic and prior accepted evidence.
+
+Diff inspection of canonical_owner.rs shows only a thread-local scope wrapper and rejection-only logging within the original post-sum pair mismatch condition. Original input guards, ordered13product/add/readout operations, rounding/loss/occurrence/coefficient updates, pair order, same Err string and assignment after guard are unchanged. Wrapper sets scope, calls original try_add_scaled exactly once and clears scope on Result return; no arithmetic or ownership mutation beyond the original call. Additional diagnostic readout calls occur only while formatting a rejection and do not charge or mutate ledger values. Formatting/cache/logging has resource cost, covered by the bounded parent command; this source review certifies no timing equality.
+
+Exactly three active callsites replace the original reducer invocation with this wrapper: segment material sum, weighted quadrature material sum and cumulative transaction sum. Their args/order remain identical. Segment tag retains node/ordinal/clock/f/q/rates/e/gas/background bits; quadrature retains node/stage/ordinal/eta/endpoints/full node witness; cumulative retains iteration/endpoints/gas bits. Payload names all13 owners and records exact weight/scalar bits plus lhs/rhs/result canonical terms/losses, occurrence, coefficients and readout bounds. Rust Debug mantissa values are roundtrip representations with explicit exponents. Unknown reference/provider/history authority is printed. A later actual refusal can be grounded in this payload rather than in preceding certificate cache output.
+
+Diagnostic caller validates source/certificate/accepted pins before mode dispatch, independently restores pinned original fine26 in its old namespace/executable/context, migrates paired state and binds new source/executable/namespace/context plus independently computed migration witness. Initial full V4 equality precedes science. Hardcoded [27,28] is the only diagnostic loop; native refusal exits at first failure with original three HEAD+STOP verification. Successful steps retain original source/gamma/EOS/budget checks and full V4 equality and save only FINE27/28_V4_UNADMITTED and typed evidence in a fresh own root. No HEAD publication or accepted/common horizon promotion exists. New latch prevents repeated use of this diagnostic namespace. Old common entry is explicitly refused in this build.
+
+Exact SHA256:
+- DIAGNOSTIC_SOURCE_MANIFEST.txt:d3c0c332e1874b6f0d0f231e61be3ab12434e46dd9b1d7b8968c4ddbba01278d
+- canonical_owner.rs:23be87fbb82a35e986c5a8d0d7595f24cb5ac08293ea436c869e6f4623a8fe44
+- paired.rs:1f46ae2e4d4708e8927345602cfdd513c4af74e15502c96103aef601a2594789
+- coupled.rs:76cbce4e556dabf11acc53697de03f1d88b321bd3b38d1a2495ff82388188b41
+- driver main.rs:d2d01ef028567c601a6c061594dfc068f9ddc24ea7ce9faf3b40d10cf97cc66e
+- executable:24c02dc08d019c4f1823dc9e31392e7f7c2262ad75c63109879a94abcfed42f4
+
+No remaining source blocker at this diagnostic boundary. Contract starts row116 with total24CPU/40execution-wall cap and diagnostic12/18 from prior remaining38.818394/65.162796824; existing reserves stay/no reset. A subsequent adapter requires its own fully compatible reviewed contract and sufficient remaining budget; this PASS does not authorize implementation or a horizon trial. Physical/history/continuum HOLD and unresolved helper/provider/historical authority UNKNOWN remain. No donor adoption or original source/archive overwrite.
+
+## Actual diagnostic117 closeout
+
+Retained stdout/stderr now identify the previously unlogged site exactly: weighted quadrature node0,stage2,ordinal0,HI A/B pair7/10,weight bits3eb8511adccc926b. Full lhs/rhs/result13-owner ledger, occurrence/coefficient/loss and node/clock/gas/background witness are logged at the unchanged rejection guard. Lhs is empty. Result canonical A=1.773770983260588×2^-1043 and B=1.3370844537124775×2^-1078 are positive; scalar A bits00000000e30aed76 and B0 mismatch. Thus this receipt grounds a positive canonical weighted material B below scalar representability, not physical negative heat or an arbitrary preceding certificate tuple. B readout bound retains the canonical center/projection discrepancy; no tail is deleted or consumer bound replaced. This observes represented-input arithmetic; missing physical/helper/history uncertainty stays UNKNOWN.
+
+Fine27 succeeded with post-startup delta41805RHS/125268sigma/13evaluate; full V4/typed FINE27_UNADMITTED files were retained before fine28. Fine28 refused after the next evaluate; total post-startup delta41809/134895/14 includes previous Gamma observer costs. Final process counters41810/134896/14 include startup1/1/0. No accepted HEAD/horizon promotion or retry. Parent reported diagnostic117 cost6.167526CPU/6.216973587wall plus compile116.84131/.925824883, leaving16.991164CPU/32.857201530wall in the same24/40 allocation. A private quadrature-only reduction adapter remains a separate pending source/contract review, not admitted by this diagnostic closeout.
