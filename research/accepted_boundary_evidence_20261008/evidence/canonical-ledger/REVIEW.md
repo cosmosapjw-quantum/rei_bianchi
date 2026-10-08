@@ -1,0 +1,64 @@
+# Focused independent source review
+
+Reviewer: `/root/ledger_review`. Scope: read-only inspection of the isolated ledger adapter and focused test source; no builds, numerical runs, provider/RHS calls, cosmology, uploads or accepted-source edits. Initial review precedes forthcoming restored GREEN and mutant evidence, so runtime evidence is not independently claimed here.
+
+## Initial disposition
+
+The inspected source safely restricts publication to conditional diagnostic bookkeeping. Physical publication always refuses with HOLD. Two approved-contract attachments need completion before claiming the full occurrence/provenance contract: ledger generation in operation identities and durable captured-operation witnesses. Neither is presently a physical-admission escape because physical publication remains unavailable.
+
+1. `Op::edge` includes the parent-issued namespace/attempt, context checkpoint/source/bits/time, stage, point, named owner/species, node, operation ordinal/kind, category and coefficient propagation role. It omits ledger generation, although `expected_generation` is checked by `DiagnosticStore::apply`. Globally disjoint parent namespaces plus monotonically leased attempts prevent present collisions under the stated trust assumption, but the required full tuple is incomplete. Include generation in sealed claims and add a control checking it rather than relying only on attempt uniqueness.
+2. The live Proposal retains captured events and verifies replayed operation coverage, outputs and claims. Persistent `Snapshot`/`Registry::Binding` retain raw bounds, coefficients, units, path and identifiers but do not retain full event operand records or both parent-stage witnesses. Restart restores accounting and keys from an independently restored typed snapshot, not a durable complete operation witness. Persist immutable accepted-stage operand/witness records alongside their identities, or explicitly retain this provenance attachment as an unresolved admission dependency.
+
+## Verified source behavior and trust limits
+
+- Namespace authenticity and global disjointness are supplied by the parent authority; the local allocator cannot prove that a caller-issued namespace is globally unique. Exclusive lease creation and append-only attempt files prevent reuse within the same trusted root. Fork copies of that root or deliberate lease deletion require the external namespace authority. A crash can leave LOCK and fail closed; there is no automatic lock-stealing or recovery inference.
+- Typed conversion paths distinguish photons/H/s, eV photons/H/s, erg/H/s, photons/H and erg/H. E, epsilon and proper dt appear once in replay. Coefficient bits/exponent are bound separately from the occurrence key; exact and changed-coefficient duplicate occurrences are rejected, including zero-bound occurrences in the adapter registry.
+- Replay creates operation-owned fresh swallowed loss, separate finite rounding, and only requested performed-readout quantization. Propagated earlier leaves are not reintroduced as new swallowed occurrences. Half1 precedes Half2; FULL is refused as an accepted half. The accepted-half addition creates its own new loss/rounding leaves. Coverage equality catches dropped, reordered or duplicated leaves and changed owner outputs.
+- Original Ledger::commit receives the caller's existing eleven-component increment and private gate, rather than deriving them from species aggregates. The caller gate is not a physical certificate. Existing Ledger authority remains responsible for cumulative caps, four increments and historical charges. This wrapper cannot complete other owner authorities or justify missing uncertainties.
+- All pre-publication changes occur on a cloned snapshot. HEAD rename is the publication point; failures before it preserve in-memory state and previous HEAD. After rename there is no rollback-shaped Err. Directory synchronization failure is exposed as `directory_synced=false`, so success at that point is publication with unconfirmed crash durability, not proof of a durable fsync. Initial creation and stale typed restoration fail closed.
+- This crate accepts supplied captured Event values and replays their arithmetic; it does not itself invoke native SourceTrial acceptance or establish that operands actually came from a particular native trial. Until an accepted-wrapper seam binds those facts, validity is conditional on caller-supplied observed inputs and original caller acceptance/gates. No authenticity, physical accuracy, a priori time bound or J=P+D+Q inference follows.
+- UNKNOWN provider/RHS/state/time/quadrature/history/full-Wide terms are never set to zero or converted to physical admission. The persistent snapshot and Publication retain HOLD.
+
+## Evidence and accounting
+
+The focused tests inspected address named owner mapping, dimensional mutation, zero/positive duplicate rejection, coefficient conflict, leaf coverage and history preservation, accepted-half order/full exclusion, rollback injection, original caps/four-increment authority, unknown HOLD and performed readout. Actual build/RED/GREEN outcomes and the all-pin immutability proof remain the implementing agent's separately recorded evidence; this review does not rerun them.
+
+Three read commands reported execution-wall times 3.869912278, 0.700603313 and 0.347579261 seconds, totaling **4.918094852 seconds**. Their CPU was not instrumented separately. Use the already approved **10 CPU / 15 execution-wall second unmetered review/admin reserve**, rather than presenting a fabricated CPU measurement or adding dispatch elapsed. No implementation files were edited by the reviewer; this evidence file is the sole write.
+
+## Source-fix addendum
+
+Both initial contract gaps are resolved in the subsequently inspected source. `Op::edge` includes expected ledger generation. Every successful diagnostic transaction appends an immutable `WitnessBundle` containing generation, attempt identity, full Context, sealed half-stage contexts/observed bits/events/operations, leaf claims and performed-export flag; HEAD contains the full snapshot image and compares it with an independently restored typed snapshot. This is a full witness attachment under the trusted restoration model, not a standalone parser or portable signed archive.
+
+`Proposal::from_native_trial` now calls unchanged `DetailedTrial::accept`, retains its accepted HALF1/HALF2 stage records and actual dt, reconstructs typed event operations, checks stage and accepted A/B equality, and carries native state bits. It adds no provider/RHS evaluation. The new native-boundary test is explicitly fabricated algebraic SourceTrial data with zero RHS work, so it establishes API acceptance/rejection and bookkeeping mechanics only. Native public structs remain caller-supplied observed-input authority; this seam is not event authenticity certification. Parent-issued namespace trust, crash LOCK recovery, directory-sync qualification and UNKNOWN physical HOLD limits above still apply.
+
+The added stale-generation test is useful but alone does not prove generation participates in the occurrence tuple: the pre-existing apply generation guard also rejects it. A same-attempt/same-context two-generation edge-inequality assertion was requested to cover that exact contract requirement.
+
+Two follow-up source reads reported 0.142247020 and 0.000035390 seconds, giving **5.060377262 seconds** of measured read-command execution wall. All reviewer CPU and evidence-write overhead remain covered by the explicit 10 CPU / 15 wall review/admin reserve; dispatch/wait duration is excluded.
+
+**Updated source disposition: PASS for conditional normal-domain occurrence/transaction plumbing**, with the targeted generation assertion and restored GREEN/mutant/pin receipts to be finalized by the implementing agent. No remaining blocking source defect found in this narrow scope. Physical-owner, accumulated-history and full-Wide admission remain HOLD.
+
+## Final-control and receipt addendum
+
+The requested `generation_is_part_of_occurrence_even_same_attempt` control uses the same leased attempt, context and halves and changes only generation 0/1. Its source assertion compares occurrence keys; the generation-omitted mutant produces an actual assertion failure. That missing control is now complete.
+
+`NativeReceipt` records original native error-norm bits, total RHS count, accepted-half RHS and iteration counts, original ledger debug image and scope. It is retained privately in the Proposal and persisted in WitnessBundle. This is audit evidence from the original accepted object, without numerical reevaluation. The synthetic native-boundary fixture explicitly asserts zero total RHS evaluations; it does not certify physical source execution or accuracy.
+
+Inspected `MUTANTS.json` and all twelve raw mutant stderr/stdout pairs confirm compiled, actual assertion RED outcomes for generation, attempt serial, coefficient conflict, named mapping, missing leaf coverage, half order/full exclusion, early publication rollback, historical cap omission, readout omission, witness omission, false physical publication and native acceptance bypass. The restored source SHA256 is `8acf4c920d2d918d5e83b6159d04924af0965511a3641ea394ff5f2d4288bb7f`, equal to PRE_MUTANT_GREEN_SOURCE at this inspection.
+
+Actual `logs/pre-mutant-green-all.stdout` reports **14 passed, zero failed**. The separately retained `pre-mutant-green-final` run reports a fixture allocation failure (`create_dir`: AlreadyExists), not an assertion RED or product defect. PID-plus-sequence temporary paths can collide after launcher PID reuse and retained failure roots; subsequent test invocation should use a fresh outer temporary root or explicit collision-safe fixture allocation. Compilation failures/timeouts likewise must remain separate from genuine assertion RED evidence.
+
+Restored-source GREEN and accepted-source/archive immutability proof remain forthcoming at the time of this addendum. Review reads now total **5.492853190 measured execution-wall seconds**; CPU and evidence writes remain unmetered within the already declared review/admin reserve. No reviewer build, solver, RHS, cosmology, upload or implementation edit occurred.
+
+## Final frozen-source disposition
+
+**PASS for the authorized conditional occurrence/transaction ledger slice. No blocking defect found in the final inspected source. Physical-owner/history/full-Wide admission remains HOLD.**
+
+Final source SHA256 `aae04f6abacd24e273a9099fb217db3b2f2474c4b942de2bc6692f610bc06306` matches FINAL_GREEN_SOURCE. The final native seam checks the first four observed context-header fields against declared context (nH, nHe, H, TCMB), seals the complete observed-bit records and rejects the tested density mismatch. This is a header consistency check; it does not establish complete gas-state/provenance authenticity or physical accuracy. The corresponding omitted-context-check mutant is an actual assertion RED.
+
+Allocator namespace now binds the parent-issued prefix and canonical UTF-8 lease-root path with collision-free length-prefix packing. Existing cloned NAMESPACE at a different canonical root is refused; two distinct roots produce distinct identities despite equal parent prefix and serial. The omitted-root-binding mutant is an actual assertion RED. Canonical root text is local protection, not a substitute for a globally disjoint parent namespace across different machines or deliberate deletion/recreation. The first attempted root mutation failed its precheck and the unmutated invocation passed; LEASE_ROOT_PRECHECK_FAILURE.json correctly excludes that run from the RED count.
+
+Inspected final-accepted-green.stdout reports **15/15 GREEN**. With the two additional context/root mutants, the preserved evidence contains **14 compiled actual assertion REDs**. No build failure, fixture collision or failed mutation precheck is counted as scientific RED. The final control run operates on captured/synthetic arithmetic witnesses; it makes no provider/RHS/cosmology reevaluation.
+
+Reviewed IMMUTABILITY_AND_SOURCE_PROOF.json and independently rehashed both previously accepted archives plus all 70 accepted source files: **72 hashes checked, zero mismatches**. Original provider, primitive, native solver and accepted sidecar pins remain unchanged. The new ledger source-only package depends on the separately accepted sibling species-sidecar source archive; it is not a standalone physical-model admission artifact.
+
+Final reviewer read/rehash commands add 0.116491012 and 0.000020303 seconds; total **5.609364505 measured command execution-wall seconds**. CPU and evidence-write overhead remain explicitly unmetered within the existing 10 CPU / 15 execution-wall review/admin reserve. Waiting/dispatch time is excluded. The reviewer performed no build, solver, RHS, cosmology, upload or implementation-source edit.
