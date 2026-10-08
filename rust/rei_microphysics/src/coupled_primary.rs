@@ -730,7 +730,9 @@ pub fn primary_stage_step_conservative(
     control: StepControl,
     incoming_w_comp: f64,
 ) -> Result<(PrimaryStep, f64), ForwardError> {
-    if !incoming_w_comp.is_finite() { return Err(fail("PRIMARY_ENERGY_COMPENSATION")); }
+    if !incoming_w_comp.is_finite() {
+        return Err(fail("PRIMARY_ENERGY_COMPENSATION"));
+    }
     let m = model(stage)?;
     signatures(old)?;
     valid(&m, old)?;
@@ -743,18 +745,21 @@ pub fn primary_stage_step_conservative(
         return Err(fail("PRIMARY_STEP_CONTROL"));
     }
     if dt == 0.0 {
-        return Ok((PrimaryStep {
-            state: old.clone(),
-            events: PrimaryEvents {
-                photo_per_h: vec![[0.0; 3]; old.packets.len()],
-                collision_per_h: [0.0; 3],
-                recombination_per_h: [0.0; 3],
-                dr_per_h: [0.0; 2],
-                thermal_work_ev_per_h: 0.0,
+        return Ok((
+            PrimaryStep {
+                state: old.clone(),
+                events: PrimaryEvents {
+                    photo_per_h: vec![[0.0; 3]; old.packets.len()],
+                    collision_per_h: [0.0; 3],
+                    recombination_per_h: [0.0; 3],
+                    dr_per_h: [0.0; 2],
+                    thermal_work_ev_per_h: 0.0,
+                },
+                iterations: 0,
+                residual: 0.0,
             },
-            iterations: 0,
-            residual: 0.0,
-        }, incoming_w_comp));
+            incoming_w_comp,
+        ));
     }
     let sigma = signatures(old)?;
     let mut guess = old.clone();
@@ -791,13 +796,20 @@ pub fn primary_stage_step_conservative(
         let _heat = photo_heat(&rates, &next.packets)?;
         // Cancellation-safe conservative form of the same backward-Euler energy equation.
         let binding_change = CHI[0] * (next.fractions[0] - old.fractions[0])
-            + stage.f_he * (CHI[1] * (next.fractions[1] - old.fractions[1])
-            + (CHI[1] + CHI[2]) * (next.fractions[2] - old.fractions[2]));
-        let packet_change = next.packets.iter().zip(&old.packets)
-            .map(|(a,b)|a.energy_ev * (a.per_h-b.per_h)).sum::<f64>();
-        let escape_change = dt*r.escaped_energy_rate/(stage.n_h_cm3*m.gas.ev_erg);
-        let dilation = 2.0*dt*stage.h_mean_per_s;
-        let thermal_change = (-binding_change-packet_change-escape_change-dilation*old.w_ev_per_h)/(1.0+dilation);
+            + stage.f_he
+                * (CHI[1] * (next.fractions[1] - old.fractions[1])
+                    + (CHI[1] + CHI[2]) * (next.fractions[2] - old.fractions[2]));
+        let packet_change = next
+            .packets
+            .iter()
+            .zip(&old.packets)
+            .map(|(a, b)| a.energy_ev * (a.per_h - b.per_h))
+            .sum::<f64>();
+        let escape_change = dt * r.escaped_energy_rate / (stage.n_h_cm3 * m.gas.ev_erg);
+        let dilation = 2.0 * dt * stage.h_mean_per_s;
+        let thermal_change =
+            (-binding_change - packet_change - escape_change - dilation * old.w_ev_per_h)
+                / (1.0 + dilation);
         let compensated_change = thermal_change - incoming_w_comp;
         next.w_ev_per_h = old.w_ev_per_h + compensated_change;
         let outgoing_w_comp = (next.w_ev_per_h - old.w_ev_per_h) - compensated_change;
@@ -828,12 +840,15 @@ pub fn primary_stage_step_conservative(
                 guess = next;
                 continue;
             }
-            return Ok((PrimaryStep {
-                state: next,
-                events,
-                iterations: iteration,
-                residual: norm,
-            }, outgoing_w_comp));
+            return Ok((
+                PrimaryStep {
+                    state: next,
+                    events,
+                    iterations: iteration,
+                    residual: norm,
+                },
+                outgoing_w_comp,
+            ));
         }
         guess = next;
     }
