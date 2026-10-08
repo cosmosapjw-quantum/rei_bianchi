@@ -1,0 +1,129 @@
+{
+  "schema": "igm-dag/v1",
+  "nodes": [
+    {
+      "id": "INTAKE08",
+      "status": "DONE_SOURCE_READ",
+      "owner": "this_handoff",
+      "requires": [],
+      "output": [
+        "inputs/HE_HH_INTAKE.json",
+        "inputs/CR_INTAKE.json",
+        "inputs/BRIDGE10_RESULTS.json",
+        "inputs/BASS_REC_INTAKE.json"
+      ]
+    },
+    {
+      "id": "JOINT-BRIDGE01",
+      "status": "DONE_TESTED_REVIEWED_BOUNDED",
+      "owner": "this_handoff",
+      "requires": [
+        "INTAKE08"
+      ],
+      "output": [
+        "bridge/joint_moment.py",
+        "THEORY.md",
+        "RESULTS.json"
+      ]
+    },
+    {
+      "id": "HE-E6",
+      "status": "RESERVED_PRODUCER",
+      "owner": "HE",
+      "requires": [],
+      "deliver": "All specified epoch matched time/panel/order rate export with original allowances/archive identity; continuous error remains separate."
+    },
+    {
+      "id": "HH-ENERGY03",
+      "status": "RESERVED_PRODUCER",
+      "owner": "HH",
+      "requires": [],
+      "deliver": "One-step energy-parameter -> fixed-grid weights/counts/rates mapping; preserve origin gas clock and parameter identity; no implicit direction inference."
+    },
+    {
+      "id": "REI-BRIDGE11",
+      "status": "RESERVED_PRODUCER",
+      "owner": "REI_fastest",
+      "requires": [],
+      "deliver": "characteristic_rounding only eventwise16->32 from original t0; reuse8/16; separate nominal order and box floor; continuous LTE open."
+    },
+    {
+      "id": "IGM-RATE-EXPORT01",
+      "status": "READY_LOCAL_CODEX",
+      "owner": "IGM_receiver",
+      "requires": [
+        "INTAKE08",
+        "JOINT-BRIDGE01"
+      ],
+      "exclusive_write_set": [
+        "new read-only observer adapter and tests under separate IGM worktree"
+      ],
+      "deliver": "Actual same-state/epoch instantaneous six-moment packet, source/units/rule/family IDs, pre/post owner parity and counted extra observer work. Missing payload is explicit rejection.",
+      "gate": "RECEIVER_CONTRACT.json",
+      "not_requires": [
+        "HE-E6 full campaign",
+        "HH-ENERGY03 opt-in activation",
+        "REI-BRIDGE11 proof"
+      ]
+    },
+    {
+      "id": "BASS-OBS-SCHEMA01",
+      "status": "READY_PARALLEL_SCHEMA_ONLY",
+      "owner": "IGM_BASS_consumer",
+      "requires": [
+        "INTAKE08"
+      ],
+      "exclusive_write_set": [
+        "new BASS observer adapter schema/tests; no BASS source edits in this PR"
+      ],
+      "deliver": "normal-time edges, proper ne units conversion once, frame/D once, declared reconstruction and caller observer tail. Real short history absent => NOT_PROVIDED."
+    },
+    {
+      "id": "REC-INITIAL-SCHEMA01",
+      "status": "READY_PARALLEL_SCHEMA_ONLY",
+      "owner": "IGM_REC_bridge",
+      "requires": [
+        "INTAKE08"
+      ],
+      "exclusive_write_set": [
+        "new late-IGM initial-state/radiation schema"
+      ],
+      "deliver": "epoch, nuclear/electron fractions/densities, Tgas/Trad, radiation/clock/frame authority; no invented matched REC history."
+    },
+    {
+      "id": "IGM-RATE-READOUT02",
+      "status": "WAITING_PAYLOAD",
+      "owner": "IGM_receiver",
+      "requires": [
+        "IGM-RATE-EXPORT01",
+        "HE-E6"
+      ],
+      "deliver": "actual declared snapshot readout and finite-rate budgets, exact family and context parity; not a new coupled evolution."
+    },
+    {
+      "id": "IGM-COUPLED-ADMISSION",
+      "status": "HOLD_SEPARATE_CONTRACT",
+      "owner": "IGM_solver",
+      "requires": [
+        "IGM-RATE-READOUT02"
+      ],
+      "deliver": "separate joint radiation/material state-error authority, full owner budgets, fresh bounded execution contract. Only then select coupling experiment; no automatic projected run."
+    },
+    {
+      "id": "IGM-PHYSICS-PLOT",
+      "status": "HOLD",
+      "owner": "IGM",
+      "requires": [
+        "IGM-COUPLED-ADMISSION",
+        "BASS-OBS-SCHEMA01",
+        "REC-INITIAL-SCHEMA01"
+      ],
+      "deliver": "scope-labelled actual xHII/He fractions/T or optical observable with declared source/IC, baseline, numerical budget; then long-history37-field gate. A diagram or algebra readout is not this plot."
+    }
+  ],
+  "scheduling": "HE/HH/REI reserved tasks belong to existing owners; READY tasks have disjoint writes. Any live ref advance requires delta intake, not blind rerun.",
+  "protected_lanes": {
+    "precision_atomic": "PARKED; original plans retained in existing donor branches; this PR deletes none",
+    "long_term_extensions": "Separate provenance-valid opt-in tasks after source/provider/closure and receiver gates."
+  }
+}

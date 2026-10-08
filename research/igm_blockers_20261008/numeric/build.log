@@ -1,0 +1,167 @@
+warning: field `front` is never read
+   --> /home/cosmosapjw/rei_worktrees/igm-rate-export01-20261008/research/igm_blockers_20261008/numeric/source/rei-next-nodes/canonical/src/primitives.rs:265:5
+    |
+257 | pub struct MomentPair {
+    |            ---------- field in this struct
+...
+265 |     front: bool,
+    |     ^^^^^
+    |
+    = note: `MomentPair` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `canonical` (lib) generated 1 warning
+   Compiling short_hhe_control v0.1.0 (/home/cosmosapjw/rei_worktrees/igm-rate-export01-20261008/research/igm_blockers_20261008/numeric/source/rei-next-nodes/short-hhe-midpoint)
+   Compiling rei_progressive_support v0.1.0 (/home/cosmosapjw/rei_worktrees/igm-rate-export01-20261008/research/igm_blockers_20261008/numeric/progressive-support/driver)
+warning: unused imports: `diagnostics::Density` and `material`
+ --> src/main.rs:1:45
+  |
+1 | use short_hhe_control::{coupled,durable,err,material,output,record::{self,D,W},radiation::{self,Grid},diagnostics::Density,Fallible};
+  |                                             ^^^^^^^^                                                  ^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `OLD_MAGIC` is never used
+ --> src/main.rs:6:7
+  |
+6 | const OLD_MAGIC:&[u8]=b"REI_DURATION_UNPROJECTED_NATIVE_STATE_V1\n";
+  |       ^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `OLD_EXE` is never used
+ --> src/main.rs:8:7
+  |
+8 | const OLD_EXE:&str="171d08b42cd5dad158584fad56a429af4a6a8eff748a4a776b2dcc8e1f3e4d81";
+  |       ^^^^^^^
+
+warning: constant `OLD64_SHA` is never used
+  --> src/main.rs:10:7
+   |
+10 | const OLD64_SHA:&str="c719008ed2a6d17863738c761e7381f9a595284d874ebf1cf7fa914718628cf6";
+   |       ^^^^^^^^^
+
+warning: constant `SEED_SHA` is never used
+  --> src/main.rs:12:7
+   |
+12 | const SEED_SHA:&str="9929edc36232b3620264f3a8b3cf55104ba31c4f63df238f02ed25079738b2b0";
+   |       ^^^^^^^^
+
+warning: function `parent_state` is never used
+  --> src/main.rs:21:4
+   |
+21 | fn parent_state(root:&Path,pinfile:&Path)->Fallible<(coupled::State,f64,Grid,f64,Vec<u8>,String)>{let pin=String::from_utf8(read(pin...
+   |    ^^^^^^^^^^^^
+
+warning: function `rule` is never used
+  --> src/main.rs:23:4
+   |
+23 | fn rule(a:f64,b:f64)->Vec<(f64,f64)>{let d=(6f64/5.).sqrt();let x=((3.-2.*d)/7.).sqrt();let y=((3.+2.*d)/7.).sqrt();let wi=(18.+30f6...
+   |    ^^^^
+
+warning: function `append` is never used
+  --> src/main.rs:24:4
+   |
+24 | fn append(cfg:&HistoryConfig,old:&Grid,a:f64,b:f64,panels:usize)->Fallible<(Grid,f64,f64)>{
+   |    ^^^^^^
+
+warning: function `support` is never used
+  --> src/main.rs:31:4
+   |
+31 | fn support(cfg:&HistoryConfig,a:f64,b:f64,lo:f64,hi:f64)->Fallible<()>{if !(lo<=cfg.start+cfg.source.energy_min_ev.ln()&&hi>=b+cfg.s...
+   |    ^^^^^^^
+
+warning: function `grid_bytes` is never used
+  --> src/main.rs:32:4
+   |
+32 | fn grid_bytes(g:&Grid)->Vec<u8>{let mut w=W(vec![]);w.text("OLD_PREFIX_APPEND_POSITIVE_GAUSS4_V1");w.n(g.nodes.len()as u64);w.n(g.in...
+   |    ^^^^^^^^^^
+
+warning: function `extend` is never used
+  --> src/main.rs:33:4
+   |
+33 | fn extend(s:&coupled::State,g:&Grid)->Fallible<coupled::State>{let old=record::state_bytes(s);let mut n=s.clone();n.density.resize(g...
+   |    ^^^^^^
+
+warning: function `context` is never used
+  --> src/main.rs:34:4
+   |
+34 | fn context(ctx:&[u8],parent_sha:&str,g:&Grid,a:f64,b:f64,n:usize,initial:f64)->Fallible<Vec<u8>>{let mut w=W(vec![]);w.text("APPEND_...
+   |    ^^^^^^^
+
+warning: function `decode_magic` is never used
+  --> src/main.rs:36:4
+   |
+36 | fn decode_magic(run:&run_identity::Run,c:&[u8],exe:&str,g:&Grid,a:f64,b:f64,n:usize,bytes:&[u8],magic:&[u8])->Fallible<(usize,f64,co...
+   |    ^^^^^^^^^^^^
+
+warning: function `decode` is never used
+  --> src/main.rs:37:4
+   |
+37 | fn decode(run:&run_identity::Run,c:&[u8],exe:&str,g:&Grid,a:f64,b:f64,n:usize,bytes:&[u8])->Fallible<(usize,f64,coupled::State)>{dec...
+   |    ^^^^^^
+
+warning: function `restore` is never used
+  --> src/main.rs:38:4
+   |
+38 | fn restore(run:&run_identity::Run,c:&[u8],exe:&str,g:&Grid,a:f64,b:f64,n:usize)->Fallible<(usize,f64,coupled::State)>{decode(run,c,e...
+   |    ^^^^^^^
+
+warning: function `save` is never used
+  --> src/main.rs:39:4
+   |
+39 | fn save(run:&run_identity::Run,c:&[u8],exe:&str,g:&Grid,a:f64,b:f64,n:usize,k:usize,e:f64,s:&coupled::State)->Fallible<()>{let mut w...
+   |    ^^^^
+
+warning: function `write_row` is never used
+  --> src/main.rs:41:4
+   |
+41 | fn write_row(f:&mut File,row:&[f64;41])->Fallible<()>{output::write_row(f,row)}
+   |    ^^^^^^^^^
+
+warning: type alias `R` is never used
+ --> src/../../../source/rei-next-nodes/short-hhe-midpoint/src/run_identity.rs:2:6
+  |
+2 | type R<T> = crate::Fallible<T>;
+  |      ^
+
+warning: struct `Run` is never constructed
+  --> src/../../../source/rei-next-nodes/short-hhe-midpoint/src/run_identity.rs:12:12
+   |
+12 | pub struct Run {
+   |            ^^^
+
+warning: function `binding` is never used
+  --> src/../../../source/rei-next-nodes/short-hhe-midpoint/src/run_identity.rs:18:4
+   |
+18 | fn binding(root: &Path) -> R<String> {
+   |    ^^^^^^^
+
+warning: function `exclusive` is never used
+  --> src/../../../source/rei-next-nodes/short-hhe-midpoint/src/run_identity.rs:34:4
+   |
+34 | fn exclusive(root: &Path) -> R<File> {
+   |    ^^^^^^^^^
+
+warning: associated items `create`, `resume`, and `check_owner` are never used
+   --> src/../../../source/rei-next-nodes/short-hhe-midpoint/src/run_identity.rs:52:12
+    |
+ 51 | impl Run {
+    | -------- associated items in this implementation
+ 52 |     pub fn create(path: &Path) -> R<Self> {
+    |            ^^^^^^
+...
+ 89 |     pub fn resume(path: &Path) -> R<Self> {
+    |            ^^^^^^
+...
+112 |     pub fn check_owner(&self) -> R<()> {
+    |            ^^^^^^^^^^^
+
+warning: function `flock` is never used
+  --> src/../../../source/rei-next-nodes/short-hhe-midpoint/src/run_identity.rs:10:8
+   |
+10 |     fn flock(fd: i32, operation: i32) -> i32;
+   |        ^^^^^
+
+warning: `rei_progressive_support` (bin "rei_progressive_support") generated 23 warnings (run `cargo fix --bin "rei_progressive_support" -p rei_progressive_support` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 2.76s

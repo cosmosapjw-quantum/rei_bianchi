@@ -1,0 +1,76 @@
+{
+  "schema": "igm-instantaneous-joint-moment-receiver/v1",
+  "current_production_adoption": false,
+  "units": {
+    "gamma": "absorber^-1 s^-1",
+    "energy": "eV absorber^-1 s^-1 incident energy",
+    "w": "erg/H",
+    "n_H_n_He": "proper cm^-3",
+    "hubble": "s^-1",
+    "epoch": "ln a; exact rational interpretation of observed float if source was binary64"
+  },
+  "required_identity": [
+    "producer commit and source-tree hash",
+    "accepted transaction or observed snapshot ID, never rejected trial",
+    "state and exact epoch",
+    "provider version, cross sections, thresholds and energy convention",
+    "source/closure/moment quadrature identities",
+    "same spectral energies for sigma and energy moments",
+    "family_id/family_kind/shared generator ordering"
+  ],
+  "model_gate": "Do not mix FT03 proof, manufactured Grackle RCT, HH ENERGY02 or cold IGM validation scopes.",
+  "required_values": [
+    "h",
+    "y",
+    "z",
+    "w_erg_h",
+    "n_h",
+    "n_he",
+    "hubble_s",
+    "kb_erg_k",
+    "ev_erg",
+    "c_thomson_cm3_s",
+    "epoch_ln_a",
+    "chi_ev[3]",
+    "Gamma[3]",
+    "incident_Ecal[3]"
+  ],
+  "moment_family": "center plus <=6 shared generators on [-1,1]^k; explicit finite_rule_envelope or supplied_uncertainty; no inferred enclosure widths",
+  "current_PR86_record": {
+    "sha": "8477bae16accaf3de168669aafd2f31eac2ca811",
+    "source": "inputs/receiver_record.rs",
+    "admission": "REJECT_FOR_THIS_INTERFACE",
+    "reason": "Integrated A/B and deliberately nonphoto midpoint photo=0 are not instantaneous moments; Segment.rates are opacities.",
+    "original_record_replay_status": "unaffected"
+  },
+  "conversion": {
+    "dt_to_dln_a": "divide source by same fixed positive H exactly once",
+    "q_ell": "already C_T*nH*Xedot/H^2, do not divide again",
+    "cm_to_m": "BASS proper number density: 1 cm^-3 = 1e6 m^-3, apply once",
+    "forbidden": [
+      "extra target density in per-absorber Gamma",
+      "extra 4pi",
+      "extra a^-3 for already proper density",
+      "divide integrated A/B by dt to invent instantaneous moments"
+    ]
+  },
+  "rejection_codes": [
+    "MISSING_INSTANTANEOUS_JOINT_MOMENTS",
+    "MODEL_DOMAIN_MISMATCH",
+    "SOURCE_CLOCK_STATE_PROVIDER_CONTEXT_MISMATCH",
+    "INSTANTANEOUS_MOMENT_FAMILY_REQUIRED_NOT_OWNER_RECORDS",
+    "NEGATIVE_GAMMA_IN_AFFINE_FAMILY",
+    "SUBTHRESHOLD_EXCESS_IN_AFFINE_FAMILY",
+    "MISSING_COMMON_SPECTRUM_PREMISE",
+    "HH_PASSIVE_GAS_CLOCK_MISMATCH"
+  ],
+  "schema_vs_implemented": "DAG native exporter will implement producer-specific/model/HH gate mapping; current joint_moment.py enforces typed algebra context/units/epoch/family and necessary marginal checks only.",
+  "acceptance_gate": [
+    "read-only actual export at one declared same-state epoch",
+    "exact or explicitly budgeted same-arithmetic parity of pre-existing owner/state output",
+    "count all extra observer/provider calls separately",
+    "positive and negative schema fixtures",
+    "no changes in source/closure/defaults/tolerances"
+  ],
+  "promotion": "conditional algebra only; coupled/continuous/physical/full-Wide HOLD"
+}
