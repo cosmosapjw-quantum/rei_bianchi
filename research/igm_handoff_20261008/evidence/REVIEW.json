@@ -1,0 +1,210 @@
+{
+  "schema": "igm-independent-decision-review/v1",
+  "reviewer": "/root/joint_bridge_review_oct08",
+  "as_of_utc": "2026-10-08T05:33:22.569233+00:00",
+  "independence": "Separate agent; did not create candidate, select its implementation or design its original validation. Read actual candidate and raw evidence; requested identity/contract corrections and independently checked final source.",
+  "model_identity": "UNKNOWN",
+  "decision": "PROMOTE",
+  "promotion_scope": "Conditional exact fixed-state joint-moment adapter and its source-pinned read-only handoff only.",
+  "scientific_status": {
+    "algebra": "DERIVED_AND_IMPLEMENTATION_VERIFIED_WITHIN_SUPPLIED_AFFINE_FAMILY",
+    "physical": "HOLD",
+    "production_receiver": "HOLD_NOT_IMPLEMENTED",
+    "coupled_history": "HOLD",
+    "provider_error": "NOT_ESTABLISHED",
+    "continuous_spectrum_state_time_error": "NOT_ESTABLISHED",
+    "full_Wide": "HOLD"
+  },
+  "source_sha256": {
+    "bridge/joint_moment.py": "6f4cf88c2bc9f240d4bb29b429df5d257d55381a5699d75af78da2897a4443cf",
+    "bridge/vendor/source_transfer.py": "1ce2e7e18425191be95722c4f4eee72a5b0cd43e6c3832e0497bba728ee28459",
+    "scripts/reproduce.py": "a2d5f43d08f688aa0a8d8d699a1b801f2f6640c1dd1cc59d194d3474d2f6b6a1",
+    "tests/test_joint_moment.py": "2e1719116dddea538556c598b89e828198a0a5a5de8fddab45f7fde4ea101785",
+    "THEORY.md": "c6101c5abed4dcdf860262fab5365d754285584cb31ba88d0428cf69fe823045",
+    "RECEIVER_CONTRACT.json": "800b52ed795159b8243300f2209197dba207615ff2f0c7de64a48617ebb0f929",
+    "inputs/OFF_H4_K5_fixture.json": "41bf8d7673d20171df30717b1c540248bc3697e79f7a5c1128eeeaefef4de5e5",
+    "inputs/RAW4_ENDCUT4_11_epoch_projection.json": "c34d3cdcc2114a5774f55b7691965f2086c655c4dc13ba8decd54fa6d1299f0c",
+    "inputs/receiver_record.rs": "9feae00f3bc82f2fd8962785140572020745280937813fbe6a843d7a88861e17",
+    "evidence/run02/RESULTS.json": "0c11533e53ce3059af780362c008e68fcc6a0c1cec257a983a5e854b399082f8"
+  },
+  "evidence_read": [
+    "CONTRACT.json",
+    "THEORY.md",
+    "README_KO.md",
+    "DAG.json",
+    "HANDOFF.json",
+    "START_PROMPT_KO.md",
+    "RECEIVER_CONTRACT.json",
+    "RESULTS.json",
+    "evidence/run02/RESULTS.json",
+    "tests/test_joint_moment.py",
+    "tests/check_mutants.py",
+    "tests/evidence/unit_after_review.json",
+    "tests/evidence/mutants.json",
+    "inputs/R11_PROVENANCE.json",
+    "inputs/CONSUMER_CONTRACT.json",
+    "inputs/SOURCE_BINDING.json",
+    "inputs/READOUT_CONSTANTS.json",
+    "inputs/READOUT_CONSTANTS_BINDING.json",
+    "inputs/receiver_record.rs"
+  ],
+  "checks": [
+    {
+      "id": "MATH01",
+      "status": "PASS",
+      "claim": "Fixed-state linear image, shared-generator extrema and comparison to decorrelated box",
+      "basis": "Direct derivation; scalar extrema center +/- sum abs(projected generators); different output extrema need not be simultaneous."
+    },
+    {
+      "id": "THERMO01",
+      "status": "PASS",
+      "claim": "Tdot retains -T Xedot/D and may be negative with nonnegative heat",
+      "basis": "Derivative of T=2w/(3 kB D), Ddot=Xedot; exact focused threshold-photon check."
+    },
+    {
+      "id": "CLOCK01",
+      "status": "PASS",
+      "claim": "Physical-time rates divided by fixed H once; optical partial source already C_T nH Xedot/H^2",
+      "basis": "Dimensions and own H=5 exact probe."
+    },
+    {
+      "id": "DOMAIN01",
+      "status": "PASS",
+      "claim": "Nonnegative rates, nonnegative threshold excess, and zero-Gamma => zero-energy enforced on entire family",
+      "basis": "Affine minima and vertex/face argument; rejection probe. Necessary marginal conditions only, not common-spectrum realization."
+    },
+    {
+      "id": "BIND01",
+      "status": "PASS_AFTER_CORRECTION",
+      "claim": "Exact chi bound to fixed context; unique generator identities preserved",
+      "basis": "Final source and 12-test evidence; own threshold/ID rejection probes."
+    },
+    {
+      "id": "SOURCE01",
+      "status": "PASS",
+      "claim": "Selected actual R11 data and vendored core authentic to retrieved archive bytes",
+      "basis": "Independently opened R11.zip SHA 01a80bd61baed21767a523ab167a51c33300e16fe4fb87aefb35f5dc97e674f8; three MOMENTS full records and two TRANSFER records exactly match JSON objects; 11 epoch projections recursively exact selected fields; vendor byte-identical. Hash is identity, not physical proof."
+    },
+    {
+      "id": "REPLAY01",
+      "status": "PASS",
+      "claim": "Final tiny replay succeeds",
+      "basis": "run02 actual tests_exit=0; source_before=source_after; 55 saved scalar equalities, 20 separate formula/extrema checks, two correlated families; 9 of 11 saved sign inversions are recounted, not new spectral sums."
+    },
+    {
+      "id": "RECEIVER01",
+      "status": "PASS_REJECTION_ONLY",
+      "claim": "Accepted A/B owner records not admitted as instantaneous rates",
+      "basis": "record.rs stores integrated owners and requires zero photo fields for nonphoto stage. No conversion implemented. Receiver contract explicitly distinguishes future producer-specific gates from current algebra."
+    },
+    {
+      "id": "PROTECTION01",
+      "status": "PASS",
+      "claim": "No new physics, provider activation, history, or full-Wide certification asserted",
+      "basis": "Contract, DAG, README, handoff and exact output status preserve physical HOLD and prior failure lanes."
+    }
+  ],
+  "focused_execution": {
+    "exit_code": 0,
+    "new_provider_calls": 0,
+    "new_solver_steps": 0,
+    "synthetic_state": {
+      "h": "0",
+      "y": "0",
+      "z": "0",
+      "w_erg_h": "30",
+      "n_h": "1",
+      "n_he": "0",
+      "H": "5",
+      "kB": "2",
+      "ev_erg": "3",
+      "C_T": "7"
+    },
+    "chi": [
+      "13",
+      "24",
+      "54"
+    ],
+    "center_Gamma": [
+      "2",
+      "0",
+      "0"
+    ],
+    "center_Ecal": [
+      "26",
+      "0",
+      "0"
+    ],
+    "generator_Gamma": [
+      "1",
+      "0",
+      "0"
+    ],
+    "generator_Ecal": [
+      "13",
+      "0",
+      "0"
+    ],
+    "expected_and_observed": {
+      "heat_native": [
+        "0",
+        "0"
+      ],
+      "temperature_native": [
+        "-30",
+        "-10"
+      ],
+      "temperature_dln_a": [
+        "-6",
+        "-2"
+      ],
+      "q_source_native_and_dln_a": [
+        "7/25",
+        "21/25"
+      ]
+    },
+    "rejections_observed": [
+      "FIXED_CONTEXT_THRESHOLD_MISMATCH",
+      "ONE_EXPLICIT_ID_PER_SHARED_GENERATOR_REQUIRED",
+      "ZERO_GAMMA_REQUIRES_ZERO_INCIDENT_ENERGY"
+    ]
+  },
+  "findings_resolved": [
+    {
+      "id": "R1",
+      "initial": "Shared generator labels absent despite theory requirement",
+      "resolution": "generator_ids required, unique, ordered and serialized; tests added."
+    },
+    {
+      "id": "R2",
+      "initial": "Projection chi unbound to fixed provider/state context",
+      "resolution": "Exact chi_ev included in FixedContext and mismatch rejected."
+    },
+    {
+      "id": "R3",
+      "initial": "Theory semantic-kind label differed from implementation",
+      "resolution": "Normalized to instantaneous_per_absorber_moment_rates."
+    },
+    {
+      "id": "R4",
+      "initial": "R11 fixture archive SHA labeled HE-E4 in source_id",
+      "resolution": "Changed to CR-R11; separate E4 archive binding remains preserved."
+    }
+  ],
+  "audit_probe_note": "An initial reviewer archive-subobject comparison expected whole nested source_difference dictionaries and failed because the 11-epoch selection intentionally retains six of eleven readouts. Recursive exact-subset comparison then passed all 11 records. This was a reviewer selection-check assumption, not a candidate scientific failure.",
+  "mutation_evidence_limit": "Read pre-review three-mutant evidence as evidence on that earlier candidate. Later owner may add final-source mutant rerun; this decision independently relies on final source and run02/focused checks.",
+  "remaining_blockers": [
+    "Actual same-state instantaneous IGM joint-moment exporter and source/provider/clock/model admission mapping",
+    "Truth of any uncertainty generator enclosure and common-spectrum realization",
+    "Continuous state/time/provider/spectrum error authority",
+    "Coupled feedback and approved history observable evidence"
+  ],
+  "fatal_issues_within_promotion_scope": [],
+  "not_reviewed_or_not_established": [
+    "Completeness of unseen chat transcripts",
+    "Fresh independent rerun of donor campaigns",
+    "Scientific validity of upstream providers and histories",
+    "Remote publication/backup receipts generated after this decision"
+  ],
+  "completion_bar": "Barring changes to the reviewed scientific code/contract, bounded adapter may be included in the IGM handoff. This is not merge, physical-production, or full-history approval."
+}

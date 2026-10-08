@@ -1,0 +1,153 @@
+{
+  "schema": "IGM_BASS_REC_FOLLOWUP_INTAKE_V1",
+  "as_of_utc": "2026-10-08",
+  "status": "COMPLETE_READ_ONLY_INTAKE",
+  "fresh_remote_findings": [
+    {
+      "id": "BASS_NO_NEW_SCIENCE_AFTER_SYNC03",
+      "claim": "Both tracked BASS heads remain the Oct7 metadata-only SYNC03 return; no production source changed in those latest commits.",
+      "source": "REMOTE_SNAPSHOT.json",
+      "basis": "fresh API commit/files and complete 214-branch inventory"
+    },
+    {
+      "id": "REC_NO_NEW_SCIENCE_AFTER_SYNC03",
+      "claim": "REC tracked forward head remains Oct7 metadata-only SYNC03 return, parent 73ed56b2383e21014fcb70cd8f87f1d010731c60.",
+      "source": "REMOTE_SNAPSHOT.json",
+      "basis": "fresh API commit/files and complete branch inventory"
+    },
+    {
+      "id": "REC_PR_BODY_STALE",
+      "claim": "PR81 original Task8 source-import/Rust-pending preamble is superseded by current FORWARD_STATUS.json V11_F1_REPAIRED_REVIEWED.",
+      "current_source_candidate": "d3cc6e0120061f113d28e7a3a55a2e3dd561e81e",
+      "reported_completed": {
+        "cargo_fmt": "PASS",
+        "rust_tests": "76/76",
+        "python_parity": "251 records, 3027 components, 111 expected errors",
+        "gate_p": "PASS_SCOPED_FIXED_INPUT_IMPLEMENTATION_REVIEW_ONLY"
+      },
+      "remaining": {
+        "gate_i": "DEFERRED_CONSUMER",
+        "allow_consumer_integration": false
+      },
+      "evidence": "sources/rec_bianchi/docs/forward/rust-20260922/FORWARD_STATUS.json"
+    }
+  ],
+  "reusable_assets": [
+    {
+      "id": "BASS_VISIBILITY_RECEIVER",
+      "source_pin": "1e45e0f48cd83dcb21c23d4087fa5526195331d7",
+      "current_head": "e57064934bb176b08d2072aa537e5f71a430ae5e",
+      "modules": [
+        "_rustcore/src/microphysics/frame.rs",
+        "_rustcore/src/microphysics/visibility.rs",
+        "_rustcore/src/microphysics/visibility_clock.rs"
+      ],
+      "reported_existing_evidence": "SYNC03 6 actual F08 histories, 112000 cells, 784054 Decimal70 scalar comparisons, max tau absolute discrepancy 1.1476861436274077e-19; not rerun here",
+      "admission": "Isolated source-pinned consumer of finite prescribed history; not full BASS or physical EoR admission"
+    },
+    {
+      "id": "REC_PEEBLES",
+      "source_pin": "73ed56b2383e21014fcb70cd8f87f1d010731c60",
+      "current_head": "d74fc9e78d1cf707eef2d16fe771b4d8eb72cd7f",
+      "module": "rust/rec_microphysics/src/hydrogen_peebles.rs",
+      "admission": "Pure-H one-temperature pointwise source and reduction reference; SYNC02 actual REC->REI pure-H benchmark already completed",
+      "constraint": "Do not promote to arbitrary two-temperature IGM closure, general Bianchi RT, He Gate I or full matched physical history"
+    },
+    {
+      "id": "BASS_GAIN_RESEARCH_ONLY",
+      "source_pin": "1c5db6ddc32c16cacf4ef548f0f6839415ee950a",
+      "current_head": "548c9f71304d4dd0b6df3565e2d25229429f64d3",
+      "admission": "Frozen-frame, exactly zero-tilt, opt-in Thomson log-gain and exponential midpoint; not active/default coupled evolution",
+      "caveat": "Large exposure tends to G(G(f)); no AP/stiff-equilibrium or exact finite-domain number/energy conservation claim"
+    }
+  ],
+  "igm_interface": {
+    "density": {
+      "producer_units": "proper cm^-3",
+      "consumer_units": "proper m^-3",
+      "conversion": "multiply 1e6 exactly once",
+      "electron_formula": "n_e=n_H*x_HII+n_He*(x_HeII+2*x_HeIII)",
+      "species": "HII relative to H nuclei; HeII and HeIII relative to He nuclei; no implicit filling-factor multiplication"
+    },
+    "clock": {
+      "required": "explicit strictly increasing normal-time edges in seconds",
+      "redshift": "Never infer t(z) without explicit H(z)/background/source-owned clock mapping",
+      "conformal": "dt=a*deta or dt=(a/c)*dchi; effective scale factor exact only for specified frozen-rate cells"
+    },
+    "rate": {
+      "formula": "q_t=c*sigma_T*n_e*D",
+      "c_m_s": 299792458,
+      "sigma_T_m2": 6.6524587e-29,
+      "doppler": "Apply exactly once; D=1 for admitted untilted FLRW histories"
+    },
+    "observer": {
+      "required": "nonnegative finite caller-supplied optical depth beyond last edge",
+      "sensitivity": "A common tail b shifts tau by b and multiplies survival/cell masses by exp(-b); not cosmological calibration"
+    },
+    "reconstruction": "Must label endpoint-linear ne or supplied frozen-cell rate. Trapezoid is exact only for declared linear density/fixed c sigma D surrogate, not arbitrary between-node physical ne.",
+    "boundaries": [
+      "accepted chemistry state export and receiver consumption are separate admission records",
+      "proper density adapter does not certify rate-temperature domain",
+      "never add a^-3 to already proper density",
+      "never multiply filling factor unless its physical meaning and owner are provided"
+    ]
+  },
+  "parallel_tasks": [
+    {
+      "id": "IGM_BASS_ACCEPTED_EXPORT_CONTRACT",
+      "owner": "new IGM handoff package / read-only producer export",
+      "depends_on": [
+        "exact admitted IGM state schema",
+        "explicit actual clock mapping"
+      ],
+      "output": [
+        "source-pinned portable accepted-state export fixture",
+        "units/frame/clock/observer schema",
+        "negative contract cases for double conversion, wrong density convention, missing time mapping",
+        "standalone source-pinned receiver bridge"
+      ],
+      "done_when": "Actual accepted IGM slab feeds unchanged BASS visibility modules with explicit scope and independent arithmetic. No second rerun of unchanged SYNC03 six histories."
+    },
+    {
+      "id": "IGM_BASS_TAIL_AND_BOX_TRANSFER",
+      "owner": "research-only downstream observable",
+      "depends_on": [
+        "admitted exported endpoints or declared fixed-rate cells"
+      ],
+      "output": [
+        "conditional tau/survival/mass interval transformation",
+        "common observer-tail sensitivity"
+      ],
+      "done_when": "Bounds are conditional on declared reconstruction and input boxes; continuum/physical sign stays separate."
+    },
+    {
+      "id": "REC_LATE_IGM_INITIAL_CONTRACT",
+      "owner": "documentation/schema lane",
+      "depends_on": [
+        "REC and IGM state schemas"
+      ],
+      "output": [
+        "epoch, proper nuclei/electron density, species denominator, gas/radiation temperature, frame and clock ownership",
+        "typed missing-radiation/temperature/epoch errors"
+      ],
+      "done_when": "Contract rejects invented matched physical histories and clearly marks numeric producer payload NOT_PROVIDED until earned."
+    }
+  ],
+  "reserved_work": [
+    "BASS PR133 native build/fmt/full-core integration, boosted/evolving geometry gain, adaptive adoption and finite-temperature Thomson admission",
+    "REC E1C split-domain replacement and single-owner residual/JVP/ledger/restart",
+    "REC He V11 consumer Gate I, source-authority extensions and full coupled primordial recombination history",
+    "IGM evolving gas/radiation owner and continuous cutoff coupled solve belongs to root's current branch analysis"
+  ],
+  "do_not_repeat": [
+    "REC-PB02 unchanged pointwise one-T HYREC/Decimal reference",
+    "SYNC02 pure-H REC->REI expanding benchmark",
+    "SYNC03 six F08 history BASS consumer and unchanged clock arithmetic",
+    "full BASS optional dependency suite merely to reconfirm known scoped limitations"
+  ],
+  "blockers_not_resolved_by_these_repos": [
+    "Current full coupled IGM photon/redshift/export/gas chemistry residual must be established in the IGM owner, not inferred from downstream opacity",
+    "Accepted short finite slab is not long physical reionization history or cosmological observer-tail calibration",
+    "Current source headers and contracts exclude automatic optional atom activation or unrestricted REC-to-IGM spectral splice"
+  ]
+}
