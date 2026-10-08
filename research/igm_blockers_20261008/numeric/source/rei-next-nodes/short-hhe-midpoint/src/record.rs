@@ -50,20 +50,25 @@ pub fn replay(cfg:&HistoryConfig,grid:&Grid,records:&[Accepted],initial_y:[f64;4
   let mut index=0;let mut next=Vec::new();let mut next_canonical=Vec::new();let mut total=Owners::default();
   for(j,&(eta,w))in grid.nodes.iter().enumerate(){
    let tau=eta-rei_microphysics::verner_cutoff_ev(crate::radiation::SPECIES[0]).ln();let end=r.s1.min(tau);
-   let mut sum=Owners::default();let mut stock=density[j];let mut last_u=None;
+   let mut sum=Owners::default();let mut stock=density.canonical()[j];
    if tau>r.s0{
     let source_start=eta-cfg.source.energy_max_ev.ln();let source_stop=eta-cfg.source.energy_min_ev.ln();let mut events=vec![source_start,source_stop];for a in crate::radiation::SPECIES{events.push(eta-rei_microphysics::verner_cutoff_ev(a).ln())}
     let cuts=crate::v2::topology(r.s0,end,&events);
     for ab in cuts.windows(2){
      let seg=r.segments.get(index).ok_or("MISSING_SEGMENT")?;let(a,b)=(ab[0],ab[1]);let mid=(a+b)*0.5;let theta=(mid-r.s0)/(r.s1-r.s0);
      let p=cfg.background.at_ln_a(mid).map_err(crate::err)?;let e=(eta-mid).exp();let q=if mid>=source_start&&mid<source_stop{cfg.source.photons_per_h_per_s/((1./cfg.source.energy_min_ev-1./cfg.source.energy_max_ev)*e*p.hubble_per_s)}else{0.};let(energy_start,_)=crate::event_anchor::start_energy(eta,a,b)?;
-     if seg.ordinal!=index||seg.node!=j||seg.eta.to_bits()!=eta.to_bits()||seg.weight.to_bits()!=w.to_bits()||seg.a.to_bits()!=a.to_bits()||seg.b.to_bits()!=b.to_bits()||seg.incoming.to_bits()!=stock.to_bits()||!bits_eq(&seg.gas,&crate::radiation::affine(r.y0,r.y1,theta))||!bits_eq(&seg.background,&context(p))||seg.q.to_bits()!=q.to_bits()||seg.energy_start.to_bits()!=energy_start.to_bits(){return Err("AFFINE_SOURCE_SEGMENT_CONTEXT".into())}
-     for k in 0..13{if seg.dyadic[k]!=Wide::from_f64(seg.owners[k]).map_err(crate::err)?||seg.ledger.terms[k].readout().map_err(crate::err)?.0.to_bits()!=seg.owners[k].to_bits(){return Err("CANONICAL_OBSERVATION_MISMATCH".into())}let _=provenance(seg,t,k)?;}
+     let incoming=stock.number.readout().map_err(crate::err)?.0;
+     if seg.ordinal!=index||seg.node!=j||seg.eta.to_bits()!=eta.to_bits()||seg.weight.to_bits()!=w.to_bits()||seg.a.to_bits()!=a.to_bits()||seg.b.to_bits()!=b.to_bits()||seg.incoming.to_bits()!=incoming.to_bits()||!bits_eq(&seg.gas,&crate::radiation::affine(r.y0,r.y1,theta))||!bits_eq(&seg.background,&context(p))||seg.q.to_bits()!=q.to_bits()||seg.energy_start.to_bits()!=energy_start.to_bits(){return Err("AFFINE_SOURCE_SEGMENT_CONTEXT".into())}
+     // The durable record keeps the historical scalar order N,U,QN,QE,red,...;
+     // OwnerLedger keeps the canonical arithmetic order N,U,red,QN,QE,... .
+     const RECORD_TO_LEDGER:[usize;13]=[0,1,3,4,2,5,6,7,8,9,10,11,12];
+     for k in 0..13{if seg.dyadic[k]!=Wide::from_f64(seg.owners[k]).map_err(crate::err)?||seg.ledger.terms[RECORD_TO_LEDGER[k]].readout().map_err(crate::err)?.0.to_bits()!=seg.owners[k].to_bits(){return Err("CANONICAL_OBSERVATION_MISMATCH".into())}let _=provenance(seg,t,k)?;}
      if seg.rates.iter().any(|x|*x<0.||!x.is_finite()){return Err("OBSERVED_OPACITY_DOMAIN".into())}
-     stock=seg.owners[0];last_u=Some(seg.owners[1]);let mut inc=owner_canonical(seg.owners,seg.ln_n,seg.ln_u,seg.ledger);inc.n=0.;inc.u=0.;inc.ln_n=None;inc.ln_u=None;crate::v2::replace_owner_components(&mut inc,&[0,1]).map_err(crate::err)?;crate::v2::try_add_scaled(&mut sum,inc,1.).map_err(crate::err)?;index+=1;
+     stock=PhotonNode{number:seg.ledger.terms[0],energy:seg.ledger.terms[1]};let mut inc=owner_canonical(seg.owners,seg.ln_n,seg.ln_u,seg.ledger);inc.n=0.;inc.u=0.;inc.ln_n=None;inc.ln_u=None;crate::v2::replace_owner_components(&mut inc,&[0,1]).map_err(crate::err)?;crate::v2::try_add_scaled(&mut sum,inc,1.).map_err(crate::err)?;index+=1;
     }
-    if tau<=r.s1{sum.outn=stock;sum.oute=crate::product(crate::product(crate::v2::EPS,rei_microphysics::verner_cutoff_ev(crate::radiation::SPECIES[0]))?,stock)?;}else{sum.n=stock;sum.u=last_u.unwrap_or(0.);if stock>0.{sum.ln_n=Some(stock.ln());sum.ln_u=Some(sum.u.ln())}}
-   }else if stock!=0.{return Err("UNSUPPORTED_INITIAL_OUTFLOW".into())}
+    let mut ledger=crate::v2::owner_ledger(sum).map_err(crate::err)?;
+    if tau<=r.s1{ledger.terms[5]=stock.number;ledger.terms[6]=stock.number.scale(crate::v2::EPS*rei_microphysics::verner_cutoff_ev(crate::radiation::SPECIES[0])).map_err(crate::err)?;sum.outn=ledger.terms[5].readout().map_err(crate::err)?.0;sum.oute=ledger.terms[6].readout().map_err(crate::err)?.0;sum.canonical=Some(ledger);crate::v2::replace_owner_components(&mut sum,&[0,1]).map_err(crate::err)?;}else{ledger.terms[0]=stock.number;ledger.terms[1]=stock.energy;sum.n=stock.number.readout().map_err(crate::err)?.0;sum.u=stock.energy.readout().map_err(crate::err)?.0;sum.canonical=Some(ledger);sum.ln_n=(!stock.number.value.is_empty()).then(||stock.number.value.log());sum.ln_u=(!stock.energy.value.is_empty()).then(||stock.energy.value.log());crate::v2::replace_owner_components(&mut sum,&[5,6]).map_err(crate::err)?;}
+   }else if !stock.number.value.is_empty(){return Err("UNSUPPORTED_INITIAL_OUTFLOW".into())}
    let n=&r.nodes[j];if n.index!=j||!bits_eq(&fields(sum),&n.owners)||sum.ln_n.map(f64::to_bits)!=n.ln_n.map(f64::to_bits)||sum.ln_u.map(f64::to_bits)!=n.ln_u.map(f64::to_bits){return Err("SEGMENT_NODE_OWNER_MISMATCH".into())}if n.ledger.occurrence.iter().any(|&x|x!=0)&&crate::v2::owner_ledger(sum).map_err(crate::err)?!=n.ledger{return Err("SEGMENT_NODE_CANONICAL_MISMATCH".into())}sum.canonical=Some(n.ledger);
    next.push(sum.n);next_canonical.push(PhotonNode{number:n.ledger.terms[0],energy:n.ledger.terms[1]});crate::v2::try_add_scaled(&mut total,sum,w).map_err(crate::err)?;
   }

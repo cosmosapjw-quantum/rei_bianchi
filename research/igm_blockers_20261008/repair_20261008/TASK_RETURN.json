@@ -1,45 +1,54 @@
 {
-  "schema": "igm-paired-owner-repair/v2",
-  "task": "IGM-PAIRED-OWNER-AND-HEAT-REPAIR-20261008",
-  "status": "PAIRED_STORAGE_OBSERVER_RESTART_AND_K16_EXECUTION_PASS__TRACKED_TRANSPORT_HOLD",
-  "source_HEAD": "b0bb3d88c75ab786c74c1912c22c2d13acf477de",
-  "implementation_commit": "1a24300ec035cbac2321bfb28912f1768082babf",
-  "branch": "research/igm-rate-export-followup-20261008",
-  "PR": 89,
-  "PR_target": "forward/rem-hhe-igm-20261006",
+  "schema": "igm-tracked-transport-repair/v3",
+  "task": "IGM-TRACKED-TRANSPORT-AND-0008-REFINEMENT-20261008",
+  "status": "MANUFACTURED_MODEL_DISCRETE_REFINEMENT_PASS_0P0008__Z12_TO10_AND_CONTINUUM_HOLD",
+  "source_identity": {
+    "handoff_branch": "research/igm-cross-thread-handoff-20261008",
+    "handoff_HEAD": "17f43b84ee49bada32d6efe84c3377e7d645f230",
+    "implementation_base": "03127d4ed3007440e7900c1f57ce78c6f4d6986f",
+    "branch": "research/igm-rate-export-followup-20261008",
+    "PR": 89,
+    "PR_target": "forward/rem-hhe-igm-20261006"
+  },
   "draft": true,
   "merge": false,
   "source_provider_closure_tolerances": "UNCHANGED",
   "IGM_default": "OFF_UNCHANGED",
   "implemented": [
-    "paired canonical photon number/energy storage through density observer and restart",
-    "canonical owner loss occurrence coefficient and direct positive photoheat owner for rounded kernel operands",
-    "checkpoint V3 with explicit V1 and V2 readers",
-    "range-boundary fallback only when historical A/B subtraction cannot resolve sign"
+    "Tracked/Wide photon number and independent incident-energy stock through every characteristic segment",
+    "positive source convolution and inherited loss propagation into N/U/redshift/A/B owners",
+    "V3 endpoint energy discrepancy retained in the carried energy loss instead of overwritten",
+    "canonical cutoff guard for scalar-zero positive tails",
+    "accepted-record final pair replay and explicit durable scalar-to-ledger permutation",
+    "all-row coarse/fine/tail comparison across the completed 0.0008 suffix"
   ],
-  "commands": [
+  "key_commands": [
     {
-      "command": "python3 research/igm_handoff_20261008/scripts/verify_package.py",
+      "command": "python3 research/igm_blockers_20261008/numeric/bounded_run.py repair-energy-coarse-16-48b ... resume .../coarse-energy-loss-final-b 48 48",
+      "exit": 0,
+      "new_advances": 32
+    },
+    {
+      "command": "python3 research/igm_blockers_20261008/numeric/bounded_run.py repair-energy-fine-28-96 ... resume .../fine-energy-loss-final 96 96",
+      "exit": 0,
+      "new_advances": 68
+    },
+    {
+      "command": "python3 research/igm_blockers_20261008/numeric/bounded_run.py repair-energy-tail-14-48 ... resume .../tail-energy-loss-final 48 48",
+      "exit": 0,
+      "new_advances": 34
+    },
+    {
+      "command": "python3 research/igm_blockers_20261008/numeric/bounded_run.py repair-energy-comparison-history-48 python3 research/igm_blockers_20261008/repair_20261008/compare_common_48.py",
       "exit": 0
     },
     {
-      "command": "python3 research/igm_handoff_20261008/scripts/reproduce.py --output /tmp/igm-reproduce-final.bbRwqU/handoff",
-      "exit": 0
+      "command": "cargo test --manifest-path research/igm_blockers_20261008/numeric/source/rei-next-nodes/short-hhe-midpoint/Cargo.toml --locked",
+      "exit": 0,
+      "tests": "18 passed"
     },
     {
-      "command": "python3 research/igm_rate_export01_20261008/reproduce.py --output /tmp/igm-reproduce-final.bbRwqU/rate-export",
-      "exit": 0
-    },
-    {
-      "command": "python3 research/igm_blockers_20261008/bass/verify.py --output /tmp/igm-consumer-final.ZwnVJi/bass",
-      "exit": 0
-    },
-    {
-      "command": "python3 -m unittest discover -s research/igm_blockers_20261008/rec -p 'test_*.py' -v",
-      "exit": 0
-    },
-    {
-      "command": "python3 research/igm_blockers_20261008/rec/adapter.py --output /tmp/igm-consumer-final.ZwnVJi/rec",
+      "command": "record_bridge live /tmp/rei-record-energy-final-store-20261008 /tmp/rei-record-energy-final-out-20261008",
       "exit": 0
     },
     {
@@ -51,79 +60,147 @@
       "exit": 0
     },
     {
-      "command": "cargo test --manifest-path research/igm_blockers_20261008/numeric/source/rei-next-nodes/short-hhe-midpoint/Cargo.toml --lib --locked --jobs 1",
-      "exit": 0,
-      "tests": "16 passed"
+      "command": "python3 research/igm_handoff_20261008/scripts/verify_package.py",
+      "exit": 0
     },
     {
-      "command": "cargo fmt --manifest-path research/igm_blockers_20261008/numeric/source/rei-next-nodes/short-hhe-midpoint/Cargo.toml --all -- --check",
+      "command": "python3 research/igm_handoff_20261008/scripts/reproduce.py --output /tmp/igm-repair-final-handoff-20261008",
+      "exit": 0
+    },
+    {
+      "command": "python3 research/igm_rate_export01_20261008/reproduce.py --output /tmp/igm-repair-final-rate-20261008",
+      "exit": 0
+    },
+    {
+      "command": "python3 research/igm_blockers_20261008/bass/verify.py --output /tmp/igm-repair-final-bass-20261008",
+      "exit": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s research/igm_blockers_20261008/rec -p 'test_*.py' -v",
+      "exit": 0
+    },
+    {
+      "command": "python3 research/igm_blockers_20261008/rec/adapter.py --output /tmp/igm-repair-final-rec-20261008",
+      "exit": 0
+    }
+  ],
+  "preserved_failures": [
+    {
+      "receipt": "repair-energy-coarse-16-48.json",
+      "exit": 2,
+      "reason": "independent energy loss was initially double-counted in the separately reconstructed positive heat sign owner"
+    },
+    {
+      "receipt": "repair-comparison-48.json",
       "exit": 1,
-      "classification": "BASELINE_PRESERVED_COMPACT_SNAPSHOT_FORMATTING"
+      "reason": "checker treated cumulative source integral as a phase increment"
+    },
+    {
+      "receipt": "repair-record-replay-live.json",
+      "exit": 2,
+      "reason": "historical record scalar order was compared as canonical ledger order"
+    },
+    {
+      "range": "repair-coarse-tracked-stock-k17 through repair-coarse-tracked-stock-k17m",
+      "reason": "preserved local repair attempts before tracked N/U transport accepted"
     }
   ],
   "accepted": {
-    "this_followup_new_advances": 9,
-    "cumulative_repair_advances": 14,
-    "common": {
-      "coarse": 14,
-      "fine": 28,
-      "tail": 14,
-      "comparison": "comparison_14.json",
-      "passed": true
-    },
-    "suffix_coarse": [
-      15,
-      16
-    ],
-    "worst_temporal_allowance_ratio": 0.023882550275375468,
-    "worst_tail_allowance_ratio": 9.736692500318166e-13
-  },
-  "first_unresolved": {
-    "branch": "coarse",
-    "attempted_step": 17,
-    "last_accepted_step": 16,
-    "last_epoch": -2.5644160241282035,
-    "reason": "authoritative tail is not empty: scalar N/U are zero while canonical lnN/lnU are finite",
-    "state_unchanged": true,
-    "counts": [
-      4,
-      3,
-      1
-    ],
-    "evidence": "runs/coarse-suffix-v3i/FAILURE_17.json"
-  },
-  "additional_observer_provider_cost": {
-    "common_coarse_phase_counts_with_observer": [
-      41858,
-      144673,
-      13
-    ],
-    "common_fine_phase_counts_with_observer": [
-      167221,
-      549193,
-      52
-    ],
-    "common_tail_phase_counts_with_observer": [
-      93907,
-      313753,
-      26
-    ],
-    "observer_sigma_common_success": 69672,
-    "observer_sigma_k15_k16_success": 19248,
-    "bounded_receipts_current_followup": 20,
-    "bounded_receipt_cpu_s": 4.225503,
-    "bounded_receipt_wall_s": 4.672247835987946,
-    "failed_attempt_counts": "preserved per receipt/log; not reset or folded into success counts",
-    "reserved_owner_recomputations": 0
+    "common_rows": 32,
+    "coarse_final": 48,
+    "fine_final": 96,
+    "tail_final": 48,
+    "epoch": -2.564149357461537,
+    "redshift": 11.98960415889089,
+    "comparison": "comparison_48.json",
+    "passed": true,
+    "worst_temporal_allowance_ratio": 0.023932797389989293,
+    "worst_tail_allowance_ratio": 4.080871757717751e-12,
+    "worst_source_allowance_ratio": 0.21071655885039875,
+    "maximum_original_gate_ratios": {
+      "coarse": [
+        0.7480650101741001,
+        0.0059403343087358965,
+        0.007448008134352242
+      ],
+      "fine": [
+        0.38221131190771285,
+        0.006135325206449706,
+        0.007499200814528094
+      ],
+      "tail": [
+        0.8834695929244284,
+        0.006563307461522517,
+        0.007702426441144525
+      ]
+    }
   },
   "negative_tests": [
-    "epoch/source/provider mismatch rejection retained",
-    "structural paired-owner mismatch rejected",
-    "negative and uncertainty-straddling photoheat rejected",
-    "canonical positive heat may project to scalar zero without becoming structural zero",
-    "checkpoint checksum/schema/trailing/roundtrip checks retained",
-    "rejected k17 state byte image unchanged"
+    "tracked N/U structural mismatch rejected",
+    "canonical positive tail at pre-cutoff entry rejected even when scalar readout is zero",
+    "negative and uncertainty-straddling photoheat remain rejected",
+    "record context/source/grid/gas mismatch checks retained",
+    "wrong record scalar-to-ledger order exposed and corrected",
+    "checkpoint schema/checksum/trailing/roundtrip controls retained"
   ],
+  "additional_observer_provider_cost": {
+    "successful_final_phase_counts_with_observer": {
+      "coarse_16_48": [
+        1339437,
+        4331199,
+        416
+      ],
+      "fine_28_96": [
+        2842753,
+        9182319,
+        884
+      ],
+      "tail_14_48": [
+        1596415,
+        5161407,
+        442
+      ],
+      "sum": [
+        5778605,
+        18674925,
+        1742
+      ]
+    },
+    "accepted_record_live_counts": {
+      "startup": [
+        1,
+        1
+      ],
+      "after": [
+        63591,
+        190477
+      ]
+    },
+    "all_bounded_receipts_at_closeout": 100,
+    "bounded_cpu_s": 248.34011900000002,
+    "bounded_wall_s": 255.48946468801296,
+    "failed_attempt_costs": "PRESERVED_PER_RECEIPT_AND_NOT_FOLDED_INTO_SUCCESS_COUNTS",
+    "reserved_owner_recomputations": 0
+  },
+  "loss_accounting": {
+    "energy_discrepancy": "PRESERVED_AS_CARRIED_U_LOSS",
+    "direct_heat": "INDEPENDENT_POSITIVE_N_AND_SOURCE_RECONSTRUCTION",
+    "uniqueness": "NOT_CLAIMED_CONSERVATIVE_OVERLAP_POSSIBLE",
+    "historical_prefix_loss": "NOT_MEASURED"
+  },
+  "independent_review": {
+    "path": "INDEPENDENT_REVIEW.md",
+    "external_artifact": "/tmp/igm-tracked-transport-final-review.md",
+    "rounds": 1,
+    "targeted_correction_verification": 1,
+    "findings_addressed": [
+      "independent energy loss transport",
+      "canonical cutoff guard",
+      "all common history rows",
+      "record replay permutation/final pair"
+    ],
+    "remaining_note": "conservative loss overlap prevents a unique no-double-count claim"
+  },
   "preservation": {
     "original_checkpoints": "UNCHANGED",
     "historical_failures": "PRESERVED",
@@ -131,43 +208,24 @@
     "PR86_PR88_sources": "UNCHANGED",
     "PR85_log_tail_and_PR86_canonical_wide": "NOT_REPLACED"
   },
-  "review": {
-    "path": "INDEPENDENT_REVIEW.md",
-    "decision": "SCOPED_EXPLORATORY_PUBLICATION_ACCEPTED__FULL_TRANSPORT_AND_ERROR_AUTHORITY_HOLD",
-    "rounds": 1,
-    "targeted_correction_verifications": 1,
-    "findings": [
-      "R1 mean-scale cancellation allowance corrected",
-      "R2 canonical value/loss not consumed by next characteristic remains blocker",
-      "R3 inactive accepted-record replay compatibility remains blocker"
-    ]
-  },
   "remaining_blockers": [
-    "Tracked/Wide transported stock and source convolution after scalar photon number reaches zero",
-    "canonical incoming value/loss propagation is absent even before scalar underflow",
-    "inactive accepted-record replay does not yet restore final canonical segment pair before comparison",
-    "full 0.0008 suffix and later horizons",
+    "later horizons from 0.0016 through ln(13/11) and z=10 endpoint are unexecuted",
     "raw kernel/provider/state and historical-prefix error enclosure",
-    "spectral reconstruction source integration and time residual/Jacobian bounds",
-    "joint six-moment nonlinear remainder",
-    "REC Gate I and matched evolution HOLD; BASS outside-window optical depth UNKNOWN"
+    "spectral reconstruction and source-integration error bounds",
+    "time residual/Jacobian propagation and joint six-moment nonlinear remainder",
+    "REC Gate I and matched evolution HOLD",
+    "BASS outside-window optical depth UNKNOWN"
   ],
   "scientific_admission": {
-    "paired_common_and_k16": "RUNNER_ACCEPTED_SCOPED__ERROR_AUTHORITY_HOLD",
-    "MANUFACTURED_MODEL_DISCRETE_REFINEMENT_PASS": "NOT_REACHED_FULL_Z12_TO10",
+    "MANUFACTURED_MODEL_DISCRETE_REFINEMENT_PASS": "0.0008_HORIZON_ONLY",
     "MANUFACTURED_MODEL_CONTINUUM_VALIDATED": "NOT_REACHED",
+    "z12_to10": "NOT_REACHED",
     "physical": "HOLD"
   },
-  "remote_CI": {
-    "tested_HEAD": "31da8250356ae2d5d21a34314d96ea4fa97f1862",
-    "push_run": 37776436487,
-    "pull_request_run": 37776442432,
-    "status": "BOTH_COMPLETED_SUCCESS"
-  },
   "publication": {
-    "push_exit": 0,
-    "draft_PR_updated": true,
     "draft_PR_url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/89",
-    "merge": false
+    "merge": false,
+    "implementation_commit": "PENDING_COMMIT",
+    "remote_CI": "PENDING"
   }
 }

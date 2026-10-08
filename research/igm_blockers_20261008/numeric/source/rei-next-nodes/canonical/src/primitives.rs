@@ -164,6 +164,24 @@ impl Wide {
         self.is_empty()
             || (!b.is_empty() && (self.exp < b.exp || (self.exp == b.exp && self.mant <= b.mant)))
     }
+    pub fn abs_diff(self, b: Self) -> R<Self> {
+        if self == b {
+            return Ok(Self::ZERO);
+        }
+        let (larger, smaller) = if self.le(b) { (b, self) } else { (self, b) };
+        if smaller.is_empty() {
+            return Ok(larger);
+        }
+        let shift = larger.exp - smaller.exp;
+        if shift > 1074 {
+            return Ok(larger);
+        }
+        let difference = larger.mant - smaller.mant * 2.0f64.powi(-shift);
+        if difference <= 0.0 {
+            return Err("unresolved wide difference");
+        }
+        Self::from_parts(difference, larger.exp)
+    }
     /// Readout is optional. The second result encloses only quantization at this boundary.
     pub fn readout(self) -> R<(f64, Self)> {
         if self.is_empty() {
@@ -674,4 +692,19 @@ pub fn endpoint_pair(l: f64, r: f64, s1: f64, o: Owners, front: bool) -> R<Endpo
         m_loss: m.loss,
         carried_u: o.u,
     })
+}
+
+#[cfg(test)]
+mod tracked_difference_tests {
+    use super::*;
+
+    #[test]
+    fn absolute_difference_retains_a_below_binary64_tail() {
+        let a = Wide::from_parts(1.25, -1100).unwrap();
+        let b = Wide::from_parts(1.0, -1101).unwrap();
+        let d = a.abs_diff(b).unwrap();
+        assert_eq!(d, Wide::from_parts(1.5, -1101).unwrap());
+        assert_eq!(d.readout().unwrap().0, 0.0);
+        assert!(!d.is_empty());
+    }
 }

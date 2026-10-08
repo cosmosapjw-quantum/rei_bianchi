@@ -86,7 +86,7 @@ fn energy_source_integral(lambda: f64, h: f64) -> f64 {
         (j(1.0, h) - j(lambda + 1.0, h)) / lambda
     }
 }
-pub fn kernel(f: f64, q: f64, rates: [f64; 3], h: f64, e: f64) -> Result<Owners, &'static str> {
+fn kernel_scalar(f: f64, q: f64, rates: [f64; 3], h: f64, e: f64) -> Result<Owners, &'static str> {
     if ![f, q, h, e]
         .into_iter()
         .chain(rates)
@@ -108,9 +108,6 @@ pub fn kernel(f: f64, q: f64, rates: [f64; 3], h: f64, e: f64) -> Result<Owners,
     let z = lambda * h;
     let decay = (-z).exp();
     let n = f * decay + q * j(lambda, h);
-    if n == 0.0 && q > 0.0 && h > 0.0 {
-        return Err("positive source underflow requires unsupported log evolution");
-    }
     let count_integral = f * j(lambda, h) + q * h * h * psi(z);
     let energy_j = j(lambda + 1.0, h);
     let source_energy_j = energy_source_integral(lambda, h);
@@ -161,6 +158,9 @@ pub fn kernel(f: f64, q: f64, rates: [f64; 3], h: f64, e: f64) -> Result<Owners,
         let mean_ev = energy_base_ev / count_base;
         let excess_ev = mean_ev - CHI[i];
         if !mean_ev.is_finite() || !excess_ev.is_finite() || excess_ev <= 0.0 {
+            if !count_base.is_normal() || !energy_base_ev.is_normal() {
+                continue;
+            }
             return Err("unresolved direct photoheat moment");
         }
         let mut absorbed = Tracked::from_f64(rates[i])?.mul(Tracked::from_f64(count_base)?)?;
@@ -227,6 +227,200 @@ pub fn kernel(f: f64, q: f64, rates: [f64; 3], h: f64, e: f64) -> Result<Owners,
         o.canonical = Some(ledger);
     }
     Ok(o)
+}
+
+fn tracked_scale(x: Tracked, coefficient: f64) -> Result<Tracked, &'static str> {
+    let mut out = x.scale(coefficient)?;
+    if !out.value.is_empty() {
+        out.loss = out.loss.upper_add(rounding(out.value)?)?;
+    }
+    Ok(out)
+}
+
+fn tracked_add(a: Tracked, b: Tracked) -> Result<Tracked, &'static str> {
+    let mut out = a.add(b)?;
+    if !a.value.is_empty() && !b.value.is_empty() {
+        out.loss = out.loss.upper_add(rounding(out.value)?)?;
+    }
+    Ok(out)
+}
+
+fn bind_scalar(value: f64, tracked: Tracked) -> Result<Tracked, &'static str> {
+    let projected = tracked.readout()?.0;
+    if projected.to_bits() == value.to_bits() {
+        return Ok(tracked);
+    }
+    let mut rebound = Tracked::from_f64(value)?;
+    rebound.loss = rebound.loss.upper_add(tracked.loss)?;
+    let delta = (projected - value).abs();
+    if delta > 0.0 {
+        rebound.loss = rebound.loss.upper_add(Wide::from_f64(delta)?)?;
+    }
+    if !rebound.value.is_empty() {
+        rebound.loss = rebound.loss.upper_add(rounding(rebound.value)?)?;
+    }
+    Ok(rebound)
+}
+
+fn positive_difference_coefficient(
+    lhs: f64,
+    rhs: f64,
+    scale: f64,
+) -> Result<Tracked, &'static str> {
+    let difference = lhs - rhs;
+    if !lhs.is_finite() || !rhs.is_finite() || difference <= 0.0 || scale <= 0.0 {
+        return Err("unresolved tracked photoheat coefficient");
+    }
+    let mut out = Tracked::from_f64(scale * difference)?;
+    let operand_allowance = rounding(Wide::from_f64(lhs.max(rhs))?)?
+        .upper_mul(Wide::from_f64(64.0)?)?
+        .upper_mul(Wide::from_f64(scale)?)?;
+    out.loss = out.loss.upper_add(operand_allowance)?;
+    for _ in 0..4 {
+        out.loss = out.loss.upper_add(rounding(out.value)?)?;
+    }
+    Ok(out)
+}
+
+/// Linear positive characteristic map with an authoritative extended-range
+/// incoming stock. Scalar outputs retain the historical kernel readout; the
+/// canonical terms carry incoming value/loss through the same coefficients.
+pub fn kernel_tracked(
+    stock: Tracked,
+    stock_energy: Tracked,
+    q: f64,
+    rates: [f64; 3],
+    h: f64,
+    e: f64,
+) -> Result<Owners, &'static str> {
+    if stock.value.is_empty() != stock_energy.value.is_empty() {
+        return Err("inconsistent tracked stock pair");
+    }
+    let f = stock.readout()?.0;
+    let mut o = kernel_scalar(f, q, rates, h, e)?;
+    let lambda = rates.iter().sum::<f64>();
+    let z = lambda * h;
+    let decay = (-z).exp();
+    let count_j = j(lambda, h);
+    let source_count_j = h * h * psi(z);
+    let energy_j = j(lambda + 1.0, h);
+    let source_energy_j = energy_source_integral(lambda, h);
+    let end_e = e * (-h).exp();
+    let source = Tracked::from_f64(q)?;
+
+    let number = tracked_add(
+        tracked_scale(stock, decay)?,
+        tracked_scale(source, count_j)?,
+    )?;
+    let energy = tracked_add(
+        tracked_scale(stock_energy, decay * (-h).exp())?,
+        tracked_scale(source, count_j * EPS * end_e)?,
+    )?;
+    let count_integral = tracked_add(
+        tracked_scale(stock, count_j)?,
+        tracked_scale(source, source_count_j)?,
+    )?;
+    let emitted_number = tracked_scale(source, h)?;
+    let emitted_energy = tracked_scale(source, EPS * e * j(1.0, h))?;
+    let redshift_energy = tracked_add(
+        tracked_scale(stock_energy, energy_j)?,
+        tracked_scale(source, EPS * e * source_energy_j)?,
+    )?;
+
+    for (scalar, tracked) in [
+        (&mut o.n, number),
+        (&mut o.u, energy),
+        (&mut o.red, redshift_energy),
+        (&mut o.qn, emitted_number),
+        (&mut o.qe, emitted_energy),
+    ] {
+        let projected = tracked.readout()?.0;
+        if !scalar.is_normal() && !tracked.value.is_empty() {
+            *scalar = projected;
+        }
+    }
+
+    // The tracked path may legitimately replace a subnormal scalar projection.
+    // Rebuild its ledger from that projection instead of comparing against the
+    // scalar-core ledger that preceded the range-boundary correction.
+    o.canonical = None;
+    let mut ledger = owner_ledger(o)?;
+    let tracked = [
+        number,
+        energy,
+        redshift_energy,
+        emitted_number,
+        emitted_energy,
+    ];
+    for (index, value) in tracked.into_iter().enumerate() {
+        ledger.terms[index] = bind_scalar(scalar(o)[index], value)?;
+        if !value.value.is_empty() {
+            ledger.occurrence[index] = ledger.occurrence[index].saturating_add(1);
+            ledger.coefficient[index] = Wide::from_f64(1.0)?;
+        }
+    }
+    for i in 0..3 {
+        let absorbed = tracked_scale(count_integral, rates[i])?;
+        let absorbed_energy = tracked_scale(redshift_energy, rates[i])?;
+        let projected_a = absorbed.readout()?.0;
+        let projected_b = absorbed_energy.readout()?.0;
+        if !o.an[i].is_normal() && !absorbed.value.is_empty() {
+            o.an[i] = projected_a;
+        }
+        if !o.be[i].is_normal() && !absorbed_energy.value.is_empty() {
+            o.be[i] = projected_b;
+        }
+        ledger.terms[7 + i] = bind_scalar(o.an[i], absorbed)?;
+        ledger.terms[10 + i] = bind_scalar(o.be[i], absorbed_energy)?;
+        if !absorbed.value.is_empty() {
+            ledger.occurrence[7 + i] = ledger.occurrence[7 + i].saturating_add(1);
+            ledger.coefficient[7 + i] = Wide::from_f64(1.0)?;
+        }
+        if !absorbed_energy.value.is_empty() {
+            ledger.occurrence[10 + i] = ledger.occurrence[10 + i].saturating_add(1);
+            ledger.coefficient[10 + i] = Wide::from_f64(1.0)?;
+        }
+        if rates[i] > 0.0 {
+            let heat_f = positive_difference_coefficient(
+                e * energy_j,
+                CHI[i] * count_j,
+                rates[i] * EPS,
+            )?;
+            let heat_q = positive_difference_coefficient(
+                e * source_energy_j,
+                CHI[i] * source_count_j,
+                rates[i] * EPS,
+            )?;
+            // This positive owner is reconstructed from the photon-number and
+            // source characteristics.  The independent carried-energy loss is
+            // retained by U/red/B above; folding it into this independently
+            // reconstructed sign certificate would count it a second time.
+            let heat = tracked_add(stock.mul(heat_f)?, source.mul(heat_q)?)?;
+            ledger.heat[i] = heat;
+            if !heat.value.is_empty() {
+                ledger.heat_occurrence[i] = ledger.heat_occurrence[i].saturating_add(1);
+                ledger.heat_coefficient[i] = Wide::from_f64(1.0)?;
+            }
+        }
+    }
+    o.canonical = Some(ledger);
+    o.ln_n = if number.value.is_empty() {
+        None
+    } else {
+        Some(number.value.log())
+    };
+    o.ln_u = if energy.value.is_empty() {
+        None
+    } else {
+        Some(energy.value.log())
+    };
+    Ok(o)
+}
+
+pub fn kernel(f: f64, q: f64, rates: [f64; 3], h: f64, e: f64) -> Result<Owners, &'static str> {
+    let stock = Tracked::from_f64(f)?;
+    let stock_energy = stock.scale(EPS * e)?;
+    kernel_tracked(stock, stock_energy, q, rates, h, e)
 }
 pub fn moments(d: Density, a: f64, b: f64) -> (f64, f64) {
     try_moments(d, a, b).expect("initial moments require supported normal inventory")
@@ -621,7 +815,7 @@ fn scalar(o:Owners)->[f64;13]{[o.n,o.u,o.red,o.qn,o.qe,o.outn,o.oute,o.an[0],o.a
 fn rounding(v:Wide)->Result<Wide,&'static str>{if v.is_empty(){Ok(Wide::ZERO)}else{Wide::from_parts(1.,v.exponent()-51)}}
 pub fn owner_ledger(o:Owners)->Result<OwnerLedger,&'static str>{
  let vals=scalar(o);let mut t=[Tracked::empty();13];let mut occurrence=[0;13];let mut coefficient=[Wide::ZERO;13];
- for i in 0..13 {t[i]=Tracked::from_f64(vals[i])?;if let Some(l)=o.canonical{if l.terms[i].readout()?.0.to_bits()==vals[i].to_bits(){t[i]=l.terms[i];occurrence[i]=l.occurrence[i];coefficient[i]=l.coefficient[i];}else{return Err("canonical owner/readout mismatch");}}}
+ for i in 0..13 {t[i]=Tracked::from_f64(vals[i])?;if let Some(l)=o.canonical{if l.terms[i].readout()?.0.to_bits()==vals[i].to_bits(){t[i]=l.terms[i];occurrence[i]=l.occurrence[i];coefficient[i]=l.coefficient[i];}else{return Err(match i{0=>"canonical N/readout mismatch",1=>"canonical U/readout mismatch",2=>"canonical red/readout mismatch",3=>"canonical QN/readout mismatch",4=>"canonical QE/readout mismatch",5=>"canonical outN/readout mismatch",6=>"canonical outE/readout mismatch",7=>"canonical A_HI/readout mismatch",8=>"canonical A_HeI/readout mismatch",9=>"canonical A_HeII/readout mismatch",10=>"canonical B_HI/readout mismatch",11=>"canonical B_HeI/readout mismatch",_=>"canonical B_HeII/readout mismatch"});}}}
  let mut heat=[Tracked::empty();3];let mut heat_occurrence=[0;3];let mut heat_coefficient=[Wide::ZERO;3];
  if let Some(l)=o.canonical{heat=l.heat;heat_occurrence=l.heat_occurrence;heat_coefficient=l.heat_coefficient;}
  Ok(OwnerLedger{terms:t,occurrence,coefficient,heat,heat_occurrence,heat_coefficient})
@@ -634,7 +828,7 @@ pub fn try_add_scaled(a:&mut Owners,b:Owners,w:f64)->Result<(),&'static str>{
  let canonical_present=o.canonical.is_some();let ledger=owner_ledger(o)?;
  for (pair,(n,e,ni,ei)) in [(o.n,o.u,0,1),(o.qn,o.qe,3,4),(o.outn,o.oute,5,6),(o.an[0],o.be[0],7,10),(o.an[1],o.be[1],8,11),(o.an[2],o.be[2],9,12)].into_iter().enumerate(){
   if (n==0.)!=(e==0.) && (ledger.terms[ni].value.is_empty()||ledger.terms[ei].value.is_empty()){return Err(match pair{0=>"unrepresented N/U owner",1=>"unrepresented QN/QE owner",2=>"unrepresented outN/outE owner",3=>"unrepresented HI A/B owner",4=>"unrepresented HeI A/B owner",_=>"unrepresented HeII A/B owner"});}
-  if ledger.terms[ni].value.is_empty()!=ledger.terms[ei].value.is_empty(){return Err("canonical paired number/energy owner mismatch");}
+  if ledger.terms[ni].value.is_empty()!=ledger.terms[ei].value.is_empty(){return Err(match pair{0=>"canonical N/U owner mismatch",1=>"canonical QN/QE owner mismatch",2=>"canonical outN/outE owner mismatch",3=>"canonical HI A/B owner mismatch",4=>"canonical HeI A/B owner mismatch",_=>"canonical HeII A/B owner mismatch"});}
  }
  if (o.n==0.&&o.ln_n.is_some()&&ledger.terms[0].value.is_empty())||(o.u==0.&&o.ln_u.is_some()&&ledger.terms[1].value.is_empty()){return Err("authoritative tail is not empty");}
  if canonical_present{if let Some(x)=o.ln_n{if o.n==0.||o.n.is_normal(){ledger.terms[0].value.validate_log(x)?;}}if let Some(x)=o.ln_u{if o.u==0.||o.u.is_normal(){ledger.terms[1].value.validate_log(x)?;}}}}
@@ -784,6 +978,8 @@ pub fn normalized_target(l: f64, r: f64, n: f64, m: f64) -> Result<f64, &'static
  #[test] fn tiny_energy_absorption_scales_before_subnormal_projection(){let f=3.729103312391377e-306;let rates=[1357642.4113259623,0.,0.];let h=8.333333333609971e-6;let e=13.693045525868545;let o=kernel(f,0.,rates,h,e).unwrap();let heat=o.be[0]-EPS*CHI[0]*o.an[0];assert!(heat>0.);assert!(!o.be[0].is_normal());}
  #[test] fn normal_energy_absorption_keeps_shared_route_bits(){let f=1e-4;let q=2e-5;let rates=[3.,5.,7.];let h=1e-3;let e=100.;let o=kernel(f,q,rates,h,e).unwrap();let lambda=rates.iter().sum::<f64>();let shared=EPS*e*(f*j(lambda+1.,h)+q*energy_source_integral(lambda,h));for i in 0..3{assert_eq!(o.be[i].to_bits(),(rates[i]*shared).to_bits());}}
  #[test] fn paired_canonical_owner_survives_asymmetric_scalar_readout(){let tiny=f64::from_bits(1);let mut a=Owners::default();try_add_scaled(&mut a,Owners{n:1e-300,u:tiny,..Default::default()},0.5).unwrap();assert!(a.n>0.);assert_eq!(a.u,0.);let l=a.canonical.unwrap();assert!(!l.terms[0].value.is_empty());assert!(!l.terms[1].value.is_empty());assert!(!l.terms[1].readout().unwrap().1.is_empty());let mut total=Owners::default();try_add_scaled(&mut total,a,1.).unwrap();assert_eq!(total.u,0.);assert!(total.ln_u.is_some());}
+ #[test] fn tracked_kernel_carries_stock_below_binary64_tail(){let stock=Tracked::exact(Wide::from_parts(1.25,-1100).unwrap());let energy=stock.scale(EPS*20.).unwrap();let o=kernel_tracked(stock,energy,0.,[3.,0.,0.],1e-3,20.).unwrap();let l=owner_ledger(o).unwrap();assert_eq!(o.n,0.);assert_eq!(o.u,0.);assert!(!l.terms[0].value.is_empty());assert!(!l.terms[1].value.is_empty());assert!(!l.terms[7].value.is_empty());assert!(!l.terms[10].value.is_empty());}
+ #[test] fn tracked_kernel_propagates_independent_energy_loss(){let stock=Tracked::from_f64(1e-4).unwrap();let mut energy=stock.scale(EPS*20.).unwrap();energy.loss=Wide::from_parts(1.,-80).unwrap();let o=kernel_tracked(stock,energy,0.,[3.,0.,0.],1e-3,20.).unwrap();let l=owner_ledger(o).unwrap();assert!(!l.terms[1].loss.is_empty());assert!(!l.terms[2].loss.is_empty());assert!(!l.terms[10].loss.is_empty());}
 }
 
 #[cfg(test)] mod exact_fixture_tests{use super::*;#[test]fn fraction_fixtures(){for(a,b,w)in [(0.,2.7403074891849688e-303,1.4493951880436e-6),(0.1,0.3,0.7),(1.,f64::from_bits(1),0.5)]{let mut out=Owners{red:a,..Default::default()};try_add_scaled(&mut out,Owners{red:b,..Default::default()},w).unwrap();let t=out.canonical.unwrap().terms[2];let bound=t.readout().unwrap().1;println!("ORACLE {} {} {} {} {} {}",a.to_bits(),b.to_bits(),w.to_bits(),out.red.to_bits(),bound.mantissa().to_bits(),bound.exponent());}}}

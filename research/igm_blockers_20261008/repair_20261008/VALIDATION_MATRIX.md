@@ -2,23 +2,22 @@
 
 | Axis | Status | Evidence |
 |---|---|---|
-| Repository CI-equivalent commands | PASS | handoff verify/reproduce, rate reproduce, BASS, REC, root fmt, root workspace tests all exit 0 |
-| Numerical library | PASS | 16/16 locked tests |
-| Positive heat below scalar readout | PASS | `canonical_positive_heat_may_project_to_zero` |
-| NORMAL A/B operation order | PASS | existing bit-parity regression |
-| Paired storage/observer/checkpoint | PASS_SCOPED | coarse/fine/tail V2 common-state runs and V2 to V3 restart |
-| Common epoch 37 fields | PASS_SCOPED | `comparison_14.json` |
-| Temporal refinement | PASS_SCOPED | worst allowance ratio `0.023882550275375468` |
-| Tail comparison | PASS_SCOPED | worst allowance ratio `9.736692500318166e-13` |
-| Original per-branch gates | PASS_SCOPED | all reported gate ratios below 1 through common state; coarse k15/k16 also below 1 |
-| Negative/structural-zero controls | PASS | unresolved and negative signs remain rejected; structural zero retained |
-| V1/V2 migration | PASS_SCOPED | old partial migration plus actual V2 k14 to V3 k15 resume |
-| Nested research package fmt | BASELINE_FAIL | preserved compact snapshot files; repository-owned CI fmt passes |
-| Canonical transport into characteristic | FAIL_BLOCKER | incoming value/loss is not consumed even before scalar underflow |
-| Accepted-record replay API | HOLD_NONACTIVE | final canonical segment pair is not restored before comparison |
-| Coarse k17 | FAIL_BLOCKER | scalar stock projects to zero while finite canonical log tail remains |
-| Full 0.0008 suffix | NOT_COMPLETED | stopped at k17 |
-| z=12 to 10 / continuum | NOT_VALIDATED | error authority and later horizons incomplete |
+| Repository CI-equivalent commands | PASS | root fmt/workspace tests, handoff verify/reproduce, rate reproduce, BASS and REC all exit 0 |
+| Numerical library | PASS | 18/18 locked tests |
+| Tracked stock below binary64 tail | PASS | `tracked_kernel_carries_stock_below_binary64_tail` |
+| Extended-range discrepancy accounting | PASS_SCOPED | `Wide::abs_diff` regression and loss-carrying node reconciliation |
+| NORMAL scalar regression | PASS | existing bit-parity and A/B route tests |
+| Accepted-record replay | PASS | live two-transition capture/replay exit 0; scalar/ledger permutation explicit |
+| Former coarse k17 blocker | RESOLVED | `repair-coarse-tracked-stock-k17n`, exit 0 |
+| Common k17/34/17 comparison | PASS | temporal `0.023889076639814984`, tail `9.888200732218342e-13` |
+| Full 0.0008 suffix | PASS | coarse/fine/tail 31/62/31 advances, all exit 0 |
+| Final k48/96/48 37 fields | PASS_SCOPED | temporal `0.023932797389989293`, tail `4.080871757717751e-12` |
+| Final suffix source N/E | PASS_SCOPED | maximum allowance ratio `0.1962283868484479` |
+| Original per-branch gates | PASS_SCOPED | maxima below 1: coarse `0.74807`, fine `0.38222`, tail `0.88347` |
+| Nested research package fmt | BASELINE_FAIL | preserved compact snapshot; repository-owned CI fmt passes |
+| Later horizons through z=10 | NOT_RUN | 0.0008 stopping point retained |
+| Continuum error authority | HOLD | spectral/source/time/Jacobian, historical-prefix and joint remainder incomplete |
+| REC/BASS broader science | HOLD_OR_UNKNOWN | REC Gate I/matched evolution HOLD; BASS outside-window optical depth UNKNOWN |
 | Physical history | HOLD | manufactured numerical scope only |
 
-No result is promoted beyond `PASS_SCOPED` for the executed manufactured-model rows.
+The accepted claim is `MANUFACTURED_MODEL_DISCRETE_REFINEMENT_PASS` for the executed 0.0008 horizon. It is not a z=12 to 10 or continuum certificate.

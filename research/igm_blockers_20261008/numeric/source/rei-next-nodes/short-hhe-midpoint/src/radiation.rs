@@ -1,5 +1,5 @@
 use crate::{
-    err, material, nonnegative, positive, product,
+    err, material, nonnegative, positive,
     v2::{self, Owners},
     Fallible,
 };
@@ -8,6 +8,47 @@ use rei_microphysics::{
     verner_cutoff_ev, Absorber, AtomicProvider, HHeModel,
 };
 pub const SPECIES: [Absorber; 3] = [Absorber::HI, Absorber::HeI, Absorber::HeII];
+fn tracked_relative_loss(value: canonical::Tracked) -> Fallible<f64> {
+    if value.loss.is_empty() {
+        return Ok(0.0);
+    }
+    if value.value.is_empty() || value.value.le(value.loss) {
+        return Err("tracked continuity uncertainty reaches zero".into());
+    }
+    let shift = value.loss.exponent() - value.value.exponent();
+    if shift < -1074 {
+        return Ok(0.0);
+    }
+    Ok(value.loss.mantissa() / value.value.mantissa() * 2.0f64.powi(shift))
+}
+fn reconcile_node_energy(
+    mut node: crate::diagnostics::PhotonNode,
+    eta: f64,
+    epoch: f64,
+) -> Fallible<crate::diagnostics::PhotonNode> {
+    if node.number.value.is_empty() {
+        if !node.energy.value.is_empty() {
+            return Err("empty number with nonempty node energy".into());
+        }
+        return Ok(node);
+    }
+    let mut expected = node
+        .number
+        .scale(v2::EPS * (eta - epoch).exp())
+        .map_err(err)?;
+    let discrepancy = expected
+        .value
+        .abs_diff(node.energy.value)
+        .map_err(err)?;
+    expected.loss = expected
+        .loss
+        .upper_add(node.energy.loss)
+        .map_err(err)?
+        .upper_add(discrepancy)
+        .map_err(err)?;
+    node.energy = expected;
+    Ok(node)
+}
 #[derive(Clone, Debug)]
 pub struct Grid {
     pub nodes: Vec<(f64, f64)>,
@@ -83,7 +124,16 @@ pub fn characteristic(
     s1: f64,
     f: f64,
 ) -> Fallible<Owners> {
-    characteristic_staged(cfg, eta, s0, s1, f, |_| Ok((y, p)))
+    let number = canonical::Tracked::from_f64(f).map_err(err)?;
+    let energy = number.scale(v2::EPS * (eta - s0).exp()).map_err(err)?;
+    characteristic_staged(
+        cfg,
+        eta,
+        s0,
+        s1,
+        crate::diagnostics::PhotonNode { number, energy },
+        |_| Ok((y, p)),
+    )
 }
 /// The same affine stage function is used by the physical path and mathematical controls.
 pub fn affine(y0: [f64; 4], y1: [f64; 4], theta: f64) -> [f64; 4] {
@@ -98,7 +148,28 @@ pub fn characteristic_path(
     s1: f64,
     f: f64,
 ) -> Fallible<Owners> {
-    characteristic_staged(cfg, eta, s0, s1, f, |m| {
+    let number = canonical::Tracked::from_f64(f).map_err(err)?;
+    let energy = number.scale(v2::EPS * (eta - s0).exp()).map_err(err)?;
+    characteristic_path_tracked(
+        cfg,
+        y0,
+        y1,
+        eta,
+        s0,
+        s1,
+        crate::diagnostics::PhotonNode { number, energy },
+    )
+}
+fn characteristic_path_tracked(
+    cfg: &HistoryConfig,
+    y0: [f64; 4],
+    y1: [f64; 4],
+    eta: f64,
+    s0: f64,
+    s1: f64,
+    stock: crate::diagnostics::PhotonNode,
+) -> Fallible<Owners> {
+    characteristic_staged(cfg, eta, s0, s1, stock, |m| {
         let theta = (m - s0) / (s1 - s0);
         if !(theta > 0. && theta < 1.) {
             return Err("unresolved affine stage".into());
@@ -115,12 +186,9 @@ fn characteristic_staged<F: FnMut(f64) -> Fallible<([f64; 4], FlrwPoint)>>(
     eta: f64,
     s0: f64,
     s1: f64,
-    f: f64,
+    initial: crate::diagnostics::PhotonNode,
     mut stage: F,
 ) -> Fallible<Owners> {
-    if !f.is_finite() || f < 0.0 {
-        return Err("invalid transported stock".into());
-    }
     if s1 <= s0 {
         return Err("invalid temporal cell".into());
     }
@@ -128,7 +196,7 @@ fn characteristic_staged<F: FnMut(f64) -> Fallible<([f64; 4], FlrwPoint)>>(
     let source_stop = eta - cfg.source.energy_min_ev.ln();
     let tau = eta - verner_cutoff_ev(SPECIES[0]).ln();
     if tau <= s0 {
-        if f != 0.0 {
+        if !initial.number.value.is_empty() {
             return Err("unsupported initial outflow stock".into());
         }
         return Ok(Owners::default());
@@ -139,9 +207,7 @@ fn characteristic_staged<F: FnMut(f64) -> Fallible<([f64; 4], FlrwPoint)>>(
         events.push(eta - verner_cutoff_ev(a).ln())
     }
     let cuts = v2::topology(s0, end, &events);
-    let mut stock = f;
-    let mut last_u: Option<f64> = None;
-    let mut last_pair = None;
+    let mut stock = reconcile_node_energy(initial, eta, s0)?;
     let mut sum = Owners::default();
     for ab in cuts.windows(2) {
         let (a, b) = (ab[0], ab[1]);
@@ -167,28 +233,35 @@ fn characteristic_staged<F: FnMut(f64) -> Fallible<([f64; 4], FlrwPoint)>>(
             0.0
         };
         let (energy_start, _) = crate::event_anchor::start_energy(eta, a, b)?;
-        if let Some(previous_u) = last_u {
-            let begin = v2::EPS * energy_start * stock;
-            if (previous_u - begin).abs() > 2e-12 * previous_u.abs().max(begin.abs()) {
-                return Err("cross-segment energy discontinuity".into());
+        if !stock.number.value.is_empty() {
+            let begin = stock.number.scale(v2::EPS * energy_start).map_err(err)?;
+            let log_delta = (stock.energy.value.log() - begin.value.log()).abs();
+            let allowance = 2e-12
+                + tracked_relative_loss(stock.energy)?
+                + tracked_relative_loss(begin)?;
+            if stock.energy.value.is_empty() || log_delta > allowance {
+                return Err(format!(
+                    "cross-segment energy discontinuity eta={eta:.17e} a={a:.17e} b={b:.17e} log_delta={log_delta:.17e} allowance={allowance:.17e} number={:?} previous_energy={:?} begin={:?} energy_start={energy_start:.17e}"
+                    , stock.number, stock.energy, begin
+                ));
             }
         }
-        let mut o = v2::kernel(stock, q, rates, b - a, energy_start).map_err(|e| {
+        let mut o = v2::kernel_tracked(stock.number, stock.energy, q, rates, b - a, energy_start).map_err(|e| {
             format!(
                 "kernel {e}; eta={eta:.17e},a={a:.17e},b={b:.17e},Eend={:.17e}",
                 (eta - a).exp() * (-(b - a)).exp()
             )
         })?;
-        crate::record::segment(eta, a, b, y, p, stock, q, rates, energy_start, o)?;
+        crate::record::segment(eta, a, b, y, p, stock.number.readout().map_err(err)?.0, q, rates, energy_start, o)?;
         // Inspect authoritative final state before stripping stock from cumulative owners.
+        let ledger = v2::owner_ledger(o).map_err(err)?;
         let mut check = Owners::default();
         v2::try_add_scaled(&mut check, o, 1.0).map_err(|e| {
             format!(
-                "segment owner admission {e}; eta={eta:.17e},a={a:.17e},b={b:.17e},N={:.17e},U={:.17e},lnN={:?},lnU={:?}",
-                o.n, o.u, o.ln_n, o.ln_u
+                "segment owner admission {e}; eta={eta:.17e},a={a:.17e},b={b:.17e},N={:.17e},U={:.17e},lnN={:?},lnU={:?},HI_A={:?},HI_B={:?}",
+                o.n, o.u, o.ln_n, o.ln_u, ledger.terms[7].value, ledger.terms[10].value
             )
         })?;
-        let ledger = v2::owner_ledger(o).map_err(err)?;
         for i in 0..3 {
             material::photoheat_owner(
                 o.an[i],
@@ -203,14 +276,10 @@ fn characteristic_staged<F: FnMut(f64) -> Fallible<([f64; 4], FlrwPoint)>>(
                 )
             })?;
         }
-        stock = o.n;
-        last_u = Some(o.u);
-        last_pair = Some((
-            ledger.terms[0],
-            ledger.terms[1],
-            [ledger.occurrence[0], ledger.occurrence[1]],
-            [ledger.coefficient[0], ledger.coefficient[1]],
-        ));
+        stock = crate::diagnostics::PhotonNode {
+            number: ledger.terms[0],
+            energy: ledger.terms[1],
+        };
         o.n = 0.0;
         o.u = 0.0;
         v2::replace_owner_components(&mut o,&[0,1]).map_err(err)?;
@@ -219,39 +288,33 @@ fn characteristic_staged<F: FnMut(f64) -> Fallible<([f64; 4], FlrwPoint)>>(
         v2::try_add_scaled(&mut sum, o, 1.0).map_err(err)?;
     }
     if tau <= s1 {
-        sum.outn = stock;
-        sum.oute = product(
-            product(
-                HHeModel::controlled_fixture().ev_erg,
-                verner_cutoff_ev(SPECIES[0]),
-            )?,
-            stock,
-        )?;
+        let mut ledger = v2::owner_ledger(sum).map_err(err)?;
+        ledger.terms[5] = stock.number;
+        ledger.terms[6] = stock
+            .number
+            .scale(HHeModel::controlled_fixture().ev_erg * verner_cutoff_ev(SPECIES[0]))
+            .map_err(err)?;
+        sum.outn = ledger.terms[5].readout().map_err(err)?.0;
+        sum.oute = ledger.terms[6].readout().map_err(err)?.0;
+        sum.canonical = Some(ledger);
     } else {
         let mut ledger = v2::owner_ledger(sum).map_err(err)?;
-        sum.n = stock;
-        sum.u = last_u.unwrap_or(0.0);
-        crate::diagnostics::continuity(sum.u, v2::EPS * (eta - s1).exp() * stock)?;
-        if stock > 0.0 {
-            let (number, energy, occurrence, coefficient) =
-                last_pair.ok_or("missing canonical transported pair")?;
-            ledger.terms[0] = number;
-            ledger.terms[1] = energy;
-            ledger.occurrence[0] = occurrence[0];
-            ledger.occurrence[1] = occurrence[1];
-            ledger.coefficient[0] = coefficient[0];
-            ledger.coefficient[1] = coefficient[1];
-            sum.canonical = Some(ledger);
-            sum.ln_n = Some(number.value.log());
-            sum.ln_u = Some(energy.value.log())
-        }
+        ledger.terms[0] = stock.number;
+        ledger.terms[1] = stock.energy;
+        sum.n = stock.number.readout().map_err(err)?.0;
+        sum.u = stock.energy.readout().map_err(err)?.0;
+        sum.canonical = Some(ledger);
+        sum.ln_n = (!stock.number.value.is_empty()).then(|| stock.number.value.log());
+        sum.ln_u = (!stock.energy.value.is_empty()).then(|| stock.energy.value.log());
     }
     if tau <= s1 {
-        v2::replace_owner_components(&mut sum, &[0, 1, 5, 6]).map_err(err)?;
+        v2::replace_owner_components(&mut sum, &[0, 1]).map_err(err)?;
     } else {
         v2::replace_owner_components(&mut sum, &[5, 6]).map_err(err)?;
     }
-    if eta >= s1 + cfg.source.energy_max_ev.ln() && sum.n != 0.0 {
+    if eta >= s1 + cfg.source.energy_max_ev.ln()
+        && !v2::owner_ledger(sum).map_err(err)?.terms[0].value.is_empty()
+    {
         return Err("nonzero at/beyond causal source front".into());
     }
     Ok(sum)
@@ -274,7 +337,7 @@ pub fn transaction(
     let mut canonical_density = Vec::with_capacity(old.len());
     let mut min_heat = f64::INFINITY;
     for (j, &(eta, w)) in grid.nodes.iter().enumerate() {
-        let o = characteristic(cfg, p, y, eta, s0, s1, old[j])?;
+        let o = characteristic_staged(cfg, eta, s0, s1, old.canonical()[j], |_| Ok((y, p)))?;
         density.push(o.n);
         let ledger = v2::owner_ledger(o).map_err(err)?;
         canonical_density.push(crate::diagnostics::PhotonNode {
@@ -311,7 +374,7 @@ pub fn transaction_path(
     let mut min_heat = f64::INFINITY;
     for (j, &(eta, w)) in grid.nodes.iter().enumerate() {
         crate::record::node(j, w);
-        let o = characteristic_path(cfg, y0, y1, eta, s0, s1, old[j])?;
+        let o = characteristic_path_tracked(cfg, y0, y1, eta, s0, s1, old.canonical()[j])?;
         crate::record::node_output(j, o)?;
         density.push(o.n);
         let ledger = v2::owner_ledger(o).map_err(err)?;

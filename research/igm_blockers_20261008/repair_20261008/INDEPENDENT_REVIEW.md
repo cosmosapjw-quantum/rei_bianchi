@@ -1,62 +1,76 @@
-# Independent review: paired density / heat / checkpoint repair
+# Independent final review: tracked transport and 0.0008 suffix
 
-Verdict on the diff as first read in this review: **CHANGES REQUIRED for the direct-photoheat bound; scoped exploratory accepted states may be preserved. Full paired transport/error admission remains HOLD.** One read-only review pass; no new evolution, arithmetic probe, provider, observer, or test invocation. Root edits made in response during this review are not silently counted as a second reviewed revision.
+**Findings-first verdict:** the initial diff had an energy-loss handoff omission and an endpoint-only comparison scope limitation. A targeted source correction to the handoff was observed during this review; publication can remain scoped exploratory, with the full continuum/error authority HOLD. The current cutoff-entry guard also needs the small canonical-state correction below. This report distinguishes the executed pre-review binary from source edits made during the review.
 
-Paths below are under `research/igm_blockers_20261008/numeric/`.
+Review is read-only: git diff/status, local source, existing logs and JSON. No new science, provider, observer, arithmetic probe or tests were executed by this reviewer.
 
-## Findings
+## Findings and dispositions
 
-### R1 — High, direct heat's claimed coefficient bound is not justified at cancellation (new local repair required)
+### T1 — High: V3 energy discrepancy was reconciled but not propagated (targeted correction observed)
 
-`source/rei-next-nodes/short-hhe-midpoint/src/canonical_owner.rs:154–193`, especially the claim at 186–190; consumed by `material.rs:100–107`.
+`numeric/source/rei-next-nodes/short-hhe-midpoint/src/radiation.rs:24–50,250`; `canonical_owner.rs::kernel_tracked`.
 
-The implementation forms `mean_ev=energy_base_ev/count_base`, then `excess_ev=mean_ev-CHI[i]`, and assigns eight `rounding(coefficient.value)` charges to `EPS*excess_ev`. This uses the **small result's** scale to bound rounding already introduced at the **mean energy's** scale. A positive threshold gap does not remove this conditioning factor. Near the HI cutoff, mean/physical excess can differ by thousands, so a fixed eight result-ULP charge is not a general enclosure of the division/subtraction chain. `count_base` and `energy_base_ev` are also formed as bare f64 before tracking; these can themselves be subnormal and have much worse relative errors. Six final-coefficient charges for `energy_coefficient` do not enclose those inputs either.
+The initially reviewed `reconcile_node_energy` formed energy from number, added old energy loss and value discrepancy, then the caller passed only `stock.number` to the kernel. The reconciled energy uncertainty affected the continuity check and was then discarded from the next owner/node. Number loss propagation alone does not preserve the V3 energy-specific discrepancy.
 
-`photoheat_owner` relies on `heat.value > heat.loss` to authorize its fallback. Consequently this is more than an unmeasured continuum-model error: the newly claimed local arithmetic/sign bound is missing necessary terms. It does not prove the observed k16 scalar result is physically wrong, but the bound must not be presented as validated.
+During the review the root changed the kernel signature to take `stock_energy` as well: outgoing stock energy now attenuates that tracked input, redshift energy integrates it, absorbed energy derives from that integral, and heat explicitly receives the incoming energy-loss term. This addresses the identified omission at those uses by inspection. It does not certify upstream coefficient errors or establish the final source edit produced the already stored suffix; exact command/binary/result identities must distinguish the existing run from the corrected path.
 
-Minimal correction: propagate an interval or magnitude bound from count/energy-base construction through division and subtraction, charge errors at each operand's scale, and only then multiply by EPS/absorbed count. Alternatively mark the fallback as exploratory with unresolved sign/error authority until such a bound exists. Keep the stored k16 evidence; do not erase failed attempts. A focused saved-operand regression is sufficient for this correction; no broad campaign is called for.
+Minimal acceptance follow-through: retain original suffix evidence and explicitly label its loss-authority limitation, or verify the corrected path in the already authorized bounded scope. Do not overwrite old receipts or silently assign their results to the new source.
 
-### R2 — High for full paired-loss admission, known remaining transport scope: checkpointed node uncertainty is not consumed by the next characteristic
+### T2 — Medium: cutoff-entry check can erase a positive canonical tail whose scalar projection is zero
 
-`source/rei-next-nodes/short-hhe-midpoint/src/radiation.rs:274,314` and `canonical_owner.rs:89–133,210–217`.
+`numeric/source/rei-next-nodes/short-hhe-midpoint/src/radiation.rs:192–203`.
 
-`Density` now stores a `PhotonNode { number, energy }`, and gamma reads it, but both transaction functions invoke the characteristic with `old[j]`, the scalar number only. The characteristic/kernel never receives the old canonical number value or either inherited loss. The next node is re-created from new kernel output. Thus persistence/observer support does not yet implement transported canonical values and uncertainties across an advance. The same issue exists across internal segment boundaries, where `stock=o.n` is the next input.
+For `tau <= s0`, the runtime tests scalar `f != 0.0` and otherwise returns `Owners::default()`. An extended-range nonempty input with binary64 projection zero is therefore silently treated as structural empty. This is the very state distinction the new transport path introduces. The repaired replay already tests `!stock.number.value.is_empty()`.
 
-This omission exists before N becomes scalar zero: any nonzero inherited uncertainty is dropped. When scalar N eventually becomes zero the current guard correctly refuses, as witnessed by k17. Do not describe this implementation as full paired transport or cumulative loss closure. Scope the PASS to paired storage/readout and observed scalar advances. The documented next blocker must include loss propagation while N is still representable, not solely convolution after N becomes zero.
+Minimal correction: use the canonical emptiness predicate at runtime too (and preserve the existing unsupported-initial-outflow error). This is a domain-boundary defect; no evidence was seen that a valid generated suffix actually supplied such an off-domain nonempty node. No full campaign rerun is needed for this one-line guard repair.
 
-Minimal eventual repair: pass the canonical input pair/loss into the characteristic flow, transport inherited uncertainty by the positive segment coefficient, add newly incurred arithmetic uncertainty once, and persist that output. This is a follow-up implementation boundary rather than justification for repeating completed campaigns now.
+### T3 — Medium: comparison_48 certifies the endpoint, not all common history rows
 
-### R3 — Medium, non-active accepted-record replay remains inconsistent with canonical restoration
+`repair_20261008/compare_common_48.py:18–29`; `comparison_48.json`.
 
-`source/rei-next-nodes/short-hhe-midpoint/src/record.rs:63–67`.
+The script reads `endpoint_48.csv`, `endpoint_96.csv` and `endpoint_48.csv`, producing one temporal and one tail row comparison. The PHASE receipts prove integration reached the 0.0008 endpoint, but this comparison alone does not prove the original 37-field limits hold at every common intermediate epoch.
 
-Replay zeroes the segment N/U canonical components before summing. It later restores only scalar `sum.n`/`sum.u` (and scalar-derived logs), then asks `owner_ledger(sum)` to compare to a node with nonzero occurrences **before** replacing `sum.canonical` with the stored node ledger. This can still produce `canonical owner/readout mismatch` for ordinary nonempty recorded nodes, while zero-projected U can also create `ln(0)`. The transport implementation separately restores `last_pair`; replay does not reproduce that step.
+Minimal correction: label the claim `0.0008 integration complete; endpoint refinement passed`, or compare already saved coarse/tail histories with the matching even-index fine rows. This requires no new evolution. Continue to exclude full z12→10 and continuum validation.
 
-This is not the running progressive driver's k17 blocker because recording is disabled. It limits the broader V1–V3 accepted-record API compatibility claim. Restore/replay the actual final segment pair and its logs before comparison, or explicitly exclude that API from this repair's accepted scope. No fresh replay was run in this review.
+### T4 — Medium for unique accounting claims, conservative rather than false-PASS: reconcile can count correlated uncertainty twice
 
-## Checkpoint and accounting observations
+`numeric/source/rei-next-nodes/short-hhe-midpoint/src/radiation.rs:35–48`; `canonical_owner.rs` direct heat loss addition.
 
-- V3 serializes per-node tracked N/E, active loss, 13 owner terms, and the new heat ledger. Explicit V1 and V2 readers exist. The V3 write path roundtrips and compares state bytes before replacing HEAD.
-- V1 migration reconstructs energy from stored N and current node/epoch geometry rather than recovering historically measured energy uncertainty. Its legacy/historical-error limitation must remain explicit. `pair_legacy_density` also computes its new energy coefficient/product without a fresh rounding charge; this belongs in R2's unclosed uncertainty scope.
-- No evidence was found that the examined V3 serializer drops its newly added heat ledger. The old 13-term trailer preserves heat from the main state record.
-- The current thermal residual adds A/B-owner uncertainty to the direct heat bound even if the fallback is selected. Some shared input uncertainty may therefore be conservatively counted through both paths. This does not create a false PASS, and the reviewed diff does not document a unique decomposition that would support a no-double-count claim. Resolve the bound authority once when R1 is fixed rather than subtracting arbitrary terms.
+Reconciliation adds the number-derived expected-energy loss to the old energy loss. The latter generally already includes uncertainty descended from the same incoming number. After the T1 fix, heat also combines a number-derived uncertainty path with the full energy-loss path. These sums are conservative but do not establish non-duplicated uncertainty accounting. Repeated reconciliation may unnecessarily inflate bounds.
 
-## Existing execution evidence and claim ceiling
+Minimal scope correction: call the result a conservative enclosure and avoid a unique/no-double-count claim. If nonduplication is required, retain a decomposition of shared number-induced and independent energy-specific terms; do not subtract guessed overlaps. For the reconciliation union alone, a maximum of separately valid enclosures after shifting centers can avoid an unnecessary sum, but that requires its invariant to be specified first. This is not evidence that the stored scalar evolution is wrong.
 
-- `repair-coarse-suffix-v3f.log` records accepted k15, observer sigma 9624, original gates `[0.6463509202763655,0.0013558191017777456,0.0074689617368987465]`.
-- `repair-coarse-suffix-v3i.log` records accepted k16, observer sigma 9624, gates `[0.6485470105119698,0.0015511531159999056,0.007448008134352242]`.
-- `repair_20261008/runs/coarse-suffix-v3i/FAILURE_17.json` preserves the actual next failure: finite `lnN=-748.5203313766382`, `lnU=-773.0631346468055`, scalar N/U zero, `authoritative tail is not empty`, last_step 16, attempted_step 17, counts `[4,3,1]`, `state_unchanged=true`. This is appropriate fail-closed behavior; no silent tail deletion is evident.
-- `comparison_14.json` explicitly limits its PASS to the common k14/28/14 epoch. That does not certify k15/k16 temporal/tail refinement or the whole suffix.
-- The TASK_RETURN read during review retains full-z12→10 and continuum NOT_REACHED and physical HOLD. These ceilings are appropriate. Rename/qualify `PAIRED_PATH_AND_K16_PASS` and `paired_common_and_k16=PASS_SCOPED` if they could be read as admission of the currently unclosed R1/R2 bounds; runner acceptance and error enclosure are different evidence.
+## Items that now look correct in the reviewed scope
 
-Review performed only with `git status`, `git diff`, source reads and existing logs/JSON. Several exploratory source/log variants are retained and should remain historical. No repository file was modified by this reviewer; only this `/tmp` review artifact was written. This pass ends here.
+- The active transaction passes `old.canonical()[j]`; segment-to-segment input is the tracked output. Positive number stock below the binary64 floor survives the `tracked_scale` / `tracked_add` value path, while inherited number loss participates in those operations.
+- Stock and source are separate positive terms in the characteristic convolution; source is not folded into old stock or added twice. Each emitted owner still has its distinct source formula. Coefficients are evaluated in binary64 and treated as the scoped given coefficients; exp/integral/provider approximation authority remains unclosed. In particular, a coefficient itself underflowing to zero at a much larger optical depth is not automatically solved by scaling the stock.
+- `record.rs` now correctly maps durable scalar order `N,U,QN,QE,red,...` to ledger order with `[0,1,3,4,2,5,6,7,8,9,10,11,12]`.
+- Replay retains the final segment's canonical number/energy pair, restores its canonical logs, and applies the same outflow routing before comparing node ledgers. This repairs the previous scalar-only final-pair restoration defect.
+- `repair-record-replay-live-b.log` records two actual midpoint acceptances and leaves full-Wide admission HOLD. It is existing evidence, not a run performed by this reviewer.
+- V3 persistence carries the tracked fields; this final diff does not replace the codec or silently remigrate old HEAD files.
 
-## Targeted correction verification within this review (one repair response)
+## Existing suffix evidence and correct claim ceiling
 
-The root implemented a targeted response to R1. I read only the changed coefficient-bound block and the existing `repair-coarse-review-fix-v3j.log`; no new computation was run by this reviewer.
+The stored phase receipts report:
 
-- The coefficient now additionally includes `64 * rounding(mean_ev) * EPS` before the excess-scale operation charges. This corrects the specific mistake of bounding division/subtraction only at the small excess scale **when the stored count_base and energy_base_ev are treated as the given rounded inputs**.
-- The comments now explicitly limit this to representation arithmetic and leave wider kernel/provider authority unresolved. Formation error of count_base/energy_base_ev, including their subnormal rounding and incoming-state uncertainty, remains outside this local bound. The 64-ULP allowance does not certify those earlier operations. This is the already documented upstream scope, not a request for another expanded review cycle.
-- The existing rerun log records k15→k16 accepted at the same displayed three gate maxima, exit reported successful by the root. It records one new advance, provider/observer/RHS costs, and physical HOLD. The earlier k17 failure artifact remains untouched.
+| Branch | completed new suffix | last epoch | max original three gates |
+|---|---:|---:|---|
+| coarse | 17→48, 31 advances | −2.564149357461537 | 0.7422992, 0.00594034, 0.00742653 |
+| fine | 34→96, 62 advances | −2.564149357461537 | 0.3719737, 0.00613533, 0.00746802 |
+| tail | 17→48, 31 advances | −2.564149357461537 | 0.8776295, 0.00656331, 0.00769745 |
 
-**Final disposition:** the specific local R1 scale error is corrected for the declared rounded-input arithmetic scope. Accept publication as a scoped exploratory paired-storage/observer/restart and k16 execution result, with R2 (full transported value/loss handoff), upstream kernel enclosure, R3 (inactive accepted-record replay compatibility), and full evolution/continuum admission remaining HOLD. Do not describe this correction as a full kernel or cumulative representation-error proof. One review plus this one targeted correction verification is complete.
+Existing `repair-comparison-48b.log` reports endpoint temporal maximum allowance ratio 0.023932797389989293, tail 4.080871757717751e-12, and source ratios below 0.197. The corrected source comparison subtracts prior from final cumulative Simpson integrals, consistent with the resumed suffix's emitted-owner difference. These observations support the stated endpoint discrete comparison for that run.
+
+The inspected TASK_RETURN was still the prior k16 closeout, so the new closeout must be updated rather than presented as already audited current documentation. Report new execution counts and per-binary evidence, preserve all k17 diagnostic failures and costs, retain `NOT_REACHED_FULL_Z12_TO10`, `NOT_VALIDATED` continuum and physical HOLD. Neither this completed short horizon nor replay success closes spectral reconstruction, original-kernel/provider/state uncertainty, historical prefix errors or global residual/Jacobian propagation.
+
+No repository files were modified by this reviewer. Only this `/tmp` report was created. Findings have been sent to the root; this one review pass is complete.
+
+## Targeted correction verification (single requested follow-up)
+
+Read only the changed `kernel_tracked` block, cutoff-entry branch, and `compare_common_48.py`. No code execution, new numerical calculation, provider call, or additional review scope was introduced.
+
+1. **Energy handoff corrected.** `kernel_tracked(stock, stock_energy, ...)` now propagates the carried energy through outgoing U and redshift-energy integration; B is scaled from that tracked redshift integral. Consequently the V3 discrepancy/loss carried by `reconcile_node_energy` is no longer discarded before those owners. The direct positive heat certificate is explicitly reconstructed from tracked photon number and source with its own positive coefficients. It no longer adds the separate carried-energy loss a second time to this independent reconstruction. This confirms the requested path correction; upstream coefficient/model error authority remains outside it.
+2. **Cutoff-entry corrected.** The early `tau <= s0` branch now checks `!initial.number.value.is_empty()`. A nonempty canonical tail with scalar projection zero is refused rather than returned as structural empty. This resolves T2.
+3. **32-row alignment corrected.** The driver histories contain newly accepted rows after the first index: coarse `history_16_48` is k17…48; fine `history_28_96` starts at k29, so slice `[5::2]` selects k34,36,…96, matching coarse k17…48; tail `history_14_48` starts at k15, so `[2:]` selects k17…48. Each selection has 32 rows. The script now compares these histories and explicitly labels that scope, resolving the endpoint-only limitation T3. It does not claim these 32 rows include every earlier historical epoch or full z12→10.
+
+**Targeted disposition:** T1's missing handoff, T2 and T3 are corrected by source inspection. The direct-heat duplicate addition identified during T1 repair is removed. The earlier T4 observation about conservative overlap inside reconciliation itself still limits a broad claim of globally unique uncertainty accounting; it does not invalidate the corrected path as a conservative scoped implementation. Execution receipts for the corrected source and the existing full-claim HOLD remain the root's closeout responsibility. This requested correction check is complete without further tests or scope expansion.
