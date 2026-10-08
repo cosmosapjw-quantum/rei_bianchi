@@ -3,7 +3,41 @@ on: [push, pull_request]
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CARGO_BUILD_JOBS: 1
+      RUST_TEST_THREADS: 1
     steps:
       - uses: actions/checkout@v4
       - run: cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check
-      - run: cargo test --manifest-path rust/rei_microphysics/Cargo.toml --workspace --locked
+      - name: Rust workspace tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -t 900
+          cargo test --manifest-path rust/rei_microphysics/Cargo.toml --workspace --locked --jobs 1
+      - name: Verify frozen IGM handoff package
+        run: python3 research/igm_handoff_20261008/scripts/verify_package.py
+      - name: Replay IGM handoff and read-only rate receiver
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -t 900
+          replay_root=$(mktemp -d)
+          python3 research/igm_handoff_20261008/scripts/reproduce.py --output "$replay_root/handoff"
+          python3 research/igm_rate_export01_20261008/reproduce.py --output "$replay_root/rate-export"
+      - name: Actual BASS and REC consumer checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -t 900
+          consumer_root=$(mktemp -d)
+          python3 research/igm_blockers_20261008/bass/verify.py --output "$consumer_root/bass"
+          python3 -m unittest discover -s research/igm_blockers_20261008/rec -p 'test_*.py' -v
+          python3 research/igm_blockers_20261008/rec/adapter.py --output "$consumer_root/rec"
+      - name: Canonical owner and residual regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -t 900
+          cargo test --manifest-path research/igm_blockers_20261008/numeric/source/rei-next-nodes/short-hhe-midpoint/Cargo.toml --lib --locked --jobs 1

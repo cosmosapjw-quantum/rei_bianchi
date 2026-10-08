@@ -1,0 +1,251 @@
+{
+  "task": "HH-ENERGY04",
+  "status": "SCOPED_PROJECTED_ENDPOINT_SOURCE_VERIFIED",
+  "verification": {
+    "task": "HH-ENERGY04",
+    "status": "SCOPED_PROJECTED_ENDPOINT_SOURCE_VERIFIED",
+    "unit_tests": 13,
+    "external_consumer_tests": 3,
+    "assertion_RED_GREEN": 1,
+    "tests_after": 15,
+    "independent_checks": 1587,
+    "new_projected_root_families": 2,
+    "new_point_dataset": 8,
+    "independent_reference_roots_unique": 8,
+    "science_probe_invocations": 2,
+    "new_root_evaluations_all_probes": 4,
+    "new_source_point_calls_all_science_probes": 20,
+    "origin_point_calls_all_science_probes": 8,
+    "independent_roots_all_verifier_runs": 16,
+    "unit_source_calls": "NOT_INSTRUMENTED",
+    "fresh_commands": [
+      {
+        "label": "unit_compile",
+        "argv": [
+          "/mnt/data/rust-1.94.1-prefix/bin/rustc",
+          "--edition=2021",
+          "--test",
+          "native/endpoint_lib.rs",
+          "-o",
+          "build/unit"
+        ],
+        "exit": 0,
+        "seconds": 0.9681151890000592,
+        "stderr_bytes": 0
+      },
+      {
+        "label": "unit",
+        "argv": [
+          "build/unit",
+          "endpoint_api"
+        ],
+        "exit": 0,
+        "seconds": 1.5224769310000283,
+        "stderr_bytes": 0
+      },
+      {
+        "label": "library_compile",
+        "argv": [
+          "/mnt/data/rust-1.94.1-prefix/bin/rustc",
+          "--edition=2021",
+          "--crate-type",
+          "rlib",
+          "--crate-name",
+          "hh_energy04",
+          "native/endpoint_lib.rs",
+          "-o",
+          "build/libhh_energy04.rlib"
+        ],
+        "exit": 0,
+        "seconds": 0.9204539850001083,
+        "stderr_bytes": 0
+      },
+      {
+        "label": "external_compile",
+        "argv": [
+          "/mnt/data/rust-1.94.1-prefix/bin/rustc",
+          "--edition=2021",
+          "--test",
+          "native/endpoint_external.rs",
+          "--extern",
+          "hh_energy04=build/libhh_energy04.rlib",
+          "-o",
+          "build/external"
+        ],
+        "exit": 0,
+        "seconds": 0.11401739799998722,
+        "stderr_bytes": 0
+      },
+      {
+        "label": "external",
+        "argv": [
+          "build/external"
+        ],
+        "exit": 0,
+        "seconds": 0.8667646820000527,
+        "stderr_bytes": 0
+      },
+      {
+        "label": "probe_compile",
+        "argv": [
+          "/mnt/data/rust-1.94.1-prefix/bin/rustc",
+          "--edition=2021",
+          "-C",
+          "opt-level=2",
+          "native/endpoint_main.rs",
+          "-o",
+          "build/probe"
+        ],
+        "exit": 0,
+        "seconds": 1.7960376370000404,
+        "stderr_bytes": 0
+      },
+      {
+        "label": "probe",
+        "argv": [
+          "build/probe"
+        ],
+        "exit": 0,
+        "seconds": 0.26472808500000156,
+        "stderr_bytes": 0
+      },
+      {
+        "label": "checker",
+        "argv": [
+          "/opt/pyvenv/bin/python",
+          "-B",
+          "research/verify_endpoint.py"
+        ],
+        "exit": 0,
+        "seconds": 2.022552859999905,
+        "stderr_bytes": 0
+      }
+    ],
+    "fresh_numerical_files_equal": {
+      "NATIVE.jsonl": true,
+      "ENDPOINT_CHECKS.json": true
+    },
+    "old_source_native_files_unchanged": 37,
+    "new_history_steps": 0,
+    "new_Cargo_full_crate_suites": 0,
+    "old_science_suites_reexecuted": false,
+    "same_parameter_two_stage_sign_certified": false,
+    "native_root_interval_trust": "inherited outward interval and AD, not formally verified",
+    "physical_admission": false,
+    "production_admission": false,
+    "patch_files": 9,
+    "patch_apply_verified": true,
+    "packaging_failure_preserved": true
+  },
+  "numerics": {
+    "task": "HH-ENERGY04",
+    "status": "SCOPED_PROJECTED_ENDPOINT_SOURCE_VERIFIED",
+    "checks": 1587,
+    "new_root_families": 2,
+    "independent_reference_roots": 8,
+    "mp_dps": 70,
+    "max_scaled_point_reference_error": "0.0000000000000001755781701699337005784596335176842226599712496616997342558795033898233",
+    "max_reference_residual_diagnostic": "3.924375665788833791418605677204865897893000287941641046948342882222251e-62",
+    "max_recomputed_contraction": 1.2677044200169154e-08,
+    "root_proofs": [
+      {
+        "mode": "OFF",
+        "q_exact": "1367089740158537786066336977412961674067270272689969207196651/107839786668602559178668060348078522694548577690162289924414440996864",
+        "q_display": 1.2677044181844293e-08
+      },
+      {
+        "mode": "LCS",
+        "q_exact": "1367089742134686975007010216132169500907361551836152308781403/107839786668602559178668060348078522694548577690162289924414440996864",
+        "q_display": 1.2677044200169154e-08
+      }
+    ],
+    "max_source_photon_relative_ledger": 8.621739039617157e-17,
+    "max_source_energy_relative_ledger": 1.0114810984526461e-16,
+    "max_composed_energy_relative_ledger": 1.0145701506766821e-16,
+    "projection_point_controls": [
+      {
+        "mode": "OFF",
+        "projected_minus_unprojected_point_h": 5.570733874193934e-10,
+        "projected_minus_unprojected_point_w_eV_per_H": -6.87805368215777e-12,
+        "end_Gamma_difference": 1.0276395532932043e-17
+      },
+      {
+        "mode": "LCS",
+        "projected_minus_unprojected_point_h": 5.570729433301835e-10,
+        "projected_minus_unprojected_point_w_eV_per_H": -6.87805368215777e-12,
+        "end_Gamma_difference": 1.0276395533033017e-17
+      }
+    ],
+    "two_source_chain_point_delta_h": 1.991647957666487e-10,
+    "independent_chain_h_interval": [
+      -2.2562325341368705e-09,
+      2.654562125670168e-09
+    ],
+    "chain_sign_certified": false,
+    "new_same_parameter_lambda_chain_proof": false,
+    "full_macro_accepted": false,
+    "continuous_error": null,
+    "physical_admission": false,
+    "trust": "inherited outward interval+AD; exact K algebra; highprecision point tests corroborate, not second complete interval backend",
+    "density_semantics": "computed binary64 point fixed in source family; enclosing real exp arithmetic is separately checked"
+  },
+  "source_scope": {
+    "profile": "HH_ENERGY04_PROJECTED_ENDPOINT_NO_BIRTH_V1",
+    "gas_input_time_s": 160625000000.0,
+    "photon_input_time_s": 161250000000.0,
+    "dt_s": 625000000.0,
+    "source_density_cm3": 9.951741818585369e-05,
+    "density_parameter": "fixed f64 derived point; exact exp enclosure corroboration separate",
+    "modes": [
+      "OFF",
+      "LCS"
+    ],
+    "shared_lambda": "explicitly rejected, linked predecessor tangent not implemented",
+    "old_gas": "origin numerical point and carried root family, no pre-cooling",
+    "photon_input": "all 33 projected nodes/counts with inherited parameter relation retained",
+    "external_births": 0,
+    "thermal_work": "BE -2Hw exactly once",
+    "radiation_work": "immutable already-computed transport sidecar, not re-applied",
+    "guard": "new lower guard from selected25measure only, inert through chemistry",
+    "public": [
+      "endpoint_source",
+      "Endpoint::verify_for",
+      "Endpoint::root",
+      "Endpoint::carry",
+      "Endpoint::observables",
+      "Endpoint::kernel_identity",
+      "commit_endpoint"
+    ],
+    "private_output": true,
+    "serialization": "NOT_IMPLEMENTED",
+    "implicit_PairedState_conversion": false,
+    "parameter_correlation": "original relation retained, root consumes conservative gas/count rectangle",
+    "numerical_point": "standard point, no original compensation inherited",
+    "root": "same original fixed-node hh_stage_root+hh_return_enclosure at new stage/input",
+    "not_admitted": [
+      "new fullmacro acceptance",
+      "birthsource policy",
+      "Bianchi directional transport",
+      "uniform density parameter",
+      "linked lambda-chain",
+      "continuous time or spectral error",
+      "physical rate accuracy",
+      "production checkpoint"
+    ]
+  },
+  "legacy": {
+    "accepted": 24,
+    "total": 289,
+    "unbounded": 265,
+    "epsilon_C": null,
+    "epsilon_R": null,
+    "B22": "OPEN_UNDETERMINED",
+    "consumed_scopes": "PRESERVED"
+  },
+  "HH": "ACTIVE",
+  "canonical_S0": "OFF_CONTROL_UNCHANGED",
+  "checkpoint": "ON06G total256 at3.2e11 unchanged",
+  "Git_mutation": false,
+  "backup_state_at_seal": "PENDING_DETACHED_PROVIDER_RECEIPT_AUTHORITY",
+  "next": "HH-ENERGY05_CORRELATED_TWO_SOURCE_TANGENT"
+}
