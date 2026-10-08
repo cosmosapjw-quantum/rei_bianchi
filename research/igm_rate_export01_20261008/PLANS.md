@@ -1,0 +1,1 @@
+Completed: exact PR87 baseline; PR88 unchanged delta import; portable readout; BASS/REC schema fixtures; latest owner return intake; independent review; one R1 metadata repair/regression and reviewed closeout. Remaining executable action: draft publication to IGM target and link receipt. No native campaign replay.

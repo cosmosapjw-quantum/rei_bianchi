@@ -1,0 +1,163 @@
+{
+  "task": "HH-ENERGY03_FIXED_GRID_PARAMETER_REMAP",
+  "state": "SCOPED_REMAP_AND_BRANCHWISE_KERNEL_ENCLOSURES_VERIFIED",
+  "date_kst": "2026-10-08",
+  "new_native_tests": 23,
+  "external_consumer_tests": 3,
+  "observed_RED_tests": 4,
+  "other_tests_not_RED_first": 22,
+  "wrong_fixture_failure_preserved": true,
+  "independent_checks": 20390,
+  "check_groups": {
+    "algebra": 253,
+    "root_algebra": 27,
+    "curvature_samples": 96,
+    "identity": 10,
+    "transport": 459,
+    "hat_uniform": 14850,
+    "conservation": 1077,
+    "kernel_samples": 3096,
+    "counts": 297,
+    "readout": 216,
+    "result": 6,
+    "symbolic": 3
+  },
+  "source_receipt_families_in_final": 3,
+  "passive_maps_in_final": 9,
+  "fresh_commands": {
+    "rustc": "rustc 1.94.1 (e408947bf 2026-03-25)",
+    "rustc_sha256": "ef6d716e5d1c6c93def277c0afa037c21e7a74f7de3aed4ee0700646c3301b1d",
+    "commands": [
+      {
+        "step": "unit_compile",
+        "argv": [
+          "/mnt/data/rust-1.94.1-prefix/bin/rustc",
+          "--edition=2021",
+          "--test",
+          "native/remap_lib.rs",
+          "-o",
+          "build/unit"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.9191343470000675,
+        "stderr_bytes": 0
+      },
+      {
+        "step": "unit",
+        "argv": [
+          "build/unit",
+          "remap_api"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.36465636100001575,
+        "stderr_bytes": 0
+      },
+      {
+        "step": "library_compile",
+        "argv": [
+          "/mnt/data/rust-1.94.1-prefix/bin/rustc",
+          "--edition=2021",
+          "--crate-type",
+          "rlib",
+          "--crate-name",
+          "hh_energy03",
+          "native/remap_lib.rs",
+          "-o",
+          "build/libhh_energy03.rlib"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.9207689600000322,
+        "stderr_bytes": 0
+      },
+      {
+        "step": "external_compile",
+        "argv": [
+          "/mnt/data/rust-1.94.1-prefix/bin/rustc",
+          "--edition=2021",
+          "--test",
+          "native/remap_external.rs",
+          "--extern",
+          "hh_energy03=build/libhh_energy03.rlib",
+          "-o",
+          "build/external"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.11397127400005047,
+        "stderr_bytes": 0
+      },
+      {
+        "step": "external",
+        "argv": [
+          "build/external"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.4656256989999292,
+        "stderr_bytes": 0
+      },
+      {
+        "step": "probe_compile",
+        "argv": [
+          "/mnt/data/rust-1.94.1-prefix/bin/rustc",
+          "--edition=2021",
+          "-C",
+          "opt-level=2",
+          "native/remap_main.rs",
+          "-o",
+          "build/probe"
+        ],
+        "exit": 0,
+        "elapsed_s": 1.782407954000064,
+        "stderr_bytes": 0
+      },
+      {
+        "step": "probe",
+        "argv": [
+          "build/probe"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.2647404550000374,
+        "stderr_bytes": 0
+      },
+      {
+        "step": "checker",
+        "argv": [
+          "/opt/pyvenv/bin/python",
+          "-B",
+          "research/verify_remap.py"
+        ],
+        "exit": 0,
+        "elapsed_s": 1.7250275000000101,
+        "stderr_bytes": 0
+      }
+    ]
+  },
+  "fresh_numeric_byte_parity": {
+    "NATIVE.jsonl": {
+      "byte_equal": true,
+      "sha256": "2e0ca00f8c2e304d19e14e611c5a11a524f9a42138f09ee7a99345db3ace400c"
+    },
+    "REMAP_CHECKS.json": {
+      "byte_equal": true,
+      "sha256": "6c6f2b879304dc24a789a3b5774db9ebdbfacdf2925aeceb0992d7b37b3214c5"
+    }
+  },
+  "inherited_source_files_unchanged": 31,
+  "new_nonlinear_history_steps": 0,
+  "new_coupled_next_stages": 0,
+  "new_independent_BE_root_finders": 0,
+  "original_scientific_suites_replayed": false,
+  "science_probe_invocations_including_development_and_reproduction": 4,
+  "science_receipt_issue_calls_total": 12,
+  "science_original_source_point_calls_total": 24,
+  "test_internal_source_call_count": "NOT_INSTRUMENTED",
+  "new_rate_evaluation": "interval kernel/energy derivatives and scalar point readout, not claimed zero",
+  "same_rustc_sha_as_parent": "ef6d716e5d1c6c93def277c0afa037c21e7a74f7de3aed4ee0700646c3301b1d",
+  "toolchain_signature_reverified": false,
+  "directional_Bianchi_state": "NOT_RECONSTRUCTED",
+  "canonical_paired_runtime_modified": false,
+  "physical_admission": false,
+  "production_admission": false,
+  "interval_AD_trust": "inherited; no second complete interval backend or proof assistant",
+  "independent_scientific_reviewer": "NOT_RUN",
+  "git_mutation": false
+}
