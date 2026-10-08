@@ -1,9 +1,9 @@
 {
-  "schema": "igm-heat-range-repair/v1",
-  "task": "IGM-HEAT-RANGE-REPAIR-20261008",
-  "status": "LOCAL_HEAT_REPAIR_PASS__PAIRED_NODE_PATH_HOLD",
-  "source_HEAD": "ddf125732854f4365e000b013c4bb78970ac6fcd",
-  "implementation_commit": "f657ccb",
+  "schema": "igm-paired-owner-repair/v2",
+  "task": "IGM-PAIRED-OWNER-AND-HEAT-REPAIR-20261008",
+  "status": "PAIRED_STORAGE_OBSERVER_RESTART_AND_K16_EXECUTION_PASS__TRACKED_TRANSPORT_HOLD",
+  "source_HEAD": "b0bb3d88c75ab786c74c1912c22c2d13acf477de",
+  "implementation_commit": null,
   "branch": "research/igm-rate-export-followup-20261008",
   "PR": 89,
   "PR_target": "forward/rem-hhe-igm-20261006",
@@ -12,91 +12,157 @@
   "source_provider_closure_tolerances": "UNCHANGED",
   "IGM_default": "OFF_UNCHANGED",
   "implemented": [
-    "dedicated finite signed photoheat operation accepting certified-positive subnormals",
-    "coefficient/product/subtraction/sum rounding bound charged once to thermal residual",
-    "conditional algebraic energy-absorption reassociation at nonnormal shared projection",
-    "finite nonnegative transported subnormal input admission without zeroing"
+    "paired canonical photon number/energy storage through density observer and restart",
+    "canonical owner loss occurrence coefficient and direct positive photoheat owner for rounded kernel operands",
+    "checkpoint V3 with explicit V1 and V2 readers",
+    "range-boundary fallback only when historical A/B subtraction cannot resolve sign"
   ],
-  "tests": {
-    "locked_library": {"passed": 12, "failed": 0},
-    "repository_rust_workspace": "PASS",
-    "repository_rust_fmt": "PASS",
-    "saved_heat_bits": "0002bdc74d339a20",
-    "normal_heat_and_kernel_bit_parity": "PASS",
-    "negative_uncertain_structural_zero": "PASS",
-    "exact_fraction_fixture": "PASS",
-    "git_diff_check": "PASS",
-    "package_cargo_fmt_check": "BASELINE_FAILS_ON_PRESERVED_COMPACT_RESEARCH_FILES",
-    "modified_material_rustfmt_check": "PASS"
-  },
+  "commands": [
+    {
+      "command": "python3 research/igm_handoff_20261008/scripts/verify_package.py",
+      "exit": 0
+    },
+    {
+      "command": "python3 research/igm_handoff_20261008/scripts/reproduce.py --output /tmp/igm-reproduce-final.bbRwqU/handoff",
+      "exit": 0
+    },
+    {
+      "command": "python3 research/igm_rate_export01_20261008/reproduce.py --output /tmp/igm-reproduce-final.bbRwqU/rate-export",
+      "exit": 0
+    },
+    {
+      "command": "python3 research/igm_blockers_20261008/bass/verify.py --output /tmp/igm-consumer-final.ZwnVJi/bass",
+      "exit": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s research/igm_blockers_20261008/rec -p 'test_*.py' -v",
+      "exit": 0
+    },
+    {
+      "command": "python3 research/igm_blockers_20261008/rec/adapter.py --output /tmp/igm-consumer-final.ZwnVJi/rec",
+      "exit": 0
+    },
+    {
+      "command": "cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check",
+      "exit": 0
+    },
+    {
+      "command": "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --workspace --locked --jobs 1",
+      "exit": 0
+    },
+    {
+      "command": "cargo test --manifest-path research/igm_blockers_20261008/numeric/source/rei-next-nodes/short-hhe-midpoint/Cargo.toml --lib --locked --jobs 1",
+      "exit": 0,
+      "tests": "16 passed"
+    },
+    {
+      "command": "cargo fmt --manifest-path research/igm_blockers_20261008/numeric/source/rei-next-nodes/short-hhe-midpoint/Cargo.toml --all -- --check",
+      "exit": 1,
+      "classification": "BASELINE_PRESERVED_COMPACT_SNAPSHOT_FORMATTING"
+    }
+  ],
   "accepted": {
-    "new_advances": 5,
-    "first_common": {"coarse": 12, "fine": 24, "tail": 12, "ln_a": -2.5644493574615366, "redshift": 11.993501624729198},
-    "extra_coarse": 13,
-    "comparison_12": "comparison_12.json",
-    "worst_temporal_allowance_ratio": 0.023877179614106396,
-    "worst_tail_allowance_ratio": 1.1305353909436463e-12
+    "this_followup_new_advances": 9,
+    "cumulative_repair_advances": 14,
+    "common": {
+      "coarse": 14,
+      "fine": 28,
+      "tail": 14,
+      "comparison": "comparison_14.json",
+      "passed": true
+    },
+    "suffix_coarse": [
+      15,
+      16
+    ],
+    "worst_temporal_allowance_ratio": 0.023882550275375468,
+    "worst_tail_allowance_ratio": 9.736692500318166e-13
   },
   "first_unresolved": {
     "branch": "coarse",
-    "attempted_step": 14,
-    "last_accepted_step": 13,
-    "reason": "paired readout requires extended material path",
+    "attempted_step": 17,
+    "last_accepted_step": 16,
+    "last_epoch": -2.5644160241282035,
+    "reason": "authoritative tail is not empty: scalar N/U are zero while canonical lnN/lnU are finite",
     "state_unchanged": true,
-    "repeated_attempt_counts_each": [5, 4, 1]
+    "counts": [
+      4,
+      3,
+      1
+    ],
+    "evidence": "runs/coarse-suffix-v3i/FAILURE_17.json"
   },
-  "new_native_counts": {
-    "RHS": 214296,
-    "provider_sigma": 731032,
-    "coupled_evaluations": 68,
-    "observer_sigma_subset": 49272,
-    "isolated_diagnostic_provider_sigma": 3,
-    "isolated_diagnostic_kernel": 1,
-    "history_writes_for_original_checkpoints": 0,
+  "additional_observer_provider_cost": {
+    "common_coarse_phase_counts_with_observer": [
+      41858,
+      144673,
+      13
+    ],
+    "common_fine_phase_counts_with_observer": [
+      167221,
+      549193,
+      52
+    ],
+    "common_tail_phase_counts_with_observer": [
+      93907,
+      313753,
+      26
+    ],
+    "observer_sigma_common_success": 69672,
+    "observer_sigma_k15_k16_success": 19248,
+    "bounded_receipts_current_followup": 20,
+    "bounded_receipt_cpu_s": 4.225503,
+    "bounded_receipt_wall_s": 4.672247835987946,
+    "failed_attempt_counts": "preserved per receipt/log; not reset or folded into success counts",
     "reserved_owner_recomputations": 0
   },
-  "measured_bounded_process": {
-    "cpu_s": 8.629478,
-    "wall_s": 8.93752,
-    "unmeasured": "interactive locked test and k14 diagnostic compile/run; not counted as zero"
-  },
+  "negative_tests": [
+    "epoch/source/provider mismatch rejection retained",
+    "structural paired-owner mismatch rejected",
+    "negative and uncertainty-straddling photoheat rejected",
+    "canonical positive heat may project to scalar zero without becoming structural zero",
+    "checkpoint checksum/schema/trailing/roundtrip checks retained",
+    "rejected k17 state byte image unchanged"
+  ],
   "preservation": {
-    "original_numeric_HEAD_and_FAILURE_sha256": "unchanged; see audit TASK_RETURN and current sha256 command",
+    "original_checkpoints": "UNCHANGED",
+    "historical_failures": "PRESERVED",
     "completed_190_step_and_0004": "NOT_RERUN",
-    "PR86_PR88_copies": "UNCHANGED",
-    "historical_costs_and_failures": "PRESERVED"
+    "PR86_PR88_sources": "UNCHANGED",
+    "PR85_log_tail_and_PR86_canonical_wide": "NOT_REPLACED"
   },
   "review": {
     "path": "INDEPENDENT_REVIEW.md",
-    "decision": "PASS_LOCAL_HEAT_REPAIR__HOLD_FULL_CONTINUATION",
+    "decision": "SCOPED_EXPLORATORY_PUBLICATION_ACCEPTED__FULL_TRANSPORT_AND_ERROR_AUTHORITY_HOLD",
     "rounds": 1,
-    "repair_closeout_rounds": 1
-  },
-  "remote_CI": {
-    "tested_HEAD": "18836595323b9f1368c338ac9ebc146f9d936a00",
-    "push_run": 37766908466,
-    "pull_request_run": 37766913382,
-    "status": "BOTH_COMPLETED_SUCCESS"
-  },
-  "publication": {
-    "push_exit": 0,
-    "draft_PR_updated": true,
-    "merge": false
+    "targeted_correction_verifications": 1,
+    "findings": [
+      "R1 mean-scale cancellation allowance corrected",
+      "R2 canonical value/loss not consumed by next characteristic remains blocker",
+      "R3 inactive accepted-record replay compatibility remains blocker"
+    ]
   },
   "remaining_blockers": [
-    "paired per-node N/E authority through quadrature weighting, density state, observer and checkpoint",
-    "raw kernel/provider/state and historical-prefix error enclosure incomplete",
-    "0.0008 suffix and later horizons incomplete",
-    "flat next-horizon append orchestration not connected",
-    "spectral reconstruction, source integration and time residual/Jacobian bounds incomplete",
-    "joint six-moment nonlinear remainder unknown",
-    "REC Gate I and matched evolution HOLD; BASS outside-window cosmic optical depth UNKNOWN"
+    "Tracked/Wide transported stock and source convolution after scalar photon number reaches zero",
+    "canonical incoming value/loss propagation is absent even before scalar underflow",
+    "inactive accepted-record replay does not yet restore final canonical segment pair before comparison",
+    "full 0.0008 suffix and later horizons",
+    "raw kernel/provider/state and historical-prefix error enclosure",
+    "spectral reconstruction source integration and time residual/Jacobian bounds",
+    "joint six-moment nonlinear remainder",
+    "REC Gate I and matched evolution HOLD; BASS outside-window optical depth UNKNOWN"
   ],
   "scientific_admission": {
-    "local_repair": "PASS",
-    "first_common_discrete_row": "PASS_SCOPED",
+    "paired_common_and_k16": "RUNNER_ACCEPTED_SCOPED__ERROR_AUTHORITY_HOLD",
     "MANUFACTURED_MODEL_DISCRETE_REFINEMENT_PASS": "NOT_REACHED_FULL_Z12_TO10",
     "MANUFACTURED_MODEL_CONTINUUM_VALIDATED": "NOT_REACHED",
     "physical": "HOLD"
+  },
+  "remote_CI": {
+    "status": "PENDING_PUSH"
+  },
+  "publication": {
+    "draft_PR_updated": false,
+    "merge": false
   }
 }

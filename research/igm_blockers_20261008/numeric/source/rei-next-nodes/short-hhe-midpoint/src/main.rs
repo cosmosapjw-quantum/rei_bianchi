@@ -61,7 +61,7 @@ fn frozen(cfg: &HistoryConfig) -> Fallible<bool> {
                 y,
                 cfg.start,
                 s1,
-                &vec![0.; grid.nodes.len()],
+                &short_hhe_control::diagnostics::Density::new(vec![0.; grid.nodes.len()]),
             )?;
             let o = a.owners;
             let nres = o.n + o.an.iter().sum::<f64>() + o.outn - o.qn;

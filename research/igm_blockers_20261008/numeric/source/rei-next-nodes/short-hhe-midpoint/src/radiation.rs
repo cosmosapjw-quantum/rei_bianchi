@@ -141,6 +141,7 @@ fn characteristic_staged<F: FnMut(f64) -> Fallible<([f64; 4], FlrwPoint)>>(
     let cuts = v2::topology(s0, end, &events);
     let mut stock = f;
     let mut last_u: Option<f64> = None;
+    let mut last_pair = None;
     let mut sum = Owners::default();
     for ab in cuts.windows(2) {
         let (a, b) = (ab[0], ab[1]);
@@ -181,16 +182,35 @@ fn characteristic_staged<F: FnMut(f64) -> Fallible<([f64; 4], FlrwPoint)>>(
         crate::record::segment(eta, a, b, y, p, stock, q, rates, energy_start, o)?;
         // Inspect authoritative final state before stripping stock from cumulative owners.
         let mut check = Owners::default();
-        v2::try_add_scaled(&mut check, o, 1.0).map_err(err)?;
+        v2::try_add_scaled(&mut check, o, 1.0).map_err(|e| {
+            format!(
+                "segment owner admission {e}; eta={eta:.17e},a={a:.17e},b={b:.17e},N={:.17e},U={:.17e},lnN={:?},lnU={:?}",
+                o.n, o.u, o.ln_n, o.ln_u
+            )
+        })?;
+        let ledger = v2::owner_ledger(o).map_err(err)?;
         for i in 0..3 {
-            material::photoheat_term(
+            material::photoheat_owner(
                 o.an[i],
                 o.be[i],
                 HHeModel::controlled_fixture().threshold_ev[i],
-            )?;
+                ledger.heat[i],
+            )
+            .map_err(|e| {
+                format!(
+                    "segment photoheat {e}; species={i},eta={eta:.17e},a={a:.17e},b={b:.17e},A={:.17e},B={:.17e}",
+                    o.an[i], o.be[i]
+                )
+            })?;
         }
         stock = o.n;
         last_u = Some(o.u);
+        last_pair = Some((
+            ledger.terms[0],
+            ledger.terms[1],
+            [ledger.occurrence[0], ledger.occurrence[1]],
+            [ledger.coefficient[0], ledger.coefficient[1]],
+        ));
         o.n = 0.0;
         o.u = 0.0;
         v2::replace_owner_components(&mut o,&[0,1]).map_err(err)?;
@@ -208,15 +228,29 @@ fn characteristic_staged<F: FnMut(f64) -> Fallible<([f64; 4], FlrwPoint)>>(
             stock,
         )?;
     } else {
+        let mut ledger = v2::owner_ledger(sum).map_err(err)?;
         sum.n = stock;
         sum.u = last_u.unwrap_or(0.0);
         crate::diagnostics::continuity(sum.u, v2::EPS * (eta - s1).exp() * stock)?;
         if stock > 0.0 {
-            sum.ln_n = Some(stock.ln());
-            sum.ln_u = Some(sum.u.ln())
+            let (number, energy, occurrence, coefficient) =
+                last_pair.ok_or("missing canonical transported pair")?;
+            ledger.terms[0] = number;
+            ledger.terms[1] = energy;
+            ledger.occurrence[0] = occurrence[0];
+            ledger.occurrence[1] = occurrence[1];
+            ledger.coefficient[0] = coefficient[0];
+            ledger.coefficient[1] = coefficient[1];
+            sum.canonical = Some(ledger);
+            sum.ln_n = Some(number.value.log());
+            sum.ln_u = Some(energy.value.log())
         }
     }
-    v2::replace_owner_components(&mut sum,&[0,1,5,6]).map_err(err)?;
+    if tau <= s1 {
+        v2::replace_owner_components(&mut sum, &[0, 1, 5, 6]).map_err(err)?;
+    } else {
+        v2::replace_owner_components(&mut sum, &[5, 6]).map_err(err)?;
+    }
     if eta >= s1 + cfg.source.energy_max_ev.ln() && sum.n != 0.0 {
         return Err("nonzero at/beyond causal source front".into());
     }
@@ -229,7 +263,7 @@ pub fn transaction(
     y: [f64; 4],
     s0: f64,
     s1: f64,
-    old: &[f64],
+    old: &crate::diagnostics::Density,
 ) -> Fallible<Radiation> {
     if old.len() != grid.nodes.len() {
         return Err("grid/state length mismatch".into());
@@ -237,17 +271,23 @@ pub fn transaction(
     material::rhs(y, p)?;
     let mut owners = Owners::default();
     let mut density = Vec::with_capacity(old.len());
+    let mut canonical_density = Vec::with_capacity(old.len());
     let mut min_heat = f64::INFINITY;
     for (j, &(eta, w)) in grid.nodes.iter().enumerate() {
         let o = characteristic(cfg, p, y, eta, s0, s1, old[j])?;
         density.push(o.n);
+        let ledger = v2::owner_ledger(o).map_err(err)?;
+        canonical_density.push(crate::diagnostics::PhotonNode {
+            number: ledger.terms[0],
+            energy: ledger.terms[1],
+        });
         v2::try_add_scaled(&mut owners, o, w).map_err(err)?;
         for i in 0..3 {
             min_heat = min_heat.min(o.be[i] - v2::EPS * v2::CHI[i] * o.an[i]);
         }
     }
     Ok(Radiation {
-        density: crate::diagnostics::Density::new(density),
+        density: crate::diagnostics::Density::from_parts(density, canonical_density).map_err(err)?,
         owners,
         min_heat,
     })
@@ -260,47 +300,51 @@ pub fn transaction_path(
     y1: [f64; 4],
     s0: f64,
     s1: f64,
-    old: &[f64],
+    old: &crate::diagnostics::Density,
 ) -> Fallible<Radiation> {
     if old.len() != grid.nodes.len() {
         return Err("grid/state length mismatch".into());
     }
     let mut owners = Owners::default();
     let mut density = Vec::with_capacity(old.len());
+    let mut canonical_density = Vec::with_capacity(old.len());
     let mut min_heat = f64::INFINITY;
     for (j, &(eta, w)) in grid.nodes.iter().enumerate() {
         crate::record::node(j, w);
         let o = characteristic_path(cfg, y0, y1, eta, s0, s1, old[j])?;
-        crate::record::node_output(j, o);
+        crate::record::node_output(j, o)?;
         density.push(o.n);
+        let ledger = v2::owner_ledger(o).map_err(err)?;
+        canonical_density.push(crate::diagnostics::PhotonNode {
+            number: ledger.terms[0],
+            energy: ledger.terms[1],
+        });
         v2::try_add_scaled(&mut owners, o, w).map_err(err)?;
         for i in 0..3 {
             min_heat = min_heat.min(o.be[i] - v2::EPS * v2::CHI[i] * o.an[i]);
         }
     }
     Ok(Radiation {
-        density: crate::diagnostics::Density::new(density),
+        density: crate::diagnostics::Density::from_parts(density, canonical_density).map_err(err)?,
         owners,
         min_heat,
     })
 }
-pub fn inventory(grid: &Grid, s: f64, density: &[f64]) -> Fallible<[f64; 2]> {
-    let mut n = 0.;
-    let mut e = 0.;
-    for (&(eta, w), &f) in grid.nodes.iter().zip(density) {
-        n += product(w, f)?;
-        e += product(
-            product(product(w, f)?, (eta - s).exp())?,
-            HHeModel::controlled_fixture().ev_erg,
-        )?;
+pub fn inventory(grid: &Grid, _s: f64, density: &crate::diagnostics::Density) -> Fallible<[f64; 2]> {
+    use canonical::Tracked;
+    let mut n = Tracked::empty();
+    let mut e = Tracked::empty();
+    for (&(_, w), node) in grid.nodes.iter().zip(density.canonical()) {
+        n = n.add(node.number.scale(w).map_err(err)?).map_err(err)?;
+        e = e.add(node.energy.scale(w).map_err(err)?).map_err(err)?;
     }
-    Ok([nonnegative(n)?, nonnegative(e)?])
+    Ok([nonnegative(n.readout().map_err(err)?.0)?, nonnegative(e.readout().map_err(err)?.0)?])
 }
 pub static LAST_GAMMA_BOUND:std::sync::Mutex<[f64;3]>=std::sync::Mutex::new([0.;3]);
-pub fn gamma(grid:&Grid,s:f64,density:&[f64],p:FlrwPoint)->Fallible<[f64;3]>{
+pub fn gamma(grid:&Grid,s:f64,density:&crate::diagnostics::Density,p:FlrwPoint)->Fallible<[f64;3]>{
  use canonical::{Tracked,Wide};let c=HHeModel::controlled_fixture();let mut out=[Tracked::empty();3];
- for (&(eta,w),&f) in grid.nodes.iter().zip(density){for i in 0..3{let sigma=AtomicProvider::reference().cross_section(SPECIES[i],(eta-s).exp()).map_err(err)?;
- let mut t=Tracked::from_f64(c.c_cm_s).map_err(err)?;for factor in [p.n_h_cm3,sigma,f,w]{t=t.scale(factor).map_err(err)?;if !t.value.is_empty(){t.loss=t.loss.upper_add(Wide::from_parts(1.,t.value.exponent()-51).map_err(err)?).map_err(err)?;}}
+ for (&(eta,w),node) in grid.nodes.iter().zip(density.canonical()){for i in 0..3{let sigma=AtomicProvider::reference().cross_section(SPECIES[i],(eta-s).exp()).map_err(err)?;
+ let mut t=node.number;for factor in [c.c_cm_s,p.n_h_cm3,sigma,w]{t=t.scale(factor).map_err(err)?;if !t.value.is_empty(){t.loss=t.loss.upper_add(Wide::from_parts(1.,t.value.exponent()-51).map_err(err)?).map_err(err)?;}}
  let old=out[i];out[i]=old.add(t).map_err(err)?;if !old.value.is_empty()&&!t.value.is_empty(){out[i].loss=out[i].loss.upper_add(Wide::from_parts(1.,out[i].value.exponent()-51).map_err(err)?).map_err(err)?;}}}
  let mut values=[0.;3];let mut bounds=[0.;3];for i in 0..3{let(v,b)=out[i].readout().map_err(err)?;values[i]=v;bounds[i]=b.bound_readout().map_err(err)?;if bounds[i]>1e-22+1e-3*v.abs(){return Err("GAMMA_REPRESENTATION_ORIGINAL_ALLOWANCE".into())}}
  *LAST_GAMMA_BOUND.lock().map_err(err)?=bounds;Ok(values)

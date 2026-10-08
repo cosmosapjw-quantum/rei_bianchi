@@ -1,5 +1,5 @@
 use crate::{checked, err, positive, product, Fallible};
-use canonical::Wide;
+use canonical::{Tracked, Wide};
 use rei_microphysics::{
     igm_background::FlrwPoint,
     igm_state::IgmGasState,
@@ -88,6 +88,28 @@ pub(crate) fn photoheat_term(a: f64, b: f64, threshold_ev: f64) -> Fallible<(f64
     Ok((heat, bound))
 }
 
+/// Prefer the historical A/B operation order when its sign is resolved.  Only
+/// the range-boundary case falls back to the positive excess-energy owner that
+/// was formed in the radiation kernel before subnormal scaling.
+pub(crate) fn photoheat_owner(
+    a: f64,
+    b: f64,
+    threshold_ev: f64,
+    heat: Tracked,
+) -> Fallible<(f64, Wide)> {
+    match photoheat_term(a, b, threshold_ev) {
+        Ok(x) => Ok(x),
+        Err(e) if e == "unresolved photoheat sign" && !heat.value.is_empty() => {
+            if heat.value.le(heat.loss) {
+                return Err("unresolved direct photoheat sign".into());
+            }
+            let (value, bound) = heat.readout().map_err(err)?;
+            Ok((value, bound))
+        }
+        Err(e) => Err(e),
+    }
+}
+
 pub fn photo_delta(a: [f64; 3], b: [f64; 3], fhe: f64) -> [f64; 4] {
     let c = HHeModel::controlled_fixture();
     [
@@ -100,16 +122,15 @@ pub fn photo_delta(a: [f64; 3], b: [f64; 3], fhe: f64) -> [f64; 4] {
     ]
 }
 
-pub(crate) fn photo_delta_bounded(
-    a: [f64; 3],
-    b: [f64; 3],
-    fhe: f64,
-) -> Fallible<([f64; 4], Wide)> {
+pub(crate) fn photo_delta_bounded(owners: crate::v2::Owners, fhe: f64) -> Fallible<([f64; 4], Wide)> {
     let c = HHeModel::controlled_fixture();
+    let ledger = crate::v2::owner_ledger(owners).map_err(err)?;
+    let a = owners.an;
+    let b = owners.be;
     let mut heat = 0.0;
     let mut heat_bound = Wide::ZERO;
     for i in 0..3 {
-        let (term, term_bound) = photoheat_term(a[i], b[i], c.threshold_ev[i])?;
+        let (term, term_bound) = photoheat_owner(a[i], b[i], c.threshold_ev[i], ledger.heat[i])?;
         let next = heat + term;
         heat_bound = heat_bound.upper_add(term_bound).map_err(err)?;
         if heat != 0.0 && term != 0.0 {
@@ -240,5 +261,14 @@ mod photoheat_tests {
         assert!(photoheat_term(1.0, coefficient, 13.598434599702)
             .unwrap_err()
             .contains("unresolved photoheat sign"));
+    }
+
+    #[test]
+    fn canonical_positive_heat_may_project_to_zero() {
+        let a = 5.5661679234838235e-316;
+        let heat = Tracked::exact(Wide::from_parts(1.25, -1100).unwrap());
+        let (value, bound) = photoheat_owner(a, 0.0, 13.598434599702, heat).unwrap();
+        assert_eq!(value, 0.0);
+        assert!(!bound.is_empty());
     }
 }

@@ -94,10 +94,10 @@ pub fn evaluate(
     let dt = (s1 - old.s) / pm.hubble_per_s;
     let radiation = radiation::transaction_path(cfg, grid, old.y, y, old.s, s1, &old.density)?;
     let (d, heat_arithmetic_bound) = material::photo_delta_bounded(
-        radiation.owners.an,
-        radiation.owners.be,
+        radiation.owners,
         p.n_he_cm3 / p.n_h_cm3,
-    )?;
+    )
+    .map_err(|e| format!("aggregate photoheat {e}"))?;
     let res = assemble_residual(old.y, y, d, r.fraction_dt, r.w_dt_erg_per_h_s, dt)?;
     let bounds=v2::owner_bounds(radiation.owners).map_err(err)?;
     let fhe=p.n_he_cm3/p.n_h_cm3;let c=rei_microphysics::HHeModel::controlled_fixture();let mut thermal=heat_arithmetic_bound;

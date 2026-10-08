@@ -146,6 +146,62 @@ pub fn kernel(f: f64, q: f64, rates: [f64; 3], h: f64, e: f64) -> Result<Owners,
             shared
         };
     }
+    // Form the excess-energy moment before the final tiny rate scaling.  Near
+    // an ionization edge, subtracting the two stored subnormal A/B readouts can
+    // lose the sign even though every photon in this split segment is above the
+    // threshold.  The mean photon energy is normal here and the split cutoff
+    // leaves a finite positive margin over CHI.
+    let count_base = f * j(lambda, h) + q * h * h * psi(z);
+    let energy_base_ev = e * (f * energy_j + q * source_energy_j);
+    let mut ledger = owner_ledger(o)?;
+    for i in 0..3 {
+        if rates[i] == 0.0 || count_base == 0.0 {
+            continue;
+        }
+        let mean_ev = energy_base_ev / count_base;
+        let excess_ev = mean_ev - CHI[i];
+        if !mean_ev.is_finite() || !excess_ev.is_finite() || excess_ev <= 0.0 {
+            return Err("unresolved direct photoheat moment");
+        }
+        let mut absorbed = Tracked::from_f64(rates[i])?.mul(Tracked::from_f64(count_base)?)?;
+        absorbed.loss = absorbed.loss.upper_add(rounding(absorbed.value)?)?;
+        let mut energy_coefficient = Tracked::from_f64(EPS * mean_ev)?;
+        for _ in 0..6 {
+            energy_coefficient.loss = energy_coefficient
+                .loss
+                .upper_add(rounding(energy_coefficient.value)?)?;
+        }
+        let mut absorbed_energy = absorbed.mul(energy_coefficient)?;
+        absorbed_energy.loss = absorbed_energy
+            .loss
+            .upper_add(rounding(absorbed_energy.value)?)?;
+        if absorbed.readout()?.0.to_bits() == o.an[i].to_bits()
+            && absorbed_energy.readout()?.0.to_bits() == o.be[i].to_bits()
+        {
+            ledger.terms[7 + i] = absorbed;
+            ledger.terms[10 + i] = absorbed_energy;
+        }
+        let excess_coefficient = EPS * excess_ev;
+        let mut coefficient = Tracked::from_f64(excess_coefficient)?;
+        // The subtraction can cancel leading digits, so an excess-scale ulp is
+        // not enough.  Charge a conservative normal-domain allowance at the
+        // pre-subtraction mean-energy scale, then the coefficient operations.
+        // This is representation arithmetic only; the wider kernel/provider
+        // error authority remains outside this scoped repair.
+        let mean_allowance = rounding(Wide::from_f64(mean_ev)?)?
+            .upper_mul(Wide::from_f64(64.0)?)?
+            .upper_mul(Wide::from_f64(EPS)?)?;
+        coefficient.loss = coefficient.loss.upper_add(mean_allowance)?;
+        for _ in 0..8 {
+            coefficient.loss = coefficient.loss.upper_add(rounding(coefficient.value)?)?;
+        }
+        let mut heat = absorbed.mul(coefficient)?;
+        heat.loss = heat.loss.upper_add(rounding(heat.value)?)?;
+        ledger.heat[i] = heat;
+        ledger.heat_occurrence[i] = 1;
+        ledger.heat_coefficient[i] = Wide::from_f64(1.0)?;
+    }
+    o.canonical = Some(ledger);
     if ![o.n, o.u, o.red, o.qn, o.qe]
         .into_iter()
         .chain(o.an)
@@ -153,6 +209,22 @@ pub fn kernel(f: f64, q: f64, rates: [f64; 3], h: f64, e: f64) -> Result<Owners,
         .all(|x| x.is_finite() && x >= 0.0)
     {
         return Err("nonfinite or negative owner");
+    }
+    // The transported number can remain representable after multiplying by the
+    // photon energy in erg has crossed below the binary64 readout floor.  Bind
+    // both members to the same canonical product before any segment weighting.
+    if o.n > 0.0 && o.u == 0.0 {
+        let mut ledger = owner_ledger(o)?;
+        let energy = Tracked::from_f64(EPS * end_e)?;
+        let mut u = ledger.terms[0].mul(energy)?;
+        if !u.value.is_empty() {
+            u.loss = u.loss.upper_add(rounding(u.value)?)?;
+        }
+        ledger.terms[1] = u;
+        if ledger.terms[1].readout()?.0.to_bits() != o.u.to_bits() {
+            return Err("canonical energy readout mismatch");
+        }
+        o.canonical = Some(ledger);
     }
     Ok(o)
 }
@@ -544,21 +616,28 @@ pub fn try_moments(d: Density, a: f64, b: f64) -> Result<(f64, f64), &'static st
 // Research-only authoritative paired owner accumulation. Original kernel is unchanged.
 use canonical::{Tracked,Wide};
 #[derive(Clone,Copy,Debug,PartialEq)]
-pub struct OwnerLedger { pub terms:[Tracked;13], pub occurrence:[u64;13], pub coefficient:[Wide;13] }
+pub struct OwnerLedger { pub terms:[Tracked;13], pub occurrence:[u64;13], pub coefficient:[Wide;13], pub heat:[Tracked;3], pub heat_occurrence:[u64;3], pub heat_coefficient:[Wide;3] }
 fn scalar(o:Owners)->[f64;13]{[o.n,o.u,o.red,o.qn,o.qe,o.outn,o.oute,o.an[0],o.an[1],o.an[2],o.be[0],o.be[1],o.be[2]]}
 fn rounding(v:Wide)->Result<Wide,&'static str>{if v.is_empty(){Ok(Wide::ZERO)}else{Wide::from_parts(1.,v.exponent()-51)}}
 pub fn owner_ledger(o:Owners)->Result<OwnerLedger,&'static str>{
  let vals=scalar(o);let mut t=[Tracked::empty();13];let mut occurrence=[0;13];let mut coefficient=[Wide::ZERO;13];
  for i in 0..13 {t[i]=Tracked::from_f64(vals[i])?;if let Some(l)=o.canonical{if l.terms[i].readout()?.0.to_bits()==vals[i].to_bits(){t[i]=l.terms[i];occurrence[i]=l.occurrence[i];coefficient[i]=l.coefficient[i];}else{return Err("canonical owner/readout mismatch");}}}
- Ok(OwnerLedger{terms:t,occurrence,coefficient})
+ let mut heat=[Tracked::empty();3];let mut heat_occurrence=[0;3];let mut heat_coefficient=[Wide::ZERO;3];
+ if let Some(l)=o.canonical{heat=l.heat;heat_occurrence=l.heat_occurrence;heat_coefficient=l.heat_coefficient;}
+ Ok(OwnerLedger{terms:t,occurrence,coefficient,heat,heat_occurrence,heat_coefficient})
 }
 pub fn replace_owner_components(o:&mut Owners,indices:&[usize])->Result<(),&'static str>{let vals=scalar(*o);if let Some(mut l)=o.canonical{for &i in indices{l.terms[i]=Tracked::from_f64(vals[i])?;l.occurrence[i]=0;l.coefficient[i]=Wide::ZERO;}o.canonical=Some(l);}Ok(())}
 pub fn owner_bounds(o:Owners)->Result<[Wide;13],&'static str>{let l=owner_ledger(o)?;let mut b=[Wide::ZERO;13];for i in 0..13{b[i]=l.terms[i].readout()?.1;}Ok(b)}
 pub fn try_add_scaled(a:&mut Owners,b:Owners,w:f64)->Result<(),&'static str>{
  let valid=|x:f64|x.is_finite()&&x>=0.;if !valid(w){return Err("invalid owner weight");}
  for o in [*a,b]{if !scalar(o).into_iter().all(valid)||o.ln_n.into_iter().chain(o.ln_u).any(|x|!x.is_finite()){return Err("invalid owner/log");}
- for (n,e) in [(o.n,o.u),(o.qn,o.qe),(o.outn,o.oute),(o.an[0],o.be[0]),(o.an[1],o.be[1]),(o.an[2],o.be[2])]{if (n==0.)!=(e==0.){return Err("unrepresented paired number/energy owner");}}
- if (o.n==0.&&o.ln_n.is_some())||(o.u==0.&&o.ln_u.is_some()){return Err("authoritative tail is not empty");}}
+ let canonical_present=o.canonical.is_some();let ledger=owner_ledger(o)?;
+ for (pair,(n,e,ni,ei)) in [(o.n,o.u,0,1),(o.qn,o.qe,3,4),(o.outn,o.oute,5,6),(o.an[0],o.be[0],7,10),(o.an[1],o.be[1],8,11),(o.an[2],o.be[2],9,12)].into_iter().enumerate(){
+  if (n==0.)!=(e==0.) && (ledger.terms[ni].value.is_empty()||ledger.terms[ei].value.is_empty()){return Err(match pair{0=>"unrepresented N/U owner",1=>"unrepresented QN/QE owner",2=>"unrepresented outN/outE owner",3=>"unrepresented HI A/B owner",4=>"unrepresented HeI A/B owner",_=>"unrepresented HeII A/B owner"});}
+  if ledger.terms[ni].value.is_empty()!=ledger.terms[ei].value.is_empty(){return Err("canonical paired number/energy owner mismatch");}
+ }
+ if (o.n==0.&&o.ln_n.is_some()&&ledger.terms[0].value.is_empty())||(o.u==0.&&o.ln_u.is_some()&&ledger.terms[1].value.is_empty()){return Err("authoritative tail is not empty");}
+ if canonical_present{if let Some(x)=o.ln_n{if o.n==0.||o.n.is_normal(){ledger.terms[0].value.validate_log(x)?;}}if let Some(x)=o.ln_u{if o.u==0.||o.u.is_normal(){ledger.terms[1].value.validate_log(x)?;}}}}
  if w==0.{return Ok(())}let lhs=owner_ledger(*a)?;let rhs=owner_ledger(b)?;let weight=Tracked::from_f64(w)?;
  let mut l=lhs;let mut sums=[0.;13];
  for i in 0..13{let mut product=rhs.terms[i].mul(weight)?;
@@ -570,9 +649,9 @@ pub fn try_add_scaled(a:&mut Owners,b:Owners,w:f64)->Result<(),&'static str>{
  l.coefficient[i]=lhs.coefficient[i].upper_add(rhs.coefficient[i].upper_mul(weight.value)?)?.upper_add(if product.value.is_empty(){Wide::ZERO}else{weight.value})?;
  sums[i]=sum.readout()?.0;
  }
- let candidate=Owners{canonical:Some(l),n:sums[0],u:sums[1],red:sums[2],qn:sums[3],qe:sums[4],outn:sums[5],oute:sums[6],an:[sums[7],sums[8],sums[9]],be:[sums[10],sums[11],sums[12]],ln_n:if sums[0]>0.{Some(sums[0].ln())}else{None},ln_u:if sums[1]>0.{Some(sums[1].ln())}else{None}};
- // Paired readouts may not silently replace a positive canonical component by zero.
- for (n,e) in [(0,1),(3,4),(5,6),(7,10),(8,11),(9,12)]{if (sums[n]==0.)!=(sums[e]==0.){return Err("paired readout requires extended material path");}}
+ for i in 0..3{let mut product=rhs.heat[i].mul(weight)?;if !rhs.heat[i].value.is_empty(){product.loss=product.loss.upper_add(rounding(product.value)?)?;}let mut sum=lhs.heat[i].add(product)?;if !lhs.heat[i].value.is_empty()&&!product.value.is_empty(){sum.loss=sum.loss.upper_add(rounding(sum.value)?)?;}l.heat[i]=sum;l.heat_occurrence[i]=lhs.heat_occurrence[i].checked_add(rhs.heat_occurrence[i]).and_then(|x|x.checked_add((!product.value.is_empty())as u64)).ok_or("heat occurrence overflow")?;l.heat_coefficient[i]=lhs.heat_coefficient[i].upper_add(rhs.heat_coefficient[i].upper_mul(weight.value)?)?.upper_add(if product.value.is_empty(){Wide::ZERO}else{weight.value})?;}
+ for (n,e) in [(0,1),(3,4),(5,6),(7,10),(8,11),(9,12)]{if l.terms[n].value.is_empty()!=l.terms[e].value.is_empty(){return Err("canonical paired readout mismatch");}}
+ let candidate=Owners{canonical:Some(l),n:sums[0],u:sums[1],red:sums[2],qn:sums[3],qe:sums[4],outn:sums[5],oute:sums[6],an:[sums[7],sums[8],sums[9]],be:[sums[10],sums[11],sums[12]],ln_n:if l.terms[0].value.is_empty(){None}else{Some(l.terms[0].value.log())},ln_u:if l.terms[1].value.is_empty(){None}else{Some(l.terms[1].value.log())}};
  *a=candidate;Ok(())
 }
 /// Minimal double-double lane for normalization, not a new physical state.
@@ -704,6 +783,7 @@ pub fn normalized_target(l: f64, r: f64, n: f64, m: f64) -> Result<f64, &'static
  #[test] fn paired_and_invalid_atomic(){let mut a=Owners::default();let original=a;assert!(try_add_scaled(&mut a,Owners{n:1.,..Default::default()},1.).is_err());assert_eq!(a,original);assert!(try_add_scaled(&mut a,Owners::default(),f64::NAN).is_err());assert_eq!(a,original);}
  #[test] fn tiny_energy_absorption_scales_before_subnormal_projection(){let f=3.729103312391377e-306;let rates=[1357642.4113259623,0.,0.];let h=8.333333333609971e-6;let e=13.693045525868545;let o=kernel(f,0.,rates,h,e).unwrap();let heat=o.be[0]-EPS*CHI[0]*o.an[0];assert!(heat>0.);assert!(!o.be[0].is_normal());}
  #[test] fn normal_energy_absorption_keeps_shared_route_bits(){let f=1e-4;let q=2e-5;let rates=[3.,5.,7.];let h=1e-3;let e=100.;let o=kernel(f,q,rates,h,e).unwrap();let lambda=rates.iter().sum::<f64>();let shared=EPS*e*(f*j(lambda+1.,h)+q*energy_source_integral(lambda,h));for i in 0..3{assert_eq!(o.be[i].to_bits(),(rates[i]*shared).to_bits());}}
+ #[test] fn paired_canonical_owner_survives_asymmetric_scalar_readout(){let tiny=f64::from_bits(1);let mut a=Owners::default();try_add_scaled(&mut a,Owners{n:1e-300,u:tiny,..Default::default()},0.5).unwrap();assert!(a.n>0.);assert_eq!(a.u,0.);let l=a.canonical.unwrap();assert!(!l.terms[0].value.is_empty());assert!(!l.terms[1].value.is_empty());assert!(!l.terms[1].readout().unwrap().1.is_empty());let mut total=Owners::default();try_add_scaled(&mut total,a,1.).unwrap();assert_eq!(total.u,0.);assert!(total.ln_u.is_some());}
 }
 
 #[cfg(test)] mod exact_fixture_tests{use super::*;#[test]fn fraction_fixtures(){for(a,b,w)in [(0.,2.7403074891849688e-303,1.4493951880436e-6),(0.1,0.3,0.7),(1.,f64::from_bits(1),0.5)]{let mut out=Owners{red:a,..Default::default()};try_add_scaled(&mut out,Owners{red:b,..Default::default()},w).unwrap();let t=out.canonical.unwrap().terms[2];let bound=t.readout().unwrap().1;println!("ORACLE {} {} {} {} {} {}",a.to_bits(),b.to_bits(),w.to_bits(),out.red.to_bits(),bound.mantissa().to_bits(),bound.exponent());}}}

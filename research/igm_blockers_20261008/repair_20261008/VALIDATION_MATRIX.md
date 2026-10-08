@@ -2,18 +2,23 @@
 
 | Axis | Status | Evidence |
 |---|---|---|
-| Saved positive subnormal heat | PASS | `material::photoheat_tests::saved_positive_subnormal_heat_is_certified`; exact bits `0002bdc74d339a20` |
-| Sign and zero controls | PASS | structural zero accepted; certified negative and sign-uncertain cases rejected |
-| NORMAL route | PASS | heat operation-order parity and kernel shared-route bit parity tests |
-| Software regression | PASS | 12/12 locked local-library tests; repository Rust workspace tests and formatting pass; `git diff --check` exit 0 |
-| First repaired common epoch | PASS | `comparison_12.json`; 37 fields, N/E and source checks |
-| Temporal refinement at k12/24 | PASS_SCOPED | worst allowance ratio `0.023877179614106396` |
-| Tail comparison at k12 | PASS_SCOPED | worst allowance ratio `1.1305353909436463e-12` |
-| Original per-branch gates | PASS_SCOPED | coarse `0.636733...`, fine `0.318860...`, tail `0.670508...`; all below 1 |
-| Kernel small-energy reassociation | PASS_SCOPED | k14 isolated fixture changes false negative heat to positive; NORMAL route unchanged |
-| Paired weighted N/E readout | FAIL_BLOCKER | coarse k14: `paired readout requires extended material path` after stable kernel repair |
-| Full 0.0008 suffix | NOT_COMPLETED | stopped at first repeated paired-path failure |
-| z=12→10 / continuum | NOT_VALIDATED | spectral/source/time/state and historical-prefix bounds remain incomplete |
+| Repository CI-equivalent commands | PASS | handoff verify/reproduce, rate reproduce, BASS, REC, root fmt, root workspace tests all exit 0 |
+| Numerical library | PASS | 16/16 locked tests |
+| Positive heat below scalar readout | PASS | `canonical_positive_heat_may_project_to_zero` |
+| NORMAL A/B operation order | PASS | existing bit-parity regression |
+| Paired storage/observer/checkpoint | PASS_SCOPED | coarse/fine/tail V2 common-state runs and V2 to V3 restart |
+| Common epoch 37 fields | PASS_SCOPED | `comparison_14.json` |
+| Temporal refinement | PASS_SCOPED | worst allowance ratio `0.023882550275375468` |
+| Tail comparison | PASS_SCOPED | worst allowance ratio `9.736692500318166e-13` |
+| Original per-branch gates | PASS_SCOPED | all reported gate ratios below 1 through common state; coarse k15/k16 also below 1 |
+| Negative/structural-zero controls | PASS | unresolved and negative signs remain rejected; structural zero retained |
+| V1/V2 migration | PASS_SCOPED | old partial migration plus actual V2 k14 to V3 k15 resume |
+| Nested research package fmt | BASELINE_FAIL | preserved compact snapshot files; repository-owned CI fmt passes |
+| Canonical transport into characteristic | FAIL_BLOCKER | incoming value/loss is not consumed even before scalar underflow |
+| Accepted-record replay API | HOLD_NONACTIVE | final canonical segment pair is not restored before comparison |
+| Coarse k17 | FAIL_BLOCKER | scalar stock projects to zero while finite canonical log tail remains |
+| Full 0.0008 suffix | NOT_COMPLETED | stopped at k17 |
+| z=12 to 10 / continuum | NOT_VALIDATED | error authority and later horizons incomplete |
 | Physical history | HOLD | manufactured numerical scope only |
 
-The arithmetic bound added here covers the stored-coefficient photoheat product/subtraction and heat summation. It does not promote the existing owner ledger to a complete kernel/provider/state error enclosure.
+No result is promoted beyond `PASS_SCOPED` for the executed manufactured-model rows.
