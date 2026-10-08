@@ -93,14 +93,14 @@ pub fn evaluate(
     crate::diagnostics::stage(1, ym, pm)?;
     let dt = (s1 - old.s) / pm.hubble_per_s;
     let radiation = radiation::transaction_path(cfg, grid, old.y, y, old.s, s1, &old.density)?;
-    let d = material::photo_delta(
+    let (d, heat_arithmetic_bound) = material::photo_delta_bounded(
         radiation.owners.an,
         radiation.owners.be,
         p.n_he_cm3 / p.n_h_cm3,
-    );
+    )?;
     let res = assemble_residual(old.y, y, d, r.fraction_dt, r.w_dt_erg_per_h_s, dt)?;
     let bounds=v2::owner_bounds(radiation.owners).map_err(err)?;
-    let fhe=p.n_he_cm3/p.n_h_cm3;let c=rei_microphysics::HHeModel::controlled_fixture();let mut thermal=canonical::Wide::ZERO;
+    let fhe=p.n_he_cm3/p.n_h_cm3;let c=rei_microphysics::HHeModel::controlled_fixture();let mut thermal=heat_arithmetic_bound;
     for i in 0..3{thermal=thermal.upper_add(bounds[10+i]).map_err(err)?.upper_add(bounds[7+i].upper_mul(canonical::Wide::from_f64(c.ev_erg*c.threshold_ev[i]).map_err(err)?).map_err(err)?).map_err(err)?;}
     let representation_bound=[bounds[7].bound_readout().map_err(err)?,bounds[8].upper_add(bounds[9]).map_err(err)?.upper_mul(canonical::Wide::from_f64(1./fhe).map_err(err)?).map_err(err)?.bound_readout().map_err(err)?,bounds[9].upper_mul(canonical::Wide::from_f64(1./fhe).map_err(err)?).map_err(err)?.bound_readout().map_err(err)?,thermal.bound_readout().map_err(err)?];
     let material = MaterialOwners::stage(r, pm, s1 - old.s)?;

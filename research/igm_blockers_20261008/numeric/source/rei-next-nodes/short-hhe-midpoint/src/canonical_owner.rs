@@ -112,8 +112,9 @@ pub fn kernel(f: f64, q: f64, rates: [f64; 3], h: f64, e: f64) -> Result<Owners,
         return Err("positive source underflow requires unsupported log evolution");
     }
     let count_integral = f * j(lambda, h) + q * h * h * psi(z);
-    let energy_integral =
-        EPS * e * (f * j(lambda + 1.0, h) + q * energy_source_integral(lambda, h));
+    let energy_j = j(lambda + 1.0, h);
+    let source_energy_j = energy_source_integral(lambda, h);
+    let energy_integral = EPS * e * (f * energy_j + q * source_energy_j);
     let mut o = Owners {
         n,
         u: EPS * end_e * n,
@@ -134,7 +135,16 @@ pub fn kernel(f: f64, q: f64, rates: [f64; 3], h: f64, e: f64) -> Result<Owners,
     }
     for i in 0..3 {
         o.an[i] = rates[i] * count_integral;
-        o.be[i] = rates[i] * energy_integral;
+        let shared = rates[i] * energy_integral;
+        // At the bottom of binary64, forming the common energy integral first
+        // can discard percent-level information before the opacity rescales it.
+        // Reassociate only that range-boundary case; the NORMAL route remains
+        // bit-for-bit unchanged.
+        o.be[i] = if rates[i] > 0.0 && !shared.is_normal() {
+            EPS * e * ((rates[i] * f) * energy_j + (rates[i] * q) * source_energy_j)
+        } else {
+            shared
+        };
     }
     if ![o.n, o.u, o.red, o.qn, o.qe]
         .into_iter()
@@ -692,6 +702,8 @@ pub fn normalized_target(l: f64, r: f64, n: f64, m: f64) -> Result<f64, &'static
  #[test] fn normal_regression(){let mut a=Owners::default();let mut expected=0.;for (v,w) in [(1.,0.5),(3.,0.125),(7.,0.25)]{try_add_scaled(&mut a,Owners{red:v,..Default::default()},w).unwrap();expected+=v*w;}assert_eq!(a.red.to_bits(),expected.to_bits());}
  #[test] fn mismatch_rejected(){let mut a=Owners::default();try_add_scaled(&mut a,Owners{red:1.,..Default::default()},1.).unwrap();a.red=2.;assert!(try_add_scaled(&mut a,Owners::default(),1.).is_err());}
  #[test] fn paired_and_invalid_atomic(){let mut a=Owners::default();let original=a;assert!(try_add_scaled(&mut a,Owners{n:1.,..Default::default()},1.).is_err());assert_eq!(a,original);assert!(try_add_scaled(&mut a,Owners::default(),f64::NAN).is_err());assert_eq!(a,original);}
+ #[test] fn tiny_energy_absorption_scales_before_subnormal_projection(){let f=3.729103312391377e-306;let rates=[1357642.4113259623,0.,0.];let h=8.333333333609971e-6;let e=13.693045525868545;let o=kernel(f,0.,rates,h,e).unwrap();let heat=o.be[0]-EPS*CHI[0]*o.an[0];assert!(heat>0.);assert!(!o.be[0].is_normal());}
+ #[test] fn normal_energy_absorption_keeps_shared_route_bits(){let f=1e-4;let q=2e-5;let rates=[3.,5.,7.];let h=1e-3;let e=100.;let o=kernel(f,q,rates,h,e).unwrap();let lambda=rates.iter().sum::<f64>();let shared=EPS*e*(f*j(lambda+1.,h)+q*energy_source_integral(lambda,h));for i in 0..3{assert_eq!(o.be[i].to_bits(),(rates[i]*shared).to_bits());}}
 }
 
 #[cfg(test)] mod exact_fixture_tests{use super::*;#[test]fn fraction_fixtures(){for(a,b,w)in [(0.,2.7403074891849688e-303,1.4493951880436e-6),(0.1,0.3,0.7),(1.,f64::from_bits(1),0.5)]{let mut out=Owners{red:a,..Default::default()};try_add_scaled(&mut out,Owners{red:b,..Default::default()},w).unwrap();let t=out.canonical.unwrap().terms[2];let bound=t.readout().unwrap().1;println!("ORACLE {} {} {} {} {} {}",a.to_bits(),b.to_bits(),w.to_bits(),out.red.to_bits(),bound.mantissa().to_bits(),bound.exponent());}}}

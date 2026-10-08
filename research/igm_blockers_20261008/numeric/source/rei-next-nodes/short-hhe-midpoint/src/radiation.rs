@@ -118,7 +118,9 @@ fn characteristic_staged<F: FnMut(f64) -> Fallible<([f64; 4], FlrwPoint)>>(
     f: f64,
     mut stage: F,
 ) -> Fallible<Owners> {
-    nonnegative(f)?;
+    if !f.is_finite() || f < 0.0 {
+        return Err("invalid transported stock".into());
+    }
     if s1 <= s0 {
         return Err("invalid temporal cell".into());
     }
@@ -181,11 +183,10 @@ fn characteristic_staged<F: FnMut(f64) -> Fallible<([f64; 4], FlrwPoint)>>(
         let mut check = Owners::default();
         v2::try_add_scaled(&mut check, o, 1.0).map_err(err)?;
         for i in 0..3 {
-            nonnegative(
-                o.be[i]
-                    - HHeModel::controlled_fixture().ev_erg
-                        * HHeModel::controlled_fixture().threshold_ev[i]
-                        * o.an[i],
+            material::photoheat_term(
+                o.an[i],
+                o.be[i],
+                HHeModel::controlled_fixture().threshold_ev[i],
             )?;
         }
         stock = o.n;

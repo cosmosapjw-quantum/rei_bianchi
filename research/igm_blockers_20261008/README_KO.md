@@ -6,7 +6,7 @@
 - REC: 원 PR88 endpoint EOS/electron 상태와 2440 저장 spectrum row를 초기조건 후보로 제공했다. CMB bath Trad와 ionizing grid는 별도 성분이며 Gate I·matched evolution은 HOLD다. 같은 상태의 exact six finite moments와 binary64 산술 차이를 원 PR87 source map에 전달했다. 연속 spectral/time/provider 오차를 뜻하지 않는다.
 - 수치: canonical Wide/Tracked 13 owner, N/E 손실, occurrence·coefficient, 원 gas residual 및 보존 허용량 계상, flat 부분 checkpoint migration을 구현했다. 실제 subnormal/NORMAL의 Fraction oracle, 7 회귀·5 semantic checkpoint 음성시험 통과.
 - 첫 1·2·1 step 이후 총 8개 새 advance가 accepted되었다. 새 공통 시각 두 개의 원 37-field/source 비교 통과. coarse k11/48, fine k22/96, tail k11/48, ln(a)=-2.56445769079487 (z=11.993609904360573)을 보존했다.
-- 다음 coarse/tail k12 및 fine k23은 양수 transported photon stock subnormal을 거절했다. guard만 풀면 이후 N/E underflow와 손실 누락이 발생할 수 있어 변경하지 않았다. node별 canonical stock/손실을 characteristic·trial·restart까지 이어야 한다. 0.0008 suffix 148 advance와 이후 horizon은 미실행이다.
+- 후속 감사에서 해당 값은 transported stock이 아니라 양수 HI photoheat임이 비트 단위로 확인됐다. `audit_20261008/`이 이전 원인 해석을 정정한다. `repair_20261008/`의 국소 heat 수리 후 첫 공통 k12/24/12는 통과했고 coarse k13도 accepted 되었다. coarse k14에서 weighted N은 남지만 U가 0으로 투영되는 실제 paired-readout blocker가 확인됐다. node별 canonical N/E를 weighting·state·observer·restart까지 이어야 하며 0.0008 suffix와 이후 horizon은 미완이다.
 
 HE E7·HH ENERGY04·REI BRIDGE12의 최신 archive와 remote 반환을 수신했으며 예약 계산은 중복하지 않았다. 이들은 다른 상태 또는 조건부 일부 구간이므로 cold IGM 연속 오차 권위로 대입하지 않았다. 과거190-step 및 완료된0.0004는 재실행하지 않았다. 독립 리뷰와 모든 실제 명령/exit/추가 observer 비용 및 미측정 compile 비용은 TASK_RETURN.json과 하위 evidence에 기록한다.
 

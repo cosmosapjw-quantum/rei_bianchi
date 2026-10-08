@@ -1,10 +1,93 @@
 use crate::{checked, err, positive, product, Fallible};
+use canonical::Wide;
 use rei_microphysics::{
     igm_background::FlrwPoint,
     igm_state::IgmGasState,
     igm_thermal::{igm_point_rhs, IgmPointRhs},
     HHeModel,
 };
+
+fn operation_rounding_bound(value: f64) -> Result<Wide, &'static str> {
+    if !value.is_finite() {
+        return Err("nonfinite photoheat operation");
+    }
+    if value == 0.0 || !value.is_normal() {
+        // One binary64 subnormal ulp. This also encloses a result rounded to zero.
+        Wide::from_parts(1.0, -1074)
+    } else {
+        let exponent = ((value.abs().to_bits() >> 52) & 0x7ff) as i32 - 1023;
+        // Match the conservative whole-ulp convention used by the owner wrapper.
+        Wide::from_parts(1.0, exponent - 51)
+    }
+}
+
+/// One photoheating contribution for the stored binary64 A/B moments.
+///
+/// The value follows the existing operation order. The bound covers only those
+/// coefficient/product/subtraction roundings; inherited A/B uncertainty is
+/// propagated separately by the owner ledger.
+pub(crate) fn photoheat_term(a: f64, b: f64, threshold_ev: f64) -> Fallible<(f64, Wide)> {
+    let c = HHeModel::controlled_fixture();
+    if !a.is_finite()
+        || !b.is_finite()
+        || !threshold_ev.is_finite()
+        || a < 0.0
+        || b < 0.0
+        || threshold_ev <= 0.0
+    {
+        return Err("invalid photoheat operands".into());
+    }
+    if a == 0.0 && b == 0.0 {
+        return Ok((0.0, Wide::ZERO));
+    }
+    let coefficient = c.ev_erg * threshold_ev;
+    let coefficient_bound = operation_rounding_bound(coefficient).map_err(err)?;
+    let threshold_energy = coefficient * a;
+    if !threshold_energy.is_finite() {
+        return Err("nonfinite photoheat threshold energy".into());
+    }
+    let mut bound = if a == 0.0 {
+        Wide::ZERO
+    } else {
+        operation_rounding_bound(threshold_energy)
+            .map_err(err)?
+            .upper_add(
+                coefficient_bound
+                    .upper_mul(Wide::from_f64(a).map_err(err)?)
+                    .map_err(err)?,
+            )
+            .map_err(err)?
+    };
+    let heat = b - threshold_energy;
+    if !(b == 0.0 && threshold_energy == 0.0) {
+        bound = bound
+            .upper_add(operation_rounding_bound(heat).map_err(err)?)
+            .map_err(err)?;
+    }
+    if !heat.is_finite() {
+        return Err("nonfinite photoheat".into());
+    }
+    let magnitude = Wide::from_f64(heat.abs()).map_err(err)?;
+    if heat < 0.0 {
+        return Err(if magnitude.le(bound) {
+            "unresolved photoheat sign"
+        } else {
+            "negative photoheat"
+        }
+        .into());
+    }
+    if heat == 0.0 {
+        if bound.is_empty() {
+            return Ok((heat, bound));
+        }
+        return Err("unresolved photoheat sign".into());
+    }
+    if magnitude.le(bound) {
+        return Err("unresolved photoheat sign".into());
+    }
+    Ok((heat, bound))
+}
+
 pub fn photo_delta(a: [f64; 3], b: [f64; 3], fhe: f64) -> [f64; 4] {
     let c = HHeModel::controlled_fixture();
     [
@@ -15,6 +98,28 @@ pub fn photo_delta(a: [f64; 3], b: [f64; 3], fhe: f64) -> [f64; 4] {
             .map(|i| b[i] - c.ev_erg * c.threshold_ev[i] * a[i])
             .sum(),
     ]
+}
+
+pub(crate) fn photo_delta_bounded(
+    a: [f64; 3],
+    b: [f64; 3],
+    fhe: f64,
+) -> Fallible<([f64; 4], Wide)> {
+    let c = HHeModel::controlled_fixture();
+    let mut heat = 0.0;
+    let mut heat_bound = Wide::ZERO;
+    for i in 0..3 {
+        let (term, term_bound) = photoheat_term(a[i], b[i], c.threshold_ev[i])?;
+        let next = heat + term;
+        heat_bound = heat_bound.upper_add(term_bound).map_err(err)?;
+        if heat != 0.0 && term != 0.0 {
+            heat_bound = heat_bound
+                .upper_add(operation_rounding_bound(next).map_err(err)?)
+                .map_err(err)?;
+        }
+        heat = next;
+    }
+    Ok(([a[0], (a[1] - a[2]) / fhe, a[2] / fhe, heat], heat_bound))
 }
 pub fn gas(y: [f64; 4]) -> Fallible<IgmGasState> {
     IgmGasState::new([y[0], y[1], y[2]], y[3]).map_err(err)
@@ -94,5 +199,46 @@ impl MaterialOwners {
         a.nonphoto_binding = checked(a.nonphoto_binding + b.nonphoto_binding)?;
         a.nonphoto_thermal = checked(a.nonphoto_thermal + b.nonphoto_thermal)?;
         Ok(a)
+    }
+}
+
+#[cfg(test)]
+mod photoheat_tests {
+    use super::*;
+
+    #[test]
+    fn saved_positive_subnormal_heat_is_certified() {
+        let (heat, bound) = photoheat_term(
+            2.5091851155235384e-296,
+            5.5049080207218545e-307,
+            13.598434599702,
+        )
+        .unwrap();
+        assert_eq!(heat.to_bits(), 0x0002_bdc7_4d33_9a20);
+        assert!(heat > 0.0 && !heat.is_normal());
+        assert!(bound.le(Wide::from_f64(heat).unwrap()));
+    }
+
+    #[test]
+    fn normal_route_preserves_existing_operation_order() {
+        let a = 0.25;
+        let b = 1.0e-10;
+        let threshold = 13.598434599702;
+        let expected = b - HHeModel::controlled_fixture().ev_erg * threshold * a;
+        let (heat, _) = photoheat_term(a, b, threshold).unwrap();
+        assert_eq!(heat.to_bits(), expected.to_bits());
+    }
+
+    #[test]
+    fn structural_zero_is_exact_but_negative_and_uncertain_are_rejected() {
+        let (_, bound) = photoheat_term(0.0, 0.0, 13.598434599702).unwrap();
+        assert!(bound.is_empty());
+        assert!(photoheat_term(1.0, 0.0, 13.598434599702)
+            .unwrap_err()
+            .contains("negative photoheat"));
+        let coefficient = HHeModel::controlled_fixture().ev_erg * 13.598434599702;
+        assert!(photoheat_term(1.0, coefficient, 13.598434599702)
+            .unwrap_err()
+            .contains("unresolved photoheat sign"));
     }
 }
