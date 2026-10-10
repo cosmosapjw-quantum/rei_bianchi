@@ -1,0 +1,181 @@
+{
+  "task": "REI-PHYS21-20261010",
+  "candidate_status": "SCOPED_PROMOTE_SCIENCE_COMPLETE",
+  "coefficient_convention": "F2=[epsilon^2]F=(1/2) second derivative at zero",
+  "report_path": "PHYS21_REPORT_KO.md",
+  "report_sha256": "59fca954d998f9ffd5af2ed857ae15992f24c9779a77e9c7ba099d058990ab7a",
+  "contract_sha256": "3d249e2915a4954268d6adee4c213a3d822d6ce31ab01466437723c1f836da42",
+  "source": {
+    "repository": "cosmosapjw-quantum/rei_bianchi",
+    "branch": "forward/rust-reion-kernels-20260922",
+    "input_commit": "faec51259ed26f660cf14568bcaa3d288e54bf9a",
+    "root_tree": "d4c734ac2047e68966ccecc81da79eb68420f8a1",
+    "scientific_src_tree": "cb69b4736dd046e4675557577eb8e0ead037d1f3",
+    "binding_evidence": "contributions/source_gas/SOURCE_BINDING.json",
+    "remote_read_evidence": "contributions/source_gas/REMOTE_SOURCE_READ.json",
+    "source_verification": "source-inspected / byte-identity-verified; not native execution"
+  },
+  "claims": [
+    {
+      "id": "P21-C1",
+      "claim": "Continuum scalar epsilon^2 radiation kernel with endpoint curvature, endpoint-opacity covariance, survival variance and mean-opacity curvature",
+      "state": "derived; numerically checked in declared diagnostics",
+      "evidence": [
+        "PHYS21_REPORT_KO.md#4",
+        "contributions/tensor/TENSOR_SECOND_ORDER_KO.md",
+        "evidence/second_order_hi_v1.json"
+      ],
+      "decision": "PROMOTE"
+    },
+    {
+      "id": "P21-C2",
+      "claim": "Physical birth-angle and fixed-q plus birth Jacobian agree at second order, including source-kernel covariance",
+      "state": "derived; exact polynomial and finite-amplitude checks",
+      "evidence": [
+        "contributions/tensor/TENSOR_SECOND_ORDER_KO.md",
+        "contributions/tensor/second_order_results_v1.json"
+      ],
+      "decision": "PROMOTE"
+    },
+    {
+      "id": "P21-C3",
+      "claim": "Fixed gas inverse-cube opacity preserves mean optical depth; Jensen gives increased mean survival and decreased cumulative absorption",
+      "state": "derived continuum inequality; no exact finite-angle certification",
+      "conditions": [
+        "all rays on same E^-3 law throughout interval",
+        "epsilon-independent gas",
+        "physical isotropic birth measure",
+        "fixed principal axes with trace-free B"
+      ],
+      "evidence": [
+        "PHYS21_REPORT_KO.md#5",
+        "contributions/tensor/TENSOR_SECOND_ORDER_KO.md"
+      ],
+      "decision": "PROMOTE"
+    },
+    {
+      "id": "P21-C4",
+      "claim": "Endpoint absorption and primary heat quadratic signs are not universal even for smooth decreasing opacity",
+      "state": "derived exact rational sign counterexamples; numerically checked",
+      "evidence": [
+        "contributions/tensor/second_order_results_v1.json",
+        "figures/PHYS21_scalar_signs.json"
+      ],
+      "decision": "PROMOTE"
+    },
+    {
+      "id": "P21-C5",
+      "claim": "Actual HI-fit frozen-neutral-fraction b=0 coefficient has negative event/heating and positive survival/energy signs at specified input",
+      "state": "numerically checked; not evolving gas",
+      "evidence": [
+        "evidence/second_order_hi_v1.json"
+      ],
+      "decision": "PROMOTE"
+    },
+    {
+      "id": "P21-C6",
+      "claim": "Source-bound linear causal Volterra gas response and temperature particle-count coefficient",
+      "state": "derived; source supports; local nonphoto/temperature derivative numerically checked",
+      "evidence": [
+        "contributions/source_gas/SOURCE_GAS_NOTE_KO.md",
+        "contributions/source_gas/GAS_RESPONSE_FUNCTIONAL.json",
+        "contributions/source_gas/LOCAL_GAS_DERIVATIVE_CHECK.json"
+      ],
+      "decision": "PROMOTE"
+    },
+    {
+      "id": "P21-U1",
+      "claim": "Actual continuous-source evolving-gas finite-time quadratic coefficients and signs",
+      "state": "unresolved; not numerically solved",
+      "reason": "A callable true-constant-S baseline and cohort survival were not materialized; derivative bounds and terminal error intervals do not uniquely determine them",
+      "whole_project_blocked": false,
+      "decision": "HOLD"
+    },
+    {
+      "id": "P21-U2",
+      "claim": "Self-consistent Einstein second-order mean expansion and observer lightcone response",
+      "state": "outside prescribed-model scope",
+      "decision": "HOLD"
+    }
+  ],
+  "verification": [
+    {
+      "id": "HI_COHORT",
+      "path": "evidence/second_order_hi_v1.json",
+      "sha256": "ed41b97cfd65ffeb4e21efb6fab672488cc0a9495f28f439e08f0840ee2f0a5b",
+      "passed": 39,
+      "total": 39,
+      "exit_code": 0,
+      "scope": "Continuum cohort kernel with frozen initial neutral fraction and retained density dilution; not evolving gas, a full source history, or native angular implementation."
+    },
+    {
+      "id": "TENSOR",
+      "path": "contributions/tensor/second_order_results_v1.json",
+      "sha256": "a90666a1e280ad736f73e0b5b84b7f372e9c43cf3ff7ea569a36e2dfdcde889f",
+      "passed": 44,
+      "total": 44,
+      "exit_code": 0,
+      "scope": "Fixed gas analytic diagnostics. No FT03 evolving-gas/native history or physical admission."
+    },
+    {
+      "id": "LOCAL_GAS",
+      "path": "contributions/source_gas/LOCAL_GAS_DERIVATIVE_CHECK.json",
+      "sha256": "e15b464cbb88f5522531b021c42988158fc901e98ece7c49801d69e01802aa57",
+      "passed": 60,
+      "total": 60,
+      "exit_code": 0,
+      "scope": "Three smooth explicit fixtures, not trajectory; nonphoto Jacobian and temperature-particle gradient"
+    }
+  ],
+  "diagnostic_b0_relative_coefficients": {
+    "survival": "1.78390360948317321921224619523198953747252063867776886482538E-18",
+    "absorption_event_s": "-2.30206280809860475649344058283634228638589898126833603897910E-15",
+    "primary_heat_ev_s": "-3.88272869428057712931582731455897470982103546131884847062753E-13",
+    "surviving_energy_ev": "8.34817904511518954530348551891276437502610673175011815774833E-15"
+  },
+  "power_law_diagnostic": {
+    "H": 0,
+    "A": "(s-b)/T diag(1,-1,0)",
+    "opacity": "E^-3",
+    "tau": "lambda0 T",
+    "absorption_relative_coefficient": "3/10 tau (tau-4)",
+    "heating_eta_half_relative_coefficient": "3/10 tau^2 -2/5 tau -8/15",
+    "scope": "analytic fixed-gas diagnostic, not actual FT03/Einstein background"
+  },
+  "local_derivative_correction": {
+    "class": "diagnostic implementation/transcription correction",
+    "v1_status": "PASS 60/60 exit 0",
+    "final_status": "PASS 60/60 exit 0",
+    "change": "DR Kelvin constants separately multiplied before sum, matching source order",
+    "tolerance_and_step_unchanged": true,
+    "initial_failure": false,
+    "preserved": "contributions/source_gas/*_v1.*"
+  },
+  "decision_review": {
+    "status": "PROMOTE",
+    "path": "independent/DECISION_REVIEW.json",
+    "reviewer": "/root/phys21_decision",
+    "reviewer_was_candidate_or_test_designer": false,
+    "sha256": "bc0a35ab9090bf7b1ee3a33910f36da4d2b89af6a7ebfd27ba28c4e60db701f7",
+    "fatal_issue_count": 0,
+    "additional_science_execution_required": false,
+    "physical_admission": "HOLD"
+  },
+  "execution_limits_observed": {
+    "native_runs": 0,
+    "gas_IVP_runs": 0,
+    "closed_PHYS19_PHYS20_science_replays": 0,
+    "large_campaigns": 0
+  },
+  "protected": {
+    "physical": "HOLD",
+    "legacy_interval_160_161": "FAIL",
+    "tick": 160,
+    "auxiliary_escape": "FAIL",
+    "HH_RCT_CR": "OFF",
+    "precision_atomic": "PARKED",
+    "source_default_runtime_returns_changes": 0
+  },
+  "next_task": "REI-PHYS22_INITIAL_TIME_COUPLED_SHEAR_RESPONSE",
+  "next_hypotheses_are_PHYS21_results": false
+}
