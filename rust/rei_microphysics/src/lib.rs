@@ -41,7 +41,10 @@ pub use axisym_contract::{
     Frame, GeometryOnlyAdmission, ICProviderRecord, MuReflectionStatus, ProviderDomain,
     ProviderErrorStatus, ProviderRecord, RadiationUnits, SourceProviderRecord, SymmetryRecord,
 };
-pub use axisym_coupling::{isotropic_expansion_terms, IsotropicExpansionTerms};
+pub use axisym_coupling::{
+    axisym_coupled_derivative, isotropic_expansion_terms, AxisymCoupledDerivative,
+    AxisymCoupledState, AxisymLocalSources, IsotropicExpansionTerms,
+};
 pub use axisym_radiation::{AxisymPhotonLedgerContract, AxisymPhotonStep};
 pub use axisym_sources::{
     validate_routing, ExcessPartition, PhotoEventLedger, PhotonRouting, PrimaryPhotoEvent,
