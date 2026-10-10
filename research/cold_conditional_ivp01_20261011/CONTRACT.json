@@ -1,0 +1,21 @@
+{
+ "unit":"COLD_CONDITIONAL_FLRW_IVP01",
+ "authority":"Parent Astra frozen contract; lower-tier implementation only",
+ "base_commit":"55091ff938f3a4649bef808f1ec83ac5d29384fb",
+ "base_tree":"5b5d5bfd9b0119d934bb6972a90676adbc5eaa2c",
+ "harness_status":"HARNESS_UNAVAILABLE",
+ "scope":"Four independent cold source-pinned FLRW conditional intervals; neutral helium, prescribed CMB, zero photons",
+ "H":"3.2407792896393e-18 sqrt(0.13 a^-3+0.343+g a^-4(1+0.227107317660239*3.04)); g=4.48162687719e-7*2.728^4",
+ "geometry":"AxisymmetricPoint(a,0,H,0); da/dtau=aH; Tgamma=Tgamma_i*a_i/a; no rescaling",
+ "native":"Full 13 isotope densities, thermal u, a, four ledgers; actual-stage production composition; RK4 N=8,16,32; tau 0..1e14; epochs 0,.25,.5,.75,1",
+ "ledgers":{"Rc":"a^3 r","Eesc":"a^3(chi*r+C)","Ebath":"-a^3 q","W":"2H a^3 u"},
+ "reference":"Independent Decimal80 reduced a,xe,T plus four ledgers; RK4 N128; no production callback",
+ "acceptance":{"stored_H_relative":3e-12,"fine_decimal":1e-10,"N16_N32":1e-10,"chemistry_energy":1e-10,"baryon_helium":1e-11,"stage_source_energy":1e-13,"stage_oracle":3e-12,"structural_zero":0,"source_free_analytic":1e-11},
+ "refinement":"D=max all fields and nonzero ledgers at all epochs |xa-xb|/max(|xa|,|xb|,appropriate nonzero initial scale); ledger initial scale is final independent-reference magnitude; exact-zero paired values equal. coarse=D8,16; fine=D16,32; coarse>2e-13 requires fine<=1.25 coarse, otherwise ROUNDOFF_LIMITED, no order claim",
+ "controls":"Baseline z20 N32 source-free a^3n,a^5u,a^2T; xe0 expansion-only RR/Compton exact zero; t0 unchanged, positive accepted, negative/NaN rejected",
+ "source_sha256":{"baseline":"f39c09cac72359ecff4366ba5e0828d75c7d44185d126fd499f9e741bfb5005e","refined":"4204d0ea44b23c868e5c5e330029bc35303ae85466cdb4671e60ba9d4a140611","REC_CONTRACT":"07630cbd86d6a8cc314e513a252dd582bab80b5153247c07e51a7c9195452f28","history.c":"8ffe38f0431fcd1ae04b55f855f36e8643b1c5eb33a947f581f95d628611f976","composition":"b9223c83e299d5037f5b9c8e301a0827e66e2441d094381e3f96257e98786ef0","HG97_PDF":"6ea0b803b554c91d598705f96416e1a8b67549fb02cb567944eaacdba5d148b0","RR":"a92fb4952cd93475616f93b4d1161c109eac0738402ce1c6c229a83c030a0b00","Compton":"2748809df576a95461e1d4ed4a530cd5691701741dbb332602186af0d7f33bbc","axisym":"6bb3feb6a290894bd8bdd45f9745f28329265cee8ce89589a11960b523e6b008"},
+ "limits":{"builds":1,"build_wall_s":300,"campaigns":1,"campaign_wall_s":120,"native_trajectories":14,"native_steps":288,"native_derivative_attempts":1400,"reference_trajectories":4,"reference_steps":512,"reference_rhs_attempts":2100,"repairs_without_Astra":0},
+ "stop":"Any substantive failure preserve first raw evidence and return to Astra; no clipping, fallback, model or tolerance changes",
+ "holds":["global admission","Bianchi","CR","helium reactions","radiation backreaction","physical continuum"],
+ "pass_transition":"fresh independent Astra review; parent publication decision"
+}

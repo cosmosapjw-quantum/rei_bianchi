@@ -24,6 +24,7 @@ mod hydrogen_step;
 pub mod cold_hii_rr;
 pub mod cold_compton;
 pub mod cold_stage_composition;
+pub mod cold_conditional_ivp;
 mod interval_ad;
 mod interval_math;
 pub mod isotope_state;

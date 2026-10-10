@@ -25,14 +25,14 @@ fn bad() -> ForwardError {
     ForwardError::InvalidInput("COLD_STAGE_COMPOSITION_DOMAIN")
 }
 
-/// Evaluate the actual current state at a gas proper-time stage tagged zero.
+/// Evaluate the actual current state at a finite nonnegative gas proper-time tag.
 pub fn stage(
     time_s: f64,
     geometry: AxisymmetricPoint,
     state: &AxisymCoupledState,
     tgamma_k: f64,
 ) -> Result<Stage, ForwardError> {
-    if time_s != 0.0
+    if !time_s.is_finite() || time_s < 0.0
         || geometry.anisotropy != 0.0
         || geometry.shear_per_s != 0.0
         || state.photon_number_m3 != 0.0
