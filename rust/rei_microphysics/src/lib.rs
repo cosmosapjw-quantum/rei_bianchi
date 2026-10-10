@@ -19,6 +19,7 @@ mod homogeneous_rates;
 mod hydrogen_step;
 mod interval_ad;
 mod interval_math;
+pub mod isotope_state;
 mod joint_affine;
 mod lift;
 mod microstep;
@@ -58,6 +59,9 @@ pub use homogeneous_rates::{
 pub use hydrogen_step::{hydrogen_step, HydrogenRates, HydrogenStep};
 pub use interval_ad::Jet;
 pub use interval_math::Interval;
+pub use isotope_state::{
+    IsotopeNumberMoments, IsotopeNumberState, IsotopeSpecies, LegacyHHeProjection,
+};
 pub use joint_affine::{
     below_strict_error_limit, joint_affine_difference, AffineEnclosure, ClosedInterval, JointParent,
 };
