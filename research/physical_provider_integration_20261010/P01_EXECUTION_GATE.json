@@ -1,0 +1,24 @@
+{
+  "schema": "rei-p01-source-bound-build-gate-v1",
+  "status": "BLOCKED_PENDING_SOURCE_PINNED_CLEAN_BUILD_RECEIPT",
+  "applies_to": "rust/rei_microphysics/python/source_bound_interval.py",
+  "finding": "The Python entrypoint accepts any --binary path. It records production source and binary hashes only after integration. Rust BIND compares caller-supplied identity strings and does not read files or prove that the executable was built from the recorded source.",
+  "impact": "A protocol-compatible stale executable can be run and then labeled SourceBoundConditional even when it was not built from the pinned source tree.",
+  "required_before_any_future_interval": [
+    "Start from an exact clean Git revision and record its commit/tree.",
+    "Hash Cargo.toml, Cargo.lock and every Rust source consumed by the binary before build.",
+    "Record toolchain identity, build command, exit status and clean-build output binary SHA-256.",
+    "Before subprocess launch, verify the current source hashes and --binary SHA-256 against the immutable build receipt.",
+    "Reject a stale or mismatched executable before BIND or integration.",
+    "Add a negative component test proving binary/source mismatch fails before solver construction."
+  ],
+  "not_sufficient": [
+    "A matching Rust BIND string",
+    "Hashes recorded only after integration",
+    "Producer-reported test counts without logs",
+    "The recovered production JSON/NPZ hashes alone"
+  ],
+  "solver_authorization": "NO_NEW_SOLVER_RUN_AUTHORIZED_BY_THIS_INTEGRATION",
+  "physical_history": "FAIL_CLOSED_UNCHANGED",
+  "optional_CR_RCT_HH": "OFF"
+}
