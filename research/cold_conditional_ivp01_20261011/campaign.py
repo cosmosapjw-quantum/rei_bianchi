@@ -49,6 +49,33 @@ def norm(aa,bb,ss):
    if den==0:assert x==y
    else:m=max(m,abs(x-y)/den)
  return m
+def finite_checks(trajectories,refs):
+ checks=[];ledgers=[]
+ def identity(name,terms,tol):
+  denominator=sum(abs(v) for v in terms);residual=abs(sum(terms))
+  value=residual/denominator if denominator else 0.
+  assert denominator or residual==0
+  checks.append({'name':name,'value':value,'limit':tol,'pass':value<=tol,'denominator':denominator,'terms':terms})
+  assert value<=tol,(name,value,tol)
+ for r in trajectories:
+  if r['control']!='physical' or r['n']!=32:continue
+  id=r['id'];ys=r['epochs'];y0=ys[0];a0=y0[0]
+  chem0=a0**3*y0[3];hi0=a0**3*y0[2];he0=a0**3*y0[11]
+  energy0=a0**3*(y0[14]+float(CHI)*y0[3]);baryon0=a0**3*(y0[2]+y0[3]+4*y0[11])
+  for j,y in enumerate(ys):
+   a3=y[0]**3
+   identity(f'chemistry_{id}_{j}',[-chem0,a3*y[3],y[15]],1e-10)
+   identity(f'HI_identity_{id}_{j}',[-hi0,a3*y[2],-y[15]],1e-10)
+   identity(f'He_identity_{id}_{j}',[-he0,a3*y[11]],1e-10)
+   identity(f'energy_{id}_{j}',[-energy0,a3*(y[14]+float(CHI)*y[3]),y[16],y[17],y[18]],1e-10)
+   identity(f'baryon_{id}_{j}',[-baryon0,a3*(y[2]+y[3]+4*y[11])],1e-11)
+   identity(f'helium_{id}_{j}',[-he0,a3*y[11]],1e-11)
+   for i,name in enumerate(('Rc','Eesc','Ebath','W'),15):
+    x,z=y[i],refs[id][j][i];den=max(abs(x),abs(z));error=abs(x-z)/den if den else 0.
+    assert den or x==z
+    ledger={'endpoint':id,'epoch_fraction':j/4,'ledger':name,'native':x,'reference':z,'comparison_denominator':den,'relative_error':error,'exact_zero':den==0}
+    ledgers.append(ledger);checks.append({'name':f'ledger_relative_{id}_{j}_{name}','value':error,'limit':1e-10,'pass':error<=1e-10});assert error<=1e-10
+ return checks,ledgers
 def main():
  receipt=json.loads((P/'evidence/BUILD_RECEIPT.json').read_text());binary=pathlib.Path(receipt['binary'])
  sources=receipt['sources']
@@ -76,13 +103,9 @@ def main():
   check(f'decimal_{id}',norm(ts[32],refs[id],ss),1e-10);check(f'refine_{id}',fine,1e-10)
   if coarse>2e-13:check(f'order_{id}',fine,1.25*coarse)
   checks.append({'name':f'order_status_{id}','status':'ROUNDOFF_LIMITED' if coarse<=2e-13 else 'REFINEMENT_RULE_PASS','coarse':coarse,'fine':fine,'scales':dict(zip(NAMES,ss))})
-  y0=ts[32][0];a0=y0[0];nh0=y0[2]+y0[3];energy0=a0**3*(y0[14]+float(CHI)*y0[3]);chem0=a0**3*y0[3]
-  for j,y in enumerate(ts[32]):
-   a=y[0];check(f'chemistry_{id}_{j}',abs(a**3*y[3]+y[15]-chem0)/chem0,1e-10)
-   check(f'energy_{id}_{j}',abs(a**3*(y[14]+float(CHI)*y[3])+y[16]+y[17]+y[18]-energy0)/energy0,1e-10)
-   check(f'baryon_{id}_{j}',abs(a**3*(y[2]+y[3]+4*y[11])-a0**3*(nh0+4*y0[11]))/(a0**3*(nh0+4*y0[11])),1e-11)
-   check(f'helium_{id}_{j}',abs(a**3*y[11]-a0**3*y0[11])/(a0**3*y0[11]),1e-11)
+  for y in ts[32]:
    assert all(y[1+i]==0 for i in range(13) if i not in (1,2,10))
+ finite,ledgers=finite_checks(trajectories,refs);checks.extend(finite)
  for r in rows:
   if r['kind']!='stage':continue
   y,dy=r['y'],r['dy'];a=D(str(y[0]));nh=D(str(y[2]+y[3]));nhe=D(str(y[11]));xe=D(str(y[3]))/nh;t=D(str(y[14]))/(D('1.5')*KB*(nh+nhe+nh*xe));e=es[r['id']];tg=D(str(e['Tgamma_K']))*D(str(e['a']))/a
@@ -107,7 +130,7 @@ def main():
    assert y[15:18]==[0.,0.,0.]
  for r in rows:
   if r['kind']=='control_stage' and not r['free']:assert r['dy'][15:18]==[0.,0.,0.]
- dump('VALIDATION.json',{'status':'PASS','checks':checks,'native_accounting':rows[-1],'reference_rhs_attempts':2048,'structural_exact_zero':'PASS','time_tag_controls':'PASS'})
+ dump('VALIDATION.json',{'status':'PASS','checks':checks,'native_accounting':rows[-1],'reference_rhs_attempts':2048,'structural_exact_zero':'PASS','time_tag_controls':'PASS','ledger_relative_errors':ledgers,'denominator_policy':'finite identities use epoch term absolute sums; ledger final/comparison magnitudes are comparison-only, never initial or residual scales'})
  dump('RESULTS.json',{'native':trajectories,'scope':'cold source-pinned FLRW finite conditional interval','broader_claims':'HOLD'})
 if __name__=='__main__':
  try:main()
