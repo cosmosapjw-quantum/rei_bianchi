@@ -70,6 +70,136 @@ pub struct ConstantHubbleBackground {
     pub hubble_per_s: [f64; 3],
 }
 
+/// A prescribed axisymmetric Bianchi-I point in proper-time units.
+///
+/// The two transverse scale factors are `a exp(-b)` and the longitudinal
+/// factor is `a exp(2b)`, so the volume remains `a^3`.  This is a geometry
+/// adapter only: it supplies neither a physical source nor gas initial data.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct AxisymmetricPoint {
+    pub mean_scale_factor: f64,
+    pub anisotropy: f64,
+    pub mean_hubble_per_s: f64,
+    pub shear_per_s: f64,
+}
+
+impl AxisymmetricPoint {
+    pub fn new(
+        mean_scale_factor: f64,
+        anisotropy: f64,
+        mean_hubble_per_s: f64,
+        shear_per_s: f64,
+    ) -> Result<Self, ForwardError> {
+        positive_finite(mean_scale_factor, "AxisymMeanScale")?;
+        finite(anisotropy, "AxisymAnisotropy")?;
+        finite(mean_hubble_per_s, "AxisymMeanHubble")?;
+        finite(shear_per_s, "AxisymShear")?;
+        let point = Self {
+            mean_scale_factor,
+            anisotropy,
+            mean_hubble_per_s,
+            shear_per_s,
+        };
+        point.snapshot()?;
+        Ok(point)
+    }
+
+    pub fn snapshot(&self) -> Result<GeometrySnapshot, ForwardError> {
+        let transverse = positive_finite(
+            self.mean_scale_factor * (-self.anisotropy).exp(),
+            "AxisymTransverseScale",
+        )?;
+        let longitudinal = positive_finite(
+            self.mean_scale_factor * (2.0 * self.anisotropy).exp(),
+            "AxisymLongitudinalScale",
+        )?;
+        GeometrySnapshot::new(
+            [transverse, transverse, longitudinal],
+            [
+                finite(
+                    self.mean_hubble_per_s - self.shear_per_s,
+                    "AxisymTransverseHubble",
+                )?,
+                finite(
+                    self.mean_hubble_per_s - self.shear_per_s,
+                    "AxisymTransverseHubble",
+                )?,
+                finite(
+                    self.mean_hubble_per_s + 2.0 * self.shear_per_s,
+                    "AxisymLongitudinalHubble",
+                )?,
+            ],
+        )
+    }
+}
+
+/// Analytic prescribed axisymmetric geometry over a finite proper-time domain.
+///
+/// It deliberately has no `ln(a)` inverse: `H=0` is a valid proper-time
+/// background, while an inverse chart would be singular there.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ConstantAxisymmetricBackground {
+    pub reference_time_s: f64,
+    pub reference_point: AxisymmetricPoint,
+    pub time_domain_s: [f64; 2],
+}
+
+impl ConstantAxisymmetricBackground {
+    pub fn new(
+        reference_time_s: f64,
+        reference_point: AxisymmetricPoint,
+        time_domain_s: [f64; 2],
+    ) -> Result<Self, ForwardError> {
+        finite(reference_time_s, "AxisymReferenceTime")?;
+        let background = Self {
+            reference_time_s,
+            reference_point,
+            time_domain_s,
+        };
+        background.validate_time_domain()?;
+        Ok(background)
+    }
+
+    fn validate_time_domain(&self) -> Result<(), ForwardError> {
+        finite(self.time_domain_s[0], "AxisymTimeDomain")?;
+        finite(self.time_domain_s[1], "AxisymTimeDomain")?;
+        if self.time_domain_s[0] > self.time_domain_s[1] {
+            return Err(invalid("AxisymTimeDomain"));
+        }
+        Ok(())
+    }
+}
+
+impl GeometryBackground for ConstantAxisymmetricBackground {
+    fn snapshot(&self, t: f64) -> Result<GeometrySnapshot, ForwardError> {
+        finite(t, "AxisymTime")?;
+        self.validate_time_domain()?;
+        if t < self.time_domain_s[0] || t > self.time_domain_s[1] {
+            return Err(invalid("AxisymTimeDomain"));
+        }
+        let dt = finite(t - self.reference_time_s, "AxisymTime")?;
+        AxisymmetricPoint::new(
+            positive_finite(
+                self.reference_point.mean_scale_factor
+                    * finite(
+                        self.reference_point.mean_hubble_per_s * dt,
+                        "AxisymExponent",
+                    )?
+                    .exp(),
+                "AxisymMeanScale",
+            )?,
+            finite(
+                self.reference_point.anisotropy
+                    + finite(self.reference_point.shear_per_s * dt, "AxisymAnisotropy")?,
+                "AxisymAnisotropy",
+            )?,
+            self.reference_point.mean_hubble_per_s,
+            self.reference_point.shear_per_s,
+        )?
+        .snapshot()
+    }
+}
+
 impl ConstantHubbleBackground {
     pub fn new(
         initial_scale_factors: [f64; 3],

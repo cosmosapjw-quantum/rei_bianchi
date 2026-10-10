@@ -7,6 +7,10 @@
 mod adaptive_history;
 mod angular_photons;
 mod atomic_provider;
+pub mod axisym_contract;
+pub mod axisym_coupling;
+pub mod axisym_radiation;
+pub mod axisym_sources;
 mod bianchi_i;
 pub mod coverage;
 mod ft03_controlled;
@@ -18,6 +22,7 @@ mod homogeneous_rates;
 mod hydrogen_step;
 mod interval_ad;
 mod interval_math;
+pub mod isotope_state;
 mod joint_affine;
 mod lift;
 mod microstep;
@@ -31,9 +36,19 @@ pub use atomic_provider::{
     Absorber, AtomicProvider, CoefficientUnits, ObservableKind, RawCoefficient, RawProcess,
     RawRecord, RecombinationCase, SourceFrame, TemperatureDomain,
 };
+pub use axisym_contract::{
+    AxisymContractError, AxisymRunContract, AxisymmetryStatus, Clock, ClosureChoice, ExecutionMode,
+    Frame, GeometryOnlyAdmission, ICProviderRecord, MuReflectionStatus, ProviderDomain,
+    ProviderErrorStatus, ProviderRecord, RadiationUnits, SourceProviderRecord, SymmetryRecord,
+};
+pub use axisym_coupling::{isotropic_expansion_terms, IsotropicExpansionTerms};
+pub use axisym_radiation::{AxisymPhotonLedgerContract, AxisymPhotonStep};
+pub use axisym_sources::{
+    validate_routing, ExcessPartition, PhotoEventLedger, PhotonRouting, PrimaryPhotoEvent,
+};
 pub use bianchi_i::{
-    CharacteristicRay, ConstantHubbleBackground, GeometryBackground, GeometrySnapshot,
-    RayDerivative,
+    AxisymmetricPoint, CharacteristicRay, ConstantAxisymmetricBackground, ConstantHubbleBackground,
+    GeometryBackground, GeometrySnapshot, RayDerivative,
 };
 pub use ft03_controlled::{
     ft03_adaptive_step, ft03_implicit_step, ft03_rhs, ft03_try_step, Ft03Events, Ft03Model,
@@ -52,6 +67,10 @@ pub use homogeneous_rates::{
 pub use hydrogen_step::{hydrogen_step, HydrogenRates, HydrogenStep};
 pub use interval_ad::Jet;
 pub use interval_math::Interval;
+pub use isotope_state::{
+    IsotopeNumberMoments, IsotopeNumberState, IsotopeSpecies, LegacyHHeEosSnapshot,
+    LegacyHHeProjection,
+};
 pub use joint_affine::{
     below_strict_error_limit, joint_affine_difference, AffineEnclosure, ClosedInterval, JointParent,
 };
