@@ -1,0 +1,87 @@
+{
+  "task_id": "REI-PHYSINPUT-01-20261010",
+  "date_utc": "2026-10-10",
+  "base_commit": "17bd1cc0ce1484ee61cac60ab1bda207ae264381",
+  "phase_order": [
+    "theory",
+    "coding",
+    "independent_review",
+    "publication"
+  ],
+  "theory": {
+    "status": "COMPLETED_SCOPED",
+    "evidence": [
+      "THEORY_DERIVATION_KO.md",
+      "THEORY_SOURCE_LEDGER.json",
+      "evidence/background_validation.json"
+    ],
+    "result": "Explicit dust+Lambda Bianchi-I / HM12 initial radiation + source / normalized warm H-He equilibrium / primary-only Case-A escape model."
+  },
+  "coding": {
+    "status": "EXECUTED_PASS_SCOPED",
+    "evidence": [
+      "native/validation/EXECUTION.json",
+      "evidence/VALIDATION.json",
+      "evidence/input_audit.json"
+    ],
+    "histories_executed": 11,
+    "tests_passed": 43,
+    "active_candidate": "evidence/extended_dataset.npz",
+    "production_source_changed": false
+  },
+  "independent_review": {
+    "status": "PROMOTE_SCOPED",
+    "files": [
+      "independent_review.json",
+      "REVIEW_KO.md"
+    ],
+    "identity": "separate decision_review agent; not the implementer",
+    "global_admission": "HOLD"
+  },
+  "scientific_admission": "HOLD",
+  "claim_ceiling": "Four missing input classes supplied for one explicit conditional model; actual existing atomic and AXI functions consume them for the first short coupled interval. Not production PhysicalHistory or global physical EoR admission.",
+  "active_decision": "D01: replace the initial 10..200 eV candidate by 10..50000 eV after quantifying material HeII tail; original evidence preserved.",
+  "failures_and_resolutions": [
+    {
+      "layer": "PHYSICAL_MODEL",
+      "finding": "200..50000 eV contributes 53.945% of initial HeII primary heating in the provider-supported range",
+      "resolution": "Extend to original native cross-section maximum 50000 eV; retain original runs",
+      "residual": "Beyond-provider reactions, secondary/Compton and diffuse transport remain unresolved"
+    },
+    {
+      "layer": "RUNTIME_ENVIRONMENT",
+      "finding": "System apt installation failed with setgroups/setuid unavailable, exit 100",
+      "resolution": "Official SHA-verified Rust tarballs installed in private prefix"
+    },
+    {
+      "layer": "REPORT_SERIALIZATION",
+      "finding": "Initial background JSON numpy bool serialization failed",
+      "resolution": "Explicit Python bool conversion; corrected audit executed; details in background_execution_notes.json"
+    },
+    {
+      "layer": "RUNTIME_ENVIRONMENT",
+      "finding": "cargo-fmt unavailable, command exit 101",
+      "resolution": "Recorded unavailable; not represented as a successful formatting check"
+    },
+    {
+      "layer": "PUBLICATION_AUTH",
+      "finding": "Noninteractive Git CLI push dry run lacks username/token, exit 128",
+      "resolution": "Connected GitHub Git-object API; actual ACK recorded separately after publication"
+    }
+  ],
+  "unexecuted": [
+    "Production SourceBoundConditional integration",
+    "PhysicalHistory admission",
+    "Cold REC/mean-IGM initial state and low-T atomic model",
+    "Full diffuse / high-energy / secondary / Compton closure",
+    "Long cosmological history and global continuum/model-error certificate",
+    "Remote CI unless separately observed"
+  ],
+  "next_bounded_unit": "P01 in RESEARCH_DAG.json: actual production conditional consumer integration",
+  "publication": "See PUBLICATION_RECEIPT.json; receipt is added only after observed remote ACK. No self-hash claim.",
+  "packaging_checks": {
+    "shell_syntax": "PASS: bash -n reproduce.sh",
+    "git_diff_check": "Whitespace-only findings in original source tables, raw test logs, frozen theory prose, and .gitignore; retained to preserve source/review identities. No code whitespace finding.",
+    "source_scope": "Only new research/physical_provider_20261010 files staged; production sources unchanged."
+  }
+}
