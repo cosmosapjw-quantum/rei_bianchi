@@ -7,6 +7,7 @@
 mod adaptive_history;
 mod angular_photons;
 mod atomic_provider;
+pub mod axisym_contract;
 mod bianchi_i;
 pub mod coverage;
 mod ft03_controlled;
@@ -30,6 +31,11 @@ pub use angular_photons::{PhotonBins, PhotonGrid, PhotonPacket, RadiationState};
 pub use atomic_provider::{
     Absorber, AtomicProvider, CoefficientUnits, ObservableKind, RawCoefficient, RawProcess,
     RawRecord, RecombinationCase, SourceFrame, TemperatureDomain,
+};
+pub use axisym_contract::{
+    AxisymContractError, AxisymRunContract, AxisymmetryStatus, Clock, ClosureChoice, ExecutionMode,
+    Frame, GeometryOnlyAdmission, ICProviderRecord, MuReflectionStatus, ProviderDomain,
+    ProviderErrorStatus, ProviderRecord, RadiationUnits, SourceProviderRecord, SymmetryRecord,
 };
 pub use bianchi_i::{
     AxisymmetricPoint, CharacteristicRay, ConstantAxisymmetricBackground, ConstantHubbleBackground,
