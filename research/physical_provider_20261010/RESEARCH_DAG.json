@@ -1,0 +1,96 @@
+{
+  "task_id": "REI-PHYSINPUT-01-20261010",
+  "global_status": "CONDITIONAL_UNBLOCK_PHYSICAL_ADMISSION_HOLD",
+  "nodes": [
+    {
+      "id": "R01",
+      "title": "source bytes, exact background, normalized IC, explicit closure",
+      "status": "completed",
+      "evidence": [
+        "CONTRACT.json",
+        "sources/acquisition.json",
+        "THEORY_DERIVATION_KO.md",
+        "evidence/background_validation.json"
+      ]
+    },
+    {
+      "id": "C01",
+      "title": "provider-bound native conditional coupled interval",
+      "status": "completed_scoped",
+      "depends_on": [
+        "R01"
+      ],
+      "evidence": [
+        "evidence/extended.json",
+        "evidence/extended_dataset.npz",
+        "evidence/VALIDATION.json"
+      ],
+      "claim_ceiling": "selected warm HHe dustLambda test-field IVP only"
+    },
+    {
+      "id": "D01",
+      "title": "material HeII tail correction 200eV to50keV",
+      "status": "completed_scoped",
+      "depends_on": [
+        "C01"
+      ],
+      "evidence": [
+        "evidence/input_audit.json",
+        "evidence/extended_refine.json"
+      ],
+      "preserved_failure": "200eV spectrum not complete for HeII heating"
+    },
+    {
+      "id": "P01",
+      "title": "production explicit conditional provider consumer",
+      "status": "ready",
+      "depends_on": [
+        "R01",
+        "C01",
+        "D01"
+      ],
+      "success": "first actual production interval using pinned dataset; do not simply bypass PhysicalHistory guard"
+    },
+    {
+      "id": "P02",
+      "title": "REC-derived cold IC and low-temperature rates/thermal provider",
+      "status": "blocked_if_cold_IGM_required",
+      "depends_on": [
+        "P01"
+      ],
+      "blocker": "FT03 range30000..110000K; current warm-parcel IC not REC history"
+    },
+    {
+      "id": "P03",
+      "title": "physical radiation closure and energy-deposition admission",
+      "status": "open_research",
+      "depends_on": [
+        "D01"
+      ],
+      "blockers": [
+        "diffuse recombination fate",
+        "secondary and Compton treatment",
+        "above50keV rates/boundary",
+        "atomic/source uncertainty",
+        "test-field background approximation"
+      ]
+    },
+    {
+      "id": "F01",
+      "title": "full intended physical reionization history",
+      "status": "HOLD",
+      "depends_on": [
+        "P01",
+        "P02",
+        "P03"
+      ],
+      "not_inherited": [
+        "continuum certificate",
+        "QV",
+        "observational fit",
+        "physical closure accuracy"
+      ]
+    }
+  ],
+  "stop_rule": "Do not repeat unchanged missing-input audits; execute P01 or resolve specific P02/P03 physical requirements."
+}

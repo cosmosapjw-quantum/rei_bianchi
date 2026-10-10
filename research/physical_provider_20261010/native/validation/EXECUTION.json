@@ -1,0 +1,82 @@
+{
+  "timestamp_utc": "2026-10-10T06:24:21.389865+00:00",
+  "commands": [
+    {
+      "test_id": "native_tests",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "research/physical_provider_20261010/native/Cargo.toml"
+      ],
+      "exit_code": 0,
+      "stdout": "native_tests.stdout.log",
+      "stderr": "native_tests.stderr.log"
+    },
+    {
+      "test_id": "legacy_targeted",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/rei_microphysics/Cargo.toml",
+        "--test",
+        "axisym_coupling",
+        "--test",
+        "axisym_radiation",
+        "--test",
+        "axisym_contract",
+        "--test",
+        "isotope_state",
+        "--test",
+        "ft03_controlled"
+      ],
+      "exit_code": 0,
+      "stdout": "legacy_targeted.stdout.log",
+      "stderr": "legacy_targeted.stderr.log"
+    },
+    {
+      "test_id": "rustc_version",
+      "command": [
+        "rustc",
+        "--version",
+        "--verbose"
+      ],
+      "exit_code": 0,
+      "stdout": "rustc_version.stdout.log",
+      "stderr": "rustc_version.stderr.log"
+    },
+    {
+      "test_id": "cargo_version",
+      "command": [
+        "cargo",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "cargo_version.stdout.log",
+      "stderr": "cargo_version.stderr.log"
+    },
+    {
+      "test_id": "cargo_fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "research/physical_provider_20261010/native/Cargo.toml"
+      ],
+      "exit_code": 101,
+      "failure_layer": "RUNTIME_ENVIRONMENT",
+      "observed": "no such command: fmt; cargo-fmt absent",
+      "scientific_effect": "none; formatting unavailable"
+    }
+  ],
+  "source_sha256": {
+    "research/physical_provider_20261010/native/src/main.rs": "ed3d6dd3fea9513b61c15aaf3b20b44843c19fc3caab6a93456f8c8e4e928912",
+    "research/physical_provider_20261010/native/Cargo.toml": "84b0428b928ab2ac1eaf1f5ec57af2c332d85c26639880304de6a6f71de393a2",
+    "rust/rei_microphysics/src/ft03_controlled.rs": "61e11471482bb49d99e5d0eb79504d3f67538fbe6361653a0462d1abb0b672db",
+    "rust/rei_microphysics/src/ft03_rates.rs": "1a97cd7a3555deeb4d8700376cd84580c5102127773bc3a235a29c33b0c1542f",
+    "rust/rei_microphysics/src/atomic_provider.rs": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3",
+    "rust/rei_microphysics/src/axisym_coupling.rs": "122ded2ba4e7d73541fabfaffed0d408ea8cc5f758567844f8666a65b9a2de5d"
+  },
+  "claim_ceiling": "implementation consistency and defined-unit/ledger checks; no PhysicalHistory or physical EoR admission"
+}
