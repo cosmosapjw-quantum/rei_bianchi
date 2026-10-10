@@ -1,0 +1,147 @@
+{
+  "task": "REI-PHYS24-20261011",
+  "role": "moment theory contributor; not final decision reviewer",
+  "created_utc": "2026-10-10T17:24:19.708427+00:00",
+  "status": "DERIVED_WITH_ACTUAL_CURVATURE_INPUT_CONNECTED",
+  "contract_sha256": "fd60772fa082a651034b21b965133e57cc0c3e37bb14cdab531a5ca3965266e2",
+  "document": {
+    "path": "MOMENT_EXTREMIZERS_KO.md",
+    "sha256": "3b85cc479a335dc61bd4ece1d09d641c2f94f5ad8b2e0c4ae1f0d98b49e96a11",
+    "bytes": 18945
+  },
+  "assumptions": {
+    "general": [
+      "I=[a,b] compact real interval with a<b",
+      "g continuous and finite on I",
+      "all nonnegative finite Borel photon measures with fixed positive mass N0 and mean m in I",
+      "Dirac spectral lines are allowed"
+    ],
+    "strict_convex_specialization": [
+      "g strictly convex on I"
+    ],
+    "sign_partition": [
+      "g(a)>0>g(b)"
+    ],
+    "physical_application": [
+      "N0 and q are positive and fixed by PHYS24 contract",
+      "g or k are not double-normalized",
+      "serialized numerical J decimals are treated as fixed exact rational inputs; their upstream numerical and physical uncertainty is not enclosed"
+    ]
+  },
+  "claims": [
+    {
+      "id": "M24-MOM-01",
+      "claim": "For any continuous g, the response set at fixed mean is a closed attained interval [lower convex envelope, upper concave envelope].",
+      "status": "derived",
+      "evidence": "Document sections 2.1 and 2.3: compact planar convex hull and elementary affine-dependence reduction."
+    },
+    {
+      "id": "M24-MOM-02",
+      "claim": "Each endpoint has an optimizer supported on at most two energies. This does not assert that all optimizers have at most two support points.",
+      "status": "derived",
+      "evidence": "Document section 2.2: interior triangle contradiction and collinear reduction."
+    },
+    {
+      "id": "M24-MOM-03",
+      "claim": "Every response in the interval is attainable; a general at-most-three-point representation follows from the same planar reduction.",
+      "status": "derived",
+      "evidence": "Document section 2.1."
+    },
+    {
+      "id": "M24-MOM-04",
+      "claim": "Under strict convexity the minimum is g(m) at unique delta_m and maximum is the endpoint chord at the unique endpoint mixture, for interior m. Endpoint means admit only their own Dirac measure.",
+      "status": "derived_conditional_assumptions_satisfied_by_separate_certificate",
+      "evidence": "Document section 3 plus curvature input."
+    },
+    {
+      "id": "M24-MOM-05",
+      "claim": "The mono-plus-endpoint mixture gives an explicit at-most-three-line family. An anchored two-line path also attains every intermediate response by continuity and strict increase of secant slopes.",
+      "status": "derived_conditional_assumptions_satisfied_by_separate_certificate",
+      "evidence": "Document section 3.1. Three lines are sufficient, not necessary; anchored-path uniqueness is not global representation uniqueness."
+    },
+    {
+      "id": "M24-MOM-06",
+      "claim": "If endpoint signs are opposite, unique kernel root E_minus and chord root E_plus obey a<E_minus<E_plus<b and determine the five complete mean-sign regimes, including unique zero extremizers at both boundaries.",
+      "status": "derived_conditional_assumptions_satisfied_by_separate_certificate",
+      "evidence": "Document section 4."
+    },
+    {
+      "id": "M24-MOM-07",
+      "claim": "The actual PHYS24 coefficient interval and sign partition follow for the fixed serialized J after consuming the separate curvature and endpoint sign certificate.",
+      "status": "derived_from_separate_exact_certificate",
+      "evidence": "Document section 6.1; no replay or independent curvature verification claimed."
+    }
+  ],
+  "consumed_scientific_input": {
+    "path": "../curvature/CURVATURE_CERTIFICATE.json",
+    "sha256": "48a301226276efa5ae42815358a9629a45f28a64ba0a8a553dc517f63913d552",
+    "read_scope": [
+      "definitions",
+      "domain",
+      "units",
+      "curvature_certificate",
+      "endpoint_sign_certificates",
+      "certified_conclusions",
+      "check_count",
+      "pass_count",
+      "scope_limits"
+    ],
+    "contract_hash_matches": true,
+    "J_input_hash_matches": true,
+    "recorded_first_execution_checks": 20,
+    "recorded_first_execution_passes": 20,
+    "code_executions_by_this_contributor": 0,
+    "not_independent_validation_credit": true
+  },
+  "literature": [
+    {
+      "id": "PINELIS_1204_0249",
+      "title": "On the extreme points of moments sets",
+      "author": "Iosif Pinelis",
+      "primary": true,
+      "urls": [
+        "https://arxiv.org/abs/1204.0249",
+        "https://arxiv.org/pdf/1204.0249"
+      ],
+      "retrieval_refs": [
+        "turn16view0",
+        "turn16view1",
+        "turn17view0",
+        "turn17view1",
+        "turn17view2"
+      ],
+      "discovery_refs": [
+        "turn15academia12",
+        "turn18academia9"
+      ],
+      "read_scope": [
+        "arXiv abstract and version metadata",
+        "10-page arXiv PDF: Theorem 1, Corollaries 4-5, Proposition 6, Theorem 7, Proposition 9, Corollaries 10-11"
+      ],
+      "support": "Corollary 11 under Polish/Borel hypotheses agrees with at-most-two-point extreme measures for f=(1,E).",
+      "role": "Primary-source consistency check; the task-specific envelope and equality proofs are given directly in this contribution.",
+      "not_read_or_not_supported": [
+        "2016 journal full text",
+        "original works cited by Pinelis",
+        "HeIII kernel curvature or physical accuracy",
+        "numerical root positions"
+      ],
+      "quote_words": 0,
+      "global_novelty_claim": false
+    }
+  ],
+  "scientific_execution_counts": {
+    "new_numerical_science_runs": 0,
+    "native_runs": 0,
+    "gas_IVP_runs": 0,
+    "old_proof_suite_replays": 0,
+    "old_helper_main_invocations": 0
+  },
+  "limits": [
+    "No finite-time or finite-epsilon remainder estimate.",
+    "Vanishing t4 coefficient gives no sign at higher time orders.",
+    "No uncertainty propagation for J or atomic fits.",
+    "No source admission or physical promotion.",
+    "No final reviewer role."
+  ]
+}
