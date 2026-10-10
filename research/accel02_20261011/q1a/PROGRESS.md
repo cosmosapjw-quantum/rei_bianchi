@@ -9,3 +9,5 @@ C08A: new-grid local preflight PASS; first NumPy boolean serialization failure p
 Started GAUSS1_FINE (rtol1e-11), GAUSS2_FINE (rtol1e-11), GAUSS1_TIGHT (rtol3e-12), each z15.9→4 and declared5400s ceiling. Original thresholds/IC/source/closure/domain criteria unchanged.
 
 C08A2: current run identities, progress snapshot, prospective full24 source-gate failure and independently checked Q1B proposal saved. Execution continues; in-progress RESTART files are diagnostic state evidence, not a supported resume interface. No terminal result yet.
+
+C08B: G1_FINE full z15.9→4 completed1795.163s, E1.08158e-10 PASS and N3.5288241e-9 FAIL; actualacceptedfinite/gas/photon PASS. Independent savedstate N audit confirmsFAIL. G1_TIGHT stopped2034.389s at u.8677276379 (zabout4.41), solverminstep failure,112epochs. PrefixE/N withincriteria isnotfullintervaladmission. BothfirstterminalrawarchivesdualACK. G1fineMOMENTSidentity/reconstructionPASS, noODEpostprocessing. FormalnewtimecomparisonNOT_EXECUTED_INCOMPLETE. G2stillrunning.

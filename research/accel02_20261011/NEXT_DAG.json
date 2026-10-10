@@ -2,7 +2,7 @@
   "schema": "rei_accel02_next_dag_v2",
   "campaign_id": "REI_ACCEL02_20261011",
   "execution_utc_date": "2026-10-10",
-  "draft_status": "Q1A_FULL_INTERVAL_IN_PROGRESS_KNOWN_SOURCE_PAIR_FAIL",
+  "draft_status": "Q1A_REJECTED_COARSE_LEDGER_AND_SOURCE_GATE_FINE_RUN_ACTIVE",
   "authority": "Current user resume instruction plus unchanged ACCEL02 contracts and independent phase2 quantitative decision",
   "completed_do_not_replay": [
     "REI-ACCEL01 RUN001/RUN002 reduced20to4",
@@ -135,7 +135,7 @@
     },
     {
       "id": "Q1A_FIXED_Q_GAUSS",
-      "state": "IMPLEMENTED_LOCAL_PASS_FULL_RUNS_ACTIVE_SOURCE_GATE_FAIL_BOUND",
+      "state": "REJECTED_CURRENT_CANDIDATE_FINE_DIAGNOSTIC_ACTIVE",
       "depends": [
         "Q0_SOURCE_PROFILE"
       ],
@@ -148,7 +148,7 @@
         "source replacement or smoothing",
         "unbounded uniform grid doubling"
       ],
-      "next_action": "Monitor existing GAUSS1_FINE,GAUSS2_FINE,GAUSS1_TIGHT; do not launch duplicates. Durable rawcheckpoint beforepostprocessing.",
+      "next_action": "Preserve G1_FINE fullrun and G1_TIGHT firstfailure; awaitexistingG2 terminal only; no duplicateoruniformgridrerun.",
       "evidence": [
         "q1a/CONTRACT.json",
         "q1a/evidence/PREFLIGHT.json",
@@ -170,14 +170,19 @@
     },
     {
       "id": "Q2_FULL_INTERVAL",
-      "state": "Q1A_THREE_NEW_RUNS_ACTIVE",
+      "state": "G1_WHOLE_LEDGER_FAIL_TIGHT_INCOMPLETE_G2_ACTIVE",
       "depends_any": [
         "Q1A_FIXED_Q_GAUSS",
         "Q1B_FIXED_CELL_TWO_MOMENT"
       ],
       "action": "Complete existing wholeinterval newGauss pair andsamegrid timecomparison. Full24spectralFAIL alreadybounded fromsource; measureevolvedresponse andpreservefailure.",
       "acceptance": "Frozen native time2e-6, energy_initial1e-9, number_nH1e-9 and empirical spectral1e-3; report sample sets separately; independent review required",
-      "if_fail": "Preserve first failure and localize changed error contribution; do not repeat unchanged campaigns or relax criteria"
+      "if_fail": "Preserve first failure and localize changed error contribution; do not repeat unchanged campaigns or relax criteria",
+      "evidence": [
+        "q1a/COMPARISON_STATUS_C08B.json",
+        "q1a/evidence/GAUSS1_FINE/RESULT.json",
+        "q1a/evidence/GAUSS1_TIGHT/RESULT.json"
+      ]
     },
     {
       "id": "P1_RESUME_CLI",

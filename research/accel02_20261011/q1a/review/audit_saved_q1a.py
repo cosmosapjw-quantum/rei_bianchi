@@ -59,8 +59,23 @@ def inspect_run(path):
     number=max(result['max_endpoint_number_ledger'],max(abs(r['number_ledger_scaled']) for r in rows))
     checks['energy_aggregation']=energy==result['max_energy_ledger']; checks['number_aggregation']=number==result['max_number_ledger']
     checks['energy_gate']=energy<=1e-9;checks['number_gate']=number<=1e-9
+    checks={key:bool(value) for key,value in checks.items()}
+    # Independent FLRW saved-state ledger arithmetic, no provider or native call.
+    h0=70*1e5/3.0856775814913673e24
+    rhob=.045*3*h0*h0/(8*np.pi*6.67430e-8);vi=(1/16.9)**3
+    nh0=.76*rhob/1.67262192369e-24/vi; nhe0=.24*rhob/(4*1.67262192369e-24)/vi
+    arel=16.9/(1+np.array([r['z'] for r in rows]))
+    photons=states[:,4:4+n];counts=np.sum(photons*arel[:,None]/q[None,:],axis=1)
+    counters=states[:,4+n:];chi=np.array([13.598434599702,24.587389011,54.41776])
+    total=1.602176634e-12*(nh0*states[:,3]+nh0*states[:,0]*chi[0]+nhe0*(states[:,1]*chi[1]+states[:,2]*(chi[1]+chi[2]))+photons.sum(axis=1))
+    independent_energy=(total+counters[:,0]+counters[:,1]-counters[:,2]-counters[:,5]-total[0])/total[0]
+    independent_number=(counts+counters[:,3]-counters[:,4]-counts[0])/nh0
+    arithmetic=dict(energy_sample_max=float(max(abs(independent_energy))),number_sample_max=float(max(abs(independent_number))),
+        energy_sample_report_difference=float(max(abs(independent_energy-[r['energy_ledger_scaled'] for r in rows]))),
+        number_sample_report_difference=float(max(abs(independent_number-[r['number_ledger_scaled'] for r in rows]))),
+        note='Independent array summation and FLRW a_rel from saved redshift; roundoff/order may differ from serial native-driver reporting. Segment-endpoint maxima use recorded evidence.')
     return dict(run=path.name,checks=checks,all_checks=all(checks.values()),energy_max=energy,number_max=number,
-                temperature_relative_disagreement=temp_relative,identities={x:sha(path/x) for x in
+                temperature_relative_disagreement=temp_relative,independent_saved_ledger_arithmetic=arithmetic,identities={x:sha(path/x) for x in
                 ['RESULT.json','IDENTITY.json','GRID.json','history.npz','EVENTS.json']})
 
 def compare(left,right,kind):
@@ -90,7 +105,8 @@ def compare(left,right,kind):
                         formal_pass=all(v['finite'] and v['pass_target'] for v in formal),
                         formal_failed_count=sum(not (v['finite'] and v['pass_target']) for v in formal))
     return dict(kind=kind,target=target,identity_checks=checks,identity_pass=all(checks.values()),selections=sets,
-                pass_all=all(checks.values()) and all(v['formal_pass'] for v in sets.values()))
+                fields_and_pair_identity_pass=all(checks.values()) and all(v['formal_pass'] for v in sets.values()),
+                combined_run_admission='NOT_DECIDED_BY_FIELD_COMPARISON; requires each run checks')
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--coarse',type=Path,required=True)
@@ -102,6 +118,9 @@ def main():
                 reviewer='/root/q1a_independent',model_identity='UNKNOWN',ODE_calls=0,native_calls=0,old_replays=0,
                 runs=[inspect_run(p) for p in paths],spectral=compare(a.coarse,a.fine,'spectral'))
     if a.time_fine:result['temporal']=compare(a.coarse,a.time_fine,'temporal')
+    result['combined_spectral_admission']=all(r['all_checks'] for r in result['runs'][:2]) and result['spectral']['fields_and_pair_identity_pass']
+    if a.time_fine:
+        result['combined_temporal_admission']=result['runs'][0]['all_checks'] and result['runs'][2]['all_checks'] and result['temporal']['fields_and_pair_identity_pass']
     result['code_sha256']=sha(Path(__file__))
     a.output.write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps({k:v for k,v in result.items() if k not in ['runs','spectral','temporal']},indent=2))
