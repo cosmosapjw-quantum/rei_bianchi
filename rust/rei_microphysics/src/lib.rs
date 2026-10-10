@@ -10,6 +10,7 @@ mod atomic_provider;
 pub mod axisym_conditional;
 pub mod axisym_contract;
 pub mod axisym_coupling;
+pub mod axisym_cr_deposition;
 pub mod axisym_radiation;
 pub mod axisym_sources;
 mod bianchi_i;
