@@ -1,0 +1,455 @@
+{
+  "schema": "rei.phys21.independent_second_order_checks.v1",
+  "created_utc": "2026-10-10T10:49:50.885615+00:00",
+  "evidence_status": [
+    "derived",
+    "numerically checked"
+  ],
+  "scope": "Fixed gas analytic diagnostics. No FT03 evolving-gas/native history or physical admission.",
+  "coordinate_convention": "Isotropic physical birth directions. beta=epsilon B; fixed principal axes.",
+  "normalization": "All reported coefficients multiply epsilon^2; the second derivative is twice the coefficient.",
+  "units": "Dimensionless x=(s-b)/T; kappa=T*lambda0. E0 is one energy unit; heating chi/E0=1/2.",
+  "method": "Exact Fraction polynomial integration and degree-four spherical cubature; Decimal80 finite-amplitude kernels, composite Boole, centered Richardson extrapolation.",
+  "limitations": [
+    "Four direction-square classes group a 14-ray cubature; exact Q2/Q4 does not imply exact finite-amplitude angular integration.",
+    "Boole resolution comparison is numerical evidence, not a rigorous quadrature enclosure.",
+    "The H=0, power-law opacity cases are analytic diagnostics, not self-consistent Einstein or production FT03 runs.",
+    "Native midpoint source/defaults were not modified."
+  ],
+  "python": "3.12.14",
+  "decimal_precision": 80,
+  "script_sha256": "055c911f1676b35ba29cd83e610166db4148a7da3e48b0dc2787b55a9987692d",
+  "exact_results": [
+    {
+      "case": "inverse_cube_absorption_tau_quarter",
+      "baseline_optical_depth": "1/4",
+      "normalized_epsilon2_coefficient": "-9/32",
+      "normalized_second_derivative": "-9/16"
+    },
+    {
+      "case": "inverse_cube_absorption_tau_eight",
+      "baseline_optical_depth": "8",
+      "normalized_epsilon2_coefficient": "48/5",
+      "normalized_second_derivative": "96/5"
+    },
+    {
+      "case": "inverse_cube_heating_eta_half_tau_quarter",
+      "baseline_optical_depth": "1/4",
+      "normalized_epsilon2_coefficient": "-59/96",
+      "normalized_second_derivative": "-59/48"
+    },
+    {
+      "case": "inverse_cube_heating_eta_half_tau_four",
+      "baseline_optical_depth": "4",
+      "normalized_epsilon2_coefficient": "8/3",
+      "normalized_second_derivative": "16/3"
+    },
+    {
+      "case": "changing_diagonal_shape_and_time_varying_opacity",
+      "baseline_optical_depth": "1/4",
+      "normalized_epsilon2_coefficient": "8050541/57348000",
+      "normalized_second_derivative": "8050541/28674000"
+    }
+  ],
+  "numerical_results": [
+    {
+      "case": "inverse_cube_absorption_tau_quarter",
+      "representation": "physical_birth",
+      "epsilon": "0.0001",
+      "epsilon_half": "0.00005",
+      "time_boole_blocks": 8,
+      "cross_blocks": 16,
+      "coefficient_epsilon": "-0.28124998711759457420000703780888108594744663922058314945654107964981621623586796",
+      "coefficient_epsilon_half": "-0.28124999677939861108281299886796174202016750483805736654701397418769091926486529",
+      "richardson_epsilon2_coefficient": "-0.28124999999999995671041498588765529404440779337721543891050493903364915360786441",
+      "analytic_coefficient": "-0.28125",
+      "absolute_error": "4.328958501411234470595559220662278456108949506096635084639213559E-17",
+      "integration_difference": "3.40757335269863471978808332424328848197622462594323662E-27"
+    },
+    {
+      "case": "inverse_cube_absorption_tau_quarter",
+      "representation": "fixed_q_with_Jb",
+      "epsilon": "0.0001",
+      "epsilon_half": "0.00005",
+      "time_boole_blocks": 8,
+      "cross_blocks": 16,
+      "coefficient_epsilon": "-0.28124994316475774161393365857811221500763507767042042472793303788972827344953370",
+      "coefficient_epsilon_half": "-0.28124998579118926332859143631816550460171065903639662846422203090664949266552768",
+      "richardson_epsilon2_coefficient": "-0.28124999999999977056681069556484993446640251949172202970965169524562323240419233",
+      "analytic_coefficient": "-0.28125",
+      "absolute_error": "2.2943318930443515006553359748050827797029034830475437676759580767E-16",
+      "integration_difference": "3.40757318289688077620058323015611058426726669958555872E-27"
+    },
+    {
+      "case": "inverse_cube_absorption_tau_eight",
+      "representation": "physical_birth",
+      "epsilon": "0.0001",
+      "epsilon_half": "0.00005",
+      "time_boole_blocks": 8,
+      "cross_blocks": 16,
+      "coefficient_epsilon": "9.5999998383333362860052268557862203707182681219772032784953331215689933774788266",
+      "coefficient_epsilon_half": "9.5999999595833335178753297685745451788535873957967100649189738380278263312006410",
+      "richardson_epsilon2_coefficient": "9.599999999999999261832030739503986781565360487069878993726854076847437315774579",
+      "analytic_coefficient": "9.6",
+      "absolute_error": "7.38167969260496013218434639512930121006273145923152562684225421E-16",
+      "integration_difference": "1.090423485616017485676228100118646772157267111915736640E-25"
+    },
+    {
+      "case": "inverse_cube_absorption_tau_eight",
+      "representation": "fixed_q_with_Jb",
+      "epsilon": "0.0001",
+      "epsilon_half": "0.00005",
+      "time_boole_blocks": 8,
+      "cross_blocks": 16,
+      "coefficient_epsilon": "9.5999998808834609279757603040172589515759223180829564155844281406037043709009868",
+      "coefficient_epsilon_half": "9.5999999702208644561466393902829326711270097969916829306477250732981028709498890",
+      "richardson_epsilon2_coefficient": "9.599999999999998965536932419038157244310705623294591769002157384196235704299523",
+      "analytic_coefficient": "9.6",
+      "absolute_error": "1.034463067580961842755689294376705408230997842615803764295700477E-15",
+      "integration_difference": "1.090423455481221746551913702251966716118645243690028602E-25"
+    },
+    {
+      "case": "inverse_cube_heating_eta_half_tau_quarter",
+      "representation": "physical_birth",
+      "epsilon": "0.0001",
+      "epsilon_half": "0.00005",
+      "time_boole_blocks": 8,
+      "cross_blocks": 16,
+      "coefficient_epsilon": "-0.61458333836933044923554028116559045804102844698841788964360380890410912987686627",
+      "coefficient_epsilon_half": "-0.61458333459233262410586707834044091784860853919448954279351609047420981373874529",
+      "richardson_epsilon2_coefficient": "-0.61458333333333334906264267739872440445113523659651342717682018433091004169270497",
+      "analytic_coefficient": "-0.61458333333333333333333333333333333333333333333333333333333333333333333333333333",
+      "absolute_error": "1.572930934406539107111780190326318009384348685099757670835937164E-17",
+      "integration_difference": "3.40757337670373648943356933641635491276887147584477828E-27"
+    },
+    {
+      "case": "inverse_cube_heating_eta_half_tau_quarter",
+      "representation": "fixed_q_with_Jb",
+      "epsilon": "0.0001",
+      "epsilon_half": "0.00005",
+      "time_boole_blocks": 8,
+      "cross_blocks": 16,
+      "coefficient_epsilon": "-0.61458334747837541527540642125721905479056088449910222247242819169890704523129538",
+      "coefficient_epsilon_half": "-0.61458333686959389802502510411513632885267915990070524832382175965903234618527191",
+      "richardson_epsilon2_coefficient": "-0.61458333333333339227489799840110875354005191836790625694095294897907411316993073",
+      "analytic_coefficient": "-0.61458333333333333333333333333333333333333333333333333333333333333333333333333333",
+      "absolute_error": "5.894156466506777542020671858503457292360761961564574077983659740E-17",
+      "integration_difference": "3.40757321991368418212887687470571206200553369401412679E-27"
+    },
+    {
+      "case": "inverse_cube_heating_eta_half_tau_four",
+      "representation": "physical_birth",
+      "epsilon": "0.0001",
+      "epsilon_half": "0.00005",
+      "time_boole_blocks": 8,
+      "cross_blocks": 16,
+      "coefficient_epsilon": "2.6666666292222225736878312102492435773736662104241157144431664253741382340267869",
+      "coefficient_epsilon_half": "2.6666666573055555775221561343588187849959794617694017098939234869225297532941643",
+      "richardson_epsilon2_coefficient": "2.6666666666666665788002644423953438542034172122178303750441758407719935930499567",
+      "analytic_coefficient": "2.6666666666666666666666666666666666666666666666666666666666666666666666666666667",
+      "absolute_error": "8.78664022242713228124632494544488362916224908258946730736167100E-17",
+      "integration_difference": "5.45211744683912306898537147536542880886516474971755609E-26"
+    },
+    {
+      "case": "inverse_cube_heating_eta_half_tau_four",
+      "representation": "fixed_q_with_Jb",
+      "epsilon": "0.0001",
+      "epsilon_half": "0.00005",
+      "time_boole_blocks": 8,
+      "cross_blocks": 16,
+      "coefficient_epsilon": "2.6666666608844436196395488777771560448995932784035337614285240591775955142405566",
+      "coefficient_epsilon_half": "2.6666666652211110595608043383689046113222684810862536275642339118613475195791355",
+      "richardson_epsilon2_coefficient": "2.6666666666666668728678894918994874667964935486471602496094705294225981880253285",
+      "analytic_coefficient": "2.6666666666666666666666666666666666666666666666666666666666666666666666666666667",
+      "absolute_error": "2.062012228252328208001298268819804935829428038627559315213586618E-16",
+      "integration_difference": "5.45211725452769772672731436042983213370078496828557962E-26"
+    },
+    {
+      "case": "changing_diagonal_shape_and_time_varying_opacity",
+      "representation": "physical_birth",
+      "epsilon": "0.0001",
+      "epsilon_half": "0.00005",
+      "time_boole_blocks": 8,
+      "cross_blocks": 16,
+      "coefficient_epsilon": "0.14038050969375449322068320150073143756828978852115900404060858096802651275657104",
+      "coefficient_epsilon_half": "0.14038050354815091182628699534292165975052867301915583308847760097843836301955646",
+      "richardson_epsilon2_coefficient": "0.14038050149961638469482159329031840047794163451848810943776727431524231310721827",
+      "analytic_coefficient": "0.14038050149961637720583106647136778963520959754481411731882541675385366534142429",
+      "absolute_error": "7.48899052681895061084273203697367399211894185756138864776579398E-18",
+      "integration_difference": "7.6532175681456652003634595013687043444059736519508077761770591E-19"
+    },
+    {
+      "case": "changing_diagonal_shape_and_time_varying_opacity",
+      "representation": "fixed_q_with_Jb",
+      "epsilon": "0.0001",
+      "epsilon_half": "0.00005",
+      "time_boole_blocks": 8,
+      "cross_blocks": 16,
+      "coefficient_epsilon": "0.14038052417378908753741753680758087670250347554287074923076930842045387600326798",
+      "coefficient_epsilon_half": "0.14038050716815959439003571735337225292429579410177871029448100885200256070765257",
+      "richardson_epsilon2_coefficient": "0.14038050149961643000757511086863604499822656695474803064905157566251878894244743",
+      "analytic_coefficient": "0.14038050149961637720583106647136778963520959754481411731882541675385366534142429",
+      "absolute_error": "5.280174404439726825536301696940993391333022615890866512360102314E-17",
+      "integration_difference": "7.6532175675132559581195370677172409227868214380484343404340679E-19"
+    }
+  ],
+  "checks": [
+    {
+      "name": "cubature_total_weight",
+      "status": "PASS"
+    },
+    {
+      "name": "new_second_order_moment_Q2_0",
+      "status": "PASS",
+      "value": "1/3"
+    },
+    {
+      "name": "new_second_order_moment_Q4_0_0",
+      "status": "PASS",
+      "value": "1/5"
+    },
+    {
+      "name": "new_second_order_moment_Q4_0_1",
+      "status": "PASS",
+      "value": "1/15"
+    },
+    {
+      "name": "new_second_order_moment_Q4_0_2",
+      "status": "PASS",
+      "value": "1/15"
+    },
+    {
+      "name": "new_second_order_moment_Q2_1",
+      "status": "PASS",
+      "value": "1/3"
+    },
+    {
+      "name": "new_second_order_moment_Q4_1_1",
+      "status": "PASS",
+      "value": "1/5"
+    },
+    {
+      "name": "new_second_order_moment_Q4_1_2",
+      "status": "PASS",
+      "value": "1/15"
+    },
+    {
+      "name": "new_second_order_moment_Q2_2",
+      "status": "PASS",
+      "value": "1/3"
+    },
+    {
+      "name": "new_second_order_moment_Q4_2_2",
+      "status": "PASS",
+      "value": "1/5"
+    },
+    {
+      "name": "tensor_vs_polynomial_inverse_cube_absorption_tau_quarter",
+      "status": "PASS",
+      "tensor_P0_factored": "-9/128",
+      "direct_P0_factored": "-9/128",
+      "normalized_epsilon2_coefficient": "-9/32"
+    },
+    {
+      "name": "fixed_q_Jb_covariance_cancellation_inverse_cube_absorption_tau_quarter",
+      "status": "PASS",
+      "averaged_second_derivative_difference_P0_factored": "0"
+    },
+    {
+      "name": "tensor_vs_polynomial_inverse_cube_absorption_tau_eight",
+      "status": "PASS",
+      "tensor_P0_factored": "384/5",
+      "direct_P0_factored": "384/5",
+      "normalized_epsilon2_coefficient": "48/5"
+    },
+    {
+      "name": "fixed_q_Jb_covariance_cancellation_inverse_cube_absorption_tau_eight",
+      "status": "PASS",
+      "averaged_second_derivative_difference_P0_factored": "0"
+    },
+    {
+      "name": "tensor_vs_polynomial_inverse_cube_heating_eta_half_tau_quarter",
+      "status": "PASS",
+      "tensor_P0_factored": "-59/768",
+      "direct_P0_factored": "-59/768",
+      "normalized_epsilon2_coefficient": "-59/96"
+    },
+    {
+      "name": "fixed_q_Jb_covariance_cancellation_inverse_cube_heating_eta_half_tau_quarter",
+      "status": "PASS",
+      "averaged_second_derivative_difference_P0_factored": "0"
+    },
+    {
+      "name": "tensor_vs_polynomial_inverse_cube_heating_eta_half_tau_four",
+      "status": "PASS",
+      "tensor_P0_factored": "16/3",
+      "direct_P0_factored": "16/3",
+      "normalized_epsilon2_coefficient": "8/3"
+    },
+    {
+      "name": "fixed_q_Jb_covariance_cancellation_inverse_cube_heating_eta_half_tau_four",
+      "status": "PASS",
+      "averaged_second_derivative_difference_P0_factored": "0"
+    },
+    {
+      "name": "tensor_vs_polynomial_changing_diagonal_shape_and_time_varying_opacity",
+      "status": "PASS",
+      "tensor_P0_factored": "8050541/34020000",
+      "direct_P0_factored": "8050541/34020000",
+      "normalized_epsilon2_coefficient": "8050541/57348000"
+    },
+    {
+      "name": "fixed_q_Jb_covariance_cancellation_changing_diagonal_shape_and_time_varying_opacity",
+      "status": "PASS",
+      "averaged_second_derivative_difference_P0_factored": "0"
+    },
+    {
+      "name": "finite_amplitude_second_order_inverse_cube_absorption_tau_quarter_physical_birth",
+      "status": "PASS",
+      "absolute_error": "4.328958501411234470595559220662278456108949506096635084639213559E-17",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "boole_resolution_inverse_cube_absorption_tau_quarter_physical_birth",
+      "status": "PASS",
+      "normalized_coefficient_difference": "3.40757335269863471978808332424328848197622462594323662E-27",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "finite_amplitude_second_order_inverse_cube_absorption_tau_quarter_fixed_q_with_Jb",
+      "status": "PASS",
+      "absolute_error": "2.2943318930443515006553359748050827797029034830475437676759580767E-16",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "boole_resolution_inverse_cube_absorption_tau_quarter_fixed_q_with_Jb",
+      "status": "PASS",
+      "normalized_coefficient_difference": "3.40757318289688077620058323015611058426726669958555872E-27",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "finite_amplitude_second_order_inverse_cube_absorption_tau_eight_physical_birth",
+      "status": "PASS",
+      "absolute_error": "7.38167969260496013218434639512930121006273145923152562684225421E-16",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "boole_resolution_inverse_cube_absorption_tau_eight_physical_birth",
+      "status": "PASS",
+      "normalized_coefficient_difference": "1.090423485616017485676228100118646772157267111915736640E-25",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "finite_amplitude_second_order_inverse_cube_absorption_tau_eight_fixed_q_with_Jb",
+      "status": "PASS",
+      "absolute_error": "1.034463067580961842755689294376705408230997842615803764295700477E-15",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "boole_resolution_inverse_cube_absorption_tau_eight_fixed_q_with_Jb",
+      "status": "PASS",
+      "normalized_coefficient_difference": "1.090423455481221746551913702251966716118645243690028602E-25",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "finite_amplitude_second_order_inverse_cube_heating_eta_half_tau_quarter_physical_birth",
+      "status": "PASS",
+      "absolute_error": "1.572930934406539107111780190326318009384348685099757670835937164E-17",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "boole_resolution_inverse_cube_heating_eta_half_tau_quarter_physical_birth",
+      "status": "PASS",
+      "normalized_coefficient_difference": "3.40757337670373648943356933641635491276887147584477828E-27",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "finite_amplitude_second_order_inverse_cube_heating_eta_half_tau_quarter_fixed_q_with_Jb",
+      "status": "PASS",
+      "absolute_error": "5.894156466506777542020671858503457292360761961564574077983659740E-17",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "boole_resolution_inverse_cube_heating_eta_half_tau_quarter_fixed_q_with_Jb",
+      "status": "PASS",
+      "normalized_coefficient_difference": "3.40757321991368418212887687470571206200553369401412679E-27",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "finite_amplitude_second_order_inverse_cube_heating_eta_half_tau_four_physical_birth",
+      "status": "PASS",
+      "absolute_error": "8.78664022242713228124632494544488362916224908258946730736167100E-17",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "boole_resolution_inverse_cube_heating_eta_half_tau_four_physical_birth",
+      "status": "PASS",
+      "normalized_coefficient_difference": "5.45211744683912306898537147536542880886516474971755609E-26",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "finite_amplitude_second_order_inverse_cube_heating_eta_half_tau_four_fixed_q_with_Jb",
+      "status": "PASS",
+      "absolute_error": "2.062012228252328208001298268819804935829428038627559315213586618E-16",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "boole_resolution_inverse_cube_heating_eta_half_tau_four_fixed_q_with_Jb",
+      "status": "PASS",
+      "normalized_coefficient_difference": "5.45211725452769772672731436042983213370078496828557962E-26",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "finite_amplitude_second_order_changing_diagonal_shape_and_time_varying_opacity_physical_birth",
+      "status": "PASS",
+      "absolute_error": "7.48899052681895061084273203697367399211894185756138864776579398E-18",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "boole_resolution_changing_diagonal_shape_and_time_varying_opacity_physical_birth",
+      "status": "PASS",
+      "normalized_coefficient_difference": "7.6532175681456652003634595013687043444059736519508077761770591E-19",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "finite_amplitude_second_order_changing_diagonal_shape_and_time_varying_opacity_fixed_q_with_Jb",
+      "status": "PASS",
+      "absolute_error": "5.280174404439726825536301696940993391333022615890866512360102314E-17",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "boole_resolution_changing_diagonal_shape_and_time_varying_opacity_fixed_q_with_Jb",
+      "status": "PASS",
+      "normalized_coefficient_difference": "7.6532175675132559581195370677172409227868214380484343404340679E-19",
+      "tolerance": "1E-12"
+    },
+    {
+      "name": "analytic_sign_case_inverse_cube_absorption_tau_quarter",
+      "status": "PASS",
+      "coefficient": "-9/32"
+    },
+    {
+      "name": "analytic_sign_case_inverse_cube_absorption_tau_eight",
+      "status": "PASS",
+      "coefficient": "48/5"
+    },
+    {
+      "name": "analytic_sign_case_inverse_cube_heating_eta_half_tau_quarter",
+      "status": "PASS",
+      "coefficient": "-59/96"
+    },
+    {
+      "name": "analytic_sign_case_inverse_cube_heating_eta_half_tau_four",
+      "status": "PASS",
+      "coefficient": "8/3"
+    }
+  ],
+  "summary": {
+    "passed": 44,
+    "total": 44,
+    "failed": 0,
+    "max_finite_amplitude_error": "1.034463067580961842755689294376705408230997842615803764295700477E-15",
+    "max_boole_resolution_difference": "7.6532175681456652003634595013687043444059736519508077761770591E-19",
+    "wall_seconds": 0.5268631639992236
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "task_id": "REI-CHAT-SPEC04-20261006",
+  "state": "THRESHOLD_OCCUPATION_THERMAL_BOUND_CONDITIONALLY_ENCLOSED_CONSERVATIVE",
+  "target_window_s": [
+    0,
+    1000000000000
+  ],
+  "physics": "S0 prescribed FLRW, FT03 HG CaseA HHe CI/RR/two DR, initial monoenergy13.7 eV .05/H and continuous birth5e-15/H/s; no extra cooling or recombination photon source",
+  "time": "proper seconds; proof normalized tau=t/1e12",
+  "density": "proper cm^-3",
+  "number": "per conserved H nucleus",
+  "thermal": "w/w0, w0 inherited exact f64",
+  "cutoff": "fit Ec13.6 active grid node, below-grid gap inherited; continuum immediate exit at Ec; binding chi separate",
+  "proof": {
+    "boundary_occupation": "B(a)=integral_0^a |P(TDelta>s)-1_{s<Tc}| ds; pre a-z(a), post Tc+z(a)-2z(Tc)",
+    "bulk": "continuous centered kernel sigma-sigma_c and (E-chi)sigma-(Ec-chi)sigma_c, zero below cutoff; globally Lipschitz",
+    "count": "CP<=K[Lsigma*2/3*sqrt(v)*a^(3/2)+sigma_c B(a)]",
+    "heat": "CQ<=K[Lheat*2/3*sqrt(v)*a^(3/2)+heat_cutoff B(a)]+Bmax integral CP",
+    "source": "N0 C(a)+T S integral_0^a C(u) du; right Riemann upper envelope uses proven monotonicity",
+    "tube": "cumulative photoevents <= .055/H plus actual interval nonphoto displacement; same original IC, one-sided faces pinned to exact binary64",
+    "feedback": "e=Ycont-(Ygrid_gas,pstar), v=e+D; bprime<=M b+C d, e<=d+b; no reset",
+    "passive_norm": "whole birth-survival TV includes post-cutoff photons; radiation diagonal upper=0, not a uniform negative absorption value"
+  },
+  "proof_input_from_numerical_reference": false,
+  "native_runs": 0,
+  "numerical_reference": "separate DOP853/Radau, continuum age moments K6/K8 with delayed outflow and initial-line event; not a separately certified reference",
+  "claim_limits": [
+    "conditional arithmetic and inherited source, not formal proof assistant",
+    "conservative absolute bound, no signed thermal certificate",
+    "no native time error at1e12s",
+    "not whole S0 or BI",
+    "no physical fit or omitted-process uncertainty",
+    "bound not a tolerance PASS"
+  ],
+  "preserved": {
+    "local_strict_lt": 0.0002,
+    "width_strict_lt": 0.002,
+    "failed_interval": [
+      160,
+      161
+    ],
+    "tick": 160,
+    "physical": "HOLD",
+    "auxiliary_escape": "FAIL_PRESERVED"
+  },
+  "next": "SPEC05_ABSORPTION_WEIGHTED_STOPPING_BOUND; sharpness improvement without source/threshold edits"
+}

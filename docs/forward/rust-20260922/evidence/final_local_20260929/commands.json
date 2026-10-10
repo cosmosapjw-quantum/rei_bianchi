@@ -1,0 +1,86 @@
+[
+  {
+    "name": "manifest",
+    "argv": [
+      "sha256sum",
+      "-c",
+      "docs/forward/rust-20260922/CODE_INPUT_MANIFEST.sha256"
+    ],
+    "exit": 0,
+    "seconds": 0.003,
+    "stdout": "/tmp/rei-rust-forward-final-s7db8a44/manifest.stdout.log",
+    "stderr": "/tmp/rei-rust-forward-final-s7db8a44/manifest.stderr.log"
+  },
+  {
+    "name": "contract",
+    "argv": [
+      "python",
+      "scripts/check_rust_forward_parity.py",
+      "--check-contract"
+    ],
+    "exit": 0,
+    "seconds": 0.05,
+    "stdout": "/tmp/rei-rust-forward-final-s7db8a44/contract.stdout.log",
+    "stderr": "/tmp/rei-rust-forward-final-s7db8a44/contract.stderr.log"
+  },
+  {
+    "name": "receipt_regression",
+    "argv": [
+      "python",
+      "docs/forward/rust-20260922/evidence/test_checker_receipts.py"
+    ],
+    "exit": 0,
+    "seconds": 0.122,
+    "stdout": "/tmp/rei-rust-forward-final-s7db8a44/receipt_regression.stdout.log",
+    "stderr": "/tmp/rei-rust-forward-final-s7db8a44/receipt_regression.stderr.log"
+  },
+  {
+    "name": "fmt",
+    "argv": [
+      "cargo",
+      "fmt",
+      "--manifest-path",
+      "rust/rei_microphysics/Cargo.toml",
+      "--",
+      "--check"
+    ],
+    "exit": 1,
+    "seconds": 0.08,
+    "stdout": "/tmp/rei-rust-forward-final-s7db8a44/fmt.stdout.log",
+    "stderr": "/tmp/rei-rust-forward-final-s7db8a44/fmt.stderr.log"
+  },
+  {
+    "name": "test",
+    "argv": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/rei_microphysics/Cargo.toml",
+      "--locked"
+    ],
+    "exit": 0,
+    "seconds": 0.612,
+    "stdout": "/tmp/rei-rust-forward-final-s7db8a44/test.stdout.log",
+    "stderr": "/tmp/rei-rust-forward-final-s7db8a44/test.stderr.log"
+  },
+  {
+    "name": "parity",
+    "argv": [
+      "cuhg-telemetry",
+      "run",
+      "--project",
+      "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+      "--task",
+      "rei-rust-forward-20260929",
+      "--",
+      "python",
+      "scripts/check_rust_forward_parity.py",
+      "--output",
+      "/tmp/rei-rust-forward-final-s7db8a44/parity.json"
+    ],
+    "exit": 2,
+    "seconds": 0.119,
+    "stdout": "/tmp/rei-rust-forward-final-s7db8a44/parity.stdout.log",
+    "stderr": "/tmp/rei-rust-forward-final-s7db8a44/parity.stderr.log"
+  }
+]

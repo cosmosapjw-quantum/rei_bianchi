@@ -1,0 +1,74 @@
+[
+  {
+    "name": "final_manifest",
+    "argv": [
+      "sha256sum",
+      "-c",
+      "docs/forward/rust-20260922/CODE_INPUT_MANIFEST.sha256"
+    ],
+    "exit": 0,
+    "seconds": 0.003
+  },
+  {
+    "name": "final_contract",
+    "argv": [
+      "python",
+      "scripts/check_rust_forward_parity.py",
+      "--check-contract"
+    ],
+    "exit": 0,
+    "seconds": 0.054
+  },
+  {
+    "name": "final_receipt_regression",
+    "argv": [
+      "python",
+      "docs/forward/rust-20260922/evidence/test_checker_receipts.py"
+    ],
+    "exit": 0,
+    "seconds": 0.124
+  },
+  {
+    "name": "final_fmt",
+    "argv": [
+      "cargo",
+      "fmt",
+      "--manifest-path",
+      "rust/rei_microphysics/Cargo.toml",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "seconds": 0.056
+  },
+  {
+    "name": "final_test",
+    "argv": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/rei_microphysics/Cargo.toml",
+      "--locked"
+    ],
+    "exit": 0,
+    "seconds": 0.364
+  },
+  {
+    "name": "final_parity",
+    "argv": [
+      "cuhg-telemetry",
+      "run",
+      "--project",
+      "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+      "--task",
+      "rei-rust-forward-20260929",
+      "--",
+      "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/.venv/bin/python",
+      "scripts/check_rust_forward_parity.py",
+      "--output",
+      "/tmp/rei-rust-forward-final-s7db8a44/final-parity.json"
+    ],
+    "exit": 1,
+    "seconds": 2.495
+  }
+]

@@ -1,0 +1,137 @@
+{
+  "schema": "rei.he-rct-low-cost-entry.v1",
+  "task": "REI-HE-RCT01-20261005",
+  "read_first": [
+    "README_KO.md",
+    "publication/PROVIDER_SELECTION_RECORDS.json",
+    "theory/CONTRACT.json",
+    "coding/NATIVE_IMPLEMENTATION_STATUS.json",
+    "evidence/FINAL_INTEGRATION.json",
+    "evidence/INDEPENDENT_RESULT.json",
+    "review/FINAL_REVIEW.json",
+    "publication/NEXT_HANDOFF_KO.md",
+    "evidence/FT03_INDEPENDENT_RESULT.json",
+    "review/POST_FT03_REVIEW.json"
+  ],
+  "missing_receipt_action": "Read README for actual receipt path; do not invent success. Fix only affected unresolved scope.",
+  "next_node": "RCT-STEP01",
+  "no_research_restart": true,
+  "baseline_source_pin": "ccbc15019296b9128a90fa45b9c68c7daddc7b77",
+  "supplier_pin": "21d5b8075429903d195d6e0e0c24a10c00b21063",
+  "execution_pin": "41e4592aa494b48929dcd23fc8504c169a98a908",
+  "api_files": [
+    "rust/rei_microphysics/src/he_rct.rs",
+    "rust/rei_microphysics/tests/he_rct.rs",
+    "rust/rei_microphysics/examples/he_rct_probe.rs"
+  ],
+  "source_selection": {
+    "default": "OFF",
+    "explicit_primary": "KF96 nominal",
+    "alternative": "GM25 constant",
+    "pair_T_K": [
+      1000,
+      10000
+    ],
+    "no_sum": true,
+    "no_auto_switch": true,
+    "no_clamp": true,
+    "rate_spread": "sensitivity only, not certified uncertainty"
+  },
+  "core_equations": {
+    "R": "k*nHI*nHeIII",
+    "dx": "[R/nH,R/nHe,-R/nHe] with explicit zero-density convention",
+    "Q_eV": "chiHeII-chiHI",
+    "chemical": "-ev_erg*Q*R",
+    "thermal": "ev_erg*(Q-Ebar)*R",
+    "escape": "ev_erg*Ebar*R",
+    "direct_ne": "0",
+    "primary_group_injection": "0 in selected escaping closure"
+  },
+  "semantic_stops": [
+    "CountOnly cannot silently become closed thermal RHS",
+    "Source null moments remain null",
+    "No provider physical admission from schema or code PASS",
+    "A wrapper is not production stepping",
+    "No F04 or EoR inference from local ledger",
+    "No HE atomic full-suite reopening without concrete dependency"
+  ],
+  "stage_contract": [
+    "Choose and pin actual target stepper: Ft03 successor or original controlled HHe; do not conflate their baseline RHS/thermal models.",
+    "same selected provider and closure at all stages",
+    "append separate integrated RCT counter",
+    "match endpoint and residual physics",
+    "sum accepted half-step event counters",
+    "preserve failed-trial state",
+    "bounded pilot before larger run"
+  ],
+  "return_required": [
+    "exact code commit and input hashes",
+    "actual commands and exit status",
+    "test/result receipt",
+    "claim/nonclaim table",
+    "failure record if any",
+    "Git publication receipt",
+    "Drive/Dropbox acknowledgments with object identity and size"
+  ],
+  "backup_semantics": "UPLOAD_VERIFIED is not RESTORE_VERIFIED",
+  "current_verified_result": {
+    "native_full_tests": 116,
+    "new_targeted_tests": 24,
+    "independent_checks": 12789,
+    "native_calls": 422,
+    "state_points": 96,
+    "event_mode_calls": 384,
+    "coefficient_points": 9,
+    "off_points": 16,
+    "negative_temperature_cases": 8,
+    "negative_closure_cases": 4,
+    "nonzero_source_ratio_checks": 24,
+    "scope": "original HHe and actual typed FT03 local RHS wrappers; neither implicit stepper connected",
+    "review_status": "POST_FT03_REVIEW confirmed;0blockers",
+    "upstream_FT03_tests": 8,
+    "FT03_independent_checks": 212,
+    "FT03_native_calls": 12,
+    "FT03_closed_points": 9,
+    "FT03_GM25_rejections": 3
+  },
+  "late_concurrent_intake": {
+    "rei_commit": "6279036f06c9ba4d47574beab90b48fc2c6f9ba7",
+    "he_commit": "e4d2753ea45593ade6c3fd3a7fea81f92cfd1a15",
+    "survey": "survey/FINAL_DELTA_KO.md",
+    "new_FT03_temperature_K": [
+      30000,
+      110000
+    ],
+    "original_HHe_baseline_guard_inherited": false,
+    "new_Ft03_guard_active": true,
+    "rct_bound_to_Ft03": "local typed combined_ft03_rhs yes; implicit stepper no",
+    "F04_state": "partial",
+    "full_F04_completed": false,
+    "GM25_overlap_with_Ft03": false,
+    "KF96_window_covers_Ft03": "true but not physical or closure admission",
+    "trap": "Ft03Model.gas has alpha/beta arrays zero; combined_hhe_rhs(&ft03.gas) would omit Ft03 temperature-dependent RR/CI/DR. Compose RCT ledger with actual ft03_rhs only in a new explicit adapter."
+  },
+  "RCT_representability_scope": {
+    "finite_checks": true,
+    "strict_nonzero_product_underflow_policy_inherited_from_FT03": false,
+    "claim": "finite point RCT tests do not certify the separate FT03 underflow representability contract"
+  },
+  "HE_owner_return": "publication/he_consumer_return/HE_F2_RCT_CONSUMER_RETURN.json",
+  "native_publication": {
+    "repository": "cosmosapjw-quantum/rei_bianchi",
+    "branch": "forward/rust-reion-kernels-20260922",
+    "immutable_commit": "41e4592aa494b48929dcd23fc8504c169a98a908",
+    "tree": "f44469e09cefe8b7c92a822e9913c47d0919782f",
+    "parent": "6279036f06c9ba4d47574beab90b48fc2c6f9ba7",
+    "packet_path": "docs/fastest_track_chat/REI-HE-RCT01-20261005/",
+    "packet_commit_resolution": "packet publication receipt owns docs commit; native code commit above is already published"
+  },
+  "next_target": {
+    "preferred": "actual Ft03 successor time integrator",
+    "pin_before_edit": true,
+    "model_id": "REI_FT03_HG_RATE_MOMENT_CASE_A_CONTROLLED_V1",
+    "baseline_RHS": "ft03_rhs",
+    "wrapper": "combined_ft03_rhs",
+    "no_GM25_in_active_Ft03_guard": true
+  }
+}

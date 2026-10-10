@@ -1,0 +1,298 @@
+{
+  "schema_version": "1.0",
+  "task_id": "REI-CHAT-FLRW02-20261005",
+  "repository": "cosmosapjw-quantum/rei_bianchi",
+  "packet_root": "docs/fastest_track_chat/REI-CHAT-FLRW02-20261005",
+  "intake_commit": "9455c2a3cbf2ce5ebaba28e9bfb1dfe79aed0efa",
+  "publication_identity": "Resolve final commit from the actual publication receipt; intake commit is not the result commit.",
+  "summary_status": "FLRW02_BOUNDED_REFERENCE_COMPLETE_PRODUCTION_ADMISSION_PENDING",
+  "completed_scope": [
+    "Source-connected local pure-H photoionization/recombination reference",
+    "Fixed-comoving-volume ensemble identities and conditional sharp filling inventory",
+    "Comoving photon finite-band ledger with explicitly supplied boundary spectrum",
+    "Independent finite-point regression and actual source-free power-law photon trajectory"
+  ],
+  "excluded_claims": [
+    "Independent geometric front evolution",
+    "Coupled ionization-photon cosmological history",
+    "Physical-provider accuracy",
+    "Thermal/energy-conserving history",
+    "Uniform interval certificate",
+    "General Bianchi or EoR prediction"
+  ],
+  "external_inherited_task": {
+    "id": "REI-F04",
+    "status": "pending_as_inherited",
+    "task_card": "docs/atomic_reionization_handoff_20261004_v1/threads/rei_bianchi/TASKS.json",
+    "instruction": "Read the current authoritative REI-F04 card and CODEX_SYNC; preserve exact task meaning. FLRW02 completion does not complete REI-F04.",
+    "source_blob_sha": "64643a83f25cc5470044a5f4243680c761798390",
+    "title_exact": "실제 공동-parent sparse nonlinear remainder 인증",
+    "outputs_exact": [
+      "runs/rei_fastest_v1/map_certificate/parent_manifest.json",
+      "runs/rei_fastest_v1/map_certificate/certificate.json",
+      "runs/rei_fastest_v1/map_certificate/checker_receipt.json"
+    ],
+    "acceptance_exact": [
+      "실제 HHe map certificate에 source/parent/runtime/input identities",
+      "all source-site remainders independently enclosed",
+      "strict <2e-4 local error and <2e-3 public width",
+      "synthetic-only result 불허",
+      "새 homogeneous 인증은 inherited 46080-node whole-history 인증/수락으로 승격되지 않는다"
+    ],
+    "verification_read_receipt": "survey/rei/fresh_aa3e98d7/REI_F04_TASK_CARD.json",
+    "initial_status_caveat": "The original task card contains initial CODEX_READY_NOT_EXECUTED statuses; current runtime return and CODEX_SYNC determine execution progress."
+  },
+  "default_next": [
+    "FLRW03-CALLSITE-CONTRACT",
+    "FLRW03-EDGE-CLOSURE",
+    "FLRW03-PHASE-GEOMETRY"
+  ],
+  "global_guards": [
+    "No heavy runs, parameter sweeps, HPC, new atomic calculations, full HyRec/CosmoRec runs, or repeated completed suites without a concrete new failure.",
+    "Preserve REI-F00/F01/F02/F03 receipts, old failed [160,161] interval and tick160 evidence; never relabel them PASS.",
+    "Keep original atomic, REC PB02/PB03, E1C and He extensions in their existing lanes; activate only for an explicit domain requirement.",
+    "Do not overwrite live CODEX_SYNC or existing REI-F04 task meaning. Resolve current branch and receipt before edits."
+  ],
+  "nodes": [
+    {
+      "id": "FLRW02-THEORY",
+      "status": "complete_conditional",
+      "depends_on": [],
+      "inputs": [
+        "theory/THREE_EQUATIONS_CONTRACT.json"
+      ],
+      "outputs": [
+        "Local ionization, exact average, spectral/comoving photon and filling-defect contracts"
+      ],
+      "acceptance": [
+        "x, X_V, X_M and geometric Q_V are distinct.",
+        "CaseA primary-only and CaseB local OTS have one photon owner; no ad hoc QSS or Peebles override.",
+        "Sharp filling reduction states persistent x=b, density contrast and endpoint conditions."
+      ],
+      "tolerances": {
+        "kind": "analytic identities with explicitly stated assumptions"
+      },
+      "stop_conditions": [
+        "A claimed identity requires unstated geometry, boundary or spectrum assumptions."
+      ]
+    },
+    {
+      "id": "FLRW02-NATIVE",
+      "status": "complete_bounded_reference",
+      "depends_on": [
+        "FLRW02-THEORY"
+      ],
+      "inputs": [
+        "coding/NATIVE_CONTRACT.json",
+        "coding/NATIVE_IMPLEMENTATION_STATUS.json"
+      ],
+      "outputs": [
+        "rust/rei_microphysics/src/flrw_three_equations.rs",
+        "rust/rei_microphysics/tests/flrw_three_equations.rs",
+        "rust/rei_microphysics/examples/flrw_three_probe.rs"
+      ],
+      "acceptance": [
+        "connected_cell calls actual AtomicProvider, hhe_rhs and homogeneous_photo_rates.",
+        "photon_balance retains upper-edge inflow and lower-threshold outflow.",
+        "ensemble, filling_defect and sharp_filling_rhs validate public inputs, including NaN/Inf.",
+        "No production front solver, geometric Q_V evolution or thermal closure is claimed."
+      ],
+      "tolerances": {
+        "relative_flux_scaled": 2e-12,
+        "absolute_rate_floor_per_s": 1e-30,
+        "dimensionless_absolute": 2e-14
+      },
+      "stop_conditions": [
+        "Unit ownership, CaseA/CaseB photon accounting or finite/domain validation fails."
+      ]
+    },
+    {
+      "id": "FLRW02-EVIDENCE",
+      "status": "complete_bounded_reference",
+      "depends_on": [
+        "FLRW02-NATIVE"
+      ],
+      "inputs": [
+        "evidence/FINAL_INTEGRATION.json",
+        "evidence/INDEPENDENT_REGRESSION_RESULT.json",
+        "evidence/PHOTON_HISTORY_RESULT.json"
+      ],
+      "outputs": [
+        "Final native test/regression receipts and source-free photon history convergence evidence"
+      ],
+      "acceptance": [
+        "Final integration exit codes are zero and evidence source hashes match the final probe.",
+        "E2/E2X independent checks and negative controls PASS.",
+        "E3 actual collisionless power-law photon history converges and closes its finite-band ledger.",
+        "E3 is not described as a coupled atomic-ionization history or cosmological reionization prediction."
+      ],
+      "tolerances": {
+        "E2_relative_flux_scaled": 2e-12,
+        "E3_finest_RK4_max_relative": 1e-07,
+        "E3_DOP853_max_relative": 1e-09,
+        "E3_inventory_flux_scaled": 2e-12
+      },
+      "stop_conditions": [
+        "Evidence source identity differs from published source.",
+        "Completed finite checks are promoted to uniform, physical-provider or EoR admission."
+      ]
+    },
+    {
+      "id": "FLRW03-CALLSITE-CONTRACT",
+      "status": "pending",
+      "depends_on": [
+        "FLRW02-EVIDENCE"
+      ],
+      "inputs": [
+        "publication/NEXT_HANDOFF_KO.md",
+        "rust/rei_microphysics/src/flrw_three_equations.rs",
+        "Current production consumer and inherited REI-F04 task card"
+      ],
+      "outputs": [
+        "A named production call site, state/unit ownership table and minimal integration diff plan"
+      ],
+      "acceptance": [
+        "Identify actual time variable, a,H,T,n_H,x and photon representation at one real consumer.",
+        "Specify prescribed-temperature scope or a separately justified thermal closure.",
+        "Distinguish source-connected reference from production admission; preserve F03 semantics.",
+        "Freeze integration tolerances and rollback/rejection behavior before running a new case."
+      ],
+      "tolerances": {
+        "kind": "must be specified before implementation; no inherited reference threshold is a production certificate"
+      },
+      "stop_conditions": [
+        "No actual production consumer is identified.",
+        "Concurrent upstream work changes the targeted call site or task priority."
+      ]
+    },
+    {
+      "id": "FLRW03-EDGE-CLOSURE",
+      "status": "pending",
+      "depends_on": [
+        "FLRW02-EVIDENCE"
+      ],
+      "inputs": [
+        "theory/THREE_EQUATIONS_CONTRACT.json",
+        "evidence/INDEPENDENT_REGRESSION_RESULT.json",
+        "rust/rei_microphysics/src/flrw_three_equations.rs"
+      ],
+      "outputs": [
+        "Explicit fixed-proper-energy edge-spectrum reconstruction and boundary ownership specification"
+      ],
+      "acceptance": [
+        "Name the reconstruction that maps group state to n_E at every edge, including upper boundary.",
+        "Preserve ambiguity control: equal bin counts can have unequal edge values.",
+        "Specify positivity/domain guards, units, threshold-exit sign and reconstruction error budget.",
+        "Identify whether closure is a controlled reference or a justified physical model."
+      ],
+      "tolerances": {
+        "kind": "closure-specific budget must be frozen before a new experiment"
+      },
+      "stop_conditions": [
+        "Only bin-integrated photon counts are available but a unique edge spectrum is asserted.",
+        "Upper inflow or threshold losses are dropped without a stated justified boundary condition."
+      ]
+    },
+    {
+      "id": "FLRW03-PHASE-GEOMETRY",
+      "status": "pending",
+      "depends_on": [
+        "FLRW02-EVIDENCE"
+      ],
+      "inputs": [
+        "theory/THREE_EQUATIONS_CONTRACT.json",
+        "rust/rei_microphysics/src/flrw_three_equations.rs"
+      ],
+      "outputs": [
+        "Geometric phase indicator/front ownership and Q_V versus X_M/X_V specification"
+      ],
+      "acceptance": [
+        "Define b, persistent sharp-phase assumptions or a resolved partial-ionization model.",
+        "Specify Delta_I and its time derivative, phase-boundary/transport terms and Q_V endpoint handling.",
+        "Keep sharp_filling_rhs as a conditional inventory reference until an actual geometry consumer is supplied.",
+        "Do not block bounded local-rate/photon integration merely because a front solver is absent; limit its claims instead."
+      ],
+      "tolerances": {
+        "kind": "geometry and endpoint error budgets unresolved until a model is selected"
+      },
+      "stop_conditions": [
+        "Geometric Q_V is inferred by relabeling a generic partially ionized X_V or X_M.",
+        "A global filling-factor prediction is attempted without phase/transport closure."
+      ]
+    },
+    {
+      "id": "FLRW03-INTEGRATE-BOUNDED",
+      "status": "pending",
+      "depends_on": [
+        "FLRW03-CALLSITE-CONTRACT",
+        "FLRW03-EDGE-CLOSURE"
+      ],
+      "inputs": [
+        "Named call-site and edge-closure specifications",
+        "Final published native module resolved from publication receipt"
+      ],
+      "outputs": [
+        "Small production-consumer integration diff",
+        "One new bounded coupled local-rate/photon trajectory with independent residual/convergence evidence"
+      ],
+      "acceptance": [
+        "Exercise the actual consumer and native module together under the frozen bounded assumptions.",
+        "Compare independent reference/ledger and a refinement sequence only for the changed path.",
+        "Keep CaseA primary-only or CaseB OTS ownership explicit and avoid duplicating recombination photons.",
+        "Report source, provider, thermal and history admission separately; coupled history is new work, not an E3 replay.",
+        "For accepted two-half updates, accumulate half1.events + half2.events from actual source stages; do not reconstruct them from only the final endpoint.",
+        "Retain photons beyond ionized capacity rather than clipping Q and discarding the excess; use upstream saturation controls when this consumer reaches that domain."
+      ],
+      "tolerances": {
+        "kind": "use the predeclared consumer/closure budgets; stop if unavailable"
+      },
+      "stop_conditions": [
+        "A physical-provider, thermal or geometry admission gap is silently filled by a fixture.",
+        "Existing F03 or original atomic behavior changes outside the integration scope."
+      ]
+    },
+    {
+      "id": "FLRW03-ADMISSION",
+      "status": "pending",
+      "depends_on": [
+        "FLRW03-INTEGRATE-BOUNDED",
+        "FLRW03-PHASE-GEOMETRY"
+      ],
+      "inputs": [
+        "Current inherited REI-F04 task card and its actual return receipt",
+        "review/REVIEW.json",
+        "New bounded integration and geometry evidence"
+      ],
+      "outputs": [
+        "Explicit consumer-specific admission matrix, remaining limitations and next handoff"
+      ],
+      "acceptance": [
+        "Original REI-F04 scope and requirements are read verbatim from its authoritative task card and preserved.",
+        "Review is resolved using the final review artifact; stale IN_PROGRESS snapshots are not called approvals.",
+        "Only claims supported by completed provider/closure/boundary/error evidence are admitted.",
+        "EoR, actual cosmological history and general Bianchi remain pending unless their own gates are independently met."
+      ],
+      "tolerances": {
+        "kind": "use inherited task requirements and the frozen new consumer contracts; no replacement thresholds"
+      },
+      "stop_conditions": [
+        "REI-F04 is renamed, narrowed, considered done by FLRW02, or silently bypassed.",
+        "Bounded regression is presented as physical accuracy or uniform error certification."
+      ]
+    }
+  ],
+  "concurrent_upstream_ack": {
+    "head": "aa3e98d7a4f90105c4ac9712ba71c955f9b53cea",
+    "comparison_base": "9455c2a3cbf2ce5ebaba28e9bfb1dfe79aed0efa",
+    "commits_ahead": 1,
+    "changed_files": 7,
+    "changed_scope": "New docs only under docs/fastest_track_chat/REI-CHAT-FLRW02-20261004; no Rust changes and no 20261005 path collision.",
+    "upstream_status": "SOURCE_BOUND_ALGEBRA_AND_MANUFACTURED_REFERENCE_CLOSED__NATIVE_CONSUMER_REGRESSION_BLOCKED",
+    "upstream_native_calls": 0,
+    "canonical_successor": "REI-CHAT-FLRW03_EXPANDING_ADAPTER_AND_INTEGRATED_BUDGET",
+    "scope_rule": "This packet provides separately executed native reference evidence. It does not claim that the earlier prepared, compiler-blocked native probe ran. Preserve upstream manufactured saturation and event-stage evidence.",
+    "snapshot_directory": "survey/rei/fresh_aa3e98d7"
+  },
+  "successor_owner_id": "REI-CHAT-FLRW03_EXPANDING_ADAPTER_AND_INTEGRATED_BUDGET",
+  "node_id_policy": "FLRW03-* nodes are bounded subtasks of the existing canonical successor, not replacement task identities."
+}

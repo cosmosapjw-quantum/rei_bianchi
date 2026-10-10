@@ -1,0 +1,58 @@
+{
+  "task_id": "REI-F03",
+  "status": "SCOPED_INDEPENDENT_REVIEW_THREE_P2_REPAIRED_BY_HOST",
+  "launch_id": "cl_b27b7a437f202b97443619c92c383f20",
+  "child_id": "01a10750-95fc-7780-8fa5-9c350900ec40",
+  "observed_profile": {
+    "model": "gpt-6-astra",
+    "effort": "xhigh"
+  },
+  "scope_hashes": {
+    "rust/rei_microphysics/src/hhe_events.rs": "d2a4435b03275b7ea9851fd6f31c515c140ed193c3438358e64ca45f5594b663",
+    "rust/rei_microphysics/src/thermal.rs": "6d7be31934bb33a46c0911d28b62e34d22027e08a8a1945c5d7d32bf32f79b8a",
+    "rust/rei_microphysics/src/microstep.rs": "fdb48b5589e53fb9cb7c19e44c4f122102445ebb500816f568cff025c0dba83b",
+    "rust/rei_microphysics/src/lib.rs": "d4f155351a7f78680f5e8cde3c5bd18d26999cc8d01d595f99fcdfc3c94441bf",
+    "rust/rei_microphysics/examples/hhe_fixture.rs": "28a5aece3d6a84925c07c9b9a845cbbb822f54789239ea2576921aa045f7c027",
+    "rust/rei_microphysics/tests/hhe_events.rs": "9048174c8e2bc411308d9b1709fff777d9182036a580948cf69e91cfec9bbfa5",
+    "rust/rei_microphysics/tests/hhe_fixture.rs": "0cc9a2e2a4a571400928a69f3ddcd9900321cf4b0e5c85c9d317f6c28352a8f1"
+  },
+  "findings": [
+    {
+      "severity": "P2",
+      "id": "ZERO_RATE_HE_IDENTITY",
+      "source": "microstep.rs::implicit_hhe_step",
+      "observed": "zero RHS with fractions [0.01,0,0.1], dt1e9 rejected due subtractive p1 numerator",
+      "fix": "nonnegative production numerator using stored old HeII fraction"
+    },
+    {
+      "severity": "P2",
+      "id": "HEI_BOUNDARY_NEGATIVE_EVENTS",
+      "source": "hhe_events.rs::hhe_rhs and microstep.rs",
+      "observed": "[0.01,0.9,0.1] has validated He sum1, negative HeI photo/collision rates",
+      "fix": "same 1-(HeII+HeIII) expression as validation, no clipping"
+    },
+    {
+      "severity": "P2",
+      "id": "TEMPERATURE_INTERMEDIATE_OVERFLOW",
+      "source": "hhe_events.rs::HHeModel::temperature",
+      "observed": "finite input nH1e308,xH1,u1e300 returns0K via npart overflow",
+      "fix": "reject nonfinite derived particles/numerator/denominator and positive quotient underflow; no false0K"
+    }
+  ],
+  "nominal_reviewer_tests": "INSPECTED_HOST_AND_AUTHOR_RECEIPTS_NOT_RERUN",
+  "direct_reproductions": [
+    "review-probe.rs",
+    "review-probe.log"
+  ],
+  "host_closeout": [
+    "boundary-red.log",
+    "boundary-green.log",
+    "final-candidate.log"
+  ],
+  "additional_host_fix": "new example needless_range_loop lint and observed rejection-state equality counter",
+  "frozen_external_tests_unchanged": true,
+  "final_bytes_independently_reviewed": false,
+  "review_rounds": 1,
+  "repair_closeout_rounds": 1,
+  "scientific_admission": "HOLD"
+}

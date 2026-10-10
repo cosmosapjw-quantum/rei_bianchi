@@ -1,0 +1,73 @@
+{
+  "schema": "rei.peebles.consumer.point.v1",
+  "stdin": "point_si Tm_K Tr_K nH_m3 H_s xp x2 | point_cgs Tm_K Tr_K nH_cm3 H_s xp x2",
+  "one_output_json_per_nonempty_row": true,
+  "invalid_output": {
+    "ok": false,
+    "error": "HydrogenError debug enum or parser error",
+    "physical_admission": false
+  },
+  "valid_example": {
+    "ok": true,
+    "mode": "PEEBLES_HYREC2_TLA_FUDGE1_ONE_T_SOURCE_V1",
+    "source_profile": "HYREC2_TLA_2020_PEEBLES_FUDGE1",
+    "rec_commit": "cd68764aacfeae9fe794d7966604ac6fbb80ba7f",
+    "n_h_m3": 250000000.0,
+    "temperature_k": 3000.0,
+    "hubble_s": 5e-14,
+    "xp": 0.1,
+    "x2": 0.3,
+    "collapsed": {
+      "source": {
+        "x1": 0.9,
+        "alpha_b_m3_s": 6.6854123439699895e-19,
+        "beta_p_s": 515.577534589934,
+        "beta_shell_s": 128.8943836474835,
+        "r_alpha_s": 1.0361997927901994,
+        "d_ground_s": 2.832299844592649,
+        "boltzmann_lya": 7.360935039286298e-18,
+        "c_factor": 0.021501337234858895
+      },
+      "dxp_dt": -3.5862885954445645e-14
+    },
+    "retained": {
+      "source": {
+        "x1": 0.6000000000000001,
+        "alpha_b_m3_s": 6.6854123439699895e-19,
+        "beta_p_s": 515.577534589934,
+        "beta_shell_s": 128.8943836474835,
+        "r_alpha_s": 1.554299689185299,
+        "d_ground_s": 3.220874766888974,
+        "boltzmann_lya": 7.360935039286298e-18,
+        "c_factor": 0.02437927916536992
+      },
+      "rhs": {
+        "dxp_dt": 38.668315094243376,
+        "dx2_dt": -39.63457752431007,
+        "dx1_dt": 0.9662624300666921,
+        "continuum_flux": -38.668315094243376,
+        "ground_flux": 0.9662624300666921
+      },
+      "same_rates_peebles_dt": -4.0663113126833014e-14,
+      "closure_defect": {
+        "direct": 38.66831509424342,
+        "shell_lag": 38.66831509424341,
+        "ground_depletion": -2.7756780160199044e-17,
+        "reconstructed": 38.66831509424341
+      },
+      "qss_at_actual_fixed_ground": 1.2651150266913441e-14
+    },
+    "source_assembly_contribution": -4.8002271723873684e-15,
+    "retained_minus_standard_collapsed": 38.66831509424341,
+    "physical_admission": false
+  },
+  "native_binary": "research_sync_20261005/loop1/peebles_consumer/runtime/peebles_consumer_probe",
+  "binary_sha256": "057df9e080f3ecd18a33619eb4c8572d77e473d212a53624065c48113f601527",
+  "library_api": {
+    "constructor": "ReferenceInput::from_si(tm,tr,nH_m3,H_s,xp,x2)",
+    "cgs_constructor": "ReferenceInput::from_cgs(tm,tr,nH_cm3,H_s,xp,x2)",
+    "collapsed": "evaluate_collapsed(input) -> CollapsedPoint { source, dxp_dt }",
+    "full": "evaluate_reference(input) -> ReferencePoint { collapsed, retained, source_assembly_contribution, retained_minus_standard_collapsed }",
+    "redshift": "collapsed_redshift_rhs(input,z)"
+  }
+}

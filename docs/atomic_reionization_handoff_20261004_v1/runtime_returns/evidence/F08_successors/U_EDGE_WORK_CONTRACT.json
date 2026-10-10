@@ -1,0 +1,44 @@
+{
+  "task_id": "REI-SPECTRAL-U-WORK",
+  "state": "completed",
+  "scope": "Derived native consumer interface from actual independently checked F08; no new campaign",
+  "input_identity": {
+    "scenario": "configs/rei_fastest_v1/science_scenario_v1.json",
+    "scenario_sha256": "c83d2d43adda663707f99af2b45576eb4478cd94d3440a21fd21eaed32b5f2c1",
+    "campaign_summary": "runs/rei_fastest_v1/paired/campaign_summary.json",
+    "source_manifest": "runs/rei_fastest_v1/paired/source_manifest.json"
+  },
+  "native_interface": {
+    "owner": "PairedState/PairedTrial and paired_history summary_json",
+    "N": "sum energy-node counts + lower_guard_n",
+    "U": "sum energy-node counts*physical_energy_eV + lower_guard_u",
+    "units": {
+      "N": "photons per H nucleus",
+      "U": "eV per H nucleus",
+      "time": "normal/proper seconds",
+      "w": "eV per H nucleus"
+    },
+    "characteristic": "r=g(q,t1)/g(q,t0), g=sqrt(sum q_i^2 exp(-2H_i t)); qhat fixed; physical direction evolves",
+    "transport": "positive linear energy deposition; total N conserved; U_old-U_transport belongs to radiation redshift work",
+    "source": "dt*5e-15 photons/H at13.7eV; normalized proper-isotropic Jacobian1/(V*g^3)",
+    "lower_guard": "N retained, U redshifted, no photoabsorption below10eV; no duplicate edge loss",
+    "upper_guard": "unimplemented export raises an error; not reached by this nonnegative-H source/window",
+    "photo_owner": "same attenuation event owns N removal, E absorption, chi binding and E-chi photoheat",
+    "escape_owner": "Case-A RR/DR escape-energy ledger; no diffuse photon count inferred",
+    "thermal_owner": "gas2Hmean*w once; distinct from radiation characteristic work"
+  },
+  "balances": {
+    "N": "N_final + absorbed_N - source_N - N_initial",
+    "U": "w + binding + escape + photon_U + radiation_redshift_work + gas_thermal_work - source_U - initial_total_U"
+  },
+  "frozen_acceptance": {
+    "local_strict_lt": 0.0002,
+    "public_width_strict_lt": 0.002,
+    "step_and_final_conservation_limit": 1e-12
+  },
+  "independent_basis": "All actual full/half1/inherited half2 stages independently checked MPFI200; reported events and final checkpoints bound",
+  "N_only_interface": "original flrw_three_equations::photon_balance remains N-only; its PASS is not a U/history certificate",
+  "continuum_projection_error_bound": "NOT_ESTABLISHED",
+  "physical_fit_model_error": "NOT_MEASURED",
+  "scientific_admission": "HOLD"
+}

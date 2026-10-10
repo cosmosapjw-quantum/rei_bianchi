@@ -1,0 +1,22 @@
+{
+  "task": "BRIDGE16",
+  "shadow_before": {
+    "match": 8,
+    "total": 32,
+    "max_abs_error_eV_H": 2.710505431213761e-20,
+    "old_python": "sum(Ej * (Pnew-Pold) for each packet), escape_total_new - escape_total_old"
+  },
+  "causes": [
+    "Python3.13 sum uses compensated reduction; original Rust .sum::<f64>() sequential fold",
+    "thermal escrow uses internal dt*rate/(nH*ev) not rounded cumulative escape differencing"
+  ],
+  "corrected": {
+    "match": 32,
+    "total": 32,
+    "packet_sum": "sequential binary64 addition in Rust packet order",
+    "esc_inc": "instrumented Rust internal escaped_energy_rate increment",
+    "trace_only_source_modifications": 2,
+    "orig_native_binary_unchanged": true
+  },
+  "computation_not_a_scientific_patch": true
+}

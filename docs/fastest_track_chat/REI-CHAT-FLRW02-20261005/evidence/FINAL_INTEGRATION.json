@@ -1,0 +1,75 @@
+{
+  "status": "PASS",
+  "reason": "Final source/binary-bound verification after Ensemble and per-CellResult public input hardening; closes final integration risk without suite expansion",
+  "runs": [
+    {
+      "id": "final_crate",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "/workspace/scratch/a5a7937171cb/flrw_three_equations_20261005/coding/rei_crate/Cargo.toml",
+        "--offline",
+        "--locked"
+      ],
+      "display": "cargo test --manifest-path CODING_CRATE/Cargo.toml --offline --locked",
+      "exit_code": 0,
+      "wall_seconds": 0.7093478070019046,
+      "log": "final_crate.log"
+    },
+    {
+      "id": "final_independent",
+      "command": [
+        "python",
+        "/workspace/scratch/a5a7937171cb/flrw_three_equations_20261005/research/independent_regression.py",
+        "--native",
+        "/workspace/scratch/a5a7937171cb/flrw_three_equations_20261005/coding/rei_crate/target/debug/examples/flrw_three_probe",
+        "--out",
+        "/workspace/scratch/a5a7937171cb/flrw_three_equations_20261005/evidence"
+      ],
+      "display": "python research/independent_regression.py --native PROBE --out evidence",
+      "exit_code": 0,
+      "wall_seconds": 0.07206359799965867,
+      "log": "final_independent.log"
+    },
+    {
+      "id": "final_history",
+      "command": [
+        "python",
+        "/workspace/scratch/a5a7937171cb/flrw_three_equations_20261005/research/native_photon_history.py",
+        "--native",
+        "/workspace/scratch/a5a7937171cb/flrw_three_equations_20261005/coding/rei_crate/target/debug/examples/flrw_three_probe",
+        "--out",
+        "/workspace/scratch/a5a7937171cb/flrw_three_equations_20261005/evidence"
+      ],
+      "display": "python research/native_photon_history.py --native PROBE --out evidence",
+      "exit_code": 0,
+      "wall_seconds": 1.3559314480007743,
+      "log": "final_history.log"
+    }
+  ],
+  "file_identities": [
+    {
+      "path": "coding/rei_crate/src/lib.rs",
+      "sha256": "e2d28b2aacb03dca9ca96b828be3017f30723ff62461e19c76967f075fd3fe1b"
+    },
+    {
+      "path": "coding/rei_crate/src/flrw_three_equations.rs",
+      "sha256": "52b165f036bab9d008989d41889972245bf7cea4e2a64a07e561982dc90cfbf0"
+    },
+    {
+      "path": "coding/rei_crate/tests/flrw_three_equations.rs",
+      "sha256": "5a50e8c364ba2a945c3397a3957cecb91a04fbf70199eea112ae63ce9248f1e1"
+    },
+    {
+      "path": "coding/rei_crate/examples/flrw_three_probe.rs",
+      "sha256": "1c248506edd1cecd6f31a3d5e2da263137c33a5a5038e88b87d70905e0dd8979"
+    },
+    {
+      "path": "coding/rei_crate/target/debug/examples/flrw_three_probe",
+      "sha256": "0f5eaf146eb67f49fcf02852323dfec18b7abd908f04c1b9c9ce9bd9cb6a9542"
+    }
+  ],
+  "native_test_count": 84,
+  "timestamp_utc": "2026-10-04T15:29:44Z"
+}

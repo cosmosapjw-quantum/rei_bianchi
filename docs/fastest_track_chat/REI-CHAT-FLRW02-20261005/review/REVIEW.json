@@ -1,0 +1,333 @@
+{
+  "schema_version": "1.0",
+  "review_id": "REI-FLRW-THREE-EQUATIONS-INDEPENDENT-20261005",
+  "status": "COMPLETE",
+  "verdict": "confirmed",
+  "verdict_scope": "Bounded theory reductions and source-connected native local/averaged/photon-number diagnostics; conditional sharp inventory only, not independent geometric filling dynamics",
+  "reviewer": "/root/rec_independent_review",
+  "review_independence": {
+    "implementation_and_theory_edits": false,
+    "production_files_modified": false,
+    "own_new_runtime_tests_executed": false,
+    "method": "Independent source/algebra/assumption and evidence review; reviewed producer/root native execution evidence",
+    "old_scientific_suites_repeated_by_reviewer": false,
+    "finite_regression_is_uniform_certificate": false
+  },
+  "source_receiver": {
+    "repository": "rei_bianchi",
+    "frozen_commit": "9455c2a3cbf2ce5ebaba28e9bfb1dfe79aed0efa",
+    "actual_path": [
+      "AtomicProvider::raw_coefficient(K1,K2)",
+      "AtomicProvider::cross_section(HI)",
+      "hhe_rhs",
+      "homogeneous_photo_rates"
+    ],
+    "baseline_files_compared": 24,
+    "changed_baseline_files": [
+      "src/lib.rs"
+    ],
+    "deployment_or_merge_verified_by_this_review": false
+  },
+  "equation_verdicts": [
+    {
+      "equation": "local photoionization-recombination",
+      "verdict": "confirmed",
+      "conditions": [
+        "proper-density continuity cancellation",
+        "pure H ne=nH*x",
+        "explicit Case A/B number ownership",
+        "prescribed material temperature"
+      ],
+      "actual_code": "connected_cell"
+    },
+    {
+      "equation": "volume/mass averages and filling factor",
+      "verdict": "confirmed_conditional_inventory",
+      "conditions": [
+        "XV, XM, QV are distinct",
+        "fixed comoving weights/common a,H/co-expanding cells",
+        "no peculiar compression/advection or intercell matter transfer in native ensemble",
+        "external sharp-phase declaration and deltaI, deltaI_dot",
+        "retains QV*deltaI_dot"
+      ],
+      "actual_code": [
+        "ensemble",
+        "filling_defect",
+        "sharp_filling_rhs"
+      ],
+      "not_confirmed": "independent front geometry or persistent sharp-phase time evolution"
+    },
+    {
+      "equation": "spectral/integrated photon number",
+      "verdict": "confirmed",
+      "conditions": [
+        "proper spectral expanded2H versus conservative3H+frequency divergence",
+        "comoving count no explicit dilution",
+        "supplied fixed physical energy edge spectra",
+        "upper inflow minus lower loss",
+        "shared internal edges telescope"
+      ],
+      "actual_code": "photon_balance"
+    }
+  ],
+  "findings": [
+    {
+      "id": "IR-F01",
+      "severity": "medium",
+      "status": "resolved",
+      "scope": "public diagnostic record finite/domain guards",
+      "finding": "Public Ensemble NaN could bypass mass-closure comparison; public CellResult negative density could be hidden in positive aggregate",
+      "resolution": "validate_ensemble at both filling helpers and validate_cell_result before weighting; latest focused21 PASS",
+      "evidence": [
+        "coding/REVIEW_FIX_RECORDS.json",
+        "coding/TARGETED_REVIEW_FIX_LOG.txt"
+      ]
+    },
+    {
+      "id": "IR-F02",
+      "severity": "scope_clarity",
+      "status": "resolved",
+      "finding": "Future coupled grey candidate originally shared E3 label with executed photon-only history",
+      "resolution": "Theory section8 and contract now mark candidate NOT_EXECUTED and separately identify actual source-free collisionless finite-band photon E3",
+      "evidence": [
+        "theory/THREE_EQUATIONS_DERIVATION_KO.md",
+        "theory/THREE_EQUATIONS_CONTRACT.json",
+        "theory/SOURCE_LEDGER.json"
+      ]
+    }
+  ],
+  "open_blocking_findings": [],
+  "verification": {
+    "latest_targeted": {
+      "passed": 21,
+      "failed": 0,
+      "exit_code": 0,
+      "authority": "coding/REVIEW_FIX_RECORDS.json"
+    },
+    "E2": {
+      "status": "PASS",
+      "cell_points": 144,
+      "photon_points": 24,
+      "ensembles": 4,
+      "checks": 2352,
+      "precision_digits": 70,
+      "max_cell_gross_flux_error": 9.050410253219996e-16,
+      "max_photon_proper_derivative_error": 2.3091371119213346e-16,
+      "acceptance": 2e-12,
+      "provider_coefficients": "reused inputs, not independent physical-fit revalidation",
+      "initial_failure": "oracle Ncomoving used instead of N/a^3 in proper dilution; fixed only oracle/scale, threshold unchanged; failure preserved"
+    },
+    "E3": {
+      "status": "PASS",
+      "kind": "exploratory",
+      "native_rhs_calls": 570,
+      "model": "source-free collisionless finite-band photon-only p=3, prescribed FLRW, supplied power-law tail upper inflow",
+      "rk4_max_relative_error_finest": 5.318013436256868e-09,
+      "dop853_max_relative_error": 1.3632292320200848e-11,
+      "inventory_max_gross_flux_residual": 1.5926699645643698e-16,
+      "not_executed": "coupled matter/recombination/thermal or geometric filling trajectory"
+    },
+    "native_integration_receipt_scope": "Final actual source and probe binary after both guards:84 Rust tests, E2 and E3 all exit0; reviewer verified all5 source/binary SHA against current bytes; previous83 receipt preserved separately",
+    "final_full_crate": {
+      "passed": 84,
+      "failed": 0,
+      "exit_code": 0,
+      "new_module_tests": 21,
+      "unchanged_existing_tests": 63,
+      "authority": "evidence/FINAL_INTEGRATION.json",
+      "final_log_count_independently_read": 84
+    },
+    "final_receipt_identities_verified": [
+      {
+        "path": "coding/rei_crate/src/lib.rs",
+        "sha256": "e2d28b2aacb03dca9ca96b828be3017f30723ff62461e19c76967f075fd3fe1b"
+      },
+      {
+        "path": "coding/rei_crate/src/flrw_three_equations.rs",
+        "sha256": "52b165f036bab9d008989d41889972245bf7cea4e2a64a07e561982dc90cfbf0"
+      },
+      {
+        "path": "coding/rei_crate/tests/flrw_three_equations.rs",
+        "sha256": "5a50e8c364ba2a945c3397a3957cecb91a04fbf70199eea112ae63ce9248f1e1"
+      },
+      {
+        "path": "coding/rei_crate/examples/flrw_three_probe.rs",
+        "sha256": "1c248506edd1cecd6f31a3d5e2da263137c33a5a5038e88b87d70905e0dd8979"
+      },
+      {
+        "path": "coding/rei_crate/target/debug/examples/flrw_three_probe",
+        "sha256": "0f5eaf146eb67f49fcf02852323dfec18b7abd908f04c1b9c9ce9bd9cb6a9542"
+      }
+    ],
+    "final_receipt_timestamp_utc": "2026-10-04T15:29:44Z"
+  },
+  "claim_limits": [
+    "finite fixtures and controlled history only",
+    "no physical provider admission",
+    "no uniform interval certificate or strict F04 gate completion",
+    "no thermal/energy OTS certificate",
+    "no independent QV front solver",
+    "no general Bianchi RT",
+    "no physical EoR history",
+    "no Git/cloud publication ACK assertion in this review"
+  ],
+  "license_scope": "No third-party upstream code vendoring introduced by this new module; existing receiver copied as authorized source snapshot, atomic coefficients reused via existing provider; source-ledger public-paper citations do not grant new code redistribution rights",
+  "file_identities": [
+    {
+      "path": "review/REVIEW_CONTRACT_KO.md",
+      "bytes": 2622,
+      "sha256": "ca009f0eb9759aa635f96f466c8a47f0b5a642c591786e65123a1d645a888cac"
+    },
+    {
+      "path": "research/PREREGISTRATION.json",
+      "bytes": 2824,
+      "sha256": "8ac6128d3dcaff90d27411475b45cd90f24a4a507f168f99ccc18b9def203cbd"
+    },
+    {
+      "path": "research/INDEPENDENT_EXPERIMENT_PLAN.json",
+      "bytes": 2200,
+      "sha256": "4f01a2d556321d6c4260dbc953bc18ee163a8e83dd0dad606eb4e50c25e3b90f"
+    },
+    {
+      "path": "research/SUPPLEMENTARY_CONTROLS_PLAN.json",
+      "bytes": 997,
+      "sha256": "7771217acda3ea4e63c739e7decb2206a416c11c6b173fb4850881ce26bce1c2"
+    },
+    {
+      "path": "research/independent_regression.py",
+      "bytes": 8128,
+      "sha256": "da78ae4c7f2488d382c9c066e831c60f4fc038044f9b8efebad7eb6ef9733039"
+    },
+    {
+      "path": "research/native_photon_history.py",
+      "bytes": 5361,
+      "sha256": "72b5f70404d2b6e8a3db68caffc4dc1f19296a36634289dba90b4d8485c3b860"
+    },
+    {
+      "path": "coding/NATIVE_CONTRACT.json",
+      "bytes": 1770,
+      "sha256": "86d6d322d90c755123b521aa4917c5cabe964e7cd53bd86eeecb72e7ec5f2f77"
+    },
+    {
+      "path": "coding/README_NATIVE_KO.md",
+      "bytes": 6550,
+      "sha256": "934ad28981fc223f9480101aebffd5f8538df2925e088523af765f9145ed9c9e"
+    },
+    {
+      "path": "coding/NATIVE_IMPLEMENTATION_STATUS.json",
+      "bytes": 3873,
+      "sha256": "afd81e55f17e50efa7ed59f021e888e7ec6fdde55c317946e6c7509647e15fb8"
+    },
+    {
+      "path": "coding/REVIEW_FIX_RECORDS.json",
+      "bytes": 1129,
+      "sha256": "65175f8b7ad4e65fd3586b500cc05bfd743eb967762115a46183f9d6008e421a"
+    },
+    {
+      "path": "coding/TARGETED_REVIEW_FIX_LOG.txt",
+      "bytes": 1744,
+      "sha256": "82c34aff7eeea26703740bf57a51d283ada3cdcdd08ba1b97d5b96ba232ea23e"
+    },
+    {
+      "path": "coding/rei_crate/src/lib.rs",
+      "bytes": 3095,
+      "sha256": "e2d28b2aacb03dca9ca96b828be3017f30723ff62461e19c76967f075fd3fe1b"
+    },
+    {
+      "path": "coding/rei_crate/src/flrw_three_equations.rs",
+      "bytes": 15943,
+      "sha256": "52b165f036bab9d008989d41889972245bf7cea4e2a64a07e561982dc90cfbf0"
+    },
+    {
+      "path": "coding/rei_crate/tests/flrw_three_equations.rs",
+      "bytes": 11127,
+      "sha256": "5a50e8c364ba2a945c3397a3957cecb91a04fbf70199eea112ae63ce9248f1e1"
+    },
+    {
+      "path": "coding/rei_crate/examples/flrw_three_probe.rs",
+      "bytes": 5304,
+      "sha256": "1c248506edd1cecd6f31a3d5e2da263137c33a5a5038e88b87d70905e0dd8979"
+    },
+    {
+      "path": "theory/THREE_EQUATIONS_DERIVATION_KO.md",
+      "bytes": 17253,
+      "sha256": "e3599177d36bac211a4033229e15f90fb0024b9c5c6569709cfe3b74ee51bd2e"
+    },
+    {
+      "path": "theory/THREE_EQUATIONS_CONTRACT.json",
+      "bytes": 12488,
+      "sha256": "9b1b09b3466515ca902a3dc7f1af4383704e90c54f71ca465a92286bcb43cf09"
+    },
+    {
+      "path": "theory/ANALYTIC_FIXTURES.json",
+      "bytes": 5729,
+      "sha256": "b63dcdeb26303032758a9a2769d1d0071fb49c9db9f5be8b0fb3ff2c3bccbcd8"
+    },
+    {
+      "path": "theory/SOURCE_LEDGER.json",
+      "bytes": 7206,
+      "sha256": "1425f38282f4f92734c224bfe8a33f580336cb6529e5bee596b623d2d7851ee8"
+    },
+    {
+      "path": "evidence/INDEPENDENT_REGRESSION_RESULT.json",
+      "bytes": 3313,
+      "sha256": "89ef52cfad8ee9d5076d38e1221e03005a2ca998b5fa457880996f64aecb375d"
+    },
+    {
+      "path": "evidence/INDEPENDENT_REGRESSION_ATTEMPT_1_FAIL.json",
+      "bytes": 5569,
+      "sha256": "ec1c396cbb0dafdd1d4a9b113ed90d90cfac0642a3d26cbc89a65ff86438e7bd"
+    },
+    {
+      "path": "evidence/ORACLE_FAILURE_RESOLUTION.json",
+      "bytes": 766,
+      "sha256": "2abb7b7460d7c6decfdb925b63a1c7f485440f80187743375705ebb26e370184"
+    },
+    {
+      "path": "evidence/PHOTON_HISTORY_RESULT.json",
+      "bytes": 2778,
+      "sha256": "6c56b416bac957700d115903fcaaedca585c557cc51a5783d44c7ce92f406543"
+    },
+    {
+      "path": "evidence/FINAL_INTEGRATION.json",
+      "bytes": 2814,
+      "sha256": "e6ab7ba7bdd54aa211803b49832d8090a2c6c046c57d1f3af5e7a33009c421f3"
+    },
+    {
+      "path": "evidence/final_crate.log",
+      "bytes": 7941,
+      "sha256": "4920b9b927fd61102dc83272b61e97cb6aeca86edd91d39657daed57f0c134bd"
+    },
+    {
+      "path": "evidence/final_independent.log",
+      "bytes": 3314,
+      "sha256": "685fb2912e58916496dbc8285b836c3b0627c2ae8a73cfb4b021bb0415e576e0"
+    },
+    {
+      "path": "evidence/final_history.log",
+      "bytes": 2779,
+      "sha256": "631bbd135ac1060e1eb2ac46f4297df41da34a97f20578cc92528e7a53a46c1e"
+    },
+    {
+      "path": "survey/rei/API_ASSESSMENT_KO.md",
+      "bytes": 5463,
+      "sha256": "0d8852fd42502bcef04e665a8009d40e90eeee59bec8e6b99396e98fd55d197e"
+    },
+    {
+      "path": "survey/rei/docs/fastest_track_chat/REI-CHAT-FLRW01-20261004/FLRW_RECOVERY_CONTRACT.json",
+      "bytes": 3167,
+      "sha256": "97ed31555795e7a607929932ec8ef754521519434746399b84993107d8294112"
+    },
+    {
+      "path": "survey/atomic/ATOMIC_DELTA_REVIEW_KO.md",
+      "bytes": 4571,
+      "sha256": "b4436e510fada20d7ee4188975e82892bd8488a28b2a73958a2c77ca9673e5fc"
+    },
+    {
+      "path": "review/INDEPENDENT_REVIEW_KO.md",
+      "bytes": 8890,
+      "sha256": "2a3d685298f4f44c60d22099c719428bd1b0acbd1856ef544cee47eec84c502d"
+    }
+  ],
+  "stop_decision": "Close one bounded review; no optional additional scientific sweeps or recursive review loop required"
+}

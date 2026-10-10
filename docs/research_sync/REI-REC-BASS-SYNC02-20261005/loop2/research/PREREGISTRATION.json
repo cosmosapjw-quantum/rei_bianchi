@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "task_id": "SYNC02-LOOP2-EXPANDING-PEEBLES",
+  "status": "PREREGISTERED_BEFORE_EXECUTION",
+  "created_utc": "2026-10-04T19:43:47.562040+00:00",
+  "dependency_gate": "Execute only after loop1 consumer/clock/HE results synchronized in LOOP1_SYNC.json",
+  "scope": "Pure H one-temperature collapsed Peebles prescribed matter-only FLRW benchmark; actual REC source→new REI consumer→native trajectory→BASS cold-Thomson visibility. This is not EoR, FT03 extension or full cosmological admission.",
+  "profile": "HYREC2_TLA_2020_PEEBLES_FUDGE1",
+  "background": {
+    "family": "prescribed_flat_matter_only_FLRW",
+    "z_start": 1200.0,
+    "z_end": 1000.0,
+    "H_at_z_start_s_inverse": 5e-14,
+    "nH_today_m3": 0.2,
+    "T_today_K": 2.7255,
+    "H_formula": "H_ref*((1+z)/(1+z_start))**1.5",
+    "nH_formula": "nH_today*(1+z)**3",
+    "temperature_formula": "T_today*(1+z)",
+    "density_kind": "proper",
+    "clock": "normal_seconds; beta=0"
+  },
+  "initial_state": {
+    "x_HII": 0.8,
+    "x_n2": 0.0,
+    "He_nuclei": 0.0,
+    "selection": "explicit benchmark initial condition, not Saha equilibrium or observational fit"
+  },
+  "native_integration": {
+    "method": "explicit RK4, equal redshift cells, source evaluated at every stage, hard reject invalid state",
+    "intervals": [
+      400,
+      800,
+      1600
+    ],
+    "opacity_sampling": "half-step RK4 midpoint state, midpoint proper density; each q held constant on its interval",
+    "clock_map": "analytic normal and conformal time edges; effective a=dt/deta per cell; chi=c*eta"
+  },
+  "independent_reference": {
+    "method": "SciPy DOP853 on separately written source formula, rtol=2e-12,atol=2e-14",
+    "variables": [
+      "x_HII",
+      "forward_tau_integral"
+    ],
+    "reference_independence": "same published coefficients/profile by design; independent source formula and ODE solver, no native calls inside reference"
+  },
+  "gates": {
+    "max_x_absolute_to_oracle": 2e-07,
+    "max_final_tau_error_relative": 2e-05,
+    "finest_interval_probability_L1_to_oracle": 2e-05,
+    "normal_eta_chi_max_tau_absolute": 5e-12,
+    "probability_absolute_mass": 2e-13,
+    "source_pointwise_relative_scaled": 3e-12,
+    "require_decreasing_x_and_tau_errors": true,
+    "observed_tau_error_ratio_range": [
+      2.5,
+      5.5
+    ]
+  },
+  "observer_tail": 0.2,
+  "negative_controls": [
+    "missing_cm3_to_m3",
+    "double_expansion_dilution",
+    "clock_a_omission",
+    "HeIII_charge_not_applicable_pureH"
+  ],
+  "no_claims": [
+    "full HyRec parity",
+    "retained shell trajectory",
+    "F04 or F05 continuum certificate",
+    "anisotropic transport",
+    "finite-T or KN physical admission",
+    "EoR stellar source model"
+  ]
+}

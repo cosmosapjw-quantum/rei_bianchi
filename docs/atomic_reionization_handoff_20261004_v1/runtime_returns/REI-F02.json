@@ -1,0 +1,110 @@
+{
+  "task_id": "REI-F02",
+  "state": "completed",
+  "input_identity": {
+    "logical_task": "REI-F02",
+    "parent_source_commit": "64bc3aa0871bb324817afd3d36db018dd34181cf",
+    "original_task_intent": ".cuh/fastest-track/REI-F02/task.json",
+    "frozen_original_test_sha256": "f334f5e8991cba9886f37717cacd0159bc4e83bcf7990f9d63192e36e47b8cf1"
+  },
+  "changed_paths": [
+    "rust/rei_microphysics/src/hydrogen_step.rs",
+    "rust/rei_microphysics/src/lib.rs",
+    "rust/rei_microphysics/tests/hydrogen_step.rs"
+  ],
+  "commands": [
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F02 -- cargo test --manifest-path rust/rei_microphysics/Cargo.toml --locked",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F02_cargo_test.log"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F02 -- cargo clippy --manifest-path rust/rei_microphysics/Cargo.toml --all-targets --locked -- -D warnings",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F02_clippy.log"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F02 -- python3 .cuh/fastest-track/REI-F02/verify_decimal.py",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F02_decimal.log"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F02 -- cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml -- --check",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F02_fmt.log"
+    },
+    {
+      "command": "cuhg-telemetry run --project /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --task REI-F02 -- cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test hydrogen_step --locked",
+      "exit_code": 0,
+      "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F02_final_targeted.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "rust/rei_microphysics/src/hydrogen_step.rs",
+      "sha256": "d3a4515dd2cb4e723095db6c750531acc3999fe0d5fa856707e520ec93056fb6"
+    },
+    {
+      "path": "rust/rei_microphysics/src/lib.rs",
+      "sha256": "b5598890b04c255c643b7decdfed4e046c84bba030aec09c7c7d38a0b32d86eb"
+    },
+    {
+      "path": "rust/rei_microphysics/tests/hydrogen_step.rs",
+      "sha256": "8e0ef4262ca7204c9463ccbaf18941f100b2dce838069ed01304f1760f317fde"
+    }
+  ],
+  "claim": {
+    "basis": "Direct frozen scalar tests, independent high-precision finite Rust comparisons, scoped independent native code review and comment-only closeout",
+    "ceiling": "Constant-rate scalar hydrogen oracle only; no physical H/He provider, nonlinear remainder, interval or history admission"
+  },
+  "next_task": "REI-F01",
+  "blocker": null,
+  "implementation_author": "Host wrapper plus managed local one_minus_phi1 helper",
+  "validation": {
+    "crate_tests_passed": 49,
+    "new_targeted_tests": 6,
+    "independent_decimal_rust_cases": 103,
+    "decimal_working_precision": 1100,
+    "finite_comparison_relative_tolerance": 4e-14,
+    "subnormal_absolute_tolerance_ulps": 2,
+    "uniform_enclosure_claim": false
+  },
+  "review": {
+    "evidence_path": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F02_review.json",
+    "status": "SCOPED_REVIEW_COMPLETE_P3_COMMENT_REPAIRED",
+    "independent_runtime_observed": true
+  },
+  "local_usage": {
+    "model_calls": 3,
+    "known_tokens": 2058,
+    "cost": "NOT_MEASURED",
+    "failures_preserved": 2,
+    "qualified_scope": "7 finite phi2 points plus zero identity only"
+  },
+  "native_author_attempts": {
+    "blocked_before_child_creation": 2,
+    "exact_registered_refs": [
+      "cl_664927ea2cf1758580940a3bce5ba410",
+      "cl_ce4acd1cfe749c71fda7ca82f0a96fb3"
+    ],
+    "claims": null,
+    "children": null,
+    "reconciliation_ref": ".cuh/fastest-track/REI-F02/native-no-writer-observation.json"
+  },
+  "native_review": {
+    "child_id": "01a106fd-cbc2-72c2-b54a-9623e8018128",
+    "model": "gpt-6-astra",
+    "effort": "xhigh",
+    "observed_usage": {
+      "input_tokens": 683370,
+      "cached_input_tokens": 611968,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 7601,
+      "reasoning_output_tokens": 4200,
+      "total_tokens": 690971
+    },
+    "cost": "NOT_MEASURED"
+  },
+  "formatting_identity": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/evidence/F02_reference/formatting_identity.json",
+  "scientific_admission": "HOLD"
+}

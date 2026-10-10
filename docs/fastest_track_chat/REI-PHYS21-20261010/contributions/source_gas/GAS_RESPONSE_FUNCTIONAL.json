@@ -1,0 +1,260 @@
+{
+  "schema_version": "1.0",
+  "task": "REI-PHYS21-20261010",
+  "contribution": "FT03 scalar gas-response functional and source binding",
+  "contributor": "/root/phys21_source_gas",
+  "evidence_states": {
+    "source_identity": "source-inspected / byte-identity-verified",
+    "source_ownership": "source-inspected; source supports derived units/ownership; no native execution",
+    "gas_functional": "derived; source supports",
+    "local_gas_jacobian": "numerically checked",
+    "evolving_gas_quadratic_coefficients": "unresolved",
+    "physical_admission": "HOLD"
+  },
+  "convention": {
+    "metric_signature": "(-,+,+,+)",
+    "time": "proper seconds",
+    "epsilon": "dimensionless shear amplitude",
+    "coefficient": "eta=[epsilon^2] y = (1/2) d^2 y/d epsilon^2 at 0",
+    "scalar_first_variation": "zero only under PHYS20 continuum isotropy/smoothness/uniqueness hypotheses",
+    "state_order": [
+      "xHII",
+      "xHeII",
+      "xHeIII",
+      "w_eV_per_H"
+    ],
+    "fixed_in_epsilon": [
+      "n_H(t)",
+      "mean H(t)",
+      "f_He",
+      "initial scalar state",
+      "source scalar amplitude and emitted spectrum"
+    ],
+    "units": {
+      "fractions": "respective nuclear fractions; He fractions are per He nucleus",
+      "w": "eV per H nucleus",
+      "Gamma": "per-absorber s^-1",
+      "A": "photo events per H nucleus per second",
+      "Q": "eV per H nucleus per second"
+    }
+  },
+  "source": {
+    "n_H_cm3": "1e-4 exp(-3 H t)",
+    "mean_H_s": 1e-14,
+    "f_He": 0.083,
+    "source_photons_per_H_s": 5e-15,
+    "birth_energy_eV": 13.7,
+    "initial_photons_per_H": 0.05,
+    "initial_fractions": [
+      0.9,
+      0.3,
+      0.6
+    ],
+    "initial_T_K": 50000,
+    "source_owner": "paired_runtime.rs: paired_initial; source_weights; endpoint",
+    "local_reaction_owner": "coupled_primary.rs: raw calls ft03_rhs with zero photon densities; packet photo/heat appended once",
+    "RR_DR_emission_owner": "escaped energy ledger; no primary photon re-injection",
+    "continuous_birth_measure": "0.05 delta_0(d tau) delta_13.7(d E_b) + S d tau delta_13.7(d E_b)",
+    "birth_angular_measure": "physical dOmega_birth/(4pi), or equivalent fixed-q with J_birth exactly once",
+    "soft_photo_inactive_species": [
+      "HeI",
+      "HeII"
+    ],
+    "thermal_He_feedback": "retained"
+  },
+  "gas": {
+    "Pi": "1+f+x+f(a+2b)",
+    "Xe": "x+f(a+2b)",
+    "n_e": "n_H Xe",
+    "T": "2 eV_erg w / (3 k_B Pi)",
+    "lower_per_H": [
+      "1-x",
+      "f(1-a-b)",
+      "f a"
+    ],
+    "upper_per_H": [
+      "x",
+      "f a",
+      "f b"
+    ],
+    "CI_j": "lower_j n_e beta_j(T)",
+    "RR_j": "upper_j n_e alpha_j(T)",
+    "DR_k": "upper_HeII n_e d_k(T)",
+    "net_fluxes": [
+      "C0-R0+A0",
+      "C1-R1-D0-D1+A1",
+      "C2-R2+A2"
+    ],
+    "fraction_derivatives": [
+      "net0",
+      "(net1-net2)/f",
+      "net2/f"
+    ],
+    "kappa_j_eV_cm3_s": "(k_B/eV_erg) T alpha_j(T) (3/2+g_j(T))",
+    "cooling": "sum_j chi_j C_j + sum_j upper_j n_e kappa_j + sum_k e_DR_k D_k",
+    "w_derivative": "-2 H w - cooling + Q",
+    "temperature_coefficient": "eta_T=T0(eta_w/w0 - (eta_x+f(eta_a+2eta_b))/Pi0)",
+    "temperature_warning": "positive w response does not alone determine T response; particle-count term is retained"
+  },
+  "radiation": {
+    "baseline_energy": "E0(s;tau,Eb)=Eb a(tau)/a(s)",
+    "baseline_hazard": "lambda0= c n_H sum_j lower_j(y0) sigma_j(E0)",
+    "baseline_survival": "P0=exp(-integral_tau^t lambda0 ds)",
+    "functional": "R_phi=integral dmu <P L_phi>_physical_birth_angle",
+    "endpoint_L": {
+      "N": "1",
+      "U_gamma": "E",
+      "Gamma_j": "c n_H sigma_j(E)",
+      "A_j": "c n_H lower_j sigma_j(E)",
+      "Q": "c n_H sum_j lower_j sigma_j(E)(E-chi_j)"
+    },
+    "gas_hazard_gradient": [
+      "-c n_H sigma0",
+      "c n_H f (sigma2-sigma1)",
+      "-c n_H f sigma1",
+      "0"
+    ],
+    "full_quadratic_coefficient": "R_phi,2 = r_phi + D_y R_phi[eta]",
+    "geometry_forcing": "r_phi=[epsilon^2] R_phi(t;y0,epsilon); y0 may evolve in t but is held fixed while differentiating epsilon",
+    "gas_Frechet_derivative": "integral dmu P0 [L_phi,y eta(t) - L_phi0 integral_tau^t lambda_y eta(s) ds]",
+    "double_count_guard": "If using A_j functional, do not add local lower-abundance variation again. If using Gamma_j, A_j,2=lower_j,0 Gamma_j,2+lower_j,2 Gamma_j,0.",
+    "instantaneous_temperature_dependence_of_cross_section": false
+  },
+  "causal_operator": {
+    "R_order": [
+      "A_HI",
+      "A_HeI",
+      "A_HeII",
+      "Q"
+    ],
+    "B_inj_symbolic": [
+      [
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        "1/f",
+        "-1/f",
+        0
+      ],
+      [
+        0,
+        0,
+        "1/f",
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1
+      ]
+    ],
+    "equation": "eta_dot=J_nonphoto eta+B_inj D_y R[eta]+B_inj r",
+    "initial_condition": "eta(0)=0",
+    "local_A": "J_nonphoto+B_inj integral_{tau<=t} dmu P0 L_y",
+    "memory_K": "-B_inj integral_{tau<=s} dmu P0(t,tau) L0(t,tau) outer lambda_y(s,tau)",
+    "Volterra_form": "eta_dot(t)=A(t)eta(t)+integral_0^t K(t,s)eta(s) ds+f2(t)",
+    "forcing": "f2=B_inj r",
+    "local_JVP_equations": "SOURCE_GAS_NOTE_KO.md SG17-SG22",
+    "gas_Hessian_required_at_this_order": false,
+    "gas_Hessian_reason": "D_y^2F[y1,y1]=0 since the continuum scalar first variation y1 is zero",
+    "sufficient_wellposedness": "finite interval; appropriate baseline C2 response; integrable source; continuous/bounded local and causal coefficients; no unsupported threshold or remapping branch crossing"
+  },
+  "observable_mapping": {
+    "Gamma_j_2": "r_Gamma_j + D_y Gamma_j[eta]",
+    "Q_2": "r_Q + D_y Q[eta]",
+    "tau_e_definition": "proper-time scalar Thomson integral only: c sigma_T integral n_e ds",
+    "tau_e_2": "c sigma_T integral n_H [eta_x+f(eta_a+2eta_b)] ds",
+    "count_ledger": "N_2_dot=-sum_j A_j,2 (source fixed)",
+    "energy_ledger": "d/dt(w2+I2+U_escape,2+U_gamma,2)=-2H w2-W_redshift,2_dot",
+    "not_calculated": [
+      "observer lightcone tau",
+      "redshift-fixed endpoint response",
+      "finite native map Hessian"
+    ]
+  },
+  "baseline_evidence": {
+    "actually_read": [
+      "PHYS19 README_KO.md",
+      "PHYS19 PHYSICS_CONTRACT.json",
+      "PHYS19 RESULTS_SUMMARY.json",
+      "PHYS19 SOURCE_BINDING.json",
+      "PHYS19 VERIFICATION.json",
+      "BRIDGE13 CONTINUOUS_CHAIN_CONTRACT.json",
+      "PHYS20 report/handoff and pinned source"
+    ],
+    "PHYS19_archive_sha256": "66b93eebf614cc83949abfeb167a94b94d1a2cae3024c9e1ecdf9fcd7e116737",
+    "archive_bytes_read_here": false,
+    "Library_searches": [
+      {
+        "query": "\"REI_PHYS19_COUPLED_BIRTH_RESPONSE_20261010.zip\"",
+        "title_only": true,
+        "results": 0
+      },
+      {
+        "query": "PHYS19",
+        "title_only": true,
+        "results": 0
+      }
+    ],
+    "search_limit": "zero results do not establish archive absence; no broad cross-repo/warm/atomic lane search",
+    "usable_now": [
+      "source-defined continuous constant-S model",
+      "scope and identity of inherited scalar derivative/source-error certificates",
+      "finite-birth versus true continuous-source distinction"
+    ],
+    "insufficient_for_numerical_quadratic_coefficients": [
+      "finite derivative upper bounds and terminal error intervals do not uniquely determine y0(s) or P0(t,tau)",
+      "no callable dense true-constant-S baseline/trajectory enclosure materialized in this contribution"
+    ],
+    "minimal_data_for_optional_numeric_solution": [
+      "same-model continuous y0(s) values/enclosure and validity interval",
+      "cohort E0 and survival function or evaluable integrals",
+      "source/time integration errors and baseline error propagation",
+      "cutoff margin and bounded C2 response over the interval"
+    ],
+    "whole_project_blocked": false
+  },
+  "validation": {
+    "source_binding": "SOURCE_BINDING.json",
+    "remote_read": "REMOTE_SOURCE_READ.json",
+    "local_derivative_evidence": "LOCAL_GAS_DERIVATIVE_CHECK.json",
+    "local_derivative_execution": "LOCAL_GAS_DERIVATIVE_EXECUTION.json",
+    "local_derivative_check_count": 60,
+    "local_derivative_passed": 60,
+    "local_derivative_max_relative_difference": 1.1287609103309596e-15,
+    "local_derivative_method": "analytic JVP and T particle-count gradient versus complex-step smooth RHS; 3 declared fixtures, not a gas trajectory",
+    "native_runs": 0,
+    "gas_IVP_runs": 0,
+    "closed_PHYS20_science_replay": false,
+    "limitations": [
+      "manual Python transcription; no native byte-level or machine-code equivalence",
+      "no rigorous enclosure from complex-step agreement",
+      "radiation memory derived, not numerically solved by this contribution"
+    ],
+    "initial_diagnostic_status": "PASS 60/60, exit 0; not an initial failure",
+    "correction_class": "diagnostic implementation/transcription correction",
+    "correction_reason": "DR Kelvin constants now multiply separately then sum, matching pinned source evaluation order",
+    "tolerance_unchanged": true,
+    "retained_complex_step": 1e-24,
+    "retained_relative_tolerance": 2e-12,
+    "initial_evidence_preserved": [
+      "LOCAL_GAS_DERIVATIVE_CHECK_v1.json",
+      "LOCAL_GAS_DERIVATIVE_EXECUTION_v1.json",
+      "check_local_gas_derivative_v1.py"
+    ]
+  },
+  "preserved": {
+    "physical": "HOLD",
+    "failed_interval": "[160,161] FAIL",
+    "tick160": "preserved",
+    "auxiliary_escape": "FAIL",
+    "HH_RCT_CR": "OFF",
+    "precision_atomic": "PARKED",
+    "source_default_runtime_returns": "no mutation"
+  }
+}

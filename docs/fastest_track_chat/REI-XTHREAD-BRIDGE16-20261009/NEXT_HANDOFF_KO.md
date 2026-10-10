@@ -1,0 +1,9 @@
+# BRIDGE16 -> BRIDGE17 원 canonical checkpoint 및 family roundoff gate
+
+BRIDGE15 unconditional production acceptance is NOT established. BRIDGE16 directly executed original Rust1.94.1 13-file source tree cb69b4736dd046e4675557577eb8e0ead037d1f3 at original nominal 32 stages; point gas/photon/work/escape all bit equal. Old Python shadow compensation matched only first8 due to Python compensated sum and cumulative escape differencing. Corrected original Rust fold plus internal escaped increment matches actual native 32/32, no source code patch.
+
+First identify genuine production `paired_runtime::PairedState` and any persisted checkpoint/save/load/transaction. Its `energy_comp`, `ledger_comp`, per-direction photons, lower guards, source birth-plan identity and actual counters cannot be casually mapped from the 7-packet research Work. An invented test-only FNV checkpoint passed 4 restart/4 corruption but is NOT canonical. Do not claim production RESTORE_VERIFIED without actual owner bytes and native loader.
+
+Check explicit compiled operation semantics with end-to-end f64 source, FMA flags, rounding mode and the original first-macro bounded family; BRIDGE15 conditional family upper 8.765649563651058e-13 eV/H is *absolute* and separate from original relative gate and failed [160,161]. If actual canonical restore is unsupported, return a source-identity blocker. Never overwrite source13/defaults/runtime returns.
+
+Verify source parent Git HEAD, ZIP SHA256 3fda67cae9876bed0c545f94ff3d1b17c0a7a70862435f892d6d70a976438337, 94 payloads, 8 pinned fresh outputs. Offline `python -B reproduce.py --verify-only`; native `--output NEW_FOLDER --rustc ABSOLUTE_RUSTC`, old shadow exit3 EXPECTED. Reuse root proofs without replaying. No full 1e13 campaign. SOURCE_C4 coupled birth-time quadrature bound is separate science track. Preserve local<2e-4, width<2e-3, auxiliary escape FAIL, historical tick160 and physical HOLD.

@@ -1,0 +1,15 @@
+{
+ "id":"BIN_EXPONENTIAL_NU_LEBESGUE_E_V1",
+ "task_id":"REI-CHAT-FLRW05-20261005",
+ "source_parent":"752e360a80e8622bcbaffae54183258b2e67b810",
+ "measure":{"p":"angular integrated photons/H/eV","N":"integral p dE","U":"integral E*p dE,eV/H","density":"proper cm^-3","c_cm_s":29979245800.0},
+ "ansatz":{"x":"(E-L)/(R-L)","p":"N*exp(lambda*x)/((R-L)*Z)","Z":"expm1(lambda)/lambda;Z(0)=1","mean":"(U/N-L)/(R-L)=1/(1-exp(-lambda))-1/lambda","uniqueness":"mean derivative=Var(x)>0","entropy_reference":"uniform dE,not Bose-Einstein/Planck","vacuum":"N=0 requires U=0","boundary_mean":"DELTA_COMPONENT_REQUIRED","max_abs_lambda_numerical_guard":10000,"max_abs_lambda_tested":1000,"silent_clipping":false},
+ "outputs_same_measure":["N","U","edge_trace","species J","species A","binding chi*J","heat integral(E-chi)dJ"],
+ "flux":{"H":"nonnegative","Phi":"H*Eedge*p_edge perH/s","trace":"higher-energy donor;top externally supplied","dN":"S0-sumJ+Phiupper-Philower","dU":"S1-sumA-H*U+Eupper*Phiupper-Elower*Philower"},
+ "positive_substeps":{"remap":"g=aold/anew in(0,1]; integrate donor over target/g; Unew=g*donor moment","upper_inflow_in_remap":0,"export_energy":"Emin*Nexit at crossing,not end energy","attenuation":"fixed densities/energies;pnew=p*exp(-h*k);species ratio*k-expm1 measure","k_zero":"zero events","cone":"N>=0,L*N<=U<=R*N","coupled_split_order_verified":false},
+ "error_separation":{"quadrature":"60-digit integrals of same reconstruction","projection":"N/U discards unresolved shape","reaction_bound":"N*M2*(mean-L)*(R-mean) if smooth K has known uniform |Ksecond|<=M2","edge_trace":"unbounded from N/U alone","physical_atomic":"not evaluated","time":"no coupled integration","interval":"not certified"},
+ "source_adapters":{"photo_api":"homogeneous_photo_rates arbitrary positive node slice","photo_units":"P*nHc*MPC_CM^3 in old cMpc^-3 API","photon_api":"photon_balance N*nHc in reference comoving cm^-3; nH*p_edge","energy_api":"independent U/edge-energy consumer open","one_node_per_bin":"not generally sufficient for species J and A"},
+ "preserved":{"strict_local_lt":0.0002,"public_width_lt":0.002,"failed_interval":[160,161],"failed_value":0.00021245050576368385,"prefix":160,"physical_admission":false,"external_REI_F04_redefined":false},
+ "next_chat_task":"REI-CHAT-FLRW06_NATIVE_SPECTRAL_STAGE_REGRESSION",
+ "full_contract":"immutable ZIP/rei_chat_flrw05_20261005/COHERENT_SPECTRAL_CONTRACT.json"
+}
