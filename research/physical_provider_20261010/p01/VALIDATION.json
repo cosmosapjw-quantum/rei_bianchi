@@ -1,0 +1,39 @@
+{
+  "task_id": "REI-PHYSINPUT-01-P01",
+  "status": "PASS_SCOPED",
+  "execution": {
+    "entrypoint": "rust/rei_microphysics/python/source_bound_interval.py",
+    "route": "production SourceBoundConditional",
+    "nodes": 2904,
+    "epochs": 17,
+    "rhs_calls": 257,
+    "time_s": [0, 100000000000.0],
+    "method": "DOP853",
+    "relative_tolerance": 2e-10
+  },
+  "comparison": {
+    "state_scaled_max": 1.0471941498209426e-15,
+    "local_photon_ledger_max": 7.000969126733937e-15,
+    "local_energy_ledger_max": 1.7556755934167118e-16,
+    "field_target": 2e-6,
+    "ledger_target": 1e-9
+  },
+  "checks": [
+    "source identity preflight",
+    "finite state",
+    "temperature guard",
+    "photon positivity",
+    "ionic fraction domain",
+    "global and local photon/energy ledgers",
+    "17-epoch state and observable comparison",
+    "PhysicalHistory remains fail-closed"
+  ],
+  "software_validation": {
+    "conditional_rust_tests": 8,
+    "python_boundary_tests": 5,
+    "existing_axisym_contract_tests": 6,
+    "existing_axisym_coupling_tests": 5,
+    "independent_review": "SCOPED_PASS"
+  },
+  "scope": "Consumer integration for the frozen source-backed conditional warm H/He IVP only. This is not independent atomic validation, a continuum certificate, a full EoR/REC history, or observational admission."
+}
