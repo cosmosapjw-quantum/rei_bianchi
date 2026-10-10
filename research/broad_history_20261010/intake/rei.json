@@ -1,0 +1,389 @@
+{
+  "schema": "rei_fresh_intake_20261010_v1",
+  "retrieved_at_utc": "2026-10-10T13:29:52.857Z",
+  "repository": "cosmosapjw-quantum/rei_bianchi",
+  "source_read_only": true,
+  "private_chat_access": false,
+  "prior_pin_changes": {
+    "pr96": false,
+    "pr97": false,
+    "pr102": false
+  },
+  "latest_physics_receiver": {
+    "pr": 103,
+    "branch": "research/cr-phys03-fs10-xi01-20261010",
+    "sha": "8d9526a75e85202764e845c7d5d79d7f903e7c55",
+    "base_pr": 102,
+    "scope": "local 100K xi=0.1 fixed knot; no solver interval"
+  },
+  "latest_owner_general_branch": {
+    "pr": 83,
+    "branch": "forward/rust-reion-kernels-20260922",
+    "sha": "e334866a4ac1be963f573c0b35182d25eb4d666b",
+    "scope": "PHYS22 additive docs; source input3dc42c64; no new IVP"
+  },
+  "recommended_additive_base": "8d9526a75e85202764e845c7d5d79d7f903e7c55",
+  "old_igm": {
+    "pr": 84,
+    "branch": "forward/rem-hhe-igm-20261006",
+    "sha": "39c39eab1cc2f1a215723680accc123e67ef13b6",
+    "scope": "manufactured constant-source FLRW z12to10 long pilot; 8of37 refinement fields fail"
+  },
+  "existing_short_interval": {
+    "z_start": 5.807,
+    "z_end": 5.80698492362111,
+    "time_s": [
+      0,
+      100000000000
+    ],
+    "output_epochs": 17,
+    "T_initial_K": 50000,
+    "T_guard_K": [
+      30000,
+      110000
+    ],
+    "nodes": 2904,
+    "optional_CR_RCT_HH": "OFF",
+    "production_contract": "SourceBoundConditional"
+  },
+  "hm12": {
+    "redshift_domain": [
+      0,
+      15.93
+    ],
+    "emissivity_sha256": "88743ec9041a47fd12f47bf50a75a06903089e1afd992b5460a4af471249469b",
+    "uvb_sha256": "a708586ead551202c068b049d48afa87b96695c5a5d12253e9b9bbb74efd75dc",
+    "parser": "research/physical_provider_20261010/hm12_data.py",
+    "extrapolation": "forbidden",
+    "unit": "erg s^-1 Mpc^-3 Hz^-1 comoving emissivity",
+    "moment_api": "table.moment(Emin,Emax,z,proper_photons=True): cm^-3 s^-1"
+  },
+  "background": {
+    "path": "research/physical_provider_20261010/background.py",
+    "model": "dust+Lambda LRS Bianchi-I",
+    "parameters": [
+      "z_i",
+      "t_max",
+      "r=s_i/H_i"
+    ],
+    "equations": [
+      "H²=D+B/a³+C/a⁶",
+      "s=s0/a³"
+    ],
+    "density": "proper nH,nHe cm^-3",
+    "radiation_backreaction": false
+  },
+  "actual_blockers": [
+    "Frozen production time-domain0..1e11s cannot be silently extended.",
+    "FT03 production guard30000..110000K excludes evolving cold/standard ionized IGM; separate existing IGM rates1..1e6K are operational CaseA subset, not physical full-history admission.",
+    "CR receiver accepts exactly xi=.01/.1 with xHII=xHeII, xHeIII=0, at fixed100K snapshot and exact geometry/time/source; no arbitrary composition or temperature.",
+    "CR causal delay, unmodelled losses and full evolving history unresolved; do not replace CR with photon/heat/CX.",
+    "HM12 table stopsz15.93; z20 needs independently defined published source.",
+    "Physical diffuse/secondary/Compton/highE closure and source uncertainty remain open for full coupled model."
+  ],
+  "shortest_candidate": {
+    "kind": "new additive explicitly scoped volume-filling-factor history",
+    "range": "z20to4 with newly pinned published source or15.93to4 with existing HM12",
+    "source": "integrated ionizing emissivity",
+    "gas": "explicit ionized-zone T and CaseB recombination prescription",
+    "reuse": "pinned BianchiBackground and density normalization",
+    "outputs": [
+      "Q_HII(z)",
+      "z50",
+      "z90",
+      "tau_segment",
+      "shear response",
+      "source/recombination photon budget"
+    ],
+    "claim_boundary": "scientifically useful reduced mean-volume model; no CR/RCT/HH history or directional RT completion"
+  },
+  "posted_returns": [
+    {
+      "library_file_id": "libfile_49321cd076888191926ac6c3c78f85b8",
+      "name": "REI_PHYS22_REPORT_KO_20261010.md",
+      "input_sha": "3dc42c64ab32075f0a59c96af3ddf7435d9b7f97",
+      "scientific_src_tree": "cb69b4736dd046e4675557577eb8e0ead037d1f3",
+      "result": "initial-time scalar shear coefficients t3/t4; no trajectory"
+    },
+    {
+      "library_file_id": "libfile_4064d223dd8481919d27781e28eedf42",
+      "name": "REI_PHYS23_CODEX_HANDOFF_KO_20261010.md",
+      "result": "proposed spectral sign diagnostic; not execution"
+    }
+  ],
+  "pr_metadata": [
+    {
+      "number": 83,
+      "title": "Draft: external-atomic fastest track and preserved research lanes",
+      "head_ref": "forward/rust-reion-kernels-20260922",
+      "head_sha": "e334866a4ac1be963f573c0b35182d25eb4d666b",
+      "base_ref": "main",
+      "base_sha": "ae3402713c4b6530ab2b27f008f5f5d5c6a999ed",
+      "updated_at": "2026-10-10T11:50:36Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/83",
+      "body": "## 목적\n외부 공개 원자 데이터를 재사용하여 reionization 연구의 실행 경로를 단축하고, 기존 정밀 연구를 독립적으로 재개 가능한 lane으로 보존합니다.\n\n## 이번 게시 범위\n- [시작문](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/4af2912ce73fdb1240db74d420a0a48fe686af0b/docs/atomic_reionization_handoff_20261004_v1/threads/rei_bianchi/CODEX_START_KO.md), 상세 물리 선행연구, 실행 파일 경로와 검증 기준, 전역 31-node DAG 및 저비용 LLM task selector.\n- H/He event/thermal/photon 계약, homogeneous opacity와 inherited effective-MFP 구분, nonlinear-map certificate recipe, Bianchi/FLRW paired campaign 단일 소유자.\n- 기존 원계획 19개 byte 보존과 source/hash manifest; 임계값과 기존 [160,161] 실패 유지.\n- [이번 문서 commit](https://github.com/cosmosapjw-quantum/rei_bianchi/commit/0ca807787c040365cde22e29dbbe95c337b936c3).\n\n## 검증과 한계\n유한 회계·reference 검사 및 전역 DAG 독립 검토를 완료했습니다. Rust 전체 solver 구현, 실제 구간 인증, 물리 history 실행은 아직 수행하지 않았습니다. 구현용 논리 PR들은 PR_PLAN.json의 후속 작업입니다.\n\n## 검토 범위 주의\n선택된 기존 연구 branch를 main에 대상으로 연결한 draft입니다. PR 전체 diff에는 이번 게시 이전의 연구 이력이 함께 포함되며, 이번 변경만은 위 commit으로 검토하십시오. 자동 merge나 기존 과학 gate 승격은 하지 않습니다.\n\n## 백업\n[Drive 전달 폴더](https://drive.google.com/drive/folders/1zzbClTE3qzz8gaiQwopXJqVk9ZGBawYZ). Dropbox 동일명 전달 폴더 및 확인 영수증은 publication/에 기록합니다.\n\n### 최종 전달 확인\n[Codex 시작문](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/4af2912ce73fdb1240db74d420a0a48fe686af0b/docs/atomic_reionization_handoff_20261004_v1/threads/rei_bianchi/CODEX_START_KO.md) · [Drive/Dropbox 확인 영수증](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/4af2912ce73fdb1240db74d420a0a48fe686af0b/docs/atomic_reionization_handoff_20261004_v1/publication/DELIVERY_RECEIPT.json)\n\n주요 8개 파일의 양쪽 저장 완료 및 ID/크기 readback 확인. 새 원격 전체 복구 검사는 미수행. 현재 PR은 draft이며 병합하지 않았습니다.\n\n\n## REC-PB02 supplier 결과 수신 (2026-10-04)\n\nREC의 새 pure-H one-T Peebles 참조 모듈과 exact source/검증 계약을 additive handoff로 연결한다. 현재 REI의 FLRW02/F04 우선순위와 F03 Case-A source-site를 보존하며 production 코드는 변경하지 않는다.\n\nREC 실행 결과: 신규 20개 / 전체 108개 Rust tests, 원저자 C 384점 및 Decimal70 24점 대조 PASS. 이론·조건부 Sobolev 각도 그림·독립 검토·후속 DAG와 exact commit pointer는 `docs/fastest_track_chat/REC-PB02-20261004/`에 있다. Peebles 실제 consumer는 이 supplier 결과만으로 완료 처리하지 않는다.\n\n핵심 후속 구분: F03는 Case-A 정적 H=0 결합 시험이며 Peebles expanding Case-B closure와 다르다. Peebles lane 재개 시 REC API로 공급원을 고정하고 actual-ground C와 collapsed C를 분리하여 source-bound call-site 및 matched history를 검증해야 한다.\n\n\n# REI-CHAT-FLRW02: source-bound three-equation reference\n\n실제 REI 원자율 경로와 FLRW 광자 redshift·평균 항의 연결을 bounded reference로 구현하고 검증했다. 새 `rust/rei_microphysics/src/flrw_three_equations.rs`는 기존 AtomicProvider·`hhe_rhs`·photo-rate 경로를 호출하며, 경계 스펙트럼을 명시적으로 받는 photon ledger와 조건부 sharp filling inventory를 제공한다. 기존 F03의 CaseA 및 thermal 의미는 유지한다.\n\n- \\(x,X_V,X_M,Q_V\\)를 분리하고 public 입력의 NaN/Inf·domain guard를 추가했다.\n- E2/E2X 독립 finite-point 회귀와 negative controls, E3 실제 source-free power-law native photon history 및 refinement를 기록했다.\n- 최종 결합 결과는 `evidence/FINAL_INTEGRATION.json`: 전체 84개 테스트와 최종 바이너리 E2/E3 성공. 강화 전 82개 snapshot과 구별한다.\n- 이월 문서·8-node DAG·저비용 LLM 진입 계약은 `docs/fastest_track_chat/REI-CHAT-FLRW02-20261005/publication/`에 있다. 완성본 SHA는 실제 publication receipt에서 해석한다.\n\nFLRW02는 bounded reference 완료다. E3는 결합 원자–광자 재이온화 history가 아니며, geometric front, 실제 우주론 history, 물리 provider/thermal/uniform-error admission은 남아 있다. 다음은 실제 production call site, spectral-edge closure, phase geometry 사양과 제한된 consumer 연결이다. REI-F04의 원래 의미·pending 상태와 이전 실패 증거를 보존한다.\n\n\n동시 수신 `aa3e98d7`의 20261004 FLRW02 문서 7개를 보존한다. Rust 변경·경로 충돌은 없으며 기존 FLRW03_EXPANDING_ADAPTER_AND_INTEGRATED_BUDGET 후속 ID를 유지한다. 이전 compiler-blocked probe는 소급 완료 처리하지 않는다.\n\n\n완성 연구 묶음: https://github.com/cosmosapjw-quantum/rei_bianchi/tree/3dceea736f9aaa363617a9a6a5bb2854d9ff9986/docs/fastest_track_chat/REI-CHAT-FLRW02-20261005\nNative commit: `c0b630d9c430049a16ebcce3b2cd76cad606370a`; 연구/evidence commit: `3dceea736f9aaa363617a9a6a5bb2854d9ff9986`.\n\n\n최종 게시·이중 백업 확인: [영수증](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/9daef2087cbd40d67d898f8de789f9f00386affe/docs/fastest_track_chat/REI-CHAT-FLRW02-20261005/publication/BACKUP_RECEIPT.json) · [Drive](https://drive.google.com/drive/folders/1kbb-65wPd-d1r5BM2_q4sRU0NdGP-Pl3). 동일 core ZIP과 핵심 파일 5개를 Drive/Dropbox에 저장하고 ID/크기를 readback 확인했다. 원격 전체 restore는 미수행. PR은 draft, 미병합이다.\n\n\n## He RCT 선택·provider·조건부 closure 연구 루프\n\n현재 H/He baseline에는 RCT channel이 없고 HE atomic offer도 실제 소비기 계약을 기다리고 있었다. 이 묶음은 원래 OFF baseline을 보존하면서 KF96 nominal 또는 GM25 constant 중 하나를 명시적으로 선택하는 provider와 사건수 ledger, caller-supplied escaped mean photon energy에 따른 조건부 RHS 연결을 분리한다.\n\nKF96 경로를 기본 bounded profile로 잡은 이유는 nominal temperature call window가 넓기 때문이다. 물리적 정확도가 더 좋다는 주장은 하지 않는다. GM25와의 sensitivity는 공통 1000–10000 K에서 별도 run으로만 비교하며, 두 source를 합산하거나 자동 전환하지 않는다. 원자 공급기의 unresolved spectrum/heat/recoil moment는 null로 남긴다.\n\nCommon provider record는 pinned HE exporter의 실제 thermal_rate view로 생성했고 event-count view와 분리했다. 조건부 closure는 chemical −QR, thermal (Q−Ebar)R, escape Ebar R이며 현재 tracked groups에는 RCT photon을 주입하지 않는다. 정확한 native/독립 검증 결과와 변경 source identity는 본 묶음의 실제 evidence 및 review receipt를 참조한다.\n\n이번 범위는 local number/RHS/conditional energy ledger이다. 기존 production microstep, endpoint thermal solve, integrated event ledger는 후속 DAG의 RCT-STEP01에서 연결한다. 물리적 source admission, spectral transport, F04 certificate, REI-F09 cosmological application closeout은 완료 주장에 포함하지 않는다. 원래 atomic lanes와 기존 실패 gate를 유지한다.\n\n검증: Rust full suite116개(기존84+수신FT03 8+RCT24), independent decimal70 검사12789개/422 native calls가 통과했다. 실제 source identity와 명령/종료코드는 evidence/FINAL_INTEGRATION.json, 세부 오차/음성 대조군은 evidence/INDEPENDENT_RESULT.json에 있다. 독립 semantic review는 confirmed, open blockers0이며 review/FINAL_REVIEW.json에 별도로 보존한다.\n\n게시 직전 actual Ft03 successor가 추가되어 lib.rs exports와4개 upstream 파일을 보존했다. Typed combined_ft03_rhs는 actual HG RR/CI/DR baseline을 보존하며 RCT만 합성한다. E2X212 assertions/12native calls(9closed+3GM25거절) PASS, 추가 독립 검토 POST_FT03_REVIEW confirmed. 두 implicit stepper는 아직 RCT와 연결하지 않았다. Native code commit:41e4592aa494b48929dcd23fc8504c169a98a908.\n\n\n연구 패킷: https://github.com/cosmosapjw-quantum/rei_bianchi/tree/a5d2404712515a039fca37d9281722f1eb069fcd/docs/fastest_track_chat/REI-HE-RCT01-20261005\n\n\n### REI-REC-BASS-SYNC02-20261005 return\n\nTwo ordered research loops independently passed within the stated pure-H prescribed-FLRW benchmark scope. Actual REC consumer:10native/2170Decimalchecks; BASSclock:30scoped/5001checks; HE mixed:2tests/274comparisons; expanding pipeline:91checks. FLRW06:167scalar/6error regression also passed. Concurrent owner results received: F05 static first interval complete; F08 conditional native stage qualified, full paired history pending. No physical EoR/full-BASS admission, merge, or optional atomic activation.\n\n- [Immutable central report](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/7c10471375837b85d58ec39fe1e8242429b74700/docs/research_sync/REI-REC-BASS-SYNC02-20261005/README_KO.md)\n- [Repository handoff](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/e198103cf20b1c925a59e5e941ea570cdd1ff75b/docs/research_sync/REI-REC-BASS-SYNC02-20261005)\n\nPreserve F08 owner path. Disjoint next work: actual F04E receiver binding, native U/edge/work contract, and OFF-dispatch observations. Recipient chat ACK remains separate. Original atomic extension lanes and historical failures retained.\n\n\nFinal delivery: [480-file reproducible packet and detached Git/backup receipts](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/7c5469101f8d6ef027c8c3119cc5c053e15ba1d9/docs/research_sync/REI-REC-BASS-SYNC02-20261005). Same ZIP 2,655,641bytes SHA256774c07fec25a9d08779ac17d1ddf866872c3e05b9d9c4e34cf4808cc59d86b4b saved on GitHub, Drive and Dropbox. Core7files + backup receipt completed on both clouds; auxiliary standalone IDENTITY Dropbox download failed, with exact identity retained inside BACKUP_RECEIPT. Remote completion/size verified; remote full-byte restore not performed.\n\n<!-- REI_F08_PAIRED_RETURN_BEGIN -->\n### Prescribed paired histories\n\nF08 now completes all 15 fixed-S0 FLRW/Bianchi/weak-shear histories over [0, 1e13] s, with 248000 accepted trials and whole-history independent MPFI200 component receipts. Original T2 candidates exceeded the unchanged 1e-12 final energy gate; both failed candidates and 64000 trials remain preserved. A conservative compensated thermal increment completes the repaired trajectories without changing the model or certified BE root map.\n\nPublished curves, final tables, separate time/spectral/angular differences, figures and source/checkpoint/proof identities are under `runs/rei_fastest_v1/paired/`. Canonical qualification passes 142 integration/frontend tests, API3, recovery3 and independent pilot3. Final sources have not received a second independent reviewer pass. Complete raw JSONL remains at the recorded local paths.\n\nSuccessor returns include N/U/work ownership, proper electron histories including t=0, exact F05 accepted-stage CR input and discrete contrast refinement evidence. F09 remains blocked by the empty FT03/KF96/GM25 common domain and optional binding. Continuous coupled time-error certification, receiver execution, physical fits/observational reionization and QV remain unadmitted. Science HOLD; PR remains draft and unmerged.\n\n[Actual F08 return and thread handoff](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/e63ca0735a3e3e7eebbf4498c697d806d375e191/docs/fastest_track_chat/REI-F08-PAIRED-20261005/README_KO.md). Direct ChatGPT thread delivery remains unavailable because no browser is connected.\n<!-- REI_F08_PAIRED_RETURN_END -->\n\n\n---\n### SYNC03 completed two-loop research and synchronization — 2026-10-07\n\n[Source-pinned research packet, figure, reproducible code and DAG](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/34765f5cc35169b5e8718571f3c01777cd28aec7/docs/research_sync/REI-REC-BASS-SYNC03-20261007).\n\nActual F08 → BASS finite-history receiver: 6 histories / 112000 cells, 784054 Decimal70 comparisons; independent exact-rational T2 review. After the recorded four-thread sync gate, conditional endpoint boxes were propagated to Δτ: T2 nominal 3.44222649e-12, conditional interval [3.25112368e-12,3.63332931e-12]. Scope: fixed-normal-time finite endpoint-linear observable. Physical/continuum admission remains HOLD/NOT_CERTIFIED.\n\nLatest HE RCT02 reference23 solves and CR-F0-R2 fixed-box source-step/current-library import are incorporated; actual receiver/cosmological integration remains with existing owners. F08 pending, CR F04E next and HH parked historical labels are superseded. Separate returns were published to REI84, HE17, CR23, HH33, REC81, BASS132/133. Existing owner solver and original atomic lanes are preserved. Direct ChatGPT recipient execution ACK has not been observed.\n\n\nSYNC03 delivery confirmed: [Git receipt](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/7d12cb3a000cbbe8dc9e8d93e8fc441cf4e63577/docs/research_sync/REI-REC-BASS-SYNC03-20261007/publication/DELIVERY_ACK.json), [Drive package](https://drive.google.com/drive/folders/1JIh1a-WtEZG-ahzN6rk-9PECVSVxljo5). Identical 13,358,870-byte ZIP plus standalone artifacts/receipt completed on Drive and Dropbox. R1 ACK/metadata; no remote full-restore claim. Archive SHA256 c952e06dcdec07684c3c33240c361aea169f46fa706bb70d4e370c7d9d57ba00.\n"
+    },
+    {
+      "number": 103,
+      "title": "CR-PHYS03: receive pinned FS10 xi=0.1 component",
+      "head_ref": "research/cr-phys03-fs10-xi01-20261010",
+      "head_sha": "8d9526a75e85202764e845c7d5d79d7f903e7c55",
+      "base_ref": "research/cr-physical-receiver-20261010",
+      "base_sha": "69541be1a88f32468494e33158a96d5341e4572c",
+      "updated_at": "2026-10-10T11:19:34Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/103",
+      "body": "## Scope\n\nAdds a separately source-bound `xi=0.1` CR packet to the actual local receiver and native probe. It accepts exactly `.01` and `.1` fixed knots; it does not introduce arbitrary composition, causal delay, or a history solver.\n\n## Evidence\n\n- packet: `2ecb1413c93f5cbc9ab64689ac17c191020320c9734138ea4bfaf291e10b6d46`\n- Rust receiver: 8 focused tests pass; native xi=.1 ON/OFF derivative pass.\n- independent Astra review: scoped PASS.\n\nNo merge is requested."
+    },
+    {
+      "number": 102,
+      "title": "CR-PHYS01: source·gas·geometry에 결속한 실제 H/He CR receiver",
+      "head_ref": "research/cr-physical-receiver-20261010",
+      "head_sha": "69541be1a88f32468494e33158a96d5341e4572c",
+      "base_ref": "research/cr-first-build-gate-20261010",
+      "base_sha": "8722f3ab587399700d96d300b617f0f37f1d831a",
+      "updated_at": "2026-10-10T10:47:54Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/102",
+      "body": "실제 charged injection/deposition 입력이 없던 blocker를 조건부 local component 범위에서 해소합니다. bass_cr의 SN proton → Rudd H/He impact → FS10 secondary output을 새 opt-in receiver가 실제 AxisymLocalSources와 axisym_coupled_derivative에 전달합니다.\n\nsource packet·gas·time·H/s·a/b를 고정하며, OFF에서는 provider를 호출하지 않습니다. ionization count, electron, heat, internal-energy, excitation escape를 분리하고 기존128EPS 보존 기준을 유지합니다. 독립 리뷰에서 발견한 geometry mismatch 수용은 수정·재검증했습니다.\n\n검증: 최종 신규 Rust7 tests PASS; 기존 관련13 regression PASS 기록 보존; matched-geometry native ON/OFF 및 Decimal70 원장 검산 PASS. Python provider의 독립 convolution/refinement 결과와 원문 pin도 전달합니다.\n\nProvider scientific commit: cosmosapjw-quantum/bass_cr@0522fac6dcaf1874974e2a59979aef88408a81e6\n보고서·packet·handoff: docs/research_sync/CR-PHYS01-20261010/\n\n판정은 CONDITIONAL_PHYSICAL_COMPONENT_AVAILABLE입니다. 현재는100K, xi=.01 고정 상태의1–4MeV 성분이며 causal cascade delay/임의 조성/전체 CR 손실/IGM history는 HOLD입니다. frozen HM12 CR=OFF, 원 atomic lanes 및 이전 인증을 변경하지 않습니다."
+    },
+    {
+      "number": 99,
+      "title": "research(rei): screen finite-grid diffuse escape envelope",
+      "head_ref": "research/physical-provider-p03a-20261010",
+      "head_sha": "05c45c3239adae63e715fd3598dbd0c53b42f667",
+      "base_ref": "research/physical-provider-p01-20261010",
+      "base_sha": "c168e578354c2f1e191a7064ffa31bd762d2a949",
+      "updated_at": "2026-10-10T08:37:05Z",
+      "draft": false,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/99",
+      "body": "P03A is a frozen 17-epoch/2904-node finite-grid diagnostic only. It assigns no recombination spectrum or multiplicity and does not execute a diffuse ON history. Actual effect remains NOT_MEASURED; materiality NOT_EVALUABLE. No merge requested."
+    },
+    {
+      "number": 101,
+      "title": "feat(rei): require clean build receipt before conditional launch",
+      "head_ref": "research/cr-first-build-gate-20261010",
+      "head_sha": "8722f3ab587399700d96d300b617f0f37f1d831a",
+      "base_ref": "codex/physical-provider-integration-20261010",
+      "base_sha": "00903cb4433276ad5d8233aca1f9e0c2b6834523",
+      "updated_at": "2026-10-10T08:23:00Z",
+      "draft": false,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/101",
+      "body": "CR_FIRST_V3 build-gate-only change. Requires clean source/binary receipt before Popen, BIND, provider, or solver construction; includes zero-launch missing/stale/source-drift tests. Fresh receipt was generated from clean f9135ec; it builds axisym_conditional only and records solver_intervals=0 and binary_launches=0. No CR physics, no production interval, and no scientific admission. No auto-merge requested."
+    },
+    {
+      "number": 100,
+      "title": "research(rei): audit 5000 K raw-provider floor semantics",
+      "head_ref": "research/physical-provider-p02a-20261010",
+      "head_sha": "8a80fa9742573e3fdc8d64df9339fa3ef3ad5ef2",
+      "base_ref": "research/physical-provider-p01-20261010",
+      "base_sha": "c168e578354c2f1e191a7064ffa31bd762d2a949",
+      "updated_at": "2026-10-10T07:49:18Z",
+      "draft": false,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/100",
+      "body": "P02A is a source-pinned, one-temperature implementation diagnostic only. It compares 18 Case-A 5000 K AtomicProvider coefficients with the archived isolated C source (max relative error 0.0). It preserves low-temperature physical-provider admission, REC endpoint, thermal/binding closure, and cold history as HOLD; it does not modify FT03, P01, or PhysicalHistory. Local recovery archive SHA256: 9313ea3d78ab7aaee508be77a695b987116f577f869f287b677c951ec961bbc2. No auto-merge requested."
+    },
+    {
+      "number": 97,
+      "title": "research: integrate physical provider with safety guards",
+      "head_ref": "codex/physical-provider-integration-20261010",
+      "head_sha": "00903cb4433276ad5d8233aca1f9e0c2b6834523",
+      "base_ref": "research/physical-provider-20261010",
+      "base_sha": "528bb69a24ce9345efec78c6d406d3c392e2671d",
+      "updated_at": "2026-10-10T07:42:59Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/97",
+      "body": "## Scope\n\nIntegrates four reviewed source lines without rewriting their ancestry:\n\n- PR96 conditional warm HM12/Bianchi-I physical-provider research (`528bb69a...`)\n- PR94 positive-energy/zero-temperature underflow guard (`2ee78d59...`)\n- PR95 current-field selected-He closure recomputation (`73bd78d0...`)\n- PR98 production `SourceBoundConditional` route (`c168e578...`), merged as a sibling while preserving PR94/95\n\nThe historical PR96 commit and source manifest are not rewritten. Original PR98 changed sealed `RESEARCH_DAG.json` and marked P01 complete without sufficient source-to-binary proof. This integration restores that sealed file byte-for-byte to the PR96 manifest value and P01 `ready`; PR98's original commit/report remain preserved in Git as non-authoritative producer evidence. This branch adds an integration report, machine validation, one bounded identical-input compatibility run, and a precise Codex handoff.\n\n## Validation\n\n- historical PR96 commit `528bb69a...`: 87/87 payload hashes PASS, including NPZ datasets\n- original PR98 commit `c168e578...`: 86/87 because sealed `RESEARCH_DAG.json` became `7a6ecb...`\n- current integrated tree after corrective restoration: all 87 PR96-manifest-listed payloads pass; `RESEARCH_DAG.json` is again manifest value `012f742...`. PR98-added files are outside that historical manifest and are bound by the Git evidence commit and integration checksum set instead.\n- HM12 intake: 10 passed\n- merged native conditional consumer: 6 passed\n- PR94 axisym coupling: 5 passed\n- PR95 adapter: 4 passed\n- merged PR98 Rust conditional: 8 passed\n- merged PR98 Python boundary: 5 passed\n- post-merge contract/coupling: 6 + 5 passed\n- saved outputs from one fixed `0..1e11 s`, 2904-node, 17-epoch interval: new same-input compatibility checks using PR96's pre-existing targets `SCOPED_PASS`; max state relative difference `4.56e-13`\n\nThe initial byte-exact array comparison is retained as FAIL with roundoff-scale deviations. The observed environments differ in Python (3.12.14 to 3.12.3) and NumPy (2.3.5 to 2.4.2), while SciPy 1.17.0 is unchanged; causation was not isolated. Corrected saved-data checks restore PR96's per-epoch pressure scaling and field threshold, and explicitly pass exact saved time/mu/weight identity, finite/positive state, ionic fraction and temperature domains. No new solver run, 11-history rerun or parameter scan was performed for the correction.\n\n## Claim ceiling\n\nThis is a conditional warm H/He HM12 lane. CR/RCT/HH are OFF. It is not a cold primordial-IGM/REC IC result, a low-energy cosmic-ray deposition result, production `PhysicalHistory`, or global EoR admission. Production source remains fail-closed. PR95 still retains `64*EPSILON`, naive summation, and a relative mutable REC path; those are not selected physical policies.\n\nRemote PR94/95 and integration PR97 CI failures are inherited formatting failures with tests skipped; targeted local results above are not a whole-CI PASS.\n\nPR98 producer JSON/NPZ raw bytes were recovered locally and match its reported SHA-256 values. The matching 3,288,066-byte Dropbox recovery archive (`9a82f25e...`, provider ID `BSpOijBcT10AAAAAAD3sHQ`) was independently statically inspected by the parent worker and contains both outputs, resolving artifact availability. It lacks the production binary, clean-build transcript and P01 command/stdout/stderr receipt, so execution remains uncertified. The Python entrypoint accepts an arbitrary `--binary`, records source/binary hashes only after integration, and Rust `BIND` verifies identity strings rather than files/build provenance. Future execution is explicitly blocked pending a clean source-pinned build receipt and prelaunch executable/source hash check. No new solver run was performed while integrating PR98.\n\nFresh PR99/`d6ad8b73...` diffuse-screen results are not merged or adopted. Its finite-grid cap is only a frozen diagnostic, and its validation-recorded `screen_diffuse.py` hash does not match the committed blob. It remains HOLD pending run-source identity resolution; this integration did not rerun it.\n\n"
+    },
+    {
+      "number": 98,
+      "title": "feat(rei): add source-bound conditional production interval",
+      "head_ref": "research/physical-provider-p01-20261010",
+      "head_sha": "c168e578354c2f1e191a7064ffa31bd762d2a949",
+      "base_ref": "research/physical-provider-20261010",
+      "base_sha": "528bb69a24ce9345efec78c6d406d3c392e2671d",
+      "updated_at": "2026-10-10T07:11:56Z",
+      "draft": false,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/98",
+      "body": "P01 production integration for the frozen REI-PHYSINPUT-01 warm H/He conditional IVP.\n\n- Adds a distinct `SourceBoundConditional` path; `PhysicalHistory` remains fail-closed.\n- Verifies frozen provider bytes before execution and binds those identities to the Rust session.\n- Executes the production-owned 2904-node, 17-epoch interval and compares it with the frozen scoped reference.\n- Scoped only: no cold REC IC, diffuse/OTS, full EoR, continuum, F04/F08, or observational admission.\n\nValidation and return identity: `research/physical_provider_20261010/p01/`.\nLocal recovery archive SHA256: `9a82f25e2f0c0dc98e1ad71f07ce974684df7648cd144a9c0a97e9568274cf5a`.\n\nNo merge requested."
+    },
+    {
+      "number": 96,
+      "title": "REI-PHYSINPUT-01: source-bound Bianchi-I inputs and first conditional interval",
+      "head_ref": "research/physical-provider-20261010",
+      "head_sha": "528bb69a24ce9345efec78c6d406d3c392e2671d",
+      "base_ref": "research/axi05-coupled-composition-20261010",
+      "base_sha": "17bd1cc0ce1484ee61cac60ab1bda207ae264381",
+      "updated_at": "2026-10-10T06:42:18Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/96",
+      "body": "The AXI development path was blocked by missing background/time map, normalized IC, radiation/source history, and an explicit closure. This stacked research change supplies those inputs for one declared conditional warm H/He model and executes the first coupled interval using the existing native atomic and AXI functions.\n\nThe theory stage derives an Einstein dust+Λ LRS Bianchi-I background and normalizes the photon, ion, and thermal initial states. The coding stage consumes hash-pinned author HM12 tables: UVB only at the initial time, independent emissivity thereafter. The selected closure is primary-only Case-A total-energy escape. Production PhysicalHistory remains blocked and unchanged.\n\nThe original 200 eV truncation missed 53.945% of initial He II primary heating within the native supported band. The retained evidence records this finding and the active candidate extends to the original 50 keV provider boundary. No guard or legacy tolerance was relaxed.\n\nValidation: 10 intake + 6 native + 27 targeted existing Rust tests passed; 11 histories executed. The active candidate has DOP853–RK4 maximum relative difference 5.24e-12 and joint spectral/angular refinement difference 3.13e-7. All-history scaled energy and active photon-number ledger residuals are at most 2.28e-15 and 1.84e-14. A separate reviewer issued PROMOTE_SCOPED; global scientific admission remains HOLD. CI is not claimed.\n\nArtifacts are under research/physical_provider_20261010/: REPORT_KO.md, CODEX_HANDOFF_KO.md, THEORY_DERIVATION_KO.md, CONTRACT.json, RESEARCH_DAG.json, raw source tables, full datasets, execution evidence, and independent_review.json. Next bounded work: actual production conditional provider/consumer integration; cold REC IC and full radiation closure remain separate scientific gates.\n\nBase: PR #93 at 17bd1cc0ce1484ee61cac60ab1bda207ae264381. This PR is intentionally stacked on its branch; no merge requested."
+    },
+    {
+      "number": 95,
+      "title": "fix(adapter): recompute selected-He closure",
+      "head_ref": "codex/pr92-residual-recompute-20261010",
+      "head_sha": "73bd78d051ba448cfa71d638615e2c360b37c86d",
+      "base_ref": "research/rec-selected-he-adapter-20261010",
+      "base_sha": "beaaf68595f5ab493654b812d66a4fa3e3177d84",
+      "updated_at": "2026-10-10T06:40:36Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/95",
+      "body": "## Scope\n\nDraft-only safety repair on top of PR92. The adapter now recomputes helium-nucleus, charge/electron, and energy closure from the current primary fields before projection. A regression mutates each primary lane while leaving the public cached residual unchanged and verifies fail-closed behavior.\n\n## Validation\n\n- `cargo test --manifest-path rust/rei_rec_source_adapter/Cargo.toml --locked --test selected_he`\n- Result: 4 passed, 0 failed\n- REC source pin used for the isolated test: `d74fc9e78d1cf707eef2d16fe771b4d8eb72cd7f`\n\n## Claim boundary\n\nThis does not select a physical source, closure, energy-routing map, tolerance, or dataset. It preserves PR92's existing 64-epsilon summation policy only to close the stale-cache bug. A production physical admission path still needs an owner-adopted compensated residual/tolerance policy and immutable REC dependency binding.\n\nPhysical dataset: `NOT_ASSEMBLED`. First coupled interval: `NOT_RUN`.\n"
+    },
+    {
+      "number": 94,
+      "title": "fix(bianchi): reject thermal temperature underflow",
+      "head_ref": "codex/pr93-temperature-underflow-20261010",
+      "head_sha": "2ee78d593f97f715495f38e629678f5affba5750",
+      "base_ref": "research/axi05-coupled-composition-20261010",
+      "base_sha": "17bd1cc0ce1484ee61cac60ab1bda207ae264381",
+      "updated_at": "2026-10-10T06:40:34Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/94",
+      "body": "## Scope\n\nDraft-only safety repair on top of PR93. The coupled derivative now rejects a positive thermal-energy density when binary64 evaluation underflows the resulting temperature to zero. The regression uses the minimum positive subnormal energy with a normal EOS denominator.\n\n## Validation\n\n- `cargo test --manifest-path rust/rei_microphysics/Cargo.toml --locked --test axisym_coupling`\n- Result: 5 passed, 0 failed\n\n## Claim boundary\n\nThis aligns the local derivative with PR91's EOS admissibility boundary. It does not select a physical IC, source, closure, provider, tolerance, or interval.\n\nPhysical dataset: `NOT_ASSEMBLED`. First coupled interval: `NOT_RUN`.\n"
+    },
+    {
+      "number": 93,
+      "title": "feat(bianchi): compose local HHe derivatives",
+      "head_ref": "research/axi05-coupled-composition-20261010",
+      "head_sha": "17bd1cc0ce1484ee61cac60ab1bda207ae264381",
+      "base_ref": "research/axi-component-contracts-20261010",
+      "base_sha": "02f170378991435835b8f0b40039bed688e0e6cc",
+      "updated_at": "2026-10-10T04:11:01Z",
+      "draft": false,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/93",
+      "body": "Adds a provider-parameterized local axisymmetric H/He derivative composition contract with closed isotope/charge/power ledgers, variable-particle thermal evolution, and photon shear work.\\n\\nScope: local manufactured-contract machinery only; no physical IC/source/closure selection, history integration, convergence, sensitivity screen, or physical-admission claim.\\n\\nFocused checks: axisym_coupling (5), isotope_state (5), axisym_sources (2). Full formatter remains baseline-unstable outside this PR diff."
+    },
+    {
+      "number": 92,
+      "title": "feat(adapter): bind REC selected-He signed ledger",
+      "head_ref": "research/rec-selected-he-adapter-20261010",
+      "head_sha": "beaaf68595f5ab493654b812d66a4fa3e3177d84",
+      "base_ref": "research/axi-component-contracts-20261010",
+      "base_sha": "02f170378991435835b8f0b40039bed688e0e6cc",
+      "updated_at": "2026-10-10T03:36:41Z",
+      "draft": false,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/92",
+      "body": "## Scope\n\nAdds a fixed-input adapter that calls the local REC canonical-SI selected-He signed ledger and projects it to REI H/He4 isotope slots under caller-declared zero tilt. Signed electron, photon, internal, photon-power, and kinetic-power channels remain separate.\n\n## Verification\n\n`cargo test --manifest-path rust/rei_rec_source_adapter/Cargo.toml --locked` (3 passed). The tests include all signed event bases, nonfinite/nonconservative rejection, zero-tilt clock identity, and unclosed BF-ledger rejection at rates 1 and 1e-20.\n\n## Claim boundary\n\nThis is a fixed-input, local-REC-checkout experiment. It does not pin a standalone REC revision, adopt physical source/populations, perform screen or spectral conversion, inject into the REI RHS, or establish a coupled Bianchi-I history."
+    },
+    {
+      "number": 91,
+      "title": "feat(bianchi): add axisymmetric component contracts",
+      "head_ref": "research/axi-component-contracts-20261010",
+      "head_sha": "02f170378991435835b8f0b40039bed688e0e6cc",
+      "base_ref": "forward/rust-reion-kernels-20260922",
+      "base_sha": "126d01e920a16b8d310b0ce8aed1635b5c9f5565",
+      "updated_at": "2026-10-10T03:28:38Z",
+      "draft": false,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/91",
+      "body": "## Scope\n\nAdds AXI component contracts for prescribed axisymmetric Bianchi-I geometry, typed pending physical inputs, isotope state/EOS bookkeeping, manufactured source ledger, collisionless packet ledger, scalar expansion identities, and manufactured paired probes.\n\n## Verification\n\nFocused component tests were run for geometry, contracts, isotope EOS, radiation ledger, source ledger, and coupling. The EOS and face-transfer repairs received independent Astra review.\n\n## Claim boundary\n\nThis PR deliberately does not provide a physical Bianchi-I ionization history, source/IC adoption, coupled chemistry-radiation evolution, convergence, or observational/CMB admission. Those remain HOLD pending immutable physical inputs and matched history evidence."
+    },
+    {
+      "number": 90,
+      "title": "Research: paired-material fine28 validation and common-epoch resource STOP",
+      "head_ref": "research/paired-material-validation-20261008",
+      "head_sha": "4b7ce564bbe467fc66fb822a83d4f684d9b20492",
+      "base_ref": "forward/rem-hhe-igm-20261006",
+      "base_sha": "39c39eab1cc2f1a215723680accc123e67ef13b6",
+      "updated_at": "2026-10-08T14:54:50Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/90",
+      "body": "Fine28 passed the original local gates after the reviewed quadrature-only material adapter, but the single common-epoch attempt stopped during tail14 at its native CPU subcap. This records-only research PR preserves that distinction and the earlier exact diagnostic refusal.\n\nAdds 22 files only under `research/paired_material_validation_20261008/`: observed outcomes, independent reviews, compatibility proof, source/build identity hashes, resource STOP, unchanged checkpoint hashes and a publication manifest. No production code or numerical defaults change. Private absolute workspace prefixes are replaced with a documented placeholder; original/published hashes are recorded. Full binaries and checkpoint states remain retained locally and are not included.\n\nValidation: rehashed all 31 final common-attempt artifacts, all 115 scientific source files and four original accepted checkpoint/STOP files; publication matches originals except documented path substitution; authored diff whitespace check passes. Existing adapter tests and independent source/caller reviews passed. No science or projected-coupling experiment was run for this publication.\n\nObserved attempt: fine27→28 used 41805 RHS, 125268 provider calls and 13 evaluations, passed original native/material/heat/source/loss/conservation/Gamma/EOS/full-restore gates, and remains UNADMITTED. Tail13→14 was CPU-interrupted before final counters/gates. Original 37-field comparison was NOT RUN; no new derived HEAD or COMMON_PASS exists. Accepted progress remains coarse13/fine26/tail13. Total attempt including build: 14.516329 CPU / 14.706218553 execution-wall seconds within the 15/25 allocation. No retry.\n\nMODEL_UNRESOLVED; physical/continuum/full-history/full-Wide remain HOLD and unresolved kernel/provider/helper/history authority remains UNKNOWN. CR/RCT/HH defaults remain OFF. This PR does not certify common-epoch success or physical admission.\n\nCI: exact-head status will be read back after creation; no passing CI is assumed. Rollback: close this unmerged draft or revert its additive records commit. Review the records before considering separately authorized future implementation or numerical work.\n"
+    },
+    {
+      "number": 89,
+      "title": "IGM: carry tracked photon stock through the 0.0008 horizon",
+      "head_ref": "research/igm-rate-export-followup-20261008",
+      "head_sha": "4b1ffbd5d35a7dfbd66797d7e03f0a298f36b621",
+      "base_ref": "forward/rem-hhe-igm-20261006",
+      "base_sha": "39c39eab1cc2f1a215723680accc123e67ef13b6",
+      "updated_at": "2026-10-08T12:52:03Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/89",
+      "body": "The IGM continuation stored canonical photon tails but the characteristic consumed scalar zero at k17. This update carries tracked photon number and independent incident energy through every characteristic segment, preserves inherited loss in N/U/redshift/A/B owners, and keeps the historical scalar interface for normal readout.\n\nThe V3 endpoint energy discrepancy is retained as carried U loss instead of being overwritten. The direct positive heat owner remains an independent N/source reconstruction, avoiding a second charge of that U discrepancy. Accepted-record replay now restores the final canonical pair and explicitly maps durable scalar order to ledger order.\n\nExecution results:\n\n- Final-source reruns resume from coarse k16, fine k28, and tail k14 and complete k48/96/48 at `ln(a)=-2.564149357461537`, `z=11.98960415889089`.\n- All 32 stored common epochs pass the unchanged 37-field comparison. Worst temporal allowance ratio is `0.023932797389989293`; worst tail ratio is `4.080871757717751e-12`.\n- Source N/E checks pass with maximum allowance ratio `0.21071655885039875`; original branch gates remain below 1.\n- Actual two-transition accepted-record capture/replay exits 0. Numerical library tests pass 18/18.\n- Handoff/rate reproduction, BASS, REC, repository formatting, and locked workspace tests all exit 0.\n\nIndependent review verified the energy-loss handoff, canonical cutoff guard, record/ledger permutation, and 32-row history alignment. Conservative overlap may remain within the broader loss enclosure, so unique no-double-count accounting is not claimed.\n\nThis reaches `MANUFACTURED_MODEL_DISCRETE_REFINEMENT_PASS` for the executed 0.0008 horizon only. Later horizons through z=10, spectral/source/time/Jacobian and historical-prefix error authority, continuum validation, and physical admission remain HOLD. REC Gate I/matched evolution remain HOLD; BASS outside-window optical depth remains UNKNOWN.\n\nSource/provider/closure/tolerances are unchanged, IGM remains OFF by default, PR85 log-tail and PR86 canonical Wide are preserved, and completed 190-step/0.0004 campaigns were not rerun. All failures and costs remain under `research/igm_blockers_20261008/repair_20261008/`. Draft only; do not merge."
+    },
+    {
+      "number": 88,
+      "title": "Opt-in six-moment export and actual PR87 typed singleton receiver",
+      "head_ref": "research/igm-rate-export01-20261008",
+      "head_sha": "1a152dd6705e10510ace485d4470d92f42ebfc38",
+      "base_ref": "research/accepted-boundary-evidence-20261008",
+      "base_sha": "8477bae16accaf3de168669aafd2f31eac2ca811",
+      "updated_at": "2026-10-08T08:28:26Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/88",
+      "body": "Exports the actual six instantaneous HI/HeI/HeII Gamma and incident-energy moments at the preserved PR86 accepted committed-2 endpoint, then consumes that stored point through the pinned PR87 typed JointMomentFamily/conditional_joint_enclosure interface with zero generators. All changes are additive under research/igm_rate_export_receiver_20261008; production physics, source, provider, defaults and tolerances are unchanged.\n\nProvenance: PR86 producer8477bae16accaf3de168669aafd2f31eac2ca811/tree118cb0e67de8f649244dd6798a6c6f37af2dc1f2; PR87 receiver head17f43b84ee49bada32d6efe84c3377e7d645f230/core93bed7e210296db7cd250421f48cdc25aff3029f. This PR is stacked on the PR86 research branch. Exact receiver modules and dependency source pins are retained.\n\nValidation reuses completed evidence: original Gamma bitwise parity;30export controls,7native controls,5corrupt-input refusals;16adapter controls including genuine receiver source/epoch context refusals; focused exporter/adapter reviews PASS and publication disclosure review PASS. No scientific tests were rerun for publication. Recorded provider/RHS counts distinguish measured successful work from inferred failed startup. Actual typed receiver consumption is established locally; no remote/default adoption is claimed.\n\nThe zero-generator premise is only the observed fixed binary64 finite-rule point; provider/continuum errors remain UNKNOWN and physical/full-Wide/history remain HOLD. Background is reconstructed from the original pinned configuration at the exact saved epoch, not an independently saved original background. No projected coupled experiment is included. INTEGRATION_STATUS.json separates implemented/tested work, design adoption and reviewed HE E6/HH ENERGY03/CR R12/REI BRIDGE11 candidates that are not yet connected; this is not wholesale upstream code integration.\n\nImmutable private archives are hash-referenced rather than published. Host/root/boot/run checkpoint authorities and cloud/runtime metadata are omitted. Only source and scientific evidence are included, with original notices preserved.\n\nDraft only; no merge/release. Exact-head CI will be read after PR creation and any production formatter failure reported without unrelated fixes. Rollback: close the unmerged draft or later revert this additive commit.\n\nObserved exact-head CI: [verify run37749852377](https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/37749852377) at1a152dd6705e10510ace485d4470d92f42ebfc38 failed cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check; workspace cargo test was skipped. Production paths are unchanged by this additive research commit. Formatter diagnostics were not repaired and no CI/scientific suite rerun was requested; identical baseline diagnostics are not independently proved here."
+    },
+    {
+      "number": 87,
+      "title": "IGM handoff: current four-lane intake and correlated joint-moment receiver",
+      "head_ref": "research/igm-cross-thread-handoff-20261008",
+      "head_sha": "17f43b84ee49bada32d6efe84c3377e7d645f230",
+      "base_ref": "forward/rem-hhe-igm-20261006",
+      "base_sha": "39c39eab1cc2f1a215723680accc123e67ef13b6",
+      "updated_at": "2026-10-08T05:38:30Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/87",
+      "body": "## Why\nHE, HH, CR and REI results have advanced at different model, clock, publication and acceptance scopes. Integrated photon owners cannot be treated as instantaneous photoionization/energy moments. This additive handoff makes the current dependencies and the next receiver task explicit.\n\n## Changes\n- Pins HE RCT03E5, HH ENERGY02 (newer nonremote result), CR R11, REI BRIDGE10, IGM accepted-boundary PR86, and auxiliary BASS/REC statuses.\n- Reuses the exact R11 source projector and actual saved moment fixtures. Adds an exact rational shared-generator adapter with bound epoch/state/provider/threshold context, stable generator IDs, unit checks and necessary marginal physical-domain checks.\n- Provides Korean research derivation, low-cost LLM HANDOFF/CONTRACT/RECEIVER_CONTRACT/DAG, independent review, source manifest, offline replay and a local Codex start prompt under research/igm_handoff_20261008/.\n- Reserves ongoing HE E6, HH ENERGY03 and REI BRIDGE11 owner work; next IGM task is IGM-RATE-EXPORT01, with independent BASS/REC schema lanes.\n\n## Verification\n12 targeted tests PASS; 55 exact saved-output comparisons; 20 separate formula comparisons; two actual finite-rule families; three intentional arithmetic mutants detected on the preserved prior candidate. Independent decision: PROMOTE only for this conditional fixed-state adapter. Fresh run source-before/source-after equal. No provider calls or new history steps. Source/manifest/DAG verifier PASS.\n\n## Limits\nThe two finite-rule hulls are not continuum error bounds. No native receiver integration, coupled history, new provider activation, projected feedback or full-Wide admission. Existing physical HOLD/default OFF settings and previous failures remain. Production source is unchanged. Exact-head repository CI is tracked in the detached publication receipt; Python evidence does not imply green native CI.\n\nThis PR targets the pinned IGM branch and does not merge PR85 or PR86. Complete core archive and detached publication receipt were saved to the existing Drive/Dropbox dossier destinations (R1 ACK/name/size/path metadata; no byte-restore claim). Final head: 17f43b84ee49bada32d6efe84c3377e7d645f230. Core archive SHA256: 718af5da72798dade8196589c6fd68180eebfdc5cb09c8edf65bbc4e6bcd4ebc. No automatic merge.\n\n## Delivery\nAll 57 core Git blob identities match the local package; PUBLICATION.json is the later receipt. Current-head Actions run https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/37733296118 fails at cargo-fmt on unchanged production paths; cargo-test is skipped. Independent Python evidence remains PASS. Local Codex prompt: research/igm_handoff_20261008/START_PROMPT_KO.md.\n"
+    },
+    {
+      "number": 86,
+      "title": "Research: accepted receiver records and scoped restart evidence",
+      "head_ref": "research/accepted-boundary-evidence-20261008",
+      "head_sha": "8477bae16accaf3de168669aafd2f31eac2ca811",
+      "base_ref": "forward/rem-hhe-igm-20261006",
+      "base_sha": "39c39eab1cc2f1a215723680accc123e67ef13b6",
+      "updated_at": "2026-10-08T05:14:09Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/86",
+      "body": "The completed receiver and restart slices used different gas, spectrum and time contracts. This additive research package makes their source identities, captured owners, recorded reviews, restart evidence and remaining integration limits reviewable together. It retains the existing numerical code bytes and deduplicates dependencies against the exact IGM base.\n\nSupport is separated explicitly: frozen cold broadband J32 k3→k4; unprojected evolving coupled midpoint records/restart for the first two original Grid512/Gauss4/192-lattice transitions; and normal-domain native point/BE diagnostic/accepted-half/restart evidence. Projected evolving feedback is not implemented and its proposed experiment is not authorized. Physical/projected/full-history/full-Wide remain HOLD. No production module, default, rate, closure or tolerance change.\n\nRecorded validation reused: ledger15 GREEN/14 compiled assertion RED; two genuine real-native caller trials with zero added RHS/provider calls; live receiver19 controls; frozen checkpoint14 latest controls and4 real acceptances across both retained campaigns; midpoint18 final controls and16 real acceptances across retained campaigns. No expensive scientific campaign was rerun for publication. Fresh local archive CRC/manifest/source-identity verification checks6 pinned archives and265 mapped source files. Independent science reviews are included; private runtime/host metadata and binary images remain in the immutable private artifacts.\n\nDependencies and original artifact SHA256s are in ARTIFACTS.json; SOURCE_MAP.json identifies exact base blobs and unique source payloads. The source materializer reconstructs a fresh isolated source/seed tree from the authorized archives without running science. The private seed availability limit is explicit.\n\nCI on the exact published head `8477bae16accaf3de168669aafd2f31eac2ca811`: verify run `37731227252` failed at `cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check`; the subsequent workspace cargo-test step was skipped. No passing CI or new numerical result is claimed. That production tree is unchanged by this additive research PR; prior PR85 already records the same format-failure/test-skipped pattern. The existing workflow does not automatically test these research crates. No unrelated formatting was changed or CI rerun requested.\n\nDirect user approval authorized backup and this draft publication. Five ZIPs were saved to private Library and each existing private Dropbox and owner-only Google Drive destination. All five Dropbox restored ZIPs passed exact SHA256/size/CRC; Drive metadata readback passed but its raw restore URLs returned HTTP403, so Drive bytes are unverified. Library creation confirmed all five saves with local identity metadata applied; its official restore helper returned HTTP403, so its restored bytes are also unverified. The source snapshots explicitly record these separate statuses and contain no private service IDs or links. No force push, merge, release, permissions change or production-readiness claim. Rollback is closing the unmerged draft or reverting this additive research commit.\n"
+    },
+    {
+      "number": 85,
+      "title": "IGM research: positive tails, continuous export and moment rate bounds",
+      "head_ref": "research/igm-two-loop-20261007",
+      "head_sha": "c690072756c23837598ac05efb3b4928a6104179",
+      "base_ref": "forward/rem-hhe-igm-20261006",
+      "base_sha": "39c39eab1cc2f1a215723680accc123e67ef13b6",
+      "updated_at": "2026-10-07T13:04:22Z",
+      "draft": false,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/85",
+      "body": "IGM's next continuous-boundary experiment was blocked by missing positive panel restrictions and by tails that could be tagged but not evolved. This PR executes two ordered, independently reviewed research loops against the IGM branch.\n\nThe first adds positive parent-panel restriction and compensated-log characteristic owners, with actual failures preserved. The second consumes these in transparent continuous stock/source export, adds a left-front family and explicit physical-cutoff geometry, and derives/tests sharp E^-3 moment-observable envelopes.\n\nValidation: 32 native tests; independent Decimal panel (903 cases), tail (86), cutoff (48), and continuous transport (138 cases / 1,794 owners) comparisons pass. Maximum continuous owner relative error is 4.4571e-13 against 3e-12. Actual Rust readout N/E budget ratios are 0.00197661/0.00156111. Frozen source hashes, scripts, all red/green evidence, independent decisions, next DAG and low-cost handoff are included.\n\nScope: additive standalone research crate only. No production source or inherited tolerance changes. This does not close the existing long z12->10 8/37 failures, inverse moment fitting, repeated projected gas coupling, or real Verner-kernel envelope certification. See README and HANDOFF.json for the exact next integration gates.\n\nPublication and backups: [Drive folder](https://drive.google.com/drive/folders/1tp_2Z4D-uC2JvJfF_dXNGBItQk6Mo3ho), [exact archive / Dropbox locator / receipt](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/research/igm-two-loop-20261007/research/transport_20261007/igm-two-loop/BACKUP.md). Both archive copies are acknowledged and metadata-verified (R1); no cloud restore test is claimed.\n\nRepository CI: [core run](https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/37624909800) fails on the unchanged rust/rei_microphysics cargo-fmt check (12 existing paths), so its cargo-test step is skipped. This is separate from the passing new-crate local tests/oracles. No merge performed.\n"
+    },
+    {
+      "number": 84,
+      "title": "Draft: adaptive H/He IGM scoped acceptance; historical failures preserved",
+      "head_ref": "forward/rem-hhe-igm-20261006",
+      "head_sha": "39c39eab1cc2f1a215723680accc123e67ef13b6",
+      "base_ref": "forward/rust-reion-kernels-20260922",
+      "base_sha": "a0001ca14644fc9fd2fbe52f8cfcae3edbedd110",
+      "updated_at": "2026-10-07T11:38:36Z",
+      "draft": true,
+      "state": "open",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/84",
+      "body": "## Bounded boundary, H/He midpoint and PDE-method checkpoint (2026-10-07)\n\nPublished commit: a9aea514e086fec6d50cdf14496ff46054cc895e. Exactly 250 new text files (3,745,634 bytes), isolated under research/transport_20261007, against parent 6fc9fb82257afd481b0080fd43dc2bc01086ec22. Expected and published tree: dff2851789989bbe62e87e8f75905fd79ef97a08. All 250 path/blob identities and all 232 unique blob contents match the independently reviewed whitelist byte-for-byte; all 4,304 existing leaf identities are preserved. Existing production source and defaults are unchanged. PR remains draft.\n\n### Scoped scientific results\n\n- Continuous-boundary V1 remains PARTIAL, including the retained initial-opacity quadrature failure. V2 passes only its selected bounded pure-radiation matrix; rejected 64/128/256 candidates and unsupported evolving logarithmic tails remain explicit.\n- Short H/He backward Euler remains PARTIAL: seven finest temporal fields fail despite physical/nonlinear/budget admission and spectral agreement.\n- Midpoint selected 16→32 and 32→64 comparisons pass all 37 fields for both Gauss orders. Overall acceptance remains PARTIAL: original 4→8 and added 8→16 work_E gates fail, and the independent reference's exact peak-array accounting remains UNVERIFIED. This covers only the original 2e-4 interval in ln(a).\n- Collisionless transport comparison: 26 cases, 234 rows and nine tests. P0 FV energy drift, unlimited-DG negative states/export, limiter-induced energy changes, and initial projection errors are retained. Ledger closure alone does not establish a continuum-accuracy ranking.\n- The benchmark's original oracle breached its 4,096-site cap at 4,369. A bounded 2,157-site replay reproduced the same oracle bytes; it does not erase the historical resource failure.\n- Reviewed conditioning, midpoint, projected-bridge and conservative-PDE notes are included with their design-only qualifications. No new log-primitive work, long-history admission, production integration, merge or release is included.\n\n### Verification and exact-head CI\n\nIndependent final-payload review accepted the exact additive bytes. Fresh bounded checks: BE 9 tests, midpoint 24, benchmark 9; V1 10 controls plus its expected failure; V2 16 controls; 62 complete 37-field saved comparisons; two 121-component exact-input kernel checks; and a 234-row benchmark audit. Historical failures remain failures. No heavy histories were rerun for publication.\n\nBoth exact-head verify runs completed with failure at cargo fmt: [pull-request run 37583352262](https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/37583352262) and [push run 37583348573](https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/37583348573). Their normalized 12 formatting paths exactly match the unchanged parent failures; none overlaps this research-only payload. The subsequent cargo test steps were skipped. Local tests do not imply green CI or merge readiness.\n\n[Research overview and reproduction](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/a9aea514e086fec6d50cdf14496ff46054cc895e/research/transport_20261007)\n[Transport-method report](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/a9aea514e086fec6d50cdf14496ff46054cc895e/research/transport_20261007/transport-method-benchmark/REPORT.md)\n\n## Preserved earlier publication record\n\n## Reviewed REI spectral, source-free and cache checkpoint (2026-10-07)\n\nAdds exactly 60 paths against d1f40c2f893b0c4e3c03e72538d59a9bfcf99cec: 57 bounded scientific evidence/documentation/fixture files and three exact reviewed source/test files, 2,139,082 bytes total. Published commit: 6fc9fb82257afd481b0080fd43dc2bc01086ec22. All 60 remote blob IDs match the independently reviewed whitelist; 4,244 untouched parent blobs are preserved. Expected and published tree: f34e56fcf61c03b3c6209f8c48bff6b423d3b38e. One additive commit; PR remains draft.\n\n### Scoped results\n\n- R1: the manufactured z=12 to 11.5 fixture with 1,024 fixed nodes and union121 outputs passes all 37 original fields and both budgets against three archived independent references. Worst Gamma_HeII allowance ratio is 0.4479077555; worst overall ratio is 0.9064143972, cumulative CMB energy. All 32 guarded microsteps remain unestimated. Schedule subsets are not independent trajectory reruns.\n- R2: zero-initial-radiation, source-free z=30 to 20 acceptance remains limited to neutral 30 K and low-ionization 20 K/300 K controls, plus a separate static pure-H constant-alpha kernel under its own assumptions. Strong/hot/cold failures, the 10,000 K reference failure, nonzero initial radiation and physical REC-to-REI handoff remain unresolved.\n- R5: exact stored-state diagnostics and the completed 117,363-case scalar arithmetic study are retained as diagnostics. The original terminal energy-budget failure remains a failure; no alternative arithmetic formula is integrated.\n- Exact transaction-local sigma cache: only igm_photo.rs and igm_step.rs affect release production code. atomic_provider.rs adds cfg(test)-only counters, preserving four cache tests. The independently rebuilt release executable has the exact reviewed cache SHA256 557dac55c793a029d17a6891ba9139e376eac67b9ef6599a956c07cc8f98e14c. The full short R1 replay matches all nine persisted output files and every original comparison metric.\n- Controlled transaction microbenchmarks show local process-CPU reductions of 25.947% at 32 nodes and 32.940% at 512 nodes. These are not full-trajectory or universal speedups.\n- Long z=12 to 10 Radau pilot: both references complete 273 epochs and pass their own budgets, but the p64/p128 comparison fails 8/37 original fields. Worst out_E and out_N ratios are 1362.1124 and 335.1653. Whole-node lower-boundary transfer produces a grid-phase-dependent staircase; endpoint agreement does not rescue the history.\n- Continuous-boundary mathematical design has independent review. The ongoing boundary prototype is excluded; coupled-history, realizability and quadrature gates remain open.\n\n### Verification and CI\n\nIndependent exact-payload review accepted this bounded checkpoint. Fresh verification: 253 Rust all-target tests, 13 scalar arithmetic tests, one analytic-kernel test, 54 high-precision boundary arithmetic cases, exact local diagnostic recomputation, three complete short-fixture comparator matches and reproduction of the long pilot's eight failures. No new long trajectory or full scalar sweep was rerun for publication.\n\n[Checkpoint, evidence and reproduction commands](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/6fc9fb82257afd481b0080fd43dc2bc01086ec22/docs/research_program/igm_next_nodes_20261007/README.md)\n\nExact-head [verify run 37566324952](https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/37566324952) completed with failure at cargo fmt. Its 12 formatting paths exactly match the unchanged legacy failures at parent d1f40c2; none overlaps the 60-path payload. The subsequent cargo test step was skipped. Independent local tests do not imply green CI or merge readiness. No unrelated formatting repair, merge or release is included.\n\n## Preserved previous checkpoints\n\n## Adaptive continuous-source checkpoint (2026-10-07)\n\nAdds exactly 36 paths against 865c16bac2d22ac30f8192f69cae9c64ed50e3b8: seven reviewed source/documentation paths and 29 bounded scientific evidence files, 824,337 bytes total. Published commit: d1f40c2f893b0c4e3c03e72538d59a9bfcf99cec. Every remote changed-file blob matches the approved byte-identical payload. The draft remains open; no merge or release.\n\nIndependent decision: **ACCEPT SCOPED**, for the manufactured homogeneous FLRW H/He fixture from z=12 to 11.5, fixed 512-node threshold-band quadrature, rtol=1e-6, absolute-scale multiplier 1000, and explicit guarded-research policy. All 37 protected fields and both unchanged global budgets pass on regular21, dense81, and offphase61 against independent same-grid 512-node and refined 1024-node Radau histories. Worst original mixed-allowance ratio: 0.9811165189523667, offphase Gamma_HeII; the spectral margin remains narrow.\n\nIndependent verification: 249 Rust and 32 Python tests PASS. Every schedule pair has 21 exact common epochs with 41 required columns equal by float64 bits; primary state, final count/log spectrum, and primary diagnostics are identical. Fixed-step defaults and checked fixed-path outputs remain unchanged.\n\nSixteen guarded adjacent-f64 transitions remain explicitly **unestimated**, with maximum motion-guard ratio 0.0004192599413256698. This is not an all-step LTE certificate, continuum/global bound, production or observed/full-EoR validation, Bianchi integration, restart implementation, or speedup claim. Exact offphase61 references are archived retight histories; a new tight/retight pair at exactly those 61 epochs was not regenerated.\n\nThe unscaled profile's minimum-step/ledger failure, stopped scale-100 run, scale-10000 and scale-3000 accuracy failures, and original pulsed failure are preserved. Completed same-grid ladder: 2.151044676 FAIL → 1.542357131 FAIL → 0.914122262 PASS; the loosest level used an earlier captured producer. Field-specific absolute-plus-relative criteria were not relaxed.\n\n[Adaptive summary and evidence](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/d1f40c2f893b0c4e3c03e72538d59a9bfcf99cec/docs/research_program/igm_adaptive_20261007/SUMMARY.md)\n\nExact-head CI: [verify run 37554975571](https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/37554975571) completed with failure at cargo fmt. Its 12 formatting paths exactly match the unchanged legacy paths at parent 865c16b; none overlaps this 36-path payload. The subsequent cargo test step was skipped. Independent local tests above do not imply green CI.\n\n## Preserved earlier continuous-source and pulsed checkpoints\n\n## Continuous-source checkpoint (2026-10-06)\n\nAdds exactly 34 changed paths against 4567b917: 10 reviewed implementation/documentation paths and 24 bounded evidence files. Published commit: 865c16bac2d22ac30f8192f69cae9c64ed50e3b8. Tree matches the reviewed local checkpoint byte-for-byte. No merge requested.\n\nThe new opt-in continuous-emissivity path passes the unchanged field criteria and number/energy ledgers on 81 manufactured homogeneous H/He outputs versus an independent refined Radau reference; worst allowance ratio 0.921259 (Gamma_heii). Independent tests: 223 Rust and 22 Python PASS. Temporal, spectral, off-phase and output-only comparisons are retained, including earlier failures. Off-phase spectral refinement is narrow at 0.980896.\n\nThis is a scoped empirical numerical result, not a continuum bound or observational EoR validation. Fixed threshold-band grid and maximum timestep remain; automatic LTE adaptivity, new-path restart and Bianchi integration are not implemented. The original pulsed-source accuracy FAIL below is preserved and is not relabeled as passing.\n\n[Continuous-source report and evidence](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/865c16bac2d22ac30f8192f69cae9c64ed50e3b8/docs/fastest_track_chat/REI-IGM-CONTINUOUS-20261006)\n\nThe continuous-source archive has SHA256 71df0aad1739ce561eda7b16f7a773058ec401c5a129ae1e3a0e60823fce02e9. Private Google Drive upload/size are verified, but full-byte restore was blocked by HTTP403; Dropbox full-byte SHA256 and ZIP CRC restore are verified. No sharing permissions were changed. The older double-backup receipt below applies only to the earlier diagnostic archive.\n\nFull cargo fmt still fails on 12 unchanged legacy paths; none of the new source paths is a formatting failure. Exact-commit CI is reported separately; local tests do not imply green CI.\n\n## Preserved prior diagnostic checkpoint\n\n## Scope\nSeparate IGM branch; current-work diff only against the existing thermal checkpoint a0001ca. Exactly 57 files: 22 reviewed source/config/test/document paths and 35 bounded diagnostic evidence/receipt files. Existing PR83 head is unchanged; no merge requested.\n\n## Verification and failed gates\nFresh isolated tests: 203 Rust + 3 CLI + 14 Python pass. Endpoint/restart/conservation software gates pass. **Numerical accuracy FAIL**: finest time probe still exceeds frozen GammaHI allowance by 361.69 times; energy4→8 by 2.133 times; birth refinement remains pulse-phase-sensitive; birth64 fails its own budgets. Combined refinement not run. No tolerance relaxation or scientific gate promotion.\n\nCanonical tight/retight independent references were reproduced from exact frozen script/input hashes. Historical refinement producer provenance remains partial. Full cargo fmt still flags 12 unchanged legacy paths; lib.rs ordering is corrected. Remote CI is tracked separately.\n\n## Evidence and backup\n[Publication report](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/4567b91785dbba1964fd807ab9c6873f542c1030/docs/fastest_track_chat/REI-IGM-HISTORY-DIAGNOSTIC-20261006/PUBLICATION.md)\n\n[Verified double-backup receipt](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/4567b91785dbba1964fd807ab9c6873f542c1030/docs/fastest_track_chat/REI-IGM-HISTORY-DIAGNOSTIC-20261006/BACKUP_RECEIPT.json): identical 2,212,843-byte ZIP on Drive/Dropbox, both remote full-byte SHA256 and ZIP CRC verified. Large raw histories remain in the archive.\n\nThis is a failed-accuracy diagnostic checkpoint, not a validated physical EoR baseline or interval certificate. Future numerical schemes and new dynamics/BDF audits are not part of this payload.\n\n---\n### SYNC03 cross-repo return — 2026-10-07\n\n[Thread-specific return](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/39c39eab1cc2f1a215723680accc123e67ef13b6/docs/research_sync/REI-REC-BASS-SYNC03-20261007) · [Central source-pinned result and DAG](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/34765f5cc35169b5e8718571f3c01777cd28aec7/docs/research_sync/REI-REC-BASS-SYNC03-20261007)\n\nTwo ordered research loops completed: actual F08 → exact BASS receiver (6 histories, 112000 cells), independent Decimal/rational verification, then conditional endpoint-linear Δτ transfer. T2 Δτ = 3.44222649e-12; conditional interval [3.25112368e-12, 3.63332931e-12]. Physical/continuum admission remains separate.\n\nLatest synchronization supersedes stale F08 pending / F04E next / HH parked entries: HE RCT02 reference histories and CR-F0-R2 fixed-box source-step are complete in their stated scopes; actual receiver/cosmological owner integration remains reserved. Source modules, old failures and original atomic lane remain preserved. Repository handoff publication is not direct ChatGPT recipient execution ACK.\n"
+    }
+  ]
+}
