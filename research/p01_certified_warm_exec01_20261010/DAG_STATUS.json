@@ -1,0 +1,19 @@
+{
+  "task": "P01-CERTIFIED-WARM-EXEC01",
+  "historical_dag_modified": false,
+  "nodes": [
+    {"id": "EXACT_BUILD_SOURCE_INPUT_PREFLIGHT", "status": "PASS"},
+    {"id": "ONE_PRODUCTION_WARM_INTERVAL", "status": "PASS_SCOPED", "depends_on": ["EXACT_BUILD_SOURCE_INPUT_PREFLIGHT"]},
+    {"id": "ASTRA_INDEPENDENT_REVIEW", "status": "PASS_SCOPED", "evidence": "INDEPENDENT_REVIEW.json", "depends_on": ["ONE_PRODUCTION_WARM_INTERVAL"]},
+    {"id": "BACKUP_SCOPED_PUBLICATION", "status": "READY_CONTROLLER", "depends_on": ["ASTRA_INDEPENDENT_REVIEW"]},
+    {"id": "P01_CLOSEOUT", "status": "PASS_SCOPED_PENDING_PUBLICATION", "depends_on": ["ASTRA_INDEPENDENT_REVIEW"]},
+    {"id": "NEXT_DEPENDENCY_SAFE_UNIT", "status": "CONTROLLER_RECOMPUTE_READY_AFTER_REVIEW", "depends_on": ["P01_CLOSEOUT"]}
+  ],
+  "solver_intervals": 1,
+  "native_rhs_calls": 257,
+  "repair_rounds_used": 0,
+  "harness": "HARNESS_UNAVAILABLE",
+  "scientific_admission": "HOLD",
+  "cold_cr_first_history": "HOLD",
+  "PASS_next_action": "controller backup and scoped publication; then recompute cross-repository READY work"
+}
