@@ -1,0 +1,90 @@
+{
+  "schema": "reion_geometry_intake.v1",
+  "observed_at_utc": "2026-10-10T13:31:13.591149+00:00",
+  "mode": "read_only_source_and_posted_result_intake",
+  "remote_mutations": false,
+  "new_numerical_execution": false,
+  "pins": {
+    "bass136": "220d765f1df3803e6d4e3e3ad92d31ff421165ec",
+    "bass135": "45f31b8edd644b49e4ea06f10d0190eb664737c7",
+    "bass134": "8216c5c6ebe2719c32a4082096ac9d7341d50c62",
+    "bass132": "e57064934bb176b08d2072aa537e5f71a430ae5e",
+    "bass133": "548c9f71304d4dd0b6df3565e2d25229429f64d3",
+    "bass_cr_sync": "62633b3b6c158d0697f57b8999eefeb1a71c24d9",
+    "rec81": "d74fc9e78d1cf707eef2d16fe771b4d8eb72cd7f",
+    "rec82": "b1213b09cab2c8d30678ae29a948ab7ad92d030f",
+    "rec_cr_sync": "da579e70d9fabf91ea77c60c3ffa40de55a2ccdb"
+  },
+  "cargo_pins": {
+    "bass136": {
+      "rec": "d3cc6e0120061f113d28e7a3a55a2e3dd561e81e",
+      "rei": "1bda1e8cea7629d31f905e126ba47ec3b3c1d0d8"
+    },
+    "bass132": {
+      "rec": "d3cc6e0120061f113d28e7a3a55a2e3dd561e81e",
+      "rei": "41e4592aa494b48929dcd23fc8504c169a98a908"
+    }
+  },
+  "new_scientific_result": {
+    "repo": "cosmosapjw-quantum/rec_bianchi",
+    "pr": 82,
+    "created_at": "2026-10-10T11:41:14Z",
+    "claim": "SOURCE_PINNED_FLRW_CONDITIONAL_ENDPOINT_EXPORT",
+    "z": 5.807,
+    "Tm_K": 1.0120602409998003,
+    "xe_per_H": 0.0001860196684866345,
+    "ne_m3": 0.010998414136317698,
+    "H_s1": 2.086105637709873e-17,
+    "nH_m3": 59.12500665007869,
+    "nHe_m3": 4.701224649342645,
+    "step_halving_relative_xe_difference": 5.929855021593254e-07,
+    "rei_bianchi_ic_adoption": "HOLD",
+    "review": "PASS_SCOPED",
+    "evidence_kind": "posted_actual_native_C_receipts_read_not_rerun"
+  },
+  "reusable_functions": [
+    "ElectronState::new",
+    "scattering_rate_per_normal_second",
+    "integrate_visibility",
+    "compare_opacity",
+    "fixed_time_optical_depth",
+    "electron_state_from_rei",
+    "electron_state_from_hhe",
+    "electron_state_from_ft03",
+    "integrate_rei_visibility",
+    "integrate_clock_visibility",
+    "charts::rhs(ClassA)",
+    "solve::integrate",
+    "photon_rhs",
+    "REC retained_rhs",
+    "REC peebles_rhs"
+  ],
+  "blockers": [
+    "BASS136 lacks modern HHe/FT03/clock modules present on sibling BASS132; compose source and exact dependency pins explicitly",
+    "REC background provider supports only orthogonal Bianchi II, not Bianchi I",
+    "BASS legacy diagonal ray integrator is forward Euler and constant-gamma matter, not long-redshift cosmological chemistry driver",
+    "Physical background cosmology, shear IC, and material inventory require binding",
+    "REC82 ~1K residual endpoint not covered by current warm/100K provider assumptions",
+    "Actual coupled HHe/thermal/photon/CR history absent from snapshot bridge",
+    "Observer tail and directional observed-z endpoint inversion remain required for reported directional tau"
+  ],
+  "geometry_derived_here": {
+    "mean_scale_factor": "(a_perp^2*a_parallel)^(1/3)",
+    "observed_redshift": "sqrt((1-mu_o^2)*(a_perp_o/a_perp)^2+mu_o^2*(a_parallel_o/a_parallel)^2)-1",
+    "fixed_time_tau": "integral c*sigma_T*ne dt; direction independent at zero tilt and homogeneous ne",
+    "fixed_observed_z_tau": "direction dependence enters emission-time inversion"
+  },
+  "recommended_next": "Actual coupled long-volume-redshift history with trajectory-valid providers, then existing BASS optical-depth primitive and exact axisymmetric ray endpoint inversion; avoid repeated tiny readback validation",
+  "artifacts": [
+    "geometry.md",
+    "geometry_github_metadata.json",
+    "geometry_source_manifest.json",
+    "bass_intake_refs.json",
+    "rec_intake_refs.json"
+  ],
+  "intake_limitations": [
+    "No new numerical tests performed",
+    "Cold-provider and physical IC adoption remain unresolved",
+    "Posted historical status in REC81 body and first line of REC82 report should not override newer exact source-bound returns"
+  ]
+}

@@ -1,0 +1,179 @@
+{
+  "schema": "rei_accel_dag_v1",
+  "nodes": [
+    {
+      "id": "S0",
+      "owner": "rei_bianchi",
+      "state": "DONE",
+      "depends": [],
+      "task": "Freeze R15/HG97-B source + existing exact Bianchi background",
+      "evidence": [
+        "SCIENTIFIC_CONTRACT.md",
+        "EXTERNAL_SOURCE_CONTRACT.json"
+      ]
+    },
+    {
+      "id": "S1",
+      "owner": "rei_bianchi",
+      "state": "DONE",
+      "depends": [
+        "S0"
+      ],
+      "task": "Full20to4 paired histories and source/C/T/IC scenarios",
+      "evidence": [
+        "evidence/RUN002/CAMPAIGN.json"
+      ]
+    },
+    {
+      "id": "S2",
+      "owner": "rei_bianchi",
+      "state": "DONE",
+      "depends": [
+        "S1"
+      ],
+      "task": "Wholeinterval convergence and independent adaptive comparison + decision",
+      "evidence": [
+        "evidence/RUN002/INDEPENDENT_COMPARISON.json",
+        "independent/DECISION.json"
+      ]
+    },
+    {
+      "id": "N1",
+      "owner": "rei_bianchi",
+      "state": "READY",
+      "depends": [
+        "S2"
+      ],
+      "task": "Bind existing low-temperature CaseA provider from IGM owner and source-pinned physical emissivity to actual native gas/photon contract",
+      "inputs": {
+        "IGM_sha": "39c39eab1cc2f1a215723680accc123e67ef13b6",
+        "physical_stack_sha": "8d9526a75e85202764e845c7d5d79d7f903e7c55",
+        "HM12_domain": [
+          0,
+          15.93
+        ]
+      },
+      "acceptance": "No invented spectrum from integratedR15; choose HM12 bounded15.9to4 for native spectral source. Verify CaseA emission/escape accounting and physical cooling domain. Common source,gas andtime bindings.",
+      "budget_hours": [
+        4,
+        16
+      ],
+      "stop": "Externalmissingrates/domain mismatch; checkpoint actual input/output; do not relax guard"
+    },
+    {
+      "id": "N2",
+      "owner": "rei_bianchi+BASS_HE+WU088_HH",
+      "state": "READY",
+      "depends": [
+        "S2"
+      ],
+      "task": "Repair native birth/remap chronology and choose efficient continuous photon integration",
+      "inputs": {
+        "HE_E13C3": "f9a34c8818c29d5e78a7bd2dafc0ef0adac2e62b",
+        "HH_PHYS03": "93e04c51c682216d9cb662b77a52a5783b15c71f"
+      },
+      "acceptance": "Whole15.9to4 temporal/spectral refinement for physicalsource, owner-fixed observable budget; no mereN/E conservation shortcut or fixedpath proof-as-history",
+      "budget_hours": [
+        8,
+        24
+      ],
+      "stop": "Preserve first sourcechronology failure and actual runtime; no recursive localcertificate prerequisite"
+    },
+    {
+      "id": "N3",
+      "owner": "rei_bianchi",
+      "state": "WAITING",
+      "depends": [
+        "N1",
+        "N2"
+      ],
+      "task": "Full native photon+H/He+thermal paired FLRW/Bianchi history",
+      "acceptance": "Complete selectedbroadinterval,positivity,energy/number,shared epoch convergence,sourceandclosureuncertainty; compare reducedlane without demanding equality of differentmodels",
+      "budget_hours": [
+        8,
+        24
+      ],
+      "stop": "Cold/energy/source boundary or numericalbudget fail => checkpoint; noCR/RCTadmission bysubstitution"
+    },
+    {
+      "id": "N4",
+      "owner": "bass",
+      "state": "READY",
+      "depends": [
+        "S2"
+      ],
+      "task": "Admit new reduced proper-time cell schema into native fixed_time_optical_depth/integrate_visibility; retain segment scope",
+      "inputs": {
+        "bass136": "220d765f1df3803e6d4e3e3ad92d31ff421165ec",
+        "bass132": "e57064934bb176b08d2072aa537e5f71a430ae5e",
+        "cells": "evidence/RUN002/*_BASS_CELLS.csv"
+      },
+      "acceptance": "Exact densityunits/timeinterval/closure identity, native integral parity; explicit noobserver tail/no fixedobservedz claim",
+      "budget_hours": [
+        2,
+        6
+      ]
+    },
+    {
+      "id": "C1",
+      "owner": "bass_cr",
+      "state": "READY",
+      "depends": [],
+      "task": "Compare distinct causal lineages on a common bath, source,energy window and channel ledger before choosing assembled operator",
+      "inputs": {
+        "DH_LINEAGE": "b157c7873851a9cc0f455786b607ad9fcfbaa168",
+        "BEQ_CCC_LINEAGE": "b5b0f2244311a6e46692da55e75db6d04d3ef305"
+      },
+      "acceptance": "Source/threshold/He-sharing consistency and interface at0.1/10/900/1000eV; no silent kernel substitution",
+      "blocks": "CRfullhistory ONLY; does not block S or N1/N2",
+      "stop": "Missing atomicinput => explicitinputrequest artifact, notphotonsubstitute"
+    },
+    {
+      "id": "C2",
+      "owner": "bass_cr+rei_bianchi",
+      "state": "WAITING",
+      "depends": [
+        "C1",
+        "N3"
+      ],
+      "task": "Causal CR evolvingbath/source and energy-tail transport, bind receiver then CRon/off pairedhistory",
+      "acceptance": "Conserving channel energy + fullsupportedsource coverage + delay + evolving independent H/Hefractions; report residualunmodeledenergy"
+    },
+    {
+      "id": "A_HE",
+      "owner": "BASS_HE",
+      "state": "EXTERNAL_INPUT_REQUIRED",
+      "depends": [],
+      "task": "Acquire actual source-pinned RCT spectrum/heat/recoil; E13C4 fixedpath enclosure stays originalprecisionlane",
+      "blocks": "RCTON only",
+      "preserve": "E13C3 and HE-F2/F09 open; legacyGamma FAIL"
+    },
+    {
+      "id": "A_HH",
+      "owner": "WU088_HH",
+      "state": "PRESERVED_EXTENSION",
+      "depends": [],
+      "task": "Actual common-state native amplitude family/root/tube; PHYS04 finite-time bound after real family exists",
+      "blocks": "originalmixedcertificate only; N2 uses chronology finding but not entireprooflane"
+    },
+    {
+      "id": "A_REC",
+      "owner": "rec_bianchi",
+      "state": "READY",
+      "depends": [],
+      "task": "Export epoch-matched residualelectron/temperature IC history with composition and cosmology bindings",
+      "inputs": {
+        "HyRec_endpoint": "b1213b09cab2c8d30678ae29a948ab7ad92d030f"
+      },
+      "acceptance": "z5.807 coldendpoint is not z20IC; samplechosenepochfromactualsource orkeep reducedQi explicit",
+      "blocks": "residual IC accuracy; not reducedbaseline execution"
+    }
+  ],
+  "checkpoint_every_hours": 4,
+  "avoid": [
+    "replay unchangedlocaltests",
+    "combine same-named CRlineages",
+    "classify parking as scientific completion",
+    "choose observational claims fromnumericalPASS"
+  ]
+}
