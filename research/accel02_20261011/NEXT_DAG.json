@@ -1,0 +1,202 @@
+{
+  "schema": "rei_accel02_next_dag_v1",
+  "campaign_id": "REI_ACCEL02_20261011",
+  "execution_utc_date": "2026-10-10",
+  "draft_status": "ROOT_MUST_AMEND_EVENT003_AFTER_ACTUAL_RESULT",
+  "authority": "Current user resume instruction plus unchanged ACCEL02 contracts and independent phase2 quantitative decision",
+  "completed_do_not_replay": [
+    "REI-ACCEL01 RUN001/RUN002 reduced20to4",
+    "N1unchangedproviderchecks",
+    "N4unchangedoldreducedcelladoption",
+    "EVENT001/002samegridtimecomparison"
+  ],
+  "current_decision": {
+    "review_file": "review/phase2/QUANTITATIVE_DECISION.json",
+    "sha256": "b64f2bf70df1e2ed760c3940951bd6b48941be76fca784a95e4f9bd70d6de0a3",
+    "decision": "PROMOTE_SCOPED_FIXED_GRID_TEMPORAL_REFINEMENT_AND_CONSERVATION",
+    "energy_initial_scale_max": 5.2481356770047917e-11,
+    "number_initial_NH_max": 5.010378245671749e-10,
+    "time_field_scaled_max": 1.4231727742082953e-08,
+    "all_accepted_gas_EVENT002": "NOT_EXPLICITLY_MEASURED_IN_ORIGINAL_RUN"
+  },
+  "frozen_acceptance": {
+    "whole_mean_redshift": [
+      15.9,
+      4.0
+    ],
+    "time_field_scaled": 2e-06,
+    "energy_residual_initial_energy_scale": 1e-09,
+    "number_residual_initial_nH_scale": 1e-09,
+    "spectral_angular_field_scaled": 0.001,
+    "spectral_angular_source": "n2/CONTRACT.md; empirical target, not certified continuum bound",
+    "comparison_normalization": "shared epochs; max absolute difference / max whole-history amplitude of each nonzero field; exactzero channels remainzero",
+    "residual_epoch_coverage": "combine every reported segment endpoint and all common output epochs",
+    "sampled_and_accepted_photon_positivity": "strict >=0; no clipping",
+    "gas_admission": "physicalfractiondomain and EOS1..1e6K; allaccepted state claim onlyifactualmeasurement exists",
+    "geometry_identity": 1e-11,
+    "no_replacement": "budget-scaledenergy residual is diagnostic only; cannot replace fixedinitialenergytarget"
+  },
+  "physics_lock": {
+    "metric": "(-,+,+,+)",
+    "geometry": "non-tilted axisymmetric dust+Lambda BianchiI test-field",
+    "redshift": "mean-volume a^-1-1, not directional observedz",
+    "source": "pinned HM12 emissivity actual RHS; UVB initialonly",
+    "band_eV": [
+      10,
+      50000
+    ],
+    "IC": "z15.9,T20K,xHII2e-4,neutralHe; conditionalnotHyRec",
+    "closure": "homogeneousprimary-only CaseAescape+GrackleRR/CI/DR/CE/ff",
+    "cmb": "prescribedisotropic2.7255(1+z)blackbodybath, signedexchange ledger",
+    "CR": "OFF_noncompletion",
+    "RCT": "OFF_noncompletion",
+    "high_energy_limit": "above50keVsource energy omitted0.300%at15.9 to7.668%at4; not equal togasheatingerror"
+  },
+  "nodes": [
+    {
+      "id": "N1",
+      "state": "DONE_SCOPED",
+      "depends": [],
+      "evidence": [
+        "n1/REPORT_KO.md",
+        "review/phase1/REVIEW_KO.md"
+      ],
+      "claim": "actualsource/coldCaseA nativebinding, not globalphysicaladmission"
+    },
+    {
+      "id": "N2_TIME",
+      "state": "DONE_SCOPED",
+      "depends": [
+        "N1"
+      ],
+      "evidence": [
+        "n2/evidence/EVENT_TIME_COMPARISON.json",
+        "review/phase2/QUANTITATIVE_DECISION.json"
+      ],
+      "claim": "FLRW128energy×2angles frozen-grid temporal refinement+conservation"
+    },
+    {
+      "id": "N2_SPECTRAL003",
+      "state": "RUNNING_RESULT_PENDING_AT_DRAFT",
+      "depends": [
+        "N2_TIME"
+      ],
+      "input": "EVENT_COUPLED003 energy256 angle2 r0 rtol1e-11",
+      "action": "Read actual RESULT/IDENTITY/progress and compare savedEVENT002/003 commonepochs; no solverreplay merely toextractmetrics",
+      "if_pass": "Storeunchangedcriteriacomparisonandindependentscopeddecision; unlockBianchiangularpair",
+      "if_fail": "Preservewhichfieldsfail; identifythresholdquadrature/sourceknot resolution; repair/discretizationrefine full15.9to4 under samebudgets; no narrowzdefault",
+      "if_incomplete": "Checkactualprocess; iffinishedwithoutRESULT classifyinterruption andpreservecheckpoint; nounsupportedautomaticNPZresume"
+    },
+    {
+      "id": "N2_ACCEPTED_GAS",
+      "state": "MEASURED_IN003_PENDING_RESULT",
+      "depends": [
+        "N2_SPECTRAL003"
+      ],
+      "action": "Read allacceptedgas/finiteness/fraction/EOSdiagnostics addedin003; do not retroactivelylabel002 allacceptedPASS",
+      "if_fail": "Preserve offendingacceptedstate andbounds; repairnumericaladmissibility withoutstateclipping"
+    },
+    {
+      "id": "N2",
+      "state": "PARTIAL_SPECTRAL_ANGULAR_PENDING",
+      "depends": [
+        "N2_TIME",
+        "N2_SPECTRAL003",
+        "N2_ACCEPTED_GAS"
+      ],
+      "blocks": [
+        "N3"
+      ],
+      "claim": "continuouscovectors andeventchronology implemented; fullpaired finiteintervalspectral/angle acceptancepending"
+    },
+    {
+      "id": "N3_BIANCHI_PAIR",
+      "state": "HOLD_UNTIL003_ACCEPTANCE",
+      "depends": [
+        "N2_SPECTRAL003",
+        "N2_ACCEPTED_GAS"
+      ],
+      "action": "Smallestnewscience: r0vsr.05 whole15.9to4 withsamephysicsandcommonmean-zoutputs; selectatleast4angles andcompare8 foranisotropicangularrefinement; verifyenergy/spectralresolutionatthatanisotropiccase",
+      "observables": [
+        "xHII",
+        "xHeII",
+        "xHeIII",
+        "T_K",
+        "ne_cm3",
+        "GammaHI",
+        "GammaHeI",
+        "GammaHeII",
+        "photonnumber/energy",
+        "photonquadrupoleifexplicitlyexported"
+      ],
+      "acceptance": "same frozen time/number/energy targets with actual r.05 same-grid temporal check; empirical spectral/angular1e-3; report delta against discretization error; unresolved smaller signals become bounds not detections",
+      "claim_limit": "finiteband conditionalBianchi comparison, noobservationaladmission orCMBbound"
+    },
+    {
+      "id": "N4",
+      "state": "DONE_SCOPED_OLD_REDUCED_DATA",
+      "depends": [],
+      "repo": "bass",
+      "pr": 140,
+      "url": "https://github.com/cosmosapjw-quantum/bass/pull/140",
+      "claim": "nativeproper-time tau/visibilityreceiver adoptsoldACCEL01FLRWandr.1reducedcells; notnewnativeHHehistory"
+    },
+    {
+      "id": "N4_NATIVE_CELLS",
+      "state": "WAIT_NATIVE_SOURCE_HISTORY_ACCEPTANCE",
+      "depends": [
+        "N3_BIANCHI_PAIR",
+        "N4"
+      ],
+      "parallel_ready_action": "Inspect/preserveadapter schema andplanexactnewsource binding; no relabelingoldcells",
+      "action": "Exportactualacceptednewnativehistoryproper-time cells with ne_eff=(integralne dt)/deltat andnativeproducerquadratureidentity; bindrun/source/closure/cosmology/units/frame toBASSreceiver; callnativefixed_time_optical_depth andvisibility once",
+      "acceptance": "nativeintegralparity under pinnedreceiverbudget; actualproper-time integrationweights; no observer-tail or fixedobservedzclaim"
+    },
+    {
+      "id": "N3",
+      "state": "HOLD_NATIVE_PAIRED_AND_CONTINUUM_ACCEPTANCE",
+      "depends": [
+        "N2",
+        "N3_BIANCHI_PAIR"
+      ],
+      "note": "Acomputedfinitegridlonghistory and scopedtimePASSexist; cannotclaimallnativephysicscomplete"
+    },
+    {
+      "id": "CR_RCT_ORIGINAL",
+      "state": "PRESERVED_SEPARATE_LANE",
+      "depends": [],
+      "action": "KeeporiginalCRphysicalprovider/causalkernel andRCTspectrumheat/recoil blockers; do notfillwithphotononly/pureheat/assumedgamma",
+      "blocks": "CRON/RCTONclaims only, not admittedprimarylaneexecution"
+    }
+  ],
+  "checkpoint_policy": {
+    "when": [
+      "eachcompletedrunorfirstfailure",
+      "majorrepairbeforechangingas-runcode",
+      "independentdecision",
+      "beforepublication"
+    ],
+    "contents": [
+      "exactsource/binary/inputhashes",
+      "driver_as_run andbase_driver_as_run",
+      "RESULT/IDENTITY/EVENTS/PROGRESS",
+      "historyNPZ andcheckpointNPZ",
+      "firstfailure",
+      "criteriaandcomparisons",
+      "reviewdecision",
+      "DAGandnextcommand"
+    ],
+    "durability": "additivegitpublication+Drive/Dropbox receipts; do notoverwriteearlierfailurearchives",
+    "restart_truth": "RESTART.npz storesstate butcurrentrun_event_coupled.py has noresumeCLI. Do notclaimcontinuousintegratorrestore. Newrootlaunch restartswholecampaignunlessareviewedresumeimplementation isadded.",
+    "selective_readback": "metadataandimmutableidentities sufficientnormally; UPLOAD_VERIFIED != RESTORE_VERIFIED"
+  },
+  "stop_rules": [
+    "NoRUN002replay",
+    "No broadliteraturereview forresolvedproviderinputs",
+    "No repeatedadjacentnarrowzprobes withoutnewglobalfailure localization",
+    "Nocriteriarelaxation,fallbackornegativeclipping",
+    "No allacceptedgasclaimfor002",
+    "No continuum/CR/RCT/observeradmission fromscope-limitedPASS"
+  ],
+  "date_note": "Campaign directory preserves historical20261011 identifier; actual executionUTC receipts20261010"
+}

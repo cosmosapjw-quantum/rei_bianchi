@@ -1,6 +1,8 @@
 # N2: source birth/remap chronology의 실제 이식과 전 구간 진단
 
-상태는 `IMPLEMENTED_COMPONENT; WHOLE_HISTORY_HOLD`다. 기존 RUN002, HE E13C3,
+현재 상태는 `NATIVE_FULL_INTERVAL_TIME_SCOPED_PASS; SPECTRAL_PENDING`다.
+아래 frozen-bath의 실패는 보존된 선행 실험이며, 마지막 단락의 실제 coupled
+event 연구가 시간 적분 blocker를 진전시켰다. 기존 RUN002, HE E13C3,
 HH PHYS03를 재실행하지 않았다. 보존량만으로 정확도를 승인하지 않았다.
 
 `rust/rei_microphysics/src/paired_runtime.rs`의 실제 endpoint 경로는 에너지
@@ -76,3 +78,32 @@ mpmath 부재(독립 oracle을 표준 Decimal로 교체), RUST_FIRST_COMPILE_FAI
 test float literal 문법 오류(수정 후 통과), TRANSPORT001 말미 JSON 실패는
 numpy.bool 직렬화 오류(계산은 재실행하지 않고 저장된6case를 요약), refinement와
 BDF positivity는 수치해석 실패다. 물리 입력 부재와 혼동하지 않았다.
+
+## 실제 native coupled event 후속 실행
+
+`run_event_coupled.py`는 root의 `Coupled`와 N1 실제 native provider를 직접
+소비한다. 가짜 bath는 사용하지 않는다. z15.9,T20K,xHII=2e-4,He neutral의
+명시적 조건부 IC에서 H/He·열·광자를 z4까지 함께 적분했다. Source-band 진입,
+Verner threshold,HM12 spectral jump와 redshift knot를122개 open segment로
+분할했다. 비활성 momentum unknown을 적분기에서 제외하고50keV에 들어올 때
+해석적으로 정확한 영 초기값으로 추가한다. Segment 끝의 단면적/source는
+one-sided limit을 취한다. 실제 최대 energy evaluation 이동은3.92e-16 상대값이며
+일반적 state clipping은 없다.
+
+EVENT_COUPLED001(rtol1e-9,128energy×2angle,FLRW)은148.82초에 전 구간을
+계산했으나 N ledger/NH가4.06e-8로 실패했다. 실패를 보존하고 실제 원인인 시간
+정확도만 강화한 EVENT_COUPLED002(rtol1e-11)는306.43초에 완료했다.
+129개 공통 출력 epoch와 segment endpoint를 **모두** 합친 최대 energy ledger는
+초기 total energy 기준5.248e-11, photon-number ledger는 초기 nH 기준5.010e-10이다.
+각각 기존1e-9 기준을 통과한다. Accepted solver mesh와 출력 photon은 모두
+비음수다. 두 실행의 모든 producer/input identity는 동일하고, 공통 epoch의
+최대 observable 상대차이는1.423e-8(광자 밀도)로 기존2e-6 기준을 통과한다.
+T 상대차이는6.315e-9이고 xHII는6.655e-10이다.
+
+원래 두 실행은 accepted photon minimum을 직접 측정했지만 모든 accepted gas
+state의 extrema를 별도 계측하지 않았다. Native stage guard와129개 출력 기체
+domain 검증을 전체 accepted mesh 계측으로 부풀리지 않는다. 다음 실제256energy
+spectral refinement에는 accepted gas fractions/normalization/T=1..1e6K/finite
+state 계측을 추가했다. 이 추가 계측을 이유로 이미 끝난128energy 실행을 반복하지
+않는다. 현재 time-scoped 성공은 continuum spectral/angular accuracy, CR/RCT,
+임의 Bianchi shear나 관측 적합성을 승인하지 않는다.

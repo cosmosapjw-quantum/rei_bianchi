@@ -1,6 +1,6 @@
 # N1 물리 해석 — 새 native 전구간 H/He·열 history
 
-이 문서는 `NATIVE002`와 `EVENT_COUPLED001`에 저장된 결과를 읽은 해석 초안이다. solver·기존 RUN002·검증 suite를 재실행하지 않았다. 아래 수치는 **현재 유한 grid의 계산 결과**이며, 고정된 number/time/spectral acceptance가 닫히기 전에는 최종 과학 결과로 승격하지 않는다. 이후 더 정밀한 run의 실제 증거가 추가되면 해당 상태를 우선해야 한다.
+이 문서는 저장된 `NATIVE002`, `EVENT_COUPLED001/002`와 독립 `review/phase2/QUANTITATIVE_DECISION.json`을 읽은 해석 초안이다. solver·기존 RUN002·검증 suite를 재실행하지 않았다. **EVENT002까지 FLRW 고정256-node grid의 time refinement와 conservation은 독립 scoped PASS**다. 아래 NATIVE002 표는 최초 완주 결과의 물리적 의미를 설명하기 위한 기록이며, spectral/angular 및 paired Bianchi acceptance는 별도로 남아 있다. 이후 EVENT003의 실제 증거가 추가되면 해당 상태를 우선해야 한다.
 
 이번에는 초기 `z_a=15.9`, `T=20 K`, `x_HII=2e-4`, 중성 He에서 출발해 `z_a=4`까지 약 **1.2713 Gyr**의 H/He ionization·thermal·photon history가 실제로 계산되었다. HM12의 초기 UVB와 이후 emissivity, 기존 Grackle Case-A 원자율, 같은 gas state의 opacity, 정확한 dust+Lambda FLRW background가 연결되어 있다. 이전 축약모형의 `Q_HII(z)`와 달리 이번 `x_HII`는 homogeneous gas의 ionic fraction이다. source·clumping·closure·IC가 달라 두 값을 같은 관측량처럼 겹쳐 일치시켜서는 안 된다.
 
@@ -37,7 +37,7 @@ reference-volume total energy는 `sum U_j`, gas thermal energy, ionization fract
 
 반면 photon number `sum U_j/E_j(t)`는 시간 의존 계수를 가진 관측량이다. `NATIVE002` 최대 number residual은 **4.55×10^-8**, event segmentation을 추가한 `EVENT_COUPLED001`의 sampled maximum도 **4.06×10^-8**로 기존 `10^-9`를 아직 넘는다. 후자는 accepted/sample positivity와 전체 구간 완주 및 energy 기준을 통과했으나 **number gate는 FAIL**이다. event 구간 endpoint의 energy maximum `4.67×10^-11`과 sampled maximum `5.32×10^-11`도 구별해야 한다. 두 run의 가까운 최종 값이나 local residual≈10^-15는 미충족 number 기준을 대체하지 않는다.
 
-따라서 현재 판정은 `computed / implementation-verified conditional evolution; numerical promotion HOLD`가 적절하다. time refinement의 field criterion `2×10^-6`, number `10^-9`, energy `10^-9`를 그대로 유지하고, 선택된 refined run 또는 number/energy를 함께 보존하는 discrete map의 실제 결과로 판단해야 한다. 성공한 에너지 metric으로 acceptance 자체를 재정의하지 않는다.
+이 실패 뒤 실제로 수행한 `EVENT_COUPLED002`는 rtol을1e-11로 낮추어 같은 고정grid의 number residual을 `5.010378245671749e-10`, energy residual을 `5.2481356770047917e-11`로 줄였다. EVENT001/002의 최대 field difference는 `1.4231727742082953e-8`이다. 보호된 time criterion `2e-6`, number `1e-9`, energy `1e-9`를 모두 유지한 채 독립 phase2 decision이 **PROMOTE_SCOPED_FIXED_GRID_TEMPORAL_REFINEMENT_AND_CONSERVATION**으로 판정했다. 따라서 최초 실패는 보존하되 그 실패를 현재 결과로 잘못 반복해서는 안 된다. 현재 남은 것은 spectral/angular와 paired Bianchi acceptance다. EVENT002의 모든 accepted gas states는 직접 측정하지 않았으므로, 그 범위까지 PASS로 소급하지 않는다. EVENT003에 추가된 진단이 이 남은 측정 범위를 담당한다.
 
 ## HeII·고에너지 source·CMB의 해석 범위
 
@@ -57,7 +57,8 @@ isotropic source/IC와 isotropic local atomic physics를 두었으므로 angular
 
 - `integration/CONTRACT.json`: 실행 전 수치·과학 범위와 보호된 acceptance.
 - `integration/evidence/NATIVE001/RESULT.json`, `NATIVE002/{RESULT.json,IDENTITY.json,driver_as_run.py}`: 저장된 실행·실패·좌표 구현.
-- N2 worktree의 `n2/evidence/EVENT_COUPLED001/{RESULT.json,IDENTITY.json,EVENTS.json}`: event segmentation과 실제 남은 number failure.
+- `n2/evidence/EVENT_COUPLED001/{RESULT.json,IDENTITY.json,EVENTS.json}`: event segmentation과 최초 number failure.
+- `n2/evidence/EVENT_TIME_COMPARISON.json`, `review/phase2/QUANTITATIVE_DECISION.json`: 실제 EVENT002 fine run의 unchanged-budget scoped PASS.
 - `n1/{REPORT_KO.md,CONTRACT.json,evidence/BINDING_CHECKS.json}`: source provenance, cold IC·Case-A·CMB·50keV tail.
 
 새 문헌 조사나 추가 solver 실행은 이 해석 초안에 사용하지 않았다. 원 source는 pinned HM12 author tables와 Grackle3.4.1; 재사용한 자료의 물리적 허용 범위는 N1 source manifest를 따른다.
