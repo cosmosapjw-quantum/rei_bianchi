@@ -224,7 +224,7 @@ where
         return Err(coupled_bad());
     }
     let temperature = 2. * state.thermal_energy_j_m3 / thermal_denominator;
-    if !temperature.is_finite() {
+    if !temperature.is_finite() || (state.thermal_energy_j_m3 > 0. && temperature == 0.) {
         return Err(coupled_bad());
     }
     let sources = provider(time_s, state)?;
