@@ -21,6 +21,7 @@ mod group_rates;
 mod hhe_events;
 mod homogeneous_rates;
 mod hydrogen_step;
+pub mod cold_hii_rr;
 mod interval_ad;
 mod interval_math;
 pub mod isotope_state;
