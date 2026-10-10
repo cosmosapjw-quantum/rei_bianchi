@@ -1,0 +1,37 @@
+{
+  "task_id": "REI-PHYSINPUT-01-P03A",
+  "working_directory": "/home/cosmosapjw/rei_worktrees/physical-provider-p03a-20261010",
+  "base_commit": "c168e578354c2f1e191a7064ffa31bd762d2a949",
+  "commands": [
+    {
+      "command": "cargo build --release --locked --manifest-path rust/rei_microphysics/Cargo.toml --bin axisym_conditional",
+      "exit": 0,
+      "result": "Finished release profile in 2.54 s"
+    },
+    {
+      "command": "python3 -m unittest discover -s research/physical_provider_20261010/p03a -p 'test_*.py' -v",
+      "exit": 0,
+      "result": "5 tests PASS: analytic constant and affine opacity, zero/saturated opacity, arbitrary energy-mixture envelope, invalid-domain rejection"
+    },
+    {
+      "command": "python3 research/physical_provider_20261010/p03a/screen_diffuse.py --output research/physical_provider_20261010/p03a/evidence",
+      "exit": 1,
+      "failure_type": "OUTPUT_SERIALIZATION_NUMPY_BOOL",
+      "raw_failure": "first_failure.stderr.log",
+      "physics_execution": "All 17 frozen stages evaluated before JSON serialization failed",
+      "repair": "Convert check values to builtin bool before JSON serialization; no formula/input/threshold changes"
+    },
+    {
+      "command": "python3 research/physical_provider_20261010/p03a/screen_diffuse.py --output research/physical_provider_20261010/p03a/evidence/repaired",
+      "exit": 0,
+      "result": "PASS_DIAGNOSTIC",
+      "validation": "repaired/VALIDATION.json",
+      "finite_node_data": "repaired/finite_grid.npz",
+      "native_calls": {"BIND": 1, "SIGMA": 17, "RHS": 17},
+      "regression": "Actual screen now serializes machine validation successfully"
+    }
+  ],
+  "total_executed_science_calls": {"BIND": 2, "SIGMA": 34, "RHS": 34},
+  "full_history_integrations": 0,
+  "scientific_admission": "HOLD"
+}
