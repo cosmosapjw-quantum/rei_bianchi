@@ -23,6 +23,7 @@ mod homogeneous_rates;
 mod hydrogen_step;
 pub mod cold_hii_rr;
 pub mod cold_compton;
+pub mod cold_stage_composition;
 mod interval_ad;
 mod interval_math;
 pub mod isotope_state;
