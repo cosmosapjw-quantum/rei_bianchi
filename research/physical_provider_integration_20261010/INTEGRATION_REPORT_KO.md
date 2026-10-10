@@ -43,9 +43,9 @@ Puchwein 같은 UVB는 이 PR96 lane에 새로 섞지 않았다. HM12의 초기 
 - PR95 selected-He adapter tests: `4 passed`.
 - One bounded integrated fixed interval was executed using the frozen PR96 IC/source/grid and 17 epochs. No other history or scan was run.
 
-최초 exact-array 비교는 보존된 실패다. PR96 evidence는 Python 3.12.14/NumPy 2.3.5/SciPy 1.17.0, 이 통합 실행은 Python 3.12.3/NumPy 2.4.2/SciPy 1.17.0이었다. Quadrature energy 최대 상대차 `2.13e-16`, state 최대 상대차 `4.56e-13` 때문에 byte/numeric-array exact equality는 FAIL이었다.
+최초 exact-array 비교는 보존된 실패다. PR96 evidence는 Python 3.12.14/NumPy 2.3.5/SciPy 1.17.0, 이 통합 실행은 Python 3.12.3/NumPy 2.4.2/SciPy 1.17.0이었다. Quadrature energy 최대 상대차 `2.13e-16`, state 최대 상대차 `4.56e-13`의 roundoff-scale deviation 때문에 byte/numeric-array exact equality는 FAIL이었다. Python과 NumPy version 차이는 관측 사실이지만 deviation의 원인은 분리하지 않았으므로 특정 library에 귀속하지 않는다.
 
-PR96의 기록된 numerical targets로 다시 판정한 결과는 `SCOPED_PASS`다: 일반 history field 최대 상대차 `1.96e-15`, state 최대 상대차 `4.56e-13` (`2e-6` target), pressure difference/photon-energy `1.86e-16` (`1e-11` target), candidate energy ledger `1.58e-15`, photon-number ledger `5.71e-15` (`1e-9` target). 이것은 같은 parser/rates/grid를 쓰는 compatibility check이며 독립 원자물리 또는 continuum 검증이 아니다.
+PR96의 pre-existing numerical targets를 적용한 **새 same-input compatibility checks** 결과는 `SCOPED_PASS`다. 이는 원래 PR96 contract 전체를 재실행한 것이 아니다. 일반 history field 최대 상대차 `1.96e-15`, state 최대 상대차 `4.56e-13` (`2e-6` field target), per-epoch `|DeltaP_base-DeltaP_candidate|/U_gamma_candidate(t)` 최대 `1.8643520454027995e-16` (`2e-6` field target), candidate energy ledger `1.58e-15`, photon-number ledger `5.71e-15` (`1e-9` ledger target)다. `times_s`, `mu0`, `weights`의 exact equality와 finite state, nonnegative photon state, ionic fraction domain, `30000..110000 K` temperature domain도 saved NPZ/JSON에서 명시적으로 PASS했다. `1e-11` geometry target은 quadrature-energy compatibility에만 적용했다. 이것은 같은 parser/rates/grid를 쓰는 cross-environment compatibility check이며 독립 원자물리 또는 continuum 검증이 아니다.
 
 기존 initial campaign과 이 integration의 측정된 build/test/run/failed-comparison 합계는 약 CPU `25.87 s`, summed process wall `19.16 s`다. Git·파일·review overhead는 `UNKNOWN`이며 0으로 간주하지 않는다. 360초 budget 안에서 full 11-history 재실행은 하지 않았다.
 
@@ -54,7 +54,7 @@ PR96의 기록된 numerical targets로 다시 판정한 결과는 `SCOPED_PASS`�
 1. `CONTRACT.json`은 `...REVIEW_PENDING` 문자열을 유지하지만 같은 immutable folder의 `independent_review.json`과 `RUN_STATE.json`은 `PROMOTE_SCOPED`를 기록한다. 원 evidence를 고쳐 쓰지 않고 metadata discrepancy로 보존한다.
 2. PR95는 stale cached residual acceptance만 막는다. 기존 `64*EPSILON`, naive summation과 mutable relative REC path를 그대로 두므로 production tolerance/immutable REC binding은 미선택이다.
 3. PR94는 positive thermal energy가 binary64에서 `T=0`으로 underflow되는 것을 거부한다. PR96 warm interval에서 이 guard가 발동했다는 뜻은 아니다.
-4. PR94/95 remote CI runs `38031760491`, `38031762177`는 두 patch 바깥의 inherited `cargo fmt --check`에서 실패했고 later tests가 skipped 됐다. 이번 targeted local PASS가 remote whole-CI PASS를 뜻하지 않는다.
+4. PR94/95 remote CI runs `38031760491`, `38031762177`와 integration PR97 runs `38033034271`, `38033014151`는 inherited `cargo fmt --check`에서 실패했고 later tests가 skipped 됐다. 이번 targeted local PASS가 remote whole-CI PASS를 뜻하지 않는다.
 5. PR96 production source는 unchanged였고 `PhysicalHistory`는 계속 `PhysicalExecutionNotImplemented`다. 별도 source-bound conditional consumer contract 없이 이 gate를 열면 안 된다.
 
 ## 남은 실제 결정

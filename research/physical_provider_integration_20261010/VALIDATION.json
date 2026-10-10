@@ -40,24 +40,35 @@
     "candidate_json_sha256": "165c0c061d88bbca17fdbbbd576a3eff2341164088a54eff7c425770dca785cf",
     "candidate_dataset_npz_sha256": "1d1e6cffed683ac982b11c73c2bad5c62aa4e75a65e00f7d16389b0b5e10143e",
     "exact_comparison": "FAIL_PRESERVED",
-    "exact_failure_reason": "Roundoff-scale array differences under NumPy 2.4.2 versus PR96 NumPy 2.3.5; no source/grid/metadata mismatch.",
+    "exact_failure_reason": "Roundoff-scale array differences were observed across environments: Python 3.12.14/NumPy 2.3.5 in PR96 versus Python 3.12.3/NumPy 2.4.2 here, with SciPy 1.17.0 unchanged. Cause not isolated; no source/grid/metadata mismatch.",
     "contract_comparison": "SCOPED_PASS",
     "max_state_relative_difference": 4.551278724487723e-13,
     "max_ordinary_history_relative_difference": 1.9582573949575487e-15,
     "quadrature_energy_relative_difference": 2.126683784807543e-16,
-    "pressure_difference_scaled_to_photon_energy": 1.8643520454027995e-16,
+    "pressure_rule": "max_t(abs(deltaP_baseline(t)-deltaP_candidate(t))/u_gamma_candidate(t)) <= 2e-6",
+    "pressure_difference_scaled_to_candidate_photon_energy": 1.8643520454027995e-16,
+    "saved_data_checks": {
+      "times_s_exact": true,
+      "mu0_exact": true,
+      "weights_exact": true,
+      "finite_states": true,
+      "nonnegative_photons": true,
+      "ionic_fraction_domain": true,
+      "temperature_30000_to_110000_K": true
+    },
     "candidate_energy_ledger_scaled_max": 1.5753781884128723e-15,
     "candidate_number_ledger_scaled_max": 5.704207918928809e-15,
-    "comparison_sha256": "163cfec2a7b4354454df6f5ee31de781e8a38cfbbac4d9f3875df9b11c81d795",
-    "claim_ceiling": "Same-input integrated consumer numerical compatibility only; not independent atomic physics, continuum, production PhysicalHistory, cold-IGM, CR-deposition or global EoR admission."
+    "comparison_sha256": "314a0128256eedf9025da54c06b1524611ecf25d5c160b7bfe0598e95d35c259",
+    "preserved_prior_comparison_sha256": "163cfec2a7b4354454df6f5ee31de781e8a38cfbbac4d9f3875df9b11c81d795",
+    "claim_ceiling": "New same-input compatibility checks using PR96's pre-existing targets only; not replay of the whole original contract, independent atomic physics, continuum, production PhysicalHistory, cold-IGM, CR-deposition or global EoR admission."
   },
   "budget": {
     "prior_campaign_measured_cpu_s": 5.20,
     "prior_campaign_summed_process_wall_s": 3.90,
-    "integration_measured_cpu_s": 20.67,
-    "integration_summed_process_wall_s": 15.26,
-    "total_measured_cpu_s": 25.87,
-    "total_summed_process_wall_s": 19.16,
+    "integration_measured_cpu_s": 22.25,
+    "integration_summed_process_wall_s": 15.49,
+    "total_measured_cpu_s": 27.45,
+    "total_summed_process_wall_s": 19.39,
     "limit_cpu_s": 360,
     "limit_execution_wall_s": 360,
     "unmeasured_overhead": "UNKNOWN_NOT_ZERO"
@@ -66,6 +77,7 @@
   "remote_ci": {
     "pr94_run": "38031760491",
     "pr95_run": "38031762177",
+    "pr97_runs": ["38033034271", "38033014151"],
     "result": "FAIL_INHERITED_FMT_TESTS_SKIPPED",
     "claim": "No whole-CI PASS."
   }
