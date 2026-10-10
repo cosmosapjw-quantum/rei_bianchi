@@ -1,6 +1,6 @@
 use rei_microphysics::axisym_cr_deposition::{
     cr_deposition_derivative, pinned_cr_deposition_geometry, pinned_cr_deposition_packet,
-    CrDepositionPacket,
+    pinned_cr_deposition_packet_for_xi, CrDepositionPacket,
 };
 use rei_microphysics::{AxisymCoupledState, AxisymmetricPoint, IsotopeNumberState, IsotopeSpecies};
 
@@ -99,6 +99,29 @@ fn pinned_source_drives_actual_closed_local_derivative() {
         a.full_injection_power_j_m3_s,
         d.sources.external_power_j_m3_s
     );
+}
+
+#[test]
+fn xi010_source_drives_actual_closed_local_derivative_without_interpolation() {
+    let p = pinned_cr_deposition_packet_for_xi(0.1).unwrap();
+    let gas = state(&p);
+    let result =
+        cr_deposition_derivative(true, p.gas.time_s, geometry(), &gas, KB, || Ok(p)).unwrap();
+    let d = result.derivative;
+    let a = result.audit.unwrap();
+    assert_eq!(p.provider_id, "CRP_L17_MD14_RUDD_FS10_XI010_CONDITIONAL_V1");
+    close(d.sources.internal_power_j_m3_s, p.ionization_power_j_m3_s);
+    close(
+        d.sources.external_power_j_m3_s,
+        p.modelled_ionization_loss_power_j_m3_s,
+    );
+    close(
+        d.sources.escape_power_j_m3_s,
+        p.excitation_escape_power_j_m3_s + p.continuum_escape_power_j_m3_s,
+    );
+    assert_eq!(d.sources.photon_number_m3_s, 0.);
+    assert_eq!(a.table_raw_residual_j_m3_s, p.table_raw_residual_j_m3_s);
+    assert!(pinned_cr_deposition_packet_for_xi(0.05).is_err());
 }
 
 #[test]

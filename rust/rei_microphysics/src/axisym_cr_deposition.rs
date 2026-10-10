@@ -65,7 +65,25 @@ pub struct CrDepositionPacket<'a> {
 include!("axisym_cr_deposition_pin.rs");
 
 pub fn pinned_cr_deposition_packet() -> Result<CrDepositionPacket<'static>, ForwardError> {
-    PINNED_CR_DEPOSITION.ok_or(ForwardError::MissingAuthority("CR_PACKET_NOT_PINNED"))
+    pinned_cr_deposition_packet_for_xi(0.01)
+}
+
+/// Return one exact acquired FS10 composition knot. The receiver never
+/// interpolates packets across ionization fractions.
+pub fn pinned_cr_deposition_packet_for_xi(
+    xi: f64,
+) -> Result<CrDepositionPacket<'static>, ForwardError> {
+    match xi.to_bits() {
+        x if x == 0.01_f64.to_bits() => {
+            PINNED_CR_DEPOSITION_XI001.ok_or(ForwardError::MissingAuthority("CR_PACKET_NOT_PINNED"))
+        }
+        x if x == 0.1_f64.to_bits() => {
+            PINNED_CR_DEPOSITION_XI010.ok_or(ForwardError::MissingAuthority("CR_PACKET_NOT_PINNED"))
+        }
+        _ => Err(ForwardError::MissingAuthority(
+            "CR_PACKET_COMPOSITION_NOT_PINNED",
+        )),
+    }
 }
 
 /// Fixed background snapshot from the same source manifest as the packet.
@@ -264,7 +282,7 @@ fn validate_packet(p: &CrDepositionPacket<'_>) -> Result<CrDepositionAudit, Forw
 
 fn bound_packet(p: &CrDepositionPacket<'_>) -> Result<CrDepositionAudit, ForwardError> {
     let audit = validate_packet(p)?;
-    let expected = pinned_cr_deposition_packet()?;
+    let expected = pinned_cr_deposition_packet_for_xi(p.gas.xi)?;
     // The provider acquisition path verifies source bytes. Here the compiled
     // output fixture is checked field-for-field; identity strings alone cannot
     // bless arbitrary numbers as physical output.
