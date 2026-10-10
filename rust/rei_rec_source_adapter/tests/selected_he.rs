@@ -89,6 +89,48 @@ fn rejects_nonconservative_or_nonfinite_ledgers() {
 }
 
 #[test]
+fn recomputes_current_closure_instead_of_trusting_cached_residuals() {
+    let baseline =
+        assemble_he_event_ledger(rates(4, 1.), HeEnergies::canonical_si(), 0., 0.).unwrap();
+
+    let mut stale_nuclei = baseline;
+    stale_nuclei.species_source[0] += 1.;
+    assert_eq!(stale_nuclei.he_nuclei_residual, baseline.he_nuclei_residual);
+    assert!(
+        project_selected_he4_non_tilted(
+            &stale_nuclei,
+            SourceConvention::SelectedHe4ProperSiGasSeconds
+        )
+        .is_err()
+    );
+
+    let mut stale_charge = baseline;
+    stale_charge.species_source[4] += 1.;
+    assert_eq!(
+        stale_charge.charge_minus_e_residual,
+        baseline.charge_minus_e_residual
+    );
+    assert!(
+        project_selected_he4_non_tilted(
+            &stale_charge,
+            SourceConvention::SelectedHe4ProperSiGasSeconds
+        )
+        .is_err()
+    );
+
+    let mut stale_energy = baseline;
+    stale_energy.p_internal += 1.;
+    assert_eq!(stale_energy.energy_residual, baseline.energy_residual);
+    assert!(
+        project_selected_he4_non_tilted(
+            &stale_energy,
+            SourceConvention::SelectedHe4ProperSiGasSeconds
+        )
+        .is_err()
+    );
+}
+
+#[test]
 fn declared_zero_tilt_preserves_the_rec_scalar_clock() {
     let velocity = MaterialVelocity::new([0.; 3]).unwrap();
     assert_eq!(velocity.gamma(), 1.);

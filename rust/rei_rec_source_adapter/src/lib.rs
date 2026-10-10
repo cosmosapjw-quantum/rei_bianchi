@@ -42,6 +42,14 @@ fn residual_is_closed(value: f64, terms: &[f64]) -> Result<bool, AdapterError> {
     Ok(normalized.abs() <= 64.0 * f64::EPSILON)
 }
 
+fn current_residual_is_closed(terms: &[f64]) -> Result<bool, AdapterError> {
+    let residual = terms.iter().copied().sum::<f64>();
+    if !residual.is_finite() {
+        return Err(AdapterError::NonFiniteLedger);
+    }
+    residual_is_closed(residual, terms)
+}
+
 /// Preserves the REC selected-He bookkeeping: ground, S and P populations
 /// become the REI He4-neutral slot; ionized He becomes He4:q1. This is valid
 /// only at declared zero tilt, where REC's material and normal clocks coincide.
@@ -70,15 +78,14 @@ pub fn project_selected_he4_non_tilted(
     if values.iter().any(|x| !x.is_finite()) {
         return Err(AdapterError::NonFiniteLedger);
     }
-    if !residual_is_closed(ledger.he_nuclei_residual, &ledger.species_source[..4])?
-        || !residual_is_closed(
-            ledger.charge_minus_e_residual,
-            &[ledger.species_source[3], ledger.species_source[4]],
-        )?
-        || !residual_is_closed(
-            ledger.energy_residual,
-            &[ledger.p_internal, ledger.p_gamma, ledger.h_kin],
-        )?
+    let charge_terms = [ledger.species_source[3], -ledger.species_source[4]];
+    let energy_terms = [ledger.p_internal, ledger.p_gamma, ledger.h_kin];
+    if !current_residual_is_closed(&ledger.species_source[..4])?
+        || !current_residual_is_closed(&charge_terms)?
+        || !current_residual_is_closed(&energy_terms)?
+        || !residual_is_closed(ledger.he_nuclei_residual, &ledger.species_source[..4])?
+        || !residual_is_closed(ledger.charge_minus_e_residual, &charge_terms)?
+        || !residual_is_closed(ledger.energy_residual, &energy_terms)?
     {
         return Err(AdapterError::ConservationMismatch);
     }
