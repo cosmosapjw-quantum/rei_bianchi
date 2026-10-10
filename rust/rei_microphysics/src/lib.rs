@@ -8,6 +8,7 @@ mod adaptive_history;
 mod angular_photons;
 mod atomic_provider;
 pub mod axisym_contract;
+pub mod axisym_sources;
 mod bianchi_i;
 pub mod coverage;
 mod ft03_controlled;
@@ -37,6 +38,9 @@ pub use axisym_contract::{
     AxisymContractError, AxisymRunContract, AxisymmetryStatus, Clock, ClosureChoice, ExecutionMode,
     Frame, GeometryOnlyAdmission, ICProviderRecord, MuReflectionStatus, ProviderDomain,
     ProviderErrorStatus, ProviderRecord, RadiationUnits, SourceProviderRecord, SymmetryRecord,
+};
+pub use axisym_sources::{
+    validate_routing, ExcessPartition, PhotoEventLedger, PhotonRouting, PrimaryPhotoEvent,
 };
 pub use bianchi_i::{
     AxisymmetricPoint, CharacteristicRay, ConstantAxisymmetricBackground, ConstantHubbleBackground,
