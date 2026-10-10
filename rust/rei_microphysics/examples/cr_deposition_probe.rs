@@ -1,11 +1,15 @@
 //! One actual source-pinned cold local derivative; no time integration.
 use rei_microphysics::axisym_cr_deposition::{
-    cr_deposition_derivative, pinned_cr_deposition_geometry, pinned_cr_deposition_packet,
+    cr_deposition_derivative, pinned_cr_deposition_geometry, pinned_cr_deposition_packet_for_xi,
 };
 use rei_microphysics::{AxisymCoupledState, IsotopeNumberState, IsotopeSpecies};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let p = pinned_cr_deposition_packet()?;
+    let xi = match std::env::args().nth(1) {
+        None => 0.01,
+        Some(value) => value.parse::<f64>()?,
+    };
+    let p = pinned_cr_deposition_packet_for_xi(xi)?;
     let g = p.gas;
     let mut n = [0.; 13];
     n[IsotopeSpecies::H1Neutral as usize] = g.n_h_m3 * (1. - g.xi);
