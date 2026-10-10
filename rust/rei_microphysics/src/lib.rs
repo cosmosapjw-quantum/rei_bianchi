@@ -8,6 +8,7 @@ mod adaptive_history;
 mod angular_photons;
 mod atomic_provider;
 pub mod axisym_contract;
+pub mod axisym_coupling;
 pub mod axisym_radiation;
 pub mod axisym_sources;
 mod bianchi_i;
@@ -40,6 +41,7 @@ pub use axisym_contract::{
     Frame, GeometryOnlyAdmission, ICProviderRecord, MuReflectionStatus, ProviderDomain,
     ProviderErrorStatus, ProviderRecord, RadiationUnits, SourceProviderRecord, SymmetryRecord,
 };
+pub use axisym_coupling::{isotropic_expansion_terms, IsotropicExpansionTerms};
 pub use axisym_radiation::{AxisymPhotonLedgerContract, AxisymPhotonStep};
 pub use axisym_sources::{
     validate_routing, ExcessPartition, PhotoEventLedger, PhotonRouting, PrimaryPhotoEvent,
