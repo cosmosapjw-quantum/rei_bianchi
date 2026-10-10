@@ -84,6 +84,17 @@ pub struct LegacyHHeProjection {
     pub n_he_cm3: f64,
     pub fractions: [f64; 3],
 }
+/// Fixed-state H1/He4 EOS under charge neutrality, no positrons, and an
+/// all-electrons-thermal, common nonrelativistic ideal-gas closure.  Thermal
+/// energy excludes binding, rest-mass, photon, and escaped components.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct LegacyHHeEosSnapshot {
+    pub projection: LegacyHHeProjection,
+    pub electron_density_m3: f64,
+    pub thermal_particle_density_m3: f64,
+    pub u_erg_cm3: f64,
+    pub temperature_k: f64,
+}
 impl IsotopeNumberState {
     pub fn new(density_m3: [f64; 13]) -> Result<Self, ForwardError> {
         if density_m3.iter().any(|x| !x.is_finite() || *x < 0.) {
@@ -164,14 +175,58 @@ impl IsotopeNumberState {
         if (h > 0. && h / 1e6 == 0.) || (he > 0. && he / 1e6 == 0.) {
             return Err(ForwardError::InvalidInput("ISOTOPE_UNIT_UNDERFLOW"));
         }
+        let fractions = [
+            if h > 0. { hp / h } else { 0. },
+            if he > 0. { hep / he } else { 0. },
+            if he > 0. { hepp / he } else { 0. },
+        ];
+        if (hp > 0. && fractions[0] == 0.)
+            || (hep > 0. && fractions[1] == 0.)
+            || (hepp > 0. && fractions[2] == 0.)
+        {
+            return Err(ForwardError::InvalidInput("ISOTOPE_FRACTION_UNDERFLOW"));
+        }
         Ok(LegacyHHeProjection {
             n_h_cm3: h / 1e6,
             n_he_cm3: he / 1e6,
-            fractions: [
-                if h > 0. { hp / h } else { 0. },
-                if he > 0. { hep / he } else { 0. },
-                if he > 0. { hepp / he } else { 0. },
-            ],
+            fractions,
+        })
+    }
+    pub fn try_legacy_hhe_eos(
+        &self,
+        thermal_energy_density_j_m3: f64,
+        kb_j_k: f64,
+    ) -> Result<LegacyHHeEosSnapshot, ForwardError> {
+        let projection = self.try_legacy_hhe_projection()?;
+        if !thermal_energy_density_j_m3.is_finite()
+            || thermal_energy_density_j_m3 < 0.
+            || !kb_j_k.is_finite()
+            || kb_j_k <= 0.
+        {
+            return Err(ForwardError::InvalidInput("ISOTOPE_EOS_DOMAIN"));
+        }
+        let moments = self.moments()?;
+        let particles = self.thermal_particle_density_all_thermal_m3()?;
+        if particles <= 0. {
+            return Err(ForwardError::InvalidInput("ISOTOPE_VACUUM"));
+        }
+        let denominator = 3. * kb_j_k * particles;
+        let temperature_k = 2. * thermal_energy_density_j_m3 / denominator;
+        let u_erg_cm3 = 10. * thermal_energy_density_j_m3;
+        if !denominator.is_finite()
+            || denominator.is_subnormal()
+            || !temperature_k.is_finite()
+            || !u_erg_cm3.is_finite()
+            || (thermal_energy_density_j_m3 > 0. && temperature_k == 0.)
+        {
+            return Err(ForwardError::InvalidInput("ISOTOPE_OVERFLOW"));
+        }
+        Ok(LegacyHHeEosSnapshot {
+            projection,
+            electron_density_m3: moments.neutral_free_electron_density_m3,
+            thermal_particle_density_m3: particles,
+            u_erg_cm3,
+            temperature_k,
         })
     }
 }

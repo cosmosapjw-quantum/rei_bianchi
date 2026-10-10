@@ -68,7 +68,8 @@ pub use hydrogen_step::{hydrogen_step, HydrogenRates, HydrogenStep};
 pub use interval_ad::Jet;
 pub use interval_math::Interval;
 pub use isotope_state::{
-    IsotopeNumberMoments, IsotopeNumberState, IsotopeSpecies, LegacyHHeProjection,
+    IsotopeNumberMoments, IsotopeNumberState, IsotopeSpecies, LegacyHHeEosSnapshot,
+    LegacyHHeProjection,
 };
 pub use joint_affine::{
     below_strict_error_limit, joint_affine_difference, AffineEnclosure, ClosedInterval, JointParent,
