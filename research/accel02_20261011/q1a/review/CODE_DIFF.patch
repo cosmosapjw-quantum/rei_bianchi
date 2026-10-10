@@ -1,0 +1,79 @@
+--- published-n2-event-driver
++++ q1a-event-driver
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Event-bounded consumer of the root's actual native coupled H/He driver.
++"""Fixed-q Gauss grid, event-bounded consumer of the root's actual native coupled H/He driver.
+ 
+ No duplicate gas/RHS implementation: load the exact supplied root driver and N1
+ provider; reduce dormant photon coordinates algebraically until source entry.
+@@ -11,8 +11,11 @@
+ from pathlib import Path
+ import numpy as np
+ from scipy.integrate import BDF
++HERE=Path(__file__).resolve().parent
++sys.path.insert(0,str(HERE.parent/'n2'))
++import characteristics as original_characteristics
++from fixed_grid import FixedCharacteristics
+ from events import crossing_events,restart_boundaries,native_jump_energies
+-import characteristics
+ 
+ 
+ def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+@@ -23,17 +26,24 @@
+     parser.add_argument('--base-driver',type=Path,required=True)
+     parser.add_argument('--n1',type=Path,required=True)
+     parser.add_argument('--output',type=Path,required=True)
+-    parser.add_argument('--energy',type=int,default=128)
++    parser.add_argument('--grid-file',type=Path,required=True)
++    parser.add_argument('--max-wall-seconds',type=float,default=5400.)
+     parser.add_argument('--angle',type=int,default=2)
+     parser.add_argument('--shear',type=float,default=0.)
+     parser.add_argument('--rtol',type=float,default=1e-9)
+     parser.add_argument('--max-step',type=float,default=1/256)
+-    args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=False)
++    args=parser.parse_args()
++    characteristics=FixedCharacteristics(args.grid_file,original_characteristics)
++    args.energy=characteristics.record['n_energy']
++    if args.angle!=characteristics.record['n_mu']:raise ValueError('GRID_ANGLE_MISMATCH')
++    args.output.mkdir(parents=True,exist_ok=False)
+     import importlib.util
+     spec=importlib.util.spec_from_file_location('n2_root_coupled',args.base_driver)
+     base=importlib.util.module_from_spec(spec);sys.modules[spec.name]=base;spec.loader.exec_module(base)
+     n1=base.load('n2_event_n1',args.n1/'provider.py')
+     provider=n1.HistoryProvider(args.shear)
++    if provider.r!=characteristics.record['construction']['r']:raise ValueError('GRID_SHEAR_MISMATCH')
++    if provider.identity!=characteristics.record['input_identity']:raise ValueError('GRID_PROVIDER_MISMATCH')
+     native=n1.Native(args.n1/'native/target/release/rei_n1_native')
+     p=base.Coupled(provider,native,characteristics,args.energy,args.angle,coordinate='energy')
+     knots=np.array(sorted(set([10.,13.60,24.59,54.42,50000.]+native_jump_energies(provider.tables['emissivity']))))
+@@ -44,11 +54,20 @@
+             if provider.z_final<z<provider.z_initial]
+     boundaries=np.unique(np.r_[boundaries,ztimes])
+     identity=dict(base_driver=str(args.base_driver),base_sha=sha(args.base_driver),driver_sha=sha(__file__),
+-                  events_sha=sha(Path(__file__).with_name('events.py')),n1_sha=sha(args.n1/'provider.py'),
++                  events_sha=sha(HERE.parent/'n2/events.py'),
++                  characteristics_sha=sha(HERE.parent/'n2/characteristics.py'),
++                  grid_factory_sha=sha(HERE/'fixed_grid.py'),grid_sha=sha(args.grid_file),
++                  grid_arrays_sha256=characteristics.record['arrays_sha256'],
++                  grid_kind='fixed_q_composite_gauss',grid_order=characteristics.record['order'],n1_sha=sha(args.n1/'provider.py'),
+                   native_sha=native.binary_sha256,input_identity=provider.identity,
+                   args={k:str(v) if isinstance(v,Path) else v for k,v in vars(args).items()},
+                   event_count=len(eventlist),segment_count=len(boundaries)-1,
+                   semantics='current-energy open-segment one-sided limits; dormant=analytic zero; no state clipping')
++    for source,target in [(Path(__file__),'driver_as_run.py'),(args.base_driver,'base_driver_as_run.py'),
++                          (HERE/'fixed_grid.py','fixed_grid_as_run.py'),(args.grid_file,'GRID.json'),
++                          (HERE.parent/'n2/characteristics.py','characteristics_as_run.py'),
++                          (HERE.parent/'n2/events.py','events_as_run.py')]:
++        (args.output/target).write_bytes(source.read_bytes())
+     (args.output/'IDENTITY.json').write_text(json.dumps(identity,indent=2)+'\n')
+     (args.output/'EVENTS.json').write_text(json.dumps(dict(events=eventlist,boundaries=boundaries.tolist()),indent=2)+'\n')
+     context={};max_shift=0.
+@@ -96,6 +115,7 @@
+             solver=BDF(rhs,float(u0),full[keep],float(u1),rtol=args.rtol,atol=args.rtol*1e-8,
+                        jac=jac,max_step=args.max_step)
+             while solver.status=='running':
++                if time.monotonic()-started>args.max_wall_seconds:raise TimeoutError('DECLARED_WALL_BUDGET_EXCEEDED')
+                 msg=solver.step()
+                 if solver.status=='failed':raise RuntimeError(msg)
+                 current=expand(solver.y)

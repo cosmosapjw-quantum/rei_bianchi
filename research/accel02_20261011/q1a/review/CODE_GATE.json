@@ -1,0 +1,137 @@
+{
+  "schema": "q1a_independent_code_gate_v1",
+  "timestamp_utc": "2026-10-10T23:00:09.614831+00:00",
+  "reviewer": "/root/q1a_independent",
+  "model_identity": "UNKNOWN",
+  "decision": "ALLOW_BOUNDED_NEW_FLRW_FULL_INTERVAL_TRIAL",
+  "scientific_acceptance": "NOT_ESTABLISHED_BY_CODE_REVIEW",
+  "independence": {
+    "candidate_or_test_oracle_edits": false,
+    "ODE_native_or_oldtest_calls": 0,
+    "new_action": "Inspect source and literal new grid arrays; calculate identities and scalar grid invariants only"
+  },
+  "allowed_inputs": {
+    "shear": 0.0,
+    "grids": [
+      "GRID_G1.json",
+      "GRID_G2.json"
+    ],
+    "time_and_spectral_targets": "unchanged contracts; require actual fresh outputs"
+  },
+  "source_review": {
+    "grid_immutable": "Returned q/mu/weights are readonly; source calls never change them",
+    "operator_pairing": "FixedCharacteristics.make_grid injected once into unchanged Coupled; same arrays feed initial_photons/source, native gas/photon RHS, counters, analytic photon/Jacobian, output and event generation",
+    "atomic_and_physical_provider": "No source/atomic/IC/closure/CMB changes in eventdriver diff",
+    "event_diff": "Only explicit-grid plumbing, identity/as-run snapshots and wallbudget added to existing eventdriver; coefficient/segment/masks/counters/domain clauses unchanged",
+    "dormant_support": "Initial q>50000 startszero; at eachsegment omitted variables verified exactzero before reduction and new entries inheritzero",
+    "band_and_belowband": "Source currently10..50000 only; retainedbelow10 photons remain active",
+    "endpoint": "Same open-segment nextafter convention, abort if relative shift>64eps; no stateclipping",
+    "claims": "Fixed threshold-informed panels, notexact moving-threshold spectral integration"
+  },
+  "grids": [
+    {
+      "name": "GRID_G1.json",
+      "order": 1,
+      "panels": 384,
+      "energy_nodes": 384,
+      "angle_nodes": 2,
+      "total_nodes": 768,
+      "positive_weights": true,
+      "finite_arrays": true,
+      "weight_sum_error": 0.0,
+      "odd_angle_moment": 0.0,
+      "grid_hash_match": true,
+      "range_eV": [
+        10.0,
+        168999.99999999997
+      ],
+      "exact_midrun_knot_alignment": false
+    },
+    {
+      "name": "GRID_G2.json",
+      "order": 2,
+      "panels": 384,
+      "energy_nodes": 768,
+      "angle_nodes": 2,
+      "total_nodes": 1536,
+      "positive_weights": true,
+      "finite_arrays": true,
+      "weight_sum_error": 0.0,
+      "odd_angle_moment": 0.0,
+      "grid_hash_match": true,
+      "range_eV": [
+        10.0,
+        168999.99999999997
+      ],
+      "exact_midrun_knot_alignment": false
+    }
+  ],
+  "nonblocking_findings": [
+    {
+      "id": "Q1A-CODE-01",
+      "severity": "RESOLVED_BEFORE_LAUNCH",
+      "finding": "Runtime now explicitly requires provider.r == gridconstruction.r before native launch."
+    },
+    {
+      "id": "Q1A-CODE-02",
+      "severity": "known_empirical_accuracy_risk",
+      "finding": "Panels containinitial UVBknots andfinite sampledthresholdtrajectories; most evolving source/opacityknots remaininsidepanels. Accuracy isonlycertified byactualfullpair comparison, no guaranteed1e-3."
+    }
+  ],
+  "required_before_promotion": [
+    "root native localJacobian/pairing preflight completion",
+    "new all-domain/ledger wholeinterval evidence",
+    "new samegrid temporal comparison2e-6",
+    "new spectral pair all24fields/moments at65and1291e-3",
+    "independent saved-artifact comparison and identities"
+  ],
+  "identities": [
+    {
+      "path": "q1a/fixed_grid.py",
+      "bytes": 3782,
+      "sha256": "04ab5f7cb1628660168c159f0319bdcbeec1f185fcab95811e14b19a77b7ca2c"
+    },
+    {
+      "path": "q1a/run_gauss_history.py",
+      "bytes": 12262,
+      "sha256": "9cbae11904e569dac47498dc5a4795f3aef8d55e5f32addf4c79a3608b815f61"
+    },
+    {
+      "path": "q1a/GRID_G1.json",
+      "bytes": 67169,
+      "sha256": "13bdcc466891d0edd18cd2c645f388cc13f89a88f13a0af44a9c0b6cd7136efd"
+    },
+    {
+      "path": "q1a/GRID_G2.json",
+      "bytes": 124466,
+      "sha256": "c602b04d9e6e7a6d287d20c9faa48d8d5ed9c0852c80c536ae78127189836abf"
+    },
+    {
+      "path": "n2/run_event_coupled.py",
+      "bytes": 10682,
+      "sha256": "fbf20cf8c200f723030bfc4dad7eeadfab15f728e9453edea7fb00b3153c7754"
+    },
+    {
+      "path": "integration/run_native_history.py",
+      "bytes": 12616,
+      "sha256": "06275b5dd45e9e2b67264a8265c60d83966539093797748aa99e0a5ea5985602"
+    },
+    {
+      "path": "n2/characteristics.py",
+      "bytes": 3128,
+      "sha256": "438ce27fb7ae78dc2ad03ac686c0288995b555ecd8bb9cc5991d07bc7fc5921a"
+    },
+    {
+      "path": "n2/events.py",
+      "bytes": 3306,
+      "sha256": "ca82ecec0a9e4d53608239bc79f2cf8b1f8110de7595c6a538e4d7755bfbcc10"
+    },
+    {
+      "path": "n1/provider.py",
+      "bytes": 6246,
+      "sha256": "42aa7ce3eb1029c653d0b97e622cfc7c45456d3547ad5c9d5d8fc52ffa271c3a"
+    }
+  ],
+  "root_preflight_status": "PASS_RECORD_INSPECTED_NOT_RERUN",
+  "root_preflight_sha256": "8d343cf86818801df345eb899ce19309f48ae0f3e362a460f952dbe2ee9038f6"
+}
