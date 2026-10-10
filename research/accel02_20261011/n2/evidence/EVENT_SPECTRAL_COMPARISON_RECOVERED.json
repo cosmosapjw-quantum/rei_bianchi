@@ -1,0 +1,551 @@
+{
+  "status": "SPECTRAL_REFINEMENT_FAIL",
+  "method": "max_abs(coarse-fine) / max_abs(fine) over the same selected whole-history shared epochs; 65 retains original CONTRACT.md sampling,129 is additional; zero fine amplitude requires exact zero difference",
+  "frozen_field_budget": 0.001,
+  "identity_checks": {
+    "base_sha": true,
+    "events_sha": true,
+    "n1_sha": true,
+    "native_sha": true,
+    "input_identity": true,
+    "semantics": true,
+    "angle": true,
+    "shear": true,
+    "rtol": true,
+    "max_step": true,
+    "energy_grid_intentional_128_to_256": true,
+    "all_moment_identity_checks": true
+  },
+  "driver_sha_equal": false,
+  "driver_change_scope": "accepted-gas/finite checks and endpoint+sample ledger reporting only; exact diff retained for review",
+  "driver_as_run_diff": "--- coarse_as_run\n+++ fine_as_run\n@@ -71,6 +71,7 @@\n     p.coefficients=types.MethodType(coefficients,p)\n     full=p.y0/p.scales; samples=np.linspace(0,1,129);si=0;rows=[];sample_v=[];sample_u=[]\n     accepted_min=np.inf;accepted_energy=accepted_number=0.;completed_segments=0\n+    gas_lo=np.full(5,np.inf);gas_hi=np.full(5,-np.inf);accepted_finite=True;accepted_gas_valid=True\n     started=time.monotonic();failure=None;solver=None;status='RUNNING'\n     try:\n         for segment,(u0,u1) in enumerate(zip(boundaries[:-1],boundaries[1:])):\n@@ -99,6 +100,14 @@\n                 if solver.status=='failed':raise RuntimeError(msg)\n                 current=expand(solver.y)\n                 physical=current*p.scales\n+                accepted_finite=accepted_finite and bool(np.isfinite(physical).all())\n+                h,he1,he2,w=physical[:4];fhe=p.g0['nHe']/p.g0['nH']\n+                temperature=2*w*base.EV/(3*base.KB*(1+fhe+h+fhe*(he1+2*he2)))\n+                gas_values=np.array([h,he1,he2,1-he1-he2,temperature])\n+                gas_lo=np.minimum(gas_lo,gas_values);gas_hi=np.maximum(gas_hi,gas_values)\n+                accepted_gas_valid=accepted_gas_valid and bool(accepted_finite and\n+                    0<=h<=1 and he1>=0 and he2>=0 and he1+he2<=1 and 1<=temperature<=1e6)\n+                if not accepted_gas_valid:raise ValueError('ACCEPTED_GAS_OR_FINITE_DOMAIN')\n                 accepted_min=min(accepted_min,float(physical[4:4+p.n].min()))\n                 # All full numerical states are retained in restart artifacts;\n                 # strict accepted positivity is a gate, never a clip operation.\n@@ -128,11 +137,17 @@\n         if solver is not None:np.savez_compressed(args.output/'LAST_ACCEPTED.npz',u=solver.t,scaled_y=expand(solver.y),scales=p.scales)\n     finally:native.close()\n     np.savez_compressed(args.output/'history.npz',u=sample_u,scaled_states=np.array(sample_v),scales=p.scales,q=p.q,mu=p.mu,weights=p.weights)\n+    energy_max=max(accepted_energy,max(abs(row['energy_ledger_scaled']) for row in rows))\n+    number_max=max(accepted_number,max(abs(row['number_ledger_scaled']) for row in rows))\n     checks=dict(whole_interval=status=='COMPUTED_NOT_REVIEWED',sampled_positive=all(row['min_N_ref']>=0 for row in rows),\n-                accepted_positive=accepted_min>=0,energy_ledger=accepted_energy<=1e-9,number_ledger=accepted_number<=1e-9)\n+                accepted_positive=accepted_min>=0,energy_ledger=energy_max<=1e-9,number_ledger=number_max<=1e-9,\n+                accepted_finite=accepted_finite,accepted_gas_domain=accepted_gas_valid)\n     result=dict(status=status,checks=checks,completed_segments=completed_segments,elapsed_s=time.monotonic()-started,\n                 rhs_calls=p.calls,jac_calls=p.jcalls,n_nodes=p.n,max_local_number=p.max_local_number,max_local_energy=p.max_local_energy,\n                 max_endpoint_energy_ledger=accepted_energy,max_endpoint_number_ledger=accepted_number,\n+                max_energy_ledger=energy_max,max_number_ledger=number_max,\n+                accepted_gas_min=dict(zip(['xHII','xHeII','xHeIII','xHeI','T_K'],gas_lo.tolist())),\n+                accepted_gas_max=dict(zip(['xHII','xHeII','xHeIII','xHeI','T_K'],gas_hi.tolist())),\n                 min_accepted_photon_energy=accepted_min,max_one_sided_relative_energy_shift=max_shift,history=rows,failure=failure)\n     (args.output/'RESULT.json').write_text(json.dumps(result,indent=2)+'\\n')\n     print(json.dumps({k:v for k,v in result.items() if k not in ['history','failure']},indent=2),flush=True)\n",
+  "native_checks": {
+    "coarse": {
+      "whole_interval": true,
+      "sampled_positive": true,
+      "accepted_positive": true,
+      "energy_ledger": true,
+      "number_ledger": true
+    },
+    "fine": {
+      "whole_interval": true,
+      "sampled_positive": true,
+      "accepted_positive": true,
+      "energy_ledger": true,
+      "number_ledger": true,
+      "accepted_finite": true,
+      "accepted_gas_domain": true
+    }
+  },
+  "comparisons": {
+    "129": {
+      "fields": {
+        "xHII": {
+          "scaled_error": 0.0017910044693989096,
+          "absolute_error": 0.0017909951157004667,
+          "fine_whole_history_amplitude": 0.9999947774008369,
+          "fine_all129_amplitude": 0.9999947774008369,
+          "worst_epoch_index": 40,
+          "worst_time_s": 1.2537271693125728e+16,
+          "worst_z": 7.881559047551951,
+          "pass_budget": false
+        },
+        "xHeII": {
+          "scaled_error": 0.0025959006361306208,
+          "absolute_error": 0.0025851659906215296,
+          "fine_whole_history_amplitude": 0.9958647702613563,
+          "fine_all129_amplitude": 0.9958647702613563,
+          "worst_epoch_index": 28,
+          "worst_time_s": 8776090185188009.0,
+          "worst_z": 9.185985186693696,
+          "pass_budget": false
+        },
+        "xHeIII": {
+          "scaled_error": 0.006772347890634107,
+          "absolute_error": 0.0019398891834485343,
+          "fine_whole_history_amplitude": 0.28644263625785166,
+          "fine_all129_amplitude": 0.28644263625785166,
+          "worst_epoch_index": 115,
+          "worst_time_s": 3.604465611773646e+16,
+          "worst_z": 4.307483602852636,
+          "pass_budget": false
+        },
+        "T_K": {
+          "scaled_error": 0.004134575295706765,
+          "absolute_error": 51.03056659518552,
+          "fine_whole_history_amplitude": 12342.396242771132,
+          "fine_all129_amplitude": 12342.396242771132,
+          "worst_epoch_index": 57,
+          "worst_time_s": 1.7865612162704162e+16,
+          "worst_z": 6.599587839888598,
+          "pass_budget": false
+        },
+        "ne_cm3": {
+          "scaled_error": 0.004115838739257669,
+          "absolute_error": 5.63974486509581e-07,
+          "fine_whole_history_amplitude": 0.0001370254089719995,
+          "fine_all129_amplitude": 0.0001370254089719995,
+          "worst_epoch_index": 8,
+          "worst_time_s": 2507454338625145.5,
+          "worst_z": 13.010541805159693,
+          "pass_budget": false
+        },
+        "photon_cm3": {
+          "scaled_error": 0.004341149354701068,
+          "absolute_error": 4.629252439908305e-06,
+          "fine_whole_history_amplitude": 0.0010663656238630093,
+          "fine_all129_amplitude": 0.0010663656238630093,
+          "worst_epoch_index": 104,
+          "worst_time_s": 3.2596906402126892e+16,
+          "worst_z": 4.60735820208728,
+          "pass_budget": false
+        },
+        "GammaHI_s": {
+          "scaled_error": 0.1269181347307354,
+          "absolute_error": 2.3773266146044577e-13,
+          "fine_whole_history_amplitude": 1.873118147889663e-12,
+          "fine_all129_amplitude": 1.873118147889663e-12,
+          "worst_epoch_index": 122,
+          "worst_time_s": 3.823867866403347e+16,
+          "worst_z": 4.136292339115915,
+          "pass_budget": false
+        },
+        "GammaHeI_s": {
+          "scaled_error": 0.14018076328709536,
+          "absolute_error": 1.4756842199133494e-13,
+          "fine_whole_history_amplitude": 1.0527009450584128e-12,
+          "fine_all129_amplitude": 1.0527009450584128e-12,
+          "worst_epoch_index": 122,
+          "worst_time_s": 3.823867866403347e+16,
+          "worst_z": 4.136292339115915,
+          "pass_budget": false
+        },
+        "GammaHeII_s": {
+          "scaled_error": 0.06315329186879581,
+          "absolute_error": 4.14157934932973e-18,
+          "fine_whole_history_amplitude": 6.557978573680803e-17,
+          "fine_all129_amplitude": 6.557978573680803e-17,
+          "worst_epoch_index": 128,
+          "worst_time_s": 4.011926941800233e+16,
+          "worst_z": 4.0,
+          "pass_budget": false
+        },
+        "source_number_ref_cm3_s": {
+          "scaled_error": 0.11504560261004958,
+          "absolute_error": 2.4718803413909756e-19,
+          "fine_whole_history_amplitude": 2.1486091474260743e-18,
+          "fine_all129_amplitude": 2.1486091474260743e-18,
+          "worst_epoch_index": 119,
+          "worst_time_s": 3.729838328704904e+16,
+          "worst_z": 4.207964003767137,
+          "pass_budget": false
+        },
+        "source_energy_ref_erg_cm3_s": {
+          "scaled_error": 0.08630366103559121,
+          "absolute_error": 3.5890043264755106e-30,
+          "fine_whole_history_amplitude": 4.1585771488829684e-29,
+          "fine_all129_amplitude": 4.1585771488829684e-29,
+          "worst_epoch_index": 119,
+          "worst_time_s": 3.729838328704904e+16,
+          "worst_z": 4.207964003767137,
+          "pass_budget": false
+        },
+        "source_number_proper_cm3_s": {
+          "scaled_error": 0.06589934463195973,
+          "absolute_error": 1.0746929925676063e-20,
+          "fine_whole_history_amplitude": 1.6308098336480327e-19,
+          "fine_all129_amplitude": 1.6308098336480327e-19,
+          "worst_epoch_index": 12,
+          "worst_time_s": 3761181507937718.0,
+          "worst_z": 11.970939303507631,
+          "pass_budget": false
+        },
+        "source_energy_proper_erg_cm3_s": {
+          "scaled_error": 0.03952448444565885,
+          "absolute_error": 1.5686401978566892e-31,
+          "fine_whole_history_amplitude": 3.968780921136038e-30,
+          "fine_all129_amplitude": 3.968780921136038e-30,
+          "worst_epoch_index": 12,
+          "worst_time_s": 3761181507937718.0,
+          "worst_z": 11.970939303507631,
+          "pass_budget": false
+        },
+        "cumulative_source_number_ref_cm3": {
+          "scaled_error": 0.003364496255265925,
+          "absolute_error": 0.00014487730858115527,
+          "fine_whole_history_amplitude": 0.04306062411405608,
+          "fine_all129_amplitude": 0.04306062411405608,
+          "worst_epoch_index": 119,
+          "worst_time_s": 3.729838328704904e+16,
+          "worst_z": 4.207964003767137,
+          "pass_budget": false
+        },
+        "cumulative_source_energy_ref_erg_cm3": {
+          "scaled_error": 0.0026835112473557604,
+          "absolute_error": 2.3066310599112208e-15,
+          "fine_whole_history_amplitude": 8.595570680704602e-13,
+          "fine_all129_amplitude": 8.595570680704602e-13,
+          "worst_epoch_index": 119,
+          "worst_time_s": 3.729838328704904e+16,
+          "worst_z": 4.207964003767137,
+          "pass_budget": false
+        },
+        "radiation_energy_ref_erg_cm3": {
+          "scaled_error": 0.0036593968999782613,
+          "absolute_error": 2.3117613973963394e-15,
+          "fine_whole_history_amplitude": 6.317328949505511e-13,
+          "fine_all129_amplitude": 6.317328949505511e-13,
+          "worst_epoch_index": 119,
+          "worst_time_s": 3.729838328704904e+16,
+          "worst_z": 4.207964003767137,
+          "pass_budget": false
+        },
+        "radiation_energy_proper_erg_cm3": {
+          "scaled_error": 0.004426666391713592,
+          "absolute_error": 7.242027741872371e-17,
+          "fine_whole_history_amplitude": 1.63600034450957e-14,
+          "fine_all129_amplitude": 1.63600034450957e-14,
+          "worst_epoch_index": 104,
+          "worst_time_s": 3.2596906402126892e+16,
+          "worst_z": 4.60735820208728,
+          "pass_budget": false
+        },
+        "photoheat_HI_per_absorber_erg_s": {
+          "scaled_error": 0.004629353218977736,
+          "absolute_error": 5.486709587821333e-26,
+          "fine_whole_history_amplitude": 1.185200032982776e-23,
+          "fine_all129_amplitude": 1.185200032982776e-23,
+          "worst_epoch_index": 119,
+          "worst_time_s": 3.729838328704904e+16,
+          "worst_z": 4.207964003767137,
+          "pass_budget": false
+        },
+        "photoheat_HeI_per_absorber_erg_s": {
+          "scaled_error": 0.007489814057552132,
+          "absolute_error": 7.002531177868819e-26,
+          "fine_whole_history_amplitude": 9.349405905221404e-24,
+          "fine_all129_amplitude": 9.349405905221404e-24,
+          "worst_epoch_index": 58,
+          "worst_time_s": 1.8179043955032304e+16,
+          "worst_z": 6.5380451965266975,
+          "pass_budget": false
+        },
+        "photoheat_HeII_per_absorber_erg_s": {
+          "scaled_error": 0.0005169938015091361,
+          "absolute_error": 2.9661247512797176e-30,
+          "fine_whole_history_amplitude": 5.73725399148195e-27,
+          "fine_all129_amplitude": 5.73725399148195e-27,
+          "worst_epoch_index": 127,
+          "worst_time_s": 3.9805837625674184e+16,
+          "worst_z": 4.022093222726559,
+          "pass_budget": true
+        },
+        "photoheat_HI_proper_erg_cm3_s": {
+          "scaled_error": 0.01813269350324884,
+          "absolute_error": 1.0264741883120526e-32,
+          "fine_whole_history_amplitude": 5.660902987899393e-31,
+          "fine_all129_amplitude": 5.660902987899393e-31,
+          "worst_epoch_index": 2,
+          "worst_time_s": 626863584656286.4,
+          "worst_z": 15.042966449184817,
+          "pass_budget": false
+        },
+        "photoheat_HeI_proper_erg_cm3_s": {
+          "scaled_error": 0.01288863196121295,
+          "absolute_error": 1.2713626815678472e-33,
+          "fine_whole_history_amplitude": 9.864217439010486e-32,
+          "fine_all129_amplitude": 9.864217439010486e-32,
+          "worst_epoch_index": 3,
+          "worst_time_s": 940295376984429.5,
+          "worst_z": 14.65353047328972,
+          "pass_budget": false
+        },
+        "photoheat_HeII_proper_erg_cm3_s": {
+          "scaled_error": 0.0015810773968012654,
+          "absolute_error": 1.20206533217002e-35,
+          "fine_whole_history_amplitude": 7.602824090724222e-33,
+          "fine_all129_amplitude": 7.602824090724222e-33,
+          "worst_epoch_index": 115,
+          "worst_time_s": 3.604465611773646e+16,
+          "worst_z": 4.307483602852636,
+          "pass_budget": false
+        },
+        "total_photoheat_proper_erg_cm3_s": {
+          "scaled_error": 0.01632883822104491,
+          "absolute_error": 1.0854430587949031e-32,
+          "fine_whole_history_amplitude": 6.647399184811348e-31,
+          "fine_all129_amplitude": 6.647399184811348e-31,
+          "worst_epoch_index": 2,
+          "worst_time_s": 626863584656286.4,
+          "worst_z": 15.042966449184817,
+          "pass_budget": false
+        }
+      },
+      "pass_all_fields": false,
+      "max_scaled_error": 0.14018076328709536
+    },
+    "65": {
+      "fields": {
+        "xHII": {
+          "scaled_error": 0.0017910044693989096,
+          "absolute_error": 0.0017909951157004667,
+          "fine_whole_history_amplitude": 0.9999947774008369,
+          "fine_all129_amplitude": 0.9999947774008369,
+          "worst_epoch_index": 40,
+          "worst_time_s": 1.2537271693125728e+16,
+          "worst_z": 7.881559047551951,
+          "pass_budget": false
+        },
+        "xHeII": {
+          "scaled_error": 0.0025959006361306208,
+          "absolute_error": 0.0025851659906215296,
+          "fine_whole_history_amplitude": 0.9958647702613563,
+          "fine_all129_amplitude": 0.9958647702613563,
+          "worst_epoch_index": 28,
+          "worst_time_s": 8776090185188009.0,
+          "worst_z": 9.185985186693696,
+          "pass_budget": false
+        },
+        "xHeIII": {
+          "scaled_error": 0.0048189664171220704,
+          "absolute_error": 0.0013803574445584998,
+          "fine_whole_history_amplitude": 0.28644263625785166,
+          "fine_all129_amplitude": 0.28644263625785166,
+          "worst_epoch_index": 114,
+          "worst_time_s": 3.5731224325408324e+16,
+          "worst_z": 4.333106343927399,
+          "pass_budget": false
+        },
+        "T_K": {
+          "scaled_error": 0.0030523193633450038,
+          "absolute_error": 37.56914498554943,
+          "fine_whole_history_amplitude": 12308.392574090874,
+          "fine_all129_amplitude": 12342.396242771132,
+          "worst_epoch_index": 58,
+          "worst_time_s": 1.8179043955032304e+16,
+          "worst_z": 6.5380451965266975,
+          "pass_budget": false
+        },
+        "ne_cm3": {
+          "scaled_error": 0.004115838739257669,
+          "absolute_error": 5.63974486509581e-07,
+          "fine_whole_history_amplitude": 0.0001370254089719995,
+          "fine_all129_amplitude": 0.0001370254089719995,
+          "worst_epoch_index": 8,
+          "worst_time_s": 2507454338625145.5,
+          "worst_z": 13.010541805159693,
+          "pass_budget": false
+        },
+        "photon_cm3": {
+          "scaled_error": 0.004341149354701068,
+          "absolute_error": 4.629252439908305e-06,
+          "fine_whole_history_amplitude": 0.0010663656238630093,
+          "fine_all129_amplitude": 0.0010663656238630093,
+          "worst_epoch_index": 104,
+          "worst_time_s": 3.2596906402126892e+16,
+          "worst_z": 4.60735820208728,
+          "pass_budget": false
+        },
+        "GammaHI_s": {
+          "scaled_error": 0.1269181347307354,
+          "absolute_error": 2.3773266146044577e-13,
+          "fine_whole_history_amplitude": 1.873118147889663e-12,
+          "fine_all129_amplitude": 1.873118147889663e-12,
+          "worst_epoch_index": 122,
+          "worst_time_s": 3.823867866403347e+16,
+          "worst_z": 4.136292339115915,
+          "pass_budget": false
+        },
+        "GammaHeI_s": {
+          "scaled_error": 0.14018076328709536,
+          "absolute_error": 1.4756842199133494e-13,
+          "fine_whole_history_amplitude": 1.0527009450584128e-12,
+          "fine_all129_amplitude": 1.0527009450584128e-12,
+          "worst_epoch_index": 122,
+          "worst_time_s": 3.823867866403347e+16,
+          "worst_z": 4.136292339115915,
+          "pass_budget": false
+        },
+        "GammaHeII_s": {
+          "scaled_error": 0.06429467772266954,
+          "absolute_error": 4.14157934932973e-18,
+          "fine_whole_history_amplitude": 6.441558611109513e-17,
+          "fine_all129_amplitude": 6.557978573680803e-17,
+          "worst_epoch_index": 128,
+          "worst_time_s": 4.011926941800233e+16,
+          "worst_z": 4.0,
+          "pass_budget": false
+        },
+        "source_number_ref_cm3_s": {
+          "scaled_error": 0.09509217461517014,
+          "absolute_error": 2.000283745245533e-19,
+          "fine_whole_history_amplitude": 2.103520876812955e-18,
+          "fine_all129_amplitude": 2.1486091474260743e-18,
+          "worst_epoch_index": 118,
+          "worst_time_s": 3.69849514947209e+16,
+          "worst_z": 4.232409327684358,
+          "pass_budget": false
+        },
+        "source_energy_ref_erg_cm3_s": {
+          "scaled_error": 0.0797458194644878,
+          "absolute_error": 3.293050148802532e-30,
+          "fine_whole_history_amplitude": 4.1294329544998716e-29,
+          "fine_all129_amplitude": 4.1585771488829684e-29,
+          "worst_epoch_index": 120,
+          "worst_time_s": 3.761181507937718e+16,
+          "worst_z": 4.183799476250951,
+          "pass_budget": false
+        },
+        "source_number_proper_cm3_s": {
+          "scaled_error": 0.06589934463195973,
+          "absolute_error": 1.0746929925676063e-20,
+          "fine_whole_history_amplitude": 1.6308098336480327e-19,
+          "fine_all129_amplitude": 1.6308098336480327e-19,
+          "worst_epoch_index": 12,
+          "worst_time_s": 3761181507937718.0,
+          "worst_z": 11.970939303507631,
+          "pass_budget": false
+        },
+        "source_energy_proper_erg_cm3_s": {
+          "scaled_error": 0.03952448444565885,
+          "absolute_error": 1.5686401978566892e-31,
+          "fine_whole_history_amplitude": 3.968780921136038e-30,
+          "fine_all129_amplitude": 3.968780921136038e-30,
+          "worst_epoch_index": 12,
+          "worst_time_s": 3761181507937718.0,
+          "worst_z": 11.970939303507631,
+          "pass_budget": false
+        },
+        "cumulative_source_number_ref_cm3": {
+          "scaled_error": 0.0031856004340139864,
+          "absolute_error": 0.0001371739428666502,
+          "fine_whole_history_amplitude": 0.04306062411405608,
+          "fine_all129_amplitude": 0.04306062411405608,
+          "worst_epoch_index": 120,
+          "worst_time_s": 3.761181507937718e+16,
+          "worst_z": 4.183799476250951,
+          "pass_budget": false
+        },
+        "cumulative_source_energy_ref_erg_cm3": {
+          "scaled_error": 0.0024259914473277757,
+          "absolute_error": 2.085278095629075e-15,
+          "fine_whole_history_amplitude": 8.595570680704602e-13,
+          "fine_all129_amplitude": 8.595570680704602e-13,
+          "worst_epoch_index": 120,
+          "worst_time_s": 3.761181507937718e+16,
+          "worst_z": 4.183799476250951,
+          "pass_budget": false
+        },
+        "radiation_energy_ref_erg_cm3": {
+          "scaled_error": 0.0032865095577995457,
+          "absolute_error": 2.0761961972313625e-15,
+          "fine_whole_history_amplitude": 6.317328949505511e-13,
+          "fine_all129_amplitude": 6.317328949505511e-13,
+          "worst_epoch_index": 120,
+          "worst_time_s": 3.761181507937718e+16,
+          "worst_z": 4.183799476250951,
+          "pass_budget": false
+        },
+        "radiation_energy_proper_erg_cm3": {
+          "scaled_error": 0.004426666391713592,
+          "absolute_error": 7.242027741872371e-17,
+          "fine_whole_history_amplitude": 1.63600034450957e-14,
+          "fine_all129_amplitude": 1.63600034450957e-14,
+          "worst_epoch_index": 104,
+          "worst_time_s": 3.2596906402126892e+16,
+          "worst_z": 4.60735820208728,
+          "pass_budget": false
+        },
+        "photoheat_HI_per_absorber_erg_s": {
+          "scaled_error": 0.0038665327277180145,
+          "absolute_error": 4.582614716420374e-26,
+          "fine_whole_history_amplitude": 1.185200032982776e-23,
+          "fine_all129_amplitude": 1.185200032982776e-23,
+          "worst_epoch_index": 118,
+          "worst_time_s": 3.69849514947209e+16,
+          "worst_z": 4.232409327684358,
+          "pass_budget": false
+        },
+        "photoheat_HeI_per_absorber_erg_s": {
+          "scaled_error": 0.007489814057552132,
+          "absolute_error": 7.002531177868819e-26,
+          "fine_whole_history_amplitude": 9.349405905221404e-24,
+          "fine_all129_amplitude": 9.349405905221404e-24,
+          "worst_epoch_index": 58,
+          "worst_time_s": 1.8179043955032304e+16,
+          "worst_z": 6.5380451965266975,
+          "pass_budget": false
+        },
+        "photoheat_HeII_per_absorber_erg_s": {
+          "scaled_error": 0.0004955345399317828,
+          "absolute_error": 2.8430075171407927e-30,
+          "fine_whole_history_amplitude": 5.73725399148195e-27,
+          "fine_all129_amplitude": 5.73725399148195e-27,
+          "worst_epoch_index": 126,
+          "worst_time_s": 3.949240583334604e+16,
+          "worst_z": 4.044429433671964,
+          "pass_budget": true
+        },
+        "photoheat_HI_proper_erg_cm3_s": {
+          "scaled_error": 0.018179551574716103,
+          "absolute_error": 1.0264741883120526e-32,
+          "fine_whole_history_amplitude": 5.6463119241052145e-31,
+          "fine_all129_amplitude": 5.660902987899393e-31,
+          "worst_epoch_index": 2,
+          "worst_time_s": 626863584656286.4,
+          "worst_z": 15.042966449184817,
+          "pass_budget": false
+        },
+        "photoheat_HeI_proper_erg_cm3_s": {
+          "scaled_error": 0.010979006220894618,
+          "absolute_error": 1.0631582002923353e-33,
+          "fine_whole_history_amplitude": 9.68355586017424e-32,
+          "fine_all129_amplitude": 9.864217439010486e-32,
+          "worst_epoch_index": 8,
+          "worst_time_s": 2507454338625145.5,
+          "worst_z": 13.010541805159693,
+          "pass_budget": false
+        },
+        "photoheat_HeII_proper_erg_cm3_s": {
+          "scaled_error": 0.0012041233877744383,
+          "absolute_error": 9.154738300775964e-36,
+          "fine_whole_history_amplitude": 7.602824090724222e-33,
+          "fine_all129_amplitude": 7.602824090724222e-33,
+          "worst_epoch_index": 114,
+          "worst_time_s": 3.5731224325408324e+16,
+          "worst_z": 4.333106343927399,
+          "pass_budget": false
+        },
+        "total_photoheat_proper_erg_cm3_s": {
+          "scaled_error": 0.01640917694011717,
+          "absolute_error": 1.0854430587949031e-32,
+          "fine_whole_history_amplitude": 6.614853766011938e-31,
+          "fine_all129_amplitude": 6.647399184811348e-31,
+          "worst_epoch_index": 2,
+          "worst_time_s": 626863584656286.4,
+          "worst_z": 15.042966449184817,
+          "pass_budget": false
+        }
+      },
+      "pass_all_fields": false,
+      "max_scaled_error": 0.14018076328709536
+    }
+  },
+  "coarse_all_accepted_gas_domain": "NOT_MEASURED",
+  "fine_all_accepted_gas_domain": true,
+  "angular_status": "NOT_EVALUATED",
+  "continuum_error_bound": "NOT_ESTABLISHED",
+  "scientific_ceiling": "conditional source-band-limited primary-only CaseA gas+photon history, isotropic CMB bath; no CR/RCT or observer visibility admission",
+  "files": {
+    "research/accel02_20261011/n2/evidence/EVENT_COUPLED002/RESULT.json": "e9276067c6512f9d37df99ac0c76e4371f990f501bfe6317c3833d2d2369bd22",
+    "research/accel02_20261011/n2/evidence/EVENT_COUPLED002/IDENTITY.json": "d6b7019b7b93fabc7e68994e509091c5b94bbdb9522316e39b6f5ba19bd86a8d",
+    "research/accel02_20261011/n2/evidence/EVENT_COUPLED002/history.npz": "b84cd3299992ddfc6d4953a6e3094ea728df37535d32fe2ab49c47199c961d3a",
+    "research/accel02_20261011/n2/evidence/EVENT_COUPLED002/MOMENTS_RECOVERED.json": "86826a25331804ef34e0f858eed20c3201342882add2325941b93b1e2999860c",
+    "research/accel02_20261011/n2/evidence/EVENT_COUPLED003_RECOVERED/RESULT.json": "b1ff00e72b5d1ad1102da99a22abbd4f2decdeb33f35f3bef0626e2eff2bf7b6",
+    "research/accel02_20261011/n2/evidence/EVENT_COUPLED003_RECOVERED/IDENTITY.json": "65f9941796d966cbe5df6f036d50b9df1c7f08733aa3f90f02b7472cf2ee0d8a",
+    "research/accel02_20261011/n2/evidence/EVENT_COUPLED003_RECOVERED/history.npz": "6b3497b2757ba6ff0fb59e4527e6901a3a332c5105e710ec0410fded1042aa84",
+    "research/accel02_20261011/n2/evidence/EVENT_COUPLED003_RECOVERED/MOMENTS_RECOVERED.json": "4acb25b79cd2b61fcb6780b7ac4b1d0ba06fe7d53f03d5e41bc96e8a1880c490"
+  },
+  "postprocess_code_sha256": "abf8fbc5a49dbc852d11a38c7059d5487ea4d648e1dd7e998ccbdfd14b5e6f83",
+  "comparison_code_sha256": "592ecca45ec3ffe44898849d0e26bf1b2f497bfc91dada6193ccaf7d5bdb9339"
+}

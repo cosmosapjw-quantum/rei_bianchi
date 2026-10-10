@@ -1,38 +1,54 @@
-# REI-ACCEL02 후속 실행 시작문
+# REI-ACCEL02 C07R 후속 local Codex 시작문
 
-REI-ACCEL02의 최신 publication receipt가 가리키는 additive branch/commit과 durable checkpoint에서 재개하라. campaign ID의 `20261011`은 한국 날짜이며, 이번 실제 실행·review의 UTC 날짜는 `2026-10-10`이다. 최신 commit/tree, 실행 중인 process, 실제 존재하는 source/evidence부터 확인하고 대화 요약으로 파일 존재나 완료를 추정하지 마라.
+REI-ACCEL02의 **C07R 실제 복구 결과**에서 이어서 작업하라. 목표는 이미 실행된 z=15.9→4 H/He·온도·광자 결합 history의 spectral blocker를 해소하고, 수치 근거를 갖춘 FLRW/Bianchi 비교와 새 native BASS 연결로 진행하는 것이다. 완료된 RUN002나 기존 128-grid 시간 검산을 반복하지 마라. 현재 실패를 숨기거나 원자율·source·closure·허용 기준을 바꾸지 마라.
 
-먼저 `research/accel02_20261011/`의 `NEXT_DAG.json`, `integration/CONTRACT.json`, `n1/REPORT_KO.md`, `n2/CONTRACT.md`, `n2/evidence/EVENT_TIME_COMPARISON.json`, `review/phase2/QUANTITATIVE_DECISION.json` 및 최신 EVENT_COUPLED003 결과·comparison·review를 읽어라. 파일명·위치가 publication projection에서 바뀌었다면 delivery manifest로 정확한 artifact를 찾아라. 완료된 ACCEL01 RUN002와 변하지 않은 provider/old-BASS 검산은 반복하지 마라.
+## 복구와 증거 경계
 
-현재 확정된 기준점은 **FLRW r=0, energy128×angle2의 EVENT001/002 same-grid time refinement와 conservation의 독립 scoped PASS**다. 최대 field error `1.4231727742082953e-8`은 기준 `2e-6` 이내이고, combined endpoint/common-epoch energy residual `5.2481356770047917e-11`, number residual `5.010378245671749e-10`은 각각 `1e-9` 이내다. 이 결과가 이전 EVENT001의 number FAIL을 보존한 채 수렴시킨 것이다. EVENT002에서 모든 accepted gas states의 domain은 **NOT_EXPLICITLY_MEASURED**이므로 과거 로그를 all-accepted PASS로 다시 쓰지 마라. 저장된 129개 epoch의 gas domain과 모든 accepted photon positivity만 그 실행의 실제 검증 범위다.
+REI PR110의 최신 publication receipt와 additive branch `research/accel02-native-broad-20261011`을 확인하라. 이번 복구의 Git 기준점은 `304afc3592ae60242e3bb72efc56d806519b4a60`이다. C07R2 archive는 `research/accel02_20261011` 전체, raw NPZ/JSON, as-run drivers, N1 provider tables와 검증된 native binary를 담는 Git용 overlay다. ACCEL02 바깥의 `research/physical_provider_20261010/{background.py,hm12_data.py,sources/emissivity.out,sources/UVB.out}` 네 source pin도 최종 R2에 포함한다. 나머지 runtime 의존성은 published Git repository에서 가져온다. 이것을 archive 하나만으로 독립 실행되는 전체 repo bundle이라 부르지 마라.
 
-N1의 source/cold Case-A native binding은 scoped DONE이다. N2는 chronology·time·conservation 부분이 완료됐으며 spectral/angular 검증이 남았다. N4는 BASS PR140에서 **이전 ACCEL01 reduced FLRW/r=.1 cell**을 실제 native receiver에 연결한 scoped DONE이다. 이를 이번 native H/He history가 이미 BASS에 수신됐다는 뜻으로 사용하지 마라. N3의 paired Bianchi와 continuum/observational admission은 아직 HOLD다.
+실제 object ID·SHA·업로드 상태는 `recovery/C07R*_BACKUP_RECEIPT.json`과 최신 publication receipt를 읽어라. 새 raw 실행은 C07R1에 먼저 이중백업했다: archive SHA-256 `5e3a694338c5c7d9c62661ad302d9b107401b9018cf21e012e273f4fb2ec93ee`, 620,910 bytes, Drive `1m60Z8BwtqxUNq7bHucybAueLmAQa7yG1`, Dropbox `id:BSpOijBcT10AAAAAAD35_w`. 최종 문서·판정·DAG는 이후 C07R2 receipt를 따른다. 정상 복구·게시 때 필요한 identity 확인만 하고 불필요한 반복 다운로드를 하지 마라. `UPLOAD_VERIFIED`와 `RESTORE_VERIFIED`는 별개다.
 
-EVENT_COUPLED003은 energy256×angle2, r=0, rtol1e-11이며 새 spectral 비교와 all-accepted gas diagnostics를 위한 계산이다. 결과를 먼저 판독하라.
+먼저 현재 checkout, 파일, 실행 중인 process, source/binary/input hashes를 확인하라. 이전 local-only EVENT003와 ce40 commit은 scratch 정리로 유실되어 채택하지 않았다. 지금의 authoritative 새 raw는 `n2/evidence/EVENT_COUPLED003_RECOVERED/`다. 대화 요약의 수치를 파일 존재나 검증 완료의 근거로 쓰지 마라. 캠페인 이름 20261011은 한국 날짜이며 실제 복구 timestamp는 UTC를 사용한다.
 
-1. **003 결과가 완성되어 기준을 통과했다면**: 저장된 002/003의 공통 epoch에서 field-wise spectral 차이와 actual accepted gas/finiteness/fraction/EOS 진단을 기록하라. residual gate는 segment endpoint와 공통 output epoch의 최대값을 모두 포함한다. 독립 decision이 이미 있으면 같은 결과를 다시 감사하지 말고 그 scope를 재사용하라. 이후 r=.05 Bianchi 장기 paired run으로 진행한다.
-2. **003이 spectral 또는 conservation/domain 기준을 실패했다면**: 첫 실패와 source/code identity를 보존하고 어떤 field·energy threshold·source knot가 지배하는지 저장된 자료로 먼저 분류하라. 필요한 수치 수정이나 spectral refinement를 같은 z15.9→4 전체 구간에 적용한다. 허용 기준을 완화하거나 인접한 좁은 redshift interval 검사로 연구 목표를 바꾸지 마라. unchanged failure를 그대로 재실행하지 않는다.
-3. **003이 미완료라면**: 실제 process가 살아 있는지 먼저 확인하고 중복 run을 띄우지 마라. process가 종료됐는데 최종 결과가 없으면 interruption/runtime failure로 정확히 분류한다. `RESTART.npz`는 state checkpoint지만 현재 event driver에 `--resume` CLI는 없다. 이를 곧바로 solver 재개 가능한 파일이라고 주장하지 마라. 복구 CLI를 실제 구현·검증하지 않는 한 새로운 campaign 실행은 처음부터 시작한다. 기존 NPZ는 원인 분석·provenance 보존 자료다.
+ZIP 해제기가 Unix 실행 권한을 복구하지 않았다면, native SHA-256 `3e3a3ef4d89019d791f4e2f4cf25108ac2c6d5e365c58a928d9ff8a85234a0ac`를 확인한 뒤 `chmod u+x research/accel02_20261011/n1/native/target/release/rei_n1_native`를 적용하라. 확인된 바이너리를 자동 재빌드하지 마라.
 
-보호할 budget은 time field `2e-6`, initial-energy-normalized energy residual `1e-9`, initial-nH-normalized photon-number residual `1e-9`, N2의 empirical spectral/angular field target `1e-3`, geometry identity `1e-11`이다. nonzero field는 공통 epoch의 차이를 해당 field의 전체 history amplitude로 정상화하고 zero channel은 exact zero를 유지한다. accumulated-budget energy residual은 보조 진단이며 initial-energy target의 대체 기준이 아니다. 새 Bianchi case에는 해당 case의 temporal·spectral·angular 수치 근거가 필요하며 FLRW PASS를 자동 복사하지 않는다.
+## 필수 읽기와 확정 상태
 
-다음 최소 과학 비교는 **동일 물리 계약의 FLRW와 r=s_i/H_i=.05 전체 z15.9→4**다. 새 source나 CR을 먼저 만들 필요는 없다. HM12 source·conditional initial gas·원자율·Case-A escape·CMB bath를 유지하고, Bianchi characteristic의 late 50keV source까지 q coverage를 잡아라. actual anisotropic angular refinement는 최소 angle4/8 비교에서 시작하며 spectral/time budget도 그 case에서 판단한다. 다음 명령은 003 통과 및 source/build identity 확인 뒤 사용할 최초 candidate 예시다. output 경로는 새 이름으로 만들고 기존 실행을 덮어쓰지 마라.
+`research/accel02_20261011/`에서 다음을 읽어라.
 
-```bash
-repo_path=$(git rev-parse --show-toplevel)
-python3 "$repo_path/research/accel02_20261011/n2/run_event_coupled.py" \
-  --base-driver "$repo_path/research/accel02_20261011/integration/run_native_history.py" \
-  --n1 "$repo_path/research/accel02_20261011/n1" \
-  --output "$repo_path/research/accel02_20261011/n2/evidence/EVENT_BIANCHI_R005_E256_A4_NEW" \
-  --energy 256 --angle 4 --shear 0.05 --rtol 1e-11 --max-step 0.00390625
-```
+1. `NEXT_DAG.json`, `REPORT_KO.md`, `integration/CONTRACT.json`, `n1/CONTRACT.json`, `n2/CONTRACT.md`.
+2. `review/recovery/SPECTRAL_DECISION.json`, `SPECTRAL_REVIEW_KO.md`, `SAVED_ARITHMETIC.json`.
+3. `n2/evidence/EVENT_SPECTRAL_COMPARISON_RECOVERED.json`, `n2/SPECTRAL_RECOVERY_REPORT_KO.md`, `n2/evidence/SPECTRAL_BAND_LOCALIZATION_RECOVERED.json`.
+4. `recovery/QUADRATURE_NEXT_STEP.md/.json`, `recovery/Q0_SOURCE_ATTRIBUTION.md/.json` 및 Q0의 제한된 독립 검토. Q0 계산은 완료됐으므로 같은 후처리를 반복하지 않고 실제 결과를 재사용하라.
 
-공통 **mean-volume redshift**에서 `Delta x_HII`, `Delta x_HeII`, `Delta x_HeIII`, `Delta T`, `Delta Gamma_a`, photon number/energy와 명시적으로 export한 경우 photon quadrupole을 비교하라. 효과가 discretization error보다 작으면 검출이 아니라 해상도 한계 또는 bound로 보고한다. homogeneous ionic fraction과 reduced filling factor Q를 같은 변수로 취급하지 마라. source-only frozen-bath diagnostic을 full coupled history로 승격하지 마라.
+N1은 actual source/cold Case-A provider 연결의 scoped DONE이다. N2_TIME은 기존 128×2 EVENT001/002 시간 비교의 scoped DONE이며, 최대 field 차이 1.4231727742e-8이 기준 2e-6을 통과했다. 기존 EVENT002 energy/number residual은 5.2481356770e-11과 5.0103782457e-10이다. EVENT002의 all-accepted gas domain은 원 실행에서 측정하지 않았으므로 **NOT_EXPLICITLY_MEASURED**로 유지한다.
 
-새 history가 수용되면 별도 후속 N4_NATIVE_CELLS로 실제 `ne(t)`를 BASS에 연결한다. 각 proper-time cell의 `ne_eff=(integral ne dt)/Delta t`를 producer의 실제 quadrature와 함께 export하고 새 run/hash·cosmology·closure·time/density units·frame identity를 담아라. snapshot/old reduced schema와 구분한 뒤 기존 native fixed-time optical-depth/visibility primitive로 한 번 수신한다. 같은 proper-time 경계의 segment tau만 주장하라. observer tail과 실제 null-covector endpoint inversion 없이 total CMB tau 또는 fixed-observed-z 방향별 tau라고 부르지 마라.
+복구된 EVENT003은 **256×2, r=0, rtol=1e-11**의 실제 전구간 실행이다. 629.20 s에 218 segment를 완료했다. segment endpoint와 저장129 epoch를 합친 energy/initial-energy 최대값은 **6.6493278602e-11**, number/initial-nH 최대값은 **5.5014857431e-10**이다. accepted gas·finite·photon positivity 직접 검사가 통과했고 독립 reviewer가 그 범위만 승격했다. 이는 256-grid의 별도 same-grid 시간 수렴이나 연속 모든 시각의 bound가 아니다.
 
-선택한 과학 범위는 primary-only, Case-A escaped radiation, 물리 band10–50000eV, prescribed isotropic `T_CMB=2.7255(1+z)` bath다. 초기 `T=20K`, `xHII=2e-4`, neutral He는 conditional IC이며 HyRec 출력이 아니다. 50keV 위 원 HM12 source energy 누락이 z4에서7.668%인 점, 이를 HeII/heating error와 동일시할 수 없다는 점, 실제 Bianchi CMB anisotropy·diffuse 재흡수·backreaction·CR·RCT가 포함되지 않은 점을 유지한다. 원래 CR/RCT/HH 원자물리 lane과 그 blocker는 별도 보존하라.
+**Spectral은 FAIL이다.** 128→256의 최대 scaled 차이는 ΓHeI의 **0.1401807633**, 고정 기준은 **0.001**이다. 65와129 epoch 검사 모두 24개 field/moment 중23개가 실패했다. 129 epoch에서 ΓHI≈0.1269181, ΓHeII≈0.0631533, T≈0.00413458, source number/reference volume≈0.1150456, source energy/reference volume≈0.08630366, total proper photoheat≈0.01632884다. 각 표본 집합의 fine 최대 진폭으로 각각 정상화한다. 원 N2 frozen-bath 계약의65 epoch/number1e-10과 native integration의129 output epoch/number1e-9을 섞지 마라.
 
-각 실제 run 완료·첫 실패·수정·decision 시 exact source/binary/input identity, as-run code, 결과·원 로그·checkpoint NPZ·criteria·comparison·review·DAG를 durable checkpoint로 남겨라. additive GitHub publication과 기존 Drive/Dropbox 백업 권한은 유지한다. 기존 owner branch를 force-push하거나 merge하지 않는다. 정상 게시 후 immutable remote identity와 provider ACK/size가 충분하면 같은 자료를 반복 내려받아 hash하는 루프를 만들지 않는다. UPLOAD_VERIFIED와 RESTORE_VERIFIED를 구분한다.
+BASS N4는 PR140에서 **옛 ACCEL01 reduced FLRW/r=.1 cell 두 개**를 수신한 scoped DONE이다. 새 native H/He history의 BASS 수신은 아직 실행하지 않았다. N2 전체 완료, N3 비등방 signal, continuum/observational admission도 아직 HOLD다.
 
-이 후속 작업은 필요한 실제 장기 계산과 그 판별을 수행하는 작업이다. 새 blocker를 해결하지 않는 광범위한 문헌 재탐색·변함없는 certificate 재검사·좁은 interval 반복은 하지 마라.
+## 지금 수행할 연구 루프
+
+Q0 source/IC 원인 분해는 완료됐다. 선언된 HM12 interpolation의 exact moment 대비 source reference-volume N 오차는 128에서10.31555%, 256에서5.08064%, E 오차는7.89482%와3.96376%다. 초기 UVB full-band photon number signed error는+0.08133%와+17.32147%로 비단조적이며, HI-ionizing N은−4.88387%/−0.35907%, HeI-ionizing N은−9.61879%/−2.62002%다. 256-grid 초기 full-N의 +17.32147% 차이는 독립 band 분해에서 거의 전부 sub-HI10–13.6 eV로 확인됐다. 이를17.3% ionizing-photon 또는 heating 오차로 바꾸어 쓰지 마라. 이 source-only 오차는 gas feedback 없이 직접 측정됐지만 evolved Γ/heat 오차 전체를 설명하지 않는다. Q0의 exact-reference 정상화는 공식 fine-grid spectral 정상화나 새로운 gate가 아니다. Q0는 `review/recovery/Q0_DECISION.json`에서 `ACCEPT_SOURCE_AND_INITIAL_FIELD_QUADRATURE_ATTRIBUTION_ONLY`로 승인됐다. 이 decision SHA-256은 `962c9979e759746e0145b23429312ec443e74e74eabbe8924949ba1d28e1511b`다. 검토는 초기8개 moment와4개 source epoch/32개 moment의 독립 적분이며129epoch 전체의 재적분은 아니다. **다음 action은 Q1A 후보 선택·구현**이다. 현재 에너지대역 합에서는 ΓHI의 차이가13.6–24.59 eV, ΓHeI는24.59–54.42 eV, source number는10–13.6 eV에서 주로 나타났다. 이는 fixed log-q midpoint quadrature와 움직이는 threshold/source knot가 관련된다는 가설을 지지하지만 유일한 원인을 증명하지 않는다. 원 HM12 table의 interpolation identity를 고정한 moment와 as-run 합은 Q0 자료에 있으므로 재계산하지 않고 후보 설계에 사용하라.
+
+최소 변경 후보 **Q1A**는 고정 q와 양의 고정 weights를 유지하는 composite Gauss다. 초기 UVB jump 및 source/threshold trajectory를 참고해 사전 knots를 선택하고 bounded node budget을 정하라. 현재 native RHS·counter·Jacobian의 동일 source/absorption/heat pairing을 그대로 사용한다. 이 방법이 매시각 threshold에 정확히 정렬된다고 주장하지 마라. 성능과 정확도 개선은 실제 새 전구간 비교 전에는 미확정이다.
+
+**Q1B**는 Q1A가 부족하거나 비경제적이라는 근거가 생겼을 때의 별도 대안이다. 고정 q-cell의 N과 Q=∫q dN, 양의 realizable reconstruction, native σ를 사용한 공통 source/absorption/heat moments를 사용하며 새 numerical closure와 Jacobian 검증이 필요하다. 현재 U_i=E_iN_i packet 식에 움직이는 q/weight만 대입하면 remap/weight-derivative 항이 빠지므로 금지한다. 한 packet에 모순되는 정확 source number와energy moments를 동시에 강제하지 마라. Γ/heat 사후 보정이나 ledger counter만 수정하는 방법도 금지한다.
+
+선택한 한 후보를 구현한 뒤 **동일 z15.9→4 전체 구간**의 candidate/enriched pair를 수행하라. 새로운 discretization에서 필요한 same-grid 시간 evidence, 물리 domain, source·radiation·ionization·heat 및 gas field spectral 차이, number/energy ledger를 확인한다. 기준은 time2e-6, initial-energy ledger1e-9, initial-nH number ledger1e-9, geometry1e-11, empirical spectral/angular1e-3이다. zero channel은 exact zero를 유지한다. 누적 source로 정상화한 보조 energy metric으로 initial-energy 기준을 바꾸지 마라.
+
+독립 판정 뒤 spectral 기준을 통과하면 r=0과r=0.05의 장기 paired run, 최소4/8 angle refinement로 진행한다. 그 case의 time/spectral/angle 근거를 확인하고 공통 mean-z에서 ΔxHII, ΔxHeII, ΔxHeIII, ΔT, ΔΓ 등을 수치오차와 비교하라. 오차보다 작은 신호를 검출로 부르지 마라. 고에너지 tail 확대, 무제한512→1024→4096 doubling, 좁은 redshift 반복 검사를 기본 경로로 삼지 마라.
+
+## 병렬 작업과 BASS 연결
+
+동시에 진행할 수 있는 것은 실제 checkpoint-resume CLI, source/serialization profiling, 새 native BASS schema다. 완료된 Q0는 재사용하고 새로운 profiling에만 소유자를 한 명 배정하라. 현재 `RESTART.npz`는 state evidence이고 `--resume`은 구현되지 않았다. resume 기능은 source/binary/grid/정상화/active-event/accepted-segment state identity를 검증하도록 실제 구현해야 한다. bare NPZ만으로 적분이 이어진다고 주장하지 않는다.
+
+새 history가 수용되면 proper-time cell의 ne_eff=(∫ne dt)/Δt를 producer의 실제 quadrature와 함께 export하고 새 run/hash·cosmology·closure·units·frame을 BASS native receiver에 연결하라. 원래 reduced cell을 재명명하지 않는다. 실제 null-covector endpoint inversion이나 observer tail 없이 total CMB τ 또는 fixed-observed-z 방향별 visibility를 주장하지 마라.
+
+## 유지할 물리와 저장 규칙
+
+초기 T20 K, xHII2e-4, neutral He는 conditional IC다. pinned HM12 초기 UVB와 evolving emissivity, physical band10–50000 eV, primary-only Case-A escape, Grackle RR/CI/DR/CE/ff, prescribed isotropic T_CMB=2.7255(1+z)를 유지한다. 50 keV 위 원 source energy 누락이 z4에서7.668%라는 한계는 그대로 기록하되 이를 gas-heating/HeII 오차와 동일시하지 않는다. CR/RCT/secondary·diffuse recombination·backreaction·완전한 anisotropic CMB 물리를 포함한 것으로 승격하지 않는다. 원래 CR/RCT/HH 확장 lane은 보존한다.
+
+실제 run 완료·첫 실패 즉시 raw와 as-run source를 새 이름으로 durable checkpoint하라. 그 뒤 독립 판정·보고서·DAG를 다음 단계로 저장한다. additive GitHub push/PR 및 기존 Drive+Dropbox 백업 권한을 사용하되 owner branch force update나 merge는 하지 않는다. 두 provider의 실제 ACK와 가능한 size/hash/object ID가 있어야 이중백업 완료라 기록한다. 다음 세션으로 넘어갈 때는 정확한 마지막 checkpoint와 다음 한 action을 제공하라. 이미 완료된 검산, 변하지 않은 blocker audit, 목적 없는 문헌 재탐색으로 이 작업을 대체하지 마라.

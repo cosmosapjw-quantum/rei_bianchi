@@ -1,8 +1,8 @@
 {
-  "schema": "rei_accel02_next_dag_v1",
+  "schema": "rei_accel02_next_dag_v2",
   "campaign_id": "REI_ACCEL02_20261011",
   "execution_utc_date": "2026-10-10",
-  "draft_status": "ROOT_MUST_AMEND_EVENT003_AFTER_ACTUAL_RESULT",
+  "draft_status": "ACTUAL_RECOVERED003_SPECTRAL_FAIL",
   "authority": "Current user resume instruction plus unchanged ACCEL02 contracts and independent phase2 quantitative decision",
   "completed_do_not_replay": [
     "REI-ACCEL01 RUN001/RUN002 reduced20to4",
@@ -10,15 +10,6 @@
     "N4unchangedoldreducedcelladoption",
     "EVENT001/002samegridtimecomparison"
   ],
-  "current_decision": {
-    "review_file": "review/phase2/QUANTITATIVE_DECISION.json",
-    "sha256": "b64f2bf70df1e2ed760c3940951bd6b48941be76fca784a95e4f9bd70d6de0a3",
-    "decision": "PROMOTE_SCOPED_FIXED_GRID_TEMPORAL_REFINEMENT_AND_CONSERVATION",
-    "energy_initial_scale_max": 5.2481356770047917e-11,
-    "number_initial_NH_max": 5.010378245671749e-10,
-    "time_field_scaled_max": 1.4231727742082953e-08,
-    "all_accepted_gas_EVENT002": "NOT_EXPLICITLY_MEASURED_IN_ORIGINAL_RUN"
-  },
   "frozen_acceptance": {
     "whole_mean_redshift": [
       15.9,
@@ -29,12 +20,17 @@
     "number_residual_initial_nH_scale": 1e-09,
     "spectral_angular_field_scaled": 0.001,
     "spectral_angular_source": "n2/CONTRACT.md; empirical target, not certified continuum bound",
-    "comparison_normalization": "shared epochs; max absolute difference / max whole-history amplitude of each nonzero field; exactzero channels remainzero",
+    "comparison_normalization": "For each selected set separately: max abs(coarse-fine)/max abs(fine) over the same shared epochs; zero amplitude requires exact zero difference. Report 65 and 129 independently.",
     "residual_epoch_coverage": "combine every reported segment endpoint and all common output epochs",
     "sampled_and_accepted_photon_positivity": "strict >=0; no clipping",
     "gas_admission": "physicalfractiondomain and EOS1..1e6K; allaccepted state claim onlyifactualmeasurement exists",
     "geometry_identity": 1e-11,
-    "no_replacement": "budget-scaledenergy residual is diagnostic only; cannot replace fixedinitialenergytarget"
+    "no_replacement": "budget-scaledenergy residual is diagnostic only; cannot replace fixedinitialenergytarget",
+    "contract_split": {
+      "native_integration": "129 output epochs plus segment endpoints, number ledger 1e-9",
+      "original_frozen_bath": "65 output epochs, number ledger 1e-10; source/radiation/Gamma/heat spectral target 1e-3",
+      "no_scope_transfer": "Native moment profiling tracks original concerns but does not rerun or replace old frozen-bath acceptance."
+    }
   },
   "physics_lock": {
     "metric": "(-,+,+,+)",
@@ -77,46 +73,131 @@
     },
     {
       "id": "N2_SPECTRAL003",
-      "state": "RUNNING_RESULT_PENDING_AT_DRAFT",
+      "state": "COMPLETED_DIAGNOSTIC_FAIL",
       "depends": [
         "N2_TIME"
       ],
-      "input": "EVENT_COUPLED003 energy256 angle2 r0 rtol1e-11",
-      "action": "Read actual RESULT/IDENTITY/progress and compare savedEVENT002/003 commonepochs; no solverreplay merely toextractmetrics",
-      "if_pass": "Storeunchangedcriteriacomparisonandindependentscopeddecision; unlockBianchiangularpair",
-      "if_fail": "Preservewhichfieldsfail; identifythresholdquadrature/sourceknot resolution; repair/discretizationrefine full15.9to4 under samebudgets; no narrowzdefault",
-      "if_incomplete": "Checkactualprocess; iffinishedwithoutRESULT classifyinterruption andpreservecheckpoint; nounsupportedautomaticNPZresume"
+      "input": "Published EVENT002 128x2 and recovered EVENT003 256x2, same r0/rtol1e-11/physics",
+      "evidence": [
+        "n2/evidence/EVENT_COUPLED003_RECOVERED/RESULT.json",
+        "n2/evidence/EVENT_SPECTRAL_COMPARISON_RECOVERED.json",
+        "review/recovery/SPECTRAL_DECISION.json"
+      ],
+      "action": "Reuse actual failure and proceed to Q0 source/IC profiling; no unchanged solver replay",
+      "blocks": [
+        "N3_BIANCHI_PAIR"
+      ],
+      "claim": "Empirical grid comparison, not exact continuum error"
     },
     {
       "id": "N2_ACCEPTED_GAS",
-      "state": "MEASURED_IN003_PENDING_RESULT",
+      "state": "DONE_SCOPED_RECOVERED003",
       "depends": [
         "N2_SPECTRAL003"
       ],
-      "action": "Read allacceptedgas/finiteness/fraction/EOSdiagnostics addedin003; do not retroactivelylabel002 allacceptedPASS",
-      "if_fail": "Preserve offendingacceptedstate andbounds; repairnumericaladmissibility withoutstateclipping"
+      "evidence": "n2/evidence/EVENT_COUPLED003_RECOVERED/RESULT.json",
+      "claim": "All accepted states checked in recovered003 only; original002 all-accepted gas remains NOT_EXPLICITLY_MEASURED"
     },
     {
       "id": "N2",
-      "state": "PARTIAL_SPECTRAL_ANGULAR_PENDING",
+      "state": "PARTIAL_SPECTRAL_FAIL_ANGULAR_PENDING",
       "depends": [
         "N2_TIME",
-        "N2_SPECTRAL003",
-        "N2_ACCEPTED_GAS"
+        "N2_ACCEPTED_GAS",
+        "Q2_FULL_INTERVAL"
       ],
       "blocks": [
         "N3"
       ],
-      "claim": "continuouscovectors andeventchronology implemented; fullpaired finiteintervalspectral/angle acceptancepending"
+      "claim": "Provider/chronology implemented and whole interval executed; spectral acceptance remains open"
+    },
+    {
+      "id": "Q0_SOURCE_PROFILE",
+      "state": "DONE_SCOPED_SOURCE_IC_ATTRIBUTION",
+      "depends": [
+        "N2_SPECTRAL003"
+      ],
+      "dependency_semantics": "completed measurement, including FAIL, unlocks diagnosis",
+      "action": "Read completed actual Q0 and bounded independent check; no source-attribution replay. Use initial UVB jumps and source/threshold trajectory data in Q1A.",
+      "design": "recovery/QUADRATURE_NEXT_STEP.md",
+      "root_cause_status": "SOURCE_ONLY_AND_INITIAL_FIELD_QUADRATURE_ERROR_MEASURED; EVOLVED_ERROR_PARTITION_UNRESOLVED",
+      "outputs": [
+        "source/IC moment error decomposition",
+        "bounded immutable node design proposal"
+      ],
+      "evidence": [
+        "recovery/Q0_SOURCE_ATTRIBUTION.json",
+        "recovery/Q0_SOURCE_ATTRIBUTION.md",
+        "review/recovery/Q0_DECISION.json"
+      ]
+    },
+    {
+      "id": "Q1A_FIXED_Q_GAUSS",
+      "state": "NEXT_READY",
+      "depends": [
+        "Q0_SOURCE_PROFILE"
+      ],
+      "action": "Select a bounded fixed-q composite Gauss rule with fixed positive weights and predetermined initial-UVB/source/threshold-trajectory knots. Keep actual native RHS, shared source/absorption/heat/counter pairing and Jacobian.",
+      "claim_limit": "Not exact moving-threshold alignment; superiority untested until actual comparison",
+      "prohibited": [
+        "moving q or weights without remap/weight derivatives",
+        "postprocessed Gamma/heat corrections only",
+        "counter-only correction",
+        "source replacement or smoothing",
+        "unbounded uniform grid doubling"
+      ],
+      "next_action": "Select and implement one bounded fixed-q composite-Gauss candidate using completed Q0 and design memo; no unchanged Q0 replay."
+    },
+    {
+      "id": "Q1B_FIXED_CELL_TWO_MOMENT",
+      "state": "ALTERNATIVE_NOT_AUTOMATIC",
+      "depends": [
+        "Q0_SOURCE_PROFILE"
+      ],
+      "action": "If Q1A is inadequate, explicitly select fixed-q cells with N and Q=integral q dN, positive realizable reconstruction and common source/absorption/heat moments. This requires a new numerical closure and Jacobian validation.",
+      "selection": "Choose one implementation route per bounded trial; do not run both automatically"
+    },
+    {
+      "id": "Q2_FULL_INTERVAL",
+      "state": "WAIT_SELECTED_REPAIR",
+      "depends_any": [
+        "Q1A_FIXED_Q_GAUSS",
+        "Q1B_FIXED_CELL_TWO_MOMENT"
+      ],
+      "action": "Run one chosen candidate/enriched pair over the full z15.9to4 interval under unchanged physics. Establish new-discretization temporal/domain/conservation evidence and compare source/radiation/Gamma/heat plus native fields.",
+      "acceptance": "Frozen native time2e-6, energy_initial1e-9, number_nH1e-9 and empirical spectral1e-3; report sample sets separately; independent review required",
+      "if_fail": "Preserve first failure and localize changed error contribution; do not repeat unchanged campaigns or relax criteria"
+    },
+    {
+      "id": "P1_RESUME_CLI",
+      "state": "PARALLEL_READY",
+      "depends": [],
+      "action": "Implement actual checkpoint-resume CLI with source/binary/grid/normalization/active-event identity and accepted segment-state validation. Verify restart semantics as a new software capability.",
+      "existing_state": "RESTART.npz exists; no supported resume CLI or continuous integrator restore currently"
+    },
+    {
+      "id": "P2_SOURCE_PROFILE",
+      "state": "Q0_COMPLETED_FURTHER_PROFILING_OPTIONAL",
+      "depends": [],
+      "action": "Reuse Q0; only new source/serialization profiling to choose or accelerate Q1A is parallel-ready.",
+      "same_work_as": "Q0_SOURCE_PROFILE; assign a single owner to avoid duplicate work"
+    },
+    {
+      "id": "P3_BASS_NATIVE_SCHEMA",
+      "state": "PARALLEL_READY_SCHEMA_ONLY",
+      "depends": [
+        "N4"
+      ],
+      "action": "Prepare new native-run source/closure/cosmology/frame/units identity and proper-time ne_eff=(integral ne dt)/Delta t producer-quadrature schema. Do not relabel old reduced cells or claim native receiver execution.",
+      "scientific_binding_requires": "accepted new native history and actual receiver call"
     },
     {
       "id": "N3_BIANCHI_PAIR",
-      "state": "HOLD_UNTIL003_ACCEPTANCE",
+      "state": "HOLD_UNTIL_Q2_ACCEPTANCE",
       "depends": [
-        "N2_SPECTRAL003",
-        "N2_ACCEPTED_GAS"
+        "Q2_FULL_INTERVAL"
       ],
-      "action": "Smallestnewscience: r0vsr.05 whole15.9to4 withsamephysicsandcommonmean-zoutputs; selectatleast4angles andcompare8 foranisotropicangularrefinement; verifyenergy/spectralresolutionatthatanisotropiccase",
+      "action": "After admitted repaired FLRW discretization, run r=.05 whole15.9to4 with same source/physics; compare angular4/8 and establish case-specific temporal/spectral evidence. Compare physical delta against numerical errors.",
       "observables": [
         "xHII",
         "xHeII",
@@ -139,22 +220,24 @@
       "repo": "bass",
       "pr": 140,
       "url": "https://github.com/cosmosapjw-quantum/bass/pull/140",
-      "claim": "nativeproper-time tau/visibilityreceiver adoptsoldACCEL01FLRWandr.1reducedcells; notnewnativeHHehistory"
+      "claim": "nativeproper-time tau/visibilityreceiver adoptsoldACCEL01FLRWandr.1reducedcells; notnewnativeHHehistory",
+      "latest_known_commit": "1b856bff408a6eb86c6ad6ba8b5ee75dac17c436",
+      "new_native_history_received": false
     },
     {
       "id": "N4_NATIVE_CELLS",
-      "state": "WAIT_NATIVE_SOURCE_HISTORY_ACCEPTANCE",
+      "state": "WAIT_ACCEPTED_NEW_NATIVE_HISTORY",
       "depends": [
         "N3_BIANCHI_PAIR",
-        "N4"
+        "N4",
+        "P3_BASS_NATIVE_SCHEMA"
       ],
-      "parallel_ready_action": "Inspect/preserveadapter schema andplanexactnewsource binding; no relabelingoldcells",
       "action": "Exportactualacceptednewnativehistoryproper-time cells with ne_eff=(integralne dt)/deltat andnativeproducerquadratureidentity; bindrun/source/closure/cosmology/units/frame toBASSreceiver; callnativefixed_time_optical_depth andvisibility once",
       "acceptance": "nativeintegralparity under pinnedreceiverbudget; actualproper-time integrationweights; no observer-tail or fixedobservedzclaim"
     },
     {
       "id": "N3",
-      "state": "HOLD_NATIVE_PAIRED_AND_CONTINUUM_ACCEPTANCE",
+      "state": "HOLD_NATIVE_PAIRED_NUMERICAL_ACCEPTANCE",
       "depends": [
         "N2",
         "N3_BIANCHI_PAIR"
@@ -188,7 +271,13 @@
     ],
     "durability": "additivegitpublication+Drive/Dropbox receipts; do notoverwriteearlierfailurearchives",
     "restart_truth": "RESTART.npz storesstate butcurrentrun_event_coupled.py has noresumeCLI. Do notclaimcontinuousintegratorrestore. Newrootlaunch restartswholecampaignunlessareviewedresumeimplementation isadded.",
-    "selective_readback": "metadataandimmutableidentities sufficientnormally; UPLOAD_VERIFIED != RESTORE_VERIFIED"
+    "selective_readback": "metadataandimmutableidentities sufficientnormally; UPLOAD_VERIFIED != RESTORE_VERIFIED",
+    "stages": [
+      "C07R0 recovery inventory",
+      "C07R1 actual new raw outputs",
+      "C07R2 final independent decision, report, DAG and figures"
+    ],
+    "archive_dependency": "C07R2 is a full research-directory/native-binary overlay on the published Git repository, not a standalone repository bundle"
   },
   "stop_rules": [
     "NoRUN002replay",
@@ -196,7 +285,82 @@
     "No repeatedadjacentnarrowzprobes withoutnewglobalfailure localization",
     "Nocriteriarelaxation,fallbackornegativeclipping",
     "No allacceptedgasclaimfor002",
-    "No continuum/CR/RCT/observeradmission fromscope-limitedPASS"
+    "No continuum/CR/RCT/observeradmission fromscope-limitedPASS",
+    "No promotion of256samegridtime from128timePASS",
+    "No dynamicq/weight substitution into fixedpacket RHS without conservation terms",
+    "No treating sourcequadrature hypothesis as established root cause",
+    "No ninefield plot in place of full source/radiation/heat comparison"
   ],
-  "date_note": "Campaign directory preserves historical20261011 identifier; actual executionUTC receipts20261010"
+  "date_note": "Campaign directory preserves historical20261011 identifier; actual executionUTC receipts20261010",
+  "updated_utc": "2026-10-10T22:41:56.434626+00:00",
+  "classification": "RUNTIME_INTERRUPTION_RECOVERY",
+  "recovery": {
+    "published_base_commit": "304afc3592ae60242e3bb72efc56d806519b4a60",
+    "C06_sha256": "c76771b2ce05ff13d9baea2e812f0635a8ba218dc25be27e55fc16127986f560",
+    "native_binary_sha256": "3e3a3ef4d89019d791f4e2f4cf25108ac2c6d5e365c58a928d9ff8a85234a0ac",
+    "new_execution": "EVENT_COUPLED003_RECOVERED only; original 003 raw missing after scratch pruning",
+    "excluded_evidence": [
+      "lost local-only 003 raw",
+      "lost local ce40 commit",
+      "transcript-only spectral conclusions"
+    ],
+    "final_archive": "C07R2: full research tree plus native binary overlay; published Git repository remains required",
+    "inventory": "recovery/RECOVERY_INVENTORY.json",
+    "receipts_glob": "recovery/C07R*_BACKUP_RECEIPT.json",
+    "final_archive_extra_source_pins": [
+      "research/physical_provider_20261010/background.py",
+      "research/physical_provider_20261010/hm12_data.py",
+      "research/physical_provider_20261010/sources/emissivity.out",
+      "research/physical_provider_20261010/sources/UVB.out"
+    ]
+  },
+  "preserved_temporal_decision": {
+    "review_file": "review/phase2/QUANTITATIVE_DECISION.json",
+    "sha256": "b64f2bf70df1e2ed760c3940951bd6b48941be76fca784a95e4f9bd70d6de0a3",
+    "decision": "PROMOTE_SCOPED_FIXED_GRID_TEMPORAL_REFINEMENT_AND_CONSERVATION",
+    "energy_initial_scale_max": 5.2481356770047917e-11,
+    "number_initial_NH_max": 5.010378245671749e-10,
+    "time_field_scaled_max": 1.4231727742082953e-08,
+    "all_accepted_gas_EVENT002": "NOT_EXPLICITLY_MEASURED_IN_ORIGINAL_RUN"
+  },
+  "current_decision": {
+    "status": "SPECTRAL_REFINEMENT_FAIL",
+    "review_file": "review/recovery/SPECTRAL_DECISION.json",
+    "comparison_file": "n2/evidence/EVENT_SPECTRAL_COMPARISON_RECOVERED.json",
+    "comparison_sha256": "4bd30ab3e0883365081f3b75e1564cf469b39d09385c4730ccbc227bc1186ccf",
+    "maximum_scaled_field_error": 0.14018076328709536,
+    "worst_field": "GammaHeI_s",
+    "frozen_spectral_target": 0.001,
+    "energy_initial_scale_max": 6.649327860202209e-11,
+    "number_initial_nH_max": 5.501485743145466e-10,
+    "accepted_gas_domain_003": true,
+    "accepted_finite_003": true,
+    "accepted_photon_positive_003": true,
+    "all_accepted_gas_002": "NOT_EXPLICITLY_MEASURED",
+    "new256_same_grid_temporal_comparison": "NOT_PERFORMED",
+    "claim": "Actual conditional finite-grid FLRW evolution and empirical spectral failure; no continuum or new Bianchi signal admission",
+    "independent_decision": "PROMOTE_SCOPED_RECOVERED_RUN_CONSERVATION_AND_DOMAIN_HOLD_SPECTRAL_ADMISSION",
+    "review_sha256": "74b8f697b20b1fd315d3fcf3c7e9e447598ab79abf65df78a44500f019d10f7d",
+    "Q0": {
+      "status": "ACCEPTED_SCOPED_SOURCE_IC_ATTRIBUTION",
+      "file": "recovery/Q0_SOURCE_ATTRIBUTION.json",
+      "sha256": "91959c5e09073ae89afcfe14937e6bc2dc4478692143873471934f542fc1ad6d",
+      "source_ref_N_error_128": 0.10315549962796294,
+      "source_ref_N_error_256": 0.05080638877348272,
+      "source_ref_E_error_128": 0.07894820303818788,
+      "source_ref_E_error_256": 0.039637617480300806,
+      "source_only_error_established": true,
+      "complete_evolved_error_attribution": false,
+      "criterion_change": false,
+      "normalization": "Attribution only: max|sampled-exact_interpolation| / max|exact_interpolation| over129 epochs; does not replace formal fine-grid spectral normalization.",
+      "independent_decision": "ACCEPT_SOURCE_AND_INITIAL_FIELD_QUADRATURE_ATTRIBUTION_ONLY",
+      "review_file": "review/recovery/Q0_DECISION.json",
+      "review_sha256": "962c9979e759746e0145b23429312ec443e74e74eabbe8924949ba1d28e1511b",
+      "review_coverage": "8 initial moments and32 source moments at4 epochs; not all129 independently integrated",
+      "initial_256_fullN_signed_error": 0.17321471727885296,
+      "initial_256_subHI_contribution_over_exact_fullN": 0.17321502182599668,
+      "initial_number_claim_limit": "17.3% fullN difference is overwhelmingly subHI10..13.6eV; not17.3% ionizing or heating error"
+    }
+  },
+  "next_action": "Q1A_FIXED_Q_GAUSS: select and implement one bounded immutable quadrature candidate; Q0 is accepted and complete."
 }
