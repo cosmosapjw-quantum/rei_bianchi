@@ -1,0 +1,70 @@
+{
+  "schema": "rei_accel02_n1_native_v1",
+  "commands": {
+    "SIGMA": {
+      "input": "E_eV ...; each must be<=50000; below thresholds returns0",
+      "output": "sigmaHI,sigmaHeI,sigmaHeII cm2 per energy"
+    },
+    "RATES": {
+      "input": "T_K in1..1e6",
+      "output": [
+        "rr_HII",
+        "rr_HeII",
+        "rr_HeIII",
+        "ci_HI",
+        "ci_HeI",
+        "ci_HeII",
+        "dr_HeII",
+        "rrcool_HII",
+        "rrcool_HeII",
+        "rrcool_HeIII",
+        "drcool_HeII",
+        "freefree"
+      ]
+    },
+    "RHS": {
+      "input_prefix": [
+        "t_s",
+        "a_rel",
+        "b",
+        "H_s^-1",
+        "s_s^-1",
+        "nH_cm^-3",
+        "nHe_cm^-3",
+        "xHII",
+        "xHeII",
+        "xHeIII",
+        "w_eV/H",
+        "Tcmb_K",
+        "node_count"
+      ],
+      "input_node": [
+        "E_eV",
+        "mu",
+        "N_reference_cm^-3",
+        "S_reference_cm^-3_s^-1"
+      ],
+      "output_prefix": [
+        "dxHII/dt",
+        "dxHeII/dt",
+        "dxHeIII/dt",
+        "dw_eV_per_H_dt",
+        "escape_erg_cm^-3ref_s^-1",
+        "work_erg_cm^-3ref_s^-1",
+        "emissivity_erg_cm^-3ref_s^-1",
+        "absorbed_cm^-3ref_s^-1",
+        "GammaHI_s^-1",
+        "GammaHeI_s^-1",
+        "GammaHeII_s^-1",
+        "T_K",
+        "number_residual_scaled",
+        "energy_residual_scaled",
+        "cmb_to_gas_erg_cm^-3ref_s^-1"
+      ],
+      "output_tail": "dN_reference/dt per node (index15 onward)"
+    }
+  },
+  "energy_sign": "E+escape+work-emissivity-cmb_into_gas=E0",
+  "old_receiver_modified": false,
+  "claim": "conditionalpointprovider; nointegrator"
+}
