@@ -1,6 +1,6 @@
 use rei_microphysics::{
-    ft03_coefficients, CharacteristicRay, ConstantHubbleBackground, GeometryBackground,
-    GeometrySnapshot,
+    ft03_coefficients, AxisymmetricPoint, CharacteristicRay, ConstantAxisymmetricBackground,
+    ConstantHubbleBackground, GeometryBackground, GeometrySnapshot,
 };
 fn close(a: f64, b: f64) {
     assert!(a.is_finite() && b.is_finite());
@@ -181,4 +181,57 @@ fn domain_errors() {
     let g1 = GeometrySnapshot::new([1e100; 3], [0.0; 3]).unwrap();
     let ray = CharacteristicRay::new(1e-300, [1.0, 0.0, 0.0], 1.0).unwrap();
     assert!(ray.pullback(&g0, &g1).is_err());
+}
+
+#[test]
+fn axisymmetric_proper_time_background_and_exact_rays() {
+    let point = AxisymmetricPoint::new(2.0, 0.1, 0.02, 0.03).unwrap();
+    let snapshot = point.snapshot().unwrap();
+    close(snapshot.volume_factor().unwrap(), 8.0);
+    close(snapshot.hubble_per_s[0], -0.01);
+    close(snapshot.hubble_per_s[2], 0.08);
+
+    let background = ConstantAxisymmetricBackground::new(1.0, point, [0.0, 2.0]).unwrap();
+    let later = background.snapshot(2.0).unwrap();
+    close(later.volume_factor().unwrap(), 8.0 * 0.06_f64.exp());
+    let axis = CharacteristicRay::new(40.0, [0.0, 0.0, 1.0], 0.7).unwrap();
+    let equator = CharacteristicRay::new(40.0, [1.0, 0.0, 0.0], 0.7).unwrap();
+    close(
+        axis.pullback(&snapshot, &later).unwrap().energy_ev,
+        40.0 * (-0.08_f64).exp(),
+    );
+    close(
+        equator.pullback(&snapshot, &later).unwrap().energy_ev,
+        40.0 * 0.01_f64.exp(),
+    );
+    for ray in [axis, equator] {
+        let image = ray.pullback(&snapshot, &later).unwrap();
+        let jacobian = ray.solid_angle_jacobian(&snapshot, &later).unwrap();
+        close(
+            (image.energy_ev / ray.energy_ev).powi(3) * jacobian,
+            snapshot.volume_factor().unwrap() / later.volume_factor().unwrap(),
+        );
+        let restored = image.pullback(&later, &snapshot).unwrap();
+        close(restored.energy_ev, ray.energy_ev);
+        assert_eq!(restored.occupation, ray.occupation);
+    }
+}
+
+#[test]
+fn axisymmetric_flrw_limit_and_domain_errors() {
+    let point = AxisymmetricPoint::new(1.5, 0.0, 0.02, 0.0).unwrap();
+    let background = ConstantAxisymmetricBackground::new(0.0, point, [-1.0, 1.0]).unwrap();
+    let g = background.snapshot(0.5).unwrap();
+    for scale in g.scale_factors {
+        close(scale, 1.5 * 0.01_f64.exp());
+    }
+    assert!(AxisymmetricPoint::new(0.0, 0.0, 0.0, 0.0).is_err());
+    assert!(AxisymmetricPoint::new(1.0, f64::NAN, 0.0, 0.0).is_err());
+    assert!(ConstantAxisymmetricBackground::new(0.0, point, [1.0, -1.0]).is_err());
+    assert!(background.snapshot(2.0).is_err());
+    let mut mutated = background;
+    mutated.time_domain_s = [f64::NAN, f64::NAN];
+    assert!(mutated.snapshot(0.0).is_err());
+    let overflow = AxisymmetricPoint::new(1.0, -1000.0, 0.0, 0.0);
+    assert!(overflow.is_err());
 }

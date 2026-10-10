@@ -32,8 +32,8 @@ pub use atomic_provider::{
     RawRecord, RecombinationCase, SourceFrame, TemperatureDomain,
 };
 pub use bianchi_i::{
-    CharacteristicRay, ConstantHubbleBackground, GeometryBackground, GeometrySnapshot,
-    RayDerivative,
+    AxisymmetricPoint, CharacteristicRay, ConstantAxisymmetricBackground, ConstantHubbleBackground,
+    GeometryBackground, GeometrySnapshot, RayDerivative,
 };
 pub use ft03_controlled::{
     ft03_adaptive_step, ft03_implicit_step, ft03_rhs, ft03_try_step, Ft03Events, Ft03Model,
