@@ -2,13 +2,15 @@
   "schema": "rei_accel02_next_dag_v2",
   "campaign_id": "REI_ACCEL02_20261011",
   "execution_utc_date": "2026-10-10",
-  "draft_status": "ACTUAL_RECOVERED003_SPECTRAL_FAIL",
+  "draft_status": "Q1A_FULL_INTERVAL_IN_PROGRESS_KNOWN_SOURCE_PAIR_FAIL",
   "authority": "Current user resume instruction plus unchanged ACCEL02 contracts and independent phase2 quantitative decision",
   "completed_do_not_replay": [
     "REI-ACCEL01 RUN001/RUN002 reduced20to4",
     "N1unchangedproviderchecks",
     "N4unchangedoldreducedcelladoption",
-    "EVENT001/002samegridtimecomparison"
+    "EVENT001/002samegridtimecomparison",
+    "EVENT003_RECOVERED whole15.9to4 run andspectralcomparison",
+    "Q0_SOURCE_PROFILE andindependentreferencecheck"
   ],
   "frozen_acceptance": {
     "whole_mean_redshift": [
@@ -133,12 +135,12 @@
     },
     {
       "id": "Q1A_FIXED_Q_GAUSS",
-      "state": "NEXT_READY",
+      "state": "IMPLEMENTED_LOCAL_PASS_FULL_RUNS_ACTIVE_SOURCE_GATE_FAIL_BOUND",
       "depends": [
         "Q0_SOURCE_PROFILE"
       ],
       "action": "Select a bounded fixed-q composite Gauss rule with fixed positive weights and predetermined initial-UVB/source/threshold-trajectory knots. Keep actual native RHS, shared source/absorption/heat/counter pairing and Jacobian.",
-      "claim_limit": "Not exact moving-threshold alignment; superiority untested until actual comparison",
+      "claim_limit": "Formalsourcepair lowerbound0.032743>0.001; evolvedresponse stillbeingmeasured",
       "prohibited": [
         "moving q or weights without remap/weight derivatives",
         "postprocessed Gamma/heat corrections only",
@@ -146,25 +148,34 @@
         "source replacement or smoothing",
         "unbounded uniform grid doubling"
       ],
-      "next_action": "Select and implement one bounded fixed-q composite-Gauss candidate using completed Q0 and design memo; no unchanged Q0 replay."
+      "next_action": "Monitor existing GAUSS1_FINE,GAUSS2_FINE,GAUSS1_TIGHT; do not launch duplicates. Durable rawcheckpoint beforepostprocessing.",
+      "evidence": [
+        "q1a/CONTRACT.json",
+        "q1a/evidence/PREFLIGHT.json",
+        "q1a/review/SOURCE_PAIR_LOWER_BOUND.json"
+      ]
     },
     {
       "id": "Q1B_FIXED_CELL_TWO_MOMENT",
-      "state": "ALTERNATIVE_NOT_AUTOMATIC",
+      "state": "PROPOSAL_ALGEBRA_REVIEWED_NOT_IMPLEMENTED",
       "depends": [
         "Q0_SOURCE_PROFILE"
       ],
       "action": "If Q1A is inadequate, explicitly select fixed-q cells with N and Q=integral q dN, positive realizable reconstruction and common source/absorption/heat moments. This requires a new numerical closure and Jacobian validation.",
-      "selection": "Choose one implementation route per bounded trial; do not run both automatically"
+      "selection": "No automaticsecondODE. Freeze emptycell/realizability/nativeABI/Jacobiancontract andnewlocalgates first.",
+      "evidence": [
+        "q1a/NEXT_DESIGN.md",
+        "q1a/review/Q1B_PROPOSAL_REVIEW.json"
+      ]
     },
     {
       "id": "Q2_FULL_INTERVAL",
-      "state": "WAIT_SELECTED_REPAIR",
+      "state": "Q1A_THREE_NEW_RUNS_ACTIVE",
       "depends_any": [
         "Q1A_FIXED_Q_GAUSS",
         "Q1B_FIXED_CELL_TWO_MOMENT"
       ],
-      "action": "Run one chosen candidate/enriched pair over the full z15.9to4 interval under unchanged physics. Establish new-discretization temporal/domain/conservation evidence and compare source/radiation/Gamma/heat plus native fields.",
+      "action": "Complete existing wholeinterval newGauss pair andsamegrid timecomparison. Full24spectralFAIL alreadybounded fromsource; measureevolvedresponse andpreservefailure.",
       "acceptance": "Frozen native time2e-6, energy_initial1e-9, number_nH1e-9 and empirical spectral1e-3; report sample sets separately; independent review required",
       "if_fail": "Preserve first failure and localize changed error contribution; do not repeat unchanged campaigns or relax criteria"
     },
@@ -221,7 +232,7 @@
       "pr": 140,
       "url": "https://github.com/cosmosapjw-quantum/bass/pull/140",
       "claim": "nativeproper-time tau/visibilityreceiver adoptsoldACCEL01FLRWandr.1reducedcells; notnewnativeHHehistory",
-      "latest_known_commit": "1b856bff408a6eb86c6ad6ba8b5ee75dac17c436",
+      "latest_known_commit": "e6acb59c89cb9b1f1b9e67516bbdc8f50c20b0ea",
       "new_native_history_received": false
     },
     {
@@ -292,7 +303,7 @@
     "No ninefield plot in place of full source/radiation/heat comparison"
   ],
   "date_note": "Campaign directory preserves historical20261011 identifier; actual executionUTC receipts20261010",
-  "updated_utc": "2026-10-10T22:41:56.434626+00:00",
+  "updated_utc": "2026-10-10T23:17:31.266632+00:00",
   "classification": "RUNTIME_INTERRUPTION_RECOVERY",
   "recovery": {
     "published_base_commit": "304afc3592ae60242e3bb72efc56d806519b4a60",

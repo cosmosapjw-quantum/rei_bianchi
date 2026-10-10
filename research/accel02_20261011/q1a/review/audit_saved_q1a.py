@@ -43,6 +43,14 @@ def inspect_run(path):
     checks['dormant_initial_empty']=bool((states[0,4:4+n][q>50000]==0).all())
     checks['accepted_instrumentation']=all(result['checks'][k] for k in ['accepted_positive','accepted_finite','accepted_gas_domain'])
     checks['one_sided_energy']=result['max_one_sided_relative_energy_shift']<=64*np.finfo(float).eps
+    root=Path(__file__).resolve().parents[2]
+    checks['actual_native_identity']=sha(root/'n1/native/target/release/rei_n1_native')==identity['native_sha']
+    checks['actual_n1_identity']=sha(root/'n1/provider.py')==identity['n1_sha']
+    checks['FLRW_locked']=identity['args']['shear']==grid['construction']['r']==0.0
+    moments=read(path/'MOMENTS.json');geometry=moments['geometry_preflight']
+    geomfile=path/geometry['relative_path']; pre=read(geomfile)
+    bound=[r for r in pre['grids'].values() if r['grid_arrays_sha256']==identity['grid_arrays_sha256']]
+    checks['geometry_evidence']=sha(geomfile)==geometry['sha256'] and len(bound)==1 and bound[0]['grid_sha256']==identity['grid_sha'] and bound[0]['geometry_max']<=1e-11 and geometry['passed'] is True
     for name,key in [('driver_as_run.py','driver_sha'),('base_driver_as_run.py','base_sha'),
                      ('fixed_grid_as_run.py','grid_factory_sha'),('GRID.json','grid_sha'),
                      ('characteristics_as_run.py','characteristics_sha'),('events_as_run.py','events_sha')]:

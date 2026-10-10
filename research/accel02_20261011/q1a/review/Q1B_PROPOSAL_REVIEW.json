@@ -1,0 +1,96 @@
+{
+  "schema": "q1b_proposal_independent_algebra_review_v1",
+  "timestamp_utc": "2026-10-10T23:10:35.069811+00:00",
+  "reviewer": "/root/q1a_independent",
+  "model_identity": "UNKNOWN",
+  "proposal_sha256": "5c631a6464bf459001a94b233bafd33a91de96823c0740c026f6f0202d7b4455",
+  "proposal_bytes": 16520,
+  "decision": "DERIVED_MOMENT_PAIRING_ACCEPTED_PROPOSAL_ONLY",
+  "implementation_approval": false,
+  "ODE_approval": false,
+  "scope": "Fixedcovectorcells withN/U state; initiallyFLRW, conditionalextension ofsameangulargeometry; noimplementationorquadratureaccuracyapproval",
+  "actions": {
+    "candidate_edits": false,
+    "test_oracle_edits": false,
+    "ODE_calls": 0,
+    "native_calls": 0,
+    "source_reference_replays": 0,
+    "kind": "Independent algebra/dimension/sign/limit inspection ofproposal"
+  },
+  "checked_derivations": [
+    {
+      "id": "MOMENT-01",
+      "claim": "Ndot=S0\u2212sum_a n_a K0; Udot=R S1\u2212sum_a n_a R K1\u2212lambda U",
+      "status": "derived",
+      "reason": "qcellboundariesfixed, U=RQ and Rdot=\u2212lambda R; directproductrule. N,U yieldlinear storednumber andradiationenergy sums."
+    },
+    {
+      "id": "SOURCE-01",
+      "claim": "S0=w_mu R^-3 integral s_log dlnE; S1=w_mu R^-4 integral E s_log dlnE",
+      "status": "derived",
+      "reason": "Fixedinitialangle Jacobian dOmega/dOmega0=(a_rel^3 R^3)^\u22121; multiplyingproper source byreferencevolume a_rel^3 leavesR^-3. q=E/R anddlnq=dlnE addoneR^-1 forS1."
+    },
+    {
+      "id": "TRANSFER-01",
+      "claim": "Gamma_a=sum_c K0/V; excess=eV_to_erg sum_c(R_c K1\u2212chi_a K0)/V",
+      "status": "derived",
+      "reason": "n_a K0 photoevents perreferencevolume; chemicalplusheatexchange =n_a R_c K1 photonenergyloss. Dividingreference photons bydimensionlessV convertsproperrates. No divisionbyn_a required, so n_a=0 remainsdefined."
+    },
+    {
+      "id": "WORK-01",
+      "claim": "Radiationworkcounterdot=eV_to_erg sum_c lambda_c U_c",
+      "status": "derived",
+      "reason": "Cancels \u2212lambda_c U_c inphotonenergydot. Withexistingthermalwork/escape/CMB counters unchanged, localphotonpairing hascorrectsign."
+    },
+    {
+      "id": "RECON-01",
+      "claim": "Powerlaw meanq increasesstrictlywithp onnonzeroactiveinterval",
+      "status": "derived",
+      "reason": "dm/dp=Cov(q,ln(q/qstar))>0 forpositivecontinuousmeasure andstrictlyincreasingfunctions; endpointsarelimits, notfinitep."
+    },
+    {
+      "id": "JAC-01",
+      "claim": "d(NB_k)/dQ=Cov(q^k kappa,lnq)/Cov(q,lnq); d(NB_k)/dN=B_k\u2212m d(NB_k)/dQ",
+      "status": "derived",
+      "reason": "m=Q/N andchainrule atfixedtime/support. N,U columns require d/dU=(1/R)d/dQ; noextra factorN."
+    },
+    {
+      "id": "DOMAIN-01",
+      "claim": "Emptycell andendpointlimits requireexplicit treatmentbeforeODE",
+      "status": "derived",
+      "reason": "Q/N undefined atorigin; momentmap generallydirectiondependent. GenericBDF neednotpreservecone. Proposed localNO-GO correctlyblocksimplicitreuse ofoldpointdiagonalJacobian."
+    }
+  ],
+  "anisotropic_scope": {
+    "valid": "For non-tiltedaxisymmetricBianchiI fixedmu0, E=R_mu0 q andcurrentphysicaldirectionareqindependent, soall moment/workidentities holdperangularordinate. R andlambda mustretaincellangleindex insums. q upperactive=min(qR,50000/R_mu0).",
+    "not_established": "Finiteangularsum ofw_mu R^-3 neednot equal a_rel^3; currentFLRW source references cannotbeused asanisotropic exactangulartruth. Separateangularcomparison/geometryevidence remainsrequired."
+  },
+  "nonblocking_clarifications": [
+    {
+      "id": "PROP-01",
+      "item": "CallV=a_rel^3 a dimensionlessproper/referencevolume ratio, notanindependent dimensionalvolume."
+    },
+    {
+      "id": "PROP-02",
+      "item": "Write counter absorption sum explicitly as sum_c sum_a n_a K0,a,c and retainR_c/lambda_c insideangularsums."
+    },
+    {
+      "id": "PROP-03",
+      "item": "Grey-opacity invariant-reconstruction fixture mustusefixed/fullactive support orotherwiseproveinvariance; enlargingpermitted50keVsupport doesnotautomaticallypreserve a powerlawonitswholeinterval."
+    }
+  ],
+  "implementation_blockers_preserved": [
+    "selectedempty/entry/endpointcone treatment",
+    "positive momentrealizable reconstruction withstableinversion",
+    "actualversionednativecommonintegratedphotoinput adapter",
+    "newN/U/Jacobian and admissibledirection verification",
+    "bounded source/IC and nativeopacity/reconstructionlocalgates",
+    "new fullinterval temporal/spectral/domain/ledger evidence"
+  ],
+  "claim_limits": [
+    "No actualQ1Bsolverexists fromthisproposalreview",
+    "No1e-3accuracyguarantee orcontinuumcertificate",
+    "NoQ1Afailure reclassification",
+    "CR/RCT/secondary/fullanisotropicCMBremainoutofscope"
+  ]
+}
