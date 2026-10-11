@@ -123,13 +123,11 @@ v=m+W/L,\qquad u=m-W/H.
 상속 경계의 실제 잔차는
 
 \[
-A(P_{\widehat V_*}^a)\simeq-2.27486876683597\times10^{-137}\ {
-m s}^{-4},
+A(P_{\widehat V_*}^a)\simeq-2.27486876683597\times10^{-137}\ {m s}^{-4},
 \]
 
 \[
-A(P_{\widehat W_0}^b)\simeq-3.25826546128542\times10^{-137}\ {
-m s}^{-4}.
+A(P_{\widehat W_0}^b)\simeq-3.25826546128542\times10^{-137}\ {m s}^{-4}.
 \]
 
 새 프로그램은 이 유한 잔차가 0이 아님을 기록했고 원 PHYS25 잔차와의 일치를 확인했다. exact root로 정의한 law의 응답 0과 이 작은 음의 수를 구분해야 한다. 새 bracket을 만들거나 root decimal의 보장 자릿수를 승격하지 않았다.
