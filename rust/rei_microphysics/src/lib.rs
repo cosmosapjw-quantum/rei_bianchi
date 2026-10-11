@@ -55,8 +55,9 @@ pub use bianchi_i::{
     GeometryBackground, GeometrySnapshot, RayDerivative,
 };
 pub use ft03_controlled::{
-    ft03_adaptive_step, ft03_implicit_step, ft03_rhs, ft03_try_step, Ft03Events, Ft03Model,
-    Ft03Rhs, Ft03Step, FT03_MODEL_ID,
+    ft03_adaptive_step, ft03_adaptive_step_with_rct, ft03_implicit_step,
+    ft03_implicit_step_with_rct, ft03_rhs, ft03_try_step, ft03_try_step_with_rct,
+    Ft03Events, Ft03Model, Ft03RctLedger, Ft03RctStep, Ft03Rhs, Ft03Step, FT03_MODEL_ID,
 };
 pub use ft03_interval::ft03_interval_rhs;
 pub use ft03_rates::{ft03_coefficients, Ft03Coefficients};

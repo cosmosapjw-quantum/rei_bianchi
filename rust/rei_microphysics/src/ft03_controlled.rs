@@ -4,6 +4,7 @@ use crate::{
     ft03_rates::ft03_coefficients, Absorber, AtomicProvider, ForwardError, HHeModel, HHeState,
     StepControl,
 };
+use crate::he_rct::{combined_ft03_rhs, ClosedRctLedger, RctSelection};
 
 pub const FT03_MODEL_ID: &str = "REI_FT03_HG_RATE_MOMENT_CASE_A_CONTROLLED_V1";
 
@@ -218,6 +219,71 @@ pub struct Ft03Step {
     pub local_error: f64,
 }
 
+/// Accepted RCT products are separate from FT03 recombination and tracked photons.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct Ft03RctLedger {
+    pub events_per_cm3: f64,
+    pub escaped_photons_per_cm3: f64,
+    pub escaped_energy_erg_cm3: f64,
+}
+
+impl Ft03RctLedger {
+    fn plus(self, other: Self) -> Result<Self, ForwardError> {
+        let result = Self {
+            events_per_cm3: self.events_per_cm3 + other.events_per_cm3,
+            escaped_photons_per_cm3: self.escaped_photons_per_cm3 + other.escaped_photons_per_cm3,
+            escaped_energy_erg_cm3: self.escaped_energy_erg_cm3 + other.escaped_energy_erg_cm3,
+        };
+        if [result.events_per_cm3, result.escaped_photons_per_cm3,
+            result.escaped_energy_erg_cm3].iter().any(|x| !x.is_finite() || *x < 0.0) {
+            return Err(ForwardError::InvalidInput("RCT_STEP_LEDGER_OVERFLOW"));
+        }
+        Ok(result)
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct Ft03RctStep {
+    pub step: Ft03Step,
+    pub rct: Ft03RctLedger,
+}
+
+/// The historical RHS wrapper permits scalar underflow. The opt-in step has
+/// the stricter FT03 product policy, without changing that wrapper or OFF calls.
+fn selected_rhs(model: &Ft03Model, state: &HHeState, selection: RctSelection)
+    -> Result<(Ft03Rhs, Option<ClosedRctLedger>), ForwardError> {
+    let (provider, closure) = match selection {
+        RctSelection::Disabled => return Ok((ft03_rhs(model, state)?, None)),
+        RctSelection::Escaping { provider, closure } => (provider, closure),
+    };
+    let t = model.validate_state(state)?;
+    let k = provider.coefficient_cm3_s(t)?;
+    let g = &model.gas;
+    let n_hi = checked_product(&[g.n_h_cm3, 1.0 - state.fractions[0]])?;
+    let n_heiii = checked_product(&[g.n_he_cm3, state.fractions[2]])?;
+    let rate = checked_product(&[k, n_hi, n_heiii])?;
+    let q = g.threshold_ev[2] - g.threshold_ev[0];
+    checked_product(&[q, g.ev_erg, rate])?;
+    checked_product(&[q - closure.mean_ev(), g.ev_erg, rate])?;
+    checked_product(&[closure.mean_ev(), g.ev_erg, rate])?;
+    let combined = combined_ft03_rhs(model, state, selection)?;
+    Ok((combined.combined, combined.rct))
+}
+
+fn integrated_rct(rct: Option<ClosedRctLedger>, dt: f64, model: &Ft03Model)
+    -> Result<Ft03RctLedger, ForwardError> {
+    let Some(rct) = rct else { return Ok(Ft03RctLedger::default()); };
+    let j = checked_product(&[dt, rct.event.event_rate_cm3_s])?;
+    let q = rct.event.q_ev;
+    let mean = rct.mean_escaped_photon_energy_ev;
+    let ev = model.gas.ev_erg;
+    checked_product(&[j, q, ev])?;
+    checked_product(&[j, q - mean, ev])?;
+    let escaped_energy = checked_product(&[j, mean, ev])?;
+    Ok(Ft03RctLedger { events_per_cm3: j, escaped_photons_per_cm3: j,
+        escaped_energy_erg_cm3: escaped_energy })
+}
+
 /// Final endpoint backward Euler residual; one source site for all seven
 /// coordinates, escaped energy, and integrated event counts.
 fn be_endpoint_residual(
@@ -225,8 +291,9 @@ fn be_endpoint_residual(
     old: &HHeState,
     new: &HHeState,
     dt: f64,
-) -> Result<(f64, Ft03Events), ForwardError> {
-    let rhs = ft03_rhs(model, new)?;
+    selection: RctSelection,
+) -> Result<(f64, Ft03Events, Ft03RctLedger), ForwardError> {
+    let (rhs, rct) = selected_rhs(model, new, selection)?;
     let x0 = old.coordinates();
     let x1 = new.coordinates();
     let scale = [
@@ -261,7 +328,7 @@ fn be_endpoint_residual(
     if !norm.is_finite() || !events.finite() {
         return Err(ForwardError::InvalidInput("FT03_OVERFLOW"));
     }
-    Ok((norm, events))
+    Ok((norm, events, integrated_rct(rct, dt, model)?))
 }
 
 fn check_invariants(
@@ -269,6 +336,8 @@ fn check_invariants(
     old: &HHeState,
     new: &HHeState,
     events: &Ft03Events,
+    rct: &Ft03RctLedger,
+    selection: RctSelection,
     tolerance: f64,
 ) -> Result<(), ForwardError> {
     let g = &model.gas;
@@ -281,6 +350,10 @@ fn check_invariants(
             - events.recombination_per_cm3[a];
     }
     j[1] -= events.dr_per_cm3.iter().sum::<f64>();
+    if let RctSelection::Escaping { .. } = selection {
+        j[0] += rct.events_per_cm3;
+        j[2] -= rct.events_per_cm3;
+    }
     norm = norm.max(((g.n_h_cm3 * (new.fractions[0] - old.fractions[0]) - j[0]) / g.n_h_cm3).abs());
     norm = norm.max(
         ((g.n_he_cm3 * (new.fractions[1] - old.fractions[1]) - j[1] + j[2]) / g.n_he_cm3).abs(),
@@ -300,12 +373,13 @@ fn check_invariants(
     Ok(())
 }
 
-pub fn ft03_implicit_step(
+fn ft03_implicit_step_selected(
     model: &Ft03Model,
     old: &HHeState,
     dt: f64,
     control: StepControl,
-) -> Result<Ft03Step, ForwardError> {
+    selection: RctSelection,
+) -> Result<Ft03RctStep, ForwardError> {
     model.validate_state(old)?;
     if !dt.is_finite()
         || dt < 0.0
@@ -316,19 +390,20 @@ pub fn ft03_implicit_step(
         return Err(ForwardError::InvalidInput("FT03_STEP_CONTROL"));
     }
     if dt == 0.0 {
-        return Ok(Ft03Step {
+        return Ok(Ft03RctStep { step: Ft03Step {
             state: *old,
             events: Ft03Events::default(),
             iterations: 0,
             residual_norm: 0.0,
             local_error: 0.0,
-        });
+        }, rct: Ft03RctLedger::default() });
     }
     let g = &model.gas;
     let mut guess = *old;
     for iteration in 1..=control.max_iterations {
         let ne = g.electron_density(&guess)?;
-        let c = ft03_coefficients(model.validate_state(&guess)?)?;
+        let t = model.validate_state(&guess)?;
+        let c = ft03_coefficients(t)?;
         let [h, he1, he2] = guess.fractions;
         let lower = [
             g.n_h_cm3 * (1.0 - h),
@@ -340,7 +415,7 @@ pub fn ft03_implicit_step(
             let opacity = (0..3).map(|a| lower[a] * g.sigma_cm2[a][k]).sum::<f64>();
             next.photon_cm3[k] = old.photon_cm3[k] / (1.0 + dt * g.c_cm_s * opacity);
         }
-        let ion = std::array::from_fn::<_, 3, _>(|a| {
+        let mut ion = std::array::from_fn::<_, 3, _>(|a| {
             (0..3)
                 .map(|k| g.c_cm_s * g.sigma_cm2[a][k] * next.photon_cm3[k])
                 .sum::<f64>()
@@ -348,12 +423,23 @@ pub fn ft03_implicit_step(
         });
         let rr = std::array::from_fn::<_, 3, _>(|a| ne * c.alpha_rr_cm3_s[a]);
         let dr = ne * c.alpha_dr_cm3_s.iter().sum::<f64>();
+        let mut heiii_rct_loss = 0.0;
+        if let RctSelection::Escaping { provider, .. } = selection {
+            let k = provider.coefficient_cm3_s(t)?;
+            let n_hi = checked_product(&[g.n_h_cm3, 1.0 - h])?;
+            let n_heiii = checked_product(&[g.n_he_cm3, he2])?;
+            checked_product(&[k, n_hi, n_heiii])?;
+            ion[0] += checked_product(&[k, n_heiii])?;
+            heiii_rct_loss = checked_product(&[k, n_hi])?;
+        }
         next.fractions[0] = (old.fractions[0] + dt * ion[0]) / (1.0 + dt * (ion[0] + rr[0]));
         let he0_old = 1.0 - (old.fractions[1] + old.fractions[2]);
         let a = dt * ion[1];
         let b = dt * (rr[1] + dr);
         let c2 = dt * ion[2];
-        let d = dt * rr[2];
+        let d = if let RctSelection::Escaping { .. } = selection {
+            dt * (rr[2] + heiii_rct_loss)
+        } else { dt * rr[2] };
         // All production terms are nonnegative at a helium boundary.
         let he1_next =
             (old.fractions[1] + he0_old * (a / (1.0 + a)) + old.fractions[2] * (d / (1.0 + d)))
@@ -362,24 +448,49 @@ pub fn ft03_implicit_step(
         next.fractions[2] = (old.fractions[2] + c2 * he1_next) / (1.0 + d);
         // Use the candidate's fractions and photons with the current thermal
         // guess; the final RHS and residual are reevaluated at the actual T.
-        let rates = ft03_rhs(model, &next)?;
+        let rates = selected_rhs(model, &next, selection)?.0;
         next.u_erg_cm3 = old.u_erg_cm3 + dt * rates.derivative[3];
         next.escaped_erg_cm3 = old.escaped_erg_cm3 + dt * rates.escaped_energy_rate;
         model.validate_state(&next)?;
-        let (norm, events) = be_endpoint_residual(model, old, &next, dt)?;
+        let (norm, events, rct) = be_endpoint_residual(model, old, &next, dt, selection)?;
         if norm < control.residual_tolerance {
-            check_invariants(model, old, &next, &events, control.residual_tolerance)?;
-            return Ok(Ft03Step {
+            check_invariants(model, old, &next, &events, &rct, selection,
+                control.residual_tolerance)?;
+            return Ok(Ft03RctStep { step: Ft03Step {
                 state: next,
                 events,
                 iterations: iteration,
                 residual_norm: norm,
                 local_error: 0.0,
-            });
+            }, rct });
         }
         guess = next;
     }
     Err(ForwardError::InvalidInput("FT03_NONCONVERGENCE"))
+}
+
+pub fn ft03_implicit_step(
+    model: &Ft03Model, old: &HHeState, dt: f64, control: StepControl,
+) -> Result<Ft03Step, ForwardError> {
+    Ok(ft03_implicit_step_selected(model, old, dt, control, RctSelection::Disabled)?.step)
+}
+
+pub fn ft03_implicit_step_with_rct(
+    model: &Ft03Model, old: &HHeState, dt: f64, control: StepControl,
+    selection: RctSelection,
+) -> Result<Ft03RctStep, ForwardError> {
+    ft03_implicit_step_selected(model, old, dt, control, selection)
+}
+
+pub fn ft03_try_step_with_rct(
+    model: &Ft03Model, state: &mut HHeState, ledger: &mut Ft03RctLedger,
+    dt: f64, control: StepControl, selection: RctSelection,
+) -> Result<Ft03RctStep, ForwardError> {
+    let result = ft03_implicit_step_selected(model, state, dt, control, selection)?;
+    let updated = ledger.plus(result.rct)?;
+    *state = result.step.state;
+    *ledger = updated;
+    Ok(result)
 }
 
 pub fn ft03_try_step(
@@ -425,4 +536,41 @@ pub fn ft03_adaptive_step(
         residual_norm: half1.residual_norm.max(half2.residual_norm),
         local_error: error,
     })
+}
+
+pub fn ft03_adaptive_step_with_rct(
+    model: &Ft03Model, old: &HHeState, dt: f64, control: StepControl,
+    selection: RctSelection,
+) -> Result<Ft03RctStep, ForwardError> {
+    if let RctSelection::Disabled = selection {
+        return Ok(Ft03RctStep { step: ft03_adaptive_step(model, old, dt, control)?,
+            rct: Ft03RctLedger::default() });
+    }
+    if dt == 0.0 {
+        return ft03_implicit_step_selected(model, old, dt, control, selection);
+    }
+    let full = ft03_implicit_step_selected(model, old, dt, control, selection)?;
+    let half1 = ft03_implicit_step_selected(model, old, dt / 2.0, control, selection)?;
+    let half2 = ft03_implicit_step_selected(model, &half1.step.state, dt / 2.0, control, selection)?;
+    let tf = model.gas.temperature(&full.step.state)?;
+    let th = model.gas.temperature(&half2.step.state)?;
+    let mut error = (tf.ln() - th.ln()).abs();
+    for a in 0..3 {
+        error = error.max((full.step.state.fractions[a] - half2.step.state.fractions[a]).abs());
+    }
+    if !error.is_finite() || error >= 2e-4 {
+        return Err(ForwardError::InvalidInput("FT03_LOCAL_ERROR"));
+    }
+    let events = half1.step.events.plus(half2.step.events);
+    if !events.finite() {
+        return Err(ForwardError::InvalidInput("FT03_OVERFLOW"));
+    }
+    let rct = half1.rct.plus(half2.rct)?;
+    Ok(Ft03RctStep { step: Ft03Step {
+        state: half2.step.state,
+        events,
+        iterations: full.step.iterations + half1.step.iterations + half2.step.iterations,
+        residual_norm: half1.step.residual_norm.max(half2.step.residual_norm),
+        local_error: error,
+    }, rct })
 }
