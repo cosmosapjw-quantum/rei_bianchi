@@ -3,3 +3,5 @@
 C11R4 verified baseline0b863af;153frozen and51reviewed identities unchanged. No old tests or native trajectory repeated. Parallel P0/P1/P2/P3 implementers own disjoint new files. Root preserves exact gen3 and will execute only after concrete binding review. See CONTRACT rulings for explicit user parallel/no-replay and campaign separation.
 
 C12R1: P0/P1/P2/P3 complete;19distinct new targetcasesPASS. Independent pre-native scopedGO issued; IR001postcheckpointtransaction and IR003outputrecordresume failures repaired withnew tests; IR002effectivecontrols metadata recorded. Oldsciencetests/native trajectories0duringbinding. Production7files frozen at reviewerhashes beforeactualchild.
+
+C12R2_FIRST_CONTINUATION: CHUNK_ATTEMPT_BOUNDARY; cursor{'accepted_boundaries': 12, 'accepted_clock_s': 10195007985.069735, 'accepted_macros': 6, 'attempts': 8, 'next_step_s': 2304387971.8976436, 'rejected_macros': 2, 'schema': 'rei.q1b.c11.adaptive_cursor.v1'}; 1completed chunks; actualtarget remains4.011926941800233e+16s, no globaladmission.
