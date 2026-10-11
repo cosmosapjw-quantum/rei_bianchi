@@ -9,3 +9,7 @@ C12R2_FIRST_CONTINUATION: CHUNK_ATTEMPT_BOUNDARY; cursor{'accepted_boundaries': 
 C12R3_CONTINUATION_021: CHUNK_ATTEMPT_BOUNDARY; cursor{'accepted_boundaries': 48, 'accepted_clock_s': 141747717375.1767, 'accepted_macros': 24, 'attempts': 26, 'next_step_s': 21420304320.47989, 'rejected_macros': 2, 'schema': 'rei.q1b.c11.adaptive_cursor.v1'}; 7completed chunks; actualtarget remains4.011926941800233e+16s, no globaladmission.
 
 C12R4_FIRST_FAILURE: FAILED_ATTEMPT; cursor{'accepted_boundaries': 78, 'accepted_clock_s': 11419941379473.664, 'accepted_macros': 39, 'attempts': 41, 'next_step_s': 2081739983022.9685, 'rejected_macros': 2, 'schema': 'rei.q1b.c11.adaptive_cursor.v1'}; 13completed chunks; actualtarget remains4.011926941800233e+16s, no globaladmission.
+
+C12R4 diagnosis: the next exact50000eV source-band/cell endpoint has a genuinely positive sub-ULP support interval. Independently rounded Q is oneULP below aN. New lower-offset trial fixes this endpoint but fails3 upperface endpoints; symmetric positive upper/loweroffset candidate is under focusedreview. Original source/gates/prefix remain intact. Newlane will debit failedattempt externally, leaving63prospective attempts.
+
+C12R5_REPAIR_GO: finaltwofacecandidate and additivefailuremigration reviewed GO; sourcehasha29207b6..., firstchangednativechunk notyetexecuted.
