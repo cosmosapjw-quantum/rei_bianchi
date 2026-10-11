@@ -1,0 +1,39 @@
+name: q1b-local-native
+on:
+  push:
+    branches: [research/accel02-native-broad-20261011]
+    paths:
+      - 'research/accel02_20261011/q1b/native/**'
+      - '.github/workflows/q1b-local.yml'
+permissions:
+  contents: read
+jobs:
+  native-bridge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record toolchain and exact revision
+        run: |
+          mkdir -p q1b-ci
+          git rev-parse HEAD > q1b-ci/COMMIT.txt
+          rustc --version --verbose > q1b-ci/RUSTC.txt
+          cargo --version > q1b-ci/CARGO.txt
+      - name: Build new cell bridge only
+        run: |
+          set -o pipefail
+          cargo build --release --offline --manifest-path research/accel02_20261011/q1b/native/Cargo.toml 2>&1 | tee q1b-ci/BUILD.log
+          cp research/accel02_20261011/q1b/native/Cargo.lock q1b-ci/Cargo.lock
+          cp research/accel02_20261011/q1b/native/target/release/rei_q1b_cell_native_v1 q1b-ci/
+          sha256sum q1b-ci/rei_q1b_cell_native_v1 > q1b-ci/BINARY_SHA256.txt
+      - name: Six new local protocol checks
+        run: |
+          set -o pipefail
+          python3 research/accel02_20261011/q1b/native/test_protocol.py 2>&1 | tee q1b-ci/TESTS.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q1b-native-${{ github.sha }}
+          path: q1b-ci/
+          retention-days: 30
+          if-no-files-found: error
