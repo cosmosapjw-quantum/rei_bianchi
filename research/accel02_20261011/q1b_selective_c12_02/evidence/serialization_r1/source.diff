@@ -1,0 +1,16 @@
+--- evidence/serialization_r1/validate_selective.before.py	2026-10-11 09:37:23.814687458 +0900
++++ validate_selective.py	2026-10-11 09:37:23.849581449 +0900
+@@ -24,7 +24,7 @@
+             q,w=nodes(rec,32,float(threshold));active=threshold<=.25*atom
+             check((q.tolist()==[atom] and w.tolist()==[1.]) if active else len(q)==len(w)==0,
+                 'HOLD_ENDPOINT_ATOM_IMPLEMENTATION',{'atom':atom,'threshold':float(threshold),'q':q.tolist(),'w':w.tolist()})
+-            rows.append({'atom':atom,'threshold':float(threshold),'threshold_hex':float(threshold).hex(),'included':active})
++            rows.append({'atom':atom,'threshold':float(threshold),'threshold_hex':float(threshold).hex(),'included':bool(active)})
+         for r in (0.,1.,2.,-3.):
+             check(rec.oracle_moment(r,atom,atom)==atom**r,'HOLD_ENDPOINT_ATOM_IMPLEMENTATION','singleton oracle')
+             check(rec.oracle_moment(r,np.nextafter(atom,np.inf),20.)==0.,
+@@ -228,4 +228,3 @@
+     RESULT['implementation_sha256']={n:digest(Path(__file__).parent/n) for n in ('reconstruction_selective.py','validate_selective.py','CONTRACT.json')}
+     with args.output.open('x') as f:json.dump(RESULT,f,indent=2,allow_nan=False)
+     print(outcome,flush=True);sys.exit(0 if outcome.startswith('PASS_') else 1)
+-
