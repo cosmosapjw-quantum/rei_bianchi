@@ -27,6 +27,64 @@ Git에는 구현·문서·review·전체 파일 SHA manifest·각 chunk의 launc
 
 Drive 또는 Dropbox에서 선택한 정상 객체들을 로컬의 별도 다운로드 디렉터리에 준비한다. 파일명을 receipt와 맞추되 실제 bytes/SHA를 먼저 확인한다. 브라우저가 붙인 `.bin`·`(1)` 같은 접미사를 이름만 보고 동일성 근거로 삼지 않는다. 양쪽 provider를 모두 다운로드할 필요는 없다. 하나의 완전한 객체를 검증해 복구하고, 다른 provider의 기존 백업 상태는 별도로 보존한다.
 
+### 큰 archive의 분할 전송
+
+Drive connector는 개별 파일이104857600 bytes(100 MiB)를 넘으면 업로드를 거부한다. 실제 C12R13 단일 ZIP 전송에서 HTTP413이 발생한 이유는 이 connector 한도이며, 이것만으로 과학 데이터나 로컬 ZIP의 손상을 뜻하지 않는다. 이 경우 원래 ZIP bytes를 최대67108864 bytes(64 MiB)의 raw part로 분할해 전송한다. 수치 내용·ZIP 내용·checkpoint identity는 바뀌지 않는다.
+
+최종 `GIT_EVIDENCE_SCOPE.json#/archive`의 `parts` 및 연결된 transport manifest에서 각 part의 index·정확한 이름·bytes·SHA·provider ID를 읽는다. 형식은 `RAW_ZIP_BYTE_PARTS_CONCATENATE_IN_INDEX_ORDER`이며, `.zip.part001` 등은 각각 독립 ZIP이 아니다. 누락된 part를 빈 파일로 대체하거나 각 part에 unzip을 호출하지 않는다. 파일명의 사전순이나 다운로드 순서를 추정해 연결하지 말고 manifest의 index 순서를 따른다.
+
+Transport manifest의 원래 ZIP 이름·총 bytes·SHA가 최종 Git receipt와 일치하고, manifest 자체의 기록된 SHA도 맞는지 먼저 확인한다. 원래 ZIP 이름은 transport manifest의 `archive` 문자열 또는 `name`으로 주어질 수 있다. 최종 scope의 `archive.drive_id`/`dropbox_id`가 multipart index/manifest 객체를 가리키는 경우 이를 전체 ZIP 객체 ID로 오인하지 않는다. 실제 part ID는 `archive.parts`에 있다. 모든 part를 내려받아 각 bytes/SHA를 확인한 뒤 header·separator·padding 없이 raw bytes를 이어붙인다. 마지막 part가64 MiB보다 작은 것은 정상이다. 복원된 전체 ZIP의 bytes/SHA/CRC 및 이후 모든 member manifest를 확인하기 전에는 overlay하지 않는다. Part별 업로드 ACK를 전체 ZIP 복구 성공으로 해석하지 않는다.
+
+아래 명령은 다운로드 폴더 안에 놓인, 최종 Git receipt의 transport manifest를 사용한다. `REI_TRANSPORT_MANIFEST`는 그 실제 경로로 지정한다. `REI_FULL_ARCHIVE_DESCRIPTOR`에는 해당 full archive의 **최종 Git `archive` 객체**를 그대로 JSON으로 저장한 파일 경로를 지정한다. 보통 `GIT_EVIDENCE_SCOPE.json#/archive`이며, 작은 delta가 앞선 full archive를 참조하면 그 명시된 base의 descriptor를 선택한다. Descriptor 자체의 출처 Git commit을 복구 기록에 남긴다. Unsplit archive에는 이 단계가 필요 없고 기존 절차를 그대로 사용한다.
+
+```bash
+export REI_ARCHIVE_DIR=/absolute/path/to/downloaded_archives
+export REI_TRANSPORT_MANIFEST=/absolute/path/to/verified_transport_manifest.json
+export REI_FULL_ARCHIVE_DESCRIPTOR=/absolute/path/to/git_full_archive_descriptor.json
+python - <<'PY'
+from pathlib import Path
+import hashlib,json,os,zipfile
+downloads=Path(os.environ['REI_ARCHIVE_DIR']).resolve()
+descriptor=json.loads(Path(os.environ['REI_FULL_ARCHIVE_DESCRIPTOR']).read_text())
+manifest_path=Path(os.environ['REI_TRANSPORT_MANIFEST'])
+expected=descriptor['transport_manifest']; raw=manifest_path.read_bytes()
+assert len(raw)==expected['bytes'] and hashlib.sha256(raw).hexdigest()==expected['sha256'], 'TRANSPORT_MANIFEST_IDENTITY'
+m=json.loads(raw)
+assert m['format']=='RAW_ZIP_BYTE_PARTS_CONCATENATE_IN_INDEX_ORDER'
+archive_name=m.get('archive') or m['name']
+assert archive_name==(descriptor.get('name') or descriptor.get('archive')), 'ORIGINAL_ZIP_NAME'
+assert (m['bytes'],m['sha256'])==(descriptor['bytes'],descriptor['sha256']), 'ORIGINAL_ZIP_IDENTITY'
+parts=sorted(m['parts'],key=lambda x:x['index'])
+declared=sorted(descriptor['parts'],key=lambda x:x['index'])
+assert [{k:x[k] for k in ('index','name','bytes','sha256')} for x in parts]==[{k:x[k] for k in ('index','name','bytes','sha256')} for x in declared], 'PART_LIST_IDENTITY'
+assert [x['index'] for x in parts]==list(range(1,len(parts)+1)), 'PART_INDEX_GAP_OR_DUPLICATE'
+assert sum(x['bytes'] for x in parts)==m['bytes'], 'TOTAL_PART_BYTES'
+assert all(0<x['bytes']<=67108864 for x in parts), 'PART_SIZE_DOMAIN'
+assert Path(archive_name).name==archive_name
+target=downloads/archive_name
+assert not target.exists(), 'DO_NOT_OVERWRITE_EXISTING_ARCHIVE'
+temp=target.with_name(target.name+'.assembling')
+whole=hashlib.sha256()
+with temp.open('xb') as out:
+    for row in parts:
+        name=row['name']; assert Path(name).name==name
+        payload=(downloads/name).read_bytes()
+        assert len(payload)==row['bytes'], ('PART_SIZE',name)
+        assert hashlib.sha256(payload).hexdigest()==row['sha256'], ('PART_SHA',name)
+        out.write(payload); whole.update(payload)
+    out.flush(); os.fsync(out.fileno())
+assert temp.stat().st_size==m['bytes'] and whole.hexdigest()==m['sha256'], 'WHOLE_ZIP_IDENTITY'
+with zipfile.ZipFile(temp) as z:
+    assert z.testzip() is None, 'WHOLE_ZIP_CRC'
+temp.rename(target)
+print(target,whole.hexdigest())
+PY
+```
+
+Assembly 실패 시 `.assembling`과 실패 기록을 보존하고 누락/잘못된 part만 바로잡는다. 과학 실행으로 대체 payload를 만들지 않는다. 이미 완성 ZIP이 존재하면 그 파일을 최종 receipt의 bytes/SHA/CRC로 확인해 재사용하며, 분할 part를 다시 이어붙이는 의식을 반복하지 않는다.
+
+최종 작은 synchronization archive가 별도 base full archive를 요구한다고 선언한 경우에는 **C11R4 → 명시된 base full archive(예: C12R14) → 작은 metadata overlay** 순으로 적용한다. 작은 overlay만으로 bulk checkpoint가 복구된다고 가정하지 않는다. 순서와 각 원래 ZIP SHA는 최종 scope/receipt의 `restore_order` 및 base 참조 선언을 따른다. 아래 복구 계획의 `stage_names`도 이 경우에는 단일 최신 파일이 아니라 선언된 순서의 원래 ZIP 이름 목록으로 채운다. C11R4는 코드에서 이미 앞에 추가하므로 `stage_names`에 중복 넣지 않는다. Full archive가 multipart이면 위 단계로 먼저 전체 ZIP을 복원한 뒤 동일한 overlay 절차에 넣는다.
+
 ## 새 작업 디렉터리와 복구 계획 고정
 
 기존 실행 디렉터리에 겹쳐 복구하지 않는다. 다음은 **local Codex가 실제 복구할 때 실행할 명령**이다. 첫 checkout은 최신 receipt를 읽는 용도이며, 실제 복구 Git baseline은 stage archive의 `MANIFEST.json#/baseline`에서 가져온다. 해당 baseline을 추정해서 대체하지 않는다.
@@ -50,10 +108,11 @@ receipts=json.loads((c12/'PUBLICATION_RECEIPTS.json').read_text())
 base_receipts=json.loads((c12.parent/'c11/PUBLICATION_RECEIPTS.json').read_text())
 base=next(x for x in base_receipts['stages'] if x['stage']=='C11R4_FINAL')
 name=scope['archive'].get('name') or scope['archive'].get('archive')
-stage=next(x for x in reversed(receipts['stages']) if (x.get('name') or x.get('archive'))==name)
+stage_names=[name]  # base-full + delta가 선언되면 정확한 restore_order의 ZIP 이름 목록으로 교체
+stages=[next(x for x in reversed(receipts['stages']) if (x.get('name') or x.get('archive'))==n) for n in stage_names]
 downloads=Path(os.environ['REI_ARCHIVE_DIR']).resolve()
 selected=[]
-for item in (base,stage):
+for item in (base,*stages):
     filename=item.get('archive') or item['name']; p=downloads/filename
     assert p.stat().st_size==item['bytes'], ('SIZE_MISMATCH',filename)
     assert hashlib.sha256(p.read_bytes()).hexdigest()==item['sha256'], ('SHA_MISMATCH',filename)
@@ -61,9 +120,9 @@ for item in (base,stage):
         assert z.testzip() is None, ('ZIP_CRC_ERROR',filename)
         manifest=json.loads(z.read('MANIFEST.json'))
     selected.append({'path':str(p),'receipt':item,'manifest':manifest})
-assert selected[1]['manifest']['stage']==scope['stage'], 'STAGE_MISMATCH'
+assert selected[-1]['manifest']['stage']==scope['stage'], 'STAGE_MISMATCH'
 plan={'source_git_head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
-      'git_baseline':selected[1]['manifest']['baseline'],
+      'git_baseline':selected[1]['manifest']['baseline'],  # 첫 full archive의 baseline
       'selected':selected,'git_scope':scope,'receipt_status':'LOCAL_ARCHIVE_SHA_SIZE_CRC_CHECKED',
       'remote_restore':'NOT_CLAIMED_BY_THIS_PRECHECK'}
 Path(os.environ['REI_RESTORE_PLAN']).write_text(json.dumps(plan,indent=2)+'\n')

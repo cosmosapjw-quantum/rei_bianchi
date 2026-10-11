@@ -19,3 +19,7 @@ B/C와 병렬로 가능한 작업은 다음 새 chunk의 source·opacity·gas·s
 Checkpoint가 매번 길이n의 전체 prefix와 kernelmetadata를 다시 저장하는 현재 구조는 C개 cell에 대해 누적 O(n²C) 저장·검증 비용을 낳는다. 실제 wall time의 지배항인지 측정하지 않았으므로 별도 성능 lane으로 남긴다. 동일 차수의 leggauss node/weight 재사용도 먼저 기존 caching 여부와 새 구간 profile을 확인할 가설이며 측정된 속도 향상이 아니다. Incremental prefix 형식은 현재 완전한 restart 의미를 보존하는 별도 구현·검증 없이는 채택하지 않는다.
 
 Reionization 과학적 admission, r≠0 Bianchi/angular comparison, 새 BASS receiver 실행은 각각 별도 의무다. CR/RCT OFF는 원래 lane의 완결을 뜻하지 않는다. 이 문서에서는 추가 코드·테스트·native 계산·할당 채택을 수행하지 않았다.
+
+## Throughput 우선 진단 추가
+
+STEP_SIZE_TREND.json의 저장자료 분석에 따라 HI_THRESHOLD_CELL24_STIFF_DEFECT_DIAGNOSIS를 다음 할당의 우선 node로 둔다. GammaHI localdefect plateau가 계속 h를 줄이므로, 단순 예산증액을 장기실행 해법으로 간주하지 않는다. 이 node는 새 미실행 fixed-input 시간간격 연구 제안이며 현재 controller·기준을 변경하지 않는다.

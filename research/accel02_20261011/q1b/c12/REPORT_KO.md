@@ -1,5 +1,15 @@
 # C12 — 전구간 이력 연결과 중단 가능한 실행
 
+## C12R14 실제 실행 결과
+
+PILOT02 gen3의 accepted 이력에서 이어서 gen96까지 수용했다. 새 accepted macro는 93개, 현재 전체 physical prefix는 193개 상태이다. 마지막 시각은 47562328985044.922 s, mean-volume redshift는 15.8309489030933이다. 원래 z15.9→4 목표와 모든 과학적 허용 기준을 유지했으며 현재 새 미해결 실패는 없다.
+
+누적 완료 attempt102 = accepted96 + rejected6이며, 별도 보존한 실패3회를 더해 원래 physical cap105를 모두 사용했다. PILOT02 이후 실제 새 작업은 accepted93 + temporal rejection4 + failed physical attempt3 =100이다. 예산 소진은 전구간 완료나 과학적 허용을 뜻하지 않는다. 129개 출력 중 생성된 것은 아직 초기 epoch0 한 개이며, evolved time/spectral65/129 이력 비교는 **NOT_EVALUATED/HOLD**이다.
+
+세 실제 실패는 source의 양의 경계 moment arithmetic, 확률좌표64/128 opacity 해상도, 그리고 그 다음 구간의128/256 해상도였다. 원래 실패·후보·checkpoint를 보존하고 별도 identity로 수리했으며, 최종 composite log-q 구현은 기존 provider/closure와 모든 gate를 유지한 채 남은36개 attempt를 연속 수용했다. `review/FAILURE67_ACTUAL_ADDENDUM.json`은 첫3개 수용과127-state prefix/99dependencies/초기 h0 보존을 독립 검토했다. 이후 같은 고정 구현에서 새 실패가 없어 완료된 검토를 반복하지 않았다. 현재 누적 결과는 각 실제 chunk와 `STATE.json`이 authority이다.
+
+다음 작업은 `future/NEXT_ALLOCATION_DESIGN.json`의 명시적 control-identity/할당 전환을 실제 최신193-state prefix와 cursor에서 구현하는 것이다. 추가100회는 아직 채택되지 않은 유한 실행분 제안이며 전구간 완료 보장이 아니다. 원래 mandatory endpoint208개의 하한과 adaptive subdivision을 고려해야 한다. 감소하는 step size와 저장 비용은 남은 장기 실행 위험이며, 허용 기준을 완화하여 숨기지 않는다.
+
 ## 결론과 결과의 범위
 
 C12는 C11에서 허용된 FLRW 국소 수치 경로를 전구간 목표에 연결하는 구현을 완료하고, 기존 PILOT02 generation 3에서 실제 연속 계산을 시작했다. 기존 상태를 초기화하지 않고 실행 계약을 명시적으로 전환했으며, 전구간 일정·24개 관측량·수용 및 거부 이력의 원자적 저장을 연결했다. 독립 검토는 연결 구현과 최초 실제 chunk를 확인했다. 이후 실제 source-band 경계에서 발생한 moment-domain 실패를 보존하고, 같은 물리 식의 양쪽 경계 offset arithmetic을 별도 source identity로 도입한 child에서 계산을 재개했다. 원래 경로와 수리 경로의 검토를 구분하며, 어느 판정도 전구간 과학적 허용이나 비등방 Bianchi 계산의 완료를 뜻하지 않는다.
@@ -174,3 +184,7 @@ actual attempt67 cell은4개 panel을 사용했고, incident 최대 차이2.3971
 게시 범위는 `GIT_EVIDENCE_SCOPE.json`을 따른다. Git에는 구현·문서·review, 전체 파일의 SHA manifest 및 stage별 launch/result/exit/log receipt를 게시한다. 기존 Git의 원시 증거는 유지하며, 새 대용량 native map·checkpoint payload 및 전체 prefix metadata는 immutable Drive/Dropbox 이중백업 archive에 저장하고 Git blob으로 전부 중복하지 않는다. 따라서 Git 저장소만 읽고 새 raw payload가 모두 포함됐다고 가정해서는 안 된다. 복원에는 기준 C11R4 코드 및 native binaries와 해당 stage archive overlay, full manifest 확인이 필요하다. 이 archive는 독립 실행환경 전체를 대체하는 standalone image가 아니다.
 
 실제 게시 상태는 `PUBLICATION_RECEIPTS.json`과 `GIT_EVIDENCE_SCOPE.json`의 provider acknowledgement·object ID·크기/SHA 및 commit identity를 따른다. 최신 archive 이름·hash·remote ID는 이 보고서에 다시 복제하지 않는다. 업로드 검증과 실제 원격 복원 검증은 구별한다. 이 보고서는 receipt가 없는 게시 또는 수행하지 않은 원격 복원 시험을 완료로 선언하지 않는다.
+
+### 후속 성능 진단: HI threshold cell24
+
+저장된 C2_FULL004의 36개 수용 macro만 읽은 결과, 후반 step을 제한한 필드는 GammaHI였다. 마지막 full/fine 차이의 99.9084%가 HI threshold cell24에서 발생했으며, 새 log-q quadrature가 적용된 HeII cell66의 기여는 약 1.10e-6 fraction이었다. 수용이 계속돼도 현재 safety factor의 중립점은 normalized defect 0.64이므로 후반 약 0.8인 defect에서는 step이 감소한다. 이는 기존 제어 규칙으로 설명되는 현상이다. optically thick source/attenuation/reconstruction의 stiff splitting 민감도는 후속 가설이며, 고정 상태 h 수렴이나 error floor는 아직 검증하지 않았다. `future/STEP_SIZE_TREND.json`에 입력 SHA와 36행 근거를, `future/STEP_SIZE_TREND_KO.md`에 확정/가설 구분을 남겼다. 다음 실행은 이 새 진단을 먼저 진행해 장기간 계산의 효율을 판단한다. 물리/허용 기준과 현재 controller는 변경하지 않았다.
