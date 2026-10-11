@@ -7,6 +7,7 @@
 mod adaptive_history;
 mod angular_photons;
 mod atomic_provider;
+pub mod axisym_conditional;
 pub mod axisym_contract;
 pub mod axisym_coupling;
 pub mod axisym_radiation;

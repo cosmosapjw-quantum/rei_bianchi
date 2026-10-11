@@ -180,4 +180,14 @@ fn rejects_open_ledgers_at_small_scales_and_calls_provider_once() {
         |_, _| Ok(zero_sources())
     )
     .is_err());
+
+    let mut normal_density = [0.; 13];
+    normal_density[IsotopeSpecies::H1Neutral as usize] = 2.;
+    let positive_energy_zero_temperature = state(normal_density, f64::from_bits(1), 1., 1., 0.);
+    assert!(
+        axisym_coupled_derivative(0., g, &positive_energy_zero_temperature, 1., |_, _| Ok(
+            zero_sources()
+        ))
+        .is_err()
+    );
 }

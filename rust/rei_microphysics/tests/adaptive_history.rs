@@ -1,9 +1,74 @@
-use rei_microphysics::{certified_ft03_trial,try_certified_ft03_step,Ft03Model,Interval,StepControl};
-fn parent(m:&Ft03Model)->[Interval;7]{let s=m.initial_state();let q=[s.fractions[0],s.fractions[1],s.fractions[2],s.u_erg_cm3/(m.gas.n_h_cm3*m.gas.ev_erg),s.photon_cm3[0]/m.gas.n_h_cm3,s.photon_cm3[1]/m.gas.n_h_cm3,s.photon_cm3[2]/m.gas.n_h_cm3];let d=[1e-7,1e-7,1e-7,1e-5,1e-8,1e-8,1e-8];std::array::from_fn(|i|Interval::new(q[i]-d[i],q[i]+d[i]).unwrap())}
-fn control()->StepControl{StepControl{max_iterations:200,residual_tolerance:1e-13}}
+use rei_microphysics::{
+    certified_ft03_trial, try_certified_ft03_step, Ft03Model, Interval, StepControl,
+};
+fn parent(m: &Ft03Model) -> [Interval; 7] {
+    let s = m.initial_state();
+    let q = [
+        s.fractions[0],
+        s.fractions[1],
+        s.fractions[2],
+        s.u_erg_cm3 / (m.gas.n_h_cm3 * m.gas.ev_erg),
+        s.photon_cm3[0] / m.gas.n_h_cm3,
+        s.photon_cm3[1] / m.gas.n_h_cm3,
+        s.photon_cm3[2] / m.gas.n_h_cm3,
+    ];
+    let d = [1e-7, 1e-7, 1e-7, 1e-5, 1e-8, 1e-8, 1e-8];
+    std::array::from_fn(|i| Interval::new(q[i] - d[i], q[i] + d[i]).unwrap())
+}
+fn control() -> StepControl {
+    StepControl {
+        max_iterations: 200,
+        residual_tolerance: 1e-13,
+    }
+}
 #[test]
-fn actual_uniform_trial_has_strict_gates_and_not_reset_parent(){let m=Ft03Model::controlled().unwrap();let s=m.initial_state();let p=parent(&m);let t=certified_ft03_trial(&m,&s,&p,1e9,control()).unwrap();assert!(t.local_bounds.iter().all(|x|x.is_finite()&&*x<2e-4));assert!(t.public_widths.iter().flatten().all(|x|x.is_finite()&&*x<2e-3));assert!(t.next_box.iter().all(|x|x.lo.is_finite()&&x.hi.is_finite()&&x.lo<x.hi));assert_eq!(t.sites.len(),3);assert!(t.state.fractions[0]>s.fractions[0]);}
+fn actual_uniform_trial_has_strict_gates_and_not_reset_parent() {
+    let m = Ft03Model::controlled().unwrap();
+    let s = m.initial_state();
+    let p = parent(&m);
+    let t = certified_ft03_trial(&m, &s, &p, 1e9, control()).unwrap();
+    assert!(t.local_bounds.iter().all(|x| x.is_finite() && *x < 2e-4));
+    assert!(t
+        .public_widths
+        .iter()
+        .flatten()
+        .all(|x| x.is_finite() && *x < 2e-3));
+    assert!(t
+        .next_box
+        .iter()
+        .all(|x| x.lo.is_finite() && x.hi.is_finite() && x.lo < x.hi));
+    assert_eq!(t.sites.len(), 3);
+    assert!(t.state.fractions[0] > s.fractions[0]);
+}
 #[test]
-fn rejected_trial_preserves_all_state_and_parent_bits(){let m=Ft03Model::controlled().unwrap();let mut s=m.initial_state();let mut p=parent(&m);let sb=format!("{s:?}");let pb=format!("{p:?}");let bad=StepControl{max_iterations:0,residual_tolerance:1e-13};assert!(try_certified_ft03_step(&m,&mut s,&mut p,1e9,bad).is_err());assert_eq!(format!("{s:?}"),sb);assert_eq!(format!("{p:?}"),pb);assert!(try_certified_ft03_step(&m,&mut s,&mut p,1e12,control()).is_err());assert_eq!(format!("{s:?}"),sb);assert_eq!(format!("{p:?}"),pb);}
+fn rejected_trial_preserves_all_state_and_parent_bits() {
+    let m = Ft03Model::controlled().unwrap();
+    let mut s = m.initial_state();
+    let mut p = parent(&m);
+    let sb = format!("{s:?}");
+    let pb = format!("{p:?}");
+    let bad = StepControl {
+        max_iterations: 0,
+        residual_tolerance: 1e-13,
+    };
+    assert!(try_certified_ft03_step(&m, &mut s, &mut p, 1e9, bad).is_err());
+    assert_eq!(format!("{s:?}"), sb);
+    assert_eq!(format!("{p:?}"), pb);
+    assert!(try_certified_ft03_step(&m, &mut s, &mut p, 1e12, control()).is_err());
+    assert_eq!(format!("{s:?}"), sb);
+    assert_eq!(format!("{p:?}"), pb);
+}
 #[test]
-fn next_step_keeps_previous_enclosure_without_radius_reset(){let m=Ft03Model::controlled().unwrap();let mut s=m.initial_state();let mut p=parent(&m);let a=try_certified_ft03_step(&m,&mut s,&mut p,1e9,control()).unwrap();let b=try_certified_ft03_step(&m,&mut s,&mut p,1e9,control()).unwrap();assert!(b.local_bounds.iter().all(|x|*x<2e-4));assert!(s.fractions[0]>a.state.fractions[0]);for k in 0..7{assert_eq!(p[k].lo.to_bits(),b.next_box[k].lo.to_bits());assert_eq!(p[k].hi.to_bits(),b.next_box[k].hi.to_bits());}}
+fn next_step_keeps_previous_enclosure_without_radius_reset() {
+    let m = Ft03Model::controlled().unwrap();
+    let mut s = m.initial_state();
+    let mut p = parent(&m);
+    let a = try_certified_ft03_step(&m, &mut s, &mut p, 1e9, control()).unwrap();
+    let b = try_certified_ft03_step(&m, &mut s, &mut p, 1e9, control()).unwrap();
+    assert!(b.local_bounds.iter().all(|x| *x < 2e-4));
+    assert!(s.fractions[0] > a.state.fractions[0]);
+    for k in 0..7 {
+        assert_eq!(p[k].lo.to_bits(), b.next_box[k].lo.to_bits());
+        assert_eq!(p[k].hi.to_bits(), b.next_box[k].hi.to_bits());
+    }
+}
