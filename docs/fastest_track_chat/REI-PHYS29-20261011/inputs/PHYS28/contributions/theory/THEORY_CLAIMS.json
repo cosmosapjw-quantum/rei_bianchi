@@ -1,0 +1,333 @@
+{
+  "task": "REI-PHYS28-20261011",
+  "contributor": "/root/phys28_theory",
+  "status": "THEORY_CANDIDATE_COMPLETE_PENDING_DISTINCT_DECISION",
+  "evidence_status": "derived, conditional on frozen kernel and inherited root existence premises",
+  "role": "NONBLIND theory generation; not the final decision reviewer",
+  "contract": {
+    "path": "../../PHYSICS_CONTRACT.json",
+    "sha256": "d9c50cb43d60bf466eb92e91e8e62791fcf84680025c34fc0c42c899ed16fde2"
+  },
+  "definitions": {
+    "a_eV": "13.61",
+    "b_eV": "24.58",
+    "m_eV": "18",
+    "L_eV": "4.39",
+    "H_eV": "6.58",
+    "delta": "uniform-band half-width in eV, right-local at0",
+    "W": "actual photon variance in eV^2, fixed in partial_delta",
+    "V": "W-delta^2/3",
+    "v": "m+W/L atdelta0",
+    "u": "m-W/H atdelta0",
+    "D_L": "L^2+W",
+    "D_H": "H^2+W",
+    "B_plus": "right partial_delta A_delta_plus atdelta0, fixedW",
+    "B_minus": "right partial_delta A_delta_minus atdelta0, fixedW",
+    "C_plus": "partial_W A_0_plus",
+    "C_minus": "partial_W A_0_minus"
+  },
+  "inherited_premises": [
+    {
+      "id": "I28_K",
+      "claim": "k in C^3([a,b]), k second>0 and k third<0; source-real constants and serialized J fixed",
+      "source": "../../inputs/PHYS26/contributions/theory/ENVELOPE_DERIVATION_KO.md",
+      "read_lines": [
+        [
+          29,
+          89
+        ],
+        [
+          356,
+          453
+        ]
+      ],
+      "relation": "supports",
+      "status": "inherited derived and certified under prior scoped decisions; not recertified here"
+    },
+    {
+      "id": "I28_FAMILY",
+      "claim": "Explicit PHYS27 center laws and envelope, W=V+delta^2/3, positive W slope and zero-width limit",
+      "source": "../../inputs/PHYS27/contributions/theory/FINITE_WIDTH_DERIVATION_KO.md",
+      "read_lines": [
+        [
+          1,
+          605
+        ]
+      ],
+      "equations": [
+        "T27.10",
+        "T27.22",
+        "T27.23",
+        "T27.35",
+        "T27.46",
+        "T27.48"
+      ],
+      "relation": "supports",
+      "status": "inherited derived"
+    },
+    {
+      "id": "I28_ROOTS",
+      "claim": "Two exact roots satisfy 0<Vstar0<Wzero0<LH; endpoint sign support remains numerical, stored roots not rigorous enclosures",
+      "source": "../../inputs/PHYS26/contributions/theory/ENVELOPE_DERIVATION_KO.md",
+      "read_lines": [
+        [
+          356,
+          453
+        ]
+      ],
+      "relation": "supports",
+      "status": "inherited conditional derived and inherited numerical support"
+    }
+  ],
+  "claims": [
+    {
+      "id": "T28_AVERAGE",
+      "status": "derived",
+      "claim": "At fixed interior center, right width derivative of symmetric uniform average at0 is0; endpoint paths have total derivatives kprime(a) and -kprime(b); Vprime(0)=0",
+      "equations": [
+        "T28.6",
+        "T28.7",
+        "T28.8"
+      ],
+      "depends_on": [
+        "I28_K",
+        "I28_FAMILY"
+      ],
+      "limits": "No fixed positive-width average centered exactly atoriginal a or b is asserted; endpoint paths stay physical."
+    },
+    {
+      "id": "T28_GEOMETRY",
+      "status": "derived",
+      "claim": "Endpoint, moving-center and photon-probability derivatives atfixed actualW are all included",
+      "equations": [
+        "T28.9",
+        "T28.11",
+        "T28.14"
+      ],
+      "formula": {
+        "alpha_prime": "1",
+        "beta_prime": "-1",
+        "ell_prime": "-1",
+        "h_prime": "-1",
+        "v_prime": "W/L^2",
+        "u_prime": "-W/H^2",
+        "p_endpoint_prime": "2 L W/(L^2+W)^2",
+        "r_endpoint_prime": "2 H W/(H^2+W)^2"
+      },
+      "depends_on": [
+        "I28_FAMILY",
+        "T28_AVERAGE"
+      ]
+    },
+    {
+      "id": "T28_BPLUS",
+      "status": "derived",
+      "claim": "Exact fixed-W derivative of upper response for 0<W<LH",
+      "formula": "B_plus(W)=W/(L^2+W) * [kprime(a)+kprime(v)-2*(k(v)-k(a))/(v-a)]",
+      "units": "s^-4 eV^-1",
+      "equations": [
+        "T28.11",
+        "T28.12"
+      ],
+      "depends_on": [
+        "T28_GEOMETRY"
+      ]
+    },
+    {
+      "id": "T28_BMINUS",
+      "status": "derived",
+      "claim": "Exact fixed-W derivative of lower response for 0<W<LH",
+      "formula": "B_minus(W)=-W/(H^2+W) * [kprime(u)+kprime(b)-2*(k(b)-k(u))/(b-u)]",
+      "units": "s^-4 eV^-1",
+      "equations": [
+        "T28.14",
+        "T28.15"
+      ],
+      "depends_on": [
+        "T28_GEOMETRY"
+      ]
+    },
+    {
+      "id": "T28_SIGN",
+      "status": "derived",
+      "claim": "B_plus<0 and B_minus>0 strictly for every interior fixedW; coefficient nonzero is proved, not assumed",
+      "formula": "T(x,y)=(y-x)^-1 integral_x^y (E-x)(y-E) kthird(E) dE <0",
+      "equations": [
+        "T28.16",
+        "T28.17",
+        "T28.18"
+      ],
+      "depends_on": [
+        "I28_K",
+        "T28_BPLUS",
+        "T28_BMINUS"
+      ],
+      "limits": "Strict containment alone would not rule out zero first derivative; the negative third derivative integral supplies the extra fact."
+    },
+    {
+      "id": "T28_C",
+      "status": "inherited derived, actually consumed",
+      "claim": "C_plus,C_minus>0 under ksecond>0",
+      "formula": {
+        "C_plus": "[k(a)-k(v)+(v-a)kprime(v)]/(v-a)^2",
+        "C_minus": "[k(b)-k(u)-(b-u)kprime(u)]/(b-u)^2"
+      },
+      "units": "s^-4 eV^-2",
+      "equations": [
+        "T28.19"
+      ],
+      "depends_on": [
+        "I28_K",
+        "I28_FAMILY"
+      ]
+    },
+    {
+      "id": "T28_IFT",
+      "status": "derived conditional on I28_ROOTS",
+      "claim": "Each internal simple root has a unique small-right-width continuation with derivative -B/C and remainder o(delta)",
+      "equations": [
+        "T28.24",
+        "T28.25",
+        "T28.26"
+      ],
+      "proof": "Choose a fixed internal W neighborhood feasible for sufficiently small delta; persist left/right signs; use positive W slope and continuity for unique converging root; apply W mean value theorem. No negative physical width or out-of-domain kernel extension.",
+      "depends_on": [
+        "I28_ROOTS",
+        "T28_AVERAGE",
+        "T28_C",
+        "T28_BPLUS",
+        "T28_BMINUS"
+      ],
+      "limits": "No numerical delta-neighborhood or quantitative error bound produced."
+    },
+    {
+      "id": "T28_ROOT_SENSITIVITY",
+      "status": "derived conditional on frozen root existence",
+      "claim": "Wstar(delta)=Vstar0+cstar delta+o(delta), Wzero(delta)=Wzero0+czero delta+o(delta), with cstar>0 and czero<0",
+      "formula": {
+        "cstar": "-B_plus(Vstar0)/C_plus(Vstar0)",
+        "czero": "-B_minus(Wzero0)/C_minus(Wzero0)",
+        "cstar_exact_root_simplified": "-Vstar0*(kprime(a)+kprime(vstar)+2*k(a)/L)/(k(a)+L*kprime(vstar))",
+        "czero_exact_root_simplified": "Wzero0*(kprime(uzero)+kprime(b)-2*k(b)/H)/(k(b)-H*kprime(uzero))"
+      },
+      "units": "eV",
+      "equations": [
+        "T28.1",
+        "T28.21",
+        "T28.22",
+        "T28.23"
+      ],
+      "depends_on": [
+        "T28_SIGN",
+        "T28_C",
+        "T28_IFT"
+      ],
+      "limits": "Exact formulas use exact roots; numerical decimal coefficients are not evaluated in this theory contribution."
+    },
+    {
+      "id": "T28_GAP",
+      "status": "derived conditional on root existence",
+      "claim": "Coexistence-variance width has first derivative czero-cstar<0 at0",
+      "formula": "Wzero(delta)-Wstar(delta)=Wzero0-Vstar0+(czero-cstar)*delta+o(delta)",
+      "equations": [
+        "T28.27"
+      ],
+      "depends_on": [
+        "T28_ROOT_SENSITIVITY"
+      ],
+      "limits": "No arbitrary positive-width family nesting or global width monotonicity."
+    },
+    {
+      "id": "T28_ROOT_RESIDUAL",
+      "status": "derived",
+      "claim": "Exact-root simplifications differ at finite approximate root by an explicit residual identity",
+      "formula": {
+        "upper": "C-Ctilde=-Aplus/D_L; B-Btilde=-2*W*Aplus/(L*D_L)",
+        "lower": "C-Ctilde=-Aminus/D_H; B-Btilde=-2*W*Aminus/(H*D_H)"
+      },
+      "equations": [
+        "T28.28",
+        "T28.29"
+      ],
+      "depends_on": [
+        "T28_BPLUS",
+        "T28_BMINUS",
+        "T28_C"
+      ],
+      "limits": "Generic B/C is available without assuming a stored midpoint is exactly aroot."
+    },
+    {
+      "id": "T28_ONE_WIDTH",
+      "status": "derived definition; numerical execution delegated and not consumed here",
+      "claim": "Residual against the alreadycomputed delta=.05 threshold is an observed one-width linear-prediction diagnostic",
+      "equations": [
+        "T28.30",
+        "T28.31"
+      ],
+      "depends_on": [
+        "T28_ROOT_SENSITIVITY"
+      ],
+      "limits": "Not a convergence rate, exact-integral enclosure, validity interval, O(delta^2) error certificate or precision guarantee."
+    }
+  ],
+  "self_checks": [
+    {
+      "topic": "all fixed-W terms",
+      "status": "PASS_DERIVED",
+      "evidence": "T28.11 and T28.14"
+    },
+    {
+      "topic": "units",
+      "status": "PASS_DERIVED",
+      "evidence": "B s^-4/eV, C s^-4/eV^2, c eV"
+    },
+    {
+      "topic": "quadratic degeneracy",
+      "status": "PASS_DIRECT_ALGEBRA",
+      "evidence": "T=0 for any quadratic k; fixed physical-W response independent of delta"
+    },
+    {
+      "topic": "root residual formulas",
+      "status": "PASS_DIRECT_ALGEBRA",
+      "evidence": "T28.29 by numerator substitution"
+    },
+    {
+      "topic": "boundary use",
+      "status": "PASS_WITH_SCOPE_LIMIT",
+      "evidence": "Original W=0 and LH excluded from fixed-W positive-width derivative; root neighborhoods areinternal"
+    }
+  ],
+  "not_claimed": [
+    "new exact or numerical root searches",
+    "new coefficient decimal values by this contributor",
+    "rigorous root or coefficient error enclosure",
+    "quantitative second-order threshold remainder or delta=.05 validity window",
+    "positive-width family nesting or global monotonicity",
+    "recertification of PHYS24/25 derivative signs or PHYS26/27 global theorem",
+    "J/atomic/gas uncertainty enclosure, finite-time or finite-epsilon remainder",
+    "native equivalence, emitter or cosmological-history admission, global novelty",
+    "final PROMOTE decision by candidate generator"
+  ],
+  "execution": {
+    "new_science_main": 0,
+    "new_kernel_or_derivative_evaluations": 0,
+    "new_physical_root_searches": 0,
+    "old_PHYS19_27_main_suite_or_root": 0,
+    "derivative_sign_campaigns": 0,
+    "native": 0,
+    "gas_IVP": 0,
+    "new_width_sweep": 0,
+    "symbolic_computer_algebra_runs": 0,
+    "external_literature_lookups": 0,
+    "artifact_authoring_and_file_identity_commands": "tooling only, not science evaluation"
+  },
+  "protected": {
+    "physical": "HOLD",
+    "legacy_interval_160_161": "FAIL",
+    "tick": 160,
+    "auxiliary_escape": "FAIL",
+    "HH_RCT_CR": "OFF",
+    "precision_atomic": "PARKED",
+    "production_source_default_runtime_changes": 0
+  }
+}

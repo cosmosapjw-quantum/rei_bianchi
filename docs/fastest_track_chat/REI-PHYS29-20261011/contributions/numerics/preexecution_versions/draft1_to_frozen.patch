@@ -1,0 +1,28 @@
+--- draft1/second_order_width.py
++++ frozen_v3/second_order_width.py
+@@ -21,8 +21,8 @@
+ getcontext().prec = 80
+ ROOT = Path(__file__).resolve().parents[2]
+ HERE = Path(__file__).resolve().parent
+-EXPECTED_CONTRACT = 'TO_BE_FROZEN_CONTRACT'
+-EXPECTED_PROTOCOL = 'TO_BE_FROZEN_PROTOCOL'
++EXPECTED_CONTRACT = '603e2a30074800edd2226c86cf1f256efe5fd49ad45a2252788059d19a487d10'
++EXPECTED_PROTOCOL = '6ab5d3c488a00ebfb868e4d4e83d98a2fe1db9479956b587f673d9d9b86e7573'
+ ZERO, ONE = D(0), D(1)
+ A, M, B = D('13.61'), D(18), D('24.58')
+ L, H, DELTA = M-A, B-M, D('0.05')
+@@ -238,9 +238,11 @@
+     powers = ((0, 0), (1, 0), (0, 1), (2, 0), (1, 1), (0, 2))
+ 
+     def __init__(self, value):
+-        self.c = ({p: value.get(p, 0) for p in self.powers}
+-                  if isinstance(value, dict) else {p: value if p == (0, 0) else 0
+-                                                 for p in self.powers})
++        if isinstance(value, dict):
++            zero = next(iter(value.values()), 0)*0
++            self.c = {p: value.get(p, zero) for p in self.powers}
++        else:
++            self.c = {p: value if p == (0, 0) else value*0 for p in self.powers}
+ 
+     @staticmethod
+     def lift(value):
