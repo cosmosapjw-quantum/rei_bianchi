@@ -1,0 +1,56 @@
+{
+  "schema": "rei.q1b.c11.adaptive_controls.v1",
+  "method_order": 1,
+  "local_defect_target": 2e-07,
+  "observable_scales": {
+    "xHII": 1.0,
+    "xHeII": 1.0,
+    "xHeIII": 1.0,
+    "T_K": 10000.0,
+    "ne_cm3": 0.000908362288758326,
+    "photon_cm3": 0.000908362288758326,
+    "GammaHI_s": 1e-12,
+    "GammaHeI_s": 1e-12,
+    "GammaHeII_s": 1e-12
+  },
+  "distribution_scales": {
+    "N_ref_distribution": 0.000908362288758326,
+    "U_eV_ref_distribution": 0.012352305176515718
+  },
+  "safety": 0.8,
+  "min_shrink": 0.2,
+  "max_growth": 2.0,
+  "min_step_s": 1000000.0,
+  "max_step_s": 1000000000000000.0,
+  "initial_step_s": 5000000000.0,
+  "max_attempts": 6,
+  "max_accepted_macros": 3,
+  "physical_state_floor": false,
+  "scientific_normalization_changed": false,
+  "freeze": "BEFORE_ANY_C11_NATIVE_CONTROLLER_RUN",
+  "scope": "r0 conditional C2 initial state; bounded adaptive prerequisite only",
+  "reference_nH_provenance": {
+    "path": "research/accel02_20261011/q1b/c10/evidence/NATIVE_ENTRY_C2_T1E11_N4_HEAT.json",
+    "sha256": "305fea1acbf62da155bc8fc7eef9a037734a78d0e6a6cb73095e573db898835a",
+    "selector": "accepted_boundaries[0].ledger.initial_nH_cm3"
+  },
+  "scale_rationale": {
+    "fractions": "Natural abundance-fraction unit1, including initial zero HeIII; no relative-to-tiny-state norm",
+    "T_K": "Fixed prospectively declared ionized-IGM thermal unit1e4K, numerical scale only",
+    "ne_cm3": "Fixed original H reference density; never the current state",
+    "photon_cm3": "Fixed original H reference density; never the current state",
+    "Gamma_species": "Fixed prospectively declared1e-12s^-1 photoionization-rate unit; numerical scale only, not fitted to candidate",
+    "N_ref_distribution": "L1 difference over all cells divided by original H reference density",
+    "U_eV_ref_distribution": "L1 difference over all cells divided by HI ionization energy times original H reference density"
+  },
+  "scientific_denominator": "UNCHANGED per-field fine maximum on its own full-history65 and129 subsets; zero maximum requires exactzero",
+  "local_control_claim": "Truncation heuristic only; target2e-7 and scales do not certify global2e-6",
+  "step_failure_policy": "Source/native/domain/ledger errors propagate failclosed; only measured temporal error rejects and shrinks",
+  "hard_events_policy": "Caller supplies physical source-band/cell birth crossings and source redshift knots; opacity thresholds inside continuous cell support are quadrature cuts, not independent hard time jumps; unresolved endpoint traces failclosed",
+  "bounded_run_request": {
+    "start_s": 0.0,
+    "end_s": 10000000000.0,
+    "no_old_schedule_replay": true,
+    "stop_at_budget_or_numerical_failure": true
+  }
+}
