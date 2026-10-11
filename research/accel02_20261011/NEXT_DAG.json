@@ -71,7 +71,7 @@
         "n2/evidence/EVENT_TIME_COMPARISON.json",
         "review/phase2/QUANTITATIVE_DECISION.json"
       ],
-      "claim": "FLRW128energy×2angles frozen-grid temporal refinement+conservation"
+      "claim": "FLRW128energy\u00d72angles frozen-grid temporal refinement+conservation"
     },
     {
       "id": "N2_SPECTRAL003",
@@ -186,10 +186,14 @@
     },
     {
       "id": "P1_RESUME_CLI",
-      "state": "PARALLEL_READY",
+      "state": "IMPLEMENTED_CONDITIONALLY_REVIEWED_ACTUAL_RESTART_UNTESTED",
       "depends": [],
       "action": "Implement actual checkpoint-resume CLI with source/binary/grid/normalization/active-event identity and accepted segment-state validation. Verify restart semantics as a new software capability.",
-      "existing_state": "RESTART.npz exists; no supported resume CLI or continuous integrator restore currently"
+      "existing_state": "One original G2 wall-only continuation, at most600s, fresh BDF initialization; no exact integrator restoration; no numerical-failure resume.",
+      "evidence": [
+        "q1a/resume/PLAN_ADDENDUM_C08C.md",
+        "q1a/review/WALL_RESUME_CODE_REVIEW.json"
+      ]
     },
     {
       "id": "P2_SOURCE_PROFILE",
@@ -237,7 +241,7 @@
       "pr": 140,
       "url": "https://github.com/cosmosapjw-quantum/bass/pull/140",
       "claim": "nativeproper-time tau/visibilityreceiver adoptsoldACCEL01FLRWandr.1reducedcells; notnewnativeHHehistory",
-      "latest_known_commit": "e6acb59c89cb9b1f1b9e67516bbdc8f50c20b0ea",
+      "latest_known_commit": "aa09f3db8424db8db7b518faa37695adf7daec5b",
       "new_native_history_received": false
     },
     {
@@ -286,12 +290,16 @@
       "DAGandnextcommand"
     ],
     "durability": "additivegitpublication+Drive/Dropbox receipts; do notoverwriteearlierfailurearchives",
-    "restart_truth": "RESTART.npz storesstate butcurrentrun_event_coupled.py has noresumeCLI. Do notclaimcontinuousintegratorrestore. Newrootlaunch restartswholecampaignunlessareviewedresumeimplementation isadded.",
+    "restart_truth": "Original driver has no resume CLI. Optional separately reviewed G2 wall-only continuation adds one BDF initialization and preserves predecessor hashes; actual restart parity remains untested until used and reviewed.",
     "selective_readback": "metadataandimmutableidentities sufficientnormally; UPLOAD_VERIFIED != RESTORE_VERIFIED",
     "stages": [
       "C07R0 recovery inventory",
       "C07R1 actual new raw outputs",
-      "C07R2 final independent decision, report, DAG and figures"
+      "C07R2 final independent decision, report, DAG and figures",
+      "C08A bounded Q1A implementation",
+      "C08A2 running snapshot",
+      "C08B first terminal raw results and independent partial decision",
+      "C08C conditional wall continuation implementation and review"
     ],
     "archive_dependency": "C07R2 is a full research-directory/native-binary overlay on the published Git repository, not a standalone repository bundle"
   },
@@ -308,7 +316,7 @@
     "No ninefield plot in place of full source/radiation/heat comparison"
   ],
   "date_note": "Campaign directory preserves historical20261011 identifier; actual executionUTC receipts20261010",
-  "updated_utc": "2026-10-10T23:17:31.266632+00:00",
+  "updated_utc": "2026-10-11T00:02:27.235893+00:00",
   "classification": "RUNTIME_INTERRUPTION_RECOVERY",
   "recovery": {
     "published_base_commit": "304afc3592ae60242e3bb72efc56d806519b4a60",
@@ -378,5 +386,5 @@
       "initial_number_claim_limit": "17.3% fullN difference is overwhelmingly subHI10..13.6eV; not17.3% ionizing or heating error"
     }
   },
-  "next_action": "Q1A_FIXED_Q_GAUSS: select and implement one bounded immutable quadrature candidate; Q0 is accepted and complete."
+  "next_action": "Await the existing GAUSS2_FINE terminal; preserve and dual-back up raw output. Only wall-budget failure permits the C08C single <=600s diagnostic continuation after actual manifest validation. No duplicate or old replay."
 }

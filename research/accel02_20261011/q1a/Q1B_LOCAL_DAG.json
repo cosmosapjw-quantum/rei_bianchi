@@ -1,0 +1,361 @@
+{
+  "schema": "rei.q1b.local_go_no_go_dag.v1",
+  "created_utc": "2026-10-10T23:50:59.513860+00:00",
+  "owner": "/root/q1a_grid_design",
+  "model_identity": "UNKNOWN",
+  "status": "PROPOSAL_LOCAL_WORK_READY_FULL_ODE_NO_GO",
+  "authority": "Current user: unchanged physics/acceptance, new candidate whole15.9to4, no completed RUN002/EVENT003/Q0 replay; prospective Q1B closure/ABI requires local gates.",
+  "executed_by_this_document_task": {
+    "new_ODE": 0,
+    "tests": 0,
+    "native_calls": 0,
+    "reference_integrations": 0,
+    "old_replays": 0,
+    "remote_mutations": 0
+  },
+  "evidence": [
+    {
+      "path": "research/accel02_20261011/q1a/CONTRACT.json",
+      "sha256": "6434df78dc7e7f6ead587e02da4810182e44da1a2042cd3acd97f48d8bde397d"
+    },
+    {
+      "path": "research/accel02_20261011/q1a/NEXT_DESIGN.md",
+      "sha256": "296421ea8846c7f137a5094fcc4745b35608efbc0e082aa02b89acd80b4d4815"
+    },
+    {
+      "path": "research/accel02_20261011/q1a/PERFORMANCE_NEXT.md",
+      "sha256": "f3191a3f9493a3e5f5cda0dc62aadc7f3034aa7759e169a6a25dcb0df3dc306e"
+    },
+    {
+      "path": "research/accel02_20261011/q1a/review/G1_FINE_SAVED_AUDIT.json",
+      "sha256": "aeba103179075f3d26798f9ec6b6cd86b234befcf09f09a39442b200264ecfc2"
+    },
+    {
+      "path": "research/accel02_20261011/q1a/review/G1_TIGHT_FAILURE_REVIEW.json",
+      "sha256": "b98cafba53a9445cd95cb3a87db67699225d8806af91f8fa2d64bf8cf274844e"
+    },
+    {
+      "path": "research/accel02_20261011/q1a/review/SOURCE_PAIR_LOWER_BOUND.json",
+      "sha256": "4c949e600bda11ca057a2070cf2a10cd5a0821203ad6d3269587729656bbe273"
+    },
+    {
+      "path": "research/accel02_20261011/q1a/review/Q1B_PROPOSAL_REVIEW.json",
+      "sha256": "9cf208e79b5f6d426d4ad820dd5fe62c9f9f2800e9a6e476d51121c6307884bc"
+    }
+  ],
+  "current_Q1A": {
+    "G1_FINE": {
+      "whole_interval": true,
+      "number_initial_nH_max": 3.5288241094050894e-09,
+      "number_gate": "FAIL",
+      "energy_initial_max": 1.0815828184883623e-10,
+      "energy_gate": "PASS",
+      "all_scientific_gates": "NOT_ADMITTED"
+    },
+    "G1_TIGHT": {
+      "whole_interval": false,
+      "saved_epochs": 112,
+      "requested_epochs": 129,
+      "last_accepted_u": 0.8677276379189706,
+      "status": "FIRST_FAILURE_PRESERVED",
+      "classification": "NUMERICAL_SOLVER_STEP_SIZE_FLOOR",
+      "root_cause": "UNRESOLVED",
+      "full_time_certificate": false
+    },
+    "G2_FINE": {
+      "status": "PENDING_TERMINAL_EVIDENCE",
+      "final_prediction": null,
+      "root_finalization_required": true
+    },
+    "source_pair_129": {
+      "number_lower_bound": 0.032743252486859845,
+      "energy_lower_bound": 0.026889893991217877,
+      "target": 0.001,
+      "status": "FROZEN_PAIR_CANNOT_PASS_FULL_SOURCE_SPECTRAL_GATE",
+      "evolved_field_prediction": false,
+      "subset65_conclusion": null
+    }
+  },
+  "physics_lock": {
+    "geometry": "non-tilted axisymmetric dust+Lambda BianchiI test field; initial trial r=0",
+    "metric": "(-,+,+,+)",
+    "redshift": "mean volume",
+    "range": [
+      15.9,
+      4.0
+    ],
+    "source": "same pinned HM12 emissivity; UVB initial field only",
+    "physical_source_band_eV": [
+      10.0,
+      50000.0
+    ],
+    "gas": "same imported primary HHe CaseA/Grackle subset",
+    "initial_T_K": 20.0,
+    "initial_fractions": [
+      0.0002,
+      0.0,
+      0.0
+    ],
+    "cmb": "same prescribed isotropic bath",
+    "CR": "OFF_NOT_COMPLETED",
+    "RCT": "OFF_NOT_COMPLETED"
+  },
+  "global_acceptance_unchanged": {
+    "time_fields": 2e-06,
+    "energy_initial_scale": 1e-09,
+    "photon_number_initial_nH_scale": 1e-09,
+    "spectral_angular": 0.001,
+    "geometry": 1e-11,
+    "strict_positive_photons": true,
+    "physical_gas_domain_required": true,
+    "clipping_allowed": false,
+    "common_epoch_sets": [
+      129,
+      65
+    ],
+    "normalization": "Each epoch set separately: max absolute difference / fine-history amplitude; exact zero if amplitude zero",
+    "ledgers": "all required saved epochs plus recorded segment endpoints",
+    "local_gate_does_not_replace_global": true
+  },
+  "new_numerical_contract": {
+    "state_per_cell": [
+      "N_reference_cm3",
+      "U_eV_reference_cm3"
+    ],
+    "derived_Q": "U/R",
+    "cell_coordinates": "fixed q boundaries and fixed initial angular ordinate",
+    "exact_source_moments": [
+      "S0=w_mu R^-3 integral s_log dlnE",
+      "S1=w_mu R^-4 integral E s_log dlnE"
+    ],
+    "opacity_moments": [
+      "K0=c integral sigma(Rq) F dlnq",
+      "K1=c integral q sigma(Rq) F dlnq"
+    ],
+    "coupled_rhs": [
+      "Ndot=S0-sum_a n_a K0_a",
+      "Udot=R S1-sum_a n_a R K1_a-lambda U"
+    ],
+    "same_integrals_required_in": [
+      "photon_depletion",
+      "species_rates",
+      "excess_heat",
+      "absorption_counter",
+      "source_N_counter",
+      "source_E_counter",
+      "work_counter"
+    ],
+    "provider_replacement": false,
+    "representation_change_is_explicit": true,
+    "full_ODE_readiness": false
+  },
+  "required_unclosed_blockers": [
+    "Empty-cell Q/N, support entry and endpoint realizability treatment",
+    "Stable positive moment reconstruction and moment inversion",
+    "Actual versioned native common integrated-photo-input adapter",
+    "N/U Jacobian including within-cell moment coupling and admissible-direction verification",
+    "New-cell source precheck using saved accepted reference",
+    "Native-opacity quadrature vs reconstruction separation",
+    "Independent bounded local gate decision"
+  ],
+  "prospective_cell_family": {
+    "selected": false,
+    "proposal": "64 uniform log-q base cells union initial UVB jumps, native atomic thresholds and initial50keV edge; preserve exact source jump distinct from54.42 cutoff",
+    "coarse_cell_count": "about90; exact immutable manifest required",
+    "enriched": "bisect each coarse log-q cell once",
+    "unbounded_escalation": false,
+    "reject_before_ODE_if_local_source_or_reconstruction_fails": true
+  },
+  "nodes": [
+    {
+      "id": "Q1B0_CONTRACT",
+      "state": "READY_DESIGN_ONLY",
+      "depends": [],
+      "action": "Freeze N/U state, cells, units, common K0/K1, exact source moments, reconstruction, active support, empty/entry/endpoint treatment, native ABI and Jacobian contract.",
+      "outputs": [
+        "Q1B_CONTRACT.json",
+        "Q1B_GRID_PAIR.json",
+        "INVARIANT_DERIVATION.md",
+        "EMPTY_CELL_DESIGN.md"
+      ],
+      "gate": "Independent derived pairing plus fully specified closure/ABI; no undefined empty-cell operation.",
+      "on_fail": "NO_GO_FULL_ODE"
+    },
+    {
+      "id": "Q1B1_SOURCE_IC",
+      "state": "WAIT_CONTRACT",
+      "depends": [
+        "Q1B0_CONTRACT"
+      ],
+      "parallel_group": "LOCAL_VALIDATION",
+      "action": "Implement new exact cell S0/S1 and UVB N/Q intersections; sum against saved accepted reference over129/65 epochs, threshold selections and support-edge cases.",
+      "old_Q0_reference_reintegration": false,
+      "engineering_headroom": {
+        "relative_reference_amplitude": 1e-12,
+        "zero_reference": "exact zero",
+        "scope": "new source implementation only, not global acceptance"
+      },
+      "outputs": [
+        "SOURCE_IC_CELL_CHECK.json"
+      ],
+      "gate": "Correct units/R factors/support and both number/energy sums; any failure blocks next costly ODE.",
+      "on_fail": "STOP_FIX_IMPLEMENTATION_NO_ODE"
+    },
+    {
+      "id": "Q1B2_OPACITY_RECONSTRUCTION",
+      "state": "WAIT_CONTRACT",
+      "depends": [
+        "Q1B0_CONTRACT"
+      ],
+      "parallel_group": "LOCAL_VALIDATION",
+      "action": "Implement positive realizable reconstruction and threshold-split native K0/K1. Independently test constant/polynomial manufactured opacity and actual native-sigma moment integration; separate within-cell reconstruction from temporary quadrature error.",
+      "engineering_headroom": {
+        "relative_reference_amplitude": 0.0001,
+        "zero_reference": "exact zero when reference amplitude zero",
+        "scope": "local headroom only; not replacement for1e-3 global gate"
+      },
+      "required_cases": [
+        "interior moments",
+        "near endpoint",
+        "empty cell",
+        "partially entered cell",
+        "moving threshold inside fixed cell",
+        "n_absorber=0",
+        "no populated E>50keV dormant support"
+      ],
+      "outputs": [
+        "REALIZABILITY_DECISION.json",
+        "OPACITY_MOMENT_CHECK.json"
+      ],
+      "gate": "No clipping/floors/hidden provider substitute; stable admissible map and bounded integration/reconstruction errors.",
+      "on_fail": "ONE_EXPLICIT_BOUNDED_REDESIGN_OR_STOP"
+    },
+    {
+      "id": "Q1B3_NATIVE_JACOBIAN",
+      "state": "WAIT_CONTRACT",
+      "depends": [
+        "Q1B0_CONTRACT"
+      ],
+      "parallel_group": "LOCAL_VALIDATION",
+      "action": "Implement versioned common integrated-photo adapter calling unchanged gas/axisym providers; verify common local ledgers and the new N/U Jacobian with admissible directional differences.",
+      "must_resolve": [
+        "empty-cell derivative/entry handling",
+        "within-cell N/U coupling",
+        "same K0/K1 in photon gas heat counters",
+        "native existing guards retained"
+      ],
+      "outputs": [
+        "NATIVE_ADAPTER_DECISION.json",
+        "JACOBIAN_DECISION.json"
+      ],
+      "gate": "Actual implemented adapter/Jacobian evidence; proposal-only algebra is insufficient.",
+      "on_fail": "NO_GO_FULL_ODE"
+    },
+    {
+      "id": "Q1B4_MANUFACTURED_EXACT_EVOLUTION",
+      "state": "WAIT_LOCAL_PARALLEL_GATES",
+      "depends": [
+        "Q1B1_SOURCE_IC",
+        "Q1B2_OPACITY_RECONSTRUCTION",
+        "Q1B3_NATIVE_JACOBIAN"
+      ],
+      "action": "New cheap analytic fixtures for source-only moment addition, expansion-only N constant and U/R constant, fixed/full-support constant-grey absorption, and explicit entry treatment.",
+      "grey_fixture_constraint": "Use fixed/full active support or prove reconstruction invariance separately; expanding support alone does not preserve a whole-cell power law.",
+      "outputs": [
+        "EXACT_EVOLUTION_DECISION.json"
+      ],
+      "gate": "Bounded independent fixture agreement, domain, counter signs; all required local gates close before full ODE.",
+      "on_fail": "STOP_LOCAL_FIX_NO_FULL_ODE"
+    },
+    {
+      "id": "Q1B5_LOCAL_REVIEW",
+      "state": "WAIT_LOCAL_EVIDENCE",
+      "depends": [
+        "Q1B4_MANUFACTURED_EXACT_EVOLUTION"
+      ],
+      "action": "Independent reviewer records GO or NO_GO from actual implementation and new local evidence, not file presence.",
+      "outputs": [
+        "LOCAL_GO_NO_GO.json"
+      ],
+      "gate": "All required blockers explicitly resolved; physics and global criteria unchanged.",
+      "on_fail": "NO_GO_FULL_ODE"
+    },
+    {
+      "id": "Q2B_FULL_PAIR",
+      "state": "NO_GO_UNTIL_LOCAL_REVIEW",
+      "depends": [
+        "Q1B5_LOCAL_REVIEW"
+      ],
+      "condition": "LOCAL_GO_NO_GO.decision==GO and all required blocker resolutions have evidence",
+      "action": "Run one frozen new cell candidate/enriched pair over full15.9to4, plus prospectively chosen same-grid temporal check. Preserve accepted-state, source/radiation/heat and global ledgers.",
+      "max_automatic_refinement_pairs": 1,
+      "global_gate": "global_acceptance_unchanged",
+      "raw_checkpoint": "Immediate on each completion or first failure, before long report/review",
+      "on_fail": "PRESERVE_CLASSIFY_STOP_NO_UNBOUNDED_GRID_GROWTH"
+    },
+    {
+      "id": "Q3B_INDEPENDENT_DECISION",
+      "state": "WAIT_NEW_FULL_EVIDENCE",
+      "depends": [
+        "Q2B_FULL_PAIR"
+      ],
+      "action": "Classify actual new numerical/physics/implementation/solver limits; permit Bianchi pair only after new full acceptance.",
+      "outputs": [
+        "FINAL_DECISION.json",
+        "REPORT_KO.md",
+        "RESUME_PROMPT_KO.md"
+      ],
+      "new_BASS_native_receiver_admission": "Requires later accepted history plus actual bound receiver call; oldN4 evidence unchanged"
+    }
+  ],
+  "optional_nonblocking_lanes": [
+    {
+      "id": "P_SCHUR_PERFORMANCE",
+      "state": "OPTIONAL_PROPOSAL_ONLY",
+      "reference": "PERFORMANCE_NEXT.md",
+      "action": "Verify exact block solve against same saved new matrices before any changed-solver comparison; preserve all six counters and SciPy factor-reuse semantics.",
+      "scope": "Current point Jacobian only; Q1B requires separate 2x2 cell-block derivation/inspection.",
+      "claimed_speedup": null,
+      "repairs_spectral_error": false,
+      "allowed_before_full_gate": [
+        "source/matrix inspection",
+        "bounded linear algebra equivalence on available new matrices"
+      ],
+      "full_ODE_requires": "Q1B gates if applied to Q1B; separately reviewed bounded solver-change contract otherwise"
+    },
+    {
+      "id": "P_BDF_STEP_FLOOR",
+      "state": "OPTIONAL_SCOPED_NEW_FAILURE_ONLY",
+      "reference": "review/G1_TIGHT_FAILURE_REVIEW.json",
+      "action": "Inspect saved new failure and, only if useful, make one bounded instrumented changed diagnostic to distinguish Newton rejection, localerror floor and source-entry scaling.",
+      "unchanged_full_replay": false,
+      "tolerance_relaxation": false,
+      "allowed_claim": "Root-cause evidence for new failure only; no whole-interval scientific certification",
+      "near_coincident_event_claim": "Not supported by current recorded boundary spacing",
+      "on_no_new_evidence": "Keep root cause unresolved; proceed with approved localQ1B work"
+    }
+  ],
+  "checkpoint_policy": {
+    "local": "Each local gate gets source/input identities and immutable evidence/decision",
+    "runs": "Archive raw terminal outputs or first failure immediately",
+    "remote": "Authorized additive GitHub plus actual Drive/Dropbox receipts",
+    "semantics": "UPLOAD_VERIFIED != RESTORE_VERIFIED",
+    "restart": "Saved state alone is not supported exact-resume CLI",
+    "new_claim_requires_actual_evidence": true
+  },
+  "forbidden": [
+    "RUN002 replay",
+    "EVENT003 replay",
+    "Q0 reference replay",
+    "uniform unbounded grid growth",
+    "physics or scientific threshold relaxation",
+    "counter-only source correction",
+    "plot-only Gamma or heat correction",
+    "native provider replacement",
+    "old point photon Jacobian reused forN/U",
+    "clipping negative states",
+    "source-only PASS as evolved field PASS",
+    "prefix temporal comparison promoted to full history",
+    "G2 terminal prediction or fabricated completion"
+  ]
+}
