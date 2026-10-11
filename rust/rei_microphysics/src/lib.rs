@@ -151,3 +151,9 @@ pub mod flrw_three_equations;
 pub mod he_rct;
 
 pub mod coupled_primary;
+
+// ACCEL02: separately scoped cold Case-A IGM provider, no FT03 admission.
+pub mod igm_rates;
+pub mod igm_state;
+pub mod igm_thermal;
+pub mod characteristic_source;

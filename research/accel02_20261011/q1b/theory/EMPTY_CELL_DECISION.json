@@ -1,0 +1,152 @@
+{
+  "schema": "rei.q1b.empty_cell_decision.v1",
+  "created_utc": "2026-10-11T00:52:39.757132+00:00",
+  "checkpoint": "C08R1_SUCCESSOR_Q1B0",
+  "owner": "/root/q1b_theory",
+  "model_identity": "UNKNOWN",
+  "status": "DERIVED_LOCAL_CONTRACT_PENDING_INDEPENDENT_REVIEW",
+  "scientific_promotion": false,
+  "full_ODE": "NO_GO",
+  "scope": "fixed-q N,U local numerical closure with unchanged physical providers",
+  "state": {
+    "stored": [
+      "N_reference_cm-3",
+      "U_eV_reference_cm-3"
+    ],
+    "derived": "Q=U/R",
+    "volume": "V=a_rel^3 dimensionless",
+    "cone": "N>=0 and R*a*N<=U<=R*b*N; N=0 implies U=0",
+    "support": "[q_L,min(q_R,50000/R)] for monotone directional redshift only",
+    "source_lower_bound_eV": 10,
+    "lower_source_bound_is_photon_deletion_boundary": false,
+    "directional_blueshift": "NOT_ADMITTED_REQUIRES_HISTORICAL_SUPPORT_AND_PROVIDER_BAND_REVIEW"
+  },
+  "selected_numerical_closure": "POSITIVE_POWER_LAW_WITH_EXPLICIT_BOUNDARY_STATES",
+  "closures_not_selected": [
+    "LINEAR_ENDPOINT_MEASURE"
+  ],
+  "empty": {
+    "value": "K0=K1=0 exactly",
+    "rhs": "[S0,R*S1]",
+    "jacobian_status": "NO_JAC_AT_EMPTY",
+    "allowed_derivative": "CONE_DIRECTIONAL_ONLY for supplied admissible direction",
+    "forbidden": [
+      "positive density floor",
+      "mean-q floor",
+      "clipping",
+      "arbitrary finite p",
+      "fabricated zero absorption Jacobian",
+      "unlabelled finite difference outside cone"
+    ]
+  },
+  "zero_width": {
+    "condition": "b<=a",
+    "allowed_state": "N=U=0 only for current continuous-source/IC scope",
+    "value": "source and opacity moments exactly zero",
+    "nonzero_state": "NONREALIZABLE",
+    "jacobian_status": "NO_JAC_AT_ZERO_WIDTH"
+  },
+  "interior": {
+    "condition": "N>0;R*a*N<U<R*b*N",
+    "reconstruction": "unique finite p from m=U/(R*N)=Z1/Z0",
+    "jacobian": "Dg=Cov(g,ln(q/qstar))/Cov(q,ln(q/qstar));dAg/dN=<g>-m*Dg;dAg/dU=Dg/R"
+  },
+  "endpoint": {
+    "rate_status": "ENDPOINT_LIMIT",
+    "trace_policy": "INTERIOR_ONE_SIDED_TRACE:lower a+ or upper b-",
+    "missing_verified_trace": "ENDPOINT_TRACE_REQUIRED_NO_RATE",
+    "smooth_kernel_derivative": "one-sided Dg=gprime(endpoint)",
+    "threshold_jacobian_status": "NO_JAC_AT_THRESHOLD_ENDPOINT",
+    "provider_exact_equality_branch_not_automatically_equal_to_trace": true
+  },
+  "source_entry": {
+    "generic_empty_finite_support": "positive source supplies an admissible direction but not a Frechet Jacobian",
+    "growing_zero_width_leading_terms": "N=A0*lambda0*tau^2/2;Q-a*N=A0*a*lambda0^2*tau^3/6",
+    "mean_location": "a+(b-a)/3+O(tau^2),subject to smooth nonzero source and lambda0>0",
+    "startup_algorithm": "NOT_SELECTED_OR_IMPLEMENTED",
+    "continuous_cone_invariance": "DERIVED;does not imply numerical-stage invariance"
+  },
+  "solver_stage": {
+    "invalid_trial": "NONREALIZABLE_STAGE must be handled by demonstrated rejection/backtracking strategy",
+    "accepted_invalid_state": "FAIL_UNCHANGED_STRICT_DOMAIN_GATE",
+    "generic_unconstrained_BDF": "NOT_ADMITTED_BY_THIS_CONTRACT",
+    "remaining_blocker": "actual source-entry plus admissible nonlinear-stage method with controlled error and stiff behavior"
+  },
+  "conservation": {
+    "number": "sum(N)-N_emit+N_abs constant",
+    "photon_rhs": [
+      "S0-sum_alpha(n_alpha*K0)",
+      "R*S1-sum_alpha(n_alpha*R*K1)-lambda*U"
+    ],
+    "gas_gamma": "sum_c(K0)/V",
+    "gas_heat": "eV_erg*sum_c(R*K1-chi*K0)/V",
+    "radiation_work_counter": "eV_erg*sum_c(lambda*U)",
+    "normalizations_unchanged": true
+  },
+  "next_code_boundary": {
+    "allowed": [
+      "source/IC cell moment implementation against saved references",
+      "positive power-law local reconstruction and directional derivatives",
+      "threshold-split paired K0/K1 local native adapter design",
+      "durable checkpoint capability design and analytic recovery fixtures"
+    ],
+    "required_before_full_ODE": [
+      "source/IC local acceptance",
+      "reconstruction and native opacity local acceptance",
+      "integrated native photo ABI acceptance",
+      "new N/U Jacobian and boundary-stage strategy acceptance",
+      "recoverable state/history/counter checkpoint acceptance",
+      "independent decision"
+    ],
+    "old_runs_forbidden_to_replay": [
+      "RUN002",
+      "EVENT003",
+      "Q0",
+      "GAUSS1_FINE",
+      "GAUSS1_TIGHT",
+      "GAUSS2_FINE"
+    ]
+  },
+  "claims": [
+    {
+      "id": "CONSERVATIVE_PAIRING",
+      "status": "DERIVED_AUTHOR_PENDING_REVIEW"
+    },
+    {
+      "id": "EMPTY_NONFRECHET",
+      "status": "DERIVED_WITH_EXACT_NONADDITIVITY_COUNTEREXAMPLE"
+    },
+    {
+      "id": "ENTRY_ONE_THIRD",
+      "status": "DERIVED_AND_ANALYTIC_FIXTURE_NUMERICALLY_CHECKED"
+    },
+    {
+      "id": "NATIVE_ENDPOINT_TRACE",
+      "status": "LOCAL_CONTRACT_REQUIREMENT_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "SOLVER_STAGE_STRATEGY",
+      "status": "UNRESOLVED"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "research/accel02_20261011/q1a/NEXT_DESIGN.md",
+      "sha256": "296421ea8846c7f137a5094fcc4745b35608efbc0e082aa02b89acd80b4d4815"
+    },
+    {
+      "path": "research/accel02_20261011/q1a/Q1B_LOCAL_DAG.json",
+      "sha256": "a515b49704069111262f5547d932fa317ceaafa88b655d7d8fed9cc13bb51a73"
+    },
+    {
+      "path": "research/accel02_20261011/q1a/review/Q1B_PROPOSAL_REVIEW.json",
+      "sha256": "9cf208e79b5f6d426d4ad820dd5fe62c9f9f2800e9a6e476d51121c6307884bc"
+    },
+    {
+      "path": "research/accel02_20261011/q1a/review/FINAL_DECISION_C08R1.json",
+      "sha256": "830f9790fed9a75aab9ab8910efea805bdd8b6a098203008634dabdea4bc60a7"
+    }
+  ],
+  "theory_contract_sha256": "14525aab9950e36c2933458accf1ed3ae3642ab5ec0bce1175d977376e207bc0",
+  "analytic_checks_sha256": "8534335c690d53829c2d7a9ed1b875970178c0338335473129e4c3ea8052afe9"
+}

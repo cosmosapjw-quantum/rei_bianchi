@@ -1,0 +1,5 @@
+C12R14의 Q2_FULL_HISTORY_NEXT_ALLOCATION부터 이어서 진행해줘. 게시 동기화 checkpoint는 C12R15_FINAL_SYNC다. research/accel02_20261011/q1b/c12/HANDOFF.json·STATE.json·NEXT_DAG.json과 future/STEP_SIZE_TREND.json·NEXT_ALLOCATION_DESIGN.json을 먼저 읽어줘. C2_FULL004 gen96의 193-state prefix, 누적 cursor attempts102/accepted96/rejected6, 외부 실패 debit3, 99개 pinned dependencies와 기존 source/physics/허용 기준을 보존해줘.
+
+먼저 최신 gen96 고정 상태의 HI_THRESHOLD_CELL24_STIFF_DEFECT_DIAGNOSIS(별칭 HI_THRESHOLD_CELL24_FIXED_STATE_H_CONVERGENCE)를 새 미실행 진단으로 수행해줘. 앞으로 진행할 구간의 h/h2/h4 비교로 HI cell24의 N/U/GammaHI 결함과 수렴성을 분리하고, 원인과 step 회복 가능성이 확인되기 전에는 전구간 ETA를 단정하지 말아줘. 현재 할당은 소진되어 같은 command 자동 재실행은 금지다. 새 계산은 명시적 prospective 할당/control identity와 create-only run/diagnostic root를 연결하고, 기존 cumulative counters와 세 과거 실패 원본을 유지한 뒤 실행해줘. 추가100회 설계는 제안 상태이므로 채택 사실로 간주하지 말아줘.
+
+완료된 RUN002·EVENT003·Q0·C10/C11 검산·PILOT02·초기 h0 및 기존 child prepare를 반복하지 말아줘. 새 실패는 원본 증거를 남긴 뒤만 수정하고 단계별 durable checkpoint와 GitHub·Drive/Dropbox 백업을 유지해줘. 전구간 목표 z=4와 65/129 time/spectral/ledger/geometry 기준은 그대로 유지하고, scientific admission과 새 BASS native receiver는 실제 gate 통과 전까지 HOLD로 남겨줘.

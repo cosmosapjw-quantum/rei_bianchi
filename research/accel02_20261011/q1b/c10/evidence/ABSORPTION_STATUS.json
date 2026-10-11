@@ -1,0 +1,220 @@
+{
+  "stage": "C10_POSITIVE_ABSORPTION_FUNCTIONAL",
+  "status": "PASS_LOCAL_TARGETED_TESTS_PENDING_INDEPENDENT_REVIEW_AND_COUPLED_USE",
+  "created_utc": "2026-10-11T04:23:41.603880+00:00",
+  "actual_host_model": "UNKNOWN",
+  "harness": "GPT-6 Astra coding v4.0.0-20260908 (instruction selection, not host claim)",
+  "frozen_parent_checkpoint": "C09B 3581a23606499c7a40d6d33f3dcfc75fed0bca4e",
+  "contract": {
+    "moment_fit_rtol": 1e-12,
+    "pairing_rtol": 1e-12,
+    "opacity_orders": [
+      64,
+      128
+    ],
+    "opacity_per_component_rtol": 1e-07,
+    "per_component_scale": "absolute fine value; zero requires exact equality",
+    "coordinate_indicator": "32*ulp(b)/min(mean-a,b-mean) <= rtol (unchanged)",
+    "endpoint_trace": "NOT_IMPLEMENTED_FAIL_CLOSED",
+    "empty": "exact zero without native calls",
+    "source_seed_or_clipping": "NONE",
+    "photoheat_numerical_gates": {
+      "ABI_heat": "KE - CHEMICAL_CHI_EV*K0",
+      "direct_heat": "c*sum((R*q-CHEMICAL_CHI_EV)*sigma*P)",
+      "order_checks": "both direct and ABI heat for each species, incident and attenuated",
+      "direct_ABI_consistency": "both quadrature orders, incident and attenuated",
+      "all_relative_scales": "own absolute direct/fine heat, exactzero requires exact equality",
+      "rtol": 1e-07,
+      "native_heat": "nonnegative, no clamp",
+      "generic_manufactured_grey": "signed mathematical heat permitted; not a physical ionization provider"
+    }
+  },
+  "tests": [
+    {
+      "id": "ABS_GREY_STIFF",
+      "reference": "N/(1+h*kappa), U/(1+h*kappa); grey backward Euler exact discrete map",
+      "h_kappa": [
+        0,
+        1e-06,
+        1,
+        1000000.0,
+        1e+16
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "ABS_AFFINE_MOMENT",
+      "reference": "c*sigma0*(N+U/E0) from linearity, independent of reconstruction quadrature",
+      "status": "PASS"
+    },
+    {
+      "id": "ABS_EMPTY_DOMAIN_AND_GATES",
+      "covers": [
+        "empty no opacity",
+        "invalid cone",
+        "endpoint refused",
+        "thin coordinate refused",
+        "invalid gas/time/sigma refused",
+        "underresolved oscillatory kernel refused"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "ABS_ACTUAL_NATIVE_49_50KEV",
+      "native_sigma_calls": 2,
+      "source": "actual pinned N1 binary SIGMA",
+      "covers": [
+        "positive H/He rates and counters",
+        "64/128 agreement",
+        "stored N/U ledger pairing",
+        "native rate/counter pairing"
+      ],
+      "status": "PASS",
+      "limitations": "native provider and cross sections are shared with production; this is binding/numerical evidence, not external physical validation"
+    },
+    {
+      "id": "ABS_PHOTOHEAT_CANCELLATION_GATE",
+      "status": "PASS",
+      "reference": "Legendre P127 positive manufactured opacity on uniform-q measure; K0 and KE pass, heat fails; preparation must reject"
+    },
+    {
+      "id": "ABS_DIRECT_HEAT_ANALYTIC",
+      "status": "PASS",
+      "reference": "constant HI cross section: direct heat = c*sigma*(U-chi*N), compared at1e-12"
+    },
+    {
+      "id": "ABS_DIRECT_HEAT_INCONSISTENT_ABI",
+      "status": "PASS",
+      "reference": "mocked 1e-5 heat contamination in ABI KE must fail direct/subtraction consistency at1e-7; mock never used by physical provider"
+    }
+  ],
+  "execution_evidence": [
+    {
+      "command": "python research/accel02_20261011/q1b/c10/test_positive_absorption.py",
+      "log": "ABSORPTION_01_RED.log",
+      "exit": 1,
+      "classification": "EXPECTED_TEST_FIRST_MISSING_MODULE"
+    },
+    {
+      "command": "python research/accel02_20261011/q1b/c10/test_positive_absorption.py",
+      "log": "ABSORPTION_02_FIRST_RUN.log",
+      "exit": 0,
+      "tests": 4,
+      "seconds": 0.088
+    },
+    {
+      "command": "python research/accel02_20261011/q1b/c10/test_positive_absorption.py",
+      "log": "ABSORPTION_03_FINAL.log",
+      "exit": 0,
+      "tests": 4,
+      "seconds": 0.029,
+      "reason": "new endpoint/threshold refusal and explicit native-counter linkage"
+    },
+    {
+      "command": "python research/accel02_20261011/q1b/c10/test_positive_absorption.py",
+      "log": "ABSORPTION_04_GATES.log",
+      "exit": 0,
+      "tests": 4,
+      "seconds": 0.031,
+      "reason": "gate rejection and counter-link assertions"
+    },
+    {
+      "command": "python -m unittest research/accel02_20261011/q1b/c10/test_positive_absorption.py -k photoheat -v",
+      "log": "ABSORPTION_05_PHOTOHEAT_RED.log",
+      "exit": 1,
+      "tests": 1,
+      "reason": "confirmed missing heat gate, QuadratureNotConverged not raised"
+    },
+    {
+      "command": "python research/accel02_20261011/q1b/c10/test_positive_absorption.py",
+      "log": "ABSORPTION_06_PHOTOHEAT_GREEN.log",
+      "exit": 0,
+      "tests": 5,
+      "seconds": 0.051
+    },
+    {
+      "command": "python research/accel02_20261011/q1b/c10/test_positive_absorption.py",
+      "log": "ABSORPTION_07_PHOTOHEAT_FINAL.log",
+      "exit": 0,
+      "tests": 5,
+      "reason": "removed duplicate diagnostic key and attached names to attenuated diagnostics"
+    },
+    {
+      "command": "python -m unittest research/accel02_20261011/q1b/c10/test_positive_absorption.py -k direct_photoheat -v",
+      "log": "ABSORPTION_08_DIRECT_HEAT_RED.log",
+      "exit": 1,
+      "tests": 2,
+      "reason": "direct heat key absent; perturbed ABI subtraction was not rejected"
+    },
+    {
+      "command": "python research/accel02_20261011/q1b/c10/test_positive_absorption.py",
+      "log": "ABSORPTION_09_DIRECT_HEAT_GREEN.log",
+      "exit": 0,
+      "tests": 7,
+      "seconds": 0.044,
+      "source_sha256": {
+        "positive_absorption.py": "71e080d2f6ce60440d008e97420a470dfebbc2d46db61195933c10f407994da4",
+        "test_positive_absorption.py": "8ea77c10b7d3d7168b375e8ef2212dc24af52b0626f62f3c69cea8c8b270c026"
+      }
+    }
+  ],
+  "code_sha256": {
+    "positive_absorption.py": "71e080d2f6ce60440d008e97420a470dfebbc2d46db61195933c10f407994da4",
+    "test_positive_absorption.py": "8ea77c10b7d3d7168b375e8ef2212dc24af52b0626f62f3c69cea8c8b270c026"
+  },
+  "native_binary_sha256": "3e3a3ef4d89019d791f4e2f4cf25108ac2c6d5e365c58a928d9ff8a85234a0ac",
+  "unchanged_reconstruction_sha256": "80a48fa9723414d6c0db31cb8a2c9287aacd1665b61a7eda5c61441bad54b4f8",
+  "claim_ceiling": "LOCAL_POSITIVE_ABSORPTION_FUNCTIONAL_ONLY",
+  "not_evaluated": [
+    "coupled four-gas solver",
+    "full C2/C3 physical step",
+    "h/h2/h4 coupled convergence",
+    "whole-history 15.9->4",
+    "scientific admission",
+    "ordinary photon Jacobian at empty or endpoints"
+  ],
+  "completed_prior_campaigns_replayed": [],
+  "review_repair": {
+    "finding": "Independent reviewer: K0/KE agreement can hide photoheat cancellation error",
+    "classification": "NUMERICAL_ACCEPTANCE_GATE_INCOMPLETE",
+    "status": "REPAIRED_TARGETED_TESTS_PASS",
+    "pre_repair_source_snapshot": "evidence/ABSORPTION_AS_RUN_PRE_PHOTOHEAT",
+    "pre_repair_source_sha256": {
+      "positive_absorption.py": "a79db555ad26e7c876b3e8fee6813a66bb4568a53715366d7a2252e8e94462b9",
+      "test_positive_absorption.py": "e33d3acdf6e317e5b451bdaab008108cd56f5194a847c6c26c29dbe73989a592"
+    },
+    "photoheat": "KE - CHEMICAL_CHI_EV * K0, each species on own abs(fine) scale; exact zero requires exact equality",
+    "applies_to": [
+      "incident order comparison",
+      "attenuated order comparison"
+    ],
+    "tolerance_unchanged": 1e-07,
+    "no_clamp": true,
+    "counterexample": {
+      "kind": "manufactured positive HI-only cross section; not adopted physical provider",
+      "energy_support_eV": [
+        13.6,
+        13.62
+      ],
+      "mean_energy_eV": 13.61,
+      "sigma_HI_cm2": "1e-18*(1+0.001*P_127((E-13.61)/0.01))",
+      "sigma_HeI_HeII": 0,
+      "K0_relative_order_error": 0.0,
+      "KE_relative_order_error": 2.8750421154910555e-08,
+      "photoheat_relative_order_error": 3.383309019666658e-05,
+      "coarse_photoheat": 3.4671024763315587e-10,
+      "fine_photoheat": 3.467219783091212e-10,
+      "first_parameter_probe_exit": 1,
+      "first_probe_reason": "epsilon=0.005 already failed existing KE gate, previous epsilon=0.001 establishes new counterexample; no physical run affected"
+    },
+    "affected_historical_evidence": "prior native-step runs retain pre-repair source identity; no retroactive promotion",
+    "direct_heat_extension": {
+      "status": "PASS_SEVEN_FOCUSED_TESTS",
+      "pre_direct_source_snapshot": "evidence/ABSORPTION_AS_RUN_DIFFERENCE_HEAT",
+      "scope": "same Important review finding, direct quadrature guards subtraction-conditioned ABI heat",
+      "first_red": "ABSORPTION_08_DIRECT_HEAT_RED.log",
+      "final_green": "ABSORPTION_09_DIRECT_HEAT_GREEN.log",
+      "native_physics_or_tolerance_changed": false
+    }
+  }
+}

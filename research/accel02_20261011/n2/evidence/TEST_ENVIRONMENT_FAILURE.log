@@ -1,0 +1,17 @@
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+_________ test_constant_coefficients_source_has_correct_residence_time _________
+
+    def test_constant_coefficients_source_has_correct_residence_time():
+        for x in (0., 1e-12, 1e-5, 1., 100., 1e6):
+            n0, source, dt = np.array([.3]), np.array([.7]), 2.
+            k = np.array([[.2, .3, .5]]) * x/dt
+            out = exponential_step(n0, source, k, dt)
+            # Independent high-precision scalar formula, not implementation phi helpers.
+>           import mpmath as mp
+E           ModuleNotFoundError: No module named 'mpmath'
+
+research/accel02_20261011/n2/tests/test_characteristics.py:16: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED research/accel02_20261011/n2/tests/test_characteristics.py::test_constant_coefficients_source_has_correct_residence_time
+1 failed, 2 passed in 0.17s

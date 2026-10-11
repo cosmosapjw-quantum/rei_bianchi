@@ -1,0 +1,73 @@
+{
+  "schema": "rei.q1b.theory_analytic_checks.v1",
+  "created_utc": "2026-10-11T00:52:39.757132+00:00",
+  "owner": "/root/q1b_theory",
+  "model_identity": "UNKNOWN",
+  "status": "AUTHOR_NUMERICALLY_CHECKED_ANALYTIC_FIXTURES_ONLY",
+  "no_ODE_no_native_no_old_replays": true,
+  "execution_anomaly": {
+    "first_attempt": "ModuleNotFoundError: No module named mpmath",
+    "stage": "import before any numeric calculation or file creation",
+    "resolution": "Use Python standard-library Decimal.exp at80decimal digits; no dependency installation"
+  },
+  "empty_nondifferentiability": {
+    "interval": [
+      1,
+      2
+    ],
+    "R": 1,
+    "kernel": "q^2",
+    "directions": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        2
+      ]
+    ],
+    "sum_direction": [
+      2,
+      3
+    ],
+    "separate_directional_sum": "5",
+    "combined_directional_value": "14/3",
+    "difference": "-1/3",
+    "proof": "sum direction mean3/2 corresponds exactly to p=1; normalized dlnq density q gives uniform dq law on[1,2]"
+  },
+  "entry_analytic_fixture": {
+    "definition": "a=1,lambda=1,b=exp(t),comoving source Fdot=1 on[1,b(t)],no opacity",
+    "solution": "N=t^2/2;Q=exp(t)-1-t",
+    "mean_fraction_limit": "(Q/N-1)/(exp(t)-1)->1/3",
+    "arithmetic_decimal_digits": 80,
+    "values": [
+      {
+        "tau": "1e-2",
+        "mean_support_fraction": "0.33250027916600198578868627997294282426822722198903768996438451846838408859984167",
+        "target_limit": "1/3",
+        "N": "0.00005",
+        "Q": "0.0000501670841680575421654569028600338073622015242925151644040312543741907313239"
+      },
+      {
+        "tau": "1e-4",
+        "mean_support_fraction": "0.33332500002777916666005257936673288690434434874549610114401584588535715671855206",
+        "target_limit": "1/3",
+        "N": "5E-9",
+        "Q": "5.0001666708334166680555753970734154541721783810346353909723112359727818E-9"
+      },
+      {
+        "tau": "1e-6",
+        "mean_support_fraction": "0.33333325000000277777916666660052906746031911375744047614872266571802251763014674",
+        "target_limit": "1/3",
+        "N": "5E-13",
+        "Q": "5.000001666667083333416666680555557539682787698440255734678130761985E-13"
+      }
+    ]
+  },
+  "limits": [
+    "Manufactured analytic fixture only; physical provider untouched",
+    "Does not test production inversion, opacity, stage admissibility or ODE temporal error",
+    "No independent acceptance"
+  ]
+}

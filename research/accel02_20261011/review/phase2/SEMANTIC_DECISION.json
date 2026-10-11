@@ -1,0 +1,150 @@
+{
+  "schema": "rei_accel02_independent_semantic_phase2_v1",
+  "reviewer": "/root/decision_review",
+  "model_identity": "UNKNOWN",
+  "timestamp_utc": "2026-10-10T17:32:55.839765+00:00",
+  "independence": {
+    "candidate_or_test_oracle_edit": false,
+    "science_solver_calls": 0,
+    "RUN002_replayed": false
+  },
+  "decision": "HOLD_NATIVE_HISTORY_QUANTITATIVE_GATE",
+  "semantic_assessment": "Coordinate/Jacobian/event conventions consistent for declared monotone expanding band-limited conditional model",
+  "candidate_commit_N2": "3305b21697f21e10866c44eaaef531fb8e7c08ce",
+  "findings": [
+    {
+      "id": "P2-01",
+      "severity": "blocking_for_final_acceptance_report",
+      "class": "IMPLEMENTATION_EVIDENCE_GATE",
+      "finding": "Event driver ledger booleans use segment endpoint maxima only; common-epoch residual maxima are already available and can be larger. Include both in declared history ledger acceptance. EVENT001 remainsFAIL either way.",
+      "evidence": "EVENT001 maxendpointE4.673108249583302e-11 vs sampled5.323744819710732e-11; maxendpointN4.063632220805425e-8 vs sampled4.0643625001944125e-8"
+    },
+    {
+      "id": "P2-02",
+      "severity": "condition_for_strict_accepted_state_claim",
+      "class": "NUMERICAL_VALIDATION_SCOPE",
+      "finding": "Accepted photon energy positivity is checked every BDF step, but gasfractions/EOS domain are guarded at native RHS stages only. Saved129commonepochs pass gasdomain, which alone is not evidence for allaccepted gasstates. Either assess accepted gasstates or limit claim accordingly."
+    },
+    {
+      "id": "P2-03",
+      "severity": "blocking_for_native_history_promotion",
+      "class": "NUMERICAL",
+      "finding": "EVENT001 photonnumber ledger exceeds unchanged1e-9; energycoordinate exactness cannot replace numberconvergence. EVENT002 and time/spectral/angular refinement not yet reviewed."
+    }
+  ],
+  "derived_checks": [
+    "U=EN obeys Udot=E*S-(kappa+lambda)*U,lambda=H+s(3mu^2-1)",
+    "Gas photon columns include1/E; photon diagonal-(kappa+lambda); work derivativeEV*lambda; absorptioncounter derivativekappa/E",
+    "Etotal plusescape/work minus sources/CMB islinear inU,gasw andfractions; N=sumU/E is timedependent so not automatic invariant ofBDF",
+    "Knownphoto-cutoff knots13.60,24.59,54.42 match actualAtomicProvider,not bindingCHI; source10/50000 andduplicateHM12jumpshandled",
+    "Omittingdormantunknowns isexactN=0 whilebothinitialandsourcearezero; nonzero state is explicitly rejected",
+    "Finiteone-sided e adjustment isdeclaredendpointconventionwithin64eps; not permissionto clipnegative state"
+  ],
+  "claim_ceiling": [
+    "Conditional frozen discrete spectral/angular native CaseA system only",
+    "No timeconvergence from wholeinterval completion",
+    "No spectralcontinuum certification from temporal convergence",
+    "No strictglobalmonotonicityproof from four sampledgeometrychecks; selectedbackgroundexpandingaxesjustify use",
+    "No fullCR/RCT/diffuse/BianchiCMB/observationalEoR admission"
+  ],
+  "evidence": [
+    {
+      "status": "FAILED_PRESERVED",
+      "elapsed_s": 116.31178113799979,
+      "rhs_calls": 54338,
+      "jac_calls": 1326,
+      "node_count": 256,
+      "sampled_epochs": 67,
+      "end_time_s": 4.011926941800233e+16,
+      "max_local_number": 3.127265560258739e-15,
+      "max_local_energy": 1.140899291732178e-15,
+      "failure": {
+        "type": "RuntimeError",
+        "message": "Required step size is less than spacing between numbers.",
+        "traceback": "Traceback (most recent call last):\n  File \"/workspace/scratch/a5a7937171cb/rei_accel02_20261011/repos/rei_bianchi/research/accel02_20261011/integration/run_native_history.py\", line 203, in main\n    raise RuntimeError(message)\nRuntimeError: Required step size is less than spacing between numbers.\n",
+        "last_accepted_u": 0.5226017558068256
+      },
+      "path": "repos/rei_bianchi/research/accel02_20261011/integration/evidence/NATIVE001/RESULT.json",
+      "sha256": "61c4f1f5159a0a7849510611961bb79cff61f7f7a1956374758398f6192ff0eb",
+      "common_epoch_max_energy": 4.768919796807439e-05,
+      "common_epoch_max_number": 6.501788602927444e-14,
+      "sampled_fraction_min": 0.0,
+      "sampled_T_min": 20.0,
+      "sampled_T_max": 12291.36571007976
+    },
+    {
+      "status": "COMPUTED_NOT_REVIEWED",
+      "elapsed_s": 173.52944717599894,
+      "rhs_calls": 86356,
+      "jac_calls": 1684,
+      "node_count": 256,
+      "sampled_epochs": 129,
+      "end_time_s": 4.011926941800233e+16,
+      "max_local_number": 3.3390497623803796e-15,
+      "max_local_energy": 1.1740841731077443e-15,
+      "failure": null,
+      "path": "repos/rei_bianchi/research/accel02_20261011/integration/evidence/NATIVE002/RESULT.json",
+      "sha256": "1eef2d37949391c8e543a05d9a6215c43d3b9778bc9a5e8dabc65563a3ccaea0",
+      "common_epoch_max_energy": 6.00024767550072e-11,
+      "common_epoch_max_number": 4.54801905339307e-08,
+      "sampled_fraction_min": 0.0,
+      "sampled_T_min": 20.0,
+      "sampled_T_max": 12291.365679688846
+    },
+    {
+      "status": "COMPUTED_NOT_REVIEWED",
+      "checks": {
+        "whole_interval": true,
+        "sampled_positive": true,
+        "accepted_positive": true,
+        "energy_ledger": true,
+        "number_ledger": false
+      },
+      "completed_segments": 122,
+      "elapsed_s": 148.8220412260016,
+      "rhs_calls": 77652,
+      "jac_calls": 1569,
+      "n_nodes": 256,
+      "max_local_number": 3.30309492824368e-15,
+      "max_local_energy": 1.3932420673793417e-15,
+      "max_endpoint_energy_ledger": 4.673108249583302e-11,
+      "max_endpoint_number_ledger": 4.063632220805425e-08,
+      "min_accepted_photon_energy": 0.0,
+      "max_one_sided_relative_energy_shift": 3.919944939771982e-16,
+      "failure": null,
+      "path": "repos/rei_n2/research/accel02_20261011/n2/evidence/EVENT_COUPLED001/RESULT.json",
+      "sha256": "c16a93909eb75c71e6d635bae5b8c5f28b91724ee47e8c301227701a58a9896b",
+      "common_epoch_max_energy": 5.323744819710732e-11,
+      "common_epoch_max_number": 4.0643625001944125e-08,
+      "sampled_fraction_min": 0.0,
+      "sampled_T_min": 20.0,
+      "sampled_T_max": 12291.365681197783
+    }
+  ],
+  "input_identity": [
+    {
+      "path": "repos/rei_bianchi/research/accel02_20261011/integration/run_native_history.py",
+      "sha256": "06275b5dd45e9e2b67264a8265c60d83966539093797748aa99e0a5ea5985602"
+    },
+    {
+      "path": "repos/rei_bianchi/research/accel02_20261011/integration/CONTRACT.json",
+      "sha256": "4ab712792c06b2bc7731d870f7880603f3825a22f54df644d22ad6c3cbfd0637"
+    },
+    {
+      "path": "repos/rei_n2/research/accel02_20261011/n2/run_event_coupled.py",
+      "sha256": "537af57eebb9bbd2cab6caec49ce454ab273a8bbde8b5fa99c3accdc10ef2df5"
+    },
+    {
+      "path": "repos/rei_n2/research/accel02_20261011/n2/events.py",
+      "sha256": "ca82ecec0a9e4d53608239bc79f2cf8b1f8110de7595c6a538e4d7755bfbcc10"
+    },
+    {
+      "path": "repos/rei_n2/research/accel02_20261011/n2/characteristics.py",
+      "sha256": "438ce27fb7ae78dc2ad03ac686c0288995b555ecd8bb9cc5991d07bc7fc5921a"
+    },
+    {
+      "path": "repos/rei_n2/research/accel02_20261011/n2/CONTRACT.md",
+      "sha256": "73cf1dbd94d01de87ac2ffbbdaac6abc49f4b8f91c576d007a59eba6d9f30d20"
+    }
+  ]
+}

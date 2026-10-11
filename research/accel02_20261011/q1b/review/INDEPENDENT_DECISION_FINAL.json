@@ -1,0 +1,138 @@
+{
+  "schema": "rei.q1b.independent_decision.v1",
+  "reviewer": "/root/q1b_independent",
+  "requested_model": "GPT-6 Astra",
+  "review_kind": "ACTUAL_SEPARATE_DECISION_REVIEWER",
+  "candidate_generation_or_test_design_by_reviewer": false,
+  "created_utc": "2026-10-11T01:01:08.135358+00:00",
+  "status": "PROMOTE_SCOPED_LOCAL_COMPONENTS_FULL_HISTORY_HOLD",
+  "baseline": "8ffd1d22f933548f7643b57eb4f774ac87661e4e",
+  "scope": "C09 local components only. No old physical ODE/native/oracle history or old full-suite replay.",
+  "decisions": {
+    "source_and_initial_moment_partition": "PROMOTE_LOCAL_SOURCE_IC_ONLY",
+    "fixed_cell_grid": "PROMOTE_LOCAL_NEW_GRID_CONSTRUCTION_ONLY",
+    "theory_pairing_and_boundary_contract": "PROMOTE_DERIVED_LOCAL_CONTRACT_ONLY",
+    "reconstruction_regular_manufactured_fixtures": "PROMOTE_SEVEN_MANUFACTURED_FIXTURES_PLUS_INDEPENDENT_R1_CORRECTION_CHECK",
+    "reconstruction_general_local_api": "PROMOTE_LOCAL_CHECKED_OR_EXPLICIT_REJECTION_API_ONLY",
+    "generic_atomic_checkpoint_and_manufactured_fresh_segment_restart": "PROMOTE_LOCAL_CAPABILITY_ONLY",
+    "native_integrated_photo_behavior": "HOLD_UNCOMPILED_NOT_EXECUTED",
+    "production_checkpoint_binding": "HOLD_UNBOUND",
+    "full_coupled_history_and_scientific_admission": "HOLD"
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "IMPORTANT_BLOCKS_GENERAL_RECONSTRUCTION_PROMOTION",
+      "layer": "NUMERICAL",
+      "status": "CLOSED_SCOPED_CORRECTION_INDEPENDENTLY_VERIFIED",
+      "file": "reconstruction.py",
+      "functions": [
+        "_log_mean_power",
+        "reconstruct",
+        "_quadrature",
+        "opacity_moments"
+      ],
+      "problem": "Absolute log-mean inversion loses support-coordinate accuracy at narrow newly entered supports. Mean-residual scaling by q and common response scaling dominated by the Jacobian let inaccurate affine moments return success.",
+      "reproducer": "review/narrow_support_counterexample.py",
+      "evidence": "review/NARROW_SUPPORT_FIRST_FAILURE.json",
+      "example": {
+        "a": 50000,
+        "b_expression": "a*(1+1e-12)",
+        "N": 1,
+        "R": 1,
+        "U_expression": "a+(b-a)/3",
+        "kernel": "(q-a)/(b-a)",
+        "exact_K0": 0.3333333333333333,
+        "returned_K0": 0.33455744929129505,
+        "rtol": 1e-07,
+        "status": "INTERIOR_LOCAL_QUADRATURE_CHECKED"
+      },
+      "required_resolution": "Use support-relative inversion/integration and per-moment accuracy checks, or explicitly reject unsupported narrow supports before reporting success. Preserve original failure; a changed-code targeted rerun is sufficient. This does not require full ODE.",
+      "resolution": {
+        "source_sha256": "80a48fa9723414d6c0db31cb8a2c9287aacd1665b61a7eda5c61441bad54b4f8",
+        "evidence": "review/NARROW_SUPPORT_CORRECTED.json",
+        "accepted_widths": [
+          0.0001,
+          1e-06
+        ],
+        "maximum_accepted_affine_relative_error": 4.393985176349622e-12,
+        "explicitly_rejected_widths": [
+          1e-08,
+          1e-10,
+          1e-12,
+          1e-14
+        ],
+        "meaning": "Cell-relative inversion/residual and componentwise checks correct R1. Conservative FLOAT_Q rejection preserves state and avoids false acceptance; it supplies no source-entry algorithm."
+      }
+    },
+    {
+      "id": "G1",
+      "severity": "FULL_HISTORY_BLOCKER",
+      "layer": "NUMERICAL",
+      "status": "DECLARED_UNRESOLVED",
+      "problem": "Actual source-entry startup, admissible nonlinear stages, full N/U and gas Jacobian, native opacity/threshold traces, and physical driver checkpoint hooks are absent. Empty directional and smooth endpoint Jacobian APIs are not implemented."
+    },
+    {
+      "id": "G2",
+      "severity": "NATIVE_LOCAL_GATE_BLOCKER",
+      "layer": "RUNTIME_ENVIRONMENT",
+      "status": "BLOCKED_NO_TOOLCHAIN_NOT_EXECUTED",
+      "problem": "Native source, planned tests and ABI now match current evidence hashes; actual compiler/build/protocol execution remains absent. No native behavioral promotion."
+    },
+    {
+      "id": "C1",
+      "severity": "BOUNDARY_OF_APPROVED_SCOPE",
+      "layer": "EVIDENCE_AUTHORITY",
+      "status": "DOCUMENTED",
+      "problem": "Checkpoint manifest self-consistency is not original-byte authenticity. Optional externally trusted manifest pin and caller-selected authoritative expected identities are necessary when that stronger claim is needed. Generic source-file hash does not itself identify callback captured parameters or runtime state; production binding must fix those. Callback cannot reconstruct all unsaved accepted extrema/ledger events; production collection hook remains separately testable."
+    }
+  ],
+  "independently_assessed_math": {
+    "source_R_and_volume": "DERIVED: V times solid-angle Jacobian gives w/R^3; source Q has one further1/R, stored-U source remains SU. Initial R=1. Source lower cutoff never deletes stored photons.",
+    "paired_K_moments": "DERIVED: thermal (KE-chiK0) plus binding chiK0 cancels photon KE sink using same per-cell moments and proper absorber density; proper gas rates divide summed K by V, never absorber density.",
+    "empty_origin": "DERIVED exact q^2 counterexample: endpoint directions give1+4=5, combined direction gives14/3. No generic Frechet Jacobian.",
+    "entry_and_endpoints": "DERIVED one-third accumulated support position under stated smooth nonzero source and monotone expansion; endpoint interior traces are mandatory at discontinuities. Stronger native trace binding remains absent.",
+    "covariance_jacobian": "DERIVED correct fixed-time interior formula; existing moderate-support test evidence valid but not a certificate for every representable interior input."
+  },
+  "reviewed_actual_evidence": {
+    "source": "Six new tests PASS; saved Q0 source partitions at129/65 epochs max C1 1.4459741733807065e-15,C2 1.647533451199053e-15. References not regenerated; pinned interpolation and weight formulas shared, independent manufactured formulas scoped separately.",
+    "reconstruction": "Seven corrected implementation tests PASS, current source/test/log/first-failure hashes verified. Reviewer independently reran only the changed-code affine counterexample and confirmed accurate moments or explicit rejection. Original six tests remain valid only for the original as-run source.",
+    "checkpoint": "Eight recorded tests PASS; saved manufactured fresh-segment experiment analytic max9.308998016877013e-12, split difference0, complete arrays/metadata equality. Scope remains new manufactured model without native Q1B binding.",
+    "identity": "review/BYTE_IDENTITY_FINAL.json: all current source, reconstruction repair, checkpoint and native declarations match; original input/provider verification retained in review/BYTE_IDENTITY_AUDIT.json."
+  },
+  "reviewer_execution": {
+    "new_targeted_algebraic_counterexample": true,
+    "old_full_tests_replayed": 0,
+    "old_ODE_replayed": 0,
+    "new_physical_ODE_calls": 0,
+    "native_calls": 0
+  },
+  "unchanged_gates": {
+    "time_full": 2e-06,
+    "energy_full": 1e-09,
+    "number_full": 1e-09,
+    "spectral_full": 0.001
+  },
+  "authorization": "This independent local decision authorizes neither external publication nor a new full coupled ODE; root owns final integration/publication.",
+  "reviewed_source_hashes": {
+    "source_cells.py": "1200e88036d6af443d6f350d896d790953f0a04f24caa4d893b420abeb10f631",
+    "grid_cells.py": "bc6e4dd6b35273dc27fc53417f4b1779c21ea6652ed1ff73cfb8d7b74e555a84",
+    "reconstruction.py": "80a48fa9723414d6c0db31cb8a2c9287aacd1665b61a7eda5c61441bad54b4f8",
+    "checkpoint/atomic_checkpoint.py": "bd2e91c1dda7c79c74623f63612229d7ffe416aef7491dfb34ddd567a76e68c5",
+    "checkpoint/fixture.py": "2312528aed9e29decdb3dedc714aeb05f9bc862d887e5f7a5019bbd8c6066eda",
+    "theory/THEORY_CONTRACT.md": "14525aab9950e36c2933458accf1ed3ae3642ab5ec0bce1175d977376e207bc0",
+    "native/src/main.rs": "147884bf5ed60024a265803896a7c76d50e4db9f28f4b24b69a4572e9634a2f6",
+    "NATIVE_ABI.md": "52cbb357bebac2f25a8d47737a36e6324c41405178fb0f450e00b2f31982468c"
+  },
+  "supersedes": "review/INDEPENDENT_DECISION_INITIAL.json for R1 disposition only; original failure retained",
+  "important_open_gate_ids": [
+    "G1",
+    "G2"
+  ],
+  "scope_caveats": [
+    "Reconstruction approval covers listed manufactured cases plus explicit resolution rejection; no arbitrary-kernel rigorous error bound, arbitrary extreme magnitudes, native opacity, or closure-error certificate.",
+    "Thin source-entry opacity rejected by local API; a demonstrated startup/admissible stiff-stage method remains mandatory.",
+    "Endpoint trace is a caller-supplied assertion in this local API, not independently certified native trace provenance.",
+    "Checkpoint approval is generic I/O and manufactured natural-boundary fresh-BDF recovery only; trusted production identity/callback/collection/restart hook is absent."
+  ]
+}

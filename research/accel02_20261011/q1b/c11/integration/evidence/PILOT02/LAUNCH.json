@@ -1,0 +1,272 @@
+{
+  "schema": "rei.q1b.c11.actual_native_launch.v1",
+  "created_utc": "2026-10-11T05:23:25.278303+00:00",
+  "argv": [
+    "research/accel02_20261011/q1b/c11/integration/run_adaptive_native_v2.py",
+    "--label",
+    "PILOT02"
+  ],
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "controls": {
+    "schema": "rei.q1b.c11.adaptive_controls.v1",
+    "method_order": 1,
+    "local_defect_target": 2e-07,
+    "observable_scales": {
+      "xHII": 1.0,
+      "xHeII": 1.0,
+      "xHeIII": 1.0,
+      "T_K": 10000.0,
+      "ne_cm3": 0.000908362288758326,
+      "photon_cm3": 0.000908362288758326,
+      "GammaHI_s": 1e-12,
+      "GammaHeI_s": 1e-12,
+      "GammaHeII_s": 1e-12
+    },
+    "distribution_scales": {
+      "N_ref_distribution": 0.000908362288758326,
+      "U_eV_ref_distribution": 0.012352305176515718
+    },
+    "safety": 0.8,
+    "min_shrink": 0.2,
+    "max_growth": 2.0,
+    "min_step_s": 1000000.0,
+    "max_step_s": 1000000000000000.0,
+    "initial_step_s": 5000000000.0,
+    "max_attempts": 5,
+    "max_accepted_macros": 3,
+    "physical_state_floor": false,
+    "scientific_normalization_changed": false,
+    "freeze": "BEFORE_ANY_C11_NATIVE_CONTROLLER_RUN",
+    "scope": "r0 conditional C2 initial state; bounded adaptive prerequisite only",
+    "reference_nH_provenance": {
+      "path": "research/accel02_20261011/q1b/c10/evidence/NATIVE_ENTRY_C2_T1E11_N4_HEAT.json",
+      "sha256": "305fea1acbf62da155bc8fc7eef9a037734a78d0e6a6cb73095e573db898835a",
+      "selector": "accepted_boundaries[0].ledger.initial_nH_cm3"
+    },
+    "scale_rationale": {
+      "fractions": "Natural abundance-fraction unit1, including initial zero HeIII; no relative-to-tiny-state norm",
+      "T_K": "Fixed prospectively declared ionized-IGM thermal unit1e4K, numerical scale only",
+      "ne_cm3": "Fixed original H reference density; never the current state",
+      "photon_cm3": "Fixed original H reference density; never the current state",
+      "Gamma_species": "Fixed prospectively declared1e-12s^-1 photoionization-rate unit; numerical scale only, not fitted to candidate",
+      "N_ref_distribution": "L1 difference over all cells divided by original H reference density",
+      "U_eV_ref_distribution": "L1 difference over all cells divided by HI ionization energy times original H reference density"
+    },
+    "scientific_denominator": "UNCHANGED per-field fine maximum on its own full-history65 and129 subsets; zero maximum requires exactzero",
+    "local_control_claim": "Truncation heuristic only; target2e-7 and scales do not certify global2e-6",
+    "step_failure_policy": "Source/native/domain/ledger errors propagate failclosed; only measured temporal error rejects and shrinks",
+    "hard_events_policy": "Caller supplies physical source-band/cell birth crossings and source redshift knots; opacity thresholds inside continuous cell support are quadrature cuts, not independent hard time jumps; unresolved endpoint traces failclosed",
+    "bounded_run_request": {
+      "start_s": 0.0,
+      "end_s": 10000000000.0,
+      "no_old_schedule_replay": true,
+      "stop_at_budget_or_numerical_failure": true
+    }
+  },
+  "dependency_closure": {
+    "dependency:research/accel02_20261011/q1b/c10/source_entry.py": "56ed274e76e4cea832d70271764534ba54b89c3d37365a0ae83e4f9ddc20db64",
+    "dependency:research/accel02_20261011/q1b/c10/positive_absorption.py": "71e080d2f6ce60440d008e97420a470dfebbc2d46db61195933c10f407994da4",
+    "dependency:research/accel02_20261011/q1b/c10/native_step.py": "95b989b80065a329277d683b0c724610cae01cda4354c67f75e1aee6cdb963d4",
+    "dependency:research/accel02_20261011/q1b/c10/run_native_entry.py": "ed76209ab70ddd5b285cd07dc0bd69d656131b3e9033d8a3a80beffe441e9185",
+    "dependency:research/accel02_20261011/q1b/c10/entry_checkpoint.py": "a98a36e9f8e3b8cd70f14055228f33fbcf10f1681559207e03d7fb36cb282c5e",
+    "dependency:research/accel02_20261011/q1b/c10/CONTRACT.json": "9555d3d0068a859e4a15c69738e18542252ba3f72f871688ae4eb55026736d92",
+    "dependency:research/accel02_20261011/q1b/source_cells.py": "1200e88036d6af443d6f350d896d790953f0a04f24caa4d893b420abeb10f631",
+    "dependency:research/accel02_20261011/q1b/grid_cells.py": "bc6e4dd6b35273dc27fc53417f4b1779c21ea6652ed1ff73cfb8d7b74e555a84",
+    "dependency:research/accel02_20261011/q1b/reconstruction.py": "80a48fa9723414d6c0db31cb8a2c9287aacd1665b61a7eda5c61441bad54b4f8",
+    "dependency:research/accel02_20261011/q1b/opacity_native.py": "6818b100e7a5331f9f244c2788813ea5ba3a746ad6c801b02e7fd1943706e9b1",
+    "dependency:research/accel02_20261011/q1b/checkpoint/atomic_checkpoint.py": "336a71f239bbca3942a664a8e8df3bd733f2bf637e404eba6897bd1aefbbb689",
+    "dependency:research/accel02_20261011/q1b/RUN_CONTRACT.json": "9ec16373de40230d18bd4d37e4eaea4f40492518138d90100c87689bd2ce01f3",
+    "dependency:research/accel02_20261011/q1b/evidence/SOURCE_C2.npz": "bd0fc845407010dbd80f3561e37fb57d523d308a5ef899ecd44b909f38f7960a",
+    "dependency:research/accel02_20261011/NEXT_DAG.json": "e686ac4356569995a7865f0d2fc8e15136c36e127a15956fb4b98dacb6ad1f9c",
+    "dependency:research/accel02_20261011/n1/provider.py": "42aa7ce3eb1029c653d0b97e622cfc7c45456d3547ad5c9d5d8fc52ffa271c3a",
+    "dependency:research/accel02_20261011/n1/native/target/release/rei_n1_native": "3e3a3ef4d89019d791f4e2f4cf25108ac2c6d5e365c58a928d9ff8a85234a0ac",
+    "dependency:research/physical_provider_20261010/background.py": "b80f1d2ca8b4ab251d93447ff746428e6230130bee9b87500b7960bbc3a0076d",
+    "dependency:research/physical_provider_20261010/hm12_data.py": "ede512206bd6f5acc85b1c6b90fda4edc256b4dd8a70c42f9726932b6bff5121",
+    "dependency:research/physical_provider_20261010/sources/UVB.out": "a708586ead551202c068b049d48afa87b96695c5a5d12253e9b9bbb74efd75dc",
+    "dependency:research/physical_provider_20261010/sources/emissivity.out": "88743ec9041a47fd12f47bf50a75a06903089e1afd992b5460a4af471249469b",
+    "dependency:research/physical_provider_20261010/sources/acquisition.json": "d9f3ce2a9174587124489d17542350cf01386eec8cdd5026be0399052f2e7b2b",
+    "dependency:research/accel02_20261011/q1b/c11/integration/native_step_v2.py": "8855239a9292ddf1bb930a0726a1a3425eeb4872a7bd0bf2972045682e5b230a",
+    "dependency:research/accel02_20261011/q1b/c11/integration/native_step_v3.py": "27cf2fb13e4f5046a7ac137c6a92467c8b18f9c2fd2f3dfb596998b3e272d629",
+    "dependency:research/accel02_20261011/q1b/c11/integration/run_adaptive_native.py": "7779760eca177683b025ae5e5fd38955daa980cc400dd15ec59cc3aa91ac76c2",
+    "dependency:research/accel02_20261011/q1b/c11/integration/run_adaptive_native_v2.py": "c25a742a74eb3d7a31b0cbea39b29d2d2f19bf5a6b77ebb3d45d5c3b15858ac0",
+    "dependency:research/accel02_20261011/q1b/c11/endpoint/native_coordinate_absorption.py": "cc9b1e864447b4bc321899ccfbeac802bc28c9b5aacedd5d736edb2cc4da2377",
+    "dependency:research/accel02_20261011/q1b/c11/endpoint/endpoint_trace.py": "a94b284777c8c1b6b2636d75595c2a495adb878ba9afae02f110e02b647d82e9",
+    "dependency:rust/rei_microphysics/src/atomic_provider.rs": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3",
+    "dependency:research/accel02_20261011/n1/native/src/main.rs": "239a08b0fdbe171f21112c128602be3ad9bbaae596ada1b6791fda482e8aeb76",
+    "dependency:research/accel02_20261011/q1b/c11/precision/source_precision.py": "7e6f51921a082a66490c8e7b9bc5a8cf5c7b9538c5f67a9ca9cd5b2d3e327bae",
+    "dependency:research/accel02_20261011/q1b/c11/controller/adaptive_controller.py": "d6b3245b25d902b04a0afbf23df6ae8dcb533e4445bfc32a295050a654277b41",
+    "dependency:research/accel02_20261011/q1b/c11/controller/adaptive_controller_v2.py": "38204d07f53826d77f81262e5dc679a5d8263bc250ecf824d515541743bf9872",
+    "dependency:research/accel02_20261011/q1b/c11/controller/CONTROL_V1.json": "6740efa3b8b1b6953a978faf756ea08d86b756f5395cfab6a55a61c5061883e6",
+    "dependency:research/accel02_20261011/q1b/c11/restart/adaptive_checkpoint.py": "e6c5db3d68ce325f6a7db1264b8a214e0d595c633672955aa1aad3f58ce2fa66",
+    "dependency:research/accel02_20261011/q1b/c11/CONTRACT.json": "bb1aeed3926d441f981ce70720a52432b5b590557588846e977d25891e4bd838",
+    "dependency:research/accel02_20261011/q1b/native/target/release/rei_q1b_cell_native_v1": "e29245acfee5be4d43c27935e2abd212d578685efa70dffbeffa8f96dd3e4b6f",
+    "dependency:research/accel02_20261011/q1b/GRID_C2.json": "409a584cc4ee863dee97cd5fba60486abfd50be63a9c0955a258aeae755bffa0",
+    "dependency:research/accel02_20261011/q1b/c11/integration/evidence/PILOT01/LAUNCH.json": "9d497400a4cdb2b6a5505d5bbbdbfd2b296d36d897fa00d57542911d80c884d2",
+    "dependency:research/accel02_20261011/q1b/c11/integration/evidence/PILOT01/INITIAL.npz": "3059207882446b4d6a24934e995972cdb9ced463ebdfbb235ab904dd83f65864",
+    "dependency:research/accel02_20261011/q1b/c11/integration/evidence/PILOT01/ATTEMPT_001.json": "3807b79cb69b39c50793f491554b4922ceb5fab9a6de0fce6a863f6b4914110b",
+    "dependency:research/accel02_20261011/q1b/c11/integration/evidence/PILOT01/RESULT.json": "4dc650272b769944235ca16a3c9eb21ba8c6a11e3bc2b8b537a4cba566643f91"
+  },
+  "hard_events_s": [],
+  "initial_time_s": 0.0,
+  "end_time_s": 10000000000.0,
+  "resume_lineage": {
+    "parent_run": "research/accel02_20261011/q1b/c11/integration/evidence/PILOT01",
+    "files": {
+      "LAUNCH.json": "9d497400a4cdb2b6a5505d5bbbdbfd2b296d36d897fa00d57542911d80c884d2",
+      "INITIAL.npz": "3059207882446b4d6a24934e995972cdb9ced463ebdfbb235ab904dd83f65864",
+      "ATTEMPT_001.json": "3807b79cb69b39c50793f491554b4922ceb5fab9a6de0fce6a863f6b4914110b",
+      "RESULT.json": "4dc650272b769944235ca16a3c9eb21ba8c6a11e3bc2b8b537a4cba566643f91"
+    },
+    "resume_cursor": {
+      "schema": "rei.q1b.c11.adaptive_cursor.v1",
+      "next_step_s": 1954726800.122123,
+      "attempts": 1,
+      "accepted_macros": 0,
+      "rejected_macros": 1,
+      "accepted_boundaries": 0,
+      "accepted_clock_s": 0.0
+    },
+    "base_controls": {
+      "schema": "rei.q1b.c11.adaptive_controls.v1",
+      "method_order": 1,
+      "local_defect_target": 2e-07,
+      "observable_scales": {
+        "xHII": 1.0,
+        "xHeII": 1.0,
+        "xHeIII": 1.0,
+        "T_K": 10000.0,
+        "ne_cm3": 0.000908362288758326,
+        "photon_cm3": 0.000908362288758326,
+        "GammaHI_s": 1e-12,
+        "GammaHeI_s": 1e-12,
+        "GammaHeII_s": 1e-12
+      },
+      "distribution_scales": {
+        "N_ref_distribution": 0.000908362288758326,
+        "U_eV_ref_distribution": 0.012352305176515718
+      },
+      "safety": 0.8,
+      "min_shrink": 0.2,
+      "max_growth": 2.0,
+      "min_step_s": 1000000.0,
+      "max_step_s": 1000000000000000.0,
+      "initial_step_s": 5000000000.0,
+      "max_attempts": 6,
+      "max_accepted_macros": 3,
+      "physical_state_floor": false,
+      "scientific_normalization_changed": false,
+      "freeze": "BEFORE_ANY_C11_NATIVE_CONTROLLER_RUN",
+      "scope": "r0 conditional C2 initial state; bounded adaptive prerequisite only",
+      "reference_nH_provenance": {
+        "path": "research/accel02_20261011/q1b/c10/evidence/NATIVE_ENTRY_C2_T1E11_N4_HEAT.json",
+        "sha256": "305fea1acbf62da155bc8fc7eef9a037734a78d0e6a6cb73095e573db898835a",
+        "selector": "accepted_boundaries[0].ledger.initial_nH_cm3"
+      },
+      "scale_rationale": {
+        "fractions": "Natural abundance-fraction unit1, including initial zero HeIII; no relative-to-tiny-state norm",
+        "T_K": "Fixed prospectively declared ionized-IGM thermal unit1e4K, numerical scale only",
+        "ne_cm3": "Fixed original H reference density; never the current state",
+        "photon_cm3": "Fixed original H reference density; never the current state",
+        "Gamma_species": "Fixed prospectively declared1e-12s^-1 photoionization-rate unit; numerical scale only, not fitted to candidate",
+        "N_ref_distribution": "L1 difference over all cells divided by original H reference density",
+        "U_eV_ref_distribution": "L1 difference over all cells divided by HI ionization energy times original H reference density"
+      },
+      "scientific_denominator": "UNCHANGED per-field fine maximum on its own full-history65 and129 subsets; zero maximum requires exactzero",
+      "local_control_claim": "Truncation heuristic only; target2e-7 and scales do not certify global2e-6",
+      "step_failure_policy": "Source/native/domain/ledger errors propagate failclosed; only measured temporal error rejects and shrinks",
+      "hard_events_policy": "Caller supplies physical source-band/cell birth crossings and source redshift knots; opacity thresholds inside continuous cell support are quadrature cuts, not independent hard time jumps; unresolved endpoint traces failclosed",
+      "bounded_run_request": {
+        "start_s": 0.0,
+        "end_s": 10000000000.0,
+        "no_old_schedule_replay": true,
+        "stop_at_budget_or_numerical_failure": true
+      }
+    },
+    "effective_controls": {
+      "schema": "rei.q1b.c11.adaptive_controls.v1",
+      "method_order": 1,
+      "local_defect_target": 2e-07,
+      "observable_scales": {
+        "xHII": 1.0,
+        "xHeII": 1.0,
+        "xHeIII": 1.0,
+        "T_K": 10000.0,
+        "ne_cm3": 0.000908362288758326,
+        "photon_cm3": 0.000908362288758326,
+        "GammaHI_s": 1e-12,
+        "GammaHeI_s": 1e-12,
+        "GammaHeII_s": 1e-12
+      },
+      "distribution_scales": {
+        "N_ref_distribution": 0.000908362288758326,
+        "U_eV_ref_distribution": 0.012352305176515718
+      },
+      "safety": 0.8,
+      "min_shrink": 0.2,
+      "max_growth": 2.0,
+      "min_step_s": 1000000.0,
+      "max_step_s": 1000000000000000.0,
+      "initial_step_s": 5000000000.0,
+      "max_attempts": 5,
+      "max_accepted_macros": 3,
+      "physical_state_floor": false,
+      "scientific_normalization_changed": false,
+      "freeze": "BEFORE_ANY_C11_NATIVE_CONTROLLER_RUN",
+      "scope": "r0 conditional C2 initial state; bounded adaptive prerequisite only",
+      "reference_nH_provenance": {
+        "path": "research/accel02_20261011/q1b/c10/evidence/NATIVE_ENTRY_C2_T1E11_N4_HEAT.json",
+        "sha256": "305fea1acbf62da155bc8fc7eef9a037734a78d0e6a6cb73095e573db898835a",
+        "selector": "accepted_boundaries[0].ledger.initial_nH_cm3"
+      },
+      "scale_rationale": {
+        "fractions": "Natural abundance-fraction unit1, including initial zero HeIII; no relative-to-tiny-state norm",
+        "T_K": "Fixed prospectively declared ionized-IGM thermal unit1e4K, numerical scale only",
+        "ne_cm3": "Fixed original H reference density; never the current state",
+        "photon_cm3": "Fixed original H reference density; never the current state",
+        "Gamma_species": "Fixed prospectively declared1e-12s^-1 photoionization-rate unit; numerical scale only, not fitted to candidate",
+        "N_ref_distribution": "L1 difference over all cells divided by original H reference density",
+        "U_eV_ref_distribution": "L1 difference over all cells divided by HI ionization energy times original H reference density"
+      },
+      "scientific_denominator": "UNCHANGED per-field fine maximum on its own full-history65 and129 subsets; zero maximum requires exactzero",
+      "local_control_claim": "Truncation heuristic only; target2e-7 and scales do not certify global2e-6",
+      "step_failure_policy": "Source/native/domain/ledger errors propagate failclosed; only measured temporal error rejects and shrinks",
+      "hard_events_policy": "Caller supplies physical source-band/cell birth crossings and source redshift knots; opacity thresholds inside continuous cell support are quadrature cuts, not independent hard time jumps; unresolved endpoint traces failclosed",
+      "bounded_run_request": {
+        "start_s": 0.0,
+        "end_s": 10000000000.0,
+        "no_old_schedule_replay": true,
+        "stop_at_budget_or_numerical_failure": true
+      }
+    },
+    "runtime_budget_lineage": {
+      "schema": "rei.q1b.c11.runtime_budget_lineage.v1",
+      "scope": "CUMULATIVE_ACROSS_RESUME",
+      "original_controls_canonical_sha256": "33ae67f3a9bc614858fdd7ee562fa18634556ee75f9631025c0210be2121ca76",
+      "effective_controls_canonical_sha256": "d5285275a75b24511851931d569bd48ad446bd42885506798425129ff6f0f1ff",
+      "original_runtime_limits": {
+        "max_attempts": 6,
+        "max_accepted_macros": 3
+      },
+      "effective_runtime_allowances": {
+        "max_attempts": 5,
+        "max_accepted_macros": 3
+      },
+      "prior_counts": {
+        "attempts": 1,
+        "accepted_macros": 0,
+        "rejected_macros": 1,
+        "accepted_boundaries": 0
+      },
+      "numerical_controls_changed": false,
+      "physical_or_scientific_criteria_changed": false
+    },
+    "effective_controls_sha256": "d5285275a75b24511851931d569bd48ad446bd42885506798425129ff6f0f1ff",
+    "budget_semantics": "Remaining invocation budget = frozen total budget minus saved cursor counts; numerical controls unchanged",
+    "completed_first_temporal_trial_replayed": false,
+    "old_accepted_prefix_count": 0
+  },
+  "old_completed_replays": 0,
+  "source_api": "c11.precision.source_precision",
+  "scientific_admission": false
+}

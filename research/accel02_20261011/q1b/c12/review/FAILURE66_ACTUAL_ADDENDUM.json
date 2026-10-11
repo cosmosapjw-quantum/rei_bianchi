@@ -1,0 +1,97 @@
+{
+  "schema": "rei.c12.failure66_actual_addendum.v1",
+  "created_utc": "2026-10-11T07:11:30.709789+00:00",
+  "prior_frozen_decision": "FAILURE66_DECISION.json",
+  "decision": "HOLD_NEW_INCIDENT_REFINEMENT_FAILURE67_REQUIRES_SCOPED_REWORK",
+  "continuation_GO": false,
+  "actual_outcome": {
+    "checkpoint": {
+      "generation": 60,
+      "manifest_sha256": "99538a9f044ec82d23e2867573f4646309755fc0b055b64cac8ec4607f727009"
+    },
+    "completed_replays": 0,
+    "cursor": {
+      "accepted_boundaries": 120,
+      "accepted_clock_s": 20476711632188.984,
+      "accepted_macros": 60,
+      "attempts": 66,
+      "next_step_s": 1781520639719.3174,
+      "rejected_macros": 6,
+      "schema": "rei.q1b.c11.adaptive_cursor.v1"
+    },
+    "elapsed_s": 22.731040796992602,
+    "failure": {
+      "message": "INCIDENT_ORDER_PAIR: per-component errors=[0.0, 1.1966432832460216e-16, 3.217668778174178e-09, 1.7149779129776535e-09, 1.9534303829368333e-07, 1.6375005093766727e-09, 5.07839564461278e-10, 1.956603052306907e-07, 1.114650807299004e-09, 4.77867051231598e-10, 2.4062745412590576e-07, 1.1146509705956716e-09, 4.778665342853488e-10, 2.406274524552277e-07], rtol=1e-07",
+      "notes": [
+        "C12 original 64/128 INCIDENT_ORDER_PAIR refusal preserved; one bounded 128/256 refinement also failed; no tolerance change or further retry.",
+        "angle=0,energy_cell=66,q_left=54.42,q_right=58.10903285705145,t0=20476711632188.984,t1=22258232271908.3"
+      ],
+      "traceback": "Traceback (most recent call last):\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c12/repair/opacity_candidate/positive_absorption_v2.py\", line 37, in prepare_incident\n    return _base.prepare_incident(N,U,R,a,b,opacity,orders=orders,rtol=rtol,support_cap_ev=support_cap_ev)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c11/endpoint/native_coordinate_absorption.py\", line 121, in prepare_incident\n    return old.prepare_incident(N,U,R,a,b,opacity,orders=orders,rtol=rtol)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c10/positive_absorption.py\", line 196, in prepare_incident\n    errors=_compare(_components(_sum(coarse.P),cell.R*_sum(coarse.q*coarse.P),cK0,cKE,ch),\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c10/positive_absorption.py\", line 81, in _compare\n    raise QuadratureNotConverged(f'{label}: per-component errors={errors.tolist()}, rtol={rtol}')\nreconstruction.QuadratureNotConverged: INCIDENT_ORDER_PAIR: per-component errors=[0.0, 0.0, 1.0957995098722644e-07, 5.814984169959828e-08, 7.384232335326327e-06, 5.557558032955643e-08, 1.7123992635349728e-08, 7.389302128219784e-06, 3.770649068567386e-08, 1.6376265906908203e-08, 8.10785842716986e-06, 3.770649068567386e-08, 1.6376265906908206e-08, 8.107858431290887e-06], rtol=1e-07\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c11/integration/production/production_journal.py\", line 177, in run_chunk\n    receipt=attempt(copy.deepcopy(c),number)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c12/repair/production_v3/run_full_history_chunk_v3.py\", line 275, in attempt\n    outcome=run_bounded(states[-1],target,step,lambda s:native_observables(s,provider),validate,one,\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c11/controller/adaptive_controller.py\", line 138, in run_bounded\n    trial=controlled_trial(current,t1,step,observe,validate,c)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c11/controller/adaptive_controller.py\", line 88, in controlled_trial\n    coarse=step(copy.deepcopy(state),t1);validate(coarse)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c12/repair/production_v3/run_full_history_chunk_v3.py\", line 232, in step\n    value=positive_native_step(state,t1,source,opacity,native,source_api=source_precision,absorption_api=absorption_api)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c11/integration/production/native_step_v4_diagnostics.py\", line 68, in positive_native_step\n    result=_v3.positive_native_step(state,t1,source,opacity,rhs,source_api=source_api,absorption_api=capture)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c11/integration/native_step_v3.py\", line 33, in positive_native_step\n    prep.append(absorption_api.prepare_incident(float(incident['N'][a,j]),float(incident['U_eV'][a,j]),\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c11/integration/production/native_step_v4_diagnostics.py\", line 48, in prepare_incident\n    def prepare_incident(self,*args,**kwargs):return self.target.prepare_incident(*args,**kwargs)\n                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c12/repair/opacity_candidate/positive_absorption_v2.py\", line 45, in prepare_incident\n    prepared=_base.prepare_incident(N,U,R,a,b,opacity,orders=(128,256),rtol=rtol,support_cap_ev=support_cap_ev)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c11/endpoint/native_coordinate_absorption.py\", line 121, in prepare_incident\n    return old.prepare_incident(N,U,R,a,b,opacity,orders=orders,rtol=rtol)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c10/positive_absorption.py\", line 196, in prepare_incident\n    errors=_compare(_components(_sum(coarse.P),cell.R*_sum(coarse.q*coarse.P),cK0,cKE,ch),\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c10/positive_absorption.py\", line 81, in _compare\n    raise QuadratureNotConverged(f'{label}: per-component errors={errors.tolist()}, rtol={rtol}')\nreconstruction.QuadratureNotConverged: INCIDENT_ORDER_PAIR: per-component errors=[0.0, 1.1966432832460216e-16, 3.217668778174178e-09, 1.7149779129776535e-09, 1.9534303829368333e-07, 1.6375005093766727e-09, 5.07839564461278e-10, 1.956603052306907e-07, 1.114650807299004e-09, 4.77867051231598e-10, 2.4062745412590576e-07, 1.1146509705956716e-09, 4.778665342853488e-10, 2.406274524552277e-07], rtol=1e-07\nC12 original 64/128 INCIDENT_ORDER_PAIR refusal preserved; one bounded 128/256 refinement also failed; no tolerance change or further retry.\nangle=0,energy_cell=66,q_left=54.42,q_right=58.10903285705145,t0=20476711632188.984,t1=22258232271908.3\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c11/integration/production/production_journal.py\", line 187, in run_chunk\n    journal.resume(reconcile)\n  File \"/workspace/scratch/a5a7937171cb/recovery_c10/rei_bianchi/research/accel02_20261011/q1b/c11/integration/production/production_journal.py\", line 129, in resume\n    if receipt is None:raise JournalError('UNRESOLVED_INFLIGHT_NO_IMPLICIT_REPLAY')\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nproduction_journal.JournalError: UNRESOLVED_INFLIGHT_NO_IMPLICIT_REPLAY\n",
+      "type": "QuadratureNotConverged"
+    },
+    "native_calls": 57,
+    "new_checkpoints": [
+      {
+        "generation": 60,
+        "manifest_sha256": "99538a9f044ec82d23e2867573f4646309755fc0b055b64cac8ec4607f727009"
+      }
+    ],
+    "new_completed_attempts": 1,
+    "old_completed_replays": 0,
+    "opacity_calls": 2052,
+    "output_epoch_count": 1,
+    "schema": "rei.c12.production_chunk_result.v1",
+    "scientific_admission": false,
+    "sigma_energy_evaluations": 203904,
+    "status": "FAILED_ATTEMPT",
+    "target_time_s": 4.011926941800233e+16,
+    "trial_map_calls": 4,
+    "whole_history_gates": "NOT_EVALUATED"
+  },
+  "assessment": {
+    "first_changed_attempt66": "ACCEPTED_WITH_ACTUAL_SOURCE_OPACITY_IMPLICIT_GAS_AND_TEMPORAL_GATES",
+    "accepted_generation": 60,
+    "accepted_manifest_sha256": "99538a9f044ec82d23e2867573f4646309755fc0b055b64cac8ec4607f727009",
+    "accepted_time_s": 20476711632188.984,
+    "accepted_prefix_states": 121,
+    "prior119_state_prefix_preserved": true,
+    "accepted66_error_ratio": 0.6957991720484682,
+    "next_attempt67": "FAILED_CLOSED_AFTER_SINGLE128_256_REFINEMENT; NOT_TEMPORALLY_REJECTED_OR_ACCEPTED",
+    "failure66_requested_refinement_was_actually_exercised": true,
+    "failure67_original64_128_max": 8.107858431290887e-06,
+    "failure67_refined128_256_max": 2.4062745412590576e-07,
+    "unchanged_gate": 1e-07,
+    "failure67_cell": "angle0,energycell66; q[54.42,58.10903285705145]",
+    "failure67_before_native_gas_for_this_attempt": true,
+    "failure67_refusal_receipt_durable": true,
+    "failure67_never_committed": true,
+    "initial_h0_not_replayed": true,
+    "all_current_bound_dependencies_match": true,
+    "candidate_unchanged_since_scoped_GO": true,
+    "independent_saved66_map_energy_initial_scaled_max": 2.1517606984015334e-11,
+    "independent_saved66_map_number_initial_nH_scaled_max": 2.797450833451511e-18
+  },
+  "allocation_observation": {
+    "completed_attempts": 66,
+    "accepted_macros": 60,
+    "temporal_rejections": 6,
+    "already_external_debited_failures": 2,
+    "new_unresolved_failed_physical_attempts": 1,
+    "physical_attempts_consumed": 69,
+    "original_total_cap": 105,
+    "remaining_physical_attempts_after_future_explicit_failure_debit": 36,
+    "new_allocation_or_transition_authority_created": false,
+    "no_counter_reset": true
+  },
+  "scientific_admission": false,
+  "whole_history_decision": "HOLD_NOT_EVALUATED",
+  "claim_limits": [
+    "Attempt66 establishes one actual accepted macro with refined opacity; finite-order adequacy was not uniform and nextcellstate fails even128/256.",
+    "No extrapolated global acceptance or further automatic order escalation is authorized by this old v2candidate.",
+    "The next repair needs a new explicit identity and focused review; oldcandidate/driver/dependencies/failure evidence remain immutable.",
+    "Only initial outputepoch is present; original65/129 scientific criteria remain mandatory and unevaluated."
+  ],
+  "saved_checks": "FAILURE66_ACTUAL_SAVED_CHECKS.json",
+  "actual_hashes": "FAILURE66_ACTUAL_REVIEWED_HASHES.json",
+  "reviewer_tests_native_or_source_calls": 0
+}

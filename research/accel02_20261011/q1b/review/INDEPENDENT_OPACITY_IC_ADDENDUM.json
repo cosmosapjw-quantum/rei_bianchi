@@ -1,0 +1,97 @@
+{
+  "schema": "rei.q1b.independent_opacity_ic_addendum.v1",
+  "created_utc": "2026-10-11T01:10:46.685431+00:00",
+  "reviewer": "/root/q1b_independent",
+  "review_kind": "BOUNDED_NEW_EVIDENCE_ADDENDUM_SAME_INDEPENDENT_REVIEWER",
+  "scope": "Actual SIGMA binding and initial-z15.9 diagnostic only; no repeated review of previous components and no numerical rerun.",
+  "decisions": {
+    "actual_native_sigma_binding": "PROMOTE_SCOPED_LOCAL_BINDING_ON_LISTED_TESTS",
+    "initial_state_opacity_diagnostic": "ADOPT_AS_EXECUTED_NUMERICALLY_CHECKED_EVIDENCE",
+    "C1_IC_headroom": "FAIL",
+    "C2_IC_headroom": "PASS_IC_ONLY",
+    "C1_C2_local_pair_headroom": "FAIL",
+    "production_candidate_and_whole_history": "HOLD"
+  },
+  "protected_local_target": 0.0001,
+  "comparison_maxima": {
+    "C1_vs_direct_UVB": 0.00033628984746407947,
+    "C2_vs_direct_UVB": 6.336521021575046e-05,
+    "C1_vs_C2": 0.00031569047703665273
+  },
+  "direct_reference_order_max": 1.0153729752486e-14,
+  "evidence_status": {
+    "binding": "IMPLEMENTATION_VERIFIED_ON_THREE_LISTED_CASES",
+    "IC_diagnostic": "NUMERICALLY_CHECKED_AT_ONE_INITIAL_EPOCH",
+    "native_opacity_Jacobian": "NOT_INDEPENDENTLY_VALIDATED_AGAINST_NATIVE_DIRECTIONAL_DIFFERENCES",
+    "evolving_closure": "NOT_EVALUATED",
+    "whole_history": "NOT_EVALUATED"
+  },
+  "code_assessment": {
+    "binding": "Uses hash-pinned existing N1 SIGMA process, correct c in cm/s, three absorber order, threshold splits at E_threshold/R, paired K0 and KE, chi distinct from cross-section threshold. No duplicated physical sigma, shifted energies, state clipping, or RHS calls. Empty state exact zero and endpoint state explicit TraceRequired.",
+    "reference": "Direct original UVB photon_number_log measure at initial R=V=1. Integrates dlnE on every native knot plus all sigma thresholds at orders32/64. This avoids power-law reconstruction and cell moment closure. Physical source, sigma provider, and Gauss family remain shared. Agreement between two orders is numerical evidence, not a rigorous continuum or independent-physics certificate.",
+    "aggregate": "Angular weights already enter N/U. At IC R=V=1 summed K0 equals proper per-absorber Gamma; summed KE and paired heat use correct energy factors. Dormant cells checked exactly empty and counted separately. Any failed occupied cell makes full aggregate None, preventing false success from partial sums.",
+    "metric": "Per-species relative errors with each direct or C2 reference denominator and exact-zero handling; target1e-4 retained. Diagnostic exit1 corresponds to accuracy failure, not execution failure."
+  },
+  "execution_read_from_evidence": {
+    "binding_tests": 3,
+    "binding_tests_result": "PASS",
+    "binding_test_SIGMA_calls": 3,
+    "binding_test_energy_evaluations": 197,
+    "IC_cells": 522,
+    "IC_cells_with_native_moments": 468,
+    "IC_dormant_empty_cells": 54,
+    "IC_cell_failures": 0,
+    "IC_SIGMA_calls": 954,
+    "IC_energy_evaluations": 124416,
+    "IC_actual_exit": 1,
+    "IC_elapsed_seconds": 5.890309631999116,
+    "gas_RHS_calls": 0,
+    "physical_ODE_calls": 0,
+    "old_history_replays": 0
+  },
+  "important_findings": [
+    {
+      "id": "O1",
+      "status": "OPEN_LOCAL_CANDIDATE_GATE_FAIL",
+      "finding": "C1 exceeds1e-4 for HI Gamma (2.9052544474817695e-4), HI energy (1.0486631239585821e-4), and HI heat (3.3628984746407947e-4). The fixed C1/C2 pair also fails in HI Gamma and heat, maximum3.1569047703665273e-4. Adopting the diagnostic does not promote this pair."
+    },
+    {
+      "id": "O2",
+      "status": "SCOPE_LIMIT",
+      "finding": "C2 passes all9 IC moments with maximum6.336521021575046e-5 (HeII Gamma), but refinement error is not uniformly monotone across species. C2 alone is not a new globally accepted candidate; the IC comparison below1e-3 says nothing about the protected evolving24-field129/65-epoch spectral gate."
+    },
+    {
+      "id": "G1",
+      "status": "HOLD_UNCHANGED",
+      "finding": "Actual native endpoint trace, native state-Jacobian verification, thin-source-entry startup and admissible stiff stages, production checkpoint binding, and full temporal/spectral/ledger/domain gates remain open. SOURCE_ENTRY_NEXT theory proposal is not admitted production code."
+    }
+  ],
+  "identity": {
+    "all20_checks_match": true,
+    "check_artifact": "review/OPACITY_IDENTITY_CHECK.json",
+    "native_binary_sha256": "3e3a3ef4d89019d791f4e2f4cf25108ac2c6d5e365c58a928d9ff8a85234a0ac",
+    "code_and_evidence": {
+      "opacity_native.py": "6818b100e7a5331f9f244c2788813ea5ba3a746ad6c801b02e7fd1943706e9b1",
+      "opacity_ic_check.py": "7ea0a2cfb6382cb6d395cbde6b62ac21008238d720fe7b84c55ec1d8a07080dd",
+      "opacity_test.py": "3189d0413dc022eb7f1afafe40d3bcfac3f015e26c68909e05ea91b2d3111b6b",
+      "evidence/OPACITY_EXECUTION.json": "2de3ebd306cffa26f2add0344acccd25609bde9de241350617693297b711233d",
+      "evidence/OPACITY_IC_CHECK.json": "efef1d60cc4fe886aa0445f010a2f6116d17c40ede446b14012be3a2adc49163",
+      "evidence/OPACITY_BINDING_GREEN.log": "ff89673dc55b46257b056bb1a2d57450d0e3f11936a45731ad558895c960c2b0",
+      "evidence/OPACITY_IC_CHECK.log": "9a589b127281cbd479b0af719599f491f700cd2b2d0e7f21d0d3fe7297dca608"
+    }
+  },
+  "reviewer_execution": {
+    "numerical_runs": 0,
+    "native_calls": 0,
+    "old_tests_replayed": 0,
+    "operations": "Source/log/result read and cryptographic byte identity checks only"
+  },
+  "unchanged_scientific_gates": {
+    "time_full": 2e-06,
+    "energy_full": 1e-09,
+    "number_full": 1e-09,
+    "spectral_full": 0.001
+  },
+  "scientific_admission": false,
+  "authorization": "No automatic grid/order escalation or full ODE; root owns integration/publication."
+}
