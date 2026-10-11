@@ -4,7 +4,7 @@
 
 C12는 C11에서 허용된 FLRW 국소 수치 경로를 전구간 목표에 연결하는 구현을 완료하고, 기존 PILOT02 generation 3에서 실제 연속 계산을 시작했다. 기존 상태를 초기화하지 않고 실행 계약을 명시적으로 전환했으며, 전구간 일정·24개 관측량·수용 및 거부 이력의 원자적 저장을 연결했다. 독립 검토는 연결 구현과 최초 실제 chunk를 확인했다. 이후 실제 source-band 경계에서 발생한 moment-domain 실패를 보존하고, 같은 물리 식의 양쪽 경계 offset arithmetic을 별도 source identity로 도입한 child에서 계산을 재개했다. 원래 경로와 수리 경로의 검토를 구분하며, 어느 판정도 전구간 과학적 허용이나 비등방 Bianchi 계산의 완료를 뜻하지 않는다.
 
-**실행 결과의 유일한 최신 요약은 `STATE.json`이다.** 현재 generation, 수용 시각, 누적 attempt/macro 수, 실제 native 호출 수, 출력 epoch 수, 마지막 chunk, 실패 또는 종료 사유는 그 파일과 연결된 실제 `RESULT.json`·checkpoint manifest를 읽어야 한다. 이 보고서는 추가 chunk가 진행되는 동안 갱신되는 마지막 수치를 별도로 복제하지 않는다. `review/ACTUAL_CHUNK_ADDENDUM.json`은 원래 연결 경로의 최초 실제 chunk를 검토한 역사적 증거이다. 수리된 source를 실제 native 경로에서 실행한 새 판정은 `review/FAILURE42_ACTUAL_ADDENDUM.json`이며, 같은 고정 source와 남은 할당 안에서의 제한적 GO이다. 두 문서는 이후 모든 chunk를 개별 재검토했다는 주장을 하지 않는다.
+**실행 결과의 유일한 최신 요약은 `STATE.json`이다.** 현재 generation, 수용 시각, 누적 attempt/macro 수, 실제 native 호출 수, 출력 epoch 수, 마지막 chunk, 실패 또는 종료 사유는 그 파일과 연결된 실제 `RESULT.json`·checkpoint manifest를 읽어야 한다. 이 보고서는 추가 chunk가 진행되는 동안 갱신되는 마지막 수치를 별도로 복제하지 않는다. `review/ACTUAL_CHUNK_ADDENDUM.json`은 원래 연결 경로의 최초 실제 chunk를 검토한 역사적 증거이다. 수리된 source를 실제 native 경로에서 실행한 판정은 `review/FAILURE42_ACTUAL_ADDENDUM.json`이다. 이후 발생한 attempt66 opacity 실패와 별도 후보는 아래 절 및 해당 scoped review에서 구분한다. 각 판정은 선택된 고정 구현과 남은 할당에만 적용되며 이후 모든 chunk를 개별 재검토했다는 주장이 아니다.
 
 ## 고정된 물리·수치 범위
 
@@ -107,7 +107,7 @@ Geometry는 실제 boundary에서 |R a_rel−1|, 방향 불변성, 그리고 정
 
 종료 상태를 구분한다. `CHUNK_ATTEMPT_BOUNDARY` 또는 `CHUNK_WALL_BOUNDARY`는 같은 고정 계약으로 다음 미실행 attempt를 이어갈 경계이다. `ALLOCATION_EXHAUSTED`는 선언된 할당의 소진이며 과학적 성공이나 수치 실패가 아니다. `FAILED_ATTEMPT`는 최초 실제 실패의 보존을 뜻한다. 정확한 final target에 도달했더라도 시간·spectral 비교를 수행하기 전에는 history admission을 주장하지 않는다.
 
-최초 할당은 누적 physical attempts 105, accepted macros 103, 즉 이전 5/3 cursor에 새 100/100을 더한 것이다. 이후 source 경계에서 완료되지 못한 실제 실패 1회는 controller의 `attempts=accepted+rejected` invariant 밖의 external debit으로 별도 기록했다. 따라서 active C2_FULL002의 **완료 attempt cap은 104**, accepted-macro cap은 103이며 physical cost cap 105를 늘리지 않았다. 최신 남은 수는 `STATE.json`을 따른다. 실패 후 cursor를 초기화하거나 사용한 비용을 돌려주지 않는다. **이 값은 전구간 완주 예산이 아니다.** 최초 PILOT02 gen3 donor 이후에 있는 서로 다른 mandatory hard stops가 208개이고 각각 macro endpoint여야 하므로, schedule만으로도 새 accepted macro가 최소 208개 필요하다. 여기에 event 사이의 temporal subdivisions와 rejected attempts가 추가될 수 있다. 따라서 최초에 할당한 새 macro 100개만으로 최종 목표에 도달할 수 없으며, 목표를 축소하거나 count를 초기화하는 대신 나중에 명시적인 prospective runtime allocation을 기록해야 한다. source 수리 child도 그 추가 할당을 암묵적으로 만들지 않는다.
+최초 할당은 누적 physical attempts 105, accepted macros 103, 즉 이전 5/3 cursor에 새 100/100을 더한 것이다. 이후 source 경계에서 완료되지 못한 실제 실패 1회는 controller의 `attempts=accepted+rejected` invariant 밖의 external debit으로 별도 기록했다. 따라서 source 수리 child C2_FULL002의 **완료 attempt cap은 104**, accepted-macro cap은 103이며 physical cost cap 105를 늘리지 않았다. 그 뒤 attempt66의 별도 실패 1회를 추가 차감하는 opacity 수리 child 계획은 completed cap 103 및 cumulative external debit 2를 사용한다. 해당 child의 실제 생성·실행 여부는 최신 상태와 transition receipt가 결정한다. 최신 남은 수는 `STATE.json`을 따른다. 실패 후 cursor를 초기화하거나 사용한 비용을 돌려주지 않는다. **이 값은 전구간 완주 예산이 아니다.** 최초 PILOT02 gen3 donor 이후에 있는 서로 다른 mandatory hard stops가 208개이고 각각 macro endpoint여야 하므로, schedule만으로도 새 accepted macro가 최소 208개 필요하다. 여기에 event 사이의 temporal subdivisions와 rejected attempts가 추가될 수 있다. 따라서 최초에 할당한 새 macro 100개만으로 최종 목표에 도달할 수 없으며, 목표를 축소하거나 count를 초기화하는 대신 나중에 명시적인 prospective runtime allocation을 기록해야 한다. source 수리 child도 그 추가 할당을 암묵적으로 만들지 않는다.
 
 전체 prefix를 매 generation에 보존하는 현재 방식은 정확하지만, n개의 수용 경계에 대해 저장된 전체 payload 합계가 일반적으로 O(n²)로 증가한다. raw native kernel history와 누적 output metadata도 함께 복제되므로 serialization, fsync, archive 크기가 실제 처리량 병목이 될 수 있다. 이는 확인된 구현 구조의 비용이며 현재 측정되지 않은 전체 실행 성능을 추정하는 근거가 아니다. 향후 append-only segment 저장과 content-addressed immutable 공유를 고려할 수 있지만, 현재 prefix의 복구 의미와 identity를 보존하는 별도 변경으로 다뤄야 한다. 지금은 history를 조용히 잘라내거나 압축 후 동등성이 확인되었다고 주장하지 않는다.
 
@@ -134,6 +134,20 @@ lower-face-only 중간 후보는 실제 첫 실패 구간을 통과했으나 새
 
 수리 후 최초 실제 chunk에서는 새 source 경로를 포함한 native map 9개가 모두 완료됐으나, 세 temporal trial 모두 기존 local defect 기준에 의해 거부됐다. 이 역사적 chunk는 source 예외 수리가 실제 native 경로에서 실행됐다는 근거이지만 **accepted advance의 근거가 아니다**. 거부 cursor를 durable journal에 남기고 동일 기준으로 다음 미실행 trial을 계속한다. 후속 chunk가 실제로 어디까지 수용되었는지와 중단 여부는 이 최초 chunk의 수치로 추정하지 않고 `STATE.json` 및 active child 결과에서 확인한다.
 
+## 두 번째 실제 실패: incident opacity quadrature의 해상도
+
+source 수리 이후의 C2_FULL002는 실제 수용을 진행하여 gen59를 남겼고, run-local attempt66의 첫 coarse map에서 `INCIDENT_ORDER_PAIR`로 중단됐다. 이 최초 opacity 실패와 해당 입력·source identity·기존 68개 dependencies는 보존한다. 구체적인 incident cell과 진단은 [repair/opacity_candidate/DIAGNOSIS_KO.md](repair/opacity_candidate/DIAGNOSIS_KO.md), 독립 수학 해석은 `repair/opacity_math/`에 있다. 이 진단 owner는 source/incident 추출과 단일 cell SIGMA만 평가했으며 gas RHS나 전체 map을 재실행하지 않았다.
+
+cell support는 q∈[54.42,58.10903285705145] eV, R=0.9982358115277721이며 power-law 지수 p≈−112.22278이다. 실제 HeII threshold q=54.42/R는 cell 내부이고 기존 quadrature에 정확히 split되어 있다. coordinate indicator는 약4.67×10⁻¹³으로 기존 10⁻⁷보다 작다. source 시간 적분과 pairing도 통과했다. 따라서 누락된 threshold 경계, source 재실패 또는 thin-cell certificate 실패로 분류하지 않는다.
+
+확률좌표 v의 inverse CDF q(v)=a[1−v(1−exp(pL))]^(1/p), L=ln(b/a)는 이 경우 pL≈−7.36으로 v=1 바로 바깥에 branch point를 가진다. 구간 내부의 smoothness만으로 충분한 낮은-order 수렴을 보장하지 않으며, 이 가까운 해석적 특이점이 확률좌표 quadrature의 수렴을 제한한다. 직접 측정에서 원래 64/128 pair의 최대 성분별 자체-scale 차이는 3.2364693116791835×10⁻⁷로 실제 실패와 일치했고, 동일 positive measure의 128/256 pair에서는 1.397079568220693×10⁻¹⁰이었다. N/U moment fit을 맞춘 사실만으로 모든 opacity/heat 적분의 정확도를 보장할 수 없다는 사례이다.
+
+최소 후보 `repair/opacity_candidate/positive_absorption_v2.py`는 원래 API를 먼저 사용하며, 실제 native provider의 기본 64/128 pair에서 정확히 `INCIDENT_ORDER_PAIR`가 발생한 경우에만 동일 입력의 128/256 pair를 한 번 시도한다. 다른 실패는 재해석하지 않고 그대로 전파하며, higher pair가 실패해도 추가 sweep을 자동 수행하지 않는다. source, physical support, native cross sections, threshold split, moment closure, positivity, pairing 및 원래 10⁻⁷ 자체-scale tolerance는 유지한다. quadrature order 선택이 바뀌므로 새 numerical identity 및 명시적 child가 필요하다.
+
+exact failed cell에 새 후보를 적용한 뒤 저장 gas 상태와 h에서 opacity attenuation만 계산했을 때 최대 자체-scale 차이는 7.666385865913117×10⁻¹¹, direct/ABI heat 차이는 최대1.860531704081449×10⁻¹⁴였다. 새 표적 테스트 3개는 실제 cell 통과 및 타 실패·higher-pair 실패의 fail-closed 처리를 확인했다. 진단과 후보 검증의 합계는 7 SIGMA calls/2048 energies, gas RHS 및 whole maps는 0이다. 이것은 제한적 opacity 수리 근거이며 새 native gas trajectory의 수용이나 rigorous quadrature bound가 아니다.
+
+원래 pair의 거부, 선택된 effective order와 tolerance, higher-pair 결과는 map별 refinement receipt에 보존한다. 생산 실행은 map이 실패하더라도 finally에서 이 receipt를 저장해야 한다. 기존 pair가 통과하는 cell은 기존 경로를 그대로 사용하며, 거부 cell의 추가 비용을 감춘 성능 향상 주장은 하지 않는다. 새 child의 actual map·수용 여부와 후속 실패는 root 실행 및 `STATE.json`에서 확인하며, 전체 history의 시간·spectral 판정은 계속 HOLD이다.
+
 ## 실제 근거와 남은 연구
 
 최초 연결 작업의 표적 검증은 transition 4개, schedule 4개, output 4개, runner 7개로 총 19개의 서로 다른 새 case이다. 이후 source 수리와 새 identity 전환의 별도 증거는 repair addendum 및 해당 review에 기록하며, 이 최초 19개를 현재 전체 검증 수로 재해석하지 않는다. 초기 구현 부재, 잘못된 toy-root oracle, volume arithmetic assumption, post-commit reconciliation 및 output-record 연결 문제는 각각 실제 실패·수정 근거와 함께 보존됐다. 이 검증은 저장 상태 연결과 transaction 및 관측량 소유권의 **implementation-verified** 근거이며, 제조된 검증 결과를 새 과학적 trajectory로 올리지 않는다.
@@ -147,7 +161,7 @@ lower-face-only 중간 후보는 실제 첫 실패 구간을 통과했으나 새
 - C3 및 필요한 spectral/angular 대응 이력의 24개 field 비교. 65/129 normalization을 각각 평가하며 이전 source/IC component 결과를 evolved history 수렴으로 대체하지 않는다.
 - 위 기준을 충족한 뒤의 비영 shear source/geometry 연결 및 BASS consumer에 대한 별도 검증. 현재 r=0 이력의 허용을 해당 연구 lane에 자동 이전하지 않는다.
 
-최신 실행 상태와 다음 실행 anchor는 `STATE.json`, `HANDOFF.json`, `NEXT_DAG.json`을 기준으로 한다. 원래 경로 및 최초 실패는 `evidence/C2_FULL001/`, 수리된 active child는 `evidence/C2_FULL002/`에 구분하여 보존한다. source 수리의 수학적 범위와 미해결 conditioning은 `REPAIR_ADDENDUM_KO.md`를 함께 읽는다.
+최신 실행 상태와 다음 실행 anchor는 `STATE.json`, `HANDOFF.json`, `NEXT_DAG.json`을 기준으로 한다. 원래 경로 및 source 최초 실패는 `evidence/C2_FULL001/`, source 수리 경로와 opacity 최초 실패는 `evidence/C2_FULL002/`에 구분하여 보존한다. opacity 수리의 새 child는 `evidence/C2_FULL003/` 계약으로 준비하며 실제 활성 경로와 게시 여부는 `STATE.json` 및 transition receipt를 따른다. source 수리의 수학적 범위와 미해결 conditioning은 `REPAIR_ADDENDUM_KO.md`를 함께 읽는다.
 
 게시 범위는 `GIT_EVIDENCE_SCOPE.json`을 따른다. Git에는 구현·문서·review, 전체 파일의 SHA manifest 및 stage별 launch/result/exit/log receipt를 게시한다. 기존 Git의 원시 증거는 유지하며, 새 대용량 native map·checkpoint payload 및 전체 prefix metadata는 immutable Drive/Dropbox 이중백업 archive에 저장하고 Git blob으로 전부 중복하지 않는다. 따라서 Git 저장소만 읽고 새 raw payload가 모두 포함됐다고 가정해서는 안 된다. 복원에는 기준 C11R4 코드 및 native binaries와 해당 stage archive overlay, full manifest 확인이 필요하다. 이 archive는 독립 실행환경 전체를 대체하는 standalone image가 아니다.
 
