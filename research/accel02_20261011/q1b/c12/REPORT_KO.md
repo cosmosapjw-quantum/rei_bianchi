@@ -2,9 +2,9 @@
 
 ## 결론과 결과의 범위
 
-C12는 C11에서 허용된 FLRW 국소 수치 경로를 전구간 목표에 연결하는 구현을 완료하고, 기존 PILOT02 generation 3에서 실제 연속 계산을 시작했다. 기존 상태를 초기화하지 않고 실행 계약을 명시적으로 전환했으며, 전구간 일정·24개 관측량·수용 및 거부 이력의 원자적 저장을 연결했다. 독립 검토는 연결 구현과 최초 실제 chunk의 저장 증거를 확인한 뒤, 동일한 고정 구현과 기존 할당 안에서 계속 진행하도록 판정했다. 이는 전구간 과학적 허용이나 비등방 Bianchi 계산의 완료 판정이 아니다.
+C12는 C11에서 허용된 FLRW 국소 수치 경로를 전구간 목표에 연결하는 구현을 완료하고, 기존 PILOT02 generation 3에서 실제 연속 계산을 시작했다. 기존 상태를 초기화하지 않고 실행 계약을 명시적으로 전환했으며, 전구간 일정·24개 관측량·수용 및 거부 이력의 원자적 저장을 연결했다. 독립 검토는 연결 구현과 최초 실제 chunk를 확인했다. 이후 실제 source-band 경계에서 발생한 moment-domain 실패를 보존하고, 같은 물리 식의 양쪽 경계 offset arithmetic을 별도 source identity로 도입한 child에서 계산을 재개했다. 원래 경로와 수리 경로의 검토를 구분하며, 어느 판정도 전구간 과학적 허용이나 비등방 Bianchi 계산의 완료를 뜻하지 않는다.
 
-**실행 결과의 유일한 최신 요약은 `STATE.json`이다.** 현재 generation, 수용 시각, 누적 attempt/macro 수, 실제 native 호출 수, 출력 epoch 수, 마지막 chunk, 실패 또는 종료 사유는 그 파일과 연결된 실제 `RESULT.json`·checkpoint manifest를 읽어야 한다. 이 보고서는 추가 chunk가 진행되는 동안 갱신되는 마지막 수치를 별도로 복제하지 않는다. `review/ACTUAL_CHUNK_ADDENDUM.json`은 최초 실제 chunk를 검토한 역사적 증거이며, 후속 chunk 전체에 대한 개별 재검토를 주장하는 문서가 아니다.
+**실행 결과의 유일한 최신 요약은 `STATE.json`이다.** 현재 generation, 수용 시각, 누적 attempt/macro 수, 실제 native 호출 수, 출력 epoch 수, 마지막 chunk, 실패 또는 종료 사유는 그 파일과 연결된 실제 `RESULT.json`·checkpoint manifest를 읽어야 한다. 이 보고서는 추가 chunk가 진행되는 동안 갱신되는 마지막 수치를 별도로 복제하지 않는다. `review/ACTUAL_CHUNK_ADDENDUM.json`은 원래 연결 경로의 최초 실제 chunk를 검토한 역사적 증거이다. 수리된 source를 실제 native 경로에서 실행한 새 판정은 `review/FAILURE42_ACTUAL_ADDENDUM.json`이며, 같은 고정 source와 남은 할당 안에서의 제한적 GO이다. 두 문서는 이후 모든 chunk를 개별 재검토했다는 주장을 하지 않는다.
 
 ## 고정된 물리·수치 범위
 
@@ -30,6 +30,8 @@ CR, RCT, secondary cascade, diffuse radiation 및 backreaction의 OFF 상태는 
 65개 epoch 부분집합과 129개 전체 epoch는 각각 별도로 비교한다. 각 field의 분모는 **동일한 선택 부분집합에 있는 fine 이력의 max abs**이다. fine 값이 모두 정확히 0이면 차이도 정확히 0이어야 한다. strict physical fraction domain, photon positivity 및 gas EOS 범위 1–10⁶ K를 유지한다. 기존 RUN002·EVENT003·Q0, 완료된 C10/C11 검사와 PILOT02 수용 prefix는 다시 실행하지 않았다.
 
 ## P0: 이전 checkpoint에서 새 실행 계약으로의 명시적 전환
+
+이 절은 최초 C2_FULL001 child의 전환을 설명한다. 뒤에 기술한 source 수리는 마지막 정상 gen39를 donor로 사용한 별도 C2_FULL002 전환이며, 원래 child를 덮어쓰지 않는다.
 
 원본 donor는 `c11/integration/evidence/PILOT02/CHECKPOINTS/gen-00000003`이며 manifest SHA-256은 `6df321273a05b681ea29a396017029a10be5968319c280591b2a3254d82d1c73`이다. donor의 수용 시각은 `4539815858.150909 s`, cursor는 attempts=5, accepted macros=3, rejected macros=2, accepted half boundaries=6이다. 초기 상태를 포함한 7개 상태 prefix 전체를 가져온다.
 
@@ -105,15 +107,38 @@ Geometry는 실제 boundary에서 |R a_rel−1|, 방향 불변성, 그리고 정
 
 종료 상태를 구분한다. `CHUNK_ATTEMPT_BOUNDARY` 또는 `CHUNK_WALL_BOUNDARY`는 같은 고정 계약으로 다음 미실행 attempt를 이어갈 경계이다. `ALLOCATION_EXHAUSTED`는 선언된 할당의 소진이며 과학적 성공이나 수치 실패가 아니다. `FAILED_ATTEMPT`는 최초 실제 실패의 보존을 뜻한다. 정확한 final target에 도달했더라도 시간·spectral 비교를 수행하기 전에는 history admission을 주장하지 않는다.
 
-현재 할당은 누적 attempts 105, accepted macros 103, 즉 이전 5/3 cursor에 새 100/100을 더한 것이다. **이 값은 전구간 완주 예산이 아니다.** donor 이후에 있는 서로 다른 mandatory hard stops가 208개이고 각각 macro endpoint여야 하므로, schedule만으로도 새 accepted macro가 최소 208개 필요하다. 여기에 event 사이의 temporal subdivisions와 rejected attempts가 추가될 수 있다. 따라서 현재 새 macro 100개로 최종 목표에 도달할 수 없으며, 목표를 축소하거나 count를 초기화하는 대신 나중에 명시적인 prospective runtime allocation을 기록해야 한다. 이번 구현은 그 추가 할당을 암묵적으로 만들지 않는다.
+최초 할당은 누적 physical attempts 105, accepted macros 103, 즉 이전 5/3 cursor에 새 100/100을 더한 것이다. 이후 source 경계에서 완료되지 못한 실제 실패 1회는 controller의 `attempts=accepted+rejected` invariant 밖의 external debit으로 별도 기록했다. 따라서 active C2_FULL002의 **완료 attempt cap은 104**, accepted-macro cap은 103이며 physical cost cap 105를 늘리지 않았다. 최신 남은 수는 `STATE.json`을 따른다. 실패 후 cursor를 초기화하거나 사용한 비용을 돌려주지 않는다. **이 값은 전구간 완주 예산이 아니다.** 최초 PILOT02 gen3 donor 이후에 있는 서로 다른 mandatory hard stops가 208개이고 각각 macro endpoint여야 하므로, schedule만으로도 새 accepted macro가 최소 208개 필요하다. 여기에 event 사이의 temporal subdivisions와 rejected attempts가 추가될 수 있다. 따라서 최초에 할당한 새 macro 100개만으로 최종 목표에 도달할 수 없으며, 목표를 축소하거나 count를 초기화하는 대신 나중에 명시적인 prospective runtime allocation을 기록해야 한다. source 수리 child도 그 추가 할당을 암묵적으로 만들지 않는다.
 
 전체 prefix를 매 generation에 보존하는 현재 방식은 정확하지만, n개의 수용 경계에 대해 저장된 전체 payload 합계가 일반적으로 O(n²)로 증가한다. raw native kernel history와 누적 output metadata도 함께 복제되므로 serialization, fsync, archive 크기가 실제 처리량 병목이 될 수 있다. 이는 확인된 구현 구조의 비용이며 현재 측정되지 않은 전체 실행 성능을 추정하는 근거가 아니다. 향후 append-only segment 저장과 content-addressed immutable 공유를 고려할 수 있지만, 현재 prefix의 복구 의미와 identity를 보존하는 별도 변경으로 다뤄야 한다. 지금은 history를 조용히 잘라내거나 압축 후 동등성이 확인되었다고 주장하지 않는다.
 
+## 실제 source-band 실패와 별도 identity의 수리
+
+상세 유도, 후보 실패 및 수치 증거는 [REPAIR_ADDENDUM_KO.md](REPAIR_ADDENDUM_KO.md)에 있다. C2_FULL001은 donor 이후 새 macro 36개를 실제 수용하여 gen39의 전체 79-state prefix를 남겼다. 다음 run-local attempt42의 첫 coarse map은 이미 일정에 포함된 50000 eV source-band/cell158 교차에서 `SOURCE_ENTRY_CELL_MOMENT_DOMAIN`으로 중단됐다. 이 실패 구간의 native gas/opacity 호출은 0이었다. 실패한 입력·journal·원래 source 파일과 마지막 정상 checkpoint를 그대로 보존했다.
+
+이는 누락된 event나 추가 물리 과정의 문제가 아니라, 극미량의 양의 N에서 독립 계산한 Q가 aN보다 1 ULP 작아지는 **수치 arithmetic 실패**였다. 저장된 R과 edge의 정확한 곱은 source 상한 아래였으므로, binary64의 곱이 상한으로 반올림된다는 이유로 source를 0으로 만드는 처리는 허용하지 않았다.
+
+최종 후보는 셀 [a,b]에서 두 비음수 offset moment
+
+\[
+D=\int(q-a)s(q)\,d\log q,\qquad
+E=\int(b-q)s(q)\,d\log q
+\]
+
+를 직접 적분하고 가까운 경계에 따라 Q=aN+D 또는 Q=bN−E로 조립한다. 상단 offset E를 이미 반올림된 bN−Q의 뺄셈으로 구하지 않고 역방향 log coordinate의 양의 exponential basis로 계산한다. 기존 N, HM12 profile, 배경, source band, raw Q와의 10⁻¹² 상대 일치 검사 및 strict aN≤Q≤bN 조건을 유지한다. floor, clamp, nextafter 또는 endpoint 이동은 없다.
+
+lower-face-only 중간 후보는 실제 첫 실패 구간을 통과했으나 새 arithmetic의 전구간 source-band endpoint 검사에서 upper-face 세 곳에 실패했다. 이 실패도 보존했으며, 최종 two-face 후보는 관련 56개 endpoint를 통과했다. 실제 실패 구간의 16/32 시간 적분 비교·source pairing과 upper-offset basis의 MP80 비교는 addendum에 수치와 범위를 기록했다. 완료된 이전 source 검사 전체를 다시 실행한 결과로 주장하지 않는다.
+
+극미량 endpoint N 자체의 MP80 상대 차이 약 0.001218은 남아 있다. 이는 near-zero support conditioning의 관측된 한계이며, 높은 상대 정확도 PASS로 표시하지 않는다. 기존 cell별 시간 적분 order-pair 기준과 endpoint 점값의 독립 상대 오차는 다른 주장이다. 이번 cell의 해당 구간 적분 dN은 정확히 0이었으며 endpoint 값을 impulse로 넣지 않았다. 이후 실제 positive-source 구간과 incident reconstruction·opacity/heat·gas residual·누적 ledger 검사는 계속 적용한다. 이 한계를 수리 성공이라는 표현으로 지우지 않는다.
+
+선택된 source SHA-256은 `a29207b6ebee37024c35b87723dd64516e528a4f0a160b17ce9965b8dd7e0779`이다. `repair/production_v2` 및 C2_FULL002는 원래 dependency나 gen39를 덮어쓰지 않고 새 source/control identity를 선언한다. gen39의 9개 배열, 전체 prefix, cursor, native kernel history와 출력 기록을 보존한다. 원래 epoch0의 h=0 record와 BEGIN/DONE receipt를 복사하며 초기 opacity 평가도 반복하지 않는다.
+
+수리 후 최초 실제 chunk에서는 새 source 경로를 포함한 native map 9개가 모두 완료됐으나, 세 temporal trial 모두 기존 local defect 기준에 의해 거부됐다. 이 역사적 chunk는 source 예외 수리가 실제 native 경로에서 실행됐다는 근거이지만 **accepted advance의 근거가 아니다**. 거부 cursor를 durable journal에 남기고 동일 기준으로 다음 미실행 trial을 계속한다. 후속 chunk가 실제로 어디까지 수용되었는지와 중단 여부는 이 최초 chunk의 수치로 추정하지 않고 `STATE.json` 및 active child 결과에서 확인한다.
+
 ## 실제 근거와 남은 연구
 
-새 연결 작업의 표적 검증은 transition 4개, schedule 4개, output 4개, runner 7개로 총 19개의 서로 다른 새 case이다. 초기 구현 부재, 잘못된 toy-root oracle, volume arithmetic assumption, post-commit reconciliation 및 output-record 연결 문제는 각각 실제 실패·수정 근거와 함께 보존됐다. 이 검증은 저장 상태 연결과 transaction 및 관측량 소유권의 **implementation-verified** 근거이며, 제조된 검증 결과를 새 과학적 trajectory로 올리지 않는다.
+최초 연결 작업의 표적 검증은 transition 4개, schedule 4개, output 4개, runner 7개로 총 19개의 서로 다른 새 case이다. 이후 source 수리와 새 identity 전환의 별도 증거는 repair addendum 및 해당 review에 기록하며, 이 최초 19개를 현재 전체 검증 수로 재해석하지 않는다. 초기 구현 부재, 잘못된 toy-root oracle, volume arithmetic assumption, post-commit reconciliation 및 output-record 연결 문제는 각각 실제 실패·수정 근거와 함께 보존됐다. 이 검증은 저장 상태 연결과 transaction 및 관측량 소유권의 **implementation-verified** 근거이며, 제조된 검증 결과를 새 과학적 trajectory로 올리지 않는다.
 
-`review/INDEPENDENT_DECISION.json`은 첫 실제 chunk 전 제한적 GO를 기록한다. `review/ACTUAL_CHUNK_ADDENDUM.json`은 명시적 child에서 수행한 첫 실제 continuation을 저장 증거로 확인했다. 그 검토는 원래 7개 상태 prefix의 보존, 기존 41개 및 새 전체 53개 dependency identity, 실제 새 map boundary의 domain/state-kernel 연결, original-IC ledger와 epoch0의 24개 field를 확인했다. 이후 동일한 구현·계약에서는 매 chunk마다 전체 review를 반복할 필요가 없으며, 구체적 새 실패·finding·구현 변경이 생길 때만 관련 부분을 다시 연다.
+`review/INDEPENDENT_DECISION.json`은 첫 실제 chunk 전 제한적 GO를 기록한다. `review/ACTUAL_CHUNK_ADDENDUM.json`은 명시적 child에서 수행한 첫 실제 continuation을 저장 증거로 확인했다. 그 검토는 원래 7개 상태 prefix의 보존, 기존 41개 및 새 전체 53개 dependency identity, 실제 새 map boundary의 domain/state-kernel 연결, original-IC ledger와 epoch0의 24개 field를 확인했다. 실제 source 경계 실패가 발생한 뒤에는 그 새 실패와 변경된 arithmetic·child 전환만 다시 검토했다. `review/FAILURE42_ACTUAL_ADDENDUM.json`은 원래 실패 비용을 차감한 남은 할당 안에서 수리된 source의 계속 실행을 허용한다. 이후 동일한 고정 구현·계약에서는 매 chunk마다 전체 review를 반복하지 않으며, 구체적 새 실패·finding·구현 변경이 생길 때만 관련 부분을 다시 연다.
 
 다음 과학적 승격에는 다음 항목이 실제로 필요하다.
 
@@ -122,4 +147,8 @@ Geometry는 실제 boundary에서 |R a_rel−1|, 방향 불변성, 그리고 정
 - C3 및 필요한 spectral/angular 대응 이력의 24개 field 비교. 65/129 normalization을 각각 평가하며 이전 source/IC component 결과를 evolved history 수렴으로 대체하지 않는다.
 - 위 기준을 충족한 뒤의 비영 shear source/geometry 연결 및 BASS consumer에 대한 별도 검증. 현재 r=0 이력의 허용을 해당 연구 lane에 자동 이전하지 않는다.
 
-최신 실행 상태와 다음 실행 anchor는 `STATE.json`, `HANDOFF.json`, `NEXT_DAG.json`을 기준으로 한다. 원시 결과는 `evidence/C2_FULL001/`의 transition, chunks, journals, checkpoints와 output records에 있다. Git 및 Drive/Dropbox 게시 상태는 `PUBLICATION_RECEIPTS.json`의 실제 provider acknowledgement와 commit/object identity를 따른다. 업로드 검증과 실제 원격 복원 검증은 구별한다. 이 보고서는 receipt가 없는 게시 또는 수행하지 않은 원격 복원 시험을 완료로 선언하지 않는다.
+최신 실행 상태와 다음 실행 anchor는 `STATE.json`, `HANDOFF.json`, `NEXT_DAG.json`을 기준으로 한다. 원래 경로 및 최초 실패는 `evidence/C2_FULL001/`, 수리된 active child는 `evidence/C2_FULL002/`에 구분하여 보존한다. source 수리의 수학적 범위와 미해결 conditioning은 `REPAIR_ADDENDUM_KO.md`를 함께 읽는다.
+
+게시 범위는 `GIT_EVIDENCE_SCOPE.json`을 따른다. Git에는 구현·문서·review, 전체 파일의 SHA manifest 및 stage별 launch/result/exit/log receipt를 게시한다. 기존 Git의 원시 증거는 유지하며, 새 대용량 native map·checkpoint payload 및 전체 prefix metadata는 immutable Drive/Dropbox 이중백업 archive에 저장하고 Git blob으로 전부 중복하지 않는다. 따라서 Git 저장소만 읽고 새 raw payload가 모두 포함됐다고 가정해서는 안 된다. 복원에는 기준 C11R4 코드 및 native binaries와 해당 stage archive overlay, full manifest 확인이 필요하다. 이 archive는 독립 실행환경 전체를 대체하는 standalone image가 아니다.
+
+실제 게시 상태는 `PUBLICATION_RECEIPTS.json`과 `GIT_EVIDENCE_SCOPE.json`의 provider acknowledgement·object ID·크기/SHA 및 commit identity를 따른다. 최신 archive 이름·hash·remote ID는 이 보고서에 다시 복제하지 않는다. 업로드 검증과 실제 원격 복원 검증은 구별한다. 이 보고서는 receipt가 없는 게시 또는 수행하지 않은 원격 복원 시험을 완료로 선언하지 않는다.
