@@ -13,3 +13,5 @@ C11R2: Actual PILOT01 source criterion passes; adaptive error rejects first macr
 C11R3: Independentreviewer boundedexperimentGO. PILOT02 resumesactualrejectedcursor (no first5e9 trial replay); native-only moment/curvature certificate subtracts budget within1e-7. Three accepted macros/sixhalfboundaries,4.539815858e9s,energymax4.8945e-16,numbermax1.9961e-19. Fixed3macro runtimebudget exhausted (driverexit1 is BUDGET_BOUNDARY, not numericalfailure). Newactualcoldrestart pending.
 
 C11R4 final: actual C11 cold-process gen1→gen2 exact. Independent decision PROMOTE_LOCAL_PRODUCTION_PREREQUISITES; full-history HOLD and unfinished runner explicit. Final handoff + Q2_FULL_HISTORY_BINDING DAG saved. 153 frozen/51 reviewed files unchanged; no new numerical execution during packaging.
+
+C11R4 published REI result a5528496b7417f4efbde5f99bc19dc0fc7f3737e; BASS sync455f969c9b3d5f0c1df5eb72c2542b3c1a88b647. Final archive2091483bytes/350memberfiles SHA256efadfe355a743b91f5e80212cabc2c8a177eeec3c69316ca946b827589748949. Drive+Dropbox uploads ACK completed; remote restore not tested. Receipt metadata is subsequent to immutable archive snapshot.
