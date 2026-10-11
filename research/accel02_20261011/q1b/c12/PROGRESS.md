@@ -17,3 +17,5 @@ C12R5_REPAIR_GO: finaltwofacecandidate and additivefailuremigration reviewed GO;
 C12R6_REPAIR_NATIVE_TRIALS: CHUNK_ATTEMPT_BOUNDARY; C2_FULL002 gen39 cursor {'accepted_boundaries': 78, 'accepted_clock_s': 11419941379473.664, 'accepted_macros': 39, 'attempts': 44, 'next_step_s': 4974558812.898191, 'rejected_macros': 5, 'schema': 'rei.q1b.c11.adaptive_cursor.v1'}; remaining 60 completed attempts plus1externaldebit. No wholehistoryadmission.
 
 C12R7_BOUNDARY_CROSSED: CHUNK_ATTEMPT_BOUNDARY; C2_FULL002 gen56 cursor {'accepted_boundaries': 112, 'accepted_clock_s': 14047759562539.297, 'accepted_macros': 56, 'attempts': 62, 'next_step_s': 1183191344059.5735, 'rejected_macros': 6, 'schema': 'rei.q1b.c11.adaptive_cursor.v1'}; remaining 42 completed attempts plus1externaldebit. No wholehistoryadmission.
+
+C12R8_OPACITY_FIRST_FAILURE: FAILED_ATTEMPT; C2_FULL002 gen59 cursor {'accepted_boundaries': 118, 'accepted_clock_s': 18619151741356.234, 'accepted_macros': 59, 'attempts': 65, 'next_step_s': 1857559890832.7485, 'rejected_macros': 6, 'schema': 'rei.q1b.c11.adaptive_cursor.v1'}; remaining 39 completed attempts plus1externaldebit. No wholehistoryadmission.
