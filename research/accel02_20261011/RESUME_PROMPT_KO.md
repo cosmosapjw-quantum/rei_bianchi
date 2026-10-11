@@ -1,5 +1,3 @@
-# REI-ACCEL02 C09B 재개
+최신 재개점: q1b/c10/RESUME_PROMPT_KO.md
 
-다음 프롬프트와 실제 상태는 [q1b/RESUME_PROMPT_KO.md](q1b/RESUME_PROMPT_KO.md), [q1b/FINAL_STATUS.json](q1b/FINAL_STATUS.json), [q1b/NEXT_DAG.json](q1b/NEXT_DAG.json)을 따른다.
-
-다음 anchor: `Q1B_SOURCE_ENTRY_POSITIVE_STEP`. 완료된 RUN002·EVENT003·Q0·G1 및 변경 없는 G2를 반복하지 않는다. C09B는 국소 구성요소를 구현하고 검증한 단계이며 전체 물리 history는 HOLD다.
+C10R4_FINAL의 Q1B_ENTRY_PRECISION_AND_PRODUCTION_CONTROL부터 이어서 진행해줘. c10/FINAL_STATUS.json·NEXT_DAG.json·HANDOFF.json·NEXT_REPAIR_DESIGN.md와 normalization addendum을 먼저 읽어줘. 완료된 RUN002·EVENT003·Q0·C3·C10 국소 검산을 무변경 재실행하지 말고, source 정밀도와 production 시간 제어를 병렬로 진행해줘. 초기 한 endpoint의 상대차이를 전구간65/129 기준 실패로 해석하지 말고 기존 물리·허용 기준을 유지해줘. 실제 cold-process restart와 필요한 endpoint/precision gate를 닫은 뒤 전구간15.9→4 run 및 refinement로 판정하고 단계별 durable checkpoint를 남겨줘.

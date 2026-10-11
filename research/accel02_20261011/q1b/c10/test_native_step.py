@@ -34,6 +34,14 @@ class NativeStepTests(unittest.TestCase):
         thermal,diag=split_thermal_work(native,gas,self.g,lam,U)
         self.assertAlmostEqual(thermal/expected,1.,places=14)
         self.assertLess(diag['relative_work_owner_disagreement'],1e-12)
+    def test_failed_ledger_does_not_enter_accepted_prefix(self):
+        from run_native_entry import record_accepted_boundary
+        result={'accepted_boundaries':[]}
+        row={'ledger':{'pass_local_ledgers':False}}
+        with self.assertRaisesRegex(ArithmeticError,'LEDGER_REJECTED'):
+            record_accepted_boundary(result,row)
+        self.assertEqual(result['accepted_boundaries'],[])
+
     def test_gas_energy_linear_chemical_pairing(self):
         y=np.array([.2,.1,.3,.5]);dy=np.array([.01,-.02,.01,.03]);nh,he=.004,.0003
         expected=nh*(dy[3]+13.598434599702*dy[0])+he*(24.587389011*dy[1]+(24.587389011+54.41776)*dy[2])

@@ -18,10 +18,13 @@ from scipy.optimize import brentq
 
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
 from reconstruction import reconstruct,TraceRequired,QuadratureNotConverged
-from opacity_native import C_CM_S,THRESHOLDS_EV,NativeOpacity
+from opacity_native import C_CM_S,THRESHOLDS_EV,CHEMICAL_CHI_EV,NativeOpacity
 
 MOMENT_FIT_RTOL=1e-12
 PAIRING_RTOL=1e-12
+RESPONSE_COMPONENTS=['N','U','K0_HI','K0_HeI','K0_HeII','KE_HI','KE_HeI','KE_HeII',
+                     'photoheat_ABI_HI','photoheat_ABI_HeI','photoheat_ABI_HeII',
+                     'photoheat_direct_HI','photoheat_direct_HeI','photoheat_direct_HeII']
 
 
 @dataclass(frozen=True)
@@ -55,8 +58,14 @@ def _sum(a):
     return math.fsum(np.asarray(a,dtype=float).ravel())
 
 
-def _components(N,U,K0,KE):
-    return np.concatenate(([N,U],np.asarray(K0),np.asarray(KE)))
+def _components(N,U,K0,KE,heat_direct):
+    K0,KE=np.asarray(K0),np.asarray(KE)
+    # Native gas heating uses the small difference KE - chi*K0. Checking
+    # only KE and K0 permits cancellation to amplify their accepted errors.
+    # Keep the pinned chemical chi (distinct from sigma thresholds), without
+    # a clamp or a larger scale borrowed from either constituent rate.
+    heat=KE-CHEMICAL_CHI_EV*K0
+    return np.concatenate(([N,U],K0,KE,heat,np.asarray(heat_direct)))
 
 
 def _compare(coarse,fine,rtol,label):
@@ -79,6 +88,21 @@ def _kernels(q,P,sigma,R):
     if not np.all(np.isfinite(K0)) or not np.all(np.isfinite(KE)):
         raise ArithmeticError('ABSORPTION_RATE_NONFINITE')
     return K0,KE
+
+
+def _direct_heat(q,P,sigma,R):
+    """Same positive measure, excess energy before summation/subtraction.
+
+    Physical native sigma vanishes below its own threshold > chemical chi.
+    A generic manufactured grey sink can instead have signed mathematical
+    heat; that fixture is not a physical ionization provider.
+    """
+    return np.array([C_CM_S*_sum((R*q-CHEMICAL_CHI_EV[k])*sigma[:,k]*P)
+                     for k in range(3)])
+
+
+def _heat_consistency(K0,KE,direct,rtol,label):
+    return _compare(KE-CHEMICAL_CHI_EV*K0,direct,rtol,label)
 
 
 def _measure(cell,opacity,order,splits):
@@ -127,6 +151,8 @@ def _measure(cell,opacity,order,splits):
     sigma=np.asarray(callback(energy),dtype=float)
     if sigma.shape!=(len(q),3) or np.any(~np.isfinite(sigma)) or np.any(sigma<0):
         raise ValueError('ABSORPTION_SIGMA_SHAPE_NONNEGATIVE_FINITE_DOMAIN')
+    if isinstance(opacity,NativeOpacity) and np.any((energy[:,None]-CHEMICAL_CHI_EV)*sigma<0):
+        raise ArithmeticError('NATIVE_PHOTOHEAT_NEGATIVE_NO_CLAMP')
     return IncidentMeasure(_freeze(q),_freeze(P),_freeze(sigma),{
         'order':order,'node_count':len(q),'eta':float(eta),
         'number_fit_relative_residual':number_residual,
@@ -163,12 +189,18 @@ def prepare_incident(N,U,R,a,b,opacity,orders=(64,128),rtol=1e-7):
     fine=_measure(cell,opacity,orders[1],splits)
     cK0,cKE=_kernels(coarse.q,coarse.P,coarse.sigma,cell.R)
     fK0,fKE=_kernels(fine.q,fine.P,fine.sigma,cell.R)
-    errors=_compare(_components(_sum(coarse.P),cell.R*_sum(coarse.q*coarse.P),cK0,cKE),
-        _components(_sum(fine.P),cell.R*_sum(fine.q*fine.P),fK0,fKE),rtol,'INCIDENT_ORDER_PAIR')
+    ch=_direct_heat(coarse.q,coarse.P,coarse.sigma,cell.R)
+    fh=_direct_heat(fine.q,fine.P,fine.sigma,cell.R)
+    ccons=_heat_consistency(cK0,cKE,ch,rtol,'INCIDENT_COARSE_HEAT_ABI_DIRECT')
+    fcons=_heat_consistency(fK0,fKE,fh,rtol,'INCIDENT_FINE_HEAT_ABI_DIRECT')
+    errors=_compare(_components(_sum(coarse.P),cell.R*_sum(coarse.q*coarse.P),cK0,cKE,ch),
+        _components(_sum(fine.P),cell.R*_sum(fine.q*fine.P),fK0,fKE,fh),rtol,'INCIDENT_ORDER_PAIR')
     return PreparedIncident(fine.q,fine.P,fine.sigma,cell.R,cell.N,cell.U,coarse,rtol,{
         'status':'INTERIOR_POSITIVE_MOMENT_FITTED','orders':list(orders),
         'float_q_coordinate_indicator':indicator,'threshold_splits_q':splits,
         'coarse':coarse.diagnostics,'fine':fine.diagnostics,
+        'order_pair_component_names':RESPONSE_COMPONENTS.copy(),
+        'heat_direct_abi_component_errors':{'coarse':ccons.tolist(),'fine':fcons.tolist()},
         'order_pair_component_errors':errors.tolist(),'order_pair_max_error':float(np.max(errors)),
         'claim':'LOCAL_INCIDENT_MEASURE_ONLY_NOT_HISTORY_ADMISSION'})
 
@@ -176,6 +208,7 @@ def prepare_incident(N,U,R,a,b,opacity,orders=(64,128),rtol=1e-7):
 def _attenuate(q,P,sigma,R,lower,h):
     if not len(P):
         return {'N':0.,'U':0.,'K0':np.zeros(3),'KE':np.zeros(3),
+            'photoheat_direct':np.zeros(3),
             'number_absorbed_species':np.zeros(3),'energy_absorbed_species':np.zeros(3),
             'pointwise_pairing_relative_max':0.}
     rates=(C_CM_S*sigma)*lower[None,:]
@@ -200,6 +233,7 @@ def _attenuate(q,P,sigma,R,lower,h):
     if pointwise>PAIRING_RTOL:raise ArithmeticError('ABSORPTION_POINTWISE_PAIRING_FAILURE')
     K0,KE=_kernels(q,survived,sigma,R)
     return {'N':_sum(survived),'U':R*_sum(q*survived),'K0':K0,'KE':KE,
+        'photoheat_direct':_direct_heat(q,survived,sigma,R),
         'number_absorbed_species':np.array([_sum(events[:,k]) for k in range(3)]),
         'energy_absorbed_species':np.array([_sum(R*q*events[:,k]) for k in range(3)]),
         'pointwise_pairing_relative_max':pointwise}
@@ -215,8 +249,10 @@ def absorb(prepared,lower_cm3,h_s):
     c=prepared.coarse
     coarse=_attenuate(c.q,c.P,c.sigma,prepared.R,lower,h)
     fine=_attenuate(prepared.q,prepared.P,prepared.sigma,prepared.R,lower,h)
-    errors=_compare(_components(coarse['N'],coarse['U'],coarse['K0'],coarse['KE']),
-        _components(fine['N'],fine['U'],fine['K0'],fine['KE']),prepared.rtol,'ATTENUATED_ORDER_PAIR')
+    ccons=_heat_consistency(coarse['K0'],coarse['KE'],coarse['photoheat_direct'],prepared.rtol,'ATTENUATED_COARSE_HEAT_ABI_DIRECT')
+    fcons=_heat_consistency(fine['K0'],fine['KE'],fine['photoheat_direct'],prepared.rtol,'ATTENUATED_FINE_HEAT_ABI_DIRECT')
+    errors=_compare(_components(coarse['N'],coarse['U'],coarse['K0'],coarse['KE'],coarse['photoheat_direct']),
+        _components(fine['N'],fine['U'],fine['K0'],fine['KE'],fine['photoheat_direct']),prepared.rtol,'ATTENUATED_ORDER_PAIR')
     nres=fine['N']+_sum(fine['number_absorbed_species'])-prepared.N
     ures=fine['U']+_sum(fine['energy_absorbed_species'])-prepared.U
     nrel=nres/prepared.N if prepared.N else nres
@@ -236,6 +272,8 @@ def absorb(prepared,lower_cm3,h_s):
             raise ArithmeticError('ABSORPTION_NATIVE_COUNTER_LINK_FAILURE')
         links.extend(np.asarray(err,dtype=float).tolist())
     fine['diagnostics']={'status':'POSITIVE_IMPLICIT_ABSORPTION_LOCAL_CHECKED',
+        'order_pair_component_names':RESPONSE_COMPONENTS.copy(),
+        'heat_direct_abi_component_errors':{'coarse':ccons.tolist(),'fine':fcons.tolist()},
         'order_pair_component_errors':errors.tolist(),'order_pair_max_error':float(np.max(errors)),
         'number_pairing_residual':nres,'energy_pairing_residual_eV':ures,
         'number_pairing_relative_residual':nrel,'energy_pairing_relative_residual':urel,

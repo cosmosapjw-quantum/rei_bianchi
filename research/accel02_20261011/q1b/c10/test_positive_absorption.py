@@ -3,14 +3,15 @@ import math
 import sys
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 import numpy as np
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 sys.path.insert(0,str(HERE.parent))
-from positive_absorption import prepare_incident,absorb
-from reconstruction import InvalidCone,TraceRequired,QuadratureNotConverged
-from opacity_native import NativeOpacity,C_CM_S
+from positive_absorption import prepare_incident,absorb,_measure,_kernels
+from reconstruction import InvalidCone,TraceRequired,QuadratureNotConverged,reconstruct
+from opacity_native import NativeOpacity,C_CM_S,CHEMICAL_CHI_EV
 
 
 def grey(energy):
@@ -18,6 +19,47 @@ def grey(energy):
 
 
 class PositiveAbsorptionTests(unittest.TestCase):
+    def test_direct_photoheat_matches_independent_affine_identity(self):
+        def sigma(E):
+            out=np.zeros((len(E),3));out[:,0]=1e-18;return out
+        p=prepare_incident(1.,13.61,1.,13.6,13.62,sigma)
+        out=absorb(p,[0.,0.,0.],1.)
+        expected=C_CM_S*1e-18*(13.61-CHEMICAL_CHI_EV[0])
+        self.assertLess(abs(out['photoheat_direct'][0]/expected-1),1e-12)
+        self.assertLess(max(out['diagnostics']['heat_direct_abi_component_errors']['fine']),1e-7)
+
+    def test_direct_photoheat_refuses_inconsistent_abi_subtraction(self):
+        def sigma(E):
+            out=np.zeros((len(E),3));out[:,0]=1e-18;return out
+        original=_kernels
+        def inconsistent(*args):
+            k,e=original(*args)
+            return k,e+1e-5*(e-CHEMICAL_CHI_EV*k)
+        with patch('positive_absorption._kernels',inconsistent):
+            with self.assertRaises(QuadratureNotConverged):
+                prepare_incident(1.,13.61,1.,13.6,13.62,sigma)
+
+    def test_photoheat_cancellation_has_own_order_gate(self):
+        # On a uniform-q measure, Gauss64 integrates P127 but not q*P127.
+        # The manufactured sigma is positive on an above-HI-threshold cell,
+        # and He channels vanish below their physical thresholds. Number and
+        # energy rates pass 1e-7 while their small photoheat difference fails.
+        coeff=np.zeros(128);coeff[-1]=1.
+        def near_threshold(E):
+            sigma=np.zeros((len(E),3))
+            sigma[:,0]=1e-18*(1.+.001*np.polynomial.legendre.legval((E-13.61)/.01,coeff))
+            return sigma
+        cell=reconstruct(1.,13.61,1.,13.6,13.62)
+        c=_measure(cell,near_threshold,64,[])
+        f=_measure(cell,near_threshold,128,[])
+        ck,ce=_kernels(c.q,c.P,c.sigma,1.)
+        fk,fe=_kernels(f.q,f.P,f.sigma,1.)
+        self.assertLess(abs(ck[0]/fk[0]-1),1e-7)
+        self.assertLess(abs(ce[0]/fe[0]-1),1e-7)
+        self.assertGreater(abs((ce[0]-CHEMICAL_CHI_EV[0]*ck[0])/(fe[0]-CHEMICAL_CHI_EV[0]*fk[0])-1),1e-7)
+        with self.assertRaises(QuadratureNotConverged):
+            prepare_incident(1.,13.61,1.,13.6,13.62,near_threshold)
+
     def test_grey_stiff_and_counter_pairing(self):
         p=prepare_incident(2.,80.,1.,20.,60.,grey)
         lower=np.array([.01,.02,.03])

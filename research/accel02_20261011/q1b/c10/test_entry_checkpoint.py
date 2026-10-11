@@ -101,7 +101,7 @@ class TestEntryCheckpoint(unittest.TestCase):
         with self.assertRaisesRegex(CheckpointError, 'Stale'):
             load_entry_checkpoint(self.root/'generations', 0, stale)
 
-    def test_signed_CMB_counter_is_valid_but_loss_counters_cannot_decrease(self):
+    def test_signed_CMB_counter_is_valid(self):
         arrays, meta = example()
         # Zero net signed bath exchange is already covered by example. An
         # equal negative CMB and smaller gas thermal energy is valid.
@@ -112,6 +112,15 @@ class TestEntryCheckpoint(unittest.TestCase):
         arrays['accepted_min'] = arrays['prefix_state'].min(axis=0)
         arrays['accepted_max'] = arrays['prefix_state'].max(axis=0)
         write_entry_checkpoint(self.root/'signed', 0, arrays, meta, self.identity)
+
+    def test_monotone_loss_counter_cannot_decrease(self):
+        arrays, meta = example()
+        arrays['state'][6+COUNTERS.index('Eescape_eV')] = -.2
+        arrays['prefix_state'][-1] = arrays['state']
+        arrays['accepted_min'] = arrays['prefix_state'].min(axis=0)
+        arrays['accepted_max'] = arrays['prefix_state'].max(axis=0)
+        with self.assertRaisesRegex(CheckpointError,'must not decrease'):
+            write_entry_checkpoint(self.root/'negative-loss',0,arrays,meta,self.identity)
 
     def test_new_split_source_absorption_restart_is_exact(self):
         from source_entry import integrate_source, advance_source
@@ -132,6 +141,20 @@ class TestEntryCheckpoint(unittest.TestCase):
         clocks = np.array([0.,.25,.5,.75,1.])
         gas = np.array([0.,0.,0.,1.5*8.617333262e-5*1.08*20.])
         initial = pack_entry_state(gas,np.array([0.]),np.array([0.]),dict.fromkeys(COUNTERS,0.))
+        binding_values = {
+            'grid': {'q_left':5.,'q_right':'5*exp(.3*t)','cells':1},
+            'binary': {'provider':'NO_NATIVE_PROVIDER_MANUFACTURED_SIGMA_ONLY','sigma_cm2':[1/C_CM_S,0,0]},
+            'control': {'boundaries':clocks.tolist(),'source_entry_sha256':hashlib.sha256((HERE/'source_entry.py').read_bytes()).hexdigest(),
+                        'positive_absorption_sha256':hashlib.sha256((HERE/'positive_absorption.py').read_bytes()).hexdigest()},
+            'physics_contract': {'gas':'fixed neutral 20K','absorbed_energy':'instant radiative escape',
+                                 'grey_kappa':1.7,'expansion_lambda':.3,'scope':'MANUFACTURED_ONLY'}}
+        paths = {'source':HERE/'source_entry.py'}
+        binding_dir = self.root/'manufactured-bindings'
+        binding_dir.mkdir()
+        for name,value in binding_values.items():
+            paths[name] = binding_dir/(name+'.json')
+            paths[name].write_text(json.dumps(value,sort_keys=True,indent=2)+'\n')
+        identity = entry_identity(**paths)
 
         def advance(state,j):
             p = unpack_entry_state(state,1)
@@ -166,14 +189,14 @@ class TestEntryCheckpoint(unittest.TestCase):
         for j in range(2): split.append(advance(split[-1],j))
         arrays,meta = snapshot(split)
         directory = self.root/'split-generations'
-        first = write_entry_checkpoint(directory,0,arrays,meta,self.identity)
-        restored = load_entry_checkpoint(directory,0,self.identity,
+        first = write_entry_checkpoint(directory,0,arrays,meta,identity)
+        restored = load_entry_checkpoint(directory,0,identity,
             expected_manifest_sha256=hashlib.sha256((first/'manifest.json').read_bytes()).hexdigest())
         split = list(restored['arrays']['prefix_state'])
         for j in range(2,4): split.append(advance(split[-1],j))
         final_a,final_m = snapshot(split)
         expected_a,expected_m = snapshot(uninterrupted)
-        write_entry_checkpoint(directory,1,final_a,final_m,self.identity)
+        write_entry_checkpoint(directory,1,final_a,final_m,identity)
         for name in final_a:
             self.assertTrue(np.array_equal(final_a[name],expected_a[name]),name)
         self.assertEqual(final_m,expected_m)
@@ -182,12 +205,14 @@ class TestEntryCheckpoint(unittest.TestCase):
         if evidence:
             dest = Path(evidence)
             shutil.copytree(directory,dest)
+            shutil.copytree(binding_dir,dest.parent/'CHECKPOINT_ENTRY_BINDINGS')
             report = dict(schema='rei.q1b.entry_checkpoint_restart.v1',status='PASS',
                 new_split_map='actual source_entry + positive_absorption functions',
                 closure='MANUFACTURED_IMMEDIATE_RADIATIVE_ESCAPE_FIXED_GAS',
                 boundary_clock=.5,final_clock=1.,accepted_boundaries=5,
                 complete_prefix_state_difference_max=0.,arrays_bitwise_equal=True,
                 metadata_exact_equal=True,ledger_max=final_m['ledger_max'],
+                identity=identity,
                 native_calls=0,physical_gas_driver_binding='NOT_EVALUATED',
                 scientific_admission=False)
             (dest.parent/'CHECKPOINT_ENTRY_RESTART.json').write_text(json.dumps(report,indent=2)+'\n')

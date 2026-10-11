@@ -559,7 +559,8 @@
     "old_RUN002_EVENT003_Q0_replays": 0,
     "native_calls": 0,
     "gas_or_coupled_ODE": 0,
-    "new_source_time_integrations": true
+    "new_source_time_integrations": true,
+    "semigroup_elapsed_s_observed": 2.250794002
   },
   "independence": {
     "manufactured": "Independent 70-digit Decimal closed-form integrals and grey survival; actual map receives actual instantaneous source moments. Grey recurrence fixture has an independently applied scalar BE sink, not production absorption/native validation.",
@@ -569,11 +570,50 @@
     "small_step_failures": "At h=5e9 number/Q/Einj and work exceed1e-10; at2.5e9 work alone exceeds1e-10. This is observed arithmetic/quadrature disagreement, consistent with source-band width and R-R1 cancellation. No rigorous conditioning bound is claimed.",
     "time_error": "The source map is integrated analytically in Q up to source quadrature; these h trials do not measure gas/absorption splitting error. Larger h passing source tests does not authorize increasing a coupled timestep.",
     "provider_changes": 0,
-    "tolerance_changes": 0
+    "tolerance_changes": 0,
+    "heuristic_roundoff_indicator": "Binary64 epsilon/(H_i*h) grows inversely with step size for thin source-band widths and R(t)-R1. This is a conditioning indicator only, not a certified bound; observed pair errors are authoritative."
   },
   "first_failures": {
     "initial_red": "Import failure before implementation",
     "fixture_attempt1": "Incorrect diagnostic O(lambda*h) bound1/20; independently expanded birth mean correction is-lambda*h/12, corrected fixture bound1/10. Integrated exact N/Q gates were already passing; scientific criteria unchanged."
   },
-  "scope_limit": "No new full-redshift history, native entry, opacity or source-partition reference replay."
+  "scope_limit": "No new full-redshift history, native entry, opacity or source-partition reference replay.",
+  "common_endpoint_gate": {
+    "fields": [
+      "N",
+      "U",
+      "work",
+      "injected"
+    ],
+    "each_cell_own_fine_rtol": 1e-10,
+    "applies_to_all_comparisons": true,
+    "zero_fine_requires_exact_zero": true
+  },
+  "reproduction_driver": {
+    "path": "c10/reproduce_source_entry.py",
+    "sha256": "e0e73ef3ef7ce047357b4d56c38f3256f966580f6bd936d861b51d29a50948a0",
+    "provenance": "Reconstructed after original inline executions; not archived original as-run text",
+    "validation": "COMPILE_ONLY_PASS_NO_SOURCE_EVALUATIONS",
+    "numerical_replay_executed": false,
+    "input_identity_policy": "Hard-coded saved C10 source/grid/IC/provider hashes; mismatch fails before outputs",
+    "output_policy": "Fresh directory only; each artifact create-only",
+    "command": "python research/accel02_20261011/q1b/c10/reproduce_source_entry.py --output-dir /tmp/q1b_source_reproduction_NEW",
+    "expectedoutputs": [
+      "REPRODUCTION_CONTRACT.json",
+      "SOURCE_ENTRY_INTERVALS.jsonl",
+      "SOURCE_ENTRY_SEMIGROUP.jsonl",
+      "SOURCE_ENTRY_SEMIGROUP_ARRAYS.npz",
+      "SOURCE_ENTRY_REPRODUCTION.json"
+    ],
+    "expected_interval_pass_pattern": [
+      true,
+      false,
+      false,
+      true,
+      true,
+      true
+    ],
+    "expected_semigroup_max_own_fine_observed": 7.012775437112667e-12,
+    "comparison_policy": "Unchanged gates and explicit interval pattern; not bitwise identity"
+  }
 }

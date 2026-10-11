@@ -1,0 +1,102 @@
+{
+  "schema": "rei.q1b.c10.source_entry_evidence.v1",
+  "commands": [
+    {
+      "command": "python research/accel02_20261011/q1b/c10/test_source_entry.py",
+      "logs": [
+        "SOURCE_ENTRY_RED.log",
+        "SOURCE_ENTRY_GREEN_ATTEMPT1.log",
+        "SOURCE_ENTRY_GREEN.log"
+      ],
+      "exit_codes": [
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "command_type": "inline Python diagnostic",
+      "record": "SOURCE_ENTRY_ACTUAL_ATTEMPT1.log",
+      "operation": "Construct pinned HistoryProvider(r=0), CellSource(GRID_C2), provider_event_times, integrate_source(0,1e10).",
+      "exit_code": 0
+    },
+    {
+      "command_type": "inline Python diagnostic with explicit per-trial rejection capture",
+      "record": "SOURCE_ENTRY_ACTUAL_ATTEMPT2.log",
+      "operation": "Same source; h=[5e9,2.5e9,1e11,5e10,2.5e10]. SourceEntryError is saved per-trial, no failed trial promoted.",
+      "exit_code": 0
+    },
+    {
+      "command_type": "inline Python semigroup diagnostic",
+      "record": "SOURCE_ENTRY_SEMIGROUP.log",
+      "operation": "Reuse SOURCE_C2.npz IC. At commonendpoint1e11 use1/2/4 equal steps, integrate_source plus advance_source, sum actual work/injected counters; compare whole arrays to4step own-fine without floor. JSON reports per-step diagnostics, birth moments and strict pairing gate; NPZ storesN/U/work/injected arrays.",
+      "exit_code": 0
+    }
+  ],
+  "files": {
+    "SOURCE_ENTRY_ACTUAL.json": {
+      "sha256": "41c9cb4aa97c66e53fd3ebe4487ada54af22ffebad00b6dc711966cf62d5318a",
+      "bytes": 21441
+    },
+    "SOURCE_ENTRY_ACTUAL_ATTEMPT1.log": {
+      "sha256": "8c1c695ed1f6c62692c9eb3bcf38d2b5d64c1073c381dd59ab567d089b0e83d4",
+      "bytes": 620
+    },
+    "SOURCE_ENTRY_ACTUAL_ATTEMPT2.log": {
+      "sha256": "a57f2d2b243f1ec3d4263ad298d7900c03a23d2c9fe8e05127c00df829c88946",
+      "bytes": 3158
+    },
+    "SOURCE_ENTRY_GREEN.log": {
+      "sha256": "0ea07806ed8880cc443038fe19765b52aad9a79b38e471c7f63a28ff8981f794",
+      "bytes": 640
+    },
+    "SOURCE_ENTRY_GREEN_ATTEMPT1.log": {
+      "sha256": "b6be17ddc9df34be00ca0777fb34b84c68a61a97670ffc16bbbe65795d324710",
+      "bytes": 1237
+    },
+    "SOURCE_ENTRY_PROGRESS.md": {
+      "sha256": "2149bd9cb6b8243a1e18ef11142d41c2fd76bc1b9e3d27704880aac466902e26",
+      "bytes": 4167
+    },
+    "SOURCE_ENTRY_RED.log": {
+      "sha256": "c2cbfbbcb4bdb5be79bfb40d8ced5a5f13f7e41b48a97c3d1e345722b12d5ec1",
+      "bytes": 292
+    },
+    "SOURCE_ENTRY_SEMIGROUP.log": {
+      "sha256": "dc26e04e93023ba983374243aeb16354376ddd54844475eb028d985801e33c70",
+      "bytes": 1706
+    },
+    "SOURCE_ENTRY_SEMIGROUP_ARRAYS.npz": {
+      "sha256": "cb7b6cedb469bfccc240c6c69257b2bb364e8eff261423925daedcf92af3ccf0",
+      "bytes": 17659
+    }
+  },
+  "reproducibility_limit": "Original inline driver text was not archived; a reconstruction of its actual operations now exists as the compile-checked reproduction script. It has not rerun the diagnostics.",
+  "reproduction_driver": {
+    "path": "c10/reproduce_source_entry.py",
+    "sha256": "e0e73ef3ef7ce047357b4d56c38f3256f966580f6bd936d861b51d29a50948a0",
+    "provenance": "Reconstructed after original inline executions; not archived original as-run text",
+    "validation": "COMPILE_ONLY_PASS_NO_SOURCE_EVALUATIONS",
+    "numerical_replay_executed": false,
+    "input_identity_policy": "Hard-coded saved C10 source/grid/IC/provider hashes; mismatch fails before outputs",
+    "output_policy": "Fresh directory only; each artifact create-only",
+    "command": "python research/accel02_20261011/q1b/c10/reproduce_source_entry.py --output-dir /tmp/q1b_source_reproduction_NEW",
+    "expectedoutputs": [
+      "REPRODUCTION_CONTRACT.json",
+      "SOURCE_ENTRY_INTERVALS.jsonl",
+      "SOURCE_ENTRY_SEMIGROUP.jsonl",
+      "SOURCE_ENTRY_SEMIGROUP_ARRAYS.npz",
+      "SOURCE_ENTRY_REPRODUCTION.json"
+    ],
+    "expected_interval_pass_pattern": [
+      true,
+      false,
+      false,
+      true,
+      true,
+      true
+    ],
+    "expected_semigroup_max_own_fine_observed": 7.012775437112667e-12,
+    "comparison_policy": "Unchanged gates and explicit interval pattern; not bitwise identity"
+  }
+}

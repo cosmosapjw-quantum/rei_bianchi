@@ -1,0 +1,95 @@
+{
+  "schema": "rei.q1b.c10.dag.v1",
+  "checkpoint": "C10R4_FINAL",
+  "next_anchor": "Q1B_ENTRY_PRECISION_AND_PRODUCTION_CONTROL",
+  "criteria_source": "../../NEXT_DAG.json#/frozen_acceptance",
+  "physics_source": "../RUN_CONTRACT.json",
+  "no_replay": [
+    "RUN002",
+    "EVENT003",
+    "Q0",
+    "unchanged_Q1A_G1_G2",
+    "completed_C1_C2",
+    "C3_source_IC_opacity",
+    "unchanged_C10_source_scans",
+    "unchanged_C10_1_2_4_native_family",
+    "old_native_6tests",
+    "old_generic_checkpoint_8tests"
+  ],
+  "nodes": [
+    {
+      "id": "C10_LOCAL_COMPONENTS",
+      "state": "PROMOTE_SCOPED",
+      "evidence": "review/INDEPENDENT_DECISION.json",
+      "depends": []
+    },
+    {
+      "id": "P_ENTRY_PRECISION",
+      "state": "NEXT",
+      "depends": [
+        "C10_LOCAL_COMPONENTS"
+      ],
+      "action": "Localize source R-difference/band-intersection/moment-offset roundoff against same-formula high-precision reference; implement changed arithmetic only after contract."
+    },
+    {
+      "id": "P_PRODUCTION_CONTROLLER",
+      "state": "NEXT_PARALLEL",
+      "depends": [
+        "C10_LOCAL_COMPONENTS"
+      ],
+      "action": "Predeclare fixed numerical error scales and event-aware admissible controller; preserve official whole-history normalization. Do not enforce trace-ion ppm from one early endpoint."
+    },
+    {
+      "id": "P_ENDPOINT_TRACE",
+      "state": "PARALLEL_DESIGN",
+      "depends": [
+        "C10_LOCAL_COMPONENTS"
+      ],
+      "action": "Prove and bind native threshold/support interior traces or retain explicit failclosed; no nextafter substitution."
+    },
+    {
+      "id": "P_COLD_RESTART",
+      "state": "PARALLEL_READY",
+      "depends": [
+        "C10_LOCAL_COMPONENTS"
+      ],
+      "action": "New fresh-process restart test for actual source/gas/precision/controller identity; existing same-process evidence reused."
+    },
+    {
+      "id": "Q1B_PRODUCTION_LOCAL_GO",
+      "state": "HOLD",
+      "depends": [
+        "P_ENTRY_PRECISION",
+        "P_PRODUCTION_CONTROLLER",
+        "P_ENDPOINT_TRACE",
+        "P_COLD_RESTART"
+      ],
+      "action": "Independent decision on changed production prerequisites only."
+    },
+    {
+      "id": "Q2_FULL_INTERVAL",
+      "state": "NOT_EVALUATED_HOLD_PREREQUISITES",
+      "depends": [
+        "Q1B_PRODUCTION_LOCAL_GO"
+      ],
+      "action": "Actualwhole15.9to4 C2/C3 and same-grid temporal pair,24fields,65/129 separatelynormalized,strictdomains,ledgers,geometry. Checkpoint eachnaturalboundary."
+    },
+    {
+      "id": "N3_BIANCHI_PAIR",
+      "state": "HOLD",
+      "depends": [
+        "Q2_FULL_INTERVAL"
+      ]
+    },
+    {
+      "id": "BASS_N4_NATIVE",
+      "state": "HOLD_NO_CALLS",
+      "depends": [
+        "N3_BIANCHI_PAIR"
+      ],
+      "old_reduced_N4": "UNCHANGED_SCOPED"
+    }
+  ],
+  "scientific_admission": false,
+  "normalization_addendum": "evidence/NATIVE_ENTRY_NORMALIZATION_ADDENDUM.json"
+}
