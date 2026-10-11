@@ -119,7 +119,9 @@ def _validate(arrays, meta, identity, physical_validator):
                  all(type(v) in (int, float) and np.isfinite(v) for v in item.values()), f'{key}: number and energy required')
     _require(all(v >= 0 for v in meta['ledger_max'].values()), 'Ledger maxima must be nonnegative')
     _require(all(v > 0 for v in meta['ledger_origins'].values()), 'Ledger normalization origins must be positive')
-    _require(meta.get('restart_kind') == 'FRESH_BDF_AT_NATURAL_SEGMENT_BOUNDARY', 'Restart type must be explicit')
+    _require(meta.get('restart_kind') in {
+        'FRESH_BDF_AT_NATURAL_SEGMENT_BOUNDARY',
+        'FRESH_SPLIT_STEP_AT_NATURAL_SEGMENT_BOUNDARY'}, 'Restart type must be explicit')
     _require(isinstance(meta.get('physical_binding'), str) and meta['physical_binding'], 'Physical binding scope required')
     # Callback is required on load as well as publish. Its result is not trusted
     # from a manifest, and hashes do not authorize the validator or physics.
