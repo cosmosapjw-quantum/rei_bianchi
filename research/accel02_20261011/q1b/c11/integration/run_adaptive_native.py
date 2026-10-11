@@ -40,7 +40,7 @@ def dependency_identity():
         C11/'controller/adaptive_controller.py',C11/'controller/CONTROL_V1.json',
         C11/'restart/adaptive_checkpoint.py',C11/'CONTRACT.json',
         Q1B/'native/target/release/rei_q1b_cell_native_v1',Q1B/'GRID_C2.json']
-    mapping.update({'dependency:'+str(path.relative_to(Q1B.parents[1])):sha(path) for path in paths})
+    mapping.update({'dependency:'+str(path.relative_to(Q1B.parents[2])):sha(path) for path in paths})
     return mapping
 
 
@@ -82,6 +82,11 @@ def main():
     controls=json.loads((C11/'controller/CONTROL_V1.json').read_text());validate_controls(controls)
     end=controls['bounded_run_request']['end_s']
     provider,source,initial=runtime_inputs();strict_validate(initial,initial,provider)
+    if not (controls['observable_scales']['ne_cm3']==initial['nH_ref'] and
+            controls['observable_scales']['photon_cm3']==initial['nH_ref'] and
+            controls['distribution_scales']['N_ref_distribution']==initial['nH_ref'] and
+            controls['distribution_scales']['U_eV_ref_distribution']==13.598434599702*initial['nH_ref']):
+        raise ValueError('C11_FIXED_SCALE_INITIAL_REFERENCE_BINDING')
     dependencies=dependency_identity();events=list(source_precision.provider_event_times(source,0.,end))
     launch=dict(schema='rei.q1b.c11.actual_native_launch.v1',created_utc=datetime.now(timezone.utc).isoformat(),
         argv=sys.argv,python=platform.python_version(),numpy=np.__version__,controls=controls,
@@ -90,7 +95,7 @@ def main():
     write_json(out/'LAUNCH.json',launch);save_state(out/'INITIAL.npz',initial)
     asrun=out/'ASRUN';asrun.mkdir()
     for key,digest in dependencies.items():
-        path=Q1B.parents[1]/key.removeprefix('dependency:')
+        path=Q1B.parents[2]/key.removeprefix('dependency:')
         if path.suffix=='.py':
             target=asrun/key.removeprefix('dependency:');target.parent.mkdir(parents=True,exist_ok=True)
             with target.open('xb') as f:f.write(path.read_bytes())
@@ -116,6 +121,7 @@ def main():
                 prospective=states+list(pair)
                 arrays,metadata=make_adaptive_snapshot(states=prospective,controls=controls,cursor=prospective_cursor,
                     end_time_s=end,hard_events=events,scales=checkpoint_scales(initial),dependency_closure=dependencies)
+                metadata['native_driver_binding']='ACTUAL_C11_NATIVE_'+args.label
                 identity=adaptive_identity(source=C11/'precision/source_precision.py',grid=Q1B/'GRID_C2.json',
                     binary=Q1B/'native/target/release/rei_q1b_cell_native_v1',physics_contract=C11/'CONTRACT.json',metadata=metadata)
                 generation=prospective_cursor['accepted_macros']

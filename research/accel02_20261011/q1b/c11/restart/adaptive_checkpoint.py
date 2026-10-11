@@ -96,12 +96,24 @@ def adaptive_identity(*,source,grid,binary,physics_contract,metadata):
 def _check_control(metadata,identity):
     require(identity['control']==canonical_sha(metadata['restart_binding']),'ADAPTIVE_CONTROL_IDENTITY')
 
+def verify_dependency_closure(metadata):
+    mapping=metadata['restart_binding']['dependency_closure']
+    require(isinstance(mapping,dict) and bool(mapping),'ADAPTIVE_EMPTY_DEPENDENCY_CLOSURE')
+    for key,expected in mapping.items():
+        require(isinstance(key,str) and key.startswith('dependency:'),'ADAPTIVE_DEPENDENCY_KEY')
+        relative=Path(key.split(':',1)[1])
+        require(not relative.is_absolute() and '..' not in relative.parts,'ADAPTIVE_DEPENDENCY_PATH')
+        require(sha(HERE.parents[4]/relative)==expected,'ADAPTIVE_DEPENDENCY_MISMATCH:'+str(relative))
+    return mapping
+
 def write_adaptive_checkpoint(directory,generation,arrays,metadata,expected_identity):
     _check_control(metadata,expected_identity)
+    verify_dependency_closure(metadata)
     return publish_generation(directory,generation,arrays,metadata,expected_identity,validate_adaptive_snapshot)
 
 def load_adaptive_checkpoint(directory,generation,expected_identity,*,expected_manifest_sha256=None):
     loaded=load_generation(directory,generation,expected_identity,validate_adaptive_snapshot,
         expected_manifest_sha256=expected_manifest_sha256)
     _check_control(loaded['metadata'],expected_identity)
+    verify_dependency_closure(loaded['metadata'])
     return loaded

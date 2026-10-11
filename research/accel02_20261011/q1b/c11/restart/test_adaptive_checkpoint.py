@@ -1,12 +1,12 @@
 """Changed adaptive adapter cases; saved C10 states are fixture bytes only."""
-import copy,json
+import copy,json,hashlib,tempfile
 from pathlib import Path
 import sys,unittest
 import numpy as np
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE.parents[1]/'c10'))
 from entry_checkpoint import unpack_entry_state
-from adaptive_checkpoint import make_adaptive_snapshot,validate_adaptive_snapshot
+from adaptive_checkpoint import make_adaptive_snapshot,validate_adaptive_snapshot,adaptive_identity,write_adaptive_checkpoint,load_adaptive_checkpoint,canonical_sha
 
 class AdaptiveTests(unittest.TestCase):
     def setUp(self):
@@ -42,4 +42,20 @@ class AdaptiveTests(unittest.TestCase):
     def test_pending_midpoint_restart_rejected(self):
         a,m=self.snap();m['pending_halfstep']={'t_s':6e10}
         with self.assertRaisesRegex(ValueError,'PENDING'):validate_adaptive_snapshot(a,m)
+    def test_new_adapter_atomic_roundtrip_and_closure(self):
+        a,m=self.snap();source=HERE/'adaptive_checkpoint.py';repo=HERE.parents[4]
+        m['restart_binding']['dependency_closure']={'dependency:'+str(source.relative_to(repo)):hashlib.sha256(source.read_bytes()).hexdigest()}
+        m['restart_binding_sha256']=canonical_sha(m['restart_binding'])
+        identity=adaptive_identity(source=source,grid=source,binary=source,physics_contract=source,metadata=m)
+        with tempfile.TemporaryDirectory() as directory:
+            write_adaptive_checkpoint(directory,1,a,m,identity)
+            loaded=load_adaptive_checkpoint(directory,1,identity)
+            self.assertEqual(loaded['metadata']['adaptive_cursor'],self.cursor)
+            self.assertTrue(np.array_equal(loaded['arrays']['prefix_state'],a['prefix_state']))
+        m['restart_binding']['dependency_closure'][next(iter(m['restart_binding']['dependency_closure']))]='0'*64
+        m['restart_binding_sha256']=canonical_sha(m['restart_binding'])
+        identity=adaptive_identity(source=source,grid=source,binary=source,physics_contract=source,metadata=m)
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError,'DEPENDENCY_MISMATCH'):
+                write_adaptive_checkpoint(directory,1,a,m,identity)
 if __name__=='__main__':unittest.main()
