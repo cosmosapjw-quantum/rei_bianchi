@@ -3,7 +3,7 @@
   "created_utc": "2026-10-10T23:50:59.513860+00:00",
   "owner": "/root/q1a_grid_design",
   "model_identity": "UNKNOWN",
-  "status": "PROPOSAL_LOCAL_WORK_READY_FULL_ODE_NO_GO",
+  "status": "PROPOSAL_LOCAL_WORK_READY_FULL_ODE_NO_GO_AFTER_Q1A_REJECTION",
   "authority": "Current user: unchanged physics/acceptance, new candidate whole15.9to4, no completed RUN002/EVENT003/Q0 replay; prospective Q1B closure/ABI requires local gates.",
   "executed_by_this_document_task": {
     "new_ODE": 0,
@@ -63,9 +63,10 @@
       "full_time_certificate": false
     },
     "G2_FINE": {
-      "status": "PENDING_TERMINAL_EVIDENCE",
+      "status": "ENVIRONMENT_INTERRUPTION_NO_TERMINAL_OR_COMPLETE_HISTORY",
       "final_prediction": null,
-      "root_finalization_required": true
+      "root_finalization_required": false,
+      "full_refinement_complete": false
     },
     "source_pair_129": {
       "number_lower_bound": 0.032743252486859845,
@@ -156,7 +157,8 @@
     "N/U Jacobian including within-cell moment coupling and admissible-direction verification",
     "New-cell source precheck using saved accepted reference",
     "Native-opacity quadrature vs reconstruction separation",
-    "Independent bounded local gate decision"
+    "Independent bounded local gate decision",
+    "Atomic complete prefix+accepted-state checkpoint generation and independently tested segment-boundary resume with durable upload receipts"
   ],
   "prospective_cell_family": {
     "selected": false,
@@ -180,6 +182,17 @@
       ],
       "gate": "Independent derived pairing plus fully specified closure/ABI; no undefined empty-cell operation.",
       "on_fail": "NO_GO_FULL_ODE"
+    },
+    {
+      "id": "P0_DURABLE_CHECKPOINT",
+      "state": "READY_DESIGN_ONLY",
+      "depends": [
+        "Q1B0_CONTRACT"
+      ],
+      "parallel_group": "LOCAL_VALIDATION",
+      "action": "Specify and implement atomic immutable checkpoint generations with full common-epoch prefix, segment-boundary state, accepted extrema/domain flags, ledger maxima/origins, source/grid/binary/control hashes, next segment and saved counters. Independently test interrupted versus uninterrupted manufactured trajectory; retain each fresh BDF initialization and actual remote receipts.",
+      "gate": "Restoration of a complete generation demonstrated, stale/torn identity rejected; no bitwise internal-integrator restoration claim.",
+      "on_fail": "NO_GO_LONG_ODE"
     },
     {
       "id": "Q1B1_SOURCE_IC",
@@ -284,9 +297,10 @@
       "id": "Q2B_FULL_PAIR",
       "state": "NO_GO_UNTIL_LOCAL_REVIEW",
       "depends": [
-        "Q1B5_LOCAL_REVIEW"
+        "Q1B5_LOCAL_REVIEW",
+        "P0_DURABLE_CHECKPOINT"
       ],
-      "condition": "LOCAL_GO_NO_GO.decision==GO and all required blocker resolutions have evidence",
+      "condition": "LOCAL_GO_NO_GO.decision==GO and all required blocker resolutions have evidence and actual complete-checkpoint restore gate PASS",
       "action": "Run one frozen new cell candidate/enriched pair over full15.9to4, plus prospectively chosen same-grid temporal check. Preserve accepted-state, source/radiation/heat and global ledgers.",
       "max_automatic_refinement_pairs": 1,
       "global_gate": "global_acceptance_unchanged",
@@ -337,7 +351,7 @@
   ],
   "checkpoint_policy": {
     "local": "Each local gate gets source/input identities and immutable evidence/decision",
-    "runs": "Archive raw terminal outputs or first failure immediately",
+    "runs": "Periodic complete generation bundles plus immediate raw terminal/first-failure archives; do not wait only for terminal output.",
     "remote": "Authorized additive GitHub plus actual Drive/Dropbox receipts",
     "semantics": "UPLOAD_VERIFIED != RESTORE_VERIFIED",
     "restart": "Saved state alone is not supported exact-resume CLI",

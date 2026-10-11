@@ -2,7 +2,7 @@
   "schema": "rei_accel02_next_dag_v2",
   "campaign_id": "REI_ACCEL02_20261011",
   "execution_utc_date": "2026-10-10",
-  "draft_status": "Q1A_REJECTED_COARSE_LEDGER_AND_SOURCE_GATE_FINE_RUN_ACTIVE",
+  "draft_status": "Q1A_REJECTED_G2_ENVIRONMENT_INTERRUPTED",
   "authority": "Current user resume instruction plus unchanged ACCEL02 contracts and independent phase2 quantitative decision",
   "completed_do_not_replay": [
     "REI-ACCEL01 RUN001/RUN002 reduced20to4",
@@ -135,7 +135,7 @@
     },
     {
       "id": "Q1A_FIXED_Q_GAUSS",
-      "state": "REJECTED_CURRENT_CANDIDATE_FINE_DIAGNOSTIC_ACTIVE",
+      "state": "CLOSED_REJECTED_FINE_HISTORY_INCOMPLETE",
       "depends": [
         "Q0_SOURCE_PROFILE"
       ],
@@ -148,11 +148,13 @@
         "source replacement or smoothing",
         "unbounded uniform grid doubling"
       ],
-      "next_action": "Preserve G1_FINE fullrun and G1_TIGHT firstfailure; awaitexistingG2 terminal only; no duplicateoruniformgridrerun.",
+      "next_action": "Use measured G1 failures and source lower bound; retain interrupted G2 snapshot only.",
       "evidence": [
         "q1a/CONTRACT.json",
         "q1a/evidence/PREFLIGHT.json",
-        "q1a/review/SOURCE_PAIR_LOWER_BOUND.json"
+        "q1a/review/SOURCE_PAIR_LOWER_BOUND.json",
+        "q1a/FINAL_STATUS.json",
+        "q1a/RUNTIME_INTERRUPTION_C08R1.json"
       ]
     },
     {
@@ -170,12 +172,12 @@
     },
     {
       "id": "Q2_FULL_INTERVAL",
-      "state": "G1_WHOLE_LEDGER_FAIL_TIGHT_INCOMPLETE_G2_ACTIVE",
+      "state": "NOT_ADMITTED_Q1A_FAILED_G2_INCOMPLETE",
       "depends_any": [
         "Q1A_FIXED_Q_GAUSS",
         "Q1B_FIXED_CELL_TWO_MOMENT"
       ],
-      "action": "Complete existing wholeinterval newGauss pair andsamegrid timecomparison. Full24spectralFAIL alreadybounded fromsource; measureevolvedresponse andpreservefailure.",
+      "action": "Q1A fullG1 computed but numberledgerFAIL; tightfirstfailure; G2runtimeinterruption. Anynewcandidatewholepair requires Q1BlocalGO and checkpoint durability. No full24or timePASS.",
       "acceptance": "Frozen native time2e-6, energy_initial1e-9, number_nH1e-9 and empirical spectral1e-3; report sample sets separately; independent review required",
       "if_fail": "Preserve first failure and localize changed error contribution; do not repeat unchanged campaigns or relax criteria",
       "evidence": [
@@ -186,10 +188,10 @@
     },
     {
       "id": "P1_RESUME_CLI",
-      "state": "IMPLEMENTED_CONDITIONALLY_REVIEWED_ACTUAL_RESTART_UNTESTED",
+      "state": "G2_WALL_ONLY_CAPABILITY_NOT_APPLICABLE_TO_INTERRUPTION",
       "depends": [],
-      "action": "Implement actual checkpoint-resume CLI with source/binary/grid/normalization/active-event identity and accepted segment-state validation. Verify restart semantics as a new software capability.",
-      "existing_state": "One original G2 wall-only continuation, at most600s, fresh BDF initialization; no exact integrator restoration; no numerical-failure resume.",
+      "action": "Before next long ODE implement atomic generation bundles with prefixhistory, currentacceptedstate, extrema, ledgerorigins, sourcehashes, and durable phase receipts; independently test split-run semantics.",
+      "existing_state": "G2 RESTART snapshot lacks fullprefix and acceptanceextrema. Existingwall-onlyCLI requires actualterminalTimeout andcannot be used here.",
       "evidence": [
         "q1a/resume/PLAN_ADDENDUM_C08C.md",
         "q1a/review/WALL_RESUME_CODE_REVIEW.json"
@@ -290,7 +292,7 @@
       "DAGandnextcommand"
     ],
     "durability": "additivegitpublication+Drive/Dropbox receipts; do notoverwriteearlierfailurearchives",
-    "restart_truth": "Original driver has no resume CLI. Optional separately reviewed G2 wall-only continuation adds one BDF initialization and preserves predecessor hashes; actual restart parity remains untested until used and reviewed.",
+    "restart_truth": "G2 original live snapshot is NOT resumable under current terminal-only capability; missing prefix history and extrema preclude exact continuation claims. Persist atomic complete checkpoint bundles before future long runs.",
     "selective_readback": "metadataandimmutableidentities sufficientnormally; UPLOAD_VERIFIED != RESTORE_VERIFIED",
     "stages": [
       "C07R0 recovery inventory",
@@ -299,7 +301,8 @@
       "C08A bounded Q1A implementation",
       "C08A2 running snapshot",
       "C08B first terminal raw results and independent partial decision",
-      "C08C conditional wall continuation implementation and review"
+      "C08C conditional wall continuation implementation and review",
+      "C08R1 runtime interruption, local archive restore, final scoped rejection and handoff"
     ],
     "archive_dependency": "C07R2 is a full research-directory/native-binary overlay on the published Git repository, not a standalone repository bundle"
   },
@@ -316,7 +319,7 @@
     "No ninefield plot in place of full source/radiation/heat comparison"
   ],
   "date_note": "Campaign directory preserves historical20261011 identifier; actual executionUTC receipts20261010",
-  "updated_utc": "2026-10-11T00:02:27.235893+00:00",
+  "updated_utc": "2026-10-11T00:11:02.368604+00:00",
   "classification": "RUNTIME_INTERRUPTION_RECOVERY",
   "recovery": {
     "published_base_commit": "304afc3592ae60242e3bb72efc56d806519b4a60",
@@ -384,7 +387,13 @@
       "initial_256_fullN_signed_error": 0.17321471727885296,
       "initial_256_subHI_contribution_over_exact_fullN": 0.17321502182599668,
       "initial_number_claim_limit": "17.3% fullN difference is overwhelmingly subHI10..13.6eV; not17.3% ionizing or heating error"
+    },
+    "Q1A": {
+      "status": "REJECTED_FINE_COMPARISON_INCOMPLETE",
+      "final_status": "q1a/FINAL_STATUS.json",
+      "review": "q1a/review/FINAL_DECISION_C08R1.json",
+      "scientific_admission": false
     }
   },
-  "next_action": "Await the existing GAUSS2_FINE terminal; preserve and dual-back up raw output. Only wall-budget failure permits the C08C single <=600s diagnostic continuation after actual manifest validation. No duplicate or old replay."
+  "next_action": "Q1B_LOCAL_CONTRACT_AND_CHECKPOINT_DESIGN: source/cell/closure/ABI/Jacobian local gates and atomic resumable checkpoint contract before any expensive new whole-interval ODE. Do not rerun unchanged Q1A to decide already established rejection."
 }
