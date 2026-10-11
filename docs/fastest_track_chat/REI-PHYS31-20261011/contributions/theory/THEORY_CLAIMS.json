@@ -1,0 +1,434 @@
+{
+  "schema": "rei-phys31-theory-claims-v1",
+  "task": "REI-PHYS31-20261011",
+  "name": "EQUAL_SECOND_MOMENT_QUARTIC_PROFILE_SPLITTING",
+  "contributor": "/root/phys31_theory",
+  "role": "THEORY_CANDIDATE_GENERATOR_NONBLIND",
+  "status": "DERIVED_CANDIDATE_AWAITING_DISTINCT_FINAL_REVIEW",
+  "model": "GPT-6 Astra Pro",
+  "model_basis": "Trusted developer designation and full-history inherited model; no switch or runtime performance measurement.",
+  "harness": {
+    "family": "gpt6-astra",
+    "research_version": "4.0.0",
+    "archive_sha256": "dae76c90f2e5d691bcdd595dadbe470bacacba3bb2a036ff9788ffe7d3bfabb7",
+    "actual_read_provenance": "PROVENANCE.json",
+    "core_files_directly_read_and_zip_matched": 13,
+    "templates_are_execution_evidence": false
+  },
+  "contract": "../../PHYSICS_CONTRACT.json",
+  "report": "DERIVATION_KO.md",
+  "premises": {
+    "P31-PROFILES": "Two fixed nonnegative symmetric Borel probabilities on [-1,1], independent of delta,W,center,branch, with equal mu2; atomic profiles allowed.",
+    "P31-GEOMETRY": "Identical center interval [a+delta,b-delta], actual W held fixed, V=W-mu2*delta^2, exact common two-center laws and feasibility as PHYS30.",
+    "P31-C3": "Inherited k in C3([a,b]) with continuous one-sided endpoint derivatives; no new recertification of this premise.",
+    "P31-C4": "Additional k in C4([a,b]), including continuous physical one-sided endpoint derivatives. Actual source-formula verification belongs to another contributor.",
+    "P31-CONVEXITY": "Inherited k''>0; min k'' on compact support is a positive abstract bound. Inherited k'''<0 supports common-profile envelope interpretation.",
+    "P31-LEVEL": "Exact same branch-specific level A=F(0,w), w in (0,LH); A=0 only if an exact root is assumed. Stored finite-point nonzero A is retained with arithmetic uncertainty distinguished.",
+    "P31-AC-PAIR": "h_u=1/2 and h_P4=(35*z^4-30*z^2+11)/16 on [-1,1], zero outside; comparison is P4 minus uniform.",
+    "P31-C3-COUNTEREXAMPLE": "Analytic family k=K*(Lambda*t^2-t^3+epsilon*t^p-B), t=(E-a)/E0, 3<p<4, Lambda>3T, 0<epsilon<6/[p(p-1)(p-2)T^(p-3)], constant B chosen for a fixed same level.",
+    "P31-DEGENERATE-COUNTEREXAMPLE": "Smooth k=K2*X^2-K3*X^3+gamma*(X^6-15*w*X^4)-B, X=E-m, K2>3*K3*max(L,H), K3>0, sufficiently small nonzero gamma and branch same-level w.",
+    "P31-EXACT-TOYS": "Dimensionless support[-2,2],m0,R2,w1,s=+-1; k3=1+X^2-X^3/10 and k4=k3+X^4/100; exact branch-specific A retained.",
+    "P31-UNITS": "E,delta,c eV; W,V eV^2; k,F,A s^-4; b3 eV^-1; b4 eV^-2. Metric(-,+,+,+), proper seconds, fixed source-real normalization; no new natural-unit choice."
+  },
+  "claims": [
+    {
+      "id": "TC31-01",
+      "claim": "Equal mu2 makes V=W-mu2*delta^2 and the center interval, feasibility interval, positions, probabilities and response denominator exactly common for every permitted (delta,W).",
+      "assumptions": [
+        "P31-PROFILES",
+        "P31-GEOMETRY"
+      ],
+      "equations": [
+        "T31.7",
+        "T31.8",
+        "T31.10",
+        "T31.11"
+      ],
+      "limits": [
+        "Identical prescribed center interval and actual W convention; no profile-dependent narrowing or widening."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-02",
+      "claim": "For k in C3([a,b]), equal-mu2 symmetric profiles have averaged-kernel difference o(delta^3), uniformly over all permitted centers, with explicit modulus-of-continuity remainder.",
+      "assumptions": [
+        "P31-PROFILES",
+        "P31-GEOMETRY",
+        "P31-C3"
+      ],
+      "equations": [
+        "T31.13",
+        "T31.14",
+        "T31.15",
+        "T31.16",
+        "T31.17"
+      ],
+      "limits": [
+        "Right physical width only; general Borel measures including atoms.",
+        "The symbolic modulus bound is not a computed numerical Taylor bound or certified width."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-03",
+      "claim": "At zero width all response partial derivatives of total order at most3 are common for equal-mu2 profiles. The explicit third derivative includes moving-center terms and need not vanish.",
+      "assumptions": [
+        "P31-PROFILES",
+        "P31-GEOMETRY",
+        "P31-C3"
+      ],
+      "equations": [
+        "T31.19",
+        "T31.21"
+      ],
+      "limits": [
+        "Equality of two profiles does not imply an even individual width expansion.",
+        "Every W derivative is at fixed actual variance coordinates."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-04",
+      "claim": "An exact interior same-level point with positive F_W has a unique physical right-Cn root for n=3 or4 under the corresponding kernel regularity, with an actual Peano expansion.",
+      "assumptions": [
+        "P31-PROFILES",
+        "P31-GEOMETRY",
+        "P31-LEVEL",
+        "P31-CONVEXITY",
+        "P31-C3",
+        "P31-C4 for n=4"
+      ],
+      "equations": [
+        "T31.12",
+        "T31.23",
+        "T31.24",
+        "section5 induction and integral remainder"
+      ],
+      "limits": [
+        "Exact zero-level existence remains a conditional premise.",
+        "No negative physical width, out-of-support kernel extension, numerical root enclosure or certified width."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-05",
+      "claim": "The common cubic coefficient is the explicit implicit-derivative expression in T31.25; equal-mu2 same-level roots share c,d,b3 and differ by o(delta^3).",
+      "assumptions": [
+        "TC31-03",
+        "TC31-04"
+      ],
+      "equations": [
+        "T31.1",
+        "T31.25",
+        "T31.26"
+      ],
+      "limits": [
+        "No numerical physical b3 value or new k''' evaluation is supplied by this contribution."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-06",
+      "claim": "Under C4, the profile response difference is Delta_mu4*H4*delta^4/24+o(delta^4), with H4=p*k''''(e)+q*k''''(x); the only differing fourth-total-order partial is delta^4.",
+      "assumptions": [
+        "P31-PROFILES",
+        "P31-GEOMETRY",
+        "P31-C4"
+      ],
+      "equations": [
+        "T31.18",
+        "T31.20",
+        "T31.22",
+        "T31.27"
+      ],
+      "limits": [
+        "The finite-width weights and center paths are exactly common; geometry enters the leading coefficient only through its zero-width values.",
+        "No physical k'''' sign or numerical value follows from C3 convexity/third-derivative sign alone."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-07",
+      "claim": "The same-level root difference satisfies Delta_b4=-Delta_mu4*H4/(24*C), with b4=W''''(0+)/24; quartic is first nonzero exactly when Delta_mu4*H4 is nonzero within this C4 asymptotic statement.",
+      "assumptions": [
+        "TC31-04",
+        "TC31-06",
+        "P31-LEVEL"
+      ],
+      "equations": [
+        "T31.2",
+        "T31.3",
+        "T31.26"
+      ],
+      "limits": [
+        "First possible integer order is distinct from first actual nonzero order.",
+        "A zero coefficient yields only o(delta^4), not finite-width equality."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-08",
+      "claim": "For retained nonzero A, the numerator equation is N-AQ=0; Delta_b4=-D*Delta_mu4*H4/[24*(N_W-A)]. Common AQ cancels in the difference numerator but N_W-A=D*C must remain.",
+      "assumptions": [
+        "P31-LEVEL",
+        "TC31-07",
+        "P31-GEOMETRY"
+      ],
+      "equations": [
+        "T31.29",
+        "T31.30",
+        "T31.31",
+        "T31.32",
+        "T31.33"
+      ],
+      "limits": [
+        "Stored finite arithmetic A is not overwritten by zero or taken as an exact root certificate.",
+        "The exact-real level identity and rounded serialized arithmetic are distinct."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-09",
+      "claim": "Uniform h=1/2 and h_P4=(35*z^4-30*z^2+11)/16 on [-1,1] are fixed positive AC profiles with mass1, mean0, common mu2=1/3, mu4 values1/5 and71/315, and Delta_mu4=8/315.",
+      "assumptions": [
+        "P31-AC-PAIR"
+      ],
+      "equations": [
+        "T31.34",
+        "T31.35",
+        "T31.36",
+        "T31.37"
+      ],
+      "limits": [
+        "Density is continuous on the support and has endpoint jumps after zero extension.",
+        "Exact analytic polynomial integration; this contributor performed no numerical moment program."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-10",
+      "claim": "For the positive AC P4-minus-uniform pair, the physical quartic root coefficient difference is -H4/(945*C), conditional on the C4 model and same exact reference level.",
+      "assumptions": [
+        "TC31-07",
+        "TC31-09"
+      ],
+      "equations": [
+        "T31.4",
+        "T31.48"
+      ],
+      "limits": [
+        "Four retained physical node fourth derivatives are new required numerical input; not inferred from lower-order caches."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-11",
+      "claim": "For the two-threshold gap, the quartic profile-coefficient change is -Delta_mu4/24*(H4_0/C_0-H4_star/C_star).",
+      "assumptions": [
+        "TC31-07",
+        "P31-LEVEL"
+      ],
+      "equations": [
+        "T31.28"
+      ],
+      "limits": [
+        "Each branch uses its own same reference level across profiles; branch levels need not equal each other.",
+        "No universal gap sign or global profile ordering."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-12",
+      "claim": "The inherited C3 regularity is sharp in polynomial exponent: for the same positive AC pair and every 3<p<4, an explicit C3 convex kernel with negative third derivative gives a nonzero delta^p root difference. Thus no fixed positive power beyond delta^3, in particular O(delta^4), follows from C3 alone.",
+      "assumptions": [
+        "P31-AC-PAIR",
+        "P31-C3-COUNTEREXAMPLE",
+        "P31-LEVEL"
+      ],
+      "equations": [
+        "T31.38",
+        "T31.39",
+        "T31.40",
+        "T31.41",
+        "T31.42",
+        "T31.43"
+      ],
+      "limits": [
+        "A conditional-function-class counterexample, not the actual frozen physical kernel.",
+        "No kernel replacement, numerical toy execution, root search or new physical input."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-13",
+      "claim": "Equal fourth moments or H4=0 erase the quartic difference; mu2=0 or1 leaves a unique symmetric profile; C=0 or a boundary reference is outside the simple interior-root theorem.",
+      "assumptions": [
+        "P31-PROFILES",
+        "TC31-07"
+      ],
+      "equations": [
+        "section10 degeneration cases"
+      ],
+      "limits": [
+        "No universal next order or finite-width equality follows from one zero coefficient.",
+        "Higher regularity and moments are separate conditions."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-14",
+      "claim": "A smooth polynomial perturbation gamma*(X^6-15*w*X^4) of a strictly convex negative-third-derivative cubic baseline has H4(0,w)=0 yet can produce leading root separation -15*gamma*Delta_mu4*c/C*delta^5. Symmetric profiles do not enforce an even first separation after quartic degeneracy.",
+      "assumptions": [
+        "P31-DEGENERATE-COUNTEREXAMPLE",
+        "P31-AC-PAIR",
+        "P31-LEVEL"
+      ],
+      "equations": [
+        "T31.44",
+        "T31.45",
+        "T31.46",
+        "T31.47"
+      ],
+      "limits": [
+        "Direct smooth counterexample only; no fifth-order physical-kernel campaign or coefficient calculation.",
+        "Requires nonzero gamma, Delta_mu4 and common c, proved available for sufficiently small perturbation."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-15",
+      "claim": "For any degree-at-most3 polynomial kernel, equal-mu2 symmetric profiles have exactly identical responses for all permitted widths and W, and any unique same-level roots coincide.",
+      "assumptions": [
+        "P31-PROFILES",
+        "P31-GEOMETRY",
+        "k polynomial of degree <=3"
+      ],
+      "equations": [
+        "T31.15",
+        "section10 final paragraph"
+      ],
+      "limits": [
+        "Special exact polynomial degeneration; not a finite-width identity for the physical kernel."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-16",
+      "claim": "The contract's dimensionless R=2,w=1 cubic/quartic toys have the exact response-moment formulas, same-level A and C values, and quartic profile response difference (2/7875)*delta^4 given in section11.",
+      "assumptions": [
+        "P31-EXACT-TOYS",
+        "P31-AC-PAIR"
+      ],
+      "equations": [
+        "T31.49",
+        "T31.50",
+        "T31.51",
+        "section11 exact A,C table"
+      ],
+      "limits": [
+        "Analytic oracle, not a claimed executed test.",
+        "Dimensionless diagnostics are not physical kernel/node evaluations or new exact physical roots."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-17",
+      "claim": "For the contract quartic toy, exact quartic root differences are -32/142065 and -32/116865. Dropping 1/24 multiplies the value by24; dropping A in N_W-A multiplies it by 5*C/(5*C+A), which differs from1 in both branches.",
+      "assumptions": [
+        "TC31-08",
+        "TC31-16"
+      ],
+      "equations": [
+        "section11 exact A,C table and omission controls",
+        "T31.33"
+      ],
+      "limits": [
+        "Actual Fraction validation and formal-series implementation are separate evidence.",
+        "No tiny physical residual is used as the sole sensitive omission control."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    },
+    {
+      "id": "TC31-18",
+      "claim": "b3 has units eV^-1 and b4 has units eV^-2; H4/C has units eV^-2. The quartic difference can be evaluated from four existing-node fourth derivatives and cached p,q,C without any new third-derivative component output or root search.",
+      "assumptions": [
+        "P31-UNITS",
+        "TC31-10"
+      ],
+      "equations": [
+        "section12 unit table",
+        "T31.48"
+      ],
+      "limits": [
+        "Sufficiency of required inputs is not evidence they have been evaluated.",
+        "No change to source normalization, physical model, tolerances or scientific admission."
+      ],
+      "evidence_status": "derived",
+      "review_status": "THEORY_CONTRIBUTOR_SELF_CHECK_CANDIDATE"
+    }
+  ],
+  "claim_count": 18,
+  "independent_final_decision": {
+    "performed_by_this_contributor": false,
+    "status": "PENDING_DISTINCT_REVIEWER",
+    "independence_limit": "Same host/model/shared evidence/full parent history; this role is a candidate generator, not final reviewer or independent physical evidence."
+  },
+  "execution": {
+    "scientific_main": 0,
+    "physical_kernel": 0,
+    "physical_derivative": 0,
+    "physical_energy_node": 0,
+    "physical_root_or_refinement": 0,
+    "numerical_toy": 0,
+    "quadrature": 0,
+    "finite_difference": 0,
+    "width_sweep": 0,
+    "old_module_import": 0,
+    "old_main_or_suite": 0,
+    "portable_replay": 0,
+    "symbolic_program_execution": 0,
+    "analytic_derivation": true,
+    "analytic_profile_moment_integration": true,
+    "analytic_toy_formulas": true,
+    "metadata_reads_hashes_zip_checks": "Actual non-scientific metadata work; provenance contains first failure and resolution."
+  },
+  "external_literature_directly_read": [],
+  "limitations": [
+    "Actual physical C4/smoothness and k'''' values are not supplied by this role.",
+    "No physical individual cubic/quartic root coefficient numerical values; only a difference formula.",
+    "No exact physical root/J uncertainty enclosure or numerical Taylor/valid-width certificate.",
+    "No universal sign/global profile ordering or unrestricted photon-envelope claim.",
+    "No odd-order or general higher-even-order exclusion after a quartic cancellation.",
+    "No finite-history/atomic/native/source/default/runtime admission or change."
+  ],
+  "protected": {
+    "physical": "HOLD",
+    "original_interval": "[160,161] FAIL",
+    "tick": 160,
+    "auxiliary_escape": "FAIL",
+    "HH": "OFF",
+    "RCT": "OFF",
+    "CR": "OFF",
+    "precision_atomic": "PARKED",
+    "production_source_default_runtime_changes": 0
+  }
+}
+
