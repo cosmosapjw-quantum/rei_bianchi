@@ -27,3 +27,5 @@ C12R10_OPACITY_NATIVE_AND_FAILURE67: FAILED_ATTEMPT; C2_FULL003 gen60 cursor {'a
 C12R11_LOGQ_REPAIR_GO: positive logq panels same1e-7; independent review saved; prospective gen60 child not yet created; wholehistory HOLD.
 
 C12R12_LOGQ_ACTUAL_CONTINUATION: CHUNK_ATTEMPT_BOUNDARY; C2_FULL004 gen63 cursor {'accepted_boundaries': 126, 'accepted_clock_s': 25482337810583.33, 'accepted_macros': 63, 'attempts': 69, 'next_step_s': 1454143792372.691, 'rejected_macros': 6, 'schema': 'rei.q1b.c11.adaptive_cursor.v1'}; remaining 33 completed attempts plus3externaldebits. No wholehistoryadmission.
+
+C12R13_CONTINUATION_GEN78: CHUNK_ATTEMPT_BOUNDARY; C2_FULL004 gen78 cursor {'accepted_boundaries': 156, 'accepted_clock_s': 41482945070365.83, 'accepted_macros': 78, 'attempts': 84, 'next_step_s': 682675174780.934, 'rejected_macros': 6, 'schema': 'rei.q1b.c11.adaptive_cursor.v1'}; remaining 18 completed attempts plus3externaldebits. No wholehistoryadmission.
