@@ -21,6 +21,8 @@ import time
 import numpy as np
 from scipy.integrate import solve_ivp
 
+from conditional_build import validate_build_receipt
+
 CRATE = Path(__file__).resolve().parents[1]
 REPOSITORY = CRATE.parents[1]
 DEFAULT_PACKET = REPOSITORY / "research/physical_provider_20261010"
@@ -68,7 +70,8 @@ def load_provider(packet: Path, filename: str):
 
 
 class NativeConsumer:
-    def __init__(self, binary: Path, identities: dict):
+    def __init__(self, binary: Path, identities: dict, build_receipt: Path | None = None):
+        self.build_identity = validate_build_receipt(CRATE, binary, build_receipt)
         self.proc = subprocess.Popen([str(binary)], stdin=subprocess.PIPE,
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                      text=True, bufsize=1)
@@ -250,25 +253,36 @@ def compare_reference(packet, interval, states, rows, contract):
                 scope="Production consumer agreement with the frozen discretization; historical empirical refinement reused; no continuum/global admission")
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--packet", type=Path, default=DEFAULT_PACKET)
     parser.add_argument("--binary", type=Path, default=CRATE/"target/release/axisym_conditional")
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
+    parser.add_argument("--build-receipt", type=Path)
+    parser.add_argument("--check-build-only", action="store_true",
+                        help="validate build/input identities without launching native code or a solver")
+    parser.add_argument("--output", type=Path)
+    args = parser.parse_args(argv)
+    build_identity = validate_build_receipt(CRATE, args.binary.resolve(), args.build_receipt)
     packet = args.packet.resolve()
     verified = preflight(packet)
+    if args.check_build_only:
+        print(json.dumps({"build": build_identity, "input_sha256": verified["identities"],
+                          "binary_launches": 0, "solver_intervals": 0}, indent=2))
+        return
+    if args.output is None:
+        parser.error("--output is required unless --check-build-only is set")
     if args.output.exists():
         raise FileExistsError("P01_OUTPUT_ALREADY_EXISTS: use a new output directory")
     args.output.mkdir(parents=True)
     start = time.perf_counter()
-    consumer = NativeConsumer(args.binary.resolve(), verified["identities"])
+    consumer = NativeConsumer(args.binary.resolve(), verified["identities"], args.build_receipt)
     try:
         interval = ProductionInterval(packet, verified, consumer)
         states, rows, nfev = interval.integrate()
         validation = compare_reference(packet, interval, states, rows, verified["contract"])
         files = [Path(__file__), CRATE/"Cargo.toml", CRATE/"Cargo.lock", *sorted((CRATE/"src").rglob("*.rs"))]
         metadata = dict(execution_path="production SourceBoundConditional", closure=CLOSURE,
+            prelaunch_build_identity=consumer.build_identity,
             source_sha256=verified["identities"],
             production_source_sha256={str(p.relative_to(CRATE)): hashlib.sha256(p.read_bytes()).hexdigest() for p in files},
             binary_sha256=hashlib.sha256(args.binary.read_bytes()).hexdigest(),

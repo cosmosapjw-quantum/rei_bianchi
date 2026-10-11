@@ -1,0 +1,20 @@
+{
+  "task": "CR_FIRST_V3_BUILD_GATE",
+  "historical_DAG_modified": false,
+  "build_closeout": "BUILD_CLOSEOUT.json",
+  "built_revision": "f9135eca0d41dd00465fcd524c07872a9c3c8fb8",
+  "metadata_publication_revision": "PENDING_CONTROLLER_PUBLICATION_DISTINCT_FROM_BUILT_REVISION",
+  "nodes": [
+    {"id": "BUILD_GATE_IMPLEMENTATION", "status": "COMPONENT_PASS_13_TESTS"},
+    {"id": "BUILD_GATE_IMPLEMENTATION_REVIEW", "status": "PASS_SCOPED_CONTROLLER_RECORDED", "depends_on": ["BUILD_GATE_IMPLEMENTATION"]},
+    {"id": "CLEAN_COMMITTED_SOURCE_BUILD", "status": "BUILD_PASS", "depends_on": ["BUILD_GATE_IMPLEMENTATION_REVIEW"]},
+    {"id": "BUILD_RECEIPT_INDEPENDENT_REVIEW", "status": "PASS_BUILD_RECEIPT_REVIEW_CONTROLLER_RECORDED", "depends_on": ["CLEAN_COMMITTED_SOURCE_BUILD"]},
+    {"id": "PRELAUNCH_BUILD_CHECK", "status": "PRELAUNCH_BUILD_PASS", "depends_on": ["BUILD_RECEIPT_INDEPENDENT_REVIEW"]},
+    {"id": "CR_FIRST_OWNER_PHYSICS_CONTRACT", "status": "HOLD_OWNER_INPUTS_REQUIRED"},
+    {"id": "NEW_SOLVER_INTERVAL", "status": "HOLD_NO_INTERVAL_IN_THIS_UNIT", "depends_on": ["PRELAUNCH_BUILD_CHECK", "CR_FIRST_OWNER_PHYSICS_CONTRACT"]}
+  ],
+  "whole_ci": "BASELINE_FORMATTER_HOLD",
+  "solver_intervals": 0,
+  "binary_launches": 0,
+  "scientific_admission": "HOLD"
+}
