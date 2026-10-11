@@ -2,7 +2,7 @@
 
 이 문서는 복구 절차이며, 이 문서를 작성하면서 원격 다운로드·복구·수치 실행을 수행하지 않았다. 기존 업로드 ACK와 해시 증거는 `UPLOAD_VERIFIED`의 해당 범위일 뿐 `RESTORE_VERIFIED`가 아니다. 실제 복구 뒤에는 수행한 파일 검증과 새 실행 결과를 별도 기록한다.
 
-후속 연결 대상은 versioned source를 유지하고 composite log-q opacity candidate를 명시적으로 묶는 `C2_FULL004`다. **이 문서 수정 시점에는 failure67 후속 후보의 scoped review가 아직 완료되지 않았으며, root가 그 review 이후에만 새 child를 생성한다.** 앞선 단일128/256 refinement는 한 macro를 수용한 뒤 다음 attempt67에서 다시1e-7 기준을 충족하지 못했고, 실패를 그대로 보존했다. 새 후보의 좌표·panel 정책·실제 source/absorption 경로와 SHA는 최신 선택 bundle과 review에서 읽으며 과거 후보 버전을 고정 가정하지 않는다. 복구 문서나 candidate 구현만으로 실행 GO를 부여하지 않는다. 실제 활성 run·generation·cursor·남은 예산·실행 허용 여부는 같은 최종 게시 단계의 `STATE.json`, `HANDOFF.json`, 실제 journal 및 review 결정에서 읽는다. 아래 경로는 별도 명시가 없으면 `rei_bianchi` repo root 기준이다.
+현재 활성 run은 versioned source와 composite log-q opacity를 명시적으로 묶은 `C2_FULL004`다. **C12R14에서 scoped review와 actual addendum 이후 gen96까지 수용했으며 현재 할당은 소진됐다. 새 pending 후보나 미생성 child로 해석하지 않는다.** 앞선 단일128/256 refinement는 한 macro를 수용한 뒤 다음 attempt67에서 다시1e-7 기준을 충족하지 못했고, 실패를 그대로 보존했다. 새 후보의 좌표·panel 정책·실제 source/absorption 경로와 SHA는 최신 선택 bundle과 review에서 읽으며 과거 후보 버전을 고정 가정하지 않는다. 복구 문서나 candidate 구현만으로 실행 GO를 부여하지 않는다. 실제 활성 run·generation·cursor·남은 예산·실행 허용 여부는 같은 최종 게시 단계의 `STATE.json`, `HANDOFF.json`, 실제 journal 및 review 결정에서 읽는다. 아래 경로는 별도 명시가 없으면 `rei_bianchi` repo root 기준이다.
 
 ## 먼저 읽을 파일
 
@@ -21,7 +21,7 @@ Git에는 구현·문서·review·전체 파일 SHA manifest·각 chunk의 launc
 
 기본 묶음은 `REI_ACCEL02_C11R4_FINAL_20261011.zip`이다. SHA256은 `efadfe355a743b91f5e80212cabc2c8a177eeec3c69316ca946b827589748949`, 크기는2091483 bytes다. Drive object는 `1g7wKiBfRu5ZilgNDT2VNVth34OQSqZV2`, Dropbox object는 `id:BSpOijBcT10AAAAAAD4Hkg`다. 이 archive에는 C11 증거, 원래 dependency closure와 두 native binary가 포함된다. 환경 전체나 Git 이력을 포함하는 독립 설치본은 아니다.
 
-그 위에 C12 최신 전체 stage archive를 덮어쓴다. 정확한 파일명·SHA·크기·provider object ID는 최신 `GIT_EVIDENCE_SCOPE.json#/archive`와 `PUBLICATION_RECEIPTS.json#/stages`가 기준이다. 예를 들어 이 문서 작성 당시 확인된 항목은 `REI_ACCEL02_C12R6_REPAIR_NATIVE_TRIALS_20261011.zip`이며, SHA256은 `80425ef858513e4746466d733544547f903a5bb8a76d51b7911584a150472761`,30813153 bytes, Drive `1OBWfRlSneiNEam7-05FEJhbb1YaPEGZ0`, Dropbox `id:BSpOijBcT10AAAAAAD4IgQ`였다. 이후 단계가 게시되면 그 단계의 항목을 사용한다.
+그 위에 C12 최신 전체 stage archive를 덮어쓴다. 정확한 파일명·SHA·크기·provider object ID는 최신 `GIT_EVIDENCE_SCOPE.json#/archive`와 `PUBLICATION_RECEIPTS.json#/stages`가 기준이다. 최종 full archive는 `REI_ACCEL02_C12R14_ALLOCATION_EXHAUSTED_20261011.zip`, SHA256 `dd58716cf57195150c7a9df4d92ac9849db77b5303f85168f13be97b10c9693f`,173089128 bytes다. 3개 raw byte part와 transport manifest로 전송됐으며 Drive manifest `1tFrY2E_Zka2c5avIeBX6nsb_UYG7OlHU`, Dropbox manifest `id:BSpOijBcT10AAAAAAD4JsQ`를 참조한다. 최종 C12R15 synchronization archive는 별도 metadata delta이므로 R14 full archive를 대체하지 않는다. 최신 scope가 R15이면 `base_full_archive`에서 R14 descriptor를 읽고 명시된 restore_order를 따른다.
 
 다음 과거 객체는 사용하지 않는다: `REI_ACCEL02_C12R3_CONTINUATION_021_20261011.zip`은 잘린 ZIP으로 분류되어 있다. 해당 단계가 꼭 필요하면 `_REPAIRED_` 파일만 유효하며, 최신 전체 archive가 이를 포함하면 과거 단계들을 순서대로 모두 내려받을 필요는 없다. `failed_publication_attempts`에 기록된 실패 객체의 ACK를 성공 근거로 재사용하지 않는다.
 
@@ -266,9 +266,9 @@ Relocation은 이미 저장된 child를 다른 경로에서 읽도록 하는 관
 
 먼저 최신 `HANDOFF.json`의 status·command_status·stop·allocation을 읽는다. `ALLOCATION_EXHAUSTED`, unresolved inflight, review pending 또는 새 concrete failure이면 동일 명령 자동 재시도로 넘어가지 않는다. 실패 입력과 마지막 accepted checkpoint를 보존하고, 허용된 다음 변경이나 새 allocation이 명시되었는지 확인한다. 남은 allocation이 있고 최신 decision이 continuation을 허용하면 기존 child에서 다음 chunk를 실행한다. 사용 중인 controller의 cumulative attempts 및 failed-attempt debit을 0으로 초기화하지 않는다.
 
-C2_FULL004 전환의 예정된 예산 정체성은 completed-attempt cap102 + 외부에서 별도 계상한 실패3 = 원래 물리 attempt cap105다. Accepted-macro cap은103이며, 실제 남은 횟수와 채택된 controls는 최신 bundle/cursor에서 읽는다. Transition bundle에 남는 seed cursor와 처음 계산된 remaining 값은 후속 journal의 현재 cursor를 대체하지 않는다. 세 과거 실패를 성공/수용 attempt로 재분류하거나 debit을 없애지 않는다.
+C2_FULL004에서 실제 채택하고 소진한 예산 정체성은 completed-attempt cap102 + 외부에서 별도 계상한 실패3 = 원래 물리 attempt cap105다. Accepted-macro cap은103이며, 실제 남은 횟수와 채택된 controls는 최신 bundle/cursor에서 읽는다. Transition bundle에 남는 seed cursor와 처음 계산된 remaining 값은 후속 journal의 현재 cursor를 대체하지 않는다. 세 과거 실패를 성공/수용 attempt로 재분류하거나 debit을 없애지 않는다.
 
-C2_FULL004 child가 이미 생성되고 **latest review/HANDOFF에서 실제 continuation을 허용한 뒤** 사용할 명령의 형태는 다음과 같다. 이 문서 자체는 pending 후보의 실행 승인이 아니다. `HANDOFF.json`이 이후 version/run을 지목하면 그 실제 명령을 사용하되 relocation bundle 인수만 대응하는 로컬 복사본으로 바꾼다.
+C2_FULL004 child가 이미 생성되고 **latest review/HANDOFF에서 실제 continuation을 허용한 뒤** 사용할 명령의 형태는 다음과 같다. 현재 gen96에서는 할당이 소진되어 아래 명령을 곧바로 재실행할 수 없다. 새 명시적 할당/identity 전환이 먼저 필요하다. `HANDOFF.json`이 이후 version/run을 지목하면 그 실제 명령을 사용하되 relocation bundle 인수만 대응하는 로컬 복사본으로 바꾼다.
 
 ```bash
 python -u research/accel02_20261011/q1b/c12/repair/production_v4/run_full_history_chunk_v4.py \
@@ -284,3 +284,11 @@ python -u research/accel02_20261011/q1b/c12/repair/production_v4/run_full_histor
 Local Codex 시작 프롬프트:
 
 > C12의 RESTORE_AND_LOCAL_CODEX_KO.md, 최신 STATE.json과 HANDOFF.json을 읽어 Git baseline과 정상 전체 archive로 실행을 복구해줘. 실제 다운로드 archive SHA/크기·member manifest·활성 checkpoint와 authoritative bundle의 전체 dependency 해시 목록을 확인하고, 네 administrative absolute path만 별도 relocation bundle에 기록해줘. 최신 HANDOFF가 가리키는 기존 child·journal·초기 output을 재사용하고, C2_FULL001 source 실패42·C2_FULL002 opacity 실패66·C2_FULL003 opacity 실패67 및 ASRUN/journal을 모두 보존해줘. 최신 선택 후보의 source/absorption provenance를 bundle에서 확인하고, composite log-q 후보의 기존1e-7·moment-fit1e-12 기준과 실제 scoped review 결정을 확인해줘. Pending 후보를 GO로 간주하지 말아줘. 완료 검산·PILOT02·초기 h=0·기존 child prepare를 반복하지 말고, cumulative counters와 외부 실패3의 debit을 유지해줘. 최신 허용 결정과 남은 allocation 내에서 전구간 목표로 다음 durable chunk를 실행하고, 매 단계 exact evidence와 Git·Drive/Dropbox 백업을 남겨줘. 실제 복구를 하지 않았다면 RESTORE_VERIFIED라고 하지 말아줘.
+
+## C12R15 최종 재개 우선순위
+
+C12R14의 Q2_FULL_HISTORY_NEXT_ALLOCATION부터 이어서 진행해줘. 게시 동기화 checkpoint는 C12R15_FINAL_SYNC다. research/accel02_20261011/q1b/c12/HANDOFF.json·STATE.json·NEXT_DAG.json과 future/STEP_SIZE_TREND.json·NEXT_ALLOCATION_DESIGN.json을 먼저 읽어줘. C2_FULL004 gen96의 193-state prefix, 누적 cursor attempts102/accepted96/rejected6, 외부 실패 debit3, 99개 pinned dependencies와 기존 source/physics/허용 기준을 보존해줘.
+
+먼저 최신 gen96 고정 상태의 HI_THRESHOLD_CELL24_STIFF_DEFECT_DIAGNOSIS(별칭 HI_THRESHOLD_CELL24_FIXED_STATE_H_CONVERGENCE)를 새 미실행 진단으로 수행해줘. 앞으로 진행할 구간의 h/h2/h4 비교로 HI cell24의 N/U/GammaHI 결함과 수렴성을 분리하고, 원인과 step 회복 가능성이 확인되기 전에는 전구간 ETA를 단정하지 말아줘. 현재 할당은 소진되어 같은 command 자동 재실행은 금지다. 새 계산은 명시적 prospective 할당/control identity와 create-only run/diagnostic root를 연결하고, 기존 cumulative counters와 세 과거 실패 원본을 유지한 뒤 실행해줘. 추가100회 설계는 제안 상태이므로 채택 사실로 간주하지 말아줘.
+
+완료된 RUN002·EVENT003·Q0·C10/C11 검산·PILOT02·초기 h0 및 기존 child prepare를 반복하지 말아줘. 새 실패는 원본 증거를 남긴 뒤만 수정하고 단계별 durable checkpoint와 GitHub·Drive/Dropbox 백업을 유지해줘. 전구간 목표 z=4와 65/129 time/spectral/ledger/geometry 기준은 그대로 유지하고, scientific admission과 새 BASS native receiver는 실제 gate 통과 전까지 HOLD로 남겨줘.

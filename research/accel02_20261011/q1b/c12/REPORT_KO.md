@@ -188,3 +188,7 @@ actual attempt67 cell은4개 panel을 사용했고, incident 최대 차이2.3971
 ### 후속 성능 진단: HI threshold cell24
 
 저장된 C2_FULL004의 36개 수용 macro만 읽은 결과, 후반 step을 제한한 필드는 GammaHI였다. 마지막 full/fine 차이의 99.9084%가 HI threshold cell24에서 발생했으며, 새 log-q quadrature가 적용된 HeII cell66의 기여는 약 1.10e-6 fraction이었다. 수용이 계속돼도 현재 safety factor의 중립점은 normalized defect 0.64이므로 후반 약 0.8인 defect에서는 step이 감소한다. 이는 기존 제어 규칙으로 설명되는 현상이다. optically thick source/attenuation/reconstruction의 stiff splitting 민감도는 후속 가설이며, 고정 상태 h 수렴이나 error floor는 아직 검증하지 않았다. `future/STEP_SIZE_TREND.json`에 입력 SHA와 36행 근거를, `future/STEP_SIZE_TREND_KO.md`에 확정/가설 구분을 남겼다. 다음 실행은 이 새 진단을 먼저 진행해 장기간 계산의 효율을 판단한다. 물리/허용 기준과 현재 controller는 변경하지 않았다.
+
+## C12R15 게시 동기화
+
+수치 결과 authority는 R14 commit `dc0f3b57cc9a56832c3e7f40e9aee6ac407873a4`다. BASS commit `2325a42c0954e949bb57f53976d0c9a9d9a9a362`에 producer gen96 상태를 전파하고 draft PR110/140 설명을 갱신했다. 새 BASS receiver/solver 호출은 없고 scientific HOLD를 보존했다. 실제 원격 ACK는 `propagation/BASS_PUBLICATION_RECEIPT.json`과 `REI_PR110_PUBLICATION_RECEIPT.json`에 있다. R14 full checkpoint ZIP은 3개 raw part 및 manifest로 Drive/Dropbox 업로드가 확인됐고, R15는 이 게시 동기화에 관한 작은 metadata delta이다. 원격 다운로드/복원 검증은 수행하지 않았다.
