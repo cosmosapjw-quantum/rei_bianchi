@@ -2,7 +2,7 @@
 
 이 문서는 복구 절차이며, 이 문서를 작성하면서 원격 다운로드·복구·수치 실행을 수행하지 않았다. 기존 업로드 ACK와 해시 증거는 `UPLOAD_VERIFIED`의 해당 범위일 뿐 `RESTORE_VERIFIED`가 아니다. 실제 복구 뒤에는 수행한 파일 검증과 새 실행 결과를 별도 기록한다.
 
-후속 연결 대상은 versioned source를 유지하고 새 opacity candidate를 명시적으로 묶는 `C2_FULL003`다. **이 문서 수정 시점에는 native positive-opacity128/256 후보의 scoped review가 아직 완료되지 않았다.** 원래 own-component tolerance1e-7은 그대로이며, 복구 문서나 candidate 구현만으로 실행 GO를 부여하지 않는다. 실제 활성 run·generation·cursor·남은 예산·실행 허용 여부는 같은 최종 게시 단계의 `STATE.json`, `HANDOFF.json`, 실제 journal 및 review 결정에서 읽는다. 아래 경로는 별도 명시가 없으면 `rei_bianchi` repo root 기준이다.
+후속 연결 대상은 versioned source를 유지하고 composite log-q opacity candidate를 명시적으로 묶는 `C2_FULL004`다. **이 문서 수정 시점에는 failure67 후속 후보의 scoped review가 아직 완료되지 않았으며, root가 그 review 이후에만 새 child를 생성한다.** 앞선 단일128/256 refinement는 한 macro를 수용한 뒤 다음 attempt67에서 다시1e-7 기준을 충족하지 못했고, 실패를 그대로 보존했다. 새 후보의 좌표·panel 정책·실제 source/absorption 경로와 SHA는 최신 선택 bundle과 review에서 읽으며 과거 후보 버전을 고정 가정하지 않는다. 복구 문서나 candidate 구현만으로 실행 GO를 부여하지 않는다. 실제 활성 run·generation·cursor·남은 예산·실행 허용 여부는 같은 최종 게시 단계의 `STATE.json`, `HANDOFF.json`, 실제 journal 및 review 결정에서 읽는다. 아래 경로는 별도 명시가 없으면 `rei_bianchi` repo root 기준이다.
 
 ## 먼저 읽을 파일
 
@@ -10,8 +10,10 @@
 2. `research/accel02_20261011/q1b/c12/HANDOFF.json`
 3. `research/accel02_20261011/q1b/c12/GIT_EVIDENCE_SCOPE.json`
 4. `research/accel02_20261011/q1b/c12/PUBLICATION_RECEIPTS.json`
-5. `research/accel02_20261011/q1b/c12/review/FAILURE42_DECISION.json`, `FAILURE42_ACTUAL_ADDENDUM.json`, 그리고 최신 HANDOFF가 지목하는 failure66/opacity candidate 결정과 실제 실행 addendum
+5. `research/accel02_20261011/q1b/c12/review/FAILURE42_DECISION.json`, `FAILURE42_ACTUAL_ADDENDUM.json`, 그리고 최신 HANDOFF가 지목하는 failure66·67/opacity candidate 결정과 실제 실행 addendum
 6. `research/accel02_20261011/q1b/c12/NEXT_DAG.json`
+
+Composite log-q 후보의 수학적 선택은 `research/accel02_20261011/q1b/c12/repair/opacity_math_v3/STRATEGY.json`과 `COMPOSITE_LOGQ_DERIVATION.md`에 있다. 현재 선언은 threshold별 양의64/128 Gauss panel, `|p|Δx≤4`, 최대128 panels이며, 기존 moment-fit1e-12와 response1e-7을 유지한다. 이는 동일한 positive closure의 적분좌표 변경 후보이며 보편적인 유한차수 오차 정리나 전구간 승격이 아니다. 실제 채택은 review와 bundle의 명시된 numerical identity가 결정한다.
 
 Git에는 구현·문서·review·전체 파일 SHA manifest·각 chunk의 launch/result/exit/log receipt가 남는다. 새 bulk checkpoint 배열·누적 metadata·native map payload는 모두 Git blob으로 중복 게시되지 않는다. 따라서 **Git checkout만으로 최신 실행 복구가 완료되지는 않는다.** 최종 게시 Git의 `GIT_EVIDENCE_SCOPE.json`이 지목한 전체 stage archive가 필요하다. Archive는 upload 이전 immutable snapshot이라 그 안의 scope/receipt가 해당 stage보다 한 단계 이전일 수 있다. Archive 선택의 authority는 아래에서 checkout 밖에 저장하는 최종 Git receipt이며, archive 내부의 이전 receipt가 아니다.
 
@@ -199,20 +201,20 @@ print(local)
 PY
 ```
 
-Relocation은 이미 저장된 child를 다른 경로에서 읽도록 하는 관리 변경이다. Child를 다시 생성하는 물리/numerical identity 전환이 아니다. 이미 child가 있으면 `prepare_opacity_transition.py`, `prepare_failure_transition.py`, 원래 `prepare_production_transition.py`를 재호출하지 않는다. 기존 journal·checkpoint·ASRUN을 삭제하거나 정리하지 않는다. `C2_FULL001`의 source attempt42 실패와 `C2_FULL002`의 opacity attempt66 실패 및 두 unresolved journal은 모두 실패 증거로 보존하며 그 실패 lane을 다시 실행하지 않는다. 새 child가 아직 없거나 candidate review가 pending이면, 존재하지 않는 복구 대상을 임의 생성하거나 후보 GO를 추정하지 않고 최신 HANDOFF의 해당 작업부터 수행한다.
+Relocation은 이미 저장된 child를 다른 경로에서 읽도록 하는 관리 변경이다. Child를 다시 생성하는 물리/numerical identity 전환이 아니다. 이미 child가 있으면 `prepare_opacity_transition_v4.py`, `prepare_opacity_transition.py`, `prepare_failure_transition.py`, 원래 `prepare_production_transition.py`를 재호출하지 않는다. 기존 journal·checkpoint·ASRUN을 삭제하거나 정리하지 않는다. `C2_FULL001`의 source attempt42, `C2_FULL002`의 opacity attempt66, `C2_FULL003`의 opacity attempt67 실패와 세 unresolved journal을 모두 실패 증거로 보존하며 그 실패 lane을 다시 실행하지 않는다. 새 child가 아직 없거나 candidate review가 pending이면, 존재하지 않는 복구 대상을 임의 생성하거나 후보 GO를 추정하지 않고 최신 HANDOFF의 해당 작업부터 수행한다.
 
 ## Local Codex가 실행할 다음 단위
 
 먼저 최신 `HANDOFF.json`의 status·command_status·stop·allocation을 읽는다. `ALLOCATION_EXHAUSTED`, unresolved inflight, review pending 또는 새 concrete failure이면 동일 명령 자동 재시도로 넘어가지 않는다. 실패 입력과 마지막 accepted checkpoint를 보존하고, 허용된 다음 변경이나 새 allocation이 명시되었는지 확인한다. 남은 allocation이 있고 최신 decision이 continuation을 허용하면 기존 child에서 다음 chunk를 실행한다. 사용 중인 controller의 cumulative attempts 및 failed-attempt debit을 0으로 초기화하지 않는다.
 
-C2_FULL003 전환의 예산 정체성은 completed-attempt cap103 + 외부에서 별도 계상한 실패2 = 원래 물리 attempt cap105다. Accepted-macro cap은103이며, 실제 남은 횟수는 최신 cursor에서 계산한다. Transition bundle에 남는 seed cursor와 처음 계산된 remaining 값은 후속 journal의 현재 cursor를 대체하지 않는다. 두 과거 실패를 성공/수용 attempt로 재분류하거나 debit을 없애지 않는다.
+C2_FULL004 전환의 예정된 예산 정체성은 completed-attempt cap102 + 외부에서 별도 계상한 실패3 = 원래 물리 attempt cap105다. Accepted-macro cap은103이며, 실제 남은 횟수와 채택된 controls는 최신 bundle/cursor에서 읽는다. Transition bundle에 남는 seed cursor와 처음 계산된 remaining 값은 후속 journal의 현재 cursor를 대체하지 않는다. 세 과거 실패를 성공/수용 attempt로 재분류하거나 debit을 없애지 않는다.
 
-C2_FULL003 child가 이미 생성되고 **latest review/HANDOFF에서 실제 continuation을 허용한 뒤** 사용할 명령의 형태는 다음과 같다. 이 문서 자체는 pending 후보의 실행 승인이 아니다. `HANDOFF.json`이 이후 version/run을 지목하면 그 실제 명령을 사용하되 relocation bundle 인수만 대응하는 로컬 복사본으로 바꾼다.
+C2_FULL004 child가 이미 생성되고 **latest review/HANDOFF에서 실제 continuation을 허용한 뒤** 사용할 명령의 형태는 다음과 같다. 이 문서 자체는 pending 후보의 실행 승인이 아니다. `HANDOFF.json`이 이후 version/run을 지목하면 그 실제 명령을 사용하되 relocation bundle 인수만 대응하는 로컬 복사본으로 바꾼다.
 
 ```bash
-python -u research/accel02_20261011/q1b/c12/repair/production_v3/run_full_history_chunk_v3.py \
-  --transition-bundle research/accel02_20261011/q1b/c12/evidence/C2_FULL003/TRANSITION_RESULT_LOCAL.json \
-  --run-directory research/accel02_20261011/q1b/c12/evidence/C2_FULL003/RUN \
+python -u research/accel02_20261011/q1b/c12/repair/production_v4/run_full_history_chunk_v4.py \
+  --transition-bundle research/accel02_20261011/q1b/c12/evidence/C2_FULL004/TRANSITION_RESULT_LOCAL.json \
+  --run-directory research/accel02_20261011/q1b/c12/evidence/C2_FULL004/RUN \
   --new-attempt-cap 3 --wall-s 45
 ```
 
@@ -222,4 +224,4 @@ python -u research/accel02_20261011/q1b/c12/repair/production_v3/run_full_histor
 
 Local Codex 시작 프롬프트:
 
-> C12의 RESTORE_AND_LOCAL_CODEX_KO.md, 최신 STATE.json과 HANDOFF.json을 읽어 Git baseline과 정상 전체 archive로 실행을 복구해줘. 실제 다운로드 archive SHA/크기·member manifest·활성 checkpoint와 authoritative bundle의 전체 dependency 해시 목록을 확인하고, 네 administrative absolute path만 별도 relocation bundle에 기록해줘. 최신 HANDOFF가 가리키는 기존 child·journal·초기 output을 재사용하고, C2_FULL001 source 실패42와 C2_FULL002 opacity 실패66·ASRUN·journal을 보존해줘. C2_FULL003의 source a292... 유지, 새 opacity128/256 후보의 원래1e-7 기준과 실제 scoped review 결정을 확인해줘. Pending 후보를 GO로 간주하지 말아줘. 완료 검산·PILOT02·초기 h=0·기존 child prepare를 반복하지 말고, cumulative counters와 외부 실패2의 debit을 유지해줘. 최신 허용 결정과 남은 allocation 내에서 전구간 목표로 다음 durable chunk를 실행하고, 매 단계 exact evidence와 Git·Drive/Dropbox 백업을 남겨줘. 실제 복구를 하지 않았다면 RESTORE_VERIFIED라고 하지 말아줘.
+> C12의 RESTORE_AND_LOCAL_CODEX_KO.md, 최신 STATE.json과 HANDOFF.json을 읽어 Git baseline과 정상 전체 archive로 실행을 복구해줘. 실제 다운로드 archive SHA/크기·member manifest·활성 checkpoint와 authoritative bundle의 전체 dependency 해시 목록을 확인하고, 네 administrative absolute path만 별도 relocation bundle에 기록해줘. 최신 HANDOFF가 가리키는 기존 child·journal·초기 output을 재사용하고, C2_FULL001 source 실패42·C2_FULL002 opacity 실패66·C2_FULL003 opacity 실패67 및 ASRUN/journal을 모두 보존해줘. 최신 선택 후보의 source/absorption provenance를 bundle에서 확인하고, composite log-q 후보의 기존1e-7·moment-fit1e-12 기준과 실제 scoped review 결정을 확인해줘. Pending 후보를 GO로 간주하지 말아줘. 완료 검산·PILOT02·초기 h=0·기존 child prepare를 반복하지 말고, cumulative counters와 외부 실패3의 debit을 유지해줘. 최신 허용 결정과 남은 allocation 내에서 전구간 목표로 다음 durable chunk를 실행하고, 매 단계 exact evidence와 Git·Drive/Dropbox 백업을 남겨줘. 실제 복구를 하지 않았다면 RESTORE_VERIFIED라고 하지 말아줘.

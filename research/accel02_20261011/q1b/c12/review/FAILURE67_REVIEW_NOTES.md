@@ -1,0 +1,13 @@
+# Focused independent review: failure67
+
+GO is limited to explicit numerical-identity migration from C2_FULL003 generation60 and the first changed full-target chunk, at most three new attempts and 45 seconds cooperative wall. No whole-history admission is implied.
+
+The original native-conditioned path runs first. Only its NativeOpacity INCIDENT_ORDER_PAIR refusal with requested 64/128 orders admits a bounded composite log-q rule. The transformed positive density is proportional to exp(p*x); exact threshold cuts and subpanels with |p|*width <= 4 remove the inverse-CDF endpoint conditioning mechanism. At most 128 panels are allowed. Global positive moment fitting retains the same reconstructed power-law moments, with the unchanged 1e-12 fit gate. This is a consistent coordinate quadrature strategy, not a finite-order continuum-error proof.
+
+The same 14 response components, each own fine scale, 1e-7 comparison, direct/ABI heat checks, and unchanged absorb API govern incident and gas-iterate attenuation. Strict nodes, positive finite weights, threshold equality refusal, native support domain and panel limits fail closed. A reviewed concern about bypassing the thin-support coordinate certificate is resolved by the explicit indicator>rtol refusal before SIGMA. No additional test was run by the reviewer.
+
+Saved q/P/sigma arithmetic exactly reproduces all 14 incident error components (maximum 2.397169634972536e-15). Saved fixed-gas attenuation maximum is 2.5300475563788924e-15, with maximum direct/ABI heat error 2.5749054496603172e-14. Owner evidence records three new candidate cases and one new migration debit case. Candidate evidence used four SIGMA calls and 1152 energies, zero source/gas/whole-map calls. This is local evidence only.
+
+The additive migration preserves all nine arrays, 121 accepted prefix states, cursor 66/60/6, accumulated outputs and native kernels, source identity, original h0 record/receipt, old transition metadata and all 83 inherited dependency bytes. The new candidate and driver enter the explicit control/dependency identity. Three incomplete physical attempts (42,66,67) are external debits: completed cap102 plus debits3 equals original cap105; 36 attempts remain. The old failed journal is retained. Finally-persisted refinement receipts and existing durable checkpoint/journal reconciliation remain active.
+
+No unresolved blocking finding remains for this scoped launch. Whole-history 65/129 gates, final target completion, and changed candidate behavior through actual implicit gas calls remain to be established. No speedup or arbitrary-state convergence claim is made.
