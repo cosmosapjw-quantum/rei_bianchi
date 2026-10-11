@@ -1,0 +1,19 @@
+{
+  "schema": "rei.q1b.continuation_dag.v2",
+  "historical_snapshots": "Preserved; status updates are additive",
+  "source_commit": "3581a23606499c7a40d6d33f3dcfc75fed0bca4e",
+  "publication_parent": "486d673c79b976a759ecdc8d2b92fedca9c300fd",
+  "nodes": [
+    {"id": "Q1B_SELECTIVE_C12_02", "status": "PASS_SCOPED", "reuse": true},
+    {"id": "Q1B3_SELECTIVE_CALLER_BINDING01", "status": "PASS_SCOPED", "reuse": true},
+    {"id": "SOURCE_ENTRY_FIXED_BATH01", "status": "PASS_SCOPED", "review": "../q1b_source_entry04/INDEPENDENT_REVIEW.json"},
+    {"id": "Q1B5_WORK_SPLIT_GAS_ABSORPTION_JVP01", "status": "PASS_SCOPED", "review": "../q1b_work_gas_jvp05/INDEPENDENT_REVIEW.json", "first_failure": "HOLD_FD_ORACLE_PRECISION preserved; one precision-only repair passed"},
+    {"id": "Q1B6_GAS_RESIDUAL_VALUE_TRIAL01", "status": "PASS_SCOPED", "review": "../q1b_gas_residual06/INDEPENDENT_REVIEW.json"},
+    {"id": "SINGLE_ENDPOINT_NONLINEAR_CORRECTION", "status": "ASTRA_CONTRACT_IN_PROGRESS", "depends": ["Q1B6_GAS_RESIDUAL_VALUE_TRIAL01"]},
+    {"id": "ACTUAL_DRIVER_CHECKPOINT", "status": "HOLD_NOT_BOUND"},
+    {"id": "TIME_AND_PHYSICS_ERROR_BUDGET", "status": "HOLD", "reason": "Channel-relative convergence, atomic/model scope and full spectrum/history not established"},
+    {"id": "FULL_BIANCHI_HISTORY_AND_BASS", "status": "HOLD_DEPENDENCIES"}
+  ],
+  "continuation": "Execute dependency-safe READY work after scoped PASS; no reset of task identity or cumulative accounting",
+  "global_admission": "HOLD"
+}
