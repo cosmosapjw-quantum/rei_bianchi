@@ -1,0 +1,90 @@
+{
+  "schema": "rei.c11.production_dag.design.v1",
+  "status": "IMPLEMENTATION_REQUIRED_BEFORE_NATIVE_MAP",
+  "resume_parent": "../evidence/PILOT02/CHECKPOINTS/gen-00000003",
+  "nodes": [
+    {
+      "id": "P0_TRANSITION",
+      "depends": [],
+      "state": "TO_IMPLEMENT",
+      "files": [
+        "production_control.py",
+        "prepare_production_transition.py",
+        "test_production_transition.py"
+      ],
+      "action": "Verify old manifest/identity, preserve physical prefix/cursor; permit only explicitruntime/end/events transition; publish newchildgeneration beforemap",
+      "new_native_maps": 0,
+      "gate": "Original source/controlpins+identical arrays/counters/acceptedprefix; forbiddenphysical/numericalchange rejection"
+    },
+    {
+      "id": "P1_SCHEDULE",
+      "depends": [],
+      "state": "TO_IMPLEMENT",
+      "files": [
+        "production_schedule.py",
+        "test_production_schedule.py"
+      ],
+      "action": "Pinexactcopied129epochs/65indices; classifyband/cellbirth/z hardevents separatelyfrom sourceinternalenergykinks; bindcallbacks",
+      "new_native_maps": 0,
+      "gate": "Nooutputmissed; no nextafter; exacteventclassification; sourceinternal splitstillcalled"
+    },
+    {
+      "id": "P2_OUTPUT24",
+      "depends": [],
+      "state": "TO_IMPLEMENT",
+      "files": [
+        "cell_history_fields.py",
+        "native_step_v4_diagnostics.py",
+        "test_cell_history_fields.py"
+      ],
+      "action": "PreserveactualattenuatedK0/KE/directheat and24fieldunits; output0fromoriginalsavedmoments withnewoutput-onlybinding",
+      "new_native_maps": 0,
+      "gate": "Moment/volume/heatpairsemantics exact; no poststep powerlawGamma substituted; actualnativeSIGMAonlymaybeneededforinitialoutput"
+    },
+    {
+      "id": "P3_CHUNK",
+      "depends": [
+        "P0_TRANSITION",
+        "P1_SCHEDULE",
+        "P2_OUTPUT24"
+      ],
+      "state": "TO_IMPLEMENT",
+      "files": [
+        "run_full_history_chunk.py",
+        "test_chunk_resume.py"
+      ],
+      "action": "Wholeendtarget,3newattempts/45scooperativechunk;persistallacceptedhalfsteps andmonotonicrejectedattemptcursor;explicitremainingbudget",
+      "gate": "Newtransition/durablejournal targetedtests; no oldpilot replay"
+    },
+    {
+      "id": "P4_REVIEW",
+      "depends": [
+        "P3_CHUNK"
+      ],
+      "state": "WAITING",
+      "action": "Independentreview ofnewtransition/schedules/outputcapture/chunkimplementation",
+      "gate": "ConcretewholehistorydriverGO; localC11numericsdecision aloneinsufficient"
+    },
+    {
+      "id": "P5_FIRST_FULL_TARGET_CHUNK",
+      "depends": [
+        "P4_REVIEW"
+      ],
+      "state": "NOT_LAUNCHED",
+      "command_after_implementation": "python research/accel02_20261011/q1b/c11/integration/production/run_full_history_chunk.py --run C2_FULL001 --resume-parent PILOT02:3 --chunk-attempts 3 --cooperative-wall-s 45",
+      "command_exists_now": false,
+      "action": "Resume t4539815858.150909 directly towardproviderend; stoponlychunkallocation/failure/end; publishdurablegeneration"
+    },
+    {
+      "id": "P6_FULL_HISTORY_AND_REFINEMENT",
+      "depends": [
+        "P5_FIRST_FULL_TARGET_CHUNK"
+      ],
+      "state": "WAITING",
+      "action": "Continueacceptedstate acrosschunks;thenmatchedsamegridtime andC2/C3 fullhistories+65/129comparisons",
+      "gate": "Originalfullhistory24field/time/ledger/geometrycriteria; no initial-localPASS transfer"
+    }
+  ],
+  "prohibited_shortcut": "No production-ready claim and no command execution before plannedfiles exist and new gatespass",
+  "old_completed_replays": 0
+}

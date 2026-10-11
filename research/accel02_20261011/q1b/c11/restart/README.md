@@ -9,3 +9,11 @@
 The caller must bind every executed implementation, source/provider/grid/physics/control and binary in `dependency_closure` using `dependency:repo/relative/path` keys. Write and load verify all listed hashes. A list of hashes cannot prove dependency completeness; the actual runner must supply its complete list. This version accepts only authoritative binary64 N,U; diagnostic source D has no restart authority. If a future solver owns low components, create a new schema and validator before claiming restart.
 
 New-target-only tests: HARNESS_RED/HARNESS_GREEN (3 cases), ADAPTIVE_RED/ADAPTIVE_GREEN_01 (5 cases)/ADAPTIVE_GREEN_02 (6 cases). Old generic checkpoint tests and C10 trajectory families were not replayed. Actual C11 cold-process proof is a separate gate.
+
+## Actual changed-C11 cold process proof
+
+`evidence/C11_ACTUAL_ATTEMPT1/` now closes the local changed-solver cold restart gate. Its isolated worker loads actual PILOT02 generation1, verifies all41 candidate dependencies before importing simulation code, and computes one macro (full step plus two accepted halves). The full reconstructed five-boundary prefix, all nine checkpoint arrays, R/support history and cursor agree exactly with uninterrupted generation2. `COMPARISON.json` contains each comparison; `POST_EXECUTION_EVIDENCE.json` also records exact compact trial agreement and verifies the prior as-run source captures.
+
+The new atomic generation2 is in this evidence directory's `CHECKPOINTS`. It binds44 dependencies including the new cold worker, launcher and unchanged comparison helper. Runtime limits are derived once from frozen CONTROL_V1 minus saved cumulative counts, then capped to one macro for this verification. This is explicitly recorded in `RUNTIME_BUDGET_LINEAGE.json`; numerical controls and scientific thresholds are unchanged. All-metadata equality is neither expected nor claimed. No old trajectory is recomputed. `BUDGET_BOUNDARY` is the intended one-macro verification stop, not a numerical rejection.
+
+The cold harness source copies were captured after execution and checked byte-for-byte against their prelaunch hashes; that timing is explicitly recorded. No implementation failure occurred in this first C11 cold execution. The earlier harness/adapter RED logs remain preserved.

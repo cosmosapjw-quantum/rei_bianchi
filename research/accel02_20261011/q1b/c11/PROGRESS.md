@@ -11,3 +11,5 @@ C11R1: Stable source h5e9/2.5e9 passes unchanged quadrature1e-10 (max1.36e-15); 
 C11R2: Actual PILOT01 source criterion passes; adaptive error rejects first macro ratio4.1874, then midpoint fails old generic physical-q indicator1.655359e-7>1e-7. Zero accepted boundaries; 5mapcalls,36gasRHS,2824SIGMA. As-run code and firstfailure inputs retained. Next same-scope repair: native smooth-kernel value/heat/side bound, no criteria change.
 
 C11R3: Independentreviewer boundedexperimentGO. PILOT02 resumesactualrejectedcursor (no first5e9 trial replay); native-only moment/curvature certificate subtracts budget within1e-7. Three accepted macros/sixhalfboundaries,4.539815858e9s,energymax4.8945e-16,numbermax1.9961e-19. Fixed3macro runtimebudget exhausted (driverexit1 is BUDGET_BOUNDARY, not numericalfailure). Newactualcoldrestart pending.
+
+C11R4 final: actual C11 cold-process gen1→gen2 exact. Independent decision PROMOTE_LOCAL_PRODUCTION_PREREQUISITES; full-history HOLD and unfinished runner explicit. Final handoff + Q2_FULL_HISTORY_BINDING DAG saved. 153 frozen/51 reviewed files unchanged; no new numerical execution during packaging.
