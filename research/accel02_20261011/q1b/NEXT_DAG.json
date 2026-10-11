@@ -1,0 +1,130 @@
+{
+  "schema": "rei.q1b.dag.v1",
+  "checkpoint": "C09B",
+  "status": "PROMOTE_LOCAL_COMPONENTS_HOLD_IC_PAIR_AND_PRODUCTION_SOLVER",
+  "completed_do_not_replay": [
+    "RUN002",
+    "EVENT003",
+    "Q0",
+    "Q1A_G1_FINE",
+    "Q1A_G1_TIGHT",
+    "unchanged_Q1A_G2",
+    "Q1B_source_IC_gate",
+    "Q1B_6_native_protocol_tests"
+  ],
+  "criteria_source": "../NEXT_DAG.json#/frozen_acceptance",
+  "physics_source": "RUN_CONTRACT.json",
+  "nodes": [
+    {
+      "id": "Q1B_SOURCE_IC",
+      "state": "PASS_SCOPED",
+      "evidence": "evidence/SOURCE_IC_CELL_CHECK.json",
+      "depends": []
+    },
+    {
+      "id": "Q1B_RECONSTRUCTION",
+      "state": "PASS_LOCAL_WITH_EXPLICIT_THIN_SUPPORT_REJECTION",
+      "evidence": "evidence/RECONSTRUCTION_REPAIR_EVIDENCE.json",
+      "depends": []
+    },
+    {
+      "id": "Q1B_NATIVE_BRIDGE",
+      "state": "PASS_LOCAL_ACTUAL_CI",
+      "evidence": "review/INDEPENDENT_NATIVE_CI_ADDENDUM.json",
+      "depends": []
+    },
+    {
+      "id": "Q1B_ATOMIC_CHECKPOINT",
+      "state": "PASS_MANUFACTURED_PRODUCTION_UNBOUND",
+      "evidence": "evidence/CHECKPOINT_VALIDATION.json",
+      "depends": []
+    },
+    {
+      "id": "Q1B_NATIVE_OPACITY",
+      "state": "PASS_BOUND_INTERIOR_IC_DIAGNOSTIC_FAIL_C1_C2_HEADROOM",
+      "depends": [
+        "Q1B_RECONSTRUCTION",
+        "Q1B_NATIVE_BRIDGE"
+      ],
+      "next": "Preserve actual C1 failure. Prepare one frozen C3 bisection of C2; assess only new C3 source/IC and C2/C3 using saved direct opacity reference. Endpoint traces and source entry remain open.",
+      "evidence": "evidence/OPACITY_IC_CHECK.json"
+    },
+    {
+      "id": "Q1B_C2_C3_FIXED_PAIR_LOCAL_GATE",
+      "state": "NEXT_PARALLEL_NOT_IMPLEMENTED",
+      "depends": [
+        "Q1B_NATIVE_OPACITY",
+        "Q1B_SOURCE_IC"
+      ],
+      "next": "C2 baseline174 energy cells; create-only C3 bisection348; compare newC3 only to saved directUVB opacity/C2 and savedQ0 source. Keep1e-4 localheadroom and allglobalcriteria."
+    },
+    {
+      "id": "Q1B_SOURCE_ENTRY_POSITIVE_STEP",
+      "state": "NEXT_IMPLEMENTATION_PROPOSAL_ONLY",
+      "depends": [
+        "Q1B_SOURCE_IC",
+        "Q1B_RECONSTRUCTION"
+      ],
+      "next": "Implement event-aligned accumulated positive source moments and admissible paired absorption step; establish local convergence and stiff/entry behavior without arbitrary photon seed or empty Jacobian.",
+      "evidence": "theory/SOURCE_ENTRY_ALGORITHM_DECISION.json"
+    },
+    {
+      "id": "Q1B_PRODUCTION_CHECKPOINT",
+      "state": "WAIT_ACTUAL_DRIVER",
+      "depends": [
+        "Q1B_SOURCE_ENTRY_POSITIVE_STEP",
+        "Q1B_ATOMIC_CHECKPOINT"
+      ],
+      "next": "Bind actual driver domain/ledger/prefix/extrema validator and natural-boundary writer/loader, test exact hook before long run."
+    },
+    {
+      "id": "Q1B_LOCAL_GO",
+      "state": "HOLD",
+      "depends": [
+        "Q1B_NATIVE_OPACITY",
+        "Q1B_SOURCE_ENTRY_POSITIVE_STEP",
+        "Q1B_PRODUCTION_CHECKPOINT",
+        "Q1B_C2_C3_FIXED_PAIR_LOCAL_GATE"
+      ],
+      "next": "One independent decision on changed material evidence; no ritual reruns."
+    },
+    {
+      "id": "Q2_FULL_INTERVAL",
+      "state": "HOLD",
+      "depends": [
+        "Q1B_LOCAL_GO"
+      ],
+      "next": "Predeclare C1/C2 and same-grid time controls; evaluate full15.9to4,65/129sets,24fields,accepted domain/ledgers. Checkpoint each natural segment and remotely each terminal result/firstfailure."
+    },
+    {
+      "id": "N3_BIANCHI_PAIR",
+      "state": "HOLD",
+      "depends": [
+        "Q2_FULL_INTERVAL"
+      ]
+    },
+    {
+      "id": "BASS_N4_NEW_NATIVE",
+      "state": "HOLD_NO_RECEIVER_CALLS",
+      "depends": [
+        "N3_BIANCHI_PAIR"
+      ],
+      "old_reduced_N4": "UNCHANGED_DONE_SCOPED"
+    }
+  ],
+  "scientific_admission": false,
+  "next_anchor": "Q1B_SOURCE_ENTRY_POSITIVE_STEP",
+  "parallel_ready": [
+    "Q1B_NATIVE_OPACITY",
+    "actual_driver_checkpoint_validator_design",
+    "BASS_native_cell_schema_metadata_only",
+    "Q1B_C2_C3_FIXED_PAIR_LOCAL_GATE"
+  ],
+  "do_not_claim": [
+    "whole_history_time_or_spectral_PASS",
+    "production_restart_verified",
+    "CR_or_RCT_completion",
+    "observer_total_or_CMB_constraint",
+    "first_accepted_scientific_plot"
+  ]
+}

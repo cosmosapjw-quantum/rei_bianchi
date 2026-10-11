@@ -1,0 +1,75 @@
+{
+  "schema": "rei-q1b-local-reconstruction-repair-v1",
+  "created_utc": "2026-10-11T01:00:14.124099+00:00",
+  "status": "LOCAL_FIXTURES_PASS_WITH_EXPLICIT_COORDINATE_RESOLUTION_LIMIT",
+  "repair_finding": "R1_NARROW_SUPPORT_FALSE_ACCEPTANCE",
+  "preserved_original_code_sha256": "582347c85a522c8c3c86d7877ea8e5b91820398bba8a91dc1b51159b5ad36dfc",
+  "supersedes_current_summary": "RECONSTRUCTION_EVIDENCE.json is immutable original six-fixture evidence; its API had false success for narrow support and is not the current validated implementation. First-failure code and reviewer evidence remain preserved.",
+  "tests": {
+    "count": 7,
+    "actual_exit": 0,
+    "elapsed_seconds": 0.072,
+    "green_log": "evidence/RECONSTRUCTION_NARROW_GREEN.log",
+    "red_exit": 1,
+    "red_log": "evidence/RECONSTRUCTION_NARROW_RED.log",
+    "intermediate_failure": "Strict component scaling exposed spurious constant-kernel covariance; fixed by exact integration of a constant anchor, not changed tolerance."
+  },
+  "corrections": [
+    "p*log1p((b-a)/a) inversion targets (m-a)/(b-a), retaining cell-relative mean information",
+    "For L<=0.01, bounded expm1-series mean evaluation through y^7; absolute numerator omitted term <= exp(0.01)*0.01^7/8!",
+    "CDF, quantile and delta-q covariance use log1p/expm1",
+    "K0/KE and each Jacobian component have separate order-error scales; N derivative cancellation uses its own two terms",
+    "Mean quadrature error scaled by distance to nearest active endpoint, not mean q",
+    "An arbitrary binary64 q kernel is rejected if 32*ulp(b)/min(m-a,b-m)>requested local rtol; this is a conservative admission policy, not a rigorous arbitrary-kernel error bound",
+    "Constant-kernel covariance is exactly zero by integrating the constant anchor analytically"
+  ],
+  "declared_fixed_orders": [
+    64,
+    128
+  ],
+  "local_rtol": 1e-07,
+  "independent_affine_test": {
+    "identity": "K0=(U/R-a*N)/(b-a) for kernel (q-a)/(b-a)",
+    "accepted_widths": [
+      0.0001,
+      1e-06
+    ],
+    "rejected_widths": [
+      1e-08,
+      1e-10,
+      1e-12,
+      1e-14
+    ],
+    "review_evidence": "review/NARROW_SUPPORT_CORRECTED.json",
+    "reviewer_reported_relative_errors": [
+      2e-15,
+      4.39e-12
+    ]
+  },
+  "remaining": {
+    "real_native_sigma": "NOT_IMPLEMENTED",
+    "smooth_endpoint_jacobian": "NOT_IMPLEMENTED",
+    "empty_directional_api": "NOT_IMPLEMENTED",
+    "zero_width_startup_and_nonrealizable_solver_stage": "UNRESOLVED",
+    "thin_source_entry": "EXPLICITLY_NOT_ADMITTED_BY_FLOAT_Q_LOCAL_API",
+    "whole_interval_ODE": "NOT_EXECUTED",
+    "global_scientific_acceptance": "NOT_EVALUATED",
+    "arbitrary_extreme_p_or_underresolved_support": "NOT_CERTIFIED",
+    "quadrature_order_check": "diagnostic_not_rigorous_error_bound",
+    "closure_error": "NOT_ESTIMATED_BY_ORDER_PAIR"
+  },
+  "physical_ode_calls": 0,
+  "native_calls": 0,
+  "old_run_replays": 0,
+  "file_sha256": {
+    "reconstruction.py": "80a48fa9723414d6c0db31cb8a2c9287aacd1665b61a7eda5c61441bad54b4f8",
+    "test_reconstruction.py": "8165ba35f8cf0600bc4aa72a5d92ef7e435af4f71ff497db1af40d1132e1fb2c",
+    "evidence/RECONSTRUCTION_NARROW_RED.log": "955687dac12b9b7f39c56d1488ecc9e72d6441ae354de88b582cb3dfab1cfe11",
+    "evidence/RECONSTRUCTION_NARROW_REPAIR_ATTEMPT.log": "e0ab1a5313fc48a6102351b66c7d7629ecbfecc87bbc4e6ad3b95099e8a0a7c7",
+    "evidence/RECONSTRUCTION_NARROW_GREEN.log": "362d6e098e44646bd9ba26eef7551169f83498a0b580140c290be13446130033",
+    "evidence/reconstruction_first_failure_as_run.py": "582347c85a522c8c3c86d7877ea8e5b91820398bba8a91dc1b51159b5ad36dfc",
+    "evidence/RECONSTRUCTION_EVIDENCE.json": "482dc8c77e8950cc27fcff96eda0d21b9539ed592e11291ea172aaac6b07fbcc",
+    "review/NARROW_SUPPORT_FIRST_FAILURE.json": "1e8b3befec00d9045e2b4edba20a18bbbe8205b12082edf96a1ea6780b21bb09",
+    "review/NARROW_SUPPORT_CORRECTED.json": "b39278b9099f20c82fa58f6d9424382d183aab18d657bf7d1e2fce6ce37bb2f4"
+  }
+}
