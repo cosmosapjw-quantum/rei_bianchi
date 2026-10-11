@@ -1,0 +1,56 @@
+--- draft1/profile_second_order.py
++++ prepared/profile_second_order.py
+@@ -24,12 +24,14 @@
+ ROOT = Path(__file__).resolve().parents[2]
+ PROTOCOL_PATH = "contributions/numerics/PROTOCOL.json"
+ FREEZE_PATH = "contributions/numerics/PREEXECUTION_FROZEN.json"
+-EXPECTED_PROTOCOL_SHA256 = "PROTOCOL_SHA256_TO_BE_SET_BEFORE_OWNER_FREEZE"
++EXPECTED_PROTOCOL_SHA256 = "74ad883b3bd04d822ed8d0fc5a9bce67509839ce6fad68e4596100f1dae031f2"
+ EXPECTED_INPUTS = (
+     ("inputs/PHYS29/contributions/numerics/SECOND_ORDER_FIRST.json", 137037,
+      "40d686d2646ac7dbaff1bd768a789fcfdbaf5043a16b26512c42ffbedbdd8d6f"),
+     ("inputs/PHYS29/contributions/numerics/PROTOCOL.json", 16527,
+      "6ab5d3c488a00ebfb868e4d4e83d98a2fe1db9479956b587f673d9d9b86e7573"),
++    ("PHYSICS_CONTRACT.json", 8241,
++     "475ce8957b46ce1440f227cd1a4b8c5fb3979cf237e4c8e52a5e76028cd78a5d"),
+ )
+ POWERS = ((0, 0), (1, 0), (0, 1), (2, 0), (1, 1), (0, 2))
+ COEFFICIENT_FIELDS = (
+@@ -482,13 +484,19 @@
+                   freeze_sha256=sha256(freeze_bytes), members=freeze_members)
+     source = json.loads(payloads[EXPECTED_INPUTS[0][0]])
+     old_protocol = json.loads(payloads[EXPECTED_INPUTS[1][0]])
++    current_contract = json.loads(payloads[EXPECTED_INPUTS[2][0]])
+     state_ok = (source["task"] == "REI-PHYS29-20261011" and source["decimal_precision"] == 80
+                 and source["summary"]["all_pass"] is True and source["summary"]["total_checks"] == 238
+                 and source["summary"]["passed"] == 238 and source["summary"]["failed"] == 0
+                 and source["physical_admission"] == "HOLD"
+                 and source["identity_sha256"]["contributions/numerics/PROTOCOL.json"] == EXPECTED_INPUTS[1][2]
+                 and old_protocol["tolerances"]["algebra_and_two_expression_scaled"] == "1e-60"
+-                and old_protocol["arithmetic"]["precision_decimal_digits"] == 80)
++                and old_protocol["arithmetic"]["precision_decimal_digits"] == 80
++                and current_contract["task"] == TASK
++                and current_contract["prospective_numerics"]["precision_decimal_digits"] == 80
++                and current_contract["prospective_numerics"]["new_physical_kernel_or_derivative_evaluations_max"] == 0
++                and current_contract["prospective_numerics"]["new_physical_root_searches_or_refinements_max"] == 0
++                and current_contract["prospective_numerics"]["old_PHYS19_through_PHYS29_main_suite_root_import_max"] == 0)
+     checks.record("PHYS29_authoritative_cached_state", state_ok,
+                   source_task=source["task"], stored_summary=source["summary"],
+                   note="Stored prior outcome read only; no old predicate reevaluation or old main/import")
+@@ -644,13 +652,13 @@
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("--output", required=True, help="New raw JSON path within project; existing files are refused")
++    parser.add_argument("--output", required=True, help="New absolute path or project-root relative path; existing files are refused")
+     args = parser.parse_args()
+     output = Path(args.output)
+     if not output.is_absolute():
+         output = ROOT/output
+-    if not output.resolve().is_relative_to(ROOT) or output.exists():
+-        raise ValueError("Output must be a new file within this portable project root")
++    if output.exists() or output.is_symlink():
++        raise ValueError("Output must be a new regular file; existing files and symlinks are refused")
+     if not output.parent.is_dir():
+         raise ValueError("Output parent must already exist")
+     counts = {key: 0 for key in (
