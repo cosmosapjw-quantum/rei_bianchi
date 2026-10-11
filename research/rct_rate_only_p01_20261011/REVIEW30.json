@@ -1,0 +1,66 @@
+{
+  "schema": "rei.rct-rate-only.independent-review.v1",
+  "task": "ASTRA_RCT_RATE_ONLY_REVIEW30",
+  "review_started_utc": "2026-10-11T09:39:10Z",
+  "review_completed_utc": "2026-10-11T09:41:34Z",
+  "review_elapsed_seconds_to_decision": 144,
+  "decision": "PASS_SCOPED_SAVED_BASELINE_NUMBER_RATE_READOUT",
+  "requested_reviewer": "gpt-6-astra/xhigh",
+  "observed_runtime": "NOT_INDEPENDENTLY_OBSERVED",
+  "independence": "Fresh reviewer did not author the contract, implement the script, or execute the postprocessing campaign. Review comprised source, recorded execution and saved-data inspection only.",
+  "scope": "The explicitly selected KF96 nominal number-rate prescription evaluated on the 17 immutable warm P01 RCT-OFF saved epochs, including correctly labelled saved-grid piecewise-linear source exposures.",
+  "identities": {
+    "contract": {"path": "/tmp/ASTRA_RCT_RATE_ONLY_CONTRACT27_20261011.json", "sha256": "39ba426b4f98310c7347f29ad80a2afe6a2e9f7030c63e938c9e711b13745e93"},
+    "script": {"path": "/tmp/RCT_RATE_ONLY27.SmVbft1W/rct_rate_only.py", "sha256": "f91a4051af342d8b2c775d58ba80d73f631d59479a5662098bc9d1cd08b7ca6d"},
+    "per_epoch": {"path": "/tmp/RCT_RATE_ONLY27.SmVbft1W/output/per_epoch.json", "sha256": "079f31c7574d6eebd05ca207ff5fcd75e8e1a78a58e0733c1ff901c6124d6b36"},
+    "validation": {"path": "/tmp/RCT_RATE_ONLY27.SmVbft1W/output/VALIDATION.json", "sha256": "03143655066edf7c92c3ae250dcb33d8ac4624f45b3fc368a716e9feb63e26b9"},
+    "raw_receipt": {"path": "/tmp/RCT_RATE_ONLY27.SmVbft1W/COMMAND_EXIT_STDOUT_STDERR.json", "sha256": "0da6891b81d9135ec4272f97659760bb98ae56f36550a7ec3c69a082d921af93"},
+    "report_ko": {"path": "/tmp/RCT_RATE_ONLY27.SmVbft1W/output/REPORT_KO.md", "sha256": "249afba99e2cd5135dbdd0d698cd1ad743e12df8a4e20f72c16cbe382cbec580"},
+    "baseline_dataset_sha256": "77a144347d8f85c91320c7acc694e770544ff61f79bc418cebe3f8f13403483a",
+    "baseline_interval_sha256": "d0745653fa463b05a47f352063e57661d97385561174c749424a7ec1907c1520",
+    "provider_kf96_sha256": "0e7c8a846112e14ec8d761fe7b9d978e65b4c30456e0d31829c52724e91a4ff6",
+    "provider_shared_validation_sha256": "529ae325622718b48292c3b748a7850ccb315733b28bff930388f00915f2d217",
+    "all_eight_contract_input_and_provider_hashes": "REVIEWER_RECHECKED_MATCH"
+  },
+  "findings": [],
+  "checks": {
+    "actual_saved_data": "Read original production JSON history and NPZ headers, times and ionic rows with allow_pickle=False. All 17 output rows use the recorded proper elapsed seconds 0..1e11, state rows 0/1/2 and corresponding saved density/temperature fields.",
+    "mapping_and_units": "Pinned background.py and source_bound_interval.py establish proper cm^-3 densities, gas proper seconds, zero-tilt rest frame and Y=0.24 with mHe=4*mproton. Multiplication by 1e6 and nHe/nH=3/38 correctly produce SI number densities. a_rel^3=nH(0)/nH(t) follows conserved nuclei in this frozen background.",
+    "selected_source": "The actual import/call selects provider._kf96.rate with KF96_HEIII_HI_RCT_NOMINAL_V1, explicit W82 ground-state mapping, zero-drift common-temperature Maxwellian and source-conflict acknowledgement. The GM25 rate function is not called; shared error/number validation definitions are used.",
+    "arithmetic_reference": "Decimal reference independently reconstructs densities, reactants, species/fraction rates and saved-grid trapezoids from stored binary64 input fields with precision70, exact 1e-20, integer1e6 and rational3/38. It does not reuse candidate densities or rates. Relative-error comparison outside the local reference context uses Decimal's default precision28, which remains ample for the frozen 5e-13 acceptance and does not alter the reference construction.",
+    "conservation": "Declared vector [-1,+1,0,+1,-1,0] conserves H nuclei, He nuclei and charge; reconstructed fraction sources and electron-density consistency are checked. Structural-zero cases preserve zero.",
+    "controls": "All eight prescribed control categories have passing recorded outcomes and corresponding script branches. Main input hashes are checked before provider import or any baseline rate evaluation; the intentional mismatch control directly verifies the same rejecting helper.",
+    "provider_calls": "17 epochs times two unit calls plus two negative provider controls =36, within40. Count is confirmed from the executed script's bounded loop and branches; the recorded integer is not a runtime instrumentation counter.",
+    "recorded_execution": "Exactly one recorded invocation, exit0, empty stderr, first_failure=null; no repaired or discarded first failure appears. Process-tool wall0.057244431s and internal post-import script wall0.020588766026776284s remain distinct measurements.",
+    "claim_boundary": "The optional trapezoid is labelled SAVED_GRID_PIECEWISE_LINEAR_RATE_EXPOSURE_DIAGNOSTIC and integration_error is NOT_ESTIMATED. No thermal power, escaped energy, mean photon energy, RCT-ON state, uncertainty budget or materiality decision is emitted. Missing moments remain null."
+  },
+  "observed_results": {
+    "saved_epochs": 17,
+    "provider_calls": 36,
+    "control_categories_passed": 8,
+    "arithmetic_max_relative_error": 4.691997598113699e-16,
+    "cgs_max_relative_error": 3.6067047998928186e-16,
+    "electron_density_max_relative_error": 0.0,
+    "maximum_rate_m3_s": 2.0370228748547872e-24,
+    "piecewise_linear_exposure_events_per_initial_m3": 2.0370151617099794e-13,
+    "fraction_exposures_xHII_xHeII_xHeIII": [3.4318478685512853e-15, 4.347007300164961e-14, -4.347007300164961e-14]
+  },
+  "residual_limits": [
+    "KF96 is a selected nominal compilation prescription; factor17 source disagreement, physical accuracy and source uncertainty remain unresolved.",
+    "One saved grid supplies no continuum interpolation error estimate or bound on an RCT-enabled coupled state.",
+    "Primary photon count is conditional on the explicitly selected single-photon ground-channel scenario; photon energy, spectrum, heat and reabsorption remain absent.",
+    "This review did not rerun the diagnostic, provider controls, production solver, atomic calculation or tests. It reviewed the exact script, recorded single execution and actual input/output bytes."
+  ],
+  "authorization": {
+    "scoped_number_rate_readout": true,
+    "local_recovery_backup": true,
+    "source_scoped_publication": "AUTHORIZED_AFTER_CONTROLLER_LIVE_RELEVANT_PR_REFRESH_AND_LOCAL_BACKUP_VERIFICATION",
+    "publication_scope": "Exact reviewed script, contract, saved diagnostic outputs, raw command receipt, this independent decision and factual DAG/report updates for this number-rate node. Preserve source identities, first-failure=null and the stated claim limits. Non-force publication only under existing owner scope; no automatic merge.",
+    "physical_RCT_ON": "HOLD_SOURCE_BACKED_ESCAPE_MOMENT",
+    "N5_materiality": "HOLD_UNASSESSED",
+    "global_physical_admission": "HOLD",
+    "repair_authorized": false
+  },
+  "next_action": "Controller performs the already authorized local backup and live relevant PR refresh, then source-scoped publication of this completed diagnostic. Continue independent dependency-safe READY work; do not reopen the same missing-moment absence search or rerun this passing diagnostic without a new finding.",
+  "review_accounting": {"focused_read_calls": 8, "focused_read_calls_max": 8, "wall_seconds_max": 240, "dataset_read_only_inspections": 1, "provider_calls": 0, "solver_calls": 0, "builds": 0, "test_runs": 0, "network_calls": 0, "source_code_edits": 0, "decision_artifacts_written": 1}
+}
