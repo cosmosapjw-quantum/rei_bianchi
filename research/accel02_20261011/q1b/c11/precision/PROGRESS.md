@@ -5,3 +5,5 @@ Completed new source precision candidate and3 targeted tests. Actual changed-sou
 Status: local evidence ready for independent review; production HOLD. Exact API and limits: THEORY_AND_SCOPE.md. D remains diagnostic only; source R0/R1 matches immutable provider exactly. Native guards untouched.
 
 No git/remote mutations performed by this lane. Parent owns integration and durable external checkpoint.
+
+PILOT01 follow-up: exact failed-boundary MP80 mean/probability diagnostic completed; source bytes unchanged. See PILOT01_MEAN_DIAGNOSIS.md. No need for authoritative D established solely for this50keV smooth-kernel boundary; generic guard remains intact pending endpoint-specific evidence.
