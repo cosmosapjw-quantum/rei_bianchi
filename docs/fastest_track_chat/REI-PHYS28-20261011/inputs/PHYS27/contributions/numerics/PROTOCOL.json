@@ -1,0 +1,213 @@
+{
+  "task": "REI-PHYS27-20261011",
+  "protocol": "PHYS27_FINITE_WIDTH_FIRST_V1",
+  "written_utc": "2026-10-11T04:29:31.681407+00:00",
+  "status": "FROZEN_BEFORE_FIRST_SCIENTIFIC_EXECUTION",
+  "inputs": [
+    {
+      "path": "PHYSICS_CONTRACT.json",
+      "sha256": "46fe6fb98a78ca549f27ed78968850c14bdc12cdd3250892f28e239574005443",
+      "bytes": 8458
+    },
+    {
+      "path": "SOURCE_MANIFEST.json",
+      "sha256": "46ede0e9ccd855a818a79d44c6b89977a08ffd1c04f51f6ca158cd451a181092",
+      "bytes": 2314
+    },
+    {
+      "path": "inputs/PHYS22_INITIAL_COEFFICIENTS.json",
+      "sha256": "6c7a4f239ef48c2a7c60592fc048600317f1233f3028434ebd1b3c7e55682a79",
+      "bytes": 26723
+    },
+    {
+      "path": "inputs/PHYS26/next/PHYS27_NEXT_HANDOFF_KO.md",
+      "sha256": "107dd360e996c1088c8edccc6ef50518d851ea0f681c78e760749c9fcf4da6c5",
+      "bytes": 7231
+    },
+    {
+      "path": "inputs/PHYS26/report/PHYS26_RESULTS_SUMMARY.json",
+      "sha256": "fcbd120870e39e3882c8111180a4f249686b623b7238d0032ad77c6308867469",
+      "bytes": 31477
+    },
+    {
+      "path": "inputs/PHYS26/report/PHYS26_REPORT_KO.md",
+      "sha256": "8a9773e333f60c2d4e1525367474d26229797852e5b5130692356d6ecd5fabea",
+      "bytes": 24136
+    },
+    {
+      "path": "inputs/PHYS26/contributions/numerics/fixed_variance_envelope.py",
+      "sha256": "6838ebe1a7a57cfd7155bb8d0c8d8437deb4617c38caf04c1daf7db674525860",
+      "bytes": 21970
+    },
+    {
+      "path": "inputs/pinned_source/rust/rei_microphysics/src/atomic_provider.rs",
+      "sha256": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3",
+      "bytes": 12939
+    },
+    {
+      "path": "inputs/pinned_source/rust/rei_microphysics/src/hhe_events.rs",
+      "sha256": "c100b08e034089c2d67b2102769ccdd51f1d29a2f388d6bb2dfe7984af93b290",
+      "bytes": 9447
+    },
+    {
+      "path": "inputs/pinned_source/rust/rei_microphysics/src/paired_runtime.rs",
+      "sha256": "b6c1d2a07ab51ff02318139ae18387b77f61859c08037347f788524df770ebe7",
+      "bytes": 23810
+    },
+    {
+      "path": "inputs/pinned_source/rust/rei_microphysics/examples/paired_history.rs",
+      "sha256": "b4f2bd67f0276766792ac8ff6dd53f314c5d507def726d8524a8af5b4bd076a3",
+      "bytes": 25066
+    }
+  ],
+  "meaning": {
+    "half_width_eV": "0.05",
+    "full_width_eV": "0.10",
+    "physical_support_eV": [
+      "13.61",
+      "24.58"
+    ],
+    "center_support_eV": [
+      "13.66",
+      "24.53"
+    ],
+    "mean_eV": "18",
+    "physical_variance": "W=V+delta^2/3",
+    "new_physical_threshold_names": [
+      "W_star_delta",
+      "W_0_delta"
+    ],
+    "new_center_threshold_names": [
+      "V_star_delta",
+      "V_0_delta"
+    ]
+  },
+  "arithmetic": {
+    "kind": "Python standard-library Decimal",
+    "decimal_precision": 80,
+    "source_literals": "Decimal.from_float(float(literal)); exact-real binary64 values, then Decimal arithmetic",
+    "J_input": "Full serialized decimals rows [2][0] and [2][3]",
+    "dependencies_installed": false
+  },
+  "primary_kernel": {
+    "method": "Explicit adaptation of read PHYS26 degree-three log Taylor jet, same original HI fit, k and k-prime only",
+    "normalization": "q*N0*kappa/180 applied once to C[sigma*(Jx+Jw*(E-chi))]",
+    "old_import_or_main": 0
+  },
+  "independent_kernel": {
+    "method": "Separately expressed scalar original-fit log derivative ell1,ell2,ell3; no Jet or finite difference",
+    "shared_dependencies": "Original HI fit, source-real constants, J, Decimal transcendental operations; not independent physical data"
+  },
+  "quadrature": {
+    "primary": "Gauss-Legendre 16 points on [-1,1], kbar(c)=sum(w_i*k(c+delta*x_i))/2",
+    "distinct_order": "Gauss-Legendre 24 points at 7 selected centers only",
+    "nodes": "Decimal polynomial recurrence and Newton roots, binary64 cosine seeds only; 20 positive node solves total, 30 iterations max each; reflected exact +/- pairs",
+    "node_stop_correction": "1e-73",
+    "polynomial_validation": "For order n check every degree 0..2n-1 against integral[-1,1] x^d; positive weights and distinct supported nodes; scaled tolerance 1e-60",
+    "independent_rule": "Composite Simpson 32/64/128 panels from common 129-point scalar grid per selected center; R6_64=(16*S64-S32)/15, R6_128=(16*S128-S64)/15, R8=(64*R6_128-R6_64)/63",
+    "normalization_check": "Simpson mean factor 1/(3n); Gauss mean factor 1/2; raw moments normalize weights to integral=2"
+  },
+  "independent_centers": {
+    "maximum": 7,
+    "rule": [
+      "a_delta",
+      "m",
+      "b_delta",
+      "new upper-root midpoint center",
+      "new lower-root midpoint center",
+      "moving upper center at physical W=19.74",
+      "moving lower center at physical W=19.74"
+    ],
+    "selection_depends_on_new_roots": true,
+    "selection_rule_fixed_before_values": true,
+    "no_adaptive_extra_centers": true
+  },
+  "physical_root_searches": {
+    "count": 2,
+    "upper_F": "(c-m)*kbar(a_delta)+L_delta*kbar(c)",
+    "upper_initial_center_bracket": [
+      "18",
+      "24.53"
+    ],
+    "upper_W": "L_delta*(c-m)+delta^2/3",
+    "lower_F": "H_delta*kbar(c)+(m-c)*kbar(b_delta)",
+    "lower_initial_center_bracket": [
+      "13.66",
+      "18"
+    ],
+    "lower_W": "H_delta*(m-c)+delta^2/3",
+    "algorithm": "Sign-preserving bisection for 80 iterations; stop earlier only if finite Decimal F equals exactly zero; evaluate final midpoint and retain full iteration history",
+    "maximum_iterations_per_root": 100,
+    "actual_requested_iterations_per_root": 80,
+    "center_width_check_eV": "1e-22",
+    "boundary_scaled_response_residual_tolerance": "1e-22",
+    "scope": "No inherited root search is rerun"
+  },
+  "physical_variance_cases": {
+    "maximum": 9,
+    "ordered_selection_rule": [
+      "Wmin_delta",
+      "8",
+      "old PHYS26 Vstar physical variance",
+      "new W_star_delta physical variance",
+      "19.74",
+      "new W_0_delta physical variance",
+      "old PHYS26 W0 physical variance",
+      "26",
+      "Wmax_delta"
+    ],
+    "new_roots_are_used_only_after_frozen_search": true,
+    "endpoints": "Explicit V=0 and V=L_delta*H_delta avoid reintroducing Decimal repeating-offset roundoff at degenerate supports"
+  },
+  "checks": {
+    "moments": "Direct integrate each uniform band for mass, mean, central variance, raw second moment; compare center variance+delta^2/3, total N0, total N0*m",
+    "response": "Explicit moment-bound formulas vs band-weight sums; degenerate endpoints, strict internal gap, strict containment in original delta-allowed same-W bounds at 9 samples",
+    "quadrature": "Compare kbar and kbar-prime GL16 vs GL24 and independent scalar Simpson/R8 at 7 centers; monotone raw Simpson refinement; not proof of continuum or enclosure",
+    "mixtures": "Quarter-upper and zero-response weight mixture at physical W19.74, actual 4-band moments and residual retained",
+    "local_root_conditioning": "Root-local response derivative from secant/tangent formula, and linearized displacement from independent quadrature difference; diagnostic only, not error bound"
+  },
+  "tolerances": {
+    "algebraic_and_polynomial_scaled": "1e-60",
+    "GL16_vs_GL24_scaled": "1e-55",
+    "GL16_vs_scalar_Richardson8_scaled": "1e-22",
+    "raw_Simpson_refinement": "Strict decreasing observed absolute error at 32,64,128",
+    "response_scale_s-4": "1e-64",
+    "derivative_scale_s-4_eV-1": "1e-64/18",
+    "moment_scale": "max(1,abs(actual),abs(expected))",
+    "tolerance_changes_before_first_execution": 0
+  },
+  "budgets": {
+    "first_new_science_main": 1,
+    "physical_root_searches_max": 2,
+    "physical_root_iterations_max_each": 100,
+    "quadrature_node_solves_separately_counted": 20,
+    "kernel_evaluations_max": 20000,
+    "W_cases_max": 9,
+    "independent_quadrature_centers_max": 7,
+    "old_module_imports": 0,
+    "old_main_invocations": 0,
+    "old_physical_root_searches": 0,
+    "old_closed_suite_replays": 0,
+    "new_k_second_or_third_sign_campaigns": 0,
+    "native_runs": 0,
+    "gas_IVP_runs": 0,
+    "dense_LP_or_multiple_parameter_campaigns": 0,
+    "replay_by_this_numerical_contributor": 0
+  },
+  "claim_ceiling": [
+    "Numerical quadrature agreement and finite bisection brackets are not directed interval enclosures.",
+    "Report new thresholds at most 12 significant digits; extra stored Decimal digits are reproducibility data only.",
+    "No J, atomic, gas or physical uncertainty enclosure; fixed serialized J and source-real constants only.",
+    "Uniform-band family only; no all-continuous-spectra or physical-source admission.",
+    "All-W continuum inequalities and equality conditions require the separate theory derivation.",
+    "No finite-time/finite-epsilon remainder, native equivalence, production source change or novelty claim."
+  ],
+  "independence": {
+    "role": "NONBLIND numerical design/generator",
+    "full_history_inherited": true,
+    "parent_design_suggestions_read": "Decimal + quadrature alternatives, fixed budgets, nine-case and seven-center selection hints",
+    "theory_prior_exposure": "Parent relayed exact containment prediction and threshold-shift directions before any science; this is not blind prediction testing",
+    "final_decision_authority": false
+  },
+  "failure_policy": "Preserve first raw stdout/stderr/exit and first result even if any check fails; no tolerance relaxation or hidden rerun."
+}
