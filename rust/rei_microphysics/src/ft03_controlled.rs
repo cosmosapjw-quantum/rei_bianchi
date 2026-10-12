@@ -64,6 +64,10 @@ pub struct Ft03Rhs {
     pub collision_per_cm3_s: [f64; 3],
     pub recombination_per_cm3_s: [f64; 3],
     pub dr_per_cm3_s: [f64; 2],
+    /// Captured kinetic power, evaluated from the same RR events and stage.
+    pub rr_kinetic_power_erg_cm3_s: [f64; 3],
+    /// Captured resonance power for the two HeII -> HeI DR terms.
+    pub dr_kinetic_power_erg_cm3_s: [f64; 2],
     pub escaped_energy_rate: f64,
 }
 
@@ -105,6 +109,7 @@ pub fn ft03_rhs(model: &Ft03Model, state: &HHeState) -> Result<Ft03Rhs, ForwardE
     let mut photo = [[0.0; 3]; 3];
     let mut ci = [0.0; 3];
     let mut rr = [0.0; 3];
+    let mut rr_kinetic_power = [0.0; 3];
     let mut photon_dot = [0.0; 3];
     let mut j = [0.0; 3];
     let mut du = 0.0;
@@ -115,6 +120,7 @@ pub fn ft03_rhs(model: &Ft03Model, state: &HHeState) -> Result<Ft03Rhs, ForwardE
         j[a] = ci[a] - rr[a];
         let chi = g.threshold_ev[a] * g.ev_erg;
         let kinetic_rate = checked_product(&[upper[a], ne, c.rr_kinetic_erg_cm3_s[a]])?;
+        rr_kinetic_power[a] = kinetic_rate;
         du -= checked_product(&[ci[a], chi])? + kinetic_rate;
         escape += checked_product(&[rr[a], chi])? + kinetic_rate;
         for (k, photon_dot_k) in photon_dot.iter_mut().enumerate() {
@@ -133,9 +139,11 @@ pub fn ft03_rhs(model: &Ft03Model, state: &HHeState) -> Result<Ft03Rhs, ForwardE
         checked_product(&[upper[1], ne, c.alpha_dr_cm3_s[0]])?,
         checked_product(&[upper[1], ne, c.alpha_dr_cm3_s[1]])?,
     ];
+    let mut dr_kinetic_power = [0.0; 2];
     for (k, event) in dr.iter().enumerate() {
         j[1] -= event;
-        du -= checked_product(&[*event, c.dr_energy_erg[k]])?;
+        dr_kinetic_power[k] = checked_product(&[*event, c.dr_energy_erg[k]])?;
+        du -= dr_kinetic_power[k];
         escape += checked_product(&[*event, g.threshold_ev[1] * g.ev_erg + c.dr_energy_erg[k]])?;
     }
     let d = [
@@ -164,6 +172,8 @@ pub fn ft03_rhs(model: &Ft03Model, state: &HHeState) -> Result<Ft03Rhs, ForwardE
         collision_per_cm3_s: ci,
         recombination_per_cm3_s: rr,
         dr_per_cm3_s: dr,
+        rr_kinetic_power_erg_cm3_s: rr_kinetic_power,
+        dr_kinetic_power_erg_cm3_s: dr_kinetic_power,
         escaped_energy_rate: escape,
     })
 }

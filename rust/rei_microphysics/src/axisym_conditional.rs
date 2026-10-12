@@ -7,7 +7,7 @@
 //! Recombination records escaped ENERGY only; its photon count is unspecified.
 use crate::{
     axisym_coupled_derivative, ft03_coefficients, ft03_rhs, Absorber, AtomicProvider,
-    AxisymCoupledState, AxisymLocalSources, AxisymmetricPoint, Ft03Model, HHeState,
+    AxisymCoupledState, AxisymLocalSources, AxisymmetricPoint, Ft03Model, HHeModel, HHeState,
     IsotopeNumberState, IsotopeSpecies,
 };
 
@@ -40,10 +40,19 @@ impl SourceBoundConditional {
     }
 
     pub fn evaluate(&self, stage: &ConditionalStage) -> Result<Vec<f64>, String> {
+        Ok(self.evaluate_detailed(stage)?.rhs)
+    }
+
+    /// The fixed physical provider is unchanged; diagnostics report the events
+    /// actually consumed by this evaluation, not a second provider evaluation.
+    pub fn evaluate_detailed(
+        &self,
+        stage: &ConditionalStage,
+    ) -> Result<ConditionalEvaluation, String> {
         if !stage.time_s.is_finite() || !(0. ..=1.0e11).contains(&stage.time_s) {
             return Err("CONDITIONAL_TIME_DOMAIN".into());
         }
-        rhs(stage)
+        detailed_rhs(stage, &Ft03CaseAProvider)
     }
 }
 
@@ -94,6 +103,222 @@ pub struct ConditionalStage {
     pub nodes: Vec<ConditionalPhotonNode>,
 }
 
+/// Primitive interaction diagnostics in proper cm^-3 s^-1 and erg cm^-3 s^-1.
+/// Edges are HI->HII, HeI->HeII, HeII->HeIII; RR reverses each edge and
+/// the two DR terms both reverse the HeI edge. These are event-weighted
+/// kinetic powers, not a prescribed mean photon energy or photon spectrum.
+#[derive(Clone, Debug)]
+pub struct CaseAEventSummary {
+    pub collision_per_cm3_s: [f64; 3],
+    pub recombination_per_cm3_s: [f64; 3],
+    pub dr_per_cm3_s: [f64; 2],
+    pub photo_per_cm3_s: [f64; 3],
+    pub rr_kinetic_power_erg_cm3_s: [f64; 3],
+    pub dr_kinetic_power_erg_cm3_s: [f64; 2],
+    pub photo_heat_erg_cm3_s: [f64; 3],
+    pub photo_absorbed_power_erg_cm3_s: [f64; 3],
+}
+
+/// Result of the same event consumption that produced the actual AXI RHS.
+#[derive(Clone, Debug)]
+pub struct ConditionalEvaluation {
+    pub rhs: Vec<f64>,
+    pub events: CaseAEventSummary,
+    pub sources: AxisymLocalSources,
+}
+
+impl ConditionalEvaluation {
+    /// Stable EVENTS protocol: 22 primitive event/moment values, five H/He
+    /// species, electron, photon number, five energy powers, T and two residuals.
+    /// All returned source values use proper cgs units. RHS remains unchanged.
+    pub fn event_values(&self) -> Vec<f64> {
+        let e = &self.events;
+        let mut values: Vec<f64> = e
+            .collision_per_cm3_s
+            .into_iter()
+            .chain(e.recombination_per_cm3_s)
+            .chain(e.dr_per_cm3_s)
+            .chain(e.photo_per_cm3_s)
+            .chain(e.rr_kinetic_power_erg_cm3_s)
+            .chain(e.dr_kinetic_power_erg_cm3_s)
+            .chain(e.photo_heat_erg_cm3_s)
+            .chain(e.photo_absorbed_power_erg_cm3_s)
+            .collect();
+        for species in [
+            IsotopeSpecies::H1Neutral,
+            IsotopeSpecies::H1Ionized,
+            IsotopeSpecies::He4Neutral,
+            IsotopeSpecies::He4SinglyIonized,
+            IsotopeSpecies::He4DoublyIonized,
+        ] {
+            values.push(self.sources.species_m3_s[species as usize] / 1e6);
+        }
+        values.extend([
+            self.sources.electron_m3_s / 1e6,
+            self.sources.photon_number_m3_s / 1e6,
+            self.sources.photon_power_j_m3_s * 10.,
+            self.sources.thermal_power_j_m3_s * 10.,
+            self.sources.internal_power_j_m3_s * 10.,
+            self.sources.escape_power_j_m3_s * 10.,
+            self.sources.external_power_j_m3_s * 10.,
+            self.rhs[11],
+            self.rhs[12],
+            self.rhs[13],
+        ]);
+        values
+    }
+}
+
+// Provider injection is private: the public source-bound physical contract
+// still chooses FT03. Tests can perturb one primitive without adding a new
+// physical profile or an arbitrary-provider bypass to that public contract.
+struct ThermalCaseAEvents {
+    ci: [f64; 3],
+    rr: [f64; 3],
+    dr: [f64; 2],
+    rr_kinetic: [f64; 3],
+    dr_kinetic: [f64; 2],
+}
+
+trait ThermalEventProvider {
+    fn events(&self, model: &Ft03Model, state: &HHeState) -> Result<ThermalCaseAEvents, String>;
+}
+
+struct Ft03CaseAProvider;
+
+impl ThermalEventProvider for Ft03CaseAProvider {
+    fn events(&self, model: &Ft03Model, state: &HHeState) -> Result<ThermalCaseAEvents, String> {
+        let atomic = ft03_rhs(model, state).map_err(|e| e.to_string())?;
+        Ok(ThermalCaseAEvents {
+            ci: atomic.collision_per_cm3_s,
+            rr: atomic.recombination_per_cm3_s,
+            dr: atomic.dr_per_cm3_s,
+            rr_kinetic: atomic.rr_kinetic_power_erg_cm3_s,
+            dr_kinetic: atomic.dr_kinetic_power_erg_cm3_s,
+        })
+    }
+}
+
+// An owned bundle is consumed once into a ledger. The read-only summary
+// returned afterwards is not another consumable source bundle.
+struct CaseAEventBundle {
+    thermal: ThermalCaseAEvents,
+    photo_by_node: Vec<[f64; 3]>,
+}
+
+struct CaseALedger {
+    summary: CaseAEventSummary,
+    net_edge: [f64; 3],
+    thermal_power: f64,
+    internal_power: f64,
+    escape_power: f64,
+    photon_dot_ref: Vec<f64>,
+    absorbed_number_ref: f64,
+    absorbed_energy_ref: f64,
+}
+
+impl CaseAEventBundle {
+    fn into_ledger(
+        self,
+        gas: &HHeModel,
+        nodes: &[ConditionalPhotonNode],
+        volume: f64,
+    ) -> Result<CaseALedger, String> {
+        let t = self.thermal;
+        if self.photo_by_node.len() != nodes.len()
+            || t.ci
+                .iter()
+                .chain(t.rr.iter())
+                .chain(t.dr.iter())
+                .chain(t.rr_kinetic.iter())
+                .chain(t.dr_kinetic.iter())
+                .chain(self.photo_by_node.iter().flatten())
+                .any(|x| !x.is_finite() || *x < 0.)
+            || t.rr
+                .iter()
+                .zip(t.rr_kinetic)
+                .any(|(r, p)| *r == 0. && p != 0.)
+            || t.dr
+                .iter()
+                .zip(t.dr_kinetic)
+                .any(|(r, p)| *r == 0. && p != 0.)
+        {
+            return Err("CASE_A_EVENT_BUNDLE_DOMAIN".into());
+        }
+        let mut summary = CaseAEventSummary {
+            collision_per_cm3_s: t.ci,
+            recombination_per_cm3_s: t.rr,
+            dr_per_cm3_s: t.dr,
+            photo_per_cm3_s: [0.; 3],
+            rr_kinetic_power_erg_cm3_s: t.rr_kinetic,
+            dr_kinetic_power_erg_cm3_s: t.dr_kinetic,
+            photo_heat_erg_cm3_s: [0.; 3],
+            photo_absorbed_power_erg_cm3_s: [0.; 3],
+        };
+        let mut thermal_power = 0.;
+        let mut escape_power = 0.;
+        for a in 0..3 {
+            let chi = gas.threshold_ev[a] * gas.ev_erg;
+            thermal_power -= t.ci[a] * chi + t.rr_kinetic[a];
+            escape_power += t.rr[a] * chi + t.rr_kinetic[a];
+        }
+        for k in 0..2 {
+            thermal_power -= t.dr_kinetic[k];
+            escape_power += t.dr[k] * gas.threshold_ev[1] * gas.ev_erg + t.dr_kinetic[k];
+        }
+        let mut photon_dot_ref = Vec::with_capacity(nodes.len());
+        let mut absorbed_number_ref = 0.;
+        let mut absorbed_energy_ref = 0.;
+        for (node, rates) in nodes.iter().zip(self.photo_by_node) {
+            let mut absorbed_ref = 0.;
+            for (a, event) in rates.into_iter().enumerate() {
+                if event > 0. && node.energy_ev < gas.threshold_ev[a] {
+                    return Err("CASE_A_PHOTO_EVENT_BELOW_THRESHOLD".into());
+                }
+                summary.photo_per_cm3_s[a] += event;
+                let heat = event * (node.energy_ev - gas.threshold_ev[a]) * gas.ev_erg;
+                summary.photo_heat_erg_cm3_s[a] += heat;
+                summary.photo_absorbed_power_erg_cm3_s[a] += event * node.energy_ev * gas.ev_erg;
+                thermal_power += heat;
+                absorbed_ref += event * volume;
+            }
+            photon_dot_ref.push(node.source_reference_cm3_s - absorbed_ref);
+            absorbed_number_ref += absorbed_ref;
+            absorbed_energy_ref += absorbed_ref * node.energy_ev * gas.ev_erg;
+        }
+        let mut net_edge =
+            std::array::from_fn::<_, 3, _>(|a| t.ci[a] - t.rr[a] + summary.photo_per_cm3_s[a]);
+        net_edge[1] -= t.dr.iter().sum::<f64>();
+        let internal_power = (0..3)
+            .map(|a| net_edge[a] * gas.threshold_ev[a] * gas.ev_erg)
+            .sum::<f64>();
+        if [
+            thermal_power,
+            internal_power,
+            escape_power,
+            absorbed_number_ref,
+            absorbed_energy_ref,
+        ]
+        .iter()
+        .chain(net_edge.iter())
+        .chain(photon_dot_ref.iter())
+        .any(|x| !x.is_finite())
+        {
+            return Err("CASE_A_EVENT_BUNDLE_OVERFLOW".into());
+        }
+        Ok(CaseALedger {
+            summary,
+            net_edge,
+            thermal_power,
+            internal_power,
+            escape_power,
+            photon_dot_ref,
+            absorbed_number_ref,
+            absorbed_energy_ref,
+        })
+    }
+}
+
 fn scaled_residual(residual: f64, scale: f64) -> f64 {
     if scale == 0. {
         residual
@@ -102,7 +327,15 @@ fn scaled_residual(residual: f64, scale: f64) -> f64 {
     }
 }
 
+#[cfg(test)]
 fn rhs(input: &ConditionalStage) -> Result<Vec<f64>, String> {
+    Ok(detailed_rhs(input, &Ft03CaseAProvider)?.rhs)
+}
+
+fn detailed_rhs(
+    input: &ConditionalStage,
+    thermal_provider: &impl ThermalEventProvider,
+) -> Result<ConditionalEvaluation, String> {
     let geometry = AxisymmetricPoint::new(input.a_rel, input.b, input.h_per_s, input.s_per_s)
         .map_err(|e| e.to_string())?;
     let volume = input.a_rel.powi(3);
@@ -121,7 +354,7 @@ fn rhs(input: &ConditionalStage) -> Result<Vec<f64>, String> {
         escaped_erg_cm3: 0.,
     };
     // Exactly native RR/CI/DR and native thermal moments, evaluated at stage T.
-    let atomic = ft03_rhs(&model, &state).map_err(|e| e.to_string())?;
+    let thermal = thermal_provider.events(&model, &state)?;
     let [h, he1, he2] = input.fractions;
     let lower = [
         input.n_h_cm3 * (1. - h),
@@ -129,17 +362,13 @@ fn rhs(input: &ConditionalStage) -> Result<Vec<f64>, String> {
         input.n_he_cm3 * he1,
     ];
     let provider = AtomicProvider::reference();
-    let mut photo = [0.; 3];
+    let mut photo_by_node = Vec::with_capacity(input.nodes.len());
     let mut gamma = [0.; 3];
-    let mut photon_dot = Vec::with_capacity(input.nodes.len());
     let mut photon_number = 0.;
     let mut photon_energy = 0.;
     let mut photon_delta = 0.;
     let mut source_number_ref = 0.;
     let mut source_energy_ref = 0.;
-    let mut absorbed_number_ref = 0.;
-    let mut absorbed_energy_ref = 0.;
-    let mut photo_heat = 0.;
     for node in &input.nodes {
         if ![
             node.energy_ev,
@@ -158,7 +387,7 @@ fn rhs(input: &ConditionalStage) -> Result<Vec<f64>, String> {
         }
         let number = node.number_reference_cm3 / volume;
         let energy = node.energy_ev * gas.ev_erg;
-        let mut absorbed_ref = 0.;
+        let mut node_events = [0.; 3];
         for (a, absorber) in ABSORBERS.iter().enumerate() {
             let sigma = provider
                 .cross_section(*absorber, node.energy_ev)
@@ -166,30 +395,29 @@ fn rhs(input: &ConditionalStage) -> Result<Vec<f64>, String> {
             let rate = gas.c_cm_s * sigma * number;
             let event = lower[a] * rate;
             gamma[a] += rate;
-            photo[a] += event;
-            absorbed_ref += event * volume;
-            photo_heat += event * (node.energy_ev - gas.threshold_ev[a]) * gas.ev_erg;
+            node_events[a] = event;
         }
-        photon_dot.push(node.source_reference_cm3_s - absorbed_ref);
+        photo_by_node.push(node_events);
         photon_number += number;
         photon_energy += number * energy;
         photon_delta += 0.5 * (3. * node.mu * node.mu - 1.) * number * energy;
         source_number_ref += node.source_reference_cm3_s;
         source_energy_ref += node.source_reference_cm3_s * energy;
-        absorbed_number_ref += absorbed_ref;
-        absorbed_energy_ref += absorbed_ref * energy;
     }
-    let mut j = std::array::from_fn::<_, 3, _>(|a| {
-        atomic.collision_per_cm3_s[a] - atomic.recombination_per_cm3_s[a] + photo[a]
-    });
-    j[1] -= atomic.dr_per_cm3_s.iter().sum::<f64>();
-    let thermal_power = atomic.derivative[3] + photo_heat;
-    let internal_power = (0..3)
-        .map(|a| j[a] * gas.threshold_ev[a] * gas.ev_erg)
-        .sum::<f64>();
+    let ledger = CaseAEventBundle {
+        thermal,
+        photo_by_node,
+    }
+    .into_ledger(gas, &input.nodes, volume)?;
+    let j = ledger.net_edge;
+    let thermal_power = ledger.thermal_power;
+    let internal_power = ledger.internal_power;
+    let photon_dot = ledger.photon_dot_ref;
+    let absorbed_number_ref = ledger.absorbed_number_ref;
+    let absorbed_energy_ref = ledger.absorbed_energy_ref;
     let photon_power = (source_energy_ref - absorbed_energy_ref) / volume;
     let source_power = source_energy_ref / volume;
-    let escape = atomic.escaped_energy_rate;
+    let escape = ledger.escape_power;
     let mut densities = [0.; 13];
     for (species, value) in [
         (IsotopeSpecies::H1Neutral, lower[0]),
@@ -288,7 +516,11 @@ fn rhs(input: &ConditionalStage) -> Result<Vec<f64>, String> {
     if output.iter().any(|x| !x.is_finite()) {
         return Err("RESULT_OVERFLOW".into());
     }
-    Ok(output)
+    Ok(ConditionalEvaluation {
+        rhs: output,
+        events: ledger.summary,
+        sources,
+    })
 }
 
 fn parse_f64(word: Option<&str>) -> Result<f64, String> {
@@ -334,7 +566,7 @@ fn native_command(line: &str, contract: &SourceBoundConditional) -> Result<Vec<f
             }
             values
         }
-        "RHS" => {
+        mode @ ("RHS" | "EVENTS") => {
             let mut p = [0.; 11];
             for value in &mut p {
                 *value = parse_f64(words.next())?;
@@ -353,7 +585,7 @@ fn native_command(line: &str, contract: &SourceBoundConditional) -> Result<Vec<f
                     source_reference_cm3_s: parse_f64(words.next())?,
                 });
             }
-            contract.evaluate(&ConditionalStage {
+            let stage = ConditionalStage {
                 time_s: p[0],
                 a_rel: p[1],
                 b: p[2],
@@ -364,7 +596,12 @@ fn native_command(line: &str, contract: &SourceBoundConditional) -> Result<Vec<f
                 fractions: [p[7], p[8], p[9]],
                 w_ev_per_h: p[10],
                 nodes,
-            })?
+            };
+            if mode == "RHS" {
+                contract.evaluate(&stage)?
+            } else {
+                contract.evaluate_detailed(&stage)?.event_values()
+            }
         }
         _ => return Err("UNKNOWN_COMMAND".into()),
     };
@@ -377,6 +614,126 @@ fn native_command(line: &str, contract: &SourceBoundConditional) -> Result<Vec<f
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::cell::Cell;
+
+    struct InjectOneRr {
+        calls: Cell<usize>,
+        delta: f64,
+        kinetic_ev: f64,
+    }
+
+    impl ThermalEventProvider for InjectOneRr {
+        fn events(
+            &self,
+            model: &Ft03Model,
+            state: &HHeState,
+        ) -> Result<ThermalCaseAEvents, String> {
+            self.calls.set(self.calls.get() + 1);
+            let mut events = Ft03CaseAProvider.events(model, state)?;
+            events.rr[2] += self.delta;
+            events.rr_kinetic[2] += self.delta * self.kinetic_ev * model.gas.ev_erg;
+            Ok(events)
+        }
+    }
+
+    #[test]
+    fn injected_heiii_rr_event_is_consumed_once_by_actual_axi_rhs() {
+        let stage = fixture();
+        let baseline = detailed_rhs(&stage, &Ft03CaseAProvider).unwrap();
+        // A manufactured source perturbation, not an alternative physical rate.
+        let provider = InjectOneRr {
+            calls: Cell::new(0),
+            delta: 1e-12,
+            kinetic_ev: 7.,
+        };
+        let changed = detailed_rhs(&stage, &provider).unwrap();
+        assert_eq!(provider.calls.get(), 1);
+        let delta = provider.delta;
+        let g = Ft03Model::controlled().unwrap().gas;
+        let a = baseline.sources;
+        let b = changed.sources;
+        for (species, factor) in [
+            (IsotopeSpecies::H1Neutral, 0.),
+            (IsotopeSpecies::H1Ionized, 0.),
+            (IsotopeSpecies::He4Neutral, 0.),
+            (IsotopeSpecies::He4SinglyIonized, 1.),
+            (IsotopeSpecies::He4DoublyIonized, -1.),
+        ] {
+            let difference =
+                (b.species_m3_s[species as usize] - a.species_m3_s[species as usize]) / 1e6;
+            assert!((difference / delta - factor).abs() <= 2e-12);
+        }
+        close((b.electron_m3_s - a.electron_m3_s) / 1e6, -delta);
+        close(changed.rhs[1] - baseline.rhs[1], delta / stage.n_he_cm3);
+        close(changed.rhs[2] - baseline.rhs[2], -delta / stage.n_he_cm3);
+        close(
+            changed.rhs[3] - baseline.rhs[3],
+            -delta * provider.kinetic_ev / stage.n_h_cm3,
+        );
+        close(
+            (b.internal_power_j_m3_s - a.internal_power_j_m3_s) * 10.,
+            -delta * g.threshold_ev[2] * g.ev_erg,
+        );
+        close(
+            (b.thermal_power_j_m3_s - a.thermal_power_j_m3_s) * 10.,
+            -delta * provider.kinetic_ev * g.ev_erg,
+        );
+        close(
+            (b.escape_power_j_m3_s - a.escape_power_j_m3_s) * 10.,
+            delta * (g.threshold_ev[2] + provider.kinetic_ev) * g.ev_erg,
+        );
+        assert_eq!(b.photon_number_m3_s, a.photon_number_m3_s);
+        assert_eq!(b.photon_power_j_m3_s, a.photon_power_j_m3_s);
+        assert_eq!(b.external_power_j_m3_s, a.external_power_j_m3_s);
+        assert_eq!(changed.rhs[14..], baseline.rhs[14..]);
+        assert!(changed.rhs[12].abs() < 1e-14 && changed.rhs[13].abs() < 1e-14);
+    }
+
+    #[test]
+    fn event_diagnostics_are_from_the_consumed_bundle_and_keep_units() {
+        let contract = SourceBoundConditional::bind(&FROZEN_INPUT_SHA256).unwrap();
+        let stage = fixture();
+        let evaluated = contract.evaluate_detailed(&stage).unwrap();
+        assert_eq!(evaluated.event_values().len(), 37);
+        assert_eq!(evaluated.rhs, contract.evaluate(&stage).unwrap());
+        let physical = Ft03Model::controlled().unwrap();
+        let expected = ft03_rhs(&physical, &physical.initial_state()).unwrap();
+        for a in 0..3 {
+            close(
+                evaluated.events.photo_per_cm3_s[a],
+                expected.photo_per_cm3_s[a].iter().sum(),
+            );
+            close(
+                evaluated.events.rr_kinetic_power_erg_cm3_s[a],
+                expected.rr_kinetic_power_erg_cm3_s[a],
+            );
+        }
+        for k in 0..2 {
+            close(
+                evaluated.events.dr_kinetic_power_erg_cm3_s[k],
+                expected.dr_kinetic_power_erg_cm3_s[k],
+            );
+        }
+        let values = evaluated.event_values();
+        close(values[27], evaluated.sources.electron_m3_s / 1e6);
+        close(values[30], evaluated.sources.thermal_power_j_m3_s * 10.);
+        close(values[32], evaluated.sources.escape_power_j_m3_s * 10.);
+        assert_eq!(values[34], evaluated.rhs[11]);
+    }
+
+    #[test]
+    fn negative_event_provider_is_rejected_before_source_consumption() {
+        let provider = InjectOneRr {
+            calls: Cell::new(0),
+            delta: -1.,
+            kinetic_ev: 7.,
+        };
+        assert_eq!(
+            detailed_rhs(&fixture(), &provider).unwrap_err(),
+            "CASE_A_EVENT_BUNDLE_DOMAIN"
+        );
+        assert_eq!(provider.calls.get(), 1);
+    }
 
     fn bound_command(line: &str) -> Result<Vec<f64>, String> {
         let mut session = ConditionalSession::default();
