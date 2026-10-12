@@ -1,3 +1,20 @@
+# 현재 통합 개발계획 — 2026-10-12 원자물리 재사용 중심 개편
+
+**다음 실행 묶음은 RUX-P0: 기존 결합 수치 골격에 한 EoR 시나리오의 rate/domain·time/source 입력을 연결하고 첫 FLRW coupled interval까지 진행하는 작업이다.**
+
+- [현재 통합 개발계획](REI-ATOMIC-REUSE-RESET-20261012/README_KO.md)
+- [다음 실행 인계](REI-ATOMIC-REUSE-RESET-20261012/CODEX_START_KO.md)
+- [17개 RUX 의무와 실행 묶음](REI-ATOMIC-REUSE-RESET-20261012/PLAN.json)
+- [활성 포인터](CURRENT_PLAN.json)
+
+기본 H/He rate·흡수/가열·implicit stage·수송은 재사용할 core다. EoR용 rate/domain과 실제 시간·광원 연결은 새 구현 의무이며 guard/admission flag 변경으로 대신하지 않는다. 입력·owner 점검은 한 scenario의 국소 조건이다. PR104·F08·SYNC03와 prescribed 수송/Thomson은 독립 대조 경로로 유지한다. FT-B1A의 선행 완료를 main coupled 경로에 요구하지 않는다.
+
+17개 신규 RUX 과학 노드는 아직 NOT_RUN이다. PHYS36과 C12 full-history/정밀 인증은 비차단 선택 경로이고 기존 결과·소진 예산·HOLD/FAIL을 보존한다. 다른 owner의 연구·외부 job을 정지시키는 지시가 아니다.
+
+아래는 앞선 계획과 동기화 원문이다. 우선순위·다음 실행·일괄 환경 지시는 위 현재 계획이 대체하며, 과거 과학 증거와 적용 범위는 보존한다.
+
+---
+
 # 현재 개발계획 — 2026-10-12 SCIENTIFIC_FAST_TRACK_RESET
 
 **다음 필수 작업은 FT-B1A: PR104의 기존 reduced history를 PR83 Bianchi ray/packet 수송에 연결해 방향별 intensity·quadrupole 결과를 만드는 일이다.**
