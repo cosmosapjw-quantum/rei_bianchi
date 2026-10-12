@@ -1,0 +1,115 @@
+//! Conditional FT03 gas/primary-packet stage. Packet energies are fixed here;
+//! geometry, emission, and spectral transport belong to the enclosing history.
+use crate::*;
+
+const CHI: [f64; 3] = [13.598_434_599_702, 24.587_389_011, 54.417_76];
+fn fail(code: &'static str) -> ForwardError {
+    ForwardError::InvalidInput(code)
+}
+fn ie(_: impl std::fmt::Debug) -> ForwardError {
+    fail("PRIMARY_INTERVAL_DOMAIN")
+}
+
+#[derive(Clone, Debug)]
+pub struct PrimaryPacket {
+    pub energy_ev: f64,
+    pub per_h: f64,
+}
+#[derive(Clone, Debug)]
+pub struct PrimaryState {
+    pub fractions: [f64; 3],
+    pub w_ev_per_h: f64,
+    pub escape_ev_per_h: f64,
+    pub packets: Vec<PrimaryPacket>,
+}
+#[derive(Clone, Copy, Debug)]
+pub struct PrimaryStage {
+    pub n_h_cm3: f64,
+    pub f_he: f64,
+    pub h_mean_per_s: f64,
+}
+#[derive(Clone, Debug)]
+pub struct PrimaryEvents {
+    pub photo_per_h: Vec<[f64; 3]>,
+    pub collision_per_h: [f64; 3],
+    pub recombination_per_h: [f64; 3],
+    pub dr_per_h: [f64; 2],
+    pub thermal_work_ev_per_h: f64,
+}
+#[derive(Clone, Debug)]
+pub struct PrimaryStep {
+    pub state: PrimaryState,
+    pub events: PrimaryEvents,
+    pub iterations: usize,
+    pub residual: f64,
+}
+#[derive(Clone, Debug)]
+pub struct PrimaryBox {
+    pub gas: [Interval; 4],
+    pub photons: Vec<Interval>,
+}
+#[derive(Clone, Debug)]
+pub struct PrimaryRoot {
+    pub centre: [f64; 4],
+    pub gas: [Interval; 4],
+    pub photons: Vec<Interval>,
+    pub preconditioner: [[f64; 4]; 4],
+    pub q: f64,
+}
+
+fn model(stage: &PrimaryStage) -> Result<Ft03Model, ForwardError> {
+    if !stage.n_h_cm3.is_finite()
+        || stage.n_h_cm3 <= 0.0
+        || !stage.f_he.is_finite()
+        || stage.f_he <= 0.0
+        || !stage.h_mean_per_s.is_finite()
+        || stage.h_mean_per_s < 0.0
+        || !(stage.n_h_cm3 * stage.f_he).is_finite()
+        || stage.n_h_cm3 * stage.f_he == 0.0
+    {
+        return Err(fail("PRIMARY_STAGE_DOMAIN"));
+    }
+    let mut m = Ft03Model::controlled()?;
+    m.gas.n_h_cm3 = stage.n_h_cm3;
+    m.gas.n_he_cm3 = stage.n_h_cm3 * stage.f_he;
+    Ok(m)
+}
+fn signatures(old: &PrimaryState) -> Result<Vec<[f64; 3]>, ForwardError> {
+    let provider = AtomicProvider::reference();
+    old.packets
+        .iter()
+        .map(|p| {
+            if !p.energy_ev.is_finite()
+                || p.energy_ev <= 0.0
+                || !p.per_h.is_finite()
+                || p.per_h < 0.0
+            {
+                return Err(fail("PRIMARY_PACKET_DOMAIN"));
+            }
+            Ok([
+                provider.cross_section(Absorber::HI, p.energy_ev)?,
+                provider.cross_section(Absorber::HeI, p.energy_ev)?,
+                provider.cross_section(Absorber::HeII, p.energy_ev)?,
+            ])
+        })
+        .collect()
+}
+fn valid(m: &Ft03Model, s: &PrimaryState) -> Result<f64, ForwardError> {
+    let [x, a, b] = s.fractions;
+    if !x.is_finite()
+        || x < 0.0
+        || x > 1.0
+        || !a.is_finite()
+        || a < 0.0
+        || !b.is_finite()
+        || b < 0.0
+        || a + b > 1.0
+        || !s.w_ev_per_h.is_finite()
+        || s.w_ev_per_h <= 0.0
+        || !s.escape_ev_per_h.is_finite()
+        || s.escape_ev_per_h < 0.0
+    {
+        return Err(fail("PRIMARY_STATE_DOMAIN"));
+    }
+    let g = &m.gas;
+    let particles = 1.0 + g.n_he_cm3 / g.n_h_cm3 + x + g.n_he_cm3 / g.n_h_cm3 * (a + 2.0 * b);
