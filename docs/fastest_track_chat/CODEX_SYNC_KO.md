@@ -1,3 +1,17 @@
+# 현재 개발계획 — 2026-10-12 SCIENTIFIC_FAST_TRACK_RESET
+
+**다음 필수 작업은 FT-B1A: PR104의 기존 reduced history를 PR83 Bianchi ray/packet 수송에 연결해 방향별 intensity·quadrupole 결과를 만드는 일이다.**
+
+- [수정 개발계획](REI-FASTTRACK-RESET-20261012/README_KO.md)
+- [다음 실행 인계](REI-FASTTRACK-RESET-20261012/CODEX_START_KO.md)
+- [현재 계획 포인터](CURRENT_PLAN.json)
+
+Full native·정밀 원자 이력과 PHYS36은 비차단 선택 경로다. PHYS36은 DEFERRED_NONBLOCKING / NOT_RUN이며, PHYS35 결과·소진 예산·기존 HOLD/FAIL은 유지한다. 첫 collisionless 결과와 실제 xe 의존 Thomson 결과를 구분한다. 계획 수정 세션에서는 새 물리 계산을 실행하지 않았다.
+
+아래의 과거 동기화 본문은 그대로 보존한다. 그 안의 다음 작업 우선순위, native 선행 조건, 일괄 CODEX_ONLY 환경 가정은 현재 실행의 지시로 사용하지 말고 위의 현재 계획을 따른다. 기존 증거·물리 제한·실패 기록은 여전히 유효하다. 다른 PR 소유자의 독립 작업이나 실행 중인 외부 작업을 취소하는 지시는 아니다.
+
+---
+
 # Fastest-track ChatGPT ↔ Codex 동기화
 
 2026-10-05 추가완료: REI-F07 prospectiveS0사전등록. source13.7eV/5e-15photon/H/s,IC50000K/정해진분율,meanH1e-14/s,epsilon0.01,구간1e13s를pairedobservable전고정했다. compactsource tailnumber/energy0은정의상정확하며physicalSED오차주장이아니다. CaseAexplicitescape/primary-only/CR-HH-RCT-off의비관측실험이다. 실제binding과Vernercutoff의별도문턱/crossing,진짜FT03Tguard,양의정수grid/normalizedweights,양의상수/EOS를직접검증했다. 독립review2major+2minor를Host한번수리하고12개finalassertionsPASS; 원후보/실패/원screening을보존하며최종수정bytes의재독립리뷰는없다. native1dispatch/known871086tokens/costNOT_MEASURED,CODEX_ONLY. pairedhistory0,physicalaccuracy/secondary/coolingerrorNOT_MEASURED,temperatureguardnotproveninvariant,scientificHOLD. 상세runtime_returns/REI-F07.json. 다음CodexREI-F04의actualparent/root/remainder로계속간다. 최신수신69fd2901의FLRW05N/Uclosure는이론/finite독립reference이며nativeexpanding아니다. 그CONCURRENT_SOURCE_ACK에서F06반환/실제source의연구측수신을확인했다. 다음연구FLRW06native spectral-stage와CodexF06collisionless는별개다. 직접브라우저전달은여전히미완료다.
