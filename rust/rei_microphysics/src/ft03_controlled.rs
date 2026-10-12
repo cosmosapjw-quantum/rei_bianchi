@@ -1,10 +1,10 @@
 //! Source bound, temperature dependent FT03 controlled H/He successor.
 //! Photon number and thermal energy use proper cm^-3 units throughout.
+use crate::he_rct::{combined_ft03_rhs, ClosedRctLedger, RctSelection};
 use crate::{
     ft03_rates::ft03_coefficients, Absorber, AtomicProvider, ForwardError, HHeModel, HHeState,
     StepControl,
 };
-use crate::he_rct::{combined_ft03_rhs, ClosedRctLedger, RctSelection};
 
 pub const FT03_MODEL_ID: &str = "REI_FT03_HG_RATE_MOMENT_CASE_A_CONTROLLED_V1";
 
@@ -234,8 +234,14 @@ impl Ft03RctLedger {
             escaped_photons_per_cm3: self.escaped_photons_per_cm3 + other.escaped_photons_per_cm3,
             escaped_energy_erg_cm3: self.escaped_energy_erg_cm3 + other.escaped_energy_erg_cm3,
         };
-        if [result.events_per_cm3, result.escaped_photons_per_cm3,
-            result.escaped_energy_erg_cm3].iter().any(|x| !x.is_finite() || *x < 0.0) {
+        if [
+            result.events_per_cm3,
+            result.escaped_photons_per_cm3,
+            result.escaped_energy_erg_cm3,
+        ]
+        .iter()
+        .any(|x| !x.is_finite() || *x < 0.0)
+        {
             return Err(ForwardError::InvalidInput("RCT_STEP_LEDGER_OVERFLOW"));
         }
         Ok(result)
@@ -250,8 +256,11 @@ pub struct Ft03RctStep {
 
 /// The historical RHS wrapper permits scalar underflow. The opt-in step has
 /// the stricter FT03 product policy, without changing that wrapper or OFF calls.
-fn selected_rhs(model: &Ft03Model, state: &HHeState, selection: RctSelection)
-    -> Result<(Ft03Rhs, Option<ClosedRctLedger>), ForwardError> {
+fn selected_rhs(
+    model: &Ft03Model,
+    state: &HHeState,
+    selection: RctSelection,
+) -> Result<(Ft03Rhs, Option<ClosedRctLedger>), ForwardError> {
     let (provider, closure) = match selection {
         RctSelection::Disabled => return Ok((ft03_rhs(model, state)?, None)),
         RctSelection::Escaping { provider, closure } => (provider, closure),
@@ -270,9 +279,14 @@ fn selected_rhs(model: &Ft03Model, state: &HHeState, selection: RctSelection)
     Ok((combined.combined, combined.rct))
 }
 
-fn integrated_rct(rct: Option<ClosedRctLedger>, dt: f64, model: &Ft03Model)
-    -> Result<Ft03RctLedger, ForwardError> {
-    let Some(rct) = rct else { return Ok(Ft03RctLedger::default()); };
+fn integrated_rct(
+    rct: Option<ClosedRctLedger>,
+    dt: f64,
+    model: &Ft03Model,
+) -> Result<Ft03RctLedger, ForwardError> {
+    let Some(rct) = rct else {
+        return Ok(Ft03RctLedger::default());
+    };
     let j = checked_product(&[dt, rct.event.event_rate_cm3_s])?;
     let q = rct.event.q_ev;
     let mean = rct.mean_escaped_photon_energy_ev;
@@ -280,8 +294,11 @@ fn integrated_rct(rct: Option<ClosedRctLedger>, dt: f64, model: &Ft03Model)
     checked_product(&[j, q, ev])?;
     checked_product(&[j, q - mean, ev])?;
     let escaped_energy = checked_product(&[j, mean, ev])?;
-    Ok(Ft03RctLedger { events_per_cm3: j, escaped_photons_per_cm3: j,
-        escaped_energy_erg_cm3: escaped_energy })
+    Ok(Ft03RctLedger {
+        events_per_cm3: j,
+        escaped_photons_per_cm3: j,
+        escaped_energy_erg_cm3: escaped_energy,
+    })
 }
 
 /// Final endpoint backward Euler residual; one source site for all seven
@@ -390,13 +407,16 @@ fn ft03_implicit_step_selected(
         return Err(ForwardError::InvalidInput("FT03_STEP_CONTROL"));
     }
     if dt == 0.0 {
-        return Ok(Ft03RctStep { step: Ft03Step {
-            state: *old,
-            events: Ft03Events::default(),
-            iterations: 0,
-            residual_norm: 0.0,
-            local_error: 0.0,
-        }, rct: Ft03RctLedger::default() });
+        return Ok(Ft03RctStep {
+            step: Ft03Step {
+                state: *old,
+                events: Ft03Events::default(),
+                iterations: 0,
+                residual_norm: 0.0,
+                local_error: 0.0,
+            },
+            rct: Ft03RctLedger::default(),
+        });
     }
     let g = &model.gas;
     let mut guess = *old;
@@ -439,7 +459,9 @@ fn ft03_implicit_step_selected(
         let c2 = dt * ion[2];
         let d = if let RctSelection::Escaping { .. } = selection {
             dt * (rr[2] + heiii_rct_loss)
-        } else { dt * rr[2] };
+        } else {
+            dt * rr[2]
+        };
         // All production terms are nonnegative at a helium boundary.
         let he1_next =
             (old.fractions[1] + he0_old * (a / (1.0 + a)) + old.fractions[2] * (d / (1.0 + d)))
@@ -454,15 +476,25 @@ fn ft03_implicit_step_selected(
         model.validate_state(&next)?;
         let (norm, events, rct) = be_endpoint_residual(model, old, &next, dt, selection)?;
         if norm < control.residual_tolerance {
-            check_invariants(model, old, &next, &events, &rct, selection,
-                control.residual_tolerance)?;
-            return Ok(Ft03RctStep { step: Ft03Step {
-                state: next,
-                events,
-                iterations: iteration,
-                residual_norm: norm,
-                local_error: 0.0,
-            }, rct });
+            check_invariants(
+                model,
+                old,
+                &next,
+                &events,
+                &rct,
+                selection,
+                control.residual_tolerance,
+            )?;
+            return Ok(Ft03RctStep {
+                step: Ft03Step {
+                    state: next,
+                    events,
+                    iterations: iteration,
+                    residual_norm: norm,
+                    local_error: 0.0,
+                },
+                rct,
+            });
         }
         guess = next;
     }
@@ -470,21 +502,31 @@ fn ft03_implicit_step_selected(
 }
 
 pub fn ft03_implicit_step(
-    model: &Ft03Model, old: &HHeState, dt: f64, control: StepControl,
+    model: &Ft03Model,
+    old: &HHeState,
+    dt: f64,
+    control: StepControl,
 ) -> Result<Ft03Step, ForwardError> {
     Ok(ft03_implicit_step_selected(model, old, dt, control, RctSelection::Disabled)?.step)
 }
 
 pub fn ft03_implicit_step_with_rct(
-    model: &Ft03Model, old: &HHeState, dt: f64, control: StepControl,
+    model: &Ft03Model,
+    old: &HHeState,
+    dt: f64,
+    control: StepControl,
     selection: RctSelection,
 ) -> Result<Ft03RctStep, ForwardError> {
     ft03_implicit_step_selected(model, old, dt, control, selection)
 }
 
 pub fn ft03_try_step_with_rct(
-    model: &Ft03Model, state: &mut HHeState, ledger: &mut Ft03RctLedger,
-    dt: f64, control: StepControl, selection: RctSelection,
+    model: &Ft03Model,
+    state: &mut HHeState,
+    ledger: &mut Ft03RctLedger,
+    dt: f64,
+    control: StepControl,
+    selection: RctSelection,
 ) -> Result<Ft03RctStep, ForwardError> {
     let result = ft03_implicit_step_selected(model, state, dt, control, selection)?;
     let updated = ledger.plus(result.rct)?;
@@ -539,19 +581,25 @@ pub fn ft03_adaptive_step(
 }
 
 pub fn ft03_adaptive_step_with_rct(
-    model: &Ft03Model, old: &HHeState, dt: f64, control: StepControl,
+    model: &Ft03Model,
+    old: &HHeState,
+    dt: f64,
+    control: StepControl,
     selection: RctSelection,
 ) -> Result<Ft03RctStep, ForwardError> {
     if let RctSelection::Disabled = selection {
-        return Ok(Ft03RctStep { step: ft03_adaptive_step(model, old, dt, control)?,
-            rct: Ft03RctLedger::default() });
+        return Ok(Ft03RctStep {
+            step: ft03_adaptive_step(model, old, dt, control)?,
+            rct: Ft03RctLedger::default(),
+        });
     }
     if dt == 0.0 {
         return ft03_implicit_step_selected(model, old, dt, control, selection);
     }
     let full = ft03_implicit_step_selected(model, old, dt, control, selection)?;
     let half1 = ft03_implicit_step_selected(model, old, dt / 2.0, control, selection)?;
-    let half2 = ft03_implicit_step_selected(model, &half1.step.state, dt / 2.0, control, selection)?;
+    let half2 =
+        ft03_implicit_step_selected(model, &half1.step.state, dt / 2.0, control, selection)?;
     let tf = model.gas.temperature(&full.step.state)?;
     let th = model.gas.temperature(&half2.step.state)?;
     let mut error = (tf.ln() - th.ln()).abs();
@@ -566,11 +614,14 @@ pub fn ft03_adaptive_step_with_rct(
         return Err(ForwardError::InvalidInput("FT03_OVERFLOW"));
     }
     let rct = half1.rct.plus(half2.rct)?;
-    Ok(Ft03RctStep { step: Ft03Step {
-        state: half2.step.state,
-        events,
-        iterations: full.step.iterations + half1.step.iterations + half2.step.iterations,
-        residual_norm: half1.step.residual_norm.max(half2.step.residual_norm),
-        local_error: error,
-    }, rct })
+    Ok(Ft03RctStep {
+        step: Ft03Step {
+            state: half2.step.state,
+            events,
+            iterations: full.step.iterations + half1.step.iterations + half2.step.iterations,
+            residual_norm: half1.step.residual_norm.max(half2.step.residual_norm),
+            local_error: error,
+        },
+        rct,
+    })
 }
