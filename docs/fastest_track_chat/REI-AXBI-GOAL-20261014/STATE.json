@@ -17,33 +17,58 @@
       "completion_scope": "Adopted goal documentation/current-result audit only"
     },
     "AX01": {
-      "status": "READY",
-      "evidence": [],
-      "scientific_work_status": "NOT_RUN",
-      "scientific_admission": "NOT_ISSUED"
+      "status": "COMPLETED",
+      "evidence": [
+        "research/axbi_goal_20261014/scenario/SCENARIO_LOCK.json",
+        "research/axbi_goal_20261014/scenario/CHOICE_RECEIPT.json"
+      ],
+      "scientific_work_status": "SCENARIO_SELECTED",
+      "scientific_admission": "NOT_ISSUED",
+      "completion_scope": "Authoritative conditional model selection; actual trajectory validation pending"
     },
     "AX02": {
-      "status": "READY",
-      "evidence": [],
-      "scientific_work_status": "NOT_RUN",
-      "scientific_admission": "NOT_ISSUED"
+      "status": "COMPLETED",
+      "evidence": [
+        "research/axbi_goal_20261014/provider/PROVIDER_DOMAIN_AND_OWNERS.json",
+        "research/axbi_goal_20261014/provider/IMPLEMENTATION_RECEIPT.json",
+        "research/axbi_goal_20261014/reviews/PREP_REVIEW.json"
+      ],
+      "scientific_work_status": "COMPONENT_PREPARATION_COMPLETE",
+      "scientific_admission": "NOT_ISSUED",
+      "completion_scope": "Implementation or report preparation only; targeted results recorded, independent prep review pending; no history admission",
+      "preparation_decision": "PASS_SCOPED_PREPARATION"
     },
     "AX03": {
-      "status": "READY",
-      "evidence": [],
-      "scientific_work_status": "NOT_RUN",
-      "scientific_admission": "NOT_ISSUED"
+      "status": "COMPLETED",
+      "evidence": [
+        "research/axbi_goal_20261014/background/BACKGROUND_FAMILY_LOCK.json",
+        "research/axbi_goal_20261014/background/VALIDITY_RECEIPT.json",
+        "research/axbi_goal_20261014/reviews/PREP_REVIEW.json",
+        "research/axbi_goal_20261014/background/raw/radiation_test.json",
+        "research/axbi_goal_20261014/reviews/SOURCE_FEEDBACK_PREP_REVIEW.json"
+      ],
+      "scientific_work_status": "COMPONENT_PREPARATION_COMPLETE",
+      "scientific_admission": "NOT_ISSUED",
+      "completion_scope": "Implementation or report preparation only; targeted results recorded, independent prep review pending; no history admission",
+      "preparation_decision": "PASS_SCOPED_PREPARATION"
     },
     "AX04": {
-      "status": "PENDING",
-      "evidence": [],
-      "scientific_work_status": "NOT_RUN",
-      "scientific_admission": "NOT_ISSUED"
+      "status": "COMPLETED",
+      "evidence": [
+        "research/axbi_goal_20261014/source/EMISSIVITY_CLOCK_LOCK.json",
+        "research/axbi_goal_20261014/source/OWNER_LEDGER.json",
+        "research/axbi_goal_20261014/source/IMPLEMENTATION_RECEIPT.json",
+        "research/axbi_goal_20261014/reviews/SOURCE_FEEDBACK_PREP_REVIEW.json"
+      ],
+      "scientific_work_status": "PREPARATION_COMPLETE",
+      "scientific_admission": "NOT_ISSUED",
+      "completion_scope": "Frozen selected model or component implementation; no trajectory admission",
+      "preparation_decision": "PASS_SCOPED_PREPARATION"
     },
     "AX05": {
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "evidence": [],
-      "scientific_work_status": "NOT_RUN",
+      "scientific_work_status": "IMPLEMENTATION_RUNNING",
       "scientific_admission": "NOT_ISSUED"
     },
     "AX06": {
@@ -89,10 +114,16 @@
       "scientific_admission": "NOT_ISSUED"
     },
     "AX13": {
-      "status": "READY",
-      "evidence": [],
-      "scientific_work_status": "NOT_RUN",
-      "scientific_admission": "NOT_ISSUED"
+      "status": "COMPLETED",
+      "evidence": [
+        "research/axbi_goal_20261014/report/manuscript.tex",
+        "research/axbi_goal_20261014/report/WORKING_REPORT_KO.md",
+        "research/axbi_goal_20261014/report/SOURCE_MANIFEST.json",
+        "research/axbi_goal_20261014/report/IMPLEMENTATION_RECEIPT.json"
+      ],
+      "scientific_work_status": "COMPONENT_PREPARATION_COMPLETE",
+      "scientific_admission": "NOT_ISSUED",
+      "completion_scope": "Implementation or report preparation only; targeted results recorded, independent prep review pending; no history admission"
     },
     "AX14": {
       "status": "PENDING",
@@ -200,13 +231,8 @@
       "owner_node": "AX16"
     }
   },
-  "publication_status": "PENDING_COORDINATOR",
-  "next_ready_ids": [
-    "AX01",
-    "AX02",
-    "AX03",
-    "AX13"
-  ],
+  "publication_status": "AUDIT_CHECKPOINT_PREPARING_NOT_FINAL_RELEASE",
+  "next_ready_ids": [],
   "durable_next_command": [
     "python3",
     "scripts/rux_codex/workflow.py",
@@ -218,7 +244,7 @@
   ],
   "requested_executor_model": "gpt-6.1-sol",
   "observed_runtime_model": null,
-  "state_rule": "Only AX00 documentation completed; no new physical work performed. Update node state with observed evidence, and scientific criteria separately under scoped review. Do not infer science or GOAL_DONE from file presence or empty ready list.",
+  "state_rule": "Node execution status follows actual artifacts; scientific criteria require separate scoped review. No scientific completion inferred from compilation, documentation, or publication.",
   "cumulative_budget_accounting": {
     "this_document_segment": {
       "wall_limit_seconds": 1800,
@@ -238,5 +264,39 @@
     "AX09",
     "AX10"
   ],
-  "flagship": "complete abundance histories and BBN-style proper-time/Tgas species plots"
+  "flagship": "complete abundance histories and BBN-style proper-time/Tgas species plots",
+  "active_agents": [
+    {
+      "agent": "/root/ax_authority",
+      "nodes": [
+        "AX01"
+      ],
+      "requested_model": "gpt-6-astra",
+      "requested_effort": "high",
+      "transport_request_accepted": true,
+      "observed_runtime_model": null
+    },
+    {
+      "agent": "/root/ax_provider",
+      "nodes": [
+        "AX02",
+        "AX13"
+      ],
+      "requested_model": "gpt-6.1-sol",
+      "requested_effort": "medium",
+      "transport_request_accepted": true,
+      "observed_runtime_model": null
+    },
+    {
+      "agent": "/root/ax_background",
+      "nodes": [
+        "AX05",
+        "AX03_FEEDBACK_HELPER"
+      ],
+      "requested_model": "gpt-6.1-sol",
+      "requested_effort": "medium",
+      "transport_request_accepted": true,
+      "observed_runtime_model": null
+    }
+  ]
 }

@@ -1,0 +1,133 @@
+{
+  "schema": "rux_codex_packet.v1",
+  "node": {
+    "id": "AX05",
+    "title": "COUPLED_DRIVER",
+    "depends_on": [
+      "AX02",
+      "AX03",
+      "AX04"
+    ],
+    "status": "PENDING",
+    "owner_repo": "rei_bianchi",
+    "write_paths": [
+      "rust/rei_microphysics/src/axbi_driver.rs",
+      "rust/rei_microphysics/src/lib.rs",
+      "rust/rei_microphysics/Cargo.toml",
+      "rust/rei_microphysics/tests/axbi_driver.rs",
+      "rust/rei_microphysics/examples/axbi_reionization.rs",
+      "research/axbi_goal_20261014/driver/"
+    ],
+    "read_first": [
+      "AGENTS.md",
+      "docs/fastest_track_chat/REI-AXBI-GOAL-20261014/GOAL.json",
+      "docs/fastest_track_chat/REI-AXBI-GOAL-20261014/OUTPUT_CONTRACT.json"
+    ],
+    "commands": [
+      [
+        "python3",
+        "scripts/rux_codex/workflow.py",
+        "--dag",
+        "docs/fastest_track_chat/REI-AXBI-GOAL-20261014/EXECUTION_DAG.json",
+        "packet",
+        "AX05",
+        "--state",
+        "docs/fastest_track_chat/REI-AXBI-GOAL-20261014/STATE.json"
+      ]
+    ],
+    "outputs": [
+      "research/axbi_goal_20261014/driver/DRIVER_BINDING.json",
+      "research/axbi_goal_20261014/driver/RUN_LIMITS.json",
+      "research/axbi_goal_20261014/driver/IMPLEMENTATION_RECEIPT.json",
+      "research/axbi_goal_20261014/driver/SPECIES_NORMALIZATION_REGISTRY.json"
+    ],
+    "acceptance": [
+      "Single shared-Rust integration owner registers dedicated modules, implements actual coupled energy/angular photon plus homogeneous H/He/thermal driver and checkpoint/resume seams.",
+      "Freeze actual science argv/config/source/limits before AX06; existing warm conditional entrypoint is a scoped seam, not a full-history driver.",
+      "Preserve no clipping/extrapolation and existing numerical/conservation gates; test changed seams with bounded tests, retain raw outcomes and failure receipts.",
+      "Register baseline neutral/ion H/He and electron plus all additional actually evolved nuclear/charge states. Enforce element sums, complete selected-model baryon inventory (H/He baseline n_H+4*n_He); tracked sum A_iY_i may be <1 with an explicit omitted reservoir, positivity and electron charge separately; derive neutral states without clipping.",
+      "Selected point and any root/interval path actually used must share physical model/domain; no old FT03 certificate inheritance. Validated point-implicit plus empirical convergence is permitted at labelled scope; no mandatory new global rigorous proof.",
+      "Bind donor unit-normal n·n=-1 in x0=ct to physical four-velocity U=c n, U·U=-c^2, with explicit donor convention and clock/unit conversion."
+    ],
+    "model_role": "Astra scientific authority; bounded lower-tier implementation",
+    "activation": true,
+    "external_requirements": [],
+    "scientific_admission": "NOT_ISSUED",
+    "science_argv": null,
+    "science_argv_status": "BIND_ACTUAL_DRIVER_AND_LIMITS_BEFORE_SCIENCE",
+    "next_on_success": [
+      "AX06"
+    ],
+    "budget": {
+      "wall_seconds": 1800,
+      "commands": 24,
+      "targeted_build_or_test_invocations": 2,
+      "solver_runs": 0,
+      "automatic_retries": 0,
+      "next_segment": "Coordinator allocates cumulatively within approved scope; science needs its own bound run receipt",
+      "scope": "PREPARATION_ONLY; bind separate finite execution allocation before any scientific run"
+    },
+    "stop_rule": "Return exact missing input/failure/capability. One concrete resolution/supply/repair task; independent ready tasks continue. No science PASS inferred from document presence."
+  },
+  "effective_status": "IN_PROGRESS",
+  "eligible": false,
+  "blockers": [],
+  "dependency_status": {
+    "AX02": "COMPLETED",
+    "AX03": "COMPLETED",
+    "AX04": "COMPLETED"
+  },
+  "required_context": [
+    {
+      "path": "AGENTS.md",
+      "exists": true,
+      "sha256": "ab29a05cac922bd393dc04f7f280a0d4e1d7289ae6ea24291f48fd7cf7b2e8eb",
+      "excerpt": "# Repository operating policy\n\n## Project classification and supported user\n\n`rei_bianchi` is a personal scientific-research codebase. It has one\ndeveloper/owner, and that owner is the only supported operator. The default\nenvironment is a trusted local account on a trusted local machine; this is not\na multi-user product, hosted service, or adversarial execution platform.\n\n## Default trust model\n\nUnless the owner explicitly requests a named security task, do not design,\nimplement, require, or report blockers for:\n\n- authentication, authorization, roles, account separation, or multi-tenant\n  isolation;\n- hostile same-UID users, malicious local repository configuration, adversarial\n  symlink/path replacement, or deliberate local artifact tampering;\n- anti-tamper ownership seals, signatures, attestations, custody state machines,\n  or redundant hash/manifest layers whose only purpose is adversarial defense;\n- product security reviews, automated security gates, dependency/supply-chain\n  hardening, secret-scanning infrastructure, or security compliance;\n- production-service availability, abuse resistance, or untrusted-input\n  hardening that has no concrete role in the owner's research workflow.\n\nThe absence of those mechanisms is not an issue, blocker, promotion gate, or\nacceptance failure for this repository. Do not introduce them speculatively.\n\n## Research-integrity boundary\n\nRetain only controls that directly support scientific correctness,\nreproducibility, recovery, or diagnosis, such as exact model/input/configuration\nidentity, deterministic seeds, raw-result preservation, numerical invariants,\nand minimal hashes or manifests needed to detect accidental corruption. Treat\nthese as research-integrity tools, not as adversarial security or anti-tamper\nrequirements, and keep them proportional to the scientific claim.\n\nHistorical receipts, manifests, and audit records remain valid evidence of the\nwork that produced them; this policy does not require deleting or rewriting\nthem. It does prevent their security-oriented machinery from becoming a\ndefault requirement for new work.\n\n## Baseline operational safety\n\nPlatform/system instructions, explicit user scope, credential privacy,\nnon-destructive filesystem practice, and external-service authorization still\napply. These are execution boundaries for the assistant, not project-level\nproduct security features. Do not add repository security settings or gates\nunless the owner explicitly asks for them.\n\nPrioritize physics validity, numerical correctness, algorithmic quality,\nreproducibility, performance, and clear scientific claim boundaries.\n\n<!-- BEGIN UNIVERSAL_EXECUTION_TRANSITION_POLICY -->\n## Execution-transition and anti-bureaucracy policy\n\nThis policy limits optional process expansion. It does not weaken explicit\nuser requirements, destructive-action safeguards, frozen scientific inputs,\nor claim-admission ceilings.\n\n> **Execution-transition rule:** Prevent the permanent-blocker attractor in which repair generates new review surfaces and fresh review continuously discovers adjacent defects without reaching execution. Nonexecution is itself a failure mode: two substantial process-only cycles trigger `PROCESS_STARVATION`. Separate execution permission from claim admission—fail closed on authoritative claims, not on exploratory progress. A blocked state must not leave documentation as the only unlimited action; perform the smallest repair, use a safe exploratory path, defer, or stop. Define a finite trust boundary so verification does not recursively verify its own machinery on every run. Do not mistake contracts, manifests, hashes, reviews, or audit documents for user utility. Every mandatory gate must have a positive `PASS → next executable action` transition and every review loop must have a stopping rule. Distinguish severity from current-task blocking relevance. Real defects receive one targeted repair and regression test; they do not automatically justify new governance layers. If ",
+      "excerpt_truncated": true,
+      "read_full_source_required": true
+    },
+    {
+      "path": "docs/fastest_track_chat/REI-AXBI-GOAL-20261014/GOAL.json",
+      "exists": true,
+      "sha256": "8c69ff9afe54ccce97b9a3ee3d4f29ee005d26db9cd2deba2d3b91017f45d04e",
+      "excerpt": "{\n  \"schema\": \"rei.axbi.goal.v1\",\n  \"goal_id\": \"REI-AXBI-GOAL-20261014\",\n  \"adoption\": \"ADOPTED_USER_GOAL\",\n  \"goal_status\": \"IN_PROGRESS\",\n  \"scientific_admission\": \"NOT_ISSUED\",\n  \"date\": \"2026-10-14\",\n  \"objective\": \"Complete reionization abundance histories in a non-tilted axisymmetric Bianchi I universe and BBN-style species/ion abundance plots versus proper cosmic time and gas temperature\",\n  \"workspace\": {\n    \"repo\": \"rei_bianchi\",\n    \"base_commit\": \"477f3756044df89ff63cceb6b432e63015c07f0a\",\n    \"existing_checkout\": true,\n    \"local_branch\": \"codex/axisymmetric-reionization-goal-20261014\",\n    \"publish_branch\": \"codex/rux-science-delivery-20261014\",\n    \"pull_request\": 117\n  },\n  \"current_delivery\": {\n    \"scope\": \"Add/modify goal-driven DAG and machine-readable planning documents, then authorized publication by coordinator\",\n    \"science_solver_runs\": 0,\n    \"planning_publication_is_goal_completion\": false\n  },\n  \"physics_contract\": {\n    \"metric\": \"ds^2=-c^2 dt^2+a^2[exp(-2b)(dx^2+dy^2)+exp(4b)dz^2]\",\n    \"scale_factors\": {\n      \"a_perp\": \"a exp(-b)\",\n      \"a_parallel\": \"a exp(2b)\"\n    },\n    \"shear\": {\n      \"s\": \"db/dt\",\n      \"directional_H\": [\n        \"H-s\",\n        \"H-s\",\n        \"H+2s\"\n      ],\n      \"sigma_squared\": \"3 s^2\",\n      \"q_ref\": \"s_*/H_FLRW(a_*); signed case parameter at locked reference epoch, not instantaneous Sigma\",\n      \"Sigma\": \"s/H; instantaneous normalized shear evaluated along each trajectory; distinct from q_ref\",\n      \"q_amp\": \"positive maximum amplitude selected in AX01/AX03; primary q_ref in {0,+q_amp/2,-q_amp/2,+q_amp,-q_amp}\"\n    },\n    \"gas_frame\": \"Non-tilted unit normal n with n·n=-1 in x0=ct convention; physical four-velocity U=c n and U·U=-c^2; metric (-,+,+,+). Explicitly map each donor four-velocity/clock convention to this representation.\",\n    \"background_primary\": {\n      \"fixed_inputs\": \"same physical matter/radiation densities and Lambda for the physical family\",\n      \"friedmann\": \"H^2=H_FLRW^2+s^2\",\n      \"shear_evolution\": \"s proportional to a^-3\",\n      \"approximation\": \"stress-free prescribed/test-field background\",\n      \"required_validity\": \"Quantify and justify omitted radiation anisotropic-stress/geometry feedback over the selected trajectory; radiation quadrupole remains in RT\"\n    },\n    \"counterfactual\": {\n      \"SAME_H\": \"separate diagnostic with mean H held to its declared reference; never substitute for the primary physical-density-fixed family\"\n    },\n    \"photon_characteristics\": {\n      \"dE_dt\": \"-E[H+s(3mu^2-1)]\",\n      \"dmu_dt\": \"-3s mu(1-mu^2)\"\n    },\n    \"matter\": \"homogeneous non-equilibrium H/He, thermal evolution, energy/angular photons\",\n    \"radiation_baseline\": \"isotropic proper-frame emissivity and isotropic initial radiation; both reflection-even in mu with symmetric microphysics\",\n    \"parity_scope\": \"Axisymmetry alone does not imply vanishing dipole/force. Under the declared reflection-even baseline check J1 and net axial radiation force against the locked numerical tolerance; preserve non-tilted gas approximation\",\n    \"angular_outputs\": [\n      \"mean\",\n      \"quadrupole\",\n      \"parity-scope J1/axial-force residual\"\n    ],\n    \"electron_census\": \"ne=nH*(xHII+fHe*(xHeII+2*xHeIII)); nH and ne proper cm^-3, fHe=nHe/nH; no extra Q factor\",\n    \"fixed_time_thomson\": \"tau_segment=c sigma_T integral ne(t) dt; cold comoving fixed cosmic-time segment is direction independent\",\n    \"observed_redshift\": \"ray-defined observed-z endpoint surfaces may be directional; zbar=a^-1-1 is not observed redshift\",\n    \"unknown_tail\": null,\n    \"optional_processes\": {\n      \"CR\": \"OFF\",\n      \"HH\": \"OFF\",\n      \"RCT\": \"OFF\"\n    },\n    \"not_mandatory\": [\n      \"all 11 Bianchi types\",\n      \"tilt\",\n      \"full/polarized sky\",\n      \"posterior inference\",\n      \"full tau or observational fit without a valid tail\"\n    ],\n    \"forbidden_inference\": [\n      \"homogeneous xHII equals QV\",\n      \"exact scalar plus/minus shear symmetry\",\n      \"retained synthetic end",
+      "excerpt_truncated": true,
+      "read_full_source_required": true
+    },
+    {
+      "path": "docs/fastest_track_chat/REI-AXBI-GOAL-20261014/OUTPUT_CONTRACT.json",
+      "exists": true,
+      "sha256": "6d52963fc3bfe5dab9b78353c539ef38b87d9e0217495b2ccb6a5ce535cfca57",
+      "excerpt": "{\n  \"schema\": \"rei.axbi.output_contract.v1\",\n  \"goal_id\": \"REI-AXBI-GOAL-20261014\",\n  \"science_status\": \"NOT_RUN\",\n  \"units_policy\": \"All numerical records specify frame, proper/comoving convention, clock origin and normalization; use explicit c,k_B and locked sigma_T.\",\n  \"tables\": {\n    \"history.csv\": {\n      \"columns\": [\n        {\n          \"name\": \"case_id\",\n          \"unit\": \"1\",\n          \"semantics\": \"frozen source/scenario/background/run identity\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"q_ref\",\n          \"unit\": \"1\",\n          \"semantics\": \"fixed campaign amplitude s_*/H_FLRW(a_*) at locked reference epoch; not instantaneous Sigma=s/H\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"Sigma\",\n          \"unit\": \"1\",\n          \"semantics\": \"instantaneous s/H along trajectory; distinct from fixed q_ref=s_*/H_FLRW(a_*)\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"time_s\",\n          \"unit\": \"s\",\n          \"semantics\": \"proper seconds with explicit origin\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"a\",\n          \"unit\": \"1\",\n          \"semantics\": \"mean scale factor in locked normalization\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"zbar\",\n          \"unit\": \"1\",\n          \"semantics\": \"a^-1-1; not observed redshift\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"b\",\n          \"unit\": \"1\",\n          \"semantics\": \"axisymmetric anisotropy\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"H_per_s\",\n          \"unit\": \"s^-1\",\n          \"semantics\": \"mean Hubble rate\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"s_per_s\",\n          \"unit\": \"s^-1\",\n          \"semantics\": \"db/dt\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"x_HII\",\n          \"unit\": \"1\",\n          \"semantics\": \"local homogeneous hydrogen ion fraction, not QV\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"x_HeII\",\n          \"unit\": \"1\",\n          \"semantics\": \"helium singly ionized fraction\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"x_HeIII\",\n          \"unit\": \"1\",\n          \"semantics\": \"helium doubly ionized fraction\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"nH_proper_cm3\",\n          \"unit\": \"cm^-3\",\n          \"semantics\": \"proper hydrogen nuclei density\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"ne_proper_cm3\",\n          \"unit\": \"cm^-3\",\n          \"semantics\": \"H/He charge-census solved electron density\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"temperature_K\",\n          \"unit\": \"K\",\n          \"semantics\": \"gas thermal state\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"Gamma_HI_per_s\",\n          \"unit\": \"s^-1\",\n          \"semantics\": \"species-resolved photoionization rate\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"Gamma_HeI_per_s\",\n          \"unit\": \"s^-1\",\n          \"semantics\": \"species-resolved photoionization rate\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"Gamma_HeII_per_s\",\n          \"unit\": \"s^-1\",\n          \"semantics\": \"species-resolved photoionization rate\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"photon_n_per_H\",\n          \"unit\": \"H^-1\",\n          \"semantics\": \"photon count per hydrogen nucleus\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"photon_u_eV_per_H\",\n          \"unit\": \"eV/H\",\n          \"semantics\": \"photon energy per hydrogen nucleus\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"J0_photon_u_eV_per_H\",\n          \"unit\": \"eV/H\",\n          \"semantics\": \"U_0=(1/nH_proper)*integral E*J_0(E,t) dE; solid-angle-integrated Legendre energy moment per H, not angular mean\",\n          \"nullable\": false\n        },\n        {\n          \"name\": \"J1_photon_u_eV_per_H\",\n ",
+      "excerpt_truncated": true,
+      "read_full_source_required": true
+    }
+  ],
+  "return_contract": {
+    "node_id": "AX05",
+    "required_outputs": [
+      "research/axbi_goal_20261014/driver/DRIVER_BINDING.json",
+      "research/axbi_goal_20261014/driver/RUN_LIMITS.json",
+      "research/axbi_goal_20261014/driver/IMPLEMENTATION_RECEIPT.json",
+      "research/axbi_goal_20261014/driver/SPECIES_NORMALIZATION_REGISTRY.json"
+    ],
+    "acceptance_verbatim": [
+      "Single shared-Rust integration owner registers dedicated modules, implements actual coupled energy/angular photon plus homogeneous H/He/thermal driver and checkpoint/resume seams.",
+      "Freeze actual science argv/config/source/limits before AX06; existing warm conditional entrypoint is a scoped seam, not a full-history driver.",
+      "Preserve no clipping/extrapolation and existing numerical/conservation gates; test changed seams with bounded tests, retain raw outcomes and failure receipts.",
+      "Register baseline neutral/ion H/He and electron plus all additional actually evolved nuclear/charge states. Enforce element sums, complete selected-model baryon inventory (H/He baseline n_H+4*n_He); tracked sum A_iY_i may be <1 with an explicit omitted reservoir, positivity and electron charge separately; derive neutral states without clipping.",
+      "Selected point and any root/interval path actually used must share physical model/domain; no old FT03 certificate inheritance. Validated point-implicit plus empirical convergence is permitted at labelled scope; no mandatory new global rigorous proof.",
+      "Bind donor unit-normal n·n=-1 in x0=ct to physical four-velocity U=c n, U·U=-c^2, with explicit donor convention and clock/unit conversion."
+    ],
+    "report": [
+      "actual executor identity if observed; requested identity separately",
+      "owned paths and observed diff",
+      "commands and exit codes",
+      "evidence paths",
+      "failures and unresolved inputs",
+      "scientific admission remains with authorized reviewer"
+    ],
+    "completed_state_requires": "Existing output artifacts and nonempty existing evidence paths; status text is not proof"
+  },
+  "execution": "READ_ONLY: no commands executed; no models called; no agents spawned"
+}

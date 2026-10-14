@@ -1,0 +1,66 @@
+{
+  "schema": "rei.axbi.provider.domain.v1",
+  "node_id": "AX02",
+  "provider_id": "AXBI_GRACKLE_3_4_1_CASE_A_POINT_V1",
+  "frozen_base": "1865fcec018ba0d2478321c9c2fac39490669697",
+  "source_commit": "af7939494ce65007887ada7b98d1813df6843346",
+  "source_url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+  "temperature_domain_k": [
+    1,
+    1000000
+  ],
+  "domain_kind": "operational numerical support; empirical fit accuracy NOT_MEASURED",
+  "selected_temperature_path_covered": "conditional on all reconstructed trajectory temperatures in domain; history not yet run",
+  "photo_energy_domain": "external Gamma and thermal power point input; AX04 owns energy transport/cross-section support",
+  "clock": "proper seconds",
+  "densities": "proper cm^-3",
+  "thermal_energy": "erg/H",
+  "closure": "Case A escape; clumping=1; primary photoelectron heat only",
+  "off": [
+    "CR",
+    "HH",
+    "RCT",
+    "metastable CI",
+    "metals",
+    "molecules",
+    "dust",
+    "secondary electrons"
+  ],
+  "sole_owners": {
+    "photo": "igm_point_rhs common absorption event supplies ion count, binding increment and external heat power",
+    "CI": "igm_point_rhs common event; HHeModel binding threshold thermal sink",
+    "RR_DR": "igm_point_rhs capture events; kinetic sink and binding release escape once",
+    "CE_freefree": "igm_point_rhs cooling/escape only; no chemistry event",
+    "CMB": "signed gas reservoir; CMB receives exact negative; excluded from nonnegative escape",
+    "expansion": "igm_point_rhs 2*H*u thermal work; coupled photon work remains AX04/AX05",
+    "cross_section_and_photons": "AX04/AX05; not inferred from Gamma"
+  },
+  "thresholds": {
+    "binding_ev": [
+      13.598434599702,
+      24.587389011,
+      54.41776
+    ],
+    "owner": "HHeModel::controlled_fixture constants only, no synthetic rates called",
+    "cutoff_semantics": "Grackle CI floor1e-20, CE exponential cap ln1e30, DR off for T<=9284K; cooling exponent scales are fit parameters, not binding thresholds",
+    "floor_cap_diagnostics_retained": true,
+    "excluded_DR_cooling_diagnostic_retained": true
+  },
+  "point_root_interval": {
+    "point": "AxbiProvider.point -> unchanged igm_point_rhs; rates unchanged igm_rates",
+    "solver_residual": "must use identical AxbiProvider.point path",
+    "interval": "NOT_IMPLEMENTED_NO_CERTIFICATE",
+    "FT03_inheritance": false,
+    "empirical_convergence": "allowed for independently validated point implicit trajectory; not a rigorous continuum proof"
+  },
+  "source_sha256": {
+    "rust/rei_microphysics/src/igm_rates.rs": "310164e620617f3089d488bd1f9668996b4a4cbd191383e45303def176ef81cf",
+    "rust/rei_microphysics/src/igm_thermal.rs": "30515d96270ec73a37829ba298513a42112991168479d3cb40f33b67fd469ab2",
+    "rust/rei_microphysics/src/igm_state.rs": "1651b00a517d67aaa71b38d3c69af6413570adfc38b591a3ed25284f039e0ae0",
+    "rust/rei_microphysics/src/atomic_provider.rs": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3",
+    "rust/rei_microphysics/tests/data/igm_grackle/grackle_literal_reference.c": "13a1b252a790dc32bdb765399841471a54765f1a390426ee5db821ce9589c594",
+    "rust/rei_microphysics/tests/data/igm_grackle/grackle_literal_reference.csv": "50ece50b98792c6c0210d6b11e2aec29b4caa4acd96ff9e09a31274dcdff4565"
+  },
+  "scientific_admission": "NOT_ISSUED",
+  "next_dependency_safe_command": "AX05 compile/use provider after AX01-AX04 input binding"
+}

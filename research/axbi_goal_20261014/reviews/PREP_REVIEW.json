@@ -1,0 +1,96 @@
+{
+  "schema": "rei.axbi.preparation_review.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "node_id": "AX01_AX02_AX03_PREP_REVIEW",
+  "date_utc": "2026-10-14T06:39:08.290124+00:00",
+  "decision": "PASS_SCOPED_PREPARATION",
+  "base_commit": "1865fcec018ba0d2478321c9c2fac39490669697",
+  "requested_executor_identity": {
+    "model": "gpt-6-astra",
+    "reasoning_effort": "high",
+    "role": "independent scientific preparation reviewer"
+  },
+  "observed_executor_identity_or_null": null,
+  "runtime_identity_status": "NOT_INDEPENDENTLY_OBSERVED",
+  "independence": "Reviewer did not implement or author the reviewed scenario/provider/background. Only this review record is written.",
+  "scope": "Preparation acceptance for frozen conditional scenario and new AX02/AX03 components; authorize AX04 source implementation and AX05 driver integration. No campaign history or final scientific admission.",
+  "reviewed_input_sha256": {
+    "rust/rei_microphysics/src/axbi_rates.rs": "e0d4d7e5d3a1b704af95ae54b63bb5e0c49e1fb68fdc4b0e7465dc92feeaf361",
+    "rust/rei_microphysics/tests/axbi_rates.rs": "475d492bcea4cd74ec5dc5aed6ee0640d91ceba1afb56be3d040564670679b36",
+    "rust/rei_microphysics/src/axbi_background.rs": "ad1c4d76963fb0d2c34959abc4f56d9005c93b1d5dd20d837e0eb0f111e37033",
+    "rust/rei_microphysics/tests/axbi_background.rs": "b7ba3d99a041928b4388066ffeef55c77695be37773451648d933482540bb84f",
+    "research/axbi_goal_20261014/scenario/SCENARIO_LOCK.json": "07aa11d2d3fd47d2ed95e9d9161f6205e4d9ba386c27ad43d2b298fcd86d1696",
+    "research/axbi_goal_20261014/scenario/AX02_AX03_IMPLEMENTATION_CONTRACT.md": "12f0b9598b4b5a34699e35c52669ad8d9be63fb530df71acf422fb102d160b9b",
+    "research/axbi_goal_20261014/provider/IMPLEMENTATION_RECEIPT.json": "fd10676ca2e6b70f85e8d2daae8b3b60a22860abcb916858dffab59b8efa35f1",
+    "research/axbi_goal_20261014/background/VALIDITY_RECEIPT.json": "3024dbb72c9d7d8982c713602e5da2783c6e7ef20b2cc8ac162b3b53f262902b"
+  },
+  "observed_tests": [
+    {
+      "owner": "AX02",
+      "command": "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --locked --test axbi_rates --test igm_rates",
+      "exit": 0,
+      "passed": 6,
+      "source_reference_temperatures": 96,
+      "raw_stdout": "research/axbi_goal_20261014/provider/raw/targeted_tests.stdout",
+      "raw_stderr": "research/axbi_goal_20261014/provider/raw/targeted_tests.stderr"
+    },
+    {
+      "owner": "AX03",
+      "command": "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --locked --test axbi_background",
+      "exit": 0,
+      "passed": 5,
+      "raw_stdout": "research/axbi_goal_20261014/background/raw/targeted_test.stdout",
+      "raw_stderr": "research/axbi_goal_20261014/background/raw/targeted_test.stderr"
+    }
+  ],
+  "review_method": "Read actual new Rust modules/tests, reused IGM rates/RHS and C-reference test, full AX01/AX02/AX03 packets, scenario/contracts, source/owner receipts and raw worker test outputs. Compared all recorded provider and background source identities: all matched. No test replay and no solver execution.",
+  "accepted_findings": [
+    "Adapter calls unchanged igm_rates/igm_point_rhs with EOS-reconstructed temperature and strict 1..1e6 K domain. Source floors/caps and excluded DR diagnostics are preserved; no FT03 certificate inheritance.",
+    "Stress-free physical family implements H=hypot(H_FLRW,s), s=q_ref H_FLRW(a_ref)(a_ref/a)^3, dt/dln(a)=1/H, db/dln(a)=s/H. q_ref is distinct from Sigma. SAME_H remains an explicit counterfactual.",
+    "Tests include independent original-C coefficient parity, exact adapter parity, event-energy closure, analytic matter clock, constraint/shear invariants, signed background checks, refinement, and reflection-even ray parity.",
+    "Scenario explicitly selects zbar20-to-4, approximate conditional gas IC rather than claimed REC donor, isotropic source-switch-on zero photons, approximate published source law and H/He-only inventory. Elapsed-time labeling and phenomenological high-z continuation remain explicit."
+  ],
+  "blocking_defects": [],
+  "integration_obligations": [
+    {
+      "path": "rust/rei_microphysics/src/axbi_background.rs::BackgroundPoint",
+      "severity": "nonblocking interface clarification",
+      "requirement": "Driver derives nH=nH0/a^3, nHe=nHe0/a^3 and Tref=T0/a from locked density/reference owners; background API only returns geometry. AX01 authority explicitly accepted this assignment in reviewer message."
+    },
+    {
+      "path": "research/axbi_goal_20261014/background/BACKGROUND_FAMILY_LOCK.json::feedback_scope.required_stress_components",
+      "severity": "nonblocking clarification before diagnostic admission",
+      "requirement": "Scenario is controlling: entire effective Omega_r initially isotropic free-streaming stress envelope plus actual ionizing U2 is required; CMB-only wording in background receipt is incomplete. AX01 authority confirmed eps_ref=rho_crit0*c^2*Omega_r/a_ref^4, with optional identified CMB subset."
+    },
+    {
+      "path": "research/axbi_goal_20261014/scenario/CHOICE_RECEIPT.json",
+      "severity": "nonblocking receipt finalization",
+      "requirement": "AX01 authority is finalizing source/choice receipt; scenario exists and explicit authority confirmation received. This review does not claim that unfinished receipt was inspected."
+    }
+  ],
+  "deferred_actual_history_decisions": {
+    "provider_full_trajectory_domain": "NOT_RUN",
+    "radiation_stress_and_energy_validity": "NOT_MEASURED",
+    "point_implicit_numerical_convergence": "NOT_RUN",
+    "full_abundance_histories_figures_and_robustness": "NOT_RUN"
+  },
+  "scientific_admission_from_authorized_reviewer_or_NOT_ISSUED": "NOT_ISSUED_FOR_CAMPAIGN",
+  "next_dependency_safe_command": "Execute AX04 source binding implementation from SCENARIO_LOCK, then AX05 coupled driver integration consuming the same point provider and geometry. Bind real argv/config/checkpoint and finite execution allocation before AX06 pilots. Reuse completed component tests unless new changes/findings warrant another targeted check.",
+  "positive_transition": "PREPARATION_PASS -> AX04/AX05 implementation; missing trajectory diagnostics do not block safe integration. AX15 remains final independent scientific decision.",
+  "budget_accounting": {
+    "review_shell_invocations_including_this_write": 15,
+    "review_targeted_buildtests": 0,
+    "review_solver_runs": 0,
+    "limits": {
+      "wall_s": 1800,
+      "commands": 24,
+      "targeted_checks": 2,
+      "solver_runs": 0
+    },
+    "notes": "Read-command stdout/stderr retained in tool transcript; CPU/RSS not separately measured. First intake read used nonexistent GOAL.md/TASK_PACKETS.json, exit1 preserved; corrected to actual json/jsonl. No fabricated durable raw intake logs."
+  },
+  "goal_status": "IN_PROGRESS_NOT_COMPLETE",
+  "owned_paths_and_diff": [
+    "research/axbi_goal_20261014/reviews/PREP_REVIEW.json"
+  ]
+}
