@@ -80,24 +80,23 @@
       "preparation_decision": "PASS_SCOPED_DRIVER_PREPARATION_AUTHORIZE_TWO_PILOTS"
     },
     "AX06": {
-      "status": "IN_PROGRESS",
+      "status": "COMPLETED",
       "evidence": [
-        "research/axbi_goal_20261014/runs/pilot/4080898d7770/PILOT_RECEIPT.json",
+        "research/axbi_goal_20261014/runs/pilot/PILOT_RECEIPT.json",
         "research/axbi_goal_20261014/reviews/PILOT_CADENCE_REVIEW.json",
-        "research/axbi_goal_20261014/runs/pilot/fc9dac5d0af1/FLRW/RETURN.txt",
-        "research/axbi_goal_20261014/runs/pilot/fc9dac5d0af1/SHEAR_PLUS_raw/execution_start.json"
+        "research/axbi_goal_20261014/reviews/PILOT_SCIENTIFIC_DECISION.json"
       ],
-      "scientific_work_status": "REVISED_FLRW_COMPLETE_SIGNED_PILOT_RUNNING",
-      "scientific_admission": "NOT_ISSUED"
+      "scientific_work_status": "SCOPED_PILOT_PASS",
+      "scientific_admission": "PASS_SCOPED_TWO_PILOTS_NOT_FULL_HISTORY"
     },
     "AX07": {
-      "status": "PENDING",
+      "status": "READY",
       "evidence": [],
       "scientific_work_status": "NOT_RUN",
       "scientific_admission": "NOT_ISSUED"
     },
     "AX08": {
-      "status": "PENDING",
+      "status": "READY",
       "evidence": [],
       "scientific_work_status": "NOT_RUN",
       "scientific_admission": "NOT_ISSUED"
@@ -184,8 +183,10 @@
       "owner_node": "AX05"
     },
     "C06": {
-      "status": "NOT_RUN",
-      "evidence": [],
+      "status": "PASS_SCOPED_PILOT",
+      "evidence": [
+        "research/axbi_goal_20261014/reviews/PILOT_SCIENTIFIC_DECISION.json"
+      ],
       "owner_node": "AX06"
     },
     "C07": {
@@ -245,7 +246,10 @@
     }
   },
   "publication_status": "AUDIT_CHECKPOINT_PREPARING_NOT_FINAL_RELEASE",
-  "next_ready_ids": [],
+  "next_ready_ids": [
+    "AX07",
+    "AX08"
+  ],
   "durable_next_command": [
     "python3",
     "scripts/rux_codex/workflow.py",
@@ -312,5 +316,13 @@
       "observed_runtime_model": null
     }
   ],
-  "next_command_precondition": "Collect currently running SHEAR_PLUS; no relaunch of completed FLRW. Review actual two-pilot outputs then execute frozen full-history stage."
+  "next_command_precondition": "Frozen full-stage resource implementation and exact binary/config review; then five fullhistories. Completed pilots are reused.",
+  "pilot_cumulative_observed": {
+    "solver_starts": 3,
+    "wall_seconds": 260.263498,
+    "RHS_evaluations": 224541,
+    "accepted_steps": 10634,
+    "tentative_steps": 32067,
+    "includes_first_failed_attempt": true
+  }
 }

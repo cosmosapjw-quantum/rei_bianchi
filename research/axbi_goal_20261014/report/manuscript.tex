@@ -7,7 +7,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-This workspace describes a homogeneous hydrogen--helium reionization calculation and its matched signed-shear comparisons. The principal products are nuclear charge-state abundances versus elapsed gas proper time since the selected initial slice and time-ordered gas temperature. Numerical histories and figures will be inserted only from completed, identified calculations. This document currently reports the model conventions and implemented provider binding, without claiming an evolved cosmological history.
+This workspace describes a homogeneous hydrogen--helium reionization calculation and its matched signed-shear comparisons. The principal products are nuclear charge-state abundances versus elapsed gas proper time since the selected initial slice and time-ordered gas temperature. Numerical histories and figures will be inserted only from completed, identified calculations. This document includes actual short coupled pilot histories over mean redshift 20 to 19.8, with scoped independent pilot admission. The full mean-redshift 20 to 4 campaign, empirical refinement and resolved paired-response results remain pending.
 \end{abstract}
 \section{Geometry, clocks, and controlled approximation}
 The metric is
@@ -76,15 +76,47 @@ Point implicit residuals must use the same provider/model/domain as accepted ste
 Product & Current intake status\\\midrule
 Provider binding and original-C parity & See AX02 implementation receipt\\
 Full FLRW and signed-shear histories & Full interval pending; partial FLRW below\\
-Time/temperature abundance figures & Await identified saved histories\\
+Time/temperature abundance figures & Actual short-pilot diagnostics below\\
 Convergence and source/IC sensitivity & Not yet inserted\\
-Independent scoped scientific decision & Not issued\\\bottomrule
+Independent scoped scientific decision & Pilot-only PASS; full campaign pending\\\bottomrule
 \end{tabular}
 \end{center}
 
 The retained F08 endpoint comparisons have their original synthetic prescribed-discrete scope. Their 15 endpoint rows are not reconstructed time histories and do not replace these campaign products. A resolved null or supported upper bound is an acceptable result; detection is not required. Segment Thomson depth may be reported as a secondary diagnostic; an unknown observer tail is neither zero nor a barrier to the abundance-history goal.
 
 
+
+\section{Completed pilot abundances and diagnostic figures}
+The revised output-cadence run completed the entire selected pilot interval $\bar z=20$ to $19.8$ for $q_{\rm ref}=0$ and $+0.01$. Each case recorded 3882 accepted steps, 11700 actual tentative starts and 81924 RHS evaluations; each has 3883 saved scalar states including the initial state. The independent decision is \texttt{PASS\_SCOPED\_CONDITIONAL\_PILOT\_EXECUTION}. It checks the represented short-interval normalization, conservation, source-bound numerical controls and sampled perturbative feedback diagnostics. It does not admit the full campaign or a converged shear response.
+
+\begin{center}
+\begin{tabular}{lrr}\toprule
+Pilot quantity & FLRW & Positive shear\\\midrule
+Endpoint $\bar z$ & 19.8 & 19.8\\
+Elapsed proper time (Myr) & 2.580698929 & 2.580571740\\
+Endpoint $T_{\rm gas}$ (K) & 22.565863657 & 22.565143160\\
+Endpoint $x_{\rm HII}$ & $5.243353784\times10^{-4}$ & $5.243193221\times10^{-4}$\\
+Measured wall time (s) & 87.721678 & 108.308765\\
+Measured CPU time (s) & 87.573524 & 108.263777\\
+GNU time peak RSS (KiB) & 3800 & 4076\\\bottomrule
+\end{tabular}
+\end{center}
+
+The figures use the saved nuclear charge-state number abundance $Y_i=n_i/(n_H+4n_{\rm He})$. Electrons use $y_e=n_e/(n_H+4n_{\rm He})$, are labelled charge census, and are excluded from nuclear baryon inventory. The source script checks the saved normalization against proper densities without changing input values. Initially exact zero He II and He III are masked only on the logarithmic display. All positive saved values are inside the plotted range; no fabricated floor, state clipping or temperature sorting is used. Very small plotted values do not carry an empirical fit-accuracy guarantee. Component and pilot residual checks do not establish the accuracy of tiny trace abundances. Displaying values near $10^{-34}$ does not imply 34 digit precision; global time, energy and angular convergence has not yet been measured.
+
+The endpoint ionic and temperature differences remain below the frozen absolute response floors $10^{-7}$ in fraction and $0.01$ K in temperature. No empirical refinement estimate is available yet, so this report issues neither a resolved shear detection nor a resolved null or validated upper bound.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{research/axbi_goal_20261014/report/pilot_figures_fc9dac5d0af1/abundance_vs_elapsed_time.png}
+\caption{Actual conditional pilot abundance histories on the short $\bar z=20$ to $19.8$ interval. The clock is elapsed proper time since the selected initial slice, in Myr, not inferred absolute cosmic age. H/He charge states and the separately labelled electron census use the complete selected H/He baryon denominator. Exact zeros are omitted only on the log display; no state floor or clipping is applied. Tiny trace values are displayed as saved, without a claim of validated trace accuracy or numerical precision. Component and pilot residual checks do not establish global convergence. This is a diagnostic pilot product, not a full EoR, convergence or resolved-response figure.}
+\end{figure}
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{research/axbi_goal_20261014/report/pilot_figures_fc9dac5d0af1/abundance_vs_Tgas_time_ordered.png}
+\caption{The same actual pilot abundances plotted parametrically against gas temperature in saved time order. Arrows indicate increasing time; the curve is never sorted by temperature, including the tiny early cooling excursion. Exact-zero, normalization and scope conventions match the preceding figure. These short pilot curves do not replace the required full-history BBN-style products.}
+\end{figure}
+\clearpage
 \section{Observed partial FLRW pilot}
 The first actual FLRW pilot used the reviewed binary identity \texttt{4080898d7770} and attempted the selected $\bar z=20$ to $19.8$ interval. It stopped checkpointed at $\bar z=19.86586760536834$ because the exact prewrite aggregate output cap rejected the next output batch. The elapsed proper time at that partial checkpoint was $5.440334630231574\times10^{13}$ s. This is a represented partial coupled history; the requested pilot endpoint was not reached, and the positive-shear pilot was not started.
 
@@ -105,10 +137,10 @@ Last recorded local estimator & $3.817\times10^{-6}$\\\bottomrule
 
 The exact terminal error was \texttt{AXBI\_OUTPUT\_CAP}; no numerical failure was reported as the stop reason. The source/model and tolerances were unchanged. Original history, abundances, spectra, ledgers, raw streams, source/config identities and checkpoint remain preserved. A lossless archive contains all 66 original regular files, 234862901 bytes before compression and 26097828 bytes compressed; every archived file was checked against its input size and SHA. This packaging verification does not admit the trajectory scientifically. Full-interval results, paired response and convergence remain pending.
 
-The authority selected one output-cadence repair: retain every accepted scalar abundance/history/ledger/feedback row, and save full unaltered spectra initially, at the existing 60-step or 30-second checkpoints, and terminally. The original failed attempt is retained. A new explicitly revised allocation and changed-output review must bind any subsequent pilot binary and source identity; no automatic retry was performed.
+The authority selected one output-cadence repair: retain every accepted scalar abundance, history, ledger and feedback row, and save full unaltered spectra initially, at the existing 60-step or 30-second checkpoints, and terminally. The original failed attempt is retained. A new explicitly revised allocation and changed-output review must bind any subsequent pilot binary and source identity; no automatic retry was performed.
 
 \section{Reproduction}
-Future release instructions must identify actual driver/config/source versions, complete case argv, cumulative budgets, raw stdout/stderr, checkpoints and output CSV/figure scripts. At present the provider receipt and source manifest identify preparation only. Publication and a compilable manuscript do not constitute scientific completion.
+Future release instructions must identify actual driver/config/source versions, complete case argv, cumulative budgets, raw stdout/stderr, checkpoints and output CSV/figure scripts. Current reproduction evidence includes both completed pilot histories, their raw streams, checkpoints and frozen identities, and the retained failed attempt. The source manifest and figure manifest bind the actual products. The plotting script is \texttt{plot\_pilot\_abundances.py}; run it from its figure directory or repository root. Compile this manuscript from the repository root so its figure paths resolve. Full-campaign reproduction remains pending. Publication and a compilable manuscript do not constitute scientific completion.
 \begin{thebibliography}{9}
 \bibitem{md14} P. Madau and M. Dickinson, Cosmic Star-Formation History, equations 15 and 22 and Figure 16, \url{https://arxiv.org/html/1403.0007}.
 \bibitem{grackle} Grackle development team, Grackle 3.4.1 pinned rate functions, \url{https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c}. Repository literal-C fixture and retained license provide the independent point reference.
