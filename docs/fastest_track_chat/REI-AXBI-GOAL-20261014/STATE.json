@@ -117,9 +117,17 @@
         "research/axbi_goal_20261014/execution/POST_CAP_START_CHECKPOINT.json",
         "research/axbi_goal_20261014/reviews/POST_CAP_DISPATCH_REVIEW.json",
         "research/axbi_goal_20261014/reviews/ZERO_CONTINUATION_REVIEW.json",
-        "research/axbi_goal_20261014/reviews/PLUS_RESOURCE_STOP_SCIENCE_REVIEW.json"
+        "research/axbi_goal_20261014/reviews/PLUS_RESOURCE_STOP_SCIENCE_REVIEW.json",
+        "research/axbi_goal_20261014/driver/full/SIGNED_CONTINUATION_MECHANISM_DECISION.json",
+        "research/axbi_goal_20261014/driver/full/SIGNED_CONTINUATION_REPAIR_AUTHORITY.json",
+        "research/axbi_goal_20261014/reviews/SIGNED_CONTINUATION_MECHANISM_REREVIEW.json",
+        "research/axbi_goal_20261014/reviews/EPOCH_RECOVERY_DISPATCH_REREVIEW.json",
+        "research/axbi_goal_20261014/reviews/EPOCH_RECOVERY_DISPATCH_REVIEW.json",
+        "research/axbi_goal_20261014/reviews/EPOCH_RECOVERY_DISPATCH_REVIEW_INITIAL_HOLD.json",
+        "research/axbi_goal_20261014/driver/full/epoch_recovery_001/EPOCH_RECOVERY_BINDING.json",
+        "research/axbi_goal_20261014/driver/full/post_cap_001/dispatch/runtime_001/POST_CAP_RECEIPT.json"
       ],
-      "scientific_work_status": "PARTIAL_RESOURCE_STOPS_AND_REVIEWED_POST_CAP_EXECUTION_RUNNING",
+      "scientific_work_status": "PARTIAL_RESOURCE_STOPS_AND_REVIEWED_POST_CAP_EXECUTION_RUNNING; signed mechanism and epoch recovery adapters reviewed, original signed cases still running and HALF_MINUS queued",
       "scientific_admission": "NOT_ISSUED"
     },
     "AX09": {
@@ -292,8 +300,11 @@
   "publication_status": "REVIEWED_CONDITIONAL_FULL_ZERO_FIGURES_15_PAGE_REPORT_AND_LOCAL_CANONICAL_RAW_BINDING_SIGNED_FAMILY_RUNNING",
   "next_ready_ids": [],
   "durable_next_command": [
-    "cat",
-    "research/axbi_goal_20261014/driver/full/post_cap_001/dispatch/runtime_001/POST_CAP_RECEIPT.json"
+    "ps",
+    "-o",
+    "pid,ppid,stat,etime,args",
+    "-p",
+    "811686,811806,811807,811808,970519,970520,970521"
   ],
   "requested_executor_model": "gpt-6.1-sol",
   "observed_runtime_model": null,
@@ -352,7 +363,7 @@
       "observed_runtime_model": null
     }
   ],
-  "next_command_precondition": "Read live original observer receipt and process; do not start PLUS successor until original observer is terminal with empty queue/active and no observer process.",
+  "next_command_precondition": "At 2026-10-14T20:21:17+09:00 observer PID811686 and both original signed Rust groups are still live; its existing receipt remains stale OBSERVING. Wait for natural owner and worker exit; reread observer/checkpoints/processes and classify actual terminal outcomes before any launch. AX11/AX12 remain pending.",
   "pilot_cumulative_observed": {
     "solver_starts": 3,
     "wall_seconds": 260.263498,
@@ -362,7 +373,7 @@
     "includes_first_failed_attempt": true
   },
   "session_checkpoint": "PAUSED_RESUMABLE",
-  "background_execution": "POST_CAP_SHARED_OBSERVER_RUNNING_SHEAR_MINUS_AND_SHEAR_HALF_PLUS_QUEUE_SHEAR_HALF_MINUS",
+  "background_execution": "OLD_POST_CAP_OBSERVER_PID811686_LIVE; SHEAR_MINUS_PID811806_AND_SHEAR_HALF_PLUS_PID970519_LIVE; HALF_MINUS_NOT_STARTED; original observer receipt stale OBSERVING",
   "resume_evidence": "research/axbi_goal_20261014/execution/RETURN_CONTRACT.json",
   "NCP_access": "VERIFIED_SSH_ROOT_49.50.142.2_WITH_NCP_KEY; 64CPU 125GiRAM ~42GB_DISK_FREE; no REI solver/checkpoint; 14-file ZERO private mirror hashes equal; reviewed binaries/configs staged, no NCP solver",
   "NCP_access_evidence": "research/axbi_goal_20261014/execution/NCP_ACCESS_RECOVERY_20261014.json",
