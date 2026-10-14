@@ -1,0 +1,103 @@
+{
+  "schema": "rei.axbi.signed_continuation_mechanism_rereview.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "node": "AX08",
+  "written_utc": "2026-10-14T11:20:07.578800+00:00",
+  "decision": "PASS",
+  "scope": "SCM-R1 changed-surface repair and generic signed mechanism preparation only",
+  "finding_closed": "SCM-R1",
+  "mechanism_preparation": "CLOSED_SCOPED_PASS",
+  "scientific_admission": "NOT_ISSUED",
+  "solver_execution_authorized": false,
+  "per_case_start_authorized": false,
+  "per_case_resource_allocation_authorized": false,
+  "publication_authorized": false,
+  "reviewer": {
+    "task": "signed_mechanism_review",
+    "independent_of_implementation": true,
+    "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED",
+    "method": "Read-only diff, source, raw-log, artifact and accounting inspection; no test/build/solver rerun"
+  },
+  "observed_checkout": {
+    "branch": "codex/rux-science-delivery-20261014",
+    "head": "3573cd97064a5d08d773c5f0fcf1fd1332cc5252",
+    "tracked_diff_empty_at_read": true
+  },
+  "reviewed_input_sha256": {
+    "research/axbi_goal_20261014/reviews/SIGNED_CONTINUATION_MECHANISM_REVIEW.json": "93b7bf2aa1e3aeafb38afb437195c95689824cb20ccdc74f0986aa9e9ef0e832",
+    "research/axbi_goal_20261014/driver/full/SIGNED_CONTINUATION_MECHANISM_DECISION.json": "80dd0bf70778f82a8bd10e1bb603fa31d270cc0dcfdfd00b9c8ddf07c7855e9a",
+    "research/axbi_goal_20261014/driver/full/SIGNED_CONTINUATION_REPAIR_AUTHORITY.json": "799cace04936b1ce8a388faa6fd5f566d13356758934ae4cc2b36fc88613de8f",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/REPAIR_RECEIPT.json": "2c17f64b2e87e68581030ff0aa83f107bbd3d6f564ec7f0c3655f7cd7981af8d",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/raw/repair.diff": "e9b467de745d756ff9bb26e4ef49f29260d79cf48c40e85c6687825f66792f6d",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/raw/test.stdout": "fe2dc3cdc825d5a6946810bbccbccb1c996c94697ee41c67571a7504f84b8158",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/raw/test.stderr": "b192898939d447476a73fa80160af535177733376013b0dd2243951e90234691",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/raw/test.metrics.json": "86c1a5f276d597aede79261822bea87f9f03097ab08a23faa1c8da67f84a87f3",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/raw/release_build.stderr": "8f11e6eb7205ed20a65e4f1e4b1d95d0e96af1720706aa178775baf99f847cfb",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/raw/release_build.metrics.json": "b2355a55369d43ffa0d35b40d7986b9d84ec3a1f5c23258a034054e6e7707339",
+    "rust/rei_microphysics/examples/axbi_signed_resource_continuation.rs": "9c74fce940416eef11a963094406e45323e26d9d7c453a9efbfd0a5843505c1c",
+    "rust/rei_microphysics/tests/axbi_signed_resource_continuation.rs": "86d3ded72106bd08f9720076ab935da79d001960cebf9245dcf22685fe85805f",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/target/release/examples/axbi_signed_resource_continuation": "4243c744af3f3237ad0ca570b14fad8db4344f33be8fc29d8da9cfda8e811c74"
+  },
+  "closure_evidence": [
+    {
+      "check": "Exact bounded repair",
+      "status": "PASS",
+      "evidence": "Independently reproduced raw repair.diff from preserved before snapshots and current source. Wrapper change removes only conditional error swallowing and false fallback after adaptive_step Err; the branch now logs, flushes and unconditionally returns Err(e). Ordinary Ok(false) local-error adaptation, thresholds, public numerical kernel, terminal-save path and resource caps are unchanged."
+    },
+    {
+      "check": "Meaningful first-failure regression",
+      "status": "PASS",
+      "evidence": "New test invokes one public adaptive_step from valid manufactured initial state with max_attempts=starting.attempts+1. It independently obtains AXBI_TENTATIVE_CAP, asserts charged attempts/comparison/rejection/consecutive rejection increments, halved next step and positive RHS charge, and verifies unchanged gas/photons/ledgers/a. Wrapper output must match the same full durable state except measured wall, retain original error in returned result and RETURN, add no accepted row, emit exactly one error row and no local_metric fallback. The pre-repair branch would fail this regression by returning AXBI_RUNTIME_CAP."
+    },
+    {
+      "check": "Observed targeted test and terminal",
+      "status": "PASS",
+      "evidence": "Raw stdout: running 1 test; adaptive_error_preserves_first_tentative_cap_and_charged_state ok; 1 passed, 0 failed, 5 filtered. Metrics exit 0. Saved RETURN result is Err(InvalidInput(\"AXBI_TENTATIVE_CAP\")), terminal save Ok(()), accepted=0, attempts=1, comparisons=1, rejections=1, RHS=13, wall=17.002268247 from starting 17. Rejection stream has one AXBI_TENTATIVE_CAP row; history has boundary only."
+    },
+    {
+      "check": "Release artifact and frozen identity",
+      "status": "PASS",
+      "evidence": "Authorized separate repair_001 target build completed with exit 0 after the targeted test. Rehashed repaired binary matches 4243c744af3f3237ad0ca570b14fad8db4344f33be8fc29d8da9cfda8e811c74. All repair receipt artifact hashes match. Reconstructed all 17 compiled library inputs and obtained unchanged 4de69c1e68ebd395fe2d0b5580d901b9a82bde86cadbd11bdd07e5ad2042b4a1, byte-identical to saved repair identity. Original binary remains exact 83e3e08480006eaab6eb9e10b5411ba0a79e426c7d430ce1f402622a09bb85e7 and is historical defective evidence only."
+    },
+    {
+      "check": "Preservation and authority",
+      "status": "PASS",
+      "evidence": "Authority hash and repair receipt hash match controller-frozen values. Original HOLD, original decision, preparation receipt, before-source snapshots and all unmodified preparation artifacts match their frozen hashes. Existing CLI executing-binary hash check and per-case authority gate are unchanged. No template flags or per-case resources changed."
+    }
+  ],
+  "accepted_repaired_binary": {
+    "path": "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/target/release/examples/axbi_signed_resource_continuation",
+    "sha256": "4243c744af3f3237ad0ca570b14fad8db4344f33be8fc29d8da9cfda8e811c74",
+    "disposition": "ACCEPTED_FOR_FUTURE_PER_CASE_BINDING_REVIEW_ONLY; NOT_LAUNCH_AUTHORITY",
+    "compiled_library_identity_sha256": "4de69c1e68ebd395fe2d0b5580d901b9a82bde86cadbd11bdd07e5ad2042b4a1",
+    "old_binary_fallback_permitted": false
+  },
+  "remaining_scope_limits": [
+    "Initial review limits remain: wrong-epoch test does not isolate the epoch gate; original-config/checkpoint/terminal rejection paths were inspected rather than fully exercised through CLI.",
+    "Original manufactured composition fixture exercises stream join/counters/epoch whitelist only. Full compose/load_case remains unexecuted.",
+    "No real signed continuation has been started by mechanism preparation or repair. Full-history feedback/tau, numerical accuracy, continuum and physical admission remain pending actual completed-data review."
+  ],
+  "accounting": {
+    "prior_cargo_invocations": 2,
+    "authorized_repair_test_invocations": 1,
+    "authorized_repair_release_build_invocations": 1,
+    "cumulative_cargo_invocations": 4,
+    "cumulative_composition_fixture_invocations": 1,
+    "scientific_process_starts": 0,
+    "repair_automatic_retries": 0,
+    "reported_repair_shell_commands": 5,
+    "reported_cumulative_shell_commands": 18,
+    "reported_total_including_prior_readonly_git_diff_subprocesses": 21,
+    "repair_test_build_wall_s": 6.5645379750058055,
+    "repair_elapsed_wall_s_reported": 65.23264,
+    "repair_raw_allocated_bytes": 28672,
+    "repair_build_allocated_bytes": 76591104,
+    "review_new_test_build_solver_invocations": 0,
+    "review_git_mutations": 0,
+    "review_only_written_path": "research/axbi_goal_20261014/reviews/SIGNED_CONTINUATION_MECHANISM_REREVIEW.json",
+    "original_costs_and_identity_reset": false
+  },
+  "blocking_findings": [],
+  "positive_transition": "Close this mechanism preparation review. Controller may proceed to read-only actual-terminal intake/classification and prepare exact per-case binding with this accepted rebuilt binary. A signed case may run only after its actual terminal classification, finite additional/cumulative resources, exact execution-binding review and genuine shared scheduler handoff are explicitly authorized. This PASS itself grants none of those starts or resources.",
+  "review_stopping_rule": "SCM-R1 is resolved by the one authorized repair and changed-surface review. No further optional review or adjacent test expansion is required for mechanism preparation."
+}

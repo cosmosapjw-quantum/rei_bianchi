@@ -1,0 +1,96 @@
+--- research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/wrapper.before.rs
++++ rust/rei_microphysics/examples/axbi_signed_resource_continuation.rs
+@@ -142,13 +142,7 @@
+                     )
+                     .map_err(ioerr)?;
+                     rejects.flush().map_err(ioerr)?;
+-                    if state.consecutive_rejects >= 30
+-                        || state.next_dln_a < 1e-10
+-                        || state.rhs_evaluations >= driver.config.max_rhs
+-                    {
+-                        return Err(e);
+-                    }
+-                    false
++                    return Err(e);
+                 }
+             };
+             if !accepted {
+--- research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/test.before.rs
++++ rust/rei_microphysics/tests/axbi_signed_resource_continuation.rs
+@@ -235,3 +235,76 @@
+         .unwrap()
+         .contains("COMPLETE_SEGMENT_TO_SELECTED_ENDPOINT"));
+ }
++
++#[test]
++fn adaptive_error_preserves_first_tentative_cap_and_charged_state() {
++    let (mut driver, mut starting) = component();
++    starting.wall_elapsed_s = 17.0;
++    driver.config.max_attempts = starting.attempts + 1;
++    let mut direct = starting.clone();
++    let first = driver.adaptive_step(&mut direct).unwrap_err();
++    assert_eq!(format!("{first:?}"), "InvalidInput(\"AXBI_TENTATIVE_CAP\")");
++    assert_eq!(direct.attempts, starting.attempts + 1);
++    assert_eq!(direct.comparisons, starting.comparisons + 1);
++    assert_eq!(direct.rejects, starting.rejects + 1);
++    assert_eq!(direct.consecutive_rejects, starting.consecutive_rejects + 1);
++    assert_eq!(direct.next_dln_a, starting.next_dln_a * 0.5);
++    assert!(direct.rhs_evaluations > starting.rhs_evaluations);
++    assert_eq!(direct.a, starting.a);
++    assert_eq!(format!("{:?}", direct.gas), format!("{:?}", starting.gas));
++    assert_eq!(direct.photons, starting.photons);
++    assert_eq!(
++        format!("{:?}", direct.ledgers),
++        format!("{:?}", starting.ledgers)
++    );
++    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
++        .join("../../research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/fixtures")
++        .join(format!("first-error-{}", std::process::id()));
++    fs::create_dir_all(&root).unwrap();
++    let out = root.join("segment");
++    let error = wrapper::run_segment(
++        driver.clone(),
++        starting.clone(),
++        "manufactured fixture",
++        &out,
++        "SHEAR_MINUS",
++    )
++    .unwrap_err();
++    assert_eq!(format!("{error:?}"), format!("{first:?}"));
++    let mut saved = driver.read_checkpoint(&out.join("checkpoint.txt")).unwrap();
++    assert!(saved.wall_elapsed_s >= starting.wall_elapsed_s);
++    saved.wall_elapsed_s = direct.wall_elapsed_s;
++    assert_eq!(format!("{saved:?}"), format!("{direct:?}"));
++    let terminal = fs::read_to_string(out.join("RETURN.txt")).unwrap();
++    let records = terminal
++        .lines()
++        .filter_map(|line| line.split_once('='))
++        .collect::<std::collections::BTreeMap<_, _>>();
++    assert_eq!(
++        records["result"],
++        "Err(InvalidInput(\"AXBI_TENTATIVE_CAP\"))"
++    );
++    for (key, value) in [
++        ("accepted", saved.accepted),
++        ("attempts", saved.attempts),
++        ("comparisons", saved.comparisons),
++        ("rejections", saved.rejects),
++        ("rhs_evaluations", saved.rhs_evaluations),
++    ] {
++        assert_eq!(records[key].parse::<usize>().unwrap(), value, "{key}");
++    }
++    assert_eq!(records["a"].parse::<f64>().unwrap(), starting.a);
++    assert_eq!(records["segment_accepted"], "0");
++    assert_eq!(
++        fs::read_to_string(out.join("history.csv"))
++            .unwrap()
++            .lines()
++            .count(),
++        2
++    );
++    let rejection = fs::read_to_string(out.join("raw/rejections.csv")).unwrap();
++    assert_eq!(rejection.lines().count(), 2);
++    assert_eq!(rejection.matches("AXBI_TENTATIVE_CAP").count(), 1);
++    assert!(!rejection.contains("local_metric"));
++    assert!(!terminal.contains("AXBI_RUNTIME_CAP"));
++}
