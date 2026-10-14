@@ -1,0 +1,59 @@
+{
+  "schema": "rei.codex.low-cost-index/1",
+  "plan_id": "REI-CODEX-SCIENCE-20261014",
+  "authority": "../REI-ATOMIC-REUSE-RESET-20261012/PLAN.json",
+  "execution_base_sha": "c07fc7e765ce204bc3e84016cc6874612e535b86",
+  "read_order": [
+    "../../../AGENTS.md",
+    "../../../CLAUDE.md",
+    "LOW_COST_INDEX.json",
+    "CODEX_HANDOFF_KO.md",
+    "one full packet for selected ready node"
+  ],
+  "pointers": {
+    "dag": "EXECUTION_DAG.json",
+    "packets": "TASK_PACKETS.jsonl",
+    "scenario_decisions": "SCENARIO_DECISIONS.json",
+    "human_plan": "PLAN_KO.md",
+    "repo_review": "REPO_REVIEW_KO.md",
+    "public_input_contract": "SOURCE_INPUTS_PUBLIC.json",
+    "public_backup_scope": "BACKUP_STATUS_PUBLIC.json",
+    "full_pr_inventory": "PR_INVENTORY.json",
+    "pr_groups": "PR_PLAN.md",
+    "roles": "SUBAGENT_SETUP_KO.md",
+    "return_contract": "RETURN_CONTRACT.json",
+    "private_payload_locator": "PRIVATE_INPUTS.json in separately delivered private transport packet"
+  },
+  "commands": {
+    "check": "python3 scripts/rux_codex/workflow.py --dag docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/EXECUTION_DAG.json check",
+    "ready": "python3 scripts/rux_codex/workflow.py --dag docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/EXECUTION_DAG.json ready",
+    "packet_template": "python3 scripts/rux_codex/workflow.py --dag docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/EXECUTION_DAG.json packet NODE_ID"
+  },
+  "roles": {
+    "mechanical": {
+      "requested_model": "gpt-6.1-sol",
+      "reasoning": "medium",
+      "config": "../../../.codex/agents/rux_worker.toml"
+    },
+    "explorer": {
+      "requested_model": "gpt-6-luna",
+      "reasoning": "high",
+      "config": "../../../.codex/agents/rux_explorer.toml"
+    },
+    "scientific_reviewer": {
+      "requested_model": "gpt-6-astra",
+      "reasoning": "high",
+      "config": "../../../.codex/agents/rux_scientific_reviewer.toml"
+    }
+  },
+  "mandatory_read_rule": "The selected full frozen packet governs scope, identities, tolerances, limits, acceptance and stopping. This index never overrides it.",
+  "unknown_rule": "Unknown scientific input/error/tolerance stays null; no inferred PASS or zero.",
+  "retained_scope": "Saved 15 F08 endpoint rows, no new ODE or invented history",
+  "execution_rule": "Perform bounded ready work until data/plots/report or precise observed blocker; report delivery remains required when claim admission is HOLD",
+  "storage_rule": "Public repo has only filename/hash/scope/reuse. Private attachments, warm history and provider locators remain in separate transport packet.",
+  "path_basis": {
+    "index_paths": "Relative to this LOW_COST_INDEX.json directory; ../../../ is repository root",
+    "command_paths": "Relative to repository root",
+    "private_payload_locator": "Relative to separately delivered private transport packet, not this repository"
+  }
+}
