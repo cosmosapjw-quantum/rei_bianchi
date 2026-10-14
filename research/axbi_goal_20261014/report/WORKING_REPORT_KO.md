@@ -149,3 +149,10 @@ PLUS continuation은 두 번째 예약 시도에서 실제 Rust solver PID 18432
 ## SHEAR_HALF_PLUS continuation 실제 시작 (2026-10-14)
 
 PLUS observer 중단을 별도 runtime abort로 분류하고 해당 observer·solver 그룹 종료, 기존 예약 소진, 로컬/NCP/pending count 및 HALF_PLUS binding/원본 checkpoint/output 부재를 새로 확인했다. 독립 검토는 `PASS_SCOPED_HALF_PLUS_HANDOFF_AND_LAUNCHER_RELEASE`를 부여했다. 기존 binding과 SHA `4243c744...`인 signed continuation binary, 10799초/2 GiB/segment 4096 MiB의 한 번만 실행하는 wrapper로 HALF_PLUS 후속 구간을 시작했다. controller PID 1965217, solver launcher PID/PGID 1965222가 `PROCESS_ACKNOWLEDGED`로 기록됐고, 첫 관측 checkpoint가 accepted 200700, $a=0.08893087067765912$로 진행했다. 이는 실행 시작과 진행의 증거이며 전구간 완료 또는 과학 판정이 아니다. 예약 시 HALF_PLUS 시도 1회/관측 시작 0회, ACK 이후 관측 시작 1회, 누적 full 시작 8회/history 시작 11회를 구분한다. 재시도는 없다. 정확한 명령·source/binding·시각·ACK 해시는 `../driver/full/half_plus_continuation_001/launch_001/START_CHECKPOINT.json`에 기록했다.
+
+
+## 새 REC R9 v2·BASS FA03 R10·CR R5 공급 자료의 적용 경계
+
+REC R9 v2 ZIP (`7bdf7b9c...`)은 앞선 R9 v1의 floating local evaluator 오차 합성식 누락을 수정했다. evaluator 오차가 양의 polynomial 적분에 상대적인 정의라면 `eta_total <= alpha + (1+alpha)*eta_eval`이며, 이전 additive 식은 교차항을 빠뜨렸다. v2의 별도 17/17 unit test와 60개 수학적 비교는 standalone 기준값에 한정되고, 현재 native abundance clock을 교체하지 않는다. 향후 별도 finite-interval 방법을 도입할 때 v2를 기준으로 삼는다.
+
+BASS FA03 R10과 xAct 복구 백업은 유한 검출기/문턱 지원의 scoped 기하·진단 자료다. BASS CR R5의 독립 native component probe는 **현재 checkout의 `axbi_driver.rs`·`axbi_sources.rs`·`atomic_provider.rs` 해시와 일치하는** frozen BB50K source에서 n16 He I/He II의 source-weighted cross-section 적분이 continuum 기준 대비 각각 +10.4085%/+38.5941%라고 보고한다. 별도 one-sided 문턱 후보의 isolated component 값은 +0.0743%/+0.1171%지만 production에는 채택되지 않았다. 이는 광원 분광 이산화의 가능한 체계오차이며 abundance·Tgas 최종 오차나 전구간 재이온화 신호의 판정이 아니다. 현재 진행 중인 이력의 binary/source는 그대로 유지하고, 선택한 source/ledger의 짧은 별도 검산과 독립 과학 판정 뒤에만 새 source lane을 고려한다. 원 ZIP·PR head·정확한 숫자·결손은 `../external_suppliers/UPDATE_SCAN_20261014_R13.json`에 기록했다.

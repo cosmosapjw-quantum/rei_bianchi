@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import subprocess
 import tempfile
+from types import SimpleNamespace
 
 import process_identity as identity
 import repaired_adapter
@@ -39,6 +40,7 @@ def group(pgid, argv, pid=None, start=700000.0):
 def main():
     binding = json.loads((HERE / 'BINDING.json').read_text())
     if binding['authority_sha256'] != sha(HERE / 'AUTHORITY.json') or \
+       binding['amendment_001_sha256'] != sha(HERE / 'AMENDMENT_001.json') or \
        binding['refusal_sha256'] != sha(REFUSAL) or \
        binding['process_identity_sha256'] != sha(HERE / 'process_identity.py') or \
        binding['repaired_adapter_sha256'] != sha(HERE / 'repaired_adapter.py'):
@@ -75,6 +77,76 @@ def main():
         adapter.EPOCH.handoff(with_operand, allowed_group=tracked.pgid)
         assert adapter.PLUS.scientific_groups(with_operand) == {tracked.pgid}
         outcomes.append({'case': 'operands_and_shell_text_ignored', 'result': 'PASS'})
+
+        # Install the real repaired wrappers over inert legacy handoffs so a
+        # refusal is proved to occur before either downstream call.
+        downstream = []
+        fake_module = SimpleNamespace(
+            EPOCH=SimpleNamespace(handoff=lambda *_a, **_k: downstream.append('epoch')),
+            PLUS=SimpleNamespace(handoff=lambda *_a, **_k: downstream.append('plus')))
+        real_load = repaired_adapter._load
+        try:
+            repaired_adapter._load = lambda *_a: fake_module
+            wrapped = repaired_adapter.install((tracked,))
+        finally:
+            repaired_adapter._load = real_load
+
+        def route(which, members, parent=None, pgid=900100):
+            observed = {pgid: members}
+            if which == 'epoch':
+                return lambda: wrapped.EPOCH.handoff(observed, allowed_parent=parent)
+            return lambda: wrapped.PLUS.handoff({}, observed, allowed_parent=parent)
+
+        for which in ('epoch', 'plus'):
+            for index, name in enumerate(sorted(identity.OWNERS)):
+                pid = 900100 + index
+                member = group(pid, ['python3', '-u', '/tmp/' + name, '--observe'], pid=pid)
+                before = len(downstream)
+                refuse(which + '_foreign_owner_' + name,
+                       route(which, member, pgid=tracked.pgid if name == 'recover_plus.py' else pid),
+                       'OWNER_LIFECYCLE_HOLD', outcomes)
+                assert len(downstream) == before, 'legacy handoff called before owner refusal'
+
+            expected_parent = ('post_cap_epoch_recovery.py' if which == 'epoch'
+                               else 'post_plus_dispatch.py')
+            member = group(900200, ['python3', '-u', '/tmp/' + expected_parent,
+                                    '--start-detached'], pid=900200)
+            before = len(downstream)
+            route(which, member, parent=900200)()
+            assert downstream[before:] == [which]
+            outcomes.append({'case': which + '_exact_detached_parent', 'result': 'PASS'})
+
+            current = group(900201, ['python3', '/tmp/recover_plus.py', '--observe'],
+                            pid=os.getpid())
+            before = len(downstream)
+            route(which, current)()
+            assert downstream[before:] == [which]
+            outcomes.append({'case': which + '_current_process', 'result': 'PASS'})
+
+            refusals = [
+                ('wrong_parent_pid', member, 900202),
+                ('wrong_parent_script', group(900200, ['python3', '/tmp/recover_plus.py',
+                                                       '--start-detached'], pid=900200), 900200),
+                ('parent_observe', group(900200, ['python3', '/tmp/' + expected_parent,
+                                                 '--observe'], pid=900200), 900200),
+            ]
+            for label, candidate, parent in refusals:
+                before = len(downstream)
+                refuse(which + '_' + label, route(which, candidate, parent=parent),
+                       'OWNER_LIFECYCLE_HOLD', outcomes)
+                assert len(downstream) == before
+
+            benign = {900300: group(900300, ['rg', '-n', 'recover_plus.py --observe',
+                                             '/tmp/axbi_fake']),
+                      900301: group(900301, ['bash', '-c',
+                                             'python3 recover_plus.py --observe'])}
+            before = len(downstream)
+            if which == 'epoch':
+                wrapped.EPOCH.handoff(benign)
+            else:
+                wrapped.PLUS.handoff({}, benign)
+            assert downstream[before:] == [which]
+            outcomes.append({'case': which + '_benign_text', 'result': 'PASS'})
 
         foreign = dict(groups)
         foreign[900004] = group(900004, ['/tmp/axbi_foreign'])
@@ -145,12 +217,12 @@ def main():
     finally:
         os.killpg = original_kill
         subprocess.Popen = original_popen
-    result = {'schema': 'rei.axbi.process_classifier_repair_fixture.v1',
+    result = {'schema': 'rei.axbi.process_classifier_repair_fixture.v2',
               'status': 'PASS', 'cases': outcomes, 'fake_calls': calls,
               'scientific_starts': 0, 'refusal_sha256': sha(REFUSAL),
               'classifier_sha256': sha(HERE / 'process_identity.py'),
               'adapter_sha256': sha(HERE / 'repaired_adapter.py')}
-    (HERE / 'raw/FIXTURE_RESULT.json').write_text(json.dumps(result, indent=2) + '\n')
+    (HERE / 'raw/amendment_001/FIXTURE_RESULT.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({'status': 'PASS', 'cases': len(outcomes), 'fake_calls': calls,
                       'scientific_starts': 0}))
 

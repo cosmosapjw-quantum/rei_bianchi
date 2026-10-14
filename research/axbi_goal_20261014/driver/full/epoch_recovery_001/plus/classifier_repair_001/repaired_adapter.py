@@ -6,13 +6,29 @@ from their exact files. Only process-identity projections replace handoff scans.
 This module never launches a science process.
 """
 import importlib.util
+import os
 from pathlib import Path
 
-from process_identity import TrackedLauncher, project_groups, scientific_groups
+from process_identity import TrackedLauncher, member_identity, project_groups, scientific_groups
 
 HERE = Path(__file__).resolve().parent
 FULL = HERE.parents[2]
 OLD_ADAPTER = FULL / 'post_plus_epoch_dispatch.py'
+
+
+def _refuse_foreign_owners(groups, allowed_parent, detached_parent_script):
+    """Apply the complete execution-position owner set before legacy projection."""
+    for members in groups.values():
+        for member in members:
+            if member['pid'] == os.getpid():
+                continue
+            identity = member_identity(member)
+            if identity is None or identity[0] != 'owner':
+                continue
+            if (member['pid'] == allowed_parent and
+                    identity == ('owner', detached_parent_script, '--start-detached')):
+                continue
+            raise RuntimeError('OWNER_LIFECYCLE_HOLD')
 
 
 def _load(path, name):
@@ -36,11 +52,13 @@ def install(tracked_launchers):
     old_plus_handoff = adapter.PLUS.handoff
 
     def epoch_handoff(groups, allowed_group=None, allowed_parent=None):
+        _refuse_foreign_owners(groups, allowed_parent, 'post_cap_epoch_recovery.py')
         projected = project_groups(groups, tracked, allowed_group)
         return old_epoch_handoff(projected, allowed_group=allowed_group,
                                  allowed_parent=allowed_parent)
 
     def plus_handoff(receipt, groups, allowed_group=None, allowed_parent=None):
+        _refuse_foreign_owners(groups, allowed_parent, 'post_plus_dispatch.py')
         projected = project_groups(groups, tracked, allowed_group)
         return old_plus_handoff(receipt, projected, allowed_group=allowed_group,
                                 allowed_parent=allowed_parent)
