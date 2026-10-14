@@ -1,0 +1,443 @@
+--- /dev/null
++++ b/research/axbi_goal_20261014/driver/full/epoch_recovery_001/plus/classifier_repair_001/process_identity.py
+@@ -0,0 +1,195 @@
++#!/usr/bin/env python3
++"""Execution-position process identities for the AXBI handoff only.
++
++No data operand or shell command string is searched for an executable name.
++"""
++from dataclasses import dataclass
++from pathlib import Path
++import re
++
++
++OWNERS = frozenset({
++    'run_campaign.py', 'recover_queue.py', 'post_cap_dispatch.py',
++    'post_plus_dispatch.py', 'post_cap_epoch_recovery.py',
++    'post_plus_epoch_dispatch.py', 'recover_plus.py',
++})
++ACTIVE_FLAGS = frozenset({'--run', '--observe', '--start-detached'})
++WRAPPERS = frozenset({'time', 'timeout', 'taskset', 'prlimit'})
++
++
++class IdentityAmbiguous(RuntimeError):
++    pass
++
++
++@dataclass(frozen=True)
++class TrackedLauncher:
++    pid: int
++    pgid: int
++    start_boot_s: float
++    native_basename: str
++
++    def __post_init__(self):
++        if self.pid <= 0 or self.pgid <= 0 or self.pid != self.pgid or not self.native_basename.startswith('axbi_'):
++            raise ValueError('INVALID_TRACKED_LAUNCHER')
++
++
++def _name(value):
++    return Path(value).name
++
++
++def _take_option(argv, index, zero, one, equals):
++    value = argv[index]
++    if value in zero:
++        return index + 1
++    if value in one:
++        if index + 1 >= len(argv):
++            raise IdentityAmbiguous('WRAPPER_OPTION_MISSING_VALUE')
++        return index + 2
++    if any(value.startswith(prefix) and len(value) > len(prefix) for prefix in equals):
++        return index + 1
++    raise IdentityAmbiguous('UNRECOGNIZED_WRAPPER_OPTION:' + value)
++
++
++def _unwrap_one(argv):
++    wrapper = _name(argv[0])
++    index = 1
++    if wrapper == 'time':
++        while index < len(argv) and argv[index].startswith('-'):
++            if argv[index] == '--':
++                index += 1
++                break
++            index = _take_option(argv, index,
++                                 {'-v', '--verbose', '-p', '--portability', '-a', '--append'},
++                                 {'-o', '--output', '-f', '--format'},
++                                 {'--output=', '--format='})
++    elif wrapper == 'timeout':
++        while index < len(argv) and argv[index].startswith('-'):
++            if argv[index] == '--':
++                index += 1
++                break
++            index = _take_option(argv, index,
++                                 {'--foreground', '--preserve-status', '-v', '--verbose'},
++                                 {'-s', '--signal', '-k', '--kill-after'},
++                                 {'--signal=', '--kill-after='})
++        if index >= len(argv) or not re.fullmatch(r'[0-9]+(?:\.[0-9]+)?[smhd]?', argv[index]):
++            raise IdentityAmbiguous('TIMEOUT_DURATION_MISSING')
++        index += 1
++    elif wrapper == 'taskset':
++        if index >= len(argv) or argv[index] not in {'-c', '--cpu-list'}:
++            raise IdentityAmbiguous('TASKSET_COMMAND_SLOT_UNKNOWN')
++        index = _take_option(argv, index, set(), {'-c', '--cpu-list'}, set())
++    elif wrapper == 'prlimit':
++        while index < len(argv) and argv[index] != '--':
++            index = _take_option(argv, index, set(), {'--as', '--fsize'},
++                                 {'--as=', '--fsize='})
++        if index >= len(argv):
++            raise IdentityAmbiguous('PRLIMIT_COMMAND_SEPARATOR_MISSING')
++        index += 1
++    else:
++        return argv
++    if index >= len(argv):
++        raise IdentityAmbiguous('WRAPPER_COMMAND_MISSING')
++    return argv[index:]
++
++
++def executable_argv(argv):
++    """Return the real command slot after only recognized wrapper options."""
++    command = list(argv)
++    for _ in range(5):
++        if not command:
++            return []
++        if _name(command[0]) not in WRAPPERS:
++            return command
++        command = _unwrap_one(command)
++    raise IdentityAmbiguous('WRAPPER_DEPTH_EXCEEDED')
++
++
++def _python_script(command):
++    if not command:
++        return None
++    first = _name(command[0])
++    if first.endswith('.py'):
++        return first, 0
++    if not re.fullmatch(r'(?:python|python[23](?:\.[0-9]+)?)', first):
++        return None
++    index = 1
++    no_value = {'-B', '-E', '-I', '-O', '-OO', '-S', '-s', '-u', '-q', '-v'}
++    with_value = {'-W', '-X'}
++    while index < len(command):
++        arg = command[index]
++        if arg == '--':
++            index += 1
++            break
++        if arg in {'-c', '-m'} or arg.startswith(('-c', '-m')):
++            return None
++        if arg in no_value or arg.startswith(('-W', '-X')) and arg not in with_value or arg.startswith('--check-hash-based-pycs='):
++            index += 1
++            continue
++        if arg in with_value:
++            if index + 1 >= len(command):
++                raise IdentityAmbiguous('PYTHON_OPTION_MISSING_VALUE')
++            index += 2
++            continue
++        if arg.startswith('-'):
++            raise IdentityAmbiguous('PYTHON_SCRIPT_SLOT_UNKNOWN:' + arg)
++        break
++    if index < len(command) and _name(command[index]).endswith('.py'):
++        return _name(command[index]), index
++    return None
++
++
++def member_identity(member):
++    """(kind, name, active_flag), or None; native identity uses argv[0]."""
++    argv = member.get('argv') or []
++    command = executable_argv(argv)
++    if not command:
++        return None
++    native = _name(command[0])
++    if native.startswith('axbi_'):
++        return ('native', native, None)
++    script = _python_script(command)
++    if script is None:
++        return None
++    name, index = script
++    if name not in OWNERS:
++        return None
++    active = next((flag for flag in command[index + 1:] if flag in ACTIVE_FLAGS), None)
++    return ('owner', name, active) if active else None
++
++
++def project_groups(groups, tracked=(), allowed_group=None):
++    """Project only execution identities into the unchanged historical checks."""
++    tracking = {item.pgid: item for item in tracked}
++    if len(tracking) != len(tuple(tracked)):
++        raise RuntimeError('DUPLICATE_TRACKED_GROUP')
++    if allowed_group is not None and allowed_group not in tracking:
++        raise RuntimeError('ALLOWED_GROUP_START_IDENTITY_REQUIRED')
++    projected = {}
++    for pgid, members in groups.items():
++        record = tracking.get(pgid)
++        if record and members:
++            leaders = [m for m in members if m['pid'] == record.pid]
++            if leaders and (len(leaders) != 1 or leaders[0].get('start_boot_s') != record.start_boot_s):
++                raise RuntimeError('TRACKED_LAUNCHER_START_IDENTITY_CHANGED')
++            if not leaders and min(m.get('start_boot_s', -1) for m in members) < record.start_boot_s:
++                raise RuntimeError('TRACKED_LAUNCHER_GROUP_IDENTITY_AMBIGUOUS')
++        out = []
++        for member in members:
++            clone = dict(member)
++            identity = member_identity(member)
++            if identity is None:
++                clone['argv'] = [_name(member['argv'][0])] if member.get('argv') else []
++            elif identity[0] == 'native':
++                clone['argv'] = [identity[1]]
++            else:
++                clone['argv'] = [identity[1], identity[2]]
++            out.append(clone)
++        if record and out and not any(m['argv'] and m['argv'][0].startswith('axbi_') for m in out):
++            out[0]['argv'] = [record.native_basename]
++        projected[pgid] = out
++    return projected
++
++
++def scientific_groups(groups, tracked=()):
++    return {pgid for pgid, members in project_groups(groups, tracked).items()
++            if any(m['argv'] and m['argv'][0].startswith('axbi_') for m in members)}
+--- /dev/null
++++ b/research/axbi_goal_20261014/driver/full/epoch_recovery_001/plus/classifier_repair_001/repaired_adapter.py
+@@ -0,0 +1,52 @@
++#!/usr/bin/env python3
++"""Runtime-only classifier bridge for the historical PLUS/EPOCH adapter.
++
++The old validators, receipts, solver observer and terminal logic remain loaded
++from their exact files. Only process-identity projections replace handoff scans.
++This module never launches a science process.
++"""
++import importlib.util
++from pathlib import Path
++
++from process_identity import TrackedLauncher, project_groups, scientific_groups
++
++HERE = Path(__file__).resolve().parent
++FULL = HERE.parents[2]
++OLD_ADAPTER = FULL / 'post_plus_epoch_dispatch.py'
++
++
++def _load(path, name):
++    spec = importlib.util.spec_from_file_location(name, path)
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    return module
++
++
++def install(tracked_launchers):
++    """Return the old adapter with classification only projected at runtime.
++
++    The caller supplies acknowledged (leader PID, PGID, start_boot_s, native
++    solver basename) records. A permitted group has to match that record.
++    """
++    tracked = tuple(tracked_launchers)
++    if not all(isinstance(item, TrackedLauncher) for item in tracked):
++        raise TypeError('TRACKED_LAUNCHER_RECORD_REQUIRED')
++    adapter = _load(OLD_ADAPTER, 'plus_classifier_repair_old_adapter')
++    old_epoch_handoff = adapter.EPOCH.handoff
++    old_plus_handoff = adapter.PLUS.handoff
++
++    def epoch_handoff(groups, allowed_group=None, allowed_parent=None):
++        projected = project_groups(groups, tracked, allowed_group)
++        return old_epoch_handoff(projected, allowed_group=allowed_group,
++                                 allowed_parent=allowed_parent)
++
++    def plus_handoff(receipt, groups, allowed_group=None, allowed_parent=None):
++        projected = project_groups(groups, tracked, allowed_group)
++        return old_plus_handoff(receipt, projected, allowed_group=allowed_group,
++                                allowed_parent=allowed_parent)
++
++    adapter.EPOCH.handoff = epoch_handoff
++    adapter.PLUS.handoff = plus_handoff
++    adapter.PLUS.scientific_groups = lambda groups: scientific_groups(groups, tracked)
++    adapter.classifier_tracking = tracked
++    return adapter
+--- /dev/null
++++ b/research/axbi_goal_20261014/driver/full/epoch_recovery_001/plus/classifier_repair_001/fixture.py
+@@ -0,0 +1,159 @@
++#!/usr/bin/env python3
++"""One fake-only replay of the preserved handoff and classifier boundaries."""
++import copy
++import hashlib
++import json
++import os
++from pathlib import Path
++import subprocess
++import tempfile
++
++import process_identity as identity
++import repaired_adapter
++
++HERE = Path(__file__).resolve().parent
++ROOT = HERE.parents[6]
++REFUSAL = HERE.parent / 'recovery_001/runtime_001/HANDOFF_REFUSAL.json'
++
++
++def sha(path):
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++def refuse(label, call, expected, outcomes):
++    try:
++        call()
++    except (RuntimeError, identity.IdentityAmbiguous) as error:
++        if expected not in str(error):
++            raise AssertionError((label, repr(error), expected)) from error
++        outcomes.append({'case': label, 'result': 'EXPECTED_REFUSAL', 'error': str(error)})
++        return
++    raise AssertionError(label + ' unexpectedly accepted')
++
++
++def group(pgid, argv, pid=None, start=700000.0):
++    return [{'pid': pgid if pid is None else pid, 'state': 'S', 'argv': argv,
++             'start_boot_s': start, 'rss_kib': 1}]
++
++
++def main():
++    binding = json.loads((HERE / 'BINDING.json').read_text())
++    if binding['authority_sha256'] != sha(HERE / 'AUTHORITY.json') or \
++       binding['refusal_sha256'] != sha(REFUSAL) or \
++       binding['process_identity_sha256'] != sha(HERE / 'process_identity.py') or \
++       binding['repaired_adapter_sha256'] != sha(HERE / 'repaired_adapter.py'):
++        raise AssertionError('BINDING_CHANGED')
++    saved = json.loads(REFUSAL.read_text())
++    groups = {g['pgid']: g['members'] for g in saved['groups']}
++    tracked = identity.TrackedLauncher(**binding['observed_owned_launcher'])
++    adapter = repaired_adapter.install((tracked,))
++    original_kill = os.killpg
++    original_popen = subprocess.Popen
++    calls = {'kill': 0, 'popen': 0}
++    def fake_kill(*_args, **_kwargs):
++        calls['kill'] += 1
++        raise AssertionError('kill attempted in classifier fixture')
++    def fake_popen(*_args, **_kwargs):
++        calls['popen'] += 1
++        raise AssertionError('Popen attempted in classifier fixture')
++    os.killpg = fake_kill
++    subprocess.Popen = fake_popen
++    outcomes = []
++    try:
++        adapter.EPOCH.handoff(groups, allowed_group=tracked.pgid)
++        assert adapter.PLUS.scientific_groups(groups) == {tracked.pgid}
++        assert 1911669 not in adapter.PLUS.scientific_groups(groups)
++        outcomes.append({'case': 'preserved_false_positive_replay', 'result': 'PASS',
++                         'scientific_groups': [tracked.pgid]})
++
++        with_operand = dict(groups)
++        with_operand[900001] = group(900001, ['rg', '-n', 'needle', '/tmp/axbi_fake'])
++        with_operand[900002] = group(900002, ['/bin/bash', '-c',
++                                            'python3 post_plus_epoch_dispatch.py --observe; axbi_fake'])
++        with_operand[900003] = group(900003, ['python3', '-c',
++                                            'print("post_plus_dispatch.py --observe axbi_fake")'])
++        adapter.EPOCH.handoff(with_operand, allowed_group=tracked.pgid)
++        assert adapter.PLUS.scientific_groups(with_operand) == {tracked.pgid}
++        outcomes.append({'case': 'operands_and_shell_text_ignored', 'result': 'PASS'})
++
++        foreign = dict(groups)
++        foreign[900004] = group(900004, ['/tmp/axbi_foreign'])
++        refuse('foreign_native_solver', lambda: adapter.EPOCH.handoff(foreign, allowed_group=tracked.pgid),
++               'LIVE_WORKERS_OR_CHILDREN_HOLD', outcomes)
++        assert adapter.PLUS.scientific_groups(foreign) == {tracked.pgid, 900004}
++
++        owner = dict(groups)
++        owner[900005] = group(900005, ['python3', '-u', '/tmp/post_plus_epoch_dispatch.py', '--observe'])
++        refuse('active_python_owner', lambda: adapter.EPOCH.handoff(owner, allowed_group=tracked.pgid),
++               'OWNER_LIFECYCLE_HOLD', outcomes)
++        assert identity.member_identity(owner[900005][0]) == ('owner', 'post_plus_epoch_dispatch.py', '--observe')
++
++        wrapper = identity.TrackedLauncher(pid=900006, pgid=900006, start_boot_s=700000.0,
++                                           native_basename='axbi_tracked')
++        leader = group(900006, ['/usr/bin/time', '-v', '-o', '/tmp/time.log',
++                                '/usr/bin/timeout', '--foreground', '10799s',
++                                '/usr/bin/taskset', '-c', '0', '/usr/bin/prlimit',
++                                '--as=2147483648', '--', '/tmp/axbi_tracked'])
++        assert identity.scientific_groups({900006: leader}, (wrapper,)) == {900006}
++        child = group(900006, ['/tmp/axbi_tracked'], pid=900007, start=700000.01)
++        assert identity.scientific_groups({900006: leader + child}, (wrapper,)) == {900006}
++        assert identity.scientific_groups({900006: leader}, (wrapper,)) == {900006}
++        assert identity.scientific_groups({900006: child}, (wrapper,)) == {900006}
++        assert identity.scientific_groups({}, (wrapper,)) == set()
++        outcomes.append({'case': 'tracked_wrapper_child_transitions', 'result': 'PASS'})
++
++        altered = copy.deepcopy(leader)
++        altered[0]['start_boot_s'] += 1
++        refuse('leader_pid_reuse', lambda: identity.project_groups({900006: altered}, (wrapper,), 900006),
++               'TRACKED_LAUNCHER_START_IDENTITY_CHANGED', outcomes)
++        refuse('unbound_allowed_group', lambda: identity.project_groups({900006: leader}, (), 900006),
++               'ALLOWED_GROUP_START_IDENTITY_REQUIRED', outcomes)
++        refuse('unknown_wrapper_option', lambda: identity.member_identity(group(900008, ['/usr/bin/time',
++               '--unknown-option', '/tmp/axbi_foreign'])[0]), 'UNRECOGNIZED_WRAPPER_OPTION', outcomes)
++
++        # Original duplicate reservation guard remains active, before any Popen.
++        with tempfile.TemporaryDirectory() as temp:
++            occupied = Path(temp) / 'runtime'
++            occupied.mkdir()
++            previous = (adapter.PLUS.validate, adapter.PLUS.fresh_handoff, adapter.PLUS.RUNTIME)
++            try:
++                adapter.PLUS.validate = lambda: ({'plus_continuation': {
++                    'fresh_output': str(Path(temp) / 'output'),
++                    'fresh_raw_output': str(Path(temp) / 'raw')}}, {})
++                adapter.PLUS.fresh_handoff = lambda **_kwargs: ({}, {})
++                adapter.PLUS.RUNTIME = occupied
++                refuse('duplicate_reservation', adapter.PLUS.observe,
++                       'PLUS_EXISTING_OUTPUT_OR_RESERVATION_NO_RETRY', outcomes)
++            finally:
++                adapter.PLUS.validate, adapter.PLUS.fresh_handoff, adapter.PLUS.RUNTIME = previous
++
++        # Non-classification validation failures remain uncaught by the adapter.
++        old_validate = adapter.EPOCH.validate
++        old_groups = adapter.EPOCH.RECOVER.process_groups
++        try:
++            adapter.EPOCH.RECOVER.process_groups = lambda: groups
++            for kind in ('NUMERICAL_FAILURE', 'RESOURCE_FAILURE', 'IMMUTABLE_IDENTITY_FAILURE'):
++                def fail(*_args, **_kwargs):
++                    raise RuntimeError(kind)
++                adapter.EPOCH.validate = fail
++                refuse(kind.lower(), lambda: adapter.fresh_handoff(allowed_group=tracked.pgid),
++                       kind, outcomes)
++        finally:
++            adapter.EPOCH.validate = old_validate
++            adapter.EPOCH.RECOVER.process_groups = old_groups
++        assert calls == {'kill': 0, 'popen': 0}
++    finally:
++        os.killpg = original_kill
++        subprocess.Popen = original_popen
++    result = {'schema': 'rei.axbi.process_classifier_repair_fixture.v1',
++              'status': 'PASS', 'cases': outcomes, 'fake_calls': calls,
++              'scientific_starts': 0, 'refusal_sha256': sha(REFUSAL),
++              'classifier_sha256': sha(HERE / 'process_identity.py'),
++              'adapter_sha256': sha(HERE / 'repaired_adapter.py')}
++    (HERE / 'raw/FIXTURE_RESULT.json').write_text(json.dumps(result, indent=2) + '\n')
++    print(json.dumps({'status': 'PASS', 'cases': len(outcomes), 'fake_calls': calls,
++                      'scientific_starts': 0}))
++
++
++if __name__ == '__main__':
++    main()
+--- /dev/null
++++ b/research/axbi_goal_20261014/driver/full/epoch_recovery_001/plus/classifier_repair_001/BINDING.json
+@@ -0,0 +1,25 @@
++{
++  "schema": "rei.axbi.process_classifier_repair_binding.v1",
++  "authority_sha256": "517461debeda6a1ce669c4bce643a3adc521d12c917f393a4460b518d8ae54a4",
++  "refusal_sha256": "6c3ee9ab2567ef5dbfb9e23b6c173bb91bbeb73b74d5103b2e396c5f10098621",
++  "stopped_receipt_sha256": "3efec0afff782d6ea42c64810943e70acae10875bb3b0d4eab806003e95e0097",
++  "preserved_old_source_sha256": {
++    "post_plus_dispatch.py": "7e8cd3ed86b003967361f464b46fd9885363641cededbeef0c244291c1ffcc12",
++    "post_plus_epoch_dispatch.py": "cb240cec5940bd639fbd32441429fdcc0e4ee457606d6b9b381c81b1a2e2a1ff",
++    "post_cap_epoch_recovery.py": "fe136e09a81ea482721f269159d0e878ea01a61b2d484a9075ca05bc2404be1e",
++    "epoch_recovery_001/plus/recovery_001/recover_plus.py": "20ca95400ef01650ad4e9df6dcd8c7f801694b81d69f57ed25d358562e538d3f"
++  },
++  "process_identity_sha256": "6d6741c67f2cd903204e0a11065067ddf3854a2ce444d4aee71bb5545a6e0f20",
++  "repaired_adapter_sha256": "e01baa39167ad6e7ff4d6e3b2a771883e50cc7e962206d16d5d72d3d122dc9b2",
++  "fixture_sha256": "3e198c30ee51be391f7a5899bbbff8efce3920214fda1c6f099fc589186bf354",
++  "observed_owned_launcher": {
++    "pid": 1843269,
++    "pgid": 1843269,
++    "start_boot_s": 622349.2,
++    "native_basename": "axbi_plus_resource_continuation"
++  },
++  "false_positive_group": 1911669,
++  "solver_starts": 0,
++  "cargo_builds": 0,
++  "scientific_admission": "NOT_ISSUED"
++}
