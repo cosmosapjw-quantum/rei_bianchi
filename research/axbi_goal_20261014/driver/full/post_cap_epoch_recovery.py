@@ -23,7 +23,9 @@ OWN = AREA / 'recovery'
 RUNTIME = OWN / 'runtime_001'
 RECEIPT = RUNTIME / 'RECOVERED_TERMINAL_RECEIPT.json'
 BINDING = AREA / 'EPOCH_RECOVERY_BINDING.json'
-REVIEW = ROOT / 'research/axbi_goal_20261014/reviews/EPOCH_RECOVERY_DISPATCH_REVIEW.json'
+REVIEW = ROOT / 'research/axbi_goal_20261014/reviews/EPOCH_EXIT_CLASSIFICATION_REPAIR_REVIEW.json'
+EXIT_AUTHORITY = ROOT / 'research/axbi_goal_20261014/reviews/SHEAR_MINUS_RESOURCE_STOP_SCIENCE_DECISION.json'
+EXIT_AUTHORITY_SHA = '9abb16bd516ba81f2e82051b869576b7414eb8b2d369f2bff0a89a6f4a34dab3'
 AUTHORITY = HERE / 'SIGNED_CONTINUATION_MECHANISM_DECISION.json'
 AUTHORITY_SHA = '80dd0bf70778f82a8bd10e1bb603fa31d270cc0dcfdfd00b9c8ddf07c7855e9a'
 OLD_RECEIPT = HERE / 'post_cap_001/dispatch/runtime_001/POST_CAP_RECEIPT.json'
@@ -97,6 +99,8 @@ def frozen_plan():
 def validate(require_review=True):
     if digest(AUTHORITY) != AUTHORITY_SHA:
         raise RuntimeError('RECOVERY_AUTHORITY_CHANGED')
+    if digest(EXIT_AUTHORITY) != EXIT_AUTHORITY_SHA:
+        raise RuntimeError('EXIT_CLASSIFICATION_AUTHORITY_CHANGED')
     binding = json.loads(BINDING.read_text())
     check_inputs(binding['execution_input_sha256'])
     if digest(OLD_RECEIPT) != binding['preserved_stale_receipt_sha256']:
@@ -110,7 +114,7 @@ def validate(require_review=True):
         review = json.loads(REVIEW.read_text())
         if review.get('epoch_recovery_execution_authorized') is not True:
             raise RuntimeError('EPOCH_REVIEW_RELEASE_REQUIRED')
-        required = {str(p.relative_to(ROOT)): digest(p) for p in [pathlib.Path(__file__), HERE/'post_plus_epoch_dispatch.py', BINDING, AUTHORITY]}
+        required = {str(p.relative_to(ROOT)): digest(p) for p in [pathlib.Path(__file__), HERE/'post_plus_epoch_dispatch.py', BINDING, AUTHORITY, EXIT_AUTHORITY]}
         if any(review.get('reviewed_input_sha256', {}).get(k) != v for k, v in required.items()):
             raise RuntimeError('EPOCH_REVIEW_SCOPE_CHANGED')
         check_inputs(review['reviewed_input_sha256'])
@@ -160,6 +164,29 @@ def half_absent(cases, old):
                 raise RuntimeError('HALF_MINUS_START_EXISTS_ANYWHERE')
 
 
+def original_cap_exit(result):
+    """Exact original handled cap semantics; never translate actual exit codes."""
+    case = result.get('case'); code = result.get('exit_code')
+    expected = 101 if case in {'ZERO','SHEAR_PLUS'} else 1 if case in {'SHEAR_MINUS','SHEAR_HALF_PLUS','SHEAR_HALF_MINUS'} else None
+    if expected is None or code != expected:
+        return False
+    proof = result.get('cap_evidence', {})
+    values = result.get('actual_terminal', {})
+    start = result.get('actual_start', {})
+    if proof.get('exact_terminal_evidence_verified') is not True or proof.get('source_identity_sha256') != 'd7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185' or proof.get('authority_sha256') != EXIT_AUTHORITY_SHA:
+        return False
+    if start.get('case') != case or start.get('binary_sha256') != '32d11e733155d355a1fa748597b48ea1c8196adba3c871722a7a598f0b6cbfca':
+        return False
+    if values.get('status') != 'STOPPED_CHECKPOINTED' or values.get('result') != 'Err(InvalidInput("AXBI_RUNTIME_CAP"))' or values.get('accepted') != '200000':
+        return False
+    if expected == 1 and (proof.get('stderr_text') != 'InvalidInput("AXBI_RUNTIME_CAP")\n' or proof.get('launcher_status') != 'FAILED_EXIT_1'):
+        return False
+    try:
+        return int(values['attempts']) < 650000 and int(values['rhs_evaluations']) < 20000000 and 0 <= float(values['wall_s']) < 10800
+    except (KeyError, ValueError, TypeError):
+        return False
+
+
 def terminal(case, original, groups):
     out = case['output']; raw = out.parent / (case['case']+'_raw')
     required = [raw/'execution_start.json', raw/'time.log', raw/'stdout.log', raw/'stderr.log', out/'RETURN.txt', out/'checkpoint.txt', out/'config.cfg', out/'case_id.txt', out/'source_identity.txt', out/'ledgers.csv']
@@ -194,22 +221,38 @@ def terminal(case, original, groups):
     state = list(map(float, lines[1].split())); counts = list(map(int, lines[2].split()))
     if not all(math.isfinite(x) for x in state) or float(values['a']) != state[0] or [int(values[k]) for k in ['accepted', 'attempts', 'rejections', 'rhs_evaluations']] != [counts[i] for i in [0,1,2,4]]:
         raise RuntimeError('TERMINAL_CHECKPOINT_PARITY')
-    if numbers[2] > 1e-11 or numbers[3] >= 2e-4 or numbers[3] < 0:
+    if len(state) != 11 or len(counts) != 6 or any(x < 0 for x in counts) or not (0 < state[0] <= .2 and state[1] >= 0 and all(0 <= x <= 1 for x in state[3:6]) and state[4]+state[5] <= 1 and state[6] > 0 and state[7] > 0):
+        raise RuntimeError('TERMINAL_CHECKPOINT_DOMAIN')
+    if [float(values[k]) for k in ['wall_s','max_newton_residual','last_error']] != [state[i] for i in [10,8,9]]:
+        raise RuntimeError('TERMINAL_CHECKPOINT_SCALAR_PARITY')
+    cells = list(map(float, lines[4].split()))
+    if len(cells) != 392 or not all(math.isfinite(x) and x >= 0 for x in cells):
+        raise RuntimeError('CHECKPOINT_PHOTON_DOMAIN')
+    if numbers[2] < 0 or numbers[2] > 1e-11 or numbers[3] >= 2e-4 or numbers[3] < 0:
         raise RuntimeError('TERMINAL_NUMERICAL_GUARD')
+    checkpoint_ledgers = list(map(float, lines[3].split()))
+    initial_energy = list(map(float, lines[5].split()))
+    if len(checkpoint_ledgers) != 24 or len(initial_energy) != 1 or not all(math.isfinite(x) for x in checkpoint_ledgers + initial_energy):
+        raise RuntimeError('CHECKPOINT_LEDGER_DOMAIN')
     with (out/'ledgers.csv').open() as stream:
-        if any(line.rstrip().endswith(',FAIL') for line in stream):
-            raise RuntimeError('TERMINAL_LEDGER_FAILURE')
+        for line in stream:
+            fields = line.rstrip().split(',')
+            if fields[-1] == 'FAIL' or any(x.lower() in {'nan','inf','-inf','+inf','infinity','-infinity','+infinity'} for x in fields):
+                raise RuntimeError('TERMINAL_LEDGER_FAILURE')
     complete = code == 0 and values.get('status') == 'COMPLETE_REPRESENTED_INTERVAL' and numbers[0] == .2
-    cap = CAP.typed_cap(case, code, groups)
-    if not complete and not cap:
-        raise RuntimeError('UNKNOWN_OR_SCIENCE_OUTCOME_HOLD:' + case['case'])
+    launcher_status = None
     if case['case'] not in {'ZERO', 'SHEAR_PLUS'}:
         launcher = raw/'execution_receipt.json'
         result = json.loads(launcher.read_text())
         if result.get('case') != case['case'] or result.get('exit_code') != code or result.get('driver_terminal_record') != (out/'RETURN.txt').read_text():
             raise RuntimeError('LAUNCHER_TERMINAL_PARITY')
+        launcher_status = result.get('status')
         required.append(launcher)
-    return dict(case=case['case'], status='COMPLETE_EXIT_0' if complete else 'STOPPED_CHECKPOINTED', typed_stop=None if complete else 'ACCEPTED_STEP_CAP', exit_code=code, occupied=False, missing_evidence=None, actual_start=start, actual_terminal=values, time_text=time_text, evidence_sha256={str(p.relative_to(ROOT)):digest(p) for p in required if p.name not in {'stdout.log','stderr.log','ledgers.csv'}}, raw_paths={p.name:str(p.relative_to(ROOT)) for p in required})
+    cap_evidence = dict(exact_terminal_evidence_verified=True, source_identity_sha256=digest(out/'source_identity.txt'), stderr_text=(raw/'stderr.log').read_text(), launcher_status=launcher_status, authority_sha256=EXIT_AUTHORITY_SHA)
+    cap = original_cap_exit(dict(case=case['case'], exit_code=code, actual_terminal=values, actual_start=start, cap_evidence=cap_evidence))
+    if not complete and not cap:
+        raise RuntimeError('UNKNOWN_OR_SCIENCE_OUTCOME_HOLD:' + case['case'])
+    return dict(case=case['case'], status='COMPLETE_EXIT_0' if complete else 'STOPPED_CHECKPOINTED', typed_stop=None if complete else 'ACCEPTED_STEP_CAP', exit_code=code, occupied=False, missing_evidence=None, actual_start=start, actual_terminal=values, cap_evidence=cap_evidence, actual_launcher_status=launcher_status, time_text=time_text, evidence_sha256={str(p.relative_to(ROOT)):digest(p) for p in required if p.name not in {'stdout.log','stderr.log','ledgers.csv'}}, raw_paths={p.name:str(p.relative_to(ROOT)) for p in required})
 
 
 def reconcile(original, cases, require_half=False, allowed_parent=None, allowed_group=None, groups=None):

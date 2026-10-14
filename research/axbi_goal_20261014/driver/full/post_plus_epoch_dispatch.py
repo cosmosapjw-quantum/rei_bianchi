@@ -32,7 +32,7 @@ def carried_receipt(receipt):
     if {r.get('case') for r in receipt.get('original_results',[])} != {'ZERO','SHEAR_PLUS','SHEAR_MINUS','SHEAR_HALF_PLUS','SHEAR_HALF_MINUS'}:
         raise RuntimeError('RECOVERED_ORIGINAL_OUTCOMES_UNKNOWN')
     for result in receipt['original_results']:
-        if not ((result.get('status') == 'COMPLETE_EXIT_0' and result.get('exit_code') == 0) or (result.get('typed_stop') == 'ACCEPTED_STEP_CAP' and result.get('exit_code') == 101)):
+        if not ((result.get('status') == 'COMPLETE_EXIT_0' and result.get('exit_code') == 0) or (result.get('typed_stop') == 'ACCEPTED_STEP_CAP' and EPOCH.original_cap_exit(result))):
             raise RuntimeError('RECOVERED_OUTCOME_UNCLASSIFIED')
     if receipt.get('zero_result',{}).get('status') != 'SUCCESS' or receipt['zero_result'].get('exit_code') != 0:
         raise RuntimeError('RECOVERED_ZERO_UNKNOWN')
