@@ -1,0 +1,110 @@
+{
+  "schema": "rei.axbi.atomic_vector_repair_authority.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "work_id": "ATOMIC_VECTOR_001",
+  "repair_id": "ONE_HARNESS_REPAIR_001",
+  "decision": "AUTHORIZE_ONE_BOUNDED_HARNESS_REPAIR_AND_REMAINING_SECOND_TARGETED_INVOCATION",
+  "authority": {
+    "requested_model": "gpt-6-astra",
+    "requested_effort": "high",
+    "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED"
+  },
+  "scientific_admission": "NOT_ISSUED",
+  "parent_contract": {
+    "path": "research/axbi_goal_20261014/performance/atomic_vector_001/AUTHORITY_CONTRACT.json",
+    "sha256": "308d701abb8fcd3caebf8d9a5861efad514f475e661168cbfdbd0371767302b2",
+    "relationship": "Additive execution authorization for one targeted repair; parent numerical gates, caps and source pins unchanged"
+  },
+  "first_failure": {
+    "path": "raw/test.stderr",
+    "sha256": "2730a4942a9326b6888fb75e0b493db82409950e9d350b46420781c49a0908b9",
+    "observed": "E0603 private module atomic_provider from src/lib.rs:4",
+    "classification": "COMPILATION_HARNESS_DEFECT; no mathematical or scientific counterexample",
+    "charged_build_test_invocations": 1,
+    "observed_numeric_evaluations": 0,
+    "preservation": "Keep raw/test.stdout and raw/test.stderr unchanged; capture remaining attempt to separately named raw/test_repair.stdout and raw/test_repair.stderr with actual command/exit/wall evidence."
+  },
+  "reviewed_pre_repair_sources": {
+    "src/lib.rs": "6b1deae2b7ccd7fdcf0bc44cef87b3cbfb8a3803c4ead48cb0a53c8b18cf2154",
+    "src/main.rs": "42c19f96bf11caff6b369cf9b6a909aa16bd3bc406cf098d083d3375cde0860b",
+    "src/photon_kernel.rs": "1ef619c5dcf6b1f03018e5197b0ce5029a970e09d2b138d8ae7110c19fe02da7",
+    "src/candidate_igm_thermal.rs": "86e37a353766aa24a75191281cb3b46acf169c55f276aeea684a866a73cea8b5",
+    "src/candidate_axbi_rates.rs": "a282046a4b6ba590eb94e8335b4afd6f64dbefe6e036c5a5d19953192e5badca"
+  },
+  "allowed_paths": {
+    "existing_worker_edits": [
+      "src/lib.rs",
+      "src/main.rs",
+      "tests/exact_components.rs"
+    ],
+    "evidence_updates": [
+      "SOURCE_MANIFEST.json",
+      "RUN_BINDING.json",
+      "IMPLEMENTATION_RECEIPT.json",
+      "BENCHMARK_RECEIPT.json"
+    ],
+    "new_evidence": [
+      "REPAIR_AUTHORITY.json"
+    ],
+    "generated": [
+      "raw/",
+      "target/"
+    ],
+    "root_rule": "All relative to atomic_vector_001; preserve raw first failure. run_ncp.sh preparation remains allowed by parent contract. No canonical source, contracts, live binaries/processes, physics candidate bodies, Cargo dependencies or numerical policy changes."
+  },
+  "authorized_repair": [
+    {
+      "finding": "Private module import prevents compilation",
+      "fix": "Replace atomic_provider::AtomicProvider import with public rei_microphysics::AtomicProvider re-export confirmed at canonical lib.rs:35-36."
+    },
+    {
+      "finding": "photon_input uses spectral cell means, which are not the fixed Driver energy nodes",
+      "fix": "Construct exact Driver::new node array: initial13.6 then every spectral_cells.upper_ev in original order; obtain same AtomicProvider cross sections. For subdivisions16/32 and angle8/16 use resulting49/97 energy nodes. Existing one-occupied-node indices0,sub,2*sub then hit13.6,24.59,54.42. Add endpoint100eV single occupied fixture in same fixed matrix (one extra stock mode), retaining varied/all-zero and partial final-block cases. This restores parent threshold endpoint requirement without changing source model or node counts."
+    },
+    {
+      "finding": "Ledger scale max(initial,abs(rhs),1e-30) violates locked normalization",
+      "fix": "Use max(initial photon inventory,1 photon/H) for these isolated no-injection fixtures. Keep normalized residual<=1e-10. Report actual loss, expected event loss and normalization where a failure occurs. Do not loosen the tolerance or hide baseline/candidate failures."
+    },
+    {
+      "finding": "Ledger reference and benchmark filtering calls bypass counters",
+      "fix": "Route every baseline/candidate point call and photon-kernel call through existing counted eval/photo_eval wrappers, including successful-input filtering and ledger recomputation; alternatively reuse already computed reference stocks to avoid a second call. Count failed calls too. Prevent cap overflow before evaluation with checked reserve rather than a post-increment assertion."
+    },
+    {
+      "finding": "Local and remote counters currently restart independently",
+      "fix": "Main reads mandatory nonnegative prior counts from AXBI_PRIOR_POINT_CALLS,AXBI_PRIOR_PHOTON_CELLS,AXBI_PRIOR_VALIDATION_POINT_CALLS before any evaluations. Populate from observed remaining local test output, bind exact values in RUN_BINDING, and initialize counters/cumulative validation accounting accordingly. No zero default for missing carry-in. First failed compile contributes0 numerical calls but1 build invocation. Report prior,remote delta,total explicitly; <=250000 point and<=50000000 photon cells globally, cumulative validation point calls<=50000. Tests emit counters even on failure using guard/unwind or equivalent mechanical reporting; do not invent counts after unobserved execution."
+    },
+    {
+      "finding": "Timed workload lacks contract-required observable checksum",
+      "fix": "Retain black_box for complete outputs; accumulate and report deterministic checksums for equal ordered workloads in both variants. A checksum is timing-elimination protection only; complete field parity remains required. Include checksum overhead equally and report it as part of component benchmark."
+    },
+    {
+      "finding": "Parity zips can silently ignore unmatched trailing output",
+      "fix": "Assert equal lengths before comparing full rate/RHS bit vectors and photon stock vectors. This is a harness assertion, not a numerical tolerance change."
+    }
+  ],
+  "unchanged_candidate_assessment": "Read-only diff shows candidate_igm_thermal differs from pinned RHS only by public-type imports and returning existing rates with RHS; candidate_axbi_rates retains outer EOS and assembles original AxbiPoint. Photon reference/hoisted arithmetic matches the approved association and ordered reductions. Do not edit these candidate body files during this repair.",
+  "remaining_execution": {
+    "targeted_build_or_test_invocations_remaining": 1,
+    "command": "CARGO_TARGET_DIR=<allowed-root>/target cargo test --release --manifest-path <allowed-root>/Cargo.toml --test exact_components -- --nocapture",
+    "binary": "Use normal benchmark binary produced by Cargo integration-test build if present and identity-bound. No third cargo build/test invocation is authorized if absent or second invocation fails.",
+    "local_prep_wall_rule": "Original1800-second cumulative preparation cap retained, including failure and review/repair elapsed work where charged by controller; no fresh timer allocation.",
+    "remote_benchmark_launches_max": 1,
+    "remote_external_timeout_seconds": 299,
+    "threads_max": 2,
+    "address_space_bytes": 2147483648,
+    "durable_output_bytes": 67108864,
+    "point_evaluations_cumulative_max": 250000,
+    "validation_point_evaluations_cumulative_max": 50000,
+    "photon_cells_cumulative_max": 50000000,
+    "trajectory_starts": 0,
+    "chemistry_evolution_steps": 0,
+    "adaptive_solver_steps": 0,
+    "automatic_retries": 0,
+    "optional_scope": "Do not add optional block8 or two-worker implementation in this repair. Existing NOT_IMPLEMENTED/NOT_MEASURED labels remain acceptable per parent contract."
+  },
+  "stopping_and_transition": {
+    "failure": "Any compiler, parity, ledger, resource or transport failure after this repair stops affected unit. Preserve exact first failure and cumulative usage; no automatic second repair/retry or cap reset.",
+    "pass": "Passing remaining targeted test permits the already-authorized single NCP benchmark if binary exists, capacity and cumulative quotas are bound, and all original gates hold. Then send final diff/raw results to independent reviewer.",
+    "claim_boundary": "This repair decision is not independent final candidate acceptance, production integration or scientific admission."
+  }
+}

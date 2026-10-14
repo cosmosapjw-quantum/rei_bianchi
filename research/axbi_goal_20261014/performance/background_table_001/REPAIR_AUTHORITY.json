@@ -1,0 +1,97 @@
+{
+  "schema": "rei.axbi.background_table_benchmark_repair_authority.v2",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "work_id": "BACKGROUND_TABLE_001",
+  "written_utc": "2026-10-14T11:42:13.996180+00:00",
+  "decision": "APPROVE_ONE_BOUNDED_COMPILE_AND_PRESCRIBED_STABLE_INTERVAL_IMPLEMENTATION_REPAIR_WITH_REMAINING_SECOND_INVOCATION",
+  "scientific_admission": "NOT_ISSUED",
+  "authority": {
+    "requested_model": "gpt-6-astra",
+    "requested_effort": "high",
+    "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED",
+    "role": "Read-only scientific authority except this repair contract"
+  },
+  "parent_contract_sha256": "77b123318c5d512876b41c96456f241fb8d92256bcb0b5da163fd54a7b851f72",
+  "first_failure": {
+    "path": "raw/build_test_1.log",
+    "sha256": "a91fe7457d257b1e34fbebd410339fe504aa886c59eb9fb8059495e7b5cc7e7e",
+    "classification": "BUILD_PLUMBING_FAILURE_BEFORE_TEST_EXECUTION",
+    "observed_errors": [
+      "src/main.rs malformed format string: unmatched closing JSON brace",
+      "src/main.rs compile-time include_str of raw/local_test_counts.json before integration test creates it",
+      "Two subsequent type-inference diagnostics on the same unavailable include_str expression"
+    ],
+    "evidence": "Compiler stopped before any tests ran; worker reports zero numerical calls and zero remote launches. Preserve log and charged first invocation.",
+    "not_scientific_counterexample": true
+  },
+  "pre_repair_sha256": {
+    "src/main.rs": "0d3c8f30952f919622d1b0738e385b192b35d14fd64a27944f8b06736331a6b3",
+    "src/lib.rs": "6415b401190d95c4c24a4578713d357b08f65464dc8b2e0df9b512f444a3817a",
+    "tests/background_tables.rs": "062153eeedc93f34ea9bc7bd2daca4ba187fb2cd9775ed89c76999d76c3934ad",
+    "Cargo.toml": "0bf2d1e6cd46c177d4584a7c85adc3ec3cecf733a8ace8728637148b4d5fb0b1"
+  },
+  "allowed_code_change": {
+    "changes": [
+      "Escape the literal closing JSON brace in the failing format string without changing the emitted field semantics.",
+      "Replace compile-time include_str of raw/local_test_counts.json with a runtime read of the actual post-test counts file adjacent to the supplied contract, at <contract_parent>/raw/local_test_counts.json. The file must be staged together with the exact successful test evidence before remote launch.",
+      "Parse the three named nonnegative integer counts direct,candidate,integrand; require all three exactly once and within original cumulative caps. Missing/malformed/out-of-cap evidence returns a clear error before numerical calls. No missing-file default, invented zero file, hardcoded unmeasured counts or counter reset.",
+      "Resolve only directly associated type annotations/imports necessary for that runtime read and format repair.",
+      "In standalone src/lib.rs and its src/main.rs call sites, define local interval width from the actual supplied positive binary64 endpoints a1<a2: delta_L=ln_1p((a2-a1)/a1). Do not obtain a small width by subtracting two independently rounded global logarithms. This is stable evaluation of the already specified ln(a2/a1) interval, not a changed physical interval.",
+      "Evaluate the32/64-panel local Simpson reference on v in[0,delta_L],with a(v)=a1*exp(v),and use a1,a2 exactly at the respective endpoints. Both panel counts must use these identical actual supplied-a endpoints. Preserve integrand quotas and the1e-9 relative reference agreement gate.",
+      "For stable Hermite increments split at the stored scale-factor knots actually crossed. For each segment[a_left,a_right],compute du=ln_1p((a_right-a_left)/a_left)/h and evaluate the factored polynomial increment using du directly; do not recover du by subtracting independently computed global coordinates. Obtain the polynomial evaluation coordinates consistently within that segment; avoid coordinate clipping or extrapolation. This only repairs the standalone increment diagnostic to implement the original cancellation-resistant contract. Keep cumulative table point evaluation and the actual driver-style time subtraction separately measured and unchanged.",
+      "Record both nominal requested dL and actual delta_L with the endpoint bits in interval evidence. Any change of generated actual endpoints,acceptance tolerance or physical rates is out of scope.",
+      "Measure wall/CPU around each existing1024/2048 Table::from_reference construction separately; label these as per-level assembly from shared references. Keep separately measured shared8193-point direct reference construction. Report actual aggregate construction and amortization for this shared-reference implementation; do not call assembly-only timing independent full-table construction or infer unmeasured standalone node-generation cost. No additional direct node-generation runs are authorized.",
+      "Report maximum1024-vs2048 point differences over the existing validation reference lattice using already generated direct samples. Record clock dimensional and normalized differences and b absolute differences separately. Extra candidate queries count against the original8million cap; no new direct references or changed gates."
+    ],
+    "unchanged": "No physical model,provider,domain,tolerance,grid,query-list,guard,acceptance or source-binding changes; no dependency additions. Only the listed stable arithmetic implements the already-required supplied-a interval diagnostic. Canonical sources and existing tests remain unchanged. Any other defect returns HOLD.",
+    "paths": [
+      "src/main.rs",
+      "src/lib.rs"
+    ]
+  },
+  "execution": {
+    "invocations_consumed": 1,
+    "remaining_build_or_test_invocations": 1,
+    "next_command_template": "CARGO_TARGET_DIR=<allowed-root>/target cargo test --release --manifest-path <allowed-root>/Cargo.toml --test background_tables",
+    "rule": "All listed fixes form one authority-approved bounded repair before the remaining second invocation; no intermediate compile/test probing. This is not an automatic retry. The second invocation must supply successful targeted tests and the normal benchmark executable as produced by Cargo for the integration test. Verify executable exists and record hash; no third cargo build/test invocation is authorized.",
+    "raw_log": "raw/build_test_2.log",
+    "charge": "Retain original preparation start/cumulative wall and all calls. If the original1800-second preparation budget is already exhausted, stop before invocation; this authority grants no wall extension.",
+    "post_test_accounting": "Use actual generated local_test_counts.json values in the remote benchmark counters. Preserve exact file bytes/hash, successful test log and build artifact identity. If a test fails after making calls, retain its observed counts and do not launch remotely."
+  },
+  "unchanged_limits": {
+    "preparation_wall_seconds_total": 1800,
+    "build_or_test_invocations_total": 2,
+    "remote_launches_total": 1,
+    "remote_wall_seconds": 600,
+    "remote_external_timeout_seconds": 599,
+    "threads": 1,
+    "address_space_bytes": 2147483648,
+    "durable_output_bytes": 134217728,
+    "direct_calls_total_max": 65536,
+    "cache_table_queries_total_max": 8000000,
+    "local_interval_integrand_evaluations_total_max": 2000000,
+    "trajectory_starts": 0,
+    "chemistry_steps": 0,
+    "adaptive_steps": 0,
+    "shared_science_slots": 0
+  },
+  "stop": "If second invocation fails, executable is unavailable, any original cap is exceeded or another substantive defect appears, preserve raw evidence and return exact HOLD. No further repair/build/test/remote retry under this authority.",
+  "pass_next_action": "Successful second invocation permits remaining originally authorized preparation and the one bounded standalone NCP component benchmark, within unmodified caps and prelaunch identity/accounting binding. Independent read-only review still precedes any production integration decision; AX11/AX12 and live original processes remain unchanged.",
+  "allowed_authority_write": "REPAIR_AUTHORITY.json only; no code,process or Git mutation by authority",
+  "supersedes_initial_authority_sha256": "809c0b84a07c35a6f6b86a375126481b34767b4d34165d20c10de3ab2cbde53c",
+  "amendment_reason": "Controller relayed pre-execution supplied-a interval cancellation and missing required timing/refinement outputs before the second invocation. This explicitly completes the originally required stable increment and evidence semantics; no tolerance,model,scope or budget expansion.",
+  "numerical_authority_decision": {
+    "classification": "APPROVED_STABLE_EVALUATION_OF_EXISTING_SUPPLIED_A_INTERVAL",
+    "reason": "ln(a2/a1)=ln1p((a2-a1)/a1) mathematically; using actual a endpoints consistently avoids testing unequal intervals after floating-point exp/log round trips. No numerical run has occurred and no measured failing gate is being relaxed.",
+    "preserved_gates": {
+      "local32_64_relative": 1e-09,
+      "stable_increment_relative": 1e-09,
+      "clock_derivative_relative": 1e-09,
+      "b_derivative_absolute": 1e-11,
+      "point_clock_normalized": 1e-09,
+      "point_b_absolute": 1e-11,
+      "driver_subtraction_HOLD_relative": 1e-08
+    },
+    "claim": "Sampled component consistency only; no trajectory-level accuracy or production switch."
+  }
+}

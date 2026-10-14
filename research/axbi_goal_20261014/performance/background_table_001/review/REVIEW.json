@@ -1,0 +1,334 @@
+{
+  "schema": "rei.axbi.background_table_independent_review.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "work_id": "BACKGROUND_TABLE_001",
+  "written_utc": "2026-10-14T11:52:56.356457+00:00",
+  "decision": "SCOPED_COMPONENT_PASS_WITH_SHORT_STEP_SUBTRACTION_HOLD",
+  "component_admission": "PASS_SAMPLED_FIXED_MODEL_COMPONENT_ONLY",
+  "table_production_integration": "HOLD_SHORT_STEP_SUBTRACTION",
+  "exact_cache_production_integration": "DEFER_ADOPTION_PENDING_SEPARATE_BOUNDED_INTEGRATION_CONTRACT_AND_DRIVER_PARITY_REVIEW",
+  "scientific_admission": "NOT_ISSUED",
+  "reviewer": {
+    "requested_model": "gpt-6-astra",
+    "requested_effort": "xhigh",
+    "transport_role": "costroute-research-review",
+    "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED",
+    "independence": "Fresh reviewer did not implement or execute the candidate. Read-only examination and stored-data arithmetic only; this authority-owned review is the sole write.",
+    "new_build_test_invocations": 0,
+    "new_remote_launches": 0,
+    "new_numerical_benchmark_calls": 0,
+    "new_trajectory_starts": 0
+  },
+  "implementation_identity": {
+    "requested_model": "gpt-6.1-sol",
+    "requested_effort": "medium",
+    "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED",
+    "note": "Requested identities in authority/manifest are historical requests, not runtime observations. The contract author recorded requested gpt-6-astra/high; this review does not rewrite that record."
+  },
+  "reviewed_identity": {
+    "checkout": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+    "branch": "codex/rux-science-delivery-20261014",
+    "head_at_review_start": "1cff09ef35196443d3a25d484c928b1512ae22c2",
+    "origin": "https://github.com/cosmosapjw-quantum/rei_bianchi.git",
+    "contract_head": "9443388e6c2fa00c41e4e8f7db11fcacfc8b9b76",
+    "contract_sha256": "77b123318c5d512876b41c96456f241fb8d92256bcb0b5da163fd54a7b851f72",
+    "repair_authority_sha256": "10bc6fbd7f897a5ec2decc9d6754eaf072cd3361f2a9b3fce711ade03e42b7c2",
+    "benchmark_receipt_sha256": "a7012ed641aa2b3fed53b9c2ca3e95cde052bc931cc5307e258f894234b1d7d8",
+    "source_manifest_sha256": "bfc9a9c31796b3e86052c4a79d6319f03cdad3b6d1e7469e310d55d15080bd10",
+    "run_binding_sha256": "8a47823ebb0b30a15de30058b07620cc331887e2f65ad2acbaa54d90721feba6",
+    "candidate_binary_sha256": "f459403d69b757b033b435dfda6635f7d9a679f08d8506f654bfd749f5c854b3",
+    "compiled_source_identity_sha256": "4de69c1e68ebd395fe2d0b5580d901b9a82bde86cadbd11bdd07e5ad2042b4a1",
+    "immutable_pins_verified": 21,
+    "candidate_manifest_entries_verified": 12,
+    "receipt_raw_hashes_verified": 11,
+    "identity_mismatches": [],
+    "compiled_identity_reconstructed": "SHA256 of the 17 pinned text inputs joined with the canonical AXBI_SOURCE_BOUNDARY separator matches.",
+    "canonical_source_diff": "No tracked working-tree diff; axbi_background.rs and axbi_driver.rs have no diff against the contract base. All 21 canonical source/contract pins are unchanged despite unrelated HEAD movement.",
+    "candidate_source_review": "Inspected complete standalone src/lib.rs, src/main.rs, tests/background_tables.rs, package manifest and launcher as subtree additions. The complete pre-repair source bytes are not retained here, so exact textual pre/post repair diff is not independently reconstructed; approved final arithmetic, unchanged test hash and first failure are inspected.",
+    "dirty_state": "Existing untracked files and concurrent work preserved; no Git operation that mutates state."
+  },
+  "gate_review": {
+    "cases": [
+      {
+        "family": "PhysicalDensityFixed",
+        "q_ref": 0.0
+      },
+      {
+        "family": "PhysicalDensityFixed",
+        "q_ref": 0.005
+      },
+      {
+        "family": "PhysicalDensityFixed",
+        "q_ref": -0.005
+      },
+      {
+        "family": "PhysicalDensityFixed",
+        "q_ref": 0.01
+      },
+      {
+        "family": "PhysicalDensityFixed",
+        "q_ref": -0.01
+      },
+      {
+        "family": "SameHDiagnostic",
+        "q_ref": 0.01
+      }
+    ],
+    "sample_scope": "For each case, 4097 points at 1024 cells and 8193 points at 2048 cells: endpoints, every knot and three quarter-cell locations. All use the unchanged 4096-panel direct evaluator; this is a finite sample comparison, not a continuum or absolute-accuracy certificate.",
+    "point_and_derivative_gates": [
+      {
+        "intervals": 1024,
+        "decision": "PASS",
+        "max_clock_normalized": 5.4438031345359534e-11,
+        "clock_limit": 1e-09,
+        "max_b_absolute": 3.3542843524449195e-16,
+        "b_limit": 1e-11,
+        "max_clock_derivative_relative": 7.370148935592624e-11,
+        "clock_derivative_limit": 1e-09,
+        "max_b_derivative_absolute": 7.178563299348184e-13,
+        "b_derivative_limit": 1e-11
+      },
+      {
+        "intervals": 2048,
+        "decision": "PASS",
+        "max_clock_normalized": 6.9036364268004545e-12,
+        "clock_limit": 1e-09,
+        "max_b_absolute": 5.117434254131581e-17,
+        "b_limit": 1e-11,
+        "max_clock_derivative_relative": 1.4665380021483543e-11,
+        "clock_derivative_limit": 1e-09,
+        "max_b_derivative_absolute": 1.1855967596563488e-13,
+        "b_derivative_limit": 1e-11
+      }
+    ],
+    "endpoints_knots_and_domain": "PASS: supplied a bits, direct t/b bits at all native knots including endpoints, finite positive H, sampled strictly increasing t, zero-shear fields and invalid/out-of-domain errors are checked in the observed matrix. Endpoint derivatives use the endpoint cell polynomial.",
+    "algebraic_and_reflection": "H_FLRW,H,s,sigma are bitwise equal to the direct reference at sampled points. Signed direct-reference reflection is checked at 8193 points for both +/- pairs. Candidate t/b interpolation uses the same signed-linear coefficients and identical grids, so even/odd parity is preserved structurally; separate candidate-reflection maxima were not emitted. No radiation/chemistry sign symmetry is admitted.",
+    "stable_interval": {
+      "decision": "PASS",
+      "unique_intervals": 480,
+      "rows_both_levels": 960,
+      "nominal_dL": [
+        1e-10,
+        1e-08,
+        1e-06,
+        0.0001,
+        0.005
+      ],
+      "actual_endpoint_rule": "Both references and stable increments use actual binary64 a endpoints and ln1p((a2-a1)/a1). Endpoint bits agree across the two levels.",
+      "reference32_64_max_relative": 1.1102230246251565e-15,
+      "reference_limit": 1e-09,
+      "max_stable_relative_by_level": {
+        "1024": 2.3826052242270634e-11,
+        "2048": 5.830225191516547e-12
+      },
+      "stable_limit": 1e-09,
+      "all_reference_and_stable_increments_positive": true,
+      "qualification": "Local 32/64-panel agreement is an empirical consistency check; stable Hermite increments are diagnostics and are not used by the production driver."
+    },
+    "level_difference": {
+      "max_clock_absolute_s": 2048.0,
+      "max_clock_normalized": 5.4245482115770385e-11,
+      "max_b_absolute": 3.3542843524449195e-16,
+      "interpretation": "Observed level differences only; no order or uniform convergence claim."
+    },
+    "subtraction": {
+      "decision": "SHORT_STEP_SUBTRACTION_HOLD",
+      "limit_relative": 1e-08,
+      "held_rows": 356,
+      "held_rows_per_level": 178,
+      "max_table_relative": 1.7637269975612213e-06,
+      "max_direct_relative": 2.245989675930815e-05,
+      "first_held_record": {
+        "kind": "interval",
+        "case": 0,
+        "n": 1024,
+        "a1_bits": 4587023449039406616,
+        "a2_bits": 4587023449040092879,
+        "nominal_requested_dL": 1e-10,
+        "actual_delta_L": 1.0000002908571882e-10,
+        "reference64_s": 844944.38036397,
+        "reference32_s": 844944.3803639702,
+        "stable_s": 844944.3803639701,
+        "table_subtraction_s": 844944.204474639,
+        "direct_subtraction_s": 844944.204474639,
+        "stable_relative_error": 2.220446049250313e-16,
+        "table_subtraction_relative_error": 2.081667562769951e-07,
+        "direct_subtraction_relative_error": 2.081667562769951e-07,
+        "short_step_hold": true
+      },
+      "consequence": "Driver::tentative currently subtracts cumulative point times at axbi_driver.rs:584. Both direct and interpolated subtraction can exceed the frozen local interval limit. Stable diagnostic PASS neither repairs that path nor removes the explicit production table HOLD.",
+      "scope": "An exact cache preserves the direct subtraction bits, including its existing cancellation. Cache parity cannot be described as a clock-accuracy repair. This finding alone does not invalidate retained baseline histories or establish their error; no trajectory effect was measured."
+    }
+  },
+  "cache_review": {
+    "component_decision": "PASS_FOR_IMMUTABLE_INSTANCE_USAGE_IN_THIS_BENCHMARK",
+    "mechanism": "Exact a.to_bits keys, maximum 256 entries, deterministic FIFO, successful direct calls only, cached BackgroundPoint copied unchanged. Cache misses execute the pinned direct routine.",
+    "evidence": "Observed unit test covers endpoint/interior hit equality, eviction and exact error-tag agreement. All 36 paired timed direct/cache aggregate checksums match; repeated lists have 112 hits/16 misses and unique lists have 0 hits/128 misses.",
+    "qualification": "Timing checksums alone are not a seven-field per-query proof. Correctness also relies on the inspected cache implementation and immutable-instance use. The standalone cache exposes a public replaceable model, so this harness type must not be copied into production with stale entries surviving background replacement.",
+    "separability": "YES: a private cache bound to an immutable background can be reviewed as a bit-preserving optimization separately from table interpolation. Current evidence permits the next integration contract; it does not approve the unimplemented production change."
+  },
+  "timings": {
+    "scope": "Observed same-host component queries with three repetitions; no whole-driver, whole-goal, parallel scaling or trajectory speedup measurement.",
+    "remote_wall_s": 12.2,
+    "remote_user_cpu_s": 12.18,
+    "peak_rss_kib": 6144,
+    "cache_speedup_range_repeated": [
+      7.718667246669274,
+      7.990369738903303
+    ],
+    "cache_speedup_range_unique": [
+      0.9918287765423942,
+      1.0198426183558502
+    ],
+    "table_speedup_range_repeated": [
+      1114.233950833042,
+      1447.7480733586965
+    ],
+    "table_speedup_range_unique": [
+      500.76584768505256,
+      760.1945580650898
+    ],
+    "construction_shared_reference_plus_both_assemblies_wall_range_s": [
+      1.235478149,
+      1.950690813
+    ],
+    "construction_accounting": "Shared 8193-point direct reference construction and each table assembly are separately measured. Reported amortization charges shared reference work plus selected assembly; it is not independently measured minimal standalone table construction.",
+    "limitations": "Each timed batch has only 128 queries and includes timer/proc-accounting overhead. Modes always run direct/cache/1024/2048 in that order; no randomized-order or host-isolation evidence is provided. These descriptive sample speedups have no statistical confidence claim.",
+    "driver_hotpath": "Source inspection shows repeated point_at_scale in ray, moments, geometry_map, inject and tentative. Reuse opportunity is source-derived; the component query list is not a measured full-driver query trace."
+  },
+  "failure_and_accounting": {
+    "first_failure": {
+      "path": "raw/build_test_1.log",
+      "sha256": "a91fe7457d257b1e34fbebd410339fe504aa886c59eb9fb8059495e7b5cc7e7e",
+      "classification": "BUILD_PLUMBING_FAILURE_BEFORE_TEST_EXECUTION",
+      "preserved": true,
+      "numerical_calls": 0
+    },
+    "repair": "The second cargo invocation passed its single targeted cache test and produced the manifest-bound executable. The approved final stable arithmetic keeps the supplied endpoints and original gates.",
+    "build_test_invocations_charged": 2,
+    "remote_launches_charged": 1,
+    "remaining_build_test_invocations": 0,
+    "remaining_remote_launches": 0,
+    "local_counts": {
+      "direct": 279,
+      "candidate": 270,
+      "integrand": 0
+    },
+    "direct_calls_cumulative": 57603,
+    "direct_cap": 65536,
+    "counted_cache_table_point_queries": 188142,
+    "candidate_cap": 8000000,
+    "candidate_count_note": "The recorded candidate counter increments cache/query entrypoints, not Table::derivatives or Table::increment. Counting 73740 derivative calls and 960 increments as additional table queries gives a conservative total 262842, still below the unchanged cap. Do not relabel 188142 as counting every table method.",
+    "local_integrand_evaluations_cumulative": 47040,
+    "integrand_cap": 2000000,
+    "rederived_from_source_and_rows": true,
+    "direct_timed_plus_cache_miss_calls_per_repetition": 2400,
+    "per_repetition_cap": 4096,
+    "raw_output_bytes_local": 581018,
+    "durable_output_cap_bytes": 134217728,
+    "preparation_wall": "Contract timestamp 11:36:15 UTC precedes the recorded preflight at 11:44:34 UTC by under 500 seconds. No separate preparation-start/elapsed receipt is present; exact preparation elapsed time is not independently measured by this review. No observed evidence of the 1800-second cap being exceeded.",
+    "remote_evidence": "Stored preflight records CPU 0 in allowed affinity, 44,124,897,280 free bytes, 12 transferred hashes verified, and observed tool paths. Stored time/exit records show one completed pinned-CPU run with address-space/file-size limits and exit 0. The reviewer did not open a new SSH session or independently observe the historical launch.",
+    "contamination": "Standalone local target and remote performance subtree; dependency sources unchanged; no trajectory/chemistry/adaptive driver call in benchmark main. Original outputs, dispatchers and live processes were not modified by this review. Stored launcher contains no signaling of original processes.",
+    "scope_ceiling_preserved": true
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "PRODUCTION_TABLE_BLOCKER",
+      "path": "rust/rei_microphysics/src/axbi_driver.rs:584; raw/numeric.jsonl interval records",
+      "finding": "Cumulative clock subtraction exceeds 1e-8 local relative discrepancy.",
+      "minimal_disposition": "Retain table integration HOLD. A future approved integration must evaluate the actual driver interval stably and pass the unchanged interval and driver checks; stable component diagnostics alone are insufficient. No such repair is authorized by this review."
+    },
+    {
+      "id": "F2",
+      "severity": "PRODUCTION_CACHE_PREREQUISITE",
+      "path": "src/lib.rs:23-26",
+      "finding": "Standalone ExactCache.model is public; replacing it after warming would leave entries for the previous background. The observed matrix never replaces it.",
+      "minimal_disposition": "Production cache must be private and owned by immutable background identity, or invalidated on replacement. Add a distinct-instance/clone/isolation regression in the next bounded unit. This does not negate the fixed immutable benchmark result."
+    },
+    {
+      "id": "F3",
+      "severity": "NONBLOCKING_ACCOUNTING_LABEL",
+      "path": "BENCHMARK_RECEIPT.json/results/cache_table_queries_cumulative; src/lib.rs:34-35",
+      "finding": "188142 excludes derivative and increment method calls.",
+      "minimal_disposition": "Use the exact counter definition and conservative all-table-method total 262842 in downstream reporting; no rerun or cap increase."
+    }
+  ],
+  "next_executable_transition": {
+    "decision": "READY_FOR_ONE_NARROW_EXACT_CACHE_INTEGRATION_CONTRACT; NO_EXECUTION_AUTHORIZATION_FROM_THIS_REVIEW",
+    "immediate_controller_action": "Freeze the current baseline source pins and a bounded EXACT_CACHE_001 integration contract using the requirements below, then assign implementation to the lower-tier worker. Retain BACKGROUND_TABLE_001 and all spent goal/task/allocation costs; do not rerun this completed benchmark.",
+    "allowed_source_paths": [
+      "rust/rei_microphysics/src/axbi_background.rs",
+      "rust/rei_microphysics/src/axbi_driver.rs"
+    ],
+    "allowed_test_paths": [
+      "rust/rei_microphysics/tests/axbi_background_cache.rs"
+    ],
+    "allowed_evidence_build_output_root": "research/axbi_goal_20261014/performance/exact_cache_001/",
+    "minimal_change": "Memoize unchanged successful BackgroundPoint values at the immutable AxbiBackground boundary so all existing full-driver callers reuse them. Keep direct computation available to the test comparator. Driver source change, if needed, is limited to paired parity tests/test-only control or the minimal accessor wiring. No public approximate-key interface, table code, stable-dt substitution, H_ref reassociation or separate origin-geometry optimization in this first cache change.",
+    "cache_requirements": [
+      "Exact u64 a.to_bits key and capacity 256 with FIFO eviction; errors are not cached.",
+      "Preserve all direct seven-field bits, validation errors, constructor behavior, point_at_time results and GeometryBackground behavior.",
+      "Bind entries to the exact immutable background, including cosmology, domain, b_ref, signed q, family and panels. No mutable-model replacement with stale entries; clones have coherent immutable ownership and deterministic numerical behavior.",
+      "Keep mutable bookkeeping outside DriverState, physical ledgers, checkpoint science state and numerical stopping policy."
+    ],
+    "required_component_tests": [
+      "Across the six frozen cases, compare all seven point bits on endpoints, the existing 128-point deterministic query lists, repeated hits and after more than 256 distinct keys; compare invalid input error tags.",
+      "Exercise different immutable background instances and cloning without cross-instance cache reuse; verify cold and warmed caches agree.",
+      "Run existing axbi_background and axbi_driver test targets unchanged, plus the new cache target. Existing point_at_time/checkpoint/output tests are relevant because the shared background boundary changes."
+    ],
+    "required_driver_parity": {
+      "fixture": "For each of the same six cases, use DriverConfig::baseline with its 4096 panels, GL8 angular grid, energy grid and original numerical tolerances. The next contract freezes exact starting state/configuration and direct/cache selection; no copied table implementation.",
+      "bounded_walk": "Pair one direct and one cached instance from identical initial states. For each case perform at most 20 paired adaptive comparisons, stopping at the first accepted step. Compare after every comparison. If no successful step occurs within the bound, preserve outcomes and return HOLD; do not extend or relax.",
+      "compare_bitwise": [
+        "a",
+        "all gas fractions and thermal energy",
+        "every photon population",
+        "every ledger scalar and event counter",
+        "next_dln_a",
+        "last_error",
+        "max_newton_residual",
+        "moments and photon/energy residuals",
+        "background time/b/rates and actual tentative cumulative-time subtraction"
+      ],
+      "compare_exact_control": [
+        "return status or error variant/tag",
+        "accepted",
+        "attempts",
+        "comparisons",
+        "rejects",
+        "consecutive_rejects",
+        "rhs_evaluations"
+      ],
+      "cold_warm_and_failure": "Include a fixed warm-cache replay of a successful paired step and a bounded forced rejection or max_attempts=1 partial-comparison case. Require identical state and counter side effects, including failed trial accounting.",
+      "output_and_checkpoint": "For the same paired state, compare physical checkpoint values and all five output_row streams with identical case labels; reload into cold/warm cached instances and compare the next bounded step. Compare physical fields exactly while handling explicit source/binary metadata as distinct candidate identity.",
+      "exclusions": "Wall elapsed, timing, cache hit/miss counters and explicit source identity metadata are not physical bit-parity fields. No tolerance substitution for a physical bit mismatch."
+    },
+    "suggested_finite_execution_envelope_for_next_contract": {
+      "preparation_wall_seconds_max": 1800,
+      "cargo_build_test_invocations_max": 2,
+      "targeted_command": "CARGO_TARGET_DIR=<exact_cache_001>/target cargo test --release --manifest-path rust/rei_microphysics/Cargo.toml --lib --test axbi_background --test axbi_driver --test axbi_background_cache -- --test-threads=1",
+      "command_note": "The fresh driver parity test can live under cfg(test) in axbi_driver.rs so private tentative/cache bypass controls need no production API. The authority must freeze the final exact command and raw-log paths before execution. The second invocation is a reserve only for one explicitly reviewed targeted repair, not an automatic retry.",
+      "driver_parity_adaptive_calls_max": 264,
+      "parity_bound_definition": "At most 240 adaptive calls for six cases x20 paired comparisons, plus at most24 calls for warm replay, rejection/cap and checkpoint checks.",
+      "optional_profile_after_parity_only": "At most three paired repetitions of one already passing, identical start-state full-driver adaptive step in each of q=0,+0.01,-0.01 PhysicalDensityFixed: at most18 further adaptive calls. Record end-to-end step wall/CPU, direct-evaluation/hit/miss counts and state parity. Alternating direct/cache order is permitted; no trajectory history or production restart.",
+      "total_new_adaptive_calls_including_profile_max": 282,
+      "one_remote_profile_launch_max": 1,
+      "remote_wall_seconds_max": 600,
+      "threads": 1,
+      "address_space_bytes": 2147483648,
+      "durable_output_bytes": 134217728,
+      "stopping": "Stop on first parity/error/identity/resource failure; retain raw outcome and cumulative counts. No new baseline-history launch, interpolation attempt, solver-parameter change or repeated repair loop."
+    },
+    "identity_and_output_requirements": [
+      "Record the actual changed canonical source identity, all new test/helper sources, build/toolchain flags and executable SHA separately from this standalone benchmark and the historical binary.",
+      "Use a new output namespace under exact_cache_001 keyed by candidate identity. Do not overwrite, append to, resume or relabel old runs/checkpoints as cache outputs.",
+      "Leave existing SCENARIO_LOCK, OUTPUT_CONTRACT, AX11/AX12 contracts and allocation records unchanged. New candidate identity does not grant scientific admission or reset cumulative accounting.",
+      "A fresh independent review of observed diff and full-driver parity evidence precedes candidate production adoption; actual production execution remains under its separately authorized allocation."
+    ],
+    "pass_next_action": "A successful independent exact-cache integration review may approve the cache as a bit-preserving optimization under a new binary/output identity, while retaining the inherited short-step clock limitation and all existing scientific claim ceilings. Table HOLD need not block that cache-only decision.",
+    "table_route": "Keep interpolation integration deferred until a separately authorized actual-driver interval treatment passes the original short-step gate and trajectory-sensitive parity/error checks; no table execution is authorized here."
+  },
+  "claim_ceiling": "Finite fixed-model component consistency, exact-cache immutable-use behavior, and descriptive same-host component timings only. No baseline trajectory accuracy conclusion, no full-goal speedup, no 64-core scaling, no AX11/AX12 PASS, no new scientific admission. Independent READY work continues under existing allocations.",
+  "artifact_write_scope": "research/axbi_goal_20261014/performance/background_table_001/review/REVIEW.json only"
+}
