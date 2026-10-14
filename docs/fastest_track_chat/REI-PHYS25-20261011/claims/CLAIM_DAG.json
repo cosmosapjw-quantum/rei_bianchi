@@ -1,0 +1,189 @@
+{
+  "task": "REI-PHYS25-20261011",
+  "version": 1,
+  "nodes": [
+    {
+      "id": "I0",
+      "claim": "frozen PHYS25 contract and exact-real J/source identities",
+      "status": "input-verified",
+      "evidence": [
+        "PHYSICS_CONTRACT.json",
+        "SOURCE_MANIFEST.json",
+        "evidence/REMOTE_INPUT_IDENTITY.json",
+        "evidence/LOCAL_INPUT_IDENTITY.json"
+      ]
+    },
+    {
+      "id": "I1",
+      "claim": "PHYS24 strict convexity and k(m)<0<B(m)",
+      "status": "inherited-closed",
+      "depends_on": [
+        "I0"
+      ],
+      "evidence": [
+        "inputs/inherited/PHYS24_DECISION_REVIEW.json",
+        "inputs/inherited/PHYS24_CURVATURE_CERTIFICATE.json",
+        "inputs/inherited/PHYS24_MOMENT_ENVELOPE.json"
+      ]
+    },
+    {
+      "id": "C1",
+      "claim": "minimum exists and every minimizer has active zero response",
+      "status": "derived",
+      "depends_on": [
+        "I0",
+        "I1"
+      ],
+      "evidence": [
+        "contributions/variational/VARIANCE_MINIMUM_DERIVATION_KO.md#1",
+        "contributions/variational/VARIANCE_MINIMUM_DERIVATION_KO.md#2"
+      ]
+    },
+    {
+      "id": "C2",
+      "claim": "general at-most-three support existence; strict convexity alone permits unique three-point optimum",
+      "status": "derived",
+      "depends_on": [
+        "C1"
+      ],
+      "evidence": [
+        "contributions/variational/VARIANCE_MINIMUM_DERIVATION_KO.md#3"
+      ]
+    },
+    {
+      "id": "C3",
+      "claim": "actual k triple prime strictly negative on I",
+      "status": "derived/exact-arithmetic implementation-verified conditional on fixed J",
+      "depends_on": [
+        "I0"
+      ],
+      "evidence": [
+        "contributions/derivative/THIRD_DERIVATIVE_DERIVATION_KO.md",
+        "contributions/derivative/THIRD_DERIVATIVE_CERTIFICATE.json",
+        "contributions/derivative/EXECUTION.json"
+      ]
+    },
+    {
+      "id": "C4",
+      "claim": "unique anchored root vstar and law Pstar",
+      "status": "derived",
+      "depends_on": [
+        "I1"
+      ],
+      "evidence": [
+        "contributions/variational/VARIANCE_MINIMUM_DERIVATION_KO.md#4"
+      ]
+    },
+    {
+      "id": "C5",
+      "claim": "continuum dual h>=0, zeros exactly a,vstar",
+      "status": "derived conditional on fixed J",
+      "depends_on": [
+        "I1",
+        "C3",
+        "C4"
+      ],
+      "evidence": [
+        "contributions/variational/VARIANCE_MINIMUM_DERIVATION_KO.md#5"
+      ]
+    },
+    {
+      "id": "C6",
+      "claim": "unique global variance minimum Vstar=(m-a)(vstar-m)",
+      "status": "derived conditional on fixed J",
+      "depends_on": [
+        "C1",
+        "C4",
+        "C5"
+      ],
+      "evidence": [
+        "contributions/variational/VARIANCE_MINIMUM_DERIVATION_KO.md#5"
+      ]
+    },
+    {
+      "id": "N1",
+      "claim": "root, probability, variance, dual and focused comparisons numerical values",
+      "status": "numerically checked/implementation-verified",
+      "depends_on": [
+        "I0",
+        "I1"
+      ],
+      "evidence": [
+        "contributions/numerics/PROTOCOL.json",
+        "contributions/numerics/VARIANCE_CANDIDATE.json",
+        "contributions/numerics/EXECUTION.json"
+      ]
+    },
+    {
+      "id": "C7",
+      "claim": "Vstar approximately 16.33994465 eV², rms approximately 4.04226974 eV",
+      "status": "numerical evaluation of exact characterized minimum",
+      "depends_on": [
+        "C6",
+        "N1"
+      ],
+      "evidence": [
+        "report/PHYS25_RESULTS_SUMMARY.json"
+      ]
+    },
+    {
+      "id": "C8",
+      "claim": "subcritical all negative; equality unique zero; supercritical positive examples; strict-positive infimum without minimum",
+      "status": "derived conditional on fixed J",
+      "depends_on": [
+        "C5",
+        "C6"
+      ],
+      "evidence": [
+        "contributions/variational/VARIANCE_MINIMUM_DERIVATION_KO.md#7"
+      ]
+    },
+    {
+      "id": "C9",
+      "claim": "locally above Vstar, same mean and variance permit opposite response signs",
+      "status": "derived by uniqueness and continuity; second boundary not computed",
+      "depends_on": [
+        "C5",
+        "C8"
+      ],
+      "evidence": [
+        "contributions/variational/VARIANCE_MINIMUM_DERIVATION_KO.md#7.2"
+      ]
+    },
+    {
+      "id": "D0",
+      "claim": "unique minimum-spectrum and dual-slack illustration",
+      "status": "display only; no proof credit",
+      "depends_on": [
+        "C6",
+        "N1"
+      ],
+      "evidence": [
+        "code/make_variance_figure.py",
+        "figures/FIGURE_EXECUTION.json",
+        "figures/PHYS25_variance_cost.json"
+      ]
+    },
+    {
+      "id": "G0",
+      "claim": "distinct final decision gate",
+      "status": "separate immutable decision record; no owner self-promotion",
+      "depends_on": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9"
+      ],
+      "evidence": [
+        "independent/DECISION_REVIEW.json"
+      ]
+    }
+  ],
+  "claim_ceiling": "conditional on frozen numerical J; no finite-time, native, physical admission or global novelty upgrade",
+  "numerical_sampling_is_not_global_proof": true
+}

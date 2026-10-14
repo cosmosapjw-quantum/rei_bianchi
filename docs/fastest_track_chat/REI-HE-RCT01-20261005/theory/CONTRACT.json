@@ -1,0 +1,220 @@
+{
+  "schema": "rei.he-rct.theory-contract.v1",
+  "task": "REI-HE-RCT01-20261005",
+  "evidence_status": [
+    "literature-supported",
+    "derived"
+  ],
+  "claim_ceiling": "Explicit source selection, number ledger, conditional escaped-energy closure; no physical admission or production stepper claim.",
+  "reaction": {
+    "id": "R_CX:He2+_H1s:He+1s_H+",
+    "initial": [
+      "HeIII",
+      "HI_1s"
+    ],
+    "final": [
+      "HeII_1s",
+      "HII",
+      "one_primary_photon"
+    ],
+    "species_order": [
+      "HI",
+      "HII",
+      "HeI",
+      "HeII",
+      "HeIII",
+      "e"
+    ],
+    "stoichiometry": [
+      -1,
+      1,
+      0,
+      1,
+      -1,
+      0
+    ],
+    "primary_photon_count_per_event": 1,
+    "excluded": [
+      "NRCT",
+      "reverse_RCT",
+      "RA",
+      "excited_products",
+      "cascade",
+      "secondary_ionizations"
+    ]
+  },
+  "provider": {
+    "default": "OFF",
+    "physical_admission": false,
+    "physical_accuracy_certified": false,
+    "selection_policy": "EXACTLY_ONE_EXPLICIT_SOURCE_NO_SUM_NO_AUTO_SWITCH",
+    "distribution": "MAXWELL_COMMON_T_ZERO_DRIFT",
+    "sources": [
+      {
+        "id": "KF96_HEIII_HI_RCT_NOMINAL_V1",
+        "k_cm3_s": "1e-14",
+        "window_K": [
+          "1000",
+          "10000000"
+        ],
+        "lower_literature_endpoint_approximate": true
+      },
+      {
+        "id": "GM25_W82_RCX_CONSTANT_200_10000_K_V1",
+        "k_cm3_s": "1.70e-13",
+        "window_K": [
+          "200",
+          "10000"
+        ]
+      }
+    ],
+    "source_spread_factor": "17",
+    "source_spread_is_uncertainty": false,
+    "out_of_domain": "ERROR_NO_CLAMP_OR_EXTRAPOLATION",
+    "dk_dT_scope": "DERIVATIVE_OF_CONSTANT_PRESCRIPTION_ONLY",
+    "cm3_s_to_m3_s": "1e-6",
+    "required_provenance": [
+      "source_id",
+      "source_identity",
+      "reaction_id",
+      "temperature",
+      "temperature_window",
+      "source_conflict_acknowledgment",
+      "closure_kind"
+    ],
+    "closure_provenance_split": {
+      "numeric_api": "positive_Ebar_eV plus explicit class CALLER_SUPPLIED_NO_ATOMIC_MOMENT",
+      "external_run_manifest": "exact supplied Ebar numeric value, input/source origin, scenario purpose; E2 Q-1/Q/Q+1 are synthetic validation scenarios",
+      "api_does_not_require": "free-form origin string inside the numeric closure type",
+      "production_claim": "No physical spectrum/heat-source provenance is established by the API class"
+    }
+  },
+  "equations": [
+    {
+      "id": "R2",
+      "expr": "R=k*nH*(1-xHII)*nHe*xHeIII",
+      "unit": "cm^-3 s^-1"
+    },
+    {
+      "id": "R3",
+      "expr": "dn_species_dt_RCT=stoichiometry*R",
+      "unit": "cm^-3 s^-1"
+    },
+    {
+      "id": "R4H",
+      "expr": "dxHII_dt_RCT=R/nH",
+      "domain": "nH>0"
+    },
+    {
+      "id": "R4He2",
+      "expr": "dxHeII_dt_RCT=R/nHe",
+      "domain": "nHe>0"
+    },
+    {
+      "id": "R4He3",
+      "expr": "dxHeIII_dt_RCT=-R/nHe",
+      "domain": "nHe>0"
+    },
+    {
+      "id": "R5",
+      "expr": "Uion_eV_cm3=chiH*nH*xHII+chiHeI*nHe*xHeII+(chiHeI+chiHeII)*nHe*xHeIII"
+    },
+    {
+      "id": "R6",
+      "expr": "Q_eV=chiHeII-chiH",
+      "fixture_value": "40.819325400298"
+    },
+    {
+      "id": "R7chemical",
+      "expr": "dUion_erg_cm3_s=-ev_erg*Q*R"
+    },
+    {
+      "id": "R7thermal",
+      "expr": "du_RCT_erg_cm3_s=ev_erg*(Q-Ebar)*R",
+      "requires": "EXPLICIT_ESCAPED_MEAN_ENERGY"
+    },
+    {
+      "id": "R7escape",
+      "expr": "descape_RCT_erg_cm3_s=ev_erg*Ebar*R",
+      "requires": "EXPLICIT_ESCAPED_MEAN_ENERGY"
+    },
+    {
+      "id": "R7identity",
+      "expr": "dUion+du_RCT+descape_RCT=0"
+    },
+    {
+      "id": "R11proper",
+      "expr": "dn_s_dt+3*H*n_s=nu_s*R"
+    },
+    {
+      "id": "R11comoving",
+      "expr": "d(a^3*n_s)/dt=nu_s*a^3*R"
+    },
+    {
+      "id": "R12exposure",
+      "expr": "tau=integral(k*a^-3 dt)",
+      "unit": "cm^3"
+    },
+    {
+      "id": "RCTphotoninventory",
+      "expr": "d(ne+sum_tracked_photon_density)/dt_RCT=p_tracked*R",
+      "assumptions": "local collision contribution; one primary photon; p_tracked route fraction",
+      "escaped_current_closure_p_tracked": 0
+    }
+  ],
+  "density_zero_policy": "Either reject absent element for its fraction or explicitly set absent-species derivative zero; never evaluate 0/0.",
+  "closures": {
+    "CountOnly": {
+      "species": true,
+      "primary_count": true,
+      "chemical_release": true,
+      "thermal": null,
+      "escaped_energy": null,
+      "group_spectrum": null,
+      "thermal_solver_admissible": false
+    },
+    "EscapedMeanEnergy": {
+      "required": [
+        "finite_positive_Ebar_eV",
+        "API_class_CALLER_SUPPLIED_NO_ATOMIC_MOMENT",
+        "external_run_manifest_exact_input_and_origin"
+      ],
+      "all_primary_photons": "ESCAPED_OUTSIDE_TRACKED_FIELD",
+      "tracked_group_source": 0,
+      "thermal": "ev_erg*(Q-Ebar)*R",
+      "escaped_energy": "ev_erg*Ebar*R",
+      "physical_accuracy": "CONDITIONAL_MODEL_INPUT_NOT_PROVIDER_PREDICTION",
+      "thermal_solver_admissible": "LOCAL_RHS_ONLY_AFTER_EXPLICIT_SELECTION"
+    }
+  },
+  "blocked_extensions": [
+    "Production microstep/Jacobian/event integration",
+    "Physical spectrum and heat moment",
+    "OTS absorber probabilities",
+    "NRCT/reverse/RA",
+    "Source disagreement resolution",
+    "Geometric filling factor and EoR history",
+    "Photon angular distribution and recoil/momentum-transfer tensor"
+  ],
+  "validation_contract": [
+    "nuclei_charge_electron_nullspace",
+    "density_fraction_normalization",
+    "unit_domain_identity",
+    "CountOnly_missing_energy",
+    "escaped_energy_identity",
+    "OFF_exact_baseline",
+    "no_source_autoswitch",
+    "nonfinite_domain_rejection"
+  ],
+  "analytic_reference": {
+    "static": "xi=AB*(1-exp(-(B-A)*k*t))/(B-A*exp(-(B-A)*k*t))",
+    "equal_reservoir": "xi=k*A*A*t/(1+k*A*t)",
+    "FLRW": "replace k*t by tau=int(k*a^-3 dt) using comoving A,B",
+    "test_scope": "isolated reaction with constant rate/closure; not coupled thermal trajectory"
+  },
+  "source_files": [
+    "../sources/snapshots/KF96_PACKET.json",
+    "../sources/snapshots/GM25_PACKET.json"
+  ],
+  "implementation_evidence": "../coding and ../evidence; this contract itself does not assert execution"
+}

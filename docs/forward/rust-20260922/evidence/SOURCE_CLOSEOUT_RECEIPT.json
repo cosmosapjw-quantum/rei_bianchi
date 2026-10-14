@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "parent_candidate_sha": "02634b078743f3556c569cc30f17322b11f2ce8a",
+  "checked_utc": "2026-09-22T22:04:38.404434+00:00",
+  "scope": "SOURCE_CLOSEOUT_ONLY; all 7 kernel bodies already ported and unchanged",
+  "commands": [
+    {
+      "label": "parent_contract",
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "scripts/check_rust_forward_parity.py",
+        "--check-contract"
+      ],
+      "cwd": "/mnt/data/rei_microphysics_source_closeout_20260923/candidate",
+      "exit": 0,
+      "stdout": "parent_contract.stdout.log",
+      "stderr": "parent_contract.stderr.log"
+    },
+    {
+      "label": "source_closeout_toy",
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "-S",
+        "docs/forward/rust-20260922/evidence/source_closeout_toy.py"
+      ],
+      "cwd": "/mnt/data/rei_microphysics_source_closeout_20260923/candidate",
+      "exit": 0,
+      "stdout": "source_closeout_toy.stdout.log",
+      "stderr": "source_closeout_toy.stderr.log"
+    },
+    {
+      "label": "final_contract",
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "-S",
+        "scripts/check_rust_forward_parity.py",
+        "--check-contract"
+      ],
+      "cwd": "/mnt/data/rei_microphysics_source_closeout_20260923/candidate",
+      "exit": 0,
+      "stdout": "final_contract.stdout.log",
+      "stderr": "final_contract.stderr.log"
+    },
+    {
+      "label": "receipt_regression",
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "-S",
+        "docs/forward/rust-20260922/evidence/test_checker_receipts.py"
+      ],
+      "cwd": "/mnt/data/rei_microphysics_source_closeout_20260923/candidate",
+      "exit": 0,
+      "stdout": "receipt_regression.stdout.log",
+      "stderr": "receipt_regression.stderr.log"
+    }
+  ],
+  "rust_execution": {
+    "cargo_fmt": "NOT_RUN_DEFERRED_TO_FINAL_LOCAL_VALIDATION",
+    "cargo_test": "NOT_RUN_DEFERRED_TO_FINAL_LOCAL_VALIDATION",
+    "python_rust_parity": "NOT_RUN_DEFERRED_TO_FINAL_LOCAL_VALIDATION"
+  },
+  "rust_tested_sha": null,
+  "declared_rust_tests": {
+    "integration": 21,
+    "frontend": 5
+  },
+  "python_receipt_tests": {
+    "run": 10,
+    "exit": 0,
+    "test_doubles": true,
+    "rust_executed": false
+  },
+  "contract": {
+    "exit": 0,
+    "manifest_files": 24,
+    "frozen_cases": 84,
+    "negative_guards": 10
+  },
+  "toy": {
+    "exit": 0,
+    "rational_cubic_points": 8,
+    "other_exact_identities": 8,
+    "rust_or_jax_executed": false
+  },
+  "protected_files": {
+    "rust/rei_microphysics/src/lib.rs": "a29ee8dca703ef350b27b50b85a511e4d562d4d6",
+    "rust/rei_microphysics/src/group_rates.rs": "02e24a8397c4e5e12ca9f24a9815760db73b205e",
+    "rust/rei_microphysics/src/lift.rs": "2bca1373921f1bf1253c08ecb87d76cad27bfd17",
+    "rust/rei_microphysics/src/coverage.rs": "eb4ac9687c13b61533c6df875638a880de3e8891",
+    "rust/rei_microphysics/Cargo.lock": "bfda4c6c53e3c6bbf5119c542bef32910945cc3f",
+    "rust/rei_microphysics/tests/fixtures/forward_inputs.json": "e30bc641c63fd4f17696164bdff4e018ea4f4ad5",
+    "scripts/check_rust_forward_parity.py": "04736f624fe537b081a8f51381aed004fd0c89d1",
+    "docs/forward/rust-20260922/PARITY_POLICY.json": "b38826e193161acd9b740e1c6162dbcf81deea81",
+    "docs/forward/rust-20260922/SOURCE_IMPORT_LOCK.json": "16837854c6d9859ccbf62f152332aa5c914156a0",
+    "docs/forward/rust-20260922/evidence/test_checker_receipts.py": "0268e350a07e175a7b874ec088ea545d6b162599"
+  },
+  "no_source_or_policy_threshold_change": true,
+  "scientific_state_mutated": false,
+  "external_rec_physical_lock_mutated": false,
+  "log": "SOURCE_CLOSEOUT_CHECKS.log",
+  "warnings": [
+    "parent contract subprocess exit 0 with unrelated artifact_tool startup diagnostic preserved in raw stderr",
+    "static-auditor attribute pattern mistake preserved and corrected without production mutation"
+  ],
+  "self_review_only": true,
+  "publication_ack": "recorded separately after remote ref update"
+}

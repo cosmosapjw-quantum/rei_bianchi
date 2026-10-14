@@ -1,0 +1,672 @@
+{
+  "schema": "rei_atomic_reuse_integrated_plan.v2",
+  "plan_id": "REI-ATOMIC-REUSE-RESET-20261012",
+  "decision": "ATOMIC_REUSE_OBSERVABLE_FIRST",
+  "planning_status": "ADOPTED",
+  "date": "2026-10-12",
+  "timezone": "Asia/Seoul",
+  "authority": {
+    "repository": "cosmosapjw-quantum/rei_bianchi",
+    "branch": "forward/rust-reion-kernels-20260922",
+    "pull_request": 83,
+    "base_commit": "633e0bd26b40bf59e8dfe6b977edb6e6dacc144d",
+    "change": "Planning overlay and active handoff only",
+    "supersedes_priority_of": "REI-FASTTRACK-RESET-20261012",
+    "preserves": [
+      "2026-10-04 historical GLOBAL_DAG",
+      "Prior fast-track plan",
+      "PHYS35 and prior scientific evidence",
+      "Other repositories/owners' work"
+    ]
+  },
+  "next_execution_package": "RUX-P0",
+  "next_handoff": "docs/fastest_track_chat/REI-ATOMIC-REUSE-RESET-20261012/CODEX_START_KO.md",
+  "main_model": {
+    "type": "Source-backed homogeneous non-equilibrium H/He + thermal + directional ionizing-photon evolution",
+    "gas_state": [
+      "x_HII",
+      "x_HeII",
+      "x_HeIII",
+      "u_th or consistent T_g"
+    ],
+    "radiation_state": "Positive packet measure or energy-angle cells N_gq with needed energy moments and explicit within-bin closure",
+    "frame": "Non-tilted normal/gas proper frame; metric -+++; c and k_B retained",
+    "xe": "Output of species/charge evolution, not prescribed in the main path",
+    "negative_ions": "Absent in baseline charge formula; HH ion-pair extension must add H-minus or a justified reduced closure",
+    "source_model": "External spectral emissivity/incident stock/boundary role and astrophysical assumptions remain explicit",
+    "claim_ceiling": "Declared homogeneous conditional cosmological model; not automatic QV/patchy 21cm/polarized sky"
+  },
+  "core_reuse": [
+    "Selected H/He rates and cross sections",
+    "Species-resolved absorption and primary heating moments",
+    "Existing implicit primary microstep and event ledger",
+    "Bianchi ray/packet transport",
+    "REC clock/initial-history provider where applicable",
+    "Existing BASS electron-history receiver"
+  ],
+  "implementation_delta": [
+    "Inject selected physical rate/thermal provider and validation domain into actual primary RHS",
+    "Keep point and any root/interval provider consistent; no old FT03 certificate inheritance for new physics",
+    "Replace fixture time/source/energy inputs by scenario adapters",
+    "Resolve single event/work/opacity owners",
+    "Connect one actual runnable entry point rather than all branches"
+  ],
+  "evidence_reuse": {
+    "F08": "Retain recorded 15 runs,248000 accepted trials,0-1e13 s synthetic/discrete scope; no rerun",
+    "SYNC02_SYNC03": "Retain recorded scoped receiver/finite-cell diagnostics; no rerun",
+    "PR104": "Retain reduced z20-to-4+ baseline and its scoped convergence",
+    "atomic": "Use per-asset upstream domain/claim; HE/CR/HH report numbers are not new checks",
+    "new_scientific_results_this_revision": 0
+  },
+  "nodes": [
+    {
+      "id": "RUX00",
+      "title": "Selected-source identity and retained evidence reuse",
+      "depends_on": [],
+      "lane": "MAIN",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S16"
+      ],
+      "artifact": "Selected source and input provenance within scenario metadata",
+      "acceptance_gate": "Record only the chosen execution path/provider identities and applicable retained results; reuse the current SOURCE_MAP; no all-repository/all-archive inventory prerequisite",
+      "fail_closed_or_stop": "Unknown source bytes remain unknown for that consumer; do not invalidate recorded F08/SYNC02/SYNC03 or stop independent retained/control work",
+      "runtime_route": "LOCAL",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "This plan already records bounded Git/source inspection. The full old authority inventory is not declared complete.",
+      "upstream_depends_on": [],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required."
+    },
+    {
+      "id": "RUX01",
+      "title": "Reuse existing reduced/F08/SYNC03 outputs immediately",
+      "depends_on": [],
+      "lane": "QUICK_RESULT",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S02",
+        "S04",
+        "S16",
+        "G_PR104"
+      ],
+      "artifact": "Existing figures/endpoint comparisons with model/interval/tail labels",
+      "acceptance_gate": "Use each retained artifact's existing source pin and claim scope; existing PNGs/endpoint plots need no science rerun. F08 Git CSV has 15 endpoint rows; time curves require their actual saved history",
+      "fail_closed_or_stop": "Do not make endpoint CSV into an invented time history; no physical EoR, continuum or sky claim from synthetic/conditional diagnostics",
+      "runtime_route": "LOCAL",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "Independent of RUX02/03/04 and whole-history completion.",
+      "upstream_depends_on": [
+        "RUX00"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required."
+    },
+    {
+      "id": "RUX02",
+      "title": "Physical-input archives: exact intake and admission",
+      "depends_on": [
+        "RUX00"
+      ],
+      "lane": "MAIN",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11"
+      ],
+      "artifact": "PHYSICAL_INPUT_ADMISSION.json",
+      "acceptance_gate": "Inspect the selected v2/P01/P02A/P03A/source-delta lineage once and resolve field-level epoch/background/time map, gas/radiation IC, spectral source role/units/history, rate/thermal domain, closures and callback",
+      "fail_closed_or_stop": "If incomplete, name exact missing fields and one explicit P0 source-backed scenario-selection/supply task; no null-to-zero, fixture relabeling, or repeat of unchanged N2 audit",
+      "runtime_route": "LOCAL",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "Parallel with RUX03; archive presence is not admission. PR104/C12 known inputs are candidates, not automatic whole-scenario admission.",
+      "upstream_depends_on": [
+        "RUX00"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required."
+    },
+    {
+      "id": "RUX03",
+      "title": "Atomic process and opacity ownership registry",
+      "depends_on": [
+        "RUX00"
+      ],
+      "lane": "MAIN",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S01",
+        "S05",
+        "S13",
+        "S15",
+        "S17"
+      ],
+      "artifact": "Process-owner and rate-domain fields plus the real provider injection interface",
+      "acceptance_gate": "Select an EoR-supported rate/thermal provider actually called by the reused primary stage; distinct fit cutoffs/binding thresholds; explicit Case-A transport OR Case-A escape ledger OR Case-B/OTS; no same-event opacity/heat/work double counting; define proper/comoving/frame conversions",
+      "fail_closed_or_stop": "Do not widen temperature guards or flip admission flags as a substitute for a physical provider. Point and any root/interval path must use the same provider or carry different claim scopes",
+      "runtime_route": "LOCAL",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "Core H/He and photoabsorption assets are distinct from optional high precision HE, hard-particle CR, HH/RCT.",
+      "upstream_depends_on": [
+        "RUX00"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required."
+    },
+    {
+      "id": "RUX04",
+      "title": "Physical EoR scenario freeze (FLRW and Bianchi pair)",
+      "depends_on": [
+        "RUX02",
+        "RUX03"
+      ],
+      "lane": "MAIN",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S17"
+      ],
+      "artifact": "PHYSICAL_SCENARIO_LOCK.json",
+      "acceptance_gate": "One source-backed homogeneous cosmological scenario with time/background, gas/radiation IC, spectral source/support, rate/thermal family and event owners fixed before comparison; source/halo/clumping assumptions explicit; narrow He claims if necessary",
+      "fail_closed_or_stop": "No manufactured physical input or unsupported extrapolation. A supported model choice must be labeled a model choice, not supplied data. Preserve failed scenarios when making a justified revision",
+      "runtime_route": "LOCAL",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "",
+      "upstream_depends_on": [
+        "RUX02",
+        "RUX03"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required."
+    },
+    {
+      "id": "RUX05",
+      "title": "Connect EoR provider/time/source to reused primary and run first FLRW interval",
+      "depends_on": [
+        "RUX04"
+      ],
+      "lane": "MAIN",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S01",
+        "S04",
+        "S12"
+      ],
+      "artifact": "Executable provider/time/source adapters and first FLRW interval data, ledgers and figure",
+      "acceptance_gate": "Reuse the existing implicit stage and event ledger; inject the selected EoR rates/domain into the real RHS, bind time/source/geometry; evaluate new residual/positivity/nuclei/charge/photon/energy and relevant convergence on the first admitted interval",
+      "fail_closed_or_stop": "Input/domain/owner failure blocks only this physical run. New point physics cannot inherit old FT03 interval/root bounds. No unconditional repeat of F08/SYNC02/SYNC03",
+      "runtime_route": "LOCAL",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "",
+      "upstream_depends_on": [
+        "RUX04"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required.",
+      "prepare_parallel_with": [
+        "RUX02",
+        "RUX03"
+      ]
+    },
+    {
+      "id": "RUX06",
+      "title": "Reuse known Bianchi transport and connect selected geometry",
+      "depends_on": [
+        "RUX00"
+      ],
+      "lane": "MAIN",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S01",
+        "S02"
+      ],
+      "artifact": "Reused ray/packet path and new geometry/clock adapter where needed",
+      "acceptance_gate": "Use retained ray/packet evidence for unchanged code; check only new time/geometry/source/projection/boundary transformations. New physical Bianchi instantiation uses RUX04 inputs",
+      "fail_closed_or_stop": "Do not require physical-input completion for existing/prescribed transport reuse; collisionless intensity is xe independent; no science rerun of unchanged identities",
+      "runtime_route": "LOCAL",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "",
+      "upstream_depends_on": [
+        "RUX04"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required.",
+      "physical_instantiation_requires": [
+        "RUX04"
+      ]
+    },
+    {
+      "id": "RUX07",
+      "title": "First physical Bianchi-I coupled interval",
+      "depends_on": [
+        "RUX05",
+        "RUX06"
+      ],
+      "lane": "MAIN",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S01",
+        "S12"
+      ],
+      "artifact": "FIRST_BI_PHYSICAL_COUPLED_INTERVAL.json",
+      "acceptance_gate": "First Bianchi coupled interval with the same chosen source/rates/IC conventions and physical geometry; same-event absorption/chemistry/heat plus directional transport with single work/boundary owners; relevant new numerical checks",
+      "fail_closed_or_stop": "No post-hoc source changes or manufactured EoR fixture; preserve nonconvergence/domain/ledger failures separately",
+      "runtime_route": "LOCAL",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "",
+      "upstream_depends_on": [
+        "RUX05",
+        "RUX06"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required."
+    },
+    {
+      "id": "RUX08",
+      "title": "Source-backed multi-epoch FLRW EoR history",
+      "depends_on": [
+        "RUX05"
+      ],
+      "lane": "MAIN",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S01",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "artifact": "FLRW_EOR_HISTORY.csv + convergence and model ledger",
+      "acceptance_gate": "Evolve the selected source-backed FLRW scenario within actual provider/source domain; xHII/xHeII/xHeIII/T/photons and ledger, convergence/reference appropriate to changed physics; stages produce figures and segment tau",
+      "fail_closed_or_stop": "No QV=xHII relabeling, no cosmological extrapolation beyond provider/source domain",
+      "runtime_route": "LOCAL",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "May proceed in parallel with RUX07 after RUX05; local xHII is not QV.",
+      "upstream_depends_on": [
+        "RUX05"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required."
+    },
+    {
+      "id": "RUX09",
+      "title": "Matched Bianchi-I/FLRW EoR history",
+      "depends_on": [
+        "RUX07",
+        "RUX08"
+      ],
+      "lane": "MAIN",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S01",
+        "S02",
+        "S16"
+      ],
+      "artifact": "PAIRED_EOR_HISTORY.csv + DIFFERENCE_ERROR_LEDGER.json",
+      "acceptance_gate": "Matched FLRW/Bianchi source and clock conventions; compare total histories and same-H isotropic-transport counterfactual. In coupled controls ne/T are solved outputs, not held fixed. Use paired observable errors",
+      "fail_closed_or_stop": "No global accuracy/novel observational claim from a contrast alone; identify source/closure and numerical limitations",
+      "runtime_route": "NCP_IF_MEASURED_HEAVY",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "",
+      "upstream_depends_on": [
+        "RUX07",
+        "RUX08"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required."
+    },
+    {
+      "id": "RUX10",
+      "title": "Stream admitted electron intervals to existing BASS tau/visibility receiver",
+      "depends_on": [
+        "RUX05"
+      ],
+      "lane": "MAIN",
+      "execution_owner": "bass",
+      "sources": [
+        "S04",
+        "S16"
+      ],
+      "artifact": "Segment tau/visibility first; full source-backed paired observable when the history/tail support it",
+      "acceptance_gate": "Bind actual proper ne(t) as soon as an admitted interval exists, label the interval and observer tail/clock. Full paired output requires RUX09 and an appropriate tail; fixed-time cold comoving tau is direction independent",
+      "fail_closed_or_stop": "No unknown tail set to zero for physical total tau; no automatic polarized sky or full BASS production claim",
+      "runtime_route": "LOCAL",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "Existing SYNC02/03 and prescribed receiver use remain independent under RUX01/control lanes.",
+      "upstream_depends_on": [
+        "RUX09"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required.",
+      "full_paired_output_requires": [
+        "RUX09"
+      ]
+    },
+    {
+      "id": "RUX11",
+      "title": "Produce scientific plots at each available physical milestone",
+      "depends_on": [
+        "RUX05"
+      ],
+      "lane": "MAIN",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S02",
+        "S16"
+      ],
+      "artifact": "Staged figures and claim/error annotations",
+      "acceptance_gate": "First interval, then FLRW history, then paired/receiver figures as respective data exist; split numerical, atomic, source, geometry and spectral/spatial closure uncertainty; final claims wait for their own inputs",
+      "fail_closed_or_stop": "Do not require full paired history before a first-interval plot. Do not call scenario ranges posterior uncertainty or homogeneous xHII QV",
+      "runtime_route": "LOCAL",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "",
+      "upstream_depends_on": [
+        "RUX08",
+        "RUX09",
+        "RUX10"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required.",
+      "full_figure_set_requires": [
+        "RUX08",
+        "RUX09",
+        "RUX10"
+      ]
+    },
+    {
+      "id": "RUX12",
+      "title": "HE precision sensitivity import, when material",
+      "depends_on": [
+        "RUX04"
+      ],
+      "lane": "OPTIONAL_ATOMIC",
+      "execution_owner": "BASS_HE",
+      "sources": [
+        "S13",
+        "S17"
+      ],
+      "artifact": "HE_EFFECT_ON_EOR.json",
+      "acceptance_gate": "Only if process and temperature/source domain relevant; consume rates, event moments or bounded perturbations with provider authority; run matched ON/OFF sensitivity in rei once",
+      "fail_closed_or_stop": "Do not promote E13C10 finite interval width to physical model error; no 2440-path replay without need",
+      "runtime_route": "NCP_IF_MEASURED_HEAVY",
+      "optional": true,
+      "status": "NOT_RUN",
+      "notes": "If the chosen scientific claim requires this channel, scope that claim accordingly or explicitly activate this consumer; preserve upstream domain and unresolved bounds.",
+      "upstream_depends_on": [
+        "RUX11"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required.",
+      "activation": "A named process is supported in this scenario and an intermediate observable/sensitivity or error-budget request makes it relevant; no wait for final RUX11 acceptance",
+      "not_a_baseline_prerequisite": true
+    },
+    {
+      "id": "RUX13",
+      "title": "CR hard-particle process extension, when material",
+      "depends_on": [
+        "RUX04"
+      ],
+      "lane": "OPTIONAL_ATOMIC",
+      "execution_owner": "bass_cr",
+      "sources": [
+        "S15"
+      ],
+      "artifact": "CR_EFFECT_ON_EOR.json",
+      "acceptance_gate": "Only if deposition/hard particle/temperature observables require, with native rate owner and supported point outputs",
+      "fail_closed_or_stop": "CR OFF remains legitimate baseline; full wide propagated numerical certificate OPEN",
+      "runtime_route": "NCP_IF_MEASURED_HEAVY",
+      "optional": true,
+      "status": "NOT_RUN",
+      "notes": "If the chosen scientific claim requires this channel, scope that claim accordingly or explicitly activate this consumer; preserve upstream domain and unresolved bounds.",
+      "upstream_depends_on": [
+        "RUX11"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required.",
+      "activation": "A named process is supported in this scenario and an intermediate observable/sensitivity or error-budget request makes it relevant; no wait for final RUX11 acceptance",
+      "not_a_baseline_prerequisite": true
+    },
+    {
+      "id": "RUX14",
+      "title": "HH chemistry/spectral response, when material",
+      "depends_on": [
+        "RUX04"
+      ],
+      "lane": "OPTIONAL_ATOMIC",
+      "execution_owner": "WU088_HH",
+      "sources": [
+        "S14"
+      ],
+      "artifact": "HH_EFFECT_ON_EOR.json",
+      "acceptance_gate": "Bind named HH processes to stoichiometric network, threshold heating, domain; local sensitivity first, actual matched histories only if needed",
+      "fail_closed_or_stop": "Singlet ion-pair not replaced by free-electron LCS; native root/continuum unfinished; no ungrounded HH promotion",
+      "runtime_route": "NCP_IF_MEASURED_HEAVY",
+      "optional": true,
+      "status": "NOT_RUN",
+      "notes": "If the chosen scientific claim requires this channel, scope that claim accordingly or explicitly activate this consumer; preserve upstream domain and unresolved bounds.",
+      "upstream_depends_on": [
+        "RUX11"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required.",
+      "activation": "A named process is supported in this scenario and an intermediate observable/sensitivity or error-budget request makes it relevant; no wait for final RUX11 acceptance",
+      "not_a_baseline_prerequisite": true
+    },
+    {
+      "id": "RUX15",
+      "title": "Patchiness/spatial topology extension",
+      "depends_on": [
+        "RUX04"
+      ],
+      "lane": "FUTURE_SPATIAL",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S03"
+      ],
+      "artifact": "QM_QV_RT_EXTENSION_PLAN.json",
+      "acceptance_gate": "Declare density–ionization correlation, topology and spatial RT/IGM opacity source if QV, 21cm power or spatial sky inference claimed",
+      "fail_closed_or_stop": "Homogeneous xHII alone cannot be relabeled QV nor predict patchy 21cm spectrum",
+      "runtime_route": "NCP_IF_MEASURED_HEAVY",
+      "optional": true,
+      "status": "NOT_RUN",
+      "notes": "Does not block the homogeneous H/He history; density-ionization and spatial source closure must be supplied for spatial claims.",
+      "upstream_depends_on": [
+        "RUX11"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required.",
+      "activation": "Only when QV/QM, spatial topology, patchiness or 21cm/sky spatial inference is actually requested"
+    },
+    {
+      "id": "RUX16",
+      "title": "Release the declared source-backed homogeneous result",
+      "depends_on": [
+        "RUX08",
+        "RUX09",
+        "RUX10",
+        "RUX11"
+      ],
+      "lane": "RELEASE",
+      "execution_owner": "rei_bianchi",
+      "sources": [
+        "S03",
+        "S11",
+        "S16"
+      ],
+      "artifact": "PHYSICAL_CLAIM_DECISION.json + final charts + reproducibility manifest",
+      "acceptance_gate": "For the declared full-history claim, complete corresponding physical-input/provider/domain, relevant numerical/independent checks, output/error and observer-tail obligations; publish reproducible scope and limitations",
+      "fail_closed_or_stop": "No silent promotion of old Physical/continuum/production HOLD; optional precision/spatial work stays optional unless that claim requires it",
+      "runtime_route": "LOCAL",
+      "optional": false,
+      "status": "NOT_RUN",
+      "notes": "",
+      "upstream_depends_on": [
+        "RUX11"
+      ],
+      "artifact_semantics": "Logical output; related records may be combined in one scenario/run artifact. No separate PR per node is required."
+    }
+  ],
+  "execution_packages": [
+    {
+      "id": "RUX-P0",
+      "priority": 0,
+      "members": [
+        "RUX00",
+        "RUX02",
+        "RUX03",
+        "RUX04",
+        "RUX05"
+      ],
+      "parallel_groups": [
+        [
+          "RUX02",
+          "RUX03"
+        ]
+      ],
+      "goal": "One physical input lineage + owner/provider decision + executable rate/domain/time/source adapter + first FLRW coupled interval if supported",
+      "completion": "Actual integration code and first supported interval data/ledger/figure; if input blocked, concrete missing fields and one source-backed selection/supply task, with independent work completed",
+      "forbidden_terminal_pattern": "Repeat the same inventory/N2 audit or end with a generic new solver design"
+    },
+    {
+      "id": "RUX-P1",
+      "priority": 1,
+      "members": [
+        "RUX06",
+        "RUX07",
+        "RUX08"
+      ],
+      "parallel_groups": [
+        [
+          "RUX07",
+          "RUX08"
+        ]
+      ],
+      "goal": "First matched Bianchi interval plus supported FLRW multi-epoch history; intermediate plots and receiver data"
+    },
+    {
+      "id": "RUX-P2",
+      "priority": 2,
+      "members": [
+        "RUX09",
+        "RUX10",
+        "RUX11",
+        "RUX16"
+      ],
+      "goal": "Full declared paired history/observables and scoped reproducible release; receiver and plotting work streams earlier"
+    },
+    {
+      "id": "RUX-RETAINED",
+      "priority": "parallel",
+      "members": [
+        "RUX01"
+      ],
+      "goal": "Reuse saved reduced/F08/SYNC03 diagnostics independent of physical-input intake"
+    }
+  ],
+  "control_lanes": [
+    {
+      "id": "CTRL-REDUCED",
+      "former": "FT-A0/FT-A1",
+      "status": "RETAINED_INDEPENDENT",
+      "source": "PR104",
+      "requires_new_physical_input": false,
+      "blocks_main": false
+    },
+    {
+      "id": "CTRL-TRANSPORT",
+      "former": "FT-B1A",
+      "status": "OPTIONAL_PARALLEL_NOT_RUN",
+      "goal": "Prescribed-history collisionless direction/intensity diagnostic",
+      "requires_new_physical_input": false,
+      "blocks_main": false,
+      "xe_response": false
+    },
+    {
+      "id": "CTRL-THOMSON",
+      "former": "FT-B1B",
+      "status": "OPTIONAL_PARALLEL_NOT_RUN",
+      "goal": "Prescribed-xe conservative Thomson response when a supported operator/entry point is bound",
+      "requires_new_physical_input": false,
+      "blocks_main": false,
+      "scope": "Intensity before polarization if necessary; not supplied by collisionless code"
+    }
+  ],
+  "optional_legacy": [
+    {
+      "id": "C12_NATIVE",
+      "status": "OFF_CRITICAL_PATH",
+      "return_condition": "Specific dominant observable model error and finite justified native/atomic improvement; retain checkpoint/counters/criteria"
+    },
+    {
+      "id": "PHYS36",
+      "status": "DEFERRED_NONBLOCKING_NOT_RUN",
+      "return_condition": "Specified moment/shape closure error requires J/coefficient stability",
+      "phys35_budget": {
+        "first_used": 1,
+        "replay_used": 1,
+        "remaining": 0
+      }
+    }
+  ],
+  "physics_invariants": [
+    "No duplicate same-event absorption/heat/thermal work",
+    "Case-A explicit radiation OR Case-A escape ledger OR consistent Case-B OTS",
+    "No invented heating from arbitrary photon energy",
+    "No homogeneous xHII=QV relabeling",
+    "Gas charge constraint matches species set",
+    "Fixed cosmic-time cold comoving tau is direction independent",
+    "Source role and proper/comoving conversions explicit"
+  ],
+  "coupled_control": "Keep inputs and mean H/density convention fixed but solve ne/T separately; holding them fixed defines a distinct prescribed one-way control",
+  "uncertainty": {
+    "numerical_target_fraction": 0.1,
+    "near_zero": "Predeclare absolute floor and report resolution limits",
+    "old_thresholds_changed": false,
+    "components": [
+      "numerical",
+      "atomic model/rates",
+      "source/escape/clumping",
+      "geometry/IC",
+      "spectral/spatial closure"
+    ],
+    "scenarios_are_posteriors": false
+  },
+  "execution_policy": {
+    "here_first": true,
+    "local_codex": "Only an observed unavailable capability or operator-requested environment",
+    "NCP": "Per-job source/scientific prerequisites, measured or specifically justified heavy cost, independent cases, thread limits and finite allocation",
+    "new_coupled_sweep_requires": "Valid selected scenario and first coupled pilot",
+    "no_global_NCP_gate_for_unrelated_jobs": true,
+    "no_64x_adaptive_history_assumption": true,
+    "no_repeat_unchanged_science": true,
+    "selective_readback": true
+  },
+  "protected_state": {
+    "legacy_physical": "HOLD",
+    "interval_160_161": "FAIL",
+    "tick": 160,
+    "auxiliary_escape": "FAIL",
+    "S0_HH": "OFF",
+    "S0_RCT": "OFF",
+    "S0_CR": "OFF",
+    "precision_atomic": "PARKED in the legacy baseline; independent owner studies unaffected"
+  },
+  "current_revision_actions": {
+    "scientific_runs": 0,
+    "scientific_tests": 0,
+    "scientific_imports": 0,
+    "archive_payload_admissions": 0,
+    "external_jobs_or_automations_changed": 0,
+    "other_repo_mutations": 0
+  },
+  "source_map": "docs/fastest_track_chat/REI-ATOMIC-REUSE-RESET-20261012/SOURCE_MAP.json",
+  "human_plan": "docs/fastest_track_chat/REI-ATOMIC-REUSE-RESET-20261012/README_KO.md"
+}
+

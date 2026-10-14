@@ -1,0 +1,76 @@
+{
+  "schema": "he-rct-review-findings.v1",
+  "created_utc": "2026-10-04T15:47:46.191049+00:00",
+  "review_stage": "FIRST_BOUNDED_SOURCE_SEMANTICS_PASS",
+  "execution_verdict": "PENDING_LOGS",
+  "findings": [
+    {
+      "id": "HRCT-IR-01",
+      "category": "implementation_contract_mismatch",
+      "priority": "P2",
+      "description": "Theory requires strictly positive photon mean energy; draft constructor accepts zero. Parent and native agent already evaluating this declared-model boundary.",
+      "resolution_options": [
+        "Require mean_ev>0 and one boundary rejection check",
+        "Declare zero as a separate nonphysical algebraic fixture and adjust theory scope explicitly"
+      ],
+      "state": "PENDING_OWNER_DECISION"
+    },
+    {
+      "id": "HRCT-IR-02",
+      "category": "provenance_contract_mismatch",
+      "priority": "P3",
+      "description": "Theory requires closure_input_origin/provenance, while scalar native closure stores only mean_ev. Run-level provenance ownership must be explicit.",
+      "resolution_options": [
+        "State external run manifest owns origin/ID and save it",
+        "Attach provenance marker to native closure metadata"
+      ],
+      "state": "PENDING_OWNER_DECISION"
+    }
+  ],
+  "semantic_checks_passed_by_inspection": [
+    "reaction HI+HeIII not HI+HeII",
+    "exact source selection not source summation",
+    "strict finite temperature window no clamp/autoswitch",
+    "provider construction conflict acknowledgment and private fields",
+    "R=k*nHI*nHeIII exactly once",
+    "fraction species denominators nH versus nHe",
+    "free electron/nuclei/charge conservation algebra",
+    "Q=chiHeII-chiHI from actual model thresholds",
+    "CountOnly does not synthesize thermal/escape moment",
+    "signed heat=(Q-Ebar)R; escaped energy=EbarR",
+    "tracked photon groups unchanged for escape closure",
+    "disabled directly returns baseline copy",
+    "zero-density explicit convention avoids division by zero",
+    "finite event/energy/composed output rejection",
+    "no production microstep or thermal endpoint modification"
+  ],
+  "scope_nonclaims": [
+    "physical accuracy of scalar source",
+    "spectral/energy-momentum closure",
+    "production stepping/positivity",
+    "EoR history",
+    "uniform F04 admission"
+  ],
+  "files_read": [
+    {
+      "path": "coding/rei_crate/src/he_rct.rs",
+      "sha256": "5519fe0a7a6dd64174301121d9e3b513cbe332b83a3dcf3f2241088574ffbe96"
+    },
+    {
+      "path": "theory/CONTRACT.json",
+      "sha256": "fc70aa8335967029c7a831461838d9683e3c797dbd4574549bbfa633f818fdbb"
+    },
+    {
+      "path": "theory/DERIVATION_KO.md",
+      "sha256": "1c6eaf1542d40777ef7f8bfe269913af82f3bbf30834ec4ca525e94bf6b3d24b"
+    },
+    {
+      "path": "theory/ANALYTIC_TEST_VECTORS.json",
+      "sha256": "df4b44b777ddc931b9b4a207a084069a7c19a2803f79470e70d56209c2801847"
+    },
+    {
+      "path": "research/INDEPENDENT_EXPERIMENT_PLAN.json",
+      "sha256": "ded532a6ea2d6f33ca5a845c7ac9b3f5a394f0d835581c234d806e7af49aba51"
+    }
+  ]
+}

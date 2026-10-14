@@ -1,0 +1,568 @@
+{
+  "schema_version": "1.0",
+  "thread": "rei_bianchi",
+  "language": "ko",
+  "scope": "CHAT_PREWORK_COMPLETE_CODEX_READY_WITH_DEPENDENCIES",
+  "entry_task": "REI-F00",
+  "base_commit": "0100b1dfa023928d67602877876b586fea319d13",
+  "branch": "forward/rust-reion-kernels-20260922",
+  "new_branch_required": false,
+  "commands_note": "Commands target concrete owner-produced paths. Proposed tests/examples become executable only after their task creates the target. F00 produces docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/rei_model_lock.json; F04 produces runs/rei_fastest_v1/map_certificate/certificate.json.",
+  "evidence_state": {
+    "source_read": true,
+    "exact_event_algebra_checked": true,
+    "rust_build_run_this_task": false,
+    "physical_provider_admitted": false,
+    "science_history_run": false
+  },
+  "budget_rules": [
+    "Read CODEX_START + this file + current task inputs only",
+    "One task per bounded change; no global reaudit",
+    "Stop after acceptance; append receipt and take next ready task",
+    "Do not ask stronger models to rediscover frozen decisions",
+    "Use high-effort escalation only for actual nonlinear remainder or source contradiction"
+  ],
+  "invariants": {
+    "unchanged_local_error_limit_strict": 0.0002,
+    "unchanged_public_width_limit_strict": 0.002,
+    "shape_lanes": {
+      "inherited_node_history": 3,
+      "homogeneous_successor": "Declare actual lane applicability in F00; no automatic inheritance of macro-shape populations"
+    },
+    "evaluation_sites": [
+      "population_t0",
+      "population_t1_predictor",
+      "thermal_tgamma",
+      "thermal_t1_final"
+    ],
+    "legacy_failure_preserved": true,
+    "full_interval_before_coupled_bianchi": true,
+    "no_jax_runtime_revival": true,
+    "evaluation_sites_scope": "Four source evaluation roles apply when using the proposed inherited split map; assign exact mathematical states and topology. Other map designs need an explicit successor contract with equivalent gate coverage."
+  },
+  "tasks": [
+    {
+      "id": "REI-F00",
+      "title": "SSOT 채택과 source/closure successor contract",
+      "lane": "FASTEST",
+      "status": "CODEX_READY_NOT_EXECUTED",
+      "dependencies": [],
+      "inputs": [
+        "REPO_SNAPSHOT.json",
+        "PREWORK_KO.md",
+        "CONTROLLED_FIXTURE.json",
+        "legacy_sources/MANIFEST.json"
+      ],
+      "outputs": [
+        "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/rei_model_lock.json",
+        "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/closure_process_decision.json",
+        "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/parent_and_lane_applicability.json"
+      ],
+      "proposed_paths": [
+        "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/rei_model_lock.json",
+        "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/closure_process_decision.json",
+        "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/parent_and_lane_applicability.json"
+      ],
+      "steps": [
+        "기존 branch HEAD 차이는 docs-only 여부부터 확인; source 차이만 bounded diff review",
+        "InheritedEffectiveMfp와 HomogeneousBoundFree를 distinct IDs로 고정",
+        "그룹/각도/threshold/units/case selection/secondary approximation을 명시",
+        "provider candidate와 admitted 상태를 분리",
+        "parent/model manifest fixes either InheritedNodeHistory(46080 nodes, all3 shape lanes) or R1HomogeneousSuccessor(actual state dimensions); certify selected map, never transfer old pass/fail across models"
+      ],
+      "verification": [
+        "git status --short",
+        "git rev-parse HEAD",
+        "git diff 0100b1dfa023928d67602877876b586fea319d13 -- rust/rei_microphysics",
+        "python scripts/verify_repo.py"
+      ],
+      "acceptance": [
+        "source snapshot와 local HEAD 차이가 기록됨",
+        "case/opacity/process flags에 암묵적 기본값 없음"
+      ],
+      "failure_branches": [
+        "SOURCE_DRIFT: 바뀐 crate와 관련 lock만 읽고 task patch",
+        "MISSING_REQUIRED_SOURCE: 해당 provider만 중단, 원자 ab-initio 자동재개 금지"
+      ],
+      "claim_ceiling": "설계와 후보만 잠금; scientific gate 변화 없음"
+    },
+    {
+      "id": "REI-F01",
+      "title": "정의된 AtomicProvider와 R1 homogeneous opacity 구현",
+      "lane": "FASTEST",
+      "status": "CODEX_READY_NOT_EXECUTED",
+      "dependencies": [
+        "REI-F00"
+      ],
+      "inputs": [
+        "Grackle3.4.1 af7939494ce65007887ada7b98d1813df6843346",
+        "Verner published parameters/source receipt",
+        "legacy source equation map"
+      ],
+      "outputs": [
+        "provider manifest",
+        "source-domain rate wrapper",
+        "homogeneous photo owner adapter"
+      ],
+      "proposed_paths": [
+        "rust/rei_microphysics/src/atomic_provider.rs",
+        "rust/rei_microphysics/src/homogeneous_rates.rs",
+        "rust/rei_microphysics/tests/atomic_provider.rs",
+        "rust/rei_microphysics/tests/homogeneous_rates.rs",
+        "rust/rei_microphysics/src/lib.rs"
+      ],
+      "steps": [
+        "ProcessId/species initial-final/frame/domain/units/error semantics typed contract 구현",
+        "Grackle formula transport는 selected reaction/cooling 함수와 notices만, 전체 solver를 dependency로 넣지 않음",
+        "Verner fit threshold/eV/Mb conversion 및 quadrature 동일함수에서 σ/heat 산출",
+        "proper n and photon N_comoving 변환을 한곳에서 수행",
+        "기존 opacity API 의미와 oldsource refusal는 유지; 새 provider admission path만 추가"
+      ],
+      "verification": [
+        "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test atomic_provider --locked",
+        "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test homogeneous_rates --locked",
+        "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test forward --locked"
+      ],
+      "acceptance": [
+        "independent C/original formula point values selected domain에서 일치",
+        "domain 밖 return error, no clamp",
+        "κ=Σnσ owner합=1, zero-opacity absorption0",
+        "기존 seven APIs tests unchanged"
+      ],
+      "failure_branches": [
+        "SOURCE_LICENSE_UNRESOLVED: third-party file vendor하지 말고 출판식 implementation+source manifest",
+        "DOMAIN_FAIL: scenario를 silent truncate하지 말고 domain coverage task"
+      ],
+      "claim_ceiling": "함수 값·units implementation 검증; physical accuracy/derivative enclosure 아님"
+    },
+    {
+      "id": "REI-F02",
+      "title": "상수율 H oracle 구현",
+      "lane": "FASTEST",
+      "status": "CODEX_READY_NOT_EXECUTED",
+      "dependencies": [
+        "REI-F00"
+      ],
+      "inputs": [
+        "PREWORK_KO.md section5"
+      ],
+      "outputs": [
+        "stable x_next and separate event counts"
+      ],
+      "proposed_paths": [
+        "rust/rei_microphysics/src/hydrogen_step.rs",
+        "rust/rei_microphysics/tests/hydrogen_step.rs",
+        "rust/rei_microphysics/src/lib.rs"
+      ],
+      "steps": [
+        "expm1/phi2로 small-depth event cancellation 방지",
+        "dt0,k0 identity",
+        "finite positive inputs/overflow 명시 오류",
+        "photo/collisional/secondary/recombination 사건분리"
+      ],
+      "verification": [
+        "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test hydrogen_step --locked"
+      ],
+      "acceptance": [
+        "analytic endpoint와 count identity",
+        "equilibrium/pure rec/pure photo/secondary at x1/small dt cases",
+        "no post-step clipping"
+      ],
+      "failure_branches": [
+        "NUMERIC_CANCELLATION: helper series 분기와 remainder 오차 확인"
+      ],
+      "claim_ceiling": "고정상수 H oracle뿐, H/He history 아님"
+    },
+    {
+      "id": "REI-F03",
+      "title": "H/He 사건/열 coupled map와 controlled fixture",
+      "lane": "FASTEST",
+      "status": "CODEX_READY_NOT_EXECUTED",
+      "dependencies": [
+        "REI-F01",
+        "REI-F02"
+      ],
+      "inputs": [
+        "CONTROLLED_FIXTURE.json",
+        "prework_checks/RESULTS.json"
+      ],
+      "outputs": [
+        "HHe rhs/implicit microstep",
+        "photon/material/energy ledgers",
+        "toy fixture receipt"
+      ],
+      "proposed_paths": [
+        "rust/rei_microphysics/src/hhe_events.rs",
+        "rust/rei_microphysics/src/thermal.rs",
+        "rust/rei_microphysics/src/microstep.rs",
+        "rust/rei_microphysics/tests/hhe_events.rs",
+        "rust/rei_microphysics/tests/hhe_fixture.rs",
+        "rust/rei_microphysics/examples/hhe_fixture.rs"
+      ],
+      "steps": [
+        "S_r 기반 production/destruction operator",
+        "n_e는 neutrality에서 재구성",
+        "proper u 혹은 extensive U state종류명시; expansion한번",
+        "CaseA toy fixture 먼저, coupledOTS는 latestowner source를 별도closure로",
+        "positivity-preserving implicit solve와 transactional candidate"
+      ],
+      "verification": [
+        "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test hhe_events --locked",
+        "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test hhe_fixture --locked",
+        "cargo run --manifest-path rust/rei_microphysics/Cargo.toml --example hhe_fixture --locked"
+      ],
+      "acceptance": [
+        "CONTROLLED_FIXTURE assertions 충족",
+        "원자별 stoichiometry exact 검산 재사용",
+        "independent toy reference와 refinement agreement",
+        "불수락 candidate writes 0"
+      ],
+      "failure_branches": [
+        "IMPLICIT_FAILURE: step reject and bisect bounded",
+        "LEDGER_FAIL: 이벤트별 first offending column 분리, 전체 audit 재실행 금지"
+      ],
+      "claim_ceiling": "합성 all-HHe coupled implementation; 천체모형/validated map 아님"
+    },
+    {
+      "id": "REI-F04",
+      "title": "실제 공동-parent sparse nonlinear remainder 인증",
+      "lane": "FASTEST",
+      "status": "CODEX_READY_NOT_EXECUTED",
+      "dependencies": [
+        "REI-F03"
+      ],
+      "inputs": [
+        "joint_affine.rs",
+        "historical judge/source identities",
+        "four source-site roles and lane applicability from F00; all3 original shape lanes if inherited NodeHistory",
+        "physical successor map input lock",
+        "PREWORK_KO.md section6.1: fixed implicit Krawczyk/derivative/Taylor/composition recipe"
+      ],
+      "outputs": [
+        "runs/rei_fastest_v1/map_certificate/parent_manifest.json",
+        "runs/rei_fastest_v1/map_certificate/certificate.json",
+        "runs/rei_fastest_v1/map_certificate/checker_receipt.json"
+      ],
+      "proposed_paths": [
+        "rust/rei_microphysics/src/validated_map.rs",
+        "rust/rei_microphysics/src/source_events.rs",
+        "rust/rei_microphysics/tests/validated_map.rs",
+        "rust/rei_microphysics/examples/check_map_certificate.rs"
+      ],
+      "steps": [
+        "Actual successor parent state dimension, topology and full/half1/half2 uncertainty-variable union are frozen; 46080 nodes only for unchanged inherited node-history structure",
+        "근거있는 공유만 coordinate 공유; site-independent uncertainties 유지",
+        "actual implicit map derivative/remainder 및 coefficient rounding 도출",
+        "table branch/floor/event topology split",
+        "independent checker는 production evaluator를 호출하지 않음",
+        "Implement section6.1 formulas on actual residual; no generic method reselection"
+      ],
+      "verification": [
+        "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test validated_map --locked",
+        "cargo run --manifest-path rust/rei_microphysics/Cargo.toml --example check_map_certificate --locked -- runs/rei_fastest_v1/map_certificate/certificate.json"
+      ],
+      "acceptance": [
+        "실제 HHe map certificate에 source/parent/runtime/input identities",
+        "all source-site remainders independently enclosed",
+        "strict <2e-4 local error and <2e-3 public width",
+        "synthetic-only result 불허",
+        "새 homogeneous 인증은 inherited 46080-node whole-history 인증/수락으로 승격되지 않는다"
+      ],
+      "failure_branches": [
+        "UNBOUNDED_REMAINDER: 실패한 node/site/topology만 refine",
+        "UNDERENCLOSURE: no commit, 실패receipt보존",
+        "ROUNDING_GAP: arithmetic enclosure 보완; fitphysical error와분리"
+      ],
+      "claim_ceiling": "인증된 해당 map/해당 domain만; 과거 실패 재판정 아님"
+    },
+    {
+      "id": "REI-F05",
+      "title": "전체 첫 canonical interval 구현·실행",
+      "lane": "FASTEST",
+      "status": "CODEX_READY_NOT_EXECUTED",
+      "dependencies": [
+        "REI-F04"
+      ],
+      "inputs": [
+        "versioned successor contract",
+        "actual successor parent data; all3 original shape lanes only when inheriting NodeHistory",
+        "approved rates and caseclosure"
+      ],
+      "outputs": [
+        "accepted/rejected transactions",
+        "first_interval_summary.json",
+        "all seven ledgers"
+      ],
+      "proposed_paths": [
+        "rust/rei_microphysics/src/adaptive_history.rs",
+        "rust/rei_microphysics/tests/adaptive_history.rs",
+        "rust/rei_microphysics/examples/first_interval.rs",
+        "runs/rei_fastest_v1/first_interval/"
+      ],
+      "steps": [
+        "frozenparent에서 full/twohalf trial",
+        "실패trial만 분할, 최소step failclosed",
+        "tableevent 경계전후 restart parentbytes",
+        "Complete every predeclared successor lane; inherited NodeHistory keeps all3 original lanes",
+        "historyclaim은 finalsummary에만"
+      ],
+      "verification": [
+        "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test adaptive_history --locked",
+        "cargo run --release --manifest-path rust/rei_microphysics/Cargo.toml --example first_interval --locked -- --input docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/rei_model_lock.json --output runs/rei_fastest_v1/first_interval"
+      ],
+      "acceptance": [
+        "각 accepted microstep strictgates",
+        "전체 declared successor interval and every applicable lane 완료; no inherited historical promotion",
+        "rejectedcandidate nevercommitted",
+        "previous [160,161] failure immutable"
+      ],
+      "failure_branches": [
+        "LOCAL_ERROR_FAIL: retainlastaccepted+boundedrefine, no tolerance change",
+        "RUNTIME_RESOURCE: resumecheckpoint, sciencefailure와구분"
+      ],
+      "claim_ceiling": "통과한 새모형 첫구간만; production cosmic history 아직아님"
+    },
+    {
+      "id": "REI-F06",
+      "title": "Bianchi-I exact geometry와 angular-energy adapter",
+      "lane": "FASTEST",
+      "status": "CODEX_READY_NOT_EXECUTED",
+      "dependencies": [
+        "REI-F01"
+      ],
+      "inputs": [
+        "R1 exact characteristic equations",
+        "PREWORK section7"
+      ],
+      "outputs": [
+        "GeometryBackground trait",
+        "positive radiation state/remap",
+        "exact transport controls"
+      ],
+      "proposed_paths": [
+        "rust/rei_microphysics/src/bianchi_i.rs",
+        "rust/rei_microphysics/src/angular_photons.rs",
+        "rust/rei_microphysics/tests/bianchi_i.rs",
+        "rust/rei_microphysics/tests/radiation_conservation.rs"
+      ],
+      "steps": [
+        "a_i(t), H_i(t), volume contract",
+        "occupation f의 exactcharacteristic pullback",
+        "threshold and subthresholdguard split",
+        "frequency/angular conservative positivityremap",
+        "current4groupState compatibility stays scoped"
+      ],
+      "verification": [
+        "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test bianchi_i --locked",
+        "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test radiation_conservation --locked"
+      ],
+      "acceptance": [
+        "isotropic FLRW limit",
+        "e norm=1",
+        "a1a2a3 n_gamma conserved collisionless",
+        "refinement errors declared",
+        "temperature-rate coordinate changes independent"
+      ],
+      "failure_branches": [
+        "TRANSPORT_REMAP_LOSS: repair quadrature/remap, no signednegativephysicalstate"
+      ],
+      "claim_ceiling": "isolated geometry/transport test; coupledhistory activation dependsF05"
+    },
+    {
+      "id": "REI-F07",
+      "title": "첫 과학 scenario 선등록",
+      "lane": "FASTEST",
+      "status": "CODEX_READY_NOT_EXECUTED",
+      "dependencies": [
+        "REI-F03"
+      ],
+      "inputs": [
+        "R1 S0/S1/S2 source contract",
+        "provider domain metadata",
+        "CONTROLLED_FIXTURE completed separately"
+      ],
+      "outputs": [
+        "science_scenario_v1.json",
+        "omitted tail number+energy bounds",
+        "secondary approximation assessment"
+      ],
+      "proposed_paths": [
+        "configs/rei_fastest_v1/science_scenario_v1.json",
+        "docs/atomic_reionization_handoff_20261004_v1/science_scenario_decision.md"
+      ],
+      "steps": [
+        "배경a_i와time/redshift/domain, SEDnormalization, IC모두 수치고정",
+        "기하-only controls에는동일isotropicsource",
+        "ratesdomain와Emaxtail bound 선계산",
+        "secondary on/off/deposition effect 필요정도를 freeze",
+        "coupledOTS validity 또는 explicitescape benchmark label 선택",
+        "recombinationinitialhistory가없으면비관측초기조건 실험임을표기"
+      ],
+      "verification": [
+        "schema validation",
+        "tail integral and domain screening before Bianchiobservable"
+      ],
+      "acceptance": [
+        "모든 scientific input specified",
+        "0/unknown source provenance없음",
+        "source/family/ε값 결과보고튜닝금지"
+      ],
+      "failure_branches": [
+        "SED_SECONDARIES_MATERIAL: externalMICRO1 minimal task",
+        "REC_DEPENDENCY: explicit adaptertask; silentfallback금지"
+      ],
+      "claim_ceiling": "사전등록된 이론시나리오; 관측우주재현주장아님"
+    },
+    {
+      "id": "REI-F08",
+      "title": "동일 원자 realization의 FLRW/Bianchi paired histories",
+      "lane": "FASTEST",
+      "status": "CODEX_READY_NOT_EXECUTED",
+      "dependencies": [
+        "REI-F05",
+        "REI-F06",
+        "REI-F07"
+      ],
+      "inputs": [
+        "science_scenario_v1.json",
+        "admitted provider manifest"
+      ],
+      "outputs": [
+        "paired_history.csv",
+        "difference_error_ledger.json",
+        "publication figure source"
+      ],
+      "proposed_paths": [
+        "rust/rei_microphysics/examples/paired_history.rs",
+        "runs/rei_fastest_v1/paired/"
+      ],
+      "steps": [
+        "same atomic parameters/SED/IC per pair",
+        "H/He fractions T Gamma Q 저장",
+        "temporal/spectral/angular error 각각기록",
+        "Bianchi–FLRW residual/weak-shearlimit 비교"
+      ],
+      "verification": [
+        "cargo run --release --manifest-path rust/rei_microphysics/Cargo.toml --example paired_history --locked -- --scenario configs/rei_fastest_v1/science_scenario_v1.json"
+      ],
+      "acceptance": [
+        "positiveallstate",
+        "gatesallpass",
+        "numerical/model/atomicerrors separate",
+        "firstscientificplot with explicitmodeldomain"
+      ],
+      "failure_branches": [
+        "PAIR_FAILURE: identifyoneactualphysics/numericcause andboundedrepair"
+      ],
+      "claim_ceiling": "선택한 homogeneous prescribedgeometry의 재이온화 결과"
+    },
+    {
+      "id": "REI-F09",
+      "title": "HH/He 원자 감도 import와 응용 종결",
+      "lane": "FASTEST",
+      "status": "CODEX_READY_NOT_EXECUTED",
+      "dependencies": [
+        "REI-F08",
+        "HH-F2",
+        "HE-F2"
+      ],
+      "inputs": [
+        "HH/HE externalprovider candidate packages",
+        "same paired scenario"
+      ],
+      "outputs": [
+        "docs/atomic_reionization_handoff_20261004_v1/runtime_outputs/paired_atomic_sensitivity_v1.json",
+        "runs/rei_fastest_v1/atomic_sensitivity/atomic_sensitivity.csv",
+        "runs/rei_fastest_v1/atomic_sensitivity/APPLICATION_CLOSEOUT.json"
+      ],
+      "proposed_paths": [
+        "runs/rei_fastest_v1/atomic_sensitivity/"
+      ],
+      "steps": [
+        "HH k57 baseline vs correctedKS family 등 valid selections",
+        "HeCX nominal approximation/onoff variations and emissionledger",
+        "동일variation양쪽pairedrun",
+        "물리상계 없는variation은 sensitivityensemble로표시",
+        "필요한precisionrequest는한process로제한"
+      ],
+      "verification": [
+        "paired scenario tasks with prescribed provider selectors"
+      ],
+      "acceptance": [
+        "관측량별 sensitivity result",
+        "providerdomain violationsnotignored",
+        "atomicthreadapplicationclosure 조건에 matchedreturnedreceipt",
+        "one combined paired campaign receipt consumed by HH-F3 and HE-F3; separate astrophysical campaign reruns prohibited"
+      ],
+      "failure_branches": [
+        "MATERIAL_ATOMIC_DEPENDENCE: precisionlane reopen definedprocessonly",
+        "OUT_OF_DOMAIN: no rateclamping"
+      ],
+      "claim_ceiling": "외부원자선택에대한모형감도; 엄밀physicaluncertaintybound아님",
+      "execution_owner": "rei_bianchi only; HH-F3/HE-F3 review same receipt and do not launch duplicate histories",
+      "optional_extension_blocking_policy": "HH/HE binding failure blocks this optional campaign only; successful baseline REI-F08 remains valid within its declared process model"
+    },
+    {
+      "id": "REI-L01",
+      "title": "정밀·확장 lane 호출",
+      "lane": "MID_LONG",
+      "status": "DORMANT_CALLABLE",
+      "dependencies": [],
+      "inputs": [
+        "LEGACY_LANE.json"
+      ],
+      "outputs": [
+        "bounded extension request and interface test"
+      ],
+      "proposed_paths": [
+        "docs/atomic_reionization_handoff_20261004_v1/extensions/"
+      ],
+      "steps": [
+        "REC/tilt/diffuse/CR/nonMaxwell/coherence 중 actualobservable requirement만 선택",
+        "동일AtomicProvider+eventledger에incrementalextension",
+        "fastbaseline retained regression"
+      ],
+      "verification": [
+        "one selected extension's explicit acceptance"
+      ],
+      "acceptance": [
+        "requestednewobservable에 필요한gate만추가"
+      ],
+      "failure_branches": [
+        "MISSING_THEORY_OR_DATA: unresolved명시, unrelatedbaseline차단금지"
+      ],
+      "claim_ceiling": "선택한확장만",
+      "activation_condition": "EXPLICIT_REOPEN_TRIGGER: user request or a concrete scientific dependency/domain/sensitivity finding; REI-F09 is one possible trigger, never a mandatory predecessor",
+      "selected_extension_prerequisite_policy": "On activation, create one bounded extension task with only its necessary artifacts and preceding scientific gates. REC or secondary dependency found in F07 may activate before F08/F09; no circular dependency on those results.",
+      "prerequisite_examples": [
+        {
+          "extension": "REC_SPLICE",
+          "required_before_activation": [
+            "exact requested rec_bianchi identity and target adapter contract"
+          ],
+          "required_before_claim": [
+            "REC adapter input lock and splice tests"
+          ]
+        },
+        {
+          "extension": "SECONDARY_DEPOSITION",
+          "required_before_activation": [
+            "frozen source SED and deposition/primary-only adequacy question from F07"
+          ],
+          "required_before_claim": [
+            "published deposition input and electron/photon/thermal bookkeeping tests"
+          ]
+        },
+        {
+          "extension": "PRECISION_ATOM",
+          "required_before_activation": [
+            "explicit process and domain or paired observable sensitivity request"
+          ],
+          "required_before_claim": [
+            "process-specific provider and validation receipt"
+          ]
+        }
+      ]
+    }
+  ]
+}

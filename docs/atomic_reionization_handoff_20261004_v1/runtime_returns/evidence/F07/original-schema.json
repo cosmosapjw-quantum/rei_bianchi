@@ -1,0 +1,821 @@
+{
+  "type": "object",
+  "required": [
+    "schema",
+    "task_id",
+    "scenario_id",
+    "status",
+    "classification",
+    "preregistration",
+    "units",
+    "constants",
+    "background",
+    "time",
+    "initial_state",
+    "source",
+    "spectral",
+    "atomic_model",
+    "secondary",
+    "numerics",
+    "outputs",
+    "dependencies"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scenario_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "classification": {
+      "type": "string",
+      "minLength": 1
+    },
+    "preregistration": {
+      "type": "object",
+      "required": [
+        "source_family",
+        "before_paired_anisotropy_observables",
+        "tuning_after_outputs",
+        "created_from_commit",
+        "source_definition_provenance",
+        "replacement_of_F03_fixture"
+      ],
+      "properties": {
+        "source_family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "before_paired_anisotropy_observables": {
+          "type": "boolean"
+        },
+        "tuning_after_outputs": {
+          "type": "string",
+          "minLength": 1
+        },
+        "created_from_commit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_definition_provenance": {
+          "type": "string",
+          "minLength": 1
+        },
+        "replacement_of_F03_fixture": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "units": {
+      "type": "object",
+      "required": [
+        "time",
+        "energy",
+        "temperature",
+        "density",
+        "source",
+        "rates",
+        "thermal",
+        "geometry"
+      ],
+      "properties": {
+        "time": {
+          "type": "string",
+          "minLength": 1
+        },
+        "energy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "temperature": {
+          "type": "string",
+          "minLength": 1
+        },
+        "density": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rates": {
+          "type": "string",
+          "minLength": 1
+        },
+        "thermal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "geometry": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "constants": {
+      "type": "object",
+      "required": [
+        "c_cm_s",
+        "k_B_erg_K",
+        "eV_erg",
+        "provider_threshold_ev",
+        "R1_threshold_ev",
+        "threshold_rounding_policy"
+      ],
+      "properties": {
+        "c_cm_s": {
+          "type": "number"
+        },
+        "k_B_erg_K": {
+          "type": "number"
+        },
+        "eV_erg": {
+          "type": "number"
+        },
+        "provider_threshold_ev": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number"
+          }
+        },
+        "R1_threshold_ev": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number"
+          }
+        },
+        "threshold_rounding_policy": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "background": {
+      "type": "object",
+      "required": [
+        "a0",
+        "H_mean_per_s",
+        "epsilon",
+        "formula",
+        "pairs",
+        "tilt",
+        "spatial_structure",
+        "density_law",
+        "redshift"
+      ],
+      "properties": {
+        "a0": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number"
+          }
+        },
+        "H_mean_per_s": {
+          "type": "number"
+        },
+        "epsilon": {
+          "type": "number"
+        },
+        "formula": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pairs": {
+          "type": "object",
+          "required": [
+            "FLRW",
+            "BIANCHI_I"
+          ],
+          "properties": {
+            "FLRW": {
+              "type": "object",
+              "required": [
+                "H_per_s"
+              ],
+              "properties": {
+                "H_per_s": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "BIANCHI_I": {
+              "type": "object",
+              "required": [
+                "H_per_s"
+              ],
+              "properties": {
+                "H_per_s": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "tilt": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number"
+          }
+        },
+        "spatial_structure": {
+          "type": "string",
+          "minLength": 1
+        },
+        "density_law": {
+          "type": "string",
+          "minLength": 1
+        },
+        "redshift": {
+          "type": "object",
+          "required": [
+            "reference_z0",
+            "formula",
+            "interpretation"
+          ],
+          "properties": {
+            "reference_z0": {
+              "type": "number"
+            },
+            "formula": {
+              "type": "string",
+              "minLength": 1
+            },
+            "interpretation": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "time": {
+      "type": "object",
+      "required": [
+        "t0_s",
+        "t_end_s",
+        "initial_trial_dt_s",
+        "minimum_trial_dt_s",
+        "refinement_dt_s"
+      ],
+      "properties": {
+        "t0_s": {
+          "type": "number"
+        },
+        "t_end_s": {
+          "type": "number"
+        },
+        "initial_trial_dt_s": {
+          "type": "number"
+        },
+        "minimum_trial_dt_s": {
+          "type": "number"
+        },
+        "refinement_dt_s": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "initial_state": {
+      "type": "object",
+      "required": [
+        "nH0_cm3",
+        "fHe",
+        "fractions",
+        "temperature_K",
+        "thermal_rule",
+        "photon_number_per_H",
+        "photon_energy_ev",
+        "photon_angular_distribution",
+        "escape_energy0_erg_cm3",
+        "provenance"
+      ],
+      "properties": {
+        "nH0_cm3": {
+          "type": "number"
+        },
+        "fHe": {
+          "type": "number"
+        },
+        "fractions": {
+          "type": "object",
+          "required": [
+            "HII",
+            "HeI",
+            "HeII",
+            "HeIII"
+          ],
+          "properties": {
+            "HII": {
+              "type": "number"
+            },
+            "HeI": {
+              "type": "number"
+            },
+            "HeII": {
+              "type": "number"
+            },
+            "HeIII": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "temperature_K": {
+          "type": "number"
+        },
+        "thermal_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "photon_number_per_H": {
+          "type": "number"
+        },
+        "photon_energy_ev": {
+          "type": "number"
+        },
+        "photon_angular_distribution": {
+          "type": "string",
+          "minLength": 1
+        },
+        "escape_energy0_erg_cm3": {
+          "type": "number"
+        },
+        "provenance": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "family",
+        "kind",
+        "energy_at_birth_ev",
+        "photons_per_H_per_s",
+        "time_support_s",
+        "matter_frame_angular_density",
+        "multipoles",
+        "paired_source_ownership",
+        "birth_rule",
+        "time_discretization"
+      ],
+      "properties": {
+        "family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "energy_at_birth_ev": {
+          "type": "number"
+        },
+        "photons_per_H_per_s": {
+          "type": "number"
+        },
+        "time_support_s": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number"
+          }
+        },
+        "matter_frame_angular_density": {
+          "type": "string",
+          "minLength": 1
+        },
+        "multipoles": {
+          "type": "object",
+          "required": [
+            "dipole",
+            "quadrupole"
+          ],
+          "properties": {
+            "dipole": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number"
+              }
+            },
+            "quadrupole": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "paired_source_ownership": {
+          "type": "string",
+          "minLength": 1
+        },
+        "birth_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "time_discretization": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "spectral": {
+      "type": "object",
+      "required": [
+        "E_min_ev",
+        "E_max_ev",
+        "mandatory_energy_edges_ev",
+        "edge_interpretation",
+        "lower_ownership",
+        "upper_ownership",
+        "source_tail_number_tolerance",
+        "source_tail_energy_tolerance",
+        "source_tail_bound_basis",
+        "angular_quadrature"
+      ],
+      "properties": {
+        "E_min_ev": {
+          "type": "number"
+        },
+        "E_max_ev": {
+          "type": "number"
+        },
+        "mandatory_energy_edges_ev": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {
+            "type": "number"
+          }
+        },
+        "edge_interpretation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lower_ownership": {
+          "type": "string",
+          "minLength": 1
+        },
+        "upper_ownership": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_tail_number_tolerance": {
+          "type": "number"
+        },
+        "source_tail_energy_tolerance": {
+          "type": "number"
+        },
+        "source_tail_bound_basis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "angular_quadrature": {
+          "type": "object",
+          "required": [
+            "kind",
+            "n_mu",
+            "n_phi",
+            "weight_rule",
+            "seed"
+          ],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "minLength": 1
+            },
+            "n_mu": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number"
+              }
+            },
+            "n_phi": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number"
+              }
+            },
+            "weight_rule": {
+              "type": "string",
+              "minLength": 1
+            },
+            "seed": {
+              "type": "null"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "atomic_model": {
+      "type": "object",
+      "required": [
+        "rate_moment_id",
+        "rate_source",
+        "photo_cross_section",
+        "closure",
+        "recombination_emission",
+        "thermal_processes",
+        "CR",
+        "optional_HH_direct",
+        "optional_He_RCT",
+        "Peebles_recombination",
+        "physical_fit_uncertainty",
+        "omitted_cooling_and_model_error",
+        "fit_implementation_temperature_guard_K",
+        "scenario_temperature_guard_K",
+        "guard_policy"
+      ],
+      "properties": {
+        "rate_moment_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rate_source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "photo_cross_section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "closure": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recombination_emission": {
+          "type": "string",
+          "minLength": 1
+        },
+        "thermal_processes": {
+          "type": "string",
+          "minLength": 1
+        },
+        "CR": {
+          "type": "string",
+          "minLength": 1
+        },
+        "optional_HH_direct": {
+          "type": "string",
+          "minLength": 1
+        },
+        "optional_He_RCT": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Peebles_recombination": {
+          "type": "string",
+          "minLength": 1
+        },
+        "physical_fit_uncertainty": {
+          "type": "string",
+          "minLength": 1
+        },
+        "omitted_cooling_and_model_error": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fit_implementation_temperature_guard_K": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number"
+          }
+        },
+        "scenario_temperature_guard_K": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number"
+          }
+        },
+        "guard_policy": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "secondary": {
+      "type": "object",
+      "required": [
+        "choice",
+        "screening",
+        "deposition_provider",
+        "physical_effect_bound",
+        "extension_trigger"
+      ],
+      "properties": {
+        "choice": {
+          "type": "string",
+          "minLength": 1
+        },
+        "screening": {
+          "type": "string",
+          "minLength": 1
+        },
+        "deposition_provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "physical_effect_bound": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extension_trigger": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "numerics": {
+      "type": "object",
+      "required": [
+        "strict_local_error_limit",
+        "strict_public_width_limit",
+        "conservation_scaled_tolerance",
+        "transactional_rejection",
+        "independent_references",
+        "F04_certificate",
+        "geometry_id",
+        "thermal_expansion_rule",
+        "photon_expansion_rule"
+      ],
+      "properties": {
+        "strict_local_error_limit": {
+          "type": "number"
+        },
+        "strict_public_width_limit": {
+          "type": "number"
+        },
+        "conservation_scaled_tolerance": {
+          "type": "number"
+        },
+        "transactional_rejection": {
+          "type": "boolean"
+        },
+        "independent_references": {
+          "type": "string",
+          "minLength": 1
+        },
+        "F04_certificate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "geometry_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "thermal_expansion_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "photon_expansion_rule": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "outputs": {
+      "type": "object",
+      "required": [
+        "paired",
+        "filling_QV",
+        "physical_claim",
+        "observational_reproduction",
+        "recombination_IC_history"
+      ],
+      "properties": {
+        "paired": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "filling_QV": {
+          "type": "string",
+          "minLength": 1
+        },
+        "physical_claim": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observational_reproduction": {
+          "type": "boolean"
+        },
+        "recombination_IC_history": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "dependencies": {
+      "type": "object",
+      "required": [
+        "F03",
+        "F06",
+        "F04",
+        "F05",
+        "coupled_runtime"
+      ],
+      "properties": {
+        "F03": {
+          "type": "string",
+          "minLength": 1
+        },
+        "F06": {
+          "type": "string",
+          "minLength": 1
+        },
+        "F04": {
+          "type": "string",
+          "minLength": 1
+        },
+        "F05": {
+          "type": "string",
+          "minLength": 1
+        },
+        "coupled_runtime": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReiScienceScenarioV1"
+}

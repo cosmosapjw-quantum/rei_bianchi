@@ -1,0 +1,45 @@
+{
+  "task": "REI-PHYS33-20261012",
+  "recorded_utc": "2026-10-11T20:08:24.550264+00:00",
+  "author": "/root",
+  "evidence_type": "CONTROLLER_OBSERVATION_ATTESTATION; not a preserved provider-tool envelope",
+  "observations": [
+    {
+      "role": "first",
+      "cwd": "/workspace/scratch/e9fc19302329/phys33",
+      "command": [
+        "python3",
+        "code/certify_upper_branch.py",
+        "--role",
+        "first",
+        "--output",
+        "evidence/CERTIFICATE_FIRST.json",
+        "--ledger",
+        "/workspace/scratch/e9fc19302329/phys33_run_ledger"
+      ],
+      "observed_tool_exit_code": 0,
+      "main_receipt": "evidence/run_ledger/first.finished.json"
+    },
+    {
+      "role": "replay",
+      "cwd": "/workspace/scratch/e9fc19302329/phys33_restored",
+      "command": [
+        "python3",
+        "code/certify_upper_branch.py",
+        "--role",
+        "replay",
+        "--output",
+        "evidence/CERTIFICATE_REPLAY.json",
+        "--ledger",
+        "/workspace/scratch/e9fc19302329/phys33_run_ledger"
+      ],
+      "observed_tool_exit_code": 0,
+      "main_receipt": "evidence/run_ledger/replay.finished.json"
+    }
+  ],
+  "raw_stdout_stderr_archive": "NOT_PRESERVED_AS_SEPARATE_FILES",
+  "provider_envelope_archive": "NOT_PRESERVED_AS_SEPARATE_FILE",
+  "distinction": "The controller observed exit_code0 for both completed exec_command responses. This JSON records that observation after execution; it is not presented as raw external capture. The independent reviewer can directly inspect certificate/started/finished bytes, not independently attest the missing original tool envelope.",
+  "reexecution_for_log_recovery": 0,
+  "structured_scientific_failures": "Raw first and replay certificate failure=null; all29 checks true; separate finished receipts preserved."
+}

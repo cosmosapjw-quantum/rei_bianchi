@@ -1,0 +1,124 @@
+--- versions/DERIVATION_DRAFT1_KO.md
++++ DERIVATION_KO.md
+@@ -1,7 +1,7 @@
+ # PHYS31 — 같은 이차 모멘트의 대칭 프로파일을 구별하는 첫 국소 차수
+ 
+-연구 기여: REI-PHYS31-20261011. 기여자 /root/phys31_theory.  
+-상태: **이론 후보 초안 — 새 PHYS31 계약 대기; 최종 freeze와 최종 판정 전**.  
++연구 기여: **REI-PHYS31-20261011 · EQUAL_SECOND_MOMENT_QUARTIC_PROFILE_SPLITTING**. 기여자 /root/phys31_theory.  
++상태: **직접 유도 후보 완성 — 실제 PHYS31 계약을 읽고 적용했으며 별도 최종 판정 대기**.  
+ 근거: **직접 유도**, 고정 커널과 명시한 정칙성·단순근 전제에 조건부.  
+ 역할: 같은 host·GPT-6 Astra Pro·부모 대화 이력을 사용하는 NONBLIND 후보 생성자이며 최종 독립 판정자가 아니다.
+ 
+@@ -50,7 +50,7 @@
+ 
+ ## 1. 실제로 읽은 선행 근거와 불변조건
+ 
+-PHYS30의 물리 계약, PHYS31 인수문, 전체 이론 유도와 주장 목록, 최종 검토 한국어 본문을 직접 읽었다. 최종 decision JSON에서는 실제 PROMOTE_SCOPED, fatal_issue_count 0, 수학 평가, 남은 한계와 다음 질문의 PROPOSED / NOT_RUN 상태를 선별적으로 읽었다. PHYS30의 판정은 이차 결과를 승인한 것이며 이 문서의 고차 결과를 선행 승인한 것이 아니다. 새 계약이 고정되기 전에는 이 문서를 이론 후보로만 취급한다.
++현재 [PHYS31 물리 계약](../../PHYSICS_CONTRACT.json) 전체를 실제 읽고 이 기여의 범위를 고정했다. PHYS30의 [물리 계약](../../inputs/PHYS30/PHYSICS_CONTRACT.json), [PHYS31 인수문](../../inputs/PHYS30/next/PHYS31_NEXT_HANDOFF_KO.md), [전체 이론 유도](../../inputs/PHYS30/contributions/theory/DERIVATION_KO.md)와 [주장 목록](../../inputs/PHYS30/contributions/theory/THEORY_CLAIMS.json), [최종 검토 한국어 본문](../../inputs/PHYS30/independent/DECISION_REVIEW_KO.md)을 직접 읽었다. 최종 decision JSON에서는 실제 PROMOTE_SCOPED, fatal_issue_count 0, 수학 평가, 남은 한계와 다음 질문의 PROPOSED / NOT_RUN 상태를 선별적으로 읽었다. PHYS30의 판정은 이차 결과를 승인한 것이며 이 문서의 고차 결과를 선행 승인한 것이 아니다. 선행 파일의 실제 읽기는 원래 PHYS30 경로에서 수행했다. 위 링크는 root가 identity를 보존하여 가져오는 이동 가능한 사본을 가리키며, 실제 읽기 경로·범위와 identity는 [PROVENANCE.json](PROVENANCE.json)에 분리했다. 이 문서는 후보 생성자의 직접 유도이며 최종 승격 판정은 별도 검토자의 역할이다.
+ 
+ 고정 에너지와 거리의 수치는
+ 
+@@ -429,8 +429,8 @@
+ 같은 T31.34의 양의 밀도 쌍을 그대로 사용한다. \(3<p<4\), \(E_0>0\)를 정하고 \(t=(E-a)/E_0\), \(T=(b-a)/E_0\)로 둔다. \(K>0\)의 단위는 s⁻⁴이고
+ 
+ \[
+-k_{\rm ex}(E)=K\left[D t^2-t^3+\varepsilon t^p-B\right],\qquad
+-D>3T,\quad
++k_{\rm ex}(E)=K\left[\Lambda t^2-t^3+\varepsilon t^p-B\right],\qquad
++\Lambda>3T,\quad
+ 0<\varepsilon<
+ \frac6{p(p-1)(p-2)T^{p-3}}
+ \tag{T31.38}
+@@ -440,7 +440,7 @@
+ 
+ \[
+ k_{\rm ex}''=\frac K{E_0^2}
+-\left[2D-6t+\varepsilon p(p-1)t^{p-2}\right]>0,
++\left[2\Lambda-6t+\varepsilon p(p-1)t^{p-2}\right]>0,
+ \]
+ 
+ \[
+@@ -502,7 +502,7 @@
+ 
+ - \(\Delta\mu_4=0\): 두 프로파일의 사차 이하 응답 미분과 근 계수가 같고 차이는 \(o(\delta^4)\)다. 더 높은 모멘트의 차이를 쓰려면 추가 정칙성이 필요하다.
+ - \(\mathcal H_4=0\), \(\Delta\mu_4\ne0\): 해당 기준점의 사차 근 차이가 소거된다. 이것은 두 프로파일이 유한폭에서 같다는 뜻이 아니다.
+-- \(\mu_2=0\) 또는 1: 대칭 확률측도는 각각 \(\delta_0\), \((\delta_{-1}+\delta_1)/2\)로 유일하다. 같은 \(\mu_2\)를 가진 서로 다른 프로파일을 그 경계에서 만들 수 없다.
++- \(\mu_2=0\) 또는 1: 대칭 확률측도는 각각 \(\delta_0\), \((\delta_{-1}+\delta_1)/2\)로 유일하다. 같은 \(\mu_2\)를 가진 서로 다른 프로파일을 그 경계에서 만들 수 없다. 전자는 \(z^2\ge0\)의 기대값이 0이라는 사실, 후자는 \(1-z^2\ge0\)의 기대값이 0이라는 사실과 대칭성으로 따른다.
+ - \(C=0\) 또는 비내부 기준점: 이 단순근 전달 정리를 적용하지 않는다.
+ 
+ 움직이는 중심 때문에 \(\mathcal H_4(0,w)=0\) 뒤의 첫 차수가 반드시 6일 수는 없다. 이를 직접적인 매끄러운 예로 확인한다. \(X=E-m\)라 하고
+@@ -542,11 +542,55 @@
+ \tag{T31.47}
+ \]
+ 
+-로 구별될 수 있다. 이 예에서는 커널이 다항식이라 필요한 정칙성이 모두 성립한다. 주 물리 모델의 오차·오차상계·오차차수 수치 결과로 해석하지 않는다. T31.47은 사차 소거 뒤의 짝수 차수 단정을 막는 직접 기호 반례이며 새 고차 물리 계산을 뜻하지 않는다.
++로 구별될 수 있다. 이 예에서는 커널이 다항식이라 필요한 정칙성이 모두 성립한다. 주 물리 모델의 5차 계수를 계산하거나 유한폭 오차를 인증한 결과로 해석하지 않는다. T31.47은 사차 소거 뒤의 짝수 차수 단정을 막는 직접 기호 반례이며 새 고차 물리 계산을 뜻하지 않는다.
+ 
+ 한편 커널이 차수 3 이하의 다항식이면 모든 양의 폭에서도 동일 \(\mu_2\)·대칭 두 프로파일의 평균 응답이 정확히 같다. T31.15의 유한 다항식 항이 전부 소거되기 때문이다. 이 경우에는 그 응답으로 정의된 같은 유일 근도 같다. 이는 특별한 다항식 퇴화이지 일반 물리 커널의 유한폭 동일성이 아니다.
+ 
+-## 11. 단위, 계산으로 넘기는 형태와 근거 상태
++## 11. 동결된 정확 산술 시험함수의 해석적 기준
++
++새 계약은 무차원 진단으로 지원 \([-2,2]\), \(m=0\), \(R=2\), \(w=1\), 두 분지 \(s=\pm1\)를 정한다. 이 절은 그 기준을 직접 유도하며 프로그램을 실행하지 않는다. 두 시험함수는
++
++\[
++k_3(X)=1+X^2-X^3/10,\qquad
++k_4(X)=1+X^2-X^3/10+X^4/100.
++\tag{T31.49}
++\]
++
++중심 평균이 0일 때 T31.10의 두 점 법칙을 직접 적분하면
++
++\[
++M_{3,Y}=sV(V/r-r),\qquad
++M_{4,Y}=V r^2-V^2+V^3/r^2.
++\]
++
++프로파일 대칭성과 독립성은
++
++\[
++M_{2,E}=W,\quad M_{3,E}=M_{3,Y},\quad
++M_{4,E}=M_{4,Y}+6\mu_2\delta^2V+\mu_4\delta^4
++\tag{T31.50}
++\]
++
++를 준다. 따라서 \(F_3=1+W-M_{3,Y}/10\), \(F_4=F_3+M_{4,E}/100\)이다. cubic 응답은 두 프로파일에 대해 모든 허용 폭과 실제 분산에서 정확히 같다. quartic 응답은 정확히
++
++\[
++F_{4,P_4}-F_{4,u}=\frac{\Delta\mu_4}{100}\delta^4
++=\frac2{7875}\delta^4.
++\tag{T31.51}
++\]
++
++영폭 \(r=2,V=W=1\)에서 \(M_3=-3s/2\), \(M_4=13/4\), \(\partial_WM_3=-s\), \(\partial_WM_4=11/4\)이므로 다음 정확한 기준이 나온다.
++
++| 시험함수 | 같은 기준 수준 \(A_s\) | \(C_s=F_W(0,1)\) | \(\Delta b_4^{P_4-u}\) |
++|---|---|---|---|
++| cubic | \(2+3s/20\) | \(1+s/10\) | \(0\) |
++| quartic | \((813+60s)/400\) | \((411+40s)/400\) | \(-32/[315(411+40s)]\) |
++
++quartic의 두 분지 차이는 각각 \(-32/142065\), \(-32/116865\)이며, \(k_4^{(4)}=6/25\)와 T31.2로도 얻는다. 이 값은 물리 에너지·응답의 단위를 갖는 수치가 아니라 계약의 무차원 진단값이다.
++
++같은 비영 A의 분자식에서 \(D=5\), \(\mathscr N_W-A=5C\)를 유지해야 한다. 각 \(A_s>0,C_s>0,\Delta b_4\ne0\)이므로 A를 분모에서 버리면 T31.33의 편향 인자 \(5C/(5C+A)\ne1\)가 된다. 사차 미분에서 ordinary 계수로 옮길 때 \(1/24\)를 빠뜨리면 정확히 24배의 오답이 된다. 이 두 대조는 tiny physical A에 의존하지 않는 해석적 오류 검출 기준이다. 실제 exact Fraction 결과·formal root 계수 실행과 PASS 여부는 별도 수치 기록을 따른다.
++
++## 12. 단위, 계산으로 넘기는 형태와 근거 상태
+ 
+ | 양 | 단위 |
+ |---|---|
+@@ -587,7 +631,8 @@
+ | 같은 비영 A 분자식 | derived | T31.29–33; A와 denominator 보존 |
+ | 양의 AC 쌍의 같은 \(\mu_2\), 다른 \(\mu_4\) | derived | T31.34–37; 정확 다항 적분 |
+ | C3 가정의 sharpness | derived counterexample | T31.38–43; 실제 물리 커널 교체 없음 |
+-| 사차 퇴화 뒤 오차 가능성 | derived counterexample | T31.44–47; 별도 매끄러운 시험함수 |
++| 사차 퇴화 뒤 5차 가능성 | derived counterexample | T31.44–47; 별도 매끄러운 시험함수 |
++| 계약 cubic/quartic toy의 exact oracle | derived | T31.49–51 및 A·C 표; 실행 결과와 구별 |
+ | 물리 \(k^{(4)}\)와 계수의 소수값 | 이 기여에서 NOT_RUN | 별도 실제 정칙성·수치 근거 필요 |
+ | 새 정확근·J 오차·수치 유효폭·global ordering | 미주장 | 기존 한계 유지 |
+ | 최종 독립 판정 | 이 역할의 범위 밖 | 생성·설계와 분리된 reviewer 필요 |
+@@ -596,3 +641,5 @@
+ 
+ **Physical HOLD; [160,161] FAIL; tick160; auxiliary escape FAIL; HH/RCT/CR OFF; precision atomic PARKED; production source/default/runtime changes0**을 유지한다. 원자·기체·방출원·유한 역사 admission, local Codex 또는 heavy native 작업을 열지 않는다. 외부 원전·우선권·신규성 조사는 이 기여에서 수행하지 않았으며, 위 새 결과는 직접 증명과 실제 읽은 선행 전제에 근거한다.
+ 
++기계 판독 주장은 [THEORY_CLAIMS.json](THEORY_CLAIMS.json), 원본 읽기·동결 계약·하네스 identity·실행 범위는 [PROVENANCE.json](PROVENANCE.json), 최초 metadata 실패와 초안 변경은 [PRE_FREEZE_EVENTS.json](PRE_FREEZE_EVENTS.json)에 있다.
++

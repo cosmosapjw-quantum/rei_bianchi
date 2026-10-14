@@ -1,0 +1,3 @@
+use rei_microphysics::Ft03Model;
+fn bits(a: &[f64])->String{a.iter().map(|v|format!("\"{:016x}\"",v.to_bits())).collect::<Vec<_>>().join(",")}
+fn main(){let m=Ft03Model::controlled().unwrap();let s=m.initial_state();let g=m.gas;let c=[s.fractions[0],s.fractions[1],s.fractions[2],s.u_erg_cm3/(g.n_h_cm3*g.ev_erg),s.photon_cm3[0]/g.n_h_cm3,s.photon_cm3[1]/g.n_h_cm3,s.photon_cm3[2]/g.n_h_cm3];let sigma:Vec<_>=g.sigma_cm2.into_iter().flatten().collect();println!("{{\"center_bits\":[{}],\"sigma_bits\":[{}],\"constants_bits\":[{}]}}",bits(&c),bits(&sigma),bits(&[g.n_h_cm3,g.n_he_cm3,g.c_cm_s,g.kb_erg_k,g.ev_erg,g.threshold_ev[0],g.threshold_ev[1],g.threshold_ev[2],g.photon_energy_ev[0],g.photon_energy_ev[1],g.photon_energy_ev[2]]));}

@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "repository": "cosmosapjw-quantum/rei_bianchi",
+  "branch": "forward/rust-reion-kernels-20260922",
+  "rust_only_parent_sha": "e54e8745ca35e5ef3a093b13dc7deafbbcf55516",
+  "tested_source_sha": "1bda1e8cea7629d31f905e126ba47ec3b3c1d0d8",
+  "historical_failed_tested_sha": "fbce265b8182cc4c9383caa554a71c8524cef8f7",
+  "toolchain": {
+    "rustc": "rustc 1.94.1 (e408947bf 2026-03-25)",
+    "cargo": "cargo 1.94.1 (29ea6fb6a 2026-03-24)",
+    "clippy": "clippy 0.1.94 (e408947bfd 2026-03-25)"
+  },
+  "executed_from_commit": "1bda1e8cea7629d31f905e126ba47ec3b3c1d0d8",
+  "commands": [
+    {
+      "argv": "cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check",
+      "exit": 0,
+      "stdout": "evidence/fmt.stdout.log",
+      "stderr": "evidence/fmt.stderr.log"
+    },
+    {
+      "argv": "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --workspace --locked",
+      "exit": 0,
+      "stdout": "evidence/test.stdout.log",
+      "stderr": "evidence/test.stderr.log",
+      "counts": {
+        "integration": 26,
+        "example_frontend": 5,
+        "unit": 0,
+        "doc": 0
+      }
+    },
+    {
+      "argv": "cargo clippy --manifest-path rust/rei_microphysics/Cargo.toml --workspace --all-targets --locked -- -D warnings",
+      "exit": 0,
+      "stdout": "evidence/clippy.stdout.log",
+      "stderr": "evidence/clippy.stderr.log",
+      "quality_evidence_only": true
+    },
+    {
+      "argv": "printf transform_exp_extreme... | cargo run --manifest-path rust/rei_microphysics/Cargo.toml --example eval_fixture --locked",
+      "exit": 0,
+      "stdout": "evidence/exp_minus_745.stdout.log",
+      "value": "4.94065645841246544e-324"
+    }
+  ],
+  "log_identity": {
+    "clippy.stderr.log": {
+      "sha256": "736e2582f563605dd272e5fb977840b0c0767377d27b6940c440caf75eec7157",
+      "bytes": 72
+    },
+    "clippy.stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "exp_minus_745.stdout.log": {
+      "sha256": "d3b74758b20c4d2fd3b403d82a3cf92f8ba4980a6b86453c83b14c5917f87081",
+      "bytes": 221
+    },
+    "fmt.stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "fmt.stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "test.stderr.log": {
+      "sha256": "0aa7b30cedb7e7495fdecae3e308a10265f689cfc3aaaa4c238016f8362f14e7",
+      "bytes": 540
+    },
+    "test.stdout.log": {
+      "sha256": "f47e7fa257db67b920dd4a9c1b952bb1832877dd85ce250c170d55f29c3b8b1e",
+      "bytes": 2261
+    }
+  },
+  "source_and_lock_checks": {
+    "rust_crate_dependencies": 0,
+    "historical_python_source_blobs": [
+      "3d806e1c1d3bb523bb3c339d1a141f67d7f10069",
+      "6f5c13f02d0e549e581a02d3c4d8b8313b209bbf"
+    ],
+    "purge_commit_vs_failed_tested_rust_tree": "IDENTICAL_AT_e54e8745",
+    "current_kernel_formula_change": "NONE_COMMENTS_AND_TESTS_ONLY",
+    "project_state_changed": false,
+    "external_rec_lock_changed": false
+  },
+  "legacy_parity": "83_OF_84_HISTORICAL_JAX_DIVERGENCE_NOT_ACTIVE",
+  "ci_on_push": "verify.yml push/pull_request runs Cargo fmt/test; rec-bianchi-monitor.yml schedule/workflow_dispatch only",
+  "scientific_validation": "NOT_RUN_NOT_CLAIMED"
+}

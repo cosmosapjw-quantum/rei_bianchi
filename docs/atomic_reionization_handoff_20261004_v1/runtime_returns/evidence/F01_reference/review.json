@@ -1,0 +1,18 @@
+{
+  "task_id": "REI-F01",
+  "status": "SCOPED_INDEPENDENT_REVIEW_P2_REPAIRED_BY_HOST",
+  "review_report": "- **P2 \u2014 Intermediate underflow silently breaks photon/species conservation.** In [homogeneous_rates.rs:53](/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/homogeneous_rates.rs:53), opacity uses `n*sigma`; [lines 118\u2013123](/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/homogeneous_rates.rs:118) independently calculate photon loss and species events. Their different multiplication orders permit materially inconsistent, finite outputs.\n\n  Concrete falsifiers, all with `a=1` and only HI density nonzero:\n\n  | `n_HI`, energy, comoving photons | Photon loss | Volume \u00d7 species events |\n  |---|---:|---:|\n  | `1e-310`, `70 eV`, `1e300` | `0` | `1.73083e-19` |\n  | `1e300`, `50000 eV`, `1e-240` | `5.14180e41` | `0` |\n  | `1e-304`, `70 eV`, `1e300` | `1.48117e-13` | `1.73083e-13` |\n\n  The third case retains nonzero subnormal opacity, so checking only underflow to zero is insufficient. Nonzero subnormal gamma also causes a `2.255e-4` relative disagreement for `n_HI=1e300`, `13.6 eV`, `N=1e-240`.\n\n  **Minimal repair:** reject precision-losing intermediate underflow explicitly, or use consistent scaled arithmetic with a ledger-consistency check. Add targeted external regressions without changing frozen tests or tolerances.\n\nThese numerical examples were directly evaluated using the candidate\u2019s operations in Python; direct candidate-API reproduction remains with the Host. I directly executed the two existing frozen test binaries: **6/6 passed**, without rebuilding. Frozen test/reference hashes match the intent. The broader 32/55-test and lint results remain Host-reported evidence.\n\nNo additional task-scoped defect found in Grackle branches/floors, coefficient units and density powers, metadata, Verner parameters, FT03 energies, exports, or admission refusal. Scientific admission remains **HOLD**.\n\nReviewed candidate SHA-256 identities:\n\n```text\natomic_provider.rs   b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3\nhomogeneous_rates.rs 2fcde8f85875aed1ce5bb38fd32eafaec04bbceda9d490101e349d2b9643ff52\nlib.rs               680acb65583cfc0b4bfabfa89471c39115b622f24707ec601d84b7601423da53\n```\n\nNo files changed; no agents or models launched.\n\n",
+  "reviewed_source_sha256": {
+    "rust/rei_microphysics/src/atomic_provider.rs": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3",
+    "rust/rei_microphysics/src/homogeneous_rates.rs": "2fcde8f85875aed1ce5bb38fd32eafaec04bbceda9d490101e349d2b9643ff52",
+    "rust/rei_microphysics/src/lib.rs": "680acb65583cfc0b4bfabfa89471c39115b622f24707ec601d84b7601423da53"
+  },
+  "finding": "P2: opacity/gamma/conversion positive intermediate underflow could return materially inconsistent finite photon/species ledgers",
+  "direct_host_red": "Actual Rust API nHI=1e-310,E70,N1e300 returned zero photon loss and positive events; external regression exit101 before repair",
+  "repair": "Reject precision-losing zero/subnormal positive products and positive subnormal photon conversion, preserving all frozen original tests/reference tolerances",
+  "direct_host_green": "Four direct Rust zero/subnormal opacity/gamma cases reject explicitly; full55 tests, frozen32 tests, fmt and scoped clippy pass",
+  "final_bytes_independently_reviewed": false,
+  "reviewer_direct_checks": "6 existing frozen test binaries without rebuilding; Python arithmetic reproductions",
+  "host_closeout_authority": "One targeted reactive repair and direct final validation; no second independent review round or physical admission",
+  "scientific_admission": "HOLD"
+}

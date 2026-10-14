@@ -1,0 +1,95 @@
+{
+  "experiment": "E3",
+  "kind": "exploratory",
+  "status": "PASS",
+  "checks": {
+    "rk4_monotonic": true,
+    "rk4_finest_below_1e-7": true,
+    "dop853_below_1e-9": true,
+    "inventory_below_2e-12": true
+  },
+  "native_rhs_calls": 570,
+  "rk4": [
+    {
+      "method": "RK4",
+      "steps": 16,
+      "max_relative_error": 1.4493493660944422e-06,
+      "end_N": [
+        1.4079120881121295e-07,
+        4.9377325966643734e-08,
+        1.1728275835389008e-08
+      ]
+    },
+    {
+      "method": "RK4",
+      "steps": 32,
+      "max_relative_error": 8.68810617922746e-08,
+      "end_N": [
+        1.4079101698793144e-07,
+        4.937725869169961e-08,
+        1.172825985600808e-08
+      ]
+    },
+    {
+      "method": "RK4",
+      "steps": 64,
+      "max_relative_error": 5.318013436256868e-09,
+      "end_N": [
+        1.4079100550458766e-07,
+        4.937725466434027e-08,
+        1.1728258899415531e-08
+      ]
+    }
+  ],
+  "rk4_error_ratios": [
+    16.681994167609464,
+    16.337127168566656
+  ],
+  "dop853": {
+    "rtol": 1e-11,
+    "atol": 1e-20,
+    "nfev": 122,
+    "max_relative_error": 1.3632292320200848e-11
+  },
+  "max_native_inventory_gross_flux_scaled": 1.5926699645643698e-16,
+  "initial_comoving_bins": [
+    6.973424116189391e-07,
+    2.4456714207948095e-07,
+    5.809044630157995e-08
+  ],
+  "physics": {
+    "kind": "exploratory",
+    "model": "collisionless number transport on prescribed expanding FLRW, finite fixed proper-energy band with power-law source-free spectrum extending above the upper edge",
+    "a0": 0.1,
+    "H_s": 1e-16,
+    "dimensionless_time": "s=Ht",
+    "s_end": 0.8,
+    "p": 3.0,
+    "energy_edges_eV": [
+      13.598434599702,
+      24.587389011,
+      54.41776,
+      200.0
+    ],
+    "N0_comoving_cm3": 1e-06,
+    "initial_distribution": "N_E=A E^-p; normalize integral over finite band to N0",
+    "closure": "At each RHS stage infer common power-law amplitude from lowest-bin number; proper n_E=N_E/a^3; use native a^3 H E n_E edge fluxes. High-edge inflow is present from the declared tail.",
+    "analytic_solution": "Each finite-band comoving bin N_g(s)=N_g(0) exp((1-p)s)",
+    "integrators": [
+      "fixed-step RK4 16,32,64 steps",
+      "SciPy DOP853 rtol1e-11 atol1e-20"
+    ],
+    "predeclared_checks": {
+      "rk4_error_decreases_each_refinement": true,
+      "rk4_finest_max_relative_error_less_than": 1e-07,
+      "dop853_max_relative_error_less_than": 1e-09,
+      "native_inventory_gross_flux_scaled_error_less_than": 2e-12
+    },
+    "claim_ceiling": "Actual native photon adapter exercised along a controlled FLRW trajectory; not a physical reionization history, energy-conserving radiation solver or EoR fit"
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "scipy": "1.17.0",
+    "numpy": "2.3.5"
+  }
+}

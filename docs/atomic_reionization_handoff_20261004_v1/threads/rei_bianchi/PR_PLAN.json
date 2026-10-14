@@ -1,0 +1,218 @@
+{
+  "schema_version": "1.0",
+  "logical_prs": [
+    {
+      "logical_pr_id": "REI-PR00",
+      "task_ids": [
+        "REI-F00"
+      ],
+      "title": "SSOT 채택과 source/closure successor contract",
+      "head_branch": "forward/rust-reion-kernels-20260922",
+      "base_policy": "retain existing head; actual integration base must match current repository intent, no automatic merge",
+      "github_pr_state": "LOGICAL_PLAN_NOT_OPENED_BY_THIS_AGENT",
+      "acceptance": [
+        "source snapshot와 local HEAD 차이가 기록됨",
+        "case/opacity/process flags에 암묵적 기본값 없음"
+      ],
+      "paths": [
+        "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/rei_model_lock.json",
+        "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/closure_process_decision.json",
+        "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/parent_and_lane_applicability.json"
+      ]
+    },
+    {
+      "logical_pr_id": "REI-PR01",
+      "task_ids": [
+        "REI-F01"
+      ],
+      "title": "정의된 AtomicProvider와 R1 homogeneous opacity 구현",
+      "head_branch": "forward/rust-reion-kernels-20260922",
+      "base_policy": "retain existing head; actual integration base must match current repository intent, no automatic merge",
+      "github_pr_state": "LOGICAL_PLAN_NOT_OPENED_BY_THIS_AGENT",
+      "acceptance": [
+        "independent C/original formula point values selected domain에서 일치",
+        "domain 밖 return error, no clamp",
+        "κ=Σnσ owner합=1, zero-opacity absorption0",
+        "기존 seven APIs tests unchanged"
+      ],
+      "paths": [
+        "rust/rei_microphysics/src/atomic_provider.rs",
+        "rust/rei_microphysics/src/homogeneous_rates.rs",
+        "rust/rei_microphysics/tests/atomic_provider.rs",
+        "rust/rei_microphysics/tests/homogeneous_rates.rs",
+        "rust/rei_microphysics/src/lib.rs"
+      ]
+    },
+    {
+      "logical_pr_id": "REI-PR02",
+      "task_ids": [
+        "REI-F02"
+      ],
+      "title": "상수율 H oracle 구현",
+      "head_branch": "forward/rust-reion-kernels-20260922",
+      "base_policy": "retain existing head; actual integration base must match current repository intent, no automatic merge",
+      "github_pr_state": "LOGICAL_PLAN_NOT_OPENED_BY_THIS_AGENT",
+      "acceptance": [
+        "analytic endpoint와 count identity",
+        "equilibrium/pure rec/pure photo/secondary at x1/small dt cases",
+        "no post-step clipping"
+      ],
+      "paths": [
+        "rust/rei_microphysics/src/hydrogen_step.rs",
+        "rust/rei_microphysics/tests/hydrogen_step.rs",
+        "rust/rei_microphysics/src/lib.rs"
+      ]
+    },
+    {
+      "logical_pr_id": "REI-PR03",
+      "task_ids": [
+        "REI-F03"
+      ],
+      "title": "H/He 사건/열 coupled map와 controlled fixture",
+      "head_branch": "forward/rust-reion-kernels-20260922",
+      "base_policy": "retain existing head; actual integration base must match current repository intent, no automatic merge",
+      "github_pr_state": "LOGICAL_PLAN_NOT_OPENED_BY_THIS_AGENT",
+      "acceptance": [
+        "CONTROLLED_FIXTURE assertions 충족",
+        "원자별 stoichiometry exact 검산 재사용",
+        "independent toy reference와 refinement agreement",
+        "불수락 candidate writes 0"
+      ],
+      "paths": [
+        "rust/rei_microphysics/src/hhe_events.rs",
+        "rust/rei_microphysics/src/thermal.rs",
+        "rust/rei_microphysics/src/microstep.rs",
+        "rust/rei_microphysics/tests/hhe_events.rs",
+        "rust/rei_microphysics/tests/hhe_fixture.rs",
+        "rust/rei_microphysics/examples/hhe_fixture.rs"
+      ]
+    },
+    {
+      "logical_pr_id": "REI-PR04",
+      "task_ids": [
+        "REI-F04"
+      ],
+      "title": "실제 공동-parent sparse nonlinear remainder 인증",
+      "head_branch": "forward/rust-reion-kernels-20260922",
+      "base_policy": "retain existing head; actual integration base must match current repository intent, no automatic merge",
+      "github_pr_state": "LOGICAL_PLAN_NOT_OPENED_BY_THIS_AGENT",
+      "acceptance": [
+        "실제 HHe map certificate에 source/parent/runtime/input identities",
+        "all source-site remainders independently enclosed",
+        "strict <2e-4 local error and <2e-3 public width",
+        "synthetic-only result 불허",
+        "새 homogeneous 인증은 inherited 46080-node whole-history 인증/수락으로 승격되지 않는다"
+      ],
+      "paths": [
+        "rust/rei_microphysics/src/validated_map.rs",
+        "rust/rei_microphysics/src/source_events.rs",
+        "rust/rei_microphysics/tests/validated_map.rs",
+        "rust/rei_microphysics/examples/check_map_certificate.rs"
+      ]
+    },
+    {
+      "logical_pr_id": "REI-PR05",
+      "task_ids": [
+        "REI-F05"
+      ],
+      "title": "전체 첫 canonical interval 구현·실행",
+      "head_branch": "forward/rust-reion-kernels-20260922",
+      "base_policy": "retain existing head; actual integration base must match current repository intent, no automatic merge",
+      "github_pr_state": "LOGICAL_PLAN_NOT_OPENED_BY_THIS_AGENT",
+      "acceptance": [
+        "각 accepted microstep strictgates",
+        "전체 declared successor interval and every applicable lane 완료; no inherited historical promotion",
+        "rejectedcandidate nevercommitted",
+        "previous [160,161] failure immutable"
+      ],
+      "paths": [
+        "rust/rei_microphysics/src/adaptive_history.rs",
+        "rust/rei_microphysics/tests/adaptive_history.rs",
+        "rust/rei_microphysics/examples/first_interval.rs",
+        "runs/rei_fastest_v1/first_interval/"
+      ]
+    },
+    {
+      "logical_pr_id": "REI-PR06",
+      "task_ids": [
+        "REI-F06"
+      ],
+      "title": "Bianchi-I exact geometry와 angular-energy adapter",
+      "head_branch": "forward/rust-reion-kernels-20260922",
+      "base_policy": "retain existing head; actual integration base must match current repository intent, no automatic merge",
+      "github_pr_state": "LOGICAL_PLAN_NOT_OPENED_BY_THIS_AGENT",
+      "acceptance": [
+        "isotropic FLRW limit",
+        "e norm=1",
+        "a1a2a3 n_gamma conserved collisionless",
+        "refinement errors declared",
+        "temperature-rate coordinate changes independent"
+      ],
+      "paths": [
+        "rust/rei_microphysics/src/bianchi_i.rs",
+        "rust/rei_microphysics/src/angular_photons.rs",
+        "rust/rei_microphysics/tests/bianchi_i.rs",
+        "rust/rei_microphysics/tests/radiation_conservation.rs"
+      ]
+    },
+    {
+      "logical_pr_id": "REI-PR07",
+      "task_ids": [
+        "REI-F07"
+      ],
+      "title": "첫 과학 scenario 선등록",
+      "head_branch": "forward/rust-reion-kernels-20260922",
+      "base_policy": "retain existing head; actual integration base must match current repository intent, no automatic merge",
+      "github_pr_state": "LOGICAL_PLAN_NOT_OPENED_BY_THIS_AGENT",
+      "acceptance": [
+        "모든 scientific input specified",
+        "0/unknown source provenance없음",
+        "source/family/ε값 결과보고튜닝금지"
+      ],
+      "paths": [
+        "configs/rei_fastest_v1/science_scenario_v1.json",
+        "docs/atomic_reionization_handoff_20261004_v1/science_scenario_decision.md"
+      ]
+    },
+    {
+      "logical_pr_id": "REI-PR08",
+      "task_ids": [
+        "REI-F08"
+      ],
+      "title": "동일 원자 realization의 FLRW/Bianchi paired histories",
+      "head_branch": "forward/rust-reion-kernels-20260922",
+      "base_policy": "retain existing head; actual integration base must match current repository intent, no automatic merge",
+      "github_pr_state": "LOGICAL_PLAN_NOT_OPENED_BY_THIS_AGENT",
+      "acceptance": [
+        "positiveallstate",
+        "gatesallpass",
+        "numerical/model/atomicerrors separate",
+        "firstscientificplot with explicitmodeldomain"
+      ],
+      "paths": [
+        "rust/rei_microphysics/examples/paired_history.rs",
+        "runs/rei_fastest_v1/paired/"
+      ]
+    },
+    {
+      "logical_pr_id": "REI-PR09",
+      "task_ids": [
+        "REI-F09"
+      ],
+      "title": "HH/He 원자 감도 import와 응용 종결",
+      "head_branch": "forward/rust-reion-kernels-20260922",
+      "base_policy": "retain existing head; actual integration base must match current repository intent, no automatic merge",
+      "github_pr_state": "LOGICAL_PLAN_NOT_OPENED_BY_THIS_AGENT",
+      "acceptance": [
+        "관측량별 sensitivity result",
+        "providerdomain violationsnotignored",
+        "atomicthreadapplicationclosure 조건에 matchedreturnedreceipt",
+        "one combined paired campaign receipt consumed by HH-F3 and HE-F3; separate astrophysical campaign reruns prohibited"
+      ],
+      "paths": [
+        "runs/rei_fastest_v1/atomic_sensitivity/"
+      ]
+    }
+  ],
+  "observed_head_open_prs": []
+}

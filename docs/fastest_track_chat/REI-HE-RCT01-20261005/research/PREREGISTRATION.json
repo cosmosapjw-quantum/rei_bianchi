@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "task_id": "REI-HE-RCT01-20261005",
+  "timestamp_utc": "2026-10-04T15:42:10Z",
+  "mode": "bounded selection/provider/closure coding-start loop",
+  "hypothesis": "Explicit scalar source selection and a separately supplied escaped-photon energy moment can be composed with the existing HHe RHS while exactly conserving nuclei, charge, and event energy; scalar rate alone is insufficient for thermal/photon closure.",
+  "source_policy": {
+    "channel": "HI+HeIII -> HII+HeII(1s)+gamma",
+    "alternative_sources": [
+      "KF96 nominal constant, frozen supplier domain",
+      "GM25 constant, frozen supplier domain"
+    ],
+    "global_default": "OFF",
+    "source_admission": false,
+    "no_auto_switch_or_extrapolation": true
+  },
+  "implementation_scope": [
+    "separate source enum and private validated provider",
+    "event-only scalar number ledger",
+    "explicit escaped mean-energy closure",
+    "additive wrapper around hhe_rhs requiring closed energy when enabled",
+    "new native tests and CLI for independent checks"
+  ],
+  "exclusions": [
+    "production microstep/thermal endpoint modification",
+    "implicit OTS or invented group spectrum",
+    "NRCT/reverse/RA channels",
+    "new atomic scattering calculation",
+    "uniform error/physical provider admission",
+    "old suite reruns except one final small crate integration"
+  ],
+  "acceptance": {
+    "native": "meaningful changed-path tests then one combined crate run",
+    "independent": "Decimal70 at selected source endpoints/interior and density/fraction variations; source k is nominal parameter, not fit validation",
+    "closures": "species and ne derivative, dUchemical+du+descape, explicit incomplete scalar-only behavior and defaultOFF exact baseline equality",
+    "negative_controls": [
+      "ne decrement",
+      "wrong helium fraction sign",
+      "wrong density normalization",
+      "double-count Q into heat with escaping Q photon",
+      "source switch/out-of-domain/clamp"
+    ]
+  },
+  "stop": "one bounded independent review; fix concrete findings, no optional extra audit loops"
+}

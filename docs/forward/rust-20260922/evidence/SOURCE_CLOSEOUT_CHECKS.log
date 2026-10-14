@@ -1,0 +1,142 @@
+COMMAND ["/opt/pyvenv/bin/python", "scripts/check_rust_forward_parity.py", "--check-contract"]
+EXIT 0
+STDOUT_BEGIN
+{
+  "grade": "CONTRACT_ONLY_NOT_RUST_PARITY",
+  "cases": 84,
+  "raw_protocol_cases": 5,
+  "source_blobs": [
+    "3d806e1c1d3bb523bb3c339d1a141f67d7f10069",
+    "6f5c13f02d0e549e581a02d3c4d8b8313b209bbf"
+  ],
+  "manifest_files": 23,
+  "negative_guards": 10
+}
+
+STDOUT_END
+STDERR_BEGIN
+Spreadsheet runtime warmup failed during python startup
+Traceback (most recent call last):
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/patches/warm_spreadsheet_runtime_on_startup.py", line 26, in warm_spreadsheet_runtime_on_startup
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py", line 785, in warm_spreadsheet_runtime
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py", line 720, in _warm_feature_flows
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py", line 704, in _warm_collaboration_flows
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/generated/interface/models.py", line 32317, in hydrate_crdt_from_proto
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/remote.py", line 749, in __call__
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/client.py", line 150, in call
+artifact_tool.rpc.client.RemoteError: hydrateCrdtFromProto requires an empty collaborative document.
+
+STDERR_END
+COMMAND ["/opt/pyvenv/bin/python", "-S", "docs/forward/rust-20260922/evidence/source_closeout_toy.py"]
+EXIT 0
+STDOUT_BEGIN
+{
+  "grade": "EXACT_RATIONAL_TOY_AND_SOURCE_IDENTITY_ONLY",
+  "source_blobs": [
+    "3d806e1c1d3bb523bb3c339d1a141f67d7f10069",
+    "6f5c13f02d0e549e581a02d3c4d8b8313b209bbf"
+  ],
+  "cubic_evaluation_rows": [
+    {
+      "x": "-2",
+      "expected": "-16",
+      "exact_agreement": true
+    },
+    {
+      "x": "-1",
+      "expected": "-5/2",
+      "exact_agreement": true
+    },
+    {
+      "x": "0",
+      "expected": "1",
+      "exact_agreement": true
+    },
+    {
+      "x": "1/2",
+      "expected": "7/8",
+      "exact_agreement": true
+    },
+    {
+      "x": "1",
+      "expected": "1/2",
+      "exact_agreement": true
+    },
+    {
+      "x": "2",
+      "expected": "2",
+      "exact_agreement": true
+    },
+    {
+      "x": "3",
+      "expected": "23/2",
+      "exact_agreement": true
+    },
+    {
+      "x": "4",
+      "expected": "35",
+      "exact_agreement": true
+    }
+  ],
+  "exact_identity_checks": 8,
+  "rust_executed": false,
+  "jax_executed": false,
+  "implementation_verified": false
+}
+
+STDOUT_END
+STDERR_BEGIN
+
+STDERR_END
+COMMAND ["/opt/pyvenv/bin/python", "-S", "scripts/check_rust_forward_parity.py", "--check-contract"]
+EXIT 0
+STDOUT_BEGIN
+{
+  "grade": "CONTRACT_ONLY_NOT_RUST_PARITY",
+  "cases": 84,
+  "raw_protocol_cases": 5,
+  "source_blobs": [
+    "3d806e1c1d3bb523bb3c339d1a141f67d7f10069",
+    "6f5c13f02d0e549e581a02d3c4d8b8313b209bbf"
+  ],
+  "manifest_files": 24,
+  "negative_guards": 10
+}
+
+STDOUT_END
+STDERR_BEGIN
+
+STDERR_END
+COMMAND ["/opt/pyvenv/bin/python", "-S", "docs/forward/rust-20260922/evidence/test_checker_receipts.py"]
+EXIT 0
+STDOUT_BEGIN
+
+STDOUT_END
+STDERR_BEGIN
+test_contract_failure_receipt_is_saved (__main__.ReceiptTests.test_contract_failure_receipt_is_saved) ... ok
+test_contract_success_does_not_execute_reference_or_rust (__main__.ReceiptTests.test_contract_success_does_not_execute_reference_or_rust) ... ok
+test_existing_receipt_aborts_before_validation_or_child (__main__.ReceiptTests.test_existing_receipt_aborts_before_validation_or_child) ... ok
+test_launch_failure_records_no_child_exit (__main__.ReceiptTests.test_launch_failure_records_no_child_exit) ... ok
+test_malformed_reply_keeps_success_exit_raw_evidence (__main__.ReceiptTests.test_malformed_reply_keeps_success_exit_raw_evidence) ... ok
+test_mismatch_retains_reference_and_both_child_runs (__main__.ReceiptTests.test_mismatch_retains_reference_and_both_child_runs) ... ok
+test_missing_reference_writes_failure_without_child (__main__.ReceiptTests.test_missing_reference_writes_failure_without_child) ... ok
+test_nonzero_child_keeps_exit_and_logs (__main__.ReceiptTests.test_nonzero_child_keeps_exit_and_logs) ... ok
+test_second_batch_timeout_keeps_first_batch (__main__.ReceiptTests.test_second_batch_timeout_keeps_first_batch) ... ok
+test_timeout_preserves_partial_binary_streams (__main__.ReceiptTests.test_timeout_preserves_partial_binary_streams) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.028s
+
+OK
+
+STDERR_END
+STATIC_CHECK_ATTEMPT_1
+{
+  "classification": "STATIC_AUDITOR_PATTERN_ERROR",
+  "expected_wrong": "#[forbid(unsafe_code)]",
+  "actual_correct": "#![forbid(unsafe_code)]",
+  "production_source_changed": false,
+  "rust_compilation_attempted": false
+}
+
+STATIC_CHECK_FINAL=PASS_SOURCE_STRUCTURE_ONLY_NOT_RUST_SYNTAX

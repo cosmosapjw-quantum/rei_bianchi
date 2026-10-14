@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "crate": "rei_microphysics",
+  "tested_source_sha": "1bda1e8cea7629d31f905e126ba47ec3b3c1d0d8",
+  "scope": "FIXED_INPUT_SEVEN_FUNCTION_IMPLEMENTATION_ONLY",
+  "binary64_policy": "Rust f64 std semantics; positive subnormals retained; no JAX FTZ adapter",
+  "functions": [
+    {"source_name": "transform_z_to_y", "rust_api": "rei_microphysics::transform_z_to_y", "module": "src/group_rates.rs", "gate": "transform_uses_rust_binary64_underflow; transform_finite_invariants_and_nonfinite_contract; transform_is_max_shifted_without_floors; transform_preserves_extreme_classifications_without_floor"},
+    {"source_name": "pchip_eval", "rust_api": "rei_microphysics::pchip_eval", "module": "src/group_rates.rs", "gate": "pchip_knots_interior_and_domain; pchip_uses_right_interval_at_interior_knot; full_cubic_on_nonuniform_knots_preserves_coefficient_layout; minimal_table_and_each_invalid_constructor_branch"},
+    {"source_name": "opacity_cMpc_inv", "rust_api": "rei_microphysics::opacity_cMpc_inv", "module": "src/group_rates.rs", "gate": "opacity_ownership_and_proper_units; high_group_atomic_owners_remain_explicit; table_errors_propagate_to_opacity_and_photon_rates"},
+    {"source_name": "photon_rates", "rust_api": "rei_microphysics::photon_rates", "module": "src/group_rates.rs", "gate": "isolated_groups_and_no_emissivity; redshift_internal_transfer_telescopes; photon_emission_is_affine_and_not_renormalized; four_site_calls_do_not_share_state"},
+    {"source_name": "gamma_species", "rust_api": "rei_microphysics::gamma_species", "module": "src/group_rates.rs", "gate": "gamma_has_one_comoving_factor_and_no_table_dependency; gamma_group_species_have_separate_atomic_accumulations"},
+    {"source_name": "positive_mass_projection", "rust_api": "rei_microphysics::positive_mass_projection", "module": "src/lift.rs", "gate": "specified_mass_and_signed_examples; zero_support_is_function_specific; error_precedence_and_nonfinite_inputs; finite_projection_totals_and_signed_reconstruction"},
+    {"source_name": "signed_transfer_lift", "rust_api": "rei_microphysics::signed_transfer_lift", "module": "src/lift.rs", "gate": "specified_mass_and_signed_examples; zero_support_is_function_specific; error_precedence_and_nonfinite_inputs; finite_projection_totals_and_signed_reconstruction"}
+  ],
+  "units": {
+    "N": "comoving count per cMpc^3",
+    "atomic_number_density": "proper cm^-3",
+    "opacity": "cMpc^-1",
+    "rates": "per second",
+    "source": "comoving count per cMpc^3 per second"
+  },
+  "authority": "Rust implementation regression only; not an outward-enclosure or full-solver claim"
+}

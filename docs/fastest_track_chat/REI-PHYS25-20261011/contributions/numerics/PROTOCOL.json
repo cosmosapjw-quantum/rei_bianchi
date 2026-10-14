@@ -1,0 +1,76 @@
+{
+  "task": "REI-PHYS25-20261011",
+  "contributor": "/root/phys25_numerics",
+  "created_utc": "2026-10-10T22:10:29.216169+00:00",
+  "state": "DESIGN_FROZEN_BEFORE_NEW_PHYS25_THEORY_OR_NUMERIC_RESULTS",
+  "objective": "Bounded numerical candidate and independent original-fit consistency checks for least variance at mean 18 eV. Feasible anchored two-line root alone is not a proof of global optimality.",
+  "input_sha256": {
+    "contract": "7fce1d8729a22b89b00d8116d237af3ddcddc0951901eaa46ba821d9ed07b1c3",
+    "J_input": "6c7a4f239ef48c2a7c60592fc048600317f1233f3028434ebd1b3c7e55682a79",
+    "inherited_numerics_code": "b323494a0e7e9017c431059c0f946b633c9678a22bd2677f5340868ea1890978",
+    "inherited_numerics_result": "551ae060d935e5145e54a1c2af9deb5c5b2c4d8d7007d90295eb0bbad5e83d09",
+    "handoff": "adc3aa7644598ac86eeb83b2447bbea11977b2b516dac2b08c0f2e88616d0473"
+  },
+  "methods": {
+    "primary": "Explicitly adapt PHYS24 original-fit ordinary logarithmic Taylor jets, extending degree 4 to degree 5; no inherited code imports or main invocations.",
+    "derivatives": "k=A(D^2+3D)f; k_prime=A/E(D^3+3D^2)f; k_second=A/E^2(D^4+2D^3-3D^2)f; k_third=A/E^3(D^5-7D^3+6D^2)f.",
+    "decimal_precision": 160,
+    "main_candidate": "Fixed 240 bisection iterations for upper line v in [18,24.58] with lower line a=13.61 and mean 18. Midpoint and sign endpoints retained.",
+    "other_root_families": [
+      "One opposite endpoint root u in [13.61,18], upper line b=24.58; 240 iterations when sign bracket exists.",
+      "One lower-line 14 eV candidate, upper line v in [18,24.58]; 240 iterations when sign bracket exists."
+    ],
+    "other_focused_checks": [
+      "Endpoint chord feasibility at lower lines 14.5 and 15 eV, no iterative root search for those.",
+      "A three-line law on {a,18,b}, active response obtained by mixing endpoint law and mono.",
+      "A half-candidate/half-mono law to check moments, variance and response interpolation."
+    ],
+    "root_claim": "Numerical brackets only. Decimal finite-precision signs do not certify exact root enclosures or J physical uncertainty.",
+    "dual_contact_candidate": "Q(E)=(E-m)^2-lambda0-lambda1(E-m)-lambda2 k(E); solve Q(a)=Q(v)=Q_prime(v)=0 algebraically; lambda2=(v-a)^2/[k(a)-k(v)+(v-a)k_prime(v)], lambda1=2(v-m)-lambda2 k_prime(v), lambda0=-(v-m)^2+lambda2[(v-m)k_prime(v)-k(v)].",
+    "finite_difference": "13 symmetric logarithmic nodes offsets -6..6, exact rational moment solve for derivative orders 1..5, original direct fit evaluations at h=1e-5 and h/2. Compare all k derivatives through order 3. Richardson factor 256 eliminates leading h^8 fifth-derivative error; no dense campaign.",
+    "finite_difference_energies_eV": [
+      "13.61",
+      "14",
+      "16",
+      "18",
+      "20",
+      "23",
+      "24.58"
+    ],
+    "dual_slack_samples_eV": [
+      "13.61",
+      "14",
+      "16",
+      "18",
+      "20",
+      "22",
+      "24.58",
+      "v-0.1",
+      "v",
+      "v+0.1"
+    ],
+    "sample_sign_hypothesis": "k_third<0 on the seven derivative sample points; sample status is not continuum proof."
+  },
+  "tolerances": {
+    "algebra_relative_or_scaled": "1e-125",
+    "root_response_scaled_by_max_endpoint_abs": "1e-65",
+    "root_interval_max_width_eV": "1e-70",
+    "finite_difference_max_relative": "1e-38",
+    "dual_contact_and_slack_absolute_eV2": "1e-60",
+    "inherited_anchor_relative": "1e-95"
+  },
+  "budgets": {
+    "root_searches_max": 3,
+    "bisection_iterations_each": 240,
+    "root_iterations_total_max": 720,
+    "finite_difference_centers": 7,
+    "no_native": true,
+    "no_gas_IVP": true,
+    "no_closed_suite_replay": true,
+    "no_old_main_import": true,
+    "no_grid_LP": true
+  },
+  "independence": "Design fixed from inherited PHYS24 inputs and task alone. No PHYS25 derivative certificate, theory output, root result or new contributor code has been read at design freeze. Timing of any later result information is recorded separately.",
+  "failure_policy": "Preserve first code, first logs and failed output; any correction has a separate reason and identity history. Tolerance changes require explicit recorded cause, never silent relaxation.",
+  "claim_ceiling": "All numbers numerically checked only, conditional on frozen serialized J. Global optimality authority belongs to separate continuum proof and final reviewer. No physical admission or finite-time sign claim."
+}

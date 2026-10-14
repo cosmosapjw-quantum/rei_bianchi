@@ -1,0 +1,156 @@
+{
+  "status": "PASS",
+  "commands": [
+    {
+      "command": [
+        "/tmp/rec_rust_1941/bin/rustc",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "rustc 1.94.1 (e408947bf 2026-03-25)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/rec_rust_1941/bin/rustc",
+        "--edition=2024",
+        "--crate-name",
+        "rec_microphysics",
+        "--crate-type",
+        "rlib",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rec/src/lib.rs",
+        "-o",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime/librec_microphysics.rlib"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/rec_rust_1941/bin/rustc",
+        "--edition=2024",
+        "--crate-name",
+        "rei_peebles_reference",
+        "--crate-type",
+        "rlib",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/crate/src/lib.rs",
+        "--extern",
+        "rec_microphysics=/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime/librec_microphysics.rlib",
+        "-L",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime",
+        "-o",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime/librei_peebles_reference.rlib"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/rec_rust_1941/bin/rustc",
+        "--edition=2024",
+        "--test",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/crate/tests/reference.rs",
+        "--extern",
+        "rei_peebles_reference=/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime/librei_peebles_reference.rlib",
+        "-L",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime",
+        "-o",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime/reference_tests"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime/reference_tests",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "stdout": "\nrunning 10 tests\ntest actual_ground_and_collapsed_assembly_are_separate ... ok\ntest collapsed_evaluation_ignores_valid_retained_shell ... ok\ntest cgs_boundary_applies_density_conversion_once ... ok\ntest shell_defect_and_source_assembly_contributions_close_separately ... ok\ntest invalid_and_overflowing_units_are_errors_without_mutating_valid_input ... ok\ntest one_temperature_positive_expansion_and_ground_are_required ... ok\ntest shell_weights_and_escape_weight_are_visible_at_consumer ... ok\ntest collapsed_redshift_sign_has_no_fraction_dilution_sink ... ok\ntest source_rounded_profile_reaches_real_consumer ... ok\ntest pure_h_electron_fraction_and_conservation_are_explicit ... ok\n\ntest result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/rec_rust_1941/bin/rustc",
+        "--edition=2024",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/crate/examples/peebles_consumer_probe.rs",
+        "--extern",
+        "rei_peebles_reference=/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime/librei_peebles_reference.rlib",
+        "-L",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime",
+        "-o",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime/peebles_consumer_probe"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "identities": [
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/crate/Cargo.toml",
+      "sha256": "f628bdba8901eb8a7aaac9280ae1c6bf43a70900db1e4fc6edb5a0c6f686d1ae",
+      "bytes": 396
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/crate/examples/peebles_consumer_probe.rs",
+      "sha256": "40fde0a234978de6addeae33e0de88a604b45e4c2b724d5e7e5f1ecfdee1ad34",
+      "bytes": 3009
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/crate/src/lib.rs",
+      "sha256": "01347f0ef3972ef506099642530ba3b43215bc8526b7acf91c52ed05136f6188",
+      "bytes": 7902
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/crate/tests/reference.rs",
+      "sha256": "23ee58a8995807dbd362d8418d1f38313bf9cdecc85927ff6b95a997e3e08135",
+      "bytes": 5065
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rec/src/coverage.rs",
+      "sha256": "9fecbad04313840e74def54d116b7e7c1a2b3dac467ec9e90aae0df46e8ef04f",
+      "bytes": 3104
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rec/src/frame.rs",
+      "sha256": "bc5715c93294dffbe69c16457559563ee6bdbcb4251573ef453d584144e68235",
+      "bytes": 13893
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rec/src/he_singlet.rs",
+      "sha256": "3c0d4c8fd9d88d337accd0b2e04c7cba4eedeb77028d6be713247a3c24418203",
+      "bytes": 57804
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rec/src/hydrogen_peebles.rs",
+      "sha256": "08d651596a99f88b5350c3a3e74e39f642c16579446aff690d60dd2f3fa6e6b8",
+      "bytes": 11862
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rec/src/ledger.rs",
+      "sha256": "2f7003ff9033a4aa8558d6639c3b57da8598efb98d40c6eb7b798f1814edb122",
+      "bytes": 23489
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rec/src/lib.rs",
+      "sha256": "ec394a01f90afcb4825759799749a493ae16d545fdf8cdee6f5ec6c040c9ffa5",
+      "bytes": 112
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rec/src/screen.rs",
+      "sha256": "39c81bcff494d674d237fd0f270dc721c6840d5d545be85eaaca875b258b019f",
+      "bytes": 8632
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime/peebles_consumer_probe",
+      "sha256": "057df9e080f3ecd18a33619eb4c8572d77e473d212a53624065c48113f601527",
+      "bytes": 4135696
+    }
+  ],
+  "cargo_git_dependency_resolution_tested": false,
+  "exact_source_rustc_build": true
+}

@@ -1,0 +1,135 @@
+{
+  "task": "REI-PHYS27-20261011",
+  "final_gate_authority": "independent/DECISION_REVIEW.json",
+  "common_condition": "Frozen source-real kernel and serialized numerical J; Physical HOLD",
+  "nodes": [
+    {
+      "id": "C27.1",
+      "claim": "Finite-band family, exact moments and feasible photon variance",
+      "grade": "derived",
+      "depends_on": [
+        "PHYSICS_CONTRACT"
+      ],
+      "evidence": [
+        "TH27.1",
+        "TH27.2",
+        "TH27.3"
+      ]
+    },
+    {
+      "id": "C27.2",
+      "claim": "Averaged derivative signs, all-W sharp bounds, unique extremes and endpoint degeneracies",
+      "grade": "derived",
+      "depends_on": [
+        "C27.1",
+        "INHERITED_PHYS24_25_26"
+      ],
+      "evidence": [
+        "TH27.4",
+        "TH27.5",
+        "TH27.6",
+        "TH27.7",
+        "TH27.8"
+      ]
+    },
+    {
+      "id": "C27.3",
+      "claim": "Strict containment within original response interval at the same physical W",
+      "grade": "derived",
+      "depends_on": [
+        "C27.1",
+        "C27.2",
+        "INHERITED_PHYS26_UNIQUE_ATOMIC_EXTREMES"
+      ],
+      "evidence": [
+        "TH27.9"
+      ]
+    },
+    {
+      "id": "C27.4",
+      "claim": "Numerical endpoint signs and two finite Decimal root approximations",
+      "grade": "numerically checked",
+      "depends_on": [
+        "FROZEN_NUMERICAL_PROTOCOL",
+        "FROZEN_J_AND_SOURCE"
+      ],
+      "evidence": [
+        "contributions/numerics/FINITE_WIDTH_FIRST.json"
+      ],
+      "limits": "No directed interval or physical uncertainty enclosure"
+    },
+    {
+      "id": "C27.5",
+      "claim": "Two unique exact-root definitions, five sign regions and inward threshold directions",
+      "grade": "derived conditional on numerically supported endpoint signs",
+      "depends_on": [
+        "C27.2",
+        "C27.3",
+        "C27.4"
+      ],
+      "evidence": [
+        "TH27.10",
+        "TH27.11",
+        "TH27.12",
+        "TH27.13"
+      ]
+    },
+    {
+      "id": "C27.6",
+      "claim": "Actual same-moment two-band positive/negative examples and zero-response convex construction",
+      "grade": "derived and numerically checked with separate roles",
+      "depends_on": [
+        "C27.2",
+        "C27.4"
+      ],
+      "evidence": [
+        "TH27.7",
+        "FINITE_WIDTH_FIRST.physical_variance_cases[mixed_W19_74]",
+        "FINITE_WIDTH_FIRST.mixtures_at_W19_74"
+      ]
+    },
+    {
+      "id": "C27.7",
+      "claim": "Weak delta->0 optimizer convergence, response convergence and conditional root convergence",
+      "grade": "derived",
+      "depends_on": [
+        "C27.2",
+        "INHERITED_PHYS26"
+      ],
+      "evidence": [
+        "TH27.14",
+        "TH27.15"
+      ]
+    },
+    {
+      "id": "C27.8",
+      "claim": "First fixed program passes and its fresh-path replay reproduces bytes",
+      "grade": "implementation-verified",
+      "depends_on": [
+        "C27.4"
+      ],
+      "evidence": [
+        "contributions/numerics/EXECUTION.json",
+        "portability/REPLAY_RECEIPT.json"
+      ],
+      "limits": "Replay gives no independent physics credit"
+    }
+  ],
+  "not_claimed": [
+    "All continuous spectra",
+    "Positive-width nesting for arbitrary widths",
+    "First-order width coefficients",
+    "J/atomic/gas uncertainty",
+    "Finite-time or finite-epsilon remainder",
+    "Native equivalence",
+    "Physical source admission",
+    "Novelty priority"
+  ],
+  "generator_roles": [
+    "/root",
+    "/root/phys27_theory",
+    "/root/phys27_numerics"
+  ],
+  "portability_operator": "/root/phys27_portability",
+  "context": "NONBLIND; no generator may issue final decision"
+}

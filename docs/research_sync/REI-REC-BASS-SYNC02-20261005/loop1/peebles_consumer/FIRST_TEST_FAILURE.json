@@ -1,0 +1,48 @@
+[
+  {
+    "command": [
+      "/tmp/rec_rust_1941/bin/rustc",
+      "--edition=2024",
+      "--crate-name",
+      "rei_peebles_reference",
+      "--crate-type",
+      "rlib",
+      "research_sync_20261005/loop1/peebles_consumer/crate/src/lib.rs",
+      "--extern",
+      "rec_microphysics=research_sync_20261005/loop1/peebles_consumer/runtime/librec_microphysics.rlib",
+      "-L",
+      "research_sync_20261005/loop1/peebles_consumer/runtime",
+      "-o",
+      "research_sync_20261005/loop1/peebles_consumer/runtime/librei_peebles_reference.rlib"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/tmp/rec_rust_1941/bin/rustc",
+      "--edition=2024",
+      "--test",
+      "research_sync_20261005/loop1/peebles_consumer/crate/tests/reference.rs",
+      "--extern",
+      "rei_peebles_reference=research_sync_20261005/loop1/peebles_consumer/runtime/librei_peebles_reference.rlib",
+      "-L",
+      "research_sync_20261005/loop1/peebles_consumer/runtime",
+      "-o",
+      "research_sync_20261005/loop1/peebles_consumer/runtime/reference_tests"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "research_sync_20261005/loop1/peebles_consumer/runtime/reference_tests",
+      "--nocapture"
+    ],
+    "exit_code": 101,
+    "stdout": "\nrunning 10 tests\ntest cgs_boundary_applies_density_conversion_once ... ok\ntest collapsed_redshift_sign_has_no_fraction_dilution_sink ... ok\ntest collapsed_evaluation_ignores_valid_retained_shell ... ok\ntest actual_ground_and_collapsed_assembly_are_separate ... FAILED\ntest invalid_and_overflowing_units_are_errors_without_mutating_valid_input ... ok\ntest one_temperature_positive_expansion_and_ground_are_required ... ok\ntest pure_h_electron_fraction_and_conservation_are_explicit ... ok\ntest shell_defect_and_source_assembly_contributions_close_separately ... ok\ntest shell_weights_and_escape_weight_are_visible_at_consumer ... ok\ntest source_rounded_profile_reaches_real_consumer ... ok\n\nfailures:\n\nfailures:\n    actual_ground_and_collapsed_assembly_are_separate\n\ntest result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "\nthread 'actual_ground_and_collapsed_assembly_are_separate' (33) panicked at research_sync_20261005/loop1/peebles_consumer/crate/tests/reference.rs:4:5:\n6.00000000000000089e-1 != 5.99999999999999978e-1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+  }
+]

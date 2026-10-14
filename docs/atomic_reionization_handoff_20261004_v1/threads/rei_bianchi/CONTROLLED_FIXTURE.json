@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0",
+  "id": "REI_SYNTHETIC_HHE_3GROUP_STATIC_V1",
+  "evidence_status": "PROPOSED_CONTROLLED_FIXTURE_COMPLETE_SPEC_NOT_EXECUTED",
+  "physical_claim": "Synthetic full H/He event/energy integration; no astrophysical rate accuracy or history claim",
+  "geometry": {
+    "kind": "STATIC_HOMOGENEOUS_MINKOWSKI_LIMIT",
+    "H_per_s": 0,
+    "shear_per_s": [
+      0,
+      0,
+      0
+    ],
+    "tilt": [
+      0,
+      0,
+      0
+    ],
+    "redshift": 0,
+    "proper_volume_cm3": 1
+  },
+  "units": "CGS_except_energy_eV",
+  "initial": {
+    "n_H_cm3": 0.0001,
+    "n_He_cm3": 0.0000083,
+    "x_HII": 0.01,
+    "x_HeI": 0.98,
+    "x_HeII": 0.019,
+    "x_HeIII": 0.001,
+    "T_K": 10000,
+    "photon_density_cm3": [
+      0.00002,
+      0.000002,
+      2e-7
+    ]
+  },
+  "constants": {
+    "c_cm_s": 29979245800,
+    "k_B_erg_K": 1.380649e-16,
+    "eV_erg": 1.602176634e-12,
+    "threshold_eV": {
+      "HI": 13.598434599702,
+      "HeI": 24.587389011,
+      "HeII": 54.41776
+    }
+  },
+  "photons": {
+    "isotropic": true,
+    "energy_eV": [
+      13.7,
+      24.7,
+      54.5
+    ],
+    "external_source_photons_cm3_s": [
+      0,
+      0,
+      0
+    ],
+    "escape_boundary": "Recombination emission is removed into cumulative escaping-energy ledger",
+    "sigma_cm2": {
+      "HI": [
+        6e-18,
+        1e-18,
+        1e-19
+      ],
+      "HeI": [
+        0,
+        7e-18,
+        1e-18
+      ],
+      "HeII": [
+        0,
+        0,
+        1.5e-18
+      ]
+    }
+  },
+  "rates": {
+    "synthetic_temperature_independent": true,
+    "alpha_cm3_s": {
+      "HII": 2e-13,
+      "HeII": 1e-12,
+      "HeIII": 3e-13
+    },
+    "electron_impact_cm3_s": {
+      "HI": 1e-16,
+      "HeI": 1e-17,
+      "HeII": 1e-18
+    },
+    "HH_direct_ionization_cm3_s": 0,
+    "He2_H_CX_cm3_s": 0
+  },
+  "energy_ledger": {
+    "photoheat": "One event deposits E_gamma-chi into thermal reservoir",
+    "collisional_ionization": "One event removes chi from thermal reservoir",
+    "recombination": "One event removes 1.5*k_B*T thermal energy and emits escaping chi+1.5*k_B*T",
+    "other_cooling": "exactly zero by synthetic model definition",
+    "primary_only": "Toy-model definition; NOT a physical assertion that secondary ionizations vanish"
+  },
+  "integration": {
+    "t0_s": 0,
+    "t_end_s": 1000000000000,
+    "initial_trial_dt_s": 1000000000,
+    "min_trial_dt_s": 1000,
+    "dt_refinement_factors": [
+      1,
+      0.5,
+      0.25
+    ],
+    "transactional_reject": true,
+    "error_observables": [
+      "x_HII",
+      "x_HeII",
+      "x_HeIII",
+      "ln_T"
+    ],
+    "strict_local_error_limit": 0.0002,
+    "strict_public_width_limit": 0.002,
+    "structural_identities": "exact algebra, then declared scaled roundoff residual in floating evaluator",
+    "controlled_float_ledger_atol": 1e-12
+  },
+  "assertions": [
+    "all five material populations and all photon populations >=0",
+    "nuclei and charge conserved",
+    "photo primary count equals bound-free absorption per species",
+    "thermal+binding+photon+escaped energy conserved",
+    "zero-duration identity",
+    "both mixed and limiting pure event cases",
+    "independent reference + resolution convergence, not same-code self-parity"
+  ]
+}

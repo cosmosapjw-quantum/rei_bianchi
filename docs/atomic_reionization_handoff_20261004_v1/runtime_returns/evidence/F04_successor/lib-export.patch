@@ -1,0 +1,25 @@
+diff --git a/rust/rei_microphysics/src/lib.rs b/rust/rei_microphysics/src/lib.rs
+index d9ca905e..8b8e9a1b 100644
+--- a/rust/rei_microphysics/src/lib.rs
++++ b/rust/rei_microphysics/src/lib.rs
+@@ -6,6 +6,8 @@
+ 
+ mod atomic_provider;
+ pub mod coverage;
++mod ft03_controlled;
++mod ft03_rates;
+ mod group_rates;
+ mod hhe_events;
+ mod homogeneous_rates;
+@@ -19,6 +21,11 @@ pub use atomic_provider::{
+     Absorber, AtomicProvider, CoefficientUnits, ObservableKind, RawCoefficient, RawProcess,
+     RawRecord, RecombinationCase, SourceFrame, TemperatureDomain,
+ };
++pub use ft03_controlled::{
++    ft03_adaptive_step, ft03_implicit_step, ft03_rhs, ft03_try_step, Ft03Events, Ft03Model,
++    Ft03Rhs, Ft03Step, FT03_MODEL_ID,
++};
++pub use ft03_rates::{ft03_coefficients, Ft03Coefficients};
+ pub use group_rates::{
+     gamma_species, opacity_cMpc_inv, pchip_eval, photon_rates, transform_z_to_y, PchipTable,
+     C_LIGHT, MPC_CM,

@@ -1,0 +1,56 @@
+--- supplier/research/run_native.py
++++ run_native_from_verified_source.py
+@@ -5,6 +5,7 @@
+ """
+ from pathlib import Path
+ import argparse,hashlib,json,shutil,subprocess,sys,tempfile
++sys.path.insert(0, str(Path(__file__).resolve().parent / "supplier/rei_chat_flrw06_20261005/research"))
+ from native_protocol import stdin_payload,validate_records,evidence_gate,ROOT
+ 
+ def digest(b):return hashlib.sha256(b).hexdigest()
+@@ -12,7 +13,7 @@
+ def run(cmd,timeout=40,**kw):return subprocess.run(cmd,capture_output=True,timeout=timeout,**kw)
+ 
+ def main():
+-    ap=argparse.ArgumentParser();ap.add_argument('--repo',type=Path);ap.add_argument('--output',type=Path,required=True);args=ap.parse_args()
++    ap=argparse.ArgumentParser();ap.add_argument('--source-dir',type=Path);ap.add_argument('--output',type=Path,required=True);args=ap.parse_args()
+     args.output.mkdir(parents=True,exist_ok=False)
+     receipt={'task':'REI-CHAT-FLRW06-20261005','status':'PREFLIGHT','native_calls':0,'compile_exit':None,'run_exit':None,'source_blobs_verified':False}
+     def save():
+@@ -21,8 +22,8 @@
+     if rustc is None:
+         receipt.update(status='BLOCKED_COMPILER_ABSENT',blocker='rustc not installed; no install/full-build fallback')
+         save();print(receipt['status']);return 78
+-    if args.repo is None:
+-        receipt.update(status='BLOCKED_EXISTING_REPO_REQUIRED');save();return 78
++    if args.source_dir is None:
++        receipt.update(status='BLOCKED_VERIFIED_SOURCE_DIR_REQUIRED');save();return 78
+     manifest=json.loads((ROOT/'SOURCE_BINDING.json').read_text());receipt['source_commit']=manifest['pinned_commit']
+     version=run([rustc,'--version','--verbose'],timeout=10)
+     receipt['compiler_version']=version.stdout.decode(errors='replace')
+@@ -32,10 +33,12 @@
+             if digest((ROOT/path).read_bytes())!=expected:raise ValueError('INPUT_IDENTITY_MISMATCH:'+path)
+         receipt['input_files_verified']=True
+         for path,sha in manifest['minimal_native_source_blobs'].items():
+-            p=run(['git','-C',str(args.repo),'show',manifest['pinned_commit']+':'+path],timeout=10)
+-            if p.returncode!=0:raise ValueError('GIT_SOURCE_UNAVAILABLE:'+path)
+-            if git_blob(p.stdout)!=sha:raise ValueError('SOURCE_BLOB_MISMATCH:'+path)
+-            sources[Path(path).name]=p.stdout
++            source_path=args.source_dir/Path(path).relative_to('rust/rei_microphysics')
++            original_bytes=source_path.read_bytes()
++            if git_blob(original_bytes)!=sha:raise ValueError('SOURCE_BLOB_MISMATCH:'+path)
++            sources[Path(path).name]=original_bytes
++        receipt['source_acquisition']='Existing exact bytes materialized from immutable Git source; six Git blobs reverified. No fabricated repository/commit.'
++        receipt['source_directory']=str(args.source_dir.resolve())
+         receipt['source_blobs_verified']=True
+         receipt['source_sha256']={k:digest(b) for k,b in sources.items()}
+         lib=sources.pop('lib.rs').decode('utf-8')
+@@ -57,6 +60,8 @@
+             data=json.loads((ROOT/'inputs/CASES.json').read_text());stdin=stdin_payload(data).encode()
+             (args.output/'native_stdin.txt').write_bytes(stdin);receipt['stdin_sha256']=digest(stdin)
+             receipt['binary_sha256']=digest((tmp/'probe').read_bytes())
++            shutil.copyfile(tmp/'probe',args.output/'native_probe')
++            receipt['retained_binary']=str((args.output/'native_probe').resolve())
+             result=run([str(tmp/'probe')],input=stdin);receipt['run_exit']=result.returncode
+             (args.output/'native_stdout.jsonl').write_bytes(result.stdout);(args.output/'native_stderr.log').write_bytes(result.stderr)
+             receipt['stdout_sha256']=digest(result.stdout)

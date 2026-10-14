@@ -1,0 +1,79 @@
+{
+  "task": "REI-CHAT-FLRW06-20261005",
+  "status": "REFERENCE_COMPLETE__NATIVE_BLOCKED",
+  "commands": [
+    {
+      "name": "independent_nodes",
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "research/reference.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.8332514240000819
+    },
+    {
+      "name": "stage_cone",
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "research/check_stage.py"
+      ],
+      "exit_code": 0,
+      "seconds": 1.0823185219999232
+    },
+    {
+      "name": "unit_protocol",
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5925877370000308
+    },
+    {
+      "name": "python_syntax",
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "-m",
+        "py_compile",
+        "/mnt/data/rei_chat_flrw06_20261005/research/run_all.py",
+        "/mnt/data/rei_chat_flrw06_20261005/research/check_stage.py",
+        "/mnt/data/rei_chat_flrw06_20261005/research/reference.py",
+        "/mnt/data/rei_chat_flrw06_20261005/research/moment_cone.py",
+        "/mnt/data/rei_chat_flrw06_20261005/research/native_protocol.py",
+        "/mnt/data/rei_chat_flrw06_20261005/research/run_native.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5439888930000052
+    }
+  ],
+  "native_preflight": {
+    "task": "REI-CHAT-FLRW06-20261005",
+    "status": "BLOCKED_COMPILER_ABSENT",
+    "native_calls": 0,
+    "compile_exit": null,
+    "run_exit": null,
+    "source_blobs_verified": false,
+    "blocker": "rustc not installed; no install/full-build fallback"
+  },
+  "native_compiles": 0,
+  "native_calls": 0,
+  "ODE_integrations": 0,
+  "prior_suites_rerun": false,
+  "counts": {
+    "unit_tests": 14,
+    "exact_rational_cone_cases": 240,
+    "symbolic_identities": 4,
+    "80digit_reference_profiles": 11,
+    "future_native_invalid_inputs": 6
+  },
+  "limitations": [
+    "Rust driver not compiled",
+    "Python protocol tests use manufactured records only",
+    "No actual time integration or physical/interval certification"
+  ]
+}

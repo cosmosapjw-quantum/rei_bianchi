@@ -1,0 +1,259 @@
+{
+  "schema": "rei.he-rct-research-dag.v1",
+  "task": "REI-HE-RCT01-20261005",
+  "execution_evidence_resolution": "Do not treat intended paths or this DAG as PASS; read actual immutable receipts. Root may bind final receipt paths before publication.",
+  "default_rct": "OFF",
+  "bounded_primary_source": "KF96_HEIII_HI_RCT_NOMINAL_V1",
+  "paired_alternative_source": "GM25_W82_RCX_CONSTANT_200_10000_K_V1",
+  "nodes": [
+    {
+      "id": "RCT-INTAKE",
+      "status": "SOURCE_IDENTITY_VERIFIED",
+      "dependencies": [],
+      "evidence": [
+        "survey/INTAKE.json",
+        "survey/SOURCE_IDENTITY.json"
+      ],
+      "output": "54 exact source files, current baseline and supplier contracts"
+    },
+    {
+      "id": "RCT-THEORY01",
+      "status": "DERIVED_WITH_EXPLICIT_CONDITIONAL_CLOSURE",
+      "dependencies": [
+        "RCT-INTAKE"
+      ],
+      "evidence": [
+        "theory/CONTRACT.json",
+        "theory/DERIVATION_KO.md"
+      ],
+      "output": "reaction/fraction/conditional energy derivation"
+    },
+    {
+      "id": "RCT-PROVIDER01",
+      "status": "THERMAL_RATE_VIEWS_EXECUTED",
+      "dependencies": [
+        "RCT-INTAKE"
+      ],
+      "evidence": [
+        "publication/PROVIDER_SELECTION_RECORDS.json",
+        "survey/build_provider_records.py"
+      ],
+      "output": "two explicit alternatives, full shared-schema fields, source null moments preserved"
+    },
+    {
+      "id": "RCT-NATIVE01",
+      "status": "IMPLEMENTATION_VERIFIED_HHE_AND_TYPED_FT03_LOCAL_RHS",
+      "dependencies": [
+        "RCT-THEORY01",
+        "RCT-PROVIDER01"
+      ],
+      "evidence": [
+        "coding/NATIVE_IMPLEMENTATION_STATUS.json",
+        "evidence/FINAL_INTEGRATION.json"
+      ],
+      "output": "source selector/event/conditional closure plus OFF-safe original HHe and actual typed FT03 local wrappers",
+      "native_targeted_tests": 24,
+      "full_crate_tests": 116,
+      "production_microstep_admitted": false
+    },
+    {
+      "id": "RCT-VERIFY01",
+      "status": "IMPLEMENTATION_AND_INDEPENDENT_NUMERICAL_PASS",
+      "dependencies": [
+        "RCT-NATIVE01"
+      ],
+      "evidence": [
+        "evidence/FINAL_INTEGRATION.json",
+        "evidence/INDEPENDENT_RESULT.json",
+        "review/FINAL_REVIEW.json",
+        "evidence/FT03_INDEPENDENT_RESULT.json"
+      ],
+      "output": "native and independent numerical checks, bounded semantic review",
+      "checks": 12789,
+      "native_calls": 422,
+      "state_points": 96,
+      "E2X_checks": 212,
+      "E2X_native_calls": 12
+    },
+    {
+      "id": "RCT-REVIEW01",
+      "status": "CONFIRMED_BOUNDED_SCOPE",
+      "dependencies": [
+        "RCT-VERIFY01"
+      ],
+      "evidence": [
+        "review/FINAL_REVIEW.json",
+        "review/INDEPENDENT_REVIEW_KO.md",
+        "review/POST_FT03_REVIEW.json"
+      ],
+      "rule": "No review PASS inferred from producer/native numerical PASS",
+      "open_blockers": 0,
+      "current_source_review": "POST_FT03_REVIEW confirmed"
+    },
+    {
+      "id": "HE-F2-RCT-INTAKE",
+      "status": "READY_FOR_PUBLISHED_CONTRACT_INTAKE",
+      "dependencies": [
+        "RCT-VERIFY01",
+        "RCT-REVIEW01"
+      ],
+      "owner": "BASS_HE changed-input consumer-return intake only",
+      "inputs": [
+        "publication/PROVIDER_SELECTION_RECORDS.json",
+        "publication/GITHUB_PUBLICATION_RECEIPT.json",
+        "coding/NATIVE_IMPLEMENTATION_STATUS.json"
+      ],
+      "output": "supplier ACK of concrete optional consumer binding; no duplicate history run"
+    },
+    {
+      "id": "RCT-STEP01",
+      "status": "NEXT_BOUNDED_IMPLEMENTATION",
+      "dependencies": [
+        "RCT-VERIFY01",
+        "RCT-REVIEW01"
+      ],
+      "owner": "rei_bianchi",
+      "outputs": [
+        "explicit opt-in successor stepper",
+        "RCT integrated event and escaped number ledgers",
+        "matched endpoint species/thermal residual",
+        "isolated reaction analytic comparison",
+        "OFF baseline parity"
+      ],
+      "acceptance": [
+        "accepted half-step events summed",
+        "exactly one density multiplication",
+        "same source all accepted stages",
+        "no temperature clamping",
+        "signed heat handled with state admissibility",
+        "failed trial leaves accepted state unchanged"
+      ],
+      "not_claimed": [
+        "F04 interval certificate",
+        "physical source accuracy",
+        "full EoR"
+      ],
+      "first_action": "Pin actual Ft03 successor time integrator as preferred target; preserve old HHe path separately",
+      "baseline_preservation": "If target is Ft03, retain ft03_rhs HG temperature-dependent RR/CI/DR moments/thermal closure and active [30000,110000] K domain",
+      "invalid_shortcut": "Do not use combined_hhe_rhs(&Ft03Model.gas) to replace typed combined_ft03_rhs.",
+      "local_wrapper_ready": "combined_ft03_rhs calls actual ft03_rhs, verified by E2X"
+    },
+    {
+      "id": "RCT-SPEC01",
+      "status": "OPEN_SCIENTIFIC_CLOSURE",
+      "dependencies": [
+        "RCT-THEORY01"
+      ],
+      "owner": "HE theory plus REI closure",
+      "outputs": [
+        "source-bound photon moment or explicitly bounded conditional input",
+        "spectrum/heat/recoil ownership"
+      ],
+      "optional_legacy_reopen": "only the specific missing atomic moment/state/channel"
+    },
+    {
+      "id": "RCT-TRANS01",
+      "status": "FUTURE",
+      "dependencies": [
+        "RCT-STEP01",
+        "RCT-SPEC01"
+      ],
+      "outputs": [
+        "number-and-energy-conserving emission projection",
+        "matched absorption or OTS ownership",
+        "secondary policy"
+      ]
+    },
+    {
+      "id": "RCT-SOURCE01",
+      "status": "CONDITIONAL_ON_MATERIAL_SENSITIVITY",
+      "dependencies": [
+        "RCT-STEP01"
+      ],
+      "outputs": [
+        "source discrepancy assessment using same defined scenario"
+      ],
+      "trigger": "material observable dependence or independently missing source domain",
+      "not_a_trigger": "routine re-audit of already pinned scalar code"
+    },
+    {
+      "id": "REI-F09",
+      "status": "UNCHANGED_EXTERNAL_CAMPAIGN",
+      "dependencies_external": [
+        "REI-F08",
+        "HH-F2",
+        "HE-F2"
+      ],
+      "additional_rct_needs": [
+        "RCT-STEP01",
+        "declared scientific scenario and applicable closure"
+      ],
+      "output": "one shared paired atomic sensitivity receipt",
+      "scope": "HE-F3 and HH-F3 consume same receipt; no duplicate cosmological campaigns"
+    },
+    {
+      "id": "F04",
+      "status": "PARTIAL_ACTUAL_FT03_SUCCESSOR_IMPLEMENTED_CERTIFICATE_OPEN",
+      "dependencies": [],
+      "rule": "current bounded RCT pass cannot close original interval/Jacobian/remainder gate",
+      "full_F04_completed": false,
+      "new_receipt": "docs/atomic_reionization_handoff_20261004_v1/runtime_returns/REI-F04.json at6279036f06c9ba4d47574beab90b48fc2c6f9ba7"
+    },
+    {
+      "id": "HE-L1-L2-L3",
+      "status": "PARKED_OPEN",
+      "dependencies": [],
+      "reference": "https://github.com/cosmosapjw-quantum/BASS_HE/blob/21d5b8075429903d195d6e0e0c24a10c00b21063/docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/LEGACY_LANE.json",
+      "reactivation": "specific user request or concrete source/spectrum/state/kinetic dependency"
+    }
+  ],
+  "preserved": [
+    "original F04 requirements",
+    "historical local error failure",
+    "public width gate",
+    "REI-F08 baseline independence",
+    "full Bianchi/finite tilt/REC long-term program"
+  ],
+  "external_publication_requested": true,
+  "review_binding": {
+    "verdict": "confirmed",
+    "open_blockers": 0,
+    "receipt": "review/FINAL_REVIEW.json",
+    "scope": "Bounded source selection, scalar event ledger, explicit escaped mean-energy closure and opt-in local HHe RHS composition; no production integration/physical admission.",
+    "pre_status_update_dag_sha256": "e7f0923e1fb66066ec59209128f32806ec69b9dac671dae862d498febc987767",
+    "post_review_update": "receipt-derived status binding only; review recorded the earlier DAG bytes, no scientific source or numerical result changed",
+    "current_final_receipt": "review/POST_FT03_REVIEW.json"
+  },
+  "late_concurrent_intake": {
+    "rei_commit": "6279036f06c9ba4d47574beab90b48fc2c6f9ba7",
+    "he_commit": "e4d2753ea45593ade6c3fd3a7fea81f92cfd1a15",
+    "survey": "survey/FINAL_DELTA_KO.md",
+    "new_FT03_temperature_K": [
+      30000,
+      110000
+    ],
+    "original_HHe_baseline_guard_inherited": false,
+    "new_Ft03_guard_active": true,
+    "rct_bound_to_Ft03": "local typed combined_ft03_rhs verified; implicit stepper no",
+    "F04_state": "partial",
+    "full_F04_completed": false,
+    "GM25_overlap_with_Ft03": false,
+    "KF96_window_covers_Ft03": "true but not physical or closure admission",
+    "trap": "Ft03Model.gas has alpha/beta arrays zero; combined_hhe_rhs(&ft03.gas) would omit Ft03 temperature-dependent RR/CI/DR. Compose RCT ledger with actual ft03_rhs only in a new explicit adapter."
+  },
+  "RCT_representability_scope": {
+    "finite_checks": true,
+    "strict_nonzero_product_underflow_policy_inherited_from_FT03": false,
+    "claim": "finite point RCT tests do not certify the separate FT03 underflow representability contract"
+  },
+  "HE_owner_return": "publication/he_consumer_return/HE_F2_RCT_CONSUMER_RETURN.json",
+  "native_publication": {
+    "repository": "cosmosapjw-quantum/rei_bianchi",
+    "branch": "forward/rust-reion-kernels-20260922",
+    "immutable_commit": "41e4592aa494b48929dcd23fc8504c169a98a908",
+    "tree": "f44469e09cefe8b7c92a822e9913c47d0919782f",
+    "parent": "6279036f06c9ba4d47574beab90b48fc2c6f9ba7",
+    "packet_path": "docs/fastest_track_chat/REI-HE-RCT01-20261005/",
+    "packet_commit_resolution": "packet publication receipt owns docs commit; native code commit above is already published"
+  }
+}

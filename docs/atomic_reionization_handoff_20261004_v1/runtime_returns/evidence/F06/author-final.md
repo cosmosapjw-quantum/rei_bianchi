@@ -1,0 +1,3 @@
+Implemented the bounded REI-F06 candidate in [bianchi_i.rs](/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/bianchi_i.rs), [angular_photons.rs](/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/angular_photons.rs), and additive [lib.rs](/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/lib.rs) exports.
+
+The frozen validator passed all 8 tests; its receipt remains `scientific_admission=HOLD`. Scoped rustfmt passed. Strict library Clippy is blocked by three pre-existing warnings in out-of-scope `flrw_three_equations.rs`; Clippy passed when that lint was allowed. Independent review and final admission remain with the parent.

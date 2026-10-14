@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "plan_id": "REI-FASTTRACK-RESET-20261012",
+  "decision_date": "2026-10-12",
+  "decision": "SCIENTIFIC_FAST_TRACK_RESET",
+  "language": "ko",
+  "scope": {
+    "repository": "cosmosapjw-quantum/rei_bianchi",
+    "branch": "forward/rust-reion-kernels-20260922",
+    "pull_request": 83,
+    "base_commit": "6bf81d268e827942614669f2edd978e23b78b0d1",
+    "change_type": "DEVELOPMENT_PLAN_ONLY",
+    "other_pr_branches": "READ_ONLY_SOURCE_PINS",
+    "scientific_execution_this_change": 0,
+    "scientific_source_changes_this_change": 0,
+    "external_job_or_automation_changes": 0
+  },
+  "current_priority": "Scientific observables from accepted reduced history and directional transport",
+  "next_task_id": "FT-B1A",
+  "next_task_document": "docs/fastest_track_chat/REI-FASTTRACK-RESET-20261012/CODEX_START_KO.md",
+  "supersedes": {
+    "planning_only": [
+      "docs/fastest_track_chat/REI-PHYS35-20261012/next/PHYS36_NEXT_HANDOFF_KO.md: next mandatory task priority",
+      "Historical next-task priorities in docs/fastest_track_chat/CODEX_SYNC_KO.md",
+      "PR104 N1/N2/N3 native precedence as a prerequisite for this fast-track"
+    ],
+    "preserves": "Frozen scientific evidence, thresholds, budgets, old documents, other owners' independent work"
+  },
+  "nodes": [
+    {
+      "id": "FT-A0",
+      "track": "A",
+      "status": "ACCEPTED_REUSE_SELECTED",
+      "depends_on": [],
+      "deliverable": "PR104 RUN002 reduced baseline and scoped sensitivity evidence",
+      "acceptance": "Existing PROMOTE_SCOPED_REDUCED_HISTORY retained; no reapproval or rerun prerequisite"
+    },
+    {
+      "id": "FT-A1",
+      "track": "A",
+      "status": "AVAILABLE_PARALLEL",
+      "depends_on": [
+        "FT-A0"
+      ],
+      "deliverable": "Reuse existing baseline figure and scenario comparisons; replot only as useful",
+      "acceptance": "z20-to-4+ tau, closure and scenario semantics explicit; preview interpolation assessed only for new use"
+    },
+    {
+      "id": "FT-B1A",
+      "track": "B",
+      "status": "NEXT_REQUIRED_NOT_RUN",
+      "depends_on": [
+        "FT-A0"
+      ],
+      "deliverable": "History/time adapter plus collisionless directional I_E and I20/I00 with separate tau",
+      "acceptance": [
+        "Actual PR104 time-dependent background mapped to seconds",
+        "Standard FLRW and same-H isotropic transport controls distinguished",
+        "New interpolation/projection/units and radiation ledger checked",
+        "Target observable numerical error assessed",
+        "Executable pilot, actual output data and first directional figure produced"
+      ],
+      "claim_limit": "Collisionless intensity is independent of prescribed xe; transport diagnostic only"
+    },
+    {
+      "id": "FT-B1B",
+      "track": "B",
+      "status": "PLANNED_NOT_RUN",
+      "depends_on": [
+        "FT-B1A"
+      ],
+      "deliverable": "Actual prescribed-xe Thomson intensity response; Stokes only when screen/collision conventions implemented",
+      "acceptance": [
+        "Conservative in-scattering plus out-scattering operator",
+        "Zero-opacity and isotropic limits",
+        "Actual xe dependence and observable convergence",
+        "Stokes physical-state and screen checks when polarization included"
+      ],
+      "parallel_work": "Bounded kernel locate/import/implementation can begin with B1A; polarization completion is not a C prerequisite"
+    },
+    {
+      "id": "FT-C1",
+      "track": "C",
+      "status": "PLANNED_NONBLOCKING_NATIVE",
+      "depends_on": [
+        "FT-A0",
+        "FT-B1A"
+      ],
+      "deliverable": "One-way versus two-way minimal radiation-ionization feedback comparison",
+      "acceptance": [
+        "Defined ionizing-band source and physical photoionization/heating moments",
+        "Explicit H/He and Case A/B bookkeeping",
+        "Delta Q, delta tau and radiation-moment error budget",
+        "No synthetic RCT energy admission"
+      ],
+      "does_not_require": [
+        "FT-B1B polarization completion",
+        "FT-D1",
+        "PHYS36"
+      ]
+    },
+    {
+      "id": "FT-I1",
+      "track": "I",
+      "status": "PLANNED_NOT_RUN",
+      "depends_on": [
+        "FT-B1B"
+      ],
+      "deliverable": "Directional-response identifiability or scoped non-identifiability result against nuisance variation",
+      "optional_inputs": [
+        "FT-C1"
+      ],
+      "acceptance": "Same-H background degeneracy separated; numerical resolution distinct from observation noise and likelihood"
+    },
+    {
+      "id": "FT-D1",
+      "track": "D",
+      "status": "OPTIONAL_OFF_CRITICAL_PATH",
+      "depends_on": [],
+      "deliverable": "Observable-justified native/atomic fidelity improvement",
+      "return_conditions": [
+        "A/B/C target observable and dominant model error identified",
+        "Proposed fidelity improvement linked to that error",
+        "Physical supplier/closure defined",
+        "Finite allocation and changed-control identity declared"
+      ],
+      "preserve": "C12 gen96, existing thresholds, counters and non-admissions"
+    },
+    {
+      "id": "PHYS36",
+      "track": "D",
+      "status": "DEFERRED_NONBLOCKING_NOT_RUN",
+      "depends_on": [],
+      "deliverable": "Conditional J/coefficient structural-stability study only if needed",
+      "return_conditions": [
+        "A specified moment/shape closure dominates an observable error budget",
+        "J/coefficient information can reduce that error"
+      ],
+      "preserve": "PHYS35 scoped result and spent first/replay budget"
+    }
+  ],
+  "physics_contract": {
+    "pr104_tau_domain": "Mean-volume redshift z=20 to z=4+, not total CMB optical depth",
+    "history_closure": "ne_mean=Q*(nH_proper+nHe_proper); xe_per_H=(1+yHe)*Q; HII+HeII ionized phase and neutral complement",
+    "background_control": "Same H(t), mean scale factor, ne, radiation inputs and cosmic-time boundaries; isotropized transport is a diagnostic, not asserted same-matter Einstein-FLRW",
+    "thomson": "Homogeneous comoving cold-electron elastic limit; fixed-cosmic-time tau is direction independent; observed-redshift boundaries require directional mapping",
+    "signal_bands": "B CMB/transport diagnostic spectrum and C ionizing-UV source are distinct; CMB moments are not H photoionization/heating suppliers",
+    "collisionless_claim": "xe does not affect collisionless I",
+    "scenario_uncertainty": "Scenario sensitivity is not a posterior or statistical interval",
+    "native_diagnostic": "Threshold-cell signed step difference is not a global true error bound; stiff order reduction remains a hypothesis",
+    "phys35_claim_limit": "No root-gap-to-delta-tau or physical-forecast conversion"
+  },
+  "numerical_policy": {
+    "new_fast_track_observable_budget": {
+      "relative_to_declared_target": 0.1,
+      "near_zero": "Declare an absolute floor before pilot; report limits below resolution",
+      "retrospective_threshold_changes": false
+    },
+    "hard_requirements": [
+      "Dimensions and normalization",
+      "Nonnegative physical states",
+      "Stokes physicality if present",
+      "Nuclei ledger where relevant",
+      "Source/absorption/escape/cosmological-work radiation ledgers"
+    ],
+    "verification": "Reuse unchanged evidence; add checks for changed code, inputs, interpolation and claims; bounded independent review of a new claim or algorithm",
+    "long_run": "Set a finite allocation and checkpoint before actual long science; no automatic native allocation renewal",
+    "delivery": "Milestone artifacts and selective publication acknowledgement; no full-archive restore prerequisite for ordinary plan or output changes"
+  },
+  "resource_policy": {
+    "pilot": "Current executable environment first",
+    "local_codex": "Only for an observed missing runtime/data capability",
+    "ncp": "Cost-measured parallel independent cases with explicit thread limits; no 64x assumption for one adaptive history"
+  },
+  "protected_status": {
+    "physical": "HOLD",
+    "interval_160_161": "FAIL",
+    "tick": 160,
+    "auxiliary_escape": "FAIL",
+    "HH": "OFF",
+    "RCT": "OFF",
+    "CR": "OFF",
+    "precision_atomic": "PARKED",
+    "phys35_budget": {
+      "first_used": 1,
+      "replay_used": 1,
+      "remaining": 0
+    },
+    "native_c12": "ALLOCATION_EXHAUSTED; whole-history targets not evaluated"
+  },
+  "source_pins": {
+    "pr83": "6bf81d268e827942614669f2edd978e23b78b0d1",
+    "pr104": "f66929c23ea3fa6e39dd4808e5b27d136c568a03",
+    "pr110": "17f8d0daa72e0f76a49cde01b110f650a6688c42",
+    "pr112": "2cae28f8d156d33511d38de9725983f59c03549c",
+    "pr113": "efb63623c4ed0f6c270a677fab3eb0a81ce80e34"
+  },
+  "source_map": "docs/fastest_track_chat/REI-FASTTRACK-RESET-20261012/SOURCE_MAP.json",
+  "human_plan": "docs/fastest_track_chat/REI-FASTTRACK-RESET-20261012/README_KO.md"
+}
+

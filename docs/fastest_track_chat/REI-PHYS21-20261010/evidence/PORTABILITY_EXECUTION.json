@@ -1,0 +1,121 @@
+{
+  "task": "REI_PHYS21_FINAL_PORTABILITY_GATE",
+  "scope": "Exactly one wrapper replay of three existing PHYS21 diagnostic scripts after final materialization",
+  "pre_gate_manifest_sha256": "7d19bac2c95bc4b13ece502dde07ed22051e3cfdd951903f3c1b4498bb73c217",
+  "pre_gate_manifest_payload_count": 53,
+  "pre_gate_manifest_is_final_manifest": false,
+  "wrapper_command": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-B",
+      "/workspace/scratch/603081e41728/phys21/reproduce.py",
+      "--output-dir",
+      "/workspace/scratch/603081e41728/phys21_portability_run"
+    ],
+    "cwd": "/workspace/scratch/603081e41728/phys21",
+    "started_utc": "2026-10-10T11:11:07.546294+00:00",
+    "ended_utc": "2026-10-10T11:11:10.034551+00:00",
+    "elapsed_s": 2.4882558669996797,
+    "returncode": 0,
+    "stdout_path": "/workspace/scratch/603081e41728/phys21_portability.stdout.log",
+    "stderr_path": "/workspace/scratch/603081e41728/phys21_portability.stderr.log",
+    "stdout": "{\"verification\": \"PASS\", \"manifest_sha256\": \"7d19bac2c95bc4b13ece502dde07ed22051e3cfdd951903f3c1b4498bb73c217\", \"payload_count\": 53, \"materialized_source_count\": 7, \"science_replayed\": false}\n{\"three_commands_completed\": 3, \"all_returncodes_zero\": true, \"scientific_value_comparison\": \"PASS\", \"native_runs\": 0, \"gas_IVP_runs\": 0, \"old_proof_replays\": 0}\n",
+    "stderr": "",
+    "pre_gate_manifest_sha256": "7d19bac2c95bc4b13ece502dde07ed22051e3cfdd951903f3c1b4498bb73c217",
+    "output_dir": "/workspace/scratch/603081e41728/phys21_portability_run"
+  },
+  "verification_before_replay": {
+    "manifest_sha256": "7d19bac2c95bc4b13ece502dde07ed22051e3cfdd951903f3c1b4498bb73c217",
+    "payload_count": 53,
+    "materialized_source_count": 7
+  },
+  "child_commands": [
+    {
+      "label": "hi_kernel",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "/workspace/scratch/603081e41728/phys21/code/second_order_hi_kernel.py",
+        "--output",
+        "/workspace/scratch/603081e41728/phys21_portability_run/second_order_hi.json"
+      ],
+      "returncode": 0,
+      "elapsed_s": 1.8414840299956268,
+      "stdout": {
+        "relative_output_path": "01.stdout.log",
+        "bytes": 524,
+        "sha256": "4c8a46edb0bb013cecaf1e46d4521006c89a96e139330c7cffeeef7bd07865c6",
+        "text_excerpt": "{\n  \"checks\": 39,\n  \"failures\": 0,\n  \"sha256\": \"ed41b97cfd65ffeb4e21efb6fab672488cc0a9495f28f439e08f0840ee2f0a5b\",\n  \"b0_relative_coefficients\": {\n    \"survival\": \"1.78390360948317321921224619523198953747252063867776886482538E-18\",\n    \"absorption_event_s\": \"-2.30206280809860475649344058283634228638589898126833603897910E-15\",\n    \"primary_heat_ev_s\": \"-3.88272869428057712931582731455897470982103546131884847062753E-13\",\n    \"surviving_energy_ev\": \"8.34817904511518954530348551891276437502610673175011815774833E-15\"\n  }\n}\n",
+        "excerpt_truncated": false
+      },
+      "stderr": {
+        "relative_output_path": "01.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text_excerpt": "",
+        "excerpt_truncated": false
+      }
+    },
+    {
+      "label": "tensor",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "/workspace/scratch/603081e41728/phys21/contributions/tensor/verify_second_order.py",
+        "--output",
+        "/workspace/scratch/603081e41728/phys21_portability_run/tensor_second_order.json"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.5792042100001709,
+      "stdout": {
+        "relative_output_path": "02.stdout.log",
+        "bytes": 286,
+        "sha256": "7ae261f71d8f993c53a6de7f84c70a26c0664b45a2de94ee47cbf8247db21fa1",
+        "text_excerpt": "{\"passed\": 44, \"total\": 44, \"failed\": 0, \"max_finite_amplitude_error\": \"1.034463067580961842755689294376705408230997842615803764295700477E-15\", \"max_boole_resolution_difference\": \"7.6532175681456652003634595013687043444059736519508077761770591E-19\", \"wall_seconds\": 0.5436207970051328}\n",
+        "excerpt_truncated": false
+      },
+      "stderr": {
+        "relative_output_path": "02.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text_excerpt": "",
+        "excerpt_truncated": false
+      }
+    },
+    {
+      "label": "local_gas",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "/workspace/scratch/603081e41728/phys21/contributions/source_gas/check_local_gas_derivative.py",
+        "--output",
+        "/workspace/scratch/603081e41728/phys21_portability_run/local_gas_derivative.json"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.02819654199993238,
+      "stdout": {
+        "relative_output_path": "03.stdout.log",
+        "bytes": 103,
+        "sha256": "b2ea90c2fddf02ac0ccbefa9bae06f877d869e2b6f71349c39a778272e5d9365",
+        "text_excerpt": "{\"status\": \"PASS\", \"check_count\": 60, \"passed\": 60, \"max_relative_difference\": 1.1287609103309596e-15}\n",
+        "excerpt_truncated": false
+      },
+      "stderr": {
+        "relative_output_path": "03.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text_excerpt": "",
+        "excerpt_truncated": false
+      }
+    }
+  ],
+  "frozen_owner_identities": {
+    "report_sha256": "59fca954d998f9ffd5af2ed857ae15992f24c9779a77e9c7ba099d058990ab7a",
+    "decision_review_sha256": "bc0a35ab9090bf7b1ee3a33910f36da4d2b89af6a7ebfd27ba28c4e60db701f7"
+  },
+  "native_runs": 0,
+  "gas_IVP_runs": 0,
+  "old_proof_replays": 0,
+  "new_science_design": false,
+  "protected_payloads_modified": false
+}

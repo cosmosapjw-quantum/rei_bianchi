@@ -1,0 +1,47 @@
+{
+  "task": "BASS-REI-CLOCK01",
+  "source_repo": "cosmosapjw-quantum/bass",
+  "base_commit": "fecfae3cbf508170513d5ad711e2897d0efe18e1",
+  "branch": "forward/rust-microphysics-host-20260930",
+  "objective": "Explicit normal-second/conformal-second/conformal-meter rate integration with optical-depth invariance for the same frozen physical cells",
+  "native_write_set": [
+    "_rustcore/src/microphysics/mod.rs",
+    "_rustcore/src/microphysics/visibility_clock.rs",
+    "_rustcore/tests/visibility_clock_contract.rs"
+  ],
+  "normal_rate_contract": "q_t is nonnegative finite rate per Bianchi normal ray second; proper density and D once are upstream responsibilities",
+  "scale_factor_contract": "Finite positive per-cell dimensionless a; exact for piecewise-constant a and q_t. If a varies, caller may provide a_eff=Delta t / Delta eta exactly for that cell; integration then remains exact only for piecewise-constant q_t surrogate. No point sample is asserted exact.",
+  "protected": [
+    "Old APIs bytes unchanged except additive mod export",
+    "Existing c and sigma_T",
+    "observer tail and no finite-interval renormalization",
+    "RCT disabled",
+    "source normal rates never acquire second D",
+    "no production dependency change"
+  ],
+  "required_tests": [
+    "missing API RED",
+    "clock invariance with analytic expected depth",
+    "tilted material D once",
+    "effective a with nonconstant a exact-ratio demonstration",
+    "a invalid/mismatched arrays/nonfinite grid/rates/overflow",
+    "old host regression"
+  ],
+  "numerical_tolerances": {
+    "unit_relative": 2e-14,
+    "probability_absolute": 2e-14,
+    "external_decimal_relative": 2e-12,
+    "external_decimal_absolute": 2e-14
+  },
+  "out_of_scope": [
+    "new chemistry evolution",
+    "expanding physical q_t continuum solver",
+    "whole BASS dependency build",
+    "finite T validity gate",
+    "CMB observables"
+  ],
+  "independent_review": "root coordinates after handoff",
+  "model_identity": "UNKNOWN: host trusted metadata unavailable",
+  "harness_selection": "Both exact canonical cores read; shared constraints used; no version-dependent next action",
+  "status": "DESIGN_FROZEN_BEFORE_IMPLEMENTATION"
+}

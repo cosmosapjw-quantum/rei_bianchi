@@ -1,0 +1,153 @@
+{
+  "status": "PASS",
+  "commands": [
+    {
+      "command": [
+        "/tmp/rec_rust_1941/bin/rustc",
+        "--edition=2021",
+        "--crate-name",
+        "rei_microphysics",
+        "--crate-type",
+        "rlib",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/lib.rs",
+        "-o",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/runtime/librei_microphysics.rlib"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/rec_rust_1941/bin/rustc",
+        "--edition=2024",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/peebles_bass_history.rs",
+        "-L",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime",
+        "-L",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/runtime",
+        "--extern",
+        "rei_peebles_reference=/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/runtime/librei_peebles_reference.rlib",
+        "--extern",
+        "rei_microphysics=/workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/runtime/librei_microphysics.rlib",
+        "-o",
+        "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/runtime/peebles_bass_history"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "warning: variants `InvalidEnergy`, `NonFiniteSource`, `ModeDirectionMismatch`, and `PairEnergyMismatch` are never constructed\n  --> /workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/../../loop1/bass_clock/baseline_bass/_rustcore/src/microphysics/frame.rs:7:5\n   |\n 4 | pub enum FrameError {\n   |          ---------- variants in this enum\n...\n 7 |     InvalidEnergy,\n   |     ^^^^^^^^^^^^^\n 8 |     NonFiniteSource,\n   |     ^^^^^^^^^^^^^^^\n 9 |     ModeDirectionMismatch,\n   |     ^^^^^^^^^^^^^^^^^^^^^\n10 |     PairEnergyMismatch {\n   |     ^^^^^^^^^^^^^^^^^^\n   |\n   = note: `FrameError` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\nwarning: methods `gamma`, `material_energy_ev`, `photon_normal_time_source`, `atomic_normal_time_source`, and `pair_material_fraction` are never used\n   --> /workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/../../loop1/bass_clock/baseline_bass/_rustcore/src/microphysics/frame.rs:37:12\n    |\n 22 | impl MaterialFrame {\n    | ------------------ methods in this implementation\n...\n 37 |     pub fn gamma(self) -> f64 {\n    |            ^^^^^\n...\n 64 |     pub fn material_energy_ev(self, normal_ev: f64, e_normal: [f64; 3]) -> Result<f64, FrameError> {\n    |            ^^^^^^^^^^^^^^^^^^\n...\n 75 |     pub fn photon_normal_time_source(\n    |            ^^^^^^^^^^^^^^^^^^^^^^^^^\n...\n 92 |     pub fn atomic_normal_time_source(self, material_source: f64) -> Result<f64, FrameError> {\n    |            ^^^^^^^^^^^^^^^^^^^^^^^^^\n...\n103 |     pub fn pair_material_fraction(\n    |            ^^^^^^^^^^^^^^^^^^^^^^\n\nwarning: struct `OpacityComparison` is never constructed\n   --> /workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/../../loop1/bass_clock/baseline_bass/_rustcore/src/microphysics/visibility.rs:158:12\n    |\n158 | pub struct OpacityComparison {\n    |            ^^^^^^^^^^^^^^^^^\n\nwarning: function `compare_opacity` is never used\n   --> /workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/../../loop1/bass_clock/baseline_bass/_rustcore/src/microphysics/visibility.rs:175:8\n    |\n175 | pub fn compare_opacity(\n    |        ^^^^^^^^^^^^^^^\n\nwarning: field `0` is never read\n  --> /workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/../../loop1/bass_clock/baseline_bass/_rustcore/src/microphysics/rei_visibility.rs:21:12\n   |\n21 |     Source(ForwardError),\n   |     ------ ^^^^^^^^^^^^\n   |     |\n   |     field in this variant\n   |\n   = note: `ReiVisibilityError` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis\nhelp: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field\n   |\n21 -     Source(ForwardError),\n21 +     Source(()),\n   |\n\nwarning: field `0` is never read\n  --> /workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/../../loop1/bass_clock/baseline_bass/_rustcore/src/microphysics/rei_visibility.rs:23:16\n   |\n23 |     Visibility(VisibilityError),\n   |     ---------- ^^^^^^^^^^^^^^^\n   |     |\n   |     field in this variant\n   |\n   = note: `ReiVisibilityError` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis\nhelp: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field\n   |\n23 -     Visibility(VisibilityError),\n23 +     Visibility(()),\n   |\n\nwarning: variant `Ft03` is never constructed\n  --> /workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/../../loop1/bass_clock/baseline_bass/_rustcore/src/microphysics/rei_visibility.rs:65:5\n   |\n63 | pub enum ReiOpacityCell<'a> {\n   |          -------------- variant in this enum\n64 |     HHe { model: &'a HHeModel, state: &'a HHeState, frame: MaterialFrame, e_normal: [f64; 3] },\n65 |     Ft03 { model: &'a Ft03Model, state: &'a HHeState, frame: MaterialFrame, e_normal: [f64; 3] },\n   |     ^^^^\n   |\n   = note: `ReiOpacityCell` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis\n\nwarning: fields `clock`, `normal_seconds_per_clock_unit`, `normal_interval_seconds`, and `interval_rates_per_clock_unit` are never read\n  --> /workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/../../loop1/bass_clock/bass/_rustcore/src/microphysics/visibility_clock.rs:49:9\n   |\n48 | pub struct ClockVisibilitySchedule {\n   |            ----------------------- fields in this struct\n49 |     pub clock: RayClock,\n   |         ^^^^^\n50 |     /// dt/d(clock): dimensionless for second clocks, s/m for conformal length.\n51 |     pub normal_seconds_per_clock_unit: Vec<f64>,\n   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n52 |     /// Positive physical normal-time widths represented by the clock cells.\n53 |     pub normal_interval_seconds: Vec<f64>,\n   |         ^^^^^^^^^^^^^^^^^^^^^^^\n54 |     /// q_t * dt/d(clock), per coordinate second or meter as identified by clock.\n55 |     pub interval_rates_per_clock_unit: Vec<f64>,\n   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = note: `ClockVisibilitySchedule` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis\n\nwarning: 8 warnings emitted\n\n"
+    }
+  ],
+  "history_executed": false,
+  "identities": [
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/coverage.rs",
+      "sha256": "0c542eaf42cd8ece217a2f02cc7fbb500f0bea8b983c1f18d44c96d0aea050c1"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/flrw_three_equations.rs",
+      "sha256": "52b165f036bab9d008989d41889972245bf7cea4e2a64a07e561982dc90cfbf0"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/hhe_events.rs",
+      "sha256": "c100b08e034089c2d67b2102769ccdd51f1d29a2f388d6bb2dfe7984af93b290"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/atomic_provider.rs",
+      "sha256": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/lift.rs",
+      "sha256": "632474da40f075051f77ed618b65af13fba133ea6bbee6e49325aeb2578d1871"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/homogeneous_rates.rs",
+      "sha256": "50000b7cd7b1f7c9536cfe92a1f932add545bb951cc32b8a63c4affecfca3f47"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/angular_photons.rs",
+      "sha256": "8da6478182f70b285e7456490469d7a7708c969d200ab93d4d468f34c0fe82db"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/he_rct.rs",
+      "sha256": "e2e461d17c47f207108dc0b4f28b9a551ffd61f4fb1a061e35c94a2a5ad12173"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/bianchi_i.rs",
+      "sha256": "4d7ec027e6074e37d355228c557cdfce54d5bb1da3657e062a556922d6c21f9a"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/ft03_rates.rs",
+      "sha256": "1a97cd7a3555deeb4d8700376cd84580c5102127773bc3a235a29c33b0c1542f"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/group_rates.rs",
+      "sha256": "393786f3c473d98dbf57752967ba63cf07f055dfff9027a1d00770d2ef73a6a4"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/interval_math.rs",
+      "sha256": "e4639a4386feee536dbe7e7ffb1260f26fa00697b6b05477083c182ddf03de18"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/lib.rs",
+      "sha256": "acaa392309ddb1dd9f3cae9ee1ee7acd2de3d4c9a07a3c9c37fcd1333f873437"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/thermal.rs",
+      "sha256": "6d7be31934bb33a46c0911d28b62e34d22027e08a8a1945c5d7d32bf32f79b8a"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/ft03_controlled.rs",
+      "sha256": "61e11471482bb49d99e5d0eb79504d3f67538fbe6361653a0462d1abb0b672db"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/joint_affine.rs",
+      "sha256": "5782ec4a2fdb8885af4056dca26e60bb31b585a7ce5de0c18cccbb143ae5f8b3"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/ft03_interval.rs",
+      "sha256": "886580a810b8ec29c8f0b6199c0e35d82fde1f46d984a5f8f1da304326a42a42"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/interval_ad.rs",
+      "sha256": "b14a16a24ba55d1d915fc890348bbafccf3c9df4566c04bbf06d38cdac2ef2dd"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/microstep.rs",
+      "sha256": "e03cc1512cdd2b60735b1ab655c8e6657423c18ee4ad55ca1d30f24ad4974e53"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/source_rei/src/hydrogen_step.rs",
+      "sha256": "d3a4515dd2cb4e723095db6c750531acc3999fe0d5fa856707e520ec93056fb6"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/peebles_bass_history.rs",
+      "sha256": "831774212c99bb51fad5ac45a90c8b233645a8b47e8eb9f131f927c893df4868"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/peebles_consumer/crate/src/lib.rs",
+      "sha256": "01347f0ef3972ef506099642530ba3b43215bc8526b7acf91c52ed05136f6188"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/bass_clock/bass/_rustcore/src/microphysics/visibility_clock.rs",
+      "sha256": "8244ee8a17fec394a799a2404eb09f6b39cc20e3d0b51735204fe80de11e7730"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/bass_clock/baseline_bass/_rustcore/src/microphysics/frame.rs",
+      "sha256": "82aa87fecfbac746ebca7ff3e9da0d243f30e9bdd9fc905c7b7abdb52a726674"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/bass_clock/baseline_bass/_rustcore/src/microphysics/visibility.rs",
+      "sha256": "380b0dfc5cf0975ee261f637735b0050bea5810ad7df18efed8ddd6e34819c9f"
+    },
+    {
+      "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop1/bass_clock/baseline_bass/_rustcore/src/microphysics/rei_visibility.rs",
+      "sha256": "78dfbfe227b8fe424038e0c609fe3e4919b8de9875dcb0213aa67cf031ba72ae"
+    }
+  ],
+  "binary": {
+    "path": "/workspace/scratch/a5a7937171cb/research_sync_20261005/loop2/native/runtime/peebles_bass_history",
+    "sha256": "63f58cb442be2bf3516f570c861907174e82cf4443d5da4e5861003f93d67524",
+    "bytes": 4232160
+  }
+}

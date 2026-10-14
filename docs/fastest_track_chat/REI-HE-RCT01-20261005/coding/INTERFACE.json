@@ -1,0 +1,132 @@
+{
+  "schema_version": "1.0",
+  "status": "FROZEN_INTERFACE",
+  "binary": "coding/rei_crate/target/debug/examples/he_rct_probe",
+  "protocol": "stdin whitespace command, one JSON result per line, flush each row",
+  "commands": [
+    "rate KF96|GM25 T_K",
+    "event KF96|GM25 nH_cm3 nHe_cm3 xHII yHeII yHeIII T_requested_K COUNT|Ebar_eV",
+    "off nH_cm3 nHe_cm3 xHII yHeII yHeIII T_requested_K",
+    "ft03 KF96|GM25 T_requested_K COUNT|Ebar_eV"
+  ],
+  "errors": {
+    "ok": false,
+    "error": "static error code"
+  },
+  "success_event_fields": [
+    "ok",
+    "kind",
+    "source",
+    "requested_temperature_k",
+    "temperature_k",
+    "n_h_cm3",
+    "n_he_cm3",
+    "fractions",
+    "k_cm3_s",
+    "n_hi_cm3",
+    "n_heiii_cm3",
+    "event_rate_cm3_s",
+    "species_rate_cm3_s",
+    "fraction_rate_s",
+    "free_electron_rate_cm3_s",
+    "emitted_photon_count_cm3_s",
+    "q_ev",
+    "ev_erg",
+    "chemical_energy_rate_erg_cm3_s",
+    "mean_escaped_photon_energy_ev",
+    "thermal_energy_rate_erg_cm3_s",
+    "escaped_energy_rate_erg_cm3_s",
+    "baseline_derivative",
+    "combined_derivative",
+    "baseline_escaped_energy_rate",
+    "combined_escaped_energy_rate",
+    "closure_complete",
+    "closure_input_origin",
+    "physical_admission"
+  ],
+  "rate_fields": [
+    "ok",
+    "kind",
+    "source",
+    "temperature_k",
+    "k_cm3_s",
+    "physical_admission"
+  ],
+  "off_fields": [
+    "ok",
+    "kind",
+    "baseline_derivative",
+    "combined_derivative",
+    "baseline_escaped_energy_rate",
+    "combined_escaped_energy_rate"
+  ],
+  "arrays": {
+    "species_rate_cm3_s": [
+      "HI",
+      "HII",
+      "HeI",
+      "HeII",
+      "HeIII",
+      "e"
+    ],
+    "fraction_rate_s": [
+      "xHII",
+      "yHeII",
+      "yHeIII"
+    ],
+    "baseline_derivative": [
+      "dxHII",
+      "dyHeII",
+      "dyHeIII",
+      "du_erg_cm3_s",
+      "dnph1_cm3_s",
+      "dnph2_cm3_s",
+      "dnph3_cm3_s"
+    ]
+  },
+  "count_only_nulls": [
+    "mean_escaped_photon_energy_ev",
+    "thermal_energy_rate_erg_cm3_s",
+    "escaped_energy_rate_erg_cm3_s",
+    "combined_derivative",
+    "combined_escaped_energy_rate",
+    "closure_input_origin"
+  ],
+  "eos": "u=1.5*kB*T_requested*(nH+nHe+ne); ordinary f64 no endpoint adjustment; recovered temperature_k controls provider domain",
+  "closure_mean_domain": "finite strictly positive Ebar_eV; no physical upper bound inferred",
+  "closure_input_origin": "CALLER_SUPPLIED_NO_ATOMIC_MOMENT; exact supplied value and scenario provenance belong to external run manifest",
+  "zero_density_policy": "all RCT event rate and fraction derivatives zero if either species absent; total nuclear density must be positive per baseline model",
+  "public_api": {
+    "module": "rei_microphysics::he_rct",
+    "provider": "RctProvider::new(RctSource, RctScenario, acknowledge_seventeen_fold_source_conflict)",
+    "source_variants": [
+      "Kf96Nominal",
+      "Gm25Constant"
+    ],
+    "scenario": "W82GroundStateCommonTemperatureZeroDrift",
+    "count": "RctProvider::events(&HHeModel,&HHeState)",
+    "closed": "RctProvider::closed_events(&HHeModel,&HHeState,EscapingMeanPhotonEnergy)",
+    "closure": "EscapingMeanPhotonEnergy::research_input_ev(f64)",
+    "selection": "RctSelection::{Disabled,Escaping{provider,closure}}",
+    "wrapper": "combined_hhe_rhs(&HHeModel,&HHeState,RctSelection)",
+    "ft03_wrapper": "combined_ft03_rhs(&Ft03Model,&HHeState,RctSelection)->CombinedFt03RctRhs"
+  },
+  "ft03_command": {
+    "fixture": "Actual Ft03Model::controlled()/initial_state; initial fractions,nuclear/photon densities unchanged; thermal energy reconstructed at requested T",
+    "success_fields": "same as event, kind=ft03, plus fields below",
+    "extra_fields": [
+      "baseline_recombination_per_cm3_s",
+      "baseline_collision_per_cm3_s",
+      "baseline_dr_per_cm3_s",
+      "combined_recombination_per_cm3_s",
+      "combined_collision_per_cm3_s",
+      "combined_dr_per_cm3_s"
+    ],
+    "count_only_extra_nulls": [
+      "combined_recombination_per_cm3_s",
+      "combined_collision_per_cm3_s",
+      "combined_dr_per_cm3_s"
+    ],
+    "temperature_intersection": "FT03 [30000,110000] K lies inside KF96; empty intersection with GM25 [200,10000] K; no auto switch"
+  }
+}

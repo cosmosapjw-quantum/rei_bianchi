@@ -1,0 +1,19 @@
+{
+ "schema_version":"1.0",
+ "id":"REI_FLRW01_THREE_EQUATION_RECOVERY_V1",
+ "task_id":"REI-CHAT-FLRW01-20261004",
+ "source_snapshot":"67957715cf3336b89c27c1e59c33ca23098f8934",
+ "status":"DERIVED_LIGHT_CHECKED__FILLING_CONDITIONAL__FULL_CONSUMER_NOT_VERIFIED",
+ "conventions":{"signature":"-+++","time":"proper seconds","nH":"proper cm^-3","alpha_CI":"cm^3/s","Gamma":"per neutral atom /s","nE":"proper cm^-3 erg^-1, angular integrated","h":"2*pi*hbar","c_cm_s":29979245800.0},
+ "definitions":{"x":"nHII/nH","XM":"mean(nH*x)/mean(nH)","QV":"mean(ionized-region indicator)","Xi":"XM-QV","eta":"tracked ionizing photon density/mean(nH)","dI":"mean(nH/mean(nH)|ionized)","CI":"mean(Delta^2|ionized)/dI^2","reff":"rA-jrec; chosen inventory consistent net sink"},
+ "equations":{"local":"dotx=(1-x)*(Gamma+ne*CIon)-alpha*ne*x+Ssec/nH","spectral":"partial_t nE+3H*nE+partial_E(-H*E*nE)=sE-c*kappa*nE","threshold":"dotn_above+3H*n_above=s_above-A_above-H*E0*nE(E0)","comoving":"dot(a^3*n_above)=a^3*(s_above-A_above-H*E0*nE(E0))","combined":"dot(XM+eta)=s_star-reff-a_other-l_z+i_extra","sharp_phase":"XM=QV*dI","sharp_recombination":"rB=alphaB*chi_e*nbarH*QV*dI^2*CI","standard_filling":"dotQV=emissivity_comoving/nH_comoving-QV/t_rec","trec":"1/t_rec=alphaB*chi_e*CI*nH_comoving*a^-3","exact_defect":"dotQV-(s_star-QV/t_ref)=-doteta-l_z-a_other+i_extra-dotXi-(reff-QV/t_ref)","legacy_group_sum":"sum dotN=sum S-sum kN-r0*N0"},
+ "profiles":[{"id":"CASE_A_PRIMARY_ONLY","net_sink":"rA","diffuse_tracked":false},{"id":"CASE_A_EXPLICIT_DIFFUSE","net_sink":"rA-jrec","diffuse_tracked":true,"rB_condition":"jrec=r1 only under declared ground-photon approximation, not an inference from emitted energy"},{"id":"LOCAL_OTS_CASE_B_PRIMARY","net_sink":"rB","diffuse_tracked":false,"condition":"same-species local ground-photon cancellation"}],
+ "standard_Q_conditions":["sharp fully ionized/neutral phases","dI=1 constant","independently specified conditional clumping and temperature/electron factor","photon storage derivative negligible","threshold exit negligible","other absorption/boundary losses accounted","extra ionization absent or explicit","CaseB-consistent photon ownership","pre-overlap or explicit post-overlap treatment"],
+ "guards":["no -3H added to fraction/comoving/perH count","no rename homogeneous x as QV","no replace conditional CI by global CHII=CI/QV","no alphaB plus duplicated ground photon emissivity","proper/comoving source and density matched","spectral edge uses edge energy","fit threshold distinct from binding","no clip Q=1 without excess-photon accounting","no duplicate effective-MFP and explicit-HI owner"],
+ "source_bound_status":{"photo_component":"source-read and independent algebra, Rust NOT_RUN","coupled_local":"pending F03","photon_continuum":"edge closure binding pending","filling":"absent from selected homogeneous state definition; not all-branch absence claim"},
+ "full_consumer_regression":"NOT_RUN",
+ "physical_provider_admitted":false,
+ "production_code_changed":false,
+ "next":"REI-CHAT-FLRW02_SOURCE_BOUND_THREE_EQUATION_REGRESSION",
+ "full_expanded_contract_in_archive":"rei_chat_flrw01_20261004/FLRW_RECOVERY_CONTRACT.json"
+}
