@@ -1,0 +1,136 @@
+{
+  "schema": "rei.axbi.epoch_recovery_dispatch_rereview.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "node": "AX08",
+  "written_utc": "2026-10-14T11:19:13.778132+00:00",
+  "decision": "PASS_SCOPED",
+  "scope": "Epoch-aware original HALF_MINUS recovery and existing PLUS successor adapter preparation; ERD-01 changed-surface repair accepted. Runtime starts remain conditional on the existing allocation and all handoff prerequisites.",
+  "epoch_recovery_execution_authorized": true,
+  "scientific_admission": "NOT_ISSUED",
+  "requested_reviewer": {
+    "model": "gpt-6-astra",
+    "effort": "xhigh"
+  },
+  "observed_reviewer_identity": "NOT_INDEPENDENTLY_OBSERVED",
+  "independence": "Same fresh non-implementing reviewer performed only changed-surface review and reviewer-owned gate promotion; no adapter implementation.",
+  "prior_review_sha256": "8349fb32fe296584ddaccbe2daff45d344ea8639b27aff2431e95134804564d4",
+  "initial_hold_archival_path": "research/axbi_goal_20261014/reviews/EPOCH_RECOVERY_DISPATCH_REVIEW_INITIAL_HOLD.json",
+  "initial_hold_archive_byte_identity": "VERIFIED_EXACT",
+  "reviewed_input_sha256": {
+    "research/axbi_goal_20261014/driver/full/post_cap_epoch_recovery.py": "55e77b0d30e549d566d8328be524a5f53efd8dd9a813c55f947f6b3b514db53a",
+    "research/axbi_goal_20261014/driver/full/post_plus_epoch_dispatch.py": "2c38960a26b25d77d04086dc9263f35efc7e564d646b640e890edcc682c35538",
+    "research/axbi_goal_20261014/driver/full/epoch_recovery_001/EPOCH_RECOVERY_BINDING.json": "020d2a3005feab25eae97649a527d3a8a6b7dea0bc40429e07a9bc862abe487c",
+    "research/axbi_goal_20261014/driver/full/SIGNED_CONTINUATION_MECHANISM_DECISION.json": "80dd0bf70778f82a8bd10e1bb603fa31d270cc0dcfdfd00b9c8ddf07c7855e9a",
+    "research/axbi_goal_20261014/driver/full/epoch_recovery_001/PREPARATION_RECEIPT.json": "191c99c650cc773813a716f8f5a082fb186c4a18713c2bc60998da619b0f2c2c",
+    "research/axbi_goal_20261014/driver/full/epoch_recovery_001/OBSERVED_DIFF.patch": "7267295100f03e559d0ebd1195e358d1f57c8be92f6f078d6e8d03b7653f948d",
+    "research/axbi_goal_20261014/driver/full/epoch_recovery_001/fake_check.stdout": "3eb684a66cf426219ea954274b4f8b0066cebab11395017d7559147679a52b15",
+    "research/axbi_goal_20261014/driver/full/epoch_recovery_001/fake_check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/axbi_goal_20261014/driver/full/epoch_recovery_001/ERD01_recheck.stdout": "7e62d31a4badf50523b5e9be7bbd0f227cade5444d85612a08a12ed733a1b9de",
+    "research/axbi_goal_20261014/driver/full/epoch_recovery_001/ERD01_recheck.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/axbi_goal_20261014/driver/full/epoch_recovery_001/ERD01_recheck_exit.json": "54b43168018420e0bbee44e7732ad8e4d779659e6d82fca237f22131678bb41c",
+    "research/axbi_goal_20261014/reviews/EPOCH_RECOVERY_DISPATCH_REVIEW_INITIAL_HOLD.json": "8349fb32fe296584ddaccbe2daff45d344ea8639b27aff2431e95134804564d4"
+  },
+  "resolved_finding": {
+    "id": "ERD-01",
+    "status": "CLOSED_SCOPED",
+    "repair": "Exactly two existing MAPPING tuple values become lists with unchanged paths and SHA strings. Full persisted receipt equality remains strict. Added tempfile/copy imports and targeted self-check fixture only; PLUS adapter unchanged.",
+    "independent_diff_method": "Reconstructed pre-repair files from preserved addition-only OBSERVED_DIFF.patch; both reconstructed hashes equal initial review exact source hashes. Computed unified diff with Python difflib; no Git or worker artifact writes.",
+    "unified_diff": "--- research/axbi_goal_20261014/driver/full/post_cap_epoch_recovery.py before ERD-01\n+++ research/axbi_goal_20261014/driver/full/post_cap_epoch_recovery.py after ERD-01\n@@ -11,6 +11,8 @@\n import subprocess\n import sys\n import threading\n+import tempfile\n+import copy\n import time\n \n sys.dont_write_bytecode = True\n@@ -28,8 +30,8 @@\n HALF = 'SHEAR_HALF_MINUS'\n ZERO_SEGMENT = 'ZERO_RESOURCE_CONTINUATION_001'\n MAPPING = {\n-    'rust/rei_microphysics/src/axbi_driver.rs': ('research/axbi_goal_20261014/convergence/output_allocation_repair/driver_source.before.rs', 'a614725c153ee21d88554573c15801087d8fb412954fa51d67b781f671475dbf'),\n-    'rust/rei_microphysics/tests/axbi_driver.rs': ('research/axbi_goal_20261014/convergence/output_allocation_repair/driver_test.before.rs', '5d7a3f893dec801e1d841a78b707c043672b237a3a5b11136c967b2b23472731'),\n+    'rust/rei_microphysics/src/axbi_driver.rs': ['research/axbi_goal_20261014/convergence/output_allocation_repair/driver_source.before.rs', 'a614725c153ee21d88554573c15801087d8fb412954fa51d67b781f671475dbf'],\n+    'rust/rei_microphysics/tests/axbi_driver.rs': ['research/axbi_goal_20261014/convergence/output_allocation_repair/driver_test.before.rs', '5d7a3f893dec801e1d841a78b707c043672b237a3a5b11136c967b2b23472731'],\n }\n \n \n@@ -311,6 +313,45 @@\n     plus = load(HERE/'post_plus_epoch_dispatch.py','epoch_plus_fake')\n     for status in ['OBSERVING','RECONCILED_READY_HALF_MINUS','STOPPED_FOR_CLASSIFICATION']:\n         refused(lambda: plus.carried_receipt(dict(status=status)))\n+    # Exercise the actual PLUS handoff after receipt JSON persistence. This\n+    # fails with the original tuple-valued MAPPING; strict equality is retained.\n+    pe = plus.EPOCH\n+    actual = dict(status='COMPLETED_EPOCH_RECOVERY', remaining_signed_queue=[],\n+                  original_actual_starts=5, continuation_actual_starts=1,\n+                  total_full_starts=6, prior_pilot_starts=3, prior_and_current_starts=9,\n+                  original_results=[dict(case=n, status='STOPPED_CHECKPOINTED',\n+                                         typed_stop='ACCEPTED_STEP_CAP', exit_code=101)\n+                                    for n in ['ZERO','SHEAR_PLUS','SHEAR_MINUS','SHEAR_HALF_PLUS',HALF]],\n+                  zero_result=dict(status='SUCCESS', exit_code=0),\n+                  source_mapping=MAPPING,\n+                  preserved_stale_receipt_sha256=digest(OLD_RECEIPT))\n+    saved_attributes = (pe.RECEIPT, pe.validate, pe.reconcile, pe.RECOVER.process_groups)\n+    with tempfile.TemporaryDirectory(dir=AREA, prefix='fake_persisted_') as directory:\n+        pe.RECEIPT = pathlib.Path(directory)/'terminal.json'\n+        pe.validate = lambda: ({}, {})\n+        pe.reconcile = lambda *args, **kwargs: actual\n+        pe.RECOVER.process_groups = lambda: {}\n+        def persist(value):\n+            pe.RECEIPT.write_text(json.dumps(value))\n+        try:\n+            persist(actual)\n+            carried, groups = plus.fresh_handoff()\n+            assert carried['all_history_starts'] == 9 and groups == {}\n+            changed = copy.deepcopy(actual)\n+            changed['source_mapping']['rust/rei_microphysics/src/axbi_driver.rs'][1] = '0'*64\n+            persist(changed); refused(lambda: plus.fresh_handoff())\n+            changed = copy.deepcopy(actual)\n+            changed['original_results'][0]['exit_code'] = 99\n+            persist(changed); refused(lambda: plus.fresh_handoff())\n+            for status in ['OBSERVING','RECONCILED_READY_HALF_MINUS','STOPPED_FOR_CLASSIFICATION']:\n+                actual['status'] = status\n+                persist(actual); refused(lambda: plus.fresh_handoff())\n+            actual['status'] = 'COMPLETED_EPOCH_RECOVERY'\n+            actual['original_results'][0]['typed_stop'] = 'UNKNOWN'\n+            persist(actual); refused(lambda: plus.fresh_handoff())\n+        finally:\n+            pe.RECEIPT, pe.validate, pe.reconcile, pe.RECOVER.process_groups = saved_attributes\n+    print('ERD01_PERSISTED_ACTUAL_PLUS_HANDOFF_PASS; valid JSON receipt accepted; changed source mapping/evidence, incomplete status and unknown outcome refused')\n     calls = []\n     reserved = False\n     for _ in range(3):\n"
+  },
+  "regression": {
+    "invocations": 1,
+    "exit_code": 0,
+    "stdout_path": "research/axbi_goal_20261014/driver/full/epoch_recovery_001/ERD01_recheck.stdout",
+    "stderr_path": "research/axbi_goal_20261014/driver/full/epoch_recovery_001/ERD01_recheck.stderr",
+    "exit_record_path": "research/axbi_goal_20261014/driver/full/epoch_recovery_001/ERD01_recheck_exit.json",
+    "coverage": "Actual new PLUS fresh_handoff accepts persisted valid terminal; rejects changed source mapping, changed terminal evidence, incomplete status and unknown outcome. Final actual validate(require_review=False) executes before fake substitutions. Existing exact-snapshot, source, owner/worker/child, duplicate and counter checks retained.",
+    "old_version_falsifier": "The positive fake persisted handoff fails on tuple-valued pre-repair MAPPING because saved JSON lists differ from live tuples.",
+    "science_process_starts": 0,
+    "subprocess_starts": 0,
+    "reviewer_fake_suite_reruns": 0
+  },
+  "worker_cumulative_accounting": {
+    "command_processes_started": 24,
+    "hard_limit": 24,
+    "remaining": 0,
+    "prior_preparation_command_processes": 21,
+    "authorized_repair_command_processes": 3,
+    "initial_fake_invocations": 1,
+    "targeted_recheck_invocations": 1,
+    "automatic_retry": false,
+    "budget_reset": false
+  },
+  "mechanical_closeout_failure": {
+    "preserved": true,
+    "command_exit_code": 1,
+    "exception": "IndexError while reconstructing OBSERVED_DIFF.patch",
+    "source": "Controller and worker completion report; no standalone durable raw traceback path supplied.",
+    "missing_artifact": "research/axbi_goal_20261014/driver/full/epoch_recovery_001/ERD01_REPAIR_RECEIPT.json",
+    "classification": "PACKAGING_CLOSEOUT_FAILURE_NOT_SCIENTIFIC_OR_TEST_FAILURE",
+    "effect": "No further worker command authorized. Current hashes and exact diff are independently captured here from unchanged initial patch plus current code. PREPARATION_RECEIPT and OBSERVED_DIFF remain historical pre-repair records, never represented as current code."
+  },
+  "retained_initial_review_checks": {
+    "historical_mapping": "Exactly axbi_driver.rs source a614725c153ee21d88554573c15801087d8fb412954fa51d67b781f671475dbf and test 5d7a3f893dec801e1d841a78b707c043672b237a3a5b11136c967b2b23472731 to their exact before snapshots; no other path is remapped. Both snapshots checked byte-exact.",
+    "authority_and_artifact_identity": "Authority SHA80dd0bf70778f82a8bd10e1bb603fa31d270cc0dcfdfd00b9c8ddf07c7855e9a and all preparation receipt artifact hashes verified. All historical FULL, POST_CAP, ZERO, POST_PLUS and PLUS reviewed-input maps match under only the two authorized historical mappings.",
+    "original_inputs_and_caps": "Recovery frozen_plan preserves original binary/config/runtime source checks and five exact original cases; explicit original 10800s/200000accepted/650000attempts/20MRHS/2048MiB limits match original validation. Original run_case is reused unchanged. Final source/cap checks statically match all four actual execution_start records.",
+    "plus_inputs_and_caps": "Retains original PLUS validate and observe execution glue, exact authority, executable/config/predecessor binding and resource checks. Historical digest adaptation changes only the two allowed build inputs; original PLUS review remains required.",
+    "old_receipt": "Original OBSERVING receipt is never written; frozen SHA and full stale receipt carried into new recovery evidence. Actual four original execution_start PIDs are ZERO396140, PLUS396141, MINUS811806, HALF_PLUS970519. ZERO segment process/terminal chain is checked separately.",
+    "accounting": "Actual four original starts plus one ZERO continuation carry full5/history8 including3pilots. HALF_MINUS is the only offered original case; terminal reconciliation requires five originals, carries full6/history9. Existing PLUS glue reserves only one further start, maxfull7/history10. No retry or ZERO reoffer.",
+    "old_owner_workers": "handoff rejects old observer, active scientific groups, and known launcher groups; recovery requires natural owner/worker/launcher exit. No process action or solver start performed by reviewer.",
+    "duplicate_protection": "Existing HALF_MINUS raw/output/start/plan and old acknowledgement block recovery; new runtime directory exclusive reservation and preserved failure prevent repetition. PLUS checks both original and new reservation/output paths.",
+    "terminal_policy": "Original outcomes require complete endpoint exit0 or exact accepted-step-cap exit101 with checkpoint/RETURN parity, finite reported scalars and ledger noFAIL; unknown outcomes refuse dispatch. PLUS re-reconciles all terminal evidence and the old chain before launch.",
+    "review_gate": "Execution requires this review explicit true and exact new adapter/binding/authority hashes. This HOLD file leaves the gate false.",
+    "verification_limit": "Worker fake suite passed before final source/cap/stale-receipt additions; only AST parse covered those final edits. This review inspected them and their existing inputs, but no full fake successful persisted receipt handoff had been run."
+  },
+  "shared_concurrency_scope": {
+    "limit": 2,
+    "implementation_scope": "Local serialized handoff using /proc; no remote registry or remote executor is implemented. No claim that local /proc independently observes global concurrency.",
+    "controller_evidence": "Controller reported fresh SSH process check exit0 with no NCP solver process, only the querying bash pattern. Durable checkpoint execution/LIVE_RESUME_CHECKPOINT_20261014T1110Z.json also records no remote solver; AX11/12 remain pending and generic signed continuations unallocated.",
+    "required_before_future_start": "Controller must freshly confirm NCP/other remote and pending scientific allocations remain absent, and retain single launch ownership. Combined local/remote/pending count must stay <=2. This is a launch precondition under existing policy, not new scheduler infrastructure."
+  },
+  "runtime_prerequisites": [
+    "Old observer PID811686 and all prior scientific worker/launcher child groups must have actually exited naturally; live PID or stale receipt is not completion.",
+    "Run exact terminal reconciliation under the unchanged classified-complete-or-accepted-cap policy; unknown/scientific failures HOLD. Preserve old OBSERVING receipt byte-exact and all original raw evidence.",
+    "No existing HALF_MINUS raw/output/start/plan or prior/new reservation; only original HALF_MINUS may start once. Never reoffer ZERO or restart an original case.",
+    "Before each future launch controller freshly verifies no NCP/other remote solver or pending allocation and preserves single dispatch ownership. Shared local+remote+pending max2 remains; local /proc alone is not a global observation.",
+    "After actual HALF_MINUS terminal classification, persist complete recovery receipt carrying five original+one ZERO/full6+threepilot/history9, then permit only existing one PLUS segment/full7/history10.",
+    "Original executable/config/predecessor/source snapshot identities and all resource caps remain exact; no extra resource allocation or generic signed continuation authorized."
+  ],
+  "positive_transition": "Gate validation PASS -> await natural old owner/workers exit -> fresh remote/pending absence check and exact terminal reconciliation -> original HALF_MINUS once -> classified recovered terminal -> existing PLUS once. No scientific completion/admission from this review.",
+  "release_gate": {
+    "path": "research/axbi_goal_20261014/reviews/EPOCH_RECOVERY_DISPATCH_REVIEW.json",
+    "field": "epoch_recovery_execution_authorized",
+    "required_value": true,
+    "identity_relation": "Exact current adapters, binding, authority and reviewed raw artifacts in reviewed_input_sha256",
+    "read_only_validation": {
+      "action": "Imported current adapter with bytecode disabled and called validate(require_review=True); no observe, handoff or launch called.",
+      "solver_starts": 0,
+      "process_mutations": 0,
+      "worker_path_writes": 0,
+      "status": "PASS",
+      "exit_code": 0,
+      "case_count": 5,
+      "case_ids": [
+        "SHEAR_HALF_MINUS",
+        "SHEAR_HALF_PLUS",
+        "SHEAR_MINUS",
+        "SHEAR_PLUS",
+        "ZERO"
+      ],
+      "original_binary_sha256": "32d11e733155d355a1fa748597b48ea1c8196adba3c871722a7a598f0b6cbfca"
+    }
+  },
+  "reviewer_actions": {
+    "solver_starts": 0,
+    "process_mutations": 0,
+    "git_actions": 0,
+    "worker_path_writes": 0,
+    "new_builds": 0,
+    "owned_written_paths": [
+      "research/axbi_goal_20261014/reviews/EPOCH_RECOVERY_DISPATCH_REVIEW_INITIAL_HOLD.json",
+      "research/axbi_goal_20261014/reviews/EPOCH_RECOVERY_DISPATCH_REREVIEW.json",
+      "research/axbi_goal_20261014/reviews/EPOCH_RECOVERY_DISPATCH_REVIEW.json"
+    ],
+    "authorization": "Controller explicitly authorized archival preservation and update of hardcoded review gate after scoped PASS."
+  }
+}
