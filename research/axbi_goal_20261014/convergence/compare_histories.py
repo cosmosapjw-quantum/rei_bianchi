@@ -113,7 +113,10 @@ def crossings(case,threshold):
     return {'target':threshold,'crossing_status':'REACHED' if events else 'NOT_REACHED','first':events[0] if events else None,'additional_upward_crossings':events[1:],'covered_zbar':[20.0,4.0],'note':'No pre-initial crossing inferred when already above threshold' if x[0]>threshold else None}
 
 def floor(name,case):
-    if name.startswith('x_') or name=='xe':return 1e-7
+    if name=='xe':
+        h,he=case['factors']
+        return 1e-7*(h+3*he)/h
+    if name.startswith('x_'):return 1e-7
     if name=='Tgas_K':return .01
     if name.startswith('Y_'):
         species=name[2:];h,he=case['factors']
