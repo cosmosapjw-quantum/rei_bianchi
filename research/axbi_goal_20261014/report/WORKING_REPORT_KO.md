@@ -1,6 +1,6 @@
 # 비경사 축대칭 Bianchi I 재이온화 abundance 작업 원고
 
-목표 산출물은 지원되는 전체 구간의 H/He 이온 이력과 BBN 방식 시간·기체 온도 abundance 그림이다. 현재 원고는 물리 관례와 구현된 provider 연결을 담은 작업본이며 새 이력 결과는 아직 삽입하지 않았다.
+목표 산출물은 지원되는 전체 구간의 H/He 이온 이력과 BBN 방식 시간·기체 온도 abundance 그림이다. 현재 원고는 물리 관례와 구현된 provider 연결을 담은 작업본이며 pilot·historical partial 기록과 conditional ZERO full-interval 결과를 포함한다.
 
 `manuscript.tex`는 metric, proper clock, q_ref/Sigma 구별, H/He EOS·electron census, Case A escape, 단일 사건 energy owner, photon characteristic, baryon/element normalization을 기술한다. Grackle provider의 1–10⁶ K는 operational domain이며 empirical 정확도나 continuum certificate를 뜻하지 않는다. 기존 F08 15행은 synthetic prescribed endpoint 범위로만 보존하며 전체 시간 이력으로 재해석하지 않는다.
 
@@ -84,3 +84,23 @@ Y=n_species/(nH+4nHe)이며 electron은 ne/nb charge census로 따로 표시하�
 ![Matched-a terminal partial H/He abundance versus chronological gas temperature](terminal_pair_32d11e733155/abundance_vs_Tgas_time_ordered.png)
 
 두 그림은 resolved shear effect, interpolation/temporal convergence bound, trace precision 또는 full $\bar z=20\to4$ history를 주장하지 않는다. 앞의 08:33 snapshot figure들은 그 시각의 unequal-endpoint historical progress로 남아 있다.
+
+
+## 실제 composed ZERO 전체 선택 구간: PASS_SCOPED_CONDITIONAL_FULL_INTERVAL_ZERO_HISTORY
+
+`ZERO_composed_001`은 exact a=.2/zbar4에서 zbar20→4를 완료했다. 기존200001행 prefix에 continuation의 신규112237 accepted states를 연결하고 shared boundary를 한 번만 계산했다. 누적312237 accepted/936768 tentative/6563796 RHS, 저장312238 history states이며 global proper clock·state·counter를 재설정하지 않았다. 원래 binary32d11e733155와 resource-only wrappera7e3f1d98bd8 및 동일한 library/source/config identity를 구별하여 보존한다.
+
+종료 elapsed proper time는1356.088277991926Myr(zbar20 이후 경과), Tgas7900.621365666492K, xHII=.9999973170987931, xHeII=.9742081012374538, xHeIII=.025784317574366333이다. 저장된 conditional discrete 값이며 표시 자릿수의 정확도나 absolute cosmic age를 뜻하지 않는다. 독립 full-history science decision은 `PASS_SCOPED_CONDITIONAL_FULL_INTERVAL_ZERO_HISTORY`이며, 실제 표현된 conditional numerical ZERO 구간만 scoped PASS다. Global/refinement uncertainty는 `UNKNOWN`, represented tau는 `PENDING`이다.
+
+![Conditional ZERO full interval versus elapsed proper time](full_zero_32d11e733155/abundance_vs_elapsed_time.png)
+
+![Conditional ZERO full interval versus chronological gas temperature](full_zero_32d11e733155/abundance_vs_Tgas_time_ordered.png)
+
+모든312238 joined states를 기존 completed reader로 endpoint/order/domain/species/normalization 및 nuclei/charge/history alignment 검사했다. 그림은 각100행 block의 endpoint·종별 및 T extrema, 전체endpoint·first positive·positive minimum를 보존한6250 chronological samples다. true zero만 log display에서 mask하며 retained positive값에 floor/clipping이 없다. 온도를 정렬하지 않아 heating/cooling branch가 보존된다. tiny trace 정확도 및 temporal/energy/angular/interpolation convergence는 미입증이다. 이 H/He ionic network는 BBN nuclear reaction network가 아니다.
+
+기존 matched-a partial pair 분석과 `HOLD_UNRESOLVED`를 보존한다. ZERO 하나의 full interval 완료는 signed family/global convergence/resolved shear/absolute IVP/matching nuclear donor/observer tail claim이 아니다. composition receipt의 whole-history feedback·tau는 명시적으로 `PENDING`이며 segment-only 진단을 full-history로 변경하지 않는다. 원고 update 직전 TEX/PDF/Markdown은 `progress_updates/ZERO_FULL_001/previous_report/`에 보존했다.
+
+
+### Fresh ZERO full-history independent decision
+
+`reviews/ZERO_FULL_HISTORY_SCIENCE_REVIEW.json`의 exact SHA는 `c58a2b4ad10f3900e0b42a1b9607a4ff4718a46fc6ef9e654b9a1bd42ee0e485`이며 결정은 `PASS_SCOPED_CONDITIONAL_FULL_INTERVAL_ZERO_HISTORY`다. 실제 표현된 conditional numerical ZERO zbar20→4만 scoped admission했다. 전312238행의 whole-history sampled feedback를 재구성하여 max|Delta s/H|=3.776565807803823e-23, max extra-energy ratio=5.809377678641879e-9가1e-4 diagnostic ceiling 이내임을 확인했다. 이는 rigorous coupled-background error bound 또는 refinement uncertainty가 아니다. 역사적 composition/PNG의 PENDING annotation은 생성 시점 기록이며 fresh review가 feedback의 missing check를 제공했다. represented tau는 여전히 미계산, observer tail UNKNOWN, temporal/energy/angular refinement UNKNOWN이다. signed family·resolved shear·C11·AX15·전체 goal PASS로 확대하지 않는다.

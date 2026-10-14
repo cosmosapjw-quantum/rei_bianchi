@@ -1,0 +1,230 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,hyperref,graphicx}
+\title{Hydrogen and helium abundance histories in non-tilted axisymmetric Bianchi I cosmology}
+\author{Working research manuscript}
+\date{14 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+This workspace describes a homogeneous hydrogen--helium reionization calculation and its matched signed-shear comparisons. The principal products are nuclear charge-state abundances versus elapsed gas proper time since the selected initial slice and time-ordered gas temperature. Numerical histories and figures will be inserted only from completed, identified calculations. This document includes actual short coupled pilot histories over mean redshift 20 to 19.8, with scoped independent pilot admission. The full mean-redshift 20 to 4 campaign, empirical refinement and resolved paired-response results remain pending.
+\end{abstract}
+\section{Geometry, clocks, and controlled approximation}
+The metric is
+\begin{equation}
+ ds^2=-c^2dt^2+a^2\{e^{-2b}(dx^2+dy^2)+e^{4b}dz^2\}.
+\end{equation}
+With $s=\dot b$, the directional expansion rates are $(H-s,H-s,H+2s)$ and $\sigma^2=3s^2$. The primary physical family keeps matter, radiation and $\Lambda$ densities fixed and uses $H^2=H_{\rm FLRW}^2+s^2$, $s\propto a^{-3}$. A separate SAME\_H calculation is a counterfactual diagnostic. The reference label $q_{\rm ref}=s_*/H_{\rm FLRW}(a_*)$ differs from the instantaneous $\Sigma=s/H$. The minimum family is $q_{\rm ref}=0,\pm q_{\rm amp}/2,\pm q_{\rm amp}$; amplitude and reference epoch require an identified scenario and quantified omitted-feedback bound.
+
+The gas is non-tilted. In the coordinate convention $x^0=ct$, its unit normal satisfies $n\cdot n=-1$ and physical four-velocity is $U=cn$, $U\cdot U=-c^2$. Proper time is in seconds with a declared absolute epoch map. The mean-expansion redshift $\bar z=a^{-1}-1$ is distinct from a ray's observed redshift. The selected interval is $\bar z=20$ to $4$. The locked conditional IC supplies no REC donor four-velocity or nuclear dataset. Its time origin is each matched $\bar z=20$ slice; an absolute cosmic age is unspecified. Plot axes must therefore read ``Elapsed proper time since $\bar z=20$.
+
+
+\section{Locked conditional scenario and continuous source}
+The rounded reference cosmology is
+\begin{gather*}
+H_{0,\mathrm{FLRW}}=67.4\,\mathrm{km\,s^{-1}\,Mpc^{-1}},\qquad \Omega_m=0.315,\\
+\Omega_b=0.0224/0.674^2,\qquad \Omega_r=9.2\times10^{-5},\\
+\Omega_\Lambda=1-\Omega_m-\Omega_r.
+\end{gather*}
+ This is a Planck-like reference choice, not a joint likelihood draw. The selected helium mass fraction is $0.2454$; $T_{\rm CMB,0}=2.7255$ K. The signed family uses $q_{\rm amp}=0.01$ at $a_*=1/21$.
+
+The gas starts at $x_{\rm HII}=2\times10^{-4}$, $x_{\rm HeII}=x_{\rm HeIII}=0$, with the explicit approximate cooling IC
+\begin{equation}
+T_*=\frac{2.7255\,21^2}{150(0.0224/0.023)^{0.4}}\,\mathrm K.
+\end{equation}
+These are conditional freeze-out approximations, not exact recombination output. The archival 6.137 K is not a matching donor; 20 K is a separately named early-heating sensitivity. Initial astrophysical ionizing photons are explicitly zero in the selected source-onset IC.
+
+The continuous source uses the selected Madau--Dickinson analytic law (equations 15 and 22, Figure 16 of the source listed below),
+\begin{align}
+\psi(z)&=\frac{0.015(1+z)^{2.7}}{1+[(1+z)/2.9]^{5.6}},\\
+\log_{10}I_{\rm ion}&=\frac{1}{0.00038Z_*^{0.227}+0.01858}-\log_{10}(2.55),\qquad Z_*=0.002.
+\end{align}
+Here $\psi$ has units $M_\odot\,\mathrm{yr}^{-1}\,\mathrm{cMpc}^{-3}$ and $I_{\rm ion}$ has photons/s per $(M_\odot/\mathrm{yr})$, so $\dot n_{\gamma,c}=f_{\rm esc}I_{\rm ion}\psi$ needs no extra year conversion. Baseline $f_{\rm esc}=0.2$; a named sensitivity uses $0.25$. The use above $z=8$ is declared phenomenological continuation, not measured high-redshift calibration.
+
+The photon-number spectrum is proportional to $E^2/[\exp(E/k_BT_*)-1]$ with stellar $T_*=50000$ K, normalized only on $13.6$--$100$ eV. Its O-star-like blackbody is an idealized conditional spectrum. The implementation splits at $13.6,24.59,54.42,100$ eV, with 16 log cells per segment, photon-number weights and cell mean energies. A preserved first quadrature failure led to the authorized Simpson subpanel increase from 8 to 32; independent moment checks then passed at $10^{-7}$. Gauss--Legendre $\mu$ weights use 8 nodes, refined to 16/32, and one axisymmetric azimuth representative. A fixed covariant-ray driver must map local isotropic injection using its solid-angle Jacobian and normalize once. Source rates already integrate over $4\pi$.
+
+Proper injection is $\dot n_{\gamma,c}/(\mathrm{Mpc}_{\rm cm}^3a^3)$ and per-H injection is $\dot n_{\gamma,c}/(\mathrm{Mpc}_{\rm cm}^3n_{\rm H0})$. The module creates continuous photons, not imposed UVB photo rates or heat. The omitted blackbody tail is a separate $100$--$500$ eV diagnostic; it is not injected outside support. The selected model still requires evolved histories and quantified omitted radiation-stress/CMB approximation diagnostics before admission.
+
+\section{Atomic gas and energy ownership}
+The evolved fractions are $(x_{\rm HII},x_{\rm HeII},x_{\rm HeIII})$, with neutral fractions supplied by element complements. The electron census is
+\begin{equation}
+ n_e=n_{\rm H}[x_{\rm HII}+f_{\rm He}(x_{\rm HeII}+2x_{\rm HeIII})],\qquad f_{\rm He}=n_{\rm He}/n_{\rm H}.
+\end{equation}
+All densities are proper $\mathrm{cm}^{-3}$. The ideal monatomic EOS is $u=\frac32 k_BT(n_{\rm H}+n_{\rm He}+n_e)$ and the evolved thermal variable is $w=u/n_{\rm H}$ in erg/H.
+
+The selected point provider binds existing Grackle 3.4.1 functions at commit \texttt{af793949} (full pinned identity in the source manifest) through the repository's IGM implementation\cite{grackle}. Its operational domain is $1\le T/\mathrm K\le10^6$; this range is numerical support, not measured empirical fit accuracy. Case A capture escape, clumping one, and primary-only photoelectron heating are selected. Source CI floors and CE caps remain diagnostic outputs. DR chemistry and owned cooling are off at $T\le9284$ K, with excluded raw cooling retained diagnostically. CR, HH, RCT, metals, molecules, dust, secondary electrons and metastable CI are absent.
+
+A common photo event owns the ionization, binding-energy increment, and excess thermal power. CI uses the same chemistry event and binding threshold as its thermal sink. RR/DR capture owns both released binding energy and kinetic cooling in escape. CE and free-free cooling add no chemistry events. CMB exchange is signed, with opposite gas/CMB reservoir rates. Expansion work on gas is $2Hu$. No recombination escape photon count is manufactured.
+
+\section{Radiation and matched source conventions}
+The isotropic proper-frame source and initial radiation are reflection-even. Energy and angle characteristics satisfy
+\begin{equation}
+ \dot E=-E[H+s(3\mu^2-1)],\qquad \dot\mu=-3s\mu(1-\mu^2).
+\end{equation}
+The quadrupole is retained; dipole and axial force are tested only under the stated parity assumptions. Source history, energy support, proper/comoving conversion and absorption/work/boundary owners must be bound before numerical execution. Externally supplied point photo rates alone are not a source history.
+
+\section{Abundance normalization and mandatory products}
+For the selected H/He-only model $n_b=n_{\rm H}+4n_{\rm He}$. Report $Y_i=n_i/n_b$ for every charge state, and $y_e=n_e/n_b$ separately for electrons. Element fractions and baryon-number shares $A_iY_i$ are distinct quantities. The charge-state baryon sum is one only for the complete selected inventory; explicitly omitted reservoirs would permit a tracked sum below one. Donor nuclear abundance does not equal evolved ionic abundance. D, T, $^3$He and Li charge states remain unimplemented optional extensions.
+
+Mandatory products are abundance versus proper time, time-ordered parametric abundance versus $T_{\rm gas}$, matched FLRW/Bianchi comparisons, and signed response versus numerical resolution. A nonmonotone temperature trajectory is never sorted into an apparent single-valued curve. Hydrogen $0.1/0.5/0.9$ crossings are measured from saved histories; noncrossing is censored or not reached. Homogeneous $x_{\rm HII}$ is not $Q_V$.
+
+\section{Numerical validation and results intake}
+Point implicit residuals must use the same provider/model/domain as accepted steps. Positivity, nuclei/charge conservation, photon and energy ledgers, rejected trials, raw failures and identified checkpoints are required. A baseline and two refinement levels provide empirical resolution evidence; no FT03 interval certificate or rigorous continuum proof is inherited. One identified source variant and one IC variant quantify sensitivity without interpreting it as posterior uncertainty.
+
+\begin{center}
+\begin{tabular}{ll}\toprule
+Product & Current intake status\\\midrule
+Provider binding and original-C parity & See AX02 implementation receipt\\
+Full FLRW and signed-shear histories & Full interval pending; partial FLRW below\\
+Time/temperature abundance figures & Actual short-pilot diagnostics below\\
+Convergence and source/IC sensitivity & Not yet inserted\\
+Independent scoped scientific decision & Pilot-only PASS; full campaign pending\\\bottomrule
+\end{tabular}
+\end{center}
+
+The retained F08 endpoint comparisons have their original synthetic prescribed-discrete scope. Their 15 endpoint rows are not reconstructed time histories and do not replace these campaign products. A resolved null or supported upper bound is an acceptable result; detection is not required. Segment Thomson depth may be reported as a secondary diagnostic; an unknown observer tail is neither zero nor a barrier to the abundance-history goal.
+
+
+
+\section{Completed pilot abundances and diagnostic figures}
+The revised output-cadence run completed the entire selected pilot interval $\bar z=20$ to $19.8$ for $q_{\rm ref}=0$ and $+0.01$. Each case recorded 3882 accepted steps, 11700 actual tentative starts and 81924 RHS evaluations; each has 3883 saved scalar states including the initial state. The independent decision is \texttt{PASS\_SCOPED\_CONDITIONAL\_PILOT\_EXECUTION}. It checks the represented short-interval normalization, conservation, source-bound numerical controls and sampled perturbative feedback diagnostics. It does not admit the full campaign or a converged shear response.
+
+\begin{center}
+\begin{tabular}{lrr}\toprule
+Pilot quantity & FLRW & Positive shear\\\midrule
+Endpoint $\bar z$ & 19.8 & 19.8\\
+Elapsed proper time (Myr) & 2.580698929 & 2.580571740\\
+Endpoint $T_{\rm gas}$ (K) & 22.565863657 & 22.565143160\\
+Endpoint $x_{\rm HII}$ & $5.243353784\times10^{-4}$ & $5.243193221\times10^{-4}$\\
+Measured wall time (s) & 87.721678 & 108.308765\\
+Measured CPU time (s) & 87.573524 & 108.263777\\
+GNU time peak RSS (KiB) & 3800 & 4076\\\bottomrule
+\end{tabular}
+\end{center}
+
+The figures use the saved nuclear charge-state number abundance $Y_i=n_i/(n_H+4n_{\rm He})$. Electrons use $y_e=n_e/(n_H+4n_{\rm He})$, are labelled charge census, and are excluded from nuclear baryon inventory. The source script checks the saved normalization against proper densities without changing input values. Initially exact zero He II and He III are masked only on the logarithmic display. All positive saved values are inside the plotted range; no fabricated floor, state clipping or temperature sorting is used. Very small plotted values do not carry an empirical fit-accuracy guarantee. Component and pilot residual checks do not establish the accuracy of tiny trace abundances. Displaying values near $10^{-34}$ does not imply 34 digit precision; global time, energy and angular convergence has not yet been measured.
+
+The endpoint ionic and temperature differences remain below the frozen absolute response floors $10^{-7}$ in fraction and $0.01$ K in temperature. No empirical refinement estimate is available yet, so this report issues neither a resolved shear detection nor a resolved null or validated upper bound.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{research/axbi_goal_20261014/report/pilot_figures_fc9dac5d0af1/abundance_vs_elapsed_time.png}
+\caption{Actual conditional pilot abundance histories on the short $\bar z=20$ to $19.8$ interval. The clock is elapsed proper time since the selected initial slice, in Myr, not inferred absolute cosmic age. H/He charge states and the separately labelled electron census use the complete selected H/He baryon denominator. Exact zeros are omitted only on the log display; no state floor or clipping is applied. Tiny trace values are displayed as saved, without a claim of validated trace accuracy or numerical precision. Component and pilot residual checks do not establish global convergence. This is a diagnostic pilot product, not a full EoR, convergence or resolved-response figure.}
+\end{figure}
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{research/axbi_goal_20261014/report/pilot_figures_fc9dac5d0af1/abundance_vs_Tgas_time_ordered.png}
+\caption{The same actual pilot abundances plotted parametrically against gas temperature in saved time order. Arrows indicate increasing time; the curve is never sorted by temperature, including the tiny early cooling excursion. Exact-zero, normalization and scope conventions match the preceding figure. These short pilot curves do not replace the required full-history BBN-style products.}
+\end{figure}
+\clearpage
+\section{Observed partial FLRW pilot}
+The first actual FLRW pilot used the reviewed binary identity \texttt{4080898d7770} and attempted the selected $\bar z=20$ to $19.8$ interval. It stopped checkpointed at $\bar z=19.86586760536834$ because the exact prewrite aggregate output cap rejected the next output batch. The elapsed proper time at that partial checkpoint was $5.440334630231574\times10^{13}$ s. This is a represented partial coupled history; the requested pilot endpoint was not reached, and the positive-shear pilot was not started.
+
+\begin{center}
+\begin{tabular}{lr}\toprule
+Measured pilot quantity & Value\\\midrule
+Accepted steps & 2870\\
+Actual tentative steps & 8667\\
+Rejected adaptive candidates & 18\\
+RHS evaluations & 60693\\
+Measured wall time (s) & 64.233055\\
+Measured CPU time (s) & 64.128211\\
+GNU time peak RSS (KiB) & 3724\\
+Maximum recorded Newton residual & $2.712\times10^{-13}$\\
+Last recorded local estimator & $3.817\times10^{-6}$\\\bottomrule
+\end{tabular}
+\end{center}
+
+The exact terminal error was \texttt{AXBI\_OUTPUT\_CAP}; no numerical failure was reported as the stop reason. The source/model and tolerances were unchanged. Original history, abundances, spectra, ledgers, raw streams, source/config identities and checkpoint remain preserved. A lossless archive contains all 66 original regular files, 234862901 bytes before compression and 26097828 bytes compressed; every archived file was checked against its input size and SHA. This packaging verification does not admit the trajectory scientifically. Full-interval results, paired response and convergence remain pending.
+
+The authority selected one output-cadence repair: retain every accepted scalar abundance, history, ledger and feedback row, and save full unaltered spectra initially, at the existing 60-step or 30-second checkpoints, and terminally. The original failed attempt is retained. A new explicitly revised allocation and changed-output review must bind any subsequent pilot binary and source identity; no automatic retry was performed.
+
+\section{Checkpointed ongoing full-stage progress}
+Historical, nonmatched progress snapshot (captured 2026-10-14 08:33:57 UTC; superseded as the latest endpoint record by the later matched-a terminal records below) uses the existing source-bound binary \texttt{32d11e733155}. Both cases remain incomplete relative to the selected $\bar z=4$ endpoint. Each plotted prefix ends exactly at its separately captured durable checkpoint.
+
+\begin{center}
+\begin{tabular}{lrr}\toprule
+Conditional saved quantity & ZERO & Positive shear\\\midrule
+Checkpoint $\bar z$ & 12.7867563 & 14.0201997\\
+Elapsed proper time (Myr) & 157.136676 & 116.631221\\
+$T_{\rm gas}$ (K) & 1285.87339 & 862.424607\\
+$x_{\rm HII}$ & 0.037996897 & 0.0242490861\\
+$x_{\rm HeII}$ & 0.0399903547 & 0.0254391198\\
+$x_{\rm HeIII}$ & 4.47551775e-06 & 1.83323659e-06\\
+\bottomrule
+\end{tabular}
+\end{center}
+These rows have different mean-redshift and elapsed-time endpoints. Their apparent differences are not a matched shear response. The figures show actual chronological partial abundance histories under the fixed conditional model; the selected full interval, global convergence and resolved response have not been established. Tiny trace values are displayed as saved and carry no validated precision claim. Electrons remain a separately labelled charge census.
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{research/axbi_goal_20261014/report/full_progress_32d11e733155/snapshot_20261014T083357015083Z/progress_abundance_vs_elapsed_time.png}
+\caption{Checkpoint-bounded actual elapsed proper-time abundance progress. The two cases have different represented endpoints; target mean redshift4 is not reached. This is incomplete conditional execution evidence, not a matched response or full-history result.}
+\end{figure}
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{research/axbi_goal_20261014/report/full_progress_32d11e733155/snapshot_20261014T083357015083Z/progress_abundance_vs_Tgas_time_ordered.png}
+\caption{The same partial abundance trajectories against gas temperature in saved time order, with arrows for increasing time. Temperature is not sorted. Exact zeros are masked only in log display, and positive states are neither floored nor clipped. No trace-accuracy or convergence claim is inferred.}
+\end{figure}
+\clearpage
+\section{Reviewed terminal partial FLRW result and evolving paired-case snapshot}
+A later resource stop yielded an actual terminal $q_{\rm ref}=0$ accepted-state prefix from $\bar z=20$ to $10.269313869154184$. The stop was typed as $\texttt{RESOURCE\_ALLOCATION\_EXHAUSTED\_PARTIAL\_INTERVAL}$ at the configured accepted-step cap, not as a physical-domain, conservation, or Newton failure. Independent read-only review issued \texttt{PASS\_SCOPED\_CONDITIONAL\_PARTIAL\_FLRW\_HISTORY} for this represented conditional interval. This scoped result does not complete the selected $20\to4$ history.
+
+\begin{center}
+\begin{tabular}{lrr}\toprule
+Actual conditional quantity & ZERO terminal (09:03 UTC) & SHEAR\_PLUS checkpoint snapshot (08:33 UTC)\\\midrule
+$q_{\rm ref}$ & 0 & $+0.01$\\
+Covered $\bar z$ & $20\to10.2693138692$ & $20\to14.0201997477$\\
+Elapsed proper time (Myr) & 275.733582 & 116.631\\
+Endpoint $T_{\rm gas}$ (K) & 2964.865324 & 862.424607\\
+Endpoint $x_{\rm HII}$ & 0.09914260554 & 0.0242490861\\
+Endpoint $x_{\rm HeII}$ & 0.10470182097 & 0.0254391198\\
+Endpoint $x_{\rm HeIII}$ & $3.07503797\times10^{-5}$ & $1.83323659\times10^{-6}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+These are independently captured endpoints from different times and different mean-redshift cutoffs. They are not a matched comparison and do not establish a shear response. The ZERO execution recorded 200000 accepted steps, 600054 attempts, 18 rejections, 4200402 RHS evaluations, 4945.1269 s wall time, 4940.75 s CPU time and 55612 KiB peak RSS; the process returned exit 101 with \texttt{AXBI\_RUNTIME\_CAP}. The terminal state and all 200001 history rows are bound by the partial-values receipt and the independent review. The review checked accepted-state domain, normalization, charge/nuclei, cumulative photon and augmented-energy ownership, the saved local numerical controls, and sampled omitted-feedback diagnostics for this represented $q_{\rm ref}=0$ interval.
+
+No upward $x_{\rm HII}=0.1$, $0.5$, or $0.9$ crossing occurred in the reviewed interval; each is \texttt{NOT\_REACHED} through $\bar z=10.269313869154184$. Do not extrapolate a crossing beyond the resource stop. Global time/energy/angle convergence, spectral-remap refinement, cold atomic empirical accuracy, continuum/interval certificate, full $20\to4$ completion, signed-shear response and the full observer tail remain unknown or unissued. The positive-shear case is represented here only by the earlier exact checkpoint snapshot while its run was observed as evolving; this table is not a simultaneous capture. The pre-update manuscript, Markdown report and 9-page PDF are preserved in \texttt{report/progress\_updates/FLRW\_RESOURCE\_STOP\_001/previous\_report/}.
+
+\section{Matched-expansion partial ZERO/PLUS terminal comparison}
+The independently reviewed ZERO and SHEAR\_PLUS executions both reached exactly 200000 accepted steps and stopped at the frozen resource cap. The terminal records share the exact native expansion endpoint $a=0.08873654701704167$ ($\bar z=10.269313869154184$), so this is an endpoint comparison at the same expansion slice without interpolation. It is not a fixed-proper-time or fixed-temperature response: the proper times and gas temperatures differ.
+
+\begin{center}
+\begin{tabular}{lrrr}\toprule
+Terminal quantity & ZERO ($q_{\rm ref}=0$) & SHEAR\_PLUS ($q_{\rm ref}=+0.01$) & PLUS $-$ ZERO\\\midrule
+Accepted steps & 200000 & 200000 & --\\
+$a$ & 0.08873654701704167 & 0.08873654701704167 & 0\\
+$\bar z$ & 10.269313869154184 & 10.269313869154184 & 0\\
+Proper time (s) & $8.701490096946133\times10^{15}$ & $8.701318923319379\times10^{15}$ & $-1.71173626754\times10^{11}$\\
+$T_{\rm gas}$ (K) & 2964.86532393337 & 2964.83878191092 & $-0.02654202245$\\
+$x_{\rm HII}$ & 0.09914260553714 & 0.09914134877928 & $-1.2567578673\times10^{-6}$\\
+$x_{\rm HeII}$ & 0.10470182097350 & 0.10470050519871 & $-1.3157747880\times10^{-6}$\\
+$x_{\rm HeIII}$ & $3.07503797\times10^{-5}$ & $3.07496898\times10^{-5}$ & $-6.89832122\times10^{-10}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Reviewed actual-data figures.} The following plots use the reviewer-approved 4003 display samples selected from all 200001 accepted rows in each case. They show conditional partial histories only. The terminal expansion factor is equal, but accumulated proper times differ by 5424.16 Julian years; therefore equal horizontal expansion endpoints do not make the elapsed-time curves a same-proper-time comparison. The gas-temperature plot preserves chronological order and does not sort by temperature.
+\begin{figure}[p]
+\centering
+\includegraphics[width=0.96\textwidth]{research/axbi_goal_20261014/report/terminal_pair_32d11e733155/abundance_vs_elapsed_time.png}
+\caption{H/He abundances and electron charge census versus elapsed proper time for the actual terminal partial ZERO and SHEAR\_PLUS histories. Each case contains 4003 display samples selected from all 200001 accepted rows. Both stop at the resource cap and terminate at $\bar z=10.269313869154184$; their proper times at that endpoint differ. The figure does not establish a resolved shear response or full $\bar z=20\to4$ history.}
+\end{figure}
+\begin{figure}[p]
+\centering
+\includegraphics[width=0.96\textwidth]{research/axbi_goal_20261014/report/terminal_pair_32d11e733155/abundance_vs_Tgas_time_ordered.png}
+\caption{The same actual terminal partial histories against gas temperature in chronological time order. Temperature is not sorted; arrows indicate increasing time. The histories share terminal $a$ but not elapsed proper time. This diagnostic does not establish a resolved shear effect, interpolation or convergence bound, or full $\bar z=20\to4$ result.}
+\end{figure}
+
+The proper-time difference is $-5424.1649$ Julian years (PLUS minus ZERO). Both terminal return records report \texttt{AXBI\_RUNTIME\_CAP}, exit 101, accepted 200000, 600054 attempts, 18 rejected trials and 4200402 RHS evaluations. Independent review classified these as typed resource stops with no accepted-state failure found and admitted only conditional partial evidence: \texttt{CONDITIONAL\_PARTIAL\_EVIDENCE\_PASS}. This does not mean either $\bar z=20\to4$ history is complete.
+
+The measured $|\Delta x_{\rm HII}|$ and $|\Delta T|$ exceed their locked response floors, but applicable paired refinement error remains UNKNOWN. The review therefore assigns \texttt{HOLD\_UNRESOLVED}: no resolved shear effect, sign, or relative-percent accuracy is claimed. $x_{\rm HeIII}$ difference remains below the fraction floor. Global temporal/energy/angular convergence, continuum certificate, empirical cold atomic fit accuracy, full $\bar z=20\to4$ history and observer tail remain unestablished. The earlier 08:33 checkpoint snapshot with unequal ZERO/PLUS endpoints is retained in the preceding section as historical progress only; it is not the matched-$a$ terminal comparison reported here.
+
+\section{Reproduction}
+Future release instructions must identify actual driver/config/source versions, complete case argv, cumulative budgets, raw stdout/stderr, checkpoints and output CSV/figure scripts. Current reproduction evidence includes both completed pilot histories, their raw streams, checkpoints and frozen identities, and the retained failed attempt. The source manifest and figure manifest bind the actual products. The plotting script is \texttt{plot\_pilot\_abundances.py}; run it from its figure directory or repository root. Compile this manuscript from the repository root so its figure paths resolve. Full-campaign reproduction remains pending. Publication and a compilable manuscript do not constitute scientific completion.
+\begin{thebibliography}{9}
+\bibitem{md14} P. Madau and M. Dickinson, Cosmic Star-Formation History, equations 15 and 22 and Figure 16, \url{https://arxiv.org/html/1403.0007}.
+\bibitem{grackle} Grackle development team, Grackle 3.4.1 pinned rate functions, \url{https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c}. Repository literal-C fixture and retained license provide the independent point reference.
+\end{thebibliography}
+\end{document}
