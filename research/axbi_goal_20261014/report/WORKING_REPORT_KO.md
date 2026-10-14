@@ -73,3 +73,14 @@ Y=n_species/(nH+4nHe)이며 electron은 ne/nb charge census로 따로 표시하�
 | $x_{HeIII}$ | 3.07503797e−5 | 3.07496898e−5 | −6.89832122e−10 |
 
 같은 expansion slice 비교이며 proper time와 $T_{gas}$는 일치하지 않는다. $|\Delta x_{HII}|$와 $|\Delta T|$는 response floors보다 크지만 해당 paired refinement uncertainty는 `UNKNOWN`; 독립 reviewer 판단은 `HOLD_UNRESOLVED`다. 따라서 resolved shear effect/sign 또는 relative-percent accuracy는 주장하지 않는다. Full $\bar z=20\to4$ history는 미완료다. 앞 절의 08:33 unequal-endpoint snapshot은 오직 역사적 progress이며 이 terminal matched-a 결과와 혼동하지 않는다.
+
+
+### Review된 matched-a abundance figures
+
+아래 그림은 각 case의 원본 200001 accepted rows에서 선택한 4003 display samples를 사용한다. ZERO/PLUS 모두 resource cap에서 멈췄으며 partial $\bar z=20\to10.269313869154184$ 자료다. 같은 terminal $a$에서 accumulated proper time는 5424.16 Julian years 차이가 있으므로 elapsed-time 곡선은 same-proper-time 비교가 아니다. Gas-temperature 그림은 원래 chronological 순서를 유지하고 온도를 정렬하지 않는다. Plot independent review는 publication-scoped PASS; solver 및 plot rerun은 하지 않았다.
+
+![Matched-a terminal partial H/He abundance versus elapsed proper time](terminal_pair_32d11e733155/abundance_vs_elapsed_time.png)
+
+![Matched-a terminal partial H/He abundance versus chronological gas temperature](terminal_pair_32d11e733155/abundance_vs_Tgas_time_ordered.png)
+
+두 그림은 resolved shear effect, interpolation/temporal convergence bound, trace precision 또는 full $\bar z=20\to4$ history를 주장하지 않는다. 앞의 08:33 snapshot figure들은 그 시각의 unequal-endpoint historical progress로 남아 있다.
