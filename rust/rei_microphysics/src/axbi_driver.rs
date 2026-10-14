@@ -116,6 +116,7 @@ impl DriverConfig {
         match self.output_budget_mib {
             256 => Ok(224 * 1024 * 1024),
             2048 => Ok(1920 * 1024 * 1024),
+            4096 => Ok(3968 * 1024 * 1024),
             _ => Err(err("AXBI_OUTPUT_ALLOCATION")),
         }
     }
@@ -123,11 +124,12 @@ impl DriverConfig {
         match self.output_budget_mib {
             256 => Ok(32 * 1024 * 1024),
             2048 => Ok(128 * 1024 * 1024),
+            4096 => Ok(128 * 1024 * 1024),
             _ => Err(err("AXBI_OUTPUT_ALLOCATION")),
         }
     }
     fn validate(&self) -> Result<(), ForwardError> {
-        if ![256, 2048].contains(&self.output_budget_mib)
+        if ![256, 2048, 4096].contains(&self.output_budget_mib)
             || self.spectra_every_accepted == 0
             || !self.q_ref.is_finite()
             || !self.end_zbar.is_finite()

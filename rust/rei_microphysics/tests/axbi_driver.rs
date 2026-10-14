@@ -388,3 +388,43 @@ fn full_resource_allocation_preserves_pilot_default_and_exact_guard() {
     std::fs::remove_file(root.join("sparse_resource_bytes")).unwrap();
     std::fs::remove_dir(root).unwrap();
 }
+
+#[test]
+fn refinement_output_allocation_4096_preserves_existing_budgets_and_exact_guard() {
+    for (total, science, reserve) in [
+        (256u64, 224u64, 32u64),
+        (2048, 1920, 128),
+        (4096, 3968, 128),
+    ] {
+        let config = DriverConfig::read(&format!("output_budget_mib={total}\n")).unwrap();
+        assert_eq!(
+            config.scientific_output_budget_bytes().unwrap(),
+            science * 1024 * 1024
+        );
+        assert_eq!(
+            config.launcher_reserve_bytes().unwrap(),
+            reserve * 1024 * 1024
+        );
+        assert_eq!(
+            config.scientific_output_budget_bytes().unwrap()
+                + config.launcher_reserve_bytes().unwrap(),
+            total * 1024 * 1024
+        );
+    }
+    assert!(DriverConfig::read("output_budget_mib=4095\n").is_err());
+    assert!(DriverConfig::read("output_budget_mib=4097\n").is_err());
+    let root = std::env::temp_dir().join(format!(
+        "axbi_refinement_output_resource_{}",
+        std::process::id()
+    ));
+    std::fs::create_dir(&root).unwrap();
+    let file = std::fs::File::create(root.join("sparse_resource_bytes")).unwrap();
+    let config = DriverConfig::read("output_budget_mib=4096\n").unwrap();
+    let limit = config.scientific_output_budget_bytes().unwrap();
+    file.set_len(limit - 100).unwrap();
+    assert!(guard_output_bytes_with_limit(&root, 100, limit).is_ok());
+    assert!(guard_output_bytes_with_limit(&root, 101, limit).is_err());
+    drop(file);
+    std::fs::remove_file(root.join("sparse_resource_bytes")).unwrap();
+    std::fs::remove_dir(root).unwrap();
+}
