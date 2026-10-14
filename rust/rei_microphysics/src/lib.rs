@@ -155,3 +155,4 @@ pub mod igm_thermal;
 pub mod axbi_rates;
 pub mod axbi_background;
 pub mod axbi_sources;
+pub mod axbi_driver;

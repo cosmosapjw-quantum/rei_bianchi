@@ -4,7 +4,7 @@
   "source_dag": "docs/fastest_track_chat/REI-AXBI-GOAL-20261014/EXECUTION_DAG.json",
   "goal_status": "IN_PROGRESS",
   "scientific_admission": "NOT_ISSUED",
-  "science_solver_runs": 0,
+  "science_solver_runs": 1,
   "nodes": {
     "AX00": {
       "status": "COMPLETED",
@@ -66,15 +66,25 @@
       "preparation_decision": "PASS_SCOPED_PREPARATION"
     },
     "AX05": {
-      "status": "IN_PROGRESS",
-      "evidence": [],
-      "scientific_work_status": "IMPLEMENTATION_RUNNING",
-      "scientific_admission": "NOT_ISSUED"
+      "status": "COMPLETED",
+      "evidence": [
+        "research/axbi_goal_20261014/driver/DRIVER_BINDING.json",
+        "research/axbi_goal_20261014/driver/RUN_LIMITS.json",
+        "research/axbi_goal_20261014/driver/IMPLEMENTATION_RECEIPT.json",
+        "research/axbi_goal_20261014/driver/SPECIES_NORMALIZATION_REGISTRY.json",
+        "research/axbi_goal_20261014/reviews/DRIVER_PILOT_REVIEW.json"
+      ],
+      "scientific_work_status": "DRIVER_COMPILED_COMPONENT_TESTED",
+      "scientific_admission": "NOT_ISSUED",
+      "completion_scope": "Reviewed cold point driver for two bounded pilots; no full-history admission",
+      "preparation_decision": "PASS_SCOPED_DRIVER_PREPARATION_AUTHORIZE_TWO_PILOTS"
     },
     "AX06": {
-      "status": "PENDING",
-      "evidence": [],
-      "scientific_work_status": "NOT_RUN",
+      "status": "IN_PROGRESS",
+      "evidence": [
+        "research/axbi_goal_20261014/runs/pilot/PILOT_RECEIPT.json"
+      ],
+      "scientific_work_status": "FIRST_PILOT_OUTPUT_CAP_REPAIR_PENDING",
       "scientific_admission": "NOT_ISSUED"
     },
     "AX07": {
@@ -235,12 +245,8 @@
   "next_ready_ids": [],
   "durable_next_command": [
     "python3",
-    "scripts/rux_codex/workflow.py",
-    "--dag",
-    "docs/fastest_track_chat/REI-AXBI-GOAL-20261014/EXECUTION_DAG.json",
-    "ready",
-    "--state",
-    "docs/fastest_track_chat/REI-AXBI-GOAL-20261014/STATE.json"
+    "research/axbi_goal_20261014/driver/run_pilots.py",
+    "--run"
   ],
   "requested_executor_model": "gpt-6.1-sol",
   "observed_runtime_model": null,
@@ -298,5 +304,6 @@
       "transport_request_accepted": true,
       "observed_runtime_model": null
     }
-  ]
+  ],
+  "next_command_precondition": "Review recorded AXBI_OUTPUT_CAP and apply one authorized output-cadence repair; do not relaunch old run_pilots.py or overwrite first attempt"
 }

@@ -1,0 +1,48 @@
+{
+  "schema": "rei.axbi.scoped_repair_decision.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "node_id": "AX05",
+  "requested_authority": {"model": "gpt-6-astra", "reasoning_effort": "high"},
+  "observed_runtime_identity": null,
+  "classification": "TEST_EXPECTATION_DEFECT_WITH_BOUNDED_MECHANICAL_ACCOUNTING_REPAIR",
+  "first_failure": {
+    "raw": "research/axbi_goal_20261014/driver/raw/targeted_test_01.stdout",
+    "observed": "4 passed,1 failed: component_step_doubling_and_state_array_metric; assert(done)",
+    "cause": "Worker confirms original test asserted that the first adaptive_step call must accept. Frozen policy allows ordinary local-error rejection followed by deterministic halving.",
+    "scientific_implication": "This failure does not establish a model or solver defect; it tests an acceptance guarantee the contract never made."
+  },
+  "test_repair": {
+    "scope": "Replace single-call guaranteed acceptance assertion with bounded20-call loop over ordinary Ok(false) rejections, retain final accepted-state/error/ledger assertions.",
+    "status": "OBSERVED_ALREADY_APPLIED_BY_WORKER_BEFORE_THIS_WRITTEN_DECISION",
+    "verification": "Authority read targeted_test_02.stdout/stderr:5/5 tests PASS plus example target compiled; no authority rerun.",
+    "unchanged": "Default initial dln(a)=1e-4, target1e-5, hard ceiling<2e-4, provider domain, physics and ledger tolerances."
+  },
+  "authorized_mechanical_bundle": {
+    "executor": "AX05 lower-tier coding worker",
+    "allowed_paths": ["rust/rei_microphysics/src/axbi_driver.rs", "rust/rei_microphysics/tests/axbi_driver.rs", "research/axbi_goal_20261014/driver/"],
+    "changes": [
+      "Count each actual full/half/half tentative launch against the frozen30000 tentative-step cap; keep adaptive comparisons as a separately named counter. Preserve all started work across rejection and resume.",
+      "Check RHS cap before evaluation starts and charge each started evaluation exactly once, including failed evaluations; do not charge calls rejected before evaluation starts.",
+      "Validate EOS-reconstructed temperature against the unchanged cold provider domain after geometric gas cooling and at accepted endpoints. Never clamp temperature or widen domain."
+    ],
+    "validation": "One focused validation invocation in root's next finite worker allocation: existing5 tests plus direct cap exhaustion/offbyone, rejection/resume counter preservation and EOS endpoint-domain checks. Compilation may be combined with that invocation. No science run.",
+    "stopping_rule": "Return diff and raw result after this single validation. If it fails, report exact residual/input/cap failure for authority classification; no automatic tolerance change or repeated repair loop. If it passes, bind actual source/config/argv and execute the authorized AX06 pilots after the independent changed-surface review."
+  },
+  "authority_evidence": [
+    "rust/rei_microphysics/src/axbi_driver.rs: chemical_stage, evaluate, tentative, adaptive_step, error_metric, geometry_map and conservation functions",
+    "rust/rei_microphysics/tests/axbi_driver.rs",
+    "research/axbi_goal_20261014/driver/raw/targeted_test_01.stdout",
+    "research/axbi_goal_20261014/driver/raw/targeted_test_02.stdout",
+    "Native worker messages explaining exact original test and cap findings"
+  ],
+  "authority_accounting": {
+    "prior_preparation_execution_calls": 24,
+    "current_repair_read_commands": 3,
+    "current_contract_patch_calls": 1,
+    "cumulative_execution_calls": 28,
+    "current_targeted_test_or_solver_runs": 0,
+    "current_allocation": {"wall_seconds": 1200, "commands": 12, "solver_runs": 0, "rerun_checks": 0},
+    "minor_intake_failure": "IMPLEMENTATION_RECEIPT.json was not yet present during third read; worker was still finalizing it. No inferred receipt evidence."
+  },
+  "scientific_admission": "NOT_ISSUED; component test repair and execution readiness do not establish a converged physical history"
+}
