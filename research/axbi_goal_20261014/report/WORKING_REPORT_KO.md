@@ -42,6 +42,10 @@ Y=n_species/(nH+4nHe)이며 electron은 ne/nb charge census로 따로 표시하�
 ![실제 incomplete progress](full_progress_32d11e733155/snapshot_20261014T083357015083Z/progress_abundance_vs_Tgas_time_ordered.png)
 
 
+## Historical 08:33 checkpoint snapshot (서로 다른 endpoint)
+
+아래의 08:33 snapshot은 이후 terminal stop 결과가 나오기 전의 역사적 진행 기록이다. 두 case endpoint가 서로 달라 paired shear response로 해석하지 않는다. 최신 same-a terminal 비교는 아래 절에 따로 기록한다.
+
 ## Independent review된 terminal ZERO partial history와 SHEAR_PLUS 진행 snapshot
 
 2026-10-14 09:03 UTC에 ZERO $q_{ref}=0$ 실행은 accepted-step resource cap에서 정지했다. 독립 read-only 검토는 실제 표현 구간 $\bar z=20\to10.269313869154184$에 한해 `PASS_SCOPED_CONDITIONAL_PARTIAL_FLRW_HISTORY`를 기록했다. 종료 상태는 200000 accepted, 600054 attempts, 18 rejections, 4200402 RHS evaluations, wall 4945.1269 s, CPU 4940.75 s, peak RSS 55612 KiB이며 실행 exit 101 / `AXBI_RUNTIME_CAP`다. 이는 full $20\to4$ 완료가 아니다.
@@ -54,3 +58,18 @@ Y=n_species/(nH+4nHe)이며 electron은 ne/nb charge census로 따로 표시하�
 이는 시간과 endpoint가 다른 캡처이므로 matched shear response가 아니다. PLUS는 기록된 snapshot 시점에 진행 중이었고 여기에 표시한 값은 그 checkpoint 한정이다. ZERO 구간에서 xHII=.1/.5/.9 upward crossings는 모두 `NOT_REACHED`; stop 밖의 crossing은 추정하지 않는다. Independent review는 이 qref=0 표현구간의 state domain, normalization, nuclei/charge, photon 및 augmented-energy ledger, 저장된 local controls와 sampled omitted-feedback diagnostics를 검토했다. Global convergence, signed shear response, full zbar20→4, continuum/interval certificate, empirical cold atomic fit accuracy와 observer tail은 여전히 미측정/미완료다.
 
 이 업데이트 직전 manuscript.tex, 9-page manuscript.pdf와 이 Markdown의 byte-identical 복사본은 `progress_updates/FLRW_RESOURCE_STOP_001/previous_report/`에 보존했다.
+
+
+## 독립 검토된 matched-a ZERO / SHEAR_PLUS terminal partial 비교
+
+두 원래 실행 모두 200000 accepted step에서 frozen resource cap으로 종료했으며 exact native endpoint는 동일한 $a=0.08873654701704167$, $\bar z=10.269313869154184$다. 두 terminal record는 `AXBI_RUNTIME_CAP`, exit 101, attempts 600054, rejections 18, RHS evaluations 4200402를 기록했다. 독립 검토 상태는 `CONDITIONAL_PARTIAL_EVIDENCE_PASS`이며, 이는 두 partial interval의 한정된 evidence decision이다.
+
+| terminal 값 | ZERO ($q_{ref}=0$) | SHEAR_PLUS ($q_{ref}=+0.01$) | PLUS − ZERO |
+|---|---:|---:|---:|
+| proper time (s) | 8.701490096946133e15 | 8.701318923319379e15 | −1.71173626754e11 s = −5424.1649 Julian years |
+| $T_{gas}$ (K) | 2964.86532393337 | 2964.83878191092 | −0.02654202245 K |
+| $x_{HII}$ | 0.09914260553714 | 0.09914134877928 | −1.2567578673e−6 |
+| $x_{HeII}$ | 0.10470182097350 | 0.10470050519871 | −1.3157747880e−6 |
+| $x_{HeIII}$ | 3.07503797e−5 | 3.07496898e−5 | −6.89832122e−10 |
+
+같은 expansion slice 비교이며 proper time와 $T_{gas}$는 일치하지 않는다. $|\Delta x_{HII}|$와 $|\Delta T|$는 response floors보다 크지만 해당 paired refinement uncertainty는 `UNKNOWN`; 독립 reviewer 판단은 `HOLD_UNRESOLVED`다. 따라서 resolved shear effect/sign 또는 relative-percent accuracy는 주장하지 않는다. Full $\bar z=20\to4$ history는 미완료다. 앞 절의 08:33 unequal-endpoint snapshot은 오직 역사적 progress이며 이 terminal matched-a 결과와 혼동하지 않는다.
