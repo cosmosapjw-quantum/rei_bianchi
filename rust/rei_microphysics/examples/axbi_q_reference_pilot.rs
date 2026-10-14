@@ -32,7 +32,7 @@ fn run() -> Result<(), rei_microphysics::ForwardError> {
     let densities = flat.at_ln_a(a_start.ln())?;
     let neutral = [densities.n_h_cm3 * (1.0 - 0.0002), densities.n_he_cm3, 0.0];
     let duration = 1e8_f64;
-    println!("q_ref,source_photons_per_H,source_energy_eV_per_H,source_absorbed_per_H,source_photoheat_eV_per_H,source_binding_eV_per_H,source_ledger_residual,freeflight_mean_E_eV,freeflight_above_HeI_per_H,freeflight_above_HeII_per_H,work_eV_per_H");
+    println!("q_ref,source_photons_per_H,source_energy_eV_per_H,source_absorbed_per_H,source_photoheat_eV_per_H,source_binding_eV_per_H,photon_number_residual_per_H,photon_energy_residual_eV_per_H,freeflight_mean_E_eV,freeflight_above_HeI_per_H,freeflight_above_HeII_per_H,work_eV_per_H");
     for q in [-0.01_f64, 0.0, 0.01] {
         let bg = AxbiBackground::new(
             params,
@@ -77,8 +77,9 @@ fn run() -> Result<(), rei_microphysics::ForwardError> {
         }
         let photon_ledger = count - absorbed - remain;
         let energy_ledger = before - heat - binding - remain_energy;
-        println!("{q},{count:.17e},{before:.17e},{absorbed:.17e},{heat:.17e},{binding:.17e},{:.17e},{:.17e},{hei:.17e},{heii:.17e},{:.17e}",
-                 photon_ledger.abs().max(energy_ledger.abs()),after/count,before-after);
+        let mean_energy = after / count;
+        let work = before - after;
+        println!("{q},{count:.17e},{before:.17e},{absorbed:.17e},{heat:.17e},{binding:.17e},{photon_ledger:.17e},{energy_ledger:.17e},{mean_energy:.17e},{hei:.17e},{heii:.17e},{work:.17e}");
     }
     Ok(())
 }
