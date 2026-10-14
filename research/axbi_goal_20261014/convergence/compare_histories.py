@@ -6,6 +6,8 @@ terminal paths and SHA256. Missing/incomplete inputs yield null typed HOLD.
 Sampled differences are not continuous suprema or numerical accuracy admission.
 """
 import argparse,array,bisect,csv,hashlib,json,math,pathlib,sys,tempfile
+from source_pair_guard import require_source_relation, SourceRelationHold
+from reconstruction_support import reconstruction_norm
 A0=1/21;A1=1/5;L0=math.log(A0);L1=math.log(A1)
 SPECIES=('H_I','H_II','He_I','He_II','He_III','electron')
 FIELDS={'x_HI':'x_HI','x_HII':'x_HII','x_HeI':'x_HeI','x_HeII':'x_HeII','x_HeIII':'x_HeIII','ne_cm3':'ne_proper_cm3','Tgas_K':'temperature_K','U0_eV_per_H':'J0_photon_u_eV_per_H','U2_eV_per_H':'J2_photon_u_eV_per_H'}
@@ -123,6 +125,26 @@ def floor(name,case):
         return 1e-7*(h+3*he if species=='electron' else h if species.startswith('H_') else he)
     return None
 
+def exact_reconstruction_summaries(reference,candidate,summary):
+    """Reuse CR62's exact union-knot PL norm, never a true-IVP error bound.
+
+    The coordinate numbers are the already stored binary64 ln(a) values. This
+    optional path is O(observables * total knots); it is not enabled silently
+    for large historical files. Existing sampled metrics remain alongside it.
+    """
+    for row in summary:
+        name=row['observable']
+        witness=reconstruction_norm(
+            zip(reference['series']['L'],reference['series'][name]),
+            zip(candidate['series']['L'],candidate['series'][name]),'LN_A')
+        row.update(reconstruction_sup_exact=str(witness['sup_absolute_difference']),
+            reconstruction_argmax_exact=str(witness['coordinate_at_sup']),
+            reconstruction_signed_at_sup_exact=str(witness['signed_difference_at_sup']),
+            reconstruction_union_knots=witness['union_knots'],
+            reconstruction_norm_kind=witness['status'],
+            reconstruction_coordinate='LN_A_STORED_BINARY64',
+            true_ivp_error=witness['true_ivp_error'])
+
 def compare(reference,candidate):
     if max(abs(x-y) for x,y in zip(reference['factors'],candidate['factors']))>1e-12:raise InputHold('HOLD_UNMATCHED_BARYON_INVENTORY',candidate['id'])
     coords=grid();observables=[k for k in reference['series'] if k not in ['L','time_s']];rows=[];summary=[]
@@ -151,7 +173,13 @@ def run(manifest_path,output,kind_override=None):
     try:
         manifest=json.loads(pathlib.Path(manifest_path).read_text());kind=kind_override or manifest.get('comparison_kind','PAIRED')
         if kind not in ['PAIRED','REFINEMENT','SOURCE','IC']:raise InputHold('HOLD_COMPARISON_KIND',kind)
+        norm_mode=manifest.get('reconstruction_norm','SAMPLED_ONLY')
+        if norm_mode not in ['SAMPLED_ONLY','EXACT_UNION']:raise InputHold('HOLD_RECONSTRUCTION_NORM_MODE',str(norm_mode))
+        base['reconstruction_norm_mode']=norm_mode
         ref=load_case(manifest['reference']);candidate=load_case(manifest['candidate'])
+        if kind in ['PAIRED','REFINEMENT']:
+            try:base['source_relation_status']=require_source_relation(ref,candidate,manifest)
+            except SourceRelationHold as exc:raise InputHold(str(exc),'compiled_source_pair') from exc
         def config_value(value):
             if value in ['true','false']:return value=='true'
             try:return float(value)
@@ -166,7 +194,9 @@ def run(manifest_path,output,kind_override=None):
             allowed={'escape_fraction'} if kind=='SOURCE' else {'initial_temperature_k'}
             if not changed<=allowed|resource or not changed&allowed:raise InputHold('HOLD_ROBUSTNESS_OTHER_INPUTS_CHANGED',str(sorted(changed)))
             if not manifest.get('assumption_reference'):raise InputHold('HOLD_ROBUSTNESS_ASSUMPTION_REFERENCE_MISSING',kind)
-        rows,summary,milestones=compare(ref,candidate);write_csv(output/'sampled_comparisons.csv',rows);write_csv(output/'comparison_summary.csv',summary)
+        rows,summary,milestones=compare(ref,candidate)
+        if norm_mode=='EXACT_UNION':exact_reconstruction_summaries(ref,candidate,summary)
+        write_csv(output/'sampled_comparisons.csv',rows);write_csv(output/'comparison_summary.csv',summary)
         write_csv(output/'milestones.csv',[{k:v for k,v in row.items() if k not in ['reference_crossings','candidate_crossings']} for row in milestones])
         base.update(status='DIAGNOSTIC_REDUCTION_COMPLETE_RESPONSE_UNRESOLVED',comparison_kind=kind,metrics=summary,milestones=milestones,immutable_input_descriptors={'reference':manifest['reference'],'candidate':manifest['candidate']},assumption_reference=manifest.get('assumption_reference'),robustness_semantics='Namedmodel sensitivity, notposterior orsignedshearrobustness' if kind in ['SOURCE','IC'] else None)
     except InputHold as e:base.update(status=e.status,missing_or_invalid_field=e.field,metrics=None,milestones=None,scientific_integrity_failure='NOT_ESTABLISHED_BY_THIS_SIGNAL')
