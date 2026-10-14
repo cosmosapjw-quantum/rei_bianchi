@@ -1,0 +1,85 @@
+{
+  "schema": "rei.source07.c2.direct_rust_integration.v1",
+  "selected_track": "coding",
+  "selected_stages": [
+    "C2_SOURCE_CODE_BINDING",
+    "C5_SCOPED_IMPLEMENTATION_BY_EXPLICIT_REQUEST"
+  ],
+  "scientific_admission": "NOT_ISSUED",
+  "source_model": "PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1",
+  "new_module": "rust/rei_microphysics/src/axbi_q_reference.rs",
+  "new_test": "rust/rei_microphysics/tests/axbi_q_reference.rs",
+  "new_example": "rust/rei_microphysics/examples/axbi_q_reference_pilot.rs",
+  "code_registry_change": "rust/rei_microphysics/src/lib.rs additive pub mod declaration",
+  "executed_scopes": [
+    "source-first MD14 discrete photon cohorts",
+    "collisionless exact k_i along Bianchi I",
+    "Verner-only frozen gas absorption with proper densities and exact constant-rate number loss",
+    "binding+photoelectron heat ownership"
+  ],
+  "test_receipts": {
+    "cargo_all_tests": {
+      "groups": 37,
+      "tests_passed": 226,
+      "failed": 0
+    },
+    "cargo_check_all_targets": {
+      "exit": 0
+    },
+    "targeted_test": {
+      "tests_passed": 5
+    },
+    "pilot_native": {
+      "exit": 0,
+      "q_cases": [
+        -0.01,
+        0,
+        0.01
+      ]
+    },
+    "wolfram_local": {
+      "engine": "15.0.0",
+      "xTensor": "1.3.0",
+      "xCoba": "0.8.6",
+      "scalar_zero": 9,
+      "tensor_zero": 5,
+      "exit": 0
+    }
+  },
+  "locks": {
+    "chemical_full_history_not_started": true,
+    "existing_axbi_driver_unchanged": true,
+    "source_model_physics_unchanged": true,
+    "old_output_not_migrated": true,
+    "old_49node_checkpoint_not_reinterpreted": true,
+    "original_AX08_AX11_AX12_status_unchanged": true
+  },
+  "numerical_scopes": {
+    "emission_zbar": 20,
+    "source_duration_s": 100000000,
+    "frozen_absorption_duration_s": 100000000,
+    "source_cells": 48,
+    "angular_cells": 8,
+    "packet_count": 384,
+    "emitted_photons_per_H": 4.2980361147642005e-10,
+    "absorbed_photons_per_H": 6.761285687276784e-12,
+    "heat_ev_per_H": 2.498946542140095e-11,
+    "binding_ev_per_H": 9.410361384225597e-11,
+    "max_abs_mixed_ledger_residual_printed": 3.308722450212111e-24,
+    "reference_only": true
+  },
+  "next_ready": {
+    "stage": "C3",
+    "task": "bounded fixed-q source projection and moving-threshold absorption design against actual Driver seam",
+    "instructions": [
+      "Compare bounded packet cohorts to an energy/angle fixed-q grid; do not let packets scale as number_of_timesteps*48*8 during the full campaign.",
+      "For continuous source and fixed-q support, apply the reference R*J source Jacobian exactly once and cover reference energies through 432.2293723204678 eV for the frozen five-case q family.",
+      "Maintain fit thresholds 13.60,24.59,54.42 eV separately from binding energies.",
+      "Implement moving-threshold time splitting before a full variable-geometry absorption step.",
+      "Compare frozen-gas rate and heat from the new optional reference with existing energy-node Driver on one same-source same-IC short interval.",
+      "Keep original source/IC/clock and output criteria unchanged; old campaign results keep historical source identities."
+    ],
+    "source_bound_continuum_error": "NOT_CERTIFIED",
+    "coupled_EoR_result": "NOT_RUN"
+  }
+}

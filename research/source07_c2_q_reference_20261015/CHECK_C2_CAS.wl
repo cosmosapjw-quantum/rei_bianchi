@@ -1,0 +1,47 @@
+(* C1 local Wolfram Engine + actual xAct checkpoint, source-only baseline *)
+ClearAll["Global`*"];
+Needs["xAct`xCoba`"];
+xAct`xTensor`$DefInfoQ=False;
+scalar=<||>;
+ClearAll[muC,rpC,rzC,enC,akC,scaleC,qrC,hhC];
+rC=Sqrt[rpC^2(1-muC^2)+rzC^2 muC^2];
+jC=rpC^2 rzC/rC^3;
+scalar["J_mu"]=FullSimplify[D[muC rzC/rC,muC]-jC,Assumptions->rpC>0&&rzC>0&&-1<muC<1];
+scalar["source_RJ"]=FullSimplify[rC jC-rpC^2 rzC/rC^2,Assumptions->rpC>0&&rzC>0&&-1<muC<1];
+scalar["J_boundary"]=FullSimplify[((muC rzC/rC)/.muC->1)-((muC rzC/rC)/.muC->-1)-2,Assumptions->rpC>0&&rzC>0];
+scalar["q_even_clock"]=FullSimplify[Sqrt[hhC^2+qrC^2 akC^2]-Sqrt[hhC^2+(-qrC)^2 akC^2]];
+scalar["FLRW_final_support"]=FullSimplify[100*21/5-420];
+DefManifold[C1Space,4,{iaC,ibC,icC,idC}];
+DefChart[C1Chart,C1Space,{0,1,2,3},{ctC[],xxC[],yyC[],zzC[]}];
+Scan[DefScalarFunction,{aC,bC,nC}];
+Scan[DefConstantSymbol,{cC,muDirC}];
+nowC=ctC[];apC=aC[nowC]Exp[-bC[nowC]];azC=aC[nowC]Exp[2bC[nowC]];
+gC=CTensor[DiagonalMatrix[{-1,apC^2,apC^2,azC^2}],{-C1Chart,-C1Chart}];
+SetCMetric[gC,C1Chart,SignatureOfMetric->{3,1,0}];
+cdC=CovDOfMetric[gC];normalC=CTensor[{1,0,0,0},{C1Chart}];
+rayC=CTensor[{1,Sqrt[1-muDirC^2]/apC,0,muDirC/azC},{C1Chart}];
+transC=CTensor[{0,1,0,0},{C1Chart}];longC=CTensor[{0,0,0,1},{C1Chart}];
+clearC[x_]:=FullSimplify[ToValues[x]];
+tensor=<||>;
+tensor["unit_normal"]=clearC[normalC[-iaC]normalC[iaC]+1];
+tensor["null_ray"]=clearC[rayC[-iaC]rayC[iaC]];
+tensor["spatial_Killing_perp"]=clearC[rayC[iaC]rayC[ibC]cdC[-iaC][transC[-ibC]]];
+tensor["spatial_Killing_parallel"]=clearC[rayC[iaC]rayC[ibC]cdC[-iaC][longC[-ibC]]];
+tensor["directional_redshift"]=clearC[cC rayC[iaC]rayC[ibC]cdC[-iaC][normalC[-ibC]]-cC*(aC'[nowC]/aC[nowC]+bC'[nowC]*(3muDirC^2-1))];
+ClearAll[n0,lambda0,lambda1,lambda2,duration,energy,bind0,bind1,bind2,totalLambda,absorbed,parts,heat0,binding0,remaining];
+totalLambda=lambda0+lambda1+lambda2;
+absorbed=n0(1-Exp[-totalLambda duration]);
+parts=absorbed {lambda0,lambda1,lambda2}/totalLambda;
+heat0=parts.{energy-bind0,energy-bind1,energy-bind2};
+binding0=parts.{bind0,bind1,bind2};
+remaining=n0-absorbed;
+scalar["frozen_photon_ledger"]=FullSimplify[n0-remaining-Total[parts],Assumptions->totalLambda>0];
+scalar["frozen_energy_ledger"]=FullSimplify[energy (n0-remaining)-heat0-binding0,Assumptions->totalLambda>0];
+scalar["frozen_zero_time"]=Limit[absorbed,duration->0];
+scalar["frozen_initial_rate"]=FullSimplify[(D[absorbed,duration]/.duration->0)-n0 totalLambda];
+res=<|"runtime"->ToString[System`$Version,InputForm],"scalar"->scalar,"tensor"->tensor,
+ "all_zero"->And@@(TrueQ[#===0]&/@Flatten[Join[Values[scalar],Values[tensor]]]),
+ "scope"->"C2 optional q reference geometry + frozen H/He photon/heat ledger; no coupled chemistry"|>;
+Export["CAS_RESULT.json",res,"RawJSON"];
+Print[ExportString[res,"RawJSON"]];
+If[!res["all_zero"],Exit[7]];
