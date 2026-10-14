@@ -123,3 +123,5 @@ TABLE은 이 한 번씩의 측정에서 각각 약 0.56%, 1.15% 느렸다. 측�
 복구 영수증은 원래 다섯 case와 ZERO continuation의 종료를 기록하고, 기존 직렬 후속 단계인 `SHEAR_PLUS` continuation handoff를 허용했다. 실제 `post_plus_epoch_dispatch.py --start-detached`는 observer 생성 후 solver `Popen` 직전의 `LIVE_WORKERS_OR_CHILDREN_HOLD`에서 멈췄다. 과학 실행 PID 확인 영수증과 continuation 출력은 없고, 예약된 첫 시도와 raw traceback은 그대로 보존했다. 실패 시점에 차단된 프로세스의 PID/argv는 남지 않아 transient 오검출을 단정할 수 없다. 독립 검토는 광범위한 argv-operand 판별식의 결함을 지적했지만 이를 이번 실패의 실제 원인으로 확정하지 않았다.
 
 새 `PLUS_PRELAUNCH_RECOVERY_001` 계약은 첫 예약 시도 1회와 관측 solver 시작 0회를 구분하고, 기존 science binary·config·predecessor·물리 한도를 바꾸지 않는 한 번의 예약 복구 준비만 허용한다. 변경 부분의 별도 독립 검토 전에는 solver를 실행하지 않는다. `SHEAR_HALF_PLUS` continuation은 PLUS 결과 판정과 observer 종료 이후의 별도 예약 순서를 기다린다. 따라서 현재 full ZERO 그림 외 signed 전구간 그림, paired 전구간 response, 수렴 판정은 여전히 없다.
+
+복구 구현은 단일 제조 fixture 8개 분기를 통과했고 변경 부분 독립 검토가 `PASS_SCOPED_PRELAUNCH_RECOVERY`를 발급했다. fresh local/NCP/pending-slot 검사를 거쳐 복구 명령을 한 번 실행했으며, 두 번째 누적 PLUS 시도에서 실제 solver launcher PID 1843269의 `PROCESS_ACKNOWLEDGED`와 새 science checkpoint 생성을 확인했다. 이는 계산 시작의 증거이며 종료나 과학 PASS가 아니다. 첫 실패 영수증은 보존했고 누적 PLUS 시도는 2회, 관측 solver 시작은 1회다. 진행 중인 실행의 자연 종료와 전구간 검토를 기다린다.
