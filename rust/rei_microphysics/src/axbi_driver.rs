@@ -45,6 +45,8 @@ pub struct DriverConfig {
     pub max_rhs: usize,
     pub max_wall_s: f64,
     pub spectra_every_accepted: usize,
+    /// Explicit per-stage total output allocation; physical controls unchanged.
+    pub output_budget_mib: usize,
 }
 impl DriverConfig {
     /// Exact choices frozen in SCENARIO_LOCK; callers select explicit variants.
@@ -66,6 +68,7 @@ impl DriverConfig {
             max_rhs: 2000000,
             max_wall_s: 1200.0,
             spectra_every_accepted: 60,
+            output_budget_mib: 256,
         }
     }
     pub fn read(text: &str) -> Result<Self, ForwardError> {
@@ -102,14 +105,30 @@ impl DriverConfig {
                 "max_rhs" => number!(max_rhs),
                 "max_wall_s" => number!(max_wall_s),
                 "spectra_every_accepted" => number!(spectra_every_accepted),
+                "output_budget_mib" => number!(output_budget_mib),
                 _ => return Err(err("AXBI_CONFIG_KEY")),
             }
         }
         c.validate()?;
         Ok(c)
     }
+    pub fn scientific_output_budget_bytes(&self) -> Result<u64, ForwardError> {
+        match self.output_budget_mib {
+            256 => Ok(224 * 1024 * 1024),
+            2048 => Ok(1920 * 1024 * 1024),
+            _ => Err(err("AXBI_OUTPUT_ALLOCATION")),
+        }
+    }
+    pub fn launcher_reserve_bytes(&self) -> Result<u64, ForwardError> {
+        match self.output_budget_mib {
+            256 => Ok(32 * 1024 * 1024),
+            2048 => Ok(128 * 1024 * 1024),
+            _ => Err(err("AXBI_OUTPUT_ALLOCATION")),
+        }
+    }
     fn validate(&self) -> Result<(), ForwardError> {
-        if self.spectra_every_accepted == 0
+        if ![256, 2048].contains(&self.output_budget_mib)
+            || self.spectra_every_accepted == 0
             || !self.q_ref.is_finite()
             || !self.end_zbar.is_finite()
             || !(4.0..20.0).contains(&self.end_zbar)
@@ -866,7 +885,11 @@ impl Driver {
     ) -> Result<(), ForwardError> {
         let text = self.checkpoint_text(s)?;
         // Existing destination remains during temporary write: include both.
-        guard_output_bytes(out, text.len() as u64)?;
+        guard_output_bytes_with_limit(
+            out,
+            text.len() as u64,
+            self.config.scientific_output_budget_bytes()?,
+        )?;
         write_checkpoint(path, &text)
     }
     pub fn read_checkpoint(&self, path: &Path) -> Result<DriverState, ForwardError> {
@@ -1109,13 +1132,23 @@ fn directory_bytes(out: &Path) -> Result<u64, ForwardError> {
     }
     Ok(total)
 }
-/// Scientific files have224MiB; launcher streams/envelope have32MiB reserved.
+/// Legacy pilot guard:224MiB scientific and32MiB launcher. Driver methods
+/// use their explicit stage allocation (full1920MiB plus128MiB).
 /// Reject before any batch write; include nested raw/checkpoint directories.
 pub fn guard_output_bytes(out: &Path, new_bytes: u64) -> Result<(), ForwardError> {
+    guard_output_bytes_with_limit(out, new_bytes, SCIENCE_OUTPUT_BUDGET_BYTES)
+}
+/// The resource allocation is bound by DriverConfig; this guard has no role
+/// in solver/model/tolerance selection.
+pub fn guard_output_bytes_with_limit(
+    out: &Path,
+    new_bytes: u64,
+    scientific_bytes: u64,
+) -> Result<(), ForwardError> {
     if directory_bytes(out)?
         .checked_add(new_bytes)
         .ok_or(err("AXBI_OUTPUT_BYTES_OVERFLOW"))?
-        > SCIENCE_OUTPUT_BUDGET_BYTES
+        > scientific_bytes
     {
         return Err(err("AXBI_OUTPUT_CAP"));
     }
@@ -1154,9 +1187,10 @@ impl Driver {
         let bytes = hv.len() + av.len() + pv.len() + lv.len() + fv.len();
         // Reserve exact bytes for next snapshot plus atomic current checkpoint.
         let checkpoint_bytes = self.checkpoint_text(s)?.len();
-        guard_output_bytes(
+        guard_output_bytes_with_limit(
             out,
             (bytes + terminal_spectrum_reserve + 2 * checkpoint_bytes) as u64,
+            self.config.scientific_output_budget_bytes()?,
         )?;
         h.write_all(&hv).map_err(ioerr)?;
         a.write_all(&av).map_err(ioerr)?;
@@ -1234,7 +1268,11 @@ impl Driver {
         self.output_row(s, case, &mut h, &mut a, &mut pv, &mut l, &mut fb)?;
         spectra.flush().map_err(ioerr)?;
         let checkpoint_bytes = self.checkpoint_text(s)?.len();
-        guard_output_bytes(out, (pv.len() + 2 * checkpoint_bytes) as u64)?;
+        guard_output_bytes_with_limit(
+            out,
+            (pv.len() + 2 * checkpoint_bytes) as u64,
+            self.config.scientific_output_budget_bytes()?,
+        )?;
         spectra.write_all(&pv).map_err(ioerr)?;
         *last = Some(time);
         Ok(true)
@@ -1408,7 +1446,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
                     &state,
                 )?;
                 driver.save_checkpoint_budget(out, &out.join("checkpoint.txt"), &state)?;
-                check_resources(out)?;
+                check_resources(out, driver.config.output_budget_mib as u64 * 1024 * 1024)?;
                 last_save = Instant::now();
             }
         }
@@ -1425,7 +1463,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
     fs::write(out.join("RETURN.txt"),format!("status={}\na={}\naccepted={}\nattempts={}\nrejections={}\nrhs_evaluations={}\nwall_s={}\nmax_newton_residual={}\nlast_error={}\nresult={outcome:?}\nscientific_admission=NOT_ISSUED\n",if outcome.is_ok(){"COMPLETE_REPRESENTED_INTERVAL"}else{"STOPPED_CHECKPOINTED"},state.a,state.accepted,state.attempts,state.rejects,state.rhs_evaluations,state.wall_elapsed_s,state.max_newton_residual,state.last_error)).map_err(ioerr)?;
     outcome
 }
-fn check_resources(out: &Path) -> Result<(), ForwardError> {
+fn check_resources(out: &Path, total_output_bytes: u64) -> Result<(), ForwardError> {
     let mut bytes = 0_u64;
     for e in fs::read_dir(out).map_err(ioerr)? {
         let e = e.map_err(ioerr)?;
@@ -1433,7 +1471,7 @@ fn check_resources(out: &Path) -> Result<(), ForwardError> {
             bytes += e.metadata().map_err(ioerr)?.len();
         }
     }
-    if bytes > 256 * 1024 * 1024 {
+    if bytes > total_output_bytes {
         return Err(err("AXBI_OUTPUT_CAP"));
     }
     if let Ok(status) = fs::read_to_string("/proc/self/status") {

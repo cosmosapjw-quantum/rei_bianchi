@@ -325,3 +325,66 @@ fn sparse_full_spectra_keep_each_abundance_and_align_terminal_resume_and_cap() {
     drop(f);
     std::fs::remove_dir_all(root).unwrap();
 }
+
+#[test]
+fn full_resource_allocation_preserves_pilot_default_and_exact_guard() {
+    let legacy = DriverConfig::read("end_zbar=19.8\nbackground_panels=64\n").unwrap();
+    assert_eq!(legacy.output_budget_mib, 256);
+    assert_eq!(
+        legacy.scientific_output_budget_bytes().unwrap(),
+        224 * 1024 * 1024
+    );
+    assert_eq!(legacy.launcher_reserve_bytes().unwrap(), 32 * 1024 * 1024);
+    let full = DriverConfig::read("end_zbar=19.8\nbackground_panels=64\noutput_budget_mib=2048\n")
+        .unwrap();
+    assert_eq!(
+        full.scientific_output_budget_bytes().unwrap(),
+        1920 * 1024 * 1024
+    );
+    assert_eq!(full.launcher_reserve_bytes().unwrap(), 128 * 1024 * 1024);
+    assert_eq!(
+        full.scientific_output_budget_bytes().unwrap() + full.launcher_reserve_bytes().unwrap(),
+        2048 * 1024 * 1024
+    );
+    assert!(DriverConfig::read("output_budget_mib=512\n").is_err());
+    let (old, oldstate) = Driver::new(legacy).unwrap();
+    let (new, newstate) = Driver::new(full.clone()).unwrap();
+    assert_eq!(oldstate.gas.fractions, newstate.gas.fractions);
+    assert_eq!(oldstate.gas.w_erg_per_h, newstate.gas.w_erg_per_h);
+    assert_eq!(old.energies, new.energies);
+    assert_eq!(oldstate.photons, newstate.photons);
+    assert_eq!(
+        old.background.point_at_scale(oldstate.a).unwrap(),
+        new.background.point_at_scale(newstate.a).unwrap()
+    );
+    let root =
+        std::env::temp_dir().join(format!("axbi_full_output_resource_{}", std::process::id()));
+    std::fs::create_dir(&root).unwrap();
+    let file = std::fs::File::create(root.join("sparse_resource_bytes")).unwrap();
+    file.set_len(SCIENCE_OUTPUT_BUDGET_BYTES + 1).unwrap();
+    assert!(guard_output_bytes(&root, 0).is_err());
+    assert!(guard_output_bytes_with_limit(
+        &root,
+        0,
+        full.scientific_output_budget_bytes().unwrap()
+    )
+    .is_ok());
+    assert!(old
+        .save_checkpoint_budget(&root, &root.join("checkpoint.txt"), &oldstate)
+        .is_err());
+    new.save_checkpoint_budget(&root, &root.join("checkpoint.txt"), &newstate)
+        .unwrap();
+    std::fs::remove_file(root.join("checkpoint.txt")).unwrap();
+    let limit = full.scientific_output_budget_bytes().unwrap();
+    file.set_len(limit - 100).unwrap();
+    assert!(guard_output_bytes_with_limit(&root, 100, limit).is_ok());
+    assert!(guard_output_bytes_with_limit(&root, 101, limit).is_err());
+    assert!(new
+        .save_checkpoint_budget(&root, &root.join("checkpoint.txt"), &newstate)
+        .is_err());
+    assert!(!root.join("checkpoint.txt").exists());
+    assert!(!root.join("checkpoint.tmp").exists());
+    drop(file);
+    std::fs::remove_file(root.join("sparse_resource_bytes")).unwrap();
+    std::fs::remove_dir(root).unwrap();
+}
