@@ -1,0 +1,119 @@
+{
+  "schema": "rei.axbi.signed_continuation_mechanism_review.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "node": "AX08",
+  "written_utc": "2026-10-14T11:14:21.442831+00:00",
+  "decision": "HOLD",
+  "scope": "Independent review of generic signed continuation mechanism preparation only",
+  "scientific_admission": "NOT_ISSUED",
+  "execution_authorized": false,
+  "resource_allocation_authorized": false,
+  "reviewer": {
+    "task": "signed_mechanism_review",
+    "independent_of_implementation": true,
+    "role": "read-only scientific review",
+    "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED"
+  },
+  "checkout": {
+    "branch": "codex/rux-science-delivery-20261014",
+    "base_published_head": "f9f6dcdfc3bbb84a55d46b2efdf45f6968058a72",
+    "observed_head": "fd58881fe68c3e9cc4a5979eff588bd7c5f1c9cb",
+    "worker_paths_untracked": true,
+    "git_actions": 0
+  },
+  "reviewed_input_sha256": {
+    "research/axbi_goal_20261014/driver/full/SIGNED_CONTINUATION_MECHANISM_DECISION.json": "80dd0bf70778f82a8bd10e1bb603fa31d270cc0dcfdfd00b9c8ddf07c7855e9a",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/PREPARATION_RECEIPT.json": "4a98f3e74d91bd46be7111b3b71d0a6a2e82c0fcc97a40fcb8a12a987efd4300",
+    "research/axbi_goal_20261014/driver/full/compose_signed_history.py": "a39ce861abae665390f150488b2cc8f1fdc7572fe25104ee98405af93ad75db2",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/raw/owned.diff": "8f4a4f2243806c05ae3270bdb742d0d00db3e4acbafad287f826aeb70533897b",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/raw/cargo_test.stdout": "136c5cae20c949b7d58ea016096a33c68e00005d77ac7ddf414af11cc4c58f20",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/raw/cargo_test.stderr": "a0002987e251be7b0ee7f683e4d32c0c70304de08206fe127693cbb444f758fa",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/raw/cargo_build.stderr": "8bc530c0eedfba2df4e715c7d5599438031ab76254552e7da07403d1a70f59e2",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/raw/composition_fixture.stdout": "8e969a912da4a6cc0c423fd584ab0944298ef6b009296d7124e205dd660b1163",
+    "rust/rei_microphysics/examples/axbi_signed_resource_continuation.rs": "37a14f2c879dfa60ab8d654272f5a3d4e0f7eb659838cee76458efb4f0dff446",
+    "rust/rei_microphysics/tests/axbi_signed_resource_continuation.rs": "49eb5c29fbc02191f9864771bc023076dbb39c695eeb0a575032ee8f06cb7957"
+  },
+  "verified_findings": [
+    {
+      "surface": "source compatibility",
+      "status": "PASS_SCOPED",
+      "evidence": "Independently reconstructed all 17 compiled_identity inputs. Current joined bytes SHA256 4de69c1e68ebd395fe2d0b5580d901b9a82bde86cadbd11bdd07e5ad2042b4a1; replacing only axbi_driver.rs with preserved driver_source.before.rs produces d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185. Exact diff adds only 4096 allocation arms and allowed allocation value. Numerical kernels, original 256/2048 semantics, clocks, checkpoint schema and cadence remain identical."
+    },
+    {
+      "surface": "artifact identity",
+      "status": "PASS_SCOPED",
+      "evidence": "All artifact_sha256 and preserved_existing_sha256 entries in preparation receipt match current bytes; decision SHA256 matches frozen 80dd0bf70778f82a8bd10e1bb603fa31d270cc0dcfdfd00b9c8ddf07c7855e9a."
+    },
+    {
+      "surface": "binding and preparation templates",
+      "status": "PASS_BY_INSPECTION_WITH_TEST_LIMITS",
+      "evidence": "CLI checks binding SHA, both true execution flags, whitelist/segment, all required keys, exact per-case original config path/hash/q_ref, predecessor case/config/checkpoint/RETURN/source hashes, authority path/hash and matching payload, exact decision/review/current source bytes, and executing binary hash before run_segment. Only resource fields are changed in an in-memory config, with positive finite additions, checked integer sums and retained original RHS ceiling. Three templates have false execution/start flags and omit terminal/state/caps/authority. No template can reach Driver construction or output creation through cli. Terminal classification remains a later per-case authority obligation; matching terminal bytes alone is not that classification."
+    },
+    {
+      "surface": "checkpoint, clock and charged counters",
+      "status": "PASS_SCOPED",
+      "evidence": "Unchanged public read_checkpoint enforces exact background time/b, initial energy, complete photon shape, next-step range and validation. Wrapper matches full restored DriverState debug payload and 392 photons, retains cumulative fields and emits predecessor boundary via public output APIs. Existing component tests meaningfully compare all three signs against uninterrupted public-kernel evolution, carried wall, all output boundaries, output-cap rollback with retained charged counters, endpoint and cap handling."
+    },
+    {
+      "surface": "composition",
+      "status": "PASS_BY_INSPECTION_AND_NARROW_FIXTURE_ONLY",
+      "evidence": "Composer permits exactly OLD -> NEW with exact decision/review relation, binds actual authority/predecessor/segment artifacts, checks final endpoint and checkpoint counters, joins all five streams with one exact shared boundary group removed, preserves both source epochs, and calls existing load_case before publishing canonical RETURN. Full feedback/tau remain PENDING. Fixture exercises join_csv/check_counters/verify_epochs only; full compose and load_case were not exercised."
+    }
+  ],
+  "blocking_findings": [
+    {
+      "id": "SCM-R1",
+      "severity": "HIGH",
+      "current_task_blocking": true,
+      "classification": "EXECUTION_GLUE_STOPPING_RULE_DEFECT_NOT_NUMERICAL_KERNEL_DEFECT",
+      "path": "rust/rei_microphysics/examples/axbi_signed_resource_continuation.rs",
+      "lines": [
+        140,
+        170
+      ],
+      "field": "run_segment adaptive_step Err branch",
+      "finding": "After logging adaptive_step Err, the wrapper returns false and continues unless consecutive_rejects >= 30, next_dln_a < 1e-10, or RHS cap is reached. This retries a scientific/unknown failure and can replace the first error with a later runtime cap, violating the frozen first-guard stop and no automatic retry rule.",
+      "evidence_kind": "DIRECT_SOURCE_INSPECTION; no new execution or fault injection performed",
+      "minimal_falsifier": "Use existing valid small manufactured component with max_attempts = starting.attempts + 1 and otherwise ample caps. Public adaptive_step begins one tentative trial then returns AXBI_TENTATIVE_CAP before a second trial. Current glue logs that error, falls through false/continue, and returns AXBI_RUNTIME_CAP at the next loop instead of preserving the first error. Require exact AXBI_TENTATIVE_CAP in returned error and RETURN result, unchanged accepted physical state, one charged tentative, retained RHS/comparison/rejection accounting, and no subsequent adaptive call."
+    }
+  ],
+  "test_limitations": [
+    "Five component tests passed and release build exited zero in saved raw logs; reviewer verified their hashes and inspected tests, without rerunning them.",
+    "Wrong-epoch test starts from execution_authorized=false and therefore does not establish that the epoch-specific gate rejects. Wrong original config/checkpoint/terminal identity paths are inspected but not exercised by this suite. These coverage limits must not be described as complete CLI rejection coverage.",
+    "Manufactured composition fixture uses simplified CSV schemas and never invokes compose/load_case. It establishes stream joining and exact epoch whitelist only, not completed scientific-history validity."
+  ],
+  "bounded_targeted_repair": {
+    "authorization": "One minimal lower-tier code repair is approved in principle; executable verification requires explicit bounded quota supplement before any test command. This review grants no scientific run, resource segment, publication or Git permission.",
+    "allowed_paths": [
+      "rust/rei_microphysics/examples/axbi_signed_resource_continuation.rs",
+      "rust/rei_microphysics/tests/axbi_signed_resource_continuation.rs",
+      "research/axbi_goal_20261014/driver/full/signed_continuation_001/"
+    ],
+    "change": "In run_segment, retain first error logging/flush and return Err(e) unconditionally for every adaptive_step Err. Preserve ordinary Ok(false) local-error adaptivity and all numerical kernels/tolerances/caps. Add one minimal regression using the tentative-cap falsifier above. Store new raw logs and a supplemental receipt without overwriting preparation raw evidence or resetting counters.",
+    "required_quota_amendment": {
+      "additional_cargo_test_invocations": 1,
+      "additional_release_build_invocations": 0,
+      "additional_composition_fixture_invocations": 0,
+      "scientific_starts": 0,
+      "automatic_retries": 0
+    },
+    "proposed_test_command": "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --locked --target-dir research/axbi_goal_20261014/driver/full/signed_continuation_001/target --test axbi_signed_resource_continuation <new_first_error_regression_name> -- --exact",
+    "stopping_rule": "One prescribed targeted test invocation after an explicit quota amendment. Preserve first failure; stop and return observed diff/raw outcome for changed-surface independent review. No further retry or adjacent suite.",
+    "binary_caveat": "Existing release binary embeds the reviewed defective wrapper and is not repaired by a source edit or test build. No future execution binding may reuse it as the repaired artifact. A separately authorized bounded release rebuild and new binary identity are needed before any later per-case execution review."
+  },
+  "accounting": {
+    "preparation_cargo_invocations_used": 2,
+    "preparation_cargo_invocations_cap": 2,
+    "composition_fixture_invocations_used": 1,
+    "composition_fixture_invocations_cap": 1,
+    "review_new_test_invocations": 0,
+    "review_new_build_invocations": 0,
+    "review_scientific_process_starts": 0,
+    "review_writes": [
+      "research/axbi_goal_20261014/reviews/SIGNED_CONTINUATION_MECHANISM_REVIEW.json"
+    ],
+    "historical_task_identity_and_costs_preserved": true
+  },
+  "positive_transition": "After authority supplies one bounded test supplement, lower-tier worker applies SCM-R1 and runs the single targeted regression; fresh changed-surface review can close mechanism preparation. Signed case launches remain blocked until actual terminal classification, per-case finite caps, exact rebuilt binary binding and shared scheduler handoff are independently authorized. No full-history feedback/tau, accuracy, continuum, or physical claim follows from mechanism PASS.",
+  "review_loop_stopping_rule": "Only SCM-R1 targeted repair and one changed-surface recheck. Do not expand to unrelated governance or rerun adjacent completed science."
+}

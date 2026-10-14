@@ -1,0 +1,120 @@
+{
+  "schema": "rei.axbi.signed_continuation_repair_authority.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "node": "AX08",
+  "written_utc": "2026-10-14T11:16:04.124485+00:00",
+  "decision": "AUTHORIZE_ONE_TARGETED_SCM_R1_REPAIR_WITH_ONE_TEST_AND_ONE_RELEASE_REBUILD_SUPPLEMENT",
+  "scientific_admission": "NOT_ISSUED",
+  "solver_execution_authorized": false,
+  "per_case_resource_allocation_authorized": false,
+  "authority_identity": {
+    "requested_model": "gpt-6-astra",
+    "role": "read-only scientific authority",
+    "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED"
+  },
+  "implementation_identity": {
+    "requested_model": "gpt-6.1-sol",
+    "requested_effort": "medium",
+    "observed_runtime_identity_or_null": null
+  },
+  "frozen_inputs": {
+    "research/axbi_goal_20261014/reviews/SIGNED_CONTINUATION_MECHANISM_REVIEW.json": "93b7bf2aa1e3aeafb38afb437195c95689824cb20ccdc74f0986aa9e9ef0e832",
+    "research/axbi_goal_20261014/driver/full/signed_continuation_001/PREPARATION_RECEIPT.json": "4a98f3e74d91bd46be7111b3b71d0a6a2e82c0fcc97a40fcb8a12a987efd4300",
+    "research/axbi_goal_20261014/driver/full/SIGNED_CONTINUATION_MECHANISM_DECISION.json": "80dd0bf70778f82a8bd10e1bb603fa31d270cc0dcfdfd00b9c8ddf07c7855e9a",
+    "rust/rei_microphysics/examples/axbi_signed_resource_continuation.rs": "37a14f2c879dfa60ab8d654272f5a3d4e0f7eb659838cee76458efb4f0dff446",
+    "rust/rei_microphysics/tests/axbi_signed_resource_continuation.rs": "49eb5c29fbc02191f9864771bc023076dbb39c695eeb0a575032ee8f06cb7957"
+  },
+  "finding": {
+    "id": "SCM-R1",
+    "classification": "EXECUTION_GLUE_STOPPING_RULE_DEFECT_NOT_NUMERICAL_KERNEL_FAILURE",
+    "confirmed": "Current adaptive_step Err branch logs error then false/continue unless selected limits bind. A max_attempts=starting.attempts+1 fixture produces AXBI_TENTATIVE_CAP inside first comparison; current loop can replace it with next-iteration AXBI_RUNTIME_CAP. This violates first-error stopping.",
+    "scope": "One affectedgenericwrapper branch and one meaningful regression. Existing library,oldZERO/PLUSwrappers,composer andallprevious raw evidence remain unchanged."
+  },
+  "authorized_change": {
+    "code": "After the existing first-error log and flush,unconditionally return Err(e) for every adaptive_step Err. Delete only the conditional swallowing/retry logic in that branch. Preserve Ok(false) normal local-error adaptivity,its existing guards andlogging,all numerical kernels/tolerances/caps,and terminal preservation behavior.",
+    "test_name": "adaptive_error_preserves_first_tentative_cap_and_charged_state",
+    "regression": "Use a valid existing smallmanufactured component,with max_attempts=starting.attempts+1 and ample othercaps. Require wrapper error and saved RETURN result exactly AXBI_TENTATIVE_CAP rather than AXBI_RUNTIME_CAP; exactly one errorlog and no local_metric fallback row; no added acceptedstate/history row; physical a/gas/photons/ledgers unchanged; attempts+=1,comparisons+=1,rejections+=1,consecutive_rejects+=1,nextstep halved; positive actual RHS charge retained. Compare full chargedstate against one direct publicadaptive_step invocation on samefixture if needed,excluding measuredwall. Require durablecheckpoint/terminal preserve those chargedcounts and unchangedphysicalstate.",
+    "no_extra_scope": "No generalized errorclassification refactor,CLIrejection coverage expansion,composition fixture rerun,old test suite replay,or physicaltrajectory run."
+  },
+  "supplement": {
+    "additional_commands_max": 8,
+    "additional_wall_seconds_max": 600,
+    "additional_cargo_test_invocations": 1,
+    "additional_release_build_invocations": 1,
+    "additional_composition_fixture_invocations": 0,
+    "additional_raw_output_mib_max": 128,
+    "additional_build_artifact_mib_max": 512,
+    "scientific_solver_starts": 0,
+    "automatic_retries": 0,
+    "accounting": "Add to original same-goal/task preparation; never reset prior2Cargo+1fixture,13shell commands and3read-onlygit subprocesses reported by PREPARATION_RECEIPT. This supplement permits total4Cargo and1fixture. Original24-command ceiling remains sufficient if previous13+atmost8=21; record all actual commands including any additional priorstarted ones instead of manufacturing a reset. Preserve original1800s allocation and add atmost600s supplemental wall explicitly. Raw/build supplements are separately reported; no unused allowance is called actualcost."
+  },
+  "prescribed_commands": {
+    "test": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/rei_microphysics/Cargo.toml",
+      "--locked",
+      "--target-dir",
+      "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/target",
+      "--test",
+      "axbi_signed_resource_continuation",
+      "adaptive_error_preserves_first_tentative_cap_and_charged_state",
+      "--",
+      "--exact"
+    ],
+    "release_build": [
+      "cargo",
+      "build",
+      "--release",
+      "--manifest-path",
+      "rust/rei_microphysics/Cargo.toml",
+      "--locked",
+      "--target-dir",
+      "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/target",
+      "--example",
+      "axbi_signed_resource_continuation"
+    ],
+    "order": "Apply exactrepair andregression,run onefiltered test; require exactly1selected/1passed/0failed. Only afterPASS run one releasebuild of changedexample. Exit0 with0selected tests is HOLD,not PASS. Preserve failure; no automatic rerun or broad test invocation."
+  },
+  "allowed_paths": {
+    "editable": [
+      "rust/rei_microphysics/examples/axbi_signed_resource_continuation.rs",
+      "rust/rei_microphysics/tests/axbi_signed_resource_continuation.rs"
+    ],
+    "new_artifacts": [
+      "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/"
+    ],
+    "read_only_preserved": [
+      "research/axbi_goal_20261014/reviews/SIGNED_CONTINUATION_MECHANISM_REVIEW.json",
+      "research/axbi_goal_20261014/driver/full/signed_continuation_001/PREPARATION_RECEIPT.json",
+      "research/axbi_goal_20261014/driver/full/SIGNED_CONTINUATION_MECHANISM_DECISION.json",
+      "research/axbi_goal_20261014/driver/full/signed_continuation_001/raw",
+      "research/axbi_goal_20261014/driver/full/signed_continuation_001/target"
+    ],
+    "required_new_receipt": "research/axbi_goal_20261014/driver/full/signed_continuation_001/repair_001/REPAIR_RECEIPT.json",
+    "independent_review_output": "research/axbi_goal_20261014/reviews/SIGNED_CONTINUATION_REPAIR_REVIEW.json",
+    "forbidden": "No composer/library/Cargo.toml/oldwrapper/binary/config/run/STATE/report edits; no git orprocess actions. No simultaneouswriters; controllerassigns originalimplementationworker or another explicitly scoped lower-tierworker."
+  },
+  "binary_disposition": {
+    "existing_release_binary": "The existing generic releasebinary embeds the reviewed defectivewrapper. Sourcechange does not repair it; it is invalid forfuture repairedexecutionbinding immediately upon sourcechange and remains preserved as firstfailedpreparation evidence. Do not overwrite its historicalartifact orrepresent itsoldSHA asfixed.",
+    "rebuild": "Use separate repair_001/target and record new binarypath/SHA,newexamplesource/testSHA,unchangedcompiledlibraryidentity4de69c1e68ebd395fe2d0b5580d901b9a82bde86cadbd11bdd07e5ad2042b4a1 and exact test/build raw outcomes. The genericexample is not an input ofcompiled_identity,so libraryidentityshouldremainunchanged.",
+    "futurebinding": "Future per-casebindings must name exact newlyrebuilt revieweracceptedbinary; oldtemplate/preparationreceipts remainhistorical andfalseexecution templates stayfalse. No stalebinaryfallback."
+  },
+  "return_and_review": {
+    "required": "New supplementalreceipt links originaldecision,HOLDreview,preparationreceipt andthisauthority byhash; records before/afterdiff,exactargv/cwd/exit/wall/CPU/RSS,testselectioncount,newbinarySHA,oldbinarypreservation,actualadded/cumulativecosts andallfailures.",
+    "review_scope": "Fresh non-implementer rechecks only SCM-R1 branch,one regression,newrawresults andrebuiltartifact identity. Existingreview limits on CLI rejection/fullcomposecoverage remain stated; no claim ofnewcoverage.",
+    "stop_rule": "Stop on first targetedtest/buildfailure,cap orunexpectedscientific/sourcechange andreturn preservedraw. This is the one boundedrepair; no repeatallocation oradjacentcheck without exactnewreason.",
+    "positive_transition": "Targetedtest+releasebuildPASS -> changed-surface independentreview -> mechanismpreparation canclose. Actual MINUS/half continuations still need actualterminalclassification,finiteper-casecaps,exactnewbinarybinding andsharedschedulerhandoff. No scientificstart oradmission follows automatically."
+  },
+  "authority_accounting": {
+    "read_commands": 2,
+    "decision_write_commands": 1,
+    "tests": 0,
+    "builds": 0,
+    "solver_starts": 0,
+    "git_actions": 0,
+    "process_actions": 0,
+    "only_written_path": "research/axbi_goal_20261014/driver/full/SIGNED_CONTINUATION_REPAIR_AUTHORITY.json"
+  }
+}
