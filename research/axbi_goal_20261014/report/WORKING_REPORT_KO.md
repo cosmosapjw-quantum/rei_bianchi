@@ -127,3 +127,11 @@ TABLE은 이 한 번씩의 측정에서 각각 약 0.56%, 1.15% 느렸다. 측�
 복구 구현은 단일 제조 fixture 8개 분기를 통과했고 변경 부분 독립 검토가 `PASS_SCOPED_PRELAUNCH_RECOVERY`를 발급했다. fresh local/NCP/pending-slot 검사를 거쳐 복구 명령을 한 번 실행했으며, 두 번째 누적 PLUS 시도에서 실제 solver launcher PID 1843269의 `PROCESS_ACKNOWLEDGED`와 새 science checkpoint 생성을 확인했다. 이는 계산 시작의 증거이며 종료나 과학 PASS가 아니다. 첫 실패 영수증은 보존했고 누적 PLUS 시도는 2회, 관측 solver 시작은 1회다. 진행 중인 실행의 자연 종료와 전구간 검토를 기다린다.
 
 새 BASS_HE PR #55/Dropbox R10 short-clock 공급 자료도 확인했다. 해당 Simpson 진단은 기존 양의 네 단항 $H$ source에 대한 짧은 proper-time exact-real 절단오차 경계만 제공한다. binary64/native 적응 적분과의 일치·roundoff 상계·production 속도 이득이 없어 현재 abundance background/driver 입력을 교체하지 않았다. BASS/REC의 다른 R9/R8 자료도 optical·기하 clock 또는 저장 구간 진단이며 이 보고서의 선택된 chemistry 이력을 바꾸지 않는다. 자세한 source commit·ZIP SHA와 claim 경계는 `../external_suppliers/UPDATE_SCAN_20261014_R11.json`에 남겼다.
+
+## 원래 다섯 case의 실제 부분 구간 abundance 그림
+
+원래 ZERO, ±0.01, ±0.005 다섯 이력은 모두 200001개 저장 행을 가지며 같은 $a=0.08873654701704167$ ($\bar z=10.269313869154184$)에서 자원 한도로 종료했다. 각 경우 4003개 시간순 표시 표본을 원자료 행과 정확히 대조했고, 그림·표본·입력 source/config/CSV 해시를 `signed_terminal_partial_32d11e733155/`에 보존했다. 독립 그림 검토 판정은 `PASS_SCOPED_SIGNED_TERMINAL_PARTIAL_FIGURES`다. 공통 $a$는 공통 proper time을 뜻하지 않는다. 이 그림은 아직 $\bar z=4$에 도달하지 않은 실제 부분 이력의 표시이며 전단 응답의 해상·부호·수렴 또는 극미량 trace 정확도 판정이 아니다.
+
+![원래 다섯 case의 실제 부분 abundance 대 경과 proper time](signed_terminal_partial_32d11e733155/abundance_vs_elapsed_time.png)
+
+![원래 다섯 case의 실제 부분 abundance 대 시간순 gas temperature](signed_terminal_partial_32d11e733155/abundance_vs_Tgas_time_ordered.png)
