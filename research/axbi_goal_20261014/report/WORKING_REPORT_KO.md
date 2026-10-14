@@ -132,6 +132,8 @@ TABLE은 이 한 번씩의 측정에서 각각 약 0.56%, 1.15% 느렸다. 측�
 
 원래 ZERO, ±0.01, ±0.005 다섯 이력은 모두 200001개 저장 행을 가지며 같은 $a=0.08873654701704167$ ($\bar z=10.269313869154184$)에서 자원 한도로 종료했다. 각 경우 4003개 시간순 표시 표본을 원자료 행과 정확히 대조했고, 그림·표본·입력 source/config/CSV 해시를 `signed_terminal_partial_32d11e733155/`에 보존했다. 독립 그림 검토 판정은 `PASS_SCOPED_SIGNED_TERMINAL_PARTIAL_FIGURES`다. 공통 $a$는 공통 proper time을 뜻하지 않는다. 이 그림은 아직 $\bar z=4$에 도달하지 않은 실제 부분 이력의 표시이며 전단 응답의 해상·부호·수렴 또는 극미량 trace 정확도 판정이 아니다.
 
+MINUS와 HALF_MINUS의 다음 구간은 기존 검토된 signed continuation binary로 각각 한 번만 실행하도록 case별 권한·비공개 starting-state binding을 준비했다. 392 photon stock, 24 ledger, 상태·counter의 checkpoint 일치를 독립 검토해 `PASS_SCOPED_EXACT_BINDINGS_CONDITIONAL_LAUNCH`를 받았다. 이는 binding 준비 판정이며 실행 release가 아니다. 현재 PLUS의 자연 종료·판정 후 HALF_PLUS를 먼저 진행하고, 그 다음 MINUS와 HALF_MINUS를 순서대로 예약한다.
+
 ![원래 다섯 case의 실제 부분 abundance 대 경과 proper time](signed_terminal_partial_32d11e733155/abundance_vs_elapsed_time.png)
 
 ![원래 다섯 case의 실제 부분 abundance 대 시간순 gas temperature](signed_terminal_partial_32d11e733155/abundance_vs_Tgas_time_ordered.png)
