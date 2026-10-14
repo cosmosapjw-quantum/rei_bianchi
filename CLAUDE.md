@@ -108,7 +108,10 @@ Active "fastest-track" work (FLRW/Bianchi-I paired histories, task cards
 `REI-F0x`) lives in `docs/atomic_reionization_handoff_20261004_v1/`
 (`GLOBAL_DAG.json`, `TASK_CARDS.jsonl`, `runtime_inputs/`, `runtime_returns/`)
 with research↔Codex sync notes in `docs/fastest_track_chat/` (mostly Korean).
-Next ready task: `python3 docs/atomic_reionization_handoff_20261004_v1/tools/task_packet.py next --thread rei_bianchi`.
+For current planning, read `docs/fastest_track_chat/CURRENT_PLAN.json` before
+using the historical `REI-F0x` task packet. The 2026-10-12 plan names `RUX-P0`
+and `docs/fastest_track_chat/REI-ATOMIC-REUSE-RESET-20261012/CODEX_START_KO.md`
+as the next task and document; refresh that plan before execution.
 Run outputs: `runs/rei_fastest_v1/{first_interval,map_certificate,paired}`.
 
 ## External dependency

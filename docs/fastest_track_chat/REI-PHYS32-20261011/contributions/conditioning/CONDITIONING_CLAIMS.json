@@ -1,0 +1,84 @@
+{
+  "task": "REI-PHYS32-20261011",
+  "contributor": "/root/phys32_conditioning",
+  "role": "NONBLIND candidate contributor; not final independent decision reviewer",
+  "document": "PHYSICAL_ENCLOSURE_REQUIREMENTS_KO.md",
+  "decision_authority": "No final PROMOTE issued by this contributor",
+  "scientific_executions": 0,
+  "new_physical_evaluations": 0,
+  "independent_physical_data_credit": 0,
+  "claims": [
+    {
+      "id": "CC32-01",
+      "claim": "The fixed exact-real interpretation of the pinned source and serialized J is analytic on an open neighborhood of the support; this does not supply numerical derivative bounds or certify the native rounding map or physical fit accuracy.",
+      "evidence_status": ["derived"],
+      "evidence": ["PHYSICAL_ENCLOSURE_REQUIREMENTS_KO.md section 2, CS32.1-2", "../../inputs/PHYS31/contributions/kernel_scope/KERNEL_REGULARITY_AND_PROFILES_KO.md K31.1-3", "../../inputs/pinned_source/rust/rei_microphysics/src/atomic_provider.rs cross_section", "../../inputs/pinned_source/rust/rei_microphysics/src/coupled_primary.rs CHI and signatures"],
+      "assumptions": ["Exact source binary64 constants as real numbers", "Fixed serialized J", "Support remains inside the same source branch"],
+      "limits": ["No new interval or physical derivative evaluation", "No native floating-point differentiability claim", "No external atomic-fit accuracy revalidation"]
+    },
+    {
+      "id": "CC32-02",
+      "claim": "For fixed other inputs, J uncertainty propagates linearly through each kernel derivative; the r-th kernel derivative uses phi through order r+2, so function-value fit error alone does not certify high derivative accuracy.",
+      "evidence_status": ["derived"],
+      "evidence": ["PHYSICAL_ENCLOSURE_REQUIREMENTS_KO.md section 2.1, CS32.3-5"],
+      "assumptions": ["Input error boxes and derivative bounds exist on the declared interval", "Parameter perturbations remain in the same smooth branch"],
+      "limits": ["All actual J/input errors and coefficient-function norms are unevaluated", "Shared inputs are not independent physical data"]
+    },
+    {
+      "id": "CC32-03",
+      "claim": "A residual enclosure epsilon_r and slope lower bound kappa on a feasible box imply existence, uniqueness and distance epsilon_r/kappa when epsilon_r<kappa*eta; common nonzero A must be preserved, and off-root G_W equals Q*F_W+(F-A).",
+      "evidence_status": ["derived"],
+      "evidence": ["PHYSICAL_ENCLOSURE_REQUIREMENTS_KO.md section 3, CS32.6-9 and following G_W identity"],
+      "assumptions": ["Feasible closed root box", "Strict positive derivative lower bound", "Certified response and level errors", "Same exact A within each profile comparison"],
+      "limits": ["Stored w is not assumed to be an exact root of the serialized target A", "Redefining A as F(0,w_hat) changes the anchor unless equality is separately known", "Approximate-base width movement requires its own B_hat bound"]
+    },
+    {
+      "id": "CC32-04",
+      "claim": "Root, retained-node, weight, derivative-evaluation and input errors admit explicit absolute bounds for H4 and C using omega4 and omega2, with C5/C3 derivative-bound corollaries.",
+      "evidence_status": ["derived"],
+      "evidence": ["PHYSICAL_ENCLOSURE_REQUIREMENTS_KO.md section 4.1-4.3, CS32.10-16"],
+      "assumptions": ["Fixed exact m and R or separately accounted geometry uncertainty", "Normalized nonnegative estimated weights", "Declared node and evaluation error enclosures", "All derivative-modulus domains contain the relevant interpolation points"],
+      "limits": ["No new value of eta_x, eta_p, epsilon_H, epsilon_C, M3 or M5 was evaluated", "PHYS31 two-expression agreement is not used as a rigorous evaluation-error enclosure"]
+    },
+    {
+      "id": "CC32-05",
+      "claim": "With C>=kappa>0 and nonzero C_hat, |D4-D4_hat| is at most |alpha|*(epsilon_H/kappa+|H_hat|*epsilon_C/(kappa*|C_hat|)) plus assembly error; C_hat-epsilon_C is a usable pointwise lower bound only if strictly positive.",
+      "evidence_status": ["derived"],
+      "evidence": ["PHYSICAL_ENCLOSURE_REQUIREMENTS_KO.md section 4.4, CS32.17-18"],
+      "assumptions": ["Exact alpha, equal to 1/945 for the selected profile pair", "Certified H and C errors", "Nonzero estimated denominator"],
+      "limits": ["A pointwise denominator bound is not automatically a root-tube bound", "Near-zero H requires absolute rather than relative error interpretation", "No current physical epsilon_D number"]
+    },
+    {
+      "id": "CC32-06",
+      "claim": "An exact quartic root remainder bound and a coefficient error bound combine additively; sufficient branch sign requires |D4_hat|>epsilon_D+R, and sufficient gap sign uses the sum of the two branch coefficient and remainder bounds.",
+      "evidence_status": ["derived"],
+      "evidence": ["PHYSICAL_ENCLOSURE_REQUIREMENTS_KO.md section 5, CS32.19-22"],
+      "assumptions": ["The exact remainder theorem applies on the stated width and root tubes", "Same exact A and fixed common inputs within each comparison", "Errors and remainders uniform over any claimed input family"],
+      "limits": ["The remainder theorem itself is the separate theory contribution", "Two negative branch shifts do not determine the gap sign", "Shared input errors are not assumed to cancel", "No numeric physical valid-width certificate"]
+    },
+    {
+      "id": "CC32-07",
+      "claim": "For the selected P4 and uniform profiles, Delta f(delta,y)=delta^4/945 times the pi4-weighted mean of k4(y+delta*z), where pi4=315*(1-z^2)^4/256 is a positive probability density.",
+      "evidence_status": ["derived"],
+      "evidence": ["PHYSICAL_ENCLOSURE_REQUIREMENTS_KO.md section 6, CS32.23-25"],
+      "assumptions": ["k in C4 on the actual photon support", "The exact fixed profile pair", "Physical delta>=0 and shifted support containment"],
+      "limits": ["Four integrations by parts and exact primitive evaluation were done analytically, with no CAS or numeric moment execution", "Not an order theorem for arbitrary equal-variance profile pairs"]
+    },
+    {
+      "id": "CC32-08",
+      "claim": "The exact positive-kernel identity yields finite-width W_p<W_u if k4 is positive on the two packet supports and the same-level roots exist with positive slope; packet-local intervals can suffice for k4 while the slope requires its own larger domain.",
+      "evidence_status": ["derived"],
+      "evidence": ["PHYSICAL_ENCLOSURE_REQUIREMENTS_KO.md section 6, CS32.26-29"],
+      "assumptions": ["Common actual W geometry and mu2=1/3", "Same exact A", "Feasible roots and root segment", "Certified positive k4 on all visited photon packets", "Certified positive slope on the root segment"],
+      "limits": ["No actual-source interval sign certificate", "No inference of gap sign from individual branch order", "Existing point signs do not establish the required packet-local bounds"]
+    },
+    {
+      "id": "CC32-09",
+      "claim": "Actual physical finite-width sign, gap sign, valid-width numbers and original root/J/atomic-model uncertainty remain unresolved in this loop's zero-physical-evaluation conditioning contribution.",
+      "evidence_status": ["unresolved"],
+      "evidence": ["PHYSICAL_ENCLOSURE_REQUIREMENTS_KO.md section 7", "../../PHYSICS_CONTRACT.json", "../../inputs/PHYS31/independent/DECISION_REVIEW_KO.md", "../../inputs/PHYS31/contributions/numerics/QUARTIC_PROFILE_FIRST.json lines 1-260"],
+      "assumptions": [],
+      "limits": ["Physical HOLD", "[160,161] FAIL, tick 160, auxiliary escape FAIL", "HH/RCT/CR OFF, precision atomic PARKED", "Production source/default/runtime changes 0"]
+    }
+  ]
+}

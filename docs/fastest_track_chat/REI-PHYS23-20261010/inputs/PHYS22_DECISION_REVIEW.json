@@ -1,0 +1,365 @@
+{
+  "schema_version": "1.0",
+  "task": "REI-PHYS22_INITIAL_TIME_COUPLED_SHEAR_RESPONSE",
+  "recorded_utc": "2026-10-10T11:46:33.918471+00:00",
+  "verdict": "PROMOTE_SCOPED",
+  "research_stage_decision": "PROMOTE",
+  "physical_admission": "HOLD",
+  "decision_scope": "Local initial-time epsilon^2 radiation and coupled gas response, actual declared IC coefficients and signs as numerically checked, research report and next bounded PHYS23 input.",
+  "reviewer": {
+    "identity": "/root/phys22_decision",
+    "role": "separate final independent decision reviewer",
+    "model_label": "GPT-6 Astra",
+    "model_basis": "trusted host developer metadata",
+    "candidate_generation_participation": false,
+    "verification_design_participation": false,
+    "owner_self_review": false,
+    "full_history_context_inherited": true,
+    "blind_review": false,
+    "independence_limit": "Role/generation separate; parent full-history context inherited. Not context-blind or an independent native implementation."
+  },
+  "harness": {
+    "file": "physmath-research-harness-gpt6-astra-v4.0.0-20260908.zip",
+    "sha256": "dae76c90f2e5d691bcdd595dadbe470bacacba3bb2a036ff9788ffe7d3bfabb7",
+    "read_core_and_policies": [
+      "START_HERE.md",
+      "PROJECT_INSTRUCTIONS.md",
+      "docs/MODEL_ROUTING.md",
+      "policies/PHASE_GATES.md",
+      "policies/STOP_RULES.md",
+      "prompts/phases/08_external_decision_gate.md"
+    ]
+  },
+  "candidate": {
+    "path": "PHYS22_REPORT_KO.md",
+    "sha256": "a3d4ed48e753538eee763a3fe26931dfea6332132de15fc3a7b43b2b600797f6",
+    "bytes": 26662,
+    "read_scope": "Entire pre-unit-correction frozen report plus exact one-unit correction verified in final bytes",
+    "superseded_report_sha256": "a5521b69166bf52e18db54697c1ebb84c28966c68b2b9255898a35906c5b6547",
+    "superseded_report_preserved": "evidence/PHYS22_REPORT_KO_v1.md"
+  },
+  "source_binding": {
+    "repository": "cosmosapjw-quantum/rei_bianchi",
+    "input_commit": "3dc42c64ab32075f0a59c96af3ddf7435d9b7f97",
+    "input_tree": "668aee2a4e573826ee0b937897157a97825c70a8",
+    "scientific_src_tree": "cb69b4736dd046e4675557577eb8e0ead037d1f3",
+    "remote_binding_basis": "owner current immutable tree read consumed; reviewer made zero remote requests",
+    "local_source_files_verified": [
+      {
+        "path": "inputs/pinned_source/rust/rei_microphysics/examples/paired_history.rs",
+        "sha256": "b4f2bd67f0276766792ac8ff6dd53f314c5d507def726d8524a8af5b4bd076a3",
+        "git_blob": "38d46c64d10f35faff1c0f347d3223d515dfc033",
+        "bytes": 25066,
+        "local_identity_match": true
+      },
+      {
+        "path": "inputs/pinned_source/rust/rei_microphysics/src/atomic_provider.rs",
+        "sha256": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3",
+        "git_blob": "62211d8910cd332fffa8f94c6989cae77128916e",
+        "bytes": 12939,
+        "local_identity_match": true
+      },
+      {
+        "path": "inputs/pinned_source/rust/rei_microphysics/src/coupled_primary.rs",
+        "sha256": "62a950137d6b5c7b43e628578cc25a2a1a99b6f135d0872a734f9149aa61c1f8",
+        "git_blob": "b95dbea540d9ca4347f05d3aef76164e668e2d5f",
+        "bytes": 28715,
+        "local_identity_match": true
+      },
+      {
+        "path": "inputs/pinned_source/rust/rei_microphysics/src/ft03_controlled.rs",
+        "sha256": "61e11471482bb49d99e5d0eb79504d3f67538fbe6361653a0462d1abb0b672db",
+        "git_blob": "370fd2fa60521f2dc121ee81c7d24013a3b0d1e5",
+        "bytes": 14726,
+        "local_identity_match": true
+      },
+      {
+        "path": "inputs/pinned_source/rust/rei_microphysics/src/ft03_rates.rs",
+        "sha256": "1a97cd7a3555deeb4d8700376cd84580c5102127773bc3a235a29c33b0c1542f",
+        "git_blob": "b8a85ff37de160ecc576a168e4259ed23920a499",
+        "bytes": 2755,
+        "local_identity_match": true
+      },
+      {
+        "path": "inputs/pinned_source/rust/rei_microphysics/src/hhe_events.rs",
+        "sha256": "c100b08e034089c2d67b2102769ccdd51f1d29a2f388d6bb2dfe7984af93b290",
+        "git_blob": "57a63eee1e9d8c4aa2b5ed663dbea15619359f71",
+        "bytes": 9447,
+        "local_identity_match": true
+      },
+      {
+        "path": "inputs/pinned_source/rust/rei_microphysics/src/paired_runtime.rs",
+        "sha256": "b6c1d2a07ab51ff02318139ae18387b77f61859c08037347f788524df770ebe7",
+        "git_blob": "70eed18b07b6dd4297d8ef8da6d7e1be8e44456e",
+        "bytes": 23810,
+        "local_identity_match": true
+      }
+    ],
+    "source_semantic_read_scope": [
+      "paired_runtime initial_w/paired_initial/constants",
+      "atomic_provider HI fit/cutoff",
+      "ft03_rates coefficients",
+      "ft03_controlled local RHS",
+      "coupled_primary zero-photon raw call/thermal mapping/primary RHS",
+      "hhe_events constants and populations"
+    ]
+  },
+  "evidence_binding": {
+    "PHYSICS_CONTRACT.json": {
+      "sha256": "1706650c98b6b30f12e57b2af670113fe8ec30770ae2f48909823c30936de4a6",
+      "bytes": 3885
+    },
+    "SOURCE_MANIFEST.json": {
+      "sha256": "ee8de581b01a630f0e12c5b9923d2d5a5cfb3bcc43c230ad19cabd07407ee8e5",
+      "bytes": 2775
+    },
+    "evidence/OWNER_EXECUTION.json": {
+      "sha256": "a8ed084ba4527744dfb7606ff483532cb1815cbc67fefea2c857110942125875",
+      "bytes": 673
+    },
+    "evidence/initial_time_coefficients_v1.json": {
+      "sha256": "6c7a4f239ef48c2a7c60592fc048600317f1233f3028434ebd1b3c7e55682a79",
+      "bytes": 26723
+    },
+    "evidence/INDEPENDENT_COEFFICIENT_COMPARISON.json": {
+      "sha256": "5075ec47f98998c42b347b43fbd59e720ce17f1910fa4a3a729745f42114025d",
+      "bytes": 9131
+    },
+    "evidence/REPORT_DOCUMENT_CORRECTION.json": {
+      "sha256": "749cb1c67bee6229335f5d612516df5538b0deaec1382f4cfe5a941002aba105",
+      "bytes": 673
+    },
+    "code/initial_time_coefficients.py": {
+      "sha256": "919adcfa2f46df6ff5fd895c2800c987caf29228e9b09b1e2a006438a6cb4d6c",
+      "bytes": 13643
+    },
+    "code/compare_initial_coefficients.py": {
+      "sha256": "726aac97d67a58a7b16a3ac4eaeeab2371bf9aa783c5ecc50b258f29c59450c6",
+      "bytes": 3630
+    },
+    "contributions/radiation/INITIAL_TIME_RADIATION_KO.md": {
+      "sha256": "cd3ff830cceb4d654ca24fbd97f6a1fb83010cfc60acacd67153621bcda93c17",
+      "bytes": 16180
+    },
+    "contributions/radiation/INITIAL_TIME_SERIES_CHECK.json": {
+      "sha256": "fbea19efef78f823dafe1cae17eaa07ec59cdda8eee954b591bc7005fb85017e",
+      "bytes": 24785
+    },
+    "contributions/radiation/EXECUTION.json": {
+      "sha256": "ba8389a0a6fafc4e62e561966df4a8ad892eefbc9466b57b85e42967d1ea2ac2",
+      "bytes": 2236
+    },
+    "contributions/radiation/check_initial_time_series.py": {
+      "sha256": "b445a7969835edfd2e922d8de7f553a52154b34970569ad1b83ad9ae17852bd1",
+      "bytes": 13621
+    },
+    "contributions/radiation/DOCUMENT_CORRECTION.json": {
+      "sha256": "ff24cf9b39cef79d991f59e99a10c494085e3231b8abc9ee2e7a1b2c507a3a9f",
+      "bytes": 4414
+    },
+    "contributions/gas/INITIAL_GAS_RESPONSE_KO.md": {
+      "sha256": "2dbdf17cede8a12f6a3375cdece56c896fc0283c22de02018e1586c7090e8b3c",
+      "bytes": 15474
+    },
+    "contributions/gas/LOCAL_INITIAL_RESPONSE.json": {
+      "sha256": "3b86f79b98bc393673f6415828818c33c80a9979049aca39494348d0d1ef735c",
+      "bytes": 8145
+    },
+    "contributions/gas/EXECUTION.json": {
+      "sha256": "f144e7b1780019f8295d9e942bfdbb424210782dee907b8fd4da26b7d44764e0",
+      "bytes": 774
+    },
+    "contributions/gas/local_initial_response.py": {
+      "sha256": "1c54c1178bcfa7b2cdb29bd2163e65820f2b38205bd600b544d98e7a50116789",
+      "bytes": 10372
+    },
+    "contributions/gas/DOCUMENT_CORRECTION.json": {
+      "sha256": "756dc565d0d7180d06f680e0f32630723367919f50496f6f29d5fca32210809b",
+      "bytes": 1855
+    }
+  },
+  "claim_decisions": [
+    {
+      "id": "C1",
+      "claim": "One-cohort u2/u3 radiation kernel",
+      "evidence_states": [
+        "derived",
+        "numerically checked"
+      ],
+      "status": "PROMOTE_SCOPED",
+      "limits": "C2 leading; C3 and smooth local baseline for generic next coefficient; exact-rational checks on declared analytic diagnostics."
+    },
+    {
+      "id": "C2",
+      "claim": "Initial atom and continuous birth order/factor distinction",
+      "evidence_states": [
+        "derived",
+        "numerically checked"
+      ],
+      "status": "PROMOTE_SCOPED",
+      "limits": "Same full baseline; birth derivative A differs from cohort derivative T=A-HD."
+    },
+    {
+      "id": "C3",
+      "claim": "Coupled a3/a4 recurrence and gas-memory delay",
+      "evidence_states": [
+        "derived",
+        "numerically checked"
+      ],
+      "status": "PROMOTE_SCOPED",
+      "limits": "Includes initial-photon endpoint abundance matrix; gas-induced opacity memory begins later than direct baseline-opacity covariance."
+    },
+    {
+      "id": "C4",
+      "claim": "Actual initial HII/w/T t3 and indirect He t4 coefficients/signs",
+      "evidence_states": [
+        "derived",
+        "numerically checked"
+      ],
+      "status": "PROMOTE_SCOPED",
+      "limits": "Source-inspected continuum local coefficients; no rigorous interval sign enclosure or finite-time endpoint claim."
+    },
+    {
+      "id": "C5",
+      "claim": "Actual full HII/w/T t4 coefficients",
+      "evidence_states": [
+        "derived",
+        "numerically checked"
+      ],
+      "status": "PROMOTE_SCOPED",
+      "limits": "Requires third spectral derivative and temperature gradient drift; two full time integrators were not run."
+    },
+    {
+      "id": "C6",
+      "claim": "Thermal sign functional report equation 19",
+      "evidence_states": [
+        "derived"
+      ],
+      "status": "PROMOTE_SCOPED",
+      "limits": "Exact linear recombination of prior a3 and temperature-gradient formulas with fixed T,y under D; not counted as new numerical experiment."
+    },
+    {
+      "id": "C7",
+      "claim": "Count and leading primary-energy time-jet consistency",
+      "evidence_states": [
+        "derived",
+        "numerically checked"
+      ],
+      "status": "PROMOTE_SCOPED",
+      "limits": "Not a full gas-history ledger execution."
+    }
+  ],
+  "execution_evidence": {
+    "owner": {
+      "passed": 21,
+      "total": 21,
+      "exit_code": 0,
+      "exit_basis": "evidence/OWNER_EXECUTION.json"
+    },
+    "radiation": {
+      "passed": 52,
+      "total": 52,
+      "exit_code": 0,
+      "exit_basis": "contributions/radiation/EXECUTION.json"
+    },
+    "gas": {
+      "passed": 11,
+      "total": 11,
+      "exit_code": 0,
+      "exit_basis": "contributions/gas/EXECUTION.json"
+    },
+    "coefficient_comparison": {
+      "passed": 16,
+      "total": 16,
+      "status": "PASS",
+      "max_relative_difference": "7.7110535200123448191146829712824064688185649464712825797822478648342956295194323E-15",
+      "relative_tolerance": "5E-12",
+      "owner_reported_exit_code": 0,
+      "exit_basis": "owner report; comparison result itself records PASS"
+    },
+    "counts_are_independent_physical_laws": false,
+    "reviewer_new_scientific_runs": 0,
+    "reviewer_native_runs": 0,
+    "reviewer_gas_IVP_runs": 0,
+    "reviewer_closed_science_replays": 0,
+    "reviewer_remote_requests": 0,
+    "local_identity_check_tool_chunk": "05899e",
+    "science_execution_scope": "Review of recorded outputs, receipts and source/code; no scientific rerun by final reviewer."
+  },
+  "resolved_findings": [
+    {
+      "id": "R-DOC-01",
+      "severity": "medium",
+      "classification": "document formula transcription",
+      "finding": "Missing plus between A(C L)/12 and k3/4 in radiation RT10.",
+      "status": "RESOLVED",
+      "resolution": "Corrected plus; original preserved; scientific code/result unchanged."
+    },
+    {
+      "id": "R-DOC-02",
+      "severity": "low",
+      "classification": "document LaTeX/control characters",
+      "finding": "Radiation RT20/21 control characters and LaTeX, RT23 opening delimiter.",
+      "status": "RESOLVED",
+      "resolution": "Bounded text corrections; RT20 additional control found by contributor; originals/receipts preserved."
+    },
+    {
+      "id": "R-DOC-03",
+      "severity": "low",
+      "classification": "document units",
+      "finding": "Seven gas-note units put time exponent on entire compound unit.",
+      "status": "RESOLVED",
+      "resolution": "Explicit eV H^-1 s^-n, K s^-n and photon H^-1 s^-n; no numeric change."
+    },
+    {
+      "id": "R-DOC-04",
+      "severity": "medium",
+      "classification": "document units",
+      "finding": "Frozen report section 7 used reciprocal of eV-times-s for C Q unit.",
+      "status": "RESOLVED",
+      "resolution": "One exact replacement to eV s^-1; original frozen report preserved with SHA and correction receipt."
+    }
+  ],
+  "blocking_findings": [],
+  "blocking_findings_count": 0,
+  "fatal_findings_count": 0,
+  "mandatory_changes_remaining": 0,
+  "not_promoted": [
+    "finite-time remainder or endpoint trajectory",
+    "temperature crossover time",
+    "native stage differentiability",
+    "native floating-point or bitwise equivalence",
+    "Einstein-backreacted mean expansion",
+    "observer lightcone",
+    "observational detectability",
+    "full gas-history energy ledger"
+  ],
+  "preserved": {
+    "physical": "HOLD",
+    "legacy_interval": "[160,161] FAIL",
+    "tick": 160,
+    "auxiliary_escape": "FAIL",
+    "HH_RCT_CR": "OFF",
+    "precision_atomic": "PARKED",
+    "protected_source_default_runtime_changes": 0
+  },
+  "reviewer_tooling_event": {
+    "classification": "review-document orchestration parse error",
+    "first_write_attempt": "functions.exec JavaScript SyntaxError: missing ) after argument list",
+    "mutation_occurred": false,
+    "scientific_program_executed": false,
+    "resolution": "Reissued review-document patch with safe string quoting",
+    "science_failure": false
+  },
+  "closeout_limits": {
+    "portable_replay_claimed_by_this_review": false,
+    "zip_restore_claimed_by_this_review": false,
+    "remote_publication_claimed_by_this_review": false
+  },
+  "stop_decision": "Focused review and required corrections complete; no new material science risk requiring further tests or recursive review.",
+  "review_note": {
+    "path": "independent/DECISION_REVIEW_KO.md",
+    "sha256": "0a152fbb0ba5a69ccbae6195d12fa205bf4bd3f81823a8e1387f5e3c8278b03f",
+    "bytes": 11370
+  }
+}

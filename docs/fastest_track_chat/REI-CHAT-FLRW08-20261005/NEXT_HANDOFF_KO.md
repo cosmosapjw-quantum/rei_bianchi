@@ -1,9 +1,16 @@
-# FLRW08 다음 실행
+# FLRW08: next actual accepted-slab continuous defect
 
-같은 task `REI-CHAT-FLRW08_PAIRED_TIME_ERROR_CONTROL`을 유지한다. `README_KO.md`, `RESULTS.json`, `VALIDATION.json`, `REVIEW.json`과 원 F08 successor 반환을 먼저 읽는다. 15개 완료 이력·F05/F08 whole-history MPFI 증명·FLRW06/07 suite를 재실행하지 않는다. F09 공통 domain과 optional supplier binding은 여전히 미완료다.
+대상 cosmosapjw-quantum/rei_bianchi, branch forward/rust-reion-kernels-20260922, PR83. 시작/단계경계/게시전후 live ref와 관련 diff만 읽는다. 마지막 inspected external e63ca0735a3e3e7eebbf4498c697d806d375e191은 F08 discrete histories15개 완료, F09blocked, continuum time certificate NOT_ESTABLISHED다.
 
-이번 루프에서 exact-binary 공통 endpoint 분석과 조건부 tail feasibility는 완료했다. 미래의 균일 수축과 continuous-time 일치성은 미증명이다. 다음 실제 계산은 원 paired transport의 fixed-grid semidiscrete generator와 source/implicit chemistry의 consistency를 명시한 뒤, 하나의 제한된 구간에서 독립 continuous-time reference와 원 이산 trial을 비교하는 것이다. 시간 간격/원자 실현/초기 photon measure/아래 guard/passive packet 처리를 일치시킨다. 이미 완료된 전체 campaign을 다시 실행해 refinement sample만 추가하는 것을 certificate로 삼지 않는다.
+완료된 FLRW07 finite-beam source13개와6개추가 common-grid refinement, 계승 DOP853/Radau를 매번 재실행하지 않는다. 각 .5K/차분1e-4K finite목표는level6에서 충족했고 엄밀certificate는 아니다. Scalar Richardson을 photon/species state에 적용하지 않는다. Escape relative2e-11 진단FAIL은 보존한다. 작은 absolute값이라는 이유로 FAIL을 PASS로 바꾸지 않는다.
 
-세 refinement의 부호·Richardson 추정·conservation PASS를 continuum 부호 또는 모델/물리 admission으로 승격하지 않는다. q<0.5609530788616102 조건은 endpoint 시간 오차를 이산 신호 하한의 10% 아래로 만들기 위한 충분조건이다. 모든 미래 refinement에서의 수축과 동일 모델의 극한 일치성을 별도로 증명해야 한다. 일반 coupled cancellation을 가정하지 않는다. Source birth와 fit/physical threshold를 보존하며 spectral projection error는 별도다.
+Logical node는 계속 REI-CHAT-FLRW08_PAIRED_TIME_ERROR_CONTROL이며 실제 continuous-defect 부분은 partial이다. 다음 최소산출물은 실제 F08 fixed spectral/angular generator f_h와 첫 accepted slab의 연속재구성 residual이다. endpoint/transport/source/root identity를 exact commit/path/blob에 묶는다. 시간h->0와 spectral-grid->0는 서로 다른 극한이다. 기존 paired campaign을 다시 돌리거나 F09 provider를 임의 생성하지 않는다.
 
-기존 strict local<2e-4, public width<2e-3, conservation≤1e-12, [160,161] 역사적 실패와 과학적 HOLD를 보존한다. 실제 관리형 coder 3회/928 tokens, 통합 helper의 local_combined_success=false, local cubic partial PASS, Host SymPy weights를 구분한다. 새 독립 hosted reviewer의 실제 사용량은 `.cuh/fastest-track/REI-CHAT-FLRW08/`와 리뷰 결과를 읽으며 모르는 비용을 0으로 처리하지 않는다.
+정확 paired identity는 delta'=AB delta+(AB-AF)eF-(rB-rF)다. 두 해를 공통 scale로 무차원화하고 전체 tube의 logarithmic norm, Jacobian 차이, residual 차이와 한쪽 error bound가 필요하다. Root endpoint box를 시간구간 전체의 residual bound로 부르지 않는다. T/lnT에는 (gB-gF)eF 항도 추가되므로 common grid라는 이유만으로 버리지 않는다.
+
+Source pulse 및 threshold를 공통 구간에서 나누고 numerical jump defect를 기록한다. 정답 궤적이나 reference source를 소비자 입력으로 강제하지 않는다. 첫 slab이 없으면 필요한 필드/정확 source identity를 명시하고 제한된 추출만 요청한다. 전체 재감사로 되돌아가지 않는다. 최신 F08 conservative solver와 본 과거 primary_stage_step 진단은 구별한다.
+
+읽기 순서는 TASK_RETURN/contract -> full REPORT §§6–7 -> F08_SELECTED_RETURN -> actual source 및 accepted slab이다. 원 production source/CODEX_SYNC/runtime_returns/source locks/F00/F03/FT03/S0를 변경하지 않는다. 같은 branch append-only non-force 및 기존 Drive/Dropbox create-only backup. R1 metadata, byte identity, science validation은 별개다. local<2e-4,width<2e-3,[160,161] FAIL/tick160/physical HOLD를 유지한다.
+
+과거 T0/T1/T2 이산 차분 단계의 인계는
+`DISCRETE_CONTRAST_HANDOFF_ARCHIVE_KO.md`에 별도 보존한다.

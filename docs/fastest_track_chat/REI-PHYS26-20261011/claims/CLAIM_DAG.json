@@ -1,0 +1,172 @@
+{
+  "task": "REI-PHYS26-20261011",
+  "created_utc": "2026-10-11T00:51:01.691052+00:00",
+  "nodes": [
+    {
+      "id": "I0",
+      "claim": "Fixed input and normalization",
+      "evidence_level": "consumed identity",
+      "evidence": "PHYSICS_CONTRACT.json",
+      "depends_on": []
+    },
+    {
+      "id": "I1",
+      "claim": "Closed k second>0 and endpoint signs",
+      "evidence_level": "consumed scoped",
+      "evidence": "inputs/inherited/PHYS24_RESULTS_SUMMARY.json",
+      "depends_on": [
+        "I0"
+      ]
+    },
+    {
+      "id": "I2",
+      "claim": "Closed exact conditional k third<0",
+      "evidence_level": "consumed scoped",
+      "evidence": "inputs/inherited/PHYS25_THIRD_DERIVATIVE_CERTIFICATE.json",
+      "depends_on": [
+        "I0"
+      ]
+    },
+    {
+      "id": "I3",
+      "claim": "Prior exact root definitions and finite numerical values",
+      "evidence_level": "consumed scoped",
+      "evidence": "inputs/inherited/PHYS25_VARIANCE_CANDIDATE.json",
+      "depends_on": [
+        "I0"
+      ]
+    },
+    {
+      "id": "C1",
+      "claim": "All feasible W and endpoint degeneracies",
+      "evidence_level": "derived",
+      "evidence": "contributions/theory/ENVELOPE_DERIVATION_KO.md",
+      "depends_on": [
+        "I0"
+      ]
+    },
+    {
+      "id": "C2",
+      "claim": "Global upper and lower quadratic residuals",
+      "evidence_level": "derived conditional",
+      "evidence": "contributions/theory/ENVELOPE_DERIVATION_KO.md",
+      "depends_on": [
+        "I0",
+        "I2"
+      ]
+    },
+    {
+      "id": "C3",
+      "claim": "Exact all-W envelope and unique bound extremizers",
+      "evidence_level": "derived conditional",
+      "evidence": "contributions/theory/ENVELOPE_DERIVATION_KO.md",
+      "depends_on": [
+        "C1",
+        "C2"
+      ]
+    },
+    {
+      "id": "C4",
+      "claim": "Strict interior gap and all intermediate responses attainable",
+      "evidence_level": "derived conditional",
+      "evidence": "contributions/theory/ENVELOPE_DERIVATION_KO.md",
+      "depends_on": [
+        "C3"
+      ]
+    },
+    {
+      "id": "C5",
+      "claim": "Both envelope functions strictly increase in W",
+      "evidence_level": "derived conditional",
+      "evidence": "contributions/theory/ENVELOPE_DERIVATION_KO.md",
+      "depends_on": [
+        "I1",
+        "C3"
+      ]
+    },
+    {
+      "id": "C6",
+      "claim": "Exactly two ordered sign boundaries including global W0",
+      "evidence_level": "derived conditional",
+      "evidence": "contributions/theory/ENVELOPE_DERIVATION_KO.md",
+      "depends_on": [
+        "I1",
+        "I3",
+        "C4",
+        "C5"
+      ]
+    },
+    {
+      "id": "C7",
+      "claim": "Complete quantifier-aware sign partition and sharp thresholds",
+      "evidence_level": "derived conditional",
+      "evidence": "contributions/theory/ENVELOPE_DERIVATION_KO.md",
+      "depends_on": [
+        "C3",
+        "C4",
+        "C6"
+      ]
+    },
+    {
+      "id": "N1",
+      "claim": "Preregistered 7 cases, original-fit paths, moments, contacts, mixtures",
+      "evidence_level": "numerically checked / implementation-verified",
+      "evidence": "contributions/numerics/FIXED_VARIANCE_ENVELOPE_FIRST.json",
+      "depends_on": [
+        "I0",
+        "I3"
+      ]
+    },
+    {
+      "id": "N2",
+      "claim": "Concrete same-variance opposite signs at W=19.74",
+      "evidence_level": "derived structure and numerical evaluation",
+      "evidence": "report/PHYS26_RESULTS_SUMMARY.json",
+      "depends_on": [
+        "C3",
+        "C7",
+        "N1"
+      ]
+    },
+    {
+      "id": "D0",
+      "claim": "Response band and equal-moment line plot",
+      "evidence_level": "display only",
+      "evidence": "figures/PHYS26_response_envelope.png",
+      "depends_on": [
+        "C3",
+        "C7",
+        "N1"
+      ]
+    },
+    {
+      "id": "R0",
+      "claim": "One exact-byte new-program portability replay",
+      "evidence_level": "implementation reproducibility only",
+      "evidence": "portability/REPLAY_RECEIPT.json",
+      "depends_on": [
+        "N1"
+      ]
+    },
+    {
+      "id": "P0",
+      "claim": "Physical admission remains HOLD",
+      "evidence_level": "preserved restriction",
+      "evidence": "PHYSICS_CONTRACT.json",
+      "depends_on": [
+        "I0"
+      ]
+    }
+  ],
+  "theory_detail": "contributions/theory/THEORY_CLAIMS.json",
+  "core_limits": [
+    "No sampled dual check proves continuum inequality",
+    "No scalar/jet agreement encloses numerical J or atomic uncertainty",
+    "No display or replay adds independent physics evidence",
+    "Finite root decimals do not replace exact root-defined boundary laws"
+  ],
+  "final_gate": {
+    "record": "independent/DECISION_REVIEW.json",
+    "must_be_distinct_from_generators_and_numerical_designers": true
+  }
+}

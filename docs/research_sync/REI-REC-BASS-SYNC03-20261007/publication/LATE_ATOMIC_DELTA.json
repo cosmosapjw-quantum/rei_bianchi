@@ -1,0 +1,714 @@
+{
+  "schema": "sync03.late-atomic-delta.v1",
+  "scope": "prepublication read-only delta; frozen intake and loop2 gate preserved",
+  "sources": [
+    {
+      "repo": "BASS_HE",
+      "sha": "9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+      "path": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT02-HISTORY_20261007/README_KO.md",
+      "content": "# HE-FAST-IGM-RCT02: 공통영역 기준 이력\n\nBOUNDED_COMMON_DOMAIN_NATIVE_RHS_HISTORY_CHECKED__RECEIVER_INTEGRATION_OPEN.\n첨부 FAST_IGM_RCT01의 native point bridge와 vendor80payload를 변경하지 않았다. SciPy DOP853/Radau를 그 native RHS의 연구용 시간적분 client로 사용했다. 새로운 generic solver 또는 receiver photon-coupled stepper를 만들지 않았다. 실제 receiver의 optional RCT 통합은 아직 미수행이다.\n\n모형: prescribed H=3e-18/s, nH0=1e-4cm^-3, fHe=.083, nH=nH0 exp(-3Ht), Tcmb=20 exp(-Ht)K; 초기(.1,.05,.9),T=2000K. photon population과 외부source는0. OFF, KF96/GM25 각각 explicit Ebar30/35/Q의7경우를0..1e15s에서세적분설정으로계산했다. Q=40.819325400298eV이며source/mean은각run에서고정된다. 실제EOS-T의공통guard[1000,10000]K를모든stage/output에적용한다.\n\nDOP853 fine의최종T: OFF1939.6198710803K; KF30/35/Q1943.4763264509/1941.6985420082/1939.6295126272K; GM30/35/Q2004.7221521422/1974.7021444938/1939.7829608931K. GM30의J=.00104482892408205events/H, KF30의J=6.18895124463549e-5다. 누적비16.8821644는같은상태rate비17과다르며온도/종분율되먹임때문이다. Ebar=Q의직접열항은0이지만GM-Q는OFF보다최종T가.1630898128K높다. 이수치들은제조초기조건의조건부모형이며관측값/실제원자스펙트럼이아니다.\n\n주실험을읽은후GM30한경우만3e15s로연장하고두방법으로대조했다. t=1.61132358163420e15s,T=2005.458190270465K에서온도가극대이며,3e15s에서는2002.109594360597K로내린다. 전환시점두방법상대차1.26126e-11. wdot=-4.82087360357e-30erg/H/s, particles/H derivative=-1.16074705659e-17/s로둘다감소한다. Tdot/T=wdot/w-sdot/s에서두감소율이같아진것이며열평형이아니다.\n\n총23 ODE solve,960accepted time steps,science native evaluations14758,101output epochs/solve. Native8tests,Python9tests통과. 전체stage/output/Jacobianprobe의actualT범위1939.61987106275..2005.45819027047K. 최대species누적결함4.9960e-16,energy결함1.91824e-15. 고정한상태/온도/RCT허용기준에서주실험최대비.0006087500,후속최대비.0012667608로모두1미만이다. 두방법은같은nativeRHS를사용하며독립atomic검증/intervalcertificate가아니다. Stage/출력검사는연속모든시각의엄밀invariance증명이아니다.\n\n최신receiver a9aea514e086fec6d50cdf14496ff46054cc895e,branch forward/rem-hhe-igm-20261006,PR84 draft를읽었다. 기존spectral/BE/midpoint부분판정과장기실패는보존한다. 실행dependency는기존dbb54009... snapshot이고,igm_state/rates/thermal/he_rct는currentblob와일치한다. current전체library를빌드했다고하지않는다. sourcefreefixture를먼저existingigm_step에RCTcandidate/thermalresidual/endpoint/장부를동시에연결해비교하고,그뒤photon/source단계를검증한다. 본high-orderreference는receiver구현채택이아니다.\n\n원자모멘트null,baselineOFF,physicalHOLD,HE-F2globalfalse,HE-F3/F09source-drivenintegrationopen을유지한다. 전체코드/부모입력/23이력/실패·성공로그는DELIVERY_RECEIPT의ZIP에있다. Git요약만으로전체실행source가있다고가정하지않는다. sourceidentity와숫자결과는같은폴더JSON을따른다. 기존point/원자/FT03/mixed/restart/receiver과학suite는재실행하지않았다.\n"
+    },
+    {
+      "repo": "BASS_HE",
+      "sha": "9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+      "path": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT02-HISTORY_20261007/RETURN.json",
+      "content": "{\n  \"gate\": \"BOUNDED_COMMON_DOMAIN_NATIVE_RHS_HISTORY_CHECKED__RECEIVER_INTEGRATION_OPEN\",\n  \"main_ODE_solves\": 21,\n  \"followup_ODE_solves\": 2,\n  \"new_accepted_time_steps\": 960,\n  \"native_evaluations_in_scientific_runs\": 14758,\n  \"all_EOS_evaluations_T_range_K\": [\n    1939.6198710627527,\n    2005.4581902704654\n  ],\n  \"max_energy_scaled\": 1.918237086496946e-15,\n  \"max_species_defect\": 4.996003610813204e-16,\n  \"native_tests\": 8,\n  \"python_tests\": 9,\n  \"receiver_source_mutations\": 0,\n  \"whole_current_receiver_library_built\": false,\n  \"rigorous_flow_or_domain_interval\": false,\n  \"independent_scientific_review\": \"NOT_RUN\",\n  \"task\": \"HE-FAST-IGM-RCT02\",\n  \"state\": \"completed_bounded_reference_only\",\n  \"root_modified\": false,\n  \"baseline_RCT\": \"OFF\",\n  \"physical_admission\": false,\n  \"photon_mean\": null,\n  \"next\": \"HE-FAST-IGM-RCT03_RECEIVER_NATIVE_INTEGRATION\"\n}\n"
+    },
+    {
+      "repo": "BASS_HE",
+      "sha": "9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+      "path": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT02-HISTORY_20261007/INPUT_PIN.json",
+      "content": "{\"supplier_observed\":\"eae1d2209fd9a555bea461032f272c7c7c19766e\",\"supplier_tree\":\"e2146b70407b0b94715bc6174790d57b34c05e13\",\"receiver_branch\":\"forward/rem-hhe-igm-20261006\",\"receiver_observed\":\"a9aea514e086fec6d50cdf14496ff46054cc895e\",\"receiver_tree\":\"dff2851789989bbe62e87e8f75905fd79ef97a08\",\"executed_library_commit\":\"dbb54009a517242ff5a41c805512471a74dd25f4\",\"executed_src_tree\":\"cb69b4736dd046e4675557577eb8e0ead037d1f3\",\"current_matching_chemistry_blobs\":{\"igm_state.rs\":\"437365fbe329a10afe292f9dd7eebf549fef804c\",\"igm_rates.rs\":\"dc3cc028a41ac852d94835372ce13545389d1c3a\",\"igm_thermal.rs\":\"0648618d9822e169e9672ac3c556f86595c3b0b6\",\"he_rct.rs\":\"37f83f83bb67cf0ad174b56ee748cf6733857701\"},\"whole_current_receiver_built\":false,\"source_reference\":\"attached parent full snapshot; source/input unchanged\",\"parent_archive_sha256\":\"ae380462714fa5ce876546e8d2271603bdcb6d256b2e7cde519dbe5f593300cc\",\"native_source_mutations\":0,\"original_igm_step_path_read\":\"rust/rei_microphysics/src/igm_step.rs\",\"original_igm_step_blob\":\"4774d512d3a06330d5d0d9d1d627737b8e9911be\",\"receiver_integration\":\"NOT_PERFORMED_OWNER_RESERVED\"}\n"
+    },
+    {
+      "repo": "BASS_HE",
+      "sha": "9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+      "path": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT02-HISTORY_20261007/SOURCE_IDENTITY.json",
+      "content": "{\n  \"native/src/lib.rs\": {\n    \"bytes\": 4649,\n    \"sha256\": \"8fa7937c87c08ecc61592b977a9c299b5331298fb90801e9457f1b8b58559e77\"\n  },\n  \"native/tests/boundary.rs\": {\n    \"bytes\": 2494,\n    \"sha256\": \"d82889e096f49146d719a36c33ff98acc48733003e4aa7d539f1ed0d57d0044c\"\n  },\n  \"research/analyze.py\": {\n    \"bytes\": 4991,\n    \"sha256\": \"18deac7a11e320090e0b15e44c2908dbc3759cde7f2d367aa4f39ccad205333b\"\n  },\n  \"research/followup.py\": {\n    \"bytes\": 340,\n    \"sha256\": \"d89431e64e4814a2fde5e155239bcd0976545f6398e7e79410104ab963a862fa\"\n  },\n  \"research/history.py\": {\n    \"bytes\": 7860,\n    \"sha256\": \"22af64656ff1a8ca67a27847279b599e38f21cb8836bdba94e64ddf9c24c3692\"\n  },\n  \"research/test_history.py\": {\n    \"bytes\": 2232,\n    \"sha256\": \"335463444ccfa9db3ec4f7dffccd6a30ba63df5d05aae97db0950fd3a50e03d3\"\n  },\n  \"run_checks.sh\": {\n    \"bytes\": 1272,\n    \"sha256\": \"6bc6d1d0bf9f1ed6a8c8a2dcb4f273d7331f5839299e1afc9a6cee09f9d74193\"\n  },\n  \"verify_parent.py\": {\n    \"bytes\": 391,\n    \"sha256\": \"5c4b55b59d08700f06f3110eec47c3518b80bc755d8b6ff3aeece3b5ea71e798\"\n  }\n}\n"
+    },
+    {
+      "repo": "bass_cr",
+      "sha": "fabb4bee9401d85d6289590b4d7b4d17f7110754",
+      "path": "research/fastest_rejoin_20261007/source_step/RUN_FROM_ARCHIVE.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"Verify and optionally execute the sealed CR-F0-R2 source-step package offline.\"\"\"\nimport argparse\nimport hashlib\nimport json\nfrom pathlib import Path\nimport subprocess\nimport sys\nimport zipfile\n\nSHA256 = \"f3156ba8e07d4cfe263cb793c424a66958fa9730cbe9c1779c96007e10a11434\"\nROOT = \"BASS_CR_FASTEST_STEP_20261007\"\n\ndef main():\n    p = argparse.ArgumentParser()\n    p.add_argument(\"--archive\", type=Path, required=True)\n    p.add_argument(\"--workspace\", type=Path)\n    p.add_argument(\"--rustc\", type=Path)\n    p.add_argument(\"--verify-only\", action=\"store_true\")\n    a = p.parse_args()\n    if hashlib.sha256(a.archive.read_bytes()).hexdigest() != SHA256:\n        raise SystemExit(\"ARCHIVE_IDENTITY_MISMATCH\")\n    with zipfile.ZipFile(a.archive) as z:\n        if z.testzip() is not None:\n            raise SystemExit(\"ZIP_CRC_FAILED\")\n        for n in z.namelist():\n            parts = Path(n).parts\n            if not parts or parts[0] != ROOT or \"..\" in parts or Path(n).is_absolute():\n                raise SystemExit(\"UNSAFE_ARCHIVE_PATH\")\n        manifest = json.loads(z.read(ROOT + \"/MANIFEST.json\"))\n        for name, record in manifest[\"files\"].items():\n            data = z.read(ROOT + \"/\" + name)\n            if len(data) != record[\"bytes\"] or hashlib.sha256(data).hexdigest() != record[\"sha256\"]:\n                raise SystemExit(\"PAYLOAD_IDENTITY_MISMATCH: \" + name)\n        if a.verify_only:\n            print(json.dumps({\"status\": \"VERIFIED\", \"payloads\": len(manifest[\"files\"])}))\n            return\n        if a.workspace is None or a.rustc is None:\n            p.error(\"execution requires --workspace NEW_DIRECTORY and --rustc\")\n        a.workspace.mkdir(parents=True, exist_ok=False)\n        z.extractall(a.workspace)\n    work = a.workspace.resolve()\n    subprocess.run([sys.executable, str(work / ROOT / \"research/reproduce.py\"),\n                    \"--rustc\", str(a.rustc.resolve()), \"--output\", str(work / \"run\")], check=True)\n\nif __name__ == \"__main__\":\n    main()\n"
+    }
+  ],
+  "compares": [
+    {
+      "repo": "BASS_HE",
+      "head": "9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+      "base": "eae1d2209fd9a555bea461032f272c7c7c19766e",
+      "data": {
+        "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/compare/eae1d2209fd9a555bea461032f272c7c7c19766e...9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+        "html_url": "https://github.com/cosmosapjw-quantum/BASS_HE/compare/eae1d2209fd9a555bea461032f272c7c7c19766e...9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+        "permalink_url": "https://github.com/cosmosapjw-quantum/BASS_HE/compare/cosmosapjw-quantum:eae1d22...cosmosapjw-quantum:9b46aab",
+        "diff_url": "https://github.com/cosmosapjw-quantum/BASS_HE/compare/eae1d2209fd9a555bea461032f272c7c7c19766e...9b46aab79eeafd452a5fb35b1c0fd00eef6f5683.diff",
+        "patch_url": "https://github.com/cosmosapjw-quantum/BASS_HE/compare/eae1d2209fd9a555bea461032f272c7c7c19766e...9b46aab79eeafd452a5fb35b1c0fd00eef6f5683.patch",
+        "base_commit": {
+          "sha": "eae1d2209fd9a555bea461032f272c7c7c19766e",
+          "node_id": "C_kwDOUstV6doAKGVhZTFkMjIwOWZkOWE1NTViZWE0NjEwMzJmMjcyYzdjN2MxOTc2NmU",
+          "commit": {
+            "author": {
+              "name": "cosmosapjw-quantum",
+              "email": "58155957+cosmosapjw-quantum@users.noreply.github.com",
+              "date": "2026-10-07T10:57:51Z"
+            },
+            "committer": {
+              "name": "cosmosapjw-quantum",
+              "email": "58155957+cosmosapjw-quantum@users.noreply.github.com",
+              "date": "2026-10-07T10:57:51Z"
+            },
+            "message": "docs(he): record current IGM RCT reconnect execution and R1 dual backups [skip ci]",
+            "tree": {
+              "sha": "e2146b70407b0b94715bc6174790d57b34c05e13",
+              "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/git/trees/e2146b70407b0b94715bc6174790d57b34c05e13"
+            },
+            "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/git/commits/eae1d2209fd9a555bea461032f272c7c7c19766e",
+            "comment_count": 0,
+            "verification": {
+              "verified": false,
+              "reason": "unsigned",
+              "signature": null,
+              "payload": null,
+              "verified_at": null
+            }
+          },
+          "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/commits/eae1d2209fd9a555bea461032f272c7c7c19766e",
+          "html_url": "https://github.com/cosmosapjw-quantum/BASS_HE/commit/eae1d2209fd9a555bea461032f272c7c7c19766e",
+          "comments_url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/commits/eae1d2209fd9a555bea461032f272c7c7c19766e/comments",
+          "author": {
+            "login": "cosmosapjw-quantum",
+            "id": 58155957,
+            "node_id": "MDQ6VXNlcjU4MTU1OTU3",
+            "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/cosmosapjw-quantum",
+            "html_url": "https://github.com/cosmosapjw-quantum",
+            "followers_url": "https://api.github.com/users/cosmosapjw-quantum/followers",
+            "following_url": "https://api.github.com/users/cosmosapjw-quantum/following{/other_user}",
+            "gists_url": "https://api.github.com/users/cosmosapjw-quantum/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/cosmosapjw-quantum/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/cosmosapjw-quantum/subscriptions",
+            "organizations_url": "https://api.github.com/users/cosmosapjw-quantum/orgs",
+            "repos_url": "https://api.github.com/users/cosmosapjw-quantum/repos",
+            "events_url": "https://api.github.com/users/cosmosapjw-quantum/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/cosmosapjw-quantum/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "committer": {
+            "login": "cosmosapjw-quantum",
+            "id": 58155957,
+            "node_id": "MDQ6VXNlcjU4MTU1OTU3",
+            "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/cosmosapjw-quantum",
+            "html_url": "https://github.com/cosmosapjw-quantum",
+            "followers_url": "https://api.github.com/users/cosmosapjw-quantum/followers",
+            "following_url": "https://api.github.com/users/cosmosapjw-quantum/following{/other_user}",
+            "gists_url": "https://api.github.com/users/cosmosapjw-quantum/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/cosmosapjw-quantum/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/cosmosapjw-quantum/subscriptions",
+            "organizations_url": "https://api.github.com/users/cosmosapjw-quantum/orgs",
+            "repos_url": "https://api.github.com/users/cosmosapjw-quantum/repos",
+            "events_url": "https://api.github.com/users/cosmosapjw-quantum/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/cosmosapjw-quantum/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "parents": [
+            {
+              "sha": "9bb4291abf22b12f76376021cdf9ecb23fb6b7fb",
+              "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/commits/9bb4291abf22b12f76376021cdf9ecb23fb6b7fb",
+              "html_url": "https://github.com/cosmosapjw-quantum/BASS_HE/commit/9bb4291abf22b12f76376021cdf9ecb23fb6b7fb"
+            }
+          ]
+        },
+        "merge_base_commit": {
+          "sha": "eae1d2209fd9a555bea461032f272c7c7c19766e",
+          "node_id": "C_kwDOUstV6doAKGVhZTFkMjIwOWZkOWE1NTViZWE0NjEwMzJmMjcyYzdjN2MxOTc2NmU",
+          "commit": {
+            "author": {
+              "name": "cosmosapjw-quantum",
+              "email": "58155957+cosmosapjw-quantum@users.noreply.github.com",
+              "date": "2026-10-07T10:57:51Z"
+            },
+            "committer": {
+              "name": "cosmosapjw-quantum",
+              "email": "58155957+cosmosapjw-quantum@users.noreply.github.com",
+              "date": "2026-10-07T10:57:51Z"
+            },
+            "message": "docs(he): record current IGM RCT reconnect execution and R1 dual backups [skip ci]",
+            "tree": {
+              "sha": "e2146b70407b0b94715bc6174790d57b34c05e13",
+              "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/git/trees/e2146b70407b0b94715bc6174790d57b34c05e13"
+            },
+            "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/git/commits/eae1d2209fd9a555bea461032f272c7c7c19766e",
+            "comment_count": 0,
+            "verification": {
+              "verified": false,
+              "reason": "unsigned",
+              "signature": null,
+              "payload": null,
+              "verified_at": null
+            }
+          },
+          "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/commits/eae1d2209fd9a555bea461032f272c7c7c19766e",
+          "html_url": "https://github.com/cosmosapjw-quantum/BASS_HE/commit/eae1d2209fd9a555bea461032f272c7c7c19766e",
+          "comments_url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/commits/eae1d2209fd9a555bea461032f272c7c7c19766e/comments",
+          "author": {
+            "login": "cosmosapjw-quantum",
+            "id": 58155957,
+            "node_id": "MDQ6VXNlcjU4MTU1OTU3",
+            "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/cosmosapjw-quantum",
+            "html_url": "https://github.com/cosmosapjw-quantum",
+            "followers_url": "https://api.github.com/users/cosmosapjw-quantum/followers",
+            "following_url": "https://api.github.com/users/cosmosapjw-quantum/following{/other_user}",
+            "gists_url": "https://api.github.com/users/cosmosapjw-quantum/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/cosmosapjw-quantum/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/cosmosapjw-quantum/subscriptions",
+            "organizations_url": "https://api.github.com/users/cosmosapjw-quantum/orgs",
+            "repos_url": "https://api.github.com/users/cosmosapjw-quantum/repos",
+            "events_url": "https://api.github.com/users/cosmosapjw-quantum/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/cosmosapjw-quantum/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "committer": {
+            "login": "cosmosapjw-quantum",
+            "id": 58155957,
+            "node_id": "MDQ6VXNlcjU4MTU1OTU3",
+            "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/cosmosapjw-quantum",
+            "html_url": "https://github.com/cosmosapjw-quantum",
+            "followers_url": "https://api.github.com/users/cosmosapjw-quantum/followers",
+            "following_url": "https://api.github.com/users/cosmosapjw-quantum/following{/other_user}",
+            "gists_url": "https://api.github.com/users/cosmosapjw-quantum/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/cosmosapjw-quantum/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/cosmosapjw-quantum/subscriptions",
+            "organizations_url": "https://api.github.com/users/cosmosapjw-quantum/orgs",
+            "repos_url": "https://api.github.com/users/cosmosapjw-quantum/repos",
+            "events_url": "https://api.github.com/users/cosmosapjw-quantum/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/cosmosapjw-quantum/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "parents": [
+            {
+              "sha": "9bb4291abf22b12f76376021cdf9ecb23fb6b7fb",
+              "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/commits/9bb4291abf22b12f76376021cdf9ecb23fb6b7fb",
+              "html_url": "https://github.com/cosmosapjw-quantum/BASS_HE/commit/9bb4291abf22b12f76376021cdf9ecb23fb6b7fb"
+            }
+          ]
+        },
+        "status": "ahead",
+        "ahead_by": 1,
+        "behind_by": 0,
+        "total_commits": 1,
+        "commits": [
+          {
+            "sha": "9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+            "node_id": "C_kwDOUstV6doAKDliNDZhYWI3OWVlYWZkNDUyYTVmYjM1YjFjMGZkMDBlZWY2ZjU2ODM",
+            "commit": {
+              "author": {
+                "name": "cosmosapjw-quantum",
+                "email": "58155957+cosmosapjw-quantum@users.noreply.github.com",
+                "date": "2026-10-07T11:27:15Z"
+              },
+              "committer": {
+                "name": "cosmosapjw-quantum",
+                "email": "58155957+cosmosapjw-quantum@users.noreply.github.com",
+                "date": "2026-10-07T11:27:15Z"
+              },
+              "message": "research(he): compute common-domain native-RHS IGM RCT histories and temperature turnover [skip ci]",
+              "tree": {
+                "sha": "a2da864e87e5aee4983c19d75a6c45731c413e1d",
+                "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/git/trees/a2da864e87e5aee4983c19d75a6c45731c413e1d"
+              },
+              "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/git/commits/9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+              "comment_count": 0,
+              "verification": {
+                "verified": false,
+                "reason": "unsigned",
+                "signature": null,
+                "payload": null,
+                "verified_at": null
+              }
+            },
+            "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/commits/9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+            "html_url": "https://github.com/cosmosapjw-quantum/BASS_HE/commit/9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+            "comments_url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/commits/9b46aab79eeafd452a5fb35b1c0fd00eef6f5683/comments",
+            "author": {
+              "login": "cosmosapjw-quantum",
+              "id": 58155957,
+              "node_id": "MDQ6VXNlcjU4MTU1OTU3",
+              "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+              "gravatar_id": "",
+              "url": "https://api.github.com/users/cosmosapjw-quantum",
+              "html_url": "https://github.com/cosmosapjw-quantum",
+              "followers_url": "https://api.github.com/users/cosmosapjw-quantum/followers",
+              "following_url": "https://api.github.com/users/cosmosapjw-quantum/following{/other_user}",
+              "gists_url": "https://api.github.com/users/cosmosapjw-quantum/gists{/gist_id}",
+              "starred_url": "https://api.github.com/users/cosmosapjw-quantum/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/cosmosapjw-quantum/subscriptions",
+              "organizations_url": "https://api.github.com/users/cosmosapjw-quantum/orgs",
+              "repos_url": "https://api.github.com/users/cosmosapjw-quantum/repos",
+              "events_url": "https://api.github.com/users/cosmosapjw-quantum/events{/privacy}",
+              "received_events_url": "https://api.github.com/users/cosmosapjw-quantum/received_events",
+              "type": "User",
+              "user_view_type": "public",
+              "site_admin": false
+            },
+            "committer": {
+              "login": "cosmosapjw-quantum",
+              "id": 58155957,
+              "node_id": "MDQ6VXNlcjU4MTU1OTU3",
+              "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+              "gravatar_id": "",
+              "url": "https://api.github.com/users/cosmosapjw-quantum",
+              "html_url": "https://github.com/cosmosapjw-quantum",
+              "followers_url": "https://api.github.com/users/cosmosapjw-quantum/followers",
+              "following_url": "https://api.github.com/users/cosmosapjw-quantum/following{/other_user}",
+              "gists_url": "https://api.github.com/users/cosmosapjw-quantum/gists{/gist_id}",
+              "starred_url": "https://api.github.com/users/cosmosapjw-quantum/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/cosmosapjw-quantum/subscriptions",
+              "organizations_url": "https://api.github.com/users/cosmosapjw-quantum/orgs",
+              "repos_url": "https://api.github.com/users/cosmosapjw-quantum/repos",
+              "events_url": "https://api.github.com/users/cosmosapjw-quantum/events{/privacy}",
+              "received_events_url": "https://api.github.com/users/cosmosapjw-quantum/received_events",
+              "type": "User",
+              "user_view_type": "public",
+              "site_admin": false
+            },
+            "parents": [
+              {
+                "sha": "eae1d2209fd9a555bea461032f272c7c7c19766e",
+                "url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/commits/eae1d2209fd9a555bea461032f272c7c7c19766e",
+                "html_url": "https://github.com/cosmosapjw-quantum/BASS_HE/commit/eae1d2209fd9a555bea461032f272c7c7c19766e"
+              }
+            ]
+          }
+        ],
+        "files": [
+          {
+            "sha": "f1da4cb855526ddd6762a81ceedb718eb1206697",
+            "filename": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT02-HISTORY_20261007/INPUT_PIN.json",
+            "status": "added",
+            "additions": 1,
+            "deletions": 0,
+            "changes": 1,
+            "blob_url": "https://github.com/cosmosapjw-quantum/BASS_HE/blob/9b46aab79eeafd452a5fb35b1c0fd00eef6f5683/docs%2Fatomic_reionization_handoff_20261004_v1%2Fthreads%2FBASS_HE%2Fruns%2FHE-FAST-IGM-RCT02-HISTORY_20261007%2FINPUT_PIN.json",
+            "raw_url": "https://github.com/cosmosapjw-quantum/BASS_HE/raw/9b46aab79eeafd452a5fb35b1c0fd00eef6f5683/docs%2Fatomic_reionization_handoff_20261004_v1%2Fthreads%2FBASS_HE%2Fruns%2FHE-FAST-IGM-RCT02-HISTORY_20261007%2FINPUT_PIN.json",
+            "contents_url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/contents/docs%2Fatomic_reionization_handoff_20261004_v1%2Fthreads%2FBASS_HE%2Fruns%2FHE-FAST-IGM-RCT02-HISTORY_20261007%2FINPUT_PIN.json?ref=9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+            "patch": "@@ -0,0 +1 @@\n+{\"supplier_observed\":\"eae1d2209fd9a555bea461032f272c7c7c19766e\",\"supplier_tree\":\"e2146b70407b0b94715bc6174790d57b34c05e13\",\"receiver_branch\":\"forward/rem-hhe-igm-20261006\",\"receiver_observed\":\"a9aea514e086fec6d50cdf14496ff46054cc895e\",\"receiver_tree\":\"dff2851789989bbe62e87e8f75905fd79ef97a08\",\"executed_library_commit\":\"dbb54009a517242ff5a41c805512471a74dd25f4\",\"executed_src_tree\":\"cb69b4736dd046e4675557577eb8e0ead037d1f3\",\"current_matching_chemistry_blobs\":{\"igm_state.rs\":\"437365fbe329a10afe292f9dd7eebf549fef804c\",\"igm_rates.rs\":\"dc3cc028a41ac852d94835372ce13545389d1c3a\",\"igm_thermal.rs\":\"0648618d9822e169e9672ac3c556f86595c3b0b6\",\"he_rct.rs\":\"37f83f83bb67cf0ad174b56ee748cf6733857701\"},\"whole_current_receiver_built\":false,\"source_reference\":\"attached parent full snapshot; source/input unchanged\",\"parent_archive_sha256\":\"ae380462714fa5ce876546e8d2271603bdcb6d256b2e7cde519dbe5f593300cc\",\"native_source_mutations\":0,\"original_igm_step_path_read\":\"rust/rei_microphysics/src/igm_step.rs\",\"original_igm_step_blob\":\"4774d512d3a06330d5d0d9d1d627737b8e9911be\",\"receiver_integration\":\"NOT_PERFORMED_OWNER_RESERVED\"}"
+          },
+          {
+            "sha": "9f2669ee0a2228535c6c0695d1507482b087fb13",
+            "filename": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT02-HISTORY_20261007/README_KO.md",
+            "status": "added",
+            "additions": 16,
+            "deletions": 0,
+            "changes": 16,
+            "blob_url": "https://github.com/cosmosapjw-quantum/BASS_HE/blob/9b46aab79eeafd452a5fb35b1c0fd00eef6f5683/docs%2Fatomic_reionization_handoff_20261004_v1%2Fthreads%2FBASS_HE%2Fruns%2FHE-FAST-IGM-RCT02-HISTORY_20261007%2FREADME_KO.md",
+            "raw_url": "https://github.com/cosmosapjw-quantum/BASS_HE/raw/9b46aab79eeafd452a5fb35b1c0fd00eef6f5683/docs%2Fatomic_reionization_handoff_20261004_v1%2Fthreads%2FBASS_HE%2Fruns%2FHE-FAST-IGM-RCT02-HISTORY_20261007%2FREADME_KO.md",
+            "contents_url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/contents/docs%2Fatomic_reionization_handoff_20261004_v1%2Fthreads%2FBASS_HE%2Fruns%2FHE-FAST-IGM-RCT02-HISTORY_20261007%2FREADME_KO.md?ref=9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+            "patch": "@@ -0,0 +1,16 @@\n+# HE-FAST-IGM-RCT02: 공통영역 기준 이력\n+\n+BOUNDED_COMMON_DOMAIN_NATIVE_RHS_HISTORY_CHECKED__RECEIVER_INTEGRATION_OPEN.\n+첨부 FAST_IGM_RCT01의 native point bridge와 vendor80payload를 변경하지 않았다. SciPy DOP853/Radau를 그 native RHS의 연구용 시간적분 client로 사용했다. 새로운 generic solver 또는 receiver photon-coupled stepper를 만들지 않았다. 실제 receiver의 optional RCT 통합은 아직 미수행이다.\n+\n+모형: prescribed H=3e-18/s, nH0=1e-4cm^-3, fHe=.083, nH=nH0 exp(-3Ht), Tcmb=20 exp(-Ht)K; 초기(.1,.05,.9),T=2000K. photon population과 외부source는0. OFF, KF96/GM25 각각 explicit Ebar30/35/Q의7경우를0..1e15s에서세적분설정으로계산했다. Q=40.819325400298eV이며source/mean은각run에서고정된다. 실제EOS-T의공통guard[1000,10000]K를모든stage/output에적용한다.\n+\n+DOP853 fine의최종T: OFF1939.6198710803K; KF30/35/Q1943.4763264509/1941.6985420082/1939.6295126272K; GM30/35/Q2004.7221521422/1974.7021444938/1939.7829608931K. GM30의J=.00104482892408205events/H, KF30의J=6.18895124463549e-5다. 누적비16.8821644는같은상태rate비17과다르며온도/종분율되먹임때문이다. Ebar=Q의직접열항은0이지만GM-Q는OFF보다최종T가.1630898128K높다. 이수치들은제조초기조건의조건부모형이며관측값/실제원자스펙트럼이아니다.\n+\n+주실험을읽은후GM30한경우만3e15s로연장하고두방법으로대조했다. t=1.61132358163420e15s,T=2005.458190270465K에서온도가극대이며,3e15s에서는2002.109594360597K로내린다. 전환시점두방법상대차1.26126e-11. wdot=-4.82087360357e-30erg/H/s, particles/H derivative=-1.16074705659e-17/s로둘다감소한다. Tdot/T=wdot/w-sdot/s에서두감소율이같아진것이며열평형이아니다.\n+\n+총23 ODE solve,960accepted time steps,science native evaluations14758,101output epochs/solve. Native8tests,Python9tests통과. 전체stage/output/Jacobianprobe의actualT범위1939.61987106275..2005.45819027047K. 최대species누적결함4.9960e-16,energy결함1.91824e-15. 고정한상태/온도/RCT허용기준에서주실험최대비.0006087500,후속최대비.0012667608로모두1미만이다. 두방법은같은nativeRHS를사용하며독립atomic검증/intervalcertificate가아니다. Stage/출력검사는연속모든시각의엄밀invariance증명이아니다.\n+\n+최신receiver a9aea514e086fec6d50cdf14496ff46054cc895e,branch forward/rem-hhe-igm-20261006,PR84 draft를읽었다. 기존spectral/BE/midpoint부분판정과장기실패는보존한다. 실행dependency는기존dbb54009... snapshot이고,igm_state/rates/thermal/he_rct는currentblob와일치한다. current전체library를빌드했다고하지않는다. sourcefreefixture를먼저existingigm_step에RCTcandidate/thermalresidual/endpoint/장부를동시에연결해비교하고,그뒤photon/source단계를검증한다. 본high-orderreference는receiver구현채택이아니다.\n+\n+원자모멘트null,baselineOFF,physicalHOLD,HE-F2globalfalse,HE-F3/F09source-drivenintegrationopen을유지한다. 전체코드/부모입력/23이력/실패·성공로그는DELIVERY_RECEIPT의ZIP에있다. Git요약만으로전체실행source가있다고가정하지않는다. sourceidentity와숫자결과는같은폴더JSON을따른다. 기존point/원자/FT03/mixed/restart/receiver과학suite는재실행하지않았다."
+          },
+          {
+            "sha": "03c0bd796cf82802cdc53e4007b8510401a0d5ce",
+            "filename": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT02-HISTORY_20261007/RETURN.json",
+            "status": "added",
+            "additions": 26,
+            "deletions": 0,
+            "changes": 26,
+            "blob_url": "https://github.com/cosmosapjw-quantum/BASS_HE/blob/9b46aab79eeafd452a5fb35b1c0fd00eef6f5683/docs%2Fatomic_reionization_handoff_20261004_v1%2Fthreads%2FBASS_HE%2Fruns%2FHE-FAST-IGM-RCT02-HISTORY_20261007%2FRETURN.json",
+            "raw_url": "https://github.com/cosmosapjw-quantum/BASS_HE/raw/9b46aab79eeafd452a5fb35b1c0fd00eef6f5683/docs%2Fatomic_reionization_handoff_20261004_v1%2Fthreads%2FBASS_HE%2Fruns%2FHE-FAST-IGM-RCT02-HISTORY_20261007%2FRETURN.json",
+            "contents_url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/contents/docs%2Fatomic_reionization_handoff_20261004_v1%2Fthreads%2FBASS_HE%2Fruns%2FHE-FAST-IGM-RCT02-HISTORY_20261007%2FRETURN.json?ref=9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+            "patch": "@@ -0,0 +1,26 @@\n+{\n+  \"gate\": \"BOUNDED_COMMON_DOMAIN_NATIVE_RHS_HISTORY_CHECKED__RECEIVER_INTEGRATION_OPEN\",\n+  \"main_ODE_solves\": 21,\n+  \"followup_ODE_solves\": 2,\n+  \"new_accepted_time_steps\": 960,\n+  \"native_evaluations_in_scientific_runs\": 14758,\n+  \"all_EOS_evaluations_T_range_K\": [\n+    1939.6198710627527,\n+    2005.4581902704654\n+  ],\n+  \"max_energy_scaled\": 1.918237086496946e-15,\n+  \"max_species_defect\": 4.996003610813204e-16,\n+  \"native_tests\": 8,\n+  \"python_tests\": 9,\n+  \"receiver_source_mutations\": 0,\n+  \"whole_current_receiver_library_built\": false,\n+  \"rigorous_flow_or_domain_interval\": false,\n+  \"independent_scientific_review\": \"NOT_RUN\",\n+  \"task\": \"HE-FAST-IGM-RCT02\",\n+  \"state\": \"completed_bounded_reference_only\",\n+  \"root_modified\": false,\n+  \"baseline_RCT\": \"OFF\",\n+  \"physical_admission\": false,\n+  \"photon_mean\": null,\n+  \"next\": \"HE-FAST-IGM-RCT03_RECEIVER_NATIVE_INTEGRATION\"\n+}"
+          },
+          {
+            "sha": "cd5a0e886b245d4d8bc65a42b73cc7aabaa561e4",
+            "filename": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT02-HISTORY_20261007/SOURCE_IDENTITY.json",
+            "status": "added",
+            "additions": 34,
+            "deletions": 0,
+            "changes": 34,
+            "blob_url": "https://github.com/cosmosapjw-quantum/BASS_HE/blob/9b46aab79eeafd452a5fb35b1c0fd00eef6f5683/docs%2Fatomic_reionization_handoff_20261004_v1%2Fthreads%2FBASS_HE%2Fruns%2FHE-FAST-IGM-RCT02-HISTORY_20261007%2FSOURCE_IDENTITY.json",
+            "raw_url": "https://github.com/cosmosapjw-quantum/BASS_HE/raw/9b46aab79eeafd452a5fb35b1c0fd00eef6f5683/docs%2Fatomic_reionization_handoff_20261004_v1%2Fthreads%2FBASS_HE%2Fruns%2FHE-FAST-IGM-RCT02-HISTORY_20261007%2FSOURCE_IDENTITY.json",
+            "contents_url": "https://api.github.com/repos/cosmosapjw-quantum/BASS_HE/contents/docs%2Fatomic_reionization_handoff_20261004_v1%2Fthreads%2FBASS_HE%2Fruns%2FHE-FAST-IGM-RCT02-HISTORY_20261007%2FSOURCE_IDENTITY.json?ref=9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+            "patch": "@@ -0,0 +1,34 @@\n+{\n+  \"native/src/lib.rs\": {\n+    \"bytes\": 4649,\n+    \"sha256\": \"8fa7937c87c08ecc61592b977a9c299b5331298fb90801e9457f1b8b58559e77\"\n+  },\n+  \"native/tests/boundary.rs\": {\n+    \"bytes\": 2494,\n+    \"sha256\": \"d82889e096f49146d719a36c33ff98acc48733003e4aa7d539f1ed0d57d0044c\"\n+  },\n+  \"research/analyze.py\": {\n+    \"bytes\": 4991,\n+    \"sha256\": \"18deac7a11e320090e0b15e44c2908dbc3759cde7f2d367aa4f39ccad205333b\"\n+  },\n+  \"research/followup.py\": {\n+    \"bytes\": 340,\n+    \"sha256\": \"d89431e64e4814a2fde5e155239bcd0976545f6398e7e79410104ab963a862fa\"\n+  },\n+  \"research/history.py\": {\n+    \"bytes\": 7860,\n+    \"sha256\": \"22af64656ff1a8ca67a27847279b599e38f21cb8836bdba94e64ddf9c24c3692\"\n+  },\n+  \"research/test_history.py\": {\n+    \"bytes\": 2232,\n+    \"sha256\": \"335463444ccfa9db3ec4f7dffccd6a30ba63df5d05aae97db0950fd3a50e03d3\"\n+  },\n+  \"run_checks.sh\": {\n+    \"bytes\": 1272,\n+    \"sha256\": \"6bc6d1d0bf9f1ed6a8c8a2dcb4f273d7331f5839299e1afc9a6cee09f9d74193\"\n+  },\n+  \"verify_parent.py\": {\n+    \"bytes\": 391,\n+    \"sha256\": \"5c4b55b59d08700f06f3110eec47c3518b80bc755d8b6ff3aeece3b5ea71e798\"\n+  }\n+}"
+          }
+        ]
+      }
+    },
+    {
+      "repo": "bass_cr",
+      "head": "fabb4bee9401d85d6289590b4d7b4d17f7110754",
+      "base": "c277bb4305ccddf5b5d94f83f59f398e7f6c3b62",
+      "data": {
+        "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/compare/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62...fabb4bee9401d85d6289590b4d7b4d17f7110754",
+        "html_url": "https://github.com/cosmosapjw-quantum/bass_cr/compare/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62...fabb4bee9401d85d6289590b4d7b4d17f7110754",
+        "permalink_url": "https://github.com/cosmosapjw-quantum/bass_cr/compare/cosmosapjw-quantum:c277bb4...cosmosapjw-quantum:fabb4be",
+        "diff_url": "https://github.com/cosmosapjw-quantum/bass_cr/compare/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62...fabb4bee9401d85d6289590b4d7b4d17f7110754.diff",
+        "patch_url": "https://github.com/cosmosapjw-quantum/bass_cr/compare/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62...fabb4bee9401d85d6289590b4d7b4d17f7110754.patch",
+        "base_commit": {
+          "sha": "c277bb4305ccddf5b5d94f83f59f398e7f6c3b62",
+          "node_id": "C_kwDOUjtnhtoAKGMyNzdiYjQzMDVjY2RkZjViNWQ5NGY4M2Y1OWYzOThlN2Y2YzNiNjI",
+          "commit": {
+            "author": {
+              "name": "cosmosapjw-quantum",
+              "email": "58155957+cosmosapjw-quantum@users.noreply.github.com",
+              "date": "2026-10-07T10:56:29Z"
+            },
+            "committer": {
+              "name": "cosmosapjw-quantum",
+              "email": "58155957+cosmosapjw-quantum@users.noreply.github.com",
+              "date": "2026-10-07T10:56:29Z"
+            },
+            "message": "research: reconnect fastest track with native photon/IGM bridge evidence and scoped CR-off acceptance [skip ci]",
+            "tree": {
+              "sha": "840f9171835d5f1024a4cb3d6b8c28b5c35b3780",
+              "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/git/trees/840f9171835d5f1024a4cb3d6b8c28b5c35b3780"
+            },
+            "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/git/commits/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62",
+            "comment_count": 0,
+            "verification": {
+              "verified": false,
+              "reason": "unsigned",
+              "signature": null,
+              "payload": null,
+              "verified_at": null
+            }
+          },
+          "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/commits/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62",
+          "html_url": "https://github.com/cosmosapjw-quantum/bass_cr/commit/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62",
+          "comments_url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/commits/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62/comments",
+          "author": {
+            "login": "cosmosapjw-quantum",
+            "id": 58155957,
+            "node_id": "MDQ6VXNlcjU4MTU1OTU3",
+            "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/cosmosapjw-quantum",
+            "html_url": "https://github.com/cosmosapjw-quantum",
+            "followers_url": "https://api.github.com/users/cosmosapjw-quantum/followers",
+            "following_url": "https://api.github.com/users/cosmosapjw-quantum/following{/other_user}",
+            "gists_url": "https://api.github.com/users/cosmosapjw-quantum/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/cosmosapjw-quantum/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/cosmosapjw-quantum/subscriptions",
+            "organizations_url": "https://api.github.com/users/cosmosapjw-quantum/orgs",
+            "repos_url": "https://api.github.com/users/cosmosapjw-quantum/repos",
+            "events_url": "https://api.github.com/users/cosmosapjw-quantum/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/cosmosapjw-quantum/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "committer": {
+            "login": "cosmosapjw-quantum",
+            "id": 58155957,
+            "node_id": "MDQ6VXNlcjU4MTU1OTU3",
+            "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/cosmosapjw-quantum",
+            "html_url": "https://github.com/cosmosapjw-quantum",
+            "followers_url": "https://api.github.com/users/cosmosapjw-quantum/followers",
+            "following_url": "https://api.github.com/users/cosmosapjw-quantum/following{/other_user}",
+            "gists_url": "https://api.github.com/users/cosmosapjw-quantum/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/cosmosapjw-quantum/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/cosmosapjw-quantum/subscriptions",
+            "organizations_url": "https://api.github.com/users/cosmosapjw-quantum/orgs",
+            "repos_url": "https://api.github.com/users/cosmosapjw-quantum/repos",
+            "events_url": "https://api.github.com/users/cosmosapjw-quantum/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/cosmosapjw-quantum/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "parents": [
+            {
+              "sha": "3129089fe0f52739961cefc65cda71ccce0a07ab",
+              "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/commits/3129089fe0f52739961cefc65cda71ccce0a07ab",
+              "html_url": "https://github.com/cosmosapjw-quantum/bass_cr/commit/3129089fe0f52739961cefc65cda71ccce0a07ab"
+            }
+          ]
+        },
+        "merge_base_commit": {
+          "sha": "c277bb4305ccddf5b5d94f83f59f398e7f6c3b62",
+          "node_id": "C_kwDOUjtnhtoAKGMyNzdiYjQzMDVjY2RkZjViNWQ5NGY4M2Y1OWYzOThlN2Y2YzNiNjI",
+          "commit": {
+            "author": {
+              "name": "cosmosapjw-quantum",
+              "email": "58155957+cosmosapjw-quantum@users.noreply.github.com",
+              "date": "2026-10-07T10:56:29Z"
+            },
+            "committer": {
+              "name": "cosmosapjw-quantum",
+              "email": "58155957+cosmosapjw-quantum@users.noreply.github.com",
+              "date": "2026-10-07T10:56:29Z"
+            },
+            "message": "research: reconnect fastest track with native photon/IGM bridge evidence and scoped CR-off acceptance [skip ci]",
+            "tree": {
+              "sha": "840f9171835d5f1024a4cb3d6b8c28b5c35b3780",
+              "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/git/trees/840f9171835d5f1024a4cb3d6b8c28b5c35b3780"
+            },
+            "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/git/commits/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62",
+            "comment_count": 0,
+            "verification": {
+              "verified": false,
+              "reason": "unsigned",
+              "signature": null,
+              "payload": null,
+              "verified_at": null
+            }
+          },
+          "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/commits/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62",
+          "html_url": "https://github.com/cosmosapjw-quantum/bass_cr/commit/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62",
+          "comments_url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/commits/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62/comments",
+          "author": {
+            "login": "cosmosapjw-quantum",
+            "id": 58155957,
+            "node_id": "MDQ6VXNlcjU4MTU1OTU3",
+            "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/cosmosapjw-quantum",
+            "html_url": "https://github.com/cosmosapjw-quantum",
+            "followers_url": "https://api.github.com/users/cosmosapjw-quantum/followers",
+            "following_url": "https://api.github.com/users/cosmosapjw-quantum/following{/other_user}",
+            "gists_url": "https://api.github.com/users/cosmosapjw-quantum/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/cosmosapjw-quantum/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/cosmosapjw-quantum/subscriptions",
+            "organizations_url": "https://api.github.com/users/cosmosapjw-quantum/orgs",
+            "repos_url": "https://api.github.com/users/cosmosapjw-quantum/repos",
+            "events_url": "https://api.github.com/users/cosmosapjw-quantum/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/cosmosapjw-quantum/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "committer": {
+            "login": "cosmosapjw-quantum",
+            "id": 58155957,
+            "node_id": "MDQ6VXNlcjU4MTU1OTU3",
+            "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/cosmosapjw-quantum",
+            "html_url": "https://github.com/cosmosapjw-quantum",
+            "followers_url": "https://api.github.com/users/cosmosapjw-quantum/followers",
+            "following_url": "https://api.github.com/users/cosmosapjw-quantum/following{/other_user}",
+            "gists_url": "https://api.github.com/users/cosmosapjw-quantum/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/cosmosapjw-quantum/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/cosmosapjw-quantum/subscriptions",
+            "organizations_url": "https://api.github.com/users/cosmosapjw-quantum/orgs",
+            "repos_url": "https://api.github.com/users/cosmosapjw-quantum/repos",
+            "events_url": "https://api.github.com/users/cosmosapjw-quantum/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/cosmosapjw-quantum/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "parents": [
+            {
+              "sha": "3129089fe0f52739961cefc65cda71ccce0a07ab",
+              "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/commits/3129089fe0f52739961cefc65cda71ccce0a07ab",
+              "html_url": "https://github.com/cosmosapjw-quantum/bass_cr/commit/3129089fe0f52739961cefc65cda71ccce0a07ab"
+            }
+          ]
+        },
+        "status": "ahead",
+        "ahead_by": 1,
+        "behind_by": 0,
+        "total_commits": 1,
+        "commits": [
+          {
+            "sha": "fabb4bee9401d85d6289590b4d7b4d17f7110754",
+            "node_id": "C_kwDOUjtnhtoAKGZhYmI0YmVlOTQwMWQ4NWQ2Mjg5NTkwYjRkN2I0ZDE3ZjcxMTA3NTQ",
+            "commit": {
+              "author": {
+                "name": "cosmosapjw-quantum",
+                "email": "58155957+cosmosapjw-quantum@users.noreply.github.com",
+                "date": "2026-10-07T11:28:32Z"
+              },
+              "committer": {
+                "name": "cosmosapjw-quantum",
+                "email": "58155957+cosmosapjw-quantum@users.noreply.github.com",
+                "date": "2026-10-07T11:28:32Z"
+              },
+              "message": "feat: add sealed native IGM source-step reproduction entrypoint [skip ci]",
+              "tree": {
+                "sha": "1cfd7b979352b0bcd937afcc47a1e9cb005b0e6c",
+                "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/git/trees/1cfd7b979352b0bcd937afcc47a1e9cb005b0e6c"
+              },
+              "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/git/commits/fabb4bee9401d85d6289590b4d7b4d17f7110754",
+              "comment_count": 0,
+              "verification": {
+                "verified": false,
+                "reason": "unsigned",
+                "signature": null,
+                "payload": null,
+                "verified_at": null
+              }
+            },
+            "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/commits/fabb4bee9401d85d6289590b4d7b4d17f7110754",
+            "html_url": "https://github.com/cosmosapjw-quantum/bass_cr/commit/fabb4bee9401d85d6289590b4d7b4d17f7110754",
+            "comments_url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/commits/fabb4bee9401d85d6289590b4d7b4d17f7110754/comments",
+            "author": {
+              "login": "cosmosapjw-quantum",
+              "id": 58155957,
+              "node_id": "MDQ6VXNlcjU4MTU1OTU3",
+              "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+              "gravatar_id": "",
+              "url": "https://api.github.com/users/cosmosapjw-quantum",
+              "html_url": "https://github.com/cosmosapjw-quantum",
+              "followers_url": "https://api.github.com/users/cosmosapjw-quantum/followers",
+              "following_url": "https://api.github.com/users/cosmosapjw-quantum/following{/other_user}",
+              "gists_url": "https://api.github.com/users/cosmosapjw-quantum/gists{/gist_id}",
+              "starred_url": "https://api.github.com/users/cosmosapjw-quantum/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/cosmosapjw-quantum/subscriptions",
+              "organizations_url": "https://api.github.com/users/cosmosapjw-quantum/orgs",
+              "repos_url": "https://api.github.com/users/cosmosapjw-quantum/repos",
+              "events_url": "https://api.github.com/users/cosmosapjw-quantum/events{/privacy}",
+              "received_events_url": "https://api.github.com/users/cosmosapjw-quantum/received_events",
+              "type": "User",
+              "user_view_type": "public",
+              "site_admin": false
+            },
+            "committer": {
+              "login": "cosmosapjw-quantum",
+              "id": 58155957,
+              "node_id": "MDQ6VXNlcjU4MTU1OTU3",
+              "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+              "gravatar_id": "",
+              "url": "https://api.github.com/users/cosmosapjw-quantum",
+              "html_url": "https://github.com/cosmosapjw-quantum",
+              "followers_url": "https://api.github.com/users/cosmosapjw-quantum/followers",
+              "following_url": "https://api.github.com/users/cosmosapjw-quantum/following{/other_user}",
+              "gists_url": "https://api.github.com/users/cosmosapjw-quantum/gists{/gist_id}",
+              "starred_url": "https://api.github.com/users/cosmosapjw-quantum/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/cosmosapjw-quantum/subscriptions",
+              "organizations_url": "https://api.github.com/users/cosmosapjw-quantum/orgs",
+              "repos_url": "https://api.github.com/users/cosmosapjw-quantum/repos",
+              "events_url": "https://api.github.com/users/cosmosapjw-quantum/events{/privacy}",
+              "received_events_url": "https://api.github.com/users/cosmosapjw-quantum/received_events",
+              "type": "User",
+              "user_view_type": "public",
+              "site_admin": false
+            },
+            "parents": [
+              {
+                "sha": "c277bb4305ccddf5b5d94f83f59f398e7f6c3b62",
+                "url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/commits/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62",
+                "html_url": "https://github.com/cosmosapjw-quantum/bass_cr/commit/c277bb4305ccddf5b5d94f83f59f398e7f6c3b62"
+              }
+            ]
+          }
+        ],
+        "files": [
+          {
+            "sha": "8c4ce37d4672b479e19170255b7dc62d6289e1ae",
+            "filename": "research/fastest_rejoin_20261007/source_step/RUN_FROM_ARCHIVE.py",
+            "status": "added",
+            "additions": 47,
+            "deletions": 0,
+            "changes": 47,
+            "blob_url": "https://github.com/cosmosapjw-quantum/bass_cr/blob/fabb4bee9401d85d6289590b4d7b4d17f7110754/research%2Ffastest_rejoin_20261007%2Fsource_step%2FRUN_FROM_ARCHIVE.py",
+            "raw_url": "https://github.com/cosmosapjw-quantum/bass_cr/raw/fabb4bee9401d85d6289590b4d7b4d17f7110754/research%2Ffastest_rejoin_20261007%2Fsource_step%2FRUN_FROM_ARCHIVE.py",
+            "contents_url": "https://api.github.com/repos/cosmosapjw-quantum/bass_cr/contents/research%2Ffastest_rejoin_20261007%2Fsource_step%2FRUN_FROM_ARCHIVE.py?ref=fabb4bee9401d85d6289590b4d7b4d17f7110754",
+            "patch": "@@ -0,0 +1,47 @@\n+#!/usr/bin/env python3\n+\"\"\"Verify and optionally execute the sealed CR-F0-R2 source-step package offline.\"\"\"\n+import argparse\n+import hashlib\n+import json\n+from pathlib import Path\n+import subprocess\n+import sys\n+import zipfile\n+\n+SHA256 = \"f3156ba8e07d4cfe263cb793c424a66958fa9730cbe9c1779c96007e10a11434\"\n+ROOT = \"BASS_CR_FASTEST_STEP_20261007\"\n+\n+def main():\n+    p = argparse.ArgumentParser()\n+    p.add_argument(\"--archive\", type=Path, required=True)\n+    p.add_argument(\"--workspace\", type=Path)\n+    p.add_argument(\"--rustc\", type=Path)\n+    p.add_argument(\"--verify-only\", action=\"store_true\")\n+    a = p.parse_args()\n+    if hashlib.sha256(a.archive.read_bytes()).hexdigest() != SHA256:\n+        raise SystemExit(\"ARCHIVE_IDENTITY_MISMATCH\")\n+    with zipfile.ZipFile(a.archive) as z:\n+        if z.testzip() is not None:\n+            raise SystemExit(\"ZIP_CRC_FAILED\")\n+        for n in z.namelist():\n+            parts = Path(n).parts\n+            if not parts or parts[0] != ROOT or \"..\" in parts or Path(n).is_absolute():\n+                raise SystemExit(\"UNSAFE_ARCHIVE_PATH\")\n+        manifest = json.loads(z.read(ROOT + \"/MANIFEST.json\"))\n+        for name, record in manifest[\"files\"].items():\n+            data = z.read(ROOT + \"/\" + name)\n+            if len(data) != record[\"bytes\"] or hashlib.sha256(data).hexdigest() != record[\"sha256\"]:\n+                raise SystemExit(\"PAYLOAD_IDENTITY_MISMATCH: \" + name)\n+        if a.verify_only:\n+            print(json.dumps({\"status\": \"VERIFIED\", \"payloads\": len(manifest[\"files\"])}))\n+            return\n+        if a.workspace is None or a.rustc is None:\n+            p.error(\"execution requires --workspace NEW_DIRECTORY and --rustc\")\n+        a.workspace.mkdir(parents=True, exist_ok=False)\n+        z.extractall(a.workspace)\n+    work = a.workspace.resolve()\n+    subprocess.run([sys.executable, str(work / ROOT / \"research/reproduce.py\"),\n+                    \"--rustc\", str(a.rustc.resolve()), \"--output\", str(work / \"run\")], check=True)\n+\n+if __name__ == \"__main__\":\n+    main()"
+          }
+        ]
+      }
+    }
+  ],
+  "source_identities": [
+    {
+      "repo": "BASS_HE",
+      "commit": "9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+      "path": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT02-HISTORY_20261007/README_KO.md",
+      "bytes": 3378,
+      "sha256": "228ef613ccb75edcf900202a30b70245bcfd7977f0027d2ac2e861ff857519ea",
+      "git_blob": "9f2669ee0a2228535c6c0695d1507482b087fb13",
+      "expected_git_blob": "9f2669ee0a2228535c6c0695d1507482b087fb13",
+      "exact": true
+    },
+    {
+      "repo": "BASS_HE",
+      "commit": "9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+      "path": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT02-HISTORY_20261007/RETURN.json",
+      "bytes": 869,
+      "sha256": "ee6f5c0189f2355fd72692a3b6ae75b34729d4b777b431782f75f2d4960af441",
+      "git_blob": "03c0bd796cf82802cdc53e4007b8510401a0d5ce",
+      "expected_git_blob": "03c0bd796cf82802cdc53e4007b8510401a0d5ce",
+      "exact": true
+    },
+    {
+      "repo": "BASS_HE",
+      "commit": "9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+      "path": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT02-HISTORY_20261007/INPUT_PIN.json",
+      "bytes": 1118,
+      "sha256": "2a0ab05a9aed5220b5fb5adc2bdcdbe605c7c23ded52818d88f646441e97ebcd",
+      "git_blob": "f1da4cb855526ddd6762a81ceedb718eb1206697",
+      "expected_git_blob": "f1da4cb855526ddd6762a81ceedb718eb1206697",
+      "exact": true
+    },
+    {
+      "repo": "BASS_HE",
+      "commit": "9b46aab79eeafd452a5fb35b1c0fd00eef6f5683",
+      "path": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT02-HISTORY_20261007/SOURCE_IDENTITY.json",
+      "bytes": 1057,
+      "sha256": "b09b6742a74f663012de3a523c58cf2c31e4b80936eb773cabd85d3c17dadbfa",
+      "git_blob": "cd5a0e886b245d4d8bc65a42b73cc7aabaa561e4",
+      "expected_git_blob": "cd5a0e886b245d4d8bc65a42b73cc7aabaa561e4",
+      "exact": true
+    },
+    {
+      "repo": "bass_cr",
+      "commit": "fabb4bee9401d85d6289590b4d7b4d17f7110754",
+      "path": "research/fastest_rejoin_20261007/source_step/RUN_FROM_ARCHIVE.py",
+      "bytes": 2006,
+      "sha256": "3365711bd9c4ea89e77f6feb9c341b096fb3ce258b77bde31899783fea8df712",
+      "git_blob": "8c4ce37d4672b479e19170255b7dc62d6289e1ae",
+      "expected_git_blob": "8c4ce37d4672b479e19170255b7dc62d6289e1ae",
+      "exact": true
+    }
+  ],
+  "science_reruns": 0,
+  "remote_mutations": 0,
+  "frozen_intake_or_loop2_gate_modified": false,
+  "assessment": {
+    "BASS_HE": {
+      "reference_history_completed": true,
+      "received_not_rerun": true,
+      "gate": "BOUNDED_COMMON_DOMAIN_NATIVE_RHS_HISTORY_CHECKED__RECEIVER_INTEGRATION_OPEN",
+      "new_scientific_solves_reported": 23,
+      "new_accepted_time_steps_reported": 960,
+      "native_science_evaluations_reported": 14758,
+      "model": "manufactured source-free H=3e-18/s, nH0=1e-4 cm^-3, fHe=.083, initial fractions(.1,.05,.9), T=2000K; seven OFF/KF96/GM25 and explicit Ebar runs to1e15s plus GM30 extension3e15s",
+      "all_sampled_stage_output_probe_T_K": [
+        1939.6198710627527,
+        2005.4581902704654
+      ],
+      "actual_receiver_integrated": false,
+      "whole_current_receiver_built": false,
+      "rigorous_continuous_domain_bound": false,
+      "physical_admission": false,
+      "next": "HE-FAST-IGM-RCT03_RECEIVER_NATIVE_INTEGRATION",
+      "new_optional_F08_tau_computed": false
+    },
+    "bass_cr": {
+      "added_path": "research/fastest_rejoin_20261007/source_step/RUN_FROM_ARCHIVE.py",
+      "archive_sha256": "f3156ba8e07d4cfe263cb793c424a66958fa9730cbe9c1779c96007e10a11434",
+      "claim": "source-step reproduction entrypoint published; this delta contains no numerical return or owner integration ACK",
+      "source_step_execution_observed_here": false,
+      "science_completion_from_entrypoint": false,
+      "owner_import_status": "UNKNOWN_FROM_THIS_DELTA; previous reported pending retained until result receipt"
+    }
+  }
+}

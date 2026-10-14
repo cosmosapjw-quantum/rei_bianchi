@@ -146,3 +146,8 @@ pub mod flrw_three_equations;
 pub mod he_rct;
 
 pub mod coupled_primary;
+
+pub mod igm_background;
+pub mod igm_state;
+pub mod igm_rates;
+pub mod igm_thermal;

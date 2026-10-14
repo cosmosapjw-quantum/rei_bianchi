@@ -1,0 +1,339 @@
+{
+  "task": "REI-PHYS31-20261011",
+  "status": "FROZEN_BEFORE_FIRST_MAIN_PENDING_OWNER_GO",
+  "created_utc": "2026-10-11T10:04:19.812824+00:00",
+  "numerical_author": "/root/phys31_numerics",
+  "role": "NONBLIND candidate implementation and validation design; not final reviewer",
+  "source_commit": "5ac0bceaac2629682f777bc8223fbba07be810b9",
+  "contract_sha256": "f0bc083e4ecc0c0899b68a7595e5fddac778cccb9eababa191a8fdc0504be8d4",
+  "objective": "Evaluate only new physical k4 at four retained node strings using two distinct degree6 phi series, then the equal-mu2 quartic root-difference coefficient; exact rational polynomial diagnostics preserve same nonzero A.",
+  "input_identities": {
+    "PHYSICS_CONTRACT.json": {
+      "bytes": 10628,
+      "sha256": "f0bc083e4ecc0c0899b68a7595e5fddac778cccb9eababa191a8fdc0504be8d4"
+    },
+    "inputs/PHYS30/contributions/numerics/PROFILE_SECOND_ORDER_FIRST.json": {
+      "bytes": 231082,
+      "sha256": "5184af6139423792abc0a95e53bd5ccabca459820761aa1a3f350bda4ac7082e"
+    },
+    "inputs/PHYS29/contributions/numerics/SECOND_ORDER_FIRST.json": {
+      "bytes": 137037,
+      "sha256": "40d686d2646ac7dbaff1bd768a789fcfdbaf5043a16b26512c42ffbedbdd8d6f"
+    },
+    "inputs/PHYS29/inputs/PHYS22_INITIAL_COEFFICIENTS.json": {
+      "bytes": 26723,
+      "sha256": "6c7a4f239ef48c2a7c60592fc048600317f1233f3028434ebd1b3c7e55682a79"
+    },
+    "inputs/pinned_source/rust/rei_microphysics/src/atomic_provider.rs": {
+      "bytes": 12939,
+      "sha256": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3"
+    },
+    "inputs/pinned_source/rust/rei_microphysics/src/coupled_primary.rs": {
+      "bytes": 28715,
+      "sha256": "62a950137d6b5c7b43e628578cc25a2a1a99b6f135d0872a734f9149aa61c1f8"
+    },
+    "SOURCE_MANIFEST.json": {
+      "bytes": 2584,
+      "sha256": "66283632d40947da7dce0fbd81dda308721f97c1d3e985f0c0411efbc337922e"
+    },
+    "contributions/numerics/quartic_profile_split.py": {
+      "bytes": 36774,
+      "sha256": "6ee29666f48420f79e9d3965b711071b6f35be8f0c61647599578b8e944f1b2f"
+    }
+  },
+  "first_command": {
+    "cwd": "PHYS31 root",
+    "argv": [
+      "python3",
+      "contributions/numerics/quartic_profile_split.py",
+      "--output",
+      "contributions/numerics/QUARTIC_PROFILE_FIRST.json"
+    ],
+    "timeout_seconds": 60,
+    "max_main_invocations": 1,
+    "executor": "root-owned wrapper after owner read and explicit GO"
+  },
+  "replay_command": {
+    "cwd": "New separate extraction directory with the same PHYS31 root layout",
+    "argv": [
+      "python3",
+      "contributions/numerics/quartic_profile_split.py",
+      "--output",
+      "contributions/numerics/QUARTIC_PROFILE_REPLAY.json"
+    ],
+    "timeout_seconds": 60,
+    "max_main_invocations": 1,
+    "executor": "root-owned wrapper; no author invocation",
+    "only_permitted_argument_difference": "Output path; no input/code/tolerance changes",
+    "expected_raw_byte_equality": true,
+    "physical_independence_credit": 0
+  },
+  "runtime_files": [
+    "PHYSICS_CONTRACT.json",
+    "inputs/PHYS30/contributions/numerics/PROFILE_SECOND_ORDER_FIRST.json",
+    "inputs/PHYS29/contributions/numerics/SECOND_ORDER_FIRST.json",
+    "inputs/PHYS29/inputs/PHYS22_INITIAL_COEFFICIENTS.json",
+    "inputs/pinned_source/rust/rei_microphysics/src/atomic_provider.rs",
+    "inputs/pinned_source/rust/rei_microphysics/src/coupled_primary.rs",
+    "SOURCE_MANIFEST.json",
+    "contributions/numerics/quartic_profile_split.py",
+    "contributions/numerics/PROTOCOL.json",
+    "contributions/numerics/PREEXECUTION_FREEZE.json"
+  ],
+  "arithmetic": {
+    "decimal_precision": 80,
+    "rounding": "ROUND_HALF_EVEN",
+    "tolerance": "1e-60",
+    "fixed_scales": {
+      "k4_and_H4": "S4=1e-64/(18 eV)^4, s^-4 eV^-4",
+      "G_W": "S0=1e-64, s^-4",
+      "D4": "1/(18 eV)^2, eV^-2"
+    },
+    "exact_rational_acceptance": "Exact Fraction equality; negative controls must differ exactly from correct coefficient",
+    "precision_or_tolerance_changes": false,
+    "quadrature_or_finite_difference": false,
+    "scale_uses_result_magnitude": false
+  },
+  "two_physical_expressions": {
+    "log_energy": {
+      "phi_variable": "E exp(t)",
+      "coefficient_convention": "c_n=[t^n]phi(E exp(t))=D^n phi/n!",
+      "order": 6,
+      "power_implementation": "log coefficients via f*(log f)prime=fprime, then exponential recurrence; positive constant base",
+      "k4": "K/E^4 * (720 c6 - 360 c5 - 168 c4 + 162 c3 - 36 c2)",
+      "physical_calls": 4
+    },
+    "ordinary_energy": {
+      "phi_variable": "E+u, u in eV",
+      "coefficient_convention": "a_n=[u^n]phi(E+u)=phi^(n)/n!",
+      "order": 6,
+      "power_implementation": "Separately implemented generalized-binomial finite sum and ordinary convolution",
+      "k4": "K*(720 E^2 a6+1440 E a5+672 a4)",
+      "physical_calls": 4
+    },
+    "shared": "Same original J, fixed fit, source binary64-as-real constants, four retained Decimal energy strings, Decimal scalar ln/exp primitives. Shared scalar normalization and final coefficient extractor formulas disclosed. No independent physical-data credit.",
+    "forbidden_outputs": "No newly evaluated physical k,kprime,ksecond,kthird; phi coefficients are internal auxiliary series and are not published as new k derivatives."
+  },
+  "physical_input_keys": {
+    "nodes": "cache30.retained_physical_data.energy_nodes_eV in exact order a,v_star,u_zero,b",
+    "geometry": "cache30.retained_physical_data.PHYS29_uniform_partials_weights_and_coefficients",
+    "cached_lower_components": "cache30.retained_physical_data.components",
+    "J": "results.baseline_local.J_nonphoto[2][0] and [2][3]",
+    "source_constants": "Fresh source_f64 interpretation from actual PHYS29 code, equality check against cache29 constants; no old module import"
+  },
+  "quartic_transfer": {
+    "first": "H4=p*k4(e)+q*k4(x); response coefficient=Delta_mu4*H4/24; D4=-Delta_mu4*H4/(24*C)",
+    "second": "N_W=cached k(e)+s*R*cached kprime(x); Q=R^2+w; G_W=N_W-A; D4=-Delta_mu4*(w*k4(e)+R^2*k4(x))/(24*G_W)",
+    "no_circular_second_denominator": "N_W is not reconstructed as Q*C+A; computed from cached k and kprime",
+    "A": "Retain exact cached nonzero response strings; no zero replacement or correction",
+    "units": {
+      "H4": "s^-4 eV^-4",
+      "response_delta4": "s^-4 eV^-4",
+      "D4": "eV^-2"
+    },
+    "sign_or_nonzero": "Recorded descriptively only; neither sign nor nonzero is a prespecified numerical PASS condition",
+    "descriptive_gap": "Report D4_lower-D4_upper from already computed branch coefficients for each path; no added physical call or separate numerical check."
+  },
+  "exact_profiles": {
+    "densities": {
+      "uniform": "1/2",
+      "p4": "(11-30 z^2+35 z^4)/16"
+    },
+    "integration": "Polynomial antiderivative sum on [-1,1], n=0..4, exactly ten Fraction moment integrals",
+    "positivity": "Coefficient equality to 35/16*(z^2-3/7)^2+2/7",
+    "mu2": "1/3 for both",
+    "mu4_uniform": "1/5",
+    "mu4_p4": "71/315",
+    "delta_mu4": "8/315",
+    "regularity": "Densities continuous on [-1,1]; zero extensions jump at endpoints; measures are positive AC with identical full support"
+  },
+  "exact_operator_cases": {
+    "phi": "E^degree, degree=0..6, E=3",
+    "count": 7,
+    "two_expressions_per_case": 2,
+    "oracle": "Direct d4/dE4 of degree*(degree+3)*E^degree; exact equality",
+    "not_physical_evaluations": true
+  },
+  "exact_toys": {
+    "kernels": {
+      "cubic": "1+X^2-X^3/10",
+      "quartic": "1+X^2-X^3/10+X^4/100"
+    },
+    "domain": "Dimensionless X in [-2,2], m=0,R=2,w=1, signs +1 upper/-1 lower",
+    "branch_level": "A=[w*k(-sR)+R^2*k(s*w/R)]/(R^2+w), nonzero retained separately per branch",
+    "analytic_slope": "C=[k(-sR)+s*R*kprime(s*w/R)-A]/(R^2+w)",
+    "formal_method": "Exact ordinary delta series of N-AQ, solve four coefficients successively using G_W; compare normalized F-A coefficient/C at every step, then final residual to order4",
+    "response_build_accounting": "2 fixed-W profiles + (4 successive coefficient constructions+1 final residual)*2 profiles = 12 per branch; four branches gives48",
+    "root_series_count": 8,
+    "formal_steps": 32,
+    "required_results": [
+      "Fixed-W difference coefficients0..3=0, degree4=beta*Delta_mu4",
+      "Root differences0..3=0, degree4=-beta*Delta_mu4/C",
+      "Cubic differences through degree4 exactly0; exact all-width equality is a separate direct polynomial identity",
+      "Correct nonzero A retained in both numerator and normalized formulations",
+      "Missing24 and droppedA deliberately incorrect formulas differ exactly in both quartic branches"
+    ],
+    "negative_controls": 4,
+    "not_physical_root_search": true,
+    "independent_hand_derived_values": {
+      "cubic_A": "(40+3*s)/20",
+      "cubic_C": "(10+s)/10",
+      "quartic_A": "(813+60*s)/400",
+      "quartic_C": "(411+40*s)/400",
+      "quartic_D4": "-32/[315*(411+40*s)]",
+      "cubic_D4": "0",
+      "comparison": "Within existing base_level and root_difference IDs, alongside general formulas; no new check ID"
+    }
+  },
+  "expected_check_ids": [
+    "IDENTITY.contract",
+    "IDENTITY.cache30",
+    "IDENTITY.cache29",
+    "IDENTITY.J",
+    "IDENTITY.atomic",
+    "IDENTITY.coupled",
+    "IDENTITY.source_manifest",
+    "IDENTITY.code",
+    "IDENTITY.protocol",
+    "IDENTITY.freeze_mapping",
+    "CACHE.nodes",
+    "CACHE.geometry_and_components",
+    "CACHE.source_real_constants",
+    "CACHE.original_J",
+    "ARITHMETIC.context",
+    "PROFILE.positivity_square",
+    "PROFILE.uniform.moment0",
+    "PROFILE.uniform.moment1",
+    "PROFILE.uniform.moment2",
+    "PROFILE.uniform.moment3",
+    "PROFILE.uniform.moment4",
+    "PROFILE.p4.moment0",
+    "PROFILE.p4.moment1",
+    "PROFILE.p4.moment2",
+    "PROFILE.p4.moment3",
+    "PROFILE.p4.moment4",
+    "PROFILE.equal_mu2",
+    "PROFILE.delta_mu4",
+    "OPERATOR.phi_degree0",
+    "OPERATOR.phi_degree1",
+    "OPERATOR.phi_degree2",
+    "OPERATOR.phi_degree3",
+    "OPERATOR.phi_degree4",
+    "OPERATOR.phi_degree5",
+    "OPERATOR.phi_degree6",
+    "PHYSICAL.k4.a",
+    "PHYSICAL.k4.v_star",
+    "PHYSICAL.k4.u_zero",
+    "PHYSICAL.k4.b",
+    "PHYSICAL.upper_root.G_W",
+    "PHYSICAL.upper_root.log.root_quotient",
+    "PHYSICAL.upper_root.energy.root_quotient",
+    "PHYSICAL.upper_root.D4_paths",
+    "PHYSICAL.lower_root.G_W",
+    "PHYSICAL.lower_root.log.root_quotient",
+    "PHYSICAL.lower_root.energy.root_quotient",
+    "PHYSICAL.lower_root.D4_paths",
+    "TOY.cubic.derivative_bounds",
+    "TOY.cubic.upper.base_level",
+    "TOY.cubic.upper.response_difference",
+    "TOY.cubic.upper.uniform.root_series",
+    "TOY.cubic.upper.p4.root_series",
+    "TOY.cubic.upper.root_difference",
+    "TOY.cubic.upper.normalized_unnormalized_steps",
+    "TOY.cubic.lower.base_level",
+    "TOY.cubic.lower.response_difference",
+    "TOY.cubic.lower.uniform.root_series",
+    "TOY.cubic.lower.p4.root_series",
+    "TOY.cubic.lower.root_difference",
+    "TOY.cubic.lower.normalized_unnormalized_steps",
+    "TOY.quartic.derivative_bounds",
+    "TOY.quartic.upper.base_level",
+    "TOY.quartic.upper.response_difference",
+    "TOY.quartic.upper.uniform.root_series",
+    "TOY.quartic.upper.p4.root_series",
+    "TOY.quartic.upper.root_difference",
+    "TOY.quartic.upper.normalized_unnormalized_steps",
+    "TOY.quartic.upper.negative_control_missing24",
+    "TOY.quartic.upper.negative_control_dropped_A",
+    "TOY.quartic.lower.base_level",
+    "TOY.quartic.lower.response_difference",
+    "TOY.quartic.lower.uniform.root_series",
+    "TOY.quartic.lower.p4.root_series",
+    "TOY.quartic.lower.root_difference",
+    "TOY.quartic.lower.normalized_unnormalized_steps",
+    "TOY.quartic.lower.negative_control_missing24",
+    "TOY.quartic.lower.negative_control_dropped_A",
+    "LEDGER.exact_counts",
+    "LEDGER.check_id_order"
+  ],
+  "expected_check_count": 79,
+  "expected_counts_per_main": {
+    "program_main_invocations_this_process": 1,
+    "unique_retained_physical_nodes": 4,
+    "log_energy_k4_calls": 4,
+    "ordinary_energy_k4_calls": 4,
+    "new_physical_k4_component_outputs": 8,
+    "new_physical_lower_order_k_component_outputs": 0,
+    "log_phi_degree6_builds": 4,
+    "ordinary_phi_degree6_builds": 4,
+    "physical_branch_coefficient_updates": 2,
+    "physical_unnormalized_quotients_from_cached_lower_values": 4,
+    "exact_profile_moment_integrals": 10,
+    "exact_profile_positivity_polynomial_checks": 1,
+    "exact_polynomial_operator_cases": 7,
+    "exact_polynomial_operator_expressions": 14,
+    "exact_toy_kernel_sign_bound_cases": 2,
+    "exact_toy_branches": 4,
+    "exact_toy_profile_root_series": 8,
+    "exact_toy_formal_root_steps": 32,
+    "exact_toy_response_series_builds": 48,
+    "new_physical_energy_nodes": 0,
+    "new_physical_root_searches_or_corrections": 0,
+    "old_scientific_module_imports": 0,
+    "old_scientific_main_or_suite_runs": 0,
+    "quadrature": 0,
+    "finite_differences": 0,
+    "physical_width_or_root_sweeps": 0,
+    "whole_interval_derivative_sign_campaigns": 0,
+    "native_gas_IVP_dense_LP_runs": 0,
+    "independent_physical_data_credit": 0
+  },
+  "combined_first_and_replay_budget": {
+    "new_main": 2,
+    "retained_unique_nodes_each_main": 4,
+    "new_physical_k4_calls": 16,
+    "new_physical_lower_k_outputs": 0,
+    "new_physical_nodes": 0,
+    "physical_roots": 0,
+    "old_program_import_main_suite": 0
+  },
+  "failure_policy": "Preserve actual first output/exit/stderr; finite failures are raw FAIL and exception writes FAIL_EXCEPTION with counts. No hidden retry, precision change, fallback, output overwrite, or old-suite run. Root assesses any repair under remaining hard budget.",
+  "raw_determinism": "No run timestamp, absolute input/output paths or first/replay label in scientific raw JSON. Actual environment, argv, timing, stdout/stderr, exit and archive restore are detached root receipts.",
+  "preexecution_state": {
+    "author_scientific_main_invocations": 0,
+    "physical_k4_evaluations": 0,
+    "exact_toy_evaluations": 0,
+    "AST_only": "STATIC_PREEXECUTION.json",
+    "newmodule_imports": 0,
+    "revision0": "preexecution_revision0: archived pending-GO code/protocol/freeze/static receipt, no scientific execution"
+  },
+  "claim_ceiling": [
+    "Finite Decimal80 two-representation agreement is not interval certification",
+    "No new J or root uncertainty enclosure",
+    "Root coefficient computed at retained numerical reference and same A, not an exact zero-root certification",
+    "No finite-width physical evaluation, quantified asymptotic remainder, global ordering, or valid-width guarantee",
+    "Final independent NONBLIND reviewer remains a separate unperformed gate"
+  ],
+  "protected": {
+    "physical": "HOLD",
+    "original_interval": "[160,161] FAIL",
+    "tick": 160,
+    "auxiliary_escape": "FAIL",
+    "HH": "OFF",
+    "RCT": "OFF",
+    "CR": "OFF",
+    "precision_atomic": "PARKED",
+    "production_source_default_runtime_changes": 0
+  },
+  "preexecution_revision": 1
+}

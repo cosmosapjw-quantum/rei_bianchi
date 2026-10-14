@@ -1,0 +1,65 @@
+{
+  "task": "SYNC03_LOOP1_ACTUAL_F08_BASS_RECEIVER",
+  "owner": "bass_rec_intake_sync03",
+  "status": "PREREGISTERED_BEFORE_IMPLEMENTATION",
+  "objective": "Consume published actual F08 proper electron density endpoints through exact BASS cold-Thomson normal-clock visibility modules without chemistry or solver changes.",
+  "bass_commit": "1e45e0f48cd83dcb21c23d4087fa5526195331d7",
+  "source_modules": [
+    "frame.rs",
+    "visibility.rs",
+    "visibility_clock.rs"
+  ],
+  "composition_semantics": "ElectronState(ne_m3,0,1,0,0) is an explicitly auxiliary density container for exported aggregate ne; it does not reconstruct or assert hydrogen-only composition.",
+  "input": "All six actual F08 T0/T1/T2 BI/FLRW endpoint proper ne in cm^-3, normal seconds, D=1; finite ordered endpoint arrays with immutable SHA256 source manifest.",
+  "cell_surrogate": "Piecewise constant qbar_i=(q_i+q_(i+1))/2 has the same cell integral as piecewise-linear interpolation of endpoint q. Endpoint survival agrees with that interpolation; cell probability is exact for its integrated depth. No within-cell visibility profile claim.",
+  "observer_tail": {
+    "baseline": 0.0,
+    "external_diagnostic": 0.1
+  },
+  "constants": {
+    "c_m_s": 299792458.0,
+    "sigma_T_m2": 6.6524587e-29,
+    "cm3_to_m3": 1000000.0
+  },
+  "validation": {
+    "oracle": "Python Decimal precision 70 independent summation/exponentials from exact binary64 inputs and independent expression c*sigma_T*ne",
+    "tau_relative_tolerance": 1e-12,
+    "tau_absolute_tolerance": 1e-18,
+    "q_relative_tolerance": 1e-14,
+    "q_absolute_tolerance": 1e-30,
+    "probability_absolute_tolerance": 2e-12,
+    "finite_interval_mass_residual_tolerance": 2e-12,
+    "checks": [
+      "nonnegative density/rates/depth/probabilities",
+      "strictly increasing times",
+      "D exactly 1",
+      "all-node tau comparison",
+      "all-cell probability comparison",
+      "survival+sum(probabilities)=exp(-tail)",
+      "tail diagnostic scales survival and probabilities by exp(-0.1)"
+    ]
+  },
+  "outputs": [
+    "native endpoint CSV.gz per history with t/ne/q/tau/survival/cell probability",
+    "history summaries",
+    "Decimal oracle receipt",
+    "native command/stdout/stderr/exit/source hashes",
+    "theory and source boundary"
+  ],
+  "protected": [
+    "BASS PR133 native-boundary/gain modules",
+    "REI production/transport modules",
+    "source chemistry and endpoint enclosures",
+    "source tolerance and history failures"
+  ],
+  "excluded_claims": [
+    "full BASS build",
+    "physical finite-temperature Thomson validity",
+    "directional Bianchi observable at fixed redshift",
+    "continuous chemistry trajectory bound",
+    "production or default solver integration",
+    "peak location/height bound",
+    "cosmological observer tail calibration"
+  ],
+  "input_acquisition_update": "All six exact files became available before native execution; original science/acceptance unchanged."
+}

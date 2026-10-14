@@ -1,3 +1,34 @@
+# 현재 통합 개발계획 — 2026-10-12 원자물리 재사용 중심 개편
+
+**다음 실행 묶음은 RUX-P0: 기존 결합 수치 골격에 한 EoR 시나리오의 rate/domain·time/source 입력을 연결하고 첫 FLRW coupled interval까지 진행하는 작업이다.**
+
+- [현재 통합 개발계획](REI-ATOMIC-REUSE-RESET-20261012/README_KO.md)
+- [다음 실행 인계](REI-ATOMIC-REUSE-RESET-20261012/CODEX_START_KO.md)
+- [17개 RUX 의무와 실행 묶음](REI-ATOMIC-REUSE-RESET-20261012/PLAN.json)
+- [활성 포인터](CURRENT_PLAN.json)
+
+기본 H/He rate·흡수/가열·implicit stage·수송은 재사용할 core다. EoR용 rate/domain과 실제 시간·광원 연결은 새 구현 의무이며 guard/admission flag 변경으로 대신하지 않는다. 입력·owner 점검은 한 scenario의 국소 조건이다. PR104·F08·SYNC03와 prescribed 수송/Thomson은 독립 대조 경로로 유지한다. FT-B1A의 선행 완료를 main coupled 경로에 요구하지 않는다.
+
+17개 신규 RUX 과학 노드는 아직 NOT_RUN이다. PHYS36과 C12 full-history/정밀 인증은 비차단 선택 경로이고 기존 결과·소진 예산·HOLD/FAIL을 보존한다. 다른 owner의 연구·외부 job을 정지시키는 지시가 아니다.
+
+아래는 앞선 계획과 동기화 원문이다. 우선순위·다음 실행·일괄 환경 지시는 위 현재 계획이 대체하며, 과거 과학 증거와 적용 범위는 보존한다.
+
+---
+
+# 현재 개발계획 — 2026-10-12 SCIENTIFIC_FAST_TRACK_RESET
+
+**다음 필수 작업은 FT-B1A: PR104의 기존 reduced history를 PR83 Bianchi ray/packet 수송에 연결해 방향별 intensity·quadrupole 결과를 만드는 일이다.**
+
+- [수정 개발계획](REI-FASTTRACK-RESET-20261012/README_KO.md)
+- [다음 실행 인계](REI-FASTTRACK-RESET-20261012/CODEX_START_KO.md)
+- [현재 계획 포인터](CURRENT_PLAN.json)
+
+Full native·정밀 원자 이력과 PHYS36은 비차단 선택 경로다. PHYS36은 DEFERRED_NONBLOCKING / NOT_RUN이며, PHYS35 결과·소진 예산·기존 HOLD/FAIL은 유지한다. 첫 collisionless 결과와 실제 xe 의존 Thomson 결과를 구분한다. 계획 수정 세션에서는 새 물리 계산을 실행하지 않았다.
+
+아래의 과거 동기화 본문은 그대로 보존한다. 그 안의 다음 작업 우선순위, native 선행 조건, 일괄 CODEX_ONLY 환경 가정은 현재 실행의 지시로 사용하지 말고 위의 현재 계획을 따른다. 기존 증거·물리 제한·실패 기록은 여전히 유효하다. 다른 PR 소유자의 독립 작업이나 실행 중인 외부 작업을 취소하는 지시는 아니다.
+
+---
+
 # Fastest-track ChatGPT ↔ Codex 동기화
 
 2026-10-05 추가완료: REI-F07 prospectiveS0사전등록. source13.7eV/5e-15photon/H/s,IC50000K/정해진분율,meanH1e-14/s,epsilon0.01,구간1e13s를pairedobservable전고정했다. compactsource tailnumber/energy0은정의상정확하며physicalSED오차주장이아니다. CaseAexplicitescape/primary-only/CR-HH-RCT-off의비관측실험이다. 실제binding과Vernercutoff의별도문턱/crossing,진짜FT03Tguard,양의정수grid/normalizedweights,양의상수/EOS를직접검증했다. 독립review2major+2minor를Host한번수리하고12개finalassertionsPASS; 원후보/실패/원screening을보존하며최종수정bytes의재독립리뷰는없다. native1dispatch/known871086tokens/costNOT_MEASURED,CODEX_ONLY. pairedhistory0,physicalaccuracy/secondary/coolingerrorNOT_MEASURED,temperatureguardnotproveninvariant,scientificHOLD. 상세runtime_returns/REI-F07.json. 다음CodexREI-F04의actualparent/root/remainder로계속간다. 최신수신69fd2901의FLRW05N/Uclosure는이론/finite독립reference이며nativeexpanding아니다. 그CONCURRENT_SOURCE_ACK에서F06반환/실제source의연구측수신을확인했다. 다음연구FLRW06native spectral-stage와CodexF06collisionless는별개다. 직접브라우저전달은여전히미완료다.

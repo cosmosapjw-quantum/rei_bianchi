@@ -1,0 +1,206 @@
+{
+  "task": "REI-PHYS24-20261011",
+  "nodes": [
+    {
+      "id": "INPUT_SOURCE",
+      "kind": "source",
+      "state": "established identity only",
+      "path": "SOURCE_MANIFEST.json"
+    },
+    {
+      "id": "INPUT_J",
+      "kind": "numeric input",
+      "state": "inherited numerically checked",
+      "path": "inputs/PHYS22_INITIAL_COEFFICIENTS.json"
+    },
+    {
+      "id": "INHERITED_FUNCTIONAL",
+      "kind": "theory input",
+      "state": "inherited established within PHYS22 scope",
+      "path": "inputs/inherited/PHYS23_REPORT_KO.md"
+    },
+    {
+      "id": "GENERAL_MOMENTS",
+      "kind": "derived theorem",
+      "state": "derived",
+      "path": "contributions/moments/MOMENT_EXTREMIZERS_KO.md"
+    },
+    {
+      "id": "C24.1",
+      "kind": "claim",
+      "statement": "At fixed numerical J the actual HeIII scalar kernel is strictly convex on I, has opposite endpoint signs and exactly one interior zero.",
+      "evidence_state": [
+        "derived",
+        "implementation-verified"
+      ],
+      "evidence": [
+        "contributions/curvature/CURVATURE_DERIVATION_KO.md",
+        "contributions/curvature/CURVATURE_CERTIFICATE.json",
+        "contributions/curvature/EXECUTION.json"
+      ],
+      "decision_authority": "independent/DECISION_REVIEW.json"
+    },
+    {
+      "id": "C24.2",
+      "kind": "claim",
+      "statement": "The exact fixed-mass/fixed-mean response set is [k(mean), endpoint_chord(mean)]; its interior-mean minimizer and maximizer are unique mono and endpoint laws.",
+      "evidence_state": [
+        "derived"
+      ],
+      "evidence": [
+        "contributions/moments/MOMENT_EXTREMIZERS_KO.md",
+        "PHYS24_REPORT_KO.md sections 4–6"
+      ],
+      "decision_authority": "independent/DECISION_REVIEW.json"
+    },
+    {
+      "id": "C24.3",
+      "kind": "claim",
+      "statement": "Every response in the interval can be achieved by at most two spectral lines; the left-endpoint path is continuous and strictly increasing at interior means.",
+      "evidence_state": [
+        "derived"
+      ],
+      "evidence": [
+        "contributions/moments/MOMENT_EXTREMIZERS_KO.md section 3.1",
+        "PHYS24_REPORT_KO.md equation 20"
+      ],
+      "decision_authority": "independent/DECISION_REVIEW.json"
+    },
+    {
+      "id": "C24.4",
+      "kind": "claim",
+      "statement": "Five mean-energy sign regions follow exactly from the kernel and chord zeros: positive; nonnegative boundary; both signs; nonpositive boundary; negative.",
+      "evidence_state": [
+        "derived",
+        "numerically checked"
+      ],
+      "evidence": [
+        "PHYS24_REPORT_KO.md sections 1 and 7",
+        "contributions/numerics/MOMENT_ENVELOPE.json",
+        "contributions/moments/MOMENT_EXTREMIZERS_KO.md section 4"
+      ],
+      "decision_authority": "independent/DECISION_REVIEW.json"
+    },
+    {
+      "id": "C24.5",
+      "kind": "claim",
+      "statement": "Original-fit Taylor jets and a separate direct finite-difference path agree on seven new curvature samples; fixed-moment examples and one PHYS23 anchor are consistent with the proved interval.",
+      "evidence_state": [
+        "numerically checked",
+        "implementation-verified"
+      ],
+      "evidence": [
+        "contributions/numerics/moment_envelope.py",
+        "contributions/numerics/MOMENT_ENVELOPE.json",
+        "contributions/numerics/EXECUTION.json",
+        "contributions/numerics/INDEPENDENCE_ACTUAL.json"
+      ],
+      "decision_authority": "independent/DECISION_REVIEW.json"
+    },
+    {
+      "id": "PHYSICAL",
+      "kind": "admission",
+      "state": "HOLD",
+      "blockers": "Inherited physical gates and unbounded finite-time/native/J uncertainty"
+    },
+    {
+      "id": "PHYS25",
+      "kind": "successor",
+      "state": "PLANNED_NOT_EXECUTED",
+      "path": "PHYS25_NEXT_HANDOFF_KO.md"
+    }
+  ],
+  "edges": [
+    {
+      "from": "INPUT_SOURCE",
+      "to": "C24.1",
+      "relation": "supports"
+    },
+    {
+      "from": "INPUT_J",
+      "to": "C24.1",
+      "relation": "supports"
+    },
+    {
+      "from": "INHERITED_FUNCTIONAL",
+      "to": "C24.1",
+      "relation": "supports"
+    },
+    {
+      "from": "INPUT_J",
+      "to": "PHYSICAL",
+      "relation": "limits"
+    },
+    {
+      "from": "GENERAL_MOMENTS",
+      "to": "C24.2",
+      "relation": "supports"
+    },
+    {
+      "from": "GENERAL_MOMENTS",
+      "to": "C24.3",
+      "relation": "supports"
+    },
+    {
+      "from": "C24.1",
+      "to": "C24.2",
+      "relation": "supports"
+    },
+    {
+      "from": "C24.1",
+      "to": "C24.3",
+      "relation": "supports"
+    },
+    {
+      "from": "C24.2",
+      "to": "C24.3",
+      "relation": "supports"
+    },
+    {
+      "from": "C24.1",
+      "to": "C24.4",
+      "relation": "supports"
+    },
+    {
+      "from": "C24.2",
+      "to": "C24.4",
+      "relation": "supports"
+    },
+    {
+      "from": "C24.5",
+      "to": "C24.1",
+      "relation": "corroborates finite points only"
+    },
+    {
+      "from": "C24.5",
+      "to": "C24.4",
+      "relation": "supports numerical values"
+    },
+    {
+      "from": "C24.2",
+      "to": "PHYS25",
+      "relation": "motivates"
+    },
+    {
+      "from": "C24.4",
+      "to": "PHYS25",
+      "relation": "motivates"
+    },
+    {
+      "from": "C24.3",
+      "to": "PHYS25",
+      "relation": "limits: response feasibility is not variance optimality"
+    }
+  ],
+  "protected": {
+    "physical": "HOLD",
+    "legacy_interval_160_161": "FAIL",
+    "tick": 160,
+    "auxiliary_escape": "FAIL",
+    "HH_RCT_CR": "OFF",
+    "precision_atomic": "PARKED",
+    "production_source_default_runtime_changes": 0
+  },
+  "owner_self_promotion": false,
+  "final_decision": "independent/DECISION_REVIEW.json"
+}
