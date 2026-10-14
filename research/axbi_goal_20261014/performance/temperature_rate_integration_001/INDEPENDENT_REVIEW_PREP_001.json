@@ -1,0 +1,36 @@
+{
+  "schema": "rei.axbi.temp_rate_integration_independent_review.v1",
+  "observed_utc": "2026-10-14T13:18:34.063221+00:00",
+  "decision": "HOLD_PROVIDER_CALL_ACCOUNTING",
+  "pilot_release": "HOLD_UNTIL_ONE_TARGETED_REPAIR_PASSES_INDEPENDENT_REVIEW",
+  "reviewer_requested": "gpt-6-astra/xhigh",
+  "reviewer_observed": "NOT_INDEPENDENTLY_OBSERVED",
+  "reviewed_authorities": {
+    "parent": "3cca99146d936f3c25ce568c1a5aba0eb7814c7a3ea81f6db818535bbfa866c7",
+    "validator_repair": "cc9390bd56d4df5407ad695b64a723f5cded96b1416116fad902fdc493b6fe3e"
+  },
+  "accepted_findings": [
+    "35 source/table/authority/manifest/evidence identities matched",
+    "All three driver rate/point call sites select per-driver provider",
+    "Solver formulas and 17 output-stop surfaces preserved",
+    "DIRECT attempted-step binary64 parity q0 and q+.01, each accepted0 attempts3 RHS39",
+    "Original first failure preserved; validator repair 10 valid point pairs,13 invalid RHS,5 invalid T exit0"
+  ],
+  "blocking_finding": {
+    "type": "PERFORMANCE_CONTRACT_INSTRUMENTATION_DEFECT",
+    "path": "src/provider.rs",
+    "lines": "38-42,52-55",
+    "defect": "DIRECT charges two coefficient calls only after canonical point succeeds; errors omit attempted calls while TABLE charges before execution",
+    "minimal_falsifier": "Valid EOS recovered T=0.5K and otherwise valid point input: both rate-domain reject; DIRECT counter0 TABLE counter1",
+    "scope": "Required workload counter biased; no trajectory error demonstrated; pilot call cap not at risk"
+  },
+  "cap_analysis": {
+    "per_pilot_max_actual_calls": 4090000,
+    "formula": "2*2000000+3*30000",
+    "frozen_cap": 5000000,
+    "four_pilot_max": 16360000,
+    "integration_cap": 20100000
+  },
+  "next": "One targeted provider accounting repair then fresh independent release review before pilots",
+  "claim_ceiling": "No pilot parity, whole-driver speedup, signed response accuracy, longer history or science admission"
+}

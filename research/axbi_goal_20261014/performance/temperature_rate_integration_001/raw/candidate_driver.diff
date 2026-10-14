@@ -1,0 +1,202 @@
+--- rust/rei_microphysics/src/axbi_driver.rs	2026-10-14 19:45:10.768768940 +0900
++++ research/axbi_goal_20261014/performance/temperature_rate_integration_001/src/candidate_driver.rs	2026-10-14 22:04:47.498677699 +0900
+@@ -3,7 +3,7 @@
+ use crate::axbi_background::{
+     isotropic_initial_radiation_moments, AxbiBackground, BackgroundFamily, Cosmology,
+ };
+-use crate::axbi_rates::AxbiProvider;
++use crate::provider::Provider;
+ use crate::axbi_sources::AxbiSource;
+ use crate::igm_background::{FlatFlrwBackground, FlatFlrwConfig};
+ use crate::igm_state::{w_erg_per_h_to_ev, w_ev_per_h_to_erg, IgmGasState};
+@@ -197,9 +197,13 @@
+     pub n_he0_cm3: f64,
+     signature: Vec<[f64; 3]>,
+     initial_energy: f64,
++    pub rate_provider: Provider,
+ }
+ impl Driver {
+     pub fn new(config: DriverConfig) -> Result<(Self, DriverState), ForwardError> {
++        Self::new_with_provider(config, Provider::direct())
++    }
++    pub fn new_with_provider(config: DriverConfig, rate_provider: Provider) -> Result<(Self, DriverState), ForwardError> {
+         config.validate()?;
+         let h0 = 67.4 * 1e5 / 3.0856775814913673e24;
+         let a_ref = 1.0_f64 / 21.0;
+@@ -290,6 +294,7 @@
+             n_he0_cm3: n_he0,
+             signature,
+             initial_energy: 0.0,
++            rate_provider,
+         };
+         driver.initial_energy = driver.total_energy(&state)?;
+         Ok((driver, state))
+@@ -400,7 +405,7 @@
+         let eos = s
+             .gas
+             .eos(self.n_h0_cm3 / to.powi(3), self.n_he0_cm3 / to.powi(3))?;
+-        AxbiProvider.rates(eos.temperature_k)?;
++        self.rate_provider.rates(eos.temperature_k)?;
+         Ok(())
+     }
+     fn inject(&self, s: &mut DriverState, dt: f64) -> Result<(), ForwardError> {
+@@ -468,7 +473,7 @@
+                 }
+             }
+         }
+-        let point = AxbiProvider.point(&gas, nh, nhe, 0.0, 2.7255 / old.a, photo)?;
++        let point = self.rate_provider.point(&gas, nh, nhe, 0.0, 2.7255 / old.a, photo)?;
+         let mut residual = [0.0; 4];
+         for i in 0..3 {
+             residual[i] = unknown[i] - old.gas.fractions[i] - dt * point.rhs.fraction_dt[i];
+@@ -601,7 +606,7 @@
+         let eos = s
+             .gas
+             .eos(self.n_h0_cm3 / s.a.powi(3), self.n_he0_cm3 / s.a.powi(3))?;
+-        AxbiProvider.rates(eos.temperature_k)?;
++        self.rate_provider.rates(eos.temperature_k)?;
+         for &n in &s.photons {
+             if f(n)? < 0.0 {
+                 return Err(err("AXBI_STOCK_NEGATIVE"));
+@@ -651,10 +656,15 @@
+         f(e.max(dn / n.max(1e-8)).max(du / u.max(1e-8)))
+     }
+     pub fn adaptive_step(&self, s: &mut DriverState) -> Result<bool, ForwardError> {
++        self.adaptive_step_to(s, 1.0 / (1.0 + self.config.end_zbar))
++    }
++    pub fn adaptive_step_to(&self, s: &mut DriverState, target_a: f64) -> Result<bool, ForwardError> {
++        let original_end = 1.0 / (1.0 + self.config.end_zbar);
++        if !target_a.is_finite() || target_a < s.a || target_a > original_end { return Err(err("AXBI_SURFACE_TARGET")); }
+         if s.accepted >= self.config.max_steps || s.attempts >= self.config.max_attempts {
+             return Err(err("AXBI_STEP_CAP"));
+         }
+-        let endpoint = 1.0 / (1.0 + self.config.end_zbar);
++        let endpoint = original_end.min(target_a);
+         if s.a == endpoint {
+             return Ok(true);
+         }
+@@ -754,29 +764,12 @@
+ /// Compiled source bytes; checked exactly with the saved record on resume.
+ /// This is a reproducibility binding, not an adversarial seal.
+ pub fn compiled_identity() -> String {
+-    [
+-        include_str!("axbi_driver.rs"),
+-        include_str!("axbi_background.rs"),
+-        include_str!("axbi_sources.rs"),
+-        include_str!("axbi_rates.rs"),
+-        include_str!("igm_rates.rs"),
+-        include_str!("igm_thermal.rs"),
+-        include_str!("igm_state.rs"),
+-        include_str!("igm_background.rs"),
+-        include_str!("atomic_provider.rs"),
+-        include_str!("bianchi_i.rs"),
+-        include_str!("hhe_events.rs"),
+-        include_str!("../examples/axbi_reionization.rs"),
+-        include_str!("lib.rs"),
+-        include_str!("../Cargo.toml"),
+-        include_str!(
+-            "../../../docs/fastest_track_chat/REI-AXBI-GOAL-20261014/OUTPUT_CONTRACT.json"
+-        ),
+-        include_str!("../../../research/axbi_goal_20261014/scenario/SCENARIO_LOCK.json"),
+-        include_str!("../../../research/axbi_goal_20261014/scenario/AX05_NUMERICAL_CONTRACT.md"),
+-    ]
+-    .join("\nAXBI_SOURCE_BOUNDARY\n")
++    format!("canonical={}\ncandidate_driver={}\nprovider={}\ncrate={}\ncontract={}",
++        rei_microphysics::axbi_driver::compiled_identity(),
++        include_str!("candidate_driver.rs"), include_str!("provider.rs"),
++        include_str!("lib.rs"), include_str!("../AUTHORITY_CONTRACT.json"))
+ }
++
+ fn ledger_values(l: &Ledgers) -> Vec<f64> {
+     let mut v = vec![
+         l.source_n,
+@@ -1300,14 +1293,33 @@
+     }
+     Ok(f)
+ }
++fn end_zbar_surface_mismatch(z: f64, target_a: f64) -> bool {
++    (1.0 / (1.0 + z)).to_bits() != target_a.to_bits()
++}
++fn write_surface(driver:&Driver, state:&DriverState, out:&Path, id:usize, index:&mut impl Write)->Result<(),ForwardError>{
++    let nh=driver.n_h0_cm3/state.a.powi(3);
++    let nhe=driver.n_he0_cm3/state.a.powi(3);
++    let eos=state.gas.eos(nh,nhe)?;
++    let time=driver.background.point_at_scale(state.a)?.time_s;
++    let (coeff,lookup,fallback)=driver.rate_provider.counts();
++    let row=format!("{id},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{},{},{},{},{},{},{},{}\n",
++        state.a,time,eos.temperature_k,eos.electron_density_cm3,w_erg_per_h_to_ev(state.gas.w_erg_per_h)?,
++        state.accepted,state.attempts,state.rejects,state.comparisons,state.rhs_evaluations,coeff,lookup,fallback);
++    guard_output_bytes_with_limit(out,(row.len()+driver.checkpoint_text(state)?.len()) as u64,driver.config.scientific_output_budget_bytes()?)?;
++    index.write_all(row.as_bytes()).map_err(ioerr)?;
++    index.flush().map_err(ioerr)?;
++    driver.save_checkpoint_budget(out,&out.join(format!("surface_{id:02}.txt")),state)?;
++    Ok(())
++}
+ /// Bound execution entry point. Actual science invocations are separately
+ /// admitted by the controller; unit tests do not run a cosmological history.
+-pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<(), ForwardError> {
++pub fn run(config_text: &str, out: &Path, case: &str, resume: bool, provider: Provider) -> Result<(), ForwardError> {
++    if resume { return Err(err("AXBI_RESUME_DISALLOWED")); }
+     if case.is_empty() || case.contains(',') || case.contains('\n') || case.contains('\r') {
+         return Err(err("AXBI_CASE_ID"));
+     }
+     let cfg = DriverConfig::read(config_text)?;
+-    let (driver, mut state) = Driver::new(cfg)?;
++    let (driver, mut state) = Driver::new_with_provider(cfg, provider)?;
+     if resume {
+         if fs::read_to_string(out.join("config.cfg")).map_err(ioerr)? != config_text
+             || fs::read_to_string(out.join("source_identity.txt")).map_err(ioerr)?
+@@ -1365,6 +1377,18 @@
+     if resume {
+         driver.ensure_spectrum_snapshot(&state, case, out, &mut last_spectrum_time, &mut p)?;
+     }
++    let mut surfaces = [0.0_f64;17];
++    let ratio = (1.0_f64 / 20.8) / (1.0_f64 / 21.0);
++    for (k, target) in surfaces.iter_mut().enumerate() {
++        *target = if k == 0 {1.0/21.0} else if k == 16 {1.0/20.8}
++            else {(1.0/21.0) * ((k as f64)*ratio.ln()/16.0).exp()};
++    }
++    if end_zbar_surface_mismatch(driver.config.end_zbar, surfaces[16]) {return Err(err("AXBI_SURFACE_ENDPOINT"));}
++    fs::write(out.join("energy_grid_eV.txt"), list(&driver.energies)).map_err(ioerr)?;
++    let mut surface_index = open_output(&out.join("surfaces.csv"), false,
++        "surface_id,a,time_s,Tgas_K,ne_cm3,thermal_eV_per_H,accepted,attempts,rejects,comparisons,rhs,coefficient_calls,lookups,fallbacks")?;
++    write_surface(&driver, &state, out, 0, &mut surface_index)?;
++    let mut surface_id = 1usize;
+     let started = Instant::now();
+     let prior_wall = state.wall_elapsed_s;
+     let mut last_save = Instant::now();
+@@ -1380,7 +1404,7 @@
+                 return Err(err("AXBI_RUNTIME_CAP"));
+             }
+             let previous = state.clone();
+-            let accepted = match driver.adaptive_step(&mut state) {
++            let accepted = match driver.adaptive_step_to(&mut state, surfaces[surface_id]) {
+                 Ok(value) => value,
+                 Err(e) => {
+                     writeln!(
+@@ -1411,10 +1435,15 @@
+                 }
+                 continue;
+             }
++            let at_surface = state.a == surfaces[surface_id];
++            if at_surface {
++                write_surface(&driver, &state, out, surface_id, &mut surface_index)?;
++                surface_id += 1;
++            }
+             let checkpoint_due = driver.spectrum_due(
+                 state.accepted,
+                 last_save.elapsed().as_secs_f64(),
+-                state.a == end,
++                state.a == end || at_surface,
+             );
+             if let Err(error) = driver.output_batch(
+                 &state,
+@@ -1455,7 +1484,7 @@
+         Ok(())
+     })();
+     state.wall_elapsed_s = prior_wall + started.elapsed().as_secs_f64();
+-    for writer in [&mut h, &mut a, &mut p, &mut l, &mut fb, &mut rejects] {
++    for writer in [&mut h, &mut a, &mut p, &mut l, &mut fb, &mut rejects, &mut surface_index] {
+         writer.flush().map_err(ioerr)?;
+     }
+     driver.ensure_spectrum_snapshot(&state, case, out, &mut last_spectrum_time, &mut p)?;

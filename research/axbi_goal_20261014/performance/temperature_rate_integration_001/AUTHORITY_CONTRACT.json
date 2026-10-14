@@ -1,0 +1,199 @@
+{
+  "schema": "rei.axbi.temperature_rate_integration_authority.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "work_id": "TEMP_RATE_INTEGRATION_001",
+  "predecessor_work_id": "TEMP_RATE_TABLE_001",
+  "decision": "AUTHORIZE_STANDALONE_DRIVER_INTEGRATION_AND_FOUR_MATCHED_SHORT_HISTORIES_AFTER_CHANGED_SURFACE_REVIEW",
+  "scientific_admission": "NOT_ISSUED",
+  "roles": {
+    "authority": "gpt-6-astra/xhigh requested; observed NOT_INDEPENDENTLY_OBSERVED",
+    "implementation": "gpt-6-sol/medium requested; observed NOT_INDEPENDENTLY_OBSERVED"
+  },
+  "base": {
+    "checkout": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+    "branch": "codex/rux-science-delivery-20261014",
+    "head": "45f166adee36d57cabe712ff66209926d1aa1556",
+    "rule": "Existing checkout; preserve all unrelated; no clone/worktree/stash/reset/clean"
+  },
+  "immutable_sha256": {
+    "rust/rei_microphysics/src/axbi_driver.rs": "92bc6ca1540c927cde7452d218f666882ecdd651558b151b31e9a6a8e2d92c8f",
+    "rust/rei_microphysics/src/axbi_rates.rs": "e0d4d7e5d3a1b704af95ae54b63bb5e0c49e1fb68fdc4b0e7465dc92feeaf361",
+    "rust/rei_microphysics/src/igm_rates.rs": "310164e620617f3089d488bd1f9668996b4a4cbd191383e45303def176ef81cf",
+    "rust/rei_microphysics/src/igm_thermal.rs": "30515d96270ec73a37829ba298513a42112991168479d3cb40f33b67fd469ab2",
+    "rust/rei_microphysics/src/igm_state.rs": "1651b00a517d67aaa71b38d3c69af6413570adfc38b591a3ed25284f039e0ae0",
+    "rust/rei_microphysics/src/axbi_background.rs": "65f10dced178aa85bb1c92da0b35350a0eec2d3d3de05630c900b5df4ec1e254",
+    "rust/rei_microphysics/src/axbi_sources.rs": "606e3c2ec367dd9951ebbf2f53486f2232b49c0218896d66d8dc13dd5ee83bfe",
+    "rust/rei_microphysics/Cargo.toml": "e04b3802c2555b612305bb900e1e9d509c2a4039a6deacf20d65ddf7e5249407",
+    "rust/rei_microphysics/Cargo.lock": "d7cbe31e7171939a4c438f4e313e5aff1f881199c8720b2fa9b2f4859b6c7407",
+    "research/axbi_goal_20261014/performance/temperature_rate_table_001/src/lib.rs": "168942bf99e8c97ce263ab901ac6df90140b551e9f9b7b8dbc0c05a1daddcc85",
+    "research/axbi_goal_20261014/performance/temperature_rate_table_001/src/thermal_adapter.rs": "5d5f81226e3e265fc2fccd43f4d24c691d6557a5176a8e26adc69eafe4203699",
+    "research/axbi_goal_20261014/performance/temperature_rate_table_001/data/rates.bin": "87a9d022dcda1bb9353bb96fa782dbdc958719ccbcc9f00187b0aa1959fed0a2",
+    "research/axbi_goal_20261014/performance/temperature_rate_table_001/ncp_validation_001/benchmark_runtime_001/INDEPENDENT_REVIEW.json": "64045e5be6c73d01662eb3b6d5c4b3cd2e4bbc05495dc84b6d5ffb907d401db4",
+    "research/axbi_goal_20261014/scenario/SCENARIO_LOCK.json": "07aa11d2d3fd47d2ed95e9d9161f6205e4d9ba386c27ad43d2b298fcd86d1696",
+    "research/axbi_goal_20261014/scenario/AX05_NUMERICAL_CONTRACT.md": "7403a1d0dcdbc3aa32d80c2f9bdd6ea5112e2b68432776c9de62bae5dd8c4054",
+    "research/axbi_goal_20261014/driver/pilot_flrw.cfg": "ae5d4fd5187293df59a6e3927d40a6232f109e505a708034448223801c580357",
+    "research/axbi_goal_20261014/driver/pilot_plus.cfg": "4855d931a013ce8259d2071916a4e5beb7f35056b0b250d20fa6e52ea2232857"
+  },
+  "protected_originals": {
+    "historical_campaign_binary_sha256": "32d11e733155d355a1fa748597b48ea1c8196adba3c871722a7a598f0b6cbfca",
+    "rule": "Canonical sources, binaries, configs, checkpoints, observers/live signed outputs untouched; record live identities; no signal/profile/restart/resume"
+  },
+  "allowed_paths": {
+    "local_root": "research/axbi_goal_20261014/performance/temperature_rate_integration_001",
+    "remote_root": "/root/REI_AXBI_GOAL_20261014_32d11e733155/performance/temperature_rate_integration_001",
+    "files": [
+      "Cargo.toml",
+      "Cargo.lock",
+      "src/lib.rs",
+      "src/candidate_driver.rs",
+      "src/provider.rs",
+      "src/main.rs",
+      "tests/provider_integration.rs",
+      "configs/",
+      "raw/",
+      "target/",
+      "runs/",
+      "compare.py",
+      "run_pilots.py",
+      "AUTHORITY_CONTRACT.json",
+      "SOURCE_MANIFEST.json",
+      "RUN_BINDING.json",
+      "IMPLEMENTATION_RECEIPT.json",
+      "TRAJECTORY_COMPARISON.json",
+      "PERFORMANCE_RECEIPT.json"
+    ],
+    "dependencies": "Read-only canonical rei_microphysics and accepted temperature_rate_table_001"
+  },
+  "implementation_boundary": {
+    "driver": "Copy pinned axbi_driver.rs to candidate_driver.rs, rebind canonical imports, per-Driver DIRECT/TABLE provider, no global mutable backend",
+    "provider": "DIRECT canonical AxbiProvider; TABLE accepted Table::load/query and thermal_adapter, original AxbiPoint with same EOS sequence/two rate evaluations; process-local Rc<Table> okay, no parallel chemistry",
+    "call_sites": "Route all coefficient admission and chemistry residual calls via selected provider including geometry_map/evaluate/validate, no mixed analytic residuals/table rates",
+    "numerics": "Keep tentative step/Newton/Jacobian/damping/error_metric/event-energy/transport/source quadrature/rejection unchanged",
+    "identity": "Original compiled identity plus candidate source identities, backend/table/binary/config/contract separate; same new executable for DIRECT/TABLE",
+    "resume": "Reject; absent output dir each run",
+    "excluded": "No background/vector optimizer, dedup, formula/table refinement, fast-math/canonical edit"
+  },
+  "table_policy": {
+    "nodes": 65537,
+    "domain_k": [
+      1,
+      1000000
+    ],
+    "model": "AXBI_GRACKLE_3_4_1_CASE_A_POINT_V1 af7939494ce65007887ada7b98d1813df6843346",
+    "query": "Accepted logT interpolation/guarded fallback unchanged, strict EOS recovered domain no clamp/extrapolate",
+    "diagnostics": "Retain exact branch/zero/cap diagnostics; record lookup/fallback/T range",
+    "load": "Accepted table once per TABLE process; no silent reconstruction"
+  },
+  "shared_output_surfaces": {
+    "count": 17,
+    "definition": "a_k=(1/21)*exp(k*ln((1/20.8)/(1/21))/16), k0..16; exact endpoints 1/21 and 1/20.8",
+    "implementation": "adaptive_step_to duplicates original adaptive_step except endpoint=min(original_end,target_a); original adaptive_step delegates original_end; pilot advances fixed surfaces, no state interpolation/clipping",
+    "outputs": "Full precision gas/EOS T/ne/photon vector+energy/grid/ledgers/counters at every surface; ordinary history/abundances/rejections/checkpoint too",
+    "comparison": "Match surface IDs/a, never accepted-step indices"
+  },
+  "preparation_checks": {
+    "direct_wiring": "q0 and +.01 one attempted copied DIRECT vs canonical step; identical binary64 state/ledger/counters excluding timing/identity",
+    "table_wiring": "Small cold/branch/warm point fixtures, all RHS/rates/diagnostics/error parity; do not rerun benchmark",
+    "construction": "At most one timed Table::construct, 65537 calls charged, never replace accepted artifact",
+    "validation_rhs_max": 5000,
+    "review": "Fresh independent read-only provider/output-stop/identity/caps; PASS launches four pilots"
+  },
+  "pilots": {
+    "cases": [
+      {
+        "id": "ZERO_DIRECT",
+        "q_ref": 0,
+        "backend": "DIRECT"
+      },
+      {
+        "id": "ZERO_TABLE",
+        "q_ref": 0,
+        "backend": "TABLE"
+      },
+      {
+        "id": "PLUS_DIRECT",
+        "q_ref": 0.01,
+        "backend": "DIRECT"
+      },
+      {
+        "id": "PLUS_TABLE",
+        "q_ref": 0.01,
+        "backend": "TABLE"
+      }
+    ],
+    "order": "listed serial no rerun",
+    "interval": "zbar20 to19.8",
+    "configuration": {
+      "same_h": false,
+      "escape_fraction": 0.2,
+      "initial_temperature_k": 8.098143045064857,
+      "energy_subdivisions": 16,
+      "n_mu": 8,
+      "background_panels": 4096,
+      "local_target": 1e-05,
+      "initial_dln_a": 0.0001,
+      "spectra_every_accepted": 60,
+      "max_steps": 10000,
+      "max_attempts": 30000,
+      "max_rhs": 2000000,
+      "max_wall_s": 600,
+      "output_budget_mib": 256
+    },
+    "other_inputs": "Pinned scenario/original conventions, each pair identical",
+    "scope": "positive signed only, no full family"
+  },
+  "trajectory_acceptance": {
+    "completion": "Both backends all17 surfaces/endpoint no terminal failure",
+    "charge_fraction": "abs(delta)<=1e-11+1e-6*max(abs(ref),abs(candidate))",
+    "Tgas_K": "abs(delta)<=1e-6+1e-6*max(abs(ref),abs(candidate))",
+    "thermal_eV_per_H": "abs(delta)<=1e-12+1e-6*max(abs(ref),abs(candidate))",
+    "photon_N_L1": "<=1e-6 normalized by max(sum(ref),sum(cand),1e-8 photons/H)",
+    "photon_energy_L1": "<=1e-6 identical grids, normalization max(sum ref EN,sum cand EN,1e-8 eV/H)",
+    "invariants": "Original nuclei/charge/reflection parity1e-12, no negatives/invalidT/nonfinite",
+    "ledgers": "Per-step photon/augmented-energy<=1e-10 cumulative<=1e-8 original positive normalizations, retain dimensional",
+    "solver": "Newton<=1e-11, local target1e-5, strict metric<2e-4; differing adaptive steps allowed",
+    "signed_response": "PLUS-minus-ZERO table effect requires <=0.1 independently measured resolution error/floor for response claim; unknown keeps HOLD",
+    "scope": "Finite binary64 short history only"
+  },
+  "performance": {
+    "measure": "Process wall/CPU including table load+output; separate load/init/integration; peakRSS/output; steps/RHS/coefficient/lookup/fallback; ratios q0/+.01",
+    "amortization": "Measured construction/load; estimate break-even only positive steady savings; otherwise NO_MEASURED_AMORTIZATION",
+    "limitations": "One run/backend/case, order/host, no general/full campaign extrapolation",
+    "adoption": "Numerical PASS does not require speedup; DIRECT retained"
+  },
+  "limits": {
+    "prep_wall_s": 1800,
+    "cargo_invocations_max": 2,
+    "automatic_retries": 0,
+    "repair": "One separately approved targeted repair within remaining prep/Cargo after first failure",
+    "trajectory_starts_max": 4,
+    "trajectory_restarts": 0,
+    "per_run_timeout_s": 599,
+    "per_run_wall_s": 600,
+    "sum_run_wall_s": 2400,
+    "per_run_cpu": 1,
+    "per_run_threads": 1,
+    "per_run_as_bytes": 2147483648,
+    "per_run_output_bytes": 268435456,
+    "all_runs_output_bytes": 1073741824,
+    "per_run_coeff_calls": 5000000,
+    "integration_coeff_calls": 20100000,
+    "shared_concurrency": "Max2 scientific processes incl original; max1 integration pilot; controller reserves slot, never preempts original",
+    "carry": "Predecessor Cargo5 direct672340 lookup606803 benchmark1/1 retained; charge new calls/tests/runs"
+  },
+  "commands": {
+    "build_test": "CARGO_BUILD_JOBS=1 CARGO_TARGET_DIR=<new-target> RUSTFLAGS=-C link-arg=-Wl,--threads=1 <observed cargo> test --release --locked --offline --manifest-path <new-root>/Cargo.toml --test provider_integration -- --test-threads=1 --nocapture",
+    "binary": "axbi_temperature_rate_integration",
+    "pilot_argv": "/usr/bin/time -v -o <raw>/time.log /usr/bin/timeout --foreground --signal=KILL 599s /usr/bin/taskset -c <freeCPU> /usr/bin/prlimit --as=2147483648 -- <new binary> --config <cfg> --backend <DIRECT|TABLE> --table <rates.bin> --output <absent output> --case <case ID>",
+    "environment": "Reuse observed staged NCP Rust1.94.1/linker threads, stage only new subtree, preserve relative deps",
+    "binding": "Freeze source/config/table/binary/argv/outputs/slot/quotas before each launch; implement specified CLI"
+  },
+  "transition": {
+    "ready": "Dispatch bounded implementation pinned source",
+    "preparation_pass": "Independent changed-surface PASS launches ZERO_DIRECT then remaining listed cases while gates/resources hold",
+    "failure": "Stop first substantive numerical/identity/resource/parity, preserve partial exact coordinate/field; no relaxation/fallback/restart",
+    "final_review": "Independent raw four cases/shared surfaces/ledgers/timing/accounting",
+    "pass": "Publish scoped comparison/reproduction, opt-in tested interval; longer history requires new allocation/new output identity",
+    "boundary": "No replacement/resume originals or full-history admission"
+  }
+}

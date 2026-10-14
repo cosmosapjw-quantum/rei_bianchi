@@ -1,0 +1,53 @@
+{
+  "schema": "rei.axbi.temp_rate_accounting_repair_authority.v1",
+  "issued_utc": "2026-10-14T13:18:34.063861+00:00",
+  "decision": "AUTHORIZE_ONE_PROVIDER_ACCOUNTING_REPAIR",
+  "review_sha256": "2029634b2a58dc2aa210346580054ff8eb3d32d8f5434fcda9d62e9658e24978",
+  "parent_authority_sha256": "3cca99146d936f3c25ce568c1a5aba0eb7814c7a3ea81f6db818535bbfa866c7",
+  "validator_authority_sha256": "cc9390bd56d4df5407ad695b64a723f5cded96b1416116fad902fdc493b6fe3e",
+  "source_preconditions": {
+    "src/provider.rs": "aafe8b28d9571b3c7d02ff9c4838102e7076151ee1a5778b8985d8ed837e9f9e",
+    "tests/provider_integration.rs": "e074ff3b36a9b1a1bc0af6dabffad65bcbbf63daf767a327e302d35bdd6cebb2",
+    "src/candidate_driver.rs": "06bbeb3eddd1898f78d6714656ee601c781751c6cd00032ef7d7739096e5e88f",
+    "accepted_table": "87a9d022dcda1bb9353bb96fa782dbdc958719ccbcc9f00187b0aa1959fed0a2"
+  },
+  "owned": [
+    "src/provider.rs",
+    "tests/provider_integration.rs",
+    "accounting_repair_001/",
+    "raw/accounting_repair_001/",
+    "target/"
+  ],
+  "implementation": [
+    "Common DIRECT/TABLE AxbiPoint assembly through existing accepted thermal_adapter callback to self.rates",
+    "Preserve canonical outer EOS, inner RHS EOS, second rate call, AxbiPoint fields/order",
+    "DIRECT self.rates invokes canonical AxbiProvider.rates",
+    "Charge attempted coefficient calls before execution; reject at cap before work",
+    "Remove success-only count_two"
+  ],
+  "prohibited": [
+    "Canonical/table/adapter/driver/solver/EOS/formula/tolerance changes",
+    "Table construction, component benchmark, pilot before independent release"
+  ],
+  "required_tests": [
+    "Existing DIRECT attempted-step canonical parity q0 and q+.01",
+    "Repaired TABLE all-field fixture tests unchanged tolerance",
+    "DIRECT point binary64 fields/diagnostics vs canonical on valid fixtures",
+    "Failed rate-domain point probe each backend charges one",
+    "Pre-rate validation failure charges zero",
+    "Seeded synthetic pre-cap/last-call tests, no millions of real calls"
+  ],
+  "limits": {
+    "prep_wall_s": 600,
+    "cargo_invocations": 1,
+    "cargo_timeout_s": 300,
+    "additional_actual_coeff_calls_max": 5000,
+    "additional_evidence_bytes_max": 16777216,
+    "automatic_retries": 0,
+    "trajectory_starts": 0,
+    "cumulative_task_cargo_before": 3,
+    "cumulative_global_cargo_before": 8
+  },
+  "command": "CARGO_BUILD_JOBS=1 RUSTFLAGS=-C link-arg=-Wl,--threads=1 timeout 300s cargo test --release --locked --offline --manifest-path <root>/Cargo.toml -- --test-threads=1 --nocapture",
+  "stop": "First failure preserved then HOLD without rerun; on PASS fresh independent read-only source/raw/cost/binary review, then parent four pilots serially"
+}
