@@ -44,6 +44,7 @@ pub struct DriverConfig {
     pub max_attempts: usize,
     pub max_rhs: usize,
     pub max_wall_s: f64,
+    pub spectra_every_accepted: usize,
 }
 impl DriverConfig {
     /// Exact choices frozen in SCENARIO_LOCK; callers select explicit variants.
@@ -64,6 +65,7 @@ impl DriverConfig {
             max_attempts: 30000,
             max_rhs: 2000000,
             max_wall_s: 1200.0,
+            spectra_every_accepted: 60,
         }
     }
     pub fn read(text: &str) -> Result<Self, ForwardError> {
@@ -99,6 +101,7 @@ impl DriverConfig {
                 "max_attempts" => number!(max_attempts),
                 "max_rhs" => number!(max_rhs),
                 "max_wall_s" => number!(max_wall_s),
+                "spectra_every_accepted" => number!(spectra_every_accepted),
                 _ => return Err(err("AXBI_CONFIG_KEY")),
             }
         }
@@ -106,7 +109,8 @@ impl DriverConfig {
         Ok(c)
     }
     fn validate(&self) -> Result<(), ForwardError> {
-        if !self.q_ref.is_finite()
+        if self.spectra_every_accepted == 0
+            || !self.q_ref.is_finite()
             || !self.end_zbar.is_finite()
             || !(4.0..20.0).contains(&self.end_zbar)
             || !self.local_target.is_finite()
@@ -1123,11 +1127,12 @@ fn write_checkpoint(path: &Path, text: &str) -> Result<(), ForwardError> {
     fs::rename(tmp, path).map_err(ioerr)
 }
 impl Driver {
-    fn output_batch(
+    pub fn output_batch(
         &self,
         s: &DriverState,
         case: &str,
         out: &Path,
+        save_spectrum: bool,
         h: &mut impl Write,
         a: &mut impl Write,
         p: &mut impl Write,
@@ -1137,6 +1142,10 @@ impl Driver {
         let (mut hv, mut av, mut pv, mut lv, mut fv) =
             (Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new());
         self.output_row(s, case, &mut hv, &mut av, &mut pv, &mut lv, &mut fv)?;
+        let terminal_spectrum_reserve = if save_spectrum { 0 } else { pv.len() };
+        if !save_spectrum {
+            pv.clear();
+        }
         h.flush().map_err(ioerr)?;
         a.flush().map_err(ioerr)?;
         p.flush().map_err(ioerr)?;
@@ -1145,13 +1154,90 @@ impl Driver {
         let bytes = hv.len() + av.len() + pv.len() + lv.len() + fv.len();
         // Reserve exact bytes for next snapshot plus atomic current checkpoint.
         let checkpoint_bytes = self.checkpoint_text(s)?.len();
-        guard_output_bytes(out, (bytes + 2 * checkpoint_bytes) as u64)?;
+        guard_output_bytes(
+            out,
+            (bytes + terminal_spectrum_reserve + 2 * checkpoint_bytes) as u64,
+        )?;
         h.write_all(&hv).map_err(ioerr)?;
         a.write_all(&av).map_err(ioerr)?;
         p.write_all(&pv).map_err(ioerr)?;
         l.write_all(&lv).map_err(ioerr)?;
         fb.write_all(&fv).map_err(ioerr)?;
         Ok(())
+    }
+}
+impl Driver {
+    pub fn spectrum_due(
+        &self,
+        accepted: usize,
+        seconds_since_checkpoint: f64,
+        terminal: bool,
+    ) -> bool {
+        accepted == 0
+            || accepted % self.config.spectra_every_accepted == 0
+            || seconds_since_checkpoint >= 30.0
+            || terminal
+    }
+    pub fn saved_spectrum_time(&self, out: &Path) -> Result<Option<f64>, ForwardError> {
+        let text = fs::read_to_string(out.join("spectra.csv")).map_err(ioerr)?;
+        let mut last = None;
+        let mut rows = 0_usize;
+        let full_rows = self.energies.len() * self.source.angular_cells.len();
+        for line in text.lines().skip(1) {
+            let t = line
+                .split(',')
+                .nth(3)
+                .and_then(|x| x.parse::<f64>().ok())
+                .ok_or(err("AXBI_SPECTRUM_TIME"))?;
+            f(t)?;
+            if Some(t) != last {
+                if last.is_some() && rows != full_rows {
+                    return Err(err("AXBI_SPECTRUM_SHAPE"));
+                }
+                if last.is_some_and(|previous| t <= previous) {
+                    return Err(err("AXBI_SPECTRUM_ORDER"));
+                }
+                last = Some(t);
+                rows = 0;
+            }
+            rows += 1;
+        }
+        if last.is_some() && rows != full_rows {
+            return Err(err("AXBI_SPECTRUM_SHAPE"));
+        }
+        Ok(last)
+    }
+    /// A resume or controlled stop adds exactly one missing checkpoint-time
+    /// full grid, never duplicates the main every-accepted-state tables.
+    pub fn ensure_spectrum_snapshot(
+        &self,
+        s: &DriverState,
+        case: &str,
+        out: &Path,
+        last: &mut Option<f64>,
+        spectra: &mut impl Write,
+    ) -> Result<bool, ForwardError> {
+        let time = self.background.point_at_scale(s.a)?.time_s;
+        if last.is_some_and(|t| t > time) {
+            return Err(err("AXBI_SPECTRUM_AHEAD_CHECKPOINT"));
+        }
+        if *last == Some(time) {
+            return Ok(false);
+        }
+        let mut pv = Vec::new();
+        let (mut h, mut a, mut l, mut fb) = (
+            std::io::sink(),
+            std::io::sink(),
+            std::io::sink(),
+            std::io::sink(),
+        );
+        self.output_row(s, case, &mut h, &mut a, &mut pv, &mut l, &mut fb)?;
+        spectra.flush().map_err(ioerr)?;
+        let checkpoint_bytes = self.checkpoint_text(s)?.len();
+        guard_output_bytes(out, (pv.len() + 2 * checkpoint_bytes) as u64)?;
+        spectra.write_all(&pv).map_err(ioerr)?;
+        *last = Some(time);
+        Ok(true)
     }
 }
 fn open_output(
@@ -1203,7 +1289,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
         fs::write(out.join("config.cfg"), config_text).map_err(ioerr)?;
         fs::write(out.join("source_identity.txt"), compiled_identity()).map_err(ioerr)?;
         fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
-        fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=cell-integrated source deposited to fixed physical-energy nodes; delta-node measures\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
+        fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=cell-integrated source deposited to fixed physical-energy nodes; delta-node measures\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
     }
     let mut h=open_output(&out.join("history.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,b,H_per_s,s_per_s,x_HII,x_HeII,x_HeIII,nH_proper_cm3,ne_proper_cm3,temperature_K,Gamma_HI_per_s,Gamma_HeI_per_s,Gamma_HeII_per_s,photon_n_per_H,photon_u_eV_per_H,J0_photon_u_eV_per_H,J1_photon_u_eV_per_H,J2_photon_u_eV_per_H,x_HI,x_HeI")?;
     let mut a=open_output(&out.join("abundances.csv"),resume,"run_id,time_s,zbar,Tgas_K,background_Tref_K,species_id,A,Z,charge,nproper,element_fraction,Ybaryon,electron_xe,normalization_registry")?;
@@ -1219,14 +1305,25 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
         true,
         "attempt,a,dln_a,error",
     )?;
+    let mut last_spectrum_time = if resume {
+        driver.saved_spectrum_time(out)?
+    } else {
+        None
+    };
     if !resume {
-        driver.output_batch(&state, case, out, &mut h, &mut a, &mut p, &mut l, &mut fb)?;
+        driver.output_batch(
+            &state, case, out, true, &mut h, &mut a, &mut p, &mut l, &mut fb,
+        )?;
+        last_spectrum_time = Some(driver.background.point_at_scale(state.a)?.time_s);
     }
     if !resume {
         for writer in [&mut h, &mut a, &mut p, &mut l, &mut fb, &mut rejects] {
             writer.flush().map_err(ioerr)?;
         }
         driver.save_checkpoint_budget(out, &out.join("checkpoint.txt"), &state)?;
+    }
+    if resume {
+        driver.ensure_spectrum_snapshot(&state, case, out, &mut last_spectrum_time, &mut p)?;
     }
     let started = Instant::now();
     let prior_wall = state.wall_elapsed_s;
@@ -1274,9 +1371,22 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
                 }
                 continue;
             }
-            if let Err(error) =
-                driver.output_batch(&state, case, out, &mut h, &mut a, &mut p, &mut l, &mut fb)
-            {
+            let checkpoint_due = driver.spectrum_due(
+                state.accepted,
+                last_save.elapsed().as_secs_f64(),
+                state.a == end,
+            );
+            if let Err(error) = driver.output_batch(
+                &state,
+                case,
+                out,
+                checkpoint_due,
+                &mut h,
+                &mut a,
+                &mut p,
+                &mut l,
+                &mut fb,
+            ) {
                 let failed = state.clone();
                 state = previous;
                 state.attempts = failed.attempts;
@@ -1286,7 +1396,8 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
                 state.wall_elapsed_s = failed.wall_elapsed_s;
                 return Err(error);
             }
-            if state.accepted % 60 == 0 || last_save.elapsed().as_secs_f64() >= 30.0 {
+            if checkpoint_due {
+                last_spectrum_time = Some(driver.background.point_at_scale(state.a)?.time_s);
                 for writer in [&mut h, &mut a, &mut p, &mut l, &mut fb, &mut rejects] {
                     writer.flush().map_err(ioerr)?;
                 }
@@ -1307,6 +1418,8 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
     for writer in [&mut h, &mut a, &mut p, &mut l, &mut fb, &mut rejects] {
         writer.flush().map_err(ioerr)?;
     }
+    driver.ensure_spectrum_snapshot(&state, case, out, &mut last_spectrum_time, &mut p)?;
+    p.flush().map_err(ioerr)?;
     driver.save_checkpoint_budget(out, &out.join("checkpoint.txt"), &state)?;
     summarize_feedback(out)?;
     fs::write(out.join("RETURN.txt"),format!("status={}\na={}\naccepted={}\nattempts={}\nrejections={}\nrhs_evaluations={}\nwall_s={}\nmax_newton_residual={}\nlast_error={}\nresult={outcome:?}\nscientific_admission=NOT_ISSUED\n",if outcome.is_ok(){"COMPLETE_REPRESENTED_INTERVAL"}else{"STOPPED_CHECKPOINTED"},state.a,state.accepted,state.attempts,state.rejects,state.rhs_evaluations,state.wall_elapsed_s,state.max_newton_residual,state.last_error)).map_err(ioerr)?;

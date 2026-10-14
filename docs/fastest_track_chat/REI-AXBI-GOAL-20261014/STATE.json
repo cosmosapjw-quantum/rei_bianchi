@@ -4,7 +4,7 @@
   "source_dag": "docs/fastest_track_chat/REI-AXBI-GOAL-20261014/EXECUTION_DAG.json",
   "goal_status": "IN_PROGRESS",
   "scientific_admission": "NOT_ISSUED",
-  "science_solver_runs": 1,
+  "science_solver_runs": 3,
   "nodes": {
     "AX00": {
       "status": "COMPLETED",
@@ -82,9 +82,12 @@
     "AX06": {
       "status": "IN_PROGRESS",
       "evidence": [
-        "research/axbi_goal_20261014/runs/pilot/PILOT_RECEIPT.json"
+        "research/axbi_goal_20261014/runs/pilot/4080898d7770/PILOT_RECEIPT.json",
+        "research/axbi_goal_20261014/reviews/PILOT_CADENCE_REVIEW.json",
+        "research/axbi_goal_20261014/runs/pilot/fc9dac5d0af1/FLRW/RETURN.txt",
+        "research/axbi_goal_20261014/runs/pilot/fc9dac5d0af1/SHEAR_PLUS_raw/execution_start.json"
       ],
-      "scientific_work_status": "FIRST_PILOT_OUTPUT_CAP_REPAIR_PENDING",
+      "scientific_work_status": "REVISED_FLRW_COMPLETE_SIGNED_PILOT_RUNNING",
       "scientific_admission": "NOT_ISSUED"
     },
     "AX07": {
@@ -245,8 +248,12 @@
   "next_ready_ids": [],
   "durable_next_command": [
     "python3",
-    "research/axbi_goal_20261014/driver/run_pilots.py",
-    "--run"
+    "scripts/rux_codex/workflow.py",
+    "--dag",
+    "docs/fastest_track_chat/REI-AXBI-GOAL-20261014/EXECUTION_DAG.json",
+    "ready",
+    "--state",
+    "docs/fastest_track_chat/REI-AXBI-GOAL-20261014/STATE.json"
   ],
   "requested_executor_model": "gpt-6.1-sol",
   "observed_runtime_model": null,
@@ -305,5 +312,5 @@
       "observed_runtime_model": null
     }
   ],
-  "next_command_precondition": "Review recorded AXBI_OUTPUT_CAP and apply one authorized output-cadence repair; do not relaunch old run_pilots.py or overwrite first attempt"
+  "next_command_precondition": "Collect currently running SHEAR_PLUS; no relaunch of completed FLRW. Review actual two-pilot outputs then execute frozen full-history stage."
 }

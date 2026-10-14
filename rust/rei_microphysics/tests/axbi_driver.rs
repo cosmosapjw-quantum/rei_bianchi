@@ -187,3 +187,141 @@ fn aggregate_output_guard_counts_nested_bytes_and_atomic_checkpoint_peak() {
     std::fs::remove_dir(root.join("raw")).unwrap();
     std::fs::remove_dir(root).unwrap();
 }
+
+#[test]
+fn sparse_full_spectra_keep_each_abundance_and_align_terminal_resume_and_cap() {
+    use std::io::{BufWriter, Write};
+    let root = std::env::temp_dir().join(format!("axbi_sparse_output_{}", std::process::id()));
+    std::fs::create_dir(&root).unwrap();
+    let (d, mut s) = component();
+    let mut h = BufWriter::new(std::fs::File::create(root.join("history.csv")).unwrap());
+    let mut a = BufWriter::new(std::fs::File::create(root.join("abundances.csv")).unwrap());
+    let mut p = BufWriter::new(std::fs::File::create(root.join("spectra.csv")).unwrap());
+    let mut l = BufWriter::new(std::fs::File::create(root.join("ledgers.csv")).unwrap());
+    let mut f = BufWriter::new(std::fs::File::create(root.join("feedback.csv")).unwrap());
+    writeln!(p,"case_id,q_ref,Sigma,time_s,a,zbar,energy_low_eV,energy_high_eV,mu_center,solid_angle_weight_sr,photon_n_per_H,photon_u_eV_per_H").unwrap();
+    let mut last = None;
+    for i in 0..=61 {
+        if i > 0 {
+            let next = s.a * (1e-6_f64).exp();
+            d.geometry_map(&mut s, next).unwrap();
+        }
+        s.accepted = i;
+        let seconds = if i == 17 { 30.0 } else { 0.0 };
+        let snapshot = d.spectrum_due(i, seconds, i == 61);
+        assert_eq!(snapshot, [0, 17, 60, 61].contains(&i));
+        d.output_batch(
+            &s, "TEST", &root, snapshot, &mut h, &mut a, &mut p, &mut l, &mut f,
+        )
+        .unwrap();
+        if snapshot {
+            last = Some(d.background.point_at_scale(s.a).unwrap().time_s);
+        }
+    }
+    for w in [&mut h, &mut a, &mut p, &mut l, &mut f] {
+        w.flush().unwrap();
+    }
+    let full_rows = d.energies.len() * d.source.angular_cells.len();
+    assert_eq!(
+        std::fs::read_to_string(root.join("spectra.csv"))
+            .unwrap()
+            .lines()
+            .count(),
+        1 + 4 * full_rows
+    );
+    assert_eq!(
+        std::fs::read_to_string(root.join("history.csv"))
+            .unwrap()
+            .lines()
+            .count(),
+        62
+    );
+    assert_eq!(
+        std::fs::read_to_string(root.join("abundances.csv"))
+            .unwrap()
+            .lines()
+            .count(),
+        62 * 6
+    );
+    assert_eq!(
+        std::fs::read_to_string(root.join("feedback.csv"))
+            .unwrap()
+            .lines()
+            .count(),
+        62
+    );
+    assert_eq!(d.saved_spectrum_time(&root).unwrap(), last);
+    assert!(!d
+        .ensure_spectrum_snapshot(&s, "TEST", &root, &mut last, &mut p)
+        .unwrap());
+    // Manufacture one accepted state with no scheduled spectrum, then resume
+    // that exact checkpoint. Adding its missing snapshot must be idempotent.
+    let next = s.a * (1e-6_f64).exp();
+    d.geometry_map(&mut s, next).unwrap();
+    s.accepted = 62;
+    d.output_batch(
+        &s, "TEST", &root, false, &mut h, &mut a, &mut p, &mut l, &mut f,
+    )
+    .unwrap();
+    for w in [&mut h, &mut a, &mut p, &mut l, &mut f] {
+        w.flush().unwrap();
+    }
+    d.save_checkpoint_budget(&root, &root.join("checkpoint.txt"), &s)
+        .unwrap();
+    let resumed = d.read_checkpoint(&root.join("checkpoint.txt")).unwrap();
+    last = d.saved_spectrum_time(&root).unwrap();
+    assert!(d
+        .ensure_spectrum_snapshot(&resumed, "TEST", &root, &mut last, &mut p)
+        .unwrap());
+    p.flush().unwrap();
+    assert!(!d
+        .ensure_spectrum_snapshot(&resumed, "TEST", &root, &mut last, &mut p)
+        .unwrap());
+    assert_eq!(
+        d.saved_spectrum_time(&root).unwrap(),
+        Some(d.background.point_at_scale(resumed.a).unwrap().time_s)
+    );
+    assert_eq!(
+        std::fs::read_to_string(root.join("spectra.csv"))
+            .unwrap()
+            .lines()
+            .count(),
+        1 + 5 * full_rows
+    );
+    assert_eq!(
+        std::fs::read_to_string(root.join("abundances.csv"))
+            .unwrap()
+            .lines()
+            .count(),
+        63 * 6
+    );
+    // A guard failure must happen before either primary rows or spectrum grow.
+    let old_h = std::fs::metadata(root.join("history.csv")).unwrap().len();
+    let old_p = std::fs::metadata(root.join("spectra.csv")).unwrap().len();
+    let bytes = std::fs::read_dir(&root)
+        .unwrap()
+        .map(|e| e.unwrap().metadata().unwrap().len())
+        .sum::<u64>();
+    let sparse = std::fs::File::create(root.join("budget_reservation")).unwrap();
+    sparse
+        .set_len(SCIENCE_OUTPUT_BUDGET_BYTES - bytes - 100)
+        .unwrap();
+    assert!(d
+        .output_batch(&resumed, "TEST", &root, false, &mut h, &mut a, &mut p, &mut l, &mut f)
+        .is_err());
+    assert_eq!(
+        std::fs::metadata(root.join("history.csv")).unwrap().len(),
+        old_h
+    );
+    assert_eq!(
+        std::fs::metadata(root.join("spectra.csv")).unwrap().len(),
+        old_p
+    );
+    drop(sparse);
+    drop(h);
+    drop(a);
+    drop(p);
+    drop(l);
+    drop(f);
+    std::fs::remove_dir_all(root).unwrap();
+}

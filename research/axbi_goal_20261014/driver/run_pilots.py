@@ -54,6 +54,7 @@ def frozen_plan():
         config=ROOT/'research/axbi_goal_20261014/driver'/name
         c=parse_config(config)
         expected={'q_ref':q,'same_h':'false','end_zbar':'19.8','max_steps':'10000','max_attempts':'30000','max_rhs':'2000000','max_wall_s':'1200'}
+        if REVIEW.name=='PILOT_CADENCE_REVIEW.json':expected['spectra_every_accepted']='60'
         if any(c.get(k)!=v for k,v in expected.items()): raise RuntimeError('PILOT_CONFIG_SCOPE:'+case)
         out=PILOTS/b['binary_sha256'][:12]/case
         cases.append(dict(case=case,config=config,output=out,binary=binary))
@@ -136,7 +137,8 @@ def self_check():
     print('MECHANICAL_SELF_CHECK_PASS; no driver process started')
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--self-check',action='store_true');parser.add_argument('--run',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--self-check',action='store_true');parser.add_argument('--run',action='store_true');parser.add_argument('--review',choices=['DRIVER_PILOT_REVIEW.json','PILOT_CADENCE_REVIEW.json'],default='DRIVER_PILOT_REVIEW.json');args=parser.parse_args()
+    REVIEW=ROOT/'research/axbi_goal_20261014/reviews'/args.review
     if args.self_check:self_check()
     elif args.run:
         binding,cases=frozen_plan();results=[]
