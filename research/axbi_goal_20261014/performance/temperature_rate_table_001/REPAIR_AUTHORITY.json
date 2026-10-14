@@ -1,0 +1,64 @@
+{
+  "schema": "rei.axbi.temperature_rate_table_repair_authority.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "work_id": "TEMP_RATE_TABLE_001",
+  "decision": "AUTHORIZE_ONE_TARGETED_CONTRACT_CONFORMANCE_REPAIR",
+  "scientific_admission": "NOT_ISSUED",
+  "parent_contract_sha256": "2bd9afbee7a40a08d84ca3bfc5c5eecce611a96922ccf0bc6c981ceca1a6a9d2",
+  "first_failure": {
+    "path": "raw/local_test_1.log",
+    "exit_code": 101,
+    "classification": "COMPILATION_PLUMBING_FAILURE_BEFORE_NUMERICAL_TEST",
+    "preserve_raw": true,
+    "numeric_tests": 0,
+    "sha256": "84ed5cb8e208b6e42c53fb0c256a3cbfcf4564a930a4cc26136a7e3dc8237351"
+  },
+  "allowed_paths": [
+    "src/thermal_adapter.rs",
+    "src/validation.rs",
+    "tests/temperature_tables.rs",
+    "src/main.rs",
+    "raw/",
+    "IMPLEMENTATION_RECEIPT.json"
+  ],
+  "repair": [
+    "Replace copied IgmPhotoInput and IgmPointRhs type definitions with canonical imports/reexports, preserving copied RHS formulas, arithmetic and validation order.",
+    "Use canonical input/output types consistently in validation and main; explicitly type seven-boundary array [f64;7] without changing literals.",
+    "Replace dimensionally invalid cross-field gross sum and gross*1e-12 floors with frozen per-field primitive and signed gates; reject nonfinite comparisons.",
+    "For each signed field, S is sum of absolute original primitive contributions in the same units. Chemical fields use photo/CI/RR/DR events; fractions divide gross events by element density; absent-He fraction derivatives remain exactly zero. Thermal micro sum includes photo heat, CI/RR/DR/CE/freefree cooling and CMB; binding micro uses photo/CI/capture binding; w_dt adds expansion work and divides by nh; temperature scale uses 2*nh/(3*kB*particles) times gross w_dt plus abs(T)*gross electron production/particles.",
+    "Implement frozen conservation checks on reference and candidate: H nuclei s0+s1, He nuclei s2+s3+s4, charge s5-(s1+s3+2*s4), energy thermal_micro+binding_micro+escape-photo_input-cmb_to_gas; compare each finite dimensional residual to 1e-300+1e-12 times corresponding gross scale. Expansion excluded from micro energy identity.",
+    "Carry 65537 canonical constructor calls when validating a loaded table; include all invalid/fallback/internal/timed calls and lookups cumulatively across local and NCP without double counting; reserve next batch before execution."
+  ],
+  "unchanged_gates": {
+    "nodes": 65537,
+    "coefficient_relative": 1e-06,
+    "coefficient_absolute": 1e-300,
+    "rhs_primitive_relative": 2e-06,
+    "rhs_signed_relative": 2e-06,
+    "conservation_relative": 1e-12,
+    "direct_calls_total_max": 2000000,
+    "table_lookups_total_max": 8000000,
+    "canonical_source_changes": "FORBIDDEN"
+  },
+  "remaining": {
+    "cargo_invocations_used": 1,
+    "cargo_invocations_remaining": 1,
+    "ncp_launches_used": 0,
+    "ncp_launches_remaining": 1,
+    "automatic_retries": 0
+  },
+  "execution": {
+    "before_last_cargo": "Read-only inspect full repaired diff and type consistency",
+    "last_cargo": "Run original targeted release integration test once and preserve stdout/stderr/exit in a new raw log",
+    "binary": "Use normal release benchmark executable from that test invocation only if actual path and hash exist; otherwise BUILD_ALLOCATION_EXHAUSTED, no third Cargo invocation",
+    "on_pass": "Only with every frozen component gate PASS and executable present may one bounded NCP component launch proceed",
+    "on_failure": "Stop first compile, numerical, invariant, accounting or resource failure; preserve exact evidence, no grid/tolerance/cap change"
+  },
+  "authority": {
+    "requested_model": "gpt-6-astra",
+    "requested_effort": "xhigh",
+    "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED",
+    "content_owner": "/root/temperature_rate_table_authority",
+    "serialization_owner": "/root"
+  }
+}

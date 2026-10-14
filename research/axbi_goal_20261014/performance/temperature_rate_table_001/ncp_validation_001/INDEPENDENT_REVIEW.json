@@ -1,0 +1,105 @@
+{
+  "schema": "rei.axbi.temperature_table_validation_review.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "work_id": "TEMP_RATE_TABLE_001",
+  "decision": "SCOPED_NUMERICAL_VALIDATION_PASS",
+  "benchmark_release": "RELEASE_SINGLE_UNUSED_BENCHMARK_AFTER_ADDITIVE_LOOKUP_ACCOUNTING_CORRECTION",
+  "scientific_admission": "NOT_ISSUED",
+  "reviewer": {
+    "requested_model": "gpt-6-astra",
+    "requested_effort": "xhigh",
+    "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED",
+    "independence": "Did not implement table or validation",
+    "actions": "Read-only source/artifact/raw inspection; no edits/builds/tests/benchmarks/solver runs"
+  },
+  "identities": {
+    "authority": "2bd9afbee7a40a08d84ca3bfc5c5eecce611a96922ccf0bc6c981ceca1a6a9d2",
+    "gate_completion_authority": "30aa21b9a01b69f1b28cea4ad4f530e14ab6487aa40f9c9cdeeb4f0850f37e45",
+    "ncp_validation_authority": "77c177827b56043c14221ecf98b294a560baeeb17c787e61e9348f131f9a39b3",
+    "table": "87a9d022dcda1bb9353bb96fa782dbdc958719ccbcc9f00187b0aa1959fed0a2",
+    "saved_temperature": "5c7516f4256cd2c846dedc253a2aa0103e8d6391d85a84c4d10123e6264df69c",
+    "remote_executable": "384fadb88af626deb6f63738c5342d877ede7902a5fe111be316e38e80f1f68d",
+    "checks": "57 local authority/source/data/raw hash checks passed; reviewer did not independently reconnect remote"
+  },
+  "validation": {
+    "status": "PASS_WITHIN_FROZEN_COMPONENT_GATES",
+    "table_nodes": 65537,
+    "columns": 15,
+    "guard_cells": 8,
+    "rhs_success_cases": 24612,
+    "rhs_invalid_cases": 13,
+    "all_45_rhs_fields_gross_and_conservation": true,
+    "slope_candidates": 4113,
+    "slope_compared": 4096,
+    "slope_skipped_guard": 17,
+    "slope_skipped_domain": 0,
+    "saved_temperature_samples": 256,
+    "benchmark_pretiming": "64 interior pairs use same all-field gross/conservation gate and rate/diagnostic comparisons before timing",
+    "observed_worst_error_values": "NOT_REPORTED"
+  },
+  "raw_invalid_rhs": {
+    "path": "raw/invalid_rhs.jsonl",
+    "classification": "PACKAGING_SERIALIZATION_DEFECT",
+    "valid_json_lines": 0,
+    "invalid_json_lines": 13,
+    "evidence_sufficient": "Verbatim case IDs and equal error strings readable; strict source comparison before emission; exit0 bound by hash",
+    "handling": "Preserve and label raw text, do not claim JSONL parsing succeeded"
+  },
+  "execution": {
+    "host": "s1a0e5abed09",
+    "cpu": 0,
+    "cargo_exit": 0,
+    "ssh_exit": 0,
+    "tests_passed": 1,
+    "tests_failed": 0,
+    "wall_seconds": 13.22,
+    "peak_rss_kib": 255924,
+    "cargo_cumulative": 5,
+    "cargo_ceiling": 5,
+    "component_benchmark_used": 0,
+    "component_benchmark_ceiling": 1
+  },
+  "accounting_finding": {
+    "classification": "BOUNDED_ACCOUNTING_DEFECT",
+    "cause": "Rejected out-of-domain table T and reconstructed-endpoint RHS query undercount",
+    "per_matrix": {
+      "coefficient_queries": 262422,
+      "literal_queries": 96,
+      "slope_queries": 8192,
+      "rhs_queries": 24672,
+      "explicit_invalid_temperature_queries": 7,
+      "required_lookup_charge": 295389,
+      "recorded_lookup_charge": 295329,
+      "omitted": 60
+    },
+    "two_matrices": {
+      "raw_cumulative_direct": 656315,
+      "raw_cumulative_lookups": 590658,
+      "additive_lookup_correction": 120,
+      "reconciled_direct": 656315,
+      "reconciled_lookups": 590778
+    },
+    "minimal_correction": "Preserve raw counters; bind derived benchmark carry-in 656315/590778; ensure unchanged executable reads reconciled input; no source repair/sixth Cargo/validation rerun"
+  },
+  "single_benchmark_release": {
+    "prerequisite": "Derived reconciled carry-in, table/saved-T/executable hashes, exact argv and fresh CPU/RAM/disk check",
+    "reservation": {
+      "additional_direct_max": 32050,
+      "additional_lookup": 16025,
+      "cumulative_direct_upper": 688365,
+      "cumulative_lookup_upper": 606803
+    },
+    "limits": {
+      "launches": 1,
+      "timeout_s": 299,
+      "cpu_threads": 1,
+      "as_bytes": 2147483648,
+      "evidence_bytes": 134217728,
+      "cumulative_direct": 2000000,
+      "cumulative_lookup": 8000000,
+      "automatic_retries": 0
+    },
+    "stop": "First identity, pretiming, numerical, resource or accounting failure; preserve launch/raw",
+    "claim_ceiling": "Same-host component timing only; no production integration, trajectory accuracy, whole-driver speedup, AX11/AX12 or broader admission"
+  }
+}

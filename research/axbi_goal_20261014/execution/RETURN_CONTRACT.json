@@ -4,7 +4,7 @@
   "status": "RUNNING",
   "session_checkpoint": "PAUSED_RESUMABLE",
   "goal_status": "IN_PROGRESS",
-  "observed_utc": "2026-10-14T12:13:44.293271Z",
+  "observed_utc": "2026-10-14T12:52:59.355352Z",
   "execution_identity": {
     "coordinator": "/root",
     "requested_model": "gpt-6-astra/high for science; gpt-6.1-sol/medium for implementation",
@@ -175,6 +175,18 @@
       "output_pid": 1417378,
       "science_start_pid": 1419443,
       "output": "research/axbi_goal_20261014/execution/EXTERNAL_R7_AND_HALF_MINUS_START_CHECKPOINT.json"
+    },
+    {
+      "command": "NCP staged offline Cargo test --release --locked --test temperature_tables -- --test-threads=1 --nocapture (exact argv in ncp_validation_001/RUN_BINDING.json)",
+      "executed": true,
+      "exit_code": 0,
+      "output": "research/axbi_goal_20261014/performance/temperature_rate_table_001/ncp_validation_001/RECEIPT.json"
+    },
+    {
+      "command": "NCP standalone axbi_temperature_rate_table_benchmark --contract <original authority> --table <isolated rates.bin> --output <raw results> (exact argv in benchmark_runtime_001/RUN_BINDING.json)",
+      "executed": true,
+      "exit_code": 0,
+      "output": "research/axbi_goal_20261014/performance/temperature_rate_table_001/ncp_validation_001/benchmark_runtime_001/raw/results.json"
     }
   ],
   "outputs": {
@@ -243,7 +255,14 @@
         "all_sha256_equal": true
       }
     },
-    "derivation": null
+    "derivation": null,
+    "temperature_rate_table": {
+      "table_path": "research/axbi_goal_20261014/performance/temperature_rate_table_001/data/rates.bin",
+      "table_sha256": "87a9d022dcda1bb9353bb96fa782dbdc958719ccbcc9f00187b0aa1959fed0a2",
+      "component_receipt": "research/axbi_goal_20261014/performance/temperature_rate_table_001/ncp_validation_001/benchmark_runtime_001/BENCHMARK_RECEIPT.json",
+      "component_review": "research/axbi_goal_20261014/performance/temperature_rate_table_001/ncp_validation_001/benchmark_runtime_001/INDEPENDENT_REVIEW.json",
+      "scope": "NCP standalone component only"
+    }
   },
   "claim": {
     "status": "PASS_SCOPED_CONDITIONAL_FULL_INTERVAL_ZERO_HISTORY_ONLY",
@@ -320,20 +339,20 @@
   ],
   "next_ready": [
     {
-      "now": "Observe signed HALF_MINUS original without restart; preserve terminal/checkpoint and obtain independent case-specific science classification."
+      "now": "Observe HALF_MINUS original without restart; preserve terminal/checkpoint and obtain case-specific independent science classification."
     },
     {
-      "after_half_minus_terminal_classified": "Invoke existing reviewed post_plus_epoch_dispatch.py --start-detached only after its exact handoff validates; prepare signed continuation under case-specific authority and review."
+      "after_half_minus_terminal_classified": "Invoke reviewed post_plus_epoch_dispatch.py --start-detached only if exact handoff validates; signed continuations require separate case-specific authority and review."
     },
     {
-      "independent": "BASS_HE PR52 diagnostic normalization correction closed scoped PASS. Temperature table BUILD_EPOCH_002 local test PASS but boundary-validation authority decision pending before original single NCP benchmark launch."
+      "independent": "Temperature table component work closed scoped PASS; separate finite production integration and short-history acceptance required before using table in canonical trajectories."
     }
   ],
   "publication": {
     "repository": "https://github.com/cosmosapjw-quantum/rei_bianchi",
     "branch": "codex/rux-science-delivery-20261014",
-    "previous_verified_commit_sha": "e09d58a0f9308b76bda78af840bd64639faa3cee",
-    "previous_verified_remote_sha": "e09d58a0f9308b76bda78af840bd64639faa3cee",
+    "previous_verified_commit_sha": "6fe1e8d03fadbc46bdc6dd0072a55b83cbd03d0d",
+    "previous_verified_remote_sha": "6fe1e8d03fadbc46bdc6dd0072a55b83cbd03d0d",
     "push_attempted": true,
     "push_exit_code": 0,
     "github_pr_number": 117,
@@ -355,9 +374,9 @@
     "AX11_T1_binding": "PASS_SCOPED_TIME_T1_ZERO_BINDING_PREPARATION; AX11 PENDING and execution disabled",
     "AX12_variant_configs": "PASS_SCOPED_VARIANT_CONFIG_PREPARATION; AX12 PENDING and no solver",
     "NCP_private_ZERO_mirror": "14/14 SHA256 equal; rsync exit0, 1,666,906,660 bytes",
-    "current_live_process_observation": "Read-only 2026-10-14T12:03:57.106436Z: MINUS terminal reviewed; HALF_PLUS PID970521 live accepted190740; old observer live; HALF_MINUS absent.",
+    "current_live_process_observation": "Read-only 2026-10-14T12:52:59.355352Z: HALF_MINUS original PID1419443 live accepted81480; old observer exited; table benchmark complete with no science trajectory start.",
     "scientific_claim_ceiling": "ZERO full interval and existing reviewed plots/report are scoped conditional outputs only. No completed signed family, convergence, robustness, resolved shear effect, GOAL_DONE, or broader scientific admission.",
-    "optimization_component_scope": "BACKGROUND_TABLE PASS component/HOLD short-step production; ATOMIC_VECTOR PASS component; T table IN_PROGRESS; no whole-driver speedup or new science admission"
+    "optimization_component_scope": "BACKGROUND_TABLE component PASS/HOLD production; ATOMIC_VECTOR component PASS; T TABLE component validation and single NCP benchmark scoped PASS; production integration and whole-driver speedup NOT_MEASURED"
   },
   "current_authority_and_review": {
     "signed_continuation_mechanism_decision": {
@@ -392,14 +411,14 @@
     }
   },
   "current_observation": {
-    "checkpoint": "research/axbi_goal_20261014/execution/EXTERNAL_R7_AND_HALF_MINUS_START_CHECKPOINT.json",
+    "checkpoint": "research/axbi_goal_20261014/execution/TEMPERATURE_TABLE_AND_HALF_MINUS_CHECKPOINT.json",
     "SHEAR_HALF_PLUS": "STOPPED_CHECKPOINTED accepted200000 external1 case-specific review pending",
     "old_observer_pid": 811686,
     "old_observer_status": "EXITED_WITH_UNACCOUNTED_SCIENTIFIC_PROCESS_GROUP_FIRST_FAILURE_PRESERVED",
-    "SHEAR_HALF_MINUS": "PROCESS_STARTED PID1419443 terminal pending",
+    "SHEAR_HALF_MINUS": "LIVE ORIGINAL accepted81480 a=0.0612703986984216 PID1419443",
     "solver_starts_this_status_update": 1,
     "total_science_solver_starts": 9,
-    "temperature_table": "BUILD_ALLOCATION_EXHAUSTED 2/2 Cargo; no numerical results or table",
+    "temperature_table": "SCOPED_COMPONENT_VALIDATION_AND_BENCHMARK_PASS; production integration NOT_AUTHORIZED; whole-driver speedup NOT_MEASURED",
     "external_supplier": "BASS_HE PR52/Dropbox R7 intake applied as corrected diagnostic xe floor; independent scoped PASS, no AX11 scientific admission",
     "electron_floor_review": "research/axbi_goal_20261014/convergence/electron_floor_001/INDEPENDENT_REVIEW.json"
   }

@@ -1,0 +1,109 @@
+{
+  "schema": "rei.axbi.temperature_rate_table_gate_completion.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "work_id": "TEMP_RATE_TABLE_001",
+  "segment_id": "TEMP_RATE_TABLE_001_GATE_COMPLETION_001",
+  "decision": "AUTHORIZE_ONE_BOUNDED_VALIDATION_COMPLETION_SEGMENT",
+  "scientific_admission": "NOT_ISSUED",
+  "authorization_basis": "Adopted GOAL.json controller.new_segment_allocation; explicit incremental allocation with cumulative costs and unchanged scientific criteria",
+  "predecessor": {
+    "cargo_invocations_used": 3,
+    "ncp_launches_used": 0,
+    "direct_calls_charged": 360926,
+    "table_lookups_charged": 295329,
+    "fallback_calls_included": 96,
+    "successful_rhs_cases": 24612,
+    "compared_slope_samples": 4096,
+    "saved_temperature_samples": 256,
+    "table_sha256": "87a9d022dcda1bb9353bb96fa782dbdc958719ccbcc9f00187b0aa1959fed0a2",
+    "binary_sha256": "3a87b35a932a40ec1d2c6f1296125c40eb281b22b58f987089ee2ce47a628496",
+    "rule": "Retain all previous authorities, failures, receipts, logs, binaries and counters. Pin current candidate source hashes in this segment RUN_BINDING before edits."
+  },
+  "allowed_paths": {
+    "source": [
+      "src/validation.rs",
+      "src/main.rs",
+      "tests/temperature_tables.rs"
+    ],
+    "new_segment_root": "research/axbi_goal_20261014/performance/temperature_rate_table_001/gate_completion_001",
+    "generated": "Previously authorized task target/ and deterministic test data outputs",
+    "immutable": [
+      "src/lib.rs table construction/interpolation",
+      "src/thermal_adapter.rs",
+      "canonical Rust library",
+      "AUTHORITY_CONTRACT.json",
+      "REPAIR_AUTHORITY.json",
+      "prior raw logs and receipts"
+    ]
+  },
+  "required_completion": {
+    "invalid_rhs_cases": {
+      "base": "Use one valid mixed gas state at T=10000 K with nh=1e-4 and nhe=.08*nh. Compare canonical and candidate error variant/message.",
+      "single_faults": [
+        "negative photo gamma",
+        "NaN photo gamma",
+        "negative photo heat",
+        "NaN photo heat",
+        "positive heat with corresponding gamma zero",
+        "negative expansion rate",
+        "NaN expansion rate",
+        "zero CMB temperature",
+        "NaN CMB temperature",
+        "zero hydrogen density",
+        "forged hydrogen fraction greater than one",
+        "negative thermal energy"
+      ],
+      "combined_fault": "Negative expansion rate together with zero CMB temperature, preserving original error precedence",
+      "rule": "Each fixture must actually invoke both evaluators. Constructor rejection followed by continue is not an RHS error-parity test. Preserve raw case IDs and returned errors."
+    },
+    "shared_rhs_gate": {
+      "change": "Extract existing all-field comparison and gross_and_conservation checks into reusable validation helper. Keep every existing formula and bound unchanged.",
+      "use": "Call from both 257-temperature validation matrix and benchmark pretiming checks.",
+      "scope": "Compare all 45 RHS fields, finite values and original nuclei/charge/energy checks. Retain separate rate-bundle and diagnostic checks.",
+      "remove": "Replace main.rs temperature_dt-only net-relative pretiming check with shared frozen gate; do not retain extra stricter cancellation-sensitive gate."
+    },
+    "benchmark_inputs": {
+      "temperatures": "Use 64 interior members of existing 257-temperature grid: indices 4*j-2 for j=1..64, with T=temperature(index*N/256).",
+      "other_inputs": "Use same mixed fractions, nh, nhe expression, h, Tcmb and gamma-derived heat as corresponding validation fixture. Prefer shared fixture constructor so actual binary64 inputs agree.",
+      "pretiming": "Validate each actual reference/candidate timed pair with shared all-field gate before timing.",
+      "comparison": "Reference and candidate retain identical input order, counts, duplicate rate-evaluation count and output consumption."
+    },
+    "guard_adjacent_slopes": {
+      "change": "Include endpoint-node temperatures of each guarded cell in candidate slope list, deduplicated.",
+      "eligibility": "Apply existing centered stencil and requirement entire stencil lie in one smooth unguarded branch.",
+      "record": "Record compared and skipped counts with guarded-stencil reasons. Added endpoint stencils may all be ineligible; no one-sided derivatives or relaxed exclusion.",
+      "gate": "Unchanged abs(delta slope)<=5e-4*(1+abs(reference slope))"
+    }
+  },
+  "accounting": {
+    "new_cargo_invocations_max": 1,
+    "combined_cargo_ceiling": 4,
+    "new_wall_seconds": 300,
+    "external_timeout_seconds": 299,
+    "build_jobs_max": 1,
+    "test_threads_max": 1,
+    "address_space_bytes": 2147483648,
+    "new_local_direct_call_reservation_max": 400000,
+    "new_local_lookup_reservation_max": 350000,
+    "original_cumulative_direct_ceiling": 2000000,
+    "original_cumulative_lookup_ceiling": 8000000,
+    "original_ncp_launch_ceiling": 1,
+    "additional_ncp_launches": 0,
+    "automatic_retries": 0,
+    "repairs_after_this_segment_test": 0,
+    "trajectory_starts": 0,
+    "rule": "Reserve against segment and original cumulative ceilings before execution. Carry prior counts 360926/295329 and all wall/CPU/output costs. Record epoch-local and cumulative counts separately. Preserve old local_test_counts.json; write new cumulative counts under gate_completion_001 and have successor benchmark read it. Include all constructor, invalid-input, reference, internal, fallback and lookup calls without double-counting."
+  },
+  "execution": {
+    "command": "CARGO_BUILD_JOBS=1 CARGO_TARGET_DIR=<task-root>/target /usr/bin/time -v -o <segment-root>/raw/time.log /usr/bin/timeout --foreground --signal=KILL 299s /usr/bin/prlimit --as=2147483648 -- cargo test --release --locked --manifest-path <task-root>/Cargo.toml --test temperature_tables -- --test-threads=1 --nocapture",
+    "evidence": "Record exact argv, cwd, before/after source hashes, stdout/stderr/exit, per-gate counts, cumulative costs, table hash and normal executable hash.",
+    "repeated_matrix_reason": "Comparison helper and coverage changed; one invocation of original matrix plus missing cases verifies validator. No completed physical history repeated."
+  },
+  "stopping_and_transition": {
+    "on_failure": "Stop immediately on compile, numerical, invariant, accounting or resource failure. Preserve exact failing case/field and raw evidence. No fifth Cargo, automatic retry, additional repair or tolerance change authorized.",
+    "on_local_pass": "Read-only review only bounded diff and missing-gate evidence. If PASS, immediately consume original unused single NCP component launch under existing 299-second, one-thread and cumulative limits.",
+    "on_ncp_failure": "Preserve charged launch and exact failure; no second launch.",
+    "claim_ceiling": "Component table accuracy and same-host component timing only. Production integration, trajectory accuracy and whole-driver speedup NOT_ADMITTED/NOT_MEASURED.",
+    "minimal_falsifier": "Any invalid fixture differing error; any timed RHS pair fails one frozen field/conservation bound; or applicable slope sample fails existing bound."
+  }
+}
