@@ -4,7 +4,7 @@
   "status": "RUNNING",
   "session_checkpoint": "PAUSED_RESUMABLE",
   "goal_status": "IN_PROGRESS",
-  "observed_utc": "2026-10-14T10:42:52.897163+00:00",
+  "observed_utc": "2026-10-14T10:58:46.824756+00:00",
   "execution_identity": {
     "coordinator": "/root",
     "requested_model": "gpt-6-astra/high for science; gpt-6.1-sol/medium for implementation",
@@ -13,7 +13,7 @@
     "native_delegation": "OBSERVED_TASK_TRANSPORT_NOT_MODEL_IDENTITY",
     "executor": "shared original post-cap observer PID 811686; completed ZERO continuation PID 811781, active SHEAR_MINUS and SHEAR_HALF_PLUS",
     "independent_reviewer": "separate read-only reviewer for each scoped decision",
-    "NCP": "SSH authenticated with ~/.ssh/ncp_key; observed64CPU,125Gi RAM,43GB free disk, no REI solver/checkpoint. Staged three exact reviewed binaries/five configs/two PLUS bindings into task-owned path with local/remote hashes equal. No NCP solver started or speedup claim."
+    "NCP": "Authenticated SSH root@49.50.142.2 with ~/.ssh/ncp_key; observed64CPU/125GiRAM/~42GB free, no REI solver/checkpoint; reviewed binaries/configs staged and 14-file 1,666,906,660-byte ZERO private mirror verified byte-identical. No NCP solver started or speedup claimed."
   },
   "source_identities": [
     {
@@ -35,6 +35,11 @@
     {
       "path": "research/axbi_goal_20261014/report/full_zero_32d11e733155/plot_full_zero.py",
       "sha256": "0ced51562a4821392634d93bc9b4c81084b58cbbe800c4e7dd73b173257ff52c"
+    },
+    {
+      "path": "research/axbi_goal_20261014/convergence/output_allocation_repair/axbi_reionization_4096",
+      "sha256": "25e3f1f726834b27762537332fcf88bd4774c8d35af2f9be2358c7f719863056",
+      "status": "reviewed resource-only binary; no AX11 science run"
     }
   ],
   "config_identities": [
@@ -52,6 +57,24 @@
       "case": "SHEAR_MINUS",
       "path": "research/axbi_goal_20261014/driver/full/SHEAR_MINUS.cfg",
       "sha256": "d5227c1925d27a89e71bf59e1e5abd0557061f910172ea5fa9baacaece46c677"
+    },
+    {
+      "case": "AX11_TIME_T1_ZERO_PREP",
+      "path": "research/axbi_goal_20261014/convergence/next_run_001/TIME_T1_ZERO.cfg",
+      "sha256": "e0bcb8bd363138a2ad3aacb79debe36176c9290ba7d2ee26aa07589352693dcb",
+      "status": "PREPARED_NOT_STARTED"
+    },
+    {
+      "case": "AX12_FESC_025_ZERO_PREP",
+      "path": "research/axbi_goal_20261014/robustness/variants_001/FESC_025_ZERO.cfg",
+      "sha256": "d8ad79975411b7c078c5d647d47849daff182e3af4077ceae6fe63ba7e37b049",
+      "status": "PREPARED_NOT_STARTED"
+    },
+    {
+      "case": "AX12_TGAS20K_ZERO_PREP",
+      "path": "research/axbi_goal_20261014/robustness/variants_001/TGAS20K_ZERO.cfg",
+      "sha256": "4d695849b4d930122695b0cf64bf76595b18f8107ab3eb9a7cbc06945470ddd6",
+      "status": "PREPARED_NOT_STARTED"
     }
   ],
   "commands": [
@@ -112,6 +135,30 @@
       "executed": true,
       "exit_code": 255,
       "output": "research/axbi_goal_20261014/execution/NCP_ACCESS_CHECK_20261014.json"
+    },
+    {
+      "command": "rsync reviewed 14-file ZERO composed dataset to task-owned private NCP evidence path",
+      "executed": true,
+      "exit_code": 0,
+      "output": "research/axbi_goal_20261014/execution/NCP_ZERO_MIRROR_RECEIPT.json"
+    },
+    {
+      "command": "sha256sum all 14 local and NCP ZERO mirror files; cmp lists",
+      "executed": true,
+      "exit_code": 0,
+      "output": "research/axbi_goal_20261014/execution/NCP_ZERO_MIRROR_REMOTE_SHA256SUMS.txt"
+    },
+    {
+      "command": "cargo test --locked --test axbi_driver [targeted allocation regression, separate target]",
+      "executed": true,
+      "exit_code": 0,
+      "output": "research/axbi_goal_20261014/convergence/output_allocation_repair/raw/corrective_targeted_test.json"
+    },
+    {
+      "command": "cargo build --release --locked --example axbi_reionization [separate target]",
+      "executed": true,
+      "exit_code": 0,
+      "output": "research/axbi_goal_20261014/convergence/output_allocation_repair/raw/release_build.json"
     }
   ],
   "outputs": {
@@ -160,8 +207,8 @@
       ],
       "original_and_current_starts": 8,
       "live_progress_snapshot": {
-        "path": "research/axbi_goal_20261014/execution/LIVE_PROGRESS_CHECKPOINT_20261014T1034Z.json",
-        "sha256": "758f4677863fb5e9d0087df420862d497bcd304a9af078de1dcd13deef6ff200"
+        "path": "research/axbi_goal_20261014/execution/LIVE_PROGRESS_CHECKPOINT_20261014T1058Z.json",
+        "sha256": "dadd7b53d388c4f1ce390094853c308b97e373910eae3ecb2d5b29b1dc7095d1"
       },
       "ncp_inventory": {
         "path": "research/axbi_goal_20261014/execution/NCP_ACCESS_RECOVERY_20261014.json",
@@ -170,6 +217,14 @@
       "ncp_stage": {
         "path": "research/axbi_goal_20261014/execution/NCP_STAGE_RECEIPT_20261014.json",
         "sha256": "c40928251cd4bf12f8d4542fc76a25afca576c4a536f9daf4a7057884de0577b"
+      },
+      "ncp_private_zero_mirror": {
+        "path": "research/axbi_goal_20261014/execution/NCP_ZERO_MIRROR_RECEIPT.json",
+        "sha256": "5b7308c7389131bd948812e690194fff99aa48eb7ca0b4e6457824e212568904",
+        "remote": "root@49.50.142.2:/root/REI_AXBI_GOAL_20261014_32d11e733155/evidence/ZERO_composed_001",
+        "file_count": 14,
+        "bytes": 1666906660,
+        "all_sha256_equal": true
       }
     },
     "derivation": null
@@ -263,13 +318,16 @@
     },
     {
       "after_AX08_full_family": "Use frozen AX11_NEXT_RUN_CONTRACT and AX12_VARIANT_LOCK with reviewed 4096MiB output-only compatibility repair; no launch until finite binding/dependencies."
+    },
+    {
+      "while_signed_cases_active": "Observe original shared scheduler PID811686 and exact case checkpoints; no duplicate start. AX11/AX12 prepared but dependency blocked."
     }
   ],
   "publication": {
     "repository": "https://github.com/cosmosapjw-quantum/rei_bianchi",
     "branch": "codex/rux-science-delivery-20261014",
-    "previous_verified_commit_sha": "224a19db296d0c0bdda210690c448b27ccc36354",
-    "previous_verified_remote_sha": "224a19db296d0c0bdda210690c448b27ccc36354",
+    "previous_verified_commit_sha": "4998fc933b425aa4e8ff2af0a995f72802225069",
+    "previous_verified_remote_sha": "4998fc933b425aa4e8ff2af0a995f72802225069",
     "push_attempted": true,
     "push_exit_code": 0,
     "github_pr_number": 117,
@@ -286,6 +344,10 @@
     "ZERO_report_review": "PASS_SCOPED_CONDITIONAL_ZERO_FULL_REPORT_PUBLICATION after one preserved targeted HOLD repair",
     "new_solver_runs_this_report_step": 0,
     "github_verify": "Existing baseline cargo fmt failure; Rust tests skipped; not green CI",
-    "AX07_canonical_local_binding": "PASS_SCOPED_AX07_CANONICAL_LOCAL_OUTPUT_BINDING; 3 symlinks and RUN_RECEIPT; raw targets remain local/private"
+    "AX07_canonical_local_binding": "PASS_SCOPED_AX07_CANONICAL_LOCAL_OUTPUT_BINDING; 3 symlinks and RUN_RECEIPT; raw targets remain local/private",
+    "AX11_output_allocation": "PASS_SCOPED_RESOURCE_ONLY_OUTPUT_ALLOCATION_IMPLEMENTATION; exact 4096=3968+128 MiB, one targeted PASS, separate build, original binary unchanged, no solver",
+    "AX11_T1_binding": "PASS_SCOPED_TIME_T1_ZERO_BINDING_PREPARATION; AX11 PENDING and execution disabled",
+    "AX12_variant_configs": "PASS_SCOPED_VARIANT_CONFIG_PREPARATION; AX12 PENDING and no solver",
+    "NCP_private_ZERO_mirror": "14/14 SHA256 equal; rsync exit0, 1,666,906,660 bytes"
   }
 }
