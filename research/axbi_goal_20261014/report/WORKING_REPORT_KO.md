@@ -137,3 +137,10 @@ MINUS와 HALF_MINUS의 다음 구간은 기존 검토된 signed continuation bin
 ![원래 다섯 case의 실제 부분 abundance 대 경과 proper time](signed_terminal_partial_32d11e733155/abundance_vs_elapsed_time.png)
 
 ![원래 다섯 case의 실제 부분 abundance 대 시간순 gas temperature](signed_terminal_partial_32d11e733155/abundance_vs_Tgas_time_ordered.png)
+
+
+## PLUS continuation observer 오검출 종료 및 새 REC BG R9 공급 자료
+
+PLUS continuation은 두 번째 예약 시도에서 실제 Rust solver PID 1843271로 실행되어 durable checkpoint accepted 240480, $a=0.10752752205956843$ ($\bar z=8.299944617397738$)까지 진행했다. 그 뒤 observer의 프로세스 판별식이 이 작업 중 실행한 읽기 전용 `rg` 명령의 `research/axbi_goal_20261014` 경로 인자를 별도 `axbi_` 실행 파일로 오인했다. 동일 시점 `HANDOFF_REFUSAL.json`은 허용된 solver PGID 1843269와 오인된 검색 PGID 1911669를 함께 보존한다. observer가 `LIVE_WORKERS_OR_CHILDREN_HOLD` 예외 경로에서 자신의 solver 그룹에 SIGKILL을 호출한 코드 경로가 확인되었다. 원래 시도 1회와 실제 solver를 시작한 복구 시도 1회, 합계 PLUS 예약 시도 2회/관측 solver 시작 1회는 그대로 계산한다. `RETURN.txt`와 정상 종료 기록은 없고, 전체 구간이나 수치 실패로 해석하지 않는다. 독립 검토는 runtime classifier false positive로 판정했으며 추가 PLUS 실행은 새 범위 계약 전까지 `HOLD`다. 원자료와 정확한 결손은 `../driver/full/epoch_recovery_001/plus/recovery_001/INCIDENT_CLASSIFICATION.json` 및 비공개 runtime snapshot에 보존했다.
+
+새 Dropbox `REC_BG_R9_20261014_COMPLETE.zip` (SHA256 `4db1e96828ba10a20ab0f1a8ac92f8075a0354e7b301c0fb07cf88624c673a4e`)도 확인했다. 정해진 homogeneous Bianchi I의 60개 finite interval geometry reference와 16개 시험 결과는 $dt$, $db$의 별도 기준 자료다. 현재 선택된 chemistry/native driver의 binary64 parity, roundoff bound, 전구간 abundance 재생성은 제공하지 않아 provider·background·driver를 교체하지 않았다. 정확한 외부 PR head와 입력 결손은 `../external_suppliers/UPDATE_SCAN_20261014_R12.json`에 기록했다.
