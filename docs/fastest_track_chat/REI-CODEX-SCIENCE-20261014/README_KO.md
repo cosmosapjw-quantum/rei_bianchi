@@ -1,6 +1,6 @@
 # REI Codex 과학 실행·결과 인계 — 2026-10-14
 
-기존 **ADOPTED v2의 H/He–열–방향성 광자 coupled main path**를 실행하고, 실제 데이터·그림·보고서를 남기기 위한 Codex overlay다. v2의 과학 의무·gate·보호 상태는 바꾸지 않는다. 이전 M0 prescribed/control 우선순위로 돌아가지 않는다.
+최신 실행 우선순위는 사용자 채택 목표 **재이온화 abundance history와 BBN 형식 time/gas-temperature plots (non-tilted axisymmetric Bianchi I)**의 [새 goal 인계](../REI-AXBI-GOAL-20261014/README_KO.md)와 [CODEX_GOAL_PROMPT_KO.md](../REI-AXBI-GOAL-20261014/CODEX_GOAL_PROMPT_KO.md)를 따른다. 이 문서는 이전 overlay 이력으로 보존하며 원본 v2 과학 의무와 완료 근거는 유지한다. 기존 **ADOPTED v2의 H/He–열–방향성 광자 coupled main path**를 실행하고, 실제 데이터·그림·보고서를 남기기 위한 Codex overlay다. v2의 과학 의무·gate·보호 상태는 바꾸지 않는다. 이전 M0 prescribed/control 우선순위로 돌아가지 않는다.
 
 사용자 승인 범위에는 이 additive handoff의 commit/push와 draft PR, frozen 계약 안의 bounded 준비·실행이 포함된다. main/타 owner branch 병합, 강제 push, 외부 작업 취소, scientific claim 자동 승격은 포함하지 않는다. 실제 push/PR 결과는 최종 반환 기록을 따른다.
 

@@ -1,0 +1,70 @@
+{
+  "schema": "rei.axis-goal.low-cost-index.v1",
+  "plan_id": "REI-AXBI-GOAL-20261014",
+  "primary_goal": "재이온화 이력을 완성해서 표준적인 BBN plot처럼 시간/온도에 따른 핵종/이온의 비율을 그리는 것",
+  "model": "Non-tilted axisymmetric Bianchi I with matched FLRW",
+  "status": "IN_PROGRESS_NOT_SCIENCE_COMPLETE",
+  "base_sha": "477f3756044df89ff63cceb6b432e63015c07f0a",
+  "path_basis": {
+    "index_paths": "Relative to this file directory; ../../../ is repository root",
+    "commands": "Relative to repository root",
+    "private_payloads": "Separate private transport; no raw provider locators in public Git"
+  },
+  "read_order": [
+    "../../../AGENTS.md",
+    "../../../CLAUDE.md",
+    "LOW_COST_INDEX.json",
+    "GOAL.json",
+    "CURRENT_RESULT_AUDIT.json",
+    "one full ready task packet with complete frozen contract"
+  ],
+  "pointers": {
+    "goal": "GOAL.json",
+    "dag": "EXECUTION_DAG.json",
+    "packets": "TASK_PACKETS.jsonl",
+    "state": "STATE.json",
+    "campaign": "CAMPAIGN_PLAN.json",
+    "outputs": "OUTPUT_CONTRACT.json",
+    "plan": "DEVELOPMENT_PLAN_KO.md",
+    "prompt": "CODEX_GOAL_PROMPT_KO.md",
+    "audit": "CURRENT_RESULT_AUDIT.json",
+    "audit_ko": "CURRENT_RESULT_AUDIT_KO.md",
+    "readme": "README_KO.md",
+    "pr_plan": "PR_PLAN.md",
+    "historical_v2": "../REI-ATOMIC-REUSE-RESET-20261012/PLAN.json",
+    "historical_result_state": "../../../research/rux_science_20261014/DAG_STATE.json",
+    "physics_framing": "SCIENCE_GOAL_FRAMING.md"
+  },
+  "initial_ready": [
+    "AX01",
+    "AX02",
+    "AX03",
+    "AX13"
+  ],
+  "secondary_optional_off": [
+    "AX09",
+    "AX10"
+  ],
+  "commands": {
+    "check": "python3 scripts/rux_codex/workflow.py --dag docs/fastest_track_chat/REI-AXBI-GOAL-20261014/EXECUTION_DAG.json check --state docs/fastest_track_chat/REI-AXBI-GOAL-20261014/STATE.json",
+    "ready": "python3 scripts/rux_codex/workflow.py --dag docs/fastest_track_chat/REI-AXBI-GOAL-20261014/EXECUTION_DAG.json ready --state docs/fastest_track_chat/REI-AXBI-GOAL-20261014/STATE.json",
+    "packet_AX01": "python3 scripts/rux_codex/workflow.py --dag docs/fastest_track_chat/REI-AXBI-GOAL-20261014/EXECUTION_DAG.json packet AX01 --state docs/fastest_track_chat/REI-AXBI-GOAL-20261014/STATE.json"
+  },
+  "roles": {
+    "worker": "../../../.codex/agents/rux_worker.toml",
+    "explorer": "../../../.codex/agents/rux_explorer.toml",
+    "reviewer": "../../../.codex/agents/rux_scientific_reviewer.toml",
+    "identity_rule": "Requested role/model is not observed runtime identity; native absent => same packets serially, actual limitation recorded"
+  },
+  "mandatory_figures": [
+    "research/axbi_goal_20261014/figures/abundance_vs_time.png",
+    "research/axbi_goal_20261014/figures/abundance_vs_Tgas.png",
+    "research/axbi_goal_20261014/figures/flrw_bianchi_abundance_comparison.png",
+    "research/axbi_goal_20261014/figures/delta_abundance_resolution.png"
+  ],
+  "abundance_rule": "Element fractions x_Hq/x_Heq differ from Y_i=n_i/n_b; electron normalization explicit; evolved-only species; time-ordered nonmonotonic gas-T curves",
+  "continuation": "state -> critical ready -> actual bounded work -> one relevant independent review -> checkpoint -> next ready; automatically renew finite chunks within approved scope with cumulative accounting",
+  "stop_rule": "Actual goal outputs and scientific decision, or precise observed irreducible blocker after independent ready work; runtime end is PAUSED_RESUMABLE with exact NEXT_ACTION",
+  "admission_rule": "Unknown remains null; docs/compiled demo/push/readyempty never imply scientific GOAL_DONE; tau/tail are secondary nonblocking",
+  "figure_path_basis": "Future planned paths relative to repository root; not existing results"
+}

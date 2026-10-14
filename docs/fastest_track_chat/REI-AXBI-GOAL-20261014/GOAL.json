@@ -1,0 +1,389 @@
+{
+  "schema": "rei.axbi.goal.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "adoption": "ADOPTED_USER_GOAL",
+  "goal_status": "IN_PROGRESS",
+  "scientific_admission": "NOT_ISSUED",
+  "date": "2026-10-14",
+  "objective": "Complete reionization abundance histories in a non-tilted axisymmetric Bianchi I universe and BBN-style species/ion abundance plots versus proper cosmic time and gas temperature",
+  "workspace": {
+    "repo": "rei_bianchi",
+    "base_commit": "477f3756044df89ff63cceb6b432e63015c07f0a",
+    "existing_checkout": true,
+    "local_branch": "codex/axisymmetric-reionization-goal-20261014",
+    "publish_branch": "codex/rux-science-delivery-20261014",
+    "pull_request": 117
+  },
+  "current_delivery": {
+    "scope": "Add/modify goal-driven DAG and machine-readable planning documents, then authorized publication by coordinator",
+    "science_solver_runs": 0,
+    "planning_publication_is_goal_completion": false
+  },
+  "physics_contract": {
+    "metric": "ds^2=-c^2 dt^2+a^2[exp(-2b)(dx^2+dy^2)+exp(4b)dz^2]",
+    "scale_factors": {
+      "a_perp": "a exp(-b)",
+      "a_parallel": "a exp(2b)"
+    },
+    "shear": {
+      "s": "db/dt",
+      "directional_H": [
+        "H-s",
+        "H-s",
+        "H+2s"
+      ],
+      "sigma_squared": "3 s^2",
+      "q_ref": "s_*/H_FLRW(a_*); signed case parameter at locked reference epoch, not instantaneous Sigma",
+      "Sigma": "s/H; instantaneous normalized shear evaluated along each trajectory; distinct from q_ref",
+      "q_amp": "positive maximum amplitude selected in AX01/AX03; primary q_ref in {0,+q_amp/2,-q_amp/2,+q_amp,-q_amp}"
+    },
+    "gas_frame": "Non-tilted unit normal n with n·n=-1 in x0=ct convention; physical four-velocity U=c n and U·U=-c^2; metric (-,+,+,+). Explicitly map each donor four-velocity/clock convention to this representation.",
+    "background_primary": {
+      "fixed_inputs": "same physical matter/radiation densities and Lambda for the physical family",
+      "friedmann": "H^2=H_FLRW^2+s^2",
+      "shear_evolution": "s proportional to a^-3",
+      "approximation": "stress-free prescribed/test-field background",
+      "required_validity": "Quantify and justify omitted radiation anisotropic-stress/geometry feedback over the selected trajectory; radiation quadrupole remains in RT"
+    },
+    "counterfactual": {
+      "SAME_H": "separate diagnostic with mean H held to its declared reference; never substitute for the primary physical-density-fixed family"
+    },
+    "photon_characteristics": {
+      "dE_dt": "-E[H+s(3mu^2-1)]",
+      "dmu_dt": "-3s mu(1-mu^2)"
+    },
+    "matter": "homogeneous non-equilibrium H/He, thermal evolution, energy/angular photons",
+    "radiation_baseline": "isotropic proper-frame emissivity and isotropic initial radiation; both reflection-even in mu with symmetric microphysics",
+    "parity_scope": "Axisymmetry alone does not imply vanishing dipole/force. Under the declared reflection-even baseline check J1 and net axial radiation force against the locked numerical tolerance; preserve non-tilted gas approximation",
+    "angular_outputs": [
+      "mean",
+      "quadrupole",
+      "parity-scope J1/axial-force residual"
+    ],
+    "electron_census": "ne=nH*(xHII+fHe*(xHeII+2*xHeIII)); nH and ne proper cm^-3, fHe=nHe/nH; no extra Q factor",
+    "fixed_time_thomson": "tau_segment=c sigma_T integral ne(t) dt; cold comoving fixed cosmic-time segment is direction independent",
+    "observed_redshift": "ray-defined observed-z endpoint surfaces may be directional; zbar=a^-1-1 is not observed redshift",
+    "unknown_tail": null,
+    "optional_processes": {
+      "CR": "OFF",
+      "HH": "OFF",
+      "RCT": "OFF"
+    },
+    "not_mandatory": [
+      "all 11 Bianchi types",
+      "tilt",
+      "full/polarized sky",
+      "posterior inference",
+      "full tau or observational fit without a valid tail"
+    ],
+    "forbidden_inference": [
+      "homogeneous xHII equals QV",
+      "exact scalar plus/minus shear symmetry",
+      "retained synthetic endpoints imply physical EoR",
+      "empirical convergence implies rigorous continuum proof",
+      "unknown tail equals zero"
+    ],
+    "provider_validation": "Selected provider point and any root/interval path actually used have the same physical model/domain. No old FT03 certificate inheritance. A canonical independently validated point-implicit history plus empirical convergence is legitimate at its declared numerical scope; no new rigorous interval proof is mandatory.",
+    "donor_four_velocity_map": {
+      "unit_normal": "n·n=-1",
+      "physical_four_velocity": "U=c n; U·U=-c^2",
+      "coordinate_convention": "x0=ct",
+      "required_donor_binding": "Record whether donor uses unit normal or physical four-velocity, coordinate/time units and the explicit conversion; do not silently interchange them."
+    }
+  },
+  "primary_campaign": {
+    "target": {
+      "start_zbar": 20,
+      "end_zbar": 4,
+      "redshift_definition": "zbar=a^-1-1, not observed redshift"
+    },
+    "full_selected_supported_interval_required": true,
+    "endpoint_choice_owner": "AX01",
+    "endpoint_reconciliation": "If donor or source/provider support differs, AX01 makes and records a justified scientific endpoint choice. Never silently relabel a warm first step as full campaign."
+  },
+  "scientific_completion_criteria": [
+    {
+      "id": "C01",
+      "owner_node": "AX01",
+      "requirement": "One justified, pinned background/donor/gas/radiation scenario with explicit epoch/clock/units and start/end decision; conflicting 20 K versus 6.137 K resolved as scientific choice, not permission request.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C02",
+      "owner_node": "AX02",
+      "requirement": "Implemented source-supported core rate/thermal provider covers full selected trajectory/energy domain with units/owners/provenance. Point and any root/interval path actually used share physical model/domain; no old FT03 certificate inheritance. Independently validated point-implicit plus empirical convergence is legitimate at labelled scope.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C03",
+      "owner_node": "AX03",
+      "requirement": "Primary axisymmetric physical-density-fixed signed-shear family and SAME_H diagnostic separately bound, with quantitative test-field/omitted-feedback validity estimate and reflection-parity assumptions.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C04",
+      "owner_node": "AX04",
+      "requirement": "Real proper-frame emissivity/time/initial-radiation binding, source history/support and units, proper/comoving conversions and single absorption/heat/work/boundary ownership.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C05",
+      "owner_node": "AX05",
+      "requirement": "Actual runnable Rust coupled driver and frozen argv/config/run limits consume AX01–AX04, with raw failures and resumable checkpoints; warm conditional CLI is not the full campaign.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C06",
+      "owner_node": "AX06",
+      "requirement": "Short zero-shear and nonzero-shear coupled pilots execute with positivity, nuclei/charge, photon/energy ledgers and relevant numerical controls.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C07",
+      "owner_node": "AX07",
+      "requirement": "Source-supported full selected FLRW interval, primary target zbar 20 to 4; any justified changed endpoints explicitly decided and labelled. A warm step alone cannot satisfy this criterion.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C08",
+      "owner_node": "AX08",
+      "requirement": "Matched zero and positive/negative shear histories cover the full selected interval with solved gas/ne/T and fixed matched source conventions; scientific null is allowed, not assumed. The minimum physical family is q_ref={0,+q_amp/2,-q_amp/2,+q_amp,-q_amp}; reuse the AX07 zero history rather than rerun it.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C09",
+      "owner_node": "AX05",
+      "requirement": "Explicit registry of baseline H I/H II/He I/He II/He III/electron plus every additional actually evolved nuclide/charge state. Neutral derivations, element charge fractions, complete selected-model baryon inventory (H/He baseline n_H+4*n_He), with any omitted reservoir explicit and tracked sum permitted below 1 and electron charge census validated; unimplemented D/T/He3/Li labelled optional missing extensions.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C10",
+      "owner_node": "AX14",
+      "requirement": "Canonical full-history abundance CSV records nuclear/ionic normalization, Y_i=n_i/nb and labelled electrons, with mandatory BBN-style abundance_vs_time and time-ordered parametric abundance_vs_Tgas plots, matched FLRW/BI comparison and signed delta-abundance diagnostics. Local hydrogen .1/.5/.9 milestone shifts use actual saved histories with explicit nonreached/censored status, independently of tau.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C11",
+      "owner_node": "AX11",
+      "requirement": "Baseline plus at least two refinement levels assess numerical/resolution error and response floor; rigorous interval/continuum support is labelled separately from empirical convergence.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C12",
+      "owner_node": "AX12",
+      "requirement": "At least one justified source and one IC robustness variant with assumptions/support fixed before each run; source/IC sensitivity is not posterior uncertainty.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C13",
+      "owner_node": "AX13",
+      "requirement": "Goal-specific manuscript workspace and reproducibility/source ledger reuse retained results only within their old scope, preserve raw outcomes and identify still-missing physical products.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C14",
+      "owner_node": "AX14",
+      "requirement": "Final full abundance-history data, BBN-style proper-time and gas-temperature figures, FLRW/BI comparison, convergence/robustness diagnostics and manuscript TeX/PDF reflect actual evolved products, not plan publication.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C15",
+      "owner_node": "AX15",
+      "requirement": "Independent scoped review decides applicable abundance-goal criteria and accepted conditional/scientific scope. No novelty/detection forced; resolved null/upper bound valid. NOT_RUN/blocked-paper only cannot complete the goal; unknown observer tail/full tau/full CMB are nonblocking secondary goals. AX15 decides C01-C16 and release-readiness; C17 remains PENDING_RELEASE until AX16 publication readback, so release is not a prerequisite of its own scientific review.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C16",
+      "owner_node": "AX14",
+      "requirement": "Reproduction instructions bind actual driver/source/config identities, complete artifact paths, raw run/checkpoint provenance and component-separated uncertainty.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "C17",
+      "owner_node": "AX16",
+      "requirement": "Release publishes applicable reviewed scientific products at their admitted scope; independently verify completion evidence and distinguish publication from GOAL_DONE. AX16 closes this criterion after an accepted AX15 scientific decision and actual publication verification, then evaluates GOAL_DONE.",
+      "status": "NOT_RUN",
+      "evidence": []
+    }
+  ],
+  "completion_rule": {
+    "GOAL_DONE": "Complete abundance history over full selected supported interval with all applicable 17 main criteria, correct normalization/conservation, mandatory time/Tgas species figures, robustness/numerical scope and independent AX15 decision. Declared scientifically accepted conditional scope is valid. Unknown full tau/tail or full CMB is not a completion prerequisite; publication, file presence or empty readiness never suffices.",
+    "accepted_result": "Completed supported abundance histories and figures with quantitative resolved response, null or upper bound on the declared family are scientific results; detection and novelty are not forced.",
+    "not_completion": [
+      "NOT_RUN",
+      "BLOCKED_INPUT",
+      "BLOCKED_CAPABILITY",
+      "paper containing only blocked/planned science",
+      "planning PR/publication"
+    ],
+    "stage_order": [
+      "AX15: independently decide C01-C16, with C17=PENDING_RELEASE",
+      "AX16: publish reviewed products and verify remote/artifact evidence; close C17",
+      "Only then evaluate GOAL_DONE across all applicable criteria"
+    ]
+  },
+  "controller": {
+    "loop": [
+      "choose critical dependency-ready tasks",
+      "dispatch disjoint bounded writers using one packet each",
+      "collect actual results/commands/evidence",
+      "one scoped review when the scientific boundary changes",
+      "checkpoint cumulative budgets and node/science state",
+      "automatically select next ready work within approved scope"
+    ],
+    "human_continue_required": false,
+    "blocked_task": "Create one concrete executable field-resolution, supply or repair task; continue independent ready work. No new generic review cycles.",
+    "PAUSED_RESUMABLE": "Context or tool allocation ends with durable state and exact next command; goal remains incomplete.",
+    "BLOCKED_INPUT_OR_CAPABILITY": "Name exact missing field or observed capability and local next action; do not declare done.",
+    "new_segment_allocation": "Coordinator may allocate the next bounded segment automatically within approved scope with cumulative accounting. Historical budgets/exceptions remain unchanged; do not reset an old cap or add an approval gate."
+  },
+  "preparation_budget": {
+    "wall_seconds": 1800,
+    "commands": 24,
+    "targeted_build_or_validation_invocations": 2,
+    "scientific_solver_runs": 0,
+    "automatic_retries": 0,
+    "historical_CC_PREP05": "11/8 commands and missing durable cargo stdout/stderr remain recorded limitations, not reset",
+    "scope": "PREPARATION_ONLY; not a permanent prohibition on future bound scientific execution"
+  },
+  "execution_routing": {
+    "science_argv": "UNBOUND until AX05 actual driver/config/run receipt; no invented flags",
+    "NCP": "Only actual independent cases plus measured pilot wall/CPU/RSS, finite per-job/thread limits and current checkpoint; no 64x sequential adaptive ODE promise",
+    "baseline_rustfmt_FAIL": "Inherited status is recorded separately, not a new scientific gate",
+    "model_identity": "Requested model and observed runtime identity separate; unavailable runtime identity stays null"
+  },
+  "legacy_reuse": "Historical receipts are immutable; scoped completed legacy activities may be consumed with explicit evidence. They do not complete new physical pipeline nodes.",
+  "user_final_objective_ko": "재이온화 이력을 완성해서 표준적인 BBN plot처럼 시간/온도에 따른 핵종/이온의 비율을 그린다.",
+  "principal_products": [
+    "Completed supported FLRW and signed axisymmetric Bianchi-I abundance histories",
+    "BBN-style abundance_vs_time and abundance_vs_Tgas figures",
+    "Matched FLRW/BI and signed delta-abundance/resolution diagnostics",
+    "Scientific scope, conservation/numerical validation and source/IC robustness",
+    "Reproducible CSV, figures and manuscript TeX/PDF"
+  ],
+  "secondary_nonblocking_products": [
+    "represented segment tau/visibility",
+    "supported optional observer/redshift/tail diagnostics; unknown full tail never blocks completed abundance goal"
+  ],
+  "abundance_normalization_contract": {
+    "registry_id": "BASELINE_H_HE_CHARGE_AND_BARYON_V1",
+    "required_species": [
+      {
+        "species_id": "H_I",
+        "element": "H",
+        "A": 1,
+        "Z": 1,
+        "charge": 0,
+        "kind": "nucleus_charge_state",
+        "state": "derived nHI=nH*(1-xHII)"
+      },
+      {
+        "species_id": "H_II",
+        "element": "H",
+        "A": 1,
+        "Z": 1,
+        "charge": 1,
+        "kind": "nucleus_charge_state",
+        "state": "evolved xHII; nHII=nH*xHII"
+      },
+      {
+        "species_id": "He_I",
+        "element": "He",
+        "A": 4,
+        "Z": 2,
+        "charge": 0,
+        "kind": "nucleus_charge_state",
+        "state": "derived nHeI=nHe*(1-xHeII-xHeIII)"
+      },
+      {
+        "species_id": "He_II",
+        "element": "He",
+        "A": 4,
+        "Z": 2,
+        "charge": 1,
+        "kind": "nucleus_charge_state",
+        "state": "evolved xHeII; nHeII=nHe*xHeII"
+      },
+      {
+        "species_id": "He_III",
+        "element": "He",
+        "A": 4,
+        "Z": 2,
+        "charge": 2,
+        "kind": "nucleus_charge_state",
+        "state": "evolved xHeIII; nHeIII=nHe*xHeIII"
+      },
+      {
+        "species_id": "electron",
+        "element": null,
+        "A": 0,
+        "Z": null,
+        "charge": -1,
+        "kind": "electron",
+        "state": "charge-census ne; excluded from baryon inventory; nuclear Z not applicable"
+      }
+    ],
+    "additional_actually_evolved_species": "Every additional evolved nuclide/charge state must be listed with A,Z,charge,element, provenance, state semantics and normalization; never omit it from outputs silently.",
+    "unimplemented_optional_extensions": [
+      {
+        "species": "D",
+        "status": "NOT_IMPLEMENTED_OPTIONAL_EXTENSION"
+      },
+      {
+        "species": "T (tritium)",
+        "status": "NOT_IMPLEMENTED_OPTIONAL_EXTENSION"
+      },
+      {
+        "species": "He3",
+        "status": "NOT_IMPLEMENTED_OPTIONAL_EXTENSION"
+      },
+      {
+        "species": "Li charge states",
+        "status": "NOT_IMPLEMENTED_OPTIONAL_EXTENSION"
+      }
+    ],
+    "no_full_17_reaction_network_claim": true,
+    "element_fraction": {
+      "H": "x_Hq=n_Hq/n_H_total",
+      "He": "x_Heq=n_Heq/n_He_total",
+      "electron": "not an element charge fraction; null element_fraction, report ye or xe separately"
+    },
+    "baryon_inventory": "n_b is the complete baryon inventory of the selected model, including any explicitly declared omitted reservoir; H/He-only baseline n_b=n_H+4*n_He. Electrons are excluded. The tracked sum is the full denominator only when the tracked nuclear registry is complete.",
+    "BBN_number_abundance": "Y_i=n_i/n_b; per baryon in the complete selected-model inventory, distinct from element charge fraction. Do not renormalize to a partial tracked registry.",
+    "electron_normalizations": {
+      "ye": "ne/nb",
+      "xe": "ne/nH",
+      "must_label": "always name denominator; electrons excluded from nb sum"
+    },
+    "optional_mass_fraction": "X_i=A_i*Y_i, separately labelled baryon mass fraction; never mix with number/charge fractions",
+    "fixed_nuclear_vs_ionic": "Donor BBN total elemental/nuclear abundances are fixed input inventory (proper densities expand); reionization evolves charge-state fractions. Do not claim nuclear reaction/BBN synthesis from ionic evolution.",
+    "conservation": "Require nonnegative densities/charge fractions and per-element charge fractions summing to 1. Sum over all model nuclear species A_i*Y_i=1 within the locked tolerance. If a declared baryon reservoir is omitted from the tracked species, tracked sum A_i*Y_i may be <1 and its missing fraction must be explicitly recorded. Check electron charge census separately; never clip invalid states.",
+    "omitted_baryon_reservoir": {
+      "fraction": null,
+      "owner_node": "AX01 with AX05 registry",
+      "binding": "Explicitly record whether selected-model inventory is exactly H/He baseline, all tracked nuclear species, or includes a quantified omitted reservoir. A tracked sum below 1 is legitimate only with that declared inventory."
+    }
+  },
+  "temperature_plot_contract": {
+    "time_axis": "proper cosmic seconds with bound origin; if only elapsed time available label elapsed correctly",
+    "gas_temperature": "Tgas may reheat/be nonmonotonic; plot parametric time-ordered trajectories with arrows/branch labels. Never sort by T to fabricate a single-valued Y(T).",
+    "optional_background_reference": "Tref=T0/a with selected model T0, distinctly labelled reference; not exact direction-dependent CMB temperature in Bianchi I.",
+    "logarithmic_abundance_axis": "Use where appropriate; exact zeros masked/annotated in display, never clip state or add a fabricated floor."
+  }
+}

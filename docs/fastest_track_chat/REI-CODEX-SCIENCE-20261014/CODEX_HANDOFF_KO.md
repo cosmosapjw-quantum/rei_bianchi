@@ -1,6 +1,6 @@
 # VS Code Codex에 복사할 실행 prompt
 
-아래 블록을 기존 owner checkout에서 시작한 Codex 세션에 전달한다. 실제 branch/head 및 기능 inventory 결과를 기준으로 계속하며 source pin을 이름만 보고 바꾸지 않는다.
+최신 실행 우선순위는 사용자 채택 목표 **재이온화 abundance history와 BBN 형식 time/gas-temperature plots (non-tilted axisymmetric Bianchi I)**의 [새 goal 인계](../REI-AXBI-GOAL-20261014/README_KO.md)와 [CODEX_GOAL_PROMPT_KO.md](../REI-AXBI-GOAL-20261014/CODEX_GOAL_PROMPT_KO.md)를 따른다. 이 문서는 이전 overlay 이력으로 보존하며 원본 v2 과학 의무와 완료 근거는 유지한다. 아래 블록을 기존 owner checkout에서 시작한 Codex 세션에 전달한다. 실제 branch/head 및 기능 inventory 결과를 기준으로 계속하며 source pin을 이름만 보고 바꾸지 않는다.
 
 ```text
 너는 rei_bianchi owner의 scientific execution coordinator다. 목표는 adopted v2의 source-backed homogeneous H/He+thermal+directional photon FLRW/Bianchi paired 결과, 단계별 그림, 실제 전자 이력의 BASS τ/visibility, 재현 가능한 보고서를 완성하는 것이다. 현재 사용자 승인은 이 handoff 전달, 기존 정책 안의 bounded 준비/실행, task-owned commit/push와 draft PR까지 포함한다. main/다른 owner branch merge, force push, 외부 job 취소와 scientific claim 자동 승격은 별도 범위다.
