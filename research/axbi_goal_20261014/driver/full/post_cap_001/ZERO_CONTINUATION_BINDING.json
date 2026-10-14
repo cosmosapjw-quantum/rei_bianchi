@@ -1,0 +1,115 @@
+{
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "node_id": "AX07",
+  "case_id": "ZERO",
+  "segment_id": "ZERO_RESOURCE_CONTINUATION_001",
+  "original_binary_sha256": "32d11e733155d355a1fa748597b48ea1c8196adba3c871722a7a598f0b6cbfca",
+  "original_config_path_and_sha256": {
+    "path": "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO/config.cfg",
+    "sha256": "b83ac8f4e93704b249f08e2114501db56e3e5de039b99056c7c10efa9a782e41"
+  },
+  "original_source_identity_sha256": "d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185",
+  "predecessor_checkpoint_path_and_sha256": {
+    "path": "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO/checkpoint.txt",
+    "sha256": "67510e5502f5c82fcda0c2f074358499dded0ca082bb24180bbafdf14e77a7a3"
+  },
+  "predecessor_RETURN_path_and_sha256": {
+    "path": "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO/RETURN.txt",
+    "sha256": "79ff011ca4f4aaa5e4777ba3a1e7e0d92f3789d91c059aa2bad33b22d368a3f0"
+  },
+  "predecessor_counters_and_wall": {
+    "accepted": 200000,
+    "tentative": 600054,
+    "rhs": 4200402,
+    "rejects": 18,
+    "solver_wall_seconds": 4945.126871471,
+    "a": 0.08873654701704167,
+    "zbar": 10.269313869154184
+  },
+  "new_example_source_sha256": "2efaca95b4391be94eb1895253de68421deb6f6a26afbf2fa11741b3b4dec507",
+  "new_binary_path": "rust/rei_microphysics/target/release/examples/axbi_resource_continuation",
+  "new_binary_sha256": "a7e3f1d98bd8a9b852357c95bb65bca4aabe13f45a9e679651d352af7dfe3b2b",
+  "new_binary_path_and_sha256": {
+    "path": "rust/rei_microphysics/target/release/examples/axbi_resource_continuation",
+    "sha256": "a7e3f1d98bd8a9b852357c95bb65bca4aabe13f45a9e679651d352af7dfe3b2b"
+  },
+  "new_launcher_sha256": "bb5cee7a7a92782b5ff6530958a67c8091936f9f37ef1f5229ad11e06751cf6f",
+  "driver_argv": [
+    "rust/rei_microphysics/target/release/examples/axbi_resource_continuation",
+    "--config",
+    "research/axbi_goal_20261014/driver/full/ZERO.cfg",
+    "--predecessor",
+    "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO",
+    "--output",
+    "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO_continuation_001",
+    "--case",
+    "ZERO"
+  ],
+  "actual_argv": [
+    "rust/rei_microphysics/target/release/examples/axbi_resource_continuation",
+    "--config",
+    "research/axbi_goal_20261014/driver/full/ZERO.cfg",
+    "--predecessor",
+    "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO",
+    "--output",
+    "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO_continuation_001",
+    "--case",
+    "ZERO"
+  ],
+  "argv_scope": "Exact reviewed driver argv; outerGNUtime/timeout/CPU/prlimit envelope appended by sole shared scheduler and recorded at actual start",
+  "effective_resource_overrides": {
+    "max_steps": 500000,
+    "max_attempts": 1550054,
+    "max_wall_s": 15745.126871471
+  },
+  "additional_and_cumulative_limits": {
+    "continuation_id": "ZERO_RESOURCE_CONTINUATION_001",
+    "same_goal_node_case": true,
+    "maximum_new_process_starts": 1,
+    "automatic_retry": false,
+    "required_start_state": "Exactly the frozen actual ZERO terminal checkpoint, never a reconstructed/interpolated state or zbar20 restart.",
+    "end_zbar": 4.0,
+    "additional_limits_from_actual_stop": {
+      "accepted": 300000,
+      "tentative": 950000,
+      "rhs": 15799598,
+      "solver_wall_seconds": 10800,
+      "launcher_wall_seconds": 10800,
+      "output_mib": 2048
+    },
+    "cumulative_case_limits": {
+      "accepted": 500000,
+      "tentative": 1550054,
+      "rhs": 20000000,
+      "solver_wall_seconds": 15745.126871471,
+      "original_and_continuation_output_mib": 4096
+    },
+    "segment_limits": {
+      "threads": 1,
+      "rss_gib": 2,
+      "address_space_gib": 2,
+      "total_output_mib": 2048,
+      "scientific_output_mib": 1920,
+      "launcher_reserve_mib": 128,
+      "external_timeout_seconds": 10799,
+      "automatic_retries": 0
+    },
+    "resource_fields_allowed": "Only max_steps=500000,max_attempts=1550054,max_wall_s=15745.126871471 in an in-memory config copied from the exact original text. max_rhs=20000000 and output_budget_mib=2048 remain unchanged. The original on-disk config is never rewritten. All counters and wall_elapsed_s start at saved values; no resetting even when a resource limit is increased.",
+    "mechanism": "Add a new Rust example using the existing public DriverConfig,Driver::new,Driver::read_checkpoint,Driver::adaptive_step,Driver::output_batch,Driver::save_checkpoint_budget and compiled_identity APIs. Link the unchanged library. The new example owns only execution/output/resource glue and does not duplicate or modify tentative(),adaptive_step(),error_metric(),chemistry,geometry or source kernels.",
+    "compatibility": "Before reading the checkpoint require exact original config bytes/hash, exact saved case identity ZERO, and equality of existing public compiled_identity() with the original source_identity.txt. Verify frozen checkpoint bytes. The library source remains unchanged, so its identity relation remains exact. Record the new example/launcher/binary hashes separately as execution-wrapper identity; never represent the new wrapper as the original binary.",
+    "binary_safety": "Build only the new named example. Do not rebuild/replace the original target/release/examples/axbi_reionization executable used by live and pending original cases. No Cargo.toml/source-identity-listed file edits are allowed; Cargo autodiscovery of a new example supplies the entrypoint.",
+    "outputs": "Use a fresh segment directory runs/flrw/32d11e733155/ZERO_continuation_001 and sibling ZERO_continuation_001_raw. Retain original ZERO directory,RETURN,checkpoint,config,source_identity and raw evidence unchanged. Write segment-start boundary snapshot explicitly, followed by every new accepted row and normal spectral/checkpoint cadence; all rows retain original global scale factor/proper time and cumulative counters.",
+    "segment_composition": "A composed ZERO history is original prefix plus continuation rows after the exact shared boundary; count that boundary once. Do not rebase proper time, species,photons,energy/photon ledgers or diagnostics. Cumulative feedback/tau integrals must include the original prefix or carry the equivalent checked integral; a segment-only diagnostic cannot be labelled full-history. Both original and continuation identities accompany the composed dataset.",
+    "stop": "Stop at zbar4 or the first segment/cumulative resource limit or scientific guard failure. Preserve first failure and final/durable checkpoint. No second continuation is released. Resource exhaustion remains partial; a physical/numerical failure returns to authority. No tolerance relaxation or method repair occurs automatically."
+  },
+  "output_segment_path": "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO_continuation_001",
+  "original_prefix_path": "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO",
+  "review_identity": {
+    "path": "research/axbi_goal_20261014/reviews/ZERO_CONTINUATION_REVIEW.json",
+    "sha256": "1ad6d7d2d600dc757e253d17ea0d2cfedc460154782f2248acba26b87d76edc9",
+    "decision": "PASS_SCOPED_RESOURCE_ONLY_ZERO_CONTINUATION_WRAPPER"
+  },
+  "actual_executor_identity_or_NOT_INDEPENDENTLY_OBSERVED": "NOT_INDEPENDENTLY_OBSERVED",
+  "execution_status": "BOUND_NOT_STARTED",
+  "scientific_admission": "NOT_ISSUED"
+}
