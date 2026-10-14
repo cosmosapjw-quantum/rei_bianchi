@@ -1,0 +1,60 @@
+{
+  "schema": "rei.rux.selected_source_contract.v1",
+  "node": "RUX00",
+  "status": "COMPLETE_SCOPED_IDENTITY_ONLY",
+  "authority": {
+    "plan": "docs/fastest_track_chat/REI-ATOMIC-REUSE-RESET-20261012/PLAN.json",
+    "plan_sha256": "3ebe0e2d6e981c35f1c28e80e4ed7cea9f081a2121ab8300d0a4c1542bced6e4",
+    "decision": "ADOPTED_v2",
+    "mandatory_nodes": 17
+  },
+  "selected_execution_candidate": {
+    "path": "E-P",
+    "entrypoint": "rust/rei_microphysics/src/coupled_primary.rs::PrimaryStage",
+    "base_commit": "c07fc7e765ce204bc3e84016cc6874612e535b86",
+    "receiving_source": "PR114",
+    "receiving_commit": "a5c958c414dea41216b445c05f58df837f05cacb",
+    "provider_class": "warm conditional EB/FT03",
+    "pr114_new_provider_integrated_into_primary_stage": false,
+    "provider_temperature_k": [30000, 110000],
+    "cold_eor_domain_supported": false,
+    "physical_scenario_admitted": false
+  },
+  "existing_path_observation": {
+    "primary_stage_model": "Ft03Model::controlled",
+    "primary_stage_point_coefficients": "ft03_coefficients",
+    "primary_stage_interval_rhs": "ft03_interval_rhs",
+    "pr114_axisym_conditional_provider": "Ft03CaseAProvider",
+    "pr114_conditional_history_driver": "Python SciPy DOP853 around Rust RHS; separate warm conditional reference, not canonical new PrimaryStage Rust history"
+  },
+  "exact_pr114_source_sha256": {
+    "rust/rei_microphysics/src/coupled_primary.rs": "915d0a898100a54d04a525227e7fbeb870e321fcc14aaa91afd61352b6d4cf4b",
+    "rust/rei_microphysics/src/axisym_conditional.rs": "9aacd51f539ff6274cd43b6e6a97483758135de76ae3445fe362abd6a230a983",
+    "rust/rei_microphysics/src/ft03_rates.rs": "1a97cd7a3555deeb4d8700376cd84580c5102127773bc3a235a29c33b0c1542f",
+    "rust/rei_microphysics/python/source_bound_interval.py": "050e9a3acf714606573c3dea73cfd3637952481d4ed0a3a85d98efd01872f411"
+  },
+  "fixed_conventions": {
+    "metric": "(-,+,+,+)",
+    "frame": "non-tilted normal/gas proper frame",
+    "clock": "proper seconds with explicit origin to be selected",
+    "density": "proper density, explicit comoving conversion",
+    "electron_census": "ne=nH*(xHII+fHe*(xHeII+2*xHeIII))",
+    "extra_q_factor": false,
+    "warm_closure": "HOMOGENEOUS_PRIMARY_ONLY_CASE_A_ESCAPE",
+    "recombination_escape_photon_count": null,
+    "optional_CR_RCT_HH": "OFF"
+  },
+  "retained_reuse": {
+    "F08_saved_endpoint_rows": 15,
+    "F08_scope": "synthetic prescribed discrete",
+    "F08_scientific_admission": "HOLD",
+    "SYNC02_SYNC03_and_completed_checks": "REUSE_DO_NOT_REPLAY"
+  },
+  "unresolved_consumers": {
+    "RUX02": ["background cosmology", "proper-time origin and epoch map", "gas H/He density/fractions and temperature IC", "radiation spectral/angular IC", "emissivity versus imposed UVB role, units, history and support"],
+    "SOURCE_INTEGRATION_RUX03": ["source-supported EoR rate/thermal provider actually called by PrimaryStage point and root/interval paths", "provider domain including any selected cold temperatures", "same-event opacity, ionization, heat, escape, boundary and work owners", "absolute/relative numerical targets"],
+    "RUX04_CC_RECV": ["matched geometry and shear", "observer endpoint and unknown tail", "sigma_T choice"]
+  },
+  "claim": "Selected candidate and exact source identities only. No physical input admission, provider integration, new interval execution or scientific PASS.",
+  "next_ready": ["RUX02", "SOURCE-INTEGRATION", "CC-PREP05", "RUX06", "LOWT-PROVIDER", "CC-RECV"]
+}

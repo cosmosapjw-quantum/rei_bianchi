@@ -1,0 +1,62 @@
+{
+  "schema": "rei.rux.execution_checkpoint.v1",
+  "task_id": "REI-CODEX-SCIENCE-20261014",
+  "checkout_start": {
+    "branch": "forward/rust-reion-kernels-20260922",
+    "head": "c07fc7e765ce204bc3e84016cc6874612e535b86",
+    "untracked_preserved": ["PLAN.md", "README_KO.md", "rei_rux_cc_bundle_20261012_r3.zip"]
+  },
+  "checkout_current": {
+    "branch": "codex/rux-science-delivery-20261014",
+    "source_commit": "069d6c88306c58a98556b67f9955fcd720e7e95a",
+    "branch_was_switched_without_reset_merge_or_stash": true
+  },
+  "capability": {
+    "native_collaboration_agents_exposed_and_used": true,
+    "requested_models_are_not_observed_runtime_models": true,
+    "observed_runtime_model": null,
+    "mcp": ["Google Drive metadata", "Dropbox synchronized local file", "GitHub CLI"],
+    "local_online_cpus": 24,
+    "local_ram_gib_approx": 31,
+    "ncp_64_core_128gb_process_or_current_rux_checkpoint_observed": false,
+    "ncp_allocation": null
+  },
+  "private_input": {
+    "archive_sha256": "6ebabd4f938de0cdec729889dcdd9046f11958fdbbd90a756bc397dc7d3525d4",
+    "restored_outside_repository": true,
+    "manifest_verified_entries": 17,
+    "archive_and_manifest_public_git_payload": false,
+    "metadata_only_full_HE_and_microphysics_archives_restored": false
+  },
+  "commands": [
+    {"command": "git fetch origin codex/rux-science-delivery-20261014", "exit_code": 0, "wall_seconds": 0.85},
+    {"command": "git switch --track -c codex/rux-science-delivery-20261014 origin/codex/rux-science-delivery-20261014", "exit_code": 0, "wall_seconds": 0.73},
+    {"command": "sha256sum <Dropbox-synchronized private ZIP>", "exit_code": 0, "wall_seconds": null},
+    {"command": "verify PRIVATE_INPUTS.json byte size and SHA256 for 17 members; extract outside repo", "exit_code": 0, "wall_seconds": null},
+    {"command": "python3 scripts/rux_codex/workflow.py --dag docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/EXECUTION_DAG.json check", "exit_code": 0, "wall_seconds": null},
+    {"command": "python3 scripts/rux_codex/workflow.py --dag docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/EXECUTION_DAG.json ready", "exit_code": 0, "wall_seconds": null},
+    {"command": "git fetch origin pull/114/head", "exit_code": 0, "wall_seconds": 1.2},
+    {"command": "cargo test --test rux_adapter", "cwd": "rust/rei_microphysics", "exit_code": 0, "wall_seconds": null, "raw_stdout_path": null},
+    {"command": "cargo check --example rux_science", "cwd": "rust/rei_microphysics", "exit_code": 0, "wall_seconds": null, "raw_stdout_path": null},
+    {"command": "xelatex -interaction=nonstopmode -halt-on-error report.tex", "cwd": "research/rux_science_20261014/report", "exit_code": 1, "wall_seconds": null, "first_failure": "figure path not found; source path repaired"},
+    {"command": "xelatex -interaction=nonstopmode -halt-on-error report.tex", "cwd": "research/rux_science_20261014/report", "exit_code": 0, "wall_seconds": null},
+    {"command": "python3 scripts/rux_codex/workflow.py --dag docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/EXECUTION_DAG.json check --state research/rux_science_20261014/DAG_STATE.json", "exit_code": 0, "wall_seconds": null}
+  ],
+  "source_and_output": {
+    "adopted_plan_sha256": "3ebe0e2d6e981c35f1c28e80e4ed7cea9f081a2121ab8300d0a4c1542bced6e4",
+    "provider_receiving_commit": "a5c958c414dea41216b445c05f58df837f05cacb",
+    "scenario_config": null,
+    "new_solver_run_output": null,
+    "saved_data_result": "docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/retained/paired_endpoint_differences.csv",
+    "plot": "docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/retained/endpoint_response.png",
+    "report_pdf": "research/rux_science_20261014/report/report.pdf"
+  },
+  "science_run": {
+    "executed": false,
+    "reason": "No admitted source-backed cold scenario/provider and no bound run limits; old output was not resumed or rolled back.",
+    "absolute_ivp": null,
+    "observer_tail": null
+  },
+  "budget_exception": "CC-PREP05 preparation shell invocations 11/8, recorded without reset or clean PASS.",
+  "ci_scope": "Existing GitHub verify cargo fmt fails on baseline branch and Rust tests were skipped. This checkpoint does not claim green CI."
+}

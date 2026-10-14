@@ -1,0 +1,115 @@
+{
+  "schema": "rei.rux.transport_reuse_and_binding.v1",
+  "task_id": "RUX06",
+  "status": "COMPLETE_SCOPED",
+  "scope": "Reusable Bianchi-I ray/packet transport API and binding contract; no physical Bianchi instantiation",
+  "execution_identity": {
+    "requested_role": "implementation",
+    "requested_model": "gpt-6.1-sol",
+    "observed_model": null,
+    "executor": "controller subagent in shared rei_bianchi checkout",
+    "scientific_solver_runs": 0,
+    "build_or_test_runs": 0
+  },
+  "authority": {
+    "adopted_v2": "docs/fastest_track_chat/REI-ATOMIC-REUSE-RESET-20261012/PLAN.json",
+    "overlay": "docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/EXECUTION_DAG.json",
+    "physical_instantiation_requires": "RUX04",
+    "scientific_admission": "NOT_ISSUED"
+  },
+  "commands": [
+    {
+      "argv": ["python3", "scripts/rux_codex/workflow.py", "--dag", "docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/EXECUTION_DAG.json", "packet", "RUX06", "--state", "research/rux_science_20261014/DAG_STATE.json"],
+      "cwd": ".",
+      "exit_code": 0,
+      "note": "The --state option follows the packet subcommand and node argument. Initial option placement before packet returned usage exit 2; no state was mutated."
+    },
+    {
+      "argv": ["cat", "rust/rei_microphysics/src/bianchi_i.rs", "rust/rei_microphysics/src/angular_photons.rs", "docs/research_sync/CURRENT_SYNC03.json"],
+      "cwd": ".",
+      "exit_code": 0,
+      "note": "Read-only API inspection."
+    },
+    {
+      "argv": ["cat", "docs/research_sync/REI-REC-BASS-SYNC03-20261007/LOW_COST_ENTRY.json", "docs/research_sync/REI-REC-BASS-SYNC03-20261007/publication/DELIVERY_ACK.json"],
+      "cwd": ".",
+      "exit_code": 0,
+      "note": "Read-only retained evidence inspection."
+    },
+    {
+      "argv": ["sha256sum", "rust/rei_microphysics/src/bianchi_i.rs", "rust/rei_microphysics/src/angular_photons.rs", "rust/rei_microphysics/tests/bianchi_i.rs", "docs/research_sync/CURRENT_SYNC03.json", "docs/research_sync/REI-REC-BASS-SYNC03-20261007/LOW_COST_ENTRY.json", "docs/research_sync/REI-REC-BASS-SYNC03-20261007/publication/DELIVERY_ACK.json"],
+      "cwd": ".",
+      "exit_code": 0
+    }
+  ],
+  "implementation_sources": [
+    {
+      "path": "rust/rei_microphysics/src/bianchi_i.rs",
+      "sha256": "0c0bb17168b36a67af6e3e2a3ada835bc77db3dbc73d06e13075f6019ec11289",
+      "reusable_api": ["GeometrySnapshot", "GeometryBackground", "ConstantHubbleBackground", "AxisymmetricPoint", "ConstantAxisymmetricBackground", "CharacteristicRay", "RayDerivative"],
+      "contract": "Positive finite scale factors; finite directional Hubble values and proper time; characteristic pullback transforms energy/direction while preserving occupation; solid-angle Jacobian provided. Axisymmetric adapter uses transverse a exp(-b), longitudinal a exp(2b), H_perp=H-sigma, H_parallel=H+2 sigma; geometry only, no source or gas IC."
+    },
+    {
+      "path": "rust/rei_microphysics/src/angular_photons.rs",
+      "sha256": "8da6478182f70b285e7456490469d7a7708c969d200ab93d4d468f34c0fe82db",
+      "reusable_api": ["PhotonPacket", "RadiationState", "PhotonGrid", "PhotonBins"],
+      "contract": "Nonnegative comoving packet counts; geometry transport carries packets with characteristic pullback; proper photon density divides comoving count by volume factor; conservative energy/count remap returns explicit below/above-grid measures."
+    },
+    {
+      "path": "rust/rei_microphysics/tests/bianchi_i.rs",
+      "sha256": "ada327045cae86cd3111436b000da7d2b585b9c19cdb176f1a2d6c998d85a446",
+      "reuse_evidence": "Existing tests cover isotropic/anisotropic pullback, occupation preservation, solid-angle behavior, roundtrip, axisymmetric relation and invalid input. Tests were inspected only, not rerun."
+    }
+  ],
+  "retained_evidence": [
+    {
+      "path": "docs/research_sync/CURRENT_SYNC03.json",
+      "sha256": "5b38f44ed43d0e082a08ec4dc58a220bf70f294a8763d8c65a9d608aa50f64a9",
+      "scope": "SYNC03 two loops complete; physical HOLD; recipient ACK not observed"
+    },
+    {
+      "path": "docs/research_sync/REI-REC-BASS-SYNC03-20261007/LOW_COST_ENTRY.json",
+      "sha256": "e310d214db31deb7319efbbe41f76d2f38b3646c51aec498abecddb1a0232e32",
+      "scope": "six retained histories, 112000 native cells, 784054 Decimal checks, paired T2 delta tau 3.44222649357858e-12 with conditional interval [3.25112367912543e-12, 3.63332930800749e-12]; source-conditional finite endpoint-linear Thomson observable only; physical HOLD and continuum sign NOT_CERTIFIED"
+    },
+    {
+      "path": "docs/research_sync/REI-REC-BASS-SYNC03-20261007/publication/DELIVERY_ACK.json",
+      "sha256": "082d0b558cbc403c1b6cd6273e483b01102b4796e0f2b01afd22eff4d803c727",
+      "scope": "Historical publication/backup receipt; cloud full restore not claimed. This is observer/receiver evidence, not admission of a new Bianchi geometry history."
+    },
+    {
+      "path": "docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/REPO_REVIEW_KO.md",
+      "scope": "Identifies current Rust geometry/ray and packet APIs; notes paired_history.rs is frozen-input F08 runner, not SOURCE07 observer completion; no polarized Thomson runnable module established."
+    }
+  ],
+  "reusable_transform_contract": {
+    "clock_input": "proper time t in seconds, origin and epoch map explicitly supplied by scenario; unresolved currently",
+    "geometry_input": "GeometryBackground::snapshot(t) -> directional scale factors a_i and directional H_i; no arbitrary FLRW/Bianchi parameter values inferred here",
+    "ray_transport": "For snapshots g0,g1, use CharacteristicRay::pullback; occupation remains invariant under collisionless transport; energy and direction are geometry dependent",
+    "solid_angle": "Use CharacteristicRay::solid_angle_jacobian for the same snapshots where an angular measure transform is required",
+    "packet_transport": "RadiationState::transport(to) preserves comoving packet counts and applies ray pullback; proper density uses current volume factor",
+    "boundary_projection": "Not supplied by these APIs; scenario-specific source, ray boundary, observer projection/redshift surface, and terminal conditions must be bound explicitly",
+    "interaction_coupling": "Collisionless intensity transport is independent of xe; absorption/chemistry/heating requires its own admitted source and event ownership contract",
+    "geometry_class": "The existing axisymmetric helper is a prescribed geometry adapter only; not itself a source-backed physical Bianchi solution"
+  },
+  "unresolved_for_physical_instantiation": {
+    "RUX04_scenario_lock": null,
+    "background_cosmology_and_mean_H": null,
+    "Bianchi_shear_history_and_normalization": null,
+    "proper_time_origin_and_epoch_map": null,
+    "scale_factor_initial_conditions": null,
+    "gas_and_radiation_initial_conditions": null,
+    "source_role_history_and_spectral_support": null,
+    "energy_angle_grid_and_boundary_ownership": null,
+    "observer_projection_and_terminal_surface": null,
+    "physical_opacity_and_tail": null,
+    "new_physical_acceptance_or_error_budget": null
+  },
+  "claim": {
+    "status": "NO_PHYSICAL_ADMISSION",
+    "accepted_scope": "Existing reusable Rust transform API plus retained scoped transport/receiver evidence",
+    "not_claimed": ["physical Bianchi run", "physical EoR", "new geometry/source transformation validation", "full observer total tau", "polarized sky", "continuum bound"],
+    "unknown_is_zero": false
+  },
+  "next_action": "RUX07 must consume the explicit RUX04 scenario lock and bind time/geometry/source/projection/boundary transforms before the first physical Bianchi interval; if any field remains null, report that exact field without changing geometry/provider scope."
+}
