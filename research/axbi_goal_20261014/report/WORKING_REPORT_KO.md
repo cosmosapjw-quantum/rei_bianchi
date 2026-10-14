@@ -104,3 +104,14 @@ Y=n_species/(nH+4nHe)이며 electron은 ne/nb charge census로 따로 표시하�
 ### Fresh ZERO full-history independent decision
 
 `reviews/ZERO_FULL_HISTORY_SCIENCE_REVIEW.json`의 exact SHA는 `c58a2b4ad10f3900e0b42a1b9607a4ff4718a46fc6ef9e654b9a1bd42ee0e485`이며 결정은 `PASS_SCOPED_CONDITIONAL_FULL_INTERVAL_ZERO_HISTORY`다. 실제 표현된 conditional numerical ZERO zbar20→4만 scoped admission했다. 전312238행의 whole-history sampled feedback를 재구성하여 max|Delta s/H|=3.776565807803823e-23, max extra-energy ratio=5.809377678641879e-9가1e-4 diagnostic ceiling 이내임을 확인했다. 이는 rigorous coupled-background error bound 또는 refinement uncertainty가 아니다. 역사적 composition/PNG의 PENDING annotation은 생성 시점 기록이며 fresh review가 feedback의 missing check를 제공했다. represented tau는 여전히 미계산, observer tail UNKNOWN, temporal/energy/angular refinement UNKNOWN이다. signed family·resolved shear·C11·AX15·전체 goal PASS로 확대하지 않는다.
+
+## 온도 전용 반응률 표의 짧은 이력 검증
+
+Case A 점 모델의 15개 반응률·냉각 계수를 온도만으로 조회하는 65,537-node 표를 독립 실행 드라이버에 선택형으로 연결했다. NCP에서 동일한 새 실행 파일로 $q_{ref}=0,+0.01$ 각각 DIRECT/TABLE 네 실행을 정해진 순서대로 한 번씩 수행했다. 범위는 $\bar z=20\to19.8$이며 각 실행에서 17개 공통 expansion surface를 저장했다. 독립 검토는 이 두 DIRECT/TABLE 쌍의 유한 binary64 짧은 이력 수치 비교에만 `PASS_SCOPED_PAIRWISE_SHORT_HISTORY_NUMERICS`를 부여했다.
+
+| 경우 | DIRECT 전체 wall (초) | TABLE 전체 wall (초) | TABLE/DIRECT |
+|---|---:|---:|---:|
+| ZERO ($q_{ref}=0$) | 89.55 | 90.05 | 1.00558 |
+| PLUS ($q_{ref}=+0.01$) | 118.35 | 119.71 | 1.01149 |
+
+TABLE은 이 한 번씩의 측정에서 각각 약 0.56%, 1.15% 느렸다. 측정된 상각 이득은 없으며 DIRECT를 기본값으로 유지한다. TABLE은 검증한 설정과 $\bar z=20\to19.8$ 구간에서만 선택형이다. PLUS−ZERO signed response의 독립 resolution error/floor가 없어 그 응답 주장은 `HOLD`다. 더 긴 이력, 전체 목표, 과학 admission은 이 결과로 발급되지 않았다. 원자료와 결론은 `../performance/temperature_rate_integration_001/`의 독립 pilot review, comparison 및 performance receipt에 묶여 있다.
