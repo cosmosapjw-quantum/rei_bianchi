@@ -1,0 +1,91 @@
+{
+  "task_id": "REI-CHAT-FLRW08_PAIRED_TIME_ERROR_CONTROL",
+  "status": "NO_BLOCKING_NUMERICAL_OR_CLAIM_BOUNDARY_FINDING__MINOR_PRESENTATION_FIXED_AND_COVERAGE_SUPPLEMENTED",
+  "launch_id": "cl_12fb9e1b99733c7dfc0ba4f1aa8ddc3a",
+  "independent_thread_id": "01a10b47-f20d-73f1-8112-b70728036b5c",
+  "observed_model": "gpt-6-astra",
+  "observed_effort": "xhigh",
+  "native_usage": {
+    "input_tokens": 414828,
+    "cached_input_tokens": 350464,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 3907,
+    "reasoning_output_tokens": 1275,
+    "total_tokens": 418735
+  },
+  "monetary_cost": "NOT_MEASURED",
+  "runtime_source": "/home/cosmosapjw/.codex/sessions/2026/10/05/rollout-2026-10-05T17-57-06-01a10b47-f20d-73f1-8112-b70728036b5c.jsonl",
+  "runtime_sha256": "2a348043c6880ac97ae14690a8cf296bebd345416ed211cd29a7cdb391542a2e",
+  "sandbox_policy": {
+    "type": "danger-full-access"
+  },
+  "read_only_scope": "Behavioral read-only review; inherited danger-full-access, no OS-enforced read-only claim",
+  "reviewed_candidate_sha256": {
+    "docs/fastest_track_chat/REI-CHAT-FLRW08-20261005/analyze_contrast.py": "cbb1e19cc3e40d7fab41f2d54287996bc2cf59ce103db6c7ca8c7c5236e48557",
+    "docs/fastest_track_chat/REI-CHAT-FLRW08-20261005/helper_coefficients.json": "58b4696491beb059949ffc415b2d5fb6610670c01ae0208bef0ebc60c76d711b",
+    "docs/fastest_track_chat/REI-CHAT-FLRW08-20261005/validate_contrast.py": "e1e636d7305c23b60ad64d813e1477601f56ee989095779fbc7f90a92388c6dd",
+    "docs/fastest_track_chat/REI-CHAT-FLRW08-20261005/README_KO.md": "7c5c8bbabf6acb8679d944cf56eca0fec581f7e277910d2b44de04c8cc4ea286",
+    "docs/fastest_track_chat/REI-CHAT-FLRW08-20261005/contrast.pdf": "f615d133c121355e47560784b8f2eb105d9da829262279ee2889b1b827c7a3ca",
+    "docs/fastest_track_chat/REI-CHAT-FLRW08-20261005/RESULTS.json": "f1dc412cb1197a7aa7e52e714d32d3709a5dfcac23ee552445d1e373725abc09",
+    "docs/fastest_track_chat/REI-CHAT-FLRW08-20261005/NEXT_HANDOFF_KO.md": "2026c6f899d32881f986aedded0bfbb07facac9cc328b993e1d66f89ed12c2df",
+    "docs/fastest_track_chat/REI-CHAT-FLRW08-20261005/contrast.png": "8820eb1026d56ec9d1b7caf98f993e8fb25d67f903f4000080f86df0c816ed3b",
+    "docs/fastest_track_chat/REI-CHAT-FLRW08-20261005/VALIDATION.json": "f56856a31b0528426b83c0bb9d9def1f37f861fa4e8d91e73886968c23f46ae3"
+  },
+  "findings": [
+    {
+      "severity": "P3",
+      "file": "validate_contrast.py",
+      "line": 75,
+      "finding": "Two original negative fixtures also omitted the final endpoint, so catching any ValueError did not identify the intended cause.",
+      "blocking": false,
+      "disposition": "FROZEN_ORIGINAL_VALIDATOR_PRESERVED; Host supplemental otherwise-complete baseline and isolated errors with exact-message assertions PASS",
+      "supplemental_receipt": {
+        "status": "SUPPLEMENTAL_TARGETED_FIXTURE_PASS",
+        "baseline": "COMPLETE_VALID_INPUT_PASS",
+        "cases": [
+          {
+            "fixture": "nonfinite",
+            "expected_error": "nonfinite sample",
+            "observed_error": "nonfinite sample",
+            "complete_endpoint": true,
+            "status": "PASS"
+          },
+          {
+            "fixture": "duplicate_time",
+            "expected_error": "duplicate/nonincreasing time",
+            "observed_error": "duplicate/nonincreasing time",
+            "complete_endpoint": true,
+            "status": "PASS"
+          }
+        ],
+        "analyzer_sha256": "cbb1e19cc3e40d7fab41f2d54287996bc2cf59ce103db6c7ca8c7c5236e48557",
+        "frozen_validator_unchanged": true
+      }
+    },
+    {
+      "severity": "P3",
+      "file": "README_KO.md",
+      "line": 12,
+      "finding": "Absolute-value pipes were unescaped in Markdown table.",
+      "blocking": false,
+      "disposition": "FIXED by escaping both pipes; only presentation file changed after independent review"
+    }
+  ],
+  "review_direct_evidence": [
+    "Frozen validator executed:49 Decimal/SymPy checks and5 negative fixtures",
+    "In-memory analyzer output reproduced RESULTS.json byte for byte",
+    "Exact grids and8000 common endpoints verified",
+    "Six original headers share33 spectral nodes and128 directions",
+    "Endpoint interval arithmetic, Richardson weights, conditional tail thresholds, polynomial witness inspected",
+    "PNG/PDF inspected"
+  ],
+  "limits": [
+    "Original whole-history proof inspected, not rerun",
+    "Reviewer did not audit local-helper usage; Host recorded exposed managed receipts",
+    "No continuum/physical admission",
+    "Supplemental fixture repair and Markdown edit verified by Host; no second native dispatch"
+  ],
+  "host_supplemental_fixture_program": "from pathlib import Path\nimport importlib.util,gzip,tempfile,json,hashlib\nrepo=Path('/home/cosmosapjw/Dropbox/bianchi/rei_bianchi')\np=repo/'docs/fastest_track_chat/REI-CHAT-FLRW08-20261005/analyze_contrast.py'\nspec=importlib.util.spec_from_file_location('m',p);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)\nhead='time_s,x_HII,temperature_K,photon_n,photon_u_ev_per_h\\n'\ncases=[('nonfinite',head+'1,NaN,1,1,1\\n10000000000000,1,1,1,1\\n','nonfinite sample'),\n       ('duplicate_time',head+'1,1,1,1,1\\n1,1,1,1,1\\n10000000000000,1,1,1,1\\n','duplicate/nonincreasing time')]\nrecords=[]\nwith tempfile.TemporaryDirectory() as d:\n p=Path(d)/'fixture.csv.gz'\n # Both baselines retain a valid final endpoint; each injected fault is isolated.\n with gzip.open(p,'wt') as f:f.write(head+'1,1,1,1,1\\n10000000000000,1,1,1,1\\n')\n assert len(m.rows(p))==2\n for name,text,message in cases:\n  with gzip.open(p,'wt') as f:f.write(text)\n  try:m.rows(p)\n  except ValueError as e:\n   assert str(e)==message\n   records.append({'fixture':name,'expected_error':message,'observed_error':str(e),'complete_endpoint':True,'status':'PASS'})\n  else:raise AssertionError('injected defect accepted')\nprint(json.dumps({'status':'SUPPLEMENTAL_TARGETED_FIXTURE_PASS','baseline':'COMPLETE_VALID_INPUT_PASS','cases':records,'analyzer_sha256':hashlib.sha256((repo/'docs/fastest_track_chat/REI-CHAT-FLRW08-20261005/analyze_contrast.py').read_bytes()).hexdigest(),'frozen_validator_unchanged':True}))\n",
+  "scientific_admission": "HOLD",
+  "continuum_time_error_certificate": "NOT_ESTABLISHED"
+}
