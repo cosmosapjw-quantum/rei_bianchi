@@ -928,6 +928,9 @@ pub fn compiled_identity() -> String {
             "../../../research/flrw_covariant_transport_20261015/INACTIVE_POOL_CONTRACT.md"
         ),
         include_str!("../../../research/flrw_covariant_transport_20261015/HPC_CONTRACT.md"),
+        include_str!(
+            "../../../research/flrw_covariant_transport_20261015/BACKGROUND_CACHE_CONTRACT.md"
+        ),
     ]
     .join("\nAXBI_SOURCE_BOUNDARY\n")
 }

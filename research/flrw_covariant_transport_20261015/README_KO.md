@@ -1,7 +1,9 @@
-# Unit3: native prepare pool와 실제 NCP 측정
-실제1/8/32/64 sweep은 complete bitwise parity PASS다.144accepted/3024RHS, external wall3.222804s, peakRSS54,079,488bytes였다. Timedwall은 .718848497/.562208340/.558850855/.591987827s이고 S8=1.2786,S32=1.2863,S64=1.2143이다.64worker timedregion은 평균약2.59busycores이며 실제5case 실행도 약8.2busycores다.64CPU를 충분히 사용했다는 목표는 OPEN이다.
-Pool은 prepare percell만 병렬화하고 originalserialkernel과 orderedflatten/diagnostics를 보존한다. Physics/domain/localerror/ledger기준과 source/event owners는 그대로다. 실제5case가8/8/8/8/32의 disjointaffinity로 실행 중이다. 완료된 같은구간5case와 source/ledger/refinement screen을 읽기 전에는 full-history admission을 쓰지 않는다.
-Original execserver가 끊겨 ownerisolated staging으로 복구했다. Unit2ZIP과003SOURCE/EXECUTION/BENCHMARK는 SHA검증한 실제 Dropbox copies다. Complete4trace파일은 ZIP에 모두 포함하고 Git에서는 제외한다. Local6testPASS/examplecompilePASS는 실제 이전 tool출력으로 관측했으나 원래rawreceipt bytes는 복구되지 않았다. 이를 재현raw처럼 만들지 않았다. RECOVERY_RECEIPT와 HPC_LOCAL_EVIDENCE_GAP를 읽는다. 독립리뷰도 원본byte복구가 아니라 supplemental기록이다.
-Unit1/Unit2 게시와 이전 cappedpilot은 원래역사로 보존한다. D H-equality point provider는 standalone이고 cosmological D coupling은 아직 없다. 다음은 실제5case endpoints/screen이다. 별도004exactbackgroundcache는 theorycontract 진행 중이며 이003snapshot에는 구현되지 않았다. 새 코드의 완료나 성능을 미리 주장하지 않는다.
+# Unit4 exact background cache
 
-Latest durable terminal update: Q128/Q256/Q512 all COMPLETE_REPRESENTED_INTERVAL atz19.8; strict source/config/binarybinding,6arrays and zeroFAILledgers verified. Time/angle remainpending; no full5case screen/fullhistoryPASS. See raw/ncp003_first3_readback.json and compactterminaldirectory.
+원래 배경 계산식을 그대로 둔 32-entry exact-key cache를 production 경로에 연결했다. 새 표적 검사 5개가 첫 시도에 통과했고, 실제 NCP에서 같은 fixture와 8 worker로 off/on을 비교해 전체 물리 상태·ledger·판정·counter·proper time bit가 일치했다.
+
+32 accepted-step 계산 시간은 off 0.602227407 s, on 0.354634095 s로 이 fixture에서 1.69817배였다. 전체 arm 기준 uncached 계산은 1743→135, hit1609, miss135, eviction103, resident32였다. Constructor/setup/warmup/timed/final check가 모두 counter에 포함된다. Historical distinct requested keys는 NOT_MEASURED다.
+
+원자료의 width0/1은 off/on이고 실제 worker 수는 둘 다8이다. speedup_vs_width1은 off/on 시간비이며 parallel_efficiency는 cache 효율 근거로 쓰지 않는다. 이 한 번의 fixture 측정으로 full-history 속도나64core 지속활용을 주장하지 않는다.
+
+BACKGROUND_CACHE_RESULT.json, BACKGROUND_CACHE_REVIEW_MEASURED.json, BACKGROUND_CACHE_LOOP_RECORD.json을 먼저 읽는다. 전체 trace는 runnableZIP에 포함하고 Git에는 compact evidence만 넣는다. Unit3의 실제 five-case screen은 같은 유한 함수라는 검토 근거로 fresh Unit4 full 실행에 재사용할 수 있으나, 모든 screen PASS와 기존 실행 조건이 먼저 충족돼야 한다. Old checkpoint를 exact-source resume로 바꾸지 않는다. Full z20→4 history는 아직 실행 완료로 주장하지 않는다.

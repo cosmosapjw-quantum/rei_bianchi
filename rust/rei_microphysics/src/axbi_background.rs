@@ -2,6 +2,9 @@
 //! Parameters have no physical defaults; SAME_H is an explicit counterfactual.
 use crate::{AxisymmetricPoint, ForwardError, GeometryBackground, GeometrySnapshot};
 
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::{Arc, Mutex};
+
 pub const DEFAULT_PANELS: usize = 4096;
 fn invalid(tag: &'static str) -> ForwardError {
     ForwardError::InvalidInput(tag)
@@ -78,6 +81,47 @@ impl BackgroundPoint {
         3.0 * self.s_per_s * self.s_per_s
     }
 }
+/// Transient exact-function telemetry; resident keys are bounded by 32.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PointCacheTelemetry {
+    pub calls: u64,
+    pub hits: u64,
+    pub misses: u64,
+    pub actual_uncached: u64,
+    pub evictions: u64,
+    pub resident_keys: Vec<u64>,
+}
+#[derive(Debug)]
+struct PointRing {
+    slots: [Option<(u64, BackgroundPoint)>; 32],
+    next: usize,
+}
+#[derive(Debug)]
+struct PointCache {
+    ring: Mutex<PointRing>,
+    enabled: AtomicBool,
+    calls: AtomicU64,
+    hits: AtomicU64,
+    misses: AtomicU64,
+    actual_uncached: AtomicU64,
+    evictions: AtomicU64,
+}
+impl PointCache {
+    fn new() -> Self {
+        Self {
+            ring: Mutex::new(PointRing {
+                slots: [None; 32],
+                next: 0,
+            }),
+            enabled: AtomicBool::new(true),
+            calls: AtomicU64::new(0),
+            hits: AtomicU64::new(0),
+            misses: AtomicU64::new(0),
+            actual_uncached: AtomicU64::new(0),
+            evictions: AtomicU64::new(0),
+        }
+    }
+}
 #[derive(Clone, Debug)]
 pub struct AxbiBackground {
     cosmology: Cosmology,
@@ -87,6 +131,7 @@ pub struct AxbiBackground {
     q_ref: f64,
     family: BackgroundFamily,
     panels: usize,
+    point_cache: Arc<PointCache>,
 }
 impl AxbiBackground {
     pub fn new(
@@ -115,6 +160,7 @@ impl AxbiBackground {
             q_ref,
             family,
             panels,
+            point_cache: Arc::new(PointCache::new()),
         };
         result.point_at_scale(a_end)?;
         Ok(result)
@@ -199,7 +245,81 @@ impl AxbiBackground {
             gl4_b_difference: finite(b4 - b8)?,
         })
     }
+    /// Toggle exact memoization on this immutable model and its clones.
+    /// Disabled calls neither consult nor modify the populated ring.
+    pub fn set_point_cache_enabled(&self, enabled: bool) {
+        self.point_cache.enabled.store(enabled, Ordering::Relaxed);
+    }
+    pub fn point_cache_enabled(&self) -> bool {
+        self.point_cache.enabled.load(Ordering::Relaxed)
+    }
+    pub fn point_cache_telemetry(&self) -> PointCacheTelemetry {
+        let c = &self.point_cache;
+        PointCacheTelemetry {
+            calls: c.calls.load(Ordering::Relaxed),
+            hits: c.hits.load(Ordering::Relaxed),
+            misses: c.misses.load(Ordering::Relaxed),
+            actual_uncached: c.actual_uncached.load(Ordering::Relaxed),
+            evictions: c.evictions.load(Ordering::Relaxed),
+            resident_keys: c
+                .ring
+                .lock()
+                .map(|r| r.slots.iter().flatten().map(|v| v.0).collect())
+                .unwrap_or_default(),
+        }
+    }
+    /// Reset counters only; constructor warming and resident entries remain.
+    pub fn reset_point_cache_telemetry(&self) {
+        let c = &self.point_cache;
+        for counter in [
+            &c.calls,
+            &c.hits,
+            &c.misses,
+            &c.actual_uncached,
+            &c.evictions,
+        ] {
+            counter.store(0, Ordering::Relaxed);
+        }
+    }
     pub fn point_at_scale(&self, a: f64) -> Result<BackgroundPoint, ForwardError> {
+        let c = &self.point_cache;
+        c.calls.fetch_add(1, Ordering::Relaxed);
+        // Preserve original validation and error priority before any lookup.
+        positive(a)?;
+        if a < self.a_ref || a > self.a_end {
+            return Err(invalid("AxbiScaleDomain"));
+        }
+        if !c.enabled.load(Ordering::Relaxed) {
+            return self.point_at_scale_uncached(a);
+        }
+        let key = a.to_bits();
+        if let Ok(ring) = c.ring.lock() {
+            if let Some((_, point)) = ring.slots.iter().flatten().find(|v| v.0 == key) {
+                c.hits.fetch_add(1, Ordering::Relaxed);
+                return Ok(*point);
+            }
+        }
+        c.misses.fetch_add(1, Ordering::Relaxed);
+        // Compute outside the lock. Only fully validated successes enter it.
+        let point = self.point_at_scale_uncached(a)?;
+        if let Ok(mut ring) = c.ring.lock() {
+            // Concurrent equal-key misses may both compute, but occupy one slot.
+            if !ring.slots.iter().flatten().any(|v| v.0 == key) {
+                let index = ring.next;
+                if ring.slots[index].is_some() {
+                    c.evictions.fetch_add(1, Ordering::Relaxed);
+                }
+                ring.slots[index] = Some((key, point));
+                ring.next = (index + 1) % 32;
+            }
+        }
+        Ok(point)
+    }
+    /// Original arithmetic reference; bypasses all ring reads and writes.
+    pub fn point_at_scale_uncached(&self, a: f64) -> Result<BackgroundPoint, ForwardError> {
+        self.point_cache
+            .actual_uncached
+            .fetch_add(1, Ordering::Relaxed);
         positive(a)?;
         if a < self.a_ref || a > self.a_end {
             return Err(invalid("AxbiScaleDomain"));
