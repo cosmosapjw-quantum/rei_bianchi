@@ -183,7 +183,7 @@ def plot_history(case_bb,case_hard):
 def save_csv(case_bb,case_hard):
     file=HERE/"PILOT_HISTORY.csv"
     with file.open("w",newline="") as fp:
-        writer=csv.writer(fp,lineterminator="\\n")
+        writer=csv.writer(fp,lineterminator="\n")
         writer.writerow(["source","time_s","x_HII","x_HeII","x_HeIII",
                          "Tgas_K","photon_N_per_H","photon_U_eV_per_H"])
         for source,data in (("BB50K",case_bb),("hard",case_hard)):
