@@ -7,6 +7,7 @@
 //! (U_ref/N) and therefore has an energy/threshold closure error requiring
 //! convergence checks. This is not the canonical coupled EoR Driver.
 use crate::axbi_q_advance::advance_frozen_expanding;
+use crate::axbi_q_closure::absorb_positive_bin;
 use crate::axbi_q_reference::CovariantPhoton;
 use crate::axbi_sources::{AngularCell, AxbiSource, SpectralCell};
 use crate::{
@@ -603,4 +604,106 @@ fn advance_chunk(
         }
     }
     Ok(out)
+}
+
+impl QFixedGrid {
+    /// Alternative positivity-preserving spectral closure with threshold-split
+    /// H/He absorption, no chemistry feedback or spectrum uniqueness claim.
+    /// Transactional scratch and at most four independent angular workers.
+    pub fn absorb_reconstructed(
+        &mut self,
+        now: &GeometrySnapshot,
+        neutrals: [f64; 3],
+        duration_s: f64,
+        threads: usize,
+    ) -> Result<QReactionLedger, ForwardError> {
+        now.volume_factor()?;
+        if !nonnegative(duration_s)
+            || !neutrals.iter().all(|v| nonnegative(*v))
+            || ![1, 2, 4].contains(&threads)
+        {
+            return Err(invalid());
+        }
+        let before = self.observe(now)?;
+        let mut new_n = self.number.clone();
+        let mut new_u = self.moment_ref_ev.clone();
+        let nmu = self.source.angular_cells.len();
+        let groups = if threads > 1 && self.cell_count() >= 2048 {
+            threads.min(nmu)
+        } else {
+            1
+        };
+        let per_group = nmu.div_ceil(groups);
+        let span = per_group * self.n_energy;
+        let nenergy = self.n_energy;
+        let reference = self.reference;
+        let edges = &self.edges;
+        let chunks = std::thread::scope(|scope| -> Result<Vec<QReactionLedger>, ForwardError> {
+            let mut handles = Vec::new();
+            for ((n, u), a) in new_n
+                .chunks_mut(span)
+                .zip(new_u.chunks_mut(span))
+                .zip(self.source.angular_cells.chunks(per_group))
+            {
+                handles.push(
+                    scope.spawn(move || -> Result<QReactionLedger, ForwardError> {
+                        let mut sum = QReactionLedger::default();
+                        for (j, ang) in a.iter().enumerate() {
+                            let mu = ang.mu;
+                            let ray =
+                                CharacteristicRay::new(1., [(1. - mu * mu).sqrt(), 0., mu], 0.)?;
+                            let r = ray.pullback(&reference, now)?.energy_ev;
+                            for i in 0..nenergy {
+                                let k = j * nenergy + i;
+                                if n[k] == 0.0 {
+                                    continue;
+                                }
+                                let loss = absorb_positive_bin(
+                                    edges[i],
+                                    edges[i + 1],
+                                    n[k],
+                                    u[k],
+                                    r,
+                                    neutrals,
+                                    duration_s,
+                                )?;
+                                n[k] = loss.surviving_photons_per_h;
+                                u[k] = loss.surviving_energy_moment_ev_per_h;
+                                for x in 0..3 {
+                                    sum.absorbed_per_h[x] += loss.absorbed_per_h[x];
+                                }
+                                sum.binding_ev_per_h += loss.binding_ev_per_h;
+                                sum.heat_ev_per_h += loss.heat_ev_per_h;
+                            }
+                        }
+                        Ok(sum)
+                    }),
+                );
+            }
+            let mut out = Vec::new();
+            for h in handles {
+                out.push(h.join().map_err(|_| invalid())??);
+            }
+            Ok(out)
+        })?;
+        let mut result = QReactionLedger::default();
+        for part in chunks {
+            for x in 0..3 {
+                result.absorbed_per_h[x] += part.absorbed_per_h[x];
+            }
+            result.binding_ev_per_h += part.binding_ev_per_h;
+            result.heat_ev_per_h += part.heat_ev_per_h;
+        }
+        self.number = new_n;
+        self.moment_ref_ev = new_u;
+        let after = self.observe(now)?;
+        result.photon_number_residual_per_h = before.photon_number_per_h
+            - after.photon_number_per_h
+            - result.absorbed_per_h.iter().sum::<f64>();
+        result.photon_energy_residual_ev_per_h = before.photon_energy_ev_per_h
+            - after.photon_energy_ev_per_h
+            - result.binding_ev_per_h
+            - result.heat_ev_per_h;
+        Ok(result)
+    }
 }
