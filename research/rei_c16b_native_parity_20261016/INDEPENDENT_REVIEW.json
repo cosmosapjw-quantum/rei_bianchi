@@ -1,0 +1,295 @@
+{
+  "schema": "rei.c16b.native_point_independent_review.v1",
+  "reviewed_utc": "2026-10-15T23:30:56.624954+00:00",
+  "decision": "PASS_NATIVE_POINT_PARITY_AND_ENERGY_OWNERSHIP_ONLY",
+  "reviewer": {
+    "task": "/root/contract_and_review",
+    "requested_role": "Astra scientific framing and independent review",
+    "observed_runtime_model_identity": "not independently observed",
+    "implementation_authorship": "none; contract author and repair authorizer only",
+    "review_pass": "single final read-only source/evidence review; no delegation"
+  },
+  "identities": {
+    "research_base": "f8f26710e3961609acf4d7e7930bc7b2a95bd39c",
+    "native_commit": "0e25846433170d0f420c4cda44a0bedbf02cd177",
+    "reviewer_compared_tracked_crate_files": 135,
+    "tracked_crate_mismatches": 0,
+    "example_copies_identical": true,
+    "original_python_source_and_photo_mapper_equal_research_base": true,
+    "contract_copy_equal_frozen_contract": true,
+    "restored_include_inputs": 9,
+    "restored_inputs_scratch_and_build_archive_equal_pinned_git": true,
+    "git_status_at_review": "only untracked research/rei_c16b_native_parity_20261016/"
+  },
+  "implementation_findings": [
+    "Rust uses original CovariantTransport preparation/evaluation, AtomicProvider, IgmGasState, igm_rates and igm_point_rhs; HHeModel fixture supplies constants/EOS, no manufactured reaction rate calls.",
+    "One delta per reference ray avoids continuous reconstruction of the mixed 20/40/80 eV spectrum. Per-H photon counts receive no extra angular, volume or 4pi weighting.",
+    "Python computes opacity and backward-Euler survivors from initial inputs through the unchanged source_aware Verner formulas before calling unchanged photo_point. Rust survivors are comparison outputs, not Python inputs.",
+    "Photo-on/off calls share the same gas/EOS state and all native nonphoto terms. Photon depletion occurs once in native absorption; point chemistry receives photo inputs only.",
+    "Physical binding energies and distinct fit thresholds are preserved. Adjacent binary64 below/equal/above cases reach exact threshold equality at b=0 and test positive threshold heat.",
+    "All six photo components have relative tolerance 1e-12 with exact structural zeros. Cancellation identities use actual participating gross operands and 128 binary64 eps; separate positive event comparisons prevent large photon stocks from hiding relative event mismatch.",
+    "Nuclei, charge, photon count, absorbed photon energy, EOS temperature variation, thermal/binding/escape/signed-CMB decompositions and photo-on/off differences close under the frozen criteria.",
+    "Signed b cases and stiff dt are frozen geometry/fixed-opacity tests; documents correctly separate them from a coupled thermal or cosmological trajectory."
+  ],
+  "blocking_findings": [],
+  "authorized_repair_episode": [
+    {
+      "defect": "rust-only export missing nine include_str compile inputs",
+      "classification": "packaging completeness",
+      "repair": "restore exact pinned Git bytes in scratch and build-input archive",
+      "status": "closed; original build101 preserved"
+    },
+    {
+      "defect": "AxbiSource::new(nh,0.1,2,4) violates fixture preconditions, including unsupported angular count4",
+      "classification": "harness constructor",
+      "repair": "use original native fixture values16,8 while retaining explicit three rays/deltas and no source injection",
+      "status": "closed; native101 preserved"
+    },
+    {
+      "defect": "substring nonstiff selector also selected dt1e16",
+      "classification": "test-selection false HOLD",
+      "repair": "exact numeric dt_s==1e9; same fixture, exposure bound, raw native data",
+      "status": "closed; first failure and empty latest failures preserved"
+    }
+  ],
+  "reviewer_execution": {
+    "command": "/root/REI_C16B_NATIVE_20261016/venv/bin/python compare_native.py evidence/native/native_points.jsonl --out /root/REI_C16B_NATIVE_20261016/review_comparator",
+    "cwd": "/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016",
+    "exit_code": 0,
+    "output_directory": "/root/REI_C16B_NATIVE_20261016/review_comparator",
+    "checks_and_summary_semantically_equal_worker_evidence": true,
+    "other_checks": "Python Git-blob byte comparison for all135 native crate files and two unchanged Python owners; tar/scratch comparison for9 restored inputs; direct JSON maxima/count/matrix and benchmark byte comparison; no scientific source edits or native rerun"
+  },
+  "numerical_results": {
+    "status": "PASS",
+    "cases": 48,
+    "checks": 4905,
+    "failures": 0,
+    "relative_tolerance": 1e-12,
+    "cancellation_factor_eps": 128,
+    "max_positive_relative_error": 9.00603935062818e-16,
+    "exact_zero_comparisons": 417,
+    "max_cancellation_normalized_residual": 0.008526034075271402,
+    "claim_ceiling": "native point photo parity and energy ownership with fixed-opacity finite-dt absorption",
+    "independent_python_source": "/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_thermal_bridge_20261016/source_aware.py",
+    "photo_component_errors": {
+      "gamma": [
+        {
+          "species": "HI",
+          "unit": "s^-1 per absorber",
+          "max_absolute_error": 1.6155871338926322e-27,
+          "max_relative_error": 1.6726757759153086e-16,
+          "nonzero_comparisons": 45,
+          "exact_zero_comparisons": 3
+        },
+        {
+          "species": "HeI",
+          "unit": "s^-1 per absorber",
+          "max_absolute_error": 6.462348535570529e-27,
+          "max_relative_error": 7.737637802620059e-16,
+          "nonzero_comparisons": 39,
+          "exact_zero_comparisons": 9
+        },
+        {
+          "species": "HeII",
+          "unit": "s^-1 per absorber",
+          "max_absolute_error": 8.077935669463161e-28,
+          "max_relative_error": 1.6727387384997298e-16,
+          "nonzero_comparisons": 33,
+          "exact_zero_comparisons": 15
+        }
+      ],
+      "heat": [
+        {
+          "species": "HI",
+          "unit": "erg per absorber s^-1",
+          "max_absolute_error": 2.350988701644575e-38,
+          "max_relative_error": 4.938562738350844e-16,
+          "nonzero_comparisons": 45,
+          "exact_zero_comparisons": 3
+        },
+        {
+          "species": "HeI",
+          "unit": "erg per absorber s^-1",
+          "max_absolute_error": 1.410593220986745e-37,
+          "max_relative_error": 6.150188727415387e-16,
+          "nonzero_comparisons": 39,
+          "exact_zero_comparisons": 9
+        },
+        {
+          "species": "HeII",
+          "unit": "erg per absorber s^-1",
+          "max_absolute_error": 2.938735877055719e-39,
+          "max_relative_error": 2.3645528452322446e-16,
+          "nonzero_comparisons": 33,
+          "exact_zero_comparisons": 15
+        }
+      ]
+    },
+    "residual_maxima": {
+      "hydrogen": {
+        "unit": "cm^-3 s^-1",
+        "max_absolute_residual": 0.0,
+        "signed_residual_at_max": 0.0,
+        "gross_scale_at_max": 9.202179613276702e-18,
+        "roundoff_bound_at_max": 2.6154167509493795e-31,
+        "case_at_max": "threshold0_below_dt0",
+        "check_at_max": "on_H",
+        "max_normalized_residual": 0.0,
+        "case_at_max_normalized": "threshold0_below_dt0"
+      },
+      "helium": {
+        "unit": "cm^-3 s^-1",
+        "max_absolute_residual": 3.512896218562318e-31,
+        "signed_residual_at_max": 3.512896218562318e-31,
+        "gross_scale_at_max": 7.675680855438458e-15,
+        "roundoff_bound_at_max": 2.181559709537867e-28,
+        "case_at_max": "mixed_b-0.1_T100_dt0",
+        "check_at_max": "on_He",
+        "max_normalized_residual": 0.0016102681962835096,
+        "case_at_max_normalized": "mixed_b-0.1_T100_dt0"
+      },
+      "charge": {
+        "unit": "cm^-3 s^-1",
+        "max_absolute_residual": 1.8562883175981934e-29,
+        "signed_residual_at_max": -1.8562883175981934e-29,
+        "gross_scale_at_max": 2.8705790111225696e-13,
+        "roundoff_bound_at_max": 8.158676255114215e-27,
+        "case_at_max": "mixed_b0_T100000_dt1000000000",
+        "check_at_max": "on_charge",
+        "max_normalized_residual": 0.0028408420148698737,
+        "case_at_max_normalized": "threshold2_above_dt1000000000"
+      },
+      "photon_number": {
+        "unit": "per H",
+        "max_absolute_residual": 3.29350067257991e-18,
+        "signed_residual_at_max": 3.29350067257991e-18,
+        "gross_scale_at_max": 0.046,
+        "roundoff_bound_at_max": 1.3073986337985843e-15,
+        "case_at_max": "mixed_b0_T100_dt10000000000000000",
+        "check_at_max": "photon_sink",
+        "max_normalized_residual": 0.0029343825120192314,
+        "case_at_max_normalized": "threshold1_equal_dt1000000000"
+      },
+      "photon_energy": {
+        "unit": "eV per H",
+        "max_absolute_residual": 3.741130718377512e-16,
+        "signed_residual_at_max": 3.741130718377512e-16,
+        "gross_scale_at_max": 1.543851854992307,
+        "roundoff_bound_at_max": 4.387890882618157e-14,
+        "case_at_max": "mixed_b-0.1_T100_dt10000000000000000",
+        "check_at_max": "photon_energy_rhs",
+        "max_normalized_residual": 0.008526034075271402,
+        "case_at_max_normalized": "mixed_b-0.1_T100_dt10000000000000000"
+      },
+      "micro_energy_including_signed_CMB": {
+        "unit": "erg cm^-3 s^-1",
+        "max_absolute_residual": 9.387634724143388e-40,
+        "signed_residual_at_max": -9.387634724143388e-40,
+        "gross_scale_at_max": 1.2077925283039253e-23,
+        "roundoff_bound_at_max": 3.432752829166717e-37,
+        "case_at_max": "mixed_b0_T100000_dt1000000000",
+        "check_at_max": "on_micro_energy",
+        "max_normalized_residual": 0.002846202723494875,
+        "case_at_max_normalized": "mixed_b0.1_T10000_dt1000000000"
+      },
+      "binding_from_species": {
+        "unit": "erg cm^-3 s^-1",
+        "max_absolute_residual": 7.310966451952582e-40,
+        "signed_residual_at_max": -7.310966451952582e-40,
+        "gross_scale_at_max": 6.046370133368794e-24,
+        "roundoff_bound_at_max": 1.7184817503928098e-37,
+        "case_at_max": "mixed_b0.1_T100000_dt1000000000",
+        "check_at_max": "on_binding_from_species",
+        "max_normalized_residual": 0.004254317190323054,
+        "case_at_max_normalized": "mixed_b0.1_T100000_dt1000000000"
+      },
+      "temperature_EOS": {
+        "unit": "K s^-1",
+        "max_absolute_residual": 2.117582368135751e-22,
+        "signed_residual_at_max": -2.117582368135751e-22,
+        "gross_scale_at_max": 4.935146222855958e-06,
+        "roundoff_bound_at_max": 1.402652919425679e-19,
+        "case_at_max": "mixed_b0_T100000_dt0",
+        "check_at_max": "on_dT_EOS",
+        "max_normalized_residual": 0.0016124936362622998,
+        "case_at_max_normalized": "mixed_b0_T100000_dt10000000000000000"
+      }
+    },
+    "CMB_exchange": {
+      "unit": "erg cm^-3 s^-1",
+      "minimum_into_gas": -2.944873670976556e-29,
+      "maximum_into_gas": 5.89151479639203e-28,
+      "reservoir_sign": "negative of native cmb_to_gas",
+      "ledger_group": "micro_energy_including_signed_CMB"
+    }
+  },
+  "focused_native_tests": {
+    "evidence": "evidence/native/focused_tests.log",
+    "exit_code": 0,
+    "total_passed": 37,
+    "suites": {
+      "axbi_covariant_transport": 7,
+      "axbi_transport_parallel": 6,
+      "igm_foundation": 9,
+      "igm_rates": 4,
+      "igm_thermal": 11
+    },
+    "independent_original_c_parity_all_selected_channels": "passed per unchanged native test log; reviewer did not regenerate historical C reference"
+  },
+  "resources": {
+    "native_execution_seconds": 0.01,
+    "native_max_rss_kib": 2560,
+    "native_exit_code": 0,
+    "final_build_seconds": 0.46,
+    "final_build_max_rss_kib": 145920,
+    "compile_jobs": 2,
+    "focused_test_seconds": 3.85,
+    "focused_test_max_rss_kib": 171876,
+    "configured_virtual_memory_limit_gib": 8,
+    "native_timeout_seconds": 300,
+    "native_transport_workers": 1
+  },
+  "separate_synthetic_evidence": {
+    "scope": "MANUFACTURED_RATE_ONLY; does not establish native runtime speedup or history validity",
+    "replay_tests_passed": 51,
+    "replay_original_tests": 22,
+    "replay_new_tests": 29,
+    "benchmark_cases": 64,
+    "reaction_substeps": 64,
+    "serial_jobs8_raw_results_exact_equal": true,
+    "serial_sweep_seconds": 1.3907925539824646,
+    "jobs8_sweep_seconds": 0.20018162700580433,
+    "single_run_sweep_speed_ratio": 6.947653362524314,
+    "worker_count": 8,
+    "observed_total_python_processes": 9,
+    "process_limit_interpretation": "controller explicitly applies8 to pool workers; orchestrator is additional",
+    "benchmark_runtime_failures": []
+  },
+  "claim_admitted": "Native point photo parity and energy ownership for these48 fixtures, including fixed-opacity backward-Euler finite-dt absorption and original native nonphoto process owners.",
+  "claim_not_admitted": [
+    "dynamic-temperature positive coupled integration",
+    "coupled solver or continuum convergence",
+    "cosmological source-age and z=20 to4 history",
+    "time-dependent shear work or two-way Einstein coupling",
+    "empirical accuracy of native physical fits",
+    "production validity of manufactured thermal bridge",
+    "native performance speedup from synthetic benchmark"
+  ],
+  "next_state": "GRACKLE_RR_CI_THERMAL_BIND is a future task: dynamic-temperature positive integration/source-age/history remain unresolved. Stop this task at point parity and energy ownership.",
+  "publication_and_backup": "not performed or admitted by this reviewer; parent owns authorized closeout and backup outcomes",
+  "reviewed_artifact_sha256": {
+    "c16b_native_parity.rs": "295cf7136ee3828f5d01c886a4c354ac4f8239eea4ef1972dd6ec9cc8b05d0a5",
+    "compare_native.py": "c296ca46f4b9646b9ab36893cc69e1c0bcc366103c139f42c4f2f2555b325f15",
+    "run_native.sh": "5b3b8f989412fd40333dde0174451d21ef43c8c97477a4ae3effdb328f04594d",
+    "CONTRACT.md": "e1bd2bbea9e964c9664bc9abb7e36f3b44f750440ea0ab9feb0c2491172636f2",
+    "OWNER_MAP_KO.md": "36d5791a01955b9f4db6f8a8f25cb767d718d532fb939e400981c391b3027d16",
+    "evidence/native/native_points.jsonl": "4c8acb23f1d2e5c8dea2fa59065899e07c67179d6a55cf45b7ea67952f81f0a4",
+    "evidence/native/checks.json": "7daf892a946bbb8b33e8745603a458e2454747c6fe47d1c4805ac919cc33b623",
+    "evidence/native/summary.json": "95037e3c2c1c2a77f6eb6b42cff10e7ac06054a57ede0487d41e79c4a6d762f6",
+    "HANDOFF_KO.md": "155739265e407cc9e59102714198695b3ac61cc2e21774ebe1253e30c3a5003f",
+    "evidence/native/execution_summary.json": "44c9b18c3d3d142f378cb80eb97b655a9650a4660a1fed0914b3ea87df963d2a",
+    "evidence/native/owned_changes.patch": "062301fc613d3298757db036f76ecdb1a0c3cb93ea97a4d80b9082800bb35651"
+  },
+  "final_handoff_check": "HANDOFF_KO.md correctly limits result to native point parity and energy ownership, reports frozen b versus dynamic history distinction and synthetic-only timing, and identifies next READY GRACKLE_RR_CI_THERMAL_BIND without starting it. execution_summary matches independently read raw results and native test counts. owned_changes.patch contains only isolated new harness/comparator/runner/README files."
+}
