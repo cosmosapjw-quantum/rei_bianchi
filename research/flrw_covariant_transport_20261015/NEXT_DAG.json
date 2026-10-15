@@ -2,7 +2,7 @@
   "schema_version": 1,
   "baseline": "c578683d995d375dbfc824cb080cb6b576d19348",
   "priority": "FLRW production first; full refinement; signed Bianchi and actual proper-time/Tgas plots; then D coupled full network. D source/provider lane runs in parallel without blocking FLRW.",
-  "current_next_executable": "Monitoractualsource005q512/q1024fullcases;preserveoriginal2026-10-16T02:50:17.774070Zdeadlineand5mincloseout. Collectterminal+wholehistoryrefinement,thenplots/signedBianchibackends. Optionalparallelproposaldoesnotblockcurrentscience.",
+  "current_next_executable": "OBSERVE_EXISTING_FULL005_AND_WATCHER_WHEN_ACCESS_RESTORED",
   "existing_evidence_reuse": "Previous28checks and completed conditional ZERO history preserved, not replayed.",
   "model_identity": {
     "implementation_requested": "gpt-6.1-sol",
@@ -437,12 +437,12 @@
     "tentative_count": 9,
     "rhs_evaluations": 63,
     "photon_N_errors": [
-      3.963479149419194e-06,
-      1.0722307640564845e-06,
-      2.794455764758477e-07
+      0.000003963479149419194,
+      0.0000010722307640564845,
+      2.794455764758477e-7
     ],
     "gas_errors_max": [
-      2.4961193178721988e-09,
+      2.4961193178721988e-9,
       6.423434000402128e-10,
       1.6295461854428177e-10
     ],
@@ -526,5 +526,77 @@
     "cumulative_wall_cap_s": 43200,
     "closeout_reserve_s": 300,
     "never_reset_on_resume": true
-  }
+  },
+  "latest_resume": "LATEST_RESUME.json",
+  "current_operational_frontier": {
+    "access": "MONTHLY_QUOTA_PAUSED_NO_RETRY",
+    "full005": "LAST_OBSERVED_RUNNING",
+    "postprocess": "COMPLETION_WATCHER_STARTED_FULL_BRANCH_PENDING",
+    "profile": "NO_TIMINGS_TWO_FAILURES_ONE_MECHANICAL_REPAIR_AUTHORIZED_UNCONSUMED",
+    "scientific_admission": "FULL_HISTORY_PENDING"
+  },
+  "resume_nodes": [
+    {
+      "id": "FULL005_EXISTING_OBSERVE",
+      "state": "WAIT_AUTHORIZED_ACCESS_RESTORED",
+      "depends_on": [],
+      "action": "Read existing controller terminal/checkpoint and owner watcher state before any launch",
+      "forbidden": [
+        "duplicate jobs",
+        "reset deadline",
+        "retry quota-blocked connector"
+      ]
+    },
+    {
+      "id": "POSTCACHE_CALLER_MECHANICAL_REPAIR",
+      "state": "AUTHORIZED_NOT_EXECUTED_QUOTA",
+      "depends_on": [
+        "FULL005_EXISTING_OBSERVE"
+      ],
+      "max_build_attempts_remaining": 1,
+      "max_runs_remaining": 1,
+      "wall_s": 60,
+      "max_rhs": 10000,
+      "action": "Replace one literal backslash-n, preserve failed attempts; source005 immutable"
+    },
+    {
+      "id": "POSTCACHE_COMPONENT_PROFILE",
+      "state": "NO_MEASUREMENTS",
+      "depends_on": [
+        "POSTCACHE_CALLER_MECHANICAL_REPAIR"
+      ],
+      "action": "Only if pinned build succeeds, measure component timings and ordered 8-versus16 prepare parity; diagnostic fixture only"
+    },
+    {
+      "id": "FULL005_TERMINAL_AND_REPORT",
+      "state": "AUTONOMOUS_WATCHER_STARTED_AWAIT_ACTUAL_COMPLETION",
+      "depends_on": [],
+      "action": "Require both actual successful endpoints and bound source/config/ledger checks; else incomplete status report",
+      "hard_stop_utc": "2026-10-16T03:50:17.774070Z"
+    },
+    {
+      "id": "FULL005_INDEPENDENT_SCIENCE_REVIEW",
+      "state": "PENDING",
+      "depends_on": [
+        "FULL005_TERMINAL_AND_REPORT"
+      ],
+      "action": "Assess whole-history pair evidence and report limitations; no automatic convergence admission"
+    },
+    {
+      "id": "NEXT_PARALLEL_IMPLEMENTATION",
+      "state": "RESEARCH_PROPOSAL_ONLY",
+      "depends_on": [
+        "POSTCACHE_COMPONENT_PROFILE"
+      ],
+      "action": "Choose measured bottleneck; preserve finite-operation/energy ownership and single shared bounded pool"
+    },
+    {
+      "id": "SIGNED_BIANCHI_AND_ISOTOPE_EXTENSION",
+      "state": "PENDING_PROVIDER_AND_BACKEND_GATES",
+      "depends_on": [
+        "FULL005_INDEPENDENT_SCIENCE_REVIEW"
+      ],
+      "action": "Use supported signed transport, real providers and donors; complete proper-time/Tgas histories"
+    }
+  ]
 }
