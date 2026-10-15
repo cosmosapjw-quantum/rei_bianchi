@@ -97,3 +97,17 @@ Actual fresh targeted C13 tests **16/16 PASS** after source32 and PR136 diagnost
 4. Source-matched isolated rec_bianchi HyRec ̅z20 initial-state counterfactual only, while original conditional baseline preserved. WU088_HH effective production rate `k_HH(T)` remains absent even after PR85 micro-scattering mathematical progress; keep OFF. BASS_HE warm P01 source-specific τ is a separate control only.
 
 **Files/backup:** Source and numerical outputs are committed and archived separately with SHA-256 and tested restorable ZIP. Their precise remote paths and two-cloud readback belong exclusively to `BACKUP_RECEIPT.json` after successful uploads. A successful archive CRC alone is not an independent scientific validation or a cloud backup acknowledgement.
+
+## Verified dual-cloud durable release, immutable payload
+
+The scientific/source payload commit `ddeec7a2f88946f87617c846acc1259e902588a4`
+was archived as `REI_C13_LIVE_MD14_20261015_ddeec7a2.zip` (1,032,541 bytes,
+275 ZIP entries, CRC PASS, SHA256
+`b4dd9ede581f53efd8ef41b5f6057ef6aa2b92d7b07a3a203f2c04bb0e8f01b9`).
+Independent fresh extraction passed C13 16, C12 6, C11 8, C10 8, C9 5 original
+unittests plus 16 original supplier Git blob hashes and actual PR136 and bass_cr
+source-consumer replays. The exact same bytes were retrieved from independent
+Dropbox and Google Drive copies, and SHA256 readbacks were identical to the
+local source ZIP. Precise remote ids, folder, full-byte hashes and reproduction
+limitations are in `BACKUP_RECEIPT.json`, committed *after* immutable payload
+creation and therefore intentionally NOT inside that original archive.
