@@ -1,0 +1,13 @@
+# Scoped publication plan
+
+Root owns git changes, pushes, PR updates, both backups, old handoff routing and DELIVERY_RECEIPT. This file prepares a concrete scope; it does not report publication as complete.
+
+Proposed title: Native covariant photon moments and conditional isotope-native D atomic RHS.
+
+The concrete transport problem is false threshold contamination from repeated physical-energy projection. The change stores reference-energy N/U/support, evaluates actual reaction energy, injects source moments through positive subcell integration and shares one threshold-split quadrature with the existing coupled cold HHe BE/Newton solve. Checkpoint representation and source/config identity change together. D adds a separate explicit H-equality provider/RHS, with native isotope/electron bookkeeping and sole thermal/binding/escape ownership. It has no default abundance or production activation.
+
+Observed validation: core7 + driver7 + D atomic8 =22 distinct new passing tests. A focused final signed-source-support rerun covers one existing core test and adds no new unique count. Driver6 actual outputs lack captured execution SHA and predate the isolated core arithmetic repair; the new focused authoritative outer-run binding test passes separately. D atomic8 passed first6.23s release attempt. Actual C9 is PASS_SCOPED_COMPONENTS_PILOT_GATE_PENDING and authorizes component publication. The prescribed five-case short screen and full NCP launch admission remain pending. The previous28 checks are reused, not rerun. Link raw receipts, source contract and independent review directly in the PR once present.
+
+Admission remains scoped. Two moments select a closure, not a unique spectrum. Short pilot convergence is an empirical full-launch screen, not a full-history accuracy result. The D rates/cross section use declared H-equality approximations and a caller-supplied threshold; Cooke-conditioned inventory is not a matched REC/new BBN donor. Actual Li photo/RR tables do not supply missing sub-Lyman transport or thermal/CI/DR/CX closure. Full FLRW/Bianchi/D histories and proper-time/Tgas plots need their own actual outputs and refinement review.
+
+Scoped C9 is recorded in INDEPENDENT_REVIEW.json. Before reporting delivery complete, root records exact committed/pushed source identity, remote readback SHA and PR URL, two successful backup receipts and the finite next executable node. Keep DELIVERY_RECEIPT root-owned and preserve PENDING statuses until those actions are observed. Full NCP execution is separately already authorized when the measured representation/screen gates pass; publication metadata must not introduce a new permission loop.

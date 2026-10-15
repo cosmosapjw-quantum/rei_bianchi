@@ -157,8 +157,11 @@ pub mod axbi_rates;
 pub mod axbi_background;
 pub mod axbi_sources;
 pub mod axbi_driver;
+pub mod axbi_covariant_transport;
 pub mod axbi_q_reference;
 pub mod axbi_q_advance;
 pub mod axbi_q_capacity;
 pub mod axbi_q_grid;
 pub mod axbi_q_closure;
+
+pub mod deuterium_atomic;

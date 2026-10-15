@@ -78,9 +78,8 @@ fn reaction_free_geometry_conserves_count_energy_and_temperature_dilution() {
     let (d, mut s) = component();
     let initial = s.a;
     let old_w = s.gas.w_erg_per_h;
-    let offset = d.energies.len() * 3;
-    s.photons[offset + 5] = 0.5;
-    s.photons[offset + d.energies.len() + 5] = 0.5;
+    d.seed_delta(&mut s, 3, d.energies[5], 0.5).unwrap();
+    d.seed_delta(&mut s, 4, d.energies[5], 0.5).unwrap();
     s.ledgers.source_n = 1.0;
     s.ledgers.source_u = d.energies[5];
     let to = 1.0 / 20.9;
@@ -99,16 +98,16 @@ fn conservative_deposit_exact_number_and_energy() {
     let mut stocks = s.photons.clone();
     let e = 20.0;
     d.deposit(&mut stocks, 0, e, 2.0).unwrap();
-    let mut v = s;
-    v.photons = stocks;
-    let (n, u) = d.photon_inventory(&v);
+    let n = stocks.iter().sum::<f64>();
+    let u = stocks
+        .iter()
+        .enumerate()
+        .map(|(i, n)| n * d.energies[i % d.energies.len()])
+        .sum::<f64>();
     assert!((n - 2.0).abs() < 1e-14);
     assert!((u - 40.0).abs() < 1e-12);
-    assert_eq!(
-        d.deposit(&mut v.photons, 0, 10.0, 3.0).unwrap(),
-        (3.0, 30.0)
-    );
-    assert!(d.deposit(&mut v.photons, 0, 101.0, 1.0).is_err());
+    assert_eq!(d.deposit(&mut stocks, 0, 10.0, 3.0).unwrap(), (3.0, 30.0));
+    assert!(d.deposit(&mut stocks, 0, 513.0, 1.0).is_err());
 }
 #[test]
 fn cold_absorption_uses_one_event_owner() {
@@ -116,7 +115,13 @@ fn cold_absorption_uses_one_event_owner() {
     let eindex = 10;
     let e = d.energies[eindex];
     for k in 0..d.source.angular_cells.len() {
-        s.photons[k * d.energies.len() + eindex] = 0.01 * d.source.angular_cells[k].count_fraction;
+        d.seed_delta(
+            &mut s,
+            k,
+            e,
+            0.01 * d.source.angular_cells[k].count_fraction,
+        )
+        .unwrap();
     }
     s.ledgers.source_n = 0.01;
     s.ledgers.source_u = 0.01 * e;
@@ -183,8 +188,7 @@ fn component_step_doubling_and_state_array_metric() {
     assert!(s.last_error < 1e-5);
     d.validate(&s, 1e-8).unwrap();
     let mut other = s.clone();
-    other.photons[0] += 1e-6;
-    other.photons[1] -= 1e-6;
+    d.seed_delta(&mut other, 0, d.energies[0], 1e-6).unwrap();
     assert!(d.error_metric(&other, &s).unwrap() > 0.0);
 }
 
