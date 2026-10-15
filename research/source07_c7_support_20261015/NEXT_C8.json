@@ -1,0 +1,105 @@
+{
+  "schema": "rei.source07.c8.numerical_reproducibility.v1",
+  "selected_next_stage": "C8_NUMERICAL_CONVERGENCE_AND_RESOURCE_VERIFICATION",
+  "parent_C7": "C7 source-age scientific validation, optional q-support envelopes and two source age-lane benchmark",
+  "scientific_admission": "AXBI_NOT_ISSUED",
+  "frozen_physical_source": "PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1",
+  "physics_locks": {
+    "initial_zbar": 20,
+    "final_zbar": 4,
+    "signed_q_ref": [
+      -0.01,
+      -0.005,
+      0,
+      0.005,
+      0.01
+    ],
+    "non_tilted_lrs_bianchi_I": true,
+    "metric": "(-,+,+,+)",
+    "emitted_energy_eV": [
+      13.6,
+      100
+    ],
+    "reference_q_grid_eV": [
+      13.6,
+      433
+    ],
+    "photoionization_fit_threshold_eV": [
+      13.6,
+      24.59,
+      54.42
+    ],
+    "binding_energy_eV": [
+      13.598434599702,
+      24.587389011,
+      54.41776
+    ],
+    "source_normalization": "MD14+BB50k, fesc0.2, photons/H/proper s",
+    "case_A_atomic": "unchanged",
+    "old_production_and_checkpoint": "immutable by C7"
+  },
+  "C7_observed": {
+    "actual_two_impulse_source": "zbar20 and zbar4, equal photons/H per pulse, proper source rates, full Bianchi-I q-redshift to zbar4",
+    "one_grid_N_U_mixed_HI_relative_error_q0_nE256": -0.004412548342069722,
+    "source_support_clipped_mixed_HI_relative_error_q0_nE256": -0.004412548342073608,
+    "two_age_lane_HI_relative_error_q0_nE256": 3.2450997444755103e-10,
+    "two_age_lane_heat_relative_error_q0_nE256": -1.1825542767240904e-9,
+    "q_positive_negative_two_age_HI_relative_errors_nE256": [
+      7.346059316404308e-10,
+      8.9010421255864e-10
+    ],
+    "real_MD14_source_all_epoch_support_common_interval_eV": [
+      58.78319463558363,
+      100
+    ],
+    "bounded_memory_256x32_bytes": {
+      "one_grid_with_envelope": 264584,
+      "two_independent_age_lanes": 529168
+    },
+    "q0_cpu4_median_ms": {
+      "pooled": 1.439313,
+      "support": 1.605156,
+      "two_age": 1.927373
+    },
+    "scope": "two sparse impulses + frozen gas only, no admitted full EoR"
+  },
+  "planned_dag": [
+    {
+      "id": "C8_A_BOUNDED_AGE_SHAPE",
+      "status": "READY",
+      "objective": "Develop fixed age/spectral-memory budget for continuous MD14 emission, not a per-step cohort list. Use two age-lanes only as oracle and compare alternative finite age bucket or within-cell slope/subband moments with meaningful number and energy ledgers.",
+      "verification": "By source ages/time refinements, HI,HeI,HeII species events and photoheat against independent exact-characteristic source integral; preserve positive sources and normalized per H."
+    },
+    {
+      "id": "C8_B_SAFE_OPACITY_BUDGET",
+      "status": "READY",
+      "objective": "Transfer only domain-compatible ingredients from bass_cr PR68/69: curvature bounds on g(E) for smooth threshold-free pieces and positive subcell quadrature. For each E/q direction and age pair, require threshold-tube checks and explicit cumulative error upper budget before compression.",
+      "verification": "No unconstrained same-N,U age merging and no unproved angular q equivalence; relabelling exact source identity refused."
+    },
+    {
+      "id": "C8_C_TRUE_VARIABLE_GAS",
+      "status": "READY_WITH_C7_REFERENCE",
+      "objective": "Implement a bounded short interval with actual H_i(a), prescribed proper gas density n_i(a) and finite photoevents, independent SciPy DOP853 comparisons; then assess gas H/He/EOS feedback as separate nonlinear work.",
+      "verification": "Physical number/energy including cosmological work and particle counts, temperature dependence, dt->0 rate/step convergence."
+    },
+    {
+      "id": "C8_D_MATCHED_DRIVER_VARIANTS",
+      "status": "BLOCKED_A_B_C",
+      "objective": "Versioned separate checkpoint/results for old 49-node, guard51 and fixed-q source with genuine HI/HeI/HeII,Tg short coupled history, same source/IC/clock, then admitted convergence.",
+      "verification": "No overwrite of AX08, no default driver change without matched physics evidence."
+    }
+  ],
+  "actual_commands": {
+    "native": "cd rust/rei_microphysics && cargo test --offline --test axbi_q_support && cargo test --offline --tests",
+    "experiment": "cargo run --offline --release --example axbi_q_support_pilot",
+    "independent": "python3 research/source07_c7_support_20261015/independent_two_age.py && python3 research/source07_c7_support_20261015/analyze_c7.py && python3 research/source07_c7_support_20261015/variable_background_reference.py",
+    "CAS": "cd research/source07_c7_support_20261015 && wolframscript -file CHECK_C7_CAS.wl"
+  },
+  "protected_claims": [
+    "C7 two-age oracle is not a full continuous source-history solution",
+    "support connectedness does not imply spectral-shape accuracy",
+    "global H/He abundance and gas temperature not computed",
+    "native_subagents NOT_RUN; local Codex not used"
+  ],
+  "source_authority": "rei_bianchi live checkout must be freshly read before C8; old source version historical; no automatic AX admission"
+}

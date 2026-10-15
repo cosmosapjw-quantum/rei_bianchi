@@ -88,6 +88,9 @@ pub struct QFixedGrid {
     source_integrals: Vec<f64>,
     number: Vec<f64>,
     moment_ref_ev: Vec<f64>,
+    // Envelopes of actual emitted reference-q source support; zero if empty.
+    support_lower_ref_ev: Vec<f64>,
+    support_upper_ref_ev: Vec<f64>,
     n_energy: usize,
     k_t_ev: f64,
 }
@@ -133,6 +136,8 @@ impl QFixedGrid {
             source_integrals: norms,
             number: vec![0.; n_cells],
             moment_ref_ev: vec![0.; n_cells],
+            support_lower_ref_ev: vec![0.; n_cells],
+            support_upper_ref_ev: vec![0.; n_cells],
             n_energy,
             k_t_ev: kt,
         })
@@ -146,9 +151,14 @@ impl QFixedGrid {
     pub fn ref_energy_moment(&self) -> &[f64] {
         &self.moment_ref_ev
     }
+    pub fn support_bounds(&self) -> (&[f64], &[f64]) {
+        (&self.support_lower_ref_ev, &self.support_upper_ref_ev)
+    }
     pub fn buffer_capacity_bytes(&self) -> usize {
         (self.number.capacity()
             + self.moment_ref_ev.capacity()
+            + self.support_lower_ref_ev.capacity()
+            + self.support_upper_ref_ev.capacity()
             + self.edges.capacity()
             + self.source_integrals.capacity())
             * std::mem::size_of::<f64>()
@@ -257,6 +267,8 @@ impl QFixedGrid {
             Ok(())
         })?;
         let mut ledger = QSourceLedger::default();
+        let mut next_lo = self.support_lower_ref_ev.clone();
+        let mut next_hi = self.support_upper_ref_ev.clone();
         for j in 0..nmu {
             let (r, _) = self.angle_scale(now, &angles[j])?;
             for i in 0..self.n_energy {
@@ -270,6 +282,27 @@ impl QFixedGrid {
                 {
                     return Err(invalid());
                 }
+                if n > 0.0 {
+                    let lo = self.edges[i].max(13.6 / r);
+                    let hi = self.edges[i + 1].min(100.0 / r);
+                    if !(lo.is_finite() && hi.is_finite() && lo < hi) {
+                        return Err(invalid());
+                    }
+                    if self.number[k] > 0.0 {
+                        next_lo[k] = next_lo[k].min(lo);
+                        next_hi[k] = next_hi[k].max(hi);
+                    } else {
+                        next_lo[k] = lo;
+                        next_hi[k] = hi;
+                    }
+                    let after_n = self.number[k] + n;
+                    let after_mean = (self.moment_ref_ev[k] + u) / after_n;
+                    if after_mean < next_lo[k] * (1.0 - 1e-10)
+                        || after_mean > next_hi[k] * (1.0 + 1e-10)
+                    {
+                        return Err(invalid());
+                    }
+                }
                 ledger.added_photons_per_h += n;
                 ledger.added_energy_ev_per_h += r * u;
             }
@@ -278,6 +311,8 @@ impl QFixedGrid {
             self.number[k] += add_n[k];
             self.moment_ref_ev[k] += add_u[k];
         }
+        self.support_lower_ref_ev = next_lo;
+        self.support_upper_ref_ev = next_hi;
         Ok(ledger)
     }
 
@@ -617,6 +652,28 @@ impl QFixedGrid {
         duration_s: f64,
         threads: usize,
     ) -> Result<QReactionLedger, ForwardError> {
+        self.absorb_reconstructed_impl(now, neutrals, duration_s, threads, false)
+    }
+    /// Optional C7 support-limited closure. The support envelope is valid
+    /// for the original continuously-positive broad MD14 source in the
+    /// selected expanding background; no arbitrary spectral hardness bound.
+    pub fn absorb_reconstructed_support(
+        &mut self,
+        now: &GeometrySnapshot,
+        neutrals: [f64; 3],
+        duration_s: f64,
+        threads: usize,
+    ) -> Result<QReactionLedger, ForwardError> {
+        self.absorb_reconstructed_impl(now, neutrals, duration_s, threads, true)
+    }
+    fn absorb_reconstructed_impl(
+        &mut self,
+        now: &GeometrySnapshot,
+        neutrals: [f64; 3],
+        duration_s: f64,
+        threads: usize,
+        restricted: bool,
+    ) -> Result<QReactionLedger, ForwardError> {
         now.volume_factor()?;
         if !nonnegative(duration_s)
             || !neutrals.iter().all(|v| nonnegative(*v))
@@ -638,11 +695,15 @@ impl QFixedGrid {
         let nenergy = self.n_energy;
         let reference = self.reference;
         let edges = &self.edges;
+        let lows = &self.support_lower_ref_ev;
+        let highs = &self.support_upper_ref_ev;
         let chunks = std::thread::scope(|scope| -> Result<Vec<QReactionLedger>, ForwardError> {
             let mut handles = Vec::new();
-            for ((n, u), a) in new_n
+            for ((((n, u), low), high), a) in new_n
                 .chunks_mut(span)
                 .zip(new_u.chunks_mut(span))
+                .zip(lows.chunks(span))
+                .zip(highs.chunks(span))
                 .zip(self.source.angular_cells.chunks(per_group))
             {
                 handles.push(
@@ -658,14 +719,13 @@ impl QFixedGrid {
                                 if n[k] == 0.0 {
                                     continue;
                                 }
+                                let left = if restricted { low[k] } else { edges[i] };
+                                let right = if restricted { high[k] } else { edges[i + 1] };
+                                if !(left > 0.0 && right > left) {
+                                    return Err(invalid());
+                                }
                                 let loss = absorb_positive_bin(
-                                    edges[i],
-                                    edges[i + 1],
-                                    n[k],
-                                    u[k],
-                                    r,
-                                    neutrals,
-                                    duration_s,
+                                    left, right, n[k], u[k], r, neutrals, duration_s,
                                 )?;
                                 n[k] = loss.surviving_photons_per_h;
                                 u[k] = loss.surviving_energy_moment_ev_per_h;
