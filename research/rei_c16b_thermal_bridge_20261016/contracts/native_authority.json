@@ -1,0 +1,42 @@
+{
+  "schema": "rei.source_aware.thermal_bridge.authority.v1",
+  "pr154_source": {
+    "head": "daf653e87a5b208ed6f51113e83d56fec4abf4f8",
+    "path": "research/rei_c16_photo_reaction_20261016/source_aware.py",
+    "git_blob_sha1": "db822a53da3ccdca7cf96628e9ef3bbcec83db5a",
+    "sha256": "f4c5ff49f9e09a2123f3830160e857beb9c224deafc9ff379d6199829013bbf4",
+    "source_authority": "immutable, actually rerun"
+  },
+  "pr150_native_snapshot": {
+    "head_at_read": "fe789b0b13b1883c5a74cbc907f72f6f963a5d66",
+    "repo": "cosmosapjw-quantum/rei_bianchi",
+    "native_files": {
+      "rust/rei_microphysics/src/igm_thermal.rs": "0648618d9822e169e9672ac3c556f86595c3b0b6",
+      "rust/rei_microphysics/src/igm_rates.rs": "dc3cc028a41ac852d94835372ce13545389d1c3a",
+      "rust/rei_microphysics/src/igm_state.rs": "437365fbe329a10afe292f9dd7eebf549fef804c",
+      "rust/rei_microphysics/src/axbi_covariant_transport.rs": "351db649afdb5b50a26fc8d6e7ec1ebbb53e9da6",
+      "rust/rei_microphysics/src/axbi_driver.rs": "ce6143c7a89cce899bd4a2a5a7cd27ef9980a38c",
+      "rust/rei_microphysics/src/hhe_events.rs": "57a63eee1e9d8c4aa2b5ed663dbea15619359f71"
+    },
+    "meaning": "historical exact fetched Git blobs, must rebind to latest PR150 HEAD before mutation"
+  },
+  "active_native_owners": {
+    "atomic_rates": "igm_rates(t) / Grackle 3.4.1 Case-A subset pinned in original Rust, rates and coolings",
+    "point_chemistry": "igm_point_rhs(IgmGasState,nh,nhe,H,Tcmb,IgmPhotoInput)",
+    "photo_input": "IgmPhotoInput{gamma_s[3],heat_erg_per_absorber_s[3]}",
+    "photo_absorption": "PreparedAbsorption::evaluate, native coupled cold Newton driver",
+    "radiation_geometry": "axbi_covariant_transport; active/passive only existing FLRW admissibility",
+    "baryon_recoil": "NOT_IMPLEMENTED"
+  },
+  "unit_adapter": {
+    "per_h_number_to_proper_cm3": "multiply by nH_proper_cm3",
+    "heat_eV_per_H_to_proper_erg_cm3": "multiply nH_proper_cm3*1.602176634e-12",
+    "state_fraction": "xHII=HII/H_total, yHeII=HeII/He_total, zHeIII=HeIII/He_total",
+    "electron_per_h": "xHII+(nHe/nH)*(yHeII+2*zHeIII)",
+    "gamma_per_absorber_s": "c*nH*sum_j(Nj_per_H*sigma_i(Ej))",
+    "heating_per_absorber_erg_s": "c*nH*ev_erg*sum_j(Nj*sigma_i(Ej)*(Ej-physical_chi_i))",
+    "RR_free_kinetic_eV_event": "rr_cooling_erg_cm3_s_i/rr_cm3_s_i/ev_erg, only when rr_cm3_s_i>0; production owner must validate",
+    "actual_casea_escape_emissivity": "not derivable from bolometric RR energy alone without source spectrum/age model"
+  },
+  "admission": {"native_physics": "NOT_ISSUED", "isolated_reference": "IMPLEMENTATION_VERIFIED", "NCP": "NOT_RUN"}
+}
