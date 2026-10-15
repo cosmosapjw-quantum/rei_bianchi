@@ -1,6 +1,6 @@
 {
   "schema": "rei.md14.casea_continuous_birth_next_dag.v1",
-  "latest_done": "C7_TRUE_MD14_CONTINUOUS_SOURCE",
+  "latest_done": "C7_MD14_CONTINUOUS_SOURCE_AND_C8_SOURCE_ONLY_GRID_TIME",
   "source_branch": "research/bass-he-optical-depth-transfer-20261015",
   "original_owner_unmodified": "0fcb2dddf5de6b583c2e00f150abff0b2afb6315",
   "evidence": "Original Rust AxbiSource per-H emissivity and source age, native 48 spectra ×8 angles, 3 q ×2 eta ×4 time steps, Case-A Grackle original, alternate exact covariant vs original fixed physical-energy grid, positive photon U/F/Pi, stellar birth and escape accounted only formally",
@@ -38,14 +38,24 @@
     },
     {
       "id": "C8_SOURCE_GRID",
-      "status": "READY",
+      "status": "PARTIAL_DONE_SOURCE_ONLY_GRID_TIME",
       "goal": "Independently vary original MD14 threshold-cell energy resolutions [4,8,16,32] and proper midpoint time steps, ensuring cross sections and energy group support consistent; check source-grid lower-node leakage and photon/gas goal errors",
       "acceptance": [
         "True-support min-energy and source spectral moments controlled",
         "Exact emitted source count and energy per H with independent GL16",
         "Native recombination, Compton and threshold boundary ledgers",
         "No publication global error claim from local Cauchy alone"
-      ]
+      ],
+      "evidence": [
+        "source_boundary_2d.rs",
+        "analyze_boundary_2d.py",
+        "test_boundary_2d.py",
+        "results/SOURCE_BOUNDARY_2D.csv",
+        "results/BOUNDARY_2D_ANALYSIS.json",
+        "C8_SOURCE_GRID_2D_KO.md"
+      ],
+      "remaining": "Original coupled H/He chemistry grid×time convergence, continuous source SED near physical 13.6eV boundary, frequency support flux/binding/heat/opacity radiation budget",
+      "source_only_E_T_completed": true
     },
     {
       "id": "C8_COHORT_COMPRESSION",
@@ -70,7 +80,8 @@
       "not_to_claim": "Production native global error, complete Einstein Q^a, observation-tested sky"
     }
   ],
-  "next_selected": "C8_SOURCE_GRID",
+  "next_selected": "C8_COUPLED_GAS_GRID_AND_UV_FLUX",
   "publication_admission": "HOLD_FULL_COUPLED_EOR_AND_OBSERVER_CMB",
-  "backup_policy": "Pre-audit checkpoint done. After independent verification push protected research branch and dual archives/Dropbox backups. Already enabled recurring backups daily 19KST; skip duplicates."
+  "backup_policy": "Pre-audit checkpoint done. After independent verification push protected research branch and dual archives/Dropbox backups. Already enabled recurring backups daily 19KST; skip duplicates.",
+  "new_claim_scope": "C8 source-only 20 original Rust cases, 5 spectral resolutions ×4 transport time levels; source photo chemistry and CMB global admission remain HOLD"
 }

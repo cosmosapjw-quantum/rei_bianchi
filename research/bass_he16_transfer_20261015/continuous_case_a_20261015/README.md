@@ -41,3 +41,7 @@ PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 python3 -m unittest discover -s
 ```
 
 Original scientific reference: [Friedrich et al. (2012)](https://academic.oup.com/mnras/article/421/3/2232/1077406), photon-conserving He/H RT and explicit Case-A vs coupled OTS distinctions. Relevant sibling science: C13 native source, C16 positive photon moment cone/stellar emitter recoil. See RESEARCH_LOOP_KO.md for evidence and boundaries.
+
+## C8 새 결과: energy × time source-only 수렴성
+
+원래 MD14 광자 방출원에 대해 원래 에너지 문턱 구간당 4,8,16,32,64개 셀과 시간분할 1,8,32,128개를 독립적으로 바꾸는 source-only 실험을 실제 Rust에서 실행했다. 20개 케이스의 유출 원본은 `source_boundary_2d.rs`, `results/SOURCE_BOUNDARY_2D.csv`, `results/BOUNDARY_2D_ANALYSIS.json`, `C8_SOURCE_GRID_2D_KO.md`에 있다. 독립 테스트 `test_boundary_2d.py`는 10/10 PASS이고 원래 16셀 source-only 계산에 대한 회귀 테스트를 포함한다. Fixed-grid time refinement alone does not cure the spurious lower boundary; energy grid doubling reduces the measured source-only artifact by about 1/2 within tested range. Photo-chemistry grid convergence and full continuum-spectrum UV leakage have NOT been certified. Scientific admission stays source-scoped.

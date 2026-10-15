@@ -13,6 +13,11 @@ class SourceEvidenceTests(unittest.TestCase):
         self.assertFalse(r["full_native_compilation_identities_equal"])
         self.assertEqual(r["scientific_admission"],"HOLD_FULL_EOR_AND_CMB")
         self.assertEqual(r["native_casea_rec_photons"],"energy_ESCAPE_ledger_only_no_OTS_spectrum")
+    def test_c8_twenty_original_rust_frequency_time_cases_are_pinned(self):
+        self.assertEqual(self.m["source_only_energy_time_executed_cases"],20)
+        self.assertEqual(len(self.m["source_only_energy_time_binary_sha256"]),64)
+        self.assertEqual(self.m["scientific_admission"],"HOLD_FULL_EOR_AND_CMB")
+
     def test_all_source_scoped_artifacts_hash_match(self):
         for row in self.m["files"]:
             p=HERE/row["relative_path"]
