@@ -95,3 +95,20 @@ C17 isolated branch root, no Codex, NumPy/SciPy/matplotlib:
   python3 research/rei_c17_escape_angular_20261015/study.py
 
 Machine-readable scientific receipts: C17_STUDY_RESULTS.json, ESCAPING_CASEA_STRESS_HISTORY.csv, and plot ESCAPING_CASEA_STRESS_HISTORY.png; source test test_recomb_angular.py. Original C9–C16/Rust regression and two-cloud byte-verified backup receipts are added only after actual execution/readback, never merely asserted.
+
+## Immutable Git payload, independent full restore and dual-cloud verification
+
+Science source HEAD 7893093569ed21ea1492b2c387d75eff80f59a68;
+ZIP REI_C17_CASEA_POSITIVE_ANGULAR_20261015_78930935.zip,
+1,967,790 bytes, 379 items, CRC PASS, SHA256
+3c59e2bf0d5283e3dc9da6bffc628d4b5e2e21962df94a4b64dcd553e7de608f.
+Authenticated Dropbox and Google Drive each independently streamed and
+matched the entire file SHA256. The ZIP was extracted in a clean separate
+location: Python C9–C17 82/82, newly compiled original Rust 23/23
+(total 105/105), original BASS PR140/137 three supplier blobs and
+C12's 16 external supplier Git blobs all passed identity checks, as did
+an independent actual C17 source-history science reexecution. Detailed
+cloud IDs, hashes, restore environment and limitations are recorded in
+BACKUP_RECEIPT.json committed AFTER the immutable source ZIP. This is a
+versioned source archive; the receipt-only successor commit is intentionally
+not inside the original ZIP.
