@@ -1,0 +1,85 @@
+{
+  "schema": "rei.c16.energy_momentum_continuation_dag.v1",
+  "date": "2026-10-15",
+  "physics_user": "LRS Bianchi I non-tilted HHe non-equilibrium reionization; Sigma=sqrt(sigma_ab sigma^ab/2)/H and epsilon_shear; gamma/nu/ionizing/massive matter Pi_ab Einstein coupling",
+  "source_parent": {
+    "C15": "435c94308c0cd7b1ba8ff6518246da061f2fc2fa",
+    "C14": "1ca73d64d3aaf7ea3ed4b7265522bbfdfae7e228",
+    "C13": "d7d0e3ad2d6d7cccdfd70df3a0f310df93ec553d",
+    "PR140": "b1cba753083ad83049c23ff538834564b49b7b6e",
+    "original_first_party_source": "MD14_Z002_FESC_BB50K_13P6_100_V1"
+  },
+  "stage": [
+    {
+      "id": "C16.0A",
+      "status": "SCOPED_VERIFIED",
+      "summary": "Actual C13 photon Killing shear work and C11 HHe/CaseA open Q0 energy flux, Sigma/epsilon, gamma and nu Boltzmann number/energy, reflection-symmetric Qz=0, no source rest mass guess",
+      "evidence": [
+        "c16_exchange.py",
+        "test_c16_exchange.py",
+        "CHECK_C16_CAS.wl",
+        "results/RESULTS_C16.json",
+        "results/C16_SIGNED_PLUS_ACCEPTED_HALFSTEPS.json"
+      ]
+    },
+    {
+      "id": "C16.0B",
+      "status": "READY_PHYSICAL_CONSTRUCTION_NOT_IMPLEMENTED",
+      "summary": "Assign and transport physically owned stellar nuclear/baryonic source energy/momentum and escaping CaseA recombination photons, with total Qmu exchange zero and exact Hamiltonian derivative/Raychaudhuri on active source",
+      "requires": [
+        "C16.0A"
+      ],
+      "blockers": [
+        "Actual source stellar energy EOS and photon emissivity momentum provenance",
+        "Escaped recombination photons angular/energy distribution and redshift; genuine gravitational pressure stress",
+        "Bound/cold gas microphysics consistent with baryon baseline rest-mass and thermal/binding choice"
+      ],
+      "acceptance": "True covariant source total including expansion/shear work and external star+escape not arbitrary cancelling negative reference energy; nontrivial source-on and source-off physical tests."
+    },
+    {
+      "id": "C16.1",
+      "status": "PENDING",
+      "summary": "Full BASS spin-weighted and PSTF polarized I/E/B Thomson hierarchy, correct E2 quadrupole collision transfer and screen rotation, non-tilted/tilt momentum exchange",
+      "requires": [
+        "C16.0B"
+      ],
+      "physical_error": "E2=0 unpolarized subblock cannot claim complete polarized operator"
+    },
+    {
+      "id": "C16.2",
+      "status": "PENDING_OPTIONAL",
+      "summary": "Actual BASS160 finite-mass FD96 radial J_i matter anisotropic stress source with Omega_m/baryon budget adjusted without double count",
+      "requires": [
+        "C16.0B"
+      ],
+      "adopt": "REI PR140 actual fd radial kinetic hierarchy, no phenomenological viscosity imposed as physical dark matter source"
+    },
+    {
+      "id": "C17",
+      "status": "PENDING",
+      "summary": "Full native 8K zbar20 to4 CMB photon neutrino ionizing source/absorption and HHe thermo/recombination coupled reionization history and BBN style time/temperature ionic fractions",
+      "requires": [
+        "C16.0B",
+        "C16.1"
+      ],
+      "hard_scope": "Physical cold source owner not derived from warm short receiver. No old AX08 stressfree checkpoint reuse."
+    },
+    {
+      "id": "AX11",
+      "status": "PENDING",
+      "summary": "Matched dt/dE/dmu, PSTF L, thermal gas, source-age, real photon opacity and observer-tail convergence plus full admission",
+      "requires": [
+        "C17"
+      ]
+    }
+  ],
+  "runtime": {
+    "original_owner_checkout_mutated": false,
+    "original_C15_source_changed": false,
+    "local_Codex": "NOT_USED",
+    "native_AI_subagents": "NOT_RUN",
+    "source_raw_original_AX08_status": "PRESERVED",
+    "current_C16_physics_scientific_admission": "NOT_ISSUED",
+    "host_runner": "authorized Ubuntu local CPU2, no solver checkpoint restart"
+  }
+}
