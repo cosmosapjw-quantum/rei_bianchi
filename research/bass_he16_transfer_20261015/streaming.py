@@ -1,64 +1,96 @@
-"""Streaming Thomson depth and exact-decimal conditional bounds.
+"""Streaming Thomson optical depth and exact conditional decimal bounds.
 
-Decimal bounds concern specified decimal constants and valid whole-cell pointwise
-electron density bounds; neither source ODE nor physical constants are certified.
+Input: elapsed proper seconds, nH and ne cm^-3, ion fractions.
+Scientific status: post-processing only; no source IVP enclosure is implied.
 """
-from decimal import Decimal, localcontext
+from decimal import Decimal
+from fractions import Fraction
 import numpy as np
 from optical_depth import C_M_S, SIGMA_T_M2, electron_density_cm3
 
 
-def cumulative_tau_chunked(t_s, n_h_cm3, x_hii, x_heii, x_heiii, he_to_h, chunk_size=65536):
-    """Node-contiguous trapezoid with O(chunk_size) temporary integrand arrays.
+def cumulative_tau_chunked(t_s,n_h_cm3,x_hii,x_heii,x_heiii,he_to_h,chunk_size=65536):
+    """Trapezoid with O(chunk_size) additional intermediate arrays, O(N) output.
 
-    Source histories and returned cumulative optical-depth history each use O(N).
+    The caller owns and stores the input arrays; memmaps are supported. An overlap
+    node between chunks preserves the whole-history integral and proper clock.
     """
-    t = np.asarray(t_s)
+    t=np.asarray(t_s)
     if t.ndim != 1 or t.size < 2 or chunk_size < 2:
         raise ValueError("Invalid times or chunk_size")
-    arrays = [np.asarray(v) for v in (n_h_cm3, x_hii, x_heii, x_heiii)]
+    arrays=[np.asarray(v) for v in (n_h_cm3,x_hii,x_heii,x_heiii)]
     if any(a.shape != t.shape for a in arrays):
         raise ValueError("Every state history must be node-aligned")
-    if not np.all(np.isfinite(t)) or np.any(np.diff(t) <= 0):
-        raise ValueError("Proper time must be finite and increasing")
-    result = np.empty(len(t), dtype=np.float64)
-    result[0] = 0.
-    factor = SIGMA_T_M2*C_M_S*1e6
-    running = 0.
-    for begin in range(0,len(t)-1,chunk_size):
-        end = min(begin+chunk_size,len(t)-1)
-        sl = slice(begin,end+1)
-        ne = electron_density_cm3(*(a[sl] for a in arrays),he_to_h)
-        dt = np.diff(t[sl].astype(np.float64))
-        increments = dt * (factor*0.5) * (ne[:-1]+ne[1:])
-        result[begin+1:end+1] = running+np.cumsum(increments)
-        running = result[end]
+    result=np.empty(t.size,dtype=np.float64)
+    result[0]=0.0
+    factor=SIGMA_T_M2*C_M_S*1e6
+    running=0.0
+    for begin in range(0,t.size-1,chunk_size):
+        end=min(begin+chunk_size,t.size-1)
+        sl=slice(begin,end+1)
+        tc=np.asarray(t[sl],dtype=np.float64)
+        if not np.all(np.isfinite(tc)):
+            raise ValueError("Nonfinite proper time")
+        dt=np.diff(tc)
+        if np.any(dt<=0):
+            raise ValueError("Proper time must increase strictly")
+        ne=electron_density_cm3(*(a[sl] for a in arrays),he_to_h)
+        increments=dt*(factor*0.5)*(ne[:-1]+ne[1:])
+        result[begin+1:end+1]=running+np.cumsum(increments)
+        running=float(result[end])
     return result
 
 
-def decimal_tau_bounds(t_strings, lo_strings, hi_strings, sigma_t_m2='6.6524587321e-29', c_m_s='299792458'):
-    """High precision decimal sum conditional on valid whole-cell electron enclosures.
+def _exact_decimal_string(frac):
+    """Terminating rational to exact base-10 expansion, no context rounding."""
+    if frac==0:
+        return "0"
+    n,d=frac.numerator,frac.denominator
+    k2=k5=0
+    while d%2==0:
+        k2+=1;d//=2
+    while d%5==0:
+        k5+=1;d//=5
+    if d!=1:
+        raise ValueError("Nonterminating rational cannot be decimal-exact")
+    places=max(k2,k5)
+    integer=abs(n)*(2**(places-k2))*(5**(places-k5))
+    digits=str(integer).rjust(places+1,"0")
+    body=digits if places==0 else digits[:-places]+"."+digits[-places:]
+    return ("-" if n<0 else "")+body
 
-    Decimal inputs represent physical times in s, electron densities in cm^-3.
-    Not an outward-rounding or independently source-certified interval.
+
+def decimal_tau_bounds(t_strings,lo_strings,hi_strings,
+                       sigma_t_m2="6.6524587321e-29",c_m_s="299792458"):
+    """Exact finite-decimal sums for supplied WHOLE-CELL electron-density bounds.
+
+    No physical uncertainty of constants, upstream ODE error, or binary64 grid
+    interpretation is enclosed. All t/ne/constant inputs must be strings or Decimals.
     """
-    if not all(isinstance(v,(str,Decimal)) for seq in (t_strings,lo_strings,hi_strings) for v in seq):
-        raise TypeError("Use strings/Decimals to avoid imported binary rounding")
-    t=list(map(Decimal,t_strings));lo=list(map(Decimal,lo_strings));hi=list(map(Decimal,hi_strings))
+    sequences=(t_strings,lo_strings,hi_strings)
+    if not all(isinstance(v,(str,Decimal)) for seq in sequences for v in seq):
+        raise TypeError("Use strings or Decimal instead of binary floats")
+    if not isinstance(sigma_t_m2,(str,Decimal)) or not isinstance(c_m_s,(str,Decimal)):
+        raise TypeError("Constants must be decimal strings or Decimal")
+    t=list(map(Decimal,t_strings))
+    lo=list(map(Decimal,lo_strings))
+    hi=list(map(Decimal,hi_strings))
+    constants=list(map(Decimal,(sigma_t_m2,c_m_s)))
+    if not all(x.is_finite() for x in t+lo+hi+constants):
+        raise ValueError("Nonfinite decimal input")
     if len(t)<2 or len(lo)!=len(t)-1 or len(hi)!=len(lo):
         raise ValueError("Mismatched cell arrays")
-    allv=t+lo+hi
-    if not all(a.is_finite() for a in allv) or any(b<=a for a,b in zip(t,t[1:])) or any(a<0 or b<a for a,b in zip(lo,hi)):
-        raise ValueError("Invalid intervals")
-    digits=max(len(a.as_tuple().digits) for a in allv)
-    emin=min(a.as_tuple().exponent for a in allv)
-    scale_digits=max(64,5*digits+5*len(t)+max(0,-emin)+32)
-    with localcontext() as ctx:
-        ctx.prec=scale_digits
-        factor=Decimal(sigma_t_m2)*Decimal(c_m_s)*Decimal(1000000)
-        cumlo=[Decimal(0)];cumhi=[Decimal(0)]
-        for i in range(len(lo)):
-            dt=t[i+1]-t[i]
-            cumlo.append(cumlo[-1]+dt*factor*lo[i])
-            cumhi.append(cumhi[-1]+dt*factor*hi[i])
-        return [str(a) for a in cumlo],[str(a) for a in cumhi]
+    if any(b<=a for a,b in zip(t,t[1:])) or any(a<0 or b<a for a,b in zip(lo,hi)):
+        raise ValueError("Invalid physical intervals")
+    if any(v<=0 for v in constants):
+        raise ValueError("Physical constants must be positive")
+    factor=Fraction(constants[0])*Fraction(constants[1])*1000000
+    L=Fraction(0);U=Fraction(0)
+    resultL=["0"];resultU=["0"]
+    for i in range(len(lo)):
+        dt=Fraction(t[i+1])-Fraction(t[i])
+        L+=dt*factor*Fraction(lo[i])
+        U+=dt*factor*Fraction(hi[i])
+        resultL.append(_exact_decimal_string(L))
+        resultU.append(_exact_decimal_string(U))
+    return resultL,resultU
