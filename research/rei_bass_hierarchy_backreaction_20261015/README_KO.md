@@ -119,3 +119,10 @@ The inherited C12 Wu source guard additionally requires the authorized local
 WU088_HH and REI original checkouts; the smoke itself does not.
 Archive SHA and both remote byte readbacks are in a **separate** backup receipt
 created only after both remote uploads and fresh restore succeed.
+
+## Verified preservation status
+
+Exact research payload a7cebeb0e26ccb42ac5f934e945921c649d184a8, ZIP size 1475309, SHA256 cc28f813d121595a46161c07e8ea07cd6326f3b0bfca34b60e97b5131e982b81.
+Dropbox source copied, remotely re-downloaded, SHA verified and independently extracted, standalone BASS/REI restored, C11 8/8, C12 five sources 6/6.
+A genuinely separate physical disk /dev/sda2 at /mnt/extdrive/research_backups/rei_bianchi/REI_BASS_HIERARCHY_20261015 also contains the same independently SHA-verified ZIP. Its independent fresh extraction passed 236 file SHA checks, the new source replay and C11 8/8.
+Google Drive 403 API requests-per-minute quota exceeded on two attempts, so no second cloud backup was claimed. See BACKUP_RECEIPT.json.
