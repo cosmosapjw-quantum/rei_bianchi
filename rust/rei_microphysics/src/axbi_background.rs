@@ -127,6 +127,77 @@ impl AxbiBackground {
         };
         Ok((hf, h, s))
     }
+    /// Cancellation-resistant elapsed SI proper time and axis anisotropy over
+    /// two ACTUAL scale-factor inputs. No subtraction of `point_at_scale().time_s`.
+    ///
+    /// Applies source-exact dt/dln(a)=1/H and db/dln(a)=s/H using four-point
+    /// Gauss-Legendre on bounded log(a) panels, with strictly positive clock
+    /// for every representable ordered interval. This is a NEW numerical
+    /// algorithm, not bitwise-equivalent to historic cumulative Simpson.
+    pub fn local_increments(&self, from_a: f64, to_a: f64) -> Result<(f64, f64), ForwardError> {
+        positive(from_a)?;
+        positive(to_a)?;
+        if from_a < self.a_ref || to_a > self.a_end || to_a < from_a {
+            return Err(invalid("AxbiIntervalScaleDomain"));
+        }
+        if from_a == to_a {
+            return Ok((0.0, 0.0));
+        }
+        // log1p of the actual (already-rounded) scale-factor endpoints.
+        let delta = positive(finite(((to_a - from_a) / from_a).ln_1p())?)?;
+        let panels = ((delta / 0.0028).ceil() as usize).max(1);
+        if panels > 2048 {
+            return Err(invalid("AxbiIntervalPanelCap"));
+        }
+        const NODE: [f64; 4] = [
+            -0.8611363115940526,
+            -0.33998104358485626,
+            0.33998104358485626,
+            0.8611363115940526,
+        ];
+        // Weights already normalized to integrate over [0,1], not [-1,1].
+        const WEIGHT: [f64; 4] = [
+            0.17392742256872692,
+            0.32607257743127307,
+            0.32607257743127307,
+            0.17392742256872692,
+        ];
+        let mut time_sum = 0.0_f64;
+        let mut time_comp = 0.0_f64;
+        let mut b_sum = 0.0_f64;
+        let mut b_comp = 0.0_f64;
+        // Keep source rates exactly as the normal AX03 family, but cache
+        // the reference H once rather than recalculating inside every ray.
+        let s_ref = self.q_ref * self.cosmology.hubble_flrw(self.a_ref)?;
+        for cell in 0..panels {
+            for k in 0..4 {
+                let frac = (cell as f64 + (1.0 + NODE[k]) * 0.5) / panels as f64;
+                let a = from_a * (frac * delta).exp();
+                let hf = self.cosmology.hubble_flrw(a)?;
+                let s = finite(s_ref * (self.a_ref / a).powi(3))?;
+                let h = match self.family {
+                    BackgroundFamily::PhysicalDensityFixed => positive(hf.hypot(s))?,
+                    BackgroundFamily::SameHDiagnostic => hf,
+                };
+                let w = WEIGHT[k] / panels as f64;
+                let v_time = w / h - time_comp;
+                let next_time = time_sum + v_time;
+                time_comp = (next_time - time_sum) - v_time;
+                time_sum = next_time;
+                let v_b = w * (s / h) - b_comp;
+                let next_b = b_sum + v_b;
+                b_comp = (next_b - b_sum) - v_b;
+                b_sum = next_b;
+            }
+        }
+        let dt = positive(finite(delta * time_sum)?)?;
+        let db = finite(delta * b_sum)?;
+        Ok((dt, db))
+    }
+    /// Explicit old->new proper-time step used in chemistry and photon sources.
+    pub fn proper_time_increment(&self, from_a: f64, to_a: f64) -> Result<f64, ForwardError> {
+        Ok(self.local_increments(from_a, to_a)?.0)
+    }
     pub fn point_at_scale(&self, a: f64) -> Result<BackgroundPoint, ForwardError> {
         positive(a)?;
         if a < self.a_ref || a > self.a_end {
