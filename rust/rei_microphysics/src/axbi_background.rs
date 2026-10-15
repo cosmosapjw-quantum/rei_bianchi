@@ -61,6 +61,15 @@ pub struct BackgroundPoint {
     /// Instantaneous s/H, distinct from the fixed signed q_ref.
     pub sigma: f64,
 }
+/// Local physical increments from the actual binary64 scale endpoints.
+/// The GL4/GL8 differences are diagnostics, not certified error bounds.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct BackgroundIncrement {
+    pub proper_time_s: f64,
+    pub delta_b: f64,
+    pub gl4_time_difference_s: f64,
+    pub gl4_b_difference: f64,
+}
 impl BackgroundPoint {
     pub fn geometry(&self) -> Result<GeometrySnapshot, ForwardError> {
         AxisymmetricPoint::new(self.a, self.b, self.h_per_s, self.s_per_s)?.snapshot()
@@ -126,6 +135,69 @@ impl AxbiBackground {
             BackgroundFamily::SameHDiagnostic => hf,
         };
         Ok((hf, h, s))
+    }
+    /// Integrate 1/H and s/H in local log scale without subtracting accumulated
+    /// clocks. Both endpoints must be ordered and inside this background.
+    pub fn interval_increment(
+        &self,
+        a0: f64,
+        a1: f64,
+    ) -> Result<BackgroundIncrement, ForwardError> {
+        positive(a0)?;
+        positive(a1)?;
+        if a0 < self.a_ref || a1 > self.a_end || a1 < a0 {
+            return Err(invalid("AxbiIntervalDomain"));
+        }
+        if a0 == a1 {
+            return Ok(BackgroundIncrement {
+                proper_time_s: 0.0,
+                delta_b: 0.0,
+                gl4_time_difference_s: 0.0,
+                gl4_b_difference: 0.0,
+            });
+        }
+        let dx = finite(((a1 - a0) / a0).ln_1p())?;
+        // Keep the quadrature local even for a full smooth background interval.
+        let panels = (dx / 0.01).ceil().max(1.0);
+        if panels > 65536.0 {
+            return Err(invalid("AxbiIntervalPanels"));
+        }
+        let panels = panels as usize;
+        // Positive nodes and weights; their reflected partners complete each rule.
+        const GL4: [(f64, f64); 2] = [
+            (0.3399810435848563, 0.6521451548625461),
+            (0.8611363115940526, 0.3478548451374538),
+        ];
+        const GL8: [(f64, f64); 4] = [
+            (0.1834346424956498, 0.3626837833783620),
+            (0.5255324099163290, 0.3137066458778873),
+            (0.7966664774136267, 0.2223810344533745),
+            (0.9602898564975363, 0.1012285362903763),
+        ];
+        let integrate = |rule: &[(f64, f64)]| -> Result<(f64, f64), ForwardError> {
+            let (mut clock, mut shear) = (0.0, 0.0);
+            let half_width = dx / (2.0 * panels as f64);
+            for panel in 0..panels {
+                for &(node, weight) in rule {
+                    for sign in [-1.0, 1.0] {
+                        let fraction = (panel as f64 + (1.0 + sign * node) * 0.5) / panels as f64;
+                        let a = a0 * (fraction * dx).exp();
+                        let (_, h, s) = self.rates(a)?;
+                        clock += weight * half_width / h;
+                        shear += weight * half_width * s / h;
+                    }
+                }
+            }
+            Ok((positive(clock)?, finite(shear)?))
+        };
+        let (t8, b8) = integrate(&GL8)?;
+        let (t4, b4) = integrate(&GL4)?;
+        Ok(BackgroundIncrement {
+            proper_time_s: t8,
+            delta_b: b8,
+            gl4_time_difference_s: finite(t4 - t8)?,
+            gl4_b_difference: finite(b4 - b8)?,
+        })
     }
     pub fn point_at_scale(&self, a: f64) -> Result<BackgroundPoint, ForwardError> {
         positive(a)?;

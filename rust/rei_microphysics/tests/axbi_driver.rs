@@ -6,6 +6,73 @@ fn component() -> (Driver, DriverState) {
     c.background_panels = 64;
     Driver::new(c).unwrap()
 }
+
+#[test]
+fn explicit_initial_hydrogen_fraction_is_opt_in_and_validated() {
+    assert_eq!(DriverConfig::baseline().initial_x_hii, 2e-4);
+    assert_eq!(DriverConfig::read("").unwrap().initial_x_hii, 2e-4);
+    for value in ["NaN", "inf", "-0.0001", "1.0001", "invalid"] {
+        assert!(DriverConfig::read(&format!("initial_x_hii={value}\n")).is_err());
+    }
+    for value in [0.0, 1.0] {
+        assert_eq!(
+            DriverConfig::read(&format!("initial_x_hii={value}\n"))
+                .unwrap()
+                .initial_x_hii,
+            value
+        );
+    }
+    let mut config = DriverConfig::baseline();
+    config.initial_x_hii = f64::NAN;
+    assert!(Driver::new(config).is_err());
+}
+
+#[test]
+fn donor_initial_eos_one_step_ledgers_and_checkpoint_roundtrip() {
+    let x = 0.000210349192936;
+    let temperature = 9.306042400380866;
+    let config = DriverConfig::read(&format!(
+        "end_zbar=19.8\nbackground_panels=64\ninitial_x_hii={x}\ninitial_temperature_k={temperature}\n"
+    ))
+    .unwrap();
+    let (d, mut s) = Driver::new(config).unwrap();
+    let (baseline, _) = component();
+    assert_eq!(d.n_h0_cm3, baseline.n_h0_cm3);
+    assert_eq!(d.n_he0_cm3, baseline.n_he0_cm3);
+    assert_eq!(s.gas.fractions, [x, 0.0, 0.0]);
+    let nh = d.n_h0_cm3 / s.a.powi(3);
+    let eos = s.gas.eos(nh, d.n_he0_cm3 / s.a.powi(3)).unwrap();
+    assert!((eos.temperature_k / temperature - 1.0).abs() < 1e-14);
+    assert!((eos.electron_density_cm3 / (nh * x) - 1.0).abs() < 1e-14);
+    assert!(s.gas.w_erg_per_h.is_finite() && s.gas.w_erg_per_h > 0.0);
+    let mut accepted = false;
+    for _ in 0..20 {
+        if d.adaptive_step(&mut s).unwrap() {
+            accepted = true;
+            break;
+        }
+    }
+    assert!(
+        accepted,
+        "bounded donor step must meet the existing local target"
+    );
+    assert_eq!(s.accepted, 1);
+    assert!(s.last_error < d.config.local_target);
+    let (n, u) = d.residuals(&s).unwrap();
+    assert!(n.is_finite() && u.is_finite());
+    d.validate(&s, 1e-8).unwrap();
+    let path =
+        std::env::temp_dir().join(format!("axbi_donor_checkpoint_{}.txt", std::process::id()));
+    d.save_checkpoint(&path, &s).unwrap();
+    let restored = d.read_checkpoint(&path).unwrap();
+    assert_eq!(restored.a, s.a);
+    assert_eq!(restored.gas.fractions, s.gas.fractions);
+    assert_eq!(restored.gas.w_erg_per_h, s.gas.w_erg_per_h);
+    assert_eq!(restored.photons, s.photons);
+    assert_eq!(restored.accepted, s.accepted);
+    assert_eq!(restored.rhs_evaluations, s.rhs_evaluations);
+    std::fs::remove_file(path).unwrap();
+}
 #[test]
 fn reaction_free_geometry_conserves_count_energy_and_temperature_dilution() {
     let (d, mut s) = component();

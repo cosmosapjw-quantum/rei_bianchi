@@ -8,7 +8,9 @@ use crate::axbi_sources::AxbiSource;
 use crate::igm_background::{FlatFlrwBackground, FlatFlrwConfig};
 use crate::igm_state::{w_erg_per_h_to_ev, w_ev_per_h_to_erg, IgmGasState};
 use crate::igm_thermal::{IgmPhotoInput, IgmPointRhs};
-use crate::{Absorber, AtomicProvider, CharacteristicRay, ForwardError, HHeModel};
+use crate::{
+    Absorber, AtomicProvider, CharacteristicRay, ForwardError, GeometrySnapshot, HHeModel,
+};
 use std::{
     fs,
     io::{BufWriter, Write},
@@ -34,6 +36,7 @@ pub struct DriverConfig {
     pub same_h: bool,
     pub end_zbar: f64,
     pub escape_fraction: f64,
+    pub initial_x_hii: f64,
     pub initial_temperature_k: f64,
     pub energy_subdivisions: usize,
     pub n_mu: usize,
@@ -56,6 +59,7 @@ impl DriverConfig {
             same_h: false,
             end_zbar: 4.0,
             escape_fraction: 0.2,
+            initial_x_hii: 2e-4,
             initial_temperature_k: 2.7255 * 21.0_f64.powi(2)
                 / (150.0 * (0.0224_f64 / 0.023).powf(0.4)),
             energy_subdivisions: 16,
@@ -94,6 +98,7 @@ impl DriverConfig {
                 }
                 "end_zbar" => number!(end_zbar),
                 "escape_fraction" => number!(escape_fraction),
+                "initial_x_hii" => number!(initial_x_hii),
                 "initial_temperature_k" => number!(initial_temperature_k),
                 "energy_subdivisions" => number!(energy_subdivisions),
                 "n_mu" => number!(n_mu),
@@ -134,6 +139,8 @@ impl DriverConfig {
             || !self.q_ref.is_finite()
             || !self.end_zbar.is_finite()
             || !(4.0..20.0).contains(&self.end_zbar)
+            || !self.initial_x_hii.is_finite()
+            || !(0.0..=1.0).contains(&self.initial_x_hii)
             || !self.local_target.is_finite()
             || self.local_target <= 0.0
             || self.local_target >= 2e-4
@@ -259,7 +266,7 @@ impl Driver {
             })
             .collect::<Result<Vec<_>, ForwardError>>()?;
         let gas = IgmGasState::from_temperature(
-            [2e-4, 0.0, 0.0],
+            [config.initial_x_hii, 0.0, 0.0],
             n_h0 / a_ref.powi(3),
             n_he0 / a_ref.powi(3),
             config.initial_temperature_k,
@@ -328,13 +335,15 @@ impl Driver {
             f(self.total_energy(s)? - self.initial_energy)?,
         ))
     }
-    fn ray(&self, k: usize, a: f64) -> Result<CharacteristicRay, ForwardError> {
+    fn ray_with_geometry(
+        &self,
+        k: usize,
+        reference: &GeometrySnapshot,
+        current: &GeometrySnapshot,
+    ) -> Result<CharacteristicRay, ForwardError> {
         let mu = self.source.angular_cells[k].mu;
         let initial = CharacteristicRay::new(1.0, [(1.0 - mu * mu).sqrt(), 0.0, mu], 0.0)?;
-        initial.pullback(
-            &self.background.point_at_scale(1.0 / 21.0)?.geometry()?,
-            &self.background.point_at_scale(a)?.geometry()?,
-        )
+        initial.pullback(reference, current)
     }
     /// Conservative two-neighbor N/U deposit. Boundary stock has one owner.
     pub fn deposit(
@@ -372,12 +381,13 @@ impl Driver {
         Ok((0.0, 0.0))
     }
     pub fn geometry_map(&self, s: &mut DriverState, to: f64) -> Result<(), ForwardError> {
+        let gref = self.background.point_at_scale(1.0 / 21.0)?.geometry()?;
         let g0 = self.background.point_at_scale(s.a)?.geometry()?;
         let g1 = self.background.point_at_scale(to)?.geometry()?;
         let mut stocks = vec![0.0; s.photons.len()];
         let ne = self.energies.len();
         for k in 0..self.source.angular_cells.len() {
-            let local = self.ray(k, s.a)?;
+            let local = self.ray_with_geometry(k, &gref, &g0)?;
             let moved = local.pullback(&g0, &g1)?;
             let ratio = moved.energy_ev / local.energy_ev;
             for i in 0..ne {
@@ -581,8 +591,7 @@ impl Driver {
     ) -> Result<DriverState, ForwardError> {
         let mut s = old.clone();
         let mid = (old.a * to).sqrt();
-        let dt = self.background.point_at_scale(to)?.time_s
-            - self.background.point_at_scale(old.a)?.time_s;
+        let dt = self.background.interval_increment(old.a, to)?.proper_time_s;
         self.geometry_map(&mut s, mid)?;
         self.inject(&mut s, dt)?;
         self.chemical_stage(&mut s, dt, counter)?;
@@ -712,10 +721,20 @@ impl Driver {
         }
     }
     pub fn moments(&self, s: &DriverState) -> Result<[f64; 3], ForwardError> {
+        let gref = self.background.point_at_scale(1.0 / 21.0)?.geometry()?;
+        let current = self.background.point_at_scale(s.a)?.geometry()?;
+        self.moments_with_geometry(s, &gref, &current)
+    }
+    fn moments_with_geometry(
+        &self,
+        s: &DriverState,
+        reference: &GeometrySnapshot,
+        current: &GeometrySnapshot,
+    ) -> Result<[f64; 3], ForwardError> {
         let mut moments = [0.0; 3];
         let ne = self.energies.len();
         for k in 0..self.source.angular_cells.len() {
-            let mu = self.ray(k, s.a)?.direction[2];
+            let mu = self.ray_with_geometry(k, reference, current)?.direction[2];
             for i in 0..ne {
                 let u = s.photons[k * ne + i] * self.energies[i];
                 moments[0] += u;
@@ -953,7 +972,9 @@ impl Driver {
         let nhe = self.n_he0_cm3 / s.a.powi(3);
         let eos = s.gas.eos(nh, nhe)?;
         let [x, y, z] = s.gas.fractions;
-        let m = self.moments(s)?;
+        let gr = self.background.point_at_scale(1.0 / 21.0)?.geometry()?;
+        let g = p.geometry()?;
+        let m = self.moments_with_geometry(s, &gr, &g)?;
         let (n, u) = self.photon_inventory(s);
         let c = HHeModel::controlled_fixture();
         let ne = self.energies.len();
@@ -1008,8 +1029,6 @@ impl Driver {
             eos.electron_density_cm3 / nh
         )
         .map_err(ioerr)?;
-        let gr = self.background.point_at_scale(1.0 / 21.0)?.geometry()?;
-        let g = p.geometry()?;
         let mut angular = Vec::new();
         for cell in &self.source.angular_cells {
             let ray =
@@ -1018,7 +1037,7 @@ impl Driver {
         }
         let norm = angular.iter().sum::<f64>();
         for (k, weight) in angular.iter().enumerate() {
-            let mu = self.ray(k, s.a)?.direction[2];
+            let mu = self.ray_with_geometry(k, &gr, &g)?.direction[2];
             for (i, &e) in self.energies.iter().enumerate() {
                 let stock = s.photons[k * ne + i];
                 // Fixed nodal representation: energy_low=energy_high=the node,

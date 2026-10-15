@@ -1,0 +1,983 @@
+{
+  "schema": "rei.production_branch_intake.v1",
+  "date": "2026-10-15",
+  "repo": "cosmosapjw-quantum/rei_bianchi",
+  "central": {
+    "branch": "codex/rux-science-delivery-20261014",
+    "sha": "0fcb2dddf5de6b583c2e00f150abff0b2afb6315",
+    "path": "/workspace/scratch/56fd3625e428/integration_20261015/rei_bianchi",
+    "source_basis": "Central git source read locally; branch source/test files read from GitHub Contents API at each exact head with Git blob IDs. No blanket merge or branch checkout."
+  },
+  "current_task": {
+    "mode": "READ_ONLY_SOURCE_INTAKE_AND_INTEGRATION_PROPOSAL",
+    "solver_runs": 0,
+    "tests_run": 0,
+    "benchmarks_run": 0,
+    "source_edits": 0,
+    "git_mutations": 0,
+    "historical_results": "Source-owned saved receipts only; not independently rerun or newly admitted."
+  },
+  "central_observations": [
+    {
+      "paths": [
+        "rust/rei_microphysics/src/axbi_driver.rs",
+        "rust/rei_microphysics/src/axbi_background.rs"
+      ],
+      "apis": [
+        "Driver::tentative",
+        "Driver::geometry_map",
+        "Driver::ray",
+        "Driver::inject",
+        "Driver::moments",
+        "AxbiBackground::point_at_scale"
+      ],
+      "finding": "point_at_scale integrates 4096 Simpson panels per query. tentative subtracts two accumulated proper-time values; stage geometry/rays/injection/validation/output repeat background queries.",
+      "risk": "Cancellation on tiny represented endpoint intervals and redundant work; no claimed measured production speedup in this intake."
+    },
+    {
+      "paths": [
+        "rust/rei_microphysics/src/axbi_rates.rs",
+        "rust/rei_microphysics/src/igm_rates.rs",
+        "rust/rei_microphysics/src/igm_thermal.rs"
+      ],
+      "apis": [
+        "AxbiProvider::rates",
+        "AxbiProvider::point",
+        "igm_point_rhs"
+      ],
+      "finding": "Existing central Grackle source af7939494ce65007887ada7b98d1813df6843346, operational 1..1e6 K, full source-owned event/thermal RHS. Case-A, primary-only closure; interval certificate absent explicitly.",
+      "action": "Keep this cold-through-reheated physical provider; do not replace it with C11/C13 warm PCHIP or omit its existing collisional/cooling/Compton terms."
+    },
+    {
+      "paths": [
+        "rust/rei_microphysics/src/axbi_driver.rs"
+      ],
+      "apis": [
+        "Driver::chemical_stage",
+        "Driver::evaluate",
+        "Driver::adaptive_step",
+        "Driver::compiled_identity",
+        "Driver::read_checkpoint"
+      ],
+      "finding": "Implicit point residual, common photon/photoheat events, finite-difference 4x4 Newton, full/two-half adaptive control, source byte-bound checkpoints and output cadence/budgets already implemented.",
+      "action": "Root owns production integration. Preserve numerical gates, event ledger and config/source identity; changed numerical source cannot silently resume old byte-bound checkpoint."
+    },
+    {
+      "paths": [
+        "rust/rei_microphysics/tests/axbi_driver.rs",
+        "rust/rei_microphysics/tests/axbi_background.rs",
+        "rust/rei_microphysics/tests/axbi_rates.rs"
+      ],
+      "apis": [
+        "reaction_free_geometry_conserves_count_energy_and_temperature_dilution",
+        "cold_absorption_uses_one_event_owner",
+        "checkpoint_roundtrip_and_registry_normalization",
+        "component_step_doubling_and_state_array_metric",
+        "sparse_full_spectra_keep_each_abundance_and_align_terminal_resume_and_cap"
+      ],
+      "finding": "Existing relevant tests inspected only. No test or old experiment rerun in this intake."
+    },
+    {
+      "paths": [
+        "rust/rei_microphysics/src/axbi_q_advance.rs",
+        "rust/rei_microphysics/src/axbi_q_grid.rs",
+        "rust/rei_microphysics/src/axbi_q_closure.rs"
+      ],
+      "apis": [
+        "advance_frozen_expanding",
+        "QFixedGrid",
+        "absorb_positive_bin"
+      ],
+      "finding": "Central optional covariant-q/closure reference modules explicitly say not coupled production. Their presence is not evidence of main-driver integration or a global error certificate."
+    }
+  ],
+  "branches": [
+    {
+      "pr": 128,
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/128",
+      "title": "SOURCE07 dynamic H/He photo-only loop: conservative sink coupling, second-order convergence, positive sparse age acceleration",
+      "head_branch": "research/rei-source07-dynamic-photo-20261015",
+      "head_sha": "26177f10d2c3264189980af2de26b3f63a9227fc",
+      "base_branch": "research/rei-source07-heii-vector-c9-20261015",
+      "base_sha": "9a0730c18a43595d3e29a9c03c2c3cf204e253d4",
+      "inspection": {
+        "lane": "Python research: stationary photo-only receiver",
+        "read": "reactions_vector uses -expm1(-tau), common absorption events feed surviving photons, ion changes and heat; midpoint_step rejects invalid species inventories.",
+        "use": "Independent scalar/event conservation controls and expm1-stable photo-kernel design only.",
+        "exclude": "Not an expanding continuously emissive cold full-chemistry driver; no wholesale replacement of central backward-Euler thermochemistry.",
+        "status": "Saved study scope: frozen zbar4 proper photo-only, no emission/recombination/cooling."
+      },
+      "files_read": [
+        {
+          "path": "research/source07_c10_dynamic_20261015/dynamic.py",
+          "read_ref": "26177f10d2c3264189980af2de26b3f63a9227fc",
+          "git_blob_sha": "0b487ae38136e8ad063310ea09964c92c5516f9f",
+          "lines": 382,
+          "apis_or_tests": [
+            "class Gas:",
+            "    def initial(cls,model:c9.Scenario,T0:float=12000.):",
+            "    def neutral(self):",
+            "    def nHII(self):",
+            "    def nHeIII(self):",
+            "    def ne(self):",
+            "    def temperature_K(self):",
+            "    def binding_eV_cm3(self):",
+            "    def check(self):",
+            "class Packets:",
+            "    def clone(self):",
+            "    def n(self):",
+            "    def u(self):",
+            "    def bytes(self):",
+            "class StepFailure(Exception):",
+            "def to_packets(cohorts:list[tuple],ages_weight:np.ndarray,gas:Gas,",
+            "def reactions_vector(pop:np.ndarray, energy:np.ndarray,sigma:np.ndarray,",
+            "def reactions_scalar(pop,energy,sigma,neutral,dt):",
+            "def midpoint_step(gas:Gas, photons:Packets,dt:float):",
+            "def observables(time:float,gas:Gas,photons:Packets)->dict:",
+            "def propagate(packets:Packets,gas:Gas,nsteps:int=16,",
+            "def compare(reference:dict,target:dict)->dict:",
+            "def weights_from_design(row:dict,nages:int)->np.ndarray:",
+            "def one_run(q:float,spectrum:str=\"bb50k\",nsteps:int=16,",
+            "def main():"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "6de2aabba8f38e2ef620b1a5a6bb32a407f7a1d6b5a1d2ffec9141820a156edd"
+        },
+        {
+          "path": "research/source07_c10_dynamic_20261015/adaptive.py",
+          "read_ref": "26177f10d2c3264189980af2de26b3f63a9227fc",
+          "git_blob_sha": "cfe4932bfa03dd0ba0160dbbd86c9605aaaaefda",
+          "lines": 130,
+          "apis_or_tests": [
+            "def propagate_adaptive(pack:d.Packets,initial:d.Gas,interval_s=1e12,",
+            "def test_case(source:str,nmu=12,ne=16,photons_per_H=1.):",
+            "def main():"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "f912fd3111c7aedb41319eb2a4e874a49815d9f858d0bd623ec0d0dfb6b55cab"
+        },
+        {
+          "path": "research/source07_c10_dynamic_20261015/test_dynamic.py",
+          "read_ref": "26177f10d2c3264189980af2de26b3f63a9227fc",
+          "git_blob_sha": "6475a8c60fc128859a9ce6d289d5f06c89cd634e",
+          "lines": 116,
+          "apis_or_tests": [
+            "class PhotonChemistryTests(unittest.TestCase):",
+            "    def test_exact_single_hydrogen_species_analytic_limit(self):",
+            "    def test_scalar_vector_independent_event_parity(self):",
+            "    def test_case_BB_and_hard_dynamic_ledgers(self):",
+            "    def test_Helium_first_and_second_photoionization_from_zero_HeII(self):",
+            "    def test_invalid_inputs(self):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "e97a0a98fef0331d7f8d97e211127bba47c706e0120082f5a838d2b6d9c67064"
+        },
+        {
+          "path": "research/source07_c10_dynamic_20261015/study_results.json",
+          "read_ref": "26177f10d2c3264189980af2de26b3f63a9227fc",
+          "git_blob_sha": "d60833e28709b5a593a38d4e088388e84be30504",
+          "lines": 904,
+          "apis_or_tests": [],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "672a342ce9a3c55fc49c76a88644f6a1fdbdb895d511c88d0938734cfdd2432c"
+        }
+      ],
+      "local_read_ref": "refs/remotes/intake/pr128",
+      "local_head_matches_contents_api_head": true,
+      "local_head_sha": "26177f10d2c3264189980af2de26b3f63a9227fc"
+    },
+    {
+      "pr": 130,
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/130",
+      "title": "SOURCE07 C11: Grackle Case-A H/He recombination and cooling with positive photon-age compression",
+      "head_branch": "research/rei-source07-casea-thermal-c11-20261015",
+      "head_sha": "10c57ed9419344d56aa9fb2d2f9feeb14b0a20a2",
+      "base_branch": "research/rei-source07-dynamic-photo-20261015",
+      "base_sha": "26177f10d2c3264189980af2de26b3f63a9227fc",
+      "inspection": {
+        "lane": "Python Case-A research plus a Rust read-only rate exporter",
+        "read": "casea.strang_step composes photo/rec/photo; rec_step solves midpoint ne/T with positive analytic H/He capture chain. CaseARates.__call__ strictly rejects outside 10000..24000 K.",
+        "use": "Analytic equal-rate helium-chain limit and independent recombination/energy tests; optional cross-check of changed seam.",
+        "exclude": "Warm 8-channel PCHIP table omits CI/CE/freefree/Compton and cannot initialize the central ~8 K trajectory. Keep AxbiProvider -> igm_point_rhs cold-through-reheated model.",
+        "status": "VERIFICATION.json: PASS_SCOPED, stationary receiver only; production_admission NOT_ISSUED."
+      },
+      "files_read": [
+        {
+          "path": "research/source07_c11_casea_20261015/casea.py",
+          "read_ref": "10c57ed9419344d56aa9fb2d2f9feeb14b0a20a2",
+          "git_blob_sha": "045bc41b4351ff403e84288619ef807b764e77ae",
+          "lines": 302,
+          "apis_or_tests": [
+            "def stable_divided_exponential(k2:float,k3:float,dt:float)->float:",
+            "def rec_analytic(hii:float,heii:float,heiii:float,kH:float,kHeII:float,",
+            "class ReservoirState:",
+            "    def conserved_total_energy(self):",
+            "    def conserved_photon_electrons(self):",
+            "def rec_step(gas:c10.Gas,dt:float,provider)->tuple[c10.Gas,dict]:",
+            "def strang_step(state:ReservoirState,dt:float,provider)->tuple[ReservoirState,dict]:",
+            "def summary_row(t:float,state:ReservoirState)->dict:",
+            "def evolve(state:ReservoirState,provider,interval_s:float=1e12,nsteps:int=32):",
+            "def build_source(spectrum:str,q:float,gas:c10.Gas,compress:bool,nmu:int=12,",
+            "def one_run(q=0.,spectrum=\"bb50k\",nsteps=32,interval_s=1e12,",
+            "def main():"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "03f6aa5e09731158c7ef7981bb6de15075aaef71a260fd1e8bd760a0386ea3ed"
+        },
+        {
+          "path": "research/source07_c11_casea_20261015/rate_table.py",
+          "read_ref": "10c57ed9419344d56aa9fb2d2f9feeb14b0a20a2",
+          "git_blob_sha": "00ab883812029440140bf77dcadb1d12d948e222",
+          "lines": 82,
+          "apis_or_tests": [
+            "class RateDomainError(ValueError):",
+            "class CaseARates:",
+            "    def __init__(self,table:Path=TABLE):",
+            "    def __call__(self,temperature:float)->np.ndarray:",
+            "    def exact_grid_parity(self)->float:",
+            "class ConstantRates:",
+            "    def __init__(self,rr=(0.,0.,0.),dr=0.,cooling=(0.,0.,0.),dr_cool=0.):",
+            "    def __call__(self,temperature):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "81a48ebdbf58fb3dbb43bc878428b85fce3cd86dd8d9a6dfda505fd6a987ff57"
+        },
+        {
+          "path": "research/source07_c11_casea_20261015/test_casea.py",
+          "read_ref": "10c57ed9419344d56aa9fb2d2f9feeb14b0a20a2",
+          "git_blob_sha": "078bd1fc1d3de7600c42dbf4627b23857060734e",
+          "lines": 144,
+          "apis_or_tests": [
+            "class C11CaseATests(unittest.TestCase):",
+            "    def setUpClass(cls):",
+            "    def test_source_table_domain_and_positive(self):",
+            "    def test_frozen_he_analytic_chain_matrix_exponential(self):",
+            "    def test_manufactured_H_only_recombination_analytic_refinement(self):",
+            "    def test_casea_negative_temperature_guard_no_clamp(self):",
+            "    def test_grackle_he_rec_photo_ledger(self):",
+            "    def test_second_order_strang_self_convergence(self):",
+            "    def test_positive_source_dependent_compression_vs_dense(self):",
+            "    def test_invalid_and_zero_recombination(self):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "cfd56785167b83a6eb0e72f5f87d7699edfc213f5395c7c159b7f26c3f4c8f89"
+        },
+        {
+          "path": "rust/rei_microphysics/examples/source07_c11_rates.rs",
+          "read_ref": "10c57ed9419344d56aa9fb2d2f9feeb14b0a20a2",
+          "git_blob_sha": "de62155d198dcafaf113f592940321c838297e4c",
+          "lines": 50,
+          "apis_or_tests": [
+            "fn row(t: f64) -> Result<(), Box<dyn std::error::Error>> {",
+            "fn real(x: &str)->Result<f64,Box<dyn std::error::Error>> {",
+            "fn main()->Result<(),Box<dyn std::error::Error>>{"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "a0ea0721d0f38f45b0b2832194f295d283068f5c2b901cd7398bc2d8d1e5eff7"
+        },
+        {
+          "path": "research/source07_c11_casea_20261015/RATE_VALIDATION.json",
+          "read_ref": "10c57ed9419344d56aa9fb2d2f9feeb14b0a20a2",
+          "git_blob_sha": "709191d6fa917bd8707f22cd5ed57b668f26d105",
+          "lines": 26,
+          "apis_or_tests": [],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "ce1518986f642c88f9dbe9d41306810680f848def7716f851844d85b2e43ff27"
+        },
+        {
+          "path": "research/source07_c11_casea_20261015/VERIFICATION.json",
+          "read_ref": "10c57ed9419344d56aa9fb2d2f9feeb14b0a20a2",
+          "git_blob_sha": "0ec79f4ea1ddd747cd8164c66100dc2499bf8cf8",
+          "lines": 150,
+          "apis_or_tests": [],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "b35fafae861f1ba843355631952fbb5ac8774c76952d601e04382777801dd9e5"
+        }
+      ],
+      "local_read_ref": "refs/remotes/intake/pr130",
+      "local_head_matches_contents_api_head": true,
+      "local_head_sha": "10c57ed9419344d56aa9fb2d2f9feeb14b0a20a2"
+    },
+    {
+      "pr": 134,
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/134",
+      "title": "C12: five source-pinned supplier integrations and executable REI science gates",
+      "head_branch": "research/rei-crossrepo-five-suppliers-20261015",
+      "head_sha": "5d940a023507a601c2c8c935bad0b0aea1dcbe9c",
+      "base_branch": "research/rei-source07-casea-thermal-c11-20261015",
+      "base_sha": "10c57ed9419344d56aa9fb2d2f9feeb14b0a20a2",
+      "inspection": {
+        "lane": "Python source-pinned supplier adapters",
+        "read": "shortstep.gauss_increment integrates physical 1/H and s/H over local log1p endpoint interval; Background.mean_hubble uses hypot(H_FLRW,s) for PhysicalDensityFixed and same signed q_ref family. crossrepo source gates keep REC opt-in, HH unsupported, HE warm separate and CR precision HOLD.",
+        "use": "Highest priority: port the direct short-interval clock mathematics into a small Rust source-native callback; share geometry points/rays per stage. Bind the same central scenario/cosmology and exact units.",
+        "exclude": "Do not adopt all five suppliers as mandatory runtime dependencies or widen a warm model. CR exact child-moment bounds do not imply its requested precision target passed.",
+        "status": "CROSSREPO_CONSUMER_RESULTS.json: exact 16 mirrored Git blobs; bass_cr precision_admission HOLD_PRECISION_TARGET."
+      },
+      "files_read": [
+        {
+          "path": "research/rei_crossrepo_integration_20261015/crossrepo_integration.py",
+          "read_ref": "5d940a023507a601c2c8c935bad0b0aea1dcbe9c",
+          "git_blob_sha": "0c61ffa38f4ba5a6549268167c553e6ff51055e5",
+          "lines": 245,
+          "apis_or_tests": [
+            "def validate_mirror():",
+            "def background_photon_source():",
+            "def source_packet_envelopes():",
+            "def recombination_initial_counterfactual():",
+            "def wu_coulomb_source_guard():",
+            "def he_tau_source_bound():",
+            "def run():"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "c173bf2ffbbe1bcf175f64c8c2803c5a2213ad228410ae0f6c22851b60c5dc48"
+        },
+        {
+          "path": "research/rei_crossrepo_integration_20261015/test_crossrepo.py",
+          "read_ref": "5d940a023507a601c2c8c935bad0b0aea1dcbe9c",
+          "git_blob_sha": "bc1ac0d6306aa99623deee4f813707469a914769",
+          "lines": 57,
+          "apis_or_tests": [
+            "class FiveSupplierIntake(unittest.TestCase):",
+            "    def test_all_mirrors_exact_git_blobs(self):",
+            "    def test_real_bass_AX03_killing_proper_clock(self):",
+            "    def test_bass_cr_actual_packet_oracle_6_bounds(self):",
+            "    def test_rec_HyRec_source_IC_declined_but_recomputed(self):",
+            "    def test_WU_HH_original_negative_admission(self):",
+            "    def test_HE_warm_independent_tau_and_prob(self):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "af44bdc6afac14c26a2c883780005ad89f3e4dc901f43299baa78a6b8e14375f"
+        },
+        {
+          "path": "research/rei_crossrepo_integration_20261015/CROSSREPO_CONSUMER_RESULTS.json",
+          "read_ref": "5d940a023507a601c2c8c935bad0b0aea1dcbe9c",
+          "git_blob_sha": "ae6d2258602defa3648a3f0d068950341af65138",
+          "lines": 290,
+          "apis_or_tests": [],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "b6bef6972f615115d5e6bc41d3aadf2b48dd45d2034e34c1f98572ef29b4216e"
+        },
+        {
+          "path": "research/rei_crossrepo_integration_20261015/suppliers/bass/rei_axbi_shortstep_20261015/shortstep.py",
+          "read_ref": "5d940a023507a601c2c8c935bad0b0aea1dcbe9c",
+          "git_blob_sha": "9997b4fb9638770c2758781bb235ed000bd9e546",
+          "lines": 258,
+          "apis_or_tests": [
+            "class ResolutionError(ValueError):",
+            "def _native_ray(a):",
+            "def _validate_pair(bg:Background,a0:float,a1:float):",
+            "def stable_dx(a0:float,a1:float)->float:",
+            "def _gauss_rule(order:int):",
+            "def gauss_increment(bg:Background,a0:float,a1:float,*,order:int=4,",
+            "def gauss_batch(bg:Background,a0_array,a1_array,*,order:int=4,",
+            "def _hermite_coeff(y0,y1,d0,d1,h):",
+            "def _min_derivative(c):",
+            "def _poly_increment(c,u,du):",
+            "class HermiteClock:",
+            "    def __init__(self,bg:Background,n:int=501):",
+            "    def _cell(self,a):",
+            "    def point(self,a):",
+            "    def increment(self,a0,a1):",
+            "    def derivative(self,a):",
+            "def photon_short_logmap(bg:Background,a_early,a_late,mu_face,*,order=4):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "728b00b505a5c558ce21895a25634b3c3325333ad0535e4e52d66f20ab9357bd"
+        },
+        {
+          "path": "research/rei_crossrepo_integration_20261015/suppliers/bass/rei_axbi_background_supplier_20261015/axbi_provider.py",
+          "read_ref": "5d940a023507a601c2c8c935bad0b0aea1dcbe9c",
+          "git_blob_sha": "cf08893bfdbaf8f4ce822df559ebc6b0f44f11dd",
+          "lines": 203,
+          "apis_or_tests": [
+            "def _finite(x):",
+            "def _read_lock():",
+            "class Family:",
+            "    def __post_init__(self):",
+            "class Background:",
+            "    def __init__(self,case:Family,rtol=8e-13,atol=5e-15):",
+            "    def h_flrw(self,a):",
+            "    def shear(self,a):",
+            "    def mean_hubble(self,a):",
+            "    def at_x(self,x):",
+            "    def at_a(self,a):",
+            "    def at_time(self,time_s):",
+            "    def table(self,n=501):",
+            "def photon_pullback(early,face,mu_face):",
+            "def matter_only_closed_form(q=0.01,a_ref=1/21,a=1/5,h0=2e-18,omega_m=1.0):",
+            "def run_demo():"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "db980776caf6a467f352ee11f55221ab711001600ef51c06d8e6a3c614903fe3"
+        }
+      ],
+      "local_read_ref": "refs/remotes/intake/pr134",
+      "local_head_matches_contents_api_head": true,
+      "local_head_sha": "5d940a023507a601c2c8c935bad0b0aea1dcbe9c"
+    },
+    {
+      "pr": 138,
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/138",
+      "title": "C13: source-native MD14 photon births, Bianchi Killing transfer, H-He CaseA and Σ/Pi supplier diagnostics",
+      "head_branch": "research/rei-c13-native-live-source-20261015",
+      "head_sha": "d7d0e3ad2d6d7cccdfd70df3a0f310df93ec553d",
+      "base_branch": "research/rei-crossrepo-five-suppliers-20261015",
+      "base_sha": "5d940a023507a601c2c8c935bad0b0aea1dcbe9c",
+      "inspection": {
+        "lane": "Rust AxbiSource exporter feeding Python/NumPy short-window integration",
+        "read": "NativeStellarSource.load validates original source ID, per-H/proper conversion, spectral/angle normalization; PhotonCloud.drift uses expm1/log1p fixed-Killing increments without a second angular Jacobian. one_interval invokes actual C11 source chemistry on warm near-z4 test gas.",
+        "use": "Source identity/units and birth N/U tests, stable characteristic formulas, and common event accounting. Coalescence only later behind explicit current/holdout error budgets.",
+        "exclude": "Do not swap central Driver with the warm near-z4 prototype. PhotonCloud.drift clamps mu numerically and coalesce is conditional; no silent clipping/merge policy transplant under the central no-clipping contract.",
+        "status": "SCIENCE_GATE.json: LOCAL_SHORT_INTERVAL_ONLY; GLOBAL_EOR/AX11/AX12_NOT_ISSUED; CR true-child gate HOLD_PRECISION_TARGET."
+      },
+      "files_read": [
+        {
+          "path": "research/rei_c13_live_source_20261015/short_interval.py",
+          "read_ref": "d7d0e3ad2d6d7cccdfd70df3a0f310df93ec553d",
+          "git_blob_sha": "89e9a4fbdbb95c6f99385d6023a4dbd0f92ad3c3",
+          "lines": 393,
+          "apis_or_tests": [
+            "class NativeStellarSource:",
+            "    def load(cls,model:Scenario,path):",
+            "    def birth(self,number_perH):",
+            "class PhotonCloud:",
+            "    def empty(cls):",
+            "    def clone(self):",
+            "    def number(self):",
+            "    def energy(self):",
+            "    def live_bytes(self):",
+            "    def packet_count(self):",
+            "    def check(self):",
+            "    def inject(self,source:NativeStellarSource,number_perH):",
+            "    def drift(self,delta_ln_a,delta_b):",
+            "    def to_native_chemistry(self,nH_cm3):",
+            "    def chemical_update(self,packets:c10.Packets,new_nH_cm3):",
+            "class SourceState:",
+            "    def number_ledger(self):",
+            "    def energy_ledger(self):",
+            "    def summary(self):",
+            "def initial_gas(model:Scenario,a,temperature_K=12000):",
+            "def drift_state(state:SourceState,a1:float,bg:Background):",
+            "def emit_half(state:SourceState,source:NativeStellarSource,rate_perH_s,half_dt_s):",
+            "def reaction_step(state:SourceState,dt:float,provider):",
+            "def one_interval(state:SourceState,a_end:float,bg:Background,model:Scenario,",
+            "def run(q:float,source:NativeStellarSource,nstep=32,a_start=START,a_end=STOP,",
+            "    def attach_geometry_and_radiation(row,epoch):",
+            "def independent_scalar_killing(E,mu,da,db):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "05201593f39637b5ae34e517dc4ec278ab11e27708590db1db2257bdb39887cf"
+        },
+        {
+          "path": "research/rei_c13_live_source_20261015/coalesce.py",
+          "read_ref": "d7d0e3ad2d6d7cccdfd70df3a0f310df93ec553d",
+          "git_blob_sha": "fa291334cb2121957bade6fe8be75b4889548c69",
+          "lines": 102,
+          "apis_or_tests": [
+            "def moments(sky):",
+            "def event_heat(sky,gas,dt):",
+            "def reduce_age_cohorts(sky,base_cells,gas,dt_s,*,event_budget=1e-10,"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "9b4b2a15740f7f0d3dd64593d743fa4a3a7d62518609153c5bf00cc1ecf47b58"
+        },
+        {
+          "path": "research/rei_c13_live_source_20261015/test_short_interval.py",
+          "read_ref": "d7d0e3ad2d6d7cccdfd70df3a0f310df93ec553d",
+          "git_blob_sha": "1fc7cfcdd36b30d924bd60ce4971b6d088885343",
+          "lines": 126,
+          "apis_or_tests": [
+            "class LiveC13(unittest.TestCase):",
+            "    def setUpClass(cls):",
+            "    def test_rust_native_md14_spectral_mu_and_perH_rate(self):",
+            "    def test_killing_scalar_independent_signed_shear_and_inverse(self):",
+            "    def test_expansion_gas_thermal_a_minus_2_and_photon_N_per_H(self):",
+            "    def test_zero_source_prevents_photon_birth(self):",
+            "    def test_born_photons_coupled_H_He_and_exact_number_energy(self):",
+            "    def test_time_refinement_observed_second_order(self):",
+            "    def test_native_spectral_source_refinement_second_order(self):",
+            "    def test_Pi_ion_actual_new_source_and_sourced_CMB_stress_separate(self):",
+            "    def test_invalid_sources_and_no_extrapolation(self):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "1b5758395b4b1a3465138a138dc859684050af21d6e03855c4ffe9dce16fe2e9"
+        },
+        {
+          "path": "rust/rei_microphysics/examples/rei_c13_native_source.rs",
+          "read_ref": "d7d0e3ad2d6d7cccdfd70df3a0f310df93ec553d",
+          "git_blob_sha": "a5641a836dd463de6baeb3c47f5b53d796962316",
+          "lines": 32,
+          "apis_or_tests": [
+            "fn main()->Result<(),Box<dyn std::error::Error>>{"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "734d86c479976c4f0a669af94e2f5b87ef2f4a0e1f46005512ff9d8117ae7224"
+        },
+        {
+          "path": "research/rei_c13_live_source_20261015/verification/SCIENCE_GATE.json",
+          "read_ref": "d7d0e3ad2d6d7cccdfd70df3a0f310df93ec553d",
+          "git_blob_sha": "4905c9cce4b4906fbf7b621941bc3cacf5f963d3",
+          "lines": 32,
+          "apis_or_tests": [],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "498b75e3708bc4d1d6bdcfbc443ecfa0d2c139894b19b4a724fa3b41f384eaaa"
+        }
+      ],
+      "local_read_ref": "refs/remotes/intake/pr138",
+      "local_head_matches_contents_api_head": true,
+      "local_head_sha": "d7d0e3ad2d6d7cccdfd70df3a0f310df93ec553d"
+    },
+    {
+      "pr": 143,
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/143",
+      "title": "C16: source-native UV/HHe open Q0 ledger and independently checked Bianchi shear work",
+      "head_branch": "research/rei-c16-source-energy-20261015",
+      "head_sha": "af67c5314669492b07cb574170c09f70994974e4",
+      "base_branch": "research/rei-c15-two-way-shear-20261015",
+      "base_sha": "435c94308c0cd7b1ba8ff6518246da061f2fc2fa",
+      "inspection": {
+        "lane": "Python shadow work/source-energy auditor around C15",
+        "read": "perH_source_balance reconstructs photon+thermal+binding+escape+geometry-work-source; WorkAuditor.drift_segment independently replays DOP853 dense trajectories and integrates U_UV+2(s/H)P2+2U_th. flux_reconstruction explicitly labels external open source Q0.",
+        "use": "Port/readback diagnostic equations against the central Ledgers/residuals, preserving Case-A escape and stellar emissivity as explicit open external reservoirs; optional independent pressure-work audit.",
+        "exclude": "Do not run this shadow solver inside production or infer closed stellar/escaping-photon Einstein Tmunu from an open-Q0 audit.",
+        "status": "RESULT_STATUS.json: SCOPED_OPEN_Q0_SHEAR_WORK_PASS_ONLY; total Einstein/Raychaudhuri source conservation and full zbar20->4 NOT_ISSUED."
+      },
+      "files_read": [
+        {
+          "path": "research/rei_c16_source_energy_20261015/c16_exchange.py",
+          "read_ref": "af67c5314669492b07cb574170c09f70994974e4",
+          "git_blob_sha": "e5e8c4b3786e9466bb614f9512cb9dd533a0d7b0",
+          "lines": 266,
+          "apis_or_tests": [
+            "def gauss_rule(order):",
+            "def formula_energies(row, fHe):",
+            "def perH_source_balance(history,fHe):",
+            "def flux_reconstruction(history,nh0):",
+            "class WorkAuditor(Coupled):",
+            "    def __init__(self,cfg,source,order=8):",
+            "    def drift_segment(self,micro,y,a_end):",
+            "    def step(self,micro,y,a_end):",
+            "    def run(self):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "f9785526a227161c6c1a26c36448bb1817b9e67df881a44c397dd398da2ffd51"
+        },
+        {
+          "path": "research/rei_c16_source_energy_20261015/test_c16_exchange.py",
+          "read_ref": "af67c5314669492b07cb574170c09f70994974e4",
+          "git_blob_sha": "09dced15f3ead5480ebda4ecf7f4127d365ddee1",
+          "lines": 96,
+          "apis_or_tests": [
+            "class OriginalC15ActualConservation(unittest.TestCase):",
+            "    def setUpClass(cls):",
+            "    def test_original_C13_native_source_and_scoped_boltzmann(self):",
+            "    def test_five_external_UV_CaseA_thermo_binding_reservoir_ledger(self):",
+            "    def test_independent_gauss8_shear_pressure_plus_adiabatic_gas_work(self):",
+            "    def test_positive_non_tilt_reflection_has_zero_baryon_momentum_recoil(self):",
+            "    def test_dipolar_source_rejected_not_fake_non_tilt_zero_transfer(self):",
+            "    def test_true_c15_source_outcomes_identical_by_adding_only_audit(self):",
+            "    def test_Gauss4_8_16_actual_source_pressure_work_refinement(self):",
+            "    def test_open_energy_source_power_dimensions_real_data(self):",
+            "    def test_schema_protects_full_covariant_admission(self):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "cf155f90b354e27c497965666b70b844a4283c679d12c0df5f7feb572c57be22"
+        },
+        {
+          "path": "research/rei_c16_source_energy_20261015/RESULT_STATUS.json",
+          "read_ref": "af67c5314669492b07cb574170c09f70994974e4",
+          "git_blob_sha": "f155cace57838167d850c72ca1116d5a2bcf1cb3",
+          "lines": 55,
+          "apis_or_tests": [],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "3739e58bd8e22a27305f03ab85496147d62166b8bed66f0656cd29f001632902"
+        }
+      ],
+      "local_read_ref": "refs/remotes/intake/pr143",
+      "local_head_matches_contents_api_head": true,
+      "local_head_sha": "af67c5314669492b07cb574170c09f70994974e4"
+    },
+    {
+      "pr": 149,
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/149",
+      "title": "C16.0B: actual Case-A escaped photons, sharp positive Bianchi angular stress and Sigma response",
+      "head_branch": "research/rei-c16-escape-transport-20261015",
+      "head_sha": "79586facd6352e7bf40cc6c7042d26923e79d7dd",
+      "base_branch": "research/rei-c16-source-energy-20261015",
+      "base_sha": "af67c5314669492b07cb574170c09f70994974e4",
+      "inspection": {
+        "lane": "Python actual-escape energy/birth-time moment envelopes",
+        "read": "CaseABirthRecorder tags actual split-midpoint positive escaped-energy increments; sharp_per_event and response_mode give fixed-background attainable angular-pressure/linear-shear envelopes, not an emitted spectrum.",
+        "use": "Optional omitted-feedback sensitivity diagnostic using actual escaped-energy birth records; preserve unknown spectrum/angle and explicit Sigma convention.",
+        "exclude": "No invented Case-A photon count or spectrum; E=30 eV in radiation_cloud is an unphysical atom carrier for moment construction. No nonlinear recoupled Einstein-HHe admission.",
+        "status": "RESULT_STATUS.json: fixed-background pressure/Green-response scope; full covariant Einstein closure and full zbar20->4 NOT_ISSUED. Source Sigma=sqrt(3)*abs(s)/H differs from central signed s/H."
+      },
+      "files_read": [
+        {
+          "path": "research/rei_c16_escape_20261015/escape_transport.py",
+          "read_ref": "79586facd6352e7bf40cc6c7042d26923e79d7dd",
+          "git_blob_sha": "e9ff318a2d3ea6eb736a2588d555b1cad9de3ee0",
+          "lines": 296,
+          "apis_or_tests": [
+            "class EscapeBirth:",
+            "    def __post_init__(self):",
+            "class CaseABirthRecorder(WorkAuditor):",
+            "    def __init__(self,cfg,source,order=8):",
+            "    def step(self,micro,y,a_end):",
+            "def get_actual_source(q_signed=0.005,nstep=32,kappa=.2):",
+            "def radiation_cloud(U,kind:str,order=64):",
+            "def evolved_moments(U,b_em,a_em,b_now,a_now,mode):",
+            "class FixedSourceGeometry:",
+            "    def __init__(self,source_result,initial_nH_cm3):",
+            "    def geometry(self,x):",
+            "    def hydrogen_density_cm3(self,a):",
+            "def angular_moments_fast(event:EscapeBirth,a_now,b_now,kind,order=64):",
+            "def sharp_per_event(event:EscapeBirth,a_now,b_now):",
+            "def response_mode(births,geometry:FixedSourceGeometry,kind,order=16,at_x=None):",
+            "def endpoint_source_pressure(births,geometry,kind):",
+            "def run_escape_response(q_signed=0.005,nstep=32,kappa=.2,order=16):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "0f8e4e9a353c038320fdf0cfadfdf193b6676ed79e9aed59c89884cfb7dc956e"
+        },
+        {
+          "path": "research/rei_c16_escape_20261015/positive_source_pr144.py",
+          "read_ref": "79586facd6352e7bf40cc6c7042d26923e79d7dd",
+          "git_blob_sha": "88fcb43a5ec19c4a5597b10bb3387ce14ba4826d",
+          "lines": 74,
+          "apis_or_tests": [
+            "class Moment:",
+            "    def from_sky(cls,photons):",
+            "    def positive_cone(self,tol=5e-14):",
+            "def positive_three_atom(moment:Moment,energy_eV=30.):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "97c7eab423961c6e7e10c97f5f39c4e1106794f4af417ada91b52d931d0a6d61"
+        },
+        {
+          "path": "research/rei_c16_escape_20261015/test_escape_transport.py",
+          "read_ref": "79586facd6352e7bf40cc6c7042d26923e79d7dd",
+          "git_blob_sha": "2f96aca90457731a6758aad0491feeab97a5699c",
+          "lines": 139,
+          "apis_or_tests": [
+            "class EscapeSourceShear(unittest.TestCase):",
+            "    def setUpClass(cls):",
+            "    def test_original_PR144_actual_sha_exact_source_class(self):",
+            "    def test_source_energy_births_are_real_and_positive(self):",
+            "    def test_sharp_cone_analytic_all_metric_signs(self):",
+            "    def test_extremal_positive_three_atoms_not_signed_negative_flux(self):",
+            "    def test_native_photon_cloud_drift_matches_vectorized_Killing(self):",
+            "    def test_endpoint_full_angular_pressure_sharply_bounded(self):",
+            "    def test_actual_linear_ode_green_pressure_bounds(self):",
+            "    def test_exact_zero_shear_cusp_is_not_a_signed_derivative(self):",
+            "    def test_einstein_angular_total_energy_not_from_unlicensed_escape_spectrum(self):",
+            "    def test_density_geometry_input_is_positive_real_source(self):",
+            "    def test_reference_positive_source_to_current_einstein_thermal_unchanged(self):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "e17e5592caba85039447dae99734f47fc2eb590b9522e3c38edebcb5d67dc4c5"
+        },
+        {
+          "path": "research/rei_c16_escape_20261015/RESULT_STATUS.json",
+          "read_ref": "79586facd6352e7bf40cc6c7042d26923e79d7dd",
+          "git_blob_sha": "098f50de5d0f6c51cb7bf16440f065ac6db1b653",
+          "lines": 68,
+          "apis_or_tests": [],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "2b62cc16e0af44ef5eb772f114eb3abbbbaf5c22453edb91cb1ded868d0a3cb4"
+        }
+      ],
+      "local_read_ref": "refs/remotes/intake/pr149",
+      "local_head_matches_contents_api_head": true,
+      "local_head_sha": "79586facd6352e7bf40cc6c7042d26923e79d7dd"
+    },
+    {
+      "pr": 145,
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/145",
+      "title": "REI Σ–π: conservative positive canonical Vlasov cells replace massive high-moment oracle",
+      "head_branch": "research/rei-canonical-positive-fv-20261015",
+      "head_sha": "54e29dff5a90c0a785cb6dcfb004403614ca403b",
+      "base_branch": "research/rei-bass-massive-radial-hierarchy-20261015",
+      "base_sha": "b1cba753083ad83049c23ff538834564b49b7b6e",
+      "inspection": {
+        "lane": "Python positive collisionless massive canonical-momentum FV/Einstein research",
+        "read": "CanonicalMomentumFV stores immutable positive cell numbers; moments computes stress from mass shell/current metric; CanonicalFVSpecies adds those sources to a distinct Einstein+gamma/nu solve_ivp system.",
+        "use": "Optional later massive-source reference; positive phase-cell and independent continuity/shear-work test ideas.",
+        "exclude": "Not required for fixed-background FLRW H/He production. It consumes a source electron history and distinct massive model; do not silently replace Omega_m/dust or cold chemistry.",
+        "status": "RESULTS.json admission SCOPED_POSITIVE_PHASE_CELL_COLLISIONLESS_VLASOV_EINSTEIN; performance scope FV moment source only, not REI chemical production."
+      },
+      "files_read": [
+        {
+          "path": "research/rei_bass_hierarchy_backreaction_20261015/canonical_fv_20261015/canonical_fv.py",
+          "read_ref": "54e29dff5a90c0a785cb6dcfb004403614ca403b",
+          "git_blob_sha": "c5386da152fb242020610fc24e25b8e155ea5125",
+          "lines": 298,
+          "apis_or_tests": [
+            "class FVMoments:",
+            "    def pbar(self):",
+            "    def delta_p(self):",
+            "    def pi_s(self):",
+            "class CanonicalMomentumFV:",
+            "    def __init__(self, mass_over_Tref:float, amplitude:float=0.,",
+            "    def cell_numbers(self):",
+            "    def total_cell_number(self):",
+            "    def packet_count(self):",
+            "    def distribution_change_deta(self):",
+            "    def moments(self,eta:float,b:float)->FVMoments:",
+            "    def moment_batch(self,eta,b,chunk=32):",
+            "class CanonicalFVSpecies(SpeciesHierarchy):",
+            "    def __init__(self,source,Tcmb0_K,ellmax=8,*,Sigma_ref=0.,",
+            "    def fields(self,x,y):",
+            "    def rhs(self,x,y):",
+            "    def integrate(self,n=121,rtol=3e-11,atol=3e-13):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "91c1641b851aa9580141d4423e2579ced5f11b95aa716b3fc2cb0137df344cc5"
+        },
+        {
+          "path": "research/rei_bass_hierarchy_backreaction_20261015/canonical_fv_20261015/test_canonical_fv.py",
+          "read_ref": "54e29dff5a90c0a785cb6dcfb004403614ca403b",
+          "git_blob_sha": "85efc8f20e7bf96d7070a3035b458b0cec77f6f4",
+          "lines": 167,
+          "apis_or_tests": [
+            "def test_cells_strict_positivity_quadrature_normalization_and_no_flux():",
+            "def test_negative_source_is_rejected(invalid):",
+            "def test_original_BASS160_fd_mass_shell_original_source_convergence(mass,A):",
+            "def test_exact_component_massive_continuity_and_shear_work():",
+            "def test_zero_massive_fraction_recovers_PR137_source_without_injection():",
+            "def test_actual_geometry_and_Killing_population_owners_sign_sources():",
+            "def test_independent_source_assisted_PR140_convergence_actual_Einstein():",
+            "def test_einstein_constraint_differentiation_independent_raychaudhuri():"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "4108a32d9176eb21b840ce9f5edad2bf6d28369209544eb5ac8717b50a26cd0a"
+        },
+        {
+          "path": "research/rei_bass_hierarchy_backreaction_20261015/canonical_fv_20261015/RESULTS.json",
+          "read_ref": "54e29dff5a90c0a785cb6dcfb004403614ca403b",
+          "git_blob_sha": "44f8a3a654abbda1fd38de5e8cd1220a928e18fb",
+          "lines": 477,
+          "apis_or_tests": [],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "1b454543976c519a9c6dac06dc7a063ed173408a61e7dff94be86a845d77cad1"
+        }
+      ],
+      "local_read_ref": "refs/remotes/intake/pr145",
+      "local_head_matches_contents_api_head": true,
+      "local_head_sha": "54e29dff5a90c0a785cb6dcfb004403614ca403b"
+    },
+    {
+      "pr": 148,
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/148",
+      "title": "REI C5: positive canonical collision semigroup with energy-recoil gas partner ledger",
+      "head_branch": "research/rei-canonical-fv-paired-collision-20261015",
+      "head_sha": "8ae94c5c5a53b1a12fffaa25ac20b7e8f4f31c99",
+      "base_branch": "research/rei-canonical-positive-fv-20261015",
+      "base_sha": "54e29dff5a90c0a785cb6dcfb004403614ca403b",
+      "inspection": {
+        "lane": "Python conditional canonical angular collision event",
+        "read": "PositiveCanonicalAngularCollision.source_rhs is dN/dtau with no physical collision frequency. event requires supplied optical depth, exchanges finite tetrad Q0/Qz with partner gas, and rejects insufficient thermal reserve / odd momentum sector.",
+        "use": "Retain negative physical-energy-owner control and paired exchange design only if a real collision channel/operator is later selected.",
+        "exclude": "Do not activate this as H/He reaction or massive collision physics: microscopic rate and actual evolving gas partner absent. Reflection parity and thermal-reserve requirements are substantive physics, not policy blockers.",
+        "status": "RESULTS.json source_tau_status CONDITIONED_GIVEN_OPTICAL_DEPTH_NO_MICROPHYSICAL_RATE_OWNER; no chemical reactions; partner is separate adiabatic reference, not C15 donor."
+      },
+      "files_read": [
+        {
+          "path": "research/rei_bass_hierarchy_backreaction_20261015/canonical_collision_20261015/paired_collision.py",
+          "read_ref": "8ae94c5c5a53b1a12fffaa25ac20b7e8f4f31c99",
+          "git_blob_sha": "7e6871d5ecc4df80e1deb0ac63985b8cf751a9f3",
+          "lines": 240,
+          "apis_or_tests": [
+            "class CollisionMoments:",
+            "class CollisionEvent:",
+            "class PositiveCanonicalAngularCollision:",
+            "    def __init__(self, source:CanonicalMomentumFV,",
+            "    def populations(self):",
+            "    def isotropic_target(self,populations):",
+            "    def _validate_parity(self,pop):",
+            "    def moments(self,eta:float,b:float,populations)->CollisionMoments:",
+            "    def relative_entropy(self,populations):",
+            "    def source_rhs(self,populations):",
+            "    def event(self,eta:float,b:float,optical_depth:float,"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "2446d4c17800292bd87183da18cfd590d6ae1ca8971bbbaf07467236541e9964"
+        },
+        {
+          "path": "research/rei_bass_hierarchy_backreaction_20261015/canonical_collision_20261015/test_paired_collision.py",
+          "read_ref": "8ae94c5c5a53b1a12fffaa25ac20b7e8f4f31c99",
+          "git_blob_sha": "8a9cadebbd81025a42dd0da91934d43bda3823b2",
+          "lines": 194,
+          "apis_or_tests": [
+            "def angular_jump():",
+            "def test_canonical_shell_numbers_and_positive_source(angular_jump):",
+            "def test_zero_optical_depth_is_exact_identity(angular_jump):",
+            "def test_exact_semigroup_positivity_and_cell_number(angular_jump,tau):",
+            "def test_collision_time_semigroup_and_ledger_composition(angular_jump):",
+            "def test_initial_source_P2_damping_exact_at_isotropic_geometry():",
+            "def test_energy_partner_recoil_and_boundary_gas_fail_closed(angular_jump):",
+            "def test_conditional_negative_b_can_heat_gas(angular_jump):",
+            "def test_markov_canonical_detailed_balance_not_physical_thermal_equilibrium(angular_jump):",
+            "def test_fail_closed_invalid_negative_and_odd_source(angular_jump):",
+            "def test_declared_source_is_not_a_physical_ionization_rate(angular_jump):",
+            "def test_relative_entropy_data_processing_bound_stronger_than_monotonicity(angular_jump):",
+            "def test_strong_generator_limit_matches_finite_event_at_small_dtau(angular_jump):"
+          ],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "04ee5f537c8ed0a055b2ffeca7c626fc752075abaf06ed42912109d32fc95869"
+        },
+        {
+          "path": "research/rei_bass_hierarchy_backreaction_20261015/canonical_collision_20261015/RESULTS.json",
+          "read_ref": "8ae94c5c5a53b1a12fffaa25ac20b7e8f4f31c99",
+          "git_blob_sha": "355bedada33eea53f4c5cd04b40db355a38dfcf0",
+          "lines": 515,
+          "apis_or_tests": [],
+          "content_retrieved": true,
+          "local_git_blob_matches_contents_api": true,
+          "sha256": "51781c93b863ed4467af90f5d378cd88f69b14c092fa120eac20d6b6d008f513"
+        }
+      ],
+      "local_read_ref": "refs/remotes/intake/pr148",
+      "local_head_matches_contents_api_head": true,
+      "local_head_sha": "8ae94c5c5a53b1a12fffaa25ac20b7e8f4f31c99"
+    }
+  ],
+  "minimal_production_delta": [
+    {
+      "priority": 1,
+      "id": "RUST_LOCAL_CLOCK_AND_SHARED_GEOMETRY",
+      "owner": "root production driver owner",
+      "source_pr": 134,
+      "source_path": "research/rei_crossrepo_integration_20261015/suppliers/bass/rei_axbi_shortstep_20261015/shortstep.py",
+      "source_apis": [
+        "stable_dx",
+        "gauss_increment",
+        "photon_short_logmap"
+      ],
+      "target_paths": [
+        "rust/rei_microphysics/src/axbi_background.rs",
+        "rust/rei_microphysics/src/axbi_driver.rs"
+      ],
+      "change": "Add a source-native local interval callback (positive dt and signed db from actual rounded a0,a1 using log1p and direct physical GL4/GL8 quadrature). Reuse frozen endpoint/midpoint background/geometry and per-ray quantities within each trial; first exact-query caching may preserve existing numerical values. Replace accumulated-time subtraction only under an explicitly rebound numerical contract.",
+      "prerequisites": [
+        "Same central scenario/cosmology/reference epoch and q family; no BASS runtime checkout dependency",
+        "Explicit dt=seconds, db dimensionless, physical H and shear source identity",
+        "Finite local quadrature/panel bound and domain rejection; no tolerance widening",
+        "Targeted changed-seam comparison to original source-owned increments (including actual adjacent binary64 endpoints), zero/signed shear and conservation controls; do not rerun unchanged whole experiments"
+      ],
+      "claim": "Numerical/algorithmic change with future independent scoped review; no production performance or science PASS issued here."
+    },
+    {
+      "priority": 2,
+      "id": "PRESERVE_SOURCE_NATIVE_COLD_EVENTS",
+      "source_prs": [
+        128,
+        130,
+        138
+      ],
+      "target_paths": [
+        "rust/rei_microphysics/src/axbi_driver.rs",
+        "rust/rei_microphysics/src/axbi_rates.rs"
+      ],
+      "change": "Retain full cold native provider and existing common absorption/heat ownership. Use C10 scalar events and C11 analytic capture chain as independent local controls, and C13 native source N/U/proper-conversion checks. Do not port its incomplete warm chemistry as production.",
+      "prerequisites": [
+        "Physical point model/domain parity with central igm_point_rhs",
+        "Any alternative midpoint/exponential/splitting method is a separate numerical method, not a mechanical same-solver speedup",
+        "No silent angular/state clipping copied from Python prototypes"
+      ]
+    },
+    {
+      "priority": 3,
+      "id": "OPEN_SOURCE_ENERGY_AND_WORK_DIAGNOSTICS",
+      "source_prs": [
+        143,
+        149
+      ],
+      "target_paths": [
+        "rust/rei_microphysics/src/axbi_driver.rs",
+        "research/axbi_goal_20261014/convergence/"
+      ],
+      "change": "Use saved central state/ledgers for photon+thermal+binding+escape+work-source diagnostics and, when needed, actual escape-energy birth records. Avoid embedding C16's duplicate DOP853 shadow solve in production. Optional escaped angular cone remains fixed-background sensitivity, with unknown emitted spectrum/count explicit.",
+      "prerequisites": [
+        "Do not double-count existing source_u, escaped_u, thermal_work/photon_work, cmb_input or boundary_u owners",
+        "Map central signed Sigma_s=s/H to research Sigma_mag=sqrt(3)*abs(s)/H and carry separate sign; q_ref=s_ref/H_FLRW(a_ref) remains distinct",
+        "Open emissivity/escape reservoirs do not supply a full Einstein stellar EOS or total Tmunu closure"
+      ]
+    },
+    {
+      "priority": 4,
+      "id": "DEFER_COMPRESSION_AND_MASSIVE_COLLISIONS",
+      "source_prs": [
+        138,
+        145,
+        148
+      ],
+      "change": "C13 positive coalescence, PR145 massive canonical FV and PR148 conditional collision semigroup are separate later candidates. They are not prerequisites for a source-native FLRW cold H/He history.",
+      "prerequisites": [
+        "Compression needs real current plus holdout event/heat and threshold error controls, not only conserved low moments or old finite-test speedup",
+        "Massive replacement needs declared density/EOS/background model choice",
+        "Collisions need an actual sourced microscopic rate and evolving partner gas energy/momentum owner; otherwise keep massive relic collisionless"
+      ]
+    }
+  ],
+  "policy_classification": {
+    "old_non_native_policy": "CLAUDE says canonical active numerical implementation is Rust and old archived Python commands are historical. This does not block reading new Python research mathematics or a user-authorized Rust production integration.",
+    "minimal_policy_correction": "Keep Rust canonical production and existing scientific scope. If active handoff text calls every production mutation unauthorized or new Python research unusable, amend that narrow stale wording to reflect current user authorization, exact source-native integration owner and preserved admission gates; do not reinterpret old receipts or rewrite old sources.",
+    "real_prerequisites": [
+      "Provider domain and full event/thermal model",
+      "Clock/geometry unit and sign convention",
+      "Conservation and photon/source ownership",
+      "Numerical method and convergence under changed code",
+      "Unknown escape spectrum/stellar Einstein closure only when making that stronger claim"
+    ],
+    "not_prerequisites": [
+      "All branch merges",
+      "All five supplier actor availability",
+      "New massive collision physics",
+      "Warm PCHIP cold extrapolation",
+      "Full Einstein/CMB/observer completion for initial FLRW conditional abundance production",
+      "Repeating unchanged science or resetting old budget exceptions"
+    ]
+  },
+  "conclusion": "Adopt the small direct-interval clock/shared-geometry Rust delta first; retain existing full cold chemistry and source. Reuse local independent event and open-source work controls. Keep stronger moment/Einstein/collision branches explicitly optional until their physical owners and target claim require them.",
+  "admission": "NO_NEW_SCIENTIFIC_ADMISSION",
+  "local_source_readback": {
+    "heads_checked": 8,
+    "all_head_matches": true,
+    "source_files_checked": 33,
+    "all_blob_matches": true,
+    "method": "read-only git rev-parse/show at exact source SHA; no scientific calculations, tests or runs"
+  }
+}

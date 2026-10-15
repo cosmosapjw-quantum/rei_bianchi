@@ -99,10 +99,14 @@ scientific claim and needs owner/Astra decision per `AGENTS.md`.
 
 Read order for current state: `handoff/CURRENT_HANDOFF_PROMPT.md` →
 `PROJECT_STATE.json` → `docs/science/current_00_READ_FIRST.md` →
-`docs/provenance/DURABLE_STAGE_LEDGER.csv`. Current claim boundary: one
-certified FLRW thermochemistry microstep; production node chemistry, `R2C-R2`,
-`B2C2B`, recombination splice, CAMB transfer, and Bianchi feedback remain
-unauthorized.
+`docs/provenance/DURABLE_STAGE_LEDGER.csv`. Historical admitted claim boundary: one certified FLRW thermochemistry
+microstep. The latest 2026-10-15 owner instruction authorizes production Rust
+edits, controlled runs, and source-native cross-repository integration.
+Scientific admission remains evidence- and scope-bound: this authorization
+does not itself certify production node chemistry, `R2C-R2`, `B2C2B`,
+recombination splice, CAMB transfer, or Bianchi feedback. Read
+`research/flrw_production_integration_20261015/HANDOFF.json` for current
+execution and unresolved representation limits; historical receipts are unchanged.
 
 Active "fastest-track" work (FLRW/Bianchi-I paired histories, task cards
 `REI-F0x`) lives in `docs/atomic_reionization_handoff_20261004_v1/`
