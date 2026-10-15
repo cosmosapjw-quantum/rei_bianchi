@@ -1,0 +1,493 @@
+diff --git a/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016/c16b_native_parity.rs b/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016/c16b_native_parity.rs
+new file mode 100644
+index 0000000..9430c97
+--- /dev/null
++++ b/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016/c16b_native_parity.rs
+@@ -0,0 +1,252 @@
++//! Frozen fixed-opacity point comparator. No chemistry integration.
++use rei_microphysics::axbi_covariant_transport::{CovariantTransport, FIT_THRESHOLDS_EV};
++use rei_microphysics::axbi_sources::{AngularCell, AxbiSource};
++use rei_microphysics::igm_rates::{igm_rates, IgmRates};
++use rei_microphysics::igm_state::IgmGasState;
++use rei_microphysics::igm_thermal::{igm_point_rhs, IgmPhotoInput, IgmPointRhs};
++use rei_microphysics::{Absorber, AtomicProvider, GeometrySnapshot, HHeModel};
++use std::fmt::Write;
++fn field<T: std::fmt::Debug>(s: &mut String, k: &str, v: T) {
++    if s.len() > 1 {
++        s.push(',');
++    }
++    write!(s, "\"{}\":{:?}", k, v).unwrap();
++}
++fn rhs_json(v: &IgmPointRhs) -> String {
++    let mut s = String::from("{");
++    field(&mut s, "fraction_dt", v.fraction_dt);
++    field(&mut s, "species_chemical_cm3_s", v.species_chemical_cm3_s);
++    field(&mut s, "w_dt_erg_per_h_s", v.w_dt_erg_per_h_s);
++    field(&mut s, "temperature_dt_k_s", v.temperature_dt_k_s);
++    field(&mut s, "photo_events_cm3_s", v.photo_events_cm3_s);
++    field(&mut s, "ci_events_cm3_s", v.ci_events_cm3_s);
++    field(&mut s, "rr_events_cm3_s", v.rr_events_cm3_s);
++    field(&mut s, "dr_events_cm3_s", v.dr_events_cm3_s);
++    field(
++        &mut s,
++        "ci_thermal_sink_erg_cm3_s",
++        v.ci_thermal_sink_erg_cm3_s,
++    );
++    field(
++        &mut s,
++        "rr_thermal_sink_erg_cm3_s",
++        v.rr_thermal_sink_erg_cm3_s,
++    );
++    field(
++        &mut s,
++        "dr_thermal_sink_erg_cm3_s",
++        v.dr_thermal_sink_erg_cm3_s,
++    );
++    field(
++        &mut s,
++        "ce_thermal_sink_erg_cm3_s",
++        v.ce_thermal_sink_erg_cm3_s,
++    );
++    field(
++        &mut s,
++        "freefree_thermal_sink_erg_cm3_s",
++        v.freefree_thermal_sink_erg_cm3_s,
++    );
++    field(&mut s, "thermal_micro_erg_cm3_s", v.thermal_micro_erg_cm3_s);
++    field(&mut s, "binding_micro_erg_cm3_s", v.binding_micro_erg_cm3_s);
++    field(&mut s, "escape_erg_cm3_s", v.escape_erg_cm3_s);
++    field(&mut s, "cmb_to_gas_erg_cm3_s", v.cmb_to_gas_erg_cm3_s);
++    field(&mut s, "photo_input_erg_cm3_s", v.photo_input_erg_cm3_s);
++    field(
++        &mut s,
++        "expansion_work_erg_cm3_s",
++        v.expansion_work_erg_cm3_s,
++    );
++    field(&mut s, "ci_floor_events_cm3_s", v.ci_floor_events_cm3_s);
++    field(
++        &mut s,
++        "ce_cap_cooling_erg_cm3_s",
++        v.ce_cap_cooling_erg_cm3_s,
++    );
++    field(
++        &mut s,
++        "excluded_dr_cooling_erg_cm3_s",
++        v.excluded_dr_cooling_erg_cm3_s,
++    );
++    s.push('}');
++    s
++}
++fn rates_json(v: &IgmRates) -> String {
++    let mut s = String::from("{");
++    field(&mut s, "ci_cm3_s", v.ci_cm3_s);
++    field(&mut s, "rr_cm3_s", v.rr_cm3_s);
++    field(&mut s, "dr_cm3_s", v.dr_cm3_s);
++    field(&mut s, "ce_erg", v.ce_erg);
++    field(&mut s, "rr_cooling_erg_cm3_s", v.rr_cooling_erg_cm3_s);
++    field(&mut s, "dr_cooling_erg_cm3_s", v.dr_cooling_erg_cm3_s);
++    field(
++        &mut s,
++        "dr_raw_cooling_erg_cm3_s",
++        v.dr_raw_cooling_erg_cm3_s,
++    );
++    field(&mut s, "freefree_erg_cm3_s", v.freefree_erg_cm3_s);
++    field(&mut s, "ci_floor_cm3_s", v.diagnostics.ci_floor_cm3_s);
++    field(&mut s, "ce_cap_erg", v.diagnostics.ce_cap_erg);
++    field(
++        &mut s,
++        "dr_excluded_erg_cm3_s",
++        v.diagnostics.dr_excluded_erg_cm3_s,
++    );
++    field(&mut s, "dr_low_branch", v.diagnostics.dr_low_branch);
++    s.push('}');
++    s
++}
++
++fn run(id: &str, q: &[f64], counts: &[f64], b: f64, dt: f64, t: f64, tcmb: f64, yhe: f64) {
++    let nh = 0.01;
++    let f = [0.31, 0.23, 0.17];
++    let mus = [0.0, 0.37, -0.81];
++    let reference = GeometrySnapshot::new([1.0; 3], [0.0; 3]).unwrap();
++    let now = GeometrySnapshot::new([(-b).exp(), (-b).exp(), (2.0 * b).exp()], [0.0; 3]).unwrap();
++    let mut source = AxbiSource::new(nh, 0.1, 16, 8).unwrap();
++    source.angular_cells = mus
++        .iter()
++        .map(|&mu| AngularCell {
++            mu,
++            count_fraction: 1.0 / 3.0,
++        })
++        .collect();
++    let tr = CovariantTransport::new(&source, reference, 1, 10.0, 100.0).unwrap();
++    let mut input = tr.empty_state();
++    for i in 0..q.len() {
++        tr.add_delta(&mut input, i, q[i], counts[i]).unwrap();
++    }
++    let gas = IgmGasState::from_temperature(f, nh, nh * yhe, t).unwrap();
++    let eos = gas.eos(nh, nh * yhe).unwrap();
++    let abs = [
++        nh * (1.0 - f[0]),
++        nh * yhe * (1.0 - (f[1] + f[2])),
++        nh * yhe * f[1],
++    ];
++    let prep = tr.prepare(&input, &now).unwrap();
++    let result = prep.evaluate(abs, nh, dt).unwrap();
++    let on = igm_point_rhs(&gas, nh, nh * yhe, 0.0, tcmb, result.photo).unwrap();
++    let off = igm_point_rhs(&gas, nh, nh * yhe, 0.0, tcmb, IgmPhotoInput::default()).unwrap();
++    let rates = igm_rates(eos.temperature_k).unwrap();
++    let rays = tr.ray_geometry(&now).unwrap();
++    let energies: Vec<f64> = q
++        .iter()
++        .enumerate()
++        .map(|(i, v)| v * rays[i].scale)
++        .collect();
++    let species = [Absorber::HI, Absorber::HeI, Absorber::HeII];
++    let provider = AtomicProvider::reference();
++    let sigma: Vec<[f64; 3]> = energies
++        .iter()
++        .map(|&e| std::array::from_fn(|i| provider.cross_section(species[i], e).unwrap()))
++        .collect();
++    let active: Vec<[bool; 3]> = energies
++        .iter()
++        .map(|&e| std::array::from_fn(|i| e >= FIT_THRESHOLDS_EV[i]))
++        .collect();
++    let mut s = String::from("{");
++    field(&mut s, "id", id);
++    field(&mut s, "q_ev", q);
++    field(&mut s, "input_counts", counts);
++    field(&mut s, "mu0", &mus[..q.len()]);
++    field(&mut s, "a", 1.0);
++    field(&mut s, "b", b);
++    field(&mut s, "dt_s", dt);
++    field(&mut s, "nh", nh);
++    field(&mut s, "yhe", yhe);
++    field(&mut s, "h", 0.0);
++    field(&mut s, "requested_t", t);
++    field(&mut s, "tcmb", tcmb);
++    field(&mut s, "fractions", f);
++    field(&mut s, "w", gas.w_erg_per_h);
++    field(&mut s, "temperature", eos.temperature_k);
++    field(&mut s, "ne", eos.electron_density_cm3);
++    field(&mut s, "u", eos.u_erg_cm3);
++    field(&mut s, "absorbers_cm3", abs);
++    field(&mut s, "node_count", prep.node_count());
++    field(&mut s, "transport_workers", tr.transport_threads());
++    field(&mut s, "actual_energy_ev", energies);
++    field(&mut s, "sigma_cm2", sigma);
++    field(&mut s, "fit_active", active);
++    field(&mut s, "input_number_cells", input.number);
++    field(&mut s, "input_energy_ref_cells", input.energy_ref);
++    field(&mut s, "survivors_cells", result.state.number);
++    field(&mut s, "survivor_energy_ref_cells", result.state.energy_ref);
++    field(&mut s, "gamma_s", result.photo.gamma_s);
++    field(
++        &mut s,
++        "heat_erg_per_absorber_s",
++        result.photo.heat_erg_per_absorber_s,
++    );
++    field(&mut s, "absorbed_per_h", result.absorbed_per_h);
++    field(&mut s, "binding_ev_per_h", result.binding_ev_per_h);
++    field(&mut s, "heat_ev_per_h", result.heat_ev_per_h);
++    let constants = HHeModel::controlled_fixture();
++    field(&mut s, "kb_erg_k", constants.kb_erg_k);
++    field(&mut s, "ev_erg", constants.ev_erg);
++    field(&mut s, "c_cm_s", constants.c_cm_s);
++    field(&mut s, "chi_ev", constants.threshold_ev);
++    write!(
++        s,
++        ",\"on\":{},\"off\":{},\"rates\":{}",
++        rhs_json(&on),
++        rhs_json(&off),
++        rates_json(&rates)
++    )
++    .unwrap();
++    s.push('}');
++    println!("{}", s);
++}
++fn main() {
++    // Frozen case matrix: adjacent binary64 thresholds; exact equality at b=0.
++    for (i, &e) in FIT_THRESHOLDS_EV.iter().enumerate() {
++        for (name, q) in [
++            ("below", f64::from_bits(e.to_bits() - 1)),
++            ("equal", e),
++            ("above", f64::from_bits(e.to_bits() + 1)),
++        ] {
++            for dt in [0.0, 1e9] {
++                run(
++                    &format!("threshold{}_{}_dt{}", i, name, dt),
++                    &[q],
++                    &[0.013],
++                    0.0,
++                    dt,
++                    1e4,
++                    30.0,
++                    0.083,
++                );
++            }
++        }
++    }
++    for b in [0.0, 0.1, -0.1] {
++        for t in [100.0, 1e4, 1e5] {
++            for dt in [0.0, 1e9, 1e16] {
++                let tcmb = if t == 100.0 { 300.0 } else { 30.0 };
++                run(
++                    &format!("mixed_b{}_T{}_dt{}", b, t, dt),
++                    &[20.0, 40.0, 80.0],
++                    &[0.013, 0.007, 0.003],
++                    b,
++                    dt,
++                    t,
++                    tcmb,
++                    0.083,
++                );
++            }
++        }
++    }
++    for dt in [0.0, 1e9] {
++        run(
++            &format!("no_helium_dt{}", dt),
++            &[20.0, 40.0, 80.0],
++            &[0.013, 0.007, 0.003],
++            0.1,
++            dt,
++            1e4,
++            30.0,
++            0.0,
++        );
++    }
++    run("empty_photons", &[], &[], 0.0, 1e9, 1e4, 30.0, 0.083);
++}
+diff --git a/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016/compare_native.py b/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016/compare_native.py
+new file mode 100644
+index 0000000..b664c0b
+--- /dev/null
++++ b/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016/compare_native.py
+@@ -0,0 +1,142 @@
++#!/usr/bin/env python3
++"""Frozen native point contract; Python survivor/photo calculation is independent."""
++import argparse, importlib.util, json, math, sys
++from pathlib import Path
++
++HERE=Path(__file__).resolve().parent
++REF=HERE.parent/'rei_c16b_thermal_bridge_20261016'
++# Explicit source_aware binding, rather than an ambient module search.
++spec=importlib.util.spec_from_file_location('source_aware',REF/'source_aware.py')
++src=importlib.util.module_from_spec(spec);sys.modules['source_aware']=src;spec.loader.exec_module(src)
++spec=importlib.util.spec_from_file_location('native_photo_contract',REF/'src/native_photo_contract.py')
++photo_module=importlib.util.module_from_spec(spec);sys.modules[spec.name]=photo_module;spec.loader.exec_module(photo_module)
++EPS=2**-52; RTOL=1e-12; EV=1.602176634e-12
++checks=[]; independent=[]
++def add(case,name,ok,**kw):
++    checks.append(dict(case=case,check=name,pass_check=bool(ok),**kw))
++def relative(case,name,native,reference):
++    scale=max(abs(native),abs(reference))
++    err=abs(native-reference)
++    add(case,name,err<=RTOL*scale if scale else err==0,kind='positive_relative' if scale else 'exact_zero',native=native,reference=reference,relative_error=err/scale if scale else 0.)
++def identity(case,name,terms):
++    residual=math.fsum(terms); gross=math.fsum(map(abs,terms)); bound=128*EPS*gross
++    add(case,name,abs(residual)<=bound if gross else residual==0,kind='cancellation',residual=residual,gross_scale=gross,roundoff_bound=bound,normalized_residual=abs(residual)/bound if bound else 0.)
++def exact(case,name,native,reference):
++    add(case,name,native==reference,kind='exact',native=native,reference=reference)
++def evaluate(row):
++    c=row['id']; nh=row['nh']; yy=row['yhe']; x,y,z=row['fractions']; dt=row['dt_s']
++    gas=src.Gas(1-x,x,yy*(1-(y+z)),yy*y,yy*z)
++    initial=[src.Node(q,mu,n) for q,mu,n in zip(row['q_ev'],row['mu0'],row['input_counts'])]
++    energies=[src.physical_energy(p,row['a'],row['b']) for p in initial]
++    absorber=(gas.h_i,gas.he_i,gas.he_ii)
++    sigmas=[[src.verner_mb(i,e)*src.MB_CM2 for i in range(3)] for e in energies]
++    kappa=[math.fsum(nh*a*s for a,s in zip(absorber,sigma)) for sigma in sigmas]
++    exposures=[dt*src.C_CM_S*k for k in kappa]
++    survivor=[p.n_per_h/(1+expo) for p,expo in zip(initial,exposures)]
++    state=src.State(tuple(src.Node(p.q_ev,p.mu0,n) for p,n in zip(initial,survivor)),gas,row['a'],row['b'])
++    photo=photo_module.photo_point(state,nh)
++    expected_events=[dt*a*g for a,g in zip(absorber,photo.gamma_s)]
++    expected_bind=math.fsum(a*chi for a,chi in zip(expected_events,src.CHI_EV))
++    expected_heat=math.fsum(dt*a*h/EV for a,h in zip(absorber,photo.heat_erg_per_absorber_s))
++    independent.append(dict(id=c,dt_s=dt,energies_ev=energies,sigma_cm2=sigmas,kappa_cm1=kappa,exposures=exposures,survivors=survivor,gamma_s=photo.gamma_s,heat_erg_per_absorber_s=photo.heat_erg_per_absorber_s,events_per_h=expected_events,binding_ev_per_h=expected_bind,heat_ev_per_h=expected_heat))
++    exact(c,'node_count',row['node_count'],len(initial)); exact(c,'single_transport_worker',row['transport_workers'],1)
++    for i,e in enumerate(energies):
++        relative(c,f'geometry_energy[{i}]',row['actual_energy_ev'][i],e)
++        for a in range(3):
++            relative(c,f'sigma[{i},{a}]',row['sigma_cm2'][i][a],sigmas[i][a])
++            exact(c,f'fit_branch[{i},{a}]',row['fit_active'][i][a],e>=src.VERNER_ROWS[a][0])
++    if c.startswith('threshold') and '_equal_' in c:
++        a=int(c[len('threshold')]); exact(c,'threshold_exact_energy',row['actual_energy_ev'][0],src.VERNER_ROWS[a][0])
++        add(c,'threshold_equal_positive_heat',row['heat_erg_per_absorber_s'][a]>0,kind='condition')
++    for i,(native,ref) in enumerate(zip(row['survivors_cells'],survivor+[0.]*(3-len(survivor)))):
++        relative(c,f'survivor[{i}]',native,ref)
++        if i<len(initial): relative(c,f'survivor_energy_ref[{i}]',row['survivor_energy_ref_cells'][i],initial[i].q_ev*survivor[i])
++    for i in range(3):
++        relative(c,f'gamma[{i}]',row['gamma_s'][i],photo.gamma_s[i])
++        relative(c,f'heat[{i}]',row['heat_erg_per_absorber_s'][i],photo.heat_erg_per_absorber_s[i])
++        relative(c,f'absorbed[{i}]',row['absorbed_per_h'][i],expected_events[i])
++        relative(c,f'absorber[{i}]',row['absorbers_cm3'][i],nh*absorber[i])
++    relative(c,'binding_absorbed',row['binding_ev_per_h'],expected_bind)
++    relative(c,'heat_absorbed',row['heat_ev_per_h'],expected_heat)
++    sink_terms=[term for n,s in zip(row['input_number_cells'],row['survivors_cells']) for term in (n,-s)]
++    identity(c,'photon_sink',sink_terms+[-v for v in row['absorbed_per_h']])
++    # The participating subtraction operands define the cancellation scale.
++    energy_operands=[]
++    for i,e in enumerate(row['actual_energy_ev']):energy_operands += [e*row['input_counts'][i],-e*row['survivors_cells'][i]]
++    identity(c,'photon_energy_ledger',energy_operands+[-row['binding_ev_per_h'],-row['heat_ev_per_h']])
++    on=row['on']; off=row['off']; chi=src.CHI_EV
++    for label,rhs in [('on',on),('off',off)]:
++        d=rhs['species_chemical_cm3_s']; events=rhs['photo_events_cm3_s']
++        identity(c,label+'_H',d[:2]);identity(c,label+'_He',d[2:5]);identity(c,label+'_charge',[d[5],-d[1],-d[3],-2*d[4]])
++        identity(c,label+'_micro_energy',[rhs['thermal_micro_erg_cm3_s'],rhs['binding_micro_erg_cm3_s'],rhs['escape_erg_cm3_s'],-rhs['cmb_to_gas_erg_cm3_s'],-rhs['photo_input_erg_cm3_s']])
++        identity(c,label+'_binding_from_species',[EV*chi[0]*d[1],EV*chi[1]*d[3],EV*chi[1]*d[4],EV*chi[2]*d[4],-rhs['binding_micro_erg_cm3_s']])
++        identity(c,label+'_w_from_thermal',[nh*rhs['w_dt_erg_per_h_s'],-rhs['thermal_micro_erg_cm3_s']])
++        particles=nh+nh*yy+row['ne']; temp=row['temperature']; kb=row['kb_erg_k']
++        identity(c,label+'_dT_EOS',[rhs['temperature_dt_k_s'], -2*nh*rhs['w_dt_erg_per_h_s']/(3*kb*particles),temp*d[5]/particles])
++        for i,j,denom in [(0,1,nh),(1,3,nh*yy),(2,4,nh*yy)]:
++            if denom:identity(c,f'{label}_fraction[{i}]',[rhs['fraction_dt'][i],-d[j]/denom])
++            else:exact(c,f'{label}_noHe_fraction[{i}]',rhs['fraction_dt'][i],0.)
++        # Exported native process decomposition independently recomposes each owner.
++        photoheat=math.fsum(row['absorbers_cm3'][i]*row['heat_erg_per_absorber_s'][i] for i in range(3)) if label=='on' else 0.
++        phbind=[EV*chi[i]*events[i] for i in range(3)]
++        ci=rhs['ci_thermal_sink_erg_cm3_s']; rr=rhs['rr_thermal_sink_erg_cm3_s']; dr=rhs['dr_thermal_sink_erg_cm3_s']; ce=rhs['ce_thermal_sink_erg_cm3_s']; ff=rhs['freefree_thermal_sink_erg_cm3_s']
++        identity(c,label+'_thermal_owners',[rhs['thermal_micro_erg_cm3_s'],-photoheat,*ci,*rr,dr,*ce,ff,-rhs['cmb_to_gas_erg_cm3_s']])
++        capture=[EV*chi[i]*rhs['rr_events_cm3_s'][i] for i in range(3)]+[EV*chi[1]*rhs['dr_events_cm3_s']]
++        identity(c,label+'_binding_owners',[rhs['binding_micro_erg_cm3_s'],*[-v for v in phbind],*[-v for v in ci],*capture])
++        identity(c,label+'_escape_owners',[rhs['escape_erg_cm3_s'],*[-v for v in capture],*[-v for v in rr],-dr,*[-v for v in ce],-ff])
++    for i in range(3):relative(c,f'event_from_native_rhs[{i}]',row['absorbed_per_h'][i],dt*on['photo_events_cm3_s'][i]/nh)
++    identity(c,'photon_energy_rhs',energy_operands+[-dt*on['photo_input_erg_cm3_s']/(nh*EV)])
++    pe=on['photo_events_cm3_s']; stoich=[[-pe[0]],[pe[0]],[-pe[1]],[pe[1],-pe[2]],[pe[2]],[pe[0],pe[1],pe[2]]]
++    for j in range(6):identity(c,f'on_off_species[{j}]',[on['species_chemical_cm3_s'][j],-off['species_chemical_cm3_s'][j],*[-v for v in stoich[j]]])
++    phheat=[row['absorbers_cm3'][i]*row['heat_erg_per_absorber_s'][i] for i in range(3)]
++    phbind=[EV*chi[i]*pe[i] for i in range(3)]
++    for key,terms in [('thermal_micro_erg_cm3_s',phheat),('binding_micro_erg_cm3_s',phbind),('photo_input_erg_cm3_s',phheat+phbind)]:
++        identity(c,'on_off_'+key,[on[key],-off[key],*[-v for v in terms]])
++    identical=['ci_events_cm3_s','rr_events_cm3_s','dr_events_cm3_s','ci_thermal_sink_erg_cm3_s','rr_thermal_sink_erg_cm3_s','dr_thermal_sink_erg_cm3_s','ce_thermal_sink_erg_cm3_s','freefree_thermal_sink_erg_cm3_s','escape_erg_cm3_s','cmb_to_gas_erg_cm3_s','expansion_work_erg_cm3_s','ci_floor_events_cm3_s','ce_cap_cooling_erg_cm3_s','excluded_dr_cooling_erg_cm3_s']
++    for key in identical:exact(c,'on_off_identical_'+key,on[key],off[key])
++    relative(c,'EOS_ne',row['ne'],nh*x+nh*yy*(y+2*z))
++    relative(c,'EOS_temperature',row['temperature'],2*nh*row['w']/(3*row['kb_erg_k']*(nh+nh*yy+row['ne'])))
++    relative(c,'EOS_u',row['u'],nh*row['w'])
++    rates=row['rates']; ne=row['ne']; ions=[nh*x,nh*yy*y,nh*yy*z]
++    for i in range(3):
++        relative(c,f'CI_rate_event[{i}]',on['ci_events_cm3_s'][i],ne*row['absorbers_cm3'][i]*rates['ci_cm3_s'][i])
++        relative(c,f'RR_rate_event[{i}]',on['rr_events_cm3_s'][i],ne*ions[i]*rates['rr_cm3_s'][i])
++    relative(c,'DR_rate_event',on['dr_events_cm3_s'],ne*ions[1]*rates['dr_cm3_s'])
++    if dt==1e16:add(c,'stiff_exposure',max(exposures)>=1e6 and all(v>0 for v in survivor),kind='condition',maximum_exposure=max(exposures))
++
++def main():
++    parser=argparse.ArgumentParser();parser.add_argument('raw',type=Path);parser.add_argument('--out',type=Path,default=HERE/'evidence/native');args=parser.parse_args()
++    args.out.mkdir(parents=True,exist_ok=True)
++    rows=[json.loads(line) for line in args.raw.read_text().splitlines() if line]
++    for row in rows:evaluate(row)
++    exact('matrix','case_count',len(rows),48)
++    # Representative active native owners and both signs, no demand on each case.
++    for name,test in [('RR',lambda r:any(v>0 for v in r['on']['rr_events_cm3_s'])),('CI',lambda r:any(v>0 for v in r['on']['ci_events_cm3_s'])),('DR_high',lambda r:r['on']['dr_events_cm3_s']>0),('DR_low',lambda r:r['rates']['dr_low_branch'] and r['on']['dr_events_cm3_s']==0),('CE',lambda r:any(v>0 for v in r['on']['ce_thermal_sink_erg_cm3_s'])),('freefree',lambda r:r['on']['freefree_thermal_sink_erg_cm3_s']>0),('CI_floor',lambda r:any(v>0 for v in r['on']['ci_floor_events_cm3_s'])),('CE_cap',lambda r:any(v>0 for v in r['on']['ce_cap_cooling_erg_cm3_s'])),('CMB_heating',lambda r:r['on']['cmb_to_gas_erg_cm3_s']>0),('CMB_cooling',lambda r:r['on']['cmb_to_gas_erg_cm3_s']<0)]:
++        hits=[r['id'] for r in rows if test(r)];add('matrix','representative_'+name,bool(hits),kind='coverage',cases=hits)
++    nonstiff=[max(v['exposures']) for v in independent if v['id'].startswith('mixed_b0_T10000_') and v['dt_s']==1e9]
++    add('matrix','nonstiff_exposure',bool(nonstiff) and all(.1<=v<=1 for v in nonstiff),kind='condition',exposures=nonstiff)
++    failures=[v for v in checks if not v['pass_check']]
++    relative_checks=[v for v in checks if v['kind']=='positive_relative']; cancellations=[v for v in checks if v['kind']=='cancellation']
++    summary=dict(status='PASS' if not failures else 'HOLD',cases=len(rows),checks=len(checks),failures=len(failures),relative_tolerance=RTOL,cancellation_factor_eps=128,max_positive_relative_error=max(v['relative_error'] for v in relative_checks),exact_zero_comparisons=sum(v['kind']=='exact_zero' for v in checks),max_cancellation_normalized_residual=max(v['normalized_residual'] for v in cancellations),claim_ceiling='native point photo parity and energy ownership with fixed-opacity finite-dt absorption',independent_python_source=str(REF/'source_aware.py'))
++    species_summary={}
++    for quantity in ['gamma','heat']:
++        entries=[]
++        for i,species in enumerate(src.SPECIES):
++            selected=[v for v in checks if v['check']==f'{quantity}[{i}]']
++            nonzero=[v for v in selected if v['kind']=='positive_relative']
++            entries.append(dict(species=species,unit='s^-1 per absorber' if quantity=='gamma' else 'erg per absorber s^-1',max_absolute_error=max(abs(v['native']-v['reference']) for v in selected),max_relative_error=max((v['relative_error'] for v in nonzero),default=0.),nonzero_comparisons=len(nonzero),exact_zero_comparisons=len(selected)-len(nonzero)))
++        species_summary[quantity]=entries
++    summary['photo_component_errors']=species_summary
++    groups=[('hydrogen','cm^-3 s^-1',lambda n:n.endswith('_H')),('helium','cm^-3 s^-1',lambda n:n.endswith('_He')),('charge','cm^-3 s^-1',lambda n:n.endswith('_charge')),('photon_number','per H',lambda n:n=='photon_sink'),('photon_energy','eV per H',lambda n:n in ['photon_energy_ledger','photon_energy_rhs']),('micro_energy_including_signed_CMB','erg cm^-3 s^-1',lambda n:n.endswith('_micro_energy')),('binding_from_species','erg cm^-3 s^-1',lambda n:n.endswith('_binding_from_species')),('temperature_EOS','K s^-1',lambda n:n.endswith('_dT_EOS'))]
++    summary['residual_maxima']={}
++    for label,unit,predicate in groups:
++        selected=[v for v in cancellations if predicate(v['check'])]
++        raw=max(selected,key=lambda v:abs(v['residual'])); normalized=max(selected,key=lambda v:v['normalized_residual'])
++        summary['residual_maxima'][label]=dict(unit=unit,max_absolute_residual=abs(raw['residual']),signed_residual_at_max=raw['residual'],gross_scale_at_max=raw['gross_scale'],roundoff_bound_at_max=raw['roundoff_bound'],case_at_max=raw['case'],check_at_max=raw['check'],max_normalized_residual=normalized['normalized_residual'],case_at_max_normalized=normalized['case'])
++    summary['CMB_exchange']=dict(unit='erg cm^-3 s^-1',minimum_into_gas=min(r['on']['cmb_to_gas_erg_cm3_s'] for r in rows),maximum_into_gas=max(r['on']['cmb_to_gas_erg_cm3_s'] for r in rows),reservoir_sign='negative of native cmb_to_gas',ledger_group='micro_energy_including_signed_CMB')
++    for name,value in [('checks.json',checks),('independent_python.json',independent),('summary.json',summary),('first_failures.json',failures)]:
++        dest=args.out/name
++        if name=='first_failures.json' and dest.exists():dest=args.out/'latest_failures.json'
++        dest.write_text(json.dumps(value,indent=2,allow_nan=False)+'\n')
++    print(json.dumps(summary,indent=2));return 0 if not failures else 1
++if __name__=='__main__':sys.exit(main())
+diff --git a/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016/run_native.sh b/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016/run_native.sh
+new file mode 100755
+index 0000000..c17c990
+--- /dev/null
++++ b/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016/run_native.sh
+@@ -0,0 +1,52 @@
++#!/usr/bin/env bash
++set -u
++here=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
++repo=$(cd "$here/../.." && pwd)
++root=$(cd "$repo/.." && pwd)
++crate="$root/native/rust/rei_microphysics"
++py="$root/venv/bin/python"
++evidence="$here/evidence/native"
++mkdir -p "$evidence"
++export CARGO_BUILD_JOBS=2 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
++ulimit -v 8388608
++# Immutable source bytes bind the complete tracked crate, not only called modules.
++"$py" - "$repo" "$crate" "$here" "$evidence" <<'PY'
++import hashlib,json,subprocess,sys
++from pathlib import Path
++repo,crate,here,out=map(Path,sys.argv[1:])
++commit='0e25846433170d0f420c4cda44a0bedbf02cd177';prefix='rust/rei_microphysics/'
++paths=subprocess.check_output(['git','-C',str(repo),'ls-tree','-r','--name-only',commit,prefix],text=True).splitlines()
++rows=[]
++for path in paths:
++    expected=subprocess.check_output(['git','-C',str(repo),'show',f'{commit}:{path}'])
++    target=crate/path.removeprefix(prefix)
++    actual=target.read_bytes() if target.exists() else None
++    rows.append(dict(path=path,sha256=hashlib.sha256(expected).hexdigest(),byte_equal=actual==expected))
++identical=(here/'c16b_native_parity.rs').read_bytes()==(crate/'examples/c16b_native_parity.rs').read_bytes()
++result=dict(native_commit=commit,research_base='f8f26710e3961609acf4d7e7930bc7b2a95bd39c',actual_research_head=subprocess.check_output(['git','-C',str(repo),'rev-parse','HEAD'],text=True).strip(),tracked_crate_files=rows,example_copies_identical=identical)
++(out/'source_identity.json').write_text(json.dumps(result,indent=2)+'\n')
++assert paths and all(r['byte_equal'] for r in rows) and identical, 'immutable source/copy byte mismatch'
++PY
++identity_exit=$?
++printf 'identity=%s\n' "$identity_exit" > "$evidence/exits.txt"
++if [ "$identity_exit" -ne 0 ]; then exit "$identity_exit"; fi
++printf '%s\n' "CARGO_BUILD_JOBS=2 cargo build --release --manifest-path $crate/Cargo.toml --example c16b_native_parity -j 2" "timeout 300s $crate/target/release/examples/c16b_native_parity" "timeout 300s $py $here/compare_native.py $evidence/native_points.jsonl --out $evidence" > "$evidence/invocation.txt"
++/usr/bin/time -v -o "$evidence/build.time" cargo build --release --manifest-path "$crate/Cargo.toml" --example c16b_native_parity -j 2 > "$evidence/build.log" 2>&1
++build_exit=$?
++printf 'build=%s\n' "$build_exit" >> "$evidence/exits.txt"
++if [ "$build_exit" -ne 0 ]; then exit "$build_exit"; fi
++/usr/bin/time -v -o "$evidence/native.time" timeout 300s "$crate/target/release/examples/c16b_native_parity" > "$evidence/native_points.jsonl" 2> "$evidence/native.stderr"
++native_exit=$?
++printf 'native=%s\n' "$native_exit" >> "$evidence/exits.txt"
++if [ "$native_exit" -ne 0 ]; then exit "$native_exit"; fi
++/usr/bin/time -v -o "$evidence/comparator.time" timeout 300s "$py" "$here/compare_native.py" "$evidence/native_points.jsonl" --out "$evidence" > "$evidence/comparator.stdout" 2> "$evidence/comparator.stderr"
++compare_exit=$?
++printf 'compare=%s\n' "$compare_exit" >> "$evidence/exits.txt"
++"$py" - "$here" "$evidence" <<'PY'
++import hashlib,json,sys
++from pathlib import Path
++here,out=map(Path,sys.argv[1:]); paths=[here/'c16b_native_parity.rs',here/'compare_native.py',here/'run_native.sh',out/'native_points.jsonl',out/'checks.json',out/'summary.json']
++(out/'artifact_hashes.json').write_text(json.dumps({str(p.relative_to(here)):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths if p.exists()},indent=2)+'\n')
++PY
++cat "$evidence/comparator.stdout"
++exit "$compare_exit"
+diff --git a/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016/README_KO.md b/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016/README_KO.md
+new file mode 100644
+index 0000000..2a7e242
+--- /dev/null
++++ b/root/REI_C16B_NATIVE_20261016/repo/research/rei_c16b_native_parity_20261016/README_KO.md
+@@ -0,0 +1,23 @@
++# C16B 원본 native 점 비교
++
++PR155 `f8f26710e3961609acf4d7e7930bc7b2a95bd39c` 연구 checkout과 PR150 `0e25846433170d0f420c4cda44a0bedbf02cd177` 원본 Rust를 비교한다. 기존 science source와 Cargo 의존성은 변경하지 않는다. 원본 `CovariantTransport::new/empty_state/add_delta/prepare`, `PreparedAbsorption::evaluate`, `AtomicProvider::reference`, `IgmGasState::from_temperature`, `igm_rates`, `igm_point_rhs`를 호출한다. `HHeModel::controlled_fixture`에서는 상수/EOS만 읽고 합성 반응 계수는 호출하지 않는다.
++
++실행 시 필요한 형제 디렉터리는 `TASK/repo`, `TASK/native/rust/rei_microphysics`, `TASK/venv`이다. `TASK/repo`는 위 PR155와 PR150 object를 모두 가진 Git checkout이어야 한다. 배포 ZIP의 `evidence/benchmark/input/native_PR150_0e258464_build_inputs.tar.gz`를 `TASK/native` 아래에 풀면 `rust/`, `research/`, `docs/`가 생긴다. crate 밖의 9개 `include_str!` 입력도 이 archive에 들어 있다. 연구 폴더의 `c16b_native_parity.rs`를 `TASK/native/rust/rei_microphysics/examples/c16b_native_parity.rs`에 복사한다. Python 가상환경은 `python3 -m venv TASK/venv`로 만들 수 있으며 이 비교기는 표준 라이브러리만 사용한다. 기존 C16B `source_aware.py`와 `src/native_photo_contract.py`도 원래 위치에 필요하다.
++
++```bash
++bash TASK/repo/research/rei_c16b_native_parity_20261016/run_native.sh
++```
++
++스크립트는 모든 tracked native crate 파일을 정확한 PR150 Git blob과 비교하고 Rust example 두 사본의 바이트 동일성을 확인한다. 빌드에는 `CARGO_BUILD_JOBS=2`, 실행에는 `timeout 300s`, 가상 메모리 한도 8 GiB, Python 관련 thread 한도 1을 적용한다. 각 단계의 원문 명령, exit code, `/usr/bin/time -v`, 원본 JSONL, 비교별 결과를 `evidence/native/`에 보존한다. 출력의 `source_identity.json`은 immutable source, `checks.json`은 수치 판정이다.
++
++48개 고정 사례는 fit threshold 3종의 바로 아래/동일/바로 위 binary64 값 × dt 0/1e9 s (18), 20/40/80 eV 비등량 스펙트럼 × b 0/+0.1/-0.1 × T 100/1e4/1e5 K × dt 0/1e9/1e16 s (27), He 없는 사례 dt 0/1e9 s (2), 빈 광자 제어 (1)이다. nH=0.01 cm^-3, Y=0.083 또는 0, native fractions=[0.31,0.23,0.17], N=[0.013,0.007,0.003] per H, reference mu=[0,0.37,-0.81], a=1, h=0이다. 100 K에서는 Tcmb=300 K, 나머지는 30 K이다. 서로 다른 delta는 서로 다른 ray에 배치한다. 원본 source 생성자의 스펙트럼 적분 격자는 입력 delta closure와 별도이며 광자를 주입하지 않는다.
++
++Python은 기존 source-locked `source_aware.py`를 명시적으로 import하고 그 Verner opacity로 survivor N/(1+dt*c*kappa)를 독립 계산한다. Rust 출력 survivor를 Python 입력으로 사용하지 않는다. Python survivor를 기존 `native_photo_contract.photo_point`에 넣어 Gamma/Heat를 계산한다. 양의 survivor/사건/에너지와 Gamma/Heat는 성분별 상대오차 1e-12, 해석적 영은 exact zero, conservation/ledger/on-minus-off 항등식은 실제 gross operands 기준 128*eps를 적용한다. 모든 native RHS/rates field와 EOS, 실제 광자 에너지, threshold branch, 흡수 ledger를 출력한다.
++
++범위는 고정 opacity의 유한 dt 흡수 및 native 점 photo/EOS/energy owner 대응이다. 큰 dt의 명시적 gas 갱신은 수행하지 않는다. 우주론적 history, 결합 적분기 수렴성, continuum 정확도, 물리 fit 정확도, 기존 합성 thermal bridge의 production 유효성은 이 실험에서 판정하지 않는다.
++
++실측 기계 검증: 48 사례, 4,905 checks 모두 PASS, exact-zero 비교 417개. 모든 양수 비교의 최대 상대오차는 9.00603935062818e-16, cancellation의 최대 `abs(residual)/(128*eps*gross)`는 0.008526034075271402였다. 종별 Gamma 상대오차 최대(HI/HeI/HeII)는 1.67268e-16 / 7.73764e-16 / 1.67274e-16, Heat는 4.93856e-16 / 6.15019e-16 / 2.36455e-16이다. 상세 절대오차, 단위, raw residual, gross scale, 정규화 잔차는 `evidence/native/summary.json`과 `checks.json`에 있다. 대표 nonstiff 최대 노출은 0.45738167894861353이며 stiff는 4.573816789486135e6 이상이다.
++
++원본 focused tests 37개도 PASS: `axbi_covariant_transport` 7, `axbi_transport_parallel` 6, `igm_foundation` 9, `igm_rates` 4, `igm_thermal` 11. 실행 command는 `focused_tests.time` 첫 줄과 `focused_tests.log`에 보존되어 있다. 마지막 example build/native/comparator/focused-test의 wall time은 각각 0.46/0.01/0.17/3.85초, 최대 RSS는 145920/2560/26624/171876 KiB, exit는 모두 0이다. 초기 library compile의 관측치는 9.97초, 329060 KiB였다. 이 결과의 과학적 admission은 부모의 독립 검토에 맡긴다.
++
++첫 실패도 별도 보존했다. 최초 build exit101은 export의 crate 밖 원본 `include_str!` 9개 입력 누락으로, 동일 PR150 blob을 복구했다. 첫 native exit101은 harness source constructor의 n_mu=4가 원본 API가 허용하는 8/16/32에 속하지 않아 발생했다. 원본 테스트의 16 cells/segment, 8 mu 생성자로 수정한 후 실제 입력 ray 3개를 동일하게 명시했다. 첫 comparator HOLD는 `dt1000000000` 문자열이 dt=1e16 사례 ID에도 포함되는 coverage selector 문제였다. exact numeric dt_s==1e9로 고치고 보존 raw JSONL만 다시 비교했다. physics, frozen 사례, 허용오차, 원본 native source는 변경하지 않았다. 원문은 `build.first_failure.log`, `native.first_failure.stderr`, `first_failures.json`, `first_scientific_pass_summary.json`이다. 재비교 전후 raw JSONL SHA-256 동일성은 `raw_preservation.json`에서 확인했다.
