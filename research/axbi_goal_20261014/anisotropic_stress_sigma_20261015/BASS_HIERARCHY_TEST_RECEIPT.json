@@ -1,0 +1,62 @@
+{
+  "schema": "rei.bass_sigma_pi.validation.v1",
+  "date_kst": "2026-10-15",
+  "source_parent": "7b6b4bd0aa3ab9efabcb7d49744b431c0ecf2e78",
+  "selected_commands": [
+    "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=<research_dir> python3 -m pytest <research_dir>/test_bass_hierarchy_transport.py <research_dir>/test_sigma_pi_coupled.py -q --tb=short",
+    "PYTHONPATH=<research_dir> python3 verify_bass_source_hierarchy.py --bass-root /home/cosmosapjw/bass --htt-root /home/cosmosapjw/Dropbox/bianchi/htt_base --dossier-pdf /home/cosmosapjw/Dropbox/dossier/Dossier_II_Kinetic_Transport.pdf --output BASS_DIRECT_HIERARCHY_RECEIPT.json",
+    "PYTHONPATH=<research_dir> python3 run_bass_hierarchy_campaign.py --scenario ../scenario/SCENARIO_LOCK.json --donor REI_DONOR_CANDIDATE_OPTIN_ONLY.json --output .",
+    "PYTHONPATH=<research_dir> python3 verify_bass_convergence.py --scenario ../scenario/SCENARIO_LOCK.json --donor REI_DONOR_CANDIDATE_OPTIN_ONLY.json --output BASS_CONVERGENCE.json"
+  ],
+  "observed": {
+    "new_source_specific_pytest": {
+      "passed": 15,
+      "failed": 0,
+      "exit_code": 0
+    },
+    "inherited_PR135_tests": {
+      "passed": 18,
+      "exit_code": 0,
+      "origin": "actual current-turn combined pytest run, 33 passed total"
+    },
+    "BASS_direct_oracle": {
+      "status": "PASS",
+      "masses": [
+        0,
+        1,
+        4,
+        20,
+        100
+      ],
+      "anis_massless_normalized_relative_residual": 7.000778604500446e-10,
+      "anis_mass4_normalized_relative_residual": 6.517364996655775e-10
+    },
+    "Einstein_initial_hierarchy_campaign": {
+      "status": "PASS_EXECUTED",
+      "cases": 60,
+      "saved_rows": 7260
+    },
+    "independent_angular_time_convergence": {
+      "status": "PASS",
+      "maximum_tested_endpoint_Sigma_error_vs_tighter_ref": 2.3079953746785176e-17
+    },
+    "BASS_PR159_Killing_shear": {
+      "status": "PASS",
+      "source_BASS_b_reported": 0.0000841189,
+      "observed_b": 0.00008411890569336655
+    },
+    "numpy_batch": {
+      "source_rad_P2_8192_batches": 8192,
+      "gl_nodes": 64,
+      "measured_speedup": 43.7073278257369,
+      "max_abs_discrepancy": 2.220446049250313e-16
+    },
+    "processes_2": {
+      "cases": 60,
+      "serial_wall_s": 2.27672367694322,
+      "parallel_wall_s": 1.2134097189409658,
+      "speedup": 1.8763024899209548
+    }
+  },
+  "release_scope": "NOT_REI_PRODUCTION"
+}
