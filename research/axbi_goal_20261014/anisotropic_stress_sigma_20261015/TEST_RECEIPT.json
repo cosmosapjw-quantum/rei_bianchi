@@ -1,0 +1,92 @@
+{
+  "schema": "rei.sigma.pi.validation.v1",
+  "date_kst": "2026-10-15",
+  "parent_commit": "fa20d75e344a28c833a47cbca82315ccbbdf6882",
+  "source_scenario_sha256": "07aa11d2d3fd47d2ed95e9d9161f6205e4d9ba386c27ad43d2b298fcd86d1696",
+  "source_donor_git_sha1": "1e3fdd5019f2a9a7d5ccd6a23e2f3a03faf74bd4",
+  "selected_commands": [
+    "PYTHONPATH=research/axbi_goal_20261014/anisotropic_stress_sigma_20261015 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m pytest research/axbi_goal_20261014/anisotropic_stress_sigma_20261015/test_sigma_pi_coupled.py -q --tb=short",
+    "rustc --edition=2021 --test -O research/axbi_goal_20261014/anisotropic_stress_sigma_20261015/sigma_pi_contract.rs -o /tmp/rei_sigma_pi_contract_test_20261015 && /tmp/rei_sigma_pi_contract_test_20261015",
+    "cd rust/rei_microphysics && CARGO_TARGET_DIR=$HOME/rec_theory_runs/REI_SIGMA_PI_VLASOV_20261015/target cargo run --offline --release --example axbi_sigma_pi_radiation_oracle",
+    "cd rust/rei_microphysics && CARGO_TARGET_DIR=$HOME/rec_theory_runs/REI_SIGMA_PI_VLASOV_20261015/target cargo test --offline --release --test axbi_background",
+    "PYTHONPATH=research/axbi_goal_20261014/anisotropic_stress_sigma_20261015 OPENBLAS_NUM_THREADS=1 python3 research/axbi_goal_20261014/anisotropic_stress_sigma_20261015/run_sigma_pi_campaign.py --scenario research/axbi_goal_20261014/scenario/SCENARIO_LOCK.json --donor research/axbi_goal_20261014/anisotropic_stress_sigma_20261015/REI_DONOR_CANDIDATE_OPTIN_ONLY.json --output research/axbi_goal_20261014/anisotropic_stress_sigma_20261015",
+    "python3 research/axbi_goal_20261014/anisotropic_stress_sigma_20261015/verify_native_feedback.py --output research/axbi_goal_20261014/anisotropic_stress_sigma_20261015/NATIVE_FEEDBACK_CROSSCHECK.json"
+  ],
+  "observed": {
+    "python_scientific_tests": {
+      "passed": 18,
+      "failed": 0,
+      "exit_code": 0
+    },
+    "rust_standalone_contract": {
+      "passed": 3,
+      "failed": 0,
+      "exit_code": 0
+    },
+    "rust_existing_native_background": {
+      "passed": 6,
+      "failed": 0,
+      "exit_code": 0
+    },
+    "rust_release_native_oracle": {
+      "exit_code": 0,
+      "radiation_angular_samples": 9
+    },
+    "Einstein_IVP": {
+      "source_case_count": 28,
+      "saved_rows": 3388,
+      "integrator": "DOP853",
+      "proper_elapsed_time_integrated": true
+    },
+    "initial_Sigma_ref": {
+      "half": 0.008660145786698617,
+      "full": 0.017319642115231484
+    },
+    "largest_positive_source_end": {
+      "Sigma_coupled": 0.0019826095513962023,
+      "Sigma_prescribed": 0.001999901873217159,
+      "relative_difference": -0.00864658514126948
+    },
+    "pi_at_end": {
+      "radiation_J_m3": -4.133671066088808e-13,
+      "matter_J_m3": -6.559763156275732e-24,
+      "ratio_abs": 1.586909807625898e-11
+    },
+    "proper_clock_largest_positive": {
+      "coupled_elapsed_s": 42794641449327970,
+      "prescribed_elapsed_s": 42794642408977720,
+      "difference_s": -959649752,
+      "relative": -2.242453023271196e-8
+    },
+    "native_prior_feedback": {
+      "source_saved_native_rows": 312238,
+      "source_native_delta_s_over_H": -0.00000500511315341987,
+      "new_source_delta_s_over_H": -0.000005000518386820171,
+      "relative_difference": 0.0009180145301129942,
+      "gate": 0.003,
+      "status": "PASS_PERTURBATIVE_CROSS_MODEL"
+    },
+    "angular_benchmark": {
+      "samples": 8192,
+      "gl_nodes": 64,
+      "scalar_median_s": 0.08706788904964924,
+      "vector_median_s": 0.001970723969861865,
+      "speedup": 44.18066171679646,
+      "max_scaled_relative_difference": 3.4782923633671986e-12
+    },
+    "independent_cases_parallel_benchmark": {
+      "cases": 28,
+      "serial_wall_s": 0.986014383030124,
+      "process_pool_2_wall_s": 0.5070899500278756,
+      "speedup": 1.9444565662875415,
+      "max_endpoint_sigma_difference": 0
+    }
+  },
+  "claim_gate": "SOURCE_EINSTEIN_COLLINEAR_COLLISIONLESS_RADIATION_AND_MATTER_WITH_PI_PASS_SCOPED; PRODUCTION_REI_STRESS_COUPLED_NOT_ADMITTED",
+  "source_byte_identity_claims": [
+    "Original canonical AX08 model and checkpoint unchanged",
+    "New work performed exclusively isolated worktree",
+    "Native Rust oracle use unchanged axbi_background::isotropic_initial_radiation_moments"
+  ],
+  "local_codex_used": false
+}
