@@ -17,3 +17,5 @@ Cold Grackle 1–10^6 K 모델은 유지한다. HH의 thermal k_HH(T)는 실제 
 실제 probe의 scale-factor 증가는 약3.63e−11뿐이다. 두 accepted steps 전 각각18회 rejection이 있었으므로 전체 history 실행 가능성이나 scaling을 주장하지 않는다. 상세 R/C 상태는 LOOP_STATUS.json과 CODING_LOOP.md를 읽는다.
 
 D/H standalone native kernel도 실제7 targeted tests를 통과했다. 전체 changed targeted tests는28개이며 독립 심사·최종 공개는 아직 대기다.
+
+게시: [PR150](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/150), science commit `7b872d4d3fa249d3af8fa99682f4bef96c3b1da8`. ZIP은 이 science commit의 코드/근거를 고정하며 Drive/Dropbox 양쪽 업로드가 완료됐다. 마지막 delivery-only commit은 게시 상태와 위치만 추가한다.
