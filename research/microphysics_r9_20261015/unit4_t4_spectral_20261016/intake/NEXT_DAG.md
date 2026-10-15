@@ -1,0 +1,10 @@
+# R9 Unit3 recovery and next dependency
+
+The already submitted aug-cc-pVTZ Li(0) to Be(+1) three-electron run completed on 2026-10-15 at 15:50:09 UTC. Current NCP inspection on 2026-10-15 at 23:03 UTC found no matching process or inspection gap. The exact V6 source, contract, input, final receipt and NPZ passed 86/86 collector gates; the independent scientific review is recorded separately. No solver was launched in this recovery.
+
+The accepted result is a finite common-orbital-space sudden ground projection, P=0.5756391820077925, with complement norm squared 0.42436081799220793. The complement contains bound excitation as well as any continuum contribution. It is not an exclusive ionization probability. Basis convergence, finite nuclear mass, recoil, relative/QED effects, complete daughter spectrum and electron capture remain open.
+
+The next selected physical item is T4, an energy and channel resolved Be+ daughter decomposition. The immediate unresolved physical dependency is T2: an outgoing Coulomb/exchange channel basis with energy normalization and exclusive cross-section/bound-state separation. The saved V6 NPZ contains only the daughter ground state and complement vector. It cannot identify continuum probability or electron-capture contact matrix elements. A narrower finite-space projected Lanczos spectrum from the saved complement is feasible once the same Be+ Hamiltonian integrals and a frozen execution contract are supplied; it would remain a diagnostic, not an exclusive continuum calculation. No additional V6 ground-state replay is justified by the successful receipt.
+
+Other DAG nodes remain open: T1 Li bound basis and mass/relativistic corrections; T3 nuclear-motion molecular rates; T5 likelihood/covariance; T6 charge cascade injection, two-photon and collisional channels; T7 coupled Be7 and charge history; T8 owner transport. Existing finite-model data and conditional bridges do not close these physics tasks. PR150 owner execution is independent and was not changed.
+
