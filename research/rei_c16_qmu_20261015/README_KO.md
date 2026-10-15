@@ -74,3 +74,20 @@ From the C16 isolated rei_bianchi worktree:
   python3 research/rei_c16_qmu_20261015/study.py
 
 An immutable Git payload, independently fresh-restored ZIP and Dropbox/Google Drive byte-identity are verified separately. A cloud copy is NEVER declared completed from an upload command alone.
+
+## Verified release and byte-identical dual cloud backups
+
+The independent source/science commit cf34716245ebcf5e957d9f242fc9d0591c9690b8
+was archived as REI_C16_QMU_CASEA_20261015_cf347162.zip, 1,725,089 bytes,
+352 entries, CRC PASS. SHA256 =
+2537c22ef1e7f61d9c89d3c354d464750e481d65fae4f3b75ac0f98f6b012a4f.
+Dropbox and Google Drive authenticated remote full-byte stream readbacks both
+matched that exact source SHA. A completely new extraction ran C16-C9 Python
+73/73 and newly compiled Rust owner 23/23 tests, 96/96 PASS, then re-executed
+C16 actual physics, 19 original Git blob identities and the C15 source state.
+Cloud IDs, detailed source tests and performance caveats are in BACKUP_RECEIPT.json
+created and committed AFTER the immutable archive. The 3-process parallel result
+was 2.83x in the first original run but only 0.87x in independently restored
+replay; parallel speedup is therefore NOT robustly established. The actual
+3-channel NumPy event allocation microkernel was ~53x faster in both tests.
+This scientific release does not alter AX08 native original production input.
