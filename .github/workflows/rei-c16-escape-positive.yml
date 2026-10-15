@@ -1,0 +1,32 @@
+name: rei-c16-escape-positive
+on:
+  push:
+    branches:
+      - research/rei-c16-escape-transport-20261015
+  pull_request:
+    paths:
+      - 'research/rei_c16_escape_20261015/**'
+      - '.github/workflows/rei-c16-escape-positive.yml'
+jobs:
+  c16-escape-science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source-locked numerical environment
+        run: python -m pip install --disable-pip-version-check numpy==2.4.2 scipy==1.17.0 matplotlib==3.10.8
+      - name: Test actual source C16 escape positivity and sharp Green response
+        run: python research/rei_c16_escape_20261015/test_escape_transport.py
+      - name: Test original C16 energy-work chemistry regression
+        run: python research/rei_c16_source_energy_20261015/test_c16_exchange.py
+      - name: Test parent C15 actual Einstein HHe solver unchanged
+        run: python research/rei_c15_two_way_shear_20261015/test_c15_coupled.py

@@ -105,6 +105,15 @@ class EscapeSourceShear(unittest.TestCase):
             self.assertTrue(p["conditional_angular_realizations_reproduce_extrema"])
             self.assertEqual(p["scientific_admission"],
                 "SCOPED_FIXED_C16_BACKGROUND_SHARP_LINEAR_SOURCE_PRESSURE_RESPONSE_ONLY")
+    def test_exact_zero_shear_cusp_is_not_a_signed_derivative(self):
+        z,geom,births=run_escape_response(q_signed=0.,nstep=8,kappa=0.)
+        self.assertTrue(z["fixed_background_Sigma_cusp_crosses_zero"])
+        self.assertFalse(z["fixed_background_Sigma_magnitude_valid_only_if_sign_does_not_cross"])
+        self.assertIsNone(z["fixed_background_shear_magnitude_Sigma_first_order_bounds"])
+        total=z["fixed_background_unsigned_Sigma_total_sharp_interval"]
+        self.assertGreaterEqual(total[0],0)
+        self.assertLessEqual(total[0],1e-20)
+        self.assertGreater(total[1],1e-17)
     def test_einstein_angular_total_energy_not_from_unlicensed_escape_spectrum(self):
         for r in (self.p,self.mn):
             self.assertEqual(r["star_emitter_mass_energy_and_escaped_recombination_physical_EOS"],

@@ -200,9 +200,9 @@ def response_mode(births,geometry:FixedSourceGeometry,kind,order=16,at_x=None):
         sample=x0+(xf-x0)*(nodes+1)/2
         a,b,H=geometry.geometry(sample)
         if kind=="envelope_low":
-            _,P=None,sharp_per_event(ev,a,b)[0]
+            P=sharp_per_event(ev,a,b)[0]
         elif kind=="envelope_high":
-            _,P=None,sharp_per_event(ev,a,b)[1]
+            P=sharp_per_event(ev,a,b)[1]
         else:
             _,P=angular_moments_fast(ev,a,b,kind)
         stress=geometry.hydrogen_density_cm3(a)*EV_CM3_TO_PA*P
@@ -238,6 +238,22 @@ def run_escape_response(q_signed=0.005,nstep=32,kappa=.2,order=16):
         raise RuntimeError("POSITIVE_CASEA_EXTREMA_NOT_SHARP_UNDER_KILLING")
     if not(lower<=preds["isotropic"]<=upper):
         raise RuntimeError("CASEA_ISOTROPIC_SHARP_PRESSURE_BOUNDS")
+    s_base=float(last["s_per_s"])
+    # Sigma=√3 |s|/H has a cusp at s=0. A signed δs interval alone
+    # is not a differentiable first-order δSigma at a sign crossing.
+    # For the same fixed H (not a nonlinear Hamiltonian solution), the
+    # sharp attainable *total norm* is obtained from |s+δs| on the interval.
+    endpoints=(s_base+lower,s_base+upper)
+    crosses=(lower<=-s_base<=upper)
+    total_abs_min=0.0 if crosses else min(abs(endpoints[0]),abs(endpoints[1]))
+    total_abs_max=max(abs(endpoints[0]),abs(endpoints[1]))
+    orientation_preserved=(endpoints[0]>0 and endpoints[1]>0) or (
+        endpoints[0]<0 and endpoints[1]<0)
+    differential_magnitude=(
+        sorted((math.sqrt(3)*sign*lower/Hlast,
+                math.sqrt(3)*sign*upper/Hlast))
+        if orientation_preserved else None
+    )
     rec={
       "schema":"rei.c16B.native_CaseA_escape_positive_transport_linear_shear_response.v1",
       "status":"ACTUAL_CASEA_RECOMBINATION_ENERGY_EMISSION_TRANSPORTED_KILLING_BIANCHI_PLUS_SHARP_PRESSURE_GREEN_BOUNDS",
@@ -260,9 +276,14 @@ def run_escape_response(q_signed=0.005,nstep=32,kappa=.2,order=16):
       "source_sharp_upper_shear_signed_per_s":upper,
       "fixed_background_signed_Normalized_Sigma_response_bounds":[
             math.sqrt(3)*lower/Hlast,math.sqrt(3)*upper/Hlast],
-      "fixed_background_shear_magnitude_Sigma_first_order_bounds":[
-            math.sqrt(3)*sign*lower/Hlast,math.sqrt(3)*sign*upper/Hlast],
-      "fixed_background_Sigma_magnitude_valid_only_if_sign_does_not_cross":True,
+      "fixed_background_shear_magnitude_Sigma_first_order_bounds":
+            differential_magnitude,
+      "fixed_background_Sigma_magnitude_valid_only_if_sign_does_not_cross":
+            orientation_preserved,
+      "fixed_background_unsigned_Sigma_total_sharp_interval":[
+            math.sqrt(3)*total_abs_min/Hlast,math.sqrt(3)*total_abs_max/Hlast],
+      "fixed_background_Sigma_cusp_crosses_zero":crosses,
+      "signed_shear_response_not_magnitude_derivative_when_zero_crossing":True,
       "conditional_angular_realizations_reproduce_extrema":True,
       "separately_green_source_and_escaped_radiation_energy_dilution":True,
       "fully_nonlinear_Einstein_chemistry_backreaction":"NOT_SOLVED",
