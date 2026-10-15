@@ -183,7 +183,7 @@ def main():
         if a.output.exists():raise Hold('FRESH_MANIFEST_REQUIRED')
         if a.mode=='FULL_PAIR':
             for v in a.case:
-                case,run,binding=v.split(',',2);frozen_full005_guard(case,json.loads(Path(binding).read_text()))
+                case,run_dir,binding=v.split(',',2);frozen_full005_guard(case,json.loads(Path(binding).read_text()))
         specs=[bind(*v.split(',',2)) for v in a.case];write(a.output,{'mode':a.mode,'end_zbar':a.end_zbar,'source_relation':'Identicalsourcebyteguard unlessexplicitreviewedrelation supplied','cases':specs});print(str(a.output))
     else:run(a.manifest,a.output)
 if __name__=='__main__':main()
