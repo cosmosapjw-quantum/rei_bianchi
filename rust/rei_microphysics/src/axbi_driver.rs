@@ -581,8 +581,12 @@ impl Driver {
     ) -> Result<DriverState, ForwardError> {
         let mut s = old.clone();
         let mid = (old.a * to).sqrt();
-        let dt = self.background.point_at_scale(to)?.time_s
-            - self.background.point_at_scale(old.a)?.time_s;
+        // Use a local physical integral instead of subtracting two
+        // O(1e16 s) accumulated times. The latter can lose even the sign
+        // and most significant bits of a sub-ULP proper-time increment.
+        // This intentionally changes the NUMERICAL method, not the source
+        // geometry/clock convention; prior checkpoints need source review.
+        let dt = self.background.proper_time_increment(old.a, to)?;
         self.geometry_map(&mut s, mid)?;
         self.inject(&mut s, dt)?;
         self.chemical_stage(&mut s, dt, counter)?;
@@ -1329,7 +1333,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
         fs::write(out.join("config.cfg"), config_text).map_err(ioerr)?;
         fs::write(out.join("source_identity.txt"), compiled_identity()).map_err(ioerr)?;
         fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
-        fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=cell-integrated source deposited to fixed physical-energy nodes; delta-node measures\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
+        fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nbackground_time_increment=local_source_GL4_log1p_from_actual_scale_endpoints\ncheckpoint_numerics=changed_from_accumulated_time_subtraction_do_not_mix_old_science_history\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=cell-integrated source deposited to fixed physical-energy nodes; delta-node measures\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
     }
     let mut h=open_output(&out.join("history.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,b,H_per_s,s_per_s,x_HII,x_HeII,x_HeIII,nH_proper_cm3,ne_proper_cm3,temperature_K,Gamma_HI_per_s,Gamma_HeI_per_s,Gamma_HeII_per_s,photon_n_per_H,photon_u_eV_per_H,J0_photon_u_eV_per_H,J1_photon_u_eV_per_H,J2_photon_u_eV_per_H,x_HI,x_HeI")?;
     let mut a=open_output(&out.join("abundances.csv"),resume,"run_id,time_s,zbar,Tgas_K,background_Tref_K,species_id,A,Z,charge,nproper,element_fraction,Ybaryon,electron_xe,normalization_registry")?;
