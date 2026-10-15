@@ -167,10 +167,20 @@ def compose(binding_path, segment_terminal_sha256, output):
     config = terminal(prefix/'config.cfg'); endpoint=1/(1+float(config['end_zbar']))
     if cp[0] != 'AXBI_CHECKPOINT_V2' or segment_cp[0] != 'AXBI_CHECKPOINT_V2' or float(segment_cp[1].split()[0]) != endpoint or float(end['a']) != endpoint:
         raise NotReady('HOLD_CHECKPOINT_SCHEMA_OR_ENDPOINT')
-    for data,record in [(cp,prior),(segment_cp,end)]:
-        for key,index in [('accepted',0),('attempts',1),('rejections',2),('rhs_evaluations',4),('comparisons',5)]:
-            if int(data[2].split()[index]) != int(record[key]): raise NotReady('HOLD_CHECKPOINT_COUNTER:'+key)
-        if float(data[1].split()[10]) != float(record['wall_s']): raise NotReady('HOLD_CHECKPOINT_WALL')
+    for data, record, is_legacy_prefix in ((cp, prior, True), (segment_cp, end, False)):
+        counters = data[2].split()
+        for key, index in [('accepted', 0), ('attempts', 1), ('rejections', 2), ('rhs_evaluations', 4), ('comparisons', 5)]:
+            value = int(counters[index])
+            if key == 'comparisons' and key not in record:
+                # The original AX08 full-run RETURN schema omits this field.
+                # Its V2 checkpoint retains it; never infer a segment count.
+                if not is_legacy_prefix or not (int(record['accepted']) <= value <= int(record['attempts'])):
+                    raise NotReady('HOLD_MISSING_COMPARISONS:' + key)
+                continue
+            if value != int(record[key]):
+                raise NotReady('HOLD_CHECKPOINT_COUNTER:' + key)
+        if float(data[1].split()[10]) != float(record['wall_s']):
+            raise NotReady('HOLD_CHECKPOINT_WALL')
     state=list(map(float,cp[1].split()))
     if state[0]!=float(prior['a']): raise NotReady('HOLD_CHECKPOINT_TERMINAL_ALIGNMENT')
     overrides=json.loads((segment/'effective_resource_overrides.json').read_text())
@@ -206,7 +216,14 @@ def compose(binding_path, segment_terminal_sha256, output):
         pending.write_text('\n'.join(k + '=' + v for k, v in dict(end, status='COMPLETE_REPRESENTED_INTERVAL', full_history_feedback='PENDING', full_history_tau='PENDING').items()) + '\n')
         module_path = ROOT / 'research/axbi_goal_20261014/convergence/compare_histories.py'
         spec = importlib.util.spec_from_file_location('axbi_completed_reader', module_path)
-        reader = importlib.util.module_from_spec(spec); spec.loader.exec_module(reader)
+        reader = importlib.util.module_from_spec(spec)
+        # The analysis module imports two sibling scientific checks by bare name.
+        import sys
+        sys.path.insert(0, str(module_path.parent))
+        try:
+            spec.loader.exec_module(reader)
+        finally:
+            sys.path.remove(str(module_path.parent))
         case = {'id': binding['case'], 'clock_origin': reader.CLOCK, 'source_epochs': {'predecessor': OLD, 'current': NEW, 'compatibility': compatibility}}
         for role, name in [('history', 'history.csv'), ('abundances', 'abundances.csv'), ('config', 'config.cfg'), ('source_identity', 'source_identity.txt'), ('terminal', 'RETURN.pending.txt')]:
             case[role] = {'path': str(output / name), 'sha256': sha(output / name)}
