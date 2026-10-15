@@ -1,0 +1,69 @@
+{
+  "schema": "he18.axbi.next_coding_dag.case_a_c6.v1",
+  "current_state": "SOURCE_GRACKLE_CASE_A_EVENT_AND_THERMAL_IMPLEMENTED_NUMERICALLY_CHECKED",
+  "origin": "rei_bianchi cold photon transport vs BASS_HE warm 16-cell separated",
+  "fixed_owner_head": "0fcb2dddf5de6b583c2e00f150abff0b2afb6315",
+  "source_function_identity_evidence": "SOURCE_RATE_SURFACE_IDENTITY.json",
+  "subagent_state": "NOT_RUN",
+  "tasks": [
+    {
+      "id": "CASE_A6_SOURCE",
+      "status": "DONE",
+      "description": "Grackle3.4.1 Case-A CI/RR/DR and thermal/CMB point into exact photon A/B and evolving HHe fractions on short high-z interval",
+      "evidence": [
+        "case_a_source.rs",
+        "case_a_micro.inc.rs",
+        "results/CASE_A_SERIAL.csv"
+      ]
+    },
+    {
+      "id": "CASE_A6_CONSERVATION",
+      "status": "DONE",
+      "description": "Nuclear charge/photo/collision/recombination and full photon-gas atomic binding+escape+Compton energy integrated event ledger",
+      "evidence": [
+        "analyze_case_a.py",
+        "test_case_a_source.py"
+      ]
+    },
+    {
+      "id": "CASE_A6_MICRO_REFINEMENT",
+      "status": "DONE_EMPIRICALLY",
+      "description": "Compare identical transport/physical configuration with micro dt ceiling 1e10 vs 5e9 seconds",
+      "evidence": [
+        "results/CASE_A_HALF_MICRO.csv"
+      ],
+      "note": "No certified global ODE error"
+    },
+    {
+      "id": "CASE_A7_ONGOING_SOURCE",
+      "status": "READY",
+      "description": "Add source-consistent continuous original cold photon emissivity and recombination photon routing with original source DOI/model, no warm HE18 transplantation",
+      "requires": [
+        "Spatially homogeneous original source weights and proper-clock normalization",
+        "Case-A escape vs coupled-OTS choice",
+        "Photon number/energy boundary and photoheating ledgers"
+      ]
+    },
+    {
+      "id": "CASE_A8_TWO_DIM_CONVERGENCE",
+      "status": "BLOCKED_ON_CASE_A7",
+      "description": "Photon energy node refinement and time/source/micro error grid with radiation/ionization/thermal goal functionals",
+      "requires": [
+        "Native energy register refined without altering Verner threshold owners",
+        "Independent solution consistency against original BE native solver and finite-volume flux"
+      ]
+    },
+    {
+      "id": "CASE_A9_PRODUCTION_INTEGRATION",
+      "status": "BLOCKED_ON_CASE_A8",
+      "description": "Evaluate isolated characteristic transport option for full cold AXBI/rei_bianchi owner, never silently alter production native code",
+      "requires": [
+        "Nuclei, photon and heat/escape ledgers",
+        "Certified or suitably bounded global goal error",
+        "Matched physical closure and clock"
+      ]
+    }
+  ],
+  "next_selected": "CASE_A7_ONGOING_SOURCE",
+  "admission": "HOLD_FULL_EOR_OBSERVATIONAL"
+}
