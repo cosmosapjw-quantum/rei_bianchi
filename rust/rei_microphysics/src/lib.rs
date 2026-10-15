@@ -154,6 +154,9 @@ pub mod igm_rates;
 pub mod igm_thermal;
 pub mod axbi_rates;
 pub mod axbi_background;
+/// Opt-in collisionless initial quadrupole anisotropic stress background.
+/// Original AX03 stress-free production driver remains authoritative.
+pub mod axbi_stress_background;
 pub mod axbi_sources;
 pub mod axbi_driver;
 pub mod axbi_q_reference;
