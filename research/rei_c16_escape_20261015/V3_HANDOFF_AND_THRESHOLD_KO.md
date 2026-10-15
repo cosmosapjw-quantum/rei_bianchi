@@ -16,7 +16,7 @@
 
 ## 구성적 이론: LRS Bianchi I의 문턱 이동 (PR150과 연결 가능한 별도 유도)
 
-Metric `(-,+,+,+)`: `ds²=-c²dt²+a²[e^(2b)(dx²+dy²)+e^(-4b) dz²]`. `s=dot b`, `x=ln a`, `v=s/H` (signed). 방출시 `z=mu_e²`, `d=b-b_e`, `q=a_e epsilon_e`를 고정한 null Killing characteristic에 대해
+Metric `(-,+,+,+)`: `ds²=-c²dt²+a²[e^(-2b)(dx²+dy²)+e^(4b) dz²]`. `s=dot b`, `x=ln a`, `v=s/H` (signed). 방출시 `z=mu_e²`, `d=b-b_e`, `q=a_e epsilon_e`를 고정한 null Killing characteristic에 대해
 
 `R²=(1-z)e^(2d)+z e^(-4d)`, `epsilon=(q/a)R`, `mu²=z e^(-4d)/R²`.
 
