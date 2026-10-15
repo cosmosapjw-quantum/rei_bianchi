@@ -64,7 +64,7 @@ Read-only full composed histories for ZERO, SHEAR_MINUS(q=-0.01), SHEAR_HALF_PLU
 
 ## Verification and next meaningful science gate
 
-Local Ubuntu Python regression suite: 27/27 PASS before final publication (see new tests). Wolfram algebra: angular energy expansion and shear invariants evaluated; no local xAct call in this run. Sources (literature basis): Friedrich et al. 2012 MNRAS 421, 2232 (H/He coupled C2-Ray), https://academic.oup.com/mnras/article/421/3/2232/1077406. Publication-grade q^2 claim remains on hold until at least a second independently converged native ODE grid/tolerance, solver discrepancy bound for tau and photon collision history, and source-consistent physical attribution are available.
+Local Ubuntu Python regression suite: 33/33 PASS in final updated run (see new tests). Wolfram algebra: angular energy expansion and shear invariants evaluated; no local xAct call in this run. Sources (literature basis): Friedrich et al. 2012 MNRAS 421, 2232 (H/He coupled C2-Ray), https://academic.oup.com/mnras/article/421/3/2232/1077406. Publication-grade q^2 claim remains on hold until at least a second independently converged native ODE grid/tolerance, solver discrepancy bound for tau and photon collision history, and source-consistent physical attribution are available.
 
 **Positive next action:** run paired q=0, ±0.005, ±0.01 with tighter time-step/error settings or independent method over the *same* mean-a prefix (not a full 5x campaign by default); propagate error into E_t and E_clock; measure cubic angular odd effects in observables carrying direction (J2/CMB morphology), not just the angle-averaged scalar tau.
 
@@ -78,3 +78,14 @@ The original AX08 thread already had the signed-prefix J2 result (2026-10-15). I
 - Five-history exact JSON numerical identity check: PASS. Sequential subprocess wall 8.073401 s; 2-worker wall 4.883689 s; speedup 1.653136x.
 - Raw source CSV bytes 601988551; provenance-cached NPZ bytes 26389839; on-disk reduction 22.8114x. Source files are not deleted or mutated.
 - Native production solver was not profiled here; throughput numbers are only postprocessing.
+
+## 추가 결과: goal-oriented ion-fraction sensitivity bound
+
+원 original scalar H/He census에서, nH와 proper time history를 **정확한 입력**으로 가정하고 각 이온화 분율 x_HII, x_HeII, x_HeIII의 절대오차를 전 시간구간에서 ε로 동시에 제한하면
+
+|δE(q)| ≤ [ (I(+q)+I(-q))/2 + I(0) ] (1+3 f_He) ε,
+I(q)=σ_T c ∫ nH_q(t) dt.
+
+Source-units: nH in cm^-3, proper t in s, sigma_T in m^2, c in m/s; include factor 1e6. nH(t)=nH_ref(a_ref/a)^3 under H nuclei conservation. Actual ZERO prefix of 200001 rows shows nH a^3 relative maximum deviation 3.3306690738754696e-16. The bound is **conditional** on accurate nH(t), endpoint/clock and time-evolution error; it does not certify the native solver or radiation collision/closure.
+
+At matched mean-a endpoint, numerical sensitivity coefficient for E(0.005) ≈0.2983152804358213742; E(0.01) ≈0.2983123932591711562. To keep contribution of *such a uniform species absolute error* under 10% of observed E, sufficient ε≤9.254687351351414e-9 for q=.005 and ε≤3.701786007074857e-8 for q=.01. For the smaller common-proper-time residual Et, sufficient ε≤8.870205669004635e-10 for q=.005 and ε≤3.547991954037655e-9 for q=.01. These are NOT necessary accuracy thresholds and the source's existing last_error is not a bound on ε. This gate determines the next minimal native convergence experiment.
