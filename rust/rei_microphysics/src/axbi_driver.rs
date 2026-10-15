@@ -40,6 +40,8 @@ pub struct DriverConfig {
     pub energy_subdivisions: usize,
     /// Fixed reference-energy finite-volume cells, independent of source quadrature.
     pub transport_cells: usize,
+    /// Persistent per-cell prepare workers; temporal/Newton ordering is serial.
+    pub transport_threads: usize,
     /// FLRW-only passive compartment below the HI fit cutoff; explicit variant.
     pub inactive_hi_split: bool,
     pub n_mu: usize,
@@ -67,6 +69,7 @@ impl DriverConfig {
                 / (150.0 * (0.0224_f64 / 0.023).powf(0.4)),
             energy_subdivisions: 16,
             transport_cells: 128,
+            transport_threads: 1,
             inactive_hi_split: false,
             n_mu: 8,
             background_panels: 4096,
@@ -107,6 +110,7 @@ impl DriverConfig {
                 "initial_temperature_k" => number!(initial_temperature_k),
                 "energy_subdivisions" => number!(energy_subdivisions),
                 "transport_cells" => number!(transport_cells),
+                "transport_threads" => number!(transport_threads),
                 "inactive_hi_split" => {
                     c.inactive_hi_split = match v.trim() {
                         "true" => true,
@@ -149,6 +153,7 @@ impl DriverConfig {
     fn validate(&self) -> Result<(), ForwardError> {
         if ![256, 2048, 4096].contains(&self.output_budget_mib)
             || (self.inactive_hi_split && self.q_ref != 0.0)
+            || !(1..=64).contains(&self.transport_threads)
             || !(8..=1024).contains(&self.transport_cells)
             || self.spectra_every_accepted == 0
             || !self.q_ref.is_finite()
@@ -274,7 +279,8 @@ impl Driver {
         )?;
         let reference = bg.point_at_scale(a_ref)?.geometry()?;
         let transport =
-            CovariantTransport::new(&source, reference, config.transport_cells, 13.6, 512.0)?;
+            CovariantTransport::new(&source, reference, config.transport_cells, 13.6, 512.0)?
+                .with_threads(config.transport_threads)?;
         let energies = (0..config.transport_cells)
             .map(|i| {
                 13.6 * (512.0_f64 / 13.6).powf((i as f64 + 0.5) / config.transport_cells as f64)
@@ -897,6 +903,7 @@ pub fn compiled_identity() -> String {
     [
         include_str!("axbi_driver.rs"),
         include_str!("axbi_covariant_transport.rs"),
+        include_str!("axbi_parallel.rs"),
         include_str!("axbi_q_closure.rs"),
         include_str!("axbi_background.rs"),
         include_str!("axbi_sources.rs"),
@@ -920,6 +927,7 @@ pub fn compiled_identity() -> String {
         include_str!(
             "../../../research/flrw_covariant_transport_20261015/INACTIVE_POOL_CONTRACT.md"
         ),
+        include_str!("../../../research/flrw_covariant_transport_20261015/HPC_CONTRACT.md"),
     ]
     .join("\nAXBI_SOURCE_BOUNDARY\n")
 }
@@ -1509,7 +1517,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
         fs::write(out.join("config.cfg"), config_text).map_err(ioerr)?;
         fs::write(out.join("source_identity.txt"), compiled_identity()).map_err(ioerr)?;
         fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
-        fs::write(out.join("transport_variant.txt"), format!("inactive_hi_split={}\npassive_scope=q0_forward_monotonic_only\ncheckpoint_version=V4\n", driver.config.inactive_hi_split)).map_err(ioerr)?;
+        fs::write(out.join("transport_variant.txt"), format!("inactive_hi_split={}\npassive_scope=q0_forward_monotonic_only\ncheckpoint_version=V4\ntransport_threads={}\nparallel_scope=persistent_cell_prepare_ordered_flatten_only\n", driver.config.inactive_hi_split, driver.config.transport_threads)).map_err(ioerr)?;
         fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=fixed reference-q two-moment transport; total N/U includes active and passive source photons; support columns are conservative active-support/passive-cell envelope union, not a recovered density or exact populated support; Gamma uses active photons only; radiation stress includes both pools; legacy boundary outflow remains zero\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
     }
     let mut h=open_output(&out.join("history.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,b,H_per_s,s_per_s,x_HII,x_HeII,x_HeIII,nH_proper_cm3,ne_proper_cm3,temperature_K,Gamma_HI_per_s,Gamma_HeI_per_s,Gamma_HeII_per_s,photon_n_per_H,photon_u_eV_per_H,J0_photon_u_eV_per_H,J1_photon_u_eV_per_H,J2_photon_u_eV_per_H,x_HI,x_HeI")?;

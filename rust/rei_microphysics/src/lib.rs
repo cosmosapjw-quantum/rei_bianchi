@@ -158,6 +158,7 @@ pub mod axbi_background;
 pub mod axbi_sources;
 pub mod axbi_driver;
 pub mod axbi_covariant_transport;
+pub mod axbi_parallel;
 pub mod axbi_q_reference;
 pub mod axbi_q_advance;
 pub mod axbi_q_capacity;

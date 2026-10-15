@@ -3,12 +3,14 @@
 //! Geometry changes the energy scale on each reference ray; it never remaps the
 //! stored cells. Spectral reconstruction is a two-moment closure, not a claim
 //! that the underlying spectrum is uniquely determined by those moments.
+use crate::axbi_parallel::OrderedWorkerPool;
 use crate::axbi_q_closure::positive_reconstruct;
 use crate::axbi_sources::AxbiSource;
 use crate::igm_thermal::IgmPhotoInput;
 use crate::{
     Absorber, AtomicProvider, CharacteristicRay, ForwardError, GeometrySnapshot, HHeModel,
 };
+use std::sync::Arc;
 
 pub const FIT_THRESHOLDS_EV: [f64; 3] = [13.60, 24.59, 54.42];
 pub const MAX_NODES_PER_CELL: usize = 1024;
@@ -242,6 +244,7 @@ pub struct CovariantTransport {
     source: AxbiSource,
     edges: Vec<f64>,
     source_norms: Vec<f64>,
+    prepare_pool: Arc<OrderedWorkerPool>,
 }
 fn shape(e: f64) -> f64 {
     let m = HHeModel::controlled_fixture();
@@ -300,7 +303,17 @@ impl CovariantTransport {
             source: source.clone(),
             edges,
             source_norms,
+            prepare_pool: Arc::new(OrderedWorkerPool::new(1)?),
         })
+    }
+    /// Construct the persistent pool once, before a production run. Clones share
+    /// the bounded pool; Newton residuals never create worker threads.
+    pub fn with_threads(mut self, width: usize) -> Result<Self, ForwardError> {
+        self.prepare_pool = Arc::new(OrderedWorkerPool::new(width)?);
+        Ok(self)
+    }
+    pub fn transport_threads(&self) -> usize {
+        self.prepare_pool.width()
     }
     pub fn n_energy(&self) -> usize {
         self.edges.len() - 1
@@ -531,6 +544,51 @@ impl CovariantTransport {
         state: &PhotonState,
         now: &GeometrySnapshot,
     ) -> Result<PreparedAbsorption, ForwardError> {
+        if self.prepare_pool.width() == 1 {
+            return self.prepare_legacy_serial(state, now);
+        }
+        self.validate_state(state)?;
+        let rays = Arc::new(self.ray_geometry(now)?);
+        let snapshot = Arc::new(state.clone());
+        let work_state = Arc::clone(&snapshot);
+        let n_energy = self.n_energy();
+        let cells = self.prepare_pool.map_ordered(self.cell_count(), move |k| {
+            prepare_cell(k, &work_state, rays[k / n_energy].scale)
+        })?;
+        let mut nodes = Vec::new();
+        let mut diagnostics = QuadratureDiagnostics::default();
+        // Original cell order and each cell's original node order. Each tail
+        // diagnostic has exactly one += per cell in cell_quadrature; replaying
+        // these individual terms preserves the original addition association.
+        for cell in cells {
+            diagnostics.max_count_relative_defect = diagnostics
+                .max_count_relative_defect
+                .max(cell.diagnostics.max_count_relative_defect);
+            diagnostics.max_energy_relative_defect = diagnostics
+                .max_energy_relative_defect
+                .max(cell.diagnostics.max_energy_relative_defect);
+            diagnostics.max_asymptotic_mean_defect_ev = diagnostics
+                .max_asymptotic_mean_defect_ev
+                .max(cell.diagnostics.max_asymptotic_mean_defect_ev);
+            diagnostics.omitted_tail_number_bound_per_h +=
+                cell.diagnostics.omitted_tail_number_bound_per_h;
+            diagnostics.omitted_tail_energy_bound_ev_per_h +=
+                cell.diagnostics.omitted_tail_energy_bound_ev_per_h;
+            diagnostics.omitted_tail_endpoint_moment_bound_ev_per_h +=
+                cell.diagnostics.omitted_tail_endpoint_moment_bound_ev_per_h;
+            nodes.extend(cell.nodes);
+        }
+        Ok(PreparedAbsorption {
+            template: Arc::unwrap_or_clone(snapshot),
+            nodes,
+            diagnostics,
+        })
+    }
+    pub fn prepare_legacy_serial(
+        &self,
+        state: &PhotonState,
+        now: &GeometrySnapshot,
+    ) -> Result<PreparedAbsorption, ForwardError> {
         self.validate_state(state)?;
         let rays = self.ray_geometry(now)?;
         let mut prepared = PreparedAbsorption {
@@ -589,6 +647,52 @@ impl CovariantTransport {
         prepared.evaluate(absorber_cm3, n_h_cm3, dt_s)
     }
 }
+struct PreparedCell {
+    nodes: Vec<AbsorptionNode>,
+    diagnostics: QuadratureDiagnostics,
+}
+fn prepare_cell(k: usize, state: &PhotonState, r: f64) -> Result<PreparedCell, ForwardError> {
+    let mut diagnostics = QuadratureDiagnostics::default();
+    let n = state.number[k];
+    if n == 0.0 {
+        return Ok(PreparedCell {
+            nodes: Vec::new(),
+            diagnostics,
+        });
+    }
+    let weights = cell_quadrature(
+        state.support_lo[k],
+        state.support_hi[k],
+        n,
+        state.energy_ref[k],
+        r,
+        &mut diagnostics,
+    )?;
+    let provider = AtomicProvider::reference();
+    let species = [Absorber::HI, Absorber::HeI, Absorber::HeII];
+    let model = HHeModel::controlled_fixture();
+    let mut nodes = Vec::with_capacity(weights.len());
+    for (q, number) in weights {
+        let e = q * r;
+        let mut sigma = [0.0; 3];
+        let mut excess = [0.0; 3];
+        for a in 0..3 {
+            sigma[a] = provider.cross_section(species[a], e)?;
+            if sigma[a] > 0.0 {
+                excess[a] = e - model.threshold_ev[a];
+            }
+        }
+        nodes.push(AbsorptionNode {
+            cell: k,
+            q,
+            number,
+            sigma,
+            excess_ev: excess,
+        });
+    }
+    Ok(PreparedCell { nodes, diagnostics })
+}
+
 fn add_support(s: &mut PhotonState, k: usize, n: f64, u: f64, lo: f64, hi: f64) {
     if n == 0.0 {
         return;
