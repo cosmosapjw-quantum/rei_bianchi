@@ -1,0 +1,67 @@
+{
+  "schema": "rei.BASS_PR160.PR137.massive_hierarchy_tests.v1",
+  "date_kst": "2026-10-15",
+  "source_commit_REI": "5d41df647c4fd624d8a1b574f67fdd0b82ff5102",
+  "source_commit_BASS": "9e50f936f3289cb0c7c8127772cf9fb8d172d7a8",
+  "sources": {
+    "BASS160_py_sha256": "1857567475b1c8586298f868e5420aae7a72e8e1ba69cce6a5b21bfca4fdd790",
+    "actual_REI_HHe_ne_hist_sha256": "4f6852c3a5152b91224ce5fecad6ccdfe9f7ece4c8a6d39825c6f5e5ca8ae92f"
+  },
+  "commands": [
+    "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=<PR137 dir>:<PR137 dir>/massive_radial_20261015 BASS160_ROOT=/home/cosmosapjw/rec_theory_runs/BASS_PR160_PINNED_20261015/checkout python3 -m pytest -q <research>/massive_radial_20261015/test_massive_radial.py <PR137 dir>/test_hierarchy.py <PR137 dir>/test_species.py --tb=short",
+    "PYTHONPATH=<PR137>:<new> OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 run_massive_radial.py --repo-owner /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --bass160-root /home/cosmosapjw/rec_theory_runs/BASS_PR160_PINNED_20261015/checkout --output <new>",
+    "PYTHONPATH=<PR137>:<new> OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 verify_convergence.py --output CONVERGENCE.json",
+    "PYTHONPATH=<PR137>:<new> OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 benchmark.py --output BENCHMARK.json"
+  ],
+  "checks": {
+    "pytest_combined": {
+      "passed": 32,
+      "failed": 0,
+      "exit_code": 0,
+      "warning": "matplotlib Axes3D environmental warning, no plotted 3D data"
+    },
+    "native_BASS160_source_sha256_check": "PASS",
+    "original_BASS_J_l_i_tensor_source_parity": "PASS",
+    "original_BASS160_independent_exact_Einstein_limit": {
+      "b_abs_error_approx": 1.12e-14,
+      "Sigma_abs_error_approx": 3.2e-14
+    },
+    "radiation_gamma_nu_number": "PASS",
+    "negative_controls_baryon_budget_signed_massive_pressure_cone": "PASS",
+    "original_REI_actual_saved_electron_C2_max_relative_interpolation_error": 0.00019755000594345873,
+    "scientific_campaign": {
+      "cases": 7,
+      "rows": 1127,
+      "source_to_exact_Vlasov_max_absolute_J_error": 1.5035839240340465e-10
+    },
+    "local_convergence": {
+      "nominal_radial": 96,
+      "nominal_angle": 32,
+      "nominal_photon_L": 8,
+      "nominal_imax": 2,
+      "ref_radial": 128,
+      "ref_angle": 64,
+      "ref_photon_L": 12,
+      "ref_imax": 4,
+      "max_endpoint_Sigma_abs_delta": 2.3787395664331967e-14,
+      "max_matter_pi_rel_delta": 5.420441750533451e-9
+    },
+    "corrected_fair_benchmark": {
+      "base_scalar_full_3_moments_once_per_sample": true,
+      "withdrawn_preliminary_speedup": 7.044089645233834,
+      "chosen_chunk": 16,
+      "actual_chunk_speedup": 2.343123199545683,
+      "matched_float64_output": "PASS"
+    },
+    "independent_IVP_process_benchmark": {
+      "cases": 9,
+      "serial_wall_s": 0.6846565160667524,
+      "two_process_wall_s": 0.4404346209485084,
+      "four_process_wall_s": 0.27337119507137686,
+      "two_speedup": 1.5545020384462378,
+      "four_speedup": 2.5044939935533055,
+      "endpoints_numerically_identical": true
+    }
+  },
+  "claim_scope": "SCOPED_IMPLEMENTATION_VERIFIED_ONLY_NO_FULL_REI_PRODUCTION"
+}
