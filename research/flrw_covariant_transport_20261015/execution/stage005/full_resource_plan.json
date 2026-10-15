@@ -1,0 +1,104 @@
+{
+  "status": "ROOT_GO_FRESH005_FULL_PAIR_AFTER_ACTUAL_ALL5_SCREEN_AND_C9",
+  "source_identity_sha256": "1a2268e3da98ed47159cb738762a1a3d3d17bdcb6806e611cbd2bc3c0c6eaff7",
+  "binary_sha256": "4aa337414a275c66068a900b8349a4114ddc1b1eebad1d904b61cbbd3da84fd4",
+  "binary": "/root/REI_FLRW_COVARIANT_20261015_005/target/release/examples/axbi_reionization",
+  "fresh_only": true,
+  "physics": {
+    "q_ref": 0,
+    "end_zbar": 4,
+    "n_mu": 8,
+    "local_target": 1e-05,
+    "source_IC_rates": "identical to accepted shortscreen; original cold Grackle and donor optin retained",
+    "no_extra_quasar_model": true
+  },
+  "cases": [
+    {
+      "case": "FLRW_FULL_Q512_001",
+      "role": "BASELINE",
+      "config": "full_q512.cfg",
+      "config_sha256": "0900652e009ebcff7566892d771de3f67a73eb8910f654f813a3069e30e78ef1",
+      "transport_cells": 512,
+      "threads": 8,
+      "cpus": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "address_space_bytes": 8589934592,
+      "native_rss_cap_bytes": 2147483648,
+      "output_budget_bytes": 12884901888
+    },
+    {
+      "case": "FLRW_FULL_Q1024_001",
+      "role": "REFINEMENT",
+      "config": "full_q1024.cfg",
+      "config_sha256": "0c9a2aef946763ed554fb418206fc329871ef0b8a9fab63f8aa6ea5c592466a3",
+      "transport_cells": 1024,
+      "threads": 8,
+      "cpus": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "address_space_bytes": 8589934592,
+      "native_rss_cap_bytes": 2147483648,
+      "output_budget_bytes": 12884901888
+    }
+  ],
+  "limits": {
+    "global_worker_ceiling": 64,
+    "our_native_workers": 16,
+    "our_address_space_bytes": 17179869184,
+    "host_memory_ceiling_bytes": 120259084288,
+    "aggregate_our_output_bytes": 25769803776,
+    "accepted_per_case": 800000,
+    "tentatives_per_case": 2600000,
+    "rhs_per_case": 200000000,
+    "cumulative_full_wall_s": 43200,
+    "closeout_reserve_s": 300,
+    "campaign_epoch_rule": "create only at FIRST actual full launch; never reset; all runtime limits use same absolute deadline",
+    "runtime_wall_rule": "remaining=deadline-now-300; native=remaining-20; externalTERM=remaining-10; externalKILL=remaining",
+    "minimum_free_disk_before_launch_bytes": 34359738368,
+    "minimum_free_disk_during_run_bytes": 8589934592
+  },
+  "output": {
+    "spectra_every_accepted": 2000,
+    "wall_checkpoint_s": 30,
+    "wall_checkpoint_also_emits_fullgrid_spectrum_and_retains_checkpoint": true,
+    "history_and_ledger_every_accepted": true,
+    "per_case_scientific_output_bytes": 12750684160,
+    "per_case_launcher_reserve_bytes": 134217728,
+    "risk": "Explicit12GiB allocation covers measured ~8.7GB output audit envelope; actual12GiB/24GiB/disk/counter/wall stops remain binding, no full completion cost or accuracy certificate."
+  },
+  "host_workload_preflight": {
+    "observed_other_python_pids": [
+      233578,
+      233805
+    ],
+    "observed_other_mean_busy_cores": 23.9934883717,
+    "other_affinity": "both broad0..63, untouched; ourcaseaffinities disjoint only between ourcases",
+    "observed_mem_available_kib": 128673200,
+    "observed_disk_free_bytes": 38468550656,
+    "refresh_required_immediately_before_launch": true
+  },
+  "required_gate": "ROOT_GO received; actual ALL5 independentPASS and source0053targettests/C9PASS; controller still verifies exactsource/build/config andfreshhostresourcecapacity beforefirstlaunch",
+  "created_utc": "2026-10-15T14:49:15.591995+00:00",
+  "source_epoch_root": "/root/REI_FLRW_COVARIANT_20261015_005",
+  "campaign_root": "/root/REI_FLRW_COVARIANT_20261015_005/full_campaign001",
+  "compiler_provenance": {
+    "pinned_build": "Rust1.94.1 existing explicitTC path",
+    "installed_default_login": "Rust1.99.0 recordedread-only, notused/reinstalled/rebuilt",
+    "source_archive_sha256": "95d4a6c1ec55d87b3a5dcf7fa5e9e0356df6f2be666b0c689019c8350770fd4b"
+  }
+}

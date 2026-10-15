@@ -139,6 +139,7 @@ impl DriverConfig {
             256 => Ok(224 * 1024 * 1024),
             2048 => Ok(1920 * 1024 * 1024),
             4096 => Ok(3968 * 1024 * 1024),
+            12288 => Ok(12160 * 1024 * 1024),
             _ => Err(err("AXBI_OUTPUT_ALLOCATION")),
         }
     }
@@ -147,11 +148,12 @@ impl DriverConfig {
             256 => Ok(32 * 1024 * 1024),
             2048 => Ok(128 * 1024 * 1024),
             4096 => Ok(128 * 1024 * 1024),
+            12288 => Ok(128 * 1024 * 1024),
             _ => Err(err("AXBI_OUTPUT_ALLOCATION")),
         }
     }
     fn validate(&self) -> Result<(), ForwardError> {
-        if ![256, 2048, 4096].contains(&self.output_budget_mib)
+        if ![256, 2048, 4096, 12288].contains(&self.output_budget_mib)
             || (self.inactive_hi_split && self.q_ref != 0.0)
             || !(1..=64).contains(&self.transport_threads)
             || !(8..=1024).contains(&self.transport_cells)
@@ -930,6 +932,9 @@ pub fn compiled_identity() -> String {
         include_str!("../../../research/flrw_covariant_transport_20261015/HPC_CONTRACT.md"),
         include_str!(
             "../../../research/flrw_covariant_transport_20261015/BACKGROUND_CACHE_CONTRACT.md"
+        ),
+        include_str!(
+            "../../../research/flrw_covariant_transport_20261015/OUTPUT_ALLOCATION_005_CONTRACT.md"
         ),
     ]
     .join("\nAXBI_SOURCE_BOUNDARY\n")
