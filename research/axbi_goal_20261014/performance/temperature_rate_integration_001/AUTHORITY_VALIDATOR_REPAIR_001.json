@@ -1,0 +1,57 @@
+{
+  "schema": "rei.axbi.validator_repair_authority.v1",
+  "work_id": "TEMP_RATE_INTEGRATION_001/VALIDATOR_REPAIR_001",
+  "issued_utc": "2026-10-14T13:09:53.308741+00:00",
+  "decision": "AUTHORIZE_TEST_ONLY_ONE_NEW_BOUNDED_SEGMENT",
+  "scientific_admission": "NOT_ISSUED",
+  "parent_authority_sha256": "3cca99146d936f3c25ce568c1a5aba0eb7814c7a3ea81f6db818535bbfa866c7",
+  "first_failure_classification": "FALSE_FAIL_NUMERICAL_DIAGNOSTIC_PAYLOAD_EXACTNESS",
+  "first_failure": {
+    "receipt_sha256": "e121bd1ff5f4cf7a2dbac0733ed8a85538a5e3c1ca07d01d17418ae50326bead",
+    "ce_cap_direct": 7.433109681610461e-49,
+    "ce_cap_table": 7.43310968160731e-49,
+    "relative_difference": 4.2391533768814674e-13,
+    "frozen_relative_gate": 1e-06,
+    "original_cargo_consumed": 2,
+    "cumulative_cargo_before": 7
+  },
+  "allowed_mutation": [
+    "tests/provider_integration.rs",
+    "raw/validator_repair_001/",
+    "VALIDATOR_REPAIR_001_RECEIPT.json",
+    "SOURCE_MANIFEST.json"
+  ],
+  "immutable": [
+    "src/*.rs",
+    "Cargo.toml",
+    "Cargo.lock",
+    "data/rates.bin",
+    "all canonical sources/configs/tolerances"
+  ],
+  "test_repair": [
+    "Use accepted public validation::compare_rate_bundle and validation::compare_rhs_pair for 15 coefficients,45 RHS fields,gross scaling,4 conservation checks",
+    "Keep exact EOS T, branch masks, dr_low_branch, CI floors and structural zeros",
+    "CE cap is bitwise returned CE when active else +0; DR excluded is bitwise raw DR on low branch else +0, and physical DR cooling zero on low branch",
+    "Nonzero diagnostic payload coefficient gate 1e-300+1e-6*abs(reference)",
+    "Retain 4 original T values and add 9284.0; zero photo and mixed_fixture nonzero photo/gross each",
+    "13 accepted invalid RHS cases with identical DIRECT/TABLE errors and no Ok",
+    "Invalid rate T 0,0.5,1000001,NaN,+Infinity error parity",
+    "Do not rerun direct_attempt_binary64_parity"
+  ],
+  "new_segment_limits": {
+    "preparation_wall_s": 600,
+    "cargo_invocations": 1,
+    "cargo_timeout_s": 300,
+    "new_point_rhs_evaluations": 1000,
+    "new_coefficient_calls": 4000,
+    "evidence_bytes": 16777216,
+    "trajectories": 0,
+    "construct": 0,
+    "benchmark": 0,
+    "ncp_science": 0,
+    "automatic_retries": 0,
+    "cumulative_cargo_after_max": 8
+  },
+  "command": "CARGO_BUILD_JOBS=1 RUSTFLAGS='-C link-arg=-Wl,--threads=1' cargo test --release --locked --offline --manifest-path research/axbi_goal_20261014/performance/temperature_rate_integration_001/Cargo.toml --test provider_integration table_point_fixtures -- --test-threads=1 --nocapture",
+  "stopping_rule": "Static review then sole command. Any source drift/compile/test/resource failure => HOLD exact, preserve raw/cost; no retry or scope expansion. PASS => independent read-only changed-surface review before pilots under parent allocation."
+}

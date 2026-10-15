@@ -1,0 +1,154 @@
+{
+  "schema": "rei.axbi.supervisor_loss_recovery_decision.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "decision": "PRESERVE_ORPHAN_LIVE_WORK_AND_PREPARE_BOUNDED_QUEUE_RECOVERY",
+  "scientific_admission": "NOT_ISSUED",
+  "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED",
+  "written_utc": "2026-10-14T08:17:52.566288+00:00",
+  "observations": {
+    "observed_utc": "2026-10-14T08:15:53.176609+00:00",
+    "supervisor_pid": 396137,
+    "supervisor_present": false,
+    "supervisor_session_error": "Parent reports write_stdin session95129 Unknown process id; not independently invoked by this reviewer.",
+    "original_processes": [
+      {
+        "case": "ZERO",
+        "time_pid": 396140,
+        "time_ppid": 1,
+        "pgid": 396140,
+        "sid": 396140,
+        "timeout_pid": 396143,
+        "rust_pid": 396146,
+        "rust_state": "R",
+        "cpu_affinity_argument": 0
+      },
+      {
+        "case": "SHEAR_PLUS",
+        "time_pid": 396141,
+        "time_ppid": 1,
+        "pgid": 396141,
+        "sid": 396141,
+        "timeout_pid": 396144,
+        "rust_pid": 396145,
+        "rust_state": "R",
+        "cpu_affinity_argument": 1
+      }
+    ],
+    "process_elapsed_seconds": 2148,
+    "observed_other_axbi_solver_or_campaign_supervisor": false,
+    "receipt_path": "research/axbi_goal_20261014/driver/full/allocations/32d11e733155/FULL_CAMPAIGN_RECEIPT.json",
+    "receipt_sha256": "ef6a01ac2a7819bcb81919ca93b005c482a150f2ba468f4bcd290e1cd924bb71",
+    "receipt_mtime_utc": "2026-10-14T08:11:25.651143+00:00",
+    "receipt_status": "RUNNING",
+    "receipt_solver_runs_started": 2,
+    "receipt_jobs_dispatched": 2,
+    "receipt_not_started_cases": [
+      "SHEAR_MINUS",
+      "SHEAR_HALF_PLUS",
+      "SHEAR_HALF_MINUS"
+    ],
+    "receipt_prior_and_current_started_runs": 5,
+    "launcher_path": "research/axbi_goal_20261014/driver/full/run_campaign.py",
+    "launcher_sha256": "026adb1e521fe49e5e8e2d5db493d4429c51d999d1037f8db5ce5e496eebdadb"
+  },
+  "classification": {
+    "supervision": "SUPERVISOR_LOST",
+    "science_execution": "TWO_ORPHAN_LIVE_CASES; NOT_STOPPED_OR_RESTARTED",
+    "receipt": "STALE_RUNNING_RECORD; preserve as first supervisor evidence",
+    "cause": "UNKNOWN; parent loss and session disappearance do not establish cause",
+    "scientific_failure": "NOT_ESTABLISHED",
+    "remaining_cases": "ALREADY_AUTHORIZED_PHASE1_UNSTARTED; no additional scientific allocation requested"
+  },
+  "preserved_authorization": {
+    "goal_and_allocation_identity": "REI-AXBI-GOAL-20261014; full allocation binary32d11e733155",
+    "phase1_exact_case_set": [
+      "ZERO",
+      "SHEAR_PLUS",
+      "SHEAR_MINUS",
+      "SHEAR_HALF_PLUS",
+      "SHEAR_HALF_MINUS"
+    ],
+    "phase1_max_solver_starts": 5,
+    "already_started": 2,
+    "remaining_max_new_starts": 3,
+    "queue_order": [
+      "SHEAR_MINUS",
+      "SHEAR_HALF_PLUS",
+      "SHEAR_HALF_MINUS"
+    ],
+    "max_total_concurrent_cases_including_orphans": 2,
+    "case_wall_seconds": 10800,
+    "case_accepted_cap": 200000,
+    "case_tentative_cap": 650000,
+    "case_rhs_cap": 20000000,
+    "case_threads": 1,
+    "case_total_output_mib": 2048,
+    "case_scientific_output_mib": 1920,
+    "phase1_sum_wall_ceiling_seconds": 54000,
+    "retries": 0,
+    "baseline_restart": false,
+    "identity_and_limits_source": "Existing FULL_DRIVER_BINDING.json plus FULL_CAMPAIGN_EXECUTION_CONTRACT.json; reverify frozen_plan before any new launch."
+  },
+  "smallest_recovery": [
+    "Assign one lower-tier execution worker a separate bounded recovery entrypoint and binding. Do not edit run_campaign.py, compiled driver, config, original allocation receipt or original raw files.",
+    "Reuse the unchanged reviewed frozen_plan() and run_case() through a normal module import where feasible. frozen_plan rechecks exact binary/source/config/review bindings; run_case retains original external caps, one-thread environment, disjoint output paths, raw logs and actual launch receipts.",
+    "Seed recovery accounting with the two observed starts and original prior pilot costs, rather than creating a new campaign allocation. Keep the recovery evidence beside the original allocation under a distinct recovery name, with total existing plus recovery bytes inside the applicable envelope.",
+    "Before every queued dispatch refresh actual process groups and exact command/case/output identity, original start receipts and absence of that unstarted case output/raw path. Count both adopted live groups and any newly started jobs toward max2, and all starts toward original max5. Exclude ZERO and SHEAR_PLUS permanently from the recovery start set.",
+    "Treat an original slot as occupied until its original process group has no running members and external GNU-time/terminal evidence is collected or explicitly classified. A stale receipt, absent supervisor, closed parent tool session or isolated missing PID never frees a slot by itself.",
+    "When one slot is free and exit classification permits, start only the next remaining authorized case using its frozen config/output and a free original CPU. Keep all temporal integration sequential within each case. No duplicate starts, automatic retries, baseline recomputation, extra signs or amplitude cases.",
+    "Use a durable supervisor launch compatible with the local execution environment and verify its actual live PID and observed monitoring progress. Do not mistake successful launch request acceptance for persistent supervision. The recovery entrypoint should have direct file-backed own stdout/stderr within its envelope rather than depend on the parent tool stream.",
+    "Preserve the first supervisor-loss evidence. Collect eventual original GNU-time and driver RETURN/checkpoint data without overwriting original incomplete logs. Non-child original processes cannot be reaped with waitpid; derive terminal status from actual process-group exit and existing external time/driver outputs, with missing quantities UNKNOWN.",
+    "The recovery observer must retain the current 10800s original deadline from original process start, not from observer adoption. It must retain original combined output/RSS monitoring or report the monitor gap. Existing timeout/prlimit and in-driver limits remain active; restarting their clocks is forbidden."
+  ],
+  "exit_and_dependency_policy": {
+    "normal_complete": "A verified completed original case frees a slot for the next queued case immediately after the focused recovery review passes. No generic readiness loop.",
+    "supervisor_loss_only": "Loss of supervisor is not a scientific dependency failure and does not revoke the original three-case execution authorization.",
+    "original_fail_stop": "The frozen run_campaign() stops new dispatch after any failed case. The recovery path preserves this behavior by default; it must not silently treat absence of its original Python future result as success.",
+    "typed_resource_stop": "If an adopted case reaches its frozen cap, preserve the checkpoint and cumulative charge and apply FULL_PROGRESS_RESOURCE_DECISION.json. Its same-case continuation needs an explicit finite resource binding; it cannot be obtained by restarting this queue. Other signed cases remain scientifically independent execution candidates, but a departure from the original stop-on-failure dispatch policy must be an explicit controller/authority decision based on the actual stop reason, not guessed now.",
+    "physical_numerical_guard_failure": "HOLD affected scientific descendants and new same-method case dispatch pending exact failure classification; preserve all raw evidence. Do not relabel a solver guard failure as supervisor loss.",
+    "unknown_exit": "HOLD new dispatch until exact available terminal/time evidence is classified; retain missing evidence as UNKNOWN. Preparation and resource observation continue within their finite limits."
+  },
+  "routing_and_owner_scope": {
+    "already_authorized": "The original phase1 release already authorizes the remaining three distinct case starts within the exact five-case and max2 parallel limits. A new owner permission request for those same starts is unnecessary.",
+    "new_mechanical_surface": "Recovery orchestration is a new execution surface. A lower-tier worker should implement the narrowly bound wrapper and factual accounting; independent review is read-only and limited to changed recovery behavior.",
+    "controller_direct_implementation": "Explicit owner approval for controller-direct fallback is not evidenced in the supplied context. Original scientific run authorization alone does not establish the AGENTS capacity-fallback exception. Reuse an available compatible lower-tier worker; do not invent owner authorization or repeat failed agent spawns.",
+    "controller_direct_invocation": "After the lower-tier implementation and focused review, any controller invocation must remain a prescribed invocation within owner scope and the binding, with actual executor identity recorded. This does not authorize controller-authored implementation fallback.",
+    "observed_identity": "Requested role/model and observed runtime identity remain separate; no self-description or task name is independent runtime evidence."
+  },
+  "bounded_implementation_contract": {
+    "allowed_new_paths": [
+      "research/axbi_goal_20261014/driver/full/recover_supervisor_32d11e733155.py",
+      "research/axbi_goal_20261014/driver/full/allocations/32d11e733155/SUPERVISOR_RECOVERY_BINDING.json",
+      "research/axbi_goal_20261014/driver/full/allocations/32d11e733155/recovery_001/",
+      "research/axbi_goal_20261014/reviews/SUPERVISOR_RECOVERY_REVIEW.json"
+    ],
+    "forbidden_mutations": [
+      "scientific source or binary",
+      "full or pilot configs",
+      "original FULL_CAMPAIGN_RECEIPT.json",
+      "original source/config/launch receipts and raw evidence",
+      "any live process during preparation"
+    ],
+    "preparation_caps": {
+      "commands": 12,
+      "wall_seconds": 600,
+      "solver_starts": 0,
+      "mechanical_check_invocations_max": 1
+    },
+    "single_targeted_mechanical_check": "Use fake process observations and fake launch call, never a scientific binary: two live original groups produce zero new starts; one slot frees exactly one next case; repeated polling does not duplicate; previously existing case/start refuses; total starts stops at5 and concurrency never exceeds2; non-success classification preserves dispatch stop.",
+    "independent_review": "One fresh read-only reviewer of the exact diff, bound argv, adopted occupancy/deadlines, original+new accounting, output envelope and meaningful mechanical check. No new scientific-method review because the frozen driver/config remain unchanged.",
+    "pass_transition": "On focused PASS, start the recovery observer immediately under the original allocation. Actual remaining solver starts occur only as eligible slots free, max3, original order and caps. No extra owner confirmation for original case starts."
+  },
+  "reviewer_accounting": {
+    "current_assignment_command_cap": 12,
+    "current_assignment_wall_cap_seconds": 600,
+    "commands_started_including_this_write": 4,
+    "solver_starts": 0,
+    "tests": 0,
+    "builds": 0,
+    "process_actions": 0,
+    "git_actions": 0,
+    "only_written_path": "research/axbi_goal_20261014/scenario/SUPERVISOR_LOSS_RECOVERY_DECISION.json"
+  },
+  "claim_ceiling": "Recovery and remaining case launches are execution progress only. No full-history, signed-response, convergence,C11,AX15 or whole-goal PASS is issued."
+}

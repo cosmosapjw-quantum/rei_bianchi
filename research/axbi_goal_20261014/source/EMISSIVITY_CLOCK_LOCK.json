@@ -1,0 +1,78 @@
+{
+  "node_id": "AX04",
+  "source_id": "MD14_Z002_FESC_BB50K_13P6_100_V1",
+  "scenario_id": "PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1",
+  "scenario_path": "research/axbi_goal_20261014/scenario/SCENARIO_LOCK.json",
+  "scenario_sha256": "07aa11d2d3fd47d2ed95e9d9161f6205e4d9ba386c27ad43d2b298fcd86d1696",
+  "frozen_contract": "research/axbi_goal_20261014/scenario/AX04_SOURCE_CONTRACT.md",
+  "contract_sha256": "1462b144900080d8e767b229648d3158379bec04f689f510e8a9824972dc7b5b",
+  "source": {
+    "role": "CONTINUOUS_ISOTROPIC_COMOVING_PHOTON_EMISSIVITY",
+    "sfr_density": "psi(z)=0.015*(1+z)^2.7/(1+((1+z)/2.9)^5.6)",
+    "sfr_units": "Msun yr^-1 cMpc^-3",
+    "stellar_metallicity_mass_fraction": 0.002,
+    "log10_ionizing_yield_formula": "1/(0.00038*Zstar^0.227+0.01858)-log10(2.55)",
+    "ionizing_yield_units": "photons s^-1 per (Msun yr^-1)",
+    "escape_fraction": 0.2,
+    "escaped_total_comoving_rate": "fesc*10^log10_ionizing_yield*psi(z), photons s^-1 cMpc^-3",
+    "sfr_and_yield_source": "https://arxiv.org/html/1403.0007; eq15, eq22, Fig16 caption",
+    "high_z_support": "The analytic function is selected as an explicit phenomenological continuation over 8<zbar<=20. It is not claimed to be measured or calibrated there; model uncertainty is separate from numerical convergence. No tabulated provider is extrapolated.",
+    "cosmology_conversion": "Use published numerical MD14 fit as a chosen comoving source law in the reference cosmology; no claim of re-fitting its observed luminosity dataset to Planck.",
+    "spectral_model": "photon-number shape phi(E) proportional to E^2/expm1(E/(kB_eV*Tstar)), normalized to integral 1 on selected support",
+    "stellar_temperature_k": 50000.0,
+    "energy_support_ev": [
+      13.6,
+      100.0
+    ],
+    "spectral_choice_source": "https://arxiv.org/html/2304.02038v2, discussion following eq3 and eq4; https://arxiv.org/abs/1405.5473",
+    "spectral_scope": "Idealized O-star-like blackbody shape, not a stellar-population synthesis spectrum or empirical EoR spectral fit. Truncation at 100 eV is part of model; report omitted blackbody tail fraction separately.",
+    "proper_spectral_rate": "escaped_total_comoving_rate/(mpc_cm^3*a^3)*phi(E), photons cm^-3 s^-1 eV^-1 integrated over solid angle",
+    "per_H_spectral_rate": "escaped_total_comoving_rate/(mpc_cm^3*nH0)*phi(E), photons H^-1 s^-1 eV^-1",
+    "angular_density": "proper_spectral_rate/(4*pi); apply angle weights exactly once when making cell-integrated photon stocks",
+    "clumping_factor": 1.0,
+    "AGN_source": "OFF"
+  },
+  "clock": {
+    "coordinate": "gas proper seconds",
+    "origin": "elapsed proper time since each matched zbar=20 initial slice",
+    "time_ref_s": 0.0,
+    "absolute_cosmic_age_s": null,
+    "required_plot_label": "Elapsed proper time since zbar=20",
+    "unit_normal": "n.n=-1 in x0=ct",
+    "physical_velocity": "U=c*n; U.U=-c^2",
+    "donor_velocity_conversion": "No donor four-velocity consumed; chosen non-tilted IC has n=(1,0,0,0) in x0=ct, U=(c,0,0,0)."
+  },
+  "initial_radiation": {
+    "ionizing_photons": "Exactly zero by chosen source-switch-on IC at zbar20; this is an explicit idealized IC, not a missing donor field filled with zero.",
+    "reflection_even": true,
+    "cmb_reference": "Isotropic blackbody at a_ref with T=Tcmb0/a_ref; Tcmb0/a later is the isotropic Compton reference approximation, not exact directional temperature.",
+    "scope": "No pre-zbar20 astrophysical photons or gas photoheating. Source onset and prehistory uncertainty remain conditional IC assumptions."
+  },
+  "point_input": "zbar on gas-proper clock via scale factor a; source law is redshift parameterized",
+  "source_redshift_domain": [
+    4,
+    20
+  ],
+  "quadrature": {
+    "energy_edges_ev": [
+      13.6,
+      24.59,
+      54.42,
+      100
+    ],
+    "log_cells_per_segment_default": 16,
+    "cell_simpson_subpanels": 32,
+    "original_subpanels": 8,
+    "change": "Preauthorized deterministic quadrature repair after preserved failed1e-7 cell energy moment check",
+    "cell_normalization": "sum actual N_i, same denominator for energy; E_i=U_i/N_i",
+    "reference_normalization": 4096,
+    "independent_test_reference": 8192,
+    "cell_energy_reference_subpanels": 64,
+    "relative_moment_tolerance": 1e-07,
+    "number_normalization_tolerance": 1e-12,
+    "angular": "Gauss-Legendre nmu8 (refine16/32),nphi1, weightsw/2",
+    "driver_fixed_q_requirement": "AX05 maps proper isotropic source onto covariant rays with solid-angle Jacobian and normalizes finite quadrature once; baseline weights are local angular representation"
+  },
+  "tail_diagnostic": "Integral100..500eV divided by13.6..500; no physical injection beyond100eV",
+  "scientific_admission": "NOT_ISSUED"
+}

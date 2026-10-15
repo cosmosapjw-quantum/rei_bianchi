@@ -1,0 +1,122 @@
+{
+  "schema": "rei.rux.scenario_decisions.v1",
+  "status": "CANDIDATE_NOT_PHYSICAL_ADMISSION",
+  "authorization": "Current user authorizes development, source-backed justified choices and delivery; old six blank approval slots are not a permission barrier.",
+  "selected_execution_candidate": {
+    "path": "E-P",
+    "entrypoint": "coupled_primary::PrimaryStage",
+    "base_commit": "c07fc7e765ce204bc3e84016cc6874612e535b86",
+    "provider_candidate": "EB warm source",
+    "provider_commit": "a5c958c414dea41216b445c05f58df837f05cacb",
+    "integration_status": "PENDING_SOURCE_INTEGRATION",
+    "adoption_owner": "RUX00",
+    "physical_admission": false
+  },
+  "decisions": [
+    {
+      "field": "background_cosmology",
+      "value": null,
+      "status": "UNRESOLVED_SCIENTIFIC_INPUT",
+      "owner_node": "RUX02",
+      "next_resolution": "Bind the selected source background parameters; if rec cosmology differs request only matching background/clock/IC fields.",
+      "user_permission_required": false
+    },
+    {
+      "field": "proper_time_origin_and_epoch_map",
+      "value": null,
+      "status": "UNRESOLVED_SCIENTIFIC_INPUT",
+      "owner_node": "RUX02",
+      "next_resolution": "Resolve the actual donor epoch and background clock; reconcile the reported clock mismatch before physical use.",
+      "user_permission_required": false
+    },
+    {
+      "field": "gas_initial_state",
+      "value": null,
+      "status": "UNRESOLVED_SCIENTIFIC_INPUT",
+      "owner_node": "RUX02",
+      "next_resolution": "Select sourced H/He ion fractions, proper densities and temperature; resolve conflicting 20 K versus 6.137 K inputs, do not silently substitute.",
+      "user_permission_required": false
+    },
+    {
+      "field": "radiation_initial_state",
+      "value": null,
+      "status": "UNRESOLVED_SCIENTIFIC_INPUT",
+      "owner_node": "RUX02",
+      "next_resolution": "Bind saved or justified spectral/angular IC including units and support; no fixture relabeling.",
+      "user_permission_required": false
+    },
+    {
+      "field": "spectral_source_role_history",
+      "value": null,
+      "status": "UNRESOLVED_SCIENTIFIC_INPUT",
+      "owner_node": "RUX02",
+      "next_resolution": "Choose explicit emissivity versus imposed UVB role/history/support and source/halo/clumping assumptions.",
+      "user_permission_required": false
+    },
+    {
+      "field": "rate_thermal_family_and_domain",
+      "value": null,
+      "status": "UNRESOLVED_SCIENTIFIC_INPUT",
+      "owner_node": "RUX03",
+      "next_resolution": "Bind the actual injected provider; warm 3e4..1.1e5 K source does not cover cold 6..20 K. Require LOWT-PROVIDER if selected scenario needs that domain.",
+      "user_permission_required": false
+    },
+    {
+      "field": "closure_and_event_owners",
+      "value": null,
+      "status": "UNRESOLVED_SCIENTIFIC_INPUT",
+      "owner_node": "RUX03",
+      "next_resolution": "Choose exactly Case-A transport, Case-A escape ledger or Case-B/OTS; bind opacity, heating, work and boundary owners once.",
+      "user_permission_required": false
+    },
+    {
+      "field": "geometry_and_shear",
+      "value": null,
+      "status": "UNRESOLVED_SCIENTIFIC_INPUT",
+      "owner_node": "RUX04",
+      "next_resolution": "Choose source-backed FLRW/Bianchi background and declared shear classes; separate physical and numerical/counterfactual response labels.",
+      "user_permission_required": false
+    },
+    {
+      "field": "observer_endpoint_and_tail",
+      "value": null,
+      "status": "UNRESOLVED_SCIENTIFIC_INPUT",
+      "owner_node": "CC-RECV",
+      "next_resolution": "Choose supported observer/ray/clock and tail; represented segment is available before a physical total. Unknown tail stays null.",
+      "user_permission_required": false
+    },
+    {
+      "field": "same_source_continuum_error_support",
+      "value": null,
+      "status": "UNRESOLVED_SCIENTIFIC_INPUT",
+      "owner_node": "SCIENCE-REVIEW",
+      "next_resolution": "For continuum claims bind nodal errors plus between-node curvature/BV/event bounds or dense signed residual; no endpoint precision substitution.",
+      "user_permission_required": false
+    }
+  ],
+  "invariants": {
+    "proper_density": true,
+    "runtime_clock": "proper seconds with explicit origin",
+    "electron_census": "ne = nH * (xHII + fHe * (xHeII + 2*xHeIII)) for the declared H/He baseline",
+    "extra_Q_factor": false,
+    "unknown_is_zero": false,
+    "emitted_recombination_photon_count": "Undefined for Case-A escape; escape energy is not an emitted spectrum/count.",
+    "optional_CR_HH_RCT": "OFF",
+    "local_xHII_is_QV": false,
+    "full_angular_exact_plus_minus_symmetry": false,
+    "shear_precision_comparison": "Conditional on the stated free-decaying Bianchi-I background, observer and quadrupole-compliance assumptions; no unconditional claim below every numerical floor."
+  },
+  "reuse": {
+    "F08_endpoint_rows": 15,
+    "current_saved_plot_admission": "SYNTHETIC/PRESCRIBED_DISCRETE_ONLY",
+    "unchanged_scientific_checks": "REUSE_DO_NOT_REPLAY"
+  },
+  "soft_followups": {
+    "OBSERVER15": "R8 same-SHEAR12 GL32 certified cubic R7-A selected; R9_SOURCE07_SAME_TARGET_CUBIC_RETURN_CONTRACT next; production receiver false",
+    "HE47": "R3",
+    "CR58": "NT_COULOMB_MATCHED_PARTITION_DECISION",
+    "HH64": "PHYS32",
+    "warm_HE_HH_absolute_IVP": null,
+    "CR_finite_rate_same_target": false
+  }
+}

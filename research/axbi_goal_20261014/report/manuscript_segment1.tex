@@ -1,0 +1,65 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,hyperref,graphicx}
+\title{Hydrogen and helium abundance histories in non-tilted axisymmetric Bianchi I cosmology}
+\author{Working research manuscript}
+\date{14 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+This workspace describes a homogeneous hydrogen--helium reionization calculation and its matched signed-shear comparisons. The principal products are nuclear charge-state abundances versus proper cosmic time and time-ordered gas temperature. Numerical histories and figures will be inserted only from completed, identified calculations. This document currently reports the model conventions and implemented provider binding, without claiming an evolved cosmological history.
+\end{abstract}
+\section{Geometry, clocks, and controlled approximation}
+The metric is
+\begin{equation}
+ ds^2=-c^2dt^2+a^2\{e^{-2b}(dx^2+dy^2)+e^{4b}dz^2\}.
+\end{equation}
+With $s=\dot b$, the directional expansion rates are $(H-s,H-s,H+2s)$ and $\sigma^2=3s^2$. The primary physical family keeps matter, radiation and $\Lambda$ densities fixed and uses $H^2=H_{\rm FLRW}^2+s^2$, $s\propto a^{-3}$. A separate SAME\_H calculation is a counterfactual diagnostic. The reference label $q_{\rm ref}=s_*/H_{\rm FLRW}(a_*)$ differs from the instantaneous $\Sigma=s/H$. The minimum family is $q_{\rm ref}=0,\pm q_{\rm amp}/2,\pm q_{\rm amp}$; amplitude and reference epoch require an identified scenario and quantified omitted-feedback bound.
+
+The gas is non-tilted. In the coordinate convention $x^0=ct$, its unit normal satisfies $n\cdot n=-1$ and physical four-velocity is $U=cn$, $U\cdot U=-c^2$. Proper time is in seconds with a declared absolute epoch map. The mean-expansion redshift $\bar z=a^{-1}-1$ is distinct from a ray's observed redshift. The campaign target is $\bar z=20$ to $4$, conditional on supported source/provider and donor choices; any endpoint change must be explicitly justified.
+
+\section{Atomic gas and energy ownership}
+The evolved fractions are $(x_{\rm HII},x_{\rm HeII},x_{\rm HeIII})$, with neutral fractions supplied by element complements. The electron census is
+\begin{equation}
+ n_e=n_{\rm H}[x_{\rm HII}+f_{\rm He}(x_{\rm HeII}+2x_{\rm HeIII})],\qquad f_{\rm He}=n_{\rm He}/n_{\rm H}.
+\end{equation}
+All densities are proper $\mathrm{cm}^{-3}$. The ideal monatomic EOS is $u=\frac32 k_BT(n_{\rm H}+n_{\rm He}+n_e)$ and the evolved thermal variable is $w=u/n_{\rm H}$ in erg/H.
+
+The selected point provider binds existing Grackle 3.4.1 functions at commit \texttt{af793949} (full pinned identity in the source manifest) through the repository's IGM implementation\cite{grackle}. Its operational domain is $1\le T/\mathrm K\le10^6$; this range is numerical support, not measured empirical fit accuracy. Case A capture escape, clumping one, and primary-only photoelectron heating are selected. Source CI floors and CE caps remain diagnostic outputs. DR chemistry and owned cooling are off at $T\le9284$ K, with excluded raw cooling retained diagnostically. CR, HH, RCT, metals, molecules, dust, secondary electrons and metastable CI are absent.
+
+A common photo event owns the ionization, binding-energy increment, and excess thermal power. CI uses the same chemistry event and binding threshold as its thermal sink. RR/DR capture owns both released binding energy and kinetic cooling in escape. CE and free-free cooling add no chemistry events. CMB exchange is signed, with opposite gas/CMB reservoir rates. Expansion work on gas is $2Hu$. No recombination escape photon count is manufactured.
+
+\section{Radiation and matched source conventions}
+The isotropic proper-frame source and initial radiation are reflection-even. Energy and angle characteristics satisfy
+\begin{equation}
+ \dot E=-E[H+s(3\mu^2-1)],\qquad \dot\mu=-3s\mu(1-\mu^2).
+\end{equation}
+The quadrupole is retained; dipole and axial force are tested only under the stated parity assumptions. Source history, energy support, proper/comoving conversion and absorption/work/boundary owners must be bound before numerical execution. Externally supplied point photo rates alone are not a source history.
+
+\section{Abundance normalization and mandatory products}
+For the selected H/He-only model $n_b=n_{\rm H}+4n_{\rm He}$. Report $Y_i=n_i/n_b$ for every charge state, and $y_e=n_e/n_b$ separately for electrons. Element fractions and baryon-number shares $A_iY_i$ are distinct quantities. The charge-state baryon sum is one only for the complete selected inventory; explicitly omitted reservoirs would permit a tracked sum below one. Donor nuclear abundance does not equal evolved ionic abundance. D, T, $^3$He and Li charge states remain unimplemented optional extensions.
+
+Mandatory products are abundance versus proper time, time-ordered parametric abundance versus $T_{\rm gas}$, matched FLRW/Bianchi comparisons, and signed response versus numerical resolution. A nonmonotone temperature trajectory is never sorted into an apparent single-valued curve. Hydrogen $0.1/0.5/0.9$ crossings are measured from saved histories; noncrossing is censored or not reached. Homogeneous $x_{\rm HII}$ is not $Q_V$.
+
+\section{Numerical validation and results intake}
+Point implicit residuals must use the same provider/model/domain as accepted steps. Positivity, nuclei/charge conservation, photon and energy ledgers, rejected trials, raw failures and identified checkpoints are required. A baseline and two refinement levels provide empirical resolution evidence; no FT03 interval certificate or rigorous continuum proof is inherited. One identified source variant and one IC variant quantify sensitivity without interpreting it as posterior uncertainty.
+
+\begin{center}
+\begin{tabular}{ll}\toprule
+Product & Current intake status\\\midrule
+Provider binding and original-C parity & See AX02 implementation receipt\\
+Full FLRW and signed-shear histories & Not yet inserted\\
+Time/temperature abundance figures & Await identified saved histories\\
+Convergence and source/IC sensitivity & Not yet inserted\\
+Independent scoped scientific decision & Not issued\\\bottomrule
+\end{tabular}
+\end{center}
+
+The retained F08 endpoint comparisons have their original synthetic prescribed-discrete scope. Their 15 endpoint rows are not reconstructed time histories and do not replace these campaign products. A resolved null or supported upper bound is an acceptable result; detection is not required. Segment Thomson depth may be reported as a secondary diagnostic; an unknown observer tail is neither zero nor a barrier to the abundance-history goal.
+
+\section{Reproduction}
+Future release instructions must identify actual driver/config/source versions, complete case argv, cumulative budgets, raw stdout/stderr, checkpoints and output CSV/figure scripts. At present the provider receipt and source manifest identify preparation only. Publication and a compilable manuscript do not constitute scientific completion.
+\begin{thebibliography}{9}
+\bibitem{grackle} Grackle development team, Grackle 3.4.1 pinned rate functions, \url{https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c}. Repository literal-C fixture and retained license provide the independent point reference.
+\end{thebibliography}
+\end{document}

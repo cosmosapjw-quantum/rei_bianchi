@@ -1,0 +1,28 @@
+{
+  "schema": "rei.codex.delivery-validation/1",
+  "date": "2026-10-14",
+  "base_commit": "c07fc7e765ce204bc3e84016cc6874612e535b86",
+  "scope": "New execution support, additive handoff and saved endpoint postprocessing",
+  "checks": [
+    {"command": "python3 -m unittest discover -s tests/rux_codex -v", "exit_code": 0, "tests": 10},
+    {"command": "python3 scripts/rux_codex/workflow.py --dag docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/EXECUTION_DAG.json check", "exit_code": 0, "nodes": 25},
+    {"command": "python3 scripts/rux_codex/workflow.py --dag docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/EXECUTION_DAG.json ready", "exit_code": 0, "ready": ["RUX00", "RETAINED-REVIEW", "SIBLING-INTAKE", "REPORT-DRAFT"]},
+    {"command": "python3 scripts/rux_codex/workflow.py --dag docs/fastest_track_chat/REI-CODEX-SCIENCE-20261014/EXECUTION_DAG.json packet REPORT-DRAFT", "exit_code": 0, "eligible": true},
+    {"command": "git diff --check", "exit_code": 0},
+    {"check": "Canonical v2 node objects equal embedded verbatim_v2 objects", "matched": 17, "mismatches": 0},
+    {"check": "DAG and task-packet IDs, paths, acceptance and execution budgets match", "matched": 25, "mismatches": 0},
+    {"check": "New JSON/TOML parsing and local document links", "result": "PASS"},
+    {"check": "Retained plot visually inspected", "result": "PASS_SCOPED_PRESENTATION"},
+    {"check": "Existing Rust, configs and run inputs remain unchanged", "result": "PASS"},
+    {"check": "Forward base remote readback", "sha": "c07fc7e765ce204bc3e84016cc6874612e535b86"}
+  ],
+  "scientific_scope": {
+    "new_solver_runs": 0,
+    "completed_scientific_suites_replayed": 0,
+    "new_output": "Paired differences and plots from 15 retained F08 endpoint rows",
+    "inherited_admission": "HOLD",
+    "new_physical_full_history_claim": false,
+    "current_NCP_job_state": null
+  },
+  "publication": "Actual commit, remote readback and draft PR are recorded by the delivery receipt after push; this validation is not a publication claim."
+}

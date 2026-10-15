@@ -1,0 +1,76 @@
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics)
+error[E0599]: no method named `support_bounds` found for reference `&QFixedGrid` in the current scope
+  --> tests/axbi_q_support.rs:36:26
+   |
+36 |         let (lo,hi)=grid.support_bounds();
+   |                          ^^^^^^^^^^^^^^ method not found in `&QFixedGrid`
+
+error[E0282]: type annotations needed
+  --> tests/axbi_q_support.rs:37:20
+   |
+37 |         assert_eq!(lo.len(),grid.number().len());
+   |                    ^^ cannot infer type
+
+error[E0599]: no method named `support_bounds` found for struct `QFixedGrid` in the current scope
+  --> tests/axbi_q_support.rs:48:18
+   |
+48 |     assert!(late.support_bounds().0.iter().any(|x|*x>55.0&&*x<59.0));
+   |                  ^^^^^^^^^^^^^^ method not found in `QFixedGrid`
+
+error[E0599]: no method named `support_bounds` found for struct `QFixedGrid` in the current scope
+  --> tests/axbi_q_support.rs:61:27
+   |
+61 |         let (lo,hi)=total.support_bounds();
+   |                           ^^^^^^^^^^^^^^ method not found in `QFixedGrid`
+
+error[E0599]: no method named `absorb_reconstructed_support` found for struct `QFixedGrid` in the current scope
+  --> tests/axbi_q_support.rs:78:15
+   |
+78 |     let a=one.absorb_reconstructed_support(&gf,gas,dt,1).unwrap();
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: there is a method `absorb_reconstructed` with a similar name
+   |
+78 -     let a=one.absorb_reconstructed_support(&gf,gas,dt,1).unwrap();
+78 +     let a=one.absorb_reconstructed(&gf,gas,dt,1).unwrap();
+   |
+
+error[E0599]: no method named `absorb_reconstructed_support` found for struct `QFixedGrid` in the current scope
+  --> tests/axbi_q_support.rs:79:16
+   |
+79 |     let b=four.absorb_reconstructed_support(&gf,gas,dt,4).unwrap();
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: there is a method `absorb_reconstructed` with a similar name
+   |
+79 -     let b=four.absorb_reconstructed_support(&gf,gas,dt,4).unwrap();
+79 +     let b=four.absorb_reconstructed(&gf,gas,dt,4).unwrap();
+   |
+
+error[E0599]: no method named `support_bounds` found for struct `QFixedGrid` in the current scope
+  --> tests/axbi_q_support.rs:98:17
+   |
+98 |     let lo=grid.support_bounds().0.to_vec();
+   |                 ^^^^^^^^^^^^^^ method not found in `QFixedGrid`
+
+error[E0599]: no method named `support_bounds` found for struct `QFixedGrid` in the current scope
+  --> tests/axbi_q_support.rs:99:17
+   |
+99 |     let hi=grid.support_bounds().1.to_vec();
+   |                 ^^^^^^^^^^^^^^ method not found in `QFixedGrid`
+
+error[E0599]: no method named `support_bounds` found for struct `QFixedGrid` in the current scope
+   --> tests/axbi_q_support.rs:102:24
+    |
+102 |     assert_eq!(lo,grid.support_bounds().0);
+    |                        ^^^^^^^^^^^^^^ method not found in `QFixedGrid`
+
+error[E0599]: no method named `support_bounds` found for struct `QFixedGrid` in the current scope
+   --> tests/axbi_q_support.rs:103:24
+    |
+103 |     assert_eq!(hi,grid.support_bounds().1);
+    |                        ^^^^^^^^^^^^^^ method not found in `QFixedGrid`
+
+Some errors have detailed explanations: E0282, E0599.
+For more information about an error, try `rustc --explain E0282`.
+error: could not compile `rei_microphysics` (test "axbi_q_support") due to 10 previous errors

@@ -1,0 +1,49 @@
+{
+  "schema": "rei.axbi.plus_runtime_classifier_incident.v1",
+  "observed_utc": "2026-10-14T14:42:23.191170+00:00",
+  "status": "RUNTIME_CLASSIFIER_FALSE_POSITIVE_SOLVER_ABORTED",
+  "case": "SHEAR_PLUS",
+  "segment": "SHEAR_PLUS_RESOURCE_CONTINUATION_001",
+  "evidence": {
+    "runtime_receipt": "research/axbi_goal_20261014/driver/full/epoch_recovery_001/plus/recovery_001/runtime_001/POST_PLUS_RECEIPT.json",
+    "runtime_receipt_sha256": "3efec0afff782d6ea42c64810943e70acae10875bb3b0d4eab806003e95e0097",
+    "handoff_refusal": "research/axbi_goal_20261014/driver/full/epoch_recovery_001/plus/recovery_001/runtime_001/HANDOFF_REFUSAL.json",
+    "handoff_refusal_sha256": "6c3ee9ab2567ef5dbfb9e23b6c173bb91bbeb73b74d5103b2e396c5f10098621",
+    "checkpoint": "research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_PLUS_continuation_001/checkpoint.txt",
+    "checkpoint_sha256": "7af4071c8267f349c0a1d106759aa39d5fa47423ecbb76137692d31d1f5f82a2",
+    "return_exists": false,
+    "time_log_bytes": 0,
+    "observer_error": "RuntimeError('LIVE_WORKERS_OR_CHILDREN_HOLD')",
+    "observer_status": "STOPPED_FOR_CLASSIFICATION",
+    "observer_polls": 53,
+    "observer_wall_s": 1193.0324753379682,
+    "allowed_solver_pgid": 1843269,
+    "falsely_blocked_pgid": 1911669,
+    "falsely_blocked_argv": [
+      [
+        "/bin/bash",
+        "-c",
+        "rg -n 'REC_BG_R9|REC_BG_R8|REC_BG' research/axbi_goal_20261014 | head -40"
+      ],
+      [
+        "rg",
+        "-n",
+        "REC_BG_R9|REC_BG_R8|REC_BG",
+        "research/axbi_goal_20261014"
+      ],
+      [
+        "head",
+        "-40"
+      ]
+    ],
+    "classifier": "scientific_groups checks basename startswith axbi_ for every argv operand; read-only rg path operand matched"
+  },
+  "accounting": {
+    "cumulative_plus_reserved_attempts": 2,
+    "observed_plus_solver_starts": 1,
+    "automatic_retry": false
+  },
+  "interpretation": "Read-only rg process group was misclassified as scientific; observer exception killed allowed solver group. This is a runtime classifier failure, not evidence of numerical solver failure or completed full history.",
+  "scientific_admission": "NOT_ISSUED",
+  "next": "Independent review and fresh bounded authority needed before any recovery/solver restart; retain raw first failure and checkpoint."
+}

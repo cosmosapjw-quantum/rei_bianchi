@@ -1,0 +1,77 @@
+{
+  "schema": "rei.source07.c5_ready.v1",
+  "stage": "C5_IMPLEMENTATION",
+  "status": "READY_FOR_SCOPED_OWNER_IMPLEMENTATION",
+  "parent_current": "0c9fd151b6e0aef9ee2414ed672364afa4a3dce1",
+  "source": "PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1",
+  "science_admission": "NOT_ISSUED",
+  "decision": "FIXED_REFERENCE_Q_ENERGY_ANGLE_GRID_AS_PRIMARY_FULL_HISTORY_CANDIDATE",
+  "reasons": [
+    "Naive every-step cohorts 384*200000*32 bytes =2.2888GiB base ray storage alone exceeds 2GiB cap",
+    "At q_ref not0, same LOCAL angular emission bin at different epochs gives different q-direction; positive one-massless-ray compression cannot conserve total number, k-vector and energy simultaneously",
+    "Actual local safe one-epoch cap384->256 saves 33.3% TaggedPhoton payload but changes fixed-neutral HI events -0.79664% and heat +1.27819%; not adopted as EoR",
+    "Fixed q grid N_E=256,N_mu=32 with 4 f64 arrays is 0.25 MiB raw arrays before solver state/cache; needs measured full memory"
+  ],
+  "protected": {
+    "geometry": "LRS Bianchi I a_perp=a exp(-b), a_par=a exp(2b), q_ref=0,+-.005,+-.01; proper time from zbar20",
+    "emitted_source": "MD14 50000K BB photo photons physical E=13.6..100eV, fesc0.2",
+    "reference_q_energy_support_eV": [
+      13.6,
+      432.2293723204678
+    ],
+    "source_transform": "eta_ref(E*,mu*)=R*J_Omega*eta_t(R E*,mu_t)",
+    "atomic_fit_cutoff_eV": [
+      13.6,
+      24.59,
+      54.42
+    ],
+    "binding_eV": [
+      13.598434599702,
+      24.587389011,
+      54.41776
+    ],
+    "chemistry": "HI/HII and HeI/HeII/HeIII, Case A, CR/RCT/HH OFF",
+    "user_locked_numerical_limits": "do not widen local tolerance or override canonical AXBI acceptance",
+    "old_results": "retain old49 and guard51 historical source identity; no automatic checkpoint cast"
+  },
+  "scoped_dag": [
+    {
+      "id": "C5_A",
+      "status": "READY",
+      "task": "Implement bounded true reference covariant-q grid; fixed q-angle nodes, 128x16 pilot, 256x32 reference, 512x32 refinement. Version state/source hash and budget; actual source must use R*J once and cutoff-split physical energy quadrature; include newly emitted photon bin support up to E*=432.23 eV.",
+      "test": "For each signed q and z=20,12,8,4, prove numeric photon count, mean physical emitted energy, HI/HeI/HeII sigma-weighted rate and photoheat convergence against C1 65dps; separate spectrally truncated negative controls."
+    },
+    {
+      "id": "C5_B",
+      "status": "READY",
+      "task": "Use existing C3 exact-q event-aware frozen neutral reference to integrate time-varying H_i(a) plus proper n_i(a), photoopacity and work; retain independent DOP853 controlled source-free test.",
+      "test": "Clock and photoheat electron conservation, threshold root bracketing, dt and spectral quadrature refinements."
+    },
+    {
+      "id": "C5_C",
+      "status": "READY",
+      "task": "Decide capacity-bound: 2GiB end-to-end resident memory and RAM/O(N_E*N_mu) deterministic reuse; no growing emission cohorts; allow 1-4 task-local CPU threads only where measured net gain.",
+      "test": "peakRSS, per-step wall clock, buffer sizes, memory cap held, no nested threads."
+    },
+    {
+      "id": "C5_D",
+      "status": "BLOCKED_C5_A_B",
+      "task": "Short source/IC matched comparison with existing AXBI energy-node Driver plus q-grid variant. Keep original AX08 histories untouched; different checkpoint version/variant required.",
+      "test": "Matched cold source/clock, nuclei/electron inventory, photon/energy including redshift, HI/HeI/HeII chemistry and Tg profiles; no full-interval science promotion."
+    }
+  ],
+  "alternative": "Retain source-bound TaggedPhoton cap as a strict single-ray local diagnostic for future code comparison. bass_cr PR66 scalar energy compression is not the missing q-vector/angular certificate.",
+  "resources": {
+    "tentative_memory_cases_MiB": {
+      "64x8x4double": 0.015625,
+      "128x16x4double": 0.0625,
+      "256x32x4double": 0.25,
+      "512x32x4double": 0.5
+    },
+    "state_scope": "raw four f64 arrays only, not heap, spectral cache, gas, solver and checkpoint",
+    "original_cohort_gib_for_200k_steps": 2.288818359375,
+    "rust_C4_capacity_reference_algorithm": "O((N-cap) N logN), not an amortized production reducer",
+    "native_subagents": "NOT_RUN",
+    "recommended_execution": "local Ubuntu 12 core Ryzen 5900X; resource-bounded native Rust + Python/scipy oracle; no unattended job"
+  }
+}

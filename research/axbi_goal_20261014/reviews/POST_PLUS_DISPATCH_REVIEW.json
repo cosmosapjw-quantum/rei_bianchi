@@ -1,0 +1,119 @@
+{
+  "schema": "rei.axbi.post_plus_dispatch_review.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "node_id": "AX08",
+  "case_id": "SHEAR_PLUS",
+  "segment_id": "SHEAR_PLUS_RESOURCE_CONTINUATION_001",
+  "reviewed_at_utc": "2026-10-14T10:11:36.649492+00:00",
+  "decision": "PASS_SCOPED_SERIALIZED_PLUS_SUCCESSOR_AFTER_ONE_TARGETED_REPAIR",
+  "dispatch_execution_authorized": true,
+  "launch_authorized_now": false,
+  "scientific_admission": "NOT_ISSUED",
+  "reviewer_implemented_reviewed_source": false,
+  "requested_reviewer": {
+    "model": "gpt-6-astra",
+    "effort": "xhigh"
+  },
+  "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED",
+  "scope": "Exactly one PLUS continuation through the reviewed serialized successor, only after the old shared scheduler naturally terminates and fresh runtime checks pass.",
+  "reviewed_input_sha256": {
+    "research/axbi_goal_20261014/driver/full/post_plus_dispatch.py": "7e8cd3ed86b003967361f464b46fd9885363641cededbeef0c244291c1ffcc12",
+    "research/axbi_goal_20261014/driver/full/post_plus_001/PLUS_CONTINUATION_BINDING.json": "7873c6e30802404932ff0b3cbe964fe4c38697554d1a2db02da1b2d48b202f01",
+    "research/axbi_goal_20261014/driver/full/post_plus_001/POST_PLUS_DISPATCH_BINDING.json": "cfe7866f447dda93d4e43909ea8a2940f9eef303467c0c76758090d62c1a24f8",
+    "research/axbi_goal_20261014/scenario/POST_PLUS_CAP_EXECUTION_DECISION.json": "8731004f23be8d5ed4fddfeaf5400211f0012bcb0b420a4958f84b706fd10429",
+    "rust/rei_microphysics/examples/axbi_plus_resource_continuation.rs": "242903c733cc44caaa038b5ab5e3d3d12f882e06093fba5aeb8022a41e655a1a",
+    "rust/rei_microphysics/tests/axbi_plus_resource_continuation.rs": "00dc02b2f54da9d89398f68155baaf084ae361ce9e308cdae57a66caece039bd",
+    "rust/rei_microphysics/target/release/examples/axbi_plus_resource_continuation": "0882f04ebfb0796b9af5d1bc643cadc2651fa5127e8eba4271d2a6861541c0e9",
+    "research/axbi_goal_20261014/driver/full/recover_queue.py": "ffa0b114982997f034f8aabc9f96b28014a3e32cef1d47db12d91cb0532fabe6",
+    "research/axbi_goal_20261014/driver/full/run_campaign.py": "026adb1e521fe49e5e8e2d5db493d4429c51d999d1037f8db5ce5e496eebdadb",
+    "research/axbi_goal_20261014/reviews/PLUS_CONTINUATION_REVIEW.json": "d5bcb3bf9c26ac664edea50133af6b970cfdf54211c8d5b4f8b7adb4817abc80",
+    "research/axbi_goal_20261014/driver/full/FULL_DRIVER_BINDING.json": "3e606b091142d07c62d733c7e757b884a1c6ef6765b5cd5dcde2d9626ac96f90",
+    "research/axbi_goal_20261014/driver/full/post_cap_dispatch.py": "bb5cee7a7a92782b5ff6530958a67c8091936f9f37ef1f5229ad11e06751cf6f",
+    "rust/rei_microphysics/target/release/examples/axbi_reionization": "32d11e733155d355a1fa748597b48ea1c8196adba3c871722a7a598f0b6cbfca",
+    "research/axbi_goal_20261014/driver/full/SHEAR_PLUS.cfg": "b9a8bdeaf61a68839e23486fa8ad0740fe1318c55cbc7f522e11cacbb4ff21c0",
+    "research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_PLUS/RETURN.txt": "d7e028dca87141f54ac2a653b4657781d679dde8e5a8de0a1bca43865a745862",
+    "research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_PLUS/checkpoint.txt": "00c74753d79b80c9f3fc73a3703d0f6b3f9d08fe003bf7bd816d570a9f37f831",
+    "research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_PLUS/config.cfg": "b9a8bdeaf61a68839e23486fa8ad0740fe1318c55cbc7f522e11cacbb4ff21c0",
+    "research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_PLUS/source_identity.txt": "d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185"
+  },
+  "authorized_driver_argv": [
+    "rust/rei_microphysics/target/release/examples/axbi_plus_resource_continuation",
+    "--config",
+    "research/axbi_goal_20261014/driver/full/SHEAR_PLUS.cfg",
+    "--predecessor",
+    "research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_PLUS",
+    "--output",
+    "research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_PLUS_continuation_001",
+    "--case",
+    "SHEAR_PLUS"
+  ],
+  "resolved_finding": {
+    "id": "PLUS_DISPATCH_R1",
+    "classification": "FALSE_FAIL_REVIEW_SCOPE_MISMATCH",
+    "initial_source_sha256": "e0dd9bc9dddd4fc93b95120b152a4124de0adb8a41145f559b326d4728f450f9",
+    "initial_lines": [
+      121,
+      129
+    ],
+    "initial_failure": "The shared mandatory-input set incorrectly required the accepted wrapper review to bind dispatcher source, both new binding files and recover_queue.py.",
+    "resolution": "review_scope_requirements supplies separate mandatory sets. Dispatcher requirements unchanged; wrapper requirements cover authority, wrapper source/test/binary, config and four predecessor inputs. Authorization, every listed hash, argv and binary checks remain.",
+    "repair_count": 1,
+    "status": "RESOLVED"
+  },
+  "findings": {
+    "natural_handoff": "PASS: old observer absent and terminal COMPLETED_POST_CAP_EXECUTION receipt with no queue, pending or unaccounted groups required; PID absence alone insufficient.",
+    "old_accounting": "PASS: require original5, ZERO1, full6 and all-history9 before successor.",
+    "single_continuation": "PASS: one PLUS start reserved durably before Popen; full7/history10; no retry or output reuse.",
+    "identity": "PASS: frozen source/config/argv/binary and predecessor inputs bound by exact hashes.",
+    "resource_envelope": "PASS: CPU0, one thread, timeout10799s, AS/RSS2GiB, science output1920MiB, total2048MiB, launcher wall10800s.",
+    "terminal_claim": "PASS: exit0 alone insufficient; actual status COMPLETE_SEGMENT_TO_SELECTED_ENDPOINT and a=0.2 required."
+  },
+  "unresolved_current_dispatcher_blockers": [],
+  "evidence": {
+    "first_hold": {
+      "path": "research/axbi_goal_20261014/driver/full/post_plus_001/preparation/raw/FIRST_HOLD.json",
+      "sha256": "6628693a5a6a31f9911e142e6abb35e564854c6bb4c76016f6106a5bed85fce8"
+    },
+    "original_preparation_receipt_sha256": "6a0e1cfd5bb636627dd26a95b6d30773ffc406bf77746f6c6bc1cfa569d9290c",
+    "repair_receipt_sha256": "e37e7ada7ae9fcd6061e5756dbccfaa590b375559267cd528236fa142096c650",
+    "repair_diff_sha256": "5a02f5c2859881f098f353993504607cfcafa360933f393d0e4fdd5e8f9011f0",
+    "membership_regression": "PASS_SCOPED_REVIEW_MEMBERSHIP_REGRESSION; original full fake check retained; reviewer did not rerun tests",
+    "execution_limit": "Static independent review and stored bounded preparation evidence; no live successor or physical continuation observed."
+  },
+  "latest_old_owner_snapshot": {
+    "observed_utc": "2026-10-14T10:11:36.649492+00:00",
+    "status": "OBSERVING",
+    "pid": 811686,
+    "total_full_starts": 4,
+    "prior_and_current_starts": 7,
+    "remaining_signed_queue": [
+      "SHEAR_HALF_PLUS",
+      "SHEAR_HALF_MINUS"
+    ],
+    "mutable_snapshot_only": true
+  },
+  "execution_conditions": [
+    "Wait for old owner to complete naturally.",
+    "Refresh process and terminal receipt; require no old owner or unaccounted group and full6/history9.",
+    "Require exact reviewed source/bindings/wrapper/binary/config/predecessor.",
+    "Require absent PLUS output/raw/runtime reservation; stopped/unknown old state remains HOLD."
+  ],
+  "next_executable_transition": "After natural terminal handoff and fresh checks pass, run python3 research/axbi_goal_20261014/driver/full/post_plus_dispatch.py --start-detached exactly once.",
+  "claim_ceiling": "Execution readiness only; no endpoint/full history/convergence/resolved shear/C11/AX15 PASS.",
+  "review_accounting": {
+    "read_commands": 8,
+    "read_command_cap": 12,
+    "wall_cap_seconds": 600,
+    "reviewer_file_writes": 0,
+    "tests": 0,
+    "solver_starts": 0,
+    "process_actions": 0,
+    "git_actions": 0,
+    "targeted_repairs_reviewed": 1
+  },
+  "serialization": {
+    "author": "independent read-only reviewer /root/plus_dispatch_review",
+    "serializer": "/root coordinator",
+    "content": "Scoped reviewer-authored decision and evidence; exact required hashes verified before writing."
+  }
+}

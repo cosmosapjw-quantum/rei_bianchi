@@ -1,0 +1,122 @@
+{
+  "schema": "rei.axbi.reducer_preparation_review.v1",
+  "decision": "PASS_SCOPED_PREPARATION",
+  "nodes": [
+    "AX11",
+    "AX12"
+  ],
+  "scope": "New pairwise completed-history diagnostic reducer and SOURCE/IC wrapper only. No actual full history or variant reduction was performed or admitted.",
+  "reviewer_requested_identity": {
+    "model": "gpt-6-astra",
+    "effort": "high"
+  },
+  "reviewer_observed_identity_or_null": null,
+  "runtime_identity_status": "NOT_INDEPENDENTLY_OBSERVED",
+  "independence": "Reviewer did not implement reviewed files. Only this review receipt was written.",
+  "reviewed_input_sha256": {
+    "research/axbi_goal_20261014/convergence/compare_histories.py": "b49fbed5f31a45e866915846357d1ddfdef8708ff7ba97ed17695ec8a5c3dc60",
+    "research/axbi_goal_20261014/convergence/README.md": "fc51163e3171f25be9941b7c066afbe2b8d2c18be1b87d9ef80e084dfeab1f99",
+    "research/axbi_goal_20261014/convergence/INPUT_TEMPLATE.json": "d1467b612578c7810a7520f08c24788f29c55995713d1d1cfe3fcc31d7e3111c",
+    "research/axbi_goal_20261014/robustness/compare_variants.py": "9081fd76f68a628a034b8cc9ebb5ca6e037bb301f1fc32ccc26a67eba5969b92",
+    "research/axbi_goal_20261014/robustness/README.md": "cb49d8e92f6d6676dce8fca1e80fa94a74e10a90e83cd9ac1468b85909b8611f",
+    "research/axbi_goal_20261014/convergence/IMPLEMENTATION_RECEIPT.json": "ad3ddc2fd4f4acc1c3a24131de10d61846c350cda56dae8fbd5b8f7c8d88e31c",
+    "research/axbi_goal_20261014/robustness/IMPLEMENTATION_RECEIPT.json": "ed463fc37e81ae0d1d76d86acd2c92030a0cd8c2955413825b5a6691b6086340",
+    "research/axbi_goal_20261014/scenario/FULL_PROGRESS_RESOURCE_DECISION.json": "53352cf41fc3247fafa73f252e384619b527c9d472e7c4eff51ea50b969b8597",
+    "research/axbi_goal_20261014/scenario/FULL_CAMPAIGN_EXECUTION_CONTRACT.json": "70834f661f09f72690a84572d2828f77f69ec71dfafa10546f7c92077e462989",
+    "research/axbi_goal_20261014/scenario/SCENARIO_LOCK.json": "07aa11d2d3fd47d2ed95e9d9161f6205e4d9ba386c27ad43d2b298fcd86d1696",
+    "research/axbi_goal_20261014/convergence/raw/complete_input_self_test.json": "c31a4aa8908cbd9a9894ff646ecf1813411555163ad738aac2a4c1294f6f07ad",
+    "research/axbi_goal_20261014/convergence/raw/complete_input_self_test.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/axbi_goal_20261014/convergence/raw/complete_input_self_test.stdout": "6026667d3a4dc004b96e90928e3515be452666c1551f569bfeb2cc70b3607af6",
+    "research/axbi_goal_20261014/convergence/raw/synthetic_self_test.json": "27878b74eaf18b98945628c585edb81f560f8183c6bb549c9d91e052beb74ec7",
+    "research/axbi_goal_20261014/convergence/raw/synthetic_self_test.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/axbi_goal_20261014/convergence/raw/synthetic_self_test.stdout": "6026667d3a4dc004b96e90928e3515be452666c1551f569bfeb2cc70b3607af6"
+  },
+  "reviewed_diff": "Entire newly added convergence/ and robustness/ source, documentation and template surfaces; these paths were untracked at review. No code or git mutation.",
+  "findings": [
+    {
+      "status": "PASS",
+      "surface": "Common grid and interpolation",
+      "evidence": "Exactly1001 samples uniform in ln(a); native A0=1/21 and A1=1/5 endpoints explicitly substituted in coordinate output. Piecewise linear interpolation uses consecutive ordered accepted rows; exact native matches returned directly, no extrapolation. Candidate/reference proper clocks independently interpolated and retained; no Tgas sorting."
+    },
+    {
+      "status": "PASS",
+      "surface": "Completed input and species validation",
+      "evidence": "Each of history, abundance, config, source identity and terminal requires an explicit path/SHA. Terminal status COMPLETE_REPRESENTED_INTERVAL, endpoint a=.2 and accepted+1 rows required; complete a=1/21\u21921/5 coverage and t0=0 required. Strict a/time order, six-species blocks, history/abundance alignment, finite nonnegative densities, element sums, fixed element inventory, baryon normalization and charge census checked. Missing/incomplete data yields null HOLD/UNKNOWN metrics."
+    },
+    {
+      "status": "PASS",
+      "surface": "Milestones",
+      "evidence": "First and all later upward x_i<threshold<=x_next brackets retained; theta applied separately to native ln(a) and proper time. Exact initial threshold is explicit, flat segments avoid division, shared endpoint is not double-counted. Initially above threshold does not invent a prior crossing. NOT_REACHED returns null with covered interval."
+    },
+    {
+      "status": "PASS",
+      "surface": "Case configuration comparison",
+      "evidence": "PAIRED permits q_ref plus resource bookkeeping changes; REFINEMENT permits exactly one numerical axis from local_target/energy_subdivisions/n_mu plus bookkeeping; SOURCE permits only escape_fraction and IC only initial_temperature_k plus bookkeeping. SOURCE/IC require an assumption reference. Config numeric representations compared numerically. Frozen source identities are retained for independent physical-compatibility interpretation, as documented; this prep review does not admit arbitrary supplied source pairs as physically matched."
+    },
+    {
+      "status": "PASS",
+      "surface": "Uncertainty and normalization floors",
+      "evidence": "Both interpolation and evolution uncertainty remain UNKNOWN; no Richardson estimate or accuracy PASS invented. Norms explicitly sampled/interpolated, endpoint shifts distinct. Ionic Y floors follow element-to-baryon factors; electron floor1e-7*(H/nb+3He/nb) propagates the charge census as locked. Proper ne/U floors remain null."
+    },
+    {
+      "status": "PASS",
+      "surface": "Raw preparation evidence",
+      "evidence": "Both recorded synthetic invocations exit0 with PASS stdout and empty stderr. Tests cover analytic linear interpolation, independent clocks, no extrapolation, multiple/initial/not-reached crossings and completed/incomplete parser fixtures. No reviewer test replay or physical solver run."
+    }
+  ],
+  "actual_raw_outcomes": [
+    {
+      "argv": [
+        "python3",
+        "research/axbi_goal_20261014/convergence/compare_histories.py",
+        "--self-test"
+      ],
+      "cwd": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+      "exit": 0,
+      "wall_seconds": 0.047266243025660515,
+      "cpu_seconds": 0.045577999999999994,
+      "max_rss_kib": 19616
+    },
+    {
+      "argv": [
+        "python3",
+        "research/axbi_goal_20261014/convergence/compare_histories.py",
+        "--self-test"
+      ],
+      "cwd": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+      "exit": 0,
+      "wall_seconds": 0.04762731306254864,
+      "cpu_seconds": 0.045884,
+      "max_rss_kib": 20312
+    }
+  ],
+  "open_current_blockers": [],
+  "preparation_limitations": [
+    "This is a two-case diagnostic engine; D01 and D12 require separate three-level input pairs. Paired differences across resolution levels, even/odd interpretation and supported error estimators are not claimed complete by this artifact.",
+    "No actual SOURCE/IC sensitivity or completed campaign result exists from this preparation task.",
+    "Independent scientific source/input compatibility and actual-results interpretation remain required before any resolved-response or robustness claim."
+  ],
+  "scientific_admission": "NOT_ISSUED",
+  "publication_decision": {
+    "approved": true,
+    "scope": "Reviewed reducer preparation code/docs/template, implementation receipts and raw synthetic evidence under existing owner audit-publication authorization.",
+    "labels": [
+      "PREPARATION_ONLY",
+      "ZERO_SOLVER_RUNS",
+      "NOT_ISSUED"
+    ]
+  },
+  "positive_transition": "When immutable completed reference/candidate descriptors and their applicable physical-input interpretation are available, run compare_histories.py once with that manifest, or compare_variants.py --kind SOURCE/IC for the named variant. Preserve all actual reduction outputs for independent results review; continuing full solver work is unaffected.",
+  "accounting": {
+    "current_shell_commands_including_receipt_write": 5,
+    "tests_replayed": 0,
+    "solver_runs": 0,
+    "actual_physical_reductions": 0,
+    "limits": {
+      "shell_commands": 12,
+      "wall_seconds": 900,
+      "solver_runs": 0
+    }
+  },
+  "goal_status": "IN_PROGRESS; reducer availability is not AX11/AX12 science completion or original goal completion."
+}

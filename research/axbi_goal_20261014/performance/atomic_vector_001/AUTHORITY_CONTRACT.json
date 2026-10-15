@@ -1,0 +1,181 @@
+{
+  "schema": "rei.axbi.atomic_vector_component_authority.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "work_id": "ATOMIC_VECTOR_001",
+  "decision": "AUTHORIZE_ONE_BOUNDED_STANDALONE_EXACT_COMPONENT_IMPLEMENTATION_AND_BENCHMARK; NO_CANONICAL_INTEGRATION",
+  "scientific_admission": "NOT_ISSUED",
+  "authority": {
+    "requested_model": "gpt-6-astra",
+    "requested_effort": "high",
+    "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED",
+    "role": "Read-only numerical authority; sole write is this contract"
+  },
+  "implementation": {
+    "requested_model": "gpt-6.1-sol",
+    "requested_effort": "medium",
+    "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED"
+  },
+  "checkout": {
+    "root": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+    "rule": "Existing checkout only; controller records live branch/HEAD/origin/status before worker writes; preserve all unrelated dirty/untracked paths. No clone/worktree/stash/reset/clean. Source pins below are checked now; Git HEAD reported in previous background contract is not independently refreshed by this authority."
+  },
+  "source_binding": {
+    "immutable_source_sha256": {
+      "rust/rei_microphysics/src/axbi_rates.rs": "e0d4d7e5d3a1b704af95ae54b63bb5e0c49e1fb68fdc4b0e7465dc92feeaf361",
+      "rust/rei_microphysics/src/axbi_driver.rs": "92bc6ca1540c927cde7452d218f666882ecdd651558b151b31e9a6a8e2d92c8f",
+      "rust/rei_microphysics/src/igm_rates.rs": "310164e620617f3089d488bd1f9668996b4a4cbd191383e45303def176ef81cf",
+      "rust/rei_microphysics/src/igm_thermal.rs": "30515d96270ec73a37829ba298513a42112991168479d3cb40f33b67fd469ab2",
+      "rust/rei_microphysics/src/igm_state.rs": "1651b00a517d67aaa71b38d3c69af6413570adfc38b591a3ed25284f039e0ae0",
+      "rust/rei_microphysics/src/atomic_provider.rs": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3",
+      "rust/rei_microphysics/src/hhe_events.rs": "c100b08e034089c2d67b2102769ccdd51f1d29a2f388d6bb2dfe7984af93b290",
+      "rust/rei_microphysics/Cargo.toml": "e04b3802c2555b612305bb900e1e9d509c2a4039a6deacf20d65ddf7e5249407"
+    },
+    "related_contract_sha256": {
+      "research/axbi_goal_20261014/performance/background_table_001/AUTHORITY_CONTRACT.json": "77b123318c5d512876b41c96456f241fb8d92256bcb0b5da163fd54a7b851f72",
+      "research/axbi_goal_20261014/provider/PROVIDER_DOMAIN_AND_OWNERS.json": "6ed73f70133f290851e764c50fe76bd3e042d8a3fdeb718689dcaf746c2167f3",
+      "research/axbi_goal_20261014/scenario/AX05_NUMERICAL_CONTRACT.md": "7403a1d0dcdbc3aa32d80c2f9bdd6ea5112e2b68432776c9de62bae5dd8c4054"
+    },
+    "source_owner": "Grackle 3.4.1 af7939494ce65007887ada7b98d1813df6843346; unchanged igm_rates selected Case A literal model; AtomicProvider::reference cross sections",
+    "baseline_protection": {
+      "original_binary_sha256": "32d11e733155d355a1fa748597b48ea1c8196adba3c871722a7a598f0b6cbfca",
+      "historical_compiled_identity": "d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185",
+      "current_compiled_identity": "4de69c1e68ebd395fe2d0b5580d901b9a82bde86cadbd11bdd07e5ad2042b4a1",
+      "identity_evidence": "Inherited background contract and controller report; this authority did not independently probe running processes",
+      "live_evidence_paths": [
+        "research/axbi_goal_20261014/execution/LIVE_RESUME_CHECKPOINT_20261014T1110Z.json",
+        "research/axbi_goal_20261014/reviews/SHEAR_MINUS_RESOURCE_STOP_SCIENCE_DECISION.json"
+      ],
+      "rule": "Never edit canonical source/config/binary or signal, restart, attach a profiler to, consume checkpoints as candidate trajectories, or change original/continuation/observer processes. Candidate cannot resume historical runs."
+    }
+  },
+  "evidence_basis": {
+    "static": "axbi_driver.rs:247-260 constructs energy nodes and three cross sections per energy once. axbi_sources.rs constructs spectral/angular quadrature once. Atomic thresholds/units and Grackle literal coefficients are fixed source data.",
+    "dynamic": "Reconstructed gas T, ne, absorber densities, radiation stocks, source amplitude, geometry and CMB temperature change. Rates depend on instantaneous EOS T; opacity depends on current Newton guess. Never cache any of these across unequal state inputs.",
+    "duplicate_rates": "axbi_rates.rs:51-53 computes EOS, calls igm_point_rhs, then rates; igm_thermal.rs:120-123 computes EOS and the same rate bundle. Exact candidate removes only the second rate evaluation.",
+    "repeated_opacity": "axbi_driver.rs:452-469 repeats the same energy-dependent three-term opacity, denominator and c*nh*sigma for each angular row. These can be reused within one residual call with original arithmetic association.",
+    "nuclear": "SPECIES_NORMALIZATION_REGISTRY.json and OUTPUT_CONTRACT.json define fixed 1H/4He inventory and evolving charge fractions. No active nuclear-reaction/BBN network; D,T,He3,Li absent optional extensions. No nuclear-network performance claim.",
+    "cold_scope": "Operational rate domain 1..1e6 K is not empirical fit validation; no new cold-EoR validity or completed-history claim."
+  },
+  "allowed_paths": {
+    "new_local_root": "research/axbi_goal_20261014/performance/atomic_vector_001",
+    "new_files": [
+      "Cargo.toml",
+      "Cargo.lock",
+      "src/lib.rs",
+      "src/main.rs",
+      "src/candidate_igm_thermal.rs",
+      "src/candidate_axbi_rates.rs",
+      "src/photon_kernel.rs",
+      "tests/exact_components.rs",
+      "run_ncp.sh",
+      "AUTHORITY_CONTRACT.json",
+      "RUN_BINDING.json",
+      "SOURCE_MANIFEST.json",
+      "IMPLEMENTATION_RECEIPT.json",
+      "BENCHMARK_RECEIPT.json"
+    ],
+    "generated_subtrees": [
+      "target/",
+      "raw/"
+    ],
+    "remote_root": "/root/REI_AXBI_GOAL_20261014_32d11e733155/performance/atomic_vector_001",
+    "rule": "Standalone independent workspace with unchanged local-path dependency ../../../../rust/rei_microphysics and CARGO_TARGET_DIR inside this subtree. No existing file modifications. Authority owns contract; worker may not change gates."
+  },
+  "approved_changes": {
+    "rate_bundle": "Copy pinned igm_thermal into candidate_igm_thermal under new subtree, retaining arithmetic, validation order, diagnostics and types (import original public IgmPointRhs/IgmPhotoInput rather than redefining). Change the private component return to include the already computed IgmRates alongside RHS. Candidate Axbi point retains its original initial gas.eos call, calls this bundle once, and assembles original AxbiPoint with that rate bundle. This removes the duplicate rates call only. Do not rewrite formulas or deduplicate EOS in this unit.",
+    "photon_reference": "Extract exact axbi_driver.rs evaluate photon-stock/photo-input loop as immutable scalar reference within photon_kernel.rs with source line provenance. Reproduce original finite checks and threshold-error branch. This component accepts fixed energies/signatures, absorbers,nh,dt,stocks; it is not a solver.",
+    "photon_hoist": "Precompute opacity[i] using the identical three-term iterator sum, denominator[i]=1.0+dt*c*opacity[i], rate_prefactor[i][k]=(c*nh)*signature[i][k], excess_ev[i][k]=energies[i]-threshold[k]. These values are local to one residual call except excess energies/signatures which are grid-constant. Do not combine rate*excess*ev into a reassociated product. Preserve original j ascending then k=0,1,2 order of gamma and heat accumulation, stock output order, and threshold check only when rate!=0.",
+    "blocked_variant": "One optional safe-Rust block-of-8 stock arithmetic loop is allowed; precompute independent n_j values in original input order then consume those values with unchanged sequential reductions. Tail length must be handled. No unsafe, fast-math, FMA substitution, reassociated reduction, Rayon, dependency addition or transcendental replacement. Call it blocked/vectorization-candidate unless emitted-code evidence establishes SIMD.",
+    "constant_factors": "Only exact source-defined grid constants and per-call repeated factors above are authorized. Existing compiler constant folding may already remove other coefficient setup; do not claim speedup from static-factor counts alone.",
+    "parallel": "Benchmark may distribute disjoint fixed point-input cases across at most two std::thread workers with private accumulators/buffers. Store per-case outputs indexed in original order and compare individually; no parallel physical reductions. This measures independent-case throughput only. Does not authorize concurrent trajectories or change science scheduler."
+  },
+  "excluded_approximations": {
+    "temperature_tables": "No T-table construction or interpolation in this unit. A future approximate table needs exact source binding, its own coefficient/derivative/solver acceptance contract, strict domain handling and explicit treatment of branches T=5500, T/11605=0.8, CE exponent caps and CI floors. Never interpolate silently across branches or make zero DR positive below its branch. Do not assume every coefficient is smooth/monotone or that a pointwise rate tolerance bounds Newton/history error.",
+    "reordered_reductions": "Require a separate numerical contract if requested; this unit preserves floating-point operation order. Difference is candidate nonconformance, not scientific-integrity failure.",
+    "canonical_integration": "Requires new bounded integration approval after component review, immutable original binary/source protection and separate candidate identity/output. No admission from this benchmark."
+  },
+  "validation": {
+    "point_matrix": "257 logarithmic requested temperatures from 1 to 1e6 K inclusive, plus next_down/exact/next_up around 5500,9284 and each CE cap transition 118348/LN_DHUGE,13179/LN_DHUGE,473638/LN_DHUGE. Cross with fractions [0,0,0],[2e-4,1e-5,1e-8],[.5,.25,.25],[1,0,1]; nh=1e-4 or 1; nhe=.08*nh; three photo/CMB cases: photo zero with Tcmb=2.7255; gamma=[1e-14,2e-14,3e-14] and matching heat=gamma*1e-12 with Tcmb=100; same nonzero photo with Tcmb=1e5. h=0 for matrix. Reference decides strict reconstructed-T endpoint success/failure; no projection.",
+    "additional_point_tests": "Absent helium with valid zero-He fractions; positive h; nonfinite/negative photo and bad heat-with-zero-gamma; invalid density, forged fractions/thermal energy, nonfinite h/Tcmb; combined-invalid cases verify original error precedence. Reuse semantic cases from existing axbi_rates/igm_thermal tests without editing them.",
+    "point_gate": "Reference AxbiProvider.point and candidate must return identical error variant/message, or all AxbiPoint temperature/rates/RHS fields equal by f64::to_bits including every diagnostic and branch boolean. Original state immutable. This exact-substitution target is explicit and limited to same-host/same-build source-preserving transformations, not a general scientific-output hash rule.",
+    "photon_matrix": "Energy grids exactly from AxbiSource subdivisions16 and32, angles8 and16. Same AtomicProvider reference cross sections. Test all-zero stocks, one occupied node at each threshold endpoint, deterministic varied nonnegative stocks, neutral/mixed/ionized absorber triples, dt=0,1,1e10,1e14, and a short final block. Include nonfinite stock and artificial nonzero cross section below threshold to test unchanged error path. Source-derived physical tests and artificial error fixtures are labelled separately.",
+    "photon_gate": "Every stock, gamma[3] and heat[3] matches reference bits; errors match variant/message. Require no negative/nonfinite physical output on valid cases. Reference and candidate photon loss versus dt*sum(absorber*gamma)/nh obey existing per-stage normalized count tolerance1e-10 when model-valid fixtures support this comparison; preserve raw residuals.",
+    "combined_gate": "For at least24 deterministic valid photon/gas inputs pass each variant's photo result into reference/candidate point evaluator and compare all outputs. No chemical_stage, Newton, adaptive_step or trajectory is called.",
+    "failure": "First parity/core invariant failure stops timings. Record exact input bits, all compared outputs and first differing field. No tolerance relaxation or automatic retry; one separately authorized targeted repair may follow independent review."
+  },
+  "benchmark": {
+    "fixed_workloads": "Fixed deterministic point-input list and fixed photon lists drawn from passed matrix; freeze list recipes or exact bits in RUN_BINDING. Reference and candidate execute same number/order of work items. Throughput uses disjoint per-case chunks at one and two workers, each retaining per-case order.",
+    "variants": [
+      "original AxbiProvider.point",
+      "candidate single-rate-bundle point",
+      "scalar original photon loop",
+      "per-energy-hoisted photon loop",
+      "optional block8 ordered-reduction photon loop"
+    ],
+    "timed_repetitions_max": 3,
+    "point_evaluations_total_max": 250000,
+    "photon_cells_total_max": 50000000,
+    "validation_point_evaluations_max": 50000,
+    "rule": "Totals include local tests, warmups, reference/candidate and remote work. Cumulative counters reserve before each batch. No resetting counters per host/repetition. Consume complete outputs via black_box and checksums; per-case scientific parity is checked before timing, not inferred from checksum.",
+    "metrics": [
+      "per-variant wall and process CPU",
+      "construction/setup cost included and separately reported",
+      "peakRSS",
+      "point-call and photon-cell counts",
+      "same-host component speed ratios",
+      "one-vs-two-worker independent-case throughput",
+      "first failures and numerical discrepancies"
+    ],
+    "ceiling": "No predicted whole-driver speedup, 64-core scaling, actual SIMD claim without emitted-code evidence, AX11/AX12 acceptance, full-history convergence or scientific admission."
+  },
+  "limits": {
+    "preparation_wall_seconds": 1800,
+    "targeted_build_or_test_invocations_max": 2,
+    "remote_benchmark_launches_max": 1,
+    "remote_wall_seconds": 300,
+    "remote_external_timeout_seconds": 299,
+    "threads_max": 2,
+    "address_space_bytes": 2147483648,
+    "durable_output_bytes": 67108864,
+    "remote_unused_disk_headroom_bytes_min": 10737418240,
+    "automatic_retries": 0,
+    "trajectory_starts": 0,
+    "chemistry_evolution_steps": 0,
+    "adaptive_solver_steps": 0,
+    "shared_scientific_solver_slots_consumed": 0,
+    "aggregate_rule": "Existing goal/task/cost identity retained. Controller records this incremental component allocation alongside BACKGROUND_TABLE_001 and all science costs; no borrowing/reset. Recheck available CPU/RAM/disk before remote execution; if no two spare permitted CPUs, run single-worker portion and report two-worker NOT_MEASURED. Do not disturb current background benchmark or original science."
+  },
+  "commands": {
+    "test": "CARGO_TARGET_DIR=<allowed-root>/target cargo test --release --manifest-path <allowed-root>/Cargo.toml --test exact_components",
+    "build": "CARGO_TARGET_DIR=<allowed-root>/target cargo build --release --manifest-path <allowed-root>/Cargo.toml --bin axbi_atomic_vector_benchmark",
+    "remote_argv": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "<remote-root>/raw/time.log",
+      "/usr/bin/timeout",
+      "--foreground",
+      "--signal=KILL",
+      "299s",
+      "/usr/bin/taskset",
+      "-c",
+      "<one-or-two-observed-available-allowed-CPUs>",
+      "/usr/bin/prlimit",
+      "--as=2147483648",
+      "--fsize=67108864",
+      "--",
+      "<remote-root>/axbi_atomic_vector_benchmark",
+      "--contract",
+      "<remote-root>/AUTHORITY_CONTRACT.json",
+      "--output",
+      "<remote-root>/raw/results.json"
+    ],
+    "binding": "Before launch write exact argv, cwd, host, CPUs, rustc/target flags, executable/source hashes, cumulative counts and remaining quota to RUN_BINDING. Verify transferred hashes. Parser implements these named flags; preserve stdout/stderr/exit/resource evidence. No target-cpu=native binary transfer unless CPU compatibility verified; prefer ordinary portable release."
+  },
+  "stopping_and_transition": {
+    "stop": "Complete fixed matrix and at most3 timings, or stop first invariant/resource/transport failure; preserve raw outcomes.",
+    "review": "Fresh read-only Astra reviewer receives pinned source comparison, candidate diff, complete numeric comparisons, raw timings/counters and receipts. Independent reviewer did not implement candidate.",
+    "pass_next_executable_action": "Component PASS allows controller to select measured useful exact substitution for a separately bounded candidate-driver integration contract; production originals remain immutable. Independent baseline READY work continues immediately under original contracts.",
+    "hold_next_action": "Return exact failing field/coordinate or missing capacity/identity. Do not create another process-only audit; defer blocked candidate and continue already-authorized independent work."
+  }
+}

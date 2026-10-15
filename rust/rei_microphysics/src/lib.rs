@@ -146,8 +146,18 @@ pub mod flrw_three_equations;
 pub mod he_rct;
 
 pub mod coupled_primary;
+pub mod rux_adapter;
 
 pub mod igm_background;
 pub mod igm_state;
 pub mod igm_rates;
 pub mod igm_thermal;
+pub mod axbi_rates;
+pub mod axbi_background;
+pub mod axbi_sources;
+pub mod axbi_driver;
+pub mod axbi_q_reference;
+pub mod axbi_q_advance;
+pub mod axbi_q_capacity;
+pub mod axbi_q_grid;
+pub mod axbi_q_closure;

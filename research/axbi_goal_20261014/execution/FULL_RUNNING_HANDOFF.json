@@ -1,0 +1,92 @@
+{
+  "source_prefix": "32d11e733155",
+  "status": "FULL_PHASE1_RUNNING",
+  "live_processes": [
+    {
+      "pid": 396137,
+      "process_group": 396131,
+      "state": "S",
+      "RSS_kib": 8308,
+      "argv": [
+        "python3",
+        "-u",
+        "research/axbi_goal_20261014/driver/full/run_campaign.py",
+        "--run"
+      ]
+    },
+    {
+      "pid": 396145,
+      "process_group": 396141,
+      "state": "R",
+      "RSS_kib": 2860,
+      "argv": [
+        "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/axbi_reionization",
+        "--config",
+        "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/axbi_goal_20261014/driver/full/SHEAR_PLUS.cfg",
+        "--output",
+        "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_PLUS",
+        "--case",
+        "SHEAR_PLUS"
+      ]
+    },
+    {
+      "pid": 396146,
+      "process_group": 396140,
+      "state": "R",
+      "RSS_kib": 2980,
+      "argv": [
+        "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/target/release/examples/axbi_reionization",
+        "--config",
+        "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/axbi_goal_20261014/driver/full/ZERO.cfg",
+        "--output",
+        "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO",
+        "--case",
+        "ZERO"
+      ]
+    }
+  ],
+  "checkpoint_coverage": [
+    {
+      "case": "ZERO",
+      "zbar": 18.727644871763577,
+      "a": 0.05069028799435215,
+      "ln_a_progress_fraction": 0.04355248181593138,
+      "accepted": 20820,
+      "tentative": 62514,
+      "rhs": 437622,
+      "rejections": 18,
+      "next_dln_a": 3.125e-06,
+      "max_Newton_residual": 2.711881210823776e-13,
+      "last_error": 3.724218786706006e-06,
+      "checkpointed_wall_s": 451.170943997,
+      "RETURN_exists": false,
+      "checkpoint": "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO/checkpoint.txt"
+    },
+    {
+      "case": "SHEAR_PLUS",
+      "zbar": 19.014528704080103,
+      "a": 0.04996370460605165,
+      "ln_a_progress_fraction": 0.03349209878914789,
+      "accepted": 16200,
+      "tentative": 48654,
+      "rhs": 340602,
+      "rejections": 18,
+      "next_dln_a": 3.125e-06,
+      "max_Newton_residual": 2.6093587742475076e-13,
+      "last_error": 3.7483109753627163e-06,
+      "checkpointed_wall_s": 450.582678612,
+      "RETURN_exists": false,
+      "checkpoint": "research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_PLUS/checkpoint.txt"
+    }
+  ],
+  "remaining_queue": [
+    "SHEAR_MINUS",
+    "SHEAR_HALF_PLUS",
+    "SHEAR_HALF_MINUS"
+  ],
+  "parallel_authorized": 2,
+  "tool_session_id": 95129,
+  "read_only_monitor_command": "python3 - <<'PY'\nimport json,pathlib\np=pathlib.Path('research/axbi_goal_20261014/driver/full/allocations/32d11e733155')\nprint((p/'FULL_CAMPAIGN_RECEIPT.json').read_text())\nfor q in [pathlib.Path('research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO'),pathlib.Path('research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_PLUS')]:\n print(q);print((q/'checkpoint.txt').read_text().splitlines()[:3]);print('RETURN exists:',(q/'RETURN.txt').exists())\nfor pid in [396137]:\n q=pathlib.Path('/proc')/str(pid);print('supervisor',pid,'alive',q.exists());print((q/'cmdline').read_bytes().replace(b'\\0',b' ') if q.exists() else b'')\nPY",
+  "execution_handling": "Existing supervisor owns queue; monitor it. Do not issue a second --run, kill or restart, and do not resume old-source checkpoints.",
+  "scientific_admission": "NOT_ISSUED"
+}

@@ -1,0 +1,77 @@
+     Locking 1 package to latest compatible version
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics)
+   Compiling axbi_temperature_rate_table_benchmark v0.1.0 (/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/axbi_goal_20261014/performance/temperature_rate_table_001)
+warning: unused import: `ForwardError`
+ --> src/validation.rs:2:80
+  |
+2 | use rei_microphysics::{igm_rates::igm_rates,igm_state::IgmGasState,igm_thermal,ForwardError};
+  |                                                                                ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0308]: mismatched types
+   --> src/validation.rs:8:621
+    |
+  8 | ...let x=igm_thermal::igm_point_rhs(&state,nh,nhe,h,*tcmb,p);let y=igm_point_rhs(&state,nh,nhe,h,*tcmb,p,|q|table.query(q));r.direc...
+    |          --------------------------                       ^ expected `IgmPhotoInput`, found `thermal_adapter::IgmPhotoInput`
+    |          |
+    |          arguments to this function are incorrect
+    |
+    = note: `thermal_adapter::IgmPhotoInput` and `IgmPhotoInput` have similar names, but are actually distinct types
+note: `thermal_adapter::IgmPhotoInput` is defined in the current crate
+   --> src/thermal_adapter.rs:7:1
+    |
+  7 | pub struct IgmPhotoInput {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^
+note: `IgmPhotoInput` is defined in crate `rei_microphysics`
+   --> /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/igm_thermal.rs:7:1
+    |
+  7 | pub struct IgmPhotoInput {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^
+note: function defined here
+   --> /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/igm_thermal.rs:101:8
+    |
+101 | pub fn igm_point_rhs(
+    |        ^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+  --> src/validation.rs:8:741
+   |
+ 8 | ...(x,y){(Ok(a),Ok(b))=>{let av=fields(&a);let bv=fields(&b);let gross=av.iter().filter(|v|v.is_finite()).map(|v|v.abs()).sum::<f64>...
+   |                                 ------ ^^ expected `thermal_adapter::IgmPointRhs`, found `IgmPointRhs`
+   |                                 |
+   |                                 arguments to this function are incorrect
+   |
+   = note: `IgmPointRhs` and `thermal_adapter::IgmPointRhs` have similar names, but are actually distinct types
+note: `IgmPointRhs` is defined in crate `rei_microphysics`
+  --> /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics/src/igm_thermal.rs:15:1
+   |
+15 | pub struct IgmPointRhs {
+   | ^^^^^^^^^^^^^^^^^^^^^^
+note: `thermal_adapter::IgmPointRhs` is defined in the current crate
+  --> src/thermal_adapter.rs:15:1
+   |
+15 | pub struct IgmPointRhs {
+   | ^^^^^^^^^^^^^^^^^^^^^^
+note: function defined here
+  --> src/validation.rs:7:4
+   |
+ 7 | fn fields(x:&IgmPointRhs)->Vec<f64>{let mut v=vec![];v.extend(x.fraction_dt);v.extend(x.species_chemical_cm3_s);v.extend([x.w_dt_erg...
+   |    ^^^^^^ --------------
+
+error[E0689]: can't call method `to_bits` on ambiguous numeric type `{float}`
+  --> src/validation.rs:10:178
+   |
+10 |  for &b in &[5500.0,0.8*11605.0,118348.0/69.07755278982137,13179.0/69.07755278982137,473638.0/69.07755278982137,470000.0/69.07755278982137,94000.0/69.07755278982137]{let bits=b.to_bits();...
+   |       - you must specify a type for this binding                                                                                                                                 ^^^^^^^
+   |
+help: specify the type in the closure argument list
+   |
+10 |  for &b: &f32 in &[5500.0,0.8*11605.0,118348.0/69.07755278982137,13179.0/69.07755278982137,473638.0/69.07755278982137,470000.0/69.07755278982137,94000.0/69.07755278982137]{let bits=b.to_bits();for t in [f64::from_bits(bits-1),b,f64::from_bits(bits+1)]{check_rates(table,t,&mut r)?}}
+   |        ++++++
+
+Some errors have detailed explanations: E0308, E0689.
+For more information about an error, try `rustc --explain E0308`.
+warning: `axbi_temperature_rate_table_benchmark` (lib) generated 1 warning
+error: could not compile `axbi_temperature_rate_table_benchmark` (lib) due to 3 previous errors; 1 warning emitted
+warning: build failed, waiting for other jobs to finish...

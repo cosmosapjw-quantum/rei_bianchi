@@ -1,0 +1,211 @@
+{
+  "schema": "rei.codex.return-contract/1",
+  "task_id": "REI-AXBI-GOAL-20261014",
+  "status": "RUNNING",
+  "session_checkpoint": "PAUSED_RESUMABLE",
+  "goal_status": "IN_PROGRESS",
+  "observed_utc": "2026-10-14T09:55:14.847738+00:00",
+  "execution_identity": {
+    "coordinator": "/root",
+    "requested_model": "gpt-6-astra/high for science; gpt-6.1-sol/medium for implementation",
+    "observed_model": null,
+    "observed_identity_basis": "NOT_INDEPENDENTLY_OBSERVED",
+    "native_delegation": "OBSERVED_TASK_TRANSPORT_NOT_MODEL_IDENTITY",
+    "executor": "reviewed shared post-cap dispatcher PID 811686",
+    "independent_reviewer": "separate read-only reviewer for each scoped decision",
+    "NCP": "SSH access timed out; NCP process/checkpoint unverified. Current cases run on local host at one CPU each."
+  },
+  "source_identities": [
+    {
+      "path": "rust/rei_microphysics/target/release/examples/axbi_reionization",
+      "sha256": "32d11e733155d355a1fa748597b48ea1c8196adba3c871722a7a598f0b6cbfca"
+    },
+    {
+      "path": "rust/rei_microphysics/target/release/examples/axbi_resource_continuation",
+      "sha256": "a7e3f1d98bd8a9b852357c95bb65bca4aabe13f45a9e679651d352af7dfe3b2b"
+    },
+    {
+      "path": "research/axbi_goal_20261014/driver/full/post_cap_dispatch.py",
+      "sha256": "bb5cee7a7a92782b5ff6530958a67c8091936f9f37ef1f5229ad11e06751cf6f"
+    },
+    {
+      "path": "research/axbi_goal_20261014/driver/full/post_cap_001/compose_zero_history.py",
+      "sha256": "da42b82799141a63573018479fbbca8bcf3b74bb3c846cfa68f9537902797f87"
+    }
+  ],
+  "config_identities": [
+    {
+      "case": "ZERO",
+      "path": "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO/config.cfg",
+      "sha256": "b83ac8f4e93704b249f08e2114501db56e3e5de039b99056c7c10efa9a782e41"
+    },
+    {
+      "case": "ZERO_RESOURCE_CONTINUATION_001",
+      "binding": "research/axbi_goal_20261014/driver/full/post_cap_001/ZERO_CONTINUATION_BINDING.json",
+      "sha256": "fa97916612d24becf7a5ecb0e813f2cb379649dae675114d723ac206c115644e"
+    },
+    {
+      "case": "SHEAR_MINUS",
+      "path": "research/axbi_goal_20261014/driver/full/SHEAR_MINUS.cfg",
+      "sha256": "d5227c1925d27a89e71bf59e1e5abd0557061f910172ea5fa9baacaece46c677"
+    }
+  ],
+  "commands": [
+    {
+      "command": "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --locked --test axbi_resource_continuation",
+      "executed": true,
+      "exit_code": 0,
+      "stdout_path": "research/axbi_goal_20261014/driver/full/post_cap_001/rust/test.log",
+      "stderr_path": "research/axbi_goal_20261014/driver/full/post_cap_001/rust/test.log"
+    },
+    {
+      "command": "cargo build --release --manifest-path rust/rei_microphysics/Cargo.toml --locked --example axbi_resource_continuation",
+      "executed": true,
+      "exit_code": 0,
+      "stdout_path": "research/axbi_goal_20261014/driver/full/post_cap_001/rust/build.log",
+      "stderr_path": "research/axbi_goal_20261014/driver/full/post_cap_001/rust/build.log"
+    },
+    {
+      "command": "python3 research/axbi_goal_20261014/driver/full/post_cap_dispatch.py --self-check",
+      "executed": true,
+      "exit_code": 0,
+      "stdout_path": "research/axbi_goal_20261014/driver/full/post_cap_001/dispatch/raw/mechanical_check.stdout",
+      "stderr_path": "research/axbi_goal_20261014/driver/full/post_cap_001/dispatch/raw/mechanical_check.stderr"
+    },
+    {
+      "command": "python3 research/axbi_goal_20261014/driver/full/post_cap_dispatch.py --start-detached",
+      "executed": true,
+      "exit_code": 0,
+      "output_pid": 811686,
+      "runtime_receipt": "research/axbi_goal_20261014/driver/full/post_cap_001/dispatch/runtime_001/POST_CAP_RECEIPT.json"
+    },
+    {
+      "command": "pdflatex -interaction=nonstopmode -halt-on-error -output-directory=research/axbi_goal_20261014/report research/axbi_goal_20261014/report/manuscript.tex",
+      "executed": true,
+      "exit_code": 0,
+      "output": "research/axbi_goal_20261014/report/manuscript.pdf"
+    }
+  ],
+  "outputs": {
+    "raw_data": [
+      "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO",
+      "research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_PLUS",
+      "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO_continuation_001",
+      "research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_MINUS"
+    ],
+    "plots": [
+      "research/axbi_goal_20261014/report/terminal_pair_32d11e733155/abundance_vs_elapsed_time.png",
+      "research/axbi_goal_20261014/report/terminal_pair_32d11e733155/abundance_vs_Tgas_time_ordered.png"
+    ],
+    "report": {
+      "path": "research/axbi_goal_20261014/report/manuscript.pdf",
+      "sha256": "1a594d4e3e5fbc2e750c6fa8c992d809f2b40509669301860851ab8a1e93db72",
+      "pages": 12
+    },
+    "checkpoint": {
+      "runtime_receipt_path": "research/axbi_goal_20261014/driver/full/post_cap_001/dispatch/runtime_001/POST_CAP_RECEIPT.json",
+      "runtime_receipt_sha256_at_snapshot": "582010b580a13be34fa192cbf7bea4288854cee2c958e53c69375d9e7112498e",
+      "current_case_checkpoints": {
+        "ZERO_continuation": {
+          "path": "research/axbi_goal_20261014/runs/flrw/32d11e733155/ZERO_continuation_001/checkpoint.txt",
+          "sha256_at_snapshot": "e526514197cbb6ba9f5c295320bdb9b30741ed5674fdcc441be4b8d46a90d492",
+          "accepted": 256320,
+          "zbar_at_snapshot": 7.423357022236171
+        },
+        "SHEAR_MINUS": {
+          "path": "research/axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_MINUS/checkpoint.txt",
+          "sha256_at_snapshot": "860f2aa81f79c5df57a78eab6a4893df12f0b383e7c2ada3e72674ae064acec8",
+          "accepted": 44100,
+          "zbar_at_snapshot": 17.343420329123454
+        }
+      }
+    },
+    "derivation": null
+  },
+  "claim": {
+    "status": "PASS_SCOPED_CONDITIONAL_PARTIAL_ZERO_AND_PLUS",
+    "scope": "H/He ion/gas conditional model from zbar20 to10.269313869154184 for ZERO and PLUS at matching a; both original runs stopped at accepted200000 resource caps. ZERO continuation and SHEAR_MINUS are running.",
+    "model_interval": "zbar20 to4 target, not yet completed",
+    "representation": "Cold point Grackle rates plus selected source model; not full BBN network",
+    "observer_tail": "UNKNOWN",
+    "acceptance_observed": [
+      "original ZERO and PLUS partial accepted-state/ledger reviews",
+      "matched-a terminal figure and report reviews"
+    ],
+    "unknown_fields": [
+      "completed zbar4 ZERO",
+      "completed signed family",
+      "global convergence",
+      "paired refinement uncertainty",
+      "resolved shear effect",
+      "full BASS tau/visibility"
+    ],
+    "error_components": {
+      "numerical": "local controls scoped; global error unknown",
+      "atomic": "cold empirical accuracy unestablished",
+      "source": "selected phenomenological source conditional",
+      "geometry": "selected axisymmetric Bianchi I model conditional",
+      "spectral_spatial_closure": "held at adopted RUX v2 boundaries"
+    },
+    "excluded_claims": [
+      "GOAL_DONE",
+      "full zbar20 to4",
+      "resolved shear detection",
+      "full BBN nuclear network",
+      "absolute age/IVP",
+      "observer tail"
+    ]
+  },
+  "reused_evidence": [
+    "research/axbi_goal_20261014/reviews/FLRW_RESOURCE_STOP_SCIENCE_REVIEW.json",
+    "research/axbi_goal_20261014/reviews/PLUS_RESOURCE_STOP_SCIENCE_REVIEW.json",
+    "research/axbi_goal_20261014/reviews/TERMINAL_PAIR_FIGURE_REVIEW.json",
+    "research/axbi_goal_20261014/reviews/TERMINAL_PAIR_REPORT_REVIEW.json",
+    "F08 completed checks (not rerun)"
+  ],
+  "failures": [
+    {
+      "type": "RESOURCE_ALLOCATION_EXHAUSTED_PARTIAL_INTERVAL",
+      "cases": [
+        "ZERO",
+        "SHEAR_PLUS"
+      ],
+      "original_exit_code": 101,
+      "accepted_each": 200000,
+      "scientific_counterexample": false
+    },
+    {
+      "type": "DISPATCH_PREP_HOLD_REPAIRED",
+      "first_failure": "research/axbi_goal_20261014/driver/full/post_cap_001/dispatch/raw/launch_registration_repair/FIRST_HOLD.json",
+      "review": "research/axbi_goal_20261014/reviews/POST_CAP_DISPATCH_REVIEW.json"
+    }
+  ],
+  "next_ready": [
+    {
+      "now": [
+        "cat",
+        "research/axbi_goal_20261014/driver/full/post_cap_001/dispatch/runtime_001/POST_CAP_RECEIPT.json"
+      ],
+      "rule": "Read-only inspect live observer/process/checkpoints; do not repeat --start-detached or original launcher."
+    },
+    {
+      "after_ZERO_segment_complete": "Freeze terminal RETURN SHA; run reviewed compose_zero_history.py once into fresh output, then actual-data review/figures/report."
+    },
+    {
+      "after_signed_original_stop": "Classify typed resource stop and seek finite authority decision for any extension; dispatcher continues remaining original signed cases within max2/5+1 caps."
+    }
+  ],
+  "publication": {
+    "repository": "https://github.com/cosmosapjw-quantum/rei_bianchi",
+    "branch": "codex/rux-science-delivery-20261014",
+    "previous_verified_commit_sha": "86a099da0c3854b2892578f569ead0a71c12df3c",
+    "push_attempted": true,
+    "push_exit_code": 0,
+    "previous_verified_remote_sha": "86a099da0c3854b2892578f569ead0a71c12df3c",
+    "github_pr_number": 117,
+    "draft_pr_url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/117",
+    "pr_state": "OPEN_DRAFT",
+    "this_contract_publication": "PENDING_COMMIT_AND_READBACK"
+  },
+  "prior_return_contract_preserved": "research/axbi_goal_20261014/execution/RETURN_CONTRACT_20261014T074733Z.json"
+}

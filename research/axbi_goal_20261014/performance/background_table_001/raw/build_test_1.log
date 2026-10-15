@@ -1,0 +1,42 @@
+     Locking 1 package to latest compatible version
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/rust/rei_microphysics)
+   Compiling axbi_background_table_benchmark v0.1.0 (/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/axbi_goal_20261014/performance/background_table_001)
+error: invalid format string: unmatched `}` found
+ --> src/main.rs:5:261
+  |
+5 | ...rence\":{reference:e},\"candidate\":{candidate:e}}",a.to_bits()))}}
+  |                                                     ^ unmatched `}` in format string
+  |
+  = note: if you intended to print `}`, you can escape it using `}}`
+
+error: couldn't read `src/../raw/local_test_counts.json`: No such file or directory (os error 2)
+  --> src/main.rs:11:48
+   |
+11 |  let counts=Counts::default();let local:Vec<_>=include_str!("../raw/local_test_counts.json").split(|c:char|!c.is_ascii_digit()).filt...
+   |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+  --> src/main.rs:11:137
+   |
+11 | ...").split(|c:char|!c.is_ascii_digit()).filter(|s|!s.is_empty()).map(|s|s.parse::<u64>().unwrap()).collect();counts.direct.set(loca...
+   |                                                  ^  - type must be known at this point
+   |
+help: consider giving this closure parameter an explicit type
+   |
+11 |  let counts=Counts::default();let local:Vec<_>=include_str!("../raw/local_test_counts.json").split(|c:char|!c.is_ascii_digit()).filter(|s: /* Type */|!s.is_empty()).map(|s|s.parse::<u64>().unwrap()).collect();counts.direct.set(local[0]);counts.candidate.set(local[1]);counts.integrand.set(local[2]);
+   |                                                                                                                                          ++++++++++++
+
+error[E0282]: type annotations needed
+  --> src/main.rs:11:159
+   |
+11 | ..._ascii_digit()).filter(|s|!s.is_empty()).map(|s|s.parse::<u64>().unwrap()).collect();counts.direct.set(local[0]);counts.candidate...
+   |                                                  ^ - type must be known at this point
+   |
+help: consider giving this closure parameter an explicit type
+   |
+11 |  let counts=Counts::default();let local:Vec<_>=include_str!("../raw/local_test_counts.json").split(|c:char|!c.is_ascii_digit()).filter(|s|!s.is_empty()).map(|s: /* Type */|s.parse::<u64>().unwrap()).collect();counts.direct.set(local[0]);counts.candidate.set(local[1]);counts.integrand.set(local[2]);
+   |                                                                                                                                                                ++++++++++++
+
+For more information about this error, try `rustc --explain E0282`.
+error: could not compile `axbi_background_table_benchmark` (bin "axbi_background_table_benchmark") due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...

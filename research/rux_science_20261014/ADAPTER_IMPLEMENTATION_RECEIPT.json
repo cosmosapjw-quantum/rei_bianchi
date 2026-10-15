@@ -1,0 +1,65 @@
+{
+  "schema": "rei.rux.adapter_implementation_receipt.v1",
+  "node": "CC-PREP05",
+  "status": "IMPLEMENTED_TARGETED_TESTS_PASS_BUDGET_EXCEPTION",
+  "executor": {
+    "role": "costroute-worker-code",
+    "requested_model": "gpt-6-sol/medium",
+    "observed_runtime_model": null
+  },
+  "base": {
+    "branch": "codex/rux-science-delivery-20261014",
+    "head_at_start": "069d6c88306c58a98556b67f9955fcd720e7e95a",
+    "selected_source_contract": "research/rux_science_20261014/SELECTED_SOURCE_CONTRACT.json"
+  },
+  "owned_paths": [
+    "rust/rei_microphysics/src/rux_adapter.rs",
+    "rust/rei_microphysics/tests/rux_adapter.rs",
+    "rust/rei_microphysics/examples/rux_science.rs",
+    "research/rux_science_20261014/ADAPTER_IMPLEMENTATION_RECEIPT.json"
+  ],
+  "coordinator_owned_registration": "rust/rei_microphysics/src/lib.rs: pub mod rux_adapter;",
+  "implementation": "Typed explicit proper clock origin, proper/comoving hydrogen density, initial photon stock versus emissivity/imposed UVB, Case-A escape closure, and sole PrimaryStage event ownership. External source roles and owner reject until a real callback is integrated. No source, cosmology, IC or physical default is supplied.",
+  "commands": [
+    {
+      "argv": ["cargo", "test", "--test", "rux_adapter"],
+      "cwd": "rust/rei_microphysics",
+      "exit_code": 0,
+      "raw_stdout_path": null,
+      "raw_stderr_path": null,
+      "observation": "2 passed; 0 failed"
+    },
+    {
+      "argv": ["cargo", "check", "--example", "rux_science"],
+      "cwd": "rust/rei_microphysics",
+      "exit_code": 0,
+      "raw_stdout_path": null,
+      "raw_stderr_path": null,
+      "observation": "Finished dev profile"
+    }
+  ],
+  "budget_accounting": {
+    "preparation_shell_invocations": 11,
+    "preparation_limit": 8,
+    "preparation_limit_exceeded": true,
+    "targeted_build_or_test_invocations": 2,
+    "targeted_limit": 2,
+    "scientific_solver_runs": 0,
+    "automatic_retries": 0,
+    "note": "The first six shell invocations were checkout and packet discovery, but all eleven are conservatively counted against this node. No further CC-PREP05 commands are authorized without a new bounded segment."
+  },
+  "entrypoint": {
+    "build_argv": ["cargo", "check", "--example", "rux_science"],
+    "runtime_cli": "cargo run --example rux_science -- ORIGIN T_S N_H_PROPER_CM3 F_HE H_PER_S X_HII X_HEII X_HEIII W_EV_PER_H ESCAPE_EV_PER_H ENERGY_EV PACKETS_PER_H DT_S MAX_ITER RESIDUAL_TOL",
+    "runtime_executed": false,
+    "scope": "conditional warm initial-stock Case-A primary step only"
+  },
+  "scientific_admission": "NOT_ISSUED",
+  "evidence_limitation": "Targeted cargo stdout/stderr was observed by the worker but not saved as separate durable raw files. No rerun was authorized to recreate them.",
+  "unresolved": [
+    "RUX02 physical background, clock epoch, gas and radiation initial state",
+    "RUX03 actual EoR provider in point and root/interval paths, including cold domain",
+    "Source emissivity or imposed UVB callback and event ownership integration",
+    "No FLRW/Bianchi physical interval or history executed"
+  ]
+}

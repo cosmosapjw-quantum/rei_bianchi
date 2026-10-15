@@ -1,0 +1,129 @@
+{
+  "schema": "rei.axbi.source_feedback_preparation_review.v1",
+  "goal_id": "REI-AXBI-GOAL-20261014",
+  "node_id": "AX04_AX03_HELPER_PREP_REVIEW",
+  "decision": "PASS_SCOPED_PREPARATION",
+  "date_utc": "2026-10-14T06:46:52.661261+00:00",
+  "base_commit": "1865fcec018ba0d2478321c9c2fac39490669697",
+  "requested_executor_identity": {
+    "model": "gpt-6-astra",
+    "reasoning_effort": "high",
+    "role": "independent changed-surface preparation reviewer"
+  },
+  "observed_executor_identity_or_null": null,
+  "runtime_identity_status": "NOT_INDEPENDENTLY_OBSERVED",
+  "independence": "No source/scenario/test implementation by reviewer; only this review record written.",
+  "prior_review": "research/axbi_goal_20261014/reviews/PREP_REVIEW.json",
+  "prior_review_preserved": true,
+  "scope": "Changed AX04 continuous-source implementation and AX03 initially-isotropic-radiation helper. Ready for AX05 integration; AX06 awaits actual driver review and finite run allocation. No history admission.",
+  "reviewed_input_sha256": {
+    "rust/rei_microphysics/src/axbi_sources.rs": "606e3c2ec367dd9951ebbf2f53486f2232b49c0218896d66d8dc13dd5ee83bfe",
+    "rust/rei_microphysics/tests/axbi_sources.rs": "067dc29ca07a381169be8b3e6d8d5bfae1707f33a2c04918524a076fb0250d07",
+    "rust/rei_microphysics/src/axbi_background.rs": "65f10dced178aa85bb1c92da0b35350a0eec2d3d3de05630c900b5df4ec1e254",
+    "rust/rei_microphysics/tests/axbi_background.rs": "b7d789106ca0dee5e34647769c12167558d8ef598659dfde35750d09cd7e25e2",
+    "research/axbi_goal_20261014/scenario/AX04_SOURCE_CONTRACT.md": "1462b144900080d8e767b229648d3158379bec04f689f510e8a9824972dc7b5b",
+    "research/axbi_goal_20261014/scenario/SCENARIO_LOCK.json": "07aa11d2d3fd47d2ed95e9d9161f6205e4d9ba386c27ad43d2b298fcd86d1696",
+    "research/axbi_goal_20261014/source/IMPLEMENTATION_RECEIPT.json": "c91864314c5a3628ac1fac1aa0fd877bcaeab6dbdb81a3d09c77b50782e5bc2b",
+    "research/axbi_goal_20261014/background/raw/radiation_test.json": "6384e7e2955dae36fd3f3d9958cdfc0f04d6e69432eb442b61d111e515cd604d"
+  },
+  "source_receipt_identity_checks": {
+    "rust/rei_microphysics/src/axbi_sources.rs": true,
+    "rust/rei_microphysics/tests/axbi_sources.rs": true,
+    "research/axbi_goal_20261014/source/EMISSIVITY_CLOCK_LOCK.json": true,
+    "research/axbi_goal_20261014/source/OWNER_LEDGER.json": true,
+    "research/axbi_goal_20261014/scenario/SCENARIO_LOCK.json": true,
+    "research/axbi_goal_20261014/scenario/AX04_SOURCE_CONTRACT.md": true
+  },
+  "first_failure": {
+    "command": "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --locked --test axbi_sources",
+    "exit": 101,
+    "passed": 1,
+    "failed": 1,
+    "failure": "Per-cell mean photon energy relative comparison exceeded frozen 1e-7 tolerance with Simpson 8 subpanels.",
+    "raw_stdout": "research/axbi_goal_20261014/source/raw/targeted_tests.stdout",
+    "raw_stderr": "research/axbi_goal_20261014/source/raw/targeted_tests.stderr",
+    "wall_s": 1.3988681839546189
+  },
+  "accepted_targeted_repair": {
+    "change": "Per-cell number and energy Simpson subpanels 8 -> 32",
+    "authorization": "AX04_SOURCE_CONTRACT.md explicitly permits deterministic 16/32 numerical refinement after preserving failure.",
+    "physics_and_tolerance_unchanged": true,
+    "verification": {
+      "exit": 0,
+      "passed": 2,
+      "wall_s": 1.1661485770018771,
+      "raw_stdout": "research/axbi_goal_20261014/source/raw/repaired_targeted_tests.stdout",
+      "raw_stderr": "research/axbi_goal_20261014/source/raw/repaired_targeted_tests.stderr"
+    }
+  },
+  "helper_verification": {
+    "exit": 0,
+    "passed": 6,
+    "new_test": "initially_isotropic_radiation_stress_small_b_limit",
+    "wall_s": 1.3474400043487549,
+    "raw_stdout": "research/axbi_goal_20261014/background/raw/radiation_test.stdout",
+    "raw_stderr": "research/axbi_goal_20261014/background/raw/radiation_test.stderr",
+    "receipt_note": "Earlier background VALIDITY_RECEIPT records pre-extension five-test/source identity. This review binds current helper bytes to new six-test raw record without overwriting prior evidence."
+  },
+  "source_findings": [
+    "MD14 SFR/yield and fesc implement frozen formulas. Multiplying Msun/year/cMpc3 by photons/s per (Msun/year) needs no additional year factor.",
+    "Proper emission = comoving/(Mpc_cm^3*a^3); emission per H = comoving/(Mpc_cm^3*nH0). Total source is solid-angle integrated; each spectral fraction and angular w_mu/2 factor is applied once.",
+    "50kK photon blackbody shape E^2/expm1(E/kT), three threshold-adjacent segments, cell E=U/N and normalized N agree with frozen numerical contract. Tests check global moments against 8192 panels and cell means against 64 panels, including 8/16/32 angular parity.",
+    "13.6..100 eV injection and reported 100..500 eV omitted tail remain distinct; no hidden tail injection. Source law only accepts zbar in [4,20]."
+  ],
+  "radiation_helper_findings": {
+    "initial_angle_variable": "mu0 is initial physical direction; integration is over 0..1 exploiting reflection symmetry, without evolved-angle weighting a second time.",
+    "formula": "db=b-b_ref; R=sqrt((1-mu0^2)*exp(2db)+mu0^2*exp(-4db)); mu_local=mu0*exp(-2db)/R; epsilon_iso=epsilon_ref*(a_ref/a)^4; epsilon=epsilon_iso*integral_0^1 R dmu0; DeltaP=P_parallel-P_perp=epsilon_iso*integral_0^1 R*P2(mu_local) dmu0.",
+    "sign_and_normalization": "Small db: DeltaP/epsilon_iso=-8db/5+O(db^2). b=0 returns isotropic redshifting energy and zero quadrupole within arithmetic tolerance; exact dipole zero is justified by enforced reflection pairing.",
+    "units": "epsilon_ref, epsilon, DeltaP and signed energy correction use J/m3. Combined with k=8piG/(3c^2), delta_s=a^-3 integral a^3*k*DeltaP dt has units s^-1; ionizing nH[cm^-3]*U2[eV/H] converts using 1.602176634e-13 J/m3 per eV/cm3.",
+    "energy_correction": "Helper retains signed epsilon-epsilon_iso. Caller explicitly chooses a conservative absolute/envelope treatment when feeding nonnegative extra_energy; never substitutes a negative correction into the nonnegative diagnostic input."
+  },
+  "blocking_defects": [],
+  "remaining_driver_obligations": [
+    "Convert locally isotropic emissivity to evolved fixed covariant ray directions using the correct solid-angle Jacobian, normalizing finite weights once. cell_per_h_s uses local quadrature and is not by itself that geometric map.",
+    "Use entire effective Omega_r initially isotropic radiation envelope with epsilon_ref=rho_crit0*c^2*Omega_r/a_ref^4 plus actual ionizing radiation quadrupole; CMB subset alone is insufficient.",
+    "Validate actual full-trajectory stress/energy and provider-domain diagnostics, photon/gas energy ownership and empirical convergence before corresponding scientific claims."
+  ],
+  "scientific_admission_from_authorized_reviewer_or_NOT_ISSUED": "NOT_ISSUED_FOR_HISTORIES_OR_FINAL_CAMPAIGN",
+  "actual_trajectory_approximation_validity": "NOT_MEASURED",
+  "positive_transition": "AX04 and AX03 helper preparation PASS -> AX05 coupled driver implementation; after driver review and frozen argv/finite allocation -> AX06 pilots. No component replay required absent new changes or concrete findings.",
+  "budget_accounting": {
+    "this_followup_shell_invocations_including_receipt": 5,
+    "this_followup_buildtests": 0,
+    "this_followup_solver_runs": 0,
+    "prior_review_shell_invocations": 15,
+    "cumulative_review_shell_invocations": 21,
+    "cumulative_review_buildtests": 0,
+    "cumulative_review_solver_runs": 0,
+    "followup_caps": {
+      "wall_s": 1800,
+      "commands": 24,
+      "targeted_checks": 2,
+      "solver_runs": 0
+    },
+    "measurement_note": "Read-only command output retained in tool transcript; reviewer CPU/RSS not independently measured. Worker tests consumed as raw evidence, not rerun.",
+    "publication_addendum_shell_invocations": 1
+  },
+  "goal_status": "IN_PROGRESS_NOT_COMPLETE",
+  "owned_paths_and_diff": [
+    "research/axbi_goal_20261014/reviews/SOURCE_FEEDBACK_PREP_REVIEW.json"
+  ],
+  "external_audit_publication_decision": {
+    "decision": "APPROVED_SCOPED_AUDIT_PUBLICATION",
+    "date_utc": "2026-10-14T06:48:20.521395+00:00",
+    "authorization": "Owner expressly requested task-owned external-audit push to existing draft PR117; controller confirmed authorization.",
+    "destination": "Existing draft PR117; task publication branch codex/rux-science-delivery-20261014",
+    "allowed_scope": "Completed AX01-AX04 scenario/contracts, reviewed provider/background/source modules and tests, preserved raw first failures and passing component results, corresponding receipts/reviews, and completed AX13 methods-only report/source evidence.",
+    "required_labels": {
+      "scientific_solver_runs": 0,
+      "scientific_admission": "NOT_ISSUED",
+      "goal_status": "IN_PROGRESS_NOT_COMPLETE",
+      "report_scope": "METHODS_AND_PREPARATION_EVIDENCE_ONLY"
+    },
+    "excluded": "Active unfinished AX05 source, driver artifacts and related unfinished edits; unrelated dirty/untracked files.",
+    "shared_registration": "Any staged lib.rs changes must register only included completed modules; exclude unfinished AX05 registration.",
+    "claim_ceiling": "Publication permits external inspection of preparation evidence; it does not admit an evolved history, validate actual omitted feedback, close AX15, or complete the user goal.",
+    "next_action": "Controller stages exact completed owned paths, preserves all other changes, pushes the existing draft branch and verifies remote commit identity. Publication execution/readback is not claimed by this decision.",
+    "review_basis": "Existing scoped reviews reused without re-review or test replay. This is a publication authorization addendum, not a new scientific decision."
+  }
+}

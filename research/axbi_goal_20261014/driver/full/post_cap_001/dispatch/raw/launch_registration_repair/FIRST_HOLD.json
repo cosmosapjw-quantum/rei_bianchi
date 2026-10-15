@@ -1,0 +1,57 @@
+{
+  "schema": "rei.axbi.post_cap_dispatch_review.v1",
+  "decision": "HOLD_ONE_BOUNDED_LAUNCH_REGISTRATION_REPAIR",
+  "dispatch_execution_authorized": false,
+  "reviewed_at_utc": "2026-10-14T09:27:26.430079+00:00",
+  "scope": "Independent read-only execution review; no scientific admission",
+  "requested_reviewer": {
+    "model": "gpt-6-astra",
+    "effort": "high"
+  },
+  "observed_runtime_identity_or_null": null,
+  "runtime_identity_status": "NOT_INDEPENDENTLY_OBSERVED",
+  "reviewed_input_sha256": {
+    "research/axbi_goal_20261014/driver/full/post_cap_dispatch.py": "3ffd2591bb3c05db4bac0b9cd716df99e3f507b095f94484e399cf1b289d53e2",
+    "research/axbi_goal_20261014/driver/full/post_cap_001/POST_CAP_DISPATCH_BINDING.json": "8b0f539b33b02a5395fb91333b0659d40d53286532df85281f0582f7a0d94b87",
+    "research/axbi_goal_20261014/driver/full/post_cap_001/ZERO_CONTINUATION_BINDING.json": "a3d00633042c003169c2ce77bf3ad33aa6d4c8ada8048606c19922a32ac779c2"
+  },
+  "findings": [
+    {
+      "id": "POSTCAP-LAUNCH-REGISTRATION",
+      "severity": "CURRENT_EXECUTION_BLOCKER",
+      "path": "research/axbi_goal_20261014/driver/full/post_cap_dispatch.py",
+      "lines": [
+        174,
+        175,
+        176,
+        186,
+        187,
+        188
+      ],
+      "defect": "The process-group scan accepts new groups only after the worker registers active[]. Popen in either worker creates a scientific group before active[] registration; the next dispatch iteration may observe this legitimate reserved launch and raise UNACCOUNTED_SCIENTIFIC_PROCESS_GROUP, losing its supervisor. Pending slot reservation bounds occupancy but does not prevent this false classification.",
+      "authorized_minimal_repair": "Synchronize the launch acknowledgement before any subsequent unknown-group scan, or recognize only the exact reserved immutable argv/output while registration is pending. Retain immediate slot reservation, exact group/source identity, and max2. Do not change original frozen launchers or numerical code."
+    },
+    {
+      "id": "POSTCAP-TERMINAL-STATUS",
+      "severity": "BOUNDED_EXECUTION_RECEIPT_DEFECT",
+      "path": "research/axbi_goal_20261014/driver/full/post_cap_dispatch.py",
+      "lines": [
+        191,
+        194
+      ],
+      "defect": "Clean completion returns zero after persisting status OBSERVING, so the durable receipt does not identify supervisor completion.",
+      "authorized_minimal_repair": "Compute completion from empty queue/futures, segment dispatched, no adopted occupied process, and no blocked condition; persist a distinct completed execution status before return. Do not label full-history science complete."
+    }
+  ],
+  "repair_scope": "One controller-authorized lower-tier repair batch of these two findings only; current raw fake check retained, no extra test beyond authority-approved budget, zero solver starts. Reviewer will inspect only repaired surface and refreshed bindings.",
+  "existing_fake_check": {
+    "exit_code": 0,
+    "wall_seconds": 0.05518507957458496,
+    "CPU_seconds": 0.052829,
+    "max_RSS_kib": 20620,
+    "solver_starts": 0,
+    "stdout": "POST_CAP_FAKE_SHARED_SCHEDULER_PASS; typed caps only, max2/max5+1, ZERO priority, no duplicate/retry, zero scientific starts"
+  },
+  "scientific_admission": "NOT_ISSUED",
+  "next_transition": "Lower-tier targeted repair, then this same independent reviewer binds final script and two binding hashes; PASS authorizes the prescribed shared --start-detached command without further optional gates."
+}

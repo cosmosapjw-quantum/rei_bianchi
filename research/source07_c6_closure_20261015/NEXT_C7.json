@@ -1,0 +1,85 @@
+{
+  "schema": "rei.source07.c7.scientific_validation_ready.v1",
+  "stage": "C7_SCIENTIFIC_VALIDATION",
+  "status": "READY_FROM_C6",
+  "parent": "C6 positive within-q-bin maximum-entropy-like bounded exponential closure and frozen gas species/heat tests",
+  "original_goal": "BBN-style HI/HII, HeI/HeII/HeIII and electron abundances plus gas temperature for non-tilted axisymmetric Bianchi I and matched FLRW",
+  "original_model": "PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1",
+  "physics": {
+    "metric_signature": "(-,+,+,+)",
+    "reference_source_energy_eV": [
+      13.6,
+      433
+    ],
+    "source_emitted_energy_eV": [
+      13.6,
+      100
+    ],
+    "proper_gas_HI_HeI_HeII": "source source densities physical cm^-3; electron/ion fractions currently frozen C6",
+    "photo_fit_cutoffs_eV": [
+      13.6,
+      24.59,
+      54.42
+    ],
+    "binding_energies_eV": [
+      13.598434599702,
+      24.587389011,
+      54.41776
+    ],
+    "source_rate": "MD14 photo fraction per H per proper s, fesc0.2",
+    "shear_signed_q": [
+      -0.01,
+      -0.005,
+      0,
+      0.005,
+      0.01
+    ]
+  },
+  "C6_executed": {
+    "fixedq_representation": "N and Uref per q energy/angle cell, O(N_E*N_mu) state",
+    "new_native_module": "rust/rei_microphysics/src/axbi_q_closure.rs",
+    "modified_optional_grid": "rust/rei_microphysics/src/axbi_q_grid.rs",
+    "source_generation": "original AxbiSource native 48 source spectral cells, 32 angular GL positions",
+    "method": "positive bounded exponential 2-moment mean matching; threshold-split Gauss8 and safeguarded beta inversion; transactional 1-4 CPU workers",
+    "C6_numbers": {
+      "HeI_256_frozen_relative_error": 1.787547478926399e-7,
+      "HeII_256_manufactured_relative_error": 2.123835045608757e-7,
+      "photoheat_256_frozen_relative_error": -6.394362817019328e-9
+    },
+    "non_identifiability_counterexample": "Same N=1, U=24.55eV may have zero or positive HeI ionizing fraction; true support NOT fixed by 2 moments."
+  },
+  "C7_ready_nodes": [
+    {
+      "id": "C7_A_SOURCE_SUPPORT_AGE",
+      "status": "READY",
+      "objective": "Track actual injection-time q-bin support or sufficient subcell topology; reject false above-threshold population after mixed-age emission/hardening; compare source vs true discrete packet oracle at ≥2 epochs with same physics and physical clock.",
+      "acceptance": "No false HeII/HeI photon above threshold in adversarial one-sided subbin, bounded memory, N/U/binding/heat ledgers and history source normalization."
+    },
+    {
+      "id": "C7_B_TIME_DEPENDENT_OPACITY",
+      "status": "READY",
+      "objective": "Advance true owner H_i(a), time-dependent proper n_HI/n_HeI/n_HeII and temperature; compare analytic constant-H frozen-gas C3 limit and independent SciPy DOP853; keep redshift work separately.",
+      "acceptance": "Physical nucleus/electron/energy closure on short bounded interval; no unexplained loss from q-grid interpolation."
+    },
+    {
+      "id": "C7_C_PHYSICAL_MATCHED_SHORT",
+      "status": "BLOCKED_C7_A_B",
+      "objective": "Versioned new numerical variant and checksum-distinct checkpoint then matched short fully coupled H/He/thermal IVP old49/guard51/fixedq, q signed family and physical H/He source.",
+      "acceptance": "Same physical initial values, Case A, proper clock, source owner and tolerance; actual convergence of HI/HeI/HeII and gas T, not only total photons."
+    }
+  ],
+  "conditions": [
+    "No wider tolerances to make HeI/HeII pass.",
+    "Current C6 is frozen-source-only; full EoR NOT issued.",
+    "Preserve original axbi_driver.rs/axbi_sources.rs/atomic_provider.rs/bianchi_i.rs and AXBI STATE/checkpoints unless C7 bounded migration explicitly justified.",
+    "No local Codex or native delegated subagents; direct tool-controlled coding and source tests."
+  ],
+  "reproduce": [
+    "cd rust/rei_microphysics && cargo test --offline --test axbi_q_closure",
+    "cd rust/rei_microphysics && cargo test --offline --tests",
+    "cd rust/rei_microphysics && cargo run --offline --release --example axbi_q_closure_pilot",
+    "python3 research/source07_c6_closure_20261015/independent_c6.py",
+    "python3 research/source07_c6_closure_20261015/analyze_c6.py",
+    "cd research/source07_c6_closure_20261015 && wolframscript -file CHECK_C6_CAS.wl"
+  ]
+}

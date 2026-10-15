@@ -1,0 +1,36 @@
+--- research/axbi_goal_20261014/driver/full/post_plus_dispatch.py
++++ research/axbi_goal_20261014/driver/full/post_plus_dispatch.py
+@@ -109,6 +109,17 @@
+                 preserved_old_receipt=receipt)
+ 
+ 
++def review_scope_requirements(decision, dispatch):
++    dispatch_required = {str(p.relative_to(ROOT)) for p in [pathlib.Path(__file__), PLUS_BINDING, BINDING, DECISION]}
++    dispatch_required.update(dispatch['execution_input_sha256'])
++    argv = decision['scheduler_release']['solver_argv']
++    wrapper_required = {str(DECISION.relative_to(ROOT)), argv[0], argv[2],
++                        'rust/rei_microphysics/examples/axbi_plus_resource_continuation.rs',
++                        'rust/rei_microphysics/tests/axbi_plus_resource_continuation.rs'}
++    wrapper_required.update(decision['actual_plus_stop']['paths'])
++    return dispatch_required, wrapper_required
++
++
+ def validate():
+     if digest(DECISION) != DECISION_SHA:
+         raise RuntimeError('PLUS_AUTHORITY_CHANGED')
+@@ -118,12 +129,12 @@
+             raise RuntimeError('IMMUTABLE_INPUT_CHANGED:' + path)
+     b = json.loads(PLUS_BINDING.read_text())
+     dispatch = json.loads(BINDING.read_text())
+-    required = {str(p.relative_to(ROOT)) for p in [pathlib.Path(__file__), PLUS_BINDING, BINDING, DECISION]}
+-    required.update(dispatch['execution_input_sha256'])
++    dispatch_required, wrapper_required = review_scope_requirements(decision, dispatch)
+     for path, sha in dispatch['execution_input_sha256'].items():
+         if digest(ROOT / path) != sha:
+             raise RuntimeError('EXECUTION_INPUT_CHANGED:' + path)
+-    for path, field in [(REVIEW, 'dispatch_execution_authorized'), (PLUS_REVIEW, 'continuation_execution_authorized')]:
++    for path, field, required in [(REVIEW, 'dispatch_execution_authorized', dispatch_required),
++                                  (PLUS_REVIEW, 'continuation_execution_authorized', wrapper_required)]:
+         review = json.loads(path.read_text())
+         if review.get(field) is not True or not required.issubset(review.get('reviewed_input_sha256', {})):
+             raise RuntimeError('FRESH_REVIEW_REQUIRED')
