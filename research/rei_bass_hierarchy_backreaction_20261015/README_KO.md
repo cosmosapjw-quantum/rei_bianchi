@@ -93,3 +93,29 @@ Historical original BASS valid \(\Gamma_T\) in proper time \(c\sigma_Tn_e\), but
 `results/hierarchy_coupled_results.json`, `results/gamma_neutrino_separate.json`, `results/C11_thomson_receiver_integration.json`, `results/opacity_source_sensitivity.json`, actual 2-D PNG and `NEXT_DAG.json` are machine-readable continuation sources. Source SHA manifest identifies legacy provider and genuine BASS blob identities.
 
 **Scientific status:** BASS↔REI Einstein+massless Boltzmann radiation quadrupoles including separate photon/neutrino backreaction and one-way physical HHe source Thomson **SCOPED_VERIFIED**; full coupled astrophysical HHe/BBN-style \(\Sigma,\pi_{ab}\)-resolved reionization source and polarized observer predictions remain **NOT_ISSUED**.
+
+
+## Independently restored source-specific backup (new)
+
+At the backup boundary, the original completed AX08 ZERO history is about 159MB
+and remains in its private authorized owner data directory. To test portable
+replay without duplicating it, make_portable_electron_donor.py derives 8193
+positive log-spline knots from the actual SHA-bound 312238-row source.
+The derived CSV is not the original historical observation/science output.
+Its recorded max relative mismatch at original source rows is about
+1.9755e-4, and no between-node error enclosure is asserted.
+
+After extracting an archive under its single root:
+  export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+  python3 research/rei_bass_hierarchy_backreaction_20261015/restore_smoke.py
+  python3 research/source07_c11_casea_20261015/test_casea.py
+  python3 research/rei_crossrepo_integration_20261015/test_crossrepo.py
+
+The standalone restore smoke checks actual BASS Git-byte-pinned
+Einstein–Vlasov + gamma/massless-neutrino coupled Sigma and Pi, actual restored
+CaseA Grackle H/He source and its short-window electron-Thomson backreaction.
+It intentionally does not require the original large private history.
+The inherited C12 Wu source guard additionally requires the authorized local
+WU088_HH and REI original checkouts; the smoke itself does not.
+Archive SHA and both remote byte readbacks are in a **separate** backup receipt
+created only after both remote uploads and fresh restore succeed.
