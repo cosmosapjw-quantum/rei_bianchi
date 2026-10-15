@@ -67,3 +67,19 @@ The exact original input provenance and generated cache data also remain in
 the locally verified archives/Dropbox dual backup. Generated summary files in
 this folder can be compared structurally/numerically using the pinned source
 IDs, rather than assuming byte-stability of compressed cache ZIPs.
+
+### Conditional directional quadrupole goal-error budget (follow-up)
+
+From the same source-bound parent tau and geometry caches, run:
+
+    OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 python3 \
+      research/bass_he16_transfer_20261015/directional_tau_20261015/directional_goal_bound.py \
+        --base-cache "$SCRATCH/parent_cache" \
+        --geometry-cache "$SCRATCH/geometry_cache" \
+        --direction-result "$SCRATCH/DIRECTIONAL_TAU.json" \
+        --out "$SCRATCH/DIRECTIONAL_GOAL_BOUND.json"
+
+The resulting bound assumes exact original proper a(t), t(a), and nH(t),
+pointwise uniform errors in b and all H/He ion fractions, and roots remaining
+in the same redshift interval. It is NOT a native solver or source-ODE
+certificate. See DIRECTIONAL_GOAL_BOUND_REPORT_KO.md and test_directional_goal_bound.py.
