@@ -151,3 +151,22 @@ Original owner checkout `0fcb2ddd...` and C13/C12 parents never overwritten.
 The GitHub branch/PR and independently checked ZIP (both Dropbox/Google
 Drive) have an exact `BACKUP_RECEIPT.json` only **after** successful
 external upload and byte-identity readback. No implicit backup claim.
+
+## Verified immutable dual-cloud release and direct fresh extraction
+
+The **scientific/source payload** is commit `107de7bc793a38dad1ec78e06ec8ef774b1b478a`,
+ZIP `REI_C14_NATIVE_HHE_THOMSON_20261015_107de7bc.zip` (1,305,427 bytes,
+295 entries, CRC PASS), SHA256
+`807a6c18b5b2eac79fce6ddbb66bae52b02720cbd1bef11a5ad7fc8326c25db2`.
+Two authenticated, independently retrieved remote copies matched this exact SHA:
+Dropbox `/bianchi/rei_bianchi/research/REI_C14_BACKUPS/` and private Google Drive
+`rei_bianchi_research_backups` (file link and IDs in `BACKUP_RECEIPT.json`).
+A clean extraction at `/tmp/rei_c14_fresh_restore_20261015` ran all 52
+inherited/new original Python tests: C14 9, C13 16, C12 6, C11 8,
+C10 8 and C9 5 (all PASS); original PR137 Git blob and 16 C12 supplier
+Git blobs also verified, and native-q0 C14 source replay succeeded.
+C12 WU guard reproducibility assumes an authenticated read-only original
+WU088_HH source checkout with same verified byte identity; the release
+is not an autonomous implementation of that external physical supplier.
+This cloud receipt was committed after the immutable source-payload ZIP,
+therefore is intentionally not inside the source archive.
