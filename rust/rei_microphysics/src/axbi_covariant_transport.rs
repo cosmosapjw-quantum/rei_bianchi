@@ -124,6 +124,18 @@ pub struct PreparedAbsorption {
     pub diagnostics: QuadratureDiagnostics,
 }
 impl PreparedAbsorption {
+    pub(crate) fn evaluate_for_cell_count(
+        &self,
+        cells: usize,
+        absorber_cm3: [f64; 3],
+        n_h_cm3: f64,
+        dt_s: f64,
+    ) -> Result<AbsorptionResult, ForwardError> {
+        if self.template.number.len() != cells {
+            return Err(bad("AXBI_COVARIANT_CACHE_SHAPE"));
+        }
+        self.evaluate(absorber_cm3, n_h_cm3, dt_s)
+    }
     pub fn node_count(&self) -> usize {
         self.nodes.len()
     }
@@ -314,6 +326,9 @@ impl CovariantTransport {
     }
     pub fn transport_threads(&self) -> usize {
         self.prepare_pool.width()
+    }
+    pub(crate) fn shared_pool(&self) -> Arc<OrderedWorkerPool> {
+        Arc::clone(&self.prepare_pool)
     }
     pub fn n_energy(&self) -> usize {
         self.edges.len() - 1
@@ -641,10 +656,7 @@ impl CovariantTransport {
         n_h_cm3: f64,
         dt_s: f64,
     ) -> Result<AbsorptionResult, ForwardError> {
-        if prepared.template.number.len() != self.cell_count() {
-            return Err(bad("AXBI_COVARIANT_CACHE_SHAPE"));
-        }
-        prepared.evaluate(absorber_cm3, n_h_cm3, dt_s)
+        prepared.evaluate_for_cell_count(self.cell_count(), absorber_cm3, n_h_cm3, dt_s)
     }
 }
 struct PreparedCell {

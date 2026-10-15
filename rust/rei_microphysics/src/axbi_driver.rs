@@ -4,6 +4,7 @@ use crate::axbi_background::{
     isotropic_initial_radiation_moments, AxbiBackground, BackgroundFamily, Cosmology,
 };
 use crate::axbi_covariant_transport::{CovariantTransport, PhotonState, PreparedAbsorption};
+use crate::axbi_parallel::OrderedWorkerPool;
 use crate::axbi_rates::AxbiProvider;
 use crate::axbi_sources::AxbiSource;
 use crate::igm_background::{FlatFlrwBackground, FlatFlrwConfig};
@@ -14,6 +15,10 @@ use std::{
     fs,
     io::{BufWriter, Write},
     path::Path,
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc,
+    },
     time::Instant,
 };
 fn err(s: &'static str) -> ForwardError {
@@ -42,6 +47,8 @@ pub struct DriverConfig {
     pub transport_cells: usize,
     /// Persistent per-cell prepare workers; temporal/Newton ordering is serial.
     pub transport_threads: usize,
+    /// Opt-in independent Jacobian columns on the same persistent worker pool.
+    pub parallel_jacobian_columns: bool,
     /// FLRW-only passive compartment below the HI fit cutoff; explicit variant.
     pub inactive_hi_split: bool,
     pub n_mu: usize,
@@ -70,6 +77,7 @@ impl DriverConfig {
             energy_subdivisions: 16,
             transport_cells: 128,
             transport_threads: 1,
+            parallel_jacobian_columns: false,
             inactive_hi_split: false,
             n_mu: 8,
             background_panels: 4096,
@@ -111,6 +119,13 @@ impl DriverConfig {
                 "energy_subdivisions" => number!(energy_subdivisions),
                 "transport_cells" => number!(transport_cells),
                 "transport_threads" => number!(transport_threads),
+                "parallel_jacobian_columns" => {
+                    c.parallel_jacobian_columns = match v.trim() {
+                        "true" => true,
+                        "false" => false,
+                        _ => return Err(err("AXBI_CONFIG_VALUE")),
+                    }
+                }
                 "inactive_hi_split" => {
                     c.inactive_hi_split = match v.trim() {
                         "true" => true,
@@ -223,6 +238,119 @@ pub struct DriverState {
     pub last_error: f64,
     pub wall_elapsed_s: f64,
 }
+
+/// Immutable inputs shared by leaf residual evaluations. This context has no
+/// worker-pool handle and cannot submit nested work or mutate the stage state.
+#[derive(Clone)]
+struct ResidualContext {
+    gas: IgmGasState,
+    a: f64,
+    n_h0_cm3: f64,
+    n_he0_cm3: f64,
+    cells: usize,
+    prepared: Arc<PreparedAbsorption>,
+}
+impl ResidualContext {
+    fn evaluate(
+        &self,
+        unknown: [f64; 4],
+        dt: f64,
+    ) -> Result<([f64; 4], PhotonState, IgmPointRhs), ForwardError> {
+        let gas = IgmGasState::new(
+            [unknown[0], unknown[1], unknown[2]],
+            w_ev_per_h_to_erg(unknown[3])?,
+        )?;
+        let nh = self.n_h0_cm3 / self.a.powi(3);
+        let nhe = self.n_he0_cm3 / self.a.powi(3);
+        let [x, y, z] = gas.fractions;
+        let absorbers = [nh * (1.0 - x), nhe * (1.0 - y - z), nhe * y];
+        let c = HHeModel::controlled_fixture();
+        let absorption = self
+            .prepared
+            .evaluate_for_cell_count(self.cells, absorbers, nh, dt)?;
+        let stocks = absorption.state;
+        let photo = absorption.photo;
+        let point = AxbiProvider.point(&gas, nh, nhe, 0.0, 2.7255 / self.a, photo)?;
+        let mut residual = [0.0; 4];
+        for i in 0..3 {
+            residual[i] = unknown[i] - self.gas.fractions[i] - dt * point.rhs.fraction_dt[i];
+        }
+        residual[3] = unknown[3]
+            - w_erg_per_h_to_ev(self.gas.w_erg_per_h)?
+            - dt * point.rhs.w_dt_erg_per_h_s / c.ev_erg;
+        for &r in &residual {
+            f(r)?;
+        }
+        Ok((residual, stocks, point.rhs))
+    }
+}
+
+/// Jacobian scheduling seam used by the driver and focused injected controls.
+/// Workers evaluate at most one column each, with its original +/- fallback.
+/// Every started residual is charged, including discarded speculative results.
+#[doc(hidden)]
+pub fn jacobian_columns<F>(
+    pool: &OrderedWorkerPool,
+    parallel: bool,
+    x: [f64; 4],
+    residual: [f64; 4],
+    counter: &mut usize,
+    max_rhs: usize,
+    evaluate: F,
+) -> Result<[[f64; 4]; 4], ForwardError>
+where
+    F: Fn([f64; 4]) -> Result<[f64; 4], ForwardError> + Send + Sync + 'static,
+{
+    let use_parallel =
+        parallel && pool.width() > 1 && max_rhs.checked_sub(*counter).is_some_and(|n| n >= 8);
+    let charged = Arc::new(AtomicUsize::new(*counter));
+    let worker_charged = Arc::clone(&charged);
+    let column = move |j: usize| {
+        let call = |unknown| {
+            worker_charged
+                .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+                    if n < max_rhs {
+                        Some(n + 1)
+                    } else {
+                        None
+                    }
+                })
+                .map_err(|_| err("AXBI_RHS_CAP"))?;
+            evaluate(unknown)
+        };
+        let delta = 1e-7 * x[j].abs().max(if j == 3 { 1e-6 } else { 1e-4 });
+        let mut xp = x;
+        xp[j] += delta;
+        let (rp, sign) = match call(xp) {
+            Ok(r) => (r, 1.0),
+            Err(_) => {
+                xp = x;
+                xp[j] -= delta;
+                (call(xp)?, -1.0)
+            }
+        };
+        Ok(std::array::from_fn::<_, 4, _>(|i| {
+            (rp[i] - residual[i]) / (sign * delta)
+        }))
+    };
+    let columns = if use_parallel {
+        pool.map_ordered(4, column)
+    } else {
+        // Preserve serial j order, early failure and cap behavior near budget.
+        (0..4).map(column).collect::<Result<Vec<_>, _>>()
+    };
+    // Merge before propagating any numerical or worker error.
+    *counter = charged.load(Ordering::Relaxed);
+    let columns = columns?;
+    let mut jac = [[0.0; 4]; 4];
+    for j in 0..4 {
+        for i in 0..4 {
+            jac[i][j] = columns[j][i];
+        }
+    }
+    Ok(jac)
+}
+
 #[derive(Clone, Debug)]
 pub struct Driver {
     pub config: DriverConfig,
@@ -555,8 +683,7 @@ impl Driver {
     }
     fn evaluate(
         &self,
-        old: &DriverState,
-        prepared: &PreparedAbsorption,
+        context: &ResidualContext,
         unknown: [f64; 4],
         dt: f64,
         counter: &mut usize,
@@ -565,30 +692,7 @@ impl Driver {
             return Err(err("AXBI_RHS_CAP"));
         }
         *counter += 1;
-        let gas = IgmGasState::new(
-            [unknown[0], unknown[1], unknown[2]],
-            w_ev_per_h_to_erg(unknown[3])?,
-        )?;
-        let nh = self.n_h0_cm3 / old.a.powi(3);
-        let nhe = self.n_he0_cm3 / old.a.powi(3);
-        let [x, y, z] = gas.fractions;
-        let absorbers = [nh * (1.0 - x), nhe * (1.0 - y - z), nhe * y];
-        let c = HHeModel::controlled_fixture();
-        let absorption = self.transport.evaluate(prepared, absorbers, nh, dt)?;
-        let stocks = absorption.state;
-        let photo = absorption.photo;
-        let point = AxbiProvider.point(&gas, nh, nhe, 0.0, 2.7255 / old.a, photo)?;
-        let mut residual = [0.0; 4];
-        for i in 0..3 {
-            residual[i] = unknown[i] - old.gas.fractions[i] - dt * point.rhs.fraction_dt[i];
-        }
-        residual[3] = unknown[3]
-            - w_erg_per_h_to_ev(old.gas.w_erg_per_h)?
-            - dt * point.rhs.w_dt_erg_per_h_s / c.ev_erg;
-        for &r in &residual {
-            f(r)?;
-        }
-        Ok((residual, stocks, point.rhs))
+        context.evaluate(unknown, dt)
     }
     fn norm(&self, residual: [f64; 4], old_w: f64, new_w: f64) -> f64 {
         residual[0]
@@ -607,13 +711,21 @@ impl Driver {
             return Err(err("AXBI_STAGE_DT"));
         }
         let geometry = self.background.point_at_scale(s.a)?.geometry()?;
-        self.partition_inactive(s, &geometry)?;
-        let old = s.clone();
+        let mut old = s.clone();
+        self.partition_inactive(&mut old, &geometry)?;
         // Quadrature reconstruction is fixed across the Newton residual/Jacobian
         // evaluations; only trial absorber densities enter backward Euler.
         let prepared = self
             .transport
             .prepare(&self.photon_state(&old), &geometry)?;
+        let context = ResidualContext {
+            gas: old.gas,
+            a: old.a,
+            n_h0_cm3: self.n_h0_cm3,
+            n_he0_cm3: self.n_he0_cm3,
+            cells: self.transport.cell_count(),
+            prepared: Arc::new(prepared),
+        };
         let old_w = w_erg_per_h_to_ev(old.gas.w_erg_per_h)?;
         let mut x = [
             old.gas.fractions[0],
@@ -622,7 +734,7 @@ impl Driver {
             old_w,
         ];
         for _ in 0..50 {
-            let (residual, stocks, rhs) = self.evaluate(&old, &prepared, x, dt, counter)?;
+            let (residual, stocks, rhs) = self.evaluate(&context, x, dt, counter)?;
             let norm = self.norm(residual, old_w, x[3]);
             if norm <= 1e-11 {
                 let nh = self.n_h0_cm3 / old.a.powi(3);
@@ -634,50 +746,43 @@ impl Driver {
                 if (nold - nnew - event_total).abs() > 1e-10 * old.ledgers.source_n.max(1.0) {
                     return Err(err("AXBI_ABSORPTION_LEDGER"));
                 }
-                s.gas = IgmGasState::new([x[0], x[1], x[2]], w_ev_per_h_to_erg(x[3])?)?;
-                Self::set_photon_state(s, stocks);
-                s.ledgers.absorbed_n += event_total;
+                let mut next = old.clone();
+                next.gas = IgmGasState::new([x[0], x[1], x[2]], w_ev_per_h_to_erg(x[3])?)?;
+                Self::set_photon_state(&mut next, stocks);
+                next.ledgers.absorbed_n += event_total;
                 for k in 0..3 {
-                    s.ledgers.photo_events[k] += events[k];
-                    s.ledgers.rr_events[k] += rhs.rr_events_cm3_s[k] * dt / nh;
-                    s.ledgers.ci_events[k] += rhs.ci_events_cm3_s[k] * dt / nh;
-                    s.ledgers.ci_floor_events[k] += rhs.ci_floor_events_cm3_s[k] * dt / nh;
+                    next.ledgers.photo_events[k] += events[k];
+                    next.ledgers.rr_events[k] += rhs.rr_events_cm3_s[k] * dt / nh;
+                    next.ledgers.ci_events[k] += rhs.ci_events_cm3_s[k] * dt / nh;
+                    next.ledgers.ci_floor_events[k] += rhs.ci_floor_events_cm3_s[k] * dt / nh;
                 }
-                s.ledgers.dr_events += rhs.dr_events_cm3_s * dt / nh;
-                s.ledgers.ce_cap_ev +=
+                next.ledgers.dr_events += rhs.dr_events_cm3_s * dt / nh;
+                next.ledgers.ce_cap_ev +=
                     rhs.ce_cap_cooling_erg_cm3_s.iter().sum::<f64>() * dt / (nh * c.ev_erg);
-                s.ledgers.excluded_dr_ev +=
+                next.ledgers.excluded_dr_ev +=
                     rhs.excluded_dr_cooling_erg_cm3_s * dt / (nh * c.ev_erg);
-                s.ledgers.escaped_u += rhs.escape_erg_cm3_s * dt / (nh * c.ev_erg);
-                s.ledgers.cmb_input += rhs.cmb_to_gas_erg_cm3_s * dt / (nh * c.ev_erg);
-                s.max_newton_residual = s.max_newton_residual.max(norm);
+                next.ledgers.escaped_u += rhs.escape_erg_cm3_s * dt / (nh * c.ev_erg);
+                next.ledgers.cmb_input += rhs.cmb_to_gas_erg_cm3_s * dt / (nh * c.ev_erg);
+                next.max_newton_residual = next.max_newton_residual.max(norm);
+                *s = next;
                 return Ok(());
             }
-            let mut jac = [[0.0; 4]; 4];
-            for j in 0..4 {
-                let delta = 1e-7 * x[j].abs().max(if j == 3 { 1e-6 } else { 1e-4 });
-                let mut xp = x;
-                xp[j] += delta;
-                let trial = self.evaluate(&old, &prepared, xp, dt, counter);
-                let (rp, sign) = match trial {
-                    Ok((r, _, _)) => (r, 1.0),
-                    Err(_) => {
-                        xp = x;
-                        xp[j] -= delta;
-                        let (r, _, _) = self.evaluate(&old, &prepared, xp, dt, counter)?;
-                        (r, -1.0)
-                    }
-                };
-                for i in 0..4 {
-                    jac[i][j] = (rp[i] - residual[i]) / (sign * delta);
-                }
-            }
+            let columns_context = context.clone();
+            let jac = jacobian_columns(
+                &self.transport.shared_pool(),
+                self.config.parallel_jacobian_columns,
+                x,
+                residual,
+                counter,
+                self.config.max_rhs,
+                move |unknown| columns_context.evaluate(unknown, dt).map(|v| v.0),
+            )?;
             let direction = solve4(jac, residual.map(|r| -r))?;
             let mut alpha = 1.0;
             let mut accepted = None;
             for _ in 0..40 {
                 let trial = std::array::from_fn(|i| x[i] + alpha * direction[i]);
-                if let Ok((r, _, _)) = self.evaluate(&old, &prepared, trial, dt, counter) {
+                if let Ok((r, _, _)) = self.evaluate(&context, trial, dt, counter) {
                     if self.norm(r, old_w, trial[3]) < norm {
                         accepted = Some(trial);
                         break;
@@ -906,6 +1011,7 @@ pub fn compiled_identity() -> String {
         include_str!("axbi_driver.rs"),
         include_str!("axbi_covariant_transport.rs"),
         include_str!("axbi_parallel.rs"),
+        include_str!("../../../research/flrw_jacobian_columns_20261016/CONTRACT.json"),
         include_str!("axbi_q_closure.rs"),
         include_str!("axbi_background.rs"),
         include_str!("axbi_sources.rs"),
@@ -1525,7 +1631,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
         fs::write(out.join("config.cfg"), config_text).map_err(ioerr)?;
         fs::write(out.join("source_identity.txt"), compiled_identity()).map_err(ioerr)?;
         fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
-        fs::write(out.join("transport_variant.txt"), format!("inactive_hi_split={}\npassive_scope=q0_forward_monotonic_only\ncheckpoint_version=V4\ntransport_threads={}\nparallel_scope=persistent_cell_prepare_ordered_flatten_only\n", driver.config.inactive_hi_split, driver.config.transport_threads)).map_err(ioerr)?;
+        fs::write(out.join("transport_variant.txt"), format!("inactive_hi_split={}\npassive_scope=q0_forward_monotonic_only\ncheckpoint_version=V4\ntransport_threads={}\nparallel_scope=persistent_cell_prepare_and_opt_in_jacobian_columns\nparallel_jacobian_columns={}\n", driver.config.inactive_hi_split, driver.config.transport_threads, driver.config.parallel_jacobian_columns)).map_err(ioerr)?;
         fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=fixed reference-q two-moment transport; total N/U includes active and passive source photons; support columns are conservative active-support/passive-cell envelope union, not a recovered density or exact populated support; Gamma uses active photons only; radiation stress includes both pools; legacy boundary outflow remains zero\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
     }
     let mut h=open_output(&out.join("history.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,b,H_per_s,s_per_s,x_HII,x_HeII,x_HeIII,nH_proper_cm3,ne_proper_cm3,temperature_K,Gamma_HI_per_s,Gamma_HeI_per_s,Gamma_HeII_per_s,photon_n_per_H,photon_u_eV_per_H,J0_photon_u_eV_per_H,J1_photon_u_eV_per_H,J2_photon_u_eV_per_H,x_HI,x_HeI")?;
