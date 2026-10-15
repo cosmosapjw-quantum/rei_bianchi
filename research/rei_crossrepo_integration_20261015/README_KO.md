@@ -58,6 +58,9 @@ export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
 python3 research/rei_crossrepo_integration_20261015/mirror_suppliers.py
 # Original WU088_HH repo required for actual previous-provider contract gate:
 export WU088_HH_LOCAL_REPO="$HOME/chat_research/WU088_HH"
+# Only for an extracted archive without its own .git metadata, bind a live
+# REI source checkout with byte-identical coverage/source/FT03/scenario files:
+# export REI_NATIVE_CONSUMER_ROOT="$HOME/Dropbox/bianchi/rei_bianchi"
 python3 research/rei_crossrepo_integration_20261015/crossrepo_integration.py
 python3 -m unittest discover -s research/rei_crossrepo_integration_20261015 -p 'test_*.py' -v
 python3 -m unittest discover -s research/source07_c11_casea_20261015 -p 'test_*.py' -v

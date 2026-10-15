@@ -164,7 +164,20 @@ def wu_coulomb_source_guard():
     provider=Path(os.environ.get("WU088_HH_LOCAL_REPO",str(default_wu)))
     if not provider.is_dir():
         raise FileNotFoundError("WU088_HH_LOCAL_REPO_REQUIRED_FOR_NATIVE_GUARD")
-    result=read_rei_guard(ROOT,provider)
+    # A relocated source archive has no .git metadata. In that case an
+    # independently checked original native REI checkout supplies the real
+    # repository identity; verify all source surfaces byte for byte first.
+    consumer=Path(os.environ.get("REI_NATIVE_CONSUMER_ROOT",str(ROOT)))
+    if consumer.resolve()!=ROOT.resolve():
+        for rel in ("rust/rei_microphysics/src/coverage.rs",
+                    "rust/rei_microphysics/src/axbi_sources.rs",
+                    "rust/rei_microphysics/src/ft03_controlled.rs",
+                    "research/axbi_goal_20261014/scenario/SCENARIO_LOCK.json"):
+            left=(ROOT/rel).read_bytes()
+            right=(consumer/rel).read_bytes()
+            if hashlib.sha256(left).digest()!=hashlib.sha256(right).digest():
+                raise ValueError("REI_NATIVE_CONSUMER_SOURCE_IDENTITY_MISMATCH: "+rel)
+    result=read_rei_guard(consumer,provider)
     assert result["consumer_actual_existing_HH_R10_excluded"]
     assert result["physical_rate_admission"]=="HOLD"
     assert result["rate_table_status"]=="NOT_AVAILABLE_FROM_BOUND_SOURCES"
