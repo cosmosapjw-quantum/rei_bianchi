@@ -1,0 +1,51 @@
+{
+  "lane": "independent_rei_lrs_threshold_oracle",
+  "source": "rei_bianchi PR152 at frozen root commit 0fcb2dddf5de6b583c2e00f150abff0b2afb6315",
+  "consumer_target": "rei_bianchi PR150 FLRW covariant transport, PR149 C16 Case-A source integration",
+  "status": "REFERENCE_IMPLEMENTED_NATIVE_ADAPTER_NOT_ATTEMPTED",
+  "signature": "(-,+,+,+)",
+  "geometry": {
+    "X": "ln(a/a0) dimensionless",
+    "b": "signed shear integral b(X)",
+    "s_over_H": "dimensionless signed; -0.5<s/H<1 in this oracle",
+    "Sigma": "sqrt(3)*abs(s)/H"
+  },
+  "ray_inputs": {
+    "E0_ev": "photon energy in eV initial comoving tetrad",
+    "mu0": "initial direction cosine wrt LRS symmetry axis",
+    "N0": "comoving photon count weight"
+  },
+  "atom_inputs": {
+    "sigma_source": "Verner 1996 Table1 raw original ASCII",
+    "sigma_unit": "Mb: 1e-22 m^2",
+    "ion_threshold_ev": "from raw donor",
+    "n_i0": "proper neutral number density at a0, 1/m^3",
+    "H0": "proper Hubble 1/s",
+    "kappa0": "dimensionless c*n_i0*sigma(Eth)/H0"
+  },
+  "output_ledgers": {
+    "survivors": "photon count in initial comoving volume",
+    "A_i": "species absorbed photon counts, same basis",
+    "Qheat_i": "excess photoelectron kinetic energy eV per initial comoving volume",
+    "Qion_i": "Eth_i*A_i eV same basis",
+    "W": "expansion/shear redshift work eV",
+    "Pi": "P_parallel-P_transverse; no feedback coupled"
+  },
+  "positive_controls": [
+    "N>=0",
+    "absorption_i>=0",
+    "Qheat_i>=0",
+    "number residual independent",
+    "energy+shear-work residual independent",
+    "exact event angular cutpoints"
+  ],
+  "limits": [
+    "no dynamic ionization fractions",
+    "no moving or tilted absorbers",
+    "no homogeneous stellar source donor activation",
+    "no real EoR history",
+    "no cosmological D/other isotope network",
+    "no H-metric shear backreaction"
+  ],
+  "acceptance_next": "Pull actual PR150 native state and run matched ray/atom rates with fixed species, then perturb dynamic neutral stock and compare; new validation required"
+}

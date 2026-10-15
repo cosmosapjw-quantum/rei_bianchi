@@ -120,3 +120,34 @@ https://doi.org/10.1103/PhysRevD.91.043511 .
 Verner et al., Astrophys J 465, 487 (1996),
 https://doi.org/10.1086/177435 . The true photoionization fits differ
 from the E^-3 toy cross sections used for the exact factorization.
+
+
+## V2: Verner primary donor and exact angular threshold panels
+
+The additive modules verner_angular.py, run_verner_convergence.py and
+verify_ncp_vs_python.py contain a full Verner-1996 H I/He I/He II
+source-parameter reference, independently measured photon/energy work
+budgets, analytic endpoint angular cutpoints, and adaptive Gauss8/16
+per-panel integration. The original positive E^-3 oracle is unchanged.
+
+Primary source donor: donors/verner1996_photo.dat (185 ASCII rows),
+SHA256 a53e73b0af4cc6b801aef67b84bd964e3ed8c9c4992f214e4a69dc7e4443f389.
+Original: https://www.pa.uky.edu/~verner/photo.html .
+
+Executed tests: 59 Python pytest PASS + 4 Rust unit tests PASS.
+NCP std-thread Rust campaign: 6171 parameter cases, 533 threshold-crossing
+cases, exact angular splitting wins all 533 at equal 24-ray count.
+HeII relative error 95th percentile 1.21385e-4 (global GL24) versus
+7.99169e-11 (piecewise GL8 × 3); reference piecewise GL64 × 3.
+NCP parallel 16 threads 0.556s and serial 5.838s; output CSV byte
+identity confirmed by SHA256. Four independent NCP/Python reference
+samples agree with maximum absolute discrepancy 4.51e-17.
+
+Run:
+    python3 -m pytest -q tests/test_lrs_threshold_oracle.py tests/test_verner_angular.py
+    python3 run_verner_convergence.py
+    python3 verify_ncp_vs_python.py
+
+See RESEARCH_V2_KO.md and NATIVE_ADAPTER_CONTRACT.json.
+No actual reionization production integration or result is claimed.
+native_subagent: NOT_RUN (native delegation capability not exposed).
