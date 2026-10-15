@@ -98,3 +98,22 @@ NEXT physics: eventwise closed Q^a_{matter}+Q^a_{radiation}=0 across stellar emi
 ## 7. Durable release status
 
 The immutable Git source+evidence ZIP, independently restored Python tests, Git blob identities, and BOTH Dropbox + Google Drive full-byte SHA readback must be recorded in BACKUP_RECEIPT.json only AFTER they actually succeed. GitHub PR alone is not remote two-cloud preservation.
+
+## Independently verified dual-cloud immutable release
+
+The immutable source/science archive commit f6a1c10aa6d3f7252a9e68a77c2c4b62c41e77f0
+has filename REI_C15_EINSTEIN_SIGMA_PI_20261015_f6a1c10a_v2.zip,
+1,680,554 bytes, 327 entries, CRC PASS, SHA256
+ a159546829ff963b354b2c8feaa5da8b5536363f870ce6a4d3a966746d9c06a4.
+Both Dropbox and Google Drive byte-stream readbacks are IDENTICAL to that source.
+A fully clean extracted directory passed Python C15/C14/C13/C12/C11/C10/C9: 66 tests,
+and newly compiled native Rust axbi_sources/background/igm_rates/igm_thermal:
+23 tests, **89 PASS total**. Two original PR140 blobs, original PR137 gamma/nu blob,
+and 16 external supplier input blobs were reverified exactly, and original
+Sigma/Pi H/He coupled source replayed. The first local ZIP v1 had omitted
+two existing Rust include_str compile-time contracts and is archived as a
+packaging-failure receipt, NOT the final restorable delivery; the corrected v2
+contains the original same-byte Rust contracts and passed fresh compilation.
+Cloud IDs, source SHA256, detailed restore limitations and original checkout
+identity are in BACKUP_RECEIPT.json, committed AFTER the immutable science
+payload archive, therefore intentionally not inside the same ZIP.
