@@ -1,0 +1,59 @@
+{
+  "schema": "rei.canonical_paired_collision.validation_receipt.v1",
+  "date_kst": "2026-10-15",
+  "source_PR145_commit": "54e29dff5a90c0a785cb6dcfb004403614ca403b",
+  "actual_tests": {
+    "new_collision_tests": {
+      "passed": 17,
+      "failed": 0
+    },
+    "inherited_PR145_and_PR140_PR137_tests": {
+      "passed": 50,
+      "failed": 0
+    },
+    "full_combined_pytest": {
+      "passed": 67,
+      "failed": 0,
+      "exit_code": 0,
+      "wall_s": 5.85
+    },
+    "source_event_campaign": {
+      "exit_code": 0,
+      "events": 18,
+      "source_cases": 3,
+      "max_radial_shell_count_abs_error": 1.3877787807814457e-17,
+      "max_total_pair_impulse_Q0_plus": 0,
+      "max_total_pair_impulse_Qz_plus": 0,
+      "entropy_monotone": true,
+      "thermal_unadmitted_rejections": 10
+    },
+    "performance": {
+      "generator_vector_speedup": 42.285261155339406,
+      "source_packet_grid": [
+        96,
+        48
+      ],
+      "source_one_thread_python_loop_vs_numpy": true,
+      "not_native_REI_speedup": true
+    },
+    "independent_Wolfram_symbolic": {
+      "status": "PASS",
+      "event_number_energy_momentum_pair_residual": "{0,0,0}"
+    }
+  },
+  "commands": [
+    "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=<PR140> : <PR145> : <new> python3 -m pytest -q <new>/test_paired_collision.py <PR145>/test_canonical_fv.py <PR140>/test_massive_radial.py <PR137>/test_species.py <PR137>/test_hierarchy.py --tb=short",
+    "PYTHONPATH=<PR140>:<PR145>:<new> OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 <new>/run_collision_campaign.py --output <new>",
+    "python3 -m compileall -q <new> && python3 -m json.tool <new>/RESULTS.json >/dev/null"
+  ],
+  "source_phys_limits": {
+    "col_rate": "NOT_SOURCED; chosen dimensionless tau test inputs only",
+    "gas_reference": "ad hoc conditional adiabatic z20 REI Tgas=8.098 K not C15 actual heated state",
+    "momentum_odd_sector": "REJECTED pending true gas Euler recoil",
+    "entropy": "canonical stationarity w_j not physical thermal detailed balance",
+    "global_reionization": "NOT_RUN"
+  },
+  "status": "LOCAL_IMPLEMENTATION_AND_CONDITIONAL_PHYSICS_SCOPED_PASS",
+  "publication": "NOT_YET_PUBLISHED_AT_RECEIPT",
+  "backup": "NOT_YET_DUAL_VERIFIED_AT_RECEIPT"
+}
