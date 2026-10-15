@@ -1,0 +1,79 @@
+{
+  "schema": "rei.source07.c6.task.v1",
+  "selected_next_stage": "C6_IMPLEMENTATION_VERIFICATION",
+  "status": "READY_AFTER_C5",
+  "owner_repo": "cosmosapjw-quantum/rei_bianchi",
+  "source_id": "PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1",
+  "stage_C5_result": "SCOPED_FIXED_Q_SOURCE_TWO_MOMENT_GRID_PILOT",
+  "source_geometry": {
+    "metric": "(-,+,+,+)",
+    "scale_factors": "a_perp=a exp(-b), a_parallel=a exp(2b)",
+    "a_ref": 0.047619047619047616,
+    "physical_emit_eV": [
+      13.6,
+      100
+    ],
+    "reference_emission_E_eV": [
+      13.6,
+      433
+    ],
+    "qref_signed": [
+      0,
+      -0.005,
+      0.005,
+      -0.01,
+      0.01
+    ],
+    "proper_clock": "elapsed time seconds since zbar20"
+  },
+  "numerical_version": "Q_FIXED_MOMENTS_V1_CENTROID_OPACITY",
+  "source_version_preservation": "MD14 source 48 owner spectral cells + 32 Gauss directions; source lower/upper/escape unchanged",
+  "implemented": [
+    "Rust q-grid new, inject with physical source split and R*J",
+    "Frozen proper HI/HeI/HeII centroid photoabsorption, binding/heat ledger",
+    "Short source-free effective log-average H_i transport using C3 threshold split",
+    "Bounded scratch source/absorb/advance, 1/2/4 fixed-angle parallelism",
+    "Two emission epochs with selected proper geometry/gas readout and no growing cohorts"
+  ],
+  "scientific_HOLDs": [
+    {
+      "item": "HeI centroid opacity branch",
+      "observed": "256-bin HeI event -1.21148% relative to independent continuum; total opacity error -0.03850% due cancellation",
+      "next": "construct C6 threshold-aware subcell reaction quadrature or positive within-cell spectral reconstruction preserving N,U; test 64,128,256,512 and independent extended >=1024"
+    },
+    {
+      "item": "Photoheating source",
+      "observed": "256-bin heat +0.045094% relative to continuum, 512-bin +0.040604%; nonmonotone due HeI fit threshold crossing cell",
+      "next": "separate HeI/HeII species and heat residuals with true source shape/independent SciPy and fixed q events"
+    },
+    {
+      "item": "True physical coupled history",
+      "observed": "Short pilot freezes ionic abundances and uses effective constant H_i across a narrow step; cannot produce T_g or ion fractions",
+      "next": "versioned owner-only H/He/thermal feedback interface; test exact electron/nucleus inventories and time/temperature EOS at one short interval, not full campaign"
+    },
+    {
+      "item": "Numerical memory and source identity",
+      "observed": "C5 bounded arrays and local peak RSS 2872 KiB; full solver peak and accepted outputs not known",
+      "next": "inspect numerical variant/checkpoint ABI before any direct canonical run and track 2 GiB full-resident limit"
+    }
+  ],
+  "verification": [
+    "full Cargo tests; all targets; native short pilot three signed q; actual local xAct; Wolfram plugin; independent SciPy continuum; release time median 3 outer x 4 inner"
+  ],
+  "next_reproducer": [
+    "cd rust/rei_microphysics && cargo test --offline --test axbi_q_grid",
+    "cd rust/rei_microphysics && cargo run --offline --release --example axbi_q_grid_pilot",
+    "cd rust/rei_microphysics && cargo run --offline --release --example axbi_q_grid_bench",
+    "python3 research/source07_c5_fixedq_20261015/independent_spectrum.py",
+    "python3 research/source07_c5_fixedq_20261015/analyze_c5.py",
+    "cd research/source07_c5_fixedq_20261015 && wolframscript -file CHECK_C5_CAS.wl"
+  ],
+  "protected": [
+    "original axbi_driver/axbi_sources/atomic_provider/bianchi_i bytes",
+    "science AX07 conditional, AX08 incomplete, AX11/AX12 pending",
+    "historical 49/51 node source identities and checkpoints",
+    "no resumption of previous long campaign",
+    "no automatic global admission from source/frozen-gas component tests"
+  ],
+  "native_subagents": "NOT_RUN"
+}
