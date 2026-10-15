@@ -24,3 +24,11 @@ Unit1 archive: REIONIZATION_R9_UNIT1_FCI_BO_BRIDGE_20261015.tar.gz
 - Dropbox:/BASS_DERIVATION_DOSSIERS_20260912/REIONIZATION_R9_UNIT1_FCI_BO_BRIDGE_20261015.tar.gz
 
 Read the contracts, versioned code, review records and actual per-case receipts before promoting a result. Source versions remain immutable. Unit2 will add balanced-basis/core-correlation calculations, exact two-electron treatment above the64-orbital bitstring limit, dissociation SCF-initializer repairs and128-step projected response.
+
+## Unit2 snapshot
+
+83 archived solver receipts; 77 accepted finite-model calculations. See [English report](REPORT_EN.pdf), [LaTeX source](REPORT_EN.tex), [execution index](results/EXECUTION_INDEX.csv), and [convergence status](results/CONVERGENCE_STATUS.json).
+
+Core-valence Li ionization I_Q=0.198041791435 Eh; T-to-Q change=0.00034997082 Eh exceeds the target. He/Li retained Q-space projection P=0.708668280218; its basis target remains unmet. NCP Rust1.99 locked offline crate check and8 deuterium integration tests passed. The report records the current large3e run status. All8 physical closure conditions remain open.
+
+Verified Unit2 raw archive and standalone PDF/LaTeX backups are recorded in [UNIT2_DELIVERY.json](UNIT2_DELIVERY.json). [PDF download](https://drive.google.com/file/d/15EuytSPKy9abpvJp2AJy7YrnrHQ6H5E4/view).
