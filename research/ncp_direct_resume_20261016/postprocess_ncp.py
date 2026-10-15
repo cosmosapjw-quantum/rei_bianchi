@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import resource
+import shutil
 import signal
 import subprocess
 import sys
@@ -29,6 +30,11 @@ HARD_DEADLINE = 1792122617.77407  # 2026-10-16T03:50:17.774070Z; NEVER reset.
 CAP_SECONDS = 300
 CAP_MEMORY = 8 * 1024**3
 SUCCESS = 'COMPLETED_ACTUAL_FULL_PAIR_DIAGNOSTICS_PENDING_INDEPENDENT_REVIEW'
+ARCHIVE_NAME = 'POSTPROCESS_REPORT_WITH_RUNNABLE_CODE_EXTERNAL_INPUTS.zip'
+PACKAGE_GENERATED = {ARCHIVE_NAME, 'REPORT_PACKAGE_RECEIPT.json', 'RECOVERY_RECEIPT.json'}
+KNOWN_STATUSES = {SUCCESS, 'NOT_READY_NO_FULL_PLOTS',
+                  'READY_FOR_EXPLICIT_ONE_SHOT_DIAGNOSTIC_RENDER',
+                  'CONTINUATION_FAILED_NO_FULL_PLOTS_OR_ADMISSION'}
 
 
 def utc():
@@ -204,6 +210,8 @@ def bounded_command(command, output, deadline):
 
 def package(output, campaign, renderer_root, status):
     """Reproducible code/evidence report; raw scientific inputs remain external."""
+    # Keep the render outcome recoverable even if subsequent packaging fails.
+    write(output / 'FINAL_STATUS.json', status)
     index = []
     for case in CASES:
         for name in NEEDED:
@@ -214,7 +222,6 @@ def package(output, campaign, renderer_root, status):
     write(output / 'EXTERNAL_RAW_INPUT_INDEX.json', {
         'status': 'RAW_INPUTS_EXTERNAL_NOT_A_SELF_CONTAINED_SCIENTIFIC_DATA_ARCHIVE',
         'files': index, 'content_hashes_when_bound': 'full_pair_manifest.json'})
-    write(output / 'FINAL_STATUS.json', status)
     (output / 'REPORT.md').write_text(
         '# Direct NCP postprocessing\n\n' + status['status'] + '\n\n'
         'One-shot; no solver runs, checkpoint changes, watcher, retries, or admission.\n'
@@ -223,8 +230,18 @@ def package(output, campaign, renderer_root, status):
         'A copied full_pair_manifest.json retains original absolute input paths; '
         'reproduce by running the wrapper against the original campaign directory.\n'
         'Full pair differences are diagnostic only. D activation is absent.\n')
-    archive = output / 'POSTPROCESS_REPORT_WITH_RUNNABLE_CODE_EXTERNAL_INPUTS.zip'
-    with zipfile.ZipFile(archive, 'x', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as bundle:
+    archive = build_archive(output, renderer_root, campaign)
+    write(output / 'REPORT_PACKAGE_RECEIPT.json', {
+        'archive': str(archive), 'bytes': archive.stat().st_size, 'sha256': sha(archive),
+        'kind': 'REPORT_WITH_RUNNABLE_CODE_REQUIRING_EXTERNAL_RAW_INPUTS',
+        'solver_runs': 0, 'scientific_admission': 'NOT_ISSUED'})
+
+
+def build_archive(output, renderer_root, campaign=None):
+    """Clamp archive metadata only; never change filesystem timestamps."""
+    archive = output / ARCHIVE_NAME
+    with zipfile.ZipFile(archive, 'x', compression=zipfile.ZIP_DEFLATED,
+                         allowZip64=True, strict_timestamps=False) as bundle:
         for path in sorted(output.rglob('*')):
             if path.is_file() and path != archive:
                 bundle.write(path, 'report/' + str(path.relative_to(output)))
@@ -233,10 +250,11 @@ def package(output, campaign, renderer_root, status):
             for path in sorted(renderer_root.glob(pattern)):
                 if path.is_file():
                     bundle.write(path, 'runnable/flrw_full005_postprocess_20261015/' + str(path.relative_to(renderer_root)))
-        small = [campaign / name for name in ('campaign_epoch.json', 'full_campaign.receipt.json',
+        small = [] if campaign is None else [campaign / name for name in ('campaign_epoch.json', 'full_campaign.receipt.json',
                  'full_campaign.binding.json', 'full_resource_plan.json')]
-        small += list((campaign / 'configs').glob('*.cfg'))
-        for case in CASES:
+        if campaign is not None:
+            small += list((campaign / 'configs').glob('*.cfg'))
+        for case in CASES if campaign is not None else ():
             small += [campaign / 'launches' / (case + suffix)
                       for suffix in ('.binding.json', '.receipt.json', '.runtime.cfg')]
             small += [campaign / 'runs' / case / name for name in ('source_identity.txt', 'config.cfg', 'RETURN.txt')]
@@ -246,10 +264,83 @@ def package(output, campaign, renderer_root, status):
     with zipfile.ZipFile(archive) as bundle:
         if bundle.testzip() is not None:
             raise RuntimeError('REPORT_ZIP_CRC_FAILURE')
-    write(output / 'REPORT_PACKAGE_RECEIPT.json', {
-        'archive': str(archive), 'bytes': archive.stat().st_size, 'sha256': sha(archive),
-        'kind': 'REPORT_WITH_RUNNABLE_CODE_REQUIRING_EXTERNAL_RAW_INPUTS',
-        'solver_runs': 0, 'scientific_admission': 'NOT_ISSUED'})
+        for path in (output / 'FINAL_STATUS.json', Path(__file__)):
+            member = ('report/FINAL_STATUS.json' if path.parent == output else
+                      'runnable/ncp_direct_resume_20261016/postprocess_ncp.py')
+            if path.is_file() and bundle.read(member) != path.read_bytes():
+                raise RuntimeError('REPORT_ZIP_PAYLOAD_READBACK_FAILURE:' + member)
+    return archive
+
+
+def packaged_render(output, campaign, renderer_root, status):
+    """Report packaging independently without changing the render receipt."""
+    result = dict(status, scientific_status=status['status'],
+                  packaging_status='PACKAGED', output=str(output),
+                  archive=str(output / ARCHIVE_NAME))
+    try:
+        package(output, campaign, renderer_root, status)
+    except Exception as error:
+        result.update(packaging_status='PACKAGING_FAILED', packaging_error=str(error))
+    return result
+
+
+def existing_scientific_status(existing):
+    """Interpret only the established wrapper schema; keep its bytes untouched."""
+    try:
+        status = load(existing / 'FINAL_STATUS.json')
+        if (not isinstance(status, dict) or status.get('status') not in KNOWN_STATUSES
+                or type(status.get('solver_runs')) is not int or status['solver_runs'] != 0
+                or status.get('scientific_admission') != 'NOT_ISSUED'
+                or (status['status'] == SUCCESS and
+                    (status.get('error') or status.get('blockers')))):
+            raise ValueError('UNRECOGNIZED_OR_CONTRADICTORY_FINAL_STATUS_SCHEMA')
+        return status, None
+    except (OSError, ValueError, TypeError) as error:
+        return {'status': 'UNKNOWN_HOLD'}, str(error)
+
+
+def repackage(existing, output, campaign, renderer_root):
+    """Copy preserved evidence and package once, with no readiness/render calls."""
+    original, status_error = existing_scientific_status(existing)
+    science = original['status']
+    if not existing.is_dir():
+        raise ValueError('EXISTING_OUTPUT_DIRECTORY_REQUIRED')
+    if output.exists():
+        raise ValueError('FRESH_SEPARATE_OUTPUT_DIRECTORY_REQUIRED')
+    for source in (existing, campaign, renderer_root):
+        if output == source or source in output.parents or output in source.parents:
+            raise ValueError('RECOVERY_OUTPUT_MUST_NOT_OVERLAP_SOURCE_CAMPAIGN_OR_RENDERER')
+    result = {'status': science, 'scientific_status': science,
+              'packaging_status': 'PACKAGING_FAILED', 'solver_runs': 0,
+              'scientific_admission': 'NOT_ISSUED', 'source_output': str(existing),
+              'output': str(output), 'archive': str(output / ARCHIVE_NAME),
+              'original_final_status': str(existing / 'FINAL_STATUS.json'),
+              'preserved_source_archive': str(existing / ARCHIVE_NAME),
+              'exit_code_meaning': 'Packaging outcome only; zero is not scientific success.'}
+    if status_error:
+        result['original_status_validation_error'] = status_error
+    if 'error' in original:
+        result['original_error'] = original['error']
+    try:
+        output.mkdir(parents=True)
+        for path in sorted(existing.rglob('*')):
+            relative = path.relative_to(existing)
+            if path.is_file() and str(relative) not in PACKAGE_GENERATED:
+                target = output / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(path, target)
+        archive = build_archive(output, renderer_root)
+        result.update(packaging_status='PACKAGED', bytes=archive.stat().st_size,
+                      sha256=sha(archive))
+    except Exception as error:
+        result['packaging_error'] = str(error)
+    # Kept beside the ZIP: it describes the finished operation, not science.
+    try:
+        write(output / 'RECOVERY_RECEIPT.json', result)
+    except OSError as error:
+        result.update(packaging_status='PACKAGING_FAILED',
+                      recovery_receipt_error=str(error))
+    return result
 
 
 def render(campaign, renderer_root, output):
@@ -260,8 +351,7 @@ def render(campaign, renderer_root, output):
     output.mkdir(parents=True)
     status = inspect(campaign, renderer_root)
     if status['blockers']:
-        package(output, campaign, renderer_root, status)
-        return status
+        return packaged_render(output, campaign, renderer_root, status)
     start = time.monotonic()
     deadline = start + min(CAP_SECONDS, HARD_DEADLINE - time.time())
     try:
@@ -287,28 +377,47 @@ def render(campaign, renderer_root, output):
             path.unlink()
         status.update(status='CONTINUATION_FAILED_NO_FULL_PLOTS_OR_ADMISSION', error=str(error))
     status['bind_render_total_wall_s'] = time.monotonic() - start
-    package(output, campaign, renderer_root, status)
-    return status
+    return packaged_render(output, campaign, renderer_root, status)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('status', 'check', 'render'))
+    parser.add_argument('action', choices=('status', 'check', 'render', 'repackage'))
     parser.add_argument('--campaign', type=Path, default=DEFAULT_CAMPAIGN)
     parser.add_argument('--renderer-root', type=Path, default=DEFAULT_RENDERER_ROOT)
-    parser.add_argument('--output', type=Path, help='Fresh directory outside the campaign; render only')
+    parser.add_argument('--output', type=Path, help='Fresh directory outside campaign and source results')
+    parser.add_argument('--existing-output', type=Path, help='Preserved results; repackage only')
     args = parser.parse_args()
-    if args.action == 'render' and args.output is None:
-        parser.error('render requires --output (fresh, separate directory)')
+    if args.action in ('render', 'repackage') and args.output is None:
+        parser.error(args.action + ' requires --output (fresh, separate directory)')
+    if args.action == 'repackage' and args.existing_output is None:
+        parser.error('repackage requires --existing-output')
     resource.setrlimit(resource.RLIMIT_AS, (CAP_MEMORY, CAP_MEMORY))
     campaign, root = args.campaign.resolve(), args.renderer_root.resolve()
     try:
-        result = (render(campaign, root, args.output.resolve()) if args.action == 'render'
-                  else inspect(campaign, root))
+        if args.action == 'repackage':
+            result = repackage(args.existing_output.resolve(), args.output.resolve(), campaign, root)
+        else:
+            result = (render(campaign, root, args.output.resolve()) if args.action == 'render'
+                      else inspect(campaign, root))
     except (OSError, ValueError) as error:
+        if args.action == 'repackage':
+            original, status_error = existing_scientific_status(args.existing_output.resolve())
+            print(json.dumps({'status': original['status'],
+                              'scientific_status': original['status'],
+                              'packaging_status': 'PACKAGING_FAILED',
+                              'packaging_error': str(error), 'original_error': original.get('error'),
+                              'original_status_validation_error': status_error,
+                              'source_output': str(args.existing_output.resolve()),
+                              'output': str(args.output.resolve()), 'solver_runs': 0}))
+            return 2
         print(json.dumps({'status': 'REQUEST_FAILED', 'error': str(error), 'solver_runs': 0}))
         return 2
     print(json.dumps(result, ensure_ascii=False, allow_nan=False))
+    if args.action == 'repackage':
+        return 0 if result['packaging_status'] == 'PACKAGED' else 2
+    if result.get('packaging_status') == 'PACKAGING_FAILED':
+        return 2
     return 0 if result['status'] in ('READY_FOR_EXPLICIT_ONE_SHOT_DIAGNOSTIC_RENDER', SUCCESS) else 2
 
 

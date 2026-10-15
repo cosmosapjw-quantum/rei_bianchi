@@ -1,0 +1,18 @@
+# NCP full005 ZIP 복구 담당 Codex 프롬프트
+
+이 문서는 최종 복사용 프롬프트가 정한 `CODE_COMMIT`에 고정된 배포본의 실행 지침이다. `CODE_COMMIT`를 현재 branch HEAD로 대체하지 말라. 사용자는 이 프롬프트만 복사한다. 다운로드·설정·명령 실행을 사용자에게 넘기지 말고 NCP Codex가 직접 수행하라.
+
+1. 기존 checkout과 dirty/untracked 파일, campaign, native checkpoint를 보존하라. clone/worktree를 만들거나 기존 checkout에 덮어 풀지 말라. GitHub `cosmosapjw-quantum/rei_bianchi`의 `CODE_COMMIT`에서 `research/flrw_full005_zip_recovery_20261016/PACKAGE_RECEIPT.json`을 직접 가져와 읽고, 그 receipt와 같은 폴더의 `REI_FULL005_ZIP_RECOVERY_20261016_v2.zip`을 직접 가져와 receipt의 SHA256과 한 번 비교하라. receipt와 ZIP은 같은 pinned commit에서 가져온다. 새 비어 있는 code 디렉터리에 풀고, 그 안의 `rei_bianchi`를 코드 루트로 삼아라. 이 다운로드·검증·압축 해제를 사용자에게 요구하지 말라. 중첩 manifest 재검증을 새 gate로 만들지 말라.
+2. 새 코드의 `AGENTS.md`, `research/flrw_full005_zip_recovery_20261016/{CONTRACT.json,HANDOFF.json,NEXT_DAG.json,RUNBOOK_KO.md,IMPLEMENTATION.json,INDEPENDENT_REVIEW.json}`을 읽어라. 이미 완료된 검토·집중 테스트를 재사용하라. 예전 28개 검증, profile, source006 시험·빌드·run은 반복하지 말라. solver 실행은 0회다.
+3. 사용자가 실제 v1 wrapper를 실행했을 때 마지막 응답은 `REQUEST_FAILED`, 오류는 `ZIP does not support timestamps before 1980`, `solver_runs: 0`이었다. 이것만으로 render 실패/성공을 판정하지 말라. 예전 wrapper는 ZIP을 만들기 전에 `FINAL_STATUS.json`을 기록했다. 실제 기존 출력은 `/root/rei-post-XXXXXX/results`처럼 임의 suffix 디렉터리 안에 있을 수 있다. `/root/rei-post-*/results` 및 이미 명시된 wrapper 출력 경로를 유한한 일회성 읽기 전용 검색으로 찾아라. 전체 디스크를 반복 탐색하거나 정확한 경로를 추측하지 말라. 각 후보의 `FINAL_STATUS.json`, `figures_and_diagnostics/POSTPROCESS_RECEIPT.json`, `bind.log`, `render.log`, manifest 및 파일 목록을 먼저 읽고 이번 full005 Q512/Q1024 실행과 일치하는 출력을 식별하라. 후보가 여러 개면 시간만으로 고르지 말고 status·경로·receipt로 구분하라. 모호하면 기존 자료를 보존하고 관측 결과를 보고하라.
+4. 기존 render 결과와 status를 그대로 보존하면서 새 배포본 wrapper의 `repackage --existing-output OLD --output NEW`를 실행하라. OLD는 확인한 기존 출력이고 NEW는 campaign 및 OLD 밖의 새 경로다. 명령 형식은 RUNBOOK을 따른다. 이 경로는 bind/render/solver를 호출하지 않는 packaging-only 복구다. 기존 과학 상태가 실패이면 실패 상태를 그대로 유지한다. 기존 성공 문구도 독립 과학 승인으로 올리지 말라. 기존 부분 ZIP·로그·그림을 삭제하거나 원본 mtime을 수정하지 말라. ZIP entry의 시간 범위는 새 코드가 내부적으로 처리한다.
+5. packaging-only 복구는 만료된 science 마감 때문에 차단하지 않는다. 새 과학 계산이 필요한 경우에만 원래 bind+render 합계 300초·AS 8 GiB·절대마감 `1792122617.77407` (`2026-10-16T03:50:17.774070Z`)과 이미 소비한 시간을 그대로 적용한다. 원래 epoch를 재설정하지 말라. 이번 기존 결과 복구에서는 render를 재실행하지 않는다. 실제 render가 실패했으면 먼저 로그와 receipt로 원인을 식별해 보존·보고하라. 별도로 정당화된 후속 render도 남은 예산을 입증하지 못하거나 마감이 지났으면 중단한다. solver·watcher를 재시작하지 말라.
+6. 새 결과의 `RECOVERY_RECEIPT.json`과 `POSTPROCESS_REPORT_WITH_RUNNABLE_CODE_EXTERNAL_INPUTS.zip`을 확인하라. repackage의 exit code 0은 packaging 성공만 뜻하며 과학 성공이 아니다. `scientific_status`와 `packaging_status`를 별도로 읽어라. 없거나 해석 불가능한 기존 status는 UNKNOWN/HOLD로 보고하고 성공으로 보정하지 말라. 새 package receipt와 ZIP 존재·CRC 검증 결과, OLD/NEW 경로, 원래 `FINAL_STATUS`의 과학 상태, renderer receipt/로그 관측값, solver 실행 0회를 보고하라. 그림이 이미 있으면 그 사실과 경로를 보고하고 독립 검토 대기로 둔다. D cosmological activation·D 곡선·whole-history time/angular convergence·Bianchi/isotope 최종결과를 주장하지 말라. 원자료는 이 코드 ZIP 밖에 있으며 실제 업로드/readback 없이 cloud backup 완료라고 말하지 말라.
+
+7. 복구 뒤에는 이미 승인된 Git/cloud 접근과 기존 백업 도구·목적지를 사용해 실제 결과를 보존하라. 공개 저장소에는 공개 가능한 report/code만 게시하고 private scientific raw는 넣지 말라. private raw는 접근 가능한 기존 private backup 목적지에 보존하라. 실제 업로드 acknowledgment와 readback으로 확인한 범위만 기록한다. 접근이 없으면 정확한 미완료 항목을 보고하고 백업 완료라고 주장하거나 사용자에게 수동 다운로드를 요구하지 말라.
+
+사용자가 원하는 것은 기존 실제 결과를 보존한 복구다. 사용자에게 수동 사전 작업을 요구하거나 새 절차만 작성하고 끝내지 말고, 접근 가능한 NCP에서 이 순서대로 실제 복구를 완료하라.
+
+배포 코드의 새 synthetic packaging 집중 테스트는 8개 PASS(0.119초)다. 기존 28 physics·3 renderer CLI·8 wrapper 검증은 반복하지 않고 재사용했다. 이것은 실제 NCP 복구·render·과학 admission의 증거가 아니다. 구현 상세는 `IMPLEMENTATION.json`, 최종 독립 코드 검토 판단은 `INDEPENDENT_REVIEW.json`을 따른다.
+
+새 독립 코드 검토는 `INDEPENDENT_REVIEW.json`의 `PASS_IN_SCOPE`로 완료됐다. 이는 packaging 복구 구현·지침에 대한 판단이며 실제 NCP 결과의 과학 승인이 아니다. 추가 선택적 검토나 기존 검증 재실행 없이 이 인계의 기존 결과 복구로 진행한다.

@@ -1,0 +1,80 @@
+{
+  "task": "FLRW_FULL005_ZIP_RECOVERY_20261016",
+  "nodes": [
+    {
+      "id": "zip_timestamp_repair",
+      "status": "COMPLETE_8_NEW_FOCUSED_SYNTHETIC_TESTS_PASS",
+      "on_pass": "scoped_independent_code_review",
+      "on_fail": "ONE_TARGETED_REPAIR_OR_REPORT",
+      "evidence": "IMPLEMENTATION.json",
+      "test_wall_s": 0.119,
+      "wrapper_sha256": "aead75ca437199be300c913d07ea3c8375940c5a0e1efe8e0123fef16108b9db",
+      "unchanged_renderer_sha256": "b396a5b439a5cc3e305ab6663ac8d6d46424b747c13a84da4fe3d89ac468b5fc"
+    },
+    {
+      "id": "scoped_independent_code_review",
+      "status": "PASS_IN_SCOPE",
+      "on_pass": "publish_pinned_v2_bundle",
+      "on_fail": "ONE_BOUNDED_TARGETED_REPAIR_OR_REPORT",
+      "evidence": "INDEPENDENT_REVIEW.json"
+    },
+    {
+      "id": "publish_pinned_v2_bundle",
+      "status": "FINALIZED_AWAIT_ROOT_PUBLICATION",
+      "on_pass": "ncp_existing_result_intake",
+      "bundle": "REI_FULL005_ZIP_RECOVERY_20261016_v2.zip",
+      "user_action": "COPY_FINAL_CODEX_PROMPT_ONLY"
+    },
+    {
+      "id": "ncp_existing_result_intake",
+      "status": "PENDING_ACTUAL_NCP_EVIDENCE",
+      "reads": [
+        "/root/rei-post-*/results/FINAL_STATUS.json and explicitly known wrapper output paths",
+        "renderer receipt",
+        "bind/render logs",
+        "full_pair_manifest.json"
+      ],
+      "on_identified": "package_only_recovery",
+      "on_ambiguous_or_missing": "PRESERVE_AND_REPORT_OBSERVED_STATE_NO_BLIND_RENDER"
+    },
+    {
+      "id": "package_only_recovery",
+      "status": "NOT_RUN_HERE",
+      "command": "postprocess_ncp.py repackage --existing-output OLD --output NEW",
+      "limits": {
+        "solver_runs": 0,
+        "bind_runs": 0,
+        "render_runs": 0,
+        "science_deadline_gates_packaging": false
+      },
+      "on_pass": "report_unchanged_science_status_and_preserve_actual_artifacts",
+      "on_fail": "PRESERVE_OLD_AND_EXACT_FAILURE"
+    },
+    {
+      "id": "actual_result_independent_review",
+      "status": "PENDING_ACTUAL_RENDER_EVIDENCE",
+      "on_existing_render_failure": "INSPECT_CAUSE_AND_PRESERVE_REPORT; NO_RERENDER_OF_EXISTING_OUTPUT_IN_THIS_RECOVERY",
+      "claim_ceiling": "No D activation/curve, no whole-history convergence, no Bianchi/isotope final claim"
+    },
+    {
+      "id": "report_unchanged_science_status_and_preserve_actual_artifacts",
+      "status": "PENDING_ACTUAL_NCP_RECOVERY",
+      "action": "Use already authorized Git/cloud access and existing private backup destinations; publish public safe report/code only, verify actual upload acknowledgment/readback; unavailable access remains explicit incomplete without manual user downloads",
+      "science_review": "Independent actual-result science admission remains separate and pending"
+    }
+  ],
+  "unchanged_science_limits": {
+    "total_wall_s": 300,
+    "address_space_bytes": 8589934592,
+    "hard_deadline_epoch": 1792122617.77407,
+    "original_epoch_never_reset": true
+  },
+  "reuse_without_rerun": [
+    "Prior 28 checks",
+    "Completed post-cache profile",
+    "Completed source006 experiment",
+    "Completed source005 Q512/Q1024 native trajectories"
+  ],
+  "scientific_status": "UNKNOWN_UNTIL_EXISTING_OUTPUT_READ; PACKAGE_RECOVERY_NEVER_PROMOTES_FAILURE_OR_ISSUES_SCIENTIFIC_ADMISSION",
+  "external_raw_preservation": "Retain original raw/controller evidence; cloud backup only after actual upload/readback evidence"
+}
