@@ -1,0 +1,73 @@
+{
+  "schema": "C10-local-implementation-tests-1",
+  "observed_utc": "2026-10-15T18:30:37.099552+00:00",
+  "executor": "coding agent; runtime model identity not exposed",
+  "scope": "Synthetic fixtures plus restored historical snapshot only; no NCP connection or physics execution",
+  "repair_pass": "One bounded independent-review repair: broken archive/schema recovery, stopped-conflict NPZ preservation, supervisor matching without optional --only, real parent run_manifest preservation; final package docs path corrected",
+  "actual_ncp_runtime": "unknown",
+  "scientific_admission": "pending independent Astra decision and actual NCP evidence",
+  "commands": [
+    {
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "/workspace/scratch/37bc4acea758/handoff_recovery/overlay/tests",
+        "-v"
+      ],
+      "cwd": "/workspace/scratch/37bc4acea758/handoff_recovery",
+      "started_utc": "2026-10-15T18:30:36.146417+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "test_actual_parent_run_manifest_is_copied (test_recover_c10.RecoveryFixtures.test_actual_parent_run_manifest_is_copied) ... ok\ntest_bad_nested_gate_and_case_hash_rejected (test_recover_c10.RecoveryFixtures.test_bad_nested_gate_and_case_hash_rejected) ... ok\ntest_cli_collect_actual_local_subprocess_and_no_overwrite (test_recover_c10.RecoveryFixtures.test_cli_collect_actual_local_subprocess_and_no_overwrite) ... ok\ntest_collection_detects_mutation (test_recover_c10.RecoveryFixtures.test_collection_detects_mutation) ... ok\ntest_corrupt_zip_checksum_matched_is_failed_and_preserved (test_recover_c10.RecoveryFixtures.test_corrupt_zip_checksum_matched_is_failed_and_preserved) ... ok\ntest_denied_process_inspection_is_unknown (test_recover_c10.RecoveryFixtures.test_denied_process_inspection_is_unknown) ... ok\ntest_duplicate_terminals_conflict (test_recover_c10.RecoveryFixtures.test_duplicate_terminals_conflict) ... ok\ntest_failed_terminal_never_accepted_from_exit_zero (test_recover_c10.RecoveryFixtures.test_failed_terminal_never_accepted_from_exit_zero) ... ok\ntest_incomplete_partial_is_stale_and_preserved (test_recover_c10.RecoveryFixtures.test_incomplete_partial_is_stale_and_preserved) ... ok\ntest_live_terminal_is_in_progress_and_npz_not_copied (test_recover_c10.RecoveryFixtures.test_live_terminal_is_in_progress_and_npz_not_copied) ... ok\ntest_malformed_receipt_schema_is_failed_and_preserved (test_recover_c10.RecoveryFixtures.test_malformed_receipt_schema_is_failed_and_preserved) ... ok\ntest_missing_accessible_root (test_recover_c10.RecoveryFixtures.test_missing_accessible_root) ... ok\ntest_npz_identity_failure_even_with_matching_file_sha (test_recover_c10.RecoveryFixtures.test_npz_identity_failure_even_with_matching_file_sha) ... ok\ntest_npz_nonfinite_shape_and_missing_rejected (test_recover_c10.RecoveryFixtures.test_npz_nonfinite_shape_and_missing_rejected) ... ok\ntest_proc_exact_identity_and_start_ticks (test_recover_c10.RecoveryFixtures.test_proc_exact_identity_and_start_ticks) ... ok\ntest_source_mutation_and_extra_unavailable_root (test_recover_c10.RecoveryFixtures.test_source_mutation_and_extra_unavailable_root) ... ok\ntest_terminal_valid_real_npz (test_recover_c10.RecoveryFixtures.test_terminal_valid_real_npz) ... ok\n\n----------------------------------------------------------------------\nRan 17 tests in 0.785s\n\nOK\n"
+    },
+    {
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/37bc4acea758/handoff_recovery/overlay/recover_c10.py",
+        "--help"
+      ],
+      "cwd": "/workspace/scratch/37bc4acea758/handoff_recovery",
+      "started_utc": "2026-10-15T18:30:21.826739+00:00",
+      "exit_code": 0,
+      "stdout": "usage: recover_c10.py [-h] {inspect,collect} ...\n\nOne-pass, local C10 evidence recovery. This program never runs physics.\n\nOnly NPZ validation imports NumPy. All original files and processes are read-only.\n\npositional arguments:\n  {inspect,collect}\n\noptions:\n  -h, --help         show this help message and exit\n\nNCP commands (run locally on NCP; no remote session is created):\n  python3 recover_c10.py inspect --root /root/REI_MICROPHYSICS_R9_20261015 --out /root/REI_C10_RECOVERY_<UTC>\n  python3 recover_c10.py collect --root /root/REI_MICROPHYSICS_R9_20261015 --out /root/REI_C10_COLLECTION_<UTC>\n\nUse a never-existing --out. collect copies stable evidence and creates a sibling\ntar.gz plus archive checksum/size receipt; publication remains a separate action.\nOnly NPZ validation needs NumPy. Frozen physics requires requirements.lock.\nNo command runs the solver, retries, terminates workers, or changes original files.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/37bc4acea758/handoff_recovery/overlay/recover_c10.py",
+        "inspect",
+        "--root",
+        "/workspace/scratch/37bc4acea758/handoff_recovery/unit2/ncp_results",
+        "--out",
+        "/workspace/scratch/37bc4acea758/handoff_recovery/local_c10_restored_snapshot_repaired"
+      ],
+      "cwd": "/workspace/scratch/37bc4acea758/handoff_recovery",
+      "started_utc": "2026-10-15T18:30:21.893153+00:00",
+      "exit_code": 0,
+      "stdout": "{\"out\": \"/workspace/scratch/37bc4acea758/handoff_recovery/local_c10_restored_snapshot_repaired\", \"reason\": \"attempt evidence remains without terminal receipt or active process; no replay\", \"runtime_class\": \"stale\"}\n",
+      "stderr": ""
+    }
+  ],
+  "passed": true,
+  "prior_repair_regression": {
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "/workspace/scratch/37bc4acea758/handoff_recovery/overlay/tests",
+      "-v"
+    ],
+    "cwd": "/workspace/scratch/37bc4acea758/handoff_recovery",
+    "started_utc": "2026-10-15T18:30:21.004522+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "test_actual_parent_run_manifest_is_copied (test_recover_c10.RecoveryFixtures.test_actual_parent_run_manifest_is_copied) ... ok\ntest_bad_nested_gate_and_case_hash_rejected (test_recover_c10.RecoveryFixtures.test_bad_nested_gate_and_case_hash_rejected) ... ok\ntest_cli_collect_actual_local_subprocess_and_no_overwrite (test_recover_c10.RecoveryFixtures.test_cli_collect_actual_local_subprocess_and_no_overwrite) ... ok\ntest_collection_detects_mutation (test_recover_c10.RecoveryFixtures.test_collection_detects_mutation) ... ok\ntest_corrupt_zip_checksum_matched_is_failed_and_preserved (test_recover_c10.RecoveryFixtures.test_corrupt_zip_checksum_matched_is_failed_and_preserved) ... /workspace/scratch/37bc4acea758/handoff_recovery/overlay/recover_c10.py:202: ResourceWarning: unclosed file <_io.BufferedReader name='/tmp/tmpnkte0ds3/root/runs/threeelectron_v6/quench_Li_Be_union_aug_TZ_occ_list_v6/data.npz'>\n  gate('validation_exception', str(e), False)\nResourceWarning: Enable tracemalloc to get the object allocation traceback\nok\ntest_denied_process_inspection_is_unknown (test_recover_c10.RecoveryFixtures.test_denied_process_inspection_is_unknown) ... ok\ntest_duplicate_terminals_conflict (test_recover_c10.RecoveryFixtures.test_duplicate_terminals_conflict) ... ok\ntest_failed_terminal_never_accepted_from_exit_zero (test_recover_c10.RecoveryFixtures.test_failed_terminal_never_accepted_from_exit_zero) ... ok\ntest_incomplete_partial_is_stale_and_preserved (test_recover_c10.RecoveryFixtures.test_incomplete_partial_is_stale_and_preserved) ... ok\ntest_live_terminal_is_in_progress_and_npz_not_copied (test_recover_c10.RecoveryFixtures.test_live_terminal_is_in_progress_and_npz_not_copied) ... ok\ntest_malformed_receipt_schema_is_failed_and_preserved (test_recover_c10.RecoveryFixtures.test_malformed_receipt_schema_is_failed_and_preserved) ... ok\ntest_missing_accessible_root (test_recover_c10.RecoveryFixtures.test_missing_accessible_root) ... ok\ntest_npz_identity_failure_even_with_matching_file_sha (test_recover_c10.RecoveryFixtures.test_npz_identity_failure_even_with_matching_file_sha) ... ok\ntest_npz_nonfinite_shape_and_missing_rejected (test_recover_c10.RecoveryFixtures.test_npz_nonfinite_shape_and_missing_rejected) ... ok\ntest_proc_exact_identity_and_start_ticks (test_recover_c10.RecoveryFixtures.test_proc_exact_identity_and_start_ticks) ... ok\ntest_source_mutation_and_extra_unavailable_root (test_recover_c10.RecoveryFixtures.test_source_mutation_and_extra_unavailable_root) ... ok\ntest_terminal_valid_real_npz (test_recover_c10.RecoveryFixtures.test_terminal_valid_real_npz) ... ok\n\n----------------------------------------------------------------------\nRan 17 tests in 0.686s\n\nOK\n"
+  },
+  "prior_repair_regression_note": "17 passed; corrupt-NPZ test exposed NumPy file-handle ResourceWarning. Explicit file context added and suite rerun below."
+}
