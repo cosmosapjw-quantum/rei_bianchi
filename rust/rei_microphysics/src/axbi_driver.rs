@@ -35,6 +35,9 @@ pub struct DriverConfig {
     pub end_zbar: f64,
     pub escape_fraction: f64,
     pub initial_temperature_k: f64,
+    /// Optional physical HII number fraction at the fresh zbar=20 slice.
+    /// Defaults to the immutable scenario value; no old checkpoint adoption.
+    pub initial_hii_fraction: f64,
     pub energy_subdivisions: usize,
     pub n_mu: usize,
     pub background_panels: usize,
@@ -58,6 +61,7 @@ impl DriverConfig {
             escape_fraction: 0.2,
             initial_temperature_k: 2.7255 * 21.0_f64.powi(2)
                 / (150.0 * (0.0224_f64 / 0.023).powf(0.4)),
+            initial_hii_fraction: 2.0e-4,
             energy_subdivisions: 16,
             n_mu: 8,
             background_panels: 4096,
@@ -95,6 +99,7 @@ impl DriverConfig {
                 "end_zbar" => number!(end_zbar),
                 "escape_fraction" => number!(escape_fraction),
                 "initial_temperature_k" => number!(initial_temperature_k),
+                "initial_hii_fraction" => number!(initial_hii_fraction),
                 "energy_subdivisions" => number!(energy_subdivisions),
                 "n_mu" => number!(n_mu),
                 "background_panels" => number!(background_panels),
@@ -132,6 +137,8 @@ impl DriverConfig {
         if ![256, 2048, 4096].contains(&self.output_budget_mib)
             || self.spectra_every_accepted == 0
             || !self.q_ref.is_finite()
+            || !self.initial_hii_fraction.is_finite()
+            || !(0.0..=1.0).contains(&self.initial_hii_fraction)
             || !self.end_zbar.is_finite()
             || !(4.0..20.0).contains(&self.end_zbar)
             || !self.local_target.is_finite()
@@ -259,7 +266,7 @@ impl Driver {
             })
             .collect::<Result<Vec<_>, ForwardError>>()?;
         let gas = IgmGasState::from_temperature(
-            [2e-4, 0.0, 0.0],
+            [config.initial_hii_fraction, 0.0, 0.0],
             n_h0 / a_ref.powi(3),
             n_he0 / a_ref.powi(3),
             config.initial_temperature_k,

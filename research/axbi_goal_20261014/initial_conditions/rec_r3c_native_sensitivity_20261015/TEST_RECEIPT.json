@@ -1,0 +1,74 @@
+{
+  "schema": "rei.rec.native_initial_sensitivity.test_receipt.v1",
+  "date_kst": "2026-10-15",
+  "parent_native_commit": "edddcd6ea9a135fcf18c7be8357b5e11fea87407",
+  "recipient_source": "07aa11d2d3fd47d2ed95e9d9161f6205e4d9ba386c27ad43d2b298fcd86d1696",
+  "donor_git_blob": "1e3fdd5019f2a9a7d5ccd6a23e2f3a03faf74bd4",
+  "commands": [
+    "CARGO_TARGET_DIR=../target CARGO_BUILD_JOBS=2 cargo build --offline --release --example axbi_rec_donor_short --example axbi_rec_donor_rhs",
+    "CARGO_TARGET_DIR=../target CARGO_BUILD_JOBS=2 cargo test --offline --test axbi_rec_donor_ic --test axbi_c9_native_interval --test axbi_driver --test axbi_rates --test axbi_background",
+    "python3 research/axbi_goal_20261014/initial_conditions/rec_r3c_native_sensitivity_20261015/run_short_native_sensitivity.py --output-dir .../science_8192step_p64 --steps 8192 --panels 64",
+    "python3 research/axbi_goal_20261014/initial_conditions/rec_r3c_native_sensitivity_20261015/validate_8192_panel_256.py --verify-existing",
+    "python3 research/axbi_goal_20261014/initial_conditions/rec_r3c_native_sensitivity_20261015/analyze_native_donor_sensitivity.py",
+    "python3 research/axbi_goal_20261014/initial_conditions/rec_r3c_native_sensitivity_20261015/summarize_8192_science.py",
+    "python3 research/axbi_goal_20261014/initial_conditions/rec_r3c_native_sensitivity_20261015/preserve_native_science_raw.py"
+  ],
+  "observed": {
+    "cargo_selected_tests": {
+      "count": 32,
+      "passed": 32,
+      "failed": 0,
+      "exit_code": 0
+    },
+    "cargo_release_two_examples": {
+      "exit_code": 0
+    },
+    "source_six_8192_actual": {
+      "source_case_count": 6,
+      "accepted_per_case": 8192,
+      "rows_per_case": 8193,
+      "all_exact_serial_parallel_SHA": true,
+      "serial_sum_s": 28.245703747030348,
+      "parallel_two_worker_wall_s": 14.923443594016135,
+      "speedup": 1.8927068386787116
+    },
+    "source_40_actual": {
+      "per_case_accepted": 40,
+      "source_case_count": 6,
+      "scientific_p64_p4096_physical_fields_equal": true,
+      "speedup_4096_to64": 30.64379914078114,
+      "parallel_4096": 1.9483917610966255,
+      "parallel_64": 2.0912079898612
+    },
+    "panel_8192": {
+      "physical_states_compared": 32772,
+      "original_strict_bitwise_source_gate": "REFUTED_ON_SIGNED_Q_ROUNDOFF",
+      "predeclared_physical_scaled_gate": "PASS_SCOPED",
+      "max_proper_time_rel": 2.1721494389679093e-15
+    },
+    "local_target_refinement": {
+      "state_max_abs_xHII": 6.5471483692955586e-9,
+      "max_abs_T_K": 2.991896224102675e-7,
+      "max_abs_J0_eV_H": 1.0867858888815656e-10,
+      "empirical_only": true
+    },
+    "source_initial_four_factor": {
+      "state_samples_per_shear": 4,
+      "q_count": 3,
+      "Wolfram_H_source_factorial_identity": "{0,0}",
+      "native_source_ledger_absolute_error": "~1e-50 erg/cm^3/s"
+    },
+    "raw_provenance_capsule": {
+      "file_sha256": "a7ebb0cfefc98ce82daede915f165aeb572f8412383c81799479a445e8b7d684",
+      "payload_count": 21,
+      "readback": "PASS"
+    },
+    "negative_tests": [
+      "old baseline checkpoint rejected by new donor initial thermal reference",
+      "malformed xHII negative/NaN/>1 fail",
+      "artificial source temperature record corruption rejected by panel analysis"
+    ],
+    "complete_eor_admission": false
+  },
+  "scientific_limit": "Numerically checked actual 8192-step prefix, no global EoR precision claim; same native source and fixed nominal model only."
+}
