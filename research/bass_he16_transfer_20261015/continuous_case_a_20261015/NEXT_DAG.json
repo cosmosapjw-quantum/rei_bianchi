@@ -1,0 +1,76 @@
+{
+  "schema": "rei.md14.casea_continuous_birth_next_dag.v1",
+  "latest_done": "C7_TRUE_MD14_CONTINUOUS_SOURCE",
+  "source_branch": "research/bass-he-optical-depth-transfer-20261015",
+  "original_owner_unmodified": "0fcb2dddf5de6b583c2e00f150abff0b2afb6315",
+  "evidence": "Original Rust AxbiSource per-H emissivity and source age, native 48 spectra ×8 angles, 3 q ×2 eta ×4 time steps, Case-A Grackle original, alternate exact covariant vs original fixed physical-energy grid, positive photon U/F/Pi, stellar birth and escape accounted only formally",
+  "native_subagent": "NOT_RUN",
+  "tasks": [
+    {
+      "id": "C7.1_MD14",
+      "status": "IMPLEMENTED_VERIFIED",
+      "goal": "Original MD14 live photon source births with conserved-source photon A/B",
+      "evidence": [
+        "continuous_casea.rs",
+        "results/MD14_CASEA_SERIAL.csv",
+        "results/MD14_CASEA_PARALLEL2.csv"
+      ]
+    },
+    {
+      "id": "C7.2_SUPPORT",
+      "status": "IMPLEMENTED_VERIFIED",
+      "goal": "Independent GL16 source birth + minimum physical source UV photon energy and original fixed-grid numerical support violation",
+      "evidence": [
+        "source_gl16.rs",
+        "source_support.rs",
+        "source_only_boundary.rs",
+        "results/SOURCE_ONLY_BOUNDARY.csv"
+      ]
+    },
+    {
+      "id": "C7.3_ANGULAR",
+      "status": "IMPLEMENTED_VERIFIED",
+      "goal": "Native positive angular radiation energy flux and P2 cone, signed q parity and C16 provenance",
+      "evidence": [
+        "continuous_casea.rs",
+        "results/CONTINUOUS_CASEA_RESULTS.json"
+      ]
+    },
+    {
+      "id": "C8_SOURCE_GRID",
+      "status": "READY",
+      "goal": "Independently vary original MD14 threshold-cell energy resolutions [4,8,16,32] and proper midpoint time steps, ensuring cross sections and energy group support consistent; check source-grid lower-node leakage and photon/gas goal errors",
+      "acceptance": [
+        "True-support min-energy and source spectral moments controlled",
+        "Exact emitted source count and energy per H with independent GL16",
+        "Native recombination, Compton and threshold boundary ledgers",
+        "No publication global error claim from local Cauchy alone"
+      ]
+    },
+    {
+      "id": "C8_COHORT_COMPRESSION",
+      "status": "READY_PARALLEL_LANE",
+      "goal": "Original C13/bass_cr source age cohort compression with false threshold ghost rejecting any merge that changes HI,HeI,HeII photoevents/heat or momentum U,F,Pi beyond bounds",
+      "acceptance": [
+        "Original source child photon positivity",
+        "True photon energy moments and near-threshold accurate cross section",
+        "Bounded memory and explicitly measured speed under same physics"
+      ]
+    },
+    {
+      "id": "C9_EMITTER_QA",
+      "status": "BLOCKED_BY_PHYSICAL_EMITTER_FOUR_MOMENTUM",
+      "goal": "Close original C16 source-emitter energy, Case-A escaped radiation four momentum and baryonic recoil Q^a on identical background, without inventing angular spectrum",
+      "next_action": "Source-specific emitter population + escaping spectral/angular kernel, or explicit prescribed stress model with its assumptions"
+    },
+    {
+      "id": "C10_EOR_GLOBAL",
+      "status": "BLOCKED_BY_C8_C9",
+      "goal": "Full zbar20->4 native source, optical tau, angular CMB and gravitational true-observable admission",
+      "not_to_claim": "Production native global error, complete Einstein Q^a, observation-tested sky"
+    }
+  ],
+  "next_selected": "C8_SOURCE_GRID",
+  "publication_admission": "HOLD_FULL_COUPLED_EOR_AND_OBSERVER_CMB",
+  "backup_policy": "Pre-audit checkpoint done. After independent verification push protected research branch and dual archives/Dropbox backups. Already enabled recurring backups daily 19KST; skip duplicates."
+}

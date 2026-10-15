@@ -1,0 +1,46 @@
+# C7: 실제 MD14 연속 광자 출생 × Grackle Case-A H/He × Bianchi I A/B
+
+2026-10-15 KST. **Source-scoped, actually executed Rust implementation.** Scientific state: DERIVED / NUMERICALLY_CHECKED / IMPLEMENTATION_VERIFIED on the fixed short cold-source model. GLOBAL_EOR / OBSERVER_CMB / FULL_EINSTEIN_Qa: HOLD. Parent live worktree unchanged.
+
+## 1. Actual source identities and sibling context
+
+- Original native cold solver frozen source SHA256 `d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185`; separately compiled original Rust `librei_microphysics-2db3552c92b16edc.rlib` SHA256 `44b7ea58b04b58e521a2db2686a4b248040414a733120c22689e857ed40d2a3f`, *different* complete compiled source SHA256 `fa00a6f73f45e8ac391b5bb723b30d162005bf79750138b1a13e84ec82248f67`. Two original MD14 source emitter methods `AxbiSource::at_redshift` and `AxbiSource::cell_per_h_s` have byte-identical definitions across both saved full source records, independently audited in `SOURCE_METHOD_IDENTITY.json`. Earlier seven Grackle rate/EOS method and 12 geometry/atomic source method audits remain distinct.
+- Latest sibling REI C13 on branch `origin/research/rei-c13-native-live-source-20261015`, C16 positive photon U/F/P2 cone on `origin/research/rei-c16-positive-qmu-ledger-20261015`, C16 external source Q0 and shear work on `origin/research/rei-c16-source-energy-20261015` were actually inspected. We reused the original source age/spectral/angular and the C16 cone, and **did not** conflate the open matter emitter, radiation escape or baryon momentum with a closed Einstein source.
+- BASS_HE warm HE18/FT03, WU088_HH screened Coulomb, and bass_cr precision donor have different physical source/temperature/clock/eligibility. No numerical cross-model values were silently inserted.
+
+## 2. Precise computational setup
+
+Metric -+++, LRS Bianchi I `ds²=-c²dt²+a²e^(-2b)(dx²+dy²)+a²e^(4b)dz²`. Original cold AXBI normal material, initial T=8.098143045064857 K, YHe=.2454, proper number density cm^-3, source units photons per H per proper second, energies eV per H. Input q_ref=-0.005,0,+0.005 is a signed old boundary adapter and NOT standard Sigma=√3 |s|/H. The source epoch and EOS are frozen to the original.
+
+Original `AxbiSource` MD14_Z002_FESC_BB50K_13P6_100_V1 spectrum has 16 cells for each source energy threshold segment 13.6–24.59, 24.59–54.42, 54.42–100 eV, 48 cells in total and 8 Gauss angular rays, 384 positive birth cohorts at each midpoint. Source has no a priori dipole/quadrupole. At each source age zbar_mid: `dot N_gamma/H = AxbiSource.at_redshift(zbar_mid).per_h_s`, normal angular weight is the original `count_fraction * solid_angle_jacobian(g_ref,g_mid) / sum`, photon spectral stock `dot N dt * photon_fraction`. The original source's 4π integration is already included and not multiplied again.
+
+Both A (fixed physical-energy two-neighbor native `Driver::geometry_map` and `deposit`) and B (exact `CovariantPhoton` conserving Killing spatial covector, no spectral re-projection) receive exactly **the same births** at each midpoint. In each arm the photon packet events from original Verner HI/HeI/HeII σ(E) use `-expm1(-λ Δt)` with the same midpoint gas neutral density, and the original Grackle3.4.1 Case-A RR/CI/DR/CE/freefree/Compton gas micro solver evolves xHII,xHeII,xHeIII,u. Original recombination radiation is Case-A ESCAPED ENERGY ONLY: no invented angular/spectral recombination photon population and no full coupled OTS. Proper adiabatic gas half-maps are separate from thermal micro RHS to avoid `2H u` double counting.
+
+Study domain `zbar=20→19.998`, 3 q ×2 initial η (0,10^-5) ×4 source/transport subdivisions (1,8,32,128) = **24 matched A/B physical cases and 48 original Rust records**. Case-A source internal Heun cap is 10^10s; no independent full-coupled global ODE error bound. Actual source cohorts at n128 = 49,152 for each A/B record; fixed grid stores 49 energy nodes ×8 angles (this does NOT say total memory is smaller).
+
+## 3. Independent MD14 emissivity / source support
+
+Original emitter formula uses MD14 SFR Ψ(zbar) with its original f_escape=.2 and blackbody 50,000 K photon yield; we did not substitute a local generic constant source. Independent 16-point Gauss-Legendre quadrature integrates `N_gamma/H=∫du (dot N_gamma/H)/H_geom(u)` using the original native H(a) rates, **not** the source stepping method.
+
+At q=0: independent GL16 `3.45955703510326897e-6` photons/H and `7.01480382462741828e-5 eV/H`; n128 step source result `3.45955703510213352e-6` photons/H, relative difference `3.28206e-13`. All q sign pairs agree in symmetric source number per-H within floating precision.
+
+True source lower-energy spectral centroid is `13.8542959378240571 eV`; even the very earliest emission, propagated with exact covariant momentum to the endpoint, remains `E>=13.852976481068076eV >13.6eV` for q0 (and similarly all signed cases). The `SOURCE_SUPPORT.csv` independently verifies this bound over 48×8 source modes for all q. The exact B transport yields zero physically sub-13.6eV photons.
+
+## 4. Constructive newly demonstrated source/grid mismatch
+
+The native grid begins at `E0=13.6eV`. The original first spectral source cell's exact centroid `Ebar0` is between grid vertices E0 and E1, so a birth alone reprojects fraction `w0=(E1-Ebar0)/(E1-E0)=0.504164283517338108` of first-cell photons to E0. Multiplying by the native first-cell source photon fraction gives `0.03280163884554491` of total stellar births. Any positive later redshift moves these E0 packets below support, which the original `Driver::deposit` records as boundary loss rather than source photons. This is an **algorithmically constructed local defect at fixed spectral grid**, not physical photoabsorption.
+
+Original Rust **source-only, no chemistry** control directly executed at q0 on source/transport steps `[1,8,32,128,512]`. Lower-boundary losses as fractions of births are `[0.032801638845544934, 0.0328756992233779494, 0.0328836348422860275, 0.0328856187645083092, 0.0328861147461339265]`, with event photon-number ledger |residual|~1e-20/H. No numerical sign of disappearance with time refinement; exact first-cell projection computation matches the n1 source-only result to floating point precision.
+
+With the actual Grackle Case-A absorption source and q=0 eta=0 at n128, projected boundary loss is `1.0652998424160929e-7 photons/H`, 3.0792955% of emitted `3.45955703510213352e-6 photons/H`, whereas B has ZERO physical below-13.6 support. Coupled A versus B results: `ΔxHII=-2.2795653842333508e-7`, `ΔxHeIII=-7.29567912527429e-7`, `ΔT=-9.87241325685062e-5 K`. At q±0.005, angular Pi2 of exact B has opposite signed response `±7.38815e-12 eV/H` and A `±7.22905e-12 eV/H` (about 2.15% lower magnitude); q0 Π2 is near numerical zero. Original 0/1/2 photon positive-moment cone `U>=0`, `-U/2<=Pi<=U`, `3F²<=U(U+2Pi)` verified for both A and B, with reflection-symmetric near-zero F.
+
+**Recombination sign feedback:** At q0 eta0 n128, projected HeII absorption difference +3.8606343480971734e-10/H, collisional HeII difference +2.063627988981364e-19/H, but extra HeIII RR difference +5.970092085971768e-8/H. The original event identity `fHe ΔxHeIII = ΔphotoHeII + ΔCIHeII − ΔRRHeIII` holds to `2.77e-17/H`, so the net HeIII response is negative despite positive ghost photoionization. Source halo and gas thermal evolution matter.
+
+## 5. Numerical evidence and claim policy
+
+- Original full run 24 matched A/B, 48 native Rust rows, serial scientific columns vs two-worker identical byte strings (only timing fields differ), confirmed after final recompile from formatted canonical committed source.
+- Independent direct source GL16, physical source support extrema, source-only photon defect, and full source/atomic/CMB escape & photon + gas/expansion/Qbirth account independently checked in Python. Max absolute residuals observed: photo counts `4.9721e-19 photons/H`, photon energy `7.3861e-18 eV/H`, full combined energy ledger `1.7764e-14 eV/H`, atomic binding `1.6431e-14 eV/H`, gas heat `3.0358e-18 eV/H`, charge `1.0131e-15/H`.
+- Source-only no-ionization time refinements 1→512 demonstrate a persistent fixed-spectral-grid boundary artefact; **does NOT certify** the fully coupled native BE source/ODE error, observer CMB opacity/polarization, emitter stellar reservoir, or total energy–momentum four-current Q^a.
+- Final original code benchmark local Ubuntu source-only scoped: 8.69s serial versus 7.09s two worker for the 24 real A/B short cases (~1.23×), with transparent raw results. Not a production solver benchmark.
+
+Next constructive physics: instead of simply increasing temporal nodes, test source-mode-consistent energy support treatment or characteristic packet transport with controlled collision/source compression and native energy-grid resolution. Couple original emitter star stress and physical Case-A escaping recombination radiation spectrum/momentum to resolve C16 open Q^a ledger. Then independently vary energy bins and source/time grids; no silent modification of original owner source.
