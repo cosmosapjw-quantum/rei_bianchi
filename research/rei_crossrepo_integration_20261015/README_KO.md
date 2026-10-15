@@ -114,3 +114,19 @@ The verified source+tests+receipts commit identity, ZIP SHA256, both external
 cloud paths, remote file sizes and independent remote hashes belong in
 `BACKUP_RECEIPT.json` **after** both uploads have succeeded. This README
 by itself does not assert remote preservation before that verification.
+
+## Corrected immutable release archive (fresh restore verified)
+
+The first source+evidence ZIP `REI_C12_FIVE_REPOS_20261015_f13872eb.zip`
+passed both remote-byte identities but omitted the older original C8
+scalar benchmark dependency. Its independent C11 archive replay reported
+2 missing-file errors. It is preserved as superseded and should not be used
+as a complete replay source. The corrected ZIP
+`REI_C12_FIVE_REPOS_20261015_5a887e48_v2.zip` includes original C8,
+reproducibility fix for the WU guard with actual same-byte native REI checkout,
+and 235 archived entries. Fresh extraction C11 8/8 tests, C12 6/6 tests,
+16 original supplier Git blobs and execution replay all passed. Its exact SHA,
+two remote destinations/metadata IDs and full remote byte readback acknowledgments
+are stored in `BACKUP_RECEIPT.json`. The receipt was committed *after* creation
+of the immutable ZIP, so the ZIP refers to payload HEAD 5a887e48, not the later
+receipt-only commit. Production scientific admission remains unchanged.
