@@ -1,0 +1,63 @@
+{
+  "schema": "rei.bass.positive_canonical_fv.validation.v1",
+  "date": "2026-10-15",
+  "source_REI_parent_sha": "b1cba753083ad83049c23ff538834564b49b7b6e",
+  "source_BASS160_module_sha256": "1857567475b1c8586298f868e5420aae7a72e8e1ba69cce6a5b21bfca4fdd790",
+  "source_HHe_ne_sha256": "4f6852c3a5152b91224ce5fecad6ccdfe9f7ece4c8a6d39825c6f5e5ca8ae92f",
+  "commands": [
+    "PYTHONPATH=<PR140 hierarchy dir>:<new canonical FV dir>:<PR140 massive_radial dir> OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m pytest -q <new>/test_canonical_fv.py <PR140>/massive_radial_20261015/test_massive_radial.py <PR140>/test_species.py <PR140>/test_hierarchy.py --tb=short",
+    "PYTHONPATH=<PR140 hierarchy dir>:<new canonical FV dir>:<PR140 massive_radial dir> OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 <new>/run_canonical_fv.py --original-owner /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --bass160-root /home/cosmosapjw/rec_theory_runs/BASS_PR160_PINNED_20261015/checkout --output <new>",
+    "PYTHONPATH=<PR140 hierarchy dir>:<new canonical FV dir>:<PR140 massive_radial dir> OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 <new>/verify_fv_and_plot.py --original-owner /home/cosmosapjw/Dropbox/bianchi/rei_bianchi --output <new>"
+  ],
+  "observed": {
+    "new_scientific_tests": {
+      "passed": 18,
+      "failed": 0
+    },
+    "all_combined_actual_tests": {
+      "passed": 50,
+      "failed": 0,
+      "elapsed_s": 6.12,
+      "exit": 0
+    },
+    "science_campaign": {
+      "actual_executed_cases": 8,
+      "saved_rows": 968,
+      "max_final_Sigma_abs_difference_vs_PR140": 2.2896279056744406e-12
+    },
+    "refinement": {
+      "initial_mass_over_T": [
+        3,
+        30
+      ],
+      "original_BASS160_reference": "actual source MassiveMoments.evaluate direct multipoint finite mass quadrature",
+      "coarse_grid": "12x8 Gauss2, gamma L8",
+      "nominal_grid": "24x12 Gauss3, gamma L8",
+      "fine_grid": "48x24 Gauss3, gamma L12",
+      "three_final_Sigma_nominal_vs_fine": [
+        1.1577696266973359e-13,
+        3.501317616914912e-13,
+        6.025249743579764e-13
+      ],
+      "three_final_Sigma_nominal_vs_PR140": [
+        1.426946668464657e-13,
+        6.640152837300572e-14,
+        5.093187156746115e-13
+      ],
+      "classification": "scoped combined discretization and time, not absolute scientific error"
+    },
+    "Wolfram": {
+      "source_mass_shell_three_IDs": "{0,0,0}",
+      "status": "PASS"
+    },
+    "numeric_efficiency": {
+      "scalar_to_chunked_source_speedup": 2.4768737879609035,
+      "two_process_IVP_batch_speedup": 1.6197565478778233,
+      "four_process_IVP_batch_speedup": 1.9925672920583353,
+      "benchmark_scope": "FV cell moment source and independent homogeneous model batch, not full native REI"
+    },
+    "source_electron_C2_interpolation_relative_max": 0.00019755000594345873,
+    "science_scope": "SCOPED_PASS",
+    "physical_claim_exclusions": "No fully polarized gamma collision, no two-way realistic HHe, no massive collision, no extra stellar emission reservoir source"
+  }
+}
