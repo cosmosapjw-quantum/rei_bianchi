@@ -1,0 +1,11 @@
+# C8 threshold-split quadrature, source-age preserved
+
+Executed 2026-10-15 on authorized local Ubuntu, `OPENBLAS_NUM_THREADS=1 python3 research/source07_c8_quadrature_20261015/compare.py`. This is a scoped **subproblem** of SOURCE07 C8, not completed spectral age compression or a coupled chemistry/history solver.
+
+Frozen original C7 source and gas: two 1e10 s physical impulses at zbar20 and zbar4 with equal injected photons/H, source MD14 + BB50K emission 13.6–100 eV, gas snapshot at zbar4; 32 Gauss mu rays, `q_ref=-.01,0,+.01`; species Verner fits from the frozen C7 reference. Each epoch retains its own correct energy redshift and direction Jacobian. Split the emitted energy integration at all three observer-frame ionization thresholds mapped backwards by each age/direction energy factor; then apply independent fixed-order GL quadrature per smooth interval. Four observables: absorbed HI, HeI, HeII photon counts and net photoelectron heat. HeII gas is zero in this fixture, so HeII accuracy is **NOT_TESTED**.
+
+Comparison is to SciPy QUADPACK as coded in `independent_two_age.py`, not a mathematically exact integral or the production Rust discretization. 2 and 4 point quadratures underresolve helium; order 8 drops error to around 3.2e-5 (HeI), order 16 reaches ~1e-13 in this frozen toy. Reported relative errors and timings are in `results.json`; absolute wall-time is timing/noise-sensitive, not a production solver speedup. No full variable H/He/electron/T history, dynamic source aging, spectral storage memory cap, time refinement or scientific admission was executed. A fixed 16 point rule cannot be assumed safe for all source ages and threshold crossings; use adaptive error checks or convergence before production.
+
+Literature comparison: Baumschlager, Shen & Wadsley (2024), *Spectral reconstruction for radiation hydrodynamic simulations of galaxy evolution*, A&A, illustrates the importance of energy-resolved spectral hardening; this standalone test does not implement their reconstruction.
+
+Next C8 constructive work: bound a per-q age distribution by independently transported spectral moments or adaptively selected age nodes, preserve positivity and species-specific absorption/heat ledgers, compare to two-age oracle and evolving short-interval coupled reference; then report time/memory/error at matched science tolerances.
