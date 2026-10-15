@@ -19,3 +19,5 @@ The new photon inventory includes retained subthreshold photons. To compare it w
 The first six driver test outputs were observed directly before the final narrow core accumulation repair; their preserved tool-output receipt explicitly records that source SHA at execution was not captured. Core failure/repair evidence is separate. The later actual run resume-binding filter checks changed grid/q_ref/source rejection before stepping, without replaying the old28 checks.
 
 `PILOT_COMPARISON.json`, when available, applies the pre-result empirical screen. An incomplete matrix cannot open the full-history launch transition. It must identify the actual remaining numerical dependency and next targeted action, rather than a new user-permission request.
+
+Observed first outcome: q128 stopped checkpointed at the20000 accepted-step cap (z19.9734321583,466.28s). All later cases remain unlaunched. See PILOT_FIRST_FAILURE.md; no refinement or full-history admission was issued.

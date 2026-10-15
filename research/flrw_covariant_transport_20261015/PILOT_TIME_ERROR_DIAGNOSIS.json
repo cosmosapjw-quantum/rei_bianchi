@@ -1,0 +1,169 @@
+{
+  "schema": "rei.covariant_transport.pilot_diagnosis.v1",
+  "status": "ACTUAL_COMPONENT_DIAGNOSTIC_READ_HI_CLOSURE_ERROR_IDENTIFIED_PASSIVE_CONTROL_APPROVED",
+  "snapshot": "raw/q128_attempt1/checkpoints/00012000.txt",
+  "snapshot_sha256": "33bae290e4a9c41223df75b86c9fc4e13501cfbc86f8578e1ef5c3e58e119a4a",
+  "config_sha256": "a3ee4928aa91bda98c8af6bb9e9e97797950e56e6bfc744888e6a546a920796a",
+  "source_sha256": {
+    "rust/rei_microphysics/src/axbi_driver.rs": "281b73cb42d8ae776b963b9e8e52594c9a315397c290b65b1c4c1f7ce4147dde",
+    "rust/rei_microphysics/src/axbi_covariant_transport.rs": "3b9c00cad6faa65cb1786009d70d7497e235ffd1a8c5d83875068024c4716fb0"
+  },
+  "observed": {
+    "accepted": 12000,
+    "rejects": 20,
+    "initial_rejects": 18,
+    "z": 19.98162650556048,
+    "proposed_dln_a": 4.8828125e-08,
+    "last_error": 3.963295399789998e-06,
+    "wall_s": 282.448457832,
+    "N_per_H": 3.8712897644979856e-08,
+    "U_eV_per_H": 9.593838027184944e-07,
+    "first_HI_cell_geometric_below_cut_fraction": 0.030457553310055396,
+    "first_HI_cell_photon_fraction": 0.017303790735978604,
+    "first_HI_cell_photon_fraction_method": "sum existing angular-weighted N[ray*128] across 8 rays / total N; corrected prior invalid 8*ray0 estimate"
+  },
+  "established": [
+    "Error metric compares common N/Q arrays, not support endpoint distance.",
+    "Initial scalar source+BE has nonmonotone relative full/half error x/[(1+x)(4+x)] with max1/9.",
+    "Repeated rejection or Newton failure is not the observed later bottleneck."
+  ],
+  "hypotheses": [
+    {
+      "id": "threshold_closure_splitting",
+      "basis": "Moving threshold lies inside cell; bounded exponential reclosure after source/absorption can have PΛ(I−DrP)Λr local h² error at moment equilibrium.",
+      "status": "REQUIRES_COMPONENT_RANK_AND_h_SCALING"
+    },
+    {
+      "id": "physical_stiff_transient",
+      "basis": "Per-node λh may remain finite despite slow total inventory; exact relative component decomposition needed.",
+      "status": "OPEN"
+    },
+    {
+      "id": "support_or_quadrature_nonsmoothness",
+      "basis": "Support activation and threshold branch could lower observed order; support not directly in norm.",
+      "status": "OPEN"
+    }
+  ],
+  "diagnostic_contract": {
+    "approved_by_root": true,
+    "production_source_mutations": false,
+    "comparisons": 3,
+    "step_scales": [
+      1,
+      0.5,
+      0.25
+    ],
+    "tentative_solves": 9,
+    "wall_cap_s": 60,
+    "rhs_cap": 10000,
+    "source_off_control": "deferred until primary results",
+    "error_components": [
+      "xHII",
+      "xHeII",
+      "xHeIII",
+      "thermal",
+      "N_L1",
+      "physical_U_L1"
+    ],
+    "top_cells": 8,
+    "record": [
+      "actual dt/dln",
+      "source N/U",
+      "HI/HeI/HeII event differences",
+      "full/half N/Q/support/cuts",
+      "local orders p",
+      "source/config/checkpoint/executable identity"
+    ]
+  },
+  "actual_component_diagnostic": {
+    "path": "raw/q128_step_diagnostic_001/diagnostic.json",
+    "tentative_solves": 9,
+    "rhs": 63,
+    "solve_wall_s": 0.047812104,
+    "N_errors": [
+      3.963479149419194e-06,
+      1.0722307640564845e-06,
+      2.794455764758477e-07
+    ],
+    "U_errors": [
+      2.2412498526443475e-06,
+      6.05735796578824e-07,
+      1.577848477171789e-07
+    ],
+    "N_orders": [
+      1.8861519527728308,
+      1.9399761911459052
+    ],
+    "U_orders": [
+      1.8875429116734892,
+      1.9407300033203836
+    ],
+    "top_cells": "all 8 rays energy cell0, HI-straddling; full/half support identical",
+    "top8_fraction_combined_N_U_error": [
+      0.9518506908248303,
+      0.9534358294648057,
+      0.9542958973360939
+    ],
+    "classification": "Normal local O(h^2) photon closure/splitting error dominated by mixed transparent/absorbing HI cell; not gas or sourceclock bottleneck."
+  },
+  "passive_control": {
+    "root_approved": true,
+    "production_activation": false,
+    "partition": "Pure core utility, selected bounded exponential restriction, moment-matched positive quadrature, new source identity",
+    "passive_state": "per-q-cell N and Q sidecar, continued redshift work, no absorption",
+    "geometry": "initial checkpoint partition once, then transfer only newly sub-HI active photons at every geometry_map",
+    "augmented_residual": "driver.residuals(active)+(sumNpassive,sumR*Qpassive)",
+    "error": "original total-cell and stronger active/inactive separated L1, same total normalization",
+    "quadrature_moment_tolerances": "64eps*N,128eps*max(Q,Nwidth)",
+    "instantaneous_Gamma_heat_parity": "relative1e-9; bothzeroexact; no arbitrary floors",
+    "comparisons": 3,
+    "wall_cap_s": 60,
+    "rhs_cap": 10000,
+    "preselected_benefit_criterion": "At h, total and stronger split errors each <=baseline/5=7.926958298838388e-7 plus unchanged gas/ledger/positive-domain acceptance",
+    "pass_next": "Explicit native inactive-pool implementation and fresh pilot, not full-history admission",
+    "actual_result": {
+      "status": "PASS_FROZEN_FIVEFOLD_LOCAL_DEFECT_CRITERION",
+      "diagnostic": "raw/q128_partition_diagnostic_001/diagnostic.json",
+      "diagnostic_sha256": "ff6c7071edc9964b6f743379b9a5c8eaa12e26a71533a75a97998692873a1f29",
+      "new_core_sha256": "f811c6c53964d903c695bf1463e287933601eabaca47e34036b05a37a2e37348",
+      "utility_compile_identity_sha256": "ad6b12c71eebec990984a307eef943be22306972cbb74b7c690eeb4b8eb2af42",
+      "total_metric": [
+        2.648206423745888e-07,
+        7.185016608031656e-08,
+        1.8747217064445134e-08
+      ],
+      "strong_split_metric": [
+        2.648206423744218e-07,
+        7.185016608145378e-08,
+        1.8747217063975643e-08
+      ],
+      "local_orders": [
+        1.8819521858958652,
+        1.938315041190333
+      ],
+      "h_defect_improvement_factor": 14.966654841856522,
+      "preselected_h_bound": 7.926958298838388e-07,
+      "h_max_gas_fraction_error": 2.4961194352832634e-09,
+      "h_thermal_error": 1.6067512264428684e-12,
+      "h_augmented_residual_full": [
+        -3.0008477649244345e-19,
+        -2.3722928750307545e-15
+      ],
+      "h_augmented_residual_half": [
+        -3.0385280713364697e-19,
+        -2.375222677054198e-15
+      ],
+      "focused_new_tests_passed": 3,
+      "tentatives": 9,
+      "rhs": 63,
+      "solve_wall_s": 0.057589372,
+      "command_wall_s": 0.753551645000698,
+      "checkpoint_use": "EXPERIMENT_INITIALSTATE_NOT_PRODUCTION_RESUME",
+      "runtime_speedup_claim": false
+    }
+  },
+  "thresholds_changed": false,
+  "production_runs_by_this_reviewer": 0,
+  "historical_tests_reexecuted": 0,
+  "next": "Frozen bounded control PASS. Implement explicit native passive pool and run fresh finite pilot, then refinement; no automatic full-history claim."
+}

@@ -88,7 +88,7 @@ fn number_only_mutation_is_rejected_instead_of_inventing_spectrum() {
     assert!(d.photon_inventory(&s).0.is_nan());
 }
 #[test]
-fn checkpoint_v3_roundtrips_all_arrays_and_rejects_projected_v2() {
+fn checkpoint_v4_roundtrips_all_arrays_and_rejects_projected_v2() {
     let (d, mut s) = component();
     seed(&d, &mut s, 30.0, 1e-6);
     d.geometry_map(&mut s, 1.0 / 20.99).unwrap();
@@ -98,11 +98,11 @@ fn checkpoint_v3_roundtrips_all_arrays_and_rejects_projected_v2() {
     ));
     d.save_checkpoint(&file, &s).unwrap();
     let text = std::fs::read_to_string(&file).unwrap();
-    assert!(text.starts_with("AXBI_CHECKPOINT_V3\n"));
+    assert!(text.starts_with("AXBI_CHECKPOINT_V4\n"));
     let loaded = d.read_checkpoint(&file).unwrap();
     assert_eq!(photons(&loaded), photons(&s));
     assert_eq!(loaded.a, s.a);
-    let legacy = text.replacen("AXBI_CHECKPOINT_V3", "AXBI_CHECKPOINT_V2", 1);
+    let legacy = text.replacen("AXBI_CHECKPOINT_V4", "AXBI_CHECKPOINT_V2", 1);
     std::fs::write(&file, legacy).unwrap();
     assert!(d.read_checkpoint(&file).is_err());
     std::fs::remove_file(file).unwrap();

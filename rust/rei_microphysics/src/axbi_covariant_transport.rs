@@ -796,3 +796,178 @@ fn cell_quadrature(
         .max(energy_defect / energy_scale);
     Ok(result)
 }
+
+/// Diagnostic passive-compartment partition. Production callers are unchanged.
+#[derive(Clone, Debug)]
+pub struct HiPartition {
+    pub active: PhotonState,
+    pub inactive_number: Vec<f64>,
+    pub inactive_energy_ref: Vec<f64>,
+    pub diagnostics: QuadratureDiagnostics,
+    pub quadrature_nodes: usize,
+}
+impl CovariantTransport {
+    /// Pure restriction at actual HI fit energy. Below-HI photons retain their
+    /// original reference cell and both moments; threshold equality is active.
+    pub fn partition_below_hi(
+        &self,
+        state: &PhotonState,
+        now: &GeometrySnapshot,
+    ) -> Result<HiPartition, ForwardError> {
+        self.validate_state(state)?;
+        let rays = self.ray_geometry(now)?;
+        let mut out = HiPartition {
+            active: self.empty_state(),
+            inactive_number: vec![0.0; self.cell_count()],
+            inactive_energy_ref: vec![0.0; self.cell_count()],
+            diagnostics: QuadratureDiagnostics::default(),
+            quadrature_nodes: 0,
+        };
+        for k in 0..self.cell_count() {
+            let (n, u, lo, hi) = (
+                state.number[k],
+                state.energy_ref[k],
+                state.support_lo[k],
+                state.support_hi[k],
+            );
+            if n == 0.0 {
+                continue;
+            }
+            let r = rays[k / self.n_energy()].scale;
+            if hi * r < FIT_THRESHOLDS_EV[0] {
+                out.inactive_number[k] = n;
+                out.inactive_energy_ref[k] = u;
+                continue;
+            }
+            if lo * r >= FIT_THRESHOLDS_EV[0] {
+                out.active.number[k] = n;
+                out.active.energy_ref[k] = u;
+                out.active.support_lo[k] = lo;
+                out.active.support_hi[k] = hi;
+                continue;
+            }
+            let cut = FIT_THRESHOLDS_EV[0] / r;
+            let nodes = cell_quadrature(lo, hi, n, u, r, &mut out.diagnostics)?;
+            out.quadrature_nodes += nodes.len();
+            let active: Vec<_> = nodes
+                .iter()
+                .copied()
+                .filter(|&(q, _)| q * r >= FIT_THRESHOLDS_EV[0])
+                .collect();
+            let passive: Vec<_> = nodes
+                .iter()
+                .copied()
+                .filter(|&(q, _)| q * r < FIT_THRESHOLDS_EV[0])
+                .collect();
+            let (an, au) = restricted_moments(&active, lo.max(cut), hi);
+            let (pn, pu) = restricted_moments(&passive, lo, hi.min(cut));
+            let nd = (an + pn - n).abs();
+            let uscale = u.abs().max(n * (hi - lo));
+            let ud = (au + pu - u).abs();
+            if nd > 64.0 * f64::EPSILON * n || ud > 128.0 * f64::EPSILON * uscale {
+                return Err(bad("AXBI_HI_PARTITION_MOMENT_DEFECT"));
+            }
+            if an > 0.0 {
+                out.active.number[k] = an;
+                out.active.energy_ref[k] = au;
+                out.active.support_lo[k] = lo.max(cut);
+                out.active.support_hi[k] = hi;
+            }
+            if !nonnegative(pn) || !nonnegative(pu) || pu < lo * pn || pu > hi.min(cut) * pn {
+                return Err(bad("AXBI_HI_PARTITION_PASSIVE_SUPPORT"));
+            }
+            out.inactive_number[k] = pn;
+            out.inactive_energy_ref[k] = pu;
+        }
+        self.validate_state(&out.active)?;
+        Ok(out)
+    }
+}
+fn restricted_moments(nodes: &[(f64, f64)], lo: f64, hi: f64) -> (f64, f64) {
+    let n = sum(nodes.iter().map(|&(_, n)| n));
+    if n == 0.0 {
+        return (0.0, 0.0);
+    }
+    let lower = sum(nodes.iter().map(|&(q, n)| (q - lo) * n));
+    let upper = sum(nodes.iter().map(|&(q, n)| (hi - q) * n));
+    let u = if lower <= upper {
+        lo.mul_add(n, lower)
+    } else {
+        hi.mul_add(n, -upper)
+    };
+    (n, u)
+}
+
+impl CovariantTransport {
+    /// Transactional repeated passive-pool addition in fixed reference cells.
+    /// Centered moments preserve endpoint realizability without clipping.
+    pub fn merge_inactive(
+        &self,
+        number: &mut Vec<f64>,
+        energy_ref: &mut Vec<f64>,
+        added_number: &[f64],
+        added_energy_ref: &[f64],
+    ) -> Result<(), ForwardError> {
+        if [
+            number.len(),
+            energy_ref.len(),
+            added_number.len(),
+            added_energy_ref.len(),
+        ]
+        .iter()
+        .any(|&n| n != self.cell_count())
+        {
+            return Err(bad("AXBI_INACTIVE_MERGE_SHAPE"));
+        }
+        let mut next_n = vec![0.0; self.cell_count()];
+        let mut next_u = vec![0.0; self.cell_count()];
+        for k in 0..self.cell_count() {
+            let lo = self.edges[k % self.n_energy()];
+            let hi = self.edges[k % self.n_energy() + 1];
+            let (n0, u0, n1, u1) = (
+                number[k],
+                energy_ref[k],
+                added_number[k],
+                added_energy_ref[k],
+            );
+            if ![n0, u0, n1, u1].iter().all(|&v| nonnegative(v))
+                || u0 < lo * n0
+                || u0 > hi * n0
+                || u1 < lo * n1
+                || u1 > hi * n1
+            {
+                return Err(bad("AXBI_INACTIVE_MERGE_SUPPORT"));
+            }
+            if n1 == 0.0 {
+                next_n[k] = n0;
+                next_u[k] = u0;
+                continue;
+            }
+            if n0 == 0.0 {
+                next_n[k] = n1;
+                next_u[k] = u1;
+                continue;
+            }
+            let n = n0 + n1;
+            let lower = (u0 - lo * n0) + (u1 - lo * n1);
+            let upper = (hi * n0 - u0) + (hi * n1 - u1);
+            let u = if lower <= upper {
+                lo.mul_add(n, lower)
+            } else {
+                hi.mul_add(n, -upper)
+            };
+            if !nonnegative(n) || !nonnegative(u) || u < lo * n || u > hi * n {
+                return Err(bad("AXBI_INACTIVE_MERGE_REALIZABILITY"));
+            }
+            let scale = (u0 + u1).abs().max(n * (hi - lo));
+            if (u - (u0 + u1)).abs() > 128.0 * f64::EPSILON * scale {
+                return Err(bad("AXBI_INACTIVE_MERGE_MOMENT_DEFECT"));
+            }
+            next_n[k] = n;
+            next_u[k] = u;
+        }
+        *number = next_n;
+        *energy_ref = next_u;
+        Ok(())
+    }
+}

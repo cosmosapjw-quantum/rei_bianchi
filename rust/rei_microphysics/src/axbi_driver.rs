@@ -40,6 +40,8 @@ pub struct DriverConfig {
     pub energy_subdivisions: usize,
     /// Fixed reference-energy finite-volume cells, independent of source quadrature.
     pub transport_cells: usize,
+    /// FLRW-only passive compartment below the HI fit cutoff; explicit variant.
+    pub inactive_hi_split: bool,
     pub n_mu: usize,
     pub background_panels: usize,
     pub local_target: f64,
@@ -65,6 +67,7 @@ impl DriverConfig {
                 / (150.0 * (0.0224_f64 / 0.023).powf(0.4)),
             energy_subdivisions: 16,
             transport_cells: 128,
+            inactive_hi_split: false,
             n_mu: 8,
             background_panels: 4096,
             local_target: 1e-5,
@@ -104,6 +107,13 @@ impl DriverConfig {
                 "initial_temperature_k" => number!(initial_temperature_k),
                 "energy_subdivisions" => number!(energy_subdivisions),
                 "transport_cells" => number!(transport_cells),
+                "inactive_hi_split" => {
+                    c.inactive_hi_split = match v.trim() {
+                        "true" => true,
+                        "false" => false,
+                        _ => return Err(err("AXBI_CONFIG_VALUE")),
+                    }
+                }
                 "n_mu" => number!(n_mu),
                 "background_panels" => number!(background_panels),
                 "local_target" => number!(local_target),
@@ -138,6 +148,7 @@ impl DriverConfig {
     }
     fn validate(&self) -> Result<(), ForwardError> {
         if ![256, 2048, 4096].contains(&self.output_budget_mib)
+            || (self.inactive_hi_split && self.q_ref != 0.0)
             || !(8..=1024).contains(&self.transport_cells)
             || self.spectra_every_accepted == 0
             || !self.q_ref.is_finite()
@@ -189,6 +200,9 @@ pub struct DriverState {
     pub photon_energy_ref: Vec<f64>,
     pub photon_support_lo: Vec<f64>,
     pub photon_support_hi: Vec<f64>,
+    /// Passive photons retain their original q cell and both moments.
+    pub photon_inactive_number: Vec<f64>,
+    pub photon_inactive_energy_ref: Vec<f64>,
     pub ledgers: Ledgers,
     pub next_dln_a: f64,
     pub accepted: usize,
@@ -280,6 +294,8 @@ impl Driver {
             photon_energy_ref: photon_state.energy_ref,
             photon_support_lo: photon_state.support_lo,
             photon_support_hi: photon_state.support_hi,
+            photon_inactive_number: vec![0.0; transport.cell_count()],
+            photon_inactive_energy_ref: vec![0.0; transport.cell_count()],
             ledgers: Ledgers::default(),
             next_dln_a: config.initial_dln_a,
             accepted: 0,
@@ -319,13 +335,100 @@ impl Driver {
         state.photon_support_lo = photons.support_lo;
         state.photon_support_hi = photons.support_hi;
     }
+    fn validate_inactive(
+        &self,
+        state: &DriverState,
+        geometry: &GeometrySnapshot,
+    ) -> Result<(), ForwardError> {
+        let count = self.transport.cell_count();
+        if state.photon_inactive_number.len() != count
+            || state.photon_inactive_energy_ref.len() != count
+        {
+            return Err(err("AXBI_INACTIVE_SHAPE"));
+        }
+        let rays = self.transport.ray_geometry(geometry)?;
+        let edges = self.transport.edges();
+        for j in 0..count {
+            let n = f(state.photon_inactive_number[j])?;
+            let u = f(state.photon_inactive_energy_ref[j])?;
+            if n < 0.0 || u < 0.0 || (!self.config.inactive_hi_split && (n != 0.0 || u != 0.0)) {
+                return Err(err("AXBI_INACTIVE_DOMAIN_OR_MODE"));
+            }
+            if n == 0.0 {
+                if u != 0.0 {
+                    return Err(err("AXBI_INACTIVE_EMPTY_ENERGY"));
+                }
+            } else {
+                let i = j % self.energies.len();
+                let scale = rays[j / self.energies.len()].scale;
+                let upper = edges[i + 1].min(13.6 / scale);
+                if u < edges[i] * n || u > upper * n {
+                    return Err(err("AXBI_INACTIVE_SUPPORT_OR_REACTIVATION"));
+                }
+            }
+        }
+        Ok(())
+    }
+    /// [active N, active physical U, passive N, passive physical U].
+    pub fn photon_pool_inventory(&self, state: &DriverState) -> Result<[f64; 4], ForwardError> {
+        let geometry = self.background.point_at_scale(state.a)?.geometry()?;
+        self.pool_inventory_with_geometry(state, &geometry)
+    }
+    fn pool_inventory_with_geometry(
+        &self,
+        state: &DriverState,
+        geometry: &GeometrySnapshot,
+    ) -> Result<[f64; 4], ForwardError> {
+        self.validate_inactive(state, geometry)?;
+        let (n, u) = self
+            .transport
+            .inventory(&self.photon_state(state), geometry)?;
+        let rays = self.transport.ray_geometry(geometry)?;
+        let pn = state.photon_inactive_number.iter().sum::<f64>();
+        let pu = state
+            .photon_inactive_energy_ref
+            .iter()
+            .enumerate()
+            .map(|(j, &v)| v * rays[j / self.energies.len()].scale)
+            .sum::<f64>();
+        Ok([n, u, f(pn)?, f(pu)?])
+    }
     fn inventory_with_geometry(
         &self,
         state: &DriverState,
         geometry: &GeometrySnapshot,
     ) -> Result<(f64, f64), ForwardError> {
-        self.transport
-            .inventory(&self.photon_state(state), geometry)
+        let [n, u, pn, pu] = self.pool_inventory_with_geometry(state, geometry)?;
+        Ok((f(n + pn)?, f(u + pu)?))
+    }
+    fn partition_inactive(
+        &self,
+        state: &mut DriverState,
+        geometry: &GeometrySnapshot,
+    ) -> Result<(), ForwardError> {
+        if !self.config.inactive_hi_split {
+            return Ok(());
+        }
+        self.validate_inactive(state, geometry)?;
+        let partition = self
+            .transport
+            .partition_below_hi(&self.photon_state(state), geometry)?;
+        let mut pn = state.photon_inactive_number.clone();
+        let mut pu = state.photon_inactive_energy_ref.clone();
+        self.transport.merge_inactive(
+            &mut pn,
+            &mut pu,
+            &partition.inactive_number,
+            &partition.inactive_energy_ref,
+        )?;
+        // Validate the complete candidate before committing either compartment.
+        let mut next = state.clone();
+        Self::set_photon_state(&mut next, partition.active);
+        next.photon_inactive_number = pn;
+        next.photon_inactive_energy_ref = pu;
+        self.validate_inactive(&next, geometry)?;
+        *state = next;
+        Ok(())
     }
     /// Preserved infallible diagnostic API. Invalid photon state yields NaNs;
     /// every mutating production entry point validates the complete state.
@@ -412,10 +515,14 @@ impl Driver {
         Ok((0.0, 0.0))
     }
     pub fn geometry_map(&self, s: &mut DriverState, to: f64) -> Result<(), ForwardError> {
+        if self.config.inactive_hi_split && to < s.a {
+            return Err(err("AXBI_INACTIVE_REVERSE_GEOMETRY"));
+        }
         let g0 = self.background.point_at_scale(s.a)?.geometry()?;
         let g1 = self.background.point_at_scale(to)?.geometry()?;
         let (_, old_u) = self.inventory_with_geometry(s, &g0)?;
         let (_, new_u) = self.inventory_with_geometry(s, &g1)?;
+        self.partition_inactive(s, &g1)?;
         s.ledgers.photon_work += old_u - new_u;
         let old_w = w_erg_per_h_to_ev(s.gas.w_erg_per_h)?;
         s.gas = s.gas.adiabatic_to(s.a, to)?;
@@ -491,8 +598,9 @@ impl Driver {
         if !dt.is_finite() || dt <= 0.0 {
             return Err(err("AXBI_STAGE_DT"));
         }
+        let geometry = self.background.point_at_scale(s.a)?.geometry()?;
+        self.partition_inactive(s, &geometry)?;
         let old = s.clone();
-        let geometry = self.background.point_at_scale(old.a)?.geometry()?;
         // Quadrature reconstruction is fixed across the Newton residual/Jacobian
         // evaluations; only trial absorber densities enter backward Euler.
         let prepared = self
@@ -602,7 +710,7 @@ impl Driver {
             .eos(self.n_h0_cm3 / s.a.powi(3), self.n_he0_cm3 / s.a.powi(3))?;
         AxbiProvider.rates(eos.temperature_k)?;
         let geometry = self.background.point_at_scale(s.a)?.geometry()?;
-        self.transport.inventory(&self.photon_state(s), &geometry)?;
+        self.inventory_with_geometry(s, &geometry)?;
         for &n in &s.photons {
             if f(n)? < 0.0 {
                 return Err(err("AXBI_STOCK_NEGATIVE"));
@@ -627,6 +735,9 @@ impl Driver {
     ) -> Result<f64, ForwardError> {
         self.transport.validate_state(&self.photon_state(full))?;
         self.transport.validate_state(&self.photon_state(half))?;
+        let geometry = self.background.point_at_scale(half.a)?.geometry()?;
+        self.validate_inactive(full, &geometry)?;
+        self.validate_inactive(half, &geometry)?;
         let mut e = 0.0_f64;
         for i in 0..3 {
             e = e.max(
@@ -646,16 +757,23 @@ impl Driver {
             .photons
             .iter()
             .zip(&half.photons)
-            .map(|(a, b)| (a - b).abs())
+            .zip(
+                full.photon_inactive_number
+                    .iter()
+                    .zip(&half.photon_inactive_number),
+            )
+            .map(|((a, b), (pa, pb))| (a - b).abs() + (pa - pb).abs())
             .sum::<f64>();
-        let geometry = self.background.point_at_scale(half.a)?.geometry()?;
         let mut du = 0.0;
         let ne = self.energies.len();
         let rays = self.transport.ray_geometry(&geometry)?;
         for (k, ray) in rays.iter().enumerate() {
             for i in 0..ne {
                 let j = k * ne + i;
-                du += (full.photon_energy_ref[j] - half.photon_energy_ref[j]).abs() * ray.scale;
+                du += ((full.photon_energy_ref[j] - half.photon_energy_ref[j]).abs()
+                    + (full.photon_inactive_energy_ref[j] - half.photon_inactive_energy_ref[j])
+                        .abs())
+                    * ray.scale;
             }
         }
         f(e.max(dn / n.max(1e-8)).max(du / u.max(1e-8)))
@@ -738,7 +856,8 @@ impl Driver {
         for (k, ray) in rays.iter().enumerate() {
             let mu = ray.mu;
             for i in 0..ne {
-                let u = s.photon_energy_ref[k * ne + i] * ray.scale;
+                let j = k * ne + i;
+                let u = (s.photon_energy_ref[j] + s.photon_inactive_energy_ref[j]) * ray.scale;
                 moments[0] += u;
                 moments[1] += u * mu;
                 moments[2] += u * (3.0 * mu * mu - 1.0) / 2.0;
@@ -798,6 +917,9 @@ pub fn compiled_identity() -> String {
         include_str!("../../../research/axbi_goal_20261014/scenario/SCENARIO_LOCK.json"),
         include_str!("../../../research/axbi_goal_20261014/scenario/AX05_NUMERICAL_CONTRACT.md"),
         include_str!("../../../research/flrw_covariant_transport_20261015/NATIVE_CONTRACT.md"),
+        include_str!(
+            "../../../research/flrw_covariant_transport_20261015/INACTIVE_POOL_CONTRACT.md"
+        ),
     ]
     .join("\nAXBI_SOURCE_BOUNDARY\n")
 }
@@ -867,8 +989,9 @@ impl Driver {
     fn checkpoint_text(&self, s: &DriverState) -> Result<String, ForwardError> {
         self.transport.validate_state(&self.photon_state(s))?;
         let p = self.background.point_at_scale(s.a)?;
+        self.validate_inactive(s, &p.geometry()?)?;
         let text = format!(
-            "AXBI_CHECKPOINT_V3\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n",
+            "AXBI_CHECKPOINT_V4\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n",
             list(&[
                 s.a,
                 p.time_s,
@@ -899,6 +1022,8 @@ impl Driver {
             list(&s.photon_energy_ref),
             list(&s.photon_support_lo),
             list(&s.photon_support_hi),
+            list(&s.photon_inactive_number),
+            list(&s.photon_inactive_energy_ref),
             list(&[self.initial_energy])
         );
         Ok(text)
@@ -925,7 +1050,7 @@ impl Driver {
     pub fn read_checkpoint(&self, path: &Path) -> Result<DriverState, ForwardError> {
         let text = fs::read_to_string(path).map_err(ioerr)?;
         let lines = text.lines().collect::<Vec<_>>();
-        if lines.len() != 9 || lines[0] != "AXBI_CHECKPOINT_V3" {
+        if lines.len() != 11 || lines[0] != "AXBI_CHECKPOINT_V4" {
             return Err(err("AXBI_CHECKPOINT_VERSION"));
         }
         let v = parse_list(lines[1])?;
@@ -938,7 +1063,9 @@ impl Driver {
         let photon_energy_ref = parse_list(lines[5])?;
         let photon_support_lo = parse_list(lines[6])?;
         let photon_support_hi = parse_list(lines[7])?;
-        let initial = parse_list(lines[8])?;
+        let photon_inactive_number = parse_list(lines[8])?;
+        let photon_inactive_energy_ref = parse_list(lines[9])?;
+        let initial = parse_list(lines[10])?;
         if v.len() != 11
             || counts.len() != 6
             || photons.len() != self.energies.len() * self.source.angular_cells.len()
@@ -957,6 +1084,8 @@ impl Driver {
             photon_energy_ref,
             photon_support_lo,
             photon_support_hi,
+            photon_inactive_number,
+            photon_inactive_energy_ref,
             ledgers: l,
             next_dln_a: v[7],
             max_newton_residual: v[8],
@@ -1056,10 +1185,20 @@ impl Driver {
             let mu = ray.mu;
             for i in 0..ne {
                 let j = k * ne + i;
-                let stock = s.photons[j];
-                let lo = s.photon_support_lo[j] * ray.scale;
-                let hi = s.photon_support_hi[j] * ray.scale;
-                let energy = s.photon_energy_ref[j] * ray.scale;
+                let stock = s.photons[j] + s.photon_inactive_number[j];
+                let mut lo = s.photon_support_lo[j] * ray.scale;
+                let mut hi = s.photon_support_hi[j] * ray.scale;
+                if s.photon_inactive_number[j] > 0.0 {
+                    let plo = self.transport.edges()[i] * ray.scale;
+                    let phi = (self.transport.edges()[i + 1] * ray.scale).min(13.6);
+                    lo = if s.photons[j] == 0.0 {
+                        plo
+                    } else {
+                        lo.min(plo)
+                    };
+                    hi = hi.max(phi);
+                }
+                let energy = (s.photon_energy_ref[j] + s.photon_inactive_energy_ref[j]) * ray.scale;
                 writeln!(
                     spectra,
                     "{case},{},{},{},{},{},{lo},{hi},{mu},{},{stock},{energy}",
@@ -1095,7 +1234,12 @@ impl Driver {
             )
             .map_err(ioerr)?;
         }
+        let pools = self.pool_inventory_with_geometry(s, &g)?;
         for (name, value) in [
+            ("active_photon_N_per_H", pools[0]),
+            ("active_photon_U_eV_per_H", pools[1]),
+            ("inactive_photon_N_per_H", pools[2]),
+            ("inactive_photon_U_eV_per_H", pools[3]),
             ("source_N_per_H", s.ledgers.source_n),
             ("source_U_eV_per_H", s.ledgers.source_u),
             ("absorbed_N_per_H", s.ledgers.absorbed_n),
@@ -1365,7 +1509,8 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
         fs::write(out.join("config.cfg"), config_text).map_err(ioerr)?;
         fs::write(out.join("source_identity.txt"), compiled_identity()).map_err(ioerr)?;
         fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
-        fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=fixed reference-q two-moment N/Uq/support transport; spectra report actual physical-energy support and moments; total stock includes retained subthreshold photons; legacy boundary outflow remains zero\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
+        fs::write(out.join("transport_variant.txt"), format!("inactive_hi_split={}\npassive_scope=q0_forward_monotonic_only\ncheckpoint_version=V4\n", driver.config.inactive_hi_split)).map_err(ioerr)?;
+        fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=fixed reference-q two-moment transport; total N/U includes active and passive source photons; support columns are conservative active-support/passive-cell envelope union, not a recovered density or exact populated support; Gamma uses active photons only; radiation stress includes both pools; legacy boundary outflow remains zero\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
     }
     let mut h=open_output(&out.join("history.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,b,H_per_s,s_per_s,x_HII,x_HeII,x_HeIII,nH_proper_cm3,ne_proper_cm3,temperature_K,Gamma_HI_per_s,Gamma_HeI_per_s,Gamma_HeII_per_s,photon_n_per_H,photon_u_eV_per_H,J0_photon_u_eV_per_H,J1_photon_u_eV_per_H,J2_photon_u_eV_per_H,x_HI,x_HeI")?;
     let mut a=open_output(&out.join("abundances.csv"),resume,"run_id,time_s,zbar,Tgas_K,background_Tref_K,species_id,A,Z,charge,nproper,element_fraction,Ybaryon,electron_xe,normalization_registry")?;
