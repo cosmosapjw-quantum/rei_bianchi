@@ -1,0 +1,137 @@
+{
+  "schema": "rei.axbi.sigma_pi_research_DAG.v1",
+  "date_KST": "2026-10-15",
+  "goal": "Continue original non-tilted LRS Bianchi I H/He reionization source with Sigma=|sigma|/H as primary reported observable and anisotropic stress of radiation and matter in Einstein and energy equations.",
+  "convention": {
+    "metric": "(-,+,+,+), ds²=-c²dt²+a² exp(-2b)(dx²+dy²)+a² exp(4b) dz²",
+    "shear_orthonormal": "diag(-s,-s,2s), s=db/dt",
+    "shear_scalar": "|sigma|=sqrt(sigma_ab sigma^ab/2)=sqrt(3)*abs(s)",
+    "Sigma_user": "sqrt3 abs(s)/H, >=0; signed axis orientation epsilon_sigma=sgn(s) separate",
+    "Sigma_WainwrightEllis": "sqrt(sigma_ab sigma^ab/6)/H=Sigma_user/sqrt3",
+    "historical_lock_compatibility": "Legacy BACKGROUND_FAMILY_LOCK.json lists Sigma=s/H (a signed component) but immutable historical byte identity is preserved. New outputs never equate it to user's scalar Sigma.",
+    "legacy_parameter_mapping": "old signed input q_ref=s_ref/H_FLRW(aref); Sigma_ref=sqrt3*abs(q_ref)/sqrt(1+q_ref²) when initial Pi and thermal reservoir vanish; q_ref is internal reproduction provenance only."
+  },
+  "physics": {
+    "Einstein_shear": "ds/dt+3Hs=(8πG/c²)(Pi_rad+Pi_m)",
+    "hamiltonian": "3H²=(8πG/c²)(rho_dust+u_thermal+rho_rad+rho_lambda)+3s²",
+    "radiation": "rho_rad=rho_iso[(1-f)+f*M0(b)]; Pi_rad=f*rho_iso*M2(b)/3; M0'(b)=-2*M2(b)",
+    "matter": "p_thermal=(gamma-1)*u_thermal; gamma=5/3; Pi_m=-2 eta s; eta=nu*rho_dust/H, 0<=nu<=0.1 as illustrative acausal first-order closure only",
+    "energy": "du_thermal/dt+3 gamma H u_thermal=-6s Pi_m=12 eta s²; drho_rad/dt+4H rho_rad=-6s Pi_rad",
+    "raychaudhuri": "dH/dt=-(4πG/c²)(rho_dust+gamma*u_thermal+4*rho_rad/3)-3s²",
+    "units": "rho,Pi are energy density [J/m3], H and s [s^-1], eta [J*s/m3]"
+  },
+  "nodes": [
+    {
+      "id": "AX_SIG_01",
+      "title": "Sigma scalar and orientation adapter",
+      "status": "IMPLEMENTED_VERIFIED",
+      "evidence": [
+        "radiation_replay.py",
+        "test_coupled_pi.py",
+        "results/actual_Sigma_Pi_history.json"
+      ],
+      "claim": "Source-locked historical four full cases mapped to user Sigma; Wainwright Ellis normalization distinguished."
+    },
+    {
+      "id": "AX_PI_RAD_02",
+      "title": "Collisionless radiation Pi and coupled Einstein",
+      "status": "IMPLEMENTED_NUMERICALLY_VERIFIED_COMPONENT",
+      "evidence": [
+        "coupled_pi.py",
+        "run_experiments.py",
+        "verify_sigma_pi.wl",
+        "results/experiment.json"
+      ],
+      "claim": "Isotropic primordial/free-streaming effective radiation f share of Omega_r; not native ionizing HHe Boltzmann."
+    },
+    {
+      "id": "AX_PI_MAT_03",
+      "title": "Conditional viscous matter shear stress and heat",
+      "status": "IMPLEMENTED_CONDITIONAL_PHENOMENOLOGY",
+      "evidence": [
+        "coupled_pi.py",
+        "sigma_pi_rhs.rs",
+        "test_coupled_pi.py"
+      ],
+      "claim": "Instantaneous first-order viscosity eta=nu rho_dust/H, positive heat, cannot substitute for derived kinetic/Israel Stewart closure."
+    },
+    {
+      "id": "AX_PI_RUST_04",
+      "title": "Independent Rust source RHS parity and regression",
+      "status": "IMPLEMENTED_VERIFIED",
+      "evidence": [
+        "sigma_pi_rhs.rs",
+        "rust/rei_microphysics/tests/axbi_sigma_pi_rhs.rs",
+        "results/rhs_frozen_golden.csv"
+      ],
+      "claim": "108 exact Python-evolved physical state RHS comparisons and four Rust unit tests."
+    },
+    {
+      "id": "AX_PI_ACTUAL_05",
+      "title": "Extract actual saved ionizing and radiation Pi",
+      "status": "READ_ONLY_MEASURED",
+      "evidence": [
+        "radiation_replay.py",
+        "results/actual_Sigma_Pi_history.json"
+      ],
+      "claim": "Original four complete AX08 cases: effective radiation and ionizing DeltaP distinct, not fed back."
+    },
+    {
+      "id": "AX_PI_MAT_06",
+      "title": "Physical matter kinetic closure, optional causal stress relaxation",
+      "status": "RESEARCH_NOT_COMPLETED",
+      "dependencies": [
+        "AX_PI_MAT_03"
+      ],
+      "ready_when": "Select physical component(s) (baryon/electron, collisionless DM or two-fluid tilt), derive kinetic/transport constitutive pressure tensor, entropy/current and positive collision operator; for causal relaxation include non-equilibrium stored energy/entropy and consistent source."
+    },
+    {
+      "id": "AX_PI_COUPLED_HHE_07",
+      "title": "True source-coupled full radiation+HHe+matter Pi reionization solver",
+      "status": "PENDING_PHYSICAL_INTEGRATION",
+      "dependencies": [
+        "AX_PI_RAD_02",
+        "AX_PI_ACTUAL_05",
+        "AX_PI_MAT_06"
+      ],
+      "ready_when": "Integrate exact source and collision ledger with AX08 HHe rates, emission, absorption heating and PI_tensors in Einstein+thermal RHS; preserve original source and code pins. Consume AX03 PR127 time increment and SOURCE07 PR128 dynamic chemistry as conditional adapters only after relevant original source controls. Fresh source identity and new experiment, do not resume old checkpoints."
+    },
+    {
+      "id": "AX_PI_AX11_08",
+      "title": "Matched dt dE dmu uncertainty and rate/temperature convergence",
+      "status": "PENDING",
+      "dependencies": [
+        "AX_PI_COUPLED_HHE_07"
+      ],
+      "ready_when": "Independent source-shape, angular, energy, time, thermal-gas error and small-Sigma stress backreaction budgets and characteristic positivity; separate model closure uncertainty."
+    },
+    {
+      "id": "AX_PI_RESULTS_09",
+      "title": "Full Sigma, pi_ab, ion histories and BBN-style time temperature plots",
+      "status": "PARTIAL_PILOT_ONLY",
+      "dependencies": [
+        "AX_PI_COUPLED_HHE_07",
+        "AX_PI_AX11_08"
+      ],
+      "claim": "Current validated Σ and Π background plots and historical four case HHe charts, not scientifically admitted physical Pi coupled ionizations."
+    }
+  ],
+  "runtime": {
+    "local_codex": "NOT_USED",
+    "native_subagent": "NOT_RUN",
+    "science_native_original_AX08_solver_started_in_this_turn": 0,
+    "source_binary_modified": false,
+    "source_frozen_history_modified": false,
+    "new_solver": "Independent Python DOP853 and additive std-only Rust RHS, validated only for source-free effective-radiation+viscous-matter toy",
+    "science_admission": "NOT_ISSUED"
+  },
+  "references": {
+    "AX08_four_cases": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/129",
+    "AX03_native_clock": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/127",
+    "SOURCE07_chemistry": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/128",
+    "BASS_HE_warm_P01": "https://github.com/cosmosapjw-quantum/BASS_HE/pull/64",
+    "Bianchi_anisotropic_covariant": "https://arxiv.org/abs/1003.3491",
+    "Viscous_causal_background": "https://arxiv.org/abs/1610.00020",
+    "Bianchi_photon_geodesic": "https://arxiv.org/abs/1410.8473"
+  }
+}
