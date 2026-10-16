@@ -12,3 +12,19 @@ The intended physical scope is isolated CX in fixed proper volume, with ideal mo
 
 The theory author performs source intake and mathematical construction. The assigned coding agent performs only the frozen bounded implementation and tests. A separate reviewer decides scoped mathematical/numerical acceptance. Actual stage artifacts are captured before advancing. No numerical computation or scientific code was executed for R1.
 
+## R2 — Source and completed-evidence reuse
+
+The pinned existing module defines forward CX as D0 + H+ → D+ + H0, explicit proper SI densities and thermal energy density, and opposite thermal/binding ledger increments. It labels its map exact only for frozen coefficients and fixed proper volume. The D atomic point evaluator includes the same signed CX event and thermal temperature derivative, while its finite-step wrapper calls the frozen map. These source contracts support the new thermal-feedback scope without replay of old tests.
+
+Savin (2002), ApJ566,599–603, DOI10.1086/324218, Eq.(6), Table2 supplies the retained fitted rates. In cm³/s:
+```
+kf(T)=2.00e-10*T^0.402*exp(-37.1/T)-3.31e-17*T^1.48
+kr(T)=2.06e-10*T^0.396*exp(-33.0/T)+2.03e-9*T^(-0.332)
+```
+Multiply by10^-6 for m³/s. Preserve the inclusive domain2.7≤T≤200000 K. The fit exponents37.1 K and33.0 K are not the binding-energy defect. The independently supplied defect remains a named input. The retained conditional example is DeltaChi=0.0037 eV, with the precision/provenance stated by the earlier isotope-provider theory.
+
+The retained physical constants are kB=1.380649e-23 J/K and eV=1.602176634e-19 J. Model fit deviations and numerical integration error are distinct. The prior isotope-provider source review and existing Savin tests are reusable evidence; new verification targets thermal-feedback integration and changed seams. Root separately acquired the primary Savin paper and will attach its receipt; this author's direct reads are the pinned repository sources.
+
+Source locators and object identities are preserved in `evidence/PINNED_SOURCES.json` and the completed intake. No scientific computation was executed for R2.
+
+
