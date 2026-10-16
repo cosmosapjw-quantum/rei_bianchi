@@ -1,31 +1,45 @@
-# V9 R5: photon birth and opacity clock isolation
+# REI LRS V9 R5: source injection versus opacity clocks
 
-Parent [PR #168](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/168) at `c02fb3492b99b79c8b2e3bae1a6183510ff1df9b`. Native owner PR150 frozen `6ea2b1b4b3875c9163cafc45efe720afded43fc4`; read-only. Related PR167, BASS_HE HE25/HE26, bass_cr C21B retain their own source-age/cut owner. All results here concern a smooth fixed-energy, single-absorption-channel toy, not native source-on EoR.
+**Authority**: rei_bianchi PR #168 at `c02fb3492b99b79c8b2e3bae1a6183510ff1df9b` (unchanged), original PR #150 frozen owner `6ea2b1b4b3875c9163cafc45efe720afded43fc4` (read-only). Related (not merged): BASS_HE HE25/HE26 PR #72/#73, bass_cr C21B PR #76, rei_bianchi PR #167. Selected phase R5 (constructive mathematical derivation), next C5/C6/C8/C10. Native subagent NOT_RUN.
 
-Time `X=ln(a/a0)`; photon number `N` and neutral target `M` per **total H nuclei**; birth rate `S(X)=dN_birth/dX`. For prescribed optical hazard `k(X)>=0`:
+## Mathematical core: smooth conditional birth and attenuation
 
-```text
-N' = S-kN,   B'=S,   A'=kN,  N+A=N0+B.
-N(b)=exp(-integral_a^b k)N(a)+integral_a^b S(y)exp(-integral_y^b k)dy.
-```
+Let X=ln(a/a0), number of photons per **total** hydrogen nucleus `N(X)`, nonnegative photon births `S(X)=dN_birth/dX`, and nonnegative instantaneous optical-depth hazard `kappa(X)` per dX on a prescribed geometry, at a frozen photon energy bin (not a full spectral/birth-cohort native calculation). Assume S,kappa are C² over one event-free interval. Then
 
-The constant-coefficient positive exact map with `h=b-a` is
-`Nnext=N*exp(-k*h)+S*h*[-expm1(-k*h)/(k*h)]`; the zero-rate limit is `N+S*h`. For smooth S,k midpoint evaluation is second-order (global) under stability and regularity.
+`N' = S(X) - kappa(X)*N`, `B'=S`, `A'=kappa*N`, and `N+A=N0+B`, with A>=0 and B>=0.
 
-**Wolfram-exact h² coefficients for numerical-minus-exact local photon number:**
+Exact characteristic Duhamel update:
 
-| numerical clock | h² error coefficient |
+`tau(a,b)=int_a^b kappa(y)dy`,
+`N(b)=exp[-tau(a,b)]N(a)+int_a^b S(y)exp[-tau(y,b)]dy`.
+
+For constants S,kappa over one panel h:
+`N(b)=exp(-kappa*h)N(a)+S*h*phi_1(-kappa*h)`, `phi_1(z)=(exp(z)-1)/z`. Use `-expm1(-z)/z` for positive z=kappa*h; continuous phi_1(0)=1. B increment = S*h, A increment = N_before+B_new-N_after. This is a *nonnegative* exact conditional update with no negative photon population. For finite smooth S,kappa, choose midpoint S_m,kappa_m for formal global second order under regularity and stability.
+
+Taylor expansion around a: `N_exact=N+h(S-kN)+(h²/2)(S'-k'N-k*S+k²*N)+O(h³)`. The following **second-order local defect coefficients** are exact in the smooth linear conditional problem:
+
+| update | coeff of h² in N_num-N_exact |
 |---|---|
-| source midpoint + opacity midpoint, exact exponential | 0 |
-| source left + opacity midpoint | `-S'/2` |
-| source midpoint + opacity left | `+k'*N/2` |
-| all midpoint photon births at step start | `-k*S/2` |
-| backward Euler on endpoint values | `(S'-k'*N-k*S+k²*N)/2` |
+| midpoint S, midpoint k, exact exponential | 0 |
+| left S, midpoint k, exact exponential | -S'/2 |
+| midpoint S, left k, exact exponential | +k'N/2 |
+| entire midpoint-source birth inserted at step START then attenuated over h | -k*S/2 |
+| backward Euler using endpoint S,k | `(S'-k'N-k*S+k²*N)/2` |
 
-For a **dynamic neutral absorber**, `N'=S-lambda(X)NM, M'=-lambda(X)NM, I'=lambda(X)NM`. An exact positive pair flow `N'=M'=-lambda N M` composed between two equal midpoint-source half injections gives a symmetric second-order smooth-system comparator. Separate perturbations of source clock, lambda clock, batch-birth clock and backward-Euler pair update identify local order defects.
+Wolfram Language verified all coefficients using Taylor expansion. Conditional statement only: none implies a particular effect dominates native PR #150.
 
-With frozen photon energy E >= ionization threshold chi, `E(N0+B)=E*N+chi*A+(E-chi)*A`. There is no geometric work by construction. For actual signed LRS or FLRW transport photon cohort energy redshifts and requires the proper energy-work owner. Born photon timing across a Verner threshold is non-smooth and requires HE26's moving-cut handling; the C² theorem cannot be extended to such crossings.
+## Dynamic neutral absorber extension with exact reaction
 
-**Degenerate exact cancellation:** if `S(X)/k(X)=const` and k is affine, midpoint optical-depth integration is exact and `N(X)=S/k+(N0-S/k)exp(-int k)` gives machine-precision agreement for every step count. Do not mistake this for uniform solver accuracy.
+Let M be comoving HI neutral stock per total H, I ionized stock, and `lambda(X)` a nonnegative proper-density, cross-section, Hubble-normalized rate coefficient. For a **frozen-energy** single channel:
 
-Science status: `DERIVED_WOLFRAM_CHECKED` for h² formulas, `CONDITIONAL_SMOOTH_ONLY`, native causal allocation `HOLD`. Literature context: Mackey (2012), A&A 539 A147, DOI [10.1051/0004-6361/201117984](https://doi.org/10.1051/0004-6361/201117984). The numerical owner is unchanged. Native subagents NOT_RUN (no callable).
+`N' = S-lambda N M`, `M'=-lambda N M`, `I'=+lambda N M`, `B'=S`, `A'=lambda N M`.
+
+On each smooth panel use exactly positive pair map for `dN/dX=dM/dX=-lambda_m N M`, symmetric source half-injections `+(h/2)S_m` before and after reaction. The palindromic composition is formally second order for smooth rates; not inherently uniformly accurate for `lambda*M*h >> 1`. A control applying all births at the beginning (or first-order BE at chemical step) is generally first order even if another stage has midpoint coefficients.
+
+At constant photon energy E>=threshold chi, defined photon binding/heat reservoirs are `Q_bind=chi*A`, `Q_heat=(E-chi)*A`, and `E*(N0+B)=E*N+Q_bind+Q_heat` (no geometric work in this frozen-energy control). For evolving energy, restore per-birth cohort Killing redshift and one separate geometric-work owner; do not treat this control as full FLRW or signed Bianchi transport.
+
+## Identification and scope
+
+The source/opacity main-effect experiment varies one factor at a time: S left/midpoint, k left/midpoint, all-birth-at-start vs half/half, and exact pair vs BE. Compare independent SciPy Radau integration of the **same** analytic continuous equations, with events and independent accumulators; sample h refinement. Distinguish local defect from global error. A second-order result under C² smoothness does not generalize across moving Verner threshold cuts, non-smooth stellar source, finite-energy multi-frequency absorption, or native Grackle chemistry. HE26's angular/birth threshold split and PR #167's cohort accounting remain independent constraints.
+
+References: J. Mackey, A&A 539 A147 (2012), DOI 10.1051/0004-6361/201117984; BASS_HE HE25/HE26 research PR #72/#73 (distinct source-age and moving-cut handling), bass_cr C21B PR #76. No claim of original algorithm novelty. **HOLD**: actual native source-on order, external RR/DR and collision/opacity ownership, whole EoR.

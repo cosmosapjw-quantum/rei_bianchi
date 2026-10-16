@@ -1,24 +1,37 @@
-# V9 C8: source / opacity / chemistry time-order isolation
+# LRS V9 C8: photon birth / opacity clock factorial isolation
 
-**Physical scope**: Manufactured smooth source (S(X)) and rate (lambda(X)) in fixed-energy 0D photons and HI/HII stocks, per *total* hydrogen nucleus; (X=\ln(a/a_0)). No Grackle RR, real stellar spectrum, redshift work, native PR150, or physical EoR history. Source: PR #168 at `c02fb3492b99b79c8b2e3bae1a6183510ff1df9b`.
+Parent: `rei_bianchi PR168 c02fb3492b99b79c8b2e3bae1a6183510ff1df9b` (read-only). Input and conclusions apply only to independent smooth 0D fixed-energy E=80 eV, threshold=13.6 eV, `X=ln(a/a0)` continuous photon source/absorber experiment. Not an actual Grackle-Case A, not stellar source, not physical EoR, and not native source-on direct execution.
 
-Python 3.13.5 / NumPy 2.3.5 / SciPy 1.17.0, direct `solve_ivp(method="Radau",rtol=1e-12,atol=1e-14)` independent RHS. **61/61 pytest PASS**. Actual C8 sweep: five problems × six numerical variants × N in {8,16,32,64,128,256}, exactly **180 numerical rows**. Machine-readable full rows are reproducible via `python run_study.py`.
+## Executed contract
 
-## Source/opacity both varying, dynamic HI stock
+Python 3.13.5, NumPy 2.3.5, SciPy 1.17.0, pytest 9.0.2 in ChatGPT sandbox. `src/birth_opacity_clock.py` evolves photons N, neutral HI M, ionized HII, source births B, absorbed A, binding energy chi*A, excess heat (E-chi)*A. Direct independent continuous SciPy Radau RHS integrates (N,M,B,A). Six alternative clock controls:
 
-| Variant | photon |N256 − N_Radau| | last observed p |
+1. `mid_mid`: S_mid, opacity_mid, exact pair, symmetric photon source;
+2. `source_left`: S_left (opacity_mid);
+3. `opacity_left`: k_left (S_mid);
+4. `both_left`: both left;
+5. `birth_start`: full source at panel start (midpoint S and k);
+6. `chem_be`: both midpoint coefficients but BE paired chemistry step.
+
+Five cases x six methods x six grid counts N=8,16,32,64,128,256 = **180 executed case/method/resolution rows**, not 180 independent production histories. Continuous Radau uses rtol=1e-12, atol=1e-14 with max_step=end/150. A separate prescribed-linear-κ problem compares exact integrating-factor SciPy QUAD reference.
+
+## Dynamic HI feedback (both source and opacity vary, t_end=0.8)
+
+| mode | N256 photon absolute error | last log2 error ratio |
 |---|---:|---:|
-| S(mid), lambda(mid), exact pair, S half/half | 4.0867843e-07 | 1.999992 |
-| S(left), lambda(mid) | 1.9614122e-04 | 0.996894 |
-| S(mid), lambda(left) | 1.3588696e-04 | 1.005172 |
-| both left | 6.0717332e-05 | 0.989347 |
-| all births at panel start | 4.3077464e-04 | 0.998190 |
-| pair backward Euler, others midpoint | 5.4371951e-04 | 0.997587 |
+| mid_mid | 4.0867843e-07 | 1.999992 |
+| source_left | 1.9614122e-04 | 0.996894 |
+| opacity_left | 1.3588696e-04 | 1.005172 |
+| both_left | 6.0717332e-05 | 0.989347 |
+| birth_start | 4.3077464e-04 | 0.998190 |
+| chem_be | 5.4371951e-04 | 0.997587 |
 
-Maximum absolute saved photon/atom/ion/energy ledger residual over 180 rows: `4.618527782440651e-13` (mixed units, dominated by fixed-energy bookkeeping); stocks nonnegative. These algebraic ledgers do **not** certify accuracy. Max `k*h*M0` of the deliberately strong opacity probe N8 ≈2.033; do not infer uniformly stiff convergence.
+Observed independent photon+HI species/event and frozen-energy ledger max abs across 180 rows: `4.61853e-13` (ledger units mixed, supremum dominated by photon-energy eV bookkeeping), all nonnegative stocks. These are bookkeeping identities by construction, not proof of continuum accuracy. Observed max `k*h*M0` in the bounded stiff probe N=8 is `2.033`; the benchmark does not show uniform stiff-order acceptance.
 
-Wolfram R5 local truncation shows one-sided source error -S′ h²/2; one-sided opacity error +k′N h²/2; batching births at start error −k S h²/2. Both first-order terms can cancel at one h: **both-left can appear more accurate in amplitude than either one-lag variation while remaining first-order**. Also the exact manufactured proportional S/k with affine k produces floating-point near-zero error for any h under midpoint integration. An initial incorrectly monotone exact-case assertion failed; diagnosed this analytic cancellation and replaced it by an exact-branch regression without relaxing tolerance.
+At identical h, leading 1st-order source and opacity error contributions can **partially cancel**, so `both_left` can numerically outperform either one-lag variant and still exhibit p≈1. A special *prescribed linear opacity* test with `S(x)/κ(x)=const` and affine κ is solved exactly by midpoint because midpoint integrates κ exactly and the particular solution is constant, giving nearly machine-zero error for every N. Initial incorrect generic monotone-error assertion **failed once**, then replaced by a derived exact-case regression; no numerical tolerance weakening.
 
-**Native owner causal attribution remains HOLD.** A correct source-on owner test must use actual PR150 fixed_step and frozen donor/clock, with source/opacity/BE flags independently varied and all photon/chemical/thermal/binding/escaped/geometry work events kept by single owner. PR #167 old/newborn, BASS_HE HE25/26 moving birth-cut, bass_cr C21B source-age are neighboring results, not replacements for this factual native test.
+## Scientific interpretation and next actual owner test
 
-Scientific sources: [Mackey 2012 A&A 539 A147](https://doi.org/10.1051/0004-6361/201117984) describes time-centred photon-conserving raytracing, not an empirical demonstration of this V9 owner's accuracy.
+R5 Wolfram formal local defects + measured C8 behavior support a specific method to isolate source birth, opacity and BE chemistry timings with a source-on full **owner-matched** native control matrix. This is **not** measured causal attribution in the owner. Next direct native study on frozen owner PR150 should create opt-in variants only: source on/off, photons on/off, birth midpoint vs source-age chronology, opacity start vs half-state, baseline BE vs RR midpoint; require exact same total-H density, source spectrum, energy/angle quadrature and physical X interval with N refinements; do not confuse optical depth predictor with actual midpoint-neutral state. Full EoR/Case B/signed Bianchi remains HOLD.
+
+Supplementary literature: Jonathan Mackey A&A 539 A147 (2012), second-order photon-conserving time-centred ray tracing; HE25/HE26 source-age + moving-cut research; bass_cr C21B threshold-safe pair control. No novelty claim for midpoint exponential integration.

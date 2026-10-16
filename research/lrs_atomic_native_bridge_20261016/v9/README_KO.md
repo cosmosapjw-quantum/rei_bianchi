@@ -1,20 +1,19 @@
-# REI LRS V9: positive photon-birth and opacity clock controls
+# REI LRS V9: Photon-birth and opacity clock factorial control
 
-Parent [PR #168](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/168) HEAD `c02fb3492b99b79c8b2e3bae1a6183510ff1df9b`. Standalone smooth manufactured test. **No edits to PR150 owner, PR168, NCP or running production checkpoints.**
+Parent: [rei_bianchi PR #168](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/168), exact commit `c02fb3492b99b79c8b2e3bae1a6183510ff1df9b`. This project is an independent smooth 0D photon/H I source–absorption diagnostic and **does not modify PR #150, PR #168, original user Ubuntu or NCP**. Native agent: NOT_RUN.
 
-Physics: `X=ln(a/a0)`, source photons N, neutral H I target M, ionized I and emitted B, all stocks per **total H nuclei**. `N'=S(X)-lambda(X)*N*M; M'=-lambda N*M; I'=lambda N*M`. One fixed E=80 eV, H binding=13.6 eV; no actual source spectrum/stellar profile, redshift, Grackle RR/CI/DR, Case B, or EoR history.
+Physics: time X=ln(a/a0), photon count N, neutral H I target M, ionized I and new photon births B, all per **total H nuclei**. Mass action N'=S(X)-lambda(X) N M, M'=-lambda N M, I'=+lambda N M. Frozen photon energy 80 eV, event binding 13.6 eV and heat 66.4 eV. No spectral/redshift dynamics or real H/He stellar sources. Tested algorithms include midpoint exponential/pair reaction, independently lagged source/opacity, all births at start, and BE chemistry.
 
-**Run** from `research/lrs_atomic_native_bridge_20261016/v9`:
-```bash
-export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
-export PYTHONPATH="$PWD/src"
-python -m pytest -q tests/test_birth_opacity_clock.py
-python run_study.py
-```
-Alternatively `bash REPLAY_V9.sh`. Python >=3.11, numpy, scipy, pytest. Source and tests have exact byte-matched Github blob identity against the ChatGPT sandbox executed originals.
+## Execute
 
-**Measured**: 61/61 pytest PASS and 180 independent 5-case×6-method×6-resolution Radau comparisons. For smooth dynamically depleting neutral stock, final N256 photon error 4.0868e-7 (source/opacity midpoint exact pair) vs 1.9614e-4 (source-left), 1.3589e-4 (opacity-left), 6.0717e-5 (both-left), 4.3077e-4 (all source photons at start), 5.4372e-4 (BE pair). Last orders ~2.000, .997, 1.005, .989, .998, .998. The source- and opacity-lag defects may cancel at a single resolution while p remains ~1. A manufactured proportional S/k with affine k is exactly captured by midpoint, so near-zero error there cannot certify universal high order.
+    bash REPLAY_V9.sh
 
-Source stages: `stages/R5_THEORY_KO.md`, `stages/DAG_R5/C5/C6/C8/FINAL.json`, `stages/C8_RESULT_KO.md`. Local complete restorable ZIP includes full raw `evidence/convergence.csv` (180 cases), JSON, inputs and test receipt. **Cloud status**: GitHub per-stage publication and Google Drive R5/C5/C6/C8 native-Doc **text mirrors** with readback are complete; binary raw ZIP upload via Library/Drive failed `container_session_expired`; Dropbox upload not attempted because connector needs fileParam injection. These are distinct assurance levels.
+Requires Python 3.11+ with numpy, scipy and pytest. The driver runs 61 tests then records `evidence/convergence.json`, `evidence/convergence.csv`, `evidence/study_stdout.txt` (five problems x six methods x six resolutions = 180 rows). Measured Python 3.13.5, NumPy 2.3.5, SciPy 1.17.0, pytest 9.0.2.
 
-**Claim**: smooth conditional 0D factor isolation only; original PR150 native source-on first-order causal allocation still **HOLD**. No all-physics 2nd order, Case B, signed Bianchi or full EoR claim. Native subagents NOT_RUN.
+## Scientific result
+
+Dynamic HI feedback representative case N256 absolute photon error vs independent Radau: midpoint 4.087e-7, source_left 1.961e-4, opacity_left 1.359e-4, both_left 6.072e-5, all births at start 4.308e-4, BE 5.437e-4. Corresponding last orders: 2.000, 0.997, 1.005, .989, .998, .998. A genuine proportional-source/opacity *exact subcase* was discovered after the first incorrect test assumption, then specifically tested without numerical tolerance relaxation.
+
+GitHub stage checkpoints: `stages/R5_THEORY_KO.md`, `DAG_R5/C5/C6/C8/FINAL.json` and `stages/C8_RESULT_KO.md`. Cloud Drive raw file upload failed with `container_session_expired` even after one diagnostic attempt; stage R5/C5/C6/C8 were separately backed up as Drive **native Docs readable text mirrors** and source blob IDs read back, not as raw file archives. Dropbox connector direct raw upload was unavailable. Generated sandbox ZIP is a fresh-restorable complete raw archive for user/Codex; use Codex to upload to both providers with raw readback if desired.
+
+Scientific admission: R5 local Taylor defects DERIVED_WOLFRAM_CHECKED, C5/C6 code source Git-blob byte checked, C8 conditional smooth manufactured PASS, original native PR150 source-on error decomposition HOLD, real H/He Case A source events and moving spectral cuts NOT_ATTEMPTED. No astrophysical reionization claims.
