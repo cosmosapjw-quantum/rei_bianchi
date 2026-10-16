@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "tolerances": {
+    "rtol": 2e-12,
+    "atol": 2e-15
+  },
+  "fixtures": [
+    {
+      "id": "analytic_matter_quadrature",
+      "inputs": {
+        "H0": 1,
+        "Omega_m": 1,
+        "Omega_r": 0,
+        "Omega_Lambda": 0,
+        "interval": [
+          -1,
+          0
+        ],
+        "panels": 8192
+      },
+      "expected": {
+        "integral_w": 0.5179132265677134,
+        "integral_w_squared": 0.3167376438773787,
+        "left_le_exact_le_right": true
+      },
+      "observed": {
+        "panels": 8192,
+        "h": 0.0001220703125,
+        "H_a": 4.4816890703380645,
+        "H_b": 1.0,
+        "w_inf": 1.0,
+        "raw_moments": {
+          "1": {
+            "left": 0.5178658116426851,
+            "right": 0.5179606443868076,
+            "upper_minus_lower": 9.4832744122475e-05,
+            "endpoint_width_formula": 9.483274412250612e-05,
+            "relative_bracket_width": 0.00018308870596673153
+          },
+          "2": {
+            "left": 0.3166796510224448,
+            "right": 0.31679564381195063,
+            "upper_minus_lower": 0.00011599278950585878,
+            "endpoint_width_formula": 0.00011599278950587598,
+            "relative_bracket_width": 0.00036614389045927634
+          }
+        },
+        "W2_bracket": [
+          0.562742970655738,
+          0.5628460214054557
+        ],
+        "quadrature_claim": "Exact-arithmetic monotone left/right enclosure; evaluated float values are not outward-rounded intervals"
+      },
+      "checks": {
+        "p1_bracket": true,
+        "p1_endpoint_identity": true,
+        "p2_bracket": true,
+        "p2_endpoint_identity": true
+      },
+      "pass": true
+    },
+    {
+      "id": "background_mismatch",
+      "inputs": {
+        "n_ref": 1,
+        "n_candidate": 1,
+        "K": 1,
+        "H_ref": 1,
+        "H_candidate": 2,
+        "interval": [
+          0,
+          1
+        ]
+      },
+      "expected": {
+        "density_difference": 0,
+        "abs_tau_difference": 0.5,
+        "shared_background_rejected": true
+      },
+      "observed": {
+        "density_difference": 0,
+        "abs_tau_difference": 0.5,
+        "shared_background_rejected": true
+      },
+      "checks": {
+        "tau_nonzero": true,
+        "shared_H_rejected": true
+      },
+      "pass": true
+    },
+    {
+      "id": "constant_hazard_sharpness",
+      "inputs": {
+        "ref": 0,
+        "candidate": 0.2,
+        "interval": [
+          0,
+          1
+        ]
+      },
+      "expected": {
+        "D": 0.2,
+        "q": 0.18126924692201818,
+        "TV": 0.18126924692201818
+      },
+      "observed": {
+        "norms": {
+          "Ninf": 0.2,
+          "N1": 0.2,
+          "N2": 0.2
+        },
+        "tau": 0.2,
+        "B": 0.2,
+        "q": 0.18126924692201815,
+        "transmission_difference": 0.18126924692201818,
+        "TV": 0.18126924692201818
+      },
+      "checks": {
+        "D": true,
+        "L1_attains": true,
+        "q": true,
+        "transmission": true,
+        "TV": true
+      },
+      "pass": true
+    },
+    {
+      "id": "localized_visibility",
+      "inputs": {
+        "ref": 0,
+        "candidate": "triangle with area .2",
+        "epsilon": [
+          0.1,
+          0.01
+        ]
+      },
+      "expected": {
+        "D_each": 0.2,
+        "hazard_maxima": [
+          4,
+          40
+        ],
+        "TV_each": 0.18126924692201815,
+        "claim": "L1-only probability versus density distinction"
+      },
+      "observed": [
+        {
+          "epsilon": 0.1,
+          "D": 0.2,
+          "tau": 0.2,
+          "hazard_max": 4.0,
+          "TV": 0.18126924692201818
+        },
+        {
+          "epsilon": 0.01,
+          "D": 0.2,
+          "tau": 0.2,
+          "hazard_max": 40.0,
+          "TV": 0.18126924692201818
+        }
+      ],
+      "checks": {
+        "D": true,
+        "TV_fixed": true,
+        "maxima": true
+      },
+      "pass": true
+    },
+    {
+      "id": "signed_cancellation",
+      "inputs": {
+        "ref": "1",
+        "candidate": "2*x",
+        "interval": [
+          0,
+          1
+        ],
+        "CDF_at": 0.5
+      },
+      "expected": {
+        "tau_ref": 1,
+        "tau_candidate": 1,
+        "D": 0.5,
+        "CDF_difference": -0.13416410697161874
+      },
+      "observed": {
+        "tau_ref": 1.0,
+        "tau_candidate": 1.0,
+        "D": 0.5,
+        "CDF_reference": 0.6065306597126334,
+        "CDF_candidate": 0.4723665527410147,
+        "CDF_difference": -0.13416410697161874,
+        "q": 0.3934693402873666
+      },
+      "checks": {
+        "equal_tau": true,
+        "D": true,
+        "CDF_formula": true,
+        "CDF_nonzero": true,
+        "CDF_bounded": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zero_and_unit_conversion",
+      "inputs": {
+        "norms_cgs": {
+          "N1": 9.797589160354307e-11,
+          "N2": 1.054157221048039e-10,
+          "Ninf": 2.7003617462766083e-10
+        },
+        "SI_conversion": {
+          "density": 1000000.0,
+          "c": 0.01,
+          "sigma": 0.0001
+        }
+      },
+      "expected": {
+        "B_zero": 0,
+        "q_zero": 0,
+        "cgs_SI_agreement": true,
+        "mixed_units_rejected": true
+      },
+      "observed": {
+        "zero": {
+          "K": 1.994356946945426e-14,
+          "components": {
+            "B_L1": 0.0,
+            "B_L2": 0.0,
+            "B_Linf": 0.0
+          },
+          "selected": "B_L1",
+          "B": 0.0,
+          "q": 0.0,
+          "units": [
+            "cm/s",
+            "cm^2",
+            "cm^-3"
+          ]
+        },
+        "cgs": {
+          "K": 1.994356946945426e-14,
+          "components": {
+            "B_L1": 1.4123629965349167e-07,
+            "B_L2": 8.749468843353422e-08,
+            "B_Linf": 2.305013666234412e-07
+          },
+          "selected": "B_L2",
+          "B": 8.749468843353422e-08,
+          "q": 8.749468460587409e-08,
+          "units": [
+            "cm/s",
+            "cm^2",
+            "cm^-3"
+          ]
+        },
+        "SI": {
+          "K": 1.9943569469454263e-20,
+          "components": {
+            "B_L1": 1.4123629965349167e-07,
+            "B_L2": 8.749468843353425e-08,
+            "B_Linf": 2.3050136662344122e-07
+          },
+          "selected": "B_L2",
+          "B": 8.749468843353425e-08,
+          "q": 8.749468460587411e-08,
+          "units": [
+            "m/s",
+            "m^2",
+            "m^-3"
+          ]
+        },
+        "mixed_units_rejected": true
+      },
+      "checks": {
+        "zero_exact": true,
+        "all_components_agree": true,
+        "B_agrees": true,
+        "q_agrees": true,
+        "unit_validation": true
+      },
+      "pass": true
+    }
+  ],
+  "executed_fixture_count": 6,
+  "status": "PASS",
+  "scope": "Synthetic equation checks only; no raw histories, solver convergence or physical accuracy admission"
+}
