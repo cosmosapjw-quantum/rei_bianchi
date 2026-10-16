@@ -2,7 +2,7 @@
   "schema_version": 1,
   "workflow_version": "1.0.0",
   "unit_id": "flrw_full005_pair_diagnostics_20261016",
-  "status": "R2_PROVENANCE_MAPPED",
+  "status": "R3_ASSUMPTIONS_FIXED",
   "baseline_commit": "4e2f0682fb605c6aa940bd756d9869e67b6ded0b",
   "branch": "research/flrw-production-integration-20261015",
   "objective": "Full-overlap piecewise-linear reconstruction pair supremum and analytic L1/L2/RMS diagnostics in stored ln(a)",
@@ -55,5 +55,32 @@
     "postprocess_flrw.py": "b396a5b439a5cc3e305ab6663ac8d6d46424b747c13a84da4fe3d89ac468b5fc",
     "vendor/compare_histories.py": "ba5441981f4dd37607648a14c4edd3663f57c061413c28713d6e37dd2f5b72ed",
     "vendor/reconstruction_support.py": "98eb05a8a13d2c613b53fa2bc6c5bc5117eb40bbb25f717da5ffab40e9531808"
+  },
+  "overlap": {
+    "lower": "max(reference L[0], candidate L[0])",
+    "upper": "min(reference L[-1], candidate L[-1])",
+    "require": "lower < upper",
+    "full_pair": "Existing reader requires identical represented endpoints",
+    "extrapolation": false,
+    "knot_equality": "Exact stored binary64 equality; no tolerance merging"
+  },
+  "arithmetic": "Binary64 evaluation of exact analytic PL formulas; no certified arithmetic bound",
+  "units": {
+    "xe": "1",
+    "x_*": "1",
+    "Y_*": "1",
+    "ne_cm3": "cm^-3",
+    "Tgas_K": "K",
+    "U0_eV_per_H": "eV/H",
+    "U2_eV_per_H": "eV/H"
+  },
+  "execution_context": {
+    "completion_commit": "5e0becf8709215e7ec8cc482c933663b045c47f9",
+    "prior_postprocess": "COMPLETE_SCOPED_REUSE",
+    "cumulative_postprocess_seconds": 103.79374452296179,
+    "render_replay": false,
+    "environment_failure": "historical; no repair required",
+    "SOURCE007": "other active thread; untouched",
+    "display_tables": "not full accepted-row histories; only separately labeled compressed-display diagnostics permissible"
   }
 }

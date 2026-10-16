@@ -25,3 +25,22 @@ Selected literature was retrieved by the controller on 2026-10-16 using Exa and 
 SciSpace supplied two contextual leads: Agocs, Hobson and Handley, *Dense output for highly oscillatory numerical solutions*, [arXiv:2007.05013](https://arxiv.org/abs/2007.05013), and Calvo, Higham and Montijano, *Global error estimation with adaptive explicit Runge–Kutta methods*, [DOI:10.1093/imanum/16.1.47](https://doi.org/10.1093/imanum/16.1.47). The former concerns method-specific dense output, whereas this unit fixes linear reconstruction of saved states; the latter concerns global-error estimation, whereas this unit computes pair-reconstruction differences. Neither paper is used as a proof of the PL norm formulas or as evidence of FULL005 global accuracy. Their role is contextual scope alignment.
 
 The theorem will be derived from affine interpolation and elementary integration. No unresolved literature lemma enters the derivation. Wolfram symbolic output and the independent small-fixture probe belong to R6/R7 and remain separate evidence from source retrieval.
+
+## R3 — quantified claims and assumptions
+
+Forward execution context supplied by the controller during R3: concurrent commit `5e0becf8709215e7ec8cc482c933663b045c47f9` preserved completed FULL005 postprocessing and its scoped independent review. The full render took 87.98996 s and the Yi extension 12.6463 s, producing nine plots; the cumulative postprocessing debit is 103.79374452296179 s. These completed outputs are reused. The earlier NumPy import failure is historical and needs no new environment repair or render replay in this unit. The three baseline code files above are unchanged. SOURCE007 work belongs to another active thread. Any future diagnostic of compressed public display tables must be labeled as a compressed-display reconstruction; this contract targets the complete validated accepted-row arrays.
+
+Let two finite data sets `(r_i,R_i)` and `(c_j,C_j)` have at least two rows each, strictly increasing finite coordinates and finite real values. Each value defines its unique continuous piecewise-affine interpolant on its represented closed interval. In the mathematical statement, stored binary64 values are regarded as exact real numbers; implementing the formulas in binary64 adds ordinary arithmetic rounding.
+
+Define `A=max(r_0,c_0)`, `B=min(r_last,c_last)`, and require `A<B`. The overlap interval is reported explicitly. Let `K` be the sorted unique union of both sets of knots strictly inside `(A,B)`, together with `A,B`. Equality here means equality of stored coordinate values: nearby distinct knots are retained. The FULL_PAIR caller has equal endpoints by the existing reader contract, so its overlap is the whole represented z20-to-z4 history. Partial overlap is supported by the generic helper and is labeled with both input domains and the returned overlap; extrapolation is absent.
+
+For each observable define `d(L)=C_PL(L)-R_PL(L)`. The requested quantities, all integrated with the dimensionless measure `dL=d ln(a)`, are:
+
+* `sup_abs = max_[A,B] |d|`, with the earliest maximizing coordinate in K and its signed difference;
+* `l1_integral = integral_A^B |d| dL` and `mean_abs = l1_integral/(B-A)`;
+* `l2_squared_integral = integral_A^B d^2 dL`, `l2_norm = sqrt(l2_squared_integral)`, and `rms = sqrt(l2_squared_integral/(B-A))`;
+* signed differences at A and B, for continuity with existing endpoint reporting.
+
+Fractions, `xe` and baryon abundances have unit one; `ne_cm3` has cm^-3, `Tgas_K` has K, and `U0_eV_per_H`,`U2_eV_per_H` have eV per H. L1, L2, RMS, mean absolute difference and supremum retain the observable's unit because L is dimensionless; the squared integral has its squared unit. Time-weighted norms would have a different measure and are outside this contract. Tgas itself need not be monotone: it is an observable reconstructed in L and is never used to reorder saved states.
+
+The proof target is: for every pair satisfying these assumptions, the union-knot formulas in R5 calculate these reconstruction functionals in exact arithmetic, with O(n+m) knot visits per fixed observable set. The binary64 implementation will report analytic reconstruction diagnostics and explicitly identify its arithmetic, rather than claiming exact dyadic values. Input validation, physical invariants and full-source identity remain responsibilities of the existing caller/reader, while the generic helper also rejects malformed numeric arrays.
