@@ -1,0 +1,528 @@
+diff --git a/rust/rei_microphysics/src/axbi_driver.rs b/rust/rei_microphysics/src/axbi_driver.rs
+index 5e2713bc1..402806f97 100644
+--- a/rust/rei_microphysics/src/axbi_driver.rs
++++ b/rust/rei_microphysics/src/axbi_driver.rs
+@@ -1,10 +1,9 @@
+ //! Cold point coupled driver. Binary64 backward Euler with empirical adaptivity;
+ //! neither an inherited FT03 certificate nor a continuum proof.
+ use crate::axbi_background::{
+-    isotropic_initial_radiation_moments, AxbiBackground, BackgroundFamily, BackgroundIncrement,
+-    BackgroundPoint, Cosmology,
++    isotropic_initial_radiation_moments, AxbiBackground, BackgroundFamily, Cosmology, BackgroundPoint, BackgroundIncrement,
+ };
+-use crate::axbi_bass_background::{sha256_bytes, BassBackground};
++use crate::axbi_bass_background::{BassBackground, sha256_bytes};
+ use crate::axbi_covariant_transport::{CovariantTransport, PhotonState, PreparedAbsorption};
+ use crate::axbi_parallel::OrderedWorkerPool;
+ use crate::axbi_rates::AxbiProvider;
+@@ -353,13 +352,35 @@ where
+     Ok(jac)
+ }
+ 
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum BassResearchNumerics {
++    Legacy,
++    LegacyTrace,
++    TightNewton,
++    SplitBe,
++    TightSplitBe,
++    UniformBirth,
++    TightUniformBirth,
++    FullExponentialFrozen,
++}
++impl BassResearchNumerics {
++    fn tolerance(self) -> f64 {
++        match self { Self::TightNewton | Self::TightSplitBe | Self::TightUniformBirth => 1e-13, _ => 1e-11 }
++    }
++    fn uniform_birth(self) -> bool {
++        matches!(self, Self::UniformBirth | Self::TightUniformBirth | Self::FullExponentialFrozen)
++    }
++    fn split_birth(self) -> bool {
++        matches!(self, Self::SplitBe | Self::TightSplitBe | Self::UniformBirth | Self::TightUniformBirth | Self::FullExponentialFrozen)
++    }
++}
+ #[derive(Clone, Debug)]
+ pub struct Driver {
+     pub config: DriverConfig,
+     pub background: AxbiBackground,
+     /// Opt-in producer table. The legacy public background remains intact.
+     bass_background: Option<BassBackground>,
+-    bass_passive_certified: bool,
++    research_numerics: BassResearchNumerics,
+     pub source: AxbiSource,
+     pub energies: Vec<f64>,
+     pub n_h0_cm3: f64,
+@@ -453,7 +474,7 @@ impl Driver {
+             config,
+             background: bg,
+             bass_background: None,
+-            bass_passive_certified: false,
++            research_numerics: BassResearchNumerics::Legacy,
+             source,
+             energies,
+             n_h0_cm3: n_h0,
+@@ -464,80 +485,39 @@ impl Driver {
+         driver.initial_energy = driver.total_energy(&state)?;
+         Ok((driver, state))
+     }
+-    pub fn new_bass(
+-        config: DriverConfig,
+-        bass: BassBackground,
+-    ) -> Result<(Self, DriverState), ForwardError> {
+-        if config.q_ref != 0.0 || config.same_h {
++    pub fn new_bass(config: DriverConfig, bass: BassBackground) -> Result<(Self, DriverState), ForwardError> {
++        if config.q_ref != 0.0 || config.same_h || config.inactive_hi_split {
+             return Err(err("BASS_DRIVER_CONFIG_MODE"));
+         }
+-        let passive_certified = if config.inactive_hi_split {
+-            let report = bass.passive_monotonicity();
+-            if report.status != crate::axbi_bass_background::BassMonotonicityStatus::Established {
+-                return Err(err("BASS_MONOTONICITY_NOT_ESTABLISHED"));
+-            }
+-            true
+-        } else {
+-            false
+-        };
+-        let (mut driver, state) = Self::new(config)?;
+-        driver.bass_passive_certified = passive_certified;
+-        let a_ref = state.a;
+-        let reference = bass.point_at_scale(a_ref)?.geometry()?;
+-        bass.point_at_scale(1.0 / (1.0 + driver.config.end_zbar))?;
+-        driver.transport = CovariantTransport::new(
+-            &driver.source,
+-            reference,
+-            driver.config.transport_cells,
+-            13.6,
+-            512.0,
+-        )?
+-        .with_threads(driver.config.transport_threads)?;
+-        driver.bass_background = Some(bass);
+-        driver.initial_energy = driver.total_energy(&state)?;
++        let (mut driver,state)=Self::new(config)?;
++        let a_ref=state.a;
++        let reference=bass.point_at_scale(a_ref)?.geometry()?;
++        bass.point_at_scale(1.0/(1.0+driver.config.end_zbar))?;
++        driver.transport=CovariantTransport::new(&driver.source,reference,driver.config.transport_cells,13.6,512.0)?
++            .with_threads(driver.config.transport_threads)?;
++        driver.bass_background=Some(bass);
++        driver.initial_energy=driver.total_energy(&state)?;
++        Ok((driver,state))
++    }
++    /// Research-only numerical lane. Selection is fixed at construction and
++    /// bound into the BASS checkpoint envelope; production defaults to Legacy.
++    pub fn new_bass_research(config: DriverConfig, bass: BassBackground,
++        numerics: BassResearchNumerics) -> Result<(Self, DriverState), ForwardError> {
++        let (mut driver, state) = Self::new_bass(config, bass)?;
++        driver.research_numerics = numerics;
+         Ok((driver, state))
+     }
+-    pub fn geometry_point(&self, a: f64) -> Result<BackgroundPoint, ForwardError> {
+-        match &self.bass_background {
+-            Some(bg) => bg.point_at_scale(a),
+-            None => self.background.point_at_scale(a),
+-        }
+-    }
+-    pub fn geometry_point_at_time(&self, t: f64) -> Result<BackgroundPoint, ForwardError> {
+-        match &self.bass_background {
+-            Some(bg) => bg.point_at_time(t),
+-            None => self.background.point_at_time(t),
+-        }
++    pub fn geometry_point(&self,a:f64)->Result<BackgroundPoint,ForwardError> {
++        match &self.bass_background {Some(bg)=>bg.point_at_scale(a),None=>self.background.point_at_scale(a)}
+     }
+-    pub fn geometry_increment(
+-        &self,
+-        a0: f64,
+-        a1: f64,
+-    ) -> Result<BackgroundIncrement, ForwardError> {
+-        match &self.bass_background {
+-            Some(bg) => bg.interval_increment(a0, a1),
+-            None => self.background.interval_increment(a0, a1),
+-        }
++    pub fn geometry_point_at_time(&self,t:f64)->Result<BackgroundPoint,ForwardError> {
++        match &self.bass_background {Some(bg)=>bg.point_at_time(t),None=>self.background.point_at_time(t)}
+     }
+-    pub fn bass_identity(&self) -> Option<&crate::axbi_bass_background::BassSourceIdentity> {
+-        self.bass_background.as_ref().map(|b| &b.identity)
++    pub fn geometry_increment(&self,a0:f64,a1:f64)->Result<BackgroundIncrement,ForwardError> {
++        match &self.bass_background {Some(bg)=>bg.interval_increment(a0,a1),None=>self.background.interval_increment(a0,a1)}
+     }
+-    pub fn transport_mode_metadata(&self) -> String {
+-        let (provider, scope) = if self.bass_background.is_some() {
+-            (
+-                "BASS_SELECTED_SOURCE008",
+-                if self.config.inactive_hi_split && self.bass_passive_certified {
+-                    "selected_BASS_certified_forward_ray_monotone_only"
+-                } else if self.config.inactive_hi_split {
+-                    "MONOTONICITY_NOT_ESTABLISHED"
+-                } else {
+-                    "disabled"
+-                },
+-            )
+-        } else {
+-            ("AXBI_ANALYTIC", "q0_forward_monotonic_only")
+-        };
+-        format!("inactive_hi_split={}\nbackground_provider={}\npassive_scope={}\ncheckpoint_version=V4\ntransport_threads={}\nparallel_scope=persistent_cell_prepare_and_opt_in_jacobian_columns\nparallel_jacobian_columns={}\n", self.config.inactive_hi_split,provider,scope,self.config.transport_threads,self.config.parallel_jacobian_columns)
++    pub fn bass_identity(&self)->Option<&crate::axbi_bass_background::BassSourceIdentity> {
++        self.bass_background.as_ref().map(|b|&b.identity)
+     }
+     fn photon_state(&self, state: &DriverState) -> PhotonState {
+         PhotonState {
+@@ -737,20 +717,6 @@ impl Driver {
+         }
+         let g0 = self.geometry_point(s.a)?.geometry()?;
+         let g1 = self.geometry_point(to)?.geometry()?;
+-        if self.config.inactive_hi_split && self.bass_background.is_some() {
+-            if !self.bass_passive_certified {
+-                return Err(err("BASS_MONOTONICITY_NOT_ESTABLISHED"));
+-            }
+-            let old_rays = self.transport.ray_geometry(&g0)?;
+-            let new_rays = self.transport.ray_geometry(&g1)?;
+-            if old_rays.len() != new_rays.len()
+-                || old_rays.iter().zip(&new_rays).any(|(old, new)| {
+-                    !old.scale.is_finite() || !new.scale.is_finite() || new.scale > old.scale
+-                })
+-            {
+-                return Err(err("BASS_PASSIVE_RAY_REDSHIFT_NOT_ESTABLISHED"));
+-            }
+-        }
+         let (_, old_u) = self.inventory_with_geometry(s, &g0)?;
+         let (_, new_u) = self.inventory_with_geometry(s, &g1)?;
+         self.partition_inactive(s, &g1)?;
+@@ -776,6 +742,14 @@ impl Driver {
+         Self::set_photon_state(s, photons);
+         Ok(())
+     }
++    fn inject_birth(&self, s: &mut DriverState, dt: f64) -> Result<PhotonState, ForwardError> {
++        let geometry = self.geometry_point(s.a)?.geometry()?;
++        let mut birth = self.transport.empty_state();
++        let emitted = self.transport.inject(&mut birth, &geometry, 1.0/s.a-1.0, dt)?;
++        s.ledgers.source_n += emitted.added_photons_per_h;
++        s.ledgers.source_u += emitted.added_energy_ev_per_h;
++        Ok(birth)
++    }
+     fn evaluate(
+         &self,
+         context: &ResidualContext,
+@@ -802,6 +776,10 @@ impl Driver {
+         dt: f64,
+         counter: &mut usize,
+     ) -> Result<(), ForwardError> {
++        self.chemical_stage_with_birth(s, dt, counter, None)
++    }
++    fn chemical_stage_with_birth(&self, s: &mut DriverState, dt: f64,
++        counter: &mut usize, birth: Option<PhotonState>) -> Result<(), ForwardError> {
+         if !dt.is_finite() || dt <= 0.0 {
+             return Err(err("AXBI_STAGE_DT"));
+         }
+@@ -810,9 +788,20 @@ impl Driver {
+         self.partition_inactive(&mut old, &geometry)?;
+         // Quadrature reconstruction is fixed across the Newton residual/Jacobian
+         // evaluations; only trial absorber densities enter backward Euler.
+-        let prepared = self
++        let mut prepared = self
+             .transport
+             .prepare(&self.photon_state(&old), &geometry)?;
++        if self.research_numerics==BassResearchNumerics::FullExponentialFrozen {
++            prepared=prepared.with_full_exponential_old();
++        }
++        if let Some(newborn) = &birth {
++            let prepared_birth=self.transport.prepare(newborn, &geometry)?;
++            prepared = if self.research_numerics==BassResearchNumerics::FullExponentialFrozen {
++                prepared.with_uniform_birth(prepared_birth)?
++            } else if self.research_numerics.uniform_birth() {
++                prepared.with_uniform_birth(prepared_birth)?
++            } else { prepared.with_split_birth_be(prepared_birth)? };
++        }
+         let context = ResidualContext {
+             gas: old.gas,
+             a: old.a,
+@@ -828,13 +817,18 @@ impl Driver {
+             old.gas.fractions[2],
+             old_w,
+         ];
+-        for _ in 0..50 {
++        for iteration in 0..50 {
+             let (residual, stocks, rhs) = self.evaluate(&context, x, dt, counter)?;
+             let norm = self.norm(residual, old_w, x[3]);
+-            if norm <= 1e-11 {
++            if self.research_numerics != BassResearchNumerics::Legacy {
++                eprintln!("BASS_NEWTON mode={:?} iteration={} norm={:.17e} dt_s={:.17e} a={:.17e}",
++                    self.research_numerics, iteration, norm, dt, old.a);
++            }
++            if norm <= self.research_numerics.tolerance() {
+                 let nh = self.n_h0_cm3 / old.a.powi(3);
+                 let c = HHeModel::controlled_fixture();
+-                let nold = old.photons.iter().sum::<f64>();
++                let nold = old.photons.iter().sum::<f64>()
++                    + birth.as_ref().map(|b| b.number.iter().sum::<f64>()).unwrap_or(0.0);
+                 let nnew = stocks.number.iter().sum::<f64>();
+                 let events = rhs.photo_events_cm3_s.map(|e| e * dt / nh);
+                 let event_total = events.iter().sum::<f64>();
+@@ -872,6 +866,17 @@ impl Driver {
+                 self.config.max_rhs,
+                 move |unknown| columns_context.evaluate(unknown, dt).map(|v| v.0),
+             )?;
++            if self.research_numerics != BassResearchNumerics::Legacy {
++                let norm1=(0..4).map(|j| (0..4).map(|i| jac[i][j].abs()).sum::<f64>()).fold(0.0_f64,f64::max);
++                let mut inv_col_max=0.0_f64;
++                for j in 0..4 {
++                    let mut unit=[0.0;4]; unit[j]=1.0;
++                    let col=solve4(jac,unit)?;
++                    inv_col_max=inv_col_max.max(col.iter().map(|x| x.abs()).sum::<f64>());
++                }
++                eprintln!("BASS_JACOBIAN mode={:?} iteration={} cond1_est={:.17e}",
++                    self.research_numerics,iteration,norm1*inv_col_max);
++            }
+             let direction = solve4(jac, residual.map(|r| -r))?;
+             let mut alpha = 1.0;
+             let mut accepted = None;
+@@ -899,8 +904,13 @@ impl Driver {
+         let mid = (old.a * to).sqrt();
+         let dt = self.geometry_increment(old.a, to)?.proper_time_s;
+         self.geometry_map(&mut s, mid)?;
+-        self.inject(&mut s, dt)?;
+-        self.chemical_stage(&mut s, dt, counter)?;
++        if self.research_numerics.split_birth() {
++            let birth = self.inject_birth(&mut s, dt)?;
++            self.chemical_stage_with_birth(&mut s, dt, counter, Some(birth))?;
++        } else {
++            self.inject(&mut s, dt)?;
++            self.chemical_stage(&mut s, dt, counter)?;
++        }
+         self.geometry_map(&mut s, to)?;
+         self.validate(&s, 1e-8)?;
+         let (n0, u0) = self.residuals(old)?;
+@@ -915,25 +925,16 @@ impl Driver {
+     /// Controlled fixed-log-scale step for independent geometry and chemistry
+     /// refinement. Uses the same transport, source, chemistry and ledger path
+     /// as each adaptive trial, without changing the adaptive acceptance rule.
+-    pub fn fixed_step(&self, s: &mut DriverState, dln_a: f64) -> Result<(), ForwardError> {
+-        if !dln_a.is_finite() || dln_a <= 0.0 || dln_a > 0.005 {
+-            return Err(err("BASS_FIXED_STEP_DOMAIN"));
+-        }
+-        if s.accepted >= self.config.max_steps || s.attempts >= self.config.max_attempts {
+-            return Err(err("AXBI_STEP_CAP"));
+-        }
+-        let mut counter = s.rhs_evaluations;
+-        s.attempts += 1;
+-        let outcome = self.tentative(s, s.a * dln_a.exp(), &mut counter);
+-        // Charge every started RHS call, including a failed tentative. The
+-        // physical state remains uncommitted until the result is successful.
+-        s.rhs_evaluations = counter;
+-        let mut next = outcome?;
+-        next.rhs_evaluations = counter;
+-        next.accepted = s.accepted + 1;
+-        next.attempts = s.attempts;
+-        next.next_dln_a = dln_a;
+-        *s = next;
++    pub fn fixed_step(&self,s:&mut DriverState,dln_a:f64)->Result<(),ForwardError> {
++        if !dln_a.is_finite() || dln_a<=0.0 || dln_a>0.005 {return Err(err("BASS_FIXED_STEP_DOMAIN"));}
++        if s.accepted>=self.config.max_steps {return Err(err("AXBI_STEP_CAP"));}
++        let mut counter=s.rhs_evaluations;
++        let mut next=self.tentative(s,s.a*dln_a.exp(),&mut counter)?;
++        next.rhs_evaluations=counter;
++        next.accepted=s.accepted+1;
++        next.attempts=s.attempts+1;
++        next.next_dln_a=dln_a;
++        *s=next;
+         Ok(())
+     }
+     pub fn validate(&self, s: &DriverState, tolerance: f64) -> Result<(), ForwardError> {
+@@ -1134,9 +1135,6 @@ pub fn compiled_identity() -> String {
+         include_str!("axbi_q_closure.rs"),
+         include_str!("axbi_background.rs"),
+         include_str!("axbi_bass_background.rs"),
+-        include_str!("interval_math.rs"),
+-        include_str!("../../../research/bass_source008_20261016/CONTRACT.json"),
+-        include_str!("../../../research/bass_source007_20261016/CONTRACT.json"),
+         include_str!("axbi_sources.rs"),
+         include_str!("axbi_rates.rs"),
+         include_str!("igm_rates.rs"),
+@@ -1275,9 +1273,7 @@ impl Driver {
+         Ok(text)
+     }
+     pub fn save_checkpoint(&self, path: &Path, s: &DriverState) -> Result<(), ForwardError> {
+-        if self.bass_background.is_some() {
+-            return Err(err("BASS_REJECT_LEGACY_CHECKPOINT"));
+-        }
++        if self.bass_background.is_some() { return Err(err("BASS_REJECT_LEGACY_CHECKPOINT")); }
+         let text = self.checkpoint_text(s)?;
+         write_checkpoint(path, &text)
+     }
+@@ -1287,9 +1283,7 @@ impl Driver {
+         path: &Path,
+         s: &DriverState,
+     ) -> Result<(), ForwardError> {
+-        if self.bass_background.is_some() {
+-            return Err(err("BASS_REJECT_LEGACY_CHECKPOINT"));
+-        }
++        if self.bass_background.is_some() { return Err(err("BASS_REJECT_LEGACY_CHECKPOINT")); }
+         let text = self.checkpoint_text(s)?;
+         // Existing destination remains during temporary write: include both.
+         guard_output_bytes_with_limit(
+@@ -1301,9 +1295,7 @@ impl Driver {
+     }
+     pub fn read_checkpoint(&self, path: &Path) -> Result<DriverState, ForwardError> {
+         let text = fs::read_to_string(path).map_err(ioerr)?;
+-        if self.bass_background.is_some() {
+-            return Err(err("BASS_REJECT_LEGACY_CHECKPOINT"));
+-        }
++        if self.bass_background.is_some() { return Err(err("BASS_REJECT_LEGACY_CHECKPOINT")); }
+         self.read_checkpoint_text(&text)
+     }
+     fn read_checkpoint_text(&self, text: &str) -> Result<DriverState, ForwardError> {
+@@ -1361,99 +1353,56 @@ impl Driver {
+     }
+     /// Separate BASS checkpoint envelope with exact producer, executable,
+     /// configuration, output epoch and state bindings. Create-only publication.
+-    pub fn save_bass_checkpoint(
+-        &self,
+-        path: &Path,
+-        s: &DriverState,
+-        epoch: &str,
+-        output: &Path,
+-    ) -> Result<(), ForwardError> {
+-        let id = self.bass_identity().ok_or(err("BASS_CHECKPOINT_MODE"))?;
+-        if epoch.is_empty() || epoch.contains('\n') || epoch.contains('\r') || epoch.contains('|') {
+-            return Err(err("BASS_CHECKPOINT_EPOCH"));
+-        }
+-        let p = self.geometry_point(s.a)?;
+-        let output_bytes = fs::read(output).map_err(|_| err("BASS_CHECKPOINT_OUTPUT_IO"))?;
+-        let source = sha256_bytes(compiled_identity().as_bytes())?;
+-        let config = sha256_bytes(format!("{:?}", self.config).as_bytes())?;
+-        let body = self.checkpoint_text(s)?;
+-        let text=format!("BASS_REI_CHECKPOINT_V1\n{}|{}|{}|{}|{}\nBASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}|inactive_hi_split={}\nDONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE008\n{}\n{}\n{}|{}\n{}\n{:.17e}|{:.17e}|{:.17e}|{:.17e}|{:.17e}\n{}\n{}\n{}",
++    pub fn save_bass_checkpoint(&self,path:&Path,s:&DriverState,epoch:&str,output:&Path)->Result<(),ForwardError> {
++        let id=self.bass_identity().ok_or(err("BASS_CHECKPOINT_MODE"))?;
++        if epoch.is_empty() || epoch.contains('\n') || epoch.contains('\r') || epoch.contains('|') {return Err(err("BASS_CHECKPOINT_EPOCH"));}
++        let p=self.geometry_point(s.a)?;
++        let output_bytes=fs::read(output).map_err(|_|err("BASS_CHECKPOINT_OUTPUT_IO"))?;
++        let source=sha256_bytes(compiled_identity().as_bytes())?;
++        let config=sha256_bytes(format!("{:?}",self.config).as_bytes())?;
++        let body=self.checkpoint_text(s)?;
++        let version=if self.research_numerics==BassResearchNumerics::Legacy {"BASS_REI_CHECKPOINT_V1"} else {"BASS_REI_CHECKPOINT_V2"};
++        let algorithm=if self.research_numerics==BassResearchNumerics::Legacy {String::new()} else {format!("|algorithm={:?}|newton_tolerance={:.1e}",self.research_numerics,self.research_numerics.tolerance())};
++        let text=format!("{}\n{}|{}|{}|{}|{}\nBASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}{}\nREI_NATIVE_SOURCE=0e25846433170d0f420c4cda44a0bedbf02cd177|REI_OWNER_BASE=7cb4ac678be019b736e85db76dfbdc7c51e380e9\n{}\n{}\n{}|{}\n{}\n{:.17e}|{:.17e}|{:.17e}|{:.17e}|{:.17e}\n{}\n{}\n{}",
++            version,
+             id.producer_commit,id.source_csv_sha256,id.source_manifest_sha256,id.case,id.grid_points,
+-            self.config.transport_cells,self.config.inactive_hi_split,
++            self.config.transport_cells,algorithm,
+             source,config,epoch,output.display(),sha256_bytes(&output_bytes)?,
+             s.a,p.time_s,p.b,p.h_per_s,p.s_per_s,
+             sha256_bytes(body.as_bytes())?,body.len(),body);
+-        let tmp = path.with_extension(format!("new-{}", std::process::id()));
+-        {
+-            use std::fs::OpenOptions;
+-            let mut file = OpenOptions::new()
+-                .write(true)
+-                .create_new(true)
+-                .open(&tmp)
+-                .map_err(|_| err("BASS_CHECKPOINT_EXISTS"))?;
+-            file.write_all(text.as_bytes()).map_err(ioerr)?;
+-            file.sync_all().map_err(ioerr)?;
+-        }
+-        let published = fs::hard_link(&tmp, path).map_err(|_| err("BASS_CHECKPOINT_EXISTS"));
++        let tmp=path.with_extension(format!("new-{}",std::process::id()));
++        {use std::fs::OpenOptions; let mut file=OpenOptions::new().write(true).create_new(true).open(&tmp).map_err(|_|err("BASS_CHECKPOINT_EXISTS"))?;
++            file.write_all(text.as_bytes()).map_err(ioerr)?; file.sync_all().map_err(ioerr)?;}
++        let published=fs::hard_link(&tmp,path).map_err(|_|err("BASS_CHECKPOINT_EXISTS"));
+         fs::remove_file(&tmp).map_err(ioerr)?;
+         published
+     }
+-    pub fn read_bass_checkpoint(
+-        &self,
+-        path: &Path,
+-        epoch: &str,
+-        output: &Path,
+-    ) -> Result<DriverState, ForwardError> {
+-        let id = self.bass_identity().ok_or(err("BASS_CHECKPOINT_MODE"))?;
+-        let text = fs::read_to_string(path).map_err(|_| err("BASS_CHECKPOINT_IO"))?;
+-        if text.starts_with("AXBI_CHECKPOINT_V4") {
+-            return Err(err("BASS_REJECT_LEGACY_CHECKPOINT"));
+-        }
+-        let (head, body) = text
+-            .split_once("\nAXBI_CHECKPOINT_V4\n")
+-            .ok_or(err("BASS_CHECKPOINT_TRUNCATED"))?;
+-        let lines = head.lines().collect::<Vec<_>>();
+-        if lines.len() != 11 || lines[0] != "BASS_REI_CHECKPOINT_V1" {
+-            return Err(err("BASS_CHECKPOINT_VERSION_OR_SHAPE"));
+-        }
+-        let expected = format!(
+-            "{}|{}|{}|{}|{}",
+-            id.producer_commit,
+-            id.source_csv_sha256,
+-            id.source_manifest_sha256,
+-            id.case,
+-            id.grid_points
+-        );
+-        if lines[1] != expected {
+-            return Err(err("BASS_CHECKPOINT_SOURCE_BINDING"));
+-        }
+-        if lines[2]!=format!("BASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}|inactive_hi_split={}",self.config.transport_cells,self.config.inactive_hi_split) {return Err(err("BASS_CHECKPOINT_PROVIDER_SCHEMA"));}
+-        if lines[3]!="DONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE008" {return Err(err("BASS_CHECKPOINT_REI_BASE"));}
+-        if lines[4] != sha256_bytes(compiled_identity().as_bytes())? {
+-            return Err(err("BASS_CHECKPOINT_NATIVE_SOURCE"));
+-        }
+-        if lines[5] != sha256_bytes(format!("{:?}", self.config).as_bytes())? {
+-            return Err(err("BASS_CHECKPOINT_CONFIG"));
+-        }
+-        if lines[6] != format!("{}|{}", epoch, output.display()) {
+-            return Err(err("BASS_CHECKPOINT_EPOCH_OUTPUT"));
+-        }
+-        let output_bytes = fs::read(output).map_err(|_| err("BASS_CHECKPOINT_OUTPUT_IO"))?;
+-        if lines[7] != sha256_bytes(&output_bytes)? {
+-            return Err(err("BASS_CHECKPOINT_OUTPUT_SHA256"));
+-        }
+-        let full_body = format!("AXBI_CHECKPOINT_V4\n{body}");
+-        if lines[9] != sha256_bytes(full_body.as_bytes())?
+-            || lines[10].parse::<usize>().ok() != Some(full_body.len())
+-        {
++    pub fn read_bass_checkpoint(&self,path:&Path,epoch:&str,output:&Path)->Result<DriverState,ForwardError> {
++        let id=self.bass_identity().ok_or(err("BASS_CHECKPOINT_MODE"))?;
++        let text=fs::read_to_string(path).map_err(|_|err("BASS_CHECKPOINT_IO"))?;
++        if text.starts_with("AXBI_CHECKPOINT_V4") {return Err(err("BASS_REJECT_LEGACY_CHECKPOINT"));}
++        let (head,body)=text.split_once("\nAXBI_CHECKPOINT_V4\n").ok_or(err("BASS_CHECKPOINT_TRUNCATED"))?;
++        let lines=head.lines().collect::<Vec<_>>();
++        let version=if self.research_numerics==BassResearchNumerics::Legacy {"BASS_REI_CHECKPOINT_V1"} else {"BASS_REI_CHECKPOINT_V2"};
++        if lines.len()!=11 || lines[0]!=version {return Err(err("BASS_CHECKPOINT_VERSION_OR_SHAPE"));}
++        let expected=format!("{}|{}|{}|{}|{}",id.producer_commit,id.source_csv_sha256,id.source_manifest_sha256,id.case,id.grid_points);
++        if lines[1]!=expected {return Err(err("BASS_CHECKPOINT_SOURCE_BINDING"));}
++        let algorithm=if self.research_numerics==BassResearchNumerics::Legacy {String::new()} else {format!("|algorithm={:?}|newton_tolerance={:.1e}",self.research_numerics,self.research_numerics.tolerance())};
++        if lines[2]!=format!("BASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}{}",self.config.transport_cells,algorithm) {return Err(err("BASS_CHECKPOINT_PROVIDER_SCHEMA"));}
++        if lines[3]!="REI_NATIVE_SOURCE=0e25846433170d0f420c4cda44a0bedbf02cd177|REI_OWNER_BASE=7cb4ac678be019b736e85db76dfbdc7c51e380e9" {return Err(err("BASS_CHECKPOINT_REI_BASE"));}
++        if lines[4]!=sha256_bytes(compiled_identity().as_bytes())? {return Err(err("BASS_CHECKPOINT_NATIVE_SOURCE"));}
++        if lines[5]!=sha256_bytes(format!("{:?}",self.config).as_bytes())? {return Err(err("BASS_CHECKPOINT_CONFIG"));}
++        if lines[6]!=format!("{}|{}",epoch,output.display()) {return Err(err("BASS_CHECKPOINT_EPOCH_OUTPUT"));}
++        let output_bytes=fs::read(output).map_err(|_|err("BASS_CHECKPOINT_OUTPUT_IO"))?;
++        if lines[7]!=sha256_bytes(&output_bytes)? {return Err(err("BASS_CHECKPOINT_OUTPUT_SHA256"));}
++        let full_body=format!("AXBI_CHECKPOINT_V4\n{body}");
++        if lines[9]!=sha256_bytes(full_body.as_bytes())? || lines[10].parse::<usize>().ok()!=Some(full_body.len()) {
+             return Err(err("BASS_CHECKPOINT_BODY_SHA256_OR_SIZE"));
+         }
+-        let state = self.read_checkpoint_text(&full_body)?;
+-        let p = self.geometry_point(state.a)?;
+-        let current = list(&[state.a, p.time_s, p.b, p.h_per_s, p.s_per_s]);
+-        if lines[8] != current.replace(' ', "|") {
+-            return Err(err("BASS_CHECKPOINT_GEOMETRY_STATE"));
+-        }
++        let state=self.read_checkpoint_text(&full_body)?;
++        let p=self.geometry_point(state.a)?;
++        let current=list(&[state.a,p.time_s,p.b,p.h_per_s,p.s_per_s]);
++        if lines[8]!=current.replace(' ',"|") {return Err(err("BASS_CHECKPOINT_GEOMETRY_STATE"));}
+         Ok(state)
+     }
+     pub fn output_row(
+@@ -1864,11 +1813,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
+         fs::write(out.join("config.cfg"), config_text).map_err(ioerr)?;
+         fs::write(out.join("source_identity.txt"), compiled_identity()).map_err(ioerr)?;
+         fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
+-        fs::write(
+-            out.join("transport_variant.txt"),
+-            driver.transport_mode_metadata(),
+-        )
+-        .map_err(ioerr)?;
++        fs::write(out.join("transport_variant.txt"), format!("inactive_hi_split={}\npassive_scope=q0_forward_monotonic_only\ncheckpoint_version=V4\ntransport_threads={}\nparallel_scope=persistent_cell_prepare_and_opt_in_jacobian_columns\nparallel_jacobian_columns={}\n", driver.config.inactive_hi_split, driver.config.transport_threads, driver.config.parallel_jacobian_columns)).map_err(ioerr)?;
+         fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=fixed reference-q two-moment transport; total N/U includes active and passive source photons; support columns are conservative active-support/passive-cell envelope union, not a recovered density or exact populated support; Gamma uses active photons only; radiation stress includes both pools; legacy boundary outflow remains zero\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
+     }
+     let mut h=open_output(&out.join("history.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,b,H_per_s,s_per_s,x_HII,x_HeII,x_HeIII,nH_proper_cm3,ne_proper_cm3,temperature_K,Gamma_HI_per_s,Gamma_HeI_per_s,Gamma_HeII_per_s,photon_n_per_H,photon_u_eV_per_H,J0_photon_u_eV_per_H,J1_photon_u_eV_per_H,J2_photon_u_eV_per_H,x_HI,x_HeI")?;

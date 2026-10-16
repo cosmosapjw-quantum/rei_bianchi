@@ -1,0 +1,66 @@
+{
+  "schema": "rei.lrs.v10.dag.progress.1",
+  "claim_status": "SCOPED_PASS_EXPERIMENTAL_RESULT_SOURCE_ON_SECOND_ORDER_HOLD",
+  "base_pr": 169,
+  "base_sha": "0cf419eb61f52f24adcfcbaa3afa055176276b6e",
+  "frozen_native_owner": "6ea2b1b4b3875c9163cafc45efe720afded43fc4",
+  "pr167_experimental_donor": "1e6a3dd60d69b22483d07a30541736018a69dea8",
+  "nodes": {
+    "V10_OWNER_INTAKE": {
+      "status": "EXECUTED",
+      "evidence": "NCP_RUN_RECEIPT.json",
+      "note": "Original owner source SHA checked; PR167 donor patch separately identified; original N8 baseline first 41 CSV columns byte-equal to derivative legacy mode."
+    },
+    "V10_NATIVE_CLOCK_MATRIX": {
+      "status": "EXECUTED_REVIEWED_SCOPED_PASS",
+      "evidence": "NCP_RUN_RECEIPT.json",
+      "histories": 51,
+      "main_matrix": "8 modes x N=8,16,32,64,128; selected N512/1024/2048 and two N128 Newton controls",
+      "tests": "axbi_driver 13/13 PASS",
+      "source_on_second_order": "HOLD_OBSERVED_T_ORDER_APPROX_1"
+    },
+    "V10_INDEPENDENT_SCIENCE_REVIEW": {
+      "status": "SCOPED_PASS_WITH_SOURCE_ON_SECOND_ORDER_HOLD",
+      "requires": [
+        "V10_NATIVE_CLOCK_MATRIX"
+      ],
+      "evidence": "INDEPENDENT_REVIEW_KO.md"
+    },
+    "V10_GITHUB_PUBLICATION": {
+      "status": "DRAFT_PR_OPEN",
+      "requires": [
+        "V10_INDEPENDENT_SCIENCE_REVIEW"
+      ],
+      "evidence": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/172"
+    },
+    "V10_DUAL_CLOUD_READBACK": {
+      "status": "PASS_BOTH_RAW_AND_CODE_RESULTS",
+      "raw_archive_sha256": "822f176dabb2d554abfabd6c13cff5779b8ff35e541e62d1d8724d27b1aa1a32",
+      "evidence": "V10_DELIVERY_RECEIPT.json"
+    },
+    "V11_GL2_SOURCE_AGE_COHORT": {
+      "status": "READY_AFTER_REVIEW",
+      "requires": [
+        "V10_INDEPENDENT_SCIENCE_REVIEW"
+      ],
+      "scope": "HE25/26 and bass_cr C21B proper-time GL2 cohort source age plus moving threshold cuts at fixed native inputs"
+    },
+    "V11_SOURCE_OFF_COLLISION_THERMAL_CLOCKS": {
+      "status": "READY_AFTER_CONTRACT",
+      "requires": [
+        "V10_INDEPENDENT_SCIENCE_REVIEW"
+      ],
+      "scope": "With source and initial photons zero, separate CI, CE, free-free and CMB endpoint timing from geometry split; GL2 source age is not a dependency"
+    },
+    "V11_SOURCE_ON_COLLISION_THERMAL_CLOCKS": {
+      "status": "HOLD_PENDING_MATCHED_SOURCE_CONTROL",
+      "requires": [
+        "V11_GL2_SOURCE_AGE_COHORT"
+      ],
+      "scope": "After matched source-age/cohort control, isolate the remaining CI, CE, free-free and CMB clocks in source-on runs"
+    },
+    "FULL_EOR_CASEB_SIGNED_BIANCHI": {
+      "status": "HOLD_NOT_EVALUATED"
+    }
+  }
+}
