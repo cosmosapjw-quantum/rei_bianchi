@@ -1,0 +1,156 @@
+{
+  "contract_id": "R9-C8-bounded-union-QZ-conditioning-repair",
+  "frozen_date": "2026-10-15",
+  "inherits": [
+    "CONTRACT_FINAL_BASIS.json",
+    "CONTRACT_MICROPHYSICS_V3_TWOE.json"
+  ],
+  "execution_cases": [
+    {
+      "kind": "quench",
+      "basis": "aug-cc-pvqz",
+      "basis_elements": [
+        "He",
+        "Li"
+      ],
+      "initial_symbol": "He",
+      "final_symbol": "Li",
+      "initial_charge": 0,
+      "final_charge": 1,
+      "spin": 0,
+      "nelec": [
+        1,
+        1
+      ],
+      "resource_gated": true,
+      "fci_tol": 1e-13,
+      "id": "quench_He_Li_union_aug_QZ_cond1e_7",
+      "s_cutoff": 1e-7
+    },
+    {
+      "kind": "quench",
+      "basis": "aug-cc-pvqz",
+      "basis_elements": [
+        "He",
+        "Li"
+      ],
+      "initial_symbol": "He",
+      "final_symbol": "Li",
+      "initial_charge": 0,
+      "final_charge": 1,
+      "spin": 0,
+      "nelec": [
+        1,
+        1
+      ],
+      "resource_gated": true,
+      "fci_tol": 1e-13,
+      "id": "quench_He_Li_union_aug_QZ_cond1e_6",
+      "s_cutoff": 0.000001
+    }
+  ],
+  "pilot_execution_cases": [
+    {
+      "kind": "quench",
+      "basis": "aug-cc-pvqz",
+      "basis_elements": [
+        "He",
+        "Li"
+      ],
+      "initial_symbol": "He",
+      "final_symbol": "Li",
+      "initial_charge": 0,
+      "final_charge": 1,
+      "spin": 0,
+      "nelec": [
+        1,
+        1
+      ],
+      "resource_gated": true,
+      "fci_tol": 1e-13,
+      "id": "quench_He_Li_union_aug_QZ_cond1e_7",
+      "s_cutoff": 1e-7
+    },
+    {
+      "kind": "quench",
+      "basis": "aug-cc-pvqz",
+      "basis_elements": [
+        "He",
+        "Li"
+      ],
+      "initial_symbol": "He",
+      "final_symbol": "Li",
+      "initial_charge": 0,
+      "final_charge": 1,
+      "spin": 0,
+      "nelec": [
+        1,
+        1
+      ],
+      "resource_gated": true,
+      "fci_tol": 1e-13,
+      "id": "quench_He_Li_union_aug_QZ_cond1e_6",
+      "s_cutoff": 0.000001
+    }
+  ],
+  "phase": "bounded_refinement_of_observed_metric_and_residual_defect",
+  "observed_defect": {
+    "same_retained_rank_at_cutoffs": [
+      1e-10,
+      1e-9
+    ],
+    "retained_rank": 126,
+    "orbital_metric_inf": 2.8e-8,
+    "original_H_residual_Eh": 1.5e-7
+  },
+  "decision": "Canonical shared AO metric cutoffs1e-7 and1e-6; no further unchanged-cutoff retry",
+  "model": {
+    "same_all_electron_Coulomb_Hamiltonian": true,
+    "same_parent_daughter_X": true,
+    "shared_retained_span_per_case": true,
+    "exact_twoelectron_singlet_FCI": true,
+    "physical_scope_unchanged": true
+  },
+  "numerics": {
+    "orbital_metric_inf_acceptance": 1e-8,
+    "original_H_residual_acceptance_Eh": 1e-7,
+    "twoelectron_residual_target_Eh": 1e-9,
+    "eigensolver_energy_tolerance_Eh": 1e-13,
+    "all_remaining_gates_unchanged": true
+  },
+  "resources": {
+    "workers": 1,
+    "threads_per_case": 12,
+    "memory_GiB_per_case": 24,
+    "case_wall_s": 7200,
+    "aggregate_all_work_cpu_cap": 48,
+    "aggregate_all_work_RSS_GiB": 96,
+    "retain_prior_estimate_guards": true,
+    "no_other_new_work": true
+  },
+  "required_comparison": [
+    "original_AO_rank",
+    "retained_rank",
+    "complete_overlap_eigenvalue_spectrum",
+    "relative_s_cutoff",
+    "orbital_metric_error",
+    "parent_energy_Eh",
+    "daughter_energy_Eh",
+    "both_original_H_residuals",
+    "P_ground",
+    "unresolved_complement",
+    "closure_error",
+    "delta_P_between_accepted_cutoffs",
+    "delta_parent_and_daughter_energies_between_accepted_cutoffs",
+    "comparison_to_accepted_aug_TZ"
+  ],
+  "interpretation": {
+    "rank_change": "explicit retained-basis change; not numerically identical to126-rank result",
+    "P_change_target": 0.0001,
+    "unchanged_rank": "not evidence of progress by itself; judge actual metric and residual",
+    "scope": "Conditioning sensitivity is separate from cardinal basis convergence",
+    "if_both_fail": "Stop this bounded repair and retain diagnostics; no automatic new cutoff or unchanged retry",
+    "if_one_passes": "Report accepted finite-space result with unresolved cutoff-sensitivity if othercase fails",
+    "if_both_pass": "Report both; prefer less aggressive cutoff only if gates pass and sensitivity is acceptable"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "contract_id": "R9_UNIT7_LANEC_DECAY_SPECTRUM_V1",
+  "status": "FROZEN_FOR_BOUNDED_EXECUTION",
+  "authority": {"requested": "Astra", "observed": "UNKNOWN"},
+  "scope": "donor-specific paper-line neutrino spectrum and source bookkeeping; no product-code edits",
+  "input_history": {
+    "path": "evidence/be_kinetics_history.csv",
+    "metadata": "evidence/BE_KINETICS_RESULT.json",
+    "z_order": "descending",
+    "z_bounds": [100000, 10000],
+    "required_columns": ["z", "x_Be3", "Fdecay", "dF_dz"],
+    "Fdecay": "cumulative fraction of initial Be7 decayed by epoch z; not normalized on finite window",
+    "p_z_column": "conditional density diagnostic only; do not use for amplitude",
+    "donor_YBe7_per_baryon": 3.784994236672219e-10,
+    "donor_direct_YLi7_per_baryon_excluded": 2.1819521581308123e-11,
+    "donor_YH_protium_per_baryon_for_ratio_check": 0.7530965905693692,
+    "nb0_cm-3": 2.47920954940649e-7,
+    "normalization": "N0=nb0*YBe7=nH0*XBe7"
+  },
+  "model": {
+    "source": "Khatri & Sunyaev arXiv:1009.3932v2 Eq10 literal approximation",
+    "branches": [
+      {"id": "ground", "fraction": 0.896, "E_emit_eV": 861800, "initial_daughter_recoil_estimate_eV": 56.5},
+      {"id": "excited", "fraction": 0.104, "E_emit_eV": 384200, "initial_daughter_recoil_estimate_eV": 11.2}
+    ],
+    "gamma_emit_eV": 477600,
+    "branch_rounding_policy": "use 0.896/0.104 throughout; do not mix section2 0.8956/0.1044",
+    "mapping": "E=E_emit/(1+z), z=E_emit/E-1",
+    "present_spectrum": "q_j(E)=N0*b_j*(-dF_dz)*E_emit/E^2 evaluated at z(E)",
+    "flavor_label": "electron-flavor emitted; present spectrum all propagated flavors summed",
+    "mass_domain": "ultrarelativistic E_obs >> m_i*c^2; no mass precision inferred",
+    "exact_Q_closure": false,
+    "deposited_heat_model": null
+  },
+  "primary_export": {
+    "method": "raw-F piecewise-linear-in-z conservative pushforward; analytic cell moments",
+    "energy_edges_eV": {"min": 0, "max": 100, "step": 0.025},
+    "bin_redshift_interval": "[Eemit/Ehi-1,Eemit/Elo-1] intersect history support; E_lo=0 uses infinity",
+    "cell_slope": "s=(F(zlo)-F(zhi))/(zhi-zlo)",
+    "cell_M0": "N0*b*s*(zhi-zlo)",
+    "cell_M1": "N0*b*s*Eemit*log1p((zhi-zlo)/(1+zlo))",
+    "cell_M2": "N0*b*s*Eemit^2*(1/(1+zlo)-1/(1+zhi))",
+    "normalization_forcing": false,
+    "negative_increment_clipping": false,
+    "moment_units": ["cm^-3", "eV cm^-3", "eV^2 cm^-3"],
+    "bin_table": "evidence/decay_neutrino_spectrum.csv",
+    "profile_table": "evidence/decay_neutrino_profile.csv",
+    "profile_method": "rate-derived dF_dz on native redshift points mapped separately for each branch",
+    "result": "evidence/DECAY_SPECTRUM_RESULT.json"
+  },
+  "required_results": [
+    "donor N0, DeltaF, early F(zmax), surviving 1-F(zmin), all normalization conventions; numerically check nH0*(YBe7/YH)=nb0*YBe7 using donor YH",
+    "branch count, present M1 and M2, mean, standard deviation, quantiles .05 .16 .50 .84 .95",
+    "branch mode of dn/dE and FWHM from rate-derived profile, interpolation method recorded",
+    "combined total present number and energy density and mean energy",
+    "computed-support and cropped [12,35]eV below/inside/above number closures",
+    "emitted neutrino/gamma and separate approximate initial recoil energy per donor and per cosmic baryon times DeltaF",
+    "absolute counts not conditional-renormalized; all emitted source versus present energy labels explicit",
+    "directLi7 omitted; no present-electron-flavor, deposited-heat, exact-Q, or mass-measurement claim"
+  ],
+  "checks": {
+    "number_closure_relative": 1e-11,
+    "M1_M2_closure_relative": 1e-10,
+    "toy_relative": 1e-11,
+    "branch_scaling_relative": 1e-10,
+    "independent_kinetic_jacobian_M0_M1_relative": 0.003,
+    "coarsened_native_CDF_mean_quantiles_relative": 0.003,
+    "toy": {"N0": 1, "branch_fraction": 1, "Eemit_eV": 12, "zlo": 1, "zhi": 3, "s": 0.5, "q": "6/E^2 on [3,6]eV", "N": 1, "M1": "6*log(2)", "M2": 18, "bins": [[3,4],[4,6]], "bin_counts": [0.5,0.5], "bin_M1": ["6*log(4/3)","6*log(3/2)"], "cropped_edges_eV": [3.5,5]},
+    "independent_method": "integrate rate-derived -dF_dz after Jacobian, not derivative of F interpolant",
+    "failure_policy": "return substantive invariant/tolerance violations to theory authority; one targeted repair, no silent renormalization"
+  },
+  "execution": {"additional_wall_time_limit_s": 15, "kind": "lightweight evidence calculation only", "product_code": false, "H_NCP": false, "paper_figure_extraction": false},
+  "next_action_on_pass": "independent Astra scientific review of donor-specific spectra and closure residuals"
+}

@@ -1,0 +1,180 @@
+{
+  "schema": "rei.r9.unit6.residual_qr_contract.v1",
+  "status": "FROZEN_READY_FOR_LOWER_TIER_IMPLEMENTATION",
+  "author": {
+    "role": "scientific authority",
+    "requested_model": "Astra",
+    "observed_runtime_model": "UNKNOWN"
+  },
+  "authoritative_theory": "spec/RESIDUAL_THEORY.md",
+  "baseline": {
+    "unit5": "/workspace/scratch/37bc4acea758/r9_unit5_t4_resume_20261016",
+    "unit5_code_sha256": "2c19a310c7024c8e5249534a4b1e78acd1f30c1c44d9f9f00d78ad2abcc8926b",
+    "unit5_review": "PASS_SCOPED_LOCAL_IMPLEMENTATION",
+    "comparison": "numerical observables and residual invariants; no QR factor byte/phase equality"
+  },
+  "physics": {
+    "energy_units": "Eh",
+    "operator": "Q(H-E0)Q",
+    "integral_policy": "unchanged repair001",
+    "new_physical_H_actions": 0,
+    "new_NCP_actions": 0,
+    "actual_checkpoint_execution": "NOT_RUN",
+    "actual_refinement": "HOLD"
+  },
+  "formula": {
+    "C": "V.conj().T @ KV",
+    "J": "(C+C.conj().T)/2",
+    "d": "u-V[:,0]",
+    "E": "KV-V@J",
+    "A": "column_stack([d,E])",
+    "x": "concatenate([1,t])",
+    "t": "solve(z*I-J,e1) via Hermitian eigendecomposition",
+    "residual_norm": "norm(R@x)",
+    "coordinate_delta": "abs((u.conj()@V-e1.conj())@t)",
+    "B": "norm(u)*residual_norm/eta+coordinate_delta",
+    "density_bound": "W*B/pi"
+  },
+  "api": {
+    "module": "code/residual_qr.py",
+    "functions": [
+      "streamed_residual_factor(V, KV, u, block_rows=64) returns J,R,delta_row,norm_u,scale diagnostics",
+      "residual_diagnostic_qr(V, KV, u, W, grid, etas, block_rows=64, batch_points=256) returns Unit5-compatible arrays plus summary",
+      "streamed_qr(row_blocks) helper accepting arbitrary finite double real/complex blocks for independent cancellation test"
+    ],
+    "inputs": "finite float64/complex128-compatible floating arrays; reject integer/object; V/KV shape(N,m), u shape(N,), N>=m>=1; W finite real >=0; nonempty finite real 1D grid and etas, each eta>0",
+    "cap": "CLI m<=128; local validation N<=512,m<=32; no new production authorization inferred",
+    "side_effects": "no operator imports or callbacks, no network, no active runner patch",
+    "streaming": "two row passes; never allocate full E or A inside QR method; global V/KV loading permitted with explicit cache-memory disclosure; reduced QR handles short/rank-deficient blocks"
+  },
+  "cli": {
+    "command": "python code/residual_qr.py postprocess --checkpoint LOCAL.npz --weight 1.0 --out NEW_OUTPUT_DIRECTORY --block-rows 64 --batch-points 256",
+    "checkpoint_arrays": [
+      "V",
+      "KV",
+      "u"
+    ],
+    "loading": "numpy.load allow_pickle=False; other checkpoint keys ignored, with no actual-checkpoint semantic compatibility claim",
+    "weight": "required explicit --weight, never infer unavailable physical W",
+    "grid_defaults_Eh": {
+      "start": 0.0,
+      "stop": 20.0,
+      "step": 0.01,
+      "count": 2001
+    },
+    "eta_defaults_Eh": [
+      0.05,
+      0.1,
+      0.2
+    ],
+    "outputs": [
+      "residual.npz",
+      "residual_summary.json"
+    ],
+    "output_arrays": [
+      "grid",
+      "etas",
+      "scalar_resolvent",
+      "scalar_bound",
+      "density_bound",
+      "residual_norm",
+      "coordinate_delta"
+    ],
+    "output_semantics": "same eta-major ordering as Unit5; new directory required; no silent overwrite",
+    "summary_required": [
+      "classification",
+      "formula",
+      "evaluation=streamed QR",
+      "changes_refinement_rule=false",
+      "max_scalar_bound_per_eta",
+      "max_density_bound_per_eta",
+      "grid_integral_density_bound_per_eta",
+      "N",
+      "m",
+      "block_rows",
+      "dtype",
+      "setup_s",
+      "evaluation_s",
+      "cache_storage_bytes",
+      "workspace_estimate_bytes",
+      "max_solve_defect",
+      "production_performance=NOT_MEASURED",
+      "physical_H_actions=0"
+    ]
+  },
+  "tolerances": {
+    "epsilon": "numpy.finfo(float64).eps",
+    "alpha": "norm(d)+norm(E,'fro')*norm(t)",
+    "rho": "norm(u)+norm(V[:,0])+(norm(KV,'fro')+norm(V,'fro')*norm(J,2))*norm(t)",
+    "norm_slack": "5e-12*max(1,alpha)+50*epsilon*max(1,rho)",
+    "qr_vs_direct": "abs(rn_qr-rn_direct)<=norm_slack at every point",
+    "B_vs_direct": "abs(B_qr-B_direct)<=norm(u)*norm_slack/eta+1e-11*max(1,abs(B_direct))",
+    "scalar_vs_dense_J_solve": "absolute error<=1e-11*max(1,abs(reference))",
+    "solve_defect": "norm(e1-(zI-J)t)<=1e-11*max(1,(abs(z)+norm(J,2))*norm(t))",
+    "dense_full_error_bound": "abs(u.conj()@solve(zI-K,u)-t[0])<=B_qr+1e-10*max(1,abs(full_reference))+norm(u)*norm_slack/eta",
+    "exact_fixture": "absolute error<=1e-12*max(1,abs(exact_value))",
+    "tiny_cancellation_fixture": "abs(rn-1e-10)<=1e-6*1e-10+1e-15",
+    "zero_residual_fixture": "rn and B <=1e-12",
+    "claim": "engineering thresholds for bounded double fixtures, not outward rounding guarantees"
+  },
+  "required_tests": [
+    "exact real 2x2 K=[[2,1],[1,3]],V=u=e1,z=2+i: rn=1,B=1,full=(1-3i)/5,error=1/sqrt(5)",
+    "exact complex K=diag(1,3),V=u=(1,i)/sqrt(2),z=2+i: rn=1,B=1,full=-i/2,error=1/2",
+    "exact nonorthogonal K=diag(2,3),V=2e1,u=e1,z=8+i: rn=sqrt(145),delta=1,B=sqrt(145)+1",
+    "invariant coordinate-subspace zero residual",
+    "standalone A=[e1,e1+1e-10*e2],x=[1,-1] QR resolution; log raw Gram result without requiring a specific Gram failure",
+    "seed20261016 real and complex Hermitian fixtures with truncated V and independently solved full resolvent",
+    "nonorthogonal V and nonzero initial-coordinate defect with KV=K@V; independent physical scalar bound",
+    "near-invariant Hermitian block coupling1e-12; direct residual comparison",
+    "block_rows1,p-1,p,>N and unequal final block; compare norms not R phases",
+    "rank deficient A; no diagonal division/rank truncation",
+    "reject shape/nonfinite/eta<=0/negative W/integer-object array errors",
+    "CLI synthetic local NPZ smoke with explicit weight; preserve eta-major output shape and zero physical actions",
+    "separate intentionally inconsistent synthetic KV_bad=K@V+V*S, skew-Hermitian S norm1e-5: material C-J catches KV-VC error; compare QR to direct using J, no full-space physical-bound claim"
+  ],
+  "performance": {
+    "single_comparison": "seed20261016,N=512,m=32,float64,P=6003,identical V/KV/u/grid/etas and precision; time direct Unit5-formula implementation versus QR including each method setup; report setup/eval/total and observed ratio once",
+    "direct_reference": "local direct formula reference allowed; no modifications to Unit5 or imports that initialize production paths",
+    "cost": "O(N*m^2+ceil(N/b)*m^3+m^3+P*m^2), existing cache O(Nm), extra workspace O(bm+m^2+m*batch+P)",
+    "pass_requires_speedup": false,
+    "production_speedup": "NOT_MEASURED"
+  },
+  "execution_limits": {
+    "dense_N_max": 512,
+    "m_max": 32,
+    "wall_s_per_command": 30,
+    "BLAS_threads": 1,
+    "OMP_threads": 1,
+    "remote_execution": false,
+    "external_checkpoint_download": false
+  },
+  "allowed_writes": [
+    "code/residual_qr.py",
+    "tests/test_residual_qr.py",
+    "tests/run_residual_evidence.py",
+    "results/laneA/**",
+    "docs/RESIDUAL_IMPLEMENTATION.md"
+  ],
+  "forbidden": [
+    "Unit5 edits",
+    "active runner changes",
+    "new physical Hamiltonian",
+    "NCP execution",
+    "cache/model convention changes",
+    "raw Gram primary norm",
+    "new convergence acceptance",
+    "production speed claim from local asymptotic argument"
+  ],
+  "evidence": [
+    "raw test stdout/stderr",
+    "fixture dimensions,seeds,dtypes and block sizes",
+    "max absolute/scaled norm and bound discrepancies",
+    "dense reference error and B",
+    "exact-case values",
+    "timing setup/evaluation/total for both methods",
+    "runtime model requested and observed separately"
+  ],
+  "failure_route": "stop and return to scientific authority on failed scientific tolerance or ambiguous convention; no autonomous threshold changes",
+  "stopping_rule": "one bounded suite and one independent scientific review, at most one explicitly authorized targeted repair; stop after PASS_SCOPED_LOCAL or scoped HOLD",
+  "pass_next_action": "retain standalone opt-in module and publish scoped local evidence; production activation remains separately authorized"
+}

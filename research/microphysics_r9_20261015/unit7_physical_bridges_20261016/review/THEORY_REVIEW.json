@@ -1,0 +1,73 @@
+{
+  "schema": "rei.r9.unit7.joint_independent_theory_review.v1",
+  "decision": "PASS_FROZEN_THEORY_ALL_THREE_LANES",
+  "reviewer": {
+    "role": "independent scientific reviewer",
+    "requested_model": "Astra",
+    "observed_runtime_model": "UNKNOWN"
+  },
+  "review_method": "Read-only independent source and mathematical inspection; no product implementation or numerical execution.",
+  "baseline": "Unit6 review/IMPLEMENTATION_REVIEW.json used as claim-boundary baseline only.",
+  "primary_sources_inspected": [
+    "inputs/verner/phfit2.f original provider source",
+    "Unit6 inputs/laneC/R5_DONOR_BBN.json",
+    "Khatri and Sunyaev arXiv:1009.3932v2, MPA3083.pdf equations 5-10"
+  ],
+  "lane_decisions": {
+    "LI_PHOTO": {
+      "decision": "PASS_FROZEN_THEORY",
+      "contracts": [
+        "spec/LI_PHOTO_CONTRACT.json",
+        "spec/LI_PHOTO_THEORY.md"
+      ],
+      "findings": [
+        "Provider occupied-shell indices and PH2-to-PH1 switch at 64.39 eV match source branches, with no additional occupancy multiplier.",
+        "Cross-section units and direct primary kinetic/configuration-energy decomposition are consistent.",
+        "Integration split at thresholds, legacy-band comparison and independent quadrature discriminate branch and response errors."
+      ]
+    },
+    "BE_KINETICS": {
+      "decision": "PASS_FROZEN_THEORY",
+      "contracts": [
+        "spec/BE_KINETICS_CONTRACT.json",
+        "spec/BE_KINETICS_THEORY.md"
+      ],
+      "findings": [
+        "Physical-time three-state generator is conservative and positive; redshift and u signs agree with source.",
+        "Total recombination, detailed balance beta without extra factor two, and 106.4-day hydrogenic capture match the stated source approximation.",
+        "Endpoint maximum of ne/Saha bounds the omitted interval because its sole interior stationary point is a minimum; radiation-only time gives an upper bound.",
+        "Stable eigenvalue product form, frozen propagator and integrated positive decay reward follow analytically from the two-state generator.",
+        "Trace free/bound electron, ionic/nuclear charge and neutrino ledgers conserve the relevant quantities without asserting a self-consistent bath.",
+        "Fixed refinement/reference/start/QSS tolerances are bounded numerical criteria; any concrete failure returns once for authority interpretation."
+      ]
+    },
+    "DECAY_SPECTRUM": {
+      "decision": "PASS_FROZEN_THEORY",
+      "contracts": [
+        "spec/DECAY_SPECTRUM_CONTRACT.json",
+        "spec/DECAY_SPECTRUM_THEORY.md"
+      ],
+      "findings": [
+        "Positive spectrum requires -Fprime and absolute Jacobian Eemit/Eobserved^2, with no extra present-density dilution.",
+        "Raw cumulative-F pushforward preserves the actual finite-window donor count; direct BBN lithium and conditional-density renormalization are excluded.",
+        "Analytic cell zeroth/first/second moments, quantile orientation and discriminating toy are correct.",
+        "Literal paper branch rounding, flavor-summed propagation, ultrarelativistic domain and approximate recoil are labeled consistently."
+      ]
+    }
+  },
+  "substantive_findings": [],
+  "repair_authorizations": [],
+  "authorized_packaging": "Controller authorized exact immutable input/helper copies and portable path lookup; this does not alter scientific formulas or tolerances.",
+  "implementation_admission": "PENDING_ACTUAL_CODE_TEST_AND_RAW_OUTPUT_REVIEW",
+  "claim_ceiling": [
+    "Smooth conditional Li I direct photoabsorption response only, not final charge, Auger or heat yield.",
+    "Three-state donor-specific early-epoch trace kinetics only, not full donor charge/plasma evolution.",
+    "Conservative idealized decay-line spectrum and source bookkeeping, not exact ionic Q closure or deposited heat.",
+    "No physical checkpoint advancement, external NCP result or refinement admission."
+  ],
+  "physical_H_actions": 0,
+  "NCP_actions": 0,
+  "actual_checkpoint_execution": "NOT_RUN",
+  "actual_refinement": "HOLD",
+  "next_action": "Execute the frozen bounded contracts with lower-tier agents and submit code, focused tests and raw results for independent lane and joint implementation decisions."
+}

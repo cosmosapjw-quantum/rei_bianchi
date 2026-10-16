@@ -1,0 +1,49 @@
+{
+  "contract_id": "R9-FCI-BO-QUENCH-RESPONSE-v3-twoelectron-backend",
+  "inherits": "CONTRACT_MICROPHYSICS_V2.json",
+  "scope": "exact_singlet_twoelectron_backend_only",
+  "model_unchanged": true,
+  "trigger": "PySCF cistring spin machinery cannot represent >=64 orbitals, or explicit backend validation",
+  "representation": {
+    "matrix": "C_ij in product alpha_i beta_j basis",
+    "singlet": "C=C.T",
+    "normalization": "vdot(C,C)=1",
+    "symmetric_packed_dimension": "norb*(norb+1)/2",
+    "unpack_diagonal": "Cii=vii",
+    "unpack_offdiagonal": "Cij=Cji=vij/sqrt(2)",
+    "pack_diagonal": "vii=Cii",
+    "pack_offdiagonal": "vij=sqrt(2)*Cij"
+  },
+  "integrals": {
+    "h": "orthonormal orbital one-electron Hamiltonian",
+    "eri": "chemist eri[a,b,c,d]=(ab|cd)"
+  },
+  "action": "HC=h@C+C@h.T+einsum('prqs,rs->pq',eri,C)",
+  "eigensolver": {
+    "type": "scipy.sparse.linalg.LinearOperator plus eigsh",
+    "which": "SA",
+    "ground_singlet": true,
+    "full_dense_manybody_H": false
+  },
+  "observables": {
+    "overlap": "vdot(Cf,Ci) or equivalent packed symmetric inner product",
+    "spin2": "1-real(vdot(C,C.T)) for normalized C",
+    "RDM1": "C@C.conj().T+C.T@C.conj()",
+    "RDM1_trace": 2,
+    "residual": "norm(HC-E*C) in full Frobenius norm",
+    "moments": "H actions with identical exact operator"
+  },
+  "validation": {
+    "same_small_basis_against_PySCF_required": true,
+    "energy_abs_diff_Eh": 1e-9,
+    "quench_probability_abs_diff": 1e-8,
+    "action_comparison_relative_tolerance": 1e-10,
+    "normalization_and_residual_gates": "inherit v1; two-electron residual target1e-9Eh",
+    "test_integral_order": "compare arbitrary normalized symmetric small-basis vectors, not only ground eigenvalue"
+  },
+  "limits": {
+    "same_V1_resources": true,
+    "threeelectron_backend": "standard PySCF only within supported orbital count; no silent truncation",
+    "backend_limit_is_not_physical_no_go": true
+  }
+}

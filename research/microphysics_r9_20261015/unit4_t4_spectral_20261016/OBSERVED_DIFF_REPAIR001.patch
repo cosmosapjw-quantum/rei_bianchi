@@ -1,0 +1,116 @@
+--- /tmp/rei-r9-unit4-zBj67G/repair_001/original_t4_spectral.py	2026-10-16 09:13:55.458059734 +0900
++++ /tmp/rei-r9-unit4-zBj67G/repair_001/code/t4_spectral.py	2026-10-16 09:12:49.078186108 +0900
+@@ -213,6 +213,33 @@
+     return next(int(line.split()[1]) for line in lines if line.startswith('MemAvailable:')) / 1024**2
+ 
+ 
++def carried_deadline_seconds(deadline_utc, now_epoch=None):
++    """Seconds remaining on the original allocation, including prior runs."""
++    deadline = dt.datetime.fromisoformat(deadline_utc.replace('Z', '+00:00'))
++    require(deadline.tzinfo is not None, 'deadline must be timezone-aware')
++    return deadline.timestamp() - (time.time() if now_epoch is None else now_epoch)
++
++
++def symmetric_integrals(h_raw, eri_raw):
++    """Apply the one approved real h and packed-ERI symmetry repair."""
++    require(np.isrealobj(h_raw) and np.isrealobj(eri_raw), 'real integral arrays required')
++    require(h_raw.ndim == 2 and h_raw.shape[0] == h_raw.shape[1], 'invalid h shape')
++    pair_count = h_raw.shape[0] * (h_raw.shape[0] + 1) // 2
++    require(eri_raw.shape == (pair_count, pair_count), 'invalid packed ERI shape')
++    h_skew = h_raw - h_raw.T
++    eri_skew = eri_raw - eri_raw.T
++    h_work = (h_raw + h_raw.T) / 2
++    eri_work = (eri_raw + eri_raw.T) / 2
++    measurements = {
++        'h_raw_symmetry_fro': float(np.linalg.norm(h_skew)),
++        'h_correction_fro': float(np.linalg.norm(h_work - h_raw)),
++        'eri_raw_symmetry_fro': float(np.linalg.norm(eri_skew)),
++        'eri_correction_fro': float(np.linalg.norm(eri_work - eri_raw)),
++        'packed_eri_shape': list(eri_raw.shape),
++    }
++    return h_work, eri_work, measurements
++
++
+ class ActionBudget:
+     def __init__(self, deadline, maximum=160, headroom_gib=20):
+         self.deadline, self.maximum, self.headroom_gib = deadline, maximum, headroom_gib
+@@ -438,11 +465,12 @@
+         return {'passed': False, 'gates': [{'name': 'orbital_metric_inf',
+                 'measured': metric if np.isfinite(metric) else str(metric), 'limit': 1e-8, 'pass': False}],
+                 'stage': 'before_ERI', 'integrals_included': False}, None
+-    h = X.conj().T @ (mol.intor('int1e_kin') + mol.intor('int1e_nuc')) @ X
++    h_raw = X.conj().T @ (mol.intor('int1e_kin') + mol.intor('int1e_nuc')) @ X
+     budget.check()
+-    eri = ao2mo.kernel(mol, X)
++    eri_raw = ao2mo.kernel(mol, X)
+     budget.check()
+-    native = v6.raw_action(h, eri, 92, (2, 1))
++    h_work, eri_work, symmetry = symmetric_integrals(h_raw, eri_raw)
++    native = v6.raw_action(h_work, eri_work, 92, (2, 1))
+     shape = arrays['CI_parent'].shape
+     def H(vector):
+         return budget.apply(lambda x: native(x.reshape(shape)).reshape(-1), vector)
+@@ -452,7 +480,8 @@
+                 receipt['daughter_energy_second_moment_Eh2'] / info['raw_parent_norm']**2, metric)
+     checks.update(resource_estimate=estimate, integrals_included=False,
+                   integral_policy='h/ERI reconstructed once in memory; not included in checkpoint',
+-                  frozen_raw_action_sha256=sha(source_path), nelec=list(mol.nelec), norb=92)
++                  frozen_raw_action_sha256=sha(source_path), nelec=list(mol.nelec), norb=92,
++                  symmetry_repair=symmetry)
+     def K(vector):
+         qv = project(vector, g)
+         return project(H(qv) - E0*qv, g)
+@@ -464,10 +493,13 @@
+     out = Path(config['out'])
+     resource.setrlimit(resource.RLIMIT_AS, (24*1024**3, 24*1024**3))
+     started = config['started_monotonic']
+-    budget = ActionBudget(started + 7200.)
++    budget = ActionBudget(time.monotonic() + carried_deadline_seconds(config['absolute_deadline_utc']),
++                          maximum=160-config['prior_Hamiltonian_actions'])
+     receipt = {'unit': UNIT, 'scope': SCOPE, 'started_utc': utc(), 'runtime': runtime(),
+                'status': 'failure', 'numerical_passed': False, 'NCP_execution_status': 'executed',
+-               'resume_implemented': False, 'integrals_included': False}
++               'resume_implemented': False, 'integrals_included': False,
++               'prior_Hamiltonian_actions': config['prior_Hamiltonian_actions'],
++               'absolute_deadline_utc': config['absolute_deadline_utc']}
+     try:
+         budget.check()
+         r, arrays, i, g, u, info = load_saved(config['receipt'], config['data'])
+@@ -502,6 +534,7 @@
+         print(receipt['traceback'], file=sys.stderr)
+     receipt.update(completed_utc=utc(), wall_s=time.monotonic()-started,
+                    Hamiltonian_actions=budget.actions,
++                   cumulative_Hamiltonian_actions=config['prior_Hamiltonian_actions']+budget.actions,
+                    peak_rss_kib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+                    checkpoint_exists=(out/'checkpoint.npz').exists())
+     dump(out / 'receipt.json', receipt)
+@@ -578,6 +611,8 @@
+             q.add_argument('--threads', type=int, default=12, choices=[12])
+             q.add_argument('--memory-gib', type=float, default=24., choices=[24.])
+             q.add_argument('--wall-s', type=float, default=7200., choices=[7200.])
++            q.add_argument('--absolute-deadline-utc', required=True)
++            q.add_argument('--prior-Hamiltonian-actions', type=int, required=True)
+     q = sub.add_parser('__worker', help=argparse.SUPPRESS)
+     q.add_argument('--config', required=True, type=Path)
+     return p
+@@ -604,13 +639,18 @@
+         started = time.monotonic()
+         require(os.cpu_count() >= 12, 'fewer than 12 host CPUs available')
+         require(sha(args.v6_source) == IDENTITIES['v6_source'], 'immutable V6 source mismatch')
++        require(0 <= args.prior_Hamiltonian_actions < 160, 'invalid carried action count')
++        remaining_wall_s = carried_deadline_seconds(args.absolute_deadline_utc)
++        require(remaining_wall_s > 0, 'cumulative_wall_limit_before_launch')
+         config = {k: str(getattr(args, k).resolve()) for k in ('receipt', 'data', 'v6_source', 'out')}
+-        config.update(started_monotonic=started, threads=12, memory_gib=24., wall_s=7200.)
++        config.update(started_monotonic=started, threads=12, memory_gib=24.,
++                      wall_s=remaining_wall_s, absolute_deadline_utc=args.absolute_deadline_utc,
++                      prior_Hamiltonian_actions=args.prior_Hamiltonian_actions)
+         dump(args.out/'worker_config.json', config)
+         env = os.environ | {'OMP_NUM_THREADS': '12', 'OPENBLAS_NUM_THREADS': '1',
+                             'MKL_NUM_THREADS': '1', 'NUMEXPR_NUM_THREADS': '1'}
+         command = [sys.executable, str(Path(__file__).resolve()), '__worker', '--config', str((args.out/'worker_config.json').resolve())]
+-        result = supervise(command, args.out, 7200., 24., env=env, started=started)
++        result = supervise(command, args.out, remaining_wall_s, 24., env=env, started=started)
+         print(json.dumps(result, indent=2, sort_keys=True))
+         return 0 if result['status'] in ('success', 'partial') else 3 if result['status'] == 'deferred' else 1
+     except Exception as e:

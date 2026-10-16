@@ -1,0 +1,57 @@
+{
+  "contract_id": "R9-FCI-BO-QUENCH-RESPONSE-v4-scf-orbital-fallback",
+  "inherits": [
+    "CONTRACT_MICROPHYSICS.json",
+    "CONTRACT_MICROPHYSICS_V2.json",
+    "CONTRACT_MICROPHYSICS_V3_TWOE.json"
+  ],
+  "scope": "SCF_initialization_failure_at_complete_space_FCI",
+  "physical_model_unchanged": true,
+  "SCF_convergence_required_for_FCI": false,
+  "priority_cases": [
+    "LiH_R20",
+    "LiH_R30"
+  ],
+  "fallback_order": [
+    {
+      "source": "existing_full_SCF_MOs",
+      "requirements": [
+        "finite_values",
+        "C.T@S@C identity within1e-8",
+        "full_retained_rank",
+        "valid_C2v_irrep_labels_if_symmetry_solver"
+      ]
+    },
+    {
+      "source": "canonical_overlap_orthogonalization",
+      "requirements": [
+        "same_overlap_cutoff1e-10_relative",
+        "block_by_irrep_when_using_symmetry_FCI",
+        "full_retained_orbitals",
+        "recompute_original_h_and_ERI"
+      ]
+    }
+  ],
+  "forbidden": [
+    "accept_HF_as_FCI",
+    "drop_unconverged_orbitals",
+    "freeze_core",
+    "truncate_virtual_space",
+    "change_spin_or_charge",
+    "accept_without_original_H_residual"
+  ],
+  "required_records": [
+    "scf_converged",
+    "scf_cycles",
+    "orbital_source",
+    "orbital_metric_error",
+    "retained_rank",
+    "fci_converged",
+    "original_H_residual",
+    "spin2",
+    "normalization",
+    "energy_rerun_check"
+  ],
+  "acceptance": "all V1 FCI numerical and spin/symmetry gates unchanged; SCF false and FCI true may be valid",
+  "threeelectron_orbital_limit_policy_unchanged": true
+}
