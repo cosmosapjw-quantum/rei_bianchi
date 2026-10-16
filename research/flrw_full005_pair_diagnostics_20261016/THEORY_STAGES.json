@@ -61,8 +61,15 @@
     },
     {
       "id": "R7",
-      "status": "pending",
-      "evidence_refs": []
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r7",
+        "probe_reconstruction.py",
+        "probe/RESULT.json",
+        "probe/stdout.log",
+        "probe/synthetic_sampling_gap.png"
+      ],
+      "reason": "Eight independent exact rational fixtures and actual sampled-spike calculation pass; final observed residual4.440892098500626e-16"
     },
     {
       "id": "R8",
@@ -92,6 +99,42 @@
       "exit_code": null,
       "reason": "Successful tool response with isError=false; expressions and residuals preserved. Tool execution has no operating-system exit code.",
       "tool_is_error": false
+    },
+    {
+      "id": "PROBE_INITIAL",
+      "status": "completed",
+      "command": "python3 research/flrw_full005_pair_diagnostics_20261016/probe_reconstruction.py",
+      "environment": "Separate lower-tier probe worker, Python3.12.14",
+      "evidence_refs": [
+        "THEORY.md#r7"
+      ],
+      "exit_code": 0,
+      "resources_reported_approximate": {
+        "cpu_seconds": 1.756,
+        "wall_seconds": 0.937,
+        "peak_rss_kib": 68192
+      },
+      "reason": "Initial worker execution reported to root; final artifacts supersede its hygiene-only precursor"
+    },
+    {
+      "id": "PROBE_FINAL",
+      "status": "completed",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 research/flrw_full005_pair_diagnostics_20261016/probe_reconstruction.py",
+      "environment": "Separate lower-tier probe worker, Python3.12.14, Matplotlib3.10.8",
+      "evidence_refs": [
+        "probe_reconstruction.py",
+        "probe/RESULT.json",
+        "probe/stdout.log"
+      ],
+      "exit_code": 0,
+      "resources": {
+        "cpu_seconds": 1.3194513529999998,
+        "wall_seconds": 0.4623350859983475,
+        "peak_rss_kib": 59868,
+        "native_solver_runs": 0,
+        "physical_history_reads": 0
+      },
+      "reason": "Hygiene correction prevents reused vendor bytecode writes; same mathematical outcomes"
     }
   ],
   "claims": [
@@ -100,22 +143,23 @@
       "statement": "Union-knot extrema and analytic segment integrals yield full-overlap PL reconstruction norms",
       "scope": "Finite ordered saved histories, positive-length overlap, exact-arithmetic theorem with binary64 implementation",
       "basis": [
-        "derived"
+        "derived",
+        "numerically checked"
       ],
       "evidence_refs": [
         "THEORY.md#r3",
         "THEORY.md#r5",
-        "evidence/wolfram_pl_integrals.json"
+        "evidence/wolfram_pl_integrals.json",
+        "probe/RESULT.json"
       ],
       "obligations": [
-        "R7 discriminating fixture",
         "C6-C9 implementation verification"
       ]
     }
   ],
   "next_actions": [
-    "R5 prove formulas and linear sweep",
-    "R6 inspect independent symbolic evidence",
-    "R7 inspect independent fixture execution"
+    "R8 scoped adoption",
+    "R9 frozen coding contract",
+    "R10 handoff"
   ]
 }
