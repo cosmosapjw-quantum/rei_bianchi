@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "unit_id": "flrw_nonlinear_error_budget_20261016",
+  "stage": "R6",
+  "status": "complete",
+  "verdict": "PASS_SCOPED_THEORY",
+  "reviewed_at_utc": "2026-10-16T01:42:53.161878+00:00",
+  "reviewer": {
+    "agent": "/root/full005_pair_review",
+    "role": "fresh independent read-only mathematical reviewer",
+    "requested_model": "gpt-6-astra/high",
+    "observed_model_identity": "not independently observed"
+  },
+  "scope": "R1-R5 derivations, source mapping, claim boundaries and eight frozen synthetic constructions; not C9 implementation admission or R7 execution evidence.",
+  "source_pin": "fdfda0fec423ccb7175552c7dc066be93ce347e1",
+  "source_inspection": {
+    "driver": "Pinned source excerpts include return before jacobian_columns. Local driver has a different blob and was excluded from pinned-source inference.",
+    "EOS": "Actual local igm_state.rs Git blob437365fbe329a10afe292f9dd7eebf549fef804c matches SOURCE_PIN; source and pinned R6 excerpt inspected."
+  },
+  "reviewed_inputs_sha256": {
+    "THEORY.md": "4421cbae6ea485052bb0b115b377b6ae818984f7d5632c3546784064b6ab4070",
+    "CONTRACT.json": "b88b848801a6505fb7cf4b8b128bda76050edd857e3501a4c8af89d24c18e51c",
+    "FIXTURE_SPEC.json": "f9bcdfe181fb3e131155229d29973462e44cb83a13e7b23c505d8ac8730eadd7",
+    "evidence/SOURCE_PIN.json": "329dd4b036aaf1bc37787503dc0fa9bc5818ef893d66ed0c9c72ed0e1973518f",
+    "evidence/SOURCE_EXCERPTS.txt": "4290a3fd2ab7bc49ac639e735fa2fdee1b166e78afc50f137e3cfbf4793b5d81",
+    "evidence/R6_SOURCE_EXCERPTS.txt": "31bef333152ad60ca7fa70943bc0368b785c8270cad4170cfa846d00df85c406",
+    "evidence/intake/WOLFRAM_INEXACT_BE.json": "0afe2a826787a3162f27f3e75913171eea4c81641af99e5aef771636d2321f9a",
+    "evidence/intake/WOLFRAM_ESTIMATOR_CANCELLATION.json": "2ef72b327d203d2125612aeb85269cd7382a86c723787223bfd54fbd418ab8c5",
+    "evidence/intake/WOLFRAM_EOS_CORRECTION.json": "5f9f6d97ea884c63235deb00e2f94af32951465575a90685f1ff66b70c83bc7c"
+  },
+  "method": "Independent algebra and source reading; inspected three existing Wolfram results. No new symbolic query, numerical execution, implementation change or native run.",
+  "checks": [
+    {
+      "id": "production_equation_and_stop",
+      "result": "pass_scoped",
+      "reason": "Pinned residual is candidate minus old state minus dt*RHS in fractions and eV/H. Native norm scales only energy by max(old/current energy,1e-6); Newton condition is <=1e-11. Adaptive fraction floor1e-5 and current-half energy floor1e-6 use a different norm. Photon blocks and strict adaptive inequalities remain outside this chemical correction."
+    },
+    {
+      "id": "accepted_iterate_binding",
+      "result": "pass_scoped",
+      "reason": "Pinned driver returns on successful norm at834-863, before jacobian_columns at866. An accepted-state J is not automatically available. R/J/state/dt/prepared context and Jacobian-construction cost must identify the same stage; substituting stale J is excluded."
+    },
+    {
+      "id": "scaled_system_and_sign",
+      "result": "pass_scoped",
+      "reason": "J delta=-R and delta=Sy z imply A z=-b with A=SR^-1 J Sy,b=SR^-1 R. Positive frozen diagonal scales give exact equivalence; A is not the derivative of a state-dependent normalized residual. Native-to-adaptive residual gain is max_i(SR_i/Sy_i), retaining the generally nonunit old/current energy ratio."
+    },
+    {
+      "id": "conditioning_and_backward_error",
+      "result": "pass_scoped",
+      "reason": "The matrix infinity norm is maximum absolute row sum; kappa_inf(A) and eta describe the supplied scaled linear system. Neither provides nonlinear root-error, stiffness or trajectory certification. Singular/nonfinite HOLD and finite ill-conditioning reported without an arbitrary threshold preserve scope."
+    },
+    {
+      "id": "nonlinear_bridge",
+      "result": "pass_scoped",
+      "reason": "Given a root and differentiability along its segment, -R(y)=Jbar*(y_star-y). Invertible Jbar gives the exact stated identity. Replacing Jbar by J(y), especially finite-difference J, requires additional neighborhood/remainder hypotheses for root-error certification. The contract withholds this inference."
+    },
+    {
+      "id": "BE_contamination",
+      "result": "pass_scoped",
+      "reason": "Residual convention (1+z)y_new-y_old=r gives full=q(y0+rF), fine=qh^2(y0+rA)+qh*rB. Their subtraction and qh^2-q=-z^2/((1+z)(2+z)^2) yield the stated formula. At z=1/200000, rF=-(z/(2+z))^2=-1/160000800001 cancels the pair signal exactly and abs(rF)<1e-11. For z>0, log(1+z/2)<z/2 implies qh^2>exp(-z), independently proving nonzero fine-versus-exact error. This is a scalar construction, not production splitting order."
+    },
+    {
+      "id": "EOS_projection",
+      "result": "pass_scoped",
+      "reason": "D=1+fHe+xHII+fHe(xHeII+2xHeIII) gives T=c*w/D. Combining fractions yields exact DeltaT=c*(D*dw-w*dD)/(D*(D+dD)); differentiation gives the linear projection and ratio1/(1+dD/D). Avoiding subtraction of nearby temperatures does not ensure relative accuracy when the numerator nearly cancels. Original positive w,k and physical fHe/fractions support the map; corrected-domain checks precede exact projection, with no clipping or state commit."
+    },
+    {
+      "id": "energy_units",
+      "result": "pass_scoped",
+      "reason": "With P=diag(1,1,1,u), transforming R,J,SR,Sy as specified cancels P in A,b,z. These and kappa remain invariant; the transformed correction is P*delta. Transforming kB with energy preserves temperature. Production adapter remains eV/H; this fixture belongs to the generic core."
+    },
+    {
+      "id": "eight_fixture_consistency",
+      "result": "pass_scoped",
+      "reason": "Identity gives delta=-R and valid composition. Coupled determinant=1201/200; species correction=(-12270,1040,1610)/1201 times1e-12 retains physical composition. Floor bridge gives native1e-11, correction norm1e-6 and target ratio1/10. Large inverse gives deltaH=-1e-3,norm5,invalid corrected hydrogen. Singular fixture has no unique solve. Unit change follows scaling. EOS cancellation has D=33/25,dD=117/12500 and proportional dw, yielding zero exact/linear thermal change with valid corrected fractions. BE follows exact cancellation. These check fixture design mathematically; R7 execution remains separate."
+    }
+  ],
+  "findings": [],
+  "correction_required": false,
+  "existing_symbolic_evidence": "Three supplied Wolfram outputs agree with independently checked BE and EOS identities; referenced above.",
+  "new_executions": {
+    "probe_runs": 0,
+    "tests": 0,
+    "native_builds": 0,
+    "native_solver_runs": 0,
+    "physical_history_reads": 0,
+    "PL_replays": 0
+  },
+  "record_creation": "Initial review-serialization command had a Python string quoting SyntaxError before any file write; corrected serialization only. No scientific execution was affected.",
+  "claim_decision": {
+    "theory": "Adopt conditional scaled-linear diagnostic and synthetic cancellation construction.",
+    "actual_stage": "NOT_RUN_MISSING_RESIDUAL_AND_JACOBIAN_PACKET",
+    "implementation": "PENDING_C1_C10",
+    "nonlinear_error_certificate": null,
+    "global_convergence_admission": false,
+    "source009_production": "independent owner unchanged"
+  },
+  "next_action": "R6 owner captures review and proceeds to R7 actual bounded independent rational probe; C9 separately reviews implemented diff and observed execution evidence."
+}
