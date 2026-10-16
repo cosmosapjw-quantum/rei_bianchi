@@ -44,3 +44,19 @@ For each observable define `d(L)=C_PL(L)-R_PL(L)`. The requested quantities, all
 Fractions, `xe` and baryon abundances have unit one; `ne_cm3` has cm^-3, `Tgas_K` has K, and `U0_eV_per_H`,`U2_eV_per_H` have eV per H. L1, L2, RMS, mean absolute difference and supremum retain the observable's unit because L is dimensionless; the squared integral has its squared unit. Time-weighted norms would have a different measure and are outside this contract. Tgas itself need not be monotone: it is an observable reconstructed in L and is never used to reorder saved states.
 
 The proof target is: for every pair satisfying these assumptions, the union-knot formulas in R5 calculate these reconstruction functionals in exact arithmetic, with O(n+m) knot visits per fixed observable set. The binary64 implementation will report analytic reconstruction diagnostics and explicitly identify its arithmetic, rather than claiming exact dyadic values. Input validation, physical invariants and full-source identity remain responsibilities of the existing caller/reader, while the generic helper also rejects malformed numeric arrays.
+
+## R4 — candidate representations and discriminating example
+
+Three representations were compared against the same saved-PL target:
+
+| Candidate | Information and cost | Decision |
+|---|---|---|
+| Existing 1001 uniform ln(a) evaluations | Historical sampled maximum and milestone reporting; repeated binary searches; a fixed grid can miss an adaptive-knot peak | Preserve for continuity; add full-overlap diagnostic |
+| Existing exact Fraction union supremum | Exact result for stored dyadic inputs and equal endpoints; rational conversion stores both histories; no integrated norms | Reuse as small-fixture independent oracle |
+| Streaming merged knots with analytic integrals | Visits every affine segment once; evaluates endpoints for the supremum and two segment integrals; binary64 implementation with O(k) auxiliary state | Select for FULL_PAIR extension |
+
+The discriminating synthetic example is a zero reference on `[0,1]` and a triangular candidate with knots `(0,0)`, `(2001/4000,0)`, `(1001/2000,1)`, `(2003/4000,0)`, `(1,0)`. Its positive support `(0.50025,0.50075)` lies strictly between consecutive samples `500/1000` and `501/1000`. Thus all 1001 uniform samples are zero, while the PL maximum is one. The triangle base is `1/2000`; its exact L1 integral is `1/4000` and squared integral is `1/6000`. R5 derives those values from the general formulas; R7 executes the example independently.
+
+An affine change from `[0,1]` to the physical ln(a) interval places the same example between adjacent regular ln(a) samples, preserves its maximum and multiplies each integral by the interval length. It is therefore a representation-level explanation of the information missing from fixed sampling. It is not an observed FULL005 discrepancy. The selected diagnostic resolves the full saved-PL question without choosing a finer arbitrary sample count.
+
+Watchdog finding closed: an additional abstract function-space formalism would add no implementation obligation here. The useful structure is precisely the union partition, affine endpoint values and elementary integrals; each maps directly to a loop accumulator.
