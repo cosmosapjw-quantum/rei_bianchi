@@ -1,0 +1,38 @@
+{
+  "schema": "rei.ssot.budget.v2",
+  "environment": "ChatGPT sandbox only, no local Codex, no external NCP",
+  "rust": {
+    "toolchain": "1.94.1 from user tarball, prefix /mnt/data/rust-1.94.1-prefix; verify each new session",
+    "jobs_default": 1,
+    "max_jobs_while_observed_rss_low": 2,
+    "cargo_flags": [
+      "--offline",
+      "--locked"
+    ],
+    "build_target": "source slice and tests; never full campaign by default"
+  },
+  "tiers": {
+    "T0": {
+      "wall_seconds": 30,
+      "ram_mib": 256,
+      "examples": "JSON validation / analytic tests"
+    },
+    "T1": {
+      "wall_seconds": 120,
+      "ram_mib": 1024,
+      "examples": "isolated Rust test small 1-thread"
+    },
+    "T2": {
+      "wall_seconds": 180,
+      "ram_mib": 2048,
+      "examples": "bounded Rust module + adaptive small case; preflight memory first"
+    },
+    "T3": {
+      "wall_seconds": "not allocated in sandbox",
+      "ram_mib": "not allocated",
+      "examples": "full z20->4, 144-case retest, 65537 dense optional memory if costs unknown"
+    }
+  },
+  "checkpoint": "save after each bounded science/code unit and before long builds",
+  "never": "run any NCP/local host, overwrite owner checkpoint or silently merge"
+}

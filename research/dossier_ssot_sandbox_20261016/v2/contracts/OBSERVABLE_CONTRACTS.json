@@ -1,0 +1,97 @@
+{
+  "schema": "rei.ssot.observables.v2",
+  "contracts": [
+    {
+      "name": "abundance_by_time",
+      "fields": [
+        "proper_time_s",
+        "redshift_label",
+        "T_gas_K",
+        "x_HII",
+        "x_HeII",
+        "x_HeIII",
+        "x_DII_optional",
+        "source_identity",
+        "approximation"
+      ],
+      "invariant": "each charge-state between 0 and isotope total and all nuclei conserved",
+      "status": "requires_native_history"
+    },
+    {
+      "name": "source_age_heI",
+      "fields": [
+        "age_bin",
+        "transport_bin",
+        "Gamma_HeI_s^-1",
+        "cumulative_HeI_events_per_H",
+        "survivor_number_per_H",
+        "energy_per_H_J"
+      ],
+      "error_axes": [
+        "birth_age",
+        "transport_spectral",
+        "native_time",
+        "source_substep"
+      ],
+      "admission": "adjacent integrated event relative <0.005 AND additional evidence for continuum"
+    },
+    {
+      "name": "tau_partial",
+      "fields": [
+        "t_start_s",
+        "t_end_s",
+        "tau_partial",
+        "tail_status",
+        "rest_frame",
+        "observer_direction",
+        "source_revision"
+      ],
+      "tail_rule": "if missing tail, total_tau=null",
+      "status": "consumer_contract"
+    },
+    {
+      "name": "directional_intensity",
+      "fields": [
+        "proper_time_s",
+        "energy_eV",
+        "mu",
+        "I_E",
+        "I20_over_I00",
+        "isotropized_H_control",
+        "shear_convention"
+      ],
+      "admission": "collisionless diagnostic cannot be claimed Thomson response"
+    },
+    {
+      "name": "signed_shear_response",
+      "fields": [
+        "r=s/H",
+        "Sigma=sqrt3abs(r)",
+        "orientation_sign",
+        "physical_or_counterfactual",
+        "deltaO_geometric",
+        "deltaO_isotropic_history",
+        "noise_floor"
+      ],
+      "admission": "conditional CMB constraint and signal/non-signal separate"
+    },
+    {
+      "name": "ledger",
+      "fields": [
+        "B_photon",
+        "A_HI",
+        "A_HeI",
+        "A_HeII",
+        "A_D_optional",
+        "survivor_N",
+        "E_photon",
+        "E_binding",
+        "E_thermal",
+        "E_escape",
+        "E_CMB",
+        "E_work"
+      ],
+      "admission": "single event / source energy and no double counting; diagnostic residual not temporal order"
+    }
+  ]
+}
