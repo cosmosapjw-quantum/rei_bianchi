@@ -35,3 +35,7 @@ The disjoint harness owner executed two test methods once: seven cached matrix c
 ## C8 — precision and conditioning
 
 Three fixed small synthetic cases passed once (exit0). A near-singular finite system reports kappa_inf=4398046511108 and recovers its exact designed correction. Consistent power-of-two matrix/residual rescaling preserves the result. Strong-cooling scales oldw=10/currentw=0.001 give SRw/Syw=10000, native energy residual norm1e-13 and scaled correction norm1e-9, so no unity thermal-scale ratio is assumed. Inner measured wall0.000463382s and CPU0.000456797s cover only these small library checks; outer command resources are separately recorded. No large benchmark, oracle or prior suite ran. Module bytes remain unchanged after C5. C9 independent review and C10 disposition are pending; actual stage attribution remains missing-telemetry HOLD.
+
+## C9 — independent review
+
+Fresh read-only reviewer /root/full005_pair_review issued PASS_SCOPED in INDEPENDENT_REVIEW.json after checking the frozen contract, final source identities and observed C6–C8 evidence. There are no findings or authorized repairs and no tests were replayed. The decision permits scoped standalone publication; actual stage telemetry remains NOT_RUN and no nonlinear/global error certificate is admitted. C10 packaging and continuation handoff remain pending.

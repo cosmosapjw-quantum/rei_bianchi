@@ -38,6 +38,15 @@ def main():
     node = next(n for n in dag['nodes'] if n['id'] == stage)
     node.update(status='complete', evidence_refs=evidence.get('evidence_refs', []), checkpoint=f'checkpoints/{stage}.json')
     dag['current_stage'] = stage
+    ordered = [f'{p}{i}' for p in ('R', 'C') for i in range(1, 11)]
+    states = {n['id']: n['status'] for n in dag['nodes']}
+    completed = []
+    for stage_id in ordered:
+        if states.get(stage_id) != 'complete':
+            break
+        completed.append(stage_id)
+    dag['completed_through'] = completed[-1] if completed else None
+    dag['next_executable'] = ordered[len(completed)] if len(completed) < len(ordered) else 'O1'
     write_json(dag_path, dag)
     checkpoint = {'schema_version':1, 'stage':stage, 'base_commit':args.base,
         'owner_stage_fact': evidence, 'packaging_status':'PACKAGED',
