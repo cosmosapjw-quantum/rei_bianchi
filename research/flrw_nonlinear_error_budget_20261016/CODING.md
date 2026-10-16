@@ -39,3 +39,8 @@ Three fixed small synthetic cases passed once (exit0). A near-singular finite sy
 ## C9 — independent review
 
 Fresh read-only reviewer /root/full005_pair_review issued PASS_SCOPED in INDEPENDENT_REVIEW.json after checking the frozen contract, final source identities and observed C6–C8 evidence. There are no findings or authorized repairs and no tests were replayed. The decision permits scoped standalone publication; actual stage telemetry remains NOT_RUN and no nonlinear/global error certificate is admitted. C10 packaging and continuation handoff remain pending.
+
+
+## C10 — final distribution and canonical continuation
+
+The final unit-only archive preserves the actual C9 reviewed code commit `e0d547521cd71047670d5c3967ca4289ea0db8b1`, root-accepted handoffs, source-binding addendum, next observer plan, actual/reused evidence and all twenty stage facts. Package verification is limited to CRC, required-member presence and reviewed-runtime member hashes; the completed C6 CLI and scientific evidence are reused. No further code, science or CLI execution occurs in publication. Canonical documents receive only the root-approved nonlinear_error_budget key, merged against the fresh CAS parent on every attempt; existing execution routing is preserved. C10 uses containing-commit semantics. The actual accepted-state diagnosis remains HOLD, and O1 is the next unit-local owner intake.

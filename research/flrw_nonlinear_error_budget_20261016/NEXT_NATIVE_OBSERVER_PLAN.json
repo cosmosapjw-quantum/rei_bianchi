@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "unit_id": "flrw_nonlinear_error_budget_20261016",
+  "artifact_role": "C10_NEXT_IMPLEMENTATION_PLAN_NOT_NEW_RESEARCH_LOOP",
+  "status": "PLANNED_NO_PRODUCTION_CHANGE_OR_EXECUTION",
+  "authorization": "Existing user authorization continues. Latest source-owner intake determines the appropriate source, exact inputs and remaining execution envelope; this artifact adds no new run-approval gate.",
+  "scope": {
+    "goal": "Obtain a bounded number of raw residual/Jacobian packets at accepted chemical iterates for the existing standalone linearized diagnostic.",
+    "production_changes_this_unit": 0,
+    "production_executions_this_unit": 0,
+    "actual_native_observer_metrics": "NOT_RUN",
+    "science_admission": "NOT_ISSUED",
+    "excluded": [
+      "Solver tolerance or adaptive acceptance changes",
+      "Accepted state correction or clipping",
+      "Full-history replay",
+      "Canonical DAG mutation",
+      "SOURCE005 mutation",
+      "Concurrent SOURCE009 owner file mutation"
+    ]
+  },
+  "baseline": {
+    "source_commit": "fdfda0fec423ccb7175552c7dc066be93ce347e1",
+    "driver_path": "rust/rei_microphysics/src/axbi_driver.rs",
+    "driver_blob": "2a16fa8d898588d859eff2c7750a5f8496cadd0c",
+    "source_pin": "evidence/SOURCE_PIN.json",
+    "binding_handoff": "SOURCE_BINDING_HANDOFF.md",
+    "source_fact": "The accepted chemical branch returns before jacobian_columns. An accepted-state Jacobian may never have been computed; a previous Newton matrix is not a substitute."
+  },
+  "pending_intake": {
+    "latest_source_owner": "SOURCE009 owner or its explicit current successor; inspect its latest published result and active ownership before editing.",
+    "next_source": null,
+    "exact_case_inputs": null,
+    "launch_command": null,
+    "execution_receipt": null,
+    "absolute_deadline": null,
+    "remaining_budget": null,
+    "reason": "These values must come from the current owner's actual continuation contract. This plan does not invent a case, copy an unrelated deadline, reset a budget or claim a launch."
+  },
+  "observer_design": {
+    "activation": "Optional explicit default-off observer configuration in the next appropriate owner-selected source. Disabled path adds no residual/Jacobian calls and no packet I/O.",
+    "capture_seam": "At native chemical acceptance norm<=1e-11, retain the raw accepted residual, old/current state, a, dt, composition/constants and immutable prepared-stage context before return. Only for selected samples evaluate J at exactly that accepted state with that same context.",
+    "jacobian": "Use the reviewed production finite-difference column semantics or document a changed derivative scheme explicitly. Store jacobian_kind, perturbation sizes/directions and failed or fallback attempts. Do not label a stale or analytic surrogate as the accepted-state production FD matrix.",
+    "cost_accounting": "Instrument every actual observer-added residual/RHS evaluation at its invocation, including failed perturbations, fallback directions, retries and any baseline residual reevaluation. Record successful and attempted counts separately, evaluation identifiers, elapsed observer time and allocation owner. Reuse of the already evaluated accepted residual is permitted only when its exact state and context are retained; never assume the Jacobian is already available.",
+    "noninterference": "Observation must not mutate the accepted state, prepared context, numerical counters used by acceptance, adaptive error metric, Newton choices or random state. Keep observation counters separate while including their real work in the owner's resource accounting.",
+    "selection": "Bounded deterministic first eligible attempts selected by the owner's configuration. Preserve role and eventual outcome rather than selecting only successful full adaptive steps. Record skipped, failed and cap-limited samples; do not claim representativeness.",
+    "io": "Keep bounded packet buffers in memory during Newton and adaptive trial loops. Serialize once at the existing safe outer boundary or terminal receipt write, atomically if supported. No inner-loop file/network I/O. If execution stops before a safe flush, mark telemetry unavailable rather than inventing a packet.",
+    "failure": "An observer derivative/domain/cap failure yields an explicit unavailable-J record and typed diagnostic HOLD; it does not replace J with zeros or alter scientific acceptance. The existing global resource-stop behavior still applies."
+  },
+  "bounds": {
+    "max_packets": 6,
+    "max_observer_added_residual_rhs_evaluations": 48,
+    "packet_limit_scope": "Whole observer execution, not per step or per case reset.",
+    "evaluation_limit_scope": "Whole observer execution. Enforce before every extra call, including parallel column dispatch reservations and failed calls. This is an upper bound, not an assertion that every packet costs eight calls.",
+    "memory": "Fixed six-slot or equivalently bounded packet buffer, each containing a four-vector residual and 4x4 Jacobian plus bounded metadata; no history accumulation.",
+    "wall_and_cpu": "Charge observation to the current owner's unchanged remaining allowance and original absolute deadline, including serialization and diagnostic processing when charged to that allocation.",
+    "effective_cap": "min(owner remaining allowance after all actual debits, original absolute deadline - current time - owner's existing stop reserve).",
+    "expired_or_exhausted": "Typed HOLD_RESOURCE_ENVELOPE_EXHAUSTED; no deadline reset, budget transfer or fresh launch inferred.",
+    "allocation_resolution": "Latest owner receipt supplies actual envelope and reserve before implementation scheduling/launch. The earlier full005 postprocess envelope is not silently assigned to a different source run."
+  },
+  "packet_extensions": {
+    "base": "Populate the frozen CONTRACT.json actual-stage fields, after the documented fresh source-binding migration.",
+    "identity": [
+      "producer source commit and actual new driver blob",
+      "reviewed residual-seam compatibility mapping identifier",
+      "run_id",
+      "stage_id",
+      "prepared_context_id",
+      "adaptive_attempt_id",
+      "parent_step_id",
+      "chemical_stage_sequence"
+    ],
+    "stage_role": {
+      "field": "adaptive_branch",
+      "allowed": [
+        "FULL",
+        "HALF_FIRST",
+        "HALF_SECOND"
+      ],
+      "requirement": "Record the real branch and its own old state, a and dt; never infer roles from output row order."
+    },
+    "outcome": {
+      "chemical_iterate_status": "ACCEPTED_CHEMICAL_STAGE",
+      "adaptive_trial_outcome": [
+        "PENDING",
+        "ACCEPTED",
+        "REJECTED",
+        "ABORTED"
+      ],
+      "requirement": "Assign actual outer outcome after the adaptive decision. A chemical acceptance inside a rejected or aborted trial remains labeled as such; it is not an accepted trajectory sample."
+    },
+    "numeric": [
+      "state_order",
+      "energy_unit",
+      "old_state",
+      "state",
+      "raw residual",
+      "Jacobian or null with reason",
+      "residual_evaluation_state",
+      "jacobian_evaluation_state",
+      "a",
+      "dt_s",
+      "f_He",
+      "k_B_eV_per_K",
+      "native residual norm"
+    ],
+    "context": "Use a stable stage-context identifier tied to the immutable prepared absorption and the actual branch state/environment. R and J identifiers must agree; an identifier alone is not proof unless the producer capture path is reviewed.",
+    "cost": [
+      "observer_added_rhs_attempts",
+      "observer_added_rhs_successes",
+      "per-column attempts and perturbations",
+      "observer elapsed time",
+      "cost_owner",
+      "allocation receipt locator"
+    ],
+    "incomplete": "Missing same-state R/J or unresolved context produces HOLD_MISSING_STAGE_DATA or the appropriate stale/context HOLD. Preserve incomplete records for accounting; do not fabricate diagnostic metrics."
+  },
+  "source_binding_migration": {
+    "requirement": "Commit the actual producer modification and record its fresh driver blob. Never put the old blob into a packet emitted by the modified driver.",
+    "comparison": [
+      "Residual equations and state order",
+      "Frozen native/adaptive chemical scale conventions",
+      "Prepared-context ownership and candidate absorber semantics",
+      "Finite-difference column procedure",
+      "Chemical acceptance branch and unchanged inequality",
+      "EOS mapping and physical domains",
+      "Geometry/source/chemistry sequencing and adaptive branch tags"
+    ],
+    "result": "Record old and new producer identities plus the reviewed unchanged-seam mapping; update the baseline-scoped adapter binding explicitly in that next implementation unit.",
+    "changed_equations": "If comparison finds a changed equation or convention, revisit only that dependency's contract and targeted checks. Do not silently admit an arbitrary source blob.",
+    "current_adapter": "Remains baseline-pinned in this unit; its binding HOLD is compatibility status, not a scientific defect finding."
+  },
+  "dag": [
+    {
+      "id": "O1",
+      "depends_on": [],
+      "action": "Read latest source-owner result/contract, record active ownership and existing resource envelope, choose appropriate next source.",
+      "completion": "Exact source/inputs/remaining envelope resolved from actual owner evidence."
+    },
+    {
+      "id": "O2",
+      "depends_on": [
+        "O1"
+      ],
+      "action": "Implement default-off bounded accepted-stage capture and explicit adaptive branch/outcome tagging in the owner-selected source.",
+      "completion": "Changed-seam diff with separate counted observer work and safe buffered output."
+    },
+    {
+      "id": "O3",
+      "depends_on": [
+        "O2"
+      ],
+      "action": "Review equation/context noninterference; record fresh producer blob mapping and migrate standalone adapter source binding.",
+      "completion": "Actual fresh identities recorded; no old-blob substitution."
+    },
+    {
+      "id": "O4",
+      "depends_on": [
+        "O3"
+      ],
+      "action": "Perform only targeted changed-seam checks using existing local fixtures and cached oracle evidence.",
+      "completion": "Default-off invariance, accepted-state/context capture, branch/outcome labels, counters/caps and missing telemetry controls verified."
+    },
+    {
+      "id": "O5",
+      "depends_on": [
+        "O4"
+      ],
+      "action": "Use the owner's already authorized next suitable bounded execution if its unchanged envelope remains live; otherwise record a resource HOLD.",
+      "completion": "Actual execution receipt and finite packet output, or explicit HOLD with no claimed run."
+    },
+    {
+      "id": "O6",
+      "depends_on": [
+        "O5"
+      ],
+      "action": "Run the standalone diagnostic on actual complete packets and review conditioning, correction and EOS projections alongside branch/outcome/cost.",
+      "completion": "Actual scoped metrics and receipts or typed missing-data HOLD; no nonlinear error certificate or global convergence admission."
+    }
+  ],
+  "acceptance": [
+    "Observer disabled leaves the scientific execution path and residual/Jacobian evaluation count unchanged.",
+    "Accepted-state capture works even when the initial Newton residual passes and no Newton Jacobian existed.",
+    "Same accepted state and prepared context used for R and J; failed or stale data remain explicit.",
+    "All extra FD attempts are counted and bounded, including parallel/fallback attempts; original execution caps and deadline survive unchanged.",
+    "Chemical acceptance is distinguished from full/half role and eventual adaptive acceptance, rejection or abort.",
+    "Fresh producer identity and reviewed source-binding migration precede actual-packet diagnosis.",
+    "Buffered output is finite, bounded and carries actual provenance and costs.",
+    "Actual NCP metrics are reported only after an actual recorded run; synthetic fixtures retain synthetic labels."
+  ],
+  "evidence_reuse": {
+    "reuse": [
+      "R6_INDEPENDENT_REVIEW.json algebra and source review where unchanged",
+      "probe/RESULT.json cached eight exact synthetic cases",
+      "Existing C6-C9 standalone diagnostic checks/review when complete",
+      "Prior full005 PL result and completed source campaigns"
+    ],
+    "targeted_new_checks": [
+      "Default-off observer seam",
+      "Accepted initial-residual-pass capture",
+      "FD failure/fallback count and hard cap",
+      "Full and both half branch tags with rejected/aborted trial outcome",
+      "Safe buffer serialization and finite missing-J record",
+      "Fresh source-binding mapping"
+    ],
+    "no_replay": [
+      "Independent exact oracle",
+      "Completed PL diagnostics",
+      "Unrelated native suites",
+      "Completed source009 histories solely for observer file identity change"
+    ]
+  },
+  "interpretation_limits": [
+    "Delta=-J^-1 R is a local linearized chemical-stage correction, not a nonlinear error certificate.",
+    "A projected EOS temperature correction is not the actual trajectory temperature error.",
+    "A single full/half packet set cannot establish the source007 cause, truncation order or convergence.",
+    "No geometry/source propagation or full photon/gas adaptive error is reconstructed by this observer plan."
+  ]
+}
