@@ -169,3 +169,8 @@ pub mod axbi_q_grid;
 pub mod axbi_q_closure;
 
 pub mod deuterium_atomic;
+
+/// Opt-in immutable temperature coefficient evaluation and exact prepared reuse.
+pub mod rate_table;
+/// Explicit Li6/Li7 shared-electronic approximation and number-rate component.
+pub mod lithium_rates;
