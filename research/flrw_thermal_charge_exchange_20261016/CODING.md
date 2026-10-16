@@ -9,3 +9,7 @@ Inputs and acceptance follow CONTRACT.json and FIXTURES.json. Densities use cm^-
 ## C2 — Equation to data and code
 
 `State`, `Defect`, `RateProvider` and `Controls` will be immutable dataclasses. `integrate` reconstructs all species and thermal density from the original state and normalized extent. The pure H/D particle inventory includes ne=hp+dp exactly once. Savin2002 uses retained cm^3/s coefficients and closed 2.7–200000 K domain. No production module is imported or changed. `verify_thermal_cx.py` will read cached independent Decimal expectations, rather than rerunning the probe. Mapping details are in coding_evidence/C2.json. No scientific run in C2.
+
+## C3 — Numerical design
+
+Use the frozen adaptive SSP Heun RK2 step-doubling map. Both Euler states are interval checked; the accepted result is two halfsteps. Every RHS call is charged, including provider failures. The scalar state retains physical positivity and the provider domain by checked stages and convex updates. Counters, finite caps and partial statuses expose incomplete work. Provider approaches return the actual interior state and reached time. The local error estimate is a heuristic; neither global error nor arbitrary stiffness is certified. Cached independent exact manufactured flow and fixed-step refinement discriminate the changed thermal-feedback seam. No run in C3.
