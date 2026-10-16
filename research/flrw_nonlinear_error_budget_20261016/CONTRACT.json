@@ -2,7 +2,7 @@
   "schema_version": 1,
   "workflow_version": "1.0.0",
   "unit_id": "flrw_nonlinear_error_budget_20261016",
-  "status": "R2_SOURCE_MAPPED",
+  "status": "R3_DEFINITIONS_FIXED",
   "coding_ready": false,
   "source_pin": "evidence/SOURCE_PIN.json",
   "baseline_commit": "fdfda0fec423ccb7175552c7dc066be93ce347e1",
@@ -37,5 +37,15 @@
   },
   "actual_stage_attribution": "NOT_RUN_MISSING_RESIDUAL_AND_JACOBIAN_PACKET",
   "next": "R2 source mapping and literature; R3-R5 derivation",
-  "comparison_scope": "Four chemical variables only; production photon blocks remain outside this linearized diagnostic"
+  "comparison_scope": "Four chemical variables only; production photon blocks remain outside this linearized diagnostic",
+  "scaling": {
+    "residual": "diag(1,1,1,max(abs(w_old),abs(w),1e-6))",
+    "state": "diag(max(abs(x_i),1e-5) fori0..2,max(abs(w),1e-6))",
+    "scaled_matrix": "A=SR^-1 J Sy",
+    "scaled_residual": "b=SR^-1 R",
+    "solve": "A z=-b; delta=Sy z",
+    "scales_frozen": true
+  },
+  "actual_packet_requirement": "Residual/Jacobian must be evaluated at the supplied accepted chemical-stage iterate and same prepared-absorption context; stale or missing data=>HOLD",
+  "linearization_scope": "Chemical-stage correction only, not total adaptive photon/gas or final split-step error"
 }
