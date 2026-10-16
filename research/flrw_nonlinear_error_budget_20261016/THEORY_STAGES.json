@@ -66,8 +66,16 @@
     },
     {
       "id": "R7",
-      "status": "pending",
-      "evidence_refs": []
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r7",
+        "probe/probe_nonlinear.py",
+        "probe/RESULT.json",
+        "probe/EXECUTIONS.json",
+        "probe/stdout.log",
+        "probe/stdout_initial.log"
+      ],
+      "reason": "Eight exact independent synthetic cases pass after one documented probe-loader repair; no production-stage data implied"
     },
     {
       "id": "R8",
@@ -89,7 +97,8 @@
     {
       "id": "SCALED_CORRECTION",
       "basis": [
-        "derived"
+        "derived",
+        "numerically checked"
       ],
       "evidence_refs": [
         "THEORY.md#r3",
@@ -97,23 +106,22 @@
       ],
       "scope": "Supplied nonsingular linear system; no nonlinear error certificate",
       "obligations": [
-        "R6 independent algebra",
-        "R7 independent fixture execution"
+        "C1-C10 implementation verification",
+        "Actual accepted-state packet for actual attribution"
       ]
     },
     {
       "id": "BE_CANCELLATION",
       "basis": [
-        "derived"
+        "derived",
+        "numerically checked"
       ],
       "evidence_refs": [
         "THEORY.md#r5",
         "FIXTURE_SPEC.json"
       ],
       "scope": "Constructed scalar BE with residual inside inclusive1e-11 inequality; no actualREI attribution",
-      "obligations": [
-        "R6/R7 independent check"
-      ]
+      "obligations": []
     }
   ],
   "executions": [
@@ -130,10 +138,44 @@
         "evidence/intake/WOLFRAM_EOS_CORRECTION.json"
       ],
       "reason": "Tool responses successful; no OS exit code exists for this tool"
+    },
+    {
+      "id": "PROBE_INITIAL",
+      "status": "failed",
+      "command": "timeout30s python3 probe/probe_nonlinear.py",
+      "exit_code": 1,
+      "evidence_refs": [
+        "probe/EXECUTIONS.json",
+        "probe/stdout_initial.log"
+      ],
+      "reason": "Fixture alias loader implementation error; targeted repair preserved exact spec"
+    },
+    {
+      "id": "PROBE_REPAIR",
+      "status": "completed",
+      "command": "timeout30s python3 probe/probe_nonlinear.py",
+      "exit_code": 0,
+      "evidence_refs": [
+        "probe/EXECUTIONS.json",
+        "probe/RESULT.json",
+        "probe/stdout.log"
+      ],
+      "reason": "Eight synthetic cases pass; remaining probe executions0"
     }
   ],
   "next_actions": [
     "R2 provenance mapping",
     "R3-R5 actual construction"
+  ],
+  "failures": [
+    {
+      "class": "implementation",
+      "scope": "Independent probe fixture loader",
+      "evidence_refs": [
+        "probe/stdout_initial.log",
+        "probe/EXECUTIONS.json"
+      ],
+      "resolution": "Single allowed alias-loading repair; final eightcases pass"
+    }
   ]
 }
