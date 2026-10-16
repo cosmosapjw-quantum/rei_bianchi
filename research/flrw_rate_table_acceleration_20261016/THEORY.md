@@ -1,5 +1,9 @@
 # Temperature coefficient acceleration
 
+## Active scope override before R6
+
+The user's latest instruction is: “선행 PR을 확인하면 우선 scope는 Li와 그 이온까지만 포함해.” The follow-up “(Li isotope 포함)” explicitly includes lithium isotopes. Added-species work is therefore restricted to 6Li and 7Li, each Li I–Li IV, after checking the preceding PR and source authority. This supersedes the root's earlier carbon selection. Existing H/He/D optimization and all generic interpolation, closure, cache, and cost derivations remain in scope. The immutable R1–R5 carbon exploration is retained as historical evidence; carbon is excluded from active production exports and added-species admission. The execution budget is unchanged. The active lithium source/domain/isotope mapping is appended at R6; no generic derivation or existing-provider validation is restarted.
+
 ## R1 — research contract
 
 This unit constructs reusable temperature-only coefficient evaluation, measures scalar and batch costs, and admits an additional species coefficient only after checking its actual primary provider. The baseline is `4583ed342b8476e86e42b023d6de1d0f50820adb`; the repository policy blob is `429a5a13ee75b1222bc50627f8d5973d01dd21c4`. `CONTRACT.json` records quantitative acceptance and bounded local execution. Existing external native runs and their checkpoints remain under their existing contracts.
@@ -105,7 +109,7 @@ The q=4 DR row has one negative fit amplitude. Its two relevant terms obey
     0.002646 exp(-2804000/T) - 0.0007843 exp(-4324000/T)
     > (0.002646-0.0007843) exp(-2804000/T) > 0
 
-for every finite T>0, and the third amplitude 0.01762 is positive. Thus the total analytic DR is positive despite a negative fitted term. Keep that negative amplitude exactly; clipping it would change the source. The other selected rows have nonnegative amplitudes. At cold temperatures a total may still underflow in binary64, requiring direct evaluation/underflow semantics.
+for every finite T>0, and the remaining amplitude 0.01762 is positive. Thus the total analytic DR is positive despite a negative fitted term. Keep that negative amplitude exactly; clipping it would change the source. The other selected rows have nonnegative amplitudes. At cold temperatures a total may still underflow in binary64, requiring direct evaluation/underflow semantics.
 
 For carbon populations n_0…n_6 and externally specified n_e≥0, define I_q=n_e n_q C_q for q=0…5 and R_q=n_e n_q(α_RR,q+α_DR,q) for q=1…6. Set absent boundary fluxes to zero. Then dot(n_q)=I_(q-1)+R_(q+1)-I_q-R_q, so summing telescopes to zero, and sum_q q dot(n_q)=sum I_q-sum R_q. If electrons are evolved, dot(n_e)=sum I_q-sum R_q conserves total electric charge e(sum q n_q-n_e). With external n_e the output records this electron source rather than asserting a closed electron evolution.
 
@@ -120,3 +124,34 @@ Let B be table construction time, c_d direct time per query, and c_l lookup time
 For m independent temperature queries with scalar-batch per-item cost c, p workers, startup L, and extra per-item scheduling/copy cost b, T_parallel≈L+mc/p+mb. Parallelism beats the serial batch only when c(1-1/p)>b and m>L/[c(1-1/p)-b]. Small batches may correctly remain serial. Outputs retain input ordering, and workers share immutable grid rows. Benchmark results must state threads, query distribution, construction inclusion, and actual break-even rather than assume that more threads or a SoA layout produces speedup.
 
 R5 outcome: the interpolation/error proof, branch construction, conservation mapping, carbon formulas and positivity, cache identity, and amortization equations are complete. R6 reviews these transitions independently; R7 measures the implementation-dependent accuracy and cost.
+
+## R6 — lithium and isotope delta under independent review
+
+The generic R5 interpolation/slope proof, closure separation, cache construction, and amortization were independently reviewed by `rate_frontier` as mathematically sound under their stated hypotheses. Its initial carbon-source comparison is retained as historical exploration. Active added-species admission uses lithium only.
+
+Preceding PR151 at head `9f455d98` has `inventory17.json` blob `69354d1065` with Li7; its Li6 abundance entry 6.035916255350921×10^-15 was omitted with no charge mapping. The existing native thirteen-species state has no Li. The prior `ISOTOPE_PROVIDER_THEORY.md` blob `7d83af0666` explicitly distinguishes elemental Verner Z,N data from isotope A and provides a declared element-equality precedent for 3He. These observations establish that the current request adds 6Li and 7Li charge stages rather than inheriting a completed isotope-native Li implementation. The old trace-inventory omission does not restrict the user's new explicit Li6 scope. No default abundance or automatic network activation is adopted from that inventory.
+
+The actual selected source rows are `data/lithium_coefficients.json`: Z=3, ground-parent M=1, CI q=0,1,2; RR q=1,2,3; DR q=1,2; structurally zero DR q=3. They use the same verified Voronov and Badnell formulas and units from R5, with lithium numeric rows. CI lower k_B T values are [1,4,5] eV and the upper value is 20 keV. RR/DR per-channel domains are [10q²,10^7q²] K; the complete CI/RR/DR chain intersects on [5/(8.617385×10^-5),10^7] K. Independent RR remains available as cold as 10 K for q=1. The standard-tabulation interpretation and low-density Maxwellian/ground-parent assumptions remain explicit.
+
+The Li+ DR row has the signed amplitudes [2.941×10^-5,6.068×10^-5,-7.753×10^-7] and energies [634500,702400,827100] K. For every T>0,
+
+    2.941e-5 exp(-634500/T) - 7.753e-7 exp(-827100/T)
+    > (2.941e-5-7.753e-7) exp(-634500/T) > 0.
+
+The remaining amplitude is positive, so the analytic total is positive. The negative amplitude is preserved. Cold binary64 underflow retains its numerical meaning and direct fallback; it is not a new structural-zero channel.
+
+Root explicitly adopted the opt-in isotope model `IsotopeRatePolicy::ElementalElectronicEquality`: for A∈{6,7}, set k_(A,q,p)(T)=k_(Li,q,p)(T) for each process p while retaining separate species identity (Z,A,q). The policy is a required constructor argument, with no implicit default. This is a declared shared-electronic coefficient approximation, not an isotope-native source or a reduced-mass scaling prescription. The source table carries no mass-number dependence, and no bound on neglected isotope shifts, mass effects, or hyperfine/population effects is asserted. An isotope-native/IsotopeResolved policy request must return typed missing-source status until such a provider exists. This model decision follows the preceding declared 3He element-equality precedent and is distinct from source-row evidence.
+
+Under that model, keep n_(A,q), q=0…3, separately for both A. Define I_(A,q)=n_e n_(A,q) C_q and R_(A,q)=n_e n_(A,q)(α_RR,q+α_DR,q), with boundary fluxes zero. Then
+
+    dot(n_(A,q)) = I_(A,q-1)+R_(A,q+1)-I_(A,q)-R_(A,q),
+    sum_q dot(n_(A,q)) = 0  for each A,
+    electron_source = sum_(A,q) I_(A,q) - sum_(A,q) R_(A,q).
+
+The charge identity is sum_(A,q) q dot(n_(A,q))=electron_source. Thus the source conserves nuclei independently for Li6 and Li7 and changes neither label; weighting those two identities by A=6,7 also proves conservation of their baryon count. For the same T,n_e and proportional initial charge populations n_(7,q)=c n_(6,q), both isotope derivatives have that same proportionality; this is a useful implementation check of the selected approximation. Electron density is an explicit external input, with its source returned for optional correct coupling. No isotope masses, binding-energy defect, nuclear reactions, thermal or radiation ledger are invented. The prior Li8/Li9 omitted reservoirs remain explicitly pending nuclear-decay and daughter-product closure; they are neither aliased into Li7 nor represented as stable in this bounded Li6/Li7 collisional component.
+
+The coefficient table may share elemental rows between A=6 and A=7 only under this named policy, while outputs and cache identity retain the policy and isotope labels. The conditional approximation and native-source status must remain visible at construction and in returned provider metadata.
+
+Primary isotope spectroscopy found by the source owner provides a concrete limitation: Bushaw et al., Physical Review A 75, 052503 (2007), DOI 10.1103/PhysRevA.75.052503, reports a neutral Li7–Li6 ionization-threshold shift of 18067.54(21) MHz. This confirms a real isotope dependence. It does not determine the isotope shifts of all electron-ion rates or DR resonances, so it supplies neither a full correction nor a rigorous error bound for `ElementalElectronicEquality`. The active implementation does not apply a threshold patch from this datum.
+
+R6 outcome: `evidence/R6_INDEPENDENT_REVIEW.json` records `PASS_SCOPED_LI6_LI7_CONDITIONAL_COEFFICIENT_IMPLEMENTATION`, with no blocking findings, independent inspection of all ten selected Li source lines, and reuse of the unchanged generic mathematical review. Its positive transition is bounded implementation and targeted tests; C9 will review the actual changed implementation and observed results. The source/domain and conditional-isotope-model obligations are now resolved at the design level. Numerical accuracy of the Li implementation and integrated adapters remains for C6–C8.
