@@ -1,0 +1,636 @@
+diff --git a/rust/rei_microphysics/examples/bass_dynamic_trial.rs b/rust/rei_microphysics/examples/bass_dynamic_trial.rs
+index f8deeb01..6d2a80e2 100644
+--- a/rust/rei_microphysics/examples/bass_dynamic_trial.rs
++++ b/rust/rei_microphysics/examples/bass_dynamic_trial.rs
+@@ -1,4 +1,4 @@
+-//! Opt-in source007 fixed-step component diagnostic; no adaptive or full-history admission.
++//! Opt-in source008 fixed-step component diagnostic; no adaptive or full-history admission.
+ use rei_microphysics::axbi_bass_background::{BassBackground, BassSourceIdentity};
+ use rei_microphysics::axbi_covariant_transport::PhotonState;
+ use rei_microphysics::axbi_driver::{Driver, DriverConfig, DriverState};
+@@ -12,8 +12,8 @@ use std::{
+ 
+ fn result() -> Result<(), Box<dyn std::error::Error>> {
+     let args = env::args().collect::<Vec<_>>();
+-    if args.len() != 11 {
+-        return Err("usage: bass_dynamic_trial CSV MANIFEST CSV_SHA MANIFEST_SHA CASE GRID DLNA STEPS WORKERS OUTPUT_DIR".into());
++    if args.len() != 11 && !(args.len() == 12 && args[11] == "--inactive-hi-split") {
++        return Err("usage: bass_dynamic_trial CSV MANIFEST CSV_SHA MANIFEST_SHA CASE GRID DLNA STEPS WORKERS OUTPUT_DIR [--inactive-hi-split]".into());
+     }
+     let output = PathBuf::from(&args[10]);
+     fs::create_dir(&output)?;
+@@ -35,9 +35,14 @@ fn result() -> Result<(), Box<dyn std::error::Error>> {
+     config.end_zbar = 19.99;
+     config.initial_dln_a = dln;
+     config.transport_threads = workers;
++    config.inactive_hi_split = args.len() == 12;
+     config.max_steps = 512;
+     config.max_wall_s = 1700.0;
+     let (driver, initial) = Driver::new_bass(config.clone(), bg.clone())?;
++    fs::write(
++        output.join("transport_variant.txt"),
++        driver.transport_mode_metadata(),
++    )?;
+     let mut uninterrupted = initial.clone();
+     let output_record = output.join("output_identity.txt");
+     fs::write(
+diff --git a/rust/rei_microphysics/src/axbi_bass_background.rs b/rust/rei_microphysics/src/axbi_bass_background.rs
+index a757a709..a3c5376a 100644
+--- a/rust/rei_microphysics/src/axbi_bass_background.rs
++++ b/rust/rei_microphysics/src/axbi_bass_background.rs
+@@ -1,6 +1,7 @@
+ //! Opt-in, source-bound BASS point table. The CSV is an immutable producer input.
+ //! Cubic Hermite interpolation uses the producer's local tangent columns.
+ use crate::axbi_background::{BackgroundIncrement, BackgroundPoint};
++use crate::interval_math::Interval;
+ use crate::ForwardError;
+ use std::{
+     fs,
+@@ -61,6 +62,69 @@ pub struct BassBackground {
+     pub max_raychaudhuri_normalized: f64,
+     pub max_producer_clock_relative: f64,
+ }
++/// Typed result of the sufficient all-segment certificate. Failure is not a
++/// physical nonmonotonicity claim: uncertain enclosures fail closed.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum BassMonotonicityStatus {
++    Established,
++    MonotonicityNotEstablished,
++}
++impl BassMonotonicityStatus {
++    pub fn code(self) -> &'static str {
++        match self {
++            Self::Established => "MONOTONICITY_ESTABLISHED",
++            Self::MonotonicityNotEstablished => "MONOTONICITY_NOT_ESTABLISHED",
++        }
++    }
++}
++#[derive(Clone, Debug)]
++pub struct BassDerivativeEnclosure {
++    /// x0,x1,b0,b1,s0,H0,s1,H1; retained even for invalid input.
++    pub inputs: [f64; 8],
++    pub controls: [Option<Interval>; 3],
++    pub status: BassMonotonicityStatus,
++}
++/// Enclose the three quadratic Bernstein controls of the existing Hermite b'.
++/// No sampling, fitting, tolerance, or interpolation coefficient is changed.
++pub fn enclose_hermite_derivative(inputs: [f64; 8]) -> BassDerivativeEnclosure {
++    let mut out = BassDerivativeEnclosure {
++        inputs,
++        controls: [None; 3],
++        status: BassMonotonicityStatus::MonotonicityNotEstablished,
++    };
++    let [x0, x1, b0, b1, s0, h0, s1, h1] = inputs;
++    let compute = || -> crate::interval_math::Result<[Interval; 3]> {
++        let point = Interval::point;
++        if !inputs.iter().all(|v| v.is_finite()) || x1 <= x0 || h0 <= 0.0 || h1 <= 0.0 {
++            return Err(crate::interval_math::IntervalError);
++        }
++        let dx = point(x1)?.sub(&point(x0)?)?;
++        let d0 = point(s0)?.div(&point(h0)?)?;
++        let d1 = point(s1)?.div(&point(h1)?)?;
++        let middle = point(3.0)?
++            .mul(&point(b1)?.sub(&point(b0)?)?)?
++            .div(&dx)?
++            .sub(&d0)?
++            .sub(&d1)?;
++        Ok([d0, middle, d1])
++    };
++    if let Ok(controls) = compute() {
++        out.controls = controls.map(Some);
++        if controls.iter().all(|v| v.lo > -0.5 && v.hi < 1.0) {
++            out.status = BassMonotonicityStatus::Established;
++        }
++    }
++    out
++}
++#[derive(Clone, Debug)]
++pub struct BassMonotonicityReport {
++    pub identity: BassSourceIdentity,
++    pub status: BassMonotonicityStatus,
++    pub reason: &'static str,
++    /// One enclosure per consecutive table pair; all raw inputs retained.
++    pub segments: Vec<BassDerivativeEnclosure>,
++}
++
+ fn integrate_clock(l: Row, r: Row, to_x: f64) -> f64 {
+     if to_x == l.x {
+         return 0.0;
+@@ -411,6 +475,46 @@ impl BassBackground {
+             gl4_b_difference: b4 - delta_b,
+         })
+     }
++    /// The source008 passive extension is deliberately limited to these exact
++    /// selected model/table/case identities. Other BASS use retains mode=false.
++    pub fn passive_monotonicity(&self) -> BassMonotonicityReport {
++        let selected = self.identity.producer_commit == "3c39bbbf46b6663e7c40277e194fd0ef48118472"
++            && self.identity.source_csv_sha256
++                == "5a7844834b50fbc046995678a6aaf936252a81e49de1593604eee30641274133"
++            && self.identity.source_manifest_sha256
++                == "98eddf4673780f0bbca711b373a3e0746cfafc8190674c8d2d6c4de658dc3eed"
++            && self.identity.grid_points == 121
++            && self.rows.len() == 121
++            && matches!(self.identity.case.as_str(), "COLD_FLRW" | "SIGNED_MINUS");
++        let segments = self
++            .rows
++            .windows(2)
++            .map(|pair| {
++                let (l, r) = (pair[0], pair[1]);
++                enclose_hermite_derivative([l.x, r.x, l.b, r.b, l.s, l.h, r.s, r.h])
++            })
++            .collect::<Vec<_>>();
++        let established = selected
++            && segments
++                .iter()
++                .all(|s| s.status == BassMonotonicityStatus::Established);
++        BassMonotonicityReport {
++            identity: self.identity.clone(),
++            status: if established {
++                BassMonotonicityStatus::Established
++            } else {
++                BassMonotonicityStatus::MonotonicityNotEstablished
++            },
++            reason: if !selected {
++                "NONSELECTED_SOURCE_IDENTITY"
++            } else if !established {
++                "CONTROL_ENCLOSURE_NOT_STRICTLY_INSIDE_MINUS_HALF_TO_ONE"
++            } else {
++                "ALL_SEGMENTS_STRICT_BERNSTEIN_ENCLOSURE"
++            },
++            segments,
++        }
++    }
+     pub fn grid_points(&self) -> usize {
+         self.rows.len()
+     }
+diff --git a/rust/rei_microphysics/src/axbi_driver.rs b/rust/rei_microphysics/src/axbi_driver.rs
+index 332a974e..5e2713bc 100644
+--- a/rust/rei_microphysics/src/axbi_driver.rs
++++ b/rust/rei_microphysics/src/axbi_driver.rs
+@@ -359,6 +359,7 @@ pub struct Driver {
+     pub background: AxbiBackground,
+     /// Opt-in producer table. The legacy public background remains intact.
+     bass_background: Option<BassBackground>,
++    bass_passive_certified: bool,
+     pub source: AxbiSource,
+     pub energies: Vec<f64>,
+     pub n_h0_cm3: f64,
+@@ -452,6 +453,7 @@ impl Driver {
+             config,
+             background: bg,
+             bass_background: None,
++            bass_passive_certified: false,
+             source,
+             energies,
+             n_h0_cm3: n_h0,
+@@ -466,10 +468,20 @@ impl Driver {
+         config: DriverConfig,
+         bass: BassBackground,
+     ) -> Result<(Self, DriverState), ForwardError> {
+-        if config.q_ref != 0.0 || config.same_h || config.inactive_hi_split {
++        if config.q_ref != 0.0 || config.same_h {
+             return Err(err("BASS_DRIVER_CONFIG_MODE"));
+         }
++        let passive_certified = if config.inactive_hi_split {
++            let report = bass.passive_monotonicity();
++            if report.status != crate::axbi_bass_background::BassMonotonicityStatus::Established {
++                return Err(err("BASS_MONOTONICITY_NOT_ESTABLISHED"));
++            }
++            true
++        } else {
++            false
++        };
+         let (mut driver, state) = Self::new(config)?;
++        driver.bass_passive_certified = passive_certified;
+         let a_ref = state.a;
+         let reference = bass.point_at_scale(a_ref)?.geometry()?;
+         bass.point_at_scale(1.0 / (1.0 + driver.config.end_zbar))?;
+@@ -510,6 +522,23 @@ impl Driver {
+     pub fn bass_identity(&self) -> Option<&crate::axbi_bass_background::BassSourceIdentity> {
+         self.bass_background.as_ref().map(|b| &b.identity)
+     }
++    pub fn transport_mode_metadata(&self) -> String {
++        let (provider, scope) = if self.bass_background.is_some() {
++            (
++                "BASS_SELECTED_SOURCE008",
++                if self.config.inactive_hi_split && self.bass_passive_certified {
++                    "selected_BASS_certified_forward_ray_monotone_only"
++                } else if self.config.inactive_hi_split {
++                    "MONOTONICITY_NOT_ESTABLISHED"
++                } else {
++                    "disabled"
++                },
++            )
++        } else {
++            ("AXBI_ANALYTIC", "q0_forward_monotonic_only")
++        };
++        format!("inactive_hi_split={}\nbackground_provider={}\npassive_scope={}\ncheckpoint_version=V4\ntransport_threads={}\nparallel_scope=persistent_cell_prepare_and_opt_in_jacobian_columns\nparallel_jacobian_columns={}\n", self.config.inactive_hi_split,provider,scope,self.config.transport_threads,self.config.parallel_jacobian_columns)
++    }
+     fn photon_state(&self, state: &DriverState) -> PhotonState {
+         PhotonState {
+             number: state.photons.clone(),
+@@ -708,6 +737,20 @@ impl Driver {
+         }
+         let g0 = self.geometry_point(s.a)?.geometry()?;
+         let g1 = self.geometry_point(to)?.geometry()?;
++        if self.config.inactive_hi_split && self.bass_background.is_some() {
++            if !self.bass_passive_certified {
++                return Err(err("BASS_MONOTONICITY_NOT_ESTABLISHED"));
++            }
++            let old_rays = self.transport.ray_geometry(&g0)?;
++            let new_rays = self.transport.ray_geometry(&g1)?;
++            if old_rays.len() != new_rays.len()
++                || old_rays.iter().zip(&new_rays).any(|(old, new)| {
++                    !old.scale.is_finite() || !new.scale.is_finite() || new.scale > old.scale
++                })
++            {
++                return Err(err("BASS_PASSIVE_RAY_REDSHIFT_NOT_ESTABLISHED"));
++            }
++        }
+         let (_, old_u) = self.inventory_with_geometry(s, &g0)?;
+         let (_, new_u) = self.inventory_with_geometry(s, &g1)?;
+         self.partition_inactive(s, &g1)?;
+@@ -1091,6 +1134,8 @@ pub fn compiled_identity() -> String {
+         include_str!("axbi_q_closure.rs"),
+         include_str!("axbi_background.rs"),
+         include_str!("axbi_bass_background.rs"),
++        include_str!("interval_math.rs"),
++        include_str!("../../../research/bass_source008_20261016/CONTRACT.json"),
+         include_str!("../../../research/bass_source007_20261016/CONTRACT.json"),
+         include_str!("axbi_sources.rs"),
+         include_str!("axbi_rates.rs"),
+@@ -1332,9 +1377,9 @@ impl Driver {
+         let source = sha256_bytes(compiled_identity().as_bytes())?;
+         let config = sha256_bytes(format!("{:?}", self.config).as_bytes())?;
+         let body = self.checkpoint_text(s)?;
+-        let text=format!("BASS_REI_CHECKPOINT_V1\n{}|{}|{}|{}|{}\nBASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}\nDONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE007\n{}\n{}\n{}|{}\n{}\n{:.17e}|{:.17e}|{:.17e}|{:.17e}|{:.17e}\n{}\n{}\n{}",
++        let text=format!("BASS_REI_CHECKPOINT_V1\n{}|{}|{}|{}|{}\nBASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}|inactive_hi_split={}\nDONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE008\n{}\n{}\n{}|{}\n{}\n{:.17e}|{:.17e}|{:.17e}|{:.17e}|{:.17e}\n{}\n{}\n{}",
+             id.producer_commit,id.source_csv_sha256,id.source_manifest_sha256,id.case,id.grid_points,
+-            self.config.transport_cells,
++            self.config.transport_cells,self.config.inactive_hi_split,
+             source,config,epoch,output.display(),sha256_bytes(&output_bytes)?,
+             s.a,p.time_s,p.b,p.h_per_s,p.s_per_s,
+             sha256_bytes(body.as_bytes())?,body.len(),body);
+@@ -1382,8 +1427,8 @@ impl Driver {
+         if lines[1] != expected {
+             return Err(err("BASS_CHECKPOINT_SOURCE_BINDING"));
+         }
+-        if lines[2]!=format!("BASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}",self.config.transport_cells) {return Err(err("BASS_CHECKPOINT_PROVIDER_SCHEMA"));}
+-        if lines[3]!="DONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE007" {return Err(err("BASS_CHECKPOINT_REI_BASE"));}
++        if lines[2]!=format!("BASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}|inactive_hi_split={}",self.config.transport_cells,self.config.inactive_hi_split) {return Err(err("BASS_CHECKPOINT_PROVIDER_SCHEMA"));}
++        if lines[3]!="DONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE008" {return Err(err("BASS_CHECKPOINT_REI_BASE"));}
+         if lines[4] != sha256_bytes(compiled_identity().as_bytes())? {
+             return Err(err("BASS_CHECKPOINT_NATIVE_SOURCE"));
+         }
+@@ -1819,7 +1864,11 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
+         fs::write(out.join("config.cfg"), config_text).map_err(ioerr)?;
+         fs::write(out.join("source_identity.txt"), compiled_identity()).map_err(ioerr)?;
+         fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
+-        fs::write(out.join("transport_variant.txt"), format!("inactive_hi_split={}\npassive_scope=q0_forward_monotonic_only\ncheckpoint_version=V4\ntransport_threads={}\nparallel_scope=persistent_cell_prepare_and_opt_in_jacobian_columns\nparallel_jacobian_columns={}\n", driver.config.inactive_hi_split, driver.config.transport_threads, driver.config.parallel_jacobian_columns)).map_err(ioerr)?;
++        fs::write(
++            out.join("transport_variant.txt"),
++            driver.transport_mode_metadata(),
++        )
++        .map_err(ioerr)?;
+         fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=fixed reference-q two-moment transport; total N/U includes active and passive source photons; support columns are conservative active-support/passive-cell envelope union, not a recovered density or exact populated support; Gamma uses active photons only; radiation stress includes both pools; legacy boundary outflow remains zero\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
+     }
+     let mut h=open_output(&out.join("history.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,b,H_per_s,s_per_s,x_HII,x_HeII,x_HeIII,nH_proper_cm3,ne_proper_cm3,temperature_K,Gamma_HI_per_s,Gamma_HeI_per_s,Gamma_HeII_per_s,photon_n_per_H,photon_u_eV_per_H,J0_photon_u_eV_per_H,J1_photon_u_eV_per_H,J2_photon_u_eV_per_H,x_HI,x_HeI")?;
+--- /dev/null
++++ rust/rei_microphysics/tests/axbi_bass_passive.rs
+@@ -0,0 +1,336 @@
++use rei_microphysics::axbi_bass_background::{
++    enclose_hermite_derivative, BassBackground, BassMonotonicityStatus, BassSourceIdentity,
++};
++use rei_microphysics::axbi_covariant_transport::PhotonState;
++use rei_microphysics::axbi_driver::{Driver, DriverConfig, DriverState};
++use std::{
++    fs,
++    path::{Path, PathBuf},
++};
++const CSV: &str = "5a7844834b50fbc046995678a6aaf936252a81e49de1593604eee30641274133";
++const RECEIPT: &str = "98eddf4673780f0bbca711b373a3e0746cfafc8190674c8d2d6c4de658dc3eed";
++fn base() -> PathBuf {
++    Path::new(env!("CARGO_MANIFEST_DIR")).join("../../research/bass_source007_20261016/inputs")
++}
++fn scratch() -> PathBuf {
++    let p = Path::new(env!("CARGO_MANIFEST_DIR"))
++        .join("../../research/bass_source008_20261016/raw/test_scratch")
++        .join(format!(
++            "{}-{:?}",
++            std::process::id(),
++            std::thread::current().id()
++        ));
++    fs::create_dir_all(&p).unwrap();
++    p
++}
++fn background(case: &str) -> BassBackground {
++    BassBackground::from_files(
++        &base().join("pr164_121.csv"),
++        &base().join("pr164_121.json"),
++        BassSourceIdentity {
++            producer_commit: "3c39bbbf46b6663e7c40277e194fd0ef48118472".into(),
++            source_csv_sha256: CSV.into(),
++            source_manifest_sha256: RECEIPT.into(),
++            case: case.into(),
++            grid_points: 121,
++        },
++    )
++    .unwrap()
++}
++fn config(split: bool) -> DriverConfig {
++    let mut c = DriverConfig::baseline();
++    c.end_zbar = 19.8;
++    c.background_panels = 64;
++    c.transport_cells = 32;
++    c.energy_subdivisions = 2;
++    c.inactive_hi_split = split;
++    c
++}
++fn driver(case: &str, split: bool) -> (Driver, DriverState) {
++    Driver::new_bass(config(split), background(case)).unwrap()
++}
++fn seed_all(d: &Driver, s: &mut DriverState, q: f64, n: f64) {
++    for (k, cell) in d.source.angular_cells.iter().enumerate() {
++        d.seed_delta(s, k, q, n * cell.count_fraction).unwrap();
++    }
++    s.ledgers.source_n += n;
++    s.ledgers.source_u += n * q;
++}
++fn photon(s: &DriverState) -> PhotonState {
++    PhotonState {
++        number: s.photons.clone(),
++        energy_ref: s.photon_energy_ref.clone(),
++        support_lo: s.photon_support_lo.clone(),
++        support_hi: s.photon_support_hi.clone(),
++    }
++}
++fn close_n(a: f64, b: f64, scale: f64) {
++    assert!(
++        (a - b).abs() <= 64.0 * f64::EPSILON * scale,
++        "number {a} {b}"
++    );
++}
++fn close_u(a: f64, b: f64, scale: f64) {
++    assert!(
++        (a - b).abs() <= 128.0 * f64::EPSILON * scale,
++        "energy {a} {b}"
++    );
++}
++#[test]
++fn all_selected_segments_are_enclosed_and_actual_rays_redshift() {
++    for case in ["COLD_FLRW", "SIGNED_MINUS"] {
++        let bg = background(case);
++        let report = bg.passive_monotonicity();
++        assert_eq!(report.status, BassMonotonicityStatus::Established);
++        assert_eq!(report.segments.len(), 120);
++        for segment in &report.segments {
++            for control in segment.controls {
++                let v = control.unwrap();
++                assert!(v.lo > -0.5 && v.hi < 1.0);
++            }
++        }
++        fs::write(
++            scratch().join(format!("{case}_all_segment_enclosures.txt")),
++            format!("{report:#?}\n"),
++        )
++        .unwrap();
++        let (d, _) = driver(case, true);
++        // Actual knot and midpoint rays are compatibility controls; the
++        // all-segment proof above, rather than samples, licenses the mode.
++        let rows = fs::read_to_string(base().join("pr164_121.csv")).unwrap();
++        let scales: Vec<f64> = rows
++            .lines()
++            .skip(1)
++            .filter_map(|line| {
++                let row: Vec<_> = line.split(',').collect();
++                (row[0] == case).then(|| row[2].parse().unwrap())
++            })
++            .collect();
++        let mut previous = d
++            .transport
++            .ray_geometry(&bg.point_at_scale(scales[0]).unwrap().geometry().unwrap())
++            .unwrap();
++        for pair in scales.windows(2) {
++            for a in [(pair[0] * pair[1]).sqrt(), pair[1]] {
++                let rays = d
++                    .transport
++                    .ray_geometry(&bg.point_at_scale(a).unwrap().geometry().unwrap())
++                    .unwrap();
++                assert!(previous
++                    .iter()
++                    .zip(&rays)
++                    .all(|(old, new)| new.scale <= old.scale));
++                previous = rays;
++            }
++        }
++        let meta = d.transport_mode_metadata();
++        assert!(meta.contains("background_provider=BASS_SELECTED_SOURCE008"));
++        assert!(meta.contains("selected_BASS_certified_forward_ray_monotone_only"));
++        assert!(!meta.contains("q0_forward_monotonic_only"));
++    }
++}
++#[test]
++fn unsafe_interior_boundary_and_nonfinite_controls_retain_typed_failure() {
++    // Endpoint derivatives are zero, but the middle Bernstein control is3,
++    // and the actual Hermite derivative at u=1/2 is1.5 (>1).
++    let unsafe_segment = enclose_hermite_derivative([0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0]);
++    assert_eq!(
++        unsafe_segment.status,
++        BassMonotonicityStatus::MonotonicityNotEstablished
++    );
++    assert!(unsafe_segment.controls[0].unwrap().hi < 1.0);
++    assert!(unsafe_segment.controls[2].unwrap().hi < 1.0);
++    assert!(unsafe_segment.controls[1].unwrap().lo > 1.0);
++    for inputs in [
++        [0.0, 1.0, 0.0, 0.0, -0.5, 1.0, 0.0, 1.0],
++        [0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0],
++        [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0],
++        [0.0, f64::NAN, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0],
++    ] {
++        let result = enclose_hermite_derivative(inputs);
++        assert_eq!(result.status.code(), "MONOTONICITY_NOT_ESTABLISHED");
++        assert_eq!(result.inputs.map(f64::to_bits), inputs.map(f64::to_bits));
++    }
++    fs::write(
++        scratch().join("manufactured_unsafe_enclosure.txt"),
++        format!("{unsafe_segment:#?}\n"),
++    )
++    .unwrap();
++}
++#[test]
++fn nonselected_identity_analytic_knobs_and_reverse_domain_reject_without_mutation() {
++    for mut bg in [background("WARM_ISOTROPIC"), background("SIGNED_MINUS")] {
++        if bg.identity.case == "SIGNED_MINUS" {
++            bg.identity.producer_commit = "0".repeat(40);
++        }
++        let report = bg.passive_monotonicity();
++        assert_eq!(report.status.code(), "MONOTONICITY_NOT_ESTABLISHED");
++        assert_eq!(report.reason, "NONSELECTED_SOURCE_IDENTITY");
++        assert!(
++            format!("{:?}", Driver::new_bass(config(true), bg).unwrap_err())
++                .contains("BASS_MONOTONICITY_NOT_ESTABLISHED")
++        );
++    }
++    for q in [-0.01, 0.01] {
++        let mut c = config(true);
++        c.q_ref = q;
++        assert!(Driver::new(c.clone()).is_err());
++        assert!(Driver::new_bass(c, background("SIGNED_MINUS")).is_err());
++    }
++    let mut c = config(true);
++    c.same_h = true;
++    assert!(Driver::new_bass(c, background("SIGNED_MINUS")).is_err());
++    let (d, mut s) = driver("SIGNED_MINUS", true);
++    seed_all(&d, &mut s, 13.6, 1e-6);
++    let to = s.a * 0.0002_f64.exp();
++    d.geometry_map(&mut s, to).unwrap();
++    for to in [s.a * 0.9999, 0.0, f64::NAN, 0.2000001] {
++        let before = format!("{s:?}");
++        assert!(d.geometry_map(&mut s, to).is_err());
++        assert_eq!(format!("{s:?}"), before);
++    }
++}
++#[test]
++fn actual_ray_hi_equality_active_just_below_passive_and_mu_crossings_differ() {
++    let (d, mut s) = driver("SIGNED_MINUS", true);
++    d.seed_delta(&mut s, 0, 13.6, 1e-6).unwrap();
++    let geometry = d.geometry_point(s.a).unwrap().geometry().unwrap();
++    let p = d
++        .transport
++        .partition_below_hi(&photon(&s), &geometry)
++        .unwrap();
++    assert_eq!(p.active.number.iter().sum::<f64>(), 1e-6);
++    assert_eq!(p.inactive_number.iter().sum::<f64>(), 0.0);
++    // At a later actual ray the reference cutoff is inside the source grid.
++    let (d, mut below) = driver("SIGNED_MINUS", true);
++    let to = below.a * 0.0001_f64.exp();
++    d.geometry_map(&mut below, to).unwrap();
++    let g = d.geometry_point(below.a).unwrap().geometry().unwrap();
++    let ray = d.transport.ray_geometry(&g).unwrap()[0];
++    let mut q = 13.6 / ray.scale;
++    while q * ray.scale >= 13.6 {
++        q = q.next_down();
++    }
++    d.seed_delta(&mut below, 0, q, 1e-6).unwrap();
++    let p = d.transport.partition_below_hi(&photon(&below), &g).unwrap();
++    assert_eq!(p.active.number.iter().sum::<f64>(), 0.0);
++    assert_eq!(p.inactive_number.iter().sum::<f64>(), 1e-6);
++    let (d, mut s) = driver("SIGNED_MINUS", true);
++    let to = s.a * 0.0001_f64.exp();
++    let g = d.geometry_point(to).unwrap().geometry().unwrap();
++    let rays = d.transport.ray_geometry(&g).unwrap();
++    let lo = rays.iter().map(|r| r.scale).fold(f64::INFINITY, f64::min);
++    let hi = rays.iter().map(|r| r.scale).fold(0.0, f64::max);
++    assert!(hi > lo);
++    let q = 13.6 / ((lo + hi) / 2.0);
++    seed_all(&d, &mut s, q, 1e-6);
++    d.geometry_map(&mut s, to).unwrap();
++    assert!(
++        s.photons.iter().sum::<f64>() > 0.0 && s.photon_inactive_number.iter().sum::<f64>() > 0.0
++    );
++    for (k, ray) in rays.iter().enumerate() {
++        let range = k * d.energies.len()..(k + 1) * d.energies.len();
++        let active = s.photons[range.clone()].iter().sum::<f64>();
++        let passive = s.photon_inactive_number[range].iter().sum::<f64>();
++        if q * ray.scale < 13.6 {
++            assert_eq!(active, 0.0);
++            assert!(passive > 0.0);
++        } else {
++            assert!(active > 0.0);
++            assert_eq!(passive, 0.0);
++        }
++    }
++}
++#[test]
++fn repeated_transfer_preserves_moments_work_and_has_no_false_events() {
++    for case in ["COLD_FLRW", "SIGNED_MINUS"] {
++        let (d, mut s) = driver(case, true);
++        seed_all(&d, &mut s, 13.6, 1e-6);
++        let (n0, u0) = d.photon_inventory(&s);
++        let a0 = s.a;
++        for x in [0.0001_f64, 0.0002, 0.0003] {
++            d.geometry_map(&mut s, a0 * x.exp()).unwrap();
++        }
++        assert_eq!(s.photons.iter().sum::<f64>(), 0.0);
++        let pn = s.photon_inactive_number.clone();
++        let pu = s.photon_inactive_energy_ref.clone();
++        d.geometry_map(&mut s, a0 * 0.0004_f64.exp()).unwrap();
++        assert_eq!(s.photon_inactive_number, pn);
++        assert_eq!(s.photon_inactive_energy_ref, pu);
++        let (n, u) = d.photon_inventory(&s);
++        close_n(n, n0, n0);
++        close_u(u + s.ledgers.photon_work, u0, u0);
++        close_u(d.moments(&s).unwrap()[0], u, u0);
++        assert_eq!(s.ledgers.photo_events, [0.0; 3]);
++        assert_eq!(s.ledgers.absorbed_n, 0.0);
++        d.validate(&s, 1e-8).unwrap();
++    }
++}
++#[test]
++fn actual_source_and_chemistry_absorb_only_active_while_passive_moments_remain() {
++    let (d, mut with) = driver("SIGNED_MINUS", true);
++    let (_, mut without) = driver("SIGNED_MINUS", true);
++    seed_all(&d, &mut with, 13.6, 1e-6);
++    let to = with.a * 0.0002_f64.exp();
++    d.geometry_map(&mut with, to).unwrap();
++    d.geometry_map(&mut without, to).unwrap();
++    let pn = with.photon_inactive_number.clone();
++    let pu = with.photon_inactive_energy_ref.clone();
++    d.fixed_step(&mut with, 1e-4).unwrap();
++    d.fixed_step(&mut without, 1e-4).unwrap();
++    assert!(with.ledgers.source_n > 1e-6 && with.ledgers.absorbed_n > 0.0);
++    assert_eq!(format!("{:?}", with.gas), format!("{:?}", without.gas));
++    assert_eq!(with.photons, without.photons);
++    assert_eq!(with.photon_energy_ref, without.photon_energy_ref);
++    assert_eq!(with.ledgers.photo_events, without.ledgers.photo_events);
++    for i in 0..pn.len() {
++        close_n(
++            with.photon_inactive_number[i] - without.photon_inactive_number[i],
++            pn[i],
++            1e-6,
++        );
++        close_u(
++            with.photon_inactive_energy_ref[i] - without.photon_inactive_energy_ref[i],
++            pu[i],
++            13.6e-6,
++        );
++    }
++    d.validate(&with, 1e-8).unwrap();
++    d.validate(&without, 1e-8).unwrap();
++}
++#[test]
++fn nonzero_passive_checkpoint_binds_mode_six_arrays_and_new_compiled_source() {
++    let (d, mut s) = driver("SIGNED_MINUS", true);
++    seed_all(&d, &mut s, 13.6, 1e-6);
++    let to = s.a * 0.0002_f64.exp();
++    d.geometry_map(&mut s, to).unwrap();
++    assert!(s.photon_inactive_number.iter().sum::<f64>() > 0.0);
++    let dir = scratch();
++    let output = dir.join("output.txt");
++    fs::write(&output, "source008 passive epoch\n").unwrap();
++    let path = dir.join("checkpoint.bass-v1");
++    d.save_bass_checkpoint(&path, &s, "source008", &output)
++        .unwrap();
++    let loaded = d.read_bass_checkpoint(&path, "source008", &output).unwrap();
++    assert_eq!(format!("{loaded:?}"), format!("{s:?}"));
++    let text = fs::read_to_string(&path).unwrap();
++    assert!(text.contains("CURRENT_PROVIDER=SOURCE008"));
++    assert!(text.contains("inactive_hi_split=true"));
++    let (_, body) = text.split_once("\nAXBI_CHECKPOINT_V4\n").unwrap();
++    assert_eq!(body.lines().count(), 10);
++    let (off, _) = driver("SIGNED_MINUS", false);
++    let e = off
++        .read_bass_checkpoint(&path, "source008", &output)
++        .unwrap_err();
++    assert!(format!("{e:?}").contains("BASS_CHECKPOINT_PROVIDER_SCHEMA"));
++    let mut lines = text.lines().map(str::to_owned).collect::<Vec<_>>();
++    lines[4] = "7a085a77634c39e65cf39150532a43d288233a9349c77803475479866b0e8f3e".into();
++    let old = dir.join("old-source007.bass");
++    fs::write(&old, format!("{}\n", lines.join("\n"))).unwrap();
++    assert!(format!(
++        "{:?}",
++        d.read_bass_checkpoint(&old, "source008", &output)
++            .unwrap_err()
++    )
++    .contains("BASS_CHECKPOINT_NATIVE_SOURCE"));
++}

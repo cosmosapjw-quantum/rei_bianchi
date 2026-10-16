@@ -359,6 +359,7 @@ pub struct Driver {
     pub background: AxbiBackground,
     /// Opt-in producer table. The legacy public background remains intact.
     bass_background: Option<BassBackground>,
+    bass_passive_certified: bool,
     pub source: AxbiSource,
     pub energies: Vec<f64>,
     pub n_h0_cm3: f64,
@@ -452,6 +453,7 @@ impl Driver {
             config,
             background: bg,
             bass_background: None,
+            bass_passive_certified: false,
             source,
             energies,
             n_h0_cm3: n_h0,
@@ -466,10 +468,20 @@ impl Driver {
         config: DriverConfig,
         bass: BassBackground,
     ) -> Result<(Self, DriverState), ForwardError> {
-        if config.q_ref != 0.0 || config.same_h || config.inactive_hi_split {
+        if config.q_ref != 0.0 || config.same_h {
             return Err(err("BASS_DRIVER_CONFIG_MODE"));
         }
+        let passive_certified = if config.inactive_hi_split {
+            let report = bass.passive_monotonicity();
+            if report.status != crate::axbi_bass_background::BassMonotonicityStatus::Established {
+                return Err(err("BASS_MONOTONICITY_NOT_ESTABLISHED"));
+            }
+            true
+        } else {
+            false
+        };
         let (mut driver, state) = Self::new(config)?;
+        driver.bass_passive_certified = passive_certified;
         let a_ref = state.a;
         let reference = bass.point_at_scale(a_ref)?.geometry()?;
         bass.point_at_scale(1.0 / (1.0 + driver.config.end_zbar))?;
@@ -509,6 +521,23 @@ impl Driver {
     }
     pub fn bass_identity(&self) -> Option<&crate::axbi_bass_background::BassSourceIdentity> {
         self.bass_background.as_ref().map(|b| &b.identity)
+    }
+    pub fn transport_mode_metadata(&self) -> String {
+        let (provider, scope) = if self.bass_background.is_some() {
+            (
+                "BASS_SELECTED_SOURCE008",
+                if self.config.inactive_hi_split && self.bass_passive_certified {
+                    "selected_BASS_certified_forward_ray_monotone_only"
+                } else if self.config.inactive_hi_split {
+                    "MONOTONICITY_NOT_ESTABLISHED"
+                } else {
+                    "disabled"
+                },
+            )
+        } else {
+            ("AXBI_ANALYTIC", "q0_forward_monotonic_only")
+        };
+        format!("inactive_hi_split={}\nbackground_provider={}\npassive_scope={}\ncheckpoint_version=V4\ntransport_threads={}\nparallel_scope=persistent_cell_prepare_and_opt_in_jacobian_columns\nparallel_jacobian_columns={}\n", self.config.inactive_hi_split,provider,scope,self.config.transport_threads,self.config.parallel_jacobian_columns)
     }
     fn photon_state(&self, state: &DriverState) -> PhotonState {
         PhotonState {
@@ -708,6 +737,20 @@ impl Driver {
         }
         let g0 = self.geometry_point(s.a)?.geometry()?;
         let g1 = self.geometry_point(to)?.geometry()?;
+        if self.config.inactive_hi_split && self.bass_background.is_some() {
+            if !self.bass_passive_certified {
+                return Err(err("BASS_MONOTONICITY_NOT_ESTABLISHED"));
+            }
+            let old_rays = self.transport.ray_geometry(&g0)?;
+            let new_rays = self.transport.ray_geometry(&g1)?;
+            if old_rays.len() != new_rays.len()
+                || old_rays.iter().zip(&new_rays).any(|(old, new)| {
+                    !old.scale.is_finite() || !new.scale.is_finite() || new.scale > old.scale
+                })
+            {
+                return Err(err("BASS_PASSIVE_RAY_REDSHIFT_NOT_ESTABLISHED"));
+            }
+        }
         let (_, old_u) = self.inventory_with_geometry(s, &g0)?;
         let (_, new_u) = self.inventory_with_geometry(s, &g1)?;
         self.partition_inactive(s, &g1)?;
@@ -1091,6 +1134,8 @@ pub fn compiled_identity() -> String {
         include_str!("axbi_q_closure.rs"),
         include_str!("axbi_background.rs"),
         include_str!("axbi_bass_background.rs"),
+        include_str!("interval_math.rs"),
+        include_str!("../../../research/bass_source008_20261016/CONTRACT.json"),
         include_str!("../../../research/bass_source007_20261016/CONTRACT.json"),
         include_str!("axbi_sources.rs"),
         include_str!("axbi_rates.rs"),
@@ -1332,9 +1377,9 @@ impl Driver {
         let source = sha256_bytes(compiled_identity().as_bytes())?;
         let config = sha256_bytes(format!("{:?}", self.config).as_bytes())?;
         let body = self.checkpoint_text(s)?;
-        let text=format!("BASS_REI_CHECKPOINT_V1\n{}|{}|{}|{}|{}\nBASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}\nDONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE007\n{}\n{}\n{}|{}\n{}\n{:.17e}|{:.17e}|{:.17e}|{:.17e}|{:.17e}\n{}\n{}\n{}",
+        let text=format!("BASS_REI_CHECKPOINT_V1\n{}|{}|{}|{}|{}\nBASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}|inactive_hi_split={}\nDONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE008\n{}\n{}\n{}|{}\n{}\n{:.17e}|{:.17e}|{:.17e}|{:.17e}|{:.17e}\n{}\n{}\n{}",
             id.producer_commit,id.source_csv_sha256,id.source_manifest_sha256,id.case,id.grid_points,
-            self.config.transport_cells,
+            self.config.transport_cells,self.config.inactive_hi_split,
             source,config,epoch,output.display(),sha256_bytes(&output_bytes)?,
             s.a,p.time_s,p.b,p.h_per_s,p.s_per_s,
             sha256_bytes(body.as_bytes())?,body.len(),body);
@@ -1382,8 +1427,8 @@ impl Driver {
         if lines[1] != expected {
             return Err(err("BASS_CHECKPOINT_SOURCE_BINDING"));
         }
-        if lines[2]!=format!("BASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}",self.config.transport_cells) {return Err(err("BASS_CHECKPOINT_PROVIDER_SCHEMA"));}
-        if lines[3]!="DONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE007" {return Err(err("BASS_CHECKPOINT_REI_BASE"));}
+        if lines[2]!=format!("BASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}|inactive_hi_split={}",self.config.transport_cells,self.config.inactive_hi_split) {return Err(err("BASS_CHECKPOINT_PROVIDER_SCHEMA"));}
+        if lines[3]!="DONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE008" {return Err(err("BASS_CHECKPOINT_REI_BASE"));}
         if lines[4] != sha256_bytes(compiled_identity().as_bytes())? {
             return Err(err("BASS_CHECKPOINT_NATIVE_SOURCE"));
         }
@@ -1819,7 +1864,11 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
         fs::write(out.join("config.cfg"), config_text).map_err(ioerr)?;
         fs::write(out.join("source_identity.txt"), compiled_identity()).map_err(ioerr)?;
         fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
-        fs::write(out.join("transport_variant.txt"), format!("inactive_hi_split={}\npassive_scope=q0_forward_monotonic_only\ncheckpoint_version=V4\ntransport_threads={}\nparallel_scope=persistent_cell_prepare_and_opt_in_jacobian_columns\nparallel_jacobian_columns={}\n", driver.config.inactive_hi_split, driver.config.transport_threads, driver.config.parallel_jacobian_columns)).map_err(ioerr)?;
+        fs::write(
+            out.join("transport_variant.txt"),
+            driver.transport_mode_metadata(),
+        )
+        .map_err(ioerr)?;
         fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=fixed reference-q two-moment transport; total N/U includes active and passive source photons; support columns are conservative active-support/passive-cell envelope union, not a recovered density or exact populated support; Gamma uses active photons only; radiation stress includes both pools; legacy boundary outflow remains zero\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
     }
     let mut h=open_output(&out.join("history.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,b,H_per_s,s_per_s,x_HII,x_HeII,x_HeIII,nH_proper_cm3,ne_proper_cm3,temperature_K,Gamma_HI_per_s,Gamma_HeI_per_s,Gamma_HeII_per_s,photon_n_per_H,photon_u_eV_per_H,J0_photon_u_eV_per_H,J1_photon_u_eV_per_H,J2_photon_u_eV_per_H,x_HI,x_HeI")?;

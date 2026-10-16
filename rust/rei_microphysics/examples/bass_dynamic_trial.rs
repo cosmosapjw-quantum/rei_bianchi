@@ -1,4 +1,4 @@
-//! Opt-in source007 fixed-step component diagnostic; no adaptive or full-history admission.
+//! Opt-in source008 fixed-step component diagnostic; no adaptive or full-history admission.
 use rei_microphysics::axbi_bass_background::{BassBackground, BassSourceIdentity};
 use rei_microphysics::axbi_covariant_transport::PhotonState;
 use rei_microphysics::axbi_driver::{Driver, DriverConfig, DriverState};
@@ -12,8 +12,8 @@ use std::{
 
 fn result() -> Result<(), Box<dyn std::error::Error>> {
     let args = env::args().collect::<Vec<_>>();
-    if args.len() != 11 {
-        return Err("usage: bass_dynamic_trial CSV MANIFEST CSV_SHA MANIFEST_SHA CASE GRID DLNA STEPS WORKERS OUTPUT_DIR".into());
+    if args.len() != 11 && !(args.len() == 12 && args[11] == "--inactive-hi-split") {
+        return Err("usage: bass_dynamic_trial CSV MANIFEST CSV_SHA MANIFEST_SHA CASE GRID DLNA STEPS WORKERS OUTPUT_DIR [--inactive-hi-split]".into());
     }
     let output = PathBuf::from(&args[10]);
     fs::create_dir(&output)?;
@@ -35,9 +35,14 @@ fn result() -> Result<(), Box<dyn std::error::Error>> {
     config.end_zbar = 19.99;
     config.initial_dln_a = dln;
     config.transport_threads = workers;
+    config.inactive_hi_split = args.len() == 12;
     config.max_steps = 512;
     config.max_wall_s = 1700.0;
     let (driver, initial) = Driver::new_bass(config.clone(), bg.clone())?;
+    fs::write(
+        output.join("transport_variant.txt"),
+        driver.transport_mode_metadata(),
+    )?;
     let mut uninterrupted = initial.clone();
     let output_record = output.join("output_identity.txt");
     fs::write(

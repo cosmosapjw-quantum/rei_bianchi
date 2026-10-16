@@ -1,6 +1,7 @@
 //! Opt-in, source-bound BASS point table. The CSV is an immutable producer input.
 //! Cubic Hermite interpolation uses the producer's local tangent columns.
 use crate::axbi_background::{BackgroundIncrement, BackgroundPoint};
+use crate::interval_math::Interval;
 use crate::ForwardError;
 use std::{
     fs,
@@ -61,6 +62,69 @@ pub struct BassBackground {
     pub max_raychaudhuri_normalized: f64,
     pub max_producer_clock_relative: f64,
 }
+/// Typed result of the sufficient all-segment certificate. Failure is not a
+/// physical nonmonotonicity claim: uncertain enclosures fail closed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum BassMonotonicityStatus {
+    Established,
+    MonotonicityNotEstablished,
+}
+impl BassMonotonicityStatus {
+    pub fn code(self) -> &'static str {
+        match self {
+            Self::Established => "MONOTONICITY_ESTABLISHED",
+            Self::MonotonicityNotEstablished => "MONOTONICITY_NOT_ESTABLISHED",
+        }
+    }
+}
+#[derive(Clone, Debug)]
+pub struct BassDerivativeEnclosure {
+    /// x0,x1,b0,b1,s0,H0,s1,H1; retained even for invalid input.
+    pub inputs: [f64; 8],
+    pub controls: [Option<Interval>; 3],
+    pub status: BassMonotonicityStatus,
+}
+/// Enclose the three quadratic Bernstein controls of the existing Hermite b'.
+/// No sampling, fitting, tolerance, or interpolation coefficient is changed.
+pub fn enclose_hermite_derivative(inputs: [f64; 8]) -> BassDerivativeEnclosure {
+    let mut out = BassDerivativeEnclosure {
+        inputs,
+        controls: [None; 3],
+        status: BassMonotonicityStatus::MonotonicityNotEstablished,
+    };
+    let [x0, x1, b0, b1, s0, h0, s1, h1] = inputs;
+    let compute = || -> crate::interval_math::Result<[Interval; 3]> {
+        let point = Interval::point;
+        if !inputs.iter().all(|v| v.is_finite()) || x1 <= x0 || h0 <= 0.0 || h1 <= 0.0 {
+            return Err(crate::interval_math::IntervalError);
+        }
+        let dx = point(x1)?.sub(&point(x0)?)?;
+        let d0 = point(s0)?.div(&point(h0)?)?;
+        let d1 = point(s1)?.div(&point(h1)?)?;
+        let middle = point(3.0)?
+            .mul(&point(b1)?.sub(&point(b0)?)?)?
+            .div(&dx)?
+            .sub(&d0)?
+            .sub(&d1)?;
+        Ok([d0, middle, d1])
+    };
+    if let Ok(controls) = compute() {
+        out.controls = controls.map(Some);
+        if controls.iter().all(|v| v.lo > -0.5 && v.hi < 1.0) {
+            out.status = BassMonotonicityStatus::Established;
+        }
+    }
+    out
+}
+#[derive(Clone, Debug)]
+pub struct BassMonotonicityReport {
+    pub identity: BassSourceIdentity,
+    pub status: BassMonotonicityStatus,
+    pub reason: &'static str,
+    /// One enclosure per consecutive table pair; all raw inputs retained.
+    pub segments: Vec<BassDerivativeEnclosure>,
+}
+
 fn integrate_clock(l: Row, r: Row, to_x: f64) -> f64 {
     if to_x == l.x {
         return 0.0;
@@ -410,6 +474,46 @@ impl BassBackground {
             gl4_time_difference_s: t4 - proper,
             gl4_b_difference: b4 - delta_b,
         })
+    }
+    /// The source008 passive extension is deliberately limited to these exact
+    /// selected model/table/case identities. Other BASS use retains mode=false.
+    pub fn passive_monotonicity(&self) -> BassMonotonicityReport {
+        let selected = self.identity.producer_commit == "3c39bbbf46b6663e7c40277e194fd0ef48118472"
+            && self.identity.source_csv_sha256
+                == "5a7844834b50fbc046995678a6aaf936252a81e49de1593604eee30641274133"
+            && self.identity.source_manifest_sha256
+                == "98eddf4673780f0bbca711b373a3e0746cfafc8190674c8d2d6c4de658dc3eed"
+            && self.identity.grid_points == 121
+            && self.rows.len() == 121
+            && matches!(self.identity.case.as_str(), "COLD_FLRW" | "SIGNED_MINUS");
+        let segments = self
+            .rows
+            .windows(2)
+            .map(|pair| {
+                let (l, r) = (pair[0], pair[1]);
+                enclose_hermite_derivative([l.x, r.x, l.b, r.b, l.s, l.h, r.s, r.h])
+            })
+            .collect::<Vec<_>>();
+        let established = selected
+            && segments
+                .iter()
+                .all(|s| s.status == BassMonotonicityStatus::Established);
+        BassMonotonicityReport {
+            identity: self.identity.clone(),
+            status: if established {
+                BassMonotonicityStatus::Established
+            } else {
+                BassMonotonicityStatus::MonotonicityNotEstablished
+            },
+            reason: if !selected {
+                "NONSELECTED_SOURCE_IDENTITY"
+            } else if !established {
+                "CONTROL_ENCLOSURE_NOT_STRICTLY_INSIDE_MINUS_HALF_TO_ONE"
+            } else {
+                "ALL_SEGMENTS_STRICT_BERNSTEIN_ENCLOSURE"
+            },
+            segments,
+        }
     }
     pub fn grid_points(&self) -> usize {
         self.rows.len()
