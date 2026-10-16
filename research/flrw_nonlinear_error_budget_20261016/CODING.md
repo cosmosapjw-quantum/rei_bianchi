@@ -15,3 +15,7 @@ Existing NCP/PL cumulative156.5376037069618/300s and deadline1792122617.77407 re
 ## C3 — numerical design
 
 The binary64 core uses maximum-absolute partial row pivots in a fixed 4x4 augmented solve/inverse. Only an exactly zero computed pivot is singular; finite ill-conditioning remains a reported diagnostic. Frozen SR and Sy build A and b once, then max vector/row-sum norms give correction, condition estimate and normwise backward error. All arithmetic must remain finite. Thermal exact-map evaluation uses linearDeltaT/(1+dD/D) after corrected-domain validation; invalid corrected states retain the linear diagnostic and null exact map. No state is committed or physical tolerance changed.
+
+## C4 — bounded execution
+
+C5 completes module/CLI/template and tests. C6 checks guards, finite serialization and fresh durable IO. The disjoint C7 harness owner compares new binary64 results with the already completed exact oracle RESULT; no oracle is run again. C8 uses only fixed small conditioning and unequal old/current-energy-scale cases. Each execution has a 30-second outer limit and actual time evidence; no large benchmark or native work is planned. Existing NCP/PL debit and deadline remain separate and unchanged. C9/C10 proceed from captured observed evidence.
