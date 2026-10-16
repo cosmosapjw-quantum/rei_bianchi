@@ -1,0 +1,97 @@
+{
+  "schema": "rei.iso_couple.source_native.bounded.v1",
+  "date_kst": "2026-10-17",
+  "node": "ISO-COUPLE",
+  "current_node_status": "PARTIAL_CX_ONLY_PASS_SCOPED",
+  "claim_admission": "NOT_FULL_NATIVE_EOR",
+  "parent_pr": 179,
+  "production_owner": {
+    "repo": "cosmosapjw-quantum/rei_bianchi",
+    "pr": 150,
+    "sha": "da4bd0b9d112cadb2ec78c49d7dc3e7ab4761ea7",
+    "readonly": true
+  },
+  "previous_eos": "rei.iso_eos.contract.v1",
+  "compiled_original_modules": [
+    "atomic_provider",
+    "igm_rates",
+    "rate_table",
+    "isotope_state",
+    "deuterium_charge_exchange",
+    "deuterium_thermal_charge_exchange",
+    "deuterium_atomic",
+    "deuterium_thermal_coupling"
+  ],
+  "energy_defect": {
+    "owner": "real original DAtomicProvider.defect()",
+    "units": "J per forward event",
+    "temperature": "K",
+    "fixture_eV": 0.0037,
+    "fixture_origin": "MANUFACTURED_NOT_PHYSICAL_SOURCE_ADMITTED",
+    "source_label_required": true
+  },
+  "evolution": {
+    "coordinates": "proper time seconds; proper volume fixed",
+    "xi": "signed m^-3",
+    "bounds": "-min(H0,Dp)<=xi<=min(Hp,D0); plus exact Savin temperature intersection",
+    "savin_rate_law": "original independent forward/reverse fits; NOT detailed balance corrected",
+    "Savin_K_operational": [
+      2.7,
+      200000.0
+    ],
+    "temperature": "[u_th0 - xi*(chi_D-chi_H)]/[1.5*k_B*n_th0]",
+    "electron_owner": "IsotopeNumberState::moments() exactly once per EOS evaluation",
+    "n_th": "sum heavy particles + ionic positive charge",
+    "thermal_step": "Heun full and two half; transactional, error ~(half-half-full)/3",
+    "no_clipping": true,
+    "no_extrapolation": true
+  },
+  "events": {
+    "owner": "CxOwnership::AtomicRhs XOR ThermalSubstep",
+    "atomic_source": "real DAtomicProvider::photo_input and d_atomic_rhs",
+    "atomic_rhs_when_thermal_substep": "CX disabled",
+    "atomic_rhs_when_atomic_rhs": "CX Savin on",
+    "thermal_advance_when_atomic_rhs": "typed OwnershipConflict",
+    "time_integrated_in_this_unit": [
+      "CX only"
+    ],
+    "time_integrated_untested": [
+      "H/He gas chemistry",
+      "D PI/CI/RR/CE",
+      "photon competition",
+      "FF/CMB",
+      "expansion"
+    ]
+  },
+  "acceptance": {
+    "source_git_blobs": 8,
+    "unit_tests_pass": 36,
+    "convergence_rows": 36,
+    "max_relative_to_strict": {
+      "1e-05": 4.516072e-05,
+      "1e-07": 2.233812e-06,
+      "1e-09": 1.029456e-07
+    },
+    "max_baryon_delta_m3": 0.0,
+    "max_electron_delta_m3": 0.0,
+    "max_cx_energy_residual_J_m3": 0.0
+  },
+  "status_classification": {
+    "ISO-EOS": "PASS_SCOPED_REUSED",
+    "ISO-COUPLE-P1": "PASS_SCOPED_13_STATE_CX_ONLY",
+    "ISO-COUPLE_FULL": "HOLD_BI_SIGNED_AND_SOURCE_ON",
+    "ISO-RUN": "HOLD",
+    "FULL_NATIVE_EOR": "HOLD",
+    "native_subagent": "NOT_RUN"
+  },
+  "detailed_balance": {
+    "source_a": "Savin 2002 10.1086/324218",
+    "source_b": "10.1093/mnras/stv2343",
+    "T_K": 10000,
+    "Savin_kf_over_kr": 1.009893756250887,
+    "Boltzmann_equilibrium_ratio_42p915K": 0.9957176953275062,
+    "rate_law_changed": false,
+    "decision": "separate source-model alternative before production"
+  },
+  "next_action": "ISO-COUPLE-P2 H/He+D non-CX and CX shared EOS proper clock; photon/FF/CMB global shared owner, then BI-SIGNED prerequisite"
+}
