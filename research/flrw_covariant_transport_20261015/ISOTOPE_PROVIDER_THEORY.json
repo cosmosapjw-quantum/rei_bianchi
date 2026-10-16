@@ -1,0 +1,301 @@
+{
+  "schema": "rei.isotope_provider.theory.v1",
+  "date": "2026-10-15",
+  "base_commit": "8aa6cd081f218e3a4ff6180a547c790df234a073",
+  "status": "READY_FOR_STANDALONE_D_PROVIDER_IMPLEMENTATION",
+  "selected_model": {
+    "id": "GRACKLE_3_4_1_H_EQUALITY_D_ATOMIC_V1",
+    "classification": "explicit conditional phenomenological atomic D model",
+    "default_activation": false,
+    "production_activation": "next isotope-native coupled network/transport/EOS integration unit",
+    "hydrogenic_scaling_selected": false,
+    "recombination_case": "A escape",
+    "physical_accuracy": "NOT_ESTABLISHED_FOR_ISOTOPE_APPROXIMATION",
+    "source_rates": "existing igm_rates H entries",
+    "photo_model": "same existing Verner HI fit above supplied chiD, exactly zero below chiD",
+    "photo_model_difference_from_upstream": "explicit threshold correction; Grackle directly reuses H Gamma",
+    "temperature_operational_k": [
+      1,
+      1000000
+    ],
+    "temperature_with_savin_cx_k": [
+      2.7,
+      200000
+    ],
+    "photo_energy_max_ev": 50000
+  },
+  "thresholds": {
+    "hydrogen_ev": 13.598434599702,
+    "deuterium_ev": 13.602134599702,
+    "defect_ev": 0.0037,
+    "defect_source": "Savin2002 approximate forward endothermic threshold 3.7meV",
+    "precision_kind": "approximation; derived chiD decimals not measured D precision",
+    "electron_volt_j": 1.602176634e-19,
+    "owner": "same thresholds in photo/CI/RR/CX",
+    "forbidden_substitutions": [
+      "37.1 K Savin fit exponent",
+      "33.0 K Savin fit exponent",
+      "rounded Verner threshold as physical binding"
+    ]
+  },
+  "provider_map": [
+    {
+      "process": "CI",
+      "owner": "igm_rates(T).ci_cm3_s[0]",
+      "scale_to_SI": 0.000001,
+      "units": "m^3/s",
+      "diagnostics": "H CI floor retained"
+    },
+    {
+      "process": "RR",
+      "owner": "igm_rates(T).rr_cm3_s[0]",
+      "scale_to_SI": 0.000001,
+      "units": "m^3/s"
+    },
+    {
+      "process": "RR thermal",
+      "owner": "igm_rates(T).rr_cooling_erg_cm3_s[0]",
+      "scale_to_SI": 1e-13,
+      "units": "J m^3/s",
+      "binding_release": "added separately exactly once to escape"
+    },
+    {
+      "process": "CE thermal",
+      "owner": "igm_rates(T).ce_erg[0]",
+      "scale_to_SI": 1e-13,
+      "units": "J m^3/s",
+      "diagnostics": "H CE cap retained"
+    },
+    {
+      "process": "photo",
+      "owner": "AtomicProvider.cross_section(Absorber::HI,E)",
+      "scale_to_SI": 0.0001,
+      "units": "m^2",
+      "precondition": "E>=chiD; otherwise0; reject negative/nonfinite/E>50000"
+    },
+    {
+      "process": "CX",
+      "owner": "deuterium_charge_exchange::Savin2002",
+      "units": "m^3/s",
+      "energy_defect": "same threshold defect",
+      "electron_change": 0
+    },
+    {
+      "process": "free-free and CMB",
+      "owner": "common full network",
+      "duplication_forbidden": true
+    }
+  ],
+  "rhs": {
+    "P": "nD0 GammaD",
+    "C": "ne nD0 betaD",
+    "R": "ne nDp alphaD",
+    "X": "kf nD0 nHp - kr nDp nH0",
+    "LR": "ne nDp ellR",
+    "LE": "ne nD0 ellE",
+    "dDplus": "P+C-R+X",
+    "dHplus": "-X",
+    "delectron": "P+C-R",
+    "thermal": "nD0 heatD-chiD C-LR-LE-DeltaChi X",
+    "binding": "chiD(P+C-R)+DeltaChi X",
+    "escape": "chiD R+LR+LE",
+    "photon_input": "chiD P+nD0 heatD",
+    "expansion_included": false
+  },
+  "inventory": {
+    "selected_available_candidate": {
+      "source": "Cooke Pettini Steidel 2018 ApJ855102 Eq10",
+      "url": "https://ar5iv.labs.arxiv.org/html/1710.11129",
+      "kind": "OBSERVATION_CONDITIONED_PRIMORDIAL_RATIO",
+      "ratio": "nD/n1H",
+      "central": 0.00002527,
+      "uncertainty": 3e-7,
+      "confidence": "68 percent",
+      "matched_rec_donor": false,
+      "new_BBN_execution": false,
+      "ion_fraction_supplied": false
+    },
+    "ionic_ic_option": {
+      "kind": "explicit conditional frozen CX equilibrium at zero ionizing radiation",
+      "formula": "xDp=kf nHp/(kf nHp+kr nH0)",
+      "recovered_donor": false,
+      "activation": "caller explicitly chooses or supplies own xDp"
+    },
+    "fixed_baryon_normalization": "n1H=nb/(1+2*rD+4*fHe4); nD=rD*n1H; nHe4=fHe4*n1H",
+    "separate_BBN_candidate": {
+      "source": "Pitrou et al2018 TablesVII-VIII",
+      "url": "https://www2.iap.fr/users/pitrou/publi/PhysReptBBN.pdf",
+      "kind": "PUBLISHED_THEORETICAL_PREDICTION_NOT_CURRENT_DONOR",
+      "omega_b_h2": 0.02225,
+      "N_nu": 3,
+      "tau_n_s": 879.5,
+      "D_H": {
+        "central": 0.00002459,
+        "uncertainty": 3.6e-7
+      },
+      "He3_H": {
+        "central": 0.00001074,
+        "uncertainty": 2.6e-7
+      },
+      "Li7_H": {
+        "central": 5.623e-10,
+        "uncertainty": 2.47e-11
+      },
+      "combined_with_measurement": false,
+      "new_code_execution": false
+    }
+  },
+  "other_nuclides": {
+    "He3": {
+      "next_model": "explicit elemental He coefficient equality; independent A3 inventory",
+      "inventory_candidate": "separate Pitrou2018 BBN prediction",
+      "isotope_specific_rates": false,
+      "requires": [
+        "baryon/helium split normalization",
+        "common electron/EOS updates"
+      ]
+    },
+    "Li": {
+      "photo_table_keys": [
+        [
+          3,
+          3
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          3,
+          1
+        ]
+      ],
+      "photo_edges_ev": [
+        5.392,
+        75.64,
+        122.5
+      ],
+      "LiI_single_fit_max_ev": 64.39,
+      "rr_model": "VernerFerland1996 Eq4",
+      "rr_parameters": [
+        {
+          "destination": "LiI",
+          "a_cm3_s": 1.036e-11,
+          "b": 0.388,
+          "T0_k": 107.7,
+          "T1_k": 11770000
+        },
+        {
+          "destination": "LiII",
+          "a_cm3_s": 1.112e-10,
+          "b": 0.6926,
+          "T0_k": 24.37,
+          "T1_k": 8323000
+        },
+        {
+          "destination": "LiIII",
+          "a_cm3_s": 3.039e-10,
+          "b": 0.7539,
+          "T0_k": 18.71,
+          "T1_k": 6209000
+        }
+      ],
+      "rr_temperature_k": [
+        3,
+        1000000000
+      ],
+      "isotope_specific_rates": false,
+      "requires": [
+        "actual sub-Lyman emissivity/transport",
+        "LiI inner-shell photo above64.39eV and branching",
+        "CI/DR/CX coverage",
+        "RR kinetic thermal moment or source-backed cooling closure",
+        "explicit isotope inventory and charge-state IC"
+      ],
+      "sub_Lyman_primary": "SwitzerHirata2005 §§II-III https://ar5iv.labs.arxiv.org/html/astro-ph/0507106"
+    }
+  },
+  "checks": {
+    "new_symbolic": "ISOTOPE_PROVIDER_WOLFRAM.json",
+    "energy_residuals": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "new_native_calls": 0,
+    "old_test_replays": 0,
+    "source_byte_readback": "fresh downloaded Grackle F equals retained source sha",
+    "claim": "algebra/dimensions/source transcription only"
+  },
+  "source_pins": {
+    "rust/rei_microphysics/src/igm_rates.rs": "310164e620617f3089d488bd1f9668996b4a4cbd191383e45303def176ef81cf",
+    "rust/rei_microphysics/src/atomic_provider.rs": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3",
+    "rust/rei_microphysics/src/deuterium_charge_exchange.rs": "482e81d29bf33981ec56bf76dad1c8da5b9a4e162a6813a727e61fec86588cc0",
+    "rust/rei_microphysics/src/isotope_state.rs": "a3a750c3751ea30621482c341e89f690e517c3ad122e56231d2810c62afe8708",
+    "docs/atomic_reionization_handoff_20261004_v1/common/external_reference/grackle_3_4_1/solve_rate_cool_g.F": "0a94542b8b35bcb47ebb1865320c3e37a3831818549eaabcbfeb65aab158fe83"
+  },
+  "source_artifacts": [
+    {
+      "url": "https://www2.iap.fr/users/pitrou/publi/PhysReptBBN.pdf",
+      "bytes": 3438313,
+      "sha256": "7f7dd4a98abb234a51c1d0e5a8042eaa31b104a6ed262b7ea072627f03b31b69",
+      "read": "Direct original PDF Tables VII-VIII and baseline cosmological inputs; confirms delegated inventory transcription"
+    },
+    {
+      "url": "https://www.pa.uky.edu/~verner/dima/rec/table1.dat",
+      "bytes": 6048,
+      "sha256": "2382f6896fe58ee1da58c9bd563fd7d02c0d94410dbd4150767eed26a54f5091",
+      "read": "original H/He/Li rows, explicit Z/N key"
+    },
+    {
+      "url": "https://www.pa.uky.edu/~verner/dima/rec/table.txt",
+      "bytes": 3299,
+      "sha256": "fa24b34f734f8d346163df77f6c277af848b799daa693387251c892f86c14ca4",
+      "read": "original column units and HeI alternate ranges"
+    },
+    {
+      "url": "https://www.pa.uky.edu/~verner/dima/photo/photo.dat",
+      "bytes": 17760,
+      "sha256": "a53e73b0af4cc6b801aef67b84bd964e3ed8c9c4992f214e4a69dc7e4443f389",
+      "read": "original H/He/Li coefficient rows"
+    },
+    {
+      "url": "https://www.pa.uky.edu/~verner/dima/photo/photo.txt",
+      "bytes": 1194,
+      "sha256": "0693f34f4ef20a838cfcca4de2d42c92cc9e675af194eabda70a24fda3a32e99",
+      "read": "original photo fit column definitions"
+    },
+    {
+      "url": "https://arxiv.org/pdf/astro-ph/9612232",
+      "bytes": 1383278,
+      "sha256": "6ea0b803b554c91d598705f96416e1a8b67549fb02cb567944eaacdba5d148b0",
+      "read": "original HuiGnedin appendix CaseA recombination/cooling, source range"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/grackle-project/grackle/af7939494ce65007887ada7b98d1813df6843346/src/clib/solve_rate_cool_g.F",
+      "bytes": 93566,
+      "sha256": "0a94542b8b35bcb47ebb1865320c3e37a3831818549eaabcbfeb65aab158fe83",
+      "read": "DI/DII update source lines2322-2346"
+    }
+  ],
+  "search_methods": {
+    "SciSpace": "actual full-question atomicD provider search; index results are discovery only",
+    "Exa": "actual public Grackle source and author tables plus original full-text extraction",
+    "Wolfram": "context + evaluator used; exact outputs retained",
+    "delegated_inventory": "guard_review read original Cooke/Pitrou/Verner/Switzer; no tests/native"
+  },
+  "next_action": "root-assigned lower-tier worker implements standalone provider and focused tests; fresh review then isotope-native common network/transport coupling",
+  "research_loop": {
+    "R1": "scope fixed",
+    "R2": "actual primary acquisition",
+    "R3": "assumptions explicit",
+    "R4": "H-equality selected",
+    "R5": "RHS/energy/normalization derived",
+    "R6": "new symbolic checks",
+    "R7": "source byte and table transcription",
+    "R8": "scoped freeze",
+    "R9": "worker contract sent",
+    "R10": "preserved next executable action"
+  }
+}

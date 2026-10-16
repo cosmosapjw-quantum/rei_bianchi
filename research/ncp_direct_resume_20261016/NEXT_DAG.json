@@ -1,0 +1,107 @@
+{
+  "schema": "rei.ncp_direct_resume.dag.v2",
+  "goal": "FLRW production full-history solver and validation; then non-tilted axisymmetric Bianchi I and nuclear/ionic fractions against elapsed proper time and actual gas temperature.",
+  "base_commit": "d3bbd732be3851fa8eff4f201e49e9e2e130bb6f",
+  "old_evidence": "REUSE_NO_REPLAY",
+  "nodes": [
+    {
+      "id": "POSTCACHE_PROFILE_REUSE",
+      "status": "COMPLETE_INDEPENDENT_PASS_REUSE_NO_REPLAY",
+      "depends_on": [],
+      "receipt": "../flrw_covariant_transport_20261015/resume_20261016_001/PROFILE_INDEPENDENT_REVIEW.json",
+      "remaining_builds": 0,
+      "remaining_runs": 0
+    },
+    {
+      "id": "NCP_CURRENT_OBSERVATION",
+      "status": "READY_ON_NCP_NOT_EXECUTED_HERE",
+      "depends_on": [],
+      "command": "ncp_resume.py status",
+      "success": "Actual snapshot saved; missing processes/receipts remain unknown or incomplete."
+    },
+    {
+      "id": "COMPACT_PRESERVATION",
+      "status": "READY_ON_NCP",
+      "depends_on": [
+        "NCP_CURRENT_OBSERVATION"
+      ],
+      "command": "backup_ncp.py compact",
+      "success": "Archive and receipt created; live snapshot remains incomplete-history preservation."
+    },
+    {
+      "id": "FULL005_READINESS",
+      "status": "UNKNOWN_CURRENT_NATIVE_STATE",
+      "depends_on": [
+        "NCP_CURRENT_OBSERVATION"
+      ],
+      "command": "postprocess_ncp.py check",
+      "success": "Both actual strict COMPLETE receipts with frozen epoch/source/binary/config. Otherwise report typed stop."
+    },
+    {
+      "id": "FULL005_PLOTS",
+      "status": "READY_CONDITIONAL_NOT_EXECUTED",
+      "depends_on": [
+        "FULL005_READINESS"
+      ],
+      "command": "postprocess_ncp.py render",
+      "success": "Actual H/He elapsed-time/Tgas figures and diagnostics; no D curve or automatic scientific admission."
+    },
+    {
+      "id": "FULL_RAW_BACKUP",
+      "status": "READY_AFTER_CASE_TERMINAL",
+      "depends_on": [
+        "NCP_CURRENT_OBSERVATION"
+      ],
+      "command": "backup_ncp.py full --case CASE",
+      "success": "Terminal raw files archived; failed terminal files retain their failure classification."
+    },
+    {
+      "id": "SOURCE006_REUSE",
+      "status": "COMPLETE_SCOPED_INDEPENDENT_PASS_REUSE_NO_REPLAY",
+      "depends_on": [
+        "POSTCACHE_PROFILE_REUSE"
+      ],
+      "receipt": "../flrw_jacobian_columns_20261016/INDEPENDENT_REVIEW.json",
+      "remaining_test_build_run_allowances": [
+        0,
+        0,
+        0
+      ],
+      "action": "Read published source006 implementation and actual7test/504RHS fixture evidence. No replay, deployment into live005, or new full run from this exhausted contract."
+    },
+    {
+      "id": "FULL005_INDEPENDENT_REVIEW",
+      "status": "PENDING_ACTUAL_PAIR",
+      "depends_on": [
+        "FULL005_PLOTS"
+      ],
+      "action": "Review actual whole-history abundances,Tgas,photon/event/energy ledgers and spatial pair; explicitly account for missing whole-history time/angular convergence."
+    },
+    {
+      "id": "NEXT_ALLOCATION_AND_FULL_HISTORY",
+      "status": "CONDITIONAL_NEW_UNIT",
+      "depends_on": [
+        "SOURCE006_REUSE",
+        "FULL005_INDEPENDENT_REVIEW"
+      ],
+      "action": "After actual full005 review, design the next changed-dependency convergence/production-adoption unit using completed source006 evidence. Freeze a finite contract before further execution. Select scientifically justified independent refinements/parameters plus per-task threads using measured throughput and fresh64core/128GB host availability; do not reinterpret005 epoch.",
+      "memory_rule": "Memory is available capacity, not a utilization target; use it for justified state/cache/grid work. No padding or idle worker claims."
+    },
+    {
+      "id": "BIANCHI_AND_ISOTOPE_HISTORY",
+      "status": "PENDING_PHYSICS_DEPENDENCIES",
+      "depends_on": [
+        "NEXT_ALLOCATION_AND_FULL_HISTORY"
+      ],
+      "parallel_research": "Real donor/photo/recombination/thermal providers may be researched alongside FLRW without activating unsupported reactions.",
+      "action": "Use signed-compatible backend and isotope-native providers with single energy ownership; then actual proper-time/Tgas fractions and report. q0-only inactive_hi_split is not admitted for signed Bianchi."
+    }
+  ],
+  "stop_rules": [
+    "No duplicate solver or existing watcher.",
+    "Never reset original campaign epoch or change running source005.",
+    "A failed or unavailable measurement stays failed/unavailable; preserve raw evidence.",
+    "New implementation uses actual theory R1–R10 and coding C1–C10 where scientifically required; this packaging unit does not claim a new complete theory cycle.",
+    "Both postcache and source006 test/build/run allowances are exhausted. Further execution requires a separate finite new unit under existing user authorization; completed checks are not rerun."
+  ]
+}

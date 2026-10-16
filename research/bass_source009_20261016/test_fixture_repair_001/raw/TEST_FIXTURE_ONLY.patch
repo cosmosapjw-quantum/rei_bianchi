@@ -1,0 +1,42 @@
+--- pre-repair/axbi_bass_adaptive.rs
++++ tests/axbi_bass_adaptive.rs
+@@ -71,7 +71,7 @@
+ #[test]
+ fn actual_bass_adaptive_path_has_initial_accepted_terminal_and_bound_six_arrays() {
+     let case = "SIGNED_MINUS";
+-    let cfg = config("19.9999", "");
++    let cfg = config("19.99999999", "");
+     let out = scratch("complete").join("run");
+     run_bass_fresh(&cfg, &out, case, bg(case), "component-check").unwrap();
+     let t = check_counts(&out);
+@@ -122,13 +122,28 @@
+ }
+ #[test]
+ fn default_axbi_delegation_and_completed_resume_preserve_physics_and_row_counts() {
+-    let cfg = config("19.9999", "").replace("inactive_hi_split=true", "inactive_hi_split=false");
++    let cfg =
++        config("19.99999999", "").replace("inactive_hi_split=true", "inactive_hi_split=false");
+     let parsed = DriverConfig::read(&cfg).unwrap();
+     let (d, mut state) = Driver::new(parsed).unwrap();
+-    let end = 1.0 / (1.0 + 19.9999);
++    let end = 1.0 / (1.0 + 19.99999999);
++    let direct_started = std::time::Instant::now();
++    let mut direct_calls = 0usize;
+     while state.a < end {
++        assert!(direct_started.elapsed().as_secs_f64() <= 10.0);
++        assert!(direct_calls < 64);
++        direct_calls += 1;
+         d.adaptive_step(&mut state).unwrap();
+     }
++    assert!(direct_started.elapsed().as_secs_f64() <= 10.0);
++    fs::write(
++        scratch("direct-reference").join("CALLS.txt"),
++        format!(
++            "actual_adaptive_step_calls={direct_calls}\nwall_s={}\n",
++            direct_started.elapsed().as_secs_f64()
++        ),
++    )
++    .unwrap();
+     let out = scratch("axbi").join("run");
+     run(&cfg, &out, "AXBI_CONTROL", false).unwrap();
+     let before = rows(&out, "history.csv");

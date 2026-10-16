@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "task": "research",
+  "unit_id": "flrw_full005_pair_diagnostics_20261016",
+  "objective": "Derive and verify full-overlap PL pair diagnostic norms for FULL005 saved histories",
+  "scope": "Mathematical diagnostic and read-only caller contract; zero solver runs",
+  "status": "complete",
+  "baseline_commit": "4e2f0682fb605c6aa940bd756d9869e67b6ded0b",
+  "stages": [
+    {
+      "id": "R1",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r1",
+        "CONTRACT.json"
+      ],
+      "reason": "Actual reader and caller inspected; scope and completion criteria fixed"
+    },
+    {
+      "id": "R2",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r2",
+        "vendor/reconstruction_support.py@98eb05a8a13d2c613b53fa2bc6c5bc5117eb40bbb25f717da5ffab40e9531808"
+      ],
+      "reason": "Actual baseline code mapped; primary method documentation distinguished from contextual literature"
+    },
+    {
+      "id": "R3",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r3"
+      ],
+      "reason": "Quantified PL domain, overlap, measure, units, arithmetic and claim boundaries fixed"
+    },
+    {
+      "id": "R4",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r4"
+      ],
+      "reason": "Three representations compared and exact rational narrow-peak counterexample constructed"
+    },
+    {
+      "id": "R5",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r5"
+      ],
+      "reason": "Endpoint-maximum proof, sign-split absolute integral, quadratic integral, overlap sweep and complexity derived"
+    },
+    {
+      "id": "R6",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r6",
+        "evidence/wolfram_pl_integrals.json"
+      ],
+      "reason": "Actual independent symbolic integrals, zero identity residuals and endpoint limit checked; conditions mapped"
+    },
+    {
+      "id": "R7",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r7",
+        "probe_reconstruction.py",
+        "probe/RESULT.json",
+        "probe/stdout.log",
+        "probe/synthetic_sampling_gap.png"
+      ],
+      "reason": "Eight independent exact rational fixtures and actual sampled-spike calculation pass; final observed residual4.440892098500626e-16"
+    },
+    {
+      "id": "R8",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r8",
+        "evidence/wolfram_pl_integrals.json",
+        "probe/RESULT.json"
+      ],
+      "reason": "Adopt derived and independently checked PL algorithm for bounded implementation; production actual-data metrics not run"
+    },
+    {
+      "id": "R9",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r9",
+        "CONTRACT.json"
+      ],
+      "reason": "Frozen exact API, outputs, numerical bounds, standalone validation reuse, relocation and prompt-only handoff contract"
+    },
+    {
+      "id": "R10",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r10",
+        "CONTRACT.json"
+      ],
+      "reason": "Theory artifacts and resume contract complete; coding starts after immutable R10 capture; actual full-data newmetrics remain NOT_RUN"
+    }
+  ],
+  "executions": [
+    {
+      "id": "WOLFRAM_SEGMENT_CHECK",
+      "status": "completed",
+      "command": "Wolfram code in evidence/wolfram_pl_integrals.json",
+      "environment": "Root connected Wolfram tool, timeConstraint30",
+      "evidence_refs": [
+        "evidence/wolfram_pl_integrals.json"
+      ],
+      "exit_code": null,
+      "reason": "Successful tool response with isError=false; expressions and residuals preserved. Tool execution has no operating-system exit code.",
+      "tool_is_error": false
+    },
+    {
+      "id": "PROBE_INITIAL",
+      "status": "completed",
+      "command": "python3 research/flrw_full005_pair_diagnostics_20261016/probe_reconstruction.py",
+      "environment": "Separate lower-tier probe worker, Python3.12.14",
+      "evidence_refs": [
+        "THEORY.md#r7"
+      ],
+      "exit_code": 0,
+      "resources_reported_approximate": {
+        "cpu_seconds": 1.756,
+        "wall_seconds": 0.937,
+        "peak_rss_kib": 68192
+      },
+      "reason": "Initial worker execution reported to root; final artifacts supersede its hygiene-only precursor"
+    },
+    {
+      "id": "PROBE_FINAL",
+      "status": "completed",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 research/flrw_full005_pair_diagnostics_20261016/probe_reconstruction.py",
+      "environment": "Separate lower-tier probe worker, Python3.12.14, Matplotlib3.10.8",
+      "evidence_refs": [
+        "probe_reconstruction.py",
+        "probe/RESULT.json",
+        "probe/stdout.log"
+      ],
+      "exit_code": 0,
+      "resources": {
+        "cpu_seconds": 1.3194513529999998,
+        "wall_seconds": 0.4623350859983475,
+        "peak_rss_kib": 59868,
+        "native_solver_runs": 0,
+        "physical_history_reads": 0
+      },
+      "reason": "Hygiene correction prevents reused vendor bytecode writes; same mathematical outcomes"
+    }
+  ],
+  "claims": [
+    {
+      "id": "PL_NORMS",
+      "statement": "Union-knot extrema and analytic segment integrals yield full-overlap PL reconstruction norms",
+      "scope": "Finite ordered saved histories, positive-length overlap, exact-arithmetic theorem with binary64 implementation",
+      "basis": [
+        "derived",
+        "numerically checked"
+      ],
+      "evidence_refs": [
+        "THEORY.md#r3",
+        "THEORY.md#r5",
+        "evidence/wolfram_pl_integrals.json",
+        "probe/RESULT.json"
+      ],
+      "obligations": [
+        "C6-C9 implementation verification"
+      ]
+    }
+  ],
+  "next_actions": [
+    "Publisher captures R10 immutable payload",
+    "Assigned coding owner executes C1-C8",
+    "Fresh independent review then C10 implementation/handoff",
+    "Future original-data standalone execution under retained external budget"
+  ],
+  "decisions": [
+    {
+      "id": "ADOPT_PL_ALGORITHM",
+      "decision": "PASS_SCOPED_FOR_IMPLEMENTATION",
+      "evidence_refs": [
+        "THEORY.md#r5",
+        "evidence/wolfram_pl_integrals.json",
+        "probe/RESULT.json"
+      ],
+      "scope": "PL reconstruction arithmetic; no solver error or convergence admission"
+    },
+    {
+      "id": "NO_STRONG_NO_GO",
+      "decision": "not_applicable",
+      "reason": "Explicit synthetic sampling counterexample is used for algorithm selection; no physical exclusion or novel no-go theorem is claimed"
+    }
+  ],
+  "checks": [
+    {
+      "id": "SEGMENT_ALGEBRA",
+      "domain": "math",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "THEORY.md#r5",
+        "evidence/wolfram_pl_integrals.json"
+      ],
+      "execution_ref": "WOLFRAM_SEGMENT_CHECK",
+      "reason": "Independent integrals and identity residuals match conditional formulas"
+    },
+    {
+      "id": "SYNTHETIC_DISCRIMINATION",
+      "domain": "numerics",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "probe/RESULT.json",
+        "probe/stdout.log"
+      ],
+      "execution_ref": "PROBE_FINAL",
+      "reason": "Eight exact rational fixtures and sampled-spike result; no physical threshold"
+    },
+    {
+      "id": "PRODUCTION_IMPLEMENTATION",
+      "domain": "implementation",
+      "result": "not_run",
+      "evidence_refs": [
+        "CONTRACT.json"
+      ],
+      "reason": "C1-C10 assigned after theory capture"
+    },
+    {
+      "id": "ACTUAL_FULL005_CONTINUOUS_METRICS",
+      "domain": "numerics",
+      "result": "not_run",
+      "evidence_refs": [
+        "CONTRACT.json"
+      ],
+      "reason": "Original large raw input execution remains separately budgeted"
+    }
+  ]
+}

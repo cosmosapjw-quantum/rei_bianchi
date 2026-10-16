@@ -1,0 +1,72 @@
+{
+  "schema": "rei.ncp_backup_implementation.v1",
+  "status": "IMPLEMENTED_SYNTHETIC_TESTS_PASS_NCP_NOT_RUN",
+  "files": [
+    "backup_ncp.py",
+    "test_backup_ncp.py",
+    "IMPLEMENTATION_BACKUP.json"
+  ],
+  "ncp_execution": "NOT_RUN",
+  "remote_access": "NOT_ATTEMPTED_QUOTA_DO_NOT_RETRY",
+  "actual_native_controller_placement": "NOT_OBSERVED; local frozen execution/stage005/full_control.py and ncp_helpers.py inspected; utility preserves both stage/campaign candidate locations if present, reports missing expected stage names; campaign/full_resource_plan.json required in inventory",
+  "test_command": "cd research/ncp_direct_resume_20261016 && python -m unittest -v test_backup_ncp",
+  "test_result": {
+    "tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "last_elapsed_s": 0.019,
+    "fixtures": "synthetic miniature files and /proc; mocked disk free, no native campaign data"
+  },
+  "tested_cli_command": "python research/ncp_direct_resume_20261016/backup_ncp.py --help",
+  "behavior": [
+    "New streaming tar.gz and .status.json outside original input roots; originals never rewritten/deleted; no solver launch or upload.",
+    "Compact includes controller/config/source identity/build receipt/current V4 checkpoint/terminal/caller failure candidates; missing files explicitly listed; 64MiB per-file cap.",
+    "Compact while matching science is live is LIVE_SNAPSHOT_NOT_FULL_HISTORY; other compact snapshots are also explicitly NOT_FULL_HISTORY.",
+    "Full includes all regular non-private files of selected declared case output directories only after terminal receipt plus no actual argv process match; terminal failures are preserved without relabeling completion.",
+    "Optional --code-root preserves local source package and dependencies with target/.git/cache/private exclusions; --code-archive preserves an existing local Git/source archive. Without either, code_dependencies explicitly says NOT_SUPPLIED_SOURCE_IDENTITY_ONLY.",
+    "8GiB floor monitors actual remaining disk during streamed writes; no uncompressed-total space requirement. Default cap 1800s and compressed archive 16GiB, adjustable; per-case full supported.",
+    "Partial runtime/byte/disk/IO/interruption statuses are not ARCHIVE_CREATED, preserve .partial, and report typed status. No PASS status is used.",
+    "Known credentials/environment/private SSH name patterns excluded; no /proc environ read or private terminal logs swept."
+  ],
+  "ncp_commands_after_legitimate_local_access": [
+    "python3 research/ncp_direct_resume_20261016/backup_ncp.py compact --output /root/rei_full005_compact_20261016_001.tar.gz --max-seconds 180 --max-archive-gib 1",
+    "python3 research/ncp_direct_resume_20261016/backup_ncp.py full --case FLRW_FULL_Q512_001 --output /root/rei_full005_q512_20261016_001.tar.gz --max-seconds 1800 --max-archive-gib 16",
+    "python3 research/ncp_direct_resume_20261016/backup_ncp.py full --case FLRW_FULL_Q1024_001 --output /root/rei_full005_q1024_20261016_001.tar.gz --max-seconds 1800 --max-archive-gib 16"
+  ],
+  "command_notes": "Run from supplied repository/package root on NCP. Output paths must be fresh. Add --code-root with the observed local source package directory including path dependencies, or --code-archive with observed local archive; actual source archive path is not invented. Commands are prepared, NOT_EXECUTED.",
+  "limitations": [
+    "Live snapshots are not transactionally consistent and are not whole scientific histories.",
+    "No scientific admission or complete-history claim follows from archive creation.",
+    "Actual source/controller file availability and native disk/runtime behavior await NCP execution.",
+    "No Git metadata in this extracted workspace; publication is handled by controller."
+  ],
+  "targeted_review_repair": "Included campaign/full_resource_plan.json, retained optional stage copy; synthetic exact-member fixture asserts archived plan bytes.",
+  "test_attempts": [
+    {
+      "attempt": "initial",
+      "tests": 6,
+      "passed": 5,
+      "errors": 1,
+      "error": "Mock disk_usage iterator exhausted during tar close after disk-floor rejection; implementation was corrected to retain the first bounded-writer stop and avoid rechecking after rejection."
+    },
+    {
+      "attempt": "after_sticky_stop_repair",
+      "tests": 6,
+      "passed": 6,
+      "errors": 0
+    },
+    {
+      "attempt": "after_process_read_error_typed_handling",
+      "tests": 6,
+      "passed": 6,
+      "errors": 0
+    },
+    {
+      "attempt": "final_after_campaign_plan_path_repair",
+      "tests": 6,
+      "passed": 6,
+      "errors": 0
+    }
+  ],
+  "final_raw_test_output": "test_compact_live_labeled_and_originals_unchanged (test_backup_ncp.BackupTests.test_compact_live_labeled_and_originals_unchanged) ... ok\ntest_full_all_exact_members_and_extraction_matches (test_backup_ncp.BackupTests.test_full_all_exact_members_and_extraction_matches) ... ok\ntest_full_rejects_active_even_with_terminal_receipt (test_backup_ncp.BackupTests.test_full_rejects_active_even_with_terminal_receipt) ... ok\ntest_live_disk_floor_checked_during_stream (test_backup_ncp.BackupTests.test_live_disk_floor_checked_during_stream) ... ok\ntest_missing_terminal_rejected_and_input_archive_never_replaced (test_backup_ncp.BackupTests.test_missing_terminal_rejected_and_input_archive_never_replaced) ... ok\ntest_partial_limit_retained_and_not_success (test_backup_ncp.BackupTests.test_partial_limit_retained_and_not_success) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.019s\n\nOK\n"
+}

@@ -1,0 +1,59 @@
+error[E0308]: mismatched types
+   --> rust/rei_microphysics/tests/rate_table.rs:87:73
+    |
+87  |         let reference=baseline::igm_point_rhs(&gas,nh,nhe,1e-16,57.2355,photo).unwrap();
+    |                       -----------------------                           ^^^^^ expected `baseline::IgmPhotoInput`, found `IgmPhotoInput`
+    |                       |
+    |                       arguments to this function are incorrect
+    |
+    = note: `IgmPhotoInput` and `baseline::IgmPhotoInput` have similar names, but are actually distinct types
+note: `IgmPhotoInput` is defined in crate `rei_microphysics`
+   --> /workspace/scratch/56fd3625e428/rei_bianchi/rust/rei_microphysics/src/igm_thermal.rs:7:1
+    |
+7   | pub struct IgmPhotoInput {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^
+note: `baseline::IgmPhotoInput` is defined in the current crate
+   --> rust/rei_microphysics/tests/../../../research/flrw_rate_table_acceleration_20261016/probe/baseline_igm_thermal.rs:7:1
+    |
+7   | pub struct IgmPhotoInput {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^
+note: function defined here
+   --> rust/rei_microphysics/tests/../../../research/flrw_rate_table_acceleration_20261016/probe/baseline_igm_thermal.rs:101:8
+    |
+101 | pub fn igm_point_rhs(
+    |        ^^^^^^^^^^^^^
+...
+107 |     photo: IgmPhotoInput,
+    |     --------------------
+
+error[E0308]: mismatched types
+   --> rust/rei_microphysics/tests/rate_table.rs:159:157
+    |
+159 | ... rhs=baseline::igm_point_rhs(black_box(gas),nh,nhe,1e-16,57.2355,photo).unwrap();black_box(direct(t));black_box(rhs).temperature_dt_k_...
+    |         -----------------------                                     ^^^^^ expected `baseline::IgmPhotoInput`, found `IgmPhotoInput`
+    |         |
+    |         arguments to this function are incorrect
+    |
+    = note: `IgmPhotoInput` and `baseline::IgmPhotoInput` have similar names, but are actually distinct types
+note: `IgmPhotoInput` is defined in crate `rei_microphysics`
+   --> /workspace/scratch/56fd3625e428/rei_bianchi/rust/rei_microphysics/src/igm_thermal.rs:7:1
+    |
+7   | pub struct IgmPhotoInput {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^
+note: `baseline::IgmPhotoInput` is defined in the current crate
+   --> rust/rei_microphysics/tests/../../../research/flrw_rate_table_acceleration_20261016/probe/baseline_igm_thermal.rs:7:1
+    |
+7   | pub struct IgmPhotoInput {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^
+note: function defined here
+   --> rust/rei_microphysics/tests/../../../research/flrw_rate_table_acceleration_20261016/probe/baseline_igm_thermal.rs:101:8
+    |
+101 | pub fn igm_point_rhs(
+    |        ^^^^^^^^^^^^^
+...
+107 |     photo: IgmPhotoInput,
+    |     --------------------
+
+error: aborting due to 2 previous errors
+
+For more information about this error, try `rustc --explain E0308`.

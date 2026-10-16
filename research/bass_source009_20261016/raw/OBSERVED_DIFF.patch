@@ -1,0 +1,611 @@
+diff --git a/rust/rei_microphysics/src/axbi_driver.rs b/rust/rei_microphysics/src/axbi_driver.rs
+index 5e2713bc1..2a16fa8d8 100644
+--- a/rust/rei_microphysics/src/axbi_driver.rs
++++ b/rust/rei_microphysics/src/axbi_driver.rs
+@@ -16,7 +16,7 @@ use crate::{ForwardError, GeometrySnapshot, HHeModel};
+ use std::{
+     fs,
+     io::{BufWriter, Write},
+-    path::Path,
++    path::{Path, PathBuf},
+     sync::{
+         atomic::{AtomicUsize, Ordering},
+         Arc,
+@@ -1148,6 +1148,8 @@ pub fn compiled_identity() -> String {
+         include_str!("hhe_events.rs"),
+         include_str!("../examples/axbi_reionization.rs"),
+         include_str!("../examples/bass_dynamic_trial.rs"),
++        include_str!("../examples/bass_adaptive_trial.rs"),
++        include_str!("../../../research/bass_source009_20261016/CONTRACT.json"),
+         include_str!("lib.rs"),
+         include_str!("../Cargo.toml"),
+         include_str!(
+@@ -1361,13 +1363,12 @@ impl Driver {
+     }
+     /// Separate BASS checkpoint envelope with exact producer, executable,
+     /// configuration, output epoch and state bindings. Create-only publication.
+-    pub fn save_bass_checkpoint(
++    fn bass_checkpoint_text(
+         &self,
+-        path: &Path,
+         s: &DriverState,
+         epoch: &str,
+         output: &Path,
+-    ) -> Result<(), ForwardError> {
++    ) -> Result<String, ForwardError> {
+         let id = self.bass_identity().ok_or(err("BASS_CHECKPOINT_MODE"))?;
+         if epoch.is_empty() || epoch.contains('\n') || epoch.contains('\r') || epoch.contains('|') {
+             return Err(err("BASS_CHECKPOINT_EPOCH"));
+@@ -1377,12 +1378,22 @@ impl Driver {
+         let source = sha256_bytes(compiled_identity().as_bytes())?;
+         let config = sha256_bytes(format!("{:?}", self.config).as_bytes())?;
+         let body = self.checkpoint_text(s)?;
+-        let text=format!("BASS_REI_CHECKPOINT_V1\n{}|{}|{}|{}|{}\nBASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}|inactive_hi_split={}\nDONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE008\n{}\n{}\n{}|{}\n{}\n{:.17e}|{:.17e}|{:.17e}|{:.17e}|{:.17e}\n{}\n{}\n{}",
++        let text=format!("BASS_REI_CHECKPOINT_V1\n{}|{}|{}|{}|{}\nBASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}|inactive_hi_split={}\nDONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE009\n{}\n{}\n{}|{}\n{}\n{:.17e}|{:.17e}|{:.17e}|{:.17e}|{:.17e}\n{}\n{}\n{}",
+             id.producer_commit,id.source_csv_sha256,id.source_manifest_sha256,id.case,id.grid_points,
+             self.config.transport_cells,self.config.inactive_hi_split,
+             source,config,epoch,output.display(),sha256_bytes(&output_bytes)?,
+             s.a,p.time_s,p.b,p.h_per_s,p.s_per_s,
+             sha256_bytes(body.as_bytes())?,body.len(),body);
++        Ok(text)
++    }
++    pub fn save_bass_checkpoint(
++        &self,
++        path: &Path,
++        s: &DriverState,
++        epoch: &str,
++        output: &Path,
++    ) -> Result<(), ForwardError> {
++        let text = self.bass_checkpoint_text(s, epoch, output)?;
+         let tmp = path.with_extension(format!("new-{}", std::process::id()));
+         {
+             use std::fs::OpenOptions;
+@@ -1428,7 +1439,7 @@ impl Driver {
+             return Err(err("BASS_CHECKPOINT_SOURCE_BINDING"));
+         }
+         if lines[2]!=format!("BASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}|inactive_hi_split={}",self.config.transport_cells,self.config.inactive_hi_split) {return Err(err("BASS_CHECKPOINT_PROVIDER_SCHEMA"));}
+-        if lines[3]!="DONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE008" {return Err(err("BASS_CHECKPOINT_REI_BASE"));}
++        if lines[3]!="DONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE009" {return Err(err("BASS_CHECKPOINT_REI_BASE"));}
+         if lines[4] != sha256_bytes(compiled_identity().as_bytes())? {
+             return Err(err("BASS_CHECKPOINT_NATIVE_SOURCE"));
+         }
+@@ -1871,6 +1882,89 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
+         .map_err(ioerr)?;
+         fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=fixed reference-q two-moment transport; total N/U includes active and passive source photons; support columns are conservative active-support/passive-cell envelope union, not a recovered density or exact populated support; Gamma uses active photons only; radiation stress includes both pools; legacy boundary outflow remains zero\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
+     }
++    let mut checkpoints = PreparedCheckpoints::Axbi;
++    run_prepared(&driver, &mut state, out, case, resume, &mut checkpoints)
++}
++
++#[derive(Clone, Copy)]
++enum CheckpointPhase {
++    Initial,
++    Periodic,
++    Terminal,
++}
++enum PreparedCheckpoints<'a> {
++    Axbi,
++    Bass {
++        epoch: &'a str,
++        binding: &'a Path,
++        last: Option<PathBuf>,
++        terminal_written: bool,
++    },
++}
++impl PreparedCheckpoints<'_> {
++    fn save(
++        &mut self,
++        driver: &Driver,
++        state: &DriverState,
++        out: &Path,
++        phase: CheckpointPhase,
++    ) -> Result<(), ForwardError> {
++        match self {
++            Self::Axbi => {
++                if matches!(phase, CheckpointPhase::Periodic) {
++                    driver.save_checkpoint_budget(
++                        out,
++                        &out.join(format!("checkpoints/{:08}.txt", state.accepted)),
++                        state,
++                    )?;
++                }
++                driver.save_checkpoint_budget(out, &out.join("checkpoint.txt"), state)
++            }
++            Self::Bass {
++                epoch,
++                binding,
++                last,
++                terminal_written,
++            } => {
++                if matches!(phase, CheckpointPhase::Terminal) && *terminal_written {
++                    return Ok(());
++                }
++                let label = match phase {
++                    CheckpointPhase::Initial => "initial",
++                    CheckpointPhase::Periodic => "accepted",
++                    CheckpointPhase::Terminal => "terminal",
++                };
++                let path = out.join(format!("checkpoints/{label}-{:08}.bass-v1", state.accepted));
++                // Scientific writes retain the original allocation. Terminal
++                // recovery uses the existing launcher reserve within total cap.
++                let budget = if matches!(phase, CheckpointPhase::Terminal) {
++                    driver.config.output_budget_mib as u64 * 1024 * 1024
++                } else {
++                    driver.config.scientific_output_budget_bytes()?
++                };
++                let bytes = driver.bass_checkpoint_text(state, epoch, binding)?.len();
++                guard_output_bytes_with_limit(out, 2 * bytes as u64, budget)?;
++                driver.save_bass_checkpoint(&path, state, epoch, binding)?;
++                *last = Some(path);
++                if matches!(phase, CheckpointPhase::Terminal) {
++                    *terminal_written = true;
++                }
++                Ok(())
++            }
++        }
++    }
++}
++
++/// The original prepared adaptive/output loop, shared by default AXBI and
++/// fresh BASS. Solver, charged rejection and output rollback rules are common.
++fn run_prepared(
++    driver: &Driver,
++    state: &mut DriverState,
++    out: &Path,
++    case: &str,
++    resume: bool,
++    checkpoints: &mut PreparedCheckpoints<'_>,
++) -> Result<(), ForwardError> {
+     let mut h=open_output(&out.join("history.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,b,H_per_s,s_per_s,x_HII,x_HeII,x_HeIII,nH_proper_cm3,ne_proper_cm3,temperature_K,Gamma_HI_per_s,Gamma_HeI_per_s,Gamma_HeII_per_s,photon_n_per_H,photon_u_eV_per_H,J0_photon_u_eV_per_H,J1_photon_u_eV_per_H,J2_photon_u_eV_per_H,x_HI,x_HeI")?;
+     let mut a=open_output(&out.join("abundances.csv"),resume,"run_id,time_s,zbar,Tgas_K,background_Tref_K,species_id,A,Z,charge,nproper,element_fraction,Ybaryon,electron_xe,normalization_registry")?;
+     let mut p=open_output(&out.join("spectra.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,energy_low_eV,energy_high_eV,mu_center,solid_angle_weight_sr,photon_n_per_H,photon_u_eV_per_H")?;
+@@ -1892,7 +1986,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
+     };
+     if !resume {
+         driver.output_batch(
+-            &state, case, out, true, &mut h, &mut a, &mut p, &mut l, &mut fb,
++            state, case, out, true, &mut h, &mut a, &mut p, &mut l, &mut fb,
+         )?;
+         last_spectrum_time = Some(driver.geometry_point(state.a)?.time_s);
+     }
+@@ -1900,10 +1994,10 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
+         for writer in [&mut h, &mut a, &mut p, &mut l, &mut fb, &mut rejects] {
+             writer.flush().map_err(ioerr)?;
+         }
+-        driver.save_checkpoint_budget(out, &out.join("checkpoint.txt"), &state)?;
++        checkpoints.save(&driver, state, out, CheckpointPhase::Initial)?;
+     }
+     if resume {
+-        driver.ensure_spectrum_snapshot(&state, case, out, &mut last_spectrum_time, &mut p)?;
++        driver.ensure_spectrum_snapshot(state, case, out, &mut last_spectrum_time, &mut p)?;
+     }
+     let started = Instant::now();
+     let prior_wall = state.wall_elapsed_s;
+@@ -1920,7 +2014,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
+                 return Err(err("AXBI_RUNTIME_CAP"));
+             }
+             let previous = state.clone();
+-            let accepted = match driver.adaptive_step(&mut state) {
++            let accepted = match driver.adaptive_step(state) {
+                 Ok(value) => value,
+                 Err(e) => {
+                     writeln!(
+@@ -1957,7 +2051,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
+                 state.a == end,
+             );
+             if let Err(error) = driver.output_batch(
+-                &state,
++                state,
+                 case,
+                 out,
+                 checkpoint_due,
+@@ -1968,7 +2062,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
+                 &mut fb,
+             ) {
+                 let failed = state.clone();
+-                state = previous;
++                *state = previous;
+                 state.attempts = failed.attempts;
+                 state.comparisons = failed.comparisons;
+                 state.rhs_evaluations = failed.rhs_evaluations;
+@@ -1982,12 +2076,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
+                     writer.flush().map_err(ioerr)?;
+                 }
+                 state.wall_elapsed_s = prior_wall + started.elapsed().as_secs_f64();
+-                driver.save_checkpoint_budget(
+-                    out,
+-                    &out.join(format!("checkpoints/{:08}.txt", state.accepted)),
+-                    &state,
+-                )?;
+-                driver.save_checkpoint_budget(out, &out.join("checkpoint.txt"), &state)?;
++                checkpoints.save(&driver, state, out, CheckpointPhase::Periodic)?;
+                 check_resources(out, driver.config.output_budget_mib as u64 * 1024 * 1024)?;
+                 last_save = Instant::now();
+             }
+@@ -1998,13 +2087,97 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
+     for writer in [&mut h, &mut a, &mut p, &mut l, &mut fb, &mut rejects] {
+         writer.flush().map_err(ioerr)?;
+     }
+-    driver.ensure_spectrum_snapshot(&state, case, out, &mut last_spectrum_time, &mut p)?;
++    driver.ensure_spectrum_snapshot(state, case, out, &mut last_spectrum_time, &mut p)?;
+     p.flush().map_err(ioerr)?;
+-    driver.save_checkpoint_budget(out, &out.join("checkpoint.txt"), &state)?;
++    checkpoints.save(&driver, state, out, CheckpointPhase::Terminal)?;
+     summarize_feedback(out)?;
+     fs::write(out.join("RETURN.txt"),format!("status={}\na={}\naccepted={}\nattempts={}\nrejections={}\nrhs_evaluations={}\nwall_s={}\nmax_newton_residual={}\nlast_error={}\nresult={outcome:?}\nscientific_admission=NOT_ISSUED\n",if outcome.is_ok(){"COMPLETE_REPRESENTED_INTERVAL"}else{"STOPPED_CHECKPOINTED"},state.a,state.accepted,state.attempts,state.rejects,state.rhs_evaluations,state.wall_elapsed_s,state.max_newton_residual,state.last_error)).map_err(ioerr)?;
+     outcome
+ }
++/// Fresh-only adaptive BASS execution. There is deliberately no resume API.
++/// Legacy/source007/source008 states cannot enter the new execution loop.
++pub fn run_bass_fresh(
++    config_text: &str,
++    out: &Path,
++    case: &str,
++    bass: BassBackground,
++    epoch: &str,
++) -> Result<(), ForwardError> {
++    if case.is_empty()
++        || case.contains(',')
++        || case.contains('\n')
++        || case.contains('\r')
++        || bass.identity.case != case
++    {
++        return Err(err("BASS_ADAPTIVE_CASE"));
++    }
++    if epoch.is_empty() || epoch.contains('\n') || epoch.contains('\r') || epoch.contains('|') {
++        return Err(err("BASS_ADAPTIVE_EPOCH"));
++    }
++    let cfg = DriverConfig::read(config_text)?;
++    if !cfg.inactive_hi_split || cfg.same_h || cfg.q_ref != 0.0 {
++        return Err(err("BASS_ADAPTIVE_CONFIG_MODE"));
++    }
++    let (driver, mut state) = Driver::new_bass(cfg, bass)?;
++    if out.exists() {
++        return Err(err("BASS_ADAPTIVE_FRESH_ONLY"));
++    }
++    fs::create_dir_all(out.join("raw")).map_err(ioerr)?;
++    fs::create_dir(out.join("checkpoints")).map_err(ioerr)?;
++    let id = driver.bass_identity().ok_or(err("BASS_CHECKPOINT_MODE"))?;
++    let binding = out.join("RUN_BINDING.txt");
++    let source_hash = sha256_bytes(compiled_identity().as_bytes())?;
++    let binding_text = format!("BASS_ADAPTIVE_RUN_BINDING_V1\nsource009_sha256={}\nconfig_text_sha256={}\nconfig_debug_sha256={}\nproducer_model={}\ncsv_sha256={}\nproducer_json_sha256={}\ncase={}\ngrid_points={}\ninactive_hi_split=true\nepoch={}\noutput={}\nresume=false\n",source_hash,sha256_bytes(config_text.as_bytes())?,sha256_bytes(format!("{:?}",driver.config).as_bytes())?,id.producer_commit,id.source_csv_sha256,id.source_manifest_sha256,id.case,id.grid_points,epoch,out.display());
++    {
++        let mut file = fs::OpenOptions::new()
++            .write(true)
++            .create_new(true)
++            .open(&binding)
++            .map_err(ioerr)?;
++        file.write_all(binding_text.as_bytes()).map_err(ioerr)?;
++        file.sync_all().map_err(ioerr)?;
++    }
++    fs::write(out.join("config.cfg"), config_text).map_err(ioerr)?;
++    fs::write(out.join("source_identity.txt"), compiled_identity()).map_err(ioerr)?;
++    fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
++    fs::write(
++        out.join("transport_variant.txt"),
++        format!(
++            "{}execution_source_epoch=SOURCE009\n",
++            driver.transport_mode_metadata()
++        ),
++    )
++    .map_err(ioerr)?;
++    fs::write(out.join("metadata.txt"),"execution=source009_fresh_BASS_shared_adaptive_loop\nclock=own elapsed proper seconds since z20\nframe=non-tilted normal tetrad\nq_ref=inactive analytic knob; not physical BASS shear\nSigma_column=signed s/H; not sqrt(3)*abs(s)/H\nfeedback=sampled perturbative prescribed-background diagnostic only\nscientific_admission=NOT_ISSUED\nfull_time_angular_history_admission=HOLD\n").map_err(ioerr)?;
++    let mut checkpoints = PreparedCheckpoints::Bass {
++        epoch,
++        binding: &binding,
++        last: None,
++        terminal_written: false,
++    };
++    let outcome = run_prepared(&driver, &mut state, out, case, false, &mut checkpoints);
++    // The shared helper drops/flushed its writers before this fallback. Keep
++    // full last-output physical state with actual charged work on every stop.
++    let checkpoint_outcome = checkpoints.save(&driver, &state, out, CheckpointPhase::Terminal);
++    let last = match &checkpoints {
++        PreparedCheckpoints::Bass { last, .. } => last
++            .as_ref()
++            .map(|p| p.display().to_string())
++            .unwrap_or_else(|| "NONE".into()),
++        _ => unreachable!(),
++    };
++    let terminal_error = match (&outcome, &checkpoint_outcome) {
++        (Err(e), _) => Some(e.clone()),
++        (Ok(_), Err(e)) => Some(e.clone()),
++        _ => None,
++    };
++    fs::write(out.join("RETURN.txt"),format!("status={}\na={}\ntime_s={}\naccepted={}\nattempts={}\ncomparisons={}\nrejections={}\nrhs_evaluations={}\nwall_s={}\nmax_newton_residual={}\nlast_error={}\nlast_checkpoint={}\nrun_binding={}\nsource009_sha256={}\ninactive_hi_split=true\nresult={outcome:?}\nterminal_checkpoint_result={checkpoint_outcome:?}\nscientific_admission=NOT_ISSUED\n",if terminal_error.is_none(){"COMPLETE_REPRESENTED_INTERVAL"}else{"STOPPED_CHECKPOINTED"},state.a,driver.geometry_point(state.a)?.time_s,state.accepted,state.attempts,state.comparisons,state.rejects,state.rhs_evaluations,state.wall_elapsed_s,state.max_newton_residual,state.last_error,last,binding.display(),source_hash)).map_err(ioerr)?;
++    if let Some(error) = terminal_error {
++        return Err(error);
++    }
++    Ok(())
++}
++
+ fn check_resources(out: &Path, total_output_bytes: u64) -> Result<(), ForwardError> {
+     let mut bytes = 0_u64;
+     for e in fs::read_dir(out).map_err(ioerr)? {
+--- /dev/null
++++ rust/rei_microphysics/examples/bass_adaptive_trial.rs
+@@ -0,0 +1,33 @@
++//! Fresh source009 BASS adaptive execution; launch authority is separate.
++use rei_microphysics::axbi_bass_background::{BassBackground, BassSourceIdentity};
++use rei_microphysics::axbi_driver::run_bass_fresh;
++use std::{env, fs, path::Path};
++pub fn execute_args(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
++    if args.iter().any(|arg| arg == "--resume") {
++        return Err("BASS_ADAPTIVE_FRESH_ONLY: resume/checkpoint adoption is unsupported".into());
++    }
++    if args.len() != 7 {
++        return Err("usage: bass_adaptive_trial CSV PRODUCER_JSON CONFIG CASE OUTPUT_DIR EPOCH (fresh only)".into());
++    }
++    let identity = BassSourceIdentity {
++        producer_commit: "3c39bbbf46b6663e7c40277e194fd0ef48118472".into(),
++        source_csv_sha256: "5a7844834b50fbc046995678a6aaf936252a81e49de1593604eee30641274133"
++            .into(),
++        source_manifest_sha256: "98eddf4673780f0bbca711b373a3e0746cfafc8190674c8d2d6c4de658dc3eed"
++            .into(),
++        case: args[4].clone(),
++        grid_points: 121,
++    };
++    let background =
++        BassBackground::from_files(Path::new(&args[1]), Path::new(&args[2]), identity)?;
++    let config = fs::read_to_string(&args[3])?;
++    run_bass_fresh(&config, Path::new(&args[5]), &args[4], background, &args[6])?;
++    Ok(())
++}
++#[allow(dead_code)]
++fn main() {
++    if let Err(error) = execute_args(&env::args().collect::<Vec<_>>()) {
++        eprintln!("BASS_ADAPTIVE_ERROR: {error:?}");
++        std::process::exit(2);
++    }
++}
+--- /dev/null
++++ rust/rei_microphysics/tests/axbi_bass_adaptive.rs
+@@ -0,0 +1,248 @@
++use rei_microphysics::axbi_bass_background::{BassBackground, BassSourceIdentity};
++use rei_microphysics::axbi_driver::{run, run_bass_fresh, Driver, DriverConfig};
++use std::{
++    collections::BTreeMap,
++    fs,
++    path::{Path, PathBuf},
++};
++#[path = "../examples/bass_adaptive_trial.rs"]
++mod adaptive_cli;
++fn fixture() -> PathBuf {
++    Path::new(env!("CARGO_MANIFEST_DIR")).join("../../research/bass_source007_20261016/inputs")
++}
++fn scratch(name: &str) -> PathBuf {
++    let p = Path::new(env!("CARGO_MANIFEST_DIR"))
++        .join("../../research/bass_source009_20261016/raw/test_scratch")
++        .join(format!(
++            "{}-{}-{:?}",
++            std::process::id(),
++            name,
++            std::thread::current().id()
++        ));
++    fs::create_dir_all(&p).unwrap();
++    p
++}
++fn bg(case: &str) -> BassBackground {
++    BassBackground::from_files(
++        &fixture().join("pr164_121.csv"),
++        &fixture().join("pr164_121.json"),
++        BassSourceIdentity {
++            producer_commit: "3c39bbbf46b6663e7c40277e194fd0ef48118472".into(),
++            source_csv_sha256: "5a7844834b50fbc046995678a6aaf936252a81e49de1593604eee30641274133"
++                .into(),
++            source_manifest_sha256:
++                "98eddf4673780f0bbca711b373a3e0746cfafc8190674c8d2d6c4de658dc3eed".into(),
++            case: case.into(),
++            grid_points: 121,
++        },
++    )
++    .unwrap()
++}
++fn config(end: &str, extra: &str) -> String {
++    format!("end_zbar={end}\ninactive_hi_split=true\ntransport_cells=128\nenergy_subdivisions=16\ntransport_threads=1\nparallel_jacobian_columns=false\nspectra_every_accepted=1\nmax_wall_s=10\n{extra}")
++}
++fn terminal(out: &Path) -> BTreeMap<String, String> {
++    fs::read_to_string(out.join("RETURN.txt"))
++        .unwrap()
++        .lines()
++        .filter_map(|line| line.split_once('=').map(|(a, b)| (a.into(), b.into())))
++        .collect()
++}
++fn rows(out: &Path, name: &str) -> Vec<String> {
++    fs::read_to_string(out.join(name))
++        .unwrap()
++        .lines()
++        .skip(1)
++        .map(str::to_owned)
++        .collect()
++}
++fn check_counts(out: &Path) -> BTreeMap<String, String> {
++    let t = terminal(out);
++    let n = t["accepted"].parse::<usize>().unwrap();
++    assert_eq!(rows(out, "history.csv").len(), n + 1);
++    assert_eq!(rows(out, "abundances.csv").len(), 6 * (n + 1));
++    assert_eq!(rows(out, "ledgers.csv").len(), 31 * (n + 1));
++    assert!(Path::new(&t["last_checkpoint"]).is_file());
++    assert!(fs::read_to_string(&t["last_checkpoint"])
++        .unwrap()
++        .contains("CURRENT_PROVIDER=SOURCE009"));
++    t
++}
++#[test]
++fn actual_bass_adaptive_path_has_initial_accepted_terminal_and_bound_six_arrays() {
++    let case = "SIGNED_MINUS";
++    let cfg = config("19.99999999", "");
++    let out = scratch("complete").join("run");
++    run_bass_fresh(&cfg, &out, case, bg(case), "component-check").unwrap();
++    let t = check_counts(&out);
++    assert_eq!(t["status"], "COMPLETE_REPRESENTED_INTERVAL");
++    assert!(t["accepted"].parse::<usize>().unwrap() > 0);
++    assert!(t["rhs_evaluations"].parse::<usize>().unwrap() > 0);
++    let (d, _) = Driver::new_bass(DriverConfig::read(&cfg).unwrap(), bg(case)).unwrap();
++    let state = d
++        .read_bass_checkpoint(
++            Path::new(&t["last_checkpoint"]),
++            "component-check",
++            &out.join("RUN_BINDING.txt"),
++        )
++        .unwrap();
++    assert_eq!(state.a.to_string(), t["a"]);
++    assert_eq!(state.accepted.to_string(), t["accepted"]);
++    assert_eq!(state.rhs_evaluations.to_string(), t["rhs_evaluations"]);
++    assert_eq!(
++        d.geometry_point(state.a).unwrap().time_s.to_string(),
++        t["time_s"]
++    );
++    let saved = fs::read_to_string(&t["last_checkpoint"]).unwrap();
++    let (_, body) = saved.split_once("\nAXBI_CHECKPOINT_V4\n").unwrap();
++    assert_eq!(body.lines().count(), 10);
++    assert!(saved.contains("inactive_hi_split=true"));
++    assert!(out.join("checkpoints/initial-00000000.bass-v1").is_file());
++    assert!(fs::read_dir(out.join("checkpoints")).unwrap().count() >= 3);
++    let mut off = DriverConfig::read(&cfg).unwrap();
++    off.inactive_hi_split = false;
++    let (off, _) = Driver::new_bass(off, bg(case)).unwrap();
++    assert!(off
++        .read_bass_checkpoint(
++            Path::new(&t["last_checkpoint"]),
++            "component-check",
++            &out.join("RUN_BINDING.txt")
++        )
++        .is_err());
++    assert!(d
++        .read_bass_checkpoint(
++            Path::new(&t["last_checkpoint"]),
++            "wrong-epoch",
++            &out.join("RUN_BINDING.txt")
++        )
++        .is_err());
++    let binding = fs::read(out.join("RUN_BINDING.txt")).unwrap();
++    assert!(run_bass_fresh(&cfg, &out, case, bg(case), "component-check").is_err());
++    assert_eq!(fs::read(out.join("RUN_BINDING.txt")).unwrap(), binding);
++}
++#[test]
++fn default_axbi_delegation_and_completed_resume_preserve_physics_and_row_counts() {
++    let cfg =
++        config("19.99999999", "").replace("inactive_hi_split=true", "inactive_hi_split=false");
++    let parsed = DriverConfig::read(&cfg).unwrap();
++    let (d, mut state) = Driver::new(parsed).unwrap();
++    let end = 1.0 / (1.0 + 19.99999999);
++    let direct_started = std::time::Instant::now();
++    let mut direct_calls = 0usize;
++    while state.a < end {
++        assert!(direct_started.elapsed().as_secs_f64() <= 10.0);
++        assert!(direct_calls < 64);
++        direct_calls += 1;
++        d.adaptive_step(&mut state).unwrap();
++    }
++    assert!(direct_started.elapsed().as_secs_f64() <= 10.0);
++    fs::write(
++        scratch("direct-reference").join("CALLS.txt"),
++        format!(
++            "actual_adaptive_step_calls={direct_calls}\nwall_s={}\n",
++            direct_started.elapsed().as_secs_f64()
++        ),
++    )
++    .unwrap();
++    let out = scratch("axbi").join("run");
++    run(&cfg, &out, "AXBI_CONTROL", false).unwrap();
++    let before = rows(&out, "history.csv");
++    let last = before.last().unwrap().split(',').collect::<Vec<_>>();
++    assert_eq!(last[4].parse::<f64>().unwrap().to_bits(), state.a.to_bits());
++    for j in 0..3 {
++        assert_eq!(
++            last[9 + j].parse::<f64>().unwrap().to_bits(),
++            state.gas.fractions[j].to_bits()
++        );
++    }
++    assert!(fs::read_to_string(out.join("checkpoint.txt"))
++        .unwrap()
++        .starts_with("AXBI_CHECKPOINT_V4\n"));
++    run(&cfg, &out, "AXBI_CONTROL", true).unwrap();
++    assert_eq!(rows(&out, "history.csv"), before);
++}
++#[test]
++fn accepted_limit_keeps_last_valid_rows_full_checkpoint_and_charged_costs() {
++    let cfg = config("19.99", "max_steps=1\n");
++    let out = scratch("accepted-cap").join("run");
++    assert!(run_bass_fresh(&cfg, &out, "SIGNED_MINUS", bg("SIGNED_MINUS"), "cap-epoch").is_err());
++    let t = check_counts(&out);
++    assert_eq!(t["status"], "STOPPED_CHECKPOINTED");
++    assert_eq!(t["accepted"], "1");
++    assert!(t["attempts"].parse::<usize>().unwrap() >= 3);
++    let (d, _) = Driver::new_bass(DriverConfig::read(&cfg).unwrap(), bg("SIGNED_MINUS")).unwrap();
++    let state = d
++        .read_bass_checkpoint(
++            Path::new(&t["last_checkpoint"]),
++            "cap-epoch",
++            &out.join("RUN_BINDING.txt"),
++        )
++        .unwrap();
++    assert_eq!(state.rhs_evaluations.to_string(), t["rhs_evaluations"]);
++    assert_eq!(
++        state.a.to_string(),
++        rows(&out, "history.csv")
++            .last()
++            .unwrap()
++            .split(',')
++            .nth(4)
++            .unwrap()
++    );
++}
++#[test]
++fn rhs_failure_keeps_initial_physical_state_and_actual_failed_debits() {
++    let cfg = config("19.99", "max_rhs=1\n");
++    let out = scratch("rhs-cap").join("run");
++    assert!(run_bass_fresh(&cfg, &out, "SIGNED_MINUS", bg("SIGNED_MINUS"), "rhs-epoch").is_err());
++    let t = check_counts(&out);
++    assert_eq!(t["accepted"], "0");
++    assert_eq!(t["rhs_evaluations"], "1");
++    assert_eq!(t["attempts"], "1");
++    let (d, initial) =
++        Driver::new_bass(DriverConfig::read(&cfg).unwrap(), bg("SIGNED_MINUS")).unwrap();
++    let state = d
++        .read_bass_checkpoint(
++            Path::new(&t["last_checkpoint"]),
++            "rhs-epoch",
++            &out.join("RUN_BINDING.txt"),
++        )
++        .unwrap();
++    assert_eq!(state.a, initial.a);
++    assert_eq!(state.photons, initial.photons);
++    assert_eq!(state.photon_energy_ref, initial.photon_energy_ref);
++    assert_eq!(state.photon_support_lo, initial.photon_support_lo);
++    assert_eq!(state.photon_support_hi, initial.photon_support_hi);
++    assert_eq!(state.photon_inactive_number, initial.photon_inactive_number);
++    assert_eq!(
++        state.photon_inactive_energy_ref,
++        initial.photon_inactive_energy_ref
++    );
++    assert_eq!(format!("{:?}", state.gas), format!("{:?}", initial.gas));
++    assert_eq!(
++        format!("{:?}", state.ledgers),
++        format!("{:?}", initial.ledgers)
++    );
++}
++#[test]
++fn resume_cli_and_existing_legacy_checkpoint_directory_are_rejected() {
++    let args = vec!["bass_adaptive_trial".into(), "--resume".into()];
++    assert!(adaptive_cli::execute_args(&args)
++        .unwrap_err()
++        .to_string()
++        .contains("FRESH_ONLY"));
++    let out = scratch("legacy").join("run");
++    fs::create_dir(&out).unwrap();
++    let legacy = out.join("checkpoint.txt");
++    fs::write(&legacy, "AXBI_CHECKPOINT_V4\nlegacy007008\n").unwrap();
++    let original = fs::read(&legacy).unwrap();
++    assert!(run_bass_fresh(
++        &config("19.9999", ""),
++        &out,
++        "SIGNED_MINUS",
++        bg("SIGNED_MINUS"),
++        "fresh"
++    )
++    .is_err());
++    assert_eq!(fs::read(&legacy).unwrap(), original);
++    assert!(!out.join("RUN_BINDING.txt").exists());
++}

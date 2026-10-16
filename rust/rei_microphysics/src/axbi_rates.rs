@@ -7,7 +7,8 @@
 use crate::{
     igm_rates::{igm_rates, IgmRates},
     igm_state::IgmGasState,
-    igm_thermal::{igm_point_rhs, IgmPhotoInput, IgmPointRhs},
+    igm_thermal::{igm_point_rhs_with_prepared, IgmPhotoInput, IgmPointRhs},
+    rate_table::IgmRateBackend,
     ForwardError,
 };
 
@@ -48,9 +49,27 @@ impl AxbiProvider {
         tcmb_k: f64,
         photo: IgmPhotoInput,
     ) -> Result<AxbiPoint, ForwardError> {
+        self.point_with_backend(&IgmRateBackend::Direct, gas, n_h_cm3, n_he_cm3,
+            mean_h_per_s, tcmb_k, photo)
+    }
+
+    /// Explicit opt-in coefficient backend; the physical ledger is unchanged.
+    /// No derivative/Jacobian or trajectory admission is supplied by this API.
+    pub fn point_with_backend(
+        self,
+        backend: &IgmRateBackend,
+        gas: &IgmGasState,
+        n_h_cm3: f64,
+        n_he_cm3: f64,
+        mean_h_per_s: f64,
+        tcmb_k: f64,
+        photo: IgmPhotoInput,
+    ) -> Result<AxbiPoint, ForwardError> {
         let temperature_k = gas.eos(n_h_cm3, n_he_cm3)?.temperature_k;
-        let rhs = igm_point_rhs(gas, n_h_cm3, n_he_cm3, mean_h_per_s, tcmb_k, photo)?;
-        let rates = self.rates(temperature_k)?;
+        let prepared = backend.prepare(temperature_k)?;
+        let rhs = igm_point_rhs_with_prepared(gas, n_h_cm3, n_he_cm3,
+            mean_h_per_s, tcmb_k, photo, &prepared)?;
+        let rates = prepared.rates();
         Ok(AxbiPoint {
             provider_id: AXBI_PROVIDER_ID,
             temperature_k,

@@ -1,0 +1,22 @@
+{
+  "stage": "C2",
+  "status": "complete",
+  "equation_code_mapping": {
+    "residual": "R=y-yold-dt*f(y); fourcomponents(threefractions,w_eV/H)",
+    "native_scale": "SR=(1,1,1,max(abs(oldw),abs(w),1e-6))",
+    "adaptive_chemical_scale": "Sy=(max(abs(x_i),1e-5),max(abs(w),1e-6))",
+    "core": "A_ij=J_ij*Sy_j/SR_i,b_i=R_i/SR_i; solveAz=-b;delta_i=Sy_i*z_i",
+    "conditioning": "max_abs_row_sum(A)*max_abs_row_sum(inverseA)",
+    "backward_error": "inf(Az+b)/(inf(A)*inf(z)+inf(b)); zero/zero->0",
+    "thermal": "Dparticlefactor; linear=T*(dw/w-dD/D), exactmap=linear/(1+dD/D) aftercorrected-domaincheck"
+  },
+  "validation": "Same accepted-state R/J/context and baseline driver binding; no producer/context reads or native import",
+  "paths": {
+    "module_and_CLI": "nonlinear_budget.py",
+    "C6": "tests/test_implementation.py",
+    "C7_delegated": "tests/test_science.py",
+    "C8": "tests/check_precision.py"
+  },
+  "io": "Finite JSON result and execution receipt, fresh output, same-directory atomic replacement with file and supported directory fsync",
+  "scope": "Chemical block only; photons, final split-step and global error remain outside"
+}

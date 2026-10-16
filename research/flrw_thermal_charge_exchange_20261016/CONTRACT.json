@@ -1,0 +1,139 @@
+{
+  "schema": "rei.thermal-cx-contract/1",
+  "unit_id": "flrw_thermal_charge_exchange_20261016",
+  "status": "R10_REVIEWED_CODING_READY",
+  "source_head": "eb2abcac4f44b7bc4ff532286953fcb4e353c7bb",
+  "owned_path": "research/flrw_thermal_charge_exchange_20261016/**",
+  "source_files": {
+    "deuterium_charge_exchange.rs": "dd0a8c9b96ef3e53b8eef0fd08961045779f20b7",
+    "deuterium_atomic.rs": "8477162430af02585a32d18092454e1f7bb52f60"
+  },
+  "question": "Isolated fixed-proper-volume thermal-feedback reversible H/D CX; reuse actual Savin rates, one extent and one thermal/binding ledger.",
+  "units": {
+    "density": "cm^-3",
+    "thermal_density": "eV cm^-3",
+    "defect": "eV per forward event",
+    "rate": "cm^3 s^-1",
+    "time": "s",
+    "temperature": "K",
+    "kB_eV_K": "1.380649e-23 / 1.602176634e-19"
+  },
+  "inputs": {
+    "state": [
+      "h0",
+      "hp",
+      "d0",
+      "dp",
+      "thermal_eV_cm3"
+    ],
+    "defect": [
+      "delta_chi_eV",
+      "source"
+    ],
+    "provider": "immutable rate callable(T)->(kf,kr), named source and inclusive Tmin/Tmax",
+    "time": "finite t_requested>=0",
+    "spectators": "NONE; pure H/D only; ne=hp+dp",
+    "initial_temperature": "derived from thermal density, never supplied as a second independent state"
+  },
+  "outputs": [
+    "status",
+    "full_interval_complete",
+    "t_reached_s",
+    "t_requested_s",
+    "extent_cm3",
+    "normalized_extent",
+    "four_densities",
+    "thermal_eV_cm3",
+    "temperature_K",
+    "chemical_delta_eV_cm3",
+    "thermal_delta_eV_cm3",
+    "electron_delta_cm3",
+    "temperature_amplitude_ceiling_K",
+    "physical_interval",
+    "admissible_interval",
+    "provider_boundary_if_approached",
+    "distance_to_boundary_cm3",
+    "event_atol_normalized",
+    "accepted_steps",
+    "rejected_steps",
+    "attempts",
+    "rhs_calls",
+    "maximum_accepted_local_error_ratio",
+    "degenerate_temperature_null_reason"
+  ],
+  "algorithm": {
+    "name": "adaptive Heun SSP-RK2 with step doubling",
+    "normalize": "S=max(h0,hp,d0,dp);z=xi/S",
+    "step": "e=z+h*G(z); v=e+h*G(e); H=(z+v)/2; interval-check e,v; field checks actual density/T inputs",
+    "accept": "two halfsteps; abs(zfine-zcoarse)/3 <= atol+rtol*max(abs(z),abs(zfine))",
+    "initial_step": "t_requested/16 unless zero; no imposed minimum physical time",
+    "trial_cap": "min(remaining_time,h,0.8*distance/abs(G(z))) toward finite bound when G!=0",
+    "growth": "0.9*(tolerance/error)^(1/3), clamped[0.2,2]; zeroerror factor2",
+    "error_reject": "same cubic factor capped<=0.8; invalid-domain stages halve h",
+    "event": "accepted-state outward-toward-provider-boundary and normalized distance<=event_atol -> partial DOMAIN_BOUNDARY_APPROACH, no clamp",
+    "equilibrium": "exact G==0 -> COMPLETE_EQUILIBRIUM at requested time with unchanged state; do not infer equilibrium from small G",
+    "degenerate": "Validate finite nonnegative densities, thermal and time, a finite signed defect, and finite ordered positive provider-temperature metadata first. S==0 and thermal==0 -> COMPLETE_EMPTY, t_reached=t_requested, T=null, amplitude=null, no RHS; S==0 and thermal>0 invalid. Otherwise derive/validate T and interval even for t_requested==0; then dt0 -> COMPLETE unchanged with zero RHS. For positive time exact G==0 -> COMPLETE_EQUILIBRIUM at requested time. D=0 follows exact zero field, not invented temperature.",
+    "underflow": "if h<=0 or t+h==t -> STEP_UNDERFLOW partial",
+    "error_meaning": "local heuristic only; no certified global bound or stiffness guarantee",
+    "failures": "Invalid initial values/metadata/outside-domain T -> INVALID_INPUT. Every attempted RHS evaluation charged first; provider exception, nonfinite or negative returned rate, or nonfinite valid-domain arithmetic -> ARITHMETIC_FAILURE at last accepted state. Euler-stage interval violations reject/halve; do not call provider there."
+  },
+  "controls": {
+    "rtol": 1e-7,
+    "atol_normalized": 1e-11,
+    "event_atol_normalized": 1e-12,
+    "max_attempts": 20000,
+    "max_rhs_calls": 200000,
+    "max_consecutive_rejections": 80,
+    "trace_rows_max": 512,
+    "aggregate_test_wall_seconds": 30,
+    "threads": 1,
+    "builds": 0,
+    "native_runs": 0,
+    "external_reference_runs": 0,
+    "old_suites": 0
+  },
+  "statuses": [
+    "COMPLETE",
+    "COMPLETE_EQUILIBRIUM",
+    "COMPLETE_EMPTY",
+    "DOMAIN_BOUNDARY_APPROACH",
+    "WORK_LIMIT",
+    "STEP_UNDERFLOW",
+    "ARITHMETIC_FAILURE",
+    "INVALID_INPUT"
+  ],
+  "requirements": [
+    "last accepted state retained on incomplete results",
+    "input immutable",
+    "no rate extrapolation or negativity clipping",
+    "every RHS evaluation charged including failure",
+    "Savin formulas retain source coefficients and inclusive domain",
+    "no production activation/source/closure/tolerance/default changes",
+    "completed input identity validated once; do not replay old suites"
+  ],
+  "verification": {
+    "manufactured": "new cases in FIXTURES; normalized endpoint error <=5e-6 for ordinary default integrations; exact oracle carries its own status",
+    "refinement": "same manufactured smooth case fixed Heun N16/32/64, each error decreases; observed ratios between3.0 and5.0 for both successive refinements, unless reviewer identifies cancellation and authorizes one fixture repair",
+    "ledger": "max absolute invariant residual <=128*machine_epsilon*max(1,gross appropriate quantities); energy cancellation normalized by max(1e-30,abs(u0),abs(delta_chi*xi)); use128eps multiplier",
+    "amplitude": "abs(deltaT)<=ceiling plus128eps*max(1,T0,abs(deltaT),ceiling)",
+    "savin": "two declared tiny trajectories + near-lower-domain case; finite nonnegative state, ledger/domain checks; default/tighter pair differences recorded, not true error",
+    "event": "manufactured analytic crossing fixture: partial status, t_reached<t_requested, within event_atol normalized of correct boundary, no domain-violating provider evaluation; time difference to analytic crossing recorded without certification",
+    "budget": "forced max_attempts=1 test yields incomplete WORK_LIMIT and last accepted state",
+    "conversion": "one equivalent physical initial state/rate through SI-to-unit conversion verifies same G up to128eps scaling; no old Rust run"
+  },
+  "publication": "stage_delivery immutable capture before each stage; only newunit files; stage commits/backups owned by publisher",
+  "claim_ceiling": "Standalone isolated thermal-CX mathematical reduction and scoped tested numerical implementation. No full-network/isotope/cosmological admission.",
+  "review_repair": {
+    "finding": "R6 signed-defect validation wording inconsistent with theory",
+    "prior": "R5 immutable snapshot retained",
+    "replacement": "finite signed defect; nonnegative applies only to density/thermal/time",
+    "affected": "input validation and negative-defect thermal interval ordering; physics/model unchanged",
+    "added_fixture": "negative_defect beta=-0.1; generic signed oracle identity reusable"
+  },
+  "review_resolution": "evidence/R6_INDEPENDENT_REVIEW.json: PASS_SCOPED_AFTER_ONE_TARGETED_CONTRACT_REPAIR",
+  "probe_binding": {
+    "R6_contract_sha256": "3588d8bf713ce19803606d6073b3f0fd5c6ad3e746362502b491705e562c2754",
+    "fixtures_sha256": "0c04f00345719913ab1d0a20e41e142114286f861c6032e26a5be0a17d1135ca",
+    "R10_change": "status and review/binding metadata only; equations/method/fixtures/controls unchanged"
+  }
+}

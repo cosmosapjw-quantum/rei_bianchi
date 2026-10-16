@@ -1,0 +1,19 @@
+# Independent NCP direct-resume review
+
+PASS for scoped implementation publication and operational handoff. Scientific admission remains NOT_ISSUED; current NCP state and current full backup remain NOT_OBSERVED.
+
+Read-only review covered the three new CLIs, their fixtures/receipts, AGENTS.md, and the existing stage005 controller/plan/terminal evidence. Source reconstruction evidence is reused from SOURCE_RESTORE.json. No tests, Rust build, profile, physical solve, remote access or old scientific checks were rerun by the reviewer.
+
+Two concrete defects received bounded implementer repairs: renderer interruption now kills/reaps its detached process group, and backup now includes campaign/full_resource_plan.json. Both code changes were read back. Evidence records five resume fixtures, seven original postprocess fixtures plus one focused interrupt regression, and six final backup fixtures passing. Backup intermediate attempts are preserved in its receipt.
+
+Status uses actual command bindings and preserves the epoch. Profile preparation changes one unique literal backslash-n in a fresh copy and preserves original failures; the optional bounded build does not invoke the unknown diagnostic caller. Postprocess requires exact terminal/source/config/binary/epoch evidence and retains the original absolute deadline; its 300-second shared bound covers bind/render, while report packaging follows separately. Backup distinguishes compact live snapshots from terminal case output archives and retains partial failures.
+
+The report ZIP contains runnable code and small evidence but requires indexed external raw inputs. Archive creation is not proof of full scientific completion. Actual source/profile dependencies and native controller placement remain subject to documented NCP-local observation.
+
+Proceed to publication and direct NCP handoff with these limitations. On legitimate NCP-local access, observe first and preserve existing outputs; do not restart either full solver or reset campaign_epoch.json. Later root handoff prose and external publication are outside this CLI review.
+
+Same-pass final handoff alignment: PASS. RUNBOOK_KO.md, CODEX_HANDOFF_KO.md, HANDOFF.json and NEXT_DAG.json were checked against the reviewed CLI commands/options, fresh destinations, one explicit build and diagnostic prerequisites, original campaign/postprocess deadlines, backup distinctions and current NOT_RUN/NOT_OBSERVED status. They are coherent. This extends the earlier scope to these four documents only; actual external publication/archive readback remain unobserved by this review. No tests or new scientific gate were added.
+
+## Superseding concurrent-integration supplement
+
+PASS for the focused integration and handoff based on published commit d3bbd732be3851fa8eff4f201e49e9e2e130bb6f. This paragraph supersedes the earlier pending-profile and source006-candidate instructions while preserving those historical reviews. The repair-profile CLI now rejects both prepare and --execute with ALREADY_COMPLETED / ALLOWANCE_EXHAUSTED and exit3 before mutation or build; the implementer’s one new regression passed and was not rerun. Published post-cache profile and source006 scoped reviews are reused: both execution allowances are exhausted, source006’s seven tests and504RHS fixture comparison are complete, and no production/full-history speedup is inferred. Current docs distinguish package source006 from live source005, prohibit replacing/restarting005, preserve its epoch/deadlines, and attribute18:36/18:37UTC native/watcher status to concurrent published evidence rather than direct observation here. Further execution needs a separate finite changed-dependency unit. No old test suite, science review, build or NCP action was repeated; full-history admission remains pending. Current reviewed hashes and exact scope are recorded in superseding_concurrent_integration in the JSON.

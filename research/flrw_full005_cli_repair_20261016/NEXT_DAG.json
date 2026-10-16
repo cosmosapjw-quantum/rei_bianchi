@@ -1,0 +1,60 @@
+{
+  "task": "FLRW_FULL005_CLI_REPAIR_20261016",
+  "nodes": [
+    {
+      "id": "actual_native_intake",
+      "status": "COMPLETE",
+      "evidence": "evidence/FINAL_STATUS.json",
+      "next": "cli_repair"
+    },
+    {
+      "id": "cli_repair",
+      "status": "FOCUSED_THREE_TESTS_PASS",
+      "evidence": "IMPLEMENTATION.json",
+      "next": "fresh_independent_review"
+    },
+    {
+      "id": "fresh_independent_review",
+      "status": "PASS_SCOPED",
+      "on_pass": "direct_ncp_postprocess",
+      "on_fail": "ONE_BOUNDED_REPAIR_OR_REPORT_OBSERVED_FAILURE",
+      "evidence": "INDEPENDENT_REVIEW.json"
+    },
+    {
+      "id": "direct_ncp_postprocess",
+      "status": "NOT_RUN_RAW_INPUTS_NOT_LOCAL",
+      "tool": "research/ncp_direct_resume_20261016/postprocess_ncp.py render --output FRESH_OUTSIDE_CAMPAIGN",
+      "limits": {
+        "solver_runs": 0,
+        "postprocess_total_wall_cap_s": 300,
+        "postprocess_address_space_bytes": 8589934592,
+        "postprocess_hard_deadline_epoch": 1792122617.77407,
+        "postprocess_hard_deadline_utc": "2026-10-16T03:50:17.774070Z",
+        "original_epoch_never_reset": true,
+        "watcher_or_solver_restart": false,
+        "profile_remaining_build_run_allowance": [
+          0,
+          0
+        ],
+        "source006_remaining_test_build_run_allowance": [
+          0,
+          0,
+          0
+        ]
+      },
+      "on_success": "diagnostic_review_and_raw_preservation",
+      "on_failure": "PRESERVE_EXACT_FAILURE_NO_AUTOMATIC_RETRY_OR_EPOCH_RESET"
+    },
+    {
+      "id": "diagnostic_review_and_raw_preservation",
+      "status": "PENDING_ACTUAL_NCP_RESULT",
+      "scope": "Review generated H/He diagnostics; preserve native raw files via existing backup path and actual upload/readback evidence before claiming cloud backup."
+    }
+  ],
+  "reuse_without_rerun": [
+    "Completed post-cache profile",
+    "Completed opt-in source006 Jacobian experiment",
+    "Completed source005 native Q512/Q1024 trajectories"
+  ],
+  "claim_ceiling": "No D curve; no whole-history time/angular convergence; no scientific admission from CLI repair or native terminal alone."
+}

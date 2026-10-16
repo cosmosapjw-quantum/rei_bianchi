@@ -1,0 +1,16 @@
+--- rust/rei_microphysics/examples/bass_dynamic_trial.rs (pre-repair)
++++ rust/rei_microphysics/examples/bass_dynamic_trial.rs (repaired)
+@@ -208,11 +208,11 @@
+     }
+     let photon_denominator = uninterrupted.ledgers.source_n.max(1.0);
+     let energy_denominator = uninterrupted.ledgers.source_u.max(1.0);
+-    let report=format!("{{\"schema\":\"bass.rei.dynamic_mini.v1\",\"case\":\"{}\",\"grid_points\":{},\"workers\":{},\"dln_a\":{:.17e},\"steps\":{},\"a\":{:.17e},\"time_s\":{:.17e},\"interval_time_s\":{:.17e},\"clock_residual_s\":{:.17e},\"b\":{:.17e},\"h_per_s\":{:.17e},\"s_per_s\":{:.17e},\"signed_s_over_h\":{:.17e},\"temperature_k\":{:.17e},\"x_hii\":{:.17e},\"x_heii\":{:.17e},\"x_heiii\":{:.17e},\"source_n_per_h\":{:.17e},\"source_u_ev_per_h\":{:.17e},\"photon_residual_per_h\":{:.17e},\"photon_denominator_per_h\":{:.17e},\"photon_normalized\":{:.17e},\"energy_residual_ev_per_h\":{:.17e},\"energy_denominator_ev_per_h\":{:.17e},\"energy_normalized\":{:.17e},\"ledger_tolerance_normalized\":1e-8,\"max_hamiltonian_normalized\":{:.17e},\"hamiltonian_tolerance_normalized\":3e-12,\"max_raychaudhuri_normalized\":{:.17e},\"restart_max_abs\":{:.17e},\"adaptive_status\":\"{}\",\"adaptive_error\":{:.17e},\"adaptive_accepted\":{},\"adaptive_rejects\":{},\"rhs_evaluations\":{},\"newton_residual\":{:.17e}}}\n",
++    let report=format!("{{\"schema\":\"bass.rei.dynamic_mini.v1\",\"case\":\"{}\",\"grid_points\":{},\"workers\":{},\"dln_a\":{:.17e},\"steps\":{},\"a\":{:.17e},\"time_s\":{:.17e},\"interval_time_s\":{:.17e},\"clock_residual_s\":{:.17e},\"b\":{:.17e},\"h_per_s\":{:.17e},\"s_per_s\":{:.17e},\"signed_s_over_h\":{:.17e},\"temperature_k\":{:.17e},\"x_hii\":{:.17e},\"x_heii\":{:.17e},\"x_heiii\":{:.17e},\"source_n_per_h\":{:.17e},\"source_u_ev_per_h\":{:.17e},\"photon_residual_per_h\":{:.17e},\"photon_denominator_per_h\":{:.17e},\"photon_normalized\":{:.17e},\"energy_residual_ev_per_h\":{:.17e},\"energy_denominator_ev_per_h\":{:.17e},\"energy_normalized\":{:.17e},\"ledger_tolerance_normalized\":1e-8,\"max_hamiltonian_normalized\":{:.17e},\"hamiltonian_tolerance_normalized\":3e-12,\"max_raychaudhuri_normalized\":{:.17e},\"restart_max_abs\":{:.17e},\"adaptive_status\":\"{}\",\"rhs_evaluations\":{},\"newton_residual\":{:.17e}}}\n",
+         identity.case,identity.grid_points,workers,dln,steps,p.a,p.time_s,clock.proper_time_s,p.time_s-clock.proper_time_s,p.b,p.h_per_s,p.s_per_s,p.sigma,eos.temperature_k,
+         uninterrupted.gas.fractions[0],uninterrupted.gas.fractions[1],uninterrupted.gas.fractions[2],
+         uninterrupted.ledgers.source_n,uninterrupted.ledgers.source_u,n,photon_denominator,n/photon_denominator,u,energy_denominator,u/energy_denominator,
+-        hamiltonian,raychaudhuri,parity,"NOT_RUN_FIXED_STEP_COMPONENT_ONLY",0.0,0,0,uninterrupted.rhs_evaluations,uninterrupted.max_newton_residual);
++        hamiltonian,raychaudhuri,parity,"NOT_RUN_FIXED_STEP_COMPONENT_ONLY",uninterrupted.rhs_evaluations,uninterrupted.max_newton_residual);
+     let mut file = fs::File::create(output.join("result.json"))?;
+     file.write_all(report.as_bytes())?;
+     print!("{report}");

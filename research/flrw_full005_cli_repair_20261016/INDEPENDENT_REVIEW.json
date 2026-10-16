@@ -1,0 +1,107 @@
+{
+  "schema": "rei.full005_cli_repair_independent_review.v1",
+  "reviewed_utc": "2026-10-15T23:11:06.009783+00:00",
+  "reviewer": {
+    "task": "/root/resume3_cli_review",
+    "independent_of_implementation": true,
+    "observed_runtime_model": null
+  },
+  "decision": "PASS_SCOPED_CLI_REPAIR_AND_EXISTING_BOUNDED_NCP_HANDOFF",
+  "selected_stages": [
+    "C9",
+    "C10"
+  ],
+  "scope": "One read-only changed-surface review of the actual AUTO001 CLI failure, the single-variable repair, three focused dispatch tests and existing unchanged wrapper bounds. Reviewer writes only these review artifacts.",
+  "source_hashes": {
+    "research/flrw_full005_postprocess_20261015/postprocess_flrw.py": "b396a5b439a5cc3e305ab6663ac8d6d46424b747c13a84da4fe3d89ac468b5fc",
+    "research/flrw_full005_postprocess_20261015/test_postprocess_cli.py": "e79e247173cd32d6f285505a866888ac3ad1465913630dbc6db14be1f2e4096a",
+    "research/flrw_full005_cli_repair_20261016/CONTRACT.json": "9347afd4393ca762d3d189784c8f5057a9a786685023e6ea7df71528872c0042",
+    "research/flrw_full005_cli_repair_20261016/IMPLEMENTATION.json": "29646525e9d7923aebaced5911e38c04bc7224fff3dc00899c39b5786dc041b0",
+    "research/flrw_full005_cli_repair_20261016/raw/cli_test.log": "fccdc2751ef7dc3c87ac4b87b1af433e9a6bc0e5b4f246826d69c0d14ad8380d",
+    "research/ncp_direct_resume_20261016/postprocess_ncp.py": "764f2f9dc9001c54b174b55def8e12e5bb61c3a8cb91f717f9f1806206a67532"
+  },
+  "old_renderer_sha256": "d62a95f8e8dff1a18931e752289a715a2d322dcfda094fda913e9b92562e9a3d",
+  "new_renderer_sha256": "b396a5b439a5cc3e305ab6663ac8d6d46424b747c13a84da4fe3d89ac468b5fc",
+  "actual_failure_evidence": {
+    "path": "/workspace/scratch/56fd3625e428/intake_full005_auto001/extracted/postprocess/render.log",
+    "sha256": "fb929c878db2c1aada1277152972a06df4776bc80c76f60805d04922e3182b28",
+    "observed": "render dispatch raises UnboundLocalError for local run in main; recovered AUTO001 runnable matches old renderer hash"
+  },
+  "findings_closed": [
+    {
+      "id": "CLI_LOCAL_RUN_SHADOWING",
+      "mechanism": "An assignment to run anywhere in main makes run local throughout main; render branch reaches an unassigned local instead of global run().",
+      "repair": "Exact diff changes only case,run,binding to case,run_dir,binding in the FULL_PAIR guard loop. The tuple value is unused there; guard and subsequent bind arguments are unchanged.",
+      "disposition": "CLOSED_BY_SCOPED_REPAIR"
+    }
+  ],
+  "focused_test_review": {
+    "result_reused": "3 PASS; exit 0; test runner 0.021s; total subprocess wall 1.6908214049981325s",
+    "raw_log": "raw/cli_test.log",
+    "semantic_fit": [
+      "Render test invokes real main with argv and patches the global run, checks exact pathlib.Path arguments and absence of bind/guard/write. The old local-shadowing code would fail before that mock call.",
+      "FULL_PAIR test checks both real JSON binding reads, guard order before bind calls, original case/run-directory/binding arguments and exact manifest write content.",
+      "SHORT_SCREEN_PREVIEW test checks bind/write dispatch and confirms the FULL_PAIR guard and render run are not called."
+    ],
+    "limits": "Focused mocked dispatch coverage is sufficient for the sole name-binding repair; it does not execute or validate full-history rendering, frozen guard internals, scientific calculations or image contents.",
+    "reviewer_test_invocations": 0
+  },
+  "wrapper_review_reused": {
+    "prior_review": "research/ncp_direct_resume_20261016/INDEPENDENT_REVIEW.json",
+    "sha256_unchanged": "764f2f9dc9001c54b174b55def8e12e5bb61c3a8cb91f717f9f1806206a67532",
+    "limited_current_read": "Read constants, bounded_command and render/main dispatch; no full re-audit.",
+    "accepted_bounds": {
+      "shared_bind_render_wall_cap_s": 300,
+      "address_space_bytes": 8589934592,
+      "original_absolute_deadline_epoch": 1792122617.77407,
+      "original_absolute_deadline_utc": "2026-10-16T03:50:17.774070Z",
+      "fresh_output_outside_campaign": true,
+      "solver_runs": 0
+    },
+    "command_template": "python3 research/ncp_direct_resume_20261016/postprocess_ncp.py render --campaign /root/REI_FLRW_COVARIANT_20261015_005/full_campaign001 --renderer-root research/flrw_full005_postprocess_20261015 --output FRESH_ABSOLUTE_PATH_OUTSIDE_CAMPAIGN",
+    "claim_limit": "Successful wrapper output itself remains pending independent diagnostic review; packaging time is outside the shared bind/render cap as previously reviewed."
+  },
+  "native_evidence_boundary": {
+    "read": "evidence/FINAL_STATUS.json and selected terminal fields in evidence/LATEST_READONLY_STATUS.json",
+    "observed_from_recovered_records": "Both source005 Q512/Q1024 cases have terminal returncode 0, COMPLETE_REPRESENTED_INTERVAL, checkpoint zbar 4.0 and matching source/config/binary readback. Earlier bind succeeded and render failed.",
+    "source005_sha256": "1a2268e3da98ed47159cb738762a1a3d3d17bdcb6806e611cbd2bc3c0c6eaff7",
+    "direct_current_ncp_observation": false,
+    "actual_full_plots_admitted": false,
+    "scientific_admission": "NOT_ISSUED"
+  },
+  "handoff_alignment": {
+    "read": "HANDOFF.json, NEXT_DAG.json, final RUNBOOK_KO.md and CODEX_HANDOFF_KO.md",
+    "decision": "COMMAND_BUDGET_AND_CLAIM_BOUNDARY_ALIGNED",
+    "note": "Draft review-pending labels are historical to this read; controller may update them to this scoped PASS. This is not independent verification of cloud publication or full raw backup.",
+    "same_pass_final_prose_checked_utc": "2026-10-15T23:11:25.278295+00:00",
+    "final_prose_sha256": {
+      "RUNBOOK_KO.md": "c0951cb3f994793de335103c0cf134eba94fc392a50965e2bddcb95eefae8581",
+      "CODEX_HANDOFF_KO.md": "b15aac0695aab82c9c0c7ee00939518fe2dcbec378c46b783ea06a105204bd82"
+    },
+    "basis": "Default campaign and renderer-root match existing wrapper; check then single render with fresh output is supported. Shared 300s, 8GiB and original 03:50:17.774070 UTC deadline match source. Complete native evidence and compact/full-raw preservation distinctions remain explicit; no exhausted profile/source006 rerun is requested."
+  },
+  "skill_context_used": {
+    "package": "c38/physmath-research-loop",
+    "version": "1.3.0",
+    "read": [
+      "SKILL.md",
+      "references/POLICY_INTEGRATION.md",
+      "references/CODING_LOOP.md",
+      "references/SUBAGENT_MODE.md"
+    ],
+    "application": "C9 changed surface only; C10 explicit source, reused evidence and execution/admission boundary; existing R/physics reused; no full research loop or recursive delegation."
+  },
+  "not_performed": [
+    "Test reruns",
+    "Historical suites",
+    "Scientific re-review",
+    "Rust/build/solver runs",
+    "NCP or Remote Desktop calls/retries",
+    "Actual full-history plotting",
+    "Cloud publication or raw-backup verification"
+  ],
+  "blocking_findings": [],
+  "bounded_repair_required": false,
+  "next_executable_action": "Use the reviewed renderer with the existing direct NCP one-shot wrapper on legitimate NCP-local access and available complete raw inputs, before the unchanged original absolute deadline, with a fresh separate output. Preserve exact result/failure; do not restart solver/watcher, reset epoch or replay exhausted profile/source006 work.",
+  "stop_boundary": "Scoped review complete. No further review cycle or tests requested."
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "source": "Actual root Wolfram tool response transmitted to stage-delivery controller; not rerun here",
+  "tool": "mcp__codex_apps__wolfram_wolframlanguageevaluator",
+  "timeConstraint": 30,
+  "isError": false,
+  "code": "Clear[p,q,t,h];d=p+(q-p)t;t0=p/(p-q);i2=FullSimplify[Integrate[h*d^2,{t,0,1}],Assumptions->Element[{p,q,h},Reals]&&h>0];same=FullSimplify[Integrate[h*d,{t,0,1}],Assumptions->p>=0&&q>=0&&h>0];cross=FullSimplify[Integrate[h*d,{t,0,t0}]-Integrate[h*d,{t,t0,1}],Assumptions->p>0&&q<0&&h>0];",
+  "observed_results": {
+    "I2": "h*(p^2+p*q+q^2)/3",
+    "same_sign": "h*(p+q)/2",
+    "opposite_sign": "h*(p^2+q^2)/(2*(p-q))",
+    "I2_identity_residual": "0",
+    "opposite_identity_residual": "0",
+    "q_to_zero_from_negative_limit": "h*p/2"
+  },
+  "claim_limit": "Triangle constants in the query were not computed independently; no independent triangle check is claimed.",
+  "include_from_stage": "R6"
+}

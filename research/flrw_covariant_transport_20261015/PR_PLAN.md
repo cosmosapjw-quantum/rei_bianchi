@@ -1,0 +1,6 @@
+# Unit3 scoped publication
+Publish deterministic persistent per-cell prepare pooling and the actual source-bound1/8/32/64 parity/scaling result. Fullphysics/counters/decisions are bitwiseequal;144accepted3024RHS. Measured speedups1.2786/1.2863/1.2143 are modest.64workerregionavg2.59busycores and fivecaseavg8.2 leave utilizationadequacyOPEN.
+Fiveactual003pilots are running on disjointaffinities under64workers/112GiB/10GiB and finite80k/260k/20M/1800s/2048MiB caps. Fullhistory/refinementscreen remains pending all5actualendpoints.
+Recovery uses SHAverifiedUnit2ZIP+003source/execution/benchmark. Originallocal6test/compile rawreceipts and HPC_REVIEW are unavailable, explicitly recorded rather than fabricated. Independent supplementalreview is a new record, not originalbyte recovery. Git excludes4complete4,235,511-byte tracefiles; runnableZIP includes them plusfullfixture/state/telemetry. Future004cache source is excluded. Rootownscreate_tree/CASpush/PR150 and finalcloudreadback.
+
+Latest durable terminal update: Q128/Q256/Q512 all COMPLETE_REPRESENTED_INTERVAL atz19.8; strict source/config/binarybinding,6arrays and zeroFAILledgers verified. Time/angle remainpending; no full5case screen/fullhistoryPASS. See raw/ncp003_first3_readback.json and compactterminaldirectory.

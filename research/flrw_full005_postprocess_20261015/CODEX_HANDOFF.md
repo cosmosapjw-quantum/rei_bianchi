@@ -1,0 +1,3 @@
+# Postprocess continuation
+
+Read HANDOFF.json/current_fields first. Do not confuse the actual SHORT preview with full completion. The existing owner watcher is active: do not relaunch, reset its deadline, or run a solver. Full pair metrics are diagnostic pending independent scientific review. D cosmological chemistry is inactive. Respect the fixed native deadline plus one hour, 8GiB owner cap and combined 300-second postprocess cap. Native005 source is immutable. Final filesystem readback is explicitly NOT_DONE due the quota pause; exact script bytes are hash-matched to retained successful tool records. Parent owns commit/CAS and all later admission.

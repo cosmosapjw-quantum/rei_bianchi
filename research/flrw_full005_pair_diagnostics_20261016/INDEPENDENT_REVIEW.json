@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "unit_id": "flrw_full005_pair_diagnostics_20261016",
+  "stage": "C9",
+  "status": "complete",
+  "verdict": "PASS_SCOPED",
+  "reviewed_at_utc": "2026-10-16T01:00:44.455998+00:00",
+  "reviewer": {
+    "agent": "/root/full005_pair_review",
+    "role": "fresh independent scientific/numerical reviewer",
+    "requested_tier": "Astra",
+    "runtime_model_identity": "not independently observed"
+  },
+  "scope": "Read-only saved piecewise-linear pair diagnostic implementation in stored binary64 ln(a), analytic L1/I2/L2/RMS, standalone receipt reuse, and opt-in caller integration.",
+  "admitted": "Implementation may proceed to C10 publication and prompt-only handoff for the existing read-only diagnostic scope.",
+  "claim_boundaries": {
+    "actual_full005_continuous_metrics": "NOT_RUN",
+    "solver_accuracy_or_convergence": "NOT_ADMITTED",
+    "new_physical_tolerance": null,
+    "arithmetic_error_certificate": "NONE",
+    "prior_full005_plots": "Existing nine completed plots/scoped review reused; no render replay"
+  },
+  "review_method": [
+    "Inspected frozen CONTRACT.json and THEORY.md R5-R10 against final production code.",
+    "Independently checked endpoint convexity maximum and sign-split absolute/squared affine integrals; mapped scaled implementation back to those formulas.",
+    "Inspected independent Fraction global-polynomial oracle, test sources, actual C6/C7 logs and execution receipts, C7 residuals, and C8 benchmark source/outcome.",
+    "Verified all seven final source/test SHA256 entries against current bytes in C8_source_manifest.json.",
+    "Inspected actual completed POSTPROCESS_RECEIPT.json and unchanged reader field/species/clock definitions; checked loader schema and data mappings statically.",
+    "Inspected complete caller integration; reused publisher-observed pre-overwrite baseline SHA checks to bound the shared caller change."
+  ],
+  "reviewed_source_sha256": {
+    "research/flrw_full005_pair_diagnostics_20261016/analyze_saved_pair.py": "29b51bbb28c123bdf5ae47e0757c160ce840d570e0f85808b0a36e52928be898",
+    "research/flrw_full005_pair_diagnostics_20261016/tests/benchmark_pair.py": "7379324b966db9559b3d40c7a80ef41ede232a8df816858e3fb2499260babf08",
+    "research/flrw_full005_pair_diagnostics_20261016/tests/fixtures.py": "ef15925bbf4f5d218eea9ecaabb26d88854b698625dd79641875ae93d26709d8",
+    "research/flrw_full005_pair_diagnostics_20261016/tests/test_implementation.py": "dd3344318c9d1e7e413b9551499baa738f61ca63e88a9f1f97c9712353ce2d2f",
+    "research/flrw_full005_pair_diagnostics_20261016/tests/test_science.py": "e4bda61e9c345abbcdec6bcecbaccb7dff1ef0bba4e4fa85cc6b762ed68fabc8",
+    "research/flrw_full005_postprocess_20261015/vendor/pair_diagnostics.py": "d738d803e4f1c75b76d1ae6d3abdd2d0bef0089919a731d149318c22ef2d90c7",
+    "research/flrw_full005_postprocess_20261015/postprocess_flrw.py": "9a4af44f3948f8c5689bc42c336e4a849fb7fcb78ee9f3b675fb770461e6b6f8"
+  },
+  "prior_receipt_sha256": "b6709ef529abfb0f6234863fc8ad892b64630fd731ed57f33a0bfe7ca9517f28",
+  "checks": [
+    {
+      "id": "math",
+      "result": "pass_scoped",
+      "reason": "On each merged affine cell, convexity puts sup|d| at an endpoint. Integrating d^2 yields h(p^2+pq+q^2)/3; same-sign trapezoids and opposite-sign zero-split triangles yield the two L1 branches. Scaling p,q by their maximum preserves these formulas; normalizing by overlap width gives mean absolute and RMS."
+    },
+    {
+      "id": "traversal",
+      "result": "pass_scoped",
+      "reason": "Initial bisect brackets cover the clipped overlap; each next point is the minimum of both next knots and the overlap end. Exact equality advances both coincident pointers, distinct binary64 knots remain distinct, and strict greater-than maximum updates retain the earliest floating tie. No extrapolation or full union list is used."
+    },
+    {
+      "id": "numeric_limits",
+      "result": "pass_scoped",
+      "reason": "Finite/ordered/shape validation, bounded convex interpolation, sign comparison without p*q, scaled integrals, and Neumaier sums match the contract. Nonfinite intermediate/result arithmetic is rejected. Ordinary binary64 cancellation, underflow, and range restrictions remain; no uniform relative-error guarantee or certified exact-real supremum is claimed. Extremely small squared integrals can underflow even when an unsquared norm would be representable."
+    },
+    {
+      "id": "complexity",
+      "result": "pass_scoped",
+      "reason": "Validation and merged traversal cost O(k(n+m)); only per-observable summaries/previous values/accumulators are retained beyond input arrays and output. C8 measured diagnostic auxiliary allocation, not whole-loader memory: 2088/2072 bytes for 2000/20000 knots, one observable. Whole standalone retains both loaded histories."
+    },
+    {
+      "id": "standalone",
+      "result": "pass_scoped",
+      "reason": "Actual receipt has required successful status, source relation, strict case checks, frozen checks and exact source/config/binding links. Loader uses identical log(a), ne/nH, nine FIELDS, and six saved Ybaryon arrays. Each required raw stream is parsed once with inline SHA256; small metadata is bound; ledger/checkpoint validation is reused without opening those files. Numeric alignment and clock prerequisites are rechecked. Missing/invalid required input produces HOLD with null metrics and nonzero CLI exit."
+    },
+    {
+      "id": "caller",
+      "result": "pass_scoped",
+      "reason": "run(manifest,out) retains defaultFalse. New import/compute/write occurs only under the opt-in branch inside FULL_PAIR. Existing sampled filenames, milestones and rendering flow remain; failure cleanup removes new metrics. Caller verification is static plus C6 AST tests; no full renderer run was performed."
+    },
+    {
+      "id": "tests",
+      "result": "pass_scoped",
+      "reason": "C6 nine unique cases passed across initial and targeted repair executions. C7 four tests include eight independent exact lifted-binary64 fixtures; largest observed absolute metric residual is 2.220446049250313e-16. Tests cover overlap, ties, nextafter knots, zero/sign-changing cases, sampling gap, symmetry, redundant knots, units/scaling, overflow, receipt/HOLD paths, single raw opens and forbidden-import isolation. C8 deterministic replay and bounded scaling completed. These resolve the current scoped risks; no optional broad replay is needed."
+    }
+  ],
+  "observed_execution_evidence": [
+    "coding_evidence/C6.json",
+    "coding_evidence/C6_first_execution.json",
+    "coding_evidence/C6_first.log",
+    "coding_evidence/C6_repair_execution.json",
+    "coding_evidence/C6_repair.log",
+    "coding_evidence/C7.json",
+    "coding_evidence/C7_execution.json",
+    "coding_evidence/C7.log",
+    "coding_evidence/C7_oracle_residuals.json",
+    "coding_evidence/C8.json",
+    "coding_evidence/C8_execution.json",
+    "coding_evidence/C8_benchmark.stdout",
+    "coding_evidence/C8_source_manifest.json"
+  ],
+  "prior_test_failure": {
+    "status": "closed",
+    "classification": "test expectation / file-handle hygiene",
+    "observed": "C6 first run: eight pass, one guard-count assertion failure; caller contains the metric guard and separate failure-cleanup guard. Two selected tests passed after correcting test expectation and closing the CSV handle. Production unchanged."
+  },
+  "shared_caller_baseline_evidence": {
+    "source": "Publisher /root/full005_stage_delivery observed command outcomes; DELIVERY_LOG.json C5 caller_baseline_checks",
+    "sha256": "b396a5b439a5cc3e305ab6663ac8d6d46424b747c13a84da4fe3d89ac468b5fc",
+    "observed_heads": [
+      "cc3272615621145e60fe2c5494620ab181641e23",
+      "39367a7ba15ec2b1b98b09723dd92406ec761eb0"
+    ],
+    "result": "Both fresh pre-overwrite caller SHA assertions exited 0; C5 commit c453e7aa873223ebe6e20d6bc6fee2ebf53b21b5 preserved the latter tree."
+  },
+  "findings": [],
+  "bounded_repair_authorized": false,
+  "review_execution": {
+    "new_numerical_tests": 0,
+    "physical_history_reads": 0,
+    "native_solver_runs": 0,
+    "renderer_runs": 0,
+    "code_mutations": 0,
+    "written_artifacts": [
+      "INDEPENDENT_REVIEW.json"
+    ]
+  },
+  "next_action": "Code owner records C9 in CODING_STAGES; publisher captures C9, then C10 handoff proceeds. Any future actual raw diagnostic remains subject to original retained deadline/budget and required input availability."
+}
