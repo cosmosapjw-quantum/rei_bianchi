@@ -169,3 +169,15 @@ Two independently interpretable construction controls also ran: a power law had 
 The refined table stored 8,913,016 bytes, took 0.109192622 s to construct, and the complete refined probe consumed 0.365005623 s wall and 0.333695 s CPU with peak RSS 18,244 KiB. Initial plus refined scientific execution totals were 0.429108927 s wall and 0.390437 s CPU. Construction and probe costs are recorded separately; no direct-versus-table speedup is inferred from these accuracy runs. Scalar/batch/parallel comparative benchmarks and Li-specific execution remain C-stage obligations under the unchanged aggregate budget.
 
 R7 outcome: actual compiled H/He prototype accuracy passes the frozen coefficient target on the stated sample after one diagnosed refinement. No derivative API, new Newton/table residual path, continuous error certificate, or trajectory claim is admitted by this result.
+
+## R8 — scoped result decision
+
+Adopt the 65537-node H/He table as the opt-in implementation candidate supported by R7 sampled coefficient accuracy. Preserve direct evaluation as default/reference/fallback and the 8193-node failed target result. The factor-eight grid refinement reduced the observed worst error by approximately a factor of 64, consistent with the smooth log-linear second-order coefficient estimate; this observed comparison does not replace the cellwise curvature hypothesis.
+
+Adopt exact prepared direct-rate reuse within a point evaluation and its D projection for implementation: it removes duplicate source work without changing coefficients. Its actual integrated point outputs and temperature-identity enforcement must pass C6–C7. Adopt the source-backed Li6/Li7 state-and-number-rate component under required `ElementalElectronicEquality`, retaining per-channel domains and typed missing-source behavior for native isotope coefficients. Source and model acceptance at R6 does not substitute for the forthcoming Li numerical tests.
+
+Performance remains an empirical comparison to be completed in C8: the table's construction cost and memory are already known, but a speedup decision requires direct/prepared/lookup/batch/parallel timing on identical inputs. No full-driver timing fraction or trajectory result is available. The new table remains opt-in so its observed workload economics can guide use.
+
+No strong no-go result is proposed or admitted. The missing isotope-native dataset, unsupported Li8/Li9 nuclear closure, and a failed coarse mesh are specific source/model/numerical obligations with constructive next actions, not impossibility theorems. NG1–NG7 therefore have no new exclusion claim to evaluate. The watchdog requirement is met by the actual compiled R7 calculation and the executable C-stage handoff; further unchanged-source audits are unnecessary.
+
+R8 outcome: approve bounded production implementation and scientific tests of the selected candidates, keeping accuracy, source fit scope, isotope approximation, and performance as distinct claims. The original tolerance and aggregate execution budget remain fixed.

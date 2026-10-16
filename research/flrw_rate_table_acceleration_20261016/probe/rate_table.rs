@@ -4,6 +4,8 @@ use std::sync::Arc;
 
 pub const MAX_TABLE_NODES: usize = 65537;
 pub const IGM_CHANNELS: usize = 15;
+/// Selected by the retained sampled-accuracy experiment, not a global bound.
+pub const IGM_TABLE_DEFAULT_NODES: usize = 65537;
 pub const IGM_DIRECT_EVALUATOR: &str = "IGM_GRACKLE_DIRECT_F64_V1";
 pub const IGM_TABLE_EVALUATOR: &str = "IGM_GRACKLE_LOGLINEAR_F64_V1";
 
@@ -27,6 +29,9 @@ impl<const N: usize> LogRateGrid<N> {
         }
         let log_lower = lower.ln();
         let step = (upper.ln() - log_lower) / (nodes - 1) as f64;
+        if !step.is_normal() || step <= 0.0 {
+            return Err(ForwardError::InvalidInput("RATE_TABLE_GRID"));
+        }
         let temperatures: Vec<_> = (0..nodes).map(|i| {
             if i == 0 { lower } else if i + 1 == nodes { upper }
             else { (log_lower + step * i as f64).exp() }
@@ -135,6 +140,7 @@ fn unpack(t: f64, mut v: [f64;15], floor: [bool;3]) -> IgmRates {
 #[derive(Clone, Debug)]
 pub struct IgmRateTable { grid: LogRateGrid<15>, floors: Vec<[bool;3]> }
 impl IgmRateTable {
+    pub fn build_default() -> Result<Self,ForwardError> { Self::new(IGM_TABLE_DEFAULT_NODES) }
     pub fn new(nodes:usize) -> Result<Self,ForwardError> { Self::with_domain(1.0,1e6,nodes) }
     pub fn with_domain(lower:f64,upper:f64,nodes:usize) -> Result<Self,ForwardError> {
         if lower < 1.0 || upper > 1e6 {return Err(ForwardError::InvalidInput("IGM_TEMPERATURE_DOMAIN"));}
@@ -147,6 +153,8 @@ impl IgmRateTable {
         Ok(Self{grid,floors})
     }
     pub fn grid(&self)->&LogRateGrid<15>{&self.grid}
+    /// Heap coefficient/mask payload; excludes small vector/struct headers.
+    pub fn storage_bytes(&self)->usize{self.grid.storage_bytes()+self.floors.len()*std::mem::size_of::<[bool;3]>()}
     pub fn rates(&self,t:f64)->Result<IgmRates,ForwardError>{
         let Some((i,_))=self.grid.cell(t)else{return igm_rates(t);};
         let values=self.grid.evaluate(t,|t|igm_rates(t).map(igm_flat))?;
