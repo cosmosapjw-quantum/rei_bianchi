@@ -1,0 +1,27 @@
+--- research/lrs_threshold_oracle_20261015/recomb_thermal.py
++++ research/lrs_atomic_native_bridge_20261016/v6/recomb_thermal_midpoint_v6.py
+@@ -15,6 +15,9 @@
+ and cooling [erg cm^3/s] for the X reaction step.
+ """
+ from __future__ import annotations
++
++from bootstrap_v6 import setup
++setup()
+ from dataclasses import dataclass
+ from math import exp, expm1, fsum, isfinite, ceil
+ from typing import Callable, Sequence
+@@ -260,6 +263,14 @@
+                         ion=gas[PRODUCT[j]]
+                         if ion==0.0 or electron==0.0 or duration==0.0:
+                             continue
++                        if physical:
++                            from midpoint_recomb_v6 import midpoint_casea_event
++                            thermal, escaped, e = midpoint_casea_event(
++                                gas, thermal, j, duration/2.0,
++                                scale*n_star_cm3/h0_s, atomic_rates, binding[j])
++                            energy_escaped += escaped
++                            recomb_events[j] += e.count
++                            continue
+                         T=gas_temperature(thermal,gas)
+                         if physical:
+                             coeff=checked_atomic(T)
