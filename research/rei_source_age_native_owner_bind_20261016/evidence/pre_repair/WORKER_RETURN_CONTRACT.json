@@ -1,0 +1,99 @@
+{
+  "schema": "rei.source_age_native_owner_bind.worker_return.v1",
+  "task": "SOURCE_AGE_NATIVE_OWNER_BIND",
+  "stage": "C5 plus targeted local validation",
+  "requested_executor": "gpt-6.1-sol medium",
+  "observed_runtime": "NOT_INDEPENDENTLY_OBSERVED",
+  "native_source_sha": "35d9747a0bbedcafdb568467ce7c1e7a25f965b6",
+  "frozen_base_sha": "a50d176b56d267b651d204f371204f61299b9a64",
+  "scope": "opt-in native example overlay; unchanged native production files",
+  "commands": [
+    {
+      "command": "bash research/rei_source_age_native_owner_bind_20261016/run_local.sh",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 research/rei_source_age_native_owner_bind_20261016/independent_solver.py /tmp/rei-source-age-native-owner-bind/native/rust/rei_microphysics/target/release/examples/source_age_campaign research/rei_source_age_native_owner_bind_20261016/evidence/local",
+      "exit_code": 0
+    },
+    {
+      "command": "rustfmt --edition 2021 research/rei_source_age_native_owner_bind_20261016/native_owner.rs research/rei_source_age_native_owner_bind_20261016/campaign.rs",
+      "exit_code": 0
+    }
+  ],
+  "first_failures": [
+    {
+      "kind": "missing multi-line include_str prerequisite",
+      "exit_code": 101,
+      "artifact": "evidence/first_build_failure/build.log",
+      "repair": "read all include_str expressions including multiline; materialize exact pinned contracts"
+    },
+    {
+      "kind": "CSV format argument mismatch",
+      "exit_code": 101,
+      "artifact": "evidence/first_build_failure/second_build.log",
+      "repair": "serialize complete numeric row"
+    },
+    {
+      "kind": "unsupported nmu=4",
+      "exit_code": 1,
+      "artifact": "evidence/first_build_failure/first_run.log",
+      "repair": "supported native8/16/32; manufactured PR164 low-resolution counterexample stays separate"
+    },
+    {
+      "kind": "invalid max_rhs=0 test config",
+      "exit_code": 1,
+      "artifact": "evidence/first_build_failure/second_run.log",
+      "repair": "valid max_rhs1 with exhausted counter1"
+    }
+  ],
+  "outcomes": {
+    "targeted_check_groups": 8,
+    "signed_campaign_cases": 45,
+    "independent_solver": "Radau and DOP853 shared unchanged native continuous RHS",
+    "campaign": {
+      "cases": 45,
+      "max_energy_residual_eV_H": 4.950972964934408e-11,
+      "max_photon_residual_H": 1.2197274440461925e-19,
+      "min_cohorts": 4.0
+    }
+  },
+  "remaining": [
+    "Fresh independent scientific review by controller",
+    "NCP execution and measured results",
+    "Source-age/angular/spectral accuracy interpretation; no convergence claim solely from conservation",
+    "Full coupled cosmological history and energy-momentum validation not executed"
+  ],
+  "scientific_admission": "NOT_SELF_APPROVED",
+  "production_scientific_admission": "NOT_ISSUED",
+  "next_executable_task": "controller copies stable examples to existing NCP scratch and executes run_local.sh",
+  "skill_context_used": [
+    "physmath-research-loop1.3.0/SKILL.md",
+    "references/POLICY_INTEGRATION.md",
+    "references/SUBAGENT_MODE.md",
+    "references/CODING_LOOP.md C5",
+    "references/STAGE_GUIDE_KO.md C5"
+  ],
+  "files": [
+    {
+      "path": "native_owner.rs",
+      "sha256": "1463e696d425f7e4f8a8f124fc1b0bef7cf5bd807b55251a3e9313828fc9e035"
+    },
+    {
+      "path": "campaign.rs",
+      "sha256": "1a3159b8d2d47ad0b7f7541064608b7a030e6c7d73f1f3c94286878b275a747c"
+    },
+    {
+      "path": "run_local.sh",
+      "sha256": "2c2d27e4f4257dd7d2f1c0412e1e01913644147116c5d46cfa0f117a8c9509d9"
+    },
+    {
+      "path": "prepare_native.py",
+      "sha256": "2036c697ce16fefe264673cdcd6c93ef3114b5e99f7d5d42335c4ede0ef82060"
+    },
+    {
+      "path": "independent_solver.py",
+      "sha256": "edf6edf98fdfe35d0347fa88ad53b0096a2f1d15738080745daf0412c706989d"
+    }
+  ]
+}

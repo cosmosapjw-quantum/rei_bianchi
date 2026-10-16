@@ -1,0 +1,53 @@
+{
+  "schema": "rei.source_age_native_owner.independent_review.v1",
+  "review_mode": "fresh Astra-tier read-only scientific C9; one bounded pass",
+  "initial_verdict": "HOLD_TARGETED_REPAIR_AND_SOURCE_MATCHED_REFERENCE",
+  "reviewed_base": "a50d176b56d267b651d204f371204f61299b9a64",
+  "native_source": "35d9747a0bbedcafdb568467ce7c1e7a25f965b6",
+  "confirmed": [
+    "Each cohort's unchanged PreparedAbsorption is evaluated against the same trial absorber stocks; species Gamma and heat enter one native gas RHS/Newton.",
+    "Returned cohort survivors own the photon sink; no duplicate absorption was found.",
+    "Positive MD14 births, j=per_h_s/H, native reference q and Killing-direction mapping agree with the selected source convention.",
+    "Fit activation threshold and native physical binding energies stay distinct.",
+    "Initial local and NCP run had 51 common numerical artifacts byte-identical; short native run exit0, 1.36s wall, peak RSS6748KiB."
+  ],
+  "findings": [
+    {
+      "id": "EOS_ENDPOINT_GUARD",
+      "severity": "BLOCK_NOW",
+      "path": "native_owner.rs geometry()",
+      "defect": "Final adiabatic geometry half-step omitted native endpoint EOS/rate temperature guard.",
+      "repair_authorized": "Restore native EOS and AxbiProvider.rates(T) guard; crossing-boundary reject and accepted-state preservation regression."
+    },
+    {
+      "id": "AGE_TIME_AXIS_COUPLING",
+      "severity": "BLOCK_NOW_FOR_INDEPENDENT_REFINEMENT_CLAIM",
+      "path": "campaign.rs age sweep and native_owner.rs birth schedule",
+      "defect": "Changing birth node count also changed chemistry step boundaries.",
+      "repair_authorized": "Use common union of all tested midpoint nodes and epoch endpoints as chemistry mesh, with zero injection at unselected nodes; time sweep subdivides same intervals with fixed births."
+    },
+    {
+      "id": "POST_BIRTH_ROLLBACK_MISSING",
+      "severity": "BLOCK_NOW",
+      "path": "campaign.rs rollback controls",
+      "defect": "Existing failures occurred before birth, so rejection after source deposition was untested.",
+      "repair_authorized": "Force a failure after birth and follow it with reduced retry compared with clean execution; preserve failed RHS accounting."
+    },
+    {
+      "id": "SOURCE_MATCHED_INDEPENDENT_REFERENCE_MISSING",
+      "severity": "BLOCK_NOW_FOR_NODE_SCIENTIFIC_PASS",
+      "path": "independent_solver.py",
+      "defect": "Existing Radau/DOP853 uses constant geometry and no source, despite valid shared-native-RHS solver comparison there.",
+      "repair_authorized": "Within existing caps compare actual native MD14 birth schedule and signed geometry against an independently integrated continuous solver with matched native physics; otherwise retain HOLD_SOURCE_MATCHED_INDEPENDENT_REFERENCE."
+    }
+  ],
+  "repair_episode": "ONE_BOUNDED_TARGETED_REPAIR_COMPLETED",
+  "repair_closure": {
+    "EOS_ENDPOINT_GUARD": "PASS_REPAIRED_LOCAL_AND_NCP",
+    "AGE_TIME_AXIS_COUPLING": "PASS_INDEPENDENT_MESH_IMPLEMENTED; AGE_REFINEMENT_HOLD_ON_OBSERVED_ENDPOINT_TREND",
+    "POST_BIRTH_ROLLBACK_MISSING": "PASS_REPAIRED_LOCAL_AND_NCP",
+    "SOURCE_MATCHED_INDEPENDENT_REFERENCE_MISSING": "HOLD_SOURCE_MATCHED_INDEPENDENT_REFERENCE; DOP853_INTERNAL_TRIAL_NATIVE_DOMAIN_ERROR_AT_CALL_291"
+  },
+  "final_scoped_verdict": "HOLD_SOURCE_MATCHED_INDEPENDENT_REFERENCE_AND_AGE_REFINEMENT",
+  "production_scientific_admission": "NOT_ISSUED"
+}
