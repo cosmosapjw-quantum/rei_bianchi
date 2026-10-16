@@ -51,3 +51,39 @@ Step doubling adds a separate possible cancellation. For scalar `y'=-lambda*y`, 
 Thermal projection adds practical interpretation: the same correction norm can act on energy, ionization or both, and composition changes alter particle count in the EOS. A valid fixture with proportional changes in w and particle factor D will have zero temperature change despite nonzero state corrections. This separates a thermal observable from the vector norm without adding an evolution model.
 
 The selected implementation therefore returns raw/scaled residuals, scaled linearized correction, conditioning, backward error and conditional thermal projections. It consumes a stage packet, rather than reconstructing unavailable information from a run-wide maximum. The first mathematical tests exercise scale mismatch, inversion, cancellation and valid/invalid thermal projections; none requires a native runner or a repeat of the PL study.
+
+## R5 — constructive derivation and frozen probe
+
+**Scale equivalence.** Multiplying `J delta=-R` by `S_R^-1` and substituting `delta=S_y z` gives `A z=-b` exactly. Positive diagonal scales are invertible, so the two linear systems have the same unique correction whenever J is nonsingular. The actual infinity norms are max absolute vector entries and max absolute row sums for matrices. In exact arithmetic `||z|| <= ||A^-1|| ||b||`; this is a bound on the linear-system solution under the supplied J, not on the nonlinear root error. In binary64 the returned inverse/norm/backward error are estimates and no certified bound is emitted.
+
+For a change of energy unit by u>0 let `P=diag(1,1,1,u)`. Transform `y'=Py`, `R'=PR`, `J'=PJP^-1`, and both scale matrices by `S_R'=PS_R`, `S_y'=PS_y`, including the energy floors. Then `A'=A`, `b'=b`, `z'=z` and `delta'=P delta`. Thus the scaled diagnostics are unchanged by consistent energy-unit conversion. The production packet adapter remains eV/H; this identity is exercised by the generic scaled-system core and the independent probe.
+
+**Residual bridge and missing nonlinear hypotheses.** The native acceptance condition gives `||S_y^-1 R|| <= ||S_y^-1 S_R|| * 1e-11`. The diagonal gain is `max(1/s_HII,1/s_HeII,1/s_HeIII,s_Rw/s_yw)`. When a species uses the 1e-5 floor, its residual-scale allowance is 1e-6. The thermal ratio depends on old/current w and is retained explicitly; it is not replaced by one in general. State correction further requires the inverse Jacobian. The norm or condition number alone neither diagnoses stiffness nor establishes a physical error.
+
+If an exact root y_star exists, the segment to it lies in a differentiability domain, and the averaged Jacobian `Jbar=integral_0^1 R'(y+t(y_star-y))dt` is invertible, the fundamental theorem gives `y_star-y=-Jbar^-1 R(y)`. The computed correction uses J at y (or a labeled finite-difference approximation) instead. A quantitative nonlinear remainder bound would need additional neighborhood derivative/inverse information. The stage packet has no such witness, so the implementation reports a linearized correction and does not infer a true root-error bound. The distinction remains relevant at species-domain boundaries and with the production one-sided finite-difference fallback.
+
+**Backward-Euler estimator mechanism.** For `y'=-lambda*y`, z=lambda*h>=0, define q=1/(1+z), qh=1/(1+z/2). If the full and half-step equation residuals are rF,rA,rB with convention `(1+z)y_new-y_old=r`, then
+
+`yhat_F=q(y0+rF)`, `yhat_A=qh(y0+rA)`, `yhat_B=qh(yhat_A+rB)`.
+
+Therefore
+
+`yhat_B-yhat_F=(qh^2-q)y0 + qh^2*rA + qh*rB - q*rF`,
+
+`qh^2-q = -z^2/((1+z)(2+z)^2)`.
+
+The exact pair signal is order z^2 with leading term `-z^2/4`. A tolerance independent of this signal can cancel it. For z=1/200000, y0=1, rA=rB=0, choose `rF=(1+z)(qh^2-q)=-1/160000800001`. Its magnitude is below 1e-11 and the computed pair difference is exactly zero, while the fine value qh^2 differs from exp(-z). This proves the stated synthetic cancellation, with no claim about the order or realized errors of the production geometry/source/chemistry splitting. The source007 endpoint offsets and nonlinear contributions remain separate unmeasured terms.
+
+**Thermal correction.** With c=2/(3k), D as in R3 and dD its correction,
+
+`DeltaT_EOS = c*(D*delta_w-w*dD)/(D*(D+dD))`,
+
+`deltaT_linear = c*(delta_w/D-w*dD/D^2)`,
+
+`DeltaT_EOS = deltaT_linear/(1+dD/D)` and `DeltaT_EOS-deltaT_linear = -dD/(D+dD)*deltaT_linear`.
+
+These avoid subtracting nearly equal absolute temperatures. They are exact algebraic identities for a proposed correction; binary64 evaluations remain rounded. A positive D+dD alone does not ensure physical ionic fractions, so the corrected-state domain check precedes the exact EOS projection. The linear directional projection can still be reported when the full proposed correction leaves that domain, with the exact projection null and the reason explicit. If `delta_w/w=dD/D`, both thermal changes vanish although the vector correction can be nonzero.
+
+**Frozen independent probe.** `FIXTURE_SPEC.json` fixes eight exact-rational constructions: identity and coupled matrices, species-floor bridge, a large-inverse example, singular rejection, energy-unit transformation, valid EOS cancellation, and scalar BE cancellation. The synthetic thermal constant k=1/10000 eV/K is deliberately a positive rational fixture constant, not a physical CODATA substitution. The oracle uses exact rational elimination and inverse calculations independent of the later production implementation; finite binary64 comparisons use test-local relative 1e-12 and absolute 1e-14, with exact equalities wherever rational. Those tolerances judge fixture arithmetic and are not scientific acceptance criteria. The singular construction is expected to return a unique-correction HOLD. Probe work is confined to the new unit's probe directory, one initial execution and at most one diagnosed repair execution, each with a 30 s cap, zero native builds/solves and zero physical-history reads. It starts only after R5 immutable capture and records its actual resources and outputs.
+
+R5 completes the conditional matrix/thermal derivations and explicit cancellation construction. R6/R7 still require independent symbolic/fixture evidence before implementation adoption. Current production R/J telemetry remains unavailable and no actual-stage result is inferred from the completed mathematics.
