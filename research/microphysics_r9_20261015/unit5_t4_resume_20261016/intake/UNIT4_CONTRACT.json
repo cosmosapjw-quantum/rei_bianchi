@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "unit_id": "R9-T4-SAVED-COMPLEMENT-SPECTRUM-v1",
+  "selected_stages": [
+    "C1",
+    "C2",
+    "C3",
+    "C4"
+  ],
+  "skill_version": "1.3.0",
+  "contract_status": "ready_for_lower_tier_implementation",
+  "claim": "finite common-space ground-projected Be+ daughter spectral diagnostic from saved Li-to-Be+ complement",
+  "baseline_head": "284916e758d87852a6137fbbb36befe83f15d271",
+  "owner_head": "0e25846433170d0f420c4cda44a0bedbf02cd177",
+  "owner_action": "untouched; actual resource inspection before any NCP work",
+  "input_identities": {
+    "unit3_archive_sha256": "d25308b8e7f1a2ea0f6f3e203c074553c661511034d7dbc07920b1d0dd65bfa0",
+    "data_sha256": "7aa230b66d500e7637161589533eef4f3f4efdc13f4beafb7e28fd275ab82c5d",
+    "receipt_sha256": "3ae0c54716df1a7cfc1586a2641e1b461dffd3a721ed77daa4ca676bb0c0c3c8",
+    "v6_source_sha256": "31cdd14df59ffc6208561cb3c61ff4bd114240c380693ff5789e14441e7c091c",
+    "v6_contract_sha256": "cf7b06ad72815513e799be253539bdfecfb9102c1fc586589003e8b6fd364e4d",
+    "v6_input_sha256": "289520d8aed460cdee460f5497762b0c613f003bd6ba43bb505416d945995097"
+  },
+  "physics": {
+    "norb": 92,
+    "nelec": [
+      2,
+      1
+    ],
+    "ci_shape": [
+      4186,
+      92
+    ],
+    "determinants": 385112,
+    "basis": "saved common_expanded_basis and X exactly",
+    "units": "Hartree and atomic units",
+    "operator": "K=Q(H_Beplus-E0)Q on Ran(Q)",
+    "starting_vector": "u=Q i/sqrt(W), Q=I-ggdagger, W=norm(Qi)^2",
+    "measure": "nu(domega)=W<u,delta(omega-K)u>domega",
+    "no_ground_state_replay": true,
+    "physical_continuum_identification": false
+  },
+  "modes": [
+    "summarize",
+    "run"
+  ],
+  "actual_now": "summarize actual restored Unit3 plus focused local tests",
+  "ncp_execution_status": "not_run_remote_unavailable",
+  "local_budget": {
+    "wall_s": 120,
+    "large_hamiltonian_actions": 0
+  },
+  "ncp_budget": {
+    "wall_s": 7200,
+    "memory_gib": 24,
+    "workers": 1,
+    "omp_threads": 12,
+    "blas_threads": 1,
+    "max_hamiltonian_actions": 160,
+    "max_krylov_length": 128,
+    "host_headroom_gib": 20
+  },
+  "milestones": [
+    16,
+    32,
+    64,
+    128
+  ],
+  "extension_rule": "stop64 if32to64 refinement passes at all eta; otherwise extend128 within original budget",
+  "spectral_grid": {
+    "start_Eh": 0,
+    "stop_Eh": 20,
+    "step_Eh": 0.01,
+    "eta_Eh": [
+      0.05,
+      0.1,
+      0.2
+    ]
+  },
+  "cantelli_cuts_Eh": [
+    5,
+    10,
+    20
+  ],
+  "gates": {
+    "reconstruction_metric_inf": 1e-08,
+    "ground_energy_difference_Eh": 1e-08,
+    "ground_H_residual_Eh": 1e-07,
+    "parent_mean_difference_Eh": 1e-08,
+    "parent_second_moment_relative_scale": 1e-08,
+    "hermiticity_scaled": 1e-09,
+    "basis_gram_inf": 1e-09,
+    "ground_leakage": 1e-10,
+    "compressed_antihermiticity_scaled": 1e-10,
+    "eigensystem_defect_scaled": 1e-10,
+    "mass_error": 1e-10,
+    "direct_moment_scaled": 1e-08,
+    "happy_breakdown_scaled_Eh": 1e-12,
+    "negative_node_interpretation_flag_Eh": -1e-07,
+    "spectral_refinement": 0.001
+  },
+  "refinement_metrics": [
+    "trapezoid integral absolute spectrum difference over0to20 dividedW",
+    "maximum grid CDF difference dividedW",
+    "analytic window mass difference dividedW"
+  ],
+  "outputs": [
+    "summary.json",
+    "focused test logs/exit",
+    "complete NCP runner and exact command",
+    "if executed: receipt.json",
+    "if executed: spectra.npz and milestone scalar tables",
+    "if executed: stdout/stderr/runtime/resource record",
+    "if executed: last valid basis/action checkpoint"
+  ],
+  "no_automatic_retry": true,
+  "independent_review": "one fresh Astra scoped decision from actual diff and outcomes",
+  "contract_md_sha256": "fa2ceda29054f9239e3f69ffc32e7de9c2e6972bf7d1b719fc4334420afd7bf7",
+  "derivation_md_sha256": "336b409d03a549522722f5c3eca8235efc00f75d8259ad9b368bbb1484aba577",
+  "moment_names": {
+    "raw": "m0=W,m1,m2",
+    "conditional_variance_Eh2": "m2/W-(m1/W)^2",
+    "weighted_central_second_moment_Eh2": "m2-m1^2/W",
+    "optional_projected_block_mixture_variance_Eh2": "m2-m1^2 for P delta0 + nu; distinct from original-H parent variance"
+  }
+}
