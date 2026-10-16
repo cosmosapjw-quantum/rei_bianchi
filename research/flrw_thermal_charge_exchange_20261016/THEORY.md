@@ -118,6 +118,17 @@ Decimal evaluation reports80 significant digits of the closed form; it is not an
 
 The actual invocation used0.006348454s wall and0.005405470s CPU. A prior wrapper failed before Python because /usr/bin/time was absent; exit127 and unknown failed-wrapper cost remain recorded. Thus there were two command attempts and one scientific invocation. The cached result binds R6 FIXTURES SHA256 `0c04f00345719913ab1d0a20e41e142114286f861c6032e26a5be0a17d1135ca` and CONTRACT SHA256 `3588d8bf713ce19803606d6073b3f0fd5c6ad3e746362502b491705e562c2754`. Reuse `probe/RESULTS.json`, the exact script and command/log records; do not rerun them during coding.
 
+## R8 — Scoped scientific decision
+
+Adopt the conserved scalar thermal-CX formulation and the frozen SSP-RK2 implementation contract for this standalone unit. The mathematical reduction, physical-interval invariance and rate-independent temperature-amplitude ceiling are derived under the stated pure-H/D, fixed-volume assumptions. Independent mathematical review passed after one wording repair. The temperature-dependent manufactured oracle is independently algebraically checked, with cached Decimal references.
+
+The admissible Heun construction has a conditional discrete domain guarantee because both Euler states are checked. Its numerical accuracy, work use and event approach behavior still require the new coding checks. The exact oracle explicitly separates temperature feedback from the earlier frozen-temperature result at the same manufactured initial state and requested time.
+
+This is a constructive local method extension, with no literature novelty or strong no-go claim. Savin's reported forward<6% and reverse<4% fit deviations refer to fits against the author's computed rates, not certified total atomic uncertainty or numerical integration error. Production source physics, isotope history, full-network coupling and the separate PR166 reference/age convergence question remain unchanged.
+
+Proceed to the assigned pure Python implementation and bounded new fixtures after R10 handoff. No additional source audit, old test replay, native launch or reference solve is required to make that transition.
+
+
 
 
 
