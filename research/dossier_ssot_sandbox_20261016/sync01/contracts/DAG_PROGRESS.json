@@ -1,0 +1,54 @@
+{
+  "schema": "rei.ssot.progress.overlay.1",
+  "parent_ssot_pr": 175,
+  "parent_ssot_commit": "f75d0cd5c01f9803d8eb0c3bb42d2cd175975b92",
+  "date": "2026-10-16",
+  "base_dag": "research/dossier_ssot_sandbox_20261016/v2/contracts/RESEARCH_DAG.json",
+  "mutates_original_dag": false,
+  "nodes": [
+    {
+      "id": "SYNC-01",
+      "status": "PASS_SCOPED_SOURCE_IDENTITY_READBACK",
+      "evidence": [
+        "contracts/SYNC01_SOURCE_LEDGER.json"
+      ],
+      "limit": "metadata and Git blob source mapping; no local native checkout merge/rebase",
+      "pass_next": [
+        "FT-B1A_SAMPLED",
+        "RT-R9_R10",
+        "SA-03"
+      ]
+    },
+    {
+      "id": "FT-B1A",
+      "status": "PARTIAL_SAMPLED_GEOMETRY_ONLY",
+      "evidence": [
+        "evidence/GEOMETRY_RESULT.json",
+        "evidence/INDEPENDENT_QUAD.json",
+        "rust/rei_pr104_geom/src/lib.rs"
+      ],
+      "limit": "three saved points per case; no spectral source, no continuous history interpolation",
+      "pass_next": [
+        "FT-B1A_SPECTRAL_PROVIDER_INTAKE"
+      ]
+    },
+    {
+      "id": "FT-B1B",
+      "status": "HOLD_NOT_ATTEMPTED",
+      "reason": "Thomson collision kernel, screen basis and physical time/opacity contract absent in this adapter"
+    },
+    {
+      "id": "FULL_NATIVE_EOR",
+      "status": "HOLD_NOT_ATTEMPTED",
+      "reason": "no original Rust production mutation, no full time/angle/spectral convergence"
+    }
+  ],
+  "next_action": "RT-R9_R10 source-locked rates/smooth interval table work, or FT-B1A ingest full saved spectral source if provided with original support",
+  "resource_policy": "sandbox only, cargo 1 job, no NCP/local Codex",
+  "publication": {
+    "github": "PENDING",
+    "google_drive": "PENDING",
+    "library": "PENDING",
+    "dropbox": "NOT_VERIFIED_no_generated_source_file_param"
+  }
+}
