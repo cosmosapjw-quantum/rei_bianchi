@@ -14,6 +14,8 @@ pub mod axisym_sources;
 mod bianchi_i;
 pub mod coverage;
 pub mod deuterium_charge_exchange;
+pub mod deuterium_thermal_charge_exchange;
+pub mod deuterium_thermal_coupling;
 mod ft03_controlled;
 mod ft03_interval;
 mod ft03_rates;
