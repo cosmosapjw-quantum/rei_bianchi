@@ -1,0 +1,79 @@
+{
+  "schema": "rei.ftb1a.sampled_geometry.contract.1",
+  "source_lock": "contracts/SYNC01_SOURCE_LEDGER.json",
+  "physical_level": "source-bound saved-geometry response only; no physical spectral intensity",
+  "input_schema": {
+    "columns": [
+      "x",
+      "z",
+      "Q",
+      "Nrec",
+      "Nemit",
+      "Nexcess",
+      "tau",
+      "t_s",
+      "b",
+      "ne_cm3",
+      "nH_cm3",
+      "H_s",
+      "ledger"
+    ],
+    "units": [
+      "dimensionless",
+      "dimensionless",
+      "dimensionless",
+      "per_H",
+      "per_H",
+      "per_H",
+      "dimensionless",
+      "s",
+      "dimensionless",
+      "cm^-3",
+      "cm^-3",
+      "s^-1",
+      "per_H"
+    ],
+    "row_indexes_in_original_csv": [
+      1,
+      129,
+      257
+    ],
+    "sample_count": 3
+  },
+  "output_schema": {
+    "delta_b": "dimensionless",
+    "delta_ln_energy_equator": "dimensionless",
+    "delta_ln_energy_pole": "dimensionless",
+    "a2_log_energy": "dimensionless",
+    "a2_1024_minus_2048": "dimensionless quadrature difference",
+    "tau_segment": "original PR104 record, z20to4",
+    "ionizing_spectrum": null,
+    "directional_intensity": null,
+    "total_cmb_tau": null
+  },
+  "math": {
+    "scale_perp": "a exp(-b)",
+    "scale_parallel": "a exp(2b)",
+    "observer_to_emission_energy_ratio": "exp(x_obs-x_emit)*sqrt((1-mu^2)*exp(-2 delta_b)+mu^2*exp(4 delta_b))",
+    "linear_delta_ln_energy": "2*delta_b*P2(mu)",
+    "quad_coefficient": "5/2 * int_-1^1 delta_ln_energy(mu) P2(mu) dmu"
+  },
+  "invariants": [
+    "saved Q+Nrec+Nexcess-Nemit equals ledger",
+    "mean z=21 exp(-x)-1",
+    "proper t and x strictly monotonic in each saved three-point sample",
+    "FLRW b=0 gives zero angular response",
+    "axis mu=0 and mu=1 exact closed-form geometry",
+    "mu parity",
+    "finite-b quadrature compared to independent high-precision adaptive integration",
+    "out-of-domain input rejects; no clipping"
+  ],
+  "gate": {
+    "tests": "cargo test --offline --locked, 12 new tests",
+    "quadrature_accuracy_abs": 2e-11,
+    "quadrat_method": "Simpson N1024 independent mpmath >50digit",
+    "original_history_temporal_interpolation_error": "NOT_ESTIMATED",
+    "spectrum_provider": "MISSING",
+    "scientific_admission": "PASS_SCOPED_SAMPLED_GEOMETRY_ONLY"
+  }
+}
