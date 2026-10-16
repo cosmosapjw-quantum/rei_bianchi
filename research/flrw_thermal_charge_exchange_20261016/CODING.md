@@ -17,3 +17,7 @@ Use the frozen adaptive SSP Heun RK2 step-doubling map. Both Euler states are in
 ## C4 — Execution and resource plan
 
 C5 writes the runtime and bounded verification harness. C6 runs new manufactured and changed-seam controls. C7 runs three Savin default/tight pairs and fixed Heun N=16/32/64. C8 audits saved evidence and environment without replay. C9 obtains a fresh independent review. C10 reports measured results and exact resume commands. Scientific verification cumulative wall time is capped at30 s, with one thread, zero builds/native/old suites/external reference runs. Each stage waits for immutable-capture ACK. Substantive failure evidence is preserved for root/Astra interpretation. No run in C4.
+
+## C5 — Implementation
+
+Completed thermal_cx.py and verify_thermal_cx.py. The module exposes immutable state/defect/provider/control records, reduction, guarded Heun map, adaptive integration and Savin JSON CLI. It preserves the last accepted state on incomplete return; initial invalid inputs have typed INVALID_INPUT records. Every attempted RHS is charged before provider evaluation. Tests read cached Decimal references and cover the new thermal seam. No tests or scientific import executed before this stage capture.
