@@ -37,3 +37,8 @@ The synthetic one-observable benchmark passed at 2,000 and 20,000 knots per hist
 ## C9 — independent review
 
 Fresh reviewer `/root/full005_pair_review` issued PASS_SCOPED in INDEPENDENT_REVIEW.json after inspecting the frozen contract, production source, independent oracle and observed C6–C8 evidence. The reviewer found no issue requiring a production repair and ran no new numerical tests. This records the reviewer decision; C10 publication and prompt-only handoff remain. Actual full-history continuous metrics remain NOT_RUN and solver accuracy/convergence remain NOT_ADMITTED.
+
+
+## C10 — final distribution
+
+The final bundle preserves the reviewed C9 code commit `e881b38951bc896c29d5ea57bb8fb1f2803873e1`, standard-library runtime dependencies, the completed prior receipt, original deadline, Korean report and prompt-only owner-side handoff. The publisher records the final archive CRC/dependency check, runtime-member byte identity, and reuse of the completed extracted `python3 -S --help` smoke outside the archive, then completes the Git publication and both provider backups. The containing commit identifies C10; the actual full FULL005 continuous diagnostics remain `NOT_RUN`. Earlier science is not replayed.
