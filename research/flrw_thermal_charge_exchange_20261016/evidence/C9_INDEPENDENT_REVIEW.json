@@ -1,0 +1,124 @@
+{
+  "schema": "rei.thermal_cx.c9_review.v1",
+  "reviewer": "crossrepo_intake",
+  "role": "fresh_read_only_independent_code_and_scientific_outcome_review",
+  "decision": "PASS_SCOPED",
+  "reviewed_snapshot": "/workspace/scratch/56fd3625e428/delivery_queue/thermal_cx/C8/research/flrw_thermal_charge_exchange_20261016",
+  "contract_snapshot": "/workspace/scratch/56fd3625e428/delivery_queue/thermal_cx/R10/research/flrw_thermal_charge_exchange_20261016/CONTRACT.json",
+  "pins_sha256": {
+    "CONTRACT.json": "ad1af8749fad697b5acff16aaaa070ca43f83d50227ae909187515aae2b863e3",
+    "FIXTURES.json": "0c04f00345719913ab1d0a20e41e142114286f861c6032e26a5be0a17d1135ca",
+    "probe/RESULTS.json": "db38f773744be166dab920d9253bf005eb1a070706941fd30bd26f5c824178cb",
+    "thermal_cx.py": "5b7894cf784a45611e8e573280adb9dcbf3b35a59a800ccec797871569fe0798",
+    "verify_thermal_cx.py": "5ff4bca1db81ac1b9d06650b25a4ca6f6ffce55b6e65f3c8070b54fe38ff49b5",
+    "coding_evidence/C6_results.json": "ed75c00ccace10629e9021eb7e54ad28fe42b0b08cc2513863e34835f2b4d3bb",
+    "coding_evidence/C7_results.json": "5a175fca3975d05edc27f6bf50fb57fd6ad3ffda40049ab9474249e59f57199c"
+  },
+  "identity_check": {
+    "C8_declared_pins_readback": "9/9 MATCH",
+    "C8_contract_vs_frozen_R10": "BYTE_IDENTICAL",
+    "scientific_meaning": "Pins bind this review to implementation/results; correctness follows scoped code/result inspection, not hashes alone."
+  },
+  "blocking_findings": [],
+  "repairs_authorized": [],
+  "reviewed_behavior": [
+    "Signed finite defect accepted; thermal interval endpoints sorted then intersected with physical interval. Negative-defect manufactured result heats in forward direction and passes.",
+    "One normalized extent reconstructs all four species, thermal and binding energy from immutable input; no separate cooling update or temperature ODE double counts CX.",
+    "Actual Savin coefficient literals, units and inclusive 2.7..200000 K domain match pinned source contract.",
+    "heun_step checks first Euler state e, second Euler state v, then convex endpoint. All actual RHS fields recheck density/temperature before rate call; invalid stages reject/halve.",
+    "Adaptive accepted state is two halfsteps, never Richardson extrapolation; local estimator /3 and frozen tolerances match contract.",
+    "Provider-domain approach remains partial and does not snap state. Output reports achieved time, distance and analytic extent boundary.",
+    "Input/domain validation precedes zero-time return; empty/no-D/zero-rate behavior is explicit. Invalid inputs and charged provider failures have distinct statuses.",
+    "Attempt/RHS/rejection caps are finite; failure or work-limit return uses last accepted z/time. Rejected candidates do not mutate inputs."
+  ],
+  "observed_results": {
+    "C6": {
+      "manufactured_cases": 7,
+      "changed_seam_controls": 17,
+      "all_checks_PASS": true,
+      "largest_complete_manufactured_normalized_endpoint_error": 5.943663490641052e-7,
+      "criterion": 0.000005,
+      "conversion_G_absolute_difference": 1.1102230246251565e-16
+    },
+    "C7": {
+      "savin_default_tighter_cases": 3,
+      "all_checks_PASS": true,
+      "fixed_Heun_steps": [
+        16,
+        32,
+        64
+      ],
+      "fixed_Heun_extent_errors_cm3": [
+        0.0007040312708213037,
+        0.0001644450019402388,
+        0.00003979254897745754
+      ],
+      "error_ratios": [
+        4.2812567272622655,
+        4.132557631163483
+      ],
+      "ratio_acceptance": [
+        3,
+        5
+      ],
+      "savin_conditional": {
+        "default_temperature_K": 100.00001061103245,
+        "temperature_amplitude_ceiling_K": 0.0006505385769741932,
+        "pair_temperature_difference_K": 3.3519143016746966e-10
+      },
+      "savin_feedback": {
+        "default_temperature_K": 9.965446072526845,
+        "pair_temperature_difference_K": 5.433988725656036e-8
+      },
+      "savin_near_lower_domain": {
+        "status": "DOMAIN_BOUNDARY_APPROACH",
+        "temperature_K": 2.7000000000047466,
+        "t_reached_s": 15843557.872494066,
+        "t_requested_s": 100000000,
+        "full_interval_complete": false
+      }
+    },
+    "ledger": {
+      "stored_manufactured_endpoint_residuals": "zero in recorded arithmetic",
+      "largest_observed_Savin_scaled_endpoint_invariant_residual": 1.3877787807814457e-17,
+      "stored_energy_residuals": "zero in recorded arithmetic; not an error certificate"
+    },
+    "events": {
+      "lower_manufactured_time_minus_analytic_s": 0.000001031404522899848,
+      "upper_reverse_time_minus_analytic_s": 9.616260203682003e-7,
+      "meaning": "Both events meet distance/partial-status criteria. Positive time differences show achieved time is not a certified lower bound on exact crossing time."
+    }
+  },
+  "resources": {
+    "coding_scientific_invocations": 2,
+    "C6_wall_s": 0.051000458995986264,
+    "C7_wall_s": 0.013560093997512013,
+    "aggregate_coding_test_wall_s": 0.06456055299349828,
+    "aggregate_coding_test_cpu_s": 0.06455672099999998,
+    "contract_ceiling_s": 30,
+    "cached_independent_probe_replays": 0,
+    "native_runs": 0,
+    "old_suite_runs": 0,
+    "builds": 0,
+    "external_reference_runs": 0
+  },
+  "claim_limits": [
+    "PASS covers standalone isolated fixed-volume thermal-CX reduction and these implemented/observed fixture checks only.",
+    "Second-order evidence is for the named smooth manufactured fixed-step Heun fixture, not a universal stiff convergence statement.",
+    "Savin tighter-pair differences are sensitivity diagnostics, not independent continuum-reference errors.",
+    "Boundary approach is neither exact event-time certification nor permission to extrapolate rates.",
+    "Ledger conservation does not establish state accuracy or physical fit accuracy.",
+    "CLI was parsed but not executed; reviewed API/result serialization exercised.",
+    "Native Rust integration, full isotope network, expansion/transport/EoR/CMB admission and O5/O6 remain HOLD.",
+    "No equilibrium uniqueness or rigorous global quadrature/error bound is inferred."
+  ],
+  "R6_relationship": "Separate R6 record retains initial signed-defect wording HOLD and author repair PASS; this C9 review neither overwrites nor repeats that stage.",
+  "review_execution": {
+    "scientific_tests": 0,
+    "solver_imports": 0,
+    "solver_invocations": 0,
+    "new_numeric_reference": 0,
+    "activities": "Read frozen source/contracts/results, compare file identities, inspect saved metadata and outcomes."
+  },
+  "next_action": "Proceed C10 scoped handoff/delivery using unchanged reviewed source/result pins; keep broader native/physical claims pending."
+}

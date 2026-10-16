@@ -33,3 +33,7 @@ Actual command `timeout30s python3 verify_thermal_cx.py --stage C7` completed ex
 ## C8 — Reproducibility and evidence binding
 
 Parsed both Python sources with stdlib AST; checked executed source/contract/fixture/probe identities against current bytes and parsed all saved results. All checks passed without importing runtime or rerunning a solver. C6+C7 actual test wall0.06456055299349828 s and CPU0.064556721 s remain separate from the independent cached probe wall0.006348454 s; its failed timing wrapper had unmeasured duration. Runtime dependencies are stdlib only. CLI source parsed; CLI execution itself was not run. Exact code/results SHA256 pins and environment are in coding_evidence/C8.json.
+
+## C9 — Independent review
+
+Fresh read-only crossrepo_intake review returned PASS_SCOPED with no blocking finding or repair. All C8 declared pins matched and the R10 contract was byte identical. The reviewer inspected source and saved outcomes without solver imports or numerical replay. Manufactured numerical boundary-approach times exceed analytic crossings by about1e-6 s; these are not certified crossing times or lower bounds. Scientific scope and all typed partial outcomes are retained.
