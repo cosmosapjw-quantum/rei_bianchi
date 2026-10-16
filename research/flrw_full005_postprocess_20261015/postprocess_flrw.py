@@ -117,7 +117,7 @@ def render(cases,out,scope):
         s=case['series'];idx=display_indices(s);ax.plot(np.asarray(s['time_s'])[idx]/MYR,np.asarray(s['Tgas_K'])[idx],label=case['id'],color=['#1d567b','#d38418'][i],ls=['-','--'][i])
     ax.set_xlabel('Elapsed proper time since z20 [Myr]');ax.set_ylabel('Actual gas temperature [K]');ax.set_title(scope+' | Saved gas-temperature history');ax.grid(alpha=.2);ax.legend();fig.tight_layout();fig.savefig(out/'Tgas_vs_elapsed_time.png');plt.close(fig);files.append('Tgas_vs_elapsed_time.png')
     return files
-def run(manifest_path,out):
+def run(manifest_path,out,continuous_pair_diagnostics=False):
     if out.exists():raise Hold('FRESH_OUTPUT_REQUIRED')
     out.mkdir(parents=True)
     receipt={'status':'NOT_READY_NO_FIGURES','solver_runs':0,'scientific_admission':'NOT_ISSUED','D_cosmological_activation':'NOT_ACTIVATED_NOT_PLOTTED','temperature_order':'SAVED_CHRONOLOGY_NEVER_SORT_BY_T','clock':'Elapsed proper seconds sincez20, not absolute cosmic age','manifest_sha256':sha(manifest_path),'script_sha256':sha(Path(__file__)),'pair_convergence_criterion':'NONE_INVENTED; diagnostics await independent review'}
@@ -149,6 +149,10 @@ def run(manifest_path,out):
             for row in summary:row.pop('absolute_resolution_floor',None);row['result_class']='DIAGNOSTIC_PAIR_DIFFERENCE_NO_THRESHOLD_OR_ERROR_BOUND'
             reader.write_csv(out/'full_pair_sampled_diagnostics.csv',rows);reader.write_csv(out/'full_pair_summary.csv',summary)
             write(out/'full_pair_milestones.json',milestones);receipt['pair_source_relation']=relation;receipt['pair_grid']='1001sampledln(a), linearinterpolation, not continuoussupremum';receipt['pair_metrics']=summary
+            if continuous_pair_diagnostics:
+                from pair_diagnostics import diagnose_pair,write_diagnostics
+                continuous=diagnose_pair(cases[0],cases[1]);write_diagnostics(continuous,out)
+                receipt['continuous_pair_diagnostics']=continuous
         if mode=='FULL_PAIR':
             pair_endpoints={}
             for key in ['endpoint_photon_N_per_H','endpoint_photon_U_eV_per_H']:
@@ -166,6 +170,9 @@ def run(manifest_path,out):
         receipt.update(status=scope,case_checks=checks,figures={name:{'sha256':sha(out/name),'bytes':(out/name).stat().st_size} for name in names},validated_complete_inputs=m['cases'],fullpair_uncertainty='UNKNOWN; no numerical/model convergence admission',versions={'matplotlib':matplotlib.__version__,'numpy':np.__version__})
     except (Hold,reader.InputHold,KeyError,ValueError,OSError) as e:
         for f in out.glob('*.png'):f.unlink()
+        if continuous_pair_diagnostics:
+            for name in ['full_pair_continuous_diagnostics.json','full_pair_continuous_summary.csv']:(out/name).unlink(missing_ok=True)
+            receipt.pop('continuous_pair_diagnostics',None)
         receipt.update(status='NOT_READY_NO_FIGURES',wait_reason=str(e),figures=None)
     report=['# FLRW postprocessing: '+receipt['status'],'','Solver runs:0. D cosmological activation: absent; no D curve is fabricated.','Temperature plots follow saved chronology; no sorting byT.','Full pair differences are diagnostic; no convergence threshold or error bound is invented.','']
     for name,check in receipt.get('case_checks',{}).items():
@@ -177,7 +184,7 @@ def run(manifest_path,out):
 def main():
     p=argparse.ArgumentParser();sub=p.add_subparsers(dest='action',required=True)
     b=sub.add_parser('bind');b.add_argument('--case',action='append',required=True,help='CASE_ID,RUN_DIR,CONTROLLER_BINDING_JSON');b.add_argument('--mode',choices=['FULL_PAIR','SHORT_SCREEN_PREVIEW'],required=True);b.add_argument('--end-zbar',type=float,required=True);b.add_argument('--output',type=Path,required=True)
-    r=sub.add_parser('render');r.add_argument('--manifest',type=Path,required=True);r.add_argument('--output',type=Path,required=True)
+    r=sub.add_parser('render');r.add_argument('--manifest',type=Path,required=True);r.add_argument('--output',type=Path,required=True);r.add_argument('--continuous-pair-diagnostics',action='store_true')
     a=p.parse_args()
     if a.action=='bind':
         if a.output.exists():raise Hold('FRESH_MANIFEST_REQUIRED')
@@ -185,5 +192,5 @@ def main():
             for v in a.case:
                 case,run_dir,binding=v.split(',',2);frozen_full005_guard(case,json.loads(Path(binding).read_text()))
         specs=[bind(*v.split(',',2)) for v in a.case];write(a.output,{'mode':a.mode,'end_zbar':a.end_zbar,'source_relation':'Identicalsourcebyteguard unlessexplicitreviewedrelation supplied','cases':specs});print(str(a.output))
-    else:run(a.manifest,a.output)
+    else:run(a.manifest,a.output,a.continuous_pair_diagnostics)
 if __name__=='__main__':main()
