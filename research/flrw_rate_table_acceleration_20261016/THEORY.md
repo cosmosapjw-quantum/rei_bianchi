@@ -53,3 +53,70 @@ Root selected the concrete scope: H/He prepared evaluation and opt-in table; D p
 The scientific execution allowance is aggregate 90 s wall, 180 s CPU, 2 GiB RAM, and four workers for this new local unit; build/toolchain commands are separately bounded at 120 s each and recorded. No derivative API is added and no Newton path is switched to the table, so derivative admission remains an explicit future interface obligation rather than an untested implicit feature.
 
 R4 outcome: log-linear shared-grid interpolation, exact branch fallback, and exact prepared reuse are selected for implementation. The discriminating experiment can admit accuracy and identify which query sizes actually benefit.
+
+## R5 — constructive derivation
+
+### Positive interpolation and its error
+
+Let h=x_(i+1)-x_i>0 and θ=(x-x_i)/h. Linear interpolation of y gives y_hat=(1-θ)y_i+θ y_(i+1), hence
+
+    k_hat = k_i^(1-θ) k_(i+1)^θ = k_* exp(y_hat) > 0.
+
+For y in C² on the closed cell, the interpolation remainder is y(x)-y_hat(x)=y''(ξ)(x-x_i)(x-x_(i+1))/2 for some interior ξ. Since |(x-x_i)(x-x_(i+1))|≤h²/4, |y-y_hat|≤M h²/8. Therefore exp(-δ)≤k_hat/k≤exp(δ), δ=M h²/8, and |k_hat/k-1|≤expm1(δ). A sufficient exact-arithmetic mesh condition for relative target ε is h≤sqrt(8 ln(1+ε)/M). Rounding adds the logarithmic error from endpoint log, affine interpolation, and exp; it must fit inside the total tolerance margin. The sampled validation includes these operations.
+
+As a small exact case, k=A T^p gives y affine, y''=0, and log-linear interpolation recovers the analytic power law in exact arithmetic on every grid. For k=A T^p exp(-B/T), y'=p+B/T and y''=-B/T. On [T_i,T_(i+1)], M=B/T_i; a grid adequate at high temperature can fail at low temperature. This provides a concrete curvature mechanism and motivates per-cell checking/fallback instead of assuming a universal table resolution.
+
+Differentiating the actual interpolant gives d k_hat/dT=k_hat s_i/T. Since s_i is the cell average of y', |s_i-y'(x)|≤M h/2 for any cell point (integrate M|u-x|/h over the cell and maximize at an endpoint). Thus |T(k_hat'-k')|/k≤exp(δ) M h/2+expm1(δ)|y'|. Coefficient error is second order in h whereas slope error is first order. At an interior knot the left and right slopes need not agree; source discontinuities may have no derivative. Any future Jacobian interface must define these cases and differentiate the actual fallback choice. This unit exports coefficients without a derivative API and changes no Newton evaluator.
+
+### Zero, sign, branch, and domain handling
+
+Exact zero is a source property only when a source predicate certifies the whole interval. The low-branch IGM DR channels and bare-carbon DR are such cases. A binary64 zero caused by exp underflow is numerical and must retain that distinction. Positive subnormal values, underflow-transition cells, negative values, and unresolved sign-changing cells use direct evaluation; never replace them with an invented positive floor. Generic signed observables can be represented on fixed-sign cells by sign×exp(interpolated ln|k|), but all admitted physical rate totals in this unit must be nonnegative. A signed fit coefficient inside a positive sum is not a signed physical channel.
+
+Branch crossing is tested using the source predicates, including `T/11605.0 <= 0.8`, not merely the decimal value 9284. A grid cell intersecting a branch or cap boundary is direct. The CI floor mask and all diagnostic booleans follow the exact source semantics. Cell endpoints and each branch's floating neighbors are checked because rounding can move an apparent algebraic boundary by an ulp. Outside a table's range but inside a provider's valid range, the provider evaluates directly; outside the provider domain, its typed error is retained. Invalid T is never clamped to an endpoint.
+
+### Rate coefficients, closures, and prepared state
+
+For binary event r, F_r=k_r(T)n_a n_b has units volume^-1 time^-1. Three-body or metastable effective channels retain their stated higher density power. In the number RHS dot(n)=N F, any conserved row vector ℓ satisfying ℓᵀN=0 obeys ℓᵀdot(n)=0 for direct and table coefficients because the same event flux multiplies the same stoichiometric column. This algebraic identity does not require k_hat=k. A process's forward/reverse detailed-balance ratio, if part of its physical contract, needs a paired representation or a bound on that ratio; independent interpolation alone only guarantees a ratio error ≤exp(δ_forward+δ_reverse)-1.
+
+Photoionization Γ=∫4πJ_ν σ(ν)/(hν)dν depends on J_ν. Photoheating includes the additional excess-energy factor, and Compton exchange depends on radiation temperature and electron density. Neither is a reusable T-only coefficient unless those external inputs are explicitly frozen and included in identity. The table contains neither these radiation functionals nor density products. It also contains no expansion-rate factor.
+
+A prepared direct rate bundle is valid for its exact T and provider identity. If T is recovered from u=(3/2)k_B T n_tot, then dT/du=T/u and dT/dn_j=-(T/n_tot)∂n_tot/∂n_j at fixed u. Composition changes can therefore change T inside a nonlinear iteration even when u is fixed. Prepared values must be reconstructed whenever that exact T changes. They may be reused for the duplicated evaluation at one already evaluated state, yielding an exact arithmetic-path optimization. A prepared object with private temperature/rate fields and a consumer temperature-identity check prevents accidental reuse at another state without introducing a global mutable cache.
+
+### Carbon source construction
+
+The selected numeric rows are `data/carbon_coefficients.json`. Voronov uses U=E_ion/(k_B^source T), k_B^source=8.617385×10^-5 eV/K, and
+
+    C_q(T)=A (1+P sqrt(U))/(X+U) U^K exp(-U)  [cm³/s].
+
+For q=0…5, the source lower electron temperatures are [1,1,2,3,20,20] eV and the upper temperature is 20 keV. This source conversion constant is identity-bearing; replacing it silently with a newer CODATA value changes reproduction. Its logarithmic slope is s_C=U-K+U/(X+U)-P sqrt(U)/(2(1+P sqrt(U))).
+
+Badnell RR uses a=sqrt(T/T0), d=sqrt(T/T1), b=B+C exp(-T2/T), and
+
+    α_RR(T)=A/[a(1+a)^(1-b)(1+d)^(1+b)]  [cm³/s].
+
+Its logarithmic slope is -1/2-(1-b)a/[2(1+a)]-(1+b)d/[2(1+d)]+b_x ln[(1+a)/(1+d)], with b_x=C exp(-T2/T) T2/T. Badnell DR uses
+
+    α_DR(T)=T^(-3/2) sum_j c_j exp(-E_j/T),
+
+where E_j is in K and c_j in cm³ s^-1 K^(3/2). Its slope is -3/2+[sum_j c_j exp(-E_j/T)(E_j/T)]/[sum_j c_j exp(-E_j/T)]. The standard source tabulation range is 10 q²≤T/K≤10^7 q² for initial target charge q=1…6; this is labeled as a tabulation interval rather than a newly proved accuracy bound. DR for bare q=6 is structurally zero.
+
+The q=4 DR row has one negative fit amplitude. Its two relevant terms obey
+
+    0.002646 exp(-2804000/T) - 0.0007843 exp(-4324000/T)
+    > (0.002646-0.0007843) exp(-2804000/T) > 0
+
+for every finite T>0, and the third amplitude 0.01762 is positive. Thus the total analytic DR is positive despite a negative fitted term. Keep that negative amplitude exactly; clipping it would change the source. The other selected rows have nonnegative amplitudes. At cold temperatures a total may still underflow in binary64, requiring direct evaluation/underflow semantics.
+
+For carbon populations n_0…n_6 and externally specified n_e≥0, define I_q=n_e n_q C_q for q=0…5 and R_q=n_e n_q(α_RR,q+α_DR,q) for q=1…6. Set absent boundary fluxes to zero. Then dot(n_q)=I_(q-1)+R_(q+1)-I_q-R_q, so summing telescopes to zero, and sum_q q dot(n_q)=sum I_q-sum R_q. If electrons are evolved, dot(n_e)=sum I_q-sum R_q conserves total electric charge e(sum q n_q-n_e). With external n_e the output records this electron source rather than asserting a closed electron evolution.
+
+Single-channel APIs retain their own cold/hot domain. The complete chain is defined on [20/k_B^source,10^7] K, the actual intersection of needed CI/RR/DR domains. It is ground-parent, low-density Maxwellian elemental carbon. There are no isotope-native 12C/13C rows; those requests receive explicit unsupported status. The source numerical rows have attribution and retained retrieval identity; source licensing is reported as unspecified where the provider does not state a license. No carbon thermal or photon ledger is introduced.
+
+### Cache identity and cost
+
+An immutable table identity includes source provider/version and numeric-row digest, process/charge/parent, recombination case and physical mode, source constants and units, operational domain, precision, interpolation/grid specification, zero/branch/fallback policy, and approximation tolerance. A mutable provider revision or precision change requires reconstruction. Background parameters absent from k(T) are absent from its key; any actually used density/radiation parameter belongs in the key of a different object. The private prepared bundle additionally carries exact temperature.
+
+Let B be table construction time, c_d direct time per query, and c_l lookup time per query for the same bundle. A repeated-query table pays off at N>B/(c_d-c_l) only if c_d>c_l. When c_l≥c_d there is no positive crossover for that measured workload; this is a cost result, not a general impossibility claim. If rate evaluation occupies fraction f of total runtime and achieves speedup s, Amdahl gives S_total=1/(1-f+f/s). No f measurement is available from the active external run, so its end-to-end speedup is not inferred from a local rate benchmark.
+
+For m independent temperature queries with scalar-batch per-item cost c, p workers, startup L, and extra per-item scheduling/copy cost b, T_parallel≈L+mc/p+mb. Parallelism beats the serial batch only when c(1-1/p)>b and m>L/[c(1-1/p)-b]. Small batches may correctly remain serial. Outputs retain input ordering, and workers share immutable grid rows. Benchmark results must state threads, query distribution, construction inclusion, and actual break-even rather than assume that more threads or a SoA layout produces speedup.
+
+R5 outcome: the interpolation/error proof, branch construction, conservation mapping, carbon formulas and positivity, cache identity, and amortization equations are complete. R6 reviews these transitions independently; R7 measures the implementation-dependent accuracy and cost.
