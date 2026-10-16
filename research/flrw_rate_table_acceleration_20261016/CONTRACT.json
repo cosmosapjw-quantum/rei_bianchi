@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "unit_id": "flrw_rate_table_acceleration_20261016",
+  "objective": "Construct and measure reusable background-independent temperature coefficient evaluation with source-backed species extension.",
+  "base_commit": "4583ed342b8476e86e42b023d6de1d0f50820adb",
+  "agents_blob": "429a5a13ee75b1222bc50627f8d5973d01dd21c4",
+  "scope": ["additive opt-in temperature-rate tables", "prepared scalar and shared-grid batch evaluation", "bounded independent-temperature benchmarks", "source-backed additional coefficient provider after primary-source review"],
+  "preserve": ["existing external running binary and checkpoints", "native campaign budget", "physical model and closure", "direct provider APIs and their domain guards", "existing dirty and untracked work"],
+  "conventions": {"temperature": "K in gas rest frame", "densities": "proper densities", "metric_signature": "(-,+,+,+)", "precision": "IEEE binary64", "units": "retain per-channel source units; explicit conversion at consumer boundary"},
+  "acceptance": {
+    "coefficient_relative_error_max": 0.00001,
+    "positive_normal_scope": "relative error applies where direct reference is finite, positive, and normal; exact zero/sign/branch semantics tested separately",
+    "log_slope_scaled_error_max": 0.001,
+    "log_slope_metric": "abs(s_table-s_reference)/max(1,abs(s_reference)) in smooth cell interiors if derivative API is implemented",
+    "jacobian_consistency": "derivative must differentiate the actual selected evaluator; no smoothness or derivative admission at branch/knot points",
+    "domain": "reject invalid provider inputs; use direct provider outside table range within provider range; no clamping/extrapolation",
+    "boundary": "direct fallback for branch-crossing, zero-transition, subnormal, sign-changing, or uncertified cells",
+    "numerical_admission": "independent off-grid, boundary-neighbor, and scalar/batch comparisons; sampled accuracy distinguished from proved curvature bound",
+    "performance_admission": "report direct/prepared/table/batch timings including construction cost and repeated-query break-even; no universal acceleration claim",
+    "trajectory_admission": "requires separate matched trajectory evidence; this unit admits coefficient and point-RHS scope only"
+  },
+  "execution": {
+    "authorization": "parent commissioned bounded local builds/tests/probes; no external native campaign",
+    "local_probe_wall_seconds_max": 60,
+    "local_probe_threads_max": 4,
+    "local_probe_rate_queries_max": 2000000,
+    "table_nodes_max": 65537,
+    "cumulative_run_budget_owner": "root",
+    "stop_rule": "stop at root cumulative limit or concrete acceptance failure; return diagnosis before changing tolerance/model/closure"
+  },
+  "provider_selection": "pending actual primary-source evidence and root concrete scope",
+  "requested_theory_model": "Astra high",
+  "observed_theory_model": "not exposed by runtime"
+}
