@@ -1,0 +1,50 @@
+{
+  "schema": "rei.r9.unit5.actual_dag.v1",
+  "stage": "S1_CHECKPOINT128",
+  "nodes": [
+    {
+      "id": "restore",
+      "status": "PASS",
+      "evidence": "restore.json; zero H actions"
+    },
+    {
+      "id": "reconstruction",
+      "status": "PASS",
+      "evidence": "reconstruction.json; three H actions"
+    },
+    {
+      "id": "cache",
+      "status": "PASS",
+      "evidence": "operator_seam.json; three H actions"
+    },
+    {
+      "id": "continuation",
+      "status": "PASS_SCOPED",
+      "evidence": "milestone_128.json; 64 H actions"
+    },
+    {
+      "id": "refinement",
+      "status": "HOLD",
+      "evidence": "milestone_128.json; all spectrum L1/W exceed 0.001"
+    },
+    {
+      "id": "residual",
+      "status": "RUNNING",
+      "evidence": "original NCP worker"
+    },
+    {
+      "id": "checkpoint_backup",
+      "status": "COMPLETE_DUAL",
+      "evidence": "BACKUP_CHECKPOINT128.json"
+    },
+    {
+      "id": "terminal_review",
+      "status": "PENDING"
+    },
+    {
+      "id": "terminal_backup",
+      "status": "PENDING"
+    }
+  ],
+  "next": "Finish supervised original residual attempt and any approved zero-action compatibility repair; preserve terminal receipt, review, backup, publish S2."
+}
