@@ -27,3 +27,7 @@ The standalone module implements the frozen four-variable scaled core, stage ada
 ## C6 — implementation and durable IO checks
 
 Six targeted tests passed in one execution (exit0; outer wall0.171708496s). They check malformed/nonfinite/singular inputs, pivot/sign/zero backward error, missing template and stale context/state, source/cost metadata and inclusive Newton boundary, atomic durable checkpoint sequence, and Python `-S` CLI success/HOLD/non-overwrite. Actual-shaped metadata in this test is fabricated synthetic control data and is not an observed accepted stage. Production code did not change after C5. Raw test output and measured command receipt are retained.
+
+## C7 — independent cached-oracle comparison
+
+The disjoint harness owner executed two test methods once: seven cached matrix cases (including singular HOLD and generic energy-unit conversion) and five adapter EOS/label cases passed. The scalar BE cancellation evidence is reused from completed R7 without recalculation. No oracle or Fraction solve ran. The largest absolute metric residual was 1.4551915228366852e-11 in a condition estimate of100000, about1.46e-16 relative; it passes the unchanged frozen fixture comparison. Execution wall was0.054295429s, child CPU0.053937s and peak RSS14720KiB. This is a bounded synthetic implementation comparison, not actual nonlinear attribution.
