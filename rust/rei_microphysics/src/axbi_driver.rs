@@ -352,12 +352,34 @@ where
     Ok(jac)
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum BassResearchNumerics {
+    Legacy,
+    LegacyTrace,
+    TightNewton,
+    SplitBe,
+    TightSplitBe,
+    UniformBirth,
+    TightUniformBirth,
+}
+impl BassResearchNumerics {
+    fn tolerance(self) -> f64 {
+        match self { Self::TightNewton | Self::TightSplitBe | Self::TightUniformBirth => 1e-13, _ => 1e-11 }
+    }
+    fn uniform_birth(self) -> bool {
+        matches!(self, Self::UniformBirth | Self::TightUniformBirth)
+    }
+    fn split_birth(self) -> bool {
+        matches!(self, Self::SplitBe | Self::TightSplitBe | Self::UniformBirth | Self::TightUniformBirth)
+    }
+}
 #[derive(Clone, Debug)]
 pub struct Driver {
     pub config: DriverConfig,
     pub background: AxbiBackground,
     /// Opt-in producer table. The legacy public background remains intact.
     bass_background: Option<BassBackground>,
+    research_numerics: BassResearchNumerics,
     pub source: AxbiSource,
     pub energies: Vec<f64>,
     pub n_h0_cm3: f64,
@@ -451,6 +473,7 @@ impl Driver {
             config,
             background: bg,
             bass_background: None,
+            research_numerics: BassResearchNumerics::Legacy,
             source,
             energies,
             n_h0_cm3: n_h0,
@@ -474,6 +497,14 @@ impl Driver {
         driver.bass_background=Some(bass);
         driver.initial_energy=driver.total_energy(&state)?;
         Ok((driver,state))
+    }
+    /// Research-only numerical lane. Selection is fixed at construction and
+    /// bound into the BASS checkpoint envelope; production defaults to Legacy.
+    pub fn new_bass_research(config: DriverConfig, bass: BassBackground,
+        numerics: BassResearchNumerics) -> Result<(Self, DriverState), ForwardError> {
+        let (mut driver, state) = Self::new_bass(config, bass)?;
+        driver.research_numerics = numerics;
+        Ok((driver, state))
     }
     pub fn geometry_point(&self,a:f64)->Result<BackgroundPoint,ForwardError> {
         match &self.bass_background {Some(bg)=>bg.point_at_scale(a),None=>self.background.point_at_scale(a)}
@@ -710,6 +741,14 @@ impl Driver {
         Self::set_photon_state(s, photons);
         Ok(())
     }
+    fn inject_birth(&self, s: &mut DriverState, dt: f64) -> Result<PhotonState, ForwardError> {
+        let geometry = self.geometry_point(s.a)?.geometry()?;
+        let mut birth = self.transport.empty_state();
+        let emitted = self.transport.inject(&mut birth, &geometry, 1.0/s.a-1.0, dt)?;
+        s.ledgers.source_n += emitted.added_photons_per_h;
+        s.ledgers.source_u += emitted.added_energy_ev_per_h;
+        Ok(birth)
+    }
     fn evaluate(
         &self,
         context: &ResidualContext,
@@ -736,6 +775,10 @@ impl Driver {
         dt: f64,
         counter: &mut usize,
     ) -> Result<(), ForwardError> {
+        self.chemical_stage_with_birth(s, dt, counter, None)
+    }
+    fn chemical_stage_with_birth(&self, s: &mut DriverState, dt: f64,
+        counter: &mut usize, birth: Option<PhotonState>) -> Result<(), ForwardError> {
         if !dt.is_finite() || dt <= 0.0 {
             return Err(err("AXBI_STAGE_DT"));
         }
@@ -744,9 +787,15 @@ impl Driver {
         self.partition_inactive(&mut old, &geometry)?;
         // Quadrature reconstruction is fixed across the Newton residual/Jacobian
         // evaluations; only trial absorber densities enter backward Euler.
-        let prepared = self
+        let mut prepared = self
             .transport
             .prepare(&self.photon_state(&old), &geometry)?;
+        if let Some(newborn) = &birth {
+            let prepared_birth=self.transport.prepare(newborn, &geometry)?;
+            prepared = if self.research_numerics.uniform_birth() {
+                prepared.with_uniform_birth(prepared_birth)?
+            } else { prepared.with_split_birth_be(prepared_birth)? };
+        }
         let context = ResidualContext {
             gas: old.gas,
             a: old.a,
@@ -762,13 +811,18 @@ impl Driver {
             old.gas.fractions[2],
             old_w,
         ];
-        for _ in 0..50 {
+        for iteration in 0..50 {
             let (residual, stocks, rhs) = self.evaluate(&context, x, dt, counter)?;
             let norm = self.norm(residual, old_w, x[3]);
-            if norm <= 1e-11 {
+            if self.research_numerics != BassResearchNumerics::Legacy {
+                eprintln!("BASS_NEWTON mode={:?} iteration={} norm={:.17e} dt_s={:.17e} a={:.17e}",
+                    self.research_numerics, iteration, norm, dt, old.a);
+            }
+            if norm <= self.research_numerics.tolerance() {
                 let nh = self.n_h0_cm3 / old.a.powi(3);
                 let c = HHeModel::controlled_fixture();
-                let nold = old.photons.iter().sum::<f64>();
+                let nold = old.photons.iter().sum::<f64>()
+                    + birth.as_ref().map(|b| b.number.iter().sum::<f64>()).unwrap_or(0.0);
                 let nnew = stocks.number.iter().sum::<f64>();
                 let events = rhs.photo_events_cm3_s.map(|e| e * dt / nh);
                 let event_total = events.iter().sum::<f64>();
@@ -806,6 +860,17 @@ impl Driver {
                 self.config.max_rhs,
                 move |unknown| columns_context.evaluate(unknown, dt).map(|v| v.0),
             )?;
+            if self.research_numerics != BassResearchNumerics::Legacy {
+                let norm1=(0..4).map(|j| (0..4).map(|i| jac[i][j].abs()).sum::<f64>()).fold(0.0_f64,f64::max);
+                let mut inv_col_max=0.0_f64;
+                for j in 0..4 {
+                    let mut unit=[0.0;4]; unit[j]=1.0;
+                    let col=solve4(jac,unit)?;
+                    inv_col_max=inv_col_max.max(col.iter().map(|x| x.abs()).sum::<f64>());
+                }
+                eprintln!("BASS_JACOBIAN mode={:?} iteration={} cond1_est={:.17e}",
+                    self.research_numerics,iteration,norm1*inv_col_max);
+            }
             let direction = solve4(jac, residual.map(|r| -r))?;
             let mut alpha = 1.0;
             let mut accepted = None;
@@ -833,8 +898,13 @@ impl Driver {
         let mid = (old.a * to).sqrt();
         let dt = self.geometry_increment(old.a, to)?.proper_time_s;
         self.geometry_map(&mut s, mid)?;
-        self.inject(&mut s, dt)?;
-        self.chemical_stage(&mut s, dt, counter)?;
+        if self.research_numerics.split_birth() {
+            let birth = self.inject_birth(&mut s, dt)?;
+            self.chemical_stage_with_birth(&mut s, dt, counter, Some(birth))?;
+        } else {
+            self.inject(&mut s, dt)?;
+            self.chemical_stage(&mut s, dt, counter)?;
+        }
         self.geometry_map(&mut s, to)?;
         self.validate(&s, 1e-8)?;
         let (n0, u0) = self.residuals(old)?;
@@ -1285,9 +1355,12 @@ impl Driver {
         let source=sha256_bytes(compiled_identity().as_bytes())?;
         let config=sha256_bytes(format!("{:?}",self.config).as_bytes())?;
         let body=self.checkpoint_text(s)?;
-        let text=format!("BASS_REI_CHECKPOINT_V1\n{}|{}|{}|{}|{}\nBASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}\nREI_NATIVE_SOURCE=0e25846433170d0f420c4cda44a0bedbf02cd177|REI_OWNER_BASE=7cb4ac678be019b736e85db76dfbdc7c51e380e9\n{}\n{}\n{}|{}\n{}\n{:.17e}|{:.17e}|{:.17e}|{:.17e}|{:.17e}\n{}\n{}\n{}",
+        let version=if self.research_numerics==BassResearchNumerics::Legacy {"BASS_REI_CHECKPOINT_V1"} else {"BASS_REI_CHECKPOINT_V2"};
+        let algorithm=if self.research_numerics==BassResearchNumerics::Legacy {String::new()} else {format!("|algorithm={:?}|newton_tolerance={:.1e}",self.research_numerics,self.research_numerics.tolerance())};
+        let text=format!("{}\n{}|{}|{}|{}|{}\nBASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}{}\nREI_NATIVE_SOURCE=0e25846433170d0f420c4cda44a0bedbf02cd177|REI_OWNER_BASE=7cb4ac678be019b736e85db76dfbdc7c51e380e9\n{}\n{}\n{}|{}\n{}\n{:.17e}|{:.17e}|{:.17e}|{:.17e}|{:.17e}\n{}\n{}\n{}",
+            version,
             id.producer_commit,id.source_csv_sha256,id.source_manifest_sha256,id.case,id.grid_points,
-            self.config.transport_cells,
+            self.config.transport_cells,algorithm,
             source,config,epoch,output.display(),sha256_bytes(&output_bytes)?,
             s.a,p.time_s,p.b,p.h_per_s,p.s_per_s,
             sha256_bytes(body.as_bytes())?,body.len(),body);
@@ -1304,10 +1377,12 @@ impl Driver {
         if text.starts_with("AXBI_CHECKPOINT_V4") {return Err(err("BASS_REJECT_LEGACY_CHECKPOINT"));}
         let (head,body)=text.split_once("\nAXBI_CHECKPOINT_V4\n").ok_or(err("BASS_CHECKPOINT_TRUNCATED"))?;
         let lines=head.lines().collect::<Vec<_>>();
-        if lines.len()!=11 || lines[0]!="BASS_REI_CHECKPOINT_V1" {return Err(err("BASS_CHECKPOINT_VERSION_OR_SHAPE"));}
+        let version=if self.research_numerics==BassResearchNumerics::Legacy {"BASS_REI_CHECKPOINT_V1"} else {"BASS_REI_CHECKPOINT_V2"};
+        if lines.len()!=11 || lines[0]!=version {return Err(err("BASS_CHECKPOINT_VERSION_OR_SHAPE"));}
         let expected=format!("{}|{}|{}|{}|{}",id.producer_commit,id.source_csv_sha256,id.source_manifest_sha256,id.case,id.grid_points);
         if lines[1]!=expected {return Err(err("BASS_CHECKPOINT_SOURCE_BINDING"));}
-        if lines[2]!=format!("BASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}",self.config.transport_cells) {return Err(err("BASS_CHECKPOINT_PROVIDER_SCHEMA"));}
+        let algorithm=if self.research_numerics==BassResearchNumerics::Legacy {String::new()} else {format!("|algorithm={:?}|newton_tolerance={:.1e}",self.research_numerics,self.research_numerics.tolerance())};
+        if lines[2]!=format!("BASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}{}",self.config.transport_cells,algorithm) {return Err(err("BASS_CHECKPOINT_PROVIDER_SCHEMA"));}
         if lines[3]!="REI_NATIVE_SOURCE=0e25846433170d0f420c4cda44a0bedbf02cd177|REI_OWNER_BASE=7cb4ac678be019b736e85db76dfbdc7c51e380e9" {return Err(err("BASS_CHECKPOINT_REI_BASE"));}
         if lines[4]!=sha256_bytes(compiled_identity().as_bytes())? {return Err(err("BASS_CHECKPOINT_NATIVE_SOURCE"));}
         if lines[5]!=sha256_bytes(format!("{:?}",self.config).as_bytes())? {return Err(err("BASS_CHECKPOINT_CONFIG"));}

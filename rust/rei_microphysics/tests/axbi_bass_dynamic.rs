@@ -1,5 +1,5 @@
 use rei_microphysics::axbi_bass_background::{sha256_bytes, BassBackground, BassSourceIdentity};
-use rei_microphysics::axbi_driver::{Driver, DriverConfig};
+use rei_microphysics::axbi_driver::{BassResearchNumerics, Driver, DriverConfig};
 use std::{
     fs,
     path::{Path, PathBuf},
@@ -48,6 +48,105 @@ fn cfg() -> DriverConfig {
     c.transport_cells = 16;
     c.energy_subdivisions = 2;
     c
+}
+
+#[test]
+fn uniform_birth_cohort_preserves_nodes_and_species_ledger() {
+    let (driver, state) = Driver::new_bass(cfg(), bg("COLD_FLRW")).unwrap();
+    let g = driver.geometry_point(state.a).unwrap().geometry().unwrap();
+    let mut old = driver.transport.empty_state();
+    let mut birth = driver.transport.empty_state();
+    driver.transport.add_delta(&mut old, 0, 30.0, 0.3).unwrap();
+    driver.transport.add_delta(&mut birth, 0, 30.0, 0.2).unwrap();
+    let old_p = driver.transport.prepare(&old, &g).unwrap();
+    let birth_p = driver.transport.prepare(&birth, &g).unwrap();
+    let dt = 1e12;
+    let absorbers = [1e-4, 0.0, 0.0];
+    let tau = old_p.optical_depth_rows(absorbers, dt)[0].5[0];
+    let both = old_p.with_uniform_birth(birth_p).unwrap();
+    let out = driver.transport.evaluate(&both, absorbers, 1e-4, dt).unwrap();
+    let phi = if tau==0.0 {1.0} else {-(-tau).exp_m1()/tau};
+    let expected = 0.3/(1.0+tau)+0.2*phi;
+    let observed: f64 = out.state.number.iter().sum();
+    assert!((observed-expected).abs()<1e-13);
+    assert!((0.5-observed-out.absorbed_per_h.iter().sum::<f64>()).abs()<1e-13);
+    assert!((30.0*(0.5-observed)-out.binding_ev_per_h-out.heat_ev_per_h).abs()<1e-12);
+}
+
+#[test]
+fn mixed_h_he_birth_nodes_conserve_number_energy_and_photo_events() {
+    let (driver,state)=Driver::new_bass(cfg(),bg("COLD_FLRW")).unwrap();
+    let g=driver.geometry_point(state.a).unwrap().geometry().unwrap();
+    let mut old=driver.transport.empty_state();
+    let mut birth=driver.transport.empty_state();
+    for (ray,q,no,nb) in [(0,30.0,0.21,0.13),(1,40.0,0.18,0.11),(2,80.0,0.09,0.07)] {
+        driver.transport.add_delta(&mut old,ray,q,no).unwrap();
+        driver.transport.add_delta(&mut birth,ray,q,nb).unwrap();
+    }
+    let dt=2e12; let nh=1e-4; let absorber=[8e-5,7e-6,2e-6];
+    let op=driver.transport.prepare(&old,&g).unwrap();
+    let bp=driver.transport.prepare(&birth,&g).unwrap();
+    let mut expected_n=0.0; let mut expected_u=0.0;
+    let mut events=[0.0_f64;3];
+    for (newborn,prepared) in [(false,&op),(true,&bp)] {
+        for (_,q,n,_,_,tau) in prepared.optical_depth_rows(absorber,dt) {
+            let total=tau.iter().sum::<f64>();
+            let phi=if total==0.0 {1.0} else {-(-total).exp_m1()/total};
+            let survived=if newborn {n*phi} else {n/(1.0+total)};
+            expected_n+=survived; expected_u+=q*survived;
+            for j in 0..3 { events[j]+=if newborn {
+                n*tau[j]*(1.0-phi)/total
+            } else { n*tau[j]/(1.0+total) }; }
+        }
+    }
+    let combined=op.with_uniform_birth(bp).unwrap();
+    let result=driver.transport.evaluate(&combined,absorber,nh,dt).unwrap();
+    let (number,energy)=driver.transport.inventory(&result.state,&g).unwrap();
+    assert!((number-expected_n).abs()<2e-13);
+    assert!((energy-expected_u).abs()<2e-11);
+    for j in 0..3 {
+        assert!((result.absorbed_per_h[j]-events[j]).abs()<2e-13);
+        assert!((result.photo.gamma_s[j]*absorber[j]*dt/nh-events[j]).abs()<2e-13);
+    }
+    let input_energy=30.0*(0.21+0.13)+40.0*(0.18+0.11)+80.0*(0.09+0.07);
+    assert!((input_energy-energy-result.binding_ev_per_h-result.heat_ev_per_h).abs()<2e-11);
+    let zero=driver.transport.evaluate(&combined,[0.0;3],nh,dt).unwrap();
+    let (zn,zu)=driver.transport.inventory(&zero.state,&g).unwrap();
+    assert!((zn-(0.21+0.13+0.18+0.11+0.09+0.07)).abs()<2e-13);
+    assert!((zu-input_energy).abs()<2e-11);
+    assert_eq!(zero.absorbed_per_h,[0.0;3]);
+}
+
+#[test]
+fn research_checkpoint_rejects_different_operator() {
+    let dir = temp().join("research-operator");
+    fs::create_dir_all(&dir).unwrap();
+    let output=dir.join("output.txt");
+    fs::write(&output,"operator identity\n").unwrap();
+    let path=dir.join("checkpoint.bass-v2");
+    let (driver,state)=Driver::new_bass_research(cfg(),bg("COLD_FLRW"),BassResearchNumerics::UniformBirth).unwrap();
+    driver.save_bass_checkpoint(&path,&state,"epoch-birth",&output).unwrap();
+    let (same,_)=Driver::new_bass_research(cfg(),bg("COLD_FLRW"),BassResearchNumerics::UniformBirth).unwrap();
+    assert_eq!(same.read_bass_checkpoint(&path,"epoch-birth",&output).unwrap().a,state.a);
+    let (legacy,_)=Driver::new_bass(cfg(),bg("COLD_FLRW")).unwrap();
+    fail(legacy.read_bass_checkpoint(&path,"epoch-birth",&output),"BASS_CHECKPOINT_VERSION_OR_SHAPE");
+    let (tight,_)=Driver::new_bass_research(cfg(),bg("COLD_FLRW"),BassResearchNumerics::TightNewton).unwrap();
+    fail(tight.read_bass_checkpoint(&path,"epoch-birth",&output),"BASS_CHECKPOINT_PROVIDER_SCHEMA");
+}
+
+#[test]
+fn research_birth_lane_runs_original_hhe_owners() {
+    let (legacy,mut old)=Driver::new_bass(cfg(),bg("COLD_FLRW")).unwrap();
+    let (birth,mut revised)=Driver::new_bass_research(cfg(),bg("COLD_FLRW"),BassResearchNumerics::UniformBirth).unwrap();
+    legacy.fixed_step(&mut old,1e-4).unwrap();
+    birth.fixed_step(&mut revised,1e-4).unwrap();
+    assert!((old.a-revised.a).abs()<1e-15);
+    assert_eq!(old.ledgers.source_n,revised.ledgers.source_n);
+    assert_eq!(old.ledgers.source_u,revised.ledgers.source_u);
+    assert!(old.ledgers.absorbed_n>=0.0 && revised.ledgers.absorbed_n>=0.0);
+    let (n,u)=birth.residuals(&revised).unwrap();
+    assert!(n.abs()<1e-8 && u.abs()<1e-8);
+    assert!(revised.gas.fractions.iter().all(|x| x.is_finite() && *x>=0.0));
 }
 
 #[test]

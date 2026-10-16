@@ -116,6 +116,13 @@ struct AbsorptionNode {
     number: f64,
     sigma: [f64; 3],
     excess_ev: [f64; 3],
+    newborn: bool,
+}
+fn uniform_birth_phi(tau: f64) -> f64 {
+    if tau == 0.0 { 1.0 }
+    else if tau < 1e-5 {
+        1.0 + tau*(-0.5 + tau*(1.0/6.0 + tau*(-1.0/24.0 + tau/120.0)))
+    } else { -(-tau).exp_m1()/tau }
 }
 #[derive(Clone, Debug)]
 pub struct PreparedAbsorption {
@@ -124,6 +131,42 @@ pub struct PreparedAbsorption {
     pub diagnostics: QuadratureDiagnostics,
 }
 impl PreparedAbsorption {
+    /// Raw quadrature nodes, including the three species optical depths.
+    /// Used by bounded research diagnostics; no radiation state is mutated.
+    pub fn optical_depth_rows(&self, absorber_cm3: [f64;3], dt_s: f64)
+        -> Vec<(usize,f64,f64,f64,f64,[f64;3])> {
+        let c=HHeModel::controlled_fixture().c_cm_s;
+        self.nodes.iter().map(|n| (n.cell,n.q,n.number,
+            self.template.support_lo[n.cell],self.template.support_hi[n.cell],
+            std::array::from_fn(|j| dt_s*c*absorber_cm3[j]*n.sigma[j]))).collect()
+    }
+    /// Keep the old and newly emitted quadratures separate while sharing the
+    /// exact same geometry, support envelope and trial gas opacity.
+    pub fn with_uniform_birth(self, birth: Self) -> Result<Self, ForwardError> {
+        self.add_birth_cohort(birth, true)
+    }
+    pub fn with_split_birth_be(self, birth: Self) -> Result<Self, ForwardError> {
+        self.add_birth_cohort(birth, false)
+    }
+    fn add_birth_cohort(mut self, mut birth: Self, uniform: bool) -> Result<Self, ForwardError> {
+        if self.template.number.len() != birth.template.number.len() {
+            return Err(bad("BASS_BIRTH_SHAPE"));
+        }
+        for k in 0..birth.template.number.len() {
+            add_support(&mut self.template, k, birth.template.number[k],
+                birth.template.energy_ref[k], birth.template.support_lo[k],
+                birth.template.support_hi[k]);
+        }
+        for node in &mut birth.nodes { node.newborn = uniform; }
+        self.nodes.extend(birth.nodes);
+        self.diagnostics.max_count_relative_defect=self.diagnostics.max_count_relative_defect.max(birth.diagnostics.max_count_relative_defect);
+        self.diagnostics.max_energy_relative_defect=self.diagnostics.max_energy_relative_defect.max(birth.diagnostics.max_energy_relative_defect);
+        self.diagnostics.max_asymptotic_mean_defect_ev=self.diagnostics.max_asymptotic_mean_defect_ev.max(birth.diagnostics.max_asymptotic_mean_defect_ev);
+        self.diagnostics.omitted_tail_number_bound_per_h+=birth.diagnostics.omitted_tail_number_bound_per_h;
+        self.diagnostics.omitted_tail_energy_bound_ev_per_h+=birth.diagnostics.omitted_tail_energy_bound_ev_per_h;
+        self.diagnostics.omitted_tail_endpoint_moment_bound_ev_per_h+=birth.diagnostics.omitted_tail_endpoint_moment_bound_ev_per_h;
+        Ok(self)
+    }
     pub(crate) fn evaluate_for_cell_count(
         &self,
         cells: usize,
@@ -179,11 +222,19 @@ impl PreparedAbsorption {
             .collect();
         for node in &self.nodes {
             let opacity = sum((0..3).map(|j| absorber_cm3[j] * node.sigma[j]));
-            let denominator = 1.0 + dt_s * model.c_cm_s * opacity;
+            let tau = dt_s * model.c_cm_s * opacity;
+            let denominator = 1.0 + tau;
             if !denominator.is_finite() || denominator < 1.0 {
                 return Err(bad("AXBI_COVARIANT_BE_DOMAIN"));
             }
-            let surviving = node.number / denominator;
+            let birth_phi = if node.newborn { uniform_birth_phi(tau) } else { 0.0 };
+            let surviving = if node.newborn { node.number * birth_phi } else { node.number / denominator };
+            // For newborns event/dt is the integrated uniform-birth absorption,
+            // not the end-of-step stock multiplied by the full slab duration.
+            let rate_factor = if node.newborn {
+                if tau < 1e-5 { 0.5 + tau*(-1.0/6.0 + tau*(1.0/24.0-tau/120.0)) }
+                else { (1.0-birth_phi)/tau }
+            } else { 0.0 };
             compensated_add(
                 &mut out.state.number[node.cell],
                 &mut count_correction[node.cell],
@@ -200,10 +251,18 @@ impl PreparedAbsorption {
                 surviving * offset,
             );
             for j in 0..3 {
-                let rate = model.c_cm_s * n_h_cm3 * node.sigma[j] * surviving;
+                let rate = if node.newborn {
+                    model.c_cm_s * n_h_cm3 * node.sigma[j] * node.number * rate_factor
+                } else {
+                    model.c_cm_s * n_h_cm3 * node.sigma[j] * surviving
+                };
                 out.photo.gamma_s[j] += rate;
                 out.photo.heat_erg_per_absorber_s[j] += rate * node.excess_ev[j] * model.ev_erg;
-                let event = dt_s * model.c_cm_s * absorber_cm3[j] * node.sigma[j] * surviving;
+                let event = if node.newborn {
+                    dt_s * rate * absorber_cm3[j] / n_h_cm3
+                } else {
+                    dt_s * model.c_cm_s * absorber_cm3[j] * node.sigma[j] * surviving
+                };
                 out.absorbed_per_h[j] += event;
                 out.binding_ev_per_h += event * model.threshold_ev[j];
                 out.heat_ev_per_h += event * node.excess_ev[j];
@@ -644,6 +703,7 @@ impl CovariantTransport {
                     number,
                     sigma,
                     excess_ev: excess,
+                    newborn: false,
                 });
             }
         }
@@ -700,6 +760,7 @@ fn prepare_cell(k: usize, state: &PhotonState, r: f64) -> Result<PreparedCell, F
             number,
             sigma,
             excess_ev: excess,
+            newborn: false,
         });
     }
     Ok(PreparedCell { nodes, diagnostics })
