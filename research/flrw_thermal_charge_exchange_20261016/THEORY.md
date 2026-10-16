@@ -128,6 +128,19 @@ This is a constructive local method extension, with no literature novelty or str
 
 Proceed to the assigned pure Python implementation and bounded new fixtures after R10 handoff. No additional source audit, old test replay, native launch or reference solve is required to make that transition.
 
+## R9 — Concrete coding and evidence handoff
+
+The implementation owns only newunit-local pure Python code and its targeted evidence. Suggested files are `thermal_cx.py`, `tests/test_thermal_cx.py` and `run_cases.py`; the coding owner may use equivalent names while recording actual commands. No Rust export or native executable is needed.
+
+Implement immutable initial state, an explicit named provider/domain, a finite signed defect with source label, scalar reconstruction, checked Heun step, adaptive step-doubling and typed result serialization. Keep Savin formulas separate from manufactured test providers. Compute the amplitude ceiling from the supplied initial inventory. Accept a partial domain approach as a useful bounded result while preserving t_reached<t_requested and full_interval_complete=false.
+
+C6 targeted checks should cover the seven manufactured fixtures against cached independent values, valid stage-domain calls, exact-temperature ledger reconstruction, negative-defect interval ordering, empty/zero-time/D=0/zero-rate changed paths, input failure, input immutability, and a forced work-cap return. Reuse `probe/RESULTS.json`; do not execute its oracle script again.
+
+C7 runs the three declared Savin fixtures under default and tighter controls, and the new fixed-Heun16/32/64 smooth manufactured refinement. Save endpoint/state/ledger/domain/work differences, measured local-error ratios and partial-event status. Default-versus-tighter differences are numerical sensitivity data, not exact Savin errors. The same aggregate30-second new-test/experiment ceiling covers C6+C7 and any expressly authorized targeted repair; do not reset it between stages. No broad old suite or build runs.
+
+A single named failure returns its exact status and raw output for a bounded repair decision. C9 independent review checks the actual code and measured outputs before scoped numerical acceptance. R6 mathematical PASS is not substituted for that result review. Per-stage publication proceeds from immutable captures with the publisher's receipts.
+
+
 
 
 
