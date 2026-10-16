@@ -25,3 +25,7 @@ Completed thermal_cx.py and verify_thermal_cx.py. The module exposes immutable s
 ## C6 — Implementation verification
 
 Actual command `timeout30s python3 verify_thermal_cx.py --stage C6` completed with exit0. Seven manufactured cases and17 changed-seam controls passed, including signed negative defect, reverse feedback, lambda-zero flow, both provider events, dt0/empty/no-D/zero-rate paths, invalid input, charged provider failures and work caps. The SI-equivalent field conversion passed. Independent Decimal expectations were read from the cached probe; the probe was not replayed. All saved invariant/amplitude checks passed. Actual test wall 0.051000459 s, CPU 0.050998123 s. Detailed outputs and exact command are in C6_results.json/C6_execution.json; event time differences are diagnostics.
+
+## C7 — Scientific and numerical fixtures
+
+Actual command `timeout30s python3 verify_thermal_cx.py --stage C7` completed exit0. Three synthetic isolated H/D states used actual Savin fits in default/tighter pairs. Domain, finite nonnegative reconstruction, inventory/energy ledgers and amplitude ceilings passed. The near-lower-domain pair returned partial DOMAIN_BOUNDARY_APPROACH. Default/tight differences are recorded as tolerance diagnostics, not true error. Fixed Heun N16/32/64 errors decreased with ratios 4.28125673 and 4.13255763, inside frozen[3,5]. Actual test wall 0.013560094 s, CPU 0.013558598 s; cumulative C6+C7 test wall 0.064560553 s. No native/NCP/source reference replay.
