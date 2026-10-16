@@ -1,0 +1,41 @@
+{
+  "task": "V8_NATIVE_RR_01",
+  "decision": "SCOPED_PASS",
+  "review": "fresh_read_only_astra_independent_review",
+  "base_pr165": "f5c117f5a3494020fa2b327aa94a6bfd5f8b87f5",
+  "frozen_pr150_owner": "6ea2b1b4b3875c9163cafc45efe720afded43fc4",
+  "native_source_sha256": "7f09ef77aae2da3d83e3eb15400704f310cfd726114554a7e83e3e414e23be87",
+  "raw_archive_sha256": "5f981e327813adb4696c76b83bdfec98b42dbc675dac8fd1348ac41187d34abe",
+  "admitted": [
+    "Original PR150 native rate, EOS and FLRW background are linked into an independent four-channel RR/DR-only Rust midpoint operator.",
+    "D=100, 1000, 10000 at T0=15000 K and D=1000 at T0=22000 K have resolved approximately second-order final temperature, electron, species, four-channel event/cooling/binding-escape and gas-work errors against independent continuous SciPy Radau on N=8,16,32,64,128.",
+    "The final 30 native runs exit 0; 1488 steps pass the measured species and energy accounting checks."
+  ],
+  "measured": {
+    "final_native_runs": 30,
+    "final_native_steps": 1488,
+    "cumulative_native_invocations": 61,
+    "cumulative_native_steps": 2984,
+    "max_species_event_reconstruction_abs_per_H": 7.78e-16,
+    "max_thermal_reconstruction_relative": 9.89e-16,
+    "max_total_energy_reconstruction_relative": 7.79e-16,
+    "max_channel_cooling_per_event_vs_donor_relative": 4.41e-16,
+    "smallest_resolved_finest_error_to_reference_floor_ratio": 949,
+    "temperature_last_order_by_case": {
+      "D100_X002_T15000": 1.999200653753104,
+      "D1000_X002_T15000": 2.000214061517722,
+      "D10000_X0003_T15000": 2.0009204385229853,
+      "D1000_X002_T22000": 2.0000682093123645,
+      "D1_X1e-5_T15000": null,
+      "D1e6_X0001_T15000": 1.5417537087569542
+    },
+    "stiff_D1e6_N128_temperature_abs_error_K": 0.07804521363323147
+  },
+  "hold": [
+    "D=1 Xend=1e-5 is roundoff limited and has no admitted temporal order.",
+    "D=1e6 on N=8..128 has no uniform stiff second-order admission.",
+    "Original production Driver::fixed_step source-on convergence and the causal source of its first-order behavior remain unisolated.",
+    "Case-B photon retransport, full EoR and signed Bianchi physics were not executed."
+  ],
+  "interpretation": "Source-free conditional H/He Case-A RR/DR subsystem on a prescribed FLRW background; diagnostic density multipliers leave H(a) fixed. Escape is an energy ledger at emission, not a transported photon count."
+}
