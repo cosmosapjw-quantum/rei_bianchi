@@ -2,7 +2,7 @@
   "schema_version": 1,
   "workflow_version": "1.0.0",
   "unit_id": "flrw_full005_pair_diagnostics_20261016",
-  "status": "R4_REPRESENTATION_SELECTED",
+  "status": "R5_DERIVED_AWAITING_INDEPENDENT_EVIDENCE",
   "baseline_commit": "4e2f0682fb605c6aa940bd756d9869e67b6ded0b",
   "branch": "research/flrw-production-integration-20261015",
   "objective": "Full-overlap piecewise-linear reconstruction pair supremum and analytic L1/L2/RMS diagnostics in stored ln(a)",
@@ -45,7 +45,6 @@
   },
   "coding_ready": false,
   "remaining_obligations": [
-    "R3-R5 formulas and algorithm",
     "R6 independent verification",
     "R7 discriminating numerical check",
     "R8 scoped adoption",
@@ -88,5 +87,25 @@
     "time": "O(k*(n+m)) for k observables",
     "auxiliary_memory": "O(k) beyond already loaded arrays and output",
     "sample_grid": "existing1001 outputs preserved"
-  }
+  },
+  "segment_formulas": {
+    "width": "h=v-u>0",
+    "left_difference": "p=C_PL(u)-R_PL(u)",
+    "right_difference": "q=C_PL(v)-R_PL(v)",
+    "sup": "max(abs(p),abs(q))",
+    "l1_same_or_zero_sign": "h*(abs(p)+abs(q))/2",
+    "l1_opposite_sign": "h*(p*p+q*q)/(2*(abs(p)+abs(q)))",
+    "l2_squared": "h*(p*p+p*q+q*q)/3",
+    "l2": "sqrt(sum(segment_l2_squared))",
+    "rms": "sqrt(sum(segment_l2_squared)/(B-A))",
+    "mean_abs": "sum(segment_l1)/(B-A)"
+  },
+  "numeric_requirements": [
+    "Retain distinct stored knots; exact equality merge only",
+    "Earliest maximum witness on exact floating comparison ties",
+    "No full union list or segment contribution list",
+    "Streaming compensated accumulation or equally bounded stable scheme",
+    "Reject nonfinite arithmetic/results with explicit failure",
+    "No numerical or physical tolerance inferred from observed pair norms"
+  ]
 }

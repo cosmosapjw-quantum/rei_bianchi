@@ -22,7 +22,7 @@ The existing support helper converts stored binary64 numbers to exact Fractions,
 
 Selected literature was retrieved by the controller on 2026-10-16 using Exa and SciSpace. Primary method support is the official SciPy [`PPoly.integrate`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.PPoly.integrate.html) reference and [piecewise-polynomial tutorial](https://docs.scipy.org/doc/scipy/tutorial/interpolate/splines_and_polynomials.html): a piecewise polynomial has a local power-basis representation and admits a definite integral over a stated interval. Here the difference is linear on each merged segment and its square is quadratic, so explicit integration suffices without importing SciPy. These sources support the computational representation; R5 supplies the actual formulas and proof.
 
-SciSpace supplied two contextual leads: Agocs, Hobson and Handley, *Dense output for highly oscillatory numerical solutions*, [arXiv:2007.05013](https://arxiv.org/abs/2007.05013), and Calvo, Higham and Montijano, *Global error estimation with adaptive explicit Runge–Kutta methods*, [DOI:10.1093/imanum/16.1.47](https://doi.org/10.1093/imanum/16.1.47). The former concerns method-specific dense output, whereas this unit fixes linear reconstruction of saved states; the latter concerns global-error estimation, whereas this unit computes pair-reconstruction differences. Neither paper is used as a proof of the PL norm formulas or as evidence of FULL005 global accuracy. Their role is contextual scope alignment.
+SciSpace supplied two contextual leads: Agocs, Hobson, Handley and Lasenby, *Dense output for highly oscillatory numerical solutions*, [arXiv:2007.05013](https://arxiv.org/abs/2007.05013), and Calvo, Higham and Montijano, *Global error estimation with adaptive explicit Runge–Kutta methods*, [DOI:10.1093/imanum/16.1.47](https://doi.org/10.1093/imanum/16.1.47). The controller fetched the arXiv primary abstract and corrected the omitted fourth author in the discovery result. The OUP primary-page retrieval timed out, so the Calvo paper remains a discovery-only lead and contributes no premise. The former concerns method-specific dense output, whereas this unit fixes linear reconstruction of saved states; the latter title identifies a distinct global-error-estimation problem. Neither paper is used as a proof of the PL norm formulas or as evidence of FULL005 global accuracy.
 
 The theorem will be derived from affine interpolation and elementary integration. No unresolved literature lemma enters the derivation. Wolfram symbolic output and the independent small-fixture probe belong to R6/R7 and remain separate evidence from source retrieval.
 
@@ -60,3 +60,33 @@ The discriminating synthetic example is a zero reference on `[0,1]` and a triang
 An affine change from `[0,1]` to the physical ln(a) interval places the same example between adjacent regular ln(a) samples, preserves its maximum and multiplies each integral by the interval length. It is therefore a representation-level explanation of the information missing from fixed sampling. It is not an observed FULL005 discrepancy. The selected diagnostic resolves the full saved-PL question without choosing a finer arbitrary sample count.
 
 Watchdog finding closed: an additional abstract function-space formalism would add no implementation obligation here. The useful structure is precisely the union partition, affine endpoint values and elementary integrals; each maps directly to a loop accumulator.
+
+## R5 — constructive derivation and algorithm
+
+Write consecutive union knots as `u<v`, with `h=v-u`, and let `p=d(u)`, `q=d(v)`. No reference or candidate knot lies inside this interval, so both interpolants, and hence their difference, are affine there. With `t=(L-u)/h`,
+
+`d(L)=(1-t)p+tq`, `0<=t<=1`.
+
+The triangle inequality gives `|d(L)| <= (1-t)|p|+t|q| <= max(|p|,|q|)`. Endpoints belong to the closed interval, so the maximum is exactly the larger endpoint magnitude. Applying this to every segment proves that the global supremum is attained at a union knot. Visiting knots in increasing order and replacing the witness only on a strictly larger magnitude returns the earliest maximizing knot, including a flat maximum.
+
+Integrating the square directly gives
+
+`I2(u,v)=h integral_0^1 [p+(q-p)t]^2 dt = h (p^2+p q+q^2)/3`.
+
+An equivalent nonnegative form is `h [p^2+q^2+(p+q)^2]/6`. For the absolute integral there are two cases. If p and q have the same sign or either is zero, the affine function retains that sign and
+
+`I1(u,v)=h (|p|+|q|)/2`.
+
+If signs are opposite, put `a=|p|`, `b=|q|`. The unique zero divides the interval in the length ratio a:b, at `t0=a/(a+b)`. The two triangular areas give
+
+`I1(u,v)=h [a*t0+b*(1-t0)]/2 = h (a^2+b^2)/(2(a+b))`.
+
+Both expressions agree at p=0 or q=0; the identically-zero segment uses the same-sign formula and never divides by zero. Summing I1 and I2 over the union partition proves the R3 definitions. The triangle example has two nonzero segments of width 1/4000 with endpoint pairs (0,1),(1,0), giving total I1=1/4000 and I2=1/6000.
+
+Useful exact consistency relations follow immediately: all metrics are nonnegative; `mean_abs <= rms <= sup_abs`; `I2_total <= sup_abs*I1_total`; swapping the two histories preserves all norms and reverses signed values. Inserting redundant knots on either affine reconstruction leaves every integral and the supremum unchanged. These are implementation checks, not new physical acceptance criteria.
+
+The algorithm first validates each coordinate array and selected observable arrays. Set A,B as above; initialize one bracket pointer per history at A. Evaluate both histories at A, recording initial differences and maxima. At each iteration choose the minimum of B and the next unconsumed knot of each history. Evaluate all k observables there by convex interpolation in the current brackets; update maxima and analytic integrals from the previous endpoint. Advance each pointer whose next knot equals the chosen endpoint; coincident knots advance both. Stop at B, recording final differences. A pointer advances at most its input length, and each merged segment is processed once: O(k(n+m)) work. The sweep stores two bracket indices, coordinates, prior differences and per-observable accumulators/witnesses: O(k) auxiliary storage. No sorted union array, Fraction copy or list of all segment contributions is needed.
+
+For floating-point implementation use exact coordinate equality for merges, exact source values at their own knots, and convex interpolation weights in [0,1]. Avoid an unconditional `q-p` interpolation when the endpoint values are large. Determine opposite signs by comparisons, not by multiplying p*q. Integrals may use scaled endpoint values and streaming compensated summation; the implementation must reject nonfinite arithmetic or results rather than write NaN/Infinity. Squared norms can overflow the representable range even when input values are finite; a typed diagnostic failure is acceptable for that explicit arithmetic domain. These representability checks add no data clipping or tolerance to the physical invariants. Production outputs identify binary64 arithmetic and do not contain an invented arithmetic error bound.
+
+R5 establishes the exact-arithmetic theorem and bounded-memory algorithm. Independent symbolic checks and actual fixture outcomes are still recorded in R6/R7 before adoption.
