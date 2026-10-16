@@ -1,0 +1,126 @@
+{
+  "contract_id": "R9_UNIT7_LI_E1_RESPONSE_A2_v1",
+  "status": "FROZEN_FOR_BOUNDED_IMPLEMENTATION",
+  "theory": "spec/LI_E1_RESPONSE_ADDENDUM.md",
+  "parent_contract": "R9_UNIT7_LI_PHOTO_v1",
+  "parent_contract_unchanged": true,
+  "requested_authority": "Astra",
+  "observed_model": "UNKNOWN",
+  "inputs": {
+    "E1_lines": {
+      "path": "/workspace/scratch/37bc4acea758/r9_unit6_parallel_20261016/results/laneB/twophoton_E1_lines.csv",
+      "bytes": 557874,
+      "sha256": "71d33288fc03abdded0ce88f8f51316d078997ae5fc1453f490c93700d9893f0"
+    },
+    "mixtures": {
+      "path": "/workspace/scratch/37bc4acea758/r9_unit6_parallel_20261016/inputs/laneB/cascade_mixture.json",
+      "bytes": 21906,
+      "sha256": "cb58e12cad09bcc61d4bb15370496a90b88ef17d7113442cd7bb5eecacc9c2b8"
+    },
+    "A1_response": {
+      "path": "/workspace/scratch/37bc4acea758/r9_unit7_physical_bridges_20261016/results/laneA/li_photo_response.csv",
+      "bytes": 187159,
+      "sha256": "bd38f6337cafc1b3cebf1149a5f4bc5960b88276051ae74a194eba3731834595"
+    },
+    "A1_source_moments": {
+      "path": "/workspace/scratch/37bc4acea758/r9_unit7_physical_bridges_20261016/results/laneA/li_photo_source_moments.csv",
+      "bytes": 26196,
+      "sha256": "698efe0f4f5dfa3d6a0e7e86b2b0e0ce447dc42028abc9e62f8e93995fdb914a"
+    },
+    "A1_contract": {
+      "path": "/workspace/scratch/37bc4acea758/r9_unit7_physical_bridges_20261016/spec/LI_PHOTO_CONTRACT.json",
+      "bytes": 6113,
+      "sha256": "2428928d7e5f2d95254a97e0332492c03d13ac7dc3c22c1208e97ae257a253bf"
+    },
+    "provider": {
+      "path": "/workspace/scratch/37bc4acea758/r9_unit7_physical_bridges_20261016/inputs/verner/phfit2.f",
+      "bytes": 209916,
+      "sha256": "8df982535a4a2b952e33ca2ffb6d81600e156d7373fbf547a0c0170c1cecc296"
+    },
+    "A1_reused_kernel_driver": {
+      "path": "/workspace/scratch/37bc4acea758/r9_unit7_physical_bridges_20261016/code/li_photo_driver.py",
+      "bytes": 15398,
+      "sha256": "2851dabdffb35c6912e8f7de20f2db01390690caa2fa8cab6031d413d5fa09b7"
+    }
+  },
+  "expected": {
+    "mixtures": 32,
+    "E1_rows": 6608,
+    "E1_max_photon_eV": 121.60088228541453,
+    "response_rows": 1440
+  },
+  "components": [
+    "E1",
+    "continuum",
+    "combined"
+  ],
+  "bands": [
+    "sub_Lyman",
+    "upper_old",
+    "extension",
+    "covered_total",
+    "full_total"
+  ],
+  "shells": [
+    "1s",
+    "2s",
+    "total"
+  ],
+  "response_fields": [
+    "G_over_J_m2",
+    "W_abs_over_J_J_m2",
+    "K_primary_over_J_J_m2",
+    "Q_threshold_over_J_J_m2",
+    "X_core_over_J_J_m2"
+  ],
+  "continuum_selection": {
+    "quadrature_nodes": 256,
+    "authoritative": true
+  },
+  "line_weights": "photon_count already mixture-weighted; sum every transition row once",
+  "canonical_boundaries_eV": [
+    5.392,
+    13.6,
+    64.39
+  ],
+  "boundary_ownership": "left closed/right open except final support cap;64.39 belongs extension and PH1 branch",
+  "cap": "max(actual E1 line maximum,Delta) per mixture;never clip E1 at Delta",
+  "flux": "same J=1 precursor-equivalent m^-2 s^-1 as A1",
+  "numerics": {
+    "method": "finite weighted line sums plus stored continuum",
+    "extra_numerical_seconds_max": 5,
+    "threads_max": 1,
+    "rerun_A1": false,
+    "new_quadrature": false,
+    "independent_new_range_check": "decimal/log-form PH1 partials at actual maximum E1 energy"
+  },
+  "tolerances": {
+    "pure_sum_and_algebra_rtol": 1e-11,
+    "source_combined_rtol": 1e-08,
+    "source_floor_photons_or_eV": 1e-14,
+    "area_floor_m2": 1e-35,
+    "energy_area_floor_J_m2": 1e-53,
+    "new_range_formula_rtol": 1e-11,
+    "new_range_formula_floor_Mb": 1e-30
+  },
+  "owned_paths": [
+    "code/li_e1_response.py",
+    "tests/test_li_e1_response.py",
+    "results/laneA2/*",
+    "docs/LI_E1_RESPONSE_IMPLEMENTATION.md",
+    "evidence/LI_E1_RESPONSE_EXECUTION.json"
+  ],
+  "required_results": [
+    "li_completed_source_response.csv",
+    "li_completed_source_moments.csv",
+    "li_completed_source_summary.json",
+    "li_e1_tests.json"
+  ],
+  "read_only_reuse": [
+    "code/li_photo.py",
+    "code/li_photo*",
+    "results/laneA/*"
+  ],
+  "claim_scope": "completed E1+two-photon smooth direct-absorption and primary-kinetic response;no heat/Auger/charge yield claim",
+  "stop_rule": "one finite-sum execution plus focused checks within5s;return concrete failure or results for scoped review;no A1 rerun"
+}
