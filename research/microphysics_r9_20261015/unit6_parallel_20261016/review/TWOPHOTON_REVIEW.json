@@ -1,0 +1,68 @@
+{
+  "reviewer": {
+    "role": "independent scientific reviewer",
+    "requested_model": "Astra high",
+    "observed_runtime_model": "UNKNOWN"
+  },
+  "review_method": "Read frozen theory/contracts, implementation and focused tests; inspect preserved raw numerical outcomes and recompute summary comparisons from existing outputs. No numerical suite, quadrature or benchmark rerun.",
+  "implementation_edits": false,
+  "findings": [],
+  "repair_authorizations": [],
+  "physical_H_actions": 0,
+  "NCP_actions": 0,
+  "actual_checkpoint_execution": "NOT_RUN",
+  "actual_refinement": "HOLD",
+  "lane": "TWOPHOTON",
+  "decision": "PASS_SCOPED_LOCAL_IMPLEMENTATION",
+  "scope": "Fit-based isolated spontaneous2s completion of32 actual fixed-shell E1 mixtures and conditional covered-range LiI response coefficients.",
+  "implementation_checks": [
+    "C kernel implements the exact frozen shape, analytic beta normalizer,2-photon count factor,energy Jacobian,8.229352*r_mu*Z^6 rate and tau=1/A.",
+    "Saved driver output has8 species,32 mixtures and160 time rows; elapsed time starts at prepared terminal reservoir. Finite decay uses expm1 and analytic infinity has explicit flag and blank CSV time.",
+    "Bin integrated count/energy moments, E1 line yields and four source bands retain total source. LiIII above64.39eV is retained in uncovered moments. Cross-section kernel returns NaN above range and driver clips response intervals.",
+    "C Gauss-Legendre results are compared against independent Python/SciPy quadrature raw references, with scale-appropriate SI tolerances. All64/128/256 levels are retained and128/256 comparisons are performed.",
+    "Flux convention, fit physical-accuracy limitation and reduced-mass electron-relative dipole approximation are present in summary metadata."
+  ],
+  "observed": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "driver_seconds": 0.835452710998652,
+    "test_seconds_reported": 0.082,
+    "actual_mixtures": 32,
+    "species": 8,
+    "max_saved_vs_cascade_probability_difference": 0.0,
+    "max_energy_closure_eV": 1.4210854715202004e-14,
+    "normalization_256": 1.000000000000132,
+    "mean_y_256": 0.500000000000066,
+    "max_relative_C_vs_saved_independent_Li_reference": {
+      "Gamma": 1.3988810110276972e-14,
+      "H": 3.552713678800501e-14,
+      "Abs": 2.6867397195928788e-14
+    },
+    "infinite_mass_H_A_s_inverse": 8.229352,
+    "infinite_mass_HeII_A_s_inverse": 526.678528,
+    "infinite_mass_LiIII_A_s_inverse": 5999.197608
+  },
+  "packaging_note": "Results reside in results/laneB and immutable copies in inputs/laneB. This differs from generic output paths in initial contract but is not a scientific model change; controller handles path authorization/publication.",
+  "claim_ceiling": [
+    "Literature-fit spectrum accuracy remains approximately1percent over nearly full range, not1e-8 physical certification.",
+    "Mass scaling is the declared reduced-mass Coulomb approximation, not full recoil/QED isotope lifetimes.",
+    "Conditional incident-flux response coefficients are not a locally inferred radiation field or cosmological transport calculation.",
+    "No higher-state coherence, collisions, stimulation, inverse absorption or recombination source reconstruction."
+  ],
+  "next_action": "Publish scoped completion code, actual-mixture outputs and conditional response coefficients with declared approximation metadata.",
+  "reviewed_files_sha256": {
+    "spec/TWOPHOTON_CONTRACT.json": "03007372cc971331df762f3a181f131202c7b35c7cd47b9891c24e7b09c7db9e",
+    "code/twophoton_kernel.c": "99b99dd01adc3f27323f06a7d5f7200698cc2a3b77bfbfe3d51748f9040c49e0",
+    "code/twophoton_driver.py": "899bb4cab924ba6097b0cc4ef549963ac261eacf1f2c336c450be54f8f080222",
+    "tests/test_twophoton.py": "570ea9203d634e4d723206aea274ec9aea8f02de09519cf5bbc132458ed0e886",
+    "results/laneB/twophoton_kernel.so": "6273c60fd8d551cb9186684fade159cf05d0cc15ecd11163c2f352b5363beaff",
+    "results/laneB/twophoton_summary.json": "019910c68d1a9582164bbc45cc3c296195a10634f66a7c6bd2925b38d39111f5",
+    "results/laneB/twophoton_test_results.json": "816c8dc9c1c4fbc532296dfa408f0b0e5fa268c8fa585f846ea8cc22811532d0",
+    "results/laneB/twophoton_moments.csv": "dea31a8b15f7c103378659248326d9c6a2bccacf5ea6612da2e2245d3729b127",
+    "results/laneB/twophoton_LiI_response.csv": "a35ed9d8401f7b233c8ab1d0b1a274d8e3dba9defebf0703fd43167851991dff",
+    "results/laneB/twophoton_bands.csv": "c12b749f799800ecf35e43f88e95bf999117b07614f360f614621edc237ed759",
+    "results/laneB/TWOPHOTON_EXECUTION.json": "0d72ddfd8ac22de8ca8b6dcd7b99011ee6537f01264cb34bf3d05cd438e44731",
+    "results/laneB/test.log": "94ee251ac9da29f1f328d63143ae4011136f5416fddc7710bd6fb55bee2169d0"
+  }
+}
