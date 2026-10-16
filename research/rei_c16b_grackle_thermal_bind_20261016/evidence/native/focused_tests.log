@@ -1,0 +1,109 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_driver.rs:311:18
+    |
+311 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+311 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+311 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/root/REI_C16B_GRACKLE_SCRATCH_20261016/native/rust/rei_microphysics)
+    Finished `release` profile [optimized] target(s) in 4.67s
+     Running tests/axbi_covariant_driver.rs (REI_C16B_GRACKLE_SCRATCH_20261016/native/rust/rei_microphysics/target/release/deps/axbi_covariant_driver-98f8797e6204a5d0)
+
+running 7 tests
+test actual_run_resume_rejects_changed_config_and_source_before_stepping ... ok
+test checkpoint_v4_roundtrips_all_arrays_and_rejects_projected_v2 ... ok
+test number_only_mutation_is_rejected_instead_of_inventing_spectrum ... ok
+test output_support_and_moments_use_local_energy ... ok
+test reference_moments_do_not_remap_and_work_uses_actual_energy ... ok
+test repeated_transport_cannot_create_heii_photo_events_below_threshold ... ok
+test transport_resolution_is_separate_and_be_stage_has_one_event_owner ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/axbi_covariant_transport.rs (REI_C16B_GRACKLE_SCRATCH_20261016/native/rust/rei_microphysics/target/release/deps/axbi_covariant_transport-d0bd3b75e9783a96)
+
+running 7 tests
+test backward_euler_node_survival_number_energy_gamma_and_heat_share_one_owner ... ok
+test broad_positive_spectrum_uses_threshold_cut_nodes_instead_of_centroid ... ok
+test exact_fit_threshold_delta_redshifts_without_false_heii_ionization ... ok
+test near_endpoint_broad_support_stays_positive_and_records_tail_control ... ok
+test redshifted_inert_photons_are_retained_and_history_memory_is_fixed ... ok
+test source_subcells_close_number_energy_and_anisotropic_reflection ... ok
+test unsupported_source_and_malformed_support_reject_transactionally ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/axbi_jacobian_parallel.rs (REI_C16B_GRACKLE_SCRATCH_20261016/native/rust/rei_microphysics/target/release/deps/axbi_jacobian_parallel-91f0cba266a567d1)
+
+running 7 tests
+test actual_stage_states_ledgers_decisions_match_and_failure_does_not_commit ... ok
+test failures_return_lowest_column_and_charge_discarded_work ... ok
+test fewer_than_eight_credits_retain_serial_prefix_exact_boundary_is_bounded ... ok
+test flag_is_explicit_opt_in_and_rejects_invalid_values ... ok
+test negative_fallback_stays_inside_each_column_and_matches_bits ... ok
+test positive_columns_preserve_residual_and_jacobian_bits ... ok
+test worker_panic_merges_every_started_debit_and_denial_starts_nothing ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/axbi_transport_parallel.rs (REI_C16B_GRACKLE_SCRATCH_20261016/native/rust/rei_microphysics/target/release/deps/axbi_transport_parallel-ec626ba3954a5730)
+
+running 6 tests
+test exact_zero_heii_events_and_invalid_input_priority_do_not_depend_on_width ... ok
+test lowest_index_error_is_deterministic_and_pool_survives_failure ... ok
+test original_scalar_new_serial_and_parallel_prepare_are_bitwise_equal ... ok
+test persistent_workers_preserve_index_order_and_reuse_fixed_threads ... ok
+test production_driver_serial_threaded_states_ledgers_and_decisions_match ... ok
+test thread_configuration_is_bounded_explicit_and_defaults_to_one ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.27s
+
+     Running tests/igm_foundation.rs (REI_C16B_GRACKLE_SCRATCH_20261016/native/rust/rei_microphysics/target/release/deps/igm_foundation-a245a96da877ce24)
+
+running 9 tests
+test adapters_reject_invalid_and_unrepresentable_values ... ok
+test background_normalization_and_geometry ... ok
+test eos_rejects_subnormal_denominator_before_legacy_rounding ... ok
+test gas_boundaries_eos_and_adiabatic_law ... ok
+test limiting_backgrounds_and_zero_helium ... ok
+test photon_units_and_exact_transport ... ok
+test redshift_roundtrips_declared_coordinate_endpoints ... ok
+test rejects_bad_background_parameters_and_coordinates ... ok
+test rejects_bad_gas_and_extreme_arithmetic ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/igm_rates.rs (REI_C16B_GRACKLE_SCRATCH_20261016/native/rust/rei_microphysics/target/release/deps/igm_rates-b01b9710358ee9a2)
+
+running 4 tests
+test independent_original_c_parity_all_selected_channels ... ok
+test overlapping_source_values_match_existing_raw_provider ... ok
+test source_low_temperature_branches_are_explicit ... ok
+test temperature_admission_is_separate_and_strict ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/igm_thermal.rs (REI_C16B_GRACKLE_SCRATCH_20261016/native/rust/rei_microphysics/target/release/deps/igm_thermal-f4ad007bd14f0c8a)
+
+running 11 tests
+test chemistry_charge_and_energy_close_with_external_photo ... ok
+test cmb_absolute_normalization_and_proper_energy_equivalence ... ok
+test cmb_signed_and_low_temperature_source_artifacts_visible ... ok
+test correct_density_powers_and_single_recombination_owners ... ok
+test eos_directional_derivative_includes_changing_particles ... ok
+test forged_states_and_nonfinite_photo_inputs_are_rejected ... ok
+test helium_simplex_boundary_uses_validated_sum_without_clipping ... ok
+test invalid_inputs_fail_without_state_mutation ... ok
+test pure_species_and_no_helium_are_valid ... ok
+test recovered_eos_temperature_is_strictly_admitted_without_endpoint_projection ... ok
+test zero_electrons_is_valid_and_only_expands ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

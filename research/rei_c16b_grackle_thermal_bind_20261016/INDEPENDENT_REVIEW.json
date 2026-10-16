@@ -1,0 +1,178 @@
+{
+  "decision": "PASS_BOUNDED_NATIVE_GRACKLE_RR_CI_THERMAL_BIND",
+  "date_utc": "2026-10-16T00:27:32.822098+00:00",
+  "scope": "Independent final review of source-bound short local photon/gas coupling, measured first-order convergence in three required families, tested photon-grid refinement axes, atomic rollback/source ownership, and limited native evolving-background execution smoke.",
+  "blockers": [],
+  "review_mode": {
+    "single_final_review": true,
+    "implementation_edits": false,
+    "scientific_campaign_reruns": false,
+    "publication_or_backup_performed_by_reviewer": false,
+    "role": "Assigned independent scientific reviewer; no separate claim about runtime model identity."
+  },
+  "source_identity": {
+    "research_base": "710f08b2bebaefbd6a28690d450d759877053ebb",
+    "native_commit": "a42fd7c9849306074a9f7a262628cd852ce34dea",
+    "native_crate_files_independently_compared_to_git_show": 135,
+    "mismatches": 0,
+    "original_rhs_and_rates_unchanged": true,
+    "research_module_matches_scratch_copy": true,
+    "point_binary_provenance": "Reference metadata distinguishes the earlier point-run binary from the current post-pulse-repair binary; native RHS ownership is unchanged."
+  },
+  "scientific_findings": [
+    "Original Driver::chemical_stage owns endpoint-temperature native rates, implicit gas solve, PreparedAbsorption backward-Euler photon survivors, and integrated reaction/thermal ledgers. The wrapper supplies atomic clone/validate/commit and rejection; no manufactured RR/CI coefficients, duplicate photon sink, clipping, or alternate native cooling law was found.",
+    "The reference uses the literal C Grackle rate subset plus independent Python EOS, photo cross sections, species/thermal equations and Radau integration. Invariant-zero photon omission and positive source-free logarithmic coordinates preserve the same ODE.",
+    "Binding uses physical thresholds distinct from fit thresholds. Native Case A, DR decomposition, collisional excitation, free-free, signed CMB exchange and escape retain their original owners.",
+    "Pulse injection rebuilds supported fixed-energy delta rays canonically with U=q*N, rejecting unsupported occupied layouts and passive stocks rather than dropping them. Actual before/after inventories own source N/E; requested-versus-represented differences are constrained to roundoff.",
+    "Invalid timestep and a failure after source deposition leave the accepted physical bundle unchanged. The test-only forced rejection followed by two accepted halves matches clean two-half execution bitwise, including source cursor two.",
+    "Native cumulative and transaction ledgers use physical gross inventories and integrated transfers; no growing timestep-count tolerance was found. Source cohort sums differ from cumulative floating sums only by roundoff."
+  ],
+  "verified_evidence": {
+    "native_audit": {
+      "checks": 203,
+      "failures": 0,
+      "status": "PASS",
+      "authoritative_pulse_paths": "evidence/native/pulse_repair; verified in final tests_native.py"
+    },
+    "original_native_focused_tests": {
+      "passed": 51,
+      "failed": 0,
+      "suite_counts": [
+        7,
+        7,
+        7,
+        6,
+        9,
+        4,
+        11
+      ]
+    },
+    "independent_point_comparison": {
+      "states": 60,
+      "checks": 4980,
+      "failures": 0,
+      "max_relative_error": 7.560317720113775e-15
+    },
+    "review_raw_native_scan": {
+      "histories": 46,
+      "saved_rows": 3505,
+      "all_admissible": true,
+      "includes_preserved_initial_pulse_outputs": true,
+      "max_cumulative_residual_divided_by_1e_minus_10_gross": 0.9107711017577137,
+      "max_transaction_residual_divided_by_1e_minus_10_gross": 0.019696139651470202
+    },
+    "required_temporal_families": {
+      "recomb8000": {
+        "finest_steps": 128,
+        "endpoint_and_sampled_max_error": 3.3371574806221016e-05,
+        "observed_order": 0.9987775067534095
+      },
+      "collision1e5": {
+        "finest_steps": 128,
+        "endpoint_and_sampled_max_error": 7.01140526586096e-05,
+        "observed_order": 0.9992678537072246
+      },
+      "mixed1e4": {
+        "finest_steps": 1024,
+        "endpoint_error": 4.0956911756575925e-05,
+        "max_own_grid_error": 0.0028037166264956027,
+        "max_frozen_33_time_error": 0.002722917170599441,
+        "endpoint_order": 1.0018761727531853,
+        "frozen_time_order": 0.9839095111552464,
+        "n512_own_grid_error_preserved": 0.005553844812862409,
+        "n512_frozen_time_error_preserved": 0.00538543398261858
+      }
+    },
+    "reference_ledgers_independently_recomputed_from_raw": {
+      "cases": 12,
+      "reference_rtol": 1e-10,
+      "max_energy_normalized": 3.511524444268754e-12,
+      "max_photon_normalized": 1.5280136910774893e-11,
+      "max_charge_normalized": 8.139006392297381e-16,
+      "criterion": 1e-10,
+      "all_pass": true,
+      "baseline_rtol_1e_minus_9": "Marginal photon ledger failures retained; not used as the accepted reference."
+    },
+    "born_cohort_refinement": {
+      "angular_finest_neighbor_error": 0.00021864228637241112,
+      "spectral_finest_neighbor_error": 1.753173984e-13,
+      "transport_finest_neighbor_error": 0.0030439570913923745,
+      "decreasing_and_below_0p005": true,
+      "interpretation": "Endpoint observable differences on tested axes for a prescribed native-redshifted photon initial condition; local isotropic controls labeled separately."
+    },
+    "repaired_pulses": {
+      "accepted_steps_each": 32,
+      "emission_cohorts_each": 16,
+      "cursor_each": 16,
+      "source_number_each": 0.02,
+      "source_energy_ev_per_H_approximately": 0.76,
+      "max_roundoff_fraction_of_128eps_gross": 0.003493651137475137,
+      "early_endpoint_reference_error": 0.001458521435314131,
+      "delayed_endpoint_reference_error": 0.0032969352247693177,
+      "whole_interval_accuracy_admitted": false
+    },
+    "dynamic_smoke": {
+      "q_ref": [
+        0,
+        0.1,
+        -0.1
+      ],
+      "accepted_steps_each": 3,
+      "attempts_each": 63,
+      "rejects_each": 18,
+      "rhs_each": 465,
+      "interpretation": "Original native MD14, geometry work and signed backgrounds execute with ledgers; tiny scale-factor advance only, no history accuracy inference."
+    },
+    "resources": "Observed campaigns and reference runs stayed well inside 8 GiB and 300 s bounds; compile scripts limit two jobs. Reference maximum observed RSS 299468 KiB; native campaign maximum observed RSS 5592 KiB."
+  },
+  "bounded_authorizations_and_repairs": [
+    "Use unchanged public Driver chemical_stage at native fixed a=.1 density/helium/CMB instead of introducing another Newton solver.",
+    "Omit exactly invariant zero photon modes and use logarithms for positive source-free Radau modes without clipping or tolerance relaxation.",
+    "Add prescribed native MD14 birth-cohort geometry mapping for meaningful angular refinement; reanchor local gas/ledger initial condition explicitly.",
+    "Extend only mixed temporal refinement through 1024 after 512 still failed the unchanged .005 trajectory criterion.",
+    "Canonicalize the pulse delta representation and rerun affected pulse/retry comparisons; preserve first support-domain failure.",
+    "Correct audit evidence paths to authoritative pulse_repair outputs; final audit-only rerun passes 203 checks.",
+    "Add bounded three-step native dynamic/source/work smoke for zero and signed geometry."
+  ],
+  "limitations_and_nonclaims": [
+    "Backward Euler remains first order. Three required smooth families pass the frozen sampled error/order gates; no universal continuous-time error bound is established.",
+    "The original pulse outputs had 76/68 accepted substeps due representation-failure halvings. Canonical repair produces 32 each, so their trajectories change through a coarser BE grid, not merely roundoff. Original outputs remain historical evidence.",
+    "Coarse pulse, no-helium, signed and strong-absorption controls do not satisfy the full-interval .005 accuracy target; strong absorption endpoint error is about .01219. Their evidence supports admissibility/ownership only.",
+    "Stiff ten-timescale steps establish finite admissible conservative execution, not stiff trajectory accuracy.",
+    "Emission-cohort ages describe accepted source deposition; they do not track surviving photon cohort ages.",
+    "Fixed-a local trajectories do not represent cosmological evolution despite their physical proper-time durations. The native signed-background three-step smoke is not convergence or full-history evidence.",
+    "Born-cohort geometry construction is a prescribed photon initial condition, not a coupled gas trajectory from z20 to z9.",
+    "Finite angular/spectral/transport comparisons do not establish continuum convergence or validate the astrophysical Case A/UV spectrum choice.",
+    "Fresh cloud restores and publication are outside this reviewer action. restore_verify.sh was read for offline, fresh-root source rebuilding; parent owns actual execution and receipts."
+  ],
+  "independent_review_artifacts": [
+    "/root/REI_C16B_GRACKLE_REVIEW_CHECK_20261016.py",
+    "/root/REI_C16B_GRACKLE_REVIEW_DATA_20261016.json",
+    "/root/REI_C16B_GRACKLE_REFERENCE_LEDGER_REVIEW_20261016.json"
+  ],
+  "review_commands_and_methods": [
+    "Read new research Rust adapter/campaign, Python+C reference, scripts, frozen contract, theory and evidence summaries/raw histories.",
+    "Compared 135 exported native crate files against git show a42fd7c9849306074a9f7a262628cd852ce34dea:<path>; zero mismatches.",
+    "/root/REI_C16B_NATIVE_20261016/venv/bin/python /root/REI_C16B_GRACKLE_REVIEW_CHECK_20261016.py",
+    "Independently recomputed physical error component maxima from raw native histories and saved Radau solutions/dense polynomials; independently recomputed all saved tight-reference energy/photon/charge ledger residuals with math.fsum.",
+    "Read final native audit after pulse_repair evidence-path correction: 203 checks, zero failures. No old scientific campaign rerun during review."
+  ],
+  "review_helper_notes": "Initial review-only helper attempts required old-cache dense-metadata fallback and NumPy JSON serialization fixes; neither altered scientific inputs nor evidence. A final summary-list introspection also encountered a harmless type assumption; final verdict uses direct artifact reads.",
+  "reviewed_file_sha256": {
+    "native_bind.rs": "0e2c3e12d13ef5cc173112054767302ecb3021c70a306a76987f7a30729cdca6",
+    "native_campaign.rs": "0c6205c11e026053651f4c8d36df77696e697eb5b881490292485d9bbfb4b19f",
+    "reference.py": "9062d0784bb3e0da528294168196f4bdab9d18c427f10d14c2c877b0c2de7b49",
+    "reference_c_bridge.c": "f2f3c214fd3cf01b3e8608268c7d8d37c6ad1525d9859e10946879173ac4b792",
+    "tests_native.py": "a86921a5527b51ba257b27dc88d52ee0fc07bd3db8f80653568ed40372521766",
+    "run_native.sh": "3b54eca4bdafdb104ca320c34e236f798171b276bf36bca8790e822f52223cac",
+    "run_reference.sh": "bf2dc34da0ff2cbcfd748281f519f73fedb26d2e9e5f70ffbf06d29adf791f04",
+    "restore_verify.sh": "ec2dd8fca37c7075173ac8f2d6fea6462f6eac728e06e603e8672b6645bf8658",
+    "CONTRACT.md": "a151d90efa20bb027d8c4b25899d8ecd7421fee15fdea5512f950301f24aaf7d",
+    "THEORY_KO.md": "8c8f699f65293bb07323eb9cb002143701570f029ade3ed8b824bd1f207d65bb",
+    "evidence/native/mechanical_summary.json": "1d509d92f9a87b2cf2d3ec35cda4344d5b113f513088f415123272c6ef595eee",
+    "evidence/native/execution_summary.json": "ce0d94e51bed691dc8320796b4ebd2814aa9e2fb276847ca3e5100e3a507f031",
+    "evidence/reference/execution_summary.json": "853a8363f60ea7111201f7000c7c52f2c0e8979da6c1eebbe3510b4c3c782792",
+    "evidence/reference/point_summary.json": "a8da4a518b224952894c344fa5d5ab8000472d84accd2c8682af4f520cca3395",
+    "evidence/reference/trajectory_summary.json": "3ebf7e8b565c9a264da65f1b549c8aadf5e78a437751fc01b64fc1510a49c9a7"
+  }
+}
