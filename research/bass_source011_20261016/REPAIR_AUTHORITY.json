@@ -1,0 +1,78 @@
+{
+  "schema": "rei.targeted-repair-authority/1",
+  "task_id": "SOURCE011_ACCEPTED_STAGE_RJ_SUFFIX_001",
+  "decision": "APPROVED_ONE_NATIVE_RHS_CAP_REPAIR_CYCLE",
+  "written_utc": "2026-10-16T02:33:31.806151+00:00",
+  "authority": "Independent scientific reviewer source007_independent_review; root explicitly supplied two separately charged supplementary command allocations",
+  "reason": "Frozen additional native RHS3000 limit currently checked only around entire comparison and may overshoot. Repair exact per-call budget enforcement before the only probe.",
+  "prior_review": "INDEPENDENT_IMPLEMENTATION_REVIEW.json",
+  "preserve_initial_review": "Retain initial HOLD evidence unchanged in raw or repair history before final review update; no replacement of first finding or original receipts.",
+  "allowed_paths": [
+    "rust/rei_microphysics/src/axbi_driver.rs",
+    "rust/rei_microphysics/examples/bass_nonlinear_stage_probe.rs",
+    "rust/rei_microphysics/tests/axbi_bass_stage_observer.rs",
+    "research/bass_source011_20261016/**"
+  ],
+  "implementation_contract": [
+    "Add optional diagnostic native RHS ceiling to ChemicalStageObserver, absent by default. Probe sets it to checked imported_rhs+3000 after pinned import. Preserve original config bytes and DriverConfig numerical fields.",
+    "Compute effective native ceiling as min(config.max_rhs, optional observer ceiling). Apply it at every native residual evaluation BEFORE increment/start and pass the same effective ceiling to native jacobian_columns, including its forward/backward fallback. Use existing per-call counter ownership and merge-before-error semantics.",
+    "Default observer-free path retains config.max_rhs and identical solver equations/acceptance/arithmetic. Observer FD evaluations continue to use their separately charged1024 limit; do not mix native and observer accounts.",
+    "Keep current suffix pre/post guards as redundant diagnostics if desired. No changes to native tolerance, source/rates/context/geometry/partition/EOS, checkpoint bridge acceptance, branch logic or physical state commit.",
+    "Add one targeted forced-small-native-ceiling regression. Starting from pinned state, set ceiling to imported native RHS+2; assert exactly2 additional native calls, error before any third evaluation, unchanged physical gas/six radiation arrays/ledgers/a, retained actual attempts/cost counters and no accepted step. Existing relevant observer parity/cap/bridge controls may run in same focused target because evaluator budget routing is modified.",
+    "Record old/new source, blob and binary identities; old source1ba9a43f2687922a73b2a00bcfce3ab075241591f1041cbfb101084df50c71b8 and old binary14c896921f780a728bc155f7afa4fa1b6b255bae5d6a3567ab1cbc9429e77528 remain pre-repair evidence.",
+    "Do not add H/s Rust repair. Wrapper may explicitly report source-provider evaluation or inference with its basis. No other changes."
+  ],
+  "commands": [
+    {
+      "ordinal": 3,
+      "argv": [
+        "cargo",
+        "test",
+        "--test",
+        "axbi_bass_stage_observer",
+        "--manifest-path",
+        "rust/rei_microphysics/Cargo.toml",
+        "--target-dir",
+        "research/bass_source011_20261016/target",
+        "-j2",
+        "--",
+        "--test-threads=1"
+      ],
+      "max_wall_seconds_including_termination": 150
+    },
+    {
+      "ordinal": 4,
+      "requires": "command3 exit0 and all focused controlsPASS",
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "bass_nonlinear_stage_probe",
+        "--manifest-path",
+        "rust/rei_microphysics/Cargo.toml",
+        "--target-dir",
+        "research/bass_source011_20261016/target",
+        "-j2"
+      ],
+      "max_wall_seconds_including_termination": 150
+    }
+  ],
+  "resources": {
+    "pinned_toolchain": "1.94.1",
+    "AS_bytes": 8589934592,
+    "jobs": 2,
+    "test_threads": 1,
+    "original_invocations_consumed": 2,
+    "original_wall_seconds": 16.416627838043496,
+    "supplementary_invocations_max": 2,
+    "total_invocations_max": 4,
+    "supplementary_combined_wall_seconds_max": 300,
+    "all_build_test_wall_seconds_max": 600,
+    "absolute_deadline_utc": "2026-10-16T02:50:17.774070Z",
+    "accounting": "Explicit cap augmentation for one repair; original2 retained, no reset or claim original2-invocation maximum met."
+  },
+  "stopping_rule": "First repair test/build failure stops with raw receipt. No further edit/retry/command automatically authorized. No probe until narrow repaired-diff/actual-receipt reviewPASS. Original deadline overrides allowances.",
+  "pass_transition": "After narrow repaired-artifact implementationPASS, copy reviewed nonlinear module with DRIVER_BLOB-only migration to actual final producer blob, then execute exactly the already frozen one<=60s suffix and one<=30s analysis. Wrapper must explicitly distinguish vendor referenceLOCAL_TARGET1e-5 from actual producer5e-6. Fresh result review before publication of new actual diagnostics.",
+  "claim_ceiling": "Unchanged frozen SOURCE011 claim ceiling; resource enforcement only, no new science admission."
+}

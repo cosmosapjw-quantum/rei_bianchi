@@ -1,0 +1,57 @@
+{
+  "schema": "rei.scoped-independent-implementation-review/1",
+  "task_id": "SOURCE011_ACCEPTED_STAGE_RJ_SUFFIX_001",
+  "decision": "HOLD_ONE_TARGETED_NATIVE_RHS_CAP_REPAIR",
+  "reviewed_utc": "2026-10-16T02:32:15.515165+00:00",
+  "reviewer": {
+    "agent": "source007_independent_review",
+    "independent_of_implementation": true,
+    "requested_runtime": "gpt-6-astra/high",
+    "observed_runtime": "NOT_INDEPENDENTLY_OBSERVED",
+    "write_scope": "this review file only"
+  },
+  "observed_identity": {
+    "driver_sha256": "ca9c4ef8aaea00230f39e002e7f38d8f75f04f69866df8f62846573cbd819e21",
+    "driver_git_blob": "350a55d8761ebae7cba8322299f762ae172c7690",
+    "compiled_source_sha256": "1ba9a43f2687922a73b2a00bcfce3ab075241591f1041cbfb101084df50c71b8",
+    "binary_sha256": "14c896921f780a728bc155f7afa4fa1b6b255bae5d6a3567ab1cbc9429e77528"
+  },
+  "observed_tests_build": {
+    "test_status": "3_PASS",
+    "build_exit_code": 0,
+    "invocations_consumed": 2,
+    "wall_seconds": 16.416627838043496,
+    "probe_invocations": 0,
+    "analysis_invocations": 0
+  },
+  "focused_semantic_mapping": {
+    "decision": "PASS",
+    "old_driver_blob": "2a16fa8d898588d859eff2c7750a5f8496cadd0c",
+    "reviewed_new_driver_blob": "350a55d8761ebae7cba8322299f762ae172c7690",
+    "module_sha256": "b556311ffe86efc019caebb0fdcf1ec4ca80d26b363c9b2ebb163e3482dc76d7",
+    "reasons": [
+      "ResidualContext and its prepared-absorption residual R=y-yold-dt*f, state order, proper densities and energy conversion unchanged.",
+      "Observer captures x and the residual from that converged iterate after native residual/domain/absorption acceptance. FD columns evaluate a cloned immutable identical context at that x with original perturbation/fallback; no preceding Newton Jacobian reused.",
+      "Native residual scaling remains diag(1,1,1,max(abs(wold),abs(w),1e-6)); adapter state scaling and EOS use the same state order, fHe and kB units.",
+      "Observer calls are separately charged before evaluation through existing jacobian_columns. Forced observer cap2 retains actual charges and avoids physical commit. Native default methods use None with original solver/acceptance equations.",
+      "Hash-pinned bridge admits only selected two old checkpoint byte identities and verified binding, maps source/locator in memory, and calls ordinary envelope/body/geometry/array checks. Ordinary importer remains strict; stored old bytes unchanged.",
+      "Branch and eventual adaptive disposition are recorded separately; final analysis must select all three chemical stages of final accepted comparison while retaining FULL discarded and FIRST_HALF intermediate roles."
+    ],
+    "migration_allowed": "DRIVER_BLOB-only copy compatible with reviewed producer semantics; final migration must bind whichever driver blob follows approved cap repair. No original module mutation.",
+    "local_target_annotation": "Vendor LOCAL_TARGET=1e-5 is its reference normalization. Actual producer5e-6 must be separately labeled and any ratio reported separately by wrapper, not mislabeled as vendor reference."
+  },
+  "findings": [
+    {
+      "id": "SOURCE011_NATIVE_RHS_CAP_NOT_ENFORCED_PER_CALL",
+      "severity": "CURRENT_PROBE_BLOCKING_RESOURCE_BOUND",
+      "path": "rust/rei_microphysics/examples/bass_nonlinear_stage_probe.rs",
+      "location": "suffix loop native RHS guard before and after adaptive_step_observed",
+      "evidence": "Guard observes delta>=3000 before comparison and delta>3000 afterward. The existing evaluator and production FD helper admit calls up to config.max_rhs=3000000, so a comparison may start residual calls beyond imported_rhs+3000 before the suffix detects overshoot. Expected504 calls from old suffix is not an enforced hard limit.",
+      "minimal_repair": "Install an opt-in diagnostic per-call native RHS ceiling imported_rhs+3000, including residual and native FD/fallback evaluations, preserving original config bytes/default methods/physics and retaining actual charged counters on failure. Add one forced small-native-budget regression verifying no excess evaluation and no physical commit.",
+      "budget": "Original2/2 invocations remain consumed. Additional targeted test/build requires explicit authority supplement; no automatic third command."
+    }
+  ],
+  "next_transition": "Authority supplies bounded repair and any added command allowance -> worker repair and targeted regression/build -> narrow independent recheck -> one existing60s suffix and one30s analysis ifPASS before original absolute deadline. No probe authorized by this HOLD.",
+  "publication": "UNREVIEWED_FINAL_RUST_NOT_AUTHORIZED",
+  "claim_ceiling": "Finite accepted chemical-stage linearized FD diagnostic only; no nonlinear certificate, total adaptive error, sensitivity-cause, convergence order, full history, isotope or Einstein admission."
+}
