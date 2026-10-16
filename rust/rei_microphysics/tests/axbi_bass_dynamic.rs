@@ -137,9 +137,17 @@ fn signed_geometry_redshift_work_uses_physical_inventory() {
     driver.geometry_map(&mut state, to).unwrap();
     let (n1, u1) = driver.photon_inventory(&state);
     let b1 = driver.geometry_point(state.a).unwrap().b;
+    eprintln!("BASS_SIGNED_PHOTON_WORK raw_ev_per_h={:.17e} denominator_ev_per_h={:.17e} work_ev_per_h={:.17e}",state.ledgers.photon_work-(u0-u1),u0.abs().max(u1.abs()),state.ledgers.photon_work);
     assert!(b1 < b0);
     assert!((n1 - n0).abs() < 1e-15);
-    assert!((state.ledgers.photon_work - (u0 - u1)).abs() < 1e-15,"work={} u0={} u1={} diff={}",state.ledgers.photon_work,u0,u1,state.ledgers.photon_work-(u0-u1));
+    assert!(
+        (state.ledgers.photon_work - (u0 - u1)).abs() < 1e-15,
+        "work={} u0={} u1={} diff={}",
+        state.ledgers.photon_work,
+        u0,
+        u1,
+        state.ledgers.photon_work - (u0 - u1)
+    );
     assert!(u1 > 0.0);
 }
 #[test]

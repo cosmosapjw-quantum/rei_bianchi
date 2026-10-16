@@ -1,0 +1,24 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_driver.rs:312:18
+    |
+312 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+312 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+312 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/root/REI_BASS_DYNAMIC_20261016_001/rust/rei_microphysics)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.32s
+     Running tests/axbi_bass_dynamic.rs (rust/rei_microphysics/target/debug/deps/axbi_bass_dynamic-53d76b207b995c88)
+
+running 1 test
+BASS_SIGNED_PHOTON_WORK raw_ev_per_h=0.00000000000000000e0 denominator_ev_per_h=2.99999999999999989e-2 work_ev_per_h=2.94686779368780183e-6
+test signed_geometry_redshift_work_uses_physical_inventory ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.01s
+
