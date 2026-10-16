@@ -13,3 +13,7 @@ The helper and standalone use only Python standard library. Test-only moderate-f
 ## C3 — numerical design
 
 The helper validates arrays without copying, locates the overlap brackets, and streams exact-equality merged knots. Own-knot values bypass interpolation; interior queries use convex weights. Endpoint differences determine the supremum and analytic L1/I2 contributions. Normalized endpoint values avoid unnecessary squaring overflow, and Neumaier sums retain O(k) auxiliary state. Every computed output must be finite. Strict maximum replacement preserves the earliest exact floating tie. Ordinary binary64 rounding and underflow remain within the declared arithmetic scope.
+
+## C4 — execution and resources
+
+Implementation precedes targeted implementation tests, independent rational/science checks, then a bounded 2,000/20,000-knot single-observable synthetic benchmark. The benchmark records CPU, wall and traced auxiliary memory with input arrays allocated before measurement. Native solver runs and physical-history reads are zero. The exact commands and stage owners are in coding_evidence/C4.json. C8 completion hands observed results to the fresh independent reviewer; actual full-data execution belongs to a future owner action under the retained external budget.
