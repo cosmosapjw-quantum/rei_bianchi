@@ -1,0 +1,49 @@
+{
+  "execution_scope": "sandbox direct Radau RR/DR cooling and exact midpoint positive subflows, no native NCP execution",
+  "native_pr150_source_untouched": true,
+  "native_subagent": "NOT_RUN",
+  "parent_commit": "a6fe0e8b1932ddf60496c5a9dbb68c19d6f0851f",
+  "parent_pr": 163,
+  "schema": "rei.v8.dag.progress.1",
+  "stage_selection": [
+    "R5",
+    "C5",
+    "C6",
+    "C8",
+    "C10"
+  ],
+  "stages": {
+    "C10": {
+      "artifacts": [
+        "RESEARCH_V8_KO.md",
+        "CODEX_NCP_HANDOFF_V8_KO.md"
+      ],
+      "next": "native RR-only Rust on NCP via external Codex",
+      "status": "READY_FOR_RESTORATION_AND_DELIVERY"
+    },
+    "C5": {
+      "artifact": "rrdr_sourcefree_v8.py",
+      "next": "C6",
+      "status": "SOURCE_IMPLEMENTED_SMOKE_PASS"
+    },
+    "C6": {
+      "artifact": "test_rrdr_sourcefree_v8.py",
+      "next": "C8",
+      "status": "21_PYTEST_PASS_SANDBOX"
+    },
+    "C8": {
+      "artifacts": [
+        "evidence/C8_REFINEMENT.json",
+        "evidence/C8_STIFF.json"
+      ],
+      "next": "C10",
+      "status": "CONDITIONAL_SECOND_ORDER_PLUS_STIFF_NONUNIFORMITY_MEASURED"
+    },
+    "R5": {
+      "artifact": "THEORY_R5_KO.md",
+      "next": "C5",
+      "status": "DERIVED_SYMBOLIC_CHECKED"
+    }
+  },
+  "whole_source_on_second_order": "HOLD"
+}
