@@ -31,3 +31,7 @@ Six targeted tests passed in one execution (exit0; outer wall0.171708496s). They
 ## C7 — independent cached-oracle comparison
 
 The disjoint harness owner executed two test methods once: seven cached matrix cases (including singular HOLD and generic energy-unit conversion) and five adapter EOS/label cases passed. The scalar BE cancellation evidence is reused from completed R7 without recalculation. No oracle or Fraction solve ran. The largest absolute metric residual was 1.4551915228366852e-11 in a condition estimate of100000, about1.46e-16 relative; it passes the unchanged frozen fixture comparison. Execution wall was0.054295429s, child CPU0.053937s and peak RSS14720KiB. This is a bounded synthetic implementation comparison, not actual nonlinear attribution.
+
+## C8 — precision and conditioning
+
+Three fixed small synthetic cases passed once (exit0). A near-singular finite system reports kappa_inf=4398046511108 and recovers its exact designed correction. Consistent power-of-two matrix/residual rescaling preserves the result. Strong-cooling scales oldw=10/currentw=0.001 give SRw/Syw=10000, native energy residual norm1e-13 and scaled correction norm1e-9, so no unity thermal-scale ratio is assumed. Inner measured wall0.000463382s and CPU0.000456797s cover only these small library checks; outer command resources are separately recorded. No large benchmark, oracle or prior suite ran. Module bytes remain unchanged after C5. C9 independent review and C10 disposition are pending; actual stage attribution remains missing-telemetry HOLD.
