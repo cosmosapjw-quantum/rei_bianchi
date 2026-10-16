@@ -1,0 +1,93 @@
+
+# axbi_driver.rs lines 834-875 (same pinned blob)
+834:             if norm <= 1e-11 {
+835:                 let nh = self.n_h0_cm3 / old.a.powi(3);
+836:                 let c = HHeModel::controlled_fixture();
+837:                 let nold = old.photons.iter().sum::<f64>();
+838:                 let nnew = stocks.number.iter().sum::<f64>();
+839:                 let events = rhs.photo_events_cm3_s.map(|e| e * dt / nh);
+840:                 let event_total = events.iter().sum::<f64>();
+841:                 if (nold - nnew - event_total).abs() > 1e-10 * old.ledgers.source_n.max(1.0) {
+842:                     return Err(err("AXBI_ABSORPTION_LEDGER"));
+843:                 }
+844:                 let mut next = old.clone();
+845:                 next.gas = IgmGasState::new([x[0], x[1], x[2]], w_ev_per_h_to_erg(x[3])?)?;
+846:                 Self::set_photon_state(&mut next, stocks);
+847:                 next.ledgers.absorbed_n += event_total;
+848:                 for k in 0..3 {
+849:                     next.ledgers.photo_events[k] += events[k];
+850:                     next.ledgers.rr_events[k] += rhs.rr_events_cm3_s[k] * dt / nh;
+851:                     next.ledgers.ci_events[k] += rhs.ci_events_cm3_s[k] * dt / nh;
+852:                     next.ledgers.ci_floor_events[k] += rhs.ci_floor_events_cm3_s[k] * dt / nh;
+853:                 }
+854:                 next.ledgers.dr_events += rhs.dr_events_cm3_s * dt / nh;
+855:                 next.ledgers.ce_cap_ev +=
+856:                     rhs.ce_cap_cooling_erg_cm3_s.iter().sum::<f64>() * dt / (nh * c.ev_erg);
+857:                 next.ledgers.excluded_dr_ev +=
+858:                     rhs.excluded_dr_cooling_erg_cm3_s * dt / (nh * c.ev_erg);
+859:                 next.ledgers.escaped_u += rhs.escape_erg_cm3_s * dt / (nh * c.ev_erg);
+860:                 next.ledgers.cmb_input += rhs.cmb_to_gas_erg_cm3_s * dt / (nh * c.ev_erg);
+861:                 next.max_newton_residual = next.max_newton_residual.max(norm);
+862:                 *s = next;
+863:                 return Ok(());
+864:             }
+865:             let columns_context = context.clone();
+866:             let jac = jacobian_columns(
+867:                 &self.transport.shared_pool(),
+868:                 self.config.parallel_jacobian_columns,
+869:                 x,
+870:                 residual,
+871:                 counter,
+872:                 self.config.max_rhs,
+873:                 move |unknown| columns_context.evaluate(unknown, dt).map(|v| v.0),
+874:             )?;
+875:             let direction = solve4(jac, residual.map(|r| -r))?;
+
+# igm_state.rs lines 90-135 (same pinned blob)
+90:         t: f64,
+91:     ) -> Result<Self, ForwardError> {
+92:         positive(t)?;
+93:         let model = eos_model(n_h, n_he)?;
+94:         let ne = model.electron_density(&hhe_state(fractions, 0.0))?;
+95:         let particles_per_h = positive((n_h + n_he + ne) / n_h)?;
+96:         let w = positive(product(1.5 * model.kb_erg_k, t)? * particles_per_h)?;
+97:         let state = Self::new(fractions, w)?;
+98:         state.eos(n_h, n_he)?;
+99:         Ok(state)
+100:     }
+101:     pub fn eos(&self, n_h: f64, n_he: f64) -> Result<IgmEos, ForwardError> {
+102:         Self::new(self.fractions, self.w_erg_per_h)?;
+103:         let model = eos_model(n_h, n_he)?;
+104:         let u = positive(self.w_erg_per_h * n_h)?;
+105:         let s = hhe_state(self.fractions, u);
+106:         let ne = nonnegative(model.electron_density(&s)?)?;
+107:         // Check positive species contributions so a subnormal product is not
+108:         // silently rounded to zero by the legacy algebraic EOS.
+109:         product(n_h, self.fractions[0])?;
+110:         product(n_he, self.fractions[1] + 2.0 * self.fractions[2])?;
+111:         // The legacy EOS permits subnormal denominators. Our explicit
+112:         // normal-intermediate contract rejects that loss of relative precision.
+113:         positive(3.0 * model.kb_erg_k * positive(n_h + n_he + ne)?)?;
+114:         let t = positive(model.temperature(&s)?)?;
+115:         Ok(IgmEos {
+116:             electron_density_cm3: ne,
+117:             temperature_k: t,
+118:             u_erg_cm3: u,
+119:         })
+120:     }
+121:     /// Exact monatomic adiabatic map at FIXED fractions: w and T scale as a^-2.
+122:     /// No new chemistry evolution, adaptive integration or ledger is implied.
+123:     pub fn adiabatic_to(&self, a0: f64, a1: f64) -> Result<Self, ForwardError> {
+124:         Self::new(self.fractions, self.w_erg_per_h)?;
+125:         let scale = positive(ratio(a0, a1)?)?;
+126:         Self::new(
+127:             self.fractions,
+128:             positive(self.w_erg_per_h * positive(scale * scale)?)?,
+129:         )
+130:     }
+131: }
+132: 
+133: pub fn w_erg_per_h_to_ev(w: f64) -> Result<f64, ForwardError> {
+134:     ratio(w, HHeModel::controlled_fixture().ev_erg)
+135: }
+

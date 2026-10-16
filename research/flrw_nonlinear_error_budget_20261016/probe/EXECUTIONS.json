@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "unit_id": "flrw_nonlinear_error_budget_20261016",
+  "execution_gate": "R5_CAPTURED: publisher acknowledged immutable ZIP f4d382931f68dd1f3957164c9128ecf498670942b64eaae5128add72e6d5cc83",
+  "command": "timeout 30s python3 research/flrw_nonlinear_error_budget_20261016/probe/probe_nonlinear.py",
+  "scope": "Independent synthetic oracle only; no production module imports, native builds, solver runs or physical-history reads",
+  "executions": [
+    {
+      "id": "initial",
+      "status": "failed",
+      "exit_code": 1,
+      "stdout_stderr": "stdout_initial.log",
+      "failure_class": "probe implementation",
+      "cause": "Singular fixture aliases R as base_residual; initial loader incorrectly iterated that string and attempted Fraction('b').",
+      "cpu_seconds": null,
+      "wall_seconds": null,
+      "timing_scope": "Initial inner-process CPU/wall not recorded; no timing value inferred.",
+      "repair": "Resolve the frozen base_residual alias to the already parsed vector. No fixture, formula, production source, tolerance or claim change."
+    },
+    {
+      "id": "one_authorized_diagnosed_repair",
+      "status": "completed",
+      "exit_code": 0,
+      "stdout_stderr": "stdout.log",
+      "result": "RESULT.json",
+      "cpu_seconds": 0.0035221950000000023,
+      "wall_seconds": 0.003524641004332807,
+      "peak_rss_kib_linux": 10880,
+      "checks": "PASS_SCOPED_EIGHT_SYNTHETIC_CASES"
+    }
+  ],
+  "remaining_probe_executions": 0,
+  "actual_stage_attribution": "NOT_RUN_MISSING_RESIDUAL_AND_JACOBIAN_PACKET",
+  "nonlinear_error_certificate": null
+}

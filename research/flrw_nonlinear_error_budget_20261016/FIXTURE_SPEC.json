@@ -1,0 +1,28 @@
+{
+  "schema_version":1,
+  "scope":"Eight synthetic exact-rational probes; never actual stage or production trajectory",
+  "state_order":["x_HII","x_HeII","x_HeIII","w_eV_per_H"],
+  "base_state":["1/5000","0","0","1/1000"],
+  "old_state":"equal to fixture state",
+  "base_residual":["1/100000000000","-1/500000000000","-3/1000000000000","1/250000000000000"],
+  "fraction_floor":"1/100000",
+  "energy_floor":"1/1000000",
+  "f_He":"2/25",
+  "k_B_eV_per_K":"1/10000",
+  "thermal_constant_scope":"Synthetic positive rational, not actual physical constant",
+  "production_residual_inequality":"norm<=1e-11; fixture inequality pass is not actual production acceptance",
+  "target":"1/100000",
+  "definitions":{"A":"SR^-1 J Sy","b":"SR^-1 R","z":"solve(A,-b)","delta":"Sy*z","kappa":"max_abs_row_sum(A)*max_abs_row_sum(inverse(A))","backward_error":"norm_inf(Az+b)/(norm_inf(A)*norm_inf(z)+norm_inf(b));0 for zero/zero"},
+  "fixtures":[
+    {"id":"identity","J":"I4","R":"base_residual","y":"base_state","expected":"delta=-R; valid corrected state; independent exact solve"},
+    {"id":"coupled","J":[["1","1/4","0","0"],["0","2","1/5","0"],["1/10","0","3","0"],["0","0","0","1"]],"R":"base_residual","y":"base_state","expected":"exact solve/inverse and scale equivalence; valid corrected state"},
+    {"id":"floor_bridge","J":"I4","R":["0","-1/100000000000","0","0"],"y":"base_state","expected_native_norm":"1/100000000000","expected_scaled_correction_norm":"1/1000000","expected_ratio_to_target":"1/10"},
+    {"id":"large_inverse","J_diagonal":["1/100000000","1","1","1"],"R":["1/100000000000","0","0","0"],"y":"base_state","expected_delta_xHII":"-1/1000","expected_scaled_correction_norm":"5","exact_EOS":"null corrected hydrogen fraction negative; linear projection remains defined"},
+    {"id":"singular","J_diagonal":["0","1","1","1"],"R":"base_residual","y":"base_state","expected":"HOLD_SINGULAR_JACOBIAN; no unique correction or fabricated condition number"},
+    {"id":"energy_unit_change","base":"coupled","u":"7/3","P":"diag(1,1,1,u)","transform":"y'=Py,yold'=Pyold,R'=PR,J'=PJP^-1,SR'=PSR,Sy'=PSy,energy_floor'=u*energy_floor,kB'=u*kB","expected":"A,b,z,kappa,thermal projections invariant; delta'=Pdelta"},
+    {"id":"EOS_composition_cancellation","y":["1/5","1/4","1/8","1/1000"],"J":"I4","delta_species":["1/100","-1/100","1/1000"],"delta_w":"w*dD/D withD=1+fHe+x+fHe*(y+2z)","R":"-delta","expected":"valid corrected composition; nonzero state correction; exact and linear DeltaT=0"},
+    {"id":"BE_pair_cancellation","z":"1/200000","y0":"1","q":"1/(1+z)","qh":"1/(1+z/2)","rA":"0","rB":"0","rF":"-1/160000800001","expected":"abs(rF)<1e-11; full=fine exactly; exact BE pair signal nonzero; fine!=exp(-z) as constructed scalar example"}
+  ],
+  "arithmetic_tests":{"relative":1e-12,"absolute":1e-14,"scope":"binary64 against independent exact-rational expectations on these fixtures only"},
+  "resources":{"execution_gate":"R5_CAPTURED","initial_executions":1,"diagnosed_repair_executions_max":1,"per_execution_wall_cap_seconds":30,"native_builds":0,"native_solver_runs":0,"physical_history_reads":0}
+}

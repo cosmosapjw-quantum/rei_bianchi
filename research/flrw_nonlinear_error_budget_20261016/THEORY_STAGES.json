@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "task": "research",
+  "unit_id": "flrw_nonlinear_error_budget_20261016",
+  "status": "in_progress",
+  "stages": [
+    {
+      "id": "R1",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r1",
+        "CONTRACT.json",
+        "evidence/SOURCE_PIN.json",
+        "evidence/SOURCE_EXCERPTS.txt"
+      ]
+    },
+    {
+      "id": "R2",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r2",
+        "evidence/SOURCE_PIN.json",
+        "evidence/SOURCE_EXCERPTS.txt"
+      ],
+      "reason": "Source actual residual/norm/adaptive/EOS mapped; primary CVODE motivation distinguished from method claims and discovery-only leads"
+    },
+    {
+      "id": "R3",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r3",
+        "evidence/SOURCE_EXCERPTS.txt"
+      ],
+      "reason": "State/residual/J context, frozen scales, conditioning, EOS and missing-stage HOLD defined"
+    },
+    {
+      "id": "R4",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r4"
+      ],
+      "reason": "Selected read-only scaled correction diagnostic over unrelated quadrature or premature tolerance change; constructed scale/inverse/EOS/BE discriminants"
+    },
+    {
+      "id": "R5",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r5",
+        "FIXTURE_SPEC.json"
+      ],
+      "reason": "Scale equivalence, nonlinear-vs-linear scope, BE contamination, stable EOS correction and exact rational probe constructions derived"
+    },
+    {
+      "id": "R6",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r6",
+        "evidence/R6_INDEPENDENT_REVIEW.json",
+        "evidence/R6_SOURCE_EXCERPTS.txt",
+        "evidence/intake/WOLFRAM_INEXACT_BE.json",
+        "evidence/intake/WOLFRAM_ESTIMATOR_CANCELLATION.json",
+        "evidence/intake/WOLFRAM_EOS_CORRECTION.json"
+      ],
+      "reason": "Fresh independent argument/source review PASS with no findings; three actual symbolic responses support BE/EOS identities"
+    },
+    {
+      "id": "R7",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r7",
+        "probe/probe_nonlinear.py",
+        "probe/RESULT.json",
+        "probe/EXECUTIONS.json",
+        "probe/stdout.log",
+        "probe/stdout_initial.log"
+      ],
+      "reason": "Eight exact independent synthetic cases pass after one documented probe-loader repair; no production-stage data implied"
+    },
+    {
+      "id": "R8",
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r8",
+        "evidence/R6_INDEPENDENT_REVIEW.json",
+        "probe/RESULT.json"
+      ],
+      "reason": "Conditional linear diagnostic adopted for implementation; actual-stage attribution remains missing-data HOLD"
+    },
+    {
+      "id": "R9",
+      "status": "pending",
+      "evidence_refs": []
+    },
+    {
+      "id": "R10",
+      "status": "pending",
+      "evidence_refs": []
+    }
+  ],
+  "claims": [
+    {
+      "id": "SCALED_CORRECTION",
+      "basis": [
+        "derived",
+        "numerically checked"
+      ],
+      "evidence_refs": [
+        "THEORY.md#r3",
+        "THEORY.md#r5"
+      ],
+      "scope": "Supplied nonsingular linear system; no nonlinear error certificate",
+      "obligations": [
+        "C1-C10 implementation verification",
+        "Actual accepted-state packet for actual attribution"
+      ]
+    },
+    {
+      "id": "BE_CANCELLATION",
+      "basis": [
+        "derived",
+        "numerically checked"
+      ],
+      "evidence_refs": [
+        "THEORY.md#r5",
+        "FIXTURE_SPEC.json"
+      ],
+      "scope": "Constructed scalar BE with residual inside inclusive1e-11 inequality; no actualREI attribution",
+      "obligations": []
+    }
+  ],
+  "executions": [
+    {
+      "id": "ROOT_WOLFRAM_THEORY_CHECKS",
+      "status": "completed",
+      "command": "Three exact submitted code strings in evidence/intake/WOLFRAM_*.json",
+      "environment": "Connected Wolfram tool via root",
+      "tool_is_error": false,
+      "exit_code": null,
+      "evidence_refs": [
+        "evidence/intake/WOLFRAM_INEXACT_BE.json",
+        "evidence/intake/WOLFRAM_ESTIMATOR_CANCELLATION.json",
+        "evidence/intake/WOLFRAM_EOS_CORRECTION.json"
+      ],
+      "reason": "Tool responses successful; no OS exit code exists for this tool"
+    },
+    {
+      "id": "PROBE_INITIAL",
+      "status": "failed",
+      "command": "timeout30s python3 probe/probe_nonlinear.py",
+      "exit_code": 1,
+      "evidence_refs": [
+        "probe/EXECUTIONS.json",
+        "probe/stdout_initial.log"
+      ],
+      "reason": "Fixture alias loader implementation error; targeted repair preserved exact spec"
+    },
+    {
+      "id": "PROBE_REPAIR",
+      "status": "completed",
+      "command": "timeout30s python3 probe/probe_nonlinear.py",
+      "exit_code": 0,
+      "evidence_refs": [
+        "probe/EXECUTIONS.json",
+        "probe/RESULT.json",
+        "probe/stdout.log"
+      ],
+      "reason": "Eight synthetic cases pass; remaining probe executions0"
+    }
+  ],
+  "next_actions": [
+    "R2 provenance mapping",
+    "R3-R5 actual construction"
+  ],
+  "failures": [
+    {
+      "class": "implementation",
+      "scope": "Independent probe fixture loader",
+      "evidence_refs": [
+        "probe/stdout_initial.log",
+        "probe/EXECUTIONS.json"
+      ],
+      "resolution": "Single allowed alias-loading repair; final eightcases pass"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "IMPLEMENT_SCALED_DIAGNOSTIC",
+      "decision": "PASS_SCOPED_FOR_IMPLEMENTATION",
+      "evidence_refs": [
+        "THEORY.md#r5",
+        "evidence/R6_INDEPENDENT_REVIEW.json",
+        "probe/RESULT.json"
+      ]
+    },
+    {
+      "id": "ACTUAL_SOURCE007_CAUSE",
+      "decision": "UNRESOLVED_MISSING_STAGE_DATA",
+      "reason": "Runwide maximum and endpoint values do not provide same-stateR/J"
+    },
+    {
+      "id": "STRONG_NO_GO",
+      "decision": "NOT_APPLICABLE",
+      "reason": "Constructed scalar cancellation is not adopted as physical exclusion or novel no-go theorem"
+    }
+  ]
+}
