@@ -1,0 +1,5 @@
+# Intake decisions
+
+PR151232df074 is the completed Unit6 baseline. No newer physical128 result was posted at intake; process execution state was not inspected. PR1506bfb2690 includes SOURCE012 partialcapture and refresh005 REC99 source-qualified q0z20 candidate. Read ADOPTION_DECISION.json and REPORT_KO.md; candidate is not automatically adopted across cosmology,census,density,thermal energy or clock. Prior automatic assumption of ADOPTION_REVIEW filename returned404; actual directory listing identified ADOPTION_DECISION and it was read successfully. This is an intake-path correction.
+
+New work uses the actual original BBN donor cosmology and primary paper formulas. Public phfit2/provider table bytes were downloaded from author URLs and SHA256 recorded. SciSpace and Exa search results are preserved as discovery, while source formulas are checked in primary documents. Wolfram evaluator/context each returned MCP-32603; no successful symbolic computation is reported. Local analytic and numerical checks are the available verification route. No tensor derivation or xAct execution is needed for these three scalar/kinetic units.
