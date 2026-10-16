@@ -1,0 +1,120 @@
+{
+  "schema": "rei.iso_eos.contract.v1",
+  "date_kst": "2026-10-17",
+  "scope": "NONRELATIVISTIC_COMMON_TEMP_FIXED_PROPER_VOLUME_H_D_CX_WITH_PASSIVE_13_STATE_ISOTOPE_CENSUS",
+  "producer_git_owner": {
+    "repo": "cosmosapjw-quantum/rei_bianchi",
+    "pr": 150,
+    "head_sha": "da4bd0b9d112cadb2ec78c49d7dc3e7ab4761ea7",
+    "read_only": true
+  },
+  "source_identity_file": "contracts/SOURCE_IDENTITY.json",
+  "species_order": [
+    "n",
+    "H1Neutral",
+    "H1Ionized",
+    "DNeutral",
+    "DIonized",
+    "TNeutral",
+    "TIonized",
+    "He3Neutral",
+    "He3SinglyIonized",
+    "He3DoublyIonized",
+    "He4Neutral",
+    "He4SinglyIonized",
+    "He4DoublyIonized"
+  ],
+  "stoichiometric_cx": {
+    "reaction": "H1Ionized + DNeutral -> H1Neutral + DIonized",
+    "change": [
+      0,
+      1,
+      -1,
+      -1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "h_d_4_state_weights": {
+      "A": [
+        1,
+        1,
+        2,
+        2
+      ],
+      "charge": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "thermal_particles": [
+        1,
+        2,
+        1,
+        2
+      ]
+    },
+    "conserved": "A dot nu = q dot nu = (1+q) dot nu = 0"
+  },
+  "variables": {
+    "n_s": "proper m^-3",
+    "n_B": "proper baryon number m^-3, isotope mass weighted",
+    "n_e": "derived free electrons m^-3",
+    "n_th": "heavy nuclei + free electrons m^-3",
+    "u_th": "thermal J m^-3",
+    "T": "K",
+    "p_th": "J m^-3",
+    "xi": "CX signed extent m^-3",
+    "R_cx": "CX net rate m^-3 s^-1",
+    "delta_chi": "chi_D - chi_H J per event",
+    "Theta": "proper s^-1"
+  },
+  "closures": [
+    "nonrelativistic",
+    "single common gas temperature",
+    "Maxwellian rate evaluation",
+    "no excited internal DOF in CV",
+    "charge neutrality for electrons",
+    "no positrons",
+    "no nonthermal species energy in u_th",
+    "no thermal diffusion",
+    "no CR or hydrogen molecular channels",
+    "no expansion in fixed-volume event"
+  ],
+  "energy": [
+    "u_thermal=1.5*n_thermal*kB*T",
+    "p=(2/3)u_thermal",
+    "Delta_u_chemical=xi*delta_chi",
+    "Delta_u_thermal=-xi*delta_chi",
+    "event photon,CMB,freefree=zero but other channels remain separately owned"
+  ],
+  "temperature_ode": "Tdot=-(2/3)*Theta*T + (Q_external- delta_chi*R_cx)/Cv -T*R_other_particle/n_th",
+  "domain": {
+    "Savin2002_supply_K": [
+      2.7,
+      200000.0
+    ],
+    "extent_m3": "-min(H0,Dp)<=xi<=min(Hp,D0)",
+    "temperature_on_nonzero_cx_event": "endpoints within Savin provider domain",
+    "clipping": false,
+    "extrapolation": false
+  },
+  "single_event_owner": "ThermalSubstep XOR AtomicRhs; this module only supports ThermalSubstep; existing producer component retains UnsupportedSpectator",
+  "event_energy_defect_source": "CALLER_SUPPLIED_CHI_D_MINUS_CHI_H_REQUIRED; numerical fixture 0.0037eV is MANUFACTURED_NOT_SOURCE_VERIFIED",
+  "not_admitted": [
+    "full H/He/D native combined solver",
+    "native ThermalcxComponent with spectators",
+    "physical delta_chi source binding for production",
+    "full Bianchi time integration",
+    "photoionizing spectrum",
+    "CMB optical depth",
+    "nuclear/isotope rates beyond the original model"
+  ]
+}
