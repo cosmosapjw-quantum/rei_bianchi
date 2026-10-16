@@ -37,5 +37,18 @@ The scalar vector field is F(xi)=kf(T(xi))(c-xi)(b-xi)-kr(T(xi))(d+xi)(a+xi). Ea
 
 The new mathematical claims are conservation reduction, invariant-interval reasoning, and an exact manufactured solution. The implementation claim will be bounded numerical agreement at declared fixtures. Adaptive error estimates are numerical diagnostics, not certified global error. A provider-domain approach returns partial-time state and a typed stop. The actual requested interval is complete only when its target time is reached.
 
+## R4 — Selected numerical representation and interface units
+
+The root accepted adaptive Heun SSP-RK2 with step doubling as a bounded standalone method. It avoids a search for all equilibrium roots and the singular time-of-flight integral near equilibrium. Domain-approach status is acceptable only as a partial-time return carrying the actual reached time; no exact crossing time is asserted.
+
+**Interface amendment at R4:** the root requested proper densities in cm^-3, thermal density in eV cm^-3, defect in eV, rates in cm³/s and time in seconds. These replace R3's provisional SI implementation interface. Its equations remain identical after the exact conversions n_cm=n_SI/10^6, u_eVcm=u_Jm/(10^6 eV_J), DeltaChi_eV=DeltaChi_J/eV_J and k_cm=k_SI*10^6. Use kB_eV=1.380649e-23/1.602176634e-19 eV/K. The final CONTRACT and fixtures use only this interface. Earlier stage captures remain unchanged.
+
+Use pure H/D only: Nth=a+b+c+d+(b+d). No spectator term or external electron inventory is supplied, so no helium/electron double counting is possible. Normalize the integrated extent as z=xi/S, with S=max(a,b,c,d)>0; return both z and xi. The ODE is z'=F(Sz)/S. Thermal capacity C=3 kB_eV Nth/2 uses the explicit pure H/D inventory.
+
+At each evaluation reconstruct density and temperature from the original state and z. Do not increment density or energy componentwise. Reject a trial whose Euler stage or temperature lies outside the closed interval. A convex Heun update then retains admissibility. Accept the two-half-step result when its difference from a full step satisfies the frozen local criterion. This is an error estimator and test-control choice, not a production tolerance or certified global error.
+
+For a finite provider-temperature boundary, if accepted state lies within the declared normalized event distance and the field points toward that boundary, return DOMAIN_BOUNDARY_APPROACH with the interior state, analytic boundary, distance, reached time and requested time. No snapping to the boundary, rate extrapolation or completed-interval status is permitted. Finite work limits, underflow and arithmetic failure return typed incomplete results.
+
+
 
 
