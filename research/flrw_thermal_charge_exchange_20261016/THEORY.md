@@ -91,6 +91,15 @@ At an accepted state, if the field points toward a provider-derived boundary and
 
 `CONTRACT.json` and `FIXTURES.json` freeze the new Python API, status meanings, numerical controls, source identities, changed-seam tests and30-second aggregate test ceiling. The independent probe owns algebra/Decimal verification under its own small bound. The coding agent will run actual Savin and manufactured fixtures, fixed-step refinement of the Heun map, thermal-domain approach and finite-budget stops. No old Rust suite, source-age reference, observer or native cosmological run is included. Mathematical construction is complete; these new numerical checks remain unexecuted by the theory author.
 
+## R6 — Independent mathematical review and bounded repair
+
+The independent reviewer read the immutable R5 theory, contract and fixtures. The conservation/EOS reduction, physical interval invariance, two-Euler-stage Heun convexity, exact manufactured solution including lambda=0 and reverse flow, event-time inversion and finite-budget semantics passed scoped mathematical review.
+
+One contract wording defect was found: R5's input validation grouped the signed energy defect with nonnegative quantities. The targeted repair now requires nonnegative densities/thermal density/time and a **finite signed defect**. One negative-defect manufactured fixture exercises thermal interval ordering. The actual R5 snapshot remains intact; `CONTRACT.json.review_repair` and `evidence/R6_INDEPENDENT_REVIEW.json` preserve the initial HOLD, exact change and after-repair PASS. No coefficient, domain, tolerance, algorithm or resource limit changed.
+
+The review permits bounded implementation under this contract. Numerical outcomes remain pending. The separate root source receipt records a successful Exa primary-paper acquisition and SciSpace metadata match. Three Wolfram calls returned internal errors and provide no verification result. Independent standard-library algebra/Decimal evidence will be recorded only after its actual execution.
+
+
 
 
 

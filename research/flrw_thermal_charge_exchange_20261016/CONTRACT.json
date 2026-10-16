@@ -72,9 +72,10 @@
     "error_reject": "same cubic factor capped<=0.8; invalid-domain stages halve h",
     "event": "accepted-state outward-toward-provider-boundary and normalized distance<=event_atol -> partial DOMAIN_BOUNDARY_APPROACH, no clamp",
     "equilibrium": "exact G==0 -> COMPLETE_EQUILIBRIUM at requested time with unchanged state; do not infer equilibrium from small G",
-    "degenerate": "Validate finite/nonnegative densities, thermal, time, defect and provider metadata first. S==0 and thermal==0 -> COMPLETE_EMPTY, t_reached=t_requested, T=null, amplitude=null, no RHS; S==0 and thermal>0 invalid. Otherwise derive/validate T and interval even for t_requested==0; then dt0 -> COMPLETE unchanged with zero RHS. For positive time exact G==0 -> COMPLETE_EQUILIBRIUM at requested time. D=0 follows exact zero field, not invented temperature.",
+    "degenerate": "Validate finite nonnegative densities, thermal and time, a finite signed defect, and finite ordered positive provider-temperature metadata first. S==0 and thermal==0 -> COMPLETE_EMPTY, t_reached=t_requested, T=null, amplitude=null, no RHS; S==0 and thermal>0 invalid. Otherwise derive/validate T and interval even for t_requested==0; then dt0 -> COMPLETE unchanged with zero RHS. For positive time exact G==0 -> COMPLETE_EQUILIBRIUM at requested time. D=0 follows exact zero field, not invented temperature.",
     "underflow": "if h<=0 or t+h==t -> STEP_UNDERFLOW partial",
-    "error_meaning": "local heuristic only; no certified global bound or stiffness guarantee"
+    "error_meaning": "local heuristic only; no certified global bound or stiffness guarantee",
+    "failures": "Invalid initial values/metadata/outside-domain T -> INVALID_INPUT. Every attempted RHS evaluation charged first; provider exception, nonfinite or negative returned rate, or nonfinite valid-domain arithmetic -> ARITHMETIC_FAILURE at last accepted state. Euler-stage interval violations reject/halve; do not call provider there."
   },
   "controls": {
     "rtol": 1e-7,
@@ -121,5 +122,12 @@
     "conversion": "one equivalent physical initial state/rate through SI-to-unit conversion verifies same G up to128eps scaling; no old Rust run"
   },
   "publication": "stage_delivery immutable capture before each stage; only newunit files; stage commits/backups owned by publisher",
-  "claim_ceiling": "Standalone isolated thermal-CX mathematical reduction and scoped tested numerical implementation. No full-network/isotope/cosmological admission."
+  "claim_ceiling": "Standalone isolated thermal-CX mathematical reduction and scoped tested numerical implementation. No full-network/isotope/cosmological admission.",
+  "review_repair": {
+    "finding": "R6 signed-defect validation wording inconsistent with theory",
+    "prior": "R5 immutable snapshot retained",
+    "replacement": "finite signed defect; nonnegative applies only to density/thermal/time",
+    "affected": "input validation and negative-defect thermal interval ordering; physics/model unchanged",
+    "added_fixture": "negative_defect beta=-0.1; generic signed oracle identity reusable"
+  }
 }
