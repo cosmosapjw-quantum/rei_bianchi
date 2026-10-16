@@ -13,3 +13,7 @@ Inputs and acceptance follow CONTRACT.json and FIXTURES.json. Densities use cm^-
 ## C3 — Numerical design
 
 Use the frozen adaptive SSP Heun RK2 step-doubling map. Both Euler states are interval checked; the accepted result is two halfsteps. Every RHS call is charged, including provider failures. The scalar state retains physical positivity and the provider domain by checked stages and convex updates. Counters, finite caps and partial statuses expose incomplete work. Provider approaches return the actual interior state and reached time. The local error estimate is a heuristic; neither global error nor arbitrary stiffness is certified. Cached independent exact manufactured flow and fixed-step refinement discriminate the changed thermal-feedback seam. No run in C3.
+
+## C4 — Execution and resource plan
+
+C5 writes the runtime and bounded verification harness. C6 runs new manufactured and changed-seam controls. C7 runs three Savin default/tight pairs and fixed Heun N=16/32/64. C8 audits saved evidence and environment without replay. C9 obtains a fresh independent review. C10 reports measured results and exact resume commands. Scientific verification cumulative wall time is capped at30 s, with one thread, zero builds/native/old suites/external reference runs. Each stage waits for immutable-capture ACK. Substantive failure evidence is preserved for root/Astra interpretation. No run in C4.
