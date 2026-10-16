@@ -1,0 +1,11 @@
+# SOURCE_AGE_NATIVE_POSITIVE_REFERENCE_INTAKE 계약
+
+독립 R5/C5 과학 계약은 PR #170 `d5203a3c3ce603e1b0487549d1bf20d4fb48128a`, PR #166 `553ce556d9f8662290c000ec675c7e6007c9d895`, 실행 native `35d9747a0bbedcafdb568467ce7c1e7a25f965b6`에 고정한다. 실제 source는 원래 `AxbiSource` MD14와 50kK truncated BB, signed `Driver::geometry_point`, 원래 `PreparedAbsorption`의 매 RHS 호출 재구성, Grackle `AxbiProvider.point`다. 초기 (a=1/21), 폭 Δln(a)=0.002, 8개 midpoint birth, (n_\mu=8), transport cell 16, source energy subdivision 8, gas fractions `[0.01,0.01,0.001]`, T=8000 K, `inactive_hi_split=false`가 기본 fixture다.
+
+원래 DOP853 call 291의 음의 photon number는 첫 cohort의 실제 occupied cell 8곳에서 일어났다. 빈 support를 음수로 처리한 사례가 아니다. (l<h)인 occupied cell에는 (L=U-lN>0, R=hN-U>0)의 로그 좌표를 사용한다. Native prepared node마다 (\lambda_j=c\sum_i n_i\sigma_i(E_j)\)라 하면 (\dot L=-\sum_j\lambda_j n_j(q_j-l)), (\dot R=-\sum_j\lambda_j n_j(h-q_j))를 직접 합산한다. 집계 (\dot U-l\dot N) 상쇄로 계산하지 않는다. (N=(L+R)/(h-l)), (U=lN+L=hN-R). Exact empty cell은 ODE에서 빼고, delta support는 log N와 정확한 (U=lN)을 사용한다. 출생 event에서 원래 native inject로만 해당 lane을 활성화한다. No clipping, no arbitrary tolerance widening, no frozen node set.
+
+Gas 내부상태에는 H logit, He 세 stock의 softmax, thermal log를 사용하고 각 physical RHS는 원래 native `AxbiProvider.point`를 호출한다. `dt=dx/H`, `j=rate/H`, proper density (n_{H0}/a^3). Native continuous RHS에 이미 H expansion cooling이 있으므로 discrete geometry thermal work를 다시 넣지 않는다. Reference는 **같은 물리 RHS를 공유하지만 알고리즘적으로 독립적인 연속 적분기**이며 독립 atomic coefficient 구현은 아니다.
+
+첫 DOP853 목표 rtol `2e-9`, 좌표 atol `1e-10`; tight 목표 rtol `2e-10`, atol `1e-11`. Native 기존 물리 gross ledger 한도 `1e-10`은 변경하지 않고 continuous reference 자체 gross ledger 목표는 `1e-8`이다. Ref solver가 실패하거나 underflow, unsupported boundary, 600초/200000 RHS cap을 만나면 raw를 보존하고 해당 범위 HOLD다. Per-solve 8 GiB, 초기 단일 process, 최대 2 build jobs. 30분 캠페인 뒤 checkpoint한다.
+
+State와 ledger 비교는 photon cohort N/U, positive reference survivor-relative N/U, HI/HeI/HeII photo·RR·CI·DR, heat, thermal/binding/escape/CMB, redshift/shear work, charge/nuclei를 분리한다. Birth-age 8/16/32는 공통 chemistry mesh, time은 같은 birth를 고정한 1/2/4(+필요시 8/16), angle 8/16/32, transport spectral 16/32/64를 각각 독립 변화시킨다. PR #170 manufactured Duhamel 수렴은 native coupling의 증거로 승격하지 않는다. Full EoR 및 `PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED` 상태를 유지한다.
