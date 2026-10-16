@@ -1,0 +1,55 @@
+{
+  "schema": "rei.ssot.physics.v2",
+  "date": "2026-10-16",
+  "geometry": {
+    "metric_signature": "(-,+,+,+)",
+    "epsilon123": "+1",
+    "metric": "ds²=-c²dt²+sum_i a_i(t)²(dx^i)² for diagonal BI",
+    "mean_scale": "a=(a1 a2 a3)^(1/3)",
+    "LRS_scale_factors": "(a*exp(-b),a*exp(-b),a*exp(2b))",
+    "LRS_Hubble": "(H-s,H-s,H+2s) where s=db/dt",
+    "shear_scalar": "sigma_abs=sqrt(sigma_ab sigma^ab/2) = sqrt(3)*abs(s)",
+    "Sigma": "sigma_abs/H when H>0; otherwise retain sigma_abs and H separately",
+    "legacy_r": "r=s/H and Sigma=sqrt(3)*abs(r) in adopted convention",
+    "orientation": "sign(s) separately from Sigma",
+    "free_decay": "s ∝ a^(-3) only when shear propagation sources absent"
+  },
+  "normalization": {
+    "total_H_nuclei": "n_H includes hydrogen isotopes only if explicitly stated; D counted separately under elemental-nuclei mode",
+    "baryon_count": "sum_A A*n_A, unambiguously count each isotope exactly once",
+    "helium_per_total_H": "y_He=n_He/n_H; He charge states relative to total n_He or total n_H must specify denominator",
+    "ionized_volume_Q": "Q_HII != local x_HII or n_e/n_H unless closure given",
+    "n_e_rest": "electron rest-frame proper number density; do not apply Lorentz gamma twice",
+    "n_e_normal": "normal-frame density; requires explicit frame map"
+  },
+  "constants": {
+    "c": "299792458 m/s",
+    "hbar": "1.054571817e-34 J s",
+    "k_B": "1.380649e-23 J/K",
+    "sigma_T": "6.6524587321e-29 m² (reference, bound to input source in production)",
+    "eV_to_J": "1.602176634e-19 J"
+  },
+  "energy": {
+    "ray_energy": "E=-p_a n^a c for normal observer",
+    "BI_conserved": "spatial covariant p_i=a_i E e_i/c",
+    "ray_map": "E1/E0=sqrt(sum_i[e0_i*a_i0/a_i1]^2)",
+    "solid_angle_J": "(prod_i a_i0/a_i1)/(E1/E0)^3 for n0->n1",
+    "opacity_hazard": "kappa=c*sum_a n_a^proper*sigma_a[E(t)] in s^-1",
+    "source_age": "integral over birth-time with cohort-dependent E/direction and kappa",
+    "no_clipping": true,
+    "no_extrapolation": true,
+    "case_a_case_b": "exclusive operator branches; CaseA transported escape must not double count OTS CaseB"
+  },
+  "observer": {
+    "d_tau_nontilted": "c*sigma_T*n_e^rest dt normal ray proper time",
+    "d_tau_tilted": "c*sigma_T*n_e^rest*gamma*(1-beta.e) dt for future-directed ray and normal time",
+    "tau_tail": "unknown tail -> total tau and total visibility return null",
+    "redshift_surface": "event time t*(direction,geometry) solves observed redshift; do not replace with fixed coordinate time"
+  },
+  "applicability": {
+    "current_physical_baseline": "non-tilted LRS Bianchi-I / matched FLRW",
+    "counterfactual_shear": "|s/H| around 1e-3..1e-1 must explicitly label COUNTERFACTUAL when applied to CMB constrained free-decay mode",
+    "11_Bianchi": "future family-specific registry; not admitted",
+    "finite_tilt": "separate conditional extension; no inferred solver from BI diagonal rays"
+  }
+}

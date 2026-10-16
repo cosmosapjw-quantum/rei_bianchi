@@ -1,0 +1,146 @@
+{
+  "schema": "rei.ssot.owners.v2",
+  "owners": [
+    {
+      "process": "photoionization_HI_HeI_HeII",
+      "owner": "rei radiation absorption transaction",
+      "upstream": "Verner1996 source or pinned native equivalent",
+      "exclusive_with": [
+        "separate unowned photon sink"
+      ],
+      "requires": [
+        "photon_birth_id",
+        "spectral_energy",
+        "absorber_id",
+        "binding_chi",
+        "heat_excess",
+        "electron_created"
+      ]
+    },
+    {
+      "process": "recombination_caseA",
+      "owner": "Grackle Case-A gas event + transported escaped photons",
+      "upstream": "Grackle3.4.1+BASS_HE when source-bound",
+      "exclusive_with": [
+        "caseB_OTS_same_event"
+      ],
+      "requires": [
+        "cooling_internal_energy_convention",
+        "escape_photon",
+        "species_transition"
+      ]
+    },
+    {
+      "process": "recombination_caseB",
+      "owner": "OTS local effective solver branch",
+      "upstream": "explicit Case-B table",
+      "exclusive_with": [
+        "caseA_explicit_recombination_escape_same_event"
+      ],
+      "requires": [
+        "on_the_spot_assumption",
+        "frequency_bin_limitations"
+      ]
+    },
+    {
+      "process": "impact_ionization",
+      "owner": "Grackle CI or opt-in CR primary model",
+      "upstream": "Grackle/bass_cr",
+      "exclusive_with": [
+        "duplicated source term event"
+      ],
+      "requires": [
+        "threshold_energy",
+        "recoil_gas",
+        "ionization_species"
+      ]
+    },
+    {
+      "process": "thermal_energy",
+      "owner": "one shared gas energy equation",
+      "upstream": "igm_thermal.rs",
+      "exclusive_with": [
+        "separate untracked thermal drift"
+      ],
+      "requires": [
+        "d_n_tot_dt",
+        "adiabatic_expansion",
+        "photoheat",
+        "CE",
+        "FF",
+        "CMB",
+        "reaction_binding"
+      ]
+    },
+    {
+      "process": "CMB_Compton",
+      "owner": "single gas-CMB transaction",
+      "upstream": "Grackle or validated equivalent",
+      "exclusive_with": [
+        "second CMB exchange in other lane"
+      ],
+      "requires": [
+        "electron_density",
+        "radiation_temperature",
+        "signed_gas_and_CMB_reservoir"
+      ]
+    },
+    {
+      "process": "H_D_charge_exchange",
+      "owner": "AtomicRhs XOR ThermalSubstep",
+      "upstream": "deuterium_thermal_coupling.rs",
+      "exclusive_with": [
+        "AtomicRhs_and_ThermalSubstep_both"
+      ],
+      "requires": [
+        "spectator_EOS",
+        "H_D_isotope_census",
+        "fixed_volume_vs_cosmo_expansion"
+      ]
+    },
+    {
+      "process": "optical_depth",
+      "owner": "bass observer consumer",
+      "upstream": "actual REI n_e rest-current output",
+      "exclusive_with": [
+        "Q_as_independent_electron_multiplier"
+      ],
+      "requires": [
+        "proper_time",
+        "electron_frame",
+        "ray_tetrad",
+        "observer_endpoint",
+        "tail_state"
+      ]
+    },
+    {
+      "process": "primordial_IC",
+      "owner": "rec_bianchi donor",
+      "upstream": "pinned rec_bianchi revision",
+      "exclusive_with": [
+        "HyRec_as_postz20_reionization_solver"
+      ],
+      "requires": [
+        "cosmology",
+        "Tgas",
+        "He_normalization",
+        "initial_time",
+        "composition_mass"
+      ]
+    },
+    {
+      "process": "BASS_gamma_nu_Thomson",
+      "owner": "BASS I/E/B/V or scoped unpolarized hierarchy",
+      "upstream": "BASS current code",
+      "exclusive_with": [
+        "Thomson_scattering_on_neutrinos"
+      ],
+      "requires": [
+        "ne_true",
+        "sigmaT",
+        "nu_collisionless",
+        "screen_basis_for_polarized"
+      ]
+    }
+  ]
+}
