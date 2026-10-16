@@ -1,3 +1,4 @@
+#[path = "matrix_owner.rs"]
 mod native_owner;
 use native_owner::*;
 use rei_microphysics::{
@@ -13,12 +14,17 @@ use std::{
     io::{self, BufRead},
     path::Path,
 };
-fn driver(q: f64) -> Result<(Driver, Accepted), Box<dyn std::error::Error>> {
+fn driver(
+    q: f64,
+    nmu: usize,
+    cells: usize,
+    source: usize,
+) -> Result<(Driver, Accepted), Box<dyn std::error::Error>> {
     let mut cfg = DriverConfig::baseline();
     cfg.q_ref = q;
-    cfg.n_mu = 8;
-    cfg.energy_subdivisions = 8;
-    cfg.transport_cells = 16;
+    cfg.n_mu = nmu;
+    cfg.energy_subdivisions = source;
+    cfg.transport_cells = cells;
     cfg.background_panels = 256;
     cfg.inactive_hi_split = false;
     cfg.transport_threads = 1;
@@ -63,21 +69,27 @@ fn encode(p: &PhotonState) -> Result<Vec<f64>, Box<dyn std::error::Error>> {
     }
     Ok(v)
 }
-fn setup(q: f64) -> Result<Setup, Box<dyn std::error::Error>> {
-    let (d, s0) = driver(q)?;
+fn setup(
+    q: f64,
+    birth_count: usize,
+    nmu: usize,
+    source: usize,
+    cells: usize,
+) -> Result<Setup, Box<dyn std::error::Error>> {
+    let (d, s0) = driver(q, nmu, cells, source)?;
     let x0 = s0.gas_owner.a.ln();
     let width = 0.002;
     let mut births = vec![];
     let mut templates = vec![];
     let mut encoded = vec![];
-    for i in 0..8 {
-        let x = x0 + width * (i as f64 + 0.5) / 8.;
+    for i in 0..birth_count {
+        let x = x0 + width * (i as f64 + 0.5) / birth_count as f64;
         let a = x.exp();
         let g = d.geometry_point(a)?.geometry()?;
         let h = d.geometry_point(a)?.h_per_s;
         let mut p = d.transport.empty_state();
         d.transport
-            .inject(&mut p, &g, 1. / a - 1., width / 8. / h)?;
+            .inject(&mut p, &g, 1. / a - 1., width / birth_count as f64 / h)?;
         births.push(x);
         encoded.push(encode(&p)?);
         templates.push(p);
@@ -217,7 +229,7 @@ fn evaluate(
     let ab = [nh * (1. - f), nhe * (1. - y - zz), nhe * y];
     let cells = s.d.transport.cell_count();
     let mut photo = IgmPhotoInput::default();
-    let mut moments = vec![0.; 2 * cells * 8];
+    let mut moments = vec![0.; 2 * cells * s.templates.len()];
     let rays = s.d.transport.ray_geometry(&g)?;
     let mut work = 0.;
     for i in 0..active {
@@ -291,17 +303,34 @@ fn physical(
     let mut log_population = vec![];
     let mut underflow = 0usize;
     let mut positive_lanes = 0usize;
-    for i in 0..8 {
+    let mut photo = IgmPhotoInput::default();
+    for i in 0..s.templates.len() {
         let mut ns = vec![0.; cells];
         let mut us = vec![0.; cells];
         let mut logs = vec![];
         let mut n = 0.;
         let mut u = 0.;
         if i < active {
-            let (p, _, _, logn) = normalized_decode(
+            let (p, l, r, logn) = normalized_decode(
                 &s.templates[i],
                 &z[4 + 2 * cells * i..4 + 2 * cells * (i + 1)],
             )?;
+            let prep = s.d.transport.prepare(&p, &g)?;
+            let (_, input) = prep.research_positive_log_rhs(
+                [
+                    s.d.n_h0_cm3 / x.exp().powi(3) * (1. - gas.fractions[0]),
+                    s.d.n_he0_cm3 / x.exp().powi(3) * (1. - gas.fractions[1] - gas.fractions[2]),
+                    s.d.n_he0_cm3 / x.exp().powi(3) * gas.fractions[1],
+                ],
+                s.d.n_h0_cm3 / x.exp().powi(3),
+                &l,
+                &r,
+                &logn,
+            )?;
+            for j in 0..3 {
+                photo.gamma_s[j] += input.gamma_s[j];
+                photo.heat_erg_per_absorber_s[j] += input.heat_erg_per_absorber_s[j];
+            }
             for k in 0..cells {
                 if p.number[k] == 0. {
                     logs.push(None);
@@ -343,11 +372,18 @@ fn physical(
         })
         .collect::<Vec<_>>()
         .join(",");
-    let extras = &z[4 + 2 * cells * 8..];
+    let point = s.d.geometry_point(x.exp())?;
+    let nh = s.d.n_h0_cm3 / x.exp().powi(3);
+    let nhe = s.d.n_he0_cm3 / x.exp().powi(3);
+    let rhs = AxbiProvider
+        .point(&gas, nh, nhe, point.h_per_s, 2.7255 / x.exp(), photo)?
+        .rhs;
+    let diagnostic=format!("\"temperature_K\":{},\"proper_time_s\":{},\"Gamma_s\":{:?},\"heat_erg_per_absorber_s\":{:?},\"photo_events_cm3_s\":{:?},\"RR_events_cm3_s\":{:?},\"CI_events_cm3_s\":{:?},\"DR_events_cm3_s\":{},\"signed_s_over_H\":{},\"Sigma_magnitude\":{}",gas.eos(nh,nhe)?.temperature_k,point.time_s,photo.gamma_s,photo.heat_erg_per_absorber_s,rhs.photo_events_cm3_s,rhs.rr_events_cm3_s,rhs.ci_events_cm3_s,rhs.dr_events_cm3_s,point.s_per_s/point.h_per_s,3f64.sqrt()*point.s_per_s.abs()/point.h_per_s);
+    let extras = &z[4 + 2 * cells * s.templates.len()..];
     // Every rounded-to-zero positive linear population is retained above in logN.
     // Underflow contributes at most one smallest binary64 subnormal per lane to
     // displayed linear N; this is an output rounding bound, not structural deletion.
-    Ok(format!("{{\"flat\":{:?},\"cohorts\":{:?},\"N\":{totaln},\"U\":{totalu},\"quadrupole_U_mu2_minus_third\":{quad},\"ledgers\":{:?},\"log_population\":[{log_json}],\"positive_lanes\":{positive_lanes},\"linear_N_underflow_lanes\":{underflow},\"linear_N_underflow_absolute_bound\":{:e}}}",flat,cohort,extras,underflow as f64*f64::from_bits(1)))
+    Ok(format!("{{\"flat\":{:?},\"cohorts\":{:?},\"N\":{totaln},\"U\":{totalu},\"quadrupole_U_mu2_minus_third\":{quad},\"ledgers\":{:?},\"log_population\":[{log_json}],\"positive_lanes\":{positive_lanes},\"linear_N_underflow_lanes\":{underflow},\"linear_N_underflow_absolute_bound\":{:e},{diagnostic}}}",flat,cohort,extras,underflow as f64*f64::from_bits(1)))
 }
 fn diagnose(
     s: &Setup,
@@ -421,8 +457,14 @@ fn normalized_diagnose(
     }
     Ok(format!("[{}]", reports.join(",")))
 }
-fn server(q: f64) -> Result<(), Box<dyn std::error::Error>> {
-    let s = setup(q)?;
+fn server(
+    q: f64,
+    birth_count: usize,
+    nmu: usize,
+    source: usize,
+    transport_cells: usize,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let s = setup(q, birth_count, nmu, source, transport_cells)?;
     let x0 = s.s0.gas_owner.a.ln();
     let initial = gas_encoded(&s.s0)?;
     let cells = s.d.transport.cell_count();
@@ -462,7 +504,12 @@ fn server(q: f64) -> Result<(), Box<dyn std::error::Error>> {
             Ok([n, u])
         })
         .collect::<Result<Vec<_>, rei_microphysics::ForwardError>>()?;
-    println!("{{\"x0\":{x0},\"x1\":{},\"births\":{:?},\"initial\":{:?},\"encoded_births\":{:?},\"physical_births\":{:?},\"cells\":{cells},\"extra\":{EXTRA},\"initial_physical\":{:?},\"active_indices\":{:?},\"source_inventory\":{:?},\"he_h\":{},\"binding_ev\":{:?}}}",x0+0.002,s.births,initial,s.encoded,injections,vec![s.s0.gas_owner.gas.fractions[0],s.s0.gas_owner.gas.fractions[1],s.s0.gas_owner.gas.fractions[2],w_erg_per_h_to_ev(s.s0.gas_owner.gas.w_erg_per_h)?],active_indices,source_inventory,s.d.n_he0_cm3/s.d.n_h0_cm3,HHeModel::controlled_fixture().threshold_ev);
+    let birth_times = s
+        .births
+        .iter()
+        .map(|x| s.d.geometry_point(x.exp()).map(|p| p.time_s))
+        .collect::<Result<Vec<_>, _>>()?;
+    println!("{{\"birth_count\":{birth_count},\"n_mu\":{nmu},\"source_subdivisions\":{source},\"transport_cells\":{transport_cells},\"birth_times_s\":{:?},\"x0\":{x0},\"x1\":{},\"births\":{:?},\"initial\":{:?},\"encoded_births\":{:?},\"physical_births\":{:?},\"cells\":{cells},\"extra\":{EXTRA},\"initial_physical\":{:?},\"active_indices\":{:?},\"source_inventory\":{:?},\"he_h\":{},\"binding_ev\":{:?}}}",birth_times,x0+0.002,s.births,initial,s.encoded,injections,vec![s.s0.gas_owner.gas.fractions[0],s.s0.gas_owner.gas.fractions[1],s.s0.gas_owner.gas.fractions[2],w_erg_per_h_to_ev(s.s0.gas_owner.gas.w_erg_per_h)?],active_indices,source_inventory,s.d.n_he0_cm3/s.d.n_h0_cm3,HHeModel::controlled_fixture().threshold_ev);
     for line in io::stdin().lock().lines() {
         let line = line?;
         let mut iter = line.split_whitespace();
@@ -508,13 +555,114 @@ fn server(q: f64) -> Result<(), Box<dyn std::error::Error>> {
     }
     Ok(())
 }
-fn native(q: f64, out: &Path) -> Result<(), Box<dyn std::error::Error>> {
-    let s = setup(q)?;
+fn native_physical(d: &Driver, s: &Accepted) -> Result<String, Box<dyn std::error::Error>> {
+    let a = s.gas_owner.a;
+    let point = d.geometry_point(a)?;
+    let g = point.geometry()?;
+    let rays = d.transport.ray_geometry(&g)?;
+    let cells = d.transport.cell_count();
+    let gas = s.gas_owner.gas;
+    let nh = d.n_h0_cm3 / a.powi(3);
+    let nhe = d.n_he0_cm3 / a.powi(3);
+    let [f, y, z] = gas.fractions;
+    let ab = [nh * (1. - f), nhe * (1. - y - z), nhe * y];
+    let mut flat = vec![f, y, z, w_erg_per_h_to_ev(gas.w_erg_per_h)?];
+    let mut cohort = vec![];
+    let mut quad = 0.;
+    let mut photo = IgmPhotoInput::default();
+    let mut births = vec![];
+    for c in &s.cohorts {
+        flat.extend(&c.surviving.number);
+        flat.extend(&c.surviving.energy_ref);
+        let (n, u) = d.transport.inventory(&c.surviving, &g)?;
+        cohort.push([n, u]);
+        births.push(c.birth.proper_time_s);
+        let p = d
+            .transport
+            .prepare(&c.surviving, &g)?
+            .evaluate(ab, nh, 0.)?
+            .photo;
+        for j in 0..3 {
+            photo.gamma_s[j] += p.gamma_s[j];
+            photo.heat_erg_per_absorber_s[j] += p.heat_erg_per_absorber_s[j];
+        }
+        for k in 0..cells {
+            let r = &rays[k / d.transport.n_energy()];
+            quad += c.surviving.energy_ref[k] * r.scale * (r.mu * r.mu - 1. / 3.);
+        }
+    }
+    let (n, u) = inventory(d, s)?;
+    let l = &s.gas_owner.ledgers;
+    let led = vec![
+        l.escaped_u,
+        l.cmb_input,
+        l.photon_work,
+        l.thermal_work,
+        l.photo_events[0],
+        l.photo_events[1],
+        l.photo_events[2],
+        l.rr_events[0],
+        l.rr_events[1],
+        l.rr_events[2],
+        l.ci_events[0],
+        l.ci_events[1],
+        l.ci_events[2],
+        l.dr_events,
+    ];
+    let point_rhs = AxbiProvider
+        .point(&gas, nh, nhe, point.h_per_s, 2.7255 / a, photo)?
+        .rhs;
+    Ok(format!("{{\"flat\":{:?},\"cohorts\":{:?},\"birth_times_s\":{:?},\"N\":{n},\"U\":{u},\"quadrupole_U_mu2_minus_third\":{quad},\"ledgers\":{:?},\"proper_time_s\":{},\"temperature_K\":{},\"Gamma_s\":{:?},\"heat_erg_per_absorber_s\":{:?},\"photo_events_cm3_s\":{:?},\"RR_events_cm3_s\":{:?},\"CI_events_cm3_s\":{:?},\"DR_events_cm3_s\":{},\"emitted_N_U\":[{},{}]}}",flat,cohort,births,led,point.time_s,gas.eos(nh,nhe)?.temperature_k,photo.gamma_s,photo.heat_erg_per_absorber_s,point_rhs.photo_events_cm3_s,point_rhs.rr_events_cm3_s,point_rhs.ci_events_cm3_s,point_rhs.dr_events_cm3_s,l.source_n,l.source_u))
+}
+fn native(
+    q: f64,
+    out: &Path,
+    birth_count: usize,
+    nmu: usize,
+    source: usize,
+    transport_cells: usize,
+    matrix: bool,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let s = setup(q, birth_count, nmu, source, transport_cells)?;
     fs::create_dir_all(out)?;
-    for level in [1, 2, 4, 8] {
+    for level in if matrix { vec![1] } else { vec![1, 2, 4, 8] } {
         let to = (s.s0.gas_owner.a.ln() + 0.002).exp();
-        let mesh = common_mesh(s.s0.gas_owner.a, to, &[8], level);
-        let a = trial_on_mesh(&s.d, &s.s0, to, 8, &mesh, &mut 0)?;
+        let mesh = common_mesh(
+            s.s0.gas_owner.a,
+            to,
+            if matrix { &[8, 16, 32] } else { &[8] },
+            level,
+        );
+        let (a, trace) = if matrix {
+            trial_on_mesh_trace(&s.d, &s.s0, to, birth_count, &mesh, &mut 0)?
+        } else {
+            (
+                trial_on_mesh(&s.d, &s.s0, to, birth_count, &mesh, &mut 0)?,
+                vec![],
+            )
+        };
+        if matrix {
+            fs::write(out.join("common_mesh_ln_a.json"), format!("{:?}", mesh))?;
+            let reference_x = common_mesh(s.s0.gas_owner.a, to, &[8], 1);
+            let observations = trace
+                .iter()
+                .filter(|(x, _, _)| reference_x.iter().any(|v| v.to_bits() == x.to_bits()))
+                .map(|(x, post, state)| {
+                    native_physical(&s.d, state).map(|p| {
+                        format!(
+                            "{{\"x\":{x},\"side\":\"{}\",\"active\":{},\"physical\":{p}}}",
+                            if *post { "post" } else { "pre" },
+                            state.cohorts.len()
+                        )
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            fs::write(
+                out.join("observations.json"),
+                format!("[{}]", observations.join(",")),
+            )?;
+            fs::write(out.join("endpoint.json"), native_physical(&s.d, &a)?)?;
+        }
         let mut f = vec![
             a.gas_owner.gas.fractions[0],
             a.gas_owner.gas.fractions[1],
@@ -535,9 +683,22 @@ fn native(q: f64, out: &Path) -> Result<(), Box<dyn std::error::Error>> {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = std::env::args().collect::<Vec<_>>();
     let q = args[2].parse()?;
+    let offset = if args[1] == "server" { 3 } else { 4 };
+    let get = |i: usize, default: usize| -> Result<usize, Box<dyn std::error::Error>> {
+        Ok(args
+            .get(offset + i)
+            .map(|v| v.parse())
+            .transpose()?
+            .unwrap_or(default))
+    };
+    let births = get(0, 8)?;
+    let nmu = get(1, 8)?;
+    let source = get(2, 8)?;
+    let cells = get(3, 16)?;
     match args[1].as_str() {
-        "server" => server(q),
-        "native" => native(q, Path::new(&args[3])),
+        "server" => server(q, births, nmu, source, cells),
+        "native" => native(q, Path::new(&args[3]), births, nmu, source, cells, false),
+        "matrix_native" => native(q, Path::new(&args[3]), births, nmu, source, cells, true),
         _ => Err("mode".into()),
     }
 }
