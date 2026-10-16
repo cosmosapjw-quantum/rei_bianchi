@@ -53,3 +53,7 @@ PYTHON=python3 NATIVE_ROOT=$(mktemp -d /tmp/rei-grackle-native.XXXXXX) bash rese
 ```
 
 전체 캠페인 재실행은 README_NATIVE_KO.md/README_REFERENCE_KO.md의 mode별 명령을 사용한다. PR150 production full solver를 재시작하지 않는다. 다음 연구에서는 먼저 DELIVERY_RECEIPT.json과 NEXT_DAG.json 및 최신 remote HEAD를 읽는다.
+
+## 실제 전달 완료
+
+Draft PR #160, science commit `8ab56b3621a030371b6157af9bd87f2009366b65`. 25,114,633-byte ZIP의 Dropbox/Drive 독립 전체 재다운로드 SHA-256은 모두 `80dc1a705afdf1f5596046bc6b10c3700557ff39f93385d155a68817e17c5b40`. 각각 CRC 및 538-file manifest PASS, 새 native source/build와 event/rollback/retry/32-step full-physics trajectory 복원 exit 0. 상세 경로·id·로그는 DELIVERY_RECEIPT.json. GitHub CI는 변경하지 않은 원래 Rust formatting 단계 exit1이며 science tree의 native Rust diff는 0 bytes. 새 연구 Rust formatting은 실행 layout에서 exit0. 전체 CI green이라고 주장하지 않는다.
