@@ -24,7 +24,8 @@ class PairImplementation(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             write_diagnostics(result,d)
             self.assertEqual(json.loads((Path(d)/'full_pair_continuous_diagnostics.json').read_text()),result)
-            rows=list(csv.DictReader((Path(d)/'full_pair_continuous_summary.csv').open()))
+            with (Path(d)/'full_pair_continuous_summary.csv').open() as stream:
+                rows=list(csv.DictReader(stream))
             self.assertEqual(len(rows),1)
             self.assertEqual(set(rows[0]),set(row))
 
@@ -62,10 +63,10 @@ class PairImplementation(unittest.TestCase):
         self.assertIs(function.args.defaults[-1].value,False)
         branches=[n for n in ast.walk(function) if isinstance(n,ast.If)
                   and isinstance(n.test,ast.Name) and n.test.id=='continuous_pair_diagnostics']
-        self.assertEqual(len(branches),1)
-        called={n.func.id for n in ast.walk(branches[0]) if isinstance(n,ast.Call)
-                and isinstance(n.func,ast.Name)}
-        self.assertEqual(called,{'diagnose_pair','write_diagnostics'})
+        self.assertEqual(len(branches),2)  # New metrics and their failure cleanup.
+        calls=[{n.func.id for n in ast.walk(branch) if isinstance(n,ast.Call)
+                and isinstance(n.func,ast.Name)} for branch in branches]
+        self.assertIn({'diagnose_pair','write_diagnostics'},calls)
         # Old sampled filenames and milestone assignment remain in the caller.
         source=ast.unparse(function)
         for name in ('full_pair_sampled_diagnostics.csv','full_pair_summary.csv','full_pair_milestones.json'):
