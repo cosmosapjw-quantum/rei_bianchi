@@ -2,8 +2,8 @@
   "schema_version": 1,
   "workflow_version": "1.0.0",
   "unit_id": "flrw_nonlinear_error_budget_20261016",
-  "status": "R8_ADOPTED_FOR_IMPLEMENTATION_CONTRACT",
-  "coding_ready": false,
+  "status": "R9_FROZEN_CODING_CONTRACT",
+  "coding_ready": true,
   "source_pin": "evidence/SOURCE_PIN.json",
   "baseline_commit": "fdfda0fec423ccb7175552c7dc066be93ce347e1",
   "objective": "Scaled nonlinear residual to Newton-correction diagnostic with conditioning and explicit missing-stage HOLD",
@@ -37,7 +37,7 @@
     "probe": "oneinitial+atmostone diagnosedrepair, each30s, no native or physicalhistory"
   },
   "actual_stage_attribution": "NOT_RUN_MISSING_RESIDUAL_AND_JACOBIAN_PACKET",
-  "next": "R6 symbolic evidence and R7 independent rational probe after R5 capture",
+  "next": "R10 capture then lower-tier C1-C10",
   "comparison_scope": "Four chemical variables only; production photon blocks remain outside this linearized diagnostic",
   "scaling": {
     "residual": "diag(1,1,1,max(abs(w_old),abs(w),1e-6))",
@@ -69,5 +69,149 @@
     "implementation": "PENDING",
     "actual_stage": "NOT_RUN_MISSING_RESIDUAL_AND_JACOBIAN_PACKET",
     "nonlinear_error_certificate": null
+  },
+  "coding_start_gate": "R10_CAPTURED",
+  "implementation_file": "research/flrw_nonlinear_error_budget_20261016/nonlinear_budget.py",
+  "api": {
+    "solve_scaled": {
+      "signature": "solve_scaled(residual,jacobian,residual_scales,state_scales)",
+      "input": "Four finite numeric entries;4x4 finite J;two positivefinite4vectors; bool is not a numeric entry",
+      "algorithm": "Binary64 Gaussian/Gauss-Jordan elimination with maximum absolute partial row pivot; exact-zero pivot HOLD, no epsilon cutoff",
+      "metrics": [
+        "A",
+        "b",
+        "residual_scales",
+        "state_scales",
+        "scaled_correction",
+        "delta",
+        "native_scaled_residual_inf",
+        "scaled_correction_inf",
+        "kappa_inf",
+        "linear_equation_residual",
+        "linear_backward_error"
+      ],
+      "success_status": "LINEAR_SYSTEM_DIAGNOSTIC",
+      "failure": "Return status HOLD, named reason, metrics null; singular/nonfinite/malformed are expected typed outcomes"
+    },
+    "analyze_stage": {
+      "signature": "analyze_stage(packet)",
+      "success_status_by_kind": {
+        "SYNTHETIC_FIXTURE": "SYNTHETIC_LINEARIZED_DIAGNOSTIC",
+        "ACTUAL_STAGE": "ACTUAL_STAGE_LINEARIZED_DIAGNOSTIC"
+      },
+      "metrics": "core metrics plus correction_to_local_target, passes_frozen_newton_inequality, thermal",
+      "output_constants": {
+        "nonlinear_error_certificate": null,
+        "scientific_admission": "NOT_ISSUED",
+        "correction_scope": "CHEMICAL_STAGE_ONLY_NO_STATE_COMMIT"
+      },
+      "failure": "Return status HOLD, named reason, metrics null; keep input_kind when known"
+    }
+  },
+  "packet_schema": {
+    "schema_version": 1,
+    "input_kind": "SYNTHETIC_FIXTURE or ACTUAL_STAGE",
+    "state_order": [
+      "x_HII",
+      "x_HeII",
+      "x_HeIII",
+      "w_eV_per_H"
+    ],
+    "energy_unit": "eV_per_H",
+    "method": "BACKWARD_EULER_PREPARED_ABSORPTION",
+    "old_state": "four numeric values",
+    "state": "four numeric values",
+    "residual": "four unnormalized values in same component units",
+    "jacobian": "4x4 dR/dy or labeled finite difference at state",
+    "residual_evaluation_state": "four values exactly equal state",
+    "jacobian_evaluation_state": "four values exactly equal state",
+    "context_id": "nonempty prepared-stage identifier",
+    "residual_context_id": "same context_id",
+    "jacobian_context_id": "same context_id",
+    "a": "finite >0",
+    "dt_s": "finite >0",
+    "f_He": "finite >=0",
+    "k_B_eV_per_K": "finite >0",
+    "jacobian_kind": "ANALYTIC or FINITE_DIFFERENCE",
+    "actual_only": {
+      "iterate_status": "ACCEPTED_CHEMICAL_STAGE",
+      "source_commit": "nonempty immutable producer commit",
+      "driver_blob_sha": "2a16fa8d898588d859eff2c7750a5f8496cadd0c",
+      "stage_id": "nonempty exact stage identifier",
+      "execution_receipt": "nonempty owner record locator; module records it and does not execute/read remote source",
+      "added_rhs_evaluations": "integer >=0, explicitly captured rather than inferred",
+      "cost_owner": "nonempty owner/observer allocation identifier"
+    },
+    "synthetic": "All equation/state/context/numeric fields still required; actual_only provenance not required; synthetic label always preserved"
+  },
+  "validation": {
+    "input_state": "0<=HII<=1;HeII>=0;HeIII>=0;HeII+HeIII<=1;w>0 for old/current states",
+    "actual_acceptance": "Computed native_scaled_residual_inf<=1e-11 required for packet claiming accepted stage; otherwise HOLD_ACCEPTED_STAGE_RESIDUAL_MISMATCH",
+    "stale": "Exact supplied numeric state/context mismatch yields HOLD_STALE_OR_MISMATCHED_STAGE",
+    "source": "Actual driver blob must match pinned residual implementation; mismatch HOLD_SOURCE_BINDING_MISMATCH, not automatic scientific-invalidity finding",
+    "missing": "Missing required packet fields or absent file => HOLD_MISSING_STAGE_DATA",
+    "conditioning": "Finite condition estimate reported with no threshold; zero pivot HOLD_SINGULAR_JACOBIAN; nonfinite arithmetic HOLD_NONFINITE_ARITHMETIC",
+    "physical_error_bounds": null
+  },
+  "thermal": {
+    "fields": [
+      "temperature_before",
+      "delta_temperature_linear",
+      "delta_temperature_exact_map",
+      "temperature_corrected",
+      "corrected_state",
+      "corrected_domain",
+      "exact_map_hold_reason"
+    ],
+    "formula": "D=1+fHe+xHII+fHe*(xHeII+2*xHeIII); dD=deltaHII+fHe*(deltaHeII+2*deltaHeIII); T=2w/(3kD); linear=T*(dw/w-dD/D); exact_delta=linear/(1+dD/D)",
+    "invalid_corrected_state": "Keep linear diagnostic; exact_delta andtemperature_corrected null, corrected_domainINVALID and reason; no clipping",
+    "finite_rounding": "All evaluated formulas binary64; exact_map denotes algebraic EOS map rather than exact arithmetic or true temperature error"
+  },
+  "cli": {
+    "command": "python3 research/flrw_nonlinear_error_budget_20261016/nonlinear_budget.py --input STAGE_PACKET.json --output FRESH_DIRECTORY",
+    "success_exit": 0,
+    "hold_exit": 2,
+    "existing_output": "Reject without overwriting",
+    "outputs": [
+      "NONLINEAR_BUDGET_RESULT.json",
+      "EXECUTION_RECEIPT.json"
+    ],
+    "receipt": "Actual input hash when file exists, module hash, argv/command, Python version, process/wall time, exit/HOLD status; no fabricated timing for nonexistent priorruns",
+    "json_finite": true
+  },
+  "implementation_acceptance": {
+    "oracle": "Reuse probe/RESULT.json expectedvalues; no oracle rerun",
+    "float_fixture_tolerances": {
+      "relative": 1e-12,
+      "absolute": 1e-14,
+      "scope": "Moderate synthetic outputs only, including zero/cancellation absolute floor"
+    },
+    "controls": [
+      "matrix/sign/scaling comparisons to cached exact fixtures",
+      "max-absolute pivot with exact-zero singular rejection",
+      "large finite condition remains reported",
+      "genericcore consistent energyunit transformation",
+      "zero residual andzero backwarderror denominator",
+      "old_w/current_w unequal residualscale",
+      "valid EOS and invalid corrected physicaldomain",
+      "EOS cancellation without closeT subtraction",
+      "missing actual stage fields/null telemetry",
+      "stale J or R evaluationstate",
+      "context mismatch",
+      "sourcepin mismatch",
+      "actual inclusive Newton1e-11 boundary",
+      "no actual acceptance inferred fromsynthetic label",
+      "finite JSON serialization",
+      "CLI missingfile typedHOLD",
+      "fresh output non-overwrite"
+    ],
+    "scope": "No native/code-source imports, build, trajectory, PL replay, source009 mutation or tolerance changes",
+    "review": "Fresh read-only C9 of newimplementation and actualoutputs; boundedtargetedrepair onlyifconcretefinding"
+  },
+  "handoff": {
+    "actual_stage": "NOT_RUN_MISSING_RESIDUAL_AND_JACOBIAN_PACKET",
+    "required_artifact": "Illustrative actual-stage packet template with null missing telemetry producing HOLD",
+    "owner_action": "Export sameacceptedstateR/J context; computeandchargeacceptedstateJ ifabsent; no observerinstalled or runlaunchedhere",
+    "budget": "Original owner allocations/deadlines remain unchanged; this unit adds no production execution authority"
   }
 }
