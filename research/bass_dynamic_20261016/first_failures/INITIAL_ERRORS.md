@@ -25,6 +25,14 @@
 - The exploratory 128-step fixed run exited 2 with `AXBI_STEP_CAP` at the
   mini executor's original 100-step cap (`step_cap_128.log`). The bounded
   diagnostic cap was raised to 512. Solver tolerance was unchanged.
+- Repository-wide `cargo fmt --all -- --check` exits 1 on 16 files
+  (`cargo_fmt_check.log.gz`). GitHub PR159 `verify` failed twice at this gate;
+  `github_ci_fmt.log.gz` retains one exact compressed raw job log. REI PR150 base also has two
+  failed `verify` jobs at the same formatting gate. The new driver/test
+  additions contribute some format differences; this Draft PR does not
+  claim CI PASS. No broad format rewrite was applied to the 13 inherited
+  files, and the scientific source-bound checkpoint identity was not changed
+  after the release calculations merely to reformat code.
 
 The release archive and release numerical summaries are the authoritative
 post-repair results. Superseded archives and comparison JSON files are kept

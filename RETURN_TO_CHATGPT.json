@@ -74,6 +74,14 @@
     ]
   },
   "execution": {
+    "cargo_fmt_gate": {
+      "command": "cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check",
+      "exit_code": 1,
+      "files_with_diffs": 16,
+      "inherited_files_with_diffs": 13,
+      "raw_log": "research/bass_dynamic_20261016/first_failures/cargo_fmt_check.log.gz",
+      "touched_files_with_diffs": 3
+    },
     "ncp_matrix": {
       "command": "bash /root/REI_BASS_DYNAMIC_20261016_001/run_ncp_release.sh",
       "exit_code": 0,
@@ -136,6 +144,13 @@
       "event": "128-step diagnostic hit trial max_steps=100",
       "exit_code": 2,
       "repair": "increase mini test cap to 512 without changing solver tolerance"
+    },
+    {
+      "classification": "CI_FORMAT_FAILURE_WITH_INHERITED_AND_NEW_DIFFS",
+      "event": "PR159 GitHub verify formatting gate",
+      "exit_code": 1,
+      "raw_log": "research/bass_dynamic_20261016/first_failures/github_ci_fmt.log.gz",
+      "repair": "separate bounded formatting maintenance with new source-bound checkpoint identity/revalidation; no science admission from CI"
     }
   ],
   "independent_scientific_review": "NOT_RUN_CURRENT_SESSION_DIRECT_IMPLEMENTATION; DRAFT_PUBLICATION_ONLY",
@@ -256,6 +271,16 @@
   },
   "publication": {
     "base_branch": "research/flrw-production-integration-20261015",
+    "ci": {
+      "pr150_base_verify_also_failed": true,
+      "pr159_verify_runs": [
+        "38829392560",
+        "38829398970"
+      ],
+      "raw_log": "research/bass_dynamic_20261016/first_failures/github_ci_fmt.log.gz",
+      "rust_tests_still_passed": 26,
+      "status": "FAIL_FORMAT_GATE"
+    },
     "draft": true,
     "draft_pr": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/159",
     "implementation_head": "1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3",
@@ -272,7 +297,8 @@
       "long-interval chemistry timestep convergence",
       "full EoR/Einstein-Boltzmann admission",
       "momentum counterpart and stellar recoil",
-      "independent Astra-tier scientific review before broader admission"
+      "independent Astra-tier scientific review before broader admission",
+      "repository-wide cargo fmt CI gate; PR remains Draft"
     ],
     "IMPLEMENTATION_VERIFIED": [
       "opt-in provider and 26 Rust tests",
