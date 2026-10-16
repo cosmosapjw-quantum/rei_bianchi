@@ -5,7 +5,7 @@
   "unit_id": "flrw_full005_pair_diagnostics_20261016",
   "objective": "Derive and verify full-overlap PL pair diagnostic norms for FULL005 saved histories",
   "scope": "Mathematical diagnostic and read-only caller contract; zero solver runs",
-  "status": "in_progress",
+  "status": "complete",
   "baseline_commit": "4e2f0682fb605c6aa940bd756d9869e67b6ded0b",
   "stages": [
     {
@@ -92,8 +92,12 @@
     },
     {
       "id": "R10",
-      "status": "pending",
-      "evidence_refs": []
+      "status": "complete",
+      "evidence_refs": [
+        "THEORY.md#r10",
+        "CONTRACT.json"
+      ],
+      "reason": "Theory artifacts and resume contract complete; coding starts after immutable R10 capture; actual full-data newmetrics remain NOT_RUN"
     }
   ],
   "executions": [
@@ -167,8 +171,10 @@
     }
   ],
   "next_actions": [
-    "R10 close and capture theory",
-    "Coding owner C1-C10 under frozen contract"
+    "Publisher captures R10 immutable payload",
+    "Assigned coding owner executes C1-C8",
+    "Fresh independent review then C10 implementation/handoff",
+    "Future original-data standalone execution under retained external budget"
   ],
   "decisions": [
     {
@@ -185,6 +191,48 @@
       "id": "NO_STRONG_NO_GO",
       "decision": "not_applicable",
       "reason": "Explicit synthetic sampling counterexample is used for algorithm selection; no physical exclusion or novel no-go theorem is claimed"
+    }
+  ],
+  "checks": [
+    {
+      "id": "SEGMENT_ALGEBRA",
+      "domain": "math",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "THEORY.md#r5",
+        "evidence/wolfram_pl_integrals.json"
+      ],
+      "execution_ref": "WOLFRAM_SEGMENT_CHECK",
+      "reason": "Independent integrals and identity residuals match conditional formulas"
+    },
+    {
+      "id": "SYNTHETIC_DISCRIMINATION",
+      "domain": "numerics",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "probe/RESULT.json",
+        "probe/stdout.log"
+      ],
+      "execution_ref": "PROBE_FINAL",
+      "reason": "Eight exact rational fixtures and sampled-spike result; no physical threshold"
+    },
+    {
+      "id": "PRODUCTION_IMPLEMENTATION",
+      "domain": "implementation",
+      "result": "not_run",
+      "evidence_refs": [
+        "CONTRACT.json"
+      ],
+      "reason": "C1-C10 assigned after theory capture"
+    },
+    {
+      "id": "ACTUAL_FULL005_CONTINUOUS_METRICS",
+      "domain": "numerics",
+      "result": "not_run",
+      "evidence_refs": [
+        "CONTRACT.json"
+      ],
+      "reason": "Original large raw input execution remains separately budgeted"
     }
   ]
 }

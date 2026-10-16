@@ -2,7 +2,7 @@
   "schema_version": 1,
   "workflow_version": "1.0.0",
   "unit_id": "flrw_full005_pair_diagnostics_20261016",
-  "status": "R9_FROZEN_CODING_CONTRACT",
+  "status": "R10_THEORY_COMPLETE_CODING_CONTRACT_FROZEN",
   "baseline_commit": "4e2f0682fb605c6aa940bd756d9869e67b6ded0b",
   "branch": "research/flrw-production-integration-20261015",
   "objective": "Full-overlap piecewise-linear reconstruction pair supremum and analytic L1/L2/RMS diagnostics in stored ln(a)",
@@ -47,7 +47,6 @@
   },
   "coding_ready": true,
   "remaining_obligations": [
-    "R10 captured handoff",
     "C1-C10 implementation and independent review",
     "Future actual full accepted-history diagnostic execution under retained external budget"
   ],
@@ -204,7 +203,17 @@
       "--bindings-root": "ROOT/<original binding basename>"
     },
     "missing_or_invalid_input": "Typed HOLD receipt; new metrics null; nonzero exit; no render or solver launch",
-    "json": "Finite-only serialization; allow_nan=False or equivalent"
+    "json": "Finite-only serialization; allow_nan=False or equivalent",
+    "loader_policy": "Direct minimal loader reuses reader.FIELDS/SPECIES/CLOCK constants and assembles identical arrays; no monkeypatching or rerun of reader.load_case physical checks. Check numeric prerequisites and exact prior stream hashes; reuse all-row physical validation.",
+    "new_numeric_prerequisites": [
+      "finite values",
+      "a>0 and nH>0 before log/division",
+      "strict L/time ordering",
+      "selected array lengths",
+      "case identity",
+      "abundance time/species alignment",
+      "full represented endpoints from prior completed receipt"
+    ]
   },
   "implementation_acceptance": {
     "exact_checks": [
@@ -243,9 +252,9 @@
     "additional_dependencies": "Include any frozen JSON actually referenced by final runtime imports",
     "published_identity": "Controller fills actual final commit/archive URL after C10; no invented locator",
     "raw_discovery": "Inspect saved receipt paths; use explicit relocation flags for discovered owner cache; missing bytes produce HOLD",
-    "prior_cpu_wall_debit_seconds": 103.79374452296179,
     "remaining_external_wall_ceiling_seconds": 196.206255477,
     "requires_finite_wall_cap": true,
-    "large_raw_run_this_unit": "NOT_RUN"
+    "large_raw_run_this_unit": "NOT_RUN",
+    "prior_postprocess_debit_seconds": 103.79374452296179
   }
 }
