@@ -1,0 +1,156 @@
+# axbi_driver.rs lines 244-287
+244: /// Immutable inputs shared by leaf residual evaluations. This context has no
+245: /// worker-pool handle and cannot submit nested work or mutate the stage state.
+246: #[derive(Clone)]
+247: struct ResidualContext {
+248:     gas: IgmGasState,
+249:     a: f64,
+250:     n_h0_cm3: f64,
+251:     n_he0_cm3: f64,
+252:     cells: usize,
+253:     prepared: Arc<PreparedAbsorption>,
+254: }
+255: impl ResidualContext {
+256:     fn evaluate(
+257:         &self,
+258:         unknown: [f64; 4],
+259:         dt: f64,
+260:     ) -> Result<([f64; 4], PhotonState, IgmPointRhs), ForwardError> {
+261:         let gas = IgmGasState::new(
+262:             [unknown[0], unknown[1], unknown[2]],
+263:             w_ev_per_h_to_erg(unknown[3])?,
+264:         )?;
+265:         let nh = self.n_h0_cm3 / self.a.powi(3);
+266:         let nhe = self.n_he0_cm3 / self.a.powi(3);
+267:         let [x, y, z] = gas.fractions;
+268:         let absorbers = [nh * (1.0 - x), nhe * (1.0 - y - z), nhe * y];
+269:         let c = HHeModel::controlled_fixture();
+270:         let absorption = self
+271:             .prepared
+272:             .evaluate_for_cell_count(self.cells, absorbers, nh, dt)?;
+273:         let stocks = absorption.state;
+274:         let photo = absorption.photo;
+275:         let point = AxbiProvider.point(&gas, nh, nhe, 0.0, 2.7255 / self.a, photo)?;
+276:         let mut residual = [0.0; 4];
+277:         for i in 0..3 {
+278:             residual[i] = unknown[i] - self.gas.fractions[i] - dt * point.rhs.fraction_dt[i];
+279:         }
+280:         residual[3] = unknown[3]
+281:             - w_erg_per_h_to_ev(self.gas.w_erg_per_h)?
+282:             - dt * point.rhs.w_dt_erg_per_h_s / c.ev_erg;
+283:         for &r in &residual {
+284:             f(r)?;
+285:         }
+286:         Ok((residual, stocks, point.rhs))
+287:     }
+
+# axbi_driver.rs lines 792-834
+792:     fn norm(&self, residual: [f64; 4], old_w: f64, new_w: f64) -> f64 {
+793:         residual[0]
+794:             .abs()
+795:             .max(residual[1].abs())
+796:             .max(residual[2].abs())
+797:             .max(residual[3].abs() / old_w.abs().max(new_w.abs()).max(1e-6))
+798:     }
+799:     pub fn chemical_stage(
+800:         &self,
+801:         s: &mut DriverState,
+802:         dt: f64,
+803:         counter: &mut usize,
+804:     ) -> Result<(), ForwardError> {
+805:         if !dt.is_finite() || dt <= 0.0 {
+806:             return Err(err("AXBI_STAGE_DT"));
+807:         }
+808:         let geometry = self.geometry_point(s.a)?.geometry()?;
+809:         let mut old = s.clone();
+810:         self.partition_inactive(&mut old, &geometry)?;
+811:         // Quadrature reconstruction is fixed across the Newton residual/Jacobian
+812:         // evaluations; only trial absorber densities enter backward Euler.
+813:         let prepared = self
+814:             .transport
+815:             .prepare(&self.photon_state(&old), &geometry)?;
+816:         let context = ResidualContext {
+817:             gas: old.gas,
+818:             a: old.a,
+819:             n_h0_cm3: self.n_h0_cm3,
+820:             n_he0_cm3: self.n_he0_cm3,
+821:             cells: self.transport.cell_count(),
+822:             prepared: Arc::new(prepared),
+823:         };
+824:         let old_w = w_erg_per_h_to_ev(old.gas.w_erg_per_h)?;
+825:         let mut x = [
+826:             old.gas.fractions[0],
+827:             old.gas.fractions[1],
+828:             old.gas.fractions[2],
+829:             old_w,
+830:         ];
+831:         for _ in 0..50 {
+832:             let (residual, stocks, rhs) = self.evaluate(&context, x, dt, counter)?;
+833:             let norm = self.norm(residual, old_w, x[3]);
+834:             if norm <= 1e-11 {
+
+# axbi_driver.rs lines 963-981
+963:     pub fn error_metric(
+964:         &self,
+965:         full: &DriverState,
+966:         half: &DriverState,
+967:     ) -> Result<f64, ForwardError> {
+968:         self.transport.validate_state(&self.photon_state(full))?;
+969:         self.transport.validate_state(&self.photon_state(half))?;
+970:         let geometry = self.geometry_point(half.a)?.geometry()?;
+971:         self.validate_inactive(full, &geometry)?;
+972:         self.validate_inactive(half, &geometry)?;
+973:         let mut e = 0.0_f64;
+974:         for i in 0..3 {
+975:             e = e.max(
+976:                 (full.gas.fractions[i] - half.gas.fractions[i]).abs()
+977:                     / half.gas.fractions[i].abs().max(1e-5),
+978:             );
+979:         }
+980:         let w = w_erg_per_h_to_ev(half.gas.w_erg_per_h)?;
+981:         e = e.max((w_erg_per_h_to_ev(full.gas.w_erg_per_h)? - w).abs() / w.abs().max(1e-6));
+
+# axbi_driver.rs lines 1013-1055
+1013:     pub fn adaptive_step(&self, s: &mut DriverState) -> Result<bool, ForwardError> {
+1014:         if s.accepted >= self.config.max_steps || s.attempts >= self.config.max_attempts {
+1015:             return Err(err("AXBI_STEP_CAP"));
+1016:         }
+1017:         let endpoint = 1.0 / (1.0 + self.config.end_zbar);
+1018:         if s.a == endpoint {
+1019:             return Ok(true);
+1020:         }
+1021:         let to = (s.a * s.next_dln_a.exp()).min(endpoint);
+1022:         let mid = (s.a * to).sqrt();
+1023:         let mut counter = s.rhs_evaluations;
+1024:         let mut trial_starts = s.attempts;
+1025:         s.comparisons += 1;
+1026:         let result = (|| {
+1027:             let mut launch = |old: &DriverState, endpoint: f64| {
+1028:                 if trial_starts >= self.config.max_attempts {
+1029:                     return Err(err("AXBI_TENTATIVE_CAP"));
+1030:                 }
+1031:                 trial_starts += 1;
+1032:                 self.tentative(old, endpoint, &mut counter)
+1033:             };
+1034:             let full = launch(s, to)?;
+1035:             let first = launch(s, mid)?;
+1036:             let half = launch(&first, to)?;
+1037:             let metric = self.error_metric(&full, &half)?;
+1038:             Ok::<_, ForwardError>((half, metric))
+1039:         })();
+1040:         s.rhs_evaluations = counter;
+1041:         s.attempts = trial_starts;
+1042:         match result {
+1043:             Ok((mut next, e)) if e < self.config.local_target && e < 2e-4 => {
+1044:                 next.accepted = s.accepted + 1;
+1045:                 next.attempts = s.attempts;
+1046:                 next.comparisons = s.comparisons;
+1047:                 next.rejects = s.rejects;
+1048:                 next.rhs_evaluations = counter;
+1049:                 next.consecutive_rejects = 0;
+1050:                 next.last_error = e;
+1051:                 next.next_dln_a = if e < self.config.local_target * 0.25 {
+1052:                     (s.next_dln_a * 2.0).min(0.005)
+1053:                 } else {
+1054:                     s.next_dln_a
+1055:                 };
