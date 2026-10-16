@@ -23,3 +23,7 @@ C5 completes module/CLI/template and tests. C6 checks guards, finite serializati
 ## C5 — implemented diagnostic and CLI
 
 The standalone module implements the frozen four-variable scaled core, stage adapter and JSON CLI. It uses exact-zero partial-pivot singular classification, finite arithmetic checks and the frozen EOS map. The adapter validates metadata and accepted-stage residual inequality without acquiring telemetry. The actual packet template deliberately contains null telemetry and is expected to HOLD. Result and measured receipt writes use same-directory temporary files, file flush/fsync, atomic replacement and supported directory fsync. The module is the only runtime code dependency. All new Python sources syntax-parse; C6–C8 executions have not yet run.
+
+## C6 — implementation and durable IO checks
+
+Six targeted tests passed in one execution (exit0; outer wall0.171708496s). They check malformed/nonfinite/singular inputs, pivot/sign/zero backward error, missing template and stale context/state, source/cost metadata and inclusive Newton boundary, atomic durable checkpoint sequence, and Python `-S` CLI success/HOLD/non-overwrite. Actual-shaped metadata in this test is fabricated synthetic control data and is not an observed accepted stage. Production code did not change after C5. Raw test output and measured command receipt are retained.
