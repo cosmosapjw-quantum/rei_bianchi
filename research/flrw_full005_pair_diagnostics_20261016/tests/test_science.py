@@ -19,6 +19,7 @@ class ScientificChecks(unittest.TestCase):
 
     def test_eight_preexisting_fixtures_against_independent_oracles(self):
         recorded=json.loads((UNIT/'probe/RESULT.json').read_text())
+        residuals=[]
         for fixture in recorded['fixtures']:
             with self.subTest(fixture=fixture['name']):
                 r=[(float(F(x)),float(F(y))) for x,y in fixture['reference_rational']]
@@ -36,6 +37,14 @@ class ScientificChecks(unittest.TestCase):
                 for field,value in truth.items():self.close(row[field],value)
                 exact=reconstruction_norm(r,c,'LN_A')
                 self.close(row['sup_absolute_difference'],float(exact['sup_absolute_difference']))
+                residuals.append({'fixture':fixture['name'],
+                                  'absolute_residuals':{field:abs(row[field]-value)
+                                                        for field,value in truth.items()}})
+        (UNIT/'coding_evidence/C7_oracle_residuals.json').write_text(json.dumps(
+            {'scope':'Eight synthetic stored-binary64 fixtures versus independent exact lifted oracle',
+             'fixtures':residuals,'maximum_absolute_residual':max(
+                 value for record in residuals for value in record['absolute_residuals'].values())},
+            indent=2,allow_nan=False)+'\n')
 
     def test_sampling_gap(self):
         r=case([0,1],[0,0]);c=case([0,.50025,.5005,.50075,1],[0,0,1,0,0])
@@ -66,11 +75,11 @@ class ScientificChecks(unittest.TestCase):
             else:self.assertEqual(original[field],refined[field])
 
     def test_measure_scaling_units_and_nonmonotone_temperature(self):
-        r=case([0,.5,1],[0,0,0],field='Tgas_K')
-        c=case([0,.5,1],[0,2,0],field='Tgas_K')
+        r=case([0,.5,1],[10,10,10],field='Tgas_K')
+        c=case([0,.5,1],[10,12,10],field='Tgas_K')
         a=diagnose_pair(r,c)['summary'][0]
-        r2=case([2,3,4],[0,0,0],field='Tgas_K')
-        c2=case([2,3,4],[0,2,0],field='Tgas_K')
+        r2=case([2,3,4],[10,10,10],field='Tgas_K')
+        c2=case([2,3,4],[10,12,10],field='Tgas_K')
         b=diagnose_pair(r2,c2)['summary'][0]
         self.assertEqual(a['units'],'K')
         self.close(b['l1_integral'],2*a['l1_integral'])
