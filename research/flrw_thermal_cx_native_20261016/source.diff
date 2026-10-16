@@ -1,0 +1,768 @@
+--- a/rust/rei_microphysics/src/lib.rs
++++ b/rust/rei_microphysics/src/lib.rs
+@@ -14,6 +14,8 @@
+ mod bianchi_i;
+ pub mod coverage;
+ pub mod deuterium_charge_exchange;
++pub mod deuterium_thermal_charge_exchange;
++pub mod deuterium_thermal_coupling;
+ mod ft03_controlled;
+ mod ft03_interval;
+ mod ft03_rates;
+--- a/rust/rei_microphysics/src/deuterium_thermal_charge_exchange.rs
++++ b/rust/rei_microphysics/src/deuterium_thermal_charge_exchange.rs
+@@ -0,0 +1,423 @@
++//! Opt-in isolated fixed-proper-volume H/D thermal CX. No driver activation.
++//! One extent owns densities and binding/thermal energy. The local estimator
++//! is heuristic; provider-boundary approach is neither an exact event time nor
++//! a certified lower bound. Core units: cm^-3, eV cm^-3, K, seconds.
++use crate::deuterium_charge_exchange::{DhEnergyDefect, DhState, Savin2002};
++
++pub const EV_J: f64 = 1.602176634e-19;
++pub const KB_EV_K: f64 = 1.380649e-23 / EV_J;
++
++#[derive(Clone, Copy, Debug, PartialEq)]
++pub struct ThermalCxState {
++    pub h0: f64,
++    pub hp: f64,
++    pub d0: f64,
++    pub dp: f64,
++    pub thermal_ev_cm3: f64,
++}
++impl ThermalCxState {
++    pub fn densities(self) -> [f64; 4] { [self.h0,self.hp,self.d0,self.dp] }
++}
++#[derive(Clone, Copy, Debug)]
++pub struct ThermalCxDefect<'a> { pub delta_chi_ev: f64, pub source: &'a str }
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum ThermalCxError {
++    InvalidInput(&'static str), StageOutside, WorkLimit(&'static str),
++    FieldFailure(&'static str),
++}
++pub struct ThermalCxProvider<'a> {
++    pub source: &'a str,
++    pub minimum_k: f64,
++    pub maximum_k: f64,
++    pub rates: &'a dyn Fn(f64) -> Result<(f64,f64), ThermalCxError>,
++}
++pub fn savin_rates_cm3(t: f64) -> Result<(f64,f64), ThermalCxError> {
++    let r=Savin2002::rates(t).map_err(|_|ThermalCxError::FieldFailure("SAVIN_PROVIDER"))?;
++    Ok((r.forward_m3_s*1e6,r.reverse_m3_s*1e6))
++}
++pub fn savin_provider() -> ThermalCxProvider<'static> {
++    ThermalCxProvider {source:Savin2002::SOURCE,minimum_k:Savin2002::MINIMUM_K,
++        maximum_k:Savin2002::MAXIMUM_K,rates:&savin_rates_cm3}
++}
++#[derive(Clone, Copy, Debug)]
++pub struct ThermalCxControls {
++    pub rtol: f64,
++    pub atol_normalized: f64,
++    pub event_atol_normalized: f64,
++    pub max_attempts: usize,
++    pub max_rhs_calls: usize,
++    pub max_consecutive_rejections: usize,
++    pub trace_rows_max: usize,
++}
++impl Default for ThermalCxControls {
++    fn default() -> Self {
++        Self {rtol:1e-7,atol_normalized:1e-11,event_atol_normalized:1e-12,
++            max_attempts:20000,max_rhs_calls:200000,max_consecutive_rejections:80,
++            trace_rows_max:512}
++    }
++}
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum ThermalCxStatus {
++    Complete, CompleteEquilibrium, CompleteEmpty, DomainBoundaryApproach,
++    WorkLimit, StepUnderflow, ArithmeticFailure, InvalidInput,
++}
++impl ThermalCxStatus {
++    pub fn as_str(self) -> &'static str {
++        match self {
++            Self::Complete=>"COMPLETE",Self::CompleteEquilibrium=>"COMPLETE_EQUILIBRIUM",
++            Self::CompleteEmpty=>"COMPLETE_EMPTY",Self::DomainBoundaryApproach=>"DOMAIN_BOUNDARY_APPROACH",
++            Self::WorkLimit=>"WORK_LIMIT",Self::StepUnderflow=>"STEP_UNDERFLOW",
++            Self::ArithmeticFailure=>"ARITHMETIC_FAILURE",Self::InvalidInput=>"INVALID_INPUT",
++        }
++    }
++    pub fn complete(self) -> bool {
++        matches!(self,Self::Complete|Self::CompleteEquilibrium|Self::CompleteEmpty)
++    }
++}
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub struct ThermalCxCounts {
++    pub accepted_steps: usize, pub rejected_steps: usize,
++    pub attempts: usize, pub rhs_calls: usize,
++}
++#[derive(Clone, Copy, Debug, PartialEq)]
++pub struct ThermalCxBoundary {
++    pub extent_cm3: f64, pub temperature_k: f64, pub interval_side: &'static str,
++}
++#[derive(Clone, Copy, Debug, PartialEq)]
++pub struct ThermalCxTraceRow {
++    pub time_s: f64, pub extent_cm3: f64, pub thermal_ev_cm3: f64,
++    pub temperature_k: Option<f64>,
++}
++#[derive(Clone, Debug)]
++pub struct ThermalCxResult {
++    pub status: ThermalCxStatus,
++    pub full_interval_complete: bool,
++    pub t_reached_s: f64,
++    pub t_requested_s: Option<f64>,
++    pub state: Option<ThermalCxState>,
++    pub extent_cm3: Option<f64>,
++    pub normalized_extent: Option<f64>,
++    pub temperature_k: Option<f64>,
++    pub chemical_delta_ev_cm3: Option<f64>,
++    pub thermal_delta_ev_cm3: Option<f64>,
++    pub electron_delta_cm3: f64,
++    pub temperature_amplitude_ceiling_k: Option<f64>,
++    pub physical_interval: Option<[f64;2]>,
++    pub admissible_interval: Option<[f64;2]>,
++    pub provider_boundary_if_approached: Option<ThermalCxBoundary>,
++    pub distance_to_boundary_cm3: Option<f64>,
++    pub event_atol_normalized: f64,
++    pub maximum_accepted_local_error_ratio: f64,
++    pub counts: ThermalCxCounts,
++    pub trace: Vec<ThermalCxTraceRow>,
++    pub reason: Option<String>,
++    pub rate_source: String,
++    pub defect_source: String,
++}
++fn invalid(time: f64, reason: &str) -> ThermalCxResult {
++    ThermalCxResult {status:ThermalCxStatus::InvalidInput,full_interval_complete:false,
++        t_reached_s:0.0,t_requested_s:time.is_finite().then_some(time),state:None,
++        extent_cm3:None,normalized_extent:None,temperature_k:None,
++        chemical_delta_ev_cm3:None,thermal_delta_ev_cm3:None,electron_delta_cm3:0.0,
++        temperature_amplitude_ceiling_k:None,physical_interval:None,admissible_interval:None,
++        provider_boundary_if_approached:None,distance_to_boundary_cm3:None,
++        event_atol_normalized:0.0,maximum_accepted_local_error_ratio:0.0,
++        counts:ThermalCxCounts::default(),trace:Vec::new(),reason:Some(reason.into()),
++        rate_source:String::new(),defect_source:String::new()}
++}
++fn finite(values: &[f64]) -> bool { values.iter().all(|x|x.is_finite()) }
++
++/// Validated algebraic reduction. Rejected candidates never replace `initial`.
++pub struct ThermalCxSystem<'a> {
++    initial: ThermalCxState,
++    defect: ThermalCxDefect<'a>,
++    provider: &'a ThermalCxProvider<'a>,
++    scale: f64,
++    capacity: f64,
++    physical: [f64;2],
++    admissible: [f64;2],
++    interval: [f64;2],
++    boundaries: [Option<ThermalCxBoundary>;2],
++    ceiling: Option<f64>,
++}
++impl<'a> ThermalCxSystem<'a> {
++    pub fn new(initial: ThermalCxState, defect: ThermalCxDefect<'a>,
++        provider: &'a ThermalCxProvider<'a>) -> Result<Self,ThermalCxError> {
++        let densities=initial.densities();
++        if !finite(&densities) || !initial.thermal_ev_cm3.is_finite()
++            || densities.iter().any(|x|*x<0.0) || initial.thermal_ev_cm3<0.0 {
++            return Err(ThermalCxError::InvalidInput("DENSITY_OR_THERMAL"));
++        }
++        if !defect.delta_chi_ev.is_finite() || defect.source.is_empty()
++            || provider.source.is_empty() || !finite(&[provider.minimum_k,provider.maximum_k])
++            || provider.minimum_k<=0.0 || provider.minimum_k>provider.maximum_k {
++            return Err(ThermalCxError::InvalidInput("DEFECT_OR_PROVIDER_METADATA"));
++        }
++        let [a,b,c,d]=densities;
++        let scale=a.max(b).max(c).max(d);
++        let nth=a+b+c+d+b+d;
++        if !nth.is_finite() { return Err(ThermalCxError::InvalidInput("PARTICLE_INVENTORY")); }
++        let capacity=1.5*KB_EV_K*nth;
++        let physical=[-a.min(d),b.min(c)];
++        let mut system=Self {initial,defect,provider,scale,capacity,physical,
++            admissible:physical,interval:[0.0,0.0],boundaries:[None,None],ceiling:None};
++        if scale==0.0 {
++            if initial.thermal_ev_cm3!=0.0 { return Err(ThermalCxError::InvalidInput("EMPTY_WITH_THERMAL")); }
++            return Ok(system);
++        }
++        let t0=initial.thermal_ev_cm3/capacity;
++        if !t0.is_finite() || t0<provider.minimum_k || t0>provider.maximum_k {
++            return Err(ThermalCxError::InvalidInput("INITIAL_TEMPERATURE_DOMAIN"));
++        }
++        let delta=defect.delta_chi_ev;
++        let ceiling=delta.abs()*(c+d)/capacity;
++        if !ceiling.is_finite() { return Err(ThermalCxError::InvalidInput("AMPLITUDE_CEILING")); }
++        system.ceiling=Some(ceiling);
++        if delta!=0.0 {
++            let ends=[(initial.thermal_ev_cm3-capacity*provider.minimum_k)/delta,
++                (initial.thermal_ev_cm3-capacity*provider.maximum_k)/delta];
++            if !finite(&ends) { return Err(ThermalCxError::InvalidInput("THERMAL_INTERVAL")); }
++            let thermal=[ends[0].min(ends[1]),ends[0].max(ends[1])];
++            system.admissible=[physical[0].max(thermal[0]),physical[1].min(thermal[1])];
++            for side in 0..2 {
++                let x=system.admissible[side];
++                if x==thermal[side] {
++                    system.boundaries[side]=Some(ThermalCxBoundary {extent_cm3:x,
++                        temperature_k:if delta*x==delta*ends[0] {provider.minimum_k} else {provider.maximum_k},
++                        interval_side:if side==0 {"lower"} else {"upper"}});
++                }
++            }
++        }
++        if system.admissible[0]>0.0 || system.admissible[1]<0.0 {
++            return Err(ThermalCxError::InvalidInput("INITIAL_EXTENT_DOMAIN"));
++        }
++        system.interval=system.admissible.map(|x|x/scale);
++        if !finite(&system.interval) { return Err(ThermalCxError::InvalidInput("NORMALIZED_INTERVAL")); }
++        Ok(system)
++    }
++    pub fn reconstruct(&self,z:f64) -> (ThermalCxState,f64,Option<f64>,f64) {
++        let s=self.initial;
++        let xi=self.scale*z;
++        let chemical=self.defect.delta_chi_ev*xi;
++        let state=ThermalCxState {h0:s.h0+xi,hp:s.hp-xi,d0:s.d0-xi,dp:s.dp+xi,
++            thermal_ev_cm3:s.thermal_ev_cm3-chemical};
++        let temperature=if self.scale==0.0 {None} else {Some(state.thermal_ev_cm3/self.capacity)};
++        (state,xi,temperature,chemical)
++    }
++    pub fn check_stage(&self,z:f64) -> Result<(),ThermalCxError> {
++        if !z.is_finite() {return Err(ThermalCxError::FieldFailure("NONFINITE_STAGE"));}
++        if z<self.interval[0] || z>self.interval[1] {return Err(ThermalCxError::StageOutside);}
++        let (s,xi,t,chemical)=self.reconstruct(z);
++        let t=t.ok_or(ThermalCxError::FieldFailure("EMPTY_FIELD"))?;
++        if !finite(&s.densities()) || !finite(&[xi,s.thermal_ev_cm3,t,chemical]) {
++            return Err(ThermalCxError::FieldFailure("NONFINITE_RECONSTRUCTION"));
++        }
++        if s.densities().iter().any(|x|*x<0.0) || s.thermal_ev_cm3<0.0
++            || t<self.provider.minimum_k || t>self.provider.maximum_k {
++            return Err(ThermalCxError::StageOutside);
++        }
++        Ok(())
++    }
++    pub fn field(&self,z:f64) -> Result<f64,ThermalCxError> {
++        self.check_stage(z)?;
++        let (s,_,t,_)=self.reconstruct(z);
++        let (kf,kr)=(self.provider.rates)(t.unwrap())
++            .map_err(|_|ThermalCxError::FieldFailure("PROVIDER_EVALUATION"))?;
++        if !finite(&[kf,kr]) || kf<0.0 || kr<0.0 {
++            return Err(ThermalCxError::FieldFailure("NONFINITE_OR_NEGATIVE_RATE"));
++        }
++        let g=(kf*s.d0*s.hp-kr*s.dp*s.h0)/self.scale;
++        if !g.is_finite() {return Err(ThermalCxError::FieldFailure("NONFINITE_FIELD"));}
++        Ok(g)
++    }
++}
++
++/// Both Euler states are checked before the convex endpoint; no extrapolation.
++pub fn heun_step<F>(system:&ThermalCxSystem<'_>,z:f64,h:f64,rhs:&mut F)
++    -> Result<f64,ThermalCxError>
++where F:FnMut(f64)->Result<f64,ThermalCxError> {
++    let e=z+h*rhs(z)?;
++    system.check_stage(e)?;
++    let v=e+h*rhs(e)?;
++    system.check_stage(v)?;
++    let endpoint=(z+v)/2.0;
++    system.check_stage(endpoint)?;
++    Ok(endpoint)
++}
++fn charged_rhs(system:&ThermalCxSystem<'_>,z:f64,counts:&mut ThermalCxCounts,
++    controls:ThermalCxControls) -> Result<f64,ThermalCxError> {
++    if counts.rhs_calls>=controls.max_rhs_calls {
++        return Err(ThermalCxError::WorkLimit("RHS_CALL_CAP"));
++    }
++    counts.rhs_calls+=1;
++    system.field(z)
++}
++struct Progress {
++    t:f64,z:f64,maximum_ratio:f64,trace:Vec<ThermalCxTraceRow>,
++    boundary:Option<ThermalCxBoundary>,counts:ThermalCxCounts,
++}
++enum TrialOutcome { Equilibrium, Boundary, Candidate(f64,f64,f64) }
++impl Progress {
++    fn trace(&mut self,system:&ThermalCxSystem<'_>,maximum:usize) {
++        if self.trace.len()<maximum.min(512) {
++            let (s,xi,t,_)=system.reconstruct(self.z);
++            self.trace.push(ThermalCxTraceRow {time_s:self.t,extent_cm3:xi,
++                thermal_ev_cm3:s.thermal_ev_cm3,temperature_k:t});
++        }
++    }
++    fn result(self,system:&ThermalCxSystem<'_>,requested:f64,controls:ThermalCxControls,
++        status:ThermalCxStatus,reason:Option<String>) -> ThermalCxResult {
++        let (state,xi,temperature,chemical)=system.reconstruct(self.z);
++        ThermalCxResult {status,full_interval_complete:status.complete(),t_reached_s:self.t,
++            t_requested_s:Some(requested),state:Some(state),extent_cm3:Some(xi),
++            normalized_extent:Some(self.z),temperature_k:temperature,
++            chemical_delta_ev_cm3:Some(chemical),thermal_delta_ev_cm3:Some(-chemical),
++            electron_delta_cm3:0.0,temperature_amplitude_ceiling_k:system.ceiling,
++            physical_interval:Some(system.physical),admissible_interval:Some(system.admissible),
++            provider_boundary_if_approached:self.boundary,
++            distance_to_boundary_cm3:self.boundary.map(|b|(b.extent_cm3-xi).abs()),
++            event_atol_normalized:controls.event_atol_normalized,
++            maximum_accepted_local_error_ratio:self.maximum_ratio,counts:self.counts,
++            trace:self.trace,reason,rate_source:system.provider.source.into(),
++            defect_source:system.defect.source.into()}
++    }
++}
++pub fn integrate(initial:ThermalCxState,defect:ThermalCxDefect<'_>,
++    provider:&ThermalCxProvider<'_>,requested:f64,controls:ThermalCxControls) -> ThermalCxResult {
++    if !requested.is_finite() || requested<0.0 {return invalid(requested,"REQUESTED_TIME");}
++    if !finite(&[controls.rtol,controls.atol_normalized,controls.event_atol_normalized])
++        || controls.rtol<0.0 || controls.atol_normalized<=0.0 || controls.event_atol_normalized<=0.0
++        || controls.max_attempts==0 || controls.max_rhs_calls==0 || controls.max_consecutive_rejections==0 {
++        return invalid(requested,"CONTROLS");
++    }
++    let system=match ThermalCxSystem::new(initial,defect,provider) {
++        Ok(s)=>s,Err(e)=>return invalid(requested,&format!("{e:?}")),
++    };
++    let mut p=Progress {t:0.0,z:0.0,maximum_ratio:0.0,trace:Vec::new(),boundary:None,
++        counts:ThermalCxCounts::default()};
++    if system.scale==0.0 {
++        p.t=requested;return p.result(&system,requested,controls,ThermalCxStatus::CompleteEmpty,None);
++    }
++    if requested==0.0 {return p.result(&system,requested,controls,ThermalCxStatus::Complete,None);}
++    p.trace(&system,controls.trace_rows_max);
++    let mut h=requested/16.0;
++    let mut consecutive=0;
++    while p.t<requested {
++        if p.counts.attempts>=controls.max_attempts || consecutive>=controls.max_consecutive_rejections {
++            return p.result(&system,requested,controls,ThermalCxStatus::WorkLimit,Some("ATTEMPT_OR_REJECTION_CAP".into()));
++        }
++        let trial=(|| -> Result<TrialOutcome,ThermalCxError> {
++            let g=charged_rhs(&system,p.z,&mut p.counts,controls)?;
++            if g==0.0 {return Ok(TrialOutcome::Equilibrium);}
++            let side=if g>0.0 {1} else {0};
++            let distance=(system.interval[side]-p.z).abs();
++            if system.boundaries[side].is_some() && distance<=controls.event_atol_normalized {
++                p.boundary=system.boundaries[side];
++                return Ok(TrialOutcome::Boundary);
++            }
++            h=h.min(requested-p.t).min(0.8*distance/g.abs());
++            if !h.is_finite() || h<=0.0 || p.t+h==p.t {
++                return Err(ThermalCxError::WorkLimit("STEP_UNDERFLOW"));
++            }
++            p.counts.attempts+=1;
++            let mut rhs=|z|charged_rhs(&system,z,&mut p.counts,controls);
++            let coarse=heun_step(&system,p.z,h,&mut rhs)?;
++            let half=heun_step(&system,p.z,h/2.0,&mut rhs)?;
++            let fine=heun_step(&system,half,h/2.0,&mut rhs)?;
++            let error=(fine-coarse).abs()/3.0;
++            let tolerance=controls.atol_normalized+controls.rtol*p.z.abs().max(fine.abs());
++            if !finite(&[fine,error,tolerance,error/tolerance]) {
++                return Err(ThermalCxError::FieldFailure("LOCAL_ERROR_ARITHMETIC"));
++            }
++            Ok(TrialOutcome::Candidate(fine,error,tolerance))
++        })();
++        match trial {
++            Ok(TrialOutcome::Equilibrium)=>{
++                p.t=requested;return p.result(&system,requested,controls,ThermalCxStatus::CompleteEquilibrium,None);
++            }
++            Ok(TrialOutcome::Boundary)=>{
++                return p.result(&system,requested,controls,ThermalCxStatus::DomainBoundaryApproach,None);
++            }
++            Ok(TrialOutcome::Candidate(fine,error,tolerance))=>{
++                let factor=if error==0.0 {2.0} else {(0.9*(tolerance/error).powf(1.0/3.0)).clamp(0.2,2.0)};
++                if error<=tolerance {
++                    p.z=fine;p.t+=h;p.counts.accepted_steps+=1;consecutive=0;
++                    p.maximum_ratio=p.maximum_ratio.max(error/tolerance);
++                    p.trace(&system,controls.trace_rows_max);h*=factor;
++                } else {
++                    p.counts.rejected_steps+=1;consecutive+=1;h*=factor.min(0.8);
++                }
++            }
++            Err(ThermalCxError::StageOutside)=>{
++                p.counts.rejected_steps+=1;consecutive+=1;h*=0.5;
++            }
++            Err(ThermalCxError::WorkLimit("STEP_UNDERFLOW"))=>{
++                return p.result(&system,requested,controls,ThermalCxStatus::StepUnderflow,None);
++            }
++            Err(e)=>{
++                let status=if matches!(e,ThermalCxError::WorkLimit(_)) {ThermalCxStatus::WorkLimit}
++                    else {ThermalCxStatus::ArithmeticFailure};
++                return p.result(&system,requested,controls,status,Some(format!("{e:?}")));
++            }
++        }
++    }
++    p.result(&system,requested,controls,ThermalCxStatus::Complete,None)
++}
++
++#[derive(Clone, Debug)]
++pub struct ThermalCxSiResult {
++    pub core: ThermalCxResult,
++    pub state_si: Option<DhState>,
++    pub extent_m3: Option<f64>,
++    pub integrated_chemical_delta_j_m3: Option<f64>,
++    pub integrated_thermal_delta_j_m3: Option<f64>,
++}
++/// Native value adapter; input and output are proper SI, rates remain explicit.
++pub fn integrate_si(initial:DhState,defect:DhEnergyDefect,provider:&ThermalCxProvider<'_>,
++    requested:f64,controls:ThermalCxControls) -> ThermalCxSiResult {
++    let native_values=[initial.h0_m3,initial.hp_m3,initial.d0_m3,initial.dp_m3,
++        initial.thermal_j_m3,defect.delta_chi_j];
++    let converted=[initial.h0_m3/1e6,initial.hp_m3/1e6,initial.d0_m3/1e6,
++        initial.dp_m3/1e6,initial.thermal_j_m3/(1e6*EV_J),defect.delta_chi_j/EV_J];
++    let conversion_preserves_nonzero=|a:f64,b:f64| b.is_finite()&&(a==0.0||b!=0.0);
++    let mut core=if initial.totals().is_err() {
++        invalid(requested,"SI_STATE_OR_INVENTORY")
++    } else if !native_values.into_iter().zip(converted)
++        .all(|(a,b)|conversion_preserves_nonzero(a,b)) {
++        invalid(requested,"SI_INPUT_CONVERSION_NONFINITE_OR_NONZERO_LOSS")
++    } else {
++        integrate(ThermalCxState {h0:converted[0],hp:converted[1],d0:converted[2],
++            dp:converted[3],thermal_ev_cm3:converted[4]},
++            ThermalCxDefect {delta_chi_ev:converted[5],source:defect.source},
++            provider,requested,controls)
++    };
++    let state_si=core.state.map(|s|DhState {h0_m3:s.h0*1e6,hp_m3:s.hp*1e6,
++        d0_m3:s.d0*1e6,dp_m3:s.dp*1e6,thermal_j_m3:s.thermal_ev_cm3*(1e6*EV_J)});
++    let extent_m3=core.extent_cm3.map(|x|x*1e6);
++    let chemical=core.chemical_delta_ev_cm3.map(|x|x*(1e6*EV_J));
++    let thermal=core.thermal_delta_ev_cm3.map(|x|x*(1e6*EV_J));
++    let output_state_valid=match (core.state,state_si) {
++        (Some(a),Some(b))=>[a.h0,a.hp,a.d0,a.dp,a.thermal_ev_cm3].into_iter()
++            .zip([b.h0_m3,b.hp_m3,b.d0_m3,b.dp_m3,b.thermal_j_m3])
++            .all(|(a,b)|conversion_preserves_nonzero(a,b)),
++        _=>true,
++    };
++    let output_scalars_valid=[(core.extent_cm3,extent_m3),
++        (core.chemical_delta_ev_cm3,chemical),(core.thermal_delta_ev_cm3,thermal)]
++        .into_iter().all(|(a,b)|match (a,b) {
++            (Some(a),Some(b))=>conversion_preserves_nonzero(a,b),_=>true,
++        });
++    if !output_state_valid || !output_scalars_valid {
++        // Retain the accepted core state/time, but export no corrupted SI state
++        // or ledger and never claim full interval completion at this interface.
++        core.status=ThermalCxStatus::ArithmeticFailure;
++        core.full_interval_complete=false;
++        core.reason=Some("SI_OUTPUT_CONVERSION_NONFINITE_OR_NONZERO_LOSS".into());
++        return ThermalCxSiResult {core,state_si:None,extent_m3:None,
++            integrated_chemical_delta_j_m3:None,integrated_thermal_delta_j_m3:None};
++    }
++    ThermalCxSiResult {extent_m3,
++        integrated_chemical_delta_j_m3:chemical,
++        integrated_thermal_delta_j_m3:thermal,
++        core,state_si}
++}
+--- a/rust/rei_microphysics/src/deuterium_thermal_coupling.rs
++++ b/rust/rei_microphysics/src/deuterium_thermal_coupling.rs
+@@ -0,0 +1,88 @@
++//! Explicit component ownership, not a full-network composition or timestep.
++//! The guarantee applies to this interface; legacy low-level kernels remain
++//! available for callers who intentionally bypass this component.
++use crate::deuterium_atomic::{d_atomic_rhs,DAtomicError,DAtomicProvider,DAtomicRhs,
++    DChargeExchange,DPhotoInput};
++use crate::deuterium_charge_exchange::DhState;
++use crate::deuterium_thermal_charge_exchange::{integrate_si,savin_provider,
++    ThermalCxControls,ThermalCxSiResult};
++use crate::{IsotopeNumberState,IsotopeSpecies};
++
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum CxOwnership { AtomicRhs, ThermalSubstep }
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum ThermalCouplingError { AtomicRhsOwnsCx, UnsupportedSpectator, InvalidState }
++
++/// Private immutable provider/owner: no independently selectable RHS CX flag.
++#[derive(Clone, Copy, Debug)]
++pub struct ThermalCxComponent { provider:DAtomicProvider, owner:CxOwnership }
++#[derive(Clone, Debug)]
++pub struct OwnedAtomicContribution {
++    pub owner:CxOwnership,
++    /// Instantaneous species derivatives and powers [J m^-3 s^-1].
++    /// This method advances no state and integrates no energy.
++    pub instantaneous_atomic_rhs:DAtomicRhs,
++}
++#[derive(Clone, Copy, Debug, PartialEq)]
++pub struct IntegratedCxEnergy {
++    pub chemical_delta_j_m3:f64,
++    pub thermal_delta_j_m3:f64,
++    pub photon_input_j_m3:f64,
++    pub escaped_j_m3:f64,
++}
++#[derive(Clone, Debug)]
++pub struct OwnedThermalSubstep {
++    pub owner:CxOwnership,
++    pub thermal_map:ThermalCxSiResult,
++    /// By-value last accepted state; partial results are not a full-dt commit.
++    pub isotope_state:Option<IsotopeNumberState>,
++    /// One integrated CX ledger, never a second instantaneous cooling power.
++    pub integrated_cx_energy:Option<IntegratedCxEnergy>,
++}
++impl ThermalCxComponent {
++    pub fn new(provider:DAtomicProvider,owner:CxOwnership) -> Self {Self {provider,owner}}
++    pub fn owner(&self) -> CxOwnership {self.owner}
++    pub fn rhs(&self,state:&IsotopeNumberState,temperature_k:f64,photo:&DPhotoInput)
++        -> Result<OwnedAtomicContribution,DAtomicError> {
++        let cx=match self.owner {
++            CxOwnership::AtomicRhs=>DChargeExchange::Savin2002,
++            CxOwnership::ThermalSubstep=>DChargeExchange::Disabled,
++        };
++        Ok(OwnedAtomicContribution {owner:self.owner,
++            instantaneous_atomic_rhs:d_atomic_rhs(self.provider,state,temperature_k,photo,cx)?})
++    }
++    pub fn thermal_substep(&self,state:&IsotopeNumberState,thermal_j_m3:f64,
++        requested_s:f64,controls:ThermalCxControls)
++        -> Result<OwnedThermalSubstep,ThermalCouplingError> {
++        // Ownership guard precedes provider calls, conversion and integration.
++        if self.owner!=CxOwnership::ThermalSubstep {
++            return Err(ThermalCouplingError::AtomicRhsOwnsCx);
++        }
++        use IsotopeSpecies::{H1Neutral,H1Ionized,DNeutral,DIonized};
++        for species in IsotopeSpecies::ALL {
++            if !matches!(species,H1Neutral|H1Ionized|DNeutral|DIonized)
++                && state.density_m3(species)!=0.0 {
++                return Err(ThermalCouplingError::UnsupportedSpectator);
++            }
++        }
++        let initial=DhState {h0_m3:state.density_m3(H1Neutral),
++            hp_m3:state.density_m3(H1Ionized),d0_m3:state.density_m3(DNeutral),
++            dp_m3:state.density_m3(DIonized),thermal_j_m3};
++        // Exactly the bound atomic provider's defect, never a second parameter.
++        let thermal_map=integrate_si(initial,self.provider.defect(),&savin_provider(),requested_s,controls);
++        let isotope_state=if let Some(s)=thermal_map.state_si {
++            let mut values=[0.0;13];
++            values[H1Neutral as usize]=s.h0_m3;values[H1Ionized as usize]=s.hp_m3;
++            values[DNeutral as usize]=s.d0_m3;values[DIonized as usize]=s.dp_m3;
++            Some(IsotopeNumberState::new(values).map_err(|_|ThermalCouplingError::InvalidState)?)
++        } else {None};
++        let integrated_cx_energy=match (thermal_map.integrated_chemical_delta_j_m3,
++            thermal_map.integrated_thermal_delta_j_m3) {
++            (Some(chemical),Some(thermal))=>Some(IntegratedCxEnergy {
++                chemical_delta_j_m3:chemical,thermal_delta_j_m3:thermal,
++                photon_input_j_m3:0.0,escaped_j_m3:0.0}),
++            _=>None,
++        };
++        Ok(OwnedThermalSubstep {owner:self.owner,thermal_map,isotope_state,integrated_cx_energy})
++    }
++}
+--- a/rust/rei_microphysics/tests/deuterium_thermal_charge_exchange.rs
++++ b/rust/rei_microphysics/tests/deuterium_thermal_charge_exchange.rs
+@@ -0,0 +1,237 @@
++//! New Rust port/coupling controls on synthetic isolated H/D states.
++//! Cached Python/Decimal data are inputs; no previous solver/oracle is run.
++use rei_microphysics::deuterium_thermal_charge_exchange::*;
++use rei_microphysics::deuterium_thermal_coupling::*;
++use rei_microphysics::deuterium_charge_exchange::{DhState,DhEnergyDefect};
++use rei_microphysics::deuterium_atomic::{DAtomicProvider,DChargeExchange,d_atomic_rhs,DEnergyLedger};
++use rei_microphysics::{IsotopeNumberState,IsotopeSpecies};
++use std::cell::Cell;
++
++fn initial(n:[f64;4],t:f64) -> ThermalCxState {
++    let [h0,hp,d0,dp]=n;
++    ThermalCxState {h0,hp,d0,dp,thermal_ev_cm3:1.5*KB_EV_K*(h0+hp+d0+dp+hp+dp)*t}
++}
++fn defect(value:f64) -> ThermalCxDefect<'static> {
++    ThermalCxDefect {delta_chi_ev:value,source:"SYNTHETIC_SIGNED_DEFECT"}
++}
++fn check_invariants(before:ThermalCxState,answer:&ThermalCxResult,delta:f64) {
++    let after=answer.state.unwrap();
++    let [a,b,c,d]=before.densities();let [e,f,g,h]=after.densities();
++    let mut maximum_ledger_scaled=0.0_f64;
++    for (left,right) in [(a+b,e+f),(c+d,g+h),(b+d,f+h),(a+b+2.0*(c+d),e+f+2.0*(g+h))] {
++        assert!((left-right).abs()<=128.0*f64::EPSILON*1.0_f64.max(left.abs()).max(right.abs()));
++        maximum_ledger_scaled=maximum_ledger_scaled.max((left-right).abs()/1.0_f64.max(left.abs()).max(right.abs()));
++    }
++    let chemical=delta*answer.extent_cm3.unwrap();
++    let energy_scale=1e-30_f64.max(before.thermal_ev_cm3.abs()).max(chemical.abs());
++    assert!((after.thermal_ev_cm3+chemical-before.thermal_ev_cm3).abs()<=128.0*f64::EPSILON*energy_scale);
++    assert_eq!(answer.thermal_delta_ev_cm3,answer.chemical_delta_ev_cm3.map(|x|-x));
++    assert_eq!(answer.electron_delta_cm3,0.0);
++    assert!(after.densities().iter().all(|x|x.is_finite()&&*x>=0.0));
++    if let (Some(t),Some(ceiling))=(answer.temperature_k,answer.temperature_amplitude_ceiling_k) {
++        let t0=before.thermal_ev_cm3/(1.5*KB_EV_K*(a+b+c+d+b+d));
++        let amplitude=(t-t0).abs();
++        assert!(amplitude<=ceiling+128.0*f64::EPSILON*1.0_f64.max(t0).max(amplitude).max(ceiling));
++    }
++    assert!(answer.trace.len()<=512);
++    assert!(answer.maximum_accepted_local_error_ratio<=1.0);
++    println!("THERMAL_CX_METRIC {{\"kind\":\"synthetic_ledger\",\"maximum_scaled_density_residual\":{maximum_ledger_scaled:.17e},\"scaled_energy_residual\":{:.17e}}}",
++        (after.thermal_ev_cm3+chemical-before.thermal_ev_cm3).abs()/energy_scale);
++}
++
++#[test]
++fn cached_manufactured_endpoints_signed_defects_and_partial_boundaries() {
++    type Reference=(&'static str,[f64;4],f64,f64,f64,f64,f64,&'static str,f64);
++    let references:&[Reference]=include!(concat!(env!("CARGO_MANIFEST_DIR"),
++        "/../../research/flrw_thermal_cx_native_20261016/cached_manufactured.rs"));
++    for &(id,n,t0,beta,tmin,tmax,time,expected_status,expected_xi) in references {
++        let state=initial(n,t0);let input=state;
++        let rates=|t:f64| {
++            assert!(t>=tmin&&t<=tmax,"invalid provider call {id} {t}");
++            Ok((0.2*t/t0,0.2*t/t0))
++        };
++        let provider=ThermalCxProvider {source:"CACHED_MANUFACTURED_EQUAL_RATES",
++            minimum_k:tmin,maximum_k:tmax,rates:&rates};
++        let delta=beta*state.thermal_ev_cm3;
++        let answer=integrate(state,defect(delta),&provider,time,ThermalCxControls::default());
++        assert_eq!(state,input);
++        check_invariants(state,&answer,delta);
++        if expected_status=="COMPLETE" {
++            assert!(answer.full_interval_complete,"{id} {:?}",answer.status);
++            let normalized=(answer.extent_cm3.unwrap()-expected_xi).abs()/n.into_iter().fold(0.0,f64::max);
++            assert!(normalized<=5e-6,"{id}: {normalized}");
++            println!("THERMAL_CX_METRIC {{\"kind\":\"cached_manufactured\",\"id\":\"{id}\",\"normalized_error\":{normalized:.17e},\"extent_cm3\":{:.17e},\"rhs\":{}}}",answer.extent_cm3.unwrap(),answer.counts.rhs_calls);
++        } else {
++            assert_eq!(answer.status,ThermalCxStatus::DomainBoundaryApproach,"{id}");
++            assert!(!answer.full_interval_complete&&answer.t_reached_s<time);
++            let boundary=answer.provider_boundary_if_approached.unwrap();
++            let scale=n.into_iter().fold(0.0,f64::max);
++            assert!((boundary.extent_cm3-expected_xi).abs()<=128.0*f64::EPSILON*1.0_f64.max(scale));
++            assert!(answer.distance_to_boundary_cm3.unwrap()/scale<=answer.event_atol_normalized);
++            println!("THERMAL_CX_METRIC {{\"kind\":\"boundary_approach\",\"id\":\"{id}\",\"status\":\"{}\",\"achieved_time_s\":{:.17e},\"requested_time_s\":{time:.17e},\"distance_cm3\":{:.17e},\"temperature_K\":{:.17e},\"certified_event_time\":false}}",
++                answer.status.as_str(),answer.t_reached_s,answer.distance_to_boundary_cm3.unwrap(),answer.temperature_k.unwrap());
++        }
++    }
++}
++
++#[test]
++fn both_euler_stage_guards_precede_invalid_provider_calls() {
++    let calls=Cell::new(0);
++    let rates=|_:f64| {calls.set(calls.get()+1);Ok((0.2,0.2))};
++    let provider=ThermalCxProvider {source:"SYNTHETIC_GUARD",minimum_k:2.7,maximum_k:30.0,rates:&rates};
++    let system=ThermalCxSystem::new(initial([1.0,3.0,2.0,1.0],10.0),defect(0.0),&provider).unwrap();
++    assert_eq!(system.field(1.0),Err(ThermalCxError::StageOutside));
++    assert_eq!(calls.get(),0);
++    let mut first_calls=0;
++    assert_eq!(heun_step(&system,0.0,1.0,&mut |_| {first_calls+=1;Ok(1.0)}),Err(ThermalCxError::StageOutside));
++    assert_eq!(first_calls,1);
++    let mut second_calls=0;
++    // e=.5 is legal; v=1 is illegal although its convex endpoint=.5 is legal.
++    assert_eq!(heun_step(&system,0.0,1.0,&mut |_| {second_calls+=1;Ok(0.5)}),Err(ThermalCxError::StageOutside));
++    assert_eq!(second_calls,2);
++    assert_eq!(calls.get(),0);
++}
++
++#[test]
++fn validation_degeneracies_work_caps_and_charged_provider_failures() {
++    let state=initial([1.0,3.0,2.0,1.0],10.0);
++    let zero=|_:f64|Ok((0.0,0.0));
++    let rates=|t:f64|Ok((0.2*t/10.0,0.2*t/10.0));
++    let provider=ThermalCxProvider {source:"SYNTHETIC",minimum_k:2.7,maximum_k:30.0,rates:&rates};
++    let no_rates=ThermalCxProvider {rates:&zero,..provider};
++    let controls=ThermalCxControls::default();
++    let dt0=integrate(state,defect(0.0),&provider,0.0,controls);
++    assert_eq!(dt0.status,ThermalCxStatus::Complete);assert_eq!(dt0.counts.rhs_calls,0);
++    assert_eq!(dt0.state,Some(state));
++    let no_d=initial([1.0,3.0,0.0,0.0],10.0);
++    assert_eq!(integrate(no_d,defect(0.0037),&provider,2.0,controls).status,ThermalCxStatus::CompleteEquilibrium);
++    assert_eq!(integrate(state,defect(0.0),&no_rates,2.0,controls).state,Some(state));
++    let empty=ThermalCxState {h0:0.0,hp:0.0,d0:0.0,dp:0.0,thermal_ev_cm3:0.0};
++    let result=integrate(empty,defect(-1.0),&provider,2.0,controls);
++    assert_eq!(result.status,ThermalCxStatus::CompleteEmpty);
++    assert_eq!(result.temperature_k,None);assert_eq!(result.temperature_amplitude_ceiling_k,None);
++    assert_eq!(result.counts.rhs_calls,0);
++    let invalid_provider=ThermalCxProvider {source:"",..provider};
++    assert_eq!(integrate(empty,defect(0.0),&invalid_provider,0.0,controls).status,ThermalCxStatus::InvalidInput);
++    for bad in [ThermalCxState {h0:-1.0,..state},ThermalCxState {hp:f64::NAN,..state},
++        ThermalCxState {thermal_ev_cm3:1.0,..empty}] {
++        assert_eq!(integrate(bad,defect(0.0),&provider,0.0,controls).status,ThermalCxStatus::InvalidInput);
++    }
++    assert_eq!(integrate(state,defect(0.0),&provider,-1.0,controls).status,ThermalCxStatus::InvalidInput);
++    assert_eq!(integrate(state,defect(0.0),&provider,0.0,ThermalCxControls {rtol:f64::NAN,..controls}).status,ThermalCxStatus::InvalidInput);
++    let capped=integrate(state,defect(0.0),&provider,2.0,ThermalCxControls {max_attempts:1,..controls});
++    assert_eq!(capped.status,ThermalCxStatus::WorkLimit);assert!(!capped.full_interval_complete);
++    assert_eq!(capped.counts.attempts,1);assert_eq!(capped.state,Some(state));
++    let rhs_capped=integrate(state,defect(0.0),&provider,2.0,ThermalCxControls {max_rhs_calls:1,..controls});
++    assert_eq!(rhs_capped.status,ThermalCxStatus::WorkLimit);assert_eq!(rhs_capped.counts.rhs_calls,1);
++    let underflow=integrate(state,defect(0.0),&provider,f64::from_bits(1),controls);
++    assert_eq!(underflow.status,ThermalCxStatus::StepUnderflow);
++    let calls=Cell::new(0usize);
++    let failing=|t:f64| {
++        calls.set(calls.get()+1);
++        if calls.get()==200 {Err(ThermalCxError::FieldFailure("SYNTHETIC_PROVIDER_FAILURE"))}
++        else {Ok((0.2*t/10.0,0.2*t/10.0))}
++    };
++    let failed=integrate(state,defect(0.0),&ThermalCxProvider {rates:&failing,..provider},2.0,controls);
++    assert_eq!(failed.status,ThermalCxStatus::ArithmeticFailure);
++    assert_eq!(failed.counts.rhs_calls,200);assert!(failed.counts.accepted_steps>0);
++    assert!(failed.t_reached_s>0.0&&failed.t_reached_s<2.0);
++    check_invariants(state,&failed,0.0);
++    let negative=|_:f64|Ok((-1.0,0.0));
++    let failed=integrate(state,defect(0.0),&ThermalCxProvider {rates:&negative,..provider},2.0,controls);
++    assert_eq!(failed.status,ThermalCxStatus::ArithmeticFailure);
++    assert_eq!(failed.counts.rhs_calls,1);assert_eq!(failed.state,Some(state));
++}
++
++#[test]
++fn si_conversion_and_reused_savin_provider_saved_endpoint_diagnostic() {
++    let input=initial([1.0,3.0,2.0,1.0],10.0);let delta=0.1*input.thermal_ev_cm3;
++    let rates=|t:f64|Ok((0.2*t/10.0,0.2*t/10.0));
++    let provider=ThermalCxProvider {source:"SYNTHETIC_SI_CONVERSION",minimum_k:2.7,maximum_k:30.0,rates:&rates};
++    let tiny=DhState {h0_m3:f64::from_bits(1),hp_m3:0.0,d0_m3:0.0,dp_m3:0.0,thermal_j_m3:0.0};
++    let original=tiny;
++    let rejected=integrate_si(tiny,DhEnergyDefect {delta_chi_j:0.0,source:"SYNTHETIC_CONVERSION_GUARD"},
++        &provider,0.0,ThermalCxControls::default());
++    assert_eq!(rejected.core.status,ThermalCxStatus::InvalidInput);
++    assert!(!rejected.core.full_interval_complete);
++    assert_eq!(rejected.core.counts.rhs_calls,0);
++    assert!(rejected.state_si.is_none());assert_eq!(tiny,original);
++    let core=integrate(input,defect(delta),&provider,2.0,ThermalCxControls::default());
++    let si=DhState {h0_m3:input.h0*1e6,hp_m3:input.hp*1e6,d0_m3:input.d0*1e6,
++        dp_m3:input.dp*1e6,thermal_j_m3:input.thermal_ev_cm3*(1e6*EV_J)};
++    let unexportable=integrate_si(si,DhEnergyDefect {delta_chi_j:f64::from_bits(1),source:"SYNTHETIC_INVERSE_CONVERSION_GUARD"},
++        &provider,1e-8,ThermalCxControls::default());
++    assert_eq!(unexportable.core.status,ThermalCxStatus::ArithmeticFailure);
++    assert!(!unexportable.core.full_interval_complete);
++    assert!(unexportable.core.state.is_some()&&unexportable.core.t_reached_s>0.0);
++    assert!(unexportable.core.chemical_delta_ev_cm3.unwrap()>0.0);
++    assert!(unexportable.state_si.is_none()&&unexportable.extent_m3.is_none());
++    assert!(unexportable.integrated_chemical_delta_j_m3.is_none());
++    assert!(unexportable.integrated_thermal_delta_j_m3.is_none());
++    let native=integrate_si(si,DhEnergyDefect {delta_chi_j:delta*EV_J,source:"SYNTHETIC_SI_CONVERSION"},
++        &provider,2.0,ThermalCxControls::default());
++    assert_eq!(core.status,native.core.status);
++    for (a,b) in [(core.extent_cm3.unwrap(),native.extent_m3.unwrap()/1e6),
++        (core.state.unwrap().thermal_ev_cm3,native.state_si.unwrap().thermal_j_m3/(1e6*EV_J))] {
++        assert!((a-b).abs()<=128.0*f64::EPSILON*1.0_f64.max(a.abs()).max(b.abs()));
++        println!("THERMAL_CX_METRIC {{\"kind\":\"si_conversion\",\"absolute_residual\":{:.17e},\"scaled_residual\":{:.17e}}}",(a-b).abs(),(a-b).abs()/1.0_f64.max(a.abs()).max(b.abs()));
++    }
++    for t in [2.7,200000.0] {assert!(savin_rates_cm3(t).is_ok());}
++    for t in [2.699999,200000.1,f64::NAN] {assert!(savin_rates_cm3(t).is_err());}
++    let input=initial([0.9,0.1,2e-5,5e-6],100.0);
++    let result=integrate(input,defect(0.0037),&savin_provider(),1e8,ThermalCxControls::default());
++    assert!(result.full_interval_complete);check_invariants(input,&result,0.0037);
++    assert!(result.temperature_k.unwrap()>=2.7&&result.temperature_k.unwrap()<=200000.0);
++    println!("THERMAL_CX_METRIC {{\"kind\":\"savin_saved_endpoint\",\"scope\":\"literature_fit_on_synthetic_isolated_state\",\"extent_cm3\":{:.17e},\"temperature_K\":{:.17e},\"thermal_ev_cm3\":{:.17e},\"extent_difference_cm3\":{:.17e},\"temperature_difference_K\":{:.17e},\"exact_error_claim\":false}}",
++        result.extent_cm3.unwrap(),result.temperature_k.unwrap(),result.state.unwrap().thermal_ev_cm3,
++        result.extent_cm3.unwrap()-(-4.077787552051901e-7),result.temperature_k.unwrap()-100.00001061103245);
++}
++
++#[test]
++fn actual_component_owner_api_excludes_double_reaction_and_energy() {
++    use IsotopeSpecies::{H1Neutral,H1Ionized,DNeutral,DIonized,He4Neutral};
++    let provider=DAtomicProvider::new(13.6,13.6037,"SYNTHETIC_BOUND_THRESHOLDS").unwrap();
++    let photo=provider.photo_input(&[],"SYNTHETIC_NO_LIGHT").unwrap();
++    let mut values=[0.0;13];
++    values[H1Neutral as usize]=0.9e6;values[H1Ionized as usize]=0.1e6;
++    values[DNeutral as usize]=2e-5*1e6;values[DIonized as usize]=5e-6*1e6;
++    let state=IsotopeNumberState::new(values).unwrap();let original=state;
++    let atomic=ThermalCxComponent::new(provider,CxOwnership::AtomicRhs);
++    assert_eq!(atomic.rhs(&state,100.0,&photo).unwrap().instantaneous_atomic_rhs,
++        d_atomic_rhs(provider,&state,100.0,&photo,DChargeExchange::Savin2002).unwrap());
++    assert_eq!(atomic.thermal_substep(&state,f64::NAN,f64::NAN,ThermalCxControls::default()).unwrap_err(),
++        ThermalCouplingError::AtomicRhsOwnsCx);
++    let thermal=ThermalCxComponent::new(provider,CxOwnership::ThermalSubstep);
++    let rhs=thermal.rhs(&state,100.0,&photo).unwrap();
++    let disabled=d_atomic_rhs(provider,&state,100.0,&photo,DChargeExchange::Disabled).unwrap();
++    assert_eq!(rhs.instantaneous_atomic_rhs,disabled);
++    assert_eq!(disabled.cx_forward_events_m3_s,0.0);assert_eq!(disabled.cx_reverse_events_m3_s,0.0);
++    assert_eq!(disabled.channel_energy[4],DEnergyLedger::default());
++    assert_eq!(disabled.channel_energy[5],DEnergyLedger::default());
++    assert_eq!(disabled.species_m3_s[H1Neutral as usize],0.0);
++    assert_eq!(disabled.species_m3_s[H1Ionized as usize],0.0);
++    let core_input=initial([0.9,0.1,2e-5,5e-6],100.0);
++    let u=core_input.thermal_ev_cm3*(1e6*EV_J);
++    let result=thermal.thermal_substep(&state,u,1e8,ThermalCxControls::default()).unwrap();
++    assert_eq!(result.owner,CxOwnership::ThermalSubstep);
++    assert!(result.thermal_map.core.full_interval_complete);
++    let energy=result.integrated_cx_energy.unwrap();
++    assert_eq!(energy.chemical_delta_j_m3,-energy.thermal_delta_j_m3);
++    assert_eq!((energy.photon_input_j_m3,energy.escaped_j_m3),(0.0,0.0));
++    let output=result.isotope_state.unwrap();
++    let xi=result.thermal_map.extent_m3.unwrap();
++    for (species,sign) in [(H1Neutral,1.0),(H1Ionized,-1.0),(DNeutral,-1.0),(DIonized,1.0)] {
++        let expected=state.density_m3(species)+sign*xi;
++        assert!((output.density_m3(species)-expected).abs()<=128.0*f64::EPSILON*expected.abs().max(1.0));
++    }
++    let prior=state.moments().unwrap();let after=output.moments().unwrap();
++    assert!((prior.neutral_free_electron_density_m3-after.neutral_free_electron_density_m3).abs()<=128.0*f64::EPSILON*prior.neutral_free_electron_density_m3.max(1.0));
++    let partial=thermal.thermal_substep(&state,u,1e8,ThermalCxControls {max_rhs_calls:1,..ThermalCxControls::default()}).unwrap();
++    assert!(!partial.thermal_map.core.full_interval_complete);
++    assert_eq!(partial.thermal_map.core.status,ThermalCxStatus::WorkLimit);
++    assert_eq!(state,original);
++    values[He4Neutral as usize]=1.0;
++    let spectator=IsotopeNumberState::new(values).unwrap();
++    assert_eq!(thermal.thermal_substep(&spectator,u,0.0,ThermalCxControls::default()).unwrap_err(),ThermalCouplingError::UnsupportedSpectator);
++    assert!(DAtomicProvider::new(13.6,13.5,"INVALID_REVERSED_THRESHOLD").is_err());
++}
