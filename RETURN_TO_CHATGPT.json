@@ -1,0 +1,366 @@
+{
+  "backup": {
+    "dropbox": {
+      "path": "dbx:REI_BASS_DYNAMIC_20261016/1f8619c2-bf8aaffd/recovery-1f8619c2.tar.gz",
+      "readback_exit_code": 0,
+      "readback_match": true,
+      "readback_sha256": "bf8aaffdae624a6de25d6f8e58fb8c7b3c166f331954d9b841907ab1bc061e4c",
+      "upload_exit_code": 0
+    },
+    "google_drive": {
+      "path": "gdrv:REI_BASS_DYNAMIC_20261016/1f8619c2-bf8aaffd/recovery-1f8619c2.tar.gz",
+      "readback_exit_code": 0,
+      "readback_match": true,
+      "readback_sha256": "bf8aaffdae624a6de25d6f8e58fb8c7b3c166f331954d9b841907ab1bc061e4c",
+      "upload_exit_code": 0
+    },
+    "local_bundle": {
+      "base_required": "7cb4ac678be019b736e85db76dfbdc7c51e380e9",
+      "path": "research/bass_dynamic_20261016/backup/source_delta.bundle",
+      "restore_exit_code": 0,
+      "restored_commit": "1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3",
+      "restored_tree": "8bc36af4e463e515623b05c1fe311ea0e7b73243",
+      "sha256": "53c43713f87bdb4b24e3ad481bfade61e1d0b5ac7ad450cba92016f5ff3043bc"
+    },
+    "package": {
+      "internal_sha256_check_exit_code": 0,
+      "path": "research/bass_dynamic_20261016/backup/recovery-1f8619c2.tar.gz",
+      "sha256": "bf8aaffdae624a6de25d6f8e58fb8c7b3c166f331954d9b841907ab1bc061e4c",
+      "size_bytes": 6115584
+    },
+    "receipt_path": "research/bass_dynamic_20261016/backup/RECEIPT.json"
+  },
+  "changed_files": [
+    "rust/rei_microphysics/src/axbi_bass_background.rs",
+    "rust/rei_microphysics/src/axbi_driver.rs",
+    "rust/rei_microphysics/src/lib.rs",
+    "rust/rei_microphysics/examples/bass_dynamic_trial.rs",
+    "rust/rei_microphysics/tests/axbi_bass_dynamic.rs",
+    "research/bass_dynamic_20261016/"
+  ],
+  "checkpoint": {
+    "bad_hamiltonian": "REJECTED:BASS_HAMILTONIAN",
+    "configuration_change": "REJECTED:BASS_CHECKPOINT_CONFIG",
+    "corrupt_truncated": "REJECTED:BASS_CHECKPOINT_TRUNCATED",
+    "create_only": true,
+    "different_case_or_grid": "REJECTED:BASS_CHECKPOINT_SOURCE_BINDING",
+    "full_state_restart_exact_runs": 22,
+    "legacy_v4_in_bass_mode": "REJECTED",
+    "nonmonotonic_clock": "REJECTED:BASS_PROPER_TIME_MONOTONIC",
+    "reused_output_epoch": "REJECTED:BASS_CHECKPOINT_EPOCH_OUTPUT",
+    "schema": "BASS_REI_CHECKPOINT_V1",
+    "source_csv_byte_change": "REJECTED:BASS_SOURCE_CSV_SHA256",
+    "source_manifest_mismatch": "REJECTED:BASS_SOURCE_MANIFEST_SHA256",
+    "tampered_geometry_state": "REJECTED:BASS_CHECKPOINT_GEOMETRY_STATE",
+    "transport_bins_change": "REJECTED:BASS_CHECKPOINT_PROVIDER_SCHEMA",
+    "wrong_signed_shear": "REJECTED:BASS_SIGNED_SHEAR"
+  },
+  "convergence": {
+    "cold_long_chemistry_temperature_ratio": 0.6518532699667154,
+    "cold_short_chemistry_temperature_ratios": [
+      1.9252034074993718,
+      1.9610571915017225
+    ],
+    "data": "CONVERGENCE_RELEASE.json",
+    "gas_geometry_grid_status": "BELOW_BINARY64_RESOLUTION_AT_FIXED_CHEMISTRY_STEP",
+    "long_status": "HOLD_NO_STABLE_TIMESTEP_CONVERGENCE",
+    "short_status": "NUMERICALLY_CHECKED_FIRST_ORDER_TREND",
+    "signed_long_chemistry_temperature_ratio": 0.6518567733578488,
+    "signed_long_geometry_b_ratio": 4.178201980193187,
+    "signed_long_geometry_s_ratio": 4.2907607685239615,
+    "signed_short_chemistry_temperature_ratios": [
+      1.9252057849623374,
+      1.961058522514395
+    ]
+  },
+  "execution": {
+    "cargo_fmt_gate": {
+      "command": "cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check",
+      "exit_code": 1,
+      "files_with_diffs": 16,
+      "inherited_files_with_diffs": 13,
+      "raw_log": "research/bass_dynamic_20261016/first_failures/cargo_fmt_check.log.gz",
+      "touched_files_with_diffs": 3
+    },
+    "ncp_matrix": {
+      "command": "bash /root/REI_BASS_DYNAMIC_20261016_001/run_ncp_release.sh",
+      "exit_code": 0,
+      "per_run_timeout_s": 1800,
+      "runs": 22
+    },
+    "prior_python_reused": {
+      "bass_pr164": 14,
+      "bass_pr165": 16,
+      "rerun_this_loop": 0
+    },
+    "python_clock": {
+      "command": "/root/REI_C16B_NATIVE_20261016/venv/bin/python research/bass_dynamic_20261016/compare_python_clock.py /root/REI_BASS_DYNAMIC_20261016_001 release",
+      "exit_code": 0,
+      "matched_points": 12,
+      "max_H_relative": 0.0,
+      "max_proper_time_relative": 2.88870482920303e-16
+    },
+    "rust_build": {
+      "command": "cargo build --offline --example bass_dynamic_trial",
+      "cwd": "/root/REI_BASS_DYNAMIC_20261016_001/rust/rei_microphysics",
+      "exit_code": 0,
+      "log": "ncp_evidence/evidence-release.tar.gz:build-owner.log"
+    },
+    "rust_tests": {
+      "command": "cargo test --offline --test axbi_bass_dynamic --test axbi_driver --test axbi_covariant_driver",
+      "exit_code": 0,
+      "legacy_tests_passed": 20,
+      "log": "ncp_evidence/evidence-release.tar.gz:test-release.log",
+      "new_tests_passed": 6,
+      "tests_passed": 26
+    },
+    "signed_photon_work": {
+      "command": "cargo test --offline --test axbi_bass_dynamic signed_geometry_redshift_work -- --nocapture",
+      "exit_code": 0,
+      "log": "research/bass_dynamic_20261016/first_failures/signed_redshift_after.log",
+      "tests_passed": 1
+    },
+    "source_row_raw": {
+      "command": "python3 research/bass_dynamic_20261016/compute_source_residuals.py /root/REI_BASS_DYNAMIC_20261016_001",
+      "exit_code": 0,
+      "result": "research/bass_dynamic_20261016/SOURCE_ROW_RESIDUALS.json",
+      "rows_checked": 1686
+    }
+  },
+  "first_failure_evidence": "research/bass_dynamic_20261016/first_failures/INITIAL_ERRORS.md and NCP evidence archives; initial system-Python stderr was overwritten by subsequent successful run",
+  "first_failures": [
+    {
+      "event": "first rsync staging lacked SSH identity",
+      "exit_code": 255,
+      "repair": "rsync -e explicit SSH key"
+    },
+    {
+      "event": "adaptive first proposed step rejected, summary initially mislabeled PASS",
+      "repair": "record repeated rejection and actual accepted state"
+    },
+    {
+      "event": "signed photon redshift-work test exposed legacy background call in photon_inventory",
+      "exit_code": 101,
+      "repair": "route all inventory and driver geometry calls through geometry_point; rerun results"
+    },
+    {
+      "event": "producer cumulative clock differed from Python GL8 intake by 7.57e-9 relative",
+      "repair": "reconstruct segment clock with GL8; final 2.89e-16 relative"
+    },
+    {
+      "event": "NCP system python lacked numpy",
+      "exit_code": 1,
+      "repair": "reuse existing read-only REI venv interpreter"
+    },
+    {
+      "event": "128-step diagnostic hit trial max_steps=100",
+      "exit_code": 2,
+      "repair": "increase mini test cap to 512 without changing solver tolerance"
+    },
+    {
+      "classification": "CI_FORMAT_FAILURE_WITH_INHERITED_AND_NEW_DIFFS",
+      "event": "PR159 GitHub verify formatting gate",
+      "exit_code": 1,
+      "raw_log": "research/bass_dynamic_20261016/first_failures/github_ci_fmt.log.gz",
+      "repair": "separate bounded formatting maintenance with new source-bound checkpoint identity/revalidation; no science admission from CI"
+    }
+  ],
+  "independent_scientific_review": "NOT_RUN_CURRENT_SESSION_DIRECT_IMPLEMENTATION; DRAFT_PUBLICATION_ONLY",
+  "ncp": {
+    "affinity_cores": "0-15",
+    "cargo": "1.99.0",
+    "host": "s1a0e5abed09",
+    "logical_cpu": 64,
+    "max_rss_kib_observed_benchmark": 10240,
+    "max_wall_s_per_run": 1800,
+    "output_evidence_sha256": "4b43737e74acaa8af935617294e1e04ff647e49336d555512fd3ae4707decfbb",
+    "owner_full_campaign_checkpoints": [
+      "/root/REI_FLRW_COVARIANT_20261015_005/full_campaign001/runs/FLRW_FULL_Q512_001/checkpoint.txt",
+      "/root/REI_FLRW_COVARIANT_20261015_005/full_campaign001/runs/FLRW_FULL_Q1024_001/checkpoint.txt"
+    ],
+    "owner_full_campaign_status": "ALL_FULL_CASES_COMPLETE_PENDING_SCIENTIFIC_POSTPROCESS",
+    "owner_process_at_closeout": null,
+    "owner_process_at_preflight": null,
+    "ram_total_gib": 125,
+    "rustc": "1.99.0",
+    "selected_workers": 16,
+    "staging_dir": "/root/REI_BASS_DYNAMIC_20261016_001",
+    "staging_size_mib_observed": 759,
+    "staging_size_mib_upper_bound": 1000,
+    "thread_env": "OPENBLAS_NUM_THREADS=OMP_NUM_THREADS=MKL_NUM_THREADS=RAYON_NUM_THREADS=1",
+    "worker_wall_metric": "median of 3 runs, seconds; same COLD_FLRW 121 four-step trial",
+    "workers_compared": {
+      "1": 1.64,
+      "16": 1.18,
+      "2": 1.42,
+      "4": 1.3,
+      "8": 1.21
+    }
+  },
+  "next_first_work": "At fixed 481-row source and identical COLD_FLRW/SIGNED_MINUS initial state, diagnose the long-interval chemistry timestep failure using original REI tolerance and stored first failures; do not promote short-interval trend to full-history convergence.",
+  "physics": {
+    "adaptive": {
+      "accepted_all_22": true,
+      "local_target": 1e-05,
+      "max_rejects_before_one_acceptance": 18
+    },
+    "augmented_energy": {
+      "denominator_ev_per_H": "max(source_u_ev_per_H,1)",
+      "max_abs_raw_ev_per_H": 7.761595186006609e-13,
+      "tolerance_normalized": 1e-08
+    },
+    "h_he_nuclei": {
+      "denominator": "one nucleus per respective element",
+      "max_h_sum_residual": 0.0,
+      "max_he_sum_residual": 0.0,
+      "scope": "state fractions at 22 final points"
+    },
+    "hamiltonian": {
+      "denominator": "max(|H^2|,|predicted_H^2|)",
+      "denominator_at_max_raw_s_minus2": 1.400696388850605e-32,
+      "max_abs_raw_s_minus2": 2.7369110631344083e-48,
+      "max_normalized": 6.142855769477296e-16,
+      "tolerance": 3e-12,
+      "units": "dimensionless"
+    },
+    "instantaneous_owners": {
+      "cold_normalized": -5.0843726840457684e-17,
+      "cold_owner_denominator_erg_cm3_s": 2.6699403852032936e-31,
+      "cold_owner_raw_erg_cm3_s": -1.3574971962558262e-47,
+      "denominator": "max(|photo_input|,|escape|,|thermal_micro|,1e-300 erg cm^-3 s^-1)",
+      "scope": "final chemistry point only",
+      "signed_normalized": -4.7360293571004345e-17,
+      "tolerance": 1e-12
+    },
+    "momentum_Qa": "OPEN_NO_GAS_COUNTERPART_OR_STELLAR_RECOIL",
+    "newton": {
+      "max_residual": 8.840535030017322e-12,
+      "solver_threshold": 1e-11
+    },
+    "photon_number": {
+      "denominator_per_H": "max(source_n_per_H,1)",
+      "max_abs_raw_per_H": 3.5575383784680614e-20,
+      "tolerance_normalized": 1e-08
+    },
+    "polarization": "NOT_RUN",
+    "proper_time": {
+      "denominator": "max(|t_Python|,1 s)",
+      "denominator_at_max_raw_s": 3380624043438.2686,
+      "matched_points": 12,
+      "max_abs_raw_s": 0.0009765625,
+      "max_relative_vs_python_source_table": 2.88870482920303e-16
+    },
+    "radiation_redshift_shear_work": {
+      "denominator_ev_per_H": 0.03,
+      "normalized_residual": 0.0,
+      "photon_work_ev_per_H": 2.946867793687802e-06,
+      "signed_case_source_free_raw_residual_ev_per_H": 0.0,
+      "test_tolerance_raw_ev_per_H": 1e-15
+    },
+    "raychaudhuri": {
+      "acceptance_check": "absolute <= 1e-26 s^-1 + 3e-12*|predicted|",
+      "denominator": "max(|predicted_dH_dln_a|,1e-300 s^-1)",
+      "denominator_at_max_raw_s_minus1": 1.0939721460763179e-16,
+      "max_abs_raw_s_minus1": 4.930380657631324e-32,
+      "max_normalized": 6.258029058584578e-16,
+      "units": "dimensionless"
+    },
+    "scope": {
+      "cases": [
+        "COLD_FLRW",
+        "SIGNED_MINUS"
+      ],
+      "geometry_grids": [
+        121,
+        241,
+        481
+      ],
+      "initial_a": 0.047619047619047616,
+      "long_delta_ln_a": 0.0004,
+      "short_delta_ln_a": 4e-07,
+      "source_only": true
+    },
+    "signed_shear": "BackgroundPoint.sigma=s/H; Sigma=sqrt(3)*abs(s)/H",
+    "source_time": {
+      "cold": {
+        "changed": true,
+        "first_rate_per_h_s": 4.2986593567552486e-18,
+        "last_rate_per_h_s": 4.302400706905109e-18,
+        "max_abs_step_source_residual_per_h": 3.8116482626443515e-21
+      },
+      "signed": {
+        "changed": true,
+        "first_rate_per_h_s": 4.2986593567552486e-18,
+        "last_rate_per_h_s": 4.302400706905109e-18,
+        "max_abs_step_source_residual_per_h": 2.964615315390051e-21
+      }
+    }
+  },
+  "publication": {
+    "base_branch": "research/flrw-production-integration-20261015",
+    "ci": {
+      "pr150_base_verify_also_failed": true,
+      "pr159_verify_runs": [
+        "38829392560",
+        "38829398970"
+      ],
+      "raw_log": "research/bass_dynamic_20261016/first_failures/github_ci_fmt.log.gz",
+      "rust_tests_still_passed": 26,
+      "status": "FAIL_FORMAT_GATE"
+    },
+    "draft": true,
+    "draft_pr": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/159",
+    "implementation_head": "1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3",
+    "merge": "NOT_RUN",
+    "push_exit_code": 0
+  },
+  "schema": "rei.bass_dynamic.return_to_chatgpt.v1",
+  "science_decision": {
+    "DERIVED": [
+      "signed-shear convention",
+      "scalar Hamiltonian/Raychaudhuri and local Q0 owner identities"
+    ],
+    "HOLD": [
+      "long-interval chemistry timestep convergence",
+      "full EoR/Einstein-Boltzmann admission",
+      "momentum counterpart and stellar recoil",
+      "independent Astra-tier scientific review before broader admission",
+      "repository-wide cargo fmt CI gate; PR remains Draft"
+    ],
+    "IMPLEMENTATION_VERIFIED": [
+      "opt-in provider and 26 Rust tests",
+      "source-bound create-only checkpoint and negative cases",
+      "exact mini restart parity"
+    ],
+    "NOT_RUN": [
+      "full-history BASS production",
+      "polarization evolution"
+    ],
+    "NUMERICALLY_CHECKED": [
+      "22 bounded native mini-histories",
+      "12 Python/Rust clock comparisons",
+      "short-interval empirical first-order chemistry trend",
+      "signed geometry b/s grid trend"
+    ]
+  },
+  "scope": "Opt-in BASS source-only geometry with native REI H/He bounded mini-history; no full EoR admission",
+  "source_identity": {
+    "bass_original_producer": "3c39bbbf46b6663e7c40277e194fd0ef48118472",
+    "bass_pr165": "2d1d061fe63f8dcb957646af5b4c86b0430dd3e9",
+    "bass_pr166_head": "02149a6830dfe7ed214b77f5309e38350d2659fb",
+    "branch": "research/bass-pr166-dynamic-provider-20261016",
+    "implementation_commit": "1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3",
+    "implementation_tree": "8bc36af4e463e515623b05c1fe311ea0e7b73243",
+    "rei_original_native_source": "0e25846433170d0f420c4cda44a0bedbf02cd177",
+    "rei_pr150_latest_base": "7cb4ac678be019b736e85db76dfbdc7c51e380e9"
+  },
+  "source_sha256": {
+    "grid241_csv": "30a9abf166005f3c2f4073eb532b0ffd35891827562ed9f0d6816329c625b6c9",
+    "grid241_receipt": "9abb74b98a2896a1aee50b373981d2cf3c0c5ba0b65bb7c8437245643c2a90bd",
+    "grid481_csv": "1104845a34658b7c99ba4d7731a955c11457cf5c9ab92b1cf49117de462b663f",
+    "grid481_receipt": "32b9690e3842c5eeeb64e453fabc1895ab6bf5e27678975521e9f945dc5cc67e",
+    "pr164_csv": "5a7844834b50fbc046995678a6aaf936252a81e49de1593604eee30641274133",
+    "pr164_receipt": "98eddf4673780f0bbca711b373a3e0746cfafc8190674c8d2d6c4de658dc3eed",
+    "python_reference_source_table": "6b8580bf7e065d03b15a3c5b2d9a810d04ae883b538795ea5b575e428310783e"
+  }
+}
