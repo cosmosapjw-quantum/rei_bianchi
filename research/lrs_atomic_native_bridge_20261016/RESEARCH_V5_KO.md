@@ -28,8 +28,16 @@ H-only, He-only, mixed FLRW, mixed LRS `s/H=±.04`의 20개 timestep 결과에�
 
 고밀도 재결합 지배 진단 `n_star=.1 cm^-3`, `H0=1e-16 s^-1`, `X_end=.01`, photon=0의 독립 Radau 최종 `T=14744.794774 K`에 대해 `ΔX=.0025,.00125,.000625,.0003125` 온도 오차는 `.0125253,.00627693,.00314200,.00157188 K`. 1차 비율로 감소한다. 현 forward pair map의 온도 의존 alpha/cooling은 각 부분단계에서 동결되므로 **일반 2차 Strang 수렴 주장은 HOLD**. 에너지 ledger가 0이라도 정밀도 결론이 되지 않는다.
 
+## 추가 PR150 source-on FLRW 한 단계
+
+별도 NCP 복사본에 GitHub PR150 `4e2f0682fb605c6aa940bd756d9869e67b6ded0b`의 실제 Rust crate를 고정하고 `native_pr150_source_step.rs`를 example로 컴파일했다. 이는 V5/Python 표 대신 PR150의 실제 `AxbiSource::inject` → `CovariantTransport::prepare` → `PreparedAbsorption::evaluate` → `igm_point_rhs`를 차례로 호출한다. `a=.05, z=19`, `dt=1e10 s`, `nH=1.518558760571221e-3 cm^-3`, gas `15000 K`, Case-A native owner로 한 번의 명시적 Euler 상태 갱신을 수행했다. NCP exit 0, source 주입 `4.951273748616365e-8` photon/H, 흡수 `2.572236103809841e-8` photon/H, 갱신 온도 `14998.84953918 K`, prepared node 2432개. source count/energy 상대잔차 `1.34e-16/1.69e-15`, 흡수 photon count/energy `2.71e-15/2.20e-16`, electron `1.23e-16`, micro energy `6.13e-16`. transport→chemistry 접속부의 종별 photo event 및 총 photo energy 상대잔차는 `2.60e-15/1.32e-15`. 최종 warmed example은 0.24 s/120 MB, 첫 build는 7.39 s/341 MB. 원래 cargo 복사본의 여섯 `include_str!` 계약 누락으로 난 첫 exit 101 로그를 보존하고 원본 계약을 추가한 뒤 재실행했다. 이 실행은 **고정 geometry/밀도의 실제 native source-on 단일 단계**의 보존 회계이며, photon 감쇠는 backward Euler, gas 갱신은 explicit Euler이다. redshift/shear work와 implicit production whole-history 수렴의 증거가 아니다.
+
+이 추가 source→transport→chemistry 접점은 구현하지 않은 독립 reviewer가 NCP 원시 결과와 PR150 코드를 읽고 위의 **고정 geometry 한 단계 회계**에 한해 scoped PASS로 판정했다.
+
 ## 과학적 채택과 다음 일
 
-채택은 엄격한 10–24 kK 내부, Case-A RR/DR+recombination cooling, 지정된 낮은 밀도/균일 background, native **점 항**까지다. 실제 native transport+source와의 시간 이력 결합, CI/CE/freefree/CMB를 포함한 총 RHS, escaping recombination photon spectrum, Case B on-the-spot, 재이온화 우주론적 이력 및 observational accuracy는 HOLD. 다음 최소 연구 단위는 PR150의 실제 `PreparedAbsorption`/`IgmPhotoInput` 연결에서 같은 frozen initial state와 donor로 하나의 source-on FLRW 짧은 구간을 실행하고, photon·species·heat·binding·escape의 한-step ledger 및 dense recombination 시간 적분 차수를 검증하는 것이다.
+채택은 엄격한 10–24 kK 내부, Case-A RR/DR+recombination cooling, 지정된 낮은 밀도/균일 background, native **점 항**과 위의 source-on **단일 단계 회계**까지다. native transport+source의 다단계 시간 이력 수렴, CI/CE/freefree/CMB를 포함한 V5/Python 총 RHS 동등성, escaping recombination photon spectrum, Case B on-the-spot, 재이온화 우주론적 이력 및 observational accuracy는 HOLD. 다음 최소 연구 단위는 동일 frozen initial state에서 PR150 owner의 source-on 다단계 FLRW 짧은 구간을 time-step refinement와 함께 실행하고, photon·species·heat·binding·escape를 연속 step으로 비교하며 dense recombination 1차 결손을 해결하거나 명시적으로 제한하는 것이다.
 
 원시 archive `REI_LRS_ATOMIC_NATIVE_BRIDGE_20261016_000210Z.tar.gz`는 606,203 bytes, SHA-256 `d5d37a6f680bd900336c40ba9e3e02e7f936cbf2bb64d9df28e989b4c692bcfd`. [Google Drive 객체](https://drive.google.com/file/d/1ICEmIEoBHV4zCLdT-wDlCyVns3PGJxBn/view)와 Dropbox `bianchi/research_backups/rei_bianchi/REI_LRS_ATOMIC_NATIVE_BRIDGE_20261016/` 객체 `id:BSpOijBcT10AAAAAAD9ixg` 모두 원격 readback SHA-256 일치. 객체별 크기와 경로는 `V5_DELIVERY.json`에 기록했다. 백업의 성공과 위의 제한적 과학 채택은 서로 다른 판정이다.
+
+추가 source-on 단계의 보충 archive `REI_LRS_ATOMIC_NATIVE_BRIDGE_20261016_SOURCESTEP_000210Z.tar.gz`는 343,625 bytes, SHA-256 `3661408083d45904d12cdafeb3eae7bfc06680afaaea5018ea48017932a1590d`. [Google Drive 객체](https://drive.google.com/file/d/1DkYVMJAwb2qg6ntYDmyULDOsQhDZO79w/view), 같은 Dropbox 폴더의 객체 `id:BSpOijBcT10AAAAAAD9kGA` 모두 별도 원격 readback SHA-256이 일치했다. 첫 archive는 변경하지 않았다.
