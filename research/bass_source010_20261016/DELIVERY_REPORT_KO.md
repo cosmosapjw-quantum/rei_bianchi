@@ -17,8 +17,19 @@
 
 - [실제 명령·source·설정·exit·자원·비교 결과](RETURN_CONTRACT.json)
 - [21개 관측량 비교](comparison_001/COMPARISON.json)
-- [기존 SOURCE009 abundance 그림 4개와 보고서](../bass_source009_20261016/DELIVERY_REPORT_KO.md): 경과 proper time과 실제 Tgas에 따른 H/He/전자 이력. SOURCE010에서 새 그림을 그렸다는 주장은 하지 않는다.
+- [기존 SOURCE009 abundance 그림 4개와 보고서](../bass_source009_20261016/DELIVERY_REPORT_KO.md): 앞선 local target 결과를 그대로 보존한다.
 - [Dropbox와 새 PR 반영 기록](../external_update_intake_20261016_001/refresh_003/INTEGRATION_KO.md)
-- [다음 frozen 실행 계약](NEXT_AUTHORITY.json): retained SIGNED_MINUS checkpoint에서 남은 24단계의 accepted-state residual/Jacobian을 관찰한다. 전체 이력을 반복하지 않는다.
+- [완료된 SOURCE011 진단](../bass_source011_20261016/DELIVERY_REPORT_KO.md): retained SIGNED_MINUS checkpoint의 마지막 24단계에서 실제 accepted-state residual/Jacobian을 측정하고 독립 검토를 통과했다. 전체 이력을 반복하지 않았다.
 
 GOAL_DONE은 false다. 게시와 백업의 실제 readback은 별도 delivery receipt에 기록한다.
+
+## 최신 데이터의 실제 abundance 그림
+
+SOURCE010의 검증된 79,206개 상태를 모두 사용한 그림 4개를 추가했다. Native baryon-normalized H/He ion abundance와 전자를 분리한 log panel, 0을 포함하는 선형 elapsed proper time, 시간 순서를 보존한 Tgas 궤적을 사용했다. 정확한 0만 mask했으며 floor나 downsampling은 없다. 실제 plotting 1회는 exit0, 7.054737538 s였다. [독립 검토](presentation_001/INDEPENDENT_REVIEW.json)는 네 PNG를 직접 확인하고 게시를 승인했다.
+
+| 구간 | 경과 proper time | 실제 gas temperature |
+|---|---|---|
+| SIGNED_MINUS | [그림](presentation_001/results/SIGNED_MINUS_Y_vs_elapsed_time.png) | [그림](presentation_001/results/SIGNED_MINUS_Y_vs_Tgas_chronological.png) |
+| COLD_FLRW | [그림](presentation_001/results/COLD_FLRW_Y_vs_elapsed_time.png) | [그림](presentation_001/results/COLD_FLRW_Y_vs_Tgas_chronological.png) |
+
+[실행·파일·input SHA 재계산 여부](presentation_001/RETURN_CONTRACT.json)를 기록했다. Solver·ledger·checkpoint 검산은 반복하지 않았다. 이 그림은 현재 conditional 구간의 저장 이력을 보여주며 시간·각도·에너지 수렴이나 전체 EoR 완료를 뜻하지 않는다.
