@@ -17,3 +17,27 @@ Use the frozen adaptive SSP Heun RK2 step-doubling map. Both Euler states are in
 ## C4 — Execution and resource plan
 
 C5 writes the runtime and bounded verification harness. C6 runs new manufactured and changed-seam controls. C7 runs three Savin default/tight pairs and fixed Heun N=16/32/64. C8 audits saved evidence and environment without replay. C9 obtains a fresh independent review. C10 reports measured results and exact resume commands. Scientific verification cumulative wall time is capped at30 s, with one thread, zero builds/native/old suites/external reference runs. Each stage waits for immutable-capture ACK. Substantive failure evidence is preserved for root/Astra interpretation. No run in C4.
+
+## C5 — Implementation
+
+Completed thermal_cx.py and verify_thermal_cx.py. The module exposes immutable state/defect/provider/control records, reduction, guarded Heun map, adaptive integration and Savin JSON CLI. It preserves the last accepted state on incomplete return; initial invalid inputs have typed INVALID_INPUT records. Every attempted RHS is charged before provider evaluation. Tests read cached Decimal references and cover the new thermal seam. No tests or scientific import executed before this stage capture.
+
+## C6 — Implementation verification
+
+Actual command `timeout30s python3 verify_thermal_cx.py --stage C6` completed with exit0. Seven manufactured cases and17 changed-seam controls passed, including signed negative defect, reverse feedback, lambda-zero flow, both provider events, dt0/empty/no-D/zero-rate paths, invalid input, charged provider failures and work caps. The SI-equivalent field conversion passed. Independent Decimal expectations were read from the cached probe; the probe was not replayed. All saved invariant/amplitude checks passed. Actual test wall 0.051000459 s, CPU 0.050998123 s. Detailed outputs and exact command are in C6_results.json/C6_execution.json; event time differences are diagnostics.
+
+## C7 — Scientific and numerical fixtures
+
+Actual command `timeout30s python3 verify_thermal_cx.py --stage C7` completed exit0. Three synthetic isolated H/D states used actual Savin fits in default/tighter pairs. Domain, finite nonnegative reconstruction, inventory/energy ledgers and amplitude ceilings passed. The near-lower-domain pair returned partial DOMAIN_BOUNDARY_APPROACH. Default/tight differences are recorded as tolerance diagnostics, not true error. Fixed Heun N16/32/64 errors decreased with ratios 4.28125673 and 4.13255763, inside frozen[3,5]. Actual test wall 0.013560094 s, CPU 0.013558598 s; cumulative C6+C7 test wall 0.064560553 s. No native/NCP/source reference replay.
+
+## C8 — Reproducibility and evidence binding
+
+Parsed both Python sources with stdlib AST; checked executed source/contract/fixture/probe identities against current bytes and parsed all saved results. All checks passed without importing runtime or rerunning a solver. C6+C7 actual test wall0.06456055299349828 s and CPU0.064556721 s remain separate from the independent cached probe wall0.006348454 s; its failed timing wrapper had unmeasured duration. Runtime dependencies are stdlib only. CLI source parsed; CLI execution itself was not run. Exact code/results SHA256 pins and environment are in coding_evidence/C8.json.
+
+## C9 — Independent review
+
+Fresh read-only crossrepo_intake review returned PASS_SCOPED with no blocking finding or repair. All C8 declared pins matched and the R10 contract was byte identical. The reviewer inspected source and saved outcomes without solver imports or numerical replay. Manufactured numerical boundary-approach times exceed analytic crossings by about1e-6 s; these are not certified crossing times or lower bounds. Scientific scope and all typed partial outcomes are retained.
+
+## C10 — Scoped result and handoff
+
+Completed REPORT_KO.md, README.md, HANDOFF.json, NEXT_DAG.json and automatic pinned-fetch CODEX_HANDOFF_PROMPT.md. Preserved original R10 theory handoff as THEORY_HANDOFF.json. C9 PASS_SCOPED source/results remain unchanged; no solver or CLI replay. The saved-array C7 convergence figure rendered with Matplotlib3.10.8 in0.806396686 s and passed visual inspection; this plotting time is separate from scientific test wall. Root approved report/metrics/figure and requested only targeted handoff metadata corrections: O6 optional support; contract PASS transitions to actual bounded local Rust port/component tests; scientific completion distinct from later publisher receipt; CLI/local git/gh/HTTPS automatic pinned fetch fallback. Applied those corrections and refreshed doc pins. Final publication/cloud ACKs are publisher-owned FINAL_PUBLICATION.json, which may be absent inside a pre-archive snapshot. The next local component task remains executable independently of external native/reference holds, with exactly-once CX ownership frozen before coupling.

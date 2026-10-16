@@ -46,7 +46,7 @@ def main():
             break
         completed.append(stage_id)
     dag['completed_through'] = completed[-1] if completed else None
-    dag['next_executable'] = ordered[len(completed)] if len(completed) < len(ordered) else 'O1'
+    dag['next_executable'] = ordered[len(completed)] if len(completed) < len(ordered) else 'READ_HANDOFF_AND_CURRENT_CANONICAL_FRONTIER'
     write_json(dag_path, dag)
     checkpoint = {'schema_version':1, 'stage':stage, 'base_commit':args.base,
         'owner_stage_fact': evidence, 'packaging_status':'PACKAGED',
