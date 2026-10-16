@@ -9,3 +9,7 @@ The helper and standalone use only Python standard library. Test-only moderate-f
 ## C2 — equations, data and code
 
 `reader.FIELDS`, `SPECIES` and `CLOCK` define the identical 16 observables and clock. A direct standalone loader constructs those arrays from history and abundance streams, hashes each stream inline once, and verifies numeric shape/order prerequisites. The successful prior receipt transfers unchanged physical and ledger validation through content identity. The new helper maps the union partition and R5 segment formulas to per-observable accumulator state. A minimal opt-in caller hook writes the new JSON/CSV after the existing sampled comparison. See coding_evidence/C2.json for the full mapping.
+
+## C3 — numerical design
+
+The helper validates arrays without copying, locates the overlap brackets, and streams exact-equality merged knots. Own-knot values bypass interpolation; interior queries use convex weights. Endpoint differences determine the supremum and analytic L1/I2 contributions. Normalized endpoint values avoid unnecessary squaring overflow, and Neumaier sums retain O(k) auxiliary state. Every computed output must be finite. Strict maximum replacement preserves the earliest exact floating tie. Ordinary binary64 rounding and underflow remain within the declared arithmetic scope.
