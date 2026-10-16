@@ -140,6 +140,17 @@ C7 runs the three declared Savin fixtures under default and tighter controls, an
 
 A single named failure returns its exact status and raw output for a bounded repair decision. C9 independent review checks the actual code and measured outputs before scoped numerical acceptance. R6 mathematical PASS is not substituted for that result review. Per-stage publication proceeds from immutable captures with the publisher's receipts.
 
+## R10 — Theory completion and next executable unit
+
+R1–R10 are complete for the isolated thermal-CX theory/design unit. Actual deliverables are the conservation-reduced scalar ODE, physically admissible extent/provider interval, exact manufactured thermal-feedback solution, rate-independent amplitude ceiling, independently reviewed bounded numerical contract and cached exact-algebra/Decimal references.
+
+One signed-defect wording repair is closed. The independent probe's initial wrapper failure is preserved, and its sole actual science invocation completed. The Wolfram failures remain environmental failures rather than symbolic evidence. CONTRACT's final status update at R10 records coding readiness only; numerical controls and equations match the R6 contract examined by the probe.
+
+**Next action:** the assigned lower-tier coding owner implements and verifies this standalone Python kernel through C1–C10, capturing each actual stage. Reuse all completed source/algebra evidence. The aggregate C6/C7 execution limit is30 seconds; no native/reference or old-suite invocation is authorized by this handoff. Fresh independent C9 review decides the scope supported by actual numerical outputs. The root owns subsequent selection and any production coupling.
+
+The theory author executed no scientific code. Independent verification was performed by its separate probe owner as recorded in R7. Full isotope history, BASS error attribution and PR166 source-age reference admission were not part of this unit.
+
+
 
 
 
