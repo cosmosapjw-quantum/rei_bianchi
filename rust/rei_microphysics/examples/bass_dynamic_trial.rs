@@ -1,7 +1,7 @@
 //! Bounded native BASS+REI H/He mini-history; independent fixed-step refinements.
 use rei_microphysics::axbi_bass_background::{BassBackground, BassSourceIdentity};
 use rei_microphysics::axbi_covariant_transport::PhotonState;
-use rei_microphysics::axbi_driver::{Driver, DriverConfig, DriverState};
+use rei_microphysics::axbi_driver::{BassResearchNumerics, Driver, DriverConfig, DriverState};
 use rei_microphysics::axbi_rates::AxbiProvider;
 use rei_microphysics::HHeModel;
 use std::{
@@ -31,39 +31,107 @@ fn result() -> Result<(), Box<dyn std::error::Error>> {
     let dln: f64 = args[7].parse()?;
     let steps: usize = args[8].parse()?;
     let workers: usize = args[9].parse()?;
+    let numerics = match env::var("BASS_NUMERICS").unwrap_or_else(|_| "legacy".into()).as_str() {
+        "legacy" => BassResearchNumerics::Legacy,
+        "legacy_trace" => BassResearchNumerics::LegacyTrace,
+        "tight_newton" => BassResearchNumerics::TightNewton,
+        "split_be" => BassResearchNumerics::SplitBe,
+        "tight_split_be" => BassResearchNumerics::TightSplitBe,
+        "uniform_birth" => BassResearchNumerics::UniformBirth,
+        "tight_uniform_birth" => BassResearchNumerics::TightUniformBirth,
+        "full_exponential_frozen" => BassResearchNumerics::FullExponentialFrozen,
+        _ => return Err("unknown BASS_NUMERICS".into()),
+    };
+    // Output-only switch for refined reference runs; physics is unchanged.
+    let optical_detail = env::var("BASS_OPTICAL_DETAIL").unwrap_or_else(|_| "1".into()) != "0";
+    // Opt-in final-step roundoff closure; bound to output identity and epoch.
+    let exact_endpoint = env::var("BASS_EXACT_ENDPOINT").unwrap_or_else(|_| "0".into()) == "1";
     let mut config = DriverConfig::baseline();
     config.end_zbar = 19.99;
     config.initial_dln_a = dln;
     config.transport_threads = workers;
-    config.max_steps = 512;
+    config.max_steps = steps.max(512);
     config.max_wall_s = 1700.0;
-    let (driver, initial) = Driver::new_bass(config.clone(), bg.clone())?;
+    let (driver, initial) = Driver::new_bass_research(config.clone(), bg.clone(), numerics)?;
+    let total_dln = if exact_endpoint {
+        env::var("BASS_TOTAL_DLNA").unwrap_or_else(|_| "4e-4".into()).parse::<f64>()?
+    } else {
+        dln * steps as f64
+    };
+    let target_a = initial.a * total_dln.exp();
     let mut uninterrupted = initial.clone();
     let output_record = output.join("output_identity.txt");
     fs::write(
         &output_record,
         format!(
-            "BASS_REI_MINI_V1\n{}\n{}\n{}\n{}\n{}\n",
-            identity.source_csv_sha256, identity.source_manifest_sha256, identity.case, dln, steps
+            "BASS_REI_MINI_V2\n{}\n{}\n{}\n{}\n{}\n{:?}\nexact_endpoint={}\ntotal_dln={:.17e}\ntarget_a={:.17e}\n",
+            identity.source_csv_sha256, identity.source_manifest_sha256, identity.case, dln, steps, numerics, exact_endpoint, total_dln, target_a
         ),
     )?;
-    let checkpoint = output.join("checkpoint.bass-v1");
-    let epoch = "bass-mini-20261016-v1";
+    let checkpoint = output.join(if numerics==BassResearchNumerics::Legacy {"checkpoint.bass-v1"} else {"checkpoint.bass-v2"});
+    let epoch = if exact_endpoint {"bass-longstep-20261016-exact-endpoint-v1"} else {"bass-longstep-20261016-v2"};
     let mut resumed: Option<DriverState> = None;
-    let mut step_trace=String::from("step,mid_a,mid_time_s,dt_s,emissivity_per_h_s,expected_source_n_per_h,actual_source_n_per_h,source_residual_per_h,temperature_k,photon_work_ev_per_h,thermal_work_ev_per_h\n");
+    let mut step_trace=String::from("step,mid_a,mid_time_s,dt_s,emissivity_per_h_s,expected_source_n_per_h,actual_source_n_per_h,source_residual_per_h,old_photons_per_h,newborn_photons_per_h,temperature_k,x_hii,x_heii,x_heiii,photo_hi_per_h,photo_hei_per_h,photo_heii_per_h,photon_work_ev_per_h,thermal_work_ev_per_h\n");
+    let mut optical_trace=String::from("step,opacity_phase,cohort,cell,ray_index,mu,energy_physical_ev,q_ref_ev,number_per_h,support_lo_ref_ev,support_hi_ref_ev,tau_hi,tau_hei,tau_heii\n");
+    let mut ledger_trace=String::from("step,source_n_per_h,source_u_ev_per_h,absorbed_n_per_h,escaped_u_ev_per_h,cmb_u_ev_per_h,rr_hi_per_h,rr_hei_per_h,rr_heii_per_h,ci_hi_per_h,ci_hei_per_h,ci_heii_per_h,photon_work_ev_per_h,thermal_work_ev_per_h,gas_w_erg_per_h\n");
     let mut max_source_rate_change = 0.0_f64;
     let mut max_source_residual = 0.0_f64;
     let initial_rate = driver.source.at_redshift(20.0)?.per_h_s;
     for j in 0..steps {
         let old_a = uninterrupted.a;
-        let next_a = old_a * dln.exp();
+        let step_dln = if exact_endpoint && j+1==steps {(target_a/old_a).ln()} else {dln};
+        let next_a = old_a * step_dln.exp();
         let mid = (old_a * next_a).sqrt();
         let midpoint = driver.geometry_point(mid)?;
         let dt = driver.geometry_increment(old_a, next_a)?.proper_time_s;
         let rate = driver.source.at_redshift(1.0 / mid - 1.0)?.per_h_s;
+        let mut at_mid=uninterrupted.clone();
+        driver.geometry_map(&mut at_mid,mid)?;
+        let geometry=driver.geometry_point(mid)?.geometry()?;
+        let rays=driver.transport.ray_geometry(&geometry)?;
+        let old_photons=PhotonState {number:at_mid.photons.clone(),energy_ref:at_mid.photon_energy_ref.clone(),
+            support_lo:at_mid.photon_support_lo.clone(),support_hi:at_mid.photon_support_hi.clone()};
+        let mut newborn=driver.transport.empty_state();
+        driver.transport.inject(&mut newborn,&geometry,1.0/mid-1.0,dt)?;
+        let [xh,yh,zh]=at_mid.gas.fractions;
+        let nhmid=driver.n_h0_cm3/mid.powi(3);
+        let nhemid=driver.n_he0_cm3/mid.powi(3);
+        let absorbers=[nhmid*(1.0-xh),nhemid*(1.0-yh-zh),nhemid*yh];
+        if optical_detail {
+            for (label,photons) in [("old",&old_photons),("newborn",&newborn)] {
+                let prepared=driver.transport.prepare(photons,&geometry)?;
+                for (cell,q,n,lo,hi,tau) in prepared.optical_depth_rows(absorbers,dt) {
+                    let ray=cell/driver.config.transport_cells;
+                    optical_trace.push_str(&format!("{j},pre,{label},{cell},{ray},{:.17e},{:.17e},{q:.17e},{n:.17e},{lo:.17e},{hi:.17e},{:.17e},{:.17e},{:.17e}\n",rays[ray].mu,q*rays[ray].scale,tau[0],tau[1],tau[2]));
+                }
+            }
+        }
+        let old_count=old_photons.number.iter().sum::<f64>();
+        let newborn_count=newborn.number.iter().sum::<f64>();
         let old_source_n = uninterrupted.ledgers.source_n;
-        driver.fixed_step(&mut uninterrupted, dln)?;
+        let old_events=uninterrupted.ledgers.photo_events;
+        let before=uninterrupted.ledgers.clone();
+        driver.fixed_step(&mut uninterrupted, step_dln)?;
+        let [xa,ya,za]=uninterrupted.gas.fractions;
+        let accepted_absorbers=[nhmid*(1.0-xa),nhemid*(1.0-ya-za),nhemid*ya];
+        if optical_detail {
+            for (label,photons) in [("old",&old_photons),("newborn",&newborn)] {
+                let prepared=driver.transport.prepare(photons,&geometry)?;
+                for (cell,q,n,lo,hi,tau) in prepared.optical_depth_rows(accepted_absorbers,dt) {
+                    let ray=cell/driver.config.transport_cells;
+                    optical_trace.push_str(&format!("{j},accepted,{label},{cell},{ray},{:.17e},{:.17e},{q:.17e},{n:.17e},{lo:.17e},{hi:.17e},{:.17e},{:.17e},{:.17e}\n",rays[ray].mu,q*rays[ray].scale,tau[0],tau[1],tau[2]));
+                }
+            }
+        }
         let actual = uninterrupted.ledgers.source_n - old_source_n;
+        let after=&uninterrupted.ledgers;
+        ledger_trace.push_str(&format!("{},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e}\n",
+            j+1,after.source_n-before.source_n,after.source_u-before.source_u,
+            after.absorbed_n-before.absorbed_n,after.escaped_u-before.escaped_u,
+            after.cmb_input-before.cmb_input,
+            after.rr_events[0]-before.rr_events[0],after.rr_events[1]-before.rr_events[1],after.rr_events[2]-before.rr_events[2],
+            after.ci_events[0]-before.ci_events[0],after.ci_events[1]-before.ci_events[1],after.ci_events[2]-before.ci_events[2],
+            after.photon_work-before.photon_work,after.thermal_work-before.thermal_work,uninterrupted.gas.w_erg_per_h));
         max_source_residual = max_source_residual.max((actual - rate * dt).abs());
         max_source_rate_change =
             max_source_rate_change.max((rate - initial_rate).abs() / initial_rate);
@@ -75,7 +143,7 @@ fn result() -> Result<(), Box<dyn std::error::Error>> {
             )?
             .temperature_k;
         step_trace.push_str(&format!(
-            "{},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e}\n",
+            "{},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e}\n",
             j + 1,
             mid,
             midpoint.time_s,
@@ -84,27 +152,34 @@ fn result() -> Result<(), Box<dyn std::error::Error>> {
             rate * dt,
             actual,
             actual - rate * dt,
+            old_count,newborn_count,
             temp,
+            uninterrupted.gas.fractions[0],uninterrupted.gas.fractions[1],uninterrupted.gas.fractions[2],
+            uninterrupted.ledgers.photo_events[0]-old_events[0],
+            uninterrupted.ledgers.photo_events[1]-old_events[1],
+            uninterrupted.ledgers.photo_events[2]-old_events[2],
             uninterrupted.ledgers.photon_work,
             uninterrupted.ledgers.thermal_work
         ));
         if j + 1 == steps / 2 {
             driver.save_bass_checkpoint(&checkpoint, &uninterrupted, epoch, &output_record)?;
-            let (reader, _) = Driver::new_bass(config.clone(), bg.clone())?;
+            let (reader, _) = Driver::new_bass_research(config.clone(), bg.clone(), numerics)?;
             resumed = Some(reader.read_bass_checkpoint(&checkpoint, epoch, &output_record)?);
         }
         if let Some(s) = resumed.as_mut() {
             if j + 1 > steps / 2 {
-                driver.fixed_step(s, dln)?;
+                driver.fixed_step(s, step_dln)?;
             }
         }
     }
     fs::write(output.join("step_trace.csv"), step_trace)?;
+    if optical_detail { fs::write(output.join("optical_nodes.csv"),optical_trace)?; }
+    fs::write(output.join("ledger_steps.csv"),ledger_trace)?;
     fs::write(
         output.join("source_time_check.txt"),
         format!(
-            "max_relative_rate_change={:.17e}\nmax_source_residual_per_h={:.17e}\n",
-            max_source_rate_change, max_source_residual
+            "max_relative_rate_change={:.17e}\nmax_source_residual_per_h={:.17e}\nexact_endpoint={}\ntotal_dln={:.17e}\ntarget_a={:.17e}\n",
+            max_source_rate_change, max_source_residual, exact_endpoint, total_dln, target_a
         ),
     )?;
     let parity = if let Some(s) = &resumed {
@@ -223,8 +298,8 @@ fn result() -> Result<(), Box<dyn std::error::Error>> {
     }
     let photon_denominator = uninterrupted.ledgers.source_n.max(1.0);
     let energy_denominator = uninterrupted.ledgers.source_u.max(1.0);
-    let report=format!("{{\"schema\":\"bass.rei.dynamic_mini.v1\",\"case\":\"{}\",\"grid_points\":{},\"workers\":{},\"dln_a\":{:.17e},\"steps\":{},\"a\":{:.17e},\"time_s\":{:.17e},\"interval_time_s\":{:.17e},\"clock_residual_s\":{:.17e},\"b\":{:.17e},\"h_per_s\":{:.17e},\"s_per_s\":{:.17e},\"signed_s_over_h\":{:.17e},\"temperature_k\":{:.17e},\"x_hii\":{:.17e},\"x_heii\":{:.17e},\"x_heiii\":{:.17e},\"source_n_per_h\":{:.17e},\"source_u_ev_per_h\":{:.17e},\"photon_residual_per_h\":{:.17e},\"photon_denominator_per_h\":{:.17e},\"photon_normalized\":{:.17e},\"energy_residual_ev_per_h\":{:.17e},\"energy_denominator_ev_per_h\":{:.17e},\"energy_normalized\":{:.17e},\"ledger_tolerance_normalized\":1e-8,\"max_hamiltonian_normalized\":{:.17e},\"hamiltonian_tolerance_normalized\":3e-12,\"max_raychaudhuri_normalized\":{:.17e},\"restart_max_abs\":{:.17e},\"adaptive_status\":\"{}\",\"adaptive_error\":{:.17e},\"adaptive_accepted\":{},\"adaptive_rejects\":{},\"rhs_evaluations\":{},\"newton_residual\":{:.17e}}}\n",
-        identity.case,identity.grid_points,workers,dln,steps,p.a,p.time_s,clock.proper_time_s,p.time_s-clock.proper_time_s,p.b,p.h_per_s,p.s_per_s,p.sigma,eos.temperature_k,
+    let report=format!("{{\"schema\":\"bass.rei.dynamic_mini.v2\",\"numerics\":\"{:?}\",\"case\":\"{}\",\"grid_points\":{},\"workers\":{},\"dln_a\":{:.17e},\"steps\":{},\"a\":{:.17e},\"time_s\":{:.17e},\"interval_time_s\":{:.17e},\"clock_residual_s\":{:.17e},\"b\":{:.17e},\"h_per_s\":{:.17e},\"s_per_s\":{:.17e},\"signed_s_over_h\":{:.17e},\"temperature_k\":{:.17e},\"x_hii\":{:.17e},\"x_heii\":{:.17e},\"x_heiii\":{:.17e},\"source_n_per_h\":{:.17e},\"source_u_ev_per_h\":{:.17e},\"photon_residual_per_h\":{:.17e},\"photon_denominator_per_h\":{:.17e},\"photon_normalized\":{:.17e},\"energy_residual_ev_per_h\":{:.17e},\"energy_denominator_ev_per_h\":{:.17e},\"energy_normalized\":{:.17e},\"ledger_tolerance_normalized\":1e-8,\"max_hamiltonian_normalized\":{:.17e},\"hamiltonian_tolerance_normalized\":3e-12,\"max_raychaudhuri_normalized\":{:.17e},\"restart_max_abs\":{:.17e},\"adaptive_status\":\"{}\",\"adaptive_error\":{:.17e},\"adaptive_accepted\":{},\"adaptive_rejects\":{},\"rhs_evaluations\":{},\"newton_residual\":{:.17e}}}\n",
+        numerics,identity.case,identity.grid_points,workers,dln,steps,p.a,p.time_s,clock.proper_time_s,p.time_s-clock.proper_time_s,p.b,p.h_per_s,p.s_per_s,p.sigma,eos.temperature_k,
         uninterrupted.gas.fractions[0],uninterrupted.gas.fractions[1],uninterrupted.gas.fractions[2],
         uninterrupted.ledgers.source_n,uninterrupted.ledgers.source_u,n,photon_denominator,n/photon_denominator,u,energy_denominator,u/energy_denominator,
         hamiltonian,raychaudhuri,parity,adaptive_status,adaptive.last_error,adaptive.accepted,adaptive.rejects,uninterrupted.rhs_evaluations,uninterrupted.max_newton_residual);
