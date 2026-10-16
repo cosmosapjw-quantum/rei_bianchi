@@ -1,0 +1,111 @@
+{
+  "schema": "rei.source007.frozen-contract/1",
+  "task_id": "SOURCE007_BASS_OPTIN_PORT",
+  "authority": "Astra/high full005_render_authority APPROVED_SOURCE007_BASS_OPTIN_PORT_AND_TARGETED_COMPATIBILITY_CHECKS",
+  "base_commit": "0f6965f79326e58d52bc9023065dccd75132c49b",
+  "requested_model": "gpt-6.1-sol/high",
+  "observed_model": "NOT_INDEPENDENTLY_OBSERVED",
+  "frozen_source006_driver_sha256": "41c969a5308070c0a27708cf7443a96f83bdb2a7685edd5ee8819c46a8e96414",
+  "unchanged_transport_sha256": "9d2d97881ca7b9b58d68dbeffad937e16ca8af237b3d9ba01de0fb5e00b67aa7",
+  "donor_rei_commit": "1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3",
+  "bass_supplier_commit": "02149a6830dfe7ed214b77f5309e38350d2659fb",
+  "bass_model_commit": "3c39bbbf46b6663e7c40277e194fd0ef48118472",
+  "inputs": {
+    "csv": "research/bass_source007_20261016/inputs/pr164_121.csv",
+    "csv_sha256": "5a7844834b50fbc046995678a6aaf936252a81e49de1593604eee30641274133",
+    "producer_receipt": "research/bass_source007_20261016/inputs/pr164_121.json",
+    "producer_receipt_sha256": "98eddf4673780f0bbca711b373a3e0746cfafc8190674c8d2d6c4de658dc3eed",
+    "selected_cases": {
+      "COLD_FLRW": {
+        "rows": 121,
+        "fraction": 0,
+        "mass_parameter": 30,
+        "A": 0,
+        "Sigma_ref": 0,
+        "orientation": 1
+      },
+      "SIGNED_MINUS": {
+        "rows": 121,
+        "fraction": 0.1,
+        "mass_parameter": 30,
+        "A": 0.5,
+        "Sigma_ref": 0.017319642115231484,
+        "orientation": -1,
+        "initial_signed_s_over_H": -0.009999500037496877
+      }
+    },
+    "mass_unit_interpretation": "UNCHANGED_UNINTERPRETED_PARAMETER"
+  },
+  "physical_conventions": {
+    "a_ref": "1/21",
+    "a_end": 0.2,
+    "proper_origin_seconds": 0,
+    "domain": "bound table only; no extrapolation; forward a1>=a0 increments",
+    "geometry": "a_perp=a exp(-b), a_parallel=a exp(2b), s=db/dt, H_perp=H-s, H_parallel=H+2s",
+    "signed_sigma": "s/H distinct from sqrt(3)*abs(s)/H user Sigma; q_ref0 disables analytic knob, not table shear",
+    "interpolation": "unchanged donor tangent cubic Hermite lnH,b",
+    "clock": "GL8 integral dx/H; GL4 differences diagnostics only",
+    "density": "existing proper nH0/a^3,nHe0/a^3",
+    "energy_ownership": "existing one photon/event/thermal owner unchanged"
+  },
+  "allowed_paths": [
+    "rust/rei_microphysics/src/axbi_bass_background.rs",
+    "rust/rei_microphysics/src/axbi_driver.rs",
+    "rust/rei_microphysics/src/lib.rs",
+    "rust/rei_microphysics/tests/axbi_bass_dynamic.rs",
+    "rust/rei_microphysics/examples/bass_dynamic_trial.rs",
+    "research/bass_source007_20261016/**"
+  ],
+  "port_policy": [
+    "optional provider seam, new_bass, geometry/time/increment, output/moment/work/checkpoint only",
+    "default Driver::new analytic remains; preserve ResidualContext, charged RHS, parallel Jacobian pool and false default",
+    "new_bass rejects q_ref!=0, same_h, inactive_hi_split",
+    "table/case/config/current compiled source/output epoch checkpoint bound; reject unbound V4",
+    "donor provenance separate from current compiled source007 identity",
+    "fixed_step component diagnostic only, no adaptive/full scientific admission"
+  ],
+  "tolerances": "Preserve donor module/test numerical tolerances unchanged (Hamiltonian3e-12, Raychaudhuri1e-26+3e-12*abs(hp), signed/scale2e-12, donor point time roundtrip1e-13, photon work/count1e-15, restart/parallel compatibility exact state); no new full-convergence criterion",
+  "commands": {
+    "test": [
+      "/home/cosmosapjw/.rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "rust/rei_microphysics/Cargo.toml",
+      "--test",
+      "axbi_bass_dynamic",
+      "--",
+      "--test-threads=1"
+    ],
+    "build": [
+      "/home/cosmosapjw/.rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin/cargo",
+      "build",
+      "--release",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "rust/rei_microphysics/Cargo.toml",
+      "--example",
+      "bass_dynamic_trial"
+    ]
+  },
+  "toolchain": {
+    "rustc": "/home/cosmosapjw/.rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin/rustc",
+    "observed_rustc": "rustc 1.94.1 (e408947bf 2026-03-25)\nbinary: rustc\ncommit-hash: e408947bfd200af42db322daf0fadfe7e26d3bd1\ncommit-date: 2026-03-25\nhost: x86_64-unknown-linux-gnu\nrelease: 1.94.1\nLLVM version: 21.1.8\n",
+    "observed_cargo": "cargo 1.94.1 (29ea6fb6a 2026-03-24)\n"
+  },
+  "target_dir": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/bass_source007_20261016/target_source007",
+  "limits": {
+    "build_test_invocations_total": 2,
+    "each_wall_seconds_including_termination": 300,
+    "cumulative_wall_seconds": 600,
+    "address_space_bytes": 8589934592,
+    "jobs": 2,
+    "test_threads": 1
+  },
+  "stopping_rule": "Preserve first failed build/test command and STOP; no auto repair/rerun; no old22matrix/26suite/7Jacobian/fullphysics campaigns",
+  "next_on_pass": "fresh Astra read-only review; then separately approved two-case component packet, not full runs",
+  "scientific_admission": "NOT_ISSUED",
+  "prepared_utc": "2026-10-16T00:29:51.312957+00:00"
+}
