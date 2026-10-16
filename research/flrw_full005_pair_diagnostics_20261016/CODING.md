@@ -33,3 +33,7 @@ Four scientific test cases passed, including all eight preexisting fixtures comp
 ## C8 — numerical reproducibility and bounded cost
 
 The synthetic one-observable benchmark passed at 2,000 and 20,000 knots per history. Measured wall times with tracing were 0.066804112 s and 0.703806943 s; CPU times were 0.066775209 s and 0.703218767 s. Traced auxiliary peaks were 2,088 and 2,072 bytes with inputs allocated before tracing; process peak RSS was 14,592 KiB. Both sizes returned identical analytic affine metrics (L1=1, I2=4/3) and exact same-input replay equality. This bounded observation supports the inspected O(k) auxiliary-memory implementation; it is not a universal performance or arithmetic bound. C7 oracle comparisons and C6 nextafter/domain checks supply the rounding and close-knot evidence. No production code changed after C5. C1–C8 are complete; C9 and C10 remain pending their independent owners.
+
+## C9 — independent review
+
+Fresh reviewer `/root/full005_pair_review` issued PASS_SCOPED in INDEPENDENT_REVIEW.json after inspecting the frozen contract, production source, independent oracle and observed C6–C8 evidence. The reviewer found no issue requiring a production repair and ran no new numerical tests. This records the reviewer decision; C10 publication and prompt-only handoff remain. Actual full-history continuous metrics remain NOT_RUN and solver accuracy/convergence remain NOT_ADMITTED.
