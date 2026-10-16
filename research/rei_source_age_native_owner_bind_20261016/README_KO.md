@@ -32,3 +32,7 @@ Species-resolved photo/RR/CI endpoint 적분 event와 `N,U,xHII,xHeII,xHeIII,w,e
 ## 첫 실패와 후속 노드
 
 초기 include/CSV/unsupported nmu/invalid config 실패와 수리 로그는 `evidence/first_build_failure/`에 보존했다. 리뷰 뒤 boundary regression의 첫 테스트 가정 오류와 수리 로그도 `evidence/first_boundary_regression/`에 있다. source-matched 독립 기준해는 291번째 DOP853 RHS 호출에서 photon number 최솟값 `-1.0561176359772685e-20/H`의 trial을 거부했다. positivity preserving 독립 적분기를 설계하고 age quadrature 수렴 원인을 판별하는 다음 노드가 `contracts/NEXT_DAG.json`에 있다. 전체 EoR history 및 energy-momentum 검증은 미실행이다.
+
+## 게시와 복원
+
+Draft PR #166은 PR #164 위에 쌓였다. Science commit `965002f32aa030486973910f70ba5218178292f9`와 원본 native source를 포함한 ZIP의 SHA-256은 `2ebab11829b793eb19a0b91e5d04a3a8637e346e456ac0931c372585ef7e21de`다. Dropbox 및 Google Drive에서 각각 전체 재다운로드한 뒤 506-file manifest, ZIP CRC, 새 Rust build/45-case run, 공통 수치 파일 51/51 identity를 통과했다. Drive rclone의 첫 업로드와 제한된 재시도는 API quota 403이었고, 같은 대상 폴더에 Google Drive 연결로 업로드·재다운로드했다. 정확한 경로와 측정은 `BACKUP_RECEIPT.json`에 있다. ZIP은 science commit을 묶고, 백업 검증 receipt는 다음 commit에 기록한다.
