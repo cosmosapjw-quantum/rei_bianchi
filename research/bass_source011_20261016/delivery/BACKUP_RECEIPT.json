@@ -1,0 +1,98 @@
+{
+  "schema": "rei.private_archive_delivery_receipt/1",
+  "task_id": "SOURCE011_ACTUAL_STAGE_DIAGNOSTIC_PRIVATE_BACKUP_001",
+  "recorded_utc": "2026-10-16T02:52:14Z",
+  "requested_profile": "Luna/low, no generation override from current packet",
+  "observed_runtime": "NOT_INDEPENDENTLY_OBSERVED",
+  "source": {
+    "content_commit": "80182d4db34508f3104adfd0320e59cce1e25b8d",
+    "content_push_exit_code": 0,
+    "draft_pr": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/150",
+    "scope": "Immutable published SOURCE011 content commit; no Git mutation in this backup task."
+  },
+  "archive": {
+    "name": "REI_BASS_SOURCE011_ACTUAL_STAGE_DIAGNOSTIC_20261016_v1.zip",
+    "local_path": "/home/cosmosapjw/Dropbox/BASS_DERIVATION_DOSSIERS_20260912/REI_BASS_SOURCE011_ACTUAL_STAGE_DIAGNOSTIC_20261016_v1.zip",
+    "remote_path": "dbx:BASS_DERIVATION_DOSSIERS_20260912/REI_BASS_SOURCE011_ACTUAL_STAGE_DIAGNOSTIC_20261016_v1.zip",
+    "bytes": 1756356,
+    "sha256": "57f1bb9d2006b51ba83442b424580e07235ff36e24122cc51901a947fee92ca6",
+    "member_count_including_manifest": 147,
+    "manifested_data_members": 146,
+    "tracked_source011_members": 133,
+    "local_creation_mode": "create-only (exclusive create)",
+    "create_exit_code": 0,
+    "local_crc_and_member_sha_verification": "PASS",
+    "local_verification_exit_code": 0,
+    "single_remote_copy_exit_code": 0,
+    "remote_cat_stream_sha256": "57f1bb9d2006b51ba83442b424580e07235ff36e24122cc51901a947fee92ca6",
+    "remote_readback_match": true,
+    "remote_readback_exit_code": 0
+  },
+  "included_scope": [
+    "all tracked research/bass_source011_20261016/** as read from content commit 80182d4db34508f3104adfd0320e59cce1e25b8d",
+    "actual repaired and retained pre-repair SOURCE011 ELF binaries",
+    "the exact accepted-00039600 and terminal-00039624 SIGNED_MINUS checkpoint bodies",
+    "axbi_driver.rs, axbi_bass_stage_observer integration test source, and bass_nonlinear_stage_probe.rs",
+    "frozen SOURCE010 NEXT_AUTHORITY, source007 provider CSV/JSON, and the reviewed original nonlinear-budget module/interface references",
+    "BACKUP_MANIFEST.json with source provenance, per-member SHA-256 and byte sizes"
+  ],
+  "key_identity_members": [
+    {
+      "path": "research/bass_source011_20261016/inputs/accepted-00039600.bass-v1",
+      "sha256": "02fbbaa43e77f15ad198aae5b690dfbac7d09d10d6f079a2f3c845bb22f0674a",
+      "bytes": 139077
+    },
+    {
+      "path": "research/bass_source011_20261016/inputs/terminal-00039624.bass-v1",
+      "sha256": "a16aaf6059091e450db6460e97d3971cd47a178383e95c5b992a805426ebd243",
+      "bytes": 139077
+    },
+    {
+      "path": "research/bass_source011_20261016/target/release/examples/bass_nonlinear_stage_probe",
+      "sha256": "f9ccc4d5e777f43eb652471b610d24df24a54b58b3676d4a512b6f43500e9ac6",
+      "bytes": 1585560
+    },
+    {
+      "path": "research/bass_source011_20261016/repair_001/pre_repair/bass_nonlinear_stage_probe",
+      "sha256": "14c896921f780a728bc155f7afa4fa1b6b255bae5d6a3567ab1cbc9429e77528",
+      "bytes": 1584624
+    },
+    {
+      "path": "research/bass_source011_20261016/vendor/nonlinear_budget.py",
+      "sha256": "c611d659cd42cfbe0cb6461f68e10ce46e7a6216a2f047781c80782002e71fef"
+    },
+    {
+      "path": "research/bass_source007_20261016/inputs/pr164_121.csv",
+      "sha256": "5a7844834b50fbc046995678a6aaf936252a81e49de1593604eee30641274133"
+    },
+    {
+      "path": "research/bass_source007_20261016/inputs/pr164_121.json",
+      "sha256": "98eddf4673780f0bbca711b373a3e0746cfafc8190674c8d2d6c4de658dc3eed"
+    }
+  ],
+  "commands_and_exits": [
+    {
+      "command": "python3 /tmp/source011_backup_build.py (git archive and git show bound to content commit 80182d4db34508f3104adfd0320e59cce1e25b8d; exclusive local ZIP create; one CRC/member-SHA verification pass)",
+      "exit_code": 0
+    },
+    {
+      "command": "rclone copyto --ignore-existing --retries 1 --low-level-retries 1 '/home/cosmosapjw/Dropbox/BASS_DERIVATION_DOSSIERS_20260912/REI_BASS_SOURCE011_ACTUAL_STAGE_DIAGNOSTIC_20261016_v1.zip' 'dbx:BASS_DERIVATION_DOSSIERS_20260912/REI_BASS_SOURCE011_ACTUAL_STAGE_DIAGNOSTIC_20261016_v1.zip'",
+      "exit_code": 0
+    },
+    {
+      "command": "set -o pipefail; rclone cat 'dbx:BASS_DERIVATION_DOSSIERS_20260912/REI_BASS_SOURCE011_ACTUAL_STAGE_DIAGNOSTIC_20261016_v1.zip' | sha256sum | awk -v expected='57f1bb9d2006b51ba83442b424580e07235ff36e24122cc51901a947fee92ca6' '{ print; if ($1 != expected) exit 1 }'",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 -m json.tool research/bass_source011_20261016/delivery/BACKUP_RECEIPT.json >/dev/null; sha256sum <local archive>; stat -c '%s' <local archive>",
+      "exit_code": 0
+    }
+  ],
+  "exclusions": [
+    "full SOURCE010 803 MB raw archive",
+    "entire target/cache trees",
+    "unrelated partial directories",
+    "duplicate full raw history"
+  ],
+  "scientific_claim": "This receipt documents packaging and remote byte readback only; it makes no additional scientific admission."
+}
