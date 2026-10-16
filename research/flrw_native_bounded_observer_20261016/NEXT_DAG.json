@@ -1,17 +1,70 @@
 {
+  "schema_version": 1,
   "unit_id": "flrw_native_bounded_observer_20261016",
-  "status": "R10_CAPTURED_C5_IMPLEMENTATION_IN_PROGRESS",
-  "R6_new_seam": "PENDING_INDEPENDENT_C9",
-  "O1": "SOURCE011_COMPLETE_SELECTED; EXECUTION_ENVELOPE_EXPIRED",
-  "O2": "IN_PROGRESS",
-  "O3": "PENDING_NEW_PRODUCER_BINDING",
-  "O4": "PENDING_TARGETED_TESTS",
-  "O5": "HOLD_RESOURCE_ENVELOPE_EXHAUSTED",
-  "O6": "HOLD_MISSING_STAGE_DATA",
-  "original_native_deadline_utc": "2026-10-16T02:50:17.774070Z",
-  "deadline_reset": false,
-  "packets_max": 6,
-  "extra_rhs_attempts_max": 48,
-  "production_scientific_admission": "NOT_ISSUED",
-  "next_executable": "C5_IMPLEMENT_DEFAULT_OFF_BOUNDED_OBSERVER"
+  "status": "C9_PASS_SCOPED",
+  "source_base_commit": "eb2abcac4f44b7bc4ff532286953fcb4e353c7bb",
+  "reviewed_producer_blob": "23f0d9a40b8fb8b595d0f73dd6b279067ccadf88",
+  "current_next_executable": "C10_PUBLISH_AND_BACKUP; O5_RESOURCE_HOLD",
+  "max_packets": 6,
+  "max_added_rhs_attempts": 48,
+  "default": "OFF",
+  "nodes": [
+    {
+      "id": "O1",
+      "status": "COMPLETE_SOURCE011_OWNER_INTAKE_ENVELOPE_EXPIRED"
+    },
+    {
+      "id": "O2",
+      "depends_on": [
+        "O1"
+      ],
+      "status": "IMPLEMENTED_DEFAULT_OFF"
+    },
+    {
+      "id": "O3",
+      "depends_on": [
+        "O2"
+      ],
+      "status": "FRESH_DRIVER_BLOB_AND_ADAPTER_BINDING_REVIEWED; COMMIT_BINDING_PENDING"
+    },
+    {
+      "id": "O4",
+      "depends_on": [
+        "O3"
+      ],
+      "status": "PASS_CHANGED_SEAM_ONLY"
+    },
+    {
+      "id": "O5",
+      "depends_on": [
+        "O4"
+      ],
+      "status": "HOLD_RESOURCE_ENVELOPE_EXHAUSTED",
+      "reason": "Latest completed SOURCE011 owner allocation native cutoff2026-10-16T02:50:17.774070Z expired; no new live source/case/launch/envelope",
+      "deadline_reset": false
+    },
+    {
+      "id": "O6",
+      "depends_on": [
+        "O5"
+      ],
+      "status": "HOLD_MISSING_STAGE_DATA",
+      "metrics": null
+    }
+  ],
+  "retained_full005_allocation": {
+    "cumulative_wall_seconds": 156.5376037069618,
+    "cap_seconds": 300,
+    "deadline_epoch": 1792122617.77407,
+    "transfer_to_observer": false,
+    "deadline_reset": false
+  },
+  "scientific_admission": "NOT_ISSUED",
+  "next_dependency": "Future owner-selected live case/launch/envelope and cost-accounting harness before actual packet collection; preserve canonical supplier source-matched reference node",
+  "no_replay": [
+    "completed oracle",
+    "PL",
+    "SOURCE009/010/011 histories",
+    "large raw hashes"
+  ]
 }

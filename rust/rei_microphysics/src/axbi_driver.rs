@@ -379,12 +379,348 @@ pub struct ChemicalStageObserver {
     pub current_comparison: usize,
     pub current_branch: &'static str,
     pub failure: Option<String>,
+    bounded: Option<BoundedObserverState>,
 }
 impl ChemicalStageObserver {
     pub fn new(max_rhs: usize) -> Self {
         Self { records: Vec::new(), rhs_evaluations: 0, max_rhs,
             native_rhs_ceiling: None, max_records: 180, current_comparison: 0, current_branch: "DIRECT",
-            failure: None }
+            failure: None, bounded: None }
+    }
+}
+
+/// Measurement-only policy, explicitly selected separately from legacy SOURCE011.
+/// The same object must be retained across the entire execution.
+#[derive(Clone, Debug)]
+pub struct BoundedChemicalStagePacket {
+    pub input_kind: &'static str,
+    pub sequence: usize,
+    pub comparison: usize,
+    pub parent_step_id: usize,
+    pub branch: &'static str,
+    pub adaptive_status: &'static str,
+    pub context_id: String,
+    pub a: f64,
+    pub dt_s: f64,
+    pub old_state: [f64; 4],
+    pub state: [f64; 4],
+    pub residual: [f64; 4],
+    pub jacobian: Option<[[f64; 4]; 4]>,
+    pub unavailable_reason: Option<String>,
+    pub native_scaled_residual_inf: f64,
+    pub added_rhs_attempts: usize,
+    pub added_rhs_successes: usize,
+    pub elapsed_seconds: f64,
+    pub f_he: f64,
+    pub k_b_ev_per_k: f64,
+}
+#[derive(Clone, Debug)]
+pub struct BoundedObserverEvaluation {
+    pub evaluation_id: usize,
+    pub packet_sequence: usize,
+    pub column: usize,
+    pub requested_delta: f64,
+    pub direction: i32,
+    pub perturbed_state: [f64; 4],
+    pub outcome: String,
+    pub elapsed_seconds: f64,
+}
+#[derive(Clone, Debug)]
+pub struct BoundedObserverSummary {
+    pub packets: usize,
+    pub attempts: usize,
+    pub successes: usize,
+    pub cap_denied: usize,
+    pub skipped_stages: usize,
+    pub failed_packets: usize,
+    pub max_packets: usize,
+    pub max_rhs: usize,
+    pub elapsed_seconds: f64,
+    pub flushed: bool,
+}
+#[derive(Clone, Debug)]
+struct BoundedObserverState {
+    packets: Vec<BoundedChemicalStagePacket>,
+    evaluations: Vec<BoundedObserverEvaluation>,
+    run_id: String,
+    source_commit: String,
+    driver_blob: String,
+    cost_owner: String,
+    parent_step_id: usize,
+    stage_sequence: usize,
+    attempts: usize,
+    successes: usize,
+    cap_denied: usize,
+    skipped_stages: usize,
+    max_packets: usize,
+    max_rhs: usize,
+    elapsed_seconds: f64,
+    flushed: bool,
+}
+
+fn observer_json_string(text: &str) -> String {
+    let mut result = String::from("\"");
+    for c in text.chars() {
+        match c {
+            '"' => result.push_str("\\\""),
+            '\\' => result.push_str("\\\\"),
+            c if c.is_control() => result.push_str(&format!("\\u{:04x}", c as u32)),
+            c => result.push(c),
+        }
+    }
+    result.push('"');
+    result
+}
+
+impl BoundedObserverState {
+    fn columns<F>(
+        &mut self, sequence: usize, x: [f64; 4], residual: [f64; 4], mut evaluate: F,
+    ) -> Result<[[f64; 4]; 4], ForwardError>
+    where F: FnMut([f64; 4]) -> Result<[f64; 4], ForwardError> {
+        let mut jac = [[0.0; 4]; 4];
+        for j in 0..4 {
+            let delta = 1e-7 * x[j].abs().max(if j == 3 { 1e-6 } else { 1e-4 });
+            let mut value = None;
+            for direction in [1, -1] {
+                if self.attempts >= self.max_rhs {
+                    self.cap_denied = self.cap_denied.saturating_add(1);
+                    return Err(err("BOUNDED_OBSERVER_RHS_CAP"));
+                }
+                let mut perturbed = x;
+                perturbed[j] += direction as f64 * delta;
+                // Charge immediately before every actual call, including failures.
+                self.attempts += 1;
+                let evaluation_id = self.attempts;
+                let started = Instant::now();
+                let evaluated = evaluate(perturbed).and_then(|r| {
+                    if r.iter().all(|v| v.is_finite()) { Ok(r) }
+                    else { Err(err("BOUNDED_OBSERVER_NONFINITE_RESIDUAL")) }
+                });
+                let elapsed_seconds = started.elapsed().as_secs_f64();
+                if evaluated.is_ok() { self.successes += 1; }
+                self.evaluations.push(BoundedObserverEvaluation {
+                    evaluation_id, packet_sequence: sequence, column: j,
+                    requested_delta: delta, direction, perturbed_state: perturbed,
+                    outcome: match &evaluated {
+                        Ok(_) => "SUCCESS".into(), Err(e) => format!("FAILED:{e:?}"),
+                    }, elapsed_seconds,
+                });
+                match evaluated {
+                    Ok(r) => { value = Some((r, direction)); break; }
+                    Err(e) if direction == -1 => return Err(e),
+                    Err(_) => {},
+                }
+            }
+            let (r, direction) = value.ok_or(err("BOUNDED_OBSERVER_MISSING_COLUMN"))?;
+            for i in 0..4 {
+                jac[i][j] = f((r[i] - residual[i]) / (direction as f64 * delta))?;
+            }
+        }
+        Ok(jac)
+    }
+}
+
+impl ChemicalStageObserver {
+    pub fn new_bounded(
+        run_id: &str, source_commit: &str, cost_owner: &str,
+    ) -> Result<Self, ForwardError> {
+        Self::new_bounded_with_limits(run_id, source_commit, cost_owner, 6, 48)
+    }
+    /// Limits are clamped to the whole-execution ceilings, never reset per step.
+    pub fn new_bounded_with_limits(
+        run_id: &str, source_commit: &str, cost_owner: &str,
+        max_packets: usize, max_rhs: usize,
+    ) -> Result<Self, ForwardError> {
+        if run_id.is_empty() || run_id.len() > 128 || cost_owner.is_empty()
+            || cost_owner.len() > 128 || source_commit.len() != 40
+            || !source_commit.bytes().all(|c| c.is_ascii_hexdigit()) {
+            return Err(err("BOUNDED_OBSERVER_PROVENANCE"));
+        }
+        // Constructor runs at the outer boundary. No identity process or I/O
+        // occurs in chemical/Newton/adaptive loops. Hash the actual compiled file.
+        use std::process::{Command, Stdio};
+        let mut child = Command::new("git").args(["hash-object", "--stdin"])
+            .stdin(Stdio::piped()).stdout(Stdio::piped()).spawn().map_err(ioerr)?;
+        child.stdin.take().ok_or(err("BOUNDED_OBSERVER_BLOB"))?
+            .write_all(include_bytes!("axbi_driver.rs")).map_err(ioerr)?;
+        let result = child.wait_with_output().map_err(ioerr)?;
+        let driver_blob = String::from_utf8(result.stdout)
+            .map_err(|_| err("BOUNDED_OBSERVER_BLOB"))?.trim().to_string();
+        if !result.status.success() || driver_blob.len() != 40 {
+            return Err(err("BOUNDED_OBSERVER_BLOB"));
+        }
+        let mut observer = Self::new(max_rhs.min(48));
+        observer.max_records = max_packets.min(6);
+        observer.bounded = Some(BoundedObserverState {
+            packets: Vec::with_capacity(max_packets.min(6)),
+            evaluations: Vec::with_capacity(max_rhs.min(48)),
+            run_id: run_id.into(), source_commit: source_commit.into(), driver_blob,
+            cost_owner: cost_owner.into(), parent_step_id: 0, stage_sequence: 0,
+            attempts: 0, successes: 0, cap_denied: 0, skipped_stages: 0,
+            max_packets: max_packets.min(6), max_rhs: max_rhs.min(48),
+            elapsed_seconds: 0.0, flushed: false,
+        });
+        Ok(observer)
+    }
+    pub fn bounded_packets(&self) -> Option<&[BoundedChemicalStagePacket]> {
+        self.bounded.as_ref().map(|s| s.packets.as_slice())
+    }
+    pub fn bounded_evaluations(&self) -> Option<&[BoundedObserverEvaluation]> {
+        self.bounded.as_ref().map(|s| s.evaluations.as_slice())
+    }
+    pub fn bounded_summary(&self) -> Option<BoundedObserverSummary> {
+        self.bounded.as_ref().map(|s| BoundedObserverSummary {
+            packets: s.packets.len(), attempts: s.attempts, successes: s.successes,
+            cap_denied: s.cap_denied, skipped_stages: s.skipped_stages,
+            failed_packets: s.packets.iter().filter(|p| p.jacobian.is_none()).count(),
+            max_packets: s.max_packets, max_rhs: s.max_rhs,
+            elapsed_seconds: s.elapsed_seconds, flushed: s.flushed,
+        })
+    }
+    fn capture_bounded<F>(
+        &mut self, a: f64, dt_s: f64, old_state: [f64; 4], state: [f64; 4],
+        residual: [f64; 4], norm: f64, f_he: f64, k_b_ev_per_k: f64, evaluate: F,
+    ) where F: FnMut([f64; 4]) -> Result<[f64; 4], ForwardError> {
+        let b = self.bounded.as_mut().expect("bounded capture policy");
+        b.stage_sequence = b.stage_sequence.saturating_add(1);
+        if b.flushed || b.packets.len() >= b.max_packets {
+            b.skipped_stages = b.skipped_stages.saturating_add(1);
+            return;
+        }
+        let started = Instant::now();
+        let sequence = b.stage_sequence;
+        let context_id = format!("{}:{}:{}:{}:{:016x}:{:016x}",
+            b.run_id, self.current_comparison, self.current_branch, sequence,
+            a.to_bits(), dt_s.to_bits());
+        let before = (b.attempts, b.successes);
+        let result = b.columns(sequence, state, residual, evaluate);
+        let (jacobian, unavailable_reason) = match result {
+            Ok(j) => (Some(j), None),
+            Err(e) => (None, Some(format!("HOLD_OBSERVER_JACOBIAN_UNAVAILABLE:{e:?}"))),
+        };
+        let elapsed_seconds = started.elapsed().as_secs_f64();
+        b.elapsed_seconds += elapsed_seconds;
+        b.packets.push(BoundedChemicalStagePacket {
+            input_kind: "ACTUAL_STAGE",
+            sequence, comparison: self.current_comparison,
+            parent_step_id: b.parent_step_id,
+            branch: match self.current_branch {
+                "FIRST_HALF" => "HALF_FIRST", "SECOND_HALF" => "HALF_SECOND", tag => tag,
+            }, adaptive_status: "PENDING", context_id, a, dt_s, old_state, state,
+            residual, jacobian, unavailable_reason,
+            native_scaled_residual_inf: norm,
+            added_rhs_attempts: b.attempts-before.0,
+            added_rhs_successes: b.successes-before.1,
+            elapsed_seconds, f_he, k_b_ev_per_k,
+        });
+        self.rhs_evaluations = b.attempts;
+    }
+    fn finalize_bounded(&mut self, first: usize, status: &'static str) {
+        if let Some(b) = self.bounded.as_mut() {
+            for packet in &mut b.packets[first..] { packet.adaptive_status = status; }
+        }
+    }
+    /// Injected changed-seam control; never owner telemetry or an IVP result.
+    #[doc(hidden)]
+    pub fn bounded_capture_control<F>(
+        &mut self, state: [f64; 4], residual: [f64; 4], evaluate: F,
+    ) where F: FnMut([f64; 4]) -> Result<[f64; 4], ForwardError> {
+        let before = self.bounded_packets().map_or(0, |p| p.len());
+        self.capture_bounded(0.05, 1.0, state, state, residual, 0.0,
+            0.08, 8.617333262e-5, evaluate);
+        if let Some(b) = &mut self.bounded {
+            if b.packets.len() > before {
+                b.packets.last_mut().unwrap().input_kind = "SYNTHETIC_FIXTURE";
+            }
+        }
+    }
+    /// Same finalizer used after the actual outer adaptive decision.
+    #[doc(hidden)]
+    pub fn bounded_finalize_control(&mut self, first: usize, status: &'static str) {
+        self.finalize_bounded(first, status);
+    }
+
+    /// Call once after the outer execution ends. No inner-loop I/O is performed.
+    /// A fresh destination and temporary files preserve partial failure evidence.
+    pub fn flush_bounded(&mut self, out: &Path) -> Result<(), ForwardError> {
+        let b = self.bounded.as_mut().ok_or(err("BOUNDED_OBSERVER_MODE"))?;
+        if b.flushed { return Err(err("BOUNDED_OBSERVER_ALREADY_FLUSHED")); }
+        let mut texts = Vec::with_capacity(b.packets.len());
+        for p in &b.packets {
+            if ![p.a, p.dt_s, p.native_scaled_residual_inf, p.elapsed_seconds,
+                p.f_he, p.k_b_ev_per_k].iter().chain(p.state.iter())
+                .chain(p.old_state.iter()).chain(p.residual.iter()).all(|x| x.is_finite())
+                || p.jacobian.as_ref().is_some_and(|j| !j.iter().flatten().all(|x| x.is_finite())) {
+                return Err(err("BOUNDED_OBSERVER_NONFINITE_PACKET"));
+            }
+            let state = format!("{:?}", p.state);
+            let jacobian = p.jacobian.map(|j| format!("{j:?}")).unwrap_or_else(|| "null".into());
+            let context = observer_json_string(&p.context_id);
+            let jcontext = if p.jacobian.is_some() { context.clone() } else { "null".into() };
+            let jstate = if p.jacobian.is_some() { state.clone() } else { "null".into() };
+            let reason = p.unavailable_reason.as_ref().map(|v| observer_json_string(v))
+                .unwrap_or_else(|| "null".into());
+            let trajectory = match (p.branch, p.adaptive_status) {
+                ("FULL", _) => "DISCARDED_FULL_TRIAL",
+                ("HALF_FIRST", "ACCEPTED") => "INTERMEDIATE_HALF_FIRST",
+                ("HALF_SECOND", "ACCEPTED") => "FINAL_TRAJECTORY_HALF_SECOND",
+                (_, "PENDING") => "UNRESOLVED_NOT_TRAJECTORY",
+                _ => "DISCARDED_TRIAL",
+            };
+            let mut evaluations = Vec::new();
+            for e in b.evaluations.iter().filter(|e| e.packet_sequence == p.sequence) {
+                if !e.requested_delta.is_finite() || !e.elapsed_seconds.is_finite()
+                    || !e.perturbed_state.iter().all(|x| x.is_finite()) {
+                    return Err(err("BOUNDED_OBSERVER_NONFINITE_EVALUATION"));
+                }
+                evaluations.push(format!(
+                    "{{\"evaluation_id\":{},\"column\":{},\"requested_delta\":{},\"direction\":{},\"perturbed_state\":{:?},\"outcome\":{},\"elapsed_seconds\":{}}}",
+                    e.evaluation_id,e.column,e.requested_delta,e.direction,e.perturbed_state,
+                    observer_json_string(&e.outcome),e.elapsed_seconds));
+            }
+            texts.push(format!(concat!(
+                "{{\"schema_version\":1,\"input_kind\":{},",
+                "\"state_order\":[\"x_HII\",\"x_HeII\",\"x_HeIII\",\"w_eV_per_H\"],",
+                "\"energy_unit\":\"eV_per_H\",\"method\":\"BACKWARD_EULER_PREPARED_ABSORPTION\",",
+                "\"run_id\":{},\"source_commit\":{},\"source_commit_kind\":\"BASE_SNAPSHOT_WITH_WORKING_DRIVER_BLOB\",",
+                "\"driver_blob_sha\":{},\"cost_owner\":{},\"stage_id\":{},\"execution_receipt\":\"SUMMARY.json\",",
+                "\"chemical_stage_sequence\":{},\"adaptive_attempt_id\":{},\"parent_step_id\":{},",
+                "\"branch\":{},\"adaptive_status\":{},\"trajectory_role\":{},",
+                "\"iterate_status\":\"ACCEPTED_CHEMICAL_STAGE\",\"state\":{},\"old_state\":{:?},",
+                "\"residual\":{:?},\"jacobian\":{},\"unavailable_reason\":{},",
+                "\"context_id\":{},\"prepared_context_id\":{},\"residual_context_id\":{},\"jacobian_context_id\":{},",
+                "\"residual_evaluation_state\":{},\"jacobian_evaluation_state\":{},",
+                "\"a\":{},\"dt_s\":{},\"f_He\":{},\"k_B_eV_per_K\":{},\"native_scaled_residual_inf\":{},",
+                "\"jacobian_kind\":\"FINITE_DIFFERENCE\",\"observer_parallel_policy\":\"SERIAL_NO_SPECULATIVE_RESERVATIONS\",",
+                "\"added_rhs_evaluations\":{},\"added_rhs_successes\":{},\"observer_elapsed_seconds\":{},\"evaluations\":[{}]}}\n"),
+                observer_json_string(p.input_kind),observer_json_string(&b.run_id),observer_json_string(&b.source_commit),
+                observer_json_string(&b.driver_blob),observer_json_string(&b.cost_owner),context,
+                p.sequence,p.comparison,p.parent_step_id,observer_json_string(p.branch),
+                observer_json_string(p.adaptive_status),observer_json_string(trajectory),state,p.old_state,
+                p.residual,jacobian,reason,context,context,context,jcontext,state,jstate,
+                p.a,p.dt_s,p.f_he,p.k_b_ev_per_k,p.native_scaled_residual_inf,
+                p.added_rhs_attempts,p.added_rhs_successes,p.elapsed_seconds,evaluations.join(",")));
+        }
+        if !b.elapsed_seconds.is_finite() { return Err(err("BOUNDED_OBSERVER_NONFINITE_TIME")); }
+        let summary = format!(concat!(
+            "{{\"status\":\"BOUNDED_OBSERVER_FLUSHED\",\"run_id\":{},\"cost_owner\":{},",
+            "\"packets\":{},\"attempts\":{},\"successes\":{},\"cap_denied\":{},\"skipped_stages\":{},",
+            "\"max_packets\":{},\"max_rhs\":{},\"observer_elapsed_seconds\":{},",
+            "\"parallel_policy\":\"SERIAL_NO_SPECULATIVE_RESERVATIONS\",\"scientific_admission\":\"NOT_ISSUED\"}}\n"),
+            observer_json_string(&b.run_id),observer_json_string(&b.cost_owner),b.packets.len(),
+            b.attempts,b.successes,b.cap_denied,b.skipped_stages,b.max_packets,b.max_rhs,b.elapsed_seconds);
+        fs::create_dir(out).map_err(ioerr)?;
+        for (name, text) in texts.into_iter().enumerate().map(|(i,t)| (format!("stage-{i:03}.json"),t))
+            .chain(std::iter::once(("SUMMARY.json".into(),summary))) {
+            let temporary = out.join(format!("{name}.tmp"));
+            let mut file = fs::OpenOptions::new().write(true).create_new(true)
+                .open(&temporary).map_err(ioerr)?;
+            file.write_all(text.as_bytes()).map_err(ioerr)?;
+            file.sync_all().map_err(ioerr)?;
+            fs::rename(temporary, out.join(name)).map_err(ioerr)?;
+        }
+        b.flushed = true;
+        Ok(())
     }
 }
 #[derive(Clone, Debug)]
@@ -869,7 +1205,8 @@ impl Driver {
             old.gas.fractions[2],
             old_w,
         ];
-        let native_rhs_ceiling = observer.as_ref().and_then(|o| o.native_rhs_ceiling)
+        let native_rhs_ceiling = observer.as_ref()
+            .filter(|o| o.bounded.is_none()).and_then(|o| o.native_rhs_ceiling)
             .map_or(self.config.max_rhs, |limit| self.config.max_rhs.min(limit));
         for _ in 0..50 {
             let (residual, stocks, rhs) = self.evaluate(&context, x, dt, counter, native_rhs_ceiling)?;
@@ -903,6 +1240,14 @@ impl Driver {
                 next.ledgers.cmb_input += rhs.cmb_to_gas_erg_cm3_s * dt / (nh * c.ev_erg);
                 next.max_newton_residual = next.max_newton_residual.max(norm);
                 if let Some(obs) = observer.as_deref_mut() {
+                    if obs.bounded.is_some() {
+                        let accepted_context = context.clone();
+                        obs.capture_bounded(old.a, dt,
+                            [old.gas.fractions[0],old.gas.fractions[1],old.gas.fractions[2],old_w],
+                            x, residual, norm, self.n_he0_cm3/self.n_h0_cm3,
+                            c.kb_erg_k/c.ev_erg,
+                            move |unknown| accepted_context.evaluate(unknown, dt).map(|v| v.0));
+                    } else {
                     if obs.records.len() >= obs.max_records {
                         obs.failure = Some("SOURCE011_STAGE_RECORD_CAP".into());
                         return Err(err("SOURCE011_STAGE_RECORD_CAP"));
@@ -927,6 +1272,7 @@ impl Driver {
                         f_he: self.n_he0_cm3/self.n_h0_cm3,
                         k_b_ev_per_k: c.kb_erg_k/c.ev_erg,
                     });
+                    }
                 }
                 *s = next;
                 return Ok(());
@@ -1092,10 +1438,15 @@ impl Driver {
         &self, s: &mut DriverState, observer: &mut ChemicalStageObserver,
     ) -> Result<bool, ForwardError> {
         let first = observer.records.len();
+        let bounded_first = observer.bounded_packets().map_or(0, |p| p.len());
+        if let Some(b) = observer.bounded.as_mut() { b.parent_step_id = s.accepted + 1; }
         observer.current_comparison = s.comparisons + 1;
         let result = self.adaptive_step_inner(s, Some(&mut *observer));
         let status = match &result { Ok(true)=>"ADAPTIVE_ACCEPTED", Ok(false)=>"ADAPTIVE_REJECTED_DISCARDED", Err(_)=>"ADAPTIVE_FAILED_DISCARDED" };
         for record in &mut observer.records[first..] { record.adaptive_status = status; }
+        observer.finalize_bounded(bounded_first, match &result {
+            Ok(true) => "ACCEPTED", Ok(false) => "REJECTED", Err(_) => "ABORTED",
+        });
         result
     }
     fn adaptive_step_inner(
