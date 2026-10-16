@@ -99,6 +99,26 @@ One contract wording defect was found: R5's input validation grouped the signed 
 
 The review permits bounded implementation under this contract. Numerical outcomes remain pending. The separate root source receipt records a successful Exa primary-paper acquisition and SciSpace metadata match. Three Wolfram calls returned internal errors and provide no verification result. Independent standard-library algebra/Decimal evidence will be recorded only after its actual execution.
 
+## R7 — Actual independent discriminating algebra/reference probe
+
+The independent probe completed one actual Python3.12.14 invocation using only the standard library. Eleven exact polynomial coefficient identities passed, including the ODE residual, initial condition, beta=0, F0=0, lambda=0 and small-time second derivative. These identities carry unrestricted signs wherever the stated denominators are nonzero. Seven80-digit Decimal fixture evaluations passed physical/provider-domain checks. No numerical integration or Savin trajectory was run by that probe.
+
+Selected retained reference values are:
+| Fixture | Analytic extent [cm^-3] | Time [s] | Interpretation |
+|---|---:|---:|---|
+| forward_feedback |0.66475987948279842778|2|completed test interval|
+| negative_defect |0.67631838618499463098|2|completed test interval|
+| reverse_feedback |-0.67631838618499463098|2|completed test interval|
+| zero_defect |0.67084995526770145357|2|frozen-temperature limit|
+| lambda_zero |0.18518518518518518519|0.25|degenerate exact solution|
+| lower_domain_event |0.3|0.39559074458227960424|analytic first provider crossing|
+| upper_domain_event_reverse |-0.3|0.38285731845547762278|analytic first provider crossing|
+
+Decimal evaluation reports80 significant digits of the closed form; it is not an interval-certified rounding bound. The later numerical kernel must report partial approach status, rather than replace its state/time with these exact crossing values.
+
+The actual invocation used0.006348454s wall and0.005405470s CPU. A prior wrapper failed before Python because /usr/bin/time was absent; exit127 and unknown failed-wrapper cost remain recorded. Thus there were two command attempts and one scientific invocation. The cached result binds R6 FIXTURES SHA256 `0c04f00345719913ab1d0a20e41e142114286f861c6032e26a5be0a17d1135ca` and CONTRACT SHA256 `3588d8bf713ce19803606d6073b3f0fd5c6ad3e746362502b491705e562c2754`. Reuse `probe/RESULTS.json`, the exact script and command/log records; do not rerun them during coding.
+
+
 
 
 

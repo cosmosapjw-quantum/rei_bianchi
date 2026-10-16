@@ -226,6 +226,12 @@ def main():
                     "platform": platform.platform(),
                     "sympy_available": importlib.util.find_spec("sympy") is not None,
                     "mpmath_available": importlib.util.find_spec("mpmath") is not None},
+        "execution_attempts": {"command_attempts": 2, "scientific_invocations": 1,
+            "prior_wrapper_failure": {"exit_code": 127, "Python_launched": False,
+                "scientific_execution": False, "error": "timeout: failed to run command /usr/bin/time: No such file or directory",
+                "cpu_seconds": None, "wall_seconds": None,
+                "timing_note": "Failed-wrapper CPU and wall were not measured; tool transport wall is not command CPU/wall.",
+                "command_record": "FAILED_WRAPPER_COMMAND.txt", "stderr_record": "FAILED_WRAPPER_STDERR.txt"}},
         "input_sha256": {name: hashlib.sha256((frozen / name).read_bytes()).hexdigest()
                          for name in ("FIXTURES.json", "CONTRACT.json")},
         "exact_polynomial_coefficient_checks": checks,
