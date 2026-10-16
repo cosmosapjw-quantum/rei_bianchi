@@ -27,4 +27,15 @@ The retained physical constants are kB=1.380649e-23 J/K and eV=1.602176634e-19 J
 
 Source locators and object identities are preserved in `evidence/PINNED_SOURCES.json` and the completed intake. No scientific computation was executed for R2.
 
+## R3 — State, assumptions and claim alignment
+
+Write the initial proper number densities as a=H0, b=H+, c=D0, d=D+, all nonnegative in m^-3. Let u0≥0 be thermal energy density in J/m³, and let DeltaChi be the independently supplied energy defect in J per forward event. This isolated model has no external heat or work. Neutrality closes ne=b+d; Nth=a+b+c+d+ne is constant. Require Nth>0 for the temperature-evolution problem; a completely empty state is an explicit degenerate no-op only if its thermal inventory is also zero.
+
+Define the forward-positive signed extent xi in m^-3. The state is (a+xi,b-xi,c-xi,d+xi). Its physical density interval is Iphys=[-min(a,d),min(b,c)]. The thermal capacity per volume is C=3 kB Nth/2, and the thermal constraint gives T(xi)=(u0-DeltaChi*xi)/C. With finite positive provider bounds Tmin≤Tmax, the valid interval I is Iphys intersect {xi:Tmin≤T(xi)≤Tmax}. Require xi=0 in I. DeltaChi may be positive, zero or negative; interval construction must reverse endpoint ordering correctly when its sign changes.
+
+The scalar vector field is F(xi)=kf(T(xi))(c-xi)(b-xi)-kr(T(xi))(d+xi)(a+xi). Each provider call is evaluated only in its closed stated temperature domain. Savin's strictly positive-temperature formulas are smooth there; the initial-value problem has local uniqueness on every interior compact interval. This does not assert that all equilibrium roots are unique. A trajectory cannot cross an interior equilibrium of this autonomous locally Lipschitz scalar field.
+
+The new mathematical claims are conservation reduction, invariant-interval reasoning, and an exact manufactured solution. The implementation claim will be bounded numerical agreement at declared fixtures. Adaptive error estimates are numerical diagnostics, not certified global error. A provider-domain approach returns partial-time state and a typed stop. The actual requested interval is complete only when its target time is reached.
+
+
 
