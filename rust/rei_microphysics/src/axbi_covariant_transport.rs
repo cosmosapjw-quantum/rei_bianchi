@@ -117,6 +117,7 @@ struct AbsorptionNode {
     sigma: [f64; 3],
     excess_ev: [f64; 3],
     newborn: bool,
+    old_exact: bool,
 }
 fn uniform_birth_phi(tau: f64) -> f64 {
     if tau == 0.0 { 1.0 }
@@ -144,6 +145,15 @@ impl PreparedAbsorption {
     /// exact same geometry, support envelope and trial gas opacity.
     pub fn with_uniform_birth(self, birth: Self) -> Result<Self, ForwardError> {
         self.add_birth_cohort(birth, true)
+    }
+    /// Frozen-opacity exact old survival and uniform-proper-birth source.
+    /// This is a research control, not an exact evolving-opacity integrator.
+    pub fn with_full_exponential_old(mut self) -> Self {
+        for node in &mut self.nodes { node.old_exact = true; }
+        self
+    }
+    pub fn with_full_exponential_birth(self, birth: Self) -> Result<Self, ForwardError> {
+        self.with_full_exponential_old().add_birth_cohort(birth, true)
     }
     pub fn with_split_birth_be(self, birth: Self) -> Result<Self, ForwardError> {
         self.add_birth_cohort(birth, false)
@@ -227,14 +237,16 @@ impl PreparedAbsorption {
             if !denominator.is_finite() || denominator < 1.0 {
                 return Err(bad("AXBI_COVARIANT_BE_DOMAIN"));
             }
-            let birth_phi = if node.newborn { uniform_birth_phi(tau) } else { 0.0 };
-            let surviving = if node.newborn { node.number * birth_phi } else { node.number / denominator };
+            let birth_phi = if node.newborn || node.old_exact { uniform_birth_phi(tau) } else { 0.0 };
+            let surviving = if node.newborn { node.number * birth_phi }
+                else if node.old_exact { node.number * (-tau).exp() }
+                else { node.number / denominator };
             // For newborns event/dt is the integrated uniform-birth absorption,
             // not the end-of-step stock multiplied by the full slab duration.
             let rate_factor = if node.newborn {
                 if tau < 1e-5 { 0.5 + tau*(-1.0/6.0 + tau*(1.0/24.0-tau/120.0)) }
                 else { (1.0-birth_phi)/tau }
-            } else { 0.0 };
+            } else if node.old_exact { birth_phi } else { 0.0 };
             compensated_add(
                 &mut out.state.number[node.cell],
                 &mut count_correction[node.cell],
@@ -251,14 +263,14 @@ impl PreparedAbsorption {
                 surviving * offset,
             );
             for j in 0..3 {
-                let rate = if node.newborn {
+                let rate = if node.newborn || node.old_exact {
                     model.c_cm_s * n_h_cm3 * node.sigma[j] * node.number * rate_factor
                 } else {
                     model.c_cm_s * n_h_cm3 * node.sigma[j] * surviving
                 };
                 out.photo.gamma_s[j] += rate;
                 out.photo.heat_erg_per_absorber_s[j] += rate * node.excess_ev[j] * model.ev_erg;
-                let event = if node.newborn {
+                let event = if node.newborn || node.old_exact {
                     dt_s * rate * absorber_cm3[j] / n_h_cm3
                 } else {
                     dt_s * model.c_cm_s * absorber_cm3[j] * node.sigma[j] * surviving
@@ -704,6 +716,7 @@ impl CovariantTransport {
                     sigma,
                     excess_ev: excess,
                     newborn: false,
+                    old_exact: false,
                 });
             }
         }
@@ -761,6 +774,7 @@ fn prepare_cell(k: usize, state: &PhotonState, r: f64) -> Result<PreparedCell, F
             sigma,
             excess_ev: excess,
             newborn: false,
+            old_exact: false,
         });
     }
     Ok(PreparedCell { nodes, diagnostics })

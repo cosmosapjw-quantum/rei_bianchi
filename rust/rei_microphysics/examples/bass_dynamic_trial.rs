@@ -39,6 +39,7 @@ fn result() -> Result<(), Box<dyn std::error::Error>> {
         "tight_split_be" => BassResearchNumerics::TightSplitBe,
         "uniform_birth" => BassResearchNumerics::UniformBirth,
         "tight_uniform_birth" => BassResearchNumerics::TightUniformBirth,
+        "full_exponential_frozen" => BassResearchNumerics::FullExponentialFrozen,
         _ => return Err("unknown BASS_NUMERICS".into()),
     };
     // Output-only switch for refined reference runs; physics is unchanged.

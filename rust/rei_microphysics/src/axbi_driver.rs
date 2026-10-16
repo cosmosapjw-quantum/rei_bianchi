@@ -361,16 +361,17 @@ pub enum BassResearchNumerics {
     TightSplitBe,
     UniformBirth,
     TightUniformBirth,
+    FullExponentialFrozen,
 }
 impl BassResearchNumerics {
     fn tolerance(self) -> f64 {
         match self { Self::TightNewton | Self::TightSplitBe | Self::TightUniformBirth => 1e-13, _ => 1e-11 }
     }
     fn uniform_birth(self) -> bool {
-        matches!(self, Self::UniformBirth | Self::TightUniformBirth)
+        matches!(self, Self::UniformBirth | Self::TightUniformBirth | Self::FullExponentialFrozen)
     }
     fn split_birth(self) -> bool {
-        matches!(self, Self::SplitBe | Self::TightSplitBe | Self::UniformBirth | Self::TightUniformBirth)
+        matches!(self, Self::SplitBe | Self::TightSplitBe | Self::UniformBirth | Self::TightUniformBirth | Self::FullExponentialFrozen)
     }
 }
 #[derive(Clone, Debug)]
@@ -790,9 +791,14 @@ impl Driver {
         let mut prepared = self
             .transport
             .prepare(&self.photon_state(&old), &geometry)?;
+        if self.research_numerics==BassResearchNumerics::FullExponentialFrozen {
+            prepared=prepared.with_full_exponential_old();
+        }
         if let Some(newborn) = &birth {
             let prepared_birth=self.transport.prepare(newborn, &geometry)?;
-            prepared = if self.research_numerics.uniform_birth() {
+            prepared = if self.research_numerics==BassResearchNumerics::FullExponentialFrozen {
+                prepared.with_uniform_birth(prepared_birth)?
+            } else if self.research_numerics.uniform_birth() {
                 prepared.with_uniform_birth(prepared_birth)?
             } else { prepared.with_split_birth_be(prepared_birth)? };
         }
