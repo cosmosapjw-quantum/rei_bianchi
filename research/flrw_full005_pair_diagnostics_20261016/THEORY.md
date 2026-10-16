@@ -108,3 +108,19 @@ Eight synthetic fixtures passed exact Fraction equalities: zero histories, same-
 The largest observed absolute binary64 residual across the eight fixtures and reported metrics is `4.440892098500626e-16` against the exact lifted-input oracle. This is a fixture observation, not a universal rounding guarantee or a new FULL005 tolerance. The nominally identical affine decimal inputs acquire a tiny nonzero exact dyadic difference after float conversion; preserving that distinction prevents false equality claims. Probe lists and Fractions intentionally prioritize independent small-case checks; production constant-memory complexity is verified separately against the future sweep implementation.
 
 There were two actual probe executions. The worker's initial completed execution reported approximately CPU 1.756 s, wall 0.937 s and peak RSS 68192 KiB. A hygiene revision suppressed bytecode writes into the reused vendor path, then the final completed execution reported CPU `1.3194513529999998` s, wall `0.4623350859983475` s and peak RSS `59868` KiB. Numerical outcomes were unchanged. The final raw result/stdout, source SHA `f65759f940b64b597091cf90be3e634c524b229dcd5307c73d6e13e43372848c`, Python 3.12.14 and Matplotlib 3.10.8 are preserved. Both runs used zero native solver runs and zero physical-history reads. The command is `PYTHONDONTWRITEBYTECODE=1 python3 research/flrw_full005_pair_diagnostics_20261016/probe_reconstruction.py`; the result records the underlying Python command. No further probe replay is required.
+
+## R8 — scoped result decision
+
+Adopt the union-knot PL theorem, analytic L1/I2 formulas and one-pass bounded-memory algorithm for implementation. The exact-arithmetic result is derived; the critical integrals have independent symbolic confirmation; eight rational fixtures provide independent finite-case verification and demonstrate the sampling gap. The claim is a computational improvement to the existing saved-history diagnostic, with source provenance and physical normalizations preserved.
+
+| Result | Basis and decision | Remaining obligation |
+|---|---|---|
+| Full-overlap PL supremum and analytic norms | Derived, independently checked; adopt for coding | Production sweep and caller tests |
+| Narrow spike with sampled maximum zero and true PL maximum one | Explicit construction and exact rational execution; use to justify added diagnostic | None for this fixture |
+| Binary64 residual at most 4.440892098500626e-16 in the eight probe fixtures | Numerically checked observation | Production implementation has its own bounded tests; no universal error claim |
+| Completed FULL005 plots and physical-validation receipt | Existing executed result reused from current intake | No replay |
+| New full accepted-history continuous diagnostic values for FULL005 | Not run in this sandbox unit | Standalone analysis of original raw arrays under the retained external budget |
+
+No new physical exclusion or strong no-go theorem is adopted. The local sampled-grid counterexample refutes equality between that grid's sampled maximum and the full PL maximum for its explicit data. It does not establish a model impossibility or a new literature novelty result; NG1–NG7 are therefore not invoked as a scientific no-go admission. The project-prior exact supremum is acknowledged, and the added contributions are integrated norms, scalable implementation and practical caller access.
+
+Execution-transition decision: proceed directly to the specified implementation after R9/R10 capture. The completed symbolic/probe checks are reusable; further theory review is triggered only by a concrete formula, input, implementation or claim-boundary change. Missing original large raw files affects the future actual-FULL005 metric execution, not this proved construction or its authorized light implementation.
