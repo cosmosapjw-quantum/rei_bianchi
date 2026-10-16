@@ -1,0 +1,178 @@
+{
+  "contract_id": "R9_UNIT6_T6_TWOPHOTON_v1",
+  "status": "FROZEN_FOR_BOUNDED_IMPLEMENTATION",
+  "theory": "spec/TWOPHOTON_THEORY.md",
+  "inputs": {
+    "transitions": {
+      "path": "/workspace/scratch/37bc4acea758/REI_R9_NCP_HANDOFF_20261016/unit2/bridge_code/inputs/transitions.csv",
+      "sha256": "d639ac0d701a78a55a1b37d3b31368e2179006d099565c1e95b01cdcf3edcce0"
+    },
+    "cascade": {
+      "path": "/workspace/scratch/37bc4acea758/REI_R9_NCP_HANDOFF_20261016/unit2/bridge_code/inputs/cascade.csv",
+      "sha256": "b108d492ddc5b0b7b323b4478ea7888781902b42176cab355b033abf647bf72a"
+    },
+    "line_yields": {
+      "path": "/workspace/scratch/37bc4acea758/REI_R9_NCP_HANDOFF_20261016/unit2/bridge_code/inputs/line_yields.csv",
+      "sha256": "1df772b17d9e0679ca840f8a644f5b8200509ecdf91a6466745492d435896720"
+    },
+    "photo": {
+      "path": "/workspace/scratch/37bc4acea758/REI_R9_NCP_HANDOFF_20261016/unit2/bridge_code/inputs/photo.dat",
+      "sha256": "a53e73b0af4cc6b801aef67b84bd964e3ed8c9c4992f214e4a69dc7e4443f389"
+    },
+    "mixtures": {
+      "path": "/workspace/scratch/37bc4acea758/REI_R9_NCP_HANDOFF_20261016/unit2/ncp_results/runs/bridge_v1/cascade_mixture.json",
+      "sha256": "cb58e12cad09bcc61d4bb15370496a90b88ef17d7113442cd7bb5eecacc9c2b8"
+    }
+  },
+  "mixture_key": "mixture_moments",
+  "expected_rows": 32,
+  "n_values": [
+    3,
+    5,
+    10,
+    12
+  ],
+  "species": [
+    "H_infinite_mass",
+    "HeII_infinite_mass",
+    "LiIII_infinite_mass",
+    "H1",
+    "D",
+    "T",
+    "He3II",
+    "He4II"
+  ],
+  "shape": {
+    "model": "Nussbaumer_Schmutz_fit_as_Chluba_Sunyaev_2006_Eq4",
+    "alpha": 0.88,
+    "beta": 1.53,
+    "gamma": 0.8,
+    "I_reference": 0.08144613055216544,
+    "probability_density": "f=g/I",
+    "photon_yield_density": "q=2*f",
+    "reported_literature_accuracy": "approximately 1% over nearly full spectrum; not uniform endpoint certification",
+    "no_ab_initio_reconstruction": true
+  },
+  "rate": {
+    "anchor_infinite_mass_H_s_inverse": 8.229352,
+    "source": "Wundt_Jentschura_2009_Eq1_arxiv0909.4836",
+    "formula": "A=anchor*Z^6*Delta/(Z^2*Delta_inf_H)",
+    "energy_source": "actual transitions 2p->1s photon_eV",
+    "mass_policy": "derived reduced-mass Coulomb/electron-relative dipole approximation; no complete recoil/QED treatment"
+  },
+  "time": {
+    "origin": "completed E1 terminal reservoir, not original shell injection",
+    "dimensionless_times": [
+      0,
+      0.1,
+      1,
+      10
+    ],
+    "asymptotic_row": true,
+    "asymptotic_time_json": null,
+    "stable_decay_fraction": "-expm1(-A*t)"
+  },
+  "bins": {
+    "uniform_y_intervals": 128,
+    "insert_eV": [
+      5.392,
+      13.6,
+      64.39
+    ],
+    "authoritative_fields": [
+      "E_lo_eV",
+      "E_hi_eV",
+      "photon_count",
+      "energy_eV"
+    ],
+    "moments_not_midpoint_estimates": true
+  },
+  "photo": {
+    "Z": 3,
+    "N": 3,
+    "Eth_eV": 5.392,
+    "Emax_eV": 64.39,
+    "E0_eV": 3.107,
+    "sigma0_Mb": 62.45,
+    "ya": 15.01,
+    "P": 4.895,
+    "yw": 0,
+    "y0": 0,
+    "y1": 0,
+    "eV_J": 1.602176634e-19,
+    "Mb_m2": 1e-22,
+    "normalization": "J=1 precursor-equivalent m^-2 s^-1, F_E=J*(2P/Delta)*f(E/Delta)",
+    "bands_eV": [
+      [
+        5.392,
+        13.6
+      ],
+      [
+        5.392,
+        64.39
+      ]
+    ],
+    "above_Emax": "do not evaluate cross section; retain uncovered source moments"
+  },
+  "numerics": {
+    "language": "C99 numerical kernel plus Python driver",
+    "quadrature": "Gauss-Legendre per smooth clipped interval",
+    "nodes": [
+      64,
+      128,
+      256
+    ],
+    "authoritative_nodes": 256,
+    "comparison_nodes": [
+      128,
+      256
+    ],
+    "independent_check": "one SciPy quad normalization/mean and covered photo response per species",
+    "per_command_seconds_max": 30,
+    "numerical_run_seconds_max": 30,
+    "threads_max": 1,
+    "no_extra_ladder_without_controller": true
+  },
+  "tolerances": {
+    "integrals_relative": 1e-08,
+    "integral_absolute_floor_photons_or_eV": 1e-14,
+    "algebraic_closure_relative": 1e-11,
+    "probability_absolute": 1e-12,
+    "shape_symmetry_absolute": 2e-13,
+    "C_beta_normalizer_relative": 1e-11,
+    "photo_relative": 1e-08,
+    "photo_area_absolute_floor_m2": 1e-35,
+    "photo_energy_area_absolute_floor_J_m2": 1e-53
+  },
+  "owned_output_paths": [
+    "code/twophoton_kernel.c",
+    "code/twophoton_driver.py",
+    "tests/test_twophoton.py",
+    "results/twophoton_kernel.so",
+    "results/twophoton_summary.json",
+    "results/twophoton_moments.csv",
+    "results/twophoton_continuum.csv",
+    "results/twophoton_time.csv",
+    "results/twophoton_LiI_response.csv",
+    "evidence/TWOPHOTON_EXECUTION.json"
+  ],
+  "acceptance_scope": [
+    "fit shape normalization symmetry positivity",
+    "32 actual saved reservoirs crosschecked against cascade",
+    "exact isolated decay/time energy closure",
+    "bounded Li photo response and retained uncovered source"
+  ],
+  "excluded": [
+    "new recombination injection",
+    "coupled cosmology",
+    "transport",
+    "stimulated transitions",
+    "inverse two photon absorption",
+    "collisions",
+    "higher-level coherent corrections",
+    "finite-mass LiIII",
+    "ab initio Coulomb sums",
+    "certified physical accuracy equal to numerical tolerances"
+  ],
+  "stop_rule": "after bounded run and focused checks; return concrete failure once if any; no optional gate expansion"
+}

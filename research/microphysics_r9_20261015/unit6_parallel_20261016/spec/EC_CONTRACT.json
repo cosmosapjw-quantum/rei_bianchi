@@ -1,0 +1,348 @@
+{
+  "contract_id": "R9_UNIT6_EC_V1",
+  "status": "FROZEN_CONDITIONAL_MODEL",
+  "theory": "spec/EC_THEORY.md",
+  "allowed_output_paths": [
+    "code/ec_bridge.py",
+    "tests/test_ec_bridge.py",
+    "evidence/EC_RESULTS.json",
+    "evidence/EC_TEST_LOG.txt"
+  ],
+  "forbidden_changes": [
+    "spec/EC_THEORY.md",
+    "spec/EC_CONTRACT.json",
+    "intake/*",
+    "native17 implementation",
+    "existing PR150 pilot"
+  ],
+  "run_budget": {
+    "total_wall_seconds": 30,
+    "install_dependencies": false,
+    "suggested_command": "python -m unittest discover -s tests -p test_ec_bridge.py"
+  },
+  "donor": {
+    "path": "/workspace/scratch/37bc4acea758/REI_R9_NCP_HANDOFF_20261016/unit2/bridge_code/inputs/R5_DONOR_BBN.json",
+    "sha256": "47f93645a4c4fbcba0a6c3d1a9f8290adf847f011ab04d29b448633ec8525417",
+    "source_commit": "4bf97d5082eee54b9df50d88f43182bb651fea80",
+    "Be7": 3.784994236672219e-10,
+    "Li7": 2.1819521581308123e-11,
+    "p": 0.7530965905693692,
+    "normalization": "number per original donor baryon; no normalization repair",
+    "initial_Be_default": [
+      0,
+      0,
+      0,
+      0,
+      3.784994236672219e-10
+    ],
+    "initial_Li_default": [
+      0,
+      2.1819521581308123e-11,
+      0,
+      0
+    ],
+    "remove_Be_from_excluded_once": true
+  },
+  "ordering": {
+    "Be": [
+      "Be7_0",
+      "Be7_1",
+      "Be7_2",
+      "Be7_3",
+      "Be7_4"
+    ],
+    "Li": [
+      "Li7_0",
+      "Li7_1",
+      "Li7_2",
+      "Li7_3"
+    ],
+    "native17_claim": false,
+    "physical_adapter_population_count": 22,
+    "generator_population_count": 9
+  },
+  "inputs": {
+    "be": "length5 finite nonnegative float64",
+    "li": "length4 finite nonnegative float64",
+    "electron_ledger": "finite nonnegative abundance per donor baryon",
+    "dt_s": "finite nonnegative float64",
+    "lambda_b_s-1": "length5 finite nonnegative; element4 exactly0",
+    "lambda_c_s-1": "length5 finite nonnegative; element0 exactly0",
+    "optional_continuum": "kappa length5 [m3/s] times prescribed finite n_e [m-3]; explicitly reservoir-driven",
+    "input_negativity": "reject; do not clip"
+  },
+  "events": [
+    {
+      "channel": "bound",
+      "q": 0,
+      "daughter_q": 0,
+      "delta_free": 0,
+      "delta_bound": -1,
+      "delta_nuclear_Z": -1,
+      "delta_A": 0
+    },
+    {
+      "channel": "bound",
+      "q": 1,
+      "daughter_q": 1,
+      "delta_free": 0,
+      "delta_bound": -1,
+      "delta_nuclear_Z": -1,
+      "delta_A": 0
+    },
+    {
+      "channel": "bound",
+      "q": 2,
+      "daughter_q": 2,
+      "delta_free": 0,
+      "delta_bound": -1,
+      "delta_nuclear_Z": -1,
+      "delta_A": 0
+    },
+    {
+      "channel": "bound",
+      "q": 3,
+      "daughter_q": 3,
+      "delta_free": 0,
+      "delta_bound": -1,
+      "delta_nuclear_Z": -1,
+      "delta_A": 0
+    },
+    {
+      "channel": "continuum",
+      "q": 1,
+      "daughter_q": 0,
+      "delta_free": -1,
+      "delta_bound": 0,
+      "delta_nuclear_Z": -1,
+      "delta_A": 0
+    },
+    {
+      "channel": "continuum",
+      "q": 2,
+      "daughter_q": 1,
+      "delta_free": -1,
+      "delta_bound": 0,
+      "delta_nuclear_Z": -1,
+      "delta_A": 0
+    },
+    {
+      "channel": "continuum",
+      "q": 3,
+      "daughter_q": 2,
+      "delta_free": -1,
+      "delta_bound": 0,
+      "delta_nuclear_Z": -1,
+      "delta_A": 0
+    },
+    {
+      "channel": "continuum",
+      "q": 4,
+      "daughter_q": 3,
+      "delta_free": -1,
+      "delta_bound": 0,
+      "delta_nuclear_Z": -1,
+      "delta_A": 0
+    }
+  ],
+  "excluded_channels": {
+    "bound_q4": "NO_BOUND_ELECTRON",
+    "continuum_q0": "EXCLUDED_CHANNEL_LI_MINUS"
+  },
+  "formula": {
+    "decayed": "be[q]*(-expm1(-(lambda_b[q]+lambda_c[q])*dt))",
+    "zero_total_hazard": "decayed=Cb=Cc=0 exactly",
+    "Cb": "decayed*lambda_b/total",
+    "Cc": "decayed*lambda_c/total",
+    "free_final": "free_initial-sum(Cc); reject negative beyond defined roundoff tolerance, return raw tiny negatives without clipping",
+    "bound_ledger": "sum((4-q)*Be_q)+sum((3-q)*Li_q)",
+    "nuclear_charge": "4*sum(Be)+3*sum(Li)",
+    "ionic_charge": "sum(q*Be_q)+sum(q*Li_q)",
+    "net_charge": "ionic_charge-free_ledger",
+    "nuclei": "sum(Be)+sum(Li)",
+    "baryons": "7*nuclei"
+  },
+  "generator": {
+    "orientation": "column",
+    "entries": "G[Be_q,Be_q]=-total_q; G[Li_q,Be_q]+=b_q; G[Li_(q-1),Be_q]+=c_q",
+    "uniformization": "nu=max(total), P=I+G/nu; nu=0 identity; split nu*dt<=10, sum Poisson terms to tail<=1e-14",
+    "reference": "exact event counts; scipy.linalg.expm optional independent check",
+    "charge_ledger": "signed reward outside one-particle nuclear generator"
+  },
+  "fixtures": [
+    {
+      "id": "zero",
+      "be": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5
+      ],
+      "li": [
+        0.6,
+        0.7,
+        0.8,
+        0.9
+      ],
+      "free": 2.0,
+      "b": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "c": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "dt": 10.0,
+      "expected": "all arrays and ledgers unchanged exactly"
+    },
+    {
+      "id": "eight_single_channels",
+      "description": "For each allowed channel, unit parent only, Li=zeros, free=2, hazard=1 for selected channel only, dt=log(2); expected parent=.5 daughter=.5, channel count=.5 and integer stoichiometry scaled by .5. Check forbidden hazards separately."
+    },
+    {
+      "id": "competition",
+      "q": [
+        1,
+        2,
+        3
+      ],
+      "description": "Run each q independently with unit parent, free=2, b_q=.6 c_q=.4 dt=log(2); parent=.5, Li_q increment=.3, Li_(q-1) increment=.2; free decrement=.2, bound decrement=.3."
+    },
+    {
+      "id": "electron_budget_failure",
+      "description": "unit Be4, free=.1, c4=1, dt=log(2); must reject since continuum count=.5 exceeds available electrons; no clipping or implicit replenishment"
+    },
+    {
+      "id": "bare_donor_zero_bound",
+      "description": "actual donor Be4, Li1, all continuum=0, all b except b4 arbitrary1; no transfer"
+    },
+    {
+      "id": "actual_donor_exposure_family",
+      "q": 3,
+      "channel": "bound",
+      "u": [
+        0,
+        0.6931471805599453,
+        1.3862943611198906,
+        10
+      ],
+      "expected_survival": "B*exp(-u)",
+      "expected_total_Li": "L+B*(-expm1(-u))",
+      "expected_Li3_increment": "B*(-expm1(-u))",
+      "free_unchanged": true,
+      "initial_assignment": "conditional donor entirely in Be3; not recombination"
+    },
+    {
+      "id": "actual_donor_continuum_family",
+      "q": 4,
+      "channel": "continuum",
+      "u": [
+        0,
+        0.6931471805599453,
+        1.3862943611198906,
+        10
+      ],
+      "free_initial": 1.0,
+      "expected_survival": "B*exp(-u)",
+      "expected_Li3_increment": "B*(-expm1(-u))",
+      "expected_free_loss": "same as Li3 increment",
+      "note": "u exposure only; no adopted continuum physical rate"
+    },
+    {
+      "id": "actual_donor_complete_limit",
+      "description": "analytic u->infinity endpoint, not numeric infinity input",
+      "Be_total": 0.0,
+      "Li_total": 4.0031894524853e-10,
+      "mass7_baryons": 2.80223261673971e-09,
+      "Li_total_over_donor_p": 5.315638794034029e-10
+    },
+    {
+      "id": "conditional_hydrogenic_clock",
+      "source": "Khatri-Sunyaev arXiv:1009.3932v2 section2 eqs3-4 and Fig2",
+      "initial": "all donor Be placed in Be3; no ionization/recombination/continuum capture; thermal/statistical hyperfine mixture held fixed",
+      "half_life_days": 106.4,
+      "seconds_per_day": 86400,
+      "lambda_b3_s-1": 7.539978206801131e-08,
+      "anchors": [
+        {
+          "elapsed_days": 106.4,
+          "Be3": 1.8924971183361095e-10,
+          "Li3_increment": 1.8924971183361095e-10,
+          "Li_total": 2.1106923341491906e-10
+        },
+        {
+          "elapsed_days": 212.8,
+          "Be3": 9.462485591680547e-11,
+          "Li3_increment": 2.838745677504164e-10,
+          "Li_total": 3.0569408933172453e-10
+        }
+      ],
+      "claim": "conditional survival with literature approximate bound rate; not cosmological epoch or all-charge rates"
+    },
+    {
+      "id": "synthetic_energy_identity",
+      "physical_input": false,
+      "Q_nuc_eV": 1000.0,
+      "Eel_parent_eV": -100.0,
+      "Eel_daughter_eV": -40.0,
+      "delta_Eel_eV": 60.0,
+      "captured_continuum_K_eV": 10.0,
+      "outgoing_total_eV": 950.0,
+      "E_neutrino_eV": 900.0,
+      "E_nonthermal_eV": 40.0,
+      "delta_Uthermal_eV": 0.0,
+      "checks": [
+        "outgoing_total=Q_nuc+K-delta_Eel",
+        "delta_Uthermal+delta_Eel+E_neutrino+E_nonthermal=Q_nuc"
+      ],
+      "note": "not a Be rate or energy prediction; remaining outgoing10eV replaces captured thermal10eV"
+    }
+  ],
+  "validation": {
+    "unit_channel_absolute": 5e-14,
+    "mass7_relative": 1e-12,
+    "donor_event_absolute_floor": 1e-25,
+    "donor_event_relative": 1e-12,
+    "cross_method_relative": 1e-12,
+    "cross_method_unit_absolute_floor": 1e-15,
+    "uniformization_tail": 1e-14,
+    "roundoff_population_absolute_unit": 5e-14,
+    "nonfinite_inputs": "reject",
+    "negative_inputs": "reject",
+    "stoichiometry": "test integer coefficients at unit population, then donor scaled",
+    "energy": "heat must be null NEEDS_ENERGY_PARTITION for actual donor",
+    "electron_budget_tolerance": "1e-12*max(free_initial,total_continuum_count)+1e-25; check before subtraction; raw tiny negative residual retained, not clipped",
+    "large_background_cancellation": "Store delta_free=-Cc explicitly. Donor-relative check applies to delta/count before adding to order-one background; check final ledger against initial+delta at 5e-14*max(1,abs(initial)) absolute. Do not infer tiny donor capture by subtracting two order-one rounded floats."
+  },
+  "required_outputs": [
+    "input identity and runtime",
+    "all8 event stoichiometry residuals",
+    "frozen generator residuals and uniformization tail",
+    "actual donor conditional exposures",
+    "hydrogenic conditional time anchors",
+    "full donor reservoirs retained with Be moved exactly once",
+    "electron budget failure and forbidden channel diagnostics",
+    "normalization defect reported unrepaired",
+    "actual heat null with missing-input status",
+    "no-shakeoff and prescribed-density limitations",
+    "signed electron ledger delta separately from absolute initial/final ledger"
+  ],
+  "physical_inputs_unresolved": [
+    "charge evolution/recombination history",
+    "bound rates outside explicitly optional Be3 approximation",
+    "continuum kappa and n_e history",
+    "hyperfine and electronic occupations",
+    "T4 shakeoff/electronic daughter kernel",
+    "consistent electronic energies and nuclear Q/branch conventions",
+    "neutrino/gamma/recoil energy deposition"
+  ],
+  "stopping_rule": "After bounded validation PASS hand off to independent authority review. On ambiguity or substantive failure preserve raw output and return; no model change or tolerance relaxation."
+}
