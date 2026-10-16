@@ -1,0 +1,16 @@
+// BEGIN RESEARCH_SOURCE_AGE_NODE_ACCESSOR
+// Opt-in read-only accessor to the exact prepared nodes. Original preparation,
+// source, coefficients, reconstruction and native solver remain unchanged.
+impl PreparedAbsorption {
+    pub fn research_continuous_moment_rhs(&self, absorber_cm3:[f64;3],n_h_cm3:f64)->Result<(Vec<f64>,Vec<f64>,IgmPhotoInput),ForwardError>{
+        let photo=self.evaluate(absorber_cm3,n_h_cm3,0.0)?.photo;
+        let mut dn=vec![0.0;self.template.number.len()];let mut du=dn.clone();
+        let c=HHeModel::controlled_fixture().c_cm_s;
+        for node in &self.nodes {
+            let loss=c*sum((0..3).map(|k|absorber_cm3[k]*node.sigma[k]))*node.number;
+            dn[node.cell]-=loss;du[node.cell]-=loss*node.q;
+        }
+        Ok((dn,du,photo))
+    }
+}
+// END RESEARCH_SOURCE_AGE_NODE_ACCESSOR

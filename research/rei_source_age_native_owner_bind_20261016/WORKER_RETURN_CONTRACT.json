@@ -1,0 +1,183 @@
+{
+  "schema": "rei.source_age_native_owner_bind.worker_return.v1",
+  "task": "SOURCE_AGE_NATIVE_OWNER_BIND",
+  "stage": "C5 plus targeted local validation",
+  "requested_executor": "gpt-6.1-sol medium",
+  "observed_runtime": "NOT_INDEPENDENTLY_OBSERVED",
+  "native_source_sha": "35d9747a0bbedcafdb568467ce7c1e7a25f965b6",
+  "frozen_base_sha": "a50d176b56d267b651d204f371204f61299b9a64",
+  "scope": "opt-in native example overlay; unchanged native production files",
+  "commands": [
+    {
+      "command": "bash research/rei_source_age_native_owner_bind_20261016/run_local.sh",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 research/rei_source_age_native_owner_bind_20261016/independent_solver.py /tmp/rei-source-age-native-owner-bind/native/rust/rei_microphysics/target/release/examples/source_age_campaign research/rei_source_age_native_owner_bind_20261016/evidence/local",
+      "exit_code": 0
+    },
+    {
+      "command": "rustfmt --edition 2021 research/rei_source_age_native_owner_bind_20261016/native_owner.rs research/rei_source_age_native_owner_bind_20261016/campaign.rs",
+      "exit_code": 0
+    },
+    {
+      "command": "bash research/rei_source_age_native_owner_bind_20261016/run_local.sh research/rei_source_age_native_owner_bind_20261016/evidence/repaired_local",
+      "exit_code": 0
+    },
+    {
+      "command": "timeout 300s python3 research/rei_source_age_native_owner_bind_20261016/source_matched_solver.py BINARY evidence/repaired_source_reference",
+      "exit_code": 1
+    },
+    {
+      "command": "timeout 300s python3 research/rei_source_age_native_owner_bind_20261016/terminal_cut_regression.py evidence/terminal_cut_regression.json",
+      "exit_code": 0
+    }
+  ],
+  "first_failures": [
+    {
+      "kind": "missing multi-line include_str prerequisite",
+      "exit_code": 101,
+      "artifact": "evidence/first_build_failure/build.log",
+      "repair": "read all include_str expressions including multiline; materialize exact pinned contracts"
+    },
+    {
+      "kind": "CSV format argument mismatch",
+      "exit_code": 101,
+      "artifact": "evidence/first_build_failure/second_build.log",
+      "repair": "serialize complete numeric row"
+    },
+    {
+      "kind": "unsupported nmu=4",
+      "exit_code": 1,
+      "artifact": "evidence/first_build_failure/first_run.log",
+      "repair": "supported native8/16/32; manufactured PR164 low-resolution counterexample stays separate"
+    },
+    {
+      "kind": "invalid max_rhs=0 test config",
+      "exit_code": 1,
+      "artifact": "evidence/first_build_failure/second_run.log",
+      "repair": "valid max_rhs1 with exhausted counter1"
+    }
+  ],
+  "outcomes": {
+    "targeted_check_groups": 11,
+    "signed_campaign_cases": 45,
+    "campaign": {
+      "cases": 45,
+      "max_energy_residual_eV_H": 7.396083745447868e-12,
+      "max_photon_residual_H": 8.131516293641283e-20,
+      "proper_time_labels": [
+        32,
+        64,
+        128
+      ],
+      "proper_time_interpretation": "1/2/4 subdivisions per common union birth-mesh interval",
+      "age_levels": [
+        8,
+        16,
+        32
+      ],
+      "age_refinement_status": "AGE_REFINEMENT_HOLD",
+      "source_matched_independent_reference": "HOLD_SOURCE_MATCHED_INDEPENDENT_REFERENCE"
+    },
+    "local_campaign_wall_s": 13.68,
+    "local_campaign_peak_rss_KiB": 10436
+  },
+  "remaining": [
+    "Independent reviewer decision and NCP execution controlled by parent",
+    "AGE_REFINEMENT_HOLD: unresolved source-age accuracy at z20",
+    "HOLD_SOURCE_MATCHED_INDEPENDENT_REFERENCE: actual-source DOP853 exits native positive state domain",
+    "Full coupled cosmological-history energy-momentum verification remains absent"
+  ],
+  "scientific_admission": "NOT_SELF_APPROVED",
+  "production_scientific_admission": "NOT_ISSUED",
+  "next_executable_task": "controller copies stable examples to existing NCP scratch and executes run_local.sh",
+  "skill_context_used": [
+    "physmath-research-loop1.3.0/SKILL.md",
+    "references/POLICY_INTEGRATION.md",
+    "references/SUBAGENT_MODE.md",
+    "references/CODING_LOOP.md C5",
+    "references/STAGE_GUIDE_KO.md C5"
+  ],
+  "files": [
+    {
+      "path": "campaign.rs",
+      "sha256": "7a31c08a23180865fb2ce8da19dde51b77450a70042c99e46e67ee4f75cbb5ea"
+    },
+    {
+      "path": "independent_solver.py",
+      "sha256": "edf6edf98fdfe35d0347fa88ad53b0096a2f1d15738080745daf0412c706989d"
+    },
+    {
+      "path": "install_accessor.py",
+      "sha256": "df027d7e2785ade667f379214abaf103405f0352a906b1fca17ffb2b67a2004e"
+    },
+    {
+      "path": "native_owner.rs",
+      "sha256": "086f99c3e8b51980bced16a4fb925216f0b5302dceddd6ff8b99998b635adf4a"
+    },
+    {
+      "path": "prepare_native.py",
+      "sha256": "2036c697ce16fefe264673cdcd6c93ef3114b5e99f7d5d42335c4ede0ef82060"
+    },
+    {
+      "path": "prepared_node_accessor.patch",
+      "sha256": "3f016387fcf142e94826d3b5d5cf0ead93e17c23dc768d9d918a8ae716860720"
+    },
+    {
+      "path": "prepared_node_accessor.rs",
+      "sha256": "55b6e7cca5b345911b6c423820df6a4d60af94db0bfdb9d9b8256bc10f4425aa"
+    },
+    {
+      "path": "run_local.sh",
+      "sha256": "cba4ea492e4d0662ac5ff7063aa5344383767d15692d592dca795b56111be7ce"
+    },
+    {
+      "path": "source_matched_solver.py",
+      "sha256": "c42e6df13d53f9b28b2e4079a159704c696f17640f3929cf27706ae99fa8ad41"
+    },
+    {
+      "path": "source_reference.rs",
+      "sha256": "ed0297afcf5a0b7bbda5f83cba84edd4fa29bcb7e81dc14f71dcbb78bf2b4dd5"
+    },
+    {
+      "path": "terminal_cut_regression.py",
+      "sha256": "c237e532dbc8551d27775c0b0a4a7ee4790301c186548021ac4f07fe32afc248"
+    }
+  ],
+  "episode": "one Astra-authorized targeted repair",
+  "repair_status": "first three C9 repairs implemented and tested; source-matched reference HOLD",
+  "source_matched_reference": {
+    "exit_code": 1,
+    "status": "HOLD_SOURCE_MATCHED_INDEPENDENT_REFERENCE",
+    "reason": "DOP853 internal state exits native positive moment domain; no projection or tolerance change",
+    "calls_to_first_failure": 291,
+    "min_trial_photon_number": -1.0561176359772685e-20,
+    "raw_state": "evidence/repaired_source_reference/first_invalid_trial_q-0.1.npy",
+    "trace": "evidence/source_matched_first_failure.stderr",
+    "source": "actual MD14 eight-birth schedule",
+    "geometry": "signed native q=-0.1 first case",
+    "preserved_native_levels": [
+      1,
+      2,
+      4
+    ]
+  },
+  "endpoint_guard_regression": {
+    "exit_code": 0,
+    "temperature_K": 1.0001,
+    "scale_ratio": 1.0001,
+    "path": "source-free geometry endpoint",
+    "accepted_state": "unchanged"
+  },
+  "post_birth_rollback": {
+    "observed_private_births": 1,
+    "charged_failed_rhs": 7,
+    "reduced_retry": "bitwise equal clean accepted state"
+  },
+  "node_accessor": {
+    "scope": "task-local scratch read-only suffix; unchanged original source bytes retained exactly",
+    "identity": "evidence/accessor_identity.json",
+    "patch": "prepared_node_accessor.patch"
+  }
+}

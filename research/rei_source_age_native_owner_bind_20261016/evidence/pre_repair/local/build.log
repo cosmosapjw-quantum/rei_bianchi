@@ -1,0 +1,45 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_driver.rs:313:18
+    |
+313 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+313 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+313 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/tmp/rei-source-age-native-owner-bind/native/rust/rei_microphysics)
+warning: fields `proper_time_s`, `rate_per_h_s`, `physical_energy_bounds_ev`, `mu_birth`, and `killing_per_q` are never read
+  --> examples/native_owner.rs:16:9
+   |
+12 | pub struct Birth {
+   |            ----- fields in this struct
+...
+16 |     pub proper_time_s: f64,
+   |         ^^^^^^^^^^^^^
+17 |     pub rate_per_h_s: f64,
+   |         ^^^^^^^^^^^^
+...
+20 |     pub physical_energy_bounds_ev: Vec<[f64; 2]>,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+21 |     pub mu_birth: Vec<f64>,
+   |         ^^^^^^^^
+...
+24 |     pub killing_per_q: Vec<[f64; 3]>,
+   |         ^^^^^^^^^^^^^
+   |
+   = note: `Birth` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `photon_state` is never used
+  --> examples/native_owner.rs:38:8
+   |
+38 | pub fn photon_state(s: &DriverState) -> PhotonState {
+   |        ^^^^^^^^^^^^
+
+warning: `rei_microphysics` (example "source_age_campaign") generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 1.71s
