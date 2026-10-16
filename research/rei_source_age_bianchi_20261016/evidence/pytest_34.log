@@ -1,0 +1,19 @@
+...................F..............                                       [100%]
+=================================== FAILURES ===================================
+____ SourceAbsorption.test_embedded_adaptive_age_positive_and_conservative _____
+
+self = <test_age_transport.SourceAbsorption testMethod=test_embedded_adaptive_age_positive_and_conservative>
+
+    def test_embedded_adaptive_age_positive_and_conservative(self):
+        m=Model()
+        a=adaptive_birth_age_source(m,8,32,rtol=1e-4,atol=1e-6)
+        self.assertTrue(a.result.ray_calls>0)
+        self.assertTrue(all(x>=0 for x in a.result.absorbed))
+        self.assertLess(abs(a.result.photon_residual),2e-12)
+>       self.assertLess(abs(a.result.energy_residual),5e-10)
+E       AssertionError: 6.430365057141785e-05 not less than 5e-10
+
+tests/test_age_transport.py:178: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_age_transport.py::SourceAbsorption::test_embedded_adaptive_age_positive_and_conservative - AssertionError: 6.430365057141785e-05 not less than 5e-10
+1 failed, 33 passed in 3.16s
