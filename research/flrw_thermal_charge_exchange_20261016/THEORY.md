@@ -49,6 +49,49 @@ At each evaluation reconstruct density and temperature from the original state a
 
 For a finite provider-temperature boundary, if accepted state lies within the declared normalized event distance and the field points toward that boundary, return DOMAIN_BOUNDARY_APPROACH with the interior state, analytic boundary, distance, reached time and requested time. No snapping to the boundary, rate extrapolation or completed-interval status is permitted. Finite work limits, underflow and arithmetic failure return typed incomplete results.
 
+## R5 — Constructive reduction, invariant bounds and numerical contract
+
+The R4 unit convention is a controller choice for this new standalone interface; the existing SI source remains unchanged.
+
+### Conservation and admissibility
+
+For each extent xi, nH=(a+xi)+(b-xi)=a+b and nD=(c-xi)+(d+xi)=c+d. The charge/electron density is (b-xi)+(d+xi)=b+d. Thus both baryon density nH+2nD and Nth=nH+nD+ne are constant. Binding energy increases by DeltaChi*xi, so u(xi)=u0-DeltaChi*xi and u+DeltaChi*xi=u0 exactly at the algebraic level. Temperature follows from u=C*T, C=3*kB_eV*Nth/2. No independent temperature ODE or second cooling increment is integrated.
+
+At the physical lower endpoint one reverse reactant vanishes, so F≥0. At the upper endpoint one forward reactant vanishes, so F≤0. Nonnegative rate coefficients therefore make the physical interval invariant for the continuous scalar flow while the temperature-dependent field is defined. The narrower provider interval can have an outward vector field: its boundary is an explicit applicability event, not a reason to extrapolate.
+
+For DeltaChi!=0, the thermal interval endpoints are the sorted pair [(u0-C*Tmin)/DeltaChi,(u0-C*Tmax)/DeltaChi]. Intersect with the physical interval. For DeltaChi=0, validate T0 once and impose no additional extent interval. Store which endpoint(s) arise from provider limits. Input and every field evaluation must have nonnegative finite densities and a temperature inside the closed provider domain; no small negative floor is introduced.
+
+Since both initial and current D+ belong to [0,nD], |xi|≤nD. Hence
+```
+|T-T0| ≤ |DeltaChi|*nD/C = 2*|DeltaChi|*nD/(3*kB_eV*Nth).
+```
+This is an a priori amplitude ceiling for isolated fixed-volume CX, independent of rates and elapsed time. It does not predict the realized change or apply to a network with changing particle count or external heating. For nD/nH=fD and Nth≥nH, the simpler ceiling is 2*|DeltaChi|*fD/(3*kB_eV). Report the exact expression evaluated from the supplied state, not a substituted cosmological abundance.
+
+### Exact manufactured thermal-feedback flow
+
+Choose equal manufactured rates kf(T)=kr(T)=k0*T/T0 on a positive-temperature test domain. Define F0=k0*(c*b-d*a), K=k0*(a+b+c+d), beta=DeltaChi/u0 and lambda=K-beta*F0. Cancellation of the quadratic density terms gives
+```
+xi'=(1-beta*xi)*(F0-K*xi).
+phi(t)=(1-exp(-lambda*t))/lambda, or t when lambda=0.
+xi(t)=F0*phi(t)/(1+beta*F0*phi(t)).
+```
+The formula is valid until its first physical/provider-domain endpoint and wherever its denominator is nonzero. It handles forward and reverse net flow. F0=0 gives xi=0; beta=0 recovers the equal-rate frozen result. At lambda=0 it becomes xi=F0*t/(1+beta*F0*t). Use expm1 for the small exponential difference; independent Decimal evaluation and an exact polynomial derivative identity will check the formula. A provider boundary xi_b has analytic crossing time obtained from E=(F0-K*xi_b)/(F0*(1-beta*xi_b)), t_b=-log(E)/lambda, or t_b=xi_b/[F0*(1-beta*xi_b)] when lambda=0. Require a positive finite log argument and first-event applicability; this is a fixture oracle, not an arbitrary-provider event locator.
+
+### Heun map and acceptance
+
+For S=max(a,b,c,d)>0 integrate z=xi/S and G(z)=F(S*z)/S. A Heun step with size h forms e=z+h*G(z), then v=e+h*G(e), then H_h(z)=(z+v)/2. Require e and v to lie in the closed admissible interval before using the convex endpoint. Every actual G evaluation independently rechecks density/temperature/provider conditions. Since z and v lie in the interval and temperature is affine, H_h(z) lies there too. This is a discrete admissibility proof; it does not prove accuracy for arbitrary stiff problems.
+
+Compute one full Heun step zc and two halfsteps zf. The accepted map is zf, never Richardson extrapolation. For smooth flow the leading difference gives the local fine-map estimate err=|zf-zc|/3. Compare err≤atol+rtol*max(|z|,|zf|). This is a heuristic truncation estimate whose global adequacy is tested on new fixtures. It is not a bound on rate uncertainty, floating error or total physical prediction error.
+
+Start h with a bounded fraction of remaining time. Before a trial cap h to at most0.8*distance/|G| toward the relevant finite interval endpoint. If any checked Euler stage fails the interval, reject and halve. For an error rejection use a bounded shrink factor from the cube-root estimator. After acceptance use a bounded growth factor. Exact requested-time completion uses h=min(h,t_requested-t_reached); no candidate may advance beyond requested time. Keep actual attempts, rejected attempts, accepted steps and field calls. Underflow, nonfinite arithmetic, provider rejection and finite work caps return typed incomplete status with the last accepted state.
+
+At an accepted state, if the field points toward a provider-derived boundary and normalized distance≤event_atol, stop with DOMAIN_BOUNDARY_APPROACH. Return actual t_reached, requested time, the analytic extent boundary, remaining extent distance and event_atol; full_interval_complete=false. Do not change the accepted state to the boundary. A beginning-at-boundary outward field gives an immediate zero-time partial return. Physical depletion with no provider boundary is not labeled a finite provider event.
+
+### Frozen implementation and discriminating checks
+
+`CONTRACT.json` and `FIXTURES.json` freeze the new Python API, status meanings, numerical controls, source identities, changed-seam tests and30-second aggregate test ceiling. The independent probe owns algebra/Decimal verification under its own small bound. The coding agent will run actual Savin and manufactured fixtures, fixed-step refinement of the Heun map, thermal-domain approach and finite-budget stops. No old Rust suite, source-age reference, observer or native cosmological run is included. Mathematical construction is complete; these new numerical checks remain unexecuted by the theory author.
+
+
 
 
 

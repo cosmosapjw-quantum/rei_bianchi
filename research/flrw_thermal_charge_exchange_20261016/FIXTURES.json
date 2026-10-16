@@ -1,0 +1,111 @@
+{
+  "schema": "rei.thermal-cx-fixtures/1",
+  "units": "CONTRACT units",
+  "manufactured_common": {
+    "h0": 1,
+    "hp": 3,
+    "d0": 2,
+    "dp": 1,
+    "T0_K": 10,
+    "k0_cm3_s": 0.2,
+    "Tmin_K": 2.7,
+    "Tmax_K": 30,
+    "t_requested_s": 2,
+    "thermal": "u0=1.5*kB_eV*Nth*T0",
+    "defect": "delta_chi=beta*u0",
+    "rates": "kf(T)=kr(T)=k0*T/T0"
+  },
+  "manufactured_cases": [
+    {
+      "id": "forward_feedback",
+      "beta": 0.1
+    },
+    {
+      "id": "reverse_feedback",
+      "h0": 3,
+      "hp": 1,
+      "d0": 1,
+      "dp": 2,
+      "beta": 0.1
+    },
+    {
+      "id": "zero_defect",
+      "beta": 0
+    },
+    {
+      "id": "lambda_zero",
+      "beta": 1.4,
+      "t_requested_s": 0.25
+    },
+    {
+      "id": "lower_domain_event",
+      "beta": 0.1,
+      "Tmin_K": 9.7,
+      "t_requested_s": 2
+    },
+    {
+      "id": "upper_domain_event_reverse",
+      "h0": 3,
+      "hp": 1,
+      "d0": 1,
+      "dp": 2,
+      "beta": 0.1,
+      "Tmax_K": 10.3,
+      "t_requested_s": 2
+    }
+  ],
+  "savin_cases": [
+    {
+      "id": "savin_primordial_conditional",
+      "h0": 0.9,
+      "hp": 0.1,
+      "d0": 0.00002,
+      "dp": 0.000005,
+      "T0_K": 100,
+      "delta_chi_eV": 0.0037,
+      "t_requested_s": 100000000
+    },
+    {
+      "id": "savin_thermal_feedback",
+      "h0": 0.5,
+      "hp": 0.5,
+      "d0": 0.5,
+      "dp": 0,
+      "T0_K": 10,
+      "delta_chi_eV": 0.0037,
+      "t_requested_s": 1000000000
+    },
+    {
+      "id": "savin_near_lower_domain",
+      "h0": 0.5,
+      "hp": 0.5,
+      "d0": 0.5,
+      "dp": 0,
+      "T0_K": 2.70000001,
+      "delta_chi_eV": 0.0037,
+      "t_requested_s": 100000000
+    }
+  ],
+  "changed_seam_controls": [
+    "dt0",
+    "D0=Dp=0 thermal-path no-op",
+    "zero manufactured rates thermal-path no-op",
+    "initial outside rate-domain rejection",
+    "negative/nonfinite input rejection",
+    "forced work-cap partial return",
+    "input immutability"
+  ],
+  "tighter_pair": {
+    "rtol": 1e-8,
+    "atol_normalized": 1e-12
+  },
+  "fixed_heun_refinement": {
+    "case": "forward_feedback",
+    "steps": [
+      16,
+      32,
+      64
+    ]
+  },
+  "scope": "Synthetic unequal-abundance stress fixtures are manufactured, not primordial initial conditions; only first Savin case names conditional primordial ratio."
+}
