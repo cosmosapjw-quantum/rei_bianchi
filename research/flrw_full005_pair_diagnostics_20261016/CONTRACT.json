@@ -2,7 +2,7 @@
   "schema_version": 1,
   "workflow_version": "1.0.0",
   "unit_id": "flrw_full005_pair_diagnostics_20261016",
-  "status": "R8_ADOPTED_FOR_CODING_CONTRACT",
+  "status": "R9_FROZEN_CODING_CONTRACT",
   "baseline_commit": "4e2f0682fb605c6aa940bd756d9869e67b6ded0b",
   "branch": "research/flrw-production-integration-20261015",
   "objective": "Full-overlap piecewise-linear reconstruction pair supremum and analytic L1/L2/RMS diagnostics in stored ln(a)",
@@ -35,7 +35,9 @@
       "NCP heavy rerun",
       "source006 mutation",
       "environment import repair"
-    ]
+    ],
+    "standalone": "research/flrw_full005_pair_diagnostics_20261016/analyze_saved_pair.py",
+    "caller_integration": "Opt-in --continuous-pair-diagnostics; existing run(manifest,out) defaults unchanged"
   },
   "resources": {
     "native_solver_runs": 0,
@@ -43,9 +45,11 @@
     "new_dependency": "none; Python standard library only",
     "small_fixture_checks": "authorized"
   },
-  "coding_ready": false,
+  "coding_ready": true,
   "remaining_obligations": [
-    "R9 frozen coding API"
+    "R10 captured handoff",
+    "C1-C10 implementation and independent review",
+    "Future actual full accepted-history diagnostic execution under retained external budget"
   ],
   "baseline_files": {
     "postprocess_flrw.py": "b396a5b439a5cc3e305ab6663ac8d6d46424b747c13a84da4fe3d89ac468b5fc",
@@ -118,5 +122,130 @@
     "actual_full005_continuous_metrics": "NOT_RUN",
     "solver_accuracy": "NOT_ADMITTED",
     "new_convergence_threshold": null
+  },
+  "coding_start_gate": "R10 immutable capture acknowledged by stage publisher",
+  "api": {
+    "signature": "diagnose_pair(reference, candidate, observables=None)",
+    "inputs": "Existing loaded case dictionaries with id and series; default16 fields except L,time_s",
+    "error": "ValueError with named invalid domain/shape/arithmetic cause; no partial metric result",
+    "output": {
+      "schema_version": 1,
+      "status": "PIECEWISE_LINEAR_RECONSTRUCTION_DIAGNOSTICS",
+      "coordinate": "LN_A_STORED_BINARY64",
+      "arithmetic": "BINARY64_ANALYTIC_SEGMENTS",
+      "reference": "input id",
+      "candidate": "input id",
+      "reference_domain": "[first L,last L]",
+      "candidate_domain": "[first L,last L]",
+      "overlap": "[A,B]",
+      "overlap_width": "B-A",
+      "union_knots": "unique visited knots including overlap endpoints",
+      "segments": "union_knots-1",
+      "summary": "list of rows defined below"
+    },
+    "summary_fields": [
+      "observable",
+      "sup_absolute_difference",
+      "ln_a_at_sup",
+      "signed_difference_at_sup",
+      "initial_difference",
+      "endpoint_difference",
+      "l1_integral",
+      "mean_absolute_difference",
+      "l2_squared_integral",
+      "l2_norm",
+      "rms_difference",
+      "units",
+      "result_class"
+    ],
+    "result_class": "DIAGNOSTIC_PAIR_RECONSTRUCTION_NO_THRESHOLD_OR_ERROR_BOUND"
+  },
+  "outputs": {
+    "json": "full_pair_continuous_diagnostics.json",
+    "csv": "full_pair_continuous_summary.csv",
+    "standalone_receipt": "PAIR_DIAGNOSTICS_RECEIPT.json",
+    "existing_outputs": "Retain all unchanged historical sampled outputs and milestones"
+  },
+  "standalone": {
+    "command": "python3 research/flrw_full005_pair_diagnostics_20261016/analyze_saved_pair.py --validated-receipt RECEIPT --output FRESH_DIRECTORY",
+    "default_receipt": "research/flrw_full005_postprocess_20261015/completed_pair_20261016_001/results/POSTPROCESS_RECEIPT.json",
+    "accepted_prior_status": "CONDITIONAL_FULL_INTERVAL_DIAGNOSTIC_REVIEW_PENDING",
+    "requires": [
+      "Exactly two validated_complete_inputs",
+      "Frozen FULL005 binding check successes",
+      "BYTE_IDENTICAL_COMPILED_SOURCE relation",
+      "Successful strict case_checks",
+      "Correct existing elapsed proper-time clock",
+      "Prior receipt identity recorded",
+      "Current necessary input bytes match prior expected hashes"
+    ],
+    "streamed_once_with_inline_sha256": [
+      "history",
+      "abundances"
+    ],
+    "small_metadata_verified": [
+      "config",
+      "source_identity",
+      "terminal",
+      "binding"
+    ],
+    "roles_not_opened": [
+      "ledger",
+      "checkpoint"
+    ],
+    "imports_forbidden": [
+      "postprocess_flrw",
+      "numpy",
+      "matplotlib"
+    ],
+    "reuse": "Prior strict physical+ledger checks transfer from same frozen input identities; report reused versus newly executed checks",
+    "relocation_flags": {
+      "--runs-root": "ROOT/<case_id>/<original basename> for history,abundances,config,source_identity,terminal",
+      "--bindings-root": "ROOT/<original binding basename>"
+    },
+    "missing_or_invalid_input": "Typed HOLD receipt; new metrics null; nonzero exit; no render or solver launch",
+    "json": "Finite-only serialization; allow_nan=False or equivalent"
+  },
+  "implementation_acceptance": {
+    "exact_checks": [
+      "Rational fixture expectations and existing exact Fraction supremum oracle for small same-endpoint fixtures",
+      "Earliest tie witness",
+      "Zero and constant differences",
+      "Sign-changing segments and endpoint zeros",
+      "Partial overlap and no extrapolation",
+      "Distinct nearly coincident knots retained",
+      "Redundant knot invariance within float rounding",
+      "All selected arrays aligned and finite",
+      "Malformed/no-overlap/overflow reject",
+      "Standalone uses same16 observable definitions",
+      "Hash mismatch and missing raw inputs produce HOLD",
+      "No ledger/checkpoint access in standalone",
+      "No renderer/numpy/matplotlib import in standalone",
+      "Existing caller default and prior outputs preserved"
+    ],
+    "test_only_float_comparison": {
+      "relative": 1e-12,
+      "absolute": 1e-14,
+      "scope": "Moderate synthetic fixtures compared with independently computed expected values; never a physical or convergence threshold"
+    },
+    "review": "Fresh read-only independent reviewer; one bounded targeted repair if concrete defect found"
+  },
+  "handoff": {
+    "mode": "Prompt-only automatic fetch using existing authenticated repository or actual publisher archive; no manual large attachment required",
+    "runtime_files": [
+      "research/flrw_full005_pair_diagnostics_20261016/analyze_saved_pair.py",
+      "research/flrw_full005_postprocess_20261015/vendor/pair_diagnostics.py",
+      "research/flrw_full005_postprocess_20261015/vendor/compare_histories.py",
+      "research/flrw_full005_postprocess_20261015/vendor/source_pair_guard.py",
+      "research/flrw_full005_postprocess_20261015/vendor/reconstruction_support.py",
+      "research/flrw_full005_postprocess_20261015/completed_pair_20261016_001/results/POSTPROCESS_RECEIPT.json"
+    ],
+    "additional_dependencies": "Include any frozen JSON actually referenced by final runtime imports",
+    "published_identity": "Controller fills actual final commit/archive URL after C10; no invented locator",
+    "raw_discovery": "Inspect saved receipt paths; use explicit relocation flags for discovered owner cache; missing bytes produce HOLD",
+    "prior_cpu_wall_debit_seconds": 103.79374452296179,
+    "remaining_external_wall_ceiling_seconds": 196.206255477,
+    "requires_finite_wall_cap": true,
+    "large_raw_run_this_unit": "NOT_RUN"
   }
 }
