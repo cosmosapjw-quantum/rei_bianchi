@@ -1,0 +1,16 @@
+{
+  "stage": "C2",
+  "formula_to_code": {
+    "temperature_coefficients": "igm_rates::igm_rates -> rate_table::LogRateGrid<15> / IgmRateTable",
+    "ledger": "igm_point_rhs_impl -> prepared bundle exact-temperature guard -> original products/stoichiometry",
+    "default_exact_reuse": "AxbiProvider.point -> point_with_backend Direct -> single prepare -> RHS + returned rates",
+    "deuterium": "DAtomicProvider.rates -> Direct.prepare -> rates_from_prepared unchanged H-equality SI conversion",
+    "lithium": "lithium_rates.rs actual source rows -> elemental coefficients -> required isotope policy -> separate A6/A7 number RHS"
+  },
+  "scope_boundary": "No driver/solver/Jacobian/defaultinventory/thermalclosure change",
+  "evidence_refs": [
+    "CODING.md#c2",
+    "THEORY.md#r9",
+    "CONTRACT.json"
+  ]
+}

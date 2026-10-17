@@ -39,7 +39,7 @@ pub struct IgmPointRhs {
     pub excluded_dr_cooling_erg_cm3_s: f64,
 }
 
-use crate::{igm_rates::igm_rates, HHeModel};
+use crate::{igm_rates::igm_rates, rate_table::PreparedIgmRates, HHeModel};
 // CODATA 2022: https://physics.nist.gov/cuu/pdf/wall_2022.pdf
 // sigma_T and electron mass; a_rad = 4*sigma_SB/c.
 // sigma_SB follows the exact SI kB,h,c blackbody expression (converted to cgs).
@@ -106,6 +106,32 @@ pub fn igm_point_rhs(
     tcmb: f64,
     photo: IgmPhotoInput,
 ) -> Result<IgmPointRhs, ForwardError> {
+    igm_point_rhs_impl(state, nh, nhe, h, tcmb, photo, None)
+}
+
+/// Evaluate the unchanged event/energy ledger using one temperature-bound bundle.
+/// A composition or energy change requires preparation at the new exact EOS T.
+pub fn igm_point_rhs_with_prepared(
+    state: &IgmGasState,
+    nh: f64,
+    nhe: f64,
+    h: f64,
+    tcmb: f64,
+    photo: IgmPhotoInput,
+    prepared: &PreparedIgmRates,
+) -> Result<IgmPointRhs, ForwardError> {
+    igm_point_rhs_impl(state, nh, nhe, h, tcmb, photo, Some(prepared))
+}
+
+fn igm_point_rhs_impl(
+    state: &IgmGasState,
+    nh: f64,
+    nhe: f64,
+    h: f64,
+    tcmb: f64,
+    photo: IgmPhotoInput,
+    prepared: Option<&PreparedIgmRates>,
+) -> Result<IgmPointRhs, ForwardError> {
     nonnegative(h)?;
     if !tcmb.is_normal() || tcmb <= 0.0 {
         return Err(invalid());
@@ -120,7 +146,15 @@ pub fn igm_point_rhs(
     let eos = state.eos(nh, nhe)?;
     let t = eos.temperature_k;
     let ne = eos.electron_density_cm3;
-    let rates = igm_rates(t)?;
+    let rates = match prepared {
+        Some(bundle) => {
+            if bundle.temperature_k() != t {
+                return Err(ForwardError::InvalidInput("IGM_PREPARED_TEMPERATURE_MISMATCH"));
+            }
+            bundle.rates()
+        }
+        None => igm_rates(t)?,
+    };
     let c = HHeModel::controlled_fixture();
     let [x, y, z] = state.fractions;
     let abs = [

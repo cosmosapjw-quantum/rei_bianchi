@@ -1,5 +1,9 @@
 # Temperature coefficient acceleration
 
+## Active scope override before R6
+
+The user's latest instruction is: “선행 PR을 확인하면 우선 scope는 Li와 그 이온까지만 포함해.” The follow-up “(Li isotope 포함)” explicitly includes lithium isotopes. Added-species work is therefore restricted to 6Li and 7Li, each Li I–Li IV, after checking the preceding PR and source authority. This supersedes the root's earlier carbon selection. Existing H/He/D optimization and all generic interpolation, closure, cache, and cost derivations remain in scope. The immutable R1–R5 carbon exploration is retained as historical evidence; carbon is excluded from active production exports and added-species admission. The execution budget is unchanged. The active lithium source/domain/isotope mapping is appended at R6; no generic derivation or existing-provider validation is restarted.
+
 ## R1 — research contract
 
 This unit constructs reusable temperature-only coefficient evaluation, measures scalar and batch costs, and admits an additional species coefficient only after checking its actual primary provider. The baseline is `4583ed342b8476e86e42b023d6de1d0f50820adb`; the repository policy blob is `429a5a13ee75b1222bc50627f8d5973d01dd21c4`. `CONTRACT.json` records quantitative acceptance and bounded local execution. Existing external native runs and their checkpoints remain under their existing contracts.
@@ -105,7 +109,7 @@ The q=4 DR row has one negative fit amplitude. Its two relevant terms obey
     0.002646 exp(-2804000/T) - 0.0007843 exp(-4324000/T)
     > (0.002646-0.0007843) exp(-2804000/T) > 0
 
-for every finite T>0, and the third amplitude 0.01762 is positive. Thus the total analytic DR is positive despite a negative fitted term. Keep that negative amplitude exactly; clipping it would change the source. The other selected rows have nonnegative amplitudes. At cold temperatures a total may still underflow in binary64, requiring direct evaluation/underflow semantics.
+for every finite T>0, and the remaining amplitude 0.01762 is positive. Thus the total analytic DR is positive despite a negative fitted term. Keep that negative amplitude exactly; clipping it would change the source. The other selected rows have nonnegative amplitudes. At cold temperatures a total may still underflow in binary64, requiring direct evaluation/underflow semantics.
 
 For carbon populations n_0…n_6 and externally specified n_e≥0, define I_q=n_e n_q C_q for q=0…5 and R_q=n_e n_q(α_RR,q+α_DR,q) for q=1…6. Set absent boundary fluxes to zero. Then dot(n_q)=I_(q-1)+R_(q+1)-I_q-R_q, so summing telescopes to zero, and sum_q q dot(n_q)=sum I_q-sum R_q. If electrons are evolved, dot(n_e)=sum I_q-sum R_q conserves total electric charge e(sum q n_q-n_e). With external n_e the output records this electron source rather than asserting a closed electron evolution.
 
@@ -120,3 +124,98 @@ Let B be table construction time, c_d direct time per query, and c_l lookup time
 For m independent temperature queries with scalar-batch per-item cost c, p workers, startup L, and extra per-item scheduling/copy cost b, T_parallel≈L+mc/p+mb. Parallelism beats the serial batch only when c(1-1/p)>b and m>L/[c(1-1/p)-b]. Small batches may correctly remain serial. Outputs retain input ordering, and workers share immutable grid rows. Benchmark results must state threads, query distribution, construction inclusion, and actual break-even rather than assume that more threads or a SoA layout produces speedup.
 
 R5 outcome: the interpolation/error proof, branch construction, conservation mapping, carbon formulas and positivity, cache identity, and amortization equations are complete. R6 reviews these transitions independently; R7 measures the implementation-dependent accuracy and cost.
+
+## R6 — lithium and isotope delta under independent review
+
+The generic R5 interpolation/slope proof, closure separation, cache construction, and amortization were independently reviewed by `rate_frontier` as mathematically sound under their stated hypotheses. Its initial carbon-source comparison is retained as historical exploration. Active added-species admission uses lithium only.
+
+Preceding PR151 at head `9f455d98` has `inventory17.json` blob `69354d1065` with Li7; its Li6 abundance entry 6.035916255350921×10^-15 was omitted with no charge mapping. The existing native thirteen-species state has no Li. The prior `ISOTOPE_PROVIDER_THEORY.md` blob `7d83af0666` explicitly distinguishes elemental Verner Z,N data from isotope A and provides a declared element-equality precedent for 3He. These observations establish that the current request adds 6Li and 7Li charge stages rather than inheriting a completed isotope-native Li implementation. The old trace-inventory omission does not restrict the user's new explicit Li6 scope. No default abundance or automatic network activation is adopted from that inventory.
+
+The actual selected source rows are `data/lithium_coefficients.json`: Z=3, ground-parent M=1, CI q=0,1,2; RR q=1,2,3; DR q=1,2; structurally zero DR q=3. They use the same verified Voronov and Badnell formulas and units from R5, with lithium numeric rows. CI lower k_B T values are [1,4,5] eV and the upper value is 20 keV. RR/DR per-channel domains are [10q²,10^7q²] K; the complete CI/RR/DR chain intersects on [5/(8.617385×10^-5),10^7] K. Independent RR remains available as cold as 10 K for q=1. The standard-tabulation interpretation and low-density Maxwellian/ground-parent assumptions remain explicit.
+
+The Li+ DR row has the signed amplitudes [2.941×10^-5,6.068×10^-5,-7.753×10^-7] and energies [634500,702400,827100] K. For every T>0,
+
+    2.941e-5 exp(-634500/T) - 7.753e-7 exp(-827100/T)
+    > (2.941e-5-7.753e-7) exp(-634500/T) > 0.
+
+The remaining amplitude is positive, so the analytic total is positive. The negative amplitude is preserved. Cold binary64 underflow retains its numerical meaning and direct fallback; it is not a new structural-zero channel.
+
+Root explicitly adopted the opt-in isotope model `IsotopeRatePolicy::ElementalElectronicEquality`: for A∈{6,7}, set k_(A,q,p)(T)=k_(Li,q,p)(T) for each process p while retaining separate species identity (Z,A,q). The policy is a required constructor argument, with no implicit default. This is a declared shared-electronic coefficient approximation, not an isotope-native source or a reduced-mass scaling prescription. The source table carries no mass-number dependence, and no bound on neglected isotope shifts, mass effects, or hyperfine/population effects is asserted. An isotope-native/IsotopeResolved policy request must return typed missing-source status until such a provider exists. This model decision follows the preceding declared 3He element-equality precedent and is distinct from source-row evidence.
+
+Under that model, keep n_(A,q), q=0…3, separately for both A. Define I_(A,q)=n_e n_(A,q) C_q and R_(A,q)=n_e n_(A,q)(α_RR,q+α_DR,q), with boundary fluxes zero. Then
+
+    dot(n_(A,q)) = I_(A,q-1)+R_(A,q+1)-I_(A,q)-R_(A,q),
+    sum_q dot(n_(A,q)) = 0  for each A,
+    electron_source = sum_(A,q) I_(A,q) - sum_(A,q) R_(A,q).
+
+The charge identity is sum_(A,q) q dot(n_(A,q))=electron_source. Thus the source conserves nuclei independently for Li6 and Li7 and changes neither label; weighting those two identities by A=6,7 also proves conservation of their baryon count. For the same T,n_e and proportional initial charge populations n_(7,q)=c n_(6,q), both isotope derivatives have that same proportionality; this is a useful implementation check of the selected approximation. Electron density is an explicit external input, with its source returned for optional correct coupling. No isotope masses, binding-energy defect, nuclear reactions, thermal or radiation ledger are invented. The prior Li8/Li9 omitted reservoirs remain explicitly pending nuclear-decay and daughter-product closure; they are neither aliased into Li7 nor represented as stable in this bounded Li6/Li7 collisional component.
+
+The coefficient table may share elemental rows between A=6 and A=7 only under this named policy, while outputs and cache identity retain the policy and isotope labels. The conditional approximation and native-source status must remain visible at construction and in returned provider metadata.
+
+Primary isotope spectroscopy found by the source owner provides a concrete limitation: Bushaw et al., Physical Review A 75, 052503 (2007), DOI 10.1103/PhysRevA.75.052503, reports a neutral Li7–Li6 ionization-threshold shift of 18067.54(21) MHz. This confirms a real isotope dependence. It does not determine the isotope shifts of all electron-ion rates or DR resonances, so it supplies neither a full correction nor a rigorous error bound for `ElementalElectronicEquality`. The active implementation does not apply a threshold patch from this datum.
+
+R6 outcome: `evidence/R6_INDEPENDENT_REVIEW.json` records `PASS_SCOPED_LI6_LI7_CONDITIONAL_COEFFICIENT_IMPLEMENTATION`, with no blocking findings, independent inspection of all ten selected Li source lines, and reuse of the unchanged generic mathematical review. Its positive transition is bounded implementation and targeted tests; C9 will review the actual changed implementation and observed results. The source/domain and conditional-isotope-model obligations are now resolved at the design level. Numerical accuracy of the Li implementation and integrated adapters remains for C6–C8.
+
+## R7 — actual discriminating computation
+
+The lower-tier code owner compiled a standalone Rust prototype that includes the unchanged production `igm_rates.rs` as its direct source reference and the new generic/table implementation. Rust 1.94.1 failed at tool startup with SIGBUS; the separately recorded Rust 1.85.1 toolchain executed successfully. This is an environment repair, not a change in source coefficients or scientific tolerance. `evidence/R7_RESULTS.json`, per-run stdout/resources, and `evidence/RUN_LEDGER.json` preserve commands and outputs.
+
+The initial 8193-node table completed execution with exit code zero but failed the fixed numerical target: 77,367 temperature queries gave maximum relative coefficient error 2.453727547795756×10^-5 versus the required 10^-5. Zero, diagnostic-mask, and invalid-input mismatches were all zero. The largest errors occurred in the steep exponential cooling channels near cap regions, consistent with the curvature mechanism in R5. The failure is classified as numerical resolution, with its original raw record retained.
+
+Root authorized the already allowed 65537-node refinement without changing tolerance or physical assumptions. The refined run tested 421,431 queries across all sixteen output fields, including deterministic log off-grid and fixed-seed nonuniform samples, refined grid knots and floating neighbors, cell-quarter probes, explicit branch neighbors, endpoints and invalid inputs. Its maximum relative error was 3.8387697880837957×10^-7, with zero mask/zero/invalid mismatches and eight direct-fallback cells. Fixed off-grid controls were retained between resolutions. The exact CI floor-crossing bracket will receive a targeted C6 predicate-neighbor check; the R7 grid/fallback coverage is not represented as that unperformed exact-boundary test.
+
+Two independently interpretable construction controls also ran: a power law had relative error 3.1086244689504383×10^-15; a curved exponential example had error 0.0018986301621563006 below its analytic bound 0.0020245602827097826. These verify the chosen examples and the implemented interpolation formula. The H/He sample maximum is empirical, not a certified continuous curvature supremum.
+
+The refined generic grid payload was 8,913,016 bytes, took 0.109192622 s to construct, and the complete refined probe consumed 0.365005623 s wall and 0.333695 s CPU with peak RSS 18,244 KiB. The IGM floor masks add 196,608 bytes, so the full coefficient/mask payload is 9,109,624 bytes; the initial probe's `storage_bytes` reports the generic grid only. Initial plus refined scientific execution totals were 0.429108927 s wall and 0.390437 s CPU. Construction and probe costs are recorded separately; no direct-versus-table speedup is inferred from these accuracy runs. Scalar/batch/parallel comparative benchmarks and Li-specific execution remain C-stage obligations under the unchanged aggregate budget.
+
+R7 outcome: actual compiled H/He prototype accuracy passes the frozen coefficient target on the stated sample after one diagnosed refinement. No derivative API, new Newton/table residual path, continuous error certificate, or trajectory claim is admitted by this result.
+
+## R8 — scoped result decision
+
+Adopt the 65537-node H/He table as the opt-in implementation candidate supported by R7 sampled coefficient accuracy. Preserve direct evaluation as default/reference/fallback and the 8193-node failed target result. The factor-eight grid refinement reduced the observed worst error by approximately a factor of 64, consistent with the smooth log-linear second-order coefficient estimate; this observed comparison does not replace the cellwise curvature hypothesis.
+
+Adopt exact prepared direct-rate reuse within a point evaluation and its D projection for implementation: it removes duplicate source work without changing coefficients. Its actual integrated point outputs and temperature-identity enforcement must pass C6–C7. Adopt the source-backed Li6/Li7 state-and-number-rate component under required `ElementalElectronicEquality`, retaining per-channel domains and typed missing-source behavior for native isotope coefficients. Source and model acceptance at R6 does not substitute for the forthcoming Li numerical tests.
+
+Performance remains an empirical comparison to be completed in C8: the table's construction cost and memory are already known, but a speedup decision requires direct/prepared/lookup/batch/parallel timing on identical inputs. No full-driver timing fraction or trajectory result is available. The new table remains opt-in so its observed workload economics can guide use.
+
+No strong no-go result is proposed or admitted. The missing isotope-native dataset, unsupported Li8/Li9 nuclear closure, and a failed coarse mesh are specific source/model/numerical obligations with constructive next actions, not impossibility theorems. NG1–NG7 therefore have no new exclusion claim to evaluate. The watchdog requirement is met by the actual compiled R7 calculation and the executable C-stage handoff; further unchanged-source audits are unnecessary.
+
+R8 outcome: approve bounded production implementation and scientific tests of the selected candidates, keeping accuracy, source fit scope, isotope approximation, and performance as distinct claims. The original tolerance and aggregate execution budget remain fixed.
+
+## R9 — formal implementation handoff
+
+The active computational statement is: source-faithful direct coefficients and an explicitly selected positive log-linear approximation provide temperature-only H/He and conditional Li6/Li7 event coefficients within the stated provider domains; live state/radiation factors remain in their consumers. H/He R7 sampled error is below 10^-5 after selection of 65537 nodes. Li isotope identity and conservation are exact properties of the selected number-state model, while its shared electronic coefficient equality is an explicit approximation with unquantified isotope-model error.
+
+The code handoff is:
+
+| Component | Input and output contract | Required verification |
+|---|---|---|
+| `LogRateGrid<N>` | Immutable uniform-log grid, positive logs and source-certified structural zeros; direct callback for blocked/outside-table cells | Power law, curved bound example, degenerate grid guard, domain/zero/sign/underflow behavior |
+| `IgmRateTable` | 65537-node default, fifteen independent stored fields, sixteen reconstructed output fields and exact diagnostic predicates | Reuse R7 valid-input evidence; targeted actual CI floor predicate neighbors; scalar/SoA/parallel equivalence |
+| `IgmRateBackend` and `PreparedIgmRates` | Default Direct or explicit table; private exact-temperature binding and evaluator identity | Mismatched prepared temperature rejects; direct prepared values reproduce original source |
+| H/He point and D reuse | Reuse one prepared bundle at the same EOS temperature; retain original density and energy factors and SI/cgs conversions | Original point/RHS and D projection agreement; table event-scale error ≤10^-5; unchanged direct default |
+| Li elemental provider | Actual Voronov/Badnell selected rows, exact source constants, per-process/per-charge domains | Independently substituted primary-row checkpoints; boundary neighbors and signed-DR total positivity |
+| Li6/Li7 wrapper | Required `ElementalElectronicEquality`, separate A/q metadata; isotope-resolved request returns MissingSource | Separate nuclei, baryon-weighted count, charge/electron source, proportionality, zero density; Li8/Li9 pending status |
+| Li table backend | Same source coefficients on the complete-chain common domain; individual cold RR calls remain direct and available | Per-channel sampled relative error ≤10^-5; typed errors and exact structural zeros |
+
+For a conservation residual, normalize by the sum of magnitudes of contributing event terms, not a cancellation-prone net source; a floating-arithmetic target of 64 ε_machine times that scale is appropriate for this small fixed chain. Zero-event cases must be exactly zero. For point-RHS approximation use the R3 absolute event-scale bound. Preserve any stricter existing source test rather than relax it to the table tolerance. No new Jacobian or derivative API is in this handoff.
+
+Timing compares identical independent-temperature arrays after output agreement checks. Report repeated direct, prepared, scalar lookup, SoA batch, and bounded parallel measurements; include construction amortization, full payload 9,109,624 bytes for H/He, and measured RSS separately. Read-only shared tables and sufficiently large chunks reduce duplication. Worker count is selected from measured crossover, with at most four workers in this unit. No SIMD assertion follows merely from the data layout, and no memory-filling goal justifies replicating tables on a large host.
+
+The bounded changed-module harness is valid for module-level scientific/API checks if unrelated full-crate toolchain features are unavailable; its exact included production files must be recorded. Such a harness does not establish a full-crate build or complete driver integration. The independent C9 review must inspect actual production diffs, source rows, raw numerical outputs, and the scope of that harness before admission.
+
+After this unit, the constructive dependency path is: retain the explicit Li6/Li7 charge-state identities → bind a separately sourced Li photo functional to the existing radiation owner → add channel-consistent thermal and emitted-energy moments → reconcile caller-supplied BBN inventory and native state integration → execute matched trajectory/error-budget tests. Li8/Li9 require nuclear-decay and daughter-product accounting before joining that path. These are later scientific dependencies, not new work authorized inside this coefficient unit. The currently running external binary and checkpoints remain unchanged.
+
+R9 outcome: formulas, units, source identity, acceptance criteria, executable module contracts, and remaining full-network dependencies are handed to the code owners. The lower-tier owners perform C1–C10 and return actual evidence for independent C9.
+
+## R10 — theory closeout and coding continuation
+
+The R1–R10 theory track is complete for the active H/He/D acceleration and explicitly conditional Li6/Li7 coefficient scope. Completed work comprises the interpolation and derivative-error derivation; source branch/zero/domain construction; coefficient-versus-density/radiation separation; prepared-state identity; isotope-separated event conservation; immutable table identity; cost/amortization criteria; actual primary Li rows and preceding-PR mapping; independent R6 review; and the compiled R7 H/He failure/refinement/pass experiment. `THEORY_STAGES.json` records this track independently of the ongoing coding track.
+
+The current source baseline is `4583ed342b8476e86e42b023d6de1d0f50820adb`; preceding Li PR151 is `9f455d98e2dd655412b561defff9e41e31dbb50a`. Exact input identities live in `evidence/intake/FRONTIER.json`, `evidence/intake/LI_PRIOR_PR.json`, and `evidence/sources/SOURCE_REGISTRY.json`. Primary selected rows and `data/lithium_coefficients.json` are reusable inputs. `evidence/R6_INDEPENDENT_REVIEW.json` and `evidence/R7_RESULTS.json` bind scientific decisions to inspected and executed artifacts. Per-stage immutable captures and delivery acknowledgements are owned by the delivery lane; their storage evidence does not replace scientific validation.
+
+The explicit scope correction from carbon exploration to Li6/Li7 is preserved in `CONTRACT.json::scope_override`; original R1–R5 packages and carbon exploration remain historical. The old Li6 inventory omission is superseded only for the requested state capacity; no abundance is manufactured. The coarse-grid numerical failure and the Rust 1.94.1 startup failure remain classified separately from the successful refined Rust 1.85.1 probe. The generic-grid versus full-payload byte correction is a packaging/measurement-label correction and changes no numerical result.
+
+Next executable action: the code owners intake this frozen theory contract, adopt the R7 prototype into the owned production modules, implement the Li6/Li7 policy wrapper and table-backed number component, and complete targeted C6–C8 validation plus comparative timings. Reuse R7 valid-input evidence wherever the arithmetic and source dependencies are unchanged; test only new guards, adapters, policy branches, and Li paths. Independent C9 then determines scoped code/science admission from those actual outputs. The 90 s wall/180 s CPU aggregate scientific allowance is cumulative and is not reset at this handoff.
+
+The full user task remains in progress until C1–C10, independent review, and delivery finish. Full Li thermal/photo closure, BBN/native network integration, and cosmological trajectory accuracy retain the explicit future dependency path in R9. No active external native execution is started, restarted, or modified by this theory completion.

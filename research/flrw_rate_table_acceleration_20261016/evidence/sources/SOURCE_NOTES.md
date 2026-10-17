@@ -1,53 +1,77 @@
-# Primary coefficient intake: elemental carbon
+# Active primary coefficient intake: lithium
 
-The admitted provider ingredients are the actual ground-state elemental-carbon electron-impact ionization (CI), radiative recombination (RR), and dielectronic recombination (DR) fit coefficients. Carbon charges q=0,...,6 form a complete adjacent charge chain for these three declared processes. This is not a complete atomic cooling/radiation model, and it is not an isotope-native 12C or 13C dataset.
+The user's scope correction before R6 selects lithium and its ions/isotopes as the only added nuclei. Earlier carbon source notes/registry are preserved without modification in `../../historical_unselected/carbon_sources_R5/`; carbon coefficient files and R1–R5 checkpoint packages remain historical unselected evidence. They are not active provider inputs.
 
-The exact source identities, hashes of downloaded original tables, bibliographic references, and source-version dates are in `SOURCE_REGISTRY.json`. Small exact selected rows and a normalized factual schema are in `../../data/`. Original full tables were downloaded only as scratch intake inputs. Their hashes identify the upstream snapshots; selected row files are exact source lines. JSON source-line numbers are one-based original-file lines. Missing optional RR C,T2 columns mean C=0; JSON records these zeros explicitly.
+The actual active electronic data are ground-state elemental-Li electron-impact ionization (CI), radiative recombination (RR), and dielectronic recombination (DR) fit coefficients. Charges q=0,...,3 form a complete adjacent charge chain for these declared processes. The upstream fit tables do **not** identify isotope mass number. `../../data/lithium_coefficients.json` therefore records `isotope_specific=false`, not isotope-native 6Li/7Li authority. Any isotope-native population integration must preserve isotope identity separately and explicitly declare whatever shared-electronic-rate approximation is authorized.
 
-## Equations and conventions
+Exact source snapshot identities/hashes and primary references appear in `SOURCE_REGISTRY.json`. The actual selected source lines are `badnell_lithium_rr_rows.txt`, `badnell_lithium_dr_rows.txt`, and `voronov_lithium_ci_rows.txt` in `../../data/`. JSON source-line numbers are one-based original-file lines. No full upstream source code or papers were copied into the repository.
 
-For CI, use Voronov (1997), DOI 10.1006/adnd.1997.0732, with U=I/(k_B T):
+## CI convention and selected rows
 
-C_q(T) = A (1 + P sqrt(U)) U^K exp(-U)/(X+U).
+Voronov (1997), DOI 10.1006/adnd.1997.0732, uses U=I/(k_B T):
 
-I is the tabulated ionization energy in eV, A and C_q have units cm^3 s^-1, and P,X,K are dimensionless. The official `cfit.f` evaluator uses k_B=8.617385e-5 eV/K. Preserve that literal for a source-faithful evaluator; do not label it current CODATA. Its implementation truncates U>80 to zero. This truncation is irrelevant inside each admitted CI fit domain and is not a reason to extrapolate to cold temperatures. The original table N is the *initial* number of bound electrons: q=Z-N, with q -> q+1.
+C_q(T)=A (1+P sqrt(U)) U^K exp(-U)/(X+U).
 
-For RR, use Badnell's official Kelvin table, version 20230511:
+I is eV; A and C_q are cm^3 s^-1; P,X,K are dimensionless. The original evaluator `https://www.pa.uky.edu/~verner/dima/col/cfit.f` uses k_B=8.617385e-5 eV/K. Preserve that historical literal for source fidelity; it is not a current-CODATA assertion. The evaluator truncates U>80 to zero, but every admitted Li CI domain lies below that cutoff. This does not license cold extrapolation. Original N is initial bound-electron count, q=Z-N, and CI maps q -> q+1.
+
+| Initial q | I/eV | P | A/(cm^3 s^-1) | X | K | Tmin/eV | Tmax/keV |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 0 | 5.4 | 0 | 1.39e-7 | 0.4380 | 0.41 | 1 | 20 |
+| 1 | 75.6 | 1 | 2.01e-9 | 0.2090 | 0.23 | 4 | 20 |
+| 2 | 122.4 | 1 | 9.60e-10 | 0.5820 | 0.17 | 5 | 20 |
+
+## RR convention
+
+Badnell's official Kelvin table version 20230511 uses
 
 b(T)=B+C exp(-T2/T),
 
-alpha_RR(T)=A / [sqrt(T/T0) (1+sqrt(T/T0))^(1-b(T)) (1+sqrt(T/T1))^(1+b(T))].
+alpha_RR(T)=A/[sqrt(T/T0) (1+sqrt(T/T0))^(1-b(T)) (1+sqrt(T/T1))^(1+b(T))].
 
-A and alpha_RR have units cm^3 s^-1; T,T0,T1,T2 are Kelvin; B,C are dimensionless. Do not accidentally treat b(T) as a constant in a temperature derivative when C is nonzero. Badnell N is also initial bound-electron count, q=Z-N, so RR maps q -> q-1. M=1 selects the initial ground level; W is preserved source metadata, not a multiplicative rate factor.
+A and alpha_RR are cm^3 s^-1; all temperatures are Kelvin; B,C are dimensionless. Differentiate the temperature dependence of b(T) when C is nonzero. Badnell N is initial electron count; RR maps q=3-N -> q-1. M=1 selects the initial ground level. W is source metadata, not a rate multiplier. Absent optional C,T2 columns mean C=0 and are recorded as zeros in JSON.
 
-For DR, use Badnell's official Kelvin table, version 20230512:
+| Initial q | N | A/(cm^3 s^-1) | B | T0/K | T1/K | C | T2/K |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 2 | 8.700e-12 | 0.3640 | 1.470e2 | 7.153e6 | 0.1508 | 7.154e5 |
+| 2 | 1 | 9.349e-11 | 0.6916 | 3.470e1 | 7.329e6 | 0.0351 | 6.293e5 |
+| 3 | 0 | 2.867e-10 | 0.7493 | 2.108e1 | 6.268e6 | 0 | 0 |
+
+## DR convention
+
+Badnell's official Kelvin table version 20230512 uses
 
 alpha_DR(T)=T^(-3/2) sum_i c_i exp(-E_i/T).
 
-E_i is Kelvin and c_i has units cm^3 s^-1 K^(3/2); the rate is cm^3 s^-1. The source places all c rows before all E rows; pair on (Z,N,M,W), not line proximity. Preserve negative fit coefficients: carbon initial N=2 has c3=-7.843e-4. Individual fit terms are not separate positive reaction channels. Rate positivity applies to their total. Bare C6+ has no core electron to excite, hence DR is a structural zero, not a missing tabulated channel filled by an approximation.
+E_i is Kelvin; c_i is cm^3 s^-1 K^(3/2); alpha_DR is cm^3 s^-1. Source c rows and E rows occupy separate table sections and must pair on (Z,N,M,W).
 
-## Temperature domains
+For Li+ (q=1,N=2): c=[2.941e-5,6.068e-5,-7.753e-7], E=[6.345e5,7.024e5,8.271e5] K.
 
-CI initial q=0,1,2,3,4,5 has source Tmin = 1,1,2,3,20,20 eV, respectively. Every carbon CI row has Tmax=20 keV. Domain checks must use each row independently.
+For Li2+ (q=2,N=1): c=[1.451e-4,5.789e-3,1.889e-5], E=[8.529e5,1.056e6,1.170e7] K.
 
-Both Badnell documentation pages describe their standard ADAS tabulation temperatures as [10 q^2, 10^7 q^2] K, where q is the initial target charge. Adopt this conservatively as the supported interval for each RR/DR channel; it is not an independently verified universal fit-accuracy bound. In particular RR q=1 starts at 10 K, q=2 at 40 K, and q=6 at 360 K. A complete carbon CI+RR+DR-chain calculation shares only [20/(8.617385e-5), 10^7] K. Do not impose that hot lower bound on an independent cold RR query, or silently allow a complete CI chain below it. The source warns of relativistic distribution effects above approximately 10^8 K; the common chosen interval is below that warning regime.
+Retain the negative fitted c3 for Li+. Individual fit terms are not physical channels; positivity applies to their sum. Bare Li3+ has no core electron to excite and its DR is a structural zero. The applicable DR literature is the H-like initial-target sequence (Badnell, A&A 447, 389, 2006) and the He-like initial-target sequence (Bautista & Badnell, A&A 466, 755, 2007, DOI 10.1051/0004-6361:20077056). The lithium-*isoelectronic* DR paper concerns initial three-electron ions and must not be mistaken for this elemental-lithium chain.
 
-These are low-density ground-level Maxwellian-electron coefficients. Metastable mixtures, three-body effects, DR density suppression, charge exchange, and non-Maxwellian distributions require additional models or data.
+## Per-channel temperature domains
 
-## Radiation, cooling, and isotope boundary
+CI source Tmin values for q=0,1,2 are 1,4,5 eV, respectively; Tmax=20 keV for all three. Convert each bound with the source k_B literal above.
 
-A photoionization rate is a radiation integral, Gamma_q=4 pi integral[J_nu sigma_q(nu)/(h nu)] dnu, and cannot be promoted to a T-only coefficient without a separately frozen J_nu and radiative-transfer convention. CI energy loss I*C_q can be derived as the electron energy removed into ionization potential under an explicitly stated energy bookkeeping convention; it is not the total carbon cooling coefficient. Number recombination coefficients alone do not specify emitted-energy moments, line cooling, or a complete thermal closure.
+The Badnell official pages specify standard ADAS tabulation extent [10q^2,10^7 q^2] K for initial target charge q. This is the conservative supported range adopted here, not a separately proven universal fit-accuracy envelope. RR q=1: [10,1e7] K; q=2: [40,4e7] K; q=3: [90,9e7] K. DR q=1 and 2 use the same respective intervals; bare-ion DR is structural zero for T>0. The full CI+RR+DR chain shares [5/(8.617385e-5),1e7] K. Cold RR queries retain their own domains and do not authorize cold CI. The common interval is below the source's approximately 1e8 K relativistic-distribution warning.
 
-The source tables identify Z, electron count and initial level, not isotope mass number. Any use with 12C/13C population labels would require a declared isotope-independent approximation or new isotope-native data and is outside this provider's authority. An abundance-weighted atomic mass is also not supplied here.
+## Isotope evidence and precise limitation
 
-## Reuse and discovery assessment
+Bushaw et al., *Ionization Energy of 6,7Li Determined by Triple-Resonance Laser Spectroscopy*, Phys. Rev. A 75, 052503 (2007), DOI 10.1103/PhysRevA.75.052503, report Li7 ionization energy 43487.15940(18) cm^-1 and an isotope shift labelled IS(EI)7,6 of 18067.54(21) MHz. The inspected abstracts do not explicitly define the subtraction order, so only the magnitude is admitted and the sign remains unresolved. The author institution's primary record is https://www.pnnl.gov/publications/ionization-energy-li-6li-7-determined-triple-resonance-laser-spectroscopy. The publisher abstract was also inspected at https://journals.aps.org/pra/abstract/10.1103/PhysRevA.75.052503. These measured isotope inputs, reported uncertainties, sign limitation, and symbolic SI conversion recipes are preserved in `../../data/lithium_isotope_thresholds.json`; no Li6 absolute threshold is inferred and no Voronov fit parameter is changed.
 
-SciSpace was used for literature discovery and Exa for primary-source discovery and inspection. SciSpace returned a misleading 2022 metadata year for the Verner-Ferland 1995 arXiv/1996 journal work; primary author pages controlled the bibliographic decision. Verner-Ferland RR alone covers only three carbon recombination transitions and therefore was not selected as a full-carbon provider. Badnell fills the actual full chain; no hydrogenic replacement was invented.
+This establishes a real isotope difference. Its energy form is h times 18067.54 MHz, which can enter a specifically derived threshold-sensitivity diagnostic. It does not establish isotope-resolved CI, RR, or DR rate fits and does not bound isotope effects on DR resonance positions/strengths. A neutral threshold shift cannot be promoted into a rigorous error bound for every Li ionic channel. No empirical bound on the complete shared-electronic-rate approximation was admitted by this intake. A shared fit applied to separately conserved 6Li/7Li populations must remain an explicitly named model approximation with its own claim ceiling. It must never be described as native isotope-specific coefficients.
 
-No explicit SPDX or blanket redistribution license was found on the inspected author pages. Badnell tables have copyright attribution. The authors publicly offer the fit tables for plasma modelling. This intake preserves a small factual selected coefficient subset, attribution, source identity and independently authored schema/notes; it does not copy upstream code or full papers, or assert that the whole upstream database is public domain. Licensing of upstream software/database redistribution remains unspecified.
+SciSpace and Exa searches found isotope-resolved spectroscopy and laser photoionization studies, but no complete isotope-resolved thermal CI/RR/DR table suitable for direct ingestion. Laser isotope selectivity is not a T-only thermal rate provider. An ion-atom isotope charge-exchange result encountered in discovery was not used as evidence for electron CI/RR/DR isotope equality.
 
-## Additional source coverage, not yet admitted implementation
+## Other boundaries and reuse
 
-Mechanical inspection of the same exact downloaded tables found full ground-state CI/RR/DR charge coverage for Li, N, O, Ne, Mg, Si, and S in addition to C. Their CI common lower limits are respectively 5,30,40,70,100,200,200 eV, with a shared upper CI bound of 20 keV. Their common supported RR/DR upper bound remains 10^7 K because q=1 is present. Per-channel domains and source-series bibliographic mapping still apply. These are ready coefficient candidates, not implemented or isotope-native claims. Fe lacks RR and DR initial N=16,17,19,20,21,22,23,24,25 in these tables, so this source combination does not supply a complete Fe chain. No gap is to be filled silently.
+These are low-density initial-ground-level Maxwellian-electron coefficients, excluding metastable mixtures, finite-density DR suppression, three-body recombination, charge exchange, molecular channels, and non-Maxwellian electrons. Photoionization requires Gamma_q=4 pi integral[J_nu sigma_q(nu)/(h nu)] dnu and is not T-only absent a frozen radiation field. Recombination number coefficients are insufficient for emitted-energy moments or full cooling. No Li photo/cooling model is inferred from these fits.
 
-Only source parsing and coverage inspection were performed during intake. No scientific rate evaluation, simulation or benchmark was run by the source-intake agent.
+No explicit SPDX or blanket redistribution license was identified on the inspected author tables/pages. Badnell headers carry copyright attribution. The authors offer numerical fit tables for plasma modelling. This unit retains only a small factual coefficient subset with attribution and independently authored schema/provenance. It asserts no permissive software license or blanket redistribution permission for upstream code/databases.
+
+All source work was parsing, discovery and documentary assessment; no rate evaluation, numerical simulation or benchmark was executed by the source-intake agent. Prior-PR isotope authority is being assessed separately by the frontier owner.
+
+## Final selected isotope policy
+
+The root contract authorizes mandatory explicit opt-in `ElementalElectronicEquality` for A=6 or A=7, preserving separate nuclear identities and charge populations q=0,...,3. Native isotope-resolved coefficient requests return `MissingSource`. This does not change `isotope_specific=false` for upstream coefficients or supply an empirical full-error bound. Li8/Li9 remain excluded pending nuclear-decay closure. The preceding PR authority is recorded in `../intake/LI_PRIOR_PR.json`.

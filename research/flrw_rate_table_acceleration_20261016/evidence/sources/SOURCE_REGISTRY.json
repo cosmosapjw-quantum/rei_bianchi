@@ -1,18 +1,15 @@
 {
-  "schema": "rei.primary_rate_sources.v1",
+  "schema": "rei.primary_lithium_rate_sources.v1",
   "retrieval_date_utc": "2026-10-16",
   "frozen_repo_base": "4583ed342b8476e86e42b023d6de1d0f50820adb",
   "selected_element": {
-    "symbol": "C",
-    "Z": 6,
+    "symbol": "Li",
+    "Z": 3,
     "charges": [
       0,
       1,
       2,
-      3,
-      4,
-      5,
-      6
+      3
     ],
     "isotope_specific": false,
     "mass_number": null
@@ -81,7 +78,7 @@
         "https://amdpp.phys.strath.ac.uk/tamoc/DR/",
         "https://amdpp.phys.strath.ac.uk/tamoc/DR/pub.html"
       ],
-      "carbon_initial_sequence_references": [
+      "lithium_initial_sequence_references": [
         {
           "N": 1,
           "authors": "N. R. Badnell",
@@ -94,24 +91,6 @@
           "journal": "A&A 466, 755\u2013762 (2007)",
           "doi": "10.1051/0004-6361:20077056",
           "title": "Dielectronic recombination data for dynamic finite-density plasmas. XII. The helium isoelectronic sequence"
-        },
-        {
-          "N": 3,
-          "authors": "J. Colgan, M. S. Pindzola and N. R. Badnell",
-          "journal": "A&A 417, 1183\u20131188 (2004)",
-          "title": "Dielectronic recombination data for dynamic finite-density plasmas. V. The lithium isoelectronic sequence"
-        },
-        {
-          "N": 4,
-          "authors": "J. Colgan, M. S. Pindzola, A. D. Whiteford and N. R. Badnell",
-          "journal": "A&A 412, 597\u2013601 (2003)",
-          "title": "Dielectronic recombination data for dynamic finite-density plasmas. III. The beryllium isoelectronic sequence"
-        },
-        {
-          "N": 5,
-          "authors": "Z. Altun, A. Yumak, N. R. Badnell, J. Colgan and M. S. Pindzola",
-          "journal": "A&A 420, 775\u2013781 (2004)",
-          "title": "Dielectronic recombination data for dynamic finite-density plasmas. VI. The boron isoelectronic sequence"
         }
       ]
     }
@@ -135,31 +114,47 @@
     "voronov_constant_policy": "Retain historical official evaluator literal for source fidelity; this is not asserted to be current CODATA.",
     "CI_Tmin_eV_by_initial_charge": [
       1,
-      1,
-      2,
-      3,
-      20,
-      20
+      4,
+      5
     ],
     "CI_Tmax_keV": 20,
     "RR_DR_supported_interval_K": "[10*q^2, 1e7*q^2] for initial charge q>0",
     "RR_DR_interval_evidence": "Official ADAS standard tabulation extent; conservative supported range, not an independently certified universal fit-accuracy envelope.",
     "complete_chain_interval_K": [
-      "20 / 8.617385e-5",
-      10000000.0
+      "5 / 8.617385e-5",
+      10000000
     ]
   },
   "claim_limits": [
-    "Elemental carbon only; no 12C/13C isotope-specific rate authority.",
+    "Elemental Li coefficients only; mapping to 6Li/7Li requires explicit shared electronic approximation or isotope-native rate data.",
     "Ground M=1 only; metastable and finite-density population effects excluded.",
     "CI+RR+DR network complete only for these declared processes; no claim of complete atomic microphysics.",
     "No photoionization, external radiation Jnu, charge exchange, molecular chemistry, cooling/emissivity or recombination energy-moment provider admitted.",
     "No coefficient values or analytic fits invented. Bare-ion DR structural zero is explicit."
   ],
   "files": [
-    "data/badnell_carbon_dr_rows.txt",
-    "data/badnell_carbon_rr_rows.txt",
-    "data/carbon_coefficients.json",
-    "data/voronov_carbon_ci_rows.txt"
-  ]
+    "data/lithium_coefficients.json",
+    "data/badnell_lithium_rr_rows.txt",
+    "data/badnell_lithium_dr_rows.txt",
+    "data/voronov_lithium_ci_rows.txt"
+  ],
+  "scope_override": "User correction before R6: only lithium and lithium ions/isotopes. Carbon source intake preserved as historical unselected; no active C provider.",
+  "historical_source_registry": "historical_unselected/carbon_sources_R5/SOURCE_REGISTRY.json",
+  "isotope_evidence": {
+    "status": "Measured isotope shifts found; no isotope-resolved CI/RR/DR coefficient table admitted.",
+    "primary_reference": {
+      "title": "Ionization Energy of 6,7Li Determined by Triple-Resonance Laser Spectroscopy",
+      "authors": "B. A. Bushaw, W. N\u00f6rtersh\u00e4user, G. W. F. Drake, H.-J. Kluge",
+      "year": 2007,
+      "doi": "10.1103/PhysRevA.75.052503",
+      "url": "https://www.pnnl.gov/publications/ionization-energy-li-6li-7-determined-triple-resonance-laser-spectroscopy",
+      "Li7_ionization_energy_cm_inverse": "43487.15940(18)",
+      "reported_IS_EI_7_6_MHz": "18067.54(21)",
+      "shift_direction": "Unresolved: inspected abstracts do not explicitly define subtraction order.",
+      "isotope_threshold_donor": "data/lithium_isotope_thresholds.json"
+    },
+    "admission_boundary": "Ionization threshold isotope shift alone does not bound RR/DR isotope changes or justify assigning elemental data as native isotope data. Shared electronic coefficients remain an explicitly named modelling approximation, not a measured equality.",
+    "authorized_model_policy": "Mandatory explicit opt-in ElementalElectronicEquality for separately conserved 6Li/7Li q=0..3. Native isotope-resolved coefficient requests return MissingSource. Li8/Li9 excluded pending nuclear-decay closure.",
+    "prior_PR_authority_record": "evidence/intake/LI_PRIOR_PR.json"
+  }
 }

@@ -9,7 +9,7 @@
 use crate::deuterium_charge_exchange::{
     step_frozen_rates, DhEnergyDefect, DhError, DhState, DhStep, Savin2002,
 };
-use crate::igm_rates::igm_rates;
+use crate::rate_table::{IgmRateBackend, PreparedIgmRates};
 use crate::{Absorber, AtomicProvider, ForwardError, HHeModel, IsotopeNumberState, IsotopeSpecies};
 
 pub const MODEL_ID: &str = "GRACKLE_3_4_1_H_EQUALITY_D_ATOMIC_V1";
@@ -167,8 +167,17 @@ impl DAtomicProvider {
         if !(1.0..=1e6).contains(&temperature_k) {
             return Err(DAtomicError::TemperatureDomain);
         }
-        let h = igm_rates(temperature_k).map_err(|_| DAtomicError::HydrogenProvider)?;
-        Ok(DAtomicRates {
+        let prepared = IgmRateBackend::Direct.prepare(temperature_k)
+            .map_err(|_| DAtomicError::HydrogenProvider)?;
+        Ok(self.rates_from_prepared(&prepared))
+    }
+
+    /// Project the selected H-equality channels from the same prepared bundle.
+    /// Its temperature and numerical evaluator remain available on the bundle.
+    pub fn rates_from_prepared(self, prepared: &PreparedIgmRates) -> DAtomicRates {
+        let temperature_k = prepared.temperature_k();
+        let h = prepared.rates();
+        DAtomicRates {
             temperature_k,
             ci_m3_s: h.ci_cm3_s[0] * 1e-6,
             rr_case_a_m3_s: h.rr_cm3_s[0] * 1e-6,
@@ -178,7 +187,7 @@ impl DAtomicProvider {
             ce_cap_j_m3_s: h.diagnostics.ce_cap_erg[0] * 1e-13,
             model_id: MODEL_ID,
             source_commit: GRACKLE_COMMIT,
-        })
+        }
     }
 
     pub fn cross_section_m2(self, energy_ev: f64) -> Result<f64, DAtomicError> {
