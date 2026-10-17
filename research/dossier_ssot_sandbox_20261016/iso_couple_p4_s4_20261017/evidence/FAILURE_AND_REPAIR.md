@@ -1,0 +1,8 @@
+# Bounded failures and repairs (P4/S4)
+
+- First Rust test compile: two separately copied `RetardedControls` types in old and new bridge caused `E0308`. Removed duplicate P4/S4 declaration and reused the original P4/S3 public `RetardedControls`; followed by five newly passing tests. **Implementation defect, resolved.**
+- First strict Clippy: `collapsible_if` and `map_entry` in newly added modules. Replaced nested conditional and applied entry-vacant construction; no owner source edited. **Styling defect, resolved.**
+- First matched time benchmark: root detector evaluated ray endpoint energies redundantly and cached implementation measured ~20% slower. Introduced `split_by_thresholds_from_energies` to reuse exact endpoint energy, then capped exact-bit rate memoization. Latest 3-run alternating-order N4/8/16 median speed ratios 0.962/0.977/1.019 (old/new). **Large slowdown resolved, general speedup NOT proven.**
+- First replay scientific validator: CSV writer includes leading whitespace before the step number, validator used literal `step=='12'` and raised `StopIteration`. Changed to integer parsing `int(step)==12`, preserving all numerical evidence. **Validator representation bug resolved, no science tolerance changed.**
+- Project nonzero source-age compression remains a genuine numerical/model-design obligation. Existing exact-f64-zero retirement is not that general solution. No manufactured claim that all physical photon tails are exactly zero; some underflow in binary64.
+- Older P4/S3 N64 threshold-split timeout retained as historical evidence; not rerun here as production EoR gate.
