@@ -1,0 +1,17 @@
+# PHYS62 C5–C8: fixed-P/Q screened first Born on-shell continuation
+
+Parent PHYS62 R5 PR107 head d0da1c3a4143f1c3a6680ea5ea94385e2c774e8a; R5 establishes Coulomb j_l Abel limit and the unweighted L2 Poisson norm blowup as tau↓0 for a fixed ell.
+
+## New original noncentral screened construction
+At physical E=49/200+i*tau/2 Hartree, tau>=0, use original immutable h=-Delta/2-1/r-(1+1/s)e^-2s, s=|x-0.7 zhat|, original eta=Fy and xi=Fy-phi unchanged. Original frozen NPZ SHA256 f1bd3074950163960cc2011682d013af60f9b17c471bea72ecbc2ffb19e6855d. For each FIXED l,l',m, Coulomb outgoing normalized p_l(tau,r)=H_l^+(-1/k_tau,k_tau r)/H_l^+(-1/k_tau,k_tau 27) is analytic near the positive real k boundary. Original angular screened V_lm,l'm(r) is bounded by delta exp[-2(r-27)] with delta<3e-23. The Coulomb fixed-l uniform near-upper-sector outgoing asymptotic provides a polynomial/exponential envelope, so dominated convergence proves the finite-mode original noncentral first Born integral D1_l,l',m(tau)=int_27^infty p_l(tau,r) V_l,l',m(r)p_l'(tau,r)dr has a real-axis limit. This does NOT establish full infinite-angular screened DtN Z_S(E+i0), its Q/P Schur inverse or sigma(E).
+
+## Executed and grounded
+Real original offcentre angular coupling (not central replacement), both outgoing factors WITHOUT complex conjugation, tau in {.01,.002,.0005,0}, m=0,1,2, radial GL12×angular GL128 [27,39]; independent tau0 GL18×192 comparison; noncertifying numerical. Tau0 m0 at 12×128: 2.7660417647442462e-24+4.5006806053936095e-25i; 18×192: 2.7660422460142386e-24+4.5006767301594555e-25i; relative grid difference 2.20486605e-7. Original source checked SHA.
+
+**Fresh executed 46/46 scoped pytest PASS**, source-locked producer exit0, original R5 22 tests + C5 24 tests. Connected Wolfram exact Gaunt 21/sqrt1763 and integral_(0,infty)(1+x)^2 e^-2x dx=5/4 PASS. These checks do not certify numerical quadrature or radial tail. Source screen L1 tail delta exp(-24)/2 is NOT Born tail without explicit p_l envelope constant. Full historical WU test suite NOT_RUN, NCP NOT_REQUIRED, native subagents NOT_RUN.
+
+## True durable source backup
+Full original NPZ + parent PHYS61 sources + full PHYS62 R5/C5 code, original tests, raw stdout/exit/resource, reports, DAG and SHA manifest in portable ZIP WU088_HH_PHYS62_C5C8_SOURCE_EVIDENCE_20261016.zip, **55,802 bytes**, SHA256 **85300fda37514b6841984f894972566e39d8354eb06bc65b210cbac07ff13f25**, 37 entries, 36 manifest payload hashes. Dropbox /WU088_HH/WU088_HH_PHYS62_C5C8_SOURCE_EVIDENCE_20261016.zip and GDrive /Google Drive/WU088_HH/PHYS62_C5C8_20261016/ each uploaded, independently RESTORE_VERIFIED byte-for-byte, SHA/ZIP CRC, manifest and original source. This Git commit includes only the tested short standalone quick reproducer, this report and DAG because direct individual file archive export tool returned container_session_expired; complete source is in the two restored clouds. Full science test code not falsely claimed as Git-committed.
+
+## DAG next
+PHYS62 R5 central Abel flux PROVED, C5–C8 original fixed-pair Born real-axis continuity PROVED, numerical finite-grid NONCERTIFYING. PHYS63 all-angular weighted on-shell Coulomb Poisson/LAP is READY_THEORY; original noncentral infinite angular screened on-shell DtN and full P-Q, original driven xi/incoming adjoint, sigma(E), identical-H Maxwellian k_HH(T) OPEN/HOLD; rei_bianchi HH_R10 OFF. No sibling mutations.

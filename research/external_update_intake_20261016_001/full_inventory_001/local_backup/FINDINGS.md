@@ -1,0 +1,43 @@
+# Local backup inventory and intake findings
+
+## Inventory boundary
+
+`ROOTS.tsv` defines 28 selected local roots: BASS dossier/backup roots, WU088 backups, named REI backup folders and archive/handoff packages, and REC archive/handoff packages. This is a bounded inventory of those roots, not a claim about all Dropbox content. Full scope and exclusions are recorded in `SCOPE_AND_EXCLUSIONS.md`.
+
+The inventory contains 6,358 files/filesystem symlinks totaling 33,294,078,133 bytes. Metadata includes exact absolute path, byte size, nanosecond mtime as UTC `Z`, raw nanoseconds, file kind, and mode. There were zero root/walk/stat errors. All files have a content-intake status in `FILE_INTAKE_STATUS.jsonl`; files not chosen for bounded metadata intake remain explicitly `METADATA_INVENTORIED_CONTENT_NOT_READ`.
+
+Archive member metadata index: 2,529 candidate archives; 2,470 ZIP/TAR containers indexed; 54 unsupported formats recorded; five indexing errors; 325,633 member rows. The index did not extract members, compute archive CRCs, or hash archives. The five error paths and messages are in `ARCHIVE_ERRORS.jsonl`; unsupported formats are retained in `ARCHIVE_INDEX.jsonl`. No corrupt archive was repaired or retried. Four previously verified SOURCE012 backup hashes/receipts were reused without rehash.
+
+## Newly dated package identities
+
+`BASS_BACKUPS/REI_BASS_LONGSTEP_CAUSAL_20261016_001` contains source and report tarballs. Bounded recovery metadata identifies repository `rei_bianchi`, required base `6f0864e017e2d1df8cae932263b7eebc917df302`, included recovery head `24dc6893182167dd9fd25fb18d70707d52b9229b`, and report-manifest final head/tree `1e6a3dd60d69b22483d07a30541736018a69dea8` / `7b2a56f468bc72cfa8a72d8fcfe5b07f1693ecc2`. The manifest-declared report/source bundle hashes are recorded in `PACKAGE_INTAKE.json`; they were not recomputed. The recovery metadata reports its restoration test exit 0; it was not rerun.
+
+`BASS_BACKUPS/BASS_PR168_NONLRS_FD96_20261016_001` contains source and report tarballs. Bounded recovery metadata identifies repository `bass`, required base `fe48e9a90a14bc6bad09941763a15aad34505e2c`, included recovery head `b1163f288a791d3f161b3f6a3ac6eaa9be6d5d8c`, and report-manifest final head/tree `03a01d21ed21e7d32737ca5e5f6d889a7203aa70` / `824665c988329bf36262a8609cea3de931cfe1b1`. Manifest-declared bundle hashes are recorded but were not recomputed.
+
+Each package carries a small report bundle, a manifest and a recovery bundle/base record. No bounded review document was present in the indexed package members. Bundle contents and code were not inspected, so review state, result details, and actionable integration are `NOT_EVALUATED`; these identities do not establish reviewed code or adoption.
+
+## Difference from known refreshes
+
+Refresh005 records REI151 head `edead5026fdcc4217a9caec5106f7839c6aec5a5` as synthetic unit5 only and REC99 head `a5e92bd17f1c0a1fd331ee203405d3971c444efb` as an unbound/unadopted q0z20 candidate, with production/isotope activation absent. Refresh006 records REI151 observed head `232df074d97cd699238db891ca015caef12a82ea`; unit6 focused tests were provider-reported, physical H/NCP actions were zero, actual checkpoint remained NOT_RUN, and refinement remained HOLD. Source012 static references were complete 62/62 while scientific reference remained HOLD.
+
+Refresh007 keeps SOURCE012 frozen and records a separate scoped Thermal CX component plus rate work at R1-R4 complete, R5 next, C1-C10 pending; no SOURCE012 runtime-input, source/domain acceptance, accuracy, speedup, or matched-trajectory result was supplied. The current `external_update_intake_20261016_001` has refresh005, refresh006 and refresh007 directories; no refresh008 directory was present at inventory time.
+
+The PR167 and PR168 backup manifests therefore add two new external bundle identities after the refresh005-007 identities. Their code, report-bundle contents, existing review state and integration relevance were not established by this bounded metadata intake.
+
+## Root coverage, packaging issues, and new-package deltas
+
+The original 6,358 named-root rows represent 6,358 unique absolute paths; there are zero duplicate rows from root overlap, and each row belongs to one of the 28 enumerated roots. The supplemental 497 loose package files are outside those roots, producing a current 6,855-path union totaling 37,424,473,370 bytes (the initial named-root snapshot remains separately recorded as 6,358 paths / 33,294,078,133 bytes). Per-root record counts/bytes/archive statuses are in `ROOT_COVERAGE.tsv`. This remains the selected-root scope in `ROOTS.tsv`, not a complete Dropbox inventory. The original member index has a 3,736,500-byte gzip copy at `ARCHIVE_MEMBERS.tsv.gz`; its 71,745,224-byte TSV remains intact (325,633 member rows). The supplemental member index has a 1,472,004-byte gzip copy at `LOOSE_ARCHIVE_MEMBERS.tsv.gz`; its 31,108,237-byte TSV remains intact (152,774 rows). Combined, 2,916 ZIP/TAR containers have 478,407 member rows. `PUBLIC_DELIVERY_MANIFEST.tsv` directs delivery to gzip copies for both oversized originals.
+
+All five errors in `ARCHIVE_ERRORS.jsonl` are observed packaging/readability issues, not scientific-integrity failures. None is a selected immutable input for the current SOURCE012 build integration. If one becomes a required input later, the effect is a scoped missing/unreadable input for that route. Exact paths and classification are in `NEW_PACKAGE_STATUS.json`.
+
+Bounded intake of newer selected packages is recorded in `NEW_PACKAGE_STATUS.json`. HE24 documents a frozen-cell source-timing comparison while temporal extension/full EoR remain HOLD. HE27 C9 has the existing scoped implementation PASS and age/time/spectral HOLD; the coordinator reports a positive reference is now available, without this inventory reading the later pilot result JSON. CR C19 remains a separate local companion calculation with same-time PR150 comparison READY_NEXT and global EoR HOLD. WU088 HH PHYS50 leaves the physical outgoing high-channel boundary unknown and HH_R10 production OFF. None supplies SOURCE012 runtime inputs or authorizes adoption. PR170/PR171 source/results were not duplicated because the coordinator reports them already restored in the active workflow.
+
+## Supplemental loose package file pass
+
+To cover transport archives outside the named backup roots, a separate scan selected only archive/bundle extension files across 14 explicit relevant roots (plus direct Dropbox top-level files), pruned `.git`, targets, caches, node_modules and virtualenvs, and did not inventory ordinary active source/data files. It found 3,079 unique archive/bundle candidate paths: 2,582 already occurred in the original named-root inventory and 497 are new unique paths. Of the 497 new paths, all 446 ZIP/TAR containers were indexed without extraction; this added 152,774 member metadata rows and produced zero index errors. The remaining 51 bundle/patch/diff files (4/30/17) remain listed and unopened. The initial 54 unsupported archive formats remain recorded separately. Per-root counts are in `LOOSE_ROOT_COVERAGE.tsv`; exact files/mtime/size are in `LOOSE_PACKAGE_FILES.tsv`.
+
+The coordinator's three examples are accounted for: `REI_LRS_CASEB_THERMAL_V4_20261016.zip` (REI project root), `REI_R9_NCP_HANDOFF_20261016.tar.gz` (REI project root, with same-sized separately listed copy already under the BASS dossier), and `rei_rux_cc_bundle_20261012_r3.zip` (REI project root, with same-sized separately listed copy under the BASS dossier). Same size is not treated as byte identity. Bounded document status for the LRS V4 and R9 packages, and metadata-only status for the RUX CC bundle, are in `NEW_PACKAGE_STATUS.json`.
+
+The supplemental unique paths add 497 files and 4,130,395,237 bytes to the original 6,358 path / 33,294,078,133-byte snapshot. Current union totals are recorded in `INVENTORY_RECEIPT.json`; the original named-root snapshot fields are preserved unchanged.
+
+Additional post-refresh package evidence is summarized in `NEW_PACKAGE_STATUS.json`: the later rate-table archive DAG records R1-R10 complete / C1 next (beyond refresh007's R5-next snapshot); CR C20 and C21C remain scoped local results with convergence/common-IC limits; HE27 positive-reference availability is coordinator-reported while age_time_spectral remains HOLD; PHYS60/61 do not turn HH_R10 on; R9 Unit8 Gamma Transfer is a scoped local implementation review with NCP/refinement not run; and LRS V10 has a scoped experiment pass with source-on second-order convergence HOLD. These later package statements have not been promoted into canonical coordinator state here.
