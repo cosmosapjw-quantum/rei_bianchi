@@ -1,0 +1,83 @@
+{
+  "schema": "rei.r9.unit8.independent_implementation_review.v1",
+  "decision": "SCOPED_PARTIAL_RELEASE_A_KINETICS_HOLD",
+  "reviewer": {
+    "requested": "Astra",
+    "observed": "UNKNOWN",
+    "role": "independent read-only scientific reviewer"
+  },
+  "lane_decisions": {
+    "A": {
+      "review": "review/LI_THERMAL_REVIEW.json",
+      "decision": "PARTIAL_ADMISSION_RATES_PASS_KINETICS_BDF_REFERENCE_HOLD",
+      "reuse_existing_review": false
+    },
+    "B": {
+      "review": "review/MOLECULAR_REVIEW.json",
+      "decision": "PASS_SCOPED_LOCAL_IMPLEMENTATION_WITH_DOMAIN_QUALIFICATIONS",
+      "reuse_existing_review": true
+    },
+    "C1": {
+      "review": "review/GAMMA_TRANSFER_REVIEW.json",
+      "decision": "PASS_SCOPED_LOCAL_IMPLEMENTATION",
+      "reuse_existing_review": true
+    },
+    "C2": {
+      "review": "review/GAMMA_COLLISION_COUNT_REVIEW.json",
+      "decision": "PASS_SCOPED_LOCAL_IMPLEMENTATION",
+      "reuse_existing_review": true
+    },
+    "D": {
+      "review": "review/NUCLEAR_PRIOR_REVIEW.json",
+      "decision": "PASS_SCOPED_FINITE_SAMPLE_PRIOR_COVARIANCE",
+      "reuse_existing_review": false
+    },
+    "dossier": {
+      "review": "review/DOSSIER_NETWORK_REVIEW.json",
+      "decision": "PASS_SCOPED_CENSUS_AND_CONDITIONAL_COVARIANCE_MAPPING",
+      "reuse_existing_review": false
+    }
+  },
+  "admission_summary": {
+    "A_rates": "PASS source-derived finite-domain thermal/opacity tables and independent18-spot detailed-balance verification",
+    "A_kinetics": "Provisional Radau early fixed-bath outputs and internal consistency only; full independent BDF gate HOLD",
+    "B": "PASS low-v finite-curve LiH nuclear motion/E1 with v2 domain qualification; actual finite-list CLT LTE per-molecule emission",
+    "C1": "PASS donor-weighted first Compton collision and cold-electron kernel; kinetic transfer is not heating",
+    "C2": "PASS conservative projected collision-count chain through16, expected waiting times and stated upper probability bounds; not cosmological cascade",
+    "D": "PASS actual64-sample small-network source-native prior covariance; finite-sample, not precision-converged or posterior",
+    "dossier": "PASS complete59-donor census and exact17/core7/Be/excluded mapping; D native8/conditional bare17 covariance only"
+  },
+  "critical_unfinished_dependency": "A independent BDF reference failed unchanged and after the one equivalent-conditioning repair. Full A kinetics validation remains HOLD; no false globalPASS.",
+  "source_and_model_distinctions": [
+    "Original large donor59 and new small-network8 are different scientific runs despite shared provider commit.",
+    "D conditional bare17 algebraic covariance is distinct from A actual provisional early-Li17 adapter with frozen H/He spectators.",
+    "Thermal/opacity rates, Compton kinetic transfer, molecular LTE emission and deposited cosmological heat remain different quantities."
+  ],
+  "review_actions": "Read original/source/spec/code and saved outcomes; reused already completed B/C/C2 independent reviews, no reviewer scientific reruns. Authorized one failed BDF repair and one dependency-safe completion; mechanical scalar serialization only afterward.",
+  "runtime_statement": {
+    "A_initial_actual_wall_seconds": "UNKNOWN",
+    "A_controller_accounting_total_seconds": 7.192186096000155,
+    "A_nominal_accounting_limit_seconds": 30,
+    "D_build_wall_seconds": 2.7916210500000034,
+    "D_numerical_wall_seconds": 2.2118739779998577,
+    "D_each_limit_seconds": 30
+  },
+  "report_review": {
+    "file": "REPORT_KO.md",
+    "known_local_sections": "Reviewed known B/C/C2/D/dossier claims and units; advised native%.10e versus JSON%.10g precision wording.",
+    "external_results": "External source documents not independently re-reviewed by this reviewer; report retains reuse and process-observation limits.",
+    "A_section": "Final evidence boundaries supplied to controller for completion."
+  },
+  "forbidden_aggregate_claims": [
+    "AllT1\u2013T8 complete",
+    "AllUnit8 scientific gates passed",
+    "Validated late17 chemistry/thermal/radiation history",
+    "New physical no-go theorem",
+    "Owner observational posterior or native EFT truncation covariance",
+    "Original donor covariance from D small network",
+    "Native product/NCP activation by this unit"
+  ],
+  "NG1_NG7": "NOT_APPLICABLE_NO_NEW_NO_GO_CLAIM",
+  "actual_NCP": "NOT_RUN_BY_UNIT8",
+  "stopping_rule": "All concrete reviewed claims now match the preserved outcomes. Stop review and release scoped partial results; no additional optional tests, computations or governance layers."
+}

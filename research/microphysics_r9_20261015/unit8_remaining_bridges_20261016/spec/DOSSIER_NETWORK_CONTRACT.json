@@ -1,0 +1,60 @@
+{
+  "contract_id": "R9_UNIT8_DOSSIER_ALL_NUCLIDES_POSTPROCESS_V1",
+  "status": "PASS_TO_EXISTING_BOUNDED_D_EXECUTION_AND_POSTPROCESSING",
+  "authority": {"requested": "Astra", "observed": "UNKNOWN"},
+  "audit": "intake/DOSSIER_NUCLIDE_AUDIT.md",
+  "base_contract": "spec/NUCLEAR_PRIOR_CONTRACT.json",
+  "source": {
+    "file": "upload/Reionization_Standalone_Dossier(3).pdf",
+    "sha256": "179b114f60c1f8923f9faffb7218a90f1189667c335922525cb6247a174e85a3",
+    "pdf_pages": 73,
+    "core_census": "PDF8 printed3 eq1.15",
+    "projection_and_baryon_constraint": "PDF10 printed5 eq1.24 and adjacent text",
+    "charge_matching_limitation": "PDF35 printed30 section2.11"
+  },
+  "physical_scope": {
+    "nuclide_definition": "Each nuclear isotope reservoir is distinct from its atomic charge states.",
+    "small_network_native_order": ["n", "p", "H2", "H3", "He3", "He4", "Li7", "Be7"],
+    "native_baryon_weights": [1, 1, 2, 3, 3, 4, 7, 7],
+    "core_reservoir_order": ["n", "p", "H2", "H3", "He3", "He4", "Li7"],
+    "core17_order": ["n", "H0", "H+", "D0", "D+", "T0", "T+", "He3_0", "He3_1+", "He3_2+", "He4_0", "He4_1+", "He4_2+", "Li7_0", "Li7_1+", "Li7_2+", "Li7_3+"],
+    "core17_baryon_weights": [1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 7, 7, 7, 7],
+    "auxiliary_native": ["Be7"],
+    "other_separate_sectors": ["electrons and positrons", "photons", "molecules", "negative ions", "other isotopes", "nonthermal populations", "resolved electronic or hyperfine states"],
+    "large_donor_census_count": 59,
+    "large_donor_census_location": "intake/DOSSIER_NUCLIDE_AUDIT.md",
+    "large_donor_other51": "Absent from D small-network model; not measured zero and not covariance constrained by D.",
+    "renormalize_core": false,
+    "collapse_H3_into_He3": false,
+    "collapse_Be7_into_Li7": false
+  },
+  "postprocessing": {
+    "input": "Existing successful native sample rows and covariance only; no new BBN solve.",
+    "native8": "Retain all eight isotope samples and full joint sample covariance, ddof=1.",
+    "core7": "Select first seven native isotope reservoirs without renormalization; preserve covariance with Be7.",
+    "excluded_baryon": {"name": "B_R", "formula": "7*Be7", "unit": "baryons per total baryon", "variance": "49*C_Be7_Be7", "cross_covariance": "Cov(Y_i,B_R)=7*C_i_Be7"},
+    "bare_lift": {
+      "required_label": "CONDITIONAL_BARE_CHARGE_BOOKKEEPING_NOT_SOLVED_ATOMIC_HISTORY",
+      "interpretation": "A fixed hypothetical charge assignment at the nuclear endpoint used only to expose the exact17 selector and conservation algebra. PRIMAT does not compute P_Aqalpha.",
+      "nonzero_mapping": {"n": "n", "H+": "p", "D+": "H2", "T+": "H3", "He3_2+": "He3", "He4_2+": "He4", "Li7_3+": "Li7"},
+      "other_core17_entries": 0,
+      "auxiliary_mapping": "Be7 remains a separate reservoir; no endpoint electron-capture depletion or lithium daughter assignment is imposed.",
+      "augmented_order": "core17_order followed by B_R",
+      "linear_map": "L is18x8. Nonzero core rows are the dictionary selector; L[17,7]=7. Use Z_s=L*Y_s and C_Z=L*C_Y*L^T.",
+      "zero_variance_slots": "Expected structural zeros; covariance zero, correlation undefined/null. Do not add jitter and do not apply the base six-selected-observable positivity/variance gate to zero charge slots."
+    },
+    "baryon_invariants": {
+      "rows": "b_s=A^T*Y_s=A17^T*y17_s+B_R_s; no row renormalization.",
+      "exact_constraint": "For exactly conserved full samples, A^T*C_Y*A=0 and Cov(b,Y_i)=0; 18-state augmented weights are [A17,1].",
+      "finite_output_diagnostics": ["min and max b_s", "max_abs(b_s-1)", "ddof1 variance and standard deviation of b_s", "A^T*C_Y*A evaluated together with noncancelling centered-row variance", "Cov(b,Y_i) from centered rows", "core17 weighted sum plus B_R residual"],
+      "operational_row_tolerance": 1e-6,
+      "tolerance_reason": "Ten times frozen1e-7 ODE precision is a loose postprocessing normalization screen, not a rigorous global solver error bound. Native exported10-significant-digit rounding must be reported. Actual residuals remain the scientific evidence.",
+      "roundoff_treatment": "A^T*C*A can have cancellation error; retain its signed value and compare with nonnegative variance from centered baryon residuals. Never set an observed variance to zero by fiat.",
+      "transform_test": "For nonzero-variance transformed slots, compare direct sample covariance with L*C_Y*L^T in standardized units<=1e-12. For structural zeros require exact zero rows/columns. Compare row partition at absolute<=1e-14."
+    },
+    "general_atomic_state": "If supplied P_Aqalpha is deterministic, y17=M(P)*Y and C17=M*C_Y*M^T; if P is uncertain or depends on the same physical parameters, joint derivatives/samples including that dependence are required. No independent invented P prior."
+  },
+  "execution_changes": {"network": false, "priors": false, "solver": false, "new_BBN_runs": false, "build_budget_change": false, "numerical_budget_change": false, "implementation_scope": "Existing code/laneD postprocessing and evidence/nuclear_prior_* plus NUCLEAR_PRIOR_RESULT.json only"},
+  "claim_boundaries": ["All actual donor59 nuclides are inventoried; only D small8 have new native joint covariance.", "The conditional17 lift is not late-time chemistry, recombination or a physical charge-distribution solution.", "No D covariance is attached to the old large-network donor.", "No missing-isotope, atomic-model, astrophysical-source or EFT-truncation variance is assigned.", "Full shared-parameter covariance across later rates and observables remains a subsequent calculation."],
+  "stopping_rule": "Apply this algebraic postprocessing once to the existing successful ensemble; preserve outcomes and send to independent review. No extra Monte Carlo or process loop."
+}

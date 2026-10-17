@@ -1,0 +1,113 @@
+{
+  "schema": "rei.r9.unit8.independent_lane_implementation_review.v1",
+  "lane": "LI_THERMAL",
+  "decision": "PARTIAL_ADMISSION_RATES_PASS_KINETICS_BDF_REFERENCE_HOLD",
+  "reviewer": {
+    "requested": "Astra",
+    "observed": "UNKNOWN",
+    "role": "independent read-only scientific reviewer"
+  },
+  "method": "Read complete provider, production, balanced-repair, ready-continuation and saved-output packaging implementations; frozen theory/amendments; actual saved raw quadrature, solver outcomes, scoped tests and ledgers. No reviewer ODE or rate-quadrature reruns.",
+  "reviewed_paths": [
+    "code/li_thermal_rates.py",
+    "code/li_thermal_run.py",
+    "code/li_thermal_resume.py",
+    "code/li_thermal_finish_ready.py",
+    "code/li_thermal_package_ready.py",
+    "results/laneA/*",
+    "evidence/LI_THERMAL_EXECUTION.json"
+  ],
+  "repair_review": "review/LI_THERMAL_REPAIR_REVIEW.json",
+  "full_suite_passed": false,
+  "scientific_status_by_block": {
+    "source_derived_thermal_rates": "PASS_SCOPED",
+    "independent_detailed_balance_18_spots": "PASS",
+    "energy_identity_scaled_and_normal_output": "PASS",
+    "Radau_ground_production": "PROVISIONAL_COMPLETED_BDF_VALIDATION_HOLD",
+    "Radau_rate_grid_comparison": "PASS_INTERNAL_RESOLUTION_ONLY",
+    "Radau_Be_grid_comparison": "PASS_INTERNAL_RESOLUTION_ONLY",
+    "total_RR_sensitivity": "PROVISIONAL_MODEL_SENSITIVITY_BDF_VALIDATION_HOLD",
+    "inventory17_and_Be_residual_ledger": "PASS_INTERNAL_CONSISTENCY_ONLY",
+    "BDF_independent_solver_comparison": "HOLD_FAILED_REFERENCE"
+  },
+  "numerical_metrics": {
+    "rate64_128_max_relative": 1.968816147093634e-14,
+    "tail60_80_max_relative": 2.0714999286340286e-24,
+    "identity_max_relative": 1.818989403547511e-12,
+    "W_K_Q_max_relative": 1.0924680835327614e-13,
+    "Decimal_formula_max_relative": 2.6641247676467994e-15,
+    "nonfinite_or_nonpositive_alpha_count": 0,
+    "nonfinite_log_beta_count": 0,
+    "independent_quad_max_relative": 1.6344888768324508e-14,
+    "rate_midpoint_direct_max_relative": 1.960860437175425e-07,
+    "independent_DB_max_relative": 4.547473508865675e-13,
+    "independent_DB_saved_crosscheck_max_relative": 3.190171443619825e-14,
+    "population_min": 0.0,
+    "per_origin_sum_abs": 0.0,
+    "Li_source_sum_normalized": 3.8540003641858495e-16,
+    "ledger_max_relative": 8.629681419780805e-13
+  },
+  "solver_comparisons": {
+    "ground_257": {
+      "max_absolute_per_origin": 2.4500839990171386e-07,
+      "max_relative_above_1e_8": 2.0852044430057985e-06
+    },
+    "ground_half_Be": {
+      "max_absolute_per_origin": 1.6564616156511391e-07,
+      "max_relative_above_1e_8": 3.1442236615840763e-06
+    }
+  },
+  "RR_sensitivity_max_population_difference": 0.27263574029046966,
+  "energy_checks": {
+    "raw_all_rows_max_relative": 3.6705962846958525e-07,
+    "raw_worst_row": {
+      "ion": "HI",
+      "T_K": 223.872113856834,
+      "core": false,
+      "raw_relative": 3.6705962846958525e-07,
+      "W": 1.346009e-317,
+      "K": 1.9046e-320,
+      "Q": 1.344104e-317,
+      "normal_range": false
+    },
+    "normal_range_raw_max_relative": 1.0924680835327614e-13,
+    "scaled_all_rows_max_relative": 4.555640123090486e-16,
+    "subnormal_or_zero_exclusion_count": 124,
+    "criterion": 2e-08,
+    "scaled_passed": true,
+    "normal_raw_passed": true
+  },
+  "findings": [
+    "Source rows and charge/product conventions are preserved; LiI2s alone enters ground Milne inversion while1s is separate opacity.",
+    "Reusable same-T shared-quadrature detailed balance is explicitly algebraic. Newly completed18 separate photon-x/electron-y QUADPACK spots provide the missing independent numerical verification.",
+    "Unscaled HI223.872K energy residual3.67e-7 is subnormal output quantization, not physical energy nonconservation. Original scaled/log acceptance gives4.56e-16; normal-range raw residual1.09e-13. Raw diagnostic remains preserved.",
+    "BalancedBDF preserves implicit equations and original error controls, but repeats the same machine-spacing failure at u=.5673291649750605; conditioning causality was not established and no second scientific repair was performed.",
+    "Pending three Radau calculations completed once with original settings; two resolution comparisons pass5e-6 while independent BDF validation stays unavailable.",
+    "No population clipping or core17 renormalization. Separate surviving Be auxiliary and excluded donor residual keep actual source and mass/charge/electron bookkeeping.",
+    "Selected-z ground diagnostics are labeled PCHIP of saved1025 output states; original output-grid history remains preserved.",
+    "Two numpy scalar JSON failures were mechanical packaging defects; first preceded all new quadrature/solves, second followed all completed blocks; final packaging used saved outputs without scientific reruns."
+  ],
+  "admitted": [
+    "Numerically checked source-derived six-channel thermal rate tables, separate LiI core opacity and96-row Li two-temperature sample, within frozen model/domain.",
+    "Documented provisional early fixed-bath Radau histories, model sensitivity and standalone17+Be bookkeeping, with explicit failed independent-solver validation.",
+    "Internal mass/charge/electron ledger consistency and finite-grid comparison results."
+  ],
+  "not_admitted": [
+    "Fully independently solver-validated Li charge trajectory.",
+    "Accurate tiny neutral fractions below absolute-tolerance reporting boundary.",
+    "Late H/He/Li charge or thermal history, multilevel/transfer/collisional/DR/charge-exchange closure, actual deposited heating, or native product activation."
+  ],
+  "runtime_accounting": {
+    "initial_actual_wall_seconds": "UNKNOWN",
+    "initial_controller_accounting_debit_seconds": 3,
+    "cumulative_accounting_seconds": 7.192186096000155,
+    "packaging_internal_wall_seconds": 0.020741278000059538,
+    "actual_cumulative_wall_seconds": "UNKNOWN; accounting is not an original measurement",
+    "original_limit_seconds": 30,
+    "packaging_accounted": true
+  },
+  "public_Fortran_execution": "NOT_RUN_compiler_unavailable",
+  "NG1_NG7": "NOT_APPLICABLE_NO_NEW_NO_GO_CLAIM",
+  "actual_NCP": "NOT_RUN",
+  "next_action": "Release explicit partial scientific result and stop this bounded unit; no more BDF/ODE/quadrature/test loops required. Future solver-validation repair requires a separately bounded scientific task."
+}
