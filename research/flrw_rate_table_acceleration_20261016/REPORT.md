@@ -1,6 +1,6 @@
 # Temperature-rate coefficient and point-RHS report
 
-C8 consolidates existing execution. No scientific build, test, benchmark or native campaign was rerun during this consolidation. Local Rust 1.85.1 results and source-matched upstream Rust 1.94.1 results are separate cohorts. Independent actor C9 remains pending; upstream PR178 explicitly recorded `NOT_RUN_NO_NATIVE_DELEGATION`.
+C8 consolidates existing execution. No scientific build, test, benchmark or native campaign was rerun during this consolidation. Local Rust 1.85.1 results and source-matched upstream Rust 1.94.1 results are separate cohorts. Fresh independent actor C9 is **PASS_SCOPED** (`evidence/C9_INDEPENDENT_REVIEW.json`), with root admission of coefficient/prepared-point and conditional Li6/Li7 number-component scope. Upstream PR178 itself explicitly recorded `NOT_RUN_NO_NATIVE_DELEGATION`. The standalone upstream Rust opt-in policy is externally reported and advisory here; its Rust code is not independently admitted by this review.
 
 ## Implemented behavior and numerical scope
 
@@ -83,3 +83,7 @@ Future Li photothermal integration still needs source-supported omitted CI bound
 Original local cumulative science usage remains **0.7098421649934608 wall s / 0.633306 CPU s** in `evidence/RUN_LEDGER.json`. Imported external executions are read-only reuse under their own historical budgets; they are not charged as new local runs or pooled with the local resource ledger. No NCP deadline, budget, observer, checkpoint, source run or production switch was changed. No SIMD, end-to-end speedup, full EoR, NCP64, global convergence or new cosmological history is admitted.
 
 Requested roles are Astra high for contract/independent review and Sol high for mechanical implementation; observed runtime model identity is not exposed. The prior usage-quota interruption is a runtime interruption, not a numerical failure.
+
+## Final handoff
+
+R1–R10 and C1–C10 are complete within this scoped admission. C9 published at `bf492b3095fe78e9a7baff4bc2003129c52fe6e5`; `FINAL_PUBLICATION.json` carries the final C10 commit, archive identity and actual backup receipts. `RESTORE.md` and `CODEX_HANDOFF_PROMPT.md` provide automated source acquisition into the existing workspace and the next-lineage handoff. Review snapshot hashes are retained as the historical reviewed state; later factual status/receipt updates do not change the reviewed production bytes or numerical outputs.

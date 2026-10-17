@@ -1,6 +1,6 @@
 # Temperature-rate implementation
 
-R1–R10 and C1–C8 are complete locally. C8 adopts existing source-matched execution without replay. Fresh independent actor C9 and root admission precede C10 final delivery.
+R1–R10 and C1–C10 are complete within scoped root admission. C8 adopts existing source-matched execution without replay, and fresh independent actor C9 is PASS_SCOPED.
 
 ## C1 — baseline and inputs
 
@@ -30,8 +30,12 @@ The source publisher compared actual remote fbe09a23d2c5152d646cd2a44d42f5324fcf
 
 ## C8 — adopted performance evidence
 
-`REPORT.md` and `coding_evidence/C8.json` consolidate local Rust 1.85.1 and upstream PR177/178 Rust 1.94.1 as separate cohorts. `summarize_local_timings.py` reads only preserved stdout and emits all local three-sample median/min/max groups plus all three upstream fair-worker run-level groups. No scientific execution occurred. Default prepared point gain is 1.342x locally; matched-worker upstream N=262144 gains are 1.608x ordered and 1.371x random, with setup amortization explicit. Table value accuracy does not admit derivative/Jacobian use or a full trajectory. Upstream independent actor review was NOT_RUN; fresh C9 remains required. The current frontier is updated from immutable newer receipts rather than repeating completed mixture-EOS derivation.
+`REPORT.md` and `coding_evidence/C8.json` consolidate local Rust 1.85.1 and upstream PR177/178 Rust 1.94.1 as separate cohorts. `summarize_local_timings.py` reads only preserved stdout and emits all local three-sample median/min/max groups plus all three upstream fair-worker run-level groups. No scientific execution occurred. Default prepared point gain is 1.342x locally; matched-worker upstream N=262144 gains are 1.608x ordered and 1.371x random, with setup amortization explicit. Table value accuracy does not admit derivative/Jacobian use or a full trajectory. Upstream independent actor review was NOT_RUN; the fresh independent C9 subsequently passed within the scope recorded below. The current frontier is updated from immutable newer receipts rather than repeating completed mixture-EOS derivation.
 
 ## C9 — independent admission
 
 Fresh read-only independent review at `evidence/C9_INDEPENDENT_REVIEW.json` is PASS_SCOPED with no blockers or repair. Root admits only coefficient/prepared-point validation and the conditional Li6/Li7 number component, with conditional measured throughput. No scientific tests/builds/runs were repeated. The upstream standalone Rust opt-in policy remains externally reported and advisory, without independent code admission here. Mechanical C9 publication then C10 handoff completion is authorized.
+
+## C10 — scoped closeout
+
+Root admitted the coefficient/prepared-point and conditional Li6/Li7 number-component result after fresh C9 PASS. Handoff, current scoped frontier, Korean resume prompt and self-contained focused restore instructions are finalized. Publication and real cloud readback belong to `FINAL_PUBLICATION.json` and publisher receipts. No production source, scientific output, default backend, physical model, native allocation, deadline or observer changed during closeout. The requested role identities remain distinct from unobserved runtime model identity.
