@@ -39,3 +39,5 @@ python3 build_focused.py --rustc /path/to/rustc --output /tmp/rate-focused
 ```
 
 The focused harness omits only the unrelated `joint_affine` declaration/reexports because Rust 1.85.1 predates its float next-up/down API. Changed modules and needed source bytes are frozen in `focused_bundle`. Historical uncalled driver context remains only compilation context; the current external driver and full production crate were not verified by this harness.
+
+See `REPORT.md` for separate local/upstream timing cohorts and `evidence/intake/upstream_pr178/OPTIN_POLICY.json` for the advisory tested standalone policy. It requires matched source, workers, temperature distribution and setup amortization; it is not bound into the production backend. Table derivative/Jacobian use remains HOLD.

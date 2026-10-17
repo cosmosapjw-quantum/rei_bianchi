@@ -1,0 +1,29 @@
+{
+  "schema": "rei.optin.rate.1",
+  "status": "ADVISORY_TESTED_NOT_DEPLOYED",
+  "source_grackle": "PR150 frozen",
+  "default": "Direct",
+  "nodes": 65537,
+  "table_memory_bytes": 9109624,
+  "accepted_coeff_sample_rel": 1e-05,
+  "safety_margin_build": 1.5,
+  "min_forecast_net_speedup": 1.1,
+  "must_match": [
+    "exact source identity",
+    "worker count",
+    "temperature locality and distribution",
+    "backend configuration"
+  ],
+  "must_reject": [
+    "no source lock",
+    "rate sampled threshold FAIL",
+    "unknown temperature distribution",
+    "Jacobian requested",
+    "memory insufficient",
+    "build cost does not amortize",
+    "calibration with invalid values"
+  ],
+  "derivative_status": "HOLD_NOT_CERTIFIED",
+  "prediction_formula": "direct=t_direct_per_query*N; table=t_build+t_table_per_query*N; choose table if margin and total speedup met",
+  "note": "This policy does not automatically switch the production solver"
+}

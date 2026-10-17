@@ -1,6 +1,6 @@
 # Temperature-rate implementation
 
-C1–C4 architecture is prepared against the Astra-owned contract; completion is gated by frozen theory intake. The numerical implementation has not started.
+R1–R10 and C1–C8 are complete locally. C8 adopts existing source-matched execution without replay. Fresh independent actor C9 and root admission precede C10 final delivery.
 
 ## C1 — baseline and inputs
 
@@ -27,3 +27,7 @@ The initial 8193-node H/He R7 prototype failed the 10^-5 target with maximum sam
 Active added-nucleus scope is lithium A=6,7 and q=0…3 under the required ElementalElectronicEquality policy. The source provider owner implements the frozen numerical rows, explicit state identities, number-rate conservation, and typed missing-source result for IsotopeResolved. Historical carbon exploration is inactive. No default inventory, nuclear evolution, photoionization, or thermal closure is introduced.
 
 The source publisher compared actual remote fbe09a23d2c5152d646cd2a44d42f5324fcf63e8 with local owned sources. Four rate/consumer files match exactly. The latest lib.rs contains three additional module registrations that must be retained when adding the new modules. The source comparison is recorded in coding_evidence/FRESH_SOURCE_COMPARISON.json.
+
+## C8 — adopted performance evidence
+
+`REPORT.md` and `coding_evidence/C8.json` consolidate local Rust 1.85.1 and upstream PR177/178 Rust 1.94.1 as separate cohorts. `summarize_local_timings.py` reads only preserved stdout and emits all local three-sample median/min/max groups plus all three upstream fair-worker run-level groups. No scientific execution occurred. Default prepared point gain is 1.342x locally; matched-worker upstream N=262144 gains are 1.608x ordered and 1.371x random, with setup amortization explicit. Table value accuracy does not admit derivative/Jacobian use or a full trajectory. Upstream independent actor review was NOT_RUN; fresh C9 remains required. The current frontier is updated from immutable newer receipts rather than repeating completed mixture-EOS derivation.
