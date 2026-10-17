@@ -31,3 +31,7 @@ The source publisher compared actual remote fbe09a23d2c5152d646cd2a44d42f5324fcf
 ## C8 — adopted performance evidence
 
 `REPORT.md` and `coding_evidence/C8.json` consolidate local Rust 1.85.1 and upstream PR177/178 Rust 1.94.1 as separate cohorts. `summarize_local_timings.py` reads only preserved stdout and emits all local three-sample median/min/max groups plus all three upstream fair-worker run-level groups. No scientific execution occurred. Default prepared point gain is 1.342x locally; matched-worker upstream N=262144 gains are 1.608x ordered and 1.371x random, with setup amortization explicit. Table value accuracy does not admit derivative/Jacobian use or a full trajectory. Upstream independent actor review was NOT_RUN; fresh C9 remains required. The current frontier is updated from immutable newer receipts rather than repeating completed mixture-EOS derivation.
+
+## C9 — independent admission
+
+Fresh read-only independent review at `evidence/C9_INDEPENDENT_REVIEW.json` is PASS_SCOPED with no blockers or repair. Root admits only coefficient/prepared-point validation and the conditional Li6/Li7 number component, with conditional measured throughput. No scientific tests/builds/runs were repeated. The upstream standalone Rust opt-in policy remains externally reported and advisory, without independent code admission here. Mechanical C9 publication then C10 handoff completion is authorized.
