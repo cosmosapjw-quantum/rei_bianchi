@@ -1,0 +1,7 @@
+# Actual failure chronology (preserved)
+
+1. Initial P4/S3 test attempted to invoke private `SourceAgeBridge::opacity_channels` from integration tests. Rust E0624. **Implementation test issue**, repaired by independently recomputing opacity using original public native AtomicProvider / DAtomicProvider; source owner unchanged. Seven new tests passed.
+2. Bounded standalone scalar scientific gate attempted `number_ledger_relative <2e-15` and failed; 64 accumulated sums have max roundoff 3.330669e-15. **Test criterion below numerical roundoff budget**, repaired to prejustified 6e-15 against O(N eps) accumulation, without relaxing native physical photon or energy tolerances.
+3. Native example release compilation initially failed due missing printf placeholder. **Implementation mistake**, fixed by print loop for exact 17 scientific fields; executable smoke FLRW N4 split GL4/m8 then passed.
+4. Extra N32/N64 native refinement launch exceeded runtime limit while the final N64 `split_gl4_m8` row was pending. Five complete rows retained, terminal row **NOT_COMPLETED / RUNTIME_TIMEOUT**; no artificial result or blind retry.
+5. Matched-error audit found initial 0.03717% DI delta compared `age_gl4_m4` vs `split_gl4_m8`, confounding m. New `age_gl4_m8` and `split_gl4_m4` modes implemented and six actual matching rows run; at N16 m4↔m8 DI delta ~4.30e-11, so the spectral delta can be attributed to different within-cell spectral representation in this bounded case.
