@@ -18,6 +18,13 @@ def overlay(native: bytes, solver: bytes) -> tuple[str, str]:
     if digest(native)!=NATIVE_SHA or digest(solver)!=SOLVER_SHA:
         raise ValueError('DONOR_SHA_MISMATCH: refusing to patch different source')
     rust=native.decode('utf-8'); py=solver.decode('utf-8')
+    thread_assignment='    cfg.transport_threads = 1;'
+    if rust.count(thread_assignment)!=1:
+        raise ValueError('NATIVE_TRANSPORT_THREADS_ANCHOR')
+    rust=rust.replace(thread_assignment,
+        '    cfg.transport_threads = std::env::var("REI_TRANSPORT_THREADS")\n'
+        '        .ok().and_then(|value| value.parse::<usize>().ok())\n'
+        '        .unwrap_or(1).clamp(1, 48);',1)
     addition=Path(__file__).with_name('native_refine.rs.inc').read_text()
     anchor='fn main() -> Result<(), Box<dyn std::error::Error>> {'
     if rust.count(anchor)!=1:

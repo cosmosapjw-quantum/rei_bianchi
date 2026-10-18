@@ -16,8 +16,26 @@ def test_age64_has_explicit_shared_mesh_control():
 
 def test_old_native_physics_functions_are_byte_preserved():
     rust, _ = m.overlay(BASE, PYBASE)
-    old = BASE.decode().split('fn main() ->')[0]
-    assert rust.startswith(old)
+    old = BASE.decode()
+    original='    cfg.transport_threads = 1;'
+    replacement=('    cfg.transport_threads = std::env::var("REI_TRANSPORT_THREADS")\n'
+                 '        .ok().and_then(|value| value.parse::<usize>().ok())\n'
+                 '        .unwrap_or(1).clamp(1, 48);')
+    assert old.count(original)==1
+    assert rust.count(replacement)==1
+    restored=rust.replace(replacement,original,1)
+    addition=(ROOT/'src/native_refine.rs.inc').read_text()+'\n'
+    assert restored.count(addition)==1
+    restored=restored.replace(addition,'',1)
+    arm='''        "native_refine" => {
+            let levels = args.get(8).ok_or("missing common birth levels")?
+                .split(',').map(str::parse::<usize>).collect::<Result<Vec<_>, _>>()?;
+            let factor: usize = args.get(9).ok_or("missing time factor")?.parse()?;
+            native_refine(q, Path::new(&args[3]), births, nmu, source, cells, &levels, factor)
+        }
+'''
+    assert restored.count(arm)==1
+    assert restored.replace(arm,'',1)==old
     assert '"matrix_native" => native(q, Path::new(&args[3]), births, nmu, source, cells, true)' in rust
 
 def test_python_changes_resource_bounds_only():
