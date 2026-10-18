@@ -1,0 +1,4 @@
+# Unit3 runnable source
+Rust1.94.1 manifest: rust/rei_microphysics/Cargo.toml. Build with cargo build --release --locked --offline --manifest-path rust/rei_microphysics/Cargo.toml --example axbi_reionization --example axbi_hpc_scaling.
+BenchmarkCLI: axbi_hpc_scaling CONFIG IMMUTABLE_V4_CHECKPOINT FRESH_OUTPUT. Actual populatedfixture/config are raw/ncp003_benchmark001/input_checkpoint.txt and input_config.cfg. Diagnosticfixture is not productionresume. Do not rerun the completed sweep without a new explicit reproducibility allocation.
+Read HPC_RESULT, supplementalreview and recoveryreceipt for measuredscope and missingoriginalraw. Complete traces retained in thisZIP. Fivecase runtimecontroller/config is execution/stage003, scientificgates unchanged. Source003 is immutable; no004cachecode included.

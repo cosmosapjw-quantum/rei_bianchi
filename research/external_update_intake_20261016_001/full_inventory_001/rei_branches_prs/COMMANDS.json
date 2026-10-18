@@ -1,0 +1,64 @@
+[
+  {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain=v1",
+      "--branch",
+      "--untracked-files=normal"
+    ],
+    "exit": 0,
+    "output": "checkout_before.json",
+    "observed_utc": "2026-10-16T04:25:31.750810+00:00"
+  },
+  {
+    "argv": [
+      "git",
+      "for-each-ref",
+      "--format=%(refname)\t%(objectname)\t%(committerdate:iso-strict)",
+      "refs/heads",
+      "refs/remotes"
+    ],
+    "exit": 0,
+    "output": "refs_before.tsv",
+    "observed_utc": "2026-10-16T04:25:31.830502+00:00"
+  },
+  {
+    "argv": [
+      "git",
+      "ls-remote",
+      "--heads",
+      "origin"
+    ],
+    "exit": 0,
+    "output": "origin_heads.tsv",
+    "observed_utc": "2026-10-16T04:25:32.290533+00:00"
+  },
+  {
+    "argv": [
+      "gh",
+      "api",
+      "--paginate",
+      "--slurp",
+      "repos/cosmosapjw-quantum/rei_bianchi/pulls?state=all&per_page=100",
+      "--jq",
+      "[.[][]|{number,title,state,draft,updated_at,merged_at,closed_at,html_url,head:{ref:.head.ref,sha:.head.sha,repo:.head.repo.full_name},base:{ref:.base.ref,sha:.base.sha}}]"
+    ],
+    "exit": 1,
+    "output": "prs_all.json",
+    "observed_utc": "2026-10-16T04:25:32.331517+00:00"
+  },
+  {
+    "argv": [
+      "gh",
+      "api",
+      "--paginate",
+      "repos/cosmosapjw-quantum/rei_bianchi/pulls?state=all&per_page=100",
+      "--jq",
+      ".[] | {number,title,state,draft,updated_at,merged_at,closed_at,html_url,head:{ref:.head.ref,sha:.head.sha,repo:.head.repo.full_name},base:{ref:.base.ref,sha:.base.sha}} | @json"
+    ],
+    "exit": 0,
+    "output": "prs_all.jsonl",
+    "observed_utc": "2026-10-16T04:25:53.259181+00:00"
+  }
+]

@@ -1,0 +1,69 @@
+{
+  "scope": "C5/C6/C9/C10: one bounded packaging recovery; no new theory or scientific-validation loop",
+  "base": {
+    "reported_remote_head": "0e25846433170d0f420c4cda44a0bedbf02cd177",
+    "branch": "research/flrw-production-integration-20261015",
+    "local_checkout": "Snapshot has no .git; do not claim local HEAD verification",
+    "wrapper": "research/ncp_direct_resume_20261016/postprocess_ncp.py",
+    "source005_sha256": "1a2268e3da98ed47159cb738762a1a3d3d17bdcb6806e611cbd2bc3c0c6eaff7",
+    "binary_sha256": "4aa337414a275c66068a900b8349a4114ddc1b1eebad1d904b61cbbd3da84fd4"
+  },
+  "observed_defect": {
+    "user_result": "REQUEST_FAILED: ZIP does not support timestamps before 1980; solver_runs=0",
+    "mechanism": "package() writes FINAL_STATUS.json before ZipFile.write; default strict timestamps reject a pre-1980 filesystem mtime",
+    "classification": "PACKAGING_FAILURE; scientific/render outcome UNKNOWN until existing FINAL_STATUS, renderer receipt and logs are read",
+    "minimal_repair": "Clamp only ZIP entry timestamps using ZipFile(strict_timestamps=False), or an equivalent archive-only clamp. Never touch source/input/result filesystem mtimes or bytes. Exact ZIP byte identity is not required."
+  },
+  "allowed_changes": [
+    "research/ncp_direct_resume_20261016/postprocess_ncp.py: timestamp handling, package-only recovery CLI, separate packaging error reporting",
+    "research/ncp_direct_resume_20261016/test_postprocess_ncp.py: targeted synthetic recovery regressions",
+    "research/flrw_full005_zip_recovery_20261016/: minimal test log, delivery evidence, pinned bundle and copy/paste NCP Codex prompt; CONTRACT.json owned by framing agent"
+  ],
+  "immutable": [
+    "Source005, binary, physics, solver, closures, tolerances, frozen configs/bindings/resource plans and epoch",
+    "Existing NCP results, FINAL_STATUS.json, plots, diagnostics, logs, input files, and partial ZIP",
+    "Existing renderer postprocess_flrw.py and vendor scientific code; reuse prior physics verification",
+    "Scientific admission remains NOT_ISSUED; full Q512/Q1024 pair differences remain diagnostic and D activation remains absent"
+  ],
+  "package_only_contract": [
+    "Accept an explicit existing result directory and a fresh destination outside the campaign and source result tree; reject existing destination and path overlap before mutation.",
+    "Read existing FINAL_STATUS.json first and validate its existing wrapper schema: JSON object, recognized status string, solver_runs=0 and scientific_admission=NOT_ISSUED; do not invent replacement science fields. Preserve it byte-for-byte in recovered evidence; absent, malformed, unrecognized or contradictory science status remains UNKNOWN/HOLD and never becomes SUCCESS from archive success.",
+    "Preserve original result directory entirely, including partial ZIP. Copy arbitrary original report payload files, including JSON/PNG/logs, to fresh destination without rewriting scientific status, plots, receipts or logs. Exclude the old report ZIP from the new archive; retain its original bytes on disk and identify that source in recovery receipt.",
+    "Build a new archive from the preserved payload plus corrected runnable wrapper and unchanged renderer dependencies; external raw scientific inputs remain external and indexed. Verify archive CRC and representative payload readback.",
+    "Do not invoke inspect-based readiness gating, bind, render, subprocess solver, watcher, retries, SSH, or campaign modification in package-only recovery. Packaging preserved results is permitted after the original render deadline because it performs no rendering or scientific computation.",
+    "Record original scientific_status and distinct packaging_status in stdout/recovery receipt. Packaging errors must retain the known original science status, error and recoverable paths; never report an undifferentiated REQUEST_FAILED as the sole outcome. Define package-only exit code explicitly as packaging operation outcome, if using zero for a packaged failed scientific result; stdout and prompt must state that zero is not scientific success.",
+    "Apply separate packaging error reporting to the original render command too: an archive failure after successful or failed rendering must not erase its already-written result status. Retain failure exit code when packaging fails."
+  ],
+  "ncp_prompt_contract": [
+    "User action is only copy/paste into NCP Codex. The prompt instructs Codex itself to fetch the repaired bundle from a concrete published immutable revision/URL, verify its stated identity and extract it into a fresh path; no user download, shell command, token disclosure or manual file transfer.",
+    "Locate /root/rei-post-*/results and other explicitly known wrapper output paths using a bounded one-shot filesystem search. Inspect candidate FINAL_STATUS, render receipt and logs before deciding recovery; do not guess success or pick an ambiguous result silently.",
+    "For existing outputs, execute package-only recovery once into a fresh directory and report original science/render status, packaging outcome, preserved source and recovered artifact paths. This recovery never rerenders existing outputs.",
+    "If original render failed, classify the actual error from status/receipt/logs before proposing any later rerender. This contract does not authorize a blind rerender. If no result is found or status is uninterpretable, preserve evidence and report the specific unresolved state.",
+    "Any separately justified later render remains subject to the original finite shared bind+render budget, 8GiB address-space cap and absolute deadline; do not reset elapsed allowance, epoch or deadline. Expired or unprovable remaining render budget stops rendering."
+  ],
+  "limits": {
+    "solver_runs": 0,
+    "recovery_bind_render_runs": 0,
+    "original_shared_bind_render_cap_seconds": 300,
+    "original_address_space_bytes": 8589934592,
+    "original_hard_deadline_epoch": 1792122617.77407,
+    "original_hard_deadline_utc": "2026-10-16T03:50:17.774070Z",
+    "review": "One implementation/verification pass and one independent scoped C9 pass; one targeted authorized repair if needed; no review recursion"
+  },
+  "acceptance": [
+    "Synthetic pre-1980 archived files reproduce the old failure and package successfully with corrected metadata; input/result bytes and filesystem mtimes are unchanged.",
+    "Package-only recovery preserves a prior SUCCESS status and its payload, performs zero bind/render/subprocess calls, leaves original partial ZIP unchanged, and succeeds even after render deadline.",
+    "Prior failed/unknown science remains failed/unknown after successful packaging; injected packaging failure reports both dimensions without destroying evidence.",
+    "Fresh-destination/path-overlap guard prevents overwriting existing output; recovered ZIP CRC and expected runnable dependencies pass.",
+    "Reuse established 28 physics checks, 3 renderer CLI checks and 8 prior wrapper checks. Run new focused recovery regressions and only directly affected prior packaging/CLI checks when a concrete changed dependency warrants them; no automatic full-suite replay. Do not restart full Q512/Q1024 runs.",
+    "Pinned self-running prompt has concrete fetch identity and zero user-operated download/command steps; locally verified delivery must not claim NCP execution or scientific success that was not observed."
+  ],
+  "transition": "Targeted checks PASS -> build/publish the authorized pinned recovery bundle -> hand user one executable Codex prompt. Existing-result recovery success -> report recovered archive and unchanged scientific status; no new scientific admission gate or numerical campaign.",
+  "skill_context_used": [
+    "PhysMath Research Loop 1.3.0 SKILL.md",
+    "references/POLICY_INTEGRATION.md: typed packaging identity, evidence reuse, finite repair/review, progress transition",
+    "references/CODING_LOOP.md: selected C5/C6/C9/C10 only",
+    "references/SUBAGENT_MODE.md: parent delegates implementation/review; this framing child does not recurse",
+    "Repository AGENTS.md: trusted single-owner scope, research integrity, typed identity, tiered authority"
+  ]
+}

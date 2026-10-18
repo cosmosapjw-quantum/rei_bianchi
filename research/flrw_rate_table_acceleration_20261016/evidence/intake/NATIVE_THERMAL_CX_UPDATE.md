@@ -1,0 +1,13 @@
+# Completed native thermal H/D CX: supplementary intake
+
+Read PR150's final publication, handoff, next DAG, numerical receipt, independent review and source binding at immutable commit `0a3bec74b4de61c9e95bf6727636c39cc970695b`. The source implementation is `8c82e2f28569ca34001153bb053fd7ae53d0299a`. Publication and dual backup are complete; earlier pending stage capsules remain historical snapshots.
+
+The upstream independent decision is `PASS_SCOPED_AFTER_ONE_TARGETED_PRETEST_REPAIR`. Its single targeted invocation passed five test groups. Maximum cached-manufactured normalized error is 5.943663490641052e-7 against 5e-6. Reported density, energy and ordinary SI conversion ledger residuals are zero in tested arithmetic, not a global solution-accuracy certificate. These are reused immutable results, not new executions in this rate-table unit. Boundary outcomes remain partial `DOMAIN_BOUNDARY_APPROACH`, not certified crossing times.
+
+Ownership is exclusive: `AtomicRhs` retains legacy CX, while `ThermalSubstep` disables atomic CX and owns the integrated species/energy map. Chemical and thermal changes have opposite signs; no duplicate cooling subtraction is admitted. The new component accepts pure H1/D at fixed proper volume and rejects every non-H1/D nonzero spectator, including Li or He. It does not perform full-network composition or accepted-state commits.
+
+The local donor core and coupling modules match the exact reviewed upstream blobs `07f8922f93aaf70f727c396621b5e02eb7479223` and `75275a7b1a90cc412f7076093745d39cfbc711b8`. The current unit's `coding_evidence/FRESH_SOURCE_COMPARISON.json` binds the fresh head `fbe09a23d2c5152d646cd2a44d42f5324fcf63e8`; its fresh `lib.rs` matches the upstream export blob `8be1b3746edc0adaab3707988ee4b8740fd3b438`. Donor modules reside in the working snapshot rather than the smaller `source_freeze` directory. Current local `lib.rs` also carries ongoing rate-table/Li exports; this is an expected source change, not donor-kernel drift.
+
+The next node remains `FULL_NETWORK_THERMAL_CX_COMPOSITION_AND_EOS_CONTRACT`: derive spectator heat capacity and EOS, specify non-CX composition and accepted-state ownership, and bound splitting error before extending the adapter. Rate-table/provider development can reuse the completed component evidence, but does not activate it for a Li/He network. Production/reference campaigns still require a separately valid owner allocation; existing budgets and deadlines are unchanged.
+
+This supplementary intake performs no science runs, test replay, production edits, or new literature search. Exact receipt URLs and blobs are in the adjacent JSON. Production adoption and the FLRW/Bianchi end goal remain incomplete.

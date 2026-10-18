@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "unit_id": "flrw_pair_observable_20261016",
+  "contract_role": "Astra theory and acceptance owner; implementation delegated",
+  "runtime_model_observed": "NOT_INDEPENDENTLY_OBSERVED",
+  "theory": "THOMSON_PAIR_DERIVATION.md",
+  "source_result_commit": "0c3958d11d654513eb23cf462d5148e87ba6c9de",
+  "current_repository_anchor": "fdfda0fec423ccb7175552c7dc066be93ce347e1",
+  "metrics_input": "intake/full_pair_continuous_diagnostics.json",
+  "background_evidence": ["intake/source005_axbi_driver.rs", "intake/source005_axbi_background.rs", "intake/BACKGROUND_BINDING.json"],
+  "immutable_metric_selection": {
+    "coordinate": "LN_A_STORED_BINARY64",
+    "arithmetic": "BINARY64_ANALYTIC_SEGMENTS",
+    "reference": "FLRW_FULL_Q512_001",
+    "candidate": "FLRW_FULL_Q1024_001",
+    "observable": "ne_cm3",
+    "units": "cm^-3",
+    "overlap": [-3.044522437723423, -1.6094379124341003],
+    "overlap_width": 1.4350845252893227,
+    "union_knots": 704041,
+    "Ninf": 2.7003617462766083e-10,
+    "N1": 9.797589160354307e-11,
+    "N2": 1.054157221048039e-10
+  },
+  "background": {
+    "type": "flat_flrw_radiation_matter_lambda",
+    "H0_expression_per_s": "67.4*1e5/3.0856775814913673e24",
+    "Omega_m": 0.315,
+    "Omega_r": 9.2e-5,
+    "Omega_Lambda_expression": "1.0-0.315-9.2e-5",
+    "formula": "H0*sqrt(Omega_r*exp(-4*x)+Omega_m*exp(-3*x)+Omega_Lambda)",
+    "shared_between_pairs": true,
+    "parameter_source_commit": "c578683d995d375dbfc824cb080cb6b576d19348",
+    "binding_status_requirement": "intake/BACKGROUND_BINDING.json; otherwise label CONDITIONAL_BACKGROUND_SCENARIO"
+  },
+  "constants": {
+    "c_cm_per_s": 29979245800,
+    "sigma_T_cm2": 6.6524587051e-25,
+    "sigma_T_source": "NIST CODATA 2022 nominal, root directly verified official table: https://physics.nist.gov/cuu/Constants/Table/allascii.txt",
+    "definition": "New postprocessing observable convention; no existing solver tau comparison",
+    "nominal_constant_treated_as_fixed": true
+  },
+  "assumptions": [
+    "Nonnegative saved PL proper electron densities; theorem assumption unless a specific observed prior positivity receipt is cited",
+    "Shared positive H on identical stored ln(a) overlap",
+    "Thomson limit hbar*omega << m_e*c^2 and k_B*T_e << m_e*c^2",
+    "Published binary64 norms substituted as nominal norm values; their outward rounding enclosure is unavailable",
+    "All optical-depth differences and last-scattering measures restricted to common interval; no z<4 continuation"
+  ],
+  "algorithm": {
+    "panels": 8192,
+    "quadrature": "uniform left and right Riemann sums of w and w^2; nondecreasing w proves left <= integral <= right",
+    "primary_bounds": [
+      "B_L1=K*N1*w(b)",
+      "B_L2=K*N2*sqrt(right_sum_w2)",
+      "B_Linf=K*Ninf*right_sum_w",
+      "B=min(B_L1,B_L2,B_Linf)",
+      "q=-expm1(-B)"
+    ],
+    "extra_checks": [
+      "right_sum-left_sum=h*(endpoint_power_difference)",
+      "matter-only analytic upper moments dominate numerical full-background upper moments up to quadrature slack; do not assert this for a finite upper sum without allowing its known width",
+      "N1<=sqrt(width)*N2 and N2<=sqrt(width)*Ninf",
+      "q<=B and 0<=q<=1"
+    ],
+    "rounding_policy": "Use math.fsum; calculate a separate 50-digit decimal reference for scalar formulae and background endpoint values. Float formulae evaluated, not interval-certified. Do not introduce an arbitrary physical-error inflation factor."
+  },
+  "acceptance": {
+    "metadata": "Exact equality of named coordinate, pair names, observable, units and union-knot count; frozen parsed scalar values must match source intake",
+    "numeric_fixture_rtol": 2e-12,
+    "numeric_fixture_atol": 2e-15,
+    "norm_consistency_rtol": 5e-12,
+    "riemann_moment_relative_bracket_width_max": 0.001,
+    "riemann_moment_relative_bracket_definition": "For each raw moment p=1 and p=2, (U_p-L_p)/U_p; the p=2 check precedes taking a square root",
+    "actual_scalar_reference_rtol": 2e-12,
+    "actual_scalar_reference_atol": 1e-20,
+    "source005_background_checks": "Endpoint H finite/positive; all density parameters nonnegative; q_ref=0 and shared scenario recorded",
+    "interpretation": "Acceptance verifies equations and bounded compact evaluation; it is not a threshold admitting solver convergence or physical observational accuracy"
+  },
+  "required_fixtures": [
+    {
+      "id": "constant_hazard_sharpness",
+      "inputs": "r_ref=0,r_candidate=0.2 on [0,1]",
+      "expected": "D=.2; q=1-exp(-.2); absolute transmission difference=TV=q; L1 component attains D"
+    },
+    {
+      "id": "signed_cancellation",
+      "inputs": "r_ref=1,r_candidate=2*x on [0,1]",
+      "expected": "Both total tau=1; D=.5; CDF(candidate,.5)-CDF(ref,.5)=exp(-.75)-exp(-.5) nonzero and absolute value <= 1-exp(-.5)"
+    },
+    {
+      "id": "localized_visibility",
+      "inputs": "r_ref=0; triangular candidate on [0,epsilon], area D=.2, epsilon=.1 and .01",
+      "expected": "TV=1-exp(-.2) in both cases; hazard maxima 4 and 40. Treat as L1-only probability vs density distinction."
+    },
+    {
+      "id": "zero_and_unit_conversion",
+      "inputs": "Identical histories; same actual norms converted consistently between cgs and SI",
+      "expected": "zero differences map to exactly zero B/q; cgs and SI B agree at prescribed rtol"
+    },
+    {
+      "id": "background_mismatch",
+      "inputs": "n_ref=n_candidate=1,K=1,H_ref=1,H_candidate=2 on [0,1]",
+      "expected": "delta n=0 but abs(delta tau)=.5; shared-H assertion must reject mismatch or retain conditional applicability"
+    },
+    {
+      "id": "analytic_matter_quadrature",
+      "inputs": "Omega_m=1,Omega_r=Omega_Lambda=0,H0=1 on [-1,0]",
+      "expected": "Left and right sums enclose exact integral of exp(1.5*x) and exp(3*x); exact upper-minus-lower endpoint formula"
+    }
+  ],
+  "expected_outputs": {
+    "results/THOMSON_PAIR_RESULT.json": ["input identity and unit mapping", "background tuple and binding state", "constants", "three component B values and selected minimum", "q transmission and TV envelope", "kernel moments with left/right brackets", "theorem status derived", "evaluation status nominal binary64-summary conditional", "solver convergence HOLD"],
+    "results/EXECUTION_RECEIPT.json": ["exact command", "start/end", "wall/CPU", "exit code", "executed fixtures", "solver_runs=0", "raw_history_reads=0", "renderer_runs=0", "historical budget unchanged"],
+    "results/TEST_RESULTS.json": ["fixture input", "expected and observed quantities", "pass/fail at frozen tolerances"],
+    "code/thomson_pair.py": "Standalone compact evaluator; no network or remote execution",
+    "tests/test_thomson_pair.py": "Targeted fixtures only"
+  },
+  "execution_limits": {
+    "host": "current assistant sandbox",
+    "primary_command": "python3 code/thomson_pair.py --metrics intake/full_pair_continuous_diagnostics.json --output results/THOMSON_PAIR_RESULT.json",
+    "tests_command": "python3 -m unittest discover -s tests -v",
+    "max_wall_seconds_per_command": 30,
+    "scope": "small scalar/quadrature computation plus targeted synthetic tests; no large raw files",
+    "historical_FULL005_cumulative_wall_s": 156.5376037069618,
+    "historical_absolute_deadline_unix": 1792122617.77407,
+    "historical_budget_reset": false,
+    "new_NCP_allocation_seconds": 0,
+    "stopping_rule": "On physical/input/tolerance ambiguity return to theory owner. One diagnosed implementation defect permits one authorized targeted repair; no optional review cascade."
+  },
+  "allowed_implementation_paths": ["code", "tests", "results", "README.md"],
+  "excluded_actions": ["NCP process interaction", "solver launch or restart", "raw history read", "PL analyzer replay", "renderer replay", "new closure or background assumption", "canonical DAG overwrite", "publication before fresh independent review"],
+  "PASS_next": "Fresh Astra read-only review of code and actual outputs; then authorized publication and side-node DAG integration preserving source009 and convergence HOLD"
+}

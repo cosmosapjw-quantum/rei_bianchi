@@ -1,0 +1,78 @@
+{
+  "schema": "rei.thermal-cx-source-coupling-map/1",
+  "source_commit": "555b113c723d590c7bb83e77ada5b7c7bce8481b",
+  "files": {
+    "rust/rei_microphysics/src/isotope_state.rs": {
+      "git_blob": "a47927cea7d060f89ea28e9731608dd89b5ae7b3",
+      "sha256": "a3a750c3751ea30621482c341e89f690e517c3ad122e56231d2810c62afe8708"
+    },
+    "rust/rei_microphysics/src/deuterium_atomic.rs": {
+      "git_blob": "8477162430af02585a32d18092454e1f7bb52f60",
+      "sha256": "52dcd49d4811ae4e6883655c2ee389b9e126a14512ca6e0d0d205e2c6934fecb"
+    },
+    "rust/rei_microphysics/src/deuterium_charge_exchange.rs": {
+      "git_blob": "dd0a8c9b96ef3e53b8eef0fd08961045779f20b7",
+      "sha256": "482e81d29bf33981ec56bf76dad1c8da5b9a4e162a6813a727e61fec86588cc0"
+    },
+    "rust/rei_microphysics/src/lib.rs": {
+      "git_blob": "1dfdc11b6af391ceaf5a92713b10b8c89d7db6b1",
+      "sha256": "38ad34aefb21c8ee1b0900e272ffd49e3fdb60f3991fd3ad97468c371cc36618"
+    },
+    "rust/rei_microphysics/src/igm_state.rs": {
+      "git_blob": "437365fbe329a10afe292f9dd7eebf549fef804c",
+      "sha256": "1651b00a517d67aaa71b38d3c69af6413570adfc38b591a3ed25284f039e0ae0"
+    }
+  },
+  "prior_python_sha256": "5b7894cf784a45611e8e573280adb9dcbf3b35a59a800ccec797871569fe0798",
+  "equations": "For xi, H0=a+xi,H+=b-xi,D0=c-xi,D+=d+xi. Therefore H,D,charge and ne are invariant. With pure H/D, Nth=H+D+ne is invariant. DeltaUchem=DeltaChi*xi, DeltaUthermal=-DeltaChi*xi; their sum vanishes. With the atomic RHS in Disabled CX mode, both CX rate events and channels4/5 are zero, so the new extent is the only CX species/energy contribution. No spectator EOS claim follows.",
+  "callgraph": {
+    "Savin2002::rates": "Current deuterium_charge_exchange.rs returns m3/s; core adapter multiplies1e6 for cm3/s. Inclusive2.7..200000K.",
+    "DAtomicProvider::step_charge_exchange": "Existing frozen-temperature map; new thermal adapter must not call it.",
+    "d_atomic_rhs": "Savin switch adds CX stoichiometry and signed energy channels4/5; new ThermalSubstep RHS forces Disabled internally.",
+    "IsotopeNumberState": "13species SI; thermal adapter rejects all non-H1/D densities; no spectator heat-capacity reinterpretation.",
+    "production_activation": "No current driver source added/changed by this unit; exported component interface only, exercised by local tests."
+  },
+  "ledger_units": {
+    "atomic_rhs": "J/m3/s power",
+    "new_integrated_cx": "J/m3 energy",
+    "electron_change": "zero for pure CX",
+    "thermal_binding_owner": "same provider.defect() used by coupling; generic signed defect retained only in standalone core"
+  },
+  "error_classes": {
+    "initial_invalid": "INVALID_INPUT before evolution",
+    "provider_rate_error": "charged ARITHMETIC_FAILURE, last accepted state",
+    "stage_outside": "reject/halve without rate extrapolation",
+    "provider_boundary": "DOMAIN_BOUNDARY_APPROACH partial, no exact event-time certification",
+    "cap": "WORK_LIMIT partial",
+    "ownership": "typed coupling error before any rate/integration call",
+    "spectator": "typed unsupported closure error before evolution"
+  },
+  "frontier_snapshot": {
+    "commit": "555b113c723d590c7bb83e77ada5b7c7bce8481b",
+    "paths": [
+      "research/flrw_covariant_transport_20261015/NEXT_DAG.json",
+      "research/flrw_covariant_transport_20261015/LATEST_RESUME.json",
+      "research/flrw_covariant_transport_20261015/HANDOFF.json"
+    ],
+    "local_files": {
+      "CANONICAL_NEXT_DAG.json": "83402d89394bcc36be75b87cf1239f9b2d4ed1cb7fce4067b3dffdec912ada97",
+      "CANONICAL_LATEST_RESUME.json": "d8aaa0b43781c07408b5f8328cc6d495d143443754ea26e99a1fc0918b81ae09",
+      "CANONICAL_HANDOFF.json": "3be632a2262f530cdcf64a65cf46413eb637f4ccde826da371c8187ed71932cf"
+    },
+    "fields_read": [
+      "current_operational_frontier.external_updates",
+      "current_operational_frontier.source012_static",
+      "next_science",
+      "native_campaign_cutoff",
+      "thermal_charge_exchange"
+    ],
+    "meaning": "refresh006 source-only intake; source01262/62 references is static index completion, exact scientific reference remainsnull/HOLD; REC99 candidate not adopted; no allowance extended.",
+    "supplier_live_read": {
+      "pr": 166,
+      "head": "553ce556d9f8662290c000ec675c7e6007c9d895",
+      "state": "open",
+      "updated_at": "2026-10-16T02:29:42Z",
+      "via": "gh api actual read in this theory turn"
+    }
+  }
+}

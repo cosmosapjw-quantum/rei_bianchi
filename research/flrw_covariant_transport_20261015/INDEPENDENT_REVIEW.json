@@ -1,0 +1,108 @@
+{
+  "schema": "rei.covariant_transport.independent_review.v1",
+  "observed_utc": "2026-10-15T12:59:19.473769+00:00",
+  "base_commit": "8aa6cd081f218e3a4ff6180a547c790df234a073",
+  "review_phase": "COMPONENT_IMPLEMENTATION_AND_TARGETED_TESTS",
+  "decision": "PASS_SCOPED_COMPONENTS_PILOT_GATE_PENDING",
+  "publication_decision": "PASS_FOR_REVIEWED_COMPONENT_IMPLEMENTATION_AND_EVIDENCE",
+  "full_ncp_launch_admission": "NOT_YET_ISSUED_PENDING_COMPLETED_PILOT_REFINEMENT_SCREEN",
+  "reviewer": {
+    "requested_model": "gpt-6-astra",
+    "requested_reasoning_effort": "high",
+    "observed_runtime_model": "not independently observed",
+    "source_edits": 0,
+    "git_mutations": 0,
+    "numerical_runs_or_tests": 0,
+    "historical_28_reexecuted": false
+  },
+  "reviewed_file_sha256": {
+    "rust/rei_microphysics/src/axbi_covariant_transport.rs": "3b9c00cad6faa65cb1786009d70d7497e235ffd1a8c5d83875068024c4716fb0",
+    "rust/rei_microphysics/src/axbi_driver.rs": "281b73cb42d8ae776b963b9e8e52594c9a315397c290b65b1c4c1f7ce4147dde",
+    "rust/rei_microphysics/src/axbi_q_closure.rs": "8c114090f11e5220659860e0ac4d9f03537b219d8384827e2bf8702d5d276c26",
+    "rust/rei_microphysics/src/deuterium_atomic.rs": "52dcd49d4811ae4e6883655c2ee389b9e126a14512ca6e0d0d205e2c6934fecb",
+    "rust/rei_microphysics/src/lib.rs": "cda3bea791a06eb8522643fdcc49b20ebccdadf2c97a53bb17a0d65fa9cbc505",
+    "rust/rei_microphysics/tests/axbi_covariant_transport.rs": "07aedc6b1d13283d470187d208528e4958e6deeed08d1cdded10c77503738a0d",
+    "rust/rei_microphysics/tests/axbi_covariant_driver.rs": "5e1a05d737dd1067c66569f790f8bee8aad43a7e62e82daff030ac986b5d6720",
+    "rust/rei_microphysics/tests/deuterium_atomic.rs": "bf4adab447356f3535918edff9f85c2310b007b23f7418b89f598f41393195e5",
+    "rust/rei_microphysics/tests/axbi_driver.rs": "90dd2fdc2bf570eaf209490607cd93137111ed4960afcae18a2bdec1518cf662"
+  },
+  "admitted_scope": [
+    "Fixed reference-energy N/Q/support transport, local E=R*q geometry without repeated fixed-physical-energy projection.",
+    "Original source-cell GL8 integration with one angular Jacobian normalization; positive fit-threshold-cut and moment-matched reconstruction.",
+    "Same-node backward-Euler survivors/Gamma/heat within existing four-unknown cold Newton; unchanged reaction and physical acceptance owners.",
+    "V3 photon state serialization, actual support/moment output, common-cell full/two-half N and physical-U norm, authoritative outer-run source/config restart binding.",
+    "Standalone GRACKLE_3_4_1_H_EQUALITY_D_ATOMIC_V1 provider and isotope-native D/CX point RHS, with explicit threshold source, SI units and conditional inventory helpers."
+  ],
+  "evidence": {
+    "core": {
+      "receipt": "raw/covariant_transport_tests_receipt.json",
+      "first_attempt": "raw/covariant_transport_tests.log",
+      "repair_attempt": "raw/covariant_transport_tests_repair.log",
+      "first_pass": 6,
+      "first_fail": 1,
+      "repaired_pass": 7,
+      "repaired_fail": 0
+    },
+    "driver": {
+      "receipt": "raw/driver_test_initial6_tool_observed.json",
+      "log": "raw/driver_test_initial6_tool_observed.log",
+      "passed": 6,
+      "limitation": "Actual tool output preserved; execution source SHA not captured. Ran before the isolated core centered-moment repair; no claim of a byte-bound final combined suite."
+    },
+    "resume_binding": {
+      "receipt": "raw/driver_resume_binding_test.json",
+      "log": "raw/driver_resume_binding_test.log",
+      "passed": 1,
+      "scope": "Actual run entry rejects changed grid/q_ref/source before history or checkpoint mutation; no history run."
+    },
+    "final_source_support": {
+      "receipt": "raw/core_signed_source_support_test.json",
+      "log": "raw/core_signed_source_support_test.log",
+      "passed": 1,
+      "counting": "Focused final assertions in existing source test, not an additional distinct test."
+    },
+    "d_atomic": {
+      "receipt": "raw/d_atomic_test_attempt1_receipt.json",
+      "log": "raw/d_atomic_test_attempt1.log",
+      "passed": 8,
+      "attempt": 1,
+      "source_hashes_match_review": true
+    },
+    "distinct_new_tests_passed": 22,
+    "native_distinct_new_tests_passed": 14,
+    "pilot": "q128 attempt1 running at this component decision; other required comparisons and final screen not yet observed."
+  },
+  "repairs_and_contract_resolutions": [
+    {
+      "issue": "Near-endpoint output U/N fell one ULP below support after independent sums.",
+      "resolution": "One root-authorized bounded repair: compensated N and positive endpoint-centered U accumulation, nearest-endpoint mean, represented moment bounds. No tolerance-based clipping or support widening. Failed attempt preserved;7/7 after repair.",
+      "status": "RESOLVED"
+    },
+    {
+      "issue": "New production closure source dependency missing in early in-progress compiled identity.",
+      "resolution": "axbi_q_closure.rs added alongside axbi_covariant_transport.rs.",
+      "status": "RESOLVED"
+    },
+    {
+      "issue": "V3 checkpoint is not a self-contained grid/reference/source binding.",
+      "resolution": "Root explicitly retains authoritative outer run exact config and compiled-source identity. Grid/reference/mode are fixed by these inputs; focused actual-run rejection test passes. Do not claim standalone read_checkpoint binds arbitrary configurations.",
+      "status": "RESOLVED_BY_EXPLICIT_EXISTING_RUN_CONTRACT"
+    }
+  ],
+  "scientific_assessment": {
+    "representation": "Fixed q transport structurally removes the previous physical-energy rebinning mechanism. A positive two-moment/support closure still approximates spectral shape; conservation and zero false-HeII delta tests do not prove arbitrary-spectrum accuracy.",
+    "photon_events": "BE opacity uses actual local energy and original fit cutoffs; bound energies are distinct. Gamma/heat and removed photons use the same node bank and the existing coupled RHS remains the sole gas-event owner.",
+    "arithmetic": "Centered positive moments are algebraically equivalent to the same measure first moment. Endpoint delta is only exact represented endpoint equality; broad-support means are not tolerance-clipped. Internal moment tolerances do not relax physical ledger/Newton/local targets.",
+    "invariants": "Physical source, cold H/He rates/domain, background and IC remain; local target1e-5, strict ceiling<2e-4, Newton1e-11, step ledger1e-10, cumulative1e-8 and parity1e-12 unchanged.",
+    "d_atomic": "H-equality and threshold correction are explicit conditional approximations. D PI/CI/RR/CE and signed CX energy channels close; ne uses all isotope charges; CT adds no electron; changing particle count enters the additive T derivative. Free-free/CMB/expansion have no duplicate owner.",
+    "d_inventory": "D/H ratio and ionic mode are explicit; Cooke example is observation-conditioned rather than BBN or matched REC. Fixed-nb helper includes2nD and labels omitted nuclides. D absent gives no-op, legacy extra-species rejection retained, and production D activation is absent."
+  },
+  "open_gates": [
+    "Complete source-bound z20-to19.8 pilot at128/256/512 energy cells with time target1e-5/2.5e-6 and8/16 angles.",
+    "Read empirical<=1e-3 metric comparisons and refinement trend under the already frozen NATIVE_CONTRACT; unresolved or incomplete screen does not pass full-launch gate.",
+    "Full-history abundance/temperature/tau convergence and runtime feasibility remain pending actual completed histories.",
+    "D is standalone; common isotope transport/EOS/coupled evolution and a declared conditional scenario remain future integration work."
+  ],
+  "next_action": "Publish the reviewed component unit and continue the already authorized bounded pilots. Issue separate full-NCP launch decision only after actual screen evidence.",
+  "stopping_rule": "Component review closed after actual targeted evidence. No additional optional tests or adjacent repairs requested; campaign review resumes at finished pilot evidence."
+}

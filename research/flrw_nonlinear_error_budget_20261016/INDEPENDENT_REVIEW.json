@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "unit_id": "flrw_nonlinear_error_budget_20261016",
+  "stage": "C9",
+  "status": "complete",
+  "verdict": "PASS_SCOPED",
+  "reviewed_at_utc": "2026-10-16T02:04:56.652456+00:00",
+  "reviewer": {
+    "agent": "/root/full005_pair_review",
+    "role": "independent scientific/numerical reviewer; no implementation participation",
+    "requested_model": "gpt-6-astra/high",
+    "observed_model_identity": "NOT_INDEPENDENTLY_OBSERVED"
+  },
+  "scope": "New standard-library four-variable scaled linearized residual/Jacobian diagnostic, stage-packet adapter, thermal projection and fresh-output JSON CLI.",
+  "decision": "Admit the reviewed implementation for C10 publication and handoff within the supplied-packet linearized diagnostic scope.",
+  "review_timing": "Read-only pre-read during C6-C8; final decision only after observed C8 results and publisher C8 capture acknowledgement.",
+  "C8_capture": {
+    "bytes": 90829,
+    "sha256": "16bbbade2019a90716c0218e09cf4f6f2215bb935d55935b77b59705a12e34dd",
+    "basis": "Coder relayed publisher acknowledgement; publication durability remains publisher-owned."
+  },
+  "reviewed_source_sha256": {
+    "research/flrw_nonlinear_error_budget_20261016/nonlinear_budget.py": "b556311ffe86efc019caebb0fdcf1ec4ca80d26b363c9b2ebb163e3482dc76d7",
+    "research/flrw_nonlinear_error_budget_20261016/ACTUAL_STAGE_PACKET_TEMPLATE.json": "acc67f88624023d4bb87699dc55db250b151096879eea06e6c5878aed9320d12",
+    "research/flrw_nonlinear_error_budget_20261016/tests/check_precision.py": "2efc73f097b8553bf8bec78e6ecfa6fe0fcb802bd9e804e06208803089890768",
+    "research/flrw_nonlinear_error_budget_20261016/tests/test_implementation.py": "77a03884fd04b23e03b93a0ea028ddd9d726f96cce1af7117c85b12edfb58d13",
+    "research/flrw_nonlinear_error_budget_20261016/tests/test_science.py": "700a62410fd6b18dceb874909a49f7c493e49c7602fb3cf584f4bb5597448864"
+  },
+  "source_identity_check": "All five final source/template/test hashes match current bytes; module unchanged from C5. Cached oracle SHA matches C7 reference.",
+  "oracle_sha256": "0856ec71dc26a20727818d53ddbfec9b3daecd919d17637a20f3926557c6c68c",
+  "review_method": [
+    "Read complete production module and frozen contract, template, source-binding handoff and test sources.",
+    "Reused completed independent R6 algebra/source review and R7 exact oracle.",
+    "Inspected actual C6/C7/C8 logs, receipts and numerical outputs, then matched final file identities.",
+    "Reasoned independently about scale/sign/pivots, EOS algebra/domain, trusted input declarations, claim ceilings and CLI completion semantics."
+  ],
+  "checks": [
+    {
+      "id": "scaled_core",
+      "result": "pass_scoped",
+      "reason": "A=SR^-1 J Sy and b=SR^-1 R are built once; augmented Gauss-Jordan maximum-absolute partial row pivots solve A z=-b while forming its inverse. Delta=Sy z has the correct sign. Norms are vector max and matrix maximum absolute row sum. Recomputed A z+b and its denominator implement the frozen normwise linear backward-error formula, including zero/zero. Fixed4x4 storage/work is bounded."
+    },
+    {
+      "id": "arithmetic_limits",
+      "result": "pass_scoped",
+      "reason": "Only computed exact-zero pivots trigger singular HOLD; finite large condition estimates remain reported. Input bool/nonfinite/malformed/shape/nonpositive-scale checks and finite arithmetic guards match the contract. kappa and backward error are binary64 estimates, not certified inverse or nonlinear bounds; no guarantee is made for all extreme-scale or near-singular inputs."
+    },
+    {
+      "id": "stage_adapter",
+      "result": "pass_scoped",
+      "reason": "Native scales use max(abs(old_w),abs(w),1e-6); state scales use species floor1e-5 and current-energy floor1e-6. The adapter checks physical old/current states, required positive stage quantities, supplied exact evaluation-state equality and shared nonempty context IDs, method/order/energy-unit conventions, labeled Jacobian kind and frozen source blob. ACTUAL_STAGE additionally requires accepted-stage status, explicit provenance/cost fields and native norm<=1e-11."
+    },
+    {
+      "id": "trusted_packet_boundary",
+      "result": "pass_scoped",
+      "reason": "Same-state/context/source validation concerns declared packet contents in the trusted owner workflow. The module does not reconstruct telemetry or independently validate a remote producer/receipt; ACTUAL_STAGE status is conditional on an honestly supplied packet. Fabricated actual-shaped C6 controls test those guards and do not establish observed actual telemetry. The null template correctly HOLDs."
+    },
+    {
+      "id": "thermal_projection",
+      "result": "pass_scoped",
+      "reason": "T=2w/(3kD), linear=T*(dw/w-dD/D), exact_map=linear/(1+dD/D) match the reviewed frozen formulas. The exact-map formula avoids subtracting close absolute temperatures; ordinary cancellation/rounding remains. Invalid corrected ionic/energy domain preserves the linear diagnostic and returns null exact projection/corrected temperature with a reason. No corrected state is committed. The exact_map label means algebraic EOS evaluation, not exact arithmetic or evolved-temperature error."
+    },
+    {
+      "id": "source_binding_transition",
+      "result": "pass_scoped",
+      "reason": "Current source pin is immutable and matching is required for the present adapter. SOURCE_BINDING_HANDOFF.md correctly treats a future observer-induced blob change as a focused equation/scale/context/acceptance seam migration under existing owner authorization. It adds no present producer mutation or fresh execution permission gate; unaffected derivations/fixtures remain reusable."
+    },
+    {
+      "id": "cli_and_records",
+      "result": "pass_scoped",
+      "reason": "Standalone imports standard library only. Fresh output prevents overwrite; missing input produces typed HOLD/null metrics and exit2; success exits0. Finite JSON results and measured receipt are separately written with same-directory temporary files, flush/fsync and atomic replacement, followed by supported directory fsync. Receipt records actual input/module hashes, argv, environment, elapsed time and outcome. Atomicity is per file; both files comprise completed output."
+    },
+    {
+      "id": "evidence_sufficiency",
+      "result": "pass_scoped",
+      "reason": "C6 actual six test cases passed. C7 actual two methods cover seven cached matrix cases and five adapter/EOS cases; cached exact oracle identity matches and was not rerun. C8 actual three small cases cover finite high conditioning, consistent power-of-two rescaling and unequal old/current energy scales. Static review and these targeted executions resolve this unit scope without optional broad replay."
+    }
+  ],
+  "actual_test_evidence": {
+    "C6": {
+      "cases": 6,
+      "exit_code": 0,
+      "outer_wall_seconds": 0.1717084959964268
+    },
+    "C7": {
+      "methods": 2,
+      "cached_matrix_cases": 7,
+      "cached_adapter_EOS_cases": 5,
+      "exit_code": 0,
+      "outer_wall_seconds": 0.05429542899946682,
+      "max_abs_metric_residual": 1.4551915228366852e-11,
+      "residual_interpretation": "Observed difference in condition estimate100000, approximately1.46e-16 relative; not a universal state or thermal error bound.",
+      "fixture_tolerances": "Frozen rel1e-12 abs1e-14 unchanged, synthetic comparisons only"
+    },
+    "C8": {
+      "cases": 3,
+      "exit_code": 0,
+      "outer_wall_seconds": 0.0804725240013795,
+      "near_singular_kappa": 4398046511108.0,
+      "known_correction": [
+        1,
+        -1,
+        0,
+        0
+      ],
+      "old_current_thermal_scale_ratio": 10000,
+      "native_norm": 1e-13,
+      "scaled_correction_norm": 1e-09
+    }
+  },
+  "evidence_refs": [
+    "CONTRACT.json",
+    "SOURCE_BINDING_HANDOFF.md",
+    "ACTUAL_STAGE_PACKET_TEMPLATE.json",
+    "evidence/R6_INDEPENDENT_REVIEW.json",
+    "probe/RESULT.json",
+    "coding_evidence/C5.json",
+    "coding_evidence/C6.json",
+    "coding_evidence/C6.log",
+    "coding_evidence/C6_execution.json",
+    "coding_evidence/C7.json",
+    "coding_evidence/C7.log",
+    "coding_evidence/C7_execution.json",
+    "coding_evidence/C7_oracle_comparisons.json",
+    "coding_evidence/C8.json",
+    "coding_evidence/C8_execution.json",
+    "coding_evidence/C8_precision.json",
+    "coding_evidence/C8_source_manifest.json"
+  ],
+  "findings": [],
+  "bounded_repair_authorized": false,
+  "claim_boundaries": {
+    "actual_stage_attribution": "NOT_RUN_MISSING_RESIDUAL_AND_JACOBIAN_PACKET",
+    "nonlinear_error_certificate": null,
+    "global_convergence_admission": false,
+    "trajectory_or_photon_error_admission": false,
+    "source009_production": "independent active owner unchanged",
+    "production_tolerances": "unchanged",
+    "PL_results": "reused; no replay"
+  },
+  "reviewer_executions": {
+    "new_numerical_tests": 0,
+    "oracle_reexecutions": 0,
+    "native_builds": 0,
+    "native_solver_runs": 0,
+    "NCP_runs": 0,
+    "physical_history_reads": 0,
+    "PL_replays": 0,
+    "implementation_mutations": 0,
+    "written_artifacts": [
+      "INDEPENDENT_REVIEW.json"
+    ]
+  },
+  "next_action": "Code owner records C9; publisher captures C9 before C10 handoff. Actual diagnosis needs an owner-supplied same-accepted-state R/J packet and any necessary source-binding seam migration under existing authorization and resource allocation."
+}

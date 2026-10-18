@@ -1,0 +1,43 @@
+{
+  "schema": "rei.bass_source012.static_blob_supplement.wrapper_receipt.v1",
+  "status": "HOLD_COLLECTOR_FAILURE_NO_RETRY",
+  "base_commit": "44a88a8d3ca8e094a636fc9b96c7404f80286623",
+  "started_command_attempts": 2,
+  "collector_process_invocations": 1,
+  "prelaunch_command_error": {
+    "command": "/usr/bin/time -v timeout --signal=TERM --kill-after=1s 8s bash -c 'ulimit -v 1048576; exec /usr/bin/python3 research/bass_source_age_reference_20261016/intake_002_static_supplement/collect_static_blobs_once.py'",
+    "exit_code": 2,
+    "elapsed_wall_seconds": 0.28,
+    "max_rss_kib": 9460,
+    "reason": "path typo omitted 012; Python reported file not found before collector start",
+    "collector_started": false,
+    "counts_as_started_attempt": true,
+    "data_read_or_written": false
+  },
+  "actual_collector_invocation": {
+    "command": "/usr/bin/time -v timeout --signal=TERM --kill-after=1s 8s bash -c 'ulimit -v 1048576; exec /usr/bin/python3 research/bass_source012_source_age_reference_20261016/intake_002_static_supplement/collect_static_blobs_once.py'",
+    "exit_code": 3,
+    "elapsed_wall_seconds": 0.07,
+    "max_rss_kib": 15316,
+    "stderr": "SUPPLEMENT_FATAL: UnboundLocalError(\"cannot access local variable 'new_bytes' where it is not associated with a value\")",
+    "failure_site": "collect_static_blobs_once.py line 68: reads new_bytes inside main(), while line 79 assignment makes it local without declaration",
+    "private_files_written": 0,
+    "new_private_bytes": 0,
+    "timeout_signal_delivered": false
+  },
+  "internal_git_commands": {
+    "intended_sequential_argv": [
+      ["git", "-c", "core.packedGitWindowSize=32m", "-c", "core.packedGitLimit=64m", "ls-tree", "--full-tree", "35d9747a0bbedcafdb568467ce7c1e7a25f965b6", "--", "configs/rei_fastest_v1/science_scenario_v1.json"],
+      ["git", "-c", "core.packedGitWindowSize=32m", "-c", "core.packedGitLimit=64m", "show", "35d9747a0bbedcafdb568467ce7c1e7a25f965b6:configs/rei_fastest_v1/science_scenario_v1.json"]
+    ],
+    "return_codes": "Not persisted before collector exception; control flow reached the following cap check only after both subprocesses returned, and would have stopped on nonzero status.",
+    "captured_blob_identity_or_size_persisted": false
+  },
+  "retry_performed": false,
+  "prior_collection_preserved": {"files": 409, "bytes": 7396570, "wall_seconds": 2.59},
+  "cumulative_collector_process_wall_seconds": 2.66,
+  "cumulative_started_command_wall_seconds": 2.94,
+  "cumulative_private_files": 409,
+  "cumulative_private_bytes": 7396570,
+  "git_mutation": false
+}

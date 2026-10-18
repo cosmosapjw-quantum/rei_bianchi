@@ -1,0 +1,44 @@
+--- original/positive_native.rs
++++ implementation/positive_native.rs
+@@ -524,6 +524,21 @@
+                     .collect::<Vec<_>>()
+                     .join(" ")
+             }),
++            "RC" => (|| -> Result<String, Box<dyn std::error::Error>> {
++                if active > s.templates.len() { return Err("invalid compact active count".into()); }
++                let size = 4 + 2 * cells * s.templates.len() + EXTRA;
++                let mut indices: Vec<usize> = (0..4).collect();
++                for group in &active_indices[..active] { indices.extend(group); }
++                indices.extend(size - EXTRA..size);
++                if z.len() != indices.len() { return Err("invalid compact state length".into()); }
++                let mut full = vec![0.; size];
++                for i in 0..active {
++                    full[4 + 2*cells*i..4 + 2*cells*(i+1)].copy_from_slice(&s.encoded[i]);
++                }
++                for (&index, &value) in indices.iter().zip(&z) { full[index] = value; }
++                let rhs = evaluate(&s, active, x, &full)?;
++                Ok(indices.iter().map(|&i| format!("{:.17e}", rhs[i])).collect::<Vec<_>>().join(" "))
++            })(),
+             "P" => physical(&s, active, x, &z),
+             "D" => diagnose(&s, active, x, &z),
+             "S" => normalized_diagnose(&s, active, x, &z),
+--- original/positive_solver.py
++++ implementation/positive_solver.py
+@@ -31,14 +31,14 @@
+                 calls+=1
+                 if calls>200000 or time.monotonic()-started>600:raise RuntimeError('frozen RHS/time cap')
+                 whole=base.copy();whole[indices]=z
+-                answer=send('R',active,x,whole)
++                answer=send('RC',active,x,z)
+                 if answer.startswith('ERR'):
+                     np.save(a.out/f'first_failed_state_event{event}_retry{retry}.npy',np.r_[x,whole])
+                     errors.append(dict(event=event,retry=retry,x=x,message=answer,calls=calls))
+                     (a.out/'provider_errors.json').write_text(json.dumps(errors,indent=2)+'\n')
+                     raise DomainError(answer)
+-                result=np.fromstring(answer,sep=' ');assert result.size==size,result.size
+-                return result[indices]
++                result=np.fromstring(answer,sep=' ');assert result.size==indices.size,result.size
++                return result
+             try:
+                 atol=np.full(size,1e-12 if a.tight else 1e-11)
+                 atol[extra_start:extra_start+4]=1e-15 if a.tight else 1e-14

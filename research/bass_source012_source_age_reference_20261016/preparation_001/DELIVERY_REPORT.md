@@ -1,0 +1,9 @@
+# SOURCE012 preparation delivery
+
+Fresh independent review: **SCOPED_CODE_PREPARATION_PASS**, publication approved, no findings or further repair. The endpoint repair shares the explicit coarse/fine cap, computes one midpoint, and rejects nonprogress before callbacks; state arithmetic/h/tolerances/CFL/birth policy remain unchanged. Original nine-test source/raw, first HOLD, repaired source freeze and eleven-test raw are retained. Supplemental raw cwd0 remains preserved with a factual clarification based on prelaunch records.
+
+Total synthetic verification: **2 invocations / 0.33612156996969134 seconds / 30-second cap**. No Rust build, native helper/process/setup/physical RHS/reference calls. The helper remains **UNBUILT_UNRUN**, with actual ELF/setup/Gamma/heat/prepared-node payloads null; physical reference remains **HOLD**. The captured old 9d052a5b ELF is fixed-eight-birth supplier evidence only, never a new helper binding.
+
+RESTORE_DEPENDENCIES.json references the existing 409-file INPUT_INTAKE content2c6a16f/archive0ec47d4f and two-file STATIC_SUPPLEMENT contentd5131cf/archivebf9b1430. No old private files, ELF or archive were copied or rehashed. The three canonical files receive only a current preparation node/next state; prior thermal/CX/native-observer/intake metadata and historical costs/deadlines remain intact. Overall state is **PAUSED_RESUMABLE**, GOAL_DONE=false.
+
+Next helper build: **BUILD_ONLY_AUTHORITY_PENDING**, not ready to launch. Root alone commits/pushes; the generic public-only prepare_public_backup.py is prepared but **NOT_EXECUTED**. After root supplies an exact published content commit, the cheap worker can package precisely the committed PUBLIC_SELECTION paths, plus its manifest, with a 4MiB exclusive archive and one CRC/per-member SHA check. No private payloads, old411 inputs, target/cache or old ELFs enter this public archive; upload is not implemented here.

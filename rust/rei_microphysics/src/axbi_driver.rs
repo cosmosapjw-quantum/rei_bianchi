@@ -1,18 +1,26 @@
 //! Cold point coupled driver. Binary64 backward Euler with empirical adaptivity;
 //! neither an inherited FT03 certificate nor a continuum proof.
 use crate::axbi_background::{
-    isotropic_initial_radiation_moments, AxbiBackground, BackgroundFamily, Cosmology,
+    isotropic_initial_radiation_moments, AxbiBackground, BackgroundFamily, BackgroundIncrement,
+    BackgroundPoint, Cosmology,
 };
+use crate::axbi_bass_background::{sha256_bytes, BassBackground};
+use crate::axbi_covariant_transport::{CovariantTransport, PhotonState, PreparedAbsorption};
+use crate::axbi_parallel::OrderedWorkerPool;
 use crate::axbi_rates::AxbiProvider;
 use crate::axbi_sources::AxbiSource;
 use crate::igm_background::{FlatFlrwBackground, FlatFlrwConfig};
 use crate::igm_state::{w_erg_per_h_to_ev, w_ev_per_h_to_erg, IgmGasState};
-use crate::igm_thermal::{IgmPhotoInput, IgmPointRhs};
-use crate::{Absorber, AtomicProvider, CharacteristicRay, ForwardError, HHeModel};
+use crate::igm_thermal::IgmPointRhs;
+use crate::{ForwardError, GeometrySnapshot, HHeModel};
 use std::{
     fs,
     io::{BufWriter, Write},
-    path::Path,
+    path::{Path, PathBuf},
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc,
+    },
     time::Instant,
 };
 fn err(s: &'static str) -> ForwardError {
@@ -34,8 +42,17 @@ pub struct DriverConfig {
     pub same_h: bool,
     pub end_zbar: f64,
     pub escape_fraction: f64,
+    pub initial_x_hii: f64,
     pub initial_temperature_k: f64,
     pub energy_subdivisions: usize,
+    /// Fixed reference-energy finite-volume cells, independent of source quadrature.
+    pub transport_cells: usize,
+    /// Persistent per-cell prepare workers; temporal/Newton ordering is serial.
+    pub transport_threads: usize,
+    /// Opt-in independent Jacobian columns on the same persistent worker pool.
+    pub parallel_jacobian_columns: bool,
+    /// FLRW-only passive compartment below the HI fit cutoff; explicit variant.
+    pub inactive_hi_split: bool,
     pub n_mu: usize,
     pub background_panels: usize,
     pub local_target: f64,
@@ -56,9 +73,14 @@ impl DriverConfig {
             same_h: false,
             end_zbar: 4.0,
             escape_fraction: 0.2,
+            initial_x_hii: 2e-4,
             initial_temperature_k: 2.7255 * 21.0_f64.powi(2)
                 / (150.0 * (0.0224_f64 / 0.023).powf(0.4)),
             energy_subdivisions: 16,
+            transport_cells: 128,
+            transport_threads: 1,
+            parallel_jacobian_columns: false,
+            inactive_hi_split: false,
             n_mu: 8,
             background_panels: 4096,
             local_target: 1e-5,
@@ -94,8 +116,25 @@ impl DriverConfig {
                 }
                 "end_zbar" => number!(end_zbar),
                 "escape_fraction" => number!(escape_fraction),
+                "initial_x_hii" => number!(initial_x_hii),
                 "initial_temperature_k" => number!(initial_temperature_k),
                 "energy_subdivisions" => number!(energy_subdivisions),
+                "transport_cells" => number!(transport_cells),
+                "transport_threads" => number!(transport_threads),
+                "parallel_jacobian_columns" => {
+                    c.parallel_jacobian_columns = match v.trim() {
+                        "true" => true,
+                        "false" => false,
+                        _ => return Err(err("AXBI_CONFIG_VALUE")),
+                    }
+                }
+                "inactive_hi_split" => {
+                    c.inactive_hi_split = match v.trim() {
+                        "true" => true,
+                        "false" => false,
+                        _ => return Err(err("AXBI_CONFIG_VALUE")),
+                    }
+                }
                 "n_mu" => number!(n_mu),
                 "background_panels" => number!(background_panels),
                 "local_target" => number!(local_target),
@@ -117,6 +156,7 @@ impl DriverConfig {
             256 => Ok(224 * 1024 * 1024),
             2048 => Ok(1920 * 1024 * 1024),
             4096 => Ok(3968 * 1024 * 1024),
+            12288 => Ok(12160 * 1024 * 1024),
             _ => Err(err("AXBI_OUTPUT_ALLOCATION")),
         }
     }
@@ -125,15 +165,21 @@ impl DriverConfig {
             256 => Ok(32 * 1024 * 1024),
             2048 => Ok(128 * 1024 * 1024),
             4096 => Ok(128 * 1024 * 1024),
+            12288 => Ok(128 * 1024 * 1024),
             _ => Err(err("AXBI_OUTPUT_ALLOCATION")),
         }
     }
     fn validate(&self) -> Result<(), ForwardError> {
-        if ![256, 2048, 4096].contains(&self.output_budget_mib)
+        if ![256, 2048, 4096, 12288].contains(&self.output_budget_mib)
+            || (self.inactive_hi_split && self.q_ref != 0.0)
+            || !(1..=64).contains(&self.transport_threads)
+            || !(8..=1024).contains(&self.transport_cells)
             || self.spectra_every_accepted == 0
             || !self.q_ref.is_finite()
             || !self.end_zbar.is_finite()
             || !(4.0..20.0).contains(&self.end_zbar)
+            || !self.initial_x_hii.is_finite()
+            || !(0.0..=1.0).contains(&self.initial_x_hii)
             || !self.local_target.is_finite()
             || self.local_target <= 0.0
             || self.local_target >= 2e-4
@@ -173,7 +219,14 @@ pub struct Ledgers {
 pub struct DriverState {
     pub a: f64,
     pub gas: IgmGasState,
+    /// Photon count per H; all four arrays together form the physical state.
     pub photons: Vec<f64>,
+    pub photon_energy_ref: Vec<f64>,
+    pub photon_support_lo: Vec<f64>,
+    pub photon_support_hi: Vec<f64>,
+    /// Passive photons retain their original q cell and both moments.
+    pub photon_inactive_number: Vec<f64>,
+    pub photon_inactive_energy_ref: Vec<f64>,
     pub ledgers: Ledgers,
     pub next_dln_a: f64,
     pub accepted: usize,
@@ -187,15 +240,501 @@ pub struct DriverState {
     pub last_error: f64,
     pub wall_elapsed_s: f64,
 }
+
+/// Immutable inputs shared by leaf residual evaluations. This context has no
+/// worker-pool handle and cannot submit nested work or mutate the stage state.
+#[derive(Clone)]
+struct ResidualContext {
+    gas: IgmGasState,
+    a: f64,
+    n_h0_cm3: f64,
+    n_he0_cm3: f64,
+    cells: usize,
+    prepared: Arc<PreparedAbsorption>,
+}
+impl ResidualContext {
+    fn evaluate(
+        &self,
+        unknown: [f64; 4],
+        dt: f64,
+    ) -> Result<([f64; 4], PhotonState, IgmPointRhs), ForwardError> {
+        let gas = IgmGasState::new(
+            [unknown[0], unknown[1], unknown[2]],
+            w_ev_per_h_to_erg(unknown[3])?,
+        )?;
+        let nh = self.n_h0_cm3 / self.a.powi(3);
+        let nhe = self.n_he0_cm3 / self.a.powi(3);
+        let [x, y, z] = gas.fractions;
+        let absorbers = [nh * (1.0 - x), nhe * (1.0 - y - z), nhe * y];
+        let c = HHeModel::controlled_fixture();
+        let absorption = self
+            .prepared
+            .evaluate_for_cell_count(self.cells, absorbers, nh, dt)?;
+        let stocks = absorption.state;
+        let photo = absorption.photo;
+        let point = AxbiProvider.point(&gas, nh, nhe, 0.0, 2.7255 / self.a, photo)?;
+        let mut residual = [0.0; 4];
+        for i in 0..3 {
+            residual[i] = unknown[i] - self.gas.fractions[i] - dt * point.rhs.fraction_dt[i];
+        }
+        residual[3] = unknown[3]
+            - w_erg_per_h_to_ev(self.gas.w_erg_per_h)?
+            - dt * point.rhs.w_dt_erg_per_h_s / c.ev_erg;
+        for &r in &residual {
+            f(r)?;
+        }
+        Ok((residual, stocks, point.rhs))
+    }
+}
+
+/// Jacobian scheduling seam used by the driver and focused injected controls.
+/// Workers evaluate at most one column each, with its original +/- fallback.
+/// Every started residual is charged, including discarded speculative results.
+#[doc(hidden)]
+pub fn jacobian_columns<F>(
+    pool: &OrderedWorkerPool,
+    parallel: bool,
+    x: [f64; 4],
+    residual: [f64; 4],
+    counter: &mut usize,
+    max_rhs: usize,
+    evaluate: F,
+) -> Result<[[f64; 4]; 4], ForwardError>
+where
+    F: Fn([f64; 4]) -> Result<[f64; 4], ForwardError> + Send + Sync + 'static,
+{
+    let use_parallel =
+        parallel && pool.width() > 1 && max_rhs.checked_sub(*counter).is_some_and(|n| n >= 8);
+    let charged = Arc::new(AtomicUsize::new(*counter));
+    let worker_charged = Arc::clone(&charged);
+    let column = move |j: usize| {
+        let call = |unknown| {
+            worker_charged
+                .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+                    if n < max_rhs {
+                        Some(n + 1)
+                    } else {
+                        None
+                    }
+                })
+                .map_err(|_| err("AXBI_RHS_CAP"))?;
+            evaluate(unknown)
+        };
+        let delta = 1e-7 * x[j].abs().max(if j == 3 { 1e-6 } else { 1e-4 });
+        let mut xp = x;
+        xp[j] += delta;
+        let (rp, sign) = match call(xp) {
+            Ok(r) => (r, 1.0),
+            Err(_) => {
+                xp = x;
+                xp[j] -= delta;
+                (call(xp)?, -1.0)
+            }
+        };
+        Ok(std::array::from_fn::<_, 4, _>(|i| {
+            (rp[i] - residual[i]) / (sign * delta)
+        }))
+    };
+    let columns = if use_parallel {
+        pool.map_ordered(4, column)
+    } else {
+        // Preserve serial j order, early failure and cap behavior near budget.
+        (0..4).map(column).collect::<Result<Vec<_>, _>>()
+    };
+    // Merge before propagating any numerical or worker error.
+    *counter = charged.load(Ordering::Relaxed);
+    let columns = columns?;
+    let mut jac = [[0.0; 4]; 4];
+    for j in 0..4 {
+        for i in 0..4 {
+            jac[i][j] = columns[j][i];
+        }
+    }
+    Ok(jac)
+}
+
+/// Opt-in measurements only; production RHS counters are never debited here.
+#[derive(Clone, Debug)]
+pub struct ChemicalStageRecord {
+    pub comparison: usize,
+    pub branch: &'static str,
+    pub adaptive_status: &'static str,
+    pub a: f64,
+    pub dt_s: f64,
+    pub old_state: [f64; 4],
+    pub state: [f64; 4],
+    pub residual: [f64; 4],
+    pub jacobian: [[f64; 4]; 4],
+    pub added_rhs: usize,
+    pub f_he: f64,
+    pub k_b_ev_per_k: f64,
+}
+#[derive(Clone, Debug)]
+pub struct ChemicalStageObserver {
+    pub records: Vec<ChemicalStageRecord>,
+    pub rhs_evaluations: usize,
+    pub max_rhs: usize,
+    pub native_rhs_ceiling: Option<usize>,
+    pub max_records: usize,
+    pub current_comparison: usize,
+    pub current_branch: &'static str,
+    pub failure: Option<String>,
+    bounded: Option<BoundedObserverState>,
+}
+impl ChemicalStageObserver {
+    pub fn new(max_rhs: usize) -> Self {
+        Self { records: Vec::new(), rhs_evaluations: 0, max_rhs,
+            native_rhs_ceiling: None, max_records: 180, current_comparison: 0, current_branch: "DIRECT",
+            failure: None, bounded: None }
+    }
+}
+
+/// Measurement-only policy, explicitly selected separately from legacy SOURCE011.
+/// The same object must be retained across the entire execution.
+#[derive(Clone, Debug)]
+pub struct BoundedChemicalStagePacket {
+    pub input_kind: &'static str,
+    pub sequence: usize,
+    pub comparison: usize,
+    pub parent_step_id: usize,
+    pub branch: &'static str,
+    pub adaptive_status: &'static str,
+    pub context_id: String,
+    pub a: f64,
+    pub dt_s: f64,
+    pub old_state: [f64; 4],
+    pub state: [f64; 4],
+    pub residual: [f64; 4],
+    pub jacobian: Option<[[f64; 4]; 4]>,
+    pub unavailable_reason: Option<String>,
+    pub native_scaled_residual_inf: f64,
+    pub added_rhs_attempts: usize,
+    pub added_rhs_successes: usize,
+    pub elapsed_seconds: f64,
+    pub f_he: f64,
+    pub k_b_ev_per_k: f64,
+}
+#[derive(Clone, Debug)]
+pub struct BoundedObserverEvaluation {
+    pub evaluation_id: usize,
+    pub packet_sequence: usize,
+    pub column: usize,
+    pub requested_delta: f64,
+    pub direction: i32,
+    pub perturbed_state: [f64; 4],
+    pub outcome: String,
+    pub elapsed_seconds: f64,
+}
+#[derive(Clone, Debug)]
+pub struct BoundedObserverSummary {
+    pub packets: usize,
+    pub attempts: usize,
+    pub successes: usize,
+    pub cap_denied: usize,
+    pub skipped_stages: usize,
+    pub failed_packets: usize,
+    pub max_packets: usize,
+    pub max_rhs: usize,
+    pub elapsed_seconds: f64,
+    pub flushed: bool,
+}
+#[derive(Clone, Debug)]
+struct BoundedObserverState {
+    packets: Vec<BoundedChemicalStagePacket>,
+    evaluations: Vec<BoundedObserverEvaluation>,
+    run_id: String,
+    source_commit: String,
+    driver_blob: String,
+    cost_owner: String,
+    parent_step_id: usize,
+    stage_sequence: usize,
+    attempts: usize,
+    successes: usize,
+    cap_denied: usize,
+    skipped_stages: usize,
+    max_packets: usize,
+    max_rhs: usize,
+    elapsed_seconds: f64,
+    flushed: bool,
+}
+
+fn observer_json_string(text: &str) -> String {
+    let mut result = String::from("\"");
+    for c in text.chars() {
+        match c {
+            '"' => result.push_str("\\\""),
+            '\\' => result.push_str("\\\\"),
+            c if c.is_control() => result.push_str(&format!("\\u{:04x}", c as u32)),
+            c => result.push(c),
+        }
+    }
+    result.push('"');
+    result
+}
+
+impl BoundedObserverState {
+    fn columns<F>(
+        &mut self, sequence: usize, x: [f64; 4], residual: [f64; 4], mut evaluate: F,
+    ) -> Result<[[f64; 4]; 4], ForwardError>
+    where F: FnMut([f64; 4]) -> Result<[f64; 4], ForwardError> {
+        let mut jac = [[0.0; 4]; 4];
+        for j in 0..4 {
+            let delta = 1e-7 * x[j].abs().max(if j == 3 { 1e-6 } else { 1e-4 });
+            let mut value = None;
+            for direction in [1, -1] {
+                if self.attempts >= self.max_rhs {
+                    self.cap_denied = self.cap_denied.saturating_add(1);
+                    return Err(err("BOUNDED_OBSERVER_RHS_CAP"));
+                }
+                let mut perturbed = x;
+                perturbed[j] += direction as f64 * delta;
+                // Charge immediately before every actual call, including failures.
+                self.attempts += 1;
+                let evaluation_id = self.attempts;
+                let started = Instant::now();
+                let evaluated = evaluate(perturbed).and_then(|r| {
+                    if r.iter().all(|v| v.is_finite()) { Ok(r) }
+                    else { Err(err("BOUNDED_OBSERVER_NONFINITE_RESIDUAL")) }
+                });
+                let elapsed_seconds = started.elapsed().as_secs_f64();
+                if evaluated.is_ok() { self.successes += 1; }
+                self.evaluations.push(BoundedObserverEvaluation {
+                    evaluation_id, packet_sequence: sequence, column: j,
+                    requested_delta: delta, direction, perturbed_state: perturbed,
+                    outcome: match &evaluated {
+                        Ok(_) => "SUCCESS".into(), Err(e) => format!("FAILED:{e:?}"),
+                    }, elapsed_seconds,
+                });
+                match evaluated {
+                    Ok(r) => { value = Some((r, direction)); break; }
+                    Err(e) if direction == -1 => return Err(e),
+                    Err(_) => {},
+                }
+            }
+            let (r, direction) = value.ok_or(err("BOUNDED_OBSERVER_MISSING_COLUMN"))?;
+            for i in 0..4 {
+                jac[i][j] = f((r[i] - residual[i]) / (direction as f64 * delta))?;
+            }
+        }
+        Ok(jac)
+    }
+}
+
+impl ChemicalStageObserver {
+    pub fn new_bounded(
+        run_id: &str, source_commit: &str, cost_owner: &str,
+    ) -> Result<Self, ForwardError> {
+        Self::new_bounded_with_limits(run_id, source_commit, cost_owner, 6, 48)
+    }
+    /// Limits are clamped to the whole-execution ceilings, never reset per step.
+    pub fn new_bounded_with_limits(
+        run_id: &str, source_commit: &str, cost_owner: &str,
+        max_packets: usize, max_rhs: usize,
+    ) -> Result<Self, ForwardError> {
+        if run_id.is_empty() || run_id.len() > 128 || cost_owner.is_empty()
+            || cost_owner.len() > 128 || source_commit.len() != 40
+            || !source_commit.bytes().all(|c| c.is_ascii_hexdigit()) {
+            return Err(err("BOUNDED_OBSERVER_PROVENANCE"));
+        }
+        // Constructor runs at the outer boundary. No identity process or I/O
+        // occurs in chemical/Newton/adaptive loops. Hash the actual compiled file.
+        use std::process::{Command, Stdio};
+        let mut child = Command::new("git").args(["hash-object", "--stdin"])
+            .stdin(Stdio::piped()).stdout(Stdio::piped()).spawn().map_err(ioerr)?;
+        child.stdin.take().ok_or(err("BOUNDED_OBSERVER_BLOB"))?
+            .write_all(include_bytes!("axbi_driver.rs")).map_err(ioerr)?;
+        let result = child.wait_with_output().map_err(ioerr)?;
+        let driver_blob = String::from_utf8(result.stdout)
+            .map_err(|_| err("BOUNDED_OBSERVER_BLOB"))?.trim().to_string();
+        if !result.status.success() || driver_blob.len() != 40 {
+            return Err(err("BOUNDED_OBSERVER_BLOB"));
+        }
+        let mut observer = Self::new(max_rhs.min(48));
+        observer.max_records = max_packets.min(6);
+        observer.bounded = Some(BoundedObserverState {
+            packets: Vec::with_capacity(max_packets.min(6)),
+            evaluations: Vec::with_capacity(max_rhs.min(48)),
+            run_id: run_id.into(), source_commit: source_commit.into(), driver_blob,
+            cost_owner: cost_owner.into(), parent_step_id: 0, stage_sequence: 0,
+            attempts: 0, successes: 0, cap_denied: 0, skipped_stages: 0,
+            max_packets: max_packets.min(6), max_rhs: max_rhs.min(48),
+            elapsed_seconds: 0.0, flushed: false,
+        });
+        Ok(observer)
+    }
+    pub fn bounded_packets(&self) -> Option<&[BoundedChemicalStagePacket]> {
+        self.bounded.as_ref().map(|s| s.packets.as_slice())
+    }
+    pub fn bounded_evaluations(&self) -> Option<&[BoundedObserverEvaluation]> {
+        self.bounded.as_ref().map(|s| s.evaluations.as_slice())
+    }
+    pub fn bounded_summary(&self) -> Option<BoundedObserverSummary> {
+        self.bounded.as_ref().map(|s| BoundedObserverSummary {
+            packets: s.packets.len(), attempts: s.attempts, successes: s.successes,
+            cap_denied: s.cap_denied, skipped_stages: s.skipped_stages,
+            failed_packets: s.packets.iter().filter(|p| p.jacobian.is_none()).count(),
+            max_packets: s.max_packets, max_rhs: s.max_rhs,
+            elapsed_seconds: s.elapsed_seconds, flushed: s.flushed,
+        })
+    }
+    fn capture_bounded<F>(
+        &mut self, a: f64, dt_s: f64, old_state: [f64; 4], state: [f64; 4],
+        residual: [f64; 4], norm: f64, f_he: f64, k_b_ev_per_k: f64, evaluate: F,
+    ) where F: FnMut([f64; 4]) -> Result<[f64; 4], ForwardError> {
+        let b = self.bounded.as_mut().expect("bounded capture policy");
+        b.stage_sequence = b.stage_sequence.saturating_add(1);
+        if b.flushed || b.packets.len() >= b.max_packets {
+            b.skipped_stages = b.skipped_stages.saturating_add(1);
+            return;
+        }
+        let started = Instant::now();
+        let sequence = b.stage_sequence;
+        let context_id = format!("{}:{}:{}:{}:{:016x}:{:016x}",
+            b.run_id, self.current_comparison, self.current_branch, sequence,
+            a.to_bits(), dt_s.to_bits());
+        let before = (b.attempts, b.successes);
+        let result = b.columns(sequence, state, residual, evaluate);
+        let (jacobian, unavailable_reason) = match result {
+            Ok(j) => (Some(j), None),
+            Err(e) => (None, Some(format!("HOLD_OBSERVER_JACOBIAN_UNAVAILABLE:{e:?}"))),
+        };
+        let elapsed_seconds = started.elapsed().as_secs_f64();
+        b.elapsed_seconds += elapsed_seconds;
+        b.packets.push(BoundedChemicalStagePacket {
+            input_kind: "ACTUAL_STAGE",
+            sequence, comparison: self.current_comparison,
+            parent_step_id: b.parent_step_id,
+            branch: match self.current_branch {
+                "FIRST_HALF" => "HALF_FIRST", "SECOND_HALF" => "HALF_SECOND", tag => tag,
+            }, adaptive_status: "PENDING", context_id, a, dt_s, old_state, state,
+            residual, jacobian, unavailable_reason,
+            native_scaled_residual_inf: norm,
+            added_rhs_attempts: b.attempts-before.0,
+            added_rhs_successes: b.successes-before.1,
+            elapsed_seconds, f_he, k_b_ev_per_k,
+        });
+        self.rhs_evaluations = b.attempts;
+    }
+    fn finalize_bounded(&mut self, first: usize, status: &'static str) {
+        if let Some(b) = self.bounded.as_mut() {
+            for packet in &mut b.packets[first..] { packet.adaptive_status = status; }
+        }
+    }
+    /// Injected changed-seam control; never owner telemetry or an IVP result.
+    #[doc(hidden)]
+    pub fn bounded_capture_control<F>(
+        &mut self, state: [f64; 4], residual: [f64; 4], evaluate: F,
+    ) where F: FnMut([f64; 4]) -> Result<[f64; 4], ForwardError> {
+        let before = self.bounded_packets().map_or(0, |p| p.len());
+        self.capture_bounded(0.05, 1.0, state, state, residual, 0.0,
+            0.08, 8.617333262e-5, evaluate);
+        if let Some(b) = &mut self.bounded {
+            if b.packets.len() > before {
+                b.packets.last_mut().unwrap().input_kind = "SYNTHETIC_FIXTURE";
+            }
+        }
+    }
+    /// Same finalizer used after the actual outer adaptive decision.
+    #[doc(hidden)]
+    pub fn bounded_finalize_control(&mut self, first: usize, status: &'static str) {
+        self.finalize_bounded(first, status);
+    }
+
+    /// Call once after the outer execution ends. No inner-loop I/O is performed.
+    /// A fresh destination and temporary files preserve partial failure evidence.
+    pub fn flush_bounded(&mut self, out: &Path) -> Result<(), ForwardError> {
+        let b = self.bounded.as_mut().ok_or(err("BOUNDED_OBSERVER_MODE"))?;
+        if b.flushed { return Err(err("BOUNDED_OBSERVER_ALREADY_FLUSHED")); }
+        let mut texts = Vec::with_capacity(b.packets.len());
+        for p in &b.packets {
+            if ![p.a, p.dt_s, p.native_scaled_residual_inf, p.elapsed_seconds,
+                p.f_he, p.k_b_ev_per_k].iter().chain(p.state.iter())
+                .chain(p.old_state.iter()).chain(p.residual.iter()).all(|x| x.is_finite())
+                || p.jacobian.as_ref().is_some_and(|j| !j.iter().flatten().all(|x| x.is_finite())) {
+                return Err(err("BOUNDED_OBSERVER_NONFINITE_PACKET"));
+            }
+            let state = format!("{:?}", p.state);
+            let jacobian = p.jacobian.map(|j| format!("{j:?}")).unwrap_or_else(|| "null".into());
+            let context = observer_json_string(&p.context_id);
+            let jcontext = if p.jacobian.is_some() { context.clone() } else { "null".into() };
+            let jstate = if p.jacobian.is_some() { state.clone() } else { "null".into() };
+            let reason = p.unavailable_reason.as_ref().map(|v| observer_json_string(v))
+                .unwrap_or_else(|| "null".into());
+            let trajectory = match (p.branch, p.adaptive_status) {
+                ("FULL", _) => "DISCARDED_FULL_TRIAL",
+                ("HALF_FIRST", "ACCEPTED") => "INTERMEDIATE_HALF_FIRST",
+                ("HALF_SECOND", "ACCEPTED") => "FINAL_TRAJECTORY_HALF_SECOND",
+                (_, "PENDING") => "UNRESOLVED_NOT_TRAJECTORY",
+                _ => "DISCARDED_TRIAL",
+            };
+            let mut evaluations = Vec::new();
+            for e in b.evaluations.iter().filter(|e| e.packet_sequence == p.sequence) {
+                if !e.requested_delta.is_finite() || !e.elapsed_seconds.is_finite()
+                    || !e.perturbed_state.iter().all(|x| x.is_finite()) {
+                    return Err(err("BOUNDED_OBSERVER_NONFINITE_EVALUATION"));
+                }
+                evaluations.push(format!(
+                    "{{\"evaluation_id\":{},\"column\":{},\"requested_delta\":{},\"direction\":{},\"perturbed_state\":{:?},\"outcome\":{},\"elapsed_seconds\":{}}}",
+                    e.evaluation_id,e.column,e.requested_delta,e.direction,e.perturbed_state,
+                    observer_json_string(&e.outcome),e.elapsed_seconds));
+            }
+            texts.push(format!(concat!(
+                "{{\"schema_version\":1,\"input_kind\":{},",
+                "\"state_order\":[\"x_HII\",\"x_HeII\",\"x_HeIII\",\"w_eV_per_H\"],",
+                "\"energy_unit\":\"eV_per_H\",\"method\":\"BACKWARD_EULER_PREPARED_ABSORPTION\",",
+                "\"run_id\":{},\"source_commit\":{},\"source_commit_kind\":\"BASE_SNAPSHOT_WITH_WORKING_DRIVER_BLOB\",",
+                "\"driver_blob_sha\":{},\"cost_owner\":{},\"stage_id\":{},\"execution_receipt\":\"SUMMARY.json\",",
+                "\"chemical_stage_sequence\":{},\"adaptive_attempt_id\":{},\"parent_step_id\":{},",
+                "\"branch\":{},\"adaptive_status\":{},\"trajectory_role\":{},",
+                "\"iterate_status\":\"ACCEPTED_CHEMICAL_STAGE\",\"state\":{},\"old_state\":{:?},",
+                "\"residual\":{:?},\"jacobian\":{},\"unavailable_reason\":{},",
+                "\"context_id\":{},\"prepared_context_id\":{},\"residual_context_id\":{},\"jacobian_context_id\":{},",
+                "\"residual_evaluation_state\":{},\"jacobian_evaluation_state\":{},",
+                "\"a\":{},\"dt_s\":{},\"f_He\":{},\"k_B_eV_per_K\":{},\"native_scaled_residual_inf\":{},",
+                "\"jacobian_kind\":\"FINITE_DIFFERENCE\",\"observer_parallel_policy\":\"SERIAL_NO_SPECULATIVE_RESERVATIONS\",",
+                "\"added_rhs_evaluations\":{},\"added_rhs_successes\":{},\"observer_elapsed_seconds\":{},\"evaluations\":[{}]}}\n"),
+                observer_json_string(p.input_kind),observer_json_string(&b.run_id),observer_json_string(&b.source_commit),
+                observer_json_string(&b.driver_blob),observer_json_string(&b.cost_owner),context,
+                p.sequence,p.comparison,p.parent_step_id,observer_json_string(p.branch),
+                observer_json_string(p.adaptive_status),observer_json_string(trajectory),state,p.old_state,
+                p.residual,jacobian,reason,context,context,context,jcontext,state,jstate,
+                p.a,p.dt_s,p.f_he,p.k_b_ev_per_k,p.native_scaled_residual_inf,
+                p.added_rhs_attempts,p.added_rhs_successes,p.elapsed_seconds,evaluations.join(",")));
+        }
+        if !b.elapsed_seconds.is_finite() { return Err(err("BOUNDED_OBSERVER_NONFINITE_TIME")); }
+        let summary = format!(concat!(
+            "{{\"status\":\"BOUNDED_OBSERVER_FLUSHED\",\"run_id\":{},\"cost_owner\":{},",
+            "\"packets\":{},\"attempts\":{},\"successes\":{},\"cap_denied\":{},\"skipped_stages\":{},",
+            "\"max_packets\":{},\"max_rhs\":{},\"observer_elapsed_seconds\":{},",
+            "\"parallel_policy\":\"SERIAL_NO_SPECULATIVE_RESERVATIONS\",\"scientific_admission\":\"NOT_ISSUED\"}}\n"),
+            observer_json_string(&b.run_id),observer_json_string(&b.cost_owner),b.packets.len(),
+            b.attempts,b.successes,b.cap_denied,b.skipped_stages,b.max_packets,b.max_rhs,b.elapsed_seconds);
+        fs::create_dir(out).map_err(ioerr)?;
+        for (name, text) in texts.into_iter().enumerate().map(|(i,t)| (format!("stage-{i:03}.json"),t))
+            .chain(std::iter::once(("SUMMARY.json".into(),summary))) {
+            let temporary = out.join(format!("{name}.tmp"));
+            let mut file = fs::OpenOptions::new().write(true).create_new(true)
+                .open(&temporary).map_err(ioerr)?;
+            file.write_all(text.as_bytes()).map_err(ioerr)?;
+            file.sync_all().map_err(ioerr)?;
+            fs::rename(temporary, out.join(name)).map_err(ioerr)?;
+        }
+        b.flushed = true;
+        Ok(())
+    }
+}
 #[derive(Clone, Debug)]
 pub struct Driver {
     pub config: DriverConfig,
     pub background: AxbiBackground,
+    /// Opt-in producer table. The legacy public background remains intact.
+    bass_background: Option<BassBackground>,
+    bass_passive_certified: bool,
     pub source: AxbiSource,
     pub energies: Vec<f64>,
     pub n_h0_cm3: f64,
     pub n_he0_cm3: f64,
-    signature: Vec<[f64; 3]>,
+    pub transport: CovariantTransport,
     initial_energy: f64,
 }
 impl Driver {
@@ -243,32 +782,31 @@ impl Driver {
             config.energy_subdivisions,
             config.n_mu,
         )?;
-        let mut energies = vec![13.6];
-        for cell in &source.spectral_cells {
-            energies.push(cell.upper_ev);
-        }
-        let provider = AtomicProvider::reference();
-        let signature = energies
-            .iter()
-            .map(|&e| {
-                Ok([
-                    provider.cross_section(Absorber::HI, e)?,
-                    provider.cross_section(Absorber::HeI, e)?,
-                    provider.cross_section(Absorber::HeII, e)?,
-                ])
+        let reference = bg.point_at_scale(a_ref)?.geometry()?;
+        let transport =
+            CovariantTransport::new(&source, reference, config.transport_cells, 13.6, 512.0)?
+                .with_threads(config.transport_threads)?;
+        let energies = (0..config.transport_cells)
+            .map(|i| {
+                13.6 * (512.0_f64 / 13.6).powf((i as f64 + 0.5) / config.transport_cells as f64)
             })
-            .collect::<Result<Vec<_>, ForwardError>>()?;
+            .collect::<Vec<_>>();
         let gas = IgmGasState::from_temperature(
-            [2e-4, 0.0, 0.0],
+            [config.initial_x_hii, 0.0, 0.0],
             n_h0 / a_ref.powi(3),
             n_he0 / a_ref.powi(3),
             config.initial_temperature_k,
         )?;
-        let photons = vec![0.0; energies.len() * source.angular_cells.len()];
+        let photon_state = transport.empty_state();
         let state = DriverState {
             a: a_ref,
             gas,
-            photons,
+            photons: photon_state.number,
+            photon_energy_ref: photon_state.energy_ref,
+            photon_support_lo: photon_state.support_lo,
+            photon_support_hi: photon_state.support_hi,
+            photon_inactive_number: vec![0.0; transport.cell_count()],
+            photon_inactive_energy_ref: vec![0.0; transport.cell_count()],
             ledgers: Ledgers::default(),
             next_dln_a: config.initial_dln_a,
             accepted: 0,
@@ -284,25 +822,223 @@ impl Driver {
         let mut driver = Self {
             config,
             background: bg,
+            bass_background: None,
+            bass_passive_certified: false,
             source,
             energies,
             n_h0_cm3: n_h0,
             n_he0_cm3: n_he0,
-            signature,
+            transport,
             initial_energy: 0.0,
         };
         driver.initial_energy = driver.total_energy(&state)?;
         Ok((driver, state))
     }
-    pub fn photon_inventory(&self, state: &DriverState) -> (f64, f64) {
-        let ne = self.energies.len();
-        let mut n = 0.0;
-        let mut u = 0.0;
-        for (i, &v) in state.photons.iter().enumerate() {
-            n += v;
-            u += v * self.energies[i % ne];
+    pub fn new_bass(
+        config: DriverConfig,
+        bass: BassBackground,
+    ) -> Result<(Self, DriverState), ForwardError> {
+        if config.q_ref != 0.0 || config.same_h {
+            return Err(err("BASS_DRIVER_CONFIG_MODE"));
         }
-        (n, u)
+        let passive_certified = if config.inactive_hi_split {
+            let report = bass.passive_monotonicity();
+            if report.status != crate::axbi_bass_background::BassMonotonicityStatus::Established {
+                return Err(err("BASS_MONOTONICITY_NOT_ESTABLISHED"));
+            }
+            true
+        } else {
+            false
+        };
+        let (mut driver, state) = Self::new(config)?;
+        driver.bass_passive_certified = passive_certified;
+        let a_ref = state.a;
+        let reference = bass.point_at_scale(a_ref)?.geometry()?;
+        bass.point_at_scale(1.0 / (1.0 + driver.config.end_zbar))?;
+        driver.transport = CovariantTransport::new(
+            &driver.source,
+            reference,
+            driver.config.transport_cells,
+            13.6,
+            512.0,
+        )?
+        .with_threads(driver.config.transport_threads)?;
+        driver.bass_background = Some(bass);
+        driver.initial_energy = driver.total_energy(&state)?;
+        Ok((driver, state))
+    }
+    pub fn geometry_point(&self, a: f64) -> Result<BackgroundPoint, ForwardError> {
+        match &self.bass_background {
+            Some(bg) => bg.point_at_scale(a),
+            None => self.background.point_at_scale(a),
+        }
+    }
+    pub fn geometry_point_at_time(&self, t: f64) -> Result<BackgroundPoint, ForwardError> {
+        match &self.bass_background {
+            Some(bg) => bg.point_at_time(t),
+            None => self.background.point_at_time(t),
+        }
+    }
+    pub fn geometry_increment(
+        &self,
+        a0: f64,
+        a1: f64,
+    ) -> Result<BackgroundIncrement, ForwardError> {
+        match &self.bass_background {
+            Some(bg) => bg.interval_increment(a0, a1),
+            None => self.background.interval_increment(a0, a1),
+        }
+    }
+    pub fn bass_identity(&self) -> Option<&crate::axbi_bass_background::BassSourceIdentity> {
+        self.bass_background.as_ref().map(|b| &b.identity)
+    }
+    pub fn transport_mode_metadata(&self) -> String {
+        let (provider, scope) = if self.bass_background.is_some() {
+            (
+                "BASS_SELECTED_SOURCE008",
+                if self.config.inactive_hi_split && self.bass_passive_certified {
+                    "selected_BASS_certified_forward_ray_monotone_only"
+                } else if self.config.inactive_hi_split {
+                    "MONOTONICITY_NOT_ESTABLISHED"
+                } else {
+                    "disabled"
+                },
+            )
+        } else {
+            ("AXBI_ANALYTIC", "q0_forward_monotonic_only")
+        };
+        format!("inactive_hi_split={}\nbackground_provider={}\npassive_scope={}\ncheckpoint_version=V4\ntransport_threads={}\nparallel_scope=persistent_cell_prepare_and_opt_in_jacobian_columns\nparallel_jacobian_columns={}\n", self.config.inactive_hi_split,provider,scope,self.config.transport_threads,self.config.parallel_jacobian_columns)
+    }
+    fn photon_state(&self, state: &DriverState) -> PhotonState {
+        PhotonState {
+            number: state.photons.clone(),
+            energy_ref: state.photon_energy_ref.clone(),
+            support_lo: state.photon_support_lo.clone(),
+            support_hi: state.photon_support_hi.clone(),
+        }
+    }
+    fn set_photon_state(state: &mut DriverState, photons: PhotonState) {
+        state.photons = photons.number;
+        state.photon_energy_ref = photons.energy_ref;
+        state.photon_support_lo = photons.support_lo;
+        state.photon_support_hi = photons.support_hi;
+    }
+    fn validate_inactive(
+        &self,
+        state: &DriverState,
+        geometry: &GeometrySnapshot,
+    ) -> Result<(), ForwardError> {
+        let count = self.transport.cell_count();
+        if state.photon_inactive_number.len() != count
+            || state.photon_inactive_energy_ref.len() != count
+        {
+            return Err(err("AXBI_INACTIVE_SHAPE"));
+        }
+        let rays = self.transport.ray_geometry(geometry)?;
+        let edges = self.transport.edges();
+        for j in 0..count {
+            let n = f(state.photon_inactive_number[j])?;
+            let u = f(state.photon_inactive_energy_ref[j])?;
+            if n < 0.0 || u < 0.0 || (!self.config.inactive_hi_split && (n != 0.0 || u != 0.0)) {
+                return Err(err("AXBI_INACTIVE_DOMAIN_OR_MODE"));
+            }
+            if n == 0.0 {
+                if u != 0.0 {
+                    return Err(err("AXBI_INACTIVE_EMPTY_ENERGY"));
+                }
+            } else {
+                let i = j % self.energies.len();
+                let scale = rays[j / self.energies.len()].scale;
+                let upper = edges[i + 1].min(13.6 / scale);
+                if u < edges[i] * n || u > upper * n {
+                    return Err(err("AXBI_INACTIVE_SUPPORT_OR_REACTIVATION"));
+                }
+            }
+        }
+        Ok(())
+    }
+    /// [active N, active physical U, passive N, passive physical U].
+    pub fn photon_pool_inventory(&self, state: &DriverState) -> Result<[f64; 4], ForwardError> {
+        let geometry = self.geometry_point(state.a)?.geometry()?;
+        self.pool_inventory_with_geometry(state, &geometry)
+    }
+    fn pool_inventory_with_geometry(
+        &self,
+        state: &DriverState,
+        geometry: &GeometrySnapshot,
+    ) -> Result<[f64; 4], ForwardError> {
+        self.validate_inactive(state, geometry)?;
+        let (n, u) = self
+            .transport
+            .inventory(&self.photon_state(state), geometry)?;
+        let rays = self.transport.ray_geometry(geometry)?;
+        let pn = state.photon_inactive_number.iter().sum::<f64>();
+        let pu = state
+            .photon_inactive_energy_ref
+            .iter()
+            .enumerate()
+            .map(|(j, &v)| v * rays[j / self.energies.len()].scale)
+            .sum::<f64>();
+        Ok([n, u, f(pn)?, f(pu)?])
+    }
+    fn inventory_with_geometry(
+        &self,
+        state: &DriverState,
+        geometry: &GeometrySnapshot,
+    ) -> Result<(f64, f64), ForwardError> {
+        let [n, u, pn, pu] = self.pool_inventory_with_geometry(state, geometry)?;
+        Ok((f(n + pn)?, f(u + pu)?))
+    }
+    fn partition_inactive(
+        &self,
+        state: &mut DriverState,
+        geometry: &GeometrySnapshot,
+    ) -> Result<(), ForwardError> {
+        if !self.config.inactive_hi_split {
+            return Ok(());
+        }
+        self.validate_inactive(state, geometry)?;
+        let partition = self
+            .transport
+            .partition_below_hi(&self.photon_state(state), geometry)?;
+        let mut pn = state.photon_inactive_number.clone();
+        let mut pu = state.photon_inactive_energy_ref.clone();
+        self.transport.merge_inactive(
+            &mut pn,
+            &mut pu,
+            &partition.inactive_number,
+            &partition.inactive_energy_ref,
+        )?;
+        // Validate the complete candidate before committing either compartment.
+        let mut next = state.clone();
+        Self::set_photon_state(&mut next, partition.active);
+        next.photon_inactive_number = pn;
+        next.photon_inactive_energy_ref = pu;
+        self.validate_inactive(&next, geometry)?;
+        *state = next;
+        Ok(())
+    }
+    /// Preserved infallible diagnostic API. Invalid photon state yields NaNs;
+    /// every mutating production entry point validates the complete state.
+    pub fn photon_inventory(&self, state: &DriverState) -> (f64, f64) {
+        self.geometry_point(state.a)
+            .and_then(|p| p.geometry())
+            .and_then(|g| self.inventory_with_geometry(state, &g))
+            .unwrap_or((f64::NAN, f64::NAN))
+    }
+    /// Explicit delta fixture: q is reference-frame energy, with no redshift
+    /// projection. This only seeds photon state; callers own source ledgers.
+    pub fn seed_delta(
+        &self,
+        state: &mut DriverState,
+        ray: usize,
+        q: f64,
+        count: f64,
+    ) -> Result<(), ForwardError> {
+        let mut photons = self.photon_state(state);
+        self.transport.add_delta(&mut photons, ray, q, count)?;
+        Self::set_photon_state(state, photons);
+        Ok(())
     }
     fn binding(&self, gas: &IgmGasState) -> f64 {
         let chi = HHeModel::controlled_fixture().threshold_ev;
@@ -328,15 +1064,9 @@ impl Driver {
             f(self.total_energy(s)? - self.initial_energy)?,
         ))
     }
-    fn ray(&self, k: usize, a: f64) -> Result<CharacteristicRay, ForwardError> {
-        let mu = self.source.angular_cells[k].mu;
-        let initial = CharacteristicRay::new(1.0, [(1.0 - mu * mu).sqrt(), 0.0, mu], 0.0)?;
-        initial.pullback(
-            &self.background.point_at_scale(1.0 / 21.0)?.geometry()?,
-            &self.background.point_at_scale(a)?.geometry()?,
-        )
-    }
-    /// Conservative two-neighbor N/U deposit. Boundary stock has one owner.
+    /// Legacy diagnostic nodal deposit only. Does not construct a physical
+    /// DriverState: use seed_delta for complete N/U/support fixtures.
+    /// Production injection/geometry/absorption never calls this method.
     pub fn deposit(
         &self,
         stocks: &mut [f64],
@@ -372,30 +1102,32 @@ impl Driver {
         Ok((0.0, 0.0))
     }
     pub fn geometry_map(&self, s: &mut DriverState, to: f64) -> Result<(), ForwardError> {
-        let g0 = self.background.point_at_scale(s.a)?.geometry()?;
-        let g1 = self.background.point_at_scale(to)?.geometry()?;
-        let mut stocks = vec![0.0; s.photons.len()];
-        let ne = self.energies.len();
-        for k in 0..self.source.angular_cells.len() {
-            let local = self.ray(k, s.a)?;
-            let moved = local.pullback(&g0, &g1)?;
-            let ratio = moved.energy_ev / local.energy_ev;
-            for i in 0..ne {
-                let n = s.photons[k * ne + i];
-                if n == 0.0 {
-                    continue;
-                }
-                let energy = self.energies[i] * ratio;
-                let (bn, bu) = self.deposit(&mut stocks, k, energy, n)?;
-                s.ledgers.boundary_n += bn;
-                s.ledgers.boundary_u += bu;
-                s.ledgers.photon_work += n * (self.energies[i] - energy);
+        if self.config.inactive_hi_split && to < s.a {
+            return Err(err("AXBI_INACTIVE_REVERSE_GEOMETRY"));
+        }
+        let g0 = self.geometry_point(s.a)?.geometry()?;
+        let g1 = self.geometry_point(to)?.geometry()?;
+        if self.config.inactive_hi_split && self.bass_background.is_some() {
+            if !self.bass_passive_certified {
+                return Err(err("BASS_MONOTONICITY_NOT_ESTABLISHED"));
+            }
+            let old_rays = self.transport.ray_geometry(&g0)?;
+            let new_rays = self.transport.ray_geometry(&g1)?;
+            if old_rays.len() != new_rays.len()
+                || old_rays.iter().zip(&new_rays).any(|(old, new)| {
+                    !old.scale.is_finite() || !new.scale.is_finite() || new.scale > old.scale
+                })
+            {
+                return Err(err("BASS_PASSIVE_RAY_REDSHIFT_NOT_ESTABLISHED"));
             }
         }
+        let (_, old_u) = self.inventory_with_geometry(s, &g0)?;
+        let (_, new_u) = self.inventory_with_geometry(s, &g1)?;
+        self.partition_inactive(s, &g1)?;
+        s.ledgers.photon_work += old_u - new_u;
         let old_w = w_erg_per_h_to_ev(s.gas.w_erg_per_h)?;
         s.gas = s.gas.adiabatic_to(s.a, to)?;
         s.ledgers.thermal_work += old_w - w_erg_per_h_to_ev(s.gas.w_erg_per_h)?;
-        s.photons = stocks;
         s.a = to;
         let eos = s
             .gas
@@ -404,82 +1136,29 @@ impl Driver {
         Ok(())
     }
     fn inject(&self, s: &mut DriverState, dt: f64) -> Result<(), ForwardError> {
-        let gref = self.background.point_at_scale(1.0 / 21.0)?.geometry()?;
-        let current = self.background.point_at_scale(s.a)?.geometry()?;
-        let mut weights = Vec::new();
-        for cell in &self.source.angular_cells {
-            let ray =
-                CharacteristicRay::new(1.0, [(1.0 - cell.mu * cell.mu).sqrt(), 0.0, cell.mu], 0.0)?;
-            weights.push(cell.count_fraction * ray.solid_angle_jacobian(&gref, &current)?);
-        }
-        let sum = weights.iter().sum::<f64>();
-        let rate = self.source.at_redshift(1.0 / s.a - 1.0)?.per_h_s;
-        for (k, w) in weights.iter().enumerate() {
-            for cell in &self.source.spectral_cells {
-                let n = rate * dt * cell.photon_fraction * w / sum;
-                let (bn, bu) = self.deposit(&mut s.photons, k, cell.energy_ev, n)?;
-                s.ledgers.source_n += n;
-                s.ledgers.source_u += n * cell.energy_ev;
-                s.ledgers.boundary_n += bn;
-                s.ledgers.boundary_u += bu;
-            }
-        }
+        let geometry = self.geometry_point(s.a)?.geometry()?;
+        let mut photons = self.photon_state(s);
+        let emitted = self
+            .transport
+            .inject(&mut photons, &geometry, 1.0 / s.a - 1.0, dt)?;
+        s.ledgers.source_n += emitted.added_photons_per_h;
+        s.ledgers.source_u += emitted.added_energy_ev_per_h;
+        Self::set_photon_state(s, photons);
         Ok(())
     }
     fn evaluate(
         &self,
-        old: &DriverState,
+        context: &ResidualContext,
         unknown: [f64; 4],
         dt: f64,
         counter: &mut usize,
-    ) -> Result<([f64; 4], Vec<f64>, IgmPointRhs), ForwardError> {
-        if *counter >= self.config.max_rhs {
+        native_rhs_ceiling: usize,
+    ) -> Result<([f64; 4], PhotonState, IgmPointRhs), ForwardError> {
+        if *counter >= native_rhs_ceiling {
             return Err(err("AXBI_RHS_CAP"));
         }
         *counter += 1;
-        let gas = IgmGasState::new(
-            [unknown[0], unknown[1], unknown[2]],
-            w_ev_per_h_to_erg(unknown[3])?,
-        )?;
-        let nh = self.n_h0_cm3 / old.a.powi(3);
-        let nhe = self.n_he0_cm3 / old.a.powi(3);
-        let [x, y, z] = gas.fractions;
-        let absorbers = [nh * (1.0 - x), nhe * (1.0 - y - z), nhe * y];
-        let c = HHeModel::controlled_fixture();
-        let ne = self.energies.len();
-        let mut stocks = Vec::with_capacity(old.photons.len());
-        let mut photo = IgmPhotoInput::default();
-        for (j, &nstar) in old.photons.iter().enumerate() {
-            let i = j % ne;
-            let opacity = (0..3)
-                .map(|k| absorbers[k] * self.signature[i][k])
-                .sum::<f64>();
-            let n = f(nstar / (1.0 + dt * c.c_cm_s * opacity))?;
-            stocks.push(n);
-            for k in 0..3 {
-                let rate = c.c_cm_s * nh * self.signature[i][k] * n;
-                photo.gamma_s[k] += rate;
-                if rate != 0.0 {
-                    if self.energies[i] < c.threshold_ev[k] {
-                        return Err(err("AXBI_THRESHOLD_OWNERSHIP"));
-                    }
-                    photo.heat_erg_per_absorber_s[k] +=
-                        rate * (self.energies[i] - c.threshold_ev[k]) * c.ev_erg;
-                }
-            }
-        }
-        let point = AxbiProvider.point(&gas, nh, nhe, 0.0, 2.7255 / old.a, photo)?;
-        let mut residual = [0.0; 4];
-        for i in 0..3 {
-            residual[i] = unknown[i] - old.gas.fractions[i] - dt * point.rhs.fraction_dt[i];
-        }
-        residual[3] = unknown[3]
-            - w_erg_per_h_to_ev(old.gas.w_erg_per_h)?
-            - dt * point.rhs.w_dt_erg_per_h_s / c.ev_erg;
-        for &r in &residual {
-            f(r)?;
-        }
-        Ok((residual, stocks, point.rhs))
+        context.evaluate(unknown, dt)
     }
     fn norm(&self, residual: [f64; 4], old_w: f64, new_w: f64) -> f64 {
         residual[0]
@@ -494,10 +1173,31 @@ impl Driver {
         dt: f64,
         counter: &mut usize,
     ) -> Result<(), ForwardError> {
+        self.chemical_stage_observed(s, dt, counter, None)
+    }
+    fn chemical_stage_observed(
+        &self, s: &mut DriverState, dt: f64, counter: &mut usize,
+        mut observer: Option<&mut ChemicalStageObserver>,
+    ) -> Result<(), ForwardError> {
         if !dt.is_finite() || dt <= 0.0 {
             return Err(err("AXBI_STAGE_DT"));
         }
-        let old = s.clone();
+        let geometry = self.geometry_point(s.a)?.geometry()?;
+        let mut old = s.clone();
+        self.partition_inactive(&mut old, &geometry)?;
+        // Quadrature reconstruction is fixed across the Newton residual/Jacobian
+        // evaluations; only trial absorber densities enter backward Euler.
+        let prepared = self
+            .transport
+            .prepare(&self.photon_state(&old), &geometry)?;
+        let context = ResidualContext {
+            gas: old.gas,
+            a: old.a,
+            n_h0_cm3: self.n_h0_cm3,
+            n_he0_cm3: self.n_he0_cm3,
+            cells: self.transport.cell_count(),
+            prepared: Arc::new(prepared),
+        };
         let old_w = w_erg_per_h_to_ev(old.gas.w_erg_per_h)?;
         let mut x = [
             old.gas.fractions[0],
@@ -505,63 +1205,94 @@ impl Driver {
             old.gas.fractions[2],
             old_w,
         ];
+        let native_rhs_ceiling = observer.as_ref()
+            .filter(|o| o.bounded.is_none()).and_then(|o| o.native_rhs_ceiling)
+            .map_or(self.config.max_rhs, |limit| self.config.max_rhs.min(limit));
         for _ in 0..50 {
-            let (residual, stocks, rhs) = self.evaluate(&old, x, dt, counter)?;
+            let (residual, stocks, rhs) = self.evaluate(&context, x, dt, counter, native_rhs_ceiling)?;
             let norm = self.norm(residual, old_w, x[3]);
             if norm <= 1e-11 {
                 let nh = self.n_h0_cm3 / old.a.powi(3);
                 let c = HHeModel::controlled_fixture();
                 let nold = old.photons.iter().sum::<f64>();
-                let nnew = stocks.iter().sum::<f64>();
+                let nnew = stocks.number.iter().sum::<f64>();
                 let events = rhs.photo_events_cm3_s.map(|e| e * dt / nh);
                 let event_total = events.iter().sum::<f64>();
                 if (nold - nnew - event_total).abs() > 1e-10 * old.ledgers.source_n.max(1.0) {
                     return Err(err("AXBI_ABSORPTION_LEDGER"));
                 }
-                s.gas = IgmGasState::new([x[0], x[1], x[2]], w_ev_per_h_to_erg(x[3])?)?;
-                s.photons = stocks;
-                s.ledgers.absorbed_n += event_total;
+                let mut next = old.clone();
+                next.gas = IgmGasState::new([x[0], x[1], x[2]], w_ev_per_h_to_erg(x[3])?)?;
+                Self::set_photon_state(&mut next, stocks);
+                next.ledgers.absorbed_n += event_total;
                 for k in 0..3 {
-                    s.ledgers.photo_events[k] += events[k];
-                    s.ledgers.rr_events[k] += rhs.rr_events_cm3_s[k] * dt / nh;
-                    s.ledgers.ci_events[k] += rhs.ci_events_cm3_s[k] * dt / nh;
-                    s.ledgers.ci_floor_events[k] += rhs.ci_floor_events_cm3_s[k] * dt / nh;
+                    next.ledgers.photo_events[k] += events[k];
+                    next.ledgers.rr_events[k] += rhs.rr_events_cm3_s[k] * dt / nh;
+                    next.ledgers.ci_events[k] += rhs.ci_events_cm3_s[k] * dt / nh;
+                    next.ledgers.ci_floor_events[k] += rhs.ci_floor_events_cm3_s[k] * dt / nh;
                 }
-                s.ledgers.dr_events += rhs.dr_events_cm3_s * dt / nh;
-                s.ledgers.ce_cap_ev +=
+                next.ledgers.dr_events += rhs.dr_events_cm3_s * dt / nh;
+                next.ledgers.ce_cap_ev +=
                     rhs.ce_cap_cooling_erg_cm3_s.iter().sum::<f64>() * dt / (nh * c.ev_erg);
-                s.ledgers.excluded_dr_ev +=
+                next.ledgers.excluded_dr_ev +=
                     rhs.excluded_dr_cooling_erg_cm3_s * dt / (nh * c.ev_erg);
-                s.ledgers.escaped_u += rhs.escape_erg_cm3_s * dt / (nh * c.ev_erg);
-                s.ledgers.cmb_input += rhs.cmb_to_gas_erg_cm3_s * dt / (nh * c.ev_erg);
-                s.max_newton_residual = s.max_newton_residual.max(norm);
+                next.ledgers.escaped_u += rhs.escape_erg_cm3_s * dt / (nh * c.ev_erg);
+                next.ledgers.cmb_input += rhs.cmb_to_gas_erg_cm3_s * dt / (nh * c.ev_erg);
+                next.max_newton_residual = next.max_newton_residual.max(norm);
+                if let Some(obs) = observer.as_deref_mut() {
+                    if obs.bounded.is_some() {
+                        let accepted_context = context.clone();
+                        obs.capture_bounded(old.a, dt,
+                            [old.gas.fractions[0],old.gas.fractions[1],old.gas.fractions[2],old_w],
+                            x, residual, norm, self.n_he0_cm3/self.n_h0_cm3,
+                            c.kb_erg_k/c.ev_erg,
+                            move |unknown| accepted_context.evaluate(unknown, dt).map(|v| v.0));
+                    } else {
+                    if obs.records.len() >= obs.max_records {
+                        obs.failure = Some("SOURCE011_STAGE_RECORD_CAP".into());
+                        return Err(err("SOURCE011_STAGE_RECORD_CAP"));
+                    }
+                    let before = obs.rhs_evaluations;
+                    let accepted_context = context.clone();
+                    let result = jacobian_columns(
+                        &self.transport.shared_pool(), false, x, residual,
+                        &mut obs.rhs_evaluations, obs.max_rhs,
+                        move |unknown| accepted_context.evaluate(unknown, dt).map(|v| v.0),
+                    );
+                    let jacobian = match result {
+                        Ok(j) => j,
+                        Err(e) => { obs.failure = Some(format!("{:?}", e)); return Err(e); }
+                    };
+                    obs.records.push(ChemicalStageRecord {
+                        comparison: obs.current_comparison, branch: obs.current_branch,
+                        adaptive_status: "PENDING_ADAPTIVE_DISPOSITION", a: old.a, dt_s: dt,
+                        old_state: [old.gas.fractions[0],old.gas.fractions[1],old.gas.fractions[2],old_w],
+                        state: x, residual, jacobian,
+                        added_rhs: obs.rhs_evaluations-before,
+                        f_he: self.n_he0_cm3/self.n_h0_cm3,
+                        k_b_ev_per_k: c.kb_erg_k/c.ev_erg,
+                    });
+                    }
+                }
+                *s = next;
                 return Ok(());
             }
-            let mut jac = [[0.0; 4]; 4];
-            for j in 0..4 {
-                let delta = 1e-7 * x[j].abs().max(if j == 3 { 1e-6 } else { 1e-4 });
-                let mut xp = x;
-                xp[j] += delta;
-                let trial = self.evaluate(&old, xp, dt, counter);
-                let (rp, sign) = match trial {
-                    Ok((r, _, _)) => (r, 1.0),
-                    Err(_) => {
-                        xp = x;
-                        xp[j] -= delta;
-                        let (r, _, _) = self.evaluate(&old, xp, dt, counter)?;
-                        (r, -1.0)
-                    }
-                };
-                for i in 0..4 {
-                    jac[i][j] = (rp[i] - residual[i]) / (sign * delta);
-                }
-            }
+            let columns_context = context.clone();
+            let jac = jacobian_columns(
+                &self.transport.shared_pool(),
+                self.config.parallel_jacobian_columns,
+                x,
+                residual,
+                counter,
+                native_rhs_ceiling,
+                move |unknown| columns_context.evaluate(unknown, dt).map(|v| v.0),
+            )?;
             let direction = solve4(jac, residual.map(|r| -r))?;
             let mut alpha = 1.0;
             let mut accepted = None;
             for _ in 0..40 {
                 let trial = std::array::from_fn(|i| x[i] + alpha * direction[i]);
-                if let Ok((r, _, _)) = self.evaluate(&old, trial, dt, counter) {
+                if let Ok((r, _, _)) = self.evaluate(&context, trial, dt, counter, native_rhs_ceiling) {
                     if self.norm(r, old_w, trial[3]) < norm {
                         accepted = Some(trial);
                         break;
@@ -579,13 +1310,18 @@ impl Driver {
         to: f64,
         counter: &mut usize,
     ) -> Result<DriverState, ForwardError> {
+        self.tentative_observed(old, to, counter, None)
+    }
+    fn tentative_observed(
+        &self, old: &DriverState, to: f64, counter: &mut usize,
+        observer: Option<&mut ChemicalStageObserver>,
+    ) -> Result<DriverState, ForwardError> {
         let mut s = old.clone();
         let mid = (old.a * to).sqrt();
-        let dt = self.background.point_at_scale(to)?.time_s
-            - self.background.point_at_scale(old.a)?.time_s;
+        let dt = self.geometry_increment(old.a, to)?.proper_time_s;
         self.geometry_map(&mut s, mid)?;
         self.inject(&mut s, dt)?;
-        self.chemical_stage(&mut s, dt, counter)?;
+        self.chemical_stage_observed(&mut s, dt, counter, observer)?;
         self.geometry_map(&mut s, to)?;
         self.validate(&s, 1e-8)?;
         let (n0, u0) = self.residuals(old)?;
@@ -597,11 +1333,37 @@ impl Driver {
         }
         Ok(s)
     }
+    /// Controlled fixed-log-scale step for independent geometry and chemistry
+    /// refinement. Uses the same transport, source, chemistry and ledger path
+    /// as each adaptive trial, without changing the adaptive acceptance rule.
+    pub fn fixed_step(&self, s: &mut DriverState, dln_a: f64) -> Result<(), ForwardError> {
+        if !dln_a.is_finite() || dln_a <= 0.0 || dln_a > 0.005 {
+            return Err(err("BASS_FIXED_STEP_DOMAIN"));
+        }
+        if s.accepted >= self.config.max_steps || s.attempts >= self.config.max_attempts {
+            return Err(err("AXBI_STEP_CAP"));
+        }
+        let mut counter = s.rhs_evaluations;
+        s.attempts += 1;
+        let outcome = self.tentative(s, s.a * dln_a.exp(), &mut counter);
+        // Charge every started RHS call, including a failed tentative. The
+        // physical state remains uncommitted until the result is successful.
+        s.rhs_evaluations = counter;
+        let mut next = outcome?;
+        next.rhs_evaluations = counter;
+        next.accepted = s.accepted + 1;
+        next.attempts = s.attempts;
+        next.next_dln_a = dln_a;
+        *s = next;
+        Ok(())
+    }
     pub fn validate(&self, s: &DriverState, tolerance: f64) -> Result<(), ForwardError> {
         let eos = s
             .gas
             .eos(self.n_h0_cm3 / s.a.powi(3), self.n_he0_cm3 / s.a.powi(3))?;
         AxbiProvider.rates(eos.temperature_k)?;
+        let geometry = self.geometry_point(s.a)?.geometry()?;
+        self.inventory_with_geometry(s, &geometry)?;
         for &n in &s.photons {
             if f(n)? < 0.0 {
                 return Err(err("AXBI_STOCK_NEGATIVE"));
@@ -624,6 +1386,11 @@ impl Driver {
         full: &DriverState,
         half: &DriverState,
     ) -> Result<f64, ForwardError> {
+        self.transport.validate_state(&self.photon_state(full))?;
+        self.transport.validate_state(&self.photon_state(half))?;
+        let geometry = self.geometry_point(half.a)?.geometry()?;
+        self.validate_inactive(full, &geometry)?;
+        self.validate_inactive(half, &geometry)?;
         let mut e = 0.0_f64;
         for i in 0..3 {
             e = e.max(
@@ -633,24 +1400,58 @@ impl Driver {
         }
         let w = w_erg_per_h_to_ev(half.gas.w_erg_per_h)?;
         e = e.max((w_erg_per_h_to_ev(full.gas.w_erg_per_h)? - w).abs() / w.abs().max(1e-6));
-        let ne = self.energies.len();
         let (n, u) = self.photon_inventory(half);
+        if full.photons.len() != half.photons.len()
+            || full.photon_energy_ref.len() != half.photon_energy_ref.len()
+        {
+            return Err(err("AXBI_PHOTON_SHAPE"));
+        }
         let dn = full
             .photons
             .iter()
             .zip(&half.photons)
-            .map(|(a, b)| (a - b).abs())
+            .zip(
+                full.photon_inactive_number
+                    .iter()
+                    .zip(&half.photon_inactive_number),
+            )
+            .map(|((a, b), (pa, pb))| (a - b).abs() + (pa - pb).abs())
             .sum::<f64>();
-        let du = full
-            .photons
-            .iter()
-            .zip(&half.photons)
-            .enumerate()
-            .map(|(i, (a, b))| (a - b).abs() * self.energies[i % ne])
-            .sum::<f64>();
+        let mut du = 0.0;
+        let ne = self.energies.len();
+        let rays = self.transport.ray_geometry(&geometry)?;
+        for (k, ray) in rays.iter().enumerate() {
+            for i in 0..ne {
+                let j = k * ne + i;
+                du += ((full.photon_energy_ref[j] - half.photon_energy_ref[j]).abs()
+                    + (full.photon_inactive_energy_ref[j] - half.photon_inactive_energy_ref[j])
+                        .abs())
+                    * ray.scale;
+            }
+        }
         f(e.max(dn / n.max(1e-8)).max(du / u.max(1e-8)))
     }
     pub fn adaptive_step(&self, s: &mut DriverState) -> Result<bool, ForwardError> {
+        self.adaptive_step_inner(s, None)
+    }
+    pub fn adaptive_step_observed(
+        &self, s: &mut DriverState, observer: &mut ChemicalStageObserver,
+    ) -> Result<bool, ForwardError> {
+        let first = observer.records.len();
+        let bounded_first = observer.bounded_packets().map_or(0, |p| p.len());
+        if let Some(b) = observer.bounded.as_mut() { b.parent_step_id = s.accepted + 1; }
+        observer.current_comparison = s.comparisons + 1;
+        let result = self.adaptive_step_inner(s, Some(&mut *observer));
+        let status = match &result { Ok(true)=>"ADAPTIVE_ACCEPTED", Ok(false)=>"ADAPTIVE_REJECTED_DISCARDED", Err(_)=>"ADAPTIVE_FAILED_DISCARDED" };
+        for record in &mut observer.records[first..] { record.adaptive_status = status; }
+        observer.finalize_bounded(bounded_first, match &result {
+            Ok(true) => "ACCEPTED", Ok(false) => "REJECTED", Err(_) => "ABORTED",
+        });
+        result
+    }
+    fn adaptive_step_inner(
+        &self, s: &mut DriverState, mut observer: Option<&mut ChemicalStageObserver>,
+    ) -> Result<bool, ForwardError> {
         if s.accepted >= self.config.max_steps || s.attempts >= self.config.max_attempts {
             return Err(err("AXBI_STEP_CAP"));
         }
@@ -664,12 +1465,17 @@ impl Driver {
         let mut trial_starts = s.attempts;
         s.comparisons += 1;
         let result = (|| {
+            let mut branch_index = 0usize;
             let mut launch = |old: &DriverState, endpoint: f64| {
                 if trial_starts >= self.config.max_attempts {
                     return Err(err("AXBI_TENTATIVE_CAP"));
                 }
                 trial_starts += 1;
-                self.tentative(old, endpoint, &mut counter)
+                if let Some(obs) = observer.as_deref_mut() {
+                    obs.current_branch = ["FULL", "FIRST_HALF", "SECOND_HALF"][branch_index];
+                }
+                branch_index += 1;
+                self.tentative_observed(old, endpoint, &mut counter, observer.as_deref_mut())
             };
             let full = launch(s, to)?;
             let first = launch(s, mid)?;
@@ -712,12 +1518,24 @@ impl Driver {
         }
     }
     pub fn moments(&self, s: &DriverState) -> Result<[f64; 3], ForwardError> {
+        let gref = self.geometry_point(1.0 / 21.0)?.geometry()?;
+        let current = self.geometry_point(s.a)?.geometry()?;
+        self.moments_with_geometry(s, &gref, &current)
+    }
+    fn moments_with_geometry(
+        &self,
+        s: &DriverState,
+        _reference: &GeometrySnapshot,
+        current: &GeometrySnapshot,
+    ) -> Result<[f64; 3], ForwardError> {
         let mut moments = [0.0; 3];
         let ne = self.energies.len();
-        for k in 0..self.source.angular_cells.len() {
-            let mu = self.ray(k, s.a)?.direction[2];
+        let rays = self.transport.ray_geometry(current)?;
+        for (k, ray) in rays.iter().enumerate() {
+            let mu = ray.mu;
             for i in 0..ne {
-                let u = s.photons[k * ne + i] * self.energies[i];
+                let j = k * ne + i;
+                let u = (s.photon_energy_ref[j] + s.photon_inactive_energy_ref[j]) * ray.scale;
                 moments[0] += u;
                 moments[1] += u * mu;
                 moments[2] += u * (3.0 * mu * mu - 1.0) / 2.0;
@@ -756,7 +1574,15 @@ fn solve4(mut a: [[f64; 4]; 4], mut b: [f64; 4]) -> Result<[f64; 4], ForwardErro
 pub fn compiled_identity() -> String {
     [
         include_str!("axbi_driver.rs"),
+        include_str!("axbi_covariant_transport.rs"),
+        include_str!("axbi_parallel.rs"),
+        include_str!("../../../research/flrw_jacobian_columns_20261016/CONTRACT.json"),
+        include_str!("axbi_q_closure.rs"),
         include_str!("axbi_background.rs"),
+        include_str!("axbi_bass_background.rs"),
+        include_str!("interval_math.rs"),
+        include_str!("../../../research/bass_source008_20261016/CONTRACT.json"),
+        include_str!("../../../research/bass_source007_20261016/CONTRACT.json"),
         include_str!("axbi_sources.rs"),
         include_str!("axbi_rates.rs"),
         include_str!("igm_rates.rs"),
@@ -767,6 +1593,11 @@ pub fn compiled_identity() -> String {
         include_str!("bianchi_i.rs"),
         include_str!("hhe_events.rs"),
         include_str!("../examples/axbi_reionization.rs"),
+        include_str!("../examples/bass_dynamic_trial.rs"),
+        include_str!("../examples/bass_adaptive_trial.rs"),
+        include_str!("../../../research/bass_source009_20261016/CONTRACT.json"),
+        include_str!("../examples/bass_nonlinear_stage_probe.rs"),
+        include_str!("../../../research/bass_source011_20261016/CONTRACT.json"),
         include_str!("lib.rs"),
         include_str!("../Cargo.toml"),
         include_str!(
@@ -774,6 +1605,17 @@ pub fn compiled_identity() -> String {
         ),
         include_str!("../../../research/axbi_goal_20261014/scenario/SCENARIO_LOCK.json"),
         include_str!("../../../research/axbi_goal_20261014/scenario/AX05_NUMERICAL_CONTRACT.md"),
+        include_str!("../../../research/flrw_covariant_transport_20261015/NATIVE_CONTRACT.md"),
+        include_str!(
+            "../../../research/flrw_covariant_transport_20261015/INACTIVE_POOL_CONTRACT.md"
+        ),
+        include_str!("../../../research/flrw_covariant_transport_20261015/HPC_CONTRACT.md"),
+        include_str!(
+            "../../../research/flrw_covariant_transport_20261015/BACKGROUND_CACHE_CONTRACT.md"
+        ),
+        include_str!(
+            "../../../research/flrw_covariant_transport_20261015/OUTPUT_ALLOCATION_005_CONTRACT.md"
+        ),
     ]
     .join("\nAXBI_SOURCE_BOUNDARY\n")
 }
@@ -841,9 +1683,11 @@ fn parse_list(s: &str) -> Result<Vec<f64>, ForwardError> {
 }
 impl Driver {
     fn checkpoint_text(&self, s: &DriverState) -> Result<String, ForwardError> {
-        let p = self.background.point_at_scale(s.a)?;
+        self.transport.validate_state(&self.photon_state(s))?;
+        let p = self.geometry_point(s.a)?;
+        self.validate_inactive(s, &p.geometry()?)?;
         let text = format!(
-            "AXBI_CHECKPOINT_V2\n{}\n{}\n{}\n{}\n{}\n",
+            "AXBI_CHECKPOINT_V4\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n",
             list(&[
                 s.a,
                 p.time_s,
@@ -871,11 +1715,19 @@ impl Driver {
             .join(" "),
             list(&ledger_values(&s.ledgers)),
             list(&s.photons),
+            list(&s.photon_energy_ref),
+            list(&s.photon_support_lo),
+            list(&s.photon_support_hi),
+            list(&s.photon_inactive_number),
+            list(&s.photon_inactive_energy_ref),
             list(&[self.initial_energy])
         );
         Ok(text)
     }
     pub fn save_checkpoint(&self, path: &Path, s: &DriverState) -> Result<(), ForwardError> {
+        if self.bass_background.is_some() {
+            return Err(err("BASS_REJECT_LEGACY_CHECKPOINT"));
+        }
         let text = self.checkpoint_text(s)?;
         write_checkpoint(path, &text)
     }
@@ -885,6 +1737,9 @@ impl Driver {
         path: &Path,
         s: &DriverState,
     ) -> Result<(), ForwardError> {
+        if self.bass_background.is_some() {
+            return Err(err("BASS_REJECT_LEGACY_CHECKPOINT"));
+        }
         let text = self.checkpoint_text(s)?;
         // Existing destination remains during temporary write: include both.
         guard_output_bytes_with_limit(
@@ -896,8 +1751,14 @@ impl Driver {
     }
     pub fn read_checkpoint(&self, path: &Path) -> Result<DriverState, ForwardError> {
         let text = fs::read_to_string(path).map_err(ioerr)?;
+        if self.bass_background.is_some() {
+            return Err(err("BASS_REJECT_LEGACY_CHECKPOINT"));
+        }
+        self.read_checkpoint_text(&text)
+    }
+    fn read_checkpoint_text(&self, text: &str) -> Result<DriverState, ForwardError> {
         let lines = text.lines().collect::<Vec<_>>();
-        if lines.len() != 6 || lines[0] != "AXBI_CHECKPOINT_V2" {
+        if lines.len() != 11 || lines[0] != "AXBI_CHECKPOINT_V4" {
             return Err(err("AXBI_CHECKPOINT_VERSION"));
         }
         let v = parse_list(lines[1])?;
@@ -907,7 +1768,12 @@ impl Driver {
             .collect::<Result<Vec<_>, _>>()?;
         let l = ledger_from(&parse_list(lines[3])?)?;
         let photons = parse_list(lines[4])?;
-        let initial = parse_list(lines[5])?;
+        let photon_energy_ref = parse_list(lines[5])?;
+        let photon_support_lo = parse_list(lines[6])?;
+        let photon_support_hi = parse_list(lines[7])?;
+        let photon_inactive_number = parse_list(lines[8])?;
+        let photon_inactive_energy_ref = parse_list(lines[9])?;
+        let initial = parse_list(lines[10])?;
         if v.len() != 11
             || counts.len() != 6
             || photons.len() != self.energies.len() * self.source.angular_cells.len()
@@ -915,7 +1781,7 @@ impl Driver {
         {
             return Err(err("AXBI_CHECKPOINT_SHAPE_OR_INITIAL"));
         }
-        let p = self.background.point_at_scale(v[0])?;
+        let p = self.geometry_point(v[0])?;
         if p.time_s != v[1] || p.b != v[2] || !(1e-10..=0.005).contains(&v[7]) || v[10] < 0.0 {
             return Err(err("AXBI_CHECKPOINT_CLOCK_OR_STEP"));
         }
@@ -923,6 +1789,11 @@ impl Driver {
             a: v[0],
             gas: IgmGasState::new([v[3], v[4], v[5]], v[6])?,
             photons,
+            photon_energy_ref,
+            photon_support_lo,
+            photon_support_hi,
+            photon_inactive_number,
+            photon_inactive_energy_ref,
             ledgers: l,
             next_dln_a: v[7],
             max_newton_residual: v[8],
@@ -938,6 +1809,148 @@ impl Driver {
         self.validate(&state, 1e-8)?;
         Ok(state)
     }
+    /// Separate BASS checkpoint envelope with exact producer, executable,
+    /// configuration, output epoch and state bindings. Create-only publication.
+    fn bass_checkpoint_text(
+        &self,
+        s: &DriverState,
+        epoch: &str,
+        output: &Path,
+    ) -> Result<String, ForwardError> {
+        let id = self.bass_identity().ok_or(err("BASS_CHECKPOINT_MODE"))?;
+        if epoch.is_empty() || epoch.contains('\n') || epoch.contains('\r') || epoch.contains('|') {
+            return Err(err("BASS_CHECKPOINT_EPOCH"));
+        }
+        let p = self.geometry_point(s.a)?;
+        let output_bytes = fs::read(output).map_err(|_| err("BASS_CHECKPOINT_OUTPUT_IO"))?;
+        let source = sha256_bytes(compiled_identity().as_bytes())?;
+        let config = sha256_bytes(format!("{:?}", self.config).as_bytes())?;
+        let body = self.checkpoint_text(s)?;
+        let text=format!("BASS_REI_CHECKPOINT_V1\n{}|{}|{}|{}|{}\nBASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}|inactive_hi_split={}\nDONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE009\n{}\n{}\n{}|{}\n{}\n{:.17e}|{:.17e}|{:.17e}|{:.17e}|{:.17e}\n{}\n{}\n{}",
+            id.producer_commit,id.source_csv_sha256,id.source_manifest_sha256,id.case,id.grid_points,
+            self.config.transport_cells,self.config.inactive_hi_split,
+            source,config,epoch,output.display(),sha256_bytes(&output_bytes)?,
+            s.a,p.time_s,p.b,p.h_per_s,p.s_per_s,
+            sha256_bytes(body.as_bytes())?,body.len(),body);
+        Ok(text)
+    }
+    pub fn save_bass_checkpoint(
+        &self,
+        path: &Path,
+        s: &DriverState,
+        epoch: &str,
+        output: &Path,
+    ) -> Result<(), ForwardError> {
+        let text = self.bass_checkpoint_text(s, epoch, output)?;
+        let tmp = path.with_extension(format!("new-{}", std::process::id()));
+        {
+            use std::fs::OpenOptions;
+            let mut file = OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&tmp)
+                .map_err(|_| err("BASS_CHECKPOINT_EXISTS"))?;
+            file.write_all(text.as_bytes()).map_err(ioerr)?;
+            file.sync_all().map_err(ioerr)?;
+        }
+        let published = fs::hard_link(&tmp, path).map_err(|_| err("BASS_CHECKPOINT_EXISTS"));
+        fs::remove_file(&tmp).map_err(ioerr)?;
+        published
+    }
+    pub fn read_bass_checkpoint(
+        &self,
+        path: &Path,
+        epoch: &str,
+        output: &Path,
+    ) -> Result<DriverState, ForwardError> {
+        let text = fs::read_to_string(path).map_err(|_| err("BASS_CHECKPOINT_IO"))?;
+        self.read_bass_checkpoint_envelope(&text, epoch, output)
+    }
+    fn read_bass_checkpoint_envelope(
+        &self, text: &str, epoch: &str, output: &Path,
+    ) -> Result<DriverState, ForwardError> {
+        let id = self.bass_identity().ok_or(err("BASS_CHECKPOINT_MODE"))?;
+        if text.starts_with("AXBI_CHECKPOINT_V4") {
+            return Err(err("BASS_REJECT_LEGACY_CHECKPOINT"));
+        }
+        let (head, body) = text
+            .split_once("\nAXBI_CHECKPOINT_V4\n")
+            .ok_or(err("BASS_CHECKPOINT_TRUNCATED"))?;
+        let lines = head.lines().collect::<Vec<_>>();
+        if lines.len() != 11 || lines[0] != "BASS_REI_CHECKPOINT_V1" {
+            return Err(err("BASS_CHECKPOINT_VERSION_OR_SHAPE"));
+        }
+        let expected = format!(
+            "{}|{}|{}|{}|{}",
+            id.producer_commit,
+            id.source_csv_sha256,
+            id.source_manifest_sha256,
+            id.case,
+            id.grid_points
+        );
+        if lines[1] != expected {
+            return Err(err("BASS_CHECKPOINT_SOURCE_BINDING"));
+        }
+        if lines[2]!=format!("BASS_TABLE|schema=1|signed_s_over_h|a_ref=1/21|proper_origin_s=0|radiation=AXBI_PHOTON_V4|chemistry=AXBI_HHE_V4|photon_bins={}|inactive_hi_split={}",self.config.transport_cells,self.config.inactive_hi_split) {return Err(err("BASS_CHECKPOINT_PROVIDER_SCHEMA"));}
+        if lines[3]!="DONOR_REI=1f8619c27c1d2b7f13e1c05cf3819c9766cd38f3|BASS_MODEL=3c39bbbf46b6663e7c40277e194fd0ef48118472|BASS_SUPPLIER=02149a6830dfe7ed214b77f5309e38350d2659fb|CURRENT_PROVIDER=SOURCE009" {return Err(err("BASS_CHECKPOINT_REI_BASE"));}
+        if lines[4] != sha256_bytes(compiled_identity().as_bytes())? {
+            return Err(err("BASS_CHECKPOINT_NATIVE_SOURCE"));
+        }
+        if lines[5] != sha256_bytes(format!("{:?}", self.config).as_bytes())? {
+            return Err(err("BASS_CHECKPOINT_CONFIG"));
+        }
+        if lines[6] != format!("{}|{}", epoch, output.display()) {
+            return Err(err("BASS_CHECKPOINT_EPOCH_OUTPUT"));
+        }
+        let output_bytes = fs::read(output).map_err(|_| err("BASS_CHECKPOINT_OUTPUT_IO"))?;
+        if lines[7] != sha256_bytes(&output_bytes)? {
+            return Err(err("BASS_CHECKPOINT_OUTPUT_SHA256"));
+        }
+        let full_body = format!("AXBI_CHECKPOINT_V4\n{body}");
+        if lines[9] != sha256_bytes(full_body.as_bytes())?
+            || lines[10].parse::<usize>().ok() != Some(full_body.len())
+        {
+            return Err(err("BASS_CHECKPOINT_BODY_SHA256_OR_SIZE"));
+        }
+        let state = self.read_checkpoint_text(&full_body)?;
+        let p = self.geometry_point(state.a)?;
+        let current = list(&[state.a, p.time_s, p.b, p.h_per_s, p.s_per_s]);
+        if lines[8] != current.replace(' ', "|") {
+            return Err(err("BASS_CHECKPOINT_GEOMETRY_STATE"));
+        }
+        Ok(state)
+    }
+    /// Probe-only, hash-pinned SOURCE010 -> observer producer binding bridge.
+    /// Ordinary read_bass_checkpoint and fresh-only run policies stay strict.
+    pub fn read_source011_probe_checkpoint(
+        &self, path: &Path, local_binding: &Path,
+    ) -> Result<DriverState, ForwardError> {
+        let bytes = fs::read(path).map_err(ioerr)?;
+        let hash = sha256_bytes(&bytes)?;
+        if hash != "02fbbaa43e77f15ad198aae5b690dfbac7d09d10d6f079a2f3c845bb22f0674a"
+            && hash != "a16aaf6059091e450db6460e97d3971cd47a178383e95c5b992a805426ebd243" {
+            return Err(err("SOURCE011_PINNED_CHECKPOINT_HASH"));
+        }
+        let binding = fs::read(local_binding).map_err(ioerr)?;
+        if sha256_bytes(&binding)? != "54d8480daafdd0c18e2f0992211536492b58ef28a2488f7e78a6ee00eddb6535" {
+            return Err(err("SOURCE011_PINNED_BINDING_HASH"));
+        }
+        let text = std::str::from_utf8(&bytes).map_err(|_|err("SOURCE011_CHECKPOINT_UTF8"))?;
+        let (head, body) = text.split_once("\nAXBI_CHECKPOINT_V4\n").ok_or(err("SOURCE011_ENVELOPE"))?;
+        let mut lines = head.lines().map(str::to_owned).collect::<Vec<_>>();
+        if lines.len()!=11 || lines[4]!="30d164c0d156c71213618dc256c74573241561a72e9853b9d85f8a689183fa50"
+            || lines[5]!="15537df0d258496d5ea74258f6efb7233e9afd1a1cabeb58864c6e48fa69aa2e"
+            || lines[6]!="source010-half-target-001-SIGNED_MINUS|/root/REI_BASS_SOURCE010_20261016_001/results/SIGNED_MINUS/RUN_BINDING.txt" {
+            return Err(err("SOURCE011_ORIGINAL_BINDING"));
+        }
+        lines[4]=sha256_bytes(compiled_identity().as_bytes())?;
+        lines[6]=format!("source010-half-target-001-SIGNED_MINUS|{}",local_binding.display());
+        let mapped=format!("{}\nAXBI_CHECKPOINT_V4\n{}",lines.join("\n"),body);
+        self.read_bass_checkpoint_envelope(&mapped,"source010-half-target-001-SIGNED_MINUS",local_binding)
+    }
+    pub fn source011_state_text(&self,s:&DriverState)->Result<String,ForwardError> {
+        self.checkpoint_text(s)
+    }
     pub fn output_row(
         &self,
         s: &DriverState,
@@ -948,21 +1961,30 @@ impl Driver {
         ledgers: &mut impl Write,
         feedback: &mut impl Write,
     ) -> Result<(), ForwardError> {
-        let p = self.background.point_at_scale(s.a)?;
+        let p = self.geometry_point(s.a)?;
         let nh = self.n_h0_cm3 / s.a.powi(3);
         let nhe = self.n_he0_cm3 / s.a.powi(3);
         let eos = s.gas.eos(nh, nhe)?;
         let [x, y, z] = s.gas.fractions;
-        let m = self.moments(s)?;
+        let gr = self.geometry_point(1.0 / 21.0)?.geometry()?;
+        let g = p.geometry()?;
+        let m = self.moments_with_geometry(s, &gr, &g)?;
         let (n, u) = self.photon_inventory(s);
         let c = HHeModel::controlled_fixture();
         let ne = self.energies.len();
-        let mut gamma = [0.0; 3];
-        for (i, &stock) in s.photons.iter().enumerate() {
-            for (k, g) in gamma.iter_mut().enumerate() {
-                *g += c.c_cm_s * nh * self.signature[i % ne][k] * stock;
-            }
-        }
+        // Zero-duration backward Euler leaves photons untouched and yields the
+        // instantaneous photo rates using actual local energies and supports.
+        let prepared = self.transport.prepare(&self.photon_state(s), &g)?;
+        let gamma = self
+            .transport
+            .evaluate(
+                &prepared,
+                [nh * (1.0 - x), nhe * (1.0 - y - z), nhe * y],
+                nh,
+                0.0,
+            )?
+            .photo
+            .gamma_s;
         writeln!(
             history,
             "{case},{},{},{},{},{},{},{},{},{x},{y},{z},{nh},{},{},{},{},{},{n},{u},{},{},{},{},{}",
@@ -1008,31 +2030,34 @@ impl Driver {
             eos.electron_density_cm3 / nh
         )
         .map_err(ioerr)?;
-        let gr = self.background.point_at_scale(1.0 / 21.0)?.geometry()?;
-        let g = p.geometry()?;
-        let mut angular = Vec::new();
-        for cell in &self.source.angular_cells {
-            let ray =
-                CharacteristicRay::new(1.0, [(1.0 - cell.mu * cell.mu).sqrt(), 0.0, cell.mu], 0.0)?;
-            angular.push(cell.count_fraction * ray.solid_angle_jacobian(&gr, &g)?);
-        }
-        let norm = angular.iter().sum::<f64>();
-        for (k, weight) in angular.iter().enumerate() {
-            let mu = self.ray(k, s.a)?.direction[2];
-            for (i, &e) in self.energies.iter().enumerate() {
-                let stock = s.photons[k * ne + i];
-                // Fixed nodal representation: energy_low=energy_high=the node,
-                // never mislabel these delta-node measures as cell densities.
+        let rays = self.transport.ray_geometry(&g)?;
+        for (k, ray) in rays.iter().enumerate() {
+            let mu = ray.mu;
+            for i in 0..ne {
+                let j = k * ne + i;
+                let stock = s.photons[j] + s.photon_inactive_number[j];
+                let mut lo = s.photon_support_lo[j] * ray.scale;
+                let mut hi = s.photon_support_hi[j] * ray.scale;
+                if s.photon_inactive_number[j] > 0.0 {
+                    let plo = self.transport.edges()[i] * ray.scale;
+                    let phi = (self.transport.edges()[i + 1] * ray.scale).min(13.6);
+                    lo = if s.photons[j] == 0.0 {
+                        plo
+                    } else {
+                        lo.min(plo)
+                    };
+                    hi = hi.max(phi);
+                }
+                let energy = (s.photon_energy_ref[j] + s.photon_inactive_energy_ref[j]) * ray.scale;
                 writeln!(
                     spectra,
-                    "{case},{},{},{},{},{},{e},{e},{mu},{},{stock},{}",
+                    "{case},{},{},{},{},{},{lo},{hi},{mu},{},{stock},{energy}",
                     self.config.q_ref,
                     p.sigma,
                     p.time_s,
                     s.a,
                     1.0 / s.a - 1.0,
-                    4.0 * std::f64::consts::PI * weight / norm,
-                    stock * e
+                    4.0 * std::f64::consts::PI * ray.angular_weight
                 )
                 .map_err(ioerr)?;
             }
@@ -1059,7 +2084,12 @@ impl Driver {
             )
             .map_err(ioerr)?;
         }
+        let pools = self.pool_inventory_with_geometry(s, &g)?;
         for (name, value) in [
+            ("active_photon_N_per_H", pools[0]),
+            ("active_photon_U_eV_per_H", pools[1]),
+            ("inactive_photon_N_per_H", pools[2]),
+            ("inactive_photon_U_eV_per_H", pools[3]),
             ("source_N_per_H", s.ledgers.source_n),
             ("source_U_eV_per_H", s.ledgers.source_u),
             ("absorbed_N_per_H", s.ledgers.absorbed_n),
@@ -1253,7 +2283,7 @@ impl Driver {
         last: &mut Option<f64>,
         spectra: &mut impl Write,
     ) -> Result<bool, ForwardError> {
-        let time = self.background.point_at_scale(s.a)?.time_s;
+        let time = self.geometry_point(s.a)?.time_s;
         if last.is_some_and(|t| t > time) {
             return Err(err("AXBI_SPECTRUM_AHEAD_CHECKPOINT"));
         }
@@ -1319,7 +2349,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
             return Err(err("AXBI_RESUME_CASE"));
         }
         state = driver.read_checkpoint(&out.join("checkpoint.txt"))?;
-        reconcile_outputs(out, driver.background.point_at_scale(state.a)?.time_s)?;
+        reconcile_outputs(out, driver.geometry_point(state.a)?.time_s)?;
     } else {
         if out.exists() {
             return Err(err("AXBI_OUTPUT_EXISTS"));
@@ -1329,8 +2359,96 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
         fs::write(out.join("config.cfg"), config_text).map_err(ioerr)?;
         fs::write(out.join("source_identity.txt"), compiled_identity()).map_err(ioerr)?;
         fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
-        fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=cell-integrated source deposited to fixed physical-energy nodes; delta-node measures\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
+        fs::write(
+            out.join("transport_variant.txt"),
+            driver.transport_mode_metadata(),
+        )
+        .map_err(ioerr)?;
+        fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=fixed reference-q two-moment transport; total N/U includes active and passive source photons; support columns are conservative active-support/passive-cell envelope union, not a recovered density or exact populated support; Gamma uses active photons only; radiation stress includes both pools; legacy boundary outflow remains zero\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
     }
+    let mut checkpoints = PreparedCheckpoints::Axbi;
+    run_prepared(&driver, &mut state, out, case, resume, &mut checkpoints)
+}
+
+#[derive(Clone, Copy)]
+enum CheckpointPhase {
+    Initial,
+    Periodic,
+    Terminal,
+}
+enum PreparedCheckpoints<'a> {
+    Axbi,
+    Bass {
+        epoch: &'a str,
+        binding: &'a Path,
+        last: Option<PathBuf>,
+        terminal_written: bool,
+    },
+}
+impl PreparedCheckpoints<'_> {
+    fn save(
+        &mut self,
+        driver: &Driver,
+        state: &DriverState,
+        out: &Path,
+        phase: CheckpointPhase,
+    ) -> Result<(), ForwardError> {
+        match self {
+            Self::Axbi => {
+                if matches!(phase, CheckpointPhase::Periodic) {
+                    driver.save_checkpoint_budget(
+                        out,
+                        &out.join(format!("checkpoints/{:08}.txt", state.accepted)),
+                        state,
+                    )?;
+                }
+                driver.save_checkpoint_budget(out, &out.join("checkpoint.txt"), state)
+            }
+            Self::Bass {
+                epoch,
+                binding,
+                last,
+                terminal_written,
+            } => {
+                if matches!(phase, CheckpointPhase::Terminal) && *terminal_written {
+                    return Ok(());
+                }
+                let label = match phase {
+                    CheckpointPhase::Initial => "initial",
+                    CheckpointPhase::Periodic => "accepted",
+                    CheckpointPhase::Terminal => "terminal",
+                };
+                let path = out.join(format!("checkpoints/{label}-{:08}.bass-v1", state.accepted));
+                // Scientific writes retain the original allocation. Terminal
+                // recovery uses the existing launcher reserve within total cap.
+                let budget = if matches!(phase, CheckpointPhase::Terminal) {
+                    driver.config.output_budget_mib as u64 * 1024 * 1024
+                } else {
+                    driver.config.scientific_output_budget_bytes()?
+                };
+                let bytes = driver.bass_checkpoint_text(state, epoch, binding)?.len();
+                guard_output_bytes_with_limit(out, 2 * bytes as u64, budget)?;
+                driver.save_bass_checkpoint(&path, state, epoch, binding)?;
+                *last = Some(path);
+                if matches!(phase, CheckpointPhase::Terminal) {
+                    *terminal_written = true;
+                }
+                Ok(())
+            }
+        }
+    }
+}
+
+/// The original prepared adaptive/output loop, shared by default AXBI and
+/// fresh BASS. Solver, charged rejection and output rollback rules are common.
+fn run_prepared(
+    driver: &Driver,
+    state: &mut DriverState,
+    out: &Path,
+    case: &str,
+    resume: bool,
+    checkpoints: &mut PreparedCheckpoints<'_>,
+) -> Result<(), ForwardError> {
     let mut h=open_output(&out.join("history.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,b,H_per_s,s_per_s,x_HII,x_HeII,x_HeIII,nH_proper_cm3,ne_proper_cm3,temperature_K,Gamma_HI_per_s,Gamma_HeI_per_s,Gamma_HeII_per_s,photon_n_per_H,photon_u_eV_per_H,J0_photon_u_eV_per_H,J1_photon_u_eV_per_H,J2_photon_u_eV_per_H,x_HI,x_HeI")?;
     let mut a=open_output(&out.join("abundances.csv"),resume,"run_id,time_s,zbar,Tgas_K,background_Tref_K,species_id,A,Z,charge,nproper,element_fraction,Ybaryon,electron_xe,normalization_registry")?;
     let mut p=open_output(&out.join("spectra.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,energy_low_eV,energy_high_eV,mu_center,solid_angle_weight_sr,photon_n_per_H,photon_u_eV_per_H")?;
@@ -1352,18 +2470,18 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
     };
     if !resume {
         driver.output_batch(
-            &state, case, out, true, &mut h, &mut a, &mut p, &mut l, &mut fb,
+            state, case, out, true, &mut h, &mut a, &mut p, &mut l, &mut fb,
         )?;
-        last_spectrum_time = Some(driver.background.point_at_scale(state.a)?.time_s);
+        last_spectrum_time = Some(driver.geometry_point(state.a)?.time_s);
     }
     if !resume {
         for writer in [&mut h, &mut a, &mut p, &mut l, &mut fb, &mut rejects] {
             writer.flush().map_err(ioerr)?;
         }
-        driver.save_checkpoint_budget(out, &out.join("checkpoint.txt"), &state)?;
+        checkpoints.save(&driver, state, out, CheckpointPhase::Initial)?;
     }
     if resume {
-        driver.ensure_spectrum_snapshot(&state, case, out, &mut last_spectrum_time, &mut p)?;
+        driver.ensure_spectrum_snapshot(state, case, out, &mut last_spectrum_time, &mut p)?;
     }
     let started = Instant::now();
     let prior_wall = state.wall_elapsed_s;
@@ -1380,7 +2498,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
                 return Err(err("AXBI_RUNTIME_CAP"));
             }
             let previous = state.clone();
-            let accepted = match driver.adaptive_step(&mut state) {
+            let accepted = match driver.adaptive_step(state) {
                 Ok(value) => value,
                 Err(e) => {
                     writeln!(
@@ -1417,7 +2535,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
                 state.a == end,
             );
             if let Err(error) = driver.output_batch(
-                &state,
+                state,
                 case,
                 out,
                 checkpoint_due,
@@ -1428,7 +2546,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
                 &mut fb,
             ) {
                 let failed = state.clone();
-                state = previous;
+                *state = previous;
                 state.attempts = failed.attempts;
                 state.comparisons = failed.comparisons;
                 state.rhs_evaluations = failed.rhs_evaluations;
@@ -1437,17 +2555,12 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
                 return Err(error);
             }
             if checkpoint_due {
-                last_spectrum_time = Some(driver.background.point_at_scale(state.a)?.time_s);
+                last_spectrum_time = Some(driver.geometry_point(state.a)?.time_s);
                 for writer in [&mut h, &mut a, &mut p, &mut l, &mut fb, &mut rejects] {
                     writer.flush().map_err(ioerr)?;
                 }
                 state.wall_elapsed_s = prior_wall + started.elapsed().as_secs_f64();
-                driver.save_checkpoint_budget(
-                    out,
-                    &out.join(format!("checkpoints/{:08}.txt", state.accepted)),
-                    &state,
-                )?;
-                driver.save_checkpoint_budget(out, &out.join("checkpoint.txt"), &state)?;
+                checkpoints.save(&driver, state, out, CheckpointPhase::Periodic)?;
                 check_resources(out, driver.config.output_budget_mib as u64 * 1024 * 1024)?;
                 last_save = Instant::now();
             }
@@ -1458,13 +2571,97 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
     for writer in [&mut h, &mut a, &mut p, &mut l, &mut fb, &mut rejects] {
         writer.flush().map_err(ioerr)?;
     }
-    driver.ensure_spectrum_snapshot(&state, case, out, &mut last_spectrum_time, &mut p)?;
+    driver.ensure_spectrum_snapshot(state, case, out, &mut last_spectrum_time, &mut p)?;
     p.flush().map_err(ioerr)?;
-    driver.save_checkpoint_budget(out, &out.join("checkpoint.txt"), &state)?;
+    checkpoints.save(&driver, state, out, CheckpointPhase::Terminal)?;
     summarize_feedback(out)?;
     fs::write(out.join("RETURN.txt"),format!("status={}\na={}\naccepted={}\nattempts={}\nrejections={}\nrhs_evaluations={}\nwall_s={}\nmax_newton_residual={}\nlast_error={}\nresult={outcome:?}\nscientific_admission=NOT_ISSUED\n",if outcome.is_ok(){"COMPLETE_REPRESENTED_INTERVAL"}else{"STOPPED_CHECKPOINTED"},state.a,state.accepted,state.attempts,state.rejects,state.rhs_evaluations,state.wall_elapsed_s,state.max_newton_residual,state.last_error)).map_err(ioerr)?;
     outcome
 }
+/// Fresh-only adaptive BASS execution. There is deliberately no resume API.
+/// Legacy/source007/source008 states cannot enter the new execution loop.
+pub fn run_bass_fresh(
+    config_text: &str,
+    out: &Path,
+    case: &str,
+    bass: BassBackground,
+    epoch: &str,
+) -> Result<(), ForwardError> {
+    if case.is_empty()
+        || case.contains(',')
+        || case.contains('\n')
+        || case.contains('\r')
+        || bass.identity.case != case
+    {
+        return Err(err("BASS_ADAPTIVE_CASE"));
+    }
+    if epoch.is_empty() || epoch.contains('\n') || epoch.contains('\r') || epoch.contains('|') {
+        return Err(err("BASS_ADAPTIVE_EPOCH"));
+    }
+    let cfg = DriverConfig::read(config_text)?;
+    if !cfg.inactive_hi_split || cfg.same_h || cfg.q_ref != 0.0 {
+        return Err(err("BASS_ADAPTIVE_CONFIG_MODE"));
+    }
+    let (driver, mut state) = Driver::new_bass(cfg, bass)?;
+    if out.exists() {
+        return Err(err("BASS_ADAPTIVE_FRESH_ONLY"));
+    }
+    fs::create_dir_all(out.join("raw")).map_err(ioerr)?;
+    fs::create_dir(out.join("checkpoints")).map_err(ioerr)?;
+    let id = driver.bass_identity().ok_or(err("BASS_CHECKPOINT_MODE"))?;
+    let binding = out.join("RUN_BINDING.txt");
+    let source_hash = sha256_bytes(compiled_identity().as_bytes())?;
+    let binding_text = format!("BASS_ADAPTIVE_RUN_BINDING_V1\nsource009_sha256={}\nconfig_text_sha256={}\nconfig_debug_sha256={}\nproducer_model={}\ncsv_sha256={}\nproducer_json_sha256={}\ncase={}\ngrid_points={}\ninactive_hi_split=true\nepoch={}\noutput={}\nresume=false\n",source_hash,sha256_bytes(config_text.as_bytes())?,sha256_bytes(format!("{:?}",driver.config).as_bytes())?,id.producer_commit,id.source_csv_sha256,id.source_manifest_sha256,id.case,id.grid_points,epoch,out.display());
+    {
+        let mut file = fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&binding)
+            .map_err(ioerr)?;
+        file.write_all(binding_text.as_bytes()).map_err(ioerr)?;
+        file.sync_all().map_err(ioerr)?;
+    }
+    fs::write(out.join("config.cfg"), config_text).map_err(ioerr)?;
+    fs::write(out.join("source_identity.txt"), compiled_identity()).map_err(ioerr)?;
+    fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
+    fs::write(
+        out.join("transport_variant.txt"),
+        format!(
+            "{}execution_source_epoch=SOURCE009\n",
+            driver.transport_mode_metadata()
+        ),
+    )
+    .map_err(ioerr)?;
+    fs::write(out.join("metadata.txt"),"execution=source009_fresh_BASS_shared_adaptive_loop\nclock=own elapsed proper seconds since z20\nframe=non-tilted normal tetrad\nq_ref=inactive analytic knob; not physical BASS shear\nSigma_column=signed s/H; not sqrt(3)*abs(s)/H\nfeedback=sampled perturbative prescribed-background diagnostic only\nscientific_admission=NOT_ISSUED\nfull_time_angular_history_admission=HOLD\n").map_err(ioerr)?;
+    let mut checkpoints = PreparedCheckpoints::Bass {
+        epoch,
+        binding: &binding,
+        last: None,
+        terminal_written: false,
+    };
+    let outcome = run_prepared(&driver, &mut state, out, case, false, &mut checkpoints);
+    // The shared helper drops/flushed its writers before this fallback. Keep
+    // full last-output physical state with actual charged work on every stop.
+    let checkpoint_outcome = checkpoints.save(&driver, &state, out, CheckpointPhase::Terminal);
+    let last = match &checkpoints {
+        PreparedCheckpoints::Bass { last, .. } => last
+            .as_ref()
+            .map(|p| p.display().to_string())
+            .unwrap_or_else(|| "NONE".into()),
+        _ => unreachable!(),
+    };
+    let terminal_error = match (&outcome, &checkpoint_outcome) {
+        (Err(e), _) => Some(e.clone()),
+        (Ok(_), Err(e)) => Some(e.clone()),
+        _ => None,
+    };
+    fs::write(out.join("RETURN.txt"),format!("status={}\na={}\ntime_s={}\naccepted={}\nattempts={}\ncomparisons={}\nrejections={}\nrhs_evaluations={}\nwall_s={}\nmax_newton_residual={}\nlast_error={}\nlast_checkpoint={}\nrun_binding={}\nsource009_sha256={}\ninactive_hi_split=true\nresult={outcome:?}\nterminal_checkpoint_result={checkpoint_outcome:?}\nscientific_admission=NOT_ISSUED\n",if terminal_error.is_none(){"COMPLETE_REPRESENTED_INTERVAL"}else{"STOPPED_CHECKPOINTED"},state.a,driver.geometry_point(state.a)?.time_s,state.accepted,state.attempts,state.comparisons,state.rejects,state.rhs_evaluations,state.wall_elapsed_s,state.max_newton_residual,state.last_error,last,binding.display(),source_hash)).map_err(ioerr)?;
+    if let Some(error) = terminal_error {
+        return Err(error);
+    }
+    Ok(())
+}
+
 fn check_resources(out: &Path, total_output_bytes: u64) -> Result<(), ForwardError> {
     let mut bytes = 0_u64;
     for e in fs::read_dir(out).map_err(ioerr)? {

@@ -1,0 +1,32 @@
+{
+  "current_node": "SOURCE_AGE_NATIVE_POSITIVE_REFERENCE_INTAKE",
+  "current_implementation_status": "PASS_BOUNDED_POSITIVE_NATIVE_REFERENCE_IMPLEMENTATION",
+  "scientific_accuracy_status": "HOLD_SOURCE_AGE_SPECTRAL_AND_NATIVE_TIME_ACCURACY",
+  "production_scientific_admission": "NOT_ISSUED",
+  "original_native_sha": "35d9747a0bbedcafdb568467ce7c1e7a25f965b6",
+  "next_ready": [
+    {
+      "id": "SOURCE_AGE_SURVIVOR_AND_NATIVE_TIME_LOCAL_REFINEMENT",
+      "state": "READY",
+      "frozen_inputs": "MD14/BB50k, Grackle Case-A, a0=1/21, delta_ln_a=0.002, signed geometry and source owner as current experiment",
+      "work": "Independently refine age32->64 and native proper-time mesh at fixed age and spatial grids; resolve the final-birth stiff survivor layer using survivor-relative N/U, species Gamma/heat, state, event and ledger checks.",
+      "prohibited_promotion": "No full-history, continuum-age or production admission from component ledger closure."
+    },
+    {
+      "id": "SOURCE_AGE_HEI_TRANSPORT_SPECTRAL_LOCAL_REFINEMENT",
+      "state": "READY",
+      "frozen_inputs": "q_ref=+0.1, age8, angular8, source subdivisions8, original native SHA",
+      "work": "Refine transport spectral cells beyond64 with event-focused HeI and radiation-pressure comparisons; retain separate source quadrature axis.",
+      "prohibited_promotion": "Do not infer spectrum convergence from two source-subdivision levels."
+    }
+  ],
+  "blocked_descendant": {
+    "id": "PRODUCTION_FULL_HISTORY_SCIENTIFIC_ADMISSION",
+    "state": "BLOCKED_ON_AGE_TRANSPORT_AND_NATIVE_TIME_ACCURACY",
+    "requires": [
+      "SOURCE_AGE_SURVIVOR_AND_NATIVE_TIME_LOCAL_REFINEMENT",
+      "SOURCE_AGE_HEI_TRANSPORT_SPECTRAL_LOCAL_REFINEMENT",
+      "full-history energy-momentum and numerical convergence validation"
+    ]
+  }
+}

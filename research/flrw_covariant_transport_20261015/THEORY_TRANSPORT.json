@@ -1,0 +1,147 @@
+{
+  "schema": "rei.covariant_transport.theory.v1",
+  "base_commit": "8aa6cd081f218e3a4ff6180a547c790df234a073",
+  "date": "2026-10-15",
+  "decision": "ROOT_ACCEPTED_FIXED_REFERENCE_Q_POSITIVE_TWO_MOMENT_SUPPORT_FV",
+  "scope": "Actual R1-R10 derivation and implementation contract; production implementation/refinement remains worker evidence",
+  "completed_checks_reused": 28,
+  "completed_checks_reexecuted": 0,
+  "source_paths": [
+    "research/flrw_production_integration_20261015/HANDOFF.json",
+    "research/flrw_production_integration_20261015/NEXT_DAG.json",
+    "research/flrw_production_integration_20261015/INDEPENDENT_REVIEW.json",
+    "rust/rei_microphysics/src/axbi_driver.rs",
+    "rust/rei_microphysics/src/axbi_q_grid.rs",
+    "rust/rei_microphysics/src/axbi_q_closure.rs",
+    "rust/rei_microphysics/src/axbi_q_reference.rs",
+    "rust/rei_microphysics/src/axbi_q_advance.rs",
+    "rust/rei_microphysics/src/axbi_q_capacity.rs",
+    "rust/rei_microphysics/src/axbi_sources.rs",
+    "rust/rei_microphysics/src/atomic_provider.rs",
+    "rust/rei_microphysics/src/hhe_events.rs"
+  ],
+  "R1": {
+    "status": "COMPLETE_CONTRACT",
+    "actual": "Frozen continuous-source cold coupled FLRW objective, current execution approval, units and previous review scope."
+  },
+  "R2": {
+    "status": "COMPLETE_READBACK",
+    "actual": "Current native/q source modules and handoff reviewed; existing tests/bridge reused. Primary FV/DG papers read for candidate comparison."
+  },
+  "R3": {
+    "status": "COMPLETE_DEFINITION",
+    "actual": "epsilon invariant reference energy; physical E=R_j epsilon; state N,Q,support; true distribution distinct from two-moment closure."
+  },
+  "R4": {
+    "status": "COMPLETE_SELECTION",
+    "actual": "Compared physical-E adaptive FV, FEM/DG, unbounded Lagrangian birth packets, fixed reference-q moment cells; root accepted latter. No invented child data."
+  },
+  "R5": {
+    "status": "COMPLETE_LOCAL_DERIVATION",
+    "actual": "Derived mapped source integrals, positive BE node elimination, identical event Gamma/heat, geometry work, angular moments."
+  },
+  "R6": {
+    "status": "COMPLETE_LOCAL_SYMBOLIC_CHECK",
+    "actual": "Independent Wolfram algebra and convex-hull/endpoint analysis; no full-history claim."
+  },
+  "R7": {
+    "status": "COMPLETE_THEORY_SCOPE_IMPLEMENTATION_TESTS_PENDING",
+    "actual": "Executed new symbolic discriminant only. Eight changed-code test/refinement obligations specified in MD."
+  },
+  "R8": {
+    "status": "CONDITIONAL_METHOD_ADMISSION",
+    "actual": "Representation selected; spectral closure and time/source/energy refinement remain. No new strong no-go theorem claimed."
+  },
+  "R9": {
+    "status": "COMPLETE_WORKER_CONTRACT",
+    "actual": "Core worker directly received APIs, units, separate fit/binding cuts, quadrature positivity and moment-match thresholds."
+  },
+  "R10": {
+    "status": "COMPLETE_HANDOFF",
+    "next": "Core+driver implementation, changed-dependency tests, independent review, graded refinement, already-authorized actual NCP full run."
+  },
+  "conventions": {
+    "metric": "(-,+,+,+)",
+    "clock": "proper seconds",
+    "density": "proper cm^-3",
+    "N": "photons/H",
+    "Q": "reference-eV/H",
+    "gas": "erg/H",
+    "fit_cuts_eV": [
+      13.6,
+      24.59,
+      54.42
+    ],
+    "binding_chi_eV": [
+      13.598434599702,
+      24.587389011,
+      54.41776
+    ],
+    "q_max_guard_eV": 433,
+    "FLRW_full_source_max_reference_eV": 420
+  },
+  "quadrature": {
+    "method": "positive bounded exponential, fit-threshold-cut GL8, positive discrete moment tilt",
+    "root_frozen_number_tolerance": "64*machine_epsilon*N",
+    "root_frozen_reference_energy_tolerance": "128*machine_epsilon*max(abs(Q),N*(support_hi-support_lo))",
+    "exact_delta": "support collapses or mean equals true support endpoint",
+    "near_endpoint": "refine endpoint quadrature until mean in node convex hull; typed cap error if impossible; no clipping or broad-support delta fallback",
+    "large_beta_optional_tail": {
+      "condition": "abs(beta)>30",
+      "y_max": 48,
+      "normalized_mass_bound": "exp(-48)/(1-exp(-2*abs(beta))) < 1.426e-21",
+      "keep_physical_support": true,
+      "not_photon_escape": true
+    }
+  },
+  "Newton_contract": {
+    "unknowns": 4,
+    "prepared_cache": "old N/Q/support and geometry; cross section nodes outside gas trial",
+    "survivor": "W_l/(1+dt*c*sum_j(n_abs_j*sigma_j(E_l)))",
+    "Gamma": "c*nH*sum_l(sigma_j(E_l)*survivor_l)",
+    "heat_power": "c*nH*ev_erg*sum_l(sigma_j(E_l)*(E_l-chi_j)*survivor_l)",
+    "single_owner": "chemical_stage + IgmPointRhs",
+    "source_inside_trial": false,
+    "photo_double_apply": false
+  },
+  "adaptivity": {
+    "implemented_contract": "fixed graded q grid; threshold and exponent-aware quadrature subdivision",
+    "dynamic_child_split": false,
+    "reason": "two parent moments do not provide true child data",
+    "refinement_obligation": "independent energy/source/time grids and observables, not conservation alone"
+  },
+  "cas": {
+    "tool": "Wolfram Language evaluator",
+    "input": "ClearAll[w,h,l1,l2,l3,en,c1,c2,c3,q1,q2,n1,n2,r0,rm,r1]; nn=w/(1+h(l1+l2+l3)); ev=h*nn*{l1,l2,l3}; bind={c1,c2,c3}.ev; heat=({en,en,en}-{c1,c2,c3}).ev; number=Together[w-nn-Total[ev]]; energy=Together[en*(w-nn)-bind-heat]; positivity=FullSimplify[0<=nn<=w,Assumptions->w>=0&&h>=0&&l1>=0&&l2>=0&&l3>=0]; split=Together[(n1+n2)*(n1*q1+n2*q2)/(n1+n2)-(n1*q1+n2*q2)]; expanding=Expand[r0*w-r1*nn-((r0-rm)*w+(rm-r1)*nn)-rm*Total[ev]]//Together; <|\"number_residual\"->number,\"energy_residual\"->energy,\"positivity\"->positivity,\"merge_first_moment\"->split,\"expanding_energy_residual\"->expanding|>",
+    "observed_output": "<|number_residual->0, energy_residual->0, positivity->True, merge_first_moment->0, expanding_energy_residual->0|>",
+    "scope": "new local algebra only",
+    "numerical_cosmology_runs": 0
+  },
+  "literature": [
+    {
+      "url": "https://arxiv.org/abs/2209.06240",
+      "claim_used": "frequency/spatial conservative finite-volume RT with discrete ordinates; method comparison only"
+    },
+    {
+      "url": "https://archive.ymsc.tsinghua.edu.cn/pacm_download/113/1121-paper-siam.pdf",
+      "doi": "10.1137/16M1061072",
+      "claim_used": "DG radiation transfer positivity requires dedicated limiter; no direct theorem transfer"
+    }
+  ],
+  "mutations": {
+    "code": 0,
+    "git": 0,
+    "remote": 0,
+    "reports": 2
+  },
+  "remaining": [
+    "implementation parity and typed errors",
+    "false HeII regression",
+    "source moment and angular normalization controls",
+    "checkpoint representation version and resume",
+    "full-vs-half common cell norm",
+    "energy/source/time refinement",
+    "actual NCP host and resource-bound full execution"
+  ],
+  "approval": "Already authorized; scientific claim admission is separate."
+}

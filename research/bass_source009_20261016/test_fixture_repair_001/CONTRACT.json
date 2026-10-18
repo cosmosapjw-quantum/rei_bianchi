@@ -1,0 +1,58 @@
+{
+  "task_id": "SOURCE009_TEST_FIXTURE_REPAIR_001",
+  "authority": "Astra APPROVED_ONE_TARGETED_SOURCE009_TEST_FIX_AND_BOUNDED_REMAINDER",
+  "authority_file": "../REPAIR_AUTHORITY.json",
+  "scope": "Only two completion configs/reference endpoint19.9999->19.99999999; directreference10s/64adaptivecalls bounds; production/native10s/realhistoryend19.8/tolerances unchanged",
+  "commands": {
+    "test": [
+      "/home/cosmosapjw/.rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "rust/rei_microphysics/Cargo.toml",
+      "--test",
+      "axbi_bass_adaptive",
+      "--",
+      "--test-threads=1",
+      "--skip",
+      "accepted_limit_keeps_last_valid_rows_full_checkpoint_and_charged_costs",
+      "--skip",
+      "rhs_failure_keeps_initial_physical_state_and_actual_failed_debits",
+      "--skip",
+      "resume_cli_and_existing_legacy_checkpoint_directory_are_rejected"
+    ],
+    "build": [
+      "/home/cosmosapjw/.rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin/cargo",
+      "build",
+      "--release",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "rust/rei_microphysics/Cargo.toml",
+      "--example",
+      "bass_adaptive_trial"
+    ]
+  },
+  "target_dir": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/bass_source009_20261016/target_source009",
+  "toolchain": {
+    "rustc": "/home/cosmosapjw/.rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin/rustc",
+    "observed_rustc": "rustc 1.94.1 (e408947bf 2026-03-25)\nbinary: rustc\ncommit-hash: e408947bfd200af42db322daf0fadfe7e26d3bd1\ncommit-date: 2026-03-25\nhost: x86_64-unknown-linux-gnu\nrelease: 1.94.1\nLLVM version: 21.1.8\n",
+    "observed_cargo": "cargo 1.94.1 (29ea6fb6a 2026-03-24)\n"
+  },
+  "limits": {
+    "test_seconds": 120,
+    "build_seconds": 180,
+    "additional_invocations": 2,
+    "prior_failed_invocations": 1,
+    "cumulative_invocations_cap": 3,
+    "prior_wall_seconds": 59.36879490094725,
+    "incremental_wall_cap": 300,
+    "cumulative_wall_cap": 359.36879490094725,
+    "AS_bytes": 8589934592,
+    "jobs": 2
+  },
+  "stopping_rule": "First newfailure stops; no4th, no additionalrepair/retry; short histories only afterfreshreview",
+  "first_failure_preserved": "pre_repair/** and original ../raw/test.* plus ../results/**",
+  "production_source_sha256_unchanged": "30d164c0d156c71213618dc256c74573241561a72e9853b9d85f8a689183fa50"
+}

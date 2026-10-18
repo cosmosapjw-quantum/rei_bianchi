@@ -1,0 +1,586 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "task": "research",
+  "unit_id": "EXTENDED_IONIC_NETWORK_20261015",
+  "objective": "Construct a minimal primordial isotope ionic extension and exact coding contract in parallel with first FLRW production solver.",
+  "scope": "Research/derivation/symbolic verification only; no repository code or branch mutations and no physical histories.",
+  "status": "complete",
+  "sources": [
+    {
+      "id": "SAVIN2002",
+      "title": "Rate Coefficients for D(1s)+H+ ↔ D+ + H(1s) Charge Transfer and Some Astrophysical Implications",
+      "doi": "10.1086/324218",
+      "url": "https://iopscience.iop.org/article/10.1086/324218/pdf",
+      "read_sections": [
+        "2",
+        "3",
+        "4",
+        "Table1",
+        "Table2",
+        "Equation6"
+      ],
+      "discovery": [
+        "SciSpace",
+        "Exa"
+      ],
+      "full_text_read": true,
+      "role": "primary CT coefficient source",
+      "calculated_table_temperature_k": [
+        1,
+        200000
+      ],
+      "analytic_fit_temperature_k": [
+        2.7,
+        200000
+      ],
+      "fit_relative_accuracy": [
+        0.06,
+        0.04
+      ],
+      "implementation_status": "NOT_IMPLEMENTED_IN_THIS_RESEARCH_UNIT"
+    },
+    {
+      "id": "SWITZER_HIRATA2005",
+      "title": "Ionizing radiation from hydrogen recombination strongly suppresses the lithium scattering signature in the CMB",
+      "doi": "10.1103/PhysRevD.72.083002",
+      "url": "https://arxiv.org/pdf/astro-ph/0507106",
+      "read_sections": [
+        "II",
+        "III",
+        "IV"
+      ],
+      "discovery": [
+        "Exa"
+      ],
+      "full_text_read": true,
+      "role": "Li spectral-support selection condition; not imported EoR source history"
+    },
+    {
+      "id": "MCQUINN_SWITZER2009",
+      "title": "Redshifted intergalactic 3He+ 8.7 GHz hyperfine absorption",
+      "doi": "10.1103/PhysRevD.80.063010",
+      "url": "https://arxiv.org/pdf/0905.1715",
+      "read_sections": [
+        "II"
+      ],
+      "discovery": [
+        "SciSpace",
+        "Exa"
+      ],
+      "full_text_read": true,
+      "role": "Example of 3He abundance mapped to HeII fraction; not isotope-specific rate authority"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "PHYS_MATH_1_0",
+      "identity": "skill://flora-user-skills/root/.codex/skills/remote-skills/skill-6aa0657100b08191b7d67482d1f97c1d",
+      "description": "User-selected physmath1.0 THEORY_LOOP, RESEARCH_POLICY, EVIDENCE_AND_HANDOFF"
+    },
+    {
+      "id": "ISOTOPE_API",
+      "identity": "integration_20261015/rei_bianchi/rust/rei_microphysics/src/isotope_state.rs",
+      "description": "13 proper-SI ionic/nuclear entries, neutral electron moments, extra-isotope legacy rejection retained"
+    },
+    {
+      "id": "ATOMIC_API",
+      "identity": "integration_20261015/rei_bianchi/rust/rei_microphysics/src/atomic_provider.rs",
+      "description": "Raw provider records separate units/domain/support/admission; not automatic extended physical provider"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "NOTE",
+      "kind": "derived_contract",
+      "locator": "extended_network_theory.md",
+      "scope": "Constructive ionic-network theory and frozen coding contract"
+    },
+    {
+      "id": "PRIMARY",
+      "kind": "primary_literature_read",
+      "locator": [
+        "https://iopscience.iop.org/article/10.1086/324218/pdf",
+        "https://arxiv.org/pdf/astro-ph/0507106",
+        "https://arxiv.org/pdf/0905.1715"
+      ],
+      "scope": "Source-backed CT coefficients and extension choices"
+    },
+    {
+      "id": "WOLFRAM_CONSERVATION",
+      "kind": "symbolic_execution",
+      "locator": [
+        "extended_network_wolfram.wl",
+        "extended_network_wolfram.json"
+      ],
+      "scope": "Exact finite-dimensional stoichiometry and energy identities"
+    },
+    {
+      "id": "WOLFRAM_STEP",
+      "kind": "symbolic_execution",
+      "locator": [
+        "extended_network_finite_step.wl",
+        "extended_network_finite_step.json"
+      ],
+      "scope": "Exact frozen-rate finite map; synthetic example only"
+    }
+  ],
+  "stages": [
+    {
+      "id": "R1",
+      "status": "complete",
+      "reason": "Bound parallel extended ionic network while FLRW HHe solver remains first.",
+      "evidence_refs": [
+        "NOTE"
+      ],
+      "dependency_ids": [
+        "PHYS_MATH_1_0"
+      ]
+    },
+    {
+      "id": "R2",
+      "status": "complete",
+      "reason": "Read requested physmath1.0 references, local isotope/atomic APIs and primary papers using SciSpace/Exa.",
+      "evidence_refs": [
+        "PRIMARY",
+        "NOTE"
+      ],
+      "dependency_ids": [
+        "PHYS_MATH_1_0"
+      ]
+    },
+    {
+      "id": "R3",
+      "status": "complete",
+      "reason": "Separated nuclei from ionic states, literature sources from installed providers and frozen-rate maps from physical histories.",
+      "evidence_refs": [
+        "NOTE"
+      ],
+      "dependency_ids": [
+        "PHYS_MATH_1_0"
+      ]
+    },
+    {
+      "id": "R4",
+      "status": "complete",
+      "reason": "Selected D0/D+ charge exchange as minimum extension; identified 3He/Li/metals dependencies.",
+      "evidence_refs": [
+        "NOTE"
+      ],
+      "dependency_ids": [
+        "PHYS_MATH_1_0"
+      ]
+    },
+    {
+      "id": "R5",
+      "status": "complete",
+      "reason": "Derived expanding stoichiometric abundances, charge, thermal/chemical identities and exact frozen-rate CX map.",
+      "evidence_refs": [
+        "NOTE",
+        "WOLFRAM_CONSERVATION",
+        "WOLFRAM_STEP"
+      ],
+      "dependency_ids": [
+        "PHYS_MATH_1_0"
+      ]
+    },
+    {
+      "id": "R6",
+      "status": "complete",
+      "reason": "Checked left-nullspaces and conservation/energy inverse substitutions with Wolfram.",
+      "evidence_refs": [
+        "NOTE",
+        "WOLFRAM_CONSERVATION",
+        "WOLFRAM_STEP"
+      ],
+      "dependency_ids": [
+        "PHYS_MATH_1_0"
+      ]
+    },
+    {
+      "id": "R7",
+      "status": "complete",
+      "reason": "Executed missing-electron discriminating example and exact finite-map synthetic calculation.",
+      "evidence_refs": [
+        "NOTE",
+        "WOLFRAM_CONSERVATION",
+        "WOLFRAM_STEP"
+      ],
+      "dependency_ids": [
+        "PHYS_MATH_1_0"
+      ]
+    },
+    {
+      "id": "R8",
+      "status": "complete",
+      "reason": "Adopted derived/checked formulas and sourced fit; left full D-history admission unresolved.",
+      "evidence_refs": [
+        "NOTE"
+      ],
+      "dependency_ids": [
+        "PHYS_MATH_1_0"
+      ]
+    },
+    {
+      "id": "R9",
+      "status": "complete",
+      "reason": "Froze two-file implementation API and meaningful targeted test contract.",
+      "evidence_refs": [
+        "NOTE"
+      ],
+      "dependency_ids": [
+        "PHYS_MATH_1_0"
+      ]
+    },
+    {
+      "id": "R10",
+      "status": "complete",
+      "reason": "Persisted note, primary locators, Wolfram code/results and resumption obligations.",
+      "evidence_refs": [
+        "NOTE"
+      ],
+      "dependency_ids": [
+        "PHYS_MATH_1_0"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "GENERIC_CONSERVATION",
+      "statement": "For ionic stoichiometry with L S=0, q S=0 and no nuclear/baryon source, isotope totals and neutrality are invariant and Ydot=S R/n_b.",
+      "basis": [
+        "derived",
+        "symbolically_checked"
+      ],
+      "evidence_refs": [
+        "NOTE",
+        "WOLFRAM_CONSERVATION"
+      ],
+      "obligations": [
+        "Numeric implementation tests and actual provider/source selection are separate."
+      ]
+    },
+    {
+      "id": "EXACT_FROZEN_RATE_MAP",
+      "statement": "The stated D/H charge-exchange finite map solves the autonomous fixed-volume frozen-rate Riccati reaction subsystem exactly.",
+      "basis": [
+        "derived",
+        "symbolically_checked"
+      ],
+      "evidence_refs": [
+        "NOTE",
+        "WOLFRAM_STEP"
+      ],
+      "obligations": [
+        "Floating point implementation, changing-temperature and cosmological splitting errors not yet tested."
+      ]
+    },
+    {
+      "id": "D_MINIMAL_SELECTION",
+      "statement": "D0/D+ plus H-D charge exchange is the recommended first added nuclide network.",
+      "basis": [
+        "literature-supported",
+        "model_choice"
+      ],
+      "evidence_refs": [
+        "PRIMARY",
+        "NOTE"
+      ],
+      "obligations": [
+        "Explicit donor D/H, D photoionization/recombination/energy spectrum and rate-domain contracts required before full D-history activation."
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "NULLSPACES",
+      "domain": "math",
+      "result": "pass_scoped",
+      "execution_ref": "WOLFRAM_1",
+      "evidence_refs": [
+        "WOLFRAM_CONSERVATION"
+      ],
+      "observed": {
+        "species": [
+          "H0",
+          "H+",
+          "D0",
+          "D+",
+          "e"
+        ],
+        "reactions": [
+          "H_ion",
+          "H_recomb",
+          "D_ion",
+          "D_recomb",
+          "D0_H+_to_D+_H0",
+          "reverse_CX"
+        ],
+        "stoichiometry": [
+          [
+            -1,
+            1,
+            0,
+            0,
+            1,
+            -1
+          ],
+          [
+            1,
+            -1,
+            0,
+            0,
+            -1,
+            1
+          ],
+          [
+            0,
+            0,
+            -1,
+            1,
+            -1,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            -1,
+            1,
+            -1
+          ],
+          [
+            1,
+            -1,
+            1,
+            -1,
+            0,
+            0
+          ]
+        ],
+        "rank": 2,
+        "leftNullspace": [
+          [
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0,
+            0
+          ]
+        ],
+        "invariantRank": 3,
+        "invariantResidual": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "baryonResidual": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "chemicalDefects": [
+          "chiH",
+          "-chiH",
+          "chiD",
+          "-chiD",
+          "chiD - chiH",
+          "-chiD + chiH"
+        ],
+        "particleChanges": [
+          1,
+          -1,
+          1,
+          -1,
+          0,
+          0
+        ],
+        "thermalIdentityResidual": 0,
+        "eventEnergyResidual": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missingElectronCounterexampleChargeResidual": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "chargeExchangeEquilibriumResidual": 0
+      }
+    },
+    {
+      "id": "EXACT_STEP",
+      "domain": "math",
+      "result": "pass_scoped",
+      "execution_ref": "WOLFRAM_2",
+      "evidence_refs": [
+        "WOLFRAM_STEP"
+      ],
+      "observed": {
+        "discriminantIdentity": 0,
+        "generalRiccatiResidual": 0,
+        "zeroDiscriminantResidual": 0,
+        "initialDisplacement": 0,
+        "manufacturedInput": {
+          "H_total": 10,
+          "D_total": 3,
+          "positive_charge": 6,
+          "initial_Dplus": 1,
+          "kf": "2/5",
+          "kr": "1/7",
+          "dt": "7/3",
+          "classification": "dimensionless manufactured algebra test; no physical rates"
+        },
+        "manufactured_Dplus_after": 1.9631848188485237,
+        "manufactured_feasible_interval": [
+          0,
+          3
+        ],
+        "manufactured_state_after": [
+          5.963184818848523,
+          4.036815181151477,
+          1.0368151811514763,
+          1.9631848188485237
+        ],
+        "manufactured_invariant_totals": [
+          10,
+          3,
+          6
+        ]
+      }
+    },
+    {
+      "id": "CODE_TESTS",
+      "domain": "implementation",
+      "result": "not_run",
+      "reason": "Separate lower-tier implementation task; research role wrote no production code."
+    }
+  ],
+  "executions": [
+    {
+      "id": "WOLFRAM_CONTEXT",
+      "status": "completed",
+      "command": "wolframcontext: ionic-network conservation and energy bookkeeping context",
+      "environment": "Wolfram connector",
+      "exit_code": null,
+      "reason": "Tool success; not a shell command."
+    },
+    {
+      "id": "WOLFRAM_1",
+      "status": "completed",
+      "command": "wolframlanguageevaluator code in extended_network_wolfram.wl",
+      "environment": "Wolfram Language kernel",
+      "exit_code": null,
+      "evidence_refs": [
+        "WOLFRAM_CONSERVATION"
+      ],
+      "reason": "Tool success with isError=false; no shell exit code applicable."
+    },
+    {
+      "id": "WOLFRAM_2",
+      "status": "completed",
+      "command": "wolframlanguageevaluator code in extended_network_finite_step.wl",
+      "environment": "Wolfram Language kernel",
+      "exit_code": null,
+      "evidence_refs": [
+        "WOLFRAM_STEP"
+      ],
+      "reason": "Tool success with isError=false; no shell exit code applicable."
+    }
+  ],
+  "coding_contract": {
+    "allowed_new_paths": [
+      "rust/rei_microphysics/src/deuterium_charge_exchange.rs",
+      "rust/rei_microphysics/tests/deuterium_charge_exchange.rs"
+    ],
+    "registration_owner": "root coordinator",
+    "legacy_extra_species_rejection": "PRESERVE",
+    "default_D_activation": false,
+    "nuclide_abundance_default": null,
+    "energy_defect_j_default": null,
+    "source_provider": {
+      "source_id": "SAVIN2002",
+      "temperature_domain_k": [
+        2.7,
+        200000
+      ],
+      "forward_cm3_s": "2.00e-10*T^0.402*exp(-37.1/T)-3.31e-17*T^1.48",
+      "reverse_cm3_s": "2.06e-10*T^0.396*exp(-33.0/T)+2.03e-9*T^(-0.332)",
+      "cm3_to_m3": 0.000001,
+      "threshold_is_fit_exponent": false
+    },
+    "test_contract_locator": "extended_network_theory.md: lower-tier frozen coding contract",
+    "runtime_scope": "Local manufactured tests only; no physical/native history under this research unit."
+  },
+  "decisions": [
+    {
+      "id": "D_FIRST",
+      "choice": "Construct D/H module independently; do not block FLRW HHe solver."
+    },
+    {
+      "id": "OTHER_SPECIES",
+      "choice": "3He optional model/provider choice; Li requires sub-Lyman-limit source; metals require enrichment/provider input."
+    },
+    {
+      "id": "NO_NUCLEAR_BURN",
+      "choice": "Retain donor isotope inventory; ionic network does not synthesize primordial nuclei."
+    }
+  ],
+  "overrides": [],
+  "failures": [],
+  "next_actions": [
+    "Lower-tier worker implements two new D/H module/test files under frozen contract.",
+    "Coordinator registers module and preserves existing extra-isotope legacy rejection.",
+    "Obtain explicit donor D/H and remaining D photo/recombination/source support before full D history.",
+    "Continue HHe FLRW solver independently."
+  ],
+  "scientific_history_executions": 0,
+  "repository_mutations": 0,
+  "remote_mutations": 0,
+  "strong_no_go_claim": false
+}
+

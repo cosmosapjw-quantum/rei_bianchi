@@ -1,0 +1,180 @@
+{
+  "schema": "rei.rate_table.c9_independent_review.v1",
+  "date_utc": "2026-10-17",
+  "decision": "PASS_SCOPED",
+  "scope": "Inspected H/He/D temperature-coefficient/prepared-point implementation and Li6/Li7 conditional elemental CI/RR/DR number component; retained sampled value/point evidence and conditional performance interpretation.",
+  "reviewer": {
+    "role": "fresh independent read-only scientific reviewer",
+    "agent": "/root/resume_review",
+    "requested_model": "Astra high",
+    "observed_model": "not exposed by runtime",
+    "implemented_reviewed_code": false,
+    "inherited_independent_pass": false,
+    "upstream_actor_record": "PR178 explicitly records NOT_RUN; this decision supplies independent review only for the objects and claims listed here."
+  },
+  "blocking_findings": [],
+  "repair_required": false,
+  "findings": [
+    {
+      "id": "PHYSICAL_LEDGER",
+      "status": "PASS",
+      "finding": "Diff against retained baseline_igm_thermal.rs contains only prepared-bundle dispatch and exact-temperature check. Reaction, binding, kinetic, escaped-radiation, CMB and expansion owners are unchanged. AxbiProvider.point prepares Direct once; explicit Table backend feeds the same ledger."
+    },
+    {
+      "id": "PREPARED_BINDING",
+      "status": "PASS",
+      "finding": "PreparedIgmRates fields are private and backend construction validates T. RHS requires exact equality to recovered EOS T, rejecting changed-temperature reuse. D projection uses 1e-6 cm3-to-m3 and 1e-13 erg cm3-to-J m3 factors and retains its preexisting explicit H-equality model."
+    },
+    {
+      "id": "TABLE_BRANCHES",
+      "status": "PASS_SCOPED",
+      "finding": "Source low predicate t/11605<=0.8, exact CI floor masks, CE caps and raw/excluded DR diagnostics are preserved. Cells crossing named source branches or endpoint floor masks fall back directly. Uncertified zeros, nonpositive or subnormal endpoints also force direct evaluation. Structural zeros require explicit certification. Grid step already rejects nonnormal or nonpositive values; no outstanding NaN-step finding."
+    },
+    {
+      "id": "SOURCE_FORMULAS_LI",
+      "status": "PASS",
+      "finding": "Retained CI/RR/DR rows map initial charge q=3-N correctly. RR temperature-dependent B and Voronov historical kB are retained. Li+ DR amplitude -7.753e-7 is summed with its original exponent; no absolute-value/clipping transform. Its negative term is dominated by the positive lower-energy 2.941e-5 term for T>0. Bare Li3+ DR is structurally absent."
+    },
+    {
+      "id": "LI_DOMAINS",
+      "status": "PASS",
+      "finding": "CI per-row lower limits are [1,4,5]/8.617385e-5 K and upper 20 keV/kB. RR/DR tabulation support is [10q^2,1e7q^2] K, not a universal fit-accuracy certificate. Complete bundle intersection is [5/8.617385e-5,1e7] K. Individual cold RR remains available; cold CI/full bundle remains unavailable. Invalid T is rejected before structural-zero return."
+    },
+    {
+      "id": "ISOTOPE_IDENTITY",
+      "status": "PASS_CONDITIONAL_MODEL",
+      "finding": "Native Z=3,A=6/7,q=0..3 state identities remain distinct. Isotope coefficient APIs and isotope RHS require explicit ElementalElectronicEquality; IsotopeResolved returns MissingSource. No isotope mass rescaling or abundance default occurs. Li8/Li9 return PendingNuclearDecayDaughterClosure. Elemental coefficient equality is a selected approximation, not isotope-resolved data."
+    },
+    {
+      "id": "LI_NUMBER_CONSERVATION",
+      "status": "PASS_SCOPED",
+      "finding": "Adjacent-charge flux differences telescope per isotope. A-weighted baryon count conserves and charge-weighted nuclear sources equal the returned combined electron source. Shared externally prescribed electron density and SI conversion are explicit. Number-only component provides no photon or thermal closure."
+    },
+    {
+      "id": "NUMERICAL_EVIDENCE",
+      "status": "PASS_SAMPLED",
+      "finding": "Original C6 raw logs record 5 HHe and 4 Li tests passed. Local HHe selected R7 maximum 3.8387697880837957e-7 and Li 1.1733732758756332e-6 meet unchanged 1e-5 sampled value target; initial HHe8193 failure is preserved. PR177 source-matched summary records 3.8172670147488274e-7. PR178 raw logs support 36 fixed-state RHS cases with worst ledger norm1.2272269344036022e-16, species1.3945420325414137e-8, energy6.667011366481301e-9 and temperature8.128720129682373e-9. This is coefficient/point evidence only."
+    },
+    {
+      "id": "PERFORMANCE",
+      "status": "MEASURED_CONDITIONAL",
+      "finding": "C8 keeps local1.85.1, PR1771.94.1 and PR1781.94.1 cohorts separate. Local table point is slightly slower than prepared Direct; random scalar lookup can also be slower. PR178 raw three-run matched-four-worker ratios at N262144 have medians1.607568396 ordered and1.370923361 random; build amortization medians are1844093.8425 and3155998.1358 queries. No full-solver or universal speedup follows."
+    },
+    {
+      "id": "DERIVATIVE",
+      "status": "HOLD_OUTSIDE_ADMISSION",
+      "finding": "PR178 diagnostic0.0065711347474461945 is absolute finite-difference log-slope difference. Contract1e-3 is a scaled metric conditional on a derivative API, which does not exist. Comparing them directly would be invalid. Coefficient-value accuracy does not certify slope, Newton/Jacobian consistency or trajectories; those remain HOLD."
+    },
+    {
+      "id": "DOSSIER_FRONTIER",
+      "status": "BOOKKEEPING_AND_INTAKE_ONLY",
+      "finding": "Dossier17 ordering plus four appended Li6 states gives21 inventory entries, not a coupled21 solver. Original native13 and separate8-state Li component are distinct. Oct17 overlay correctly distinguishes completed upstream PR179/180 mixture-EOS/CX reference work from historical pure-HD0a3bec74 scope; subsequent lineages are intake references, not reviewed/admitted by this decision."
+    },
+    {
+      "id": "CLAIM_AND_BUILD_BOUNDARY",
+      "status": "PASS_SCOPED",
+      "finding": "C8 report discloses sampled-only bounds, focused local build, original resource ledger, reused external runs, old compiler-label caveat and no new runs. Standalone PR178 Rust opt-in policy is externally reported tested and advisory only; this review read its JSON but did not inspect its Rust implementation/tests, and does not independently admit that policy or the whole PR178."
+    }
+  ],
+  "source_identity": {
+    "integration_ref": "da4bd0b9d112cadb2ec78c49d7dc3e7ab4761ea7",
+    "intake": "evidence/intake/RESUME_GITHUB_20261017.json",
+    "owned_paths_exact_remote_matches": 8,
+    "focused_manifest_entries_verified": 67,
+    "focused_manifest_current_source_and_bundle_mismatches": 0,
+    "hhe_upstream_core_blobs_match_current": true,
+    "PR177": "2f4103968cc26061a62dc7931c27c2fe86d75cd8",
+    "PR178": "1579a5e4b0c3093bfd6942cc4914e29a00a71978"
+  },
+  "evidence_limits": [
+    "PR177 imported JSON is source-pinned summary evidence; its raw inner timing samples were not imported or independently reanalyzed here.",
+    "PR178 imported raw RUN1-3 contain three test entries each; no blanket four-test raw claim is made. Exact prepared-T binding is independently supported by inspected local C6 code/raw PASS.",
+    "No source-rate external empirical uncertainty, continuum interpolation bound, derivative/Jacobian, trajectory or global cosmological conclusion is admitted.",
+    "No independent code review of PR178 standalone policy crate or later EOS/CX/transport branches; intake does not globally upgrade those branches.",
+    "Cloud backups/readback and final publication are outside this scientific review."
+  ],
+  "holds": [
+    "Derivative API/Newton/Jacobian table use",
+    "Full EoR/FLRW/Bianchi trajectory or global convergence",
+    "End-to-end/NCP64 speedup or new native campaign",
+    "Li isotope-resolved rate accuracy",
+    "Cold complete Li CI/RR/DR chain and Li photon/thermal/nuclear closure",
+    "Coupled21-state solver",
+    "Automatic production backend switch"
+  ],
+  "reviewed_production_and_test_paths": [
+    "rust/rei_microphysics/src/rate_table.rs",
+    "rust/rei_microphysics/src/igm_thermal.rs",
+    "rust/rei_microphysics/src/axbi_rates.rs",
+    "rust/rei_microphysics/src/deuterium_atomic.rs",
+    "rust/rei_microphysics/src/lithium_rates.rs",
+    "rust/rei_microphysics/src/lib.rs",
+    "rust/rei_microphysics/tests/rate_table.rs",
+    "rust/rei_microphysics/tests/lithium_rates.rs"
+  ],
+  "reviewed_evidence": [
+    "CONTRACT.json",
+    "FOCUSED_SOURCE_FILES.json",
+    "evidence/R6_INDEPENDENT_REVIEW.json",
+    "evidence/R7_RESULTS.json",
+    "evidence/C6_rate_tests_and_timings.stdout",
+    "evidence/C6_lithium_tests.stdout",
+    "evidence/RUN_LEDGER.json",
+    "REPORT.md",
+    "coding_evidence/C8.json",
+    "coding_evidence/C8_LOCAL_TIMINGS.json",
+    "coding_evidence/C8_UPSTREAM_FAIR_TIMINGS.json",
+    "data/dossier_species_registry.json",
+    "evidence/intake/DOSSIER_RECONCILIATION.json",
+    "evidence/intake/RESUME_GITHUB_20261017.json",
+    "evidence/intake/upstream_pr177/C8_RESULTS.json",
+    "evidence/intake/upstream_pr178/C9_RESULTS.json",
+    "evidence/intake/upstream_pr178/REVIEW_DECISION.json",
+    "evidence/intake/upstream_pr178/OPTIN_POLICY.json",
+    "evidence/intake/upstream_pr178/C9_RUN1.stdout",
+    "evidence/intake/upstream_pr178/C9_RUN2.stdout",
+    "evidence/intake/upstream_pr178/C9_RUN3.stdout"
+  ],
+  "reviewed_sha256": {
+    "rust/rei_microphysics/src/rate_table.rs": "334e0da513b07ae78e8bbc669ac09b7c74dd9abec3c48934cbc94442c0cef8a6",
+    "rust/rei_microphysics/src/igm_thermal.rs": "29fc785e20f1218578c90df4ef39a69de3577eb0b65585e86a6183328e0c75f1",
+    "rust/rei_microphysics/src/axbi_rates.rs": "4bbfa83430c05714ec97db7b643bf06fe6e6e4544bc1f34c52950bf5b327081f",
+    "rust/rei_microphysics/src/deuterium_atomic.rs": "b9666efedf86c88e80a82ec412dc18a06bdc8d563c3786cc5001a63580422cf1",
+    "rust/rei_microphysics/src/lithium_rates.rs": "10e4db3fa5bd9a4c2dca5c4bfd7fc7fa6a3fa4bbe83862c25b5c4e1a7ba4d629",
+    "rust/rei_microphysics/src/lib.rs": "607188f783af4e1cf93d063aaf02cb132a2fca57383dd06418ca4d062f62a000",
+    "rust/rei_microphysics/tests/rate_table.rs": "a00863cb85116c93613aaf43844159afbbb2de56eb42b8dbb2223420c49e07d5",
+    "rust/rei_microphysics/tests/lithium_rates.rs": "29bad28fd96aecda4f7b3df5f522e888b4ec8fdfef829b3a384fa1ee0a9f29de"
+  },
+  "evidence_sha256": {
+    "CONTRACT.json": "2a5b376d987d230696ee9f1a0a22ed3d165ad2444cb5cb3cc730c3596d83bdd6",
+    "FOCUSED_SOURCE_FILES.json": "77dfcafe998f9cdf5bbd71c67901e81c9d7b3164b5362ad8055679175de7c530",
+    "evidence/R6_INDEPENDENT_REVIEW.json": "a8a5f1bacb58a4544d85ecdba4252ee617fc2898bb61f9e501299541e18abb62",
+    "evidence/R7_RESULTS.json": "70b956cb8e8c805fc296a3d8e9f72e5fa0e93370c69c7449899c91def5846a0c",
+    "evidence/C6_rate_tests_and_timings.stdout": "cb1cc8dc9eb1382a5dd6fd025e5328a3a02b5d426a74657b7cf1ab5682c8d318",
+    "evidence/C6_lithium_tests.stdout": "4ee60e9320d56804704dd8a294b90e2a509b014af230d9d79158e92d8e72160b",
+    "evidence/RUN_LEDGER.json": "d537e9e333a3585a5c7c1da3314e02a2a21b3822ab595d2b8fb6279465b648a2",
+    "REPORT.md": "8e018d981ebfa86f84870cadd9e0b7fa66073dbcfbda2fae5efde08d16aa9ea5",
+    "coding_evidence/C8.json": "3d906a4a2b4540e848aa337c35927005aaca24e3486a9796f93509683c440152",
+    "coding_evidence/C8_LOCAL_TIMINGS.json": "283392a4c19eb89cdf780703f3695054db8efa115e0d8346437ab1e653d843ef",
+    "coding_evidence/C8_UPSTREAM_FAIR_TIMINGS.json": "07d5ffddb22b493f9f1e8c0a45d0c16d68da214a52d674e8173697a5ba6c2a9d",
+    "data/dossier_species_registry.json": "896bfa30577b244612e2ea61e44647d206a2c1f27ecb0597aee25c9ea0febf11",
+    "evidence/intake/DOSSIER_RECONCILIATION.json": "5f662726560c820596399e727f50dc7e5e7d40f4c457bf8eae772527726d71dc",
+    "evidence/intake/RESUME_GITHUB_20261017.json": "fad91711d31d1b0e010505bec42943f49a0993719005840b4a2f0f65b282ad19",
+    "evidence/intake/upstream_pr177/C8_RESULTS.json": "5f3a78390de9f94a07ab875f720ef2178b6876c59833a9be5c374fa9603724dc",
+    "evidence/intake/upstream_pr178/C9_RESULTS.json": "a185aefa33721422ecf757766837a820f04b7a8ef36ab3c1c93e0df60f9a815f",
+    "evidence/intake/upstream_pr178/REVIEW_DECISION.json": "265f9160762d871701fb45f58a4039b8497718d8a5877edd17a817a2d9dc2b41",
+    "evidence/intake/upstream_pr178/OPTIN_POLICY.json": "f4def0422371e2d7e2cccbbda8b113ffe3cdb0cfe3489770adde0b4a2d267bbc",
+    "evidence/intake/upstream_pr178/C9_RUN1.stdout": "cd3c1220cc5b31aadf25eb05e16a89f5968bce9a59d49071f1dabdfced4f62f0",
+    "evidence/intake/upstream_pr178/C9_RUN2.stdout": "1d00a6530df6028c156fa6bb68d51ee24f6236ede90b903c286b04ff81f2ecfd",
+    "evidence/intake/upstream_pr178/C9_RUN3.stdout": "b8e93c4c33e515c541759227883dfd61359a7a3d7fe7847da04293878c4721bf"
+  },
+  "execution": {
+    "scientific_runs": 0,
+    "tests": 0,
+    "builds": 0,
+    "production_changes": 0,
+    "review_artifacts_written": 2,
+    "verification": "Read-only code/diff/raw-log inspection and bounded metadata/hash checks; no numerical rerun."
+  },
+  "next_executable_action": "Root may admit this scoped result and authorize mechanical C9/C10 checkpoint/handoff publication from retained evidence. Preserve Direct default and all stated HOLDs; no new scientific gate or repair is requested."
+}

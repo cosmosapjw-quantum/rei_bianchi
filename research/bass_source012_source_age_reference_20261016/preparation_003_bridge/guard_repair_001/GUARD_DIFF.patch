@@ -1,0 +1,124 @@
+--- pre_repair/setup_bridge.py
++++ repaired/setup_bridge.py
+@@ -89,66 +89,93 @@
+     except Exception as exc:raise BridgeFailure('malformed JSON') from exc
+     return record,validate_setup(record,expected_birth_count)
+ 
+-def collect(argv,outdir,expected_birth_count,*,wall_cap=10,output_cap=16777216,unit_deadline=None):
+-    """Capture first, reap, then parse; stdin DEVNULL ensures zero requests."""
+-    outdir=Path(outdir);outdir.mkdir(parents=True,exist_ok=False)
++def output_size(*roots):
++    return sum(p.stat().st_size for root in set(map(Path,roots)) for p in root.rglob('*') if p.is_file())
++
++def collect(argv,outdir,expected_birth_count,*,wall_cap=10,output_cap=16777216,unit_deadline=None,public_receipt_dir=None):
++    """Capture private raw first, retain public measured costs on every rejection."""
++    outdir=Path(outdir);compact=Path(public_receipt_dir) if public_receipt_dir is not None else outdir
+     start=time.monotonic();deadline=min(start+wall_cap,unit_deadline if unit_deadline is not None else math.inf)
++    def fail(reason):
++        compact.mkdir(parents=True,exist_ok=True)
++        (compact/'FAILURE_DISPOSITION.json').write_text(json.dumps({'status':'FAIL_STOP_NO_RETRY','reason':reason,'elapsed_seconds':time.monotonic()-start,'raw_preserved':True,'derivative_requests':0},indent=2)+'\n')
++        raise BridgeFailure(reason)
++    if time.monotonic()>=deadline:fail('DEADLINE_BEFORE_CASE_START_ZERO_NEW_CHILDREN')
++    outdir.mkdir(parents=True,exist_ok=False)
++    if compact!=outdir:compact.mkdir(parents=True,exist_ok=False)
+     def limits():
+         resource.setrlimit(resource.RLIMIT_AS,(1073741824,1073741824))
+         resource.setrlimit(resource.RLIMIT_FSIZE,(output_cap,output_cap))
+     env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1',OMP_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS='1')
+     with (outdir/'stdout').open('xb') as out,(outdir/'stderr').open('xb') as err:
++        if time.monotonic()>=deadline:fail('DEADLINE_IMMEDIATE_PREPOPEN_ZERO_NEW_CHILDREN')
+         child=subprocess.Popen(argv,stdin=subprocess.DEVNULL,stdout=out,stderr=err,env=env,preexec_fn=limits,start_new_session=True)
+-        started={'argv':argv,'pid':child.pid,'start_epoch':time.time(),'stdin':'DEVNULL','AS_bytes':1073741824,'wall_cap_s':wall_cap,'output_cap_bytes':output_cap,'derivative_requests':0}
+-        (outdir/'STARTED.json').write_text(json.dumps(started,indent=2)+'\n')
++        started={'argv':argv,'pid':child.pid,'start_epoch':time.time(),'stdin':'DEVNULL','AS_bytes':1073741824,'wall_cap_s':wall_cap,'output_cap_bytes':output_cap,'derivative_requests':0,'private_raw':str(outdir),'public_compact':str(compact)}
++        (compact/'STARTED.json').write_text(json.dumps(started,indent=2)+'\n')
+         reason=None;term=False;kill=False
+         while True:
+             pid,status,usage=os.wait4(child.pid,os.WNOHANG)
+             if pid:break
+-            now=time.monotonic();size=sum(p.stat().st_size for p in outdir.iterdir() if p.is_file())
++            now=time.monotonic();size=output_size(outdir,compact)
+             if (now>=deadline-2 or size>=output_cap) and not term:
+                 reason='OUTPUT_CAP' if size>=output_cap else 'WALL_CAP';os.killpg(child.pid,signal.SIGTERM);term=True
+             if now>=deadline-1 and not kill:os.killpg(child.pid,signal.SIGKILL);kill=True
+             time.sleep(.005)
+     child.returncode=os.waitstatus_to_exitcode(status)
+-    receipt={'argv':argv,'exit_code':child.returncode,'wall_seconds':time.monotonic()-start,'user_seconds':usage.ru_utime,'system_seconds':usage.ru_stime,'peak_RSS_bytes':usage.ru_maxrss*1024,'termination_reason':reason,'stdin':'DEVNULL','derivative_requests':0}
+-    (outdir/'PROCESS_RECEIPT.json').write_text(json.dumps(receipt,indent=2)+'\n')
+-    if child.returncode!=0 or reason is not None:raise BridgeFailure('first helper process failure/cap')
+-    if sum(p.stat().st_size for p in outdir.iterdir() if p.is_file())>output_cap:
+-        raise BridgeFailure('aggregate process output cap')
++    reaped=time.monotonic()
++    receipt={'argv':argv,'exit_code':child.returncode,'wall_seconds':reaped-start,'user_seconds':usage.ru_utime,'system_seconds':usage.ru_stime,'peak_RSS_bytes':usage.ru_maxrss*1024,'termination_reason':reason,'stdin':'DEVNULL','derivative_requests':0}
++    (compact/'PROCESS_RECEIPT.json').write_text(json.dumps(receipt,indent=2)+'\n')
++    if reaped>=deadline:fail('DEADLINE_AFTER_REAP_COST_RETAINED')
++    if child.returncode!=0 or reason is not None:fail('FIRST_HELPER_PROCESS_FAILURE_OR_CAP')
++    if output_size(outdir,compact)>output_cap:fail('AGGREGATE_OUTPUT_AFTER_RECEIPT')
+     try:
+         record,validation=parse_stdout((outdir/'stdout').read_bytes(),expected_birth_count)
+     except Exception as exc:
+-        (outdir/'VALIDATION_FAILURE.json').write_text(json.dumps({'status':'FAIL_STOP_NO_RETRY','error':str(exc),'raw_preserved':True,'derivative_requests':0},indent=2)+'\n')
+-        raise
+-    (outdir/'VALIDATION.json').write_text(json.dumps(validation,indent=2)+'\n')
++        (compact/'VALIDATION_FAILURE.json').write_text(json.dumps({'status':'FAIL_STOP_NO_RETRY','error':str(exc),'raw_preserved':True,'derivative_requests':0},indent=2)+'\n')
++        fail('FIRST_PROTOCOL_OR_DOMAIN_FAILURE')
++    (compact/'VALIDATION.json').write_text(json.dumps(validation,indent=2)+'\n')
++    if time.monotonic()>=deadline:fail('DEADLINE_AFTER_VALIDATION_COST_RETAINED')
++    if output_size(outdir,compact)>output_cap:fail('AGGREGATE_OUTPUT_AFTER_VALIDATION_METADATA')
+     return record,validation,receipt
+ 
+-def plan(output_root):
++def plan(output_root,public_receipts_root=None):
+     return {'scope':'PROPOSED_NOT_AUTHORIZED_REAL_SETUP','helper_candidate_sha256':ELF_SHA,'helper_bytes':908120,'producer_commit':PRODUCER,
+             'build_receipt':str(HERE.parent/'preparation_002_build/WRAPPER_RECEIPT.json'),
+-            'commands':[{'argv':[ELF_PATH,'source_rhs','-0.1',str(n)],'stdin':'DEVNULL','output':str(Path(output_root)/('birth_'+str(n))),'wall_cap_s_including_termination':10} for n in (8,16,32)],
++            'commands':[{'argv':[ELF_PATH,'source_rhs','-0.1',str(n)],'stdin':'DEVNULL','private_raw_output':str(Path(output_root)/('birth_'+str(n))),'public_compact_receipts':str(Path(public_receipts_root or HERE.parent/'setup_001')/('birth_'+str(n))),'wall_cap_s_including_termination':10} for n in (8,16,32)],
+             'sequential':True,'total_wall_s':30,'AS_bytes':1073741824,'aggregate_output_bytes':16777216,'derivative_requests':0,'Gamma':None,'heat':None,'prepared_nodes':None,
+             'requires':'independently accepted build and bridge + explicit owner authorization; not granted by preparation'}
+ 
+-def run_owner_approved(output_root):
++def run_owner_approved(output_root,public_receipts_root):
+     """Future owner-authorized use ONLY. Never called by preparation tests."""
+-    root=Path(output_root)
+-    if root.exists():raise BridgeFailure('future setup output root must be fresh')
++    root=Path(output_root);public=Path(public_receipts_root)
++    if root.exists() or public.exists():raise BridgeFailure('future private and public output roots must be fresh')
+     # Revalidate actual launch candidate once; never substitute captured old ELF.
+     identity=json.loads((HERE.parent/'preparation_002_build/ELF_IDENTITY.json').read_text())
+     if identity['sha256']!=ELF_SHA or identity['bytes']!=908120 or identity['producer_commit']!=PRODUCER or identity['path']!=ELF_PATH:raise BridgeFailure('producer/ELF receipt mismatch')
+     raw=Path(ELF_PATH).read_bytes()
+     if len(raw)!=908120 or hashlib.sha256(raw).hexdigest()!=ELF_SHA:raise BridgeFailure('actual launch ELF mismatch')
+-    root.mkdir();start=time.monotonic();results=[]
+-    for n in (8,16,32):
+-        used=sum(f.stat().st_size for f in root.rglob('*') if f.is_file());remaining=16777216-used
+-        if remaining<=0:raise BridgeFailure('aggregate output cap')
+-        results.append(collect([ELF_PATH,'source_rhs','-0.1',str(n)],root/('birth_'+str(n)),n,output_cap=remaining,unit_deadline=start+30))
+-    return results
++    root.mkdir();public.mkdir(parents=True)
++    return _collect_cases(root,public)
++
++def _collect_cases(root,public):
++    """Separate guard loop enables mocked-clock tests without ELF/process use."""
++    start=time.monotonic();deadline=start+30;results=[]
++    try:
++        for n in (8,16,32):
++            if time.monotonic()>=deadline:raise BridgeFailure('UNIT_DEADLINE_BEFORE_NEXT_CASE_ZERO_NEW_CHILDREN')
++            remaining=16777216-output_size(root,public)
++            if remaining<=0:raise BridgeFailure('UNIT_AGGREGATE_OUTPUT_BEFORE_NEXT_CASE')
++            result=collect([ELF_PATH,'source_rhs','-0.1',str(n)],root/('birth_'+str(n)),n,output_cap=remaining,unit_deadline=deadline,public_receipt_dir=public/('birth_'+str(n)))
++            results.append(result)
++            if time.monotonic()>=deadline:raise BridgeFailure('UNIT_DEADLINE_AFTER_CASE_VALIDATION')
++            if output_size(root,public)>16777216:raise BridgeFailure('UNIT_AGGREGATE_OUTPUT_AFTER_CASE_METADATA')
++        return results
++    except Exception as exc:
++        (public/'UNIT_FAILURE_DISPOSITION.json').write_text(json.dumps({'status':'FAIL_STOP_NO_RETRY','reason':str(exc),'completed_cases':len(results),'elapsed_seconds':time.monotonic()-start,'raw_and_process_costs_preserved':True,'derivative_requests':0},indent=2)+'\n')
++        raise
+ 
+ if __name__=='__main__':
+-    parser=argparse.ArgumentParser();parser.add_argument('--output-root',required=True);parser.add_argument('--execute-owner-approved',action='store_true')
++    parser=argparse.ArgumentParser();parser.add_argument('--output-root',required=True);parser.add_argument('--execute-owner-approved',action='store_true');parser.add_argument('--public-receipts-root',required=True)
+     args=parser.parse_args()
+-    if args.execute_owner_approved:run_owner_approved(args.output_root)
+-    else:print(json.dumps(plan(args.output_root),indent=2))
++    if args.execute_owner_approved:run_owner_approved(args.output_root,args.public_receipts_root)
++    else:print(json.dumps(plan(args.output_root,args.public_receipts_root),indent=2))

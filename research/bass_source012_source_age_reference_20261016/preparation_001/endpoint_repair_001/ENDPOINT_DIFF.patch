@@ -1,0 +1,108 @@
+--- pre_repair/positive_reference.py
++++ repaired/positive_reference.py
+@@ -106,15 +106,18 @@
+     return dv
+ 
+ 
+-def heun(rhs, x, v, h, domain, counts):
++def heun(rhs, x, v, h, domain, counts, *, endpoint=None):
+     """No RHS at algebraic B (which represents two Euler substeps)."""
++    endpoint = x+h if endpoint is None else endpoint
++    if not math.isfinite(endpoint) or not endpoint > x:
++        raise Hold('STEP_UNDERFLOW_HOLD: Heun endpoint')
+     domain.validate(v)
+     f0 = _rhs(rhs, x, v, counts)
+     if h > domain.euler_bound(v, f0):
+         raise DomainReject('first Euler step exceeds affine bound')
+     a = tuple(vi+h*fi for vi, fi in zip(v, f0))
+     domain.validate(a)  # before F1
+-    f1 = _rhs(rhs, x+h, a, counts)
++    f1 = _rhs(rhs, endpoint, a, counts)
+     if h > domain.euler_bound(a, f1):
+         raise DomainReject('second Euler step exceeds affine bound')
+     b = tuple(ai+h*fi for ai, fi in zip(a, f1))
+@@ -124,14 +127,16 @@
+     return result
+ 
+ 
+-def transaction(rhs, x, v, h, domain, counts):
++def transaction(rhs, x, v, h, domain, counts, *, endpoint=None):
+     """Returns fine accepted candidate/error; never changes the caller's state."""
+-    if h <= 0 or not math.isfinite(h) or x+h == x or x+h/2 == x:
++    endpoint = x+h if endpoint is None else endpoint
++    midpoint = x+h/2
++    if h <= 0 or not math.isfinite(h) or not math.isfinite(endpoint) or not x < midpoint < endpoint:
+         raise Hold('STEP_UNDERFLOW_HOLD')
+     counts.attempts += 1
+-    coarse = heun(rhs, x, v, h, domain, counts)
+-    mid = heun(rhs, x, v, h/2, domain, counts)
+-    fine = heun(rhs, x+h/2, mid, h/2, domain, counts)
++    coarse = heun(rhs, x, v, h, domain, counts, endpoint=endpoint)
++    mid = heun(rhs, x, v, h/2, domain, counts, endpoint=midpoint)
++    fine = heun(rhs, midpoint, mid, h/2, domain, counts, endpoint=endpoint)
+     e = max(abs(a-b)/(3*((2e-13 if i < 3 else 2e-12 if i == 3 else 1e-15)
+                    + 2e-9*max(abs(old), abs(a))))
+             for i, (a,b,old) in enumerate(zip(fine,coarse,v)))
+@@ -163,8 +168,9 @@
+     for target in mesh:
+         while x < target:
+             step = min(h, target-x)
++            endpoint = target if step == target-x else x+step
+             try:
+-                fine, e = transaction(rhs,x,v,step,domain,counts)
++                fine, e = transaction(rhs,x,v,step,domain,counts,endpoint=endpoint)
+             except DomainReject:
+                 counts.rejected_domain += 1
+                 h = step/2
+@@ -177,7 +183,7 @@
+                 if x+h == x:
+                     raise Hold('STEP_UNDERFLOW_HOLD after error rejection')
+                 continue
+-            x = target if step == target-x else x+step
++            x = endpoint
+             v = fine; counts.accepted += 1
+             saved.append((x,v))
+             h = step*(2 if e == 0 else min(2,max(.2,.9*e**(-1/3))))
+--- pre_repair/test_positive_reference.py
++++ repaired/test_positive_reference.py
+@@ -120,5 +120,40 @@
+             with self.assertRaises(ValueError):decode_setup(bad)
+ 
+ 
++    def test_strict_hex_endpoint_and_capped_birth_boundary(self):
++        x=float.fromhex('-0x1.8571600faf24ap+1')
++        end=float.fromhex('-0x1.8571600faf247p+1')
++        h=end-x; midpoint=x+h/2
++        self.assertEqual(h.hex(),'0x1.8000000000000p-50')
++        self.assertGreater(midpoint+h/2,end) # actual frozen defect falsifier
++        seen=[]
++        def strict(t,v):
++            self.assertLessEqual(t,end)
++            seen.append(t)
++            return (0.,)*len(v)
++        fine,e=transaction(strict,x,self.v,h,self.d,Counters(),endpoint=end)
++        self.assertEqual(seen,[x,end,x,midpoint,midpoint,end])
++        self.assertEqual(fine,self.v);self.assertEqual(e,0.)
++        # Same short capped transaction ends at a birth, then injects once.
++        seen.clear(); initial=self.v+(0.,0.)
++        domain=Domain(.08,.001,((4,5,2.,4.),))
++        out=integrate(strict,initial,domain,[x,end],[end],[(0.,0.,0.,0.,.125,.375)],initial_h=1e-4)
++        self.assertEqual(seen,[x,end,x,midpoint,midpoint,end])
++        self.assertEqual(out['x'],end)
++        self.assertEqual(out['state'],self.v+(.125,.375))
++        self.assertEqual((out['counts'].accepted,out['counts'].births),(1,1))
++
++    def test_nonprogressing_midpoint_holds_before_callbacks(self):
++        x=float.fromhex('-0x1.8571600faf24ap+1')
++        end=math.nextafter(x,math.inf);seen=[];counts=Counters()
++        def forbidden(t,v):
++            seen.append(t)
++            return (0.,)*len(v)
++        with self.assertRaisesRegex(Hold,'STEP_UNDERFLOW_HOLD'):
++            transaction(forbidden,x,self.v,end-x,self.d,counts,endpoint=end)
++        self.assertEqual(seen,[])
++        self.assertEqual((counts.rhs,counts.attempts),(0,0))
++
++
+ if __name__=='__main__':
+     unittest.main(verbosity=2)

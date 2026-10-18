@@ -1,0 +1,23 @@
+{
+  "schema": "rei.thermal-cx-bounded-repair/1",
+  "recorded_utc": "2026-10-16T04:00:17.735492+00:00",
+  "decision": "AUTHORIZE_ONE_TARGETED_SI_CONVERSION_REPAIR_EPISODE",
+  "finding": "SI_NONEMPTY_INPUT_SILENTLY_BECOMES_EMPTY",
+  "object": "rust/rei_microphysics/src/deuterium_thermal_charge_exchange.rs::integrate_si",
+  "evidence": "Source conversion h0_m3/1e6 underflows to0 for f64::from_bits(1). Initial totals validates nonnegative finite input; with other densities and thermal zero, resulting core allzero state returns COMPLETE_EMPTY, bypassing original nonempty positive-provider-T domain validation even at requested0. This is a source-level exact binary64 counterexample, not a native numerical run.",
+  "impact": "Incorrect complete/empty admission and dropped positive density at SI interface. Current-task mapping correctness, not a new physics policy.",
+  "repair_scope": [
+    "Reject nonzero-tozero density conversion and nonfinite conversions before core integration. Keep supplied value immutable and report typed INVALID_INPUT.",
+    "Review adjacent SI conversions for the same nonzero-tozero loss only; do not add unrelated range limits or change tolerances/physics.",
+    "Add narrow regression to new existing targeted Rust test target; use already frozen remaining test command allocation."
+  ],
+  "protected": [
+    "Legacy atomic and frozen-rate kernels unchanged",
+    "Same signed defect/domain/Heun method",
+    "No new native owner/ref campaign",
+    "No reviewer source edits"
+  ],
+  "stop_rule": "Return final repaired diff and focused test outcome in existing C9 pass. No recursive review or extra test command beyond frozen allowance without diagnosed parent disposition.",
+  "requested_model": "gpt-6-astra/high",
+  "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED"
+}

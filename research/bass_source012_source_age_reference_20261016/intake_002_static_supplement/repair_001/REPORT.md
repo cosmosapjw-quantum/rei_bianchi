@@ -1,0 +1,9 @@
+# Source012 static supplement targeted repair
+
+The one prospectively authorized repair collector completed with exit0. Both native-pin35d9747a0bbedcafdb568467ce7c1e7a25f965b6 blobs were copied exclusively into the fresh private repair_001 directory: science_scenario_v1.json8,875B and ft03_first_interval.json2,343B, total11,218B. Git blob SHA1, copy SHA256 and JSON parsing matched; no source bytes were placed in the public metadata. The original collector, first two failure receipts and metadata remain unchanged.
+
+The repair changed only new_bytes declaration, corrected launcher012 path, and create-only output routing required to preserve the original evidence. Actual command wall was0.065819341s; /usr/bin/time reports0.05s rounded, user0.03s/system0.02s, RSS16,176KiB. No retry after this invocation occurred.
+
+Both prior started attempts remain charged: malformed path exit2/0.28s; unauthorized second launch exit3/0.07s with new_bytes UnboundLocalError. Second-launch argv remains UNCERTAIN_INCONSISTENT_TRANSCRIPTION with verifiedargv=null. This prospective approval does not retroactively license that launch. Cumulative started-command time including prior2.59s intake is3.005819341s; conservative collector-process time is2.725819341s. The raw collector manifest’s smaller internal-time counter does not supersede this accounting. Cumulative private payload is411files/7,407,788B, below128MiB; original90s and10s-unit limits were not reset.
+
+Completion resolves only these two static dependencies. Instantaneous Gamma, heat, prepared nodes, intermediate old state and successful positive independent reference remain null/HOLD. No solver, native reference, tests, builds, ELF, canonical update, backup or Git mutation occurred. The expired02:50 native cutoff remains expired. Root owns the next review/publication decision.

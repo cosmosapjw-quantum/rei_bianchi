@@ -1,0 +1,131 @@
+{
+  "schema": "rei.thermal-cx-native-independent-review/1",
+  "decision": "PASS_SCOPED_AFTER_ONE_TARGETED_PRETEST_REPAIR",
+  "recorded_utc": "2026-10-16T04:05:31.315499+00:00",
+  "role": "Independent C9 reviewer; not implementation or framing author; no source edits, delegation, numerical tests or prior-kernel replay",
+  "requested_model": "gpt-6-astra/high",
+  "observed_runtime_identity": "NOT_INDEPENDENTLY_OBSERVED",
+  "base_commit": "555b113c723d590c7bb83e77ada5b7c7bce8481b",
+  "contract": "/root/flrw-thermal-cx-port-theory-20261016/FROZEN_IMPLEMENTATION_PACKET.md",
+  "reviewed_final_source": {
+    "rust/rei_microphysics/src/deuterium_thermal_charge_exchange.rs": {
+      "sha256": "f82a44742f9b77fade9fc349d7c261e348586c9ae280276146702b0511fa34ab",
+      "git_blob": "07f8922f93aaf70f727c396621b5e02eb7479223",
+      "bytes": 20618
+    },
+    "rust/rei_microphysics/src/deuterium_thermal_coupling.rs": {
+      "sha256": "8c116f8d9196634b800ed642aabfbbd2ad4b6627dc3ee781efbb316c4ae57eb5",
+      "git_blob": "75275a7b1a90cc412f7076093745d39cfbc711b8",
+      "bytes": 4460
+    },
+    "rust/rei_microphysics/src/lib.rs": {
+      "sha256": "be5eeceacd060fec2d796c04107a4946db91a7ae73f137a81b19a04708d4ac82",
+      "git_blob": "8be1b3746edc0adaab3707988ee4b8740fd3b438",
+      "bytes": 5388
+    },
+    "rust/rei_microphysics/tests/deuterium_thermal_charge_exchange.rs": {
+      "sha256": "5bda52aed9bf9351be86674964b0445b45e818a77a9d5a8fffbee75a4eb97648",
+      "git_blob": "ba670bc546d10b042aa485d30082b805311cfe48",
+      "bytes": 15952
+    }
+  },
+  "protected_source_identity": {
+    "deuterium_charge_exchange.rs": "dd0a8c9b96ef3e53b8eef0fd08961045779f20b7",
+    "deuterium_atomic.rs": "8477162430af02585a32d18092454e1f7bb52f60",
+    "isotope_state.rs": "a47927cea7d060f89ea28e9731608dd89b5ae7b3",
+    "axbi_driver.rs": "23f0d9a40b8fb8b595d0f73dd6b279067ccadf88",
+    "relation": "BYTE_IDENTICAL_TO_SELECTED_BASE; independently recomputed small source Git blobs"
+  },
+  "blocking_findings": [],
+  "closed_findings": [
+    {
+      "id": "SI_NONEMPTY_INPUT_SILENTLY_BECOMES_EMPTY",
+      "authority": "REPAIR_AUTHORITY.json",
+      "original_evidence": "Positive h0_m3=f64::from_bits(1), other densities and thermal zero, requested0: division by1e6 mapped nonempty SI state to allzero core, incorrectly admitting COMPLETE_EMPTY.",
+      "repair": "Forward nonzero-to-zero/nonfinite conversion now returns INVALID_INPUT before evaluation. Inverse conversion loss returns ARITHMETIC_FAILURE/full_interval_complete=false, preserves accepted core state/time, exports no SI state, extent or integrated ledger.",
+      "validation": "Two targeted regressions exercised in first planned cargo invocation; both passed.",
+      "status": "CLOSED",
+      "scope": "One pretest unit-mapping repair episode; no tolerance, rate, physics or ownership change; no failed numerical invocation or retest loop."
+    }
+  ],
+  "review_checks": {
+    "reduction_and_energy": "PASS. Forward-positive extent reconstructs H0+xi,H+-xi,D0-xi,D++xi from immutable input; chemical=DeltaChi*xi and thermal=-chemical. Electron change zero. No separately advanced temperature or extra cooling subtraction.",
+    "signed_defect_and_domain": "PASS. Generic core accepts finite signed defect and sorted thermal endpoints intersect physical interval. Zero defect retains initial positive-provider-domain validation. Existing physical DAtomicProvider chiD>chiH guard remains unchanged.",
+    "rate_source": "PASS. New Savin wrapper calls existing Savin2002 Rust provider, converts SI rate by1e6, retains inclusive2.7..200000K. No duplicate fit coefficients or extrapolation.",
+    "Heun_method": "PASS. Both Euler stages and convex endpoint checked; each actual field rechecks reconstructed density/temperature before provider. Fine two-half result is accepted with inherited /3 local estimator, frozen tolerances, step bounds and growth; no Richardson extrapolation.",
+    "work_and_partial": "PASS. Attempted RHS charged before call, caps deny without evaluation; provider errors/invalid rates retain last accepted core state/time. Empty,dt0,equilibrium,underflow and boundary statuses remain distinct. Trace limited512; input immutable.",
+    "exactly_once_component": "PASS. Private provider+immutable AtomicRhs/ThermalSubstep selector fixes RHS CX ownership. AtomicRhs selects legacy Savin and rejects thermal method before any work; ThermalSubstep selects Disabled in atomic RHS and integrates CX solely through new map. Same bound provider supplies defect. Existing frozen substep is never called by new component.",
+    "power_vs_energy": "PASS. Instantaneous atomic RHS and integrated CX energy use separate output types/field names and units. Wrapper performs no integration of remaining atomic channels, no state commit and no inference of gross event counts from net extent.",
+    "pure_HD_EOS": "PASS. Thermal method inspects all13species and rejects every non-H1/D nonzero density before even zero-time evolution. Pure-H/D neutrality and fixed-volume capacity are explicit; no spectator heat inventory substitution.",
+    "SI_conversion": "PASS_AFTER_REPAIR. Forward mapping and inverse export use explicit EV_J and1e6 factors with loss checks; core diagnostic state retained when SI output unavailable. Ordinary equivalent core/SI case meets128eps criterion.",
+    "cached_reference_reuse": "PASS. Prior Python/contract/fixtures/probe/C6/C7 source hashes independently match selected cache. Seven cached manufactured entries supply five complete endpoints and two boundary extents. Prior solver, exact/Decimal oracle and16/32/64 order suite were not rerun.",
+    "default_and_scope": "PASS. Only new modules, two lib exports and new targeted test added; legacy atomic/frozen kernel, registry and driver identities unchanged. No default activation or full-network composition.",
+    "metadata_and_privacy": "PASS_SCOPED. Final worker stage/report/selection distinguishes synthetic component tests from production histories, prior evidence reuse, pending parent publication and independent observer O5/O6 holds. Public selection contains code/contracts/cached scalar expectations/synthetic evidence; excludes build target, test binary and owner raw telemetry."
+  },
+  "verification": {
+    "command_receipt": "/root/flrw-thermal-cx-native-20261016/research/flrw_thermal_cx_native_20261016/focused_attempt_01/EXECUTION.json",
+    "stdout": "/root/flrw-thermal-cx-native-20261016/research/flrw_thermal_cx_native_20261016/focused_attempt_01/stdout.log",
+    "stderr": "/root/flrw-thermal-cx-native-20261016/research/flrw_thermal_cx_native_20261016/focused_attempt_01/stderr.log",
+    "command": "timeout --signal=TERM --kill-after=2s 178s cargo test --manifest-path rust/rei_microphysics/Cargo.toml --target-dir research/flrw_thermal_cx_native_20261016/target -j2 --test deuterium_thermal_charge_exchange -- --test-threads=1 --nocapture",
+    "exit_code": 0,
+    "test_groups_passed": 5,
+    "test_groups_failed": 0,
+    "command_attempts": 1,
+    "wall_seconds": 6.4293317399860825,
+    "cpu_seconds": 8.735545,
+    "peak_rss_kib_linux": 363944,
+    "largest_manufactured_normalized_error": 5.943663490641052e-07,
+    "inherited_error_limit": 5e-06,
+    "density_and_energy_residuals": "Zero in reported tested arithmetic; not a state-accuracy certificate.",
+    "SI_conversion_residuals": "Zero in tested ordinary mapped case.",
+    "Savin_saved_extent_difference_cm3": 1.0587911840678754e-22,
+    "Savin_saved_temperature_difference_K": 0.0,
+    "Savin_interpretation": "Existing literature fit on synthetic isolated H/D state; cached endpoint comparison, not new exact-error estimate.",
+    "boundary_results": "Both remain partial DOMAIN_BOUNDARY_APPROACH, inside normalized distance threshold; achieved times preserved without exact crossing/lower-bound claims.",
+    "reviewer_test_runs": 0,
+    "old_Python_oracle_runs": 0,
+    "old_Rust_suites": 0,
+    "native_production_or_reference_campaigns": 0,
+    "remaining_command": "Second allowed command unused; no further test justified by final evidence."
+  },
+  "stage_disposition": {
+    "C9": "PERFORMED_PASS_SCOPED_AFTER_CLOSED_PRETEST_MAPPING_REPAIR",
+    "C7": "LOCAL_COMPONENT_PHYSICS_AND_OWNERSHIP_CHECKED_WITH_PRIOR_THEORY_REUSE",
+    "C8": "SCOPED_CACHED_ENDPOINT_AND_RESOURCE_EVIDENCE; no new convergence campaign",
+    "C10": "PARENT_EXACT_SOURCE_PUBLICATION_DUAL_BACKUP_HANDOFF_PENDING",
+    "observer_O5": "HOLD_RESOURCE_ENVELOPE_EXHAUSTED",
+    "observer_O6": "HOLD_MISSING_STAGE_DATA",
+    "observer_relevance": "Independent optional support; not a prerequisite for this local development"
+  },
+  "claim_ceiling": [
+    "Isolated pure-H/D fixed-proper-volume thermal CX Rust component and exactly-once ownership interface only.",
+    "Legacy low-level callers can bypass the new interface; no guarantee over arbitrary separately constructed calls.",
+    "Adaptive local estimator and boundary approach are heuristic, not rigorous global error/event-time guarantees.",
+    "No new FLRW/isotope/EoR/Bianchi history, full-network split composition, physical isotope model validation or new reference campaign.",
+    "No production allocation renewed; future owner coupling/composition and live execution envelope remain separate obligations."
+  ],
+  "positive_next_action": "Parent may publish exact reviewed source identities, close C9 in current stage records, and complete C10 selected artifacts/dual backup. No additional review tree, source edit or test required.",
+  "publication_binding": "Review binds working file blobs; actual committed tree remains parent-owned and must contain those exact reviewed source blobs.",
+  "skill_context_used": {
+    "name": "physmath-research-loop",
+    "version": "1.3.0",
+    "files": [
+      "SKILL.md",
+      "references/POLICY_INTEGRATION.md",
+      "references/CODING_LOOP.md",
+      "references/SUBAGENT_MODE.md"
+    ],
+    "reuse": "Previously read unchanged version in this reviewer thread; applied finite review, one repair and typed identity policies",
+    "AGENTS": "/root/flrw-thermal-cx-port-intake-20261016/AGENTS.md"
+  },
+  "reviewed_metadata": [
+    "/root/flrw-thermal-cx-native-20261016/research/flrw_thermal_cx_native_20261016/C5_READY.json",
+    "/root/flrw-thermal-cx-native-20261016/research/flrw_thermal_cx_native_20261016/CACHED_REFERENCE_SELECTION.json",
+    "/root/flrw-thermal-cx-native-20261016/research/flrw_thermal_cx_native_20261016/cached_manufactured.rs",
+    "/root/flrw-thermal-cx-native-20261016/research/flrw_thermal_cx_native_20261016/IMPLEMENTATION_RETURN.json",
+    "/root/flrw-thermal-cx-native-20261016/research/flrw_thermal_cx_native_20261016/STAGE_RECORD.json",
+    "/root/flrw-thermal-cx-native-20261016/research/flrw_thermal_cx_native_20261016/PUBLIC_SELECTION.json",
+    "/root/flrw-thermal-cx-native-20261016/research/flrw_thermal_cx_native_20261016/REPORT.md",
+    "/root/flrw-thermal-cx-native-20261016/research/flrw_thermal_cx_native_20261016/focused_attempt_01/EXECUTION.json"
+  ]
+}

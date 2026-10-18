@@ -1,0 +1,80 @@
+{
+  "selected_stage": "C9",
+  "decision": "PASS_IN_SCOPE",
+  "scope": "One fresh independent review of the bounded full005 packaging recovery implementation, focused synthetic test evidence, recovery instructions and delivery builder. No scientific-result admission.",
+  "reviewer": "Native independent child /root/zip_recovery_review; runtime model identity not independently observed",
+  "base": {
+    "reported_remote_head": "0e25846433170d0f420c4cda44a0bedbf02cd177",
+    "local_git_identity": "UNAVAILABLE_SNAPSHOT_HAS_NO_GIT",
+    "diff_baseline": "/tmp/postprocess_ncp_before_zip_recovery.py"
+  },
+  "reviewed_sha256": {
+    "research/ncp_direct_resume_20261016/postprocess_ncp.py": "aead75ca437199be300c913d07ea3c8375940c5a0e1efe8e0123fef16108b9db",
+    "research/ncp_direct_resume_20261016/test_postprocess_zip_recovery.py": "256bae12b6d389451c899bcf9699545168f37c9890a6609e6378a201c1f45ac5",
+    "research/flrw_full005_postprocess_20261015/postprocess_flrw.py": "b396a5b439a5cc3e305ab6663ac8d6d46424b747c13a84da4fe3d89ac468b5fc",
+    "research/flrw_full005_zip_recovery_20261016/raw/test.log": "066d027c14c4057e707dd8fb8550fde61007b13bfe6604189ce7dbc3e9744f96"
+  },
+  "findings": [],
+  "acceptance_evidence": [
+    {
+      "object": "ZIP timestamp defect",
+      "result": "PASS",
+      "basis": "build_archive uses strict_timestamps=False, changing ZIP entry metadata only. Focused regression reproduces the old before-1980 failure, checks clamped header and unchanged original bytes/mtime_ns."
+    },
+    {
+      "object": "Preserved results and fresh destination",
+      "result": "PASS",
+      "basis": "repackage validates fresh nonoverlapping destination before mutation, copies report payload with copy2, preserves FINAL_STATUS bytes, leaves original partial ZIP and packaging receipts untouched, and excludes old generated package metadata from the new archive. Tests read back all included synthetic payload and runnable dependencies."
+    },
+    {
+      "object": "Package-only execution path",
+      "result": "PASS",
+      "basis": "CLI routes repackage directly; it does not call inspect, bind, render or a child process and does not gate on render deadline. Mocked forbidden-call/deadline regression plus real executable CLI smoke passed."
+    },
+    {
+      "object": "Scientific status versus packaging status",
+      "result": "PASS",
+      "basis": "Recognized wrapper schema requires solver_runs integer zero and NOT_ISSUED; invalid or contradictory status stays UNKNOWN_HOLD. Original failed status/error remains failed after successful or failed packaging. Exit zero is explicitly packaging-only."
+    },
+    {
+      "object": "Original render packaging failures",
+      "result": "PASS",
+      "basis": "FINAL_STATUS is written before packaging, and packaged_render reports independent packaging failure without erasing already known render status/error. CLI returns failure for packaging failure. Targeted mocked-render tests cover both original success and failure."
+    },
+    {
+      "object": "Archive integrity and runnable content",
+      "result": "PASS",
+      "basis": "Archive CRC and representative FINAL_STATUS/wrapper bytes are read back; focused fixtures check unchanged renderer dependencies and external raw exclusion. Builder includes current wrapper, renderer dependencies and recovery instructions with fixed archive timestamps."
+    },
+    {
+      "object": "NCP handoff",
+      "result": "PASS_FOR_PINNED_DELIVERY_PREPARATION",
+      "basis": "Current HANDOFF, CODEX_HANDOFF_KO and RUNBOOK require Codex self-fetch from the final immutable CODE_COMMIT, verify the stated ZIP identity, use a fresh code directory, perform bounded existing-result intake and one package-only recovery, preserve failed/unknown science, and require no user download/setup. Root intentionally supplies final concrete commit and artifact identity after publication."
+    }
+  ],
+  "tests": {
+    "evidence": "IMPLEMENTATION.json and raw/test.log read; recorded command python3 -m unittest discover -s research/ncp_direct_resume_20261016 -p test_postprocess_zip_recovery.py -v",
+    "recorded_outcome": "8 tests PASS; exit 0; 0.119 seconds",
+    "reviewer_reruns": 0,
+    "historical_evidence": "Existing 28 physics checks, 3 renderer CLI checks and 8 original wrapper checks reused without replay"
+  },
+  "typed_identity": "Packaging validity uses intended payload bytes/structure; ZIP byte identity across metadata repairs is not a scientific criterion. Frozen renderer/source/physics remain outside authorized changes.",
+  "claim_boundary": {
+    "actual_ncp_access": "NOT_AVAILABLE_TO_REVIEWER",
+    "actual_ncp_recovery": "NOT_RUN_HERE",
+    "actual_existing_render_status": "UNKNOWN_UNTIL_NCP_EVIDENCE_READ",
+    "scientific_admission": "NOT_ISSUED",
+    "full_pair_differences": "DIAGNOSTIC_ONLY",
+    "D_activation": "ABSENT",
+    "native_raw_data": "EXTERNAL_NOT_INCLUDED"
+  },
+  "next_action": "Build and publish the finalized pinned v2 bundle, bind the final user-copyable prompt to its concrete immutable commit and ZIP identity, then let NCP Codex perform authorized existing-result package-only recovery. No further optional review or science rerun is required by this PASS.",
+  "skill_context_used": [
+    "Repository AGENTS.md",
+    "PhysMath Research Loop 1.3.0 SKILL.md",
+    "references/POLICY_INTEGRATION.md",
+    "references/CODING_LOOP.md C9",
+    "references/SUBAGENT_MODE.md",
+    "Recovery CONTRACT.json"
+  ]
+}

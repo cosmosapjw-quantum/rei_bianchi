@@ -13,6 +13,9 @@ pub mod axisym_radiation;
 pub mod axisym_sources;
 mod bianchi_i;
 pub mod coverage;
+pub mod deuterium_charge_exchange;
+pub mod deuterium_thermal_charge_exchange;
+pub mod deuterium_thermal_coupling;
 mod ft03_controlled;
 mod ft03_interval;
 mod ft03_rates;
@@ -154,10 +157,20 @@ pub mod igm_rates;
 pub mod igm_thermal;
 pub mod axbi_rates;
 pub mod axbi_background;
+pub mod axbi_bass_background;
 pub mod axbi_sources;
 pub mod axbi_driver;
+pub mod axbi_covariant_transport;
+pub mod axbi_parallel;
 pub mod axbi_q_reference;
 pub mod axbi_q_advance;
 pub mod axbi_q_capacity;
 pub mod axbi_q_grid;
 pub mod axbi_q_closure;
+
+pub mod deuterium_atomic;
+
+/// Opt-in immutable temperature coefficient evaluation and exact prepared reuse.
+pub mod rate_table;
+/// Explicit Li6/Li7 shared-electronic approximation and number-rate component.
+pub mod lithium_rates;

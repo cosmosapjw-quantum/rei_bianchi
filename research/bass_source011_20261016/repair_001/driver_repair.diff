@@ -1,0 +1,60 @@
+--- pre-repair
++++ repaired
+@@ -374,6 +374,7 @@
+     pub records: Vec<ChemicalStageRecord>,
+     pub rhs_evaluations: usize,
+     pub max_rhs: usize,
++    pub native_rhs_ceiling: Option<usize>,
+     pub max_records: usize,
+     pub current_comparison: usize,
+     pub current_branch: &'static str,
+@@ -382,7 +383,7 @@
+ impl ChemicalStageObserver {
+     pub fn new(max_rhs: usize) -> Self {
+         Self { records: Vec::new(), rhs_evaluations: 0, max_rhs,
+-            max_records: 180, current_comparison: 0, current_branch: "DIRECT",
++            native_rhs_ceiling: None, max_records: 180, current_comparison: 0, current_branch: "DIRECT",
+             failure: None }
+     }
+ }
+@@ -815,8 +816,9 @@
+         unknown: [f64; 4],
+         dt: f64,
+         counter: &mut usize,
++        native_rhs_ceiling: usize,
+     ) -> Result<([f64; 4], PhotonState, IgmPointRhs), ForwardError> {
+-        if *counter >= self.config.max_rhs {
++        if *counter >= native_rhs_ceiling {
+             return Err(err("AXBI_RHS_CAP"));
+         }
+         *counter += 1;
+@@ -867,8 +869,10 @@
+             old.gas.fractions[2],
+             old_w,
+         ];
++        let native_rhs_ceiling = observer.as_ref().and_then(|o| o.native_rhs_ceiling)
++            .map_or(self.config.max_rhs, |limit| self.config.max_rhs.min(limit));
+         for _ in 0..50 {
+-            let (residual, stocks, rhs) = self.evaluate(&context, x, dt, counter)?;
++            let (residual, stocks, rhs) = self.evaluate(&context, x, dt, counter, native_rhs_ceiling)?;
+             let norm = self.norm(residual, old_w, x[3]);
+             if norm <= 1e-11 {
+                 let nh = self.n_h0_cm3 / old.a.powi(3);
+@@ -934,7 +938,7 @@
+                 x,
+                 residual,
+                 counter,
+-                self.config.max_rhs,
++                native_rhs_ceiling,
+                 move |unknown| columns_context.evaluate(unknown, dt).map(|v| v.0),
+             )?;
+             let direction = solve4(jac, residual.map(|r| -r))?;
+@@ -942,7 +946,7 @@
+             let mut accepted = None;
+             for _ in 0..40 {
+                 let trial = std::array::from_fn(|i| x[i] + alpha * direction[i]);
+-                if let Ok((r, _, _)) = self.evaluate(&context, trial, dt, counter) {
++                if let Ok((r, _, _)) = self.evaluate(&context, trial, dt, counter, native_rhs_ceiling) {
+                     if self.norm(r, old_w, trial[3]) < norm {
+                         accepted = Some(trial);
+                         break;

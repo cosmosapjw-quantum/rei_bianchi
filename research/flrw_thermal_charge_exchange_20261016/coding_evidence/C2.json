@@ -1,0 +1,20 @@
+{
+  "mapping": {
+    "state": "frozen dataclass State(h0,hp,d0,dp,thermal_eV_cm3)",
+    "provider": "frozen dataclass RateProvider(source,minimum_K,maximum_K,rate callable)",
+    "defect": "frozen dataclass Defect(delta_chi_eV,source)",
+    "reduction": "xi=S*z; densities=(a+xi,b-xi,c-xi,d+xi); u=u0-deltaChi*xi",
+    "temperature": "T=u/(1.5*kB_eV*Nth); Nth=a+b+c+d+b+d",
+    "rhs": "G(z)=[kf(T)*(c-xi)*(b-xi)-kr(T)*(d+xi)*(a+xi)]/S",
+    "ledger": "chemical=deltaChi*xi; thermal=-chemical; electron delta=0",
+    "domain": "physical interval intersect signed-affine temperature interval"
+  },
+  "files": [
+    "thermal_cx.py",
+    "verify_thermal_cx.py",
+    "coding_evidence/*"
+  ],
+  "dependencies": "stdlib runtime only; cached probe/RESULTS.json read for independent exact expectations",
+  "production_mutations": 0,
+  "execution": "not_run"
+}

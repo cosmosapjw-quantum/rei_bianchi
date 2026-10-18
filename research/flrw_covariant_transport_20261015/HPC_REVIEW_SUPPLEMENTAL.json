@@ -1,0 +1,228 @@
+{
+  "schema": "rei.hpc.independent_review_supplemental.v1",
+  "record_kind": "SUPPLEMENTAL_RECONSTRUCTION_FROM_REVIEWER_CONTEXT_NOT_ORIGINAL_BYTE_RECOVERY",
+  "date": "2026-10-15",
+  "reviewer": "integration_science_review",
+  "requested_model": "gpt-6-astra",
+  "requested_reasoning": "high",
+  "observed_runtime_model": "NOT_INDEPENDENTLY_OBSERVED",
+  "decision": "PASS_SCOPED_PREPARE_AND_MEASURED_PARITY_GO_FIVE_CASE_PILOT",
+  "original_review": "research/flrw_covariant_transport_20261015/HPC_REVIEW.json and HPC_REVIEW.md were written and reported complete in the now-inaccessible scratch checkout. This new record is not those files and does not claim their byte recovery.",
+  "basis": "Independent source/diff/test-log and raw benchmark inspection actually completed before local executor disconnect. No new numerical runs or source edits in preparing this supplement.",
+  "reviewed_base_commit": "54dd5352672127e77970eb06f3dda027f2aee275",
+  "known_reviewed_sha256": {
+    "rust/rei_microphysics/src/axbi_driver.rs": "798440f50e8cd488b48a9fda30f2c0d0b4303c517dfe144a3931648f522f3d8f",
+    "rust/rei_microphysics/src/axbi_covariant_transport.rs": "d2bb5b9c91fa07ed7e520c4660b11af5e5e861df8dcddb5768fdf6fa3ada21b9",
+    "rust/rei_microphysics/src/axbi_parallel.rs": "239c5a2bd3dd9e4033462fc18aeda5ff12d6f7f9a6ac8c7e24e4529a274a5ca6",
+    "rust/rei_microphysics/src/lib.rs": "e7bf2828e810c7e427b84c0ce92bd1a2f9e10c8ac257f74fddd7d9a8d12502e0",
+    "rust/rei_microphysics/tests/axbi_transport_parallel.rs": "cabcacb9629131fae3f03a7ae1b4aad2452510fe24c9750cfa04b37aaa1f4888",
+    "research/flrw_covariant_transport_20261015/HPC_CONTRACT.md": "bdf7689c13152b2c30519c45a4e3b20abde3c511c82a81caaeb43d2bc24ed5fa"
+  },
+  "implementation_findings": {
+    "scope": "Persistent bounded std pool for independent cell preparation only, original scalar fast path, driver thread configuration and source binding.",
+    "ordered_arithmetic": "Per-cell scalar quadrature/cross-section arithmetic retained. Original cell/node flatten order and individual diagnostic tail-term addition order retained. Global absorption evaluate reductions unchanged.",
+    "errors_and_lifetime": "All launched indexed results collected; lowest-index error selected. Mutex released before task execution. Bounded channels; sender close then worker join; partial spawn cleanup. No nested submissions.",
+    "scientific_bounds": "No physical rates, thresholds, source, interval clock, moment bounds, Newton/local/refinement tolerances, passive accounting, or adaptive ordering changed.",
+    "repair_required": false
+  },
+  "targeted_tests": {
+    "status": "OBSERVED_PASS_6_OF_6_FIRST_ATTEMPT",
+    "command": "cargo test --release --manifest-path rust/rei_microphysics/Cargo.toml --locked --test axbi_transport_parallel -- --test-threads=1",
+    "command_wall_s": 7.04714905199944,
+    "original_log": "raw/hpc_prepare_test_attempt1.log",
+    "original_receipt": "raw/hpc_prepare_test_attempt1_receipt.json",
+    "source_binding_observed": "All23receipt input hashes matched current files when reviewer checked.",
+    "durability_limit": "Original local log/receipt not currently accessible and not claimed recovered here. Outcome was directly read by reviewer and remains recorded in conversation/tool history.",
+    "coverage": "Fixed persistent thread reuse/order; lowest-index error/reuse; legacy/scalar/widths8,32,64 prepared result parity; threshold-zero and support-domain behavior; three accepted adaptive startup steps1vs8 with all state/ledgers/counters/decisions equal; config1..64 default1.",
+    "historical_tests_rerun": false
+  },
+  "benchmark": {
+    "artifact_directory": "raw/ncp003_benchmark001",
+    "status": "COMPLETED_SWEEP_BITWISE_PARITY_PASS",
+    "fixture_role": "IMMUTABLE_V4_DIAGNOSTIC_INITIAL_STATE_NOT_PRODUCTION_RESUME",
+    "source_identity_sha256": "63899f056e57de9a9bcfe0e33ef0d61e73434e080f31c2838f8950025ba83529",
+    "binary_sha256": "1cbb8dda0f1e2d26117f467ad6bba48dda63294db9d18d4170bfe99ff47fea23",
+    "fixture_sha256": "f092e606727ad25ac8bc9819e77aee6ae2e2a622590de6b1e401983ec16404df",
+    "config_sha256": "e358acb6930a0a230b4ffd4556609f3865b04794ff463d0a131b801e0b636874",
+    "independent_verification": "Reviewer compared complete warmup/timed trace arrays and final u64 physical/result words across1/8/32/64; all equal. Verified source/fixture/config hashes and reconstructed current23-input compiled identity, equal to benchmark source_identity.txt. Read benchmark code to establish comparison scope.",
+    "timed_steps_each": 32,
+    "warmup_steps_each": 4,
+    "timed_attempts_each": 96,
+    "timed_rhs_each": 672,
+    "timed_rejects_each": 0,
+    "results": [
+      {
+        "workers": 1,
+        "wall_s": 0.718848497,
+        "speedup": 1,
+        "approx_busy_cores": 1.01
+      },
+      {
+        "workers": 8,
+        "wall_s": 0.56220834,
+        "speedup": 1.2786158544001678,
+        "approx_busy_cores": 1.43
+      },
+      {
+        "workers": 32,
+        "wall_s": 0.558850855,
+        "speedup": 1.2862975703955932,
+        "approx_busy_cores": 1.63
+      },
+      {
+        "workers": 64,
+        "wall_s": 0.591987827,
+        "speedup": 1.214296078760417,
+        "approx_busy_cores": 2.59
+      }
+    ],
+    "aggregate_accepted": 144,
+    "aggregate_rhs": 3024,
+    "receipt_wall_s": 3.22280358900025,
+    "peak_process_tree_rss_bytes": 54079488,
+    "output_bytes": 19052597,
+    "final_number_residual_per_h": 2.710505431213761e-19,
+    "final_energy_residual_ev_per_h": -2.534430998402115e-15,
+    "measurement_limit": "One short fixture sweep. Busy-core estimates use100Hzprocess ticks and trace-inclusive wall.32workers only0.6%faster than8;64slower. Not full-grid/full-history performance evidence."
+  },
+  "pilot_admission": {
+    "decision": "GO_FIVE_PRESCRIBED_FRESH_CASES_CONCURRENTLY",
+    "cases": [
+      "Q128",
+      "Q256",
+      "Q512",
+      "Q512_time",
+      "Q512_angle"
+    ],
+    "aggregate_native_workers_cap": 64,
+    "aggregate_memory_gib": 112,
+    "aggregate_output_gib": 10,
+    "per_case": {
+      "accepted_cap": 80000,
+      "tentative_cap": 260000,
+      "rhs_cap": 20000000,
+      "wall_s": 1800,
+      "output_mib": 2048
+    },
+    "allocation": "Disjoint CPU sets;8/8/8/8/32 admissible. Actualq128benchmark does not prove32optimal for larger cases.",
+    "reported_running_telemetry": {
+      "source": "flrw_native_worker collaboration message; not independently reread raw telemetry by this reviewer",
+      "elapsed_s": 92.85,
+      "window_s": 62.6,
+      "cpu_seconds": 518.42,
+      "approx_busy_cores": 8.2808,
+      "allocated_workers": 64,
+      "os_threads": 69,
+      "rss_approx_mb": 150.81
+    }
+  },
+  "resource_adequacy": "OPEN: neither short benchmark nor reported five-case~8.28busy cores demonstrates sufficient sustained64CPU utilization. No intentional RAM fill or unmeasured64x claim.",
+  "full_history_admission": "PENDING: complete scientific interval and unchanged five-case empirical refinement screen required; benchmark grants no full-history claim.",
+  "next_performance_interpretation": "Measure repeated point_at_scale integrations; exact immutable-model memoization is a separately scoped candidate, not a proven dominant fraction. Useful throughput, not artificial occupancy, is the goal. No64case factorial solely for filling CPUs.",
+  "background_cache_R6": {
+    "contract_sha256": "3387824f90c9c4a4b743e13f42fdff0abf5a92582fa924753f366936e4306be0",
+    "decision": "GO_MINIMAL_IMPLEMENTATION_ONLY",
+    "basis": "Actual seven private constructor-only AxbiBackground fields and frozen contract read.32entry background-owned exactbits cache with successful Copy points and original checks/body; clone sharing valid, replacement selects another cache. No implementation/scaling admission yet."
+  },
+  "spatial_pilot_review": {
+    "decision": "PASS_SPATIAL_ENDPOINT_EMPIRICAL_SCREEN_TIME_AND_ANGLE_PENDING",
+    "basis": "Reviewer directly read owner strict_first3_readback.json and frozen NATIVE_CONTRACT; independently calculated endpoint metrics in JavaScript. No simulation rerun. Raw six-array shape/totals, complete return and bindings were read through strict extraction, not independently rederived from every raw checkpoint element.",
+    "source_artifact": "/home/cosmosapjw/REI_FLRW_COVARIANT_20261015_003/strict_first3_readback.json",
+    "source_identity_sha256": "63899f056e57de9a9bcfe0e33ef0d61e73434e080f31c2838f8950025ba83529",
+    "production_binary_sha256": "408c76fdcb472f4ed47f5e115a946d5dc5cc198fe79878893b432a25bd1200d4",
+    "all_three_complete_zbar": 19.8,
+    "checkpoint_version": "AXBI_CHECKPOINT_V4",
+    "six_array_lengths_per_case": [
+      1024,
+      2048,
+      4096
+    ],
+    "ledger_failure_rows": [
+      0,
+      0,
+      0
+    ],
+    "bindings_reported_equal": true,
+    "metric": "abs(A-B)/max(abs(A),abs(B),floor); gasfractionfloor1e-5,Tfloor1K,N/U/eventfloor1e-8perHunits. Each fine difference<=1e-3 and<=1.1previous difference unless both<1e-8.",
+    "independent_metric_values": {
+      "x_HII": {
+        "coarse_difference": 0.000039552618866510986,
+        "fine_difference": 0.000027179060697091032,
+        "contraction_ratio": 0.6871621014229077,
+        "pass": true
+      },
+      "x_HeII": {
+        "coarse_difference": 0.0008139788962834394,
+        "fine_difference": 0.0005598331292644172,
+        "contraction_ratio": 0.6877735182331743,
+        "pass": true
+      },
+      "x_HeIII": {
+        "coarse_difference": 1.379429099796083e-8,
+        "fine_difference": 1.3290031605089788e-8,
+        "contraction_ratio": 0.9634443413622646,
+        "pass": true
+      },
+      "temperature_K": {
+        "coarse_difference": 0.00006965848694713084,
+        "fine_difference": 0.000047754965549583095,
+        "contraction_ratio": 0.6855584673527002,
+        "pass": true
+      },
+      "photon_n_per_H": {
+        "coarse_difference": 0.00022930456706668685,
+        "fine_difference": 0.00007583335335235128,
+        "contraction_ratio": 0.3307101743433538,
+        "pass": true
+      },
+      "photon_u_eV_per_H": {
+        "coarse_difference": 0.0002276104604264513,
+        "fine_difference": 0.00007521708828133985,
+        "contraction_ratio": 0.33046411021889327,
+        "pass": true
+      },
+      "photo_events_0_per_H": {
+        "coarse_difference": 0.00006480631314338805,
+        "fine_difference": 0.00004455199796577395,
+        "contraction_ratio": 0.6874638566029802,
+        "pass": true
+      },
+      "photo_events_1_per_H": {
+        "coarse_difference": 0.000813791245358228,
+        "fine_difference": 0.0005598044697017819,
+        "contraction_ratio": 0.6878968935766298,
+        "pass": true
+      },
+      "photo_events_2_per_H": {
+        "coarse_difference": 0.0000011250815563451727,
+        "fine_difference": 0.000001084101501942146,
+        "contraction_ratio": 0.9635759255212125,
+        "pass": true
+      }
+    },
+    "cases": [
+      {
+        "grid": 128,
+        "accepted": 21430,
+        "rejects": 21,
+        "rhs": 450495,
+        "native_wall_s": 535.232173426
+      },
+      {
+        "grid": 256,
+        "accepted": 14901,
+        "rejects": 20,
+        "rhs": 313365,
+        "native_wall_s": 556.831242075
+      },
+      {
+        "grid": 512,
+        "accepted": 8453,
+        "rejects": 19,
+        "rhs": 177936,
+        "native_wall_s": 530.865938246
+      }
+    ],
+    "scientific_limit": "Spatial endpoint launch screen only; no continuum/fullhistorycertificate; time and angle results remain required."
+  }
+}

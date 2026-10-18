@@ -1,0 +1,48 @@
+{
+  "schema": "rei.li_cold_next_experiment.v1",
+  "status": "proposal_not_current_validation",
+  "new_execution_authorized_here": false,
+  "current_network_activation": false,
+  "scope": "Future Li6/Li7 low-temperature number and energy closure; no carbon extension",
+  "evidence_reused": ["evidence/intake/LI_PRIOR_PR.json", "evidence/sources/SOURCE_REGISTRY.json", "data/lithium_coefficients.json", "THEORY.md"],
+  "nodes": [
+    {
+      "id": "LI_COLD_NUMBER_PROBE",
+      "depends_on": [],
+      "action": "Prepare a small prescribed T/ne/Jnu Li6/Li7 photo plus per-channel RR/DR number experiment from existing providers, with explicit isotope policy and caller initial populations.",
+      "output": "Channel-domain map, retained-process charge histories, isotope/charge invariants and direct-versus-table comparison",
+      "claim": "Declared retained-process model only until missing CI contribution is bounded"
+    },
+    {
+      "id": "LI_COLD_CI_BOUND",
+      "depends_on": ["LI_COLD_NUMBER_PROBE"],
+      "action": "Obtain actual finite source-supported Bq(T) bounds on omitted CI and integrate their occupation-weighted contribution.",
+      "conditional_bound": "l1 population difference <= min(2, 2 integral ne sumq Bq p_omit,q dt)",
+      "assumptions": ["prescribed background", "linear finite integrable Markov generators", "same initial populations", "actual source-supported finite CI upper bounds"],
+      "current_status": "No numerical Bq bound available from collected sources",
+      "output": "Quantitative CI-omission contribution separate from interpolation and source/model uncertainty"
+    },
+    {
+      "id": "LI_ENERGY_DONORS",
+      "depends_on": ["LI_COLD_NUMBER_PROBE"],
+      "action": "Bind existing photo absorption-energy conventions and source RR/DR kinetic and emitted-energy moments without duplicate ownership.",
+      "output": "Consistent number/thermal/photon ledger and its stated closure"
+    },
+    {
+      "id": "LI_NATIVE_INVENTORY",
+      "depends_on": ["LI_COLD_CI_BOUND", "LI_ENERGY_DONORS"],
+      "action": "Integrate eight Li6/Li7 charge states with explicit BBN reservoir mapping, native electron/EOS interfaces and invariant checks.",
+      "output": "Scoped native state and network integration ready for matched trajectory tests"
+    },
+    {
+      "id": "LI_RADIOACTIVE_DAUGHTERS",
+      "depends_on": [],
+      "action": "If later selected, source Li8/Li9 and Be7 nuclear decay and daughter bookkeeping; preserve upstream reservoirs meanwhile.",
+      "output": "Separate nuclear-decay closure; no alias into stable Li7"
+    }
+  ],
+  "uncertainty_separation": ["table interpolation target1e-5", "atomic fit uncertainty", "shared-electronic isotope approximation", "CI omission bound", "trajectory discretization and coupled stability"],
+  "performance_interpretation": "C8 compares matched serial/direct/prepared/table/batch/parallel costs with construction amortization and repeated-run variation; no full-driver or SIMD claim without corresponding evidence.",
+  "new_runs": 0,
+  "new_source_lookups": 0
+}

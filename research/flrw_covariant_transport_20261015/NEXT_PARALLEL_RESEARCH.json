@@ -1,0 +1,180 @@
+{
+  "schema": "rei.next_parallel_research.v1",
+  "status": "PROPOSED_AFTER_UNIT4",
+  "implementation_performed": false,
+  "new_numerical_execution": false,
+  "old_test_replay": false,
+  "new_full_campaign_allocation": false,
+  "frozen_unit4_modified": false,
+  "source_read": {
+    "owner_checkout": "/home/cosmosapjw/REI_UNIT3_CLOSEOUT_20261015_001/source",
+    "files": [
+      "rust/rei_microphysics/src/axbi_driver.rs",
+      "rust/rei_microphysics/src/axbi_covariant_transport.rs",
+      "rust/rei_microphysics/src/axbi_parallel.rs",
+      "rust/rei_microphysics/src/axbi_background.rs"
+    ],
+    "driver_sha256": "798440f50e8cd488b48a9fda30f2c0d0b4303c517dfe144a3931648f522f3d8f"
+  },
+  "existing_evidence": {
+    "cache_C10": {
+      "status": "PASS",
+      "benchmark_speedup": 1.698,
+      "uncached_evaluations_before": 1743,
+      "uncached_evaluations_after": 135,
+      "source": "controller-reported observed Unit4 C10 receipt",
+      "whole_history_speedup_claim": false
+    },
+    "reported_busy_cores": 8.2,
+    "reported_rss_MB_approx": 159,
+    "cpu_adequacy": "OPEN",
+    "post_cache_profile": "PROPOSED_NOT_PERFORMED"
+  },
+  "nodes": [
+    {
+      "id": "FLRW5_SCREEN",
+      "depends_on": [],
+      "status": "AWAIT_ACTUAL_FIVE_CASE_SCREEN",
+      "purpose": "unchanged space/time/angular convergence; reuse completed evidence"
+    },
+    {
+      "id": "CACHE4_ADMIT",
+      "depends_on": [],
+      "status": "REUSE_EXISTING_C10_AND_REVIEW",
+      "purpose": "exact background cache admission without replay"
+    },
+    {
+      "id": "NEXT_PARALLEL_CHOICE",
+      "depends_on": [
+        "CACHE4_ADMIT"
+      ],
+      "status": "PROPOSED_NOT_PERFORMED",
+      "blocks_admitted_science": false,
+      "purpose": "profile remaining cost and choose one next optimization"
+    },
+    {
+      "id": "FLRW_FULL_Q0",
+      "depends_on": [
+        "FLRW5_SCREEN",
+        "CACHE4_ADMIT"
+      ],
+      "status": "FUTURE_EXISTING_GOAL_NO_NEW_ALLOCATION",
+      "q_ref": 0,
+      "target_zbar": [
+        20,
+        4
+      ]
+    },
+    {
+      "id": "BI_SIGNED_SHORT",
+      "depends_on": [
+        "FLRW5_SCREEN"
+      ],
+      "status": "FUTURE_BACKEND_AND_SOURCE_SUPPORT_REQUIRED",
+      "q_ref": [
+        -0.01,
+        0.01
+      ],
+      "purpose": "signed anisotropic support plus genuinely needed angular refinement",
+      "inactive_hi_split_allowed": false
+    },
+    {
+      "id": "BI_FULL_FAMILY",
+      "depends_on": [
+        "BI_SIGNED_SHORT"
+      ],
+      "status": "FUTURE_EXISTING_GOAL_NO_NEW_ALLOCATION",
+      "q_ref": [
+        -0.01,
+        -0.005,
+        0.005,
+        0.01
+      ],
+      "may_overlap_q0_full": true
+    },
+    {
+      "id": "PROGRESSIVE_REPORT",
+      "depends_on": [],
+      "activation": "any valid preserved history",
+      "purpose": "abundance versus proper time and time-ordered gas temperature; final comparison needs q0 and signed outputs"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "JACOBIAN_COLUMNS",
+      "independent_width": 4,
+      "dependency": "baseline residual first; per-column positive then negative fallback",
+      "ideal_for_seven_RHS_pattern": "7T to 4T",
+      "ideal_RHS_only_speedup": 1.75,
+      "measured": false
+    },
+    {
+      "id": "ORDERED_ABSORPTION_MAPS",
+      "dependency": "immutable prepared state",
+      "fold": "original node/species order and cell compensated sums",
+      "worker_partial_sum_reduction": false,
+      "measured_after_cache": false
+    },
+    {
+      "id": "COARSE_FINE_BRANCHES",
+      "independent_chains": 2,
+      "fine_dependency": "half1 then half2",
+      "equal_cost_ideal": "3T to 2T",
+      "equal_cost_ideal_speedup": 1.5,
+      "measured": false,
+      "priority": "secondary"
+    }
+  ],
+  "branch_contract": {
+    "private_state_and_ledgers": true,
+    "commit": "half2 only after existing error_metric(full,half2); never add coarse ledger",
+    "failure_precedence": [
+      "coarse",
+      "half1",
+      "half2"
+    ],
+    "actual_work_accounting": "count all launched tentative/RHS including discarded speculative work",
+    "serial_work_count_equivalence_on_failure": false,
+    "near_cap": "serial fallback",
+    "if_exact_serial_launched_counts_required": "retain serial branch execution"
+  },
+  "bitwise_contract": {
+    "include": [
+      "physical state arrays",
+      "gas",
+      "proper-time geometry",
+      "physical ledgers",
+      "local error metric",
+      "accept/reject and next step"
+    ],
+    "exclude": [
+      "wall time",
+      "scheduling",
+      "explicitly separated actual speculative accounting"
+    ],
+    "preserve_arithmetic_order": true,
+    "source_binding": "each artifact retains own recorded identity"
+  },
+  "resource_contract": {
+    "aggregate_cpu_max": 64,
+    "aggregate_memory_GiB_max": 112,
+    "full_deadline_seconds_from_first_actual_full": 43200,
+    "closeout_reserve": "retain existing bound reserve",
+    "deadline_reset_on_resume_or_new_case": false,
+    "five_case_convergence_before_new_full_allocation": true,
+    "superseded_two_case_cap_reintroduced": false,
+    "dummy_cases_or_RAM_filling": false
+  },
+  "R1_R10": {
+    "R1": "COMPLETE: useful utilization scoped to frozen science",
+    "R2": "COMPLETE: actual source and existing evidence read",
+    "R3": "COMPLETE: dependencies and side effects identified",
+    "R4": "COMPLETE: cache first then one measured bottleneck",
+    "R5": "COMPLETE: DAG and ideal schedules derived",
+    "R6": "SOURCE_REVIEW_ONLY: no new numerical or symbolic validation",
+    "R7": "PROPOSED_NOT_PERFORMED: post-cache profile and new algorithm tests",
+    "R8": "PROPOSAL_ONLY: CPU adequacy OPEN, no new scientific admission",
+    "R9": "CONTRACT_SUPPLIED: deterministic folds and actual-work accounting",
+    "R10": "PRESERVED_PROPOSAL: separate next-unit docs, frozen Unit4 unchanged"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "schema": "rei.independent_scientific_review.v1",
+  "date": "2026-10-15",
+  "decision": "PASS_SCOPED_CHANGED_SEAMS",
+  "publication_decision": "PASS_FOR_IMPLEMENTED_CLOCK_IC_AND_STANDALONE_DH_OPERATOR_ONLY",
+  "reviewer": {
+    "role": "independent read-only scientific reviewer",
+    "requested_model": "gpt-6-astra",
+    "requested_reasoning_effort": "high",
+    "observed_runtime_model": "not independently observed",
+    "source_or_git_mutations": 0,
+    "tests_or_numerical_runs_by_reviewer": 0,
+    "report_files_written": 2
+  },
+  "base_commit": "0fcb2dddf5de6b583c2e00f150abff0b2afb6315",
+  "branch": "research/flrw-production-integration-20261015",
+  "reviewed_source_sha256": {
+    "rust/rei_microphysics/src/axbi_background.rs": "3e415c6525c9b8cd65e9cb0856b208c9bf42d11d5710ee116ba8c8eafdab0d99",
+    "rust/rei_microphysics/src/axbi_driver.rs": "798ef8c1dda37f8e48fcd9b4cd61b53370803b269895addcbf1434560f9d4238",
+    "rust/rei_microphysics/src/lib.rs": "56b1c710ed0db5df1c6baafdeab26d76c94d3152be8b7c704b74bb57426f4483",
+    "rust/rei_microphysics/src/deuterium_charge_exchange.rs": "482e81d29bf33981ec56bf76dad1c8da5b9a4e162a6813a727e61fec86588cc0",
+    "rust/rei_microphysics/tests/axbi_background.rs": "1fea5be465650f5dafecf9f48e296f04a4453e7285170c95bbc39163f92bc399",
+    "rust/rei_microphysics/tests/axbi_driver.rs": "cd36a948b53f85a59469a6569d432c99a6101108099c459cbedfb98eb5587c41",
+    "rust/rei_microphysics/tests/deuterium_charge_exchange.rs": "6c6300fdb78719e5b919a1d814e3d53b74b697c0acbae8c86ee91abc2eb79fe1",
+    "rust/rei_microphysics/examples/flrw_integration_probe.rs": "651c8739ae7710fef75e8b1594b7308a96cd4debd6a1e51b32a3689eb74c1c57"
+  },
+  "admitted_units": [
+    "Local proper-time and signed-shear GL8 increments on actual binary64 endpoints, with GL4 diagnostic; unchanged accumulated geometry and physical background.",
+    "One common local dt in tentative source/chemistry calls; deterministic geometry snapshot reuse.",
+    "Validated explicit initial_x_hii opt-in, unchanged baseline 2e-4, and fresh conditional REC HyRec z20 donor IC at xHII=0.000210349192936 and T=9.306042400380866 K.",
+    "Standalone proper-SI Savin-2002 D/H charge-exchange rate fit on 2.7..200000 K and frozen-rate, fixed-proper-volume Riccati finite map with explicit energy defect."
+  ],
+  "scientific_checks": {
+    "clock": "ln1p uses represented endpoint difference; positive quadrature weights and positive H preserve positive time. Zero interval and q0 shear are exact, signed shear reflection is preserved. Root explicitly authorized log-panel width .01 and cap65536 as native choices, distinct from supplier prototype. GL4 difference is not a certified error bound.",
+    "ic": "Donor temperature already Kelvin; recipient nH/fHe conventions preserved. Neutral-He projection is conditional, not independently resolved helium. Source/recipient density-normalization difference remains documented. Existing baseline checkpoint was not resumed with new IC.",
+    "invariants": "No changes to cold rate/thermal kernels, chemistry residual, photon/event ownership, strict local error target, provider domain, or ledger acceptance thresholds. No clipping or table extrapolation introduced.",
+    "dh_theory": "For x=D+, F=f(x), K=-f′(x), d²=K²-4(kf-kr)F. The implemented normalized map is algebraically equivalent to F theta/(1+K theta/2), including d=0 and stiff limits. H and D totals, baryons and charge are conserved; CT changes no electrons or thermal particle count.",
+    "dh_energy": "Forward-positive extent gives chemical delta=delta_chi*extent and thermal delta of opposite sign. Defect and source are explicit. Negative thermal outcome rejects transactionally; no default abundance/threshold or production activation.",
+    "dh_fit": "Table-2 coefficients, directions and cm³/s to m³/s factor1e-6 match the frozen source contract. Table-1 comparisons use6%/4% fit deviations, separate from1e-13 manufactured numerical controls and from physical uncertainty."
+  },
+  "observed_evidence": {
+    "native_targeted": {
+      "receipt": "raw/targeted_tests_receipt.json",
+      "log": "raw/targeted_tests.log",
+      "passed": 21,
+      "failed": 0,
+      "scope": "8 background and13 driver targeted tests"
+    },
+    "native_probe": {
+      "receipt": "raw/native_probe_receipt.json",
+      "baseline": "raw/native_probe/baseline_ic/summary.json",
+      "donor": "raw/native_probe/donor_ic/summary.json",
+      "status": "PASS",
+      "accepted_each": 2,
+      "comparisons_each": 20,
+      "tentative_attempts_each": 60,
+      "rejects_each": 18,
+      "rhs_each": 444,
+      "final_a_each": 0.04761904765537807,
+      "checkpoint_roundtrip_each": true,
+      "source_identity_readback_equal": true,
+      "probe_source_readback_equal": true,
+      "source_identity_sha256": "1e83075dd3feabd8e62711b2da4de531b6f8da7a25f68cb965575e4175a9643f",
+      "interpretation": "Microscopic finite progress only; not a full-history feasibility or performance demonstration."
+    },
+    "clock_sample": {
+      "path": "raw/native_probe/clock_comparison.json",
+      "stable_dt_s": 6700735.980051018,
+      "accumulated_difference_s": 6700672,
+      "gl4_minus_gl8_s": 0,
+      "interpretation": "Single sample illustrates cancellation avoidance; zero GL discrepancy is not proof of exactness and timing is not a general benchmark."
+    },
+    "dh_targeted": {
+      "receipt": "raw/d_test_attempt1_receipt.json",
+      "log": "raw/d_test_attempt1.log",
+      "passed": 7,
+      "failed": 0,
+      "attempt": 1,
+      "coverage": "Savin domain/SI/table data; Wolfram manufactured oracle; frozen semigroup; zero/donor-empty/equilibrium identities; pure-forward d0/reverse/stiff limits; conservation and electron counterexample; thermal rejection; no-D no-op."
+    },
+    "upstream": "Existing source/theory/full-history receipts reused within their original scopes; no upstream suite or historical campaign rerun."
+  },
+  "actual_defects_found": [],
+  "targeted_repair_authorizations": 0,
+  "remaining_claim_limits": [
+    "Repeated fixed-energy photon projection can create false threshold events; covariant native transport remains unfinished.",
+    "No new z20-to-z4 full FLRW abundance/temperature/optical-depth history or global refinement certificate.",
+    "Old baseline full-history results remain reused conditional evidence, not newly revalidated under changed sources.",
+    "No full D ionic/thermal cosmological history: donor D/H, D photoionization/recombination and coupled temperature-dependent control remain future inputs/work.",
+    "No microscopic HH rate, arbitrary CR injection, massive collision, Einstein closure or primordial anisotropic-history claim."
+  ],
+  "next_executable_action": "Publish this scoped implementation/evidence, then implement the already identified covariant photon state/energy threshold seam under its own finite contract.",
+  "stopping_rule": "No actual changed-seam defect found. Review closed without optional adjacent repairs or additional tests."
+}

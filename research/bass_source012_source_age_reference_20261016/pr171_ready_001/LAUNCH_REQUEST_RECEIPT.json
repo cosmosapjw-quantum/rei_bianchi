@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "ssh",
+    "-i",
+    "/home/cosmosapjw/.ssh/ncp_key",
+    "-p",
+    "22",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=10",
+    "root@49.50.142.2",
+    "python3 -c 'import sys,json,os,subprocess,datetime\nfrom pathlib import Path\nroot=Path('\"'\"'/root/REI_PR171_READY_20261018_001'\"'\"');payload=json.load(sys.stdin)\nif (root/'\"'\"'LAUNCH.json'\"'\"').exists():\n print((root/'\"'\"'LAUNCH.json'\"'\"').read_text());sys.exit(0)\nassert sorted(x.name for x in root.iterdir())==['\"'\"'inputs'\"'\"'],'\"'\"'Unexpected stage contents: observe instead of relaunch'\"'\"'\n(root/'\"'\"'supervise_ready.py'\"'\"').write_text(payload['\"'\"'supervisor'\"'\"'])\n(root/'\"'\"'APPROVED_EXECUTION_PACKET.json'\"'\"').write_text(json.dumps(payload['\"'\"'packet'\"'\"'],indent=2)+'\"'\"'\\n'\"'\"')\nwith (root/'\"'\"'supervisor.stdout'\"'\"').open('\"'\"'wb'\"'\"') as out,(root/'\"'\"'supervisor.stderr'\"'\"').open('\"'\"'wb'\"'\"') as err:\n child=subprocess.Popen([sys.executable,str(root/'\"'\"'supervise_ready.py'\"'\"')],cwd=root,stdin=subprocess.DEVNULL,stdout=out,stderr=err,start_new_session=True)\nreceipt={'\"'\"'supervisor_pid'\"'\"':child.pid,'\"'\"'pgid'\"'\"':child.pid,'\"'\"'argv'\"'\"':[sys.executable,str(root/'\"'\"'supervise_ready.py'\"'\"')],'\"'\"'cwd'\"'\"':str(root),'\"'\"'launch_utc'\"'\"':datetime.datetime.now(datetime.timezone.utc).isoformat(),'\"'\"'boot_id'\"'\"':Path('\"'\"'/proc/sys/kernel/random/boot_id'\"'\"').read_text().strip(),'\"'\"'allocation_path'\"'\"':str(root/'\"'\"'ALLOCATION.json'\"'\"'),'\"'\"'status_path'\"'\"':str(root/'\"'\"'STATUS.json'\"'\"'),'\"'\"'new_allocation_approved'\"'\"':True}\n(root/'\"'\"'LAUNCH.json'\"'\"').write_text(json.dumps(receipt,indent=2)+'\"'\"'\\n'\"'\"');print(json.dumps(receipt))\n'"
+  ],
+  "cwd": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi",
+  "exit": 0,
+  "wall_s": 1.1833442249335349,
+  "stdout": "{\"supervisor_pid\": 29828, \"pgid\": 29828, \"argv\": [\"/usr/bin/python3\", \"/root/REI_PR171_READY_20261018_001/supervise_ready.py\"], \"cwd\": \"/root/REI_PR171_READY_20261018_001\", \"launch_utc\": \"2026-10-18T03:09:04.787304+00:00\", \"boot_id\": \"d1720622-df98-427a-ba04-7fcbd1727d50\", \"allocation_path\": \"/root/REI_PR171_READY_20261018_001/ALLOCATION.json\", \"status_path\": \"/root/REI_PR171_READY_20261018_001/STATUS.json\", \"new_allocation_approved\": true}\n",
+  "stderr": "",
+  "supervisor_sha256": "60b3913d89d4f6c2ab5d4d8968369ebc7fd9bc1c48ab99636526f4a17bad448a",
+  "program_source_changes": 0
+}

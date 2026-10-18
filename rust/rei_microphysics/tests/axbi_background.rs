@@ -30,6 +30,46 @@ fn matter_clock_and_flrw_limit() {
     assert!((inverse.time_s / (p.time_s * 0.5) - 1.0).abs() < 1e-12);
     assert!(bg.snapshot(-1.0).is_err());
 }
+
+#[test]
+fn local_matter_clock_preserves_tiny_late_intervals() {
+    let bg = toy(0.0, BackgroundFamily::PhysicalDensityFixed, 4096);
+    let a0 = 0.19_f64;
+    for a1 in [a0 * (1.0 + 1e-10), f64::from_bits(a0.to_bits() + 1)] {
+        let increment = bg.interval_increment(a0, a1).unwrap();
+        let dx = ((a1 - a0) / a0).ln_1p();
+        let exact = 2.0 / (3.0 * 2e-18) * a0.powf(1.5) * (1.5 * dx).exp_m1();
+        assert!((increment.proper_time_s / exact - 1.0).abs() < 5e-13);
+        assert_eq!(increment.delta_b, 0.0);
+        assert!(increment.gl4_time_difference_s.is_finite());
+        assert_eq!(increment.gl4_b_difference, 0.0);
+    }
+}
+
+#[test]
+fn local_clock_and_shear_match_smooth_accumulated_reference_and_sign_symmetry() {
+    let positive = toy(0.01, BackgroundFamily::PhysicalDensityFixed, 4096);
+    let negative = toy(-0.01, BackgroundFamily::PhysicalDensityFixed, 4096);
+    let a0 = 1.0 / 21.0;
+    let a1 = 0.2;
+    let increment = positive.interval_increment(a0, a1).unwrap();
+    let reflected = negative.interval_increment(a0, a1).unwrap();
+    let p0 = positive.point_at_scale(a0).unwrap();
+    let p1 = positive.point_at_scale(a1).unwrap();
+    assert!((increment.proper_time_s / (p1.time_s - p0.time_s) - 1.0).abs() < 1e-9);
+    assert!((increment.delta_b / (p1.b - p0.b) - 1.0).abs() < 1e-9);
+    assert_eq!(increment.proper_time_s, reflected.proper_time_s);
+    assert_eq!(increment.delta_b, -reflected.delta_b);
+    assert_eq!(increment.gl4_b_difference, -reflected.gl4_b_difference);
+    let zero = positive.interval_increment(a1, a1).unwrap();
+    assert_eq!(zero.proper_time_s, 0.0);
+    assert_eq!(zero.delta_b, 0.0);
+    assert_eq!(zero.gl4_time_difference_s, 0.0);
+    assert_eq!(zero.gl4_b_difference, 0.0);
+    for (lo, hi) in [(a1, a0), (0.0, a1), (a0, 0.21), (f64::NAN, a1)] {
+        assert!(positive.interval_increment(lo, hi).is_err());
+    }
+}
 #[test]
 fn density_constraint_signed_shear_and_refinement() {
     let plus = toy(0.01, BackgroundFamily::PhysicalDensityFixed, 4096);

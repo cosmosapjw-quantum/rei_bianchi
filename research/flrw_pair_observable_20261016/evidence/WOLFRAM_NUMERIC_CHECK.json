@@ -1,0 +1,15 @@
+{
+  "code": "h0=(674/10)*10^5/(30856775814913673/10^16*10^24); om=315/1000; orr=92/10^6; ol=1-om-orr; a=-3044522437723423/10^15; b=-16094379124341003/10^16; w[x_]:=1/(h0 Sqrt[om Exp[-3 x]+orr Exp[-4 x]+ol]); k=29979245800*(66524587051/10^10)*10^-25; n1=9797589160354307/10^26; n2=1054157221048039/10^25; ni=27003617462766083/10^26; m1=NIntegrate[w[x],{x,a,b},WorkingPrecision->40,AccuracyGoal->25,PrecisionGoal->25]; m2=NIntegrate[w[x]^2,{x,a,b},WorkingPrecision->40,AccuracyGoal->25,PrecisionGoal->25]; comps=N[{k*n1*w[b],k*n2*Sqrt[m2],k*ni*m1},25]; <|\"H0_per_s\"->N[h0,25],\"moment1\"->m1,\"moment2\"->m2,\"exact_kernel_component_estimates\"->comps,\"min_estimate\"->Min[comps],\"q_estimate\"->(1-Exp[-Min[comps]]),\"status\"->\"Independent high precision quadrature check, not interval certificate or production upper sums\"|>",
+  "tool": "wolfram_wolframlanguageevaluator",
+  "timeConstraint_s": 20,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= <|\"H0_per_s\" -> 2.1842852410855020107358286594234308170761`25.*^-18, \"moment1\" -> 4.279489144155795778646848643815356089478020411044817713`40.*^16, \"moment2\" -> 1.7315443405238544599479442269535016020557171958643565`40.*^33, \"exact_kernel_component_estimates\" -> {1.412362996534916759970172003507050996552867156652749`25.*^-7, 8.74832859089596528350703245038707131080908022889263`25.*^-8, 2.304712548344406806962792819008413912285388578377857`25.*^-7}, \"min_estimate\" -> 8.74832859089596528350703245038707131080908022889263`25.*^-8, \"q_estimate\" -> 8.74832820822971077103530331987384513798390929995123`25.00000001899675*^-8, \"status\" -> \"Independent high precision quadrature check, not interval certificate or production upper sums\"|>"
+      }
+    ],
+    "isError": false
+  },
+  "purpose": "Independent high-precision full-kernel comparison. Production bound uses monotone right sums and is slightly larger."
+}
