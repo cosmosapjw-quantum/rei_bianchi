@@ -37,3 +37,7 @@ Y는 이 모델의 `n_H+4n_He` 분모를 쓴 H/He-only abundance다. Electron은
 `python -m json.tool research/bass_source012_source_age_reference_20261016/pr171_ready_001/RETURN_CONTRACT.json`
 
 Checkpoint `PAUSED_RESUMABLE`, goal미완료. 이문서는실행·후처리결과를보고하며독립과학승인을발급하지않는다.
+
+## 게시 확인
+
+결과 content commit `bc991fdd5e0af4504213946a43000dee081325e0`를 기존 branch에 push하고 원격 SHA 일치를 확인했다. 기존 draft PR150의 본문에 이번 실제 결과를 추가했다. 공개 결과 ZIP(350400bytes)과 비공개 원자료 archive(1310257bytes)는 각각 Dropbox 원격 readback SHA256 일치를 확인했다. 세부 영수증은 `BACKUP_RECEIPT.json`, `RAW_BACKUP_RECEIPT.json`, `PUBLICATION_RECEIPT.json`에 있다. 공개 ZIP은 content commit에 고정되며 이후 게시 영수증은 별도다. 게시 확인은 과학 승인으로 해석하지 않는다.
