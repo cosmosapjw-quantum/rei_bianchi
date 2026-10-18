@@ -35,17 +35,33 @@ def test_old_native_physics_functions_are_byte_preserved():
         }
 '''
     assert restored.count(arm)==1
-    assert restored.replace(arm,'',1)==old
+    restored=restored.replace(arm,'',1)
+    binary=(ROOT/'src/binary_server.rs.inc').read_text()
+    assert restored.count(binary)==1
+    restored=restored.replace(binary,'',1)
+    restored=restored.replace('    transport_cells: usize,\n    binary_rpc: bool,','    transport_cells: usize,',1)
+    restored=restored.replace('let offset = if args[1] == "server" || args[1] == "server_binary64" { 3 } else { 4 };',
+                              'let offset = if args[1] == "server" { 3 } else { 4 };',1)
+    restored=restored.replace('"server" => server(q, births, nmu, source, cells, false),\n        "server_binary64" => server(q, births, nmu, source, cells, true),',
+                              '"server" => server(q, births, nmu, source, cells),',1)
+    assert restored==old
     assert '"matrix_native" => native(q, Path::new(&args[3]), births, nmu, source, cells, true)' in rust
 
-def test_python_changes_resource_bounds_only():
+def test_python_changes_resource_bounds_and_opt_in_rpc_only():
     _, py = m.overlay(BASE, PYBASE)
     ast.parse(py)
     assert 'a.max_rhs' in py and 'a.max_wall_s' in py
     for line in PYBASE.decode().splitlines():
-        if 'p=argparse.' in line or 'frozen RHS/time cap' in line or "solver_return.json" in line:
+        if any(x in line for x in ('p=argparse.','frozen RHS/time cap','solver_return.json',
+            'server=subprocess.Popen','setup=json.loads','def send(','server.stdin.write',
+            'line=server.stdout.readline','if not line:','return line.strip()',
+            "if answer.startswith('ERR')",'result=np.fromstring(answer','import argparse,json')):
             continue
         assert line in py
+    assert "choices=('text','binary64'),default='text'" in py
+    assert "'server_binary64' if a.rpc_mode=='binary64' else 'server'" in py
+    assert 'rtol=2e-11 if a.tight else 2e-10' in py
+    assert 'abs(er)<=1e-8*eg and abs(nr)<=1e-8*ng' in py
 
 def test_mismatched_donor_rejected():
     with pytest.raises(ValueError, match='DONOR_SHA'):
@@ -53,3 +69,27 @@ def test_mismatched_donor_rejected():
 
 def test_generation_is_deterministic():
     assert m.overlay(BASE,PYBASE)==m.overlay(BASE,PYBASE)
+
+def test_binary_rpc_pipe_helpers_handle_fragmented_io():
+    source=(ROOT/'src/binary_solver.py.inc').read_text()
+    tree=ast.parse(source)
+    helpers=[node for node in tree.body if isinstance(node,ast.FunctionDef) and node.name in ('_write_all','_read_exact')]
+    namespace={}
+    exec(compile(ast.Module(body=helpers,type_ignores=[]),'<binary_rpc_helpers>','exec'),namespace)
+    class Fragmented:
+        def __init__(self,data=b''):
+            self.data=bytearray(data)
+            self.written=bytearray()
+        def read(self,size):
+            take=min(size,2)
+            result=bytes(self.data[:take]);del self.data[:take]
+            return result
+        def write(self,data):
+            self.written.extend(data[:3])
+            return min(len(data),3)
+    stream=Fragmented(b'abcdefgh')
+    assert namespace['_read_exact'](stream,8)==b'abcdefgh'
+    namespace['_write_all'](stream,b'12345678')
+    assert bytes(stream.written)==b'12345678'
+    with pytest.raises(RuntimeError,match='TRUNCATED'):
+        namespace['_read_exact'](Fragmented(b'abc'),4)

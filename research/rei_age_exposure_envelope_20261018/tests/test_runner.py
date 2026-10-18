@@ -16,6 +16,9 @@ def test_plan_separates_age_time_and_spectral_axes():
     assert cases['spectral128']['birth_panels']==8
     assert cases['spectral128']['transport_cells']==128
 
+def test_transport_thread_identity_matches_rust_clamp():
+    assert [r.effective_transport_threads(v) for v in (None,'nonsense','-2','0','1','48','100')]==[1,1,1,1,1,48,48]
+
 def test_native_argv_contains_shared_levels_and_factor():
     c={'name':'test','kind':'native','q':0.,'birth_panels':64,'n_mu':8,
        'source_subdivisions':8,'transport_cells':16,'common_birth_levels':[8,16,32,64],

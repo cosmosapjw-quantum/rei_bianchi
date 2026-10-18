@@ -5,7 +5,7 @@ source/binary/interpreter identity, and matching output byte hashes. Interrupted
 or failed cases stop the default path; --retry-failed allocates a NEW attempt.
 """
 from pathlib import Path
-import argparse, hashlib, json, math, os, platform, signal, subprocess, sys, time
+import argparse, hashlib, json, math, os, platform, re, signal, subprocess, sys, time
 
 NATIVE_SHA='35d9747a0bbedcafdb568467ce7c1e7a25f965b6'
 
@@ -17,6 +17,16 @@ def sha(p: Path) -> str:
 
 def canonical(x) -> bytes:
     return json.dumps(x,sort_keys=True,separators=(',',':'),allow_nan=False).encode()
+
+def effective_transport_threads(value: str|None) -> int:
+    if value is None or re.fullmatch(r'\+?[0-9]+',value) is None:
+        return 1
+    try:
+        parsed=int(value)
+    except ValueError:
+        return 1
+    # Match Rust's parse::<usize>().unwrap_or(1).clamp(1, 48).
+    return min(48,max(1,parsed)) if parsed<=sys.maxsize*2+1 else 1
 
 def read_json(p: Path):
     def reject(x): raise ValueError('NONFINITE_JSON: '+x)
@@ -47,6 +57,7 @@ def command(c: dict, binary: Path, solver: Path, out: Path, cap: float, rhs: int
             '--transport-cells',str(c['transport_cells']),'--max-wall-s',str(cap),
             '--max-rhs',str(rhs)]
     if c.get('tight'): result.append('--tight')
+    result.extend(['--rpc-mode',c.get('rpc_mode','text')])
     return result
 
 def run_process(argv: list[str], out: Path, cap: float) -> dict:
@@ -123,6 +134,7 @@ def main() -> None:
     p.add_argument('--total-wall-s',type=float,default=5400.)
     p.add_argument('--max-rhs',type=int,default=200000)
     p.add_argument('--tight',action='store_true')
+    p.add_argument('--rpc-mode',choices=('text','binary64'),default='text')
     p.add_argument('--retry-failed',action='store_true')
     p.add_argument('--dry-run',action='store_true')
     a=p.parse_args()
@@ -130,7 +142,7 @@ def main() -> None:
         p.error('positive finite resource bounds required')
     cases=plan();names=a.cases.split(',')
     if len(set(names))!=len(names) or any(n not in cases for n in names): p.error('unknown/duplicate case name')
-    configs=[dict(cases[n],tight=a.tight) for n in names]
+    configs=[dict(cases[n],tight=a.tight,rpc_mode=a.rpc_mode) for n in names]
     if a.dry_run:
         print(json.dumps(configs,indent=2));return
     native=a.prepared.resolve();solver=native/'positive_solver_refined.py'
@@ -145,7 +157,9 @@ def main() -> None:
     import numpy, scipy
     identity=dict(native_sha=NATIVE_SHA,binary_sha=sha(binary),solver_sha=sha(solver),
                   source_sha=sha(native/'PREPARED_IDENTITY.json'),python=platform.python_version(),
-                  numpy=numpy.__version__,scipy=scipy.__version__)
+                  numpy=numpy.__version__,scipy=scipy.__version__,
+                  transport_threads=effective_transport_threads(os.environ.get('REI_TRANSPORT_THREADS')),
+                  rpc_mode=a.rpc_mode)
     a.out=a.out.resolve();a.out.mkdir(parents=True,exist_ok=True)
     lock=a.out/'.campaign.lock';fd=os.open(lock,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600)
     os.write(fd,str(os.getpid()).encode());os.close(fd)

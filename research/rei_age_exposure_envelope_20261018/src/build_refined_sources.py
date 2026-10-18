@@ -40,11 +40,40 @@ def overlay(native: bytes, solver: bytes) -> tuple[str, str]:
 '''
     if rust.count(anchor)!=1: raise ValueError('NATIVE_MODE_ANCHOR')
     rust=rust.replace(anchor,arm+anchor)
+    rust=rust.replace('    io::{self, BufRead},','    io::{self, BufRead},',1)
+    signature='    transport_cells: usize,\n) -> Result<(), Box<dyn std::error::Error>> {\n    let s = setup(q, birth_count, nmu, source, transport_cells)?;'
+    assert rust.count(signature)==1
+    rust=rust.replace(signature,signature.replace('    transport_cells: usize,','    transport_cells: usize,\n    binary_rpc: bool,'),1)
+    loop='    for line in io::stdin().lock().lines() {'
+    assert rust.count(loop)==1
+    rust=rust.replace(loop,Path(__file__).with_name('binary_server.rs.inc').read_text()+loop,1)
+    rust=rust.replace('let offset = if args[1] == "server" { 3 } else { 4 };',
+                      'let offset = if args[1] == "server" || args[1] == "server_binary64" { 3 } else { 4 };',1)
+    assert rust.count('"server" => server(q, births, nmu, source, cells),')==1
+    rust=rust.replace('"server" => server(q, births, nmu, source, cells),',
+                      '"server" => server(q, births, nmu, source, cells, false),\n        "server_binary64" => server(q, births, nmu, source, cells, true),',1)
     extra="p.add_argument('--max-wall-s',type=float,default=600.);p.add_argument('--max-rhs',type=int,default=200000);"
     py=py.replace('a=p.parse_args();',extra+'a=p.parse_args();')
     py=py.replace('calls>200000 or time.monotonic()-started>600',
                   'calls>a.max_rhs or time.monotonic()-started>a.max_wall_s')
     py=py.replace("dict(status=status,failure=failure,q=a.q", "dict(max_rhs=a.max_rhs,max_wall_s=a.max_wall_s,status=status,failure=failure,q=a.q")
+    py=py.replace('import argparse,json,subprocess,time,resource','import argparse,json,subprocess,time,resource,struct',1)
+    py=py.replace('a=p.parse_args();',"p.add_argument('--rpc-mode',choices=('text','binary64'),default='text');a=p.parse_args();",1)
+    original="server=subprocess.Popen([str(a.binary),'server',str(a.q),str(a.birth_panels),str(a.n_mu),str(a.source_subdivisions),str(a.transport_cells)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,bufsize=1)"
+    assert py.count(original)==1
+    py=py.replace(original,"server=subprocess.Popen([str(a.binary),'server_binary64' if a.rpc_mode=='binary64' else 'server',str(a.q),str(a.birth_panels),str(a.n_mu),str(a.source_subdivisions),str(a.transport_cells)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,bufsize=0)",1)
+    py=py.replace('setup=json.loads(server.stdout.readline());','setup=json.loads(server.stdout.readline().decode());',1)
+    old="""def send(mode,active,x,y):
+    server.stdin.write(f'{mode} {active} {x:.17e} '+' '.join(format(v,'.17e') for v in y)+'\\n');server.stdin.flush()
+    line=server.stdout.readline()
+    if not line:raise RuntimeError(server.stderr.read())
+    return line.strip()
+"""
+    assert py.count(old)==1
+    py=py.replace(old,Path(__file__).with_name('binary_solver.py.inc').read_text(),1)
+    py=py.replace("if answer.startswith('ERR'):","if isinstance(answer,str) and answer.startswith('ERR'):",1)
+    py=py.replace("result=np.fromstring(answer,sep=' ');", "result=answer if isinstance(answer,np.ndarray) else np.fromstring(answer,sep=' ');",1)
+    py=py.replace('max_rhs=a.max_rhs,max_wall_s=a.max_wall_s,status=status', 'max_rhs=a.max_rhs,max_wall_s=a.max_wall_s,rpc_mode=a.rpc_mode,status=status',1)
     return rust,py
 
 def write_checked(path: Path, data: bytes) -> None:
