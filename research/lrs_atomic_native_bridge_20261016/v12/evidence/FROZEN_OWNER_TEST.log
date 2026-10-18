@@ -1,0 +1,35 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_driver.rs:447:18
+    |
+447 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+447 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+447 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/root/REI_LRS_V12_NATIVE_20261018/research/lrs_atomic_native_bridge_20261016/v12/native_owner/rust/rei_microphysics)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.59s
+     Running tests/axbi_driver.rs (research/lrs_atomic_native_bridge_20261016/v12/native_owner/rust/rei_microphysics/target/debug/deps/axbi_driver-2e146e889a39eba3)
+
+running 13 tests
+test explicit_initial_hydrogen_fraction_is_opt_in_and_validated ... ok
+test refinement_output_allocation_4096_preserves_existing_budgets_and_exact_guard ... ok
+test conservative_deposit_exact_number_and_energy ... ok
+test geometry_map_rejects_cold_endpoint_outside_provider_domain ... ok
+test reaction_free_geometry_conserves_count_energy_and_temperature_dilution ... ok
+test cold_absorption_uses_one_event_owner ... ok
+test full_resource_allocation_preserves_pilot_default_and_exact_guard ... ok
+test aggregate_output_guard_counts_nested_bytes_and_atomic_checkpoint_peak ... ok
+test checkpoint_roundtrip_and_registry_normalization ... ok
+test hard_caps_charge_started_trials_and_resume_without_off_by_one ... ok
+test sparse_full_spectra_keep_each_abundance_and_align_terminal_resume_and_cap ... ok
+test component_step_doubling_and_state_array_metric ... ok
+test donor_initial_eos_one_step_ledgers_and_checkpoint_roundtrip ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.43s
+
