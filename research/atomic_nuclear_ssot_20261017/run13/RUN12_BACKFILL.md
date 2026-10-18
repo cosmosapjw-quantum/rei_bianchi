@@ -1,0 +1,13 @@
+# RUN12 transcript backfill before RUN13 execution
+
+2026-10-18. User explicitly requested backup/publication FIRST. This is a reconstruction of the previous RUN12 final response, not recovered raw Wolfram code or evaluator logs. No new scientific result is claimed here.
+
+RUN12 selected P4-S4C-SPECTRAL-EDGE-SUPPORT/M2-CONVERGENCE. Actual native m2 endpoints=0, native tests=0, new remote objects=0. Terminal ClientError/Python ServerError blocked execution. Last published execution parent is RUN11 commit 56e39a0783e85cc83339d0d3ee2a89b45f7c92ee.
+
+Previous prose reported a separate manufactured FLRW optical-energy-layer study: ell_E=epsilon*omega/kappa; delta=0.0004,Lambda_H=350,D/H=1/40000, single birth, prescribed neutral density, E^-3 manufactured cross sections; ell_E=1.5542857e-5eV, Sref=3.1064327633113574e-5,7 checks. These are TRANSCRIPT_REPORTED values, not newly replayed or native BASS/Verner/m2 evidence. Raw source/output was not recovered. Do not mark m2 complete from this surrogate.
+
+RUN13 recovery: initial container command failed; one minimal diagnostic succeeded, then terminal listing and Python-in-container succeeded. Actual RUN11 ZIP SHA256 verified: cd9258a2b7ca6fee8f82155d4fa2bc016ac5d05a25b061f8fcf74db3c3e2d0a8. File bytes=17968344. Verification of payload and scientific tests follows separately; not preclaimed.
+
+New backfill archive contains that unchanged RUN11 ZIP, its original delivery receipt, this backfill narrative and a machine-readable transcript provenance record. Name REI_ATOMIC_NUCLEAR_RUN12_BACKFILL_20261018.zip; bytes17148847; SHA25661a52684255dc754110a4b83b7aee78ad39ed5de684957b6cc71dead4f018f5b. Google Drive upload completed as1MZxg8q7lTn8SreH-5chJU4FAtMvVfkr2 in established folder1pkohlay5eIfFJsBwPZ_yn2jIZONZjesI. Dropbox upload initiated to /BASS_DERIVATION_DOSSIERS_20260912/REI_ATOMIC_NUCLEAR_RUN12_BACKFILL_20261018.zip; final status must be read from the external delivery receipt, not assumed from initiation.
+
+Resume unchanged inputs/spectral11/m2.json (160 births,GL8,other47cells,BASS121,atomic/IC unchanged) with scripts/spectral_joint11.py chunk 2 --rtol 3e-11 --budget 20 in bounded sequential calls. Native subagent NOT_RUN: no delegation tool exposed. No local/Codex/NCP/SSH or production/main/old checkpoint mutation. Original45/26-node DAGs remain in ancestors. New final results and delivery receipts will be added separately; this backfill is immutable history.
