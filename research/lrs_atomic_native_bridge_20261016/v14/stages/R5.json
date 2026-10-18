@@ -1,0 +1,36 @@
+{
+  "schema": "rei.v14.r5.1",
+  "parent_pr": 196,
+  "parent_sha": "7fb18cec3d6d6eebad5fe418ec83b36d82cfff1e",
+  "backup_first": {
+    "V12_RELEASE_sha256": "a8d596c56eb837a0ecc1762c00fd2f8d5fe5790d9141ddc40f4b6e1c1962d634",
+    "V13_FULL_sha256": "49be73ce38094a87ac23bacd6190a9ce1517775a13dbf339b8733269162bad6d",
+    "V13_Drive_Dropbox_fresh_bytes": "MATCH",
+    "V13_payload_hashes_checked": 199
+  },
+  "objective": "Opt-in original native source-off propagation with actual positive GL2 birth times; not V13 common-midpoint half source",
+  "conventions": "FLRW X=ln(a/a0), dt=dX/H(a), original MD14/BB50k, H/He Verner and Grackle, eV and total-H normalization unchanged",
+  "nodes": "c_minus=(1-1/sqrt(3))/2; c_plus=1-c_minus; source_weight_dt=h/(2*H(a_birth))",
+  "source_free_segments": "[0,c_minus], [c_minus,c_plus], [c_plus,1]",
+  "Wolfram_checks": {
+    "GL2_moments_0_to_3": [0, 0, 0, 0],
+    "constant_S_k_GL2_minus_exact_local_h5": "-S*k^4/4320",
+    "constant_source_midpoint_vacuum_energy_local_h3": "-E_birth*S/24"
+  },
+  "implementation_contract": [
+    "Separate fixed-run API, no change to default/adaptive/checkpoint path",
+    "Existing source clocks must be Disabled to prevent double injection",
+    "Propagate original native tentative source-free substeps between physical birth nodes",
+    "Capture and integrate each subsegment RHS with its own proper dt and nH; never last-RHS times macro-dt",
+    "Macro failure rolls back gas, photons, all ledgers and diagnostic; attempted work remains charged",
+    "Add physical-midpoint and matched source-off segmented controls"
+  ],
+  "R5": "DERIVED_WOLFRAM_CHECKED",
+  "C5_C6": "NEXT",
+  "C8": "PENDING",
+  "C10": "PENDING",
+  "native_compile": "NOT_RUN_NO_RUST_TOOLCHAIN",
+  "native_subagent": "NOT_RUN_SERIAL_USER_AUTHORIZED",
+  "hold": ["full source-on p2", "uniform stiff accuracy", "Case B", "full EoR", "signed Bianchi"],
+  "literature_context": ["Mackey 2012 arXiv:1201.5651", "rei_bianchi PR185 retarded source-age", "bass_cr PR76/77/79 photo-only controls"]
+}
