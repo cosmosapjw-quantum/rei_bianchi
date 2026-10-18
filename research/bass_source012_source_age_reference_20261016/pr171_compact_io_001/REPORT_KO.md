@@ -17,3 +17,7 @@ active34 한 쌍의 request+reply는 764340→235893bytes다. roundtrip은 0.091
 이 단위는 구현과 여섯 저장 상태 parity만 닫는다. 전체 solver에서의 수렴·성능과 독립 scientific admission은 NOT_ISSUED다. age64 첫 WALL_CAP, 원 provider32 trial rejection, native 공통mesh 제한, age/spectral/native-time 및 full EoR HOLD를 유지한다. 이 승인은 새 full solver 또는 mesh 수정 실행을 허가하지 않는다. 독립 reviewer가 복구되면 이 diff/raw 결과만 검토하고, 후속 bounded solver 측정을 새 계약으로 연결한다. 기존 공급자 검토는 반복하지 않는다.
 
 Checkpoint PAUSED_RESUMABLE, GOAL_DONE=false.
+
+## 전체 단위 시간 제한 초과
+
+검증 계산은 시작 후109.333428초에 종료했다. 증거 정리 종료 당시3.25초가 남았으나 이후 Git staging/commit 및 closeout에서180초 전체 단위 한도를 넘겼다. 첫 사후 관측 경과시간은207.459747314초, 초과27.459748745초다. 전체 단위는 `HOLD_WHOLE_UNIT_WALL_CAP_AFTER_COMPLETED_PARITY`로 기록한다. 6쌍 parity 사실은 보존하지만 예산 준수 PASS나 과학 admission으로 승격하지 않는다. 이후 수치 계산/재시도는0이며 원시 BUILD.stderr의 EOF 공백 경고도 그대로 보존했다.
