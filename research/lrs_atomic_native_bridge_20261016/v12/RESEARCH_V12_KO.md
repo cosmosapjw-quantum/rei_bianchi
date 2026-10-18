@@ -12,7 +12,7 @@ PR #150 frozen native owner (`6ea2b1b4b3875c9163cafc45efe720afded43fc4`)의 격�
 
 독립 V11 Radau 적분은 세 조건 모두 성공했고 569–576 RHS 평가를 사용했다. Radau 끝점 온도는 baseline `Xend=1e-5`에서 14988.760902944214 K, baseline `Xend=1e-4`에서 14890.301774931422 K, density×5 짧은 구간에서 14947.600712439470 K였다. PR #172 기록의 baseline BE N=128 온도와 현재 native 결과는 약 `7.2e-11 K` 차이로 일치한다.
 
-CE midpoint는 세 조건 모두 온도 오차를 줄였고, N=128에서 owner BE 대비 약 97.0%, 97.0%, 97.5% 감소시켰다. 그러나 CE-only 오차는 N=32→64→128→256에서 계속 약 절반씩 줄어 1차에 머문다. CE는 이 통제 상태의 가장 큰 열 항이며, 그 시간을 midpoint로 바꾸는 것이 개선의 인과적 부분을 설명한다. 남은 1차 오차는 endpoint로 남겨둔 화학 반응/상태 및 결합된 에너지 항에서 발생한다. 화학 midpoint만 적용해도 오차 차수는 1차이며 개선 폭은 작았다.
+CE midpoint는 세 조건 모두 온도 오차를 줄였고, N=128에서 owner BE 대비 약 97.0%, 97.0%, 97.5% 감소시켰다. 그러나 CE-only 오차는 N=32→64→128→256에서 계속 약 절반씩 줄어 1차에 머문다. CE는 이 통제 상태의 가장 큰 열 항이며, 그 시간을 midpoint로 바꾸는 것이 개선의 인과적 부분을 설명한다. 남은 1차 오차는 endpoint로 남겨둔 화학 반응/상태 및 결합된 에너지 항에서 발생한다. 화학 midpoint만 적용해도 오차 차수는 1차이며 개선 폭은 작았다. `Xend=1e-4`, N=128의 대조군 오차는 owner BE 0.021704 K, CI midpoint 0.021197 K, CE midpoint 0.0006456 K, free-free midpoint 0.021704 K, CMB midpoint 0.021568 K, thermal midpoint 0.0005098 K, chemical midpoint 0.021195 K였다. 따라서 이 입력에서는 CE 시각 배치가 오차 감소의 주된 원인이며, CI/화학 clock 변경은 약 2.3%, free-free는 측정 가능한 개선이 없고 CMB만 변경한 효과도 작다. 모든 항을 midpoint로 묶었을 때 잔여 1차 항이 제거되고 해당 구간에서 2차로 전환된다.
 
 Full midpoint는 온도 방정식과 결합된 CI/재결합 상태 변화, CE, free-free, CMB를 같은 midpoint 상태에서 평가했다. baseline `Xend=1e-4`에서 N을 두 배로 할 때 N=32→64, 64→128, 128→256 차수는 2.173, 1.983, 2.010으로 2차 수렴을 확인했다. 짧은 두 구간에서는 N=128 이후 오차가 대략 `1e-8 K` 수준까지 내려 Radau/부동소수점 차이 바닥에 닿으므로 점근 차수를 주장하지 않는다. 둘 다 거친 분할에서는 2차형 감소를 보였다.
 
