@@ -90,7 +90,7 @@ pub fn blackbody_moments(lo: f64, hi: f64, kt: f64) -> Result<[f64;4], Error> {
     if !lo.is_finite() || !hi.is_finite() || !kt.is_finite()
         || lo <= 0.0 || hi <= lo || kt <= 0.0 { return Err(Error::Input); }
     let mut previous = simpson_moments(lo, hi, kt, 32)?;
-    for n in [64,128,256,512,1024] {
+    for n in [64,128,256,512,1024,2048,4096] {
         let current = simpson_moments(lo, hi, kt, n)?;
         let change = (0..4).map(|k| (current[k]-previous[k]).abs()).fold(0.0_f64,f64::max);
         if change <= 5e-13 * current[0] { return Ok(current); }
