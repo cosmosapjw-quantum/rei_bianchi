@@ -1,0 +1,122 @@
+{
+  "schema": "rei.source008.frozen-contract/1",
+  "task_id": "SOURCE008_SELECTED_BASS_MONOTONE_PASSIVE_EXTENSION",
+  "authority": "Astra APPROVED_SOURCE008_SELECTED_BASS_MONOTONE_PASSIVE_EXTENSION",
+  "base_HEAD": "2f63d28ce3002b146b4ca14007ff2a9dcc071527",
+  "requested_model": "gpt-6.1-sol/high",
+  "observed_model": "NOT_INDEPENDENTLY_OBSERVED",
+  "base_source007_compiled_sha256": "7a085a77634c39e65cf39150532a43d288233a9349c77803475479866b0e8f3e",
+  "base_files": [
+    {
+      "path": "rust/rei_microphysics/src/axbi_bass_background.rs",
+      "sha256": "a218ee4579400dfc10126424e60f17bef9ae53a7e833e85e20c1c6982b5fc7b6"
+    },
+    {
+      "path": "rust/rei_microphysics/src/axbi_driver.rs",
+      "sha256": "c422fba9529aeff8c77173e8d4876139a49589af69cd8214362c97dca884807b"
+    },
+    {
+      "path": "rust/rei_microphysics/examples/bass_dynamic_trial.rs",
+      "sha256": "edab99df6a39a8baf87670a8d4b7f4563c24ffdacc72eae32fbfddbe527a939b"
+    }
+  ],
+  "unchanged_transport_sha256": "9d2d97881ca7b9b58d68dbeffad937e16ca8af237b3d9ba01de0fb5e00b67aa7",
+  "input_identity": {
+    "BASS_model": "3c39bbbf46b6663e7c40277e194fd0ef48118472",
+    "csv": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/bass_source007_20261016/inputs/pr164_121.csv",
+    "csv_sha256": "5a7844834b50fbc046995678a6aaf936252a81e49de1593604eee30641274133",
+    "receipt": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/bass_source007_20261016/inputs/pr164_121.json",
+    "receipt_sha256": "98eddf4673780f0bbca711b373a3e0746cfafc8190674c8d2d6c4de658dc3eed",
+    "grid_points": 121,
+    "selected_cases": [
+      "COLD_FLRW",
+      "SIGNED_MINUS"
+    ],
+    "a_ref": "1/21",
+    "a_end": 0.2
+  },
+  "monotonicity_gate": {
+    "model": "same tangent Hermite b on x=ln(a/aref)",
+    "controls": [
+      "d0=s0/H0",
+      "3*(b1-b0)/(x1-x0)-d0-d1",
+      "d1=s1/H1"
+    ],
+    "enclosure": "existing interval_math outward primitives on every operation; ALL3 controls strictlyinside(-0.5,1) for ALL120segments",
+    "consequence": "Hperp/H=1-bprime and Hparallel/H=1+2bprime positive for all ray directions",
+    "failure": "typed MONOTONICITY_NOT_ESTABLISHED retaining segment rawinputs and optional control enclosures; no clipping, sampling or coefficient change"
+  },
+  "runtime_guard": "WHEN BASS passive active, forward in bound table and every actual ray newscale<=oldscale before any physical state mutation; typed failure, no tolerance or clipping",
+  "preserved": [
+    "analytic nonzeroq guard",
+    "default passivefalse and old example invocations",
+    "transport partition/merge",
+    "Hermite/GL8/rates/source/chemistry residual/solver/tolerances",
+    "six-array error norm",
+    "parallel Jacobian and charged RHS",
+    "old source007 identities,inputs,evidence,costs"
+  ],
+  "metadata_checkpoint": "actual BASS passive certified mode explicit; source008/table/case/config flag/six arrays bound; reject source007 and flag mismatch",
+  "example_opt_in": "optional trailing --inactive-hi-split, absent meansfalse; no adaptive probe/falsezeros",
+  "allowed_paths": [
+    "rust/rei_microphysics/src/axbi_bass_background.rs",
+    "rust/rei_microphysics/src/axbi_driver.rs",
+    "rust/rei_microphysics/examples/bass_dynamic_trial.rs",
+    "rust/rei_microphysics/tests/axbi_bass_passive.rs",
+    "research/bass_source008_20261016/**"
+  ],
+  "targeted_controls": [
+    "selectedcases allsegments and actualforwardrays",
+    "manufactured endpointsafe interiorunsafe derivative reject",
+    "reverse/domain/nonselected identity reject without physical mutation",
+    "actualray HI equality active vs justbelow passive and differentmu crossing",
+    "repeat transfer N/Uq/physicalU+work conservation and no false photoevents",
+    "sourceon chemistry absorbs active only while passive moments retained",
+    "nonzeropassive bound checkpoint roundtrip/mode mismatch"
+  ],
+  "tolerances": "Reuse existing moment64EPS number/128EPS energy; native ledger1e-8, census/native Newton1e-11; no new physical tolerance",
+  "commands": {
+    "test": [
+      "/home/cosmosapjw/.rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "rust/rei_microphysics/Cargo.toml",
+      "--test",
+      "axbi_bass_passive",
+      "--",
+      "--test-threads=1"
+    ],
+    "build": [
+      "/home/cosmosapjw/.rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin/cargo",
+      "build",
+      "--release",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "rust/rei_microphysics/Cargo.toml",
+      "--example",
+      "bass_dynamic_trial"
+    ]
+  },
+  "toolchain": {
+    "rustc": "/home/cosmosapjw/.rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin/rustc",
+    "observed_rustc": "rustc 1.94.1 (e408947bf 2026-03-25)\nbinary: rustc\ncommit-hash: e408947bfd200af42db322daf0fadfe7e26d3bd1\ncommit-date: 2026-03-25\nhost: x86_64-unknown-linux-gnu\nrelease: 1.94.1\nLLVM version: 21.1.8\n",
+    "observed_cargo": "cargo 1.94.1 (29ea6fb6a 2026-03-24)\n"
+  },
+  "target_dir": "/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/bass_source008_20261016/target_source008",
+  "limits": {
+    "build_test_invocations": 2,
+    "per_invocation_wall_seconds_including_termination": 300,
+    "cumulative_wall_seconds": 600,
+    "address_space_bytes": 8589934592,
+    "jobs": 2,
+    "test_threads": 1
+  },
+  "stopping_rule": "First failed build/test command: preserve and STOP, no autorepair/retry. No component/pilot until fresh independentPASS.",
+  "prior_costs": "source007 threecompile/test20.121775138075463s+coarse.130703988019377s+refine.29052651301026344s; source005/006 untouched; no reset",
+  "scientific_admission": "NOT_ISSUED",
+  "time_convergence": "source007 HOLD independent of representation extension",
+  "created_utc": "2026-10-16T00:50:37.245053+00:00"
+}
