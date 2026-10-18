@@ -8,6 +8,7 @@ from pathlib import Path, PurePosixPath
 import argparse, hashlib, json, subprocess, urllib.request, zipfile
 from build_refined_sources import overlay, write_checked
 from run_refinement import sha, read_json
+from native_inputs import load_manifest
 
 
 def safe_relative(name: str) -> str:
@@ -17,7 +18,7 @@ def safe_relative(name: str) -> str:
 
 def prepare(root: Path, dest: Path, archive: Path|None=None, repo: Path|None=None,
             fetch_missing: bool=False) -> dict:
-    manifest=read_json(root/'contracts/NATIVE_INPUTS.json')
+    manifest=load_manifest(root,archive)
     for name, entry in read_json(root/'contracts/DONOR_IDENTITY.json').items():
         if sha(root/'donors/pr171'/name)!=entry['sha256']: raise ValueError('DONOR_FILE_SHA_MISMATCH: '+name)
     if archive is not None and sha(archive)!=manifest['archive_sha256']:
