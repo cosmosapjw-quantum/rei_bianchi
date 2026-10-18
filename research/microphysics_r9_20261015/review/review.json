@@ -1,0 +1,94 @@
+{
+  "reviewer": "independent_physics_code_review",
+  "v1_source_sha256": "774ff7372c8d10901d3cf06bbbc726ab9490d914fbee1a740665d3da2e1621cf",
+  "v2_source_sha256_reported_by_code_agent": "91ba83f519448d02940bd2b916fe1caec3e054342c92ce0671dd1b9b88aa60d0",
+  "review_status": "v1_actual_NCP_output_audited; V4_V5_source_and_NCP_validation_logs_reviewed; extension_results_pending",
+  "production_accepted": false,
+  "checks": {
+    "FCI": "Molecular C2v/A1, explicit spin penalty, S2 check, original-H energy and residual correct.",
+    "quench": "Identical primitives/center and one canonicalX for both nuclear charges; correct correlated CI dot product, complement, mean, variance.",
+    "dipole": "Projected one-body contraction verified against local PySCF implementation; centered starts, K moments, twice-full-reorthogonalized Lanczos, analytic Lorentzian window correct.",
+    "counterpoise": "Li3e doublet/H1e doublet/He2e singlet and zero-charge ghost basis correct; CP subtraction once; nuclear repulsion<=4.5e-200 Eh.",
+    "v2": "General quench uses basis_elements union, initial/final symbols+charges and spin; asserts same nelec and retains arbitraryN projection. Li0\u2192Be+ spin1 correctly leads to(2,1); actual deck not yet read.",
+    "v3": "Read exact2e symmetric-matrix backend: H(C)=hC+ChT+sum_rs(pr|qs)Crs correct; sqrt2 off-diagonal pack/expand is orthonormal; RDM=CC^T+C^TC and S2=1-<C,C^T> correct; eigsh residual uses unsymmetrized original action. n>=64 non2e deferred. Independent native-PySCF random-Haction/energy/projection test read but execution not yet witnessed.",
+    "v4": "Full orthonormal SCF MOs are valid FCI input even if initializer is unconverged. Otherwise canonical S orthogonalization per C2v irrep preserves symmetry and original-H acceptance. SCF status retained separately. No formula blocker.",
+    "v5": "Verifier uses saved retained MO rank, not AO dimension, for CI overlap; unequal retained ranks explicitly marked unavailable. Correct limitation, not fabricated overlap."
+  },
+  "resolved_initial_findings": [
+    "Response moment/Gram gates now propagate to finite_model_numerics_passed.",
+    "v1 adds live wall/RSS/headroom supervisor; root must aggregate other supervisors.",
+    "v1 consumes basis/grid tables; v2 accepts execution_cases directly."
+  ],
+  "local_checks": {
+    "successful_STO_and_small_basis_npz_hashes_verified": 7,
+    "actual_basis_pilots_read": 5,
+    "actual_basis_pilots_all_finite_gates_passed": true,
+    "tighter_Li_cc_pvdz": {
+      "E_Eh": -7.432637514964876,
+      "delta_E_Eh": -8.881784197001252e-16,
+      "residual_Eh": 1.8760829111533497e-10,
+      "converged": true,
+      "S2": 0.7500000000000008,
+      "conv_tol": 1e-13,
+      "residual_tol": 5e-10,
+      "lindep": 1e-17,
+      "note": "Earlier residualtol1e-10 attempt stalled at same residual and converged=false; retained honestly."
+    },
+    "independent_common_Li_augDZ_RHF_MO_FCI": {
+      "parent_E_Eh": -2.312812375508139,
+      "daughter_E_Eh": -7.236230821919927,
+      "conclusion": "Same-AO independently optimized orbital FCI reproduces common-X energies to roundoff."
+    }
+  },
+  "physical_scope_findings": [
+    {
+      "id": "basis_quench",
+      "detail": "Common-Li AO augDZ P=.4672820371605733 to augTZ=.7167028695233413 changes by.24942083236,2494x target1e-4. Mark basis-unconverged. He parent augDZ energy-2.3128 is poor contracted-Li representation, not code bug."
+    },
+    {
+      "id": "LiHe_CP",
+      "detail": "ccDZ R11.5 raw V=-3.7952382486494685e-5 Eh; CP V=+5.510908593464592e-6 Eh. Raw attraction does not validate physical well."
+    },
+    {
+      "id": "response",
+      "detail": "Li augDZ L32 moment maxerror1.96e-14, Gram2.08e-15; TRK1.111259 vs N3. Exact finite-model moments but strong basis incompleteness;64\u2192128 shape comparison remains needed."
+    }
+  ],
+  "remaining": [
+    "Review pending extension: balanced union2e, actual3e quench, QZ matrix backend, SCF recovery and response64/128.",
+    "Adjacent-geometry overlap exports absent in current archive; run verifier before complete contract claim.",
+    "Atomic ionization and LiH basis targets fail in actual v1 series; LiHe has no second-basis series.",
+    "No physical continuum, exclusive channels or molecular rates established."
+  ],
+  "v3_source_sha256_reported_by_code_agent": "421043fee5c2c790bc3e947c49101bd8c5701cb7e6803da8f29774fae857dc68",
+  "actual_NCP_audit": {
+    "receipt_count": 56,
+    "successful_hashes": 53,
+    "all_hashes_verified": true,
+    "gate_failures": [],
+    "saved_array_failures": [],
+    "evidence_file": "actual_ncp_audit.json",
+    "reviewed_utc": "2026-10-15T14:19:43.716314+00:00"
+  },
+  "NCP_test_logs": {
+    "matrix_backend_test": "1 test passed in0.060s",
+    "microphysics_tests": "4 tests passed in0.347s",
+    "scf_fallback_test": "1 test passed in0.326s"
+  },
+  "NCP_H_action_scaling": {
+    "threads": [
+      4,
+      8,
+      12
+    ],
+    "median_seconds": [
+      1.3752872139884857,
+      0.7317672250064788,
+      0.5228457550110761
+    ],
+    "maximum_action_difference_norm": 8.956830880459022e-16,
+    "recommended_threads": 12
+  },
+  "source_v4_sha256": "4d503b40f104b8b91436fa68a9546225e2a092580ad47cafee54ee9b17772077",
+  "source_v5_sha256": "10f63af7d589210c6def57c9f1167efa19541ef8c294bae95514d10c820436a7"
+}

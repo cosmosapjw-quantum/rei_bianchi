@@ -1,0 +1,35 @@
+{
+  "schema": "rei.r9.unit5.t4_recovery_dag_append.v1",
+  "basis_commit": "6391f3f8bbf34f16c7b36013d424183786a51086",
+  "allocation_id": "REI-R9-UNIT5-20261016T024854Z_99ca7c",
+  "deadline_utc": "2026-10-16T04:48:54.971486Z",
+  "nodes": [
+    {
+      "id": "T4_CHECKPOINT128_REUSE",
+      "status": "PASS_SCOPED_INTERNAL_GATES",
+      "evidence": "existing checkpoint and milestone recovered and hashed; 70 actions, no regeneration",
+      "claim_ceiling": "finite saved-complement projected spectrum"
+    },
+    {
+      "id": "T4_64_TO_128_REFINEMENT",
+      "status": "HOLD",
+      "evidence": "all three eta refinement pairs exceed at least the spectrum-L1 threshold 0.001; eta0.05 and eta0.1 CDF also exceed threshold"
+    },
+    {
+      "id": "T4_ZERO_H_RESIDUAL_POSTPROCESSING",
+      "status": "DEFERRED_WALL_LIMIT",
+      "evidence": "receipt present; exit -9 at fixed deadline; residual_summary.json, residual.npz and success recovery receipt absent; no H actions"
+    },
+    {
+      "id": "T4_NEXT_READY",
+      "status": "READY_METHOD_REVIEW_ONLY",
+      "action": "Review the O(N_grid*d*m) direct residual-evaluation cost and select a bounded zero-H evaluation strategy; do not execute in this recovery intake and do not recreate checkpoint128"
+    },
+    {
+      "id": "PHYSICAL_CONTINUUM_AND_BASIS_CLOSURE",
+      "status": "OPEN_HOLD",
+      "evidence": "No exclusive continuum operator, EC operator, or complete-basis closure established"
+    }
+  ],
+  "forbidden_transition": "Do not reset the expired deadline, rerun the existing postprocessor under this allocation, or regenerate the length-128 checkpoint."
+}

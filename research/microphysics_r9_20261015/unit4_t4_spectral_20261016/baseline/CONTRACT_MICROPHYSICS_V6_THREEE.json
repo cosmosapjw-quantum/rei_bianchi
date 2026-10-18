@@ -1,0 +1,103 @@
+{
+  "contract_id": "R9-FCI-BO-QUENCH-RESPONSE-v6-threeelectron-occupation-list",
+  "frozen_date": "2026-10-15",
+  "inherits": [
+    "CONTRACT_MICROPHYSICS_V2.json",
+    "CONTRACT_MICROPHYSICS_V3_TWOE.json",
+    "CONTRACT_MICROPHYSICS_V4_SCF.json"
+  ],
+  "scope": "threeelectron_(2,1)_nonsymmetry_common_basis_quench_with_norb_ge64",
+  "physical_model_unchanged": true,
+  "solver": {
+    "class": "pyscf.fci.direct_spin1.FCI",
+    "spin_penalty": false,
+    "pspace_size": 0,
+    "davidson_only": true,
+    "nroots": 1,
+    "nelec": [
+      2,
+      1
+    ],
+    "same_original_H_residual_and_convergence_gates": true
+  },
+  "basis": {
+    "same_union_AO_and_shared_X": true,
+    "orbital_truncation": false,
+    "occupation_list_backend": "cistring.OIndexList and gen_linkstr_index_o1"
+  },
+  "post_solve_spin": {
+    "RDM_method": "direct_spin1.make_rdm12s",
+    "method": "spin_op.spin_square_general(dm1a,dm1b,dm2aa,dm2ab,dm2bb,eye(n),ovlp=1)",
+    "target": 0.75,
+    "absolute_tolerance": 0.000001,
+    "forbidden_routes": [
+      "fix_spin_",
+      "contract_ss",
+      "spin_square0",
+      "solver.spin_square"
+    ],
+    "note": "module spin_op.spin_square is allowed only if installed source confirms its make_rdm12s/general path"
+  },
+  "memory": {
+    "include_three_dense_spin_RDM2_and_transients": true,
+    "release_after_spin_and_RDM1": true,
+    "aggregate_caps_unchanged": true
+  },
+  "validation": {
+    "small_actual_quench_vs_penalized_FCI_required": true,
+    "energy_abs_diff_Eh": 1e-9,
+    "P_ground_abs_diff": 1e-8,
+    "spin2_abs_diff": 0.000001,
+    "actual_ge64_case_required": true,
+    "existing_failed_case_preserved": true
+  },
+  "execution_cases": [
+    {
+      "id": "quench_Li_Be_union_aug_TZ_occ_list_v6",
+      "kind": "quench",
+      "basis": "aug-cc-pvtz",
+      "basis_elements": [
+        "Li",
+        "Be"
+      ],
+      "initial_symbol": "Li",
+      "final_symbol": "Be",
+      "initial_charge": 0,
+      "final_charge": 1,
+      "spin": 1,
+      "nelec": [
+        2,
+        1
+      ],
+      "resource_gated": true
+    }
+  ],
+  "failure_rule": "Failed spin gate is not accepted as doublet; report numerical/backend failure rather than physical no-go",
+  "sources": [
+    "https://pyscf.org/_modules/pyscf/fci/cistring.html",
+    "https://pyscf.org/_modules/pyscf/fci/direct_spin1.html",
+    "https://pyscf.org/_modules/pyscf/fci/spin_op.html",
+    "https://pyscf.org/_modules/pyscf/fci/rdm.html"
+  ],
+  "pilot_execution_cases": [
+    {
+      "id": "quench_Li_Be_union_aug_TZ_occ_list_v6",
+      "kind": "quench",
+      "basis": "aug-cc-pvtz",
+      "basis_elements": [
+        "Li",
+        "Be"
+      ],
+      "initial_symbol": "Li",
+      "final_symbol": "Be",
+      "initial_charge": 0,
+      "final_charge": 1,
+      "spin": 1,
+      "nelec": [
+        2,
+        1
+      ],
+      "resource_gated": true
+    }
+  ]
+}

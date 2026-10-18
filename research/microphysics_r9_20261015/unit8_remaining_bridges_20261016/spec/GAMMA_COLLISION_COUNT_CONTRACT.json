@@ -1,0 +1,78 @@
+{
+  "contract_id": "R9_UNIT8_C2_GAMMA_COLLISION_COUNT_V1",
+  "status": "FROZEN_FOR_BOUNDED_EXECUTION",
+  "authority_requested": "Astra",
+  "authority_observed": "UNKNOWN",
+  "parent_authorization": "separate5s target/10s hard ceiling for lightweight collision-count extension; original C unchanged",
+  "inherits": "spec/GAMMA_TRANSFER_CONTRACT.json",
+  "additional_reference": "evidence/GAMMA_TRANSFER_RESULT.json admitted first-collision result",
+  "source": "same exact Unit7 raw F history and gamma amplitude N0*0.104*DeltaF",
+  "scope": "fixed-background collision-number distribution and expected holding time; analytic expansion probability bound only",
+  "counts": [0,1,2,4,8,16],
+  "energy_grid": {"positive_nodes": [256,512], "spacing": "log", "min_eV": 1000, "max_eV": 477600, "sentinel_eV": 0},
+  "kernel": {
+    "angular_GL_primary": 128,
+    "angular_GL_refinement_fine_grid": 256,
+    "distribution": "normalized exact cold KN at each parent energy",
+    "projection": "two adjacent nodes with positive barycentric weights preserving number and Eout exactly",
+    "orientation": "P[daughter,parent], column stochastic, daughter energy<=parent energy",
+    "zero_state": "identity; sigma0=sigmaT; must remain unoccupied",
+    "no_clipping": true,
+    "initial": "one photon at exact477600eV endpoint node"
+  },
+  "recurrence": {
+    "p": "p_(k+1)=P*p_k",
+    "K_parent": "Eparent-sum_daughter E_daughter*P[daughter,parent]",
+    "K_cumulative": "K_(k+1)=K_k+dot(K_parent,p_k)",
+    "waiting_L": "L_(k+1)=L_k+sum_j p_k[j]/sigma0(E_j)",
+    "mean_elapsed_s": "L_n/(ne(zs)*c)",
+    "support_lower_eV": "E0/(1+2*n*E0/mec2)",
+    "projected_support_lower_eV": "continuous_support_lower*exp(-n*log(E0/1000)/(Npositive-1))",
+    "physical_support_leakage": "report probability below continuous support; not exact-zero acceptance for barycentric interpolant"
+  },
+  "time_bounds": {
+    "Gamma0": "ne(zs)*c*sigma0(E0)",
+    "mean_upper": "n/Gamma0",
+    "epsilon": [0.01,0.05],
+    "frozen_tail": "gammaincc(n,epsilon*Gamma0/Hs)",
+    "expanding_comparison_tail": "gammaincc(n,epsilon*exp(-3*epsilon)*Gamma0/Hs)",
+    "endpoint_margin": "if log((1+zs)/10001)<epsilon then expanding comparison probability bound=1; report its source mass",
+    "frozen_upper_quantiles": [0.99,0.999],
+    "upper_quantile_formula": "gammaincinv(n,p)/Gamma0",
+    "n0": "zero elapsed time and zero tail probability",
+    "variation_bounds": {"density": "1-exp(-3epsilon)", "redshift": "1-exp(-epsilon)", "H": "1-exp(-2epsilon)"}
+  },
+  "source_quadrature": {
+    "method": "raw DeltaF native history cells, log(1+z) cell midpoint; coarsening pairs adjacent cells",
+    "preserve_DeltaF": true,
+    "report": ["per gamma", "per initial donor", "per cosmic baryon", "per comoving cm^-3", "source-weighted mean elapsed and H*elapsed", "weighted probability bounds", "z10,z50,z90 diagnostics"]
+  },
+  "outputs": {
+    "result": "evidence/GAMMA_COLLISION_COUNT_RESULT.json",
+    "states": "evidence/gamma_collision_count_states.csv",
+    "kernel": "evidence/gamma_collision_count_kernel.npz",
+    "timing": "evidence/gamma_collision_count_timing.csv",
+    "note": "evidence/GAMMA_COLLISION_COUNT_EXECUTION.md"
+  },
+  "acceptance": {
+    "P_column_sum_absolute": 2e-12,
+    "parent_energy_relative": 2e-12,
+    "count_cumulative_energy_relative": 1e-11,
+    "sentinel_probability": 1e-14,
+    "prob_below_projected_support_minimum": 1e-14,
+    "support_energy_roundoff_relative": 1e-12,
+    "first_mean_vs_C_relative": 1e-9,
+    "grid_mean_and_L_relative": 0.003,
+    "grid_cumulative_K_over_E0_absolute": 0.001,
+    "grid_quantile_relative": 0.03,
+    "angular_mean_and_L_relative": 0.003,
+    "angular_quantile_relative": 0.03,
+    "source_refinement_relative": 0.0001,
+    "tiny_probability_source_refinement_absolute": 1e-8,
+    "bounds": "positive probabilities; energy nonincreasing; waiting<=n/Gamma0; tailsin[0,1]; rawsourceamplitudeunchanged"
+  },
+  "preexecution_correction": "replace arbitrary0.99continuous-support cutoff by proven exp(-n*Delta_logE) projected-support bound; retain physical leakage report and all observable convergence tolerances",
+  "limits": {"numerical_wall_target_s": 5, "numerical_wall_hard_s": 10, "product_code": false, "full_cosmological_cascade": false, "heat": false},
+  "next_action_on_pass": "independent scientific review, then energetic-electron cooling handoff",
+  "failure_action": "one targeted theory diagnosis/repair within cumulativehardceiling; no silent scope enlargement"
+}

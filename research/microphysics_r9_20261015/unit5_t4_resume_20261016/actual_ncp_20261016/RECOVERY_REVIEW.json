@@ -1,0 +1,72 @@
+{
+  "schema": "rei.r9.unit5.zero_h_residual_recovery_review.v1",
+  "reviewer_role": "read-only recovery evidence review",
+  "independent_of_original_implementation": "true for this intake examination only; no separate reviewer agent was used",
+  "decision": "PARTIAL_RESULT_RECOVERED; RESIDUAL_DIAGNOSTIC_HOLD",
+  "source_and_checkpoint": {
+    "source_binding": "PASS",
+    "identity_hashes_match_checkpoint_metadata": "PASS",
+    "checkpoint_sha256_matches_existing_PR151_checkpoint_receipt": "PASS",
+    "source_code_sha256_matches_PR151_head": "PASS",
+    "archive_npz_crc": "PASS",
+    "checkpoint_SHA256_recomputed": "PASS"
+  },
+  "actual_execution": {
+    "allocation_id_matches": true,
+    "fixed_deadline_preserved": true,
+    "max_new_H_actions": 70,
+    "observed_new_H_actions": 70,
+    "residual_recovery_H_actions": 0,
+    "active_matching_process_at_intake": false,
+    "original_failure": "np.trapz missing in NumPy 2.5.4; eager getattr default evaluated np.trapz even when np.trapezoid existed",
+    "repair_attempt": "executed but did not finish before fixed deadline; supervisor wall_limit and exit -9"
+  },
+  "declared_gates": {
+    "reconstruction": {
+      "pass_count": 9,
+      "total": 9
+    },
+    "cached_operator_seam": {
+      "pass_count": 3,
+      "total": 3,
+      "max_scaled_error": 1.0763813711854046e-15
+    },
+    "checkpoint128_internal_milestone": "PASS",
+    "refinement_threshold": 0.001,
+    "eta_0.05": {
+      "spectrum_L1_over_W": 0.07681738135701295,
+      "max_CDF_change_over_W": 0.003688887437478915,
+      "window_mass_change_over_W": 0.0007687406276918659,
+      "status": "HOLD"
+    },
+    "eta_0.1": {
+      "spectrum_L1_over_W": 0.031964668911699044,
+      "max_CDF_change_over_W": 0.0014095139981823764,
+      "window_mass_change_over_W": 0.00039140279655848866,
+      "status": "HOLD"
+    },
+    "eta_0.2": {
+      "spectrum_L1_over_W": 0.0074765095988159995,
+      "max_CDF_change_over_W": 0.00026695849430701847,
+      "window_mass_change_over_W": 9.54086026208798e-05,
+      "status": "HOLD"
+    }
+  },
+  "interpretation": {
+    "W": 0.4243608179922081,
+    "W_meaning": "finite retained-space daughter ground-state complement spectral weight; NOT an ionization probability",
+    "finite_model_scope": "saved-complement projected Be+ spectrum in the 92-orbital finite space",
+    "physical_continuum": "UNKNOWN/HOLD",
+    "electron_capture": "OPEN",
+    "basis_closure": "OPEN",
+    "residual_diagnostic_numerical_output": "MISSING",
+    "residual_diagnostic_terminal_state": "DEFERRED_WALL_LIMIT"
+  },
+  "limits": [
+    "The existing 128 checkpoint and milestone are authentic and readable, but the zero-H residual summary was not produced.",
+    "A repair source intended to avoid the eager np.trapz fallback was present and launched; no scientific success is inferred from source inspection because it timed out.",
+    "No repeated checkpoint creation, H-action, postprocessor replay, deadline reset, or gate relaxation occurred.",
+    "Exit -9 denotes supervisor wall-limit termination; it is not a successful completion."
+  ],
+  "next": "READY_METHOD_REVIEW_ONLY; any future computation needs a distinct explicit allocation and must reuse the extant 128 checkpoint. The expired deadline remains immutable."
+}

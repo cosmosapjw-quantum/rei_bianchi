@@ -1,0 +1,406 @@
+{
+  "contract_id": "R9-FCI-BO-QUENCH-RESPONSE-v1",
+  "frozen_date": "2026-10-15",
+  "status": "specification_not_execution_receipt",
+  "model": {
+    "units": {
+      "length": "a0",
+      "energy": "Eh",
+      "dipole": "e*a0"
+    },
+    "hamiltonian": "nonrelativistic point-nucleus all-electron Coulomb clamped infinite nuclear mass",
+    "cart": false,
+    "ecp": false,
+    "frozen_core": false,
+    "density_fitting": false,
+    "solver": "FCI",
+    "isotope_effects_included": false,
+    "excluded": [
+      "finite_mass",
+      "mass_polarization",
+      "nuclear_recoil",
+      "relativistic_QED",
+      "finite_nuclear_size",
+      "hyperfine",
+      "nonadiabatic"
+    ]
+  },
+  "atomic": {
+    "required_species": [
+      {
+        "id": "Li",
+        "symbol": "Li",
+        "Z": 3,
+        "charge": 0,
+        "nelec": [
+          2,
+          1
+        ],
+        "spin": 1,
+        "state": "2S_even"
+      },
+      {
+        "id": "Li_plus",
+        "symbol": "Li",
+        "Z": 3,
+        "charge": 1,
+        "nelec": [
+          1,
+          1
+        ],
+        "spin": 0,
+        "state": "1S_even"
+      },
+      {
+        "id": "He",
+        "symbol": "He",
+        "Z": 2,
+        "charge": 0,
+        "nelec": [
+          1,
+          1
+        ],
+        "spin": 0,
+        "state": "1S_even"
+      }
+    ],
+    "bases": [
+      "cc-pvdz",
+      "cc-pvtz",
+      "cc-pvqz"
+    ],
+    "diffuse_species": [
+      "Li",
+      "Li_plus"
+    ],
+    "diffuse_bases": [
+      "aug-cc-pvdz",
+      "aug-cc-pvtz"
+    ],
+    "optional_core_bases": [
+      "cc-pcvdz",
+      "cc-pcvtz"
+    ],
+    "nroots": 1,
+    "threshold": "E_Li_plus_minus_E_Li_same_Li_AO_basis"
+  },
+  "quench": {
+    "mandatory": {
+      "id": "He_to_Li_plus",
+      "initial_Z": 2,
+      "final_Z": 3,
+      "nelec": [
+        1,
+        1
+      ],
+      "spin": 0,
+      "basis_element": "Li",
+      "bases": [
+        "aug-cc-pvdz",
+        "aug-cc-pvtz",
+        "aug-cc-pvqz"
+      ]
+    },
+    "optional": {
+      "id": "T_minus_to_He",
+      "initial_Z": 1,
+      "final_Z": 2,
+      "nelec": [
+        1,
+        1
+      ],
+      "spin": 0,
+      "basis_mode": "concatenate_H_He_AO_basis_at_same_origin",
+      "bases": [
+        "aug-cc-pvdz",
+        "aug-cc-pvtz",
+        "aug-cc-pvqz"
+      ],
+      "bound_parent_gate": "E_Hminus_less_than_E_H_same_retained_basis"
+    },
+    "orthogonalization": {
+      "type": "canonical_shared",
+      "relative_eigenvalue_cutoff": 1e-10,
+      "sensitivity_cutoff": 1e-09,
+      "separate_parent_daughter_orbital_rotations": false
+    },
+    "nroots": 1,
+    "outputs": [
+      "parent_CI",
+      "daughter_CI",
+      "shared_X",
+      "P_ground",
+      "complement_norm",
+      "orthogonality",
+      "daughter_H_mean",
+      "daughter_H2_mean",
+      "daughter_H_variance"
+    ],
+    "complement_label": "unresolved_bound_plus_continuum_excitation"
+  },
+  "molecular": {
+    "geometry": "A at (0,0,-R/2), B at (0,0,+R/2), unit Bohr",
+    "symmetry": "C2v",
+    "wfnsym": "A1",
+    "nroots": 1,
+    "counterpoise_required": true,
+    "dipole_shape": [
+      3
+    ],
+    "dipole_convention": "electronic -sum_i r_i plus nuclear sum_A Z_A R_A, midpoint origin",
+    "cases": [
+      {
+        "id": "LiH",
+        "atoms": [
+          "Li",
+          "H"
+        ],
+        "charge": 0,
+        "spin": 0,
+        "nelec": [
+          2,
+          2
+        ],
+        "state": "X1Sigma+",
+        "R_a0": [
+          2,
+          2.5,
+          3,
+          3.2,
+          3.5,
+          4,
+          5,
+          6,
+          8,
+          12,
+          20,
+          30
+        ],
+        "bases": [
+          "cc-pvdz",
+          "aug-cc-pvdz"
+        ],
+        "optional_basis": "cc-pvtz",
+        "optional_R_a0": [
+          2.5,
+          3,
+          3.2,
+          4,
+          8,
+          20
+        ]
+      },
+      {
+        "id": "LiHe",
+        "atoms": [
+          "Li",
+          "He"
+        ],
+        "charge": 0,
+        "spin": 1,
+        "nelec": [
+          3,
+          2
+        ],
+        "state": "X2Sigma+",
+        "R_a0": [
+          4,
+          6,
+          8,
+          10,
+          11.5,
+          13,
+          16,
+          20,
+          30,
+          40
+        ],
+        "bases": [
+          "cc-pvdz"
+        ],
+        "budget_gated_bases": [
+          "aug-cc-pvdz"
+        ]
+      }
+    ],
+    "fragment_states": {
+      "Li": {
+        "charge": 0,
+        "spin": 1,
+        "nelec": [
+          2,
+          1
+        ]
+      },
+      "H": {
+        "charge": 0,
+        "spin": 1,
+        "nelec": [
+          1,
+          0
+        ]
+      },
+      "He": {
+        "charge": 0,
+        "spin": 0,
+        "nelec": [
+          1,
+          1
+        ]
+      }
+    },
+    "output_energies": [
+      "E_AB",
+      "E_A_own",
+      "E_B_own",
+      "E_A_ghostB",
+      "E_B_ghostA",
+      "V_raw",
+      "V_CP"
+    ]
+  },
+  "response": {
+    "species": "Li",
+    "bases": [
+      "aug-cc-pvdz",
+      "aug-cc-pvtz"
+    ],
+    "observable": "finite_Gaussian_projected_dipole_response",
+    "dipole": "P sum_i r_i P",
+    "source": "(D_a-mean_D_a)*CI0",
+    "moments": [
+      0,
+      1,
+      2
+    ],
+    "lanczos_steps": [
+      32,
+      64,
+      128
+    ],
+    "optional_steps": 256,
+    "eta_Eh": [
+      0.02,
+      0.01,
+      0.005
+    ],
+    "omega_grid_Eh": {
+      "min": 0,
+      "max": 2,
+      "step": 0.002
+    },
+    "reorthogonalization": true,
+    "TRK_diagnostic": "(2/3)*sum_a <b_a|(H-E0)|b_a>; complete_space_reference_N=3",
+    "cross_sections_authorized": false,
+    "physical_continuum_status": "missing_provider_or_boundary_validation"
+  },
+  "numerics": {
+    "scf_energy_tolerance_Eh": 1e-12,
+    "scf_max_cycles": 150,
+    "fci_energy_tolerance_Eh": 1e-11,
+    "fci_max_cycles": 200,
+    "davidson_max_space": 40,
+    "norm_abs_tol": 1e-10,
+    "orbital_metric_inf_tol": 1e-08,
+    "rdm_trace_abs_tol": 1e-08,
+    "spin2_abs_tol": 1e-06,
+    "original_H_residual_Eh": 1e-07,
+    "two_electron_residual_target_Eh": 1e-09,
+    "projection_closure_abs_tol": 1e-10,
+    "quench_orthogonality_abs_tol": 1e-10,
+    "energy_rerun_diff_Eh": 1e-09,
+    "lanczos_moment_tol": "1e-8*max(1,abs(moment))",
+    "lanczos_Gram_defect": 1e-08,
+    "response_chain_relative_L1_target": 0.001
+  },
+  "basis_targets_not_guaranteed": {
+    "Li_ionization_energy_delta_Eh": 0.0001,
+    "quench_probability_delta": 0.0001,
+    "LiH_near_minimum_CP_delta_Eh": 0.0001,
+    "LiHe_well_CP_delta_Eh": 1e-06,
+    "failure_action": "retain_actual_series_and_label_basis_unconverged"
+  },
+  "resources": {
+    "host_logical_cpus_reported": 64,
+    "host_Ram_GiB_approx": 125,
+    "aggregate_cpu_cap": 48,
+    "aggregate_RSS_cap_GiB": 96,
+    "pilot_threads": 4,
+    "pilot_memory_GiB": 16,
+    "pilot_wall_s": 1800,
+    "production_threads": 12,
+    "production_memory_GiB": 24,
+    "production_max_workers": 4,
+    "production_case_wall_s": 7200,
+    "family_wall_s": 21600,
+    "LiHe_optional_memory_GiB": 32,
+    "LiHe_optional_max_workers": 3,
+    "determinant_dimension_cap": 10000000,
+    "dense_ERI_cap_GiB": 8,
+    "predicted_memory_fraction_cap": 0.75,
+    "host_headroom_stop_GiB": 20,
+    "dense_manybody_H_allowed": false,
+    "environment": {
+      "OMP_NUM_THREADS": "allocated",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    }
+  },
+  "pilots": [
+    {
+      "family": "atomic",
+      "species": "Li",
+      "basis": "aug-cc-pvtz"
+    },
+    {
+      "family": "quench",
+      "id": "He_to_Li_plus",
+      "basis": "aug-cc-pvtz"
+    },
+    {
+      "family": "molecular",
+      "id": "LiH",
+      "basis": "aug-cc-pvdz",
+      "R_a0": 3.2
+    },
+    {
+      "family": "molecular",
+      "id": "LiHe",
+      "basis": "cc-pvdz",
+      "R_a0": 11.5
+    },
+    {
+      "family": "response",
+      "species": "Li",
+      "basis": "aug-cc-pvdz",
+      "lanczos_steps": 32
+    }
+  ],
+  "required_result_fields": [
+    "implementation_checked",
+    "finite_model_numerics_passed",
+    "basis_target_met",
+    "physical_scope",
+    "remaining_dependencies",
+    "expanded_basis_sha256",
+    "source_sha256",
+    "input_sha256",
+    "versions",
+    "command",
+    "wall_s",
+    "aggregate_peak_RSS",
+    "exit_code",
+    "CI_wavefunctions",
+    "RDM",
+    "residuals",
+    "stdout_stderr"
+  ],
+  "sources": [
+    "https://pyscf.org/user/ci.html",
+    "https://pyscf.org/_modules/pyscf/fci/direct_spin1.html",
+    "https://pyscf.org/pyscf_api_docs/pyscf.gto.html",
+    "https://arxiv.org/abs/1001.0120",
+    "https://doi.org/10.1007/s004600050118",
+    "https://jupiter.chem.uoa.gr/pchem/pubs/pdf/JPCA_104(2000)408.pdf"
+  ]
+}

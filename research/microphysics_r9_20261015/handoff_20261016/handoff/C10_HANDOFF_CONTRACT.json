@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "unit_id": "C10-NCP-TERMINAL-RECOVERY",
+  "scope": "Recover one previously launched V6 case, preserve evidence, validate finite-model results, publish full portable handoff; no new physics execution by default",
+  "status": "contract_ready_for_implementation",
+  "current_runtime": "unknown",
+  "current_claim_verdict": "unresolved_missing_terminal_evidence",
+  "phase": "C10",
+  "source_archive_sha256": "725cf8bf53d366b179d41708c4efc9477b29c6c6e0a748ac2d3585dbe33709a1",
+  "pr151_intake_head": "57e6e2d79c1a1ea4786d83b36c871abf581be738",
+  "protected_owner": {
+    "pr": 150,
+    "head": "fe789b0b13b1883c5a74cbc907f72f6f963a5d66",
+    "campaign": "full005",
+    "deadline_utc": "2026-10-16T02:50:17.774070Z",
+    "runtime": "unknown",
+    "action": "leave_untouched_regardless_of_deadline"
+  },
+  "ncp_root": "/root/REI_MICROPHYSICS_R9_20261015",
+  "case_id": "quench_Li_Be_union_aug_TZ_occ_list_v6",
+  "case_relative_path": "runs/threeelectron_v6/quench_Li_Be_union_aug_TZ_occ_list_v6",
+  "identities": [
+    {
+      "path": "code/microphysics_driver_v6.py",
+      "sha256": "31cdd14df59ffc6208561cb3c61ff4bd114240c380693ff5789e14441e7c091c"
+    },
+    {
+      "path": "CONTRACT_MICROPHYSICS_V6_THREEE.json",
+      "sha256": "cf7b06ad72815513e799be253539bdfecfb9102c1fc586589003e8b6fd364e4d"
+    },
+    {
+      "path": "ncp_results/runs/threeelectron_v6/quench_Li_Be_union_aug_TZ_occ_list_v6/input.json",
+      "sha256": "289520d8aed460cdee460f5497762b0c613f003bd6ba43bb505416d945995097"
+    },
+    {
+      "path": "ncp_results/runs/threeelectron_v6/quench_Li_Be_union_aug_TZ_occ_list_v6/launch.json",
+      "sha256": "cc5e4f0374556037b33e044700018c9d5a1d41c873d0e7c7ea38765ee153c633"
+    },
+    {
+      "path": "ncp_results/requirements.lock",
+      "sha256": "77998770b18bf3f363f0699354b93951305a9df68999bbf86acfab1a88483ea5"
+    },
+    {
+      "path": "tests/test_threeelectron_occupied_list.py",
+      "sha256": "25361d57dd8c5602f73ab0c9e8af9ec91584a7e55d65ad065413e3e4ccd4b377"
+    },
+    {
+      "path": "ncp_results/threeelectron_backend_test.log",
+      "sha256": "357e9edd73f4ac4b46844287af88c873f023336e05325eaa604ed45518a69d67"
+    }
+  ],
+  "resources": {
+    "threads": 12,
+    "memory_gib": 24,
+    "workers": 1,
+    "wall_s": 7200,
+    "family_wall_s": 7200,
+    "cpu_cap": 48,
+    "memory_cap_gib": 96,
+    "min_host_headroom_gib": 20
+  },
+  "required_package": "complete verified Unit2 archive/tree plus this contract, recovery script, state/gate fixture tests, manifests, concrete NCP Codex prompt",
+  "required_script_modes": [
+    "inspect",
+    "collect"
+  ],
+  "runtime_classes": [
+    "complete-success",
+    "complete-fail",
+    "in-progress",
+    "stale",
+    "missing"
+  ],
+  "inspection_blocked_runtime": "unknown",
+  "classification_requirements": {
+    "complete-success": "stable terminal receipt and NPZ; all identity and gates accepted; no matching live process",
+    "complete-fail": "terminal failed/deferred receipt OR terminal validation failure; no matching live process",
+    "in-progress": "exact command/cwd/start-identity matched live worker or supervisor",
+    "stale": "no live process or terminal receipt but attempted-run/partial artifacts exist",
+    "missing": "actual accessible-root and process inspection finds no artifacts/process/terminal receipt; historical launch still retained"
+  },
+  "worker_mode_unsafe_alone": "case lacks wall supervisor and can overwrite out; use guarded run supervisor",
+  "run_exit_zero_sufficient": false,
+  "checkpoints": "final data/receipt only; no saved iterative solver restart",
+  "numerical_gates": {
+    "parent_and_daughter": {
+      "norm_error_max": 1e-10,
+      "orthogonality_inf_max": 1e-08,
+      "rdm_trace_error_max": 1e-08,
+      "spin_error_max": 1e-06,
+      "original_H_residual_Eh_max": 1e-07,
+      "fci_converged": true,
+      "spin_squared_target": 0.75,
+      "nelec": [
+        2,
+        1
+      ],
+      "norb_min": 64,
+      "backend": "unpenalized_direct_spin1_occupied_list_capable_RDM_spin"
+    },
+    "quench": {
+      "closure_error_max": 1e-10,
+      "ground_complement_overlap_max": 1e-10,
+      "array_identity_error_max": 1e-10
+    },
+    "required_arrays": [
+      "CI_parent",
+      "CI_daughter_ground",
+      "CI_complement",
+      "common_orbital_matrix",
+      "AO_overlap_eigenvalues",
+      "rdm1_parent",
+      "rdm1_daughter"
+    ],
+    "array_finiteness": true,
+    "data_sha256_match": true,
+    "receipt_source_input_contract_match": true,
+    "original_H_recomputed_by_archive_validation": false
+  },
+  "return_files": [
+    "inspection.json",
+    "STATUS.md",
+    "process snapshot",
+    "runtime/dependency identities",
+    "copied original attempt evidence",
+    "validation.json",
+    "SHA256 manifest",
+    "collector command/stdout/stderr/exit",
+    "Unit3 recovery archive",
+    "provider/object/hash acknowledgements"
+  ],
+  "separate_status_axes": [
+    "runtime_class",
+    "claim_verdict",
+    "validation",
+    "durable_storage"
+  ],
+  "accepted_claim_scope": "finite common-space Li-to-Be+ sudden ground projection and unresolved complement",
+  "physical_closure": {
+    "li_bound": "open",
+    "li_continuum": "open",
+    "molecular_lowT": "open",
+    "daughter_correlated": "open",
+    "nuclear_precision": "open",
+    "atomic_charge_cascade": "open",
+    "bbn17": "open",
+    "full_transport": "open"
+  },
+  "next_repair": "User-authorized constructive bounded repair may follow diagnosed actual failure with preserved original evidence, changed-dependency contract and new attempt identity; no blind replay",
+  "contract_md_sha256": "0c069d66f3e793de0ce22e841c848325d93eacf08d9d4f620198b56c44f15405",
+  "subsequent_attempt": {
+    "execution": "manual Codex decision under existing continue authorization, not C10 script subcommand",
+    "preconditions": [
+      "actual failed or missing-artifact diagnosis",
+      "preserve all original evidence",
+      "new bounded repair/reconstruction identity with exact source/input/gates/resources",
+      "new attempt label and never-existing output root",
+      "current matching-process and resource check",
+      "exclusive local case lock"
+    ],
+    "template": "immutable or explicitly versioned driver run supervisor; see MD exact template",
+    "no_blind_replay": true,
+    "never_completed_proof_required": false
+  }
+}

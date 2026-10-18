@@ -1,0 +1,70 @@
+{
+  "schema": "rei.r9.unit6.independent_implementation_review.v1",
+  "lane": "EC",
+  "decision": "PASS_SCOPED_LOCAL_IMPLEMENTATION",
+  "reviewer": {
+    "role": "independent scientific reviewer",
+    "requested_model": "Astra high",
+    "observed_runtime_model": "UNKNOWN"
+  },
+  "scope": "Charge-resolved no-shakeoff EC event maps, prescribed frozen-hazard kernel, nine-state nuclear generator and actual-donor conditional families with a 22-population bookkeeping adapter.",
+  "review_method": "Read code, tests, raw EC_RESULTS.json and EC_TEST_LOG.txt; inspect numerical records and compare donor identity, original bridge assignments and packaging authorization. No suite rerun, new experiment or implementation edit.",
+  "implementation_checks": [
+    "Bound q0..3 deposits into Li_q; continuum q1..4 deposits into Li_(q-1). Bare bound and neutral continuum hazards/counts raise explicit forbidden-channel errors.",
+    "Parent budget and continuum electron budget are checked before updates. Explicit delta_free,delta_bound and nuclear/ionic-charge rewards preserve donor-scale signals independently of rounded order-one backgrounds.",
+    "Tiny allowed electron-budget residuals remain raw and are reported without clipping, as prescribed by the frozen engineering tolerance. This is not a claim that negative physical inventories are admissible.",
+    "Frozen exponential competition branches correctly and zero hazards are exact. Continuum density conversion is explicitly prescribed rather than dynamically closed.",
+    "Nine-state generator has nonnegative off-diagonals and zero column sums within roundoff. Electron ledgers remain outside the one-particle generator.",
+    "Uniformization splits nu*dt to<=10 and uses compensated Poisson accumulation. Its descending-ratio geometric bound on omitted positive terms and summed split bound are valid; finite truncation is disclosed.",
+    "All 8 channels are checked at unit and donor scale, with competition, zero hazard, electron-budget/forbidden-channel rejections, split uniformization and independent SciPy matrix exponential references.",
+    "Actual donor is read by frozen SHA and source commit. All original excluded nuclides are preserved except Be7 moved once into auxiliary bins. Existing H/D/T/He/Li charge assignments match CONTRACT_BRIDGE.md and remain conditional.",
+    "22-population adapter is distinct from the 9-population evolving nuclear subsystem and claims no native17 change. Original baryon normalization defect remains unrepaired.",
+    "106.4-day clock applies only to prepared Be3 with fixed statistical hyperfine populations and no charge exchange or continuum capture. Exposure families do not infer a cosmological epoch.",
+    "Actual heat is null NEEDS_ENERGY_PARTITION. Synthetic energy identity is explicitly nonphysical input; no neutrino or gamma energy is silently deposited as heat."
+  ],
+  "observed": {
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "test_log_seconds": 0.149,
+    "recorded_internal_wall_seconds": 0.1430517519984278,
+    "raw_observations": 32,
+    "max_uniformization_vs_analytic_error": 1.2878587085651816e-14,
+    "max_scipy_expm_vs_analytic_error": 3.3306690738754696e-15,
+    "max_omitted_tail_bound": 9.72483562957141e-15,
+    "max_generator_column_sum_residual": 1.1102230246251565e-16,
+    "tracked_population_count": 22,
+    "generator_population_count": 9,
+    "Be_move_count": 1,
+    "donor_full_baryons": 1.0000000000016263,
+    "donor_normalization_defect_unrepaired": 1.6262546864709293e-12,
+    "baryon_map_residual": -2.220446049250313e-16,
+    "tracked_electron_closure_residual": 0.0,
+    "analytic_complete_Li_total": 4.0031894524853e-10,
+    "conditional_Be3_lambda_s_inverse": 7.539978206801131e-08
+  },
+  "reviewed_files_sha256": {
+    "spec/EC_CONTRACT.json": "e3198ec167637b59f1ba597ab03ec9eaaac9225b4ba542d3ebd61e2cfe3399e1",
+    "spec/EC_THEORY.md": "7479f1e5714f2139286ce5857999daaffbff20c43a465dc55d0954c87d17a1d1",
+    "code/ec_bridge.py": "4628f741efac3d416a32a1cd8c855cb3dde79ae5031aee88743fef120cfd8f06",
+    "tests/test_ec_bridge.py": "a27abbe500ad827069ea0179ff00bf2188682feeb4a582a2851634239431a121",
+    "evidence/EC_RESULTS.json": "b044ea1f3c8c13fcacb0b72a8ddfcf22d0c96f30f22140593ef35cb074b2b4c6",
+    "evidence/EC_TEST_LOG.txt": "76962f53611a4e5cc37a5e8e72bac34de3f809d1993ef7e56354f83e66f561bf",
+    "inputs/laneC/R5_DONOR_BBN.json": "47f93645a4c4fbcba0a6c3d1a9f8290adf847f011ab04d29b448633ec8525417",
+    "progress/PATH_MAPPING.json": "38f7e44de6c53a35dfab048d23a658fc17bcb3b4951ed690549db35498ff3527"
+  },
+  "findings": [],
+  "repair_authorizations": [],
+  "implementation_edits": false,
+  "claim_ceiling": [
+    "Locally validated bounded conditional kernel and donor bookkeeping only.",
+    "Prescribed hazards are not a dynamically closed plasma or a full recombination/EC history.",
+    "No actual charge-specific rate inference beyond the explicitly conditional approximate Be3 clock.",
+    "No daughter electronic-state/shakeoff prediction, thermal history, native17 implementation or physical checkpoint advancement."
+  ],
+  "physical_H_actions": 0,
+  "NCP_actions": 0,
+  "actual_checkpoint_execution": "NOT_RUN",
+  "actual_refinement": "HOLD",
+  "next_action": "Publish scoped EC code, exact-donor conditional output and preserved raw validation with unresolved physical-input boundary."
+}

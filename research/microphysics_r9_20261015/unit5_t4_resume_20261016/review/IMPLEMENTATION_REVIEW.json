@@ -1,0 +1,126 @@
+{
+  "schema": "rei.r9.unit5.implementation_review.v1",
+  "reviewed_utc": "2026-10-16T02:34:24.436727+00:00",
+  "reviewer_role": "fresh independent scientific reviewer; read-only code/evidence inspection; review artifact writes only",
+  "requested_model": "Astra",
+  "requested_reasoning": "high",
+  "observed_runtime_model": "UNKNOWN",
+  "decision": "PASS_SCOPED_LOCAL_IMPLEMENTATION",
+  "admission": "Accept the bounded dense continuation, legacy-format adapter behavior, residual diagnostic, and preparation of the native entry point. No actual-checkpoint, native PySCF, physical128, production performance, or spectral-refinement admission.",
+  "reviewed_sha256": {
+    "spec/THEORY.md": "5633227e85b0dab3aedeafce1c6056ed069445b500c8d99a2c542be38674fbef",
+    "spec/CONTRACT.json": "330afa67aa5688942317b2c1555ba8a625260f8b49db645074de43292317d9a9",
+    "baseline/t4_spectral_repair001.py": "b9a14d1bfa192da17b7c2a6dfa20560964d553b3c0ba30343a45bb90ee09db7a",
+    "code/t4_resume.py": "2c19a310c7024c8e5249534a4b1e78acd1f30c1c44d9f9f00d78ad2abcc8926b",
+    "README.md": "1faf16e47c59ef07084cd77844a9521f5f551401e22f13f8056bbc7d7f6a6f82",
+    "tests/test_resume.py": "21cc832020dca4fbd59b4b4c90544bc15d814cf53a8977633a6a90cad0852cfd",
+    "tests/native_fixture_worker.py": "c0bdc64c1b225413bb1b2baa220510050742a2e2b94b1eb6469dc77fe94d4ca4",
+    "tests/exact_fraction_check.py": "e69f3a21fafd6d0f66cf3a0d21d1eaf23f485aae378c5bdf332ac18cea40a2bf",
+    "tests/exact_resolvent_check.py": "b292e30f580f02223a6ebe82368c8b49e3d0a0eb7d6e191d74f2c215a9664aea",
+    "tests/run_evidence.py": "b3558c7a34385d2fb1e7131a233b443213a6d221522dabdd7e6404eaa6abff40",
+    "results/final_run/execution.json": "87fcba5e6bcf7e37234edcdfef62e677250da9b9a2f62add279dcef2001f44b8",
+    "results/final_run/tests.stderr.log": "4905b49d88b434b3868ac41ac6aa21a81fad330b90ac87312917f11aac4b0efb",
+    "results/final_run/exact_fraction.stdout.log": "f35ed9759df304bcf81248f567b59ba354e7d554f03b3525170574b953123ec1",
+    "results/final_run/dense_observations.json": "f87eb1e5a8d2aa08b7e0670b0a88b1dd73af56d7deee35d1776c6cea72c34f4c",
+    "results/final_run/native_fixture_worker/receipt.json": "a20ebf648fedd02269633520a6a4be484aea3a6c105af7e01392598314b7205b",
+    "results/final_run/native_fixture_worker/operator_seam.json": "24ed362180b6f1eee48991ced6478f6eed13a1c6aa444d5bfca2afa89ff04e6b",
+    "results/final_run/native_fixture_worker/residual_summary.json": "550179e9842c618a4b540cb2f19c9f0fc45b0b1810975424c2ddee2613c80bb5",
+    "results/final_run/native_fixture_worker/checkpoint.npz": "959e1ba526f7a81dde510dcb58546c23301ff2781c69bfd493e81ff1d9c365e3",
+    "results/final_run/native_fixture_worker/spectra.npz": "12b8c326827e825f30ab938c2ba27d2caabe67f97f71a69906a6536a536ad015",
+    "results/final_run/native_fixture_worker/residual.npz": "2c46b2afee696707843b41e1a848e4122a18ae04101278024723a1c3ac9fe929",
+    "results/final_run/prepared/allocation_template.json": "df16c8d381ba9910e3813cb5e067fd347f0a2201a1c07ab1b345b0742aaf2f32",
+    "evidence/WOLFRAM_ATTEMPTS.json": "20679da4f3cf113a4cfe21a408fa8b67423e72655c3c475ab039e4dd152ee620"
+  },
+  "method": "Inspected implementation, tests, raw logs, JSON receipts and saved NPZ arrays. No optional reruns, new Hamiltonian actions, or implementation edits. REPORT_KO.md remains a draft outside this numerical admission.",
+  "findings": [
+    {
+      "topic": "theory correspondence",
+      "decision": "PASS",
+      "evidence": "residual_diagnostic computes Hermitian J, full E=KV\u2212VJ, d=u\u2212V[:,0], and |(u\u2020V\u2212e1\u2020)t|, then multiplies the scalar bound by W/pi. It evaluates direct residual norms and does not replace E by the last recurrence beta or C. Saved synthetic spectra and scalar resolvent agree to 2.7755575615628914e-17 in density units."
+    },
+    {
+      "topic": "serialized continuation",
+      "decision": "PASS_LOCAL",
+      "evidence": "Legacy writer generates a file, load_checkpoint reloads and recompresses it, and resume_chain begins at j=m with saved next_vector and beta. Two-pass MGS uses all restored/new columns and preserves the recurrence prior-beta term. Raw tests compare spectra, direct moments, resolvents and projectors with uninterrupted runs. Real64\u219295 uses31 actions; complex32\u219264 uses32. No128-column chain was achieved or claimed."
+    },
+    {
+      "topic": "checkpoint and identity validation",
+      "decision": "PASS_LOCAL",
+      "evidence": "Shape/finiteness/vector/seam checks, inherited compressed gates, immutable receipt/data/V6 identities, pinned baseline, explicit legacy runner/operator mapping and current runner mapping are implemented. Legacy omitted corrections become null or matching milestone values; new corrections are numeric. Actual archive checksum is enforced in ordinary native_worker. Synthetic integration explicitly substitutes acquisition/input/reconstruction and is not evidence of actual archive compatibility."
+    },
+    {
+      "topic": "bounds and tests",
+      "decision": "PASS_LOCAL",
+      "evidence": "Eight captured unittest cases pass. Dense full-space eigenanalysis supplies an independent scalar resolvent comparison with coordinate defects. A separate J/C fixture catches using KV\u2212VC. Exact Fraction fallback proves its stated rational residual/error identities and sufficient bound inequality. Wolfram produced two errors, and SymPy imports failed; neither is counted as PASS."
+    },
+    {
+      "topic": "action accounting and native flow",
+      "decision": "PASS_LOCAL_PREPARATION",
+      "evidence": "Cached restoration consumes zero actions; reconstruction consumes3; sampled cache validation consumes3; extension consumes one per added column. The toy worker used37=3+3+31. Expired/empty budgets prevent new actions; post-action deadline crossing still charges the action. The native worker honors a restored scientific stopping decision before reconstruction, writes fresh output, and uses the unchanged repair001 reconstruction. The supervisor and bounded allocation prevent silent renewal. Native integration is synthetic, not a physical run."
+    },
+    {
+      "topic": "allocation and historical limits",
+      "decision": "PASS",
+      "evidence": "Prepared template is unauthorized/NOT_RUN. Activated CLI requires explicit allocation fields and fixed70-action/7200s/24GiB/thread ceilings; cap128 is hard-coded in continuation. Historical expired deadline and UNKNOWN [86,160] are retained. Toy receipt [123,197] is explicitly simulated bookkeeping, not a changed physical historical interval."
+    },
+    {
+      "topic": "production residual cost",
+      "decision": "NONBLOCKING_LIMITATION",
+      "evidence": "Direct evaluation costs O(Ngrid*d*m) for6003 points; actual385112-dimensional runtime and resource feasibility were not measured. The Gram optimization is optional in the frozen theory and unimplemented. No claim that native128 plus all residual output will finish in7200 seconds is admitted. This is not a new gate for the completed local scope."
+    }
+  ],
+  "observed_results": {
+    "tests_passed": 8,
+    "real_continuation": {
+      "from": 64,
+      "to": 95,
+      "extension_actions": 31,
+      "max_spectrum_difference": 0.0
+    },
+    "complex_continuation": {
+      "from": 32,
+      "to": 64,
+      "extension_actions": 32,
+      "max_spectrum_difference": 3.121808367367862e-14
+    },
+    "synthetic_native_worker": {
+      "from": 64,
+      "to": 95,
+      "new_toy_actions": 37,
+      "termination": "certified_invariant_subspace",
+      "campaign_interval": "SIMULATED [123,197] only"
+    },
+    "saved_NPZ_numeric_finite": true,
+    "initial_toy_attempt": "Preserved headroom deferral before any action",
+    "exact_fraction": "PASS",
+    "Wolfram": "NO_VERIFIED_WOLFRAM_OUTPUT",
+    "SymPy": "IMPORT_UNAVAILABLE"
+  },
+  "blocking_issues": [],
+  "targeted_repair_required": false,
+  "new_optional_gates": [],
+  "remaining_actual_dependencies": [
+    "Acquire the exact archived Unit4 checkpoint and unchanged frozen physical inputs.",
+    "Obtain a separate explicitly authorized new allocation before physical execution.",
+    "Run actual native reconstruction and the three sampled cache checks before physical extension; none has run in this unit.",
+    "Observe actual continuation/refinement and residual output under that allocation before making any new physical numerical admission."
+  ],
+  "claim_limits": {
+    "actual_checkpoint_compatibility": "NOT_RUN",
+    "native_PySCF_reconstruction": "NOT_RUN",
+    "actual128_continuation": "NOT_RUN",
+    "production_performance": "NOT_MEASURED",
+    "new_actual_physical_H_actions": 0,
+    "new_NCP_actions": 0,
+    "actual_Unit4_refinement": "HOLD",
+    "actual_Unit4_status": "PARTIAL_WALL_LIMIT",
+    "actual_historical_action_interval": [
+      86,
+      160
+    ],
+    "cached_bound": "Conditional floating-point residual diagnostic, not outward-rounded certification; three cache samples do not prove all cached actions.",
+    "physics": "Finite saved-complement projected measure only; no ionization probability, energy-normalized physical continuum, electron capture, or complete-basis closure."
+  },
+  "next_executable_action": "Finalize the report and publish/package this scoped local result; preserve actual-run dependencies. No remote execution is authorized by this review.",
+  "stopping_rule": "Review complete with no targeted repair; stop optional process work."
+}

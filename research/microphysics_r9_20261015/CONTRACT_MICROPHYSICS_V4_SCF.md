@@ -1,0 +1,7 @@
+# SCF orbital-initialization fallback V4
+
+Frozen ID R9-FCI-BO-QUENCH-RESPONSE-v4-scf-orbital-fallback. Complete retained-space FCI is invariant under unitary orbital rotations, so SCF convergence is not required for a valid FCI calculation. V1/V2 physical models and all original-Hamiltonian FCI residual, spin, norm and resource gates remain unchanged.
+
+At a failed/stagnant SCF, retain the full SCF MO matrix if it is finite, spans the complete retained orbital space, satisfies C.T S C=I within1e-8, and carries valid symmetry labels for the chosen solver. Otherwise use canonical overlap orthogonalization at the shared relative cutoff1e-10. When a C2v symmetry FCI solver is used, construct canonical orbitals within each irrep and preserve their correct labels; do not attach invented labels to arbitrary mixed orbitals. Recompute the original one- and two-electron integrals in those orbitals and solve the same complete FCI problem with unchanged charge, electron number, target spin and A1 molecular symmetry.
+
+Record scf_converged=false, actual SCF cycles, orbital_source, metric error, retained rank and independent FCI convergence/residual diagnostics. Acceptance requires FCI gates, not HF convergence. Never substitute HF energy, freeze orbitals, discard virtuals, or loosen a failed FCI residual to bypass this condition. The first requested retries are neutral LiH R20 andR30a0. The three-electron >=64-orbital backend policy is unchanged. No physical dissociation hole should be introduced solely by failure of an unnecessary mean-field initialization.

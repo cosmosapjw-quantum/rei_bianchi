@@ -1,0 +1,117 @@
+{
+  "contract_id": "R9-final-bounded-basis-extension",
+  "frozen_date": "2026-10-15",
+  "inherits": [
+    "CONTRACT_MICROPHYSICS.json",
+    "CONTRACT_MICROPHYSICS_V2.json",
+    "CONTRACT_MICROPHYSICS_V3_TWOE.json",
+    "CONTRACT_MICROPHYSICS_V4_SCF.json",
+    "CONTRACT_MICROPHYSICS_V6_THREEE.json"
+  ],
+  "scope": "three_same_Hamiltonian_basis_extensions_only",
+  "execution_cases": [
+    {
+      "id": "atomic_Li_core_QZ_final",
+      "kind": "atomic",
+      "species": "Li",
+      "basis": "cc-pcvqz",
+      "resource_gated": true
+    },
+    {
+      "id": "atomic_Li_plus_core_QZ_final",
+      "kind": "atomic",
+      "species": "Li+",
+      "basis": "cc-pcvqz",
+      "resource_gated": true
+    },
+    {
+      "id": "quench_He_Li_union_aug_QZ_final",
+      "kind": "quench",
+      "basis": "aug-cc-pvqz",
+      "basis_elements": [
+        "He",
+        "Li"
+      ],
+      "initial_symbol": "He",
+      "final_symbol": "Li",
+      "initial_charge": 0,
+      "final_charge": 1,
+      "spin": 0,
+      "nelec": [
+        1,
+        1
+      ],
+      "resource_gated": true
+    }
+  ],
+  "pilot_execution_cases": [
+    {
+      "id": "atomic_Li_core_QZ_final",
+      "kind": "atomic",
+      "species": "Li",
+      "basis": "cc-pcvqz",
+      "resource_gated": true
+    },
+    {
+      "id": "atomic_Li_plus_core_QZ_final",
+      "kind": "atomic",
+      "species": "Li+",
+      "basis": "cc-pcvqz",
+      "resource_gated": true
+    },
+    {
+      "id": "quench_He_Li_union_aug_QZ_final",
+      "kind": "quench",
+      "basis": "aug-cc-pvqz",
+      "basis_elements": [
+        "He",
+        "Li"
+      ],
+      "initial_symbol": "He",
+      "final_symbol": "Li",
+      "initial_charge": 0,
+      "final_charge": 1,
+      "spin": 0,
+      "nelec": [
+        1,
+        1
+      ],
+      "resource_gated": true
+    }
+  ],
+  "model_unchanged": true,
+  "no_new_scattering_or_continuum_model": true,
+  "scientific_purpose": {
+    "matched_core_QZ": "Compare I_Q=E(Li+,cc-pCVQZ)-E(Li,cc-pCVQZ) to matched cc-pCVTZ; current DZ-to-TZ change0.000858Eh exceeds target1e-4Eh",
+    "quench_union_QZ": "Compare commonHe+Li union aug-QZ Pground to union aug-TZ; current DZ-to-TZ change0.00026647 exceeds target1e-4"
+  },
+  "backends": {
+    "twoelectron": "exact symmetric-matrix singlet backend at>=64; validated PySCF below64 permitted",
+    "threeelectron": "V6 unpenalized occupation-list direct_spin1 at>=64 with RDM spin_squared=.75 gate",
+    "all_cases": "complete retained orbital space; no frozen core; same infinite-mass point-nucleus Coulomb Hamiltonian"
+  },
+  "resources": {
+    "threads_per_case": 12,
+    "memory_GiB_per_case": 24,
+    "workers": 3,
+    "total_declared_threads": 36,
+    "total_declared_GiB": 72,
+    "aggregate_all_work_cpu_cap": 48,
+    "aggregate_all_work_RSS_GiB": 96,
+    "production_case_wall_s": 7200,
+    "family_wall_s": 21600,
+    "determinant_dimension_cap": 10000000,
+    "dense_ERI_cap_GiB": 8,
+    "predicted_RSS_fraction_cap": 0.75,
+    "explicit_threeelectron_spin_RDM2_memory": true,
+    "estimate_before_allocation": true
+  },
+  "acceptance": {
+    "all_prior_numerical_gates_unchanged": true,
+    "Li_ionization_delta_target_Eh": 0.0001,
+    "quench_probability_delta_target": 0.0001,
+    "basis_targets_are_empirical_not_rigorous_bounds": true,
+    "failure_action": "retain computed series and mark target unmet; no silent relaxation or further unbounded extension"
+  },
+  "immutability": "create new case IDs; preserve all prior source and receipts"
+}

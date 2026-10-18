@@ -1,0 +1,52 @@
+{
+  "basis_target_met": null,
+  "case": {
+    "basis": "aug-cc-pvqz",
+    "contract_id": "R9-FCI-BO-QUENCH-RESPONSE-v1",
+    "contract_sha256": "81be48898f6edbe07729c50f01104b4b7feb40bfdda3d47e63e02d93b15da9a2",
+    "id": "quench_He_Liplus_aug-cc-pvqz",
+    "kind": "quench",
+    "memory_gib": 16.0,
+    "s_cutoff": 1e-10,
+    "threads": 4
+  },
+  "case_sha256": "46cc30aae65ffd45732e2f19dce1a2ff54694ac7d093e7b37703a161728fb55e",
+  "completed_utc": "2026-10-15T14:02:26.586754+00:00",
+  "error": "System with 64 orbitals or more",
+  "executed_command": [
+    "/root/REI_MICROPHYSICS_R9_20261015/.venv/bin/python",
+    "/root/REI_MICROPHYSICS_R9_20261015/code/microphysics_driver.py",
+    "case",
+    "--case-file",
+    "runs/production_v1/quench_He_Liplus_aug-cc-pvqz/input.json",
+    "--out",
+    "runs/production_v1/quench_He_Liplus_aug-cc-pvqz"
+  ],
+  "exit_code": 1,
+  "finite_model_numerics_passed": false,
+  "implementation_checked": true,
+  "input_sha256": "4c090ac2f2cb4938bbce4cb4510f786175f927b5f1968d18699bd4a8d20012c8",
+  "peak_rss_kib": 618736,
+  "remaining_dependencies": [
+    "basis_convergence",
+    "finite_nuclear_mass_relativistic_and_HFS_terms",
+    "physical_continuum_scattering_provider",
+    "channel_specific_molecular_reaction_calculation"
+  ],
+  "runtime": {
+    "cpu_count": 64,
+    "numpy": "2.5.4",
+    "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+    "pyscf": "2.14.0",
+    "python": "3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]",
+    "scipy": "1.18.1",
+    "source_sha256": "774ff7372c8d10901d3cf06bbbc726ab9490d914fbee1a740665d3da2e1621cf",
+    "thread_pools": []
+  },
+  "started_utc": "2026-10-15T14:02:25.314987+00:00",
+  "status": "failed",
+  "supervisor_peak_rss_kib": 369916,
+  "supervisor_stop_reason": null,
+  "traceback": "Traceback (most recent call last):\n  File \"/root/REI_MICROPHYSICS_R9_20261015/code/microphysics_driver.py\", line 206, in execute_case\n    info,arrays={'atomic':atomic,'quench':quench,'molecule':molecule,'response':response}[case['kind']](case);receipt.update(info);receipt['status']='finite_model_computed'\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/code/microphysics_driver.py\", line 118, in quench\n    ii,ai,_=target(mi);fi,af,hf=target(mf);ci=ai['CI'];cf=af['CI'];A=np.vdot(cf,ci);p=float(abs(A)**2);q=ci-A*cf;comp=float(np.vdot(q,q).real);cross=float(abs(np.vdot(cf,q)))\n            ^^^^^^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/code/microphysics_driver.py\", line 117, in target\n    return solve_integrals(m,X,h,eri,case)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/code/microphysics_driver.py\", line 65, in solve_integrals\n    t=time.monotonic();e,c=solver.kernel(h,eri,n,mol.nelec,ecore=mol.energy_nuc())\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/.venv/lib/python3.12/site-packages/pyscf/fci/direct_spin1.py\", line 972, in kernel\n    e, c = kernel_ms1(self, h1e, eri, norb, nelec, ci0, link_index,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/.venv/lib/python3.12/site-packages/pyscf/fci/direct_spin1.py\", line 743, in kernel_ms1\n    e, c = fci.eig(hop, ci0, precond, tol=tol, lindep=lindep,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/.venv/lib/python3.12/site-packages/pyscf/fci/direct_spin1.py\", line 940, in eig\n    lib.davidson1(lambda xs: [op(x) for x in xs],\n  File \"/root/REI_MICROPHYSICS_R9_20261015/.venv/lib/python3.12/site-packages/pyscf/lib/linalg_helper.py\", line 442, in davidson1\n    axt = aop(xt)\n          ^^^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/.venv/lib/python3.12/site-packages/pyscf/fci/direct_spin1.py\", line 940, in <lambda>\n    lib.davidson1(lambda xs: [op(x) for x in xs],\n                              ^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/.venv/lib/python3.12/site-packages/pyscf/fci/direct_spin1.py\", line 705, in hop\n    hc = fci.contract_2e(h2e, c, norb, nelec, link_index)\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/.venv/lib/python3.12/site-packages/pyscf/fci/addons.py\", line 546, in contract_2e\n    ci1 = self.contract_ss(fcivec, norb, nelec).reshape(fcivec.shape)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/.venv/lib/python3.12/site-packages/pyscf/fci/direct_spin1.py\", line 1076, in contract_ss\n    return contract_ss(fcivec, norb, nelec)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/.venv/lib/python3.12/site-packages/pyscf/fci/spin_op.py\", line 204, in contract_ss\n    ades = gen_map(cistring.gen_des_str_index, neleca)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/.venv/lib/python3.12/site-packages/pyscf/fci/spin_op.py\", line 193, in gen_map\n    a_index = fstr_index(range(norb), nelec)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/REI_MICROPHYSICS_R9_20261015/.venv/lib/python3.12/site-packages/pyscf/fci/cistring.py\", line 289, in gen_des_str_index\n    raise NotImplementedError('System with 64 orbitals or more')\nNotImplementedError: System with 64 orbitals or more\n",
+  "wall_s": 1.27182693699433
+}

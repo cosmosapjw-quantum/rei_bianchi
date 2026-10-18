@@ -1,0 +1,15 @@
+{
+  "purpose": "Symbolic exact-eigenvector conditional-moment identity; approximate-ground corrections handled separately in T4 contract",
+  "code": "Clear[p,e0,m1,m2,mu,s2]; sol=Solve[{m1==p e0+(1-p)(e0+mu),m2==p e0^2+(1-p)(e0^2+2 e0 mu+s2)},{mu,s2}]; variance=FullSimplify[(s2-mu^2)/.First[sol],Assumptions->0<p<1]; vals={p->5756391820077925/10^16,e0->-14294193208284327/10^15,m1->-13161909284410008/10^15,m2->1822300266366419/10^13}; <|\"conditionalMoments\"->sol,\"conditionalVariance\"->variance,\"numericalEh\"->N[{mu,s2,s2-mu^2}/.First[sol]/.vals,20]|>",
+  "tool": "Wolfram Language evaluator",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= <|\"conditionalMoments\" -> {{mu -> -((-e0 + m1)/(-1 + p)), s2 -> -((e0^2 - 2*e0*m1 + m2)/(-1 + p))}}, \"conditionalVariance\" -> (-m1^2 + m2 + 2*e0*m1*p - (e0^2 + m2)*p)/(-1 + p)^2, \"numericalEh\" -> {2.66821034333832165697367439684774893081`20., 24.21580191707627776594933900845709139957`20., 17.09645548077867342803876525611277820702`20.}|>"
+      }
+    ],
+    "isError": false
+  },
+  "precision_note": "20-digit arithmetic on rationalized recorded decimals does not increase input physical or numerical accuracy"
+}

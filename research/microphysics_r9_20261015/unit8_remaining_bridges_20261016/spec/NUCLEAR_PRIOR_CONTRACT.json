@@ -1,0 +1,31 @@
+{
+  "contract_id":"R9_UNIT8_LANED_PRIMAT_NATIVE_PRIOR_COVARIANCE_V1",
+  "authority":{"requested":"Astra","observed":"UNKNOWN"},
+  "theory":"spec/NUCLEAR_PRIOR_THEORY.md",
+  "provider":{"repository":"https://github.com/CyrilPitrou/primat","commit":"4bf97d5082eee54b9df50d88f43182bb651fea80","root":"/workspace/scratch/37bc4acea758/u8_primat_provider","source_subdir":"primat-c","data_subdir":"primat/data","manifest":"intake/PRIMAT_DOWNLOAD_MANIFEST.json","identity":"Require root-generated download manifest with used files verified against pinned Git blob IDs; preserve it with outputs","source_edits_allowed":false},
+  "config":{"network":"small","Omegabh2":0.02205,"Omegach2":0.12495,"h":0.7,"DeltaNeff":0,"tau_n":878.4,"std_tau_n":0.5,"T_end_MeV":0.001,"decay_era":false,"numerical_precision":1e-7,"strict_params":true,"mc_rate_rescale_cap":30,"show_progress":false,"user_nuclear_dir":null,"cache_dir":"task-owned laneD cache overlay","other_parameters":"exact pinned-source defaults"},
+  "prior":{"rate_offsets":"one independent N(0,1) per each of12 active thermonuclear reactions","temperature_correlation":"one coherent p_r shared across everyT for each reaction","rate_formula":"median(T)*clip(exp(p_r*log(factor_uncertainty_r(T))),1/30,30)","additive_deltas":0,"tau_n":"N(878.4,0.5^2) seconds, independent of reaction deviates","reverse_rates":"source detailed balance from same varied forward rates","cosmology":"fixed, no prior samples","rng":"native xoshiro256**/SplitMix64, native normal routine, seed+sample_index"},
+  "selected_quantities":["YPBBN","DoH","He3oH","Li7oH","Be7","Li7"],
+  "derived_quantity":{"name":"Ymass7","formula":"Be7+Li7","units":"number per baryon"},
+  "observable_conventions":{"Li7oH":"(YLi7+YBe7)/Yp","He3oH":"(YHe3+YH3)/Yp","Be7_and_Li7":"actual separate endpoint abundances per baryon","donor_relation":"same source commit and cosmology, distinct small network and no original large-network overlay; no covariance assignment to old donor"},
+  "execution":{
+    "build":{"command":["make","-j2"],"cwd":"provider/primat-c","timeout_s":30,"allowed_output":"provider/primat-c/build/**"},
+    "base_cli":["--data_dir","PROVIDER/primat/data","--network","small","--Omegabh2","0.02205","--DeltaNeff","0","--numerical_precision","1e-7","--set","Omegach2=0.12495","--set","h=0.7","--set","tau_n=878.4","--set","std_tau_n=0.5","--set","T_end_MeV=0.001","--set","decay_era=False","--set","strict_params=True","--set","mc_rate_rescale_cap=30","--set","show_progress=False","--set","cache_dir='TASK_CACHE'","--json"],
+    "profile":{"baseline_timeout_s":5,"tight_precision":1e-8,"tight_timeout_s":5},
+    "pilot":{"samples":8,"seed":20261016,"jobs":1},
+    "production_candidates":[64,32,16],
+    "selection":"largestN with1.5*t_pilot8*(N+2)/10<=remaining_numerical_budget-2; if none use completed8pilot",
+    "mc_extra_cli":["--mc","N","--mc-seed","20261016","--mc-jobs","1","--output_mc_samples","--output_mc_covariance","--output_mc_correlation","--output_mc_file_prefix","TASK_OUTPUT_PREFIX"],
+    "numerical_total_wall_s":30,
+    "numerical_timeout_policy":"Every subprocess bounded by remaining total. Failed larger ensemble never counted; valid8pilot may remain BUDGET_LIMITED.",
+    "new_source_install":false,
+    "NCP":false,
+    "source_repair":false
+  },
+  "analysis":{"ddof":1,"native_outputs":"retain all observable and nuclide samples/covariance/correlation","independent_covariance":"NumPy centered sample outerproducts, selected quantities plus derivedYmass7","fractional_covariance":"Cij/(central_i*central_j)","PSD_check":"correlation matrix, not unscaled abundance covariance","sampling_diagnostics":["first/second half means and std","Gaussian variance relativeSE estimate sqrt(2/(N-1))"],"optional_bootstrap":{"resamples":512,"seed":20261017,"statistics":["std","correlation"],"scope":"finite-sample percentile diagnostic, no converged precision claim"}},
+  "acceptance":{"central_precision_relative":1e-4,"central_precision_over_sample_std":0.05,"repeat_first8_relative":1e-9,"all_selected_samples_finite_positive":true,"covariance_symmetry_standardized":1e-12,"correlation_diagonal_abs":1e-10,"correlation_min_eigenvalue":-1e-10,"native_covariance_standardized_difference":5e-7,"native_correlation_abs_difference":5e-7,"mass7_row_relative":1e-12,"mass7_row_absolute_floor":1e-25,"mass7_covariance_transform_standardized":1e-12,"sampling_convergence_required":false,"zero_selected_variance":"return unexpected-result evidence, no jitter or silent deletion","failure":"retain raw output, return once to authority"},
+  "outputs":{"summary":"evidence/NUCLEAR_PRIOR_RESULT.json","execution":"evidence/NUCLEAR_PRIOR_EXECUTION.md","raw_directory":"evidence/laneD_raw","selected_samples":"evidence/nuclear_prior_samples.csv","covariance":"evidence/nuclear_prior_covariance.csv","correlation":"evidence/nuclear_prior_correlation.csv","source_record":"evidence/NUCLEAR_PRIOR_SOURCES.md","required_metadata":["requested_executor","observed_executor","source_commit","source_manifest","effective_parameters","reaction_list","prior_definition","cap30_explicit","sample_count","seed","profile_timings","central_precision_errors","native_independent_covariance_errors","sampling_diagnostics","runtime_budget","scope","status"]},
+  "allowed_paths":["code/laneD/**","tests/laneD/**","inputs/laneD/**","evidence/laneD_raw/**","evidence/nuclear_prior_*","evidence/NUCLEAR_PRIOR_RESULT.json","evidence/NUCLEAR_PRIOR_EXECUTION.md","provider/primat-c/build/**","task-owned laneD cache overlay"],
+  "forbidden_claims":["owner observational posterior","EFT truncation covariance","precision-converged64sample covariance","old large-donor covariance","native runner integration","allT5 dependencies closed"],
+  "success_transition":"Independent scientific review, then release scoped actual prior covariance and finite-sample diagnostics"
+}
