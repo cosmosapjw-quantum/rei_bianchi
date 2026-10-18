@@ -48,7 +48,7 @@ q=0의 신규 age/time endpoint가 완성되지 않아 기존 age32 결과와 �
 
 ## 게시 및 백업 상태
 
-코드, donor/source identity, 빌드 receipt, 원시 성공/실패 사례, 기준 입력, 비교 JSON, 실행 요약과 DAG를 이 PR 경로에 게시한다. Dropbox와 Google Drive의 새 archive 업로드 및 원격 재읽기 SHA/CRC/payload 검증은 미완료다. 현재 host에는 승인된 rclone binary/config가 없고, Dropbox connector는 대화 첨부 파일만 받고 생성된 local 파일 경로를 직접 허용하지 않는다. Google Drive도 이 런타임에서 local artifact file reference를 제공하지 않았다. 따라서 클라우드 SHA를 생성하거나 확인한 것으로 보고하지 않는다.
+코드, donor/source identity, 빌드 receipt, 원시 성공/실패 사례, 기준 입력, 비교 JSON, 실행 요약과 DAG를 이 PR 경로에 게시한다. Google Drive에는 `REI_AGE_EXPOSURE_NCP_EXECUTION_20261018.zip` (4,044,690 bytes)을 업로드했고 원격 raw readback SHA-256이 로컬 SHA와 일치했으며 ZIP CRC 검증을 통과했다. SHA-256: `4a62f72426e92b654ad7caa059187198c50ddb2d0a8e0d6bd75b9e629a9f96f4`. Dropbox 업로드와 readback은 미완료다. 현재 host에는 승인된 rclone binary/config가 없고 Dropbox connector는 대화 첨부 파일만 받으므로 local artifact를 직접 전달할 수 없다.
 
 ### 다음 READY
 
