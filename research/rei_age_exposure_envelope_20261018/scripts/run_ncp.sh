@@ -10,7 +10,8 @@ mkdir -p "$SCRATCH"
 export PATH="$HOME/.cargo/bin:$PATH"
 export PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
-{ date -u +%FT%TZ; hostname; nproc; free -h; df -h "$SCRATCH"; command -v cargo; cargo --version; ps -eo pid,etime,pcpu,rss,comm --sort=-pcpu | head -20; } > "$SCRATCH/inventory.txt"
-python3 "$ROOT/src/prepare_native.py" --repo "$REPO" --fetch-missing --dest "$SCRATCH/native"
+{ date -u +%FT%TZ; hostname; nproc; free -h; df -h "$SCRATCH"; command -v cargo; cargo --version; ps -eo pid,etime,pcpu,rss,comm --sort=-pcpu | sed -n '1,20p'; } > "$SCRATCH/inventory.txt"
+bash "$ROOT/scripts/fetch_donor.sh"
+python3 "$ROOT/src/prepare_native.py" --archive "$ROOT/donors/REI_POSITIVE_NATIVE_C9_20261016_v1.zip" --dest "$SCRATCH/native"
 python3 "$ROOT/src/build_native.py" --prepared "$SCRATCH/native"
 python3 "$ROOT/src/run_refinement.py" --prepared "$SCRATCH/native" --out "$SCRATCH/results" --cases "$CASES" --case-wall-s 1800 --total-wall-s 5400
