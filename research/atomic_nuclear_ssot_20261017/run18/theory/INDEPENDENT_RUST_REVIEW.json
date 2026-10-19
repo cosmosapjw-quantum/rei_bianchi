@@ -1,0 +1,54 @@
+{
+  "schema": "rei.run18.single-independent-rust-math-review.v1",
+  "reviewer_role": "spectral-theory agent, complementary to the new Python exact reference and runtime Rust implementation",
+  "status": "NO_CONCRETE_DEFECT_FOUND_WITHIN_REVIEWED_SCOPE",
+  "files_read": [
+    "runtime/exact_dense_adapter/src/lib.rs",
+    "runtime/exact_dense_adapter/src/main.rs",
+    "runtime/exact_dense_adapter/Cargo.toml",
+    "runtime/validate_exact_adapter.py",
+    "runtime/adapter_execution01/RUST_EXACT_VIGILODE_RESULT.json",
+    "runtime/exact_dense_adapter/provenance/VIGILODE_SOURCE_IDENTITY.json"
+  ],
+  "checks": [
+    "Rust uses the nested seven-row value/derivative recurrence, independently of the Python explicit basis.",
+    "Exact binary64 values, normalized clock, physical derivative1/h and endpoint jump sign agree.",
+    "Fixture/reference frozen hashes are checked by the runtime driver; raw Rust values are computed from bits rather than supplied Python endpoints.",
+    "Cumulative signed offsets, original/shifted Bernstein bounds and rational beta agree with all reference values.",
+    "VigilODE point interval inclusion is checked against BigRational truth rather than rounded floating truth.",
+    "The nonunit-clock and normal/subnormal/nonfinite tests target meaningful arithmetic semantics; beta rejects Gamma>=1.",
+    "The exact repaired path is separate from immutable original arrays, and native gasG is unchanged."
+  ],
+  "actual_producer_findings": {
+    "exact_endpoint_cases": 5911,
+    "nonzero_internal_depth_coordinate_jumps": 431,
+    "gas_internal_jumps": 0,
+    "gamma": "9/288230376151711744",
+    "beta": "9/288230376151711735",
+    "nonnegative_repaired_depth_pieces": 23,
+    "vigilode_endpoint_value_inclusions": 5911,
+    "vigilode_endpoint_derivative_inclusions": 5911,
+    "rust_tests": {
+      "count": 4,
+      "composition": "3 new adapter tests plus1 imported kernel test",
+      "attribution": "actual PASS reported by runtime producer; reviewer read test definitions, not rerun"
+    },
+    "native_RHS_calls": 0,
+    "new_IVP_solves": 0
+  },
+  "scope": [
+    "The5911 interval inclusions are right-endpoint expressions. They are not whole-time-piece RHS/residual enclosures.",
+    "Whole-piece depth positivity is independently provided by exact Bernstein coefficients.",
+    "Exact start derivatives are used for interface derivative jumps; derivative jumps are not atoms in the first-order state residual.",
+    "Point containment checks demonstrate the used arithmetic cases, not a proof of the entire VigilODE library.",
+    "Repair beta bounds the change between two defined paths with identical gas/geometry and fixed positive channels; it is not the coupled exact-IVP or continuum error."
+  ],
+  "reviewer_execution": {
+    "new_tests": 0,
+    "native_RHS_calls": 0,
+    "IVP_solves": 0,
+    "production_source_edits": 0
+  },
+  "remaining": "Outward native RHS and uniform feedback Jacobian bounds on an admitted tube, prefix/event/source uncertainty propagation."
+}
+
