@@ -1,0 +1,75 @@
+test_complete_endpoint_is_accepted (test_run13_endpoint_guard.EndpointGuardTests.test_complete_endpoint_is_accepted) ... ERROR
+test_endpoint_not_latest_state_rejected (test_run13_endpoint_guard.EndpointGuardTests.test_endpoint_not_latest_state_rejected) ... FAIL
+test_event_gap_rejected (test_run13_endpoint_guard.EndpointGuardTests.test_event_gap_rejected) ... FAIL
+test_final_segment_must_exist (test_run13_endpoint_guard.EndpointGuardTests.test_final_segment_must_exist) ... FAIL
+test_in_progress_cannot_become_endpoint (test_run13_endpoint_guard.EndpointGuardTests.test_in_progress_cannot_become_endpoint) ... FAIL
+test_packet_mismatch_rejected (test_run13_endpoint_guard.EndpointGuardTests.test_packet_mismatch_rejected) ... FAIL
+test_state_corruption_rejected (test_run13_endpoint_guard.EndpointGuardTests.test_state_corruption_rejected) ... FAIL
+
+======================================================================
+ERROR: test_complete_endpoint_is_accepted (test_run13_endpoint_guard.EndpointGuardTests.test_complete_endpoint_is_accepted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/rei_run13_recovered/work/scripts/test_run13_endpoint_guard.py", line 21, in test_complete_endpoint_is_accepted
+    result,state=load_complete(self.root,2,3e-11);self.assertEqual(result['status'],'COMPLETE');np.testing.assert_array_equal(state,self.y)
+    ^^^^^^^^^^^^
+TypeError: cannot unpack non-iterable NoneType object
+
+======================================================================
+FAIL: test_endpoint_not_latest_state_rejected (test_run13_endpoint_guard.EndpointGuardTests.test_endpoint_not_latest_state_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/rei_run13_recovered/work/scripts/test_run13_endpoint_guard.py", line 36, in test_endpoint_not_latest_state_rejected
+    with self.assertRaisesRegex(ValueError,'endpoint'):load_complete(self.root,2,3e-11)
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_event_gap_rejected (test_run13_endpoint_guard.EndpointGuardTests.test_event_gap_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/rei_run13_recovered/work/scripts/test_run13_endpoint_guard.py", line 39, in test_event_gap_rejected
+    with self.assertRaisesRegex(ValueError,'event'):load_complete(self.root,2,3e-11)
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_final_segment_must_exist (test_run13_endpoint_guard.EndpointGuardTests.test_final_segment_must_exist)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/rei_run13_recovered/work/scripts/test_run13_endpoint_guard.py", line 27, in test_final_segment_must_exist
+    with self.assertRaisesRegex(ValueError,'incomplete'):load_complete(self.root,2,3e-11)
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_in_progress_cannot_become_endpoint (test_run13_endpoint_guard.EndpointGuardTests.test_in_progress_cannot_become_endpoint)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/rei_run13_recovered/work/scripts/test_run13_endpoint_guard.py", line 24, in test_in_progress_cannot_become_endpoint
+    with self.assertRaisesRegex(ValueError,'incomplete'):load_complete(self.root,2,3e-11)
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_packet_mismatch_rejected (test_run13_endpoint_guard.EndpointGuardTests.test_packet_mismatch_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/rei_run13_recovered/work/scripts/test_run13_endpoint_guard.py", line 30, in test_packet_mismatch_rejected
+    with self.assertRaisesRegex(ValueError,'packet'):load_complete(self.root,2,3e-11)
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_state_corruption_rejected (test_run13_endpoint_guard.EndpointGuardTests.test_state_corruption_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/rei_run13_recovered/work/scripts/test_run13_endpoint_guard.py", line 33, in test_state_corruption_rejected
+    with self.assertRaisesRegex(ValueError,'state hash'):load_complete(self.root,2,3e-11)
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.010s
+
+FAILED (failures=6, errors=1)

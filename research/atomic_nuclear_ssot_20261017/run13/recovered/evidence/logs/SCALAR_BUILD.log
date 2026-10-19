@@ -1,0 +1,15 @@
+   Compiling rei_iso_couple_reference v0.1.0 (/mnt/data/rei_run11/work/code/rei_bass_coupled)
+error[E0599]: no method named `verner_cross_section_cm2` found for struct `AtomicProvider` in the current scope
+ --> examples/spectral_scalar_probe.rs:4:168
+  |
+4 | ...e=eta*n.energy_ev;let sh=AtomicProvider::reference().verner_cross_section_cm2(Absorber::HI,e).unwrap()*1e-4;let sd=if e>=d{sh}else...
+  |                                                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+help: there is a method `cross_section` with a similar name
+  |
+4 - for m in [1,2,4]{let q=refine_cell(cell,eta,&[13.6,d],m,h.kb_erg_k/h.ev_erg*50000.).unwrap();for n in q.nodes{let e=eta*n.energy_ev;let sh=AtomicProvider::reference().verner_cross_section_cm2(Absorber::HI,e).unwrap()*1e-4;let sd=if e>=d{sh}else{0.};println!("{m},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e}",n.energy_ev,n.photon_fraction/p.photon_fraction,n.panel_lower_ev,n.panel_upper_ev,sh,sd,sh*(e-h.threshold_ev[0]),sd*(e-d),q.photon_fraction_residual/p.photon_fraction,q.mean_residual_ev,q.continuous_minus_owner_mean_ev);}}
+4 + for m in [1,2,4]{let q=refine_cell(cell,eta,&[13.6,d],m,h.kb_erg_k/h.ev_erg*50000.).unwrap();for n in q.nodes{let e=eta*n.energy_ev;let sh=AtomicProvider::reference().cross_section(Absorber::HI,e).unwrap()*1e-4;let sd=if e>=d{sh}else{0.};println!("{m},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e}",n.energy_ev,n.photon_fraction/p.photon_fraction,n.panel_lower_ev,n.panel_upper_ev,sh,sd,sh*(e-h.threshold_ev[0]),sd*(e-d),q.photon_fraction_residual/p.photon_fraction,q.mean_residual_ev,q.continuous_minus_owner_mean_ev);}}
+  |
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `rei_iso_couple_reference` (example "spectral_scalar_probe") due to 1 previous error

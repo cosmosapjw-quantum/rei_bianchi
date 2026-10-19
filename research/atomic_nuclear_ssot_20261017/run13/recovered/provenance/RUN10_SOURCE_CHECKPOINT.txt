@@ -1,0 +1,365 @@
+﻿RUN10 SOURCE CHECKPOINT: spectral-edge support
+2026-10-18 KST
+
+
+Status: PARTIAL_RUNTIME_BLOCKED_NATIVE_INTEGRATION.
+Sandbox terminal returned ClientError on initial and minimal diagnostic calls; Python returned ServerError on initial and minimal diagnostic calls. No Rust compilation, Rust test execution, RUN09 archive restore, finite source packet generation, or joint BASS integration was performed in this turn. Requested Wolfram evaluator calculations were actually executed, including replay of published source. No local/Codex/NCP/SSH and no native subagents.
+
+
+This native document is a recoverable textual checkpoint of the new candidate Rust source, executed Wolfram source, numerical results, derivation and resume instructions. It is NOT a new full restoration ZIP or a verified native executable. Source files are delimited by @@FILE:name@@ and @@END@@. Compare with the immutable Git source commit before use; no byte hash of this Google Docs export is asserted here.
+
+
+Repository: cosmosapjw-quantum/rei_bianchi
+RUN10 source commit: f6e87d27c4c6da4315cf0426b5bddca00151c76d
+RUN10 branch: research/rei-atomic-run10-spectral-edge-20261018
+Git source directory: research/atomic_nuclear_ssot_20261017/run10/
+Source URL: https://github.com/cosmosapjw-quantum/rei_bianchi/tree/f6e87d27c4c6da4315cf0426b5bddca00151c76d/research/atomic_nuclear_ssot_20261017/run10
+Parent RUN09: 86ffbea52e3a786ef360cf1434b8e3504e2dfdbf
+Parent ZIP SHA256 (historical, not rehashed this turn): 039fbce620bfa90e43822727d01cb8a2734fbfa78ef894673c7de9a06aa16029
+Parent Drive file: 1PBxYh7wM0t7IUrsB2v7g5eu6vW1BB9wo
+Parent Dropbox file: id:BSpOijBcT10AAAAAAD-obA
+
+
+Scientific result
+For a positive achromatic monotone redshift path E(t)=R(t;tb,mu) Eb with R(tb)=1 and R(t1)=eta<=1, a transverse threshold crossing occurs for epsilon<Eb<epsilon/eta. Include both birth thresholds and terminal preimages in the spectral partition. Endpoint eta<=1 alone does not prove monotonicity. Use the existing BASS interval condition H>0,-1/2<b_X<1 before applying this helper to actual geometry.
+
+
+The first native cell is [13.6,13.6*(24.59/13.6)^(1/16)] eV; its upper edge is 14.112863291954786... eV. Shape g(E)=E^2/expm1(E/kT), T=50000 K, kT=4.3086666310725887 eV. Keep H binding13.598434599702, HI fit edge13.6 and inherited manufactured D edge13.602134599702 eV distinct. The D cross section is the inherited H-equality approximation, not measured isotope-specific spectroscopy.
+
+
+In the manufactured FLRW control eta=exp(-0.0004), the D-crossing band is (13.602134599702,13.607576541857753) eV. Birth-edge-only GL3 has no node in this band. Its continuous conditional first-cell photon mass is 0.010871289873784619, about1.08713% of THIS CELL, not of the full source or the absorption events.
+
+
+On each swept panel, define z=(E-mid)/half and Mk=integral z^k g(E)dE,k=0..3. Let mu=M1/M0, v=M2/M0-mu^2>0, c3=M3/M0-3mu M2/M0+2mu^3, alpha=c3/v. The Jacobi matrix [[mu,sqrt(v)],[sqrt(v),mu+alpha]] gives internal nodes z-/z+ and weights w-=(z+-mu)/(z+-z-),w+=(mu-z-)/(z+-z-). A positive measure gives positive weights and reproduces moments0..3. Parent photon fraction f0 is distributed as f0*(M0_panel/M0_cell)*w. This defines the conditional source measure, not a post-evolution repair. Report finite numerical residuals and the stored owner-mean shift.
+
+
+The continuous first-cell mean is13.8542959378206139938784 eV. The exact-decimal reconstruction of the native Simpson32 formula gives13.8542959378240584778580 eV. Difference=-3.444483979562936e-12 eV. This is not an actual native binary64 parity result. The C4 Gauss remainder applies on smooth response panels, not across unpartitioned thresholds and not as a joint nonlinear ODE error bound.
+
+
+@@FILE:spectral_edge_support.rs@@
+//! RUN10 candidate: photon-count anchored, positive two-node spectral rules.
+//! SOURCE_WRITTEN_NOT_COMPILED: ChatGPT sandbox unavailable in this turn.
+//! No parent owner, native solver, input packet or default behavior is modified.
+//! All energies and kT are eV. Fractions refer to the whole native source.
+//! Caller must independently establish monotonically nonincreasing ray energy.
+//! An endpoint ratio <= 1 alone is NOT a monotonicity certificate.
+#![forbid(unsafe_code)]
+
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Error { Input, UnresolvedBand, MomentDomain, MomentConvergence }
+#[derive(Debug, Clone, Copy)]
+pub struct Cell {
+    pub lower_ev: f64,
+    pub upper_ev: f64,
+    pub owner_mean_ev: f64,
+    pub photon_fraction: f64,
+}
+#[derive(Debug, Clone, Copy)]
+pub struct Node {
+    pub energy_ev: f64,
+    pub photon_fraction: f64,
+    pub panel_lower_ev: f64,
+    pub panel_upper_ev: f64,
+}
+#[derive(Debug, Clone)]
+pub struct Rule {
+    pub nodes: Vec<Node>,
+    pub photon_fraction_residual: f64,
+    pub continuous_mean_ev: f64,
+    pub mean_residual_ev: f64,
+    pub continuous_minus_owner_mean_ev: f64,
+}
+
+
+/// Birth thresholds and their terminal preimages. Exact duplicate cuts only.
+/// active_edges must be max(binding threshold, cross-section fit threshold).
+/// The mathematical scope is a positive, achromatic, monotone redshift path.
+pub fn monotone_swept_cuts(
+    lo: f64, hi: f64, ratio_end: f64, active_edges: &[f64],
+) -> Result<Vec<f64>, Error> {
+    if !lo.is_finite() || !hi.is_finite() || lo <= 0.0 || hi <= lo
+        || !ratio_end.is_finite() || ratio_end <= 0.0 || ratio_end > 1.0
+        || active_edges.iter().any(|e| !e.is_finite() || *e <= 0.0) {
+        return Err(Error::Input);
+    }
+    let mut cuts = vec![lo, hi];
+    for &edge in active_edges {
+        if lo < edge && edge < hi { cuts.push(edge); }
+        // Avoid overflow: a preimage at or beyond hi is outside this cell.
+        if edge < hi * ratio_end {
+            let preimage = edge / ratio_end;
+            if lo < preimage && preimage < hi { cuts.push(preimage); }
+        }
+    }
+    cuts.sort_by(f64::total_cmp);
+    cuts.dedup();
+    Ok(cuts)
+}
+
+
+/// Raw moments in local z=(E-mid)/half on [-1,1], including dE.
+/// The shape is the existing E^2/expm1(E/kT); no new atomic rate is introduced.
+fn simpson_moments(lo: f64, hi: f64, kt: f64, n: usize) -> Result<[f64;4], Error> {
+    let mid = 0.5 * (lo + hi);
+    let half = 0.5 * (hi - lo);
+    if !(lo < mid && mid < hi) { return Err(Error::UnresolvedBand); }
+    let mut out = [0.0;4];
+    let mut correction = [0.0;4];
+    for i in 0..=n {
+        let z = -1.0 + 2.0 * i as f64 / n as f64;
+        let energy = mid + half * z;
+        let denominator = (energy / kt).exp_m1();
+        if !denominator.is_finite() || denominator <= 0.0 { return Err(Error::MomentDomain); }
+        let simpson = if i == 0 || i == n { 1.0 } else if i % 2 == 0 { 2.0 } else { 4.0 };
+        let factor = (2.0 * half / (3.0 * n as f64)) * simpson * energy * energy / denominator;
+        let mut power = 1.0;
+        for k in 0..4 {
+            let value = factor * power - correction[k];
+            let next = out[k] + value;
+            correction[k] = (next - out[k]) - value;
+            out[k] = next;
+            power *= z;
+        }
+    }
+    if out.iter().any(|x| !x.is_finite()) || out[0] <= 0.0 { return Err(Error::MomentDomain); }
+    Ok(out)
+}
+
+
+/// Successive Simpson rules test local moments against the positive zeroth moment.
+/// This stopping criterion is a diagnostic, NOT a rigorous quadrature enclosure.
+pub fn blackbody_moments(lo: f64, hi: f64, kt: f64) -> Result<[f64;4], Error> {
+    if !lo.is_finite() || !hi.is_finite() || !kt.is_finite()
+        || lo <= 0.0 || hi <= lo || kt <= 0.0 { return Err(Error::Input); }
+    let mut previous = simpson_moments(lo, hi, kt, 32)?;
+    for n in [64,128,256,512,1024] {
+        let current = simpson_moments(lo, hi, kt, n)?;
+        let change = (0..4).map(|k| (current[k]-previous[k]).abs()).fold(0.0_f64,f64::max);
+        if change <= 5e-13 * current[0] { return Ok(current); }
+        previous = current;
+    }
+    Err(Error::MomentConvergence)
+}
+
+
+/// Positive two-node Gauss-Christoffel rule from local moments M0..M3.
+/// Returns (z, conditional weight); conditional weights sum to one mathematically.
+pub fn gauss2_local(m: [f64;4]) -> Result<[(f64,f64);2],Error> {
+    if m.iter().any(|x| !x.is_finite()) || m[0] <= 0.0 { return Err(Error::MomentDomain); }
+    let mu = m[1]/m[0];
+    let second = m[2]/m[0];
+    let variance = second-mu*mu;
+    if !variance.is_finite() || variance <= 0.0 { return Err(Error::MomentDomain); }
+    let third = m[3]/m[0]-3.0*mu*second+2.0*mu*mu*mu;
+    let alpha = third/variance;
+    let radius = (alpha*alpha+4.0*variance).sqrt();
+    let zm = mu+0.5*(alpha-radius);
+    let zp = mu+0.5*(alpha+radius);
+    let wm = (zp-mu)/(zp-zm);
+    let wp = (mu-zm)/(zp-zm);
+    if !(-1.0 < zm && zm < zp && zp < 1.0 && wm > 0.0 && wp > 0.0)
+        || !wm.is_finite() || !wp.is_finite() { return Err(Error::MomentDomain); }
+    Ok([(zm,wm),(zp,wp)])
+}
+
+
+/// Replace only one source cell; the caller keeps all other cells byte-for-byte.
+/// f_child = f_owner * integral_child(shape)/integral_cell(shape).
+/// This defines the conditional source measure, not a post-evolution repair.
+/// The continuous mean and the stored Simpson32 owner mean are reported separately.
+/// Do not suppress the reported residuals or claim exact binary64 conservation.
+pub fn refine_cell(
+    cell: Cell, ratio_end: f64, active_edges: &[f64], subdivisions: usize, kt_ev: f64,
+) -> Result<Rule,Error> {
+    if !cell.photon_fraction.is_finite() || cell.photon_fraction <= 0.0
+        || !cell.owner_mean_ev.is_finite()
+        || !(cell.lower_ev < cell.owner_mean_ev && cell.owner_mean_ev < cell.upper_ev)
+        || !(1..=64).contains(&subdivisions) { return Err(Error::Input); }
+    let cuts = monotone_swept_cuts(cell.lower_ev,cell.upper_ev,ratio_end,active_edges)?;
+    let full = blackbody_moments(cell.lower_ev,cell.upper_ev,kt_ev)?;
+    let continuous_mean = 0.5*(cell.lower_ev+cell.upper_ev)
+        +0.5*(cell.upper_ev-cell.lower_ev)*full[1]/full[0];
+    let mut nodes = Vec::with_capacity(2*(cuts.len()-1)*subdivisions);
+    for pair in cuts.windows(2) {
+        for j in 0..subdivisions {
+            let a = if j == 0 {pair[0]} else {pair[0]+(pair[1]-pair[0])*j as f64/subdivisions as f64};
+            let b = if j+1 == subdivisions {pair[1]} else {pair[0]+(pair[1]-pair[0])*(j+1) as f64/subdivisions as f64};
+            let m = blackbody_moments(a,b,kt_ev)?;
+            for (z,w) in gauss2_local(m)? {
+                let energy = 0.5*(a+b)+0.5*(b-a)*z;
+                let fraction = cell.photon_fraction*(m[0]/full[0])*w;
+                if !(a < energy && energy < b) { return Err(Error::UnresolvedBand); }
+                if !fraction.is_finite() || fraction <= 0.0 { return Err(Error::MomentDomain); }
+                nodes.push(Node {energy_ev:energy,photon_fraction:fraction,panel_lower_ev:a,panel_upper_ev:b});
+            }
+        }
+    }
+    let count:f64 = nodes.iter().map(|p|p.photon_fraction).sum();
+    let energy:f64 = nodes.iter().map(|p|p.photon_fraction*p.energy_ev).sum();
+    Ok(Rule {
+        photon_fraction_residual:count-cell.photon_fraction,
+        continuous_mean_ev:continuous_mean,
+        mean_residual_ev:energy/cell.photon_fraction-continuous_mean,
+        continuous_minus_owner_mean_ev:continuous_mean-cell.owner_mean_ev,
+        nodes,
+    })
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn fixture()->Cell {Cell{lower_ev:13.6,upper_ev:13.6*(24.59_f64/13.6).powf(1.0/16.0),owner_mean_ev:13.854295937824058,photon_fraction:0.1}}
+    fn kt()->f64 {1.380649e-16/1.602176634e-12*50000.0}
+    const D:f64=13.602134599702;
+    #[test] fn swept_edges_are_sorted() {
+        let c=fixture(); let e=monotone_swept_cuts(c.lower_ev,c.upper_ev,(-0.0004_f64).exp(),&[13.6,D]).unwrap();
+        assert_eq!(e.len(),5); assert!(e.windows(2).all(|p|p[0]<p[1]));
+    }
+    #[test] fn static_path_has_only_birth_edges() {
+        let c=fixture();assert_eq!(monotone_swept_cuts(c.lower_ev,c.upper_ev,1.0,&[13.6,D,D]).unwrap().len(),3);
+    }
+    #[test] fn invalid_endpoint_ratio_rejected() {
+        for eta in [0.0,-1.0,1.001,f64::NAN] {assert_eq!(monotone_swept_cuts(13.6,14.2,eta,&[D]),Err(Error::Input));}
+    }
+    #[test] fn uniform_rule_reproduces_four_moments() {
+        let q=gauss2_local([2.0,0.0,2.0/3.0,0.0]).unwrap();
+        for k in 0_i32..4 {let v:f64=q.iter().map(|(z,w)|w*z.powi(k)).sum();let target=if k%2==0 {1.0/(k+1)as f64}else{0.0};assert!((v-target).abs()<1e-14);}
+    }
+    #[test] fn first_cell_count_energy_and_positivity() {
+        let c=fixture();let r=refine_cell(c,(-0.0004_f64).exp(),&[13.6,D],1,kt()).unwrap();
+        assert_eq!(r.nodes.len(),8);assert!(r.nodes.iter().all(|p|p.photon_fraction>0.0));
+        assert!(r.photon_fraction_residual.abs()<1e-11*c.photon_fraction);
+        assert!(r.mean_residual_ev.abs()<1e-10);
+        assert!(r.continuous_minus_owner_mean_ev.abs()<1e-10);
+    }
+    #[test] fn deuterium_crossing_band_is_represented() {
+        let eta=(-0.0004_f64).exp();let c=fixture();let r=refine_cell(c,eta,&[13.6,D],1,kt()).unwrap();
+        let crossing:f64=r.nodes.iter().filter(|p|D<p.energy_ev&&p.energy_ev<D/eta).map(|p|p.photon_fraction).sum();
+        assert!((crossing/c.photon_fraction-0.010871289873784619).abs()<5e-11);
+    }
+}
+@@END@@
+
+
+@@FILE:spectral_edge_reference.wl@@
+(* RUN10 MP55 reference. Executed through Wolfram, not ChatGPT sandbox.
+   Exact-decimal reconstruction of read source formulas; no claim of Rust parity.
+   eta=Exp[-0.0004] is a manufactured FLRW kinematic control, not a BASS ray.
+   Response columns: HI sigma [m^2], DI sigma [m^2], HI/DI sigma*(E-chi) [eV m^2]. *)
+Module[{wp=55,lo,hi,kt,ch,cd,eta,shape,mom,raw,rule,cuts,base,mean,ref,resp,pack,rows,tests,x,z,ruleResiduals},
+lo=N[68/5,wp];hi=N[(68/5)(2459/1360)^(1/16),wp];
+kt=N[(1380649/10^22)/(1602176634/10^21)*50000,wp];
+ch=N[13598434599702/10^12,wp];cd=N[13602134599702/10^12,wp];eta=N[Exp[-1/2500],wp];
+shape[e_?NumericQ]:=e^2/(Exp[e/kt]-1);
+mom[a_?NumericQ,b_?NumericQ,k_Integer]:=mom[a,b,k]=NIntegrate[x^k shape[x],{x,a,b},WorkingPrecision->wp,AccuracyGoal->42,PrecisionGoal->42];
+base=mom[lo,hi,0];mean=mom[lo,hi,1]/base;
+cuts=DeleteDuplicates[Sort[N[Join[{lo,hi},Select[{lo,cd,lo/eta,cd/eta},lo<#<hi&]],wp]]];
+raw[a_,b_]:=raw[a,b]=With[{mid=(a+b)/2,half=(b-a)/2},Table[half NIntegrate[z^k shape[mid+half z],{z,-1,1},WorkingPrecision->wp,AccuracyGoal->42,PrecisionGoal->42],{k,0,3}]];
+rule[a_,b_]:=rule[a,b]=Module[{m=raw[a,b],mu,v,t,d,zm,zp,wm,wp2,mid=(a+b)/2,half=(b-a)/2},
+mu=m[[2]]/m[[1]];v=m[[3]]/m[[1]]-mu^2;t=m[[4]]/m[[1]]-3mu m[[3]]/m[[1]]+2mu^3;d=t/v;
+zm=mu+(d-Sqrt[d^2+4v])/2;zp=mu+(d+Sqrt[d^2+4v])/2;
+wm=(zp-mu)/(zp-zm);wp2=(mu-zm)/(zp-zm);
+{{mid+half zm,m[[1]]wm/base},{mid+half zp,m[[1]]wp2/base}}];
+pack[n_Integer]:=pack[n]=Flatten[Table[With[{a=cuts[[s]],b=cuts[[s+1]]},Table[rule[a+(b-a)j/n,a+(b-a)(j+1)/n],{j,0,n-1}]],{s,1,Length[cuts]-1}],2];
+resp[e_?NumericQ,k_Integer]:=Module[{q=eta e,y,s},If[q<If[k==1||k==3,lo,cd],Return[0]];
+y=q/(4298/10000);s=54750(y-1)^2 y^((2963/1000)/2-11/2)(1+Sqrt[y/(3288/100)])^(-2963/1000)*10^-22;
+If[k<=2,s,s(q-If[k==3,ch,cd])]];
+ref=Table[NIntegrate[shape[x]resp[x,k],{x,If[k==1||k==3,lo/eta,cd/eta],hi},WorkingPrecision->wp,AccuracyGoal->40,PrecisionGoal->35]/base,{k,1,4}];
+rows=Table[With[{q=pack[n]},<|"subdivisions"->n,"nodes"->Length[q],"count_residual"->N[Total[q[[All,2]]]-1,8],"mean_residual_eV"->N[Total[Times@@#& /@ q]-mean,8],"relative_response_errors_H_D_Hheat_Dheat"->N[Table[Total[(#[[2]]resp[#[[1]],k])& /@ q]/ref[[k]]-1,{k,1,4}],14],"D_crossing_mass"->N[Total[Cases[q,{e_,w_}/;cd<e<cd/eta:>w]],17]|>],{n,{1,2,4}}];
+ruleResiduals=Flatten[Table[With[{a=cuts[[s]],b=cuts[[s+1]]},Table[Abs[base Total[(#[[2]]((#[[1]]-(a+b)/2)/((b-a)/2))^k)& /@ rule[a,b]]-raw[a,b][[k+1]]]/raw[a,b][[1]],{k,0,3}]],{s,1,Length[cuts]-1}]];
+tests=<|"ordered_nodes_within_parent"->And@@Flatten[Table[(lo<#[[1]]<hi)& /@ pack[n],{n,{1,2,4}}]],"strictly_positive_weights"->And@@Flatten[Table[(#[[2]]>0)& /@ pack[n],{n,{1,2,4}}]],"zeroth_to_third_local_moments"->(Max[ruleResiduals]<10^-40),"source_count_unchanged"->And@@Table[Abs[Total[pack[n][[All,2]]]-1]<10^-40,{n,{1,2,4}}],"source_energy_continuous_mean_unchanged"->And@@Table[Abs[Total[Times@@#& /@ pack[n]]-mean]<10^-38,{n,{1,2,4}}],"D_crossing_class_mass"->And@@Table[Abs[Total[Cases[pack[n],{e_,w_}/;cd<e<cd/eta:>w]]-mom[cd,cd/eta,0]/base]<10^-40,{n,{1,2,4}}]|>;
+<|"reference_values"->N[ref,18],"rows"->rows,"checks"->tests,"max_local_moment_scaled_residual"->N[Max[ruleResiduals],8],"scope"->"MP55 source-formula reference; manufactured monotone FLRW ray; frozen terminal response only; native Rust and joint BASS NOT_RUN"|>
+]
+@@END@@
+
+
+@@FILE:RESULTS.json@@
+{
+  "schema":"rei.atomic.nuclear.run10.scalar.v1",
+  "date_kst":"2026-10-18",
+  "execution_platform":"requested Wolfram evaluator; not sandbox Rust",
+  "basis":"exact-decimal reconstruction of fetched native source formulas",
+  "assumptions":{"ray":"manufactured FLRW endpoint ratio exp(-0.0004), monotone","response":"frozen terminal cross-section and primary-heating kernels; no opacity evolution or chemistry integration","normalization":"conditional distribution in first source cell only"},
+  "cell_eV":[13.6,14.112863291954786],
+  "kT_eV":4.308666631072589,
+  "H_binding_eV":13.598434599702,
+  "H_fit_edge_eV":13.6,
+  "D_inherited_manufactured_edge_eV":13.602134599702,
+  "continuous_mean_eV":13.854295937820614,
+  "source_formula_Simpson32_mean_eV":13.854295937824058,
+  "continuous_minus_Simpson32_mean_eV":-3.444483979562936e-12,
+  "swept_cut_edges_eV":[13.6,13.602134599702,13.605441088145081,13.607576541857753,14.112863291954786],
+  "D_crossing_conditional_cell_mass":0.010871289873784619,
+  "birth_edge_only_GL3_nodes_in_D_crossing_band":0,
+  "reference_H_D_sigma_m2_H_D_sigma_heat_eVm2":[5.978688483929317e-22,5.951625380089480e-22,1.488221266490745e-22,1.466129006557760e-22],
+  "weighted_Gauss2_rows":[
+    {"subdivisions":1,"nodes":8,"relative_errors":[-9.70236345476356e-8,-9.74648183466973e-8,3.86546001467379e-6,3.92517032742550e-6]},
+    {"subdivisions":2,"nodes":16,"relative_errors":[-6.07662057507244e-9,-6.10425205438434e-9,2.42145692369665e-7,2.45886132243488e-7]},
+    {"subdivisions":4,"nodes":32,"relative_errors":[-3.79986910476840e-10,-3.81714778841488e-10,1.51427956683774e-8,1.53767070928850e-8]}
+  ],
+  "centroid_control_rows":[
+    {"subdivisions":1,"nodes":4,"relative_errors":[-0.0005337101849593,-0.0005361370154637,0.01596550775756,0.01621413417245]},
+    {"subdivisions":2,"nodes":8,"relative_errors":[-0.0001335691140825,-0.0001341764654428,0.003996722410601,0.004058961698169]},
+    {"subdivisions":4,"nodes":16,"relative_errors":[-0.00003340114202545,-0.00003355302016948,0.0009995153688954,0.001015080368922]},
+    {"subdivisions":8,"nodes":32,"relative_errors":[-8.35083971846665e-6,-8.38881177457689e-6,0.0002498997756798,0.0002537913494828]}
+  ],
+  "wolfram_checks":{"ordered_nodes_within_parent":true,"strictly_positive_weights":true,"zeroth_to_third_local_moments":true,"source_count_unchanged":true,"continuous_shape_mean_unchanged":true,"D_crossing_class_mass":true},
+  "native_tests_written":6,
+  "native_tests_executed":0,
+  "joint_BASS_runs":0,
+  "source_packet_160_births_generated":false,
+  "status":"PARTIAL_DERIVED_AND_WOLFRAM_SCALAR_CHECKED_RUST_PORT_UNCOMPILED"
+}
+@@END@@
+
+
+@@FILE:DAG_PROGRESS.json@@
+{
+ "schema":"rei.atomic.nuclear.run10.overlay.v1",
+ "parent_run":"RUN09",
+ "parent_commit":"86ffbea52e3a786ef360cf1434b8e3504e2dfdbf",
+ "selected_node":"P4-S4C-SPECTRAL-EDGE-SUPPORT",
+ "status":"PARTIAL_RUNTIME_BLOCKED_NATIVE_INTEGRATION",
+ "completed":{"threshold_preimage_derivation":"DERIVED","positive_weighted_Gauss2":"WOLFRAM_SCALAR_CHECKED","Rust_candidate":"SOURCE_WRITTEN_NOT_COMPILED"},
+ "blocked":{"sandbox_terminal":"ClientError on initial command and minimal diagnostic","sandbox_python":"ServerError on initial call and minimal diagnostic","native_Rust_tests":"NOT_RUN","RUN09_archive_restore":"NOT_RUN_THIS_TURN","same_BASS_r4_joint_spectral_comparison":"NOT_RUN","fresh_full_ZIP_restore":"NOT_RUN"},
+ "next_node":"P4-S4C-SPECTRAL-EDGE-SUPPORT/NATIVE-INTEGRATION",
+ "next_contract":"Recover sandbox. Restore and hash RUN09. Compile six new Rust tests; compare returned moments to MP55 values. Keep 160 birth times, native GL8, all other 47 spectral cells, source rate, gas and geometry fixed. Obtain each actual monotone ray endpoint ratio from native geometry. Refine first cell only; record per-cell number, mean shift and threshold crossings. Jointly solve baseline and one refined support before further changes. Do not use manufactured eta as BASS input.",
+ "holds":["native spectral port correctness","same-source joint spectral endpoint","continuous spectrum","birth continuum enclosure","angular convergence","full EoR","Einstein reaction feedback","unfinished Li Be nuclear T1 T8"],
+ "native_subagent":"NOT_RUN_TOOL_NOT_EXPOSED",
+ "original_45_and_26_DAGs":"UNCHANGED_IN_PARENT_ARCHIVES",
+ "preservation":"Direct GitHub source plus connector-native source bundle and unchanged parent reference; external receipt records actual delivery. No complete fresh ZIP or hash replay claimed."
+}
+@@END@@
+
+
+Resume and exact boundaries
+NEXT remains the same spectral-edge node /NATIVE-INTEGRATION. Restore and hash RUN09, compile the six written tests using rustc --edition=2024 --test spectral_edge_support.rs -o spectral_edge_tests and run the binary. There was no Rust test execution in this turn. Compare native moments against the MP55 reference before connecting the first cell to the existing source builder. Use actual HHeModel constants, actual parent photon fraction and actual monotone BASS ray endpoint ratios. Keep160 birth times,8 angles,other47cells,gas,geometry and atomic rates fixed. The manufactured exp(-0.0004) control must not be substituted for actual BASS geometry. First compare baseline and one refined support jointly, then decide on further refinement.
+
+
+Arithmetic-only cost estimate: at most4 swept panels, two nodes per panel gives8 first-cell nodes and55 total energy nodes,70400 physical cohorts at160 births and8 angles. Two subdivisions gives16 first-cell nodes and80640 cohorts. These are not measured runtime, memory or actual packet counts. Both require the future actual native adapter.
+
+
+Failure history: an initial Wolfram Table iterator attempted list destructuring and returned Table::write with unevaluated expressions. It was replaced by integer indexing and the corrected code executed. The first symbolic Sort output was canonical expression order, then corrected to numeric Sort. Failed outputs are excluded from numerical data. Source-replay of the published spectral_edge_reference.wl at f6e87d27c4c6da4315cf0426b5bddca00151c76d was actually performed through Wolfram and reproduced all six True checks and the three response-error rows. This is not native executable restoration or independent atomic data validation.
+
+
+Published Rust blob:2f9ae1fc86331901b62b61546618153cb6dd0673
+Published Wolfram blob:658e4d7842e396d0080c93bda734ff9e241b3cad
+Original source blobs read this turn:
+axbi_sources.rs36d24eb13db3fc42321cb0ddb165e003c0a086c7
+hhe_events.rs57a63eee1e9d8c4aa2b5ed663dbea15619359f71
+atomic_provider.rs62211d8910cd332fffa8f94c6989cae77128916e
+deuterium_atomic.rs9d64984fe091b7e0ed1f13e63ce411b4d6ac5632
+Git blobs identify provider-published content, not a local byte-hash replay. Parent source was not modified.
+
+
+References
+NIST DLMF3.5 https://dlmf.nist.gov/3.5
+Verner etal1996 https://arxiv.org/abs/astro-ph/9601009 ; https://www.pa.uky.edu/~verner/photo.html
+Pawlik and Schaye https://arxiv.org/abs/1008.1071
+Mirocha,Skory,Burns,Wise2012 https://arxiv.org/abs/1204.1944
+Literature grounds the quadrature and atomic-fit context, not this run's numerical values or novelty. New fullEoR,angular/spectral continuum,Einstein feedback,Li/Be/nuclear completion is not claimed.
+
+
+END RUN10 SOURCE CHECKPOINT

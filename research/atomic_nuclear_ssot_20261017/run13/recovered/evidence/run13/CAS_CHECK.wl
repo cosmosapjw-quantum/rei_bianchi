@@ -1,0 +1,1 @@
+Module[{p1,p2,a1,a2,b1,b2,r1,r2,c,h,q0,e1,e2},a1={aH1,aHe1,aHeII1,aD1};a2={aH2,aHe2,aHeII2,aD2};r1=p1+Total[a1]-b1;r2=p2+Total[a2]-b2;{Expand[(p2-p1)+Total[a2-a1]-(b2-b1)-(r2-r1)],FullSimplify[((q0+c h^4)-(q0+c(h/2)^4))/((q0+c(h/2)^4)-q0),Assumptions->{c!=0,h>0}],Expand[((q2+e2)-(q1+e1))-(q2-q1)-(e2-e1)]}]
