@@ -1,42 +1,43 @@
-# REI-LRS V14: 출생시각 실행 코드 게시와 독립 사건·열에너지 검사
+# REI-LRS V14 현재 연구 전달 — 2026-10-19
 
-## 재개 기준
-2026-10-18 지정된 Google Drive 및 Dropbox의 rei_bianchi 백업을 먼저 확인했다. V14에는 R5/C5_C6만 있었고 새 native 실행 영수증을 찾지 못했다. GitHub V14 HEAD도 1c219805bb3684a83377e68eebd581ec00d97cde였다. 이는 조회한 경로의 결과이지 사용자의 모든 저장소에 결과가 없다는 주장이 아니다.
+## 현재 결론
 
-직전 복구 아카이브 d2ae9b8af0c9fe68e60e263d5dedfdb25edd9663251d5942a7d6f62f4626b406 (2353693 bytes)를 입력으로 재사용했다. 과거 V11 문서의 NOT_RUN/출력 수치는 현재 V14의 실행 증거가 아니다. V12/V13의 기존 source capsule은 변경하지 않았다.
+**V14 native 컴파일·표적시험·smoke·84개 full 이력은 2026-10-18 NCP에서 실제 완료됐다.** 이번 재개에서 Drive와 Dropbox의 전체 archive, stdout, 종료코드, source hash 및 원시 CSV를 확인했으며 기존 campaign을 다시 실행하지 않았다. 실행 code anchor는 `f6046418d15e2f44418dfbc04ca67999f389a7df`, 재개 때 HEAD는 `55d267d00e8dd9b04005af5d8551e948251c0777`이다.
 
-## 완료한 코드 수정
-직전 복구에서는 32 Python tests 및 76개 제조 수치 문제를 실행했지만, 수정된 분석기·실행기의 GitHub 게시가 없었다. 이번에는 누락된 복원기, source manifest, 실행기, Python reference, 테스트, native module 등록 조각을 모두 정상 repository 파일로 게시했다. 코드 anchor는 f6046418d15e2f44418dfbc04ca67999f389a7df이다. NCP에서 압축 소스 capsule을 복사·해독할 필요가 없다.
+실제 GL2 온도 refinement는 Xend=1e-5 / 1e-4에서 p≈1.059 / 0.947였다. 이번 원시 사건·열 채널 분해에서 photoheat와 종별 광흡수 배분이 leading 온도 차이를 운반함을 확인했다. 기존 source-off 제어는 photon population이 0인 gas-only 이력이었다.
 
-새로 발견한 결함: 기존 분석기는 native가 적은 energy_residual 값이 0이면 CE/RR/FF/CMB/팽창 work/escape/photo-binding/electron 열을 개별적으로 바꾼 잘못된 CSV도 받아들였다. 먼저 8 FAIL / 1 PASS 반례를 보존했다. event_energy_audit.py와 연결된 analyze_v14.py는 원시 열을 이용해 여섯 회계를 따로 재구성한다. 수정 뒤 57/57 PASS: 기존32 + 반례·무사건9 + 혼합 비영 사건/부호 있는 CMB16이다. 이 검증용 CSV는 실제 native 이력이 아니다.
+새 이론 유도와 실제 native transport 진단은 고정 기체·기하에서 spectrum을 N/U로 매번 재구성하는 map의 O(h²) 국소 결함과 약 1차 반복 적분을 확인했다. 새 고유 행렬은 48 pair +14 frozen-history=62행이며 coupled 우주론 이력이 아니다. 재현 runner를 fresh sibling layout에서 한 번 확인했고 최초 62행/13,312 cell rows와 완전히 같은 CSV bytes를 얻었다. 보존 잔차가 작아도 이 시간 오차는 남는다.
 
-## 물리적 정의와 직접 유도
-평탄 FLRW, X=ln(a/a0), metric (-,+,+,+), a0=1/21. 모든 사건수와 에너지는 전체 H 핵수당 정규화한다. Y=0.2454/[4(1-0.2454)]는 He/H 핵수비, x,y,z는 HII/HeII/HeIII 분율이다. e=x+Y(y+2z), w=(3/2) k_B T(1+Y+e)/eV_erg이다. k_B=1.380649e-16 erg/K 및 eV_erg=1.602176634e-12 erg/eV를 유지한다.
+전체 유도, 가정, native source 대응, 결과 및 한계는 [RESEARCH_CONTINUATION_KO.md](projection_diagnostic_20261019/RESEARCH_CONTINUATION_KO.md)에 있다. [독립 검토](projection_diagnostic_20261019/INDEPENDENT_PROJECTION_REVIEW.md)는 PASS_SCOPED다. 원래 coupled T 오차 중 이번 기작의 인과적 기여율은 미분리이며 full source-on 2차는 HOLD다.
 
-P_i,C_i,R_i는 HI/HeI/HeII 광이온화, 충돌이온화, 대응 이온의 RR 누적 사건/H이고 D는 HeII DR 사건/H이다. 결합에너지 문턱 chi=(13.598434599702,24.587389011,54.41776)eV는 native hhe_events의 정의이며 Verner fitting cutoff와 혼동하지 않는다.
+## 실제 실행 범위
 
-B=chi_H*x+Y[chi_HeI*y+(chi_HeI+chi_HeII)*z].
-C_B=sum_i chi_i C_i, R_B=sum_i chi_i R_i+chi_HeI D, P_B=sum_i chi_i P_i.
-Q=Q_RR+Q_DR+Q_CE+Q_FF. E_CMB는 기체로 유입되는 부호 있는 열량이다.
+| 항목 | 상태 |
+|---|---|
+| 2026-10-18 NCP | Rust1.99.0, offline locked release, 36 distinct targeted tests가 smoke/full에서 각각 PASS |
+| Smoke | exit0, 28 histories/336 rows |
+| Full | exit0, 84 histories/7056 rows, 7 modes×6 N×2 Xend |
+| 2026-10-19 sandbox native 진단 | Rust1.94.1, compile0/run0, 첫 native 실행0.094112117s |
+| 새 runner 재현 | fresh restore/build/run/analyzer 모두0; 같은 두 CSV SHA256 일치 |
+| 이번 새 NCP 실행 | NOT_EXECUTED — Desktop Commander 실제 probe가 월 사용량 한도 SERVICE_ERROR |
+| 기존 Python57/제조76 | 과거 결과 재사용, 이번에 재실행·새 연구 집계하지 않음 |
 
-Delta e=sum(P+C-R)-D
-Delta B=P_B+C_B-R_B
-Delta w=Q_photoheat-C_B-Q+E_CMB-W_gas
-E_escape=R_B+Q
+기존 네 V14 native output, MD14 source, Verner/Grackle/EOS, default/adaptive/checkpoint는 그대로다. 새 native 파일은 추가 진단 example 하나다. 현재 분석기와 재현 runner를 정상 GitHub 파일로 제공한다.
 
-따라서 Delta(w+B)+E_escape+W_gas-E_CMB-(Q_photoheat+P_B)=0이다. Wolfram Language의 직접 대수 전개 잔차가 정확히 0이었다. 이는 주어진 owner 회계의 항등식이지 실제 재결합 photon spectrum, Case-B 재수송 또는 이산화 정확도 정리가 아니다.
+## 이번에 정정한 실제 결함
 
-검사하는 여섯 잔차: reported electron/EOS, electron/events, photo-binding, chemical binding, escaped cooling+capture binding, gas thermal. energy 1e-9 eV/H 및 events 1e-9/H는 기존 V14 analyzer의 bound 그대로다. 이 bound의 적합성은 후속 실제 실행에서 관측 오차·Newton residual과 함께 보고해야 하며 정확도 목표로 오해하지 않는다. V14 고정 초기상태(.075,.12,.03),15000K에 한정한다. 초기상태를 바꾸려면 판독 계약도 함께 바꿔야 한다.
+두 기존 요약 JSON에서 species-event residual의 전체 최댓값이 `0`으로 잘못 집계돼 있었다. 기존 독립 분석의 두 interval 값 중 최대인 `4.84017834763862e-14/H`로 정정하고 이전0과 근거를 보존했다. Native 사건 회계의 변경은 아니다. 새 analyzer의 환경 상태는 CSV로 추정하지 않도록 고쳤다.
 
-## 기존 수치 결과 재사용
-직전 실행의 76개 제조 문제(선형54, 비선형16, 강성6)는 보존·재검산한다. 고정 S,k 선형 GL2는 약4차, 일반적인 curved-opacity 비선형은 약2차이고, k=1000의 한 단계 GL2 생존량은 상대오차 약100%였다. 이들에 Grackle/Verner 전체 source-on 정확도를 부여하지 않는다. 이번 새 과학/코드 결과는 여섯 독립 회계의 유도와 반례를 잡는 수정이며, 과거76건을 새 native 실행으로 세지 않는다.
+`ef94f08df149b57959b868646b397a2bff2b268b`는 full run 종료12:41:16 뒤인12:45:53에 생성된 **실행 증거 게시 commit**이다. 이를 실제 실행 순간의 checkout SHA로 부르지 않는다. 원본 필드는 보존하고 역할을 부연했으며, native byte identity는 code anchor+네 output SHA로 확인한다.
 
-## 실행·게시 범위
-Python57, shell syntax, 원본을 복원한 native 네 파일 SHA 검사가 실제 수행됐다. Rust compiler/cargo가 없고 sandbox DNS도 실패했으므로 컴파일과 NCP 실행은 NOT_RUN이다. 네 Rust 파일은 이번 수정에서 그대로 유지됐다. 독립 subagent 도구가 없어 native_subagent NOT_RUN, user-authorized serial implementation이다.
+## 판정·다음 작업
 
-표적 native 테스트는 기존29+V14 신규7로 예상하지만 실제 통과를 주장하지 않는다. 넓은 V13 crate 시험의 과거 누락 fixture 실패도 지우지 않는다. 실행은 RUN_V14.sh가 담당하며, 두 구간에서 7모드×6N=84이력/7056 macro rows를 만들도록 설정되어 있다.
+원시 P/C/R/D 사건, binding/heat/cooling/escape/signed CMB/work를 구분한다. 모든 양은 total-H 기준이며 e=x+Y(y+2z), Y=.2454/[4(1-.2454)]다. 기존 CSV에 없는 surviving photon energy와 boundary photon number의 전체 독립 회계를 새로 주장하지 않는다.
 
-CSV에 살아남은 photon energy와 boundary photon number가 없으므로 완전한 photon energy/number 독립 재구성은 여기서 주장하지 않는다. 저장된 native residual 검사는 유지하되 이것을 독립 검증으로 다시 세지 않는다. full source-on p2, uniform stiff accuracy, Case B, full EoR, signed Bianchi는 HOLD.
+Full source-on p2, uniform stiff, Case B, full EoR, signed Bianchi는 HOLD다. 다음 연구 대상은 closure R(M)를 유지한 source-free photon–gas update의 시간 중심 stage 설계다. 기존 84이력을 반복하거나 birth quadrature만 추가하는 것으로 이번 projection 결함을 해결했다고 하지 않는다. 이 알고리즘 선택은 NCP의 작은 호환 수정으로 넘기지 않는다.
 
-## 문헌과 근거
-Grackle: Smith et al., MNRAS, DOI 10.1093/mnras/stw3291. Photon-conserving transfer: Mellema et al. astro-ph/0508416. 시간 중심 optical depth: Mackey arXiv:1201.5651. 이 문헌은 배경이며 V14 판독기 검증의 근거는 실제 반례/회귀 로그다. 동료 프로젝트의 source-age 연구는 PR185 및 bass_cr PR76/77/79를 참조하되 본 native owner를 자동 교체하지 않는다.
+[실행 인계](CODEX_NCP_EXECUTE_KO.md), [다음 연구 인계](NEXT_CHAT_HANDOFF_KO.md), [이번 DAG](stages/PROJECTION_DIAGNOSTIC_20261019.json)를 따른다. 사용자가 파일을 내려받거나 수동 SSH/SCP를 할 필요는 없다.
+
+## 과거 기록
+
+기존 57 Python 제조 CSV 시험, 8 FAIL 반례와 독립 여섯 회계 수정, 76 제조 수치 문제는 [실행 준비 시점 기록](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/2676c31df1bf18ec0c7d60108846f1e9c8ca853c/research/lrs_atomic_native_bridge_20261016/v14/RESEARCH_DELIVERY_KO.md)에 보존돼 있다. 그 시점의 native NOT_RUN과 독립 agent NOT_RUN은 현재 완료 상태가 아니다. 기존 실행 원본과 초기 실패는 [NCP execution directory](executions/REI_LRS_V14_20261018T124115Z/)에 그대로 남아 있다.

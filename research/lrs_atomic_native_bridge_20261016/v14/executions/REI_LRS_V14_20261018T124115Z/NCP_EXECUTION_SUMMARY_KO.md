@@ -2,7 +2,9 @@
 
 Verified: 2026-10-18T13:10:43.095395+00:00
 
-PR #198; latest source/run commit `ef94f08df149b57959b868646b397a2bff2b268b`, native code anchor `f6046418d15e2f44418dfbc04ca67999f389a7df`. Host `s1a0e5abed09`; 64 CPUs, 125 GiB RAM; rustc 1.99.0 (b940084d7 2026-09-28); cargo 1.99.0 (5f94df478 2026-08-27); 2 Cargo jobs.
+2026-10-19 clarification: the publication commit below was created at 12:45:53 UTC after full-run completion at 12:41:16 UTC. It is not an attested runtime checkout SHA. Native byte identity is the code anchor plus four reconstruction hashes. The JSON global species maximum was corrected from 0 to 4.84017834763862e-14/H using its existing per-interval values; original raw CSV and archived receipts are unchanged.
+
+PR #198; execution-evidence publication commit `ef94f08df149b57959b868646b397a2bff2b268b`, native code anchor `f6046418d15e2f44418dfbc04ca67999f389a7df`. Host `s1a0e5abed09`; 64 CPUs, 125 GiB RAM; rustc 1.99.0 (b940084d7 2026-09-28); cargo 1.99.0 (5f94df478 2026-08-27); 2 Cargo jobs.
 
 ## Actual execution
 
@@ -42,8 +44,9 @@ Deltas are T(N)-T(2N) and T(2N)-T(4N); p=log2(|first/second|). Temperature round
 | 1e-4 | source_off_midpoint | -7.68909e-07 | -2.10792e-07 | 1.866993679870282 | False |
 | 1e-4 | source_off_gl2 | -4.87811e-07 | -2.06697e-07 | 1.2388036441536958 | False |
 
-The source-on physical GL2 temperature order is about 1.06 at X=1e-5 and 0.95 at X=1e-4 over this refinement pair; physical midpoint gives about 1.47 and 1.37. This does not establish second-order source-on convergence. Source-off controls approach the roundoff floor at X=1e-5.
+The source-on physical GL2 temperature order is about 1.06 at X=1e-5 and 0.95 at X=1e-4 over this refinement pair; physical midpoint gives about 1.47 and 1.37. This does not establish second-order source-on convergence. The source-off controls have zero photon population. Their small irregular X=1e-5 differences also contain endpoint-X displacement effects, and finer X=1e-4 differences have visible gas/electron ledger-residual contributions; they are not all explained by a temperature-ulp floor. The preserved numbers remain unchanged; see the 2026-10-19 continuation for the exact decomposition.
 
 ## Cost and claim boundary
 
 Per-history `wall_s` is the cumulative wall value at the final row, summed over 42 histories within each interval (the CSV records elapsed-so-far on each row, so summing all rows would overcount). The native test and the executed physical modes are bounded to this V14 owner. Full source-on second order, uniform stiff accuracy, Case-B retransport, full EoR, and signed Bianchi remain HOLD.
+

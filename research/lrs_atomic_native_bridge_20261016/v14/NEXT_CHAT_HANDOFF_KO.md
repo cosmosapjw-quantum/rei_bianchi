@@ -1,17 +1,46 @@
-# 새 ChatGPT 연구 스레드 인계: REI-LRS V14
+# 다음 연구 스레드: REI-LRS V14 native projection 진단 이후
 
-나는 rei_bianchi의 독립 LRS photon/chemistry/thermal 시간적분 연구를 이어가고 있다. 이 스레드는 production v3/rux DAG와 별개다. $physmath-research-loop를 사용해 이론과 샌드박스 경량 코딩을 진행하되, 여기서 가능한 코드 수정을 끝내고 GitHub에 push하여 NCP에는 컴파일/작은 호환 수정/실제 실행만 남겨라. 완료 단계마다 백업/게시/DAG를 갱신하고 다음 실행용 프롬프트를 복사 가능한 본문으로 제공하라. 사용자에게 수동 다운로드나 SSH 작업을 요구하지 않는다.
+나는 독립 LRS photon–chemistry–thermal 시간적분 연구를 이어간다. Production v3/rux와 별개다. $physmath-research-loop를 사용해 실제 이론 유도와 샌드박스 경량 native 검증을 수행하고, 가능한 수정은 완성해 같은 GitHub branch에 push하라. NCP에는 컴파일·작은 호환 수정·실제 실행만 남긴다. 완료 단계마다 게시·백업·DAG를 기록하며 사용자에게 다운로드·수동 SSH/SCP를 요구하지 않는다.
 
-첫 작업은 새 실행 결과 확인이다. Google Drive REI_RESEARCH_BACKUPS/rei_bianchi/ 및 Dropbox bianchi/research_backups/rei_bianchi/의 V14 폴더, repository cosmosapjw-quantum/rei_bianchi branch research/rei-lrs-v14-physical-birth-20261018의 최신 HEAD/PR/실행 영수증을 먼저 읽어라. 파일 목록만으로 실행을 추정하지 말고 stdout/receipt/source identity를 확인한다. 입력 source는 현재 대화의 요약보다 실제 최신 소스가 권위다.
+## 첫 행동: 새로운 결과부터
 
-V14 실행 code anchor=f6046418d15e2f44418dfbc04ca67999f389a7df. V13 parent=7fb18cec3d6d6eebad5fe418ec83b36d82cfff1e. v14/RESEARCH_DELIVERY_KO.md, CODEX_NCP_EXECUTE_KO.md, SOURCE_DELTA.json, stages/*DELIVERY*.json을 읽고 최신 후속 commit을 반영한다. 기존 V11 supplied 문서의 NOT_RUN과 과거 41-test 결과를 현재 V14 상태로 쓰지 않는다.
+Drive `REI_RESEARCH_BACKUPS/rei_bianchi/`, Dropbox `/bianchi/research_backups/rei_bianchi/`, repository `cosmosapjw-quantum/rei_bianchi`의 branch `research/rei-lrs-v14-physical-birth-20261018`과 [draft PR #198](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/198)을 먼저 읽어라. 최신 HEAD·receipt·stdout·종료코드·원시 CSV·source SHA를 확인하고, 이 인계 뒤 새 결과가 있으면 우선한다.
 
-현재 완료: 실제 physical birth GL2 시각 사이를 기존 source-free V13 native tentative로 진행하는 opt-in 네 Rust 파일과 seven controls가 작성돼 있다. default/adaptive/checkpoint, MD14 source, Verner/Grackle/EOS는 변경하지 않았다. Python57/57, bash syntax, 네 native output SHA reconstruction이 확인됐다. Rust compiler 부재로 V14 native compile/run은 아직 없다. 이 인계 이후 새 실행이 있으면 그 결과로 상태를 갱신한다.
+`v14/RESEARCH_DELIVERY_KO.md`, `SOURCE_DELTA.json`, `stages/FINAL_DELIVERY.json`, `stages/PROJECTION_DIAGNOSTIC_20261019.json`, `projection_diagnostic_20261019/RESEARCH_CONTINUATION_KO.md`, `CODEX_NCP_EXECUTE_KO.md`를 읽어라. 후속 dual-backup receipt가 있으면 실제 object id와 readback SHA로 상태를 확인한다.
 
-가장 최근 수정: 기존 분석기가 저장된 energy_residual=0을 믿고 변조된 CE/RR/FF/CMB/work/escape/photo-binding/electron 열을 통과시키는 실제 결함을 8 FAIL 반례로 재현했다. event_energy_audit.py는 원시 species/events/T로 전자 EOS·전자 사건·photo binding·chemical binding·escaped energy·gas thermal 여섯 회계를 재구성한다. 32 기존 +9 반례/zero +16 비영 혼합 부호 있는 CMB=57 PASS. 이것들은 제조 CSV 시험이지 native 우주론 이력이 아니다. 없는 photon energy/boundary number 열의 전수 회계를 주장하지 않는다.
+## 완료된 실제 결과
 
-전 단계 76개 Python 제조 문제는 선형54/비선형16/강성6이다. GL2의 선형4차를 일반 비선형/native4차로 확장하지 않는다. k=1000,h=1에서 양수·보존을 유지하면서 생존량 상대오차100%인 반례가 있다. 이 결과와 수렴 확인을 재포장 때 새 과학 실행으로 중복 집계하지 않는다.
+원래 V14 컴파일·표적 36 tests·smoke·84 full histories는 2026-10-18 NCP에서 완료됐다. Smoke는 28 histories/336 rows, full은 84 histories/7056 rows이며 모두 exit 0이다. 36 distinct tests를 양쪽에서 실행해 72회 PASS다. 이번 진입 때 HEAD는 `55d267d00e8dd9b04005af5d8551e948251c0777`이었다.
 
-다음 최소 과학 실행은 CODEX_NCP_EXECUTE_KO.md에 있는 실제 native compile→표적36 expected→별도 smoke→84 source-on/control histories이다. 실행 결과가 없으면 새 toy나 검증 메타루프를 무한 추가하지 말고, 현재 runnable 전달과 concrete compile blocker를 먼저 해결한다. 필요할 때만 native 결함의 최소 코드수정과 회귀를 진행한다. source-on full p2, uniform stiff, Case B, full EoR, signed Bianchi는 실제 근거 없이 승격하지 않는다.
+Frozen native source anchor는 `f6046418d15e2f44418dfbc04ca67999f389a7df`, V13 parent는 `7fb18cec3d6d6eebad5fe418ec83b36d82cfff1e`다. `ef94f08df149b57959b868646b397a2bff2b268b`는 run 종료 뒤인 12:45:53 UTC에 생성된 실행 증거 게시 commit이며 runtime checkout attestation이 아니다.
 
-NCP 승인 경로: ssh -i /home/cosmosapjw/.ssh/ncp_key root@49.50.142.2 -p 22. 이 대화 환경에 local 제어가 없으면 NCP 실행을 직접 했다고 주장하지 말고 복사 가능한 Codex 프롬프트를 출력한다. 기존 checkpoint/다른 작업 보호, 실제 실행 버전·수치 residual·실패 보존, GitHub/Drive/Dropbox 각각의 ACK와 remote readback을 구별한다. 독립 subagent가 없는 경우 모델 독립 검토를 했다고 꾸미지 않는다.
+원본 full archive는 2,713,000 bytes, SHA256 `049686b0dbe28f59ca0c8c3d7365e35fb2bef7f99799976f029501948899ad22`다. Drive `1BgKZPcl0bhtNKf_ylvA3-eD57IEwlPA1`, Dropbox `id:BSpOijBcT10AAAAAAD_MvA`의 전체파일 readback으로 확인했다. 기존 57 Python 시험과 76 제조 문제는 과거 결과이며 재실행·재집계하지 않는다.
+
+실제 GL2 T p는 Xend=1e-5/1e-4에서 1.0591/0.94695였다. 원시 P/C/R/D와 signed CMB, EOS의 exact finite difference로 photoheat·종별 absorption이 leading T 차이를 운반함을 확인했다. 기존 source-off는 photon arrays가 비어 모든 photo 사건이 0인 gas-only controls다. X endpoint displacement와 gas/electron ledger residual도 finer source-off 차이에 영향을 준다. 작은 차이를 전부 ulp floor로 부르지 않는다.
+
+## 새로 완료한 유도와 native 진단
+
+고정 기체·기하, M=(N,Uq), AR(M)=M, Lf=−κf에서 현재 map은 Φ_h=A exp(hL)R이고, closed-moment ODE는 M′=F=ALR이다. Full minus two halves는
+
+\[
+\Phi_h-\Phi_{h/2}\circ\Phi_{h/2}
+=\frac{h^2}{4}AL(I-R'A)LR+O(h^3).
+\]
+
+고정 node의 exponential family에서는 number coefficient=N⟨κ_perp²⟩≥0다. CSV는 halves-minus-full convention이라 부호가 반대다. 가정과 전체 유도를 보고서에서 읽어라. 일반 projection lemma의 새로운 novelty나 흡수계의 entropy theorem을 주장하지 않는다.
+
+새 native example은 실제 MD14+Verner/physical c, 고정 gas/geometry, cells=8/16/32/64, broad와 delta60을 시험했다. 48 pair+14 frozen-history=62 고유 행, 13,312 cell 행이다. Sandbox Rust 1.94.1에서 compile 0/run 0, 첫 실행 0.094112117 s였다. Fresh sibling runner를 한 번 재현해 두 CSV 모두 동일한 bytes를 얻었다. 이는 새로운 우주론 이력이나 124개 고유 사례가 아니다.
+
+Cells16의 local N/U defect slopes는 1.9426/1.9552다. Fixed-medium global self-difference slopes는 N/U=1.00924/1.00736, HeI=0.99318, heat=0.97984다. Delta pair의 상대 N/U 차이는 1.65e-16 이하다. 작은 N/U 보존 잔차와 1차 오차가 공존한다.
+
+독립 agent가 이론·native 대응·CSV를 읽어 PASS_SCOPED로 검토했다. 또 다른 agent가 기존 CSV 채널 분해를 했다. 서로 다른 모델 계열이 합의했다고 꾸미지 않는다. Native full coupled T 오차에서 projection 기작의 기여율은 아직 미분리다.
+
+실제 수정은 두 기존 summary의 species global max 0을 4.84017834763862e-14/H로 정정하고 원래 값·근거를 보존한 것이다. 새 analyzer의 NCP 상태 hardcode도 고쳤다. 기존 네 V14 native 파일·source·rates·EOS·default/adaptive/checkpoint는 그대로다.
+
+## 다음 유한한 연구
+
+완료된 compile/smoke/84 이력이나 76 toy/57 제조 CSV를 반복하지 않는다. 다음 수정 대상은 기존 closure R(M)를 유지하면서 F(M)=ALR(M)와 반응·열 사건을 시간 중심 stage에서 일관되게 적분하는 source-free photon–gas update다. Gas midpoint opacity만으로 old-moment spectral reconstruction의 2차항이 맞춰지지 않는다. Birth quadrature를 더 높이거나 closure/rates/광속을 바꾸는 것으로 이번 결함을 제거했다고 하지 않는다. 단순한 음수 Richardson 조합 역시 양수성·realizability 검토를 대신하지 않는다.
+
+먼저 closed-moment time-centering의 opt-in 수식을 고정하고 구현하라. 현재 positive broad-spectrum frozen matrix와 delta 대조에서 원래 결함이 사라지는지 확인하고, 양의 기존 photon을 가진 evolving-gas source-free history, 그 뒤 source-on paired refinement로 진행한다. 이는 알고리즘 연구이지 NCP 호환 수정이 아니다. Full source-on 2차·uniform stiff·Case B·full EoR·signed Bianchi는 실제 새 증거 전까지 HOLD다.
+
+이전 controller의 Desktop Commander probe는 월 사용량 SERVICE_ERROR였고 재시도 금지 응답이었다. 이전 환경 결과를 현 환경에 영구 일반화하지 말되 실패한 서비스를 맹목적으로 반복하지 않는다. 기존 승인 NCP 경로는 `ssh -i /home/cosmosapjw/.ssh/ncp_key root@49.50.142.2 -p 22`다. 현재 외부 실행이 불가능하면 실제 실행했다고 하지 말고 `CODEX_NCP_EXECUTE_KO.md`의 완성 runner 인계를 사용한다.
