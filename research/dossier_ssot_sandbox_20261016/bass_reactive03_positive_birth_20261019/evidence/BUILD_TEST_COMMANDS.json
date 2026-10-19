@@ -1,0 +1,67 @@
+[
+  {
+    "command": [
+      "rustfmt",
+      "--edition",
+      "2024",
+      "--config",
+      "skip_children=true",
+      "crate/fitted_birth.rs",
+      "crate/tests/ap_fitted_birth.rs",
+      "crate/examples/ap_frozen_oracle.rs"
+    ],
+    "exit_code": 0,
+    "wall_s": 0.03877579199979664,
+    "log": "AP_ROOT_RUSTFMT.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "ap/Cargo.toml",
+      "--offline",
+      "--locked",
+      "--release",
+      "--all-targets"
+    ],
+    "exit_code": 0,
+    "wall_s": 9.767139706000307,
+    "log": "RUST_FULL_TESTS.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--manifest-path",
+      "ap/Cargo.toml",
+      "--offline",
+      "--locked",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0,
+    "wall_s": 3.01094477299921,
+    "log": "CLIPPY_FULL.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "build",
+      "--manifest-path",
+      "ap/Cargo.toml",
+      "--offline",
+      "--locked",
+      "--release",
+      "--example",
+      "ap_native_driver",
+      "--example",
+      "ap_frozen_oracle"
+    ],
+    "exit_code": 0,
+    "wall_s": 0.3404591580001579,
+    "log": "NATIVE_BUILD_FINAL.log"
+  }
+]

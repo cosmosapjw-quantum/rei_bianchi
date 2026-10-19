@@ -1,0 +1,82 @@
+{
+  "status": "SCOPED_PARSER_CHECKS_PASS",
+  "cases": [
+    {
+      "case": "valid_binary_payload",
+      "exit_code": 0,
+      "result": {
+        "status": "VERIFIED_PAYLOAD_BYTES",
+        "root": "/workspace/scratch/996fc62899da/packaging_work/manifest_validation",
+        "manifest": "MANIFEST.sha256",
+        "manifest_sha256": "e163152e93456b5a9955156e43381388531ac18341ce12cb6cb18544e746bb7e",
+        "payload": {
+          "entries": 1,
+          "bytes_hashed": 19,
+          "errors": []
+        },
+        "immutable_parent_source": null,
+        "scope": "Checks listed byte identities only; no scientific convergence claim and no claim about unlisted files."
+      }
+    },
+    {
+      "case": "tampered_hash",
+      "exit_code": 2,
+      "result": {
+        "status": "ARTIFACT_INTEGRITY_FAILURE",
+        "root": "/workspace/scratch/996fc62899da/packaging_work/manifest_validation",
+        "manifest": "MANIFEST.sha256",
+        "manifest_sha256": "459081bd35a85f8c4bf8130ba494510f0ae40a8a3bf0ade35d885861abb1a196",
+        "payload": {
+          "entries": 1,
+          "bytes_hashed": 19,
+          "errors": [
+            {
+              "path": "payload.bin",
+              "category": "SHA256_MISMATCH",
+              "expected": "0000000000000000000000000000000000000000000000000000000000000000",
+              "actual": "943bbca6ec730203edfee1fb04546b621bd266b800d9171c177e08f02759e678"
+            }
+          ]
+        },
+        "immutable_parent_source": null,
+        "scope": "Checks listed byte identities only; no scientific convergence claim and no claim about unlisted files."
+      }
+    },
+    {
+      "case": "missing_payload",
+      "exit_code": 2,
+      "result": {
+        "status": "ARTIFACT_VERIFICATION_BLOCKED",
+        "category": "INPUT_DEPENDENCY_MISSING",
+        "detail": "missing.bin"
+      }
+    },
+    {
+      "case": "path_traversal",
+      "exit_code": 2,
+      "result": {
+        "status": "ARTIFACT_VERIFICATION_BLOCKED",
+        "category": "INVALID_MANIFEST_PATH",
+        "detail": "../README_RESTORE.md"
+      }
+    },
+    {
+      "case": "duplicate_entry",
+      "exit_code": 2,
+      "result": {
+        "status": "ARTIFACT_VERIFICATION_BLOCKED",
+        "category": "DUPLICATE_MANIFEST_ENTRY",
+        "detail": "payload.bin"
+      }
+    },
+    {
+      "case": "symlink_payload",
+      "exit_code": 2,
+      "result": {
+        "status": "ARTIFACT_VERIFICATION_BLOCKED",
+        "category": "SYMLINK_NOT_ADMITTED",
+        "detail": "linked.bin"
+      }
+    }
+  ]
+}
