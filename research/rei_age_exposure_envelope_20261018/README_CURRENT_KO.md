@@ -38,3 +38,9 @@ N4의 고정 positive support/정확 count 아래 10개 1η 가중치가 유일�
 이번 source snapshot과 C8/C10 v6의 실제 commit/provider/readback 상태는 `DELIVERY_RECEIPT_CURRENT.json`이 기준이다. Archive 생성 이후 작성되는 final receipt와 별도 delivery confirmation이 archive 내부의 생성 시점 pending 상태를 대체한다. 자기 commit/hash를 자기 안에 재귀적으로 기록하지 않는다.
 
 Owner checkout, PR150/R9, LRS, BASS HHeD는 보존한다. PR199 draft 유지, no merge/no force-push. **PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED**.
+
+## v6 최종 배송 확인
+
+VigilODE source는 `50bc41f6b6aea05f67c03ab3ad23bb118d574622`에 게시했고, C8/C10 v6의 Drive·Dropbox 네 전체 readback에서 bytes/SHA/CRC/payload와 source·native153/B1·vendor identity를 확인했다. 상세는 `DELIVERY_RECEIPT_CURRENT.json`과 `evidence/delivery_v6_20261019/`이다. 최종 receipt commit은 별도 confirmation과 PR199 actual HEAD에서 확인한다.
+
+Source CI 두 workflow는 이 task 밖의 기존 top-level native crate `cargo fmt --check`에서 실패했고 후속 테스트는 skipped였다. Scoped task 검증 PASS와 구별하며, full-PR CI가 green이라고 주장하지 않는다. `evidence/delivery_v6_20261019/SOURCE_CI_READBACK.json`에 실제 job/log 확인을 보존했다.

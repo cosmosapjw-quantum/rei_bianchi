@@ -27,3 +27,7 @@ READY는 R_AGE32_BLOCK_MAX_SAME_SOURCE_WITH_PASSIVE_DIAGNOSTICS 한 사례. q0 a
 NCP 도구는 이번 실제 호출에서 월 사용량 중지였다. NCP NOT_RUN. Local Rust1.94.1 compile/새 bounded 계산과 Drive/Dropbox 읽기는 작동했다. 과거 blocker를 상속하지 말고 가용 도구를 다시 확인한다.
 
 게시·backup은 실제 receipt 기준으로 보고한다. Source/C8/C10 v6와 별도 final confirmation을 구분하고 나중 receipt가 ZIP 안에 있다고 주장하지 않는다. Owner checkout/PR150/R9/LRS/BASS HHeD 보호, no force-push/no merge. PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED.
+
+## v6 최종 배송 확인
+
+Source snapshot `50bc41f6b6aea05f67c03ab3ad23bb118d574622` 및 C8/C10 v6의 네 provider full readback은 완료되었다. 이후 final receipt/confirmation은 ZIP 안에 들어 있다고 주장하지 않는다. Source CI는 task 밖 기존 native formatting에서 실패했고 tests는 skipped였으므로 full-PR green claim은 없다. 실제 최종 receipt commit은 PR199와 v6 confirmation으로 확인한다.

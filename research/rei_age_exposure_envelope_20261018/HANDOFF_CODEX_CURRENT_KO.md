@@ -100,3 +100,7 @@ PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED.
 단일 age32 결과가 기존 age64와 비교 가능해지는 것이 이번 목표다. age resolution의 finite-neighbor 차이, 출생 jump 저장 잔차, binding blocks를 분리해 보고한다. observer 추가 자체는 기존 age64를 다시 실행할 사유가 아니다. block-max의 성공만으로 RMS 희석 가설을 판정하지 않는다.
 
 현재 wrapper의 원본 time8-subnormal-count 모드는 과거 진단용이다. native count/energy representation이 HOLD인 상태에서 이 모드를 새 캠페인으로 실행하지 않는다.
+
+## v6 최종 배송 확인
+
+완료된 source snapshot은 `50bc41f6b6aea05f67c03ab3ad23bb118d574622`이며 C8/C10 v6의 양 provider 네 전체 readback이 완료되었다. 다음 시작에서는 별도 final confirmation과 PR199 actual HEAD를 먼저 읽고, 이미 완료된 고정 모형 계산·export를 반복하지 않는다. Immutable ZIP에는 생성 시점의 pending CURRENT가 남고, 이 최종 receipt가 이를 대체한다. Source CI의 기존 task 밖 formatting 실패와 skipped tests는 `SOURCE_CI_READBACK.json` 참조.
