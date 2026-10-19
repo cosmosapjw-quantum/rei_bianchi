@@ -1,0 +1,838 @@
+{
+  "schema": "rei.run15.postloss.fixed_gas_optical_response.v1",
+  "status": "NUMERICALLY_CHECKED",
+  "source_status": "NEW_POSTLOSS_IMPLEMENTATION_NOT_LOST_SOURCE_RECONSTRUCTION",
+  "script_sha256": "f95c99ce30c886f9bff26744b00d6617b3a0f39661fec97c4cec1fb285f9d968",
+  "exact_command_argv": [
+    "/tmp/rei_run15_clean_git/research/atomic_nuclear_ssot_20261017/run15/postloss_diagnostic/postloss_fixed_gas_optical_response.py",
+    "--source-root",
+    "/tmp/rei_run15_clean_git/research/atomic_nuclear_ssot_20261017/run13/recovered",
+    "--output",
+    "/tmp/rei_run15_salvage/verification/reproduction_D/FIXED_GAS_OPTICAL_RESPONSE_REPRODUCED.json"
+  ],
+  "execution_environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "native_IVP_runs": 0
+  },
+  "scope": {
+    "gas_path": "prescribed archive checkpoint PCHIP only",
+    "geometry": "actual original prescribed BASS121 SIGNED_MINUS Hermite table",
+    "source": "fixed original 160 births and GL8; first-cell continuous energy diagnostic",
+    "quadrature_claim": "finite refinement differences only",
+    "tail_claim": "conditional analytic positive H-only omitted-tail estimate, binary64 implementation with explicit padding",
+    "unresolved": [
+      "true gas IVP path between archived checkpoints",
+      "nonlinear spectral opacity feedback",
+      "rigorous core quadrature error enclosure",
+      "birth-time continuum",
+      "angular continuum",
+      "whole donor domain",
+      "full EoR",
+      "Einstein feedback",
+      "FLRW-CONV",
+      "BI-SIGNED",
+      "ISO-COUPLE full",
+      "Li/Be and nuclear T1-T8"
+    ]
+  },
+  "inputs": {
+    "tight": {
+      "profile": "tight",
+      "archived_rtol": 6e-12,
+      "gas_knots_including_IC": 13,
+      "gas_path_definition": "PCHIP of archived dimensionless comoving HI and DI coordinates, multiplied by nH_initial*exp(-3*dx*z) for proper densities",
+      "checkpoint_gas_data_sha256": "41508e19226912360937606b80bc45191a1d358b9804b0705b5bb145aeaf520e",
+      "input_files": {
+        "SHA256SUMS.txt": {
+          "sha256": "ae0e9818db6a9ec5047a0b3fd72cb92bf8bd0384c5ef73de385094e5a9a05b15",
+          "bytes": 34982,
+          "verification": "MANIFEST_HASH_RECORDED"
+        },
+        "scripts/retarded_integrator.py": {
+          "sha256": "2e013024eae36bb7a39da61a7932b31d20d6e204837f28863e15361084efcbb5",
+          "bytes": 12922,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "scripts/gas_integrator_parent.py": {
+          "sha256": "097bb4a8955dd1f478e98792d2bf5089e0ffa69166ef042a9106ddfa19d93bf3",
+          "bytes": 4569,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "scripts/spectral_joint11.py": {
+          "sha256": "1e051855551856f07092682dac7f9b38b2728c35af8c37d79d16b01a25f88107",
+          "bytes": 7112,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "inputs/source_table.py": {
+          "sha256": "0c7df87c7c41ba254e3c631c98930fba96ea544702e25863d79cc82b8bd70c8c",
+          "bytes": 12949,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "inputs/bass164/PRODUCER_RECEIPT.json": {
+          "sha256": "98eddf4673780f0bbca711b373a3e0746cfafc8190674c8d2d6c4de658dc3eed",
+          "bytes": 3566,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "inputs/bass164/PROPOSED_REI_BACKGROUND.csv": {
+          "sha256": "5a7844834b50fbc046995678a6aaf936252a81e49de1593604eee30641274133",
+          "bytes": 408472,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "code/rei_bass_coupled/owner_src/axbi_sources.rs": {
+          "sha256": "606e3c2ec367dd9951ebbf2f53486f2232b49c0218896d66d8dc13dd5ee83bfe",
+          "bytes": 7707,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "code/rei_bass_coupled/owner_src/atomic_provider.rs": {
+          "sha256": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3",
+          "bytes": 12939,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "code/rei_bass_coupled/src/spectral_edge_support.rs": {
+          "sha256": "fbffed6df163385b40d0377ec55fcd09ef0150ec68e58055410584f177c64406",
+          "bytes": 10955,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "code/rei_bass_coupled/src/spectral_native.rs": {
+          "sha256": "65a3c2a20dc23e61a3b6bb8f1e2ff0e7a6ccdf0ab4fdc509603fbd3437ac2e87",
+          "bytes": 2379,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "inputs/spectral11/m0.json": {
+          "sha256": "16d6060097ee46b20ae530c6fbb3fcd40bcb0511544e32dd01f194ea49a36168",
+          "bytes": 12765485,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "inputs/spectral11/m2.json": {
+          "sha256": "67ec6958ac6f662125e049003d785c917c89e832b6bcbbd026ab8a332870b88a",
+          "bytes": 16759101,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint.json": {
+          "sha256": "61e10452fdc675896148f906e4666fec237b3b23598703d005b3319607c48caf",
+          "bytes": 348841,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint_1292.npz": {
+          "sha256": "332c011b5cfd5ac0771572eebf75acb0c789ee9bfec059ad81c1fb9416c41a02",
+          "bytes": 66964,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint_2167.npz": {
+          "sha256": "13e08f41520cfdd70a098b81bdac5fd13695f6cf5bf0bd361b6a3590359263c4",
+          "bytes": 98973,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint_2835.npz": {
+          "sha256": "a997cbe0aebaa0fabfa790bb71224cf01a213bc1ec9b498227decea4d7f6bf20",
+          "bytes": 127544,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint_3397.npz": {
+          "sha256": "dd2c8b0086b1383a30d500ba6ff6ed03074f74da5ce4093021975c81ca9d2c43",
+          "bytes": 148002,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint_3869.npz": {
+          "sha256": "1c89bb7f1d9ae35362a617a467810e71c29bb08c5683d74ae2b79cfeaecd26b8",
+          "bytes": 167979,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint_4309.npz": {
+          "sha256": "0cd301b6603ba895c7cd354ca098c61c6396b82b54fca5f1d2869be127c006df",
+          "bytes": 186577,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint_4693.npz": {
+          "sha256": "fcaa7913e303c98c41753f25c7583a6244abe7ea3ff3eebe54e3fd81dc8b3a6d",
+          "bytes": 203350,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint_5068.npz": {
+          "sha256": "66b1ace51b4294a63f106e0b8481cb6e1c28106c6f06c520856bee88ac44f9ba",
+          "bytes": 217552,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint_5393.npz": {
+          "sha256": "541422d07ac8c59c5c3a6da39d781ded2806e3697d5da78c014e88d35f0a870d",
+          "bytes": 224866,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint_5735.npz": {
+          "sha256": "68097087a955f793fe40e36d3e3fe77e42c906d3ccf11802f97f01ec5ca026ce",
+          "bytes": 232020,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint_6076.npz": {
+          "sha256": "21237685361d7f16443d1d1ffa5d66926ff4424aca1d61bc1402cc8601a2e93c",
+          "bytes": 236173,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_6e-12/checkpoint_6241.npz": {
+          "sha256": "82efc55cba236fb24d1136c229433b5e2db94ebf0cecca9b833e940505aa56f9",
+          "bytes": 238881,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        }
+      },
+      "checkpoint_knots": [
+        {
+          "segment": 1292,
+          "z": 0.7609039888237062,
+          "file": "evidence/joint11_sided_m2_6e-12/checkpoint_1292.npz"
+        },
+        {
+          "segment": 2167,
+          "z": 0.9046708727608859,
+          "file": "evidence/joint11_sided_m2_6e-12/checkpoint_2167.npz"
+        },
+        {
+          "segment": 2835,
+          "z": 0.95867357955179,
+          "file": "evidence/joint11_sided_m2_6e-12/checkpoint_2835.npz"
+        },
+        {
+          "segment": 3397,
+          "z": 0.9775149197498821,
+          "file": "evidence/joint11_sided_m2_6e-12/checkpoint_3397.npz"
+        },
+        {
+          "segment": 3869,
+          "z": 0.9873826714333391,
+          "file": "evidence/joint11_sided_m2_6e-12/checkpoint_3869.npz"
+        },
+        {
+          "segment": 4309,
+          "z": 0.9927016348163477,
+          "file": "evidence/joint11_sided_m2_6e-12/checkpoint_4309.npz"
+        },
+        {
+          "segment": 4693,
+          "z": 0.995687631857851,
+          "file": "evidence/joint11_sided_m2_6e-12/checkpoint_4693.npz"
+        },
+        {
+          "segment": 5068,
+          "z": 0.997305764126905,
+          "file": "evidence/joint11_sided_m2_6e-12/checkpoint_5068.npz"
+        },
+        {
+          "segment": 5393,
+          "z": 0.9983386683265554,
+          "file": "evidence/joint11_sided_m2_6e-12/checkpoint_5393.npz"
+        },
+        {
+          "segment": 5735,
+          "z": 0.9991864938684799,
+          "file": "evidence/joint11_sided_m2_6e-12/checkpoint_5735.npz"
+        },
+        {
+          "segment": 6076,
+          "z": 0.9997552001425154,
+          "file": "evidence/joint11_sided_m2_6e-12/checkpoint_6076.npz"
+        },
+        {
+          "segment": 6241,
+          "z": 1.0,
+          "file": "evidence/joint11_sided_m2_6e-12/checkpoint_6241.npz"
+        }
+      ],
+      "birth_samples": 160,
+      "angular_rule": "GL8; exact +/-mu scalar reflection quotient",
+      "finite_rays": 640,
+      "original_first_cell_rows": 1280,
+      "first_cell_birth_com3": 3.907682604850519e-06,
+      "source_measure": "original M0 first-cell count for each birth/angular pair times BB50K g(E)/integral_first_cell(g)",
+      "source_energy_integral_GL96": 4.115534595605445,
+      "source_energy_integral_GL64": 4.115534595605446,
+      "cell_edges_eV": [
+        13.6,
+        14.112863291954785
+      ],
+      "kT_eV": 4.3086666310725885,
+      "physical_H_binding_eV": 13.598434599702,
+      "H_fit_edge_eV": 13.6,
+      "D_gate_eV": 13.602134599702,
+      "D_model": "archived threshold-gated H-equality approximation",
+      "core_upper_eV": 13.600487882177362,
+      "core_upper_below_D_gate": true,
+      "core_optical_cutoff": 32.0,
+      "analytic_tail_constants": {
+        "b_X_min_padded": -0.0034720883198218794,
+        "b_X_max_padded": -0.003469988737594002,
+        "q_min_global": 0.9930558233603562,
+        "q_max_global": 1.0034720883198218,
+        "H_max_per_s_padded": 4.137586184645471e-17,
+        "Y_HI_min_polynomial": 0.8997201612727117,
+        "Y_HI_max_polynomial": 0.8999999999999999,
+        "n_HI_min_m3_padded": 194.95057025175333,
+        "energy_upper_for_sigma_eV": 13.60543083370573,
+        "sigma_over_E_log_derivative_upper": -2.9532314391580994,
+        "lambda_min_per_eV": 65589.60643536107,
+        "binary64_extrema_pad": 2e-11,
+        "directed_rounding_certificate": false
+      },
+      "tail_upper_bounds": {
+        "below_H_binding_com3": 9.444722740810645e-25,
+        "H_binding_to_H_fit_com3": 4.23778886466757e-25,
+        "all_below_H_fit_com3": 1.3682511605478213e-24,
+        "lower_bound": 0.0,
+        "meaning": "conditional H-only analytic upper bound on omitted energy tail; D opacity is nonnegative",
+        "core_quadrature_error_included": false,
+        "directed_rounding_certificate": false
+      }
+    },
+    "standard": {
+      "profile": "standard",
+      "archived_rtol": 3e-11,
+      "gas_knots_including_IC": 18,
+      "gas_path_definition": "PCHIP of archived dimensionless comoving HI and DI coordinates, multiplied by nH_initial*exp(-3*dx*z) for proper densities",
+      "checkpoint_gas_data_sha256": "0d90a3cf56dd2d360f41f37fddd99b067ecc3b5e08b843d2517c1d4e33185b76",
+      "input_files": {
+        "SHA256SUMS.txt": {
+          "sha256": "ae0e9818db6a9ec5047a0b3fd72cb92bf8bd0384c5ef73de385094e5a9a05b15",
+          "bytes": 34982,
+          "verification": "MANIFEST_HASH_RECORDED"
+        },
+        "scripts/retarded_integrator.py": {
+          "sha256": "2e013024eae36bb7a39da61a7932b31d20d6e204837f28863e15361084efcbb5",
+          "bytes": 12922,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "scripts/gas_integrator_parent.py": {
+          "sha256": "097bb4a8955dd1f478e98792d2bf5089e0ffa69166ef042a9106ddfa19d93bf3",
+          "bytes": 4569,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "scripts/spectral_joint11.py": {
+          "sha256": "1e051855551856f07092682dac7f9b38b2728c35af8c37d79d16b01a25f88107",
+          "bytes": 7112,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "inputs/source_table.py": {
+          "sha256": "0c7df87c7c41ba254e3c631c98930fba96ea544702e25863d79cc82b8bd70c8c",
+          "bytes": 12949,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "inputs/bass164/PRODUCER_RECEIPT.json": {
+          "sha256": "98eddf4673780f0bbca711b373a3e0746cfafc8190674c8d2d6c4de658dc3eed",
+          "bytes": 3566,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "inputs/bass164/PROPOSED_REI_BACKGROUND.csv": {
+          "sha256": "5a7844834b50fbc046995678a6aaf936252a81e49de1593604eee30641274133",
+          "bytes": 408472,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "code/rei_bass_coupled/owner_src/axbi_sources.rs": {
+          "sha256": "606e3c2ec367dd9951ebbf2f53486f2232b49c0218896d66d8dc13dd5ee83bfe",
+          "bytes": 7707,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "code/rei_bass_coupled/owner_src/atomic_provider.rs": {
+          "sha256": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3",
+          "bytes": 12939,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "code/rei_bass_coupled/src/spectral_edge_support.rs": {
+          "sha256": "fbffed6df163385b40d0377ec55fcd09ef0150ec68e58055410584f177c64406",
+          "bytes": 10955,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "code/rei_bass_coupled/src/spectral_native.rs": {
+          "sha256": "65a3c2a20dc23e61a3b6bb8f1e2ff0e7a6ccdf0ab4fdc509603fbd3437ac2e87",
+          "bytes": 2379,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "inputs/spectral11/m0.json": {
+          "sha256": "16d6060097ee46b20ae530c6fbb3fcd40bcb0511544e32dd01f194ea49a36168",
+          "bytes": 12765485,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "inputs/spectral11/m2.json": {
+          "sha256": "67ec6958ac6f662125e049003d785c917c89e832b6bcbbd026ab8a332870b88a",
+          "bytes": 16759101,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint.json": {
+          "sha256": "eecfbb461ede3ba0f41a20e8078c89408d6ec6ce354d46d24414e134ee492370",
+          "bytes": 348924,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_977.npz": {
+          "sha256": "409be8cde38fca95a5699b08f905e480a411e56f14fff1ab77e63ef08e92e2a6",
+          "bytes": 53168,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_1652.npz": {
+          "sha256": "28d35bd5b62d5c9931b08e1ff5824758dde9a78d3fa19abc655f626cfea0888a",
+          "bytes": 81303,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_2200.npz": {
+          "sha256": "af50fe5f48039fa89df0809dc0086fa59e1f3df94a8d0b4ab234bcfc535418f6",
+          "bytes": 100476,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_2654.npz": {
+          "sha256": "2fe3f557e32a83b6c56a5f748b6cdaad7e99ecdde6ae3140f84551218d83a748",
+          "bytes": 122999,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_3071.npz": {
+          "sha256": "f9bd64be4e00f43fedcfea9845abc31d5664cdf6748f58f40d246d017a39a2b1",
+          "bytes": 136089,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_3451.npz": {
+          "sha256": "ffe5708781161a4a1d71d4568c1fe2f162d2639e4c11fc6b766ceb9ac55ef2e4",
+          "bytes": 150573,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_3780.npz": {
+          "sha256": "b78e8f0a52e7d344327b3c3cb1104a981422096cdfdc9fce250d7773d790be34",
+          "bytes": 163923,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_4091.npz": {
+          "sha256": "92e791be56c2eaa80da721cabdbdbb1c628a254f6e2bcebc67a0cfe5ac90bfd7",
+          "bytes": 178119,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_4392.npz": {
+          "sha256": "8d8239d00abd5b2a22fed4bdb63107229c751b00d39b2d1bb8537a784aea7b90",
+          "bytes": 189617,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_4660.npz": {
+          "sha256": "f4c219c384909391bd8abba034b0120f669dbc073e2bcd24b82bf6e262443891",
+          "bytes": 202139,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_4927.npz": {
+          "sha256": "15e4db260d36c72958a0465eda06f084d631fbfc012ff1a224ceb0fb237d686f",
+          "bytes": 212089,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_5183.npz": {
+          "sha256": "b21f345b3ef27f5e67ce27fabefe7bc03ec41fbf7c0ece4293846af897f9f413",
+          "bytes": 220610,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_5437.npz": {
+          "sha256": "61d26716a2a00d0e19b5182480f4139b3478efeb84b05c9b99975738a5ecce9e",
+          "bytes": 226249,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_5687.npz": {
+          "sha256": "3c4bb85e9e14086cd0b473eec2914753e555e2ec41544fcd29978a20895a9d7d",
+          "bytes": 231878,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_5915.npz": {
+          "sha256": "3f1f9909375b3f9a92d6af9d26af05fa44df99f7bb2f069be907c254f452d682",
+          "bytes": 235871,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_6156.npz": {
+          "sha256": "c44a7f0afd30b87d2874fccd01cb9a82f8c3bff884249fd732a3177c28dfd9dc",
+          "bytes": 237596,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        },
+        "evidence/joint11_sided_m2_3e-11/checkpoint_6241.npz": {
+          "sha256": "2e03e820c03635cea1c29750d85cd07c946a184dcd5cf21a4848c9b870486605",
+          "bytes": 238891,
+          "verification": "MATCHES_RESTORED_MANIFEST"
+        }
+      },
+      "checkpoint_knots": [
+        {
+          "segment": 977,
+          "z": 0.6479966231660246,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_977.npz"
+        },
+        {
+          "segment": 1652,
+          "z": 0.8379375268960997,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_1652.npz"
+        },
+        {
+          "segment": 2200,
+          "z": 0.9100573946654258,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_2200.npz"
+        },
+        {
+          "segment": 2654,
+          "z": 0.9523362894464329,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_2654.npz"
+        },
+        {
+          "segment": 3071,
+          "z": 0.9667571731508701,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_3071.npz"
+        },
+        {
+          "segment": 3451,
+          "z": 0.9788149244472516,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_3451.npz"
+        },
+        {
+          "segment": 3780,
+          "z": 0.9858879319064785,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_3780.npz"
+        },
+        {
+          "segment": 4091,
+          "z": 0.9906112243754127,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_4091.npz"
+        },
+        {
+          "segment": 4392,
+          "z": 0.9934916526395122,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_4392.npz"
+        },
+        {
+          "segment": 4660,
+          "z": 0.9955080566449572,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_4660.npz"
+        },
+        {
+          "segment": 4927,
+          "z": 0.9967458313933204,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_4927.npz"
+        },
+        {
+          "segment": 5183,
+          "z": 0.9977540302246602,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_5183.npz"
+        },
+        {
+          "segment": 5437,
+          "z": 0.9984535326529367,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_5437.npz"
+        },
+        {
+          "segment": 5687,
+          "z": 0.9991076316545127,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_5687.npz"
+        },
+        {
+          "segment": 5915,
+          "z": 0.9995346602020911,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_5915.npz"
+        },
+        {
+          "segment": 6156,
+          "z": 0.9998772335729011,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_6156.npz"
+        },
+        {
+          "segment": 6241,
+          "z": 1.0,
+          "file": "evidence/joint11_sided_m2_3e-11/checkpoint_6241.npz"
+        }
+      ],
+      "birth_samples": 160,
+      "angular_rule": "GL8; exact +/-mu scalar reflection quotient",
+      "finite_rays": 640,
+      "original_first_cell_rows": 1280,
+      "first_cell_birth_com3": 3.907682604850519e-06,
+      "source_measure": "original M0 first-cell count for each birth/angular pair times BB50K g(E)/integral_first_cell(g)",
+      "source_energy_integral_GL96": 4.115534595605445,
+      "source_energy_integral_GL64": 4.115534595605446,
+      "cell_edges_eV": [
+        13.6,
+        14.112863291954785
+      ],
+      "kT_eV": 4.3086666310725885,
+      "physical_H_binding_eV": 13.598434599702,
+      "H_fit_edge_eV": 13.6,
+      "D_gate_eV": 13.602134599702,
+      "D_model": "archived threshold-gated H-equality approximation",
+      "core_upper_eV": 13.600487882177362,
+      "core_upper_below_D_gate": true,
+      "core_optical_cutoff": 32.0,
+      "analytic_tail_constants": {
+        "b_X_min_padded": -0.0034720883198218794,
+        "b_X_max_padded": -0.003469988737594002,
+        "q_min_global": 0.9930558233603562,
+        "q_max_global": 1.0034720883198218,
+        "H_max_per_s_padded": 4.137586184645471e-17,
+        "Y_HI_min_polynomial": 0.8997201612727102,
+        "Y_HI_max_polynomial": 0.8999999999999999,
+        "n_HI_min_m3_padded": 194.950570251753,
+        "energy_upper_for_sigma_eV": 13.60543083370573,
+        "sigma_over_E_log_derivative_upper": -2.9532314391580994,
+        "lambda_min_per_eV": 65589.60643536095,
+        "binary64_extrema_pad": 2e-11,
+        "directed_rounding_certificate": false
+      },
+      "tail_upper_bounds": {
+        "below_H_binding_com3": 9.444722740811198e-25,
+        "H_binding_to_H_fit_com3": 4.237788864667816e-25,
+        "all_below_H_fit_com3": 1.3682511605479014e-24,
+        "lower_bound": 0.0,
+        "meaning": "conditional H-only analytic upper bound on omitted energy tail; D opacity is nonnegative",
+        "core_quadrature_error_included": false,
+        "directed_rounding_certificate": false
+      }
+    }
+  },
+  "implementation_checks": {
+    "tight": {
+      "status": "IMPLEMENTATION_VERIFIED_WITHIN_REPORTED_TOLERANCES",
+      "geometry_max_relative_differences_a_b_H_bX": [
+        0.0,
+        2.007795056878947e-16,
+        7.153935563318728e-15,
+        2.9492048855686284e-14
+      ],
+      "native_ray_energy_max_relative_difference": 2.220446049250313e-16,
+      "source_GL64_over_GL96_minus1": 2.220446049250313e-16,
+      "scalar_native_optical_depth_probes": [
+        {
+          "ray": 0,
+          "birth_energy_eV": 13.600082939970152,
+          "scalar_native_quad_tau": 5.508859449132488,
+          "vector_GL24_tau": 5.508859449073215,
+          "relative_difference": -1.075950439854978e-11,
+          "quad_reported_absolute_error": 6.116062599850744e-14
+        },
+        {
+          "ray": 193,
+          "birth_energy_eV": 13.600258577554001,
+          "scalar_native_quad_tau": 17.109643807083092,
+          "vector_GL24_tau": 17.109643806955166,
+          "relative_difference": -7.476796959338117e-12,
+          "quad_reported_absolute_error": 1.8995520497758868e-13
+        },
+        {
+          "ray": 417,
+          "birth_energy_eV": 13.600070707626877,
+          "scalar_native_quad_tau": 4.678111442210537,
+          "vector_GL24_tau": 4.678111442135633,
+          "relative_difference": -1.6011525438841545e-11,
+          "quad_reported_absolute_error": 5.193747034904536e-14
+        },
+        {
+          "ray": 639,
+          "birth_energy_eV": 13.600000097534222,
+          "scalar_native_quad_tau": 0.006412748976770061,
+          "vector_GL24_tau": 0.006412748975734363,
+          "relative_difference": -1.6150603077136338e-10,
+          "quad_reported_absolute_error": 7.119581565151535e-17
+        }
+      ]
+    },
+    "standard": {
+      "status": "IMPLEMENTATION_VERIFIED_WITHIN_REPORTED_TOLERANCES",
+      "geometry_max_relative_differences_a_b_H_bX": [
+        0.0,
+        2.007795056878947e-16,
+        7.153935563318728e-15,
+        2.9492048855686284e-14
+      ],
+      "native_ray_energy_max_relative_difference": 2.220446049250313e-16,
+      "source_GL64_over_GL96_minus1": 2.220446049250313e-16,
+      "scalar_native_optical_depth_probes": [
+        {
+          "ray": 0,
+          "birth_energy_eV": 13.600082939970152,
+          "scalar_native_quad_tau": 5.5088591650119705,
+          "vector_GL24_tau": 5.508859164952699,
+          "relative_difference": -1.0759393376247317e-11,
+          "quad_reported_absolute_error": 6.116062284413604e-14
+        },
+        {
+          "ray": 193,
+          "birth_energy_eV": 13.600258577554001,
+          "scalar_native_quad_tau": 17.109640152548796,
+          "vector_GL24_tau": 17.109640152420855,
+          "relative_difference": -7.477685137757817e-12,
+          "quad_reported_absolute_error": 1.8995516440410748e-13
+        },
+        {
+          "ray": 417,
+          "birth_energy_eV": 13.600070707626877,
+          "scalar_native_quad_tau": 4.678111449486855,
+          "vector_GL24_tau": 4.678111449411955,
+          "relative_difference": -1.6010748282724308e-11,
+          "quad_reported_absolute_error": 5.1937470429828716e-14
+        },
+        {
+          "ray": 639,
+          "birth_energy_eV": 13.600000097534222,
+          "scalar_native_quad_tau": 0.0064127489762662426,
+          "vector_GL24_tau": 0.006412748975230545,
+          "relative_difference": -1.6150603077136338e-10,
+          "quad_reported_absolute_error": 7.119581564592184e-17
+        }
+      ]
+    }
+  },
+  "results": [
+    {
+      "gas_profile": "tight",
+      "energy_GL_order": 6,
+      "time_GL_order": 16,
+      "energy_panels": 2193,
+      "energy_nodes": 13158,
+      "core_survivor_com3": {
+        "below_H_binding": 8.400292962599765e-11,
+        "H_binding_to_H_fit": 3.402852262378652e-11,
+        "all_below_H_fit": 1.1803145224978455e-10
+      },
+      "bin_additivity_absolute_com3": -3.877409121342317e-25,
+      "crossings": {
+        "bisection_iterations": 48,
+        "max_z_bracket_width": 3.5388358909926865e-15,
+        "max_energy_residual_eV": 7.105427357601002e-15
+      },
+      "time_quadrature": {
+        "time_energy_evaluations": 381888,
+        "smooth_time_panels": 23868,
+        "minimum_sampled_q": 0.9938666793006011,
+        "minimum_sampled_energy_above_H_fit_eV": 1.5335288594542362e-11
+      },
+      "wall_seconds": 0.13978282199968817
+    },
+    {
+      "gas_profile": "tight",
+      "energy_GL_order": 8,
+      "time_GL_order": 16,
+      "energy_panels": 2193,
+      "energy_nodes": 17544,
+      "core_survivor_com3": {
+        "below_H_binding": 8.400293020628773e-11,
+        "H_binding_to_H_fit": 3.402852285297203e-11,
+        "all_below_H_fit": 1.1803145305926034e-10
+      },
+      "bin_additivity_absolute_com3": -5.686866711302065e-25,
+      "crossings": {
+        "bisection_iterations": 48,
+        "max_z_bracket_width": 3.5388358909926865e-15,
+        "max_energy_residual_eV": 7.105427357601002e-15
+      },
+      "time_quadrature": {
+        "time_energy_evaluations": 509728,
+        "smooth_time_panels": 31858,
+        "minimum_sampled_q": 0.9938666792990614,
+        "minimum_sampled_energy_above_H_fit_eV": 2.7485569376040075e-11
+      },
+      "wall_seconds": 0.16307694800343597
+    },
+    {
+      "gas_profile": "tight",
+      "energy_GL_order": 12,
+      "time_GL_order": 16,
+      "energy_panels": 2193,
+      "energy_nodes": 26316,
+      "core_survivor_com3": {
+        "below_H_binding": 8.400293020544156e-11,
+        "H_binding_to_H_fit": 3.402852285267487e-11,
+        "all_below_H_fit": 1.180314530581173e-10
+      },
+      "bin_additivity_absolute_com3": -8.788794008375919e-25,
+      "crossings": {
+        "bisection_iterations": 48,
+        "max_z_bracket_width": 3.5388358909926865e-15,
+        "max_energy_residual_eV": 7.105427357601002e-15
+      },
+      "time_quadrature": {
+        "time_energy_evaluations": 766992,
+        "smooth_time_panels": 47937,
+        "minimum_sampled_q": 0.9938666792978841,
+        "minimum_sampled_energy_above_H_fit_eV": 3.0162539133016253e-12
+      },
+      "wall_seconds": 0.25464521200046875
+    },
+    {
+      "gas_profile": "tight",
+      "energy_GL_order": 12,
+      "time_GL_order": 24,
+      "energy_panels": 2193,
+      "energy_nodes": 26316,
+      "core_survivor_com3": {
+        "below_H_binding": 8.400293020544156e-11,
+        "H_binding_to_H_fit": 3.402852285267486e-11,
+        "all_below_H_fit": 1.1803145305811728e-10
+      },
+      "bin_additivity_absolute_com3": -8.788794008375919e-25,
+      "crossings": {
+        "bisection_iterations": 48,
+        "max_z_bracket_width": 3.5388358909926865e-15,
+        "max_energy_residual_eV": 7.105427357601002e-15
+      },
+      "time_quadrature": {
+        "time_energy_evaluations": 1150488,
+        "smooth_time_panels": 47937,
+        "minimum_sampled_q": 0.9938666792973269,
+        "minimum_sampled_energy_above_H_fit_eV": 1.3695711231775931e-12
+      },
+      "wall_seconds": 0.29536489600286586
+    },
+    {
+      "gas_profile": "standard",
+      "energy_GL_order": 12,
+      "time_GL_order": 24,
+      "energy_panels": 2193,
+      "energy_nodes": 26316,
+      "core_survivor_com3": {
+        "below_H_binding": 8.400298228267853e-11,
+        "H_binding_to_H_fit": 3.402853062008153e-11,
+        "all_below_H_fit": 1.180315129027609e-10
+      },
+      "bin_additivity_absolute_com3": -8.530300066953098e-25,
+      "crossings": {
+        "bisection_iterations": 48,
+        "max_z_bracket_width": 3.5388358909926865e-15,
+        "max_energy_residual_eV": 7.105427357601002e-15
+      },
+      "time_quadrature": {
+        "time_energy_evaluations": 1378368,
+        "smooth_time_panels": 57432,
+        "minimum_sampled_q": 0.9938666792973269,
+        "minimum_sampled_energy_above_H_fit_eV": 1.9539925233402755e-13
+      },
+      "wall_seconds": 0.29339417899609543
+    }
+  ],
+  "comparisons": [
+    {
+      "comparison": "tight E6 to E8, time16",
+      "relative_change_using_right_denominator": {
+        "below_H_binding": 6.907974375648939e-09,
+        "H_binding_to_H_fit": 6.735100186206662e-09,
+        "all_below_H_fit": 6.858136308903119e-09
+      }
+    },
+    {
+      "comparison": "tight E8 to E12, time16",
+      "relative_change_using_right_denominator": {
+        "below_H_binding": -1.0073219055313276e-11,
+        "H_binding_to_H_fit": -8.732620396062269e-12,
+        "all_below_H_fit": -9.684150537524571e-12
+      }
+    },
+    {
+      "comparison": "tight time16 to time24, E12",
+      "relative_change_using_right_denominator": {
+        "below_H_binding": 0.0,
+        "H_binding_to_H_fit": -3.798195157367841e-16,
+        "all_below_H_fit": -2.1900428633674603e-16
+      }
+    },
+    {
+      "comparison": "tight13 to standard18 PCHIP-defined gas path, E12 time24; combines checkpoint grid and finite solver differences",
+      "relative_change_using_right_denominator": {
+        "below_H_binding": 6.199450966820357e-07,
+        "H_binding_to_H_fit": 2.28261594900189e-07,
+        "all_below_H_fit": 5.070225921291e-07
+      }
+    }
+  ],
+  "wall_seconds": 2.1645026199985296,
+  "next_existing_DAG_node": "P4-S4C-SPECTRAL-EDGE-SUPPORT remains incomplete: coupled continuum error and gas-path control"
+}
