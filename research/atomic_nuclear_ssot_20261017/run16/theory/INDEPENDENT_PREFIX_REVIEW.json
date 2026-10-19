@@ -1,0 +1,38 @@
+{
+  "schema": "rei.run16.prefix-read-review.v1",
+  "reviewer": "root, separate from implementation agent runtime_setup",
+  "status": "IMPLEMENTATION_VERIFIED_BY_READ_AND_PRODUCER_NUMERICAL_CHECKS",
+  "code_read": [
+    {
+      "path": "source_free_prefix.py",
+      "sha256": "8247edc50a7ed246ab15cdd362f5ce2ac41264e71ea6eb070f9a386083f3b555"
+    },
+    {
+      "path": "prefix_step_halving.py",
+      "sha256": "5d313ca43d4cab3a210111bca9cbb971af3b3131b010067e67907529967ad071"
+    }
+  ],
+  "reference_read": "run13/recovered/scripts/retarded_integrator.py: original geometry, raw_rhs, initial gas scaling, temperature; byte-pinned original input in producer result",
+  "checked": [
+    "Five invariant coordinates lift exactly to original gas initial state; H/D/He nuclear totals preserved up to recorded rounding",
+    "Native mask7 and proper-state conversion; DeltaX*V/H derivative and -2*DeltaX*U expansion match original RHS",
+    "Domain terminates at first-birth preactivation side with no active photons",
+    "Tolerances expressed in new five-coordinate norm rather than relabelled as original40357-dimensional norm",
+    "Prior identical four-step grids preserved; separate eight-step solve supplies discretization contrast",
+    "112 original source/input hashes checked before and after by each producer",
+    "Result includes actual accepted grids, sample states, all parsed native RHS calls and correct runtime/binary identities",
+    "Prefix does not supply absent escape/CMB/event ledgers or a full transport restart checkpoint"
+  ],
+  "concrete_defects_found": [],
+  "numerical_scope": "Five sampled positions agree under max-step halving to reported finite precision; not a rigorous supremum error enclosure",
+  "reviewer_native_rhs_calls": 0,
+  "reviewer_ivp_solves": 0,
+  "reviewer_test_reruns": 0,
+  "integration_checks": {
+    "feedback_manifest_payload_files": 16,
+    "feedback_payload_hashes_match": true,
+    "checkpoint45_manifest_payload_files_unchanged": true,
+    "existing_feedback_files_byte_identical": 3
+  },
+  "further_review_required": false
+}
