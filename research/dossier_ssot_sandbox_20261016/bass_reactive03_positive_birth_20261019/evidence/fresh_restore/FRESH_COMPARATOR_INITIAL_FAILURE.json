@@ -1,0 +1,9 @@
+{
+  "status": "AUDIT_HARNESS_INPUT_CONTRACT_MISMATCH",
+  "command": "compare_fresh_outputs.py initial execution",
+  "exit_code": 1,
+  "observed_error": "ValueError: missing or duplicate headers: native/ap_cx_worklimit.csv",
+  "cause": "The native driver exits before flushing its buffered header when the first step hits Cx(WorkLimit); this produces a zero-byte CSV plus the raw stderr and explicit rows=0, status=RESOURCE_LIMIT_CX JSON.",
+  "scientific_runs_affected": false,
+  "correction": "Permit an empty CSV only when accompanying outcome JSON independently records RESOURCE_LIMIT_CX, rows=0, and exit_code=2. Preserve data, logs and failure classification."
+}

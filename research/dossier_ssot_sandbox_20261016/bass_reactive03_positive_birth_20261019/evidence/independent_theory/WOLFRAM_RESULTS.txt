@@ -1,0 +1,18 @@
+Execution path: Wolfram Language evaluator connector, current theory unit.
+
+Integral and small-opacity check, exact returned output:
+{(1 - Cosh[tau] + Sinh[tau])/tau,
+ (-1 + E^tau - tau)/(E^tau*tau^2),
+ SeriesData[tau, 0, {1, -1/2, 1/6, -1/24, 1/120, -1/720, 1/5040}, 0, 7, 1],
+ SeriesData[tau, 0, {1/2, -1/12, 0, 1/720, 0, -1/30240}, 0, 7, 1]}
+
+Positive-real local panel expansion, exact returned output:
+{SeriesData[z, 0, {1/Sqrt[3], 0, 1/(90*Sqrt[3]), 0,
+ -1/4200*1/Sqrt[3], 0, 1/(378000*Sqrt[3]), 0,
+ 533/(6286896000*Sqrt[3])}, 0, 9, 1],
+ SeriesData[z, 0, {1/270, 0, -1/1890, 0, 1/17010}, 3, 8, 1]}
+
+Earlier local expansion evaluation omitted the positive-real assumption and
+returned branch-dependent expressions plus MinValue/MaxValue lpsub warnings.
+The final query supplied z>0 explicitly and returned the expressions above.
+This was a symbolic branch-assumption correction, with no physical model change.
