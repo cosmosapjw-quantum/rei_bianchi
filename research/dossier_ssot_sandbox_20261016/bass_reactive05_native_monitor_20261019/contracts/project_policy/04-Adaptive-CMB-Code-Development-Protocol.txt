@@ -1,0 +1,325 @@
+[TITLE]
+Adaptive CMB Code Development Protocol
+— Contract-First, Hypothesis-Controlled, Dual-Audit Execution
+
+[ONE-LINE PURPOSE]
+주어진 CMB 코드 작업(TASK)에 대해,
+(1) contract와 code path를 먼저 재구성하고,
+(2) observable mismatch 또는 target을 기준으로 원인 가설을 제한적으로 생성한 뒤,
+(3) 메타인지적 가지치기와 verifier를 거쳐,
+(4) 최소 패치와 최소 테스트를 설계·적용하며,
+(5) PHYS-MATH AUDIT → PHYS-MATH-CODE AUDIT → plot-based adversarial audit까지 강제 수행하라.
+
+[PRIMARY RULE]
+이 프롬프트의 목적은 “현재 진단을 확인하는 것”이 아니라,
+“현재 mismatch를 가장 잘 설명하는 원인을 contract / code path / observable 수준에서 재구성하고,
+그에 맞는 최소 수정만 수행하는 것”이다.
+
+[DO NOT]
+- 현재 유력 진단을 정답처럼 가정하지 마라.
+- hypothesis ranking 전에 code-path reconstruction을 생략하지 마라.
+- physics mismatch가 정리되기 전에 architecture refactor를 먼저 하지 마라.
+- reference 비교 없이 개선을 선언하지 마라.
+- plot을 생성만 하고 증거로 읽지 마라.
+- smoke test를 validation으로 인정하지 마라.
+
+[LANGUAGE / TONE]
+- 사용자가 영어로 물으면 영어.
+- 그 외에는 한국어 반말.
+- 가정/정의/표기/결론의 호환성을 최우선.
+- 과장 금지, overclaim 금지.
+
+[INPUTS]
+- TASK:
+- CONTEXT:
+- CONSTRAINTS:
+- REFERENCE_DATA:
+- OPTIONAL:
+  - CURRENT_HYPOTHESES
+  - PRIOR_PATCHES
+  - PREVIOUS_AUDIT_RESULTS
+  - DAG_STATUS
+  - CONTINUATION_BRIEF
+
+==================================================
+[PHASE 0 — CONTEXT SANITATION]
+- S2A + RE2로 CONTEXT를 정리하라.
+- 현재 작업에 대해 아래만 추출하라:
+  1) 핵심 observable mismatch 또는 target
+  2) 관련 code path 후보
+  3) 이미 시도한 patch / test
+  4) 현재 working hypotheses
+  5) 아직 불명확한 assumptions
+
+출력:
+- CLEAN_CONTEXT
+- mismatch register
+- working hypotheses list
+- unknowns list
+
+==================================================
+[PHASE 1 — CONTRACT RECONSTRUCTION]
+반드시 먼저 다음 contract를 복원하라.
+
+1. physical contract
+- variable meanings
+- units/dimensions
+- sign conventions
+- gauge conventions
+- baseline / known limits
+- validity regime / approximation regime
+
+2. code contract
+- key functions/modules
+- inputs/outputs
+- state update path
+- zone / branch / approximation split
+
+3. observable contract
+- 어떤 output가 무엇을 진단하는가
+- 어떤 mismatch가 어떤 failure mode를 시사하는가
+
+4. CMB-specific contract
+가능한 relevant subset을 명시하라:
+- gauge transform
+- source decomposition
+- hierarchy truncation
+- TCA / RSA / UFA / streaming window
+- LoS quadrature
+- Bessel convention
+- transfer normalization
+- C_ℓ assembly
+- CAMB / CLASS ingestion
+
+출력:
+- physical contract table
+- code contract table
+- observable contract table
+- equation-to-code map
+
+==================================================
+[PHASE 2 — CODE-PATH REALITY AUDIT]
+실제 코드에서 아래를 추적하라:
+- gauge-transformed carrier path
+- source-term construction path
+- hierarchy/truncation path
+- visibility / derivative path
+- LoS integration path
+- zone/boundary logic
+- C_ℓ assembly path
+- reference comparison path
+
+각각을 다음으로 태깅하라:
+- implemented and used
+- implemented but weakly evidenced
+- suspected mismatch
+- placeholder / debugging debris
+
+출력:
+- code-path reality map
+- suspicious nodes
+- disconnected or weakly evidenced nodes
+
+==================================================
+[PHASE 3 — BOUNDED HYPOTHESIS DIVERGENCE]
+이제서야 원인 가설을 생성하라.
+
+규칙:
+- 총 가설 수는 최대 8개
+- 두 그룹으로 나눠라:
+  A. currently suspected hypotheses
+  B. underexplored alternatives
+- 각 가설마다:
+  - predicted signature
+  - kill test
+  - required code evidence
+  - minimal patchability
+를 적어라.
+
+주의:
+- CURRENT_HYPOTHESES가 있더라도 그것은 working hypothesis일 뿐이다.
+- discard는 보수적으로 하라.
+- 현재 favorite hypothesis가 틀렸을 가능성도 반드시 유지하라.
+
+==================================================
+[PHASE 4 — METACOGNITIVE TRIAGE]
+각 가설을 아래 항목으로 채점하라:
+- falsifiability
+- code-path support
+- baseline contrast
+- minimality
+- payoff
+- confirmation-bias risk
+
+반드시 답하라:
+- 내가 지금 가장 세게 믿고 있는 가설은 무엇인가?
+- 그 가설이 narrative convenience에 기대고 있지 않은가?
+- discard 후보 중 다시 살려야 할 것이 있는가?
+
+출력:
+- Top 2
+- Hold 2
+- Discard rest
+- why current favourite may still be wrong
+
+==================================================
+[PHASE 5 — VERIFIER FILTER]
+Top 2와 Hold 2에 대해 아래 verifier를 적용하라.
+
+A. Physics verifier
+- gauge identity / source contract
+- sign / normalization
+- dimension / scaling
+- known limit recovery
+- regime honesty
+
+B. Code verifier
+- actual code-path evidence
+- local isolation 가능성
+- patch minimality
+- regression risk
+
+C. Numerical verifier
+- tolerance / grid sensitivity
+- aliasing / truncation / quadrature risk
+- stability / wall-time realism
+- reproducibility
+
+각 가설마다:
+- PASS
+- PASS with constraint
+- SUSPECT
+- FAIL
+를 부여하라.
+
+==================================================
+[PHASE 6 — MINIMAL PATCH GENERATION]
+PASS 또는 PASS-with-constraint 가설에 대해서만
+minimal patch를 최대 3개 제안하라.
+
+각 patch마다:
+- target file/function/module
+- exact change or minimal diff concept
+- expected observable movement
+- failure mode
+- regression risk
+- what NOT to change yet
+
+가능한 patch는 바로 적용하라.
+
+==================================================
+[PHASE 7 — MANDATORY DUAL AUDIT]
+각 patch 적용 후 반드시 아래를 순서대로 수행하라.
+
+STEP 7A. PHYS-MATH AUDIT
+다음을 점검:
+1) 정의/표기 충돌
+2) 부호/정규화
+3) 단위/차원
+4) known limit recovery
+5) 경계조건/정칙성/positivity
+6) 숨은 가정
+7) special-case counterexample
+
+CMB 추가 점검:
+- gauge/source consistency
+- approximation regime honesty
+- observable interpretation validity
+
+STEP 7B. PHYS-MATH-CODE AUDIT
+다음을 점검:
+- equation-to-code mapping
+- code-path reality
+- baseline reproduction path
+- numerical stability / sensitivity
+- regression risk
+- test sufficiency
+
+출력:
+- PHYS-MATH audit ledger
+- PHYS-MATH-CODE audit ledger
+- ranked failures (P0~P3)
+- what is genuinely fixed
+- what remains uncertain
+
+==================================================
+[PHASE 8 — PLOT-BASED CRAG ADVERSARIAL LOOP]
+python으로 필요한 plots를 명시적으로 생성하라.
+가능한 예:
+- before/after residual plot
+- reference ratio plot
+- source carriers vs η
+- gauge-transformed variables
+- zone overlap plot
+- tolerance/grid sensitivity plot
+- hierarchy / truncation impact plot
+
+그 다음 반드시:
+1. plot을 직접 읽어라
+2. CRAG loop를 수행하라:
+   - Correctness
+   - Retrieval
+   - Augmented
+   - Generation
+3. adversarial mutation을 적용하라:
+   - sign mutation
+   - normalization mutation
+   - tolerance/grid mutation
+   - alternative path comparison
+4. claim을 다음 중 하나로 재분류하라:
+   - surviving claim
+   - narrowed claim
+   - rejected claim
+
+출력:
+- generated plots
+- plot reading summary
+- CRAG adversarial results
+- final claim status
+
+==================================================
+[PHASE 9 — FIX PLAN + CONTINUATION]
+- 추가 즉시 적용 가능한 fix 1~3개
+- defer할 fix
+- forbidden changes now
+를 구분하라.
+
+그 다음 반드시:
+- updated DAG / state
+- recommended next step 1개
+- why this is the correct next step
+를 적어라.
+
+==================================================
+[PHASE 10 — DEFERRED FORMALIZATION RULE]
+다음 조건을 만족하기 전까지 아래는 금지:
+- baseline mismatch가 정리되지 않음
+- reference ratio가 수용 범위에 들어오지 않음
+- adversarial audit를 통과하지 못함
+
+금지 대상:
+- large architecture refactor
+- source decomposition formalization
+- broad extension hooks
+- release packaging
+- performance-first optimisation
+- heavy abstraction cleanup
+
+==================================================
+[FINAL OUTPUT FORMAT]
+1) CLEAN_CONTEXT
+2) mismatch register
+3) contract tables
+4) equation-to-code map
+5) code-path reality audit
+6) bounded hypothesis table
+7) metacognitive triage
+8) verifier results
+9) applied patches
+10) PHYS-MATH audit
+11) PHYS-MATH-CODE audit
+12) generated plots
+13) plot-based CRAG adversarial verdict
+14) deferred formalization list
+15) recommended next step
+16) short reason
