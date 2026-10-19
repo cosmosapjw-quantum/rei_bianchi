@@ -1,0 +1,18 @@
+{
+  "schema": "rei.run18.symbolic-repair-check.v1",
+  "tool": "mcp__codex_apps__wolfram_wolframlanguageevaluator",
+  "context_tool_executed": true,
+  "code": "Clear[g,c,tau,rp,rm,cprev,j]; result={Simplify[D[-Log[1-g]-g,g]],Reduce[0<=g<1 && g/(1-g)<0,g,Reals],Simplify[(-Log[1-g]-g)/.g->0],FullSimplify[Exp[-(tau-c)]==Exp[c] Exp[-tau]],FullSimplify[(rp-(cprev+j))-(rm-cprev)/.j->rp-rm],FullSimplify[((rp-rm)-j)/.j->rp-rm]};result",
+  "actual_result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= {g/(1 - g), False, 0, True, 0, 0}"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "interpretation": "Checks derivative of -Log(1-g)-g, nonnegative derivative for0<=g<1, zero initial value, exponential ratio and corrected interface cancellation. Does not execute the native model or certify the floating dataset."
+}
+
