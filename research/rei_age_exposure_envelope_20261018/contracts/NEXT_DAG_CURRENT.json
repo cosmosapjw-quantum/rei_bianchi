@@ -1,7 +1,6 @@
 {
-  "schema": "rei.age.resume.dag.current.v2",
+  "schema": "rei.age.resume.dag.current.v3",
   "updated_utc": "2026-10-19",
-  "intake_head": "0c6b0466b10a47788f6415a8538e9d3e7a268163",
   "source_native": "35d9747a0bbedcafdb568467ce7c1e7a25f965b6",
   "completed": {
     "FRESH_GITHUB_INTAKE": "10_COMMITS_AFTER_SUPPLIED_HEAD; FRESH_NCP_RESULTS_READ",
@@ -20,7 +19,12 @@
     "SUBNORMAL_COUNT_CORRECTION": "OPT_IN_IMPLEMENTED_AND_REVIEWED;FIRST_CELL_GATES_PASS;LATER_ENERGY_ONLY_FAILURE_RETAINED",
     "SCRATCH_RESET_RECOVERY": "D_SOURCE5_EXACT;NATIVE153_AGE64RAW70_EXACT;LATER_D_RAW_PARTIALLY_LOST_AND_LABELLED",
     "C10_SOURCE_PUBLICATION": "db87456e6b2b528a046f7856c04c73c7b4b43a54",
-    "C10_BACKUP": "DRIVE_AND_DROPBOX_UPLOAD_COMPLETE;LOCAL_SHA_CRC346PAYLOADS_PASS;PROVIDER_SIZE_MATCH;REMOTE_FULL_READBACK_NOT_RUN"
+    "C10_BACKUP": "DRIVE_AND_DROPBOX_UPLOAD_COMPLETE;LOCAL_SHA_CRC346PAYLOADS_PASS;PROVIDER_SIZE_MATCH;REMOTE_FULL_READBACK_NOT_RUN",
+    "AGE64_BLOCK_MAX_NCP": "EXIT0;19756RHS;782.7S;PHOTON2.0027e-10<=1e-8;ENERGY1.93e-13;evidence/ncp_blockmax_20261019T084150Z",
+    "AGE64_BLOCK_MAX_PHOTON_DIAGNOSIS": "EXACT_FRACTION_GATE_PASS;65_INTERVALS;18_COMMON_PRE_POST_OBS_PASS;SOURCE_JUMPS_MISSING_DATA",
+    "AGE64_BLOCK_MAX_EVIDENCE_PUBLICATION": "4b8e41f3c945612f686a34e11044b36925adf970",
+    "AGE64_BLOCK_MAX_BACKUP": "DRIVE_DROPBOX_RCLONE_UPLOAD_EXIT0;SIZE3894245;REMOTE_FULL_READBACK_SHA256_MATCH_BOTH",
+    "AGE64_BLOCK_MAX_INDEPENDENT_REVIEW": "C1_C2_PASS;C3_C4_C5_WORDING_CONCERNS_ADOPTED;evidence/independent_review_blockmax_20261019/REVIEW.json"
   },
   "new_targeted_tests": {
     "photon_diagnosis": 11,
@@ -34,35 +38,50 @@
   "native_execution": {
     "spectral128": "REUSE_COMPLETE;HEI64_TO128_RELATIVE0.0026607786820587805;FINITE_NEIGHBOR_TARGET_ONLY",
     "age64_original": "REUSE_FAILED_FROZEN_PHOTON_GATE1.0081783527976493e-8>1e-8",
-    "age64_block_max": "NOT_RUN_READY",
+    "age64_block_max": "COMPLETE_GATES_PASS;SINGLE_CASE;NO_REPEAT",
     "time8_original_diagnostic": "LOCAL_FAILURE_REPRODUCED_DIAGNOSED",
     "time16_time32": "HOLD_UNTIL_COUNT_ENERGY_STORAGE_REPRESENTATION_VALIDATED",
     "time8_subnormal_count": "LOCAL6.849479S_EXIT1;FIRST_COUNT_CELL_FIXED;LATER_ENERGY2ETA>TOL1ETA;NO_IDENTICAL_RETRY"
   },
   "next_ready": [
     {
-      "id": "R_AGE64_BLOCK_MAX",
-      "state": "READY",
-      "new_reason": "New opt-in DOP853 block controller; original rtol/atol, physics and gates",
-      "command": "bash scripts/run_accuracy_followup.sh REPO NEW_SCRATCH age64-block-max",
-      "case_wall_s": 1800,
-      "repeat_old_rms": false
+      "id": "R_BLOCK_MAX_BINDING_BLOCK_LOG",
+      "state": "NOT_READY_REQUIRES_LOCAL_IMPLEMENTATION_AND_TESTS",
+      "reason": "Discriminate RMS ledger dilution from generic step tightening: record which block attains E_block per accepted step (no numerical change). Then one age64 block-max diagnostic run with identical gates.",
+      "alternative_requiring_owner_decision": "iso-cost RMS run at rtol giving ~19.8k RHS (changes rtol; not authorized by current contract)"
+    },
+    {
+      "id": "R_AGE32_BLOCK_MAX_SAME_SOURCE",
+      "state": "NOT_READY_REQUIRES_PLAN_ENTRY",
+      "reason": "Age convergence needs a same-source (block-max, same solver/binary/native) age32 reference; run_refinement.plan() has no age32 reference case. Adding it changes runner identity and needs local tests + review before one NCP run.",
+      "gate_policy": "unchanged rtol/atol, RK, physics, photon/energy 1e-8",
+      "repeat_age64_block_max": false
+    },
+    {
+      "id": "R_SOURCE_JUMP_PAIRED_SNAPSHOTS",
+      "state": "DESIGN_REQUIRED",
+      "reason": "Photon diagnosis source_jumps=MISSING_DATA (paired_source_jump_observations absent); birth-jump side check cannot be claimed."
     },
     {
       "id": "R_NATIVE_COUNT_ENERGY_STORAGE",
       "state": "THEORY_REQUIRED_BEFORE_NEW_NATIVE_CAMPAIGN",
       "known_failure": "count0/tol0; energy2eta/tol1eta after first count repair",
-      "ncp_ready": false,
-      "missing_evidence": "Complete later-cell128-node/rawstderr lost after scratch reset; compact observed values retained"
+      "ncp_ready": false
     }
   ],
-  "scientific_accuracy": "HOLD_AGE_AND_NATIVE_TIME;SPECTRAL_FINITE_NEIGHBOR_TARGET_MET_ONLY",
+  "scientific_accuracy": "AGE64_BLOCK_MAX_GATE_PASS_SINGLE_CASE;AGE_CONVERGENCE_HOLD;NATIVE_TIME_HOLD;SPECTRAL_FINITE_NEIGHBOR_TARGET_MET_ONLY",
   "production_scientific_admission": "NOT_ISSUED",
   "runtime_after_scratch_reset": {
-    "rustc": "NOT_FOUND",
-    "cargo": "NOT_FOUND",
-    "ncp_current_access": "NOT_ESTABLISHED_THIS_SESSION",
-    "note": "Initial local compilation/tests completed before reset; re-probe future environments"
+    "ncp_current_access": "ESTABLISHED_2026-10-19_SSH_root@49.50.142.2",
+    "ncp_toolchain": "rustc/cargo 1.99.0, gcc 13.3.0, venv Py3.12.3 NumPy2.3.5 SciPy1.17.0",
+    "ncp_cpu": "64x Xeon Gold 5220, 125GiB"
   },
-  "delivery_receipt": "DELIVERY_RECEIPT_CURRENT.json"
+  "delivery_receipt": "DELIVERY_RECEIPT_CURRENT.json",
+  "previous_intake_head": "0c6b0466b10a47788f6415a8538e9d3e7a268163",
+  "intake_head": "18aae24bd1d102c50164bd6224a09ec5c4eaf45d",
+  "ncp_preflight_tests": "24_PASS_2_SKIP(moment1,subnormal1) on NCP venv Py3.12.3/NumPy2.3.5/SciPy1.17.0; not counted as 26 PASS",
+  "ready_on_ncp_now": [],
+  "open_numerical_questions": [
+    "Native IGM_STATE_OR_UNIT_DOMAIN rejection of trial states at interval endpoints (60/65 intervals, both controllers); max_step=dt/4 restart shapes step path; root cause uncharacterized"
+  ]
 }
