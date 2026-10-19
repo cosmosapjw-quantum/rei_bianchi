@@ -1,15 +1,13 @@
-# 새 ChatGPT 스레드로 REI age-exposure 연구 이어가기
+# 새 대화 재개 | 2026-10-19
 
-physmath-research-loop로 이어서 작업해줘. 먼저 아래 GitHub branch와 최신 백업을 실제로 읽고 신규 실행결과가 있는지 확인해. 이미 검증된 코드를 재작성하거나 완료된 NCP 결과를 이유 없이 재실행하지 마.
+`physmath-research-loop`로 PR199 / `research/rei-age-exposure-envelope-20261018`의 실제 HEAD를 읽고 `README_CURRENT_KO.md`, `RESEARCH_UPDATE_20261019_KO.md`, `HANDOFF_CODEX_CURRENT_KO.md`, `contracts/NEXT_DAG_CURRENT.json`, `DELIVERY_RECEIPT_CURRENT.json`을 확인한다.
 
-Repo cosmosapjw-quantum/rei_bianchi, branch research/rei-age-exposure-envelope-20261018, 경로 research/rei_age_exposure_envelope_20261018/. README_CURRENT_KO.md, HANDOFF_CODEX_CURRENT_KO.md, contracts/NEXT_DAG_CURRENT.json, DELIVERY_RECEIPT_CURRENT.json이 재개 기준이야. 신규 science commit a3b8c6100c12da2bbb7bb4b009f9a01057863632와 후속 bootstrap/배송 commit의 최신 HEAD를 확인해.
+2026-10-18의 공급된 최종 HEAD604c228 이후 실제 NCP 결과가 추가되어 이번 재개 기준은0c6b046이었다. spectral128은 완료됐고 He I64→128 누적 photo 차이0.2660778682%다. age64는 endpoint 도달 후 photon ratio1.0081783527976493e-8로 원래1e-8 gate에 실패했다. native time8/16/32는 MOMENT_FIT로 실패했다. 완료된 코드를 재작성하거나 같은 캠페인을 반복하지 않는다.
 
-원 native SHA 35d9747a0bbedcafdb568467ce7c1e7a25f965b6를 유지해. PR171은 양성 source-matched reference 구현 PASS지만 age16->32 survivor90.13%, HeI spectral32->64 누적 photoevent0.749735%, native time 정확도는 HOLD야. 2026-10-18 fresh NCP q0-age8 replay는 성공했지만 age64/spectral128을 계산한 것은 아니야.
+2026-10-19에는 새 opt-in DOP853 성분군 최대 오차검사, 정확한 저장항 photon ledger 진단, failure-only native moment instrumentation을 구현·독립 검토했다. 새23 targeted tests PASS, 기존85 PASS/1 optional skip은 재사용한 원격 증거다. Rust1.94.1을 실제로 확보하여 원본153개 입력 identity를 확인한 task copy를 컴파일했다. 새 목적의 로컬 time8 첫 실패 진단은6.436 s, 원래exit1. 해당 셀의 count defect5η>3η, energy89η≤116η이며 독립 원본 Rust 재생이 일치했다. 평균 적합 이후의 subnormal 저장 양자화로 판별했다.
 
-이 대화는 중단된 49-test 파일과 실제 원격74-test 코드를 복원한 뒤, 서로 다른 gas/opacity response를 비교하는 조건부 경계를 추가했어. 8개 새 경계 테스트와 1개 NCP bootstrap 테스트를 포함하여 83/83 PASS, 24개 prescribed-opacity 수치 사례를 실행했어. 같은 age measure라도 opacity가 다르면 W1=0으로 응답 차이가 사라지지 않아. 새 paired bound에는 실제 response sup-difference가 필요해. 일반적인 native nonlinear bound를 측정했다고 주장하면 안 돼.
+기존 age64 raw70 파일을 실제 Git blob과 일치시켜 읽고65구간을 정확 재합산했다. 마지막 합산만 교정해도 원래 gate 실패가 남는다. 실제 source-birth paired snapshot은 없어 MISSING이다. 새 block-max age64 실행은 이 checkpoint에서 NOT_RUN이다. native moment 교정 연구와 후속 실행의 최종 상태는 최신 DAG/receipt를 따른다.
 
-원본 input153개를 검증해 native 준비 출력156개를 생성했어. Native Rust compile/NCP run은 이 재개에서 NOT_RUN이야. 실행기는 source/binary/config/outputs identity를 확인하고 failed attempt를 보존하며, pre/post 출생시각을 혼동하지 않아. NCP에서 컴파일/작은 연결수정/실행만 하도록 가능한 준비는 되어 있어.
+현재 도구 제약은 이 세션에서 실제 재확인했다. Python/NumPy/SciPy/C++/Rust 로컬 실행과 GitHub connector는 작동했고, shell signed-URL 다운로드는 네트워크 제한, Desktop Commander process는 월간 사용량 제한을 반환했다. 이를 다음 세션의 자동 blocker로 상속하지 않는다.
 
-다음은 age64, age32고정 time factor8/16/32, q+0.1/age8고정 transport128을 분리 실행하는 일이야. 샌드박스에서는 가능한 source 수정과 경량 검증을 끝내서 push해. NCP가 필요하면 HANDOFF_CODEX_CURRENT_KO.md의 명령을 사용하고, 필요한 프롬프트를 본문에 복사 가능하게 제공해. 단계마다 게시/백업/DAG를 명확히 표시해.
-
-현재 Google Drive와 Dropbox는 복구 archive를 업로드한 이력이 있으며 최종 receipt의 정확한 SHA와 fresh replay 범위를 다시 읽어. 과거 tools unavailable/blocker를 현재 기능으로 단정하지 마. user checkout, PR150/R9 및 별도 BASS HHeD lane을 보호해. 전체 scientific production admission은 NOT_ISSUED야.
+원 native physics SHA35d9747을 고정하고 owner checkout, PR150/R9, 별도 BASS HHeD lane을 보존한다. 과거 paired response bound와24 prescribed-opacity 증거는 조건부이며 nonlinear Grackle certificate가 아니다. `PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED`.

@@ -74,6 +74,20 @@ def overlay(native: bytes, solver: bytes) -> tuple[str, str]:
     py=py.replace("if answer.startswith('ERR'):","if isinstance(answer,str) and answer.startswith('ERR'):",1)
     py=py.replace("result=np.fromstring(answer,sep=' ');", "result=answer if isinstance(answer,np.ndarray) else np.fromstring(answer,sep=' ');",1)
     py=py.replace('max_rhs=a.max_rhs,max_wall_s=a.max_wall_s,status=status', 'max_rhs=a.max_rhs,max_wall_s=a.max_wall_s,rpc_mode=a.rpc_mode,status=status',1)
+    py=py.replace("a=p.parse_args();", "p.add_argument('--error-norm',choices=('rms','block-max'),default='rms');a=p.parse_args();",1)
+    error_module=Path(__file__).with_name('error_control.py').read_text()
+    adapter='''
+if a.error_norm == 'block-max':
+    _scipy_solve_ivp = solve_ivp
+    def solve_ivp(*args, **kwargs):
+        kwargs['method'] = make_block_dop853(production_blocks(len(args[2])))
+        return _scipy_solve_ivp(*args, **kwargs)
+'''
+    anchor='server=subprocess.Popen('
+    assert py.count(anchor)==1
+    py=py.replace(anchor,error_module+'\n'+adapter+'\n'+anchor,1)
+    py=py.replace('rpc_mode=a.rpc_mode,status=status',
+                  'rpc_mode=a.rpc_mode,error_norm=a.error_norm,error_control_identity=error_control_identity(),status=status',1)
     return rust,py
 
 def write_checked(path: Path, data: bytes) -> None:

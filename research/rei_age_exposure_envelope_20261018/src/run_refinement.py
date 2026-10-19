@@ -58,6 +58,7 @@ def command(c: dict, binary: Path, solver: Path, out: Path, cap: float, rhs: int
             '--max-rhs',str(rhs)]
     if c.get('tight'): result.append('--tight')
     result.extend(['--rpc-mode',c.get('rpc_mode','text')])
+    result.extend(['--error-norm',c.get('error_norm','rms')])
     return result
 
 def run_process(argv: list[str], out: Path, cap: float) -> dict:
@@ -110,6 +111,8 @@ def validate_outputs(c: dict, root: Path) -> None:
         if key not in endpoint: raise ValueError('MISSING_ENDPOINT_'+key)
     if c['kind']=='reference':
         r=read_json(root/'solver_return.json')
+        if r.get('error_norm','rms')!=c.get('error_norm','rms'):
+            raise ValueError('REFERENCE_ERROR_NORM_MISMATCH')
         for key in ('q','birth_panels','n_mu','source_subdivisions','transport_cells'):
             if r[key]!=c[key]: raise ValueError('REFERENCE_CONFIG_MISMATCH_'+key)
         if r['status']!='SCOPED_NUMERICAL_EXECUTION_COMPLETE' or r['server_exit']!=0:
@@ -135,6 +138,7 @@ def main() -> None:
     p.add_argument('--max-rhs',type=int,default=200000)
     p.add_argument('--tight',action='store_true')
     p.add_argument('--rpc-mode',choices=('text','binary64'),default='text')
+    p.add_argument('--error-norm',choices=('rms','block-max'),default='rms')
     p.add_argument('--retry-failed',action='store_true')
     p.add_argument('--dry-run',action='store_true')
     a=p.parse_args()
@@ -143,6 +147,9 @@ def main() -> None:
     cases=plan();names=a.cases.split(',')
     if len(set(names))!=len(names) or any(n not in cases for n in names): p.error('unknown/duplicate case name')
     configs=[dict(cases[n],tight=a.tight,rpc_mode=a.rpc_mode) for n in names]
+    for config in configs:
+        if config['kind']=='reference':
+            config['error_norm']=a.error_norm
     if a.dry_run:
         print(json.dumps(configs,indent=2));return
     native=a.prepared.resolve();solver=native/'positive_solver_refined.py'
