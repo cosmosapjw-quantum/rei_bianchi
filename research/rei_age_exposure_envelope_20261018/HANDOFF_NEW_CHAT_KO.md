@@ -1,17 +1,29 @@
-# 새 대화 재개 | 2026-10-19 pair-search 배송
+# 새 대화 재개 | VigilODE affine source-age 연구
 
-physmath-research-loop를 사용한다. 먼저 cosmosapjw-quantum/rei_bianchi PR199 실제 HEAD와 최신 Drive/Dropbox 백업을 읽어 age32 등 새 실행결과가 추가됐는지 확인한다. 이번 intake는 ee3b6c8014bcb21e6d4c9ef3a3560dc40df61309였다. 현재 코드와 배송 HEAD는 PR 및 DELIVERY_RECEIPT_CURRENT.json에서 확인한다.
+physmath-research-loop를 사용한다. 연구 전에 실제 GitHub와 관련 Drive/Dropbox의 새 실행결과부터 읽는다. Repo cosmosapjw-quantum/rei_bianchi, draft PR199, branch research/rei-age-exposure-envelope-20261018, task research/rei_age_exposure_envelope_20261018/. 이번 intake는 0ae749e9fdb179729c018706dbd59c4f61732b6a. 실제 최종 HEAD는 PR와 DELIVERY_RECEIPT_CURRENT.json/DELIVERY_CONFIRMATION v6에서 확인한다.
 
-우선 읽기: README_CURRENT_KO.md, RESEARCH_UPDATE_20261019_PAIRSEARCH_KO.md, HANDOFF_CODEX_CURRENT_KO.md, contracts/NEXT_DAG_CURRENT.json, DELIVERY_RECEIPT_CURRENT.json. branch research/rei-age-exposure-envelope-20261018, task research/rei_age_exposure_envelope_20261018/. 원 physics35d9747a0bbedcafdb568467ce7c1e7a25f965b6.
+우선 CURRENT5와 RESEARCH_UPDATE_20261019_VIGILODE_KO.md를 읽는다. 이전 CURRENT5는 evidence/current_entries_before_vigilode_20261019/에 있다. 원 physics 35d9747a0bbedcafdb568467ce7c1e7a25f965b6.
 
-완료 재사용: q0 age64 block-max NCP exit0/photon2.002711130429069e-10/energy1.92966e-13/19756RHS; spectral128 He I64→128 0.2660778682%. age 수렴성은 HOLD. 기존 age64 source jumps는 MISSING_DATA. 같은 사례 반복 금지.
+## 새로 완료한 것: 반복하지 말고 재사용
 
-이번 새 코드: native-input-dir exact153→156; 실패-only k1 및 exact interval single-pair search; explicit age32; 수동적 binding-block/source-jump 진단; exact computational base/binary/runtime 비교; compactB1 복원. native 신규8+S신규5 test methods, 독립 review PASS; 기존 norm9도 대상 회귀 확인. 실제 native birth2 off/on exit0,1302RHS씩, 저장 상태·기존 출력 byte 동일,2/2 birth coverage. internal adaptive x/y·실제native RHS stream은 저장하지 않았으므로 해당 byte 주장은 금지.
+VigilODE main만 보지 않고 147 branches/71 PR metadata와 source/CSV/DAG를 읽었다. All-DAG source ee65d4dbecf3b3cd5f4587c27f87ef297d2bb406의 두 원본 affine/directed 모듈을 그대로 재사용한다. PR71의 별도 새 strict comparison은 9f80e38dd6c7e5cf002d2436f6cf5fb2cc372858까지 읽고 756 accuracy cells/1,152 timing processes를 재집계했다. 해당 upstream 결과는 empirical sampled accuracy이며 production guarantee가 아니다. 상세 intake에 raw gzip/184MB backup 및 오래된 Drive history의 미확인 범위를 명시했다.
 
-마지막 N4 time8은 변경된 코드를 한 번 실행해22.1506s exit1. 새16-node 셀에서 n10η, 양의 가중치10개 모두1η, storedenergy246η≠목표245η/tol0. fixed positive support와 exactcount가 유일한 벡터를 강제한다. 그 표현 범위에서 교정 불가이며 다른 표현까지의 비존재 주장은 아니다. 새 native repair/동일 실행 반복 없이 HOLD.
+새 subtree vigilode_age_transport_20261019/는 실제 원 birth packet 64개/57,344 nodes를 내보낸 고정 gas·geometry·node 모형이다. 새로운 native ODE history는 0회. num-rational/num-bigint의 exact dyadic exp enclosure와 VigilODE original affine-prefix API를 연결했다. 고유 설정 4개(8/16/32/64), 변경된 grouping 분석 replay 1회까지 완료했고 historical runs를 중복 계수하지 않았다. 그룹 1,112개 상한은 직접 labelled D의 Decimal100 검산을 통과했다. R6/C9와 offline Cargo.lock+22 vendor packages 검증은 reviews/results에 있다.
 
-다음 READY는 단일 q0 age32 block-max/source8/n_mu8/transport16/time1, binary64, diagnostics ON, 기존48threads/동일binary·runtime, cap1800s. 기존 age64를 재사용하여 finite-neighbor 비교·진짜 source-jump·binding-block 분석. 기존 rtol/atol/gates/RK/source schedule 유지. 새 실제 결과가 이미 있으면 ingest 먼저.
+중요한 해석: 전체 survivor 32→64는 −0.815145%지만 zero-hazard 4,096개 node를 제외한 sensitive survivor는 약 −82.574593%다. Exact P와 양의 분모 interval을 보존했다. 고정 모형의 전체 N64≈1.30931e-7는 실제 native endpoint≈1.29091e-9/H와 다르다. 이를 native age reference 또는 nonlinear bound로 승격하지 않는다. THEORY_KO.md의 조건부 구성과 age-moment theorem을 실제 native trajectory 인증과 구분한다.
 
-이번 원격 명령 도구는 실제 월 사용량 중지로 막혔으나 로컬Rust1.94.1 compile과 양쪽 백업 다운로드는 동작했다. 차기 세션은 실제 도구 상태를 재확인한다. owner checkout/PR150/R9/LRS/BASS HHeD 보호, no force-push/merge, PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED.
+## 이전 완료 상태
 
-배송: 코드·증거9f85ea1a08063d27f1148b386b5e4fb0d4c16c28; C8/C10 v5 양쪽 업로드와 네 전체 readback PASS. ZIP 내부 CURRENT의 upload-pending은 생성 시점 상태다. 원격 최종 receipt 또는 별도 DELIVERY_CONFIRMATION v5가 이를 대체한다. 전체 C10은 source811/native153/기존B1binary를 포함하며 복원 Git tree 일치가 검증됐다.
+Native age64 block-max NCP exit0/19,756 RHS/case782.731 s/photon2.002711130429069e-10/energy1.92966e-13; spectral128 HeI64→128 차이0.2660778682%. 완료 캠페인을 반복하지 않는다. Native age 수렴 HOLD, 기존 age64 birth jumps MISSING_DATA.
+
+기존 age32 passive diagnostics/true birth snapshots/base binary-runtime binding/compactB1 자동 복원은 구현 및 tiny-native OFF/ON 검증 완료. Saved 3 states와 endpoint/관측/ledger byte 동일, 각1,302 RHS, 2/2 actual birth. 모든 내부 adaptive 좌표/native RHS stream은 NOT_RECORDED였으므로 더 넓은 byte identity 주장은 금지한다.
+
+N4 time8 fixed-positive-support 10 tick의 stored energy246η≠target245η/tol0 문제는 그 저장 표현에서의 유일 벡터 장애다. 다른 표현까지의 일반 no-go가 아니며 이번 VigilODE code가 고치지 않았다. Time8/16/32 HOLD.
+
+## 다음 외부 실행
+
+READY는 R_AGE32_BLOCK_MAX_SAME_SOURCE_WITH_PASSIVE_DIAGNOSTICS 한 사례. q0 age32/source8/n_mu8/transport16/time1, binary64, block-max, diagnostics ON, transport48, cap1800 s, 원 rtol/atol/RK/source schedule/photon-energy1e-8를 유지한다. 기존 age64 binary/runtime와 맞춰 finite-neighbor·true birth·binding blocks를 분석한다. Source/identity mismatch는 실행 전에 HOLD. HANDOFF_CODEX_CURRENT_KO.md의 복사 프롬프트로 사용자 수동 파일 처리 없이 실행한다.
+
+NCP 도구는 이번 실제 호출에서 월 사용량 중지였다. NCP NOT_RUN. Local Rust1.94.1 compile/새 bounded 계산과 Drive/Dropbox 읽기는 작동했다. 과거 blocker를 상속하지 말고 가용 도구를 다시 확인한다.
+
+게시·backup은 실제 receipt 기준으로 보고한다. Source/C8/C10 v6와 별도 final confirmation을 구분하고 나중 receipt가 ZIP 안에 있다고 주장하지 않는다. Owner checkout/PR150/R9/LRS/BASS HHeD 보호, no force-push/no merge. PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED.

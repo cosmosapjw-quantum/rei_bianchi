@@ -1,6 +1,12 @@
 # Codex/NCP 인계 | 단일 age32 reference READY
 
-코드·증거 배송 커밋: `9f85ea1a08063d27f1148b386b5e4fb0d4c16c28`. 최종 receipt 커밋은 PR199 actual HEAD에서 확인한다. C8/C10 v5의 Drive·Dropbox 네 full readback은 PASS다. 기존 결과가 남아 있으면 그대로 사용한다.
+이번 intake HEAD는 `0ae749e9fdb179729c018706dbd59c4f61732b6a`다. 새 VigilODE 연구 source와 C8/C10 v6의 실제 배송 상태·commit·SHA는 `DELIVERY_RECEIPT_CURRENT.json`과 PR199 actual HEAD에서 확인한다. 기존 v5 배송 및 age64 결과는 보존한다. 이미 생긴 새 결과가 있으면 그대로 ingest한다.
+
+## 이번 로컬 연구도 완료됐다
+
+`vigilode_age_transport_20261019/`의 고정-opacity/native-derived 연구는 원래64 source/57,344 nodes, VigilODE affine original modules, exact-rational exp, locked22 dependencies, 4설정 및 독립 검산까지 완료했다. 전체 N32→64의 −0.815145%와 sensitive-node N의 약 −82.574593%를 구분한다. 이 모형은 원 nonlinear trajectory가 아니며 기존 native time HOLD를 해제하지 않는다. NCP에서 이 완료된 분석을 다시 돌릴 필요는 없다.
+
+수정한 Rust 코드의 컴파일만 필요할 경우 새 task runtime에서 bundled inputs/offline dependency를 사용할 수 있다. 실제 재분석 명령은 새 subtree README에 있으며 필요 없이 실행하지 않는다. 다음 과학 실행은 아래 age32 native reference 한 사례다.
 
 ## 고정 기준과 완료 작업
 
@@ -24,6 +30,8 @@ Repo cosmosapjw-quantum/rei_bianchi, branch research/rei-age-exposure-envelope-2
 task research/rei_age_exposure_envelope_20261018/.
 README_CURRENT_KO.md, HANDOFF_CODEX_CURRENT_KO.md, HANDOFF_NEW_CHAT_KO.md,
 contracts/NEXT_DAG_CURRENT.json, DELIVERY_RECEIPT_CURRENT.json을 먼저 읽어.
+RESEARCH_UPDATE_20261019_VIGILODE_KO.md와 완료된 고정 모형 결과도 읽어.
+VigilODE 연구는 native age32 결과가 아니다. 그4설정 분석/원 native age64/spectral128은 완료되어 반복하지 마.
 
 NCP 연결은 실제 사용 가능한 경로로 확인해. 기존 접속 대상 root@49.50.142.2.
 키/토큰 내용은 출력하지 마. owner checkout, PR150/R9, LRS repo, BASS HHeD,
