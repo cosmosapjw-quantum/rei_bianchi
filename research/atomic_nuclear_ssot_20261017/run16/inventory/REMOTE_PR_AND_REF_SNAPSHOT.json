@@ -1,0 +1,264 @@
+{
+  "schema": "rei.run16.readonly.remote_inventory.v1",
+  "repository": "cosmosapjw-quantum/rei_bianchi",
+  "observed_at_utc": "2026-10-19T09:27:51.491Z",
+  "refs": {
+    "run15": {
+      "ref": "refs/heads/research/rei-run15-subh-optical-enclosure-20261019",
+      "node_id": "REF_kwDOTtgjudoAPXJlZnMvaGVhZHMvcmVzZWFyY2gvcmVpLXJ1bjE1LXN1Ymgtb3B0aWNhbC1lbmNsb3N1cmUtMjAyNjEwMTk",
+      "url": "https://api.github.com/repos/cosmosapjw-quantum/rei_bianchi/git/refs/heads/research/rei-run15-subh-optical-enclosure-20261019",
+      "object": {
+        "sha": "c875005e30d9de1ce7f426898e46fe912068412c",
+        "type": "commit",
+        "url": "https://api.github.com/repos/cosmosapjw-quantum/rei_bianchi/git/commits/c875005e30d9de1ce7f426898e46fe912068412c"
+      }
+    },
+    "recovery": {
+      "ref": "refs/heads/research/rei-atomic-run13-m2-recovery-20261018",
+      "node_id": "REF_kwDOTtgjudoAOXJlZnMvaGVhZHMvcmVzZWFyY2gvcmVpLWF0b21pYy1ydW4xMy1tMi1yZWNvdmVyeS0yMDI2MTAxOA",
+      "url": "https://api.github.com/repos/cosmosapjw-quantum/rei_bianchi/git/refs/heads/research/rei-atomic-run13-m2-recovery-20261018",
+      "object": {
+        "sha": "3dcb5f7aed8d33ff64f7952e9465f4239a216c89",
+        "type": "commit",
+        "url": "https://api.github.com/repos/cosmosapjw-quantum/rei_bianchi/git/commits/3dcb5f7aed8d33ff64f7952e9465f4239a216c89"
+      }
+    }
+  },
+  "prs": [
+    {
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/204",
+      "number": 204,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "draft": true,
+      "body": "## 문제와 범위\n\nRUN13의 완료된 m2 standard/tight 원본을 보존하면서, 전체 survivor와 작은 sub-H-fit 성분의 다른 수렴 상태를 분리해야 합니다. 이 PR은 원본 recovery branch 위에 add-only RUN15 연구 산출물을 게시합니다. 원래 main/production/atomic owner와 45-node/26-node DAG를 바꾸지 않습니다.\n\n## 변경과 실제 결과\n\n- RUN13 원본333 파일 / manifest332 / source-input113을 Git 및 실제 Drive ZIP 바이트와 대조하고, saved endpoint84개 관측량을 재적분 없이 재구성했습니다.\n- 정의된 gas PCHIP에서 continuous-energy response를 계산하는 새 Python 진단을 구현했습니다. 다섯 설정과 focused tests5개를 실제 실행했습니다.\n- Tight13 E12/T24 sub-H-fit core는 1.1803145305811728e-10 comoving m^-3입니다. Standard18 경로와의 상대 변화5.070225921291e-7은 checkpoint 배치와 저장 경로를 함께 바꾼 민감도입니다.\n- Source-positive quadrature의 새 native crate, 공식 Rust 복원 recipe, 세 수치 제어와 실행 증거를 보존했습니다.\n- 소실 전 네 새 coupled IVP는 실제 완주했으나 외부 게시 전 작업 파일이 사라져 raw state/packet/ZIP을 복구하지 못했습니다. 원인 미확정, 값은 TRANSCRIPT_RECONSTRUCTION_ONLY이며 원래 RUN13 이력과 혼동하지 않습니다.\n\n## 고정 커밋의 검증\n\nScience commit: 6405bcba8ec654bf3ab98182be344cd8c3915b97.\n\nFresh checkout에서 fixed-gas326 숫자와 native128 숫자/16nodes/1,851-byte stdout이 일치했습니다. Scoped501 tracked files 및 HEAD/tree/index는 불변입니다. 원래 gas binary는 SHA3454e9…c8b로 동일하게 재빌드됐습니다.\n\n최종 검증 지위는 VERIFIED_SCOPED_WITH_BINARY_BYTE_MISMATCH입니다. 새 quadrature executable은 ec8804…e8f66(569,800bytes)에서 clean-build a6879c…2a529(569,792bytes)로 달랐습니다. 원인·명령어 수준 동등성은 미확립이며 strict gate 실패와 후속 scoped receipt를 함께 보존했습니다. 완료된 RUN13/RUN14 IVP 재실행은0회입니다.\n\n## 미완료\n\nTail estimate는 core quadrature/roundoff/actual gas path/continuous opacity feedback을 포함하지 않습니다. 전체 spectral continuum, uniform m4, 원래 DAG의 남은 의무를 완료 처리하지 않습니다. 다음 노드는 P4-S4C-SPECTRAL-EDGE-SUPPORT/SUBTHRESHOLD-SURVIVOR-RESOLUTION 안의 actual gas path 및 nonlinear feedback 오차 통제입니다.\n\n최종 archive와 양쪽 download SHA 검증은 DELIVERY.json 및 RESUME_DELIVERY.json에 기록합니다.\n\n## Delivery\n\nFinal delivery commit: c875005e30d9de1ce7f426898e46fe912068412c\nArchive checkpoint: 17d5be64e06a8280163f8dba42b56937475c4091\nArchive: REI_RUN15_RECOVERY_FIXED_GAS_NATIVE_20261019_085443Z.zip, 41,913,080bytes, SHA256 8729696dbb1efb7a7a76f59b12afacaa22d9481210b505c3b674b201b7b89dcb.\n\n[Google Drive backup](https://drive.google.com/file/d/1oDJIWU2oqE7ABG8z2CNoLQOmz9TP_fXO/view)\n\nDropbox: /BASS_DERIVATION_DOSSIERS_20260912/REI_RUN15_RECOVERY_FIXED_GAS_NATIVE_20261019_085443Z.zip (id:BSpOijBcT10AAAAAAD_Qfw).\n\nBoth full downloads match SHA256 and all293 payload hashes. No claim is made that the unavailable preincident four raw histories are included.",
+      "title": "RUN15: preserve RUN13 recovery and reproducible spectral response with explicit limits",
+      "base": "research/rei-atomic-run13-m2-recovery-20261018",
+      "base_sha": "3dcb5f7aed8d33ff64f7952e9465f4239a216c89",
+      "head": "research/rei-run15-subh-optical-enclosure-20261019",
+      "head_sha": "c875005e30d9de1ce7f426898e46fe912068412c",
+      "created_at": "2026-10-19T09:01:25Z",
+      "updated_at": "2026-10-19T09:01:25Z",
+      "closed_at": null,
+      "merged_at": null,
+      "commits": 6,
+      "changed_files": 296,
+      "additions": 60184,
+      "deletions": 0
+    },
+    {
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/199",
+      "number": 199,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "draft": true,
+      "body": "## Current outcome\n\nThis continues the age-exposure/source-age accuracy research. Fresh intake read actual PR199 HEAD `0c6b0466b10a47788f6415a8538e9d3e7a268163`, the newer NCP receipts and current Drive/Dropbox backup metadata before selecting work. The completed RMS/binary64 and spectral campaigns were reused.\n\nSource and scientific handoff commit: `db87456e6b2b528a046f7856c04c73c7b4b43a54`. Final delivery receipt HEAD: `18aae24bd1d102c50164bd6224a09ec5c4eaf45d`. Original native physics: `35d9747a0bbedcafdb568467ce7c1e7a25f965b6`. C8 checkpoint: `e729adaf2a16064e95f6f5efc7e469f708b58559`.\n\n| Axis | Evidence and status |\n|---|---|\n| q+0.1, age8, transport64→128 | Existing completed spectral128; He I cumulative photoevent difference **0.2660778682%**, with 18/18 common observations. Finite-neighbor target only. |\n| q0 age64 original reference | Existing endpoint reached; photon ratio **1.0081783527976493e-8 > 1e-8**, exit1. Failure retained. |\n| Existing age64 exact stored terms | 70 raw Git blobs verified; 65 interval budgets. Exact ratio **1.008178364096903740e-8** still fails. Final-addition roundoff alone cannot rescue it. |\n| Native time refinement | Existing NCP time8/16/32 failures retained. New local diagnostics identified subnormal stored-node quantization. |\n| Limited count correction | First captured cell count5η→0, energy89η→4η within original gates; new local time8 later fails an energy-only gate2η>η. Full time8 remains FAILED. |\n\n## Changes\n\n- Read-only exact-Fraction photon ledger diagnosis, separating stored assertion, exact endpoint terms, interval drift and missing birth-jump snapshots.\n- Opt-in DOP853 `block-max` error controller; default `rms` retained. A same-stage exact-arithmetic proof gives old RMS ≤ block maximum. RK coefficients, initial-step heuristic, interpolation, source schedule, rtol/atol and all final gates stay fixed.\n- Eight manufactured prescribed-opacity runs: increasing dimension2→9234 raises original RMS photon residual about37×, while block mode remains nearly constant. These controls are not native nonlinear accuracy certificates.\n- Failure-only instrumentation of the frozen transport copy, plus opt-in `subnormal-count` correction using exact integer multiples of η=2^-1074. It changes one existing largest positive weight only, keeps fixed nodes and rechecks BOTH original count/energy gates. Infeasible or energy-only cases retain the original error. Statistics are first-success-only.\n- Bundled exact153-input manifest and `scripts/run_accuracy_followup.sh` make a single explicitly named follow-up runnable from immutable repo objects without manual donor ZIP handling.\n- Updated the five CURRENT entry files, research derivations, independent reviews and DAG.\n\n## Validation and limits\n\n**26 unique new targeted unittest tests passed** before the runtime reset; an additional3 existing diagnostic regressions passed after the count change. Historical85 PASS/1 optional skip is reused evidence, not a newly rerun total. Two task copies compiled with Rust1.94.1. Actual local time8 diagnostics ended with original exit1 after6.436s and6.849479s. Independent scoped review passed, including an independent compiled captured fixture and exact68-term age64 endpoint tally.\n\nA late scratch reset removed temporary artifacts. Tested D source files were recovered exactly against independently retained hashes; native153 plus age64raw70 were recovered and their223 Git blob identities verified. The later D failure's full128-node vector, original stderr/result bytes and native binary were not recovered. Historical displayed receipts and compact observed values are explicitly labelled reconstructed; no fresh execution or full-byte claim is substituted. See `evidence/SCRATCH_RESET_RECOVERY_20261019.json`.\n\nNo new NCP execution occurred in this session. Native time16/32 remain HOLD. The next execution READY is **q0 age64 with the new block-max controller once**, binary64, fixed tolerances/gates and the existing1800s cap. Do not repeat old RMS, spectral128 or unchanged time8 campaigns.\n\n## Delivery\n\nBoth C8 and C10 uploaded successfully to Drive AND Dropbox; provider file sizes match. Local ZIP CRC and all payload SHA256 checks pass. **Full remote byte readback was not performed this session**; upload completion is recorded separately.\n\n- C8: `REI_AGE_ENVELOPE_C8_CODE_20261019_v4.zip`, 241703 bytes,95 payloads, SHA256 `9db1b14af855fd1729696ad6ad6e249336e74489fd362ce8f65cf41bc60eec31`.\n  [Drive](https://drive.google.com/file/d/1EI8dnO55KqNwDOhFDHb025gR_qOImANc/view?usp=drivesdk); Dropbox file `id:BSpOijBcT10AAAAAAD_PsA`.\n- C10: `REI_AGE_ENVELOPE_EXECUTION_READY_20261019_v4.zip`, 2976385 bytes,346 payloads, SHA256 `7ecd783def3fb284b34b1160412a1359a91fcec25a5f52d7d226a82b289c8e0e`.\n  [Drive](https://drive.google.com/file/d/145DpsxdGcNjgkzqLxkSCMgwuljI5iyYT/view?usp=drivesdk); Dropbox file `id:BSpOijBcT10AAAAAAD_QAw`.\n- Dropbox folder: `/bianchi/rei_bianchi/research/REI_POSITIVE_AGE_REFERENCE_BACKUPS/`.\n- C10 contains121 source/evidence files,153 native inputs,70 historical age64 raw files and2 recovery records. Its payload manifest identifies the source commit; this delivery receipt is committed afterward.\n\nStart at `research/rei_age_exposure_envelope_20261018/README_CURRENT_KO.md`, `RESEARCH_UPDATE_20261019_KO.md`, `HANDOFF_CODEX_CURRENT_KO.md`, `contracts/NEXT_DAG_CURRENT.json` and `DELIVERY_RECEIPT_CURRENT.json`.\n\nOwner checkout, PR150/R9 and the separate BASS HHeD lane are preserved. All branch updates were fast-forward with an expected-head lease. This PR stays draft; no merge.\n\n**PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED.**\n",
+      "title": "Age-exposure accuracy: ledger diagnosis, subnormal moment study and focused follow-up",
+      "base": "research/rei-source-age-positive-native-intake-20261016",
+      "base_sha": "69b4e596ef679e17ccac7c1c1384c1c61cdfd47f",
+      "head": "research/rei-age-exposure-envelope-20261018",
+      "head_sha": "d56ca68d5631598a1d244cc4194eec6201567710",
+      "created_at": "2026-10-18T13:40:48Z",
+      "updated_at": "2026-10-19T09:11:33Z",
+      "closed_at": null,
+      "merged_at": null,
+      "commits": 22,
+      "changed_files": 625,
+      "additions": 34212,
+      "deletions": 0
+    },
+    {
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/203",
+      "number": 203,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "draft": true,
+      "body": "## Problem and scope\n\nBR03 (#202) repaired the constant-opacity survivor-count integral, but age moments and energy-weighted q2 did not contract reliably under temporal refinement. This bounded follow-up adds a separately buildable, opt-in mass/age-shape diagnostic and two missing native histories to measure the time-by-birth interaction.\n\n**BASS-REACTIVE-04_TIME_AGE = COMPLETE_VERIFIED_SCOPED_DIAGNOSTIC_CONTROL.**  \n**LONGSPAN_SOLUTION = NOT_ADMITTED_JOINT_TIME_AGE_CONVERGENCE_INCOMPLETE.**\n\nThis stacked draft targets the BR03 branch at `8e60ecb627da46bb85861e2a4148a1b683d96fb0`. The scientific source release is **`1b5acc89cfbcfa7b42b87255e604f8f86c6a3a01`**, tree **`01f1dffe958f51fceb885f86857eff0bf776d6c1`**, with **326 added files** in the new BR04 directory. Publication receipts are added separately. No previous branch, PR, production source or physical owner is changed; no merge is requested.\n\n## What changes\n\n- New Rust `compare_nodes` / `compare_fitted` diagnostics separate emitted/survivor mass error from normalized age-CDFsup, W1, mean and second moment. Zero source, underflow and unrepresentable placement have distinct states.\n- CDF jump limits and positive plateau integrals implement frozen-reference distribution diagnostics. The theory covers disjoint panel composition, label-weight TV corrections, and conditional Bianchi observable bounds. Mixture outputs are upper bounds, not exact unlabelled-mixture distances.\n- All 118 copied parent inputs, including 105 crate files, remain byte-identical. The 12 original physical owners, source identity, native Killing paths, CX half-flows and S10 four-corner controller are unchanged. The native runs use the unchanged BR03 driver.\n\n## Quantitative results\n\n- At tau=93 and one time panel, AP r=1 -> 4 -> 16 reduces survivor CDFsup `0.2152354382 -> 0.0671209749 -> 0.0177192053` and fractional-age W1 `0.002009860423 -> 0.0006178404901 -> 0.0001669431599`. Constant-reference photon mass remains fitted to rounding accuracy; the age distribution still has finite error.\n- For the actual 384-label frozen source at Nt=32, the exact survivor count is `1.00111686436201655e-8` reference-comoving m^-3. AP r=1 -> 8 reduces the labelled-mixture W1 upper bound from `3.5196749383e-4` to `5.6983450103e-5` in A/T units. GL2/GL4 survivor biases reproduce `-74.50568024% / -16.28240889%`. These are frozen-reference results, not evolving-gas absolute error bounds.\n- Only **two new native histories**, Nt16r4 and Nt64r4, were executed: **80 macrosteps, 203.6714 seconds** combined. Seven prior histories are reused with exact identities. With the existing Nt32r4 history, formal temporal orders are count **1.0054**, mean age **0.4956**, second age moment **0.1350**, q2 **0.0592**, DI events **0.6565**, temperature **1.8187**. These finite-grid ratios do not establish an asymptotic order.\n- On the Nt32->64, r2->4 rectangle, the mixed difference is **4.1268 times** the r4 temporal difference in mean age and **6.5203 times** that difference in q2, with opposite sign. A stable separable time/birth error model is not demonstrated.\n- New-history independently reconstructed ledger maxima: photon number **1.49894e-14**, total energy **1.02341e-15**, species sum **3.52316e-16**, using the declared count/energy normalizations. Conservation is not an accuracy certificate.\n\n## Validation and failure classification\n\n- Actual final-source Rust 1.94.1 run: **224/224 tests** (15 new), strict all-target Clippy and scoped rustfmt PASS.\n- Independent Decimal90: all 84 scalar cases / 16,370 actual nodes / 2,016 field comparisons; source actual-node sampling is explicitly **12/288 rules, 5,888 nodes, 264 fields**, alongside all 4,608 label identities and 12 mixture rows. Wolfram identities/series checks and SciSpace/Exa primary-source evidence are retained.\n- PHYS-MATH-CODE audit PASS_SCOPED. Figure audit: **21 checks and 21 detected mutations**; digital PASS_SCOPED. 182-mm/90-mm journal print layouts are not qualified by this release.\n- Subnormal-quantile, zero-label CLI and fresh-path defects were corrected with before/after records. Tau1e300 `NoForwardProgress` is a representation limit. The prior zero-row `Cx(WorkLimit)` remains work-budget exhaustion; neither new native history failed.\n- Original fresh restore reran the new15 tests and both studies, while full224/Clippy were separately run on the identical final source. After an execution-environment replacement during publication, a new light replay again passed Rust15/Python7, reproduced all seven study CSVs and three independent CSVs byte-for-byte, and matched nine saved native analyses. It ran no additional native simulation.\n\n## Full archive and verified backups\n\n`REI_BASS_REACTIVE04_TIME_AGE_20261019_ae69c7c9_FULL.zip`\n\n- **18,943,104 bytes**, **399 ZIP entries / 398 verified payload hashes**.\n- SHA-256: **`ae69c7c912cb918112b96b471a5494a3dea6cc24e265d6a3604af6bed5c103da`**.\n- [Google Drive full ZIP](https://drive.google.com/file/d/1oh_aSpB0Ab-2ewdQJ1UGH3iFFSdO1izN/view): upload ACK, size and actual raw GET/extraction SHA-256 plus all398 payload hashes verified. The connector did not expose a separate provider checksum.\n- Dropbox: `/bianchi/rei_bianchi/research/REI_BASS_HIERARCHY_BACKUPS/REI_BASS_REACTIVE04_TIME_AGE_20261019_ae69c7c9_FULL.zip`. Upload completed; size, provider content hash, actual raw GET/extraction SHA-256 and all398 payload hashes verified.\n- Dropbox content hash: `7caa310cdae159a3c0d8195cf903e6ec1096eb10f0d0c24df492d379a89a7702`.\n- Binary-safe patch reconstructs the exact source tree in an isolated index. The incremental bundle verifies with the pinned BR03 parent prerequisite. Both are included in the full ZIP.\n\n**Explicit recovery exception:** one Decimal verification JSON's old UTC/Python metadata bytes could not be recovered after the environment replacement. The full ZIP contains the actual new execution record, with identical scientific/reference CSVs and preserved summary fields, and retains the original expected hash plus a separate provenance-replacement contract. No original-byte parity is claimed for that one report. All tracked source files, scientific CSVs, and the native analysis JSON's original bytes were verified. The truncated Cargo installation encountered during recovery was separately diagnosed and repaired; it was not a scientific-code failure.\n\n## Review and next DAG\n\nRead [REPORT_KO.md](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/1b5acc89cfbcfa7b42b87255e604f8f86c6a3a01/research/dossier_ssot_sandbox_20261016/bass_reactive04_time_age_20261019/docs/REPORT_KO.md), `AGE_CERTIFICATE_THEORY.md`, `VERIFICATION.json`, `DAG_PROGRESS.json`, and the full ZIP's `ARCHIVE_README_KO.md` / `RECOVERY` records.\n\nNext bounded node: **BR05_NATIVE_BIRTH_MONITOR_AND_R_PAIR** — connect a read-only physical/optical birth-width/reference-error monitor to actual retained cohorts, optionally close the r4->8 rectangle with one Nt16r8 history and the existing Nt32r8 result. Variable opacity/threshold entry, complete age-energy-angle convergence, native gas-response bounds and two-way Einstein feedback remain open. ISO-COUPLE-P4 stays PARTIAL; SA-01/02, FLRW-CONV, BI-SIGNED and FULL_EOR stay HOLD.\n",
+      "title": "research: BASS-REACTIVE-04 time-age certificate and crossed control",
+      "base": "research/rei-bass-reactive03-positive-birth-20261019",
+      "base_sha": "8e60ecb627da46bb85861e2a4148a1b683d96fb0",
+      "head": "research/rei-bass-reactive04-time-age-20261019",
+      "head_sha": "a8e550846745fc89e79e84ad32567e3fb556c175",
+      "created_at": "2026-10-19T08:32:56Z",
+      "updated_at": "2026-10-19T08:34:59Z",
+      "closed_at": null,
+      "merged_at": null,
+      "commits": 2,
+      "changed_files": 334,
+      "additions": 54118,
+      "deletions": 0
+    }
+  ],
+  "recent_prs": [
+    {
+      "number": 199,
+      "title": "Age-exposure accuracy: ledger diagnosis, subnormal moment study and focused follow-up",
+      "state": "open",
+      "draft": true,
+      "updated_at": "2026-10-19T09:11:33Z",
+      "head": "research/rei-age-exposure-envelope-20261018",
+      "head_sha": "d56ca68d5631598a1d244cc4194eec6201567710",
+      "base": "research/rei-source-age-positive-native-intake-20261016",
+      "base_sha": "69b4e596ef679e17ccac7c1c1384c1c61cdfd47f",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/199"
+    },
+    {
+      "number": 204,
+      "title": "RUN15: preserve RUN13 recovery and reproducible spectral response with explicit limits",
+      "state": "open",
+      "draft": true,
+      "updated_at": "2026-10-19T09:01:25Z",
+      "head": "research/rei-run15-subh-optical-enclosure-20261019",
+      "head_sha": "c875005e30d9de1ce7f426898e46fe912068412c",
+      "base": "research/rei-atomic-run13-m2-recovery-20261018",
+      "base_sha": "3dcb5f7aed8d33ff64f7952e9465f4239a216c89",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/204"
+    },
+    {
+      "number": 203,
+      "title": "research: BASS-REACTIVE-04 time-age certificate and crossed control",
+      "state": "open",
+      "draft": true,
+      "updated_at": "2026-10-19T08:34:59Z",
+      "head": "research/rei-bass-reactive04-time-age-20261019",
+      "head_sha": "a8e550846745fc89e79e84ad32567e3fb556c175",
+      "base": "research/rei-bass-reactive03-positive-birth-20261019",
+      "base_sha": "8e60ecb627da46bb85861e2a4148a1b683d96fb0",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/203"
+    },
+    {
+      "number": 198,
+      "title": "LRS V14: physical GL2 birth adapter, complete execution-only source and independent event-energy checks",
+      "state": "open",
+      "draft": true,
+      "updated_at": "2026-10-19T08:29:13Z",
+      "head": "research/rei-lrs-v14-physical-birth-20261018",
+      "head_sha": "ddfa6f5210ed6e17b54c0757fc23ed40d16f18c6",
+      "base": "research/rei-lrs-v13-sourceon-average-photons-20261018",
+      "base_sha": "7fb18cec3d6d6eebad5fe418ec83b36d82cfff1e",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/198"
+    },
+    {
+      "number": 202,
+      "title": "research: BASS-REACTIVE-03 positive photon birth (scoped verification)",
+      "state": "open",
+      "draft": true,
+      "updated_at": "2026-10-19T04:43:33Z",
+      "head": "research/rei-bass-reactive03-positive-birth-20261019",
+      "head_sha": "8e60ecb627da46bb85861e2a4148a1b683d96fb0",
+      "base": "research/rei-bass-reactive02-resume-20261019",
+      "base_sha": "5a2ae6313ad8ea7b5fdc9b0b2a58009778764b6e",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/202"
+    },
+    {
+      "number": 201,
+      "title": "Draft: BASS reactive02 controlled long-span study and optically thick birth-quadrature bias",
+      "state": "open",
+      "draft": true,
+      "updated_at": "2026-10-19T01:07:54Z",
+      "head": "research/rei-bass-reactive02-resume-20261019",
+      "head_sha": "5a2ae6313ad8ea7b5fdc9b0b2a58009778764b6e",
+      "base": "research/rei-bass-native-binding-20261018",
+      "base_sha": "2051b492fe2227cb5f7ea1a53e56271e083aaf19",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/201"
+    },
+    {
+      "number": 200,
+      "title": "Draft: BASS reactive02 long-span birth-quadrature diagnosis and recovered three-provider backups",
+      "state": "open",
+      "draft": true,
+      "updated_at": "2026-10-19T00:09:08Z",
+      "head": "research/rei-bass-reactive02-recovery-20261019",
+      "head_sha": "ce87b1b745785876d76c9b8092a6fa81a38a134b",
+      "base": "research/rei-bass-native-binding-20261018",
+      "base_sha": "2051b492fe2227cb5f7ea1a53e56271e083aaf19",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/200"
+    },
+    {
+      "number": 197,
+      "title": "Draft: BASS reactive01 preservation and reactive02 long-span error separation",
+      "state": "open",
+      "draft": true,
+      "updated_at": "2026-10-18T14:47:03Z",
+      "head": "research/rei-bass-reactive02-longspan-20261018",
+      "head_sha": "72436724048f617442165f79c7659a7798a92c1f",
+      "base": "research/rei-bass-native-binding-20261018",
+      "base_sha": "2051b492fe2227cb5f7ea1a53e56271e083aaf19",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/197"
+    },
+    {
+      "number": 150,
+      "title": "FLRW native production: ordered pool, exact cache, full-run launch and bounded postprocessing",
+      "state": "open",
+      "draft": true,
+      "updated_at": "2026-10-18T09:41:29Z",
+      "head": "research/flrw-production-integration-20261015",
+      "head_sha": "fd9a21c4d3886a495540b51d780a83b608e72ea2",
+      "base": "codex/rux-science-delivery-20261014",
+      "base_sha": "0fcb2dddf5de6b583c2e00f150abff0b2afb6315",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/150"
+    },
+    {
+      "number": 151,
+      "title": "R9 NCP microphysics: correlated atoms, daughter projections and molecular curves",
+      "state": "open",
+      "draft": true,
+      "updated_at": "2026-10-18T09:29:50Z",
+      "head": "research/microphysics-r9-ncp-20261015",
+      "head_sha": "8a4f5df46f6e3058f5e685b85cc1cf3c20926368",
+      "base": "research/flrw-production-integration-20261015",
+      "base_sha": "54dd5352672127e77970eb06f3dda027f2aee275",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/151"
+    },
+    {
+      "number": 196,
+      "title": "LRS V13: compiled source-on photon interval-average and coupled gas-clock controls; NCP execution-only handoff",
+      "state": "open",
+      "draft": true,
+      "updated_at": "2026-10-18T04:50:11Z",
+      "head": "research/rei-lrs-v13-sourceon-average-photons-20261018",
+      "head_sha": "7fb18cec3d6d6eebad5fe418ec83b36d82cfff1e",
+      "base": "research/rei-lrs-v12-native-thermal-clocks-20261018",
+      "base_sha": "46b567e0ee96e725a21e77fed9ab4160d0ffa9e7",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/196"
+    },
+    {
+      "number": 171,
+      "title": "Positive source-matched native age reference: bounded PASS, age and transport HOLD",
+      "state": "open",
+      "draft": true,
+      "updated_at": "2026-10-18T03:32:01Z",
+      "head": "research/rei-source-age-positive-native-intake-20261016",
+      "head_sha": "69b4e596ef679e17ccac7c1c1384c1c61cdfd47f",
+      "base": "research/rei-positive-age-reference-20261016",
+      "base_sha": "d5203a3c3ce603e1b0487549d1bf20d4fb48128a",
+      "url": "https://github.com/cosmosapjw-quantum/rei_bianchi/pull/171"
+    }
+  ],
+  "latest_created_pr_numbers": [
+    204,
+    203,
+    202,
+    201
+  ],
+  "probe_errors": [
+    {
+      "operation": "GitHub fetch encoded-slash branches endpoint",
+      "result": "HTTP400 connector URL parser rejected repository path",
+      "resolution": "Successful Git refs GET, independently confirmed both current commit SHAs"
+    },
+    {
+      "operation": "Single shell argument saving all snapshots",
+      "result": "os error7 Argument list too long, no process created",
+      "resolution": "16 bounded per-file copies, each Git blob identity verified"
+    }
+  ],
+  "remote_mutations": 0,
+  "native_IVP_runs": 0,
+  "tests": 0,
+  "source_scripts_executed": 0,
+  "archive_downloads": 0
+}
