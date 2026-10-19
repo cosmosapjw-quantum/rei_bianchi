@@ -13,3 +13,5 @@ physmath-research-loop를 사용한다. 먼저 cosmosapjw-quantum/rei_bianchi PR
 다음 READY는 단일 q0 age32 block-max/source8/n_mu8/transport16/time1, binary64, diagnostics ON, 기존48threads/동일binary·runtime, cap1800s. 기존 age64를 재사용하여 finite-neighbor 비교·진짜 source-jump·binding-block 분석. 기존 rtol/atol/gates/RK/source schedule 유지. 새 실제 결과가 이미 있으면 ingest 먼저.
 
 이번 원격 명령 도구는 실제 월 사용량 중지로 막혔으나 로컬Rust1.94.1 compile과 양쪽 백업 다운로드는 동작했다. 차기 세션은 실제 도구 상태를 재확인한다. owner checkout/PR150/R9/LRS/BASS HHeD 보호, no force-push/merge, PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED.
+
+배송: 코드·증거9f85ea1a08063d27f1148b386b5e4fb0d4c16c28; C8/C10 v5 양쪽 업로드와 네 전체 readback PASS. ZIP 내부 CURRENT의 upload-pending은 생성 시점 상태다. 원격 최종 receipt 또는 별도 DELIVERY_CONFIRMATION v5가 이를 대체한다. 전체 C10은 source811/native153/기존B1binary를 포함하며 복원 Git tree 일치가 검증됐다.

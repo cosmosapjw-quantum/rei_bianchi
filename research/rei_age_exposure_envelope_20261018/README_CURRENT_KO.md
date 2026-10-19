@@ -27,3 +27,9 @@ Drive·Dropbox 최신 B1/B2를 각각 전체 readback하여 네 SHA/크기/CRC�
 이번 NCP 도구는 실제 호출에서 월 사용량 중지 응답을 반환했다. NCP 실행은 NOT_RUN이며 compiler 부재·백업 연결 blocker는 상속하지 않았다. 복사 가능한 인계는 `HANDOFF_CODEX_CURRENT_KO.md`에 있다.
 
 owner checkout, PR150/R9, LRS repo, 별도 BASS HHeD lane을 보존한다. PR은 draft, no merge, no force-push. **PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED**.
+
+## 배송 완료
+
+코드·증거 커밋: `9f85ea1a08063d27f1148b386b5e4fb0d4c16c28`. C8 v5와 C10 v5를 Drive·Dropbox 양쪽에 올리고 네 원격 전체 readback의 SHA256·크기·CRC·내부 항목을 모두 확인했다. C10은 게시된 소스811개, 원본 native 입력153개, 기존 age64 binary와 복원 map을 포함한다. C10 복원 소스의 Git tree도 원격과 정확히 일치한다.
+
+최종 원격 검증 receipt는 ZIP 생성 뒤 작성되어 내부의 배송-pending receipt를 대체한다. 실제 최종 HEAD는 PR199 및 별도 `REI_AGE_ENVELOPE_DELIVERY_CONFIRMATION_20261019_v5.json`에서 확인한다. 자세한 파일명·SHA·양쪽 file ID는 `DELIVERY_RECEIPT_CURRENT.json`에 있다.

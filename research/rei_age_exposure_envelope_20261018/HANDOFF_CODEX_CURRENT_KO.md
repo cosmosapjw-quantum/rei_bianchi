@@ -1,5 +1,7 @@
 # Codex/NCP 인계 | 단일 age32 reference READY
 
+코드·증거 배송 커밋: `9f85ea1a08063d27f1148b386b5e4fb0d4c16c28`. 최종 receipt 커밋은 PR199 actual HEAD에서 확인한다. C8/C10 v5의 Drive·Dropbox 네 full readback은 PASS다. 기존 결과가 남아 있으면 그대로 사용한다.
+
 ## 고정 기준과 완료 작업
 
 - Repo cosmosapjw-quantum/rei_bianchi, draft PR199, branch research/rei-age-exposure-envelope-20261018.
