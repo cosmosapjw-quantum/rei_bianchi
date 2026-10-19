@@ -1,3 +1,19 @@
+# REI-LRS V14 최신 연구 전달 — 2026-10-19 SSPRK2 후속
+
+## 최신 완료 범위
+
+닫힌 광자 모멘트의 실제 SSPRK(2,2)와 공통 gas-midpoint를 opt-in으로 구현했다. Sandbox Rust1.94.1의 실제14고유표적시험,52 transport진단행,16고유결합이력과 한 번의 실제 clock결함 수정·같은행렬재실행을 완료했다. SourceGL2의 관측가능한 w/T/photonN/photoheat는 이번 유한구간에서 약2차이며 HeIII endpoint는 수치분해능 때문에 HOLD다. 일반 source-on 전체2차/uniformstiff/CaseB/fullEoR/signedBianchi는 승격하지 않는다.
+
+최신 [연구보고서](time_centered_ssprk2_20261019/RESEARCH_CONTINUATION_KO.md), [source delta](time_centered_ssprk2_20261019/SOURCE_DELTA_SSPRK2.json), [root 판정](time_centered_ssprk2_20261019/ROOT_SCIENTIFIC_ADMISSION.json), [독립 검토](time_centered_ssprk2_20261019/theory/INDEPENDENT_COUPLED_REVIEW.md), [NCP 실행 인계](time_centered_ssprk2_20261019/CODEX_NCP_EXECUTE_KO.md)를 읽는다. 실제 최종HEAD·게시commit·백업objectID·전체readback은 [SSPRK2 최종deliveryreceipt](stages/SSPRK2_FINAL_DELIVERY.json)에 있다.
+
+원본 SOURCE_DELTA.json은 V14 원4파일 복원 identity로 보존했다. 새확장은 위 SOURCE_DELTA_SSPRK2.json을사용한다. 원native default/adaptive/checkpoint/MD14/Verner/Grackle/EOS 및기존physical_birth본문은그대로다. 원래 NCP84이력은 이미완료된근거이며 새16이력과합쳐새사례로세지않는다.
+
+이번 새NCP실행은 NOT_RUN이다. 지정키가샌드박스에없고 원격연결기가월간한도로호출을중단했다. 정상Git파일로된복원기·실행기·14표적시험과코드수정은완료했으므로NCP에는실제compile/test/run과필요시작은호환수정만남는다. 사용자에게파일다운로드나수동SSH/SCP를요구하지않는다.
+
+---
+
+## 아래는 직전 projection 전달 기록
+
 # REI-LRS V14 현재 연구 전달 — 2026-10-19
 
 ## 현재 결론
@@ -41,3 +57,4 @@ Full source-on p2, uniform stiff, Case B, full EoR, signed Bianchi는 HOLD다. �
 ## 과거 기록
 
 기존 57 Python 제조 CSV 시험, 8 FAIL 반례와 독립 여섯 회계 수정, 76 제조 수치 문제는 [실행 준비 시점 기록](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/2676c31df1bf18ec0c7d60108846f1e9c8ca853c/research/lrs_atomic_native_bridge_20261016/v14/RESEARCH_DELIVERY_KO.md)에 보존돼 있다. 그 시점의 native NOT_RUN과 독립 agent NOT_RUN은 현재 완료 상태가 아니다. 기존 실행 원본과 초기 실패는 [NCP execution directory](executions/REI_LRS_V14_20261018T124115Z/)에 그대로 남아 있다.
+
