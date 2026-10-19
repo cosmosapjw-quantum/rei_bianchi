@@ -6,7 +6,9 @@ import run_refinement as r
 
 def test_plan_separates_age_time_and_spectral_axes():
     cases=r.plan()
-    assert set(cases)=={'age64','time8','time16','time32','spectral128'}
+    assert set(cases)=={'age32','age64','time8','time16','time32','spectral128'}
+    assert r.DEFAULT_CASES=='age64,time8,time16,time32,spectral128'
+    assert cases['age32']==dict(cases['age64'],name='age32',birth_panels=32)
     assert cases['age64']['birth_panels']==64
     for k in ('time8','time16','time32'):
         assert cases[k]['birth_panels']==32

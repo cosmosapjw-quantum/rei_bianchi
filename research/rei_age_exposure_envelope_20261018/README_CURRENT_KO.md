@@ -1,24 +1,29 @@
-# REI age-exposure/source-age 현재 상태 | 2026-10-19 (block-max 실행 후)
+# REI age-exposure/source-age 현재 상태 | 2026-10-19 pair-search 배송
 
-진입 문서는 이 파일, `RESEARCH_UPDATE_20261019_BLOCKMAX_KO.md`, `contracts/NEXT_DAG_CURRENT.json`, `DELIVERY_RECEIPT_CURRENT.json`이다. 이전 단계 기록은 `RESEARCH_UPDATE_20261019_KO.md`와 `evidence/current_entries_before_blockmax_20261019/`에 그대로 있다. PR199는 draft다. intake HEAD `18aae24bd1d102c50164bd6224a09ec5c4eaf45d`, 과학 코드 `db87456e6b2b528a046f7856c04c73c7b4b43a54`, original physics `35d9747a0bbedcafdb568467ce7c1e7a25f965b6`.
+진입: 이 파일, `RESEARCH_UPDATE_20261019_PAIRSEARCH_KO.md`, `HANDOFF_CODEX_CURRENT_KO.md`, `contracts/NEXT_DAG_CURRENT.json`, `DELIVERY_RECEIPT_CURRENT.json`. Repo cosmosapjw-quantum/rei_bianchi, draft PR199, branch research/rei-age-exposure-envelope-20261018. 이번 실제 intake HEAD ee3b6c8014bcb21e6d4c9ef3a3560dc40df61309. 원 native physics 35d9747a0bbedcafdb568467ce7c1e7a25f965b6.
 
-## 완료된 실제 결과
+## 새 실행결과를 먼저 확인했다
 
-- **q0 age64 block-max (새, NCP):** 명령 exit0, 19756 RHS, case wall 782.731 s, 48 transport threads, binary64. 고정 gate 유지 상태에서 photon `2.002711130429069e-10 ≤ 1e-8`, energy `1.93e-13`. 정확한 유리수 재합산도 PASS. 단일 사례 결과이며 재실행하지 않는다.
-- **해석:** 기존 RMS 대비 photon 잔차 0.0199배. 그러나 block-max는 정의상 더 엄격하고 step 수도 늘었으므로(후반 11→16) RMS 희석과 일반적 step 축소를 **판별하지 않는다**. 독립 검토 `evidence/independent_review_blockmax_20261019/REVIEW.json`.
-- charge/species residual은 저장값이며 assert가 없다. 18개 관측 기록은 9개 고유 상태다. source-jump paired snapshot은 MISSING_DATA다. DR은 aggregate 0이다.
-- **age 수렴성 HOLD:** 같은 source의 age32 reference가 없다. PR171 age32는 controller/solver/binary가 달라 비교하지 않았다.
-- spectral128 완료(He I 64→128 0.2660778682%), 기존 RMS age64 실패(1.0081783527976493e-8), native time8 subnormal 진단과 count 교정 후 energy 2η>η 실패는 모두 이전 그대로다. native time16/32는 HOLD다.
+Drive·Dropbox 최신 B1/B2를 각각 전체 readback하여 네 SHA/크기/CRC를 검증했다. B1 payload161/161 및 case output131/131 PASS. 이미 끝난 q0 age64 block-max(NCP exit0, 19,756 RHS, 782.731 s)와 spectral128은 반복하지 않았다.
 
-## 현재 NCP READY
+- age64 photon 2.002711130429069e-10, energy 1.929660553608937e-13: 기존 1e-8 gate PASS. 정확 Fraction 재합산도 PASS. age 수렴성과 RMS dilution 인과 판정은 HOLD.
+- spectral64→128 He I 누적 photoevent 0.2660778682%: 기존 유한 이웃 결과만 재사용.
+- age64 source jumps는 MISSING_DATA. 기존 18 관측 기록은 9 고유 상태다.
 
-**없음.** 다음 후보는 모두 로컬 구현·테스트·검토가 먼저 필요하다.
+## 이번에 완성한 코드와 실제 검증
 
-1. `R_BLOCK_MAX_BINDING_BLOCK_LOG`: accepted step마다 E_block을 결정한 block 기록(수치 변경 없음).
-2. `R_AGE32_BLOCK_MAX_SAME_SOURCE`: runner plan에 age32 reference 항목 추가 후 단일 실행.
-3. `R_SOURCE_JUMP_PAIRED_SNAPSHOTS`: birth-jump 측 검사 계측.
-4. `R_NATIVE_COUNT_ENERGY_STORAGE`: THEORY_REQUIRED.
+1. `--native-input-dir`: frozen153 inputs를 먼저 검증하여 동일156 prepared outputs 생성. none/count/기존pair 준비 identity를 정확히 보존.
+2. `subnormal-pair` 및 `subnormal-pair-search`: 원래 실패 분기에서 정확 count base와 고정 node/positive support를 유지하며 원래 Kahan count·energy gate 모두 검사. exact dyadic interval, checked i128, 자원 예산과 비존재 범위 분리.
+3. N2/N3 실제 셀에서 k1/k3 보정 성공. 변경된 N4 time8은 22.1506 s 후 새 16-node 셀에서 exit1. n10η, 양의 가중치10개 각각1η, 저장 energy246η≠목표245η, tol0. 현재 support·표현 아래 유일한 벡터이므로 이 셀은 그 범위에서 교정 불가. **native time8/16/32 HOLD.**
+4. 명시적 age32 reference plan, passive binding-block telemetry, 실제 birth 전후 snapshot, 엄격한 source/runtime 비교, compact B1 자동 준비·binary 재사용 구현.
+5. 실제 native birth2 OFF/ON 대조: 양쪽 exit0, 2.377/2.525 s, 각각1302 RHS. 저장 상태3개·endpoint·기존관측·ledger byte 동일. source jump2/2, tiny photon1.19296e-11, energy1.27900e-14 PASS.
 
-미해결 수치 질문: native가 구간 끝점 trial state를 `IGM_STATE_OR_UNIT_DOMAIN`으로 거부하고 `max_step=Δ/4`로 재시작하는 패턴(65구간 중 60, 두 controller 공통).
+신규 test methods는 native8 + S5 =13개이며 S 검토에서 기존 norm9개도 재사용 실행했다. 구현자와 reviewer의 같은 테스트를 unique 수에 중복 합산하지 않는다. N1/N3·N4·S 독립 검토 모두 범위 내 PASS. 전체 historical suite와24 prescribed-opacity 캠페인은 다시 돌리지 않았다. 실제 native RHS byte stream·모든 내부 adaptive step 좌표는 NOT_RECORDED로 남긴다.
 
-owner checkout, PR150/R9, 별도 BASS HHeD lane은 변경하지 않았다. **`PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED`**.
+## NCP READY: 한 사례
+
+**q0 age32 block-max, binary64, source8/n_mu8/transport16/time1, 진단 ON, 1800 s cap.** 기존 age64 binary·계산 base·Python/NumPy/SciPy·48 transport threads를 맞춘 후 `age32-block-max-diagnostics`만 실행하고 기존 age64와 비교한다. 소스/실행 identity가 다르거나 실패하면 HOLD를 남긴다. 자동 age64 반복은 없다.
+
+이번 NCP 도구는 실제 호출에서 월 사용량 중지 응답을 반환했다. NCP 실행은 NOT_RUN이며 compiler 부재·백업 연결 blocker는 상속하지 않았다. 복사 가능한 인계는 `HANDOFF_CODEX_CURRENT_KO.md`에 있다.
+
+owner checkout, PR150/R9, LRS repo, 별도 BASS HHeD lane을 보존한다. PR은 draft, no merge, no force-push. **PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED**.

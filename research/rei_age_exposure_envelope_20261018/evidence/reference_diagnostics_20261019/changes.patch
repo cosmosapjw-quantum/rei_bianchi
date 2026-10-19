@@ -1,0 +1,805 @@
+--- a/research/rei_age_exposure_envelope_20261018/src/run_refinement.py
++++ b/research/rei_age_exposure_envelope_20261018/src/run_refinement.py
+@@ -8,6 +8,7 @@
+ import argparse, hashlib, json, math, os, platform, re, signal, subprocess, sys, time
+ 
+ NATIVE_SHA='35d9747a0bbedcafdb568467ce7c1e7a25f965b6'
++DEFAULT_CASES='age64,time8,time16,time32,spectral128'
+ 
+ def sha(p: Path) -> str:
+     h=hashlib.sha256()
+@@ -42,6 +43,7 @@
+     base=dict(q=0.,birth_panels=32,n_mu=8,source_subdivisions=8,
+               transport_cells=16,common_birth_levels=[8,16,32,64],time_factor=1)
+     result={'age64':dict(base,name='age64',kind='reference',birth_panels=64)}
++    result['age32']=dict(base,name='age32',kind='reference',birth_panels=32)
+     for f in (8,16,32): result[f'time{f}']=dict(base,name=f'time{f}',kind='native',time_factor=f)
+     result['spectral128']=dict(base,name='spectral128',kind='reference',q=.1,birth_panels=8,transport_cells=128)
+     return result
+@@ -113,6 +115,8 @@
+         r=read_json(root/'solver_return.json')
+         if r.get('error_norm','rms')!=c.get('error_norm','rms'):
+             raise ValueError('REFERENCE_ERROR_NORM_MISMATCH')
++        if c.get('reference_diagnostics') and not r.get('reference_diagnostics'):
++            raise ValueError('REFERENCE_DIAGNOSTICS_MISSING')
+         for key in ('q','birth_panels','n_mu','source_subdivisions','transport_cells'):
+             if r[key]!=c[key]: raise ValueError('REFERENCE_CONFIG_MISMATCH_'+key)
+         if r['status']!='SCOPED_NUMERICAL_EXECUTION_COMPLETE' or r['server_exit']!=0:
+@@ -132,13 +136,14 @@
+     p.add_argument('--prepared',type=Path,required=True)
+     p.add_argument('--binary',type=Path)
+     p.add_argument('--out',type=Path,required=True)
+-    p.add_argument('--cases',default=','.join(plan()))
++    p.add_argument('--cases',default=DEFAULT_CASES)
+     p.add_argument('--case-wall-s',type=float,default=1800.)
+     p.add_argument('--total-wall-s',type=float,default=5400.)
+     p.add_argument('--max-rhs',type=int,default=200000)
+     p.add_argument('--tight',action='store_true')
+     p.add_argument('--rpc-mode',choices=('text','binary64'),default='text')
+     p.add_argument('--error-norm',choices=('rms','block-max'),default='rms')
++    p.add_argument('--reference-diagnostics',action='store_true')
+     p.add_argument('--retry-failed',action='store_true')
+     p.add_argument('--dry-run',action='store_true')
+     a=p.parse_args()
+@@ -146,10 +151,14 @@
+         p.error('positive finite resource bounds required')
+     cases=plan();names=a.cases.split(',')
+     if len(set(names))!=len(names) or any(n not in cases for n in names): p.error('unknown/duplicate case name')
++    if a.reference_diagnostics and a.error_norm!='block-max':
++        p.error('reference diagnostics require block-max')
+     configs=[dict(cases[n],tight=a.tight,rpc_mode=a.rpc_mode) for n in names]
+     for config in configs:
+         if config['kind']=='reference':
+             config['error_norm']=a.error_norm
++            if a.reference_diagnostics:
++                config['reference_diagnostics']=True
+     if a.dry_run:
+         print(json.dumps(configs,indent=2));return
+     native=a.prepared.resolve();solver=native/'positive_solver_refined.py'
+@@ -173,7 +182,15 @@
+     start=time.monotonic();records=[]
+     try:
+         for c in configs:
+-            fingerprint=hashlib.sha256(canonical(dict(config=c,identity=identity))).hexdigest()
++            case_identity=dict(identity)
++            diagnostic_source=None
++            if c.get('reference_diagnostics'):
++                from reference_diagnostics import transform_solver, transform_identity
++                diagnostic_source=transform_solver(solver.read_bytes())
++                case_identity.update(computational_base_solver_sha=sha(solver),
++                                     diagnostic_transform_sha=transform_identity(),
++                                     solver_sha=hashlib.sha256(diagnostic_source).hexdigest())
++            fingerprint=hashlib.sha256(canonical(dict(config=c,identity=case_identity))).hexdigest()
+             dest=a.out/c['name'];dest.mkdir(exist_ok=True)
+             attempts=sorted(dest.glob('attempt[0-9][0-9][0-9]'))
+             if attempts:
+@@ -185,11 +202,15 @@
+             if cap<=0: raise TimeoutError('TOTAL_CAMPAIGN_BUDGET_EXHAUSTED')
+             trial=dest/f'attempt{len(attempts)+1:03d}';trial.mkdir()
+             out=trial/'data';out.mkdir()
+-            receipt=dict(config=c,identity=identity,fingerprint=fingerprint,status='RUNNING',
++            executed_solver=solver
++            if diagnostic_source is not None:
++                executed_solver=trial/'reference_solver_diagnostics.py'
++                executed_solver.write_bytes(diagnostic_source)
++            receipt=dict(config=c,identity=case_identity,fingerprint=fingerprint,status='RUNNING',
+                          resource_bounds=dict(case_wall_s=cap,max_rhs=a.max_rhs))
+             save(trial/'RECEIPT.json',receipt)
+             try:
+-                result=run_process(command(c,binary,solver,out,cap,a.max_rhs),trial,cap+2)
++                result=run_process(command(c,binary,executed_solver,out,cap,a.max_rhs),trial,cap+2)
+                 receipt['execution']=result
+                 if result['exit_code']!=0: raise RuntimeError('CHILD_EXIT_'+str(result['exit_code']))
+                 validate_outputs(c,out)
+--- a/research/rei_age_exposure_envelope_20261018/src/reference_diagnostics.py
++++ b/research/rei_age_exposure_envelope_20261018/src/reference_diagnostics.py
+@@ -0,0 +1,60 @@
++"""Transform the known generated reference into a passive diagnostic copy."""
++from pathlib import Path
++import argparse
++import hashlib
++import json
++
++
++COMPUTATIONAL_BASE_SHA = '78386db7ac2e35488ab610c4a3ddb1d87f8b51bbe25d855bf417dc17dd07d620'
++
++
++def transform_identity():
++    return hashlib.sha256(Path(__file__).read_bytes()+Path(__file__).with_name('reference_diagnostics_runtime.py').read_bytes()).hexdigest()
++
++
++def transform_solver(source: bytes) -> bytes:
++    if hashlib.sha256(source).hexdigest() != COMPUTATIONAL_BASE_SHA:
++        raise ValueError('REFERENCE_DIAGNOSTIC_BASE_SHA_MISMATCH')
++    text = source.decode()
++    def replace_once(old, new):
++        nonlocal text
++        if text.count(old) != 1:
++            raise ValueError('REFERENCE_DIAGNOSTIC_ANCHOR: '+old[:60])
++        text = text.replace(old, new, 1)
++    runtime = Path(__file__).with_name('reference_diagnostics_runtime.py').read_text()
++    identity = dict(computational_base_solver_sha=COMPUTATIONAL_BASE_SHA,
++                    diagnostic_transform_sha=transform_identity(), reference_diagnostics=True)
++    adapter = '''
++if a.error_norm != 'block-max':
++    raise ValueError('REFERENCE_DIAGNOSTICS_REQUIRE_BLOCK_MAX')
++_reference_diagnostics = ReferenceDiagnostics(a.out, IDENTITY, __file__)
++make_block_dop853 = _reference_diagnostics.instrument_factory(make_block_dop853, block_error_norm)
++_reference_base_solve = solve_ivp
++def solve_ivp(*args, **kwargs):
++    return _reference_diagnostics.solve(_reference_base_solve, event, retry, *args, **kwargs)
++'''.replace('IDENTITY', repr(identity))
++    replace_once('server=subprocess.Popen(', runtime+'\n'+adapter+'\nserver=subprocess.Popen(')
++    birth = "            y[4+2*cells*event:4+2*cells*(event+1)]=setup['encoded_births'][event];active+=1"
++    replace_once(birth, "            _before_birth_coordinates=y.copy()\n"+birth+"\n            _reference_diagnostics.birth(event,stop,active-1,active,setup,_before_birth_coordinates,y,physical,lambda:json.loads(send('P',active,stop,y)))")
++    replace_once('finally:\n    server.stdin.close();', 'finally:\n    _reference_diagnostics.persist()\n    server.stdin.close();')
++    replace_once('dict(max_rhs=a.max_rhs,max_wall_s=a.max_wall_s,rpc_mode=',
++                 'dict(reference_diagnostics=True,reference_diagnostic_identity=_reference_diagnostics.identity,max_rhs=a.max_rhs,max_wall_s=a.max_wall_s,rpc_mode=')
++    return text.encode()
++
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('source',type=Path)
++    parser.add_argument('--out',type=Path,required=True)
++    args=parser.parse_args()
++    data=transform_solver(args.source.read_bytes())
++    args.out.parent.mkdir(parents=True,exist_ok=True)
++    if args.out.exists() and args.out.read_bytes()!=data:
++        raise FileExistsError('DIAGNOSTIC_COPY_EXISTS')
++    args.out.write_bytes(data)
++    print(json.dumps(dict(computational_base_solver_sha=COMPUTATIONAL_BASE_SHA,
++                         diagnostic_transform_sha=transform_identity(), executed_solver_sha=hashlib.sha256(data).hexdigest())))
++
++
++if __name__ == '__main__':
++    main()
+--- a/research/rei_age_exposure_envelope_20261018/src/reference_diagnostics_runtime.py
++++ b/research/rei_age_exposure_envelope_20261018/src/reference_diagnostics_runtime.py
+@@ -0,0 +1,126 @@
++"""Passive runtime helpers embedded only in the opt-in reference copy."""
++import hashlib
++import json
++import math
++from pathlib import Path
++
++import numpy as np
++
++
++def _diagnostic_json(value):
++    if isinstance(value, float) and not math.isfinite(value):
++        return repr(value)
++    if isinstance(value, dict):
++        return {k: _diagnostic_json(v) for k, v in value.items()}
++    if isinstance(value, list):
++        return [_diagnostic_json(v) for v in value]
++    return value
++
++
++class ReferenceDiagnostics:
++    def __init__(self, output, identity, executed_file):
++        self.output = Path(output)
++        self.identity = dict(identity)
++        self.identity['executed_solver_sha'] = hashlib.sha256(Path(executed_file).read_bytes()).hexdigest()
++        self.attempts = []
++        self.jumps = []
++        self.current = None
++
++    def persist(self):
++        telemetry = dict(schema='rei.reference.passive_diagnostics.v1', identity=self.identity,
++                         interpretation='DESCRIPTIVE_ONLY; does not establish RMS dilution causality',
++                         attempts=self.attempts)
++        jumps = dict(schema='rei.reference.source_jumps.v1', identity=self.identity,
++                     status='AVAILABLE' if self.jumps else 'MISSING_DATA', records=self.jumps)
++        self.output.mkdir(parents=True, exist_ok=True)
++        for name, value in [('reference_diagnostics.json', telemetry), ('source_jumps.json', jumps)]:
++            (self.output/name).write_text(json.dumps(_diagnostic_json(value), indent=2, allow_nan=False)+'\n')
++
++    def instrument_factory(self, original_factory, component_norm):
++        owner = self
++
++        def factory(block_sizes):
++            original = original_factory(block_sizes)
++
++            class ObservedDOP853(original):
++                def _estimate_error_norm(self, K, h, scale):
++                    # The existing controller is called once and its exact
++                    # return value is returned unchanged to SciPy.
++                    actual = super()._estimate_error_norm(K, h, scale)
++                    err5 = np.dot(K.T, self.E5)/scale
++                    err3 = np.dot(K.T, self.E3)/scale
++                    names = ['gas'] + (['photon_logs'] if len(scale) > 18 else []) + [f'ledger_{i}' for i in range(14)]
++                    values = []
++                    start = 0
++                    for index, size in enumerate(self.block_sizes):
++                        stop = start+size
++                        value = component_norm(err5[start:stop], err3[start:stop], h, (size,))
++                        values.append(dict(index=index, name=names[index], start=start, stop=stop, value=value))
++                        start = stop
++                    maximum = max(x['value'] for x in values)
++                    record = dict(t=float(self.t), h=float(h), t_new=float(self.t+h),
++                                  dimension=len(scale), blocks=values,
++                                  binding_indices=[x['index'] for x in values if x['value'] == maximum],
++                                  binding_names=[x['name'] for x in values if x['value'] == maximum],
++                                  block_max_diagnostic=maximum, error_norm_actual=float(actual),
++                                  old_rms_diagnostic=component_norm(err5, err3, h, (len(scale),)),
++                                  error_accept=bool(actual < 1.))
++                    if owner.current is not None:
++                        owner.current['estimates'].append(record)
++                    return actual
++
++            return ObservedDOP853
++        return factory
++
++    def solve(self, original_solve, event, retry, *args, **kwargs):
++        start, stop = args[1]
++        attempt = dict(attempt=len(self.attempts), event=event, retry=retry,
++                       interval_start=float(start), interval_stop=float(stop), estimates=[],
++                       status='RUNNING', discarded=True, retained=False)
++        self.attempts.append(attempt)
++        self.current = attempt
++        try:
++            solution = original_solve(*args, **kwargs)
++            attempt.update(status='RETURNED_SUCCESS' if solution.success else 'RETURNED_FAILURE',
++                           discarded=not bool(solution.success), retained=bool(solution.success),
++                           returned_steps=len(solution.t)-1)
++            return solution
++        except BaseException as error:
++            attempt.update(status='EXCEPTION', exception_type=type(error).__name__, exception=repr(error))
++            raise
++        finally:
++            attempt['local_error_accepted_estimates'] = sum(x['error_accept'] for x in attempt['estimates'])
++            attempt['final_trajectory_accepted_estimates'] = (
++                attempt['local_error_accepted_estimates'] if attempt['retained'] else 0)
++            self.current = None
++            self.persist()
++
++    @staticmethod
++    def compact(physical):
++        if len(physical.get('flat', [])) < 4 or len(physical.get('ledgers', [])) != 14:
++            raise ValueError('SOURCE_JUMP_PHYSICAL_SHAPE')
++        return dict(N=physical['N'], U=physical['U'], gas=physical['flat'][:4],
++                    ledgers=list(physical['ledgers']))
++
++    def birth(self, event, x, active_before, active_after, setup, before, after, physical_before, get_post):
++        record = dict(event=event, x=float(x), active_before=active_before, active_after=active_after,
++                      source_inventory=setup['source_inventory'][event], status='RUNNING')
++        self.jumps.append(record)
++        try:
++            record['pre'] = self.compact(physical_before)
++            record['post'] = self.compact(get_post())
++            lo = 4+2*setup['cells']*event
++            hi = lo+2*setup['cells']
++            mask = np.ones(before.size, dtype=bool)
++            mask[lo:hi] = False
++            bits_before = np.asarray(before, dtype=np.float64).view(np.uint64)
++            bits_after = np.asarray(after, dtype=np.float64).view(np.uint64)
++            record.update(status='AVAILABLE',
++                          unchanged_nonbirth_coordinates_bits=bool(np.array_equal(bits_before[mask], bits_after[mask])),
++                          unchanged_gas_coordinate_bits=bool(np.array_equal(bits_before[:4], bits_after[:4])),
++                          unchanged_ledger_coordinate_bits=bool(np.array_equal(bits_before[-setup['extra']:], bits_after[-setup['extra']:])))
++        except BaseException as error:
++            record.update(status='ERROR', exception_type=type(error).__name__, exception=repr(error))
++            raise
++        finally:
++            self.persist()
+--- a/research/rei_age_exposure_envelope_20261018/src/source_jump_diagnosis.py
++++ b/research/rei_age_exposure_envelope_20261018/src/source_jump_diagnosis.py
+@@ -0,0 +1,68 @@
++"""Exact stored-term source-jump report, with explicit per-birth coverage."""
++from fractions import Fraction
++from pathlib import Path
++import argparse
++
++from run_refinement import read_json, save
++
++
++def exact(value):
++    return Fraction.from_float(float(value))
++
++
++def rational(value):
++    return dict(numerator=str(value.numerator),denominator=str(value.denominator),float=float(value))
++
++
++def diagnose_jumps(setup, payload):
++    inventory=setup['source_inventory']
++    records=payload.get('records',[])
++    missing=[];duplicate=[];invalid=[];results=[]
++    for event,source in enumerate(inventory):
++        candidates=[record for record in records if record.get('event')==event]
++        if not candidates:
++            missing.append(event);continue
++        if len(candidates)!=1:
++            duplicate.append(dict(event=event,count=len(candidates)));continue
++        record=candidates[0]
++        if (record.get('status')!='AVAILABLE' or record.get('active_before')!=event
++                or record.get('active_after')!=event+1 or record.get('source_inventory')!=source):
++            invalid.append(dict(event=event,reason='STATUS_ACTIVE_OR_INVENTORY_MISMATCH'));continue
++        if 'x' not in record or record['x']!=setup['births'][event]:
++            invalid.append(dict(event=event,reason='BIRTH_CLOCK_MISMATCH'));continue
++        try:
++            pre,post=record['pre'],record['post']
++            if len(pre['ledgers'])!=14 or len(post['ledgers'])!=14:
++                raise ValueError('LEDGER_SHAPE')
++            delta_n=exact(post['N'])-exact(pre['N'])
++            delta_photo=sum((exact(post['ledgers'][i])-exact(pre['ledgers'][i]) for i in range(4,7)),Fraction())
++            delta=delta_n+delta_photo-exact(source[0])
++            results.append(dict(event=event,x=record['x'],active_before=event,active_after=event+1,
++                                delta_N=rational(delta_n),delta_photo=rational(delta_photo),
++                                delta_photon_invariant=rational(delta),exact_invariant_unchanged=delta==0,
++                                unchanged_nonbirth_coordinates_bits=record.get('unchanged_nonbirth_coordinates_bits'),
++                                unchanged_gas_coordinate_bits=record.get('unchanged_gas_coordinate_bits'),
++                                unchanged_ledger_coordinate_bits=record.get('unchanged_ledger_coordinate_bits')))
++        except (KeyError,ValueError,OverflowError,TypeError) as error:
++            invalid.append(dict(event=event,reason=repr(error)))
++    unexpected=[record.get('event') for record in records
++                if not isinstance(record.get('event'),int) or record['event']<0 or record['event']>=len(inventory)]
++    return dict(schema='rei.source_jump.exact_diagnosis.v1',
++                coverage='COMPLETE' if not (missing or duplicate or invalid or unexpected) else 'INCOMPLETE',
++                expected_births=len(inventory),available_unique_births=len(results),missing_events=missing,
++                duplicate_events=duplicate,invalid_events=invalid,unexpected_events=unexpected,records=results,
++                scope='Exact arithmetic on stored binary64 terms; no automatic accuracy gate or simulation roundoff certificate.')
++
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--data',type=Path,required=True)
++    parser.add_argument('--out',type=Path,required=True)
++    args=parser.parse_args()
++    path=args.data/'source_jumps.json'
++    payload=read_json(path) if path.is_file() else dict(records=[])
++    save(args.out,diagnose_jumps(read_json(args.data/'setup.json'),payload))
++
++
++if __name__ == '__main__':
++    main()
+--- a/research/rei_age_exposure_envelope_20261018/src/compare_age_references.py
++++ b/research/rei_age_exposure_envelope_20261018/src/compare_age_references.py
+@@ -0,0 +1,60 @@
++"""Bind same-computational-source age32/64 receipts before finite differences."""
++from pathlib import Path
++import argparse
++import subprocess
++import sys
++
++from reference_diagnostics import COMPUTATIONAL_BASE_SHA
++from run_refinement import NATIVE_SHA, read_json, save, sha
++
++
++def validate_pair(left, right):
++    receipts=[read_json(Path(path)/'RECEIPT.json') for path in (left,right)]
++    for expected,receipt,path in zip((32,64),receipts,(left,right)):
++        if receipt.get('status')!='COMPLETE':
++            raise ValueError('REFERENCE_NOT_COMPLETE')
++        config=receipt['config'];identity=receipt['identity']
++        required=dict(kind='reference',q=0.,birth_panels=expected,n_mu=8,source_subdivisions=8,
++                      transport_cells=16,common_birth_levels=[8,16,32,64],time_factor=1,
++                      tight=False,rpc_mode='binary64',error_norm='block-max')
++        if any(config.get(key)!=value for key,value in required.items()):
++            raise ValueError('REFERENCE_AXIS_CONFIG_MISMATCH')
++        if identity.get('native_sha')!=NATIVE_SHA:
++            raise ValueError('REFERENCE_NATIVE_SHA_MISMATCH')
++        base=identity.get('computational_base_solver_sha',identity.get('solver_sha'))
++        if base!=COMPUTATIONAL_BASE_SHA:
++            raise ValueError('REFERENCE_COMPUTATIONAL_BASE_MISMATCH')
++        if not receipt.get('outputs'):
++            raise ValueError('REFERENCE_OUTPUT_IDENTITIES_MISSING')
++        for name,digest in receipt['outputs'].items():
++            if not (Path(path)/name).is_file() or sha(Path(path)/name)!=digest:
++                raise ValueError('REFERENCE_OUTPUT_IDENTITY_MISMATCH: '+name)
++    a,b=receipts
++    for key in ('native_sha','binary_sha','python','numpy','scipy','transport_threads','rpc_mode'):
++        if key not in a['identity'] or a['identity'][key]!=b['identity'].get(key):
++            raise ValueError('REFERENCE_RUNTIME_OR_BINARY_MISMATCH: '+key)
++    ca={k:v for k,v in a['config'].items() if k not in ('name','birth_panels','reference_diagnostics')}
++    cb={k:v for k,v in b['config'].items() if k not in ('name','birth_panels','reference_diagnostics')}
++    if ca!=cb:
++        raise ValueError('REFERENCE_NONAGE_CONFIG_MISMATCH')
++    return dict(status='SAME_COMPUTATIONAL_SOURCE_BOUND',native_sha=NATIVE_SHA,
++                binary_sha=a['identity']['binary_sha'],computational_base_solver_sha=COMPUTATIONAL_BASE_SHA,
++                source_function_and_clock='Shared native binary and base solver; different birth inventory discretizations are the explicit age axis',
++                scope='Finite neighbor age32-to-age64 difference only; no continuum or production admission.')
++
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--age32',type=Path,required=True)
++    parser.add_argument('--age64',type=Path,required=True)
++    parser.add_argument('--out',type=Path,required=True)
++    args=parser.parse_args()
++    binding=validate_pair(args.age32,args.age64)
++    subprocess.run([sys.executable,str(Path(__file__).with_name('compare_results.py')),
++                    str(args.age32/'data'),str(args.age64/'data'),'--out',str(args.out)],check=True)
++    result=read_json(args.out);result['computational_source_binding']=binding
++    save(args.out,result)
++
++
++if __name__ == '__main__':
++    main()
+--- a/research/rei_age_exposure_envelope_20261018/tests/test_runner.py
++++ b/research/rei_age_exposure_envelope_20261018/tests/test_runner.py
+@@ -6,7 +6,9 @@
+ 
+ def test_plan_separates_age_time_and_spectral_axes():
+     cases=r.plan()
+-    assert set(cases)=={'age64','time8','time16','time32','spectral128'}
++    assert set(cases)=={'age32','age64','time8','time16','time32','spectral128'}
++    assert r.DEFAULT_CASES=='age64,time8,time16,time32,spectral128'
++    assert cases['age32']==dict(cases['age64'],name='age32',birth_panels=32)
+     assert cases['age64']['birth_panels']==64
+     for k in ('time8','time16','time32'):
+         assert cases[k]['birth_panels']==32
+--- a/research/rei_age_exposure_envelope_20261018/tests/test_reference_diagnostics.py
++++ b/research/rei_age_exposure_envelope_20261018/tests/test_reference_diagnostics.py
+@@ -0,0 +1,89 @@
++import hashlib
++import json
++import os
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++import tempfile
++import unittest
++
++import numpy as np
++
++from build_refined_sources import overlay
++from reference_diagnostics import COMPUTATIONAL_BASE_SHA, transform_solver
++from source_jump_diagnosis import diagnose_jumps
++
++
++ROOT=Path(__file__).resolve().parents[1]
++
++
++class ReferenceDiagnosticsTests(unittest.TestCase):
++    def test_passive_generated_reference_and_retry_rollback(self):
++        _,source=overlay((ROOT/'donors/pr171/positive_native.rs').read_bytes(),
++                         (ROOT/'donors/pr171/positive_solver.py').read_bytes())
++        self.assertEqual(hashlib.sha256(source.encode()).hexdigest(),COMPUTATIONAL_BASE_SHA)
++        with self.assertRaises(ValueError):
++            transform_solver(source.encode()+b'\n')
++        with tempfile.TemporaryDirectory() as directory:
++            directory=Path(directory)
++            server=directory/'fixture'
++            shutil.copyfile(ROOT/'tests/fixtures/reference_rpc_fixture.py',server)
++            server.chmod(0o755)
++            results={}
++            for mode,data in [('off',source.encode()),('on',transform_solver(source.encode()))]:
++                script=directory/(mode+'.py');script.write_bytes(data)
++                out=directory/mode;log=directory/(mode+'_rhs.txt')
++                result=subprocess.run([sys.executable,str(script),str(server),str(out),
++                                       '--birth-panels','2','--transport-cells','1',
++                                       '--error-norm','block-max','--max-wall-s','20'],
++                                      env=dict(os.environ,REI_FIXTURE_RHS_LOG=str(log),
++                                               OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1'),
++                                      capture_output=True,text=True,timeout=30)
++                self.assertEqual(result.returncode,0,result.stderr)
++                results[mode]=(out,log)
++            left,right=results['off'][0],results['on'][0]
++            self.assertEqual(results['off'][1].read_bytes(),results['on'][1].read_bytes())
++            for name in ('endpoint.json','observations.json','ledgers.json','provider_errors.json'):
++                self.assertEqual((left/name).read_bytes(),(right/name).read_bytes(),name)
++            for path in left.glob('accepted_coordinates_event*.npy'):
++                self.assertEqual(path.read_bytes(),(right/path.name).read_bytes())
++            a=json.loads((left/'solver_return.json').read_text());b=json.loads((right/'solver_return.json').read_text())
++            for key in ('calls','errors','intervals','status'):
++                self.assertEqual(a[key],b[key],key)
++            trace=json.loads((right/'reference_diagnostics.json').read_text())
++            self.assertTrue(any(not estimate['error_accept'] for attempt in trace['attempts'] for estimate in attempt['estimates']))
++            discarded=[attempt for attempt in trace['attempts'] if attempt['discarded']]
++            self.assertEqual(len(discarded),1)
++            self.assertGreater(discarded[0]['local_error_accepted_estimates'],0)
++            self.assertEqual(discarded[0]['final_trajectory_accepted_estimates'],0)
++            self.assertEqual(sum(attempt['final_trajectory_accepted_estimates'] for attempt in trace['attempts']),
++                             sum(record['solver_steps'] for record in b['intervals']))
++            for attempt in trace['attempts']:
++                for estimate in attempt['estimates']:
++                    self.assertEqual(estimate['block_max_diagnostic'],estimate['error_norm_actual'])
++            setup=json.loads((right/'setup.json').read_text())
++            jumps=json.loads((right/'source_jumps.json').read_text())
++            report=diagnose_jumps(setup,jumps)
++            self.assertEqual(report['coverage'],'COMPLETE')
++            self.assertEqual(report['available_unique_births'],2)
++            self.assertTrue(all(record['unchanged_nonbirth_coordinates_bits'] for record in report['records']))
++            self.assertTrue(all(record['unchanged_gas_coordinate_bits'] and record['unchanged_ledger_coordinate_bits'] for record in report['records']))
++
++    def test_source_jump_missing_duplicate_and_exact_subnormal(self):
++        eta=float.fromhex('0x0.0000000000001p-1022')
++        setup=dict(births=[1.,2.],source_inventory=[[eta,0.],[1.,0.]])
++        pre=dict(N=0.,U=0.,gas=[0.]*4,ledgers=[0.]*14)
++        post=dict(pre,N=eta)
++        record=dict(status='AVAILABLE',event=0,x=1.,active_before=0,active_after=1,
++                    source_inventory=[eta,0.],pre=pre,post=post)
++        report=diagnose_jumps(setup,dict(records=[record]))
++        self.assertEqual(report['missing_events'],[1])
++        self.assertEqual(report['records'][0]['delta_photon_invariant']['numerator'],'0')
++        report=diagnose_jumps(setup,dict(records=[record,record]))
++        self.assertEqual(report['duplicate_events'],[dict(event=0,count=2)])
++        self.assertEqual(report['available_unique_births'],0)
++
++
++if __name__ == '__main__':
++    unittest.main()
+--- a/research/rei_age_exposure_envelope_20261018/tests/test_age_reference_binding.py
++++ b/research/rei_age_exposure_envelope_20261018/tests/test_age_reference_binding.py
+@@ -0,0 +1,49 @@
++import copy
++import hashlib
++import json
++from pathlib import Path
++import tempfile
++import unittest
++
++from compare_age_references import validate_pair
++from reference_diagnostics import COMPUTATIONAL_BASE_SHA
++from run_refinement import DEFAULT_CASES, NATIVE_SHA, plan
++
++
++class AgeReferenceBindingTests(unittest.TestCase):
++    def test_new_axis_keeps_explicit_historical_default(self):
++        cases=plan()
++        self.assertEqual(cases['age32'],dict(cases['age64'],name='age32',birth_panels=32))
++        self.assertEqual(DEFAULT_CASES,'age64,time8,time16,time32,spectral128')
++
++    def test_binding_accepts_passive_copy_and_rejects_binary_or_axis_change(self):
++        with tempfile.TemporaryDirectory() as directory:
++            root=Path(directory)
++            paths=[]
++            for births in (32,64):
++                path=root/str(births);(path/'data').mkdir(parents=True)
++                data=b'{"fixture":true}\n';(path/'data/endpoint.json').write_bytes(data)
++                config=dict(plan()[f'age{births}'],tight=False,rpc_mode='binary64',error_norm='block-max')
++                identity=dict(native_sha=NATIVE_SHA,binary_sha='fixture_same_binary',python='fixture_py',
++                              numpy='fixture_numpy',scipy='fixture_scipy',transport_threads=48,rpc_mode='binary64',
++                              solver_sha=COMPUTATIONAL_BASE_SHA)
++                if births==32:
++                    config['reference_diagnostics']=True
++                    identity.update(computational_base_solver_sha=COMPUTATIONAL_BASE_SHA,
++                                    solver_sha='fixture_passive_copy',diagnostic_transform_sha='fixture_transform')
++                receipt=dict(status='COMPLETE',config=config,identity=identity,
++                             outputs={'data/endpoint.json':hashlib.sha256(data).hexdigest()})
++                (path/'RECEIPT.json').write_text(json.dumps(receipt));paths.append(path)
++            self.assertEqual(validate_pair(*paths)['status'],'SAME_COMPUTATIONAL_SOURCE_BOUND')
++            target=paths[0]/'RECEIPT.json';original=json.loads(target.read_text())
++            for key,value in [('binary_sha','different'),('computational_base_solver_sha','different')]:
++                changed=copy.deepcopy(original);changed['identity'][key]=value;target.write_text(json.dumps(changed))
++                with self.assertRaises(ValueError):validate_pair(*paths)
++            changed=copy.deepcopy(original);changed['config']['source_subdivisions']=16;target.write_text(json.dumps(changed))
++            with self.assertRaises(ValueError):validate_pair(*paths)
++            target.write_text(json.dumps(original));(paths[0]/'data/endpoint.json').write_text('changed')
++            with self.assertRaises(ValueError):validate_pair(*paths)
++
++
++if __name__ == '__main__':
++    unittest.main()
+--- a/research/rei_age_exposure_envelope_20261018/tests/fixtures/reference_rpc_fixture.py
++++ b/research/rei_age_exposure_envelope_20261018/tests/fixtures/reference_rpc_fixture.py
+@@ -0,0 +1,44 @@
++#!/usr/bin/env python3
++"""Deterministic text RPC fixture: prescribed opacity plus one domain retry."""
++import json
++import math
++import os
++from pathlib import Path
++import sys
++
++births=[.3,.7]
++cells=1
++extra=14
++size=4+2*len(births)+extra
++initial=[0.,0.,0.,1.]
++setup=dict(birth_count=2,births=births,x0=0.,x1=1.,cells=cells,extra=extra,
++           initial=initial,initial_physical=initial,encoded_births=[[math.log(1e-4),0.]]*2,
++           active_indices=[[4,5],[6,7]],source_inventory=[[1e-4,.002]]*2,
++           he_h=.08,binding_ev=[13.6,24.59,54.42],birth_times_s=births)
++print(json.dumps(setup),flush=True)
++failed=False
++for line in sys.stdin:
++    fields=line.split();mode=fields[0];active=int(fields[1]);x=float(fields[2]);y=list(map(float,fields[3:]))
++    if mode=='R':
++        with Path(os.environ['REI_FIXTURE_RHS_LOG']).open('a') as log:log.write(line)
++        if active==1 and not failed and x>.55:
++            failed=True
++            print('ERR IGM_STATE_OR_UNIT_DOMAIN fixture_once',flush=True)
++            continue
++        result=[0.]*size
++        opacity=50. if x<.4 else 200.
++        photo=0.
++        for cohort in range(active):
++            index=4+2*cohort
++            result[index]=-opacity
++            photo+=opacity*math.exp(y[index])
++        result[-extra]=20.*photo
++        result[-extra+4]=photo
++        print(' '.join(format(v,'.17e') for v in result),flush=True)
++    elif mode=='P':
++        number=sum(math.exp(y[4+2*i]) for i in range(active))
++        print(json.dumps(dict(N=number,U=20.*number,flat=y[:4],ledgers=y[-extra:],
++                              Gamma_s=[0.,0.,0.],heat_erg_per_absorber_s=[0.,0.,0.],
++                              temperature_K=1.,cohorts=[],birth_times_s=births[:active])),flush=True)
++    else:
++        raise RuntimeError(mode)
+--- a/research/rei_age_exposure_envelope_20261018/scripts/run_accuracy_followup.sh
++++ b/research/rei_age_exposure_envelope_20261018/scripts/run_accuracy_followup.sh
+@@ -4,20 +4,69 @@
+ ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+ REPO=${1:?usage: run_accuracy_followup.sh REPO NEW_SCRATCH mode}
+ SCRATCH=${2:?new follow-up scratch required}
+-MODE=${3:?mode: age64-block-max or time8-subnormal-count}
++MODE=${3:?mode: age64-block-max, age32-block-max-diagnostics, or time8-subnormal-count}
+ case "$MODE" in
+     age64-block-max) CASE=age64; CAP=1800; PREPARE_FLAGS=(); RUN_FLAGS=(--error-norm block-max --rpc-mode binary64) ;;
++    age32-block-max-diagnostics) CASE=age32; CAP=1800; PREPARE_FLAGS=(); RUN_FLAGS=(--error-norm block-max --rpc-mode binary64 --reference-diagnostics) ;;
+     time8-subnormal-count) CASE=time8; CAP=120; PREPARE_FLAGS=(--moment-diagnostics --moment-rounding subnormal-count); RUN_FLAGS=() ;;
+     *) echo 'UNKNOWN_FOLLOWUP_MODE' >&2; exit 2 ;;
+ esac
+ export PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
+ export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
+ mkdir -p "$SCRATCH"
++PREPARED="$SCRATCH/native"
++PREPARATION_ROUTE=fresh_prepare
++KNOWN_NCP_BASE=/root/REI_AGE_BLOCKMAX_AGE64_20261019T084150Z/run/native
++if [[ "$MODE" == age32-block-max-diagnostics ]]; then
++    if [[ -n "${REI_PREPARED_BASE:-}" ]]; then
++        PREPARED="$REI_PREPARED_BASE"
++        [[ -f "$PREPARED/PREPARED_IDENTITY.json" && -f "$PREPARED/BUILD_RECEIPT.json" ]] || { echo 'REQUESTED_PREPARED_BASE_MISSING' >&2; exit 2; }
++        PREPARATION_ROUTE=explicit_prepared_base
++    elif [[ -f "$KNOWN_NCP_BASE/PREPARED_IDENTITY.json" && -f "$KNOWN_NCP_BASE/BUILD_RECEIPT.json" ]]; then
++        PREPARED="$KNOWN_NCP_BASE"
++        PREPARATION_ROUTE=known_completed_age64_base
++    fi
++fi
++if [[ "$PREPARATION_ROUTE" != fresh_prepare ]]; then
++    BASE_CANDIDATE="$PREPARED"
++    if ! python3 "$ROOT/src/reference_base.py" --check-complete "$PREPARED"; then
++        PREPARED="$SCRATCH/native"
++        python3 "$ROOT/src/prepare_native.py" --repo "$REPO" --fetch-missing --dest "$PREPARED"
++        if python3 "$ROOT/src/reference_base.py" --base "$BASE_CANDIDATE" --prepared "$PREPARED" --scratch "$SCRATCH"; then
++            PREPARATION_ROUTE=compact_base_exact_reconstruction
++            RUN_FLAGS+=(--binary "$SCRATCH/positive_native.bin")
++        else
++            PREPARATION_ROUTE=compact_base_fresh_build_fallback
++            python3 "$ROOT/src/build_native.py" --prepared "$PREPARED"
++        fi
++    elif [[ ! -f "$PREPARED/rust/rei_microphysics/target/release/examples/positive_native" ]]; then
++        if python3 "$ROOT/src/reference_base.py" --base "$BASE_CANDIDATE" --prepared "$PREPARED" --scratch "$SCRATCH"; then
++            PREPARATION_ROUTE=compact_binary_exact_binding
++            RUN_FLAGS+=(--binary "$SCRATCH/positive_native.bin")
++        else
++            echo 'PREPARED_BASE_BINARY_UNAVAILABLE_OR_MISMATCHED' >&2
++            exit 2
++        fi
++    fi
++fi
+ # The bundled frozen manifest makes git-object restoration independent of ZIPs.
+-python3 "$ROOT/src/prepare_native.py" --repo "$REPO" --fetch-missing --dest "$SCRATCH/native" "${PREPARE_FLAGS[@]}"
+-python3 "$ROOT/src/build_native.py" --prepared "$SCRATCH/native"
++if [[ "$PREPARATION_ROUTE" == fresh_prepare ]]; then
++    python3 "$ROOT/src/prepare_native.py" --repo "$REPO" --fetch-missing --dest "$PREPARED" "${PREPARE_FLAGS[@]}"
++    python3 "$ROOT/src/build_native.py" --prepared "$PREPARED"
++fi
++python3 - "$PREPARED" "$KNOWN_NCP_BASE" "$SCRATCH" "$PREPARATION_ROUTE" <<'PY'
++import json,sys
++from pathlib import Path
++from run_refinement import read_json,save
++prepared,known,scratch=map(Path,sys.argv[1:4])
++build=read_json(prepared/'BUILD_RECEIPT.json')
++expected=read_json(known/'BUILD_RECEIPT.json').get('binary_sha256') if (known/'BUILD_RECEIPT.json').is_file() else None
++save(scratch/'PREPARATION_COMPARISON.json',dict(route=sys.argv[4],prepared=str(prepared),
++    binary_sha256=build.get('binary_sha256'),completed_age64_binary_sha256=expected,
++    binary_comparison='MATCH' if expected and expected==build.get('binary_sha256') else 'MISMATCH' if expected else 'MISSING_COMPLETED_BINARY_IDENTITY'))
++PY
+ set +e
+-python3 "$ROOT/src/run_refinement.py" --prepared "$SCRATCH/native" --out "$SCRATCH/results" --cases "$CASE" --case-wall-s "$CAP" --total-wall-s "$CAP" "${RUN_FLAGS[@]}"
++python3 "$ROOT/src/run_refinement.py" --prepared "$PREPARED" --out "$SCRATCH/results" --cases "$CASE" --case-wall-s "$CAP" --total-wall-s "$CAP" "${RUN_FLAGS[@]}"
+ RESULT=$?
+ set -e
+ python3 - "$SCRATCH" "$MODE" "$RESULT" <<'PY'
+--- a/research/rei_age_exposure_envelope_20261018/src/reference_base.py
++++ b/research/rei_age_exposure_envelope_20261018/src/reference_base.py
+@@ -0,0 +1,63 @@
++"""Reuse a compact completed reference binary only under its exact build binding."""
++from pathlib import Path
++import argparse
++import shutil
++
++from run_refinement import read_json, save, sha
++
++
++def prepared_sources_complete(prepared):
++    prepared=Path(prepared)
++    try:
++        identity=read_json(prepared/'PREPARED_IDENTITY.json')
++        return bool(identity['outputs']) and all((prepared/name).is_file() and sha(prepared/name)==digest
++                                                for name,digest in identity['outputs'].items())
++    except (OSError,KeyError,ValueError):
++        return False
++
++
++def reuse_compact(base,prepared,scratch):
++    base,prepared,scratch=map(Path,(base,prepared,scratch))
++    result=dict(base=str(base),prepared=str(prepared),status='NOT_REUSED')
++    try:
++        build=read_json(base/'BUILD_RECEIPT.json')
++        binary=base/'positive_native.bin'
++        if build.get('exit_code')!=0 or not prepared_sources_complete(prepared):
++            raise ValueError('COMPACT_BASE_SOURCE_OR_BUILD_INCOMPLETE')
++        if sha(prepared/'PREPARED_IDENTITY.json')!=build['prepared_identity_sha256']:
++            raise ValueError('COMPACT_BASE_PREPARED_BYTES_DIFFER')
++        if not binary.is_file() or sha(binary)!=build['binary_sha256']:
++            raise ValueError('COMPACT_BASE_BINARY_SHA_MISMATCH')
++        scratch.mkdir(parents=True,exist_ok=True)
++        target=scratch/'positive_native.bin'
++        if target.exists() and sha(target)!=build['binary_sha256']:
++            raise FileExistsError('COMPACT_BINARY_OUTPUT_CONFLICT')
++        if not target.exists():shutil.copyfile(binary,target)
++        target.chmod(target.stat().st_mode | 0o100)
++        if (base/'BUILD_RECEIPT.json').resolve()!=(prepared/'BUILD_RECEIPT.json').resolve():
++            shutil.copyfile(base/'BUILD_RECEIPT.json',prepared/'BUILD_RECEIPT.json')
++        result.update(status='REUSED_EXACT_BUILD_BINDING',binary=str(target),binary_sha256=build['binary_sha256'],
++                      prepared_identity_sha256=build['prepared_identity_sha256'])
++    except (OSError,KeyError,ValueError) as error:
++        result['reason']=repr(error)
++    return result
++
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--check-complete',type=Path)
++    parser.add_argument('--base',type=Path)
++    parser.add_argument('--prepared',type=Path)
++    parser.add_argument('--scratch',type=Path)
++    args=parser.parse_args()
++    if args.check_complete is not None:
++        raise SystemExit(0 if prepared_sources_complete(args.check_complete) else 2)
++    if any(value is None for value in (args.base,args.prepared,args.scratch)):
++        parser.error('base, prepared and scratch required')
++    result=reuse_compact(args.base,args.prepared,args.scratch)
++    save(args.scratch/'COMPACT_BASE_REUSE.json',result)
++    raise SystemExit(0 if result['status']=='REUSED_EXACT_BUILD_BINDING' else 2)
++
++
++if __name__ == '__main__':
++    main()
+--- a/research/rei_age_exposure_envelope_20261018/tests/test_reference_base.py
++++ b/research/rei_age_exposure_envelope_20261018/tests/test_reference_base.py
+@@ -0,0 +1,37 @@
++import hashlib
++import json
++from pathlib import Path
++import tempfile
++import unittest
++
++from reference_base import prepared_sources_complete,reuse_compact
++
++
++class ReferenceBaseTests(unittest.TestCase):
++    def test_compact_archive_can_reuse_only_exact_prepared_bytes(self):
++        with tempfile.TemporaryDirectory() as directory:
++            root=Path(directory);base=root/'base';prepared=root/'prepared';scratch=root/'scratch'
++            base.mkdir();prepared.mkdir()
++            source=b'fixture frozen source\n';(prepared/'source').write_bytes(source)
++            identity=json.dumps(dict(outputs={'source':hashlib.sha256(source).hexdigest()})).encode()
++            (prepared/'PREPARED_IDENTITY.json').write_bytes(identity)
++            (base/'PREPARED_IDENTITY.json').write_bytes(identity)
++            binary=b'fixture executable bytes';(base/'positive_native.bin').write_bytes(binary)
++            build=dict(exit_code=0,prepared_identity_sha256=hashlib.sha256(identity).hexdigest(),
++                       binary_sha256=hashlib.sha256(binary).hexdigest())
++            (base/'BUILD_RECEIPT.json').write_text(json.dumps(build))
++            self.assertFalse(prepared_sources_complete(base))
++            self.assertTrue(prepared_sources_complete(prepared))
++            result=reuse_compact(base,prepared,scratch)
++            self.assertEqual(result['status'],'REUSED_EXACT_BUILD_BINDING')
++            self.assertEqual((scratch/'positive_native.bin').read_bytes(),binary)
++            self.assertEqual((prepared/'BUILD_RECEIPT.json').read_bytes(),(base/'BUILD_RECEIPT.json').read_bytes())
++            (prepared/'PREPARED_IDENTITY.json').write_bytes(identity+b'\n')
++            self.assertEqual(reuse_compact(base,prepared,scratch)['status'],'NOT_REUSED')
++            (prepared/'PREPARED_IDENTITY.json').write_bytes(identity)
++            (base/'positive_native.bin').write_bytes(b'changed')
++            self.assertEqual(reuse_compact(base,prepared,scratch)['status'],'NOT_REUSED')
++
++
++if __name__ == '__main__':
++    unittest.main()

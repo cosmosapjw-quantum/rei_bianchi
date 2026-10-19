@@ -8,6 +8,7 @@ from pathlib import Path
 import argparse, hashlib, json, math, os, platform, re, signal, subprocess, sys, time
 
 NATIVE_SHA='35d9747a0bbedcafdb568467ce7c1e7a25f965b6'
+DEFAULT_CASES='age64,time8,time16,time32,spectral128'
 
 def sha(p: Path) -> str:
     h=hashlib.sha256()
@@ -42,6 +43,7 @@ def plan() -> dict:
     base=dict(q=0.,birth_panels=32,n_mu=8,source_subdivisions=8,
               transport_cells=16,common_birth_levels=[8,16,32,64],time_factor=1)
     result={'age64':dict(base,name='age64',kind='reference',birth_panels=64)}
+    result['age32']=dict(base,name='age32',kind='reference',birth_panels=32)
     for f in (8,16,32): result[f'time{f}']=dict(base,name=f'time{f}',kind='native',time_factor=f)
     result['spectral128']=dict(base,name='spectral128',kind='reference',q=.1,birth_panels=8,transport_cells=128)
     return result
@@ -113,6 +115,8 @@ def validate_outputs(c: dict, root: Path) -> None:
         r=read_json(root/'solver_return.json')
         if r.get('error_norm','rms')!=c.get('error_norm','rms'):
             raise ValueError('REFERENCE_ERROR_NORM_MISMATCH')
+        if c.get('reference_diagnostics') and not r.get('reference_diagnostics'):
+            raise ValueError('REFERENCE_DIAGNOSTICS_MISSING')
         for key in ('q','birth_panels','n_mu','source_subdivisions','transport_cells'):
             if r[key]!=c[key]: raise ValueError('REFERENCE_CONFIG_MISMATCH_'+key)
         if r['status']!='SCOPED_NUMERICAL_EXECUTION_COMPLETE' or r['server_exit']!=0:
@@ -132,13 +136,14 @@ def main() -> None:
     p.add_argument('--prepared',type=Path,required=True)
     p.add_argument('--binary',type=Path)
     p.add_argument('--out',type=Path,required=True)
-    p.add_argument('--cases',default=','.join(plan()))
+    p.add_argument('--cases',default=DEFAULT_CASES)
     p.add_argument('--case-wall-s',type=float,default=1800.)
     p.add_argument('--total-wall-s',type=float,default=5400.)
     p.add_argument('--max-rhs',type=int,default=200000)
     p.add_argument('--tight',action='store_true')
     p.add_argument('--rpc-mode',choices=('text','binary64'),default='text')
     p.add_argument('--error-norm',choices=('rms','block-max'),default='rms')
+    p.add_argument('--reference-diagnostics',action='store_true')
     p.add_argument('--retry-failed',action='store_true')
     p.add_argument('--dry-run',action='store_true')
     a=p.parse_args()
@@ -146,10 +151,14 @@ def main() -> None:
         p.error('positive finite resource bounds required')
     cases=plan();names=a.cases.split(',')
     if len(set(names))!=len(names) or any(n not in cases for n in names): p.error('unknown/duplicate case name')
+    if a.reference_diagnostics and a.error_norm!='block-max':
+        p.error('reference diagnostics require block-max')
     configs=[dict(cases[n],tight=a.tight,rpc_mode=a.rpc_mode) for n in names]
     for config in configs:
         if config['kind']=='reference':
             config['error_norm']=a.error_norm
+            if a.reference_diagnostics:
+                config['reference_diagnostics']=True
     if a.dry_run:
         print(json.dumps(configs,indent=2));return
     native=a.prepared.resolve();solver=native/'positive_solver_refined.py'
@@ -173,7 +182,15 @@ def main() -> None:
     start=time.monotonic();records=[]
     try:
         for c in configs:
-            fingerprint=hashlib.sha256(canonical(dict(config=c,identity=identity))).hexdigest()
+            case_identity=dict(identity)
+            diagnostic_source=None
+            if c.get('reference_diagnostics'):
+                from reference_diagnostics import transform_solver, transform_identity
+                diagnostic_source=transform_solver(solver.read_bytes())
+                case_identity.update(computational_base_solver_sha=sha(solver),
+                                     diagnostic_transform_sha=transform_identity(),
+                                     solver_sha=hashlib.sha256(diagnostic_source).hexdigest())
+            fingerprint=hashlib.sha256(canonical(dict(config=c,identity=case_identity))).hexdigest()
             dest=a.out/c['name'];dest.mkdir(exist_ok=True)
             attempts=sorted(dest.glob('attempt[0-9][0-9][0-9]'))
             if attempts:
@@ -185,11 +202,15 @@ def main() -> None:
             if cap<=0: raise TimeoutError('TOTAL_CAMPAIGN_BUDGET_EXHAUSTED')
             trial=dest/f'attempt{len(attempts)+1:03d}';trial.mkdir()
             out=trial/'data';out.mkdir()
-            receipt=dict(config=c,identity=identity,fingerprint=fingerprint,status='RUNNING',
+            executed_solver=solver
+            if diagnostic_source is not None:
+                executed_solver=trial/'reference_solver_diagnostics.py'
+                executed_solver.write_bytes(diagnostic_source)
+            receipt=dict(config=c,identity=case_identity,fingerprint=fingerprint,status='RUNNING',
                          resource_bounds=dict(case_wall_s=cap,max_rhs=a.max_rhs))
             save(trial/'RECEIPT.json',receipt)
             try:
-                result=run_process(command(c,binary,solver,out,cap,a.max_rhs),trial,cap+2)
+                result=run_process(command(c,binary,executed_solver,out,cap,a.max_rhs),trial,cap+2)
                 receipt['execution']=result
                 if result['exit_code']!=0: raise RuntimeError('CHILD_EXIT_'+str(result['exit_code']))
                 validate_outputs(c,out)
