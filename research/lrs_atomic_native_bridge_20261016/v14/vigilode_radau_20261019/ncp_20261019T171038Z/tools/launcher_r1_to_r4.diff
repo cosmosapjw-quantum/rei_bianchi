@@ -1,0 +1,23 @@
+--- /tmp/claude-1000/-home-cosmosapjw-Dropbox-bianchi-rei-bianchi/656ec900-bbc0-4dbf-8cc0-1f7c4dfaaa13/scratchpad/vigil/stage/research/lrs_atomic_native_bridge_20261016/v14/vigilode_radau_20261019/ncp_20261019T171038Z/tools/launcher_r1_verbatim.sh	2026-10-20 02:23:57.822899873 +0900
++++ /tmp/claude-1000/-home-cosmosapjw-Dropbox-bianchi-rei-bianchi/656ec900-bbc0-4dbf-8cc0-1f7c4dfaaa13/scratchpad/vigil/stage/research/lrs_atomic_native_bridge_20261016/v14/vigilode_radau_20261019/ncp_20261019T171038Z/tools/launcher_r4_refspec_fix.sh	2026-10-20 02:23:57.827899860 +0900
+@@ -2,7 +2,7 @@
+ # Wrapper: runs the owner-supplied command block verbatim inside the existing LRS checkout.
+ cd /root/REI_LRS_CASEB_V4_20261016/repo
+ export PATH=/root/.cargo/bin:$PATH
+-LOG=/tmp/rei_lrs_vigilode_launch_20261019T170805Z
++LOG=/tmp/rei_lrs_vigilode_launch_20261019T171026Z
+ mkdir -p $LOG
+ date -u +%FT%T.%NZ > $LOG/START_UTC
+ bash -c '
+@@ -13,7 +13,10 @@
+ REI_REL="research/lrs_atomic_native_bridge_20261016/v14/vigilode_radau_20261019"
+ 
+ git -C "$REI_REPO" status --short
+-git -C "$REI_REPO" fetch origin "$REI_BRANCH"
++# Minimal compatibility fix: this checkout has a single-branch fetch refspec, so
++# "fetch origin BRANCH" only wrote FETCH_HEAD and left origin/BRANCH stale.
++git -C "$REI_REPO" fetch origin "+refs/heads/$REI_BRANCH:refs/remotes/origin/$REI_BRANCH"
++echo "ORIGIN_BRANCH_SHA=$(git -C "$REI_REPO" rev-parse "origin/$REI_BRANCH")"
+ 
+ REI_SOURCE_SHA="$(
+   git -C "$REI_REPO" show     "origin/$REI_BRANCH:$REI_REL/stages/FINAL_DELIVERY.json" |
