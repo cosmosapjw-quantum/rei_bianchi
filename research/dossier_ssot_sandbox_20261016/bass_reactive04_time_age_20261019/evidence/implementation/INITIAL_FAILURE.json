@@ -1,0 +1,29 @@
+{
+  "classification": "IMPLEMENTATION_NUMERICAL_CONDITIONING",
+  "status": "CORRECTED_VERIFIED",
+  "input": {
+    "tau": "f64::from_bits(1)",
+    "born": 1,
+    "nodes": [
+      [
+        0.1,
+        0.3
+      ],
+      [
+        0.7,
+        0.7
+      ]
+    ]
+  },
+  "observed_w1": 0.29,
+  "expected_uniform_w1": 0.15,
+  "initial_log": "evidence/implementation/AGE_TESTS_INITIAL.log",
+  "cause": "In inverse CDF -log1p(-p D)/tau, p D can underflow while the quotient remains finite.",
+  "correction": "For tau<=1 evaluate p*phi(tau)*[-log1p(-z)/z], using the removable z=0 limit 1. Input ages/weights and original quadrature unchanged.",
+  "impact": "Diagnostic quantile only; no native gas, physical source, CX, or quadrature owner code touched.",
+  "validation": [
+    "evidence/implementation/AGE_TESTS_QUANTILE_FIX.log",
+    "evidence/implementation/ALL_RUST_TESTS_FINAL.log",
+    "evidence/implementation/STRICT_CLIPPY_FINAL.log"
+  ]
+}

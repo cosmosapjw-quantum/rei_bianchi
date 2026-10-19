@@ -1,0 +1,143 @@
+{
+  "schema": "rei.bass.reactive04.phys_math_code_audit.v1",
+  "status": "PASS_SCOPED",
+  "stage": "C9_PHYS_MATH_CODE",
+  "started_utc": "2026-10-19 05:58:41 UTC",
+  "completed_utc": "2026-10-19T06:11:10.952412+00:00",
+  "ordering": "Started after parent confirmed fixed theory section10 PHYS-MATH audit ledger. Earlier source read and subnormal finding were preliminary C2 inspection, not C9 approval.",
+  "physics_math_contract": {
+    "path": "docs/AGE_CERTIFICATE_THEORY.md",
+    "sha256": "3b6e022e7c1460fce82c20f2adff290695a0f5144d3067fe7a3a614da889d992",
+    "bytes": 20642
+  },
+  "final_new_source_sha256": {
+    "br04/Cargo.toml": "82ad4312044af0ec472da36434be17e0b826e331499307b22d3c64749005ac22",
+    "br04/Cargo.lock": "726aaa9383bb3660afd92631d85ca9b010d8cdc39d80e804d49236656347d2d9",
+    "crate/br04_lib.rs": "b23a8f1dda15e059f262b406577bb819b97cf6591b3f0fae3d50eb1f523ab730",
+    "crate/birth_age_certificate.rs": "8091268f51545559ba1036beb1bce2891e51dbec8324c9391251a001fba770ae",
+    "crate/tests/birth_age_certificate.rs": "8ef26047f0bb4be2d0b9d22319f88e6fed01f705239ff42e02c3118badec7957",
+    "crate/examples/birth_age_study.rs": "aefe8d7b25f363d6437fdd6ba40932bd687a2d1862774c7dd953f5b6b969790b",
+    "crate/examples/birth_age_source_study.rs": "e2da81aae1e57ea73a657ece1a7ce6d4029ba3cc71781447d3e612ec758a63ac"
+  },
+  "parent_files_checked": 118,
+  "parent_changes": [],
+  "checks": [
+    {
+      "id": "PM_CODE_01",
+      "item": "Measure and units",
+      "result": "PASS_SCOPED",
+      "reason": "tau=kappa*T, age x in [0,1], born in caller count convention; emitted tau=0 and survivor tau references separated. Physical W1=T*reported W1."
+    },
+    {
+      "id": "PM_CODE_02",
+      "item": "CDF supremum and W1 formulas",
+      "result": "PASS_SCOPED",
+      "reason": "Both sides of all CDF jumps are checked. Positive plateau integrals equal the theory section3 expressions; each interval is split at the continuous quantile."
+    },
+    {
+      "id": "PM_CODE_03",
+      "item": "Stable limiting arithmetic",
+      "result": "PASS_SCOPED",
+      "reason": "phi uses expm1; psi/chi Taylor coefficients match their positive integrals; large-tau scaled formulas avoid tau squared. Subnormal quantile uses the factored removable limit."
+    },
+    {
+      "id": "PM_CODE_04",
+      "item": "Mass versus normalized shape",
+      "result": "PASS_SCOPED",
+      "reason": "Direct/log mass fields and normalized shape are separate. A zero source or empty quadrature has shape=None. A positive underflowed mass can retain a mathematical conditional shape with an explicit absolute_mass_underflow flag."
+    },
+    {
+      "id": "PM_CODE_05",
+      "item": "Physical population and ownership",
+      "result": "PASS_SCOPED",
+      "reason": "No AgeHistory/state/cohort mutation, absorption, thermal, chemical or work update is introduced. Sorting acts on an owned copy for diagnostics. Parent118 bytes, including original 105 crate files, remain identical."
+    },
+    {
+      "id": "PM_CODE_06",
+      "item": "Time and label composition",
+      "result": "PASS_SCOPED",
+      "reason": "Global age mapping (elapsed_cells+x_local)/Nt and emitted weight w_local/Nt represent the stated constant-source reference. Cache reuse is restricted to identical scalar tau within a fixed family/refinement; source row identities remain distinct."
+    },
+    {
+      "id": "PM_CODE_07",
+      "item": "Mixture upper bound semantics",
+      "result": "PASS_SCOPED",
+      "reason": "Source summary computes sum p_exact*d_label + half L1 difference in normalized label masses. W1 diameter is one and the CDF bound uses the same TV bound. It does not compute the exact unlabelled mixture distance."
+    },
+    {
+      "id": "PM_CODE_08",
+      "item": "Bound versus floating evaluation",
+      "result": "PASS_SCOPED",
+      "reason": "Theorems hold in real arithmetic. API/docs identify outputs as binary64 evaluations without directed intervals; tests use floating tolerances. No executable returned bound is presented as an outward-rounded enclosure."
+    },
+    {
+      "id": "PM_CODE_09",
+      "item": "Input rejection and failure classification",
+      "result": "PASS_SCOPED",
+      "reason": "Invalid/nonfinite/negative masses and ages are rejected. Fixed-source CLI now requires strictly positive label masses. Original fitted NoForwardProgress is retained as a representational limit; no physical no-solution inference or CX-flow change occurs."
+    },
+    {
+      "id": "PM_CODE_10",
+      "item": "Independent execution at final hashes",
+      "result": "PASS_SCOPED",
+      "reason": "Reviewer executed 15 final diagnostic tests and a before/after synthetic zero-label CLI probe. Root post-review full 224 tests/Clippy/fmt and source 384-output byte parity are separately evidenced."
+    }
+  ],
+  "findings": [
+    {
+      "id": "C2_SUBNORMAL_QUANTILE",
+      "phase": "pre-C9 preliminary formula read and author implementation test",
+      "class": "DIAGNOSTIC_NUMERICAL_CONDITIONING_DEFECT",
+      "status": "CLOSED",
+      "observation": "At tau=min positive subnormal and p=0.3, p*(1-exp(-tau)) rounded to zero. Initial W1 was 0.29 versus uniform 0.15.",
+      "correction": "For thin tau use p*phi(tau)*[-log1p(-z)/z], z=p*(1-exp(-tau)), with ratio 1 at z=0.",
+      "verification": [
+        "evidence/implementation/AGE_TESTS_INITIAL.log",
+        "evidence/implementation/INITIAL_FAILURE.json",
+        "evidence/implementation/AGE_TESTS_QUANTILE_FIX.log",
+        "evidence/code_audit/C9_INDEPENDENT_RUST_TESTS.json"
+      ],
+      "scientific_impact": "Original quadrature/native histories unchanged; corrected diagnostics."
+    },
+    {
+      "id": "C9_ZERO_LABEL_UNIT_SHAPE",
+      "phase": "C9_PHYS_MATH_CODE",
+      "class": "SOURCE_STUDY_INPUT_CONTRACT_GAP",
+      "status": "CLOSED",
+      "observation": "The old source-study CLI accepted a zero-born label inside a positive inventory and exported its cached unit-source shape. The actual 384-source inventory has no zero-born labels.",
+      "correction": "Root explicitly documented and rejects nonpositive label mass in this positive-inventory CLI. Core compare_nodes(born=0) still returns undefined shape.",
+      "before_sha256": "05005cec55181adea530575a146ee8ac489e3d6eb805cc7a6ea5d39edc4b753d",
+      "after_sha256": "e2da81aae1e57ea73a657ece1a7ce6d4029ba3cc71781447d3e612ec758a63ac",
+      "verification": [
+        "evidence/code_audit/ZERO_LABEL_PROBE_RECOVERY.json",
+        "evidence/code_audit/ZERO_LABEL_EDGE_FIX_VERIFICATION.json",
+        "evidence/implementation/SOURCE_CONTRACT_PARITY.json"
+      ],
+      "scientific_impact": "The existing 384-source scientific CSVs retain byte parity; no physics owner change."
+    }
+  ],
+  "open_blocking_findings": [],
+  "independent_tests": {
+    "passed": 15,
+    "failed": 0,
+    "receipt": "evidence/code_audit/C9_INDEPENDENT_RUST_TESTS.json",
+    "log_sha256": "e427d24b73357898769b7dfb47fba2964ff0a44d5a29bf4d35a45a202a3de756"
+  },
+  "source_csv_mass_observation": {
+    "rows": 4608,
+    "zero_exact_mass_rows": 0,
+    "zero_discrete_mass_rows": 0,
+    "min_exact_mass_com3": 5.802284283239271e-16,
+    "min_discrete_mass_com3": 5.798290819182901e-16,
+    "csv_sha256": "ca3904fdb46e15d2976a6daa0bd3a1035c3eb7b4b13e0cba85c76ef5380a28d1"
+  },
+  "limitations": [
+    "f64 diagnostic evaluation is not a directed interval certificate",
+    "constant source and frozen opacity reference; evolving gas/opacity response needs the stated stability assumptions",
+    "mixture summary is an upper bound, not exact scalar-mixture W1",
+    "native crossed-grid findings do not establish universal second order or full longspan convergence"
+  ],
+  "main_source_written_by_reviewer": false,
+  "reviewer_native_execution": false,
+  "source_correction_owner": "parent root; only source-study input contract"
+}

@@ -1,0 +1,28 @@
+--- a/docs/AGE_CERTIFICATE_THEORY.md
++++ b/docs/AGE_CERTIFICATE_THEORY.md
+@@ -234,7 +234,7 @@
+ 
+ Thus $E P_2$ has Lipschitz constant at most $E_*[H_*+(9/4)s_*]$. This is a bound on the exact birth-geometry map for fixed labels and background; it does not merge cohorts.
+ 
+-If future attenuation is $S(A)=e^{-\Lambda(A)}$, with nonnegative optical depth and Lipschitz constant $L_\Lambda$, then $0\le S\le1$ and $L_S\le L_\Lambda$. Hence $fS$ has Lipschitz constant at most $L_f+B_fL_S$, and the preceding W1 bound applies. On a smooth threshold-free domain, $\int|\partial_A\kappa|dt$ bounds $L_\Lambda$. Threshold crossing, grazing/tangency, and changing source labels require their own variation or differentiability bounds.
++If future attenuation is $S(A)=e^{-\Lambda(A)}$, with nonnegative optical depth and Lipschitz constant $L_\Lambda$, then $0\le S\le1$ and $L_S\le L_\Lambda$. Hence $fS$ has Lipschitz constant at most $L_f+B_fL_S$, and the preceding W1 bound applies. Here future propagation begins at the same current time $t$ for every age, so $\Lambda(A)=\int_t^{T_*}\kappa(s,A)ds$. On a smooth threshold-free domain, $\int_t^{T_*}|\partial_A\kappa|ds$ bounds $L_\Lambda$. A birth-dependent integration endpoint would add its own endpoint term. Threshold crossing, grazing/tangency, and changing source labels require their own variation or differentiability bounds.
+ 
+ For bounded-variation observables, integration by parts instead gives
+ 
+@@ -276,7 +276,15 @@
+ 
+ The four-corner mixed difference is bounded by the sum of its four birth bounds. This determines whether measured temporal differences can be explained by birth contamination before fitting a convergence order.
+ 
+-The frozen certificate bounds its declared reference response. If the evolving gas changes when birth discretization changes, an additional gas/opacity response stability term is required. The positive certificate construction remains valid, while that application obligation stays explicit. No broad nonlinear positivity impossibility statement is needed.
++The frozen certificate bounds its declared reference response. If the evolving gas changes when birth discretization changes, an additional gas/opacity response stability term is required. A constructive sufficient condition is available: suppose both gas trajectories remain in a specified physical state domain, the gas vector field is locally Lipschitz there in the chosen state norm with bound $L_g(t)$, and the fixed-gas radiative forcing difference is bounded by a computable $b(t)$. The latter may use the label-wise W1/mass bounds or the threshold-sensitive CDF/variation bounds above. Then the usual differential inequality gives
++
++$$
++\|\delta g(t)\|\le
++e^{\int_0^t L_g(v)dv}\|\delta g(0)\|
+++\int_0^t e^{\int_s^t L_g(v)dv}\,b(s)ds.
++$$
++
++This follows by splitting the vector-field difference into its state-response and fixed-state forcing parts and integrating the scalar norm inequality. The forcing bound must cover the actual propagated radiation difference, including opacity-history effects, or those effects must be included in a larger state-response bound. A newborn frozen certificate alone is not automatically $b(t)$. This is a conditional extension, not a bound evaluated for the native run: the physical domain, norm, rate/opacity sensitivity and threshold variation still need to be certified, and stiffness may make an unrefined bound too loose to be useful. The positive certificate construction remains valid while these application obligations stay explicit. No broad nonlinear positivity impossibility statement is needed.
+ 
+ ## 9. Primary literature and direct contribution
+ 

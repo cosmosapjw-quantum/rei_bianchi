@@ -1,0 +1,1 @@
+Clear[u,r]; {Normal[Series[(1-Exp[-u r])/(1-Exp[-u]),{u,0,2}]]//FullSimplify,Normal[Series[(u r+Exp[-u r]-1)/(u (1-Exp[-u])),{u,0,2}]]//FullSimplify,FullSimplify[Integrate[s Exp[-z s],{s,0,1},Assumptions->z>0]-(1-(1+z)Exp[-z])/z^2,z>0],FullSimplify[Integrate[(1-s)Exp[-z s],{s,0,1},Assumptions->z>0]-(z+Exp[-z]-1)/z^2,z>0]}

@@ -1,0 +1,3 @@
+# Synthetic CLI contract probe
+
+These two input labels and resulting rows are a manufactured boundary test, not native science data. The old source printed a unit-rule shape for a label whose physical source mass is zero; the corrected inventory CLI rejects that input with exit code 2. The core zero-source API remains supported. SOURCE_BEFORE_FIX.txt is an exact byte snapshot of the old Rust example (SHA-256 05005cec55181adea530575a146ee8ac489e3d6eb805cc7a6ea5d39edc4b753d), preserved as a failure fixture. Use the current br04 library and this old example text as a separate binary to reproduce the before case. ZERO_LABEL_EDGE_FIX_VERIFICATION.json records the actual before/after commands and source hashes.
