@@ -1,0 +1,18 @@
+{
+  "schema": "rei.lrs.v16.independent-radau-positivity-cas.1",
+  "agent": "/root/drive_v15_intake",
+  "query": "Module[{s=Sqrt[6],a,tau,ys},a={{(88-7 Sqrt[6])/360,(296-169 Sqrt[6])/1800,(-2+3 Sqrt[6])/225},{(296+169 Sqrt[6])/1800,(88+7 Sqrt[6])/360,(-2-3 Sqrt[6])/225},{(16-Sqrt[6])/36,(16+Sqrt[6])/36,1/9}};ys=FullSimplify[Inverse[IdentityMatrix[3]+tau a].{1,1,1}];<|\"stage_survival_functions\"->(ToString[InputForm[Together[#]]]& /@ ys),\"large_tau_stage_coefficients\"->(ToString[InputForm[Limit[tau #,tau->Infinity]]]& /@ ys),\"tau_10_stages\"->N[ys/.tau->10,20],\"tau_100_stages\"->N[ys/.tau->100,20],\"second_stage_positive_zero\"->ToString[InputForm[Reduce[Numerator[Together[ys[[2]]]]==0&&tau>0,tau,Reals]]],\"second_stage_negative_domain\"->ToString[InputForm[Reduce[ys[[2]]<0&&tau>0,tau,Reals]]],\"endpoint_is_between_zero_and_one\"->FullSimplify[0<ys[[3]]<1,Assumptions->tau>0]|>]",
+  "context_attempt": {
+    "isError": true,
+    "text": [
+      "tool call error: tool call failed for `codex_apps/wolfram.WolframContext`\n\nCaused by:\n    Mcp error: -32603: Internal error"
+    ]
+  },
+  "actual_evaluator_result": {
+    "isError": false,
+    "text": [
+      "Infinity::indet: -- Message text not found -- (0*Infinity*Infinity)\nInfinity::indet: -- Message text not found -- (10 - 5*Sqrt[6] + -Infinity + Infinity)\nInfinity::indet: -- Message text not found -- (0*Infinity*Infinity)\nGeneral::messages: Messages were generated which may indicate errors.\n\nOut[1]= <|\"stage_survival_functions\" -> {\"(6*(50 + 10*tau$83858 + 5*Sqrt[6]*tau$83858 + tau$83858^2 + Sqrt[6]*tau$83858^2))/(5*(60 + 36*tau$83858 + 9*tau$83858^2 + tau$83858^3))\", \"(-6*(-50 - 10*tau$83858 + 5*Sqrt[6]*tau$83858 - tau$83858^2 + Sqrt[6]*tau$83858^2))/(5*(60 + 36*tau$83858 + 9*tau$83858^2 + tau$83858^3))\", \"(3*(20 - 8*tau$83858 + tau$83858^2))/(60 + 36*tau$83858 + 9*tau$83858^2 + tau$83858^3)\"}, \"large_tau_stage_coefficients\" -> {\"(6*(1 + Sqrt[6]))/5\", \"(6 - 6*Sqrt[6])/5\", \"3\"}, \"tau_10_stages\" -> {0.31935696280214312830840997131338812506`20., -0.06073627314697071451530652303752605659`20., 0.05172413793103448275862068965517241379`20.}, \"tau_100_stages\" -> {0.04034487021475416860567797975723193899`20., -0.01609601773775034657689389695270386627`20., 0.02529122396357185962730647550427006565`20.}, \"second_stage_positive_zero\" -> \"tau$83858 == (-5*(-2 + Sqrt[6]))/(2*(-1 + Sqrt[6])) + (5*Sqrt[(1 + 2*Sqrt[6])/2])/(-1 + Sqrt[6])\", \"second_stage_negative_domain\" -> \"tau$83858 > (-5*(-2 + Sqrt[6]))/(2*(-1 + Sqrt[6])) + (5*Sqrt[2 + 4*Sqrt[6]])/(2*(-1 + Sqrt[6]))\", \"endpoint_is_between_zero_and_one\" -> True|>"
+    ]
+  },
+  "interpretation": "Use the explicitly returned rational stage functions and finite tau values. Infinity::indet warning was present in the Limit subcalculation; asymptotic coefficients are independently obtained by leading polynomial coefficients. This is an algebraic review check, not a native cosmological run."
+}
