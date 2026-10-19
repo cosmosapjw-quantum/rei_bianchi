@@ -1,13 +1,13 @@
-# 새 대화 재개 | 2026-10-19
+# 새 대화 재개 | 2026-10-19 최종
 
-`physmath-research-loop`로 PR199 / `research/rei-age-exposure-envelope-20261018`의 실제 HEAD를 읽고 `README_CURRENT_KO.md`, `RESEARCH_UPDATE_20261019_KO.md`, `HANDOFF_CODEX_CURRENT_KO.md`, `contracts/NEXT_DAG_CURRENT.json`, `DELIVERY_RECEIPT_CURRENT.json`을 확인한다.
+`physmath-research-loop`로 repo cosmosapjw-quantum/rei_bianchi, draft PR199, branch research/rei-age-exposure-envelope-20261018의 실제 HEAD와 최신 Drive/Dropbox를 먼저 읽는다. 연구 경로는 research/rei_age_exposure_envelope_20261018/이다. 다섯 CURRENT 진입 파일 및 RESEARCH_UPDATE_20261019_KO.md가 기준이다.
 
-2026-10-18의 공급된 최종 HEAD604c228 이후 실제 NCP 결과가 추가되어 이번 재개 기준은0c6b046이었다. spectral128은 완료됐고 He I64→128 누적 photo 차이0.2660778682%다. age64는 endpoint 도달 후 photon ratio1.0081783527976493e-8로 원래1e-8 gate에 실패했다. native time8/16/32는 MOMENT_FIT로 실패했다. 완료된 코드를 재작성하거나 같은 캠페인을 반복하지 않는다.
+공급된604c228 이후 실제NCP결과가 있었다. 이번 intake0c6b046, 첫C8게시e729adaf. 최종HEAD는receipt/PR실제값을 사용한다. spectral128완료, HeI64→128누적photo차이0.2660778682%. 기존age64는endpoint도달후photon1.0081783527976493e-8>고정1e-8 gate실패. native time8/16/32는MOMENT_FIT실패. 완료코드나동일캠페인을반복하지않는다.
 
-2026-10-19에는 새 opt-in DOP853 성분군 최대 오차검사, 정확한 저장항 photon ledger 진단, failure-only native moment instrumentation을 구현·독립 검토했다. 새23 targeted tests PASS, 기존85 PASS/1 optional skip은 재사용한 원격 증거다. Rust1.94.1을 실제로 확보하여 원본153개 입력 identity를 확인한 task copy를 컴파일했다. 새 목적의 로컬 time8 첫 실패 진단은6.436 s, 원래exit1. 해당 셀의 count defect5η>3η, energy89η≤116η이며 독립 원본 Rust 재생이 일치했다. 평균 적합 이후의 subnormal 저장 양자화로 판별했다.
+새로 구현·검토한 것은 정확저장항photon진단, opt-inDOP853block-max, failure-onlymoment진단, opt-insubnormal-count교정이다. 고유26targeted testsPASS; 기존85PASS/1optional skip은재사용이력. Rust1.94.1로두taskcopy를컴파일했다. 로컬time8첫진단6.436s는count5η>3η,energy89η≤116η였다. 독립원본셀재생이일치했다. count최소교정5η후첫셀통과했으나새time8은6.849s뒤다른셀의energy2η>η로다시exit1이었다. 전체time8성공이아니다.
 
-기존 age64 raw70 파일을 실제 Git blob과 일치시켜 읽고65구간을 정확 재합산했다. 마지막 합산만 교정해도 원래 gate 실패가 남는다. 실제 source-birth paired snapshot은 없어 MISSING이다. 새 block-max age64 실행은 이 checkpoint에서 NOT_RUN이다. native moment 교정 연구와 후속 실행의 최종 상태는 최신 DAG/receipt를 따른다.
+기존age64raw70개및65구간을읽었다. 정확한저장항ratio1.008178364096903740e-8로여전히FAIL이며마지막합산만의교정으로해소되지않는다. 실제source-birthpairedsnapshot은MISSING이다. 다음READY는q0age64의명시적block-max검사1회뿐이다. native time8동일교정재실행과time16/32확장은HOLD다.
 
-현재 도구 제약은 이 세션에서 실제 재확인했다. Python/NumPy/SciPy/C++/Rust 로컬 실행과 GitHub connector는 작동했고, shell signed-URL 다운로드는 네트워크 제한, Desktop Commander process는 월간 사용량 제한을 반환했다. 이를 다음 세션의 자동 blocker로 상속하지 않는다.
+후반scratch초기화가발생했다. Git게시/캐시에서native153+age64raw70을exactblobhash로복구했고D코드5개도검토당시SHA와일치했다. D두번째실패의전체128노드/원stderr/전체result/binary는미복구라기존도구관측기반compact기록으로명시했다. 재실행을한것이아니다. 초기화후compiler도없어새NCP환경에서실제확인·컴파일해야한다. 이환경상태를다음세션blocker로상속하지않는다.
 
-원 native physics SHA35d9747을 고정하고 owner checkout, PR150/R9, 별도 BASS HHeD lane을 보존한다. 과거 paired response bound와24 prescribed-opacity 증거는 조건부이며 nonlinear Grackle certificate가 아니다. `PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED`.
+HANDOFF_CODEX_CURRENT_KO.md에는사용자수동파일처리없는자동준비와 `scripts/run_accuracy_followup.sh REPO NEW_SCRATCH age64-block-max` 인계가있다. 원physics35d9747,ownercheckout,PR150/R9,별도BASS HHeDlane을보존한다. 조건부pairedresponse경계는native nonlinearcertificate가아니다. **PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED**.

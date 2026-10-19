@@ -115,9 +115,33 @@ F'(\lambda)=\operatorname{Var}_{p(\lambda)}\!\left(\frac{q-\mu}{s}\right)\ge0.
 
 진단은 task copy의 이미 실패가 결정된 branch에서 첫 1건만 JSON으로 출력하고 원래 `AXBI_COVARIANT_MOMENT_FIT`를 반환한다. 교정 검토가 끝나기 전 기존 time16/32 캠페인을 반복하지 않는다.
 
-## 4. 검증 및 게시 범위
+## 4. 제한적 저장 교정과 두 번째 native 실패
 
-신규 targeted stdlib unittest는 photon 진단 11개, error control 9개, moment 진단 3개가 통과했다. 기존 85 PASS + 1 optional skip은 원격 이력을 재사용하며, 이 세트 전체를 이번 환경에서 다시 실행했다고 주장하지 않는다. Python3.12.14, NumPy2.3.5, SciPy1.17.0, C++17 g++13.3.0, Rust1.94.1의 현재 실제 작동을 확인했다. pytest는 이 환경에서 없었으나 새 검증은 stdlib unittest로 수행했다.
+`--moment-rounding subnormal-count`를 별도로 선택하면 원래 count gate가 실패한 경우에만 저장된 중량을 교정한다. 기본 `none`과 원래 통과한 결과는 그대로다. 양수 subnormal n, 수렴한 적합, 비음수 subnormal/0 노드 중량을 확인하고, 각 중량의 binary64 bit pattern을 η 단위 정수로 읽어 u128로 합한다. 목표와의 정수 차이 d를 가장 큰 기존 중량 하나에 더한다. 동률은 첫 index로 고정한다. 양수를 유지할 수 없거나 기존 count/energy gate 중 하나라도 통과하지 못하면 후보를 버리고 원래 오류를 반환한다.
+
+노드 위치와 다른 중량은 움직이지 않는다. 교정의 정확한 L1 크기는 |d|η다. 합을 정확히 맞추는 모든 교정은 삼각부등식에 의해 L1≥|d|η이므로 이 단일 중량 교정은 가능할 때 최소 L1이다. 선형 이산 응답 R=ΣK(q_i)z_i에 한해서
+
+\[
+|\Delta R|\le \max_i|K(q_i)|\,|d|\eta
+\]
+
+가 성립한다. 각 원래 저장값이 RN(np_i)이고 0≤p_i≤1이면
+
+\[
+|d|\eta\le n\left|\sum_i p_i-1\right|+\frac{M\eta}{2}
+\]
+
+로 정규화 오차와 저장 양자화를 나눌 수 있다. 이는 해당 이산 선형 응답의 조건부 경계이며 nonlinear chemistry 전체의 인증이 아니다. 큰 상대 오차가 모든 subnormal 입력에서 배제된다는 주장도 하지 않는다.
+
+포착된 첫 셀은 index1의 기존 중량에서 5η만 빼면 count defect가 0, energy defect가 4η가 되어 두 원래 gate를 통과했다. 새 합성·실제 셀·실패 유지 조건에 대한 3개 targeted tests와 독립 compiled fixture 검토가 통과했다. whole crate도 Rust1.94.1에서 컴파일했다.
+
+**이 교정을 넣은 새 로컬 time8은 6.849479431999498초 후 다시 exit1이었다.** 뒤의 다른 셀은 n=`6.149329425376e-312`, u=`1.04816159217743e-310`이고 count defect/tolerance는0/0, energy defect/tolerance는2η/η다. count가 이미 정확하므로 이 교정은 적용되지 않는다. 최초 보정의 성공을 time8 전체의 성공으로 표시하지 않는다. 저장된 통계는 FIRST_SUCCESS_ONLY이며 전체 보정 횟수·누적 경계는 확보하지 않았다.
+
+따라서 native time16/32는 계속 HOLD다. 추가 native 실행보다 count와 energy를 함께 만족시키는 저장 표현의 타당성을 먼저 연구해야 한다. 두 번째 실패를 없애기 위해 tolerance를 늘리거나 광자 tail을 제거하지 않았다. 새 age64 block-max 검사는 별도의 READY이며 native count 교정을 사용하지 않는다.
+
+## 5. 검증 및 게시 범위
+
+신규 targeted stdlib unittest는 photon 진단11, error control9, moment 진단3, subnormal count 교정3으로 **고유26개 PASS**다. 교정 이후 기존 moment 진단3도 다시 통과했지만 고유 개수에 중복 가산하지 않는다. 기존85 PASS +1 optional skip은 원격 이력을 재사용하며 이 전체 세트를 이번에 재실행했다고 주장하지 않는다. 초기 환경에서 Python3.12.14, NumPy2.3.5, SciPy1.17.0, C++17 g++13.3.0, Rust1.94.1의 실제 작동을 확인했다. pytest는 없었으나 새 검증은 stdlib unittest로 수행했다.
 
 독립 검토는 `evidence/independent_review_20261019/INDEPENDENT_REVIEW.json`에 범위와 SHA를 기록한다. 모델 요청 역할은 Astra가 과학 계약·판정·독립 검토, gpt-6.1-sol이 기계적 구현이다. 요청 모델과 별개인 실행 서비스 identity를 추정하여 적지 않는다.
 
@@ -132,3 +156,11 @@ F'(\lambda)=\operatorname{Var}_{p(\lambda)}\!\left(\frac{q-\mu}{s}\right)\ge0.
 - [Hairer 공식 software 안내](https://www.unige.ch/~hairer/software.html).
 
 owner checkout, PR150/R9 및 별도 BASS HHeD lane에는 변경을 적용하지 않는다. 현재 PR의 실제 parent 위에 이 연구 경로만 fast-forward로 게시한다.
+
+## 6. 실행 중 환경 초기화와 증거 복구의 한계
+
+후반 도구 재개 시 scratch 내용이 사라진 것을 실제 확인했다. 먼저 게시해 둔 C8 commit `e729adaf2a16064e95f6f5efc7e469f708b58559`와 살아 있는 connector 응답에서 A/B/C 코드·증거, native153 및 age64 raw70개를 복구했다. 223개 원자료의 Git blob identity를 모두 확인했다. D 코드5개와 fixture는 독립 검토자가 보유한 초기화 전 SHA256과 정확히 일치시켰다. 수치 캠페인을 반복해서 복구하지 않았다.
+
+D의 두 번째 셀 전체128노드, 원래 stderr 전체 byte, 원래 전체 result JSON, compiled binary와 전체 prepared identity는 복구되지 않았다. 당시 도구 출력과 독립 검토에서 실제 읽었던 수치·종료 상태는 `SUBNORMAL_COUNT_RESULT_RECOVERED_20261019.json` 및 별도 검토 기록으로 복원했지만 원본 byte와 같다고 주장하지 않는다. 해당 기록은 재실행 결과가 아니다. 초기화 후에는 rustc/cargo와 이전 compiler archive가 없어 즉시 재컴파일하지 않았다. NCP에서는 실제 compiler를 다시 확인하고 빌드한다.
+
+복구 범위: `evidence/SCRATCH_RESET_RECOVERY_20261019.json`. D의 원래 실행 receipt가 가리키는 미복구 파일은 이 복구 기록으로 해석해야 한다. C8/최종 ZIP에는 실제 존재하는 파일만 payload SHA로 열거한다. 이전 과학적 판정은 그대로 유지하며, 이 환경 초기화를 다음 세션의 자동 연결 blocker로 상속하지 않는다.

@@ -14,38 +14,52 @@
     "MOMENT_FIRST_FAILURE": "LOCAL_TIME8_6.436S_EXIT1; COUNT5ETA>TOL3ETA; ENERGY89ETA<=116ETA; INDEPENDENT_ORIGINAL_CELL_REPLAY",
     "AGE64_RAW_DIAGNOSIS": "70_BLOBS_VERIFIED;65_INTERVALS;EXACT_STORED_TERM_GATE_FAIL;FINAL_SUMMATION_ONLY_EXCLUDED",
     "BLOCK_ERROR_CONTROL": "OPT_IN_IMPLEMENTED; EXACT_ARITHMETIC_INEQUALITY_DERIVED;8_MANUFACTURED_RUNS_COMPLETE",
-    "INDEPENDENT_REVIEW": "PASS_SCOPED_A_B_C;RETURN_MODE_MISMATCH_REPAIRED"
+    "INDEPENDENT_REVIEW": "PASS_SCOPED_A_B_C;RETURN_MODE_MISMATCH_REPAIRED",
+    "C8_PUBLICATION": "e729adaf2a16064e95f6f5efc7e469f708b58559",
+    "C8_BACKUP": "DRIVE_AND_DROPBOX_UPLOAD_COMPLETE;LOCAL_SHA_CRC_95PAYLOADS_PASS;REMOTE_READBACK_NOT_RUN",
+    "SUBNORMAL_COUNT_CORRECTION": "OPT_IN_IMPLEMENTED_AND_REVIEWED;FIRST_CELL_GATES_PASS;LATER_ENERGY_ONLY_FAILURE_RETAINED",
+    "SCRATCH_RESET_RECOVERY": "D_SOURCE5_EXACT;NATIVE153_AGE64RAW70_EXACT;LATER_D_RAW_PARTIALLY_LOST_AND_LABELLED"
   },
   "new_targeted_tests": {
     "photon_diagnosis": 11,
     "error_control": 9,
     "moment_diagnostic": 3,
-    "total_pass": 23,
+    "total_pass": 26,
     "framework": "stdlib unittest",
-    "full_historical_suite_rerun": false
+    "full_historical_suite_rerun": false,
+    "subnormal_count": 3
   },
   "native_execution": {
     "spectral128": "REUSE_COMPLETE;HEI64_TO128_RELATIVE0.0026607786820587805;FINITE_NEIGHBOR_TARGET_ONLY",
     "age64_original": "REUSE_FAILED_FROZEN_PHOTON_GATE1.0081783527976493e-8>1e-8",
-    "age64_block_max": "NOT_RUN_READY_AFTER_SOURCE_PUBLICATION",
+    "age64_block_max": "NOT_RUN_READY",
     "time8_original_diagnostic": "LOCAL_FAILURE_REPRODUCED_DIAGNOSED",
-    "time16_time32": "NO_RETRY_UNTIL_SUBNORMAL_REPAIR_VALIDATED"
+    "time16_time32": "HOLD_UNTIL_COUNT_ENERGY_STORAGE_REPRESENTATION_VALIDATED",
+    "time8_subnormal_count": "LOCAL6.849479S_EXIT1;FIRST_COUNT_CELL_FIXED;LATER_ENERGY2ETA>TOL1ETA;NO_IDENTICAL_RETRY"
   },
   "next_ready": [
     {
       "id": "R_AGE64_BLOCK_MAX",
-      "state": "READY_AFTER_PUBLICATION",
-      "new_reason": "Opt-in DOP853 block controller tests ledger error dilution; fixed tolerances/gates and physics",
-      "case": "age64",
+      "state": "READY",
+      "new_reason": "New opt-in DOP853 block controller; original rtol/atol, physics and gates",
+      "command": "bash scripts/run_accuracy_followup.sh REPO NEW_SCRATCH age64-block-max",
+      "case_wall_s": 1800,
       "repeat_old_rms": false
     },
     {
-      "id": "R_SUBNORMAL_STORAGE_CORRECTION",
-      "state": "SANDBOX_RESEARCH_IN_PROGRESS",
-      "new_reason": "Exact smallest stored-mass correction of captured5eta count defect; must retain BOTH original gates",
-      "ncp_ready": false
+      "id": "R_NATIVE_COUNT_ENERGY_STORAGE",
+      "state": "THEORY_REQUIRED_BEFORE_NEW_NATIVE_CAMPAIGN",
+      "known_failure": "count0/tol0; energy2eta/tol1eta after first count repair",
+      "ncp_ready": false,
+      "missing_evidence": "Complete later-cell128-node/rawstderr lost after scratch reset; compact observed values retained"
     }
   ],
   "scientific_accuracy": "HOLD_AGE_AND_NATIVE_TIME;SPECTRAL_FINITE_NEIGHBOR_TARGET_MET_ONLY",
-  "production_scientific_admission": "NOT_ISSUED"
+  "production_scientific_admission": "NOT_ISSUED",
+  "runtime_after_scratch_reset": {
+    "rustc": "NOT_FOUND",
+    "cargo": "NOT_FOUND",
+    "ncp_current_access": "NOT_ESTABLISHED_THIS_SESSION",
+    "note": "Initial local compilation/tests completed before reset; re-probe future environments"
+  }
 }

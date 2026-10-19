@@ -10,6 +10,7 @@ from build_refined_sources import overlay, write_checked
 from run_refinement import sha, read_json
 from native_inputs import load_manifest
 from moment_fit_diagnostic import instrument, diagnostic_identity
+from subnormal_count_rounding import instrument_rounding, rounding_identity
 
 
 def safe_relative(name: str) -> str:
@@ -18,7 +19,10 @@ def safe_relative(name: str) -> str:
     return name
 
 def prepare(root: Path, dest: Path, archive: Path|None=None, repo: Path|None=None,
-            fetch_missing: bool=False, moment_diagnostics: bool=False) -> dict:
+            fetch_missing: bool=False, moment_diagnostics: bool=False,
+            moment_rounding: str='none') -> dict:
+    if moment_rounding not in ('none','subnormal-count'):
+        raise ValueError('MOMENT_ROUNDING_MODE')
     manifest=load_manifest(root,archive)
     for name, entry in read_json(root/'contracts/DONOR_IDENTITY.json').items():
         if sha(root/'donors/pr171'/name)!=entry['sha256']: raise ValueError('DONOR_FILE_SHA_MISMATCH: '+name)
@@ -33,6 +37,10 @@ def prepare(root: Path, dest: Path, archive: Path|None=None, repo: Path|None=Non
             raise ValueError('EXISTING_MOMENT_DIAGNOSTIC_MODE_CONFLICT')
         if moment_diagnostics and prior.get('moment_diagnostic_injection_sha256')!=diagnostic_identity():
             raise ValueError('EXISTING_MOMENT_DIAGNOSTIC_VERSION_CONFLICT')
+        if prior.get('moment_rounding','none')!=moment_rounding:
+            raise ValueError('EXISTING_MOMENT_ROUNDING_MODE_CONFLICT')
+        if moment_rounding!='none' and prior.get('moment_rounding_injection_sha256')!=rounding_identity():
+            raise ValueError('EXISTING_MOMENT_ROUNDING_VERSION_CONFLICT')
         for n,h in prior['outputs'].items():
             if not (dest/n).is_file() or sha(dest/n)!=h:
                 raise ValueError('EXISTING_PREPARED_FILE_CONFLICT: '+n)
@@ -70,7 +78,10 @@ def prepare(root: Path, dest: Path, archive: Path|None=None, repo: Path|None=Non
     p='rust/rei_microphysics/src/axbi_covariant_transport.rs'
     original=contents[p]
     suffix=(d/'prepared_node_accessor.rs').read_bytes()+(d/'positive_accessor.rs').read_bytes()
-    contents[p]=(instrument(original) if moment_diagnostics else original)+suffix
+    if moment_rounding=='subnormal-count':
+        contents[p]=instrument_rounding(original,moment_diagnostics)+suffix
+    else:
+        contents[p]=(instrument(original) if moment_diagnostics else original)+suffix
     contents['rust/rei_microphysics/examples/positive_native.rs']=native.encode()
     contents['rust/rei_microphysics/examples/matrix_owner.rs']=owner.read_bytes()
     contents['positive_solver_refined.py']=solver.encode()
@@ -82,6 +93,8 @@ def prepare(root: Path, dest: Path, archive: Path|None=None, repo: Path|None=Non
             'outputs':{n:hashlib.sha256(data).hexdigest() for n,data in sorted(contents.items())}}
     if moment_diagnostics:
         record.update(moment_diagnostics=True,moment_diagnostic_injection_sha256=diagnostic_identity())
+    if moment_rounding!='none':
+        record.update(moment_rounding=moment_rounding,moment_rounding_injection_sha256=rounding_identity())
     write_checked(completed,(json.dumps(record,indent=2,sort_keys=True)+'\n').encode())
     return record
 
@@ -90,7 +103,8 @@ def main():
     p.add_argument('--dest',type=Path,required=True);p.add_argument('--archive',type=Path)
     p.add_argument('--repo',type=Path);p.add_argument('--fetch-missing',action='store_true')
     p.add_argument('--moment-diagnostics',action='store_true')
+    p.add_argument('--moment-rounding',choices=('none','subnormal-count'),default='none')
     a=p.parse_args()
-    out=prepare(Path(__file__).resolve().parents[1],a.dest.resolve(),a.archive,a.repo,a.fetch_missing,a.moment_diagnostics)
+    out=prepare(Path(__file__).resolve().parents[1],a.dest.resolve(),a.archive,a.repo,a.fetch_missing,a.moment_diagnostics,a.moment_rounding)
     print(json.dumps({'status':'PREPARED_NOT_COMPILED','native_sha':out['native_sha'],'files':len(out['outputs'])}))
 if __name__=='__main__':main()
