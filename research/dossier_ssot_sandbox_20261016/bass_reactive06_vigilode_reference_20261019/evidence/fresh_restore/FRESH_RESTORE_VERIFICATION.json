@@ -1,0 +1,147 @@
+{
+  "schema": "rei.br06.fresh_restore.v1",
+  "created_utc": "2026-10-19T17:53:06.543313+00:00",
+  "source_files_verified": 143,
+  "vigilode_selected_files_verified": 477,
+  "registry_packages_verified": 99,
+  "registry_files_verified": 4944,
+  "work": "/workspace/scratch/996fc62899da/br06_recovery/fresh_restore_r1",
+  "empty_cargo_home": true,
+  "new_cargo_target": true,
+  "parent_reference_scope": "Exact step1 row subsets plus original source and donor; not the whole BR05 archive",
+  "mode": "verify",
+  "runs": [
+    {
+      "label": "PARENT_TESTS",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--all-targets"
+      ],
+      "cwd": "/workspace/scratch/996fc62899da/br06_recovery/fresh_restore_r1/parent/br05",
+      "started_utc": "2026-10-19T17:53:06.581223+00:00",
+      "timeout_s": 600,
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 63.871719718998065,
+      "stdout_sha256": "93764d5511248bd72855f9282a6e5420e2835514416f5149e04e3adf245447e2",
+      "stderr_sha256": "2708335d86470c52a65729b7d348969bcb0a7f22a04e9ecaa693dc1acb686265"
+    },
+    {
+      "label": "BR06_TESTS",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--all-targets"
+      ],
+      "cwd": "/workspace/scratch/996fc62899da/br06_recovery/fresh_restore_r1/br06",
+      "started_utc": "2026-10-19T17:54:10.453390+00:00",
+      "timeout_s": 600,
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 72.52871909599344,
+      "stdout_sha256": "967d08d7ba8050bd7b15d87615bc3eab85210869905d46416234e07a742b0a0b",
+      "stderr_sha256": "a7e3e0cfcf109d4a49202230bfbe64296cf6d2ab9fe0fd190cd438933fb139bc"
+    },
+    {
+      "label": "BR06_CLIPPY",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--offline",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/workspace/scratch/996fc62899da/br06_recovery/fresh_restore_r1/br06",
+      "started_utc": "2026-10-19T17:55:22.982741+00:00",
+      "timeout_s": 600,
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 45.93648172800022,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "beee5c6c79c9271d170e4f27f1efd8d7faa112db2279d855192472c66d7a629c"
+    },
+    {
+      "label": "PARENT_CLIPPY",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--offline",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/workspace/scratch/996fc62899da/br06_recovery/fresh_restore_r1/parent/br05",
+      "started_utc": "2026-10-19T17:56:08.919570+00:00",
+      "timeout_s": 600,
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 4.655694503991981,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "8bf1ec80d10b65d1664b4a410de12511433b657f4b022adf69ae6221cbbca072"
+    },
+    {
+      "label": "SMALL_REFERENCE",
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "--offline",
+        "--bin",
+        "br06_reference",
+        "--",
+        "run",
+        "SIGNED_MINUS",
+        "gauss",
+        "1",
+        "8",
+        "4",
+        "8",
+        "16",
+        "original",
+        "8",
+        "/workspace/scratch/996fc62899da/br06_recovery/fresh_restore_r1/small_reference"
+      ],
+      "cwd": "/workspace/scratch/996fc62899da/br06_recovery/fresh_restore_r1/br06",
+      "started_utc": "2026-10-19T17:56:13.575700+00:00",
+      "timeout_s": 600,
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 21.338572545995703,
+      "stdout_sha256": "bb3c0431d5057e16f05554519e36f1b65b6180d51537b1abfd8e31e5ff777f82",
+      "stderr_sha256": "b9f1cac9a42e2c1b6e956ccd6b4258f0fa33f92ef6958fd5fa39002e7942cd2c"
+    },
+    {
+      "label": "INDEPENDENT_REFERENCE",
+      "command": [
+        "python3",
+        "/workspace/scratch/996fc62899da/repo/research/dossier_ssot_sandbox_20261016/bass_reactive06_vigilode_reference_20261019/scripts/independent_birth_reference.py",
+        "--parent",
+        "/workspace/scratch/996fc62899da/br06_recovery/fresh_restore_r1/reference_parent",
+        "--orders",
+        "64:64:8,128:128:16",
+        "--output",
+        "/workspace/scratch/996fc62899da/br06_recovery/fresh_restore_r1/independent_reference"
+      ],
+      "cwd": "/workspace/scratch/996fc62899da/br06_recovery/fresh_restore_r1",
+      "started_utc": "2026-10-19T17:56:34.914932+00:00",
+      "timeout_s": 600,
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 19.438520858995616,
+      "stdout_sha256": "0f567f713a458eba2dbefa68e18093e2265fb779e886c367e45898f6d474570a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "status": "FRESH_OFFLINE_SOURCE_TEST_AND_REFERENCE_EXECUTIONS_PASSED",
+  "completed_utc": "2026-10-19T17:56:54.375833+00:00"
+}

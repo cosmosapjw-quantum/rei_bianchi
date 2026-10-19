@@ -1,0 +1,130 @@
+# VigilODE
+
+> **2026-10-18 production audit:** The latest packet and polynomial optimizations
+> remain research features. The LP10 certified-packet promotion and the Diffsol
+> headline performance/allocation claims are superseded by the
+> [production readiness audit](docs/reviews/20261018_production_audit/REPORT_KO.md)
+> and its [machine-readable decision](research/production_audit_20261018/DECISION.json).
+> Targeted correctness repairs are included on this audit branch; a complete
+> floating-point packet enclosure and an equivalent-work performance comparison
+> remain open. Existing problem-specific validation of the generic RODAS5P path
+> retains its original scope.
+
+**Causal, Budgeted Jacobian-Free Polyalgorithms for Stiff and Oscillatory ODEs**
+
+VigilODE is a research platform for generic stiff and oscillatory ordinary differential equations. The project studies evidence-gated polyalgorithm design that combines a protected matrix-free Rosenbrock path with guarded exponential-Rosenbrock candidates while preserving complete speculative-work accounting.
+
+## Current research scope
+
+The current program focuses on:
+
+- matrix-free, Jacobian-free stiff integration;
+- explicit-Jacobian-free and Newton-free fast-path candidates;
+- resumable Krylov / exponential-Rosenbrock stage prefixes;
+- causal regime telemetry and event-conditioned method admission;
+- tolerance-aware nonlinear-flow diagnostics;
+- transactional speculative-work budgets;
+- same-error, same-output, failure-preserving performance comparisons.
+
+Active method switching is treated as a research target rather than a completed production capability. Safety, fifth-order recovery after real switches, controller/cache transfer, and full same-error economics remain explicit validation gates.
+
+## Development policy
+
+Scientific claims are evidence-gated. Research branches retain failed, speculative, fallback, and diagnostic work in their ledgers. Comparator implementations are not silently tuned to improve headline results, and holdout problems are not used to retune core policy thresholds.
+
+## Scientific-validity boundary
+
+The internal BDF1/BDF2/RadauIIA1/RadauIIA3 solvers are reference implementations, not competitive production baselines. This is machine-checked: every fair-ab run row and G3 adaptive row they produce carries `comparator_fidelity = "reference-implementation-only"`, every front, attainment, or report that mixes them with production arms carries `comparative_reading = "forbidden"`, and the unified gates return `not-evaluated` rather than promote/hold for any relative comparison against such a reference (audit F-052/F-056 Tier B). Existing receipts support no comparison with RADAU5, CVODE, OrdinaryDiffEq, SciPy, or SUNDIALS. The synthetic stage-batch/parallel probe measures thread-pool and compute-bound overhead only; it does not predict memory-bandwidth-bound JVP scaling.
+
+`AcceptedSteps` and `InternalSteps` count accepted state-advancing substeps, not
+adaptive controller macro-attempts. Thus the explicit BDF startup and the Radau IIA1
+step-doubling path count their two retained half steps; their discarded coarse probe is
+not counted. Steady-state BDF1/BDF2 and embedded Radau IIA3 count one substep per
+accepted macro-step. Adaptive diagnostics separately expose accepted/rejected macro-step
+counts, so these axes must not be treated as interchangeable.
+
+The scientific-validity-v2 implementation is locally committed at
+`ab8fbcdb709aa1e87603b1ef6f83c5e610c8cb04`. Its source-bound canonical calibration
+completed all 54 cases without an execution failure, but all 54 rows were classified
+`output-policy-dominated`. The pass-only freeze was therefore not created and the sealed
+Oregonator holdout was not opened. External calibration retained 54 successful SciPy
+Radau records and 54 typed-unavailable CVODE records; it is not a complete production
+baseline. Consequently no v2 performance, scaling, ranking, equal-error, or publication
+claim is admitted. Legacy v3.5/v3.6/v3.7 receipts remain valid only under their original
+corpus, comparator, inner-solve, and output policies and are not transplantable to v2.
+
+## Run the existing solver as a library example
+
+With Rust 1.94.1 and normal Cargo registry access (or an already populated cache):
+
+```bash
+cargo run --locked -p rodas5p-integrators --no-default-features --example solve_stiff > solution.json
+```
+
+`examples/solve_stiff.rs` supplies its own RHS and analytic JVP for the
+nondimensional system `y' = (-y[0], -1000*y[1])`, `y(0)=(1,1)`, on `[0,1]`.
+It uses the existing adaptive, matrix-free sequential RODAS5P path with dense
+output. No assembled Jacobian, exact-solution callback, or audit2 backend is
+provided to the integrator. Change the RHS/JVP and initial state in that example
+to start a problem-specific integration; independently validate the new problem.
+
+JSON includes sampled states, completion status, diagnostics, and work counters.
+A partial solve emits its available states and work but exits nonzero. This
+exercises that behavior deliberately (expected exit code 1):
+
+```bash
+cargo run --locked -p rodas5p-integrators --no-default-features --example solve_stiff -- --max-attempts 1 > partial.json
+```
+
+The example has a predeclared absolute error check against its analytic solution;
+it is a narrow usage regression, not a general accuracy, performance, or release
+certificate. The legacy common-W correction still requires explicit W. Separate
+matrix-free common-W and reusable-diagonal transactional entries remain behind
+`audit2-research`; neither is enabled by this example or the default dispatcher.
+
+For the scoped research-on / default-solver checks, run
+`bash tools/check-audit2-readiness.sh`. Output files go to a new temporary
+directory unless `AUDIT2_OUTPUT_DIR` is supplied; existing output is not replaced.
+The historical A1 receipt workflow runs its frozen experiment checks only for
+explicit A1 work or changed A1 evidence; an unrelated PR is not a new A1 receipt.
+
+The non-default `audit2-bateman-authority` feature adds a single frozen
+four-state Bateman nuclear-decay client above the reusable transaction research
+substrate. Hosted checks validate its exact manifest, reference enclosure,
+canonical W identities, one-shot admission, and local-receipt validator without
+executing the six candidate scenarios. The actual fixed suite remains a
+host-only local handoff in
+`research/audit2_real_client_authority_construction_20260830/CODEX_START_HERE.md`.
+It is not a production client, default dispatch path, general real-client
+accuracy certificate, performance result, or holdout authorization.
+
+## Build reproducibility
+
+A normal fresh clone uses Cargo's default crates.io configuration:
+
+```bash
+cargo metadata --locked --format-version 1
+cargo test --workspace --all-targets --no-run --locked
+```
+
+No repository-external sibling directory is required by default. Network access is needed only when the pinned registry artifacts are not already present in the local Cargo cache.
+
+For air-gapped or deliberately offline development, create a standard Cargo vendor directory and opt in explicitly:
+
+```bash
+cargo vendor --locked /absolute/path/to/vendor
+bash ./tools/cargo-offline.sh \
+  --vendor-dir /absolute/path/to/vendor \
+  metadata --frozen --format-version 1
+bash ./tools/cargo-offline.sh \
+  --vendor-dir /absolute/path/to/vendor \
+  test --workspace --all-targets --no-run --frozen
+```
+
+`tools/cargo-offline.sh` accepts either `--vendor-dir PATH` or the `VIGILODE_CARGO_VENDOR_DIR` environment variable. The vendor directory must be a standard Cargo directory source created by `cargo vendor`; the wrapper validates its structure, uses an isolated temporary Cargo home with an absolute vendor path, and leaves `Cargo.toml`, `Cargo.lock`, and tracked Cargo configuration unchanged.
+
+The repository keeps `vendor/` untracked. `.cargo/config.offline.toml` is a documented template for users who prefer a repository-local `vendor/` directory and an explicit manual Cargo configuration.
+
+## License
+
+MIT
