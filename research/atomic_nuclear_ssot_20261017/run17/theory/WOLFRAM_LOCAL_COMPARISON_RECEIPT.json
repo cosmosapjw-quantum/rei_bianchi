@@ -1,0 +1,20 @@
+{
+  "schema": "rei.run17.symbolic-local-comparison.v1",
+  "input": "Clear[a,b,c,rq,rt,h,u0,v0]; M={{a,b},{c,0}}; rho={rq,rt}; Aug={{a,b,rq},{c,0,rt},{0,0,0}}; powerChecks=Table[Simplify[MatrixPower[Aug,j][[1;;2,1;;2]]==MatrixPower[M,j] && MatrixPower[Aug,j][[1;;2,3]]==MatrixPower[M,j-1].rho],{j,1,6}]; forcingCubic=Expand[Sum[h^j/Factorial[j] MatrixPower[M,j-1].rho,{j,1,3}]]; initialQuadratic=Expand[Sum[h^j/Factorial[j] MatrixPower[M,j].{u0,v0},{j,0,2}]]; nilpotentCheck=FullSimplify[MatrixExp[h (Aug/.{a->0,b->0,c->0})][[1;;2,3]]==h rho]; d=Sqrt[a^2+4 b c]; Eform=Exp[a h/2](Cosh[d h/2] IdentityMatrix[2]+2 Sinh[d h/2]/d (M-a/2 IdentityMatrix[2])); exponentialODE=FullSimplify[D[Eform,h]-M.Eform,Assumptions->Element[{a,b,c,h},Reals]&&b>=0&&c>=0&&a^2+4 b c>0]; <|\"augmentedPowerChecks1Through6\"->powerChecks,\"constantForcingCubic\"->forcingCubic,\"initialErrorQuadratic\"->initialQuadratic,\"zeroMatrixForcingCheck\"->nilpotentCheck,\"closedFormMatrixODECheck\"->exponentialODE,\"closedFormInitialCheck\"->FullSimplify[Eform/.h->0]|>",
+  "actual_result": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Symbol::undefined2: Warning: Global symbols \"M, Aug, Aug, M, Aug, M, M, M, Aug, Eform, M, Eform, M, Eform, Eform\" are undefined.\nGeneral::messages: Messages were generated which may indicate errors.\n\nOut[1]= <|\"augmentedPowerChecks1Through6\" -> {True, True, True, True, True, True}, \"constantForcingCubic\" -> {h*rq + (a*h^2*rq)/2 + (a^2*h^3*rq)/6 + (b*c*h^3*rq)/6 + (b*h^2*rt)/2 + (a*b*h^3*rt)/6, (c*h^2*rq)/2 + (a*c*h^3*rq)/6 + h*rt + (b*c*h^3*rt)/6}, \"initialErrorQuadratic\" -> {u0 + a*h*u0 + (a^2*h^2*u0)/2 + (b*c*h^2*u0)/2 + b*h*v0 + (a*b*h^2*v0)/2, c*h*u0 + (a*c*h^2*u0)/2 + v0 + (b*c*h^2*v0)/2}, \"zeroMatrixForcingCheck\" -> True, \"closedFormMatrixODECheck\" -> {{0, 0}, {0, 0}}, \"closedFormInitialCheck\" -> {{1, 0}, {0, 1}}|>"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  },
+  "interpretation": "All displayed finite power identities, matrix ODE/initial checks and zero-matrix forcing identity evaluated as expected. Preserve the tool's undefined-global-symbol precheck warning. This is a symbolic check of a conditional linear comparison, not a nonlinear tube certificate.",
+  "native_ivp_solves": 0
+}
+
