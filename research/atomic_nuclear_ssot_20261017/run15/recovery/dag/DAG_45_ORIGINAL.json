@@ -1,0 +1,1335 @@
+{
+  "schema": "rei.atomic_nuclear.sandbox.ssot.dag.v1",
+  "created_at_kst": "2026-10-17",
+  "scope": "planning overlay, not replacement of PR175 26-node or native PR150",
+  "roots": [
+    "A00"
+  ],
+  "nodes": [
+    {
+      "id": "A00",
+      "track": "AUTH",
+      "depends_on": [],
+      "resource_tier": "T0",
+      "title": "현재 repo/branch/PR과 두 원전의 권위 고정",
+      "physical_inputs": "GitHub PR150, PR151, PR175~183의 참조 SHA; 2026-10-14 두 원전 PDF, Dropbox/Drive 백업 식별자",
+      "derivation_contract": "원전의 물리 정의와 native 코드의 구현 권위를 구별한다. Git SHA1, ZIP SHA256, 파일 크기, 의미론적 동치 상태를 분리 기록한다.",
+      "implementation_contract": "source_manifest.json 및 공통 URL/파일 키 registry; 활성 production/source files write 금지.",
+      "validation_plan": "실제 Git ref GET과 SHA 위치검사; 샘플 파일 blob별 출처 검증; 각 링크 유효성.",
+      "acceptance_gate": "고정된 branch tip, source-owner, 원전 및 백업 인덱스가 충돌 없이 보존되고 누락 자료는 UNREAD로 표시.",
+      "stop_condition": "한 branch가 누적 PR과 비선형으로 갈라지거나 원전 내용 불일치 시 source adoption HOLD.",
+      "historical_links": [
+        "PR150",
+        "PR151",
+        "PR175",
+        "PR183",
+        "PDF_ATOMIC",
+        "PDF_MICRO"
+      ],
+      "priority": 0,
+      "status": "PARTIAL_READ_ONLY_INTAKE",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/A00/THEORY.md",
+        "evidence/A00/RUN.json",
+        "evidence/A00/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "A01",
+      "track": "AUTH",
+      "depends_on": [
+        "A00"
+      ],
+      "resource_tier": "T1",
+      "title": "과거 source·백업 내용 해시와 재현성 수집",
+      "physical_inputs": "C07 thermal CX/rate, FULL005, SOURCE012 static, R9 Unit7, 183 source ZIP, 우선순위 source manifest",
+      "derivation_contract": "동일 basename은 identity가 아니다. provider rev, Git tree/blob, local SHA256 및 독립원격 readback을 별도로 유지한다.",
+      "implementation_contract": "용량 작은 ZIP부터 선택적 수집·해시. 736MB git-bundle 및 대용량 NCP raw는 manifest-only; 조건부 staging.",
+      "validation_plan": "ZIP members hash/checklist; 복구 후 텍스트/binary object identity 비교. 미확인 경우 remote checksum verified로 기재 금지.",
+      "acceptance_gate": "다음 코드 변경에 사용되는 모든 실제 소스 bytes와 source-fit version이 확인되며 확인 못한 백업은 pending.",
+      "stop_condition": "검증 없는 출처 교체, large archive 무차별 추출, 원본 immutable archive 수정 중단.",
+      "historical_links": [
+        "DROP_C07",
+        "DRIVE_P183",
+        "PR151"
+      ],
+      "priority": 0,
+      "status": "READY_SCOPED_ARCHIVE_INTAKE",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/A01/THEORY.md",
+        "evidence/A01/RUN.json",
+        "evidence/A01/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "A02",
+      "track": "AUTH",
+      "depends_on": [
+        "A00"
+      ],
+      "resource_tier": "T0",
+      "title": "샌드박스 CPU·RAM·Rust/Python 실행 계약과 복구",
+      "physical_inputs": "실제 cgroup 4GiB RAM, 약 4 CPU quota; 사용자 Rust 1.94.1 오프라인 툴체인; RUSTCORE",
+      "derivation_contract": "샌드박스 한계와 수치 난제는 별개다. provider가 없으면 이론 불가능이 아니라 execution blocker다.",
+      "implementation_contract": "cargo --offline --locked; BUILD_JOBS=1; staged fixture; RSS/wall monitor; output/artifact hash; 실패 로그 append-only.",
+      "validation_plan": "rustc,cargo 실제 버전; standalone 12개 Rust smoke/fmt/clippy; cold restore mini cargo.",
+      "acceptance_gate": "사전 고정 tier가 cgroup 상한 이내이고 최소 smoke의 test/fmt/lint가 재실행 가능.",
+      "stop_condition": "네트워크 crate resolution, memory >4GiB, NCP/SSH 요구는 sandbox-only 작업에서 HOLD.",
+      "historical_links": [
+        "RUSTCORE",
+        "PR175"
+      ],
+      "priority": 0,
+      "status": "TOOLCHAIN_AND_MINI_RUST_VERIFIED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/A02/THEORY.md",
+        "evidence/A02/RUN.json",
+        "evidence/A02/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "A03",
+      "track": "AUTH",
+      "depends_on": [
+        "A00",
+        "A01",
+        "A02"
+      ],
+      "resource_tier": "T0",
+      "title": "26-node legacy DAG와 신규 micro/nuclear DAG 접합",
+      "physical_inputs": "PR175 RESEARCH_DAG.json, PR183 overlay, PR151 8-programme DAG, 외부 공급자 PR",
+      "derivation_contract": "작업 완료 기록은 source-specific scoped test일 뿐 stage promotion이 아니다. DAG는 역사 상태를 덮어쓰지 않는 별도 overlay다.",
+      "implementation_contract": "모든 새 노드의 upstream, planned evidence, stop/gate, aliases/crosswalk, owner, resource-tier를 JSON 및 MD로 생성.",
+      "validation_plan": "위상 정렬, orphan/중복/cycle 검사; PASS/HOLD/NOT_RUN 플래그 정책 검사.",
+      "acceptance_gate": "기존 26개 IDs 그대로 기록; 새 DAG acyclic; 두 branch의 claim gate 상호 종속 불명확성 제거.",
+      "stop_condition": "26-node master에 새 node statuses를 무비판적으로 덮어쓰기 금지.",
+      "historical_links": [
+        "PR175",
+        "PR183",
+        "PR151"
+      ],
+      "priority": 0,
+      "status": "PLAN_GENERATED_PENDING_SOURCE_INTAKE",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/A03/THEORY.md",
+        "evidence/A03/RUN.json",
+        "evidence/A03/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "M00",
+      "track": "MICRO",
+      "depends_on": [
+        "A03"
+      ],
+      "resource_tier": "T0",
+      "title": "17-state 핵종 벡터와 확장 상태 단일 Census",
+      "physical_inputs": "n,H,D,T,3He,4He,7Li 17상태 정의 및 6Li/7Be/전자·광자 extension",
+      "derivation_contract": "A-weighted baryon nB=ΣA nA와 Σq nAq 전자를 정의한다. 핵반응 ν와 단순 이온화 ν의 보존 열공간을 분리.",
+      "implementation_contract": "typed SpeciesId/StateIndex, q,A,mass, nucleus ownership, free-electron derived field; cm^-3↔m^-3 conversion.",
+      "validation_plan": "ν stoichiometry symbolic nullspace + Rust randomized abundance fixture; electron double-count regression.",
+      "acceptance_gate": "각 event wA^Tν=0 및 total charge + free e = const; zero-abundance safe.",
+      "stop_condition": "H_total이 H1 전체 동위원소까지 포함할 때 D 중복 가산 금지. 7Be 외부 state 이식은 donor 미일치 시 HOLD.",
+      "historical_links": [
+        "PDF_MICRO",
+        "PDF_ATOMIC",
+        "PR179"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/M00/THEORY.md",
+        "evidence/M00/RUN.json",
+        "evidence/M00/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "M01",
+      "track": "MICRO",
+      "depends_on": [
+        "A03"
+      ],
+      "resource_tier": "T1",
+      "title": "Grackle3.4.1·Verner·Savin rate ABI와 domain registry",
+      "physical_inputs": "PR150 실제 igm_rates/thermal/rate_table/atomic_provider, C07 and owner 15 Grackle channels",
+      "derivation_contract": "각 반응의 source formula, temperature/eV threshold, Case A/B branch, floor/cap/kink, 영점 및 직접 fallback 구간을 고정.",
+      "implementation_contract": "rate(x, source_id)->Result<value, typed domain error>; coefficients, temperature bounds, unit metadata, exact original source blob.",
+      "validation_plan": "source direct bitwise/relative parity at knots, either side of kink, and out-of-domain rejection.",
+      "acceptance_gate": "지원 domain에서 source identity 매치, structural zeros, kink masking, no silent extrapolation.",
+      "stop_condition": "원본 Grackle와 혼합된 임의 fit, 변환계수 누락, source-ID 없는 cache는 차단.",
+      "historical_links": [
+        "PR150",
+        "PR177",
+        "PR178",
+        "DROP_C07"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/M01/THEORY.md",
+        "evidence/M01/RUN.json",
+        "evidence/M01/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "M02",
+      "track": "MICRO",
+      "depends_on": [
+        "M00",
+        "M01"
+      ],
+      "resource_tier": "T1",
+      "title": "광이온화·재결합·충돌이온화 stoichiometric owner",
+      "physical_inputs": "H/He/DI σ(E), Grackle Case A, collision/RR, neutrino-photon 격리",
+      "derivation_contract": "Rr 단위 m^-3s^-1, νsr, 광자 event 하나당 한 absorber, CaseA escaped photon XOR CaseB OTS를 유도한다.",
+      "implementation_contract": "one_event_transaction typed PhotonLoss, Binding, PrimaryElectron, Thermal, Escape; charge/electron created exactly once.",
+      "validation_plan": "HI/HeI/HeII/DI 문턱 아래 zero; positivity; CaseA/B XOR; ∑absorbed=Nlost; source provenance.",
+      "acceptance_gate": "모든 플럭스와 ledger signed residual이 physical count/energy 척도에서 닫힘. event field 단위 명시.",
+      "stop_condition": "Case A recombination photon과 Case B local sink 동시 활성/unknown radiation energy이면 FAIL.",
+      "historical_links": [
+        "PDF_ATOMIC",
+        "PR181",
+        "PR182",
+        "PR150"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/M02/THEORY.md",
+        "evidence/M02/RUN.json",
+        "evidence/M02/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "M03",
+      "track": "MICRO",
+      "depends_on": [
+        "M00",
+        "M02"
+      ],
+      "resource_tier": "T1",
+      "title": "온도/입자수 의존 EOS와 homogeneous 팽창",
+      "physical_inputs": "n_s, q_s, H(t), material proper t, binding εs, He spectator thermal capacity",
+      "derivation_contract": "u_th=3/2 n_tot kB T; Tdot=-(2/3)ΘT-T R_ntot/n_tot+2 Qth/(3 kB n_tot), valid monatomic ideal gas common T.",
+      "implementation_contract": "fixed-volume & expanding single-temperature integrator with spectral external heating and native free-free/CMB only once.",
+      "validation_plan": "He spectator sweep, pure H/D limit, Θ=0, adiabatic Θ>0, electron charge variation, energy binding ledger.",
+      "acceptance_gate": "same-state energy and particle conservation; cm^-3 and K/eV/J consistent; derivation valid domain explicit.",
+      "stop_condition": "nonthermal/relativistic species or multiple temperatures require new EOS; no silent physical promotion.",
+      "historical_links": [
+        "PDF_MICRO",
+        "PDF_ATOMIC",
+        "PR179"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/M03/THEORY.md",
+        "evidence/M03/RUN.json",
+        "evidence/M03/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "M04",
+      "track": "MICRO",
+      "depends_on": [
+        "M01",
+        "M03"
+      ],
+      "resource_tier": "T1",
+      "title": "H+/D0 reversible thermal CX with isotope threshold",
+      "physical_inputs": "Savin2002 original k_forward/k_reverse within 2.7..2e5K; DAtomicProvider source-bound χD-χH",
+      "derivation_contract": "H+ + D0↔H0 + D+ ∆n=(+1,-1,-1,+1); ∆Ubind=∆χ ξ, ∆Uth=-∆χ ξ; He impacts Cv but is spectator.",
+      "implementation_contract": "original producer `AtomicRhs XOR ThermalSubstep` Rust opt-in; one source-labelled CX owner, reject second thermal event.",
+      "validation_plan": "pure H/D parity, 13-state He spectator 4×3×3 P1 cases, detailed-balance ratio versus equilibrium as separate diagnostic.",
+      "acceptance_gate": "event/energy closure, actual source χ used, Savin domain, full-step/two-half convergence for scoped state.",
+      "stop_condition": "Savin forward/reverse finite fit not forced to thermodynamic detailed balance without separate adopted model.",
+      "historical_links": [
+        "PR179",
+        "PR180",
+        "PR181"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/M04/THEORY.md",
+        "evidence/M04/RUN.json",
+        "evidence/M04/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "M05",
+      "track": "MICRO",
+      "depends_on": [
+        "M02"
+      ],
+      "resource_tier": "T1",
+      "title": "Case A/B 복사 탈출·온더스팟 XOR",
+      "physical_inputs": "Grackle native Case-A RR/DR; external H/He edge occupation; CaseB OTS assumptions",
+      "derivation_contract": "R_A와 R_B를 동일 species transition에 합산하지 않는다. photon birth/escape and cooling heat rows are disjoint.",
+      "implementation_contract": "Case-A native + source age escaped photon adapter; Case-B independent closure switch with provenance.",
+      "validation_plan": "no-source limit, escape reservoir, Saha equilibrium only under matched Planck, interval optical budget.",
+      "acceptance_gate": "각 선택에서 charge, photon, chemical, thermal identity; switch result conditional scope recorded.",
+      "stop_condition": "CaseB table not source-backed or active local escape duplicate => FAIL; no `CaseA=CaseB` assumption.",
+      "historical_links": [
+        "PDF_ATOMIC",
+        "PR150",
+        "HE25"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/M05/THEORY.md",
+        "evidence/M05/RUN.json",
+        "evidence/M05/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "M06",
+      "track": "MICRO",
+      "depends_on": [
+        "M03",
+        "M04",
+        "M05"
+      ],
+      "resource_tier": "T2",
+      "title": "stiff Jacobian와 rate derivative 안정성",
+      "physical_inputs": "rate_table scalar/SoA, ∂ln k/∂ln T source direct, coupled Gas RHS and EOS",
+      "derivation_contract": "Jacobian J=∂F/∂Y must include N_e(T,Y), Cv(Y), opacity derivative, photo channel energy and CX; smooth cells only.",
+      "implementation_contract": "SymPy/analytic JVP then f64 Rust direct derivative and dense small Newton; no automatic table derivative promotion.",
+      "validation_plan": "complex-step where differentiable; central difference multi-step; eigenvalue/condition number; kink masked.",
+      "acceptance_gate": "Newton residual and conservation stable at fixed tests; independently measured rate derivative error accepted.",
+      "stop_condition": "PR178 table derivative sample 6.571e-3 prohibits naive production Jacobian rate opt-in.",
+      "historical_links": [
+        "PR178",
+        "PR150"
+      ],
+      "priority": 2,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/M06/THEORY.md",
+        "evidence/M06/RUN.json",
+        "evidence/M06/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "M07",
+      "track": "MICRO",
+      "depends_on": [
+        "M01",
+        "M06"
+      ],
+      "resource_tier": "T1",
+      "title": "rate-table amortization and fail-closed conditional acceleration",
+      "physical_inputs": "C8 65,537 knots and C9/C10 matched-worker benchmark/opt-in policy",
+      "derivation_contract": "direct baseline and four-worker table compared with matched threads/input order; reject non-smooth derivative use.",
+      "implementation_contract": "benchmark runner >3 trials, ordered & shuffled states, memory limit; default direct remains authoritative.",
+      "validation_plan": "same worker count, same source cases, no cache cold-start concealment; ≥2 order scenarios.",
+      "acceptance_gate": "measured speedup conditional and prediction includes build cost; no full solver claim.",
+      "stop_condition": "ordered 1.608x median and shuffled1.371x historical are point-assembly not solver speedup.",
+      "historical_links": [
+        "PR177",
+        "PR178"
+      ],
+      "priority": 2,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/M07/THEORY.md",
+        "evidence/M07/RUN.json",
+        "evidence/M07/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "M08",
+      "track": "MICRO",
+      "depends_on": [
+        "A03"
+      ],
+      "resource_tier": "T1",
+      "title": "He excited-level, recombination and effective source response intake",
+      "physical_inputs": "BASS_HE HE25→HE27 native CaseA source-cut/birth-age supplier records",
+      "derivation_contract": "source/binding threshold/charge and low-density asymptotic domain; HE precision/Case A input uncertainty distinguished.",
+      "implementation_contract": "no-extrapolate HE independent response adapter; compact P(a,E,μ)/rate input contract; supplier SHA registry.",
+      "validation_plan": "compare threshold crossing and source cut geometry; preserve true child photon moments.",
+      "acceptance_gate": "only provider measured source domain and well-posed process-specific energy; no HE global transport claim.",
+      "stop_condition": "HE27 positive source-cut not universal continuum spectral convergence.",
+      "historical_links": [
+        "HE25",
+        "HE26",
+        "HE27"
+      ],
+      "priority": 2,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/M08/THEORY.md",
+        "evidence/M08/RUN.json",
+        "evidence/M08/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "M09",
+      "track": "MICRO",
+      "depends_on": [
+        "M01",
+        "M08",
+        "M05"
+      ],
+      "resource_tier": "T1",
+      "title": "Verner threshold 및 Li/He photo source에서 분광적 사건수",
+      "physical_inputs": "Verner H/He original; Li I 1s/2s original phfit2 64.39 eV; source E1+2gamma",
+      "derivation_contract": "σfit threshold vs χbinding vs photon bin boundaries separately; integral ∫φ(E)σ(E) dE and energy moments; moving cuts split.",
+      "implementation_contract": "adaptive threshold-split positive quadrature with strict source support; narrow structure not silently recovered.",
+      "validation_plan": "q4/8/16/32, independent adaptive quadrature per source, correct 1s heat E-64.39 eV.",
+      "acceptance_gate": "per-species event and energy q refinement, positivity, source-specific normalisation; no fixed 48-bin global claim.",
+      "stop_condition": "do not treat Verner smooth fit as resonance-resolved Li cross section.",
+      "historical_links": [
+        "PR151",
+        "PR183",
+        "HE26"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/M09/THEORY.md",
+        "evidence/M09/RUN.json",
+        "evidence/M09/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "M10",
+      "track": "MICRO",
+      "depends_on": [
+        "M03",
+        "M04",
+        "M09"
+      ],
+      "resource_tier": "T2",
+      "title": "H/He/D 한 시계에서 결합한 thermal chemistry",
+      "physical_inputs": "PR150 immutable native 10+ source modules, P1/P2/P3 code, source-cohort interface",
+      "derivation_contract": "du/dt = heating-cooling-work-binding and dn/dt+Θn=νR; one electron, FF, CMB, photo, CX owner.",
+      "implementation_contract": "source-locked native opt-in Rust stepper; common proper seconds; transactional rollback; first-order vs second-order split declared.",
+      "validation_plan": "PR181 45-manufactured and PR182 N8/16/32/64 replays only changed cases; full-time refinement separately.",
+      "acceptance_gate": "no owner duplication; physical source labels exact; conditional fixed-volume/FLRW target gates.",
+      "stop_condition": "full EoR claim forbidden without PH/COS refinement and native source-on Bianchi donor.",
+      "historical_links": [
+        "PR181",
+        "PR182",
+        "PR183"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/M10/THEORY.md",
+        "evidence/M10/RUN.json",
+        "evidence/M10/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "P00",
+      "track": "PHOTON",
+      "depends_on": [
+        "A03"
+      ],
+      "resource_tier": "T0",
+      "title": "birth source clock의 positive Duhamel kernel",
+      "physical_inputs": "PR183 P4/S1 Python oracle, PR182 Rust P3 birth problem; fixed dt and κ",
+      "derivation_contract": "N1=N0e^-τ+jh Φ(τ), Φ=(1-e^-τ)/τ; initial photons vs newborn exposure must differ.",
+      "implementation_contract": "Rust source-native per-birth cohort callback with phi/expm1/series and typed invalid domain; first standalone reference in code/src/lib.rs.",
+      "validation_plan": "τ→0, τ≫1, j=0, κ=0 and 12 manufactured smoke; DOP853 smooth time grid N16→128.",
+      "acceptance_gate": "survivor/event/energy inventory roundoff within condition-scaled tolerance, manufactured temporal order ~2 for smooth data only.",
+      "stop_condition": "P3 newborn full dt absorption is a known source-clock defect; this new standalone smoke is not linked to owner.",
+      "historical_links": [
+        "PR183",
+        "PR182",
+        "PR175"
+      ],
+      "priority": 0,
+      "status": "MINI_MANUFACTURED_SMOKE_VERIFIED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/P00/THEORY.md",
+        "evidence/P00/RUN.json",
+        "evidence/P00/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "P01",
+      "track": "PHOTON",
+      "depends_on": [
+        "P00",
+        "M01"
+      ],
+      "resource_tier": "T1",
+      "title": "source-birth time integral with evolving κ(t,E)",
+      "physical_inputs": "actual source-age per-cohort photons and original opacity callback, source law j(t)",
+      "derivation_contract": "N1=N0exp(-∫κ)+∫j(tb) exp(-∫tb^tκ)dtb; κ depends on photon redshift/absorber, not global total population only.",
+      "implementation_contract": "adaptive positive cohort slabs, fast expm1, registered birth proper time/energy/direction, reject out-of-support.",
+      "validation_plan": "exact piecewise constant/affine κ cases, DOP853 external independent oracle, source pulse and extinction layer.",
+      "acceptance_gate": "isolated age/time error table with true within-step births; monotone photon survival and exact owner ledger.",
+      "stop_condition": "no unverified uniform-midpoint birth in time-varying Bianchi; full non-linear feedback not yet present.",
+      "historical_links": [
+        "PR183",
+        "HE25",
+        "CR21D"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/P01/THEORY.md",
+        "evidence/P01/RUN.json",
+        "evidence/P01/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "P02",
+      "track": "PHOTON",
+      "depends_on": [
+        "P01",
+        "M09"
+      ],
+      "resource_tier": "T1",
+      "title": "D photo-edge와 moving source spectral support",
+      "physical_inputs": "MD14 BB50k 48 cell mean/GL8 original, H fixture χH 13.598434599702eV, manufactured χD 13.602134599702eV, Verner Eth=13.6eV",
+      "derivation_contract": "photo-fit threshold, true atomic binding, energy group support and redshifted moving-cut preimage are separate.",
+      "implementation_contract": "per species positive Gaussian spectral subcells, explicit threshold split; true support 13.6..100eV; array moment ownership.",
+      "validation_plan": "q4/8/16/32 edge split, boundary ±ULP, no 100eV-tail extrapolation, sampling independent high-order.",
+      "acceptance_gate": "per-edge species event/heat controlled under same source+gas; report continuous error bound only if curvature certified.",
+      "stop_condition": "P4 frozen spectral 5.63e-14 convergence does not grant source-on spectral or angle convergence.",
+      "historical_links": [
+        "PR183",
+        "HE26",
+        "PR177"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/P02/THEORY.md",
+        "evidence/P02/RUN.json",
+        "evidence/P02/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "P03",
+      "track": "PHOTON",
+      "depends_on": [
+        "P02"
+      ],
+      "resource_tier": "T2",
+      "title": "positive source-age integration and conservative compression",
+      "physical_inputs": "384 original owner cells and retained 64-bin compression; matched donor and gas clock",
+      "derivation_contract": "positive hazard competition; ψ(u) spectral compression exact only with frozen E/source, otherwise no exact closure.",
+      "implementation_contract": "state-dependent adaptive merge/split of cohort only if spectral/absorber heat moments and age error certified.",
+      "validation_plan": "N8/16/32/64 age; 48means vs q; newborn clock on/off; same gas evolution, no inflated crosstalk.",
+      "acceptance_gate": "time/age/spectral errors individually evaluated for each absorber and survivor; compression accepted only for target observables.",
+      "stop_condition": "P3 survivor N difference1.25484% between 48means/64proj despite species event <0.5%.",
+      "historical_links": [
+        "PR182",
+        "PR183",
+        "PR171"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/P03/THEORY.md",
+        "evidence/P03/RUN.json",
+        "evidence/P03/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "P04",
+      "track": "PHOTON",
+      "depends_on": [
+        "A03"
+      ],
+      "resource_tier": "T1",
+      "title": "Bianchi-I/FLRW exact Killing ray, angle Jacobian",
+      "physical_inputs": "a_i(t), signed s, observer t; fixed metric signature and proper time",
+      "derivation_contract": "R_i=a_i(t0)/a_i(t1); E1/E0=sqrt(Σ(e_i R_i)^2); e_i1=e_i R_i/rE, JΩ=(ΠR_i)/rE^3. Σ=√3|s|/H separately.",
+      "implementation_contract": "reference Killing characteristic with signed off-shell shear and FLRW s=0; finite tilt current later.",
+      "validation_plan": "unit direction, isotropic sky integrals, Liouville occupation, time-reversal group property, s→0 limit.",
+      "acceptance_gate": "exact collisionless map and sampled angular Jacobian; no assumption of on-shell Einstein shear.",
+      "stop_condition": "off-shell ±0.08H cannot be marketed as physical anisotropic EoR detection.",
+      "historical_links": [
+        "PR175",
+        "PR182",
+        "PDF_MICRO"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/P04/THEORY.md",
+        "evidence/P04/RUN.json",
+        "evidence/P04/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "P05",
+      "track": "PHOTON",
+      "depends_on": [
+        "P04",
+        "P02"
+      ],
+      "resource_tier": "T2",
+      "title": "threshold-dependent Bianchi angular cubature",
+      "physical_inputs": "GL8/16/32 source angles, moving χ/G cut, source mean bins",
+      "derivation_contract": "angle and energy cannot in general be separated at moving spectral threshold; endpoint and cusp quadrature need splitting.",
+      "implementation_contract": "angular patch splitting by root μcut and photon birth-energy cut; per direction threshold-aware integrator.",
+      "validation_plan": "signed ± shear, GL8/16/32/64, spherical symmetry exact, monotonic bounds not inferred from only adjacent pair.",
+      "acceptance_gate": "per-species photon and deposited-heat angular convergence on same energy/time grids.",
+      "stop_condition": "PR183 GL8/16 nonmonotone vs GL32; angle admission HOLD.",
+      "historical_links": [
+        "PR183",
+        "HE26",
+        "PR175"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/P05/THEORY.md",
+        "evidence/P05/RUN.json",
+        "evidence/P05/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "P06",
+      "track": "PHOTON",
+      "depends_on": [
+        "P03",
+        "P05",
+        "M10"
+      ],
+      "resource_tier": "T2",
+      "title": "native H/He/D photon/gas shared-clock integration",
+      "physical_inputs": "verified original Grackle/Verner/Savin source modules, MD14 producer, Bianchi Killing ray, central EOS",
+      "derivation_contract": "coupled du, dn, N photon and redshift/work on identical proper-time cells; birth, absorption, gas expansion and feedback one event clock.",
+      "implementation_contract": "opt-in single owner external adapter restoring immutable original producer source snapshot; no PR150 overwrite.",
+      "validation_plan": "one interval FLRW reference then small LRS BI, per-absorber/thermal redshift work, time split p measured.",
+      "acceptance_gate": "actual Rust build + source-identity, all ledgers, independently matched reference and positive complete interval.",
+      "stop_condition": "if source mismatch/no real donor, downgrade to manufactured and hold source-on cosmology.",
+      "historical_links": [
+        "PR150",
+        "PR182",
+        "PR183",
+        "HE25"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/P06/THEORY.md",
+        "evidence/P06/RUN.json",
+        "evidence/P06/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "P07",
+      "track": "PHOTON",
+      "depends_on": [
+        "P06"
+      ],
+      "resource_tier": "T3",
+      "title": "독립 time-age-spectrum-angle refinement 분리",
+      "physical_inputs": "same source/IC/model and frozen physical clock, N/Q/angle/spectral basis",
+      "derivation_contract": "finite adjacent differences vs actual continuum error bound distinct; coupled error needs amplification/stability bound.",
+      "implementation_contract": "factorial sparse refinement time, age, energy, angle, nonthermal tolerance; store reference and time/RSS.",
+      "validation_plan": "time 32→64→128; age 16→32→64; frequency threshold split 8→16→32; GL8→16→32 on matched inputs.",
+      "acceptance_gate": "species event, survivor, heat, T and electron history all have axis-separated residual; no tolerance tightening after observing results.",
+      "stop_condition": "historical #171 age16→32 90.13% and HeI transport32→64 0.7497% vs target0.5% remain failures.",
+      "historical_links": [
+        "PR171",
+        "PR183",
+        "PR175"
+      ],
+      "priority": 2,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/P07/THEORY.md",
+        "evidence/P07/RUN.json",
+        "evidence/P07/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "Q00",
+      "track": "ATOM",
+      "depends_on": [
+        "A03"
+      ],
+      "resource_tier": "T1",
+      "title": "hydrogenic finite-mass E1 원자선·cascade baseline",
+      "physical_inputs": "µ=me M/(me+M), qeff=e(M+Zme)/(M+me), LiIII and hydrogen-like states",
+      "derivation_contract": "A∝qeff² ω³ |I|² angular average; internal finite-mass scaling, spin spectator; finite-time Markov cascade vs eventual yields.",
+      "implementation_contract": "standalone SymPy/mpmath radial Gauss-Laguerre and Rust sparse level transition solver; no correlated LiI usage.",
+      "validation_plan": "analytic 2p→1s, 3p→2s branching, ∑daughter rate/line count and delay moments; units s^-1.",
+      "acceptance_gate": "numeric quadrature vs finite polynomial exact identity; no high-n finite-precision exactness claim.",
+      "stop_condition": "LiI and neutral He cannot be modeled by one-electron hydrogenic E1 without separate many-body data.",
+      "historical_links": [
+        "PDF_ATOMIC",
+        "PR151"
+      ],
+      "priority": 2,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/Q00/THEORY.md",
+        "evidence/Q00/RUN.json",
+        "evidence/Q00/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "Q01",
+      "track": "ATOM",
+      "depends_on": [
+        "Q00"
+      ],
+      "resource_tier": "T1",
+      "title": "Stobbe/Milne continuum detailed balance and thermal moments",
+      "physical_inputs": "hydrogenic one-electron ground state, Coulomb infinite nuclear mass approximation",
+      "derivation_contract": "σPI(E) Stobbe, σRR(v)=2(E/(me c v))²σPI and Maxwell integrals α(T), Λ(T), exact positive energy moments; specify spin conventions.",
+      "implementation_contract": "mpmath energy quadrature threshold split, log-domain Planck balance reference; target model no provider replacement.",
+      "validation_plan": "T grid and hydrogenic Z scaling αZ(T)=Z α1(T/Z²), ΛZ=Z³ Λ1(T/Z²), dimensions SI.",
+      "acceptance_gate": "PI and RR match Milne/Planck equilibrium at matched physics; energy partition energy positive.",
+      "stop_condition": "level-specific α1s is not total Case A or Case B recombination coefficient.",
+      "historical_links": [
+        "PDF_ATOMIC",
+        "GRACKLE"
+      ],
+      "priority": 2,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/Q01/THEORY.md",
+        "evidence/Q01/RUN.json",
+        "evidence/Q01/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "Q02",
+      "track": "ATOM",
+      "depends_on": [
+        "Q00",
+        "M09"
+      ],
+      "resource_tier": "T1",
+      "title": "LiI 1s/2s inner-shell 및 6608 E1 lines 검증 재사용",
+      "physical_inputs": "R9 Unit7 A1+A2 raw source and Verner phfit2 file SHA; true E1 line 6608 & 2gamma continuum",
+      "derivation_contract": "per-shell Γs=∫Sσs and E/heat moments; 1s threshold64.39eV and 2s5.392eV not same heat.",
+      "implementation_contract": "source-locked 1440 row response reader + shell-level quadrature check, no re-run unless changed source.",
+      "validation_plan": "preserved A1 9 checks, A2 8 checks and 6608-line sum; independent source totals vs stored receipts.",
+      "acceptance_gate": "reuse saved PASS_SCOPED without turning spectrum-weighted direct primary heat into full IGM deposited heat.",
+      "stop_condition": "Auger, final Li charge, resonances/secondary losses remain pending.",
+      "historical_links": [
+        "PR151",
+        "PDF_ATOMIC"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/Q02/THEORY.md",
+        "evidence/Q02/RUN.json",
+        "evidence/Q02/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "Q03",
+      "track": "ATOM",
+      "depends_on": [
+        "Q01",
+        "Q02"
+      ],
+      "resource_tier": "T3",
+      "title": "Li bound-continuum correlated many-electron response",
+      "physical_inputs": "PR151 R9 T1/T2 saved finite-model FCI and projected-response/TRK diagnostics, 92-orbital Be+ complement",
+      "derivation_contract": "finite Hamiltonian discrete moment measures differ from energy-normalized outgoing physical channels; TRK and continuum tail separately controlled.",
+      "implementation_contract": "source-pinned sparse response/moment reader, reduced basis-once Krylov; retain Hermiticity and spectral positivity.",
+      "validation_plan": "moment sum rules, norm conservation, basis cutoff changes, outgoing Coulomb asymptote for future exclusive σ.",
+      "acceptance_gate": "only finite Galerkin spectral moment checks admitted without continuum/outgoing normalization.",
+      "stop_condition": "no claim of exclusive ionization fraction from projected Q-state.",
+      "historical_links": [
+        "PR151",
+        "PDF_ATOMIC"
+      ],
+      "priority": 3,
+      "status": "HOLD_BASIS_OR_HARDWARE",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/Q03/THEORY.md",
+        "evidence/Q03/RUN.json",
+        "evidence/Q03/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "Q04",
+      "track": "ATOM",
+      "depends_on": [
+        "Q03"
+      ],
+      "resource_tier": "TH",
+      "title": "molecular low-T radial scattering and reaction coefficients",
+      "physical_inputs": "PR151 T3 BO potentials/dipoles, WU088_HH PHYS62 finite-Born Coulomb spectator",
+      "derivation_contract": "positive-energy physical outgoing coupled channels, scattering amplitude and Maxwellian rate need radial/electronic coupled uncertainties.",
+      "implementation_contract": "derive cheap Born/basis asymptotic benchmarks in Python; full multi-channel radial integration deferred without resource headroom.",
+      "validation_plan": "energy/partial-wave/angular truncations and resonance sampling independently; threshold Wigner law.",
+      "acceptance_gate": "only scoped Born/theory may pass here; full HH physical scattering rate remains HOLD.",
+      "stop_condition": "WU088 PHYS62 PR108 fixed-partial-wave Abel limit not a complete physical rate.",
+      "historical_links": [
+        "PR151",
+        "WU088_PR108"
+      ],
+      "priority": 3,
+      "status": "HOLD_HIGH_RESOURCE_OR_SOURCE",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/Q04/THEORY.md",
+        "evidence/Q04/RUN.json",
+        "evidence/Q04/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "N00",
+      "track": "NUCLEAR",
+      "depends_on": [
+        "A03",
+        "M00"
+      ],
+      "resource_tier": "T0",
+      "title": "BBN 59 nuclei donor + 17 ion baseline inventory",
+      "physical_inputs": "PR151 donor composition, rec_bianchi splice, isotope nuclear masses/half-lives, rate conventions",
+      "derivation_contract": "BBN initial abundance vs ionization state; nuclear A and q conservation, radioactive decay lepton/gamma ledger distinct.",
+      "implementation_contract": "source pin donor mass vs number fractions and 59-species normalization. 7Be and direct Li7 distinct.",
+      "validation_plan": "donor electron 0.8765521884/nb consistency under saved input, non-overlap initial charge basis.",
+      "acceptance_gate": "initial source census exactly reproducible; ion/electron scalar correct in proper time and volume.",
+      "stop_condition": "donor cosmology is not automatically identical to PR150 z20/4 source cosmology.",
+      "historical_links": [
+        "PR151",
+        "REC_BIANCHI"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/N00/THEORY.md",
+        "evidence/N00/RUN.json",
+        "evidence/N00/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "N01",
+      "track": "NUCLEAR",
+      "depends_on": [
+        "N00"
+      ],
+      "resource_tier": "T1",
+      "title": "early Be7 4+/3+/Li3+ positive kinetics replay",
+      "physical_inputs": "R9 Unit7 saved Khatri-Sunyaev recomb/photo/EC rate, donor h=0.7 Ωm=0.3 Neff=3.0439773",
+      "derivation_contract": "x4dot=-rx4+βx3; x3dot=rx4-(β+λ)x3; Fdot=λx3; hydrogenlike half-life106.4d, not neutral 53.29d.",
+      "implementation_contract": "replay source-locked lightweight 2-state matrix propagator; stable slow eigenvalue; independent Radau for limited samples.",
+      "validation_plan": "z50=29307.17654 historical, conservation, λ units, zmax=1e5→1e4, start-tail bound.",
+      "acceptance_gate": "pass historical donor-specific conversion only after input bytes parity; not a complete recombination model.",
+      "stop_condition": "fixed ne bath and source equilibrium approximation; not a z20→4 integrated isotope history.",
+      "historical_links": [
+        "PR151",
+        "KHS_2010"
+      ],
+      "priority": 1,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/N01/THEORY.md",
+        "evidence/N01/RUN.json",
+        "evidence/N01/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "N02",
+      "track": "NUCLEAR",
+      "depends_on": [
+        "N01"
+      ],
+      "resource_tier": "T1",
+      "title": "Be7 EC neutrino doublet, daughter recoil/gamma source",
+      "physical_inputs": "R9 Unit7 actual F(z), branches 0.896/0.104, Eν emitted 861800/384200eV",
+      "derivation_contract": "nν(E)=nb0YBe7 bj[-F′(z)] Ej/E², z=Ej/E−1; gamma source and recoil distinct, electron bath evolution explicit.",
+      "implementation_contract": "bin-integrated redshifted positive spectrum and moments, stage-resolved daughter injection, energy ledger.",
+      "validation_plan": "number and first energy moment vs direct quadrature, ratio near historical0.1043% independent profile check.",
+      "acceptance_gate": "finite-bin normalization preserves Be7 decay count; no automatic heat deposition for neutrinos or γ.",
+      "stop_condition": "real daughter charge migration and hard γ absorption require later transport.",
+      "historical_links": [
+        "PR151",
+        "KHS_2010"
+      ],
+      "priority": 2,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/N02/THEORY.md",
+        "evidence/N02/RUN.json",
+        "evidence/N02/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "N03",
+      "track": "NUCLEAR",
+      "depends_on": [
+        "N02",
+        "Q03"
+      ],
+      "resource_tier": "TH",
+      "title": "92-orbital Be+ daughter complement 64→128 physical refinement",
+      "physical_inputs": "R9 Unit4 saved X/AO order/H, partial Lanczos 16/32/64 and finite Q=I-|g><g| subspace",
+      "derivation_contract": "K=Q(H-E0)Q and q=Q|i>; quadrature gives finite-space spectral measure not continuum exclusive probability.",
+      "implementation_contract": "verify saved q,H first moments and residuals without Hamiltonian rerun; full 128 Krylov requires HPC 12threads 24GiB 7200s (prohibited in this thread).",
+      "validation_plan": "orthogonality leakage, Ritz residual, moments, 32→64→128 broadening; require actual execution evidence.",
+      "acceptance_gate": "in current sandbox metadata/theory only; claim HOLD_EXTERNAL_128 until measured source-compatible output.",
+      "stop_condition": "resource 24GiB exceeds 4GiB sandbox; do not run local/NCP by user restriction.",
+      "historical_links": [
+        "PR151",
+        "DRIVE_R9_HANDOFF"
+      ],
+      "priority": 3,
+      "status": "BLOCKED_RESOURCE_AND_EXTERNAL_INPUT",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/N03/THEORY.md",
+        "evidence/N03/RUN.json",
+        "evidence/N03/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "N04",
+      "track": "NUCLEAR",
+      "depends_on": [
+        "N00"
+      ],
+      "resource_tier": "T1",
+      "title": "BBN thermonuclear capture↔photodisintegration uncertainty",
+      "physical_inputs": "reaction tables and uncertainties with nuclear excited/thermal target occupations",
+      "derivation_contract": "reciprocity including statistical weights, Q threshold, thermal target motion; invert cross section only in specified equilibrium regime.",
+      "implementation_contract": "lightweight rates and covariance/finite-difference sensitivity; no novel nuclear amplitudes inserted.",
+      "validation_plan": "detailed-balance SI prefactor; nuclear A/charge sum, normalized covariance PSD and truncated thermal tail.",
+      "acceptance_gate": "propagate source-uncertainty as model input separate from numerical integration error.",
+      "stop_condition": "absence of original nuclear likelihood/covariance => uncertainty UNRESOLVED, never set zero.",
+      "historical_links": [
+        "PDF_ATOMIC",
+        "PR151"
+      ],
+      "priority": 2,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/N04/THEORY.md",
+        "evidence/N04/RUN.json",
+        "evidence/N04/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "N05",
+      "track": "NUCLEAR",
+      "depends_on": [
+        "N01",
+        "Q02"
+      ],
+      "resource_tier": "T2",
+      "title": "Be7 이후 Li7 charge-state 및 spectral relaxation",
+      "physical_inputs": "R9 Unit7 early F(z), direct BBN Li7 donor, Li E1+2gamma, PI/CI/RR/CE fit",
+      "derivation_contract": "daughter creation time and initial charge state must follow EC events; no instantaneous neutral Li assumption.",
+      "implementation_contract": "positive charge-transition master equation across early to z20, sparse matrix exponential/Radau comparison.",
+      "validation_plan": "nuclear Li7 nuclei = direct donor + integrated Be7 decay, population count and delayed photons ledger.",
+      "acceptance_gate": "charge curves and delay spectra conditional on justified temperature/source; unit consistency and positivity.",
+      "stop_condition": "missing Li-specific correlated rates cannot be silently substituted by H or C+.",
+      "historical_links": [
+        "PR151",
+        "PDF_ATOMIC"
+      ],
+      "priority": 2,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/N05/THEORY.md",
+        "evidence/N05/RUN.json",
+        "evidence/N05/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "N06",
+      "track": "NUCLEAR",
+      "depends_on": [
+        "N05",
+        "N04",
+        "M10"
+      ],
+      "resource_tier": "T3",
+      "title": "17+ ion state coupled native chemistry bridge",
+      "physical_inputs": "13 state H/He/D native, T/3He/4He/6,7Li extension and 7Be, source owner mapping",
+      "derivation_contract": "∑A A n_A expansion and each photon/charge/reaction under one ledger, decay daughters injection and trace approximation validity.",
+      "implementation_contract": "optional extensions separate from canonical 13 state. Rust sparse stoich network and tests before source-age bi coupling.",
+      "validation_plan": "zero trace limit HHeD parity, Be7 daughter conservation, e- production and ion charge, positivity.",
+      "acceptance_gate": "measured native charge histories with error/refinement and explicit absent-rate markers.",
+      "stop_condition": "missing nuclide-specific source or nonthermal closure => hold extension only, baseline HHeD remains usable.",
+      "historical_links": [
+        "PR151",
+        "PR175",
+        "PR181"
+      ],
+      "priority": 3,
+      "status": "HOLD_SOURCE_COMPLETENESS",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/N06/THEORY.md",
+        "evidence/N06/RUN.json",
+        "evidence/N06/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "E00",
+      "track": "ELECTRON",
+      "depends_on": [
+        "M02",
+        "Q01"
+      ],
+      "resource_tier": "T2",
+      "title": "primary electron vs nonthermal secondary state owner",
+      "physical_inputs": "photoelectron spectrum, original impact ionization σ, free-electron kinetic energy population",
+      "derivation_contract": "primary E-χ not automatically instantaneous gas heat; kinetic f_e(t,E,Ω) and delayed deposition with conserved charge/current.",
+      "implementation_contract": "minimal positive multi-bin electron energy map; initial photoelectron source and continuous slowing-down approximation optional.",
+      "validation_plan": "number/energy moments, no double primary or secondary ionization, no spurious heat from threshold process.",
+      "acceptance_gate": "event source specific kinetic energy ledger; no full cosmological thermalization claim.",
+      "stop_condition": "unverified collision operator or electron rest frame => hold physically interpreted heating.",
+      "historical_links": [
+        "PDF_ATOMIC",
+        "PR151"
+      ],
+      "priority": 2,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/E00/THEORY.md",
+        "evidence/E00/RUN.json",
+        "evidence/E00/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "E01",
+      "track": "ELECTRON",
+      "depends_on": [
+        "E00"
+      ],
+      "resource_tier": "T2",
+      "title": "nonthermal electron thermalization jumps/positive kernel",
+      "physical_inputs": "BASS dossier ch5 positive collision evolution, thermalization front, finite error bounds",
+      "derivation_contract": "positive semigroup and event root/stopping, thermal distribution as derived transfer of count, energy, stress and current.",
+      "implementation_contract": "sparse upwind/Markov and simple manufactured exact kernel; event bracket crossing, no negative clipping.",
+      "validation_plan": "nonthermal+thermal count, energy, stress; step convergence near kink separately from smooth p=2.",
+      "acceptance_gate": "only specified model positive kernel and finite observation error bound pass.",
+      "stop_condition": "front may create finite derivative jump; smooth interpolation across event not admitted.",
+      "historical_links": [
+        "PDF_ATOMIC"
+      ],
+      "priority": 3,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/E01/THEORY.md",
+        "evidence/E01/RUN.json",
+        "evidence/E01/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "E02",
+      "track": "ELECTRON",
+      "depends_on": [
+        "E01",
+        "N02"
+      ],
+      "resource_tier": "T2",
+      "title": "γ/recoil/neutrino source에서 실제 침적/escape 분리",
+      "physical_inputs": "N02 decay gamma and recoil sources, electron kernel, optical depth",
+      "derivation_contract": "γ propagation energy not same as heat, neutrino collisionless; heat is deposited only by validated interaction.",
+      "implementation_contract": "manufactured energy yield vs optical depth and electron deposition table; observable sensitivity with tail null.",
+      "validation_plan": "optically thin no deposition, opaque limit bounded by source, energy residual all reservoirs.",
+      "acceptance_gate": "bounded physical model and photon/electron yields; actual cosmological source coupling still pending.",
+      "stop_condition": "set deposited heat to unknown not to emitted γ energy when sink transport absent.",
+      "historical_links": [
+        "PR151",
+        "PDF_MICRO",
+        "PDF_ATOMIC"
+      ],
+      "priority": 3,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/E02/THEORY.md",
+        "evidence/E02/RUN.json",
+        "evidence/E02/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "E03",
+      "track": "ELECTRON",
+      "depends_on": [
+        "E02",
+        "Q04"
+      ],
+      "resource_tier": "TH",
+      "title": "CR/hard-particle/hydrogen molecule branch",
+      "physical_inputs": "bass_cr C21D/common-IC and WU088 PHYS62, physical astrophysical CR injection",
+      "derivation_contract": "separate cosmic ray energy distribution and coupling; positivity of source-age pair does not establish hard-particle chemistry.",
+      "implementation_contract": "typed opt-in provider with measured energy domain; only read existing CR proof; no NCP or local execution.",
+      "validation_plan": "rate/source spectrum full pin and exact event-energy ledger; matched ON/OFF comparisons before production.",
+      "acceptance_gate": "safe optional branch remains OFF if no input, no impact to baseline HHeD claims.",
+      "stop_condition": "no physical high-energy source/data or full physical scattering certificate => HOLD.",
+      "historical_links": [
+        "CR21D",
+        "WU088_PR108"
+      ],
+      "priority": 3,
+      "status": "BLOCKED_PHYSICS_AND_RESOURCE",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/E03/THEORY.md",
+        "evidence/E03/RUN.json",
+        "evidence/E03/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "C00",
+      "track": "COSMO",
+      "depends_on": [
+        "M10",
+        "P07"
+      ],
+      "resource_tier": "T3",
+      "title": "source-on z20→4 FLRW source-clock matched history",
+      "physical_inputs": "FULL005 saved Q512/Q1024, MD14 BB50k source, HHeD chemical EOS, original Grackle/Verner/Savin",
+      "derivation_contract": "same proper time, source-on photon inventory and actual thermal history; compare to reduced PR104 only as distinct closure.",
+      "implementation_contract": "thin z-shell pilot, checkpoint restart, then adaptive targeted full z20..4 only if resource measurements allow.",
+      "validation_plan": "time/age/spectrum/angular separate; xHII,xHeII,xHeIII,D0,D+,T,ne,heat,photon ledgers.",
+      "acceptance_gate": "full history only after all data identity and axis convergence, source/systematic budgets declared.",
+      "stop_condition": "4GiB CPU sandbox may not support Q1024 native full run; retain HOLD without NCP.",
+      "historical_links": [
+        "PR150",
+        "PR104",
+        "PR183"
+      ],
+      "priority": 2,
+      "status": "HOLD_COMPUTE_AND_CONVERGENCE",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/C00/THEORY.md",
+        "evidence/C00/RUN.json",
+        "evidence/C00/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "C01",
+      "track": "COSMO",
+      "depends_on": [
+        "C00",
+        "P04",
+        "P05"
+      ],
+      "resource_tier": "T3",
+      "title": "matched signed Bianchi-I vs same-H isotropized FLRW",
+      "physical_inputs": "actual on-shell BASS shear/Einstein donor, matched source and IC, ±s controls",
+      "derivation_contract": "geometric shear changes E, μ and photon source exposure and gravity/opacity; s=0 limit FLRW; Σ=√3 |s|/H, sign separately.",
+      "implementation_contract": "paired BI/isoHB/FLRW sampled states, optics, work, stellar history with shared baseline input hashes.",
+      "validation_plan": "signed ± cases, observer direction reversal, sigma→0, matched w/o galaxy source retune.",
+      "acceptance_gate": "transport vs background-response disentangled; 5 uncertainty axes exceed residual numerical estimate.",
+      "stop_condition": "counterfactual large shear not observational allowed claim; off-shell geometry not physical Einstein solution.",
+      "historical_links": [
+        "PR137",
+        "PR175",
+        "PR182"
+      ],
+      "priority": 3,
+      "status": "HOLD_ONSHELL_AND_FULL_SOURCE",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/C01/THEORY.md",
+        "evidence/C01/RUN.json",
+        "evidence/C01/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "C02",
+      "track": "COSMO",
+      "depends_on": [
+        "C01"
+      ],
+      "resource_tier": "T2",
+      "title": "electron-current observer τ and finite-bin visibility",
+      "physical_inputs": "true ne_rest(t), velocity/normal frame and finite observer surface, BASS time/visibility interface",
+      "derivation_contract": "τ=σT∫c ne_rest γ(1-β·e) dt; total τ requires tails; bin P=e^-τnear-e^-τfar with declared direction.",
+      "implementation_contract": "one electron rest current τ consumer, monotone finite-bin masses, optional BASS collisionless/Thomson separation.",
+      "validation_plan": "source-known interval compared direct integral; zero electron; frame-invariant under passive transformation.",
+      "acceptance_gate": "partial τ/Δτ/visibility only, tail states explicit null; independent note of unknown observer times.",
+      "stop_condition": "PR104 reduced τ≈0.03744 NOT full CMB τ. Do not infer sky polarization from τ scalar.",
+      "historical_links": [
+        "PDF_MICRO",
+        "PR104",
+        "PR137"
+      ],
+      "priority": 3,
+      "status": "HOLD_PHYSICAL_ELECTRON_DONOR",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/C02/THEORY.md",
+        "evidence/C02/RUN.json",
+        "evidence/C02/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "C03",
+      "track": "COSMO",
+      "depends_on": [
+        "C02",
+        "N04"
+      ],
+      "resource_tier": "T2",
+      "title": "원자/핵물리·수치·source 불확실도 분해와 adjoint",
+      "physical_inputs": "paired histories or conditional manufactured reference and nuclear reaction covariance, source/geometry nuisances",
+      "derivation_contract": "δO=∫ adjoint · δF + source variation; event/time moving surface derivatives require saltation/endpoint terms.",
+      "implementation_contract": "bounded Python sensitivities and physically dimensioned observables; separate model vs discretization intervals.",
+      "validation_plan": "perturb source/rates/shear, matched finite differences; singular Jacobian, kink event position and source domain.",
+      "acceptance_gate": "error budget provenance and bounds state; no quadrature precision mistaken for model error.",
+      "stop_condition": "unavailable nuclear covariance or source input means epistemic uncertainty unresolved not 0.",
+      "historical_links": [
+        "PDF_MICRO",
+        "PDF_ATOMIC",
+        "PR151"
+      ],
+      "priority": 3,
+      "status": "HOLD_PHYSICAL_FULL_HISTORY",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/C03/THEORY.md",
+        "evidence/C03/RUN.json",
+        "evidence/C03/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "C04",
+      "track": "COSMO",
+      "depends_on": [
+        "C03"
+      ],
+      "resource_tier": "T0",
+      "title": "범위별 claim release, restore 검증과 handoff",
+      "physical_inputs": "all stage receipts, process owner, immutable checksum, unit tests, source exact revisions",
+      "derivation_contract": "per-claim gate: proof, manufactured reference, source-native implementation, actual physical history and observation separately.",
+      "implementation_contract": "archive deterministic manifest, clean-room small restoration, staged GitHub publication only on separate explicit request.",
+      "validation_plan": "DAG acyclic and no fake PASS; important outputs present, SHA measured from bytes, restore and minimal execution.",
+      "acceptance_gate": "Release `PASS_SCOPED` per node only; global physical/observational release HOLD until missing upstream gates pass.",
+      "stop_condition": "do not mutate historical PR150/checkpoints or merge unrelated code automatically.",
+      "historical_links": [
+        "PR175",
+        "PR183",
+        "PR151"
+      ],
+      "priority": 2,
+      "status": "PLANNED",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/C04/THEORY.md",
+        "evidence/C04/RUN.json",
+        "evidence/C04/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    },
+    {
+      "id": "C05",
+      "track": "COSMO",
+      "depends_on": [
+        "C01",
+        "N06",
+        "E02"
+      ],
+      "resource_tier": "TH",
+      "title": "옵션: 실제 Li/Be 원자핵 확장에 따른 EoR 감도",
+      "physical_inputs": "source-native 17+ charge histories, nonthermal γ/e deposition, physically admissible Bianchi source-on case",
+      "derivation_contract": "trace species altered radiative/thermal/opacity fields through same owner without inventing Li resonances or Be7 direct heat.",
+      "implementation_contract": "matched ON/OFF species, reflect source domain and tail, no local/NCP heavy run.",
+      "validation_plan": "max response vs source atomic/nuclear uncertainty; numerical axes separated.",
+      "acceptance_gate": "can be publication-admitted only with N06/E02 and physical source complete; baseline EoR remains independent.",
+      "stop_condition": "all missing physical nuclear source lines/blockers remain OPEN.",
+      "historical_links": [
+        "PR151",
+        "PR183"
+      ],
+      "priority": 3,
+      "status": "BLOCKED_UPSTREAM_COMPUTE",
+      "scientific_admission": "NOT_EVALUATED_IN_THIS_SSOT",
+      "output_paths": [
+        "evidence/C05/THEORY.md",
+        "evidence/C05/RUN.json",
+        "evidence/C05/DECISION.json"
+      ],
+      "failure_policy": "결과 미수렴·일치 불명·누락 입력은 유형별 FAIL/HOLD로 보존. 타 단계 PASS를 이전하거나 tolerance를 사후 확대하지 않는다."
+    }
+  ],
+  "node_count": 45,
+  "statuses_are_planning_not_science": true
+}
