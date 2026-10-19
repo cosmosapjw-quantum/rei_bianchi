@@ -1,0 +1,50 @@
+{
+  "unit": "BASS-REACTIVE-04_TIME_AGE",
+  "parent": "BASS-REACTIVE-03_POSITIVE_BIRTH",
+  "parent_pr": 202,
+  "contract_version": 1,
+  "objective": "Compute positive-cohort birth-age mass and shape diagnostics, compose frozen reference errors across time and labels, and measure two native time-by-birth grid interactions.",
+  "source_scope": "Add-only diagnostic crate; all 105 BR03 crate files, original physical owners, one-way BASS donor, source identities, CX half flow and S10 four-corner controller are immutable.",
+  "physical_contract": {
+    "metric_signature": "(-,+,+,+)",
+    "axisymmetric_scale_factors": ["a exp(-b)", "a exp(-b)", "a exp(2b)"],
+    "volume": "a^3",
+    "H": "d(log(a))/dt",
+    "s": "db/dt; signed s/H is distinct from sqrt(3)*abs(s/H)",
+    "energy": "E(t)^2=sum_i K_i^2/a_i(t)^2, K_i=a_i(t_b)*E_b*n_bi",
+    "age_coordinate": "A=t_observation-t_birth; x=A/T or local A/dt is explicitly identified",
+    "kappa": "total absorption rate per second, sum of HI/HeI/HeII/DI rates",
+    "tau": "kappa*T, dimensionless",
+    "born": "reference-comoving photon number in a declared interval",
+    "shape_normalization": "Normalize exact and numerical positive measures by their own mass; report the mass defect separately.",
+    "zero_source": "Empty physical measure; conditional age shape is undefined.",
+    "underflow": "A positive mathematical mass rounded to zero is separate from zero source; log-domain shape diagnostics may remain defined.",
+    "native_geometry": "Unmodified one-way background, no Einstein feedback from H/He/D."
+  },
+  "observable_contract": {
+    "mass_defect": "Photon number quadrature error in the stated frozen reference.",
+    "cdf_sup": "Normalized CDF supremum distance, dimensionless; thresholds require a separately justified variation bound.",
+    "w1": "Normalized 1D Wasserstein-1 in the declared age coordinate; multiply by T or dt for seconds.",
+    "moments": "Signed first and raw second age moment defects; they do not determine the complete age distribution.",
+    "mixture_bounds": "Label-weighted component distance plus normalization-weight total variation; not exact unlabelled mixture distance.",
+    "native_differences": "Measured grid differences, not absolute error versus an exact evolving solution.",
+    "native_ledgers": "Independent photon number, competitive species event sum and total energy residuals, with explicit normalizing scale."
+  },
+  "new_native_cases": ["ap_n16_r4", "ap_n64_r4"],
+  "reused_native_grid": [[16,2],[32,1],[32,2],[32,4],[32,8],[64,2],[128,2]],
+  "scalar_controls": {
+    "total_tau": [0,1e-8,1,93,1000,1e12],
+    "AP_refinement": [1,2,4,8,16],
+    "GL_orders": [2,4],
+    "Nt_at_tau93": [1,2,4,8,16,32,64],
+    "Nt_other_tau": [1]
+  },
+  "source_controls": {"source_labels":384,"unique_opacity_rules":48,"Nt":32,"AP_refinement":[1,2,4,8],"GL_orders":[2,4]},
+  "applicability_limits": [
+    "Frozen analytic distribution certificate does not directly bound evolving gas and opacity response.",
+    "Native exports contain moments and q2, not the full retained age-energy-angle joint distribution.",
+    "No universal temporal order, full EoR initial condition or full angular/spectral/age convergence claim.",
+    "Binary64 numerical diagnostics are independently checked; they are not directed-rounding interval enclosures.",
+    "CMB gauge, hierarchy, line-of-sight and CAMB/CLASS-specific protocol sections do not apply to this bounded H/He/D source-integration unit."
+  ]
+}

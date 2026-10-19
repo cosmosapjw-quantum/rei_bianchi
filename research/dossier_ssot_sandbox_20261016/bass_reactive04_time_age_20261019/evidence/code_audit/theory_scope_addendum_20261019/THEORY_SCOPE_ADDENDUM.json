@@ -1,0 +1,152 @@
+{
+  "schema": "rei.bass.reactive04.c9_theory_scope_addendum.v1",
+  "stage": "C9_THEORY_CONTRACT_ADDENDUM",
+  "status": "PASS_SCOPED",
+  "completed_utc": "2026-10-19T06:18:47.830843+00:00",
+  "ordering": "Document-only addendum after the completed C9 PHYS-MATH-CODE review. Original C9 results, timestamps, findings and test receipts remain unchanged.",
+  "previous_audit": {
+    "path": "evidence/code_audit/PHYS_MATH_CODE_AUDIT.json",
+    "sha256": "dd8ae8e225064299ae0af94a65f379a21614af1fd52104a4583c7abc7b6160e6",
+    "status": "PASS_SCOPED",
+    "completed_utc": "2026-10-19T06:11:10.952412+00:00"
+  },
+  "previous_theory": {
+    "path": "docs/AGE_CERTIFICATE_THEORY.md",
+    "bytes": 20642,
+    "sha256": "3b6e022e7c1460fce82c20f2adff290695a0f5144d3067fe7a3a614da889d992",
+    "preserved_snapshot": "THEORY_CONTRACT_PRE_DELTA.md"
+  },
+  "current_theory": {
+    "path": "docs/AGE_CERTIFICATE_THEORY.md",
+    "bytes": 22032,
+    "sha256": "0e4d8e6005e40226b4db01a34e89253ad3253482144311d4e79c29fb14902cc1"
+  },
+  "delta_verification": {
+    "exactly_two_replaced_passages": true,
+    "bytes_added": 1390,
+    "reconstructed_previous_hash_matches_original_C9_contract": true,
+    "all_other_theory_bytes_unchanged": true,
+    "unified_diff": "THEORY_CONTRACT_DELTA.patch"
+  },
+  "changes": [
+    {
+      "id": "THEORY_DELTA_01",
+      "section": "7. Conditional future Bianchi observables",
+      "old_bytes": 453,
+      "new_bytes": 651,
+      "status": "PASS_SCOPED",
+      "change": "Future attenuation is explicitly integrated on the common current-to-observation interval [t,T_*]. An age-dependent endpoint requires its own Leibniz endpoint term.",
+      "independent_reason": "For a fixed interval, differentiating Lambda(A)=integral_t^T_* kappa(s,A) ds gives integral_t^T_* partial_A kappa(s,A) ds under the stated regularity. A sufficient Lipschitz constant is a uniform age-domain bound on that integral of absolute derivatives. Because Lambda>=0, exp(-Lambda) has slope magnitude at most one as a function of Lambda. This conditional response bound does not alter the scalar age certificate or its binary64 implementation.",
+      "conditions": "Use a bound uniform over the compared age domain; differentiating under the integral requires the stated smooth threshold-free domain and an integrable derivative bound. Moving endpoints and threshold crossings require the extra terms or variation bounds stated in the document."
+    },
+    {
+      "id": "THEORY_DELTA_02",
+      "section": "8. Crossed timestep–birth comparison",
+      "old_bytes": 356,
+      "new_bytes": 1548,
+      "status": "PASS_SCOPED",
+      "change": "The required gas/opacity stability term now has an explicit conditional Gronwall bound with a state-response coefficient L_g(t) and forcing defect b(t).",
+      "independent_reason": "Splitting the vector-field difference into state response and fixed-state forcing gives the scalar norm differential inequality D^+||delta g|| <= L_g(t)||delta g||+b(t). The integrating-factor expression in the document follows for integrable coefficient and forcing bounds. The text explicitly requires propagated radiation and opacity-history effects to be included in b or a larger state response.",
+      "conditions": "The specified physical domain must contain the compared trajectories and support a valid bound on their vector-field differences in the chosen norm. L_g and b must be integrable and sufficiently bounded for a finite useful result. No value of L_g, b, threshold variation, or nonlinear native response bound was calculated in this unit; a newborn frozen certificate is not automatically the required forcing bound."
+    }
+  ],
+  "final_source_checks": {
+    "br04/Cargo.toml": {
+      "expected_sha256": "82ad4312044af0ec472da36434be17e0b826e331499307b22d3c64749005ac22",
+      "actual_sha256": "82ad4312044af0ec472da36434be17e0b826e331499307b22d3c64749005ac22",
+      "match": true
+    },
+    "br04/Cargo.lock": {
+      "expected_sha256": "726aaa9383bb3660afd92631d85ca9b010d8cdc39d80e804d49236656347d2d9",
+      "actual_sha256": "726aaa9383bb3660afd92631d85ca9b010d8cdc39d80e804d49236656347d2d9",
+      "match": true
+    },
+    "crate/br04_lib.rs": {
+      "expected_sha256": "b23a8f1dda15e059f262b406577bb819b97cf6591b3f0fae3d50eb1f523ab730",
+      "actual_sha256": "b23a8f1dda15e059f262b406577bb819b97cf6591b3f0fae3d50eb1f523ab730",
+      "match": true
+    },
+    "crate/birth_age_certificate.rs": {
+      "expected_sha256": "8091268f51545559ba1036beb1bce2891e51dbec8324c9391251a001fba770ae",
+      "actual_sha256": "8091268f51545559ba1036beb1bce2891e51dbec8324c9391251a001fba770ae",
+      "match": true
+    },
+    "crate/tests/birth_age_certificate.rs": {
+      "expected_sha256": "8ef26047f0bb4be2d0b9d22319f88e6fed01f705239ff42e02c3118badec7957",
+      "actual_sha256": "8ef26047f0bb4be2d0b9d22319f88e6fed01f705239ff42e02c3118badec7957",
+      "match": true
+    },
+    "crate/examples/birth_age_study.rs": {
+      "expected_sha256": "aefe8d7b25f363d6437fdd6ba40932bd687a2d1862774c7dd953f5b6b969790b",
+      "actual_sha256": "aefe8d7b25f363d6437fdd6ba40932bd687a2d1862774c7dd953f5b6b969790b",
+      "match": true
+    },
+    "crate/examples/birth_age_source_study.rs": {
+      "expected_sha256": "e2da81aae1e57ea73a657ece1a7ce6d4029ba3cc71781447d3e612ec758a63ac",
+      "actual_sha256": "e2da81aae1e57ea73a657ece1a7ce6d4029ba3cc71781447d3e612ec758a63ac",
+      "match": true
+    }
+  },
+  "preserved_original_C9_checks": {
+    "C9_INDEPENDENT_RUST_TESTS.json": {
+      "expected_sha256": "1498bcada7167271438ba7a0b1f8a0a93c2f39268ccdb8f35cc70b70d81a0c87",
+      "actual_sha256": "1498bcada7167271438ba7a0b1f8a0a93c2f39268ccdb8f35cc70b70d81a0c87",
+      "match": true
+    },
+    "C9_INDEPENDENT_RUST_TESTS.log": {
+      "expected_sha256": "e427d24b73357898769b7dfb47fba2964ff0a44d5a29bf4d35a45a202a3de756",
+      "actual_sha256": "e427d24b73357898769b7dfb47fba2964ff0a44d5a29bf4d35a45a202a3de756",
+      "match": true
+    },
+    "C9_START_IDENTITY.json": {
+      "expected_sha256": "a0e7c510a3f12aca0224c7e1c1bedefe02e99eba9a78e09947e1a4901989504c",
+      "actual_sha256": "a0e7c510a3f12aca0224c7e1c1bedefe02e99eba9a78e09947e1a4901989504c",
+      "match": true
+    },
+    "PHYS_MATH_CODE_AUDIT.json": {
+      "expected_sha256": "dd8ae8e225064299ae0af94a65f379a21614af1fd52104a4583c7abc7b6160e6",
+      "actual_sha256": "dd8ae8e225064299ae0af94a65f379a21614af1fd52104a4583c7abc7b6160e6",
+      "match": true
+    },
+    "PHYS_MATH_CODE_AUDIT.md": {
+      "expected_sha256": "e6e6d8fdfa8fa5adcd216a6bcb77f8096f218f9e40ccdf67b559f020f43334bb",
+      "actual_sha256": "e6e6d8fdfa8fa5adcd216a6bcb77f8096f218f9e40ccdf67b559f020f43334bb",
+      "match": true
+    },
+    "ZERO_LABEL_AFTER.log": {
+      "expected_sha256": "2ef0acfed89182c34e49ff917e9f17e77860905388e0e392906478ba48ebf091",
+      "actual_sha256": "2ef0acfed89182c34e49ff917e9f17e77860905388e0e392906478ba48ebf091",
+      "match": true
+    },
+    "ZERO_LABEL_BEFORE.log": {
+      "expected_sha256": "d3393b6fe61a29ef987fd492ee0cddc0c9bf59c7da75a6007ae0f9c42d61a80a",
+      "actual_sha256": "d3393b6fe61a29ef987fd492ee0cddc0c9bf59c7da75a6007ae0f9c42d61a80a",
+      "match": true
+    },
+    "ZERO_LABEL_EDGE_FIX_VERIFICATION.json": {
+      "expected_sha256": "6782f1e5bc0711d4ebe7b6307105b28c97a2e2703d6eead4f73090024f5260da",
+      "actual_sha256": "6782f1e5bc0711d4ebe7b6307105b28c97a2e2703d6eead4f73090024f5260da",
+      "match": true
+    },
+    "ZERO_LABEL_PROBE_RECOVERY.json": {
+      "expected_sha256": "f4e97f3a6753ef49972dcbb8eb39fd183f47aba68a1412e67a1ccc627c92aa8e",
+      "actual_sha256": "f4e97f3a6753ef49972dcbb8eb39fd183f47aba68a1412e67a1ccc627c92aa8e",
+      "match": true
+    }
+  },
+  "original_C9_manifest_sha256": "bd85d931b3d090a4c50dda3aad1d2168df554b4feacabab3cd3d59c48a84b8b2",
+  "tests": {
+    "status": "NOT_RERUN_DOCUMENT_ONLY_DELTA",
+    "reason": "Parent explicitly requested a review of this document delta without repeat tests. All seven source hashes still match the tested final C9 bytes. No new execution result is claimed.",
+    "prior_independent_test_receipt": "evidence/code_audit/C9_INDEPENDENT_RUST_TESTS.json"
+  },
+  "limitations": [
+    "No native nonlinear stability bound has been evaluated.",
+    "Real-arithmetic observable bounds remain conditional; implementation diagnostics remain binary64 evaluations without directed interval enclosure.",
+    "A normalized log-domain shape under absolute-mass underflow is not a restored physical population.",
+    "No new convergence order or full longspan admission follows from this document clarification."
+  ],
+  "open_blocking_findings": [],
+  "reviewer_modified_main_source": false,
+  "reviewer_modified_theory": false
+}
