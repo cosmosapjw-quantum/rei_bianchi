@@ -1,0 +1,83 @@
+{
+  "schema": "rei.run15.postloss.static_owner_review.v1",
+  "created_at_utc": "2026-10-19T08:19:10.685521+00:00",
+  "reviewer_agent": "/root/repo_inventory",
+  "target": "postloss_fixed_gas_optical_response.py",
+  "target_bytes": 30484,
+  "target_sha256": "f95c99ce30c886f9bff26744b00d6617b3a0f39661fec97c4cec1fb285f9d968",
+  "review_kind": "ONE_BOUNDED_STATIC_REVIEW",
+  "result": "NO_CONCRETE_PHYSICAL_OR_NUMERICAL_SCOPE_MISMATCH_FOUND",
+  "source_changes_by_reviewer": 0,
+  "fresh_IVP_runs_by_reviewer": 0,
+  "fresh_test_suite_runs_by_reviewer": 0,
+  "diagnostic_executions_by_reviewer": 0,
+  "original_owner_refs": [
+    {
+      "path": "scripts/retarded_integrator.py",
+      "sha256": "2e013024eae36bb7a39da61a7932b31d20d6e204837f28863e15361084efcbb5"
+    },
+    {
+      "path": "scripts/spectral_joint11.py",
+      "sha256": "1e051855551856f07092682dac7f9b38b2728c35af8c37d79d16b01a25f88107"
+    },
+    {
+      "path": "inputs/source_table.py",
+      "sha256": "0c7df87c7c41ba254e3c631c98930fba96ea544702e25863d79cc82b8bd70c8c"
+    },
+    {
+      "path": "code/rei_bass_coupled/owner_src/axbi_sources.rs",
+      "sha256": "606e3c2ec367dd9951ebbf2f53486f2232b49c0218896d66d8dc13dd5ee83bfe"
+    },
+    {
+      "path": "code/rei_bass_coupled/owner_src/atomic_provider.rs",
+      "sha256": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3"
+    },
+    {
+      "path": "code/rei_bass_coupled/src/spectral_native.rs",
+      "sha256": "65a3c2a20dc23e61a3b6bb8f1e2ff0e7a6ccdf0ab4fdc509603fbd3437ac2e87"
+    },
+    {
+      "path": "code/rei_bass_coupled/src/spectral_edge_support.rs",
+      "sha256": "fbffed6df163385b40d0377ec55fcd09ef0150ec68e58055410584f177c64406"
+    }
+  ],
+  "checks": [
+    {
+      "topic": "Gas coordinate and SI optical-depth units",
+      "finding": "Consistent: saved Y_HI is the original dimensionless comoving gas coordinate; proper density is nH_initial*Y_HI*exp(-3*dx*z), and dt/dz=dx/H gives c*dx/H times proper density times cross section."
+    },
+    {
+      "topic": "Source M0 and blackbody normalization",
+      "finding": "Consistent with the original count-anchored first-cell measure: each original m0 reflection-pair count is converted to comoving density by a0^3 and redistributed using the original BB50K E^2/expm1(E/kT) shape divided by its first-cell GL96 integral. GL64 is separately reported. This is a quadrature-defined conditional source measure, without a rigorous normalization/core quadrature certificate."
+    },
+    {
+      "topic": "Birth samples and angular quotient",
+      "finding": "Uses unchanged coalesce_reflections; explicit640 rays and160 distinct birth-X values agree with original GL8 paired scalar quotient. No angular or birth-time continuum claim is made."
+    },
+    {
+      "topic": "H binding, H fit edge and D gate",
+      "finding": "The code distinguishes13.598434599702eV binding from13.6eV fit edge and retains the13.602134599702eV threshold-gated H-equality D approximation. It checks the retained birth-energy core lies below D and positive q ensures redshift, so D vanishes only in that core. Omitted-tail D opacity is treated as nonnegative."
+    },
+    {
+      "topic": "Actual geometry and monotonicity",
+      "finding": "Vector Hermite coefficients reproduce original source-table definitions; each ray retains its own birth a,b,mu. Positive q is derived from b_X extrema over all relevant geometry pieces, rather than inferred from the endpoint ratio alone."
+    },
+    {
+      "topic": "Conditional optical tail estimate",
+      "finding": "The lambda expression has the energy-integral form c*nHI/(H*q)*(sigmaH/E). The code bounds density,H,q and decreasing sigmaH/E, then bounds the omitted count with decreasing source shape. It explicitly excludes core quadrature error and directed-rounding certification."
+    },
+    {
+      "topic": "Tight13 versus standard18 gas paths",
+      "finding": "The two PCHIP profiles use distinct archived checkpoint grids, including their initial states, and are explicitly compared as a combined grid-and-solver difference. The code does not treat their contrast as an isolated ODE tolerance error."
+    },
+    {
+      "topic": "Scientific scope",
+      "finding": "The receipt states prescribed checkpoint-PCHIP gas, fixed160 births/GL8, no native IVP, unbounded difference from the true intervening gas path, unresolved nonlinear spectral opacity feedback and no rigorous coupled continuum bound."
+    }
+  ],
+  "limits": [
+    "Static review only; no scientific result or implementation-check PASS is inferred from reading the code.",
+    "The reviewed identity is the frozen V1 SHA above.",
+    "Existing source records and saved states are not modified; no new reviewer loop was created."
+  ]
+}

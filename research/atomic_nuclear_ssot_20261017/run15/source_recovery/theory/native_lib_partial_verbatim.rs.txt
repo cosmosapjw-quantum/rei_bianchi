@@ -1,0 +1,356 @@
+//! Opt-in RUN15 source quadrature for the preserved Planck photon shape.
+//!
+//! Input energies and kT are in eV. The source measure is
+//! dM = E^2 / expm1(E/kT) dE; absolute weights and mass have units eV^3.
+//! These are source-measure weights, before the caller's photon normalization.
+//! The mass anchor comes from unchanged RUN13 `blackbody_moments`.
+//! No atomic provider, ray path, gas initial condition, or IVP is changed here.
+//!
+//! A positive GL64 discretization on local z=(E-mid)/half supplies a stable
+//! Stieltjes recurrence. Golub-Welsch uses a small symmetric Jacobi eigensolve.
+//! Polynomial exactness applies to that discrete positive measure; the reported
+//! GL64/retained-moment differences are diagnostics, not continuum enclosures.
+#![forbid(unsafe_code)]
+
+use rei_iso_couple_reference::spectral_edge_support::blackbody_moments;
+use std::fmt;
+
+const BASE_ORDER: usize = 64;
+const MAX_ORDER: usize = 16;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Error {
+    InvalidInput,
+    InvalidOrder,
+    UnresolvedBand,
+    RetainedMomentFailure,
+    InvalidPositiveMeasure,
+    DegenerateRecurrence,
+    EigenConvergence,
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{self:?}")
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Node {
+    pub energy_ev: f64,
+    pub absolute_weight: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct Panel {
+    /// Integral of the unchanged shape, anchored to retained M0, in eV^3.
+    pub mass: f64,
+    pub nodes: Vec<Node>,
+    /// Direct sum(E_i W_i)/M0, in eV.
+    pub mean: f64,
+    pub retained_mean: f64,
+    pub mass_residual: f64,
+    pub mean_residual: f64,
+    /// Residual in local z; keeps a diagnostic sensitive on very thin bands.
+    pub local_mean_residual: f64,
+    pub raw_gl64_mass: f64,
+    pub mass_anchor_scale: f64,
+    pub eigen_residual: f64,
+}
+
+/// Neumaier accumulation, including cancellation in local moments.
+fn sum(values: impl IntoIterator<Item = f64>) -> f64 {
+    let mut total = 0.0_f64;
+    let mut correction = 0.0_f64;
+    for value in values {
+        let next = total + value;
+        correction += if total.abs() >= value.abs() {
+            (total - next) + value
+        } else {
+            (value - next) + total
+        };
+        total = next;
+    }
+    total + correction
+}
+
+fn legendre(n: usize, z: f64) -> (f64, f64) {
+    let mut previous = 1.0;
+    let mut current = z;
+    for k in 2..=n {
+        let next = ((2 * k - 1) as f64 * z * current - (k - 1) as f64 * previous)
+            / k as f64;
+        previous = current;
+        current = next;
+    }
+    (current, previous)
+}
+
+fn gl64() -> Result<Vec<(f64, f64)>, Error> {
+    let n = BASE_ORDER;
+    let mut out = Vec::with_capacity(n);
+    for i in 0..n / 2 {
+        let mut z = (std::f64::consts::PI * (i as f64 + 0.75) / (n as f64 + 0.5)).cos();
+        let mut converged = false;
+        for _ in 0..64 {
+            let (pn, previous) = legendre(n, z);
+            let derivative = n as f64 * (z * pn - previous) / (z * z - 1.0);
+            let next = z - pn / derivative;
+            if !next.is_finite() {
+                return Err(Error::InvalidPositiveMeasure);
+            }
+            if (next - z).abs() <= 2.0 * f64::EPSILON {
+                z = next;
+                converged = true;
+                break;
+            }
+            z = next;
+        }
+        if !converged {
+            return Err(Error::EigenConvergence);
+        }
+        let (pn, previous) = legendre(n, z);
+        let derivative = n as f64 * (z * pn - previous) / (z * z - 1.0);
+        let weight = 2.0 / ((1.0 - z * z) * derivative * derivative);
+        if !(0.0 < z && z < 1.0 && weight.is_finite() && weight > 0.0) {
+            return Err(Error::InvalidPositiveMeasure);
+        }
+        out.push((-z, weight));
+        out.push((z, weight));
+    }
+    out.sort_by(|a, b| a.0.total_cmp(&b.0));
+    Ok(out)
+}
+
+fn weighted_dot(left: &[f64], right: &[f64], weights: &[f64]) -> f64 {
+    sum(left.iter().zip(right).zip(weights).map(|((&a, &b), &w)| w * a * b))
+}
+
+/// Small symmetric eigensolver. Columns of vectors are normalized eigenvectors.
+fn symmetric_eigen(matrix: &[Vec<f64>]) -> Result<(Vec<f64>, Vec<Vec<f64>>, f64), Error> {
+    let n = matrix.len();
+    let mut a = matrix.to_vec();
+    let mut vectors = vec![vec![0.0; n]; n];
+    for (i, row) in vectors.iter_mut().enumerate() {
+        row[i] = 1.0;
+    }
+    let tolerance = 4.0 * f64::EPSILON;
+    let mut converged = false;
+    for _ in 0..64 {
+        let mut largest = 0.0_f64;
+        for p in 0..n {
+            for q in p + 1..n {
+                largest = largest.max(a[p][q].abs());
+            }
+        }
+        if largest <= tolerance {
+            converged = true;
+            break;
+        }
+        for p in 0..n {
+            for q in p + 1..n {
+                let apq = a[p][q];
+                if apq.abs() <= tolerance {
+                    continue;
+                }
+                let tau = (a[q][q] - a[p][p]) / (2.0 * apq);
+                let t = 1.0_f64.copysign(tau) / (tau.abs() + tau.hypot(1.0));
+                let c = 1.0 / (1.0 + t * t).sqrt();
+                let s = t * c;
+                a[p][p] -= t * apq;
+                a[q][q] += t * apq;
+                a[p][q] = 0.0;
+                a[q][p] = 0.0;
+                for k in 0..n {
+                    if k != p && k != q {
+                        let kp = a[k][p];
+                        let kq = a[k][q];
+                        a[k][p] = c * kp - s * kq;
+                        a[p][k] = a[k][p];
+                        a[k][q] = s * kp + c * kq;
+                        a[q][k] = a[k][q];
+                    }
+                    let kp = vectors[k][p];
+                    let kq = vectors[k][q];
+                    vectors[k][p] = c * kp - s * kq;
+                    vectors[k][q] = s * kp + c * kq;
+                }
+            }
+        }
+    }
+    if !converged {
+        return Err(Error::EigenConvergence);
+    }
+    let eigenvalues: Vec<_> = (0..n).map(|i| a[i][i]).collect();
+    let mut residual = 0.0_f64;
+    for (j, &eigenvalue) in eigenvalues.iter().enumerate() {
+        for i in 0..n {
+            let mv = sum((0..n).map(|k| matrix[i][k] * vectors[k][j]));
+            residual = residual.max((mv - eigenvalue * vectors[i][j]).abs());
+        }
+    }
+    if !residual.is_finite() || residual > 256.0 * f64::EPSILON {
+        return Err(Error::EigenConvergence);
+    }
+    Ok((eigenvalues, vectors, residual))
+}
+
+/// Gauss rule for a positive discrete measure on (-1,1), normalized to mass one.
+fn from_positive_measure(measure: &[(f64, f64)], order: usize) -> Result<(Vec<(f64, f64)>, f64), Error> {
+    if !(2..=MAX_ORDER).contains(&order) {
+        return Err(Error::InvalidOrder);
+    }
+    if measure.len() < order
+        || measure.iter().any(|&(x, w)| !x.is_finite() || x <= -1.0 || x >= 1.0 || !w.is_finite() || w <= 0.0)
+        || measure.windows(2).any(|p| p[0].0 >= p[1].0)
+    {
+        return Err(Error::InvalidPositiveMeasure);
+    }
+    let mass = sum(measure.iter().map(|p| p.1));
+    if !mass.is_finite() || mass <= 0.0 {
+        return Err(Error::InvalidPositiveMeasure);
+    }
+    let weights: Vec<_> = measure.iter().map(|p| p.1 / mass).collect();
+    if weights.iter().any(|w| *w <= 0.0 || !w.is_finite()) {
+        return Err(Error::InvalidPositiveMeasure);
+    }
+    let length = measure.len();
+    let mut basis = vec![vec![1.0; length]];
+    let mut alpha = Vec::with_capacity(order);
+    let mut beta = Vec::with_capacity(order - 1);
+    for k in 0..order {
+        let p = &basis[k];
+        let diagonal = sum((0..length).map(|j| weights[j] * measure[j].0 * p[j] * p[j]));
+        if !diagonal.is_finite() {
+            return Err(Error::DegenerateRecurrence);
+        }
+        alpha.push(diagonal);
+        if k + 1 == order {
+            break;
+        }
+        let mut residual: Vec<_> = (0..length)
+            .map(|j| (measure[j].0 - diagonal) * p[j] - if k == 0 { 0.0 } else { beta[k - 1] * basis[k - 1][j] })
+            .collect();
+        // Two passes preserve weighted orthogonality against roundoff loss.
+        for _ in 0..2 {
+            for previous in &basis {
+                let projection = weighted_dot(&residual, previous, &weights);
+                for j in 0..length {
+                    residual[j] -= projection * previous[j];
+                }
+            }
+        }
+        let norm = weighted_dot(&residual, &residual, &weights).sqrt();
+        if !norm.is_finite() || norm <= 0.0 {
+            return Err(Error::DegenerateRecurrence);
+        }
+        beta.push(norm);
+        for value in &mut residual {
+            *value /= norm;
+        }
+        basis.push(residual);
+    }
+    let mut jacobi = vec![vec![0.0; order]; order];
+    for i in 0..order {
+        jacobi[i][i] = alpha[i];
+        if i + 1 < order {
+            jacobi[i][i + 1] = beta[i];
+            jacobi[i + 1][i] = beta[i];
+        }
+    }
+    let (eigenvalues, vectors, eigen_residual) = symmetric_eigen(&jacobi)?;
+    let mut nodes: Vec<_> = (0..order).map(|i| (eigenvalues[i], vectors[0][i] * vectors[0][i])).collect();
+    nodes.sort_by(|a, b| a.0.total_cmp(&b.0));
+    let weight_sum = sum(nodes.iter().map(|node| node.1));
+    for node in &mut nodes {
+        node.1 /= weight_sum;
+    }
+    if nodes.iter().any(|&(x, w)| !(-1.0 < x && x < 1.0 && w.is_finite() && w > 0.0))
+        || nodes.windows(2).any(|p| p[0].0 >= p[1].0)
+    {
+        return Err(Error::InvalidPositiveMeasure);
+    }
+    Ok((nodes, eigen_residual))
+}
+
+/// Construct an n-point positive Planck source rule for 2 <= n <= 16.
+pub fn panel(lo: f64, hi: f64, kt: f64, order: usize) -> Result<Panel, Error> {
+    if !(2..=MAX_ORDER).contains(&order) {
+        return Err(Error::InvalidOrder);
+    }
+    if !lo.is_finite() || !hi.is_finite() || !kt.is_finite() || lo <= 0.0 || hi <= lo || kt <= 0.0 {
+        return Err(Error::InvalidInput);
+    }
+    let half = 0.5 * (hi - lo);
+    let mid = 0.5 * (lo + hi);
+    if !(lo < mid && mid < hi && half.is_finite() && half > 0.0) {
+        return Err(Error::UnresolvedBand);
+    }
+    let moments = blackbody_moments(lo, hi, kt).map_err(|_| Error::RetainedMomentFailure)?;
+    let mut measure = Vec::with_capacity(BASE_ORDER);
+    for (z, w) in gl64()? {
+        let energy = mid + half * z;
+        let denominator = (energy / kt).exp_m1();
+        let weight = half * w * energy * energy / denominator;
+        if !(denominator.is_finite() && denominator > 0.0 && weight.is_finite() && weight > 0.0) {
+            return Err(Error::InvalidPositiveMeasure);
+        }
+        measure.push((z, weight));
+    }
+    let raw_gl64_mass = sum(measure.iter().map(|p| p.1));
+    let (local, eigen_residual) = from_positive_measure(&measure, order)?;
+    let nodes: Vec<_> = local.iter().map(|&(z, w)| Node { energy_ev: mid + half * z, absolute_weight: moments[0] * w }).collect();
+    if nodes.iter().any(|node| !(lo < node.energy_ev && node.energy_ev < hi && node.absolute_weight > 0.0 && node.absolute_weight.is_finite()))
+        || nodes.windows(2).any(|p| p[0].energy_ev >= p[1].energy_ev)
+    {
+        return Err(Error::UnresolvedBand);
+    }
+    let mass = moments[0];
+    let local_mean = sum(local.iter().map(|&(z, w)| z * w));
+    let mean = sum(nodes.iter().map(|node| node.energy_ev * node.absolute_weight)) / mass;
+    let retained_mean = mid + half * moments[1] / mass;
+    Ok(Panel {
+        mass,
+        mass_residual: sum(nodes.iter().map(|node| node.absolute_weight)) - mass,
+        mean,
+        retained_mean,
+        mean_residual: mean - retained_mean,
+        local_mean_residual: local_mean - moments[1] / mass,
+        raw_gl64_mass,
+        mass_anchor_scale: mass / raw_gl64_mass,
+        eigen_residual,
+        nodes,
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rei_iso_couple_reference::spectral_edge_support::gauss2_local;
+
+    fn kt() -> f64 {
+        1.380649e-16 / 1.602176634e-12 * 50000.0
+    }
+
+    #[test]
+    fn uniform_measure_matches_analytic_moments_through_gauss_degree() {
+        let source = gl64().unwrap();
+        for n in [2, 4, 6, 10, 16] {
+            let (q, _) = from_positive_measure(&source, n).unwrap();
+            for degree in 0..2 * n {
+                let actual = sum(q.iter().map(|&(x, w)| w * x.powi(degree as i32)));
+                let target = if degree % 2 == 0 { 1.0 / (degree + 1) as f64 } else { 0.0 };
+                assert!((actual - target).abs() < 3e-13, "n={n} k={degree} actual={actual:e} target={target:e}");
+            }
+        }
+    }
+
+    #[test]
+    fn asymmetric_polynomial_measure_matches_independent_analytic_moments() {
+        let source: Vec<_> = gl64().unwrap().into_iter().map(|(x, w)| (x, w * (1.0 + 0.3 * x))).collect();
+        for n in [2, 4, 6, 16] {
+            let (q, _) = from_positive_measure(&source, n).unwrap();
+            for degree in 0..2 * n {
+                let actual = sum(q.iter().map(|&(x, w)| w * x.powi(degree as i32)));
+                let target = if degree % 2 == 0 { 1.0 / (degree + 1) as f64 } else { 0.3 / (degree + 2) as f64 };
+                assert!((actual - target).abs() < 3e-13, "n={n} k={degree} actual={actual:e} target={target:e}");
