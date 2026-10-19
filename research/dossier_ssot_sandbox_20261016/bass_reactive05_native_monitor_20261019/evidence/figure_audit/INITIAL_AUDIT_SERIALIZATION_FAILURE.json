@@ -1,0 +1,15 @@
+{
+  "schema": "BR05_FIGURE_AUDIT_FAILURE_RECORD_V1",
+  "scope": "Independent figure-audit report serialization only",
+  "first_attempt_exit_code": 1,
+  "observed_exception": "TypeError: Object of type bool is not JSON serializable",
+  "cause": "A NumPy scalar boolean in the artist boundary audit was passed to the standard JSON encoder.",
+  "location": "verify_final_figures.py final report json.dumps",
+  "correction": "Explicit conversion of NumPy scalar values via item(), while retaining an error for unsupported types.",
+  "physics_solver_rerun": false,
+  "original_source_data_or_figures_modified": false,
+  "classification": "AUDIT_REPORT_SERIALIZATION_BUG",
+  "post_correction_validation": "Recorded in FIGURE_NUMERIC_LAYOUT_AUDIT.json after the corrected audit is executed.",
+  "status": "CORRECTED_VERIFIED",
+  "corrected_check_result": "44/44 PASS; originals unchanged"
+}

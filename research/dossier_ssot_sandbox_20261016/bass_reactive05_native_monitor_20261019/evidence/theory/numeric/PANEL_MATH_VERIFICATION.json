@@ -1,0 +1,73 @@
+{
+  "schema": "BR05_PANEL_MATH_DECIMAL90_V1",
+  "status": "PASS",
+  "created_utc": "2026-10-19T09:43:53.154777+00:00",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "script_sha256": "9a9b1cc3b9643f8870b9d21cb4d0c822ed93ebd3511aaf5ef140248d026c0670",
+  "input": {
+    "path": "/workspace/scratch/996fc62899da/br05_work/theory/inputs/BR04_PANEL_RULE_ACTUAL_NODES.csv",
+    "sha256": "1eba2f52895d42b621d519687570b14e02f1894241fb37dddfe01990a63be843"
+  },
+  "precision_decimal_digits": 90,
+  "rules": 30,
+  "panels": 1403,
+  "actual_nodes": 2806,
+  "scope": "Actual prior BR04 Rust scalar node lists only. New independent panel/clock/composition audit; no native dynamics rerun.",
+  "tail_policy": "Decimal exp tails below exp(-1800) are cut. For the declared <=1e12 optical-depth domain and bounded positive rule weights, conservative omitted normalized mass <1e-768.",
+  "checks": [
+    "all actual paired nodes interior and positive",
+    "both width bounds with separately reported binary64 excess",
+    "global/partition masses agree in Decimal90",
+    "actual emitted W1 agrees with symmetric closed formula up to measured node-symmetry coupling bound",
+    "emitted second defect formula has measured rounding bound",
+    "matched panel W1 vs actual global W1 differs by at most panel-mass TV",
+    "unequal mass W1 bound",
+    "panel CDFplusTV bound",
+    "normalized mass-weighted width bound",
+    "whole fitted survivor mass defect below 3e-14",
+    "three explicit finite counterexamples/limitations"
+  ],
+  "largest_whole_relative_mass_defect": "1.020309424956381334118842341E-16",
+  "largest_panel_mass_TV": "3.99027508603086110823923760492081312647090172976755670128347672083618086923537740222668577E-17",
+  "examples": {
+    "unequal_panel_mass": {
+      "panel_width_each": "0.01",
+      "mass_weighted_width": "0.01",
+      "panel_probabilities_P": [
+        "0.9",
+        "0.1"
+      ],
+      "panel_probabilities_Q": [
+        "0.1",
+        "0.9"
+      ],
+      "age_atoms": [
+        "0.005",
+        "0.995"
+      ],
+      "actual_W1": "0.7920",
+      "TV": "0.8",
+      "conclusion": "A retained weighted width alone is not a bound without matching panel masses."
+    },
+    "clock_shift": {
+      "delta": "1E-12",
+      "same_weight_W1": "1E-12",
+      "CDFsup": "1",
+      "conclusion": "A small atom-clock shift controls W1 but not atomic CDFsup."
+    },
+    "label_swap": {
+      "label_L_ages": [
+        "0",
+        "1"
+      ],
+      "label_R_ages": [
+        "1",
+        "0"
+      ],
+      "unlabelled_mixture_W1": "0",
+      "equal_weight_label_constrained_W1": "1",
+      "conclusion": "The age-only mixture loses label discrepancies."
+    }
+  },
+  "failures": []
+}

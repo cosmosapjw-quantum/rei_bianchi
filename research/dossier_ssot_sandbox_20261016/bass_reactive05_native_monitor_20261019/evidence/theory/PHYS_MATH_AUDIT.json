@@ -1,0 +1,141 @@
+{
+  "schema": "BR05_PHYS_MATH_AUDIT_V1",
+  "recorded_utc": "2026-10-19 09:39:23 UTC",
+  "scope": "Constructive monitor derivation, actual independent CAS, Decimal90 prior-rule panel study, and read-only audit of the complete BR05 Nt16/r8 native monitor.",
+  "audit": [
+    {
+      "item": "definitions",
+      "status": "PASS",
+      "evidence": "Target normalized age, represented native clock, batch/label/panel IDs, positive mass normalization and frozen reference are separately defined."
+    },
+    {
+      "item": "signs",
+      "status": "PASS",
+      "evidence": "kappa>=0 and dt>0 give tau>=0; positive weights and exp attenuation preserve reference positivity. s/H signed convention retained."
+    },
+    {
+      "item": "units",
+      "status": "PASS",
+      "evidence": "Reference opacity s^-1, count m^-3, age/W1 s, count-weighted W1 m^-3 s; no source-density volume factor replaced."
+    },
+    {
+      "item": "physical_owners",
+      "status": "PASS_CONTRACT",
+      "evidence": "Original source, photon absorption, thermal/chemical budgets, geometry work and CX/controller own all physical changes. Monitor creates none."
+    },
+    {
+      "item": "panel_mass",
+      "status": "PASS_DERIVATION_CAS",
+      "evidence": "Equal emitted half-weights and cosh fitting exactly integrate the constant-kappa survivor panel in real arithmetic."
+    },
+    {
+      "item": "moments",
+      "status": "PASS_DERIVATION_CAS",
+      "evidence": "Emitted first moment exact. Emitted second defect d^3(f^2-f+1/6) explicitly nonzero away from GL2; survivor shape distances remain necessary."
+    },
+    {
+      "item": "positivity",
+      "status": "PASS_DERIVATION",
+      "evidence": "1<sinh(z)/z<cosh(z) gives 0<acosh(sinhc(z))<z, hence strict interior nodes and positive weights at finite z."
+    },
+    {
+      "item": "known_limits",
+      "status": "PASS_WITH_RECORDED_CAS_WARNING",
+      "evidence": "kappa->0 agrees with GL2/uniform; optically thick mass remains exact. Initial CAS limit warnings are preserved; clean series independently confirmed the regular limits."
+    },
+    {
+      "item": "composition",
+      "status": "PASS_CONDITIONAL",
+      "evidence": "Exact CDF-area sum requires ordered disjoint panels and matching masses. Label mixtures admit only upper bounds unless transport is label constrained."
+    },
+    {
+      "item": "unequal_panel_mass",
+      "status": "PASS_CONSTRUCTIVE_BOUND",
+      "evidence": "Match min(p_i,q_i) locally and transport TV remainder over full diameter; zero components have no invented shape."
+    },
+    {
+      "item": "clock_rounding",
+      "status": "PASS_CONDITIONAL",
+      "evidence": "Same-weight atom coupling bounds W1 by mean absolute clock defect. Weight changes need a separate TV term. Small shifts do not bound atomic CDFsup."
+    },
+    {
+      "item": "native_width",
+      "status": "PASS_LIMITED_INTERPRETATION",
+      "evidence": "Actual retained weighted width is a resolution statistic and a bound for an explicitly mass-matched hypothetical panel measure, not the unknown nonlinear solution."
+    },
+    {
+      "item": "geometry_observable",
+      "status": "PASS_CONDITIONAL",
+      "evidence": "Fixed-label, positive C1 scale factors and finite Hmax/Emax imply |dE/dtb|<=Hmax Emax. Native threshold-dependent opacity lacks this automatic smooth bound."
+    },
+    {
+      "item": "counterexample_scope",
+      "status": "PASS",
+      "evidence": "Mass/shape and age-only/labelled distinctions follow explicit finite examples; no global nonlinear positivity no-go is asserted."
+    },
+    {
+      "item": "finite_and_empty_states",
+      "status": "PASS_CONTRACT",
+      "evidence": "Zero source, actual zero retained mass, absolute underflow, normalized tail underflow and invalid provenance are different statuses."
+    },
+    {
+      "item": "solver_failure_classification",
+      "status": "PASS_CONTRACT",
+      "evidence": "Cx(WorkLimit) is a work-budget result. MonitorError cannot cancel successful local physics state. Predictor observations are excluded; outer adaptive trial filtering is not implemented in this bounded unit."
+    },
+    {
+      "item": "literature_attribution",
+      "status": "PASS",
+      "evidence": "Primary source versions/access scope verified; no external paper is treated as native H/He/D correctness evidence."
+    },
+    {
+      "item": "independent_numeric",
+      "status": "PASS_DECIMAL90_WITH_EXPLICIT_SCOPE",
+      "evidence": "New independent calculation: 30 prior scalar rules / 1403 panels / 2806 nodes, separate sample 48 rules / 48 panels / 768 births, and full native 768 step-rules / 19664 panels / 314624 birth records. See the separate input-hashed receipts."
+    }
+  ],
+  "admissible_claim": "The actual successful fixed-step native run has a source-labelled panel monitor with independent frozen local certificates, exact width replay and retained-support/width checks. The mathematical bounds have their stated comparator and stability assumptions.",
+  "inadmissible_claims": [
+    "Absolute nonlinear gas/radiation error from width alone",
+    "Full longspan convergence",
+    "Universal second order",
+    "Spectral or angular convergence from an age-only metric",
+    "Two-way Einstein feedback",
+    "Directed-rounding interval enclosure from ordinary binary64"
+  ],
+  "failure_notes": [
+    "Wolfram initial regular-limit evaluation emitted warnings, with clean series followup preserved.",
+    "Native numerical gates are not inherited from BR04."
+  ],
+  "accepted_scope": "Successful local advance_core transaction in the fixed-macrostep native driver. S10 adaptive four-corner controller and ap_budget remain uninstrumented parent paths; future adaptive callers must export only after outer acceptance.",
+  "independent_reference_file": "numeric/PANEL_MATH_VERIFICATION.json",
+  "native_sample_reference": "native_sample_final_checker/NATIVE_PANEL_VERIFICATION.json",
+  "native_sample_scope": {
+    "steps": 1,
+    "rules": 48,
+    "panels": 48,
+    "births": 768,
+    "certificate_fields": 576,
+    "status": "PASS",
+    "large_native_run": "COMPLETED_AND_INDEPENDENTLY_VERIFIED_SEPARATELY"
+  },
+  "finite_precision_caveats": [
+    "Whole-rule mass agreement does not imply uniform relative accuracy of exponentially negligible individual panels.",
+    "Template source-weight reconstruction can differ in floating arithmetic from direct native count sums; quotient underflow is not separately flagged."
+  ],
+  "native_full_reference": "native_full/NATIVE_PANEL_VERIFICATION.json",
+  "native_panel_replay_reference": "native_full/NATIVE_PANEL_REPLAY_VERIFICATION.json",
+  "native_full_scope": {
+    "status": "PASS",
+    "steps": 16,
+    "step_rules": 768,
+    "panels": 19664,
+    "rule_nodes": 39328,
+    "births_and_final_cohorts": 314624,
+    "local_certificate_fields": 235968,
+    "exact_replayed_boundary_fields": 58992,
+    "source_template_records": 6144,
+    "source_templates_per_step": 384,
+    "solver_execution_by_theory_agent": false
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "status": "PASS_EXACT_REVERSIBLE_EDITS",
+  "source_path": "repo/research/dossier_ssot_sandbox_20261016/bass_reactive05_native_monitor_20261019/crate/ap_midpoint.rs",
+  "source_sha256": "10d4e92f9c3b6718a88f8dfe9e66f3a04df39f5b0b1f233aaa3445d6c672196f",
+  "generated_path": "repo/research/dossier_ssot_sandbox_20261016/bass_reactive05_native_monitor_20261019/crate/monitored_midpoint.rs",
+  "generated_sha256_before_rustfmt": "b06176eafc74d901c21dd808735edb993c100c71015243b5f6b8e76d0ff5749d",
+  "recovered_sha256": "10d4e92f9c3b6718a88f8dfe9e66f3a04df39f5b0b1f233aaa3445d6c672196f",
+  "edits": [
+    {
+      "old": "ApMidpointBridge",
+      "new": "MonitoredMidpointBridge",
+      "count": 2
+    },
+    {
+      "old": "//! BASS-REACTIVE-03 opt-in exponentially fitted birth-age corrector.",
+      "new": "//! BASS-REACTIVE-05 generated read-only monitor over the BR03 corrector.\n//! Generated with exact reversible edits; physics bodies remain unchanged.\n//! BASS-REACTIVE-03 opt-in exponentially fitted birth-age corrector.",
+      "count": 1
+    },
+    {
+      "old": "use crate::axbi_sources::SOURCE_ID;",
+      "new": "use crate::axbi_sources::SOURCE_ID;\nuse crate::native_birth_monitor::{Capture, MonitorError, MonitorMode, MonitoredStep};",
+      "count": 1
+    },
+    {
+      "old": "#[derive(Clone, Copy, Debug, PartialEq, Eq)]\npub enum BirthMode {\n    Off,\n    Fitted { refinement: usize },\n}",
+      "new": "pub use crate::ap_midpoint::BirthMode;",
+      "count": 1
+    },
+    {
+      "old": "    pub fn advance_with_diagnostics(\n        &self,\n        initial: &AgeHistory,\n        conf: &NetworkConfig,\n        dt: f64,\n    ) -> Result<(AgeStep, RetardedDiagnostics), NetworkError> {\n        if self.4 == BirthMode::Off {\n            return self.original().advance_with_diagnostics(initial, conf, dt);\n        }\n        self.advance_core(initial, conf, dt, true)\n    }\n",
+      "new": "    /// No monitoring: dispatch directly to the unchanged parent AP implementation.\n    pub fn advance_with_diagnostics(\n        &self,\n        initial: &AgeHistory,\n        conf: &NetworkConfig,\n        dt: f64,\n    ) -> Result<(AgeStep, RetardedDiagnostics), NetworkError> {\n        self.parent().advance_with_diagnostics(initial, conf, dt)\n    }\n\n    pub fn from_parent(parent: crate::ap_midpoint::ApMidpointBridge) -> Self {\n        Self(parent.0, parent.1, parent.2, parent.3, parent.4)\n    }\n\n    pub fn parent(&self) -> crate::ap_midpoint::ApMidpointBridge {\n        crate::ap_midpoint::ApMidpointBridge(self.0.clone(), self.1, self.2, self.3, self.4)\n    }\n\n    /// Monitoring errors are diagnostics; they cannot turn accepted physics\n    /// into a rejected step. Legacy birth mode is run by the original owner.\n    pub fn advance_with_monitor(\n        &self,\n        initial: &AgeHistory,\n        conf: &NetworkConfig,\n        dt: f64,\n        mode: MonitorMode,\n    ) -> Result<MonitoredStep, NetworkError> {\n        let MonitorMode::On(controls) = mode else {\n            let (step, diagnostics) = self.parent().advance_with_diagnostics(initial, conf, dt)?;\n            return Ok(MonitoredStep { step, diagnostics, monitor: None });\n        };\n        if self.4 == BirthMode::Off {\n            let (step, diagnostics) = self.parent().advance_with_diagnostics(initial, conf, dt)?;\n            return Ok(MonitoredStep {\n                step,\n                diagnostics,\n                monitor: Some(Err(MonitorError::UnsupportedBirthMode)),\n            });\n        }\n        let mut capture = Capture::new(controls);\n        let (step, diagnostics) = self.advance_core(initial, conf, dt, true, Some(&mut capture))?;\n        Ok(MonitoredStep { step, diagnostics, monitor: Some(capture.finish()) })\n    }\n",
+      "count": 1
+    },
+    {
+      "old": "        predict: bool,\n    ) -> Result<(AgeStep, RetardedDiagnostics), NetworkError> {",
+      "new": "        predict: bool,\n        mut monitor: Option<&mut Capture>,\n    ) -> Result<(AgeStep, RetardedDiagnostics), NetworkError> {",
+      "count": 1
+    },
+    {
+      "old": "Some(first_order.advance_core(initial, &pc, 0.5 * dt, false)?.0)",
+      "new": "Some(first_order.advance_core(initial, &pc, 0.5 * dt, false, None)?.0)",
+      "count": 1
+    },
+    {
+      "old": "        let births = self.emit_births(t0, dt, conf, &rate_gas)?;",
+      "new": "        let births = self.emit_births(t0, dt, conf, &rate_gas)?;\n        // BR05 read-only corrector hook; the predictor receives None.\n        if let Some(observer) = monitor.as_deref_mut() {\n            observer.observe_births(&self.parent(), initial, conf, dt, &rate_gas,\n                &births, &gm, &g1);\n        }",
+      "count": 1
+    },
+    {
+      "old": "        )?;\n        s.full.photon_bins.clear();",
+      "new": "        )?;\n        if let Some(observer) = monitor.as_deref_mut() {\n            observer.observe_after_photo(&s.cohorts);\n        }\n        s.full.photon_bins.clear();",
+      "count": 1
+    },
+    {
+      "old": "        diag.emitted_photon_energy_j_com3 = e_birth;",
+      "new": "        diag.emitted_photon_energy_j_com3 = e_birth;\n        if let Some(observer) = monitor {\n            observer.observe_accepted(&s, conf);\n        }",
+      "count": 1
+    }
+  ],
+  "scope": "Exact reversibility before scoped formatting; all physics body edits are observer insertions only."
+}

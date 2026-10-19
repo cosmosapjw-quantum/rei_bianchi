@@ -1,0 +1,83 @@
+/mode: 심사위원
+/think: 표준
+/web: off
+/tools: files
+/cites: none
+
+[TITLE]
+Figure Residual Error Pass — Overlap / Legibility / Final Consistency
+
+[ONE-LINE PURPOSE]
+1차 수정 후 남아 있는 잔여 figure 오류를 다시 점검하고,
+겹침/잘림/축소 가독성/수식 및 글자 크기/패널 간 간격 문제를 제거하는 최종 패스를 수행하라.
+
+[IMPORTANT MODE DECLARATION]
+- 이 단계는 대규모 재설계 단계가 아니다.
+- semantic 구조를 새로 바꾸기보다, 남아 있는 잔여 오류를 제거하는 최종 polishing + safety check 단계다.
+- 단, P0 semantic error가 남아 있으면 즉시 재설계 필요를 선언하라.
+
+[TARGET PRINT ASSUMPTION]
+- 사용자가 별도 지정하지 않으면 single-column(≈89–90 mm)과 double-column(≈180–183 mm) 두 경우를 모두 가정하라.
+- figure는 축소 후에도 핵심 텍스트와 수식이 읽혀야 한다고 가정하라.
+
+[FINAL PASS PRIORITIES]
+1. 글자/수식/legend/tick/annotation overlap 제거
+2. 축소 후 읽기 어려운 요소 제거
+3. subplot spacing / alignment / common legend 정리
+4. 시각적 일관성 확보
+5. 마지막 semantic drift 확인
+
+[PHASE 1 — RESIDUAL ERROR SCAN]
+다음을 빠르게 but 엄격하게 스캔하라:
+- 겹치는 글자/수식/마커/legend/annotation
+- figure boundary에 너무 가까운 요소
+- 잘리는 tick label, panel label, colorbar label
+- 지나치게 작은 문자/수식
+- subplot 간 정렬 불일치
+- 불필요하게 빽빽한 legend 또는 redundant annotation
+- 너무 얇은 선, 너무 작은 marker, 너무 작은 error bar cap
+- panel label(a, b, c...)와 caption/본문 연결의 혼란
+
+[PHASE 2 — SELF-ADVERSARIAL FINAL CHECK]
+반드시 아래를 묻고 답하라:
+- “축소 인쇄본에서 가장 먼저 안 읽힐 요소는 무엇인가?”
+- “겹침은 해결됐지만 여전히 혼동을 주는 배치가 있는가?”
+- “이 figure를 처음 보는 독자가 가장 잘못 읽을 가능성이 높은 지점은 어디인가?”
+- “annotation을 하나 덜어내고 caption으로 보내면 더 좋아지는 부분이 있는가?”
+
+[PHASE 3 — BOUNDED FINAL VERIFICATION]
+- CoVe mini-pass:
+  (i) 최종 합격 판정 초안 작성
+  (ii) 검증 질문 3~5개 생성
+  (iii) 독립 답변
+  (iv) 판정 수정
+- contrastive check:
+  A. “현재 수정본 유지”
+  B. “텍스트/legend 일부를 더 줄이고 간결화”
+  둘 중 어느 쪽이 실제 논문 figure로 더 안전한지 판단하라.
+
+[PHASE 4 — FINAL MICRO-REPAIR]
+다음만 허용한다:
+- font size / math size / tick size / legend size 미세 조정
+- label 위치 미세 이동
+- subplot spacing / padding 조정
+- legend 외부화 또는 공통화
+- annotation 일부 삭제 또는 축약
+- colorbar / axis label / panel label 위치 조정
+- 필요 시 한 개 figure를 두 개로 나누는 제안
+대규모 의미 변경은 금지한다. 필요하면 “재설계 필요”로 분리해 선언하라.
+
+[OUTPUT FORMAT]
+1. residual error list
+2. print-size risk list
+3. final micro-repair plan
+4. 삭제/축약 추천 annotation or text
+5. 최종 판정:
+   - PASS
+   - MINOR REVISE
+   - REVISE AGAIN
+   중 하나
+6. 최종 판정 사유 한 줄
+
+[MATERIALS]
+<<<여기에 1차 수정 후 figure image(s)를 넣어라>>>
