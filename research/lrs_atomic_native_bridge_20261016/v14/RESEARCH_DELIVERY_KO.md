@@ -1,3 +1,21 @@
+# REI-LRS V14 최신 연구 전달 — 2026-10-19 VigilODE Radau 후속
+
+## 최신 완료 범위
+
+VigilODE의 정확한 source `8a8bd409b1d96c7b7421f496d229e119fd3d284e`에 있는 실제 Radau IIA3와 faer 0.24.4 LU를, 기존 native photon moment·chemistry·thermal 방정식에 opt-in으로 연결했다. 샌드박스 Rust 컴파일과 표적시험 **7개**, 실제 native **19개 고유 설정**이 통과했다. 19개 모두 exit 0이며 RHS 38,840회, native wall 9.146159986초다. 별도 실행기 회귀 4개는 process-only 검사이며 native 사례로 세지 않는다.
+
+최종 실행 source는 **`d87ba9ca25acb8a2a032154fa23057b45acd6207`**다. 339개 게시 파일의 Git blob을 원본 바이트와 대조했다. 이 뒤의 branch HEAD는 source와 백업을 가리키는 전달 기록이다. 새 NCP 실행은 **NOT_RUN**이며 과거 V14의 NCP 84개 이력 완료와 구분한다.
+
+현재 [연구보고서](vigilode_radau_20261019/RESEARCH_DELIVERY_KO.md), [이론 유도](vigilode_radau_20261019/THEORY.md), [source delta](vigilode_radau_20261019/SOURCE_DELTA.json), [root 판정](vigilode_radau_20261019/ROOT_SCIENTIFIC_ADMISSION.json), [실행 인계](vigilode_radau_20261019/CODEX_NCP_EXECUTE_KO.md), [최종 receipt와 DAG](vigilode_radau_20261019/stages/FINAL_DELIVERY.json)를 먼저 읽는다. 원래 `v14/SOURCE_DELTA.json`은 기존 복원 계약으로 유지한다.
+
+고정 기하의 유한 refinement에서 주요 채널의 Radau 비율은 약 4.89–4.97이다. Source-on 전체 차수, 일반 nonlinear native 5차, uniform stiff 정확도·양수성, Case B/full EoR/signed Bianchi는 HOLD다. 원시 사건·gas·binding와 photon N/U 배열로 독립 재구성한 전체 누적 에너지 잔차는 최대 8.1864e-15 eV/H다. 이번 boundary N/U는 0이고 저장된 CMB stage는 모두 음수다.
+
+최종 백업 `REI_LRS_V14_VIGILODE_C10_20261019T141050Z.tar.gz`은 **59621285 bytes**, SHA256 `7d709bcb82476fbfa11b8b68654319173740480686633b1e7d7e8b7f7e02812c`이다. Drive `1iubEGl2Cc7gLgm5l4s4M0U2LexsAqk_l`와 Dropbox `id:BSpOijBcT10AAAAAAD_Q6A` 양쪽 ACK 및 전체 readback hash가 일치했다. Drive 회수본의 1,299개 manifest hash와 manifest 자체까지 총 **1,300개 파일**을 검증했다. 상세 [remote ACK](vigilode_radau_20261019/stages/FINAL_REMOTE_ACK.json)를 참조한다. 이전 SSPRK2 Drive 미확인 기록은 역사적 상태로 보존한다.
+
+---
+
+## 아래는 직전 SSPRK2 및 projection 전달 기록
+
 # REI-LRS V14 최신 연구 전달 — 2026-10-19 SSPRK2 후속
 
 ## 최신 완료 범위
