@@ -1,0 +1,111 @@
+{
+  "schema": "rei.v9.c9_independent_review.v1",
+  "status": "PASS_SCOPED",
+  "reviewer_role": "independent read-only reviewer, prior backup intake owner, no implementation ownership",
+  "remote_base": "93aca4cc483080b802fa85c9c44e43b9c85db5b7",
+  "scope": "New native32 stored-output analysis, conditional scalar source primitive and explicit source-jump integration hook. No scientific admission beyond this scope.",
+  "source_hashes": {
+    "research/rei_age_exposure_envelope_20261018/native_age32_analysis_20261020/analysis.py": "ae64305e226c401536ec47457fdd08e48c8be4bf572edaee94c041d71815a0a2",
+    "research/rei_age_exposure_envelope_20261018/native_age32_analysis_20261020/run_bounded.py": "3c68c43fb6d46871f8da6b95312268bca05c8f56ea6c02f401dde07d60532ffc",
+    "research/rei_age_exposure_envelope_20261018/native_age32_analysis_20261020/test_analysis.py": "c00848af31c35de663f12db6fc3d1d1df7c3912f4a80a45da0433deb996af27e",
+    "research/rei_age_exposure_envelope_20261018/src/photon_ledger_diagnosis.py": "2954b90186d45c1bc896b628a1ce60cfe1e014cc2ff3142c065e91b4285820af",
+    "research/rei_age_exposure_envelope_20261018/tests/test_photon_ledger_diagnosis.py": "462eba71e2300a8351607ba90a60e2e8c441ef905c7646c97858080c803ac839",
+    "research/rei_age_exposure_envelope_20261018/native_age32_analysis_20261020/THEORY_KO.md": "d390e40721113ba83b1e078a6ca290d9cb4e051946b2acd7882536639f1e484c"
+  },
+  "authoritative_output_hashes": {
+    "results/attempt004/ANALYSIS.json": "e252907f43a7b94c5ddf3fe9e4c4cd598cfb47729d9021e992e275c6337cdad0",
+    "results/attempt004/COMMON_TIME.csv": "806f0ec2b4b491d2269a8a0de109f23048ca3b87f891118818e2785a026dedbe",
+    "results/attempt004/PHOTON_HISTORY.csv": "0f8f707ab2f8fb7043b9bfec19c66bbfd7e7e38658e174a3c7ce4c2c909ec98d",
+    "results/attempt004/DIAGNOSTICS.png": "3890043ca3dd63075d75c00e50327011173df43d5fe75c8e3f0b4aaf80b5b385"
+  },
+  "initial_findings": 3,
+  "closed_findings": 3,
+  "open_findings": 0,
+  "findings": [
+    {
+      "id": "C9-01",
+      "target": "analysis.py: photon_history final event B crosscheck",
+      "evidence": "Only j=0..B-1 is compared to solver interval and accepted-state photo ledgers. A memory-only probe doubles endpoint N and still returns AVAILABLE, 32 crosschecks and exact telescope zero. Original raw unchanged.",
+      "impact": "The final crosscheck promised in V9_IMPLEMENTATION_CONTRACT.md and THEORY_KO.md is absent; telescope is an identity for altered endpoint too. Actual raw endpoint has no observed mismatch.",
+      "minimal_repair": "Crosscheck event B active, clock, N and accepted_coordinates_eventB.npy photo ledgers against endpoint; preserve missing status and reject mismatch; targeted regression.",
+      "status": "CLOSED_CORRECTED",
+      "closure_evidence": "C9_TARGETED_RECHECK.json#C9-01"
+    },
+    {
+      "id": "C9-02",
+      "target": "analysis.py: source_step / midpoint_ratio exponent-product evaluation",
+      "evidence": "source_step(1e300,0,1,1000) returns n1=0; Decimal100 yields representable 5.075958897549457e-135. midpoint_ratio(1491) returns0; Decimal100 yields representable2.554e-321.",
+      "impact": "Intermediate exponential underflow loses representable final answers within the documented nonnegative finite-input scalar domain. Existing native analysis ordinary-scale outputs unaffected.",
+      "minimal_repair": "Scale exponential products in a log-domain branch before underflow; add the two concrete dynamic-range regressions or explicitly narrow accepted scalar domain.",
+      "status": "CLOSED_CORRECTED",
+      "closure_evidence": "C9_TARGETED_RECHECK.json#C9-02"
+    },
+    {
+      "id": "C9-03",
+      "target": "analysis.py: exposure_limits continuum_bracket / test_root_bracket",
+      "evidence": "At epsilon=.005, independent Decimal100 defect-epsilon at lower/upper endpoints is -1.672496290659364e-16 / -1.656555704831550e-16. At epsilon=.1 both signs positive. Existing test recomputes the same floating defect.",
+      "impact": "Returned interval is not a mathematical root bracket. Numeric threshold estimates remain approximately correct but the stated bracket assertion and conditional bound need correction.",
+      "minimal_repair": "Use independently validated higher precision signs to bracket, or accurately label approximate floating estimate instead; update root test with independent Decimal reference.",
+      "status": "CLOSED_CORRECTED",
+      "closure_evidence": "C9_TARGETED_RECHECK.json#C9-03"
+    }
+  ],
+  "independent_recheck": "C9_TARGETED_RECHECK.json",
+  "independent_recheck_script": "C9_TARGETED_RECHECK.py",
+  "independent_recheck_command": [
+    "python3",
+    "/workspace/scratch/3fac997d7514/review_c9_v9/C9_TARGETED_RECHECK.py"
+  ],
+  "independent_recheck_exit_code": 0,
+  "reviewer_scientific_process_wall_seconds": 0.562281198,
+  "implementation_scientific_wall_seconds": 10.235522128990851,
+  "validation_reused": {
+    "integration_tests": {
+      "count": 12,
+      "receipt": "receipts/05_integration_tests.stderr.log",
+      "status": "PASS"
+    },
+    "v8_campaign": "REUSED_NO_RERUN",
+    "native32_native64_trajectories": "REUSED_NO_RERUN"
+  },
+  "new_validation": {
+    "focused_repair_tests": {
+      "count": 12,
+      "receipt": "receipts/08_c9_focused_repair_tests.stderr.log",
+      "status": "PASS"
+    },
+    "final_postprocess": {
+      "receipt": "receipts/09_postprocess.stdout.log",
+      "output": "results/attempt004",
+      "exit_code": 0
+    },
+    "independent_probes": {
+      "actual_crosschecks": 33,
+      "endpoint_N_and_photo_mismatch_rejected": true,
+      "weighted_exponential_representability": true,
+      "midpoint_subnormal_representability": true,
+      "root_bracket_signs_decimal150": true
+    }
+  },
+  "claims_checked": [
+    "Photon Fraction telescope derivation and jump/continuous separation are correct for supplied raw data.",
+    "Own N/U population normalization and centered exact moments are implemented.",
+    "Legacy age64 missing explicit source events remains INCOMPLETE with no fabricated zero history.",
+    "Original .005 endpoint target and1e-8 conservation target remain unchanged.",
+    "Output nonempty guard and append-only numbered command receipts preserve existing attempts.",
+    "No native continuum or nonlinear response certificate is issued.",
+    "Regular-scale scalar primitive and midpoint ratios agree with independent Decimal probes."
+  ],
+  "numerical_limits": [
+    "Scalar log-domain weighted survival test has relative error2.378875921469783e-14; no universal correctly-rounded primitive claim is made.",
+    "Continuum brackets are independently Decimal150-checked numerical results for exact binary64 epsilon inputs; no native error certificate follows.",
+    "Age64 explicit event history remains INCOMPLETE.",
+    "The exact stored photon telescope is an arithmetic identity, separate from full integration/global error."
+  ],
+  "environment_warning": "Final plotting wrote successfully with matplotlib temporary cache fallback; stderr warning preserved in09_postprocess.stderr.log.",
+  "stop_condition": "Satisfied: all three concrete findings repaired and direct dependencies checked; optional review expansion stopped.",
+  "native_age": "HOLD",
+  "native_time": "HOLD",
+  "nonlinear_response_bound": "NOT_ESTABLISHED",
+  "PRODUCTION_SCIENTIFIC_ADMISSION": "NOT_ISSUED"
+}

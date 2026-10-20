@@ -72,6 +72,40 @@ def missing(names):
     return dict(status='MISSING_DATA', missing=names)
 
 
+
+def explicit_source_jumps(path, setup):
+    """Prefer saved event pre/post states; legacy observation path stays intact."""
+    try:
+        obj = read_json(path)
+        rows = obj.get('records', [])
+        count = setup['birth_count']
+        sources = setup['source_inventory']
+        if len(rows) != count:
+            raise ValueError('INCOMPLETE_SOURCE_EVENT_COUNT')
+        if [r.get('event') for r in rows] != list(range(count)):
+            raise ValueError('INVALID_SOURCE_EVENT_ORDER_OR_DUPLICATE')
+        result = []
+        for j, row in enumerate(rows):
+            if (row.get('status') != 'AVAILABLE' or row.get('active_before') != j
+                    or row.get('active_after') != j+1):
+                raise ValueError('INVALID_SOURCE_EVENT_ACTIVE_OR_STATUS')
+            if finite(row['x']) != finite(setup['births'][j]):
+                raise ValueError('INVALID_SOURCE_EVENT_CLOCK')
+            if row.get('source_inventory') != sources[j]:
+                raise ValueError('INVALID_SOURCE_EVENT_INVENTORY')
+            pre = budget(row['pre']['N'], row['pre']['ledgers'][4:7], [s[0] for s in sources[:j]])
+            post = budget(row['post']['N'], row['post']['ledgers'][4:7], [s[0] for s in sources[:j+1]])
+            delta = residual_fraction(post)-residual_fraction(pre)
+            result.append(dict(event=j, x=row['x'], status='AVAILABLE', active_pre=j,
+                               active_post=j+1, signed_residual_change_decimal80=display_fraction(delta),
+                               signed_residual_change_exact_fraction=fraction_record(delta),
+                               exact_stored_invariant_unchanged=delta==0))
+        return dict(status='AVAILABLE', provenance='EXPLICIT_SOURCE_JUMPS_JSON', records=result)
+    except (ValueError, KeyError, IndexError, TypeError) as e:
+        return dict(status='INCOMPLETE' if 'INCOMPLETE' in str(e) else 'INVALID',
+                    reason=str(e), provenance='EXPLICIT_SOURCE_JUMPS_JSON', records=[])
+
+
 def diagnose(data: Path):
     data = Path(data)
     objects = {}
@@ -211,6 +245,9 @@ def diagnose(data: Path):
                                   exact_stored_invariant_unchanged=delta == 0))
         report['source_jumps'] = dict(status='AVAILABLE' if jumps else 'MISSING_DATA', records=jumps,
                                       missing=[] if jumps else ['paired_source_jump_observations'])
+    explicit_path = data/'source_jumps.json'
+    if explicit_path.is_file():
+        report['source_jumps'] = explicit_source_jumps(explicit_path, setup)
     return report
 
 

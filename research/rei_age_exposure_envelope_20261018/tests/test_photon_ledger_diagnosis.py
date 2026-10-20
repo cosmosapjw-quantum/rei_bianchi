@@ -54,6 +54,22 @@ class PhotonLedgerDiagnosisTests(unittest.TestCase):
         assert report['history_interpretation']=='UNRESOLVED'
 
 
+    def test_explicit_events_preferred_without_observations(self):
+        data=fixture(self.tmp_path)
+        setup=json.loads((data/'setup.json').read_text())
+        rows=[]
+        for j,(pre,post) in enumerate([(physical(0.),physical(1.)),(physical(.75,.25),physical(2.75,.25))]):
+            rows.append(dict(event=j,x=setup['births'][j],active_before=j,active_after=j+1,
+                             source_inventory=setup['source_inventory'][j],status='AVAILABLE',pre=pre,post=post))
+        write(data/'source_jumps.json',dict(records=rows))
+        report=diagnosis.diagnose(data)
+        self.assertEqual(report['observations']['status'],'MISSING_DATA')
+        self.assertEqual(report['source_jumps']['provenance'],'EXPLICIT_SOURCE_JUMPS_JSON')
+        self.assertEqual(len(report['source_jumps']['records']),2)
+        rows[1]['active_after']=99
+        write(data/'source_jumps.json',dict(records=rows))
+        self.assertEqual(diagnosis.diagnose(data)['source_jumps']['status'],'INVALID')
+
     def test_real_frozen_gate_failure_is_retained(self):
         tmp_path=self.tmp_path
         fixture(tmp_path, 1e-6)
