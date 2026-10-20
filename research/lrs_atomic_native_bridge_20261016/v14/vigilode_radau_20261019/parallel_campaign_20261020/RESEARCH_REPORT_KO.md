@@ -88,7 +88,7 @@ V12 release build exit0는11.700944882초였다. V13의 처음 공유 target bui
 
 ## 독립 검토와 승인 경계
 
-Root Astra 계약→lower-tier 구현·실행→구현하지 않은 Astra 독립검토의 실제 위임을 수행했다. C9/R6는 PASS_SCOPED_RESOURCE_AWARE_ORCHESTRATION이며 복원 identity누락과V12reference경로를 같은 episode에서 수정·확인했다. Root의64-core 상한 교정도 같은 episode의 한 addendum으로 닫는다. 기존21tests/23native의 근거와 최종 administrative CLI repair를 구분한다.
+Root Astra 계약→lower-tier 구현·실행→구현하지 않은 Astra 독립검토의 실제 위임을 수행했다. C9/R6는 PASS_SCOPED_RESOURCE_AWARE_ORCHESTRATION이며 복원 identity누락과V12reference경로를 같은 episode에서 수정·확인했다. Root의64-core 상한 교정도 같은 episode의 한 addendum으로 닫았다. 기존21tests/23native의 근거와 최종 administrative CLI repair를 구분한다.
 
 source-on 일반2차, uniform stiff, 일반 양수성, CaseB/fullEoR/signedBianchi, 넓은 positive-CMB·비영 boundary, continuous global certificate는 HOLD다. 해당 CSV가 제공하지 않는 photon energy·boundary photon number의 완전한 독립 회계나 production admission은 주장하지 않는다. GL2 선형 약4차를 일반 비선형/native4차로 확장하지 않는다. borrowed의 속도와 peak-memory 감소는 여전히 NOT_ESTABLISHED다. repository CI의 과거 cargo fmt실패/test skipped는 이 scoped native/process PASS와 별개다.
 
@@ -99,3 +99,14 @@ source-on 일반2차, uniform stiff, 일반 양수성, CaseB/fullEoR/signedBianc
 최종 source/results와 C10 archive·별도 ACK의 실제 commit/ID/bytes/hash는 FINAL_DELIVERY.json, FINAL_PUBLICATION_ACK.json 및 DAG_FINAL.json이 기록한다. archive내 문서는 포장 시점 상태이며 이후 원격회수 완료는 별도 ACK와 최종Git문서로 닫는다. 기존 저장소·dirty상태를 보존하며 force/reset/clean이나 불필요한 clone/worktree는 수행하지 않았다.
 
 접근 가능한 NCP에서 CODEX_NCP_EXECUTE_KO.md의 한 명령을 실행하면 정상복원→variant별컴파일→기존표적시험→228shards+SSPRK3명령→병합·분석을 이어간다. 완료된19/N2/원본84는 재실행하지 않는다. 다음 대화는 NEXT_THREAD_PROMPT_KO.md대로 새 실행receipt부터 확인한다.
+
+현재 source 게시 commit의 CI는 2026-10-20 22:42:57UTC에 단 한 번 읽었다. push/PR verify 두 job은 당시 in_progress였고 fmt/test 결과는 관측하지 못했다. 과거 source524의 fmt 실패/test skipped와 구분하며 전체 CI green을 주장하지 않는다. CURRENT_SOURCE_CI.json과 원시응답을 보존했다.
+
+## 최종 게시·백업 identity
+
+- 구현·결과 source commit: `d234243a79e4e8e611aaf4ac61949c5ef9111468`. 최종 metadata HEAD는 이 파일을 포함하는 commit이다.
+- Archive: `REI_LRS_PARALLEL_C10_20261020.tar.xz`, 7,654,920bytes, SHA256 `388ef80e25fef7905e44fcc1aaf6179c6332b41fdf7c7e07233f51b805e608ac`. Drive `1yK1fsc_-ybJ59l8VYDvIARrpZtTIWbc5`, Dropbox `id:BSpOijBcT10AAAAAAD_aKw`.
+- ACK: `REI_LRS_PARALLEL_C10_ACK_20261020.json`, 6,391bytes, SHA256 `05c4bd684818cbc65b89a3f4091cdfb0c87a6902117ea954d0ded60f1774539e`. Drive `19mpts1yDKBtp02K6qOpG9C_dolyfDt4H`, Dropbox `id:BSpOijBcT10AAAAAAD_aLQ`.
+- Archive와 ACK 각각 양쪽 전체 GET/bytes/SHA256 일치. Archive343 regular files/manifest342개+self1개 PASS. Drive origin HTTP NOT_EXPOSED/materialization200, Dropbox HTTP200, 실제 회수 process exit0.
+- archive는 기존 검증된 dependency/base 위에 repo_payload를 overlay하는 delta이며 단독 복원본이 아니다. 포장 시점 PENDING은 별도 ACK와 FINAL_PUBLICATION_ACK.json이 닫는다.
+- 실제 source524의 NCP19/borrowedN2/originalV14 84 완료를 유지한다. 이번 V12/V13/SSPRK backlog는 NOT_RUN_BLOCKED_EXECUTION_ACCESS다.

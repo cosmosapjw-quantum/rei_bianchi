@@ -9,8 +9,8 @@
 | 기존 metadata 기준 HEAD | `96aaad584bbecded34485526a4bb53a49708ffc6` |
 | 현재 Radau scientific source | `5248822167e3fbe374f4333f7f2efdcdbfdaeeaf` |
 | VigilODE pin | `8a8bd409b1d96c7b7421f496d229e119fd3d284e` |
-| 새 병렬 구현의 게시 commit | `PENDING_ROOT_PUBLICATION_RECEIPT` |
-| 새 병렬 구현의 archive/Drive/Dropbox/ACK | `PENDING_ROOT_PROVIDER_RECEIPTS` |
+| 새 병렬 구현의 게시 commit | `d234243a79e4e8e611aaf4ac61949c5ef9111468` |
+| 새 병렬 구현의 archive/Drive/Dropbox/ACK | `ARCHIVE_AND_ACK_DUAL_FULL_GET_PASS — FINAL_PUBLICATION_ACK.json` |
 | V12/V13/SSPRK 전체 backlog의 NCP 실행 | `NOT_RUN` — 현재 도구 quota0/SSH key 부재 |
 | production | `NOT_ISSUED` |
 
@@ -79,3 +79,12 @@ source-on 일반2차, uniform stiff accuracy, 일반 양수성, Case B/full EoR,
 ## NCP 실행 agent에게 주어진 연결 권한
 
 사용자가 지정한 연결은 `ssh -i /home/cosmosapjw/.ssh/ncp_key root@49.50.142.2 -p 22`다. 이 명령을 사용자에게 수동 수행하도록 요구하지 않는다. 실제로 인증 가능한 실행 환경의 agent가 기존 checkout 상태를 먼저 읽고 작업한다. key가 없는 sandbox나 quota가 소진된 원격 도구에서 접속/실행을 수행했다고 기록하지 않는다.
+
+## 최종 게시·백업 identity
+
+- 구현·결과 source commit: `d234243a79e4e8e611aaf4ac61949c5ef9111468`. 최종 metadata HEAD는 이 파일을 포함하는 commit이다.
+- Archive: `REI_LRS_PARALLEL_C10_20261020.tar.xz`, 7,654,920bytes, SHA256 `388ef80e25fef7905e44fcc1aaf6179c6332b41fdf7c7e07233f51b805e608ac`. Drive `1yK1fsc_-ybJ59l8VYDvIARrpZtTIWbc5`, Dropbox `id:BSpOijBcT10AAAAAAD_aKw`.
+- ACK: `REI_LRS_PARALLEL_C10_ACK_20261020.json`, 6,391bytes, SHA256 `05c4bd684818cbc65b89a3f4091cdfb0c87a6902117ea954d0ded60f1774539e`. Drive `19mpts1yDKBtp02K6qOpG9C_dolyfDt4H`, Dropbox `id:BSpOijBcT10AAAAAAD_aLQ`.
+- Archive와 ACK 각각 양쪽 전체 GET/bytes/SHA256 일치. Archive343 regular files/manifest342개+self1개 PASS. Drive origin HTTP NOT_EXPOSED/materialization200, Dropbox HTTP200, 실제 회수 process exit0.
+- archive는 기존 검증된 dependency/base 위에 repo_payload를 overlay하는 delta이며 단독 복원본이 아니다. 포장 시점 PENDING은 별도 ACK와 FINAL_PUBLICATION_ACK.json이 닫는다.
+- 실제 source524의 NCP19/borrowedN2/originalV14 84 완료를 유지한다. 이번 V12/V13/SSPRK backlog는 NOT_RUN_BLOCKED_EXECUTION_ACCESS다.
