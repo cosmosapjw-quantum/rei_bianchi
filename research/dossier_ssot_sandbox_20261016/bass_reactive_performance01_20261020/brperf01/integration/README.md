@@ -24,9 +24,7 @@
 
 초기 밀도 단위는 `m^-3`이다. `HI=1000`, `HII=900`, `DI=25`, `DII=5`, `He4I=300`, `He4II=100`, `He4III=60`을 사용하고 나머지 6개 isotope population은 0으로 둔다. 초기 광자, 탈출 복사 에너지, CMB reservoir는 0이다. 체적은 고정이며 광원과 photo reaction은 OFF이다. CI, RR, CE, DR, free-free, CMB thermochemistry와 원 CX를 사용한다. CMB bath는 원 회귀 설정 20 K이다.
 
-초기 열 에너지는 원 EOS의 전체 열입자수로 (U_{
-m th}=3k_B n_{
-m part}T/2)를 만족하도록 구성한다. H binding energy는 13.598434599702 eV, 제조된 D binding energy는 H+0.0037 eV, HeI/HeII는 24.587389011/54.41776 eV이다. 이는 full-EoR 초기조건의 주장이나 새로운 isotope 데이터의 admission이 아니다.
+초기 열 에너지는 원 EOS의 전체 열입자수로 (U_{m th}=3k_B n_{m part}T/2)를 만족하도록 구성한다. H binding energy는 13.598434599702 eV, 제조된 D binding energy는 H+0.0037 eV, HeI/HeII는 24.587389011/54.41776 eV이다. 이는 full-EoR 초기조건의 주장이나 새로운 isotope 데이터의 admission이 아니다.
 
 | Case | 초기 T (K) | 구간 (s) | 각 backend의 시간 격자 |
 |---|---:|---:|---|
