@@ -1,0 +1,237 @@
+//! BASS-REACTIVE-05 read-only monitor driver; parent native CSV is preserved.
+//! Macrostep, birth refinement, spectrum and opacity controls are independent.
+#[path = "study_controls.rs"]
+mod study_controls;
+use rei_iso_couple_reference::ap_midpoint::{ApMidpointBridge, BirthMode};
+use rei_iso_couple_reference::monitored_midpoint::MonitoredMidpointBridge;
+use rei_iso_couple_reference::native_birth_monitor::{MonitorControls, MonitorMode};
+use rei_iso_couple_reference::native_monitor_csv::MonitorCsv;
+use rei_iso_couple_reference::positive_spectral::SpectralMode;
+use study_controls::AxisControls;
+#[path = "tests/bass_common/mod.rs"]
+mod bass_common;
+use rei_iso_couple_reference::{
+    bass_reactive::GeometryChoice,
+    bianchi_i::{AxisymmetricPoint, ConstantAxisymmetricBackground},
+    bound_adaptive::{events_comoving, photon_projection},
+    isotope_state::IsotopeSpecies as S,
+};
+use std::{
+    io::{self, Write},
+    time::Instant,
+};
+fn main() {
+    let a: Vec<_> = std::env::args().collect();
+    assert_eq!(
+        a.len(),
+        13,
+        "case grid nsteps t0 duration split frozen birth_gl opacity cx_rtol off|refinement monitor-off|output_dir"
+    );
+    let case = &a[1];
+    let grid = a[2].parse().unwrap();
+    let n: usize = a[3].parse().unwrap();
+    let t0: f64 = a[4].parse().unwrap();
+    let dur: f64 = a[5].parse().unwrap();
+    let split: bool = a[6].parse().unwrap();
+    let frozen: bool = a[7].parse().unwrap();
+    assert!(n > 0 && dur > 0.);
+    let birth_gl: usize = a[8].parse().unwrap();
+    let opacity: usize = a[9].parse().unwrap();
+    let cx_rtol: f64 = a[10].parse().unwrap();
+    let mode = if a[11] == "off" {
+        BirthMode::Off
+    } else {
+        BirthMode::Fitted {
+            refinement: a[11].parse().unwrap(),
+        }
+    };
+    let refinement = match mode {
+        BirthMode::Off => 0,
+        BirthMode::Fitted { refinement } => refinement,
+    };
+    let (mut b, mut c, g) = bass_common::fixture(case, grid, t0, false, 8192);
+    AxisControls {
+        birth_gl,
+        opacity,
+        spectrum: if split {
+            SpectralMode::SplitPositiveGauss3
+        } else {
+            SpectralMode::OriginalCellMean
+        },
+        cx_rtol,
+    }
+    .apply(&mut b, &mut c)
+    .unwrap();
+    if frozen {
+        let p = b.0.geometry.snapshot(t0).unwrap();
+        let mean = p.hubble_per_s.iter().sum::<f64>() / 3.;
+        let shear = (p.hubble_per_s[2] - p.hubble_per_s[0]) / 3.;
+        let aa = p.volume_factor().unwrap().cbrt();
+        let bb = (p.scale_factors[2] / aa).ln() / 2.;
+        b.0.geometry = GeometryChoice::constant(
+            ConstantAxisymmetricBackground::new(
+                t0,
+                AxisymmetricPoint::new(aa, bb, mean, shear).unwrap(),
+                [t0, t0 + dur],
+            )
+            .unwrap(),
+        );
+    }
+    let b = MonitoredMidpointBridge::from_parent(ApMidpointBridge::from_original(b, mode));
+    let monitor_on = a[12] != "monitor-off";
+    let mut monitor_output = if monitor_on {
+        match MonitorCsv::create(std::path::Path::new(&a[12])) {
+            Ok(out) => Some(out),
+            Err(error) => {
+                eprintln!("MONITOR_IO_FAILURE before_physics {error}");
+                std::process::exit(4);
+            }
+        }
+    } else {
+        None
+    };
+    let mut monitor_failures = 0usize;
+    let mut monitor_io_failures = 0usize;
+    let original = b.original(); // only immutable labelled projections are borrowed.
+    let mut state = b.initial(g, &c, t0).unwrap();
+    let initial_volume = b.0.geometry.snapshot(t0).unwrap().volume_factor().unwrap();
+    let initial_photon_energy = photon_projection(&original, &state).unwrap().energy_j;
+    let initial_total_energy = (state.full.gas.thermal_j_m3
+        + state.full.binding_j_m3(&c)
+        + state.full.escaped_j_m3
+        + state.full.cmb_reservoir_j_m3)
+        * initial_volume
+        + initial_photon_energy;
+    let timer = Instant::now();
+    let (mut max_n, mut max_e, mut max_w) = (0f64, 0f64, 0f64);
+    let mut ev = [0.; 4];
+    let (mut rr, mut cx, mut ff, mut cmb) = (0., 0., 0., 0.);
+    let (mut thermal, mut chemical, mut photo_energy) = (0., 0., 0.);
+    let mut o = io::BufWriter::new(io::stdout().lock());
+    writeln!(o,"case,grid,nsteps,t0,duration,split,frozen,step,time_s,T_K,DII_m3,photons_com3,absorbed_com3,HI,HeI,HeII,DI,source_count,source_energy,geom_work,q2,H_perp,H_parallel,volume,cohorts,maxN,maxE,maxW,RR,CX_abs,FF,CMB_abs,hits,misses,cache_size,birth_gl,opacity,cx_rtol,cx_atol,threshold_crossings,wall_s,birth_mode,refinement,thermal_change_com3,chemical_change_com3,photo_energy_com3,survivor_age_com_s,survivor_age2_com_s2,photon_energy_com3,gas_thermal_com3,gas_binding_com3,escaped_com3,cmb_reservoir_com3,initial_total_energy_com3").unwrap();
+    for step in 1..=n {
+        let next = if step == n {
+            t0 + dur
+        } else {
+            t0 + dur * step as f64 / n as f64
+        };
+        let dt = next - state.time_s;
+        let begin = state.time_s;
+        let monitor_mode = if monitor_on {
+            MonitorMode::On(MonitorControls {
+                step_id: step,
+                ..MonitorControls::default()
+            })
+        } else {
+            MonitorMode::Off
+        };
+        let observed = match b.advance_with_monitor(&state, &c, dt, monitor_mode) {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("FAILED_AT step={step} t={begin} {e:?}");
+                std::process::exit(2);
+            }
+        };
+        match observed.monitor {
+            Some(Ok(data)) => {
+                if let Some(out) = monitor_output.as_mut()
+                    && let Err(error) = out.write_step(&data)
+                {
+                    eprintln!("MONITOR_IO_FAILURE accepted_step={step} {error}");
+                    monitor_io_failures += 1;
+                    monitor_output = None;
+                }
+            }
+            Some(Err(error)) => {
+                eprintln!("MONITOR_FAILURE accepted_step={step} {error:?}");
+                monitor_failures += 1;
+            }
+            None => {}
+        }
+        let (s, d) = (observed.step, observed.diagnostics);
+        let v =
+            b.0.geometry
+                .snapshot(begin + 0.5 * dt)
+                .unwrap()
+                .volume_factor()
+                .unwrap();
+        for (i, x) in events_comoving(&original, &s, begin)
+            .unwrap()
+            .iter()
+            .enumerate()
+        {
+            ev[i] += x;
+        }
+        thermal += s.chemistry_budget.thermal_change_j_m3 * v;
+        chemical += s.chemistry_budget.chemical_change_j_m3 * v;
+        photo_energy += s.chemistry_budget.photo_energy_j_m3 * v;
+        rr += s.chemistry_budget.rr_events_m3.iter().sum::<f64>() * v;
+        cx += s.chemistry_budget.cx_signed_m3.abs() * v;
+        ff += s.chemistry_budget.freefree_integrated_j_m3 * v;
+        cmb += s.chemistry_budget.cmb_change_j_m3.abs() * v;
+        max_e = max_e.max(s.global_energy_relative_error);
+        let p = photon_projection(&original, &s.state).unwrap();
+        max_n = max_n.max(
+            ((p.count + s.state.photon_absorbed_count_com3 - s.state.source_injected_count_com3)
+                / s.state.source_injected_count_com3)
+                .abs(),
+        );
+        max_w = max_w.max(
+            (d.photon_work_ledger_j_com3 - d.photon_work_independent_j_com3).abs()
+                / s.state.source_injected_energy_j_com3,
+        );
+        state = s.state;
+        let q = b.0.geometry.snapshot(state.time_s).unwrap();
+        let (h, m, k) = b.0.geometry.cache_stats();
+        let age1: f64 = state
+            .cohorts
+            .iter()
+            .map(|x| x.n_comoving_m3 * (state.time_s - x.birth_time_s))
+            .sum();
+        let age2: f64 = state
+            .cohorts
+            .iter()
+            .map(|x| x.n_comoving_m3 * (state.time_s - x.birth_time_s).powi(2))
+            .sum();
+        let volume = q.volume_factor().unwrap();
+        let photon_energy = p.energy_j;
+        let gas_thermal = state.full.gas.thermal_j_m3 * volume;
+        let gas_binding = state.full.binding_j_m3(&c) * volume;
+        let escaped = state.full.escaped_j_m3 * volume;
+        let cmb_reservoir = state.full.cmb_reservoir_j_m3 * volume;
+        let mode_label = if mode == BirthMode::Off {
+            "off"
+        } else {
+            "fitted"
+        };
+        writeln!(o,"{case},{grid},{n},{t0:.17e},{dur:.17e},{split},{frozen},{step},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{},{max_n:.17e},{max_e:.17e},{max_w:.17e},{rr:.17e},{cx:.17e},{ff:.17e},{cmb:.17e},{h},{m},{k},{birth_gl},{opacity},{cx_rtol:.17e},{:.17e},{},{:.9e},{mode_label},{refinement},{thermal:.17e},{chemical:.17e},{photo_energy:.17e},{age1:.17e},{age2:.17e},{photon_energy:.17e},{gas_thermal:.17e},{gas_binding:.17e},{escaped:.17e},{cmb_reservoir:.17e},{initial_total_energy:.17e}",state.time_s,state.full.gas.eos().unwrap().temperature_k,state.full.gas.nuclei.density_m3(S::DIonized),p.count,state.photon_absorbed_count_com3,ev[0],ev[1],ev[2],ev[3],state.source_injected_count_com3,state.source_injected_energy_j_com3,state.geometry_work_j_com3,p.q2_energy,q.hubble_per_s[0],q.hubble_per_s[2],q.volume_factor().unwrap(),state.cohorts.len(),c.cx_controls.atol_normalized,d.threshold_crossings,timer.elapsed().as_secs_f64()).unwrap();
+        o.flush().unwrap();
+    }
+    if let Some(out) = monitor_output.as_mut() {
+        let end = b.0.geometry.snapshot(state.time_s).unwrap();
+        if let Err(error) = out.write_final(&state, &end) {
+            eprintln!("MONITOR_IO_FAILURE final_export {error}");
+            monitor_io_failures += 1;
+        } else {
+            let export_status = if monitor_failures == 0 {
+                "MONITOR_COMPLETE"
+            } else {
+                "MONITOR_EXPORT_PARTIAL"
+            };
+            eprintln!(
+                "{export_status} accepted_steps={} birth_rows={} final_cohorts={}",
+                out.steps_written,
+                out.births_written,
+                state.cohorts.len()
+            );
+        }
+    }
+    assert!(rr > 0. && cx > 0. && ff > 0. && cmb > 0.);
+    assert!(max_n < 3e-10 && max_e < 3e-10);
+    if monitor_io_failures > 0 {
+        std::process::exit(4);
+    }
+    if monitor_failures > 0 {
+        std::process::exit(3);
+    }
+}

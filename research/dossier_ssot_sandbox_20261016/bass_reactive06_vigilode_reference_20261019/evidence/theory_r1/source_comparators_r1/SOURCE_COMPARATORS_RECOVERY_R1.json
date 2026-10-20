@@ -1,0 +1,87 @@
+{
+  "version": "BR06_THEORY_RECOVERY_R1",
+  "status": "COMPLETED_FRESH_RECOVERY_EXECUTION",
+  "historical_pass_inherited": false,
+  "scope": "Actual BR05 step1 spectral/gas fixture. C0/C1/C2 are different physical comparators, not three discretizations of one problem. Fixed GL bias is not the BR02 frozen table rerun.",
+  "definition": "All stored decimal input tokens are parsed to binary64, then lifted exactly with Decimal.from_float. C0 uses stored rule tau and exact sum of midpoint source label rates. Matched actual age is computed in Decimal from exact binary64 dt and actual_birth_time_s; target age is the exact binary64 target_age_x. Opacity remains fixed in C1. Source weights are held identical in the clock intervention.",
+  "utc": "2026-10-19T17:40:27.148510+00:00",
+  "python": "3.12.14",
+  "source_sha256": "bfbcbcb112f8e0d91339c04daa4142ab21ea63b19cb11f8cbca52793f8429a74",
+  "decimal_module_sha256": "344763bcc57c9adf5e79ec3c6330d98f468b99452ec9e3df890885d2abd58c79",
+  "independent_module_sha256": "85f7c09f606359d30085869ef28e240b15443d33b26c3a2f6b3edb01858097c9",
+  "inputs": {
+    "br06_recovery/parent_archive/evidence/native/monitor_n16_r8/MONITOR_STEPS.csv": "bbf4b2e9c4ca1a74d749755b0aba44a047f86dbe762e94ad34546328c55a653c",
+    "br06_recovery/parent_archive/evidence/native/monitor_n16_r8/MONITOR_TEMPLATES.csv": "7148f98fd3111a4c32001de57a3d3ab091face885df1abafeebf35bdd87f0957",
+    "br06_recovery/parent_archive/evidence/native/monitor_n16_r8/MONITOR_RULES.csv": "0cc5498ce3f98d2805c4c70bf96497264062a428709b00971524a79b83247f94",
+    "br06_recovery/parent_archive/evidence/native/monitor_n16_r8/MONITOR_BIRTHS.csv": "a67f60377222f702e53b76bab47e51b15e4866ebd749e579de0036650bef906d",
+    "br06_recovery/parent_archive/donor_input/donor/background_968rows_f9f0bfd3.csv": "5a7844834b50fbc046995678a6aaf936252a81e49de1593604eee30641274133"
+  },
+  "variable_reference": "br06_recovery/theory/evidence/independent_minus_r1/INDEPENDENT_REFERENCE.json",
+  "variable_reference_sha256": "ec57072c8b6665cd90ee9854fae494250128e364f857d18e237567895b77bb08",
+  "results": {
+    "constant_midpoint_source_opacity_C0_decimal90": "1.00119770256851116070815725763633369863573119053539836395391979015044332302313945678918490E-8",
+    "actual_source_constant_opacity_C1_continuous": [
+      {
+        "degree": 64,
+        "N_com3": 1.0012784178785809e-08
+      },
+      {
+        "degree": 128,
+        "N_com3": 1.001278417878988e-08
+      }
+    ],
+    "actual_source_constant_opacity_C1_matched_exact_clock_decimal90": "1.00127841784859719926979731583197602622582857276341391807998013003276562881634600264049868E-8",
+    "same_birth_weights_target_age_C1_decimal90": "1.00127841784859724241600856789723957021736967455440898883398341265465676559161050607394436E-8",
+    "actual_source_variable_opacity_C2": 1.0013572745743383e-08,
+    "C1_source_shift_relative": 8.061875318912544e-05,
+    "C2_physical_transport_shift_relative": 7.875601225610226e-05,
+    "matched_birth_vs_continuous_C1_relative": -3.035204906311851e-11,
+    "clock_intervention_relative": -4.309112279157242e-17,
+    "C1_continuous_64_to_128_relative": -4.066184691776767e-13,
+    "fixed_gauss_birth_comparator": [
+      {
+        "degree": 2,
+        "N_com3": 4.298398828284074e-10,
+        "relative_bias_vs_C0": -0.9570674321639293
+      },
+      {
+        "degree": 4,
+        "N_com3": 5.001366385713088e-09,
+        "relative_bias_vs_C0": -0.5004616597818402
+      },
+      {
+        "degree": 8,
+        "N_com3": 9.692939040807773e-09,
+        "relative_bias_vs_C0": -0.031865632937317645
+      },
+      {
+        "degree": 16,
+        "N_com3": 1.0011918346586249e-08,
+        "relative_bias_vs_C0": -5.860890282918159e-06
+      },
+      {
+        "degree": 32,
+        "N_com3": 1.0011977025685592e-08,
+        "relative_bias_vs_C0": 4.802135100374527e-14
+      },
+      {
+        "degree": 64,
+        "N_com3": 1.0011977025685578e-08,
+        "relative_bias_vs_C0": 4.6534207057274253e-14
+      }
+    ],
+    "tau_range": [
+      2.662759859990653,
+      92.76932222323488
+    ],
+    "end_volume_over_anchor_minus_one": 8.876571901406116e-05,
+    "birth_rows": 19664,
+    "unique_clock_groups": 2458
+  },
+  "wall_s": 0.656762514001457,
+  "interpretation": {
+    "H1_clock_or_path_dominance": "The actual clock intervention is evaluated directly. The ~80 ppm C1/C0 and C2/C1 shifts describe actual source time dependence and physical geometry/comoving dilution; they must not be called native path errors.",
+    "cohort_age": "Exact frozen survivor mass does not imply exact age moments when fitted weights/nodes depend on tau.",
+    "precision_scope": "Decimal90 eliminates rounded-input ambiguity in scalar and matched-clock comparisons. SciPy Gaussian refinement provides empirical convergence for continuous source dependence; this receipt is not an interval proof."
+  }
+}
