@@ -60,3 +60,21 @@ Stdout/stderr, RECEIPT, HOST, CAMPAIGN, argv/env/source/prepared/binary/runtime,
 세 case 종료 후 원 실패가 남으면 첫 새 실패를 진단한다. 동일 자동 반복·허용오차 완화·완료 campaign 반복은 없다. 작은 연결 수정에는 이유/source diff/binary identity를 남기고 모델·solver 변경은 원 연구 계약으로 돌아간다.
 
 반환을 task-owned evidence에 보존하고 실제 최신 원격 부모를 잇는 expected-head FF로 push한다. 결과 archive와 필요한 source C8/C10을 Drive `rei_bianchi_research_backups` 및 Dropbox `/bianchi/rei_bianchi/research/REI_POSITIVE_AGE_REFERENCE_BACKUPS/`에 자동 백업하고 whole readback한다. CURRENT5/DAG에 case별 COMPLETE/FAILED/INCOMPLETE·남은 분석을 반영한다. PR199 draft/open,no merge/no force-push. Root CI와 scoped 연구 검증을 구분한다.
+
+
+## v10 실제 소스·이중 백업 전달 — 20261021
+
+소스 `4f13648985e417028c530892ea02be4f56018a31`을 부모 `abbf71caf4bd45af5bdf8bc7744690d10b8715e7`에서 expected-head fast-forward로 게시했다. 소스 root tree는 `7314041a7b58d35df4a4b417dcdcfcd34d9f5b15`, task tree는 `1107a5039615148ff72f6fb68d8b72dfce157012`이며 전체 task 소스는2391파일이다. PR199는 open/draft 상태다.
+
+| 패키지 | bytes | SHA256 | Drive ID | Dropbox ID |
+|---|---:|---|---|---|
+| C8 | 23546319 | `c55dc1280a8fc0154e7fc577e0aab9b2d14853c721b80e620972a4a7bb7b9bdd` | `1n0xltg0nngOih7FVuhuGoI6LoeaC5UbS` | `id:BSpOijBcT10AAAAAAD_aPw` |
+| C10 | 25611513 | `d6f2c121f554d3e59d56a15abe910a6dba115a69b167539de42b0df7eb5fd6c5` | `1d80Dn9O92FocYbojvFyF7Qewb2yt5w9-` | `id:BSpOijBcT10AAAAAAD_aQA` |
+
+네 원격 파일을 실제 전체 다운로드하여 bytes/SHA256, ZIP CRC, 전체 payload, 소스 blob/mode/task tree를 확인했다. C10은 frozen native153, 원 B1, deduplicated source161, vendor22패키지/865파일, 원 native32 tar까지 통과했다. 영수증은 `evidence/delivery_v10_20261021/`의 여섯 delivery JSON이며, 전체 원격 검증 상태는 `PASS_FOUR_FULL_PROVIDER_READBACKS`다. 비공개 단일사용 download URL은 게시하지 않는다.
+
+실제 소스 CI는 PR run39509350736/job118926184408 및 push run39509344439/job118926162607에서 기존 root `cargo fmt` 실패, workspace tests SKIPPED다. 전체 PR CI가 green이라는 주장은 하지 않는다. task R6/C9의 scoped PASS와 구분한다.
+
+C8/C10은 위 소스 snapshot을 고정한다. 최종 delivery metadata commit과 실제 readback 이후, 외부 `REI_AGE_ENVELOPE_DELIVERY_CONFIRMATION_20261021_v10.json`에 정확한 task 소유 UTF-8 delta를 넣어 최종 tree를 복원한다. 확인서 자신의 SHA/provider 수신확인은 외부에 둔다. 아직 확정되지 않은 final head/hash를 이 metadata에 쓰지 않는다.
+
+미완료 time8/time16/time32 실행은 `READY_EXPLORATORY_NCP`다. 이번 NCP 새 실행은0이며 native age/time convergence는 HOLD, nonlinear response bound는 NOT_ESTABLISHED, production scientific admission은 NOT_ISSUED를 유지한다. 원격 백업의 완료는 실제 time endpoint나 수렴 판정의 완료를 뜻하지 않는다.
