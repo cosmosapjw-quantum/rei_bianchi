@@ -25,6 +25,6 @@ BASS는 현재 compile/normalization 단계까지 준비됐다. 물리 donor clo
 
 ## REI NCP 실행 반환 (2026-10-20)
 
-- LRS V14: [실행 결과와 DAG](https://github.com/cosmosapjw-quantum/rei_bianchi/commit/301297a2cd34346d666ec74e12831697db9a6f01), 19개 cache 설정 4.937 s/180 s 누적 cap, 고정 Radau N2 borrowed 비교 완료. 유한 기록과 카운터는 일치하나 단일 비교로 speedup은 주장하지 않으며 생산 admission은 발행하지 않았다.
+- LRS V14: [실행 결과와 DAG](https://github.com/cosmosapjw-quantum/rei_bianchi/commit/90c46b3d305ae7d1c3a6d54cd5de6b55dfdc70ec), 19개 cache 설정 4.937 s/180 s 누적 cap, 고정 Radau N2 borrowed 비교 완료. 유한 기록과 카운터는 일치하나 단일 비교로 speedup은 주장하지 않으며 생산 admission은 발행하지 않았다.
 - age32: [실행 결과, DAG, 독립 검토, 백업 영수증](https://github.com/cosmosapjw-quantum/rei_bianchi/commit/93aca4cc483080b802fa85c9c44e43b9c85db5b7), 48 transport workers, 248.816 s/1800 s cap. 고정 photon gate 통과; 선택된 0.5% finite-neighbor 목표 미달. age/time continuum 및 production admission은 HOLD/NOT_ISSUED.
 - 이 NCP host에서 확인한 capacity는 64 CPU/125.75 GiB였다. age32 실행 중 HE29의 one-thread case가 계속 관측되어 추가 대형 작업을 동시에 배정하지 않았다. 이 snapshot은 한 host만 다루며 나머지 UNKNOWN 상태는 바꾸지 않는다. RUN13 M2와 R9 Unit5 terminal/128 checkpoint는 회수 완료 상태로 유지하고 재실행하지 않았다.
