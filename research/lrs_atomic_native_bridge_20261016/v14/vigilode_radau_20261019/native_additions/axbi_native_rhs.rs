@@ -18,11 +18,25 @@ impl PreparedAbsorption {
         absorber_cm3: [f64; 3],
         n_h_cm3: f64,
     ) -> Result<NativeAbsorptionRates, ForwardError> {
+        native_rates_ordered(&self.template, self.nodes.iter(), absorber_cm3, n_h_cm3)
+    }
+} 
+
+/// The original native-rate arithmetic, shared by owned and borrowed node sequences.
+fn native_rates_ordered<'n, I>(
+    template: &PhotonState,
+    nodes: I,
+    absorber_cm3: [f64; 3],
+    n_h_cm3: f64,
+) -> Result<NativeAbsorptionRates, ForwardError>
+where
+    I: Iterator<Item = &'n AbsorptionNode>,
+{
         if !absorber_cm3.iter().all(|&x| nonnegative(x)) || !n_h_cm3.is_finite() || n_h_cm3 <= 0.0 {
             return Err(bad("AXBI_COVARIANT_OPACITY_DOMAIN"));
         }
         let m = HHeModel::controlled_fixture();
-        let cells = self.template.number.len();
+        let cells = template.number.len();
         let mut r = NativeAbsorptionRates {
             number_dt: vec![0.; cells],
             energy_ref_dt: vec![0.; cells],
@@ -35,7 +49,7 @@ impl PreparedAbsorption {
         let mut cn = vec![0.; cells];
         let mut cu = vec![0.; cells];
         let mut co = vec![0.; cells];
-        for node in &self.nodes {
+        nodes.for_each(|node| {
             let mut total = 0.;
             for j in 0..3 {
                 let photo = m.c_cm_s * n_h_cm3 * node.sigma[j] * node.number;
@@ -56,9 +70,9 @@ impl PreparedAbsorption {
             compensated_add(
                 &mut r.energy_offset_dt[node.cell],
                 &mut co[node.cell],
-                -(node.q - self.template.support_lo[node.cell]) * total,
+                -(node.q - template.support_lo[node.cell]) * total,
             );
-        }
+        });
         if !r
             .number_dt
             .iter()
@@ -78,7 +92,6 @@ impl PreparedAbsorption {
             return Err(bad("AXBI_NATIVE_RHS_NONFINITE"));
         }
         Ok(r)
-    }
 }
 
 /// Segment-scoped geometry and Jacobian-local photon reconstruction cache.
@@ -122,5 +135,56 @@ impl NativeCellCache<'_> {
             prepared.nodes.extend(cell.nodes.iter().cloned());
         }
         Ok(prepared)
+    }
+}
+
+/// A borrowed ordered node sequence, with at most one owned changed-cell preparation.
+pub struct NativeBorrowedView<'cache, 'transport> {
+    cache: &'cache NativeCellCache<'transport>,
+    state: &'cache PhotonState,
+    changed: Option<usize>,
+    replacement: Option<PreparedCell>,
+    pub diagnostics: QuadratureDiagnostics,
+}
+impl<'transport> NativeCellCache<'transport> {
+    pub fn prepare_borrowed<'cache>(
+        &'cache self,
+        state: &'cache PhotonState,
+        changed: Option<usize>,
+    ) -> Result<NativeBorrowedView<'cache, 'transport>, ForwardError> {
+        self.transport.validate_state(state)?;
+        if changed.is_some_and(|k| k >= self.cells.len()) { return Err(bad("NATIVE_CACHE_CHANGED_CELL")); }
+        for k in 0..self.cells.len() {
+            if state.support_lo[k] != self.base.support_lo[k] || state.support_hi[k] != self.base.support_hi[k]
+                || (changed != Some(k) && (state.number[k] != self.base.number[k] || state.energy_ref[k] != self.base.energy_ref[k])) {
+                return Err(bad("NATIVE_CACHE_STALE_CELL_OR_SUPPORT"));
+            }
+        }
+        let replacement = changed.map(|k| prepare_cell(k,state,self.ray_scales[k / self.transport.n_energy()])).transpose()?;
+        let mut diagnostics = QuadratureDiagnostics::default();
+        for k in 0..self.cells.len() {
+            let cell = if changed == Some(k) { replacement.as_ref().unwrap() } else { &self.cells[k] };
+            let d = &cell.diagnostics;
+            diagnostics.max_count_relative_defect = diagnostics.max_count_relative_defect.max(d.max_count_relative_defect);
+            diagnostics.max_energy_relative_defect = diagnostics.max_energy_relative_defect.max(d.max_energy_relative_defect);
+            diagnostics.max_asymptotic_mean_defect_ev = diagnostics.max_asymptotic_mean_defect_ev.max(d.max_asymptotic_mean_defect_ev);
+            diagnostics.omitted_tail_number_bound_per_h += d.omitted_tail_number_bound_per_h;
+            diagnostics.omitted_tail_energy_bound_ev_per_h += d.omitted_tail_energy_bound_ev_per_h;
+            diagnostics.omitted_tail_endpoint_moment_bound_ev_per_h += d.omitted_tail_endpoint_moment_bound_ev_per_h;
+        }
+        Ok(NativeBorrowedView { cache:self, state, changed, replacement, diagnostics })
+    }
+}
+impl NativeBorrowedView<'_, '_> {
+    fn cells(&self) -> impl Iterator<Item=&PreparedCell> {
+        self.cache.cells.iter().enumerate().map(move |(k,cell)| {
+            if self.changed == Some(k) { self.replacement.as_ref().unwrap() } else { cell }
+        })
+    }
+    pub fn node_count(&self) -> usize {
+        self.cells().map(|cell|cell.nodes.len()).sum()
+    }
+    pub fn native_rates(&self, absorber_cm3:[f64;3], n_h_cm3:f64) -> Result<NativeAbsorptionRates,ForwardError> {
+        native_rates_ordered(self.state, self.cells().flat_map(|cell|cell.nodes.iter()), absorber_cm3, n_h_cm3)
     }
 }

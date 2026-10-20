@@ -300,7 +300,7 @@ impl Events {
     }
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum NativeEval { Legacy, CellCache }
+pub enum NativeEval { Legacy, CellCache, CellBorrowed }
 #[derive(Debug, Default, Serialize)]
 struct ProfileTimes { preparation_s: f64, rates_s: f64, provider_s: f64, other_s: f64, jacobian_inclusive_s: f64 }
 #[derive(Debug)]
@@ -310,6 +310,8 @@ pub struct Budget {
     pub profile: bool,
     preparations: AtomicUsize,
     node_visits: AtomicUsize,
+    cached_prepared_state_clones: AtomicUsize,
+    cached_prepared_node_clones: AtomicUsize,
     times: Mutex<ProfileTimes>,
     pub cap: usize,
     start: Instant,
@@ -322,14 +324,14 @@ impl Budget {
     pub fn with_options(cap: usize, max_wall_s: f64, native_eval: NativeEval, profile: bool) -> Arc<Self> {
         Arc::new(Self {
             calls: AtomicUsize::new(0), native_eval, profile,
-            preparations: AtomicUsize::new(0), node_visits: AtomicUsize::new(0), times: Mutex::new(ProfileTimes::default()),
+            preparations: AtomicUsize::new(0), node_visits: AtomicUsize::new(0), cached_prepared_state_clones: AtomicUsize::new(0), cached_prepared_node_clones: AtomicUsize::new(0), times: Mutex::new(ProfileTimes::default()),
             cap,
             start: Instant::now(),
             max_wall_s,
         })
     }
     pub fn profile_json(&self) -> serde_json::Value {
-        serde_json::json!({"charged_rhs_attempts":self.calls(),"occupied_cell_preparations":self.preparations.load(Ordering::Relaxed),"node_visits":self.node_visits.load(Ordering::Relaxed),"timings_enabled":self.profile,"exclusive_evaluation_times_and_inclusive_jacobian":*self.times.lock().unwrap()})
+        serde_json::json!({"charged_rhs_attempts":self.calls(),"occupied_cell_preparations":self.preparations.load(Ordering::Relaxed),"node_visits":self.node_visits.load(Ordering::Relaxed),"cached_prepared_state_clones":self.cached_prepared_state_clones.load(Ordering::Relaxed),"cached_prepared_node_clones":self.cached_prepared_node_clones.load(Ordering::Relaxed),"timings_enabled":self.profile,"exclusive_evaluation_times_and_inclusive_jacobian":*self.times.lock().unwrap()})
     }
     pub fn calls(&self) -> usize {
         self.calls.load(Ordering::Relaxed)
@@ -455,20 +457,34 @@ impl Context {
         native(self.transport.validate_state(&p))?;
         let [x, he2, he3] = gas.fractions;
         let prep_clock = self.budget.profile.then(Instant::now);
-        let prepared = if let Some((cache,changed)) = cache { native(cache.prepare(&p,changed))? } else { native(self.transport.prepare(&p, &self.geometry))? };
+        let mut owned = None;
+        let mut borrowed = None;
+        if let Some((cache,changed)) = cache {
+            if self.budget.native_eval == NativeEval::CellBorrowed {
+                borrowed = Some(native(cache.prepare_borrowed(&p,changed))?);
+            } else {
+                owned = Some(native(cache.prepare(&p,changed))?);
+            }
+        } else {
+            owned = Some(native(self.transport.prepare(&p, &self.geometry))?);
+        }
+        let nodes = if let Some(view)=&borrowed {view.node_count()} else {owned.as_ref().unwrap().node_count()};
+        if cache.is_some() && owned.is_some() {
+            self.budget.cached_prepared_state_clones.fetch_add(1,Ordering::Relaxed);
+            self.budget.cached_prepared_node_clones.fetch_add(nodes,Ordering::Relaxed);
+        }
         let prep_s = prep_clock.map_or(0.,|t|t.elapsed().as_secs_f64());
         let count = if let Some((_,changed)) = cache { changed.filter(|&k|p.number[k] != 0.).map_or(0, |_|1) } else { p.number.iter().filter(|&&n|n!=0.).count() };
         self.budget.preparations.fetch_add(count, Ordering::Relaxed);
-        self.budget.node_visits.fetch_add(prepared.node_count(), Ordering::Relaxed);
+        self.budget.node_visits.fetch_add(nodes, Ordering::Relaxed);
         let rate_clock = self.budget.profile.then(Instant::now);
-        let direct = native(prepared.native_rates(
-            [
+        let absorbers = [
                 self.nh * (1. - x),
                 self.nhe * (1. - he2 - he3),
                 self.nhe * he2,
-            ],
-            self.nh,
-        ))?;
+            ];
+        let direct = if let Some(view)=&borrowed { native(view.native_rates(absorbers,self.nh))? }
+            else { native(owned.as_ref().unwrap().native_rates(absorbers,self.nh))? };
         let rate_s = rate_clock.map_or(0.,|t|t.elapsed().as_secs_f64());
         let provider_clock = self.budget.profile.then(Instant::now);
         let rhs =
@@ -497,13 +513,13 @@ impl Context {
             direct,
             gas,
             point_identity,
-            nodes: prepared.node_count(),
+            nodes,
         })
     }
     fn jacobian(&self, y: &[f64]) -> R<DenseMatrix> {
         let jac_clock = self.budget.profile.then(Instant::now);
         let mut cache = None;
-        let base = if self.budget.native_eval == NativeEval::CellCache {
+        let base = if self.budget.native_eval != NativeEval::Legacy {
             self.budget.charge()?;
             self.admissibility(y).map_err(EvaluationError::message)?;
             let p = self.coordinates.decode(y)?.0;
@@ -910,10 +926,16 @@ mod cache_native_regressions {
             budget:Budget::with_options(200000,30.,mode,false) }
     }
     fn compare(d:&Driver,s:&DriverState) {
-        let legacy=context(d,s,NativeEval::Legacy);let cached=context(d,s,NativeEval::CellCache);
+        let legacy=context(d,s,NativeEval::Legacy);let cached=context(d,s,NativeEval::CellCache);let borrowed=context(d,s,NativeEval::CellBorrowed);
         let y=legacy.coordinates.encode(&photon(s),&s.gas).unwrap();
-        let a=legacy.jacobian(&y).unwrap();let b=cached.jacobian(&y).unwrap();
-        assert_eq!(a.as_slice(),b.as_slice()); assert_eq!(legacy.budget.calls(),cached.budget.calls());
+        let a=legacy.jacobian(&y).unwrap();let b=cached.jacobian(&y).unwrap();let c=borrowed.jacobian(&y).unwrap();
+        assert_eq!(a.as_slice(),b.as_slice());assert_eq!(b.as_slice(),c.as_slice());
+        assert_eq!(cached.budget.calls(),borrowed.budget.calls());
+        assert_eq!(cached.budget.preparations.load(Ordering::Relaxed),borrowed.budget.preparations.load(Ordering::Relaxed));
+        assert_eq!(cached.budget.node_visits.load(Ordering::Relaxed),borrowed.budget.node_visits.load(Ordering::Relaxed));
+        assert_eq!(borrowed.budget.cached_prepared_state_clones.load(Ordering::Relaxed),0);
+        assert_eq!(borrowed.budget.cached_prepared_node_clones.load(Ordering::Relaxed),0);
+        assert_eq!(cached.budget.cached_prepared_state_clones.load(Ordering::Relaxed),1+2*y.len()); assert_eq!(legacy.budget.calls(),cached.budget.calls());
         let occupied=cached.coordinates.cells.len();
         let photon_dims=y.len()-4;
         assert_eq!(cached.budget.preparations.load(Ordering::Relaxed),occupied+2*photon_dims);
@@ -937,22 +959,32 @@ mod cache_native_regressions {
         let cache=d.transport.native_cell_cache(&base,&g).unwrap();
         let mut changed=base.clone();changed.energy_ref[k]=(0.5*(lo+hi))*base.number[k];
         let full=d.transport.prepare(&changed,&g).unwrap();let reused=cache.prepare(&changed,Some(k)).unwrap();
+        let borrowed=cache.prepare_borrowed(&changed,Some(k)).unwrap();
+        assert_eq!(format!("{:?}",reused.diagnostics),format!("{:?}",borrowed.diagnostics));
+        assert_eq!(reused.node_count(),borrowed.node_count());
         let abs=[1e-4,2e-5,1e-6];
         assert_eq!(format!("{:?}",full.native_rates(abs,1e-4).unwrap()),format!("{:?}",reused.native_rates(abs,1e-4).unwrap()));
+        assert_eq!(format!("{:?}",reused.native_rates(abs,1e-4).unwrap()),format!("{:?}",borrowed.native_rates(abs,1e-4).unwrap()));
+        assert!(cache.prepare_borrowed(&changed,None).is_err());
+        let mut unrelated=changed.clone();let other=(0..unrelated.number.len()).find(|&j| j!=k && unrelated.number[j]>0.).unwrap();
+        unrelated.number[other]*=0.9;unrelated.energy_ref[other]*=0.9;
+        assert!(cache.prepare_borrowed(&unrelated,Some(k)).is_err());
         assert!(cache.prepare(&changed,None).is_err());
-        changed.support_hi[k]=hi-0.1*(hi-lo);assert!(cache.prepare(&changed,Some(k)).is_err());
-        assert!(cache.prepare(&base,Some(base.number.len())).is_err());
-        let mut wrong=base.clone();wrong.number.pop();assert!(cache.prepare(&wrong,None).is_err());
+        changed.support_hi[k]=hi-0.1*(hi-lo);assert!(cache.prepare(&changed,Some(k)).is_err());assert!(cache.prepare_borrowed(&changed,Some(k)).is_err());
+        assert!(cache.prepare(&base,Some(base.number.len())).is_err());assert!(cache.prepare_borrowed(&base,Some(base.number.len())).is_err());
+        let mut wrong=base.clone();wrong.number.pop();assert!(cache.prepare(&wrong,None).is_err());assert!(cache.prepare_borrowed(&wrong,None).is_err());
     }
     #[test]
     fn cached_resource_failure_transactional_and_domain_classified() {
+        for mode in [NativeEval::CellCache,NativeEval::CellBorrowed] {
         let (d,mut s,k)=initial(true).unwrap();let before=state_json(&d,&s).unwrap();
-        let budget=Budget::with_options(1,30.,NativeEval::CellCache,false);
+        let budget=Budget::with_options(1,30.,mode,false);
         let err=chemical_step(&d,&mut s,1./(4.*k),1e-13,budget.clone()).unwrap_err();assert!(err.contains("NATIVE_RHS_CAP"));
         let after=state_json(&d,&s).unwrap();for key in ["a","fractions","w_ev","number","energy_ref","support_lo","support_hi","ledgers","accepted"] {assert_eq!(before[key],after[key],"{key}");}
         assert_eq!(budget.calls(),1);assert_eq!(s.attempts,1);
-        let c=context(&d,&s,NativeEval::CellCache);let mut y=c.coordinates.encode(&photon(&s),&s.gas).unwrap();
+        let c=context(&d,&s,mode);let mut y=c.coordinates.encode(&photon(&s),&s.gas).unwrap();
         y[0]=-1.;assert!(matches!(c.evaluate_typed(&y),Err(EvaluationError::PerturbationDomain(_))));
         y[0]=f64::NAN;assert!(matches!(c.evaluate_typed(&y),Err(EvaluationError::Fatal(_))));
+        }
     }
 }

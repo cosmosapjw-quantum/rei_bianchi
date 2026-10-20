@@ -24,7 +24,7 @@ fn main() -> R<()> {
     while option < args.len() {
         match args[option].as_str() {
             "--profile" => {profile=true;option+=1;},
-            "--native-eval" if option+1<args.len() => {native_eval=match args[option+1].as_str(){"legacy"=>NativeEval::Legacy,"cell-cache"=>NativeEval::CellCache,_=>return Err("invalid native-eval".into())};option+=2;},
+            "--native-eval" if option+1<args.len() => {native_eval=match args[option+1].as_str(){"legacy"=>NativeEval::Legacy,"cell-cache"=>NativeEval::CellCache,"cell-borrowed"=>NativeEval::CellBorrowed,_=>return Err("invalid native-eval".into())};option+=2;},
             _=>return Err("unknown option".into()),
         }
     }

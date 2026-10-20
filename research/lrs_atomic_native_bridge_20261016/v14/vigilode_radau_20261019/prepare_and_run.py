@@ -116,7 +116,7 @@ def main():
  p.add_argument('--output-root',type=Path,required=True,help='Fresh output workspace; existing paths refused')
  p.add_argument('--vigilode-source',type=Path,help='Verified local immutable source closure or full source tree')
  p.add_argument('--vigilode-archive',type=Path,help='Exact SHA-bound upstream tar.gz backup')
- p.add_argument('--native-eval',choices=('legacy','cell-cache'),default='legacy',help='Native evaluation implementation; default preserves legacy behavior')
+ p.add_argument('--native-eval',choices=('legacy','cell-cache','cell-borrowed'),default='legacy',help='Native evaluation implementation; default preserves legacy behavior')
  p.add_argument('--profile',action='store_true',help='Enable native evaluation profiling')
  p.add_argument('--cargo',default='cargo');p.add_argument('--cargo-home',type=Path);p.add_argument('--offline',action='store_true')
  action=p.add_mutually_exclusive_group();action.add_argument('--prepare-only',action='store_true');action.add_argument('--all',action='store_true');action.add_argument('--case',nargs=3,metavar=('MODE','METHOD','N'))
