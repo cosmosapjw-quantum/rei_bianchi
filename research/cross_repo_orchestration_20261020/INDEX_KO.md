@@ -11,7 +11,7 @@
 | bass_cr | 2269 exact recovered files published; H/I guards backed by real receipts | G/H native and conditional I pilot | [고정 문서](https://github.com/cosmosapjw-quantum/bass_cr/blob/edcf6cde39b64833fed231953cbb4f8731e272cc/research/cr_orchestration_20261020/NCP_ORCHESTRATION_KO.md) | [PR86](https://github.com/cosmosapjw-quantum/bass_cr/pull/86) |
 | bass | 11 tests; compensated C99 source adapter | physical donor and proper paired export input dependent | [고정 문서](https://github.com/cosmosapjw-quantum/bass/blob/56137bcbe1f32ae6948a4992970bf652fc233f37/research/bass_orchestration_20261020/NCP_HANDOFF_KO.md) | [PR175](https://github.com/cosmosapjw-quantum/bass/pull/175) |
 | rec_bianchi | 10 tests + actual final 2-step C/Python parity | h4 first event+2 and independent h2 low-z | [고정 문서](https://github.com/cosmosapjw-quantum/rec_bianchi/blob/1ad0380110621446c42df9d995fd85db3a6c7e7a/research/rec_r3q_h4_continuation_20261020/HANDOFF_KO.md) | [PR111](https://github.com/cosmosapjw-quantum/rec_bianchi/pull/111) |
-| rei_bianchi | 11 tests + scoped Markov defect review | optimized LRS19 and age32; nonlinear tube remains open | [고정 문서](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/84a87002dde79426c6202611699e9e4f9cb6cb8f/research/cross_repo_orchestration_20261020/NCP_HANDOFF_KO.md) | [PR212](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/212) |
+| rei_bianchi | LRS V14 19-setting matrix + borrowed N2; age32 block-max scoped run; independent review PASS | nonlinear tube and finite-neighbor target remain open; RUN13/R9 reused without rerun | [고정 문서](https://github.com/cosmosapjw-quantum/rei_bianchi/blob/84a87002dde79426c6202611699e9e4f9cb6cb8f/research/cross_repo_orchestration_20261020/NCP_HANDOFF_KO.md) | [PR212](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/212) |
 
 장문의 실제 실행 명령은 각 PR 본문에도 실었다. CR은 PR85(H)→PR86(I)이며 실행용 I content는 `fe6bbaec2de5032b938aed0713623b9618ba70e6`, H content는 `40ea4bbd5b2eb1b0c82f8ec9d5fdc1c6324e44f8`이다. receipt/document HEAD로 실행 content pin을 대체하지 않는다. HE controller content는 `ed5adca43f474553a9bce7f5de45d464be5905cb`; REC R3Q content는 `8d6a9e40eb509f467b10a22d3a690c57b85b6131`이다.
 
@@ -22,3 +22,9 @@ BASS는 현재 compile/normalization 단계까지 준비됐다. 물리 donor clo
 한 host의 여섯 agent는 공통 allocation을 먼저 읽는다. age32 48worker와 다른 대형 campaign을 동시에 과대 배정하지 않는다. 원래 expired/closed allocation은 유지하고, 명시적으로 새로 정의한 REC event campaign만 별도 allocation으로 기록한다.
 
 최종 통합 문서 capsule S2: [Drive](https://drive.google.com/file/d/1OZjEbwWhLBfhaiM3Us4DoCoJ3laJXcBL/view), Dropbox `id:BSpOijBcT10AAAAAAD_SYw`, 34,141bytes, SHA256 `63d8099d9663b1afb1fe5a02255bcae7e20b4739d41879915fc64f86cf45c25c`. 자신의 upload ACK는 immutable ZIP 이후 생성되므로 최종 Git BACKUP_DELIVERY에 기록했다. 세 단계 모두 provider ACK/size를 확인했고, 전체 remote archive를 다시 내려받았다고 주장하지 않는다.
+
+## REI NCP 실행 반환 (2026-10-20)
+
+- LRS V14: [실행 결과와 DAG](https://github.com/cosmosapjw-quantum/rei_bianchi/commit/301297a2cd34346d666ec74e12831697db9a6f01), 19개 cache 설정 4.937 s/180 s 누적 cap, 고정 Radau N2 borrowed 비교 완료. 유한 기록과 카운터는 일치하나 단일 비교로 speedup은 주장하지 않으며 생산 admission은 발행하지 않았다.
+- age32: [실행 결과, DAG, 독립 검토, 백업 영수증](https://github.com/cosmosapjw-quantum/rei_bianchi/commit/93aca4cc483080b802fa85c9c44e43b9c85db5b7), 48 transport workers, 248.816 s/1800 s cap. 고정 photon gate 통과; 선택된 0.5% finite-neighbor 목표 미달. age/time continuum 및 production admission은 HOLD/NOT_ISSUED.
+- 이 NCP host에서 확인한 capacity는 64 CPU/125.75 GiB였다. age32 실행 중 HE29의 one-thread case가 계속 관측되어 추가 대형 작업을 동시에 배정하지 않았다. 이 snapshot은 한 host만 다루며 나머지 UNKNOWN 상태는 바꾸지 않는다. RUN13 M2와 R9 Unit5 terminal/128 checkpoint는 회수 완료 상태로 유지하고 재실행하지 않았다.
