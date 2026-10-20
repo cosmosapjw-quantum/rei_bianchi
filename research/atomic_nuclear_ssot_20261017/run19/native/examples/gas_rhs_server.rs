@@ -8,6 +8,7 @@ use rei_iso_couple_reference::{
     isotope_state::{IsotopeNumberState, IsotopeSpecies as S},
     mixture_eos::MixtureState,
     rate_table::{IgmRateBackend, IgmRateTable},
+    cubic_igm::{CubicIgmTable,source_id_hex},
 };
 use std::{io::{self, BufRead, Write}, sync::Arc};
 
@@ -106,30 +107,52 @@ fn write_row(out: &mut impl Write, row: &[f64]) -> io::Result<()> {
     for x in row { write!(out," {x:.17e}")?; }
     writeln!(out)
 }
-fn options() -> Result<(IgmRateBackend,usize),String> {
+struct CacheMeta { action: &'static str, sha256: String, nodes: usize }
+fn options() -> Result<(IgmRateBackend,usize,CacheMeta),String> {
     let mut args=std::env::args().skip(1);
     let mut selection="direct".to_string(); let mut workers=1;
+    let mut cache_path:Option<std::path::PathBuf>=None;
     while let Some(arg)=args.next() { match arg.as_str() {
-        "--rates" => selection=args.next().ok_or("--rates requires direct or table")?,
+        "--rates" => selection=args.next().ok_or("--rates requires direct, table, or cubic")?,
+        "--table-cache" => cache_path=Some(args.next().ok_or("--table-cache requires a file path")?.into()),
         "--workers" => workers=args.next().ok_or("--workers requires 1..4")?
             .parse::<usize>().map_err(|_|"invalid worker count")?,
         "--help" => {
-            println!("gas_rhs_server [--rates direct|table] [--workers 1..4]\nRHS mask Tcmb n[13] U\nRHS_BATCH count mask Tcmb (n[13] U)*count\nMETA | QUIT\nSTEP/STEP_TIGHT retain Direct backend and original protocol.");
+            println!("gas_rhs_server [--rates direct|table|cubic] [--workers 1..4] [--table-cache FILE]\nThe cache option is cubic-only: exact-source/default-grid load or create-new save.\nRHS mask Tcmb n[13] U\nRHS_BATCH count mask Tcmb (n[13] U)*count\nMETA | QUIT\nSTEP/STEP_TIGHT retain Direct backend and original protocol.");
             std::process::exit(0);
         },
         _=>return Err(format!("unknown argument: {arg}")),
     }}
     if !(1..=4).contains(&workers) { return Err("workers must be 1..4".into()); }
+    if cache_path.is_some()&&selection!="cubic" {return Err("--table-cache requires --rates cubic".into());}
+    let mut cache=CacheMeta{action:"DISABLED",sha256:String::new(),nodes:0};
     let backend=match selection.as_str() {
         "direct"=>IgmRateBackend::Direct,
         "table"=>IgmRateBackend::Table(Arc::new(IgmRateTable::build_default()
             .map_err(|e|format!("table build: {e:?}"))?)),
-        _=>return Err("rates must be direct or table".into()),
+        "cubic"=>{
+            let table=if let Some(path)=cache_path {
+                let table=if path.try_exists().map_err(|e|format!("cache metadata: {e}"))? {
+                    cache.action="LOADED_EXACT_SOURCE";
+                    CubicIgmTable::load_default(&path).map_err(|e|format!("cache load: {e}"))?
+                }else{
+                    let table=CubicIgmTable::build_default().map_err(|e|format!("cubic build: {e}"))?;
+                    table.save_new(&path).map_err(|e|format!("cache save_new: {e}"))?;
+                    cache.action="BUILT_SAVED_NEW";table
+                };
+                let bytes=std::fs::read(&path).map_err(|e|format!("cache identity: {e}"))?;
+                cache.sha256=rei_rate_cubic::source_digest(&bytes).iter().map(|b|format!("{b:02x}")).collect();
+                table
+            }else{CubicIgmTable::build_default().map_err(|e|format!("cubic build: {e}"))?};
+            cache.nodes=table.grid().nodes();IgmRateBackend::Cubic(Arc::new(table))
+        },
+        _=>return Err("rates must be direct, table, or cubic".into()),
     };
-    Ok((backend,workers))
+    if let IgmRateBackend::Table(t)=&backend{cache.nodes=t.grid().nodes();}
+    Ok((backend,workers,cache))
 }
 fn main() -> io::Result<()> {
-    let (backend,workers)=options().unwrap_or_else(|e|{eprintln!("{e}");std::process::exit(64)});
+    let (backend,workers,cache)=options().unwrap_or_else(|e|{eprintln!("{e}");std::process::exit(64)});
     let base=base_config().map_err(|e|io::Error::other(format!("{e:?}")))?;
     let mut workspace=GasRateWorkspace::new(&backend);
     let mut out=io::BufWriter::new(io::stdout().lock());
@@ -139,7 +162,8 @@ fn main() -> io::Result<()> {
         let request=line.trim_end_matches(['\r','\n']);
         if request=="QUIT" {break;}
         if request=="META" {
-            writeln!(out,"{{\"schema\":\"REI_GAS_RHS_PROTOCOL_V2\",\"rhs_evaluator\":\"{}\",\"step_evaluator\":\"IGM_GRACKLE_DIRECT_F64_V1\",\"photo_owner\":\"OFF\",\"workers\":{},\"cache\":\"ONE_ENTRY_EXACT_EOS_T_BITS\",\"max_batch\":{}}}",backend.evaluator_id(),workers,MAX_BATCH)?;
+            let cubic_source=if matches!(backend,IgmRateBackend::Cubic(_)){source_id_hex()}else{String::new()};
+            writeln!(out,"{{\"schema\":\"REI_GAS_RHS_PROTOCOL_V3\",\"rhs_evaluator\":\"{}\",\"step_evaluator\":\"IGM_GRACKLE_DIRECT_F64_V1\",\"photo_owner\":\"OFF\",\"workers\":{},\"cache\":\"ONE_ENTRY_EXACT_EOS_T_BITS\",\"max_batch\":{},\"table_nodes\":{},\"cubic_source_id\":\"{}\",\"table_cache_action\":\"{}\",\"table_cache_sha256\":\"{}\"}}",backend.evaluator_id(),workers,MAX_BATCH,cache.nodes,cubic_source,cache.action,cache.sha256)?;
         } else { match execute(request,base,&backend,&mut workspace,workers) {
             Ok(Reply::Single{row,len})=>write_row(&mut out,&row[..len])?,
             Ok(Reply::Batch{rows,stats})=>{

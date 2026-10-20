@@ -1,0 +1,642 @@
+--- unit_a/native/Cargo.lock
++++ unit_b/native/Cargo.lock
+@@ -3,5 +3,98 @@
+ version = 4
+ 
+ [[package]]
++name = "block-buffer"
++version = "0.10.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "3078c7629b62d3f0439517fa394996acacc5cbc91c5a20d8c658e77abd503a71"
++dependencies = [
++ "generic-array",
++]
++
++[[package]]
++name = "cfg-if"
++version = "1.0.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
++
++[[package]]
++name = "cpufeatures"
++version = "0.2.17"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "59ed5838eebb26a2bb2e58f6d5b5316989ae9d08bab10e0e6d103e656d1b0280"
++dependencies = [
++ "libc",
++]
++
++[[package]]
++name = "crypto-common"
++version = "0.1.7"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "78c8292055d1c1df0cce5d180393dc8cce0abec0a7102adb6c7b1eef6016d60a"
++dependencies = [
++ "generic-array",
++ "typenum",
++]
++
++[[package]]
++name = "digest"
++version = "0.10.7"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9ed9a281f7bc9b7576e61468ba615a66a5c8cfdff42420a70aa82701a3b1e292"
++dependencies = [
++ "block-buffer",
++ "crypto-common",
++]
++
++[[package]]
++name = "generic-array"
++version = "0.14.7"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
++dependencies = [
++ "typenum",
++ "version_check",
++]
++
++[[package]]
++name = "libc"
++version = "0.2.191"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "65cd87c9a6d60536580b316ad985726104730a5151c99845f2490428ef91240a"
++
++[[package]]
+ name = "rei_iso_couple_reference"
+ version = "0.1.0"
++dependencies = [
++ "rei_rate_cubic",
++]
++
++[[package]]
++name = "rei_rate_cubic"
++version = "0.1.0"
++dependencies = [
++ "sha2",
++]
++
++[[package]]
++name = "sha2"
++version = "0.10.9"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283"
++dependencies = [
++ "cfg-if",
++ "cpufeatures",
++ "digest",
++]
++
++[[package]]
++name = "typenum"
++version = "1.20.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
++
++[[package]]
++name = "version_check"
++version = "0.9.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
+--- unit_a/native/Cargo.toml
++++ unit_b/native/Cargo.toml
+@@ -5,3 +5,6 @@
+ publish = false
+ 
+ [workspace]
++
++[dependencies]
++rei_rate_cubic = { path = "../rate_cubic" }
+--- unit_a/native/examples/gas_rhs_server.rs
++++ unit_b/native/examples/gas_rhs_server.rs
+@@ -8,6 +8,7 @@
+     isotope_state::{IsotopeNumberState, IsotopeSpecies as S},
+     mixture_eos::MixtureState,
+     rate_table::{IgmRateBackend, IgmRateTable},
++    cubic_igm::{CubicIgmTable,source_id_hex},
+ };
+ use std::{io::{self, BufRead, Write}, sync::Arc};
+ 
+@@ -106,30 +107,52 @@
+     for x in row { write!(out," {x:.17e}")?; }
+     writeln!(out)
+ }
+-fn options() -> Result<(IgmRateBackend,usize),String> {
++struct CacheMeta { action: &'static str, sha256: String, nodes: usize }
++fn options() -> Result<(IgmRateBackend,usize,CacheMeta),String> {
+     let mut args=std::env::args().skip(1);
+     let mut selection="direct".to_string(); let mut workers=1;
++    let mut cache_path:Option<std::path::PathBuf>=None;
+     while let Some(arg)=args.next() { match arg.as_str() {
+-        "--rates" => selection=args.next().ok_or("--rates requires direct or table")?,
++        "--rates" => selection=args.next().ok_or("--rates requires direct, table, or cubic")?,
++        "--table-cache" => cache_path=Some(args.next().ok_or("--table-cache requires a file path")?.into()),
+         "--workers" => workers=args.next().ok_or("--workers requires 1..4")?
+             .parse::<usize>().map_err(|_|"invalid worker count")?,
+         "--help" => {
+-            println!("gas_rhs_server [--rates direct|table] [--workers 1..4]\nRHS mask Tcmb n[13] U\nRHS_BATCH count mask Tcmb (n[13] U)*count\nMETA | QUIT\nSTEP/STEP_TIGHT retain Direct backend and original protocol.");
++            println!("gas_rhs_server [--rates direct|table|cubic] [--workers 1..4] [--table-cache FILE]\nThe cache option is cubic-only: exact-source/default-grid load or create-new save.\nRHS mask Tcmb n[13] U\nRHS_BATCH count mask Tcmb (n[13] U)*count\nMETA | QUIT\nSTEP/STEP_TIGHT retain Direct backend and original protocol.");
+             std::process::exit(0);
+         },
+         _=>return Err(format!("unknown argument: {arg}")),
+     }}
+     if !(1..=4).contains(&workers) { return Err("workers must be 1..4".into()); }
++    if cache_path.is_some()&&selection!="cubic" {return Err("--table-cache requires --rates cubic".into());}
++    let mut cache=CacheMeta{action:"DISABLED",sha256:String::new(),nodes:0};
+     let backend=match selection.as_str() {
+         "direct"=>IgmRateBackend::Direct,
+         "table"=>IgmRateBackend::Table(Arc::new(IgmRateTable::build_default()
+             .map_err(|e|format!("table build: {e:?}"))?)),
+-        _=>return Err("rates must be direct or table".into()),
++        "cubic"=>{
++            let table=if let Some(path)=cache_path {
++                let table=if path.try_exists().map_err(|e|format!("cache metadata: {e}"))? {
++                    cache.action="LOADED_EXACT_SOURCE";
++                    CubicIgmTable::load_default(&path).map_err(|e|format!("cache load: {e}"))?
++                }else{
++                    let table=CubicIgmTable::build_default().map_err(|e|format!("cubic build: {e}"))?;
++                    table.save_new(&path).map_err(|e|format!("cache save_new: {e}"))?;
++                    cache.action="BUILT_SAVED_NEW";table
++                };
++                let bytes=std::fs::read(&path).map_err(|e|format!("cache identity: {e}"))?;
++                cache.sha256=rei_rate_cubic::source_digest(&bytes).iter().map(|b|format!("{b:02x}")).collect();
++                table
++            }else{CubicIgmTable::build_default().map_err(|e|format!("cubic build: {e}"))?};
++            cache.nodes=table.grid().nodes();IgmRateBackend::Cubic(Arc::new(table))
++        },
++        _=>return Err("rates must be direct, table, or cubic".into()),
+     };
+-    Ok((backend,workers))
++    if let IgmRateBackend::Table(t)=&backend{cache.nodes=t.grid().nodes();}
++    Ok((backend,workers,cache))
+ }
+ fn main() -> io::Result<()> {
+-    let (backend,workers)=options().unwrap_or_else(|e|{eprintln!("{e}");std::process::exit(64)});
++    let (backend,workers,cache)=options().unwrap_or_else(|e|{eprintln!("{e}");std::process::exit(64)});
+     let base=base_config().map_err(|e|io::Error::other(format!("{e:?}")))?;
+     let mut workspace=GasRateWorkspace::new(&backend);
+     let mut out=io::BufWriter::new(io::stdout().lock());
+@@ -139,7 +162,8 @@
+         let request=line.trim_end_matches(['\r','\n']);
+         if request=="QUIT" {break;}
+         if request=="META" {
+-            writeln!(out,"{{\"schema\":\"REI_GAS_RHS_PROTOCOL_V2\",\"rhs_evaluator\":\"{}\",\"step_evaluator\":\"IGM_GRACKLE_DIRECT_F64_V1\",\"photo_owner\":\"OFF\",\"workers\":{},\"cache\":\"ONE_ENTRY_EXACT_EOS_T_BITS\",\"max_batch\":{}}}",backend.evaluator_id(),workers,MAX_BATCH)?;
++            let cubic_source=if matches!(backend,IgmRateBackend::Cubic(_)){source_id_hex()}else{String::new()};
++            writeln!(out,"{{\"schema\":\"REI_GAS_RHS_PROTOCOL_V3\",\"rhs_evaluator\":\"{}\",\"step_evaluator\":\"IGM_GRACKLE_DIRECT_F64_V1\",\"photo_owner\":\"OFF\",\"workers\":{},\"cache\":\"ONE_ENTRY_EXACT_EOS_T_BITS\",\"max_batch\":{},\"table_nodes\":{},\"cubic_source_id\":\"{}\",\"table_cache_action\":\"{}\",\"table_cache_sha256\":\"{}\"}}",backend.evaluator_id(),workers,MAX_BATCH,cache.nodes,cubic_source,cache.action,cache.sha256)?;
+         } else { match execute(request,base,&backend,&mut workspace,workers) {
+             Ok(Reply::Single{row,len})=>write_row(&mut out,&row[..len])?,
+             Ok(Reply::Batch{rows,stats})=>{
+--- unit_a/native/examples/run19_cache_probe.py
++++ unit_b/native/examples/run19_cache_probe.py
+@@ -0,0 +1,45 @@
++"""One bounded cold/save + warm/load + mismatched-source server cache probe."""
++import argparse,gzip,hashlib,json,pathlib,subprocess,time
++def ident(p):
++    b=p.read_bytes();return {'path':str(p),'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()}
++def main():
++    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--binary',type=pathlib.Path,required=True)
++    p.add_argument('--inputs',type=pathlib.Path,required=True);p.add_argument('--output',type=pathlib.Path,required=True)
++    a=p.parse_args();a.output.mkdir(parents=True,exist_ok=False)
++    values=json.loads(gzip.decompress(a.inputs.read_bytes()));key=sorted(values)[0]
++    request='META\n'+''.join('RHS 7 29 '+s+'\n'for s in values[key][:4])+'QUIT\n'
++    (a.output/'REQUEST.txt').write_text(request)
++    cache=a.output/'cubic_default.bin';rows=[];good_reply=None;old_sha=None
++    for phase in ['cold_build_save','warm_load']:
++        argv=[str(a.binary),'--rates','cubic','--table-cache',str(cache)]
++        t=time.perf_counter();result=subprocess.run(argv,input=request,text=True,capture_output=True,timeout=10)
++        (a.output/(phase+'.stdout.txt')).write_text(result.stdout);(a.output/(phase+'.stderr.txt')).write_text(result.stderr)
++        if result.returncode or result.stderr:raise RuntimeError('cache run failed '+repr(result.stderr))
++        lines=result.stdout.splitlines();metadata=json.loads(lines[0]);reply='\n'.join(lines[1:])
++        if len(lines)!=5 or any(len(x.split())!=29 or not x.startswith('OK ')for x in lines[1:]):raise RuntimeError('reply shape')
++        digest=ident(cache)
++        if metadata['table_cache_sha256']!=digest['sha256']:raise RuntimeError('META file identity mismatch')
++        if phase=='cold_build_save':
++            assert metadata['table_cache_action']=='BUILT_SAVED_NEW';good_reply=reply;old_sha=digest['sha256']
++        else:
++            assert metadata['table_cache_action']=='LOADED_EXACT_SOURCE'
++            if reply!=good_reply or digest['sha256']!=old_sha:raise RuntimeError('warm/cold byte mismatch')
++        rows.append({'phase':phase,'argv':argv,'wall_seconds':time.perf_counter()-t,'metadata':metadata,'cache_identity':digest,'exit_code':result.returncode})
++    # Deliberately different source-ID header with an otherwise valid digest.
++    bad=bytearray(cache.read_bytes());bad[24]^=1;bad[-32:]=hashlib.sha256(bad[:-32]).digest()
++    wrong=a.output/'wrong_source.bin';wrong.write_bytes(bad)
++    argv=[str(a.binary),'--rates','cubic','--table-cache',str(wrong)]
++    r=subprocess.run(argv,input='META\nQUIT\n',text=True,capture_output=True,timeout=10)
++    (a.output/'wrong_source.stdout.txt').write_text(r.stdout);(a.output/'wrong_source.stderr.txt').write_text(r.stderr)
++    if r.returncode!=64 or 'CUBIC_CACHE_IDENTITY'not in r.stderr or r.stdout:
++        raise RuntimeError('wrong source cache not rejected before serving')
++    summary={'schema':'REI_RUN19_NATIVE_CACHE_PROBE_V1','producer_argv':__import__('sys').argv,
++        'binary_identity':ident(a.binary),'retained_inputs_identity':ident(a.inputs),
++        'selected_input_key':key,'selected_rows':list(range(4)),'request_identity':ident(a.output/'REQUEST.txt'),
++        'runs':rows,'warm_cold_reply_bytes_identical':True,'cache_unchanged_on_load':True,
++        'wrong_source':{'argv':argv,'identity':ident(wrong),'exit_code':r.returncode,'stderr':r.stderr},
++        'gas_rhs_point_evaluations':8,'ivps':0,'scope':'actual source-bound cache roundtrip and rejection, not benchmark or cache-producer authentication'}
++    (a.output/'CACHE_PROBE.json').write_text(json.dumps(summary,indent=2)+'\n')
++    print(json.dumps({'phases':[{'phase':r['phase'],'seconds':r['wall_seconds']}for r in rows],
++        'cache':ident(cache),'wrong_source_rejected':True,'rhs_points':8,'ivps':0},indent=2))
++if __name__=='__main__':main()
+--- unit_a/native/examples/run19_compare_retained.py
++++ unit_b/native/examples/run19_compare_retained.py
+@@ -0,0 +1,80 @@
++"""Replay retained Unit A POINT requests through native backend comparison.
++
++This is neither an IVP nor another full IPC performance benchmark. The measured
++error denominators are native sums of elementary absolute flux/power terms.
++"""
++import argparse,gzip,hashlib,json,pathlib,struct,subprocess,time
++def identity(p):
++    data=p.read_bytes();return {'path':str(p),'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
++def same_bits(a,b):return len(a)==len(b)and all(struct.pack('>d',x)==struct.pack('>d',y)for x,y in zip(a,b))
++def main():
++    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--binary',type=pathlib.Path,required=True)
++    p.add_argument('--inputs',type=pathlib.Path,required=True);p.add_argument('--unit-a-replies',type=pathlib.Path,required=True)
++    p.add_argument('--output',type=pathlib.Path,required=True);a=p.parse_args();a.output.mkdir(parents=True,exist_ok=False)
++    inputs=json.loads(gzip.decompress(a.inputs.read_bytes()));prior=json.loads(gzip.decompress(a.unit_a_replies.read_bytes()))
++    maxima={name:[{'channel':j,'max_absolute_error':0.0,'max_relative_error':0.0,'max_error_over_sum_abs_flux':0.0,
++        'absolute_location':None,'relative_location':None,'scaled_location':None,'direct_zero_nonzero_error_count':0}
++        for j in range(28)]for name in ['loglinear','cubic']}
++    max_condition=[{'value':0.0,'location':None}for _ in range(28)]
++    ledgers={name:{'max_absolute':0.0,'max_scaled':0.0}for name in ['direct','loglinear','cubic']}
++    count=0;bit_counts={'direct':0,'loglinear':0};t=time.perf_counter()
++    proc=subprocess.Popen([str(a.binary)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
++    raw_path=a.output/'GAS_POINT_ROWS.jsonl.gz'
++    try:
++        header=proc.stdout.readline();metadata=json.loads(header)
++        with raw_path.open('xb')as file,gzip.GzipFile(fileobj=file,mode='wb',mtime=0)as raw:
++            raw.write(header)
++            for key in sorted(inputs):
++                old_direct=prior['direct_'+key].splitlines();old_table=prior['table_'+key].splitlines()
++                assert len(inputs[key])==len(old_direct)==len(old_table)
++                for index,payload in enumerate(inputs[key]):
++                    proc.stdin.write(('RHS 7 29 '+payload+'\n').encode());proc.stdin.flush()
++                    line=proc.stdout.readline()
++                    if not line:raise RuntimeError('native comparison ended early')
++                    record=json.loads(line);record['input_key']=key;record['input_index']=index
++                    raw.write((json.dumps(record,separators=(',',':'))+'\n').encode())
++                    for name,old in [('direct',old_direct[index]),('loglinear',old_table[index])]:
++                        expected=[float(s)for s in old.split()[1:]]
++                        if not same_bits(record[name],expected):raise RuntimeError('Unit A bit mismatch '+name+' '+key+' '+str(index))
++                        bit_counts[name]+=len(expected)
++                    direct=record['direct'];denom=record['sum_abs_flux'];loc=[key,index,record['temperature_k']]
++                    for j,(value,scale)in enumerate(zip(direct,denom)):
++                        if abs(value)>scale*(1+3e-14):raise RuntimeError('elementary denominator missed a term')
++                        if value!=0 and scale/abs(value)>max_condition[j]['value']:
++                            max_condition[j]={'value':scale/abs(value),'location':loc,'direct':value,'sum_abs_flux':scale}
++                    for name in ['direct','loglinear','cubic']:
++                        q=record[name]
++                        if any(q[j]<0 for j in list(range(16,25))+[26]):raise RuntimeError('negative positive event channel')
++                        residual=abs(record['ledger_residuals'][['direct','loglinear','cubic'].index(name)])
++                        scale=sum(abs(q[j])for j in [13,14,15,27]);ratio=residual/scale if scale else 0.0
++                        if residual and not scale or ratio>3e-14:raise RuntimeError('ledger gate')
++                        ledgers[name]['max_absolute']=max(ledgers[name]['max_absolute'],residual)
++                        ledgers[name]['max_scaled']=max(ledgers[name]['max_scaled'],ratio)
++                    for name in ['loglinear','cubic']:
++                        for j,(ref,v,scale)in enumerate(zip(direct,record[name],denom)):
++                            delta=abs(v-ref);row=maxima[name][j]
++                            if delta>row['max_absolute_error']:row.update(max_absolute_error=delta,absolute_location=loc+[ref,v,scale])
++                            if ref!=0 and delta/abs(ref)>row['max_relative_error']:row.update(max_relative_error=delta/abs(ref),relative_location=loc+[ref,v,scale])
++                            if scale and delta/scale>row['max_error_over_sum_abs_flux']:row.update(max_error_over_sum_abs_flux=delta/scale,scaled_location=loc+[ref,v,scale])
++                            if ref==0 and delta:row['direct_zero_nonzero_error_count']+=1
++                    count+=1
++            proc.stdin.write(b'QUIT\n');proc.stdin.flush();proc.stdin.close();proc.wait(timeout=3)
++            stderr=proc.stderr.read()
++            (a.output/'native.stderr.txt').write_bytes(stderr)
++            if proc.returncode or stderr:raise RuntimeError('native comparison failed '+repr(stderr[:300]))
++    finally:
++        if proc.poll()is None:proc.kill();proc.wait()
++    result={'schema':'REI_RUN19_UNIT_B_GAS_COMPARISON_V1','metadata':metadata,
++        'input_identities':[identity(a.inputs),identity(a.unit_a_replies)],'binary_identity':identity(a.binary),
++        'raw_point_result':identity(raw_path),'producer_argv':__import__('sys').argv,'wall_seconds':time.perf_counter()-t,
++        'point_inputs':count,'native_gas_evaluations':3*count,'extra_direct_d_evaluations_for_denominators':count,
++        'unit_a_output_float_bits_equal':bit_counts,'positive_event_channel_checks_passed':True,
++        'ledger_gate_passed':True,'ledgers':ledgers,'maxima':maxima,'max_flux_cancellation_condition':max_condition,
++        'scope':'finite retained manufactured states; denominators are f64 point diagnostics; no continuous table/Jacobian/trajectory bound',
++        'ivps':0,'full_ipc_benchmarks':0}
++    (a.output/'GAS_COMPARISON.json').write_text(json.dumps(result,indent=2)+'\n')
++    print(json.dumps({'point_inputs':count,'wall_seconds':result['wall_seconds'],'bit_counts':bit_counts,
++        'cubic_max_net_species_relative':max(x['max_relative_error']for x in maxima['cubic'][:13]),
++        'cubic_max_species_error_over_flux':max(x['max_error_over_sum_abs_flux']for x in maxima['cubic'][:13]),
++        'cubic_max_ci_rr_relative':max(x['max_relative_error']for x in maxima['cubic'][16:24]),'ledgers':ledgers},indent=2))
++if __name__=='__main__':main()
+--- unit_a/native/examples/run19_gas_bench.rs
++++ unit_b/native/examples/run19_gas_bench.rs
+@@ -9,6 +9,7 @@
+     isotope_state::{IsotopeNumberState,IsotopeSpecies as S},
+     mixture_eos::{MixtureState,KB_J_K},
+     rate_table::{IgmRateBackend,IgmRateTable},
++    cubic_igm::CubicIgmTable,
+ };
+ use std::{hint::black_box,sync::Arc,time::Instant};
+ #[allow(dead_code)]
+@@ -55,21 +56,27 @@
+     (seconds,black_box(checksum),stats)
+ }
+ fn main(){
+-    let mut probe=false;let mut target=8192usize;let mut repeats=5usize;
++    let mut probe=false;let mut unit_b=false;let mut target=8192usize;let mut repeats=5usize;
+     let mut args=std::env::args().skip(1);
+     while let Some(a)=args.next(){match a.as_str(){
+         "--probe"=>probe=true,
++        "--unit-b"=>unit_b=true,
+         "--target-evaluations"=>target=args.next().unwrap().parse().unwrap(),
+         "--repetitions"=>repeats=args.next().unwrap().parse().unwrap(),
+-        _=>panic!("usage: run19_gas_bench [--probe] [--target-evaluations 8192] [--repetitions 5]"),
++        _=>panic!("usage: run19_gas_bench [--probe|--unit-b] [--target-evaluations 8192] [--repetitions 5]"),
+     }}
+     assert!((1..=65536).contains(&target)&&(1..=7).contains(&repeats));
+     if probe{target=1024;repeats=1;}
+     let table_start=Instant::now();let table=IgmRateTable::build_default().unwrap();
+     let construction=table_start.elapsed().as_secs_f64();let table_bytes=table.storage_bytes();
+     let direct=IgmRateBackend::Direct;let table=IgmRateBackend::Table(Arc::new(table));
++    assert!(!(probe&&unit_b));
++    let cubic_start=Instant::now();
++    let cubic=if unit_b{Some(IgmRateBackend::Cubic(Arc::new(CubicIgmTable::build_default().unwrap())))}else{None};
++    let cubic_construction=if unit_b{cubic_start.elapsed().as_secs_f64()}else{0.0};
++    let cubic_bytes=if let Some(IgmRateBackend::Cubic(t))=&cubic{t.grid().storage_bytes()}else{0};
+     let c=config();let mut rows=Vec::new();
+-    let sizes:Vec<_>=if probe{vec![512]}else{vec![1,32,512,4096]};
++    let sizes:Vec<_>=if probe{vec![512]}else if unit_b{vec![4096]}else{vec![1,32,512,4096]};
+     for pattern in ["same_temperature","varying_temperature"]{for n in &sizes{
+         let states:Vec<_>=(0..*n).map(|i|fixture(if pattern=="same_temperature"{10000.0}
+             else{9500.0+((i*104729)%5000)as f64},i%5)).collect();
+@@ -77,8 +84,9 @@
+         let loops=target.div_ceil(*n);let mut modes=vec![("direct","original"),("direct","shared"),("direct","cached"),
+             ("direct","batch1"),("table","shared"),("table","cached"),("table","batch1")];
+         if *n>=512{modes.extend([("direct","batch2"),("direct","batch4"),("table","batch2"),("table","batch4")]);}
++        if unit_b{modes.extend([("cubic","shared"),("cubic","cached"),("cubic","batch1"),("cubic","batch2"),("cubic","batch4")]);}
+         for(name,mode)in modes{
+-            let backend=if name=="direct"{&direct}else{&table};
++            let backend=if name=="direct"{&direct}else if name=="table"{&table}else{cubic.as_ref().unwrap()};
+             if !probe{black_box(run(mode,&states,&c,backend,1));}
+             let mut seconds=Vec::new();let mut sums=Vec::new();let mut counts=Vec::new();
+             for _ in 0..repeats{let(dt,sum,stats)=run(mode,&states,&c,backend,loops);
+@@ -88,5 +96,5 @@
+                 unique.len(),loops*n,seconds,median*1e9/(loops*n)as f64,sums,counts.join(",")));
+         }
+     }}
+-    println!("{{\"schema\":\"REI_RUN19_CORE_BENCH_V1\",\"probe\":{probe},\"table_build_seconds\":{construction:.17e},\"table_payload_bytes\":{table_bytes},\"mask\":7,\"repetitions\":{repeats},\"target_evaluations\":{target},\"timing_scope\":\"steady_rhs_with_preallocated_output_includes_scoped_thread_start_and_join\",\"f64_flags\":\"release_default_no_fast_math_no_target_cpu_override\",\"ivps\":0,\"rows\":[{}]}}",rows.join(","));
++    println!("{{\"schema\":\"REI_RUN19_CORE_BENCH_V2\",\"probe\":{probe},\"unit_b\":{unit_b},\"table_build_seconds\":{construction:.17e},\"table_payload_bytes\":{table_bytes},\"cubic_build_seconds\":{cubic_construction:.17e},\"cubic_payload_bytes\":{cubic_bytes},\"mask\":7,\"repetitions\":{repeats},\"target_evaluations\":{target},\"timing_scope\":\"steady_rhs_with_preallocated_output_includes_scoped_thread_start_and_join\",\"f64_flags\":\"release_default_no_fast_math_no_target_cpu_override\",\"ivps\":0,\"rows\":[{}]}}",rows.join(","));
+ }
+--- unit_a/native/examples/run19_gas_compare.rs
++++ unit_b/native/examples/run19_gas_compare.rs
+@@ -0,0 +1,69 @@
++//! Evaluate retained manufactured point inputs, without integrating a trajectory.
++//! The conditioning denominator is an f64 sum of magnitudes of elementary
++//! native source terms. It is a point diagnostic, not an interval error bound.
++use rei_iso_couple_reference::{HHeModel,
++    cubic_igm::{CubicIgmTable,source_id_hex},
++    deuterium_atomic::{DAtomicProvider,DChargeExchange,d_atomic_rhs_from_prepared},
++    full_network::{FullState,NetworkConfig,EV_J},
++    gas_reference_rhs::{GasRates,gas_rates_with_backend},
++    isotope_state::{IsotopeNumberState,IsotopeSpecies as S},mixture_eos::MixtureState,
++    rate_table::{IgmRateBackend,IgmRateTable}};
++use std::{io::{self,BufRead,Write},sync::Arc};
++fn vector(q:GasRates)->[f64;28]{let mut a=[0.0;28];a[..27].copy_from_slice(&q.vector());a[27]=q.chemical;a}
++fn denominator(s:&FullState,c:&NetworkConfig,q:GasRates)->Result<[f64;28],String>{
++    let eos=s.gas.eos().map_err(|e|format!("EOS {e:?}"))?;let t=eos.temperature_k;
++    let p=IgmRateBackend::Direct.prepare(t).map_err(|e|format!("prepare {e:?}"))?;
++    let rates=p.rates();let n=|sp|s.gas.nuclei.density_m3(sp);let ne=eos.free_electrons_m3*1e-6;
++    let photo=c.deuterium.photo_input_from_bound_rates(0.0,0.0,c.photon_source).map_err(|e|format!("photo {e:?}"))?;
++    let d=d_atomic_rhs_from_prepared(c.deuterium,&s.gas.nuclei,t,&photo,DChargeExchange::Savin2002,&p,&IgmRateBackend::Direct).map_err(|e|format!("D {e:?}"))?;
++    let cx=d.cx_forward_events_m3_s+d.cx_reverse_events_m3_s;
++    let mut a=[0.0;28];
++    a[S::H1Neutral as usize]=q.ci[0]+q.rr[0]+cx;a[S::H1Ionized as usize]=a[S::H1Neutral as usize];
++    a[S::DNeutral as usize]=q.ci[3]+q.rr[3]+cx;a[S::DIonized as usize]=a[S::DNeutral as usize];
++    a[S::He4Neutral as usize]=q.ci[1]+q.rr[1]+q.dr;
++    a[S::He4SinglyIonized as usize]=q.ci[1]+q.rr[1]+q.ci[2]+q.rr[2]+q.dr;
++    a[S::He4DoublyIonized as usize]=q.ci[2]+q.rr[2];
++    let chi=HHeModel::controlled_fixture().threshold_ev;
++    for(j,ion)in[S::H1Ionized,S::He4SinglyIonized,S::He4DoublyIonized].into_iter().enumerate(){
++        let rr_kin=ne*(n(ion)*1e-6)*rates.rr_cooling_erg_cm3_s[j]*0.1;
++        a[13]+=chi[j]*EV_J*q.ci[j]+rr_kin;
++        a[27]+=chi[j]*EV_J*(q.ci[j]+q.rr[j]);
++    }
++    let dr_kin=ne*(n(S::He4SinglyIonized)*1e-6)*rates.dr_cooling_erg_cm3_s*0.1;
++    let ce=0.1*(ne*n(S::H1Neutral)*1e-6*rates.ce_erg[0]
++        +ne*ne*n(S::He4SinglyIonized)*1e-6*rates.ce_erg[1]
++        +ne*n(S::He4SinglyIonized)*1e-6*rates.ce_erg[2]);
++    a[13]+=dr_kin+ce+q.ff+q.cmb.abs();a[27]+=chi[1]*EV_J*q.dr;
++    for channel in &d.channel_energy[1..]{a[13]+=channel.thermal.abs();a[27]+=channel.chemical.abs();}
++    a[14]=q.escape.abs();a[15]=q.cmb.abs();
++    for j in 0..4{a[16+j]=q.ci[j];a[20+j]=q.rr[j];}
++    a[24]=q.dr;a[25]=cx;a[26]=q.ff;
++    if a.iter().any(|x|!x.is_finite()||*x<0.0){return Err("invalid denominator".into());}
++    Ok(a)
++}
++fn run()->Result<(),String>{
++    let direct=IgmRateBackend::Direct;
++    let loglinear=IgmRateBackend::Table(Arc::new(IgmRateTable::build_default().map_err(|e|format!("loglinear {e:?}"))?));
++    let cubic=IgmRateBackend::Cubic(Arc::new(CubicIgmTable::build_default().map_err(|e|format!("cubic {e:?}"))?));
++    let h=HHeModel::controlled_fixture().threshold_ev[0];
++    let mut c=NetworkConfig::source_bound(DAtomicProvider::new(h,h+0.0037,"MANUFACTURED_D_H_DELTA_CHI").map_err(|e|format!("provider {e:?}"))?,"MD14_Z002_FESC_BB50K_13P6_100_V1");
++    c.use_photo=false;
++    let mut out=io::BufWriter::new(io::stdout().lock());
++    writeln!(out,"{{\"schema\":\"REI_RUN19_GAS_CONDITIONING_V1\",\"cubic_source_id\":\"{}\"}}",source_id_hex()).map_err(|e|e.to_string())?;out.flush().map_err(|e|e.to_string())?;
++    for(index,line)in io::stdin().lock().lines().enumerate(){
++        let line=line.map_err(|e|e.to_string())?;if line=="QUIT"{break;}
++        let mut words=line.split_whitespace();if words.next()!=Some("RHS"){return Err("expected RHS".into());}
++        let values=words.map(|s|s.parse::<f64>().map_err(|_|"invalid number".to_string())).collect::<Result<Vec<_>,_>>()?;
++        if values.len()!=16||values[0]!=7.0||values.iter().any(|v|!v.is_finite()){return Err("expected finite mask7 input".into());}
++        c.cmb_temperature_k=values[1];let mut n=[0.0;13];n.copy_from_slice(&values[2..15]);
++        let s=FullState{gas:MixtureState{nuclei:IsotopeNumberState::new(n).map_err(|e|format!("state {e:?}"))?,thermal_j_m3:values[15]},photon_bins:Vec::new(),escaped_j_m3:0.0,cmb_reservoir_j_m3:0.0,elapsed_s:0.0};
++        let q=gas_rates_with_backend(&s,&c,7,&direct).map_err(|e|format!("Direct {e:?}"))?;
++        let l=gas_rates_with_backend(&s,&c,7,&loglinear).map_err(|e|format!("loglinear {e:?}"))?;
++        let cu=gas_rates_with_backend(&s,&c,7,&cubic).map_err(|e|format!("cubic {e:?}"))?;
++        let sum=denominator(&s,&c,q)?;let t=s.gas.eos().map_err(|e|format!("EOS {e:?}"))?.temperature_k;
++        writeln!(out,"{{\"index\":{index},\"temperature_k\":{t:.17e},\"direct\":{:?},\"loglinear\":{:?},\"cubic\":{:?},\"sum_abs_flux\":{:?},\"ledger_residuals\":{:?}}}",vector(q),vector(l),vector(cu),sum,[q.residual(),l.residual(),cu.residual()]).map_err(|e|e.to_string())?;
++        out.flush().map_err(|e|e.to_string())?;
++    }
++    Ok(())
++}
++fn main(){if let Err(e)=run(){eprintln!("{e}");std::process::exit(2);}}
+--- unit_a/native/owner_src/rate_table.rs
++++ unit_b/native/owner_src/rate_table.rs
+@@ -8,6 +8,7 @@
+ pub const IGM_TABLE_DEFAULT_NODES: usize = 65537;
+ pub const IGM_DIRECT_EVALUATOR: &str = "IGM_GRACKLE_DIRECT_F64_V1";
+ pub const IGM_TABLE_EVALUATOR: &str = "IGM_GRACKLE_LOGLINEAR_F64_V1";
++pub const IGM_CUBIC_EVALUATOR: &str = "IGM_GRACKLE_NODE_MAJOR16_CUBIC_F64_V1";
+ 
+ /// Coefficient-major log storage. The caller certifies source smoothness and
+ /// structural zeros; equal zero endpoints alone never certify an interval.
+@@ -174,10 +175,10 @@
+ }
+ /// The default evaluator is the unchanged direct source provider.
+ #[derive(Clone,Debug,Default)]
+-pub enum IgmRateBackend { #[default] Direct, Table(Arc<IgmRateTable>) }
++pub enum IgmRateBackend { #[default] Direct, Table(Arc<IgmRateTable>), Cubic(Arc<crate::cubic_igm::CubicIgmTable>) }
+ impl IgmRateBackend {
+-    pub fn rates(&self,t:f64)->Result<IgmRates,ForwardError>{match self{Self::Direct=>igm_rates(t),Self::Table(table)=>table.rates(t)}}
+-    pub fn evaluator_id(&self)->&'static str{match self{Self::Direct=>IGM_DIRECT_EVALUATOR,Self::Table(_)=>IGM_TABLE_EVALUATOR}}
++    pub fn rates(&self,t:f64)->Result<IgmRates,ForwardError>{match self{Self::Direct=>igm_rates(t),Self::Table(table)=>table.rates(t),Self::Cubic(table)=>table.rates(t)}}
++    pub fn evaluator_id(&self)->&'static str{match self{Self::Direct=>IGM_DIRECT_EVALUATOR,Self::Table(_)=>IGM_TABLE_EVALUATOR,Self::Cubic(_)=>IGM_CUBIC_EVALUATOR}}
+     pub fn prepare(&self,t:f64)->Result<PreparedIgmRates,ForwardError>{Ok(PreparedIgmRates{temperature_k:t,rates:self.rates(t)?,evaluator_id:self.evaluator_id()})}
+ }
+ /// Private fields bind a reusable bundle to its exact temperature/evaluator.
+--- unit_a/native/src/cubic_igm.rs
++++ unit_b/native/src/cubic_igm.rs
+@@ -0,0 +1,61 @@
++//! RUN19 opt-in coefficient-value cubic evaluator on log T, not a new atom model.
++//! Derived from the tested rate_cubic examples/common field mapping. Actual source
++//! bytes, algorithm implementation and wrapper policy are compile-bound to cache ID.
++use rei_rate_cubic::{CubicRateGrid,Error,Sample,source_digest};
++use crate::{ForwardError,igm_rates::{igm_rates,IgmRates,IgmRateDiagnostics},
++    rate_table::{igm_flat,igm_branch_knots}};
++use std::path::Path;
++
++pub const DEFAULT_NODES:usize=32_769;
++const POLICY:&[u8]=b"REI_NATIVE_HHE_CUBIC_V1;T=[1,1000000];units=cgs;channels=15+zeroPad;layout=nodeMajor16;grid=lnT;stencil=-1,0,1,2;order=nonFMA;tag=floors3-drLow1-ceCaps3;thresholdBranchStencilFallback;normalPositiveOrDirect;cacheDefaultNodes=32769";
++pub fn source_id()->[u8;32]{
++    let mut bytes=Vec::new();
++    for part in [POLICY,include_bytes!("../owner_src/igm_rates.rs").as_slice(),
++        include_bytes!("../owner_src/rate_table.rs").as_slice(),
++        include_bytes!("../../rate_cubic/src/lib.rs").as_slice(),
++        include_bytes!("cubic_igm.rs").as_slice()] {
++        bytes.extend_from_slice(&(part.len()as u64).to_le_bytes());bytes.extend_from_slice(part);
++    }
++    source_digest(&bytes)
++}
++pub fn source_id_hex()->String{source_id().iter().map(|b|format!("{b:02x}")).collect()}
++
++#[derive(Clone,Debug)]
++pub struct CubicIgmTable{grid:CubicRateGrid<16>}
++impl CubicIgmTable{
++    pub fn build_default()->Result<Self,Error>{Self::new(DEFAULT_NODES)}
++    pub fn new(nodes:usize)->Result<Self,Error>{
++        let grid=CubicRateGrid::build(1.0,1e6,nodes,source_id(),|t|{
++            let r=igm_rates(t).map_err(|_|Error::Invalid("IGM_TEMPERATURE_DOMAIN"))?;
++            let flat=igm_flat(r);let mut values=[0.0;16];values[..15].copy_from_slice(&flat);
++            let mut tag=if r.diagnostics.dr_low_branch{8}else{0};
++            for j in 0..3{if r.diagnostics.ci_floor_cm3_s[j]!=0.0{tag|=1<<j;}
++                if r.diagnostics.ce_cap_erg[j]!=0.0{tag|=1<<(4+j);}}
++            Ok(Sample{values,tag})
++        },|a,b|igm_branch_knots().iter().any(|&k|a<=k&&k<=b),
++        |j,a,b|j==15||(j==6&&a/11605.0<=0.8&&b/11605.0<=0.8))?;
++        Ok(Self{grid})
++    }
++    pub fn grid(&self)->&CubicRateGrid<16>{&self.grid}
++    pub fn save_new(&self,path:impl AsRef<Path>)->Result<(),Error>{self.grid.save_new(path)}
++    /// The server contract is the default grid. A differently sized valid cache
++    /// is rejected rather than silently selecting a different accuracy budget.
++    pub fn load_default(path:impl AsRef<Path>)->Result<Self,Error>{
++        let grid=CubicRateGrid::load(path,source_id())?;
++        if grid.domain().map(f64::to_bits)!=[1.0_f64.to_bits(),1e6_f64.to_bits()]
++            ||grid.nodes()!=DEFAULT_NODES{return Err(Error::Invalid("IGM_CUBIC_CACHE_DOMAIN_OR_NODES"));}
++        Ok(Self{grid})
++    }
++    pub fn rates(&self,t:f64)->Result<IgmRates,ForwardError>{
++        let Some(s)=self.grid.sample(t)else{return igm_rates(t);};
++        let mut v=s.values;let floor:[bool;3]=std::array::from_fn(|j|s.tag&(1<<j)!=0);
++        for j in 0..3{if floor[j]{v[j]=1e-20;}}
++        let low=t/11605.0<=0.8;let ce=[v[7],v[8],v[9]];
++        Ok(IgmRates{ci_cm3_s:[v[0],v[1],v[2]],rr_cm3_s:[v[3],v[4],v[5]],dr_cm3_s:v[6],ce_erg:ce,
++            rr_cooling_erg_cm3_s:[v[10],v[11],v[12]],dr_cooling_erg_cm3_s:if low{0.0}else{v[13]},
++            dr_raw_cooling_erg_cm3_s:v[13],freefree_erg_cm3_s:v[14],
++            diagnostics:IgmRateDiagnostics{ci_floor_cm3_s:std::array::from_fn(|j|if floor[j]{v[j]}else{0.0}),
++                ce_cap_erg:std::array::from_fn(|j|if [118348.0,13179.0,473638.0][j]/t>69.07755278982137{ce[j]}else{0.0}),
++                dr_excluded_erg_cm3_s:if low{v[13]}else{0.0},dr_low_branch:low}})
++    }
++}
+--- unit_a/native/src/lib.rs
++++ unit_b/native/src/lib.rs
+@@ -80,6 +80,8 @@
+ 
+ // RUN06 independent gas vector field and opt-in integration seam.
+ pub mod gas_reference_rhs;
++// RUN19 Unit B opt-in cubic numerical evaluator, original atomic source retained.
++pub mod cubic_igm;
+ pub mod gas_solver_contract;
+ pub mod bass_gas_reference;
+ 
+--- unit_a/native/tests/run19_cubic_integration.rs
++++ unit_b/native/tests/run19_cubic_integration.rs
+@@ -0,0 +1,89 @@
++//! Unit B integration checks, independent of historical IVP/test suites.
++use rei_iso_couple_reference::{
++    HHeModel,cubic_igm::{CubicIgmTable,source_id,DEFAULT_NODES},
++    deuterium_atomic::{DAtomicProvider,DAtomicError,DChargeExchange,d_atomic_rhs_from_prepared},
++    full_network::{FullState,NetworkConfig},
++    gas_reference_rhs::{gas_rates_with_backend,gas_rates_batch_into,GasRates},
++    igm_rates::igm_rates,isotope_state::{IsotopeNumberState,IsotopeSpecies as S},
++    mixture_eos::{MixtureState,KB_J_K},rate_table::{IgmRateBackend,igm_flat,igm_branch_knots,IGM_CUBIC_EVALUATOR},
++};
++use std::{sync::Arc,path::PathBuf};
++fn fixture(t:f64)->(FullState,NetworkConfig){
++    let n=[0.0,180.0,20.0,0.0045,0.0005,0.0,0.0,0.0,0.0,0.0,12.0,3.0,1.0];
++    let nuclei=IsotopeNumberState::new(n).unwrap();
++    let u=1.5*KB_J_K*nuclei.thermal_particle_density_all_thermal_m3().unwrap()*t;
++    let h=HHeModel::controlled_fixture().threshold_ev[0];
++    let mut c=NetworkConfig::source_bound(DAtomicProvider::new(h,h+0.0037,"RUN19_TEST_THRESHOLD").unwrap(),"RUN19_TEST_SOURCE");
++    c.use_photo=false;c.cmb_temperature_k=29.0;
++    (FullState{gas:MixtureState{nuclei,thermal_j_m3:u},photon_bins:Vec::new(),escaped_j_m3:0.0,cmb_reservoir_j_m3:0.0,elapsed_s:0.0},c)
++}
++fn bits(q:GasRates)->[u64;28]{let mut a=[0;28];a[..27].copy_from_slice(&q.vector().map(f64::to_bits));a[27]=q.chemical.to_bits();a}
++struct Temp(PathBuf);
++impl Temp{fn new()->Self{let p=std::env::temp_dir().join(format!("rei_unit_b_{}_{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));std::fs::create_dir(&p).unwrap();Self(p)}}
++impl Drop for Temp{fn drop(&mut self){std::fs::remove_dir_all(&self.0).unwrap();}}
++
++#[test]
++fn cubic_prepared_hhe_d_uses_one_bound_bundle_and_same_ledgers(){
++    let backend=IgmRateBackend::Cubic(Arc::new(CubicIgmTable::build_default().unwrap()));
++    assert_eq!(backend.evaluator_id(),IGM_CUBIC_EVALUATOR);
++    for t in [100.0,9284.0,10000.0,13817.0,100000.0]{
++        let(s,c)=fixture(t);let eos=s.gas.eos().unwrap();let p=backend.prepare(eos.temperature_k).unwrap();
++        let photo=c.deuterium.photo_input_from_bound_rates(0.0,0.0,c.photon_source).unwrap();
++        let d=d_atomic_rhs_from_prepared(c.deuterium,&s.gas.nuclei,eos.temperature_k,&photo,DChargeExchange::Savin2002,&p,&backend).unwrap();
++        let q=gas_rates_with_backend(&s,&c,7,&backend).unwrap();
++        assert_eq!(q.ci[3].to_bits(),d.ci_events_m3_s.to_bits());assert_eq!(q.rr[3].to_bits(),d.rr_events_m3_s.to_bits());
++        assert_eq!(q.ci[0].to_bits(),(eos.free_electrons_m3*1e-6*s.gas.nuclei.density_m3(S::H1Neutral)*p.rates().ci_cm3_s[0]).to_bits());
++        let scale=q.heat.abs()+q.chemical.abs()+q.escape.abs()+q.cmb.abs();
++        assert!(q.residual().abs()<=3e-14*scale);
++        assert_eq!(d_atomic_rhs_from_prepared(c.deuterium,&s.gas.nuclei,eos.temperature_k,&photo,DChargeExchange::Disabled,&p,&IgmRateBackend::Direct),Err(DAtomicError::PreparedEvaluatorMismatch));
++    }
++}
++
++#[test]
++fn cubic_retains_direct_boundary_floor_diagnostics_and_domain(){
++    let table=CubicIgmTable::build_default().unwrap();
++    for t in igm_branch_knots().into_iter().flat_map(|x|[x.next_down(),x,x.next_up()]).chain([1.0,1e6]){
++        let direct=igm_rates(t).unwrap();let actual=table.rates(t).unwrap();
++        assert_eq!(igm_flat(direct).map(f64::to_bits),igm_flat(actual).map(f64::to_bits),"T={t}");
++        assert_eq!(direct.diagnostics.ci_floor_cm3_s.map(f64::to_bits),actual.diagnostics.ci_floor_cm3_s.map(f64::to_bits));
++        assert_eq!(direct.diagnostics.ce_cap_erg.map(f64::to_bits),actual.diagnostics.ce_cap_erg.map(f64::to_bits));
++        assert_eq!(direct.diagnostics.dr_low_branch,actual.diagnostics.dr_low_branch);
++    }
++    for t in [2.0,300.0,9000.0,10000.0,900000.0]{
++        let direct=igm_rates(t).unwrap();let actual=table.rates(t).unwrap();
++        for j in 0..3{assert_eq!(direct.diagnostics.ci_floor_cm3_s[j]!=0.0,actual.diagnostics.ci_floor_cm3_s[j]!=0.0);
++            if direct.diagnostics.ci_floor_cm3_s[j]!=0.0{assert_eq!(actual.ci_cm3_s[j].to_bits(),1e-20_f64.to_bits());}
++            assert_eq!(direct.diagnostics.ce_cap_erg[j]!=0.0,actual.diagnostics.ce_cap_erg[j]!=0.0);}
++        assert_eq!(actual.diagnostics.dr_low_branch,direct.diagnostics.dr_low_branch);
++        if actual.diagnostics.dr_low_branch{assert_eq!(actual.dr_cooling_erg_cm3_s,0.0);assert_eq!(actual.diagnostics.dr_excluded_erg_cm3_s.to_bits(),actual.dr_raw_cooling_erg_cm3_s.to_bits());}
++    }
++    for t in [0.0,0.5,1e6_f64.next_up(),f64::NAN,f64::INFINITY]{assert_eq!(table.rates(t).err(),igm_rates(t).err());}
++}
++
++#[test]
++fn exact_source_cache_roundtrip_and_wrong_identity_or_size_are_rejected(){
++    let dir=Temp::new();let file=dir.0.join("good.bin");let table=CubicIgmTable::build_default().unwrap();
++    assert_eq!(table.grid().source_id(),source_id());assert_eq!(table.grid().nodes(),DEFAULT_NODES);
++    table.save_new(&file).unwrap();assert!(table.save_new(&file).is_err());
++    let loaded=CubicIgmTable::load_default(&file).unwrap();
++    for t in [3.0,9284.0,10001.5,50000.0,1e6]{assert_eq!(igm_flat(table.rates(t).unwrap()).map(f64::to_bits),igm_flat(loaded.rates(t).unwrap()).map(f64::to_bits));}
++    let mut bytes=std::fs::read(&file).unwrap();bytes[24]^=1;let len=bytes.len();
++    let digest=rei_rate_cubic::source_digest(&bytes[..len-32]);bytes[len-32..].copy_from_slice(&digest);
++    let wrong=dir.0.join("wrong_source.bin");std::fs::write(&wrong,bytes).unwrap();
++    assert!(matches!(CubicIgmTable::load_default(&wrong),Err(rei_rate_cubic::Error::Invalid("CUBIC_CACHE_IDENTITY"))));
++    let small=dir.0.join("wrong_nodes.bin");CubicIgmTable::new(257).unwrap().save_new(&small).unwrap();
++    assert!(matches!(CubicIgmTable::load_default(&small),Err(rei_rate_cubic::Error::Invalid("IGM_CUBIC_CACHE_DOMAIN_OR_NODES"))));
++}
++
++#[test]
++fn cubic_typed_batch_preserves_scalar_bits_all_masks_workers(){
++    let backend=IgmRateBackend::Cubic(Arc::new(CubicIgmTable::build_default().unwrap()));
++    let(s,c)=fixture(10000.0);let mut states=vec![s;97];
++    for(i,s)in states.iter_mut().enumerate().skip(48){*s=fixture(9500.0+i as f64*19.0).0;}
++    for mask in [0,1,2,4,7]{for workers in [1,2,4]{
++        let mut output=vec![GasRates::default();states.len()];
++        let stats=gas_rates_batch_into(&states,&c,mask,&backend,&mut output,workers).unwrap();
++        assert_eq!(stats.evaluations,states.len());
++        for(s,q)in states.iter().zip(output){assert_eq!(bits(q),bits(gas_rates_with_backend(s,&c,mask,&backend).unwrap()));}
++    }}
++}

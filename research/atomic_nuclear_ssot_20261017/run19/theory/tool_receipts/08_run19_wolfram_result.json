@@ -1,0 +1,30 @@
+{
+  "key": "run19_wolfram_result",
+  "tool": "wolfram_wolframlanguageevaluator",
+  "request": {
+    "code": "Clear[x,a,b,c,p,q,s,u,v,A,B,T0,T1,T];\ng = c+p x-A Exp[-x]-q Log[1+b Exp[s x]];\ngeneral = FullSimplify[D[g,{x,2}] - (-A Exp[-x]-q s^2 b Exp[s x]/(1+b Exp[s x])^2), Assumptions->{b>0,Element[{x,A,p,q,s},Reals]}];\nrrLog = Log[a] - (x-Log[T0])/2 - (1-b) Log[1+Exp[x/2]/Sqrt[T0]] - (1+b) Log[1+Exp[x/2]/Sqrt[T1]];\nrrExpected = -((1-b) (Exp[x/2]/Sqrt[T0])/(1+Exp[x/2]/Sqrt[T0])^2+(1+b)(Exp[x/2]/Sqrt[T1])/(1+Exp[x/2]/Sqrt[T1])^2)/4;\nrrCheck=FullSimplify[D[rrLog,{x,2}]-rrExpected,Assumptions->{a>0,T0>0,T1>0,-1<=b<=1,Element[x,Reals]}];\ndr=Log[1+(3/10)Exp[-A Exp[-x]]];\nw=(3/10)Exp[-A Exp[-x]]/(1+(3/10)Exp[-A Exp[-x]]);\ndrCheck=FullSimplify[D[dr,{x,2}]-(w(1-w)(A Exp[-x])^2-w A Exp[-x]),Assumptions->{A>0,Element[x,Reals]}];\nbrem=Log[a+b Exp[-(c-x/Log[10])^2/3]];\nwb=b Exp[-(c-x/Log[10])^2/3]/(a+b Exp[-(c-x/Log[10])^2/3]);\nyb=c-x/Log[10];\nbremCheck=FullSimplify[D[brem,{x,2}]-(4yb^2 wb(1-wb)/9-2wb/3)/Log[10]^2,Assumptions->{a>0,b>0,Element[{x,c},Reals]}];\nrrGenericM = FullSimplify[((1-b)+(1+b))/16,Assumptions->{-1<=b<=1}];\n<|\"general_curvature_identity_zero\"->general,\"VF96_curvature_identity_zero\"->rrCheck,\"DR_sum_curvature_identity_zero\"->drCheck,\"bremsstrahlung_curvature_identity_zero\"->bremCheck,\"VF96_uniform_curvature_bound\"->rrGenericM,\"default_h2_over_8\"->N[(Log[10^6]/65536)^2/8,25],\"VF96_default_log_error_bound\"->N[(Log[10^6]/65536)^2/64,25]|>",
+    "timeConstraint": 30
+  },
+  "raw_result_json_sha256": "4ba04818453921b177d9194c7a9a8d0212997532ba1cbe6c98f7054e75c4b623",
+  "raw_result_json_utf8_bytes": 701,
+  "raw_result_retention": "Exact response retained in session functions.store at key; this public receipt preserves actual returned identifiers/errors/CAS and digest without republishing article bodies.",
+  "returned_result_metadata": {
+    "returned_is_error": false,
+    "content_block_count": 1,
+    "text_characters": 602,
+    "urls_observed": [],
+    "retrieval_failures_observed": [
+      "Symbol::undefined2"
+    ],
+    "actual_CAS_result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Symbol::undefined2: Warning: Global symbols \"A, B, T0, T1, T, A, A, A, T0, T0, T1, T0, T0, T1, T1, T0, T1, A, A, A, A, A, A\" are undefined.\nGeneral::messages: Messages were generated which may indicate errors.\n\nOut[1]= <|\"general_curvature_identity_zero\" -> 0, \"VF96_curvature_identity_zero\" -> 0, \"DR_sum_curvature_identity_zero\" -> 0, \"bremsstrahlung_curvature_identity_zero\" -> 0, \"VF96_uniform_curvature_bound\" -> 1/8, \"default_h2_over_8\" -> 5.5549995734246426838281328670385013362825753048302`25.*^-9, \"VF96_default_log_error_bound\" -> 6.943749466780803354785166083798126670353219131038`25.*^-10|>"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  }
+}

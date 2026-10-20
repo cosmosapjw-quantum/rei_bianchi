@@ -9,6 +9,7 @@ use rei_iso_couple_reference::{
     isotope_state::{IsotopeNumberState,IsotopeSpecies as S},
     mixture_eos::{MixtureState,KB_J_K},
     rate_table::{IgmRateBackend,IgmRateTable},
+    cubic_igm::CubicIgmTable,
 };
 use std::{hint::black_box,sync::Arc,time::Instant};
 #[allow(dead_code)]
@@ -55,21 +56,27 @@ fn run(mode:&str,states:&[FullState],c:&NetworkConfig,backend:&IgmRateBackend,lo
     (seconds,black_box(checksum),stats)
 }
 fn main(){
-    let mut probe=false;let mut target=8192usize;let mut repeats=5usize;
+    let mut probe=false;let mut unit_b=false;let mut target=8192usize;let mut repeats=5usize;
     let mut args=std::env::args().skip(1);
     while let Some(a)=args.next(){match a.as_str(){
         "--probe"=>probe=true,
+        "--unit-b"=>unit_b=true,
         "--target-evaluations"=>target=args.next().unwrap().parse().unwrap(),
         "--repetitions"=>repeats=args.next().unwrap().parse().unwrap(),
-        _=>panic!("usage: run19_gas_bench [--probe] [--target-evaluations 8192] [--repetitions 5]"),
+        _=>panic!("usage: run19_gas_bench [--probe|--unit-b] [--target-evaluations 8192] [--repetitions 5]"),
     }}
     assert!((1..=65536).contains(&target)&&(1..=7).contains(&repeats));
     if probe{target=1024;repeats=1;}
     let table_start=Instant::now();let table=IgmRateTable::build_default().unwrap();
     let construction=table_start.elapsed().as_secs_f64();let table_bytes=table.storage_bytes();
     let direct=IgmRateBackend::Direct;let table=IgmRateBackend::Table(Arc::new(table));
+    assert!(!(probe&&unit_b));
+    let cubic_start=Instant::now();
+    let cubic=if unit_b{Some(IgmRateBackend::Cubic(Arc::new(CubicIgmTable::build_default().unwrap())))}else{None};
+    let cubic_construction=if unit_b{cubic_start.elapsed().as_secs_f64()}else{0.0};
+    let cubic_bytes=if let Some(IgmRateBackend::Cubic(t))=&cubic{t.grid().storage_bytes()}else{0};
     let c=config();let mut rows=Vec::new();
-    let sizes:Vec<_>=if probe{vec![512]}else{vec![1,32,512,4096]};
+    let sizes:Vec<_>=if probe{vec![512]}else if unit_b{vec![4096]}else{vec![1,32,512,4096]};
     for pattern in ["same_temperature","varying_temperature"]{for n in &sizes{
         let states:Vec<_>=(0..*n).map(|i|fixture(if pattern=="same_temperature"{10000.0}
             else{9500.0+((i*104729)%5000)as f64},i%5)).collect();
@@ -77,8 +84,9 @@ fn main(){
         let loops=target.div_ceil(*n);let mut modes=vec![("direct","original"),("direct","shared"),("direct","cached"),
             ("direct","batch1"),("table","shared"),("table","cached"),("table","batch1")];
         if *n>=512{modes.extend([("direct","batch2"),("direct","batch4"),("table","batch2"),("table","batch4")]);}
+        if unit_b{modes.extend([("cubic","shared"),("cubic","cached"),("cubic","batch1"),("cubic","batch2"),("cubic","batch4")]);}
         for(name,mode)in modes{
-            let backend=if name=="direct"{&direct}else{&table};
+            let backend=if name=="direct"{&direct}else if name=="table"{&table}else{cubic.as_ref().unwrap()};
             if !probe{black_box(run(mode,&states,&c,backend,1));}
             let mut seconds=Vec::new();let mut sums=Vec::new();let mut counts=Vec::new();
             for _ in 0..repeats{let(dt,sum,stats)=run(mode,&states,&c,backend,loops);
@@ -88,5 +96,5 @@ fn main(){
                 unique.len(),loops*n,seconds,median*1e9/(loops*n)as f64,sums,counts.join(",")));
         }
     }}
-    println!("{{\"schema\":\"REI_RUN19_CORE_BENCH_V1\",\"probe\":{probe},\"table_build_seconds\":{construction:.17e},\"table_payload_bytes\":{table_bytes},\"mask\":7,\"repetitions\":{repeats},\"target_evaluations\":{target},\"timing_scope\":\"steady_rhs_with_preallocated_output_includes_scoped_thread_start_and_join\",\"f64_flags\":\"release_default_no_fast_math_no_target_cpu_override\",\"ivps\":0,\"rows\":[{}]}}",rows.join(","));
+    println!("{{\"schema\":\"REI_RUN19_CORE_BENCH_V2\",\"probe\":{probe},\"unit_b\":{unit_b},\"table_build_seconds\":{construction:.17e},\"table_payload_bytes\":{table_bytes},\"cubic_build_seconds\":{cubic_construction:.17e},\"cubic_payload_bytes\":{cubic_bytes},\"mask\":7,\"repetitions\":{repeats},\"target_evaluations\":{target},\"timing_scope\":\"steady_rhs_with_preallocated_output_includes_scoped_thread_start_and_join\",\"f64_flags\":\"release_default_no_fast_math_no_target_cpu_override\",\"ivps\":0,\"rows\":[{}]}}",rows.join(","));
 }

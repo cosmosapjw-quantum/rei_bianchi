@@ -8,6 +8,7 @@ pub const IGM_CHANNELS: usize = 15;
 pub const IGM_TABLE_DEFAULT_NODES: usize = 65537;
 pub const IGM_DIRECT_EVALUATOR: &str = "IGM_GRACKLE_DIRECT_F64_V1";
 pub const IGM_TABLE_EVALUATOR: &str = "IGM_GRACKLE_LOGLINEAR_F64_V1";
+pub const IGM_CUBIC_EVALUATOR: &str = "IGM_GRACKLE_NODE_MAJOR16_CUBIC_F64_V1";
 
 /// Coefficient-major log storage. The caller certifies source smoothness and
 /// structural zeros; equal zero endpoints alone never certify an interval.
@@ -174,10 +175,10 @@ impl IgmRateTable {
 }
 /// The default evaluator is the unchanged direct source provider.
 #[derive(Clone,Debug,Default)]
-pub enum IgmRateBackend { #[default] Direct, Table(Arc<IgmRateTable>) }
+pub enum IgmRateBackend { #[default] Direct, Table(Arc<IgmRateTable>), Cubic(Arc<crate::cubic_igm::CubicIgmTable>) }
 impl IgmRateBackend {
-    pub fn rates(&self,t:f64)->Result<IgmRates,ForwardError>{match self{Self::Direct=>igm_rates(t),Self::Table(table)=>table.rates(t)}}
-    pub fn evaluator_id(&self)->&'static str{match self{Self::Direct=>IGM_DIRECT_EVALUATOR,Self::Table(_)=>IGM_TABLE_EVALUATOR}}
+    pub fn rates(&self,t:f64)->Result<IgmRates,ForwardError>{match self{Self::Direct=>igm_rates(t),Self::Table(table)=>table.rates(t),Self::Cubic(table)=>table.rates(t)}}
+    pub fn evaluator_id(&self)->&'static str{match self{Self::Direct=>IGM_DIRECT_EVALUATOR,Self::Table(_)=>IGM_TABLE_EVALUATOR,Self::Cubic(_)=>IGM_CUBIC_EVALUATOR}}
     pub fn prepare(&self,t:f64)->Result<PreparedIgmRates,ForwardError>{Ok(PreparedIgmRates{temperature_k:t,rates:self.rates(t)?,evaluator_id:self.evaluator_id()})}
 }
 /// Private fields bind a reusable bundle to its exact temperature/evaluator.

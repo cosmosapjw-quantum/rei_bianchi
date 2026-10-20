@@ -80,6 +80,8 @@ pub mod bass_optical_birth;
 
 // RUN06 independent gas vector field and opt-in integration seam.
 pub mod gas_reference_rhs;
+// RUN19 Unit B opt-in cubic numerical evaluator, original atomic source retained.
+pub mod cubic_igm;
 pub mod gas_solver_contract;
 pub mod bass_gas_reference;
 
