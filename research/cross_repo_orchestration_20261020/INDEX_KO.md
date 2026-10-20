@@ -20,3 +20,5 @@ S1 전체 새 코드/검토/REC raw 전달물: [Drive](https://drive.google.com/
 BASS는 현재 compile/normalization 단계까지 준비됐다. 물리 donor closure와 actual paired event export 없이 NCP에서 전체 source-feedback 구현을 시작하라는 인계가 아니다. 나머지 인계도 원래 cap과 reviewer/owner 계약을 따른다. 재시작하지 않을 완료 항목은 보고서와 DAG에 기록했다.
 
 한 host의 여섯 agent는 공통 allocation을 먼저 읽는다. age32 48worker와 다른 대형 campaign을 동시에 과대 배정하지 않는다. 원래 expired/closed allocation은 유지하고, 명시적으로 새로 정의한 REC event campaign만 별도 allocation으로 기록한다.
+
+최종 통합 문서 capsule S2: [Drive](https://drive.google.com/file/d/1OZjEbwWhLBfhaiM3Us4DoCoJ3laJXcBL/view), Dropbox `id:BSpOijBcT10AAAAAAD_SYw`, 34,141bytes, SHA256 `63d8099d9663b1afb1fe5a02255bcae7e20b4739d41879915fc64f86cf45c25c`. 자신의 upload ACK는 immutable ZIP 이후 생성되므로 최종 Git BACKUP_DELIVERY에 기록했다. 세 단계 모두 provider ACK/size를 확인했고, 전체 remote archive를 다시 내려받았다고 주장하지 않는다.
