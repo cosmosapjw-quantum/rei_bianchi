@@ -1,3 +1,15 @@
+## 현재 전달 상태 — 실제 게시와 archive·sidecar 양쪽 전체 읽기 검증 완료
+
+실제 stage1 commit은 **82364d3d2548a1e864468cb781336f825fc18c29**이며 원격 22파일의 전체 내용과 Git blob SHA가 모두 일치했다. 실행 source **5248822167e3fbe374f4333f7f2efdcdbfdaeeaf**와 과학 판정은 그대로다. 이 최종 metadata의 Git identity는 이를 담는 **ENCLOSING_COMMIT**이며, 아직 수행하지 않은 최종 ref 이동·원격 readback의 성공을 미리 주장하지 않는다.
+
+고정 archive `REI_LRS_NCP_RETURN_RECOVERY_20261020.tar.xz`는 **1,816,608 bytes**, SHA256 `089a1ab2bf05f3368b77b5ec330bfb394b176e7f0b89ce7e32ce6eb2c71390be`다. 233파일의 manifest SHA256은 `6f438f505571d396c91ae1b13f2baabf41bc9497c64b71291539496a4ac9cebe`다. Drive `1XMokGRZfOeE284bvC0wJHuzD86rNMLRl`, Dropbox `id:BSpOijBcT10AAAAAAD_aEw`에서 전체 회수한 bytes·SHA256이 모두 일치했다.
+
+별도 sidecar `REI_LRS_NCP_RETURN_RECOVERY_20261020_ACK.json`도 **4,735 bytes**, SHA256 `71ed1fbf1a5179d13199f321d6b01cf7591b4a9e116dc31342d02bc7b455a6c0`으로 Drive `1sMHEilLsvPF19lWhQ8gr1CgLzS8aB5TB`, Dropbox `id:BSpOijBcT10AAAAAAD_aFQ`의 전체 회수가 모두 일치했다. 모든 회수 process exit는0이다. Drive의 원천 HTTP 상태는 connector가 노출하지 않으며 raw fetch 성공 및 materialization HTTP200을 확인했다. Dropbox 직접 GET은 HTTP200이다.
+
+archive 내부 PREPARED_NOT_PUBLISHED는 동결 당시 상태다. 실제 순서는 archive 동결 → Git 게시와 archive 양쪽 읽기 검증 병행 → sidecar 양쪽 읽기 검증 → 최종 metadata commit이다. archive·sidecar bytes와 과학/analysis/review 원문은 바꾸지 않았다. 이번 native 실행·build·Rust/native/numerical source 변경은0이며, 원래 C10 archive 필드는 역사 범위로 보존한다.
+
+[최종 실제 ACK](FINAL_PUBLICATION_ACK.json)에서 실제 게시·archive·sidecar 회수 receipt와 승인 범위를 확인한다. 다음 과학 작업은 실제 profile이 지목하는 optimizer 하나에 한정하며 완료된 native 실행을 강제 반복하지 않는다.
+
 # 새 대화: 독립 LRS — 현재 NCP 완료 결과에서 이어가기
 
 나는 이론물리·우주론 연구자다. $physmath-research-loop로 독립 LRS를 이어가라. 저장소 `cosmosapjw-quantum/rei_bianchi`, PR198, 기존 branch `research/rei-lrs-v14-physical-birth-20261018`를 사용한다. 현재 `AGENTS.md`를 먼저 읽고 기존 checkout·dirty 상태를 보존한다. 새 clone/worktree/reset/clean을 만들지 않는다. source·이론·물리 판정은 Astra, 고정 계약의 구현·기계 실행은 lower-tier, 구현하지 않은 Astra가 독립 검토한다. 사용자가 승인한 기존 branch 게시·백업 범위는 유지한다.

@@ -34,20 +34,40 @@
     },
     {
       "id": "stage1_Git",
-      "status": "PREPARED_NOT_PUBLISHED"
+      "status": "COMPLETE",
+      "commit": "82364d3d2548a1e864468cb781336f825fc18c29",
+      "receipt": "publication/STAGE1_PUBLICATION_READBACK.json"
     },
     {
       "id": "archive",
-      "status": "PENDING"
+      "status": "FROZEN_UNCHANGED",
+      "archive": {
+        "name": "REI_LRS_NCP_RETURN_RECOVERY_20261020.tar.xz",
+        "bytes": 1816608,
+        "sha256": "089a1ab2bf05f3368b77b5ec330bfb394b176e7f0b89ce7e32ce6eb2c71390be",
+        "manifest_sha256": "6f438f505571d396c91ae1b13f2baabf41bc9497c64b71291539496a4ac9cebe",
+        "regular_files": 233,
+        "internal_publication_state": "PREPARED_NOT_PUBLISHED (frozen packaging-time state, not overwritten)"
+      }
     },
     {
       "id": "dual_provider_full_readback",
-      "status": "PENDING"
+      "status": "COMPLETE",
+      "scope": "ARCHIVE_DUAL_FULL_GET",
+      "receipt": "publication/ARCHIVE_DUAL_READBACK.json"
     },
     {
-      "id": "ACK_and_final_Git_closure",
-      "status": "PENDING",
-      "planned_receipt": "FINAL_PUBLICATION_ACK.json"
+      "id": "sidecar_dual_full_readback",
+      "status": "COMPLETE",
+      "receipt": "publication/ACK_DUAL_READBACK.json",
+      "sidecar_sha256": "71ed1fbf1a5179d13199f321d6b01cf7591b4a9e116dc31342d02bc7b455a6c0"
+    },
+    {
+      "id": "final_Git_closure",
+      "status": "THIS_COMMIT",
+      "metadata_commit_identity": "ENCLOSING_COMMIT",
+      "receipt": "FINAL_PUBLICATION_ACK.json",
+      "final_ref_and_remote_readback": "NOT_PREASSERTED"
     },
     {
       "id": "next_optimizer",
@@ -73,26 +93,36 @@
     },
     {
       "from": "root_admission",
-      "to": "stage1_Git"
+      "to": "archive"
     },
     {
-      "from": "stage1_Git",
-      "to": "archive"
+      "from": "archive",
+      "to": "stage1_Git"
     },
     {
       "from": "archive",
       "to": "dual_provider_full_readback"
     },
     {
-      "from": "dual_provider_full_readback",
-      "to": "ACK_and_final_Git_closure"
+      "from": "stage1_Git",
+      "to": "sidecar_dual_full_readback"
     },
     {
-      "from": "ACK_and_final_Git_closure",
+      "from": "dual_provider_full_readback",
+      "to": "sidecar_dual_full_readback"
+    },
+    {
+      "from": "sidecar_dual_full_readback",
+      "to": "final_Git_closure"
+    },
+    {
+      "from": "final_Git_closure",
       "to": "next_optimizer",
-      "condition": "Actual profile identifies one useful optimizer; otherwise stop."
+      "condition": "At most one optimizer selected only from an actual profile; otherwise stop."
     }
   ],
   "no_forced_native_repeats": true,
-  "production": "NOT_ISSUED"
+  "production": "NOT_ISSUED",
+  "actual_order": "Archive frozen, stage1 Git and dual archive GET in parallel, sidecar dual GET, final metadata represented by this enclosing commit.",
+  "updated_utc": "2026-10-20T21:00:11Z"
 }
