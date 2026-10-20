@@ -1,3 +1,17 @@
+# 현재 상태 — VigilODE NCP 완료 및 2026-10-20 복원 확인
+
+2026-10-19 NCP에서 고정 source `d87ba9ca25acb8a2a032154fa23057b45acd6207`의 locked/offline release build, 표적시험 7개와 **샌드박스와 같은 19개 고유 설정**이 완료됐다. 모두 exit 0, 실패·중단 0, native RHS 38,840회, native wall 15.824811033초다. 두 host의 실행을 38개 고유 설정으로 합산하지 않는다. 실행 근거 commit은 `09bfe94bc270623b014bc6db78c59211152739aa`, C11 전달 commit은 `46a29285ad7095959bb0e5b5a10dab0fec97501f`다.
+
+[실제 NCP 실행 receipt](vigilode_radau_20261019/ncp_20261019T171038Z/NCP_EXECUTION_RECEIPT.json), [NCP delivery/DAG](vigilode_radau_20261019/stages/NCP_DELIVERY_20261019.json), [2026-10-20 복원 보고](vigilode_radau_20261019/recovery_20261020/RECOVERY_REPORT_KO.md)를 먼저 읽는다. 이번 host에서는 native run 0·build 0이며 prepare-only 복원과 저장 결과 readback만 수행했다. 316,540개 raw 비시간 수치 leaf와 209개 endpoint, 435+323개 분석 leaf가 유한 f64이고 packed IEEE64로 일치했다. 기존 walker와 같은 시간 leaf 38개는 제외했다. 이는 같은 유한 설정의 결과 재현 확인이다.
+
+일반 source-on 차수·HeIII endpoint 단일 차수·uniform stiff 정확도·일반 양수성·Case B·full EoR·signed Bianchi·positive CMB/비영 boundary는 HOLD이며 production admission은 NOT_ISSUED다.
+
+---
+
+## 아래 본문은 NCP 실행 전까지의 역사적 전달 기록
+
+아래의 NCP NOT_RUN·남은 실행 지시는 해당 작성 시점의 상태다. 현재 완료 상태는 위 receipt와 복원 보고를 따른다.
+
 # REI-LRS V14 최신 연구 전달 — 2026-10-19 VigilODE Radau 후속
 
 ## 최신 완료 범위

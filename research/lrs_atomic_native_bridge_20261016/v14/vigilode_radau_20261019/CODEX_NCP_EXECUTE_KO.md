@@ -1,3 +1,21 @@
+# 현재 상태 — VigilODE NCP 완료 및 2026-10-20 복원 확인
+
+2026-10-19 NCP에서 고정 source `d87ba9ca25acb8a2a032154fa23057b45acd6207`의 locked/offline release build, 표적시험 7개와 **샌드박스와 같은 19개 고유 설정**이 완료됐다. 모두 exit 0, 실패·중단 0, native RHS 38,840회, native wall 15.824811033초다. 두 host의 실행을 38개 고유 설정으로 합산하지 않는다. 실행 근거 commit은 `09bfe94bc270623b014bc6db78c59211152739aa`, C11 전달 commit은 `46a29285ad7095959bb0e5b5a10dab0fec97501f`다.
+
+[실제 NCP 실행 receipt](ncp_20261019T171038Z/NCP_EXECUTION_RECEIPT.json), [NCP delivery/DAG](stages/NCP_DELIVERY_20261019.json), [2026-10-20 복원 보고](recovery_20261020/RECOVERY_REPORT_KO.md)를 먼저 읽는다. 이번 host에서는 native run 0·build 0이며 prepare-only 복원과 저장 결과 readback만 수행했다. 316,540개 raw 비시간 수치 leaf와 209개 endpoint, 435+323개 분석 leaf가 유한 f64이고 packed IEEE64로 일치했다. 기존 walker와 같은 시간 leaf 38개는 제외했다. 이는 같은 유한 설정의 결과 재현 확인이다.
+
+일반 source-on 차수·HeIII endpoint 단일 차수·uniform stiff 정확도·일반 양수성·Case B·full EoR·signed Bianchi·positive CMB/비영 boundary는 HOLD이며 production admission은 NOT_ISSUED다.
+
+최신 receipt를 먼저 읽고 원본 source·C10/C11 raw·이전 transcript는 고정된 근거로 보존한다. 이번 2026-10-20 복원에서는 NCP에 접속하거나 native를 실행하지 않았다. 아래 절차는 이미 완료한 작업의 선택적 재현 가이드이며, 향후 명시적 재현 요청이 있을 때만 새 실행을 수행한다.
+
+확인된 launcher 결함은 single-branch checkout에서 `git fetch origin BRANCH`가 FETCH_HEAD만 갱신하고 `origin/BRANCH`를 오래된 상태로 둔 것이었다. 아래의 fetch 한 줄만 실제 성공한 [refspec 수정 diff](ncp_20261019T171038Z/tools/launcher_r1_to_r4.diff)와 같은 명시적 refspec으로 고쳤다. 첫 세 launcher는 native 이전 exit 1이었다. 네 번째는 `prepare_and_run.py` exit 0으로 19개 실행을 끝낸 뒤 system Python의 matplotlib 부재로 analyzer exit 1이었다. 분석 전용 venv의 analyzer 재실행 exit 0은 `NCP_EXECUTION_RECEIPT.json`의 보고값이며, 저장된 `analysis_r2` stdout 요약과 빈 stderr가 이를 뒷받침한다. 별도의 재실행 `EXIT_CODE` 파일은 관찰하지 못했다. 이 호환 수정은 이미 수행된 기록이며 이번 복원에서 의존성을 설치하지 않았다.
+
+---
+
+## 아래 본문은 실행 전 인계의 역사적 기록 및 선택적 재현 절차
+
+아래의 NCP NOT_RUN·NCP에 남은 작업 문장은 당시 상태다. 현재 완료 결과는 위 receipt를 따른다. 아래 명령의 fetch 한 줄만 위에서 설명한 실제 수정으로 반영했다.
+
 # Codex NCP 인계 — 독립 LRS V14 / VigilODE native Radau
 
 사용자는 source 복원·코드 수정·컴파일·실제 실행·동일 연구 branch push와 Drive/Dropbox 백업을 승인했다. 사용자가 다운로드나 수동 SSH/SCP를 수행하도록 요구하지 않는다. Production v3/rux, BASS, atomic, age-reference DAG와 별개인 독립 LRS 작업이다.
@@ -41,7 +59,7 @@ REI_REPO="$(git rev-parse --show-toplevel)"
 REI_BRANCH='research/rei-lrs-v14-physical-birth-20261018'
 REI_REL='research/lrs_atomic_native_bridge_20261016/v14/vigilode_radau_20261019'
 git -C "$REI_REPO" status --short
-git -C "$REI_REPO" fetch origin "$REI_BRANCH"
+git -C "$REI_REPO" fetch origin "+refs/heads/$REI_BRANCH:refs/remotes/origin/$REI_BRANCH"
 REI_SOURCE_SHA="$(git -C "$REI_REPO" show "origin/$REI_BRANCH:$REI_REL/stages/FINAL_DELIVERY.json" | python3 -c 'import json,sys; print(json.load(sys.stdin)["source_publication_sha"])')"
 REI_JOB_ROOT="/tmp/rei_lrs_vigilode_$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$REI_JOB_ROOT/input"
