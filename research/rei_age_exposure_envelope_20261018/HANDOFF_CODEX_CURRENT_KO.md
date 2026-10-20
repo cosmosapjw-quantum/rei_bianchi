@@ -1,46 +1,62 @@
-# Codex/NCP 현재 인계 | v9: age32 완료, 추가 native 실행 미발행
+# Codex/NCP 현재 인계 | v10 time8·16·32 한 캠페인
 
-## 먼저 확인할 상태
+Repo `cosmosapjw-quantum/rei_bianchi`, draft PR199, branch `research/rei-age-exposure-envelope-20261018`, task `research/rei_age_exposure_envelope_20261018/`.
 
-기존 단일 `age32-block-max-diagnostics` 실행은 `93aca4cc483080b802fa85c9c44e43b9c85db5b7`에서 완료됐다. Native248.815719s/11786RHS/exit0, 원 photon·energy gate PASS다. 현재 분석은 `native_age32_analysis_20261020/results/attempt004/ANALYSIS.json`이며 native32/64의 N/U 상대차0.8248861211419689/0.7916059535400799는 원0.005 목표 FAIL이다.
+## 목표와 먼저 확인할 상태
 
-**현재 NCP에 남은 필수 실행은 없다.** 완료 age32·age64·spectral128·v7 benchmark·v8 fixed-model 계산을 반복하지 않는다. Native age/time HOLD, nonlinear response bound NOT_ESTABLISHED, PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED다. 다음 native 실행을 하려면 CURRENT DAG의 path exposure/source/reconstruction 연구 의무에서 새 workload를 구체화해야 한다.
+이번 연구에서 N2/N3/N4를 원 count/energy gate로 복구하는 제한된 subnormal support 변경, order-preserving cohort parallelism, compact observation trace, accepted chemistry의 저장 분모 BE observer를 구현·컴파일·작게 검증했다. 최종 R6/C9 및 publication/backup receipts를 읽는다. NCP에는 컴파일·작은 환경 연결·실제 time8/16/32 실행만 남긴다. 완료 age32·age64·spectral128·v7 benchmark·v8 fixed-model은 반복하지 않는다.
 
-## 자동 입력 복원
+최신 PR199 HEAD와 CURRENT5 및 이 배송 이후 새 결과를 먼저 확인한다. 완료 matching case는 raw/receipt를 읽어 ingest한다. 실패·중단 attempt를 새 directory로 옮겨 budget을 초기화하지 않는다. Native age/time 수렴 HOLD, nonlinear Grackle response bound NOT_ESTABLISHED, PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED는 exit0만으로 바뀌지 않는다.
 
-User에게 ZIP 이동·해제를 맡기지 않는다. 실제 최신 PR199 HEAD와 CURRENT5를 먼저 읽고, 기존 task-owned 저장 자료가 없을 때만 connector 또는 이미 설정된 rclone으로 새 task-owned 경로에 복원한다. Owner checkout, PR150/R9/LRS/BASS HHeD, 기존 실행과 파일을 변경하지 않는다.
+## 자동 복원과 환경 연결
 
-C10은 source `729a12c5fdee8d05e77f26b396f0464c945351e1`의2,242 files snapshot이다. 실제 C10 provider IDs·SHA는 `DELIVERY_RECEIPT_CURRENT.json`을 따른다. 별도 post-commit `REI_AGE_ENVELOPE_DELIVERY_CONFIRMATION_20261020_v9.json` 자신의 IDs·SHA는 최종 사용자 인계 본문 또는 외부 배송 receipt를 따른다. Confirmation은 자신의 hash를 내부에 포함하지 않는다. C10 원 task snapshot에 confirmation의 정확한 UTF-8 delta를 자동 적용해 최종 tree를 확인한다. C10 루트의 `archive_only/RESTORATION_LAYOUT.md`이 원 native153/B1/deduplicated source161·vendor 복원 정보를 제공한다.
+1. 기존 owner checkout의 branch/HEAD·dirty/untracked·진행 중인 작업을 확인하고 보존한다. 별도 clone/worktree를 만들지 않는다. Task-owned source/runtime/output만 변경하며 PR150/R9·LRS·별도 BASS HHeD를 변경하거나 중단하지 않는다. Prepared/build target은 이번 source identity의 별도 task-owned 경로를 쓴다.
+2. Git source가 없으면 connector 또는 이미 설정된 rclone으로 CURRENT receipt의 v10 C10을 자동 내려받아 whole SHA/size를 확인한다. C10 task source에 별도 v10 confirmation exact UTF-8 delta를 적용해 최종 task tree를 복원한다. `archive_only/RESTORATION_LAYOUT.md`와 confirmation의 exact file set을 따른다. User에게 ZIP 이동·해제를 요구하지 않는다.
+3. Frozen native153와 stored native32는 `campaign.py --c10`이 자동 복원한다. C10에는 native153/B1/source161/vendor22·865와 native32 원 tar가 있다. V9 C10도 같은 immutable native inputs fallback이다: SHA `5eef15a565636fa1e7c160aa30f3b2bb294dfa00364e504ee774f867c6ca4995`,bytes25,147,021,Drive `1c6bCjR8oY3bhr337zqjVOi03lUbIclwD`,Dropbox `id:BSpOijBcT10AAAAAAD_aAA`. 실행 source는 최신 v10을 쓴다.
+4. 실제 host affinity/cgroup CPU quota/current memory headroom·현재 jobs를 확인한다. 이번 대화의 device list는 성공했지만 config 조회는 현재 월 Desktop Commander usage cap이었다. 재시도/재접속하지 않았고 실제64/128 host·기존 jobs는 NOT_OBSERVED, 새 NCP 제출0이었다. 다음 환경의 정상적인 가용 실행 경로를 확인한다.
+5. 기존 NCP venv의 Python3.12.3/NumPy2.3.5/SciPy1.17.0을 우선 사용하고 실제 runtime을 기록한다. Sandbox Py3.12.14와 동일하다고 쓰지 않는다. 실제 rustc/cargo 위치를 찾아 bin의 부모를 `--rust-prefix`에 넣는다. 새 전역 설치가 아니라 필요한 기존 runtime 연결을 한다. Native crate는 offline build한다.
 
-새 native32 입력은 C10의 `archive_only/native_age32/REI_AGE32_BLOCKMAX_DIAGNOSTICS_NCP_20261020T112800Z.tar.gz`에 들어 있다. C10을 사용하지 않을 때 이 파일을 직접 자동 다운로드해도 된다.
+## 한 명령으로 남은 case 모두 실행
 
-- Archive bytes1,181,985 / SHA256 `8c4579811faefbf3738c2dcd3c5105300a9aedec0b08c930bee032e094ef0cde`
-- Drive folder `1phclg92jkhC5KgvnXhks8GbOFlya4qGe`, file `1VXPkeMv7-u3GTbVFRESX8poY6X-7qFTw`
-- Dropbox `/bianchi/rei_bianchi/research/REI_POSITIVE_AGE_REFERENCE_BACKUPS/`, file `id:BSpOijBcT10AAAAAAD_UEw`
-
-새 빈 디렉터리에 archive를 해제한 뒤 `run_corrected/results/age32/attempt001/data`를 사용한다. 부모의 RECEIPT.json과 executed source도 함께 유지한다. ArchiveSHA,45raw hashes, 실행 source SHA `ab240948846a3a09e2bb60767af206e3865f6528a8673c90de177582569596f7`를 확인한다. Age64는 현재 task의 `evidence/ncp_blockmax_20261019T084150Z/run/results/age64/attempt001/data`를 재사용한다. 상세 경로는 `native_age32_analysis_20261020/RAW_INPUTS.json`에 있다.
-
-## 저장 자료 분석을 다시 수행해야 할 구체적 이유가 생긴 경우
-
-현재 결과를 읽기만 하는 데 재실행은 필요하지 않다. 환경 이식 또는 새 입력 확인이 실제로 필요할 때만 다음 entrypoint의 절대경로를 assistant가 정해 사용한다.
+아래 변수는 Codex가 기존 경로·최신 source·자동 확보 archive를 찾아 직접 설정한다. User가 경로를 찾거나 파일을 준비할 필요가 없다. REI_TASK=repo task절대경로, REI_PY=기존 compatible Python, REI_RUST_PREFIX=Rust bin부모, REI_C10=자동확보 archive, REI_RUNTIME/REI_RUN=이번 source/attempt의 task-owned 경로다. 기존 결과를 보존한다.
 
 ~~~bash
-python <task>/native_age32_analysis_20261020/run_bounded.py \
-  --data32 <자동복원한-native32>/run_corrected/results/age32/attempt001/data \
-  --data64 <task>/evidence/ncp_blockmax_20261019T084150Z/run/results/age64/attempt001/data \
-  --out <새-빈-attempt-directory> \
-  --receipts <새-receipt-directory> \
-  --postprocess-only
+"$REI_PY" "$REI_TASK/native_optimization_20261021/campaign.py" \
+  --runtime "$REI_RUNTIME" --out "$REI_RUN" \
+  --c10 "$REI_C10" --rust-prefix "$REI_RUST_PREFIX" --plan-only
+
+"$REI_PY" "$REI_TASK/native_optimization_20261021/campaign.py" \
+  --runtime "$REI_RUNTIME" --out "$REI_RUN" \
+  --c10 "$REI_C10" --rust-prefix "$REI_RUST_PREFIX"
 ~~~
 
-이 경로는 Python·NumPy·Matplotlib 저장 자료 분석이며 native solver/Grackle/Rust trajectory를 호출하지 않는다. 기존 결과를 덮어쓰지 않고120s aggregate cap과 command/exit/wall/stdout/stderr receipts를 유지한다. Native runtime 동일성은 Python3.12.3/NumPy2.3.5/SciPy1.17.0·B1 계약으로 별도 보존한다. Postprocess runtime과 native runtime을 혼동하지 않는다.
+Shared host에서는 `--available-cpus`와 `--available-memory-gib`에 이 task에 실제 배정 가능한 양을 명시한다. 다른 job의 자원을 가용으로 간주하지 않는다. Verified idle64core128GB 기본값은3cases×20workers+3main=63slots,BLAS/OMP1이다. `--repo`는 original Git objects가 이미 있는 offline 대안이다. Stored age32 자동 비교까지 연결하는 `--c10`을 권장하며 두 옵션을 동시에 주지 않는다.
 
-## 다음 native 작업에 반드시 남길 계약
+| 항목 | 동결 값 |
+|---|---|
+| Original native | `35d9747a0bbedcafdb568467ce7c1e7a25f965b6` /153files |
+| Positive B1 reference SHA256 | `89c646db1de80c6e85fe34f7c3eaae2f10904810a8a6c3acc3426a7e7c1dd7a4` |
+| Computational base SHA256 | `78386db7ac2e35488ab610c4a3ddb1d87f8b51bbe25d855bf417dc17dd07d620` |
+| Cases | time8,time16,time32 각1회 |
+| 공통 설정 | q0/birth32/n_mu8/source8/transport16/common8·16·32·64 |
+| 수치 경로 | 원 native BE/Newton, opt-in subnormal-barycenter, 원 count/energy/Newton gates |
+| Observer | accepted chemistry STORED_DENOMINATOR_DISCRETE_BE streaming ON |
+| 큰 host 기본 자원 | jobs3/workers20/63slots/case address space24GiB/reserve16GiB |
+| 각 case wall |1800s |
+| Aggregate child wall |5400s,기존 attempts 포함 |
+| Campaign elapsed | jobs3→2000s,jobs2→3800s,jobs1→5600s |
+| Build | 별도300s |
+| 작은 preflight | 각 control30s,persistent light cap240s |
+| 자동 재시도 |0 |
 
-원 physics `35d9747a0bbedcafdb568467ce7c1e7a25f965b6`, B1 binary SHA `89c646db1de80c6e85fe34f7c3eaae2f10904810a8a6c3acc3426a7e7c1dd7a4`, computational base SHA `78386db7ac2e35488ab610c4a3ddb1d87f8b51bbe25d855bf417dc17dd07d620`를 유지한다. Native time8/16/32는 HOLD다. Source representation을 바꾸려면 이전 fixed-support 제약과 source-age 전달 문제를 수학·코드·작은 검증으로 먼저 닫고, NCP에는 필요한 컴파일·작은 환경 연결·명시된 실행만 남긴다.
+B1은 원 positive reference binary다. 새 BE binary는 generated source/compiler/runtime과 별도 SHA로 기록하고 B1과 byte-identical이라고 쓰지 않는다. Campaign은 source/prepared/binary/runtime/host/argv/env를 연결하며 stale prepared/build를 재사용하지 않는다. 작은 compiled preflight 뒤 세 heavy case를 실행한다. 유효한 tiny domain2birth/n_mu8/source8/transport8만 쓰고 원 guard를 완화하지 않는다.
 
-모든 새 원격 변경은 그때 읽은 실제 HEAD를 부모로 잇고 expected-head fast-forward만 사용한다. PR199 draft/open, no merge/no force-push. 원 root CI cargo fmt 실패와 scoped analysis/R6/C9 PASS를 구분한다.
+## 반환·분석·게시
 
-## V9 백업 확인
+Stdout/stderr, RECEIPT, HOST, CAMPAIGN, argv/env/source/prepared/binary/runtime, output SHA, repair counters, accepted BE trace를 모두 보존한다. Timeout/실패 prefix를 지우지 않는다. Controller interruption에는 살아 있는 자기 child를 확인해 중복 launch를 막고 wall debit을 유지한다. 다른 lane process를 종료하지 않는다.
 
-C10 Drive ID `1c6bCjR8oY3bhr337zqjVOi03lUbIclwD`, Dropbox ID `id:BSpOijBcT10AAAAAAD_aAA`, bytes25,147,021, SHA256 `5eef15a565636fa1e7c160aa30f3b2bb294dfa00364e504ee774f867c6ca4995`. C8/C10 네 전체 readback과 두 C10의 native/B1/vendor/raw checks가 PASS다. Source task tree `0cd25257f9e0fe4cfe1ce4ea6f34f2f65929fab7`. Final commit identity는 별도 confirmation에 있으며 자동 복원 후 exact tree를 확인한다. 현재 추가 native READY는 없다.
+완료 case에는 원 validate_outputs를 적용한다. 자동 분석은 time8↔16,time16↔32,각 case↔저장 age32를 원0.005 목표와 함께 기록한다. Age32는 positive DOP853, time cases는 native BE이므로 cross-operator 비교임을 명시한다. 빠진 case는 MISSING, 실패 prefix는 INCOMPLETE다. Identity/hash 검증에서 거부된 결과를 postprocess에서 다시 성공으로 사용하지 않는다. Stored denominator enclosure를 continuous-path/Grackle response certificate로 확대하지 않는다.
+
+세 case 종료 후 원 실패가 남으면 첫 새 실패를 진단한다. 동일 자동 반복·허용오차 완화·완료 campaign 반복은 없다. 작은 연결 수정에는 이유/source diff/binary identity를 남기고 모델·solver 변경은 원 연구 계약으로 돌아간다.
+
+반환을 task-owned evidence에 보존하고 실제 최신 원격 부모를 잇는 expected-head FF로 push한다. 결과 archive와 필요한 source C8/C10을 Drive `rei_bianchi_research_backups` 및 Dropbox `/bianchi/rei_bianchi/research/REI_POSITIVE_AGE_REFERENCE_BACKUPS/`에 자동 백업하고 whole readback한다. CURRENT5/DAG에 case별 COMPLETE/FAILED/INCOMPLETE·남은 분석을 반영한다. PR199 draft/open,no merge/no force-push. Root CI와 scoped 연구 검증을 구분한다.

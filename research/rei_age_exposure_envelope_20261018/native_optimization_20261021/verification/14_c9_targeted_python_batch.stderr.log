@@ -1,0 +1,27 @@
+test_c9_analysis_rejects_wrong_identity_hash_and_reference_cache (test_changed.ChangedRiskTests.test_c9_analysis_rejects_wrong_identity_hash_and_reference_cache) ... ok
+test_c9_live_orphan_refusal_then_confirmed_exit_debit (test_changed.ChangedRiskTests.test_c9_live_orphan_refusal_then_confirmed_exit_debit) ... FAIL
+test_c9_original_b1_is_separate_reference (test_changed.ChangedRiskTests.test_c9_original_b1_is_separate_reference) ... ok
+test_c9_timeout_preserves_output_and_debits_both_budgets (test_changed.ChangedRiskTests.test_c9_timeout_preserves_output_and_debits_both_budgets) ... ok
+test_endpoint_setup_enrichment_and_missing_channel (test_changed.ChangedRiskTests.test_endpoint_setup_enrichment_and_missing_channel) ... ok
+test_exact_stored_denominators_zero_and_threshold (test_changed.ChangedRiskTests.test_exact_stored_denominators_zero_and_threshold) ... ok
+test_failure_preserved_independent_complete_and_resume (test_changed.ChangedRiskTests.test_failure_preserved_independent_complete_and_resume) ... ok
+test_host64_default_and_small_budget (test_changed.ChangedRiskTests.test_host64_default_and_small_budget) ... ok
+test_persistent_aggregate_budget (test_changed.ChangedRiskTests.test_persistent_aggregate_budget) ... ok
+
+======================================================================
+FAIL: test_c9_live_orphan_refusal_then_confirmed_exit_debit (test_changed.ChangedRiskTests.test_c9_live_orphan_refusal_then_confirmed_exit_debit)
+----------------------------------------------------------------------
+RuntimeError: PRIOR_LAUNCH_IDENTITY_UNCERTAIN_NO_NEW_LAUNCH
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/3fac997d7514/rei_repo/research/rei_age_exposure_envelope_20261018/native_optimization_20261021/test_changed.py", line 24, in test_c9_live_orphan_refusal_then_confirmed_exit_debit
+    with self.assertRaisesRegex(RuntimeError,'LIVE_OWN_ORPHAN'):c.run_scheduler(Path('/unused'),root,{},dict(jobs=1,workers=1,case_memory_bytes=c.GIB),case_wall=1,total_wall=3,elapsed_cap=5,command_factory=lambda n,d:(_ for _ in ()).throw(AssertionError('NO_NEW_LAUNCH')))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "LIVE_OWN_ORPHAN" does not match "PRIOR_LAUNCH_IDENTITY_UNCERTAIN_NO_NEW_LAUNCH"
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.308s
+
+FAILED (failures=1)
