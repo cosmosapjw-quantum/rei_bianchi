@@ -75,7 +75,7 @@ def record_toolchain(evidence,cargo_exe,env):
  metadata={'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'host':platform.uname()._asdict(),'python':sys.version,'cpu_count':os.cpu_count(),'cargo_path':str(cargo_exe),'rustc_path':str(rustc),'cargo_sha256':sha(cargo_exe),'rustc_sha256':sha(rustc),'cargo_vv':(evidence/'cargo_version/stdout.txt').read_text(),'rustc_vv':(evidence/'rustc_version/stdout.txt').read_text()}
  write_json(evidence/'HOST_TOOLCHAIN_METADATA.json',metadata)
 
-def run_cases(evidence,command_prefix,cases,env=None,sources=(),total_budget_s=180.,case_timeout_s=40.):
+def run_cases(evidence,command_prefix,cases,env=None,sources=(),total_budget_s=180.,case_timeout_s=40.,case_args=()):
  """Return nonzero for any failed or unrun case; always retain matrix evidence."""
  total=0.;rows=[];blocked=set();executable=Path(command_prefix[0])
  def flush():
@@ -90,7 +90,7 @@ def run_cases(evidence,command_prefix,cases,env=None,sources=(),total_budget_s=1
   folder=evidence/f'{mode}_{method}_n{n}';raw=folder/'raw.json'
   timeout=min(case_timeout_s,remaining)
   try:
-   capture(folder,[*command_prefix,raw,mode,method,n],env,timeout,sources=sources)
+   capture(folder,[*command_prefix,raw,mode,method,n,*case_args],env,timeout,sources=sources)
    data=json.loads(raw.read_text());total+=data['wall_s']
    rows.append({'mode':mode,'method':method,'N':n,'status':'COMPLETED' if data['completed'] else 'FAILED','native_rhs':data['native_rhs_attempts_including_fd_replay'],'native_wall_s':data['wall_s'],'external_timeout_s':timeout})
    if not data['completed']:blocked.add((mode,method))
@@ -116,6 +116,8 @@ def main():
  p.add_argument('--output-root',type=Path,required=True,help='Fresh output workspace; existing paths refused')
  p.add_argument('--vigilode-source',type=Path,help='Verified local immutable source closure or full source tree')
  p.add_argument('--vigilode-archive',type=Path,help='Exact SHA-bound upstream tar.gz backup')
+ p.add_argument('--native-eval',choices=('legacy','cell-cache'),default='legacy',help='Native evaluation implementation; default preserves legacy behavior')
+ p.add_argument('--profile',action='store_true',help='Enable native evaluation profiling')
  p.add_argument('--cargo',default='cargo');p.add_argument('--cargo-home',type=Path);p.add_argument('--offline',action='store_true')
  action=p.add_mutually_exclusive_group();action.add_argument('--prepare-only',action='store_true');action.add_argument('--all',action='store_true');action.add_argument('--case',nargs=3,metavar=('MODE','METHOD','N'))
  a=p.parse_args();out=a.output_root.resolve()
@@ -156,7 +158,7 @@ def main():
  capture(evidence/'release_build',[cargo_exe,'build','--offline','--locked','--release','--manifest-path',adapter/'Cargo.toml'],env,1200,sources=(native,vigilode,adapter))
  if a.all:capture(evidence/'focused_tests',[cargo_exe,'test','--offline','--locked','--release','--manifest-path',adapter/'Cargo.toml','--lib','--test','focused','--','--test-threads=1','--nocapture'],env,600,sources=(native,vigilode,adapter))
  binary=adapter/'target/release/rei-vigilode-radau-research';cases=[tuple(a.case)] if a.case else [(mode,method,str(n)) for mode,methods in [('fixed',{'radau':[2,4,8,16],'ssprk':[8,16,32]}),('birth',{'radau':[4,8,16],'ssprk':[4,8,16]}),('disabled',{'radau':[4,8,16],'ssprk':[4,8,16]})] for method,levels in methods.items() for n in levels]
- return run_cases(evidence,[binary],cases,env,sources=(native,vigilode,adapter))
+ return run_cases(evidence,[binary],cases,env,sources=(native,vigilode,adapter),case_args=['--native-eval',a.native_eval]+(['--profile'] if a.profile else []))
 if __name__=='__main__':
  try:raise SystemExit(main() or 0)
  except Exception as e:print(str(e),file=sys.stderr);raise SystemExit(1)

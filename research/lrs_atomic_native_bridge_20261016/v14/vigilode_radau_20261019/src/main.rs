@@ -1,12 +1,12 @@
 use rei_microphysics::axbi_driver::PhysicalBirthRule;
 use rei_vigilode_radau_research::{
-    Budget, Events, R, birth_step, chemical_step, initial, state_json,
+    Budget, NativeEval, Events, R, birth_step, chemical_step, initial, state_json,
 };
 use serde_json::json;
 use std::{fs::File, io::Write, time::Instant};
 fn main() -> R<()> {
     let args = std::env::args().collect::<Vec<_>>();
-    if args.len() != 5 {
+    if args.len() < 5 {
         return Err("usage: output.json fixed|birth|disabled radau|ssprk N".into());
     }
     let n = args[4].parse::<usize>().map_err(|e| e.to_string())?;
@@ -18,11 +18,21 @@ fn main() -> R<()> {
     if !["fixed", "birth", "disabled"].contains(&mode) || !["radau", "ssprk"].contains(&method) {
         return Err("mode/method".into());
     }
+    let mut native_eval = NativeEval::Legacy;
+    let mut profile = false;
+    let mut option = 5;
+    while option < args.len() {
+        match args[option].as_str() {
+            "--profile" => {profile=true;option+=1;},
+            "--native-eval" if option+1<args.len() => {native_eval=match args[option+1].as_str(){"legacy"=>NativeEval::Legacy,"cell-cache"=>NativeEval::CellCache,_=>return Err("invalid native-eval".into())};option+=2;},
+            _=>return Err("unknown option".into()),
+        }
+    }
     let clock = Instant::now();
     let (d, mut s, kref) = initial(mode != "birth")?;
     let start_a = s.a;
     let before = state_json(&d, &s)?;
-    let budget = Budget::new(200000, 30.);
+    let budget = Budget::with_options(200000, 30., native_eval, profile);
     let mut records = vec![];
     let mut ssprk_counter = 0;
     let mut failed = None;
@@ -84,7 +94,7 @@ fn main() -> R<()> {
             }
         }
     }
-    let payload = json!( {
+    let mut payload = json!( {
         "schema":"v16-native-radau-raw-v1","config": {
             "q":0.,"cells":8,"n_mu":8,"threads":1,"background_panels":128,"source_energy_subdivisions":d.config.energy_subdivisions,
             "inactive_hi_split":false,"initial_fractions":[0.075,0.12,0.03],"initial_temperature_k":15000.,"seed_dt_s":if mode=="birth" {
@@ -110,6 +120,7 @@ fn main() -> R<()> {
         ,"wall_s":clock.elapsed().as_secs_f64()
     }
     );
+    payload["native_evaluation"] = json!({"mode":format!("{native_eval:?}"),"profile":budget.profile_json()});
     let mut f = File::create(&args[1]).map_err(|e| e.to_string())?;
     serde_json::to_writer_pretty(&mut f, &payload).map_err(|e| e.to_string())?;
     writeln!(f).map_err(|e| e.to_string())?;

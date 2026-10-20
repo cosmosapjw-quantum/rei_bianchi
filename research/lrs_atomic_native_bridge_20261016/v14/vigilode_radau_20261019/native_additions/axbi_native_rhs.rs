@@ -80,3 +80,47 @@ impl PreparedAbsorption {
         Ok(r)
     }
 }
+
+/// Segment-scoped geometry and Jacobian-local photon reconstruction cache.
+/// No cached cell may be reused after its state or support changes.
+pub struct NativeCellCache<'a> {
+    transport: &'a CovariantTransport,
+    base: PhotonState,
+    cells: Vec<PreparedCell>,
+    ray_scales: Vec<f64>,
+}
+impl CovariantTransport {
+    pub fn native_cell_cache<'a>(&'a self, state: &PhotonState, now: &GeometrySnapshot)
+        -> Result<NativeCellCache<'a>, ForwardError> {
+        self.validate_state(state)?;
+        let ray_scales = self.ray_geometry(now)?.iter().map(|r| r.scale).collect::<Vec<_>>();
+        let cells = (0..self.cell_count()).map(|k| prepare_cell(k, state, ray_scales[k / self.n_energy()])).collect::<Result<Vec<_>, _>>()?;
+        Ok(NativeCellCache { transport: self, base: state.clone(), cells, ray_scales })
+    }
+}
+impl NativeCellCache<'_> {
+    pub fn prepare(&self, state: &PhotonState, changed: Option<usize>) -> Result<PreparedAbsorption, ForwardError> {
+        self.transport.validate_state(state)?;
+        if changed.is_some_and(|k| k >= self.cells.len()) { return Err(bad("NATIVE_CACHE_CHANGED_CELL")); }
+        for k in 0..self.cells.len() {
+            if state.support_lo[k] != self.base.support_lo[k] || state.support_hi[k] != self.base.support_hi[k]
+                || (changed != Some(k) && (state.number[k] != self.base.number[k] || state.energy_ref[k] != self.base.energy_ref[k])) {
+                return Err(bad("NATIVE_CACHE_STALE_CELL_OR_SUPPORT"));
+            }
+        }
+        let replacement = changed.map(|k| prepare_cell(k,state,self.ray_scales[k / self.transport.n_energy()])).transpose()?;
+        let mut prepared = PreparedAbsorption { template: state.clone(), nodes: Vec::new(), diagnostics: QuadratureDiagnostics::default() };
+        for k in 0..self.cells.len() {
+            let cell = if changed == Some(k) { replacement.as_ref().unwrap() } else { &self.cells[k] };
+            let d = &cell.diagnostics;
+            prepared.diagnostics.max_count_relative_defect = prepared.diagnostics.max_count_relative_defect.max(d.max_count_relative_defect);
+            prepared.diagnostics.max_energy_relative_defect = prepared.diagnostics.max_energy_relative_defect.max(d.max_energy_relative_defect);
+            prepared.diagnostics.max_asymptotic_mean_defect_ev = prepared.diagnostics.max_asymptotic_mean_defect_ev.max(d.max_asymptotic_mean_defect_ev);
+            prepared.diagnostics.omitted_tail_number_bound_per_h += d.omitted_tail_number_bound_per_h;
+            prepared.diagnostics.omitted_tail_energy_bound_ev_per_h += d.omitted_tail_energy_bound_ev_per_h;
+            prepared.diagnostics.omitted_tail_endpoint_moment_bound_ev_per_h += d.omitted_tail_endpoint_moment_bound_ev_per_h;
+            prepared.nodes.extend(cell.nodes.iter().cloned());
+        }
+        Ok(prepared)
+    }
+}

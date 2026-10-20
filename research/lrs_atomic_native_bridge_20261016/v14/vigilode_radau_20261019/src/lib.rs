@@ -17,6 +17,7 @@ use std::{
     sync::{
         Arc,
         atomic::{AtomicUsize, Ordering},
+        Mutex,
     },
     time::Instant,
 };
@@ -298,21 +299,37 @@ impl Events {
         s.ledgers.excluded_dr_ev += self.excluded_dr;
     }
 }
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum NativeEval { Legacy, CellCache }
+#[derive(Debug, Default, Serialize)]
+struct ProfileTimes { preparation_s: f64, rates_s: f64, provider_s: f64, other_s: f64, jacobian_inclusive_s: f64 }
 #[derive(Debug)]
 pub struct Budget {
     calls: AtomicUsize,
+    pub native_eval: NativeEval,
+    pub profile: bool,
+    preparations: AtomicUsize,
+    node_visits: AtomicUsize,
+    times: Mutex<ProfileTimes>,
     pub cap: usize,
     start: Instant,
     pub max_wall_s: f64,
 }
 impl Budget {
     pub fn new(cap: usize, max_wall_s: f64) -> Arc<Self> {
+        Self::with_options(cap, max_wall_s, NativeEval::Legacy, false)
+    }
+    pub fn with_options(cap: usize, max_wall_s: f64, native_eval: NativeEval, profile: bool) -> Arc<Self> {
         Arc::new(Self {
-            calls: AtomicUsize::new(0),
+            calls: AtomicUsize::new(0), native_eval, profile,
+            preparations: AtomicUsize::new(0), node_visits: AtomicUsize::new(0), times: Mutex::new(ProfileTimes::default()),
             cap,
             start: Instant::now(),
             max_wall_s,
         })
+    }
+    pub fn profile_json(&self) -> serde_json::Value {
+        serde_json::json!({"charged_rhs_attempts":self.calls(),"occupied_cell_preparations":self.preparations.load(Ordering::Relaxed),"node_visits":self.node_visits.load(Ordering::Relaxed),"timings_enabled":self.profile,"exclusive_evaluation_times_and_inclusive_jacobian":*self.times.lock().unwrap()})
     }
     pub fn calls(&self) -> usize {
         self.calls.load(Ordering::Relaxed)
@@ -337,6 +354,7 @@ struct Context {
     nhe: f64,
     a: f64,
     budget: Arc<Budget>,
+    ray_scales: Vec<f64>,
 }
 struct Evaluation {
     f: Vec<f64>,
@@ -420,17 +438,29 @@ impl Context {
     fn evaluate_typed(&self, y: &[f64]) -> Result<Evaluation, EvaluationError> {
         self.budget.charge().map_err(EvaluationError::Fatal)?;
         self.admissibility(y)?;
-        self.evaluate_native(y)
+        self.evaluate_native(y, None)
             .map_err(|e| EvaluationError::Fatal(format!("{e}; scaled_state={y:?}")))
     }
     fn evaluate(&self, y: &[f64]) -> R<Evaluation> {
         self.evaluate_typed(y).map_err(EvaluationError::message)
     }
-    fn evaluate_native(&self, y: &[f64]) -> R<Evaluation> {
+    fn evaluate_cached(&self, y: &[f64], cache: &rei_microphysics::axbi_covariant_transport::NativeCellCache<'_>, changed: Option<usize>) -> Result<Evaluation, EvaluationError> {
+        self.budget.charge().map_err(EvaluationError::Fatal)?;
+        self.admissibility(y)?;
+        self.evaluate_native(y, Some((cache,changed))).map_err(EvaluationError::Fatal)
+    }
+    fn evaluate_native(&self, y: &[f64], cache: Option<(&rei_microphysics::axbi_covariant_transport::NativeCellCache<'_>, Option<usize>)>) -> R<Evaluation> {
+        let clock = self.budget.profile.then(Instant::now);
         let (p, gas) = self.coordinates.decode(y)?;
         native(self.transport.validate_state(&p))?;
         let [x, he2, he3] = gas.fractions;
-        let prepared = native(self.transport.prepare(&p, &self.geometry))?;
+        let prep_clock = self.budget.profile.then(Instant::now);
+        let prepared = if let Some((cache,changed)) = cache { native(cache.prepare(&p,changed))? } else { native(self.transport.prepare(&p, &self.geometry))? };
+        let prep_s = prep_clock.map_or(0.,|t|t.elapsed().as_secs_f64());
+        let count = if let Some((_,changed)) = cache { changed.filter(|&k|p.number[k] != 0.).map_or(0, |_|1) } else { p.number.iter().filter(|&&n|n!=0.).count() };
+        self.budget.preparations.fetch_add(count, Ordering::Relaxed);
+        self.budget.node_visits.fetch_add(prepared.node_count(), Ordering::Relaxed);
+        let rate_clock = self.budget.profile.then(Instant::now);
         let direct = native(prepared.native_rates(
             [
                 self.nh * (1. - x),
@@ -439,15 +469,15 @@ impl Context {
             ],
             self.nh,
         ))?;
+        let rate_s = rate_clock.map_or(0.,|t|t.elapsed().as_secs_f64());
+        let provider_clock = self.budget.profile.then(Instant::now);
         let rhs =
             native(AxbiProvider.point(&gas, self.nh, self.nhe, 0., 2.7255 / self.a, direct.photo))?
                 .rhs;
+        let provider_s = provider_clock.map_or(0.,|t|t.elapsed().as_secs_f64());
         let f = self.coordinates.derivative(&direct, &rhs);
         let events = Events::from_rhs(&rhs, self.nh);
-        let ray_scales = native(self.transport.ray_geometry(&self.geometry))?
-            .iter()
-            .map(|r| r.scale)
-            .collect::<Vec<_>>();
+        let ray_scales = &self.ray_scales;
         let linear = self.coordinates.physical_linear(
             &f,
             self.nhe / self.nh,
@@ -456,6 +486,11 @@ impl Context {
         );
         let forcing = events.forcing();
         let point_identity = std::array::from_fn(|j| linear[j] - forcing[j]);
+        if let Some(clock) = clock {
+            let elapsed = clock.elapsed().as_secs_f64(); let mut t=self.budget.times.lock().unwrap();
+            t.preparation_s += prep_s; t.rates_s += rate_s; t.provider_s += provider_s;
+            t.other_s += elapsed-prep_s-rate_s-provider_s;
+        }
         Ok(Evaluation {
             f,
             events,
@@ -466,7 +501,18 @@ impl Context {
         })
     }
     fn jacobian(&self, y: &[f64]) -> R<DenseMatrix> {
-        let base = self.evaluate(y)?.f;
+        let jac_clock = self.budget.profile.then(Instant::now);
+        let mut cache = None;
+        let base = if self.budget.native_eval == NativeEval::CellCache {
+            self.budget.charge()?;
+            self.admissibility(y).map_err(EvaluationError::message)?;
+            let p = self.coordinates.decode(y)?.0;
+            let cache_clock = self.budget.profile.then(Instant::now);
+            cache = Some(native(self.transport.native_cell_cache(&p,&self.geometry))?);
+            self.budget.preparations.fetch_add(p.number.iter().filter(|&&n|n!=0.).count(), Ordering::Relaxed);
+            if let Some(t) = cache_clock { self.budget.times.lock().unwrap().preparation_s += t.elapsed().as_secs_f64(); }
+            self.evaluate_native(y,Some((cache.as_ref().unwrap(),None)))?.f
+        } else { self.evaluate(y)?.f };
         let n = y.len();
         let mut j = DenseMatrix::zeros(n, n);
         for col in 0..n {
@@ -475,17 +521,19 @@ impl Context {
             let mut m = y.to_vec();
             p[col] += eps;
             m[col] -= eps;
-            let fp = self.evaluate_typed(&p).map(|e| e.f);
+            let changed = self.coordinates.cells.iter().find(|c| c.number_index==col || c.offset_index==Some(col)).map(|c|c.cell);
+            let fp = if let Some(cache)=&cache {self.evaluate_cached(&p,cache,changed)} else {self.evaluate_typed(&p)}.map(|e|e.f);
             // Stop immediately on internal/arithmetic/resource failure.
             if let Err(EvaluationError::Fatal(e)) = &fp {
                 return Err(e.clone());
             }
-            let fm = self.evaluate_typed(&m).map(|e| e.f);
+            let fm = if let Some(cache)=&cache {self.evaluate_cached(&m,cache,changed)} else {self.evaluate_typed(&m)}.map(|e|e.f);
             let column = fd_column(&base, fp, fm, eps)?;
             for row in 0..n {
                 j[(row, col)] = column[row];
             }
         }
+        if let Some(clock) = jac_clock { self.budget.times.lock().unwrap().jacobian_inclusive_s += clock.elapsed().as_secs_f64(); }
         Ok(j)
     }
     fn problem(self: Arc<Self>) -> CoreResult<OdeProblem> {
@@ -568,11 +616,12 @@ pub fn chemical_step(
         let context = Arc::new(Context {
             coordinates: coordinates.clone(),
             transport: d.transport.clone(),
-            geometry,
+            geometry: geometry.clone(),
             nh: d.n_h0_cm3 / s.a.powi(3),
             nhe: d.n_he0_cm3 / s.a.powi(3),
             a: s.a,
             budget: budget.clone(),
+            ray_scales: native(d.transport.ray_geometry(&geometry))?.iter().map(|r|r.scale).collect(),
         });
         let problem = context.clone().problem().map_err(|e| format!("{e:?}"))?;
         let mut cfg = RadauConfig::default();
@@ -847,5 +896,63 @@ mod classification_regression {
             );
         }
         assert!(fd_column(&base, domain(), domain(), 0.5).is_err());
+    }
+}
+
+#[cfg(test)]
+mod cache_native_regressions {
+    use super::*;
+    fn context(d:&Driver,s:&DriverState,mode:NativeEval)->Context {
+        let geometry=d.geometry_point(s.a).unwrap().geometry().unwrap();
+        Context { coordinates:Coordinates::new(&photon(s),&s.gas).unwrap(), transport:d.transport.clone(),
+            ray_scales:d.transport.ray_geometry(&geometry).unwrap().iter().map(|r|r.scale).collect(),
+            geometry,nh:d.n_h0_cm3/s.a.powi(3),nhe:d.n_he0_cm3/s.a.powi(3),a:s.a,
+            budget:Budget::with_options(200000,30.,mode,false) }
+    }
+    fn compare(d:&Driver,s:&DriverState) {
+        let legacy=context(d,s,NativeEval::Legacy);let cached=context(d,s,NativeEval::CellCache);
+        let y=legacy.coordinates.encode(&photon(s),&s.gas).unwrap();
+        let a=legacy.jacobian(&y).unwrap();let b=cached.jacobian(&y).unwrap();
+        assert_eq!(a.as_slice(),b.as_slice()); assert_eq!(legacy.budget.calls(),cached.budget.calls());
+        let occupied=cached.coordinates.cells.len();
+        let photon_dims=y.len()-4;
+        assert_eq!(cached.budget.preparations.load(Ordering::Relaxed),occupied+2*photon_dims);
+        assert_eq!(legacy.budget.preparations.load(Ordering::Relaxed),(1+2*y.len())*occupied);
+        println!("CACHE_NATIVE d={} occupied={} calls={} legacy_preps={} cache_preps={}",y.len(),occupied,legacy.budget.calls(),legacy.budget.preparations.load(Ordering::Relaxed),cached.budget.preparations.load(Ordering::Relaxed));
+    }
+    #[test]
+    fn seeded_empty_and_delta_full_jacobians_match() {
+        let (d,mut s,_)=initial(true).unwrap();compare(&d,&s);
+        set_photon(&mut s,d.transport.empty_state());compare(&d,&s);
+        let mut p=photon(&s);d.transport.add_delta(&mut p,0,20.,0.5).unwrap();set_photon(&mut s,p);compare(&d,&s);
+    }
+    #[test]
+    fn threshold_steep_changed_cell_and_stale_rejection() {
+        let (d,s,_)=initial(true).unwrap();let g=d.geometry_point(s.a).unwrap().geometry().unwrap();
+        let mut base=photon(&s);let threshold=HHeModel::controlled_fixture().threshold_ev[1];
+        let k=d.transport.edges().windows(2).position(|e|e[0]<threshold && e[1]>threshold).unwrap();
+        let lo=d.transport.edges()[k];let hi=d.transport.edges()[k+1];
+        base.number[k]=base.number.iter().copied().fold(0.,f64::max);
+        base.support_lo[k]=lo;base.support_hi[k]=hi;base.energy_ref[k]=(lo+1e-4*(hi-lo))*base.number[k];
+        let cache=d.transport.native_cell_cache(&base,&g).unwrap();
+        let mut changed=base.clone();changed.energy_ref[k]=(0.5*(lo+hi))*base.number[k];
+        let full=d.transport.prepare(&changed,&g).unwrap();let reused=cache.prepare(&changed,Some(k)).unwrap();
+        let abs=[1e-4,2e-5,1e-6];
+        assert_eq!(format!("{:?}",full.native_rates(abs,1e-4).unwrap()),format!("{:?}",reused.native_rates(abs,1e-4).unwrap()));
+        assert!(cache.prepare(&changed,None).is_err());
+        changed.support_hi[k]=hi-0.1*(hi-lo);assert!(cache.prepare(&changed,Some(k)).is_err());
+        assert!(cache.prepare(&base,Some(base.number.len())).is_err());
+        let mut wrong=base.clone();wrong.number.pop();assert!(cache.prepare(&wrong,None).is_err());
+    }
+    #[test]
+    fn cached_resource_failure_transactional_and_domain_classified() {
+        let (d,mut s,k)=initial(true).unwrap();let before=state_json(&d,&s).unwrap();
+        let budget=Budget::with_options(1,30.,NativeEval::CellCache,false);
+        let err=chemical_step(&d,&mut s,1./(4.*k),1e-13,budget.clone()).unwrap_err();assert!(err.contains("NATIVE_RHS_CAP"));
+        let after=state_json(&d,&s).unwrap();for key in ["a","fractions","w_ev","number","energy_ref","support_lo","support_hi","ledgers","accepted"] {assert_eq!(before[key],after[key],"{key}");}
+        assert_eq!(budget.calls(),1);assert_eq!(s.attempts,1);
+        let c=context(&d,&s,NativeEval::CellCache);let mut y=c.coordinates.encode(&photon(&s),&s.gas).unwrap();
+        y[0]=-1.;assert!(matches!(c.evaluate_typed(&y),Err(EvaluationError::PerturbationDomain(_))));
+        y[0]=f64::NAN;assert!(matches!(c.evaluate_typed(&y),Err(EvaluationError::Fatal(_))));
     }
 }
