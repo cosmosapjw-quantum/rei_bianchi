@@ -1,0 +1,821 @@
+--- run13/recovered/code/rei_bass_coupled/examples/gas_rhs_server.rs
++++ run19/native/examples/gas_rhs_server.rs
+@@ -1,45 +1,18 @@
+-//! Safe, offline line protocol for independent numerical integrators. No FFI/unsafe.
++//! Backward-compatible source-off line protocol. Opt-in batch and backend.
++//! RHS/STEP/STEP_TIGHT replies retain their original numeric layout.
+ use rei_iso_couple_reference::{
+     HHeModel,
+     deuterium_atomic::DAtomicProvider,
+     full_network::{self, FullState, NetworkConfig, NetworkError},
+-    gas_reference_rhs::gas_rates,
++    gas_reference_rhs::{GasRates, GasBatchStats, GasRateWorkspace, gas_rates_batch_into},
+     isotope_state::{IsotopeNumberState, IsotopeSpecies as S},
+     mixture_eos::MixtureState,
++    rate_table::{IgmRateBackend, IgmRateTable},
+ };
+-use std::io::{self, BufRead, Write};
+-fn execute(line: &str) -> Result<Vec<f64>, NetworkError> {
+-    let words: Vec<_> = line.split_whitespace().collect();
+-    let tight = words.first() == Some(&"STEP_TIGHT");
+-    let step = words.first() == Some(&"STEP") || tight;
+-    if words.first() != Some(&"RHS") && !step {
+-        return Err(NetworkError::InvalidInput);
+-    }
+-    let vals = words[1..]
+-        .iter()
+-        .map(|w| w.parse::<f64>().map_err(|_| NetworkError::InvalidInput))
+-        .collect::<Result<Vec<_>, _>>()?;
+-    if vals.len() != 16 + usize::from(step) || !vals.iter().all(|v| v.is_finite()) {
+-        return Err(NetworkError::InvalidInput);
+-    }
+-    if vals[0] < 0. || vals[0] > 7. || vals[0].fract() != 0. {
+-        return Err(NetworkError::InvalidInput);
+-    }
+-    let mask = vals[0] as u8;
+-    let tcmb = vals[1];
+-    let offset = 2 + usize::from(step);
+-    let mut n = [0.; 13];
+-    n.copy_from_slice(&vals[offset..offset + 13]);
+-    let s = FullState {
+-        gas: MixtureState {
+-            nuclei: IsotopeNumberState::new(n).map_err(|_| NetworkError::NegativePopulation)?,
+-            thermal_j_m3: vals[offset + 13],
+-        },
+-        photon_bins: vec![],
+-        escaped_j_m3: 0.,
+-        cmb_reservoir_j_m3: 0.,
+-        elapsed_s: 0.,
+-    };
++use std::{io::{self, BufRead, Write}, sync::Arc};
++
++const MAX_BATCH: usize = 65_536;
++fn base_config() -> Result<NetworkConfig, NetworkError> {
+     let h = HHeModel::controlled_fixture().threshold_ev[0];
+     let mut c = NetworkConfig::source_bound(
+         DAtomicProvider::new(h, h + 0.0037, "MANUFACTURED_D_H_DELTA_CHI")
+@@ -47,58 +20,168 @@
+         "MD14_Z002_FESC_BB50K_13P6_100_V1",
+     );
+     c.use_photo = false;
++    Ok(c)
++}
++fn number(words: &mut std::str::SplitWhitespace<'_>) -> Result<f64, NetworkError> {
++    let value = words.next().ok_or(NetworkError::InvalidInput)?
++        .parse::<f64>().map_err(|_| NetworkError::InvalidInput)?;
++    if !value.is_finite() { return Err(NetworkError::InvalidInput); }
++    Ok(value)
++}
++fn parse_mask(words: &mut std::str::SplitWhitespace<'_>) -> Result<u8, NetworkError> {
++    let value = number(words)?;
++    if !(0.0..=7.0).contains(&value) || value.fract() != 0.0 {
++        return Err(NetworkError::InvalidInput);
++    }
++    Ok(value as u8)
++}
++fn parse_state(words: &mut std::str::SplitWhitespace<'_>) -> Result<FullState, NetworkError> {
++    let mut n = [0.0;13];
++    for value in &mut n { *value = number(words)?; }
++    let thermal = number(words)?;
++    Ok(FullState {
++        gas: MixtureState { nuclei: IsotopeNumberState::new(n)
++            .map_err(|_|NetworkError::NegativePopulation)?, thermal_j_m3: thermal },
++        photon_bins: Vec::new(), escaped_j_m3: 0.0, cmb_reservoir_j_m3: 0.0, elapsed_s: 0.0,
++    })
++}
++fn configured(mut c: NetworkConfig, mask: u8, tcmb: f64, tight: bool) -> NetworkConfig {
+     c.cmb_temperature_k = tcmb;
+     c.use_collisions = mask & 1 != 0;
+     c.use_cx = mask & 2 != 0;
+     c.use_cmb = mask & 4 != 0;
+-    if tight {
+-        c.cx_controls.atol_normalized = 1e-15;
+-        c.cx_controls.rtol = 1e-11;
++    if tight { c.cx_controls.atol_normalized = 1e-15; c.cx_controls.rtol = 1e-11; }
++    c
++}
++enum Reply {
++    Single { row: [f64;28], len: usize },
++    Batch { rows: Vec<GasRates>, stats: GasBatchStats },
++}
++fn execute(line: &str, base: NetworkConfig, backend: &IgmRateBackend,
++    workspace: &mut GasRateWorkspace<'_>, workers: usize) -> Result<Reply, NetworkError> {
++    let mut words = line.split_whitespace();
++    let command = words.next().ok_or(NetworkError::InvalidInput)?;
++    if command == "RHS_BATCH" {
++        let count = words.next().ok_or(NetworkError::InvalidInput)?.parse::<usize>()
++            .map_err(|_|NetworkError::InvalidInput)?;
++        if count == 0 || count > MAX_BATCH { return Err(NetworkError::InvalidInput); }
++        let mask = parse_mask(&mut words)?;
++        let c = configured(base, mask, number(&mut words)?, false);
++        let mut states = Vec::with_capacity(count);
++        for _ in 0..count { states.push(parse_state(&mut words)?); }
++        if words.next().is_some() { return Err(NetworkError::InvalidInput); }
++        let mut rows = vec![GasRates::default();count];
++        let stats = gas_rates_batch_into(&states,&c,mask,backend,&mut rows,workers)?;
++        return Ok(Reply::Batch{rows,stats});
+     }
++    let tight = command == "STEP_TIGHT";
++    let step = command == "STEP" || tight;
++    if command != "RHS" && !step { return Err(NetworkError::InvalidInput); }
++    let mask = parse_mask(&mut words)?;
++    let tcmb = number(&mut words)?;
++    let dt = if step {number(&mut words)?} else {0.0};
++    let s = parse_state(&mut words)?;
++    if words.next().is_some() { return Err(NetworkError::InvalidInput); }
++    let c = configured(base,mask,tcmb,tight);
++    let mut row = [0.0;28];
+     if step {
+-        let out = full_network::step(&s, &c, vals[2])?;
+-        let mut a = Vec::with_capacity(27);
+-        for sp in S::ALL {
+-            a.push(out.state.gas.nuclei.density_m3(sp));
+-        }
+-        a.extend([
+-            out.state.gas.thermal_j_m3,
+-            out.state.escaped_j_m3,
+-            out.state.cmb_reservoir_j_m3,
+-        ]);
+-        a.extend(out.budget.ci_events_m3);
+-        a.extend(out.budget.rr_events_m3);
+-        a.extend([
+-            out.budget.dr_hei_m3,
+-            out.budget.cx_signed_m3,
+-            out.budget.freefree_integrated_j_m3,
+-        ]);
+-        Ok(a)
++        // The table flag affects RHS only; the original STEP owner stays Direct.
++        let out = full_network::step(&s,&c,dt)?;
++        for sp in S::ALL { row[sp as usize] = out.state.gas.nuclei.density_m3(sp); }
++        row[13..16].copy_from_slice(&[out.state.gas.thermal_j_m3,
++            out.state.escaped_j_m3,out.state.cmb_reservoir_j_m3]);
++        row[16..20].copy_from_slice(&out.budget.ci_events_m3);
++        row[20..24].copy_from_slice(&out.budget.rr_events_m3);
++        row[24..27].copy_from_slice(&[out.budget.dr_hei_m3,out.budget.cx_signed_m3,
++            out.budget.freefree_integrated_j_m3]);
++        Ok(Reply::Single{row,len:27})
+     } else {
+-        let r = gas_rates(&s, &c, mask)?;
+-        let mut a = r.vector().to_vec();
+-        a.push(r.chemical);
+-        Ok(a)
++        let rates = workspace.evaluate(&s,&c,mask)?;
++        row[..27].copy_from_slice(&rates.vector()); row[27] = rates.chemical;
++        Ok(Reply::Single{row,len:28})
+     }
+ }
++fn write_row(out: &mut impl Write, row: &[f64]) -> io::Result<()> {
++    write!(out,"OK")?;
++    for x in row { write!(out," {x:.17e}")?; }
++    writeln!(out)
++}
++fn options() -> Result<(IgmRateBackend,usize),String> {
++    let mut args=std::env::args().skip(1);
++    let mut selection="direct".to_string(); let mut workers=1;
++    while let Some(arg)=args.next() { match arg.as_str() {
++        "--rates" => selection=args.next().ok_or("--rates requires direct or table")?,
++        "--workers" => workers=args.next().ok_or("--workers requires 1..4")?
++            .parse::<usize>().map_err(|_|"invalid worker count")?,
++        "--help" => {
++            println!("gas_rhs_server [--rates direct|table] [--workers 1..4]\nRHS mask Tcmb n[13] U\nRHS_BATCH count mask Tcmb (n[13] U)*count\nMETA | QUIT\nSTEP/STEP_TIGHT retain Direct backend and original protocol.");
++            std::process::exit(0);
++        },
++        _=>return Err(format!("unknown argument: {arg}")),
++    }}
++    if !(1..=4).contains(&workers) { return Err("workers must be 1..4".into()); }
++    let backend=match selection.as_str() {
++        "direct"=>IgmRateBackend::Direct,
++        "table"=>IgmRateBackend::Table(Arc::new(IgmRateTable::build_default()
++            .map_err(|e|format!("table build: {e:?}"))?)),
++        _=>return Err("rates must be direct or table".into()),
++    };
++    Ok((backend,workers))
++}
+ fn main() -> io::Result<()> {
+-    let mut out = io::BufWriter::new(io::stdout().lock());
+-    for line in io::stdin().lock().lines() {
+-        let line = line?;
+-        if line == "QUIT" {
+-            break;
+-        }
+-        match execute(&line) {
+-            Ok(v) => {
+-                write!(out, "OK")?;
+-                for x in v {
+-                    write!(out, " {x:.17e}")?;
++    let (backend,workers)=options().unwrap_or_else(|e|{eprintln!("{e}");std::process::exit(64)});
++    let base=base_config().map_err(|e|io::Error::other(format!("{e:?}")))?;
++    let mut workspace=GasRateWorkspace::new(&backend);
++    let mut out=io::BufWriter::new(io::stdout().lock());
++    let mut input=io::stdin().lock(); let mut line=String::new();
++    loop {
++        line.clear(); if input.read_line(&mut line)?==0 {break;}
++        let request=line.trim_end_matches(['\r','\n']);
++        if request=="QUIT" {break;}
++        if request=="META" {
++            writeln!(out,"{{\"schema\":\"REI_GAS_RHS_PROTOCOL_V2\",\"rhs_evaluator\":\"{}\",\"step_evaluator\":\"IGM_GRACKLE_DIRECT_F64_V1\",\"photo_owner\":\"OFF\",\"workers\":{},\"cache\":\"ONE_ENTRY_EXACT_EOS_T_BITS\",\"max_batch\":{}}}",backend.evaluator_id(),workers,MAX_BATCH)?;
++        } else { match execute(request,base,&backend,&mut workspace,workers) {
++            Ok(Reply::Single{row,len})=>write_row(&mut out,&row[..len])?,
++            Ok(Reply::Batch{rows,stats})=>{
++                writeln!(out,"BATCH_OK {} 28",rows.len())?;
++                for rates in rows {
++                    let mut row=[0.0;28];row[..27].copy_from_slice(&rates.vector());row[27]=rates.chemical;
++                    write_row(&mut out,&row)?;
+                 }
+-                writeln!(out)?;
+-            }
+-            Err(e) => writeln!(out, "ERR {e:?}")?,
+-        }
++                writeln!(out,"BATCH_END {} {} {}",stats.evaluations,stats.preparations,stats.exact_temperature_hits)?;
++            },
++            Err(e)=>writeln!(out,"ERR {e:?}")?,
++        }}
+         out.flush()?;
+     }
+     Ok(())
+ }
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    fn payload() -> String {
++        let n=[0.0,180.0,20.0,0.0045,0.0005,0.0,0.0,0.0,0.0,0.0,12.0,3.0,1.0];
++        let nuclei=IsotopeNumberState::new(n).unwrap();
++        let u=1.5*rei_iso_couple_reference::mixture_eos::KB_J_K*
++            nuclei.thermal_particle_density_all_thermal_m3().unwrap()*1e4;
++        n.into_iter().chain([u]).map(|v|format!("{v:.17e}")).collect::<Vec<_>>().join(" ")
++    }
++    #[test]
++    fn original_rhs_layout_and_batch_reply_agree_exactly() {
++        let backend=IgmRateBackend::Direct;let mut ws=GasRateWorkspace::new(&backend);
++        let base=base_config().unwrap();let p=payload();
++        let Reply::Single{row,len}=execute(&format!("RHS 7 29 {p}"),base,&backend,&mut ws,1).unwrap() else {panic!()};
++        assert_eq!(len,28);
++        let Reply::Batch{rows,stats}=execute(&format!("RHS_BATCH 2 7 29 {p} {p}"),base,&backend,&mut ws,1).unwrap() else {panic!()};
++        assert_eq!(stats.preparations,1);assert_eq!(stats.exact_temperature_hits,1);
++        for r in rows {assert_eq!(row[..27].iter().map(|x|x.to_bits()).collect::<Vec<_>>(),r.vector().map(f64::to_bits));assert_eq!(row[27].to_bits(),r.chemical.to_bits());}
++    }
++    #[test]
++    fn malformed_batch_is_rejected_before_output() {
++        let backend=IgmRateBackend::Direct;let mut ws=GasRateWorkspace::new(&backend);let base=base_config().unwrap();
++        for request in ["RHS_BATCH 0 7 29","RHS_BATCH 65537 7 29","RHS_BATCH 1 7 NaN","RHS_BATCH 1 7 29","RHS 8 29","UNKNOWN"] {
++            assert!(execute(request,base,&backend,&mut ws,1).is_err(),"{request}");
++        }
++    }
++}
+--- /dev/null
++++ run19/native/examples/run19_gas_bench.rs
+@@ -0,0 +1,92 @@
++//! Bounded same-executable native core comparison; no trajectory integration.
++//! Old gas assembly is included byte-for-byte from RUN13. Its D direct wrapper
++//! uses the unchanged shared event/energy implementation in this RUN19 fork.
++pub use rei_iso_couple_reference::{HHeModel,deuterium_atomic,full_network,igm_rates,isotope_state};
++use rei_iso_couple_reference::{
++    deuterium_atomic::DAtomicProvider,
++    full_network::{FullState,NetworkConfig},
++    gas_reference_rhs::{gas_rates_with_backend,GasRateWorkspace,GasRates,GasBatchStats,gas_rates_batch_into},
++    isotope_state::{IsotopeNumberState,IsotopeSpecies as S},
++    mixture_eos::{MixtureState,KB_J_K},
++    rate_table::{IgmRateBackend,IgmRateTable},
++};
++use std::{hint::black_box,sync::Arc,time::Instant};
++#[allow(dead_code)]
++#[path="../../../run13/recovered/code/rei_bass_coupled/src/gas_reference_rhs.rs"]
++mod original_gas;
++
++fn fixture(t:f64,variant:usize)->FullState {
++    let mut n=[0.0;13];
++    for(s,v)in[(S::H1Neutral,180.0),(S::H1Ionized,20.0),(S::DNeutral,0.0045),
++        (S::DIonized,0.0005),(S::He4Neutral,12.0),(S::He4SinglyIonized,3.0),(S::He4DoublyIonized,1.0)]{
++        n[s as usize]=v;
++    }
++    n[S::H1Neutral as usize]-=variant as f64;n[S::He4Neutral as usize]+=variant as f64;
++    let nuclei=IsotopeNumberState::new(n).unwrap();
++    let u=1.5*KB_J_K*nuclei.thermal_particle_density_all_thermal_m3().unwrap()*t;
++    FullState{gas:MixtureState{nuclei,thermal_j_m3:u},photon_bins:Vec::new(),
++        escaped_j_m3:0.0,cmb_reservoir_j_m3:0.0,elapsed_s:0.0}
++}
++fn config()->NetworkConfig{
++    let h=HHeModel::controlled_fixture().threshold_ev[0];
++    let mut c=NetworkConfig::source_bound(DAtomicProvider::new(h,h+0.0037,"RUN19_BENCH_THRESHOLD").unwrap(),"RUN19_BENCH_SOURCE");
++    c.use_photo=false;c.cmb_temperature_k=29.0;c
++}
++fn run(mode:&str,states:&[FullState],c:&NetworkConfig,backend:&IgmRateBackend,loops:usize)
++    ->(f64,f64,GasBatchStats){
++    let mut workspace=GasRateWorkspace::new(backend);
++    let mut output=vec![GasRates::default();states.len()];
++    let mut checksum=0.0;let mut stats=GasBatchStats::default();
++    let start=Instant::now();
++    for _ in 0..loops {match mode {
++        "original"=>for s in states{let q=black_box(original_gas::gas_rates(black_box(s),black_box(c),7).unwrap());checksum+=q.heat;},
++        "shared"=>for s in states{let q=black_box(gas_rates_with_backend(black_box(s),black_box(c),7,black_box(backend)).unwrap());checksum+=q.heat;},
++        "cached"=>for s in states{let q=black_box(workspace.evaluate(black_box(s),black_box(c),7).unwrap());checksum+=q.heat;},
++        "batch1"|"batch2"|"batch4"=>{
++            let workers=if mode=="batch1"{1}else if mode=="batch2"{2}else{4};
++            let st=gas_rates_batch_into(black_box(states),black_box(c),7,black_box(backend),&mut output,workers).unwrap();
++            stats.evaluations+=st.evaluations;stats.preparations+=st.preparations;stats.exact_temperature_hits+=st.exact_temperature_hits;
++            for q in black_box(&output){checksum+=q.heat;}
++        },
++        _=>panic!("unknown mode"),
++    }}
++    let seconds=start.elapsed().as_secs_f64();
++    if mode=="cached"{stats=workspace.stats;}
++    (seconds,black_box(checksum),stats)
++}
++fn main(){
++    let mut probe=false;let mut target=8192usize;let mut repeats=5usize;
++    let mut args=std::env::args().skip(1);
++    while let Some(a)=args.next(){match a.as_str(){
++        "--probe"=>probe=true,
++        "--target-evaluations"=>target=args.next().unwrap().parse().unwrap(),
++        "--repetitions"=>repeats=args.next().unwrap().parse().unwrap(),
++        _=>panic!("usage: run19_gas_bench [--probe] [--target-evaluations 8192] [--repetitions 5]"),
++    }}
++    assert!((1..=65536).contains(&target)&&(1..=7).contains(&repeats));
++    if probe{target=1024;repeats=1;}
++    let table_start=Instant::now();let table=IgmRateTable::build_default().unwrap();
++    let construction=table_start.elapsed().as_secs_f64();let table_bytes=table.storage_bytes();
++    let direct=IgmRateBackend::Direct;let table=IgmRateBackend::Table(Arc::new(table));
++    let c=config();let mut rows=Vec::new();
++    let sizes:Vec<_>=if probe{vec![512]}else{vec![1,32,512,4096]};
++    for pattern in ["same_temperature","varying_temperature"]{for n in &sizes{
++        let states:Vec<_>=(0..*n).map(|i|fixture(if pattern=="same_temperature"{10000.0}
++            else{9500.0+((i*104729)%5000)as f64},i%5)).collect();
++        let unique:std::collections::BTreeSet<_>=states.iter().map(|s|s.gas.eos().unwrap().temperature_k.to_bits()).collect();
++        let loops=target.div_ceil(*n);let mut modes=vec![("direct","original"),("direct","shared"),("direct","cached"),
++            ("direct","batch1"),("table","shared"),("table","cached"),("table","batch1")];
++        if *n>=512{modes.extend([("direct","batch2"),("direct","batch4"),("table","batch2"),("table","batch4")]);}
++        for(name,mode)in modes{
++            let backend=if name=="direct"{&direct}else{&table};
++            if !probe{black_box(run(mode,&states,&c,backend,1));}
++            let mut seconds=Vec::new();let mut sums=Vec::new();let mut counts=Vec::new();
++            for _ in 0..repeats{let(dt,sum,stats)=run(mode,&states,&c,backend,loops);
++                seconds.push(dt);sums.push(sum);counts.push(format!("{{\"evaluations\":{},\"preparations\":{},\"hits\":{}}}",stats.evaluations,stats.preparations,stats.exact_temperature_hits));}
++            let mut sorted=seconds.clone();sorted.sort_by(f64::total_cmp);let median=sorted[sorted.len()/2];
++            rows.push(format!("{{\"pattern\":\"{pattern}\",\"n\":{n},\"unique_eos_temperature_bits\":{},\"backend\":\"{name}\",\"mode\":\"{mode}\",\"loops\":{loops},\"evaluations_per_repetition\":{},\"seconds\":{:?},\"median_ns_per_rhs\":{:.17e},\"checksums\":{:?},\"stats\":[{}]}}",
++                unique.len(),loops*n,seconds,median*1e9/(loops*n)as f64,sums,counts.join(",")));
++        }
++    }}
++    println!("{{\"schema\":\"REI_RUN19_CORE_BENCH_V1\",\"probe\":{probe},\"table_build_seconds\":{construction:.17e},\"table_payload_bytes\":{table_bytes},\"mask\":7,\"repetitions\":{repeats},\"target_evaluations\":{target},\"timing_scope\":\"steady_rhs_with_preallocated_output_includes_scoped_thread_start_and_join\",\"f64_flags\":\"release_default_no_fast_math_no_target_cpu_override\",\"ivps\":0,\"rows\":[{}]}}",rows.join(","));
++}
+--- /dev/null
++++ run19/native/examples/run19_ipc_bench.py
+@@ -0,0 +1,112 @@
++"""Bounded opt-in gas-server IPC benchmark, preserving exact request/reply bytes.
++
++Measures the NEW optimized scalar protocol against its NEW batched protocol.
++It does not label this an end-to-end timing of the historical binary. Inputs
++are named manufactured point states; no gas/transport trajectory is solved.
++"""
++import argparse, datetime, gzip, hashlib, json, pathlib, statistics, subprocess, time
++
++def identity(data):
++    return {"bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
++
++def payload(i, varying):
++    variant = i % 5
++    n = [0.0, 180.0-variant, 20.0, 0.0045, 0.0005, 0.0, 0.0, 0.0, 0.0, 0.0, 12.0+variant, 3.0, 1.0]
++    charge = [0,0,1,0,1,0,1,0,1,2,0,1,2]
++    heavy = electrons = 0.0
++    for value,z in zip(n,charge):
++        heavy += value
++        electrons += z*value
++    temperature = 9500.0+(i*104729)%5000 if varying else 10000.0
++    u = 1.5*1.380649e-23*(heavy+electrons)*temperature
++    return " ".join(format(v,".17e") for v in n+[u])
++
++def read_row(process):
++    line = process.stdout.readline()
++    words = line.split()
++    if len(words) != 29 or words[0] != b"OK":
++        raise RuntimeError("unexpected reply: "+repr(line[:300]))
++    return line
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--binary', type=pathlib.Path, required=True)
++    parser.add_argument('--output', type=pathlib.Path, required=True)
++    parser.add_argument('--repetitions', type=int, default=3)
++    args=parser.parse_args()
++    if not 1 <= args.repetitions <= 5:
++        raise SystemExit('repetitions must be 1..5')
++    args.output.mkdir(parents=True,exist_ok=False)
++    inputs={}
++    for varying in [False,True]:
++        for size in [512,4096]:
++            key=('varying' if varying else 'same')+'_'+str(size)
++            inputs[key]=[payload(i,varying) for i in range(size)]
++    input_bytes=json.dumps(inputs,sort_keys=True,separators=(',',':')).encode()
++    compressed=gzip.compress(input_bytes,mtime=0)
++    (args.output/'IPC_INPUTS.json.gz').write_bytes(compressed)
++    rows=[]; startup=[]; gold={}; replies={}
++    started=time.perf_counter()
++    for backend,workers in [('direct',1),('direct',4),('table',1),('table',4)]:
++        argv=[str(args.binary),'--rates',backend,'--workers',str(workers)]
++        before=time.perf_counter()
++        process=subprocess.Popen(argv,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
++        try:
++            process.stdin.write(b'META\n');process.stdin.flush()
++            meta_bytes=process.stdout.readline();metadata=json.loads(meta_bytes)
++            startup.append({'argv':argv,'seconds_to_metadata':time.perf_counter()-before,'metadata':metadata})
++            for key,payloads in inputs.items():
++                scalar=[('RHS 7 29 '+p+'\n').encode() for p in payloads]
++                batch=('RHS_BATCH '+str(len(payloads))+' 7 29 '+' '.join(payloads)+'\n').encode()
++                for mode in (['single','batch'] if workers==1 else ['batch']):
++                    seconds=[];stats=[]
++                    for _ in range(args.repetitions):
++                        output=[];t=time.perf_counter()
++                        if mode=='single':
++                            for request in scalar:
++                                process.stdin.write(request);process.stdin.flush()
++                                output.append(read_row(process))
++                            counts=None
++                        else:
++                            process.stdin.write(batch);process.stdin.flush()
++                            header=process.stdout.readline().split()
++                            if header != [b'BATCH_OK',str(len(payloads)).encode(),b'28']:
++                                raise RuntimeError('bad batch header '+repr(header))
++                            for _ in payloads:output.append(read_row(process))
++                            end=process.stdout.readline().split()
++                            if len(end)!=4 or end[0]!=b'BATCH_END' or int(end[1])!=len(payloads):
++                                raise RuntimeError('bad batch end '+repr(end))
++                            counts=dict(zip(['evaluations','preparations','hits'],map(int,end[1:])))
++                        seconds.append(time.perf_counter()-t);stats.append(counts)
++                        # Byte comparison is outside the timed region.
++                        raw=b''.join(output);gold_key=backend+'_'+key
++                        if gold_key not in gold:
++                            gold[gold_key]=raw;replies[gold_key]=raw.decode()
++                        elif raw!=gold[gold_key]:
++                            raise RuntimeError('scalar/batch/repetition byte mismatch '+gold_key)
++                    rows.append({'backend':backend,'workers':workers,'input':key,'mode':mode,
++                        'n':len(payloads),'seconds':seconds,'median_us_per_rhs':statistics.median(seconds)*1e6/len(payloads),
++                        'stats':stats,'reply_identity':identity(gold[backend+'_'+key]),
++                        'reply_bytes_equal_within_backend':True})
++            process.stdin.write(b'QUIT\n');process.stdin.flush();process.stdin.close()
++            process.wait(timeout=3)
++            err=process.stderr.read()
++            if process.returncode!=0 or err:
++                raise RuntimeError('server failed '+repr(err[:500]))
++        finally:
++            if process.poll() is None:process.kill();process.wait()
++    reply_bytes=json.dumps(replies,sort_keys=True,separators=(',',':')).encode()
++    reply_gzip=gzip.compress(reply_bytes,mtime=0)
++    (args.output/'IPC_REPLIES.json.gz').write_bytes(reply_gzip)
++    result={'schema':'REI_RUN19_IPC_BENCH_V1','utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
++        'binary':{'path':str(args.binary),**identity(args.binary.read_bytes())},
++        'producer_argv':__import__('sys').argv,'total_wall_seconds':time.perf_counter()-started,
++        'timing_scope':'new_optimized_server_write_flush_read_validate_token_count; preformatted_inputs; includes_float_formatting_in_server; float_conversion_not_timed',
++        'legacy_binary_timed':False,'repetitions':args.repetitions,'startup':startup,'rows':rows,
++        'inputs':{'gzip':identity(compressed),'uncompressed':identity(input_bytes)},
++        'replies':{'gzip':identity(reply_gzip),'uncompressed':identity(reply_bytes)},'ivps':0}
++    (args.output/'IPC_RESULT.json').write_text(json.dumps(result,indent=2)+'\n')
++    print(json.dumps({'rows':len(rows),'total_wall_seconds':result['total_wall_seconds'],
++        'all_same_backend_replies_byte_identical':True,'result':str(args.output/'IPC_RESULT.json')},indent=2))
++
++if __name__=='__main__':main()
+--- run13/recovered/code/rei_bass_coupled/owner_src/deuterium_atomic.rs
++++ run19/native/owner_src/deuterium_atomic.rs
+@@ -24,6 +24,8 @@
+     TemperatureDomain,
+     PhotonEnergyDomain,
+     PhotoThresholdMismatch,
++    PreparedTemperatureMismatch,
++    PreparedEvaluatorMismatch,
+     HydrogenProvider,
+     ChargeExchange(DhError),
+ }
+@@ -353,6 +355,50 @@
+         return Err(DAtomicError::PhotoThresholdMismatch);
+     }
+     let rates = provider.rates(temperature_k)?;
++    d_atomic_rhs_with_rates(provider, state, temperature_k, photo, cx, rates)
++}
++
++/// Reuse one caller-selected H/He bundle with exact temperature and evaluator
++/// kind checks. The immutable backend is supplied explicitly; the evaluator ID
++/// identifies its algorithm, not a certificate for a particular table grid.
++/// Binding-energy and photo-source checks are identical to `d_atomic_rhs`.
++pub fn d_atomic_rhs_from_prepared(
++    provider: DAtomicProvider,
++    state: &IsotopeNumberState,
++    temperature_k: f64,
++    photo: &DPhotoInput,
++    cx: DChargeExchange,
++    prepared: &PreparedIgmRates,
++    backend: &IgmRateBackend,
++) -> Result<DAtomicRhs, DAtomicError> {
++    if photo.chi_d_ev != provider.chi_d_ev || photo.threshold_source != provider.threshold_source {
++        return Err(DAtomicError::PhotoThresholdMismatch);
++    }
++    if !temperature_k.is_finite() {
++        return Err(DAtomicError::NonFiniteInput);
++    }
++    if !(1.0..=1e6).contains(&temperature_k) {
++        return Err(DAtomicError::TemperatureDomain);
++    }
++    if temperature_k.to_bits() != prepared.temperature_k().to_bits() {
++        return Err(DAtomicError::PreparedTemperatureMismatch);
++    }
++    if prepared.evaluator_id() != backend.evaluator_id() {
++        return Err(DAtomicError::PreparedEvaluatorMismatch);
++    }
++    let rates = provider.rates_from_prepared(prepared);
++    d_atomic_rhs_with_rates(provider, state, temperature_k, photo, cx, rates)
++}
++
++// One unchanged event/energy assembly for the direct and prepared entry points.
++fn d_atomic_rhs_with_rates(
++    provider: DAtomicProvider,
++    state: &IsotopeNumberState,
++    temperature_k: f64,
++    photo: &DPhotoInput,
++    cx: DChargeExchange,
++    rates: DAtomicRates,
++) -> Result<DAtomicRhs, DAtomicError> {
+     let moments = state.moments().map_err(|_| DAtomicError::Arithmetic)?;
+     let ne = moments.neutral_free_electron_density_m3;
+     let n = |species| state.density_m3(species);
+--- run13/recovered/code/rei_bass_coupled/src/gas_reference_rhs.rs
++++ run19/native/src/gas_reference_rhs.rs
+@@ -2,10 +2,11 @@
+ //! Proper densities m^-3, thermal/escape/CMB powers J m^-3 s^-1.
+ //! No photon step, expansion step, clipping, or hidden finite-difference timestep.
+ use crate::HHeModel;
+-use crate::deuterium_atomic::{DChargeExchange, d_atomic_rhs};
++use crate::deuterium_atomic::{DChargeExchange, d_atomic_rhs_from_prepared};
+ use crate::full_network::{EV_J, FullState, NetworkConfig, NetworkError};
+-use crate::igm_rates::igm_rates;
+ use crate::isotope_state::IsotopeSpecies as S;
++use crate::mixture_eos::EosSnapshot;
++use crate::rate_table::{IgmRateBackend, PreparedIgmRates};
+ 
+ pub const GAS_VECTOR_LEN: usize = 27;
+ #[derive(Clone, Copy, Debug, Default)]
+@@ -43,11 +44,41 @@
+ /// mask: bit0 = CI/RR/DR/CE/FF, bit1 = reversible Savin CX, bit2 = CMB.
+ /// The native photon owner is OFF here; incoming photon bins are rejected.
+ pub fn gas_rates(s: &FullState, c: &NetworkConfig, mask: u8) -> Result<GasRates, NetworkError> {
++    gas_rates_with_backend(s, c, mask, &IgmRateBackend::Direct)
++}
++
++/// Explicit numerical backend. Default `gas_rates` remains Direct. One bundle
++/// supplies both H/He and the unchanged D H-equality approximation; no density,
++/// ion fraction, opacity or heating power is cached. Mask2 retains the original
++/// D atomic validation, including coefficients unused by its CX-only result.
++pub fn gas_rates_with_backend(
++    s: &FullState, c: &NetworkConfig, mask: u8, backend: &IgmRateBackend,
++) -> Result<GasRates, NetworkError> {
++    let eos = checked_eos(s, c, mask)?;
++    let prepared = prepare_for_mask(backend, eos.temperature_k, mask)?;
++    gas_rates_prepared(s, c, mask, eos, prepared.as_ref(), backend)
++}
++
++fn checked_eos(s: &FullState, c: &NetworkConfig, mask: u8) -> Result<EosSnapshot, NetworkError> {
+     if mask > 7 || c.use_photo || !s.photon_bins.is_empty() {
+         return Err(NetworkError::OwnershipConflict);
+     }
+     s.validate(c)?;
+-    let eos = s.gas.eos()?;
++    Ok(s.gas.eos()?)
++}
++
++fn prepare_for_mask(backend: &IgmRateBackend, t: f64, mask: u8)
++    -> Result<Option<PreparedIgmRates>, NetworkError> {
++    if mask & 3 == 0 { return Ok(None); }
++    backend.prepare(t).map(Some).map_err(|_| if mask & 1 != 0 {
++        NetworkError::TemperatureOutsideSource
++    } else { NetworkError::InputOutsideDomain })
++}
++
++fn gas_rates_prepared(
++    s: &FullState, c: &NetworkConfig, mask: u8, eos: EosSnapshot,
++    prepared: Option<&PreparedIgmRates>, backend: &IgmRateBackend,
++) -> Result<GasRates, NetworkError> {
+     let t = eos.temperature_k;
+     let n = |sp| s.gas.nuclei.density_m3(sp);
+     let ne = eos.free_electrons_m3;
+@@ -55,7 +86,7 @@
+     let mut q = GasRates::default();
+     let chi = HHeModel::controlled_fixture().threshold_ev;
+     if mask & 1 != 0 {
+-        let rates = igm_rates(t).map_err(|_| NetworkError::TemperatureOutsideSource)?;
++        let rates = prepared.ok_or(NetworkError::InvalidInput)?.rates();
+         let edges = [
+             (S::H1Neutral, S::H1Ionized),
+             (S::He4Neutral, S::He4SinglyIonized),
+@@ -93,7 +124,7 @@
+             .deuterium
+             .photo_input_from_bound_rates(0., 0., c.photon_source)
+             .map_err(|_| NetworkError::SourceMismatch)?;
+-        let d = d_atomic_rhs(
++        let d = d_atomic_rhs_from_prepared(
+             c.deuterium,
+             &s.gas.nuclei,
+             t,
+@@ -103,6 +134,8 @@
+             } else {
+                 DChargeExchange::Disabled
+             },
++            prepared.ok_or(NetworkError::InvalidInput)?,
++            backend,
+         )
+         .map_err(|_| NetworkError::InputOutsideDomain)?;
+         if mask & 1 != 0 {
+@@ -151,3 +184,77 @@
+     }
+     Ok(q)
+ }
++
++/// A bounded one-entry exact-T cache tied by lifetime to one immutable backend.
++/// Reuse is allowed only when the newly evaluated EOS temperature has identical
++/// f64 bits. This is particularly useful for consecutive same-T batch states.
++pub struct GasRateWorkspace<'a> {
++    backend: &'a IgmRateBackend,
++    prepared: Option<PreparedIgmRates>,
++    pub stats: GasBatchStats,
++}
++
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub struct GasBatchStats {
++    pub evaluations: usize,
++    pub preparations: usize,
++    pub exact_temperature_hits: usize,
++}
++
++impl<'a> GasRateWorkspace<'a> {
++    pub fn new(backend: &'a IgmRateBackend) -> Self {
++        Self { backend, prepared: None, stats: GasBatchStats::default() }
++    }
++    pub fn evaluate(&mut self, s: &FullState, c: &NetworkConfig, mask: u8)
++        -> Result<GasRates, NetworkError> {
++        let eos = checked_eos(s, c, mask)?;
++        let prepared = if mask & 3 == 0 { None } else {
++            if self.prepared.as_ref().is_some_and(|p|
++                p.temperature_k().to_bits() == eos.temperature_k.to_bits()) {
++                self.stats.exact_temperature_hits += 1;
++            } else {
++                self.prepared = prepare_for_mask(self.backend, eos.temperature_k, mask)?;
++                self.stats.preparations += 1;
++            }
++            self.prepared.as_ref()
++        };
++        let result = gas_rates_prepared(s, c, mask, eos, prepared, self.backend)?;
++        self.stats.evaluations += 1;
++        Ok(result)
++    }
++}
++
++/// Typed source-off batch: fixed caller-owned config/mask, caller-owned output,
++/// and a separate exact-T workspace per worker. At most four scoped workers.
++/// On any error the output may be partially written and must be discarded.
++/// There is no SIMD or speedup claim; thread startup is included in benchmarks.
++pub fn gas_rates_batch_into(
++    states: &[FullState], c: &NetworkConfig, mask: u8, backend: &IgmRateBackend,
++    output: &mut [GasRates], workers: usize,
++) -> Result<GasBatchStats, NetworkError> {
++    if output.len() != states.len() || !(1..=4).contains(&workers) || states.len() > 65_536 {
++        return Err(NetworkError::InvalidInput);
++    }
++    if mask > 7 || c.use_photo { return Err(NetworkError::OwnershipConflict); }
++    if states.is_empty() { return Ok(GasBatchStats::default()); }
++    fn chunk(states: &[FullState], c: &NetworkConfig, mask: u8,
++        backend: &IgmRateBackend, output: &mut [GasRates]) -> Result<GasBatchStats, NetworkError> {
++        let mut workspace = GasRateWorkspace::new(backend);
++        for (s, out) in states.iter().zip(output) { *out = workspace.evaluate(s, c, mask)?; }
++        Ok(workspace.stats)
++    }
++    if workers == 1 { return chunk(states, c, mask, backend, output); }
++    let width = states.len().div_ceil(workers);
++    std::thread::scope(|scope| {
++        let handles: Vec<_> = states.chunks(width).zip(output.chunks_mut(width)).map(|(s,o)|
++            scope.spawn(move || chunk(s,c,mask,backend,o))).collect();
++        let mut total = GasBatchStats::default();
++        for handle in handles {
++            let stats = handle.join().map_err(|_| NetworkError::InvalidInput)??;
++            total.evaluations += stats.evaluations;
++            total.preparations += stats.preparations;
++            total.exact_temperature_hits += stats.exact_temperature_hits;
++        }
++        Ok(total)
++    })
++}
+--- /dev/null
++++ run19/native/tests/run19_shared_rates.rs
+@@ -0,0 +1,117 @@
++//! New integration checks only; no integration of any gas/transport history.
++pub use rei_iso_couple_reference::{HHeModel, deuterium_atomic, full_network, igm_rates, isotope_state};
++use rei_iso_couple_reference::{
++    deuterium_atomic::{DAtomicProvider,DAtomicError,DChargeExchange,d_atomic_rhs,d_atomic_rhs_from_prepared},
++    full_network::{FullState,NetworkConfig,NetworkError,PhotonBin},
++    gas_reference_rhs::{gas_rates,gas_rates_with_backend,gas_rates_batch_into,GasRateWorkspace,GasRates},
++    isotope_state::{IsotopeNumberState,IsotopeSpecies as S},
++    mixture_eos::{MixtureState,KB_J_K},
++    rate_table::{IgmRateBackend,IgmRateTable},
++};
++use std::sync::Arc;
++// Byte-exact original RUN13 gas assembly, compiled in this same executable.
++// Its direct D wrapper shares the unchanged D event/energy implementation.
++#[path="../../../run13/recovered/code/rei_bass_coupled/src/gas_reference_rhs.rs"]
++mod original_gas;
++
++fn fixture(t:f64, variant:usize)->(FullState,NetworkConfig){
++    let mut n=[0.0;13];
++    for (s,v) in [(S::H1Neutral,180.0),(S::H1Ionized,20.0),(S::DNeutral,0.0045),
++        (S::DIonized,0.0005),(S::He4Neutral,12.0),(S::He4SinglyIonized,3.0),(S::He4DoublyIonized,1.0)]{
++        n[s as usize]=v;
++    }
++    // Same total particles and electrons, but a different density-dependent RHS.
++    n[S::H1Neutral as usize]-=variant as f64;
++    n[S::He4Neutral as usize]+=variant as f64;
++    let nuclei=IsotopeNumberState::new(n).unwrap();
++    let u=1.5*KB_J_K*nuclei.thermal_particle_density_all_thermal_m3().unwrap()*t;
++    let h=HHeModel::controlled_fixture().threshold_ev[0];
++    let mut c=NetworkConfig::source_bound(DAtomicProvider::new(h,h+0.0037,"RUN19_TEST_THRESHOLD").unwrap(),"RUN19_TEST_SOURCE");
++    c.use_photo=false;c.cmb_temperature_k=29.0;
++    (FullState{gas:MixtureState{nuclei,thermal_j_m3:u},photon_bins:Vec::new(),escaped_j_m3:0.0,cmb_reservoir_j_m3:0.0,elapsed_s:0.0},c)
++}
++fn bits(q:GasRates)->[u64;28]{
++    let mut out=[0;28];out[..27].copy_from_slice(&q.vector().map(f64::to_bits));out[27]=q.chemical.to_bits();out
++}
++#[test]
++fn direct_shared_bundle_preserves_original_all_channels_and_masks(){
++    let ts=[3.0,100.0,5500.0_f64.next_down(),5500.0,5500.0_f64.next_up(),
++        9284.0_f64.next_down(),9284.0,9284.0_f64.next_up(),10000.0,50000.0,190000.0];
++    for t in ts {for variant in [0,1,4] {let(s,c)=fixture(t,variant);for mask in 0..8 {
++        let old=original_gas::gas_rates(&s,&c,mask).unwrap();
++        let new=gas_rates(&s,&c,mask).unwrap();
++        assert_eq!(old.vector().map(f64::to_bits),new.vector().map(f64::to_bits),"T={t},variant={variant},mask={mask}");
++        assert_eq!(old.chemical.to_bits(),new.chemical.to_bits());
++        let scale=new.heat.abs()+new.chemical.abs()+new.escape.abs()+new.cmb.abs();
++        assert!(new.residual().abs()<=2e-14*scale.max(f64::MIN_POSITIVE));
++    }}}
++}
++#[test]
++fn prepared_d_preserves_direct_event_and_thermal_ledger(){
++    let backend=IgmRateBackend::Direct;
++    for t in [3.0,100.0,9284.0,10000.0,50000.0,190000.0]{
++        let(s,c)=fixture(t,0);let p=backend.prepare(t).unwrap();
++        let photo=c.deuterium.photo_input_from_bound_rates(3e-14,1e-33,"BOUND_TEST").unwrap();
++        for cx in [DChargeExchange::Disabled,DChargeExchange::Savin2002]{
++            let a=d_atomic_rhs(c.deuterium,&s.gas.nuclei,t,&photo,cx).unwrap();
++            let b=d_atomic_rhs_from_prepared(c.deuterium,&s.gas.nuclei,t,&photo,cx,&p,&backend).unwrap();
++            assert_eq!(a,b);
++        }
++    }
++}
++#[test]
++fn prepared_temperature_evaluator_and_photo_threshold_fail_closed(){
++    let(s,c)=fixture(1e4,0);let direct=IgmRateBackend::Direct;
++    let table=IgmRateBackend::Table(Arc::new(IgmRateTable::new(257).unwrap()));
++    let p=direct.prepare(1e4).unwrap();
++    let photo=c.deuterium.photo_input_from_bound_rates(0.0,0.0,"TEST").unwrap();
++    let call=|t,ph:&deuterium_atomic::DPhotoInput,b:&IgmRateBackend|
++        d_atomic_rhs_from_prepared(c.deuterium,&s.gas.nuclei,t,ph,DChargeExchange::Disabled,&p,b);
++    assert_eq!(call(10000.0_f64.next_up(),&photo,&direct),Err(DAtomicError::PreparedTemperatureMismatch));
++    assert_eq!(call(1e4,&photo,&table),Err(DAtomicError::PreparedEvaluatorMismatch));
++    assert_eq!(call(f64::NAN,&photo,&direct),Err(DAtomicError::NonFiniteInput));
++    let other=DAtomicProvider::new(c.deuterium.chi_h_ev(),c.deuterium.chi_d_ev()+0.001,"OTHER").unwrap();
++    let wrong=other.photo_input_from_bound_rates(0.0,0.0,"TEST").unwrap();
++    assert_eq!(call(1e4,&wrong,&direct),Err(DAtomicError::PhotoThresholdMismatch));
++}
++#[test]
++fn exact_temperature_workspace_never_caches_density_dependent_powers(){
++    let backend=IgmRateBackend::Direct;let mut ws=GasRateWorkspace::new(&backend);
++    let(s,c)=fixture(1e4,0);let(s2,_)=fixture(1e4,4);
++    assert_eq!(s.gas.eos().unwrap().temperature_k.to_bits(),s2.gas.eos().unwrap().temperature_k.to_bits());
++    let first=ws.evaluate(&s,&c,7).unwrap();let second=ws.evaluate(&s2,&c,7).unwrap();
++    assert_eq!(bits(first),bits(gas_rates(&s,&c,7).unwrap()));
++    assert_eq!(bits(second),bits(gas_rates(&s2,&c,7).unwrap()));
++    assert_ne!(bits(first),bits(second));
++    assert_eq!(ws.stats.preparations,1);assert_eq!(ws.stats.exact_temperature_hits,1);
++    let(mut s3,_)=fixture(1e4,0);s3.gas.thermal_j_m3=s3.gas.thermal_j_m3.next_up();
++    assert_ne!(s3.gas.eos().unwrap().temperature_k.to_bits(),s.gas.eos().unwrap().temperature_k.to_bits());
++    ws.evaluate(&s3,&c,7).unwrap();assert_eq!(ws.stats.preparations,2);
++}
++#[test]
++fn typed_batch_workers_match_scalar_for_direct_and_optin_table(){
++    let(_,c)=fixture(1e4,0);
++    let states:Vec<_>=(0..97).map(|i|fixture(if i<48{1e4}else{2e4},i%5).0).collect();
++    let backends=[IgmRateBackend::Direct,IgmRateBackend::Table(Arc::new(IgmRateTable::new(1025).unwrap()))];
++    for backend in backends {for workers in [1,2,4] {for mask in [0,1,2,4,7]{
++        let mut out=vec![GasRates::default();states.len()];
++        let stats=gas_rates_batch_into(&states,&c,mask,&backend,&mut out,workers).unwrap();
++        assert_eq!(stats.evaluations,states.len());
++        for(s,q)in states.iter().zip(out){assert_eq!(bits(q),bits(gas_rates_with_backend(s,&c,mask,&backend).unwrap()));}
++        if mask&3==0{assert_eq!(stats.preparations,0);}
++        else{assert_eq!(stats.preparations+stats.exact_temperature_hits,states.len());}
++    }}}
++}
++#[test]
++fn input_errors_and_mask2_contract_match_original(){
++    let(s,c)=fixture(1e4,0);
++    for mask in [0,2,7,8] {for case in 0..5{
++        let mut ss=s.clone();let mut cc=c;
++        match case{0=>{},1=>ss.gas.thermal_j_m3*=100.0,2=>cc.use_photo=true,
++            3=>ss.photon_bins.push(PhotonBin{energy_ev:20.0,number_m3:0.0}),4=>cc.cmb_temperature_k=0.0,_=>unreachable!()}
++        assert_eq!(original_gas::gas_rates(&ss,&cc,mask).err(),gas_rates(&ss,&cc,mask).err());
++    }}
++    let mut output=[GasRates::default();1];
++    assert_eq!(gas_rates_batch_into(&[],&c,7,&IgmRateBackend::Direct,&mut output,1),Err(NetworkError::InvalidInput));
++    assert_eq!(gas_rates_batch_into(&[],&c,7,&IgmRateBackend::Direct,&mut [],0),Err(NetworkError::InvalidInput));
++}

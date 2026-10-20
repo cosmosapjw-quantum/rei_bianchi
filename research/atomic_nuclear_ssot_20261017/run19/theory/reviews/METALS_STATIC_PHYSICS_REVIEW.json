@@ -1,0 +1,148 @@
+{
+  "unit": "RUN19_METALS_SINGLE_STATIC_PHYSICS_REVIEW",
+  "reviewer": "spectral_theory",
+  "reviewed_utc": "2026-10-20T03:06:39.835580+00:00",
+  "scope": "One bounded read-only review requested by implementation owner. Source/formula/units/charge mapping/partial-network ownership, without new tests or native execution.",
+  "reviewed_files": [
+    {
+      "path": "src/beryllium_rr.rs",
+      "bytes": 13446,
+      "sha256": "f4f122b4699a37cb5a4283b3af389b620f98ad1e645d53f14a7c9c0cf5dfeb81"
+    },
+    {
+      "path": "src/lithium_backend.rs",
+      "bytes": 3709,
+      "sha256": "edff24974fd8daca876ba14cba754d6495de843634605ddbcad0b1d4ce092e28"
+    },
+    {
+      "path": "src/lib.rs",
+      "bytes": 1123,
+      "sha256": "5b88bbfc03da0152bca775b0f7e09f6dac42314f56f8eef9e695fbaa7874c63f"
+    },
+    {
+      "path": "data/vf1996_be_rr_rows.dat",
+      "bytes": 168,
+      "sha256": "0792b2794c4a4d996c02537cb2e83f6b7855b58daba6e89c9675cf97e2cd2570"
+    },
+    {
+      "path": "upstream/rei_bianchi/rust/rei_microphysics/src/lithium_rates.rs",
+      "bytes": 17849,
+      "sha256": "10e4db3fa5bd9a4c2dca5c4bfd7fc7fa6a3fa4bbe83862c25b5c4e1a7ba4d629"
+    },
+    {
+      "path": "provenance/ORIGINAL_SOURCE_MANIFEST.json",
+      "bytes": 7137,
+      "sha256": "19077ca12a426bdec25b3a7efc20da69c2144ecdee58b73dcf97222aaec07ca5"
+    },
+    {
+      "path": "provenance/BE_DECIMAL_REFERENCE_RECEIPT.json",
+      "bytes": 400,
+      "sha256": "30337d99e6a4d526d2ce23dfda62d3d8c794c291a522e13cbe484e089ff87418"
+    },
+    {
+      "path": "validation02/NUMERICAL_SUMMARY.json",
+      "bytes": 1246,
+      "sha256": "e9363f2c567ce5650975e8328547d38dfba1bf49209c0b6dae5f329280d8dcd5"
+    },
+    {
+      "path": "validation01/FAILURE_INTERPRETATION.json",
+      "bytes": 1522,
+      "sha256": "3e792e85212669d8c17772476e7a8273ce4ff232500464fb0805f147eb610b17"
+    }
+  ],
+  "source_manifest_byte_checks": [
+    {
+      "path": "upstream/rei_bianchi/rust/rei_microphysics/src/lithium_rates.rs",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "upstream/rei_bianchi/rust/rei_microphysics/src/isotope_state.rs",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "upstream/rei_bianchi/rust/rei_microphysics/tests/lithium_rates.rs",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "upstream/rei_bianchi/research/flrw_rate_table_acceleration_20261016/data/badnell_lithium_rr_rows.txt",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "upstream/rei_bianchi/research/flrw_rate_table_acceleration_20261016/data/badnell_lithium_dr_rows.txt",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "upstream/rei_bianchi/research/flrw_rate_table_acceleration_20261016/data/voronov_lithium_ci_rows.txt",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "LICENSE",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "provenance/primary_sources/verner_ferland_table1.dat",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "provenance/primary_sources/verner_ferland_table_description.txt",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "provenance/primary_sources/verner_recombination_index.html",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "provenance/PRIMARY_FETCH_RECEIPT.json",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "data/vf1996_be_rr_rows.dat",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "provenance/R9_LI_THERMAL_CONTRACT.json",
+      "bytes_match": true,
+      "sha256_match": true
+    },
+    {
+      "path": "provenance/R9_SCOPE_CORRECTION.json",
+      "bytes_match": true,
+      "sha256_match": true
+    }
+  ],
+  "finding_count": 0,
+  "conclusion": "No concrete physical formula, unit, charge-direction, source-owner or declared-scope mismatch found in the reviewed frozen source.",
+  "reasoned_checks": [
+    "VF Eq4 parameters match the selected author rows. N denotes formed electron count; for Z=4, initial charge=5-N and final charge=4-N. The three array channels are q2->1, q3->2, q4->3.",
+    "The coefficient calculation retains a/[sqrt(T/T0)(1+sqrt(T/T0))^(1-b)(1+sqrt(T/T1))^(1+b)] and the declared low-Z 3..1e9 K domain. The 1e4 K log-domain reference difference is binary64 evaluator roundoff, separated from the exact-decimal model and fit error.",
+    "Proper densities ne and ni in m^-3 multiply alpha_cm3_s*1e-6, giving events in m^-3 s^-1. A-weighted mass counts use A=7 or9; nuclear charge uses Z=4; ionic charge uses electronic q.",
+    "Every positive RR event subtracts one parent, adds one child, and consumes one free electron. Thus each isotope nuclei count and A-weighted baryon count are conserved by this contribution; d(ionic charge minus free electron density)=0 in exact arithmetic.",
+    "BeI formation is typed MissingSource rather than a structural zero. Arrays cover q1..4 and only the selected three-channel contribution; they are not a complete electronic or nuclear network.",
+    "Be7 and Be9 are explicit caller-supplied labels with ElementalElectronicEquality and isotope_resolved_coefficients=false. Nuclear evolution is explicitly NOT_MODELED_BY_ELECTRONIC_PROVIDER; no decay, electron-capture or daughter model is asserted.",
+    "Private prepared bundle fields and exact temperature bits plus fixed source/evaluator/node-count binding prevent a table/direct or temperature mismatch in the supported consumer API. The source rows and grid bounds are fixed by construction.",
+    "The Li wrapper compiles the manifest-identical donor module; it keeps the original complete-bundle temperature intersection, channel-specific donor entry points, structural boundaries and explicit Li6/Li7 equality policy. Li8/Li9 remain pending nuclear closure.",
+    "Total RR number coefficients do not supply recombination energy moments. No temperature, photon, abundance, decay, full gas feedback, production registry activation or isotope-specific experimental rate is introduced by these modules."
+  ],
+  "limitations": [
+    "Static byte/formula review does not certify all binary64 rounding or table error over a continuum.",
+    "Producer validation02 tests and finite scan are separate executions by the implementation owner, read as evidence here. This review did not rerun them.",
+    "A trace-species contribution needs caller-owned global charge/electron accounting and thermal/nuclear/source closure before full integration. The present three-channel module is intentionally partial."
+  ],
+  "new_native_rhs_calls": 0,
+  "new_ivp_runs": 0,
+  "tests_rerun": 0,
+  "source_modifications": 0,
+  "further_review_loop_requested": false
+}
