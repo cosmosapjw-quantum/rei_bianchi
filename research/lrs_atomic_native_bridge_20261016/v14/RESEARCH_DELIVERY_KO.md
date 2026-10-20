@@ -1,3 +1,15 @@
+# 최신 상태 — 2026-10-20 borrowed-cell 연구 완료
+
+현재 실행 source는 **5248822167e3fbe374f4333f7f2efdcdbfdaeeaf**다. 기존 native-rate 연산열을 공유하는 **cell-borrowed**를 명시적 실험 옵션으로 추가했다. 두 버전의 실제 build/test/기존19설정 회귀와 독립 raw 읽기에서 물리 값 차이0, 지정 cached 상태·node clone0을 확인했다. **속도 향상은 입증되지 않았으며 성능 목적에는 기존 cell-cache를 유지한다.** default는 legacy다. 원본152개 기존 바이트·hook·VigilODE477개·provider/FD/허용오차를 유지했다.
+
+[현재 연구 보고](vigilode_radau_20261019/continuation_20261020b/RESEARCH_REPORT_KO.md), [최신 source·실행·백업·DAG receipt](vigilode_radau_20261019/continuation_20261020b/FINAL_DELIVERY.json), [Codex NCP 인계](vigilode_radau_20261019/continuation_20261020b/CODEX_NCP_EXECUTE_KO.md), [다음 대화 prompt](vigilode_radau_20261019/continuation_20261020b/NEXT_THREAD_PROMPT_KO.md)를 먼저 읽는다.
+
+현재 source의 새 NCP 실행은 **NOT_RUN**이다. 과거 d87ba9ca의 NCP19설정 완료, 제조76/Python57/과거84 및 기존19설정과 구분하며 재집계하지 않는다. 넓은 source-on 차수·uniform stiff·CaseB/fullEoR/signed Bianchi·production은 기존 HOLD/NOT_ISSUED다.
+
+---
+
+## 아래는 보존한 이전 전달 기록
+
 # 최신 상태 — 2026-10-20 native 캐시·Rayon 최적화 C10 완료
 
 실행 코드 source commit은 `33ae18c31bf61bcc99d6d05edb6c2e7a5cb272a1`이다. `--native-eval cell-cache`로 Jacobian 안의 광자 cell 준비를 재사용하고, 독립 이력은 pinned VigilODE의 local Rayon pool로 병렬 실행한다. 원본 native 152개 파일과 VigilODE 477개 파일의 bytes 및 모든 물리식·허용오차를 유지했다. 같은 기존 19개 설정의 회귀, 독립 전체값 비교, Rust 표적 10개·Python 실행기 4개 및 실제 옵션 전달 smoke가 통과했다. 15개의 교차 측정쌍에서 finite numeric equality를 유지하면서 native 실행시간이 줄었다. 메모리 감소와 별도 SIMD 구현은 이번 성과에 포함하지 않는다.
