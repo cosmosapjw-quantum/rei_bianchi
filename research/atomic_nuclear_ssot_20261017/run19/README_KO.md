@@ -1,6 +1,10 @@
 # RUN19 — T 계수 재사용, 경량 cubic table, Li/Be 및 19개 목표 반응
 
-**선택한 optimization/coding 단위 A·B·C의 실제 구현·유도·검증을 완료했다.** 기준 physics/source는 RUN18 `99e07bcff126d0a73a03bafc4b71e0b735dbcc3e`이며, 게시 branch는 `research/rei-run19-rate-acceleration-20261020`, draft PR은 [211](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/211)이다. 정확한 게시 SHA·백업·검증 단계는 `delivery/`의 receipt를 따른다. 최종 B receipt는 source commit 이후 별도 commit으로 추가한다.
+**선택한 optimization/coding 단위 A·B·C의 실제 구현·유도·검증·게시·백업을 완료했다.** 기준 physics/source는 RUN18 `99e07bcff126d0a73a03bafc4b71e0b735dbcc3e`이며, 게시 branch는 `research/rei-run19-rate-acceleration-20261020`, draft PR은 [211](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/211)이다. 최종 과학/source commit은 `e540256ecf77df1c88fccb57b81d5d60110f367c`다. 최신 게시·백업 상태는 [최종 receipt](delivery/UNIT_B_FINAL_DELIVERY.json)와 [최종 DAG delivery](DAG_PROGRESS_FINAL_DELIVERY.json)를 따른다. 개별 보고서의 PENDING 문구는 보존한 게시 전 시점을 가리킨다.
+
+## 최종 백업 확인
+
+[Google Drive 전체 패키지](https://drive.google.com/file/d/1pRPhitdAFfEU8HrSC02uXXVXwRI1U8wk/view)와 Dropbox `/BASS_DERIVATION_DOSSIERS_20260912/REI_RUN19_FINAL_T_RATE_ACCELERATION_LI_BE_20261020.zip` (`id:BSpOijBcT10AAAAAAD_SVw`)에 보존했다. 두 서비스에서 각각 실제 전체 GET으로 내려받은 25,344,988 bytes의 SHA-256이 모두 `6421ead745f3e5d298286e13b9515b7f668dcbb72de11b9f86650021c92b4f62`와 일치했다. ZIP은 1,175항목이며 경로·형식·mode·CRC·모든 manifest SHA를 대조했다. 이 다운로드 검사는 원격에서 과학 계산을 재실행했다는 뜻이 아니다.
 
 ## 완료한 구현
 

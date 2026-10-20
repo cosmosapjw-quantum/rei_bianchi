@@ -6,8 +6,10 @@
 - Branch: `research/rei-run19-rate-acceleration-20261020`; draft [PR211](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/211).
 - Fixed physics/source parent: `99e07bcff126d0a73a03bafc4b71e0b735dbcc3e` (RUN18). 새 스레드에서는 원격 ref를 다시 읽는다.
 - 완료된 A source: `f2996d02908e5a2e678fab0dc0efb3424fa86a99`; C source: `ffcb3709c3d19d577b1e6eb69dd0ce4d4d94d85a`.
-- A/B/C bounded 구현·검증은 완료. B의 정확한 source commit, aggregate archive SHA, 두 백업 및 readback 수준은 source 게시 후 추가되는 `delivery/UNIT_B_FINAL_DELIVERY.json`을 최우선으로 읽는다. 아직 없다면 source 게시와 최종 receipt 사이의 checkpoint다.
+- A/B/C bounded 구현·검증·게시·백업 완료. 최종 과학/source commit은 `e540256ecf77df1c88fccb57b81d5d60110f367c`; 이후 commit은 delivery·RESUME 문서만 추가한다. `delivery/UNIT_B_FINAL_DELIVERY.json`과 `DAG_PROGRESS_FINAL_DELIVERY.json`을 현재 상태로 읽는다.
 - 우선 읽기: `README_KO.md`, `UNIT_B_FINAL_KO.md`, `DAG_PROGRESS_UNIT_B.json`, `REPRODUCE_UNIT_B_FINAL.json`, `metals/network/TARGET_NETWORK_19.json`.
+
+최종 ZIP: [Drive](https://drive.google.com/file/d/1pRPhitdAFfEU8HrSC02uXXVXwRI1U8wk/view); Dropbox `/BASS_DERIVATION_DOSSIERS_20260912/REI_RUN19_FINAL_T_RATE_ACCELERATION_LI_BE_20261020.zip`, file ID `id:BSpOijBcT10AAAAAAD_SVw`. 실제 25,344,988 bytes, SHA-256 `6421ead745f3e5d298286e13b9515b7f668dcbb72de11b9f86650021c92b4f62`. 두 백업 모두 별도 전체 다운로드 후 같은 SHA를 확인했다. 이전 A/C 개별 ZIP은 업로드 완료만 확인했으며, 최종 aggregate의 byte readback을 과거 개별 ZIP의 검산으로 바꾸어 쓰지 않는다.
 
 ## 완료해서 반복하지 않을 것
 
