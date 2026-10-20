@@ -1,46 +1,39 @@
-# REI age-exposure/source-age 현재 상태 | 2026-10-19 VigilODE 연결
+# REI age-exposure/source-age 현재 상태 | 2026-10-20 정확 산술 최적화
 
-진입: 이 파일, `RESEARCH_UPDATE_20261019_VIGILODE_KO.md`, `HANDOFF_CODEX_CURRENT_KO.md`, `HANDOFF_NEW_CHAT_KO.md`, `contracts/NEXT_DAG_CURRENT.json`, `DELIVERY_RECEIPT_CURRENT.json`.
+같은 57,344 nodes와 birth clocks 8/16/32/64에서 warm kernel 중앙값을 **47.413 s → 3.532 s(2 task threads, 13.424배)**로 줄였다. 8 task threads에서는 **1.560 s**이며 2-thread baseline 대비 30.383배다. 모든 scientific binary64 값·interval endpoint·prefix 출력은 원 baseline과 동일하다. 새 native history나 age32 사례를 계산한 결과가 아니라 완료된 고정 모형의 산술·캐시·독립 검증 실행을 최적화한 결과다.
 
-Repo `cosmosapjw-quantum/rei_bianchi`, draft PR199, branch `research/rei-age-exposure-envelope-20261018`. 이번 실제 intake HEAD는 `0ae749e9fdb179729c018706dbd59c4f61732b6a`. 원 native physics는 `35d9747a0bbedcafdb568467ce7c1e7a25f965b6`. 이전 CURRENT5는 `evidence/current_entries_before_vigilode_20261019/`에 원래 bytes로 보존했다.
+| 계산 경로 | Task threads | 3회 중앙값 (s) | Baseline 대비 | 검증 실행 |
+|---|---:|---:|---:|---|
+| 원 baseline | 2 | 47.413 | 1.000배 | 원 exact oracle 반복 |
+| A: integer Taylor | 2 | 10.461 | 4.532배 | 원 exact oracle 반복 |
+| B: cache preload | 2 | 6.619 | 7.164배 | 원 exact oracle 반복 |
+| C: shared oracle | 2 | 3.532 | 13.424배 | 1회 exact oracle + 모든 prefix bit 비교 |
+| C: shared oracle | 8 | 1.560 | 30.383배 | C와 동일, task threads 증가 |
 
-## 먼저 읽은 새 결과
+현재 진입은 `RESEARCH_UPDATE_20261020_OPTIMIZATION_KO.md`, `optimization_20261020/README.md`, `optimization_20261020/THEORY_KO.md`, `optimization_20261020/results/BENCHMARK.json`, CURRENT5다. Source baseline HEAD는 `58dc257d1402daa3d0f64786279e13cd72bfb0c7`, task tree는 `1360944eb7e94743c1d5a668e7458f5b4f902d7a`다. 이전 CURRENT5 원문은 `optimization_20261020/baseline_current/`에 보존했다. 게시·백업은 `DELIVERY_RECEIPT_CURRENT.json`의 실제 응답을 따른다. 현재 v7 source/배송은 PREPARED이며 push/upload 확인 전에는 완료라고 표시하지 않는다.
 
-REI branch 247개/PR metadata 205개 전체 페이지와 관련 PR·최신 workflow, Drive 52회/Dropbox 18회 폴더 목록을 실제 읽었다. BR05·LRS·RUN16의 새 archive 3개를 전체 다운로드하여 payload 1,204개를 검증했다. 이들은 별도 연구 lane의 결과이며 새 age32 결과는 발견되지 않았다. 기존 age64 block-max와 spectral128은 완료 결과로 재사용한다.
+## 구현·검증과 자원
 
-VigilODE도 branch 147개/PR metadata 71개와 실제 source/CSV를 읽었다. 작업 중 PR71에 새 strict comparison 결과가 올라와 `9f80e38dd6c7e5cf002d2436f6cf5fb2cc372858`까지 추가 조사했다. 새 756-cell campaign의 aggregate를 재집계했으며 empirical accuracy와 실제 source identity를 구분했다. 상세 coverage와 누락된 raw gzip/184MB bundle은 `vigilode_age_transport_20261019/intake/`에 명시한다. 계정 전체의 오래된 모든 파일을 읽었다고 주장하지 않는다.
+Exact rational exp의 S18/S19를 같은 integer denominator recurrence로 계산하고 마지막 두 rationals만 normalize한다. Zero/752 guard·halving·directed conversion/squaring은 유지한다. B는 실제 unique miss 53,408개를 immutable rate에서 indexed Rayon map으로 계산하고 serial insert한다. C는 4,448 group exact recurrences/27,552 leaf inequalities를 한 번 확인한 뒤 64,000 all-prefix bit 비교로 thread 2/4 결과에 같은 부등식을 이전한다. 원 B repeated-oracle 경로도 유지한다.
 
-## 이번에 추가한 이론·코드·실제 계산
+142개 deterministic 일반 rational/경계 fixture, 4개 focused Rust tests, 실제 입력 53,628 exp endpoint parity를 확인했다. C9에서 요청 flag만으로 mode 실행을 인정하던 runner 결함을 실제 출력의 flag/counter로 교정했고 네 regression과 feature-free reference 요청의 예상 `MODE_NOT_ACTIVATED` 실패를 보존했다. 독립 C9는 PASS이며 C9-01 mode-activation finding을 교정·회귀 검증으로 닫았다. 실제 범위와 근거는 `optimization_20261020/reviews/c9/C9_RECEIPT.json`에 있다. 과거 83/85-suite·24-case·native 완료 campaign은 반복하지 않았다.
 
-`vigilode_age_transport_20261019/`에 원래 source packet 64개/57,344 nodes를 사용하는 고정 gas·endpoint geometry·고정 node 모형을 완성했다. VigilODE `ee65d4db…`의 `affine_transport.rs`와 `directed.rs`를 변경 없이 재사용하고, exact dyadic `num-rational`/`num-bigint`, Rayon, locked dependency 22개를 실제 적용했다.
+측정은 순차 실행했고 build는 별도다. 누적 executable wall 253.924 s/600 s, 각 command 240 s 이하다. 공식 Rust/cargo 1.94.1 설치와 offline locked 22 dependencies가 실제 작동한다. 재첨부 installer는 192,287,020 bytes/SHA256 `294b3d81fa72e62581276290c60c81eb8b58498d333d422ca1dfc432877d0c40`이며 이미 설치한 동일 버전 공식 component runtime을 교체하지 않았다. C2 median CPU 6.581 s, C8 9.132 s로 8 threads는 이 표본에서 CPU를 약 38.8% 더 사용해 latency를 줄인다. 메모리 감소나 cold-build 전체 30배 speedup은 주장하지 않는다.
 
-- 원 native 153개 입력에서 별도 사본으로 읽기 전용 node export 1회, 약 11.8 s. 출생·physical source·encoded source·inventory는 원래 setup과 동일. 새 transformed RHS/ODE history 0회.
-- Birth clocks만 8/16/32/64로 비교한 고유 4개 설정. 전역 최소 hazard bound를 실제 확인한 뒤, 같은 hazard tuple의 sensitive group 1,112개로 보완했다. 첫 결과도 보존한다.
-- 최종 grouped 계산 약 53.733 s. Number-error upper는 8/16/32 순서로 1.292312768972707e-9, 1.2882258655815744e-9, 1.25025157367156e-9 photons/H. 기존 global bound보다 약 1,356–1,437배 좁다.
-- **전체 N의 32→64 차이는 −0.815145%지만, 흡수가 있는 node만의 survivor 차이는 약 −82.574593%다.** Zero-hazard 4,096개의 공통 mass가 전체 정규화에서 차이를 가린다. Exact Fraction 재합산과 양의 분모 interval을 함께 기록했다.
-- 고유 Rust tests 4개(새 task 3개+원본 upstream 1개), exp 17 fixtures, 전체 node Decimal100 검산, ledger 0 포함, thread 1/2/4 일치, offline locked 검증. 기존 전체 suite/24-case/NCP 완료 캠페인은 반복하지 않았다.
-- R6/C9 독립 검토 및 처리한 finding은 `reviews/`에 있다. 고정 모형 N64≈1.30931e-7/H는 실제 nonlinear native endpoint≈1.29091e-9/H와 다르며 native reference로 수용하지 않는다.
+## 바로 쓰는 최적 경로
 
-정리·증명·단위·원본 code 대응은 `THEORY_KO.md`, 실제 명령과 실패 기록은 `IMPLEMENTATION.json`/`results/`, raw 계수는 `inputs/`에 있다. 실제 nonlinear Grackle response bound는 NOT_ESTABLISHED다.
+`optimization_20261020/run_optimized.py`가 preload/shared-oracle을 명시적으로 켜고 실제 mode activation과 원 numeric 출력을 확인한다. 기본 threads는 min(8, affinity, cgroup quota), `--threads 2`는 이 표본의 CPU economy, `--threads 8`은 낮은 latency 선택이다. 완료된 benchmark를 단순 재개 때문에 반복하지 않는다. 재현이 필요한 경우 README의 fresh scratch/offline build 명령을 사용한다.
 
-## 이전 과학 상태와 다음 NCP
+## 새 intake와 기존 물리 상태
 
-완료된 native age64 block-max: exit 0, 19,756 RHS, case 782.731 s, photon 2.002711130429069e-10/energy 1.929660553608937e-13, 원 1e-8 gate PASS. Source jumps는 MISSING_DATA, 18개 관측은 9개 고유 상태다. Spectral64→128 HeI 누적 photoevent 차이 0.2660778682%는 유한 이웃 결과로만 재사용한다.
+Parent의 REI BR06·LRS C11·RUN17/RUN18 및 VigilODE PR73/74/75 등의 실제 읽기에서 선택 source/CSV/receipt를 `optimization_20261020/intake/`로 보존했다. 이들과 2026-10-20 02:43:13Z cutoff의 upstream workflow 39360079278 failure에서 새 age32 완료 결과는 확인되지 않았다. Banded/JVP/residual-first 기법은 별도 ODE lane의 근거로 남기며 이 고정 exp model에 새 solver로 대입하지 않았다.
 
-N4의 고정 positive support/정확 count 아래 10개 1η 가중치가 유일해 stored energy 246η와 target 245η/tol 0를 맞추지 못한 native time8 결과는 HOLD로 유지한다. 새 affine 모형이 이 저장 문제를 고쳤다는 주장은 없다.
+완료된 native age64 block-max는 exit0/19,756 RHS/case782.731 s, photon2.002711130429069e-10·energy1.929660553608937e-13로 원 1e-8 gate를 통과했다. Age64 source jumps는 MISSING_DATA다. Spectral64→128 HeI 누적 photoevent 차이 0.2660778682%는 finite-neighbor 결과다. Native age 수렴·time8/16/32 HOLD는 유지한다. 고정 모형 N64≈1.30931e-7/H와 nonlinear native endpoint≈1.29091e-9/H를 구분하며 nonlinear response bound는 NOT_ESTABLISHED다.
 
-**READY는 단일 q0 age32 block-max/binary64, source8/n_mu8/transport16/time1, passive diagnostics ON, transport48, case/total cap1800 s다.** 완료된 age64의 원 binary·computational base·runtime에 binding해 비교한다. Age32 코드·진단·compactB1 복원·비교기는 이전에 구현 및 tiny-native 검증을 끝냈다. 복사 가능한 프롬프트는 `HANDOFF_CODEX_CURRENT_KO.md`에 있다.
+다음 native READY는 **단일 q0 age32 block-max/binary64, source8/n_mu8/transport16/time1, passive diagnostics ON, transport48, case/total cap1800 s**다. 원 B1 binary·computational base·runtime binding과 rtol/atol/RK/source schedule/photon-energy1e-8를 유지한다. 사용자 파일 이동 없이 실행하는 원 프롬프트와 모든 B1 identity는 `HANDOFF_CODEX_CURRENT_KO.md`에 그대로 있다.
 
-현재 NCP connector 실제 호출은 월 사용량 중지 응답이었다. 이번 NCP 실행은 NOT_RUN. Local Rust compile/계산과 양쪽 백업 읽기는 작동했다. 다음 세션에서는 다시 실제 도구 상태를 확인한다.
+## 현재 접근·배송 상태
 
-## 게시·백업과 보호 범위
+현재 NCP 도구의 device list는 **DEVICE_LIST_SUCCEEDED**다. 이 턴 SSH 접근·명령은 **NCP_SSH_NOT_PROBED_THIS_TURN**, NCP 과학 실행은 NOT_RUN이다. 이전 월 사용량 중지 응답은 역사 receipt에 보존하며 현재 blocker로 상속하지 않는다.
 
-이번 source snapshot과 C8/C10 v6의 실제 commit/provider/readback 상태는 `DELIVERY_RECEIPT_CURRENT.json`이 기준이다. Archive 생성 이후 작성되는 final receipt와 별도 delivery confirmation이 archive 내부의 생성 시점 pending 상태를 대체한다. 자기 commit/hash를 자기 안에 재귀적으로 기록하지 않는다.
-
-Owner checkout, PR150/R9, LRS, BASS HHeD는 보존한다. PR199 draft 유지, no merge/no force-push. **PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED**.
-
-## v6 최종 배송 확인
-
-VigilODE source는 `50bc41f6b6aea05f67c03ab3ad23bb118d574622`에 게시했고, C8/C10 v6의 Drive·Dropbox 네 전체 readback에서 bytes/SHA/CRC/payload와 source·native153/B1·vendor identity를 확인했다. 상세는 `DELIVERY_RECEIPT_CURRENT.json`과 `evidence/delivery_v6_20261019/`이다. 최종 receipt commit은 별도 confirmation과 PR199 actual HEAD에서 확인한다.
-
-Source CI 두 workflow는 이 task 밖의 기존 top-level native crate `cargo fmt --check`에서 실패했고 후속 테스트는 skipped였다. Scoped task 검증 PASS와 구별하며, full-PR CI가 green이라고 주장하지 않는다. `evidence/delivery_v6_20261019/SOURCE_CI_READBACK.json`에 실제 job/log 확인을 보존했다.
+PR199 draft/no merge/no force-push, owner checkout/PR150/R9/LRS/BASS HHeD와 원 B1 binary 보호를 유지한다. 기존 v6 source/C8/C10 및 네 provider full readback은 완료된 역사다. v7 final receipt/confirmation은 source-bound ZIP 뒤에 생성하며 self-hash loop를 만들지 않는다. **PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED**.

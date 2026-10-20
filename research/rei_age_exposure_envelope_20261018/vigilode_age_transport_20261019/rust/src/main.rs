@@ -3,14 +3,34 @@ use num_rational::BigRational;
 use num_traits::{Zero,ToPrimitive};
 use serde::Deserialize;
 use serde_json::{json,Value};
-use std::{collections::{BTreeMap,HashMap},path::Path,time::Instant};
+use rayon::prelude::*;
+use std::{collections::{BTreeMap,HashMap,HashSet},path::Path,time::Instant};
 
 #[derive(Deserialize)]
 struct Model { observe_time_s:f64, clocks:BTreeMap<String,Vec<f64>> }
 struct Rate { lambda:BigRational, shares:[Interval;3], central:f64 }
 struct Node { cohort:usize, mass:f64, energy:f64, rate:usize, birth:f64 }
-struct Cache { rates:Vec<Rate>, values:HashMap<(usize,u64,u64),Interval>, evaluations:usize }
+struct Cache { rates:Vec<Rate>, values:HashMap<(usize,u64,u64),Interval>, evaluations:usize,
+    preload_enabled:bool, preloaded:usize, preload_seconds:f64 }
 impl Cache {
+    fn preload(&mut self, requests:impl IntoIterator<Item=(usize,f64,f64)>) {
+        if !self.preload_enabled { return; }
+        let started=Instant::now();
+        let mut seen=HashSet::new();
+        let misses:Vec<_>=requests.into_iter().filter_map(|(rate,later,earlier)| {
+            assert!(later>=earlier);
+            let key=(rate,later.to_bits(),earlier.to_bits());
+            if !self.values.contains_key(&key) && seen.insert(key) {Some(key)}else{None}
+        }).collect();
+        let values:Vec<_>=misses.par_iter().map(|&(rate,later,earlier)| {
+            let tau=&self.rates[rate].lambda*(exact(f64::from_bits(later))-exact(f64::from_bits(earlier)));
+            exp_negative(&tau)
+        }).collect();
+        self.values.reserve(misses.len());
+        self.evaluations+=misses.len(); self.preloaded+=misses.len();
+        for (key,value) in misses.into_iter().zip(values) { self.values.insert(key,value); }
+        self.preload_seconds+=started.elapsed().as_secs_f64();
+    }
     fn survival(&mut self, rate:usize, later:f64, earlier:f64)->Interval {
         assert!(later>=earlier);
         let key=(rate,later.to_bits(),earlier.to_bits());
@@ -55,7 +75,8 @@ fn model_input(dir:&Path)->(Model,Vec<Node>,Cache) {
         assert_eq!(node.birth,model.clocks["64"][node.cohort]);
         nodes.push(node);
     }
-    (model,nodes,Cache{rates,values:HashMap::new(),evaluations:0})
+    (model,nodes,Cache{rates,values:HashMap::new(),evaluations:0,
+        preload_enabled:std::env::var_os("REI_PRELOAD").is_some(),preloaded:0,preload_seconds:0.0})
 }
 fn case(model:&Model,nodes:&[Node],cache:&mut Cache,n:usize)->(Value,Interval,f64) {
     let mut totals=[point(0.0);7]; // N,U,age1,age2,A0,A1,A2
@@ -63,10 +84,12 @@ fn case(model:&Model,nodes:&[Node],cache:&mut Cache,n:usize)->(Value,Interval,f6
     let mut underflow=0usize;
     let mut passive=point(0.0);
     let clocks=&model.clocks[&n.to_string()];
+    cache.preload(nodes.iter().map(|node|(node.rate,model.observe_time_s,clocks[node.cohort*n/64])));
+    let ages:Vec<_>=if cache.preload_enabled {clocks.iter().map(|b|rational_interval(&(exact(model.observe_time_s)-exact(*b)))).collect()}else{vec![]};
     for node in nodes {
         let b=clocks[node.cohort*n/64];
-        let age=exact(model.observe_time_s)-exact(b);
-        let age_i=rational_interval(&age);
+        let age_i=if cache.preload_enabled {ages[node.cohort*n/64]}else{
+            rational_interval(&(exact(model.observe_time_s)-exact(b)))};
         let e=cache.survival(node.rate,model.observe_time_s,b);
         let survival=mul(point(node.mass),e);
         let absorbed=mul(point(node.mass),sub(point(1.0),e));
@@ -100,6 +123,10 @@ fn case(model:&Model,nodes:&[Node],cache:&mut Cache,n:usize)->(Value,Interval,f6
 }
 fn paired(model:&Model,nodes:&[Node],cache:&mut Cache,n:usize,coarse:Interval,fine:Interval,central_diff:f64)->Value {
     let clocks=&model.clocks[&n.to_string()];
+    cache.preload(nodes.iter().filter(|node|!cache.rates[node.rate].lambda.is_zero()).flat_map(|node| {
+        let a=clocks[node.cohort*n/64];let b=node.birth;let later=a.max(b);let earlier=a.min(b);
+        [(node.rate,later,earlier),(node.rate,model.observe_time_s,later)]
+    }).collect::<Vec<_>>());
     let mut events:BTreeMap<u64,f64>=BTreeMap::new();
     let mut sharp=0.0;
     let mut group_events:Vec<BTreeMap<u64,f64>>=(0..cache.rates.len()).map(|_|BTreeMap::new()).collect();
@@ -148,6 +175,13 @@ fn paired(model:&Model,nodes:&[Node],cache:&mut Cache,n:usize,coarse:Interval,fi
     let mut grouped_maps=vec![];
     let mut group_leaves=0usize;
     let mut group_compositions=0usize;
+    let mut requests=vec![];
+    for id in &group_ids {
+        let events=&mut group_events[*id]; events.entry(model.observe_time_s.to_bits()).or_insert(0.0);
+        let mut last=f64::from_bits(*events.keys().next().unwrap());
+        for bits in events.keys() {let time=f64::from_bits(*bits);requests.push((*id,time,last));last=time;}
+    }
+    cache.preload(requests);
     for id in &group_ids {
         let events=&mut group_events[*id];
         events.entry(model.observe_time_s.to_bits()).or_insert(0.0);
@@ -164,19 +198,58 @@ fn paired(model:&Model,nodes:&[Node],cache:&mut Cache,n:usize,coarse:Interval,fi
         grouped_maps.push(maps);
     }
     let mut grouped_parity=None;
+    let reuse_oracle=std::env::var_os("REI_REUSE_ORACLE").is_some();
+    let mut canonical_prefixes:Option<Vec<Vec<f64>>>=None;
+    let mut oracle_recurrences=0usize;
+    let mut oracle_prefix_checks=0usize;
+    let mut thread_prefix_bit_comparisons=0usize;
     let mut grouped_upper=0.0;
     let mut grouped_finals=vec![];
     for threads in [1,2,4] {
         let pool=rayon::ThreadPoolBuilder::new().num_threads(threads).build().unwrap();
-        let finals=pool.install(||grouped_maps.iter().map(|maps|{
-            let prefix=parallel_error_prefix(maps,0.0).unwrap();
-            let mut oracle=BigRational::zero();
-            for (leaf,bound) in maps.iter().zip(prefix.radii().iter().skip(1)) {
-                oracle=exact(leaf.gain())*oracle+exact(leaf.defect());
-                assert!(exact(*bound)>=oracle);
+        let finals=if reuse_oracle {
+            // Indexed outer parallelism preserves group order and each original prefix tree.
+            let prefixes:Vec<Vec<f64>>=pool.install(||grouped_maps.par_iter().map(|maps|{
+                parallel_error_prefix(maps,0.0).unwrap().radii().to_vec()
+            }).collect());
+            if let Some(ref canonical)=canonical_prefixes {
+                assert_eq!(canonical.len(),prefixes.len());
+                for (reference,current) in canonical.iter().zip(&prefixes) {
+                    assert_eq!(reference.len(),current.len());
+                    for (a,b) in reference.iter().zip(current) {
+                        assert_eq!(a.to_bits(),b.to_bits(),"all grouped prefix endpoints agree across thread counts");
+                        thread_prefix_bit_comparisons+=1;
+                    }
+                }
+            } else {
+                // Each independent exact recurrence is checked once. The equal prefix bits
+                // above transfer every checked inequality to the other thread executions.
+                grouped_maps.par_iter().zip(prefixes.par_iter()).for_each(|(maps,prefix)|{
+                    let mut oracle=BigRational::zero();
+                    assert_eq!(prefix[0].to_bits(),0.0f64.to_bits());
+                    for (leaf,bound) in maps.iter().zip(prefix.iter().skip(1)) {
+                        oracle=exact(leaf.gain())*oracle+exact(leaf.defect());
+                        assert!(exact(*bound)>=oracle);
+                    }
+                });
+                oracle_recurrences+=grouped_maps.len();
+                oracle_prefix_checks+=grouped_maps.iter().map(Vec::len).sum::<usize>();
+                canonical_prefixes=Some(prefixes.clone());
             }
-            *prefix.radii().last().unwrap()
-        }).collect::<Vec<_>>());
+            prefixes.iter().map(|prefix|*prefix.last().unwrap()).collect::<Vec<_>>()
+        } else {
+            oracle_recurrences+=grouped_maps.len();
+            oracle_prefix_checks+=grouped_maps.iter().map(Vec::len).sum::<usize>();
+            pool.install(||grouped_maps.iter().map(|maps|{
+                let prefix=parallel_error_prefix(maps,0.0).unwrap();
+                let mut oracle=BigRational::zero();
+                for (leaf,bound) in maps.iter().zip(prefix.radii().iter().skip(1)) {
+                    oracle=exact(leaf.gain())*oracle+exact(leaf.defect());
+                    assert!(exact(*bound)>=oracle);
+                }
+                *prefix.radii().last().unwrap()
+            }).collect::<Vec<_>>())
+        };
         let bytes:Vec<_>=finals.iter().map(|v|v.to_bits()).collect();
         if let Some(ref previous)=grouped_parity {assert_eq!(previous,&bytes);}else{grouped_parity=Some(bytes);}
         grouped_upper=finals.iter().copied().try_fold(0.0,directed::add_up).unwrap();
@@ -195,7 +268,10 @@ fn paired(model:&Model,nodes:&[Node],cache:&mut Cache,n:usize,coarse:Interval,fi
             "final_upper":grouped_upper,"final_min_valid_upper":grouped_upper.min(sharp),
             "independent_upper_bounds_not_required_to_order":true,"thread_byte_parity":true,
             "all_group_prefixes_bound_exact_rational_leaf_recurrence":true,
-            "rate_ids_in_fixed_sorted_order":group_ids,"group_final_uppers":grouped_finals},
+            "rate_ids_in_fixed_sorted_order":group_ids,"group_final_uppers":grouped_finals,
+            "optimization":{"reuse_oracle":reuse_oracle,"oracle_recurrences":oracle_recurrences,
+                "oracle_prefix_checks":oracle_prefix_checks,"thread_prefix_bit_comparisons":thread_prefix_bit_comparisons,
+                "canonical_thread_count":1,"all_prefix_thread_parity":reuse_oracle}},
         "sharp_per_node_final_upper":sharp,"affine_prefix_final_upper":prefix,
         "prefix_bounds_sharp":prefix>=sharp,"prefix_bounds_central_observation":prefix>=central_diff.abs(),
         "all_prefixes_bound_exact_rational_leaf_recurrence":true,"rayon_thread_counts":[1,2,4],"thread_byte_parity":true,
@@ -211,18 +287,31 @@ fn main() {
         println!("{}",serde_json::to_string_pretty(&result).unwrap());return;
     }
     let started=Instant::now();
+    if std::env::var_os("REI_PRELOAD").is_some() {rayon::ThreadPoolBuilder::new().build_global().unwrap();}
+    let input_started=Instant::now();
     let (model,nodes,mut cache)=model_input(Path::new(&args[1]));
+    let input_seconds=input_started.elapsed().as_secs_f64();
     let mut cases=vec![];let mut populations=vec![];let mut central=vec![];
+    let mut case_seconds=vec![];let mut pair_seconds=vec![];
     for n in [8,16,32,64] {
+        let phase=Instant::now();
         let (result,p,c)=case(&model,&nodes,&mut cache,n);cases.push(result);populations.push(p);central.push(c);
+        case_seconds.push(phase.elapsed().as_secs_f64());
     }
     let mut pairs=vec![];
-    for (k,n) in [8,16,32,64].iter().enumerate(){pairs.push(paired(&model,&nodes,&mut cache,*n,populations[k],populations[3],central[k]-central[3]));}
+    for (k,n) in [8,16,32,64].iter().enumerate(){let phase=Instant::now();pairs.push(paired(&model,&nodes,&mut cache,*n,populations[k],populations[3],central[k]-central[3]));pair_seconds.push(phase.elapsed().as_secs_f64());}
     let result=json!({"schema":"rei.vigilode.fixed_age_transport.v1","PRODUCTION_SCIENTIFIC_ADMISSION":"NOT_ISSUED",
         "model":"fixed-source fixed-opacity endpoint geometry; no nonlinear ODE or cosmological history solve",
         "nodes":nodes.len(),"unique_rate_tuples":cache.rates.len(),"certified_exp_evaluations":cache.evaluations,
         "passive_nodes":nodes.iter().filter(|n|cache.rates[n.rate].lambda.is_zero()).count(),
-        "wall_seconds":started.elapsed().as_secs_f64(),"cases":cases,"paired_bounds":pairs});
+        "wall_seconds":started.elapsed().as_secs_f64(),"cases":cases,"paired_bounds":pairs,
+        "optimization":{"integer_taylor":true,"preload":cache.preload_enabled,
+            "rayon_threads":std::env::var("RAYON_NUM_THREADS").ok(),"preloaded_exp_evaluations":cache.preloaded,
+            "preload_seconds":cache.preload_seconds,"input_seconds":input_seconds,
+            "reference_exp_endpoint_checks":rei_vigilode_age_transport::certified::reference_check_count(),
+            "case_seconds":case_seconds,"pair_seconds":pair_seconds,
+            "original_oracle_passes_preserved":std::env::var_os("REI_REUSE_ORACLE").is_none(),
+            "reuse_oracle":std::env::var_os("REI_REUSE_ORACLE").is_some()}});
     std::fs::write(&args[2],serde_json::to_string_pretty(&result).unwrap()+"\n").unwrap();
     println!("{}",json!({"status":"COMPLETED","nodes":nodes.len(),"exp_evaluations":cache.evaluations,"wall_seconds":started.elapsed().as_secs_f64()}));
 }

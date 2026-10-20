@@ -1,5 +1,18 @@
 # Codex/NCP 인계 | 단일 age32 reference READY
 
+## 2026-10-20 현재 재개점: 최적화 완료, 새 native age32는 별도 READY
+
+`optimization_20261020/`의 exact-arithmetic/cache/shared-oracle 최적화와 실제 측정을 재사용한다. Warm median baseline2 47.413 s, A2 10.461 s, B2 6.619 s, C2 3.532 s, C8(8 threads)1.560 s; scientific numeric bits는 동일하다. 원 입력·정확도·native B1은 바뀌지 않았다. 표준 최적 실행은 `optimization_20261020/run_optimized.py`이며 필요 없는 benchmark 재실행은 하지 않는다. 새 report/README/THEORY/BENCHMARK와 C9 receipt를 먼저 읽는다.
+
+이번 baseline PR HEAD는 58dc257d1402daa3d0f64786279e13cd72bfb0c7/task1360944eb7e94743c1d5a668e7458f5b4f902d7a. v7 source와 backup은 PREPARED, 실제 게시·provider 응답 전에는 pending이다. CURRENT5 이전 원문은 optimization_20261020/baseline_current/에 보존했다.
+
+현재 NCP는 DEVICE_LIST_SUCCEEDED; NCP_SSH_NOT_PROBED_THIS_TURN; NCP 과학 실행 NOT_RUN이다. 월 사용량 중지는 과거 receipt이며 현재 blocker가 아니다. 공식 Rust/cargo1.94.1 runtime과 22 locked vendor가 실제 작동한다. 재첨부192287020-byte installer SHA294b3d81fa72e62581276290c60c81eb8b58498d333d422ca1dfc432877d0c40는 추가 provenance이고 기존 공식 설치를 교체하지 않았다.
+
+아래 age32 사용자 파일 처리 없는 복사 프롬프트, 원 binary/runtime identities, 원 gate와 cap은 유지한다. Native age32 READY와 native age/time HOLD는 최적화로 해제되지 않는다. PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED.
+
+## v6 인계의 유지된 과학·실행 본문
+
+
 이번 intake HEAD는 `0ae749e9fdb179729c018706dbd59c4f61732b6a`다. 새 VigilODE 연구 source와 C8/C10 v6의 실제 배송 상태·commit·SHA는 `DELIVERY_RECEIPT_CURRENT.json`과 PR199 actual HEAD에서 확인한다. 기존 v5 배송 및 age64 결과는 보존한다. 이미 생긴 새 결과가 있으면 그대로 ingest한다.
 
 ## 이번 로컬 연구도 완료됐다
