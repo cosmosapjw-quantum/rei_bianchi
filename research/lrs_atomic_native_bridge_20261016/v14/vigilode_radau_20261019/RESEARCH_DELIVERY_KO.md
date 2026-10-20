@@ -1,3 +1,15 @@
+# 최신 상태 — 2026-10-20 native 캐시·Rayon 최적화 C10 완료
+
+실행 코드 source commit은 `33ae18c31bf61bcc99d6d05edb6c2e7a5cb272a1`이다. `--native-eval cell-cache`로 Jacobian 안의 광자 cell 준비를 재사용하고, 독립 이력은 pinned VigilODE의 local Rayon pool로 병렬 실행한다. 원본 native 152개 파일과 VigilODE 477개 파일의 bytes 및 모든 물리식·허용오차를 유지했다. 같은 기존 19개 설정의 회귀, 독립 전체값 비교, Rust 표적 10개·Python 실행기 4개 및 실제 옵션 전달 smoke가 통과했다. 15개의 교차 측정쌍에서 finite numeric equality를 유지하면서 native 실행시간이 줄었다. 메모리 감소와 별도 SIMD 구현은 이번 성과에 포함하지 않는다.
+
+[새 연구 보고](optimization_20261020/RESEARCH_REPORT_KO.md), [최종 source·실행·백업·DAG receipt](optimization_20261020/FINAL_DELIVERY.json), [완성된 Codex NCP 인계](optimization_20261020/CODEX_NCP_OPTIMIZATION_KO.md)를 먼저 읽는다. C10 archive와 ACK의 Drive/Dropbox 전체 파일 readback이 모두 통과했고, 회수 archive의 payload 5,462개 파일을 검증했다. 복원된 native 153개·adapter 7개·VigilODE 477개 파일은 컴파일한 최종 소스와 같았다.
+
+이번 optimization의 NCP 실행은 **NOT_RUN**이다. 아래의 d87ba9ca source NCP 완료 및 이전 NOT_RUN 문장은 각 과거 단계의 기록이다. 일반 source-on 차수·uniform stiff·CaseB/fullEoR/signed Bianchi는 HOLD이며 production admission은 NOT_ISSUED다.
+
+---
+
+## 이전 전달 기록
+
 # 현재 상태 — VigilODE NCP 완료 및 2026-10-20 복원 확인
 
 2026-10-19 NCP에서 고정 source `d87ba9ca25acb8a2a032154fa23057b45acd6207`의 locked/offline release build, 표적시험 7개와 **샌드박스와 같은 19개 고유 설정**이 완료됐다. 모두 exit 0, 실패·중단 0, native RHS 38,840회, native wall 15.824811033초다. 두 host의 실행을 38개 고유 설정으로 합산하지 않는다. 실행 근거 commit은 `09bfe94bc270623b014bc6db78c59211152739aa`, C11 전달 commit은 `46a29285ad7095959bb0e5b5a10dab0fec97501f`다.
