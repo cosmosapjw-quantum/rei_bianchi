@@ -1,0 +1,170 @@
+{
+  "recorded_utc": "2026-10-20T05:20:28.734311+00:00",
+  "status": "RUNTIME_COMPLETE_VERIFIED",
+  "archive": {
+    "path": "/workspace/scratch/996fc62899da/project_sources/06-rust-1.94.1-x86_64-unknown-linux-gnu.tar.xz",
+    "size_bytes": 192287020,
+    "sha256": "294b3d81fa72e62581276290c60c81eb8b58498d333d422ca1dfc432877d0c40",
+    "official_sha_url": "https://static.rust-lang.org/dist/rust-1.94.1-x86_64-unknown-linux-gnu.tar.xz.sha256",
+    "official_readback": "HTTP_200_DEFAULT_PROXY",
+    "official_checksum_file": "/workspace/scratch/996fc62899da/brperf01/runtime_evidence/OFFICIAL_RUST_ARCHIVE.sha256",
+    "official_sha_match": true,
+    "detached_signature_path": "/workspace/scratch/996fc62899da/project_sources/02-rust-1.94.1-x86_64-unknown-linux-gnu.tar.xz.asc",
+    "detached_signature_sha256": "942bc6926af6a2130d70e77933e3df09d39beeedafad77710259e6df7eadee08",
+    "openpgp_signature_verification": "NOT_PERFORMED",
+    "signature_scope": "Official HTTPS checksum compared to the full supplied archive. Detached signature was retained but no signing key was imported or signature verified."
+  },
+  "installer": {
+    "read_before_execution": true,
+    "source_sha256": "3d5a09d2e414c74e2bb6df12b233c4f8ccc8af4e3dfc9fe38401947a1a1acadd",
+    "minimal_components": [
+      "rustc",
+      "cargo",
+      "rust-std-x86_64-unknown-linux-gnu",
+      "rustfmt-preview",
+      "clippy-preview"
+    ],
+    "prefix": "/workspace/scratch/996fc62899da/brperf01/runtime/rust-1.94.1",
+    "disable_ldconfig": true,
+    "install_exit_code": 0,
+    "fresh_prefix": true,
+    "system_or_user_home_writes_requested": false
+  },
+  "source_env": {
+    "path": "/workspace/scratch/996fc62899da/brperf01/runtime/env.sh",
+    "sha256": "627ff9bdd729b60e1db8e00a167f1fbf3c19da683c16e155c6df69239c12fc23",
+    "supplied_env_used": false,
+    "reason": "Supplied environment script points at a prior /mnt/data prefix."
+  },
+  "tool_versions": [
+    {
+      "command": [
+        "rustc",
+        "--version",
+        "--verbose"
+      ],
+      "returncode": 0,
+      "stdout": "rustc 1.94.1 (e408947bf 2026-03-25)\nbinary: rustc\ncommit-hash: e408947bfd200af42db322daf0fadfe7e26d3bd1\ncommit-date: 2026-03-25\nhost: x86_64-unknown-linux-gnu\nrelease: 1.94.1\nLLVM version: 21.1.8\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "cargo",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "cargo 1.94.1 (29ea6fb6a 2026-03-24)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "rustfmt",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "rustfmt 1.8.0-stable (e408947bfd 2026-03-25)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "cargo-clippy",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "clippy 0.1.94 (e408947bfd 2026-03-25)\n",
+      "stderr": ""
+    }
+  ],
+  "registry": {
+    "archive": "/workspace/scratch/996fc62899da/repo/research/dossier_ssot_sandbox_20261016/bass_reactive06_vigilode_reference_20261019/vendor/REGISTRY_99_CARGO_LOCKED.tar.gz",
+    "archive_sha256": "a609f400af02d432e16956ef44d4ba5187a5a9b5360a9f6218f1d540818b3292",
+    "registry_path": "/workspace/scratch/996fc62899da/brperf01/runtime/vendor/registry",
+    "package_count": 99,
+    "verified_payload_count": 4944,
+    "failed": [],
+    "cargo_home": "/workspace/scratch/996fc62899da/brperf01/runtime/cargo_home"
+  },
+  "registry_lock": {
+    "lock_path": "/workspace/scratch/996fc62899da/repo/research/dossier_ssot_sandbox_20261016/bass_reactive06_vigilode_reference_20261019/br06/Cargo.lock",
+    "lock_sha256": "2d1c997de506d31d57d42c40cae55e6ab6ff3f953e93091b99e9798d5413f4be",
+    "registry_packages_in_lock": 99,
+    "matched_packages": 99,
+    "failed": []
+  },
+  "smoke": [
+    {
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "--manifest-path",
+        "/workspace/scratch/996fc62899da/brperf01/runtime/smoke/Cargo.toml"
+      ],
+      "returncode": 0,
+      "stdout": "runtime smoke OK: expm1(1)=1.71828182845904509e0\n",
+      "stderr": "     Locking 3 packages to latest Rust 1.94.1 compatible versions\n   Compiling autocfg v1.5.1\n   Compiling num-traits v0.2.19\n   Compiling approx v0.5.1\n   Compiling brperf01_runtime_smoke v0.1.0 (/workspace/scratch/996fc62899da/brperf01/runtime/smoke)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.21s\n     Running `/workspace/scratch/996fc62899da/brperf01/runtime/smoke_target/debug/brperf01_runtime_smoke`\n"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--manifest-path",
+        "/workspace/scratch/996fc62899da/brperf01/runtime/smoke/Cargo.toml",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "    Checking num-traits v0.2.19\n    Checking approx v0.5.1\n    Checking brperf01_runtime_smoke v0.1.0 (/workspace/scratch/996fc62899da/brperf01/runtime/smoke)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.50s\n"
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "/workspace/scratch/996fc62899da/brperf01/runtime/smoke/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "resources": {
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "cpu_info": {
+      "vendor_id": "AuthenticAMD",
+      "model name": "AMD EPYC 9V74 80-Core Processor",
+      "flags": "fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm arch_capabilities"
+    },
+    "os_cpu_count": 9,
+    "process_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "cgroup": {
+      "cpu.max": "800000 100000",
+      "cpuset.cpus.effective": "0-8",
+      "memory.max": "8589934592",
+      "memory.peak": "8592080896"
+    },
+    "cpu_quota_cores": 8.0,
+    "memory_limit_bytes": 8589934592,
+    "note": "CPU model/flags are reported host features. Effective benchmark resources are constrained by cgroup quota and affinity. Multiple agents share these resources."
+  },
+  "scope": {
+    "full_science_or_source_tests_run": false,
+    "old_source_or_lock_changed": false,
+    "runtime_smoke_only": true
+  }
+}
