@@ -14,6 +14,9 @@ task-thread 배분 증가가 포함된다. Compiler 설치·cold build는 별도
 | C: exact oracle 공유·모든 prefix parity | 2 | 3.532 | 13.424배 |
 | C: 동일 경로 | 8 | 1.560 | 30.383배 |
 
+표의 thread 수는 global task-pool setting이다. Explicit affine-prefix validation은
+모든 경로에서 별도 pools1/2/4로 수행한다.
+
 ## 식과 구현
 
 `optimization_20261020/THEORY_KO.md`에 exact recurrence, Taylor enclosure,
@@ -86,8 +89,20 @@ age/time HOLD, age64 source jumps MISSING_DATA, 원 age32 prompt/gates/cap을 �
 
 진입은 `optimization_20261020/run_optimized.py`, 상세 재현은 같은 subtree의
 README/BUILD_MANIFEST/BENCHMARK다. 완료 benchmark는 재개 때문에 반복하지 않는다.
-현재 source·v7 C8/C10은 PREPARED, GitAPI/provider 응답 전 게시·백업은 PENDING이다.
+Source는 `354823050e6da98e64dde40596be061ce22e71f2`에 게시했고 actual Git tree의
+2,049개 blob/mode를 확인했다. v7 C8/C10 local package의 CRC/payload 검증은 PASS다.
+Drive/Dropbox 네 upload와 네 full readback이 완료되었으며 whole bytes/SHA/CRC,
+모든 manifest payload/source blob·mode, C10 task tree, native153/B1/map161,
+22 vendor packages/865 files 검증이 모두 PASS다. 실제 provider IDs와 SHA는
+`DELIVERY_RECEIPT_CURRENT.json` 및 `evidence/delivery_v7_20261020/`에 보존했다.
+실제 source와 backup은 완료되었다. 이 배송 기록은 자신을 담은 Git commit에
+binding하며 exact HEAD는 별도 post-commit v7 confirmation에 기록한다.
+Confirmation 자체의 upload/readback은 그 뒤의 별도 단계다.
 CURRENT5 원문은 baseline_current에 보존했고 최종 delivery receipt/confirmation은
 source-bound archive 뒤에 생성한다. PR199 draft/no merge/no force-push,
 owner checkout·PR150/R9·LRS·BASS·원 B1 보호를 유지한다.
 **PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED**.
+
+## Source CI 실제 상태
+
+Source commit354823의 [run39366286534](https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/39366286534)와 [run39366281780](https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/39366281780)는 untouched top-level native `cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check`에서 실패했고 workspace cargo test는 skipped였다. Scoped optimization C9/tests PASS와 구분하며 full-PR CI green을 주장하지 않는다. 실제 job IDs/URLs는 `evidence/delivery_v7_20261020/SOURCE_CI_READBACK.json`에 보존했다.

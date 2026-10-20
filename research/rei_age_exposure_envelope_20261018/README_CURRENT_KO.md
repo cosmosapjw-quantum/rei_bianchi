@@ -10,7 +10,9 @@
 | C: shared oracle | 2 | 3.532 | 13.424배 | 1회 exact oracle + 모든 prefix bit 비교 |
 | C: shared oracle | 8 | 1.560 | 30.383배 | C와 동일, task threads 증가 |
 
-현재 진입은 `RESEARCH_UPDATE_20261020_OPTIMIZATION_KO.md`, `optimization_20261020/README.md`, `optimization_20261020/THEORY_KO.md`, `optimization_20261020/results/BENCHMARK.json`, CURRENT5다. Source baseline HEAD는 `58dc257d1402daa3d0f64786279e13cd72bfb0c7`, task tree는 `1360944eb7e94743c1d5a668e7458f5b4f902d7a`다. 이전 CURRENT5 원문은 `optimization_20261020/baseline_current/`에 보존했다. 게시·백업은 `DELIVERY_RECEIPT_CURRENT.json`의 실제 응답을 따른다. 현재 v7 source/배송은 PREPARED이며 push/upload 확인 전에는 완료라고 표시하지 않는다.
+현재 진입은 `RESEARCH_UPDATE_20261020_OPTIMIZATION_KO.md`, `optimization_20261020/README.md`, `optimization_20261020/THEORY_KO.md`, `optimization_20261020/results/BENCHMARK.json`, CURRENT5다. Source baseline HEAD는 `58dc257d1402daa3d0f64786279e13cd72bfb0c7`, task tree는 `1360944eb7e94743c1d5a668e7458f5b4f902d7a`다. 이전 CURRENT5 원문은 `optimization_20261020/baseline_current/`에 보존했다. 게시·백업은 `DELIVERY_RECEIPT_CURRENT.json`의 실제 응답을 따른다. v7 source는 `354823050e6da98e64dde40596be061ce22e71f2`에 게시했고 2,049개 Git blob/mode와 task tree `c583d426082fedc6ff67cce9644388e61573b492`를 확인했다. C8/C10 v7의 Drive/Dropbox 네 upload와 서로 다른 네 전체 readback이 완료되었다. Whole bytes/SHA/CRC/payload/source blob·mode/task tree/native153·B1/vendor 검증은 모두 PASS다. 실제 provider IDs·크기·SHA는 `DELIVERY_RECEIPT_CURRENT.json`과 `evidence/delivery_v7_20261020/`에 있다. 실제 source와 backup은 완료되었다. 이 배송 기록은 자신을 담은 Git commit에 binding하며 exact HEAD는 별도 post-commit v7 confirmation에 기록한다. Confirmation 자체의 upload/readback은 그 뒤의 별도 단계다.
+
+표의 2/8은 global task-pool setting이며 모든 경로의 explicit affine-prefix validation은 별도 pools 1/2/4에서 수행한다.
 
 ## 구현·검증과 자원
 
@@ -37,3 +39,7 @@ Parent의 REI BR06·LRS C11·RUN17/RUN18 및 VigilODE PR73/74/75 등의 실제 �
 현재 NCP 도구의 device list는 **DEVICE_LIST_SUCCEEDED**다. 이 턴 SSH 접근·명령은 **NCP_SSH_NOT_PROBED_THIS_TURN**, NCP 과학 실행은 NOT_RUN이다. 이전 월 사용량 중지 응답은 역사 receipt에 보존하며 현재 blocker로 상속하지 않는다.
 
 PR199 draft/no merge/no force-push, owner checkout/PR150/R9/LRS/BASS HHeD와 원 B1 binary 보호를 유지한다. 기존 v6 source/C8/C10 및 네 provider full readback은 완료된 역사다. v7 final receipt/confirmation은 source-bound ZIP 뒤에 생성하며 self-hash loop를 만들지 않는다. **PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED**.
+
+## Source CI 실제 상태
+
+Source commit354823의 [run39366286534](https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/39366286534)와 [run39366281780](https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/39366281780)는 untouched top-level native `cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check`에서 실패했고 workspace cargo test는 skipped였다. Scoped optimization C9/tests PASS와 구분하며 full-PR CI green을 주장하지 않는다. 실제 job IDs/URLs는 `evidence/delivery_v7_20261020/SOURCE_CI_READBACK.json`에 보존했다.
