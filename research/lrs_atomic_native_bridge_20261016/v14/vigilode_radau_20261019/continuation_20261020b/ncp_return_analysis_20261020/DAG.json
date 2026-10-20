@@ -1,0 +1,98 @@
+{
+  "schema": "rei.lrs.v14.ncp_return_analysis.dag.v1",
+  "created_utc": "2026-10-20T17:20:33Z",
+  "source_sha": "5248822167e3fbe374f4333f7f2efdcdbfdaeeaf",
+  "nodes": [
+    {
+      "id": "saved_source_NCP",
+      "status": "COMPLETED_SCOPED",
+      "evidence": "../ncp_20261020T110800Z/REPORT.json"
+    },
+    {
+      "id": "intake_and_recovery",
+      "status": "COMPLETE",
+      "evidence": "INTAKE.json"
+    },
+    {
+      "id": "saved_output_analysis",
+      "status": "COMPLETE",
+      "evidence": "analysis/compare_ncp_return.json"
+    },
+    {
+      "id": "independent_review",
+      "status": "COMPLETE",
+      "decision": "PASS_SCOPED_NCP_EXECUTION_AND_FINITE_SAVED_OUTPUT_AGREEMENT",
+      "receipt": "review/INDEPENDENT_REVIEW.json",
+      "report": "review/REVIEW_KO.md",
+      "implemented_reviewed_changes": false
+    },
+    {
+      "id": "root_admission",
+      "status": "ACCEPTED_SCOPED",
+      "decision": "ADMIT_SCOPED_NCP_EXECUTION_AND_FINITE_SAVED_OUTPUT_AGREEMENT",
+      "receipt": "review/ROOT_ADMISSION.json"
+    },
+    {
+      "id": "stage1_Git",
+      "status": "PREPARED_NOT_PUBLISHED"
+    },
+    {
+      "id": "archive",
+      "status": "PENDING"
+    },
+    {
+      "id": "dual_provider_full_readback",
+      "status": "PENDING"
+    },
+    {
+      "id": "ACK_and_final_Git_closure",
+      "status": "PENDING",
+      "planned_receipt": "FINAL_PUBLICATION_ACK.json"
+    },
+    {
+      "id": "next_optimizer",
+      "status": "CONDITIONAL_ONE_ONLY_ON_ACTUAL_PROFILE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "saved_source_NCP",
+      "to": "intake_and_recovery"
+    },
+    {
+      "from": "intake_and_recovery",
+      "to": "saved_output_analysis"
+    },
+    {
+      "from": "saved_output_analysis",
+      "to": "independent_review"
+    },
+    {
+      "from": "independent_review",
+      "to": "root_admission"
+    },
+    {
+      "from": "root_admission",
+      "to": "stage1_Git"
+    },
+    {
+      "from": "stage1_Git",
+      "to": "archive"
+    },
+    {
+      "from": "archive",
+      "to": "dual_provider_full_readback"
+    },
+    {
+      "from": "dual_provider_full_readback",
+      "to": "ACK_and_final_Git_closure"
+    },
+    {
+      "from": "ACK_and_final_Git_closure",
+      "to": "next_optimizer",
+      "condition": "Actual profile identifies one useful optimizer; otherwise stop."
+    }
+  ],
+  "no_forced_native_repeats": true,
+  "production": "NOT_ISSUED"
+}
