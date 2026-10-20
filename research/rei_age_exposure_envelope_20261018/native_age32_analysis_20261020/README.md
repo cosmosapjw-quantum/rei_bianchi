@@ -23,3 +23,7 @@ No new native trajectory or v8/v7 campaign is needed to read or reproduce these 
 ## Review and delivery
 
 R6 PASS_SCOPED(open0), C9 PASS_SCOPED(open0,3 concrete code findings closed). The implementation's reviewed source hashes are in the C9 receipt. Source publication and dual-provider archive identities are recorded in the parent CURRENT5/delivery receipts. R6 reviewed THEORY bytes must retain SHA256 `d390e40721113ba83b1e078a6ca290d9cb4e051946b2acd7882536639f1e484c`.
+
+## Source and delivery identity
+
+Published source `729a12c5fdee8d05e77f26b396f0464c945351e1` has task tree `0cd25257f9e0fe4cfe1ce4ea6f34f2f65929fab7` and2,242 source files. C8/C10 each passed full Drive and Dropbox bytes/SHA/CRC/payload/source identity readback. The C10 native153/B1/source161/vendor22·865/new-native32 payload also passed. Archives remain immutable source snapshots. The separate post-commit v9 confirmation carries the exact UTF-8 delta to the final metadata tree; its own SHA/provider IDs are supplied externally. See [delivery receipt](../DELIVERY_RECEIPT_CURRENT.json). No scientific runs were repeated during environment recovery or delivery.

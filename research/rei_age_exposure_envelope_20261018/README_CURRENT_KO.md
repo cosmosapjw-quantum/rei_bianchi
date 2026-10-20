@@ -25,3 +25,13 @@ V9 source 게시와 C8/C10 양쪽 백업의 실제 단계는 `DELIVERY_RECEIPT_C
 이번 intake는 REI253 branches·최근PR100, VigilODE154 branches·PR78·최근workflow25, Drive 반환 직접 자식130·Dropbox28이다. 다른 대화 검색은 현재 실제 SERVICE_ERROR였고 모든 과거 자료를 읽었다고 가정하지 않는다.
 
 Intake HEAD93aca의 PR39415863199/push39415854273은 기존 root native cargo fmt FAILURE, workspace tests SKIPPED다. V9 commit CI는 배송 receipt의 실제 readback을 따른다. Scoped R6/C9 PASS를 full PR CI green으로 쓰지 않는다. Root Rust·.github와 owner checkout·PR150/R9/LRS/BASS HHeD를 보호하며 PR199 draft/open, no merge/no force-push다.
+
+### V9 source와 백업 확정
+
+Source `729a12c5fdee8d05e77f26b396f0464c945351e1`, 실제 부모 `93aca4cc483080b802fa85c9c44e43b9c85db5b7`, source task tree `0cd25257f9e0fe4cfe1ce4ea6f34f2f65929fab7`, source 파일2,242개다. C8/C10의 Drive·Dropbox 네 전체 readback에서 whole bytes/SHA256/ZIP CRC/모든 payload/source blob·mode·task tree가 PASS다. 두 C10의 native153/B1/deduplicated source161/vendor22·865 및 새 native32 원 tar도 PASS다. 실제 IDs·SHA·검증 근거는 [배송 receipt](DELIVERY_RECEIPT_CURRENT.json)에 있다.
+
+중단 후 작업 환경이 초기화돼 게시된 Git source와 동일한 Dropbox ZIP에서 자동 복원했다. ZIP을 다시 만들거나 과학 계산을 재실행하지 않았으며, 복원한 bytes와 네 provider payload를 검증했다.
+
+C8/C10은 이 source snapshot이다. 최종 metadata commit의 정확한 HEAD·tree·파일 수는 게시 뒤 별도 `REI_AGE_ENVELOPE_DELIVERY_CONFIRMATION_20261020_v9.json`에 기록하고, 그 정확한 UTF-8 delta를 적용해 복원한다. Confirmation 자신의 SHA와 provider IDs는 최종 사용자 인계 본문 등 외부 receipt를 따른다. 자기 자신의 hash를 내부에 넣지 않는다.
+
+Source729a의 실제 CI는 PR39464799828/push39464790281에서 root native cargo fmt FAILURE, workspace tests SKIPPED다. 최종 metadata commit CI는 post-commit confirmation의 실제 readback을 따른다. Scoped 과학 검증 PASS와 구분한다.

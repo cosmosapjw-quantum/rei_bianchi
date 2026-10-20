@@ -126,3 +126,13 @@ Intake HEAD93aca의 전체 PR/push CI도 실제 조회했다. PR run39415863199�
 이번 age32 실행·저장 자료 분석은 완료다. 즉시 추가할 native 실행은 발행하지 않는다. 다음 연구 노드는 `R_NATIVE_PATH_EXPOSURE_AND_RECONSTRUCTION_BRIDGE`이며, (i) time-varying native opacity를 덮는 exposure, (ii)32/64 source weight 대응, (iii)threshold crossing과 재구성의 관측량 전달을 명시해야 한다. 이것이 확보돼야 새 source representation 또는 연속 source 처리를 native에 적용할 수 있다. Native time8/16/32의 별도 representation HOLD는 유지한다.
 
 CURRENT5와 DAG는 이 상태를 반영한다. 게시·C8/C10 양쪽 백업·최종 confirmation의 실제 완료 상태는 [DELIVERY_RECEIPT_CURRENT.json](DELIVERY_RECEIPT_CURRENT.json)을 따른다. C10은 source snapshot이며 별도 confirmation의 정확한 UTF-8 delta를 적용하면 최종 배송 tree가 된다. 복원·download·unpack은 다음 assistant가 자동 수행하며 사용자에게 파일 이동·해제를 맡기지 않는다. PR199는 draft/open, no merge/no force-push, expected-head fast-forward만 사용한다.
+
+### V9 source와 백업 확정
+
+Source `729a12c5fdee8d05e77f26b396f0464c945351e1`, 실제 부모 `93aca4cc483080b802fa85c9c44e43b9c85db5b7`, source task tree `0cd25257f9e0fe4cfe1ce4ea6f34f2f65929fab7`, source 파일2,242개다. C8/C10의 Drive·Dropbox 네 전체 readback에서 whole bytes/SHA256/ZIP CRC/모든 payload/source blob·mode·task tree가 PASS다. 두 C10의 native153/B1/deduplicated source161/vendor22·865 및 새 native32 원 tar도 PASS다. 실제 IDs·SHA·검증 근거는 [배송 receipt](DELIVERY_RECEIPT_CURRENT.json)에 있다.
+
+중단 후 작업 환경이 초기화돼 게시된 Git source와 동일한 Dropbox ZIP에서 자동 복원했다. ZIP을 다시 만들거나 과학 계산을 재실행하지 않았으며, 복원한 bytes와 네 provider payload를 검증했다.
+
+C8/C10은 이 source snapshot이다. 최종 metadata commit의 정확한 HEAD·tree·파일 수는 게시 뒤 별도 `REI_AGE_ENVELOPE_DELIVERY_CONFIRMATION_20261020_v9.json`에 기록하고, 그 정확한 UTF-8 delta를 적용해 복원한다. Confirmation 자신의 SHA와 provider IDs는 최종 사용자 인계 본문 등 외부 receipt를 따른다. 자기 자신의 hash를 내부에 넣지 않는다.
+
+Source729a의 실제 CI는 PR39464799828/push39464790281에서 root native cargo fmt FAILURE, workspace tests SKIPPED다. 최종 metadata commit CI는 post-commit confirmation의 실제 readback을 따른다. Scoped 과학 검증 PASS와 구분한다.
