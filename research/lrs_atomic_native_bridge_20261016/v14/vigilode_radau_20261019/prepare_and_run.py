@@ -20,7 +20,7 @@ def capture(folder,argv,env=None,timeout=60,sources=()):
  folder.mkdir(parents=True,exist_ok=False)
  files=sorted(set(p for source in sources for p in source.rglob('*') if p.is_file() and not any(x in ('target','evidence','receipts','__pycache__') for x in p.relative_to(source).parts)))
  hashes={str(p):sha(p) for p in files}
- inputs={'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'argv':[str(x) for x in argv],'timeout_s':timeout,'source_sha256':hashes,'environment':{k:env[k] for k in ('CARGO_HOME','RUSTC') if env and k in env}}
+ inputs={'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'argv':[str(x) for x in argv],'timeout_s':timeout,'source_sha256':hashes,'environment':{k:env[k] for k in ('CARGO_HOME','RUSTC','CARGO_BUILD_JOBS') if env and k in env}}
  if Path(argv[0]).is_file():inputs['executable_sha256']=sha(argv[0])
  if files:
   with tarfile.open(folder/'sources.tar.gz','w:gz') as archive:
@@ -109,6 +109,11 @@ def run_cases(evidence,command_prefix,cases,env=None,sources=(),total_budget_s=1
  flush()
  return 1 if any(row['status']!='COMPLETED' for row in rows) else 0
 
+def positive_int(value):
+ result=int(value)
+ if result<1:raise argparse.ArgumentTypeError('must be a positive integer')
+ return result
+
 def main():
  p=argparse.ArgumentParser(description=__doc__)
  p.add_argument('--input-root',type=Path,default=ROOT.parents[1],help='Repository research/lrs_atomic_native_bridge_20261016 root')
@@ -118,8 +123,10 @@ def main():
  p.add_argument('--vigilode-archive',type=Path,help='Exact SHA-bound upstream tar.gz backup')
  p.add_argument('--native-eval',choices=('legacy','cell-cache','cell-borrowed'),default='legacy',help='Native evaluation implementation; default preserves legacy behavior')
  p.add_argument('--profile',action='store_true',help='Enable native evaluation profiling')
+ p.add_argument('--build-jobs',type=positive_int,default=1,help='Cargo build jobs; default1 preserves prior behavior')
+ p.add_argument('--run-focused-tests',action='store_true',help='Run the existing focused suite with --build-only or --case')
  p.add_argument('--cargo',default='cargo');p.add_argument('--cargo-home',type=Path);p.add_argument('--offline',action='store_true')
- action=p.add_mutually_exclusive_group();action.add_argument('--prepare-only',action='store_true');action.add_argument('--all',action='store_true');action.add_argument('--case',nargs=3,metavar=('MODE','METHOD','N'))
+ action=p.add_mutually_exclusive_group();action.add_argument('--prepare-only',action='store_true');action.add_argument('--build-only',action='store_true');action.add_argument('--all',action='store_true');action.add_argument('--case',nargs=3,metavar=('MODE','METHOD','N'))
  a=p.parse_args();out=a.output_root.resolve()
  if out.exists():raise RuntimeError('Refusing existing output workspace: '+str(out))
  if not a.ssprk_restore.is_file():raise RuntimeError('Missing committed SSPRK restore chain: '+str(a.ssprk_restore))
@@ -144,8 +151,8 @@ def main():
  write_json(evidence/'PREPARE_RECEIPT.json',prepared)
  print(json.dumps(prepared,indent=2))
  if a.prepare_only:return
- if not a.all and not a.case:raise RuntimeError('Preparation complete; choose --prepare-only, --case or --all explicitly')
- env=os.environ.copy();env['CARGO_BUILD_JOBS']='1'
+ if not a.all and not a.case and not a.build_only:raise RuntimeError('Preparation complete; choose --prepare-only, --build-only, --case or --all explicitly')
+ env=os.environ.copy();env.pop('CARGO_TARGET_DIR',None);env['CARGO_BUILD_JOBS']=str(a.build_jobs)
  if a.cargo_home:env['CARGO_HOME']=str(a.cargo_home.resolve())
  elif (ROOT/'backup/cargo_home').is_dir():env['CARGO_HOME']=str(ROOT/'backup/cargo_home')
  cargo_exe=invocation_path(a.cargo)
@@ -156,7 +163,11 @@ def main():
  fetch=[cargo_exe,'fetch','--locked','--manifest-path',adapter/'Cargo.toml']+(['--offline'] if a.offline else [])
  capture(evidence/'cargo_fetch',fetch,env,600)
  capture(evidence/'release_build',[cargo_exe,'build','--offline','--locked','--release','--manifest-path',adapter/'Cargo.toml'],env,1200,sources=(native,vigilode,adapter))
- if a.all:capture(evidence/'focused_tests',[cargo_exe,'test','--offline','--locked','--release','--manifest-path',adapter/'Cargo.toml','--lib','--test','focused','--','--test-threads=1','--nocapture'],env,600,sources=(native,vigilode,adapter))
+ if a.all or a.run_focused_tests:capture(evidence/'focused_tests',[cargo_exe,'test','--offline','--locked','--release','--manifest-path',adapter/'Cargo.toml','--lib','--test','focused','--','--test-threads=1','--nocapture'],env,600,sources=(native,vigilode,adapter))
+ if a.build_only:
+  binary=adapter/'target/release/rei-vigilode-radau-research'
+  receipt={'status':'BUILD_ONLY_COMPLETE','build_jobs':a.build_jobs,'focused_tests_executed':a.run_focused_tests,'binary_sha256':sha(binary),'scientific_cases':'NOT_RUN'}
+  write_json(evidence/'BUILD_ONLY_RECEIPT.json',receipt);print(json.dumps(receipt,indent=2));return
  binary=adapter/'target/release/rei-vigilode-radau-research';cases=[tuple(a.case)] if a.case else [(mode,method,str(n)) for mode,methods in [('fixed',{'radau':[2,4,8,16],'ssprk':[8,16,32]}),('birth',{'radau':[4,8,16],'ssprk':[4,8,16]}),('disabled',{'radau':[4,8,16],'ssprk':[4,8,16]})] for method,levels in methods.items() for n in levels]
  return run_cases(evidence,[binary],cases,env,sources=(native,vigilode,adapter),case_args=['--native-eval',a.native_eval]+(['--profile'] if a.profile else []))
 if __name__=='__main__':

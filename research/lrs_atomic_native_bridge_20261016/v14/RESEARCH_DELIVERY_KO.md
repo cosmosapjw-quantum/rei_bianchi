@@ -1,3 +1,24 @@
+# 현재 전달: 독립 이력 병렬 backlog — 2026-10-20
+
+V12 144이력·V13 84이력(cells32/tol1e-15)·SSPRK2의 원래3명령을 최대64core 자원 pool에서 처리하는 구현을 완료했다. 정상복원·variant별 target·표적시험·재개·정확한CSV병합·기계분석을 한 명령으로 수행한다. 새 native모델은0이다. 원본source/defaultlegacy/currentcell-cache/borrowed실험상태는 보존한다.
+
+로컬검증은 native23회(profile3/shard2/serial-parallel18), 원래21process tests와 후속build64표적1건PASS다. 독립Astra검토 및 같은episode의build64수정검토가PASS이고root는ACCEPTED_SCOPED다. 3-worker전체phase시간비중앙2.199360426은local관측이며 NCP64scaling/compile가속/RSS감소를 입증하지 않는다.
+
+새 전체backlog NCP는 NOT_RUN: 이 환경의 실제remotequota0/지정SSHkey부재다. 이미완료한 source524 NCP19·borrowedN2·원본V14 NCP84를 다시NOT_RUN으로 돌리지 않는다. 아래 오래된 인계는 각 작성 시점의 역사 기록이다.
+
+- [현재 연구 보고](vigilode_radau_20261019/parallel_campaign_20261020/RESEARCH_REPORT_KO.md)
+- [최종 상태와 source](vigilode_radau_20261019/parallel_campaign_20261020/FINAL_DELIVERY.json)
+- [64-core NCP 실행 인계](vigilode_radau_20261019/parallel_campaign_20261020/CODEX_NCP_EXECUTE_KO.md)
+- [다음 대화 prompt](vigilode_radau_20261019/parallel_campaign_20261020/NEXT_THREAD_PROMPT_KO.md)
+- [현재 DAG](vigilode_radau_20261019/parallel_campaign_20261020/DAG_FINAL.json)
+- [root 승인](vigilode_radau_20261019/parallel_campaign_20261020/ROOT_ADMISSION.json)
+
+실제 게시·양쪽 백업은 위 최종전달과 별도 FINAL_PUBLICATION_ACK.json의 관측 receipt로 판정한다. production은 NOT_ISSUED이며 기존 과학HOLD를 유지한다.
+
+---
+
+## 이전 전달 기록 — 원문 보존
+
 ## 현재 전달 상태 — 실제 게시와 archive·sidecar 양쪽 전체 읽기 검증 완료
 
 실제 stage1 commit은 **82364d3d2548a1e864468cb781336f825fc18c29**이며 원격 22파일의 전체 내용과 Git blob SHA가 모두 일치했다. 실행 source **5248822167e3fbe374f4333f7f2efdcdbfdaeeaf**와 과학 판정은 그대로다. 이 최종 metadata의 Git identity는 이를 담는 **ENCLOSING_COMMIT**이며, 아직 수행하지 않은 최종 ref 이동·원격 readback의 성공을 미리 주장하지 않는다.
