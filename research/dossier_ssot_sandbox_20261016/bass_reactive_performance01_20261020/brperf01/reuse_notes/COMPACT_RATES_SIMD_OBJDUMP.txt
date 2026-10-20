@@ -1,0 +1,283 @@
+
+/workspace/scratch/996fc62899da/brperf01/rates/target/release/examples/measure_rates:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+000000000002f210 <rei_brperf01_rates::CompactRateTable::rates_simd>:
+   2f210:	push   %r14
+   2f212:	push   %rbx
+   2f213:	sub    $0xc8,%rsp
+   2f21a:	mov    %rdi,%rbx
+   2f21d:	movq   %xmm0,%rax
+   2f222:	movabs $0x7fffffffffffffff,%rcx
+   2f22c:	and    %rax,%rcx
+   2f22f:	movabs $0x7fefffffffffffff,%rax
+   2f239:	cmp    %rax,%rcx
+   2f23c:	jle    2f255 <rei_brperf01_rates::CompactRateTable::rates_simd+0x45>
+   2f23e:	mov    %rbx,%rdi
+   2f241:	call   *0x44dd1(%rip)        # 74018 <_DYNAMIC+0x598>
+   2f247:	mov    %rbx,%rax
+   2f24a:	add    $0xc8,%rsp
+   2f251:	pop    %rbx
+   2f252:	pop    %r14
+   2f254:	ret
+   2f255:	ucomisd -0x25e05(%rip),%xmm0        # 9458 <anon.9dbee23b1ae6635d6caf5b602e475d4c.6.llvm.14298059603885549728+0x220>
+   2f25d:	jb     2f23e <rei_brperf01_rates::CompactRateTable::rates_simd+0x2e>
+   2f25f:	movsd  -0x25c9f(%rip),%xmm1        # 95c8 <anon.9dbee23b1ae6635d6caf5b602e475d4c.858.llvm.14298059603885549728+0x140>
+   2f267:	ucomisd %xmm0,%xmm1
+   2f26b:	jb     2f23e <rei_brperf01_rates::CompactRateTable::rates_simd+0x2e>
+   2f26d:	movaps %xmm0,0x70(%rsp)
+   2f272:	mov    %rsi,%r14
+   2f275:	call   *0x44dcd(%rip)        # 74048 <log@GLIBC_2.29>
+   2f27b:	mulsd  0x18(%r14),%xmm0
+   2f281:	movsd  %xmm0,(%rsp)
+   2f286:	call   *0x44dc4(%rip)        # 74050 <_DYNAMIC+0x5d0>
+   2f28c:	cvttsd2si %xmm0,%rcx
+   2f291:	mov    %rcx,%rdx
+   2f294:	sar    $0x3f,%rdx
+   2f298:	movapd %xmm0,%xmm1
+   2f29c:	subsd  -0x25e14(%rip),%xmm1        # 9490 <anon.9dbee23b1ae6635d6caf5b602e475d4c.858.llvm.14298059603885549728+0x8>
+   2f2a4:	cvttsd2si %xmm1,%rsi
+   2f2a9:	and    %rdx,%rsi
+   2f2ac:	or     %rcx,%rsi
+   2f2af:	xor    %ecx,%ecx
+   2f2b1:	xorpd  %xmm1,%xmm1
+   2f2b5:	ucomisd %xmm1,%xmm0
+   2f2b9:	cmovae %rsi,%rcx
+   2f2bd:	ucomisd -0x25fad(%rip),%xmm0        # 9318 <anon.9dbee23b1ae6635d6caf5b602e475d4c.6.llvm.14298059603885549728+0xe0>
+   2f2c5:	mov    $0xffffffffffffffff,%rdi
+   2f2cc:	cmovbe %rcx,%rdi
+   2f2d0:	mov    0x10(%r14),%rsi
+   2f2d4:	lea    -0x1(%rsi),%rcx
+   2f2d8:	cmp    %rdi,%rcx
+   2f2db:	cmovb  %rcx,%rdi
+   2f2df:	cmp    %rsi,%rdi
+   2f2e2:	jae    2f7ce <rei_brperf01_rates::CompactRateTable::rates_simd+0x5be>
+   2f2e8:	mov    0x8(%r14),%rax
+   2f2ec:	mov    %rdi,%rcx
+   2f2ef:	shl    $0x9,%rcx
+   2f2f3:	lea    (%rcx,%rdi,8),%rcx
+   2f2f7:	cmpb   $0x0,0x203(%rax,%rcx,1)
+   2f2ff:	movapd 0x70(%rsp),%xmm0
+   2f305:	jne    2f23e <rei_brperf01_rates::CompactRateTable::rates_simd+0x2e>
+   2f30b:	xorps  %xmm0,%xmm0
+   2f30e:	cvtsi2sd %rdi,%xmm0
+   2f313:	add    %rcx,%rax
+   2f316:	movsd  (%rsp),%xmm1
+   2f31b:	subsd  %xmm0,%xmm1
+   2f31f:	xorpd  %xmm0,%xmm0
+   2f323:	maxsd  %xmm1,%xmm0
+   2f327:	movsd  -0x25ed8(%rip),%xmm11        # 9458 <anon.9dbee23b1ae6635d6caf5b602e475d4c.6.llvm.14298059603885549728+0x220>
+   2f330:	movapd %xmm11,%xmm1
+   2f335:	minsd  %xmm0,%xmm1
+   2f339:	subsd  %xmm1,%xmm11
+   2f33e:	movapd %xmm11,%xmm0
+   2f343:	mulsd  %xmm11,%xmm0
+   2f348:	mulsd  %xmm11,%xmm0
+   2f34d:	movsd  -0x25e45(%rip),%xmm7        # 9510 <anon.9dbee23b1ae6635d6caf5b602e475d4c.858.llvm.14298059603885549728+0x88>
+   2f355:	mulsd  %xmm11,%xmm7
+   2f35a:	mulsd  %xmm7,%xmm11
+   2f35f:	mulsd  %xmm1,%xmm11
+   2f364:	mulsd  %xmm1,%xmm7
+   2f368:	mulsd  %xmm1,%xmm7
+   2f36c:	movapd %xmm1,%xmm2
+   2f370:	mulsd  %xmm1,%xmm2
+   2f374:	mulsd  %xmm1,%xmm2
+   2f378:	movapd %xmm0,%xmm14
+   2f37d:	unpcklpd %xmm0,%xmm14
+   2f382:	movapd %xmm11,%xmm9
+   2f387:	unpcklpd %xmm11,%xmm9
+   2f38c:	movapd %xmm7,%xmm13
+   2f391:	unpcklpd %xmm7,%xmm13
+   2f396:	movapd %xmm2,0xa0(%rsp)
+   2f39f:	movapd %xmm2,%xmm12
+   2f3a4:	unpcklpd %xmm2,%xmm12
+   2f3a9:	movupd 0x80(%rax),%xmm4
+   2f3b1:	movupd 0x90(%rax),%xmm6
+   2f3b9:	movupd 0x100(%rax),%xmm3
+   2f3c1:	movupd 0x110(%rax),%xmm2
+   2f3c9:	movupd 0x180(%rax),%xmm15
+   2f3d2:	movupd 0x190(%rax),%xmm10
+   2f3db:	movupd (%rax),%xmm1
+   2f3df:	movupd 0x10(%rax),%xmm8
+   2f3e5:	mulpd  %xmm14,%xmm1
+   2f3ea:	mulpd  %xmm9,%xmm4
+   2f3ef:	addpd  %xmm1,%xmm4
+   2f3f3:	movupd 0x20(%rax),%xmm5
+   2f3f8:	mulpd  %xmm14,%xmm8
+   2f3fd:	mulpd  %xmm9,%xmm6
+   2f402:	addpd  %xmm8,%xmm6
+   2f407:	movupd 0x30(%rax),%xmm1
+   2f40c:	mulpd  %xmm13,%xmm3
+   2f411:	addpd  %xmm4,%xmm3
+   2f415:	mulpd  %xmm13,%xmm2
+   2f41a:	addpd  %xmm6,%xmm2
+   2f41e:	mulpd  %xmm12,%xmm15
+   2f423:	addpd  %xmm3,%xmm15
+   2f428:	movapd %xmm15,0x80(%rsp)
+   2f432:	movapd %xmm12,0x90(%rsp)
+   2f43c:	mulpd  %xmm12,%xmm10
+   2f441:	addpd  %xmm2,%xmm10
+   2f446:	movupd 0xa0(%rax),%xmm2
+   2f44e:	mulpd  %xmm14,%xmm5
+   2f453:	mulpd  %xmm14,%xmm1
+   2f458:	movupd 0x40(%rax),%xmm3
+   2f45d:	movupd 0x50(%rax),%xmm8
+   2f463:	mulpd  %xmm14,%xmm3
+   2f468:	mulpd  %xmm14,%xmm8
+   2f46d:	movupd 0x60(%rax),%xmm6
+   2f472:	mulpd  %xmm14,%xmm6
+   2f477:	movupd 0xb0(%rax),%xmm12
+   2f480:	mulpd  %xmm9,%xmm2
+   2f485:	movapd %xmm2,0x20(%rsp)
+   2f48b:	mulpd  %xmm9,%xmm12
+   2f490:	movupd 0xc0(%rax),%xmm14
+   2f499:	mulpd  %xmm9,%xmm14
+   2f49e:	movupd 0xd0(%rax),%xmm4
+   2f4a6:	mulpd  %xmm9,%xmm4
+   2f4ab:	movupd 0xe0(%rax),%xmm15
+   2f4b4:	mulpd  %xmm9,%xmm15
+   2f4b9:	mulsd  0x70(%rax),%xmm0
+   2f4be:	mulsd  0xf0(%rax),%xmm11
+   2f4c7:	movzwl 0x200(%rax),%edx
+   2f4ce:	movzbl 0x202(%rax),%ecx
+   2f4d5:	shl    $0x10,%ecx
+   2f4d8:	or     %edx,%ecx
+   2f4da:	movups 0x120(%rax),%xmm2
+   2f4e1:	movaps %xmm2,0x30(%rsp)
+   2f4e6:	movups 0x130(%rax),%xmm2
+   2f4ed:	movaps %xmm2,0x40(%rsp)
+   2f4f2:	movups 0x140(%rax),%xmm2
+   2f4f9:	movaps %xmm2,0x50(%rsp)
+   2f4fe:	movups 0x150(%rax),%xmm2
+   2f505:	movaps %xmm2,(%rsp)
+   2f509:	movupd 0x160(%rax),%xmm2
+   2f511:	xorpd  %xmm9,%xmm9
+   2f516:	movsd  %xmm9,0x18(%rsp)
+   2f51d:	movapd %xmm10,0xb0(%rsp)
+   2f527:	test   $0x10000,%ecx
+   2f52d:	je     2f53f <rei_brperf01_rates::CompactRateTable::rates_simd+0x32f>
+   2f52f:	movsd  -0x26038(%rip),%xmm10        # 9500 <anon.9dbee23b1ae6635d6caf5b602e475d4c.858.llvm.14298059603885549728+0x78>
+   2f538:	movsd  %xmm10,0x18(%rsp)
+   2f53f:	movsd  %xmm10,0x68(%rsp)
+   2f546:	movupd 0x1e0(%rax),%xmm9
+   2f54f:	addpd  %xmm15,%xmm6
+   2f554:	mulpd  %xmm13,%xmm2
+   2f559:	movupd 0x1a0(%rax),%xmm10
+   2f562:	addpd  0x20(%rsp),%xmm5
+   2f568:	movups 0x1b0(%rax),%xmm15
+   2f570:	movaps %xmm15,0x20(%rsp)
+   2f576:	addpd  %xmm12,%xmm1
+   2f57b:	movapd 0x30(%rsp),%xmm12
+   2f582:	mulpd  %xmm13,%xmm12
+   2f587:	movapd %xmm12,0x30(%rsp)
+   2f58e:	movapd 0x40(%rsp),%xmm12
+   2f595:	mulpd  %xmm13,%xmm12
+   2f59a:	movapd %xmm12,0x40(%rsp)
+   2f5a1:	movupd 0x1c0(%rax),%xmm12
+   2f5aa:	addpd  %xmm14,%xmm3
+   2f5af:	movupd 0x1d0(%rax),%xmm14
+   2f5b8:	addpd  %xmm4,%xmm8
+   2f5bd:	movapd 0x50(%rsp),%xmm4
+   2f5c3:	mulpd  %xmm13,%xmm4
+   2f5c8:	movapd %xmm4,0x50(%rsp)
+   2f5ce:	movapd (%rsp),%xmm4
+   2f5d3:	mulpd  %xmm13,%xmm4
+   2f5d8:	movapd %xmm4,(%rsp)
+   2f5dd:	addsd  %xmm11,%xmm0
+   2f5e2:	mulsd  0x170(%rax),%xmm7
+   2f5ea:	movaps 0x80(%rsp),%xmm4
+   2f5f2:	movaps %xmm4,%xmm13
+   2f5f6:	unpckhpd %xmm4,%xmm13
+   2f5fb:	movsd  -0x26104(%rip),%xmm15        # 9500 <anon.9dbee23b1ae6635d6caf5b602e475d4c.858.llvm.14298059603885549728+0x78>
+   2f604:	movaps %xmm15,%xmm11
+   2f608:	test   $0x1,%dl
+   2f60b:	jne    2f615 <rei_brperf01_rates::CompactRateTable::rates_simd+0x405>
+   2f60d:	movaps %xmm4,%xmm11
+   2f611:	xorps  %xmm15,%xmm15
+   2f615:	addpd  %xmm2,%xmm6
+   2f619:	addpd  0x30(%rsp),%xmm5
+   2f61f:	addpd  0x40(%rsp),%xmm1
+   2f625:	addpd  0x50(%rsp),%xmm3
+   2f62b:	addpd  (%rsp),%xmm8
+   2f631:	movapd 0x90(%rsp),%xmm2
+   2f63a:	mulpd  %xmm2,%xmm9
+   2f63f:	mulpd  %xmm2,%xmm10
+   2f644:	movapd 0x20(%rsp),%xmm4
+   2f64a:	mulpd  %xmm2,%xmm4
+   2f64e:	mulpd  %xmm2,%xmm12
+   2f653:	mulpd  %xmm2,%xmm14
+   2f658:	addsd  %xmm7,%xmm0
+   2f65c:	movapd 0xa0(%rsp),%xmm2
+   2f665:	mulsd  0x1f0(%rax),%xmm2
+   2f66d:	test   $0x100,%ecx
+   2f673:	je     2f67e <rei_brperf01_rates::CompactRateTable::rates_simd+0x46e>
+   2f675:	movsd  -0x2617e(%rip),%xmm13        # 9500 <anon.9dbee23b1ae6635d6caf5b602e475d4c.858.llvm.14298059603885549728+0x78>
+   2f67e:	addpd  %xmm9,%xmm6
+   2f683:	addpd  %xmm10,%xmm5
+   2f688:	addpd  %xmm4,%xmm1
+   2f68c:	addpd  %xmm12,%xmm3
+   2f691:	addpd  %xmm14,%xmm8
+   2f696:	addsd  %xmm2,%xmm0
+   2f69a:	movapd -0x28082(%rip),%xmm2        # 7620 <anon.be753bdf5eb2b0f663bb175665dd23df.434.llvm.14392809115119258441+0x6ae>
+   2f6a2:	movapd 0x70(%rsp),%xmm9
+   2f6a9:	unpcklpd %xmm9,%xmm2
+   2f6ae:	movapd -0x27e36(%rip),%xmm4        # 7880 <anon.566e8472f54db27c7ffa65d7a5411555.32.llvm.6122657087698423557+0x250>
+   2f6b6:	movsd  %xmm9,%xmm4
+   2f6bb:	divpd  %xmm4,%xmm2
+   2f6bf:	xorpd  %xmm4,%xmm4
+   2f6c3:	je     2f6cd <rei_brperf01_rates::CompactRateTable::rates_simd+0x4bd>
+   2f6c5:	movsd  -0x261cd(%rip),%xmm4        # 9500 <anon.9dbee23b1ae6635d6caf5b602e475d4c.858.llvm.14298059603885549728+0x78>
+   2f6cd:	unpcklpd %xmm9,%xmm9
+   2f6d2:	movapd -0x27e2a(%rip),%xmm7        # 78b0 <anon.566e8472f54db27c7ffa65d7a5411555.32.llvm.6122657087698423557+0x280>
+   2f6da:	divpd  %xmm9,%xmm7
+   2f6df:	movsd  %xmm11,(%rbx)
+   2f6e4:	movsd  %xmm13,0x8(%rbx)
+   2f6ea:	movsd  0x68(%rsp),%xmm9
+   2f6f1:	movsd  %xmm9,0x10(%rbx)
+   2f6f7:	movapd 0xb0(%rsp),%xmm9
+   2f701:	shufpd $0x1,%xmm5,%xmm9
+   2f707:	movupd %xmm9,0x18(%rbx)
+   2f70d:	shufpd $0x1,%xmm1,%xmm5
+   2f712:	movupd %xmm5,0x28(%rbx)
+   2f717:	shufpd $0x1,%xmm3,%xmm1
+   2f71c:	movupd %xmm1,0x38(%rbx)
+   2f721:	movapd %xmm3,%xmm5
+   2f725:	shufpd $0x1,%xmm8,%xmm5
+   2f72b:	movupd %xmm5,0x48(%rbx)
+   2f730:	shufpd $0x1,%xmm6,%xmm8
+   2f736:	movupd %xmm8,0x58(%rbx)
+   2f73c:	movhpd %xmm6,0x70(%rbx)
+   2f741:	movsd  %xmm0,0x78(%rbx)
+   2f746:	movsd  %xmm15,0x80(%rbx)
+   2f74f:	movsd  %xmm4,0x88(%rbx)
+   2f757:	movsd  0x18(%rsp),%xmm0
+   2f75d:	movsd  %xmm0,0x90(%rbx)
+   2f765:	movapd -0x280fd(%rip),%xmm0        # 7670 <anon.566e8472f54db27c7ffa65d7a5411555.32.llvm.6122657087698423557+0x40>
+   2f76d:	cmpltpd %xmm7,%xmm0
+   2f772:	andpd  %xmm1,%xmm0
+   2f776:	movupd %xmm0,0x98(%rbx)
+   2f77e:	movsd  -0x26326(%rip),%xmm0        # 9460 <anon.9dbee23b1ae6635d6caf5b602e475d4c.6.llvm.14298059603885549728+0x228>
+   2f786:	cmpltsd %xmm2,%xmm0
+   2f78b:	cmplepd -0x27fa4(%rip),%xmm2        # 77f0 <anon.566e8472f54db27c7ffa65d7a5411555.32.llvm.6122657087698423557+0x1c0>
+   2f794:	shufpd $0x2,%xmm2,%xmm0
+   2f799:	pextrw $0x4,%xmm2,%eax
+   2f79e:	and    $0x1,%al
+   2f7a0:	xorpd  %xmm1,%xmm1
+   2f7a4:	jne    2f7ae <rei_brperf01_rates::CompactRateTable::rates_simd+0x59e>
+   2f7a6:	movapd %xmm6,%xmm1
+   2f7aa:	unpckhpd %xmm6,%xmm1
+   2f7ae:	unpckhpd %xmm6,%xmm3
+   2f7b2:	andpd  %xmm3,%xmm0
+   2f7b6:	movsd  %xmm1,0x68(%rbx)
+   2f7bb:	movupd %xmm0,0xa8(%rbx)
+   2f7c3:	mov    %al,0xb8(%rbx)
+   2f7c9:	jmp    2f247 <rei_brperf01_rates::CompactRateTable::rates_simd+0x37>
+   2f7ce:	lea    0x42af3(%rip),%rdx        # 722c8 <anon.c6dae2680c1b4c61e659035938dc81cc.25.llvm.10482802425340346554>
+   2f7d5:	call   *0x444f5(%rip)        # 73cd0 <_DYNAMIC+0x250>
+   2f7db:	int3
+   2f7dc:	int3
+   2f7dd:	int3
+   2f7de:	int3
+   2f7df:	int3

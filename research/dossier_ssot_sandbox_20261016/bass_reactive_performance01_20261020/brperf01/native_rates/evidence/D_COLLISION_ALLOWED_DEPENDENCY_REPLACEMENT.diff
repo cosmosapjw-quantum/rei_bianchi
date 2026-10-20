@@ -1,0 +1,115 @@
+--- immutable_parent/owner_src/deuterium_atomic.rs:d_atomic_rhs
++++ native_rates/src/collision.rs:collision_rhs
+@@ -1,34 +1,41 @@
+-pub fn d_atomic_rhs(
++pub(crate) fn collision_rhs(
+     provider: DAtomicProvider,
+     state: &IsotopeNumberState,
+     temperature_k: f64,
+     photo: &DPhotoInput,
+-    cx: DChargeExchange,
+-) -> Result<DAtomicRhs, DAtomicError> {
+-    if photo.chi_d_ev != provider.chi_d_ev || photo.threshold_source != provider.threshold_source {
+-        return Err(DAtomicError::PhotoThresholdMismatch);
++    h: &IgmRates,
++) -> Result<CollisionRhs, DAtomicError> {
++    if !temperature_k.is_finite() {
++        return Err(DAtomicError::NonFiniteInput);
+     }
+-    let rates = provider.rates(temperature_k)?;
++    if !(1.0..=1e6).contains(&temperature_k) {
++        return Err(DAtomicError::TemperatureDomain);
++    }
++    if photo.gamma_s() != 0.0 || photo.heat_j_per_absorber_s() != 0.0 {
++        return Err(DAtomicError::InvalidInput);
++    }
++    let rates = DAtomicRates {
++        temperature_k,
++        ci_m3_s: h.ci_cm3_s[0] * 1e-6,
++        rr_case_a_m3_s: h.rr_cm3_s[0] * 1e-6,
++        rr_kinetic_j_m3_s: h.rr_cooling_erg_cm3_s[0] * 1e-13,
++        ce_j_m3_s: h.ce_erg[0] * 1e-13,
++        ci_floor_m3_s: h.diagnostics.ci_floor_cm3_s[0] * 1e-6,
++        ce_cap_j_m3_s: h.diagnostics.ce_cap_erg[0] * 1e-13,
++        model_id: MODEL_ID,
++        source_commit: GRACKLE_COMMIT,
++    };
+     let moments = state.moments().map_err(|_| DAtomicError::Arithmetic)?;
+     let ne = moments.neutral_free_electron_density_m3;
+     let n = |species| state.density_m3(species);
+-    use IsotopeSpecies::{DIonized, DNeutral, H1Ionized, H1Neutral};
++    use IsotopeSpecies::{DIonized, DNeutral};
+     let (d0, dp) = (n(DNeutral), n(DIonized));
+-    let pi = product(&[d0, photo.gamma_s])?;
++    let pi = product(&[d0, photo.gamma_s()])?;
+     let ci = product(&[ne, d0, rates.ci_m3_s])?;
+     let rr = product(&[ne, dp, rates.rr_case_a_m3_s])?;
+-    let (cxf, cxr) = match cx {
+-        DChargeExchange::Disabled => (0.0, 0.0),
+-        DChargeExchange::Savin2002 => {
+-            let r = Savin2002::rates(temperature_k).map_err(DAtomicError::ChargeExchange)?;
+-            (
+-                product(&[r.forward_m3_s, d0, n(H1Ionized)])?,
+-                product(&[r.reverse_m3_s, dp, n(H1Neutral)])?,
+-            )
+-        }
+-    };
+-    let chi = provider.chi_d_ev * ev_j();
+-    let pi_heat = product(&[d0, photo.heat_j_per_absorber_s])?;
++    let (cxf, cxr) = (0.0, 0.0);
++    let chi = provider.chi_d_ev() * ev_j();
++    let pi_heat = product(&[d0, photo.heat_j_per_absorber_s()])?;
+     let pi_chemical = product(&[chi, pi])?;
+     let ci_chemical = product(&[chi, ci])?;
+     let rr_chemical_loss = product(&[chi, rr])?;
+@@ -41,7 +48,7 @@
+             thermal: pi_heat,
+             chemical: pi_chemical,
+             escape: 0.0,
+-            photon_input: product(&[d0, photo.energy_j_per_absorber_s])?,
++            photon_input: product(&[d0, photo.energy_j_per_absorber_s()])?,
+         },
+         DEnergyLedger {
+             thermal: -ci_chemical,
+@@ -80,13 +87,8 @@
+     let atomic_net = arithmetic(pi + ci - rr)?;
+     let cx_net = arithmetic(cxf - cxr)?;
+     let d_net = arithmetic(atomic_net + cx_net)?;
+-    let mut species_m3_s = [0.0; 13];
+-    species_m3_s[H1Neutral as usize] = cx_net;
+-    species_m3_s[H1Ionized as usize] = -cx_net;
+-    species_m3_s[DNeutral as usize] = -d_net;
+-    species_m3_s[DIonized as usize] = d_net;
+     let particles = arithmetic(moments.heavy_particle_density_m3 + ne)?;
+-    let temperature_k_s = if particles == 0.0 {
++    let _temperature_k_s = if particles == 0.0 {
+         0.0
+     } else {
+         arithmetic(
+@@ -95,22 +97,12 @@
+                 - temperature_k * atomic_net / particles,
+         )?
+     };
+-    Ok(DAtomicRhs {
+-        species_m3_s,
+-        electron_m3_s: atomic_net,
+-        photo_events_m3_s: pi,
++    let _ci_floor_events = product(&[ne, d0, rates.ci_floor_m3_s])?;
++    let _ce_cap_cooling = product(&[ne, d0, rates.ce_cap_j_m3_s])?;
++    Ok(CollisionRhs {
++        d_net,
+         ci_events_m3_s: ci,
+         rr_events_m3_s: rr,
+-        cx_forward_events_m3_s: cxf,
+-        cx_reverse_events_m3_s: cxr,
+-        channel_energy,
+         energy,
+-        ci_floor_events_m3_s: product(&[ne, d0, rates.ci_floor_m3_s])?,
+-        ce_cap_cooling_j_m3_s: product(&[ne, d0, rates.ce_cap_j_m3_s])?,
+-        electron_density_m3: ne,
+-        thermal_particle_density_m3: particles,
+-        temperature_k_s,
+-        rates,
+-        plasma: d_plasma_contributions(state),
+     })
+ }

@@ -1,0 +1,46 @@
+--- immutable_parent/src/midpoint_gas.rs:RHS
++++ native_rates/src/lib.rs:rhs_core
+@@ -25,7 +25,10 @@
+     }
+     Ok(())
+ }
+-pub fn rhs(s: &FullState, c: &NetworkConfig) -> Result<GasRhs, NetworkError> {
++fn rhs_core<F>(s: &FullState, c: &NetworkConfig, evaluator: &mut F) -> Result<GasRhs, NetworkError>
++where
++    F: FnMut(f64) -> Result<IgmRates, NetworkError>,
++{
+     contract(s, c)?;
+     let dt = 1.0; // Unit exposure for powers/event rates, never a finite-difference RHS.
+     let eos = s.gas.eos()?;
+@@ -43,22 +46,16 @@
+     let mut esc = 0.0;
+     let mut ff = 0.0;
+     let kbase = HHeModel::controlled_fixture().threshold_ev;
+-    let r = igm_rates(t).map_err(|_| NetworkError::TemperatureOutsideSource)?;
++    let r = evaluator(t)?;
+     if c.use_collisions {
+         // The original D RHS sees the entire mixture n_e; CX disabled here.
+         let no_d_photo = c
+             .deuterium
+             .photo_input_from_bound_rates(0.0, 0.0, c.photon_source)
+             .map_err(|_| NetworkError::SourceMismatch)?;
+-        let d = d_atomic_rhs(
+-            c.deuterium,
+-            &s.gas.nuclei,
+-            t,
+-            &no_d_photo,
+-            DChargeExchange::Disabled,
+-        )
+-        .map_err(|_| NetworkError::InputOutsideDomain)?;
+-        d_net = d.species_m3_s[S::DIonized as usize];
++        let d = collision::collision_rhs(c.deuterium, &s.gas.nuclei, t, &no_d_photo, &r)
++            .map_err(|_| NetworkError::InputOutsideDomain)?;
++        d_net = d.d_net;
+         d_ci = d.ci_events_m3_s;
+         d_rr = d.rr_events_m3_s;
+         let d_ledger = d.energy;
+@@ -217,3 +214,4 @@
+         budget_per_s: budget,
+     })
+ }
++
