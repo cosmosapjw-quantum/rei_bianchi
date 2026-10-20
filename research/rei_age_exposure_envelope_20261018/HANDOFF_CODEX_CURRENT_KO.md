@@ -1,25 +1,20 @@
-# Codex/NCP 인계 | 단일 age32 reference READY
+# Codex/NCP 인계 | v8 고정 모형 완료, native age32 READY
 
-## 2026-10-20 현재 재개점: 최적화 완료, 새 native age32는 별도 READY
+## 최신 v8 연구·코드 상태
 
-`optimization_20261020/`의 exact-arithmetic/cache/shared-oracle 최적화와 실제 측정을 재사용한다. Warm median baseline2 47.413 s, A2 10.461 s, B2 6.619 s, C2 3.532 s, C8(8 threads)1.560 s; scientific numeric bits는 동일하다. 원 입력·정확도·native B1은 바뀌지 않았다. 표준 최적 실행은 `optimization_20261020/run_optimized.py`이며 필요 없는 benchmark 재실행은 하지 않는다. 새 report/README/THEORY/BENCHMARK와 C9 receipt를 먼저 읽는다.
+기존 57,344 labels와 birth clocks 8/16/32/64에서 energy, HI/HeI/HeII photoevents, age moments, population별 normalized survivor age의 outward 경계를 구현·계산했다. Sensitive32−64 평균 age 차이는 `130812976009.628 s`, 선택 상한은 `135852646019.94653 s`다. 기존 전역 상한보다 `315380.621117배` 좁다. 전체32−64 차이는 `88822856290.8 s`, 상한은 `237111181117.59164 s`다. Passive32−64는 number 차이 0이지만 평균 age 차이 `-2058109991.46399 s`가 남는다.
 
-이번 baseline PR HEAD는 58dc257d1402daa3d0f64786279e13cd72bfb0c7/task1360944eb7e94743c1d5a668e7458f5b4f902d7a. v7 source는 354823050e6da98e64dde40596be061ce22e71f2/taskc583d426082fedc6ff67cce9644388e61573b492에 게시했고 실제 Git blob/mode를 확인했다. C8/C10의 Drive/Dropbox 네 upload와 네 whole-file readback은 PASS다. Source/native153/B1/vendor와 전체 payload를 확인했고 실제 provider IDs·SHA·receipt는 DELIVERY_RECEIPT_CURRENT.json과 evidence/delivery_v7_20261020/에 있다. 실제 source와 backup은 완료되었고 이 배송 기록의 identity는 자신을 담은 Git commit이다. Exact HEAD는 별도 post-commit v7 confirmation과 actual PR HEAD에서 확인한다. Confirmation 자체의 upload/readback은 별도 후속 단계다. CURRENT5 이전 원문은 optimization_20261020/baseline_current/에 보존했다.
+새 Rust fixtures10개와 Decimal100 독립 직접식 612개 aggregate checks가 PASS다. 실제 node 요청만 preload하도록 한 번 수정한 결과 scientific float bits는 모두 동일했고 unique exponentials는 346,945→34,625다. 수정 후 Rust subprocess wall은 13.421518592 s, Decimal wall은 12.855201847 s이며 누적 분석은 68.545581187/240 s다. 2 Rayon workers를 사용했다. 반복 benchmark나 전체 역사 suite를 새로 실행하지 않았다.
 
-현재 NCP는 DEVICE_LIST_SUCCEEDED; NCP_SSH_NOT_PROBED_THIS_TURN; NCP 과학 실행 NOT_RUN이다. 월 사용량 중지는 과거 receipt이며 현재 blocker가 아니다. 공식 Rust/cargo1.94.1 runtime과 22 locked vendor가 실제 작동한다. 재첨부192287020-byte installer SHA294b3d81fa72e62581276290c60c81eb8b58498d333d422ca1dfc432877d0c40는 추가 provenance이고 기존 공식 설치를 교체하지 않았다.
+`RESEARCH_UPDATE_20261020_OBSERVABLES_KO.md`, `observable_certificates_20261020/README.md`, `THEORY_KO.md`, `results/STUDY.json`, `results/DECIMAL_REFERENCE.json`, `results/NORMALIZED_MEAN_BOUNDS.csv`, `reviews/R6_RECEIPT.json`, `reviews/c9/C9_RECEIPT.json`와 CURRENT5를 먼저 읽는다. 이번 고정 모형 계산과 이전 v7 최적화는 완료됐으므로 재개만을 위해 반복하지 않는다. R6 PASS, C9 최종 판정 PASS(열린 지적 0개)다.
 
-아래 age32 사용자 파일 처리 없는 복사 프롬프트, 원 binary/runtime identities, 원 gate와 cap은 유지한다. Native age32 READY와 native age/time HOLD는 최적화로 해제되지 않는다. PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED.
+이번 baseline PR199 HEAD는 `cf00684741eb612e35f987713c28937513d44d57`(task tree `c5127608ba4e4344da45d685b9cd78aa3861cd13`)다. v8 source 게시·C8/C10 이중 백업·전체 readback은 아직 PENDING이다. 기존 v7 source/Drive·Dropbox 네 전체 readback 완료 기록은 `observable_certificates_20261020/baseline_current/DELIVERY_RECEIPT_CURRENT.json` 및 `evidence/delivery_v7_20261020/`에 보존했다. 이 문서의 준비 상태를 게시·업로드 완료로 해석하지 않는다.
 
-## v6 인계의 유지된 과학·실행 본문
+다음 native READY는 원래 단일 q0 age32/source8/n_mu8/transport16/time1, block-max/binary64, passive diagnostics ON, transport48, case/total cap1800 s다. 원 B1 binary·computational base·runtime binding과 rtol/atol·RK·source schedule·photon/energy1e-8를 유지한다. 사용자 수동 파일 복원 없는 복사 프롬프트는 `HANDOFF_CODEX_CURRENT_KO.md`에 있다. 완료 age64·spectral128·v7 benchmark·이번 고정 모형 계산은 반복하지 않는다. Native age/time HOLD, age64 source jumps MISSING_DATA, nonlinear response bound NOT_ESTABLISHED를 유지한다.
 
+현재 NCP device listing은 성공했으며 이번 unit에서 NCP SSH probe나 native RHS/trajectory 실행은 하지 않았다. 과거 월 사용량 중지는 역사 기록이다. Owner checkout, PR150/R9/LRS/BASS HHeD 보호, PR199 draft/no merge/no force-push를 유지한다. **PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED**.
 
-이번 intake HEAD는 `0ae749e9fdb179729c018706dbd59c4f61732b6a`다. 새 VigilODE 연구 source와 C8/C10 v6의 실제 배송 상태·commit·SHA는 `DELIVERY_RECEIPT_CURRENT.json`과 PR199 actual HEAD에서 확인한다. 기존 v5 배송 및 age64 결과는 보존한다. 이미 생긴 새 결과가 있으면 그대로 ingest한다.
-
-## 이번 로컬 연구도 완료됐다
-
-`vigilode_age_transport_20261019/`의 고정-opacity/native-derived 연구는 원래64 source/57,344 nodes, VigilODE affine original modules, exact-rational exp, locked22 dependencies, 4설정 및 독립 검산까지 완료했다. 전체 N32→64의 −0.815145%와 sensitive-node N의 약 −82.574593%를 구분한다. 이 모형은 원 nonlinear trajectory가 아니며 기존 native time HOLD를 해제하지 않는다. NCP에서 이 완료된 분석을 다시 돌릴 필요는 없다.
-
-수정한 Rust 코드의 컴파일만 필요할 경우 새 task runtime에서 bundled inputs/offline dependency를 사용할 수 있다. 실제 재분석 명령은 새 subtree README에 있으며 필요 없이 실행하지 않는다. 다음 과학 실행은 아래 age32 native reference 한 사례다.
+아래 원 age32 복사 프롬프트와 B1 identities·gates는 그대로 유지한다. 이전 v7 CURRENT5 원문은 `observable_certificates_20261020/baseline_current/`에 있다.
 
 ## 고정 기준과 완료 작업
 
@@ -113,7 +108,3 @@ PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED.
 단일 age32 결과가 기존 age64와 비교 가능해지는 것이 이번 목표다. age resolution의 finite-neighbor 차이, 출생 jump 저장 잔차, binding blocks를 분리해 보고한다. observer 추가 자체는 기존 age64를 다시 실행할 사유가 아니다. block-max의 성공만으로 RMS 희석 가설을 판정하지 않는다.
 
 현재 wrapper의 원본 time8-subnormal-count 모드는 과거 진단용이다. native count/energy representation이 HOLD인 상태에서 이 모드를 새 캠페인으로 실행하지 않는다.
-
-## v6 최종 배송 확인
-
-완료된 source snapshot은 `50bc41f6b6aea05f67c03ab3ad23bb118d574622`이며 C8/C10 v6의 양 provider 네 전체 readback이 완료되었다. 다음 시작에서는 별도 final confirmation과 PR199 actual HEAD를 먼저 읽고, 이미 완료된 고정 모형 계산·export를 반복하지 않는다. Immutable ZIP에는 생성 시점의 pending CURRENT가 남고, 이 최종 receipt가 이를 대체한다. Source CI의 기존 task 밖 formatting 실패와 skipped tests는 `SOURCE_CI_READBACK.json` 참조.
