@@ -116,3 +116,9 @@ R6 이론 검토는 PASS이며 문헌의 dimensionless 식에 weight를 곱하�
 Native age/time 정확도는 HOLD, 실제 nonlinear Grackle response bound는 NOT_ESTABLISHED다. 현재 고정 모형의 경계 결과와 별개의 의존성이다. Owner checkout, PR150/R9, LRS, BASS HHeD를 유지하고 PR199는 draft 상태에서 expected-head fast-forward 게시만 한다.
 
 **PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED.**
+
+## v8 실제 배송 완료
+
+v8 source는 `02767dc5e6c4b47883f590834aee38530852568d`에 게시했으며 2,152개 Git blob/mode, task tree `8fce099de816bdebb1dbd7bb22f87817ff50e9f5`, root/research의 다른 subtree 보존을 확인했다. C8/C10의 Drive·Dropbox 네 upload 및 서로 다른 네 전체 readback이 완료됐다. Whole bytes/SHA256/CRC/모든 manifest payload/source blob·mode/C10 전체 task tree/native153/B1/deduplicated source/vendor22·865 검증은 모두 PASS다. 실제 provider IDs·크기·SHA와 원 receipt는 `DELIVERY_RECEIPT_CURRENT.json`, `evidence/delivery_v8_20261020/`에 있다. Immutable ZIP에는 source 준비 시점의 pending CURRENT가 남고 이 완료 기록이 이를 대체한다. 이 배송 metadata의 identity는 자신을 담은 Git commit이며 exact HEAD와 UTF-8 restore delta는 별도 post-commit v8 confirmation에 기록한다. Confirmation 자체의 두 provider upload/readback은 별도 후속 단계다.
+
+Source push/PR workflow는 변경하지 않은 root native cargo fmt에서 실패했고 workspace tests는 skipped다. Full PR CI green은 아니며 새 scoped C9 PASS와 구분한다. 세부 근거는 `evidence/delivery_v8_20261020/SOURCE_CI_READBACK.json`에 있다.

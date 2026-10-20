@@ -8,7 +8,7 @@
 
 `RESEARCH_UPDATE_20261020_OBSERVABLES_KO.md`, `observable_certificates_20261020/README.md`, `THEORY_KO.md`, `results/STUDY.json`, `results/DECIMAL_REFERENCE.json`, `results/NORMALIZED_MEAN_BOUNDS.csv`, `reviews/R6_RECEIPT.json`, `reviews/c9/C9_RECEIPT.json`와 CURRENT5를 먼저 읽는다. 이번 고정 모형 계산과 이전 v7 최적화는 완료됐으므로 재개만을 위해 반복하지 않는다. R6 PASS, C9 최종 판정 PASS(열린 지적 0개)다.
 
-이번 baseline PR199 HEAD는 `cf00684741eb612e35f987713c28937513d44d57`(task tree `c5127608ba4e4344da45d685b9cd78aa3861cd13`)다. v8 source 게시·C8/C10 이중 백업·전체 readback은 아직 PENDING이다. 기존 v7 source/Drive·Dropbox 네 전체 readback 완료 기록은 `observable_certificates_20261020/baseline_current/DELIVERY_RECEIPT_CURRENT.json` 및 `evidence/delivery_v7_20261020/`에 보존했다. 이 문서의 준비 상태를 게시·업로드 완료로 해석하지 않는다.
+v8 source는 `02767dc5e6c4b47883f590834aee38530852568d`에 게시했으며 2,152개 Git blob/mode, task tree `8fce099de816bdebb1dbd7bb22f87817ff50e9f5`, root/research의 다른 subtree 보존을 확인했다. C8/C10의 Drive·Dropbox 네 upload 및 서로 다른 네 전체 readback이 완료됐다. Whole bytes/SHA256/CRC/모든 manifest payload/source blob·mode/C10 전체 task tree/native153/B1/deduplicated source/vendor22·865 검증은 모두 PASS다. 실제 provider IDs·크기·SHA와 원 receipt는 `DELIVERY_RECEIPT_CURRENT.json`, `evidence/delivery_v8_20261020/`에 있다. Immutable ZIP에는 source 준비 시점의 pending CURRENT가 남고 이 완료 기록이 이를 대체한다. 이 배송 metadata의 identity는 자신을 담은 Git commit이며 exact HEAD와 UTF-8 restore delta는 별도 post-commit v8 confirmation에 기록한다. Confirmation 자체의 두 provider upload/readback은 별도 후속 단계다.
 
 다음 native READY는 원래 단일 q0 age32/source8/n_mu8/transport16/time1, block-max/binary64, passive diagnostics ON, transport48, case/total cap1800 s다. 원 B1 binary·computational base·runtime binding과 rtol/atol·RK·source schedule·photon/energy1e-8를 유지한다. 사용자 수동 파일 복원 없는 복사 프롬프트는 `HANDOFF_CODEX_CURRENT_KO.md`에 있다. 완료 age64·spectral128·v7 benchmark·이번 고정 모형 계산은 반복하지 않는다. Native age/time HOLD, age64 source jumps MISSING_DATA, nonlinear response bound NOT_ESTABLISHED를 유지한다.
 
@@ -108,3 +108,7 @@ PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED.
 단일 age32 결과가 기존 age64와 비교 가능해지는 것이 이번 목표다. age resolution의 finite-neighbor 차이, 출생 jump 저장 잔차, binding blocks를 분리해 보고한다. observer 추가 자체는 기존 age64를 다시 실행할 사유가 아니다. block-max의 성공만으로 RMS 희석 가설을 판정하지 않는다.
 
 현재 wrapper의 원본 time8-subnormal-count 모드는 과거 진단용이다. native count/energy representation이 HOLD인 상태에서 이 모드를 새 캠페인으로 실행하지 않는다.
+
+## Source CI 실제 상태
+
+Source commit의 push/PR 두 workflow는 기존 root `rust/rei_microphysics` cargo fmt에서 실패했고 workspace test는 skipped였다. 해당 root Rust와 `.github` tree는 baseline과 같다. Scoped10 fixture/Decimal/C9 PASS와 별개이며 full PR CI green은 아니다. 실제 run/job/log readback은 `evidence/delivery_v8_20261020/SOURCE_CI_READBACK.json`에 있다.
