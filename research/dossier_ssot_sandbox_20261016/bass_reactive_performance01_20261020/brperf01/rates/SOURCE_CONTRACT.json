@@ -1,0 +1,59 @@
+{
+  "unit": "BRPERF01_COMPACT_IGM_RATES",
+  "implementation_scope": "Additive temperature-coefficient receiver; immutable original H/He/D physical owner remains baseline.",
+  "parent_owner_sha256": {
+    "igm_rates.rs": "310164e620617f3089d488bd1f9668996b4a4cbd191383e45303def176ef81cf",
+    "rate_table.rs": "334e0da513b07ae78e8bbc669ac09b7c74dd9abec3c48934cbc94442c0cef8a6"
+  },
+  "compiled_source_digest": "d087c829f4aaea6bce155ce2da14c5854b404ca25175711003190fb7fd4d10e3",
+  "domain_temperature_k": [
+    1.0,
+    1000000.0
+  ],
+  "interpolation": "Uniform lnT coefficient-space harmonic PCHIP evaluated as nonnegative Bernstein sum",
+  "default_backend": "Direct",
+  "recommended_opt_in": "CompactScalar8193",
+  "maximum_advertised_scope": "sampled coefficient error below1e-4; actual gas history validation reported separately by integration unit",
+  "dependencies": {
+    "wide": {
+      "version": "1.7.1",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "application": "Safe f64x4 coefficients; 15channels+1padding; no unsafe block, no fast math/FMA."
+    },
+    "sha2": {
+      "version": "0.10.9",
+      "license": "MIT OR Apache-2.0",
+      "application": "Compiled immutable source and serialized-table integrity digest."
+    }
+  },
+  "original_source_pin": "grackle-project/grackle af7939494ce65007887ada7b98d1813df6843346",
+  "source_channels": [
+    "HI CI cm^3/s",
+    "HeI CI cm^3/s",
+    "HeII CI cm^3/s",
+    "HII RR cm^3/s",
+    "HeII RR cm^3/s",
+    "HeIII RR cm^3/s",
+    "HeII DR cm^3/s",
+    "HI CE erg cm^3/s",
+    "metastable HeI CE erg cm^6/s",
+    "HeII CE erg cm^3/s",
+    "HII RR cooling erg cm^3/s",
+    "HeII RR cooling erg cm^3/s",
+    "HeIII RR cooling erg cm^3/s",
+    "DR raw cooling erg cm^3/s",
+    "free-free erg cm^3/s"
+  ],
+  "excluded_owners": [
+    "electron/ion density products",
+    "population update",
+    "charge exchange kinetics",
+    "geometry",
+    "radiation",
+    "CMB bath",
+    "four-corner timestep control",
+    "thermal/chemical/geometry ledger"
+  ],
+  "out_of_domain_policy": "Call immutable direct owner and preserve its rejection; no clamp or extrapolation.",
+  "direct_fallback_policy": "Endpoints, branch/floor-mask transition cells expanded by two neighbor cells; nonfinite/negative/subnormal controls also block interpolation."
+}
