@@ -1,0 +1,51 @@
+{
+  "schema": "rei.d9.literature_and_cas.v1",
+  "skill_context": {
+    "package_read": "c39/physmath-research-loop",
+    "version": "1.3.0",
+    "current_equivalent_package": "e44/skills/physmath-research-loop",
+    "selected_scope": "New bounded D9 unit after actual newer D8 recovery; no automatic D10 execution"
+  },
+  "tools_used": {
+    "exa": "actual web_search_exa call; 5 results",
+    "scispace": "actual natural-language search_papers call; 10 results including duplicates and excluded incompatible modified-gravity papers",
+    "wolfram": "actual WolframLanguageEvaluator symbolic substitutions"
+  },
+  "primary_sources": [
+    {
+      "url": "https://arxiv.org/pdf/gr-qc/9505017",
+      "author": "Alan D. Rendall",
+      "title": "The initial singularity in solutions of the Einstein-Vlasov system of Bianchi type I",
+      "formula_location": "Sec.2 Eqs.(2.1)-(2.14)",
+      "reused": "Einstein extrinsic-curvature equations, Vlasov moments, diagonal reflection/LRS convention",
+      "adapter": "H_paper=trace(k)=-3 H_here in expanding proper time; c=G=1 in paper restored to K=8 pi G/c^2 for energy density",
+      "not_transferred": "compact-support assumptions and asymptotic theorems to finite-z mixed+Lambda pilot"
+    },
+    {
+      "url": "https://arxiv.org/abs/1911.04937",
+      "authors": "Ho Lee, Ernesto Nungesser, Paul Tod",
+      "version": "v2, 2020-02-05",
+      "reused": "massless small-anisotropy source-context only",
+      "not_transferred": "late-time decay theorem as certificate for present massive+massless+Lambda pilot"
+    },
+    {
+      "url": "https://docs.scipy.org/doc/scipy-1.17.0/reference/generated/scipy.integrate.cumulative_simpson.html",
+      "version_used": "SciPy1.17.0",
+      "reused": "Array-axis cumulative integration of stored samples; actual monotone x spacing and initial=0",
+      "scope": "sampled-data quadrature, no rigorous trajectory error certification"
+    }
+  ],
+  "derived": {
+    "proper_time": "d(a^3*s)/dt=K*a^3*(p_m+p_r)",
+    "x_identity": "d(M*S_F)/dx=M*(P_m+P_r), M=(a/a_i)^3*H/H_i",
+    "interpretation": "Additive accounting on each solved coupled trajectory; not superposition across altered initial data"
+  },
+  "wolfram_actual_response": [
+    "Out[1]= <|\"x_identity_residual\" -> 0, \"proper_time_identity_residual\" -> 0, \"crossing_x_slope\" -> pm0 + pr0, \"crossing_z_slope\" -> (-pm0 - pr0)/(1 + z0)|>"
+  ],
+  "code_reuse_decision": {
+    "scipy": "adopted existing cumulative_simpson; no copied/vendor implementation",
+    "PR215": "Warm96x32 reflected96x16 kernel not a drop-in canonical24x12Gauss3 adapter; preserve separate provenance",
+    "VigilODE": "New source5fd6e459a3f67cee90e002821b9b4b740c47475b and resultsfbbc832fdf942396155c12b04c30e63dc67fefe9 inspected; broad production HOLD; no solver replacement"
+  }
+}

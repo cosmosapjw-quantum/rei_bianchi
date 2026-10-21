@@ -1,3 +1,21 @@
+# Current continuation: D8 complete, D9 scoped PASS, D10 ready but not run
+
+This section updates the historical status preserved below. D8's four accepted adjacent stored-sample brackets were already complete and were reused without a D8 rerun. D9_COMPONENT_SHEAR_BUDGET is scientifically complete with the controller's **PASS_SCOPED_D9**, supported by its frozen identity derivation, 175 nominal stored histories ×153 epochs, 35 exact references, four meaningful software controls and one independent complementary review whose three findings are closed.
+
+D9 created **0 new IVPs, 0 ODE callbacks and 0 momentum-moment recomputations**. Maximum sampled scaled residual is 1.473444875767401e-6, below the fixed 2e-5 diagnostic. All four accepted D8 brackets retain reconstructed signs and satisfy the local 0.1 residual ratio requirement; maximum observed ratio is 2.022140048467199e-5. These are sampled-data consistency results, not a convergence certificate, continuous-root estimate or trajectory-superposition theorem.
+
+Final D9 source/result publication is **PENDING_FINAL** and final backup is **PENDING_FINAL** at this assembled snapshot. Phase-1 source checkpoint `cf2dfcad80960726283c641ba781e0bb166fc041` and its dual-provider complete readback are actual completed evidence; their receipts are under `D9_COMPONENT_SHEAR_BUDGET/preservation/phase1/`. This final source snapshot does not claim its own future commit or future provider acknowledgement. Read the later D9_DELIVERY_ACK and external post-publication receipts for those outcomes.
+
+The next single node is **D10_ZERO_INITIAL_MATTER_STRESS_GENERATION**, status **READY_FOR_THEORY_AND_SAVED_DATA_INTAKE_NOT_RUN**, depending on D9. Begin with an exact LRS pressure-moment derivation and existing 35 zero-initial-matter histories; initial new-IVP allowance is **0**. D10 has not been executed here. Completed pilot/AGE/PR198/D8/D9 campaigns must not be replayed.
+
+D9's portable NCP input is included, with a python3 wrapper and externally bound compact-input identity; actual D9 NCP execution is **NOT_RUN**. PR215 NCP evidence remains a separate physical lane. PR198 scoped PASS, AGE convergence HOLD, Grackle bound NOT_ESTABLISHED, production admission NOT_ISSUED and V12 restrictions remain unchanged.
+
+Current scientific report, code, input identities and handoffs: `D9_COMPONENT_SHEAR_BUDGET/`. Current code guide and next-thread prompt are also copied to the central handoff paths with this context.
+
+---
+
+# Historical status snapshot retained verbatim
+
 # REI 통합 상태 — 2026-10-21
 
 ## 현재 결론

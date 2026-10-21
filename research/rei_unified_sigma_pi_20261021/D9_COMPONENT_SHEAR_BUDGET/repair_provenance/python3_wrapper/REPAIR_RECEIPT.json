@@ -1,0 +1,49 @@
+{
+  "schema": "rei.d9.python3_wrapper_repair.v1",
+  "scope": "Existing bounded repair episode; portability only; core scientific source unchanged",
+  "observed_reason": {
+    "attempt": 1,
+    "command": "python",
+    "exit_code": 127,
+    "error": "python: command not found",
+    "recovery": "existing /usr/bin/python3; no install"
+  },
+  "reason_receipt_path": "../intake_remote/PR215_NCP.json",
+  "reason_receipt_sha256": "6795a0361d037c485fe55696d7048fd687dcbac92e80f836b407bef84cce87e6",
+  "prior_wrapper_sha256": "eac66741b00bbaf92a7e6e9afb134e1ae41973c3bade35986ec19edb8e1d5c77",
+  "new_wrapper_sha256": "f3414f13502193ca0926d87cd548e202a6249801a53a8ee11696bd6ca5ffbcad",
+  "prior_readme_sha256": "0ef05a6903307559763272e2578cafe9bd250b63ae8725d0120cc87ad6f16988",
+  "new_readme_sha256": "b0148f4df8ce0b402a5f740bda98a1f24f78fc0f86f0bf0351467db778c6d1d5",
+  "changes": [
+    "Default interpreter python3",
+    "Optional D9_PYTHON names one executable path",
+    "Explicit command existence check exits69 with clear error",
+    "Future portable CLI/control instructions use python3; actual recorded production argv preserved"
+  ],
+  "validation": [
+    {
+      "command": "bash -n run_ncp.sh",
+      "exit": 0
+    },
+    {
+      "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 timeout 120s python3 -B analyze_d9.py --help",
+      "exit": 0,
+      "stdout": "PYTHON3_HELP.stdout",
+      "stderr": "PYTHON3_HELP.stderr"
+    },
+    {
+      "command": "D9_PYTHON=/nonexistent/d9_python_interpreter bash run_ncp.sh /tmp/d9_wrapper_existence_probe_no_output",
+      "exit": 69,
+      "expected_exit": 69,
+      "output_directory_created": false,
+      "stdout": "MISSING_INTERPRETER.stdout",
+      "stderr": "MISSING_INTERPRETER.stderr"
+    }
+  ],
+  "analysis_source_sha256_unchanged": "ac053652ee74a4e12741b9d201b21c9adef33d80ec802ee1d30cb468ebc24850",
+  "production175_analysis_repeated": false,
+  "new_ivps": 0,
+  "ode_calls": 0,
+  "moment_recomputations": 0,
+  "actual_NCP_execution": "NOT_RUN"
+}

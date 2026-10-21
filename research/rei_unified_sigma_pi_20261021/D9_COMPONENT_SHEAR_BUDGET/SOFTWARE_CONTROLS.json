@@ -1,0 +1,47 @@
+{
+  "schema": "rei.d9.software_controls.v1",
+  "controls": [
+    {
+      "name": "nonuniform quadratic weighted primitive",
+      "status": "PASS",
+      "receipt": "UNIT_TEST.stderr"
+    },
+    {
+      "name": "source-free decay with nonconstant M",
+      "status": "PASS_TARGETED_REPAIR",
+      "receipt": "TARGETED_DECAY_REPAIR.stderr"
+    },
+    {
+      "name": "opposite source cancellation",
+      "status": "PASS",
+      "receipt": "UNIT_TEST.stderr"
+    },
+    {
+      "name": "nonmonotone grid rejected",
+      "status": "PASS",
+      "receipt": "UNIT_TEST.stderr"
+    }
+  ],
+  "initial_defect": {
+    "description": "Missing broadcast source axis",
+    "receipt": "UNIT_TEST.initial_broadcast_failure.stderr",
+    "before_production": true,
+    "repair": "M[...,None,:] weights cases and species explicitly"
+  },
+  "reviewer_control_repair": {
+    "description": "Source-free geometry originally M=1; strengthened H to2exp(-1.5x)",
+    "changed_test_only": true,
+    "targeted_test_command": "timeout 120s python -B -m unittest -v test_d9.BudgetControls.test_source_free_decay_and_broadcast",
+    "reported_test_call_seconds": 0.001
+  },
+  "full_control_command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 timeout 120s python -B -m unittest -v test_d9.py",
+  "full_control_reported_test_call_seconds": 0.003,
+  "wrapper_syntax_command": "bash -n run_ncp.sh",
+  "wrapper_syntax_exit": 0,
+  "NCP_execution": "NOT_RUN",
+  "production_analysis_repeated": false,
+  "production_source_sha256": "4724e57cdc786b7c00a5392c78ac12c8c8eca1b989e8f71227009041a7bb8481",
+  "current_source_sha256": "ac053652ee74a4e12741b9d201b21c9adef33d80ec802ee1d30cb468ebc24850",
+  "portable_python3_repair_receipt": "repair_provenance/python3_wrapper/REPAIR_RECEIPT.json",
+  "wrapper_sha256": "f3414f13502193ca0926d87cd548e202a6249801a53a8ee11696bd6ca5ffbcad"
+}

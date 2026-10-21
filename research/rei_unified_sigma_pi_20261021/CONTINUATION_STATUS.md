@@ -1,36 +1,23 @@
-# D9 continuation checkpoint — phase 1
+# D9 final source/result continuation snapshot
 
-This checkpoint records completed intake and the frozen next research unit. D9_COMPONENT_SHEAR_BUDGET is in progress; its execution, verification, scientific decision, publication and backup remain pending at this checkpoint snapshot.
+Assembled UTC: 2026-10-21T14:01:04.275472+00:00. Expected publication base: `ca705c496c59c95e4a26f7092f03556280b57b24`; the controller checks the current remote HEAD separately. This assembler performed no external mutation and created no final archive.
 
-## Observed intake identities
+## Scientific result and decision
 
-Intake snapshot: 2026-10-21 13:24 UTC. Publication staging is additive against frozen PR199 base `eb8042b729051f4700bd5d88d6781c4620009bcb`, requiring expected-head fast-forward. The historical `source_heads` in UNIFIED_DAG.json retain their original meaning and values.
+D8 was already complete and is not rerun. D9_COMPONENT_SHEAR_BUDGET is complete with ROOT_SCIENTIFIC_DECISION.json verdict **PASS_SCOPED_D9**. One production computation used 175 nominal existing histories, 153 saved epochs each and 35 exact references. New IVPs, ODE callbacks and moment recomputations are all **0**. The observed maximum scaled sampled residual is **1.473444875767401e-6**, below the frozen **2e-5** threshold. All four immutable accepted D8 brackets pass the budget interpretation checks; largest local abs(R)/abs(Q) is **2.022140048467199e-5**, below **0.1**.
 
-| Source | Observed head |
-|---|---|
-| PR198 | `8bd35af5f11c7ea5945b656be1c013d1c1933498` |
-| PR199 | `eb8042b729051f4700bd5d88d6781c4620009bcb` |
-| PR213 | `d32cd99fa19c65aa1ca63dbc8aab8741834270e8` |
-| PR214 | `98fcf3943fa54e089b0292d166c3a47becb5edb8` |
-| PR215 | `926bae816ef8339137e2813cc40f1d514b763e1f` |
-| PR216 | `1f32cc442ebde284bbb944455ba96066c9e0e055` |
-| BASS178 | `215bb3e66d81a7013d2132831d210aee36234ab4` |
-| BASS_HE83 | `e173f373cd481864d0395e3a7a76520615a80e1a` |
-| VigilODE_source | `5fd6e459a3f67cee90e002821b9b4b740c47475b` |
-| VigilODE_results | `fbbc832fdf942396155c12b04c30e63dc67fefe9` |
+The exact integrating-factor identity, literature/CAS evidence, actual controls, preserved failed-worker distinctions, compact exact-array relation, source versions and actual figures are included. The independent review is **PASS_SCOPED_D9**, one complementary pass with all three findings closed. These results concern additive accounting on each solved coupled trajectory and sampled quadrature only. Continuous roots, universal counterfactual superposition and rigorous global convergence are not asserted.
 
-## Reused completion and next work
+## Publication and preservation
 
-D8 is complete with verified existing raw identities, published result `a3cb0606341688affb6aea29990e960e53188d32`, scoped independent PASS, and recorded dual-provider full-readback evidence. Its four adjacent stored-sample brackets are reused; no D8 rerun is pending. The central DAG status was corrected from stale `ready_not_run` to `complete` and D8 was removed from `next_ready`.
+The controller observed a direct-child concurrent advance from phase-1 commit `cf2dfcad80960726283c641ba781e0bb166fc041` to `ca705c496c59c95e4a26f7092f03556280b57b24`. Its actual comparison contains five additive D8 reconciliation files outside this D9 owner prefix, with no changed existing numerical/configuration/bracket/raw-identity fields and no D9/central conflict. Build on the new base tree `bb07b5c7b858fd27e228e0aa6dea5e904ce6119f` to preserve those files; no D8 replay or new validation is needed. The exact comparison receipt is `D9_COMPONENT_SHEAR_BUDGET/CONCURRENT_HEAD_RECONCILIATION.json`.
 
-D9 follows D8. Its frozen contract analyzes weighted component stress integrals on 175 existing nominal saved trajectories, with 0 new IVPs and no ODE callbacks or momentum-moment recomputation. No D9 result or scientific admission is claimed by this checkpoint.
+Final source/results publication: **PENDING_FINAL**. Final backup/archive: **PENDING_FINAL**, deliberately not packed until the controller obtains the actual source publication/readback receipt. Phase-1 publication `cf2dfcad80960726283c641ba781e0bb166fc041` and dual complete provider readback are already verified in `D9_COMPONENT_SHEAR_BUDGET/preservation/phase1/`; their immutable archive is referenced, not replicated.
 
-## Actual runtime and execution boundary
+The full D9 portable NPZ view and identity are in `D9_COMPONENT_SHEAR_BUDGET/results/portable_input/`. The wrapper defaults to python3, permits an explicit executable override, uses one inner thread and a finite timeout, and requires a new output directory. Actual D9 NCP execution remains **NOT_RUN**. The staged source is a restored payload rather than a local Git checkout; owner checkout state was not changed.
 
-The local runtime probe actually ran Python (NumPy/SciPy calculation) and compiled and executed C++; results were PYTHON_PASS and CPP_PASS. The current workstream did not observe live NCP access or resources and did not dispatch NCP execution. PR215's newer warm-kernel NCP receipt is an existing result from a separate physical lane, not D9 execution or current live-machine availability evidence.
+## Next node
 
-## Preservation and publication state
+**D10_ZERO_INITIAL_MATTER_STRESS_GENERATION** is **READY_FOR_THEORY_AND_SAVED_DATA_INTAKE_NOT_RUN**, depends on D9, and initially permits **0 new IVPs**. Freeze that node's analytic and saved-data contract before working. No D10 calculation or new review cycle is implied by this completion.
 
-This phase is locally staged for controller review. Git commit/push and provider upload/readback are PENDING. LOCAL_BACKUP_RECEIPT.json reports local archive verification only; upload acknowledgements and restoration verification must be recorded from actual later provider responses. No external mutation was performed by the checkpoint assembler.
-
-PR198 remains PASS_SCOPED_PRELIMINARY; AGE convergence remains HOLD; nonlinear Grackle response bound remains NOT_ESTABLISHED; production scientific admission remains NOT_ISSUED; V12 restrictions remain unchanged.
+PR198 scoped PASS, AGE convergence HOLD, Grackle bound NOT_ESTABLISHED, production scientific admission NOT_ISSUED and V12 restrictions remain unchanged. See central CODEX_HANDOFF.md/NEXT_THREAD_HANDOFF.md and the D9-local originals for exact continuation instructions.
