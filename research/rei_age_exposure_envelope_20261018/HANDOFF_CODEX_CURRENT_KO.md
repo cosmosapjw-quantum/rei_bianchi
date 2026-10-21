@@ -85,3 +85,5 @@ C8/C10은 위 소스 snapshot을 고정한다. 최종 delivery metadata commit�
 [RESEARCH_UPDATE_20261021_NATIVE_TIME_CAMPAIGN_KO.md](RESEARCH_UPDATE_20261021_NATIVE_TIME_CAMPAIGN_KO.md)에 실행 ID, 원자료, 분석, 자원, claim ceiling 및 provider 반환 상태를 기록했다. time8·time16·time32는 원 validator를 통과했으나 원 0.005 finite-neighbor 목표에 도달하지 못했다. Native age/time convergence HOLD, nonlinear response bound NOT_ESTABLISHED, production scientific admission NOT_ISSUED. Evidence: `native_optimization_20261021/evidence/ncp_time_campaign_20261021/`.
 
 독립 Astra-tier read-only 검토는 factual report/DAG publication에 `PASS_SCOPED_FACTUAL_PUBLICATION`을 반환했다. 검토는 native convergence나 production admission을 부여하지 않는다.
+
+결과/DAG는 PR199 branch commit `349aeef40bc27fe922d1e3afe77ae6747a408c6a`에 게시했고, 결과 bundle Drive·Dropbox 양쪽 전체 readback SHA256 `3fde54fdfbdccc3cb0e6991209fe156f3535f44e6c0ad0f1582ea9adbb999c06` PASS. 저장 ID/경로 및 ACK는 DELIVERY_RECEIPT_CURRENT.json과 evidence/BACKUP_READBACK_ACK.json 참고. 최신 PR CI는 root cargo fmt 실패, workspace tests skipped.
