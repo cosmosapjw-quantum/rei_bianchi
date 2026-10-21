@@ -89,3 +89,8 @@ Resume는 matching new model/contract/parent6 files/reference-table/config/case 
 `run_ncp.sh`는 source가 기존 checkout에 정상 전달된 뒤 **새606만** finite cap64/900s/3600s로 실행하고 성공 후 NCP-labeled plots를 만든다. Parent Python source/vendor와 이 디렉터리의 `reference_controls.json`, `old_representative_histories.csv`가 필요하다. 두 table에 참조 endpoint와 representative historical samples가 들어 있어 **전체 기존625 raw NPZ를 NCP에 복사할 필요가 없다.** NCP 실행 자체는 하지 않았다. Source-level cap64 지원은 actual64-core execution이나 speedup 증거가 아니다.
 
 독립 review와 response-fit addendum은 PASS_SCOPED_PRELIMINARY로 완료되었고 numerical gate는 닫혔다. Source/validation checkpoint는 `34f93a48778a2d8a36b058e33de5302732752bae`에 게시되었다. Final delivery metadata, canonical DAG, 후속 게시와 backup은 root controller가 마무리한다. 실행 당시 `run.json`/`summary.json`에 저장된 PENDING_INDEPENDENT_REVIEW는 그 시점의 historical status이며 실행 증거를 다시 쓰지 않는다. 이 판정은 production admission, native H/He, non-LRS/general-Bianchi closure, full distribution/quadrature convergence를 의미하지 않는다.
+
+
+## Final publication and full backup
+
+Reviewed source/results: `b140170ce0c58159368b6b81be49ac35ca764851`. Complete dual full-readback evidence, source identity and the latest containing delivery commit are linked by `FINAL_DELIVERY.json`, `FINAL_BACKUP_ACK.json` and `SOURCE_DELTA.json`. The full archive contains this extension and all original pilot raw data; no older base archive is required to restore this pilot subtree. Workspace cargo fmt fails/tests skip remain separate from the Python results. Use `CODEX_NCP_EXECUTE_KO.md` and `NEXT_THREAD_PROMPT_KO.md` for continuation.
