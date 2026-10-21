@@ -10,3 +10,12 @@ Observed run links:
 - https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/39624118987
 
 Final commit status should be re-read at delivery; no conclusion is inferred for an unobserved later workflow run.
+
+## Scientific delivery S observation
+
+Source S2fd46785ef2e7af8c25c01387c89e00b3edf9e9b produced verify runs39629223991 and39629214144. Both actually completed with failure at the same existing cargo fmt step; cargo test was skipped. The jobs were read directly, including step conclusions. All419 P2 changes stay under the new research task; no Rust/workflow file changed.
+
+- https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/39629223991
+- https://github.com/cosmosapjw-quantum/rei_bianchi/actions/runs/39629214144
+
+This is a non-green repository workflow state. The final metadata-only commit can trigger separate workflow runs; its actual observed status belongs in the terminal delivery receipt, without an infinite metadata-commit cycle.

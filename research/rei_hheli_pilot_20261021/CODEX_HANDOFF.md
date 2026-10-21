@@ -6,7 +6,9 @@ Repository cosmosapjw-quantum/rei_bianchi; draft PR218:
 https://github.com/cosmosapjw-quantum/rei_bianchi/pull/218
 Dedicated branch research/rei-hheli-sandbox-pilot-20261021.
 Task path research/rei_hheli_pilot_20261021/.
-Read UNIFIED_STATUS.md, UNIFIED_DAG.json, FINAL_REVIEW.json and the later PUBLICATION_RECEIPT/FINAL_ACK before mutation. The final delivery commit may be newer than the P1 checkpoint0d795da7f9114f89353c72a5829e5efcb64dfa44. Inspect the live head; do not infer it from this packing-time handoff.
+Scientific delivery S: 2fd46785ef2e7af8c25c01387c89e00b3edf9e9b; tree 51ef238f3d3fc0a14c6018c4674ab6a636977158. Read UNIFIED_STATUS.md, UNIFIED_DAG.json, FINAL_REVIEW.json and PUBLICATION_RECEIPT.json before mutation. The branch may have a later metadata-only commit; inspect the live head and terminal capsule ACK. P1 checkpoint0d795da7f9114f89353c72a5829e5efcb64dfa44 is historical.
+
+Scientific S:419changed files fully read back,494tree identities verified. P2 archive23591727bytes/501members SHA256 ea6eafef3e982a8983cf4cf46dcbb9924bd3d6dc43cdba0e087bdaacb6d05841; Drive1yVhYWgDxirGL533iFzrZzvN1AMnWZ6tY and Dropboxid:BSpOijBcT10AAAAAAD_hnw both fullGET/byte/SHA/memberPASS. Extracted CLI audit passed once: exit0,0newIVPs,raw/core unchanged. Source-S repository verify failed only at the observed existing Rust cargo-fmt step; cargo test was skipped. See CI_OBSERVATION.md.
 
 The 79nominal+3control sandbox pilot is COMPLETE,82/82,257samples each,z20→2. Ten PNG/PDF families and raw/provenance are delivered. Independent verdict PASS_SCOPED_PRELIMINARY_ATOMIC_TEST_FLUID. No completed IVP needs rerunning. Actual execution identity is file SHA256 outside a Git checkout; later Git publication is a separate event.
 

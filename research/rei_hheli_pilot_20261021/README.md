@@ -17,3 +17,5 @@ This is a self-contained Linux/Python atomic test-fluid pilot with non-tilted LR
 
 Publication: https://github.com/cosmosapjw-quantum/rei_bianchi/pull/218 (draft).
 Later publication/preservation receipts bind the frozen payload and its actual Git/provider identities.
+
+Scientific delivery: 2fd46785ef2e7af8c25c01387c89e00b3edf9e9b. The actual source/Git/provider and portability evidence is linked in [PUBLICATION_RECEIPT.json](PUBLICATION_RECEIPT.json) and [PRESERVATION_STAGE_LOG.md](PRESERVATION_STAGE_LOG.md). This later metadata checkpoint preserves the immutable P2 packing-time snapshot.

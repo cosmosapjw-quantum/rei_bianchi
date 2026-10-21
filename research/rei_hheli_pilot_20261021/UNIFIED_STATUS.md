@@ -36,7 +36,13 @@ Remote task: research/rei_hheli_pilot_20261021/
 P1 source-contract commit0d795da7f9114f89353c72a5829e5efcb64dfa44, tree6ea8f61e1c67bad6204005ccde3a930a33cc2682:77/77 Git full file readback PASS.
 P1 archive172736bytes SHA256 b9d70902a86b5c6a9190f4f099ce32d3b16212477a99acf63231dffafe110b9d: Drive/Dropbox full GET exact bytes/SHA256/all80members PASS. Drive1FSBuUi9-15yAZ626c_xSNrOtQkaxcLm5; Dropbox id:BSpOijBcT10AAAAAAD_hmg. Original stalled child upload remains UNCERTAIN_NO_ACK; the uniquely named R1 objects were actually verified.
 
-P2 scientific publication and dual preservation are IN_PROGRESS at this frozen snapshot. Later publication/preservation receipts bind this snapshot; packing-time statuses are not retroactively rewritten. Expected-head fast-forward only; draft retained; no merge or force-push. Existing Rust-format workflow is not green; see CI_OBSERVATION.md.
+P2 scientific publication COMPLETE: source 2fd46785ef2e7af8c25c01387c89e00b3edf9e9b, tree 51ef238f3d3fc0a14c6018c4674ab6a636977158, expected-head fast-forward from P1. All419 changed files were fully downloaded and matched bytes/SHA256/Gitblob. The actual source tree verified494 path/blob/size/mode identities, including75 unchanged P1 paths whose prior whole-byte proof is preserved. No retries or failures.
 
-Next operational node: C10 final publication and dual full readback, then portable saved-data audit with zero IVPs.
+P2 self-contained archive23591727bytes/501members, SHA256 ea6eafef3e982a8983cf4cf46dcbb9924bd3d6dc43cdba0e087bdaacb6d05841. Drive1yVhYWgDxirGL533iFzrZzvN1AMnWZ6tY and Dropbox id:BSpOijBcT10AAAAAAD_hnw each passed full GET exact bytes/SHA256/all501member verification.
+
+A fresh extraction passed the actual --audit-existing CLI from an unrelated working directory: exit0,82saved cases,0newIVPs,27.282203s wall. Original raw/core/archive stayed unchanged. PNG/CSV/summary bytes match; ten PDF files differ only by creation-date metadata. Receipt SHA256 c14e4d9668b6635a88ea70138589a0f1627180cc0f4378203b5bfc2a3513b2b8.
+
+The scientific C10 delivery is closed. This additive metadata update and the final delivery capsule bind later publication ACKs without rewriting the immutable archive's packing-time fields. Expected-head fast-forward only; draft retained; no merge or force-push. Source-S verify workflows39629223991/39629214144 failed in existing cargo fmt; cargo test was skipped. Repository CI is not green; no Rust/workflow source changed.
+
+Operational science/preservation nodes are complete. Final metadata/capsule receipts are separate terminal evidence, not a new scientific computation.
 Next single scientific node: NEXT1 harder-UV Li inner-shell/Auger and RR/DR energy-moment source contract. No completed pilot rerun without a material new condition.
