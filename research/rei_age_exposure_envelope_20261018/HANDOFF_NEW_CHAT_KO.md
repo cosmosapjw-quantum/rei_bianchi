@@ -1,58 +1,24 @@
-# 새 대화 인계 | 2026-10-21 v10 native 최적화
+# 새 대화 인계 — rei age-exposure/native time lane (2026-10-21)
 
-$physmath-research-loop와 SciSpace·Exa·Wolfram을 사용해 이어간다. Repo cosmosapjw-quantum/rei_bianchi,draft PR199,branch research/rei-age-exposure-envelope-20261018,task research/rei_age_exposure_envelope_20261018/.
+이 task는 PR199 draft `research/rei-age-exposure-envelope-20261018`에서 이어진다. intake 시 실제 PR HEAD는 `dd24a9f89e847ae7e97c017ffededd4aa53790d8`, task tree `bbe0079939ad642a4d38e443950f37926432dd70` (2,412 files)다. 기존 owner checkout dirty state는 보존했고 `/tmp/rei_age_followup_20261021/research/rei_age_exposure_envelope_20261018` task snapshot을 사용한다. 최신 대화/branch/Drive/Dropbox intake는 범위를 명시해 보고서에 기록했다. 모든 대화나 전체 branch를 검사했다고 말하지 않는다.
 
-## 실제 최신 상태부터
+## 완료와 결과
 
-V10은 v9 최종HEAD `abbf71caf4bd45af5bdf8bc7744690d10b8715e7`에서 시작했다. 실제 최신 PR HEAD를 먼저 읽는다. Source/final commit·tree·파일 수·provider IDs/SHA는 CURRENT receipt와 별도 `REI_AGE_ENVELOPE_DELIVERY_CONFIRMATION_20261021_v10.json`에서 확인한다. C8/C10은 source snapshot이며 confirmation exact UTF-8 delta로 최종 tree를 자동 복원한다. User에게 ZIP 이동·해제를 맡기지 않는다.
+- v10 optimized native BE `time8`, `time16`, `time32`: 각 1회 실행, exit0 및 원 validator PASS. 재실행하지 않는다.
+- 저장된 raw endpoint로 one-pass finite-grid diagnostic: N/U 포함 12 scalar 성분의 adjacent difference magnitude가 모두 감소. `DIAGNOSTIC.json`과 hashes/raw identities를 확인한다.
+- 원 0.005 기준은 인접 두 쌍 모두 미달. `p3`는 세 격자 경험값이지 convergence theorem/error bound가 아니다.
+- Positive DOP853 `age32`는 native BE와 다른 operator라 native time level로 합치지 않는다.
+- `native_age_time_convergence=HOLD`; `nonlinear_Grackle_response_bound=NOT_ESTABLISHED`; `PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED`.
+- NCP solver 재실행 없음. 이 lane에서 지금 READY NCP job은 없다.
 
-연구 전에 다른 대화·REI/VigilODE branches/PRs·Drive·Dropbox의 새 실행 결과를 실제 확인한다. V10 root conversation search는 SUCCESS였다. Child 한 호출 unavailable과 구분한다. 기존 blocker를 상속하지 않는다. 이번 NCP config 호출은 현재 monthly tool usage cap이었고 no retry/reconnect를 지켰다. Host64/128·현재 jobs는 미관측, 새 NCP 제출0이었다.
+## 인계 파일
 
-필수: CURRENT5,RESEARCH_UPDATE_20261021_NATIVE_OPTIMIZATION_KO.md,native_optimization_20261021/{README.md,THEORY_KO.md,IMPLEMENTATION_CONTRACT.md},verification receipts,R6/C9 receipts. V9 native32 update/ANALYSIS와 v8 STUDY/DECIMAL_REFERENCE/ACTUAL_REQUEST_CACHE_PARITY/R6/C9는 완료 근거로 재사용한다.
+읽을 것: `README_CURRENT_KO.md`, `HANDOFF_CODEX_CURRENT_KO.md`, `RESEARCH_UPDATE_20261021_NATIVE_TIME_REFINEMENT_DIAGNOSTIC_KO.md`, `contracts/NEXT_DAG_CURRENT.json`, `DELIVERY_RECEIPT_CURRENT.json`, `native_optimization_20261021/evidence/ncp_time_campaign_20261021/`, `native_optimization_20261021/evidence/native_time_refinement_20261021/`, `state/`.
 
-## 완료한 새 연구
+v10 binary `2d5d95371df4c4cf882a4563edc4becdf965c76fdbbf9b9dfaa97fe083fd57fd`는 원 positive B1 `89c646db1de80c6e85fe34f7c3eaae2f10904810a8a6c3acc3426a7e7c1dd7a4`와 다르다. source/prepared/runtime identity는 receipts에 있다.
 
-- 원 failed moment gate의 finite subnormal mass만 q=U/N 등 제한된 한 positive atom 후보로 복구한다. N2/N3/N4 원 count/energy gates PASS,normal unchanged,invalid reject. 전체 subnormal 성공 정리가 아니다.
-- 같은 질량/support의 bounded observable range 및 C2 variance/실수 first-moment residual bound를 유도했다. Machine energy defect0을 실수 residual0으로 쓰지 않는다. Nonlinear feedback bound는 아니다.
-- 기존 persistent OrderedWorkerPool로 PreparedAbsorption.evaluate를 병렬화하고 original index·직렬 reduction을 유지한다. 중첩pool/new dependency 없다.
-- 기존 physics stepping 유지,common8 pre/post와 final state만 보존해 clone을 줄이고 accepted scalar stream을 추가했다.
-- 원 BE denominator association의 min/max와 outward Q/S로 exact Fraction stored-denominator kernel을 감싼다. 같은 cohort 전달의 kappa/rho/E 항등식을 유도했다. 인증 범위는 per-step 저장 kernel,연속path/unroundedcoefficients/Grackle가 아니다.
-- campaign.py가 frozen153복원/source-bound compile/작은preflight/time8·16·32/storedage32복원/finitecomparison을 연결한다. 완료 matching 결과 재사용,실패/중단/corrupt 자동반복0,모든raw보존.
+현재 CI: root `cargo fmt` failure, workspace tests skipped; scoped research result과 구분한다. PR199 draft 유지, no merge/no force-push. Drive/Dropbox v11 결과 archive whole readback 후 ACK와 DAG를 확인한다. PR150/R9, LRS, 별도 BASS HHeD 보호.
 
-Original native153=`35d9747a0bbedcafdb568467ce7c1e7a25f965b6`,B1 reference=`89c646db1de80c6e85fe34f7c3eaae2f10904810a8a6c3acc3426a7e7c1dd7a4`,computational base=`78386db7ac2e35488ab610c4a3ddb1d87f8b51bbe25d855bf417dc17dd07d620`. 새 BE binary와 B1은 별도 identity다.
+## 다음 새 작업의 규칙
 
-## 검증·실제 측정
-
-Original core Rust1.94.1 compile,captured N2/N3/N4,normal/domain,worker1/2/4,changed Python risks를 검증했다. Tiny native4개의 serial/parallel·observer off/on·full/compact endpoint/observations/native_return bytes 동일. Invalidtransport4/n_mu2/source1 pre-trajectory 실패도 보존했다. Full timecases는 sandbox에서 미실행. 정확한 counts/debit/최종R6·C9는 receipt를 읽는다.
-
-새 absorption-only fixture는 source8/n_mu8/transport16,32cohortjobs,20evaluations/sample,5samples/config다. Allscientificfieldbitparity PASS. 중앙값 serial0.009680326s,pool1 0.009681998s,pool2 0.006849993s,pool4 0.004608712s;1.4132×/2.1004×. Sandbox8CPU/8GiB kernel값이며 sharedgasRHS/IVP/fullnative/NCP64core성능 주장이 아니다.
-
-Fresh intake: REI253branches/updatedPR100,VigilODE161branches/PR78/workflow25,Drive133/Dropbox31.25actualsource/raw/report·18separateGitblobchecks. LRS PR198새HEAD는 기존19setting반환 admission수정이지 새run이 아니다. BRPERF workerpattern 재사용;RUN19 current-Tcache와VigilODEfailedfilter/LU를 읽었으나 다른solver/근사rate/frozenopacitycache는 가져오지 않았다. 전대화/큰archive전체감사는 아니다.
-
-## 다음 실행·연구
-
-R_NATIVE_TIME8_16_32_OPTIMIZED_SUBNORMAL_BE는 R6/C9 PASS로 탐색READY다. Verifiedidle64core128GB에서 jobs3×20workers+3main=63slots,case24GiB/reserve16GiB,BLAS1. Case1800s,aggregate5400s,elapsed2000s(작은jobs3800/5600),별도build300s,자동retry0. 실제 자원을 관측하고 공유lane보호. 단일명령과자동복원은 HANDOFF_CODEX_CURRENT_KO.md를 따른다.
-
-새 time return이 있으면 먼저 ingest·원gate·repaircount/mass·BEtrace·finite difference를 분석한다. Age32/64의0.005 N/U목표는 아직FAIL(0.8248861211419689/0.7916059535400799). TimeBE↔positiveDOP853 operator차이를 명시한다. Nativeage/timeconvergence HOLD,nonlinearresponse NOT_ESTABLISHED,PRODUCTION_SCIENTIFIC_ADMISSION=NOT_ISSUED.
-
-새 결과가 없으면 현재 승인된 세case를 NCP에서 실행하도록 자동 준비/호출한다. 가능한 새 이론·코드·가벼운 검증은 끝까지 수행·push하고 NCP에는 compile/작은연결/실제run만 남긴다. 단계마다 게시/백업/DAG표시. Root cargo fmt CI실패와 scopedPASS 구분. Ownercheckout·PR150/R9·LRS·별도BASS HHeD보호. PR199draft,no merge/no force-push,실제remoteparent에expected-headFF만 사용한다.
-
-최종 scoped 검토: R6/C9 PASS_SCOPED, 열린 지적0. C9 네 수정 완료; Python10checks PASS. 구현 light9.371467904/240s, build10.375765744/120s; 독립 R6 algebra0.023791468s. 정확한 원자료는 새 단위 IMPLEMENTATION_RECEIPT와 verification/를 따른다.
-
-
-## v10 실제 소스·이중 백업 전달 — 20261021
-
-소스 `4f13648985e417028c530892ea02be4f56018a31`을 부모 `abbf71caf4bd45af5bdf8bc7744690d10b8715e7`에서 expected-head fast-forward로 게시했다. 소스 root tree는 `7314041a7b58d35df4a4b417dcdcfcd34d9f5b15`, task tree는 `1107a5039615148ff72f6fb68d8b72dfce157012`이며 전체 task 소스는2391파일이다. PR199는 open/draft 상태다.
-
-| 패키지 | bytes | SHA256 | Drive ID | Dropbox ID |
-|---|---:|---|---|---|
-| C8 | 23546319 | `c55dc1280a8fc0154e7fc577e0aab9b2d14853c721b80e620972a4a7bb7b9bdd` | `1n0xltg0nngOih7FVuhuGoI6LoeaC5UbS` | `id:BSpOijBcT10AAAAAAD_aPw` |
-| C10 | 25611513 | `d6f2c121f554d3e59d56a15abe910a6dba115a69b167539de42b0df7eb5fd6c5` | `1d80Dn9O92FocYbojvFyF7Qewb2yt5w9-` | `id:BSpOijBcT10AAAAAAD_aQA` |
-
-네 원격 파일을 실제 전체 다운로드하여 bytes/SHA256, ZIP CRC, 전체 payload, 소스 blob/mode/task tree를 확인했다. C10은 frozen native153, 원 B1, deduplicated source161, vendor22패키지/865파일, 원 native32 tar까지 통과했다. 영수증은 `evidence/delivery_v10_20261021/`의 여섯 delivery JSON이며, 전체 원격 검증 상태는 `PASS_FOUR_FULL_PROVIDER_READBACKS`다. 비공개 단일사용 download URL은 게시하지 않는다.
-
-실제 소스 CI는 PR run39509350736/job118926184408 및 push run39509344439/job118926162607에서 기존 root `cargo fmt` 실패, workspace tests SKIPPED다. 전체 PR CI가 green이라는 주장은 하지 않는다. task R6/C9의 scoped PASS와 구분한다.
-
-C8/C10은 위 소스 snapshot을 고정한다. 최종 delivery metadata commit과 실제 readback 이후, 외부 `REI_AGE_ENVELOPE_DELIVERY_CONFIRMATION_20261021_v10.json`에 정확한 task 소유 UTF-8 delta를 넣어 최종 tree를 복원한다. 확인서 자신의 SHA/provider 수신확인은 외부에 둔다. 아직 확정되지 않은 final head/hash를 이 metadata에 쓰지 않는다.
-
-미완료 time8/time16/time32 실행은 `READY_EXPLORATORY_NCP`다. 이번 NCP 새 실행은0이며 native age/time convergence는 HOLD, nonlinear response bound는 NOT_ESTABLISHED, production scientific admission은 NOT_ISSUED를 유지한다. 원격 백업의 완료는 실제 time endpoint나 수렴 판정의 완료를 뜻하지 않는다.
+새 이론 질문이나 solver case는 먼저 독립 Astra가 scope, immutable inputs, tolerance, stop rule을 frozen contract로 정한 뒤 실행한다. 기존 완료 case, time64 또는 saved age32를 자동 재실행하지 않는다. 이 현행 diagnostic에는 NCP command/prompt가 필요하지 않다. publication은 reviewed result를 위한 것이며 production scientific admission은 계속 미발급이다.

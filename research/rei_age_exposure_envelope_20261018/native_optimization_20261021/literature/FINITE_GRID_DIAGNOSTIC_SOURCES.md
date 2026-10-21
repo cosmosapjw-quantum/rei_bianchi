@@ -1,0 +1,10 @@
+# Literature intake: finite-grid slopes and convergence claims
+
+Queried SciSpace and Exa on 2026-10-21. These sources inform the claim boundary only; none is evidence about the rei_bianchi model itself.
+
+1. Arieh Iserles, *A First Course in the Numerical Analysis of Differential Equations*, Cambridge University Press excerpt, https://assets.cambridge.org/97805215/56552/excerpt/9780521556552_excerpt.pdf. The excerpt distinguishes local order from global convergence for Euler and notes that additional method conditions are needed to transfer a local error statement to global behavior. Scope here is general ODE numerical analysis.
+2. V. Gregory Weirs, *Solution Verification Using the Robust Multi-Regression Approach*, Sandia SAND2017-4811C, https://www.osti.gov/servlets/purl/1457898. The 3-mesh Richardson discussion uses a difference-ratio slope when a constant refinement ratio is assumed, while showing noisy/outlying pointwise estimates and discussing multi-model fitting. This is a primary national-laboratory presentation, not a theorem for this trajectory.
+3. E. Love and W. J. Rider, “On the convergence of finite difference methods for PDE under temporal refinement,” DOI 10.1016/J.CAMWA.2013.04.019, https://www.sciencedirect.com/science/article/pii/S0898122113002265. They report that temporal refinement with a fixed spatial mesh can yield an observed rate different from the nominal space-time method order for a coupled discretization. This motivates separating mesh identity from a general order claim.
+4. L. F. Shampine and W. Zhang, “Rate of convergence of multistep codes started by variation of order and stepsize,” SIAM Journal on Numerical Analysis (1990), DOI 10.1137/0727087, https://epubs.siam.org/doi/abs/10.1137/0727087. SciSpace surfaced this work on asymptotic behavior for variable order/step startup; its scope differs from the frozen native BE cases, so no direct result is transferred.
+
+The diagnostic uses raw endpoint differences under a common `h ∝ 1/time_factor` proxy. It does not use these references to claim asymptotic BE order or an error bound.
