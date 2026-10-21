@@ -7,7 +7,7 @@
 - 현재 원격 HEAD at intake: `dd24a9f89e847ae7e97c017ffededd4aa53790d8`; task tree `bbe0079939ad642a4d38e443950f37926432dd70` (2,412 files)
 - v10 배송 HEAD: `652a7e03b844a145d6c6cbb401ab81f4a8429aff`; actual v10 parent/source `4f13648985e417028c530892ea02be4f56018a31`
 - Owner checkout branch/dirty state was preserved; task snapshot and edits are isolated under `/tmp/rei_age_followup_20261021/research/rei_age_exposure_envelope_20261018` until expected-head publication.
-- No new NCP case remains. Do not invoke `campaign.py` for time8/16/32 or rerun completed age32/64, spectral128, benchmark, fixed-model.
+- The results commit `96d88ae767b09f9d70e5f65f4180115f886beee0` is now published by expected-head fast-forward from `dd24a9f89e847ae7e97c017ffededd4aa53790d8`. No new NCP case remains. Do not invoke `campaign.py` for time8/16/32 or rerun completed age32/64, spectral128, benchmark, fixed-model.
 
 ## Completed v10 execution
 
@@ -21,7 +21,7 @@ The existing 0.005 result remains FAIL for both adjacent pairs. Raw-difference f
 
 ## Latest intake and checks
 
-PR199 latest head was checked directly. The selected first 100 GitHub branch entries, Drive folder (138 direct entries), Dropbox folder (36 direct entries), latest PR commits/checks, and v10 campaign return showed no later native execution. Current exposed connectors do not provide root conversation search, so other-conversation results are unverified; do not describe the intake as exhaustive. Latest CI runs `39523990828` and `39523997460` fail the root `cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check`; workspace tests are skipped. Root Rust/CI was not changed.
+PR199 latest head was checked directly. The selected first 100 GitHub branch entries, Drive folder (138 direct entries), Dropbox folder (36 direct entries), latest PR commits/checks, and v10 campaign return showed no later native execution. Current exposed connectors do not provide root conversation search, so other-conversation results are unverified; do not describe the intake as exhaustive. Prior-head CI runs `39523990828` and `39523997460` failed the root `cargo fmt --manifest-path rust/rei_microphysics/Cargo.toml --all -- --check`; workspace tests were skipped. Checks for results commit `96d88ae` are currently in progress/queued (runs `39529207425`, `39529213287`) and must be read to completion before reporting their outcome. Root Rust/CI was not changed.
 
 SciSpace, Exa, and Wolfram were used for literature search and independent arithmetic cross-check. The literature sources and limits are in `native_optimization_20261021/literature/FINITE_GRID_DIAGNOSTIC_SOURCES.md`.
 

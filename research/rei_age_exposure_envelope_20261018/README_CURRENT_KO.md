@@ -1,6 +1,6 @@
 # rei_age_exposure_envelope_20261018 — 현재 연구 상태
 
-현재 기준 PR199 head `dd24a9f89e847ae7e97c017ffededd4aa53790d8` 이후 v10 native time8/time16/time32 실행은 전부 반환·검증됐다. 저장 결과를 대상으로 한 bounded three-level finite-grid diagnostic도 2026-10-21 완료했다. 다음 단계에서 이 세 case를 재실행하지 않는다.
+현재 기준 PR199 published result commit `96d88ae767b09f9d70e5f65f4180115f886beee0` (부모 `dd24a9f89e847ae7e97c017ffededd4aa53790d8`) 이후 v10 native time8/time16/time32 실행은 전부 반환·검증됐다. 저장 결과를 대상으로 한 bounded three-level finite-grid diagnostic도 2026-10-21 완료했다. 다음 단계에서 이 세 case를 재실행하지 않는다.
 
 - [현재 연구 업데이트](RESEARCH_UPDATE_20261021_NATIVE_TIME_REFINEMENT_DIAGNOSTIC_KO.md)
 - [Codex 현재 인계](HANDOFF_CODEX_CURRENT_KO.md)

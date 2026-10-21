@@ -12,3 +12,6 @@
 | Literature | `native_optimization_20261021/literature/FINITE_GRID_DIAGNOSTIC_SOURCES.md` | Context only; no model-specific theorem claimed |
 | Fresh artifact search | PR199 current head/checks; first 100 branch names; Drive 138 direct files; Dropbox 36 direct files; root chat search unavailable through exposed connector | No later native return observed within listed scope; not exhaustive of all conversations/branches |
 | Latest CI | PR199 runs 39523990828 / 39523997460 | Root `cargo fmt` failure; workspace tests skipped; scoped task did not modify root Rust/CI |
+
+- Publication: result commit `96d88ae767b09f9d70e5f65f4180115f886beee0` parent `dd24a9f89e847ae7e97c017ffededd4aa53790d8`; 30 changed task paths, 0 outside task.
+- Owner checkout remained branch `research/flrw-production-integration-20261015`, HEAD `fef2baf960f57f37b838004fbb8a7d37b3824852`, with its pre-existing 431 dirty entries.
