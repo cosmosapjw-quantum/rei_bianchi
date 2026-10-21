@@ -1,62 +1,107 @@
 {
   "schema": "rei.isotope_quotient.next_dag.v1",
-  "status": "FINITE_ATOMIC_EXECUTION_AND_FINAL_REVIEW_DONE_PUBLICATION_PENDING",
+  "status": "FINITE_ATOMIC_EXECUTION_REVIEW_AND_PUBLICATION_COMPLETE",
   "nodes": [
     {
       "id": "atomic_numerical_pilot",
       "state": "COMPLETE_SCOPED_NUMERICAL",
-      "evidence": ["pilot/summary.json", "pilot/results/sweep_receipt.json", "pilot/figures_final/PLOT_REPORT.json"],
+      "evidence": [
+        "pilot/summary.json",
+        "pilot/results/sweep_receipt.json",
+        "pilot/figures_final/PLOT_REPORT.json"
+      ],
       "actual_ivps": 83,
-      "next": ["final_independent_C9", "stage_c_preservation"]
+      "next": [
+        "final_independent_C9",
+        "stage_c_preservation"
+      ]
     },
     {
       "id": "final_independent_C9",
       "state": "COMPLETE_PASS_SCOPED_PRELIMINARY_ATOMIC_TEST_FLUID",
       "decision": "PASS_SCOPED_PRELIMINARY_ATOMIC_TEST_FLUID",
-      "evidence": ["review/INDEPENDENT_REVIEW.md", "review/INDEPENDENT_DECISION.json"],
-      "requires": ["atomic_numerical_pilot", "data_backed_figures"],
-      "next": ["publication_closeout", "thermal_radiation_extension", "nuclear_target_extension"]
+      "evidence": [
+        "review/INDEPENDENT_REVIEW.md",
+        "review/INDEPENDENT_DECISION.json"
+      ],
+      "requires": [
+        "atomic_numerical_pilot",
+        "data_backed_figures"
+      ],
+      "next": [
+        "publication_closeout",
+        "thermal_radiation_extension",
+        "nuclear_target_extension"
+      ]
     },
     {
       "id": "data_backed_figures",
       "state": "COMPLETE_SAVED_RAW_READBACK",
-      "evidence": ["pilot/figures_final/PLOT_REPORT.json", "pilot/figures_final/PLOT_SELECTION_MANIFEST.csv"],
+      "evidence": [
+        "pilot/figures_final/PLOT_REPORT.json",
+        "pilot/figures_final/PLOT_SELECTION_MANIFEST.csv"
+      ],
       "actual_ivps": 0
     },
     {
       "id": "stage_c_preservation",
-      "state": "PENDING_ACTUAL_FINAL_DELIVERY_ACK",
-      "requires": ["atomic_numerical_pilot", "data_backed_figures", "final_independent_C9"],
-      "next": ["publication_closeout"]
+      "state": "COMPLETE_GIT_AND_DUAL_PROVIDER_FULL_GET_VERIFIED",
+      "requires": [
+        "atomic_numerical_pilot",
+        "data_backed_figures",
+        "final_independent_C9"
+      ],
+      "next": [
+        "publication_closeout"
+      ],
+      "evidence": [
+        "delivery/STAGE_C_DELIVERY_ACK.json"
+      ]
     },
     {
       "id": "publication_closeout",
-      "state": "PENDING_PUBLISHER_OBSERVED_COMMIT_AND_ARCHIVE_RECEIPTS",
-      "requires": ["final_independent_C9", "stage_c_preservation"],
-      "scope": "Draft PR219 additive research unit; no automatic merge or production default change"
+      "state": "COMPLETE_DRAFT_PR219_ADDITIVE_PAYLOAD_AND_ACK",
+      "requires": [
+        "final_independent_C9",
+        "stage_c_preservation"
+      ],
+      "scope": "Draft PR219 additive research unit; no automatic merge or production default change",
+      "evidence": [
+        "delivery/STAGE_C_DELIVERY_ACK.json"
+      ]
     },
     {
       "id": "thermal_radiation_extension",
       "state": "NOT_STARTED_SEPARATE_PHYSICS_CONTRACT",
-      "requires": ["source_backed_thermal_and_UV_radiation_equations", "energy_moment_consistency"],
+      "requires": [
+        "source_backed_thermal_and_UV_radiation_equations",
+        "energy_moment_consistency"
+      ],
       "scope": "Close gas and radiation energy; harder UV needs LiI inner-shell/Auger and energy moments"
     },
     {
       "id": "nuclear_target_extension",
       "state": "NOT_STARTED_SEPARATE_PHYSICS_CONTRACT",
-      "requires": ["rates_and_validity_for_16_nuclear_capture_decay_targets", "daughter_charge_electron_and_energy_projection"],
+      "requires": [
+        "rates_and_validity_for_16_nuclear_capture_decay_targets",
+        "daughter_charge_electron_and_energy_projection"
+      ],
       "scope": "19 total targets consist of 3 atomic and 16 nuclear/capture/decay; zero n/T IC does not suppress enabled production channels"
     },
     {
       "id": "broader_repos_optimization",
       "state": "SOURCE_ADOPTION_MAP_ONLY",
-      "evidence": ["REPO_OPTIMIZATION_ADOPTION.json"],
+      "evidence": [
+        "REPO_OPTIMIZATION_ADOPTION.json"
+      ],
       "scope": "The current pilot implemented an additive rei_bianchi lane, not completion of optimization/physics in seven repositories"
     },
     {
       "id": "clean_empty_bootstrap",
       "state": "OPTIONAL_SEPARATE_IMPLEMENTATION_NOT_REQUIRED_FOR_COMPLETED_PILOT",
-      "requires": ["explicit new execution contract and missing prerequisite evidence plan"],
+      "requires": [
+        "explicit new execution contract and missing prerequisite evidence plan"
+      ],
       "scope": "Recovered all command validates this completed package and can resume missing quotient cases when retained point checks/profile/reference/summary exist; it does not bootstrap an empty tree"
     }
   ],

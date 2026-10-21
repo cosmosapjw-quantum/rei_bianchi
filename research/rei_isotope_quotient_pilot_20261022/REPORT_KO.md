@@ -1,6 +1,6 @@
 # REI 동위원소 전하 quotient 파일럿: 실제 실행 보고
 
-상태: **79개 명목 사례와 3개 L24 대조, 별도 18-분율 기준 1개를 실제 적분 완료**했다. `pilot/summary.json`의 범위 한정 수치 검사와 최종 독립 C9 검토가 통과했고, 판정은 **PASS_SCOPED_PRELIMINARY_ATOMIC_TEST_FLUID**다. 원문은 `review/INDEPENDENT_REVIEW.md`의 최종 절에 있으며 `review/INDEPENDENT_DECISION.json`은 그 기존 판정을 복구하여 기계적으로 직렬화한 것으로 새 심사가 아니다. PR219의 출판 커밋과 Stage C 백업 ACK는 관측 전까지 대기다. PR219는 초안이며 이전 PR218의 미완료 화학 궤적을 완료로 상속하지 않는다.
+상태: **79개 명목 사례와 3개 L24 대조, 별도 18-분율 기준 1개를 실제 적분 완료**했다. `pilot/summary.json`의 범위 한정 수치 검사와 최종 독립 C9 검토가 통과했고, 판정은 **PASS_SCOPED_PRELIMINARY_ATOMIC_TEST_FLUID**다. 원문은 `review/INDEPENDENT_REVIEW.md`의 최종 절에 있으며 `review/INDEPENDENT_DECISION.json`은 그 기존 판정을 복구하여 기계적으로 직렬화한 것으로 새 심사가 아니다. PR219의 payload 커밋 `b6edd1480de7d1774ad1c9c3bdb4c045acd035cb`를 빠른 전진으로 출판했고, 별도 최종 ZIP의 Dropbox·Drive 원격 전체 GET SHA256과 CRC를 확인했다. 수령증은 `delivery/STAGE_C_DELIVERY_ACK.json`이다. PR219는 초안이며 이전 PR218의 미완료 화학 궤적을 완료로 상속하지 않는다.
 
 ## 질문과 고정된 모형
 
@@ -26,10 +26,12 @@
 
 ## 증거, 자원, 범위
 
-원본 compact transport SHA256은 `0fa826025836a0126fac580de98e3b45c9dcc750e1e243afe933c249ae8e4b6c`, 상속 물리 계약은 `dd3950150be8718d1bb60eed4f1ba3f4cd7447b377adc92476abf28ba8369dee`다. 현재 실행기·데이터 해시는 `SOURCE_MANIFEST.json`, 83개 원시 NPZ와 개별 JSON 수령증은 `pilot/results/`, 부호 축 CSV는 `pilot/summary.csv`, 21개 census 및 시간·redshift와 대조 도표는 `pilot/figures_final/`에 있다. 모든 도표의 원시 파일·열·변환은 `PLOT_SELECTION_MANIFEST.csv`가 지정한다. `pilot/code/run.py all --workers 4`는 빠진 작업만 수행하며 `audit-existing`은 IVP 없이 저장물/소스를 검사한다. `pilot/code/render.py`는 저장 데이터만 재그린다.
+원본 compact transport SHA256은 `0fa826025836a0126fac580de98e3b45c9dcc750e1e243afe933c249ae8e4b6c`, 상속 물리 계약은 `dd3950150be8718d1bb60eed4f1ba3f4cd7447b377adc92476abf28ba8369dee`다. 당시 최종 실행기의 기대 해시는 원본 그대로 둔 `SOURCE_MANIFEST.json`에, 복구된 현재 실행기·계약·데이터 해시는 `delivery/RUNTIME_RECOVERY_CURRENT_MANIFEST.json`에 있다. 원본 최종 실행기·계약의 바이트는 복구되지 않았고, 현재 CLI의 제한된 복구와 기존 83개 결과의 관계는 `delivery/RUNTIME_RECOVERY_ADDENDUM.md`에 명시한다. 83개 원시 NPZ와 개별 JSON 수령증은 `pilot/results/`, 부호 축 CSV는 `pilot/summary.csv`, 21개 census 및 시간·redshift와 대조 도표는 `pilot/figures_final/`에 있다. 모든 도표의 원시 파일·열·변환은 `PLOT_SELECTION_MANIFEST.csv`가 지정한다. `pilot/code/run.py all --workers 4`는 보존된 선행 증거가 있는 완료/부분 트리에서 유효성을 검사하고 누락된 quotient 사례만 재개한다. 깨끗한 빈 트리의 처음부터 실행은 이 복구의 범위 밖이다. `audit-existing`은 IVP 없이 저장물/소스를 검사한다. `pilot/code/render.py`는 저장 데이터만 재그린다.
+
+
 
 83개 사례 수령증의 CPU 합계는 **211.72초**이고 bulk stage의 실제 경과시간은 **46.82초**다. 첫 quotient/reference 쌍은 각각 CPU `6.0439/13.4240`초였으나, 한 쌍의 차이를 일반 가속률로 주장하지 않는다. 체크·import·도표의 CPU는 별도로 계측되지 않았으므로 211.72초는 전체 작업 CPU가 아니다. SciPy 내부의 모든 선형대수 연산을 RHS 호출 수에 포함했다고 주장하지 않는다. NCP 비공개 궤적 0개를 이 새 공개 파일럿의 83개와 혼동하지 않으며, 이전 예산이나 결과를 재설정하거나 다시 세지 않는다.
 
-원천별 7개 저장소의 채택 관계는 `REPO_OPTIMIZATION_ADOPTION.json`에 한 번 기록했다. 이 실행은 `rei_bianchi`에만 새 단위를 더했고 나머지 저장소의 기본 경로는 바꾸지 않았다. Stage A/B Git·Drive·Dropbox 수령증은 `delivery/`에 있다. 최종 C9 PASS는 이미 기록됐지만 PR219 출판 커밋 및 Stage C 백업 ACK는 관측된 수령증이 있을 때만 채운다. 전체 19개 목표 채널과 native production 발행은 이 판정에 포함되지 않는다.
+원천별 7개 저장소의 채택 관계는 `REPO_OPTIMIZATION_ADOPTION.json`에 한 번 기록했다. 이 실행은 `rei_bianchi`에만 새 단위를 더했고 나머지 저장소의 기본 경로는 바꾸지 않았다. Stage A/B Git·Drive·Dropbox 수령증은 `delivery/`에 있다. 최종 C9 PASS와 PR219 출판 커밋, Stage C의 두 백업 원격 전체 GET 검증은 `delivery/STAGE_C_DELIVERY_ACK.json`에 관측값으로 기록했다. 전체 19개 목표 채널과 native production 발행은 이 판정에 포함되지 않는다.
 
 다음 물리 단계는 별도 원천과 계약으로 원천이 뒷받침하는 닫힌 열·복사/UV 에너지 방정식, 더 단단한 UV에서 Li I 내각/Auger 및 에너지 모멘트, 그리고 19개 전체 목표(원자 3, 핵·포획·붕괴 16)의 실제 적용 범위와 생성물 전하·전자·에너지 보존이다. 현 모형의 누락된 CI/CX/핵 경로를 근거 없는 영율로 채우지 않는다. 최종 독립 판정의 최대 주장은 **PASS_SCOPED_PRELIMINARY_ATOMIC_TEST_FLUID**이며, 전체 반응망·열역학·관측·생산 완성은 아니다.
