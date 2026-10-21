@@ -1,0 +1,53 @@
+test_c9_analysis_rejects_wrong_identity_hash_and_reference_cache (test_changed.ChangedRiskTests.test_c9_analysis_rejects_wrong_identity_hash_and_reference_cache) ... ok
+test_c9_live_orphan_refusal_then_confirmed_exit_debit (test_changed.ChangedRiskTests.test_c9_live_orphan_refusal_then_confirmed_exit_debit) ... ERROR
+test_c9_original_b1_is_separate_reference (test_changed.ChangedRiskTests.test_c9_original_b1_is_separate_reference) ... ok
+test_c9_timeout_preserves_output_and_debits_both_budgets (test_changed.ChangedRiskTests.test_c9_timeout_preserves_output_and_debits_both_budgets) ... ok
+test_endpoint_setup_enrichment_and_missing_channel (test_changed.ChangedRiskTests.test_endpoint_setup_enrichment_and_missing_channel) ... ok
+test_exact_stored_denominators_zero_and_threshold (test_changed.ChangedRiskTests.test_exact_stored_denominators_zero_and_threshold) ... ok
+test_failure_preserved_independent_complete_and_resume (test_changed.ChangedRiskTests.test_failure_preserved_independent_complete_and_resume) ... ERROR
+test_host64_default_and_small_budget (test_changed.ChangedRiskTests.test_host64_default_and_small_budget) ... ok
+test_persistent_aggregate_budget (test_changed.ChangedRiskTests.test_persistent_aggregate_budget) ... ok
+
+======================================================================
+ERROR: test_c9_live_orphan_refusal_then_confirmed_exit_debit (test_changed.ChangedRiskTests.test_c9_live_orphan_refusal_then_confirmed_exit_debit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/3fac997d7514/rei_repo/research/rei_age_exposure_envelope_20261018/native_optimization_20261021/test_changed.py", line 21, in test_c9_live_orphan_refusal_then_confirmed_exit_debit
+    row=dict(case='time8',attempt='time8_attempt001',status='RUNNING',cap_seconds=1.,data=str(data),child_identity=c.process_identity(child.pid),identity={})
+                                                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/3fac997d7514/rei_repo/research/rei_age_exposure_envelope_20261018/native_optimization_20261021/campaign.py", line 67, in process_identity
+    children=Path(f'/proc/{owner}/task/{owner}/children').read_text().split()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/381119/task/381119/children'
+
+======================================================================
+ERROR: test_failure_preserved_independent_complete_and_resume (test_changed.ChangedRiskTests.test_failure_preserved_independent_complete_and_resume)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/3fac997d7514/rei_repo/research/rei_age_exposure_envelope_20261018/native_optimization_20261021/test_changed.py", line 50, in test_failure_preserved_independent_complete_and_resume
+    r=c.run_scheduler(Path('/unused'),root,dict(test=1),alloc,case_wall=2,total_wall=6,elapsed_cap=4,command_factory=cmd)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/3fac997d7514/rei_repo/research/rei_age_exposure_envelope_20261018/native_optimization_20261021/campaign.py", line 129, in run_scheduler
+    row.update(status='RUNNING',child_identity=process_identity(proc.pid))
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/3fac997d7514/rei_repo/research/rei_age_exposure_envelope_20261018/native_optimization_20261021/campaign.py", line 67, in process_identity
+    children=Path(f'/proc/{owner}/task/{owner}/children').read_text().split()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/381119/task/381119/children'
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.219s
+
+FAILED (errors=2)

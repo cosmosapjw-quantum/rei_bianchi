@@ -1,0 +1,7 @@
+# D9 portable input addendum
+
+Authorized by the same Astra controller before the D9 production result is admitted. The frozen physical definitions, input population, tolerance, zero-ODE rule and resource ceiling in EXECUTION_CONTRACT.md are unchanged.
+
+To make the pushed analysis directly runnable on NCP, preserve a compact lossless NPZ of only the loaded arrays required by D9: case IDs, x/a/H/s, signed matter/photon/neutrino stresses and physical-axis metadata, with a separate JSON mapping to each original raw SHA256 and source/configuration receipt. These are derived input views of the already computed histories, not new trajectories or replacement raw evidence. Preserve the original source file bytes and identities. Check that the compact arrays reproduce the loaded arrays exactly after a save/load round trip.
+
+The CLI may accept either the existing full package or this compact input plus its identity record. Produce the compact file during the one authorized raw-loading pass and reuse it for plots/reproduction. This avoids requiring an NCP user to restore the complete earlier archive solely to run this small diagnostic. The compact mode applies the same mathematical computation and validations. A small representative comparison between both readers is sufficient; do not re-integrate or restart the historical campaign. Include an exact repository-relative command and an immutable input checksum in the README and wrapper. No dependency or solver backend change is authorized by this addendum.

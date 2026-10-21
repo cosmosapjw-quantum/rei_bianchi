@@ -1,0 +1,67 @@
+   Compiling crossbeam-utils v0.8.23
+   Compiling proc-macro2 v1.0.107
+   Compiling autocfg v1.5.1
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling crossbeam-epoch v0.9.21
+   Compiling num-traits v0.2.19
+   Compiling serde_core v1.0.228
+   Compiling crossbeam-deque v0.8.8
+   Compiling rayon-core v1.13.0
+   Compiling syn v2.0.119
+   Compiling num-integer v0.1.47
+   Compiling serde v1.0.228
+   Compiling serde_json v1.0.145
+   Compiling serde_derive v1.0.228
+   Compiling num-bigint v0.4.6
+   Compiling either v1.19.0
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling ryu v1.0.23
+   Compiling num-rational v0.4.2
+   Compiling rayon v1.12.0
+   Compiling rei-vigilode-age-transport v0.1.0 (/workspace/scratch/36ed695112a9/rei_bianchi/research/rei_age_exposure_envelope_20261018/vigilode_age_transport_20261019/rust)
+error[E0463]: can't find crate for `serde`
+ --> src/main.rs:4:5
+  |
+4 | use serde::Deserialize;
+  |     ^^^^^ can't find crate
+
+error[E0277]: the trait bound `Model: serde::Deserialize<'de>` is not satisfied
+    --> src/main.rs:35:21
+     |
+  35 |     let model:Model=serde_json::from_slice(&std::fs::read(dir.join("model.json")).unwrap()).unwrap();
+     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+     |
+help: the trait `serde_core::de::Deserialize<'_>` is not implemented for `Model`
+    --> src/main.rs:9:1
+     |
+   9 | struct Model { observe_time_s:f64, clocks:BTreeMap<String,Vec<f64>> }
+     | ^^^^^^^^^^^^
+     = note: for local types consider adding `#[derive(serde::Deserialize)]` to your `Model` type
+     = note: for types from other crates check whether the crate offers a `serde` feature flag
+     = help: the following other types implement trait `serde_core::de::Deserialize<'de>`:
+               &'a Path
+               &'a [u8]
+               &'a str
+               ()
+               (T,)
+               (T0, T1)
+               (T0, T1, T2)
+               (T0, T1, T2, T3)
+             and 141 others
+     = note: there are multiple different versions of crate `rei_vigilode_age_transport` in the dependency graph
+     = help: you can use `cargo tree` to explore your dependency tree
+note: required by a bound in `from_slice`
+    --> /workspace/scratch/36ed695112a9/rei_bianchi/research/rei_age_exposure_envelope_20261018/vigilode_age_transport_20261019/rust/vendor/serde_json/src/de.rs:2657:8
+     |
+2655 | pub fn from_slice<'a, T>(v: &'a [u8]) -> Result<T>
+     |        ---------- required by a bound in this function
+2656 | where
+2657 |     T: de::Deserialize<'a>,
+     |        ^^^^^^^^^^^^^^^^^^^ required by this bound in `from_slice`
+
+Some errors have detailed explanations: E0277, E0463.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `rei-vigilode-age-transport` (bin "rei-vigilode-age-transport" test) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

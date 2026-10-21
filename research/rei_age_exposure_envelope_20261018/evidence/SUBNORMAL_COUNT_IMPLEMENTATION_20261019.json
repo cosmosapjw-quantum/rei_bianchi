@@ -1,0 +1,59 @@
+{
+  "contract": "AE-SUBNORMAL-COUNT-20261019-D",
+  "base": "0c6b0466b10a47788f6415a8538e9d3e7a268163",
+  "files": {
+    "src/subnormal_count_rounding.py": {
+      "sha256": "c9e76b05613fa0fea4b28f1b509f6a240c1153b5724ff76297fa2f5f429f0f50",
+      "size": 4681
+    },
+    "src/prepare_native.py": {
+      "sha256": "490c069f8df885b2a9498353241812b768fe0d1823424c2b3e91f5719ed2d497",
+      "size": 6862
+    },
+    "scripts/run_accuracy_followup.sh": {
+      "sha256": "dc58b72302ac4fd9e123cd6024192b61c2d84ebee0996d2e025108c482b9c76e",
+      "size": 2062
+    },
+    "tests/test_subnormal_count_rounding.py": {
+      "sha256": "2396fa6dc043c1f2bc06b6aab2f8237a4dad995c45325f85c754c94e368c3e09",
+      "size": 5666
+    },
+    "tests/fixtures/subnormal_count_captured_cell.json": {
+      "sha256": "49e306b254f9f9694630e513f2a792d0a6a1db2d679e012795ff1becd9e7a3aa",
+      "size": 11568
+    },
+    "contracts/NATIVE_INPUTS.json": {
+      "sha256": "ab90ff29ec8b13b1bf6b31aa075be563d4ceab68f34b7255f107306fc750e4d3",
+      "size": 25989
+    }
+  },
+  "stage1_prepare_snapshot": "evidence/stage1_source_snapshot/prepare_native.py",
+  "stage1_prepare_sha256": "22395cbfff72ab362b7012009b881f3b8d101ba54f897ec467f54243e4ff353b",
+  "tests": {
+    "command": "source runtime_probe/rust_env.sh; PYTHONPATH=rei_bianchi/research/rei_age_exposure_envelope_20261018/src python3 -m unittest discover -s rei_bianchi/research/rei_age_exposure_envelope_20261018/tests -p test_subnormal_count_rounding.py -v",
+    "exit_code": 0,
+    "count": 3,
+    "wall_s": 0.384
+  },
+  "shell_syntax": {
+    "command": "bash -n scripts/run_accuracy_followup.sh",
+    "exit_code": 0
+  },
+  "compile": {
+    "command": "build_native.py --prepared evidence/native_subnormal_count_smoke/native --wall-s 60",
+    "exit_code": 0,
+    "receipt": "evidence/native_subnormal_count_smoke/native/BUILD_RECEIPT.json"
+  },
+  "execution_result": "evidence/native_subnormal_count_smoke/SUBNORMAL_COUNT_RESULT.json",
+  "execution_scope": "One local time8 only; no age64 or NCP run",
+  "default_mode": "none",
+  "statistics_scope": "FIRST_SUCCESS_ONLY",
+  "unmodified_stage1_evidence_receipts": true,
+  "scientific_admission": "NOT_ISSUED",
+  "reviewed_default_diagnostic_regression": {
+    "command": "source runtime_probe/rust_env.sh; PYTHONPATH=rei_bianchi/research/rei_age_exposure_envelope_20261018/src python3 -m unittest discover -s rei_bianchi/research/rei_age_exposure_envelope_20261018/tests -p test_moment_fit_diagnostic.py -v",
+    "exit_code": 0,
+    "count": 3,
+    "wall_s": 0.142
+  }
+}

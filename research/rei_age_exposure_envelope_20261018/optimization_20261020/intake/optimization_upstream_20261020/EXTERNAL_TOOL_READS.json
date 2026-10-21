@@ -1,0 +1,787 @@
+{
+  "exa_search": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Title: std::simd - Rust\nURL: https://doc.rust-lang.org/stable/std/simd/\nPublished: N/A\nAuthor: N/A\nHighlights:\nstd::simd - Rust\n\nSource \n\n🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nExpand description\n\nPortable SIMD module.\n\nThis module offers a portable abstraction for SIMD operations that is not bound to any particular hardware architecture.\n\n## § What is “portable”?\n\nThis module provides a SIMD implementation that is fast and predictable on any target.\n\n#### § Portable SIMD works on every target\n\nUnlike target-specific SIMD in `std::arch`, portable SIMD compiles for every target. In this regard, it is just like “regular” Rust.\n\n#### § Portable SIMD is consistent between targets\n\nA program using portable SIMD can expect identical behavior on any target. In most regards, `Simd<T, N>` can be thought of as a parallelized `[T; N]` and operates like a sequence of `T`.\n\nThis has one notable exception: a handful of older architectures (e.g. `armv7` and `powerpc`) flush subnormal `f32` values to zero. On these architectures, subnormal `f32` input values are replaced with zeros, and any operation producing subnormal `f32` values produces zeros instead. This doesn’t affect most architectures or programs.\n\n#### § Operations use the best instructions available\n\nOperations provided by this module compile to the best available SIMD instructions.\n\nPortable SIMD is not a low-level vendor library, and operations in portable SIMD do not necessarily map to a single instruction. Instead, they map to a reasonable implementation of the operation for the target.\n\nConsistency between targets is not compromised to use faster or fewer instructions. In some cases, `std::arch` will provide a faster function that has slightly different behavior than the `std::simd` equivalent. For example, `_mm_min_ps` 1 can be slightly faster than `SimdFloat::simd_min`, but does not conform to the IEEE standard also used by `f32::min`. When necessary, `Simd<T, N>` can be converted to the types provided by `std::arch` to make use of target-specific functions.\n\nMany targets simply don’t have SIMD, or don’t support SIMD for a particular element type. In those cases, regular scalar operations are generated instead.\n\n---\n\nTitle: rug - Rust\nURL: https://docs.rs/rug/latest/rug/\nPublished: N/A\nAuthor: N/A\nHighlights:\n## § Arbitrary-precision numbers\n\nRug provides integers and floating-point numbers with arbitrary precision and correct rounding:\n\n- `Integer` is a bignum integer with arbitrary precision,\n- `Rational` is a bignum rational number with arbitrary precision,\n- `Float` is a multi-precision floating-point number with correct rounding, and\n- `Complex` is a multi-precision complex number with correct rounding.\n\nRug is a high-level interface to the following GNU libraries:\n\n- GMP for integers and rational numbers,\n- MPFR for floating-point numbers, and\n- MPC for complex numbers.\n\nRug is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See the full text of the GNU LGPL and GNU GPL for details.\n\nYou are also free to use the examples in this documentation without any restrictions; the examples are in the public domain.\n\n...\n\n### § Quick example\n\n```\nuse rug::{Assign, Integer};\nlet mut int = Integer::new();\nassert_eq!(int, 0);\nint.assign(14);\nassert_eq!(int, 14);\n\nlet decimal = \"98_765_432_109_876_543_210\";\nint.assign(Integer::parse(decimal).unwrap());\nassert!(int > 100_000_000);\n\nlet hex_160 = \"ffff0000ffff0000ffff0000ffff0000ffff0000\";\nint.assign(Integer::parse_radix(hex_160, 16).unwrap());\nassert_eq!(int.significant_bits(), 160);\nint = (int >> 128) - 1;\nassert_eq!(int, 0xfffe_ffff_u32);\n```\n\n- `Integer::new` creates a new `Integer` intialized to zero.\n- To assign values to Rug types, we use the `Assign` trait and its method `Assign::assign`. We do not use the assignment operator `=` as that would drop the left-hand-side operand and replace it with a right-hand-side operand of the same type, which is not what we want here.\n- Arbitrary precision numbers can hold numbers that are too large to fit in a primitive type. To assign such a number to the large types, we use strings rather than primitives; in the example this is done using `Integer::parse` and `Integer::parse_radix`.\n- We can compare Rug types to primitive types or to other Rug types using the normal comparison operators, for example `int > 100_000_000`.\n- Most arithmetic operations are supported with Rug types and primitive types on either side of the operator, for example `int >> 128`.\n\n...\n\n### § Incomplete-computation values\n\nThere are two main reasons why operations like `&a - &b` do not perform a complete computation and return a Rug type:\n\n1. Sometimes we need to assign the result to an object that already exists. Since Rug types require memory allocations, this can help reduce the number of allocations. (While the allocations might not affect performance noticeably for computationally intensive functions, they can have a much more significant effect on faster functions like addition.)\n2. For the `Float` and `Complex` number types, we need to know the precision when we create a value, and the operation itself does not convey information about what precision is desired for the result.\n\nThere are two things that can be done with incomplete-computation values:\n\n1. Assign them to an existing object without unnecessary allocations. This is usually achieved using the `Assign` trait or a similar method, for example `int.assign(incomplete)` and `float.assign_round(incomplete, Round::Up)`.\n2. Convert them to the final value using the `Complete` trait, the `From` trait or a similar method. For example incomplete integers can be completed using `incomplete.complete()` or `Integer::from(incomplete)`. Incomplete floating-point numbers can be completed using `incomplete.complete(53)` or `Float::with_val(53, incomplete)` since the precision has to be specified.\n\n...\n\n### § Using Rug\n\nRug is available on crates.io. To use Rug in your crate, add it as a dependency inside Cargo.toml:\n\n```toml\n[dependencies]\nrug = \"1.30\"\n```\n\nRug requires rustc version 1.85.0 or later.\n\nRug also depends on the GMP, MPFR and MPC libraries through the low-level FFI bindings in the gmp-mpfr-sys crate, which needs some setup to build; the gmp-mpfr-sys documentation has some details on usage under GNU/Linux, macOS and Windows.\n\n---\n\nTitle: pulp - Rust\nURL: https://docs.rs/pulp/latest/pulp/\nPublished: N/A\nAuthor: N/A\nHighlights:\npulp - Rust\n\nSource \n\nExpand description\n\n`pulp` is a safe abstraction over SIMD instructions, that allows you to write a function once and dispatch to equivalent vectorized versions based on the features detected at runtime.\n\n## § Autovectorization example\n\n```\nuse pulp::Arch;\n\nlet mut v = (0..1000).map(|i| i as f64).collect::<Vec<_>>();\nlet arch = Arch::new();\n\narch.dispatch(|| {\n\tfor x in &mut v {\n\t\t*x *= 2.0;\n\t}\n});\n\nfor (i, x) in v.into_iter().enumerate() {\n\tassert_eq!(x, 2.0 * i as f64);\n}\n```\n\n## § Manual vectorization example\n\n```\nuse pulp::{Arch, Simd, WithSimd};\n\nstruct TimesThree<'a>(&'a mut [f64]);\nimpl<'a> WithSimd for TimesThree<'a> {\n\ttype Output = ();\n\n\t#[inline(always)]\n\tfn with_simd<S: Simd>(self, simd: S) -> Self::Output {\n\t\tlet v = self.0;\n\t\tlet (head, tail) = S::as_mut_simd_f64s(v);\n\n\t\tlet three = simd.splat_f64s(3.0);\n\t\tfor x in head {\n\t\t\t*x = simd.mul_f64s(three, *x);\n\t\t}\n\n\t\tfor x in tail {\n\t\t\t*x = *x * 3.0;\n\t\t}\n\t}\n}\n\nlet mut v = (0..1000).map(|i| i as f64).collect::<Vec<_>>();\nlet arch = Arch::new();\n\narch.dispatch(TimesThree(&mut v));\n\nfor (i, x) in v.into_iter().enumerate() {\n\tassert_eq!(x, 3.0 * i as f64);\n}\n```\n\n...\n\n`macro`\n: Requires the first non-lifetime generic parameter, as well as the function’s first input parameter to be the SIMD type. Also currently requires that all the lifetimes be explicitly specified.\n\n---\n\nTitle: wide - Rust\nURL: https://docs.rs/wide/latest/wide/\nPublished: N/A\nAuthor: N/A\nHighlights:\nwide - Rust\n\nSource \n\nExpand description\n\nA crate to help you go wide.\n\nThis crate provides SIMD-compatible data types.\n\nWhen possible, explicit SIMD is used with all the math operations here. As a fallback, the fact that all the lengths of a fixed length array are doing the same thing will often make LLVM notice that it should use SIMD instructions to complete the task. In the worst case, the code just becomes totally scalar (though the math is still correct, at least).\n\n...\n\n## § Masks\n\nSIMD vector masks are per-element booleans, and are represented by SIMD vectors where each\n\n...\n\n## § Shuffling\n\nShuffling, also known as swizzling, creates a new SIMD vector by selecting elements from one or more input vectors according to a set of indices.\n\nSingle-input shuffling is performed using the `shuffle` method and its variants. Multi-input shuffling is performed by placing the input vectors in an array and calling the corresponding methods from `ShuffleExt`.\n\nCurrently, `wide` only supports runtime-index based shuffling:\n\n```\nuse wide::{f32x4, ShuffleExt, u32x4};\n\nlet simd_a = f32x4::new([0.0, 1.0, 2.0, 3.0]);\nlet simd_b = f32x4::new([100.0, 101.0, 102.0, 103.0]);\n\nlet reverse = simd_a.shuffle(u32x4::new([3, 2, 1, 0]));\n\nassert_eq!(reverse, f32x4::new([3.0, 2.0, 1.0, 0.0]));\n\n// Here, indices `0..4` map to `simd_a`, and indices `4..8` map to `simd_b`\nlet from_two_vectors = [simd_a, simd_b].shuffle(u32x4::new([2, 3, 4, 5]));\n\nassert_eq!(from_two_vectors, f32x4::new([2.0, 3.0, 100.0, 101.0]));\n```\n\n...\n\n## § Wrapping semantics\n\nSIMD vectors of integers treat operators as wrapping, as if `Wrapping ` was used. Thus, SIMD vectors do not implement `wrapping_*` functions, because that is the default behavior. This means there are no overflow checks, even in debug builds.\n\nThe reason for this is that for most applications where SIMD is appropriate, it is “not a bug” to wrap, and even debug builds are unlikely to tolerate the loss of performance.\n\nThis “no panicking” approach extends to more than just integer overflows. It is also true for things like `f32x4::clamp`. Even though `f32::clamp` panics for invalid inputs, the SIMD version does not, because it may be used with per-element branching, where invalid elements get discarded later by `select`.\n\n---\n\nTitle: rust-lang/portable-simd\nURL: https://github.com/rust-lang/stdsimd\nPublished: N/A\nAuthor: N/A\nHighlights:\n# The Rust standard library's portable SIMD API\nBuild Status\n\nCode repository for the Portable SIMD Project Group.\nPlease refer to CONTRIBUTING.md for our contributing guidelines.\n\nThe docs for this crate are published from the main branch.\nYou can [read them here][docs].\n\nIf you have questions about SIMD, we have begun writing a [guide][simd-guide].\nWe can also be found on [Zulip][zulip-project-portable-simd].\n\nIf you are interested in support for a specific architecture, you may want [stdarch] instead.\n\n## Hello World\n\nNow we're gonna dip our toes into this world with a small SIMD \"Hello, World!\" example. Make sure your compiler is up to date and using `nightly`. We can do that by running \n\n```bash\nrustup update -- nightly\n```\n\nor by setting up `rustup default nightly` or else with `cargo +nightly {build,test,run}`. After updating, run \n```bash\ncargo new hellosimd\n```\nto create a new crate. Finally write this in `src/main.rs`:\n```rust\n#![feature(portable_simd)]\nuse std::simd::f32x4;\nfn main() {\n    let a = f32x4::splat(10.0);\n    let b = f32x4::from_array([1.0, 2.0, 3.0, 4.0]);\n    println!(\"{:?}\", a + b);\n}\n```\n\nExplanation: We construct our SIMD vectors with methods like `splat` or `from_array`. Next, we can use operators like `+` on them, and the appropriate SIMD instructions will be carried out. When we run `cargo run` you should get `[11.0, 12.0, 13.0, 14.0]`.\n\n...\n\n## Supported vectors\n\nCurrently, vectors may have up to 64 elements, but aliases are provided only up to 512-bit vectors.\n\nDepending on the size of the primitive type, the number of lanes the vector will have varies. For example, 128-bit vectors have four `f32` lanes and two `f64` lanes.\n\nThe supported element types are as follows:\n* **Floating Point:** `f32`, `f64`\n* **Signed Integers:** `i8`, `i16`, `i32`, `i64`, `isize` (`i128` excluded)\n* **Unsigned Integers:** `u8`, `u16`, `u32`, `u64`, `usize` (`u128` excluded)\n* **Pointers:** `*const T` and `*mut T` (zero-sized metadata only)\n* **Masks:** 8-bit, 16-bit, 32-bit, 64-bit, and `usize`-sized masks\n\nFloating point, signed integers, unsigned integers, and pointers are the primitive types you're already used to.\nThe mask types have elements that are \"truthy\" values, like `bool`, but have an unspecified layout because different architectures prefer different layouts for mask types.\n\n[simd-guide]: ./beginners-guide.md\n[zulip-project-portable-simd]: https://rust-lang.zulipchat.com/#narrow/stream/257879-project-portable-simd\n[stdarch]:\n\n---\n\nTitle: StdFloat in std::simd - Rust\nURL: https://doc.rust-lang.org/stable/std/simd/trait.StdFloat.html\nPublished: N/A\nAuthor: N/A\nHighlights:\nStdFloat in std::simd - Rust\n\nSource \n\npub trait StdFloat: Sealed + Sized { \n\nShow 16 methods\n\n // Required method fn fract(self) -> Self; // Provided methods fn mul_add(self, a: Self, b: Self) -> Self { ... } fn sqrt(self) -> Self { ... } fn sin(self) -> Self { ... } fn cos(self) -> Self { ... } fn exp(self) -> Self { ... } fn exp2(self) -> Self { ... } fn ln(self) -> Self { ... } fn log(self, base: Self) -> Self { ... } fn log2(self) -> Self { ... } fn log10(self) -> Self { ... } fn ceil(self) -> Self { ... } fn floor(self) -> Self { ... } fn round(self) -> Self { ... } fn trunc(self) -> Self { ... } fn round_ties_even(self) -> Self { ... } \n\n🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nExpand description\n\nThis trait provides a possibly-temporary implementation of float functions that may, in the absence of hardware support, canonicalize to calling an operating system’s `math.h` dynamically-loaded library (also known as a shared object). As these conditionally require runtime support, they should only appear in binaries built assuming OS support: `std`.\n\nHowever, there is no reason SIMD types, in general, need OS support, as for many architectures an embedded binary may simply configure that support itself. This means these types must be visible in `core` but have these functions available in `std`.\n\n`f32` and `f64` achieve a similar trick by using “lang items”, but due to compiler limitations, it is harder to implement this approach for abstract data types like `Simd`. From that need, this trait is born.\n\nIt is possible this trait will be replaced in some manner in the future, when either the compiler or its supporting runtime functions are improved. For now this trait is available to permit experimentation with SIMD float operations that may lack hardware support, such as `mul_add`.\n\n...\n\n## Required Methods§\n\nSource fn fract(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nReturns the floating point’s fractional value, with its integer part removed.\n\n## Provided Methods§\n\nSource fn mul_add(self, a: Self, b: Self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nElementwise fused multiply-add. Computes `(self * a) + b` with only one rounding error, yielding a more accurate result than an unfused multiply-add.\n\nUsing `mul_add` may be more performant than an unfused multiply-add if the target architecture has a dedicated `fma` CPU instruction. However, this is not always true, and will be heavily dependent on designing algorithms with specific target hardware in mind.\n\nSource fn sqrt(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nProduces a vector where every element has the square root value of the equivalently-indexed element in `self`\n\nSource fn sin(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nProduces a vector where every element has the sine of the value in the equivalently-indexed element in `self`.\n\nSource fn cos(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nProduces a vector where every element has the cosine of the value in the equivalently-indexed element in `self`.\n\nSource fn exp(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nProduces a vector where every element has the exponential (base e) of the value in the equivalently-indexed element in `self`.\n\nSource fn exp2(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nProduces a vector where every element has the exponential (base 2) of the value in the equivalently-indexed element in `self`.\n\nSource fn ln(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nProduces a vector where every element has the natural logarithm of the value in the equivalently-indexed element in `self`.\n\nSource fn log(self, base: Self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nProduces a vector where every element has the logarithm with respect to an arbitrary in the equivalently-indexed elements in `self` and `base`.\n\nSource fn log2(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nProduces a vector where every element has the base-2 logarithm of the value in the equivalently-indexed element in `self`.\n\nSource fn log10(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nProduces a vector where every element has the base-10 logarithm of the value in the equivalently-indexed element in `self`.\n\nSource fn ceil(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nReturns the smallest integer greater than or equal to each element.\n\nSource fn floor(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nReturns the largest integer value less than or equal to each element.\n\nSource fn round(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nRounds to the nearest integer value. Ties round toward zero.\n\nSource fn trunc(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nReturns the floating point’s integer value, with its fractional part removed.\n\nSource fn round_ties_even(self) -> Self🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nRounds each element to the nearest integer-valued float. Ties are resolved by rounding to the number with an even least significant digit.",
+        "_meta": {
+          "searchTime": 1797.1
+        }
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "exa_docs": {
+    "content": [
+      {
+        "type": "text",
+        "text": "# Round in rug::float - Rust\nURL: https://docs.rs/rug/1.30.0/rug/float/enum.Round.html\n\nRound in rug::float - Rust\n\nSource \n\n#[non_exhaustive]\n\npub enum Round { Nearest, Zero, Up, Down, AwayZero, }\n\nExpand description\n\nThe rounding methods for floating-point values.\n\nWhen rounding to the nearest, if the number to be rounded is exactly between two representable numbers, it is rounded to the even one, that is, the one with the least significant bit set to zero.\n\n## § Examples\n\n```\nuse rug::float::Round;\nuse rug::ops::AssignRound;\nuse rug::Float;\nlet mut f4 = Float::new(4);\nf4.assign_round(10.4, Round::Nearest);\nassert_eq!(f4, 10);\nf4.assign_round(10.6, Round::Nearest);\nassert_eq!(f4, 11);\nf4.assign_round(-10.7, Round::Zero);\nassert_eq!(f4, -10);\nf4.assign_round(10.3, Round::Up);\nassert_eq!(f4, 11);\n```\n\nRounding to the nearest will round numbers exactly between two representable numbers to the even one.\n\n```\nuse rug::float::Round;\nuse rug::ops::AssignRound;\nuse rug::Float;\n// 24 is 11000 in binary\n// 25 is 11001 in binary\n// 26 is 11010 in binary\n// 27 is 11011 in binary\n// 28 is 11100 in binary\nlet mut f4 = Float::new(4);\nf4.assign_round(25, Round::Nearest);\nassert_eq!(f4, 24);\nf4.assign_round(27, Round::Nearest);\nassert_eq!(f4, 28);\n```\n\n## Variants (Non-exhaustive)§\n\nThis enum is marked as non-exhaustive\n\nNon-exhaustive enums could have additional variants added in future. Therefore, when matching against variants of non-exhaustive enums, an extra wildcard arm must be added to account for any future variants.\n\n### Nearest\n\nRound towards the nearest, with ties rounding to even.\n\n### Zero\n\nRound towards zero.\n\n### Up\n\nRound towards plus infinity.\n\n### Down\n\nRound towards minus infinity.\n\n### AwayZero\n\nRound away from zero.\n\n## Implementations§\n\nSource§ impl Round\n\nSource pub fn reverse(self) -> Round\n\nReverses the rounding direction.\n\n- `Up` becomes `Down`.\n- `Down` becomes `Up`.\n- Other variants are not affected.\n\n##### § Examples\n\n```\nuse rug::float::Round;\n\nassert_eq!(Round::Up.reverse(), Round::Down);\nassert_eq!(Round::Down.reverse(), Round::Up);\nassert_eq!(Round::Nearest.reverse(), Round::Nearest);\n```\n\n## Trait Implementations§\n\nSource§ impl Clone for Round\n\nSource§ fn clone(&self) -> Self\n\nReturns a duplicate of the value. Read more\n\n1.0.0 (const: unstable) · Source§ fn clone_from(&mut self, source: &Self)\n\nPerforms copy-assignment from `source`. Read more\n\n### impl Copy for Round\n\nSource§ impl Debug for Round\n\nSource§ fn fmt(&self, f: &mut Formatter<'_>) -> Result\n\nFormats the value using the given formatter. Read more\n\nSource§ impl Default for Round\n\nSource§ fn default() -> Self\n\nReturns the “default value” for a type. Read more\n\n### impl Eq for Round\n\nSource§ impl Hash for Round\n\nSource§ fn hash<__H: Hasher>(&self, state: &mut __H)\n\nFeeds this value into the given `Hasher`. Read more\n\n1.3.0 · Source§ fn hash_slice (data: &[Self], state: &mut H) where H: Hasher, Self: Sized,\n\nFeeds a slice of this type into the given `Hasher`. Read more\n\nSource§ impl Ord for Round\n\nSource§ fn cmp(&self, other: &Self) -> Ordering\n\nThis method returns an `Ordering` between `self` and `other`. Read more\n\n1.21.0 (const: unstable) · Source§ fn max(self, other: Self) -> Self where Self: Sized,\n\nCompares and returns the maximum of two values. Read more\n\n1.21.0 (const: unstable) · Source§ fn min(self, other: Self) -> Self where Self: Sized,\n\nCompares and returns the minimum of two values. Read more\n\n1.50.0 (const: unstable) · Source§ fn clamp(self, min: Self, max: Self) -> Self where Self: Sized,\n\nRestrict a value to a certain interval. Read more\n\nSource§ fn clamp_to (self, range: R) -> Self where Self: Sized, R: ClampBounds,\n\n🔬 This is a nightly-only experimental API. (`clamp_to`)\n\nRestrict a value to a certain range. Read more\n\nSource§ impl PartialEq for Round\n\nSource§ fn eq(&self, other: &Self) -> bool\n\nEquality operator `==`. Read more\n\n1.0.0 (const: unstable) · Source§ fn ne(&self, other: &Rhs) -> bool\n\nInequality operator `!=`. Read more\n\nSource§ impl PartialOrd for Round\n\nSource§ fn partial_cmp(&self, other: &Self) -> Option< Ordering>\n\nThis method returns an ordering between `self` and `other` values if one exists. Read more\n\n1.0.0 (const: unstable) · Source§ fn lt(&self, other: &Rhs) -> bool\n\nTests less than (for `self` and `other`) and is used by the `<` operator. Read more\n\n1.0.0 (const: unstable) · Source§ fn le(&self, other: &Rhs) -> bool\n\nTests less than or equal to (for `self` and `other`) and is used by the `<=` operator. Read more\n\n1.0.0 (const: unstable) · Source§ fn gt(&self, other: &Rhs) -> bool\n\nTests greater than (for `self` and `other`) and is used by the `>` operator. Read more\n\n1.0.0 (const: unstable) · Source§ fn ge(&self, other: &Rhs) -> bool\n\nTests greater than or equal to (for `self` and `other`) and is used by the `>=` operator. Read more\n\n## Blanket Implementations§\n\nSource§ impl Any for T where T: 'static + ? Sized,\n\nSource§ fn type_id(&self) -> TypeId\n\nGets the `TypeId` of `self`. Read more\n\nSource§ impl Az for T\n\nSource§ fn az (self) -> Dst where T: Cast,\n\nCasts the value.\n\nS\n\n# Float in rug - Rust\nURL: https://docs.rs/rug/1.30.0/rug/struct.Float.html\n\nFloat in rug - Rust\n\nSource \n\n```\npub struct Float { /* private fields */ }\n```\n\nExpand description\n\nA multi-precision floating-point number with arbitrarily large precision and correct rounding\n\nThe precision has to be set during construction. The rounding method of the required operations can be specified, and the direction of the rounding is returned.\n\n## § Examples\n\n```\nuse core::cmp::Ordering;\nuse rug::float::Round;\nuse rug::ops::DivAssignRound;\nuse rug::Float;\n// A precision of 32 significant bits is specified here.\n// (The primitive `f32` has a precision of 24 and\n// `f64` has a precision of 53.)\nlet mut two_thirds_down = Float::with_val(32, 2.0);\nlet dir = two_thirds_down.div_assign_round(3.0, Round::Down);\n// since we rounded down, direction is Ordering::Less\nassert_eq!(dir, Ordering::Less);\nlet mut two_thirds_up = Float::with_val(32, 2.0);\nlet dir = two_thirds_up.div_assign_round(3.0, Round::Up);\n// since we rounded up, direction is Ordering::Greater\nassert_eq!(dir, Ordering::Greater);\nlet diff_expected = 2.0_f64.powi(-32);\nlet diff = two_thirds_up - two_thirds_down;\nassert_eq!(diff, diff_expected);\n```\n\nOperations on two borrowed `Float` numbers result in an incomplete-computation value that has to be assigned to a new `Float` value.\n\n```\nuse rug::Float;\nlet a = Float::with_val(53, 10.5);\nlet b = Float::with_val(53, -1.25);\nlet a_b_ref = &a + &b;\nlet a_b = Float::with_val(53, a_b_ref);\nassert_eq!(a_b, 9.25);\n```\n\nAs a special case, when an incomplete-computation value is obtained from multiplying two `Float` references, it can be added to or subtracted from another `Float` (or reference). This will result in a fused multiply-accumulate operation, with only one rounding operation taking place.\n\n```\nuse rug::Float;\n// Use only 4 bits of precision for demonstration purposes.\n// 24 in binary is 11000.\nlet a = Float::with_val(4, 24);\n// 1.5 in binary is 1.1.\nlet mul1 = Float::with_val(4, 1.5);\n// -13 in binary is -1101.\nlet mul2 = Float::with_val(4, -13);\n// 24 + 1.5 × -13 = 4.5\nlet add = Float::with_val(4, &a + &mul1 * &mul2);\nassert_eq!(add, 4.5);\n// 24 - 1.5 × -13 = 43.5, rounded to 44 using four bits of precision.\nlet sub = a - &mul1 * &mul2;\nassert_eq!(sub, 44);\n\n// With separate addition and multiplication:\nlet a = Float::with_val(4, 24);\n// No borrows, so multiplication is computed immediately.\n// 1.5 × -13 = -19.5 (binary -10011.1), rounded to -20.\nlet separate_add = a + mul1 * mul2;\nassert_eq!(separate_add, 4);\n```\n\nThe incomplete-computation value obtained from multiplying two `Float` references can also be added to or subtracted from another such incomplete-computation value, so that two muliplications and an addition are fused with only one rounding operation taking place.\n\n```\nuse rug::Float;\nlet a = Float::with_val(53, 24);\nlet b = Float::with_val(53, 1.5);\nlet c = Float::with_val(53, 12);\nlet d = Float::with_val(53, 2);\n// 24 × 1.5 + 12 × 2 = 60\nlet add = Float::with_val(53, &a * &b + &c * &d);\nassert_eq!(add, 60);\n// 24 × 1.5 - 12 × 2 = 12\nlet sub = Float::with_val(53, &a * &b - &c * &d);\nassert_eq!(sub, 12);\n```\n\nThe `Float` type supports various functions. Most methods have four versions:\n\n1. The first method consumes the operand and rounds the returned `Float` to the nearest representable value.\n2. The second method has a “`_mut`” suffix, mutates the operand and rounds it the nearest representable value.\n3. The third method has a “`_round`” suffix, mutates the operand, applies the specified rounding method, and returns the rounding direction: \n\n- `Ordering::Less` if the stored value is less than the exact result,\n- `Ordering::Equal` if the stored value is equal to the exact result,\n- `Ordering::Greater` if the stored value is greater than the exact result.\n4. The fourth method has a “`_ref`” suffix and borrows the operand. The returned item is an incomplete-computation value that can be assigned to a `Float`; the rounding method is selected during the assignment.\n\n```\nuse core::cmp::Ordering;\nuse rug::float::Round;\nuse rug::Float;\nlet expected = 0.9490_f64;\n\n// 1. consume the operand, round to nearest\nlet a = Float::with_val(53, 1.25);\nlet sin_a = a.sin();\nassert!((sin_a - expected).abs() < 0.0001);\n\n// 2. mutate the operand, round to nearest\nlet mut b = Float::with_val(53, 1.25);\nb.sin_mut();\nassert!((b - expected).abs() < 0.0001);\n\n// 3. mutate the operand, apply specified rounding\nlet mut c = Float::with_val(4, 1.25);\n// using 4 significant bits, 0.9490 is rounded down to 0.9375\nlet dir = c.sin_round(Round::Nearest);\nassert_eq!(c, 0.9375);\nassert_eq!(dir, Ordering::Less);\n\n// 4. borrow the operand\nlet d = Float::with_val(53, 1.25);\nlet r = d.sin_ref();\nlet sin_d = Float::with_val(53, r);\nassert!((sin_d - expected).abs() < 0.0001);\n// d was not consumed\nassert_eq!(d, 1.25);\n```\n\nThe following example is a translation of the MPFR sample found on the MPFR website. The program computes a lower bound on 1 + 1/1! + 1/2! + … + 1/100! using 200-bit precision. The program writes:\n\n`Sum is\n\n# f64x4 in wide - Rust\nURL: https://docs.rs/wide/latest/wide/struct.f64x4.html\n\nf64x4 in wide - Rust\n\nSource \n\n```\npub struct f64x4 { /* private fields */ }\n```\n\nExpand description\n\nA SIMD vector with four elements of type `f64`.\n\nSee the crate level documentation for more information about SIMD vectors.\n\n## Implementations§\n\nSource§ impl f64x4 The following functionality exists for all SIMD vectors. \n\nSource pub const fn new(array: [f64; 4]) -> Self\n\nConverts an array to a SIMD vector.\n\nSource pub const fn splat(elem: f64) -> Self\n\nConstructs a new SIMD vector with all elements set to the given value.\n\nSource pub const fn to_array(self) -> [f64; 4]\n\nConverts a SIMD vector to an array.\n\nSource pub const fn as_array(&self) -> &[f64; 4]\n\nReturns an array reference containing the entire SIMD vector.\n\nSource pub const fn as_mut_array(&mut self) -> &mut [f64; 4]\n\nReturns a mutable array reference containing the entire SIMD vector.\n\nSource pub const fn from_ne_bytes(bytes: [u8; 32]) -> Self\n\nCreates a SIMD vector from a native-endian byte array.\n\nThe bytes are interpreted as the raw memory representation of the vector. This is equivalent to the `from_ne_bytes` functions on the primitive scalar types, but operates on the entire vector at once.\n\nThis is the inverse of `to_ne_bytes`.\n\nSource pub const fn to_ne_bytes(self) -> [u8; 32]\n\nReturns the raw memory representation of `self` as a native-endian byte array.\n\nThis is the inverse of `from_ne_bytes`.\n\nSource pub fn simd_eq (self, other: Rhs) -> >:: Output where Self: CmpEq,\n\nReturns a mask that checks if each element of `self` is equal to the corresponding element of `other`.\n\nSource pub fn simd_ne (self, other: Rhs) -> >:: Output where Self: CmpNe,\n\nReturns a mask that checks if each element of `self` is not equal to the corresponding element of `other`.\n\nSource pub fn simd_lt (self, other: Rhs) -> >:: Output where Self: CmpLt,\n\nReturns a mask that checks if each element of `self` is less than the corresponding element of `other`.\n\nSource pub fn simd_gt (self, other: Rhs) -> >:: Output where Self: CmpGt,\n\nReturns a mask that checks if each element of `self` is greater than the corresponding element of `other`.\n\nSource pub fn simd_le (self, other: Rhs) -> >:: Output where Self: CmpLe,\n\nReturns a mask that checks if each element of `self` is less than or equal to the corresponding element of `other`.\n\nSource pub fn simd_ge (self, other: Rhs) -> >:: Output where Self: CmpGe,\n\nReturns a mask that checks if each element of `self` is greater than or equal to the corresponding element of `other`.\n\nSource pub fn reduce_add(self) -> f64\n\nReducing addition. Returns the sum of the vector’s elements.\n\nEquivalent to `self[0] + self[1] + ...`.\n\n##### § Unspecified precision\n\nThe order of addition is non-deterministic. This means it varies by platform, version, and can even differ within the same execution from one invocation to the next.\n\nSource pub fn reduce_mul(self) -> f64\n\nReducing multiplication. Returns the product of the vector’s elements.\n\nEquivalent to `self[0] * self[1] * ...`.\n\n##### § Unspecified precision\n\nThe order of multiplication is non-deterministic. This means it varies by platform, version, and can even differ within the same execution from one invocation to the next.\n\nSource pub fn bitselect(self, if_one: Self, if_zero: Self) -> Self\n\nBitwise selection.\n\nFor each bit of `self`:\n\n- If the bit is one, return the corresponding bit of `if_one`\n- If the bit is zero, return the corresponding bit of `if_zero`\n\nIf you know `self` is a mask, meaning each element is either all zeros or all ones, consider using `select` which is faster.\n\nSource pub fn select (self, if_true: Output, if_false: Output) -> Output where Self: Select,\n\nLanewise SIMD selection.\n\nFor each lane:\n\n- If all bits of `self` are one, return the corresponding lane of `if_true`\n- If all bits of `self` are zero, return the corresponding lane of `if_false`\n\nThis function assumes `self` is a mask, meaning each element is either all zeros or all ones. For bitwise selection use `bitselect`.\n\nIn addition to selecting SIMD vectors, this method can be used to select composite types (e.g., a downstream `Vec3 ` structure) if you implement `Select for Simd`.\n\nSource pub fn to_bitmask(self) -> u32\n\nConverts to a bitmask, where each bit is `1` if the element of `self` is true or `0` if the element of `self` is false.\n\nEach bit of the output corresponds to an element of `self`. The least significant bit corresponds to the lowest element. Remaining bits are `0`.\n\nThis function assumes `self` is a mask, meaning each element is either all zeros or all ones. If the input is not a mask, the result is unspecified.\n\nSource pub fn any(self) -> bool\n\nReturns `true` if any element of `self` is true.\n\nThis function assumes `self` is a mask, meaning each element is either all zeros or all ones. If the input is not a mask, the result is unspecified.\n\nSource pub fn all(self) -> bool\n\nReturns `true` if all elements of `self` are true.\n\nThis function assumes `self` is a mask, meaning each element is either \n\n# pulp - Rust\nURL: https://docs.rs/pulp/latest/pulp/\n\npulp - Rust\n\nSource \n\nExpand description\n\n`pulp` is a safe abstraction over SIMD instructions, that allows you to write a function once and dispatch to equivalent vectorized versions based on the features detected at runtime.\n\n## § Autovectorization example\n\n```\nuse pulp::Arch;\n\nlet mut v = (0..1000).map(|i| i as f64).collect::<Vec<_>>();\nlet arch = Arch::new();\n\narch.dispatch(|| {\n\tfor x in &mut v {\n\t\t*x *= 2.0;\n\t}\n});\n\nfor (i, x) in v.into_iter().enumerate() {\n\tassert_eq!(x, 2.0 * i as f64);\n}\n```\n\n## § Manual vectorization example\n\n```\nuse pulp::{Arch, Simd, WithSimd};\n\nstruct TimesThree<'a>(&'a mut [f64]);\nimpl<'a> WithSimd for TimesThree<'a> {\n\ttype Output = ();\n\n\t#[inline(always)]\n\tfn with_simd<S: Simd>(self, simd: S) -> Self::Output {\n\t\tlet v = self.0;\n\t\tlet (head, tail) = S::as_mut_simd_f64s(v);\n\n\t\tlet three = simd.splat_f64s(3.0);\n\t\tfor x in head {\n\t\t\t*x = simd.mul_f64s(three, *x);\n\t\t}\n\n\t\tfor x in tail {\n\t\t\t*x = *x * 3.0;\n\t\t}\n\t}\n}\n\nlet mut v = (0..1000).map(|i| i as f64).collect::<Vec<_>>();\nlet arch = Arch::new();\n\narch.dispatch(TimesThree(&mut v));\n\nfor (i, x) in v.into_iter().enumerate() {\n\tassert_eq!(x, 3.0 * i as f64);\n}\n```\n\n## Re-exports§\n\n`pub use x86::Arch;`\n`pub use bytemuck;`\n`pub use num_complex;`\n\n## Modules§\n\ncore_\n\narch\n: Platform dependent intrinsics.\nx86\n\nx86 or x86-64\n: Low level x86 API.\n\n## Macros§\n\ncast\n: Safe transmute macro.\nfeature_\n\ndetected\n\n`std` and (x86 or x86-64)\nsimd_\n\ntype\nstatic_\n\nassert_\n\nsame_\n\nsize\nstatic_\n\nassert_\n\nsize_\n\nless_\n\nthan_\n\nor_\n\nequal\n\n## Structs§\n\nMemMask\nScalar\nScalar128b\nScalar256b\nScalar512b\nb8\n: Bitmask type for 8 elements, used for mask operations on AVX512.\nb16\n: Bitmask type for 16 elements, used for mask operations on AVX512.\nb32\n: Bitmask type for 32 elements, used for mask operations on AVX512.\nb64\n: Bitmask type for 64 elements, used for mask operations on AVX512.\nc32x2\n: A 128-bit SIMD vector with 2 elements of type `c32`.\nc32x4\n: A 256-bit SIMD vector with 4 elements of type `c32`.\nc32x8\n: A 512-bit SIMD vector with 8 elements of type `c32`.\nc64x1\n: A 128-bit SIMD vector with 1 elements of type `c64`.\nc64x2\n: A 256-bit SIMD vector with 2 elements of type `c64`.\nc64x4\n: A 512-bit SIMD vector with 4 elements of type `c64`.\nf32x4\n: A 128-bit SIMD vector with 4 elements of type `f32`.\nf32x8\n: A 256-bit SIMD vector with 8 elements of type `f32`.\nf32x16\n: A 512-bit SIMD vector with 16 elements of type `f32`.\nf64x2\n: A 128-bit SIMD vector with 2 elements of type `f64`.\nf64x4\n: A 256-bit SIMD vector with 4 elements of type `f64`.\nf64x8\n: A 512-bit SIMD vector with 8 elements of type `f64`.\ni8x16\n: A 128-bit SIMD vector with 16 elements of type `i8`.\ni8x32\n: A 256-bit SIMD vector with 32 elements of type `i8`.\ni8x64\n: A 512-bit SIMD vector with 64 elements of type `i8`.\ni16x8\n: A 128-bit SIMD vector with 8 elements of type `i16`.\ni16x16\n: A 256-bit SIMD vector with 16 elements of type `i16`.\ni16x32\n: A 512-bit SIMD vector with 32 elements of type `i16`.\ni32x4\n: A 128-bit SIMD vector with 4 elements of type `i32`.\ni32x8\n: A 256-bit SIMD vector with 8 elements of type `i32`.\ni32x16\n: A 512-bit SIMD vector with 16 elements of type `i32`.\ni64x2\n: A 128-bit SIMD vector with 2 elements of type `i64`.\ni64x4\n: A 256-bit SIMD vector with 4 elements of type `i64`.\ni64x8\n: A 512-bit SIMD vector with 8 elements of type `i64`.\nm8\n: Mask type with 8 bits. Its bit pattern is either all ones or all zeros. Unsafe code must not depend on this, however.\nm8x16\n: A 128-bit SIMD vector with 16 elements of type `m8`.\nm8x32\n: A 256-bit SIMD vector with 32 elements of type `m8`.\nm8x64\n: A 512-bit SIMD vector with 64 elements of type `m8`.\nm16\n: Mask type with 16 bits. Its bit pattern is either all ones or all zeros. Unsafe code must not depend on this, however.\nm32\n: Mask type with 32 bits. Its bit pattern is either all ones or all zeros. Unsafe code must not depend on this, however.\nm64\n: Mask type with 64 bits. Its bit pattern is either all ones or all zeros. Unsafe code must not depend on this, however.\nm16x8\n: A 128-bit SIMD vector with 8 elements of type `m16`.\nm16x16\n: A 256-bit SIMD vector with 16 elements of type `m16`.\nm16x32\n: A 512-bit SIMD vector with 32 elements of type `m16`.\nm32x4\n: A 128-bit SIMD vector with 4 elements of type `m32`.\nm32x8\n: A 256-bit SIMD vector with 8 elements of type `m32`.\nm32x16\n: A 512-bit SIMD vector with 16 elements of type `m32`.\nm64x2\n: A 128-bit SIMD vector with 2 elements of type `m64`.\nm64x4\n: A 256-bit SIMD vector with 4 elements of type `m64`.\nm64x8\n: A 512-bit SIMD vector with 8 elements of type `m64`.\nu8x16\n: A 128-bit SIMD vector with 16 elements of type `u8`.\nu8x32\n: A 256-bit SIMD vector with 32 elements of type `u8`.\nu8x64\n: A 512-bit SIMD vector with 64 elements of type `u8`.\nu16x8\n: A 128-bit SIMD vector with 8 elements of type `u16`.\nu16x16\n: A 256-bit SIMD vector with 16 elements of type `u16`.\nu16x32\n: A 512-bit SIMD vector with 32 elements of type `u16`.\nu32x4\n: A 128-bit SIMD vector with 4 elements of type `u3\n\n# std::simd - Rust\nURL: https://doc.rust-lang.org/stable/std/simd/\n\nstd::simd - Rust\n\nSource \n\n🔬 This is a nightly-only experimental API. (`portable_simd` #86656)\n\nExpand description\n\nPortable SIMD module.\n\nThis module offers a portable abstraction for SIMD operations that is not bound to any particular hardware architecture.\n\n## § What is “portable”?\n\nThis module provides a SIMD implementation that is fast and predictable on any target.\n\n#### § Portable SIMD works on every target\n\nUnlike target-specific SIMD in `std::arch`, portable SIMD compiles for every target. In this regard, it is just like “regular” Rust.\n\n#### § Portable SIMD is consistent between targets\n\nA program using portable SIMD can expect identical behavior on any target. In most regards, `Simd<T, N>` can be thought of as a parallelized `[T; N]` and operates like a sequence of `T`.\n\nThis has one notable exception: a handful of older architectures (e.g. `armv7` and `powerpc`) flush subnormal `f32` values to zero. On these architectures, subnormal `f32` input values are replaced with zeros, and any operation producing subnormal `f32` values produces zeros instead. This doesn’t affect most architectures or programs.\n\n#### § Operations use the best instructions available\n\nOperations provided by this module compile to the best available SIMD instructions.\n\nPortable SIMD is not a low-level vendor library, and operations in portable SIMD do not necessarily map to a single instruction. Instead, they map to a reasonable implementation of the operation for the target.\n\nConsistency between targets is not compromised to use faster or fewer instructions. In some cases, `std::arch` will provide a faster function that has slightly different behavior than the `std::simd` equivalent. For example, `_mm_min_ps` 1 can be slightly faster than `SimdFloat::simd_min`, but does not conform to the IEEE standard also used by `f32::min`. When necessary, `Simd<T, N>` can be converted to the types provided by `std::arch` to make use of target-specific functions.\n\nMany targets simply don’t have SIMD, or don’t support SIMD for a particular element type. In those cases, regular scalar operations are generated instead.\n\n---\n\n1. `_mm_min_ps(x, y)` is equivalent to `x.simd_lt(y).select(x, y)` ↩\n\n## Modules§\n\ncmp\n\nExperimental\n: Traits for comparing and ordering vectors.\nnum\n\nExperimental\n: Traits for vectors with numeric elements.\nprelude\n\nExperimental\n: The portable SIMD prelude.\nptr\n\nExperimental\n: Traits for vectors of pointers.\n\n## Macros§\n\nsimd_\n\nswizzle\n\nExperimental\n: Constructs a new SIMD vector by copying elements from selected elements in other vectors.\n\n## Structs§\n\nMask\n\nExperimental\n: A SIMD vector mask for `N` elements of width specified by `Element`.\nSimd\n\nExperimental\n: A SIMD vector with the shape of `[T; N]` but the operations of `T`.\n\n## Traits§\n\nMask\n\nElement\n\nExperimental\n: Marker trait for types that may be used as SIMD mask elements.\nSelect\n\nExperimental\n: Choose elements from two vectors using a mask.\nSimd\n\nCast\n\nExperimental\n: Supporting trait for `Simd::cast`. Typically doesn’t need to be used directly.\nSimd\n\nElement\n\nExperimental\n: Marker trait for types that may be used as SIMD vector elements.\nStdFloat\n\nExperimental\n: This trait provides a possibly-temporary implementation of float functions that may, in the absence of hardware support, canonicalize to calling an operating system’s `math.h` dynamically-loaded library (also known as a shared object). As these conditionally require runtime support, they should only appear in binaries built assuming OS support: `std`.\nSwizzle\n\nExperimental\n: Creates a vector from the elements of another vector.\nToBytes\n\nExperimental\n: Converts SIMD vectors to vectors of bytes\n\n## Type Aliases§\n\nf16x1\n\nExperimental\n: A SIMD vector with one element of type `f16`.\nf16x2\n\nExperimental\n: A SIMD vector with two elements of type `f16`.\nf16x4\n\nExperimental\n: A SIMD vector with four elements of type `f16`.\nf16x8\n\nExperimental\n: A SIMD vector with eight elements of type `f16`.\nf16x16\n\nExperimental\n: A SIMD vector with 16 elements of type `f16`.\nf16x32\n\nExperimental\n: A SIMD vector with 32 elements of type `f16`.\nf16x64\n\nExperimental\n: A SIMD vector with 64 elements of type `f16`.\nf32x1\n\nExperimental\n: A SIMD vector with one element of type `f32`.\nf32x2\n\nExperimental\n: A SIMD vector with two elements of type `f32`.\nf32x4\n\nExperimental\n: A SIMD vector with four elements of type `f32`.\nf32x8\n\nExperimental\n: A SIMD vector with eight elements of type `f32`.\nf32x16\n\nExperimental\n: A SIMD vector with 16 elements of type `f32`.\nf32x32\n\nExperimental\n: A SIMD vector with 32 elements of type `f32`.\nf32x64\n\nExperimental\n: A SIMD vector with 64 elements of type `f32`.\nf64x1\n\nExperimental\n: A SIMD vector with one element of type `f64`.\nf64x2\n\nExperimental\n: A SIMD vector with two elements of type `f64`.\nf64x4\n\nExperimental\n: A SIMD vector with four elements of type `f64`.\nf64x8\n\nExperimental\n: A SIMD vector with eight elements of type `f64`.\nf64x16\n\nExperimental\n: A SIMD vector with 16 elements of type `f64",
+        "_meta": {
+          "searchTime": 2786.638416999951
+        }
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "exa_mpfr_rayon_num": {
+    "content": [
+      {
+        "type": "text",
+        "text": "# GNU MPFR 4.2.2\nURL: https://www.mpfr.org/mpfr-current/mpfr.html\n\nGNU MPFR 4.2.2\n\n# GNU MPFR ¶\n\nThis manual documents how to install and use the Multiple Precision Floating-Point Reliable Library, version 4.2.2. \n\nPermission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with no Front-Cover Texts, and with no Back-Cover Texts. A copy of the license is included in GNU Free Documentation License. \n\n- MPFR Copying Conditions\n- Introduction to MPFR\n- Installing MPFR\n- Reporting Bugs\n- MPFR Basics\n- MPFR Interface\n- API Compatibility\n- MPFR and the IEEE 754 Standard\n- Contributors\n- References\n- GNU Free Documentation License\n- Concept Index\n- Function and Type Index\n\n## MPFR Copying Conditions ¶\n\nThe GNU MPFR library (or MPFR for short) is free; this means that everyone is free to use it and free to redistribute it on a free basis. The library is not in the public domain; it is copyrighted and there are restrictions on its distribution, but these restrictions are designed to permit everything that a good cooperating citizen would want to do. What is not allowed is to try to prevent others from further sharing any version of this library that they might get from you. \n\nSpecifically, we want to make sure that you have the right to give away copies of the library, that you receive source code or else can get it if you want it, that you can change this library or use pieces of it in new free programs, and that you know you can do these things. \n\nTo make sure that everyone has such rights, we have to forbid you to deprive anyone else of these rights. For example, if you distribute copies of the GNU MPFR library, you must give the recipients all the rights that you have. You must make sure that they, too, receive or can get the source code. And you must tell them their rights. \n\nAlso, for our own protection, we must make certain that everyone finds out that there is no warranty for the GNU MPFR library. If it is modified by someone else and passed on, we want their recipients to know that what they have is not what we distributed, so that any problems introduced by others will not reflect on our reputation. \n\nThe precise conditions of the license for the GNU MPFR library are found in the Lesser General Public License that accompanies the source code. See the file COPYING.LESSER.. \n\n Next: Installing MPFR, Previous: MPFR Copying Conditions, Up: GNU MPFR [Index]\n\n## 1 Introduction to MPFR ¶\n\nMPFR is a portable library written in C for arbitrary precision arithmetic on floating-point numbers. It is based on the GNU MP library. It aims to provide a class of floating-point numbers with precise semantics. The main characteristics of MPFR, which make it differ from most arbitrary precision floating-point software tools, are: \n\n- the MPFR code is portable, i.e., the result of any operation does not depend on the machine word size `mp_bits_per_limb` (64 on most current processors), possibly except in faithful rounding. It does not depend either on the machine rounding mode or rounding precision; \n- the precision in bits can be set exactly to any valid value for each variable (including very small precision); \n- MPFR provides the four rounding modes from the IEEE 754-1985 standard, plus away-from-zero, as well as for basic operations as for other mathematical functions. Faithful rounding (partially supported) is provided too, but the results may no longer be reproducible. \n\nIn particular, MPFR follows the specification of the IEEE 754 standard, currently IEEE 754-2019 (which will be referred to as IEEE 754 in this manual), with some minor differences, such as: there is a single NaN, the default exponent range is much wider, and subnormal numbers are not implemented (but the exponent range can be reduced to any interval, and subnormals can be emulated). For instance, computations in the binary64 format (a.k.a. double precision) can be reproduce\n\n# IndexedParallelIterator in rayon::iter - Rust\nURL: https://docs.rs/rayon/1.12.0/rayon/iter/trait.IndexedParallelIterator.html\n\nIndexedParallelIterator in rayon::iter - Rust\n\nSource \n\npub trait IndexedParallelIterator: ParallelIterator { \n\nShow 33 methods\n\n // Required methods fn len(&self) -> usize; fn drive >(self, consumer: C) -> C:: Result; fn with_producer >( self, callback: CB, ) -> CB:: Output; // Provided methods fn by_exponential_blocks(self) -> ExponentialBlocks { ... } fn by_uniform_blocks(self, block_size: usize) -> UniformBlocks { ... } fn collect_into_vec(self, target: &mut Vec) { ... } fn unzip_into_vecs<A, B>(self, left: &mut Vec, right: &mut Vec) where Self: IndexedParallelIterator, A: Send, B: Send { ... } fn zip (self, zip_op: Z) -> Zip<Self, Z:: Iter> where Z: IntoParallelIterator { ... } fn zip_eq (self, zip_op: Z) -> ZipEq<Self, Z:: Iter> where Z: IntoParallelIterator { ... } fn interleave (self, other: I) -> Interleave<Self, I:: Iter> where I: IntoParallelIterator { ... } fn interleave_shortest ( self, other: I, ) -> InterleaveShortest<Self, I:: Iter> where I: IntoParallelIterator { ... } fn chunks(self, chunk_size: usize) -> Chunks { ... } fn fold_chunks<T, ID, F>( self, chunk_size: usize, identity: ID, fold_op: F, ) -> FoldChunks<Self, ID, F> where ID: Fn() -> T + Send + Sync, F: Fn(T, Self:: Item) -> T + Send + Sync, T: Send { ... } fn fold_chunks_with<T, F>( self, chunk_size: usize, init: T, fold_op: F, ) -> FoldChunksWith<Self, T, F> where T: Send + Clone, F: Fn(T, Self:: Item) -> T + Send + Sync { ... } fn cmp (self, other: I) -> Ordering where I: IntoParallelIterator, Self:: Item: Ord { ... } fn partial_cmp (self, other: I) -> Option< Ordering> where I: IntoParallelIterator, Self:: Item: PartialOrd { ... } fn eq (self, other: I) -> bool where I: IntoParallelIterator, Self:: Item: PartialEq { ... } fn ne (self, other: I) -> bool where I: IntoParallelIterator, Self:: Item: PartialEq { ... } fn lt (self, other: I) -> bool where I: IntoParallelIterator, Self:: Item: PartialOrd { ... } fn le (self, other: I) -> bool where I: IntoParallelIterator, Self:: Item: PartialOrd { ... } fn gt (self, other: I) -> bool where I: IntoParallelIterator, Self:: Item: PartialOrd { ... } fn ge (self, other: I) -> bool where I: IntoParallelIterator, Self:: Item: PartialOrd { ... } fn enumerate(self) -> Enumerate { ... } fn step_by(self, step: usize) -> StepBy { ... } fn skip(self, n: usize) -> Skip { ... } fn take(self, n: usize) -> Take { ... } fn position_any (self, predicate: P) -> Option< usize> where P: Fn(Self:: Item) -> bool + Sync + Send { ... } fn position_first (self, predicate: P) -> Option< usize> where P: Fn(Self:: Item) -> bool + Sync + Send { ... } fn position_last (self, predicate: P) -> Option< usize> where P: Fn(Self:: Item) -> bool + Sync + Send { ... } fn positions (self, predicate: P) -> Positions<Self, P> where P: Fn(Self:: Item) -> bool + Sync + Send { ... } fn rev(self) -> Rev { ... } fn with_min_len(self, min: usize) -> MinLen { ... } fn with_max_len(self, max: usize) -> MaxLen { ... } \n\nExpand description\n\nAn iterator that supports “random access” to its data, meaning that you can split it at arbitrary indices and draw data from those points.\n\nNote: Not implemented for `u64`, `i64`, `u128`, or `i128` ranges\n\n## Required Methods§\n\nSource fn len(&self) -> usize\n\nProduces an exact count of how many items this iterator will produce, presuming no panic occurs.\n\n##### § Examples\n\n```\nuse rayon::prelude::*;\n\nlet par_iter = (0..100).into_par_iter().zip(vec![0; 10]);\nassert_eq!(par_iter.len(), 10);\n\nlet vec: Vec<_> = par_iter.collect();\nassert_eq!(vec.len(), 10);\n```\n\nSource fn drive >(self, consumer: C) -> C:: Result\n\nInternal method used to define the behavior of this parallel iterator. You should not need to call this directly.\n\nThis method causes the iterator `self` to start producing items and to feed them to the consumer `consumer` one by one. It may split the consumer before doing so to create the opportunity to produce in parallel. If a split does happen, it will inform the consumer of the index where the split should occ\n\n# lib.rs - source\nURL: https://docs.rs/num-rational/0.4.2/src/num_rational/lib.rs.html\n\nlib.rs - source\n\nlib.rs\n\n```\n1// Copyright 2013-2014 The Rust Project Developers. See the COPYRIGHT\n2// file at the top-level directory of this distribution and at\n3// http://rust-lang.org/COPYRIGHT.\n4//\n5// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or\n6// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license\n7// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your\n8// option. This file may not be copied, modified, or distributed\n9// except according to those terms.\n10\n11//! Rational numbers\n12//!\n13//! ## Compatibility\n14//!\n15//! The `num-rational` crate is tested for rustc 1.60 and greater.\n16\n17#![doc(html_root_url = \"https://docs.rs/num-rational/0.4\")]\n18#![no_std]\n19// Ratio ops often use other \"suspicious\" ops\n20#![allow(clippy::suspicious_arithmetic_impl)]\n21#![allow(clippy::suspicious_op_assign_impl)]\n22\n23#[cfg(feature = \"std\")]\n24#[macro_use]\n25extern crate std;\n26\n27use core::cmp;\n28use core::fmt;\n29use core::fmt::{Binary, Display, Formatter, LowerExp, LowerHex, Octal, UpperExp, UpperHex};\n30use core::hash::{Hash, Hasher};\n31use core::ops::{Add, Div, Mul, Neg, Rem, ShlAssign, Sub};\n32use core::str::FromStr;\n33#[cfg(feature = \"std\")]\n34use std::error::Error;\n35\n36#[cfg(feature = \"num-bigint\")]\n37use num_bigint::{BigInt, BigUint, Sign, ToBigInt};\n38\n39use num_integer::Integer;\n40use num_traits::float::FloatCore;\n41use num_traits::{\n42    Bounded, CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, ConstOne, ConstZero, FromPrimitive,\n43    Inv, Num, NumCast, One, Pow, Signed, ToPrimitive, Unsigned, Zero,\n44};\n45\n46mod pow;\n47\n48/// Represents the ratio between two numbers.\n49#[derive(Copy, Clone, Debug)]\n50#[allow(missing_docs)]\n51pub struct Ratio<T> {\n52    /// Numerator.\n53    numer: T,\n54    /// Denominator.\n55    denom: T,\n56}\n57\n58/// Alias for a `Ratio` of machine-sized integers.\n59#[deprecated(\n60    since = \"0.4.0\",\n61    note = \"it's better to use a specific size, like `Rational32` or `Rational64`\"\n62)]\n63pub type Rational = Ratio<isize>;\n64/// Alias for a `Ratio` of 32-bit-sized integers.\n65pub type Rational32 = Ratio<i32>;\n66/// Alias for a `Ratio` of 64-bit-sized integers.\n67pub type Rational64 = Ratio<i64>;\n68\n69#[cfg(feature = \"num-bigint\")]\n70/// Alias for arbitrary precision rationals.\n71pub type BigRational = Ratio<BigInt>;\n72\n73/// These method are `const`.\n74impl<T> Ratio<T> {\n75    /// Creates a `Ratio` without checking for `denom == 0` or reducing.\n76    ///\n77    /// **There are several methods that will panic if used on a `Ratio` with\n78    /// `denom == 0`.**\n79    #[inline]\n80    pub const fn new_raw(numer: T, denom: T) -> Ratio<T> {\n81        Ratio { numer, denom }\n82    }\n83\n84    /// Deconstructs a `Ratio` into its numerator and denominator.\n85    #[inline]\n86    pub fn into_raw(self) -> (T, T) {\n87        (self.numer, self.denom)\n88    }\n89\n90    /// Gets an immutable reference to the numerator.\n91    #[inline]\n92    pub const fn numer(&self) -> &T {\n93        &self.numer\n94    }\n95\n96    /// Gets an immutable reference to the denominator.\n97    #[inline]\n98    pub const fn denom(&self) -> &T {\n99        &self.denom\n100    }\n101}\n102\n103impl<T: Clone + Integer> Ratio<T> {\n104    /// Creates a new `Ratio`.\n105    ///\n106    /// **Panics if `denom` is zero.**\n107    #[inline]\n108    pub fn new(numer: T, denom: T) -> Ratio<T> {\n109        let mut ret = Ratio::new_raw(numer, denom);\n110        ret.reduce();\n111        ret\n112    }\n113\n114    /// Creates a `Ratio` representing the integer `t`.\n115    #[inline]\n116    pub fn from_integer(t: T) -> Ratio<T> {\n117        Ratio::new_raw(t, One::one())\n118    }\n119\n120    /// Converts to an integer, rounding towards zero.\n121    #[inline]\n122    pub fn to_integer(&self) -> T {\n123        self.trunc().numer\n124    }\n125\n126    /// Returns true if the rational number is an integer (denominator is 1).\n127    #[inline]\n128    pub fn is_integer(&self) -> bool {\n129        self.denom.is_one()\n130    }\n131\n132    /// Puts s\n\n# Crate  num_bigint Copy item path\nURL: https://docs.rs/num-bigint/0.4.6/num_bigint/\n\nnum\\_bigint - Rust\nDocs.rs\n* num-bigint-0.4.6\n* num-bigint 0.4.6\n* Docs.rs crate page\n* MITORApache-2.0\n* Links\n* Homepage\n* Repository\n* crates.io\n* Source\n* Owners\n* cuviper\n* Dependencies\n* * arbitrary ^1*normal**optional*\n* num-integer ^0.1.46*normal*\n* num-traits ^0.2.18*normal*\n* quickcheck ^1*normal**optional*\n* rand ^0.8*normal**optional*\n* serde ^1.0*normal**optional*\n* Versions\n* * **84%**of the crate is documented\n* Platform\n* i686-pc-windows-msvc\n* i686-unknown-linux-gnu\n* x86\\_64-apple-darwin\n* x86\\_64-pc-windows-msvc\n* x86\\_64-unknown-linux-gnu\n* Feature flags\n* Rust\n* About docs.rs\n* Privacy policy\n* Rust website\n* The Book\n* Standard Library API Reference\n* Rust by Example\n* The Cargo Guide\n* Clippy Documentation\n# Cratenum\\_bigintCopy item path\nSource\nExpand description\nBig Integer Types for Rust\n* A`BigUint`is unsigned and represented as a vector of digits.\n* A`BigInt`is signed and is a combination of`BigUint`and`Sign`.\nCommon numerical operations are overloaded, so we can treat them\nthe same way we treat other numbers.\n### §Example\n```\n`usenum\\_bigint::BigUint;usenum\\_traits::One;// Calculate large fibonacci numbers.fnfib(n: usize) -> BigUint {letmutf0 = BigUint::ZERO;letmutf1 = BigUint::one();for \\_ in0..n {letf2 = f0 +&f1;\nf0 = f1;\nf1 = f2;\n}\nf0\n}// This is a very large number.println!(\"fib(1000) = {}\", fib(1000));`\n```\nIt’s easy to generate large random numbers:\nⓘ\n```\n`usenum\\_bigint::{ToBigInt, RandBigInt};letmutrng = rand::thread\\_rng();leta = rng.gen\\_bigint(1000);letlow = -10000.to\\_bigint().unwrap();lethigh =10000.to\\_bigint().unwrap();letb = rng.gen\\_bigint\\_range(&low,&high);// Probably an even larger number.println!(\"{}\", a \\* b);`\n```\nSee the “Features” section for instructions for enabling random number generation.\n### §Features\nThe`std`crate feature is enabled by default, which enables`std::error::Error`implementations and some internal use of floating point approximations. This can be disabled by\ndepending on`num-bigint`with`default-features = false`. Either way, the`alloc`crate is\nalways required for heap allocation of the`BigInt`/`BigUint`digits.\n#### §Random Generation\n`num-bigint`supports the generation of random big integers when the`rand`feature is enabled. To enable it include rand as\n```\n`rand = \"0.8\"\nnum-bigint = { version = \"0.4\", features = [\"rand\"] }`\n```\nNote that you must use the version of`rand`that`num-bigint`is compatible\nwith:`0.8`.\n#### §Arbitrary Big Integers\n`num-bigint`supports`arbitrary`and`quickcheck`features to implement`arbitrary::Arbitrary`and`quickcheck::Arbitrary`, respectively, for both`BigInt`and`BigUint`. These are useful for fuzzing and other forms of randomized testing.\n#### §Serialization\nThe`serde`feature adds implementations of`Serialize`and`Deserialize`for both`BigInt`and`BigUint`. Their serialized data is\ngenerated portably, regardless of platform differences like the internal digit size.\n### §Compatibility\nThe`num-bigint`crate is tested for rustc 1.60 and greater.\n## Structs§\nBigIntA big signed integer type.BigUintA big unsigned integer type.ParseBigIntErrorRandomBits`rand`A random distribution for`BigUint`and`BigInt`values of a particular bit size.TryFromBigIntErrorThe error type returned when a checked conversion regarding big integer fails.U32DigitsAn iterator of`u32`digits representation of a`BigUint`or`BigInt`,\nordered least significant digit first.U64DigitsAn iterator of`u64`digits representation of a`BigUint`or`BigInt`,\nordered least significant digit first.UniformBigInt`rand`The back-end implementing rand’s`UniformSampler`for`BigInt`.UniformBigUint`rand`The back-end implementing rand’s`UniformSampler`for`BigUint`.## Enums§\nSignA`Sign`is a`BigInt`’s composing element.## Traits§\nRandBigInt`rand`A trait for sampling random big integers.ToBigIntA generic trait for converting a value to a`BigInt`. This may return`None`when converting from`f32`or`f64`, and will always succeed\nwhen converting from any integer or unsigned primitive, or`BigUint`.ToBigUint",
+        "_meta": {
+          "searchTime": 727.8959529999993
+        }
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "exa_faer": {
+    "content": [
+      {
+        "type": "text",
+        "text": "# faer - Rust\nURL: https://docs.rs/faer/latest/faer/\n\nfaer - Rust\n\nSource \n\nExpand description\n\n`faer` is a general-purpose linear algebra library for rust, with a focus on high performance for algebraic operations on medium/large matrices, as well as matrix decompositions\n\nmost of the high-level functionality in this library is provided through associated functions in its vocabulary types: `Mat`/`MatRef`/`MatMut`\n\n`faer` is recommended for applications that handle medium to large dense matrices, and its design is not well suited for applications that operate mostly on low dimensional vectors and matrices such as computer graphics or game development. for such applications, `nalgebra` and `cgmath` may be better suited\n\n## § basic usage\n\n`Mat` is a resizable matrix type with dynamic capacity, which can be created using [`Mat::new`] to produce an empty $0\\times 0$ matrix, [`Mat::zeros`] to create a rectangular matrix filled with zeros, [`Mat::identity`] to create an identity matrix, or [`Mat::from_fn`] for the more general case\n\nGiven a `&Mat ` (resp. `&mut Mat `), a `MatRef<'_, T>` (resp. `MatMut<'_, T>`) can be created by calling [`Mat::as_ref`] (resp. [`Mat::as_mut`]), which allow for more flexibility than `Mat` in that they allow slicing ([`MatRef::get`]) and splitting ([`MatRef::split_at`])\n\n`MatRef` and `MatMut` are lightweight view objects. the former can be copied freely while the latter has move and reborrow semantics, as described in its documentation\n\nmost of the matrix operations can be used through the corresponding math operators: `+` for matrix addition, `-` for subtraction, `*` for either scalar or matrix multiplication depending on the types of the operands.\n\n### § example\n\n```\nuse faer::{Mat, Scale, mat};\nlet a = mat![\n\t[1.0, 5.0, 9.0], //\n\t[2.0, 6.0, 10.0],\n\t[3.0, 7.0, 11.0],\n\t[4.0, 8.0, 12.0f64],\n];\nlet b = Mat::from_fn(4, 3, |i, j| (i + j) as f64);\nlet add = &a + &b;\nlet sub = &a - &b;\nlet scale = Scale(3.0) * &a;\nlet mul = &a * b.transpose();\nlet a00 = a[(0, 0)];\n```\n\n## § matrix decompositions\n\n`faer` provides a variety of matrix factorizations, each with its own advantages and drawbacks:\n\n### §$LL^\\top$ decomposition\n\n[`Mat::llt`] decomposes a self-adjoint positive definite matrix $A$ such that $$A = LL^H,$$ where $L$ is a lower triangular matrix. this decomposition is highly efficient and has good stability properties\n\nan implementation for sparse matrices is also available\n\n### §$LBL^\\top$ decomposition\n\n[`Mat::lblt`] decomposes a self-adjoint (possibly indefinite) matrix $A$ such that $$P A P^\\top = LBL^H,$$ where $P$ is a permutation matrix, $L$ is a lower triangular matrix, and $B$ is a block diagonal matrix, with $1 \\times 1$ or $2 \\times 2$ diagonal blocks. this decomposition is efficient and has good stability properties\n\n### §$LU$ decomposition with partial pivoting\n\n[`Mat::partial_piv_lu`] decomposes a square invertible matrix $A$ into a lower triangular matrix $L$, a unit upper triangular matrix $U$, and a permutation matrix $P$, such that $$PA = LU$$ it is used by default for computing the determinant, and is generally the recommended method for solving a square linear system or computing the inverse of a matrix (although we generally recommend using a `faer::linalg::solvers::Solve` instead of computing the inverse explicitly)\n\nan implementation for sparse matrices is also available\n\n### §$LU$ decomposition with full pivoting\n\n[`Mat::full_piv_lu`] decomposes a generic rectangular matrix $A$ into a lower triangular matrix $L$, a unit upper triangular matrix\n\nError fetching https://www.math.kit.edu/iwrmm/seite/preprints/media/preprint%20nr.%2010-01.pdf: CRAWL_NOT_FOUND",
+        "_meta": {
+          "searchTime": 835.3934639999643
+        }
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "scispace": {
+    "searchTerm": "How can rigorously bounded exponential functions be evaluated efficiently with fixed-point arithmetic, directed rounding, range reduction and parallel batching while retaining interval guarantees?",
+    "papers": [
+      {
+        "id": 2151622020,
+        "title": "Parallel Interval Methods for Perturbed Linear Systems",
+        "is_archived": false,
+        "full_slug": "parallel-interval-methods-for-perturbed-linear-systems-58btxonm6w",
+        "journal": null,
+        "conference_series": {
+          "display_name": "Parallel Computing",
+          "id": 1195800536,
+          "slug": "parallel-computing",
+          "unique_id": "1i9q894j",
+          "full_slug": "parallel-computing-1i9q894j"
+        },
+        "date": "1994-06-20T00:00:00Z",
+        "is_oa": false,
+        "publication_type": "Book Chapter",
+        "doi": "10.1007/BFB0030164",
+        "unique_id": "58btxonm6w",
+        "abstract": "The constants defining a system of linear equations may be subject to incertainties. In this case the induced variations of the solution can be effectively bounded by methods of interval analysis. In the worst case the complexity of this problem is exponential in the number of variables. We consider Rohn's sign-accord algorithm to solve the problem. A parallel version of the method is developed using rounded interval arithmetic. Theoretical considerations as well as numerical tests indicate that the parallelling is efficient (i.e. the speedup is near linear) if an appropriate number of parallel processors is allocated. This number can be estimated before the start of the parallel process.",
+        "authors": {
+          "total": 2,
+          "data": [
+            {
+              "display_name": "Kaj Madsen",
+              "id": 2197520899,
+              "slug": "kaj-madsen",
+              "unique_id": "wuy8zvrp53",
+              "full_slug": "kaj-madsen-wuy8zvrp53",
+              "affiliation_full_slug": "technical-university-of-denmark-1d4srdmh"
+            },
+            {
+              "display_name": "Ole Toft",
+              "id": 2091038869,
+              "slug": "ole-toft",
+              "unique_id": "10bu5jxno5",
+              "full_slug": "ole-toft-10bu5jxno5",
+              "affiliation_full_slug": "technical-university-of-denmark-1d4srdmh"
+            }
+          ]
+        },
+        "affiliations": {
+          "total": 1,
+          "data": [
+            {
+              "display_name": "Technical University of Denmark",
+              "city": "Kongens Lyngby",
+              "region": "Hovedstaden",
+              "country": "Denmark",
+              "id": 96673099,
+              "slug": "technical-university-of-denmark",
+              "unique_id": "1d4srdmh",
+              "full_slug": "technical-university-of-denmark-1d4srdmh"
+            }
+          ]
+        },
+        "fulltext_url": null,
+        "fulltext_url_no_follow": true,
+        "paper_urls": {
+          "order": [
+            "Html"
+          ],
+          "data": {
+            "Html": [
+              "https://dblp.uni-trier.de/db/conf/para/para1994.html#MadsenT94",
+              "https://link.springer.com/chapter/10.1007/BFb0030164"
+            ]
+          },
+          "is_show": true
+        },
+        "metrics": {
+          "citations": {
+            "total": null
+          }
+        },
+        "tldr": "This work considers Rohn's sign-accord algorithm to solve the problem of induced variations of the solution of a system of linear equations and indicates that the parallelling is efficient if an appropriate number of parallel processors is allocated.",
+        "podcast": null,
+        "podcast_generation_allowed": true,
+        "entity_type": "PAPER"
+      },
+      {
+        "id": 2121581186,
+        "title": "Fast table-driven algorithms for interval elementary functions",
+        "is_archived": false,
+        "full_slug": "fast-table-driven-algorithms-for-interval-elementary-1ry3pmyo2g",
+        "journal": null,
+        "conference_series": {
+          "display_name": "Symposium on Computer Arithmetic",
+          "id": 1197111096,
+          "slug": "symposium-on-computer-arithmetic",
+          "unique_id": "2alrc6yg",
+          "full_slug": "symposium-on-computer-arithmetic-2alrc6yg"
+        },
+        "date": "1997-03-06T00:00:00Z",
+        "is_oa": false,
+        "publication_type": "Proceedings Article",
+        "doi": "10.1109/ARITH.1997.614892",
+        "unique_id": "1ry3pmyo2g",
+        "abstract": "We present table driven algorithms for computing interval bounds on several common elementary functions. Our algorithms use directed rounding to obtain sharp bounds-within 1.5 units in the last place of the exact range of the function over the argument interval-without the explicit use of extended precision. Moreover, by performing all floating point operations in the same rounding mode, our algorithms can exploit software pipelining to provide better performance than simply evaluating the corresponding point elementary function at each endpoint of the argument interval and rounding.",
+        "authors": {
+          "total": 1,
+          "data": [
+            {
+              "display_name": "Douglas M. Priest",
+              "id": 2136045870,
+              "slug": "douglas-m-priest",
+              "unique_id": "661nowkgdo",
+              "full_slug": "douglas-m-priest-661nowkgdo",
+              "affiliation_full_slug": "sun-microsystems-uraqfwt9"
+            }
+          ]
+        },
+        "affiliations": {
+          "total": 1,
+          "data": [
+            {
+              "display_name": "Sun Microsystems",
+              "city": null,
+              "region": null,
+              "country": null,
+              "id": 1328046515,
+              "slug": "sun-microsystems",
+              "unique_id": "uraqfwt9",
+              "full_slug": "sun-microsystems-uraqfwt9"
+            }
+          ]
+        },
+        "fulltext_url": null,
+        "fulltext_url_no_follow": true,
+        "paper_urls": {
+          "order": [
+            "Html"
+          ],
+          "data": {
+            "Html": [
+              "https://dblp.uni-trier.de/db/conf/arith/arith1997.html#Priest97",
+              "https://www.computer.org/csdl/proceedings-article/arith/1997/78460168/12OmNyvGykZ"
+            ]
+          },
+          "is_show": true
+        },
+        "metrics": {
+          "citations": {
+            "total": 19
+          }
+        },
+        "tldr": "By performing all floating point operations in the same rounding mode, these algorithms can exploit software pipelining to provide better performance than simply evaluating the corresponding point elementary function at each endpoint of the argument interval and rounding.",
+        "podcast": null,
+        "podcast_generation_allowed": true,
+        "entity_type": "PAPER"
+      },
+      {
+        "id": 2118250725,
+        "title": "Adaptive range reduction for hardware function evaluation",
+        "is_archived": false,
+        "full_slug": "adaptive-range-reduction-for-hardware-function-evaluation-4s54zlf2mz",
+        "journal": null,
+        "conference_series": {
+          "display_name": "Field-Programmable Technology",
+          "id": 1130347816,
+          "slug": "field-programmable-technology",
+          "unique_id": "uye8yyv6",
+          "full_slug": "field-programmable-technology-uye8yyv6"
+        },
+        "date": "2004-12-06T00:00:00Z",
+        "is_oa": true,
+        "publication_type": "Proceedings Article",
+        "doi": "10.1109/FPT.2004.1393265",
+        "unique_id": "4s54zlf2mz",
+        "abstract": "Function evaluation f(x) typically consists of range reduction and the actual function evaluation on a small interval. We investigate optimization of range reduction given the range and precision of x and f(x). For every function evaluation there exists a convenient interval such as [0, /spl pi//2) for sin(x). The adaptive range reduction method, which we propose in this work, involves deciding whether range reduction can be used effectively for a particular design. The decision depends on the function being evaluated, precision, and optimization metrics such as area, latency and throughput. In addition, the input and output range has an impact on the preferable function evaluation method such as polynomial, table-based, or combinations of the two. We explore this vast design space of adaptive range reduction for fixed-point sin(x), log(x) and /spl radic/(x) accurate to one unit in the last place using MATLAB and ASC, A Stream Compiler. These tools enable us to study over 1000 designs resulting in over 40 million Xilinx equivalent circuit gates, in a few hours' time. The final objective is to progress towards a fully automated library that provides optimal function evaluation hardware units given input/output range and precision.",
+        "authors": {
+          "total": 4,
+          "data": [
+            {
+              "display_name": "Dong-U Lee",
+              "id": 2151463111,
+              "slug": "dong-u-lee",
+              "unique_id": "25ecis4tih",
+              "full_slug": "dong-u-lee-25ecis4tih",
+              "affiliation_full_slug": "imperial-college-london-1zhbqb9r"
+            },
+            {
+              "display_name": "A.A. Gaffar",
+              "id": 2460241549,
+              "slug": "a-a-gaffar",
+              "unique_id": "167cquaooc",
+              "full_slug": "a-a-gaffar-167cquaooc",
+              "affiliation_full_slug": "imperial-college-london-1zhbqb9r"
+            },
+            {
+              "display_name": "Oskar Mencer",
+              "id": 1998618398,
+              "slug": "oskar-mencer",
+              "unique_id": "4sjf302w2h",
+              "full_slug": "oskar-mencer-4sjf302w2h",
+              "affiliation_full_slug": "imperial-college-london-1zhbqb9r"
+            },
+            {
+              "display_name": "Wayne Luk",
+              "id": 2123028573,
+              "slug": "wayne-luk",
+              "unique_id": "25fk88d3gh",
+              "full_slug": "wayne-luk-25fk88d3gh",
+              "affiliation_full_slug": "imperial-college-london-1zhbqb9r"
+            }
+          ]
+        },
+        "affiliations": {
+          "total": 1,
+          "data": [
+            {
+              "display_name": "Imperial College London",
+              "city": "London",
+              "region": "Westminster",
+              "country": "United Kingdom",
+              "id": 47508984,
+              "slug": "imperial-college-london",
+              "unique_id": "1zhbqb9r",
+              "full_slug": "imperial-college-london-1zhbqb9r"
+            }
+          ]
+        },
+        "fulltext_url": "/pdf/adaptive-range-reduction-for-hardware-function-evaluation-4s54zlf2mz.pdf",
+        "fulltext_url_no_follow": false,
+        "paper_urls": {
+          "order": [
+            "Pdf",
+            "Html"
+          ],
+          "data": {
+            "Pdf": [
+              "http://comparch.doc.ic.ac.uk/publications/files/don04fpt.pdf",
+              "https://www.doc.ic.ac.uk/~oskar/pubs/fpt04.pdf"
+            ],
+            "Html": [
+              "https://dblp.uni-trier.de/db/conf/fpt/fpt2004.html#LeeGML04"
+            ]
+          },
+          "is_show": true
+        },
+        "metrics": {
+          "citations": {
+            "total": 7
+          }
+        },
+        "tldr": "This work explores this vast design space of adaptive range reduction for fixed-point sin(x), log(x) and /spl radic/(x) accurate to one unit in the last place using MATLAB and ASC, A Stream Compiler.",
+        "podcast": null,
+        "podcast_generation_allowed": true,
+        "entity_type": "PAPER"
+      },
+      {
+        "id": 2564554657,
+        "title": "A priori worst case error bounds for floating-point computations",
+        "is_archived": false,
+        "full_slug": "a-priori-worst-case-error-bounds-for-floating-point-4i4yyklm2m",
+        "journal": {
+          "display_name": "IEEE Transactions on Computers",
+          "official_page": "http://www.computer.org/portal/web/tc",
+          "issn": "0018-9340",
+          "alias": [
+            "Institute of Electrical and Electronics Engineers transactions on computers",
+            "Transactions on computers"
+          ],
+          "id": 157670870,
+          "slug": "ieee-transactions-on-computers",
+          "unique_id": "1pdvkvya",
+          "full_slug": "ieee-transactions-on-computers-1pdvkvya"
+        },
+        "conference_series": null,
+        "date": "1998-07-01T00:00:00Z",
+        "is_oa": false,
+        "publication_type": "Journal Article",
+        "doi": "10.1109/12.709374",
+        "unique_id": "4i4yyklm2m",
+        "abstract": "A new technique for the a priori calculation of rigorous error bounds for floating-point computations is introduced. The theorems given in the paper combined with interval arithmetic lead to the implementation of reliable software routines, which enable the user to compute the desired error bounds automatically by a suitable computer program. As a prominent example, a table-lookup algorithm for calculating the function exp(x)-1 that has been published by P.T.P. Tang (1992) is analyzed using these new tools. The result shows the high quality of the new approach.",
+        "authors": {
+          "total": 1,
+          "data": [
+            {
+              "display_name": "Walter Krämer",
+              "id": 2168073696,
+              "slug": "walter-kramer",
+              "unique_id": "58c1vnzevq",
+              "full_slug": "walter-kramer-58c1vnzevq",
+              "affiliation_full_slug": "karlsruhe-institute-of-technology-qoyshx5q"
+            }
+          ]
+        },
+        "affiliations": {
+          "total": 1,
+          "data": [
+            {
+              "display_name": "Karlsruhe Institute of Technology",
+              "city": "Karlsruhe",
+              "region": null,
+              "country": "Germany",
+              "id": 102335020,
+              "slug": "karlsruhe-institute-of-technology",
+              "unique_id": "qoyshx5q",
+              "full_slug": "karlsruhe-institute-of-technology-qoyshx5q"
+            }
+          ]
+        },
+        "fulltext_url": null,
+        "fulltext_url_no_follow": true,
+        "paper_urls": {
+          "order": [
+            "Html",
+            "Others"
+          ],
+          "data": {
+            "Html": [
+              "https://dblp.uni-trier.de/db/journals/tc/tc47.html#Kramer98",
+              "https://ieeexplore.ieee.org/document/709374/"
+            ],
+            "Others": [
+              "http://ieeexplore.ieee.org/document/709374/"
+            ]
+          },
+          "is_show": true
+        },
+        "metrics": {
+          "citations": {
+            "total": 44
+          }
+        },
+        "tldr": "A new technique for the a priori calculation of rigorous error bounds for floating-point computations is introduced and the theorems given in the paper combined with interval arithmetic lead to the implementation of reliable software routines, which enable the user to compute the desired error bounds automatically by a suitable computer program.",
+        "podcast": null,
+        "podcast_generation_allowed": true,
+        "entity_type": "PAPER"
+      },
+      {
+        "id": 2512237897,
+        "title": "On efficiency of tightening bounds in interval global optimization",
+        "is_archived": false,
+        "full_slug": "on-efficiency-of-tightening-bounds-in-interval-global-l7g3bvufsx",
+        "journal": {
+          "display_name": "Lecture Notes in Computer Science",
+          "official_page": "http://www.springer.com/lncs",
+          "issn": "0302-9743",
+          "alias": [
+            "LNCS",
+            "0302-9743",
+            "Springer Series-ID 558",
+            "Springer Series 558",
+            "Springer Lecture Notes in Computer Science"
+          ],
+          "id": 106296714,
+          "slug": "lecture-notes-in-computer-science",
+          "unique_id": "toobp8l4",
+          "full_slug": "lecture-notes-in-computer-science-toobp8l4"
+        },
+        "conference_series": null,
+        "date": "2006-01-01T00:00:00Z",
+        "is_oa": true,
+        "publication_type": "Journal Article",
+        "doi": null,
+        "unique_id": "l7g3bvufsx",
+        "abstract": "The tightness of bounds is very important factor of efficiency of branch and bound based global optimization algorithms. An experimental model of interval arithmetic with controllable tightness of bounds is proposed to investigate the impact of bounds tightening in interval global optimization. A parallel version of the algorithm is implemented to cope with the computational intensity of the experiment. The experimental results on efficiency of tightening bounds are presented for several test and practical problems. The suitability of mater-slave type parallelization to speed up the experiments is justified.",
+        "authors": {
+          "total": 2,
+          "data": [
+            {
+              "display_name": "Antanas Zilinskas",
+              "id": 2021363059,
+              "slug": "antanas-zilinskas",
+              "unique_id": "9zewg1sofz",
+              "full_slug": "antanas-zilinskas-9zewg1sofz"
+            },
+            {
+              "display_name": "Julius Zilinskas",
+              "id": 2803934320,
+              "slug": "julius-zilinskas",
+              "unique_id": "4v4nii265a",
+              "full_slug": "julius-zilinskas-4v4nii265a"
+            }
+          ]
+        },
+        "affiliations": {
+          "total": 0,
+          "data": []
+        },
+        "metrics": {
+          "citations": {
+            "total": 10
+          }
+        },
+        "tldr": "The experimental results on efficiency of tightening bounds are presented for several test and practical problems and the suitability of mater-slave type parallelization to speed up the experiments is justified.",
+        "podcast": null,
+        "podcast_generation_allowed": true,
+        "entity_type": "PAPER"
+      },
+      {
+        "id": 1497066119,
+        "title": "On efficiency of tightening bounds in interval global optimization",
+        "is_archived": false,
+        "full_slug": "on-efficiency-of-tightening-bounds-in-interval-global-2z80h5gr95",
+        "journal": null,
+        "conference_series": {
+          "display_name": "Parallel Computing",
+          "id": 1195800536,
+          "slug": "parallel-computing",
+          "unique_id": "1i9q894j",
+          "full_slug": "parallel-computing-1i9q894j"
+        },
+        "date": "2004-06-20T00:00:00Z",
+        "is_oa": false,
+        "publication_type": "Book Chapter",
+        "doi": "10.1007/11558958_22",
+        "unique_id": "2z80h5gr95",
+        "abstract": "The tightness of bounds is very important factor of efficiency of branch and bound based global optimization algorithms. An experimental model of interval arithmetic with controllable tightness of bounds is proposed to investigate the impact of bounds tightening in interval global optimization. A parallel version of the algorithm is implemented to cope with the computational intensity of the experiment. The experimental results on efficiency of tightening bounds are presented for several test and practical problems. The suitability of mater-slave type parallelization to speed up the experiments is justified.",
+        "authors": {
+          "total": 2,
+          "data": [
+            {
+              "display_name": "Antanas Žilinskas",
+              "id": 1838562985,
+              "slug": "antanas-zilinskas",
+              "unique_id": "1cpmr5e2gd",
+              "full_slug": "antanas-zilinskas-1cpmr5e2gd"
+            },
+            {
+              "display_name": "Julius Žilinskas",
+              "id": 2288791643,
+              "slug": "julius-zilinskas",
+              "unique_id": "3u6gtx8ebq",
+              "full_slug": "julius-zilinskas-3u6gtx8ebq"
+            }
+          ]
+        },
+        "affiliations": {
+          "total": 0,
+          "data": []
+        },
+        "fulltext_url": null,
+        "fulltext_url_no_follow": true,
+        "paper_urls": {
+          "order": [
+            "Html"
+          ],
+          "data": {
+            "Html": [
+              "https://link.springer.com/chapter/10.1007%2F11558958_22",
+              "https://rd.springer.com/chapter/10.1007%2F11558958_22"
+            ]
+          },
+          "is_show": true
+        },
+        "metrics": {
+          "citations": {
+            "total": 7
+          }
+        },
+        "tldr": "In this article, an experimental model of interval arithmetic with controllable tightness of bounds is proposed to investigate the impact of bounds tightening in interval global optimization, and a parallel version of the algorithm is implemented to cope with the computational intensity of the experiment.",
+        "podcast": null,
+        "podcast_generation_allowed": true,
+        "entity_type": "PAPER"
+      },
+      {
+        "id": 4002390869,
+        "title": "Simple Multiple Precision Algorithms for Exponential Functions [Tips & Tricks]",
+        "is_archived": false,
+        "full_slug": "simple-multiple-precision-algorithms-for-exponential-2o96wzgr",
+        "journal": {
+          "display_name": "IEEE Signal Processing Magazine",
+          "official_page": "http://ieeexplore.ieee.org/servlet/opac?punumber=79",
+          "issn": "1053-5888",
+          "alias": [
+            "I.E.E.E. signal processing magazine",
+            "Institute of Electrical and Electronics Engineers signal processing magazine",
+            "Signal processing magazine"
+          ],
+          "id": 120977877,
+          "slug": "ieee-signal-processing-magazine",
+          "unique_id": "2en3mke1",
+          "full_slug": "ieee-signal-processing-magazine-2en3mke1"
+        },
+        "conference_series": null,
+        "date": "2022-07-01T00:00:00Z",
+        "is_oa": false,
+        "publication_type": "Journal Article",
+        "doi": "10.1109/MSP.2022.3157460",
+        "unique_id": "2o96wzgr",
+        "abstract": "Exponential functions are essential in many areas of science and engineering. Fast and efficient computing of such functions in multiple floating-point formats is a complex task for all classes of processing units—general purpose CPUs, digital signal processors, GPUs, intelligent processing units, and tensor processors (TPU)—developed recently for neural computing and deep machine learning.",
+        "authors": {
+          "total": 4,
+          "data": [
+            {
+              "display_name": "Leonid Moroz",
+              "id": 2261285781,
+              "slug": "leonid-moroz",
+              "unique_id": "33qvhc4vt5",
+              "full_slug": "leonid-moroz-33qvhc4vt5"
+            },
+            {
+              "display_name": "Volodymyr Samotyy",
+              "id": 1967400295,
+              "slug": "volodymyr-samotyy",
+              "unique_id": "24kg3jebsu",
+              "full_slug": "volodymyr-samotyy-24kg3jebsu"
+            },
+            {
+              "display_name": "Zbigniew Kokosiński",
+              "id": 168496902,
+              "slug": "zbigniew-kokosinski",
+              "unique_id": "5giij2fule",
+              "full_slug": "zbigniew-kokosinski-5giij2fule"
+            },
+            {
+              "display_name": "Pawel Gepner",
+              "id": 2027895215,
+              "slug": "pawel-gepner",
+              "unique_id": "3cld2qpc24",
+              "full_slug": "pawel-gepner-3cld2qpc24"
+            }
+          ]
+        },
+        "affiliations": {
+          "total": 0,
+          "data": []
+        },
+        "metrics": {
+          "citations": {
+            "total": 2
+          }
+        },
+        "tldr": "This paper presents a parallel version of the TPU architecture, developed recently for neural computing and deep machine learning, that addresses the challenge of parallelizing exponential functions in multiple floating-point formats.",
+        "podcast": null,
+        "podcast_generation_allowed": false,
+        "entity_type": "PAPER"
+      },
+      {
+        "id": 2044610542,
+        "title": "The exact dot product as basic tool for long interval arithmetic",
+        "is_archived": false,
+        "full_slug": "the-exact-dot-product-as-basic-tool-for-long-interval-224g2jfuw3",
+        "journal": {
+          "display_name": "Computing",
+          "official_page": "https://www.springer.com/journal/607",
+          "issn": "0010-485X",
+          "alias": [
+            "computer technology"
+          ],
+          "id": 35593046,
+          "slug": "computing",
+          "unique_id": "3rms29f3",
+          "full_slug": "computing-3rms29f3"
+        },
+        "conference_series": null,
+        "date": "2011-03-01T00:00:00Z",
+        "is_oa": true,
+        "publication_type": "Journal Article",
+        "doi": "10.1007/S00607-010-0127-7",
+        "unique_id": "224g2jfuw3",
+        "abstract": "Computing with guarantees is based on two arithmetical features. One is fixed (double) precision interval arithmetic. The other one is dynamic precision interval arithmetic, here also called long interval arithmetic. The basic tool to achieve high speed dynamic precision arithmetic for real and interval data is an exact multiply and accumulate operation and with it an exact dot product. Pipelining allows to compute it at the same high speed as vector operations on conventional vector processors. Long interval arithmetic fully benefits from such high speed. Exactitude brings very high accuracy, and thereby stability into computation. This document, which has been incorporated into the draft standard for interval arithmetic being developed by IEEE P1788, specifies the implementation of an exact multiply and accumulate operation.",
+        "authors": {
+          "total": 2,
+          "data": [
+            {
+              "display_name": "Ulrich Kulisch",
+              "id": 428189884,
+              "slug": "ulrich-kulisch",
+              "unique_id": "mek67s7byb",
+              "full_slug": "ulrich-kulisch-mek67s7byb",
+              "affiliation_full_slug": "karlsruhe-institute-of-technology-qoyshx5q"
+            },
+            {
+              "display_name": "Van Snyder",
+              "id": 2273913326,
+              "slug": "van-snyder",
+              "unique_id": "3izkouqhxf",
+              "full_slug": "van-snyder-3izkouqhxf",
+              "affiliation_full_slug": "california-institute-of-technology-3qpga2aa"
+            }
+          ]
+        },
+        "affiliations": {
+          "total": 2,
+          "data": [
+            {
+              "display_name": "Karlsruhe Institute of Technology",
+              "city": "Karlsruhe",
+              "region": null,
+              "country": "Germany",
+              "id": 102335020,
+              "slug": "karlsruhe-institute-of-technology",
+              "unique_id": "qoyshx5q",
+              "full_slug": "karlsruhe-institute-of-technology-qoyshx5q"
+            },
+            {
+              "display_name": "California Institute of Technology",
+              "city": "Pasadena",
+              "region": "California",
+              "country": "United States",
+              "id": 122411786,
+              "slug": "california-institute-of-technology",
+              "unique_id": "3qpga2aa",
+              "full_slug": "california-institute-of-technology-3qpga2aa"
+            }
+          ]
+        },
+        "fulltext_url": "/pdf/the-exact-dot-product-as-basic-tool-for-long-interval-224g2jfuw3.pdf",
+        "fulltext_url_no_follow": false,
+        "paper_urls": {
+          "order": [
+            "Pdf",
+            "Html",
+            "Others"
+          ],
+          "data": {
+            "Html": [
+              "https://dblp.uni-trier.de/db/journals/computing/computing91.html#KulischS11",
+              "https://link.springer.com/article/10.1007/s00607-010-0127-7"
+            ],
+            "Pdf": [
+              "https://www.math.kit.edu/iwrmm/seite/preprints/media/preprint%20nr.%2010-01.pdf"
+            ],
+            "Others": [
+              "http://dx.doi.org/10.1007/s00607-010-0127-7",
+              "https://link.springer.com/content/pdf/10.1007%2Fs00607-010-0127-7.pdf"
+            ]
+          },
+          "is_show": true
+        },
+        "metrics": {
+          "citations": {
+            "total": null
+          }
+        },
+        "tldr": "This document, which has been incorporated into the draft standard for interval arithmetic being developed by IEEE P1788, specifies the implementation of an exact multiply and accumulate operation.",
+        "podcast": null,
+        "podcast_generation_allowed": true,
+        "entity_type": "PAPER"
+      },
+      {
+        "id": 2552899723,
+        "title": "A priori Worst-Case Error Bounds for Floating-Point Computations",
+        "is_archived": false,
+        "full_slug": "a-priori-worst-case-error-bounds-for-floating-point-3f5a1iqvgu",
+        "journal": null,
+        "conference_series": null,
+        "date": "1997-01-01T00:00:00Z",
+        "is_oa": true,
+        "publication_type": null,
+        "doi": null,
+        "unique_id": "3f5a1iqvgu",
+        "abstract": "A new technique for the a priori calculation of rigorous errOr bounds forfloating-point computations is introduced. The theorems given in the paper combined with interval arithmetic lead to the implementation of reliable sofhuareroutines, which enables the user to compute the desired error bounds automatically by a suitable computer program. As a prominent example a table-lookup algorithm for calculating the function exp(x) - 1 that has been published by Tang [I51 is analyzed using these new tools. The result shows the high quality of the new approach.",
+        "authors": {
+          "total": 2,
+          "data": [
+            {
+              "display_name": "Walter IQ-tier",
+              "id": 2556770760,
+              "slug": "walter-iq-tier",
+              "unique_id": "3nqg5hox9x",
+              "full_slug": "walter-iq-tier-3nqg5hox9x"
+            },
+            {
+              "display_name": "Universitgt Karlsruhe",
+              "id": 2549350171,
+              "slug": "universitgt-karlsruhe",
+              "unique_id": "3elavrye75",
+              "full_slug": "universitgt-karlsruhe-3elavrye75"
+            }
+          ]
+        },
+        "affiliations": {
+          "total": 0,
+          "data": []
+        },
+        "metrics": {
+          "citations": {
+            "total": null
+          }
+        },
+        "tldr": "A new technique for the a priori calculation of rigorous errOr bounds for floating-point computations combined with interval arithmetic lead to the implementation of reliable sofhuareroutines, which enables the user to compute the desired error bounds automatically by a suitable computer program.",
+        "podcast": null,
+        "podcast_generation_allowed": true,
+        "entity_type": "PAPER"
+      },
+      {
+        "id": 4049951842,
+        "title": "GPU-Accelerated, Interval-Based Parameter Identification Methods Illustrated Using the Two-Compartment Problem",
+        "is_archived": false,
+        "full_slug": "gpu-accelerated-interval-based-parameter-identification-1w6zux5aqitl",
+        "journal": {
+          "display_name": "Acta Cybernetica",
+          "official_page": null,
+          "issn": "0324-721X",
+          "alias": null,
+          "id": 5962179,
+          "slug": "acta-cybernetica",
+          "unique_id": "2fqey03e",
+          "full_slug": "acta-cybernetica-2fqey03e"
+        },
+        "conference_series": null,
+        "date": "2024-10-24T00:00:00Z",
+        "is_oa": null,
+        "publication_type": "Journal Article",
+        "doi": "10.14232/actacyb.306774",
+        "unique_id": "1w6zux5aqitl",
+        "abstract": "Interval methods are helpful in the context of scientific computing for reliable treatment of problems with bounded uncertainty. Most traditional interval algorithms, however, were designed for sequential execution while internally depending on processor-specific instructions for directed rounding. Nowadays, many-core processors and dedicated hardware for massively parallel data processing have become the de facto standard for high-performance computers. Interval libraries have yet to adapt to this heterogeneous computing paradigm. In this article, we investigate the parallelization of interval methods with an emphasis on modern graphics processors. Using a parameter identification scenario in combination with newly developed or enhanced GPU-based interval software, we evaluate different methods for reducing the size of large interval search domains. For the first time, algorithmic differentiation can be used with intervals on the GPU. Different versions of interval optimization algorithms are compared wrt. their functionality, run times, and energy consumption. ",
+        "authors": {
+          "total": 2,
+          "data": [
+            {
+              "display_name": "L. Gillner",
+              "full_slug": null
+            },
+            {
+              "display_name": "Ekaterina Auer",
+              "full_slug": null
+            }
+          ]
+        },
+        "affiliations": {
+          "total": 0,
+          "data": []
+        },
+        "metrics": {
+          "citations": {
+            "total": null
+          }
+        },
+        "tldr": "This study explores GPU-accelerated interval methods for reliable scientific computing, adapting traditional algorithms to modern heterogeneous computing, and evaluates their performance in a parameter identification scenario using a two-compartment problem.",
+        "podcast": null,
+        "podcast_generation_allowed": true,
+        "entity_type": "PAPER"
+      }
+    ]
+  }
+}
