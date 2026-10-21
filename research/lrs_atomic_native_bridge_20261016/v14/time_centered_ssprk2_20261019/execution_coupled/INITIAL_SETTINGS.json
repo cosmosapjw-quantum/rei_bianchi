@@ -1,0 +1,54 @@
+{
+  "schema": "rei.v15.coupled.initial.1",
+  "cells": 16,
+  "threads": 1,
+  "background_panels": 128,
+  "a": 0.047619047619047616,
+  "fractions": [
+    0.075,
+    0.12,
+    0.03
+  ],
+  "temperature_K": 15000,
+  "source": "original native MD14; no normalization",
+  "physical_constants": "original HHeModel controlled_fixture c",
+  "clock": "AllMid, opacity_midpoint=true, SourcePlacement::Disabled",
+  "attenuation_enum": "Exponential; explicitly ignored by new named SSPRK API only",
+  "nonlinear_tolerance": 1e-15,
+  "historical_nonlinear_tolerance": 1e-13,
+  "seed_dt_s": 1e+16,
+  "seed_interpretation": "controlled initial packet, not elapsed cosmological history",
+  "seed_accountability": "native transport.inject arrays and original N/U source ledger before set_source_clocks initial_energy reset",
+  "fixed_geometry": {
+    "total_time": "1/k_ref20 using initial gas native physical rate",
+    "m": [
+      8,
+      16,
+      32,
+      64,
+      128,
+      256
+    ]
+  },
+  "birth": {
+    "Xend": 1e-05,
+    "N": [
+      32,
+      64,
+      128,
+      256,
+      512
+    ],
+    "modes": [
+      "Gauss2 initially empty",
+      "DisabledGauss2 seeded"
+    ],
+    "endpoint_target": "a_start*exp((i+1)*Xend/N); actual dx=ln1p((target-currenta)/currenta)"
+  },
+  "automatic_subcycling": false,
+  "max_cpu": 2,
+  "old_histories_rerun": false,
+  "accepted_microsegment_dt": "ln1p((end-begin)/begin)/Hmid; segment report reuses exact accepted solve dt",
+  "unique_cases": 16,
+  "pre_post_replays_are_same_cases": true
+}

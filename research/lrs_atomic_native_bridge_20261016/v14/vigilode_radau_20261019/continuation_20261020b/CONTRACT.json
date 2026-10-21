@@ -1,0 +1,69 @@
+{
+  "schema": "rei_lrs_borrowed_cell_contract_v1",
+  "utc": "2026-10-20T06:52:00Z",
+  "scope": "independent LRS opt-in native-evaluation implementation; no change of solver/model",
+  "base": {
+    "repository": "cosmosapjw-quantum/rei_bianchi",
+    "branch": "research/rei-lrs-v14-physical-birth-20261018",
+    "delivery_head": "70a9ff3f2437101a1df13054dcb10f8106741b26",
+    "code_source": "33ae18c31bf61bcc99d6d05edb6c2e7a5cb272a1",
+    "vigilode_pin": "8a8bd409b1d96c7b7421f496d229e119fd3d284e",
+    "baseline_binary_sha256": "24f9d38e56d3380e830478b8afe7760b2f44fff7ab60167ed14aa668ae7f4ac0",
+    "adapter_repo_path": "research/lrs_atomic_native_bridge_20261016/v14/vigilode_radau_20261019"
+  },
+  "question": "Can borrowing the identical ordered node sequence remove per-cached-RHS PreparedAbsorption photon-state/node clones while preserving finite native outcomes and providing measurable cost improvement?",
+  "allowed_paths": [
+    "native_additions/axbi_native_rhs.rs",
+    "src/lib.rs",
+    "src/main.rs",
+    "src/bin/lrs_batch.rs (only CLI mode forwarding if needed)",
+    "prepare_and_run.py (only mode forwarding/help if needed)",
+    "tests for this affected path",
+    "README.md and task-specific research/receipt/handoff files"
+  ],
+  "forbidden_changes": [
+    "all original 152 native baseline file bytes (the already existing exact parent append remains)",
+    "transport_hook.txt",
+    "VigilODE pin/source",
+    "Cargo dependency versions or lockfile",
+    "native prepare_cell/cell_quadrature/provider/rate algebra",
+    "FD epsilon, perturbation policy, solver tolerances, charge/admissibility order, fatal propagation, commit semantics",
+    "default legacy mode",
+    "unrelated repository formatting"
+  ],
+  "implementation": [
+    "Add opt-in NativeEval::CellBorrowed / --native-eval cell-borrowed; preserve legacy and existing cell-cache as references.",
+    "Extract original addon native_rates body once into a shared borrowed iterator helper. Both PreparedAbsorption and borrowed view call this body; do not duplicate or re-express physical arithmetic.",
+    "Borrowed view holds state/cache references and at most one owned replacement PreparedCell, prepared by original prepare_cell. Preserve stale/support/shape/index checks, diagnostics folds and original increasing cell then within-cell node order. Empty cells yield no nodes.",
+    "No inner threading/SIMD/reassociated reductions, unsafe code, new dependencies or physical approximations.",
+    "Track narrowly named cached_prepared_state_clones and cached_prepared_node_clones if useful, excluding the once-per-Jacobian base clone and coordinate decoding. These are explicit operation counters, not allocation bytes, peak RSS or bandwidth measurements."
+  ],
+  "acceptance": {
+    "correctness": "Existing legacy/cache regression tests continue to pass; extend meaningful native equality coverage to borrowed mode, including seeded/empty/delta Jacobians, changed threshold/steep cells and stale support/shape/index failure; resource cap transactional and domain/fatal classifications are unchanged. Require exact finite numerical equality and structure equality for shared physical fields on tested fixtures; do not claim signed-zero bit equality or a universal solver theorem.",
+    "native_replay": "Replay existing 19-case settings once with cell-borrowed and compare raw non-time physical fields to previously admitted same cell-cache settings; classify this as replay of existing fixtures, not new 19 scientific models/histories. Run limited new legacy/cache controls when needed to establish shared-kernel baseline continuity.",
+    "cost": "For same-binary cell-cache vs cell-borrowed, CPU0, profiling OFF, warmups then 5 paired AB/BA repetitions per fixed/birth/disabled Radau N16. Preserve each raw output/stdout/stderr/exit/binary identity. Report median paired speed ratios and dispersion, scoped to environment. No speedup claim unless observed; no memory-reduction claim from clone counts alone.",
+    "stopping_rule": "One bounded targeted repair for a concrete implementation/test failure after Astra classification. Stop optional testing when changed-path risks and finite claims are resolved. Return to Astra for acceptance/model ambiguity."
+  },
+  "limits": {
+    "native_cumulative_wall_s": 180,
+    "per_case_timeout_s": 40,
+    "build_timeout_s": 1200,
+    "test_timeout_s": 600,
+    "cargo_jobs": 1,
+    "new_dependencies": 0,
+    "initial_available_disk_mib": 721
+  },
+  "execution": {
+    "controller": "Astra-tier root; contract/theory/admission",
+    "implementer": "existing lower-tier opt20_coder; requested versus observed model identity recorded separately",
+    "reviewer": "Astra-tier opt20_intake_theory did not implement this change",
+    "use_existing_workspace": true,
+    "no_new_git_clone_or_worktree": true,
+    "preserve_old_sources_binaries_and_raw": true
+  },
+  "publication": {
+    "checkpoint": "C1-C4 intake/theory/contract normal Git files + additive dual backup",
+    "final": "source commit, independent decision, raw evidence, scoped findings, stage/DAG record, dual full-file readback, delivery commit, NCP and next-chat handoffs",
+    "new_ncp": "NOT_RUN; supplied SSH key absent"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "schema": "rei.bianchi.matter_radiation.contract_review.v1",
+  "date": "2026-10-21",
+  "reviewer": "/root/pilot_independent_review",
+  "requested_role": "Independent nonimplementing Astra review",
+  "observed_identity": "Developer context identifies GPT-6 Astra Pro; no additional runtime model telemetry",
+  "decision": "PASS_SCOPED_EXTENSION_CONTRACT",
+  "did_implement_solver": false,
+  "did_run_expanded_campaign": false,
+  "contract_sha256": "66dd8ada93dd1074f40c847129e71d4a4e6923c07d92510ce03e46ea2775f6fb",
+  "blocking_mismatches": [],
+  "scope": {
+    "existing_histories_decomposed_without_ODE": 625,
+    "new_nonzero_matter_slice_solves": 600,
+    "existing_neutral_control_references": 25,
+    "new_mixed_cancellation_solves": 6,
+    "new_scientific_sweep_solves": 606,
+    "new_original_source_comparison_cases": 4
+  },
+  "conventions": {
+    "frame": "common comoving orthonormal spatial frame",
+    "tensor": "pi_m=diag(-pm,-pm,2pm); pi_r=diag(-pr,-pr,2pr)",
+    "signed_components": "signedPi_i=sqrt(3)*K*pi_s_i/H^2; K=8piG/c^2",
+    "total_magnitude": "abs(signedPi_m+signedPi_r), generally not abs(signedPi_m)+abs(signedPi_r)",
+    "dust": "zero anisotropic stress in this non-tilted pressureless model",
+    "radiation": "photons plus massless neutrinos; shared collisionless energy initial data justify common vector"
+  },
+  "attainability_static_original_helper": {
+    "A_domain": [
+      -1,
+      2
+    ],
+    "Sigma0": 0.004,
+    "signedPi_m_at_A_minus1": -0.0004833821888780246,
+    "signedPi_m_at_A_plus2": 0.0009667643777560494,
+    "chosen_symmetric_Pi_m_max": 0.0004,
+    "required_max_abs_A_approx": 0.8275025625756662,
+    "symmetric_Pi_m_max_0_001": "UNREALIZABLE under frozen mass/fraction/distribution family"
+  },
+  "reuse_decision": {
+    "status": "ACCEPTABLE_EXPLICIT_REFERENCE_REUSE",
+    "conditions": [
+      "Retain original case/source identity, history path, old k and actual realized component axes",
+      "Mark REFERENCE_REUSE; do not assign new execution/resume identity",
+      "Physical-axis agreement is tolerance-based, not exact-zero or bitwise equivalence"
+    ],
+    "observed_saved_isotropic_control": {
+      "signedPi_m0": 0.0,
+      "signedPi_r0": 1.4928082245968736e-19,
+      "stored_signed_total": 1.4928082245968736e-19
+    },
+    "note": "Scalar helper and batched helper can distribute tiny roundoff offsets differently; report actual saved components."
+  },
+  "validation_gate": {
+    "new_signed_initial_cases": [
+      [
+        0.004,
+        0.0004,
+        0
+      ],
+      [
+        -0.004,
+        -0.0004,
+        0
+      ],
+      [
+        0,
+        0.0004,
+        -0.0004
+      ],
+      [
+        0.004,
+        -0.0004,
+        0.0004
+      ]
+    ],
+    "new_full_vs_reduced_max_abs": 1e-08,
+    "source_H2_relative": 2e-13,
+    "massive_energy_directional_checks": 2,
+    "massive_energy_relative_limit": 1e-07,
+    "initial_axes_absolute_limit": 1e-12,
+    "existing_decomposition": "component signed sum against original signed_Pi at every saved sample",
+    "old_comparisons_closure_tolerance": "No mandatory repetition; investigate only a material new discrepancy"
+  },
+  "Wolfram_receipt_review": "Read actual saved output: half norms3pm^2,3pr^2,3(pm+pr)^2; cross6pmpr; work6s(pm+pr); constraint derivative0; P2 square1/5 and range[-1/2,1]. Consistent with contract, formal algebra only.",
+  "claim_limits": [
+    "Initially pure component stress need not remain pure during coupled evolution",
+    "Mixed histories require actual coupled solves, not sum of separate responses",
+    "No general non-LRS Bianchi closure, global positivity/convergence certificate, native HHe feedback or production admission",
+    "No detailed benchmark, speedup or measured memory-reduction claim"
+  ],
+  "next_action": "Proceed with lower-tier bounded implementation and new validation; return actual source/raw outputs for independent final review."
+}

@@ -1,0 +1,71 @@
+{
+  "schema": "rei.bianchi.pilot.initial_independent_review.v1",
+  "date": "2026-10-21",
+  "reviewer": "/root/pilot_independent_review",
+  "requested_role": "Independent Astra review, nonimplementing",
+  "observed_identity": "Developer context identifies GPT-6 Astra Pro; no independent runtime model telemetry available",
+  "did_implement_solver": false,
+  "decision": "PASS",
+  "decision_scope": "Intake/contract publication and bounded exploratory implementation/execution; directional variable clarification resolved",
+  "production_admission": false,
+  "contract_sha256_at_read": "798720755edbbf5be0b89e764e79d2aba25ded234a8b875d0e4722f31b7445a8",
+  "source_canonical_sha256_verified": "91c1641b851aa9580141d4423e2579ced5f11b95aa716b3fc2cb0137df344cc5",
+  "checks": {
+    "half_contraction_norm": "PASS: sigma norm=sqrt(3)|s|; pi norm=sqrt(3)|p|",
+    "SI_mapping": "PASS: K=8piG/c^2 for energy-density units, K*rhocrit=3H0^2",
+    "constraint_propagation": "PASS analytically: derivative of 3H^2-Krho-Lambda*c^2-3s^2 vanishes",
+    "eight_state_reduction": "PASS: identical collisionless gamma/nu, reflection parity, passive number and identically zero thermal state",
+    "physical_axes": "PASS: stated mappings correct with realized-field offset check",
+    "validation_scope": "PASS for preliminary finite-L8/quadrature model, pending actual target results"
+  },
+  "bounded_clarification": {
+    "location": "PILOT_CONTRACT.md minimal validation item 4",
+    "finding": "v denotes s/Href in integrated state, whereas directional moment energy derivative requires db/dx.",
+    "required_interpretation": "Let w=db/dx=Href*v/H; compare [rho(x+h,b+w*h)-rho(x-h,b-w*h)]/(2h) to -3(rho+pbar)-6*w*pi_s. If prescribing an arbitrary independent direction, name it w.",
+    "impact": "Test wording only; source physics and reduced RHS unchanged",
+    "repair_owner": "controller/implementation agent; reviewer does not edit contract or solver",
+    "status": "RESOLVED_BY_CONTROLLER_AND_VERIFIED",
+    "corrected_contract_line": "4. Check massive moment directional finite-difference energy identity at interior x for a few prescribed (b,w), where w=db/dx=s/H is the direction, distinct from the state v=s/Href: d rho/dx=-3(rho+pbar)-6w*pi_s. Evaluate moments(x+h,b+w*h) and moments(x-h,b-w*h), relative residual <=1e-7, h=1e-5. Preserve failure and return to controller if substantive. This wording correction follows independent reviewer clarification before execution."
+  },
+  "independent_source_probe": {
+    "maximum_abs_k_ideal": 0.4736657615275149,
+    "rho_initial": 0.9999999999999999,
+    "pressure_perp_initial": 0.0046809925598988176,
+    "pressure_parallel_initial": 0.004680992559898817,
+    "min_cell_number": 1.491026203638869e-30,
+    "energy_monopole_row_max_residual": 7.599476603559197e-14,
+    "odd_even_matrix_max_abs": 4.440892098500626e-16,
+    "number_monopole_row_max_abs": 5.487277299209836e-14,
+    "directional_fd_h": 1e-05,
+    "directional_fd_cases": [
+      {
+        "x": 0.3,
+        "b": 0.001,
+        "w": 0.003,
+        "relative_residual": 1.5440149726611593e-10
+      },
+      {
+        "x": 0.8,
+        "b": -0.003,
+        "w": -0.002,
+        "relative_residual": 1.458846906283942e-10
+      },
+      {
+        "x": 1.1,
+        "b": 0.002,
+        "w": 0,
+        "relative_residual": 1.50181909052755e-10
+      }
+    ]
+  },
+  "limits": [
+    "No target sweep or reduced implementation reviewed in initial review",
+    "Algebraically imposed Hamiltonian residual is consistency bookkeeping, not independent dynamical accuracy evidence",
+    "Parity and number conservation are exact in continuum projected algebra; original numerical matrices contain roundoff-level leakage",
+    "L8 versus L12 and sampled brightness checks do not establish full phase-space convergence or positivity",
+    "No detailed performance benchmark requested or required",
+    "No general Bianchi I initial-data completeness, native HHe feedback, production admission, or NCP execution claim"
+  ],
+  "next_action": "Apply the one variable clarification, execute frozen validation and bounded sweep; send implementation diff and actual raw results for final independent scoped review.",
+  "contract_sha256_after_clarification": "798720755edbbf5be0b89e764e79d2aba25ded234a8b875d0e4722f31b7445a8"
+}

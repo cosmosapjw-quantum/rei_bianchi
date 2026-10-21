@@ -1,0 +1,11 @@
+# LRS exit-observation follow-up (2026-10-21)
+
+Base: `c2ad64131d3127d74110a39744c59b037a411103`; runner source: `d234243a79e4e8e611aaf4ac61949c5ef9111468`.
+
+The prospective opt-in supervisor path now freezes all child exit observations before persistence, rechecks aggregate charge immediately before each `Popen`, records launch/exit/persistence observations and overshoot, and is enabled only by the explicit `EXIT_ACCOUNTING_V1` manifest policy. Legacy accounting remains on its prior path. The prospective charge means supervisor-observed launch-to-first-exit-observation wall time; it is not kernel exit time or CPU time. Poll cadence is requested, not a latency bound; scheduling and sequential observation can delay detection, and overshoot remains possible.
+
+Candidate `campaign.py` SHA256: `0a2ca329d196e37e95daf5fb87c4ae28b1f5b17e37bcca2f0fde0d93e446c63e`. One seven-row synthetic process matrix passed (max 2 children; 1.076134769 s), and a separate row-2 final-candidate target passed (0.315666203 s). After independent review authorized one repair, the focused cached A→B→C regression passed in 0.370819296 s: resume launched zero processes, A was `FAILED_IDENTITY_MISMATCH`, B/C were `BLOCKED_DEPENDENCY_IDENTITY`; all 18 prior attempt files and the historical manifest/receipt/debit were preserved. Astra read-only final review: `PASS_SCOPED`. Raw outputs and receipts are under `evidence/`.
+
+Historical NCP campaign remains exit 1 / INCOMPLETE_OR_FAILED: 144/246 complete, 100 `NOT_RUN_AGGREGATE_CAP`, 2 dependency-blocked; native 131/131, V13 84/84, SSPRK 3/3, V12 44/144. Historical V12 supervisor debit remains 200.39897231891518 s against its 180 s cap (overshoot 20.39897231891518 s). Raw internal elapsed 4.538247207 s is a different clock and is not a refund. No new NCP campaign was submitted. The remaining 100 full job identities/dependencies are preserved in the prospective skeleton; it is `NOT_AUTHORIZED`, with new budget and debit-import policy `NOT_FROZEN`. V12 merge and saved-reference analysis remain blocked.
+
+Scientific conclusions unchanged: LRS scope remains subject to its existing review; this supervisory repair does not establish broader scientific admission. Production remains `NOT_ISSUED`. PR199 AGE is separate and untouched.

@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "unit_id": "rei_bianchi_sigma_pi_pilot_20261021",
+  "task": "both",
+  "objective": "First actual sign-resolved non-tilted LRS Bianchi I Sigma0-Pi0 pilot plots; additive optimization and bounded parallel execution",
+  "status": "in_progress",
+  "base_commit": "3360a345f8e0f2f9d2b6bdd42d21e584446ec9b8",
+  "source_commit": "3b85dedce84d37b3e165da00685a8a984950aafe",
+  "stages": {
+    "R1": "complete",
+    "R2": "complete_with_recorded_access_gaps",
+    "R3": "complete",
+    "R4": "complete",
+    "R5": "complete",
+    "R6": "complete_scoped_initial_review",
+    "R7": "in_progress",
+    "R8": "pending",
+    "R9": "complete_contract",
+    "R10": "pending",
+    "C1": "complete",
+    "C2": "complete",
+    "C3": "complete",
+    "C4": "complete",
+    "C5": "in_progress",
+    "C6": "in_progress",
+    "C7": "in_progress",
+    "C8": "in_progress",
+    "C9": "pending_final_raw_review",
+    "C10": "pending"
+  },
+  "nodes": [
+    {
+      "id": "intake",
+      "status": "complete",
+      "evidence": [
+        "INTAKE_REPO.md",
+        "COVERAGE.json",
+        "INTAKE_BACKUPS.json"
+      ],
+      "limits": "Pagination-complete REI branch/PR listings; targeted file reads; conversations unavailable; provider listing limits recorded"
+    },
+    {
+      "id": "theory",
+      "status": "complete",
+      "depends_on": [
+        "intake"
+      ],
+      "evidence": [
+        "PILOT_CONTRACT.md",
+        "THEORY_AND_DESIGN_KO.md",
+        "WOLFRAM_ALGEBRA.json"
+      ]
+    },
+    {
+      "id": "initial_independent_review",
+      "status": "pass_scoped",
+      "depends_on": [
+        "theory"
+      ],
+      "evidence": [
+        "INITIAL_REVIEW.json"
+      ],
+      "correction": "validation directional variable w=db/dx differs from state v=s/Href; corrected before execution"
+    },
+    {
+      "id": "implementation_and_validation",
+      "status": "in_progress",
+      "depends_on": [
+        "initial_independent_review"
+      ]
+    },
+    {
+      "id": "local_pilot_625",
+      "status": "pending",
+      "depends_on": [
+        "implementation_and_validation"
+      ]
+    },
+    {
+      "id": "plots_and_final_independent_review",
+      "status": "pending",
+      "depends_on": [
+        "local_pilot_625"
+      ]
+    },
+    {
+      "id": "stage_A_publication_backup",
+      "status": "in_progress",
+      "depends_on": [
+        "initial_independent_review"
+      ]
+    },
+    {
+      "id": "final_publication_backup",
+      "status": "pending",
+      "depends_on": [
+        "plots_and_final_independent_review"
+      ]
+    },
+    {
+      "id": "ncp_pilot",
+      "status": "blocked_authentication_transport",
+      "depends_on": [
+        "implementation_and_validation"
+      ],
+      "reason": "Sandbox key absent; connected Desktop Commander explicitly returned monthly usage exhausted. No NCP execution attempted. User-authorized command remains in handoff."
+    }
+  ],
+  "execution_scopes": {
+    "old_v12": {
+      "cap_s": 180,
+      "debit_s": 200.39897231891518,
+      "remaining100": "NOT_REPLAYED_NOT_REFUNDED"
+    },
+    "new_pilot": {
+      "max_wall_s": 900,
+      "max_aggregate_solve_s": 3600,
+      "local_max_workers": 8,
+      "ncp_max_workers": 64,
+      "automatic_retry": false
+    }
+  },
+  "claims": {
+    "production": "NOT_ISSUED",
+    "speedup": "NOT_MEASURED_REQUEST_OMITS_BENCHMARKS",
+    "general_non_LRS": "OUTSIDE_THIS_PILOT",
+    "native_HHe_feedback": "OUTSIDE_THIS_PILOT"
+  }
+}

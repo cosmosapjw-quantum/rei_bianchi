@@ -1,0 +1,154 @@
+{
+  "schema": "rei.run16.prefix-execution-receipt.v1",
+  "status": "NUMERICALLY_CHECKED",
+  "physical_scope": "Original source-free gas prior to first birth; endpoint left limit",
+  "first_birth_z": 0.004989333151072248,
+  "prefix_solves": 3,
+  "dimension_each": 5,
+  "controls": [
+    {
+      "nominal_rtol": 3e-11,
+      "effective_rtol": 1.3416407864998737e-11,
+      "max_step": 0.001247333287768062,
+      "accepted_steps": 4,
+      "native_rhs_calls": 62
+    },
+    {
+      "nominal_rtol": 6e-12,
+      "effective_rtol": 2.6832815729997476e-12,
+      "max_step": 0.001247333287768062,
+      "accepted_steps": 4,
+      "native_rhs_calls": 62
+    },
+    {
+      "nominal_rtol": 6e-12,
+      "effective_rtol": 2.6832815729997476e-12,
+      "max_step": 0.000623666643884031,
+      "accepted_steps": 8,
+      "native_rhs_calls": 122
+    }
+  ],
+  "actual_commands": [
+    [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-B",
+      "/tmp/rei_run16_work/feedback/source_free_prefix.py",
+      "--source-root",
+      "/tmp/rei_run15_clean_git/research/atomic_nuclear_ssot_20261017/run13/recovered",
+      "--gas-binary",
+      "/tmp/rei_run15_salvage/bin/gas_rhs_server",
+      "--point-result",
+      "/tmp/rei_run16_work/feedback/execution01/RECORDED_STATE_FEEDBACK.json",
+      "--output-dir",
+      "/tmp/rei_run16_work/feedback/prefix_execution01",
+      "--wall-cap-seconds",
+      "20"
+    ],
+    [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-B",
+      "/tmp/rei_run16_work/feedback/prefix_step_halving.py",
+      "--source-root",
+      "/tmp/rei_run15_clean_git/research/atomic_nuclear_ssot_20261017/run13/recovered",
+      "--gas-binary",
+      "/tmp/rei_run15_salvage/bin/gas_rhs_server",
+      "--point-result",
+      "/tmp/rei_run16_work/feedback/execution01/RECORDED_STATE_FEEDBACK.json",
+      "--prefix-result",
+      "/tmp/rei_run16_work/feedback/prefix_execution01/SOURCE_FREE_PREFIX.json",
+      "--output-dir",
+      "/tmp/rei_run16_work/feedback/prefix_stephalf_execution01"
+    ]
+  ],
+  "tool_executions": [
+    {
+      "session_id": 63839,
+      "exit_code": 0
+    },
+    {
+      "session_id": 44154,
+      "exit_code": 0
+    }
+  ],
+  "native_prefix_rhs_calls": 246,
+  "native_prefix_call_wall_seconds": 0.02232714199635666,
+  "combined_with_point_native_rhs_calls": 331,
+  "full_transport_ivp_solves": 0,
+  "historical_m2_reruns": 0,
+  "historical_test_reruns": 0,
+  "initial_pair_limitation": "Both controls selected identical4stepgrids and all sampled q values; this was resolved with one additional max-step-halving solve",
+  "actual_step_halving_check": {
+    "max_relative_HI_difference": 0.0,
+    "max_T_difference_K": 3.637978807091713e-12,
+    "max_coordinate_difference": 2.220446049250313e-16,
+    "predeclared_gate_relative_HI_or_deltaT_over10000": 1e-10,
+    "original_source_input_112_unchanged": true,
+    "nuclear_total_drift_per_initial_H": [
+      1.1102230246251565e-16,
+      0.0,
+      1.3877787807814457e-17
+    ]
+  },
+  "first_birth_latest_comparison": {
+    "z": 0.004989333151072248,
+    "halfstep_minus_prior_HI_relative": 0.0,
+    "halfstep_minus_prior_T_K": -3.637978807091713e-12,
+    "halfstep_minus_prior_q": [
+      -1.3877787807814457e-17,
+      1.3877787807814457e-17,
+      0.0,
+      0.0,
+      -2.220446049250313e-16
+    ],
+    "pchip_minus_halfstep_HI_relative": -1.5712776951781748e-06,
+    "pchip_minus_halfstep_T_K": 0.04470254583975475,
+    "halfstep_HI_per_initial_H": 0.9000000534472483,
+    "halfstep_T_K": 9999.925747777985
+  },
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "python_executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39"
+  },
+  "source_binary": {
+    "file": "/tmp/rei_run15_salvage/bin/gas_rhs_server",
+    "sha256": "3454e9e401560df188c7410de29d0712c4afe235e9899021e5314766ab778c8b",
+    "bytes": 571904
+  },
+  "source_inputs_read_only_hash_checked": 112,
+  "proof_scope": "Numerical prefix path comparison only; no rigorous error enclosure, no post-first-birth trajectory, no full ledger checkpoint",
+  "files": [
+    {
+      "path": "source_free_prefix.py",
+      "bytes": 11945,
+      "sha256": "8247edc50a7ed246ab15cdd362f5ce2ac41264e71ea6eb070f9a386083f3b555"
+    },
+    {
+      "path": "prefix_step_halving.py",
+      "bytes": 10205,
+      "sha256": "5d313ca43d4cab3a210111bca9cbb971af3b3131b010067e67907529967ad071"
+    },
+    {
+      "path": "prefix_execution01/SOURCE_FREE_PREFIX.json",
+      "bytes": 15535,
+      "sha256": "617059f5f170f74f95f1fa9822a3bc31d5acb7c213add7aae760334a5a784d92"
+    },
+    {
+      "path": "prefix_execution01/NATIVE_PREFIX_RHS_VALUE_TRACE.jsonl",
+      "bytes": 107732,
+      "sha256": "e2b12fc8ccbe4b326b7b73c90aadcf70ee71c2168810c4063437f10d36f57f8d"
+    },
+    {
+      "path": "prefix_stephalf_execution01/PREFIX_STEP_HALVING.json",
+      "bytes": 9914,
+      "sha256": "69cd9e459991fa7f0bf1ed6fed12bedbadffc1b5451ad0b8a380235e8f8813eb"
+    },
+    {
+      "path": "prefix_stephalf_execution01/NATIVE_STEPHALF_RHS_VALUE_TRACE.jsonl",
+      "bytes": 105986,
+      "sha256": "862d86b1d531e096186e03168a3053b4e920f8e1189034705d78cc83493b3fdc"
+    }
+  ]
+}

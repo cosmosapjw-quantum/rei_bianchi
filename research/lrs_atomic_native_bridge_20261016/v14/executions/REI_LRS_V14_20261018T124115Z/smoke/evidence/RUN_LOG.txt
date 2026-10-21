@@ -1,0 +1,182 @@
+utc=2026-10-18T12:40:28Z
+host=s1a0e5abed09
+rustc 1.99.0 (b940084d7 2026-09-28)
+cargo 1.99.0 (5f94df478 2026-08-27)
+Python 3.12.3
+ 21:40:28 up  9:59,  7 users,  load average: 0.04, 0.04, 0.02
+               total        used        free      shared  buff/cache   available
+Mem:           125Gi       3.0Gi        88Gi       1.3Mi        35Gi       122Gi
+Swap:             0B          0B          0B
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda2        99G   64G   32G  68% /
+{
+  "schema": "rei.v13.restore.1",
+  "parent_commit": "46b567e0ee96e725a21e77fed9ab4160d0ffa9e7",
+  "changed_file_hashes": {
+    "rust/rei_microphysics/src/axbi_driver.rs": "63a8d6f4675312eec0b0a593f54a33d87b20692e19b7e156ba9447a148c89aac",
+    "rust/rei_microphysics/src/axbi_covariant_transport.rs": "79b4d0972db8ed65ba64e71edc7530e46274ce8299197295bf24c800f86dbee9",
+    "rust/rei_microphysics/tests/v13_source_clocks.rs": "96233f3b81248fb4bc025b2de60e33e5d1405e2df4ec29f9b6b0be67d360ca79",
+    "rust/rei_microphysics/examples/v13_source_clock_sweep.rs": "70029e2b2ada5ba9f2a7fee01c5c346c5d69cafe49db813e7202a642363745d5"
+  },
+  "base": "/root/REI_LRS_V14_20261018T124115Z/input/v12/native_owner",
+  "output": "/root/REI_LRS_V14_20261018T124115Z/smoke/native_owner",
+  "restored_files": 4,
+  "status": "SOURCE_RESTORED"
+}
+{
+  "schema": "rei.v14.restore.1",
+  "parent_pr": 196,
+  "parent_sha": "7fb18cec3d6d6eebad5fe418ec83b36d82cfff1e",
+  "output": "/root/REI_LRS_V14_20261018T124115Z/smoke/native_owner",
+  "verified_files": 4,
+  "native_compile": "NOT_PERFORMED_BY_RESTORE",
+  "sha256": {
+    "rust/rei_microphysics/src/axbi_driver.rs": "fd5b040bceb2134dc92c09f4bf49e6b04be2e8115f553c19fe989f472f32c01d",
+    "rust/rei_microphysics/src/axbi_physical_birth.rs": "3de9ca2dc4a442cb6d4d7fa6eaeb0f993ffc634d6ffdeb2b9410faec38fee0fa",
+    "rust/rei_microphysics/examples/v14_physical_birth_sweep.rs": "192f68282cf072874c86369ad51e9b71f227e72eff61dbb944051231eed6015c",
+    "rust/rei_microphysics/tests/v14_physical_birth.rs": "8c368cf35866bd7fe317515a9f1a31bc97cc7340bfd2ed799edf3047cbfd7af7"
+  }
+}
+   Compiling rei_microphysics v0.1.0 (/root/REI_LRS_V14_20261018T124115Z/smoke/native_owner/rust/rei_microphysics)
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_driver.rs:584:18
+    |
+584 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+584 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+584 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 11.77s
+     Running tests/axbi_covariant_transport.rs (smoke/target/release/deps/axbi_covariant_transport-d0bd3b75e9783a96)
+
+running 7 tests
+test broad_positive_spectrum_uses_threshold_cut_nodes_instead_of_centroid ... ok
+test unsupported_source_and_malformed_support_reject_transactionally ... ok
+test backward_euler_node_survival_number_energy_gamma_and_heat_share_one_owner ... ok
+test near_endpoint_broad_support_stays_positive_and_records_tail_control ... ok
+test exact_fit_threshold_delta_redshifts_without_false_heii_ionization ... ok
+test source_subcells_close_number_energy_and_anisotropic_reflection ... ok
+test redshifted_inert_photons_are_retained_and_history_memory_is_fixed ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/axbi_driver.rs (smoke/target/release/deps/axbi_driver-36adc61fa03d8993)
+
+running 13 tests
+test explicit_initial_hydrogen_fraction_is_opt_in_and_validated ... ok
+test conservative_deposit_exact_number_and_energy ... ok
+test refinement_output_allocation_4096_preserves_existing_budgets_and_exact_guard ... ok
+test geometry_map_rejects_cold_endpoint_outside_provider_domain ... ok
+test reaction_free_geometry_conserves_count_energy_and_temperature_dilution ... ok
+test cold_absorption_uses_one_event_owner ... ok
+test checkpoint_roundtrip_and_registry_normalization ... ok
+test aggregate_output_guard_counts_nested_bytes_and_atomic_checkpoint_peak ... ok
+test full_resource_allocation_preserves_pilot_default_and_exact_guard ... ok
+test hard_caps_charge_started_trials_and_resume_without_off_by_one ... ok
+test sparse_full_spectra_keep_each_abundance_and_align_terminal_resume_and_cap ... ok
+test component_step_doubling_and_state_array_metric ... ok
+test donor_initial_eos_one_step_ledgers_and_checkpoint_roundtrip ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/v12_thermal_clocks.rs (smoke/target/release/deps/v12_thermal_clocks-a5a8b6c022fd342c)
+
+running 2 tests
+test ce_midpoint_changes_only_the_ce_clock_while_chemical_midpoint_keeps_ce_endpoint ... ok
+test source_free_clock_modes_run_the_original_fixed_step_path_and_keep_ledgers_finite ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/v13_source_clocks.rs (smoke/target/release/deps/v13_source_clocks-bb31141dacd19783)
+
+running 7 tests
+test exponential_average_is_positive_and_count_consistent_from_zero_to_stiff ... ok
+test actual_verner_delta_exponential_loss_shares_species_binding_heat_owner ... ok
+test source_clocks_reject_mode_conflict_and_bad_tolerance ... ok
+test failed_trial_never_commits_newborn_photons_or_gas ... ok
+test source_halves_preserve_total_birth_number_and_energy_at_common_geometry ... ok
+test no_source_limit_matches_v12_full_midpoint_without_new_physics ... ok
+test source_on_native_step_is_conservative_and_photo_events_are_real ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/v14_physical_birth.rs (smoke/target/release/deps/v14_physical_birth-782a088eb5d52bf6)
+
+running 7 tests
+test gauss2_positive_nodes_have_exact_first_four_moments ... ok
+test failure_rolls_back_physical_state_and_rhs_but_charges_work ... ok
+test physical_birth_api_requires_explicit_disabled_native_source ... ok
+test disabled_gl2_is_exact_same_three_native_source_off_substeps ... ok
+test every_microsegment_rhs_is_integrated_with_its_own_clock ... ok
+test source_number_is_original_md14_at_each_actual_birth_geometry ... ok
+test physical_midpoint_and_gauss2_are_conservative_positive_experiments ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_driver.rs:584:18
+    |
+584 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+584 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+584 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/root/REI_LRS_V14_20261018T124115Z/smoke/native_owner/rust/rei_microphysics)
+    Finished `release` profile [optimized] target(s) in 0.43s
+COMPLETE mode=be_control N=8 cells=8 Xend=0.00001 microsegments=8 wall=0.007698
+COMPLETE mode=be_control N=16 cells=8 Xend=0.00001 microsegments=16 wall=0.014854
+COMPLETE mode=common_combined N=8 cells=8 Xend=0.00001 microsegments=8 wall=0.010127
+COMPLETE mode=common_combined N=16 cells=8 Xend=0.00001 microsegments=16 wall=0.020037
+COMPLETE mode=physical_midpoint N=8 cells=8 Xend=0.00001 microsegments=16 wall=0.015694
+COMPLETE mode=physical_midpoint N=16 cells=8 Xend=0.00001 microsegments=32 wall=0.024135
+COMPLETE mode=physical_gl2 N=8 cells=8 Xend=0.00001 microsegments=24 wall=0.020222
+COMPLETE mode=physical_gl2 N=16 cells=8 Xend=0.00001 microsegments=48 wall=0.039031
+COMPLETE mode=source_off N=8 cells=8 Xend=0.00001 microsegments=8 wall=0.001510
+COMPLETE mode=source_off N=16 cells=8 Xend=0.00001 microsegments=16 wall=0.003110
+COMPLETE mode=source_off_midpoint N=8 cells=8 Xend=0.00001 microsegments=16 wall=0.003125
+COMPLETE mode=source_off_midpoint N=16 cells=8 Xend=0.00001 microsegments=32 wall=0.004416
+COMPLETE mode=source_off_gl2 N=8 cells=8 Xend=0.00001 microsegments=24 wall=0.003554
+COMPLETE mode=source_off_gl2 N=16 cells=8 Xend=0.00001 microsegments=48 wall=0.006685
+COMPLETE mode=be_control N=8 cells=8 Xend=0.0001 microsegments=8 wall=0.007925
+COMPLETE mode=be_control N=16 cells=8 Xend=0.0001 microsegments=16 wall=0.015582
+COMPLETE mode=common_combined N=8 cells=8 Xend=0.0001 microsegments=8 wall=0.011304
+COMPLETE mode=common_combined N=16 cells=8 Xend=0.0001 microsegments=16 wall=0.021232
+COMPLETE mode=physical_midpoint N=8 cells=8 Xend=0.0001 microsegments=16 wall=0.017429
+COMPLETE mode=physical_midpoint N=16 cells=8 Xend=0.0001 microsegments=32 wall=0.034096
+COMPLETE mode=physical_gl2 N=8 cells=8 Xend=0.0001 microsegments=24 wall=0.025196
+COMPLETE mode=physical_gl2 N=16 cells=8 Xend=0.0001 microsegments=48 wall=0.049756
+COMPLETE mode=source_off N=8 cells=8 Xend=0.0001 microsegments=8 wall=0.001517
+COMPLETE mode=source_off N=16 cells=8 Xend=0.0001 microsegments=16 wall=0.003030
+COMPLETE mode=source_off_midpoint N=8 cells=8 Xend=0.0001 microsegments=16 wall=0.003110
+COMPLETE mode=source_off_midpoint N=16 cells=8 Xend=0.0001 microsegments=32 wall=0.006322
+COMPLETE mode=source_off_gl2 N=8 cells=8 Xend=0.0001 microsegments=24 wall=0.005040
+COMPLETE mode=source_off_gl2 N=16 cells=8 Xend=0.0001 microsegments=48 wall=0.009282
+REQUESTED_MATRIX_COMPLETE
+{
+  "schema": "rei.v14.execution.1",
+  "utc": "2026-10-18T12:40:42.019945+00:00",
+  "host": "s1a0e5abed09",
+  "histories": 28,
+  "rows": 336,
+  "native_tests": "ACTUAL_TARGETED_COMMAND_EXIT_ZERO",
+  "source_on_p2": "HOLD",
+  "files": {
+    "evidence/birth_1e-4.csv.births.csv": "4d58f3aa08fbbca992a2e7d000531e0e2a4f3b4d68579574e841a19f7219b706",
+    "evidence/birth_1e-4.csv": "c1a243f5a3a30622d18ae7a9220ebb131ea167b530f2eaa1a6d69fbebcf48738",
+    "evidence/birth_1e-5.csv.births.csv": "fab48ece680b53f0cf0d189b40152c2324687e9a0f453c8dde0de6977f5d83e8",
+    "evidence/birth_1e-5.csv": "2b5b5aca5a85de06440c52ca8e3ac87b6ee9e0688d643c5d16d375f42eb23a64"
+  }
+}
+V14_RUN_COMPLETE /root/REI_LRS_V14_20261018T124115Z/smoke

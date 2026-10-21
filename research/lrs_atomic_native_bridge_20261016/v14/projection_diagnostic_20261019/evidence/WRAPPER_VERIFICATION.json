@@ -1,0 +1,139 @@
+{
+  "schema": "rei.v14.projection.wrapper.verification.1",
+  "purpose": "Required end-to-end placement/restore/plumbing replay of the SAME 62-row scientific matrix; no new unique science cases or cosmological histories.",
+  "wrapper_exit": 0,
+  "fresh_sibling_input": "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_input",
+  "fresh_output": "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_output",
+  "actual_execution_receipt": {
+    "schema": "rei.v14.projection.runner.1",
+    "started_utc": "2026-10-19T05:46:18.389808+00:00",
+    "output": "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_output",
+    "hostname": "4450a6b8b7d6",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "build_timeout_s": 180,
+    "diagnostic_timeout_s": 60,
+    "stages": [
+      {
+        "name": "restore",
+        "command": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+          "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_input/v14/RESTORE_V14.py",
+          "--out",
+          "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_output/native"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.10159610900154803
+      },
+      {
+        "name": "rustc_version",
+        "command": [
+          "rustc",
+          "--version",
+          "--verbose"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.010087896000186447
+      },
+      {
+        "name": "cargo_version",
+        "command": [
+          "cargo",
+          "--version",
+          "--verbose"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.01823775600132649
+      },
+      {
+        "name": "build",
+        "command": [
+          "cargo",
+          "build",
+          "--offline",
+          "--locked",
+          "--release",
+          "--example",
+          "v14_projection_diagnostic",
+          "--jobs",
+          "2"
+        ],
+        "exit": 0,
+        "elapsed_s": 9.256738101001247
+      },
+      {
+        "name": "diagnostic",
+        "command": [
+          "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_output/target/release/examples/v14_projection_diagnostic",
+          "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_output/projection_diagnostic.csv"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.10142876800091472
+      },
+      {
+        "name": "analysis",
+        "command": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+          "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_input/v14/projection_diagnostic_20261019/analyze_projection_diagnostic.py",
+          "--csv",
+          "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_output/projection_diagnostic.csv",
+          "--identity",
+          "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_output/native/V14_RESTORE_RECEIPT.json",
+          "--native-root",
+          "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_output/native",
+          "--source",
+          "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_output/native/rust/rei_microphysics/examples/v14_projection_diagnostic.rs",
+          "--out",
+          "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_output/evidence/PROJECTION_ANALYSIS.json",
+          "--figures",
+          "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_output/figures"
+        ],
+        "exit": 0,
+        "elapsed_s": 3.026065894999192
+      }
+    ],
+    "native_root": "/workspace/scratch/6af5e9e6c737/v14_work/runner_replay_output/native",
+    "source_sha256": "868a4f8e28acebce0f1d78ff62f0adaf6a5d411c6896ea0b528afb8a16a0085f",
+    "native_identity_receipt_sha256": "ad64ae67816f9125a15346b4e88dd432f9e1236183e1d5aa80fb51d22e21813c",
+    "rustc": "rustc 1.94.1 (e408947bf 2026-03-25)\nbinary: rustc\ncommit-hash: e408947bfd200af42db322daf0fadfe7e26d3bd1\ncommit-date: 2026-03-25\nhost: x86_64-unknown-linux-gnu\nrelease: 1.94.1\nLLVM version: 21.1.8\n",
+    "cargo": "cargo 1.94.1 (29ea6fb6a 2026-03-24)\nrelease: 1.94.1\ncommit-hash: 29ea6fb6a5db279426f4cc4e17aa385f05a0cfbc\ncommit-date: 2026-03-24\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.3 vendored)\nlibcurl: 8.15.0-DEV (sys:0.4.83+curl-8.15.0 vendored ssl:OpenSSL/3.5.4)\nssl: OpenSSL 3.5.4 30 Sep 2025\nos: Ubuntu 24.4.0 (noble) [64-bit]\n",
+    "status": "COMPLETE",
+    "finished_utc": "2026-10-19T05:46:30.913330+00:00",
+    "output_sha256": {
+      "projection_diagnostic.csv": "ca4b20024bd2f8adfac5995ffeebfecd0c56f47d7cbe89d38f874a909402dc3e",
+      "projection_diagnostic.csv.cells.csv": "3e9af61a432d40e743901c5000611a00788b3766b90840df4806a56466737b6b",
+      "evidence/PROJECTION_ANALYSIS.json": "e46426acc15e03da001aa4666d84282899854cf0a6064feea93c0f24fd5b5aa1"
+    }
+  },
+  "csv_comparison": [
+    {
+      "file": "projection_diagnostic.csv",
+      "original_sha256": "ca4b20024bd2f8adfac5995ffeebfecd0c56f47d7cbe89d38f874a909402dc3e",
+      "replay_sha256": "ca4b20024bd2f8adfac5995ffeebfecd0c56f47d7cbe89d38f874a909402dc3e",
+      "byte_equal": true,
+      "original_rows": 62,
+      "replay_rows": 62,
+      "parsed_rows_equal": true
+    },
+    {
+      "file": "projection_diagnostic.csv.cells.csv",
+      "original_sha256": "3e9af61a432d40e743901c5000611a00788b3766b90840df4806a56466737b6b",
+      "replay_sha256": "3e9af61a432d40e743901c5000611a00788b3766b90840df4806a56466737b6b",
+      "byte_equal": true,
+      "original_rows": 13312,
+      "replay_rows": 13312,
+      "parsed_rows_equal": true
+    }
+  ],
+  "diagnostic_source_sha256": "868a4f8e28acebce0f1d78ff62f0adaf6a5d411c6896ea0b528afb8a16a0085f",
+  "all_diagnostic_source_copies_identical": true,
+  "original_evidence_analysis_rerun_after_metadata_fix": {
+    "exit": 0,
+    "execution_platform": "NOT_INFERRED_FROM_CSV"
+  },
+  "NCP_this_turn": {
+    "status": "NOT_EXECUTED",
+    "reason": "Controller Desktop Commander probe failed with monthly-usage SERVICE_ERROR and instructed no retry."
+  },
+  "prior_NCP_20261018": "SMOKE_AND_FULL_COMPLETED"
+}
