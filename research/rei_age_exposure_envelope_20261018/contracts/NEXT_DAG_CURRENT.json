@@ -1,6 +1,6 @@
 {
   "schema": "rei.age.resume.dag.current.v10",
-  "updated_utc": "2026-10-20T23:06:47.552027+00:00",
+  "updated_utc": "2026-10-21T01:00:00+00:00",
   "baseline_head": "abbf71caf4bd45af5bdf8bc7744690d10b8715e7",
   "previous_full_dag": "native_optimization_20261021/baseline_current/contracts/NEXT_DAG_CURRENT.json",
   "source_native": "35d9747a0bbedcafdb568467ce7c1e7a25f965b6",
@@ -13,7 +13,9 @@
     "kernel_measurement": "20_SAMPLES_SERIAL_POOL1_2_4_ALL_SCIENTIFIC_FIELDS_BIT_IDENTICAL",
     "implementation_review": "C9_PASS_SCOPED_4_CLOSED_OPEN0",
     "targeted_python": "10_TESTS_PASS;TWO_FAILED_NAMESPACE_REGRESSIONS_PRESERVED",
-    "source_delivery": "SOURCE_4f136489_DUAL_PROVIDER_FOUR_WHOLE_READBACKS_PASS"
+    "source_delivery": "SOURCE_4f136489_DUAL_PROVIDER_FOUR_WHOLE_READBACKS_PASS",
+    "native_time_campaign": "TIME8_TIME16_TIME32_COMPLETE_EXIT0_ORIGINAL_VALIDATORS_PASS;NEW3_FAIL0_REUSE0_RETRY0;HISTORICAL4_DEBITED;RAW_RETURNED",
+    "native_return_analysis": "ALL5_FINITE_COMPARISONS_AVAILABLE;ALL_FAIL_ORIGINAL_0.005;BE_VS_DOP853_CROSS_OPERATOR;TRACE_COMPLETE;NO_NEW_CLAIM"
   },
   "current_protocol": {
     "R1": {
@@ -98,93 +100,44 @@
     "C10": {
       "status": "COMPLETE_SOURCE_DUAL_BACKUP_FULL_READBACK",
       "evidence": "DELIVERY_RECEIPT_CURRENT.json;evidence/delivery_v10_20261021/REMOTE_FULL_READBACK_RECEIPT.json"
+    },
+    "R_NATIVE_TIME8_16_32_OPTIMIZED_SUBNORMAL_BE": {
+      "status": "COMPLETE_SCOPED_EXECUTION",
+      "cases": {
+        "time8": "COMPLETE_EXIT0_VALIDATED",
+        "time16": "COMPLETE_EXIT0_VALIDATED",
+        "time32": "COMPLETE_EXIT0_VALIDATED"
+      },
+      "new_attempts": 3,
+      "new_failures": 0,
+      "reuse": 0,
+      "automatic_retries": 0,
+      "evidence": "native_optimization_20261021/evidence/ncp_time_campaign_20261021/CAMPAIGN_RECEIPT.json"
+    },
+    "R_NATIVE_RETURN_EXPOSURE_RECONSTRUCTION_ANALYSIS": {
+      "status": "COMPLETE_SCOPED_ANALYSIS",
+      "analysis": "native_optimization_20261021/evidence/ncp_time_campaign_20261021/ANALYSIS.json",
+      "all_five_pairs_available": true,
+      "original_target": 0.005,
+      "all_pairs_target_met": false,
+      "trace_rows": {
+        "time8": 15488,
+        "time16": 30976,
+        "time32": 61952
+      },
+      "cross_operator_age32": "NATIVE_BE_VS_POSITIVE_DOP853_FINITE_DIFFERENCE_ONLY",
+      "nonlinear_response_bound": "NOT_ESTABLISHED"
     }
   },
-  "next_ready": [
-    {
-      "id": "R_NATIVE_TIME8_16_32_OPTIMIZED_SUBNORMAL_BE",
-      "state": "READY_EXPLORATORY_NCP",
-      "ncp_ready": true,
-      "cases": [
-        "time8",
-        "time16",
-        "time32"
-      ],
-      "entrypoint": "native_optimization_20261021/campaign.py",
-      "config": {
-        "q": 0,
-        "births": 32,
-        "n_mu": 8,
-        "source": 8,
-        "transport": 16,
-        "common_births": [
-          8,
-          16,
-          32,
-          64
-        ],
-        "time_factors": [
-          8,
-          16,
-          32
-        ],
-        "subnormal_repair": "subnormal-barycenter",
-        "accepted_BE_observer": true,
-        "full_trace": false
-      },
-      "idle_verified_64core128GB": {
-        "jobs": 3,
-        "workers_per_case": 20,
-        "main_lanes": 3,
-        "cpu_slots": 63,
-        "case_address_space_GiB": 24,
-        "reserve_GiB": 16,
-        "BLAS_OMP_threads": 1
-      },
-      "budget": {
-        "per_case_wall_seconds": 1800,
-        "aggregate_child_wall_seconds": 5400,
-        "elapsed_by_jobs": {
-          "3": 2000,
-          "2": 3800,
-          "1": 5600
-        },
-        "build_wall_seconds": 300,
-        "preflight_light_cap_seconds": 240,
-        "automatic_retries": 0,
-        "cpu_slot_upper_bound": 63,
-        "allocated_core_seconds_upper_bound": 113400,
-        "persistent_debit": true
-      },
-      "next_action": "READ_DELIVERED_SOURCE_COMPILE_PREFLIGHT_RUN_THREE_CASES",
-      "science_claim": "EXPLORATORY_EXECUTION_ONLY;ORIGINAL_GATES_AND_0.005_FINITE_COMPARISONS;NO_CONVERGENCE_OR_PRODUCTION_ADMISSION"
-    },
-    {
-      "id": "R_NATIVE_RETURN_EXPOSURE_RECONSTRUCTION_ANALYSIS",
-      "state": "WAITING_FOR_NEW_TIME_RETURN",
-      "depends_on": [
-        "R_NATIVE_TIME8_16_32_OPTIMIZED_SUBNORMAL_BE"
-      ],
-      "requirements": [
-        "original output gates",
-        "actual repair count and maximum mass",
-        "stored denominator BE bounds and incomplete prefixes",
-        "time8_vs16_vs32 finite differences",
-        "explicit BE_vs_positive_DOP853 age32 comparison"
-      ],
-      "new_nonlinear_certificate": "NOT_ESTABLISHED"
-    }
-  ],
-  "ready_on_ncp_now": [
-    "R_NATIVE_TIME8_16_32_OPTIMIZED_SUBNORMAL_BE"
-  ],
+  "next_ready": [],
+  "ready_on_ncp_now": [],
   "native_execution": {
     "age32_block_max": "COMPLETE_REUSE_V9",
     "age64_block_max": "COMPLETE_REUSE",
     "spectral128": "COMPLETE_REUSE",
-    "time8": "READY_V10_CHANGED_REPRESENTATION;OLD_FAILED_ATTEMPTS_RETAINED",
-    "time16": "READY_V10",
-    "time32": "READY_V10"
+    "time8": "COMPLETE_V10_NCP_VALIDATED",
+    "time16": "COMPLETE_V10_NCP_VALIDATED",
+    "time32": "COMPLETE_V10_NCP_VALIDATED"
   },
   "scientific_accuracy": {
     "age32_64_original_target": 0.005,
@@ -192,23 +145,64 @@
     "U_relative": 0.7916059535400799,
     "native_age_time_convergence": "HOLD",
     "nonlinear_Grackle_response_bound": "NOT_ESTABLISHED",
-    "BE_vs_DOP853": "DISTINCT_OPERATORS;FINITE_COMPARISON_ONLY"
+    "BE_vs_DOP853": "DISTINCT_OPERATORS;FINITE_COMPARISON_ONLY",
+    "time8_vs_time16": {
+      "N_relative": 0.3217324691920821,
+      "U_relative": 0.2736494288784484,
+      "target": 0.005,
+      "target_met": false
+    },
+    "time16_vs_time32": {
+      "N_relative": 0.14911536405043538,
+      "U_relative": 0.12886080156345753,
+      "target": 0.005,
+      "target_met": false
+    },
+    "time_vs_age32": {
+      "time8": {
+        "N_relative": 0.7447440510144809,
+        "U_relative": 0.6231817042311669
+      },
+      "time16": {
+        "N_relative": 0.3200432702398296,
+        "U_relative": 0.2744336608076761
+      },
+      "time32": {
+        "N_relative": 0.14874738562967477,
+        "U_relative": 0.1289555444237253
+      },
+      "target": 0.005,
+      "target_met": false,
+      "operators": "NATIVE_BE_VS_POSITIVE_DOP853"
+    }
   },
   "runtime": {
-    "sandbox": "ACTUAL_RUST1.94.1_PYTHON3.12.14_NUMPY2.3.5_SCIPY1.17.0_8CPU_8GIB",
-    "NCP_access": "CURRENT_DEVICE_LIST_SUCCESS;CONFIG_MONTHLY_TOOL_USAGE_LIMIT;DO_NOT_RETRY_OR_RECONNECT",
-    "NCP_hardware_and_jobs": "NOT_OBSERVED",
-    "NCP_new_runs": 0
+    "host": "s1a0e5abed09",
+    "affinity_cpus": 64,
+    "cpu_quota": "unlimited",
+    "preflight_available_memory_bytes": 131366031360,
+    "jobs": 3,
+    "workers_per_case": 20,
+    "total_cpu_slots": 63,
+    "case_address_space_bytes": 25769803776,
+    "reserve_bytes": 17179869184,
+    "python": "3.12.3 NumPy2.3.5 SciPy1.17.0 existing venv",
+    "rust": "rustc/cargo 1.99.0 existing offline cache",
+    "build_seconds": 12.793722889997298,
+    "build_exit": 0,
+    "ncp_binary_sha256": "2d5d95371df4c4cf882a4563edc4becdf965c76fdbbf9b9dfaa97fe083fd57fd",
+    "prepared_identity_sha256": "ca09947a4a460d3643430547688da8f7c8e0d8bd2e7f4b79e66d3fd0bc17cb1c",
+    "original_B1_sha256": "89c646db1de80c6e85fe34f7c3eaae2f10904810a8a6c3acc3426a7e7c1dd7a4",
+    "binary_relation": "V10_BE_BINARY_IS_DISTINCT"
   },
   "delivery": {
-    "version": "v10",
-    "stage": "SOURCE_DUAL_BACKUP_FULL_READBACK_COMPLETE",
-    "source_publication": "COMPLETE_EXPECTED_HEAD_FAST_FORWARD",
-    "C8_C10": "PASS_FOUR_FULL_PROVIDER_READBACKS",
-    "confirmation": "REI_AGE_ENVELOPE_DELIVERY_CONFIRMATION_20261021_v10.json",
-    "source_commit": "4f13648985e417028c530892ea02be4f56018a31",
-    "source_task_tree": "1107a5039615148ff72f6fb68d8b72dfce157012",
-    "confirmation_stage": "EXTERNAL_POST_DELIVERY_COMMIT_READBACK_PENDING"
+    "version": "v10 native time return",
+    "stage": "EXECUTION_ANALYSIS_COMPLETE_PROVIDER_UPLOAD_PENDING",
+    "source_publication": "PENDING_EXPECTED_HEAD_FAST_FORWARD",
+    "evidence_bundle": "native_optimization_20261021/evidence/ncp_time_campaign_20261021/NCP_RETURN_BUNDLE.tar.gz",
+    "bundle_bytes": 97904010,
+    "bundle_sha256": "3f8a8214d0c1909e70d2804ae606280295cda95db1a9541597900df1327d38c2",
+    "claim_ceiling": "NATIVE_AGE_TIME_CONVERGENCE_HOLD;NONLINEAR_RESPONSE_NOT_ESTABLISHED;PRODUCTION_NOT_ISSUED"
   },
   "delivery_receipt": "DELIVERY_RECEIPT_CURRENT.json",
   "protected_lanes": [

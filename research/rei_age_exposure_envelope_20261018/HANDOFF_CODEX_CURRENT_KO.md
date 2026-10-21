@@ -78,3 +78,10 @@ Stdout/stderr, RECEIPT, HOST, CAMPAIGN, argv/env/source/prepared/binary/runtime,
 C8/C10은 위 소스 snapshot을 고정한다. 최종 delivery metadata commit과 실제 readback 이후, 외부 `REI_AGE_ENVELOPE_DELIVERY_CONFIRMATION_20261021_v10.json`에 정확한 task 소유 UTF-8 delta를 넣어 최종 tree를 복원한다. 확인서 자신의 SHA/provider 수신확인은 외부에 둔다. 아직 확정되지 않은 final head/hash를 이 metadata에 쓰지 않는다.
 
 미완료 time8/time16/time32 실행은 `READY_EXPLORATORY_NCP`다. 이번 NCP 새 실행은0이며 native age/time convergence는 HOLD, nonlinear response bound는 NOT_ESTABLISHED, production scientific admission은 NOT_ISSUED를 유지한다. 원격 백업의 완료는 실제 time endpoint나 수렴 판정의 완료를 뜻하지 않는다.
+
+
+## Native time campaign 반환 — 2026-10-21
+
+[RESEARCH_UPDATE_20261021_NATIVE_TIME_CAMPAIGN_KO.md](RESEARCH_UPDATE_20261021_NATIVE_TIME_CAMPAIGN_KO.md)에 실행 ID, 원자료, 분석, 자원, claim ceiling 및 provider 반환 상태를 기록했다. time8·time16·time32는 원 validator를 통과했으나 원 0.005 finite-neighbor 목표에 도달하지 못했다. Native age/time convergence HOLD, nonlinear response bound NOT_ESTABLISHED, production scientific admission NOT_ISSUED. Evidence: `native_optimization_20261021/evidence/ncp_time_campaign_20261021/`.
+
+독립 Astra-tier read-only 검토는 factual report/DAG publication에 `PASS_SCOPED_FACTUAL_PUBLICATION`을 반환했다. 검토는 native convergence나 production admission을 부여하지 않는다.
