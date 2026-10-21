@@ -1,0 +1,127 @@
+{
+  "review": "SIGMA_PI_PILOT_20261021_C9",
+  "decision": "PASS_SCOPED_PRELIMINARY",
+  "scientific_admission": "Frozen 91-case finite-grid LRS pilot, with the three specified joint-resolution endpoint stability checks.",
+  "contract_sha256": "c2411b90e00df82ae0feaa6278cc7f2a965a3a596830b7e1fd59a578e9c51534",
+  "requested_reviewer_profile": "Astra",
+  "independently_observed_runtime_model": "NOT_ESTABLISHED",
+  "method": "Read-only review of adapter/controller/resources/mechanical tests and theory; independent arithmetic from all 94 raw NPZs; source byte comparison; visual PNG inspection. No solver reruns.",
+  "executed_wrapper_sha256": {
+    "adapter.py": "04338e6a17c860be092c43029dd56d08d73ea5a65bcf2de341b1259ec450cd0e",
+    "pilot.py": "d01919aa6d23a1753cd59b8c5cb4123b5423601936751b19b04523d41ec1b9ea",
+    "resources.py": "d0626b4d961db1c7f0fe5765905122c562a2be1387445d6cbe9b87c19d081382"
+  },
+  "checks": {
+    "vendor_3_kernels_and_source_lock_byte_exact": true,
+    "nominal_cases_complete": 91,
+    "corner_refinements_complete": 3,
+    "all_raw_epochs": 121,
+    "all_raw_states_finite": true,
+    "raw_endpoints_match_result_json_exactly": true,
+    "independent_raw_brightness_reconstruction_matches_exactly": true,
+    "maximum_initial_Sigma_error": 1.0408340855860843e-17,
+    "maximum_initial_Pi_error": 8.673617379884035e-19,
+    "maximum_sigma_formula_error": 4.163336342344337e-17,
+    "maximum_pi_formula_error": 4.336808689942018e-19,
+    "maximum_gamma_number_error": 0.0,
+    "maximum_nu_number_error": 0.0,
+    "minimum_gamma_nu_sampled_brightness": 0.5496039447867973,
+    "minimum_canonical_population": 3.5575226790652905e-65,
+    "isotropic_max_Sigma": 1.4776326795805075e-19,
+    "isotropic_max_abs_Pi": 2.3515858040786705e-19,
+    "corner_checks": [
+      {
+        "absolute_endpoint_differences": {
+          "H_relative": 3.480549182199866e-13,
+          "Pi_F_signed": 1.387236679695203e-14,
+          "Sigma_F": 5.4985530018036854e-14,
+          "b": 1.501229696110329e-14
+        },
+        "id": "fedafad5ca215a7bc25f36d680df77dec4bbce4972877b04e8278e125f0695fc",
+        "status": "PASS"
+      },
+      {
+        "absolute_endpoint_differences": {
+          "H_relative": 3.4783287361506154e-13,
+          "Pi_F_signed": 1.4033370819566127e-14,
+          "Sigma_F": 1.2068644694718245e-13,
+          "b": 3.1127878052927827e-14
+        },
+        "id": "b4103f430a3a86b23de3270ea1b1fcb17bba55e353958bb69a16d68c87cac8bd",
+        "status": "PASS"
+      },
+      {
+        "absolute_endpoint_differences": {
+          "H_relative": 3.481659405224491e-13,
+          "Pi_F_signed": 3.803652271622271e-16,
+          "Sigma_F": 2.182685455986988e-13,
+          "b": 7.246137826051602e-14
+        },
+        "id": "634e0484d34f077f05bbe7bef8dee4d9c9f993758f2d72248cbacbc0d784dfda",
+        "status": "PASS"
+      }
+    ],
+    "plot_visual_inspection": "PASS: both stress signs, finite samples, epoch and case count visible.",
+    "signed_endpoint_plot": "PASS: postprocessing sqrt(6)*s/H from saved endpoints; both signs and eye-guide line meaning explicit; visually inspected."
+  },
+  "observed_resources": {
+    "controller_wall_s": 2.720931695002946,
+    "cumulative_child_charged_wall_s": 8.778983763986616,
+    "maximum_case_charged_wall_s": 0.8207944370005862,
+    "worker_processes": 4,
+    "effective_cpu_limit": 8,
+    "maximum_worker_peak_rss_bytes": 68358144,
+    "unrelated_process_actions": 0
+  },
+  "bounded_repair": {
+    "status": "CLOSED_PASS",
+    "science_reruns_authorized": 0,
+    "findings": [
+      {
+        "id": "C9-1",
+        "target": "resources.cpu_ticks and initial sampling",
+        "evidence": "Host aggregate CPU ticks ignored restricted affinity; initial idle=1 could launch full allocation without observation.",
+        "impact": "Future busy-host/NCP cooperative scheduling; observed bounded sandbox scientific results unaffected.",
+        "repair": "Aggregate affinity CPU rows and begin conservatively at one worker until measured tick delta; synthetic regression."
+      },
+      {
+        "id": "C9-2",
+        "target": "execution identity and future resume",
+        "evidence": "Case identity covered input and immutable vendor, but not wrapper version.",
+        "impact": "Future modified wrapper could reuse prior results without explicit version mismatch.",
+        "repair": "Preserve actual pre-repair wrapper bytes/hashes and versions; add minimal execution identity and resume mismatch check without changing case IDs or raw outcomes."
+      }
+    ],
+    "targeted_regression": {
+      "tests": 3,
+      "wall_s": 0.049,
+      "exit": 0,
+      "evidence": "package/REPAIR_TEST.stderr.txt",
+      "scientific_trajectories": 0
+    },
+    "post_repair_wrapper_sha256": {
+      "adapter.py": "04338e6a17c860be092c43029dd56d08d73ea5a65bcf2de341b1259ec450cd0e",
+      "pilot.py": "cbb12822a57b45cf4f809bf400b4e6309c87c9b31c7f20938e84789a774e6107",
+      "resources.py": "31b5692675d246f5bfa5c3cb2f50780de07df285db0e218e2cf5f4ba023f8024"
+    },
+    "closure": "Affinity-specific sampling and conservative first dispatch inspected. Resume binding compares wrapper hashes and semantic dependency versions; executable path/build string remain diagnostic. Original execution bytes retained; case IDs and raw scientific outcomes preserved."
+  },
+  "theory_review": {
+    "formulas": "PASS",
+    "prose_correction": "CLOSED: saved s and signed Pi distinguished from reconstructed signed Sigma.",
+    "theory_sha256": "b86031028f79d0296c8bea85bafec266e9d0a545eff84b42e7b0828eb44503a9"
+  },
+  "interpretation_limits": [
+    "Hamiltonian residual is algebraic construction consistency only.",
+    "Three refined corners are a preliminary endpoint stability gate, not a global error bound.",
+    "Angular positivity is checked at 64 nodes, not established globally for the evolved truncated expansion.",
+    "LRS slice and fixed species allocation, not general non-LRS initial data."
+  ],
+  "preserved_status": {
+    "existing_native_age_time": "HOLD_UNCHANGED",
+    "production_scientific_admission": "NOT_ISSUED",
+    "ncp_execution": "NOT_OBSERVED"
+  },
+  "stopping_rule": "Review complete. Proceed to scoped preliminary delivery/publication; no additional review or scientific runs required.",
+  "remaining_scientific_blockers": []
+}
