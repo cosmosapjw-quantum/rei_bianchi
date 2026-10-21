@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "unit_id": "rei_isotope_quotient_pilot_20261022",
+  "status": "contract_frozen_execution_pending",
+  "source_commit": "0d795da7f9114f89353c72a5829e5efcb64dfa44",
+  "inherited_contract_sha256": "dd3950150be8718d1bb60eed4f1ba3f4cd7447b377adc92476abf28ba8369dee",
+  "contract_markdown": "intake/PHYSICS_CONTRACT.md",
+  "portable_source_manifest": "intake/PORTABLE_SOURCE_MANIFEST.json",
+  "allowed_new_paths": ["rei_bianchi/research/rei_isotope_quotient_pilot_20261022/**"],
+  "read_only_paths": ["rei_bianchi/research/rei_hheli_pilot_20261021/**"],
+  "production_default_change": false,
+  "scientific_admission": "pending_independent_review",
+  "quotient": {
+    "conditional_state_order": ["H0","H1","He0","He1","He2","Li0","Li1","Li2","Li3"],
+    "isotope_groups": [["H1","D"],["He3","He4"],["Li6","Li7"]],
+    "inherited_absent_isotopes": ["n","T"],
+    "output_heavy_census_count": 21,
+    "reduced_conditional_count": 9,
+    "reference_conditional_count": 18,
+    "L16_transport_count": 39,
+    "reduced_total_with_tau": 49,
+    "reference_total_with_tau": 58,
+    "assumptions": ["fixed isotope abundances", "elemental electronic coefficient equality", "identical same-element conditional IC", "zero n and T", "atomic test-fluid closure"],
+    "chemical_jacobian": "(P + ne*R + outer(R@f,w))/H",
+    "geometry_derivatives": "hybrid central finite differences of unchanged transport permitted"
+  },
+  "limits": {"profile_wall_s":120,"profile_cpu_s":240,"lane_wall_s":900,"lane_cpu_s":2400,"lane_ivp_attempts":90,"workers_max":4,"blas_threads_per_process":1},
+  "case_counts": {"nominal_grid":75,"cancellation":2,"negative_orientation":2,"total_nominal":79,"L24_tighter_controls":3,"unreduced_profile_reference":1,"expected_total_with_profile_reuse":83},
+  "solver": {"method":"Radau","ellmax":16,"rtol":2e-8,"atol":2e-11,"max_step_x":0.04,"output_points":257,"z_start":20,"z_end":2},
+  "checks": {"rhs_scaled_error":5e-13,"electron_relative_error":5e-14,"jacobian_mixed_error":2e-6,"profile_max_abs_difference":2e-7,"control_max_abs_difference":2e-5,"initial_axis_abs_error":2e-10,"fraction_min":-2e-9,"isotope_sum_abs_error":2e-9,"number_relative_drift":2e-9,"sampled_brightness_min":-2e-8},
+  "positive_transitions": ["point checks pass -> two profile IVPs", "profile passes and measured cost fits -> missing nominal sweep", "nominal results -> figures and three selected controls", "raw outputs and observed diff -> fresh independent review"],
+  "research_scope": {"atomic_rates":"source-backed elemental electronic equality", "temperature":"prescribed 100–10000 K", "UV_support_eV":[5,60], "baryon_stress":"zero by isotropic-fluid closure", "matter_stress":"inherited nonbaryonic massive collisionless component", "full19_target":"not yet established"}
+}
