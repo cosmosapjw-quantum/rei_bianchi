@@ -2,7 +2,7 @@
   "schema": "rei.tritium_nuclear_scope_progress.v1",
   "user_scope": "Audit prior tritium zero and include all dossier nuclear source/sink terms with explicit Li-isotope closure",
   "anchor_branch": "research/rei-isotope-quotient-pilot-20261022",
-  "published_checkpoint_head": "480bfdb969437e7f202eb3fc7c723dcbc0f6711f",
+  "published_checkpoint_head": "7a9df697fa54d8ed353a21fa65620995d06bd69a",
   "old_background_ivps_reused": 83,
   "new_background_ivps": 0,
   "nodes": [
@@ -34,23 +34,26 @@
     },
     {
       "id": "all_dossier_nuclear_contract",
-      "state": "IN_PROGRESS",
-      "scope": "13 deduplicated families from 16 dossier labels plus 5 named Li/D closure families"
+      "state": "COMPLETE_FROZEN",
+      "scope": "13 deduplicated families from 16 dossier labels plus 5 named Li/D closure families",
+      "evidence": "NUCLEAR_NETWORK_CONTRACT.json"
     },
     {
       "id": "all_dossier_nuclear_implementation",
-      "state": "IN_PROGRESS",
+      "state": "COMPLETE_SCOPED",
       "requires": [
         "all_dossier_nuclear_contract"
       ],
-      "scope": "Conditional passive fully ionized instantaneous-thermalization sensitivity; explicit source/sink/reverse ledger"
+      "scope": "Conditional passive fully ionized instantaneous-thermalization sensitivity; explicit source/sink/reverse ledger",
+      "evidence": "NUCLEAR_NETWORK_REPORT.json"
     },
     {
       "id": "all_dossier_nuclear_validation",
-      "state": "PENDING",
+      "state": "PASS_SCOPED",
       "requires": [
         "all_dossier_nuclear_implementation"
-      ]
+      ],
+      "evidence": "review/NUCLEAR_NETWORK_DECISION.json"
     },
     {
       "id": "coupled_ion_energy_fast_product_model",
@@ -59,10 +62,11 @@
     },
     {
       "id": "final_publication_backup",
-      "state": "PENDING",
+      "state": "READY_FOR_PUBLICATION",
       "requires": [
         "all_dossier_nuclear_validation"
-      ]
+      ],
+      "evidence": "delivery/FINAL_DELIVERY_ACK.json"
     }
   ],
   "invariants": [
@@ -95,5 +99,8 @@
       "requested_model": "gpt-6-sol"
     },
     "runtime_model_identity": "Not independently observed; requested models are scheduling parameters"
-  }
+  },
+  "scientific_decision": "PASS_SCOPED_CONDITIONAL_18_FAMILY_NETWORK",
+  "publication_status": "FINAL_DELIVERY_PENDING",
+  "next_executable_unit": "Design and implement explicit nuclear-to-ionic daughter and energy projection, retaining the existing production solver until the coupled physical closure is validated; authorized scoped development continues without a new permission gate."
 }

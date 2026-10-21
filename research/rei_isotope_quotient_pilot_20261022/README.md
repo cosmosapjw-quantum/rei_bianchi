@@ -14,3 +14,7 @@ The recovered `all` command validates the retained point checks, profile, refere
 `pilot/summary.json` requires 82/82 saved quotient histories, 3/3 L24 controls, passed point checks and all trajectory gates for its scoped numerical PASS. `pilot/summary.csv` contains actual signed initial/final axes and execution counters. The 83rd IVP is the independent 18-fraction isotropic reference. Raw arrays and immutable case receipts are in `pilot/results`; the profile's original raw pair was independently reanalyzed over all 18 fractions in `profile_existing_reanalysis.json`, with no repeat IVP. Historical final expected hashes remain in `SOURCE_MANIFEST.json`; current recovered runner and source hashes are in `delivery/RUNTIME_RECOVERY_CURRENT_MANIFEST.json`.
 
 The summed 83 per-case CPU receipts are 211.72 seconds; the bulk stage elapsed 46.82 seconds. Import/check/plot overhead was not separately metered, so the CPU sum is not an overall job CPU total or a general speedup claim. Independent review admits the scoped preliminary atomic test-fluid result. The full 19-channel target (3 atomic, 16 nuclear/capture/decay) is a separate unresolved obligation.
+
+## Nuclear-source continuation
+
+The historical T census is structurally zero and must not be read as a computed nuclear-production prediction. The continuation in `../rei_tritium_production_audit_20261022/HANDOFF.json` evaluates all16 dossier nuclear labels plus five declared closure families under a separate conditional model; historical atomic outputs and their admission remain preserved.
