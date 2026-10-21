@@ -112,6 +112,8 @@ def binding(job):
     return {'job_identity':identity(job),'input_identity':files,'executable_sha256':digest(executable)}
 
 def run(manifest,output,max_workers=64,memory_limit_mb=None,nominal_job_mb=512,poll_s=.01):
+    if manifest.get("accounting_policy") == EXIT_ACCOUNTING_V1:
+        return run_exit_observed(manifest,output,max_workers,memory_limit_mb,nominal_job_mb,poll_s)
     validate_manifest(manifest);output=Path(output).resolve();output.mkdir(parents=True,exist_ok=True)
     mid=identity(manifest);saved=output/'MANIFEST.json'
     if saved.exists()and identity(json.loads(saved.read_text()))!=mid:raise ValueError('MANIFEST_IDENTITY_MISMATCH: existing results preserved')
@@ -220,6 +222,191 @@ def run(manifest,output,max_workers=64,memory_limit_mb=None,nominal_job_mb=512,p
     successful=all(s['status']in('COMPLETED','REUSED_COMPLETED')for s in states.values())
     result=json.loads((output/'CAMPAIGN_RECEIPT.json').read_text());result['overall_status']='COMPLETED'if successful else'INCOMPLETE_OR_FAILED';result['overall_exit_code']=0 if successful else 1;write(output/'CAMPAIGN_RECEIPT.json',result)
     return result
+
+EXIT_ACCOUNTING_V1 = 'LRS_EXIT_OBSERVATION_PROSPECTIVE_V1_20261021'
+
+def run_exit_observed(manifest, output, max_workers=64, memory_limit_mb=None, nominal_job_mb=512, poll_s=.01):
+    """Opt-in launch-to-first-exit-observed accounting; persistence is uncharged.
+
+    Observations have scheduling latency. poll_s is a requested sleep, not a
+    maximum latency guarantee. Historical process_wall_s debits remain intact.
+    """
+    validate_manifest(manifest)
+    output=Path(output).resolve();output.mkdir(parents=True,exist_ok=True)
+    mid=identity(manifest);saved=output/'MANIFEST.json'
+    if saved.exists() and identity(json.loads(saved.read_text()))!=mid:
+        raise ValueError('MANIFEST_IDENTITY_MISMATCH: existing results preserved')
+    if not saved.exists():write(saved,manifest)
+    plan=resources(max_workers,memory_limit_mb,nominal_job_mb);write(output/'RESOURCE_PLAN.json',plan)
+    jobs={j['id']:j for j in manifest['jobs']};states={k:{'status':'PENDING'}for k in jobs}
+    active={};used=set();caps=manifest.get('aggregate_caps_s',{});charged={g:0. for g in caps};latched=set()
+    started=time.monotonic();events=[];stop=False
+    invocation=output/f'invocations/{time.time_ns()}';invocation.mkdir(parents=True)
+    def flush():
+        record={'schema':'rei.lrs.parallel_campaign.exit_observed.v1','utc':utc(),'manifest_identity':mid,
+          'accounting_policy':EXIT_ACCOUNTING_V1,'charge_definition':'launch_to_first_exit_observed',
+          'requested_poll_s':poll_s,'poll_s_is_latency_guarantee':False,'states':states,
+          'aggregate_charged_process_wall_s':charged,'aggregate_caps_latched':sorted(latched),
+          'active_jobs':list(active),'phase_wall_s':time.monotonic()-started,'resource_plan':plan,
+          'observation_events':events,'native_numerical_source_changed':False}
+        write(output/'CAMPAIGN_RECEIPT.json',record);write(invocation/'receipt.json',record)
+    # Debit every old outcome once, including failed/partial attempts. Missing
+    # charge is unknown, never silently zero or permission to launch more work.
+    for jid,j in jobs.items():
+        for oldpath in sorted((output/'jobs'/jid).glob('attempt_*/outcome.json')):
+            old=json.loads(oldpath.read_text())
+            if 'process_wall_s' not in old:
+                if j.get('budget_groups'):stop=True;states[jid]={'status':'FAILED_HISTORICAL_DEBIT_UNKNOWN','attempt':str(oldpath.parent)}
+            else:
+                for g in j.get('budget_groups',[]):charged[g]+=float(old['process_wall_s'])
+        attempts=sorted((output/'jobs'/jid).glob('attempt_*'))
+        if not attempts:continue
+        latest=attempts[-1]/'outcome.json'
+        if not latest.exists():
+            stop=True;states[jid]={'status':'FAILED_PARTIAL_DEBIT_UNKNOWN','attempt':str(latest.parent)};continue
+        old=json.loads(latest.read_text())
+        if old.get('status')!='COMPLETED':continue
+        try:
+            now=binding(j)
+            if now!=old['binding']:raise ValueError('INPUT_OR_EXECUTABLE_IDENTITY_MISMATCH')
+            if file_outputs(j,latest.parent)!=old['outputs']:raise ValueError('OUTPUT_IDENTITY_MISMATCH')
+            if any(digest(latest.parent/n)!=old['logs'][n]for n in ['stdout.txt','stderr.txt']):raise ValueError('LOG_IDENTITY_MISMATCH')
+            states[jid]={'status':'REUSED_COMPLETED','attempt':str(latest.parent),'binding':now}
+        except (OSError,ValueError,KeyError)as exc:
+            states[jid]={'status':'FAILED_IDENTITY_MISMATCH','reason':str(exc),'attempt':str(latest.parent)}
+    # Identity failure is a supervisor stop, not permission to launch a fresh
+    # independent or dependent process. Preserve historical cached evidence.
+    if any(s['status']=='FAILED_IDENTITY_MISMATCH'for s in states.values()):
+        stop=True
+    changed=True
+    while changed:
+        changed=False
+        for jid,j in jobs.items():
+            if states[jid]['status']=='REUSED_COMPLETED'and any(states[d]['status']not in ('PENDING','REUSED_COMPLETED','COMPLETED')for d in j.get('deps',[])):
+                states[jid]={'status':'BLOCKED_DEPENDENCY_IDENTITY','deps':j.get('deps',[]),'historical_attempt':states[jid]['attempt']}
+                changed=True
+    def observe():
+        # Freeze ALL exit observations before any serialization/hash/validation.
+        for jid,a in list(active.items()):
+            if a.get('exit_observed') is not None:continue
+            code=a['process'].poll();now=time.monotonic()
+            previous=a['last_observation'];a['intervals'].append(now-previous);a['last_observation']=now
+            if code is None:a['last_running_observed']=now
+            else:a['exit_observed']=now;a['exit_code']=code
+            events.append({'job':jid,'observed_monotonic':now,'exit_code':code})
+    def total(g,now):
+        return charged[g]+sum((a['exit_observed']if a.get('exit_observed')is not None else now)-a['start']for jid,a in active.items()if g in jobs[jid].get('budget_groups',[]))
+    def request_kill(jid,reason):
+        a=active[jid]
+        if a.get('exit_observed')is not None or a.get('kill_request')is not None:return
+        a['kill_request']=time.monotonic();a['reason']=reason
+        try:os.killpg(a['process'].pid,signal.SIGKILL)
+        except ProcessLookupError:pass
+    def enforce():
+        observe();now=time.monotonic()
+        latched.update(g for g in caps if total(g,now)>=caps[g])
+        # Signal every affected group member BEFORE persistence of any outcome.
+        for jid,a in active.items():
+            if latched.intersection(jobs[jid].get('budget_groups',[])):request_kill(jid,'AGGREGATE_CAP')
+            elif a.get('exit_observed')is None and now-a['start']>=jobs[jid]['timeout_s']:request_kill(jid,'JOB_TIMEOUT')
+    def persist(jid):
+        nonlocal stop
+        a=active[jid];j=jobs[jid];elapsed=a['exit_observed']-a['start']
+        a['stdout'].close();a['stderr'].close();a['persistence_start']=time.monotonic()
+        outputs={};error=a.get('reason');failure='EXIT_FAILURE'if a['exit_code']else None
+        if a['exit_code']==0 and not error:
+            try:outputs=file_outputs(j,a['attempt'])
+            except (ValueError,OSError,KeyError)as exc:error=str(exc);failure='OUTPUT_VALIDATION_FAILURE'
+        timing={k:a.get(k)for k in ['start','popen_returned','last_running_observed','exit_observed','exit_code','kill_request','persistence_start']}
+        timing.update({'actual_observation_intervals_s':a['intervals'],'requested_poll_s':poll_s})
+        outcome={'status':'COMPLETED'if a['exit_code']==0 and error is None else'FAILED','exit_code':a['exit_code'],
+          'reason':error,'failure_kind':failure,'process_wall_s':elapsed,'accounting_policy':EXIT_ACCOUNTING_V1,
+          'timing':timing,'binding':a['binding'],'outputs':outputs,'assigned_cpus':a['cpus'],
+          'aggregate_overshoot_s':{g:max(0,total(g,time.monotonic())-caps[g])for g in j.get('budget_groups',[])}}
+        try:
+            outcome['logs']={n:digest(a['attempt']/n)for n in ['stdout.txt','stderr.txt']}
+            # The outcome is written before its persistence end is knowable.
+            # The final campaign receipt stores the measured end after both writes.
+            timing['persistence_end']=None
+            write(a['attempt']/'outcome.json',outcome);(a['attempt']/'exit.txt').write_text(str(a['exit_code'])+'\n')
+            timing['persistence_end']=time.monotonic()
+        except Exception as exc:
+            stop=True;outcome.update(status='FAILED_PERSISTENCE',failure_kind='PERSISTENCE_FAILURE',persistence_error=repr(exc))
+            timing['persistence_end']=time.monotonic()
+            # Independent minimal partial record if the normal persistence failed.
+            (a['attempt']/'partial_outcome.json').write_text(json.dumps(outcome,indent=2)+'\n')
+        for g in j.get('budget_groups',[]):charged[g]+=elapsed
+        used.difference_update(a['cpus']);active.pop(jid)
+        states[jid]={'status':outcome['status'],'attempt':str(a['attempt']),'outcome':outcome}
+    try:
+        flush()
+        while True:
+            enforce()
+            for jid in list(active):
+                if active[jid].get('exit_observed')is not None:persist(jid)
+            if stop:break
+            for jid,j in jobs.items():
+                if states[jid]['status']!='PENDING':continue
+                deps=[states[d]['status']for d in j.get('deps',[])]
+                if any(s not in ['PENDING','RUNNING','COMPLETED','REUSED_COMPLETED']for s in deps):states[jid]={'status':'BLOCKED_DEPENDENCY','deps':j.get('deps',[])}
+                elif latched.intersection(j.get('budget_groups',[])):states[jid]={'status':'NOT_RUN_AGGREGATE_CAP'}
+            pending=sorted([j for j in jobs.values()if states[j['id']]['status']=='PENDING'and all(states[d]['status']in ['COMPLETED','REUSED_COMPLETED']for d in j.get('deps',[]))],key=lambda j:-float(j.get('estimated_duration_s',0)))
+            for j in pending:
+                if stop:break
+                enforce()
+                if latched.intersection(j.get('budget_groups',[])):states[j['id']]={'status':'NOT_RUN_AGGREGATE_CAP'};continue
+                need=int(j.get('cpu_slots',1));memory=int(j.get('nominal_memory_mb',nominal_job_mb)*1024**2)
+                live=resources(max_workers,memory_limit_mb,nominal_job_mb);reserved=sum(a['memory']for a in active.values());free=[c for c in plan['assigned_cpu_pool']if c not in used]
+                if need<1 or need>plan['cpu_budget']or memory>min(plan['usable_memory_bytes_after_20_percent_headroom']-reserved,live['usable_memory_bytes_after_20_percent_headroom']):
+                    if not active:states[j['id']]={'status':'NOT_RUN_RESOURCE_ADMISSION'}
+                    continue
+                if len(free)<need or len(active)>=plan['admitted_workers']:continue
+                jobroot=output/'jobs'/j['id'];jobroot.mkdir(parents=True,exist_ok=True)
+                attempt=jobroot/f"attempt_{len(list(jobroot.glob('attempt_*')))+1:04d}";attempt.mkdir()
+                try:b=binding(j)
+                except (OSError,ValueError)as exc:states[j['id']]={'status':'FAILED_INPUT_BINDING','reason':str(exc)};continue
+                cpus=free[:need];argv=[x.replace('{attempt}',str(attempt))for x in j['argv']];full=['taskset','-c',','.join(map(str,cpus)),*argv]
+                env=os.environ.copy();env.pop('CARGO_TARGET_DIR',None);env.update(j.get('environment',{}));env.update(THREADS)
+                if j.get('kind')=='build':env['CARGO_BUILD_JOBS']=str(need)
+                write(attempt/'inputs.json',{'argv':full,'binding':b,'manifest_identity':mid,'accounting_policy':EXIT_ACCOUNTING_V1,'assigned_cpus':cpus,'thread_environment':THREADS,'timeout_s':j['timeout_s']})
+                so=(attempt/'stdout.txt').open('wb');se=(attempt/'stderr.txt').open('wb')
+                # Binding, input persistence and log opening can take time. Last
+                # gate must observe again and enforce caps immediately before spawn.
+                enforce()
+                if latched.intersection(j.get('budget_groups',[])):
+                    so.close();se.close()
+                    no_launch={'status':'NOT_RUN_AGGREGATE_CAP','process_started':False,'process_wall_s':0.0,'accounting_policy':EXIT_ACCOUNTING_V1,'reason':'CAP_LATCHED_BEFORE_POPEN','binding':b}
+                    write(attempt/'outcome.json',no_launch)
+                    states[j['id']]={'status':'NOT_RUN_AGGREGATE_CAP','unlaunched_attempt':str(attempt),'outcome':no_launch};continue
+                t=time.monotonic()
+                try:child=subprocess.Popen(full,cwd=j.get('cwd'),env=env,stdout=so,stderr=se,start_new_session=True)
+                except OSError as exc:
+                    so.close();se.close();states[j['id']]={'status':'FAILED_LAUNCH','reason':str(exc),'attempt':str(attempt)};stop=True;break
+                popen_returned=time.monotonic()
+                used.update(cpus);active[j['id']]={'process':child,'start':t,'popen_returned':popen_returned,'last_observation':t,'last_running_observed':None,'exit_observed':None,'exit_code':None,'kill_request':None,'intervals':[],'stdout':so,'stderr':se,'attempt':attempt,'binding':b,'cpus':cpus,'memory':memory}
+                states[j['id']]={'status':'RUNNING','attempt':str(attempt)}
+            observe()
+            # No receipt persistence while exited children remain unobserved.
+            flush()
+            if not active and not any(s['status']=='PENDING'for s in states.values()):break
+            time.sleep(poll_s)
+    except BaseException as exc:
+        stop=True;events.append({'supervisor_exception':repr(exc),'observed_monotonic':time.monotonic()})
+    finally:
+        # Observe all, signal all, then reap/observe all before individual writes.
+        observe()
+        for jid in active:request_kill(jid,'SUPERVISOR_INTERRUPTION')
+        for a in active.values():a['process'].wait()
+        observe()
+        for jid in list(active):persist(jid)
+        if stop:
+            for jid,s in states.items():
+                if s['status']=='PENDING':states[jid]={'status':'NOT_RUN_SUPERVISOR_STOP'}
+        flush()
+    result=json.loads((output/'CAMPAIGN_RECEIPT.json').read_text());ok=all(s['status']in ['COMPLETED','REUSED_COMPLETED']for s in states.values())
+    result.update(overall_status='COMPLETED'if ok else'INCOMPLETE_OR_FAILED',overall_exit_code=0 if ok else 1)
+    write(output/'CAMPAIGN_RECEIPT.json',result);return result
+
 
 def merge_csv(paths,output,keys,expected_keys,expected_steps,columns=None):
     """Validate exact finite coverage, then emit in declared original key/step order."""
