@@ -2,7 +2,7 @@
   "schema": "rei.sigma_pi.pilot.dag.v1",
   "workflow": "physmath-research-loop 1.0.0",
   "unit": "rei_bianchi_sigma_pi_pilot_20261021",
-  "status": "science_complete_publication_in_progress",
+  "status": "complete_scoped_pilot_delivery_ncp_not_run",
   "scope": "Self-gravitating collisionless reflection-even LRS slice, zbar20 to4, common initial gamma/nu quadrupole, massiveAm0",
   "stages": [
     {
@@ -179,12 +179,12 @@
     },
     {
       "id": "C10",
-      "status": "in_progress",
+      "status": "complete",
       "evidence": [
         "FINAL_DELIVERY.json",
         "NEXT_THREAD_PROMPT.md"
       ],
-      "reason": "Final source publication and dual backup pending provider acknowledgements"
+      "reason": "Source/results published; full archive has dual complete readback SHA256 matches; this final metadata commit closes delivery without rewriting the archive"
     }
   ],
   "nodes": [
@@ -260,10 +260,17 @@
     },
     {
       "id": "final_git_backup",
-      "status": "in_progress",
+      "status": "complete",
       "depends_on": [
         "independent_raw_review"
-      ]
+      ],
+      "source_results_commit": "03d12c64d266a43f209b5f21408210186464ca5d",
+      "evidence": [
+        "FINAL_BACKUP_ACK.json",
+        "SOURCE_PUBLICATION_ACK.json",
+        "FINAL_DELIVERY.json"
+      ],
+      "delivery_metadata_commit": "containing commit; resolve actual remote HEAD"
     },
     {
       "id": "ncp_execution",
@@ -272,6 +279,14 @@
         "reduced_implementation"
       ],
       "reason": "Key absent in current sandbox, connected remote tool monthly quota exhausted; not attempted, no NCP claim"
+    },
+    {
+      "id": "source_results_git",
+      "status": "complete",
+      "commit": "03d12c64d266a43f209b5f21408210186464ca5d",
+      "depends_on": [
+        "independent_raw_review"
+      ]
     }
   ],
   "results": {
@@ -311,5 +326,6 @@
     "current_user_authorization": "2026-10-21 latest request explicitly authorizes optimization coding and first pilot sweep/plot with shared available resources",
     "replacement": "New separate finite625pilot allowed; oldV12debit/scope untouched",
     "evidence": "PILOT_CONTRACT.md and current user request"
-  }
+  },
+  "source_results_publication_head": "03d12c64d266a43f209b5f21408210186464ca5d"
 }
