@@ -1,0 +1,31 @@
+# Independent H/He/Li PHYS-MATH review
+
+**PASS_SCOPED_PHYS_MATH_FOR_BOUNDED_PILOT.** This is the new atomic test-fluid pilot. The reviewer did not author its contract or implementation. No IVP, old trajectory, old geometry parity test, or momentum recomputation was run. Requested model gpt-6-astra; observed runtime identity NOT_VISIBLE. Source identities are recorded in PHYS_MATH_REVIEW.json.
+
+## Actual source and mathematical findings
+
+Read the complete selected HE32 CompactTransport source, its prior independent evidence, selected Verner photo rows and full Verner–Ferland RR table, prior R9 rate formula/theory, current remote intake, source preparation manifest and pinned cosmology. The selected transport source has SHA256 0fa826025836a0126fac580de98e3b45c9dcc750e1e243afe933c249ae8e4b6c. Its four independent even towers are photon energy/number and neutrino energy/number. Thomson terms act only on photon towers; the proper electron input is cm^-3. Its 3+4*(L/2+1) state count is39 at L16 and23 at L8. Geometry and all signed stress normalizations match the contract. The pre-existing finite-operator and trajectory parity evidence is reused in its recorded scope and does not establish truncation accuracy for the new chemistry sweep.
+
+Sigma_F=sqrt(6)|s|/H, so Sigma0=.6 gives s²/H²=.06, below the positive-density limit Sigma<sqrt(6). The source uses a full anisotropic geometry rather than a small-shear expansion. W=1+A*P2 is nonnegative for -1<=A<=2; the selected amplitudes have strictly positive initial minima. A wider domain still requires the declared finite L16/L24 comparisons and actual sampled brightness checks. Passing those is evidence for this finite pilot, not an angular-continuum or observational-admission theorem.
+
+The requested21-state census counts1 neutron +6 H/D/T charge states +6 He3/He4 charge states +8 Li6/Li7 charge states. Neutron and T remain absent by exact zero initial abundance and no nuclear transitions. Evolving populated-isotope conditional fractions avoids loss of trace abundance at a global absolute tolerance. The A-weighted abundance normalization is consistent with the now-explicit A*m_u mass convention. Charge neutrality uses ionic charge q, not atomic number Z. The transition generator has nonnegative neighbour rates and zero column sums; the common electron density makes the combined system nonlinear but leaves isotope normalization conserved.
+
+The author's primary RR table description confirms HeI-a's3K<T<1e6K domain and2.5% rms fit label. The selected100–10000K interval lies within it. The six local rows are HI, HeI-a, HeII, LiI, LiII, LiIII; RR labels name the recombined product. Total RR already includes ground capture. The prescribed model is not LTE or a detailed-balance closure and makes no such claim. [RR source](https://www.pa.uky.edu/~verner/rec.html); [table description](https://www.pa.uky.edu/~verner/dima/rec/table.txt).
+
+The photo table uses eV and megabarns;1Mb=1e-18cm²=1e-22m². Actual selected thresholds are13.60,24.59,54.42,5.392,75.64,122.5eV. The5–60eV support stays below LiI Emax64.39eV, while LiII/LiIII photoionization is exactly absent for this source. Their RR downward channels remain part of the operator and require a positive-population local test. The HI normalization c*integral(sigma*n_E*dE)=Gamma_HI has the correct isotropic collision-rate factor c, with no surface-flux1/4. Energy integrals require eV-to-joule conversion. [Photo source](https://www.pa.uky.edu/~verner/photo.html); [table units](https://www.pa.uky.edu/~verner/dima/photo/photo.txt).
+
+ElementalElectronicEquality is an explicit electronic closure. Since paired isotope initial fractions also agree, H1/D, He3/He4 and Li6/Li7 conditional charge histories agree within numerical error, while nuclear abundances differ. Such coincident curves must be interpreted as the chosen closure, not isotope-resolved spectroscopy. Neutron/T conditional plots are absent, not normalized invented distributions.
+
+## Energy and matter separation
+
+The canonical massive population is nonbaryonic. The inherited dust retains the baryon rest mass once; the atomic census provides electron scattering without adding that mass again. Isotropic gas pressure/thermal and ionization energy and external UV energy are omitted from Einstein's source as declared test-fluid quantities. Their energy ratio is an approximation diagnostic, not a bound on trajectory errors. The prescribed external UV reservoir is distinct from the evolved photon tower and is maintained by unspecified external processes; the calculation does not close its radiation equation.
+
+With U_th=(3/2)kB*n_part*T, p=n_part*kB*T and dot(n_part)+3H*n_part=S_e, direct differentiation gives dot(U_th)+3H(U_th+p)=(3/2)kB*n_part*dot(T)+(3/2)kB*T*S_e+3H*kB*T*n_part. Thus the contract's electron particle-creation and expansion-work terms are correct. With neutral-reference cumulative positive ionization energy epsilon_q=sum_(j<q)chi_j, dot(B)+3HB=sum chi*(R_PI-R_RR). Adding the two yields the stated Q_gas_required. Subtracting absorbed photon power leaves bath input minus escaped recombination radiation; total RR number coefficients cannot by themselves determine the emitted cooling power. The contract correctly avoids inventing that energy moment.
+
+## Findings resolved before admission
+
+HHELI-PM-1: The initial text did not fix the sign/reference of epsilon_binding. Root added cumulative positive ionization energy with neutral reference0 and U_binding=B, using the same fitted thresholds. Readback confirms closure.
+
+HHELI-PM-2: The A-weighted abundance and n_B formula needed an explicit mass convention. Root now states A*m_u and neglected nuclear mass defects. Readback confirms closure.
+
+No remaining contract blocker. Proceed with the lower-tier implementation and its actual coefficient, quadrature and generator controls, then the79+3 bounded IVPs under the frozen limits. Actual code/raw/figures remain to be reviewed before result admission. The maximum supported future result is PASS_SCOPED_PRELIMINARY_ATOMIC_TEST_FLUID; the19-reaction nuclear target and native production remain unestablished/unissued. No old D9 or closed geometry campaign should be repeated.
