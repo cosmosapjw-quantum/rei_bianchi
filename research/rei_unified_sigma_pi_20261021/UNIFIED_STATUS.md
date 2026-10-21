@@ -6,6 +6,16 @@ Lane B의 175점 component pilot은 **COMPLETE_WITH_VERIFIED_RAW**다. 35개 기
 
 B1/B2 numerical gate, 독립 raw 검토, 실제 그림 검토와 최종 bundle 독립 판정은 PASS_SCOPED_PRELIMINARY로 닫혔다. 최종 독립 감사는 independent_audit/FINAL_REVIEW.json이며 미해결 material finding은 0개다. 최종 Git/provider closure는 별도 receipt로 기록한다. Production scientific admission은 NOT_ISSUED다.
 
+## 최종 전달 상태
+
+- Reviewed source/results commit: `3a525e3e16f1ba9393818a800327cc58597fd7b5`, tree `d12858ca1caa2496374e87f3fe3f489425eebda9`.
+- 175개 게시 대상 파일, 8,013,267바이트 전체 Git readback PASS. 실제 변경 171개는 지정한 두 연구 경로 안에만 있으며 삭제는 0개다.
+- 최종 archive: `REI_UNIFIED_FINAL_20261021_20261021T111808Z.tar.gz`, 36,855,980바이트, payload 2,900개 + manifest.
+- SHA256: `7b39d8c8ffa0b61762211295a25d14412de37f6e1a6d163ebf0b93a8337f2251`.
+- Drive `1PeQ_F7oNut4qjcy7dv5RCuEZBUk6th72`, Dropbox `id:BSpOijBcT10AAAAAAD_gOw`: 각각 upload ACK, HTTP200 전체 GET, 크기/SHA256 및 2,900개 payload hash 검증 PASS.
+- D0–D7 완료. 현재 과학 case pending 0. 다음 단일 노드는 D8의 저장 sample에 기초한 네 late sign reversal의 redshift bracket 산출이며, 새 ODE 호출 허용량은 0이다.
+- archive는 source/results 게시 후 포장한 고정 객체다. 이 최종 상태 문서와 FINAL_DELIVERY_ACK는 포장 후의 별도 metadata다. 마지막 metadata commit은 이 파일을 포함한 Git commit과 외부 transport ACK에서 확인한다.
+
 ## Lane별 source와 provenance
 
 | Lane | 실제 source / 실행 identity | 결과·검토 상태 | 게시·보존 |
@@ -51,7 +61,7 @@ Photon/nu각각의energy/number출력은있지만 초기brightness와collisionle
 | PR198기존final | 2c1433a92ae68c328436852b2842c9b7c51d30b9ff84a22fe2dffbd04ee4246d | 37,945,383B;5747payload+manifest; 양쪽archive/ACK fullGET검증 |
 | D0/D1복구 | 25e1196e3050ae535273f1b88baf99183656bcd0930be49ff9a359e960594abf | 10,829,091B;604payload+manifest; Drive1qHeeBL1y1uIbd7vY0pwo8t4asdNI8kbh, Dropboxid:BSpOijBcT10AAAAAAD_gLA; 양쪽fullGET검증 |
 | D3실행 | 7f3856bceea80f25e1f32d69f61cb40841a8461f66e1257bbd7eb79e01184498 | 31,904,176B;2360payload+manifest; Drive1_noyMOexSIBbHdWIqkoGsvt3nBxwGZGi, Dropboxid:BSpOijBcT10AAAAAAD_gNA; 양쪽fullGET검증 |
-| D4–D7최종 | FINAL_DELIVERY_ACK 참조 | 최종문서/그림/source/전체raw를별도create-only포장하며 포장후게시ACK와구분 |
+| D4–D7 최종 | 7b39d8c8ffa0b61762211295a25d14412de37f6e1a6d163ebf0b93a8337f2251 | 36,855,980B; 2,900 payload+manifest; 양쪽 upload ACK 및 전체 GET/bytes/SHA/manifest 검증 PASS |
 
 CASE_PROVENANCE_LEDGER.json/csv에는1705numerical segments와60referencealiases,총1765rows가있다. B의237prefix와237tail은같은237histories의다른구간이며 신규모형474개가아니다. Git에는losslessgzip사본과index,전체uncompressed파일은최종archive와직접deliverable에보존한다.
 
@@ -63,5 +73,5 @@ REI254branches/212PRentries,BASS261branches,VigilODE184branches의목록paginati
 
 NCPwrapper는최대63one-threadworkers와실제affinity/cgroup/idle/RAM/disk로하향하는준비상태다. 현재과학casepending=0이므로NCP가사용가능해져도같은계산을재실행하지않는다. NCP64/128의현재실측이나가속배수는없다.
 
-PR198/199기존전체CI verify failure는미해소이며scopedpilotPASS와분리한다. 최종게시후workflow상태는CI receipt를따른다. V12cap180/debit200.39897231891518/remaining100NOT_AUTHORIZED보존. 관측likelihood,통계fit,generalnon-LRS,fullnative reionization및productionadmission은이pilot의승인범위가아니다.
+Source/results commit의 verify run39590742697은 unchanged Rust 경로의 cargo fmt --check에서 failure, Rust tests는 skipped다. 실제 변경에 rust/ 파일은 0개다. 기존 전체 CI failure는 scoped Python pilot PASS와 구분하며 CI_POSTPUBLICATION.json에 실제 결과를 보존했다. V12cap180/debit200.39897231891518/remaining100NOT_AUTHORIZED보존. 관측likelihood,통계fit,generalnon-LRS,fullnative reionization및productionadmission은이pilot의승인범위가아니다.
 

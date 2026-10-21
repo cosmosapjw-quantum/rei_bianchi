@@ -3,6 +3,11 @@
 아래 block을 복사해 사용한다. 정확한 최신 source/result publication과 provider ACK는 함께 제공된 FINAL_DELIVERY_ACK.json을 먼저 읽는다.
 
 ~~~text
+
+최종 source/results publication=3a525e3e16f1ba9393818a800327cc58597fd7b5, tree=d12858ca1caa2496374e87f3fe3f489425eebda9.175files 전체GitreadbackPASS.
+최종archive=REI_UNIFIED_FINAL_20261021_20261021T111808Z.tar.gz,36855980B,SHA7b39d8c8ffa0b61762211295a25d14412de37f6e1a6d163ebf0b93a8337f2251;Drive1PeQ_F7oNut4qjcy7dv5RCuEZBUk6th72;Dropboxid:BSpOijBcT10AAAAAAD_gOw.양쪽wholeGET와2900payloadhashPASS.
+포장후metadata는별도ACK이며sourcepublicationcommit을실행당시commit이나미래의currentHEAD로가정하지마라.
+
 [$physmath-research-loop] [$exa] [$scispace] [$wolfram]
 cosmosapjw-quantum/rei_bianchi의2026-10-21통합연구를이어가라.
 이번통합은대화/DAG의통합이며물리모형이나Gitbranch의동일성을뜻하지않는다.

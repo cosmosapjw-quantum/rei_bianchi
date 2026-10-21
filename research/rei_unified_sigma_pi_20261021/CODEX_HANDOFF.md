@@ -1,6 +1,6 @@
 # Codex handoff — REI unified LRS pilot, 2026-10-21
 
-아래 block을 다음 Codex 세션에 그대로 전달한다. 최종 delivery commit/provider ID는 FINAL_DELIVERY_ACK.json의 실제 readback 값을 우선한다. 이 파일 안의 과거 확인점은 현재 HEAD를 대신하지 않는다.
+아래 block을 다음 Codex 세션에 그대로 전달한다. 최종 source/results commit과 provider ID는 FINAL_DELIVERY_ACK.json의 실제 readback 값을 우선한다. 마지막 metadata delivery HEAD는 현재 PR의 실제 HEAD 또는 포장 후 외부 transport ACK에서 확인한다. 이 파일 안의 과거 확인점은 현재 HEAD를 대신하지 않는다.
 
 ~~~text
 [$physmath-research-loop] cosmosapjw-quantum/rei_bianchi 통합 연구를 이어가라.
@@ -15,6 +15,11 @@ research/rei_unified_sigma_pi_20261021/PHYSICAL_CONVENTION_ADAPTER.md
 research/rei_unified_sigma_pi_20261021/CASE_PROVENANCE_LEDGER_INDEX.json
 research/rei_unified_sigma_pi_20261021/independent_audit/
 research/rei_age_exposure_envelope_20261018/sigma_pi_pilot_20261021/
+
+
+최종 source/results publication=3a525e3e16f1ba9393818a800327cc58597fd7b5, tree=d12858ca1caa2496374e87f3fe3f489425eebda9.175files 전체GitreadbackPASS.
+최종archive=REI_UNIFIED_FINAL_20261021_20261021T111808Z.tar.gz,36855980B,SHA7b39d8c8ffa0b61762211295a25d14412de37f6e1a6d163ebf0b93a8337f2251;Drive1PeQ_F7oNut4qjcy7dv5RCuEZBUk6th72;Dropboxid:BSpOijBcT10AAAAAAD_gOw.양쪽wholeGET와2900payloadhashPASS.
+포장후metadata는별도ACK이며sourcepublicationcommit을실행당시commit이나미래의currentHEAD로가정하지마라.
 
 과학 상태:
 A: PR198 HEAD8bd35af5f11c7ea5945b656be1c013d1c1933498, reviewedsourceb140170ce0c58159368b6b81be49ac35ca764851.625+606,z20→4,8-state,half-contraction,기존PASS_SCOPED_PRELIMINARY. 재실행하지 마라.
