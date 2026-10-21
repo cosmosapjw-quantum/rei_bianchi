@@ -1,0 +1,13 @@
+# 다음 실행자를 위한 복사 가능한 요청
+
+`cosmosapjw-quantum/rei_bianchi`의 draft PR219, 브랜치 `research/rei-isotope-quotient-pilot-20261022`를 현재 원격에서 읽어 주세요. 저장소 루트에서 이 단원의 명령을 실행하려면 먼저 `cd research/rei_isotope_quotient_pilot_20261022` 하세요. 브랜치/HEAD/PR 상태와 `AGENTS.md`, `HANDOFF.json`, `NEXT_DAG.json`, `REPORT_KO.md`, `SOURCE_MANIFEST.json`, `review/INDEPENDENT_REVIEW.md`, `review/INDEPENDENT_DECISION.json`, `pilot/summary.json`, `pilot/figures_final/PLOT_REPORT.json` 및 실제 Stage C 수령증 유무를 확인하세요. Stage A와 B의 관측 커밋은 각각 `f7ed3b642ebda9c7a2f3cd4766af5e48fe8ba6ff`, `f277345a3c7b156c3d709d64c48cee85b64a4e1a`입니다. 이후 커밋은 추측하지 말고 읽어서 기록하세요. 기존 checkout의 미추적·수정 파일을 보존하고 reset, force push 또는 이전 자료 덮어쓰기를 하지 마세요.
+
+이 파일럿에서는 z20→2의 새 IVP 83개(79 명목 + 3 L24 + 별도 18-분율 기준)가 이미 끝났습니다. `pilot/summary.json`, 원시 수령증과 최종 `PLOT_REPORT.json`의 범위 한정 결과 및 기존 검토를 재사용하세요. 입력·코드·결과 의존성이 실제로 바뀌지 않았다면 `audit-existing`, 원시 해시 재점검, 도표 재생성, IVP 재실행, 새 독립 심사를 기본 요구사항으로 만들지 마세요. 변경 의존성이나 구체적인 불일치가 있으면 해당 부분만 표적 점검하세요. NCP 비공개 이전 예산을 이 공개 파일럿의 예산으로 재설정하거나 과거 IVP를 새 실행으로 세지 마세요.
+
+최종 독립 C9 판정은 `review/INDEPENDENT_REVIEW.md`의 마지막 절에서 이미 **PASS_SCOPED_PRELIMINARY_ATOMIC_TEST_FLUID**이며, `review/INDEPENDENT_DECISION.json`은 Stage C 아카이브 이후 기존 판정을 복구 직렬화한 것입니다. 새 검토가 아닙니다. 이제 실제 출판 커밋과 Stage C 백업 ACK를 확인하고, 관측된 수령증이 있을 때만 `HANDOFF.json`의 빈 필드와 관련 문구를 갱신하세요. 출판과 native production 채택은 이 과학 판정과 별개입니다.
+
+현재 물리는 Verner photo, Verner–Ferland 총 RR의 HeI a 행, 처방 T100–10000 K와 5–60 eV UV, 같은 원소 동위원소 전자계수, 바리온 원자 test fluid입니다. H/D·He3/He4·Li6/Li7의 정확한 현재 모형 quotient가 9개 조건부 분율을 진화시키고 21개 census 출력을 복원합니다. 이것은 전체 19개 반응 목표의 완료가 아닙니다. 19개는 원자 3개와 핵/포획/붕괴 16개입니다. CI, DR, CX, 핵 변환, 열/복사 에너지의 독립 진화, LiI 단단한 UV 내각/Auger는 미포함이며 영율의 물리적 인증도 아닙니다. 다음 연구는 별도 원천과 계약으로 닫힌 열·UV 방정식 및 생성물 전하·전자·에너지 투영을 먼저 정해야 합니다. `REPO_OPTIMIZATION_ADOPTION.json`에 있는 7개 저장소의 채택 지도는 이번 한 번만 참조하고, 이 파일럿을 일곱 저장소 전부의 최적화 완료로 넓히지 마세요.
+
+보고할 때 211.72초는 83개 **사례별 CPU 수령증의 합**이며 점검/import/도표 CPU는 따로 계측되지 않았음을 명시하세요. bulk 단계 실제 wall은 46.82초입니다. 기준 한 쌍의 실행 시간 차이를 보편적인 성능 개선으로 외삽하지 마세요. 강한 사례의 z=2 부호 shear 차이는 약 `0.03148486`; 등방성 대비 경로상 최대 Li 조건부 분율 차이는 약 `0.00254746`입니다. 이는 처방된 모형의 출력이지 관측 재이온화 추론이 아닙니다. 강한 사례 `2.8979336435676505e-9`는 **UV를 뺀** `(U_thermal+U_binding)/epsilon_(m+r)`입니다. 최종 도표 보고서의 전 82개 최대 `3.7184457663740415e-9`는 **UV를 포함한** 같은 물질·복사 분모 `epsilon_(m+r)=3(H²−s²−H0²ΩΛ)/K`를 사용합니다. `summary.json`의 `3.441216023624155e-9`는 UV를 포함하지만 **critical-equivalent** 분모 `3H²/K`를 사용합니다. 분자·분모·범위가 다른 수치를 혼동하지 마세요.
+
+다음 과학 연구는 별도의 원천과 계약으로 닫힌 열·복사/UV 에너지 방정식 및 Li I의 더 단단한 UV 내각/Auger와 에너지 모멘트를 정하고, 핵·포획·붕괴 16개 목표의 적용 범위 및 생성물 전하·전자·에너지 투영을 규정하는 일입니다. 현재의 PASS를 전체 19개 목표나 생산 완료로 확대하지 마세요.

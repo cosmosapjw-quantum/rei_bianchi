@@ -216,7 +216,8 @@ def verify_existing_case(config):
                   A_r=requested.transport.ar,ellmax=requested.transport.ellmax,
                   reference=requested.reference,rtol=requested.rtol,
                   atol=requested.atol,max_step=.04,samples=257)
-    if receipt['status']!='PASS' or receipt['model']!=expected:
+    if receipt['status']!='PASS' or receipt['model']!=expected or \
+       not receipt.get('gates') or any(v is not True for v in receipt['gates'].values()):
         raise RuntimeError('existing config/result mismatch: '+name)
     for path in ('code/compact_transport.py','data/verner_photo_Z1_Z2_Z3.dat',
                  'data/verner_ferland_rr_table1_original.dat'):
@@ -229,13 +230,66 @@ def verify_existing_case(config):
         # repair. The immutable raw pair was reanalyzed against all 18 states.
         evidence=OUT/'profile_existing_reanalysis.json'
         profile_name='quotient_L16_S0_Am0_Ar0'
-        if name!=profile_name or older!='ce4b8d7aa69651559a4c45a4d40195d85600b6f6bb11591e717e9f68ffa1bae1'\
+        reference_name='reference_L16_S0_Am0_Ar0'
+        if name not in (profile_name,reference_name) or older!='ce4b8d7aa69651559a4c45a4d40195d85600b6f6bb11591e717e9f68ffa1bae1'\
                 or not evidence.exists() or json.loads(evidence.read_text())['status']!='PASS':
             raise RuntimeError('existing atomic source mismatch: '+name)
     path=OUT/(name+'.npz')
     if sha(path)!=receipt['npz_sha256']:
         raise RuntimeError('existing case hash mismatch: '+name)
+    if receipt['source_hashes']['code/atomic_quotient.py']!=current:
+        reanalysis=json.loads((OUT/'profile_existing_reanalysis.json').read_text())
+        if reanalysis['source_npz_sha256'].get(path.name)!=receipt['npz_sha256']:
+            raise RuntimeError('retained profile source/raw binding mismatch: '+name)
     return receipt
+
+
+def saved_inventory(require_complete=True):
+    """Validate the admitted saved set without IVPs or rewriting results."""
+    verify_sources()
+    check=json.loads((OUT/'point_checks_v2.json').read_text())
+    pair=json.loads((OUT/'profile_pair.json').read_text())
+    reanalysis=json.loads((OUT/'profile_existing_reanalysis.json').read_text())
+    if check['passed'] is not True or pair['status']!='PASS' or reanalysis['status']!='PASS':
+        raise RuntimeError('saved point/profile evidence did not pass')
+    cases,controls=case_configurations()
+    configs=cases+controls
+    names=[case_id(Coupled(**config)) for config in configs]
+    reference=dict(sigma=0.,am=0.,ar=0.,reference=True)
+    reference_name=case_id(Coupled(**reference))
+    if len(cases)!=79 or len(controls)!=3 or len(set(names+[reference_name]))!=83:
+        raise RuntimeError('expected case IDs are not unique or complete')
+    present=[];missing=[]
+    for config,name in [*zip(configs,names),(reference,reference_name)]:
+        receipt=OUT/(name+'.json');raw=OUT/(name+'.npz')
+        if receipt.exists()!=raw.exists():
+            raise RuntimeError('partial saved case: '+name)
+        if receipt.exists():
+            present.append(verify_existing_case(config))
+        else:
+            missing.append(name)
+    if require_complete and missing:
+        raise RuntimeError('missing expected saved cases: '+', '.join(missing))
+    if missing:
+        return dict(status='INCOMPLETE',missing=missing,present=len(present))
+    summary=json.loads((ROOT/'summary.json').read_text())
+    control_names={case_id(Coupled(**config)) for config in controls}
+    if summary.get('completed')!=82 or summary.get('expected')!=82 or \
+       summary.get('ivp_attempts_including_full18_reference')!=83 or \
+       summary.get('point_checks_v2_pass') is not True or \
+       summary.get('all_82_and_3_controls_scoped_numerical_pass') is not True or \
+       set(summary.get('controls',{}))!=control_names:
+        raise RuntimeError('saved strict summary coverage mismatch')
+    for config in controls:
+        name=case_id(Coupled(**config))
+        low=case_id(Coupled(**dict(config,ellmax=16,rtol=RTOL,atol=ATOL)))
+        row=summary['controls'][name]
+        if row.get('reference')!=low or row.get('passed') is not True or \
+           set(row.get('axes',{}))!={'signed_Sigma','P_m','P_r'} or \
+           max(row['fraction'],*row['axes'].values())>2e-5:
+            raise RuntimeError('saved control failed: '+name)
+    return dict(status='COMPLETE_NO_WORK',new_cases=0,validated_quotients=82,
+                validated_reference=1,validated_controls=3,summary=summary)
 
 
 def run_stage(configurations,workers,stage):
@@ -256,6 +310,9 @@ def run_stage(configurations,workers,stage):
         if rec.exists():
             verify_existing_case(config)
         else:pending.append(config)
+    if not pending:
+        return dict(status='COMPLETE_NO_WORK',stage=stage,new_cases=0,
+                    attempts_total=attempts,unlaunched=[])
     outcomes=[]
     unlaunched=[]
     reason=None
@@ -292,7 +349,9 @@ def run_stage(configurations,workers,stage):
                 wall_s=time.monotonic()-start,wall_cumulative_upper_s=wall_prior+time.monotonic()-start,
                 unlaunched=unlaunched,
                 statuses={v['case']:v['status'] for v in outcomes})
-    atomic_save(OUT/(stage+'_receipt.json'),lambda p:p.write_text(json.dumps(result,indent=2)+'\n'))
+    stage_receipt=OUT/(stage+'_receipt.json')
+    if not stage_receipt.exists():
+        atomic_save(stage_receipt,lambda p:p.write_text(json.dumps(result,indent=2)+'\n'))
     return result
 
 
@@ -308,86 +367,23 @@ def sweep(workers=4):
     return run_stage(cases+controls,workers,'sweep')
 
 
-def summarize():
-    """Generate CSV, scoped controls, and data-backed scientific figures without IVPs."""
-    import matplotlib
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
+def all_action(workers=4):
+    """Reuse a complete saved pilot; execute only missing quotient cases in a future copy."""
+    inventory=saved_inventory(require_complete=False)
+    if inventory['status']=='COMPLETE_NO_WORK':
+        return inventory
+    if 'reference_L16_S0_Am0_Ar0' in inventory['missing']:
+        raise RuntimeError('retained full18 reference missing; no automatic profile rerun')
     cases,controls=case_configurations()
-    configs=cases+controls
-    records=[];data={}
-    for config in configs:
-        name=case_id(Coupled(**config))
-        rpath=OUT/(name+'.json');path=OUT/(name+'.npz')
-        if not rpath.exists():continue
-        receipt=json.loads(rpath.read_text())
-        if receipt['status']!='PASS' or not path.exists() or sha(path)!=receipt['npz_sha256']:
-            continue
-        with np.load(path,allow_pickle=True) as z:
-            data[name]={k:z[k] for k in ('x','z','conditional','census','diagnostics','diagnostic_names')}
-        records.append(receipt)
-    figdir=ROOT/'figures';figdir.mkdir(exist_ok=True)
-    with (ROOT/'summary.csv').open('w',newline='') as stream:
-        writer=csv.writer(stream)
-        writer.writerow(['case','L','A_m','A_r','S_initial','P_m_initial','P_r_initial',
-                         'S_final','P_m_final','P_r_final','tau_final','wall_s','cpu_s','nfev','njev','nlu'])
-        for r in records:
-            c=r['model'];writer.writerow([r['case'],c['ellmax'],c['A_m'],c['A_r'],
-                   *r['initial_axes'],*r['final_axes'],r['final_tau'],r['wall_s'],
-                   r['cpu_s'],r['nfev'],r['njev'],r['nlu']])
-    def series(case,key):
-        row=data[case];names=row['diagnostic_names'].tolist()
-        return row['diagnostics'][:,names.index(key)]
-    def plot(name,selection,keys):
-        fig,ax=plt.subplots(figsize=(7,4.2))
-        for label,cname in selection:
-            if cname not in data:continue
-            z=data[cname]['z']
-            for k in keys:ax.plot(z,series(cname,k),label=label+' '+k)
-        ax.invert_xaxis();ax.set_xlabel('redshift z');ax.legend(fontsize=7,ncol=2)
-        fig.tight_layout();fig.savefig(figdir/(name+'.png'),dpi=160);plt.close(fig)
-    iso=case_id(Coupled(**cases[7]))
-    strong=case_id(Coupled(**next(c for c in cases if c['sigma']==.6 and c['am']==1.6 and c['ar']==-.8)))
-    canc=[case_id(Coupled(**c)) for c in cases[75:77]]
-    negative=[case_id(Coupled(**c)) for c in cases[77:79]]
-    plot('stress_histories',[('isotropic',iso),('strong',strong)],
-         ('Sigma_F','Pi_m','Pi_r','Pi_total'))
-    plot('photon_neutrino',[('strong',strong)],('P_gamma','P_nu'))
-    plot('cancellation_orientation',[(s,s) for s in canc+negative],
-         ('signed_Sigma','P_m','P_r'))
-    fig,ax=plt.subplots(figsize=(7,5))
-    for r in records:
-        if r['model']['ellmax']!=16 or r['model']['Sigma_F0']!=.6:continue
-        ax.scatter(r['initial_axes'][1],r['initial_axes'][2],c=r['final_axes'][0],
-                   vmin=-.6,vmax=.6,cmap='coolwarm',s=60,edgecolor='k',linewidth=.25)
-    ax.set_xlabel('realized signed initial P_m');ax.set_ylabel('realized signed initial P_r')
-    fig.tight_layout();fig.savefig(figdir/'signed_final_sweep.png',dpi=160);plt.close(fig)
-    if strong in data:
-        fig,axes=plt.subplots(3,1,figsize=(8,8),sharex=True)
-        z=data[strong]['z'];f=data[strong]['conditional']
-        for ax,(element,sl) in zip(axes,OFFSETS.items()):
-            for q,j in enumerate(range(sl.start,sl.stop)):
-                ax.plot(z,f[:,j],label=f'{element} q={q}')
-            ax.set_ylabel('charge fraction');ax.legend(fontsize=8,ncol=4)
-        axes[-1].invert_xaxis();axes[-1].set_xlabel('redshift z')
-        fig.tight_layout();fig.savefig(figdir/'charge_fractions.png',dpi=160);plt.close(fig)
-        plot('energy_ledger',[('strong',strong)],
-             ('Q_gas_required_W_m3','P_photo_W_m3','bath_minus_escape_W_m3'))
-    differences={}
-    for config in controls:
-        high=case_id(Coupled(**config))
-        low=case_id(Coupled(**dict(config,ellmax=16,rtol=RTOL,atol=ATOL)))
-        if high not in data or low not in data:continue
-        axes={k:float(np.max(abs(series(high,k)-series(low,k)))) for k in
-              ('signed_Sigma','P_m','P_r')}
-        fraction=float(np.max(abs(data[high]['conditional']-data[low]['conditional'])))
-        differences[high]=dict(reference=low,axes=axes,fraction=fraction,
-                               passed=max(fraction,*axes.values())<=2e-5)
-    result=dict(completed=len(records),expected=len(configs),controls=differences,
-                preliminary_all_cases=all(r['status']=='PASS' for r in records) and len(records)==len(configs),
-                figures=sorted(p.name for p in figdir.glob('*.png')))
-    (ROOT/'summary.json').write_text(json.dumps(result,indent=2)+'\n')
-    return result
+    stage=run_stage(cases+controls,workers,'sweep')
+    if stage['status']!='PASS':
+        return stage
+    return saved_inventory(require_complete=True)
+
+
+def summarize():
+    """Return the already admitted strict saved summary without rewriting it."""
+    return saved_inventory(require_complete=True)
 
 
 def run_case(model,output=OUT):
@@ -586,10 +582,11 @@ def reanalyze_existing_profile():
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('action',choices=('checks','profile','reanalyze-profile','controls','sweep','summarize','audit-existing'))
+    p.add_argument('action',choices=('all','checks','profile','reanalyze-profile','controls','sweep','summarize','audit-existing'))
     p.add_argument('--workers',type=int,default=4)
     a=p.parse_args()
-    if a.action=='checks':r=point_checks()
+    if a.action=='all':r=all_action(a.workers)
+    elif a.action=='checks':r=point_checks()
     elif a.action=='profile':r=profile()
     elif a.action=='reanalyze-profile':r=reanalyze_existing_profile()
     elif a.action=='controls':r=controls_stage(a.workers)
