@@ -1,0 +1,99 @@
+{
+  "schema": "rei.tritium_nuclear_scope_progress.v1",
+  "user_scope": "Audit prior tritium zero and include all dossier nuclear source/sink terms with explicit Li-isotope closure",
+  "anchor_branch": "research/rei-isotope-quotient-pilot-20261022",
+  "published_checkpoint_head": "480bfdb969437e7f202eb3fc7c723dcbc0f6711f",
+  "old_background_ivps_reused": 83,
+  "new_background_ivps": 0,
+  "nodes": [
+    {
+      "id": "zero_origin_audit",
+      "state": "COMPLETE",
+      "evidence": "CODE_PATH_AUDIT.json",
+      "result": "T census was a structural zero, not a measured/calculated nuclear production result"
+    },
+    {
+      "id": "dd_contract",
+      "state": "COMPLETE",
+      "evidence": "PHYSICS_CONTRACT.json"
+    },
+    {
+      "id": "dd_execution",
+      "state": "COMPLETE_SCOPED",
+      "evidence": "TRACER_REPORT.json"
+    },
+    {
+      "id": "dd_independent_review",
+      "state": "PASS_SCOPED",
+      "evidence": "review/TRITIUM_DD_DECISION.json"
+    },
+    {
+      "id": "intake_publication_backup",
+      "state": "COMPLETE_GIT_DUAL_PROVIDER_SIZE_ACK",
+      "evidence": "delivery/INTAKE_CHECKPOINT_DELIVERY_ACK.json"
+    },
+    {
+      "id": "all_dossier_nuclear_contract",
+      "state": "IN_PROGRESS",
+      "scope": "13 deduplicated families from 16 dossier labels plus 5 named Li/D closure families"
+    },
+    {
+      "id": "all_dossier_nuclear_implementation",
+      "state": "IN_PROGRESS",
+      "requires": [
+        "all_dossier_nuclear_contract"
+      ],
+      "scope": "Conditional passive fully ionized instantaneous-thermalization sensitivity; explicit source/sink/reverse ledger"
+    },
+    {
+      "id": "all_dossier_nuclear_validation",
+      "state": "PENDING",
+      "requires": [
+        "all_dossier_nuclear_implementation"
+      ]
+    },
+    {
+      "id": "coupled_ion_energy_fast_product_model",
+      "state": "NOT_COMPLETED",
+      "scope": "Gas-energy feedback, daughter ionic branching, nonthermal slowing; no scientific promotion from conditional tracer"
+    },
+    {
+      "id": "final_publication_backup",
+      "state": "PENDING",
+      "requires": [
+        "all_dossier_nuclear_validation"
+      ]
+    }
+  ],
+  "invariants": [
+    "No old NCP budget or deadline reset",
+    "No old background rerun",
+    "Historical raw and figures preserved",
+    "No missing provider converted to zero",
+    "Photonuclear zeros only for specified photon support",
+    "One energy owner; passive Q ledger is not gas deposition"
+  ],
+  "routing": {
+    "physics_contract": {
+      "task": "/root/tritium_physics_contract",
+      "requested_model": "gpt-6-astra"
+    },
+    "dd_code": {
+      "task": "/root/tritium_code_audit",
+      "requested_model": "gpt-6-sol"
+    },
+    "network_code": {
+      "task": "/root/nuclear_network_code",
+      "requested_model": "gpt-6-sol"
+    },
+    "independent_review": {
+      "task": "/root/tritium_independent_review",
+      "requested_model": "gpt-6-astra"
+    },
+    "publication": {
+      "task": "/root/tritium_delivery",
+      "requested_model": "gpt-6-sol"
+    },
+    "runtime_model_identity": "Not independently observed; requested models are scheduling parameters"
+  }
+}
