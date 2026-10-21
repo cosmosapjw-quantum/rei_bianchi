@@ -36,3 +36,5 @@ The campaign itself reported `PASS_EXECUTION_AND_ORIGINAL_OUTPUT_VALIDATION`; th
 ## 게시와 이중 백업 확인
 
 결과·DAG commit `349aeef40bc27fe922d1e3afe77ae6747a408c6a`는 PR199 branch의 `652a7e03b844a145d6c6cbb401ab81f4a8429aff`를 부모로 한 일반 fast-forward다. PR199는 open/draft다. Backup archive는 97,636,165 bytes, SHA256 `3fde54fdfbdccc3cb0e6991209fe156f3535f44e6c0ad0f1582ea9adbb999c06`; Drive ID `1IdjtDx9AkbGmBVNRhRZtmHirphSfW3VF`, Dropbox ID `id:BSpOijBcT10AAAAAAD_cRw`로 저장했다. 두 provider에서 전체 GET readback bytes와 SHA256가 모두 일치한다. ACK는 `evidence/ncp_time_campaign_20261021/BACKUP_READBACK_ACK.json`이다.
+
+최종 최신 결과/DAG 패키지 `REI_AGE_NATIVE_TIME_CAMPAIGN_20261021_v10_FINAL.tar.gz`는 97,637,067 bytes, SHA256 `f57a019786f7cb2afba205040fe400fbc97f43a0783e03572f080214fa61224b`이다. Drive ID `1E24n-kw72nR_9qnvfNHiU3AMasBHDdQp`와 Dropbox ID `id:BSpOijBcT10AAAAAAD_cWA`에서 두 전체 GET readback이 같은 크기와 SHA로 PASS했다. 영수증은 `evidence/ncp_time_campaign_20261021/FINAL_PACKAGE_READBACK.json`이다.

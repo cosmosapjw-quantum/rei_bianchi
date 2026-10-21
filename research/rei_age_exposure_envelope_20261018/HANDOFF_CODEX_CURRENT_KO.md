@@ -87,3 +87,5 @@ C8/C10은 위 소스 snapshot을 고정한다. 최종 delivery metadata commit�
 독립 Astra-tier read-only 검토는 factual report/DAG publication에 `PASS_SCOPED_FACTUAL_PUBLICATION`을 반환했다. 검토는 native convergence나 production admission을 부여하지 않는다.
 
 결과/DAG는 PR199 branch commit `349aeef40bc27fe922d1e3afe77ae6747a408c6a`에 게시했고, 결과 bundle Drive·Dropbox 양쪽 전체 readback SHA256 `3fde54fdfbdccc3cb0e6991209fe156f3535f44e6c0ad0f1582ea9adbb999c06` PASS. 저장 ID/경로 및 ACK는 DELIVERY_RECEIPT_CURRENT.json과 evidence/BACKUP_READBACK_ACK.json 참고. 최신 PR CI는 root cargo fmt 실패, workspace tests skipped.
+
+최종 결과/DAG bundle: `REI_AGE_NATIVE_TIME_CAMPAIGN_20261021_v10_FINAL.tar.gz`, 97,637,067 bytes, SHA256 `f57a019786f7cb2afba205040fe400fbc97f43a0783e03572f080214fa61224b`. Drive/Dropbox full readback PASS; file IDs and ACK in `native_optimization_20261021/evidence/ncp_time_campaign_20261021/FINAL_PACKAGE_READBACK.json`.
