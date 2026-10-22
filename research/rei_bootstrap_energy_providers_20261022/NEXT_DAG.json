@@ -1,62 +1,64 @@
 {
-  "schema": "rei.bootstrap_energy_providers.next_dag.v1",
-  "status": "PARTIAL_RUNTIME_BLOCKED",
-  "priority": "clean_empty_bootstrap",
+  "schema": "rei.bootstrap_energy_providers.next_dag.v2",
+  "status": "COMPLETE_SCOPED",
   "nodes": [
     {
-      "id": "recover_runtime_and_local_files",
-      "state": "BLOCKED_RUNTIME_UNAVAILABLE",
-      "next": "finish_bootstrap",
-      "instructions": "Inventory existing local files before regenerating only missing files; do not rerun preserved83."
+      "id": "bootstrap",
+      "state": "COMPLETE_SCOPED",
+      "scope": "Source-only prepare, plan, completed-no-work and stateful missing-only orchestration; fixtures only, no fresh83",
+      "contract": "BOOTSTRAP_CONTRACT.md",
+      "code": "bootstrap/bootstrap.py",
+      "result": "bootstrap/BUDGET_REPAIR_RESOURCE_RECEIPT.json and BUDGET_REPAIR_STDERR.txt; earlier 14-test evidence on previous source reused for unaffected dependencies",
+      "review": "bootstrap/BOOTSTRAP_REVIEW.json PASS_SCOPED_BOOTSTRAP_ORCHESTRATION",
+      "delivery": "delivery/FINAL_DELIVERY_ACK.json"
     },
     {
-      "id": "finish_bootstrap",
-      "state": "IN_PROGRESS_NOT_VALIDATED",
+      "id": "thermal",
+      "state": "COMPLETE_SCOPED",
+      "scope": "Instantaneous supplied-moment scalar ledger T1–T8 only",
+      "contract": "thermal/THERMAL_CODE_CONTRACT.md",
+      "derivation": "thermal/THERMAL_DERIVATION.md",
+      "code": "thermal/thermal_ledger.py",
+      "result": "thermal/THERMAL_SCALAR_RESULT.json",
+      "review": "thermal/THERMAL_REVIEW.json PASS",
+      "delivery": "delivery/FINAL_DELIVERY_ACK.json"
+    },
+    {
+      "id": "providers",
+      "state": "COMPLETE_SCOPED",
+      "scope": "Six-channel conditional RR scalar adapter restored and three ground-target DR fits numerically evaluated on 100–10000 K",
+      "contract": "providers/PROVIDER_IMPLEMENTATION_CONTRACT.md",
+      "code": "providers/code/rr_adapter.py; providers/code/dr_adapter.py",
+      "result": "providers/code/CURRENT_IMPLEMENTATION_RECORD.json",
+      "review": "providers/PROVIDER_REVIEW.md PASS_SCOPED_SCALAR_PROVIDERS",
+      "delivery": "delivery/FINAL_DELIVERY_ACK.json"
+    },
+    {
+      "id": "source_publication_and_shared_archive_delivery",
+      "state": "COMPLETE_SCOPED",
       "requires": [
-        "recover_runtime_and_local_files"
+        "bootstrap",
+        "thermal",
+        "providers"
       ],
-      "evidence": "BOOTSTRAP_CONTRACT.md",
-      "next": "bootstrap_changed_dependency_review"
+      "scope": "One combined source/results archive may preserve all three subunits; C10 requires actual commit and provider receipts",
+      "delivery": "delivery/FINAL_DELIVERY_ACK.json"
     },
     {
-      "id": "thermal_ledger_theory",
-      "state": "DERIVED_CONDITIONAL_CONTRACT",
-      "evidence": "THERMAL_THEORY.md",
-      "next": "thermal_provider_moments_and_operator"
+      "id": "full_fresh83",
+      "state": "NOT_RUN_NOT_AUTOMATIC",
+      "scope": "Separate explicit execution authorization required"
     },
     {
-      "id": "manufactured_ledger_arithmetic",
-      "state": "EXECUTED_29_COMPARISONS",
-      "evidence": "LEDGER_CHECKS_RESULT.json",
-      "scope": "Pure arithmetic only; no physical IVP"
-    },
-    {
-      "id": "through_li_provider_intake",
-      "state": "PRIMARY_SOURCES_CLASSIFIED",
-      "evidence": "PROVIDER_REGISTRY.json",
-      "next": "implement_and_validate_candidates"
-    },
-    {
-      "id": "thermal_provider_moments_and_operator",
-      "state": "PENDING_SPECTRAL_AND_PARTICLE_SOURCE_CLOSURES"
-    },
-    {
-      "id": "source_package_dual_backup",
-      "state": "BLOCKED_LOCAL_FILE_ACCESS",
-      "requires": [
-        "recover_runtime_and_local_files"
-      ],
-      "old_backup_verification": "REUSED"
-    },
-    {
-      "id": "full_production",
+      "id": "coupled_production",
       "state": "HOLD_DEPENDENCIES",
-      "not_promoted": true
+      "scope": "CI/CX, DR moments/cascades, spectral closure, nuclear daughter injection and coupled backreaction remain open"
     }
   ],
   "NCP": {
     "new_runs": 0,
     "budget_reset": false,
     "deadline_reset": false
-  }
+  },
+  "delivery": "delivery/FINAL_DELIVERY_ACK.json"
 }
