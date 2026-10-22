@@ -32,4 +32,11 @@
 
 PASS_SCOPED는 명시된 범위의 수락이다. 그림 생성, 백업 성공, 조건부 반응망 통과를 FLRW production이나 최종 Bianchi I 과학 승인으로 승격하지 않는다.
 
-최신 사용자 요청에 따라 소스 포함 로컬 ZIP을 먼저 전달한다. 최종 도표·dossier의 외부 게시와 백업은 아직 수행하지 않았다. 앞서 완료된 메타데이터 체크포인트는 유지하며, ZIP 내부 파일 목록과 함께 전달되는 DELIVERY_LOCAL_RECEIPT.json으로 실제 로컬 포장 결과를 확인한다.
+최신 사용자 승인에 따라 최종 소스·개별 그림·공개 NPZ의 Git 게시와 이중 백업을 완료했다. Payload commit은 `c004c22ef938fdfbc7a135fcd4a31c2df0f25f12`이며 실제 branch head readback이 일치했다. 현재 상태는 [FINAL_DELIVERY_ACK.json](delivery/FINAL_DELIVERY_ACK.json)을 따른다.
+
+- [최종 81쪽 PDF](https://drive.google.com/file/d/1hxw8OgXcRxkvBvcsio1PQwoFvBgZFJx-/view?usp=drivesdk): 17,997,787 bytes, 원본 SHA256 `a3a642c3971a545eac4f119b1b38cc4e4fe610edac5537a46d8ef7442c4a914e`; Drive 전체 다운로드 일치.
+- [소스 포함 복원 ZIP](https://drive.google.com/file/d/1pq7KtPNKxVoZ_NyqKXG_SVAxDoOweIMI/view?usp=drivesdk): 76,130,340 bytes, 567 members, SHA256 `a6e50ee0aa86c55f46728e55df72bbb84a156317ca951f54ddf5af1ed413f758`. Dropbox와 Drive 전체 다운로드의 SHA256 및 ZIP CRC가 일치했다.
+
+최종 PDF는 Git connector의 16 MiB request 제한 때문에 Git에는 넣지 않았다. 재압축·재빌드 없이 원본을 위 Drive 링크와 검증된 ZIP에 보존했다. 개별 PNG/PDF 그림과 코드·문서는 Git에서 제공한다. 복원 ZIP 내부의 DEFERRED 표기와 DELIVERY_LOCAL_RECEIPT는 포장 당시의 역사적 snapshot이며, 현재 ACK가 delivery 상태만 대체한다. ZIP과 과거 receipt는 변경하지 않았다.
+
+C10은 COMPLETE, 다음 `COUPLED_ISOTOPE_NATIVE_CONTRACT`는 READY다. production은 HOLD_DEPENDENCIES를 유지한다. 이번 전달 재개에서 과학 계산·기존 테스트 재실행은 0회다.
