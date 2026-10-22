@@ -1,47 +1,48 @@
 {
   "schema": "rei.bootstrap_energy_providers.next_dag.v2",
-  "status": "THREE_SCOPED_UNITS_REVIEW_PASS_C10_PENDING_DELIVERY",
+  "status": "COMPLETE_SCOPED",
   "nodes": [
     {
       "id": "bootstrap",
-      "state": "COMPLETE_SCOPED_C10_PENDING_DELIVERY",
+      "state": "COMPLETE_SCOPED",
       "scope": "Source-only prepare, plan, completed-no-work and stateful missing-only orchestration; fixtures only, no fresh83",
       "contract": "BOOTSTRAP_CONTRACT.md",
       "code": "bootstrap/bootstrap.py",
       "result": "bootstrap/BUDGET_REPAIR_RESOURCE_RECEIPT.json and BUDGET_REPAIR_STDERR.txt; earlier 14-test evidence on previous source reused for unaffected dependencies",
       "review": "bootstrap/BOOTSTRAP_REVIEW.json PASS_SCOPED_BOOTSTRAP_ORCHESTRATION",
-      "next": "source_publication_and_shared_archive_delivery"
+      "delivery": "delivery/FINAL_DELIVERY_ACK.json"
     },
     {
       "id": "thermal",
-      "state": "COMPLETE_SCOPED_C10_PENDING_DELIVERY",
+      "state": "COMPLETE_SCOPED",
       "scope": "Instantaneous supplied-moment scalar ledger T1–T8 only",
       "contract": "thermal/THERMAL_CODE_CONTRACT.md",
       "derivation": "thermal/THERMAL_DERIVATION.md",
       "code": "thermal/thermal_ledger.py",
       "result": "thermal/THERMAL_SCALAR_RESULT.json",
       "review": "thermal/THERMAL_REVIEW.json PASS",
-      "next": "source_publication_and_shared_archive_delivery"
+      "delivery": "delivery/FINAL_DELIVERY_ACK.json"
     },
     {
       "id": "providers",
-      "state": "COMPLETE_SCOPED_C10_PENDING_DELIVERY",
+      "state": "COMPLETE_SCOPED",
       "scope": "Six-channel conditional RR scalar adapter restored and three ground-target DR fits numerically evaluated on 100–10000 K",
       "contract": "providers/PROVIDER_IMPLEMENTATION_CONTRACT.md",
       "code": "providers/code/rr_adapter.py; providers/code/dr_adapter.py",
       "result": "providers/code/CURRENT_IMPLEMENTATION_RECORD.json",
       "review": "providers/PROVIDER_REVIEW.md PASS_SCOPED_SCALAR_PROVIDERS",
-      "next": "source_publication_and_shared_archive_delivery"
+      "delivery": "delivery/FINAL_DELIVERY_ACK.json"
     },
     {
       "id": "source_publication_and_shared_archive_delivery",
-      "state": "PENDING",
+      "state": "COMPLETE_SCOPED",
       "requires": [
         "bootstrap",
         "thermal",
         "providers"
       ],
-      "scope": "One combined source/results archive may preserve all three subunits; C10 requires actual commit and provider receipts"
+      "scope": "One combined source/results archive may preserve all three subunits; C10 requires actual commit and provider receipts",
+      "delivery": "delivery/FINAL_DELIVERY_ACK.json"
     },
     {
       "id": "full_fresh83",
@@ -58,5 +59,6 @@
     "new_runs": 0,
     "budget_reset": false,
     "deadline_reset": false
-  }
+  },
+  "delivery": "delivery/FINAL_DELIVERY_ACK.json"
 }

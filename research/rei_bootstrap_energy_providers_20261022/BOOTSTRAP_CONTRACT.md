@@ -1,6 +1,6 @@
 # Bootstrap continuation contract
 
-Status: PASS_SCOPED_BOOTSTRAP_ORCHESTRATION. Runtime recovered; final C10 publication/delivery pending. See bootstrap/ for exact implementation and raw records. Historical interrupted contract is retained at evidence/recovery/history/BOOTSTRAP_CONTRACT.md.
+Status: PASS_SCOPED_BOOTSTRAP_ORCHESTRATION. Runtime recovered; final C10 COMPLETE_SCOPED through delivery/FINAL_DELIVERY_ACK.json. See bootstrap/ for exact implementation and raw records. Historical interrupted contract is retained at evidence/recovery/history/BOOTSTRAP_CONTRACT.md.
 
 This additive POSIX orchestration prepares an explicit separate empty workspace from frozen source/data/vendor/contracts; plans prerequisites; supports completed-no-work and stateful missing-only recovery; and derives summaries from retained raw artifacts. Definitions remain 79 nominal +3 controls +1 reference. No solver settings or physical definitions are changed. Actual execution in this task is deterministic fixture/change-only verification, not fresh83 or physical integration.
 
@@ -15,4 +15,4 @@ Cumulative reproduction bounds remain 90 attempts, 2400 CPU seconds, 900 wall se
 
 Prepare/plan/reuse-existing commands are in README.md. No fresh-reproduce or physical-IVP campaign is authorized by this documentation task. An orchestration PASS admits the scoped bootstrap implementation only; it does not constitute independent trajectory review or a fresh83 reproduction. Original83 review, figures and old backup evidence remain reused; NCP budget/deadline are unchanged.
 
-PASS leads to publication of reviewed source and one combined source/results archive, followed by actual provider delivery receipts. C10 is pending until those receipts exist. Full thermal/photon closure, CI/CX, DR energy moments and nuclear daughter injection remain separate dependencies.
+PASS led to source payload publication at 61e08967832363b611a8e5ba4167ba7b06c06b6b and shared archive Dropbox/Drive/Library acknowledgments with matching sizes. C10 is COMPLETE_SCOPED in delivery/FINAL_DELIVERY_ACK.json; local CRC/SHA were checked, new remote full GET was NOT_RUN. Full thermal/photon closure, CI/CX, DR energy moments and nuclear daughter injection remain separate dependencies.
