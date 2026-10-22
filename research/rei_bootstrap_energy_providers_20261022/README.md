@@ -1,9 +1,27 @@
-# REI bootstrap, energy closure and providers — interrupted continuation
+# REI bootstrap, scalar thermal ledger and through-Li providers
 
-Bootstrap implementation remains IN_PROGRESS / BLOCKED_RUNTIME_UNAVAILABLE. The current local filesystem is inaccessible; prior code is not declared lost or recovered. See RECOVERY_STATUS.json and BOOTSTRAP_CONTRACT.md.
+Runtime and local source access have recovered. The thermal supplied-moment ledger has independent PASS; restored conditional RR and new scalar DR evaluation have PASS_SCOPED_SCALAR_PROVIDERS. Bootstrap orchestration has PASS_SCOPED_BOOTSTRAP_ORCHESTRATION after its cumulative-budget repair and independent changed-path review. Publication and archive delivery remain pending (C10). See LOOP_PROGRESS.json for R1–R10 and C1–C10 separately for each unit.
 
-THERMAL_THEORY.md contains derived conditional gas/binding/radiation equations and single energy ownership. PROVIDER_REGISTRY.json classifies primary-source H/He/Li rates without unsupported extrapolation. ledger_checks.js has 29 actually executed V8 manufactured-arithmetic comparisons and an independent scoped read-only review. This code is a small arithmetic check, not a production kernel. To invoke in a JavaScript runtime, load the source and call runChecks(); historical Python/SciPy work is not reexecuted.
+The existing 83 trajectories, their review/plots/backups, historical 29 JavaScript comparisons, and unchanged historical RR receipt are reused. They were not rerun. Full fresh83 is NOT_RUN. No new NCP allocation, run, budget reset or deadline reset occurred. This unit does not complete a coupled thermal/radiation/isotope/nuclear solver or alter production defaults.
 
-The original83 integrations/review/plots/backup evidence remain reused. Original expected, recovered, and new bootstrap identities are separate. Full fresh83 reproduction and production admission remain NOT_RUN / HOLD. NCP allocation and deadline are unchanged.
+Current evidence:
 
-Git is the durable text/code checkpoint. A separate native Drive text copy preserves this checkpoint; Dropbox/source ZIP completion requires a filesystem-capable runtime. Neither this note nor those text copies constitute a source-inclusive restored bootstrap package.
+- Bootstrap: BOOTSTRAP_CONTRACT.md, bootstrap/BOOTSTRAP_REVIEW.json and budget-repair records. The 14-test suite covers the previous source; five affected tests cover the corrected source, with unchanged dependencies reused.
+- Thermal: thermal/THERMAL_DERIVATION.md, THERMAL_CODE_CONTRACT.md, THERMAL_SCALAR_RESULT.json and THERMAL_REVIEW.json. Nine test methods, 44 numerical checks, 12 invalid rejections and six discrimination controls; no physical IVP.
+- Providers: providers/PROVIDER_REVIEW.md and providers/code/CURRENT_IMPLEMENTATION_RECORD.json. RR historical evidence remains separately in IMPLEMENTATION_RECORD.json. DR has 27 direct Decimal comparisons and 771 representability cases; this validates fit evaluation, not physical fit accuracy.
+- Recovery: EXECUTION_INTAKE_20261022.json and evidence/recovery/. Prior task-root recovery claims remain in evidence/recovery/history/.
+
+Run from the repository root. These commands prepare/inspect sources or read the completed inventory; they do not launch fresh83:
+
+```bash
+TASK=research/rei_bootstrap_energy_providers_20261022
+SOURCE=research/rei_isotope_quotient_pilot_20261022
+WORKSPACE=/tmp/rei-bootstrap-source-only-20261022
+PYTHONDONTWRITEBYTECODE=1 python3 "$TASK/bootstrap/bootstrap.py" prepare --source "$SOURCE" --workspace "$WORKSPACE"
+PYTHONDONTWRITEBYTECODE=1 python3 "$TASK/bootstrap/bootstrap.py" plan --workspace "$WORKSPACE"
+PYTHONDONTWRITEBYTECODE=1 python3 "$TASK/bootstrap/bootstrap.py" reuse-existing --source "$SOURCE"
+```
+
+Choose a new or empty workspace. Preparation copies immutable source/data/vendor/contracts, not saved results. Plan is inspection. Resume/fresh-reproduce can launch computations and require a separate execution decision; they are not part of this closeout. Completed saved inventories take the no-work path. Partial artifacts without cumulative usage history must stop before launching work; stateful missing-only recovery retains prior budgets and failed artifacts. Bootstrap limits remain 90 attempts, 2400 CPU seconds, 900 wall seconds, at most four workers (current engine serial).
+
+The scientific source and saved results in the original isotope unit are unchanged; only three continuation metadata fields in its NEXT_DAG.json are updated. New source, raw execution logs and independent reviews remain distinct. A later combined archive will preserve the whole isotope unit (including saved83/results/summary), this task unit and AGENTS.md. Its delivery receipt will identify the actual payload commit, archive hash and provider IDs; no archive completion is inferred here.
