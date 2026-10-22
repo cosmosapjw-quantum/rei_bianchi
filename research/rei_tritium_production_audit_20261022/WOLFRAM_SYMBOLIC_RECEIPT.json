@@ -1,0 +1,24 @@
+{
+  "kind": "EXTERNAL_SYMBOLIC_CHECK",
+  "scope": "DD tracer and three nuclear stoichiometry channels; not full network validation",
+  "tool": "wolfram.wolframlanguageevaluator",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= <|\"constantSourceResidual\" -> 0, \"initialValue\" -> y0, \"zeroInitialPositiveDerivative\" -> s, \"DDpBaryonResidual\" -> 0, \"DDnBaryonResidual\" -> 0, \"He3nTProtonBaryonResidual\" -> 0, \"DDpChargeResidual\" -> 0, \"DDnChargeResidual\" -> 0|>"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "species_order_for_stoichiometry": [
+    "p",
+    "D",
+    "T",
+    "He3",
+    "He4",
+    "n"
+  ],
+  "evaluated_code": "Clear[s,lam,t,y0,u]; sol=y0 Exp[-lam t]+s (1-Exp[-lam t])/lam; <|\"constantSourceResidual\"->FullSimplify[D[sol,t]-(s-lam sol)],\"initialValue\"->Simplify[sol/.t->0],\"zeroInitialPositiveDerivative\"->Simplify[D[sol,t]/.{t->0,y0->0}],\"DDpBaryonResidual\"->{1,2,3,3,4,1}.{1,-2,1,0,0,0},\"DDnBaryonResidual\"->{1,2,3,3,4,1}.{0,-2,0,1,0,1},\"He3nTProtonBaryonResidual\"->{1,2,3,3,4,1}.{1,0,1,-1,0,-1},\"DDpChargeResidual\"->{1,1,1,2,2,0}.{1,-2,1,0,0,0},\"DDnChargeResidual\"->{1,1,1,2,2,0}.{0,-2,0,1,0,1}|>"
+}

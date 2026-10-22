@@ -1,0 +1,106 @@
+--- historical_before_budget_repair/bootstrap.py
++++ bootstrap.py
+@@ -213,8 +213,9 @@
+             raise ValueError('workers must be 1..4 (current serial executor uses one)')
+         self.workspace, self.ex = Path(workspace), executor
+         self.state_path = self.workspace / 'BOOTSTRAP_STATE.json'
++        self.had_state = self.state_path.exists()
+         self.started, self.cpu_started = time.monotonic(), time.process_time()
+-        self.state = read(self.state_path) if self.state_path.exists() else dict(
++        self.state = read(self.state_path) if self.had_state else dict(
+             schema='rei.bootstrap.state.v1', attempts=0, cpu_s=0., wall_s=0., events=[],
+             status='READY', active=None, limits=dict(attempts=90,cpu_s=2400,wall_s=900),
+             requested_max_workers=workers, actual_workers=1, ncp_allocation='UNCHANGED')
+@@ -271,16 +272,17 @@
+     def run(self):
+         if self.state['status'] in ('FAILED', 'RESOURCE_LIMIT', 'EXECUTOR_EXCEPTION_REQUIRES_DIAGNOSIS', 'INTERRUPTED_REQUIRES_DIAGNOSIS'):
+             raise RuntimeError('prior stop retained; inspect state/logs; no automatic retry')
+-        records = self.ex.receipts()
+-        if not self.state_path.exists():
+-            # Partial saved evidence consumes prior case allowance and measured CPU;
+-            # sum of case wall times is a conservative historical elapsed bound.
+-            self.state['attempts'] = len(records)
+-            self.state['cpu_s'] += sum(v['cpu_s'] for v in records)
+-            self.state['wall_s'] += sum(v['wall_s'] for v in records)
+         complete = self.ex.complete()
+         if complete:
+             return dict(complete, bootstrap_status='COMPLETE_NO_WORK', new_ivps=0)
++        if not self.had_state:
++            evidence = any(p.is_file() for directory in ('pilot/results', 'bootstrap_logs')
++                           for p in (self.workspace / directory).rglob('*'))
++            evidence = evidence or (self.workspace / 'pilot/summary.json').exists()
++            evidence = evidence or bool(self.ex.receipts())
++            evidence = evidence or any(self.ex.present(stage) for stage in ('checks', 'pair', 'reanalysis'))
++            if evidence:
++                raise RuntimeError('INPUT_BUDGET_UNKNOWN: incomplete legacy evidence has no cumulative bootstrap state; preserve and diagnose')
+         self.run_one('checks')
+         self.run_one('case', self.ex.cases[7])
+         self.run_one('case', self.ex.reference)
+--- historical_before_budget_repair/test_bootstrap.py
++++ test_bootstrap.py
+@@ -80,14 +80,64 @@
+ 
+     def test_partial_resume_only_missing_and_inherit_budget(self):
+         ex = FakeExecutor()
++        engine = b.Engine(self.ws,ex)
+         for stage, config in [('checks',None),('case',ex.cases[7]),('case',ex.reference),('pair',None),('reanalysis',None)]:
+-            ex.execute(stage,config,2400,900)
++            engine.run_one(stage,config)
++        prior = b.read(self.ws/'BOOTSTRAP_STATE.json')
+         ex.calls.clear()
+         result = b.Engine(self.ws,ex).run()
+         self.assertEqual(result['attempts_total'],83)
+         self.assertEqual(sum(s=='case' for s,_ in ex.calls),81)
+         self.assertFalse(any(s in ('checks','pair','reanalysis') for s,_ in ex.calls))
+         self.assertGreaterEqual(result['limits_consumed']['cpu_s'],83*ex.cost)
++        self.assertGreaterEqual(result['limits_consumed']['cpu_s'],prior['cpu_s'])
++        self.assertGreaterEqual(result['limits_consumed']['wall_s'],prior['wall_s'])
++
++    def test_legacy_partial_budget_unknown_no_launch_or_state(self):
++        ex = FakeExecutor()
++        ex.execute('case',ex.cases[7],2400,900)
++        ex.calls.clear()
++        with self.assertRaisesRegex(RuntimeError,'INPUT_BUDGET_UNKNOWN'):
++            b.Engine(self.ws,ex).run()
++        self.assertEqual(ex.calls,[])
++        self.assertFalse((self.ws/'BOOTSTRAP_STATE.json').exists())
++        marker = self.ws/'pilot/results/retained.json'
++        marker.parent.mkdir(parents=True)
++        marker.write_bytes(b'legacy receipt bytes')
++        before = {p.relative_to(self.ws):p.read_bytes() for p in self.ws.rglob('*') if p.is_file()}
++        for _ in range(2):
++            with self.assertRaisesRegex(RuntimeError,'INPUT_BUDGET_UNKNOWN'):
++                b.Engine(self.ws,ex).run()
++        self.assertEqual(ex.calls,[])
++        self.assertFalse((self.ws/'BOOTSTRAP_STATE.json').exists())
++        self.assertEqual(before,{p.relative_to(self.ws):p.read_bytes() for p in self.ws.rglob('*') if p.is_file()})
++
++    def test_legacy_prerequisite_or_log_budget_unknown(self):
++        for relative in ('pilot/results/point_checks_v2.json','bootstrap_logs/0001_checks.command.json',
++                         'bootstrap_logs/0001_checks.outcome.json','bootstrap_logs/0001_checks.stderr'):
++            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as tmp:
++                ws = Path(tmp)
++                marker = ws/relative
++                marker.parent.mkdir(parents=True)
++                marker.write_bytes(b'prior execution evidence')
++                ex = FakeExecutor()
++                with self.assertRaisesRegex(RuntimeError,'INPUT_BUDGET_UNKNOWN'):
++                    b.Engine(ws,ex).run()
++                self.assertEqual(ex.calls,[])
++                self.assertEqual(marker.read_bytes(),b'prior execution evidence')
++                self.assertFalse((ws/'BOOTSTRAP_STATE.json').exists())
++
++    def test_legacy_complete_no_work_no_state_write(self):
++        ex = FakeExecutor()
++        ex.saved.add(ex.key('summary',None))
++        marker = self.ws/'retained.txt'
++        marker.write_bytes(b'complete legacy inventory')
++        before = {p.relative_to(self.ws):p.read_bytes() for p in self.ws.rglob('*') if p.is_file()}
++        result = b.Engine(self.ws,ex).run()
++        self.assertEqual(result['bootstrap_status'],'COMPLETE_NO_WORK')
++        self.assertEqual(ex.calls,[])
++        self.assertFalse((self.ws/'BOOTSTRAP_STATE.json').exists())
++        self.assertEqual(before,{p.relative_to(self.ws):p.read_bytes() for p in self.ws.rglob('*') if p.is_file()})
+ 
+     def test_failure_is_retained_no_retry(self):
+         ex = FakeExecutor(fail=3)

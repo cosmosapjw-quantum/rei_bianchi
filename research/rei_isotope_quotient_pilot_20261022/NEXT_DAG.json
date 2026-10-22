@@ -1,0 +1,140 @@
+{
+  "schema": "rei.isotope_quotient.next_dag.v1",
+  "status": "FINITE_ATOMIC_EXECUTION_REVIEW_AND_PUBLICATION_COMPLETE",
+  "nodes": [
+    {
+      "id": "atomic_numerical_pilot",
+      "state": "COMPLETE_SCOPED_NUMERICAL",
+      "evidence": [
+        "pilot/summary.json",
+        "pilot/results/sweep_receipt.json",
+        "pilot/figures_final/PLOT_REPORT.json"
+      ],
+      "actual_ivps": 83,
+      "next": [
+        "final_independent_C9",
+        "stage_c_preservation"
+      ]
+    },
+    {
+      "id": "final_independent_C9",
+      "state": "COMPLETE_PASS_SCOPED_PRELIMINARY_ATOMIC_TEST_FLUID",
+      "decision": "PASS_SCOPED_PRELIMINARY_ATOMIC_TEST_FLUID",
+      "evidence": [
+        "review/INDEPENDENT_REVIEW.md",
+        "review/INDEPENDENT_DECISION.json"
+      ],
+      "requires": [
+        "atomic_numerical_pilot",
+        "data_backed_figures"
+      ],
+      "next": [
+        "publication_closeout",
+        "thermal_radiation_extension",
+        "nuclear_target_extension"
+      ]
+    },
+    {
+      "id": "data_backed_figures",
+      "state": "COMPLETE_SAVED_RAW_READBACK",
+      "evidence": [
+        "pilot/figures_final/PLOT_REPORT.json",
+        "pilot/figures_final/PLOT_SELECTION_MANIFEST.csv"
+      ],
+      "actual_ivps": 0
+    },
+    {
+      "id": "stage_c_preservation",
+      "state": "COMPLETE_GIT_AND_DUAL_PROVIDER_FULL_GET_VERIFIED",
+      "requires": [
+        "atomic_numerical_pilot",
+        "data_backed_figures",
+        "final_independent_C9"
+      ],
+      "next": [
+        "publication_closeout"
+      ],
+      "evidence": [
+        "delivery/STAGE_C_DELIVERY_ACK.json"
+      ]
+    },
+    {
+      "id": "publication_closeout",
+      "state": "COMPLETE_DRAFT_PR219_ADDITIVE_PAYLOAD_AND_ACK",
+      "requires": [
+        "final_independent_C9",
+        "stage_c_preservation"
+      ],
+      "scope": "Draft PR219 additive research unit; no automatic merge or production default change",
+      "evidence": [
+        "delivery/STAGE_C_DELIVERY_ACK.json"
+      ]
+    },
+    {
+      "id": "thermal_radiation_extension",
+      "state": "SCALAR_LEDGER_AND_PROVIDERS_COMPLETE_SCOPED_COUPLED_PENDING",
+      "requires": [
+        "source_backed_thermal_and_UV_radiation_equations",
+        "energy_moment_consistency"
+      ],
+      "scope": "Reviewed instantaneous scalar ledger and conditional RR/DR scalar providers; supplied moments only. Coupled thermal/radiation solver remains incomplete.",
+      "evidence": [
+        "../rei_bootstrap_energy_providers_20261022/thermal/THERMAL_REVIEW.json",
+        "../rei_bootstrap_energy_providers_20261022/providers/PROVIDER_REVIEW.md"
+      ],
+      "delivery": "../rei_bootstrap_energy_providers_20261022/delivery/FINAL_DELIVERY_ACK.json"
+    },
+    {
+      "id": "nuclear_target_extension",
+      "state": "CONDITIONAL_18_FAMILY_POSTPROCESS_COMPLETE_COUPLED_MODEL_REMAINS",
+      "requires": [
+        "rates_and_validity_for_16_nuclear_capture_decay_targets",
+        "daughter_charge_electron_and_energy_projection"
+      ],
+      "scope": "All16 dossier nuclear labels plus5 finite closure families evaluated in conditional all-bare passive mode; isotope/ion/energy-coupled production solver remains incomplete.",
+      "continuation": "../rei_tritium_production_audit_20261022/HANDOFF.json",
+      "evidence": [
+        "../rei_tritium_production_audit_20261022/review/NUCLEAR_NETWORK_DECISION.json"
+      ]
+    },
+    {
+      "id": "broader_repos_optimization",
+      "state": "SOURCE_ADOPTION_MAP_ONLY",
+      "evidence": [
+        "REPO_OPTIMIZATION_ADOPTION.json"
+      ],
+      "scope": "The current pilot implemented an additive rei_bianchi lane, not completion of optimization/physics in seven repositories"
+    },
+    {
+      "id": "clean_empty_bootstrap",
+      "state": "COMPLETE_SCOPED_ORCHESTRATION_AND_DELIVERY",
+      "requires": [
+        "explicit new execution contract and missing prerequisite evidence plan"
+      ],
+      "scope": "Source-only prepare, plan, completed-no-work and stateful missing-only orchestration; fixtures only, no fresh83",
+      "continuation": "../rei_bootstrap_energy_providers_20261022/BOOTSTRAP_CONTRACT.md",
+      "reason": "Independent PASS_SCOPED_BOOTSTRAP_ORCHESTRATION; five affected tests on corrected code PASS, previous 14-test suite reused for unchanged dependencies. Full fresh83 NOT_RUN.",
+      "evidence": [
+        "../rei_bootstrap_energy_providers_20261022/bootstrap/BOOTSTRAP_REVIEW.json",
+        "../rei_bootstrap_energy_providers_20261022/LOOP_PROGRESS.json"
+      ],
+      "delivery": "../rei_bootstrap_energy_providers_20261022/delivery/FINAL_DELIVERY_ACK.json"
+    }
+  ],
+  "nonclaims": [
+    "No full19-reaction nuclear network or production model",
+    "No independent gas-temperature or kinetic UV/radiation evolution",
+    "No isotope-resolved electronic spectroscopy",
+    "No observational reionization inference or global speedup theorem",
+    "No repeat of historical IVPs or reset of older NCP budgets"
+  ],
+  "continuation": "../rei_tritium_production_audit_20261022/HANDOFF.json",
+  "active_additive_work": {
+    "unit": "../rei_bootstrap_energy_providers_20261022",
+    "state": "COMPLETE_SCOPED",
+    "old83_reexecution": 0,
+    "progress": "../rei_bootstrap_energy_providers_20261022/LOOP_PROGRESS.json",
+    "C10": "COMPLETE_SCOPED_SHARED_DELIVERY",
+    "delivery": "../rei_bootstrap_energy_providers_20261022/delivery/FINAL_DELIVERY_ACK.json"
+  }
+}

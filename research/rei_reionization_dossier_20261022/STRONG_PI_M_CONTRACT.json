@@ -1,0 +1,234 @@
+{
+  "schema_version": "1.0",
+  "status": "FROZEN_FOR_IMPLEMENTATION",
+  "unit": "rei_reionization_dossier_20261022",
+  "extension_id": "strong_pi_m_semirelativistic",
+  "question": "Does the previously unresolved matter-stress atomic response remain unresolved when initial physical Pi_m is substantially larger in a physically admissible matched family?",
+  "scope": "New matched semi-relativistic nonbaryonic collisionless component. Not a pure continuation of the original cold-component experiment. No observational cosmology admission.",
+  "source_identity": {
+    "research/rei_isotope_quotient_pilot_20261022/pilot/code/compact_transport.py": "0fa826025836a0126fac580de98e3b45c9dcc750e1e243afe933c249ae8e4b6c",
+    "research/rei_isotope_quotient_pilot_20261022/pilot/code/run.py": "2b3332936a3e9012d435876206b0fb006fcbeb7da9ee61d6f4b3299754831513",
+    "research/rei_isotope_quotient_pilot_20261022/pilot/code/atomic_quotient.py": "65fe94ac21dae77edced4be4798ac66ced8358a47a49a88c14cef37429cedffe",
+    "research/rei_isotope_quotient_pilot_20261022/pilot/vendor/canonical_fv.py": "91c1641b851aa9580141d4423e2579ced5f11b95aa716b3fc2cb0137df344cc5",
+    "research/rei_isotope_quotient_pilot_20261022/pilot/vendor/prepared_moments.py": "ee552a09c9b10e72f82105f071af7c6f9ccfaae64407932b0844f70b1e4328ed",
+    "research/rei_isotope_quotient_pilot_20261022/pilot/vendor/REI_BACKGROUND_FAMILY_LOCK.json": "46f818c2f9de890c72f71fa3cc70366b28c42ca0d65190bd905b6310023e7af0"
+  },
+  "old_family_bound": {
+    "mass_fraction": 0.1,
+    "mass_over_Tref": 30.0,
+    "angular_distribution": "W(mu)=1+A_m P2(mu)",
+    "admissible_A_m": [
+      -1,
+      2
+    ],
+    "w0": 0.004680992559898818,
+    "P_m0_per_A_m": 0.000683609293237126,
+    "max_positive_Pi_m0": 0.001367218586474252,
+    "max_negative_orientation_Pi_m0": 0.000683609293237126,
+    "previous_largest_tested_positive_Pi_m0": 0.0010937748691794015,
+    "bound_scope": "Exact angular-family positivity bound at Sigma0=0 for the admitted discrete quadrature, not a universal bound on arbitrary matter distributions."
+  },
+  "family": {
+    "mass_fraction": 0.3,
+    "mass_over_Tref": 3.0,
+    "Sigma_F0": 0.0,
+    "signed_Sigma0": 0.0,
+    "Pi_r0": 0.0,
+    "P_r0": 0.0,
+    "orientation": "P_m0>=0",
+    "angular_distribution": "Same frozen positive canonical FV f(q,mu) proportional to [exp(q)+1]^-1*(1+A_m P2(mu)); reflection even, zero bulk velocity.",
+    "momentum_scale": "Tref denotes the nonbaryonic momentum scale, not the prescribed gas temperature.",
+    "w0_nominal": 0.17484002513850347,
+    "energy_weighted_speed_squared_over_c_squared": 0.5245200754155104,
+    "P_m0_per_A_m_nominal": 0.07660059131801567,
+    "positivity_max_Pi_m0_nominal": 0.15320118263603133,
+    "A_m_targets_approx": [
+      0,
+      0.13054729510486304,
+      0.6527364755243152,
+      1.3054729510486305
+    ],
+    "target_Pi_m0": [
+      0,
+      0.01,
+      0.05,
+      0.1
+    ],
+    "same_initial_across_family": [
+      "total energy density",
+      "massive-component energy density",
+      "massive-component isotropic pressure",
+      "massive particle number normalization",
+      "dust and baryon density",
+      "Hubble rate",
+      "radiation isotropic energy/number",
+      "gas temperature and atomic fractions",
+      "UV/source prescription"
+    ],
+    "same_prescribed_histories": [
+      "baryon density versus z",
+      "gas temperature versus z",
+      "external UV versus z",
+      "atomic source coefficients"
+    ],
+    "dynamically_different": [
+      "H(z)",
+      "elapsed time(z)",
+      "massive energy and isotropic pressure after initial time",
+      "shear and stress histories",
+      "atomic fractions"
+    ],
+    "cross_family_change": "m/Tref and massive fraction differ from the cold family; initial massive pressure and composition are therefore different across families. Compare each strong case to its new matched zero anchor."
+  },
+  "discrete_matching": {
+    "rho0": "CanonicalMomentumFV reference_energy_norm is the same quadrature sum of packet energies: rho(0,0)=1 to binary64 reduction error for every A.",
+    "pressure_identity": "At eta=b=0, pbar is independent of A and pi_s=A*pbar/5. Positive Gauss angular quadrature integrates the needed polynomials exactly to rounding; verify actual discrete values.",
+    "mapping": "P_m0 = [KAPPA_T*sqrt(6)*rho_crit*(Omega_m*f_m/a_ref^3)/H_init^2]*pi_s. Determine coefficient with actual chosen quadrature, then A=target/coefficient; verify actual diagnostics. Do not call old amplitudes_to_axes, which hardcodes fm=.1 and mass30.",
+    "fine_mapping": "Recompute coefficient for the control quadrature so realized target Pi=.1 matches; report tiny changed A and initial pbar quadrature discrepancy.",
+    "number_note": "Reflection symmetry gives zero mean velocity even though the velocity dispersion is large."
+  },
+  "cases": [
+    {
+      "case": "strongPiM_m3_f0.3_Pi0_L16",
+      "Pi_m0": 0.0,
+      "role": "matched_zero_anchor"
+    },
+    {
+      "case": "strongPiM_m3_f0.3_Pi0.01_L16",
+      "Pi_m0": 0.01,
+      "role": "strong_1"
+    },
+    {
+      "case": "strongPiM_m3_f0.3_Pi0.05_L16",
+      "Pi_m0": 0.05,
+      "role": "strong_2"
+    },
+    {
+      "case": "strongPiM_m3_f0.3_Pi0.1_L16",
+      "Pi_m0": 0.1,
+      "role": "strong_3"
+    },
+    {
+      "case": "strongPiM_m3_f0.3_Pi0.1_L24_control",
+      "Pi_m0": 0.1,
+      "role": "strongest_matched_control",
+      "override": {
+        "ellmax": 24,
+        "radial_cells": 48,
+        "angular_cells": 24,
+        "gauss_order": 4,
+        "rtol": 2e-10,
+        "atol": 2e-13,
+        "max_step": 0.02
+      }
+    }
+  ],
+  "numerics": {
+    "method": "Radau",
+    "ellmax": 16,
+    "radial_cells": 24,
+    "angular_cells": 12,
+    "gauss_order": 3,
+    "rtol": 2e-09,
+    "atol": 2e-12,
+    "max_step": 0.04,
+    "samples": 257,
+    "x_interval": [
+      0,
+      1.9459101490553132
+    ],
+    "z_interval": [
+      20,
+      2
+    ],
+    "max_new_background_ivps": 5,
+    "additional_cpu_seconds_cap": 180,
+    "per_case_wall_seconds_cap": 120,
+    "old_cases_rerun": 0,
+    "no_cloud_compute": true,
+    "nuclear_postprocess": "Only the four new nominal histories; existing admitted rates and instant-thermalization passive closure. Control may omit nuclear postprocessing because target is atomic/geometry convergence.",
+    "budget_policy": "Count actual CPU for all new runs and any failed attempts; no automatic extra IVP or parameter search if a gate fails."
+  },
+  "adapter": {
+    "location": "strong_pi_m.py in this new unit; preserve old code/results",
+    "implementation": "Small explicit configurable Coupled adapter initializing CompactTransport with target physical pm, pr=0, sigma=0, mass_fraction=.3, mass_over_Tref=3 and selected quadrature; reuse existing Coupled RHS/Jacobian/diagnostics and AtomicQuotient unchanged. Use distinct case IDs and include physical/model parameters in receipts.",
+    "mandatory_metadata": [
+      "mass_fraction",
+      "mass_over_Tref",
+      "A_m",
+      "target_Pi_m0",
+      "actual_Pi_m0",
+      "rho0",
+      "pbar0",
+      "P_parallel0",
+      "P_perp0",
+      "reference_energy_norm",
+      "particle_number0",
+      "source_hashes",
+      "adapter_hash",
+      "quadrature",
+      "solver_settings",
+      "CPU_seconds"
+    ],
+    "point_parity": "Before new IVPs, verify adapter default cold parameters reproduce old Coupled geometry/RHS at initial state and two finite physical sample states without integration; relative/absolute scaled discrepancy<=1e-11."
+  },
+  "acceptance": {
+    "initial_fixed_zero_axes_absolute": 1e-14,
+    "actual_Pi_target_absolute": 1e-12,
+    "nominal_family_rho_pbar_number_relative": 2e-12,
+    "nominal_family_H_relative": 2e-12,
+    "angular_amplitude_range": [
+      -1,
+      2
+    ],
+    "minimum_continuous_W": "min(1+A,1-A/2)>=0; actual targets remain strictly positive",
+    "canonical_cells_minimum": 0,
+    "full_history": "Apply inherited finite, endpoint, isotope sum, number drift and angular brightness gates unchanged; positivity is not checked by arbitrary amplitude alone.",
+    "quadrature_pressure_relative_nominal_control_max": 1e-07,
+    "no_claim_from_gate_failure": true,
+    "control_absolute_fraction_max_for_numerical_agreement": 1e-07,
+    "control_relative_H_and_elapsed_time_max": 1e-07,
+    "control_absolute_signed_Sigma_and_P_m_max": 1e-07,
+    "control_failure_action": "Preserve raw result, report observed failure and scope; no automatic sixth run. Small unresolved effect is a valid scientific outcome, not a computational failure."
+  },
+  "observables": {
+    "primary": "max over common-z grid of abs(f_case-f_hot_zero) for each9 conditional channel and allchannels; report maxima and redshifts, endpoint shifts, electron per baryon shift, tau difference",
+    "context": [
+      "actual signed P_m and Pi_m",
+      "Sigma",
+      "P_r",
+      "H/H_hot_zero-1",
+      "elapsed time",
+      "massive pbar and energy",
+      "photon/neutrino stress separately"
+    ],
+    "nuclear": "all8total nuclei plus21charge entries using earlier plot semantics; T charge unresolved",
+    "comparison": "All strong-family deltas use new hot zero anchor. Cold-versus-hot zero difference is separately labelled composition/pressure change, not Pi_m effect."
+  },
+  "resolution_rule": {
+    "control_metric": "e_f=max_z,q abs(f_Pi.1_L16-f_Pi.1_L24_control); preserve per-channel errors too. This is observed sensitivity to combined discretization/tolerance changes, not a rigorous error bound.",
+    "reference_scale": "e_ref=max(e_f,3.3929270504273745e-9) where latter is observed inherited control discrepancy; state its different-family provenance.",
+    "classification": "For each strong case report raw amplitude/e_ref. If amplitude>=10*e_ref, describe a response separated from the observed control discrepancy in this conditional family; if amplitude<e_ref, unresolved at observed accuracy; otherwise numerically marginal. No statistical confidence or universal theorem.",
+    "strongest_control_effect": "Also compute f_Pi.1_control-f_hot_zero and check the leading effect sign/profile agrees at the peak within the observed discrepancy.",
+    "if_all_unresolved": "Document that tested strong Pi up to.1 remains unresolved within this specified family and accuracy; do not generalize to all matter models."
+  },
+  "figures": {
+    "nominal_case_count": 4,
+    "required": [
+      "strong_pi_m_totals_redshift",
+      "strong_pi_m_totals_elapsed_time",
+      "strong_pi_m_ions_redshift",
+      "strong_pi_m_ions_elapsed_time",
+      "strong_pi_m_ionic_difference_redshift",
+      "strong_pi_m_stress_redshift",
+      "strong_pi_m_control_comparison"
+    ],
+    "formats": [
+      "png",
+      "pdf"
+    ],
+    "reuse_plot_semantics": "PHYSICS_PLOT_CONTRACT.json; retain all earlier28figures and cold-family labels",
+    "required_dossier_update": "Replace universal interpretation of unresolved Pi_m by a cold-family finding plus the new tested strong-family result and its physical limits."
+  },
+  "stopping_rule": "Five IVPs maximum, four nominal-case-only nuclear postprocesses, seven figure pairs and one independent scientific review with at most a targeted non-IVP repair. Additional runs require a new explicit decision, not silent scope expansion."
+}

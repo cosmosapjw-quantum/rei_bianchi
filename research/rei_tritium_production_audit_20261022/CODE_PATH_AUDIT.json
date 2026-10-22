@@ -1,0 +1,50 @@
+{
+  "scope": "Read-only mechanical audit of inherited atomic quotient and saved trajectories; no nuclear-rate admission",
+  "inherited_root": "research/rei_isotope_quotient_pilot_20261022/pilot",
+  "source_identity": {
+    "code/atomic_quotient.py_sha256_current": "65fe94ac21dae77edced4be4798ac66ced8358a47a49a88c14cef37429cedffe",
+    "code/run.py_sha256_current": "2b3332936a3e9012d435876206b0fb006fcbeb7da9ee61d6f4b3299754831513",
+    "pinned_PR219_head": "215d5c33a9a6fc9940ead91c29128f2c6f20b5b2",
+    "note": "The current atomic source has a documented old-receipt exception for two retained profile cases in run.py:226-240. New work must read, not rewrite, inherited raw results. These hashes identify current source bytes only; no trajectory corpus rehash was performed."
+  },
+  "code_paths": [
+    {"path": "code/atomic_quotient.py", "lines": "13-27", "finding": "T is a declared isotope with two census charge names but abundance() initializes its elemental yield to exactly zero; D has 2.5e-5 before baryon normalization."},
+    {"path": "code/atomic_quotient.py", "lines": "38-45", "finding": "The integrated chemistry is nine shared conditional H/He/Li fractions; W excludes T and n. The nine initial fractions have no isotope inventory variable."},
+    {"path": "code/atomic_quotient.py", "lines": "119-150", "finding": "matrices()/point() contain atomic photoionization/recombination only. lift() inserts literal zeros for both n and T at every sample; other isotope charge censuses are fixed yield times shared conditional fractions."},
+    {"path": "code/atomic_quotient.py", "lines": "152-176", "finding": "Reference mode duplicates H1/D, He3/He4, Li6/Li7 charge fractions only; no n or T component."},
+    {"path": "code/run.py", "lines": "52-95", "finding": "Coupled initializes transport plus 9 or 18 conditional fractions and optical depth. RHS contains no D(D,p)T or T decay source."},
+    {"path": "code/run.py", "lines": "127-163", "finding": "Diagnostics save cosmological H, nB, elapsed time, and prescribed T. Isotopic census does not feed nuclear energy/electron feedback."},
+    {"path": "code/run.py", "lines": "389-444", "finding": "257 samples of integrated state, conditional fractions, lifted census, and diagnostics are saved to per-case NPZ; old census T columns inherit lift() literal zeros."},
+    {"path": "intake/NUCLEAR19_APPLICABILITY.md", "lines": "22-35", "finding": "Channel 14 D(D,p)T is listed but unimplemented, with initial-T-zero specifically not proving no production. Identical D reactants require the 1/2 event factor, and rate/charge mapping/decay need separate physical decisions."}
+  ],
+  "saved_inventory": {
+    "npz_count": 83,
+    "quotient_trajectories": 82,
+    "reference_trajectories": 1,
+    "all_schema_shapes_agree": true,
+    "all_relevant_arrays_finite": true,
+    "all_T_0_and_T_1_exact_zero": true,
+    "x_range": [0.0, 1.9459101490553132],
+    "H_per_s_range": [6.622173843739769e-18, 1.2206975634162752e-16],
+    "nB_m3_range": [6.841278420868707, 2346.5584983579656],
+    "T_K_range": [100.000020405421, 9998.507967455207],
+    "D_0_range": [9.496157821947681e-10, 1.887008766493072e-05],
+    "D_1_range": [3.772304052129417e-09, 1.887291035320063e-05],
+    "elapsed_s_range": [0.0, 9.759559903025003e+16],
+    "npz_members": {"x": [257], "z": [257], "state": [257, 49], "conditional": [257, 9], "census": [257, 21], "census_names": [21], "abundances": "object array", "diagnostics": [257, 37], "diagnostic_names": [37]},
+    "required_census_names": ["D_0", "D_1", "T_0", "T_1"],
+    "required_diagnostic_names": ["H_per_s", "nB_m3", "T_K", "elapsed_s"],
+    "avoid_pickle": "The abundances member is object dtype. Schema checks and postprocessing can read all required arrays using np.load(..., allow_pickle=False), without reading abundances."
+  },
+  "offline_tracer_feasibility": {
+    "inputs": "At each sample n_D[cm^-3] = (nB_m3/1e6)*(census[D_0]+census[D_1]); T_K, H_per_s, elapsed_s and x are directly available. D_0 and D_1 remain available if the physical contract chooses charge-specific branching.",
+    "event_source": "The frozen conditional bare-ion model uses D_1 only: in SI s_DDp=0.5*nB_m3*(census[D_1])^2*k_DDp, with k in m^3/s. An all-D same-kernel comparator substitutes D_0+D_1; it does not bound neutral or screened physical channels. The source per x is s/H.",
+    "limits": "An offline tracer follows frozen atomic/cosmological trajectories and cannot claim self-consistent depletion, daughter-ion feedback, nuclear heat, or a full 19-channel network. Decay, rate validity, ionic product mapping, and numerical interpolation must follow the separately frozen physical contract."
+  },
+  "reproducible_inspection": [
+    "sha256sum research/rei_isotope_quotient_pilot_20261022/pilot/code/{atomic_quotient.py,run.py}",
+    "rg -n 'def abundance|def lift|def matrices|def point|def rhs|def run_case|np.savez_compressed' research/rei_isotope_quotient_pilot_20261022/pilot/code/{atomic_quotient.py,run.py}",
+    "Use numpy.load(path, allow_pickle=False) on all results/*.npz, check listed shapes/keys, finite input columns, and count_nonzero(census[:,T_0/T_1]) == 0; omit the object-valued abundances member."
+  ],
+  "conclusion": "Old T=0 is structurally enforced by absent initial inventory and absent source/decay dynamics, then literal-zero census lift. It is not a prediction that D(D,p)T is physically zero."
+}

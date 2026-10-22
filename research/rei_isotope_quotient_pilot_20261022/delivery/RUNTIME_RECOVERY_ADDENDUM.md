@@ -1,0 +1,14 @@
+# Runtime source recovery addendum
+
+The Stage C results and final independent decision remain the admitted 83-IVP atomic test-fluid pilot. The exact final `run.py` and `PHYSICS_CONTRACT.md` bytes named by `SOURCE_MANIFEST.json` were not recovered from the available archives. This is a source-provenance and packaging gap, not a new scientific failure or a claim that the raw trajectories were rerun. The historical manifest remains unchanged.
+
+| Source | Historical final expected SHA256 / bytes | Restored or recovered distributed SHA256 / bytes |
+| --- | --- | --- |
+| `pilot/code/run.py` | `1d1cad1484b113ea767eb07bc1dc617c994e551f8c05f4606081686753d82586` / 33503 | `2b3332936a3e9012d435876206b0fb006fcbeb7da9ee61d6f4b3299754831513` / 30465 |
+| `PHYSICS_CONTRACT.md` | `d7e3dcc79d815021927bd5308e1c87c3f5d1d7f4efe415c24717fce6d2fcd1d1` / 11457 | `a9278ed456566cdcde0c29ad9158d4bf7bf5ce5dd8dcaefa780fe18a3eeb1b0e` / 11464 |
+
+The inherited contract remains byte-identical to its historical SHA256 `dd3950150be8718d1bb60eed4f1ba3f4cd7447b377adc92476abf28ba8369dee`. The atomic quotient, compact transport, and pinned data identities are recorded in `RUNTIME_RECOVERY_CURRENT_MANIFEST.json`. The unknown seven-byte difference in the restored physics contract was not guessed or edited. The new runner hash is a **recovery identity**, not the original execution identity.
+
+The repair restores the documented `all` action and checks exact saved coverage before returning a completed result. It validates 79 nominal and three L24 quotient cases, the one retained full18 isotropic reference, point/profile receipts, all three named controls, and the saved strict summary. The historical reference's older atomic-source hash is accepted only with its exact `profile_existing_reanalysis.json` PASS and NPZ SHA binding. On this completed tree, `all` and `summarize` return `COMPLETE_NO_WORK` with no writes or IVPs; a no-pending stage preserves its historical receipt. A future incomplete copy can schedule only missing quotient cases within the existing caps, but a missing retained full18 reference is never rerun automatically. The basic `audit-existing` action was not expanded. Frozen physics source, solver, tolerance, closure, point checks, raw results, and final figures were unchanged by this recovery.
+
+`RUNTIME_RECOVERY_VERIFICATION.json` records one bounded dependency check: CLI/compile, frozen AST comparison against the Stage B archived runner, all/summarize/stage no-work routes under IVP and worker traps, and missing-case/failed-control rejection. It also records before/after hashes of frozen evidence. The final scientific admission remains the durable `review/INDEPENDENT_REVIEW.md` decision, **PASS_SCOPED_PRELIMINARY_ATOMIC_TEST_FLUID**; no production or broader physical admission follows from this packaging repair.

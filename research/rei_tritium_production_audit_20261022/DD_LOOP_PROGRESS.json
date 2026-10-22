@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "task": "coding",
+  "unit_id": "rei_tritium_production_audit_20261022/DD_passive_tracer",
+  "status": "C10_COMPLETE_PUBLISHED_GIT_DUAL_PROVIDER_FULL_GET_VERIFIED",
+  "scope": "Original exact-zero T code-path audit and conditional passive bare-ion DDp/DDn tracer over 82 immutable quotient histories; the later all-nuclear extension is a separate unit.",
+  "base_head_supplied": "215d5c33a9a6fc9940ead91c29128f2c6f20b5b2",
+  "base_git_observation": "The available rei_bianchi directory had no .git metadata; this agent did not observe that commit locally. Current inherited atomic_quotient.py and run.py SHA256 values are recorded in CODE_PATH_AUDIT.json.",
+  "agent_identity": {
+    "requested": "Sol coding executor, as delegated by root",
+    "observed_runtime_model": null,
+    "observation_note": "No reliable runtime model identity was exposed to this worker; requested routing is not execution-identity evidence."
+  },
+  "environment": {
+    "cwd": "/workspace/scratch/56fd3625e428/rei_bianchi",
+    "platform": "cloud workspace Linux",
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "matplotlib": "3.10.8",
+    "version_observation": "Read-only package-version inspection after execution; no environment snapshot was captured inside the one-shot run."
+  },
+  "stages": [
+    {
+      "id": "C1",
+      "status": "complete",
+      "evidence": [
+        "PHYSICS_CONTRACT.md",
+        "PHYSICS_CONTRACT.json",
+        "CODE_PATH_AUDIT.json"
+      ],
+      "note": "Pinned task identity, 82 quotient inputs, total-T/source observables and finite R9/R10 criteria."
+    },
+    {
+      "id": "C2",
+      "status": "complete",
+      "evidence": [
+        "CODE_PATH_AUDIT.json",
+        "CODE_PATH_AUDIT.md"
+      ],
+      "note": "Traced zero T initialization/lift and missing DD source/decay to exact old source paths; inspected saved NPZ fields and all 83 original censuses read-only."
+    },
+    {
+      "id": "C3",
+      "status": "complete",
+      "evidence": [
+        "PHYSICS_CONTRACT.md",
+        "postprocess.py"
+      ],
+      "note": "SI constant-S Maxwell integral in shifted log domain; identical-reactant source; logsumexp exact endpoint convolution for linearly interpolated source in proper time."
+    },
+    {
+      "id": "C4",
+      "status": "complete",
+      "evidence": [
+        "PHYSICS_CONTRACT.json",
+        "DD_LOOP_PROGRESS.json"
+      ],
+      "note": "One nominal 82-history postprocessing sweep, one 2x source-grid reconstruction, optional 4x only above 0.02 dex; no background IVP."
+    },
+    {
+      "id": "C5",
+      "status": "complete",
+      "evidence": [
+        "postprocess.py",
+        "render_tracer.py",
+        "TRACER_HISTORIES.npz",
+        "TRACER_REPORT.json"
+      ],
+      "note": "Implemented, ran and serialized all 82 case histories and conditional diagnostics; two figures rendered."
+    },
+    {
+      "id": "C6",
+      "status": "complete",
+      "evidence": [
+        "TRACER_REPORT.json",
+        "01_DD_source.png",
+        "02_births_vs_survival.png"
+      ],
+      "note": "Compilation/JSON parsing succeeded, targeted controls and the one-shot sweep exited zero, and both plots were visually inspected."
+    },
+    {
+      "id": "C7",
+      "status": "complete_scoped_internal",
+      "evidence": [
+        "TRACER_REPORT.json",
+        "TRACER_REPORT.md",
+        "PHYSICS_CONTRACT.md"
+      ],
+      "note": "Checked structural-zero versus positive modeled source, DD A/Z stoichiometry, identical-reactant 1/2, SI S conversion, channel S ratio, surviving inventory <= births and negligible passive depletion. Independent scientific review remains C9."
+    },
+    {
+      "id": "C8",
+      "status": "complete_scoped",
+      "evidence": [
+        "TRACER_REPORT.json",
+        "TRACER_HISTORIES.npz",
+        "postprocess.py"
+      ],
+      "note": "Quadrature tightening at 100/1000/10000 K, analytic constant-source convolution control and 1x-to-2x reconstructed-grid comparison passed frozen limits. No 4x sweep triggered."
+    },
+    {
+      "id": "C9",
+      "status": "PASS_SCOPED",
+      "evidence": [
+        "review/TRITIUM_DD_DECISION.json",
+        "review/TRITIUM_DD_DECISION.md"
+      ],
+      "note": "Fresh independent reviewer completed bounded read-only checks; zero findings and no repair."
+    },
+    {
+      "id": "C10",
+      "status": "complete",
+      "evidence": [
+        "delivery/DD_CHECKPOINT_DELIVERY_ACK.json",
+        "delivery/FINAL_DELIVERY_ACK.json"
+      ],
+      "note": "Scoped DD independently admitted and published in the intermediate checkpoint and standalone final archive; exact Git payload and dual remote full-GET SHA256/CRC receipts are in FINAL_DELIVERY_ACK.json. Earlier interim Git blob truncation repaired in final payload, without change to scientific results or provider ZIP."
+    }
+  ],
+  "executions": [
+    {
+      "id": "targeted_controls",
+      "command": "python - <<'PY'\nimport sys\nsys.path.insert(0,'research/rei_tritium_production_audit_20261022')\nimport postprocess as p\n_,lt,ln=p.load_decay()\nprint('lambdaT',lt,'lambdaN',ln)\nprint(p.controls(lt))\nPY",
+      "status": "completed",
+      "exit_code": 0,
+      "evidence": "Observed lambdaT=1.784030041121361e-09 s^-1, lambdaN=0.001138433515482696 s^-1; constant-source relative error=2.884978206567459e-14; quadrature log differences printed as 0.0 at 100/1000/10000 K.",
+      "timing": "Tool reported 0.625934455 s wall for the controls command."
+    },
+    {
+      "id": "nominal_and_refinement",
+      "command": "python research/rei_tritium_production_audit_20261022/postprocess.py --run > research/rei_tritium_production_audit_20261022/EXECUTION_STDOUT.json",
+      "status": "completed",
+      "exit_code": 0,
+      "evidence": [
+        "TRACER_REPORT.json",
+        "TRACER_HISTORIES.npz",
+        "EXECUTION_STDOUT.json"
+      ],
+      "timing": "No process-level wall/CPU timer was recorded. The interactive command yielded after 1.001159796 s, then returned after polls of 30.000359688 s and 1.486737287 s; these are tool waits, not a measured compute runtime.",
+      "limits_used": {
+        "nominal_sweeps": 1,
+        "refinement_2x_sweeps": 1,
+        "refinement_4x_sweeps": 0,
+        "new_background_ivps": 0
+      }
+    },
+    {
+      "id": "figure_render",
+      "command": "python research/rei_tritium_production_audit_20261022/render_tracer.py",
+      "status": "completed",
+      "exit_code": 0,
+      "evidence": [
+        "01_DD_source.png",
+        "02_births_vs_survival.png"
+      ],
+      "timing": "Tool reported 1.094143885 s wall."
+    },
+    {
+      "id": "visual_inspection",
+      "command": "view_image on 02_births_vs_survival.png and 01_DD_source.png",
+      "status": "completed",
+      "exit_code": null,
+      "evidence": "Both figures displayed with legible axes, units, legends, and log-scale curves; no modification followed.",
+      "timing": "No aggregate visual-inspection duration recorded."
+    }
+  ],
+  "observed_results": {
+    "quotient_history_count": 82,
+    "old_reference_history_count_inspected": 1,
+    "old_T_census_exact_zero_all": true,
+    "positive_DII_and_positive_log_sources_all_quotient_samples": true,
+    "max_endpoint_DDp_births_per_baryon": 3.961270205990423e-96,
+    "max_endpoint_surviving_direct_T_per_baryon": 1.3937512483261945e-104,
+    "max_passive_D_depletion": 8.411777958529177e-91,
+    "max_1x_to_2x_cumulative_birth_difference_dex": 1.7435069540536664e-05,
+    "new_background_ivps": 0,
+    "nominal_postprocessing_sweeps": 1,
+    "refinement_2x_sweeps": 1,
+    "refinement_4x_sweeps": 0
+  },
+  "artifact_identity_observed_after_run": {
+    "postprocess.py_sha256": "10c23608d87db5fb4a0fc9b5f68df591890505619531bd84c9ec0e1e890c602e",
+    "TRACER_REPORT.json_sha256": "534a87fae77dde46586c99c11148304d88baf85365c0baecdde853345911fb94",
+    "TRACER_HISTORIES.npz_sha256": "f0147f864970faa805252c8d329159b466ef853f733028b938eed1ce1ab163a8"
+  },
+  "claim_boundary": "Conditional passive bare-ion constant-S Maxwellian tracer only. Source inputs are not validated at 100-10000 K; no nuclear-network closure, 99% confidence, energetic-particle transport, charge-state prediction, coupled feedback or production-default adoption is claimed.",
+  "next_action": "DD C10 is complete. New reionization dossier/plot request proceeds as a separate additive unit."
+}

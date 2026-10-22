@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.0",
+  "status": "FROZEN_DISPLAY_ONLY",
+  "parent_contracts": [
+    "PHYSICS_PLOT_CONTRACT.json",
+    "STRONG_PI_M_CONTRACT.json"
+  ],
+  "scope": {
+    "base_designs": 28,
+    "strong_designs": 7,
+    "total_designs": 35,
+    "formats": [
+      "png",
+      "pdf"
+    ],
+    "archived_reference_designs": 18,
+    "preserve_archived_reference_figures": true,
+    "new_ivps": 0,
+    "new_physics_postprocessing": 0,
+    "source": "Already saved257sample atomic/nuclear trajectories only"
+  },
+  "reference_cases": {
+    "sigma": "quotient_L16_S0_Am0_Ar0",
+    "pi_r": "quotient_L16_S0_Am0_Ar0",
+    "pi_m": "quotient_L16_S0_Am0_Ar0",
+    "stress_orientation_cancellation": "quotient_L16_S0_Am0_Ar0",
+    "shear_orientation": "quotient_L16_S0_Am0_Ar0",
+    "strong_pi_m": "strongPiM_m3_f0.3_Pi0_L16",
+    "strong_pi_m_control_comparison": "strongPiM_m3_f0.3_Pi0_L16"
+  },
+  "x_axes": {
+    "primary_scaling": "linear",
+    "reason": "Elapsed time includes0 and z spans2..20; logarithmic x is not needed for these saved grids.",
+    "time_unit": "Myr = 1e6 * 365.25 *86400seconds",
+    "redshift_panels": {
+      "bottom": "Redshift z, decreasing20to2 left-to-right",
+      "top": "Elapsed time [Myr], reference clock",
+      "curve_coordinates": "Each curve retains its own saved z values.",
+      "top_mapping": "Use the group reference case monotonic saved z versus elapsed_s; place reference-time ticks at interpolated reference z. Reference times increase left-to-right."
+    },
+    "time_panels": {
+      "bottom": "Elapsed proper time since z=20 [Myr]",
+      "top": "Redshift z, reference clock",
+      "curve_coordinates": "Each curve uses ITS OWN saved elapsed_s converted to Myr.",
+      "top_mapping": "For readable reference-z ticks within saved reference support, interpolate their times on reference history and place them on the bottom time axis. No top ticks beyond reference time support."
+    },
+    "reference_label": "Every figure must state exact reference case ID and: Auxiliary axis uses reference clock; other cases have different z(t).",
+    "mapping_method": "Piecewise-linear interpolation of actual saved monotonic coordinates; reverse descending z before interpolation. Do not solve another background or assume one universal mapping.",
+    "domain_policy": "Mask out-of-reference-support ticks; no extrapolation, endpoint clamping, or fiction of actual case-specific conversion. Curves may extend beyond reference support without extra top ticks.",
+    "validation": "Verify finite strictly monotonic reference elapsed_s and z in opposite directions; check endpoint mapping and a saved interior knot numerically.",
+    "shared_panels": "A shared physical x-axis allows a top auxiliary axis on the top row of each column plus a figure-wide reference-clock note. Do not place top labels where they overlap facet titles."
+  },
+  "y_axes": {
+    "abundance": {
+      "internal_coordinates": "Retain direct log10(Y) values for very small nuclear inventories; do not exponentiate before plotting and do not apply a second logarithmic transform.",
+      "tick_formatter": "Display plotted coordinate k as 10^k using mathtext; use explicit fractional exponent if an automatically selected tick is noninteger.",
+      "label": "Y = n_species/n_B (log scale)",
+      "ionic_label": "Y_Aq = n_Aq/n_B (log scale)",
+      "zero_policy": "Initial/genuine zero is not positive and cannot be placed on log axis; annotate its omission. Unresolved T charge entries remain blank labelled UNRESOLVED."
+    },
+    "signed": {
+      "observables": [
+        "delta conditional fractions",
+        "signed_Sigma",
+        "P_m",
+        "P_r",
+        "P_gamma",
+        "P_nu",
+        "H/H_reference-1",
+        "signed control residuals"
+      ],
+      "scale": "symlog base10 with exact zero visible, positive and negative branches retained",
+      "zero_line": true,
+      "fraction_difference_linthresh": 3.3929270504273745e-09,
+      "fraction_difference_linthresh_meaning": "Display transition chosen from recorded observed comparison scale, not an error bar, certified noise floor or data correction. Preserve cold-family unresolved label.",
+      "other_linthresh_rule": "For a panel M=max(abs(all finite displayed signed ordinates)); if M>0 choose linthresh=10^(floor(log10(M))-2); if M=0 use a finite benign1e-12 and annotate allzero. Control residuals use this panel rule, not the fraction-difference comparison scale.",
+      "linthresh_display": "State linear-region |y|<=linthresh in each signed panel or a compact legible figure legend/table keyed by panel.",
+      "no_abs_substitution": "Do not replace signed quantities by absolute values to fit a logarithmic axis."
+    },
+    "positive_geometry": {
+      "observables": [
+        "positive H",
+        "positive elapsed time",
+        "nonnegative stress/shear norm when plotted"
+      ],
+      "scale": "log base10 wherever positive",
+      "zero_policy": "Omit exactzero points from logarithmic ordinate and annotate them; do not add a positivity floor. If allzero annotate instead of generating invalid limits.",
+      "small_dynamic_range": "Retain accurate values and readable ticks; no data-dependent renormalization that changes meaning."
+    },
+    "unchanged": "Preserve every data value, case selection, scientific label, initial matching and observed-control interpretation."
+  },
+  "acceptance": {
+    "render_count": 35,
+    "visual_files": 70,
+    "zero_ivps": true,
+    "all_trajectory_figures": "Both physical coordinate labels visible via the primary plus reference-clock auxiliary axis; actual case-specific time curves preserved.",
+    "axis_checks": [
+      "Reference time conversion is Myr, not Gyr.",
+      "Nuclear log10 values remain representable; no log-of-log.",
+      "Signed differences still show negative, zero and positive values.",
+      "Reference mapping does not extrapolate.",
+      "Exact reference case and differing clocks disclosed.",
+      "No omitted case or changed scientific dataset."
+    ],
+    "visual_review": "Inspect representative abundance, ionic, tiny difference, signed context and strongest-control panels after rendering. Check top axes/titles do not overlap and exponent tick labels remain readable.",
+    "scope": "Display-only review/addendum; scientific contracts and measured numbers unchanged except clarifying units/axes.",
+    "stop": "One render pass plus at most one targeted display repair; no new physics run."
+  },
+  "explicit_overrides": {
+    "prior_forbid_common_secondary_time_axis": "A disclosed reference-clock auxiliary axis is now required. A common axis falsely presented as the physical clock of every case remains forbidden.",
+    "prior_time_unit_Gyr": "Display time in Myr; physical elapsed_s arrays remain unchanged.",
+    "prior_log10_y_label": "Keep log10 numerical coordinates but show physical abundance tick labels10^k and Y(logscale)."
+  }
+}

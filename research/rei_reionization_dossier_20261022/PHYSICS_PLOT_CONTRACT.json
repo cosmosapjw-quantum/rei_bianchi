@@ -1,0 +1,240 @@
+{
+  "schema_version": "1.0",
+  "status": "FROZEN_FOR_IMPLEMENTATION",
+  "unit": "rei_reionization_dossier_20261022",
+  "baseline_case": "quotient_L16_S0_Am0_Ar0",
+  "scope": "Three independent initial physical norm slices with fixed positive orientation, plus declared signed-orientation and cancellation comparisons. No exhaustive nuclear or fully coupled ion claim.",
+  "atomic_source": "../rei_isotope_quotient_pilot_20261022/pilot/results",
+  "nuclear_source": "../rei_tritium_production_audit_20261022/NUCLEAR_NETWORK_HISTORIES.npz",
+  "new_case_source": "results",
+  "new_nuclear_source": "NEW_CASE_NUCLEAR_HISTORIES.npz",
+  "slices": [
+    {
+      "id": "sigma",
+      "label": "Initial shear norm; positive orientation",
+      "cases": [
+        "quotient_L16_S0_Am0_Ar0",
+        "quotient_L16_S0.01_Am0_Ar0",
+        "quotient_L16_S0.05_Am0_Ar0",
+        "quotient_L16_S0.2_Am0_Ar0",
+        "quotient_L16_S0.6_Am0_Ar0"
+      ],
+      "varied": "Sigma_F",
+      "fixed_initial": {
+        "Pi_m": 0,
+        "Pi_r": 0
+      },
+      "orientation": "signed_Sigma >= 0; initial P_m=P_r=0"
+    },
+    {
+      "id": "pi_r",
+      "label": "Initial radiation stress norm; positive orientation",
+      "cases": [
+        "quotient_L16_S0_Am0_Ar0",
+        "quotient_L16_S0_Am0_Ar0.4",
+        "quotient_L16_S0_Am0_Ar1.6"
+      ],
+      "varied": "Pi_r",
+      "fixed_initial": {
+        "Sigma_F": 0,
+        "Pi_m": 0
+      },
+      "orientation": "P_r >= 0; initial signed_Sigma=P_m=0"
+    },
+    {
+      "id": "pi_m",
+      "label": "Initial matter stress norm; positive orientation",
+      "cases": [
+        "quotient_L16_S0_Am0_Ar0",
+        "quotient_L16_S0_Am0.8_Ar0",
+        "quotient_L16_S0_Am1.6_Ar0"
+      ],
+      "varied": "Pi_m",
+      "fixed_initial": {
+        "Sigma_F": 0,
+        "Pi_r": 0
+      },
+      "orientation": "P_m >= 0; initial signed_Sigma=P_r=0"
+    }
+  ],
+  "interesting_groups": [
+    {
+      "id": "stress_orientation_cancellation",
+      "label": "Signed stress orientation and initial cancellation",
+      "cases": [
+        "quotient_L16_S0_Am0_Ar0",
+        "quotient_L16_S0_Am-0.8_Ar0",
+        "quotient_L16_S0_Am0_Ar-0.8",
+        "quotient_L16_S0_Am1.6_Ar-0.366",
+        "quotient_L16_S0_Am-0.8_Ar0.183",
+        "quotient_L16_S0_Am1.6_Ar-0.8",
+        "quotient_L16_S0_Am1.6_Ar1.6"
+      ],
+      "interpretation": "Multi-parameter examples, not independent norm derivatives. Exact cancellation is initial only; rounded filename amplitudes are not physical labels."
+    },
+    {
+      "id": "shear_orientation",
+      "label": "Strong shear, opposite orientations and mixed stresses",
+      "cases": [
+        "quotient_L16_S0_Am0_Ar0",
+        "quotient_L16_S0.6_Am0_Ar0",
+        "quotient_L16_S-0.6_Am0_Ar0",
+        "quotient_L16_S0.6_Am1.6_Ar-0.8",
+        "quotient_L16_S-0.6_Am1.6_Ar-0.8",
+        "quotient_L16_S0.6_Am1.6_Ar1.6"
+      ],
+      "interpretation": "Same norm with opposite signed shear is distinct orientation; mixed stresses are additional cases."
+    }
+  ],
+  "new_case_budget": {
+    "maximum_new_background_ivps": 1,
+    "cases": [
+      {
+        "case": "quotient_L16_S0_Am0.8_Ar0",
+        "S": 0,
+        "Am": 0.8,
+        "Ar": 0,
+        "L": 16,
+        "purpose": "Third nonnegative initial Pi_m value with the two other physical axes held at zero."
+      }
+    ],
+    "reuse_existing_controls": true,
+    "no_old_case_reruns": true,
+    "new_nuclear_postprocess_cases_only": true,
+    "no_new_parameter_search": true
+  },
+  "observables": {
+    "species": [
+      "n",
+      "H1",
+      "D",
+      "T",
+      "He3",
+      "He4",
+      "Li6",
+      "Li7"
+    ],
+    "census_names": [
+      "n_0",
+      "H1_0",
+      "H1_1",
+      "D_0",
+      "D_1",
+      "T_0",
+      "T_1",
+      "He3_0",
+      "He3_1",
+      "He3_2",
+      "He4_0",
+      "He4_1",
+      "He4_2",
+      "Li6_0",
+      "Li6_1",
+      "Li6_2",
+      "Li6_3",
+      "Li7_0",
+      "Li7_1",
+      "Li7_2",
+      "Li7_3"
+    ],
+    "primary_y": "log10 Y, where Y=n_species/n_baryon; ionic Y uses saved absolute census, not fraction of isotope",
+    "bulk_totals": "sum saved charge census for H1,D,He3,He4,Li6,Li7; passive reservoir approximation; do not fabricate tiny feedback changes",
+    "trace_totals": "canonical log_T_n natural logarithm, column0 T and column1 n; convert /ln(10), map exact case_names",
+    "T_0_T_1": "UNRESOLVED charge partition: blank annotated T ion panel; never use inherited hardzeros as a prediction",
+    "n_0": "new conditional total neutron inventory, explicitly labelled; n has no ionic partition",
+    "zero_policy": "Do not floor genuine zero to a fake abundance; show zero/unresolved in annotation. Initial T/n zero is -inf and omitted from log ordinate with explicit initial-zero label.",
+    "sensitivity": "At common saved z/x, delta conditional fraction = case.f - baseline.f for all9 conditional channels; redshift axis only. Not a same-proper-time difference."
+  },
+  "axes": {
+    "required": [
+      "redshift",
+      "elapsed_time"
+    ],
+    "redshift": "z=20 to2, decreasing left to right",
+    "elapsed_time": "each case own elapsed_s/(365.25*86400*1e9), Gyr since z=20; not cosmic age",
+    "forbid_common_secondary_time_axis": true
+  },
+  "figures": {
+    "per_primary_slice": [
+      "totals_redshift",
+      "totals_elapsed_time",
+      "ions_redshift",
+      "ions_elapsed_time",
+      "ionic_difference_redshift",
+      "stress_redshift"
+    ],
+    "per_interesting_group": [
+      "totals_redshift",
+      "totals_elapsed_time",
+      "ions_redshift",
+      "ions_elapsed_time",
+      "stress_redshift"
+    ],
+    "total_figure_count": 28,
+    "formats": [
+      "png",
+      "pdf"
+    ],
+    "total_visual_files": 56,
+    "totals_layout": "8 isotope facets",
+    "ions_layout": "8 isotope groups displaying all21 census channels or explicit unresolved annotation; species colors/case colors and charge line styles consistent",
+    "stress_fields": [
+      "signed_Sigma",
+      "P_m",
+      "P_r",
+      "P_gamma_and_P_nu",
+      "H_per_s_over_baseline_minus1",
+      "elapsed_time_Gyr"
+    ],
+    "stress_note": "Signed stress components required; norms alone erase orientation. Pi_m=abs(P_m), Pi_r=abs(P_r), Pi_total=abs(P_m+P_r). Show initial norms plus signs in case table and concise legends."
+  },
+  "fixed_physics": {
+    "same_as_function_of_z": [
+      "nB_m3",
+      "T_K",
+      "UV closure and source normalization",
+      "atomic rate model and initial abundances"
+    ],
+    "not_fixed": [
+      "H_per_s",
+      "elapsed_s",
+      "evolving Sigma and stress moments"
+    ],
+    "fixed_means": "Other named initial physical parameters, not their full evolved histories. Sigma changes expansion rate despite fixed physical density history."
+  },
+  "numerical_interpretation": {
+    "existing_control_max_abs_conditional_discrepancy": 3.3929270504273745e-09,
+    "control_status": "Observed L16/L24 plus tighter-tolerance discrepancy; not a certified global bound or statistical error bar.",
+    "observed_existing_pi_m_max_abs_delta_f": 4.1617853607789357e-10,
+    "observed_existing_pi_r_max_abs_delta_f": 2.1083219725603897e-08,
+    "mandatory_pi_m_label": "Matter-only atomic response is unresolved relative to the saved numerical-control discrepancy.",
+    "no_noise_subtraction": true,
+    "no_automatic_convergence_campaign": true
+  },
+  "acceptance": {
+    "initial_fixed_axis_absolute_tolerance": 1e-15,
+    "initial_ordering": "Positive varied norms strictly ordered after the zero anchor; diagnostics are authoritative.",
+    "case_alignment": "Unique exact case-name join; each new case has its own canonical new-case nuclear output. Never positional join old82 to new case.",
+    "grid": "257 original samples, shared x/z verified; no fabricated IVP histories",
+    "case_table_required": [
+      "case",
+      "source",
+      "signed_Sigma0",
+      "Sigma_F0",
+      "P_m0",
+      "Pi_m0",
+      "P_gamma0",
+      "P_nu0",
+      "P_r0",
+      "Pi_r0",
+      "Pi_total0",
+      "elapsed_time_end_Gyr"
+    ],
+    "data_integrity": "Finite stored atomic histories, nonnegative census within inherited acceptance, sums per isotope; neutron/T canonical logs allow -inf only for actual zeros.",
+    "new_case_gate": "Reuse matching L16 solver settings and inherited acceptance checks; verify initial physical fixed axes, conservation/positivity, finite257samples; retain actual runtime receipt.",
+    "manifest": "Every selected case appears in totals and ions on both axes and signed context; all8nuclei/all21census channels accounted; required28figures exist and labels reviewed.",
+    "model_separation": "Every total T/n plot states conditional all-bare instantaneous thermalization, passive background; old ions are inherited atomic model. No T-ion partition or fully coupled-network claim.",
+    "stopping_rule": "One new IVP maximum, one new-case-only nuclear postprocess, finite figure render/visual inspection and fresh scientific review. Do not rerun old82."
+  },
+  "source_policy": "Existing admitted contracts, diagnostics and original dossier source map; no new rates or external empirical validation claimed."
+}

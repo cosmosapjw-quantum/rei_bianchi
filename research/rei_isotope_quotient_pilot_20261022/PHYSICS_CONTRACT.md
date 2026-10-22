@@ -1,0 +1,57 @@
+# Frozen executable optimization contract, REI 2026-10-22
+
+Status: derived implementation contract; scientific admission pending actual outcomes and fresh independent review. Owner: framing/physics intake agent. This additive lane preserves production defaults and the active PR218 worker.
+
+## Source and inheritance
+
+Repository cosmosapjw-quantum/rei_bianchi, exact PR218 head `0d795da7f9114f89353c72a5829e5efcb64dfa44`, branch `research/rei-hheli-sandbox-pilot-20261021`. At this head the 77 changed paths contain transport/rates/preparation and the frozen physical contract, but no new atomic solver or completed 79+3 histories. The PR text says execution is in progress; that is a status statement, not result evidence.
+
+Inherit `research/rei_hheli_pilot_20261021/PHYSICAL_CONTRACT.md` byte SHA256 `dd3950150be8718d1bb60eed4f1ba3f4cd7447b377adc92476abf28ba8369dee` in full, including all atomic inputs, UV/temperature, isotope abundance, geometry, 79-case domain, 3 controls, tolerances and acceptance ceilings. Exact restored dependencies and bytes are in `intake/PORTABLE_SOURCE_MANIFEST.json`. Frozen unchanged transport SHA256 `0fa826025836a0126fac580de98e3b45c9dcc750e1e243afe933c249ae8e4b6c`. Read repository AGENTS.md; no checkout/reset/publish is part of this task.
+
+Allowed new implementation/output paths: `rei_bianchi/research/rei_isotope_quotient_pilot_20261022/**`; intake files here are contract records. Source donor paths are read-only. Copy vendor/data bytes as needed into the new relocatable package preserving relative donor layout. New code never imports a neighboring active checkout.
+
+## R3–R6: conventions and exact reduction
+
+Metric (-,+,+,+); a_perp=a exp(-b), a_parallel=a exp(2b); s=dot b; sigma=diag(-s,-s,2s); pi_X=diag(-p_X,-p_X,2p_X). All stresses are signed before addition. Full Frobenius axes S=sqrt(6)s/H, Sigma=abs(S), P_X=sqrt(6)K p_X/H^2, K=8*pi*G/c^2 with energy density in J/m^3. Pi_r=abs(P_gamma+P_nu), Pi_total=abs(P_m+P_gamma+P_nu). Half-contraction axes are divided by sqrt(2). Positive p sources positive dot s in dot s+3Hs=K sum p. Norms alone lose cancellation and orientation.
+
+The 21 requested output populations remain exactly the inherited census n,H1(2),D(2),T(2),He3(3),He4(3),Li6(4),Li7(4). Under inherited ElementalElectronicEquality, identical initial conditional fractions, fixed isotope abundances, and absent n/T, H1 and D share one conditional vector, He3/He4 share one, and Li6/Li7 share one. This gives 9 evolved conditional entries f=(H0,H1,He0,He1,He2,Li0,Li1,Li2,Li3), plus unchanged 39 transport entries at L16 and tau (49 total). The unreduced populated-isotope reference uses 18 conditional entries (58 total). Do not conflate a 21-population output with 21 independent dynamical degrees of freedom.
+
+Proof: each isotope satisfies dot f_A=G_Z(ne,T,UV) f_A. The difference of two isotopes of the same element obeys dot delta=G_Z delta and starts at zero. Local uniqueness gives delta=0. The common electron density is unchanged because n_e=n_B sum_Z W_Z sum_q q f_Zq, W_H=Y_H1+Y_D, W_He=Y_He3+Y_He4, W_Li=Y_Li6+Y_Li7. Reconstruction Y_Aq=Y_A f_Zq therefore commutes with the full RHS. This reduction ceases to apply if isotope rates, isotope ICs, nuclear conversion, or positive T inventory change. Fail explicitly for such configurations; use unreduced state then.
+
+## Analytic atomic operator and hybrid Jacobian
+
+At fixed x and geometry, write G=P+n_e R in s^-1. For a Z+1 charge block, P[q+1,q]=beta_q, P[q,q]=-beta_q; R[q-1,q]=alpha_q for q>=1, R[q,q]=-alpha_q. All other entries zero. beta is s^-1, alpha cm^3/s and n_e cm^-3. Each column sums to zero and off-diagonal entries are nonnegative. df/dx=F=(P+n_e R)f/H. Photo matrices are fixed spectral integrals times the inherited amplitude; no quadrature inside RHS. RR coefficients are evaluated at prescribed T(x).
+
+Let w_Zq=n_B,cm^-3 W_Z q, so n_e=w^T f. The exact 9x9 atomic Jacobian at fixed geometry is
+
+`J_ff = (P + n_e R + outer(R @ f, w)) / H`.
+
+Use block diagonal P,R across elements. The outer product couples all elemental charge blocks through electrons and must not be dropped as a tridiagonal approximation. At fixed x, H is independent of f in this inherited atomic test-fluid Einstein closure. Its derivatives with transport y enter J_fy=-outer(F, dlogH/dy). Atomic derivatives of tau'=GAMMA_PER_NE*n_e/H are GAMMA_PER_NE*w/H.
+
+Transport ne-dependence is explicit only in photon towers: dF_Egamma/df_j=-(GAMMA_PER_NE/H)*damp*Egamma*w_j and similarly Ngamma; neutrino and geometry rows receive zero direct atomic derivative. Existing GAMMA_PER_NE must be used with cm^-3. The geometry/tower block and dlogH/dy may use central finite differences of the unchanged donor with scaled step `eps^(1/3)*max(1,abs(y_j))`; the analytical atomic/cross blocks must not perturb chemical fractions or perform duplicate massive-moment calls. This is a hybrid Jacobian, clearly reported as such. If numerical differencing of geometry causes concrete failures, first run the same frozen model with Radau numerical Jacobian as a diagnostic and return outcome to the controller; do not change solver/model tolerances silently.
+
+No clipping/renormalization. Negative trial states internal to an implicit solver are not physical outputs; validity checks apply to accepted outputs, and rate functions must remain mathematically evaluable for those internal trials unless a real domain boundary is crossed. All physical outputs retain inherited positivity tests.
+
+## Frozen finite checks and execution transitions
+
+1. Compile/import and exact donor hash check; no IVPs. Scalar RR independent formula checks at T=100,1000,10000 K, including explicit HeI a row. Photo64 versus128 inherited relative tolerance2e-8. Include high-charge positive f points even though soft UV nominal LiIII/IV are zero.
+2. Pointwise reduced/unreduced RHS reconstruction over a deterministic grid x in {0,ln(7)/2,ln(7)}, Sigma0 in {0,.6}, Am in {-.8,1.6}, Ar in {-.8,1.6}, positive normalized charge vectors. Max scaled RHS mismatch <=5e-13, scaling each derivative by max(1,abs(reference)). Generator column-sum error <=5e-15 times max(1,largest coefficient). Charge-neutral electron closure relative agreement <=5e-14. Frobenius/sign checks and actual initial-axis error<=2e-10. Verify analytic J_ff and cross blocks against central differences with max mixed error abs(delta)/(1+abs(reference))<=2e-6. Preserve residual arrays and exact point configs.
+3. PASS -> actual bounded profile: one isotropic z20->2 reduced run and its unreduced reference at unchanged L16/Radau rtol2e-8 atol2e-11 max_step.04 output257. Bound initial profile wall120s and aggregateCPU240s; one BLAS thread/process. Compare all reconstructed conditional fractions and S,P_m,P_r,tau with max abs difference<=2e-7. Measure nfev,njev,nlu,CPU,wall and peak RSS where available. Report measured outcomes; a single pair is not a general speedup claim.
+4. PASS -> run missing inherited79 nominal reduced cases plus3 L24/tighter controls. Reuse a profile nominal case when its identity agrees; do not rerun it to populate a different directory. If same-identity completed PR218 outputs become available, reuse them for scientific histories and run only the derivative/reduction comparison needed by this optimization. Refresh once before launching sweep; do not poll continuously or edit the other worker.
+5. Controller selects up to4 workers against measured CPU/RAM. Entire new lane cap900s wall,2400 aggregate childCPU,90 IVP attempts, including profile/reference/controls/failed attempts; do not inherit unused older-campaign budgets. These are maximums, not permission to run after measured resource boundary. Checkpoint each finished case and stop new admissions on resource cap. No timing campaign.
+6. Actual trajectory and control acceptance exactly inherited: endpoints, finiteness, min fraction>=-2e-9, isotope sum residual<=2e-9, initial axes<=2e-10, number relative drift<=2e-9, nonnegative canonical cells, sampled brightness minimum>=-2e-8, and 3-control max absolute S/P_m/P_r/populated-f discrepancy<=2e-5. Failed cases remain visible; do not relax limits or convert finite-grid failure into a general no-go.
+7. PASS -> produce actual data-backed figures and summary immediately, then fresh independent read-only review. Figure minimum: Sigma/Pi_m/Pi_r/Pi_total histories; signed final-S sweep on realized initial signed P axes; separate photon/neutrino stress; all21 census outputs with absent n/T and zero nominal LiIII/IV explicit; cancellation/orientation; refinement. Save CSV+NPZ and a reproducible command. Scientific ceiling remains inherited preliminary atomic test-fluid scope, pending reviewer; production defaults unchanged.
+
+## Source status and full target remaining work
+
+PR218 supplies an atomic charge census, prescribed T and UV, separate radiation/massive nonbaryonic stress, and electron coupling to Thomson scattering. It does not yet supply completed atomic trajectories at this pinned head. The full diagram has19 total channels, of which3 are atomic and16 are nuclear/capture/decay; call these19 target channels, not19 nuclear channels. Li6 and LiIV additions are census extensions beyond the drawing. Nuclear source/rate validity and ionized product projection must be supplied before enabling their operators. No authoritative rate may be inferred from an arrow.
+
+Under the inherited compact5–60eV UV support, nuclear photodisintegration cannot occur for the target nuclei with MeV thresholds; this is a specified-source statement. It does not set reverse capture, charged fusion, neutron capture or beta decay to zero. Nominal n=T=0 removes their initial inventory but would not justify omission if production channels were enabled. Do not add a positive n/T history without source-pinned decay constants and daughter ionic/electron and energy treatment.
+
+Temperature is prescribed100–10000K; atomic gas/radiation energy is test-fluid. Matter anisotropic stress belongs to the inherited collisionless massive nonbaryonic component; baryonic atomic fluids have pi_baryon=0 by closure. No claim of complete thermal, nuclear, isotope-spectroscopic or observed reionization evolution follows from this pilot. The next physical extension needs a source-backed thermal equation and nuclear/capture/decay applicability, while this exact optimized atomic lane executes now.
+
+## Substantive external checks
+
+SciSpace search on elemental H/He/Li atomic rates returned Verner-related recombination literature and cosmological recombination scope; it did not establish isotope-specific rate validity. Exa retrieved authors' primary data page https://www.pa.uky.edu/~verner/rec.html and Verner & Ferland1996 DOI10.1086/192284, supporting the RR formula and recombined-product naming. Exa also located Bianchi shear primary work https://arxiv.org/abs/1003.3491 and Barrow/Maartens https://arxiv.org/abs/astro-ph/9808268; the present exact sign is fixed directly by inherited metric convention, not copied from an incompatible tensor convention.
+
+Wolfram Language actual checks returned trace(sigma)=trace(pi)=0, contractions6s^2,6p^2,6sp and normalized signed shear derivative `(q-2)*s/H+K*p/H^2`. A separate4-charge generator calculation returned zero column sums and exactly zero difference between the differentiated nonlinear RHS and `P+n_e R+outer(R f,w)`. These algebra checks validate the stated identities; they are not trajectory or physics admission.
