@@ -1,0 +1,63 @@
+{
+  "schema": "rei-sandbox-theory-code-handoff-v1",
+  "date": "2026-10-22",
+  "unit": "rei_coupled_isotope_sandbox_20261022",
+  "decision": "PASS_SCOPED_CONDITIONAL_LOCAL_SANDBOX",
+  "scope": "Prescribed-input atomic local kinetics and conditional supplied-event/EOS operators",
+  "workflow": "User-selected physmath-research-loop built-in 1.0.0",
+  "theory_stages": [
+    {"id":"R1","name":"연구 위치·계약","status":"COMPLETE_SCOPED","evidence":["EXECUTION_CONTRACT.md"]},
+    {"id":"R2","name":"근거·재사용","status":"COMPLETE_SCOPED","evidence":["SOURCES.md","vendor/INPUT_COPIES.json"]},
+    {"id":"R3","name":"주장·전제 정렬","status":"COMPLETE_SCOPED","evidence":["EXECUTION_CONTRACT.md","THEORY_DERIVATION.md"]},
+    {"id":"R4","name":"가설·표현 탐색","status":"COMPLETE_SCOPED","evidence":["THEORY_DERIVATION.md","evidence/TIMING.json"],"choice":"Retain all abundances; share electronic blocks, use exact electron rank one, fixed positive trace scaling and measured dense default"},
+    {"id":"R5","name":"구성적 유도","status":"COMPLETE_SCOPED","evidence":["THEORY_DERIVATION.md"]},
+    {"id":"R6","name":"독립 검증","status":"COMPLETE_SCOPED","evidence":["SOURCES.md","REVIEW.md"],"methods":["Two actual Wolfram evaluations","Independent adjacent-difference proof and implementation review"]},
+    {"id":"R7","name":"판별 검증","status":"COMPLETE_SCOPED","evidence":["evidence/RESULTS.json","evidence/TARGETED_SOURCE_ONSET.json","evidence/TIMING.json"]},
+    {"id":"R8","name":"결과 판정","status":"COMPLETE_SCOPED","evidence":["REVIEW.md","REPORT_KO.md"],"new_strong_no_go_claim":false},
+    {"id":"R9","name":"정식 결과·코딩 연결","status":"COMPLETE_SCOPED","evidence":["THEORY_DERIVATION.md","EXECUTION_CONTRACT.md","IMPLEMENTATION.md"]},
+    {"id":"R10","name":"종료·재개","status":"COMPLETE_SCOPED","evidence":["RESUME.md","REPORT_KO.md"]}
+  ],
+  "coding_stages": [
+    {"id":"C1","name":"목표·baseline","status":"REUSED_WITH_NEW_LOCAL_EXECUTION_CONTRACT","evidence":["https://github.com/cosmosapjw-quantum/rei_bianchi/blob/42e44494bd0956756d8c610e75da5b1cafe20d3c/research/rei_coupled_isotope_contract_20261022/CONTRACT.md","EXECUTION_CONTRACT.md"]},
+    {"id":"C2","name":"식–데이터–코드","status":"REUSED_AND_EXTENDED_FOR_NEW_LOCAL_MODULES","evidence":["https://github.com/cosmosapjw-quantum/rei_bianchi/blob/c1714f82ea7de15fee230a1a995365970ee6dc02/research/rei_coupled_isotope_mapping_20261022/CODE_MAP.md","SOURCES.md","IMPLEMENTATION.md"]},
+    {"id":"C3","name":"수치 설계","status":"COMPLETE_SCOPED","evidence":["THEORY_DERIVATION.md","EXECUTION_CONTRACT.md"]},
+    {"id":"C4","name":"실행 DAG·자원","status":"COMPLETE_SCOPED","evidence":["EXECUTION_CONTRACT.md","evidence/EXECUTION.json","DAG.json"]},
+    {"id":"C5","name":"구현","status":"COMPLETE_SCOPED","evidence":["code/atomic.py","code/local.py","IMPLEMENTATION.md"]},
+    {"id":"C6","name":"구현 검증","status":"COMPLETE_SCOPED","evidence":["code/run_diagnostic.py","evidence/RESULTS.json","code/check_source_onset.py","evidence/TARGETED_SOURCE_ONSET.json"]},
+    {"id":"C7","name":"과학 검증","status":"COMPLETE_SCOPED","evidence":["evidence/RESULTS.json","evidence/TARGETED_SOURCE_ONSET.json","REVIEW.md"]},
+    {"id":"C8","name":"수치·재현성","status":"COMPLETE_SCOPED","evidence":["evidence/EXECUTION.json","evidence/TIMING.json","evidence/FRESH_ENTRYPOINT_CHECK.json","figures/midpoint_convergence.png","figures/trace_onset_and_error.png","figures/timing.png"]},
+    {"id":"C9","name":"독립 검토","status":"COMPLETE_SCOPED","evidence":["REVIEW.md","evidence/INDEPENDENT_REVIEW.json"],"review_passes":1},
+    {"id":"C10","name":"판정·인계","status":"SCIENTIFIC_HANDOFF_COMPLETE_DELIVERY_RECORDED_SEPARATELY","evidence":["README.md","RESUME.md","REPORT_KO.md"],"delivery_receipt":"DELIVERY.json after actual publication and provider acknowledgments"}
+  ],
+  "dependencies": [
+    {"from":"C1_C2_REUSED","to":"R1_R3","meaning":"Preserved normalization, ownership and source pins"},
+    {"from":"R2_R6","to":"C3","meaning":"Actual block/rank-one/midpoint/scaling derivations"},
+    {"from":"C3_C4","to":"C5","meaning":"Frozen criteria and bounded resource contract"},
+    {"from":"C5","to":"C6_C8","meaning":"One baseline diagnostic and two targeted source-onset checks"},
+    {"from":"C6_C8","to":"C9","meaning":"Read-only independent theory/code/raw-result/figure review"},
+    {"from":"C9","to":"R8_R10_C10","meaning":"Scoped admission and concrete resume point"}
+  ],
+  "execution_accounting": {
+    "baseline_invocations":1,
+    "baseline_checks_pass":156,
+    "targeted_invocations":1,
+    "targeted_checks_pass":2,
+    "baseline_code_modified_after_run":false,
+    "full_diagnostic_reruns":0,
+    "atomic_grid_states":54,
+    "selected_linear_solves":27,
+    "atomic_midpoint_trajectories":4,
+    "atomic_Radau_oracles":1,
+    "scalar_trace_reference_solves":6,
+    "helper_validation":"shell syntax, help and prepare-only; no scientific replay",
+    "old_C1_C2_invocations":0,
+    "cosmological_IVPs":0,
+    "historical_campaign_budget_reset":false
+  },
+  "next_open_dependency": {
+    "name":"Physical resolved-event/energy providers and finite coupled local integration",
+    "status":"OPEN_SEPARATE_SCIENTIFIC_UNIT",
+    "resume":"RESUME.md",
+    "do_not_infer":["Unprovided branch probabilities","Nuclear Q or beta energy partitions from manufactured ledgers","Physical interpolation curvature from three knots","Full augmented Jacobian theorem from atomic rank-one theorem","Full cosmological speedup from local timing"]
+  }
+}

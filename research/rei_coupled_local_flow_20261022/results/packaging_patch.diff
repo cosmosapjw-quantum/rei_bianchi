@@ -1,0 +1,46 @@
+--- first_run/code/run_diagnostic.py
++++ delivered/code/run_diagnostic.py
+@@ -220,15 +220,12 @@
+ 
+ 
+ def input_checks():
+-    sibling=BASE.parent/'rei_coupled_isotope_sandbox_20261022'
+-    paths=[('vendor/donor_atomic/data/atomic_coefficients.json','atomic_coefficients.json'),
+-           ('vendor/nuclear/EVALUATED_DECAY_INPUTS.json','EVALUATED_DECAY_INPUTS.json'),
+-           ('fixtures/nuclear_saved_metadata.json','nuclear_saved_metadata.json')]
++    manifest=json.loads((BASE/'inputs/copy_manifest.json').read_text())
+     rows=[]
+-    for src,dst in paths:
+-        a=hashlib.sha256((sibling/src).read_bytes()).hexdigest(); b=hashlib.sha256((BASE/'inputs'/dst).read_bytes()).hexdigest()
+-        rows.append(dict(source=str(sibling/src),copy='inputs/'+dst,source_sha256=a,copy_sha256=b))
+-        check('input_copy_'+dst,a==b)
++    for row in manifest['copies']:
++        a=row['source_sha256']; b=hashlib.sha256((BASE/row['copy']).read_bytes()).hexdigest()
++        rows.append(dict(source=row['source'],copy=row['copy'],source_sha256=a,copy_sha256=b))
++        check('input_copy_'+Path(row['copy']).name,a==b)
+     DATA['inputs']={'copies':rows,'selected_H_RR':ROW,'chi_H_eV':CHI/EV,'neutron_lifetime_s':1/LAMBDA,
+                     'atomic_donor_pin':'8be7533cc97b3302bf42608699d6e8313ed6af8a','sandbox_science_pin':'569f784e78676123513b7390001d317eb62d6372',
+                     'PR219_provider_pin':'6a12f3865d9ea427c1391c41caed8bb7cb7ec00d'}
+--- first_run/run_fresh.sh
++++ delivered/run_fresh.sh
+@@ -1,8 +1,18 @@
+ #!/usr/bin/env bash
+ set -euo pipefail
+-cd "$(dirname "$0")"
++UNIT_DIR="$(cd "$(dirname "$0")" && pwd)"
++RUN_DIR="$(mktemp -d /tmp/rei-coupled-local-flow.XXXXXX)"
++mkdir -p "$RUN_DIR/code" "$RUN_DIR/inputs" "$RUN_DIR/results" "$RUN_DIR/figures"
++cp "$UNIT_DIR"/code/*.py "$RUN_DIR/code/"
++cp "$UNIT_DIR"/inputs/*.json "$RUN_DIR/inputs/"
++cd "$RUN_DIR"
++printf 'Fresh run directory: %s\n' "$RUN_DIR"
+ export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
+ export MPLCONFIGDIR="${TMPDIR:-/tmp}/rei_coupled_local_flow_mpl"
+ ulimit -t 120
+ ulimit -v 1048576
+-timeout --signal=TERM 180s python3 code/run_diagnostic.py "$@"
++if [[ "${1:-}" == "--prepare-only" ]]; then
++    python3 code/prepare_only.py
++else
++    timeout --signal=TERM 180s python3 code/run_diagnostic.py "$@"
++fi
