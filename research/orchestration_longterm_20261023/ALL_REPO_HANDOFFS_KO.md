@@ -1,13 +1,13 @@
-# 저장소별 복사용 인수인계
+# 저장소별 고정 소스 복사용 인수인계
 
-각 블록은 해당 저장소 작업자에게 전달할 수 있다. 중앙 계획은 실행 허가나 예산 초기화가 아니다.
+기준 소스: https://github.com/cosmosapjw-quantum/rei_bianchi/tree/eb03981d15ad291375dd6d574a9c28809f85fc02/research/orchestration_longterm_20261023
 
 ## HANDOFF_BASS_HE_KO
 
 ````text
 # cosmosapjw-quantum/BASS_HE 인수인계
 
-중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/research/orchestration-sandbox-20261022), `research/orchestration_longterm_20261023/`.
+중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/eb03981d15ad291375dd6d574a9c28809f85fc02/research/orchestration_longterm_20261023), `research/orchestration_longterm_20261023/`.
 
 첫 행동: 동결 계약을 읽고 진행 중인 소유자 결과와 실제 잔여 예산을 확인한다. 완료 근거를 재사용하며 예산·실패 기록을 초기화하지 않는다. 이 문서는 새로운 과학적 판정을 추가하지 않는다.
 
@@ -247,7 +247,7 @@
 ````text
 # WU088_HH 인수인계
 
-중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/research/orchestration-sandbox-20261022), `research/orchestration_longterm_20261023/`.
+중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/eb03981d15ad291375dd6d574a9c28809f85fc02/research/orchestration_longterm_20261023), `research/orchestration_longterm_20261023/`.
 
 첫 행동: 동결 계약을 읽고 진행 중인 소유자 결과와 실제 잔여 예산을 확인한다. 완료 근거를 재사용하며 예산·실패 기록을 초기화하지 않는다. 이 문서는 새로운 과학적 판정을 추가하지 않는다.
 
@@ -564,7 +564,7 @@
 ````text
 # cosmosapjw-quantum/bass 인수인계
 
-중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/research/orchestration-sandbox-20261022), `research/orchestration_longterm_20261023/`.
+중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/eb03981d15ad291375dd6d574a9c28809f85fc02/research/orchestration_longterm_20261023), `research/orchestration_longterm_20261023/`.
 
 첫 행동: 동결 계약을 읽고 진행 중인 소유자 결과와 실제 잔여 예산을 확인한다. 완료 근거를 재사용하며 예산·실패 기록을 초기화하지 않는다. 이 문서는 새로운 과학적 판정을 추가하지 않는다.
 
@@ -947,7 +947,7 @@
 ````text
 # bass_cr 인수인계
 
-중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/research/orchestration-sandbox-20261022), `research/orchestration_longterm_20261023/`.
+중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/eb03981d15ad291375dd6d574a9c28809f85fc02/research/orchestration_longterm_20261023), `research/orchestration_longterm_20261023/`.
 
 첫 행동: 동결 계약을 읽고 진행 중인 소유자 결과와 실제 잔여 예산을 확인한다. 완료 근거를 재사용하며 예산·실패 기록을 초기화하지 않는다. 이 문서는 새로운 과학적 판정을 추가하지 않는다.
 
@@ -1268,7 +1268,7 @@
 ````text
 # cosmosapjw-quantum/rec_bianchi 인수인계
 
-중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/research/orchestration-sandbox-20261022), `research/orchestration_longterm_20261023/`.
+중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/eb03981d15ad291375dd6d574a9c28809f85fc02/research/orchestration_longterm_20261023), `research/orchestration_longterm_20261023/`.
 
 첫 행동: 동결 계약을 읽고 진행 중인 소유자 결과와 실제 잔여 예산을 확인한다. 완료 근거를 재사용하며 예산·실패 기록을 초기화하지 않는다. 이 문서는 새로운 과학적 판정을 추가하지 않는다.
 
@@ -1505,7 +1505,7 @@
 ````text
 # cosmosapjw-quantum/rei_bianchi 인수인계
 
-중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/research/orchestration-sandbox-20261022), `research/orchestration_longterm_20261023/`.
+중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/eb03981d15ad291375dd6d574a9c28809f85fc02/research/orchestration_longterm_20261023), `research/orchestration_longterm_20261023/`.
 
 첫 행동: 동결 계약을 읽고 진행 중인 소유자 결과와 실제 잔여 예산을 확인한다. 완료 근거를 재사용하며 예산·실패 기록을 초기화하지 않는다. 이 문서는 새로운 과학적 판정을 추가하지 않는다.
 
@@ -2052,7 +2052,7 @@
 ````text
 # cosmosapjw-quantum/vigilode 인수인계
 
-중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/research/orchestration-sandbox-20261022), `research/orchestration_longterm_20261023/`.
+중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/eb03981d15ad291375dd6d574a9c28809f85fc02/research/orchestration_longterm_20261023), `research/orchestration_longterm_20261023/`.
 
 첫 행동: 동결 계약을 읽고 진행 중인 소유자 결과와 실제 잔여 예산을 확인한다. 완료 근거를 재사용하며 예산·실패 기록을 초기화하지 않는다. 이 문서는 새로운 과학적 판정을 추가하지 않는다.
 
