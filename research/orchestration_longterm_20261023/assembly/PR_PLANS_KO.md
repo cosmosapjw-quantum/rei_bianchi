@@ -17,7 +17,7 @@
 
 | 노드 | 계획 상태 | 선행 노드 | 계약 |
 |---|---|---|---|
-| CR_N4_C23B_CUTOFF_BINDING | PROPOSED | 내부 없음; 외부: []; 조건부: [] | `atomic/LONGTERM_CONTRACTS.json/nodes/bass_cr/0` |
+| CR_N4_C23B_CUTOFF_BINDING | COMPLETE_SCOPED | 내부 없음; 외부: []; 조건부: [] | `atomic/LONGTERM_CONTRACTS.json/nodes/bass_cr/0` |
 | CR_N4_STOPPING_KERNEL | PROPOSED | CR_N4_C23B_CUTOFF_BINDING; 외부: []; 조건부: [] | `atomic/LONGTERM_CONTRACTS.json/nodes/bass_cr/1` |
 | CR_N5_ATOMIC_ISOTOPE_COVERAGE | PROPOSED | 내부 없음; 외부: []; 조건부: [] | `atomic/LONGTERM_CONTRACTS.json/nodes/bass_cr/2` |
 | CR_N6_CONSERVATIVE_COUPLING | PROPOSED | CR_N4_STOPPING_KERNEL, CR_N5_ATOMIC_ISOTOPE_COVERAGE; 외부: []; 조건부: [] | `atomic/LONGTERM_CONTRACTS.json/nodes/bass_cr/3` |
