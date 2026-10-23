@@ -30,3 +30,16 @@ The new ledgers represent event transfer to/from a prescribed thermal bath.
 They do not update temperature and are never pasted into old gas/photon ledgers.
 Native fractions are retained without floor, clipping or renormalization.
 
+## Completed execution and diagnosed presentation repairs
+
+All ten frozen conditional cases completed once with all local invariant gates.
+The saved-only analysis initially imported the donor case table because donor
+code was first on sys.path; it was repaired to load this unit's exact run_cases.py
+by explicit file location. The failed analysis log is preserved and charged;
+no chemistry case was rerun. Root then authorized Figure01 fraction axes to use
+actual values in the displayed crossing interval with modest padding. Only
+saved analysis/plot regeneration was performed; raw data and all gates remained
+unchanged. Exact final resource categories and case dimensions/costs are in
+results/execution_summary.json, with the known60CPU/90wall original command-cap
+debit clearly separated from measured current and lost-history receipts.
+

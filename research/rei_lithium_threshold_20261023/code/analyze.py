@@ -45,6 +45,12 @@ def main():
     ax[0,1].plot(ts,width,color='black');ax[0,1].set(ylabel='Active width in covariant mu0',title='Physical integration measure')
     for i in [2,3,4,6,7]:
         ax[1,0].plot(ts,hs[i]['fractions'][0],label=CASES[i]['name'],color=colors[i]);ax[1,1].plot(ts,hs[i]['fractions'][1],color=colors[i])
+    mask=(ts>=.44)&(ts<=.78)
+    for q,axis in [(0,ax[1,0]),(1,ax[1,1])]:
+        shown=np.concatenate([hs[i]['fractions'][q][mask] for i in [2,3,4,6,7]])
+        span=max(float(shown.max()-shown.min()),1e-12);low=float(shown.min())-.05*span
+        if q==0:low=max(0.,low)
+        axis.set_ylim(low,float(shown.max())+.05*span)
     ax[1,0].set(ylabel='Li I fraction per Li nucleus',title='Neutral lithium threshold response');ax[1,1].set(ylabel='Li II fraction per Li nucleus',title='Singly ionized lithium');ax[1,0].legend(fontsize=8)
     for a in ax.flat:
         a.set(xlim=(.44,.78),xlabel='eta = ln(a/a0)')
