@@ -39,7 +39,7 @@
 
 | 노드 | 계획 상태 | 선행 노드 | 계약 |
 |---|---|---|---|
-| HE-X1 | OWNER_IN_PROGRESS | 내부 없음; 외부: []; 조건부: [] | `thermal/BASS_HE_LONGTERM_CONTRACTS.json/nodes/0` |
+| HE-X1 | COMPLETE_SCOPED | 내부 없음; 외부: []; 조건부: [] | `thermal/BASS_HE_LONGTERM_CONTRACTS.json/nodes/0` |
 | HE-ANG | PROPOSED | HE-X1; 외부: []; 조건부: [] | `thermal/BASS_HE_LONGTERM_CONTRACTS.json/nodes/1` |
 | HE-EXCHANGE | PROPOSED | 내부 없음; 외부: []; 조건부: [] | `thermal/BASS_HE_LONGTERM_CONTRACTS.json/nodes/2` |
 | HE-RESERVOIR | PROPOSED | 내부 없음; 외부: []; 조건부: [] | `thermal/BASS_HE_LONGTERM_CONTRACTS.json/nodes/3` |

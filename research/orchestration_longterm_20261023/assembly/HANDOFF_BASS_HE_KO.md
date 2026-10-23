@@ -232,3 +232,7 @@
 
 
 - `HE-CLOSURE` → `REI-L4`: selecting nonzero baryonic anisotropic stress. Isotropic pi_b=0 minimal pilot does not require this extension
+
+## 현재 X1 실행 상태 보정
+
+HE-X1 계획 wrapper는 `COMPLETE_SCOPED`다. `current_unit/INDEPENDENT_REVIEW.md`, `raw_outcomes.json`, `LOOP_PROGRESS.json`과 과학 커밋 `eb03981d15ad291375dd6d574a9c28809f85fc02`가 실제 32 fixture 및 독립 PASS_SCOPED를 기록한다. 위 원 계약의 `current_unit_selected`는 역사적 선택 상태로 그대로 보존했다. 물리 소스·event 상관·runtime 승인은 별도다.
