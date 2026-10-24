@@ -393,3 +393,67 @@ HE-ANG의 source/frame/event 계약은 PR92 과학 핀 `896e5427100ad48d017deff2
 ## 현재 X1 실행 상태 보정
 
 HE-X1 계획 wrapper는 `COMPLETE_SCOPED`다. `current_unit/INDEPENDENT_REVIEW.md`, `raw_outcomes.json`, `LOOP_PROGRESS.json`과 과학 커밋 `eb03981d15ad291375dd6d574a9c28809f85fc02`가 실제 32 fixture 및 독립 PASS_SCOPED를 기록한다. 위 원 계약의 `current_unit_selected`는 역사적 선택 상태로 그대로 보존했다. 물리 소스·event 상관·runtime 승인은 별도다.
+
+
+# HE-ANG-CBA-NORDSIECK actual S / central C scoped return
+
+Actual science S `a891cd4b9a3548e66db669b9eb472fea88a3b78b`, tree `ee6768ab8a934cb9b47819a24cf5498e4f8b8ece`, Draft PR100 <https://github.com/cosmosapjw-quantum/BASS_HE/pull/100>, unmerged/activation=false. C is this containing commit, not an invented literal self-SHA. Exact root-confirmed canonical base `b0f02efc6925a98e670136027561d267f9fa601f`, tree `ceaafc0d0c5b31841cf306e948b769819a572043`; preserve all existing HE observations and other39nodes/40contracts/7authorities/17edges.
+
+The defined analytic direct CBA science unit is18/20. R10/C10 and actual B2/D/E/B3 remain pending publication/backup/delivery. Entire HE-ANG stays SOURCE_INPUT_PENDING, global physical completion=null, physical_provider/event_sigma/physical_recoil/HE-X1 empirical correction=false.
+
+Root verified all87 S blobs/sizes and preserved14root entries/88old research subtrees. Original S0 `86fc9206d885633b59745fb80dcc22fa163bfd89` retains a publication-only CSV CRLF→LF serialization failure. Successor S fixes only the exact raw CSV bytes; no scientific rerun, tolerance change or reserve consumption. Failed packet/receipt and minimal helper correction remain recorded separately.
+
+B1 `HEANG_CBA_NORDSIECK_B1_PREEXECUTION_20261025.tar.gz`, 792680bytes/77members, SHA256 `afa42e0e7ed6b8d963528a0cb480bbb5373cfcaa18c1791429b6afbf731ccdcf`, Drive `18KqAWKFtZE5K0t0-TzVUMFEQJXc-oTWo`, Dropbox `id:BSpOijBcT10AAAAAAD_9qA`: actual dual upload/separate metadata-size ACK and local member verification only; independent remote whole-GET/hash not asserted. B1 is preexecution scope. New S/C exact B2, D/E exact B3 and final actual PR tail remain pending.
+
+Fresh root base moved through2354(CR neutral elastic owner return) to b0f02efc(PHYS89 covariance diagnosis/interface return). PHYS89 raw covariance stochastic admission DISALLOWED_DISPLAYED_MATRIX, source-defect cause NOT_ESTABLISHED; physical parent PARTIAL_INPUT_DEPENDENCIES, BASS nuclear consumer NOT_BOUND, HH_R10OFF/production NOT_ISSUED. Its actual report of dual restores belongs to its owner; this HE worker did not repeat them. CR fullN4/N5PARTIAL/OPEN/N6N7gated and all costs/failures/unknown remain. REC227 and earlier selected PR observations are not substituted for canonical authority.
+
+C9-NB-01 future partial mu_window/theta metadata, C23E and every existing owner OPEN remain. This return completes the requested scoped science snapshot; proceed through the authorized delivery chain and stop after this defined unit, with no new loop or unused-reserve execution.
+
+# HE-ANG-CBA-NORDSIECK 실제 결과
+
+고정핵 직접 Coulomb–Born 모형의 수소 1s overlap, delta-state 정규화와 절대 labelled TDCS를 유도하고 구현했다. 핵심 식은 THEORY_KO.md의 (1)–(9)다. 전체 HE-ANG physical provider 채택과 이번 analytic model의 확보 범위는 CLAIM_GATE.json에서 분리한다.
+
+## 새 수학과 구현
+
+원전 Eq19/A9의 I는 1/r 적분이다. 1s 전이 overlap K는 eta,p,q를 고정한 -partial_lambda I로 얻는다. eta=lambda/p는 그 뒤 적용한다. 이 순서에서 K(lambda,-p,p;eta)=2I0(lambda-eta*p)/(p²+lambda²)가 되어 같은 Coulomb Hamiltonian의 bound–continuum 직교성을 재현한다. Source Eq18의 추가1/r와 Appendix A7 부호는 실제 읽은 preprint의 문자적 불일치로 기록했고 출판본 교정 여부는 추정하지 않았다. 원전 Eq28의 J와 이번 K는 서로 다른 적분이다.
+
+Matched eta=lambda/p에서 Delta=q+p로 쓰면 K=16*pi*lambda*C*[Delta²-(1+i*eta)Delta.p]/(A²*Bc)다. 작은 Delta의 두 큰 항을 빼지 않는 구현이고 Delta0은 정확히0이다. Generic overlap와 별도로 이 식을 주 경로로 사용했다. Principal Log(Bc)는 lambda,p>0에서 Im(Bc)<0인 연속 가지로 고정했다.
+
+Nc=(2*pi)^(-3/2)exp(pi*eta/2)Gamma(1-i*eta)와 정규화된1s를 사용한 F_D에 대해 TDCS=4*(pf*p/pi_momentum)*|F_D|²/Delta^4다. Box-state 황금률/상태밀도/flux와 delta-state T 양쪽 계수를 맞췄다. 직접 spin-diagonal 채널의 spin factor는1이다. 수소 matched 경로의 nuclear overlap은0이며 eta0 plane-wave control에서는 nuclear subtraction을 유지했다. 단위 a0,p0,E_h와 물리 TDCS a0²/E_h를 명시했다.
+
+## 실제 수치 근거
+
+| 관측 | 범위 | 최대 관측 오차 |
+|---|---|---:|
+| 표적 테스트 | 14methods, failures0/errors0 | PASS |
+| Generic I/K binary64 | 9inputs, mp80 reference | 1.0629567988304066e-15 scaled |
+| Formula precision | 같은9inputs mp50–mp80 | 9.183265145706724e-51 scaled |
+| 원적분 Eq6 quadrature | 4moderate complex cases,mp50 | 3.506764608003949e-51 scaled |
+| Stable tiny transfer | 16parallel/transverse inputs | 4.0063870834280886e-16 true relative |
+| Nc/Sommerfeld normalization | 7eta values | 1.5116805406513489e-15 scaled |
+| Delta-state TDCS conversion | 73angles×2models | 7.159247292900658e-16 scaled |
+
+Scaled error는 abs(value-reference)/max(1,abs(reference))이다. Tiny-transfer만 nonzero mp80 reference에 대한 true relative error를 썼다. Tolerance를 실행 뒤 바꾸지 않았다. 원적분 quadrature는 K의 parabolic-coordinate 1차원 적분이며 closed I의 수치 미분을 되풀이한 검사가 아니다.
+
+Conditioning 예: pvec=(0,0,0.7),lambda1, transverse Delta=(1e-14,0,0)에서 generic subtraction 식의 상대오차는1.742881133761018e12, 안정식은1.928809976914049e-16이다. 같은 t의 parallel generic error는0.016729855113103972, 안정식은1.8021982992221216e-16이다. 이들은 작은-transfer 수학 fixture이며 실제 ionization kinematics에서 Delta0 사건을 의미하지 않는다. 전체 입력 공간에 대한 uniform/outward error bound는 주장하지 않는다.
+
+Illustration은 source에서 읽은250eV incident/5eV ejected/3degree scattered geometry와 nominal U27.2를 사용했다. Oriented coplanar angle -180..180degree step5의73points에서 표본최대는 두 모형 모두 -50degree에 있다. Direct CBA0.45610407121581825, direct plane0.9421399651692766 a0²/(eV sr²)이다. 이는 새 근사의 계산 예이며 원전 곡선 fit,20/54.4/413.6eV 데이터 재적합 또는 연속각 최대치의 증명이 아니다. 그림은 저장된 JSON만 읽어 만들었다.
+
+## 실제 실행·실패·비용
+
+Three actual children은 tests0.2772319999999999CPU/0.3188933669953258wall, analysis2.580506/2.6289747010014253, saved-output plot2.130236/2.174621346995991초다. 합계4.987974CPU/5.122489414992742wall, 새20/60할당,512MiB/1thread다. Repair reserve1은 미사용이며 이전 예산에서 이전하지 않았다. 변경 없는 이전 suite 및 이번 tests/analysis 재실행은0이다.
+
+첫03_plot 호출은 기존0byte RUN.lock 때문에 scientific START 전에 중단됐다. 실제02session terminalexit0,완성FINISH,관련activeprocess0,03START없음을 확인하고 원시traceback/lockstat를 보존한 뒤 그 lock만 제거했다. 이후 plot child를 처음 실제로 실행했다. Stale-lock 발생/cleanup 실패의 원인은 NOT_ESTABLISHED, prelaunch CPU는 UNKNOWN_NOT_ZERO이다. 이를 scientific child 실패나 reserve 소비로 바꾸지 않았다.
+
+Wolfram original call은12True/5structuralFalse/1unevaluated, targeted diagnostic6residual은Together/FullSimplify/유리수대입 모두0이다. Cancel의 항별 표현을 SameQ로 literal0과 비교한 false-FAIL을 교정했으며 첫 결과를 그대로 남겼다. Evaluator2calls toolwall16.886s,bodyCPU0.304298s/bodywall0.304892s; context1call toolwall20.315s; 합toolwall37.201s다. Remote 전체CPU는 UNKNOWN_NOT_ZERO이다. Third evaluator call은 없었다. SciSpace2search,Exa2search+2fetch(4URLs)의401/timeout 및 이전403도 보존했다.
+
+Metadata preparation0.038864099000000006CPU/0.040913912998803426wall, B1pack0.07220352099999999/0.0722468569947523초를 별도로 기록했다. 모델·provider·IO·prelaunch 및 과거unknown은0으로 환산하지 않았고 end-to-end 총 cap은 입증하지 않았다. PR99의2.484451/2.519181445000868,PR98의3.117567/3.242023329999938,PR97의3.304038/3.4507949489989187 및 모든 이전 원장·실패·reserve 상태는 inherited reference chain에 보존한다.
+
+## 조사와 남은 의무
+
+초기 최신 조사:7repos,14collections,30pages terminal,1339branches/874openPRs. Dropbox4929entries/9pages,Drive926documents/3pages+27folders/1page terminal이다. Drive document 검색은 binary archive 전체를 열거하지 않으므로 knownID metadata 확인과 구분한다. 관련 대화는1query-selected이며 self-echo/stale delivery 요약을 새 근거로 채택하지 않았다. 선택된 PR/원전 본문과 전체 branch metadata의 coverage를 구분한다.
+
+중앙 HEAD는 조사 시작E9600a605에서2354d6e9로 진행했다. 게시 시점의 실제 최신 HEAD와 DAG를 사용하여 그 owner 변경과 모든 oldHE/other39를 보존한다. REC/CR/HH의 scoped 결과·OPEN·비용·실패·unknown은 해당owner 범위에 둔다. C23E 및 미래 partial mu_window theta metadata C9-NB-01도 OPEN으로 유지한다.
+
+전체 HE-ANG은 SOURCE_INPUT_PENDING이다. 다음 실제 연구 입력은 source-consistent physical joint amplitude/event payload와 source validity, spin/exchange/count, full support, frame/finite-M dynamics, calibrated uncertainty다. 이번 fixed-centre amplitude와 PR99 finite-M shell의 결합은 그 별도 의무를 만족한 뒤 수행한다. Event sigma, physical recoil law, HE-X1 empirical angular correction을 이번 단위에서 승인하지 않았다. 새 strong no-go 또는 문헌 최초성 주장은 없다.
+
