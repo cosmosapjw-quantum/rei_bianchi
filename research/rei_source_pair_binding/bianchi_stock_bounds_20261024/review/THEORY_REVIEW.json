@@ -1,0 +1,213 @@
+{
+  "schema": "REI_BIANCHI_STOCK_INDEPENDENT_THEORY_REVIEW_V1",
+  "reviewed_utc": "2026-10-24T08:58:26.755932+00:00",
+  "reviewer": {
+    "task": "/root/pressure_review",
+    "role": "Independent read-only theory review",
+    "theory_author": false,
+    "implementation_author": false,
+    "same_inherited_model_family": true,
+    "cross_family_independence_claimed": false
+  },
+  "verdict": "PASS_SCOPED_THEORY",
+  "findings": [],
+  "blocking_findings": 0,
+  "nonblocking_mathematical_findings": 0,
+  "root_admission": "SEPARATE_ROOT_DECISION",
+  "actual_read_set": [
+    {
+      "path": "/workspace/scratch/03a65a604d4c/rei_pressure_execute_20261024/next_stock/THEORY_KO.md",
+      "bytes": 10581,
+      "sha256": "4041f7bd3971e3930ddcd76adca2b91f74c63cee05cca674f522cfbe3dfa15e9",
+      "actual_read": "FULL_TEXT; THEORY_REREAD_AFTER_ROOT_BIBLIOGRAPHIC_TITLE_CORRECTION"
+    },
+    {
+      "path": "/workspace/scratch/03a65a604d4c/rei_pressure_execute_20261024/next_stock/IMPLEMENTATION_CONTRACT.json",
+      "bytes": 5780,
+      "sha256": "b65528e96764b5eb7dc44284b1b50d61ee406d0a0bf692ec01ca61be09e93fb9",
+      "actual_read": "FULL_TEXT; THEORY_REREAD_AFTER_ROOT_BIBLIOGRAPHIC_TITLE_CORRECTION"
+    }
+  ],
+  "fixed_authority_commit": "0f9d9df825be1dac9ca9bdf73cdc2e8908bcba17",
+  "base_central_sha": "9f410bf0f4b5d14d1e6b7c17cd2e23a916f241c9",
+  "assumptions": [
+    "Prescribed homogeneous diagonal Bianchi I geometry with positive C1 scale factors on finite time interval",
+    "Geodesic collisionless positive-mass particles; no Lorentz force, stopping or collision",
+    "Physical orthonormal momentum components with fixed spatial axes",
+    "Finite nonnegative measures supported in finite kinetic energy interval, atoms allowed",
+    "N>=0,U>=0,L>=0,M>0 and represented U<=N*L",
+    "N is number per physical volume; U and pressure trace/3 are energy per physical volume",
+    "M,k,L use one common energy unit",
+    "Ratios strictly positive; unrestricted angular measures for energy sharpness",
+    "Integrable supplied source/transported moment data for the optional source-cohort integral"
+  ],
+  "checks": [
+    {
+      "id": "geometry_units",
+      "status": "PASS_BY_INSPECTION",
+      "reason": "Prescribed positive C1 diagonal scale factors, physical orthonormal momentum, positive mass and number-per-physical-volume measure are explicit."
+    },
+    {
+      "id": "characteristics_dilution",
+      "status": "PASS_BY_INSPECTION",
+      "reason": "q_i=a_i p_i conserved; p_t=Rp_s; D=V_s/V_t; measure D*T_pushforward applies density conversion once."
+    },
+    {
+      "id": "single_particle_bounds",
+      "status": "PASS_BY_INSPECTION",
+      "reason": "Extremal singular ratios of positive diagonal R bound momentum norm, kinetic map and support."
+    },
+    {
+      "id": "kinetic_map_derivatives",
+      "status": "PASS_BY_HAND_DERIVATION",
+      "reason": "Fprime=r^2(k+M)/S; Fsecond=r^2*M^2*(1-r^2)/S^3; convex expansion, concave contraction, identity at r1."
+    },
+    {
+      "id": "energy_bounds",
+      "status": "PASS_BY_HAND_DERIVATION",
+      "reason": "Jensen and endpoint chord interchange for convex/concave cases; multiply by D; lower at rmin, upper at rmax."
+    },
+    {
+      "id": "energy_sharpness",
+      "status": "PASS_BY_CONSTRUCTION",
+      "reason": "Atomic radial extremizers aligned with extremal axes attain each endpoint; +/- pairs also give zero mean momentum; unrestricted angular class only."
+    },
+    {
+      "id": "zero_cases",
+      "status": "PASS_BY_INSPECTION",
+      "reason": "N0 or L0 forces U0; U0 has zero momenta; bypass U/N and U/L divisions."
+    },
+    {
+      "id": "pressure_trace_bounds",
+      "status": "PASS_BY_HAND_DERIVATION",
+      "reason": "Trace/3 kernel valid without isotropy; support coefficient decreases with L; upper pressure increases with U; conservative composition correct."
+    },
+    {
+      "id": "continuity_shear_work",
+      "status": "PASS_BY_HAND_DERIVATION",
+      "reason": "dot k=-sum H_i*c^2*p_i^2/E plus density dilution gives dot U+theta(U+Pi)+sum sigma_i*pi_ii=0."
+    },
+    {
+      "id": "positive_cohort_superposition",
+      "status": "PASS_CONDITIONAL",
+      "reason": "Linear positive geodesic propagator with per-volume per-proper-time injection; finite integrated results require integrable relevant transported moments/bounds."
+    },
+    {
+      "id": "sqrt_enclosure",
+      "status": "PASS_BY_INTEGER_INEQUALITY",
+      "reason": "n=isqrt(floor(p*s^2/q)) implies n^2*q<=p*s^2<(n+1)^2*q; collapse when grid equality holds; absolute width<=2^-b."
+    },
+    {
+      "id": "rationalized_kinetic_enclosure",
+      "status": "PASS_BY_HAND_DERIVATION",
+      "reason": "x/(sqrtQ+M) and positive denominators give reversed denominator endpoints; x0 and r1 exact; positive lower for x>0."
+    },
+    {
+      "id": "composed_numeric_outer_bounds",
+      "status": "PASS_BY_MONOTONICITY",
+      "reason": "Outer radical endpoints and min with Nt*L_upper remain valid; pressure endpoint substitutions use correct monotonic directions."
+    },
+    {
+      "id": "future_exact_references",
+      "status": "PASS_BY_SYMBOLIC_SUBSTITUTION_NOT_RUN",
+      "reason": "Identity, expansion, contraction, mixed, tiny positive energy, zeros/refusals and exact measure-weight homogeneity are properly specified."
+    }
+  ],
+  "formulas": {
+    "D": "r1*r2*r3",
+    "number_density": "D*N",
+    "F_r": "sqrt(M*M+r*r*k*(k+2*M))-M",
+    "F_second": "r*r*M*M*(1-r*r)/(M*M+r*r*k*(k+2*M))^(3/2)",
+    "ell_r_expansion": "N*F_r(U/N)",
+    "u_r_expansion": "(U/L)*F_r(L)",
+    "ell_r_contraction": "(U/L)*F_r(L)",
+    "u_r_contraction": "N*F_r(U/N)",
+    "energy_lower": "D*ell_rmin",
+    "energy_upper": "D*u_rmax",
+    "support_upper": "F_rmax(L)",
+    "pressure_lower": "U_lower*(L_upper+2*M)/(3*(L_upper+M))",
+    "pressure_upper": "U_upper*(U_upper+2*M*Nt)/(3*(U_upper+M*Nt))",
+    "kinetic_continuity": "dot U+theta*(U+Pi)+sum sigma_i*pi_ii=0"
+  },
+  "future_reference_checks": {
+    "base_N_U_L_M": "2,2,2,1",
+    "identity": {
+      "energy": "2",
+      "support": "2",
+      "pressure": "[8/9,1]"
+    },
+    "expansion_half": {
+      "D": "1/8",
+      "energy_lower": "(sqrt(7)-2)/8",
+      "energy_upper": "(sqrt(3)-1)/8"
+    },
+    "contraction_two": {
+      "D": "8",
+      "energy_lower": "8*(sqrt(33)-1)",
+      "energy_upper": "16*(sqrt(13)-1)"
+    },
+    "mixed_half_one_two": {
+      "D": "1",
+      "energy_lower": "sqrt(7)-2",
+      "energy_upper": "2*sqrt(13)-2",
+      "support": "sqrt(33)-1"
+    },
+    "tiny": "k=2^-200,M=1,r=1/2,bits64; positive rational lower, check square inequalities",
+    "common_weight_scale": "7/3; exact linear scaling of density/energy endpoint enclosures/pressure, unchanged support",
+    "status": "ANALYTIC_REFERENCES_CHECKED; ALL_FIXTURE_EXECUTION_NOT_RUN"
+  },
+  "sqrt_qualifications": {
+    "bits": "int excluding bool, 1..4096, default128",
+    "error_unit": "Absolute supplied energy-unit sqrt grid",
+    "grid_exact_square_collapses": true,
+    "all_rational_square_roots_forced_exact": false,
+    "positive_rational_lower_for_x_positive": true,
+    "physical_precision_restored": false,
+    "bit_exact_energy_unit_scaling_claimed": false
+  },
+  "literature_review": {
+    "root_supplied_primary_intake": "Heinzle/Uggla gr-qc/0512031 section2 equations2c-5; Dash/Jaiswal1711.07130 massless convention and characteristics",
+    "independently_requeried_by_this_reviewer": false,
+    "root_bibliographic_title_corrections_seen": true,
+    "massless_pressure_formula_used_as_massive_formula": false,
+    "novelty_claim": false,
+    "CAS_proof_claim": false
+  },
+  "claim_boundaries": {
+    "energy_sharp_over_unrestricted_angular_positive_measures": true,
+    "energy_sharp_for_imposed_initial_isotropy": false,
+    "pressure_trace_outer_bounds_valid": true,
+    "pressure_outer_bounds_claimed_sharp": false,
+    "pressure_tensor_claimed_isotropic": false,
+    "prescribed_geometry_is_self_consistent_Einstein_solution": false,
+    "single_redshift_rate_is_stock_history": false
+  },
+  "not_admitted": [
+    "Executed stock numerical evidence",
+    "physical source history",
+    "qualified stopping/thermalization law",
+    "calibrated EOS",
+    "self-consistent Einstein evolution",
+    "L4",
+    "whole-model completion",
+    "new scientific child release"
+  ],
+  "review_actions": {
+    "numerical_evaluations": 0,
+    "candidate_imports": 0,
+    "compiles": 0,
+    "tests": 0,
+    "scientific_children": 0,
+    "CAS": 0,
+    "renders": 0,
+    "implementation_edits": 0,
+    "Git_mutations": 0,
+    "cloud_mutations": 0,
+    "hand_derivation_and_local_read_hash_review_write_only": true
+  },
+  "numerical_status": "NOT_RUN",
+  "implementation_status": "SEPARATE_STATIC_CODE_REVIEW_REQUIRED_WHEN_SUPPLIED",
+  "new_stock_execution": "PROPOSED_NOT_RELEASED; CURRENT_PRESSURE_CHILD_ALLOWANCE_ALREADY_CONSUMED",
+  "recommendation": "Continue already authorized static preparation and separate equation-to-code review under the stated domain, units and prescribed geometry; no theory repair or new execution authorized by this review.",
+  "stopping_rule": "Satisfied: no mathematical finding. Stop bounded theory review; inspect actual static implementation only when assigned."
+}
