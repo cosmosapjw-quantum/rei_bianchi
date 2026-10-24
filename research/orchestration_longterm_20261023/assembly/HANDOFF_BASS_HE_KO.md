@@ -1,5 +1,17 @@
 # cosmosapjw-quantum/BASS_HE 인수인계
 
+## 최신 실측 window 결과 — 2026-10-24 / PR94
+
+**HE-ANG-DDCS20-WINDOW는 COMPLETE_SCOPED**, 과학 commit `d8bae9f7e24ad3494e399f7ab46c4167a5623d48` ([draft PR94](https://github.com/cosmosapjw-quantum/BASS_HE/pull/94)), source base `bf3c21a39b1111497ed77667d05b8a853ffe6646`다. Childers et al. PRA69,022709(2004) Table IV E0=20 eV의40개 전사값을 보존하고 E=3–6 eV/theta15–120degree의32개만 사용했다. 검출 전자 finite-window marginal, 축대칭 linear-mu 보간 및 선택한 deterministic sensitivity box 조건부 결과다. Box 범위는 confidence interval이 아니다.
+
+N_W=1.918935932462322e-21 m², mean(mu)=0.5215950231699314, mean(P2)=0.1799846901344856, mean(E)=4.581073268756349 eV, mean(sqrt(E)mu)=1.111325457435915다. Source quoted errors/미지 covariance, 보간 가정, 미관측 영역은 별도다. 다른 scalar의 box witness를 하나의 공동 극값으로 결합하지 않는다.
+
+R6 PASS/C9 PASS_SCOPED, 8 targeted unittest 및11 actual-output checks가 통과했다. 실제3 child 누적 local CPU1.9570049999999999초/wall2.104758352987119초(새 allocation20/60), repair0회다. 이전 Hex/HEANG/HE38/HE-X1/D10 및 remote UNKNOWN_NOT_ZERO는 보존하고 새 예산으로 전용하지 않았다. 완료된 기존 suite의 재실행과 새 IVP는 수행하지 않았다.
+
+부모 **HE-ANG SOURCE_INPUT_PENDING**과 다음 node **HE-ANG-SOURCE-PAYLOAD**는 유지한다. 실측 single-electron marginal은 확보했지만 joint outgoing electron law, full support, count/spin/exchange convention, laboratory/COM 및 finite-mass recoil correlation 입력이 여전히 필요하다. X1 empirical angular correction/event total/collision source로 승격하지 않는다.
+
+근거: `research/he_ang_ddcs20_window_20261024/RESULTS_KO.md`, `CLAIM_GATE.json`, `evidence/review/C9_REVIEW.json`; 중앙 return `assembly/returns/BASS_HE_HEANG_DDCS20_20261024.json`. 최종 S+C backup은 PENDING_PROVIDER다. 원 저자 계약, 다른39node 및 기존 Hex 성공기록은 변경하지 않았다. no_merge/no_activation.
+
 ## 최신 관측과 재개점 — 2026-10-24
 
 HE-ANG의 source/frame/event 계약은 PR92 과학 핀 `896e5427100ad48d017deff2697b6f992ba029cd`에서 이미 `COMPLETE_SCOPED`다. 이를 재사용하여 **HE-ANG-SOURCE-HEX-INTAKE**를 [PR93](https://github.com/cosmosapjw-quantum/BASS_HE/pull/93), 과학 핀 `15053fe4445a32e0544d644e864fe27780d08743`에서 완료했다. 부모 **HE-ANG은 SOURCE_INPUT_PENDING**이다.
