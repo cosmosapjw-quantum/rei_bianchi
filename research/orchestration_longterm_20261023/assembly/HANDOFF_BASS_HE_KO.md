@@ -1,3 +1,21 @@
+# HE-ANG TDCS413 실제 전달 D와 B2 ACK — 2026-10-24
+
+실제 S `de9c9ee9d9406a531b0c360f29004181bf7edc98`, D `d477aafcc620a010e954aa711d108fa2761a1d7e` (tree `b4c69e769af4dcee867f3e040bc8d3cdcef48500`), C `374c355ea2239ad8e924a23e732126a0e2ea6ff0`를 연결합니다. Draft PR98 <https://github.com/cosmosapjw-quantum/BASS_HE/pull/98>는 병합·활성화하지 않았습니다. 이 중앙 E의 parent는 `689cf792a1f2bb706436489cbe06ddca9da0d78d`이며 자기 SHA는 CURRENT_FILE_COMMIT 의미입니다.
+
+새 TDCS413 정의된 단위는 실제 R6/R7/C9 PASS 및 root PASS_SCOPED, D의 20개 단계 전달 metadata로 닫혔습니다. S 당시 18개 완료/R10+C10 대기는 역사적 스냅샷으로 보존합니다. E/B3 tail의 실제 B3 SHA와 Drive/Dropbox ACK는 업로드 후 PR98 description에 기록하며, 현재 B3는 PENDING_ACTUAL입니다. 미래 영수증을 이 archive나 자기 commit 안에 꾸미지 않습니다.
+
+B2는 2026-10-24 11:17:26 UTC에 실제 두 provider 업로드와 별도 metadata readback을 완료했습니다. 1,716,134 bytes / 147 members, 로컬 업로드 bytes SHA256 a6ed4c287dcc38315e8e689112b08618dd57798ac487f039732c3be3926fe341, Drive ID1H2p4mTAhRErac4KkAx-ksXFHNizNaGIc, Dropbox ID id:BSpOijBcT10AAAAAAD_9gA입니다. B2는 exact S108/C3와 별도 재사용 pwbe.py/mpmath wheel, 조사·복구 영수증을 담습니다. 실제 D/E는 후속 B3 overlay로 복원하며 새 과학 실행 권한은 없습니다. 원격 SHA256을 독립 검증했다고 주장하지 않습니다.
+
+TDCS413의 실제 4개 child 비용은 CPU 3.117567초 / wall 3.242023329999938초, 동일 10/40초 배정, reserve 1개 사용/잔여 0개입니다. 이전 PWBE C8은 별도 원장의 총 5개 시도 CPU 3.304038초 / wall 3.4507949489989187초와 원래 8/30초 배정을 그대로 유지합니다. 두 원장의 실패·준비·UNKNOWN_NOT_ZERO 비용을 초기화하거나 이전하지 않았으며 추가 science/render는 없습니다.
+
+소실 원인은 NOT_ESTABLISHED입니다. 게시 S108의 Git blob SHA1/size와 B1 full GET hash를 대조하여 복원했고, D는 source manifest의 실제 B1 metadata member 경로만 정정했습니다. 원본 source data/PDF hash/이론/계약/코드/원시 결과/과학 review는 그대로입니다. 원본 raw body/full text/PDF/page image 보관을 주장하지 않습니다.
+
+최신 base689cf792의 8개 pinned 원문은 Git blob SHA1 8/8 일치를 확인했습니다. 별도 stock은 ADMITTED_SCOPED_CONDITIONAL_STOCK_ARITHMETIC, work는 ADMITTED_SCOPED_MOMENT_WORK_AND_STORED_STOCK_CONSUMPTION이며 owner 독립 PASS_SCOPED/0 findings입니다. 두 child CPU 0.080863초, exit0/retry0, owner known partial 10.318970초 및 과거 overrun 0.110448초 FAIL은 그대로이며 추가 release는 0입니다. 여섯 signed-rate fixture case의 저장 mixed-energy stock 소비, 별도 N/D 유도와 support5 analytic majorant에 한정됩니다. 실제 history/common HI measure/thermal heat/Einstein/L4 readiness나 HE electron-impact provider 승인이 아닙니다. 이전 stock NUMERICAL_NOT_RUN은 역사적 준비 관측입니다. 최신 base tree의 모든 새 leaf와 다른 39개 노드, 기존 HE 계약·authority·integration을 보존하며 선택된 owner 원문과 compare receipt는 B3에 보충합니다.
+
+부모 HE-ANG은 SOURCE_INPUT_PENDING, physical_provider_admitted=false, 전체 목표 달성률 null을 유지합니다. 모델 calibration, detector response/covariance, 절대 scale/전체 support, finite-mass recoil 및 consumer admission은 남아 있습니다. C9-NB-01/C23E/CR Drive UNKNOWN/별도 REC225와 HH source-native 제한/ANGTHERM02 READ_ONLY 및 모든 이전 원장 의무를 보존합니다. 정확한 새 ACK return은 `research/orchestration_longterm_20261023/assembly/returns/BASS_HE_HEANG_TDCS413_DIAGONAL_BACKUP_ACK_20261024.json`입니다.
+
+---
+
 # HE-ANG TDCS413 새 관측과 PWBE C8 종료 — 2026-10-24
 
 과학 S는 `de9c9ee9d9406a531b0c360f29004181bf7edc98` (tree `3d308cb443a6ca9f7a7bf70b2076dfff84be8bee`), draft PR98 <https://github.com/cosmosapjw-quantum/BASS_HE/pull/98>에 실제 게시되었습니다. 이번 관측의 중앙 parent는 `85f9ba1350c076e8df01f5858342df74c3574215`입니다. 새 TDCS413 단위는 R6 PASS, R7 symbolic/toy PASS, C9 PASS_AFTER_BOUNDED_PRESENTATION_REPAIR 및 root PASS_SCOPED이며, 현재 과학 스냅샷은 18개 단계 완료, R10/C10 실제 전달 대기입니다. PR은 병합하거나 활성화하지 않았습니다.
