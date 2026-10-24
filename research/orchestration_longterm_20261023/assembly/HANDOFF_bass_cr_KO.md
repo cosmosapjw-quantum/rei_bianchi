@@ -1,3 +1,22 @@
+<!-- BEGIN CR_N5_EI_20261024_LATEST -->
+# 최신 BASS_CR 추가 인계: 선택된 H1/He4 EI 에너지 교환
+
+과학 S: `d3d9b0de8796de6e988c0d95540b1dbbe1d1cff3`, tree `362ae3d526d0b3dee2f771ef3ed4076975b26842`.
+[Draft PR103](https://github.com/cosmosapjw-quantum/bass_cr/pull/103), branch `research/cr-n5-ei-energy-20261024`.
+
+**CR_N5_EI_MAXWELLIAN_ENERGY_EXCHANGE / N5_C23D_H1_HE4_EI_ENERGY_V1**을 `NUMERICALLY_CHECKED_SCOPED_CONDITIONAL_EI_FINITE_CHAIN`으로 채택했다. Ti=Te10000K, thermal ne=.14cm^-3, prescribed lnLambda20, H1+/He4+/He4++ 조건이다. C23D source와 PR102의 저장된 8 native grids를 재사용했다. 새 combined8 / primary96RHS / source1152atoms / grid·boundary18PASS, controls25PASS, 독립 C9 80자리55pairs/24RHS PASS, blocking0이다. 새ODE/sourcequadrature/oldscience replay0이다.
+
+[결과와 유도](https://github.com/cosmosapjw-quantum/bass_cr/blob/d3d9b0de8796de6e988c0d95540b1dbbe1d1cff3/research/cr_n5_ei_energy_20261024/RESULTS_KO.md), [과학 gate](https://github.com/cosmosapjw-quantum/bass_cr/blob/d3d9b0de8796de6e988c0d95540b1dbbe1d1cff3/research/cr_n5_ei_energy_20261024/CLAIM_GATE.json), [C9](https://github.com/cosmosapjw-quantum/bass_cr/blob/d3d9b0de8796de6e988c0d95540b1dbbe1d1cff3/research/cr_n5_ei_energy_20261024/review/C9_REVIEW.json).
+
+이번 local worker CPU는 실패 포함5.039778s, 알려진 상속 lineage29.870022114s이다. S0 및 실행 checkpoint의 Library/Dropbox R1 ACK가 있으며 최종 canonical R3와 D/M2 인계는 진행 중이다. 이전 Drive unknown은 그대로 유지한다. Scratch loss의 원인은 UNOBSERVED이고 핵심 S0 53files·입력23pins는 exact 복원했다. 원 private survey29pages/22bodies와theory17files의 복구불가 기록을 보존했다.
+
+**다음 첫 노드는 CR_N5_ATOMIC_ISOTOPE_COVERAGE**이다. Full N4/N5 PARTIAL/OPEN, N6/N7 PREDECESSOR_GATED. Missing rate/species/omitted-process ranking=null이다. PHYS84 numerical WAIT와 HE-ANG physical SOURCE_INPUT_PENDING을 수치 완료로 승격하지 않는다. PHYS87 neutron-capture scoped완료와 PHYS88 active remap owner를 구분한다. First entry는 irreversible assimilation/Maxwellization이 아니며 CE internal reward는 최종 bath heat가 아니다. Global error/completion은null, 원 nuclearPNG는NOT_RECOVERED_NOT_READ다.
+
+EXECUTION: selected EI complete | PUBLICATION: ScienceS R1, additiveM1 | BACKUP: checkpoint dualACK, finalR3pending | DAG: selectedchild complete, fullN4/N5open.
+<!-- END CR_N5_EI_20261024_LATEST -->
+
+---
+
 # 현재 C23D 부분 수신 — EE source 연결, full stopping OPEN
 
 새 science [d04b2a56adb4a5d55b901420aa544332b41f6dbb](https://github.com/cosmosapjw-quantum/bass_cr/tree/d04b2a56adb4a5d55b901420aa544332b41f6dbb/research/cr_c23d_finiteT_source_bridge_20261024) / [Draft PR99](https://github.com/cosmosapjw-quantum/bass_cr/pull/99): named consumer C23D_FROZEN_MAXWELL_EE_LOW10_V1은 독립 C9 PASS 후 NUMERICALLY_CHECKED_SCOPED이다. 10000K,thermal ne=.14cm^-3,lnLambda20,closedbox,0<W<10eV impulsive source의 signed EE exchange·first-entry·유한 격자 진화만 수신한다. 기존 PR59–64와 C23B를 재사용했고 old science replay0이다. 새 linear EE ODE는 primary3+이미 완료된 보조1이며 보조는 admission 근거가 아니다.
