@@ -1,3 +1,17 @@
+# 현재 C23D 부분 수신 — EE source 연결, full stopping OPEN
+
+새 science [d04b2a56adb4a5d55b901420aa544332b41f6dbb](https://github.com/cosmosapjw-quantum/bass_cr/tree/d04b2a56adb4a5d55b901420aa544332b41f6dbb/research/cr_c23d_finiteT_source_bridge_20261024) / [Draft PR99](https://github.com/cosmosapjw-quantum/bass_cr/pull/99): named consumer C23D_FROZEN_MAXWELL_EE_LOW10_V1은 독립 C9 PASS 후 NUMERICALLY_CHECKED_SCOPED이다. 10000K,thermal ne=.14cm^-3,lnLambda20,closedbox,0<W<10eV impulsive source의 signed EE exchange·first-entry·유한 격자 진화만 수신한다. 기존 PR59–64와 C23B를 재사용했고 old science replay0이다. 새 linear EE ODE는 primary3+이미 완료된 보조1이며 보조는 admission 근거가 아니다.
+
+전체 CR_N4_STOPPING_KERNEL은 PARTIAL/OPEN이다. 원40계약, 다른39wrapper,7authorities와17integration edges를 그대로 보존했다. 원 drift-only schematic을 finite-T current 전체로 사용하지 않는다. 실제 child는 J=aF-partial_W(DF)의 같은 count/energy current와 diffusion 경계항을 사용하며 bath heat를 중복 가산하지 않는다.
+
+다음은 N5 실제 source-owner return의 종·전하·온도·에너지 coverage 및 neutral/ion/inelastic 경쟁률 수신이다. 최신00:43UTC metadata에서 WU PHYS84 PR141은 NUMERICAL_ADMISSION_WAIT, HE-ANG PR93은 SOURCE_INPUT_PENDING이다. missing rate를0으로 대체하거나 이들을 완료된 numerical provider로 채택하지 않는다. Full conservative coupling N6와 새 parcel N7은 선행 gate 이후다.
+
+새 ZIP의 Library/Dropbox R3 PASS, Drive 상태는 실제 return/BACKUP_RECEIPTS를 따른다. 전체대화UNAVAILABLE,externalruntimeUNOBSERVED,global_error_bound/global_completion_percent=null. 완료 suite와 기존NCP51을 복원 목적으로 재실행하지 않는다. 다음node전 actualHEAD/AGENTS/parallelchanges/backup과 누적 예산을 확인한다.
+
+EXECUTION: scoped child COMPLETE | PUBLICATION: science S/Draft99 | BACKUP: actual per-provider receipts | DAG: full stopping PARTIAL/OPEN.
+
+---
+
 # 현재 N4 수신 overlay — 독립 검토 및 수신 패킷 게시 완료
 
 C23C terminal `910a9a92e4bf5a9d77b6ff60365d94559f54cbbd`의 저장된 결과를 `research/cr_n4_admission_20261024/`에서 수신한다. Science `54c2ff11e8308d45c545679301059bc1fcf268eb`, documents `6c760dc1f0ce5820263b276fa7263e87c1285bd2`. 소비자 `C23C_FROZEN_FIVE_LABEL_CALORIC_V1`의 저장된 18개 입력만 수치 승인 범위다. 중앙 N4 wrapper의 COMPLETE_SCOPED/CONSUMER_ADMITTED 변경은 독립 PASS_SCOPED_NEW_ADMISSION_MAPPING를 받았으며 실제 수신 패킷 commit `f3244471eeb7b209f4d1fad89ab2f5e8ed1d13cd`를 게시했다. Immutable packet: https://github.com/cosmosapjw-quantum/bass_cr/tree/f3244471eeb7b209f4d1fad89ab2f5e8ed1d13cd/research/cr_n4_admission_20261024 . Git R1: create_commit acknowledgement, non-force update_ref success 및 exact ls-remote 일치. 원 OPEN/NOT_RUN 저자 계약은 당시 snapshot으로 보존한다. stopping/N5/N6는 이 수신으로 승격하지 않는다.
@@ -319,3 +333,4 @@ C23C terminal `910a9a92e4bf5a9d77b6ff60365d94559f54cbbd`의 저장된 결과를 
 
 
 - `CR_BETA_FULL_OWNER` → `REI-L2`: activating source-qualified beta partition and stopping. One beta owner; total Q not all heat
+
