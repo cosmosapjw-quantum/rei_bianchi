@@ -8,7 +8,7 @@
 
 새 이론은 주어진 순간의 입자 수·운동에너지·support로 가능한 pressure tensor 집합을 구성하고, 주어진 팽창률과 shear가 하는 일의 sharp 구간을 계산한다. Exact Fraction 구현은 부호 반전·희석 항·full Frobenius convention을 보존한다. 실제 입력 연결 오류1건을 실행 전에 교정했고, stock source나 완료된 시험을 재생하지 않았다.
 
-최종 scientific decision은 STOCK_ADMISSION.json 및 WORK_ADMISSION.json이다. Stock과 work의 실제 raw 독립 심사는 모두 PASS_SCOPED, finding 0으로 끝났고 root의 한정 채택도 완료했다. 실제 publication/backup의 권위는 publication/PUBLICATION_READBACK.json 및 외부 FINAL_DELIVERY receipt다. 이 보고서의 과학 마감본 작성 시 최종 전달은 진행 중이며, 이후 closeout은 과학 입력·결과를 바꾸지 않고 실제 ACK/HEAD와 단계 상태를 갱신한다.
+최종 scientific decision은 STOCK_ADMISSION.json 및 WORK_ADMISSION.json이다. Stock과 work의 실제 raw 독립 심사는 모두 PASS_SCOPED, finding0이며 root의 한정 채택과 실제 전달도 완료했다. 각 유한 단위는 과학18+전달2의20/20이다. 과학 게시 `689cf792a1f2bb706436489cbe06ddca9da0d78d`는원격 Git blob·크기75/75 일치; 로컬 복구 SHA25675/75 일치를 확인했다. 현재 전달 metadata는 `CURRENT_FILE_COMMIT`, 실제 expected parent는 `2650548a6d221282861c837fae5f99aa0c0fe749`다. 실제 publication과 backup의 권위는 publication/PUBLICATION_READBACK.json 및 delivery/FINAL_C_BACKUP_ACK.json이고, 최종 metadata SHA는 root의 외부 delivery receipt가 기록한다. 이 editorial closeout은 과학 입력·결과·심사·예산을 바꾸지 않는다.
 
 ## 1. 재개 권위와 보존
 
@@ -56,7 +56,7 @@ C23E 조건부 D43K, HE94 부분창, PHYS85 실패 이력과 PHYS86 제한범위
 | REC134 /31d3d5b… | S1 static11/20,primary0,physical epsilon null | 시간 이력/물리오차를 새로 공급하지 않음 |
 | HH144 PHYS87 /cf48be1… | 유한 원전 창147assertions,18angular,153knots+152cells; scoped PASS | atomic→bare remap,tails,covariance,consumer,stopping OPEN |
 | BASS187 /0a088e1… |35×26=910massless 초기재고bridge;finite20/20 | massive Bianchi I cohort로 전용하지 않음;coupled endpoint false |
-| HE97 | B3 dual actual ACK/109576bytes 확인 | 과학19/20,C8 PARTIAL/NOT_RERENDERED;근사 joint law 존재,physical provider false |
+| HE97 — 당시 고정 조사 snapshot | B3 dual actual ACK/109576bytes 확인 | 당시19/20·C8 PARTIAL/NOT_RERENDERED 보존; 이후 C8을 닫아 scoped20/20, physical provider false |
 | PHYS86 | 실제1099scoped 결과와 후속 전달 근거 유지 | PHYS85 불완전2calls/실패와 비용 보존 |
 
 새3분기 compare는 자기 신규 leaf에만49/93/110개 파일을 추가했다.
@@ -70,13 +70,13 @@ PHYS83 완료 근거 재사용, PHYS84 numerical WAIT, PHYS87 S2_RECOVERY1 actua
 
 REI 직접 백업 폴더는Dropbox128개(has_more=false)와Drive205개였다.
 직전 C의 양쪽 metadata9244742bytes 및 작은 final receipt의 실제 내용 일치를 확인했다.
-이번 조사에서 그 큰 archive를 다시 내려받아 원격 전체SHA를 검증했다고 표현하지 않는다.
+이 당시 metadata 조사에서는 큰 archive의 원격 전체SHA를 검증하지 않았다. 이후 실제 복구에서는 A/B/직전 C 세 archive를 full GET하여 각 SHA256이 모두 일치함을 확인했다. 현재 새 C는 actual dual upload와 별도 metadata-size readback이며 remote full GET SHA256은 NOT_RUN이다.
 
 Personal Context는 실제 호출에서 이용 불가 오류를 반환했다.
 모든 비공개 대화를 읽었다거나 관련 대화가 없다는 결론은 내리지 않는다.
 첨부20개는 현재존재·크기가 맞고13개의 이전hash/읽기근거를 재사용했다.
 과거mtime baseline이 없어 변경 여부는UNKNOWN이다. 재해제·설치·과학재생은0이다.
-조사의 정확한 범위와 source refs는 survey/SURVEY_SYNTHESIS_KO.md 및 OWNER_INVENTORY_ADDENDUM에 있다.
+조사의 고정 범위와 source refs는 survey/SURVEY_SYNTHESIS_KO.md 및 compact manifest에 있다. Owner 추가 관측은 당시 보고서의 snapshot으로 보존한다. 이후 로컬 소실로 비export owner/private/detail raw는 현재 LOST_LOCAL_ONLY/NOT_RECONSTRUCTED이며 그 가용성 한계는 recovery note가 명시한다.
 
 ## 3. 실제 stock 실행
 
@@ -247,10 +247,13 @@ A/B 실제 ACK는 delivery의 파일로 확인한다.
 |---|---|---:|---|
 |A|2ec7e44795b72596279998565c5d659985e2f7d8d7590eb9ff8c5ea9c0ef49d3|181204|1Y7NirO1EsrTEeTApY6-dojyhHmKbLK6T /id:BSpOijBcT10AAAAAAD_9dw|
 |B|b366dcee5d7f6bf9802a01d2a16616223054be187669e676a4808baf0918cb1c|309964|1cuaLcjWeYMmJRi7W9MR-QeF-fbr18hsr /id:BSpOijBcT10AAAAAAD_9ew|
-|C|최종외부receipt 참조|최종외부receipt 참조|원 immutable C와 이후 delivery closeout을 구분|
+|C|93e6794c90f61cd281e0d4370e5298538277463ff6835657a79b901516f17e9c|10515765|11uR4dIsRTR6_9vF72OjYmlGkRecRdxeG /id:BSpOijBcT10AAAAAAD_9gQ|
 
 기존 source/준비 문서의 역사적 NOT_RELEASED와 실제 ROOT_GO/WORK_GO를 구분했다.
 현재 leaf의 CURRENT_STATE가 실제 실행 결과와 새 handoff로 안내한다.
+
+최종 C는 `REI_STOCK_WORK_C_20261024_93e6794c90f6.zip`, 191members(190payload+manifest), Library `libfile_6fcb69cc223881918e5cfb2e5986d0c9`로 실제 저장했다. 양쪽 provider의 업로드 완료 및 별도 metadata10515765bytes readback을 관측했다. 과학 source publication은 `689cf792a1f2bb706436489cbe06ddca9da0d78d`, tree `19bc4912a9cd7798b3e0880e47402afd2d70f70b`, parent `374c355ea2239ad8e924a23e732126a0e2ea6ff0`이며75/75 파일이 일치한다. 초기 ref-update server error 뒤 실제 HEAD를 읽고 HE3경로/owned overlap0인 새 부모에 동일 과학 subtree를 보존했다. 이후 HE delivery commit `2650548a6d221282861c837fae5f99aa0c0fe749`도3assembly paths/owned overlap0이고 AGENTS/protected head는 동일하다. 전달 metadata의 commit은 `CURRENT_FILE_COMMIT`이며 실제 SHA는 외부 최종 receipt에 기록한다. C를 자신의 미래 ACK 때문에 재생성하지 않는다.
+
 게시 대상은 stock/work 두 owned leaf뿐이며 실제 최신base의 병렬WU·HE 변경을 보존한다.
 expected-SHA/non-force를 사용하고 ANGTHERM02/newPR/main merge는 수행하지 않는다.
 
@@ -271,3 +274,17 @@ Primary nonthermal kinetic energy와 actual stopping/thermal heat를 구분한�
 다음 실제cohort의command/CPU/wall/input scope는NOT_FROZEN이다.
 완료한두fixture나old22/66/83을재생하지않고,새입력의존성이채워지면그한정단위를다음계약으로고정한다.
 
+
+## 9. 복구 사실과 근거의 현재 가용성
+
+일시 작업공간의 로컬 파일 소실을 실제 관측했으며 원인은 **NOT_ESTABLISHED**다. 런타임·사용자·동기화 중 어느 원인이라고 단정하지 않는다. Root가 실제 원격 A181204bytes/B309964bytes/ancestor C9244742bytes를 full GET했고, 세 archive의 전체 SHA256이 기존 identity와 모두 일치했다. Worker는 실제 A/B payload bytes와 functions store에 보존된 원래 publication73 entries의 content를 복원했다. 요약에서 source/raw를 재작성하지 않았다. 추가2관측 파일을 합친 published75개는 원격 Git blob·크기75/75 일치; 로컬 복구 SHA25675/75 일치다. 기존stock16/work core9 및 actual child raw8개가 복구되었고 **own claim-critical missing0**이다. 과학 재실행·새 심사·테스트는0이다.
+
+비export full external/owner/private/detail/transport 자료 중 기존 hash inventory로 식별되는169개는 현재 **LOST_LOCAL_ONLY / NOT_RECONSTRUCTED**다. 앞선 omissions의 “local retained”는 당시 상태이며 현재 가용성은 recovery/LOST_LOCAL_ONLY_NOTE.json 및 OWN_SOURCE_RESTORATION_RECEIPT.json이 설명한다. 원래 기록된 identity는 보존하지만 잃은 raw body를 보유한다고 주장하지 않는다. 넓은 재수집이나 외부 fulltext 재배포는 하지 않았다. 자체 채택의 exact theory/contract/source/fixture/input/actual raw/reviews/admission은 모두 있다.
+
+A/B/ancestor의 actual full-GET SHA 검증과 새 C의 metadata-size readback은 구별한다. 새 C의 remote full-GET SHA는 **NOT_RUN**이며 실제 local CRC/member-byte 확인, upload success와 양쪽 별도 metadata-size readback만 주장한다. immutable C에는 자체 미래 ACK가 없고 이 D metadata가 실제 ACK를 연결한다.
+
+## 10. 최종 병렬 전달 관측
+
+과거 HE97/PWBE19/20·C8 PARTIAL 기록은 해당 snapshot으로 남긴다. 이후 C8 presentation을 실제 닫아 정의된 PWBE 단위는20/20이다. 새 HE98/TDCS413은 science `de9c9ee9d9406a531b0c360f29004181bf7edc98`, delivery `d477aafcc620a010e954aa711d108fa2761a1d7e`이며 현재 중앙 `2650548a6d221282861c837fae5f99aa0c0fe749`의 반환에서 정의된 단위20/20과 B2 dual ACK1716134bytes가 관측된다. 이 pinned return의 B3 external final receipt는 아직 PENDING_ACTUAL이다. 물리 parent SOURCE_INPUT_PENDING, physical_provider_admitted=false는 그대로다.
+
+현재 C에 들어 있는 앞선 HE98의18/20은 그 시점 snapshot이다. 최신 상태는 survey/LATEST_HE_DELIVERY_2650548.json 및 publication/DELIVERY_PARENT_RECHECK.json의 additive metadata로 연결한다. 이 전달 변화는 현재 REI stock/work의 source·raw·가정·채택을 바꾸지 않으며 physical-provider나 global model 완료로 승격하지 않는다.
