@@ -1,0 +1,32 @@
+# 다음 스레드 handoff — stock/work 과학 완료, 전달 마감 중
+
+$physmath-research-loop 내장1.0.0으로 rei_bianchi를이어가라.
+고정authority0f9d9df825be1dac9ca9bdf73cdc2e8908bcba17 및 research/orchestration_longterm_20261023/assembly/HANDOFF_rei_bianchi_KO.md.
+마지막현재관측central85f9ba1350c076e8df01f5858342df74c3574215(branch research/orchestration-sandbox-20261022).
+현재primarypublication과finalC/최신HEAD는최종외부deliveryreceipt를읽어확인한다. 이파일초안작성당시전달마감은진행중이다.
+ANGTHERM02 research/rei-coupled-isotope-contract-20261022 @8d10231b1f0f788164d5eadbe1bcee0b802cceca READ_ONLY.
+
+현재작업root /workspace/scratch/03a65a604d4c/rei_stock_execute_20261024.
+먼저 REPORT_KO.md,CLAIM_GATE.json,STOCK_ADMISSION.json,WORK_ADMISSION.json,BUDGET_CLOSEOUT.json,LOOP_CLOSEOUT.json,next_work/NEXT_PHYSICAL_BINDING_KO.md와publication/readback·외부최종receipt를읽어라.
+
+Stocksource25c0e7919df496b79c131ffe0a25cc1101e9bf1d804e721bf190e48d3a165907.
+Stockraw5e6446adf8e9ba93212eaf001b9d2aa9c77e63deef8ca42eae1aa8ee79b8c733.
+Worksourceb0f08028dc96e78aa10c83eef6bcd88a02975a507a8a9a62a3ccb69a979c2152.
+Workraw8a38079873d3f3739ebc5a811f411eb992d2b56b2bde60d6d178d0e143cd4815.
+Stock/work각1child,CPU.035674/.045189s,wall.036127479001152096/.04566222199900949s,exit0/0,retry0.
+Native독립심사실제RUN_PASS_SCOPED,finding0. Workbindingfinding1은정적계약수리와actualraw소비로닫혔다.
+Stockraw의mixedenergy만읽었고Nt2와support5는각각동결N·D/해석majorant에서유도했음을보존한다.
+Scope는조건부massivepositive-measure수송·순간stress/work경계다. 실제시간이력·EOS·Einstein/thermalheat채택으로늘리지않는다.
+
+이번두childCPU합.080863,knownpartial합10.318970s.
+원래7.009328+3.101120=10.110448s/10scapFAIL/over.110448보존.
+WholeL0UNKNOWN_NOT_ZERO,originalcumulativecapNOT_FROZEN;model/parent/IO/remoteCAS별도미측정0아님.
+현재release두개모두소진;남은초이전0. old22/66/83/ANG/NCP/HI/pressure및stock재생0,추가science/render0.
+
+다음단일행동은 NEXT_PHYSICAL_BINDING_KO의실제cohort입력6행선언표를 source identity·단위·범위로결속하는것이다.
+기존한점HI를시간이력으로추정연장하거나초기값0을자동선택하지말라.
+Source-qualified공통양의측도/target밀도/IC/geometry·clock/각정보·support/collision·광자공급조건을읽고정한다.
+새단위의exactcommand·executor·CPU/wall은NOT_FROZEN;완료된fixture를다시시작하지말라.
+L4_ready=false,전체완료율null. C23E조건부D43K/HE94부분창/PHYS85역사와ANGTHERM02예약유지.
+게시가필요하면그시점실제AGENTS/HEAD/병렬변경을다시읽고두ownedleaf allowedpath를expectedSHA/nonforce로게시한다.
+

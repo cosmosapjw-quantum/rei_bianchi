@@ -1,0 +1,21 @@
+# Exact snapshot stress and diagonal work bounds
+
+This unit implements the frozen `authority/IMPLEMENTATION_CONTRACT.json` and `authority/THEORY_KO.md`. It accepts supplied physical-volume N,U,L,M and three signed diagonal rates in the physical orthonormal frame, with proper time measured in seconds. Inputs int, finite float and Fraction become exact represented Fractions; bool, unsupported and invalid/nonfinite values raise named ValueError. No float output, eigensolver, square root, numerical integration, unit conversion or stock import is used.
+
+`diagonal_work_bounds(N,U,L,M,rates)` returns a frozen `WorkBounds` with claim `sharp_given_exact_moments`. `enclosure_work_bounds(N,energy_interval,L,M,rates)` returns claim `conservative_given_energy_enclosure`. Fields are number_density, energy_interval, support_upper, rest_energy, rates, theta, shear_rates, trace_interval, work_interval, shear_work_interval, energy_derivative_interval, anisotropy_norm_squared_upper, claim. Scalar numerical fields and tuple entries are Fraction.
+
+The trace is S=tr(P), not S/3. Work is sum(H_i P_ii); shear work uses H_i-theta/3. The kinetic-energy derivative is -theta U-work. The norm field is the upper bound on the full Frobenius STF norm squared, with factor2/3. Separate extrema need not be attained by one measure. Exact-moment sharpness permits unrestricted angular positive measures including symmetric atomic beams. The enclosure composition is conservative; no sharpness is claimed for correlated energy/work within that outer rectangle. No physical source history, EOS, stopping, heat, self-consistent Einstein solution or L4 readiness is supplied. Historical2e-12 gates are unchanged.
+
+## Saved stock input binding
+
+`inputs/stock_stdout.jsonl` is an unchanged full byte copy of this root's single completed stock child stdout. The only numerical raw selector consumed here is `mixed_energy_interval`. The raw identity_checked flag has no identity numerical payload. N_t=2 is derived separately from frozen initial N=2 and ratios(1/2,1,2), whose product D=1. Lbar=5 is a separately proved support majorant: initial L=2,M=1,rmax=2 gives sqrt(33)-1<5 since33<36. N_t and Lbar are never described as raw JSON fields. SHA256 of the full saved stdout and original stock fixture is pinned in SOURCE_BINDING and PROPOSED_EXECUTION. Stock is never imported, called or rerun.
+
+The prepared future fixture checks the transported symmetric axis2 mono-energy witness: its unchanged axis ratio1 and D1 give U2 and Pdiag(0,3,0), hence trace3/work3/shear0/derivative-9/full STF norm squared6 for rates(-2,1,4). The actual saved mixed energy interval must contain2; the new conservative bounds must contain all witness values. This synthetic integration check does not adopt a physical initial condition.
+
+## Preparation and future execution
+
+The module, fixture and runner have not been imported, compiled or executed during this preparation. One future fixture group covers the six frozen signed-rate literal cases, independently summed +/-axis stress witnesses, norm squared, common weight scaling, rate reversal/permutation, saturated and zero moments, tiny exact positive energy, represented float equivalence, named invalid-input cases, the literal enclosure case and saved-raw consumption. Fractions serialize as numerator/denominator decimal strings. These finite cases do not prove all arbitrary-input behavior.
+
+Status is STATIC_PREPARED_UNEXECUTED. The completed stock release is consumed; this work fixture requires its own root GO and actual pre-execution backup. The one-shot runner checks source, fixture and saved-input hashes, creates exclusive raw/attempt.json before one child attempt, records actual stdout/stderr/resource use, applies child CPU soft=hard1s and launch-inclusive wall5s, and performs no automatic retry. The marker is an accidental-rerun/reproducibility control, not an authorization token. Historical cap FAIL, whole L0 UNKNOWN_NOT_ZERO and cumulative cap NOT_FROZEN remain. Parent/model/I/O/remote CAS costs are separate and unmeasured, not zero.
+
+Executor requested: /root/pressure_coding, gpt-6.1-sol/high. Observed backend model/effort: unknown. Root owns independent review, failure classification, any repair authorization and scientific admission.
