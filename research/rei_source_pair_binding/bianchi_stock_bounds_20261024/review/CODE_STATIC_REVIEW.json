@@ -1,0 +1,235 @@
+{
+  "schema": "REI_BIANCHI_STOCK_INDEPENDENT_STATIC_CODE_REVIEW_V1",
+  "unit": "REI_BIANCHI_STOCK_BOUNDS_PREP",
+  "reviewer": "/root/pressure_survey",
+  "recorded_utc": "2026-10-24T09:00:08.707Z",
+  "decision": "PASS_STATIC_SCOPED",
+  "recommended_root_status": "PREPARED_PASS_STATIC_SCOPED",
+  "authority": "ADVISORY_ONLY_ROOT_OWNS_ADMISSION_AND_ANY_FUTURE_RELEASE",
+  "scientific_admission": "NOT_ISSUED",
+  "numerical_validation": "NOT_RUN",
+  "runtime_or_resource_cap_validation": "NOT_RUN",
+  "reviewer_independence": {
+    "authored_theory": false,
+    "authored_candidate": false,
+    "authored_fixture": false,
+    "authored_runner": false,
+    "modified_implementation": false,
+    "implementation_owner": "/root/pressure_coding",
+    "review_basis": "Direct complete source read plus mathematical reasoning and mechanical byte/hash/diff comparisons only",
+    "model_backend_independently_observed": "unknown"
+  },
+  "reviewed_root": "/workspace/scratch/03a65a604d4c/rei_pressure_execute_20261024/work/research/rei_source_pair_binding/bianchi_stock_bounds_20261024",
+  "authority_pins": {
+    "fixed_handoff_commit": "0f9d9df825be1dac9ca9bdf73cdc2e8908bcba17",
+    "base_central_sha": "9f410bf0f4b5d14d1e6b7c17cd2e23a916f241c9",
+    "theory_sha256": "4041f7bd3971e3930ddcd76adca2b91f74c63cee05cca674f522cfbe3dfa15e9",
+    "contract_sha256": "b65528e96764b5eb7dc44284b1b50d61ee406d0a0bf692ec01ca61be09e93fb9",
+    "theory_and_contract_copies_byte_equal": true,
+    "bibliography": "Reviewed final corrected local theory; this code review did not independently re-query external literature"
+  },
+  "files": [
+    {
+      "path": "stock_bounds.py",
+      "bytes": 5085,
+      "sha256": "25c0e7919df496b79c131ffe0a25cc1101e9bf1d804e721bf190e48d3a165907"
+    },
+    {
+      "path": "focused_check.py",
+      "bytes": 4972,
+      "sha256": "47ecf7dc0ec59790e4eb339d59c527e71c07aab4ecb7b2fc0c4e265e77b35f43"
+    },
+    {
+      "path": "run_focused_once.py",
+      "bytes": 4758,
+      "sha256": "f3c40f3d426104503370e7ba3f833a15ec19ef41d0cbbab3f70d78f30e3e9cda"
+    },
+    {
+      "path": "PROPOSED_EXECUTION.json",
+      "bytes": 2305,
+      "sha256": "529f9f182407424d09c4521274bcc2795c49fda9eb5ad7787f673fd680cdcdd1"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3566,
+      "sha256": "82741186ab4a804db445bcd357e6af97b86bacf84da3b198754200aa82cf3122"
+    },
+    {
+      "path": "SOURCE_BINDING.json",
+      "bytes": 2772,
+      "sha256": "8a48fa83837bafccb2a276d115cf0dde68f4d3c27f24742df5ce941e458a9b9a"
+    },
+    {
+      "path": "authority/THEORY_KO.md",
+      "bytes": 10581,
+      "sha256": "4041f7bd3971e3930ddcd76adca2b91f74c63cee05cca674f522cfbe3dfa15e9"
+    },
+    {
+      "path": "authority/IMPLEMENTATION_CONTRACT.json",
+      "bytes": 5780,
+      "sha256": "b65528e96764b5eb7dc44284b1b50d61ee406d0a0bf692ec01ca61be09e93fb9"
+    }
+  ],
+  "delivery_consistency": {
+    "CODING_REPORT_hashes_and_sizes": "MATCH_8_OF_8",
+    "proposal_source_and_fixture_hashes": "MATCH",
+    "proposal_runner_hash": "MATCH",
+    "binding_prepared_hashes": "MATCH",
+    "CODING_DIFF_sha256": "074182c5e66e9cd079bba2dd9b2eabdf3f42804555eca6bda7571295f71f86d4",
+    "diff_paths": "EXACT_8_NEW_FILES_UNDER_ALLOWED_PREFIX",
+    "diff_payloads": "BYTE_MATCH_8_OF_8",
+    "raw_directory": "ABSENT_WHEN_READ",
+    "source_rewrites_by_reviewer": 0
+  },
+  "checks": [
+    {
+      "id": "STATIC-01",
+      "subject": "Represented input and domain guards",
+      "result": "PASS_STATIC",
+      "locations": [
+        "stock_bounds.py::_fraction",
+        "stock_bounds.py::_bits",
+        "stock_bounds.py::stock_bounds"
+      ],
+      "reason": "int/Fraction/finite float are converted directly to Fraction; bool/non-number/nonfinite are rejected before use. M and all three ratios are strictly positive; N,U,L,k are nonnegative, U<=N*L exact, bits integer excluding bool in1..4096. Ratios are tuple/list length3 and each error names its input."
+    },
+    {
+      "id": "STATIC-02",
+      "subject": "Exact sqrt enclosure",
+      "result": "PASS_STATIC",
+      "locations": [
+        "stock_bounds.py::_sqrt_interval"
+      ],
+      "reason": "With Q=p/q and s=2^b, n=isqrt((p*s*s)//q) ensures n^2*q<=p*s^2<(n+1)^2*q. Equality check n*n*q==p*s*s collapses exactly representable grid roots; otherwise the upper endpoint is (n+1)/s. All arithmetic stays integer/Fraction, with no float sqrt or clipping."
+    },
+    {
+      "id": "STATIC-03",
+      "subject": "Rationalized kinetic map and outward direction",
+      "result": "PASS_STATIC",
+      "locations": [
+        "stock_bounds.py::kinetic_map_interval"
+      ],
+      "reason": "For x=r^2*k*(k+2M)>=0, x/(sqrt_upper+M) is the lower endpoint and x/(sqrt_lower+M) the upper. Both denominators are positive. x0 returns exact0; r1 returns exact k. For k>0, all numerator/denominator values remain positive rationals, so tiny-k positivity is not lost to subtraction or output underflow."
+    },
+    {
+      "id": "STATIC-04",
+      "subject": "Anisotropic axis and volume factors",
+      "result": "PASS_STATIC",
+      "locations": [
+        "stock_bounds.py::stock_bounds",
+        "authority/THEORY_KO.md sections2-4"
+      ],
+      "reason": "D is exactly the product of all three ratios; Nt=D*N. Support uses rmax. Lower sharp-energy endpoint uses rmin and upper uses rmax. No implicit isotropy, density normalization, unit conversion or source-history inference is inserted."
+    },
+    {
+      "id": "STATIC-05",
+      "subject": "Convex/concave branch formulas",
+      "result": "PASS_STATIC",
+      "locations": [
+        "stock_bounds.py::stock_bounds"
+      ],
+      "reason": "rmin<=1 uses D*N*F(U/N) for lower and rmin>1 uses D*(U/L)*F(L). rmax<=1 uses D*(U/L)*F(L) for upper and rmax>1 uses D*N*F(U/N). At r1 both mathematical choices equal D*U and the kinetic map preserves exactness. Mixed axes are handled without requiring all expansion or all contraction."
+    },
+    {
+      "id": "STATIC-06",
+      "subject": "Zero branches and energy cap",
+      "result": "PASS_STATIC",
+      "locations": [
+        "stock_bounds.py::stock_bounds"
+      ],
+      "reason": "Domain validation precedes degeneracies. n0/u0/L0 bypass U/N and U/L and set all energy/pressure endpoint fields to exact zero while still mapping the supplied support bound. Nonzero energy uses lower[0] and min(upper[1],Nt*support[1]); both candidates in the min are valid upper bounds. Mathematical endpoint enclosures remain separate fields."
+    },
+    {
+      "id": "STATIC-07",
+      "subject": "Pressure-trace outward composition",
+      "result": "PASS_STATIC",
+      "locations": [
+        "stock_bounds.py::stock_bounds",
+        "authority/THEORY_KO.md section5"
+      ],
+      "reason": "The lower expression uses Ulower with Lupper; its support coefficient decreases with L. The upper uses Uupper and exact Nt; for a=M*Nt>0 its U derivative is (1+a^2/(U+a)^2)/3>0. Positive-domain denominators and the zero branch are correct. Documentation claims Tr(P)/3 only, not isotropic tensor stress or sharp composed pressure bounds."
+    },
+    {
+      "id": "STATIC-08",
+      "subject": "Independent future fixture oracles",
+      "result": "PASS_STATIC_PREPARATION",
+      "locations": [
+        "focused_check.py::check_radical",
+        "focused_check.py::main"
+      ],
+      "reason": "For a>0 the fixture independently brackets a*sqrt(q)+b via transformed rational endpoint squares. It requires nonnegative right endpoint and permits a negative lower endpoint correctly. It does not import/use production isqrt helper. Identity, expansion, contraction and mixed radical constants match the frozen contract; tiny k uses the independent identity (F+M)^2 relative to Q."
+    },
+    {
+      "id": "STATIC-09",
+      "subject": "Fixture boundary and homogeneity coverage",
+      "result": "PASS_STATIC_PREPARATION",
+      "locations": [
+        "focused_check.py::main",
+        "focused_check.py::refused",
+        "focused_check.py::serial"
+      ],
+      "reason": "Frozen zero cases, invalid U>NL, nonpositive M/r, wrong ratios length, bools and bits are prepared. Positive measure scaling7/3 checks Nt, both mathematical endpoint enclosures, actual energy interval and pressure exactly while support stays fixed. Future Fraction outputs serialize numerator/denominator strings. This is one finite fixture group, not a claim of exhaustive valid-input testing."
+    },
+    {
+      "id": "STATIC-10",
+      "subject": "Single-child prospective runner",
+      "result": "PASS_STATIC_PREPARATION",
+      "locations": [
+        "run_focused_once.py::main",
+        "run_focused_once.py::cpu_limit",
+        "PROPOSED_EXECUTION.json"
+      ],
+      "reason": "Parent imports no candidate/fixture. It checks source and fixture hashes, creates exclusive raw/attempt.json before attempting one Popen, sets child RLIMIT_CPU soft=hard1, starts elapsed timer before launch, subtracts launch elapsed from the5s communicate timeout, kills on timeout, and has no retry loop. stdout/stderr, CPU deltas, launch-inclusive elapsed, exit/timeout/error and actual identities are recorded. The fixture/production path spawns no further children."
+    },
+    {
+      "id": "STATIC-11",
+      "subject": "Scope, historical gate and permission separation",
+      "result": "PASS_STATIC",
+      "locations": [
+        "README.md",
+        "SOURCE_BINDING.json",
+        "PROPOSED_EXECUTION.json",
+        "authority/THEORY_KO.md section8"
+      ],
+      "reason": "bits is explicitly an input-unit sqrt grid resolution, not physical tolerance or replacement of the historical2e-12 gate. The reviewed diff adds only this unit's8 files; no old gate or pressure implementation is edited. Stock remains PROPOSED_NOT_RELEASED and separate from the already-consumed current pressure release. No source-history/EOS/stopping/Einstein/L4 or total-completion claim is made."
+    },
+    {
+      "id": "STATIC-12",
+      "subject": "File identity and exact authority binding",
+      "result": "PASS_MECHANICAL_READ_ONLY",
+      "locations": [
+        "SOURCE_BINDING.json",
+        "PROPOSED_EXECUTION.json",
+        "next_stock/CODING_REPORT.json",
+        "next_stock/CODING_DIFF.patch"
+      ],
+      "reason": "Direct current byte/hash reads agree with all8 report entries, binding and proposal pins; final corrected theory and contract copies are byte equal to root authorities. All8 /dev/null diff payloads reconstruct exactly the read files and remain inside allowed prefix."
+    }
+  ],
+  "blocking_findings": [],
+  "nonblocking_findings": [],
+  "repair_required": false,
+  "repair_count": 0,
+  "reviewer_actions": {
+    "candidate_imports": 0,
+    "fixture_imports": 0,
+    "runner_imports": 0,
+    "compile_or_AST_execution": 0,
+    "tests": 0,
+    "scientific_children": 0,
+    "CAS": 0,
+    "render": 0,
+    "Git_mutations": 0,
+    "cloud_mutations": 0,
+    "implementation_mutations": 0,
+    "mechanical_actions": "Read source/JSON/diff text, enumerate8 files, calculate SHA256 and compare literal bytes only",
+    "mechanical_model_IO_CPU": "UNMEASURED_NOT_ZERO"
+  },
+  "limits": [
+    "Static correctness recommendation only: the candidate, fixture and runner have not been imported, compiled or executed by this reviewer.",
+    "No actual assertion count, runtime, CPU, wall, timeout behavior or resource admission is established. Future actual receipt is required if root separately releases the frozen fixture.",
+    "Sharp energy bounds are conditional on supplied N,U,L,M and external positive axis ratios over unrestricted angular measures. Composed pressure trace bounds are conservative; anisotropic work and physical stock history are not closed.",
+    "No new physical scientific admission, no new strong no-go, and no transfer of the current pressure/L1 release or historical budget."
+  ],
+  "next_action": "Root may record this exact pinned candidate as PREPARED_PASS_STATIC_SCOPED. Keep numerical_validation NOT_RUN and future proposal PROPOSED_NOT_RELEASED unless root separately issues an execution release. No code repair is requested."
+}

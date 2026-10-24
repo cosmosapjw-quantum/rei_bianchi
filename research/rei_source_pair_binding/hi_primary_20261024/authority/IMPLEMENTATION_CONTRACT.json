@@ -1,0 +1,73 @@
+{
+  "schema": "REI_L1_SELECTED_HI_STATIC_IMPLEMENTATION_CONTRACT_V1",
+  "status": "AUTHORIZED_STATIC_PREPARATION_ONLY",
+  "unit": "REI-L1-SELECTED-ELEMENTAL-HI-SUMMARY",
+  "authority": {
+    "fixed": "0f9d9df825be1dac9ca9bdf73cdc2e8908bcba17",
+    "L0_admission": "ADMITTED_SCOPED",
+    "L0_science_commit": "566f242b843fe4428cedbb8f2ea319ad706ac605",
+    "L0_source_sha256": "c8dc1d8e8ad1ee72693bae20b86367b0e1aa1e52e9ff307575d21ca0b9279f77"
+  },
+  "allowed_path": "work/research/rei_source_pair_binding/hi_primary_20261024/",
+  "frozen_source": {
+    "repository": "cosmosapjw-quantum/bass_cr",
+    "read_commit": "b8882d026887f375acf90768d4e3740eb03da226",
+    "original_science_commit": "54477b285e0c712610453bca1408a076af43521d",
+    "cases_path": "research/cr_c23b_source_frame_20261023/source_providers/runs/c23b_pw19_spectral_source_20261023_v1/CASES.json",
+    "cases_blob": "61bcbc0b44206f496534da6bdffcdfe1731ad063",
+    "local_selected_row": "survey/github/L1_SELECTED_SAVED_ROW.json",
+    "channel": "HI",
+    "species_semantics": "elemental ground-state HI; no H1/D/T identification",
+    "redshift": 2.479,
+    "threshold_eV": 13.6,
+    "photon_support_eV": [
+      13.6,
+      50000
+    ],
+    "frame": "bath_frame_rest_target",
+    "recoil": "zero approximation",
+    "normalization": "per_absorbing_target_per_proper_second"
+  },
+  "representation": "Load saved JSON via ordinary json.load: binary64 floats. Internally use exact Fraction representations of int/Fraction/finite float to form products/sums, with one float conversion per final float-containing result. Do not reinterpret saved decimal spellings as original exact physics.",
+  "fields": {
+    "A": "number_per_target_s",
+    "B": "binding_eV_per_target_s",
+    "P": "absorbed_photon_eV_per_target_s",
+    "K": "kinetic_eV_per_target_s"
+  },
+  "model": "NO_DEPOSITION_SELECTED_MODEL; isotropic scalar closure; instantaneous prescribed source snapshot, not finite-stock or cosmic evolution",
+  "physics": [
+    "m=x_hi*amplitude; x_hi is target per fixed Href, nonnegative finite; amplitude nonnegative finite, adopted physical source amplitude1. Normalization once.",
+    "Six energy owners thermal,binding,UV,dynamic_escape,source_reservoir,primary_nonthermal. q=m*(0,B,-P,0,0,K). No feed, RR, deposition or hidden energy correction in this implementation.",
+    "Particle rates in order HI,HII,e_nt,e_th,absorbed_photon: m*(-A,+A,+A,0,-A). e_all source equals e_nt+e_th; don't charge electrons twice. No thermal heat-capacity update.",
+    "Analytic JVP with fixed moments only: dm = amplitude*dx_hi + x_hi*d_amplitude; same coefficient vectors multiplied by exact full dm. Tangents may be signed finite. No z/chi/support/angular derivatives.",
+    "Return exact represented-input residuals r_B=B-chi*A and r_E=B+K-P as Fractions, plus gross scales abs(B)+abs(chi*A),abs(B)+abs(K)+abs(P). Source exact expected sum m*r_E, JVP expected sum dm*r_E. Do not force closure.",
+    "Preserve donor raw residual -1.6155871338926322e-27 and null secondary_heat/global_error_bound in saved source card; don't relabel donor residual as new r_E.",
+    "Keep physical secondary_heat=None separate from chosen no-deposition q_thermal=0. No instant-deposition projection method implemented unless future separate contract.",
+    "Return named isotropic STF0 and flux0 only as declared closure; do not claim calibrated pressure trace, recoil/four-force or measured angular source."
+  ],
+  "implementation": [
+    "stdlib-only small standalone source_pair.py, source_card.json (exact copy of source row plus separate provenance wrapper if needed), README_KO.md, SOURCE_BINDING.json.",
+    "Expose pure functions source_per_href, source_jvp_fixed_moments, represented_residuals and selected-case loader; names may be concrete variants documented in README.",
+    "Use explicit dataclass/source metadata and validation appropriate to declared model: finite/nonnegative moments and normalization, pinned selection, required source fields; missing unsupported rates stay null and are never used as zeros.",
+    "No global tolerance policy or empirical source qualification. Future frozen2e-12 ledger criterion may be proposed, not reported as tested.",
+    "Prepare one focused_check.py for future one-child evaluation, unexecuted: load saved source row; exact Fraction reference source and JVP; check preserved K/null and particle charge; mixed cancellation direction; one unsupported z refusal. No donor quadrature or old L0 suite.",
+    "No changes to admitted L0 or donor source. Mechanical file copy/hash only; don't import/compile/run candidate/test code, no CAS/render/Git/cloud.",
+    "Stop after writing source/fixture/readme/manifest. Report all files and identities, no fabricated numerical outputs."
+  ],
+  "budget": {
+    "L1_scientific_invocations": 0,
+    "L1_actual_CPU": "NOT_MEASURED_NO_L1_SCIENCE_EXECUTION",
+    "new_L1_cpu_cap": "NOT_FROZEN",
+    "new_L1_wall_cap": "NOT_FROZEN",
+    "no_transfer_from_SRC01": true,
+    "proposal_for_next_one_child": {
+      "cpu_s": 1,
+      "wall_s": 5,
+      "automatic_retries": 0,
+      "status": "PROPOSED_NOT_AUTHORIZED"
+    }
+  },
+  "admission": "NOT_ISSUED; independent static review can review preparedness only; full L1 numerical/source admission waits future specifically bound increment",
+  "whole_model_completion_percent": null
+}

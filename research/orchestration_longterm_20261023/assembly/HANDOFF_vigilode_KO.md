@@ -1,0 +1,379 @@
+# cosmosapjw-quantum/vigilode 인수인계
+
+중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/research/orchestration-sandbox-20261022), `research/orchestration_longterm_20261023/`.
+
+첫 행동: 동결 계약을 읽고 진행 중인 소유자 결과와 실제 잔여 예산을 확인한다. 완료 근거를 재사용하며 예산·실패 기록을 초기화하지 않는다. 이 문서는 새로운 과학적 판정을 추가하지 않는다.
+
+현재 소스 핀·예약·자원 정책(원본 계약 기준):
+
+```json
+{
+  "numerics/VIGILODE_CONTRACTS.json": {
+    "schema": "longterm-scientific-contract.v1",
+    "survey_date": "2026-10-23",
+    "authority": "parent-assigned Astra scientific framing; implementation delegated only after contract",
+    "production": "HOLD",
+    "execution": "not_run",
+    "resource_policy": {
+      "ncp": false,
+      "campaign_replay": false,
+      "preserve_cumulative_ledger": true,
+      "budget_reset": false,
+      "new_scoped_local_unit_wall_seconds": 120,
+      "existing_campaign_budgets": "preserve immutable run plans; do not infer remaining budget"
+    },
+    "status_axes": [
+      "evidence",
+      "execution",
+      "claim",
+      "publication"
+    ],
+    "repository": "cosmosapjw-quantum/vigilode",
+    "pins": {
+      "PR79": "69e83044aacfb9a8fd2c6c3fb1146911beeedd79",
+      "nonstiff": "fbc3c272fa06b443de148631ea78bfa6a34f1b2b",
+      "hardening_publication": "14c74978b93339a79d7228a324fa77552dae548e",
+      "hardening_execution": "5913fe062706c820e768b9e150e5cd1c274f7bf9",
+      "adaptive_causal": "9b210c76dffb8909902f733e80d6cfa32405006e",
+      "local_frontier": "55ad7ec6af8b127cb90849db56abff4f02b9920b"
+    },
+    "units": {
+      "time": "client-declared physical or dimensionless time; record conversion",
+      "state": "full physical units per component",
+      "error": "dimensionless WRMS"
+    },
+    "source_evidence": [
+      "github_evidence.json",
+      "SURVEY_HANDOFF.md"
+    ]
+  }
+}
+```
+
+
+## V1-affine-native
+
+원본: `numerics/VIGILODE_CONTRACTS.json/nodes/0`. 내부 선행: 내부 없음. 외부 선행: `[]`. 조건부 선행: `[]`.
+
+원 저자 계약(변경 없음):
+
+```json
+{
+  "id": "V1-affine-native",
+  "depends_on": [],
+  "paths": [
+    "crates/rodas5p-integrators/src/affine_error.rs",
+    "crates/rodas5p-integrators/src/rodas5p_fast.rs",
+    "research/lifted_error_norm_20261022/code/"
+  ],
+  "equations": [
+    "y=L*z+b",
+    "e_full=L*e_reduced",
+    "s_i=atol_i+rtol_i*max(abs(y_old_i),abs(y_new_i))",
+    "err=sqrt(sum((e_full_i/s_i)^2)/33)"
+  ],
+  "interface": "Client-owned full33 pullback error norm into native RODAS; DOPRI AffineErrorNorm already exists. Preserve full denominator33, mixed-exponent behavior and typed refusal; no accepted commit on norm failure.",
+  "acceptance": [
+    "Exact correlated-error acceptance versus full33 oracle",
+    "Reuse10Decimal+5negative PR79 cases and shortIVP13gates only if identities hold",
+    "Keep defaultWRMS numerical digest; no allocations in norm hot path",
+    "Reuse existing tolerances; no new speed claim until actual counters measured"
+  ],
+  "pr_split": "PR V1a native norm hook; V1b actual BASS owner adapter and bounded client; V1c measured costs.",
+  "positive_claim": "Native adaptive acceptance matches full physical error geometry.",
+  "remaining": "Actual nonlinear full33/reduced30 client and native RODAS integration remain open.",
+  "status": "planned",
+  "execution": "not_run",
+  "repository": "cosmosapjw-quantum/vigilode",
+  "dependencies": [],
+  "source_pins": {
+    "PR79": "69e83044aacfb9a8fd2c6c3fb1146911beeedd79",
+    "nonstiff": "fbc3c272fa06b443de148631ea78bfa6a34f1b2b",
+    "hardening_publication": "14c74978b93339a79d7228a324fa77552dae548e",
+    "hardening_execution": "5913fe062706c820e768b9e150e5cd1c274f7bf9",
+    "adaptive_causal": "9b210c76dffb8909902f733e80d6cfa32405006e",
+    "local_frontier": "55ad7ec6af8b127cb90849db56abff4f02b9920b"
+  },
+  "source_refs": [
+    "github_evidence.json",
+    "SURVEY_HANDOFF.md"
+  ],
+  "scope": "Native adaptive acceptance matches full physical error geometry.",
+  "claim_limits": "Actual nonlinear full33/reduced30 client and native RODAS integration remain open.",
+  "resource_contract": {
+    "ncp": false,
+    "campaign_replay": false,
+    "preserve_cumulative_ledger": true,
+    "budget_reset": false,
+    "new_scoped_local_unit_wall_seconds": 120,
+    "existing_campaign_budgets": "preserve immutable run plans; do not infer remaining budget"
+  },
+  "source_status": "source-bound planning; not implemented by this survey"
+}
+```
+
+
+## V2-session-fatal
+
+원본: `numerics/VIGILODE_CONTRACTS.json/nodes/1`. 내부 선행: 내부 없음. 외부 선행: `[]`. 조건부 선행: `[]`.
+
+원 저자 계약(변경 없음):
+
+```json
+{
+  "id": "V2-session-fatal",
+  "depends_on": [],
+  "paths": [
+    "crates/vigilode/src/switching.rs",
+    "crates/vigilode/src/fd.rs",
+    "crates/vigilode/src/explicit.rs"
+  ],
+  "equations": [
+    "accepted checkpoint=(t,y,controller,FSAL,method,provider,epoch)",
+    "cost=sum(all accepted+rejected+pilot+cache rebuild work)"
+  ],
+  "interface": "Persistent authorized explicit/implicit driver sessions; invalidation on epoch/method/provider changes. Distinct terminal fatal callback and recoverable retry; return last accepted state.",
+  "acceptance": [
+    "Single-method state/counter parity; callback entered once on fatal and no further native attempts after fatal propagation",
+    "Rollback rejected pilot state and all provisional outputs",
+    "Keep defaultDerivativePolicyForbidden108parity pairs; no hidden FD underProvidedOnly",
+    "Retain rapid JVP32.5x loss control; matched-error cost evidence for switches"
+  ],
+  "pr_split": "PR V2a fatal terminal channel; V2b persistent checkpoint API; V2c bounded measured switching.",
+  "positive_claim": "Transactional restart and correctly charged opt-in switching.",
+  "remaining": "Existing screened replay kernel does not close persistence or future-regret guarantee.",
+  "status": "planned",
+  "execution": "not_run",
+  "repository": "cosmosapjw-quantum/vigilode",
+  "dependencies": [],
+  "source_pins": {
+    "PR79": "69e83044aacfb9a8fd2c6c3fb1146911beeedd79",
+    "nonstiff": "fbc3c272fa06b443de148631ea78bfa6a34f1b2b",
+    "hardening_publication": "14c74978b93339a79d7228a324fa77552dae548e",
+    "hardening_execution": "5913fe062706c820e768b9e150e5cd1c274f7bf9",
+    "adaptive_causal": "9b210c76dffb8909902f733e80d6cfa32405006e",
+    "local_frontier": "55ad7ec6af8b127cb90849db56abff4f02b9920b"
+  },
+  "source_refs": [
+    "github_evidence.json",
+    "SURVEY_HANDOFF.md"
+  ],
+  "scope": "Transactional restart and correctly charged opt-in switching.",
+  "claim_limits": "Existing screened replay kernel does not close persistence or future-regret guarantee.",
+  "resource_contract": {
+    "ncp": false,
+    "campaign_replay": false,
+    "preserve_cumulative_ledger": true,
+    "budget_reset": false,
+    "new_scoped_local_unit_wall_seconds": 120,
+    "existing_campaign_budgets": "preserve immutable run plans; do not infer remaining budget"
+  },
+  "source_status": "source-bound planning; not implemented by this survey"
+}
+```
+
+
+## V3-affine-quotient
+
+원본: `numerics/VIGILODE_CONTRACTS.json/nodes/2`. 내부 선행: 내부 없음. 외부 선행: `[]`. 조건부 선행: `[]`.
+
+원 저자 계약(변경 없음):
+
+```json
+{
+  "id": "V3-affine-quotient",
+  "depends_on": [],
+  "paths": [
+    "crates/rodas5p-integrators/src/quotient_flow.rs",
+    "crates/rodas5p-integrators/tests/frontier_affine_contracts.rs",
+    "crates/vigilode/src/lawson.rs"
+  ],
+  "equations": [
+    "y_next=exp(h*A)*y+h*phi1(h*A)*b",
+    "harmonic=sum_sigma exp(i*sigma*nu*(t+h))*h*phi1(h*(A-i*sigma*nu))*c_sigma"
+  ],
+  "interface": "Declared constant damping/rotation A and constant/harmonic forcing. Scale mantissa/exponents before half-splitting subnormal coefficients. General nonlinear residual remains explicit N.",
+  "acceptance": [
+    "At A=0,b=minsubnormal,nu=1e-308,h=1e308: b*sin(nu*h)/nu, rtol2e-14 atol1e-30",
+    "nu=0 with huge sine amplitude returns constant-forcing solution",
+    "Reuse actual native regression receipt if latest synthesis already executed it",
+    "Compare complete same-error forced trajectories; no generic speed claim from exact carrier"
+  ],
+  "pr_split": "PR V3a reconcile publication/test receipt; V3b native scoped adapter; V3c matched-error new-client extension.",
+  "positive_claim": "Stable exact declared affine/harmonic subflow.",
+  "remaining": "Targeted regression pending in inspected dirty audit; latest report can supersede.",
+  "status": "planned",
+  "execution": "not_run",
+  "repository": "cosmosapjw-quantum/vigilode",
+  "dependencies": [],
+  "source_pins": {
+    "PR79": "69e83044aacfb9a8fd2c6c3fb1146911beeedd79",
+    "nonstiff": "fbc3c272fa06b443de148631ea78bfa6a34f1b2b",
+    "hardening_publication": "14c74978b93339a79d7228a324fa77552dae548e",
+    "hardening_execution": "5913fe062706c820e768b9e150e5cd1c274f7bf9",
+    "adaptive_causal": "9b210c76dffb8909902f733e80d6cfa32405006e",
+    "local_frontier": "55ad7ec6af8b127cb90849db56abff4f02b9920b"
+  },
+  "source_refs": [
+    "github_evidence.json",
+    "SURVEY_HANDOFF.md"
+  ],
+  "scope": "Stable exact declared affine/harmonic subflow.",
+  "claim_limits": "Targeted regression pending in inspected dirty audit; latest report can supersede.",
+  "resource_contract": {
+    "ncp": false,
+    "campaign_replay": false,
+    "preserve_cumulative_ledger": true,
+    "budget_reset": false,
+    "new_scoped_local_unit_wall_seconds": 120,
+    "existing_campaign_budgets": "preserve immutable run plans; do not infer remaining budget"
+  },
+  "source_status": "source-bound planning; not implemented by this survey"
+}
+```
+
+
+## V4-causal-polynomial
+
+원본: `numerics/VIGILODE_CONTRACTS.json/nodes/3`. 내부 선행: 내부 없음. 외부 선행: `[]`. 조건부 선행: `[]`.
+
+원 저자 계약(변경 없음):
+
+```json
+{
+  "id": "V4-causal-polynomial",
+  "depends_on": [],
+  "paths": [
+    "crates/vigilode-coupled/src/adaptive.rs",
+    "crates/vigilode-coupled/src/causal.rs",
+    "crates/rodas5p-integrators/src/polynomial_resolvent.rs",
+    "crates/vigilode-coupled/examples/frontier_causal_trajectory.rs"
+  ],
+  "equations": [
+    "p(z)=(q(z)-q(1))/(q(1)*(z-1))",
+    "(I-B)*p(B)=I-q(B)/q(1)",
+    "error<=P/(1-delta)*||residual||, delta=||q(B)||/|q(1)|<1"
+  ],
+  "interface": "Declared full-space relation/witness; d-1 candidate actions plus1 original residual; near-pole refusal. Coupled adaptive acceptance retains full residual and embedded norm; all failed stages charged.",
+  "acceptance": [
+    "No inferred full-space relation from probes",
+    "Retain finite-causal amplification10^7 counterexample to residual-only solution claims",
+    "Accepted trajectories at common outputs, phase/amplitude/mass; count frozen-base JVP and projected work",
+    "Separate1/2/4-thread scheduling costs and current2targeted-test receipt"
+  ],
+  "pr_split": "PR V4a relation provider adapter; V4b full-space witness and poles; V4c accepted trajectory evidence.",
+  "positive_claim": "Conditional action reduction and accepted-trajectory performance within measured scope.",
+  "remaining": "Frozen-native timing and broad stability/long-time phase remain open.",
+  "status": "planned",
+  "execution": "not_run",
+  "repository": "cosmosapjw-quantum/vigilode",
+  "dependencies": [],
+  "source_pins": {
+    "PR79": "69e83044aacfb9a8fd2c6c3fb1146911beeedd79",
+    "nonstiff": "fbc3c272fa06b443de148631ea78bfa6a34f1b2b",
+    "hardening_publication": "14c74978b93339a79d7228a324fa77552dae548e",
+    "hardening_execution": "5913fe062706c820e768b9e150e5cd1c274f7bf9",
+    "adaptive_causal": "9b210c76dffb8909902f733e80d6cfa32405006e",
+    "local_frontier": "55ad7ec6af8b127cb90849db56abff4f02b9920b"
+  },
+  "source_refs": [
+    "github_evidence.json",
+    "SURVEY_HANDOFF.md"
+  ],
+  "scope": "Conditional action reduction and accepted-trajectory performance within measured scope.",
+  "claim_limits": "Frozen-native timing and broad stability/long-time phase remain open.",
+  "resource_contract": {
+    "ncp": false,
+    "campaign_replay": false,
+    "preserve_cumulative_ledger": true,
+    "budget_reset": false,
+    "new_scoped_local_unit_wall_seconds": 120,
+    "existing_campaign_budgets": "preserve immutable run plans; do not infer remaining budget"
+  },
+  "source_status": "source-bound planning; not implemented by this survey"
+}
+```
+
+
+## V5-sphere-production
+
+원본: `numerics/VIGILODE_CONTRACTS.json/nodes/4`. 내부 선행: V1-affine-native, V2-session-fatal, V4-causal-polynomial. 외부 선행: `[]`. 조건부 선행: `[]`.
+
+원 저자 계약(변경 없음):
+
+```json
+{
+  "id": "V5-sphere-production",
+  "depends_on": [
+    "V1-affine-native",
+    "V2-session-fatal",
+    "V4-causal-polynomial"
+  ],
+  "paths": [
+    "research/spherical_information_20261023/",
+    "research/production_frontier_20261023/src/pde_frontier.py",
+    "research/production_frontier_20261023/BENCHMARK_PLAN.json"
+  ],
+  "equations": [
+    "Q_i=sum_j c_ij*(y_j-y_i)/w_i",
+    "1^T W Q=0",
+    "positive normalizedPoisson error<=2*tau*||y||",
+    "global defect=sum propagated temporal/remap/switch errors under model stability bound"
+  ],
+  "interface": "Fixed-grid actual B=V^T U collision action; full occupation/joint(number,energy) remap only after accepted steps; cache/norm epoch refreshed. Explicit diffusion kernels conditional on reversible autonomous graph.",
+  "acceptance": [
+    "Preserve exact RKL2 positivity failure-5/512; positive branch usesPoisson tail accounting",
+    "Joint photon number/total energy, domain/PSD/FD, Fisher boundary, remap/time/spatial error separated",
+    "Broad production requires long-time phase, restart/events/callback behavior and common-reference external evidence",
+    "No NCP replay; completed96configs384runs and72configs288runs reused at own source pins"
+  ],
+  "pr_split": "PR V5a physical fixed-grid collision; V5b conservative accepted remap; V5c preregistered matched-error application cohort.",
+  "positive_claim": "Scope-specific physical transport admission with complete cost and error accounting.",
+  "remaining": "Diffusion mass conservation is insufficient for radiation energy+number; broadVODE-like production HOLD.",
+  "status": "planned",
+  "execution": "not_run",
+  "repository": "cosmosapjw-quantum/vigilode",
+  "dependencies": [
+    "V1-affine-native",
+    "V2-session-fatal",
+    "V4-causal-polynomial"
+  ],
+  "source_pins": {
+    "PR79": "69e83044aacfb9a8fd2c6c3fb1146911beeedd79",
+    "nonstiff": "fbc3c272fa06b443de148631ea78bfa6a34f1b2b",
+    "hardening_publication": "14c74978b93339a79d7228a324fa77552dae548e",
+    "hardening_execution": "5913fe062706c820e768b9e150e5cd1c274f7bf9",
+    "adaptive_causal": "9b210c76dffb8909902f733e80d6cfa32405006e",
+    "local_frontier": "55ad7ec6af8b127cb90849db56abff4f02b9920b"
+  },
+  "source_refs": [
+    "github_evidence.json",
+    "SURVEY_HANDOFF.md"
+  ],
+  "scope": "Scope-specific physical transport admission with complete cost and error accounting.",
+  "claim_limits": "Diffusion mass conservation is insufficient for radiation energy+number; broadVODE-like production HOLD.",
+  "resource_contract": {
+    "ncp": false,
+    "campaign_replay": false,
+    "preserve_cumulative_ledger": true,
+    "budget_reset": false,
+    "new_scoped_local_unit_wall_seconds": 120,
+    "existing_campaign_budgets": "preserve immutable run plans; do not infer remaining budget"
+  },
+  "source_status": "source-bound planning; not implemented by this survey"
+}
+```
+
+
+## 저장소 간 조건부 연결
+
+채널을 선택할 때만 해당 공급자 조건을 적용한다. 모든 공급자의 동시 완료를 요구하지 않는다.
+
+
+- `V1-affine-native` → `REI-L4`: using native reduced30/full33 affine adaptive client. Actual full physical norm and inherited scales; other validated solvers remain available
+
+
+- `V2-session-fatal` → `REI-L4`: using switching/restart driver. Accepted-state transactional semantics and all costs preserved
+
+
+- `V5-sphere-production` → `REI-L5`: claiming its physical spherical transport scheme. Joint number/energy remap and source-appropriate stability; not all selected-model pilots

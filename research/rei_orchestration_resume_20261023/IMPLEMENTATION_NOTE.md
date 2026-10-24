@@ -1,0 +1,13 @@
+# D10 implementation facts
+
+The executor recovered six immutable files at pinned source commit cce008b3fc32c298185b30550b2cd909d74fcd87. SOURCE_RECOVERY.json records byte counts, SHA256 and verified Git blob identities. The first attempt stopped before any physical diagnostic because text materialization stripped two trailing newlines from the adapter. Astra authorized exact-byte repair; the original failure is retained in FAILURE.log and attempt1_source_materialization.log. This was input materialization failure, not scientific failure.
+
+analyze_d10.py imports no historical model code. It checks compact bytes, metadata order and axes, selects exact target P_m,i=0, verifies 35 unique histories and the seven-by-five grid, finite arrays, positive a/H, increasing common saved scale-factor grid, and increasing153-point x. It reuses all153 epochs and integrates s/H using cumulative sampled Simpson from b0=0. The alternate trapezoid primitive measures sensitivity, not a rigorous error bound. Quadrature sign disagreement is classified separately from nearzero and resolved agreement/violation.
+
+Controls passed for an analytic quadratic integrand on a nonuniform grid, the neutral primitive, duplicate/reversed grid rejection, wrong population count, wrong physical grid, and duplicate identity rejection. The one physical diagnostic pass (including controls and figure exports) completed in CPU7.928258514s and wall8.021539945s with BLAS thread counts1. Initial failed source-validation attempt timing was not instrumented; its command returned after approximately1 second and did not reach physical analysis. No performance campaign or scientific rerun occurred.
+
+Observed sample counts:5168 resolved sign agreements,0 violations,187 nearzero/unresolved and0 quadrature-sensitive. All34 nonneutral first resolved stress samples match the qualitative local-onset signs. The neutral case remains below2.352e-19 in absolute signed stress. Endpoint max|trapezoid−Simpson| is7.271122424712395e-7. These are finite-sample diagnostic facts; no sampled finite difference is called an exact derivative, and no absent pressure/beta moment is invented.
+
+The actual-data figure groups all35 signed stress histories by seven initial shear targets. RESULT.json, endpoints35.csv, selected_input_identity.json and sampled_diagnostics35.npz retain the evidence. Scientific admission remains pending fresh Astra review. Publication and backups belong to root.
+
+Optional controller CAS probe was unavailable: importing sympy raised ModuleNotFoundError (exit1, wall0.266672621s). Exact symbolic CAS verification is NOT_RUN due to environment; this is not a scientific failure. Controller manual algebra and fresh Astra review remain the theory route.

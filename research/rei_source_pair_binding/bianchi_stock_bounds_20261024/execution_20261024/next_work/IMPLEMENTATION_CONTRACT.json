@@ -1,0 +1,260 @@
+{
+  "schema": "REI_BIANCHI_WORK_IMPLEMENTATION_CONTRACT_V1",
+  "unit": "REI_BIANCHI_WORK_BOUNDS_20261024",
+  "authority": "Root Astra mathematical contract; current continuation request",
+  "theory": "next_work/THEORY_KO.md",
+  "allowed_leaf": "research/rei_source_pair_binding/bianchi_work_bounds_20261024",
+  "frozen_physics": {
+    "metric": "(-,+,+,+)",
+    "clock": "proper seconds",
+    "momentum_frame": "physical orthonormal",
+    "mass": "m>0; M=mc^2",
+    "measure": "finite positive physical-volume number measure; angular unrestricted; atoms allowed",
+    "moments": "N=integral dnu, U=integral k dnu, 0<=k<=L, U<=N L",
+    "stress": "P=integral c^2 p p^T/(k+M) dnu",
+    "dynamic_interpretation": "homogeneous source-free collisionless force-free geodesic snapshot in prescribed diagonal Bianchi I",
+    "initial_or_injection_history_selected": false,
+    "Einstein_feedback": false,
+    "physical_EOS": false
+  },
+  "implementation": {
+    "module": "work_bounds.py",
+    "dependencies": "Python3.12 standard library fractions/dataclasses/math only; no stock import or science execution by parent",
+    "inputs": "int, finite float, Fraction converted to exact represented Fraction; reject bool and all invalid/nonfinite values with ValueError naming input",
+    "functions": [
+      {
+        "name": "diagonal_work_bounds",
+        "signature": "(N,U,L,M,rates)",
+        "inputs": "N,U,L>=0; M>0; U<=N*L; rates tuple/list length3 of finite signed values",
+        "claim": "sharp_given_exact_moments"
+      },
+      {
+        "name": "enclosure_work_bounds",
+        "signature": "(N,energy_interval,L,M,rates)",
+        "inputs": "N,L>=0; M>0; energy_interval tuple/list length2, 0<=lo<=hi<=N*L; rates tuple/list length3 signed finite",
+        "claim": "conservative_given_energy_enclosure"
+      }
+    ],
+    "output_dataclass": "WorkBounds frozen dataclass",
+    "fields": [
+      "number_density",
+      "energy_interval",
+      "support_upper",
+      "rest_energy",
+      "rates",
+      "theta",
+      "shear_rates",
+      "trace_interval",
+      "work_interval",
+      "shear_work_interval",
+      "energy_derivative_interval",
+      "anisotropy_norm_squared_upper",
+      "claim"
+    ],
+    "scalar_type": "Fraction; tuples contain Fraction. No float output, sqrt, integration, eigensolver, or borrowed tolerance.",
+    "formulas": {
+      "trace_lower": "u_lo*(L+2*M)/(L+M)",
+      "trace_upper": "u_hi*(u_hi+2*M*N)/(u_hi+M*N); N==0 or u_hi==0 =>0 before division",
+      "contraction": "a=min(rates),b=max(rates); (a*(Slo if a>=0 else Shi), b*(Shi if b>=0 else Slo))",
+      "theta": "sum(rates)",
+      "shear": "rates-theta/3; same contraction formula",
+      "derivative": "A=sorted((-theta*u_lo,-theta*u_hi)); (Alo-Whi,Ahi-Wlo)",
+      "anisotropy_norm_squared_upper": "Fraction(2,3)*Shi**2",
+      "empty": "N==0 implies all energies and stress/work/derivative/norm bounds0; rates/theta retain input value"
+    }
+  },
+  "fixture": {
+    "script": "focused_check.py",
+    "groups": 1,
+    "scientific_expected_values": "Exact rational literal endpoints and explicit discrete radial +/-axis stress witnesses, independent of production private helpers.",
+    "base": "N=U=L=2,M=1 =>S=(8/3,3),norm2upper6",
+    "rates_cases": [
+      {
+        "rates": [
+          -2,
+          1,
+          4
+        ],
+        "work": [
+          "-6",
+          "12"
+        ],
+        "shear": [
+          "-9",
+          "9"
+        ],
+        "derivative": [
+          "-18",
+          "0"
+        ]
+      },
+      {
+        "rates": [
+          1,
+          2,
+          3
+        ],
+        "work": [
+          "8/3",
+          "9"
+        ],
+        "shear": [
+          "-3",
+          "3"
+        ],
+        "derivative": [
+          "-21",
+          "-44/3"
+        ]
+      },
+      {
+        "rates": [
+          -3,
+          -2,
+          -1
+        ],
+        "work": [
+          "-9",
+          "-8/3"
+        ],
+        "shear": [
+          "-3",
+          "3"
+        ],
+        "derivative": [
+          "44/3",
+          "21"
+        ]
+      },
+      {
+        "rates": [
+          2,
+          2,
+          2
+        ],
+        "work": [
+          "16/3",
+          "6"
+        ],
+        "shear": [
+          "0",
+          "0"
+        ],
+        "derivative": [
+          "-18",
+          "-52/3"
+        ]
+      },
+      {
+        "rates": [
+          -2,
+          -2,
+          -2
+        ],
+        "work": [
+          "-6",
+          "-16/3"
+        ],
+        "shear": [
+          "0",
+          "0"
+        ],
+        "derivative": [
+          "52/3",
+          "18"
+        ]
+      },
+      {
+        "rates": [
+          0,
+          0,
+          0
+        ],
+        "work": [
+          "0",
+          "0"
+        ],
+        "shear": [
+          "0",
+          "0"
+        ],
+        "derivative": [
+          "0",
+          "0"
+        ]
+      }
+    ],
+    "independent_witnesses": "Radial (weight1,k0)+(weight1,k2) =>S=8/3; (weight2,k1)=>S=3. Axis beam stress diagonal uses each radial point contribution weight*(k+M-M*M/(k+M)), ±directions split equally. Verify N,U,trace,work endpoints against literals.",
+    "controls": [
+      "weight scale7/3, norm squared scale(7/3)^2",
+      "rates reversal and axis permutation",
+      "U=N*L gives trace collapse",
+      "N=0,U=0,L=0 guards",
+      "tiny exact U=2^-1075,N=L=M=1,rates=(1,1,1) yields strictly positive Fraction trace/work",
+      "represented float values match same exact integer values",
+      "invalid N/U/L/M/rates/energy interval/types/bool/nonfinite refusal"
+    ],
+    "enclosure_case": {
+      "N": 2,
+      "energy_interval": [
+        1,
+        2
+      ],
+      "L": 2,
+      "M": 1,
+      "rates": [
+        -2,
+        1,
+        4
+      ],
+      "trace": [
+        "4/3",
+        "3"
+      ],
+      "work": [
+        "-6",
+        "12"
+      ],
+      "derivative": [
+        "-18",
+        "3"
+      ],
+      "claim": "conservative_given_energy_enclosure"
+    },
+    "stored_input": "After current stock child succeeds, consume its actual mixed_energy_interval from full raw stdout copied unchanged to inputs/stock_stdout.jsonl. N_t=2 is derived from frozen fixture N=2, ratios=(1/2,1,2) with D=1; support upper Lbar=5 is an analytic majorant since L=2,M=1,rmax=2 gives sqrt(33)-1<5 (33<36). These N/L values are not read from raw. Pin full raw SHA and original fixture SHA in SOURCE_BINDING and execution proposal. M=1, rates=(-2,1,4). Never import/call/replay stock module.",
+    "serialization": "Fractions use numerator/denominator decimal strings. stdout one compact JSON summary with case values and flags after all assertions.",
+    "stored_input_witness": {
+      "initial": "N=2,mono k=1, symmetric +/-axis2, within initial L=2",
+      "ratios": [
+        "1/2",
+        "1",
+        "2"
+      ],
+      "final": "r2=1,D=1 -> U=2,P=diag(0,3,0)",
+      "expected_exact": {
+        "trace": "3",
+        "work": "3",
+        "shear": "0",
+        "derivative": "-9",
+        "anisotropy_norm_squared": "6"
+      },
+      "assertions": "Actual saved mixed U interval contains2; new trace/work/shear/derivative intervals contain witness values; anisotropy squared upper>=6. Literal expected cases elsewhere test exact endpoint formulas."
+    }
+  },
+  "execution": {
+    "status": "PREPARE_THEN_SEPARATE_CURRENT_ROOT_RELEASE",
+    "runner": "run_focused_once.py",
+    "pattern": "Reuse one-child resource-limited stock runner pattern. Parent checks source/fixture/stored raw input hashes, exclusive raw/attempt marker, no candidate imports. One child Python -B focused_check.py, RLIMIT_CPU soft=hard1s, launch-inclusive wall5s. Preserve stdout/stderr/resource receipt on success/failure.",
+    "retries": 0,
+    "acceptance": "Frozen source/fixture/input hash match; all assertions reach final summary; child/wrapperexit0; no timeout/launch error; measured child CPU<=1s and wall<=5s; independent native raw/source review then root decision.",
+    "command": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python -B /workspace/scratch/03a65a604d4c/rei_stock_execute_20261024/work/research/rei_source_pair_binding/bianchi_work_bounds_20261024/run_focused_once.py",
+    "executor": "/root/pressure_coding requestedgpt-6.1-sol/high; observedbackendunknown",
+    "provenance": "Historical budget FAIL remains. This prospective release is separate from consumed prior releases. model/parent/remoteCAS unmeasured separately, no allowance transfer."
+  },
+  "stopping_rule": "One focused fixture run; no automatic retry. Actual finding classified by root; only minimal authorized repair. No broad replay/test/render campaign.",
+  "scientific_claim": "Moment-feasible stress set theorem and sharp snapshot bounds with exact moments; conservative stock-enclosure composition; finite fixture does not prove full arbitrary-input implementation correctness.",
+  "no_strong_no_go": true,
+  "old_gate_2e_12_unchanged": true,
+  "L4_ready": false,
+  "whole_model_completion_percent": null
+}
