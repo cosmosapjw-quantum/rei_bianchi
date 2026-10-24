@@ -1,3 +1,21 @@
+# HE-ANG TDCS413 새 관측과 PWBE C8 종료 — 2026-10-24
+
+과학 S는 `de9c9ee9d9406a531b0c360f29004181bf7edc98` (tree `3d308cb443a6ca9f7a7bf70b2076dfff84be8bee`), draft PR98 <https://github.com/cosmosapjw-quantum/BASS_HE/pull/98>에 실제 게시되었습니다. 이번 관측의 중앙 parent는 `85f9ba1350c076e8df01f5858342df74c3574215`입니다. 새 TDCS413 단위는 R6 PASS, R7 symbolic/toy PASS, C9 PASS_AFTER_BOUNDED_PRESENTATION_REPAIR 및 root PASS_SCOPED이며, 현재 과학 스냅샷은 18개 단계 완료, R10/C10 실제 전달 대기입니다. PR은 병합하거나 활성화하지 않았습니다.
+
+FIAS-R-39 Table1의 16개 대각 설정 중 사전에 선택한 13개만 사용했고, 모호한 45/46/48도는 제외했으며 60도의 0(1)은 유지했습니다. 상대 각도 모양의 자유 정규화 비교에서 a=79.98401712311731, kappa=4.514958607183564, 활성 각도 50/38도, peak=42.96377691157668도입니다. 자유 scale은 전체 spin/count 배수를 흡수하므로 이 절단면이 그 절대 배수를 측정하지는 않습니다. 그 관례의 근거는 이전 유도에 있습니다. 최적점의 binary64 L>U 차이 1.4210854715202004e-14는 원시 반올림 진단이며, 외향 반올림 구간 인증이나 새로운 strong no-go가 아닙니다.
+
+새 단위는 실제 4개 child, CPU 3.117567초 / wall 3.242023329999938초를 사용했습니다. 동일 10/40초 배정의 reserve 1개를 소비하여 잔여 0개이며, 초기 그림 footer 문제와 한정 수정 기록을 보존했습니다. Wolfram 전체 remote CPU, 호스트 조립 및 파일 복구 비용은 UNKNOWN_NOT_ZERO이며 전체 end-to-end CPU cap을 입증하지 않습니다. B1은 실제 두 provider 업로드와 별도 metadata readback을 완료했고(1,249,757 bytes), B2의 실제 S/C 보관과 D/E/B3 전달은 아직 대기 중입니다.
+
+이 S에는 이전 PWBE의 저장 출력만 사용한 C8 종료도 가산적으로 포함됩니다. 실제 독립 visual review PASS로 그 정의된 이전 단위는 20/20 scoped 완료입니다. 이전 4개 시도와 실패 비용은 유지하며, 동일 8/30초 원장에서 총 5개 시도 CPU 3.304038초 / wall 3.4507949489989187초, reserve 1개 사용 / 잔여 0개입니다. PR97의 원래 S/D 및 당시 19단계/C8 OPEN 기록은 역사적 사실로 보존됩니다. 새 단위와 이전 단위 사이에 예산 이전이나 초기화가 없습니다.
+
+부모 HE-ANG은 SOURCE_INPUT_PENDING, physical_provider_admitted=false, 전체 목표 달성률 null을 유지합니다. PWBE 모델과 이번 유한 source benchmark는 사용 가능하지만 물리적 정확도/보정, detector covariance와 응답, 절대 scale 및 전체 support, 유한 질량 recoil과 consumer admission은 남아 있습니다. C9-NB-01의 향후 부분 mu_window theta metadata 의무와 기존 ledger의 실패/unknown도 보존합니다.
+
+다른 39개 노드와 기존 HE 계약·의존성·authority·integration은 그대로입니다. 중앙85f9의 실제 HH PHYS87 S2/147-check 관측을 보존합니다. 이후 HH owner HEAD496670cf의 문서/영수증 변경은 별도 survey 관측이며 canonical node 승격 또는 당사자의 archive 복원 검증이 아닙니다. C23E, CR Drive UNKNOWN, REC225의 별도 unmerged 관측, ANGTHERM02 read-only 경계도 유지합니다. 로컬 소실 원인은 NOT_ESTABLISHED이며 게시된 S108 blob과 크기의 일치를 확인해 복원했습니다. 복구 영수증은 B2/D에 보충하고 S 바이트는 수정하지 않습니다.
+
+정확한 새 반환 파일: `research/orchestration_longterm_20261023/assembly/returns/BASS_HE_HEANG_TDCS413_DIAGONAL_20261024.json`. 이 파일의 중앙 commit은 CURRENT_FILE_COMMIT 의미로만 기록하며, 미래 B2/D/E/B3 ACK는 꾸미지 않습니다.
+
+---
+
 ## PWBE 실제 D와 B2 ACK — 2026-10-24 / Draft PR97
 
 **HE-ANG-PWBE-SPIN-AZIMUTH**의 actual Delivery D는 `e3b2f786c7597ffa65aa6439194e7cbcae6103e7` (tree `f16961ffba179a4daa211ffea846d257448a9fb5`)이며 Science S `db91cbd3ac0f4db7908cd69c1f40e961f81051f9` 위의 metadata·late owner survey update만 전달한다. Actual Central C는 `cdba5c98819ea615c32c4d7cea2c613a737e9eb1`다. [Draft PR97](https://github.com/cosmosapjw-quantum/BASS_HE/pull/97)는 open/unmerged이며 no merge/no activation이다. 현재 E는 **CURRENT_FILE_COMMIT**으로 결속하고 실제 E의 SHA는 이후 publication receipt에서 제공한다.
