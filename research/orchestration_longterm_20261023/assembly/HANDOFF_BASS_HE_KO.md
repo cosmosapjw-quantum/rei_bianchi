@@ -1,3 +1,16 @@
+# HE-ANG finite-mass 실제 전달 갱신
+
+S 8d481ed47f57774f48bcfb412671ff927601316e, C 407381b302d8b98f251b54d277823997bc4fca9f, 실제 D bec636ffa3014035292c1078a758c7aa1827174d. E는 이 파일의 CURRENT_FILE_COMMIT이며, 아래 기존 인계 전체는 바이트 그대로 보존했습니다.
+
+정의된 finite-mass shell 단위는 D에서 COMPLETE_AT_DELIVERY_COMMIT, R1–R10/C1–C10 20/20입니다. C의 18/20/B2 pending은 해당 immutable snapshot의 역사적 상태입니다. 전체 HE-ANG은 SOURCE_INPUT_PENDING, physical_provider_admitted=false입니다. 유한 질량 운동학은 진폭/event sigma/물리 recoil 분포를 제공하지 않습니다. Merge/activation은 없습니다.
+
+실제 B2: HEANG_FINITEMASS_SHELL_SCIENCE_20261024_8d481ed4_407381b3.tar.gz, 2281167 bytes/221 members, SHA256 c45167100ada3287899a5d49b4686948a2f859c9b36b8db78a2f13bd4bbec43a. Drive 1jFe0xxImaBLsqz8K1DFgje4MdQjtMzHb, Dropbox id:BSpOijBcT10AAAAAAD_9lw. 두 provider 업로드와 별도 metadata size readback 완료이며 원격 전체 GET SHA256 검증은 주장하지 않습니다. E 게시 readback과 B3는 외부 전달 tail이며 B3 실제 영수증 위치는 PR99 description입니다: https://github.com/cosmosapjw-quantum/BASS_HE/pull/99 .
+
+최신 조사: 7 repositories, 1336 branches, 871 open PRs, 14 terminal collections/30 pages. REC135 및 VIG86은 metadata-only lead이며 본문 완료·물리 provider 승인을 추론하지 않습니다. 실제 post-S CR103 conditional EI finite-chain 및 HH145 conditional bare finite-window 결과는 각 원 소유자의 scope로 보존합니다. CR Drive UNKNOWN_NO_ACK, full N4/N5 PARTIAL/OPEN, HH source-equivalence/covariance/tails/consumer OPEN, HH_R10 OFF와 실패·unknown 비용을 유지합니다.
+
+S67/B1 121-member byte 복구 사실과 원인 NOT_ESTABLISHED를 유지합니다. 원문 PDF/fulltext/page images는 제외하고 metadata/선택식만 보존했습니다. 과학 재실행 0, 예산 초기화/이전 0. 원래 science/resource 숫자 및 아래 다른 owner 계약·authority·integration은 바꾸지 않았습니다.
+
+---
 # HE-ANG finite-M shell 새 과학 관측 — 2026-10-24
 
 Science S `8d481ed47f57774f48bcfb412671ff927601316e` (tree `9106f0a602e0561e69ca2b6302dab6590815d70e`)를 draft [PR99](https://github.com/cosmosapjw-quantum/BASS_HE/pull/99)에 게시했다. R6 PASS, Wolfram 21/21 True, 별도 Astra C9 PASS_SCOPED_KINEMATICS이며 과학 스냅샷은18/20, R10/C10의 실제 전달은 대기 중이다. 병합·activation은 하지 않았다.
