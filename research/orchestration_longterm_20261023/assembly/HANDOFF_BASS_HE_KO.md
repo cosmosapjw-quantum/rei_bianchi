@@ -1,3 +1,15 @@
+## 실제 Delivery D와 B2 ACK — 2026-10-24 / PR96
+
+HE-ANG-TDCS54-ANCHORS의 실제 Delivery D는 `32f9227a9abef814bb009a87272c44be74941163`이며 Science S `60cacdb740fa4dadcdcbff43b7ffcb52566e077d` 위에13개 metadata file만 추가했다. [Draft PR96](https://github.com/cosmosapjw-quantum/BASS_HE/pull/96)는 open/unmerged이고 no merge/no activation이다. D의 정의된 R1–R10/C1–C10 20개 stage row는 COMPLETE_SCOPED다. 실제 Central C는 `e69b01457f1f27e11806ad724a925a1f723d0c24`이며, 현재 E는 D와 실제 B2 ACK를 기록한다. E의 자체 identity는 CURRENT_FILE_COMMIT이고 최종 B3 tail ACK는 아직 발생 전이다.
+
+B2 `HEANG_TDCS54_ANCHORS_20261024_60cacdb7_e69b0145.tar.gz`는546602bytes/100members, local uploaded-byte SHA256 `1dd283fa7f08fe301e6151acaa34bdc0c9784e65bcbd92d2cb9f759ee915216c`다. Exact S91+C3, 실제 S/C receipts, local recovery/rebase observations와 복원 자료를 보존한다. Drive `1sZqUve2jKRwuWb3dlsnG05PM5lxFJoLz`, Dropbox `id:BSpOijBcT10AAAAAAD_9Sw` 양쪽 upload 완료와 독립 metadata size readback을 확인했다. 별도의 remote SHA256 비교는 주장하지 않는다. 실제 ACK는 `assembly/returns/BASS_HE_HEANG_TDCS54_ANCHORS_BACKUP_ACK_20261024.json`에 기록한다.
+
+S 게시 후 사라진 local project는 retained literal UTF8/base64 transport에서91개 파일을 복원해 actual immutable S Git blob SHA1/size와 모두 대조했다. 기존4attempt ledger, CPU1.887889초/wall1.9431963300012285초와 reserve1회, 실패·unknown은 그대로이며 과학 재실행·budget reset은0이다. 원인은 NOT_ESTABLISHED이고 host recovery/orchestration 및 remote 전체 CPU는 UNKNOWN_NOT_ZERO로 end_to_end_cpu_cap_established=false다. D는 실제 recovery/rebase 기록과 짧은 최신 중앙 survey addendum을 보존하며 S의 초기43-file survey는 불변이다.
+
+현재 parent는 `c40d287874f72519103e68267e659fc022eba188`다. 그 최신 REI L1 publication/recovery closeout과 앞선 fca9 scoped HI photon-summary/no-deposition/zero-recoil consumer, raw-atom qualification 미실행, pressure interval 정적 준비/수치 NOT_RUN, ANGTHERM02 read-only 및 각 owner의 예산·OPEN은 그대로 보존한다. 최신 DAG에서 산정한 비HEANG 39개 node와 원래 HEANG contract/dependencies/기존subunits/next sparse status는 변경하지 않았다. TDCS54는 두 located TDCS 관측값과 조건부 exact 진단을 공급할 뿐 HEANG full electron-impact joint law/event sigma/finite-mass recoil를 admit하지 않는다. 부모 SOURCE_INPUT_PENDING과 C9-NB-01/C23E 등 모든 기존 의무를 유지한다.
+
+B3는 실제 D/E metadata와 publication receipts를 B2 위에 overlay하는 보충본으로 만들 예정이다. B3 자체의 실제 SHA256/Drive/Dropbox ACK와 size readback은 업로드 뒤 [PR96 설명](https://github.com/cosmosapjw-quantum/BASS_HE/pull/96)에 기록한다. 자기 archive에 자신의 미래 ACK를 재귀적으로 넣지 않으며, 현재 E의 PENDING_B3_ACTUAL_ACK는 그 시점의 역사적 상태로 유지한다. 최종 사용자 전달 보고는 그 실제 이중 ACK 뒤에 한다.
+
 ## 최신 sparse joint TDCS 결과 — 2026-10-24 / PR96
 
 **HE-ANG-TDCS54-ANCHORS는 COMPLETE_SCOPED**다. Science S는 `60cacdb740fa4dadcdcbff43b7ffcb52566e077d` ([draft PR96](https://github.com/cosmosapjw-quantum/BASS_HE/pull/96)), source baseline은 `2cb9f9176c2a1764bb8ceaf2392531a100eb6820`다. Jones–Madison, PRA62,042701(2000)의 Table IV와 article p8/Fig.10에서 입사 54.4eV, slow 5eV, slow 210도 CW, fast 4/10도 CCW의 두 located H1s joint TDCS 좌표를 확보했다. Source atomic units의 (CDW-EIS, CCC99, experiment)는 각각 (1.83,2.58,1.52)와 (0.99,1.51,1.24)다. 전체 8개 높이 특징량의 24개 source value와 16개 printed ratio를 보존하지만, slow angle이 없는 나머지 행을 추가 joint 좌표로 만들지 않았다.
