@@ -1,3 +1,18 @@
+## 최신 추가: N5 neutral elastic scoped 결과 (2026-10-24 22:01:15 UTC)
+
+- Science S: 5eb895abbacce1642c451fd3fdfd2f776783871f; Draft PR104: https://github.com/cosmosapjw-quantum/bass_cr/pull/104
+- Gate: NUMERICALLY_CHECKED_SCOPED_CONDITIONAL_NEUTRAL_FP_FINITE_CHAIN; consumer N5_C23D_H1_HE4_NEUTRAL_ELASTIC_V1.
+- 실제 CCC/LXCat H1/He4 MTCS를 선도 질량비 thermal elastic FP와 저장 EE+EI+CE chain에 결속. 새8matrices/16neutralgenerators/112primaryRHS, 독립Decimal70 28RHS(t/v_s/v_p 포함),39controls/18finitecomparisons. 새ODE/sourcequadrature/oldreplay0.
+- 중성종에 의한 CE 상대 감소 약0.01092–0.01097%, no-CE first-entry 평균 감소14.5–18.4s. First entry는 assimilation이 아니다. Signed6bathledger와CEinternalgap분리.
+- R6/C9 PASS, blocking0. Reviewer의 signedreward norm/generator 진단정정은 허용값변경없이 처리했고 원FAIL·환경실패·staleownlease거부를 보존.
+- 새worker4.364423CPU s; 상속포함34.234445114CPU s. globalspend/remaining/null 유지.
+- Science근거: https://github.com/cosmosapjw-quantum/bass_cr/blob/5eb895abbacce1642c451fd3fdfd2f776783871f/research/cr_n5_neutral_elastic_20261025/RESULTS_KO.md
+- R10/C10 delivery는 다음DocumentsD/centralM2에서 닫는다. 준비/실행 checkpoint Library+DropboxACK; finalcanonicalR3대기. 이전DriveUNKNOWN을 성공으로 바꾸지 않는다.
+- 다음첫노드 CR_N5_ATOMIC_ISOTOPE_COVERAGE. CI/RR/DR/CX 및isotope/energyowner보완, PHYS84WAIT/HEphysicalsourcePENDING 유지. N4/N5 PARTIAL/OPEN, N6/N7 선행gate대기. global_error_bound=null,global_completion_percent=null.
+- 중앙 fc159d2b15843bdfe81af0840bc07392a4977680의 REI HI native 및 기존HE/WU/REC/BASS변경을 보존해 N5 additionalchild만 추가했다.
+
+---
+
 <!-- BEGIN CR_N5_EI_20261024_LATEST -->
 # 최신 BASS_CR N5 EI 인계 — 2026-10-24
 
