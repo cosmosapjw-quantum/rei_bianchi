@@ -18,7 +18,7 @@ L0와 HI summary-consumer의 앞선 scoped admission은 동일 근거에서 재�
 
 ## 1. 최신 자료 조사의 범위와 반영
 
-일곱 저장소의 branch heads를 빈 종료 페이지까지24GET으로 열거하여 **1326개 head**를 확인했다.
+08:34UTC의 일곱 저장소 branch heads를 빈 종료 페이지까지24GET으로 열거하여 **1326개 head**를 확인했다. 게시 중의09:12UTC HE 변화는 아래7절에서 추가 반영한다.
 이전1323개에서3개 늘었다. 기존 선택 PR56개와 새 branch query5개를 갱신해 서로 다른 PR60개,
 고정 source text18개, 관련 PR 본문3개를 읽었다. 모든 branch blob·모든 과거 대화의 본문을 전부 읽었다고 주장하지 않는다.
 이번 Personal Context 실제 호출은 unavailable/isError였다. 사용자 제공 대화와 저장된 handoff는 실제 파일 근거와 구분했다.
@@ -185,4 +185,44 @@ C는 게시 readback과 누적 인계 자료를 포함하는 최종 checkpoint�
 과거 parentC는 원래 bytes로 최종 package에 보존한다.
 새 Git 변경은 두 owned leaf의 추가 파일에 한정하고, 기존 scientific source·보호branch·다른 병렬 변경은 보존한다.
 최종 HANDOFF_KO.md와 외부 final delivery receipt를 함께 다음 스레드로 가져간다.
+
+## 7. 실제 게시와 마지막 HE 병렬 결과
+
+첫 update_ref 호출은 generic GitHubGraphQL 오류를 반환했다. 실제 ref를 다시 읽으니
+중앙이 HE PWBE/azimuth 관측 commit cdba5c98819ea615c32c4d7cea2c613a737e9eb1로 이동했다.
+실제 compare의3assembly 파일은 두 owned leaf와 겹치지 않았고 AGENTS 본문도 동일했다.
+그 새 부모 위에48개 추가파일을 expected-SHA/non-force로 게시한 실제 science commit은
+**79c042a15e7e29b894dadc32188e286dade73aad**이다.
+변경48개 모두 added이고 Git blob이 준비 manifest와 일치한다. 수정·삭제0,
+ANGTHERM02는8d10231… 그대로다. 첫 API 오류의 원인은 확정하지 않았다.
+
+이 추가 조사는 새로운HE pinned source9개와 central text4개,compare1개,PR1개를 실제 읽었다.
+HE97/db91cbd3ac0f4db7908cd69c1f40e961f81051f9는
+**DERIVED_PWBE_MODEL_INPUT_AVAILABLE**을 제공한다.
+Nonrelativistic infinite-fixed-proton H(1s) 전자충돌 이온화의 연속 pointwise joint TDCS와
+조건부 relative-azimuth 법칙이 실제로 유도되었다. 현재 HE에 joint model이 전혀 없다고 쓰면 부정확하다.
+
+그 근사모형의 calibrated accuracy, finite-mass recoil, support·uncertainty 및 consumer admission은 열려 있다.
+Full energy/solid-angle event integral은 NOT_RUN이고 parent SOURCE_INPUT_PENDING,
+physical_provider=false다. 실제 유한 상태는17complete/C8partial/R10·C10pending이다.
+첫 plot 실패 뒤 label3개만 정적으로 고쳤고 재렌더링하지 않았다.
+HE97 B1 dualACK는 확인된 source receipt에 있고 새B2/D/E/B3는 관측 시점PENDING_ACTUAL이다.
+이는 이전HE96 B3완료와 구별한다.
+
+새HE모형은 현재의HI photoionization source를 교체하지 않고,
+stock의 N,U,L,M·초기 저장고·시간 이력·외부 배경을 공급하지도 않는다.
+따라서 현재 추상 pressure/stock 결과와 코드 수리는 필요하지 않았다.
+해당 단위의 비용·실패·남은 권한은 REI의 예산으로 이전하지 않았다.
+정확한 근거와 실제읽기 범위는 survey/PARALLEL_HE_REFRESH_KO.md/json에 보존했다.
+
+## 8. C 고정 후 실제 전달 갱신
+
+최종 C의9,244,742bytes/250members와SHA6e21122eb0d7…를 고정한 뒤
+실제 중앙ba4417810b84ca7fa46db535059d6894e50127d5에서 HE전달3파일 추가변경을 읽었다.
+그 기록의 HE97 DeliveryD는e3b2f786c7597ffa65aa6439194e7cbcae6103e7이며,
+단계는19complete/C8partial, B2actualdualACK, B3PENDING_ACTUAL로 갱신됐다.
+그 전C 내부의17complete 표시는09:12 관측을 보존한 것이며 최신 전달 상태는 이 보완을 적용한다.
+물리provider=false, C8render미완료, REI pressure/stock 과학 결과와 자원은 변하지 않았다.
+실제AGENTS동일·ownedpath중복0·보호head동일을 확인하고 새base 위에metadata만 게시한다.
+상세한 보완과최종archiveID는 publication/POST_ARCHIVE_UPDATE_KO.md 및 외부FINAL_DELIVERY영수증에 있다.
 
