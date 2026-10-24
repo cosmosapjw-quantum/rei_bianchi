@@ -383,3 +383,16 @@ PUBLICATION: Science b8882d026887f375acf90768d4e3740eb03da226 and Documents b65b
 BACKUP: Library R3 PASS; Dropbox R3 PASS; Drive UNKNOWN_NO_ACK/R3 NOT_RUN after one upload and one exact reconciliation; no retransmit; three-provider backup incomplete
 
 DAG: N5 scoped child complete; parent N5 PARTIAL/OPEN; full N4 stopping PARTIAL/OPEN; N6/N7 predecessor-gated
+
+
+## 2026-10-24 N5 CE killed-chain scoped return — PR102
+
+Science [896800b4511f323ad3f0b5372b4912fb4770ea98](https://github.com/cosmosapjw-quantum/bass_cr/tree/896800b4511f323ad3f0b5372b4912fb4770ea98/research/cr_n5_ce_resolvent_20261024), [Draft PR102](https://github.com/cosmosapjw-quantum/bass_cr/pull/102). Named child CR_N5_CE_KILLED_GENERATOR_FIRST_EVENT / consumer N5_C23D_HI_CE_RESOLVENT_V1은 NUMERICALLY_CHECKED_SCOPED_CONDITIONAL_FINITE_CHAIN, independent C9 PASS, blocking0이다. Native-knot v3의8matrices/72RHS/24source rows와 frozen grid/boundary criteria를 수신한다.
+
+T10000K, thermal ne=.14cm^-3, lnLambda20, nH1s=.9cm^-3, stationary heavy unpolarized H1, closed box, proper seconds. Selected source 전체의 첫2S+2P CE확률은1.4302747727e-5–1.4642413873e-5, 원 active 확률2.2387889316e-5–3.4726318512e-5다. Initial0<W<10eV는 path ceiling이 아니며 exposure10000s는 impulsive population 정의다. 사건 조건부 평균 energy11.25887eV/time5.90986e5–5.95978e5s는 first-entry mean 및 final heat와 구별한다.
+
+원 v1의2Q/1complete/9RHS·비용을 유지하되 scratch-loss 뒤 raw NOT_RECOVERED이고 admission 제외다. V2의18개 probability grid FAIL을 보존한다. V3는 별도 입력에서 원 tolerance를 유지해 PASS했다. 전체 실제22Q/21complete/189RHS, retained raw20complete/180RHS, newODE/quadrature/old-science replay/NCP0. Known bounded worker lineage24.830244114CPU s; global/remaining금액null. 기존 C23D actualEEODE4 및 RESULT_CLARIFICATION 의미 유지.
+
+최신 fullmetadata07:26–07:27UTC1325branches/859openPR, relevant HEAD07:46:26UTC. PHYS84WAIT, PHYS86formal-reference scopedPASS는 physical stopping provider가 아니며 HE96sparseTDCS도 fullHE-ANG를 완료하지 않는다. Full N4/N5PARTIAL/OPEN, 다음첫노드는N5 selected-provider 실제 return admission이다. Missing CI/RR/DR/CX/neutralelastic/EIhazards=null. N6/N7는 선행 gate 이후다.
+
+EXECUTION: scoped numerical child complete. PUBLICATION: Science S R1 PASS; 원40contracts/다른39nodes/7authorities/17edges 및 병렬 HE/REI 변경 보존. BACKUP: final canonical pending; 이전DriveUNKNOWN 유지. DAG: CE child만완료, 전체N4/N5OPEN. 이후 Documents D와canonical 실제영수증은 같은return의후속갱신으로수신한다.
