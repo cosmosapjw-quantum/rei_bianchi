@@ -320,3 +320,22 @@ PHYS87 S2 actual HEAD는 `cf48be1b8838a3839fa3c605512c1a5bb4faa8e3`(tree `2c1a36
 최초 짧은 S2 ZIP의 pre-upload source-byte mismatch는 업로드 없이 보존했고 원인은 `UNRESOLVED`다. 고유 RECOVERY1 pack 한 번의 표적 packaging repair만 채택했으며 과학 유효성에 관한 추론은 하지 않는다. PHYS83/PHYS86 완료 identity를 재실행하지 않는다.
 
 핵반응 supplier 부모는 PARTIAL이며 atomic-to-bare remap·full support/covariance·named consumer·stopping/activation은 OPEN이다. Source-native child는 한정 수치 관측이고 consumer_admitted=false, HH_R10=OFF, production NOT_ISSUED를 유지한다. 이 부록은 원 인계 전체 bytes 뒤에 추가한 pointer이며 원래 물리 계약을 대체하지 않는다.
+
+
+## 2026-10-24 PHYS88 조건부 bare finite-window child — 실제 S2 관측
+
+[PHYS88 별도 owner return](returns/WU_PHYS88_CONDITIONAL_BARE_REMAP_20261024.json)에 이번 수용을 기록한다. S2 actual HEAD는 `a0853f2a3d1a8e9276a8834bfefca5325d0f9a73`, tree `e3f8a4656351b12cd25d199372e36334a83b9cf6`, PR145 Draft/open이다. Executed source S1은 `e9b7b78041fb0a7ea7763a0135a7a030953f0784`, scientific identity는 `2712595494bd9d784539d470c4ad0b178314c1ca55d2b0b9a75cb5dc1e6a2774`다. Scientific scoped child COMPLETE, R1–R9/C1–C9 18/20이며 S2 양쪽 실제 ACK와 exact metadata를 확인했으며 FINAL/중앙 전달은 후속 실제 영수증을 기다린다. 미래 성공을 추정하지 않는다.
+
+`MASS_CONVENTION_COVARIANT_RELABELLING_AND_CONDITIONAL_BARE_KERNEL`은 두 명시적 kernel-transfer 가정의 nominal mass/4vector 회계와 새 bare finite-window 수치 결과다. Primary482/482(guard36포함),20integrals=16full+4FD,18relabel/36bare/32owner다. 별도 parser612fields와 SciPy reference8fields가 일치했고1216quad/25620callbacks를 기록했다. 원153knots/152convexcells witness는 재사용했으며 oldscience/positivity/ODE/network/stopping replay0이다. Root SCIENTIFIC_ADMISSION과 independent C9 PASS_SCOPED를 별도 return의 실제 hash로 결속한다.
+
+실제 local child4=원3성공+affected-PDF artifact child1 exit1보존, CPU7.322937s/wall7.330995100001019s다. 짧아진 PDF의 최초 원인은NOT_ESTABLISHED다. 추가 saved-only 한 그림 child에서 완전한 candidate를 닫았으나 metadata token guard가 실패했고 그 비용/실패를 보존했다. 이후 equal-length CreationDate metadata bytes만 교정해 추가render0으로 원21400B/SHA6389368893663f161be17845fa618d8c8e9348d0a10b6eeccddf9876f18dbde7을 복구했다. 원 source/primary/reference/figure receipt는 불변이다.
+
+앞 부록 PHYS87_FINAL pending은 역사적 S2 snapshot이다. PHYS87의 실제 FINAL496670cf39b3c2b5ff5e208c01bb135fe96b3780은 양쪽 wholeGET/CRC562/payload561/Git102/extraction562/wholeparent1 및 main/terminal raw readback 완료 근거를 PHYS88 delivery/PARENT_PHYS87_FINAL_REUSE.json에서 재사용한다. 이를 이번에 다시 수행했다고 쓰지 않으며 기존 PHYS87 return bytes는 보존한다.
+
+원 NUCLEAR_ATOMIC_TO_BARE_CAPTURE_REMAP 및 NUCLEAR_PHYSICAL_FINITE_T_EVENT_SUPPLIER 부모는PARTIAL이고 consumer_admitted=false다. 다음 canonical successor는 `NUCLEAR_BARE_KERNEL_SOURCE_AND_CONSUMER_CONTRACT` OPEN이다. Electron-state는 그 안의 선행 sub-contract다. 실제 bare/atomic kernel 적합성, physical covariance/tails, named thermal/fast/radiation consumer와 stopping/activation은OPEN이다. BASS B3C는 atomicLyalpha manufactured consumer-design lead이며 PHYS88 nuclear-photon binding은NOT_BOUND다. Signed same-normal-frame tensor합 후norm, non-tiltedLRS/gaspi0/DMpi_m별도, HH_R10=OFF, productionNOT_ISSUED, globalcompletionnull을 유지한다.
+
+이 부록은 원13753-byte 인계 전체 뒤에만 추가한다. 원40contracts/planstatuses/authorities/dependencies, 전체17edge integration, 다른39nodes와 최신 HE/stock/work 및 모든 병렬 owner 파일을 바꾸지 않는다. S2dualACK는 실제 receipt로 결속했고 FINAL외부영수증은 실제 전달 후 root가 별도로 결속한다.
+
+### PHYS88 S2 실제 양쪽 ACK
+
+`PHYS88_S2_20261024_a0853f2a3d1a.zip`은29,964,156bytes, SHA256 `8bc9fa93f09119a035f131909d4f8434dbc8d88ad76a3019fe92f95ad891d5eb`,379payload/380members다. 실제 Dropbox `id:BSpOijBcT10AAAAAAD_9kA`와 Drive `1zYKVGmM4KJ4ldtbIn78HWGgOQoyJ7vir`의 upload ACK 및 exact metadata PASS를 owner `delivery/S2_DUAL_ACK.json`에 기록했다. LocalCRC380/380과 closed-pack byteSHA 확인은 stage packaging이고 providerwholeGET0/restoreNOT_CLAIMED_AT_STAGE다. FINAL은여전히PENDING_EXTERNAL_FINAL_RECEIPT이며 stageACK를최종복원으로소급하지않는다.
