@@ -1,0 +1,20 @@
+--- closed_exchange_before.py
++++ closed_exchange.py
+@@ -120,7 +120,7 @@
+     if feed_mode not in ('finite', 'external'):
+         raise DomainError('feed_mode must be finite or external')
+     return _finite_output((_poly_sum((p,-k), ((-chi,a),)),
+-                           _poly_sum((), ((chi,a),(-chi,r))), _add(j,-p),
++                           _poly_sum((), ((chi,a),(-chi,r))), _poly_sum((j,-p)),
+                            _poly_sum((k,), ((chi,r),)),
+                            -j if feed_mode == 'finite' else 0))
+ 
+@@ -140,7 +140,7 @@
+         raise DomainError('unknown feed mode')
+     return _finite_output((_poly_sum((dp,-dk), ((-chi,da),(-a,dchi))),
+                            _poly_sum((), ((chi,da),(-chi,dr),(a,dchi),(-r,dchi))),
+-                           _add(dj,-dp), _poly_sum((dk,), ((chi,dr),(r,dchi))),
++                           _poly_sum((dj,-dp)), _poly_sum((dk,), ((chi,dr),(r,dchi))),
+                            -dj if feed_mode == 'finite' else 0))
+ 
+ 
