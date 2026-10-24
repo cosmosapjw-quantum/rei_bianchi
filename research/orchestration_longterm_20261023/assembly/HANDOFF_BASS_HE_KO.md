@@ -1,3 +1,13 @@
+## 최신 CCC equal-sharing convention 결과 — 2026-10-24 / PR95
+
+**HE-ANG-CCC-EXCHANGE는 COMPLETE_SCOPED**다. Science S는 `63706d605ddfc5d313ca310b09b5fd54a4efdbf4` ([draft PR95](https://github.com/cosmosapjw-quantum/BASS_HE/pull/95))이며, baseline은 `c8f5818c61d14872837abf7e9bc1a73c670ae25c`다. Bray physics/9906008v3 Eq. (26)의 인쇄된 minus와 정의의 차이를 해당 pinned 식에 한정해 교정했다. Raw complex pair, 이미 coherent인 density, 이미 spin-weighted인 density, phase 정보가 없는 intensity를 구별하는 조건부 CCC exact equal-sharing adapter를 구현했다. 실제 Stelbovics TP Table I의 8개 4CCC 값은 원문 정규화를 보존하고 printed BRM과 산술 비교만 수행했다.
+
+R6와 C9는 모두 PASS_AFTER_CORRECTION이고 현재 blocker는 0이며, root는 PASS_SCOPED를 채택했다. 초기 14개 test method의 PASS 뒤 C9-01 assertion scale 결함만 수정하여 test_05 한 method를 reserve로 검산했다. Kernel은 변경하지 않았다. 실제 4개 child와 runner 구간의 측정 누적 CPU는 1.410021초, wall은 1.4436621759814443초이며, 새 allocation은 CPU8/wall30초, reserve 사용은 1회다. 최초 reserve prelaunch는 빈 task lock의 FileExistsError 때문에 START와 child 전에 멈췄고, root가 해당 task lock만 정리하도록 승인했다. 부모 CPU의 UNKNOWN_NOT_ZERO를 별도로 보존하므로 end_to_end_cpu_cap_established=false다. 미측정 host 준비·문서 I/O와 remote symbolic 전체 CPU도 0으로 바꾸지 않았다. 과거 allocation, 실패와 unknown은 이전 ledger에 보존하며 새 예산으로 전용하지 않는다.
+
+부모 **HE-ANG SOURCE_INPUT_PENDING**, 다음 node **HE-ANG-SOURCE-PAYLOAD**, physical_provider_admitted=false를 유지한다. 같은 source·producer·kinematics·preparation, exact energy point, 단위와 측도를 갖춘 조건부 산술이다. Full H joint payload, support, count, frame, recoil과 uncertainty 입력은 여전히 필요하다. 새 strong no-go나 전체 물리 목표의 완료를 주장하지 않는다. HE38, X1, contract, Hex와 DDCS20의 실행 근거는 재사용했으며, old suite replay, 새 IVP, CCC solve와 Hex solve는 0회다.
+
+근거는 `research/he_ang_ccc_exchange_20261024/RESULTS_KO.md`, `CLAIM_GATE.json`, `SCIENCE_DECISION_KO.md`, `evidence/review/C9_REPORT.json`과 새 central return `assembly/returns/BASS_HE_HEANG_CCC_EXCHANGE_20261024.json`이다. B1 preparation은 양쪽 provider에서 40,303 bytes의 metadata readback을 완료했다. 최종 Science S와 central C, 후속 delivery의 backup ACK는 **PENDING_ACTUAL_BACKUP_ACK**이며 실제 응답 뒤 별도로 추가한다. C10은 실제 최종 전달 대기다. 현재 central base는 CR-N5의 최신 receipts와 Drive ACK unknown 상태를 포함한 `f3ff95c4ddbdc4279223929a777072ec4eace577`다. 원래 HE-ANG 계약, 의존성, 기존 관측과 다른 39개 node 및 C23E·CR 기록을 그대로 보존했다. no_merge/no_activation을 유지한다.
+
 # cosmosapjw-quantum/BASS_HE 인수인계
 
 ## 최신 실측 window 결과 — 2026-10-24 / PR94
