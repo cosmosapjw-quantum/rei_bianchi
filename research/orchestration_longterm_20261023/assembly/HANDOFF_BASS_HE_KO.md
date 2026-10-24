@@ -1,3 +1,21 @@
+# HE-ANG finite-M shell 새 과학 관측 — 2026-10-24
+
+Science S `8d481ed47f57774f48bcfb412671ff927601316e` (tree `9106f0a602e0561e69ca2b6302dab6590815d70e`)를 draft [PR99](https://github.com/cosmosapjw-quantum/BASS_HE/pull/99)에 게시했다. R6 PASS, Wolfram 21/21 True, 별도 Astra C9 PASS_SCOPED_KINEMATICS이며 과학 스냅샷은18/20, R10/C10의 실제 전달은 대기 중이다. 병합·activation은 하지 않았다.
+
+Kadyrov2009의 arbitrary finite-mass Jacobi 기초로 lab energy shell, 두 positive radial roots, coarea, conditional sphere, 전체 kinematic phase-space volume 및 W=1 moments를 유도·구현했다. 테스트14/14,6개 energy/binding fixture,16개 ray reference 및7개 mp80 적분이 통과했다. 실제3children CPU2.484451/wall2.519181445000868,8/30, reserve0used/1remaining이다. Wolfram1회 toolwall10.709/bodyCPU1.583364/bodywall1.559547,remoteTOTALCPU UNKNOWN_NOT_ZERO다. 과거 비용·실패·unknown과 완료 suite 재사용을 유지한다.
+
+부모 HE-ANG은 SOURCE_INPUT_PENDING이다. 새 finite-M support/frame/recoil 사상은 amplitude가 없는 운동학 substrate이며 event sigma나 physical recoil law가 아니다. Fixed-center PWBE에 새 shell만 붙여 finite-M source consistency를 주장하지 않는다. 첫 입력은 여전히 source-consistent joint amplitude/event payload 및 normalization/count/spin/exchange/support/frame/finite-M/uncertainty 계약이다. C9-NB-01과 C23E를 보존한다.
+
+B1은1151966bytes/SHA256 cba13356f29b27818c41c743f008b95dc0c3ddb89f1d0f0e13bf6aad0d41f176, 실제 dual ACK를 받았다. 게시 후18:25UTC에 로컬 파일 부재를 관측했으나 원인은 NOT_ESTABLISHED다. S의67파일을 remote Git에 대조한 literal bytes로 복원했고, B1은 실제 단일 full GET의 SHA256과121멤버를 확인했다. 과학 재실행은0이며 복구 비용과 원문 body 미복원 범위는 D/B2 영수증으로 보충한다. B2와 D/E/B3는 현재 실제 대기 중이다.
+
+PR98의 실제 B3는 이미 완료됐고 양 provider metadata 및 최종 PR 본문을 이번 진입에서 재확인했다. 기존 아래 역사적 B3pending 문구는 당시 snapshot이며, 새 tdcs413_final_B3_observation에 실제 영수증을 가산 기록한다.
+
+현재 중앙 parent `6de537660df51101c68c7adf18a697d1aae1cceb`의 병렬 CR103 EI와 HH145 PHYS88 FINAL 관측을 포함해 다른39개 노드를 그대로 보존한다. CR의 fullN4/N5 OPEN/Drive UNKNOWN, HH의 physical parents PARTIAL/source equivalence·consumer·stopping·covariance/tails OPEN/HH_R10 OFF, REC H5 HOLD 및 별도226 관측도 승격하지 않는다. 기존 DAG의 다른 모든 바이트는 유지하고 HE observed_completion 내부에 두 own-key만 추가했다.
+
+새 반환 파일: `research/orchestration_longterm_20261023/assembly/returns/BASS_HE_HEANG_FINITEMASS_SHELL_20261024.json`.
+
+---
+
 # HE-ANG TDCS413 실제 전달 D와 B2 ACK — 2026-10-24
 
 실제 S `de9c9ee9d9406a531b0c360f29004181bf7edc98`, D `d477aafcc620a010e954aa711d108fa2761a1d7e` (tree `b4c69e769af4dcee867f3e040bc8d3cdcef48500`), C `374c355ea2239ad8e924a23e732126a0e2ea6ff0`를 연결합니다. Draft PR98 <https://github.com/cosmosapjw-quantum/BASS_HE/pull/98>는 병합·활성화하지 않았습니다. 이 중앙 E의 parent는 `689cf792a1f2bb706436489cbe06ddca9da0d78d`이며 자기 SHA는 CURRENT_FILE_COMMIT 의미입니다.
