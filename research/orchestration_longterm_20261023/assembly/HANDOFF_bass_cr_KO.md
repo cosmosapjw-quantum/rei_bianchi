@@ -343,3 +343,23 @@ Science `8e4e06361d714939513a11f64a27f02822bde2fa` / [Draft PR100](https://githu
 실측 새 child CPU2.161932s/wall2.171415343s; 알려진 tracked-lineage CPU15.493261114s는 lower bound이며 과거 전체비용/미측정CAS/금전·잔여예산은 null이다. 원문·결과·검토는 `research/cr_c23e_d43_source_binding_20261024/`의 RESULTS_KO.md, THEORY_KO.md, review/와 raw run에 있다. 새 release backup은 PENDING_NEW_RELEASE이며 기존 Drive UNKNOWN_NO_ACK는 승격하지 않는다.
 
 부모 CR_N5_ATOMIC_ISOTOPE_COVERAGE는 PARTIAL/OPEN이다. empirical isotope-resolved D, microscopic Milne pair, full21 rates, finite-mass corrections, stopping 및 cosmological admission은 OPEN이다. 원 계약과 다른39 nodes/7 authorities/17 embedded edges를 보존하며 C23E 완료를 전체 네트워크 완료로 해석하지 않는다.
+
+
+<!-- N5_CE_PUBLICATION_n5_initial_20261024_v1 -->
+## N5 CE child — n5_initial_20261024_v1
+
+Child: `CR_N5_PROVIDER_RATE_SEMANTICS_AND_CE_ENVELOPE`; parent N5 `PARTIAL/OPEN`; N4 `PARTIAL/OPEN`; N6/N7 predecessor gates remain open.
+
+Science: `b8882d026887f375acf90768d4e3740eb03da226`; https://github.com/cosmosapjw-quantum/bass_cr/pull/101; run `n5_ce_envelope_primary_20261024t031906828z_v1`. Review: PASS_SCOPED; blocking0; 3 resolved findings; 2 nonblocking documentation clarifications preserved.
+
+Return: `returns/CR_N5_PROVIDER_RATE_SEMANTICS_AND_CE_ENVELOPE_20261024.json`. Existing C23E: `returns/CR_N5_C23E_D43_SOURCE_BINDING_20261024.json` (preserved).
+
+Conditional finite-band first-CE-event diagnostic with n_H(1s)=0.9 cm^-3. Initial 0<W<10 eV is selection only; CE envelope covers the full admitted R80 path. Thermal target rates and tagged CE hazards remain distinct. Missing rates and total non-EE bound remain null. PHYS84 numerical admission WAIT and HE-ANG full law SOURCE_INPUT_PENDING remain.
+
+EXECUTION: COMPLETE_SCOPED; independent C9 PASS; primary1; ODE/quadrature/old-replay0
+
+PUBLICATION: Science R1 PASS at b8882d026887f375acf90768d4e3740eb03da226; documents PENDING
+
+BACKUP: New canonical delivery PENDING; historical unknown Drive states preserved
+
+DAG: N5 scoped child complete; parent N5 PARTIAL/OPEN; full N4 stopping PARTIAL/OPEN; N6/N7 predecessor-gated
