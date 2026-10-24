@@ -1,5 +1,17 @@
 # cosmosapjw-quantum/BASS_HE 인수인계
 
+## 최신 관측과 재개점 — 2026-10-24
+
+HE-ANG의 source/frame/event 계약은 PR92 과학 핀 `896e5427100ad48d017deff2697b6f992ba029cd`에서 이미 `COMPLETE_SCOPED`다. 이를 재사용하여 **HE-ANG-SOURCE-HEX-INTAKE**를 [PR93](https://github.com/cosmosapjw-quantum/BASS_HE/pull/93), 과학 핀 `15053fe4445a32e0544d644e864fe27780d08743`에서 완료했다. 부모 **HE-ANG은 SOURCE_INPUT_PENDING**이다.
+
+선택한 공식 Hex SQL 전체에서 tmat948,557행, H1초기100 tmat86,457행, 해당 Ei raw extrema1e-7..0.9374Ry, ionf0행을 확인했다. 이 파일은 H1 이온화 payload를 제공하지 않는다. 저장된 유한 Chebyshev 계수의 전체 생략 suffix bound와 명시적 ABI utility는 scoped 승인이다. HE-X1의32fixture와 기존 HE-ANG 검토는 재사용했으며 경험적 각분포로 확대하지 않았다.
+
+첫 열린 입력은 **HE-ANG-SOURCE-PAYLOAD**다. [NEXT_SOURCE_CONTRACT.json](https://github.com/cosmosapjw-quantum/BASS_HE/blob/15053fe4445a32e0544d644e864fe27780d08743/research/he_ang_source_hex_20261024/NEXT_SOURCE_CONTRACT.json)에 실제 ionization coefficient/joint differential data, producer ABI, normalization·spin/exchange·support, finite-mass 및 동일 frame/event law 의무를 고정했다. 다음 단위 전에 AGENTS·실제HEAD·병렬변경·백업을 확인하고 새 입력에 해당하는 범위만 실행한다.
+
+새 intake 누적 CPU18.434312초/wall18.739399초(총20/60)는 실패2회를 포함한다. nominal8초보다 큰 실제 catalogue CPU8.349479/8.144439초도 보존했다. 과거 예산과 UNKNOWN_NOT_ZERO를 초기화하거나 전용하지 않는다. 현재 예산에서 full Hex solve·새 IVP를 착수하지 않는다. 독립 science/code 판정은 PASS_SCOPED, 물리 provider gate는 유지한다.
+
+근거: [RESULTS_KO.md](https://github.com/cosmosapjw-quantum/BASS_HE/blob/15053fe4445a32e0544d644e864fe27780d08743/research/he_ang_source_hex_20261024/RESULTS_KO.md), `assembly/returns/BASS_HE_HEANG_SOURCE_HEX_20261024.json`. 실제 Dropbox/Drive archive ACK는 `assembly/returns/BASS_HE_HEANG_SOURCE_BACKUP_ACK_20261024.json`에 별도 기록한다. 아래 원 저자 계약과 다른 39개 node는 변경하지 않았다. no_merge / no_activation.
+
 중앙 경로: `cosmosapjw-quantum/rei_bianchi`, 브랜치 [research/orchestration-sandbox-20261022](https://github.com/cosmosapjw-quantum/rei_bianchi/tree/research/orchestration-sandbox-20261022), `research/orchestration_longterm_20261023/`.
 
 첫 행동: 동결 계약을 읽고 진행 중인 소유자 결과와 실제 잔여 예산을 확인한다. 완료 근거를 재사용하며 예산·실패 기록을 초기화하지 않는다. 이 문서는 새로운 과학적 판정을 추가하지 않는다.
