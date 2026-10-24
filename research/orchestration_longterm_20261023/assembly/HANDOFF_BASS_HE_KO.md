@@ -1,3 +1,13 @@
+## 최신 전달 완료 기록 — 2026-10-24 / PR95, Delivery D
+
+HE-ANG-CCC-EXCHANGE의 실제 Delivery D는 `2cb9f9176c2a1764bb8ceaf2392531a100eb6820`이며 Science S `63706d605ddfc5d313ca310b09b5fd54a4efdbf4` 위에 metadata만 추가했다. R1–R10/C1–C10의 20개 stage row는 COMPLETE_SCOPED다. [Draft PR95](https://github.com/cosmosapjw-quantum/BASS_HE/pull/95)는 merge/activation 없이 유지한다. Science S의 code, source, numerical results, figure, 독립 review와 raw 실행은 재사용했고 추가 과학 실행은 없다. Central observation C는 `d5aa6c94a77b5687052d3d6902d140e2df9ef798`다.
+
+B2 archive `HEANG_CCC_EXCHANGE_20261024_63706d60_d5aa6c94.tar.gz`는 278,842 bytes, 72 members이며 local SHA256는 `21303684dbb2a0bed96d368802c70093cd343ccd644c53710036f16712c881f0`다. Science S의 정확한 65개 파일과 Central C의 3개 파일, 실제 게시 receipts와 복원 자료를 보존한다. Drive ID `1QuA8qmz8tOuLcQTAIozQEI0Jy-3pjBkV`, Dropbox ID `id:BSpOijBcT10AAAAAAD_9JQ` 양쪽에서 upload 완료와 독립 metadata size readback을 확인했다. 별도의 remote SHA256는 반환되지 않아 독립 원격 hash 검증을 주장하지 않는다.
+
+실제 ACK와 S/D/C identity는 `assembly/returns/BASS_HE_HEANG_CCC_EXCHANGE_BACKUP_ACK_20261024.json`에 기록한다. 이 파일의 E identity는 CURRENT_FILE_COMMIT이며 실제 SHA는 후속 receipt에 남긴다. D와 E를 보존하는 B3 supplement는 아직 실제 upload/readback ACK 대기다. B3의 실제 SHA256, Drive/Dropbox ACK와 metadata size readback은 업로드 뒤 [PR95 설명](https://github.com/cosmosapjw-quantum/BASS_HE/pull/95)에 기록한다. 자체 archive 안에 그 archive의 미래 업로드 receipt를 재귀적으로 넣지 않는다. 최종 사용자 인계 보고는 B3의 이중 ACK 뒤에 한다. B2가 미래 D/E를 이미 포함했다고 해석하지 않는다.
+
+독립 R6/C9 PASS_AFTER_CORRECTION과 root PASS_SCOPED, physical_provider_admitted=false, 부모 HE-ANG SOURCE_INPUT_PENDING 및 다음 HE-ANG-SOURCE-PAYLOAD를 유지한다. 측정된 4개 child와 runner의 CPU 1.410021초, wall 1.4436621759814443초 및 reserve 1회와 별도 prelaunch 부모 CPU UNKNOWN_NOT_ZERO를 보존한다. end_to_end_cpu_cap_established=false다. C9-NB-01, C23E, 최신 CR-N5의 Drive ACK unknown과 다른 owner의 기록, 원래 HE-ANG 계약·의존성·기존 관측은 변경하지 않는다.
+
 ## 최신 CCC equal-sharing convention 결과 — 2026-10-24 / PR95
 
 **HE-ANG-CCC-EXCHANGE는 COMPLETE_SCOPED**다. Science S는 `63706d605ddfc5d313ca310b09b5fd54a4efdbf4` ([draft PR95](https://github.com/cosmosapjw-quantum/BASS_HE/pull/95))이며, baseline은 `c8f5818c61d14872837abf7e9bc1a73c670ae25c`다. Bray physics/9906008v3 Eq. (26)의 인쇄된 minus와 정의의 차이를 해당 pinned 식에 한정해 교정했다. Raw complex pair, 이미 coherent인 density, 이미 spin-weighted인 density, phase 정보가 없는 intensity를 구별하는 조건부 CCC exact equal-sharing adapter를 구현했다. 실제 Stelbovics TP Table I의 8개 4CCC 값은 원문 정규화를 보존하고 printed BRM과 산술 비교만 수행했다.
