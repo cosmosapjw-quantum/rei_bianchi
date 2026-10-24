@@ -10,7 +10,7 @@ R6 PASS/C9 PASS_SCOPED, 8 targeted unittest 및11 actual-output checks가 통과
 
 부모 **HE-ANG SOURCE_INPUT_PENDING**과 다음 node **HE-ANG-SOURCE-PAYLOAD**는 유지한다. 실측 single-electron marginal은 확보했지만 joint outgoing electron law, full support, count/spin/exchange convention, laboratory/COM 및 finite-mass recoil correlation 입력이 여전히 필요하다. X1 empirical angular correction/event total/collision source로 승격하지 않는다.
 
-근거: `research/he_ang_ddcs20_window_20261024/RESULTS_KO.md`, `CLAIM_GATE.json`, `evidence/review/C9_REVIEW.json`; 중앙 return `assembly/returns/BASS_HE_HEANG_DDCS20_20261024.json`. 최종 S+C backup은 PENDING_PROVIDER다. 원 저자 계약, 다른39node 및 기존 Hex 성공기록은 변경하지 않았다. no_merge/no_activation.
+근거: `research/he_ang_ddcs20_window_20261024/RESULTS_KO.md`, `CLAIM_GATE.json`, `evidence/review/C9_REVIEW.json`; 중앙 return `assembly/returns/BASS_HE_HEANG_DDCS20_20261024.json`. 최종 S+C archive(441,890 bytes, SHA256 bca49013628469f7d149366d651a1a004f936ad15fc1e5d74f8029ba3799223e)는 Dropbox/Drive metadata readback 양쪽 확인을 완료했다. 실제 provider ID와 범위는 `assembly/returns/BASS_HE_HEANG_DDCS20_BACKUP_ACK_20261024.json`를 참조한다. 독립 remote SHA256 검증은 하지 않았다. 원 저자 계약, 다른39node 및 기존 Hex 성공기록은 변경하지 않았다. no_merge/no_activation.
 
 ## 최신 관측과 재개점 — 2026-10-24
 
