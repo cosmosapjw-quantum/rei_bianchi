@@ -363,3 +363,23 @@ PUBLICATION: Science R1 PASS at b8882d026887f375acf90768d4e3740eb03da226; docume
 BACKUP: New canonical delivery PENDING; historical unknown Drive states preserved
 
 DAG: N5 scoped child complete; parent N5 PARTIAL/OPEN; full N4 stopping PARTIAL/OPEN; N6/N7 predecessor-gated
+
+
+<!-- N5_CE_PUBLICATION_n5_final_20261024_v1 -->
+## N5 CE child — n5_final_20261024_v1
+
+Child: `CR_N5_PROVIDER_RATE_SEMANTICS_AND_CE_ENVELOPE`; parent N5 `PARTIAL/OPEN`; N4 `PARTIAL/OPEN`; N6/N7 predecessor gates remain open.
+
+Science: `b8882d026887f375acf90768d4e3740eb03da226`; https://github.com/cosmosapjw-quantum/bass_cr/pull/101; run `n5_ce_envelope_primary_20261024t031906828z_v1`. Review: PASS_SCOPED; blocking0; 3 resolved findings; 2 nonblocking documentation clarifications preserved.
+
+Return: `returns/CR_N5_PROVIDER_RATE_SEMANTICS_AND_CE_ENVELOPE_20261024.json`. Existing C23E: `returns/CR_N5_C23E_D43_SOURCE_BINDING_20261024.json` (preserved).
+
+Conditional finite-band first-CE-event diagnostic with n_H(1s)=0.9 cm^-3. Initial 0<W<10 eV is selection only; CE envelope covers the full admitted R80 path. Thermal target rates and tagged CE hazards remain distinct. Missing rates and total non-EE bound remain null. PHYS84 numerical admission WAIT and HE-ANG full law SOURCE_INPUT_PENDING remain.
+
+EXECUTION: COMPLETE_SCOPED; independent C9 PASS; primary1; ODE/quadrature/old-replay0
+
+PUBLICATION: Science b8882d026887f375acf90768d4e3740eb03da226 and Documents b65befa5187d3e1e11574a98dcadd2032831de72 R1 PASS; central receipt update in this commit
+
+BACKUP: Library R3 PASS; Dropbox R3 PASS; Drive UNKNOWN_NO_ACK/R3 NOT_RUN after one upload and one exact reconciliation; no retransmit; three-provider backup incomplete
+
+DAG: N5 scoped child complete; parent N5 PARTIAL/OPEN; full N4 stopping PARTIAL/OPEN; N6/N7 predecessor-gated
