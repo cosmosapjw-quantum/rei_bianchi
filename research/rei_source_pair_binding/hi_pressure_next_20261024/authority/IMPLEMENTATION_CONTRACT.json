@@ -1,0 +1,76 @@
+{
+  "schema": "REI_PRESSURE_INTERVAL_STATIC_CONTRACT_V1",
+  "authority": "Root derivation next_pressure/THEORY_KO.md under current user theory+coding request",
+  "status": "AUTHORIZED_STATIC_PREPARATION_ONLY",
+  "allowed_path": "work/research/rei_source_pair_binding/hi_pressure_next_20261024/",
+  "unchanged_paths": [
+    "work/research/rei_source_pair_binding/hi_primary_20261024/"
+  ],
+  "representation": "int/Fraction/finite float converted to exact Fraction; bool/nonfinite rejected; all outputs Fraction, no final float conversion needed",
+  "domain": "N>=0,U>=0,L>=0,M>0; exact U<=N*L; if N=0 or L=0 then U=0; no hidden numerical tolerance",
+  "functions": [
+    {
+      "name": "pressure_interval_from_moments",
+      "inputs": [
+        "N",
+        "U",
+        "L",
+        "M"
+      ],
+      "outputs": [
+        "lower=U*(L+2*M)/(3*(L+M))",
+        "upper=U*(U+2*M*N)/(3*(U+M*N)) when N>0 else0",
+        "width=upper-lower",
+        "nr_pressure=2*U/3",
+        "nr_error_upper=U*L/(3*(L+M))"
+      ],
+      "edge": "All zero valid edge returns0; bypass upper denominator whenN=0."
+    },
+    {
+      "name": "pressure_moment_from_atoms",
+      "inputs": [
+        "iterable of(weight,k)",
+        "M",
+        "L"
+      ],
+      "outputs": [
+        "N=sum(weight)",
+        "U=sum(weight*k)",
+        "pressure=sum(weight*k*(k+2*M)/(k+M))/3"
+      ],
+      "checks": "finite nonnegativeweight,k;0<=k<=L;M>0;L>=0; emptylistvalidzero; suppliedatoms are callerinput notqualifiedprovider"
+    }
+  ],
+  "metadata": "conditional_positive_measure_interval; no thermalization/physicaluncertainty/stockevolution/Einsteinclaim; preserve rate vsstockcallerunits",
+  "fixture": {
+    "status": "PREPARE_UNEXECUTED",
+    "groups_if_run": 1,
+    "checks": [
+      "Exact endpointN=2,U=2,L=2,M=1 lower8/9upper1.",
+      "Atoms(1,0),(1,2) achieve lower; atoms(2,1) achieve upper.",
+      "Halfmixture(.5,0),(.5,2),(1,1) gives17/18 betweenbounds.",
+      "ZeroN/U;L0U0 withpositiveN;invalidU>N*L rejected.",
+      "Commonscale of weights preserves linearhomogeneity ofN/U/pressure."
+    ],
+    "expected_references": "Explicitpaperfractions and independently written direct atomreference; no donor fetchorquadrature."
+  },
+  "files": [
+    "pressure_interval.py",
+    "focused_check.py",
+    "README_KO.md",
+    "PROPOSED_EXECUTION.json",
+    "run_focused_once.py",
+    "SOURCE_BINDING.json"
+  ],
+  "runner": "Prepare only, preserve proven one-childpattern but fresh ownpath/attemptmarker; bindnewsource/fixturehashes. No imports/compile/run ofmodule/fixture/runner now. Sourcecard notneeded; exclude copied HI inputs.",
+  "budget": {
+    "current_extension_scientific_invocations": 0,
+    "future_proposal_cpu_soft_hard_s": 1,
+    "future_proposal_wall_s": 5,
+    "future_max_children": 1,
+    "automatic_retries": 0,
+    "status": "PROPOSED_NOT_AUTHORIZED",
+    "no_transfer_from_L1": true
+  },
+  "stop_rule": "Reportfiles/hashesandprepared exactfuturecommand. No execution orrepairtoexistingL1. NoGit/cloudmutations; independentstaticreviewnext."
+}
