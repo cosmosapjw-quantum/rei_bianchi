@@ -350,3 +350,51 @@ PHYS88 FINAL `92dec7cdc1cf5afeff5bdff8d6234f7f1e3dbbd8`/tree`ce62d9e8c7145d12c06
 한정 PHYS88 workflow는 R1–R10/C1–C10=20/20이다. 앞S2의18/20과mainJSON작성시점18/20은불변역사snapshot으로보존한다. 과학identity2712595494bd9d784539d470c4ad0b178314c1ca55d2b0b9a75cb5dc1e6a2774, primary482checks/20integrals,독립8fields,원PDF복구와보존된artifactexit1/CPU7.322937는변하지않았다. 새과학재실행0,예산reset0,새ODE/rate/stopping0.
 
 다음노드는 NUCLEAR_BARE_KERNEL_SOURCE_AND_CONSUMER_CONTRACT이며 physicalkernel/electronstate/covariance/tails/namedconsumer가OPEN이다. 부모PARTIAL,consumerfalse,HH_R10OFF,productionNOT_ISSUED,globalcompletionnull을유지한다. 본중앙commit의actualSHA/후속terminal자신의전달영수증은외부terminal과PR145최종본문에서확인한다. 원40contracts/17integration/다른39nodes 및새CR최종D/Library+DropboxR3·DriveUNKNOWN 관측은그대로보존했다.
+
+
+## PHYS89 FINAL 추가 인계 — source covariance와 capture 소비자 계약
+
+Finite child ENDF_MF33_PULLBACK_AND_TYPED_NUCLEAR_CONSUMER_INTERFACE의 독립 판정은 PASS_SCOPED_SOURCE_DIAGNOSTIC_AND_TYPED_FINITE_INTERFACE다. 선택 NUCLEAR_BARE_KERNEL_SOURCE_AND_CONSUMER_CONTRACT와 원 atomic-to-bare/physical finite-T supplier는 PARTIAL_INPUT_DEPENDENCIES를 유지한다.
+
+### 확정 identity
+
+- Draft PR: `https://github.com/cosmosapjw-quantum/WU088_HH/pull/146`
+- Branch: `research/hh-phys89-bare-kernel-contract-20261025`
+- FINAL HEAD: `480baabc73ebaaba735d285d969e79177f5545ed`
+- FINAL tree: `10b9ce681428432379ff87c1bf0febdd731a0cae`
+- S2 science: `01396ce7f7c16d8a303a51fa1f2ced6fac6c9334`
+- S1 code: `bd161dbdb42bd31c0df7e5ac23dca73938453291`
+- S1R1 separate checker: `2dab95248fae65d3117cfc6ce29e16689c4713a8`
+- Primary scientific identity: `c688ab6b06ab1e94781645e174cd555423ba49fc15d6b76c31acef3890f2e8b2`
+- Separate checker identity: `0f946ef3e6d2253091e50f4bdfca708ce9900a93677d0793367510b5ee2111b5`
+- Parent PHYS88 FINAL: `92dec7cdc1cf5afeff5bdff8d6234f7f1e3dbbd8`
+
+PHYS82 복구와 이후 ancestry를 보존한다. S2만 단독 checkout하지 말고 FINAL descendant를 사용한다.
+
+### 실제 과학 결과
+
+원153-group MF33의 zero-based group0,10 block은 [[0.0004278572,0.0004278572],[0.0004278572,0.0004278571]]이다. w=e0-e10이면 정확히 w^T F w=-10^-10, determinant=-1069643/25000000000000000000<0이다. 두 group 모두 원 sigma support와 겹친다. 표시된 raw F의 stochastic admission은 DISALLOWED, 원인은 NOT_ESTABLISHED다. Full-precision evaluator 전체의 strong no-go는 주장하지 않는다. Projection/jitter/clipping0. PHYS87/88 nominal rates는 별도 완료identity로 재사용한다.
+
+154boundaries/11781packed/23409matrix 독립 exact 대조, primary27checks(15guards), float/exact117비교를 통과했다. Primary1성공, 원reference1실패(blank controlfield int변환), 별도repairchecker1성공. 원실패/원7freeze를 보존했고 primary/eigh 재실행0. Children3=success2+failure1, CPU0.41659s/wall0.420138513s. Metadata dispatchfailure1은 wrapper/child0. Actualreadonlyresume2SKIP,22files불변,callback/integral/rewrite0.
+
+### 실제 전달
+
+FINAL ZIP `PHYS89_FINAL_20261025_480baabc73eb.zip`: 31435596bytes, SHA256 `cc9d9d4810c2cd0f8a4084b557a9868fbe65762c89ec0aebb5e0f26e53686fb2`. Dropbox `id:BSpOijBcT10AAAAAAD_9sQ`, Drive `1vlijzrMrNsEDpGDLjvCJVBnWw42Pcc-r`.
+
+양쪽 각wholeGET1/retry0, CRC141/141,payloadSHA140/140,authoritativeGitidentity137/137,실제추출재hash141/141 PASS. Remote Git key GET3개를 두provider가 공유했으며137개 개별GET을 뜻하지 않는다. Originalfreeze7/7+separatechecker1/binding PASS. Parent PHYS88 wholeZIP1,nestedextract0. S0/S1/S1R1/S2는dualACK/metadata,stagewholeGET0.
+
+MAIN `PHYS89_FINAL_DELIVERY_20261025.json`: 143138bytes, SHA256 `627c72d6d5b93d5edef85ff2f8262ec7b685d6147730ffc1e7b8a34aa833cd4a`. Dropbox `id:BSpOijBcT10AAAAAAD_9sg`, Drive `1fnMWXKiThyvWivCrHKu50cA2CI6ud4Vh`.
+
+양쪽 MAIN 실제rawGET1/retry0,원bytes/SHA/parsedFINALidentity PASS. 보고서와MAIN의18/20은 불변snapshot이다. 이번 중앙관측과 후속TERMINAL·PR146actual본문이 scoped20/20을 결속한다. TERMINAL 자체ID/SHA/원문검증과 이 중앙commit의exactSHA는 외부TERMINAL·PR146actual최종본문에서 확인한다. 전역물리목표완료율null.
+
+### 다음 입력과 보존 경계
+
+현재nominal에결속된 covariance 원precision/153group변환·normalization 또는승인된source correction; exact evaluator massdeck/invariant-s transfer; electron/targetstate/differentialkernel; support밖tailB0/BA; named capture thermal/fast/radiation 구현·measure·clock/reference-density·ownership ACK가 필요하다. 원REI-L2는beta scope다. WU89_REI_L2_NP_CAPTURE_REQUEST_V1은capture scope확장제안/PROPOSED_UNIMPLEMENTED/ACKnull이다. BASSnuclearconsumerNOT_BOUND, B3C는manufactured cold H-Ly-alpha14cohort참고다.
+
+PHYS89 Wolframevaluator1/7zeros,contextSERVICE_ERROR1을transcript로재사용한다. Workspace소실원인NOT_ESTABLISHED,당시Wolframrawbytes미복구. Symboliclineage8,새호출0. 모든기존허용량0,budgetresetfalse. 전체역사/원격CPU/금액/잔여예산의미관측값null. PHYS88 PDFshortening원인NOT_ESTABLISHED,artifactchildexit1,exact원bytes복구와원2PNG+2PDF를유지한다. PHYS88 child4=success3+failure1,CPU7.322937s/wall7.330995100001019s,metadataCPU0.0005106s,Wolfram2calls/18zeros/all_zeroFalse/별도positivebranch를보존한다.
+
+원40contracts/planstatus/dependencies,7authorities,17edges,다른39nodes와CR/HE/HI late결과·backup한계를유지한다. 다른owner의 과거PHYS89 S0/실행0문장은 당시snapshot이다. 완료PHYS78–88/HH/REI/REC/HE/C22/C23A와이번완료identity를재실행하지않는다. Runtime차이만으로science재실행금지. 매새노드전AGENTS/actualHEAD/parallel delta/backup/완료증거/누적예산확인. 1worker/thread,원sharedlease,다른process종료0.
+
+새integrals0,ODE0,benchmark0,nuclearrateactivation0,faststopping0. HH_R10OFF,productionNOT_ISSUED. Non-tiltedLRS BianchiI(-+++),reactinggaspi0/DMpi_m별도,common normalframe signedtensor합후norm,Frobenius=sqrt(2)*halfcontraction. 동일trajectory분해는species-off인과실험이아니며sampledresidual은continuumcertificate가아니다.
+
+권위있는 반환: `research/orchestration_longterm_20261023/assembly/returns/WU_PHYS89_BARE_KERNEL_SOURCE_CONSUMER_20261025.json`.
