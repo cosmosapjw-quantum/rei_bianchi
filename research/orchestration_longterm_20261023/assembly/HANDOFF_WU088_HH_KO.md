@@ -309,3 +309,14 @@
 
 
 - `REC-LINE02` → `WU_SPECTRAL_GEOMETRY_COUPLING`: selecting native line in WU spectral coupling. One native line owner; no detached/native double counting
+
+
+## 2026-10-24 WU owner 관측 추가 — PHYS87 S2 실제 ACK 결속
+
+PHYS83 owner 완료는 원 identity로 재사용하며, PHYS85/86 joint event ownership과 PHYS87 ENDF source-native finite-window child의 실제 검증 결과는 [추가 owner return](returns/WU_PHYS87_NATIVE_FINITE_T_OBSERVATION_20261024.json)에 분리해 기록한다. 원 contract·plan_status·dependencies와 다른 owner 관측은 보존한다.
+
+PHYS87 S2 actual HEAD는 `cf48be1b8838a3839fa3c605512c1a5bb4faa8e3`(tree `2c1a36dea9a35c85ec6c685bf083743fc4716813`)다. 채택 S2 archive는 `PHYS87_S2_RECOVERY1_20261024_cf48be1b8838.zip`, 18,545,712bytes, SHA256 `719da3433b912d554110998ee0f1d591214bf733a64dec4a4354e53b9e0db7e4`이며 실제 Dropbox ACK `id:BSpOijBcT10AAAAAAD_9dQ`와 Drive ACK `1-hVBvZY3q4VZNvRjgbzQXTJ7ge3ax6hx`의 exact metadata를 확인했다. Owner ACK 영수증 SHA256은 `8c8db8f6b7f1cbea3ac22e52c1fd79e9d75f66ad216d3bb1cb980ab29f6b5a0e`다. Local473/473CRC는 stage packaging 관측이며 remoteStageGET/restore는 `NOT_RUN_STAGE_ACK_SCOPE`다. FINAL은 PR144 최종 전달 문서와 실제 외부 영수증을 기다리는 `PENDING_EXTERNAL_FINAL_RECEIPT`다.
+
+최초 짧은 S2 ZIP의 pre-upload source-byte mismatch는 업로드 없이 보존했고 원인은 `UNRESOLVED`다. 고유 RECOVERY1 pack 한 번의 표적 packaging repair만 채택했으며 과학 유효성에 관한 추론은 하지 않는다. PHYS83/PHYS86 완료 identity를 재실행하지 않는다.
+
+핵반응 supplier 부모는 PARTIAL이며 atomic-to-bare remap·full support/covariance·named consumer·stopping/activation은 OPEN이다. Source-native child는 한정 수치 관측이고 consumer_admitted=false, HH_R10=OFF, production NOT_ISSUED를 유지한다. 이 부록은 원 인계 전체 bytes 뒤에 추가한 pointer이며 원래 물리 계약을 대체하지 않는다.
