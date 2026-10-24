@@ -1,8 +1,8 @@
 # 단계별 완료·백업·게시 및 DAG
 
-현재 스냅샷: science S 준비, **18/20**. R10·C10은 최종 C 백업·D 게시·외부 final receipt가 실제로 완료된 후 닫는다. 완료율의 분모는 이번 유한 HI_NATIVE_ATOMS_20261024 단위의20단계다. 전체 모델 완료율은 null, L4_ready=false다.
+현재 스냅샷: **전달 commit D에서20/20 완료**. Science S 8d68dff35ca2bdc456049081132a7d2449b29143의71파일 readback과 final C 백업 ACK를 갖추고 R10·C10을 닫았다. 실제 D readback은 외부 FINAL_DELIVERY에 추가한다. 완료율의 분모는 이번 유한 HI_NATIVE_ATOMS_20261024 단위의20단계다. 전체 모델 완료율은 null, L4_ready=false다.
 
-A=Recovery A(6516f0881791…), B=실행 checkpoint(e969ee7e7239…), P=private survey(bc791f117e6c…), C=미래 final archive. 단계마다 ZIP을 새로 만들지 않고, 해당 단계의 실제 증거를 포함하는 checkpoint와 공개 경로를 연결했다. 세부 ACK는 delivery 파일을 따른다.
+A=Recovery A(6516f0881791…), B=실행 checkpoint(e969ee7e7239…), P=private survey(bc791f117e6c…), C=Final C(11740e51b7b0…), 실제 Drive+Dropbox+Library 저장 완료. 단계마다 ZIP을 새로 만들지 않고, 해당 단계의 실제 증거를 포함하는 checkpoint와 공개 경로를 연결했다. 세부 ACK는 delivery 파일을 따른다.
 
 | DAG 순서 | 단계 | 실제 산출물·완료 근거 | 현재 상태 | 백업 | 게시 위치/시점 |
 |---:|---|---|---|---|---|
@@ -24,8 +24,8 @@ A=Recovery A(6516f0881791…), B=실행 checkpoint(e969ee7e7239…), P=private s
 | 16 | R7 판별 검증 | 실제4368 atom 소비와원summary결속 | COMPLETE | B | S raw |
 | 17 | C9 독립 검토 | 같은독립pass의실제raw읽기,PASS_SCOPED,finding0 | COMPLETE | 최종C | S execution review |
 | 18 | R8 결과 판정 | root ADMITTED_SCOPED_NATIVE_HI_COMMON_MEASURE | COMPLETE | 최종C | S ADMISSION |
-| 19 | R10 종료·재개 | provenance/남은6입력/재사용/예산handoff | DELIVERY_PENDING | 최종C+외부receipt | D |
-| 20 | C10 판정·인계 | actualS/C/D/전달ACK·최종readback | DELIVERY_PENDING | 최종C+외부receipt | D |
+| 19 | R10 종료·재개 | provenance/남은6입력/재사용/예산handoff | COMPLETE_AT_DELIVERY_COMMIT | 최종C+외부receipt | D |
+| 20 | C10 판정·인계 | actualS/C/D/전달ACK·최종readback | COMPLETE_AT_DELIVERY_COMMIT | 최종C+외부receipt | D |
 
 단계 번호는 스킬의 공식 이름을 유지하고 실제 의존 DAG 순서로 표를 배열했다. R9의 코딩 계약 작성은 C1 전, R8의 최종 판정은 실제 실행과 C9 후다.
 
@@ -36,4 +36,12 @@ A=Recovery A(6516f0881791…), B=실행 checkpoint(e969ee7e7239…), P=private s
 기존 L0/HI-summary/pressure/stock/work의 유효 근거를 재사용하고, 이번 단위로 입력 표의 common radial measure 행을 실제 원자료 수준으로 전진시켰다. 시간·밀도·IC·실제 geometry·transport를 갖춘 cohort와 전체 Einstein/Vlasov/source 결합 모델은 후속 의존성이다. local20/20을 전체100%로 바꾸지 않는다.
 
 C23E conditional D43K, HE94 partial window, PHYS85 역사 상태, ANGTHERM02 read-only, old2e−12 gate, old10s capFAIL은 그대로 유지한다.
+
+## 실제 전달 identity
+
+S=8d68dff35ca2bdc456049081132a7d2449b29143
+Final C SHA256=11740e51b7b098d763bb6fed62c127b85bfb164d392ec4495a50f011746dafb4
+C: 2,196,846bytes/80members, Drive 1fHlHuWIqIE4CjeoYmwYBzyAFSfI72sxc, Dropbox id:BSpOijBcT10AAAAAAD_9og, Library libfile_e0b0d2ba79008191a8139c4b7c975879.
+D=CURRENT_FILE_COMMIT; 실제 D SHA/expected parent/non-force/readback은 외부 FINAL_DELIVERY.json.
+R10/C10을 포함한20/20은 이 유한 단위의 종료이며 전체 모델 완료율null을 유지한다.
 

@@ -10,7 +10,9 @@ research/orchestration_longterm_20261023/assembly/HANDOFF_rei_bianchi_KO.md
 
 repo: cosmosapjw-quantum/rei_bianchi
 branch: research/orchestration-sandbox-20261022
-현재 보고서 직전 관측central:407381b302d8b98f251b54d277823997bc4fca9f
+Science S:8d68dff35ca2bdc456049081132a7d2449b29143
+S parent:9600a605f6380bc2262d0cfce5ff00290e594a5a
+Delivery D:CURRENT_FILE_COMMIT; actual final HEAD/readback is in external FINAL_DELIVERY.
 AGENTS blob:429a5a13ee75b1222bc50627f8d5973d01dd21c4
 
 ANGTHERM02 branch:
@@ -21,10 +23,12 @@ READ_ONLY 예약 유지.
 owned path:
 research/rei_source_pair_binding/hi_native_atoms_20261024/
 
-이 handoff는 science S용 스냅샷이다. 현재18/20. 후속 DELIVERY_CLOSEOUT.json/외부 FINAL_DELIVERY에 실제S/C/D와20/20 종료가 있으면 그 최신 전달 상태를 우선한다. 과거 raw나manifest의ROOT_REVIEW_REQUIRED/18단계는 당시 스냅샷이며 덮어쓰지 않는다.
+이 handoff는 실제 전달 D에서20/20을 닫는 최종 문서다. Final C는 S시점18/20스냅샷을 그대로 보존한다. DELIVERY_CLOSEOUT.json과 외부 FINAL_DELIVERY에 실제S/C/D·ACK·readback을 연결한다. 과거 raw나manifest의ROOT_REVIEW_REQUIRED/18단계는 당시 스냅샷이며 덮어쓰지 않는다.
 
 ## 먼저 읽을 실제 파일
 
+CURRENT_STATUS.md
+execution_20261024/delivery/DELIVERY_CLOSEOUT.json
 execution_20261024/REPORT_KO.md
 execution_20261024/ADMISSION.json
 execution_20261024/CLAIM_GATE.json
@@ -36,6 +40,7 @@ authority/IMPLEMENTATION_CONTRACT.json
 SOURCE_BINDING.json, native_source.py, focused_check.py
 raw/stdout.jsonl, raw/resource_receipt.json
 execution_20261024/survey/LATEST_PARALLEL_407.md 및 .json
+execution_20261024/survey/LATEST_DELTA_9600.md 및 .json
 
 science state: ADMITTED_SCOPED_NATIVE_HI_COMMON_MEASURE
 fresh native independent review: RUN_PASS_SCOPED
@@ -88,6 +93,18 @@ wholeL0 UNKNOWN_NOT_ZERO,cumulativecap NOT_FROZEN.
 CAS/parent/model/IO/packaging/recovery비용별도미측정,0아님.
 22/66/83/ANGTHERM01·02/NCP/HI-summary/pressure/stock/work/donorquadrature 재생0유지.
 
+## 최종 전달
+
+Final C:REI_HI_NATIVE_FINAL_C_20261024_11740e51b7b0.zip
+SHA256:11740e51b7b098d763bb6fed62c127b85bfb164d392ec4495a50f011746dafb4
+2,196,846bytes/80members,localCRC/memberidentityPASS.
+Drive:1fHlHuWIqIE4CjeoYmwYBzyAFSfI72sxc
+Dropbox:id:BSpOijBcT10AAAAAAD_9og
+Library:libfile_e0b0d2ba79008191a8139c4b7c975879
+actualuploadscompleted;remotewholeGETSHA NOT_RUN.
+S=8d68dff35ca2bdc456049081132a7d2449b29143,71/71Gitblob+sizereadbackPASS.
+Dmetadata만변경,source/input/raw/review/admission/budget불변.
+
 ## 저장·복구
 
 초기failedA5a4e3299…는업로드3곳NoSuchFile,NO_ACK,ZIP원본NOT_RECOVERED.
@@ -126,12 +143,15 @@ CR103science d3d9b0de8796de6e988c0d95540b1dbbe1d1cff3,
 docs bdcb576f4202be81b7436726eca6b588029de840:conditionalEI20/20,전체N4/N5OPEN.
 PHYS88FINAL92dec7cdc1cf5afeff5bdff8d6234f7f1e3dbbd8:conditionalbare20/20,482checks,
 parent/supplierPARTIAL,consumerfalse,stopping0.
-HE99science8d481ed47f57774f48bcfb412671ff927601316e:finiteMshell18/20,
+HE99science8d481ed47f57774f48bcfb412671ff927601316e,
+D bec636ffa3014035292c1078a758c7aa1827174d:finiteMshell20/20,B2dualACK,B3externalpending,
 actualamplitude/recoilproviderfalse.
 REC134physicalepsilonnull/H5uncalibrated/REIactivationfalse.
 HE98B3dualmetadataACK확인,physicalproviderfalse.
 BASSB3cbackup-onlyfinite결과,GitTOOL_REJECTED_NO_ACK.
-VigilD3laterS2metadata만,후속payload미심사.
+Vigil02060cc9…고정source:manufacturedRiccati D3finite20/20,nativeowner미결/productionHOLD.
+REC135 cutoff0e3f6ead…:9/20,scienceNOT_RUN,z≈1100scalarFLRW6축Jacobian준비;
+liveafa237a7…는metadata만관측. HI2.479의여섯입력새공급0.
 C23EconditionalD43K,HE94partialwindow,PHYS85역사상태보존.
 
 ## 다음 단일 행동

@@ -4,7 +4,7 @@
 
 HI_NATIVE_ATOMS_20261024의 실제 HI 4,368개 원자와 공통 양의 측도를 직접 연결했다. 단 한 번의 실행과 독립 theory/source/code/raw 검토를 마쳤으며, root 판정은 **ADMITTED_SCOPED_NATIVE_HI_COMMON_MEASURE**다. finding 0, repair 0이다.
 
-이 문서는 과학 게시 S를 위한 스냅샷이다. R1–R9와 C1–C9는 완료했고, R10/C10의 최종 백업·게시·인계는 후속 delivery 기록에서 닫는다. 현재 단계 수는 18/20이며 전체 모델 완료율은 null, L4_ready=false다. RESULT_SUMMARY.json의 ROOT_DECISION_REQUIRED는 root 판정 이전 표시값을 보존한 것이며 현재 판정은 ADMISSION.json을 따른다.
+이 문서는 전달 commit D에서 닫는 최종 보고서다. 과학 S=8d68dff35ca2bdc456049081132a7d2449b29143를 게시하고 71/71 파일의 Git blob·크기를 확인했다. Final C의 실제 Drive·Dropbox·Library 백업을 마쳤으며 R1–R10/C1–C10은 이 유한 단위에서 20/20이다. 전체 모델 완료율은 null, L4_ready=false다. Final C 안의 18/20은 당시 과학 게시 스냅샷으로 보존하며, 현재 전달 identity는 delivery/DELIVERY_CLOSEOUT.json과 외부 FINAL_DELIVERY를 따른다. RESULT_SUMMARY.json의 ROOT_DECISION_REQUIRED 및 frozen README의 C1–C5/미실행 문장은 각 당시 스냅샷이다. 현재 판정은 ADMISSION.json과 CURRENT_STATUS.md를 따른다.
 
 고정 authority는 0f9d9df825be1dac9ca9bdf73cdc2e8908bcba17의 research/orchestration_longterm_20261023/assembly/HANDOFF_rei_bianchi_KO.md다. 기존 L0의 scoped admission과 source/HI-summary/pressure/stock/work 결과를 재사용했다. 과거 22/66/83 및 기존 source suite는 재생하지 않았다. 현재 API는 새 owned leaf에 추가하며 기존 공개 API와 energy owner를 변경하지 않는다.
 
@@ -144,19 +144,20 @@ source control m=6/35의 최종 rounded energy sum은 −1.0097419586828951e−2
 
 private owner/all51/PC/bulk 조사 원문은 별도 private appendix로 보존했다. public Git에는 관련 과학 요약·출처만 게시한다.
 
-central은 조사 시작 3423209a55d800de7e464f16fc600ec0c278833f에서 407381b302d8b98f251b54d277823997bc4fca9f로 진행했다. 실제 diff의 5 commits/8 assembly paths는 새 owned leaf와 겹치지 않았고 AGENTS blob은 429a5a13ee75b1222bc50627f8d5973d01dd21c4로 유지되었다. 최종 게시 직전에 다시 확인한다.
+central은 조사 시작 3423209a55d800de7e464f16fc600ec0c278833f에서 407381b302d8b98f251b54d277823997bc4fca9f로 진행했다. 실제 diff의 5 commits/8 assembly paths는 새 owned leaf와 겹치지 않았고 AGENTS blob은 429a5a13ee75b1222bc50627f8d5973d01dd21c4로 유지되었다. 최종 게시 직전에 9600a605f6380bc2262d0cfce5ff00290e594a5a의 HE delivery 변경3경로를 추가 확인했다. owned overlap0, AGENTS 동일, 보호 head 동일인 상태에서 expected-SHA/non-force로 S를 게시했다.
 
 | 병렬 결과 | 최신 관측 | 현재 HI와의 관계 |
 |---|---|---|
 | CR103 | d3d9b0de… science / bdcb576f… docs, 조건부 finite EI chain20/20, 8 cases/96 primary RHS/24 independent RHS | 전체 N4/N5 PARTIAL_OPEN; HI 전체 stopping으로 전이하지 않음 |
 | PHYS88/HH145 | 92dec7cd… FINAL, 조건부20/20, 482 assertions, 독립8field 최대4.2887098119610273e−13 | parent/supplier PARTIAL, consumer false, fast stopping0 |
-| HE99 | 8d481ed4… finite-M shell science18/20,14tests/6fixtures | actual event amplitude와 physical recoil provider 미공급 |
+| HE99 | science 8d481ed4…, delivery bec636ff…에서20/20; B2 dual ACK, B3 외부receipt 대기 | actual event amplitude와 physical recoil provider 미공급 |
 | REC134 | ccf2bd08… finite20/20, 저장 diagnostic만 수정 | physical epsilon=null,H5 uncalibrated,physical HOLD,REI activation=false |
 | HE98 | d477aafc… finite20/20,B3 dual metadata 확인 | physical provider=false; HE94 부분 창 유지 |
 | BASS B3c | backup-only finite20/20 원문; Git TOOL_REJECTED_NO_ACK | cold f_plus0,14 rays,τ≤0.1의 별도 모델; 실제 HI IC로 채택하지 않음 |
-| Vigil D3 | 읽은 pin은 S1/RED14/S2 진행; 뒤 S2 backup metadata 관측 | later payload 미심사, native owner 미결,production HOLD |
+| Vigil D3 | 후속 고정02060cc9…에서 D3 4/4·유한20/20 원문 확인 | manufactured Riccati consumer; native owner 미결,production HOLD |
+| REC135 | 고정0e3f6ead…에서9/20·science NOT_RUN; live afa237a7…는metadata만관측 | z≈1100 scalar-FLRW 국소6축Jacob​​ian 준비; HI2.479 입력 미공급 |
 
-CR103·PHYS88·HE99의 최신 원문 4개와 Git blob 4/4 확인은 survey/LATEST_PARALLEL_407 및 연결된 source에 있다. source-reported donor 실행과 이번 스레드의 직접 실행을 구별했다. C23E 조건부 D43K, HE94 부분 창, PHYS85 역사 실패·미측정 비용, ANGTHERM02 예약을 보존한다.
+CR103·PHYS88·HE99의 407 원문4개와 후속 HE ACK·REC135·Vigil86의 9600 원문7개는 각각 survey/LATEST_PARALLEL_407와 survey/LATEST_DELTA_9600에 있다. 후속7개 Git blob도7/7 일치했다. 407의 HE18/20과 초기 Vigil 상태는 역사 기록이며 현재 표는 후속 확인을 반영했다. source-reported donor 실행과 이번 스레드의 직접 실행을 구별했다. C23E 조건부 D43K, HE94 부분 창, PHYS85 역사 실패·미측정 비용, ANGTHERM02 예약을 보존한다.
 
 ## 6. 문헌과 외부 도구의 기여
 
@@ -185,9 +186,9 @@ Exa 검색2회, SciSpace1회가 원전 후보를 좁혔고 실제 primary PDF를
 | Recovery A | 6516f088179177c6b99480c950f4609603ab64e5f132c90fa46384ad1d492e01 | Drive+Dropbox+Library completed |
 | Execution B | e969ee7e72397ec4c3ac8332c92421dbdf84fe8b3ac92e6e33cccffa5431fe5d | Drive+Dropbox completed |
 | Private survey | bc791f117e6c270ba5b45f957874501af85b8e79298df059fcfc1c12bf4cc071 | Drive+Dropbox+Library completed, public Git 제외 |
-| Final C | 아직 생성 전 | S 게시 후 고정; 미래 ACK는 외부 receipt와 D에 기록 |
+| Final C | 11740e51b7b098d763bb6fed62c127b85bfb164d392ec4495a50f011746dafb4 | 2,196,846 bytes/80members; Drive+Dropbox+Library completed; ACK는외부D |
 
-현재 백업은 local ZIP CRC/member identity와 실제 provider 성공 ACK를 갖는다. 이번 A/B/private의 remote whole-file GET/SHA는 NOT_RUN이다. 원래 HI_ATOMS_IDENTITY.json은 후속 exact 복구를 마쳤지만 일부 초기 survey 서술 metadata는 NOT_RESTORED 기록을 유지한다. 현재 결과를 지지하는 원 CSV·코드·raw·독립 검토는 복구 또는 새 실행 후 보존되어 있다.
+현재 백업은 local ZIP CRC/member identity와 실제 provider 성공 ACK를 갖는다. 이번 A/B/private/finalC의 remote whole-file GET/SHA는 NOT_RUN이다. 원래 HI_ATOMS_IDENTITY.json은 후속 exact 복구를 마쳤지만 일부 초기 survey 서술 metadata는 NOT_RESTORED 기록을 유지한다. 현재 결과를 지지하는 원 CSV·코드·raw·독립 검토는 복구 또는 새 실행 후 보존되어 있다.
 
 ## 8. 전체 목표 DAG와 다음 단일 행동
 
@@ -218,4 +219,10 @@ flowchart TD
 다음 단일 행동은 **이 표의 실제 source-qualified cohort 입력을 공급자 근거와 결속하고, 해당 입력이 완성하는 가장 작은 다음 단위의 식과 실행 계약을 고정하는 것**이다. 이번 GO는 소비되었다. 이전 unused seconds를 이월하지 않으며 추가 실행의 범위·CPU/wall·종료 조건은 다음 입력에 맞춰 별도로 고정한다. 기존 사용자 승인은 유지하므로 동일 승인을 다시 묻지 않는다.
 
 범용 fixture의 m=6/35 또는 JVP −7, B3c의 cold 초기조건, donor의 부분 에너지 창을 실제 HI cohort 입력으로 임의 채택하지 않는다. 필요한 입력이 들어오면 R1/R3 및 C1/C2의 바뀐 의존성부터 진행하고, 유지된 source·code·raw·review는 재사용한다.
+
+## 최종 전달 위치
+
+Final C: REI_HI_NATIVE_FINAL_C_20261024_11740e51b7b0.zip.
+Drive 1fHlHuWIqIE4CjeoYmwYBzyAFSfI72sxc, Dropbox id:BSpOijBcT10AAAAAAD_9og, Library libfile_e0b0d2ba79008191a8139c4b7c975879.
+Science S 8d68dff35ca2bdc456049081132a7d2449b29143; D는 이 문서의 CURRENT_FILE_COMMIT이며 실제 D SHA와 readback은 외부 FINAL_DELIVERY에 기록한다. D는 보고·인계·ACK metadata만 바꾸고 source/input/raw/review/admission/budget는 변경하지 않는다.
 
