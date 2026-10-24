@@ -457,3 +457,19 @@ Metadata preparation0.038864099000000006CPU/0.040913912998803426wall, B1pack0.07
 
 전체 HE-ANG은 SOURCE_INPUT_PENDING이다. 다음 실제 연구 입력은 source-consistent physical joint amplitude/event payload와 source validity, spin/exchange/count, full support, frame/finite-M dynamics, calibrated uncertainty다. 이번 fixed-centre amplitude와 PR99 finite-M shell의 결합은 그 별도 의무를 만족한 뒤 수행한다. Event sigma, physical recoil law, HE-X1 empirical angular correction을 이번 단위에서 승인하지 않았다. 새 strong no-go 또는 문헌 최초성 주장은 없다.
 
+
+
+# HE-ANG-CBA-NORDSIECK actual D/B2 delivery tail
+
+Science S `a891cd4b9a3548e66db669b9eb472fea88a3b78b` (tree `ee6768ab8a934cb9b47819a24cf5498e4f8b8ece`), central C `7caca70d94d03732bff5e7adf2f9aa5cf59310ec` (tree `ebeaf6623dfd0077adae43933f8494056e8974c8`), actual D `8e0fb28fea520364d8794bac32840621dd150f95` (tree `b1cff8c85f9c343f8d0f1d3192e638023f0d5157`). Draft PR100 <https://github.com/cosmosapjw-quantum/BASS_HE/pull/100>, actual HEAD D, unmerged/activation=false. This E is CURRENT_FILE_COMMIT; its literal SHA and B3actualACK are external future receipts, not invented here. Root fresh canonical ref at22:49:08UTC remained actual C; cached exactthree Gitblobs were root remote-verified and locally matched before Eassembly.
+
+Defined analytic direct CBA unit: D20/20, R10/C10 COMPLETE_AT_DELIVERY_COMMIT. Immutable S18/20 and C's pendingdelivery/B2 fields remain their historical snapshots. The entire HE-ANG physical goal remains SOURCE_INPUT_PENDING/globalcompletionnull; physical_provider/event_sigma/physical_recoil/HE-X1empiricalcorrectionfalse. Independent scientificreview/source/resources/validation values are unchanged fromC. No new numerical evaluation or oldsuite replay.
+
+Actual B2 `HEANG_CBA_NORDSIECK_SCIENCE_20261025_a891cd4b_7caca70d.tar.gz`, 2054451bytes/142members, uploadedbyteSHA256 `a3525a7d739695f2755de50f761524b98190b4d7b4dbcb67392e9cd6da4c2911`, Drive `10VI1GXobkRS-r1dWrxb-_nSHjg9phvRV`, Dropbox `id:BSpOijBcT10AAAAAAD_9tg`. Local allmember verification and actual dualupload/separate metadata-size ACK complete; independent remote wholeGET/SHA not asserted. B1 was preexecution-only; B2 holds exactS87/C3 plus its manifest's wholeB1once/dependency/inherited/publicationcorrection/postS scope. D/Eoverlay B3 remains PENDING_ACTUAL and final external receipt belongs to PR100.
+
+Root verified D102/102 remote blobs/sizes, six allowed documentchanges and15operationalevidence additions; all81unchangedSfiles and39science/code/raw/review/execution remain exact, including rawCSV74CRLF/blob4fb9ffe5353c2526b9a16d6e47aae196c1c5b1a6. S0publication BYTE_IDENTITY_MISMATCH and rawCSVonly successor remain preserved, not a scientificfailure/reserveuse. Other88researchtrees/14rootentries are unchanged.
+
+Separate operations: DassemblyCPU0.060255385999999994/wall0.06030375500267837s; B2packCPU0.161368652/wall0.16143304800061742s. Scientific3childrenCPU4.987974/wall5.122489414992742, oldcosts/failures/unknown and reserve states remain unchanged; unmeteredhost/model/provider/IO/prelaunchCPU UNKNOWN_NOT_ZERO.
+
+This E changes only own cba_nordsieck_subunit deliveryfields and appends this HEhandofftail. Canonical CRneutral/PHYS89covariancediagnostic children, RECobservations and everyexistingowner scope/OPEN/cost are preserved asactualcurrentbase. C23E/C9-NB-01, fullphysicalprovider/spinexchange/count/validity/support/framefiniteM/uncertainty remainopen. Complete exactD/E B3dualACK and actualPR100body/copyhandoff, then stop after this definedunit. No nextscience loop, unusedreserve, merge or activation is authorized.
+
