@@ -2,7 +2,7 @@
 
 Lead: cosmosapjw-quantum/BASS_HE
 
-Current status: `GATED`
+Current status: `CONDITIONAL_OWNERSHIP_IMPLEMENTATION_VERIFIED_PHYSICAL_INPUT_PENDING`
 
 Source: `authority/thermal/BASS_HE/research/program_expansion_20261025/TASK_ASSIGNMENT.json#/tasks/6`
 
@@ -91,7 +91,7 @@ Source: `authority/thermal/BASS_HE/research/program_expansion_20261025/TASK_ASSI
       "source_field": "prerequisites"
     }
   ],
-  "current_status": "GATED",
+  "current_status": "CONDITIONAL_OWNERSHIP_IMPLEMENTATION_VERIFIED_PHYSICAL_INPUT_PENDING",
   "claim_gate": "CommonT/u requires calibrated reduction; particlecount/heatcapacity separate",
   "pass_next_action": "Saved-background finitegas thenHE-FEEDBACK",
   "budget_status": "NoIVP authorized",
@@ -167,6 +167,25 @@ Source: `authority/thermal/BASS_HE/research/program_expansion_20261025/TASK_ASSI
       "source_file": "authority/thermal/BASS_HE/research/program_expansion_20261025/TASK_ASSIGNMENT.json",
       "json_pointer": "/allowed_paths",
       "qualification": "SOURCE_DECLARED"
+    }
+  },
+  "status_observation": {
+    "source_file": "status/HE_EXP_INTAKE01_20261025.json",
+    "json_pointer": "/observations/HE-EXP-CLOSURE",
+    "value": {
+      "unit_id": "HE-EXP-INTAKE-01",
+      "current_scoped_state": "CONDITIONAL_OWNERSHIP_IMPLEMENTATION_VERIFIED_PHYSICAL_INPUT_PENDING",
+      "scoped_contribution": "Conditional caloric-count and energy-ownership implementation verified; physical closure inputs pending.",
+      "source_intake": {
+        "source_file": "status/HE_EXP_INTAKE01_20261025.json",
+        "json_pointer": "/source_intake"
+      },
+      "source_repository": "cosmosapjw-quantum/BASS_HE",
+      "source_commit": "965da72aa7a5e885e12956fafadfb8dc2519b81f",
+      "physical_provider_admitted": false,
+      "production_status": "NOT_APPROVED",
+      "activation": false,
+      "physical_allocation": "UNALLOCATED"
     }
   }
 }

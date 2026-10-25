@@ -2,7 +2,7 @@
 
 Lead: cosmosapjw-quantum/BASS_HE
 
-Current status: `PROPOSED_SOURCE_INPUT_PENDING`
+Current status: `CONDITIONAL_OWNERSHIP_IMPLEMENTATION_VERIFIED_PHYSICAL_INPUT_PENDING`
 
 Source: `authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json#/nodes/3`
 
@@ -31,7 +31,7 @@ Source: `authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json#/nodes/3`
   "dependencies": [],
   "conditional_dependencies": [],
   "external_prerequisites": [],
-  "current_status": "PROPOSED_SOURCE_INPUT_PENDING",
+  "current_status": "CONDITIONAL_OWNERSHIP_IMPLEMENTATION_VERIFIED_PHYSICAL_INPUT_PENDING",
   "claim_gate": [
     "C23AUVB z<=15.1 cannot supply z20; spectrum not inferred from total heating"
   ],
@@ -116,6 +116,25 @@ Source: `authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json#/nodes/3`
     "source_file": "authority/FINAL_ASSEMBLY_MISSING_FIELDS.json",
     "scope": "Execution-readiness guard only; retain finite past admissions and source object unchanged",
     "other_nodes_runnable_not_inferred": true
+  },
+  "status_observation": {
+    "source_file": "status/HE_EXP_INTAKE01_20261025.json",
+    "json_pointer": "/observations/HE-RESERVOIR",
+    "value": {
+      "unit_id": "HE-EXP-INTAKE-01",
+      "current_scoped_state": "CONDITIONAL_OWNERSHIP_IMPLEMENTATION_VERIFIED_PHYSICAL_INPUT_PENDING",
+      "scoped_contribution": "Conditional caloric-count and energy-ownership implementation verified; physical inputs pending.",
+      "source_intake": {
+        "source_file": "status/HE_EXP_INTAKE01_20261025.json",
+        "json_pointer": "/source_intake"
+      },
+      "source_repository": "cosmosapjw-quantum/BASS_HE",
+      "source_commit": "965da72aa7a5e885e12956fafadfb8dc2519b81f",
+      "physical_provider_admitted": false,
+      "production_status": "NOT_APPROVED",
+      "activation": false,
+      "physical_allocation": "UNALLOCATED"
+    }
   }
 }
 ```

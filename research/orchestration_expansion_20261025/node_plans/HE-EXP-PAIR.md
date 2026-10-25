@@ -2,7 +2,7 @@
 
 Lead: cosmosapjw-quantum/BASS_HE
 
-Current status: `SOURCE_INPUT_PENDING`
+Current status: `SOURCE_INTAKE_AND_CONDITIONAL_IMPLEMENTATION_VERIFIED_PHYSICAL_BINDING_PENDING`
 
 Source: `authority/thermal/BASS_HE/research/program_expansion_20261025/TASK_ASSIGNMENT.json#/tasks/2`
 
@@ -65,7 +65,7 @@ Source: `authority/thermal/BASS_HE/research/program_expansion_20261025/TASK_ASSI
       "source_field": "prerequisites"
     }
   ],
-  "current_status": "SOURCE_INPUT_PENDING",
+  "current_status": "SOURCE_INTAKE_AND_CONDITIONAL_IMPLEMENTATION_VERIFIED_PHYSICAL_BINDING_PENDING",
   "claim_gate": "l2 relaxation distinct from event rate;HE35 conditionalkappa reused;sourceuncertainty calibrated",
   "pass_next_action": "Coefficient tensor toHE-CLOSURE",
   "budget_status": "One pair first;no large allpair scan",
@@ -141,6 +141,25 @@ Source: `authority/thermal/BASS_HE/research/program_expansion_20261025/TASK_ASSI
       "source_file": "authority/thermal/BASS_HE/research/program_expansion_20261025/TASK_ASSIGNMENT.json",
       "json_pointer": "/allowed_paths",
       "qualification": "SOURCE_DECLARED"
+    }
+  },
+  "status_observation": {
+    "source_file": "status/HE_EXP_INTAKE01_20261025.json",
+    "json_pointer": "/observations/HE-EXP-PAIR",
+    "value": {
+      "unit_id": "HE-EXP-INTAKE-01",
+      "current_scoped_state": "SOURCE_INTAKE_AND_CONDITIONAL_IMPLEMENTATION_VERIFIED_PHYSICAL_BINDING_PENDING",
+      "scoped_contribution": "Source intake and conditional pair implementation verified; source isotope/state/mass, actual Q value and calibrated uncertainty pending.",
+      "source_intake": {
+        "source_file": "status/HE_EXP_INTAKE01_20261025.json",
+        "json_pointer": "/source_intake"
+      },
+      "source_repository": "cosmosapjw-quantum/BASS_HE",
+      "source_commit": "965da72aa7a5e885e12956fafadfb8dc2519b81f",
+      "physical_provider_admitted": false,
+      "production_status": "NOT_APPROVED",
+      "activation": false,
+      "physical_allocation": "UNALLOCATED"
     }
   }
 }
