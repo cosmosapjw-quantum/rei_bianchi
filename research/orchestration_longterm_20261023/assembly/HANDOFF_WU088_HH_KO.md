@@ -398,3 +398,26 @@ PHYS89 Wolframevaluator1/7zeros,contextSERVICE_ERROR1을transcript로재사용�
 새integrals0,ODE0,benchmark0,nuclearrateactivation0,faststopping0. HH_R10OFF,productionNOT_ISSUED. Non-tiltedLRS BianchiI(-+++),reactinggaspi0/DMpi_m별도,common normalframe signedtensor합후norm,Frobenius=sqrt(2)*halfcontraction. 동일trajectory분해는species-off인과실험이아니며sampledresidual은continuumcertificate가아니다.
 
 권위있는 반환: `research/orchestration_longterm_20261023/assembly/returns/WU_PHYS89_BARE_KERNEL_SOURCE_CONSUMER_20261025.json`.
+
+
+## PHYS90 — covariance formatting cell 및 공통 consumer envelope (2026-10-25 UTC)
+
+PHYS89 FINAL 이후의 유한 자식을 완료했다. Draft PR147, branch `research/hh-phys90-covariance-cell-20261025`, FINAL `9d32d115c0b8c5d5b2ce3a66ebc4a7f277334fcc`, tree `30e3a281d81e3fbb88d26f290579085475f54235`. S2 science `60d062104438b3f99553a74d210e9c2b48ed2dd3`, S1 code `298aebe3889011d8a7f48a454cf18d1a98c8f54c`. Scientific identity `a7107870ad5a66e3bb602115f1068ca7366444b42c539e1a6b4b83da2037513a`. S2만 checkout하지 말고 FINAL descendant를 사용한다.
+
+조건부 nearest-formatting box에서 153 singleton과 11,628 pair를 검사했다. t=0 실패 pair74, t=1 실패 pair0/singleton0. 정확한 pair threshold는 `(34406736621/68719476736, 550507785937/1099511627776]`, 폭 `2^-40`이며 바깥쪽 십진 표시는 `0.5006839145935373 < t_pair <= 0.5006839145944469`다. 하단 witness는 zero-based(10,16), 최대 determinant `-23113/549755813888000000000000000000`이다. 전체153 PSD compatibility와 그 threshold는 UNRESOLVED다. Pair pass를 global PSD나 실제 physical CI로 승격하지 않는다. 대칭 상삼각 원소를 공유하는 sharp box support와 `K=LCL^T`, `q^TL=0` 공통 보존식을 닫았다.
+
+Primary1/reference1, 42 stored checkpoints/40 bisections, 8 manufactured vertices/9 support entries, 15 guards PASS. Actual resume 각1회 SKIP으로 9개 파일98,380bytes 불변이다. Child CPU2.9139999999999997s, wall2.917763527002535s. 첫 wrapper WAIT는 child0이며 PID/proc namespace 불일치를 같은 frozen wrapper의 host-PID 실행으로 해결했다. Wrapper coordinator CPU0.07425899999999999s와 metadata resume CPU0.063894s는 별도다. Wolfram evaluator1, 9 scalar zeros/all_zero=True/positive branch=True, symbolic lineage9. 소진 허용량0, reset=false, 미관측 전체 비용·금액·global잔여는 null이다.
+
+최종 ZIP `PHYS90_FINAL_20261025_9d32d115c0b8.zip`, 33,227,568bytes, SHA256 `507f7b9d04652fe516673d5c484ef5f37beff10753a3671062c407ff912b6d15`. Dropbox `id:BSpOijBcT10AAAAAAD_9xg`, Drive `1UpYSBkeiSguw8kfGemn2RbOQ9j6Lm2sh`. 양쪽 실제 wholeGET 각1회/retry0, CRC118/118, payloadSHA117/117, authoritative remote Git114/114, 실제 추출118/118, frozen7/7, cachedinputs2/2 PASS. Remote raw key GET3개는 양쪽 검증에 공유되었으며114개별GET를 뜻하지 않는다. Parent PHYS89 whole archive1/nestedrestore0. S0/S1/S2는 dualACK/별도metadata이며 stagewholeGET0이다.
+
+MAIN `PHYS90_FINAL_DELIVERY_20261025.json`, 179,452bytes, SHA256 `78ce7f0b1abed366c9648a8a0030fb49bfe37f797a98a6c424335711f2eddc4e`. Dropbox `id:BSpOijBcT10AAAAAAD_9xw`, Drive `18LbPXs_ftuw-jO7UjRnUhHbjFfpzhCGK`. 양쪽 actual 원문 GET/SHA/parsed identity PASS. Report/MAIN18/20은 불변 snapshot이다. 이 중앙 actual 게시 이후 TERMINAL과 PR147 actual 최종 본문이 R10/C10 및 한정20/20을 결속한다. 중앙 자기 SHA와 아직 생성되지 않은 TERMINAL identity를 미리 지어 쓰지 않는다.
+
+원 부모 `NUCLEAR_BARE_KERNEL_SOURCE_AND_CONSUMER_CONTRACT`는 PARTIAL_INPUT_DEPENDENCIES. 다음 의무는 current MT102 nominal에 결속된 원 precision covariance/formatter 또는 approved correction, actual mass/electron-target state/atomic→bare kernel, full-support tailB0/BA와 named thermal/fast/radiation consumer의 measure/clock/reference-density/ownership ACK다. REI capture ACK=null, BASS nuclear consumer=NOT_BOUND를 유지한다.
+
+Fresh survey51repo/2254refs/65pages, 관련6repo×최근5PR, DropboxHH529/DriveHH561/최근Library311을 확인했다. 비공개 대화 전체, 모든 branch source, Drive1000cap 밖 전수 열람을 주장하지 않는다. 중앙42f598의 새 HI massive-stress 결과와 CR/HE/BASS/REC의 owner별 과학·백업 한계를 MAIN과 원문에 보존했다. 새 HI electron mass sensitivity를 nuclear massdeck 또는 physical CI로 사용하지 않는다.
+
+원40 contracts/planstatus/dependencies,7authorities17edges,다른39nodes와 기존 WU 관측키 및 고정 최초 handoff를 보존한다. 다음 node 전에 actualHEAD/AGENTS/parallel delta/backup/completion/budget를 다시 대조한다. 완료 PHYS78–90 및 HH/REI/REC/HE/C22/C23A identity를 재실행하지 않는다. 1worker/thread, 원 shared lease, 다른 process 종료0. ODE0/benchmark0/nuclear activation0/fast stopping0, HH_R10=OFF, production=NOT_ISSUED, global physical completion=null. PHYS88 PDF 원인 NOT_ESTABLISHED/원bytes 복구와 PHYS89 첫 reference 실패를 보존한다.
+
+Non-tilted LRS Bianchi I, metric(-+++), reacting gas pi=0/DM pi_m 별도. 동일 normal frame signed matter/radiation tensor를 합한 후 norm; Frobenius=sqrt(2)×half-contraction. 같은 trajectory 분해는 species-off 인과 실험이 아니며 sampled residual은 continuum certificate가 아니다.
+
+게시 직전 추가 delta: 중앙 `ecbb3124b49e75d8a7e948705b3894307d628349`는 위 HI science42f598 이후의 전달 파일5개만 갱신했다. 이 최신 HEAD/tree1e13f9f3b951cb2fcd4e9ebb853d6d3b2011ee0a를 parent로 삼는다. Canonical DAG/HH/returns/AGENTS는 그대로다. HI owner workflow20/20, finalC857432bytes/81members/SHA2562fcee29558fc2d2791f814eea2143ed7a8a9c8f889976f80d320e7979a555434, Library+Dropbox 실제ACK를 관측했다. FinalC remote wholeGET는 NOT_RUN이며 finalDriveACK는 공급되지 않았다. 앞선 MAIN의42f598 당시 pending 기록은 역사적 snapshot으로 보존한다. 이 delivery delta는 PHYS90의 source 또는 science identity를 바꾸지 않는다.
