@@ -473,3 +473,22 @@ Separate operations: DassemblyCPU0.060255385999999994/wall0.06030375500267837s; 
 
 This E changes only own cba_nordsieck_subunit deliveryfields and appends this HEhandofftail. Canonical CRneutral/PHYS89covariancediagnostic children, RECobservations and everyexistingowner scope/OPEN/cost are preserved asactualcurrentbase. C23E/C9-NB-01, fullphysicalprovider/spinexchange/count/validity/support/framefiniteM/uncertainty remainopen. Complete exactD/E B3dualACK and actualPR100body/copyhandoff, then stop after this definedunit. No nextscience loop, unusedreserve, merge or activation is authorized.
 
+
+
+## HE-ANG-FINITEMASS-CBA 과학 인계 — 2026-10-25
+
+PR101: https://github.com/cosmosapjw-quantum/BASS_HE/pull/101 (draft/unmerged,activation=false).
+Science S=9fc8185437f145a6ba4569e1b38aa2e12d15acd9; base PR100 D=8e0fb28fea520364d8794bac32840621dd150f95.
+경로 research/he_ang_finitemass_cba_20261025/의 THEORY_KO.md, RESULTS_KO.md, CLAIM_GATE.json, LOOP_PROGRESS.json, reviews/C9_REPORT.json을 읽는다.
+
+유한M Jacobi direct C1 Born channel의 두 recoil phase, B=mu/2, bound/continuum matching, invariant/Jacobi/lab density, amplitude-weighted two-positive-root fold를 유도·구현했다. 17tests와 고정 수치12generic/3two-termquadrature/12tiny/4kinematics/3fold/73angles/8masspoints의 저장 근거가 PASS_SCOPED다. Fold96 두값2.2489961639448635/2.248996163944868, 상대차1.974610792893064e-15, refinement6.160785673826359e-14.
+
+실제 실행은 PASS/FAIL/FAIL이다. 최초분석과repair의-9/개별CPU초과를 보존한다. 최종ANALYSIS와PNG는 실제 저장·독립검토했고 SVG/FIGURE_METADATA/REPAIR01_SUMMARY는 없다. 현재S17/20, C8=PARTIAL_EXPORT; R10/C10은 실제전달 뒤 닫는다. 20/20로 확대하지 않는다. C9=PASS_SCOPED_NUMERICAL_WITH_FAILED_PROCESSES_AND_PARTIAL_EXPORT.
+
+새CPU11.882829/wall11.985978921002243, cap12/35. Parent100포함lineageCPU16.870803/wall17.108468335994985,cap20/60. Repair1사용/0잔여, 이전reserve전용0. 추가science/재렌더 승인없음. 완료된17tests/12generic/첫2quadrature는 재실행하지 않았다. 이전모든비용/실패/unknown과Wolfram의Infinity::indet(raw) 및remoteCPU UNKNOWN_NOT_ZERO를 보존한다.
+
+B1 Drive=1jcHpeQW_B0bpLYOV7-nEiujjPoV2d4qI,Dropbox=id:BSpOijBcT10AAAAAAD_9vw,SHA256=a15dd819bc164572af0f2c591b7cd3ccfc070e2447be1a0d24db9de6e72c6ef9.
+B1R Drive=1WH-20Vmg9rSaieB3Y3yImFUxNbu0YJqq,Dropbox=id:BSpOijBcT10AAAAAAD_9wQ,SHA256=79dbf442a088a62797d841e33f34bbdb6118e99eb79497b3964821cc88e679c6.
+실제업로드완료+별도metadata ACK이며 이번두백업의원격전체GET을 주장하지 않는다. B2/D/E/B3는 뒤따르는 실제영수증에서 확인한다.
+
+전체HE-ANG SOURCE_INPUT_PENDING; 첫물리입력은 source-consistent joint outgoing-electron law 또는 amplitude/event payload와count/spin/exchange/support/frame/recoil 계약이다. Physicalprovider/event_sigma/physical_recoil/HE-X1empiricalcorrection=false,전체완료율null. DDCS20고정window, C9-NB-01,C23E,다른ownerOPEN을 유지한다. 현재ecbb3124b49e75d8a7e948705b3894307d628349의새REI massive-stress leaf와보호branch8d10231b1f0f788164d5eadbe1bcee0b802cceca 예약을 보존한다.
