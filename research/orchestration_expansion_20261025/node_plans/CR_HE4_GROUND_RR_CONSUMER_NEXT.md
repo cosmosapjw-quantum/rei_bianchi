@@ -2,7 +2,7 @@
 
 Lead: cosmosapjw-quantum/bass_cr
 
-Current status: `PROPOSED_EXPANDED_SCOPE`
+Current status: `NUMERICALLY_CHECKED_SCOPED_CONDITIONAL_HE4_SMOOTH_GROUND_RR_ON_SAVED_H1_CHAIN`
 
 Source: `authority/atomic/EXPANDED_NODE_CONTRACTS.json#/nodes/16`
 
@@ -223,3 +223,17 @@ Source: `authority/atomic/EXPANDED_NODE_CONTRACTS.json#/nodes/16`
   }
 }
 ```
+
+## Scoped owner return (2026-10-25)
+
+Current status: `NUMERICALLY_CHECKED_SCOPED_CONDITIONAL_HE4_SMOOTH_GROUND_RR_ON_SAVED_H1_CHAIN`.
+
+The JSON block above is the historical expansion snapshot at central commit `fc2c6044b5e9eb08e0e0486c17d1987c7099df9c`. Its original contract, source fields, budgets, and historical wrapper remain unchanged. The current wrapper and its `owner_return_20261025` record are in the [matching contract](../contracts/CR_HE4_GROUND_RR_CONSUMER_NEXT.json), including the canonical backup receipt.
+
+Source commit S: [4caf4273eefd51f2c605a8667c3533d8489dd0f5](https://github.com/cosmosapjw-quantum/bass_cr/commit/4caf4273eefd51f2c605a8667c3533d8489dd0f5). Documents commit D: [b11b2e9255f2b10fb5582376412e045bd1e9151c](https://github.com/cosmosapjw-quantum/bass_cr/commit/b11b2e9255f2b10fb5582376412e045bd1e9151c).
+
+Scope: One conditional He4+ ground capture component, saved-bath finite chains; no parent N5 completion.
+
+N4/N5 remain PARTIAL_OPEN; N6/N7 remain PREDECESSOR_GATED. Historical budgets and UNKNOWN_NO_ACK records are retained. Caloric partition is not promoted to physical heating; global physical completion remains null and L4_ready remains false.
+
+Next action: Reuse the completed single-channel He4+ ground capture result. Select a remaining N5 microscopic channel and bind its source/domain/isotope/energy owners under a new named consumer; preserve N4/N5 PARTIAL_OPEN, N6/N7 predecessor gates, original budgets and completed-result identities.

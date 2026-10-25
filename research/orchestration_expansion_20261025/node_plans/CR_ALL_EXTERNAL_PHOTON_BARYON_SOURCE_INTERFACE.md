@@ -2,7 +2,7 @@
 
 Lead: cosmosapjw-quantum/bass_cr
 
-Current status: `PROPOSED_EXPANDED_SCOPE`
+Current status: `IMPLEMENTATION_VERIFIED_SCOPED_SOURCE_AND_EVENT_CONSUMER`
 
 Source: `authority/atomic/EXPANDED_NODE_CONTRACTS.json#/nodes/15`
 
@@ -209,3 +209,17 @@ Source: `authority/atomic/EXPANDED_NODE_CONTRACTS.json#/nodes/15`
   }
 }
 ```
+
+## Scoped owner return (2026-10-25)
+
+Current status: `IMPLEMENTATION_VERIFIED_SCOPED_SOURCE_AND_EVENT_CONSUMER`.
+
+The JSON block above is the historical expansion snapshot at central commit `fc2c6044b5e9eb08e0e0486c17d1987c7099df9c`. Its original contract, source fields, budgets, and historical wrapper remain unchanged. The current wrapper and its `owner_return_20261025` record are in the [matching contract](../contracts/CR_ALL_EXTERNAL_PHOTON_BARYON_SOURCE_INTERFACE.json), including the canonical backup receipt.
+
+Source commit S: [4caf4273eefd51f2c605a8667c3533d8489dd0f5](https://github.com/cosmosapjw-quantum/bass_cr/commit/4caf4273eefd51f2c605a8667c3533d8489dd0f5). Documents commit D: [b11b2e9255f2b10fb5582376412e045bd1e9151c](https://github.com/cosmosapjw-quantum/bass_cr/commit/b11b2e9255f2b10fb5582376412e045bd1e9151c).
+
+Scope: Finite scalar measure/normalization/event consumption; additional physical beta/cascade/stopping sources remain input-dependent.
+
+N4/N5 remain PARTIAL_OPEN; N6/N7 remain PREDECESSOR_GATED. Historical budgets and UNKNOWN_NO_ACK records are retained. Caloric partition is not promoted to physical heating; global physical completion remains null and L4_ready remains false.
+
+Next action: Use the tested source/event interfaces to bind one evaluated external spectrum/history or a source-qualified cascade/stopping provider. Keep missing beta Q/spectrum/branch/clock, angular/finite-mass laws and heating/assimilation as explicit dependencies; preserve N6/N7 gates and reuse saved science without replay.
