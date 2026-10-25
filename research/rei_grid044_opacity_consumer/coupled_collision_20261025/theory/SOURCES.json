@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "date_UTC": "2026-10-25",
+  "scope": "Primary literature context for coupled photon/chemistry conservation and actual symbolic verification of the directly derived reference normalization and finite collision blocks.",
+  "tools": {
+    "SciSpace": {
+      "executed": true,
+      "tool": "mcp__codex_apps__scispace_search_papers",
+      "query": "How do photon-conserving radiative transfer methods couple hydrogen and helium photoionization to the photon field while preserving photon number, chemical abundance constraints, and photoelectron energy?",
+      "returned_papers": 10,
+      "isError": false,
+      "applicability": "Retrieved primary paper candidates. Indexed dates are not adopted when inconsistent with primary arXiv bibliographic record."
+    },
+    "Exa": {
+      "search_executed": true,
+      "fetch_executed": true,
+      "search_query": "Original paper coupled photon conserving radiation chemistry Jacobian photon number ionization energy conservation cosmological expansion comoving number density",
+      "fetched_urls": [
+        "https://arxiv.org/abs/0901.1110",
+        "https://arxiv.org/abs/astro-ph/9812151",
+        "https://arxiv.org/abs/1008.1071"
+      ],
+      "applicability": "Primary identification and abstract access. Enriched citation/h-index metadata is not adopted."
+    },
+    "primary_direct_check": {
+      "executed": true,
+      "tool": "mcp__codex_apps__search_service_web_run",
+      "urls": [
+        "https://arxiv.org/abs/0901.1110",
+        "https://arxiv.org/abs/astro-ph/9812151"
+      ],
+      "refs": [
+        "turn57view0",
+        "turn57view1"
+      ]
+    },
+    "Wolfram": {
+      "context_executed": true,
+      "context_status": "ERROR",
+      "context_error": "MCP -32603 Internal error; not a numerical failure",
+      "evaluator_executions": 3,
+      "first_residuals": 60,
+      "extension_first_residuals": 15,
+      "extension_first_warning": "Global symbol Q undefined warning from tool; returned 15 zeros; preserved and repaired",
+      "extension_repair": "Changed Q identifier to qvec; returned clean 15 zeros",
+      "distinct_structural_residuals": 75,
+      "remote_CPU": "UNKNOWN",
+      "input": "WOLFRAM_CHECK.wl",
+      "output": "WOLFRAM_RESULT.json"
+    },
+    "xAct": {
+      "executed": false,
+      "reason": "No new tensor curvature manipulation needed; geometry is inherited and finite collision/reference algebra is scalar/matrix."
+    }
+  },
+  "sources": [
+    {
+      "id": "REYNOLDS_ETAL2009",
+      "title": "Self-Consistent Solution of Cosmological Radiation-Hydrodynamics and Chemical Ionization",
+      "authors": [
+        "Daniel R. Reynolds",
+        "John C. Hayes",
+        "Pascal Paschos",
+        "Michael L. Norman"
+      ],
+      "year": 2009,
+      "arxiv": "0901.1110",
+      "doi": "10.1016/j.jcp.2009.06.006",
+      "url": "https://arxiv.org/abs/0901.1110",
+      "web_ref": "turn57view0",
+      "read_scope": "Primary arXiv abstract and bibliographic record",
+      "relation": "contextual",
+      "own_note": "Radiation, chemical ionization, and gas energy can be assembled as a coupled stiff system; the paper motivates explicit coupling and block solvers. Current exact quotient and finite-state Jacobian are independently derived here, not attributed to uninspected full-text equations."
+    },
+    {
+      "id": "ABEL_NORMAN_MADAU1999",
+      "title": "Photon Conserving Radiative Transfer around Point Sources in multi-dimensional Numerical Cosmology",
+      "authors": [
+        "Tom Abel",
+        "Michael L. Norman",
+        "Piero Madau"
+      ],
+      "year": 1999,
+      "preprint_year": 1998,
+      "arxiv": "astro-ph/9812151",
+      "doi": "10.1086/307739",
+      "url": "https://arxiv.org/abs/astro-ph/9812151",
+      "web_ref": "turn57view1",
+      "read_scope": "Primary arXiv abstract and bibliographic record",
+      "relation": "supports",
+      "own_note": "Photon-conserving transport is established prior work. It supports the physical requirement to match photon absorption and ionization event counts; it does not certify this fixture's continuum convergence."
+    },
+    {
+      "id": "PAWLIK_SCHAYE2011",
+      "title": "Multi-frequency, thermally coupled radiative transfer with TRAPHIC: Method and tests",
+      "authors": [
+        "Andreas H. Pawlik",
+        "Joop Schaye"
+      ],
+      "year": 2011,
+      "preprint_year": 2010,
+      "url": "https://arxiv.org/abs/1008.1071",
+      "doi": "10.1111/j.1365-2966.2010.18032.x",
+      "read_scope": "Primary page fetched with Exa; prior verified bibliographic record reused",
+      "relation": "contextual",
+      "own_note": "Multifrequency photon conservation and thermal coupling motivate separate radiation-number and energy responses. No solver accuracy or performance claim transferred."
+    },
+    {
+      "id": "VERNER_PROVIDER_REUSED",
+      "url": "https://www.pa.uky.edu/~verner/photo.html",
+      "read_scope": "Prior source metadata and exact pinned source coefficients reused",
+      "prior_locator": "pilot/opacity_response_20261025/theory/SOURCES.json",
+      "relation": "supports",
+      "own_note": "Same inherited ground-state PH2/PH1 valence provider; no coefficient or channel replacement in this node."
+    },
+    {
+      "id": "FURLANETTO_STOEVER2010_REUSED",
+      "url": "https://arxiv.org/abs/0910.4410",
+      "doi": "10.1111/j.1365-2966.2010.16401.x",
+      "read_scope": "Prior primary bibliographic/abstract evidence reused",
+      "prior_locator": "pilot/opacity_response_20261025/theory/SOURCES.json",
+      "relation": "limits",
+      "own_note": "Primary electron energy can feed heat, excitation and secondary ionization; K remains an injection ledger until a deposition closure is provided."
+    }
+  ],
+  "adoption": {
+    "new_fit_parameters": false,
+    "new_nuclear_or_CR_rates": false,
+    "fulltext_copies_in_deliverable": false,
+    "strong_no_go_claim": false,
+    "actual_new_equations": "DERIVATION.md sections 2-6",
+    "numerical_result_status": "Separate implementation execution and review; this theory artifact makes no local 40-state numerical PASS claim"
+  },
+  "skill_context_used": {
+    "effective_version": "1.0.0",
+    "effective_source": "Executor physmath-research-loop requested by parent/user; existing RESEARCH_POLICY.md, THEORY_LOOP.md and EVIDENCE_AND_HANDOFF.md read and applied",
+    "cloud_version_seen": "1.3.0",
+    "resolution": "No workflow migration; current parent-selected 1.0.0 preserved. Cloud policy reading caused no new execution or review gate."
+  }
+}

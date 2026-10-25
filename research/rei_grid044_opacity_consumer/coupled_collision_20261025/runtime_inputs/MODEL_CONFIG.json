@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "status": "FROZEN_PROPOSED_FINITE_MODEL; NEW_IVP_AUTHORIZATION_PENDING",
+  "birth_energy_support_eV": [
+    5.0,
+    150.0
+  ],
+  "spectral_split_eV": [
+    5.0,
+    5.392,
+    13.6,
+    24.59,
+    54.42,
+    64.39,
+    75.64,
+    122.5,
+    150.0
+  ],
+  "spectral_order_per_interval": 2,
+  "angular_order": 4,
+  "birth_eta_edges": [
+    0.0,
+    0.4864775372638283,
+    0.9729550745276566,
+    1.4594326117914849,
+    1.9459101490553132
+  ],
+  "time_rate_order_per_cell": 16,
+  "initial_uv": false,
+  "sources": [
+    {
+      "name": "stellar",
+      "spectrum": "blackbody_photon_number",
+      "temperature_K": 40000.0,
+      "amplitude_per_Href_s": 3e-17,
+      "escape_fraction": 0.2,
+      "z_on": 12.0,
+      "delta_z": 2.0
+    },
+    {
+      "name": "external_IGM",
+      "spectrum": "cutoff_power_law",
+      "pivot_energy_eV": 13.6,
+      "power_index": -2.0,
+      "cutoff_energy_eV": 100.0,
+      "amplitude_per_Href_s": 1.5e-18,
+      "escape_fraction": 1.0,
+      "z_on": 10.0,
+      "delta_z": 2.0
+    }
+  ],
+  "assumptions": {
+    "parameter_selection": "illustrative uncalibrated choices; no fit or sweep",
+    "stellar_amplitude": "intrinsic before constant escape_fraction applied once",
+    "IGM_amplitude": "external emission into field; source separate from tracked gas",
+    "source_shapes": "compact emission support; normalized on adopted finite spectral quadrature",
+    "source_time": "four integrated-amplitude midpoint impulses; refinement OPEN",
+    "geometry": "normal tetrad; isotropic source; frozen donor H,b,nHref",
+    "spectral_domain": "birth support only; all redshifted cohorts retained",
+    "new_Einstein_feedback": false,
+    "amplitude_quadrature": "partition at donor logH-PCHIP eta knots plus each birth cell endpoint; retain same midpoint birth"
+  },
+  "local_check_config_overrides": {
+    "birth_eta_edges": [
+      0.0,
+      1.9459101490553132
+    ],
+    "angular_order": 2,
+    "spectral_order_per_interval": 2,
+    "time_rate_order_per_cell": 16,
+    "quadrature_partition": "donor_H_knots"
+  },
+  "local_gate_targets": {
+    "normalized_jump_residual_max": 2e-12,
+    "geometry_relative_max": 2e-12,
+    "amplitude_quadrature_relative_max": 2e-10,
+    "amplitude_quadrature_absolute_photons_per_Href": 1e-14,
+    "scaled_Jacobian_FD_max": 2e-05
+  },
+  "planned_refinement_overrides": {
+    "timestep": "inherited nominal vs tight Radau; unchanged limits",
+    "source_time": {
+      "birth_eta_cells": 8
+    },
+    "spectral": {
+      "spectral_order_per_interval": 4
+    },
+    "angular": {
+      "angular_order": 8
+    }
+  },
+  "new_ivps": "NOT_RUN; no approval implied",
+  "quadrature_partition": "donor_H_knots",
+  "quadrature_rule": "composite_Gauss_Legendre16_on_each_birth_cell_intersection_with_donor_H_interpolation_segments",
+  "photo_event_diagnostics": {
+    "channels": [
+      "H_I",
+      "He_I",
+      "He_II",
+      "Li_I",
+      "Li_II",
+      "Li_III"
+    ],
+    "units": "events/Href",
+    "integration": "append C_PI,e prime=sum_active_packets A_ej; passive diagnostics only",
+    "gas_photon_feedback": "none beyond inherited events",
+    "isotope_lift": "C_A,e=(Y_A/Y_element)*C_element,e under admitted equal-fraction quotient; absent n/T remain zero"
+  }
+}
