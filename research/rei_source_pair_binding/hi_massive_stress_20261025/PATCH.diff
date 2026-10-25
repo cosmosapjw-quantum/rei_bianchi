@@ -1,0 +1,802 @@
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1,54 @@
++# HI native massive-stress consumer — prepared implementation
++
++Unit `HI_NATIVE_MASSIVE_STRESS_20261025`, isolated leaf
++`research/rei_source_pair_binding/hi_massive_stress_20261025/`.
++
++C3–C5 implements the root-frozen massive stress kernel, its mass derivative,
++pressure source and signed mass/amplitude JVP. Source CSV and prior raw are exact
++copies. Saved moments A/K/B/P and maximum kinetic energy are extracted from the
++prior raw; previous consumer functions and tests are never imported or replayed.
++
++`stress_source.py` creates exact per-term rational kernels and directly accumulates
++signed integer dyadic enclosures at P128/P160. General rational denominator sums
++are absent. Interval operations propagate endpoints. Binary64 output is certified
++only when both endpoints round to the same finite value. Zero, final underflow,
++subnormal and unresolved classifications remain explicit.
++
++`focused_check.py` is one production/verification pass. It binds the 4368 HI/z2.479
++rows, support maximum and prior fields; checks nesting, width, stable rounding,
++Decimal100 alternative-kernel containment and relative error <=2e-15; then verifies
++support, monotonicity and concavity certificates plus the frozen focused controls.
++Synthetic a=2,X=3,da=-1,dX=2,dM=3 controls are distinct from physical density/history.
++
++## Execution state
++
++PREPARED_NOT_EXECUTED. No evaluator, project import, compilation, tests, CAS or
++render has run in this preparation phase. No science outcome is claimed.
++
++Root writes a separate `ROOT_GO.json` containing the exact unit,
++`"science_execution": "GO"` and actual `PRE_EXECUTION_MANIFEST.json` SHA-256.
++Then run once from this directory:
++
++```bash
++python3 -B run_focused_once.py /absolute/path/to/ROOT_GO.json
++```
++
++The launcher uses an exclusive durable attempt file, one primary Python child,
++CPU hard cap6s, wall cap8s, memory512MiB and one-thread environment. It measures
++actual wait4 user/system CPU, elapsed wall and max RSS and preserves stdout/stderr
++and resource receipt for successful or failed termination. No network API exists
++in the child implementation. No retry is implicit. Root interprets failures and
++authorizes any targeted repair within the same cumulative new-unit cap.
++
++## Scientific interpretation
++
++Energies are eV, clock proper seconds, bath-rest zero-recoil target, no-deposition,
++declared isotropic angular closure. W/3 is pressure injection per target per proper
++second. Flux and STF are zero under that closure. Thermal heat remains null; no
++rest-energy MA enters the existing energy ledger. Mass endpoints are standard-
++uncertainty sensitivity probes, not confidence bounds. Actual n_HI/time history,
++initial stock, geometry/time/frame matching and collision/stopping/photon supply
++remain unresolved. L4_ready=false; whole-model completion=null.
++
++Historical10s failure10.110448s and known-partial10.765369s remain preserved;
++wholeL0=UNKNOWN_NOT_ZERO and original cumulative cap=NOT_FROZEN.
+--- /dev/null
++++ b/THEORY_MASSIVE_STRESS_KO.md
+@@ -0,0 +1,84 @@
++# HI 실제 원자 측도의 massive stress 주입률
++
++## R1–R3: 고정 질문과 재사용
++
++단위: HI_NATIVE_MASSIVE_STRESS_20261025. 같은 HI/z=2.479의 4,368개 원자 측도에 전자 rest-energy M을 결속했을 때 압력 trace W, isotropic pressure source W/3, 비상대론적 근사 2K의 오차, M에 대한 민감도를 계산한다. 과거 native-HI 수·에너지 및 stock/work 이론은 재사용한다. 이 작업은 실제 순간 source의 다음 모멘트이며 시간 진화된 stock 계산이 아니다.
++
++불변 입력은 prior science 8d68dff35ca2bdc456049081132a7d2449b29143의 CSV SHA256 f5bcfe477b8a073341a7496c079e6eb2737f6ca578b884376887b04989e57fc3와 raw SHA256 0335abad8879817b5e61b0f5ef7120009c2e18251be4fe82ea3e48c8e7aa5669다. CSV의 decimal spelling은 float round-trip 후 exact binary64 유리수 k_j,w_j로 읽는다. 저장 raw의 exact A,K,B,P를 재사용하며 이전 모멘트 실행을 반복하지 않는다.
++
++NIST 2022 CODATA complete table의 electron mass energy equivalent는 0.51099895069 MeV, standard uncertainty 0.00000000016 MeV다. 이번 계산의 명목 입력을 decimal exact M0=510998.95069 eV로 정의하고 u=0.00016 eV의 M0±u를 민감도 탐색점으로 쓴다. 유한 입력 M0의 exact arithmetic과 물리 상수의 불확실성은 서로 다른 문제다. M0±u는 보장된 참값 구간/신뢰구간이라는 주장을 하지 않는다. 첨부14의 미사용 선언 _ME_EV=510998.95는 역사적 비교 자료이며 owner를 조용히 바꾸지 않는다.
++
++문헌의 local-frame kinetic stress T^ij=∫ f v^i p^j d^3p(Sarbach–Zannias, arXiv:1303.2899v1, Eqs.52–58)를 사용한다. 이전 stock/work에서 유도한 massive trace kernel 자체는 재사용 결과다. 신규 기여는 실제 μ와 electron M의 결속, 유한 모멘트의 민감도/근사 오차, 효율적인 유리수 enclosure 구현 및 실제 검증이다. strong no-go/문헌 최초성 주장은 없다.
++
++서명 (-,+,+,+), 에너지 단위 eV, 시간 proper second, target 기준을 유지한다. M=mc²로 c를 보존하며 c의 수치를 새로 넣지 않는다. χ=represented float(13.6) eV, bath-rest target, ground-state HI, zero recoil, no-deposition, photon upper endpoint 50000 eV는 변하지 않는다. CSV에는 angular data가 없으므로 μ⊗dΩ/(4π)는 별도로 선언한 isotropic closure다.
++
++## R4–R5: 구성, 미분과 유한 support bound
++
++μ=Σ w_j δ_(k_j), k_j≥0, w_j≥0, M>0라고 하자. 총에너지 E=k+M, p²c²=k(k+2M), v=pc²/E로부터
++
++    g(k,M)=pv=k(k+2M)/(k+M)=k+Mk/(k+M)=2k−k²/(k+M).
++    W(M)=∫g(k,M)dμ, p_inj(M)=W(M)/3.
++
++source가 local rest frame에서 isotropic이면 momentum flux와 STF injection은 0이다. W/3의 단위는 eV target⁻¹ proper_s⁻¹다. 압력의 시간 주입 모멘트이며 현재 stock pressure나 thermal heat의 값이 아니다. 물리 n_HI와 시간 이력이 주어져야 실제 volume source/stock과 접합된다. Rest energy M A를 기존 kinetic/binding/UV ledger에 더하지 않는다.
++
++직접 미분하면
++
++    g_k=1+M²/(k+M)²,
++    g_M=k²/(k+M)²,
++    Hess(g)=−2/(k+M)³ [[M²,−Mk],[−Mk,k²]].
++
++임의 벡터 (a,b)에 대한 Hessian quadratic form은 −2(Ma−kb)²/(k+M)³≤0이다. 따라서 g는 양의 영역에서 joint concave이고 k g_k+M g_M=g다. k=0에서는 g=g_M=0이다. M→0+에서 g→k, M→∞에서 g→2k이므로 K≤W≤2K다.
++
++    S(M)=dW/dM=Σ w_j k_j²/(k_j+M)² ≥0.
++    W''(M)=−2Σ w_j k_j²/(k_j+M)³ ≤0.
++
++유한합이므로 미분과 합 교환은 즉시 정당하다. 0≤k≤L에서
++
++    D(M)=2K−W(M)=Σ w_j k_j²/(k_j+M),
++    0≤D≤ L K/(L+M),
++    W≥ (L+2M)K/(L+M),
++    D/W≤ L/(L+2M),       K>0.
++
++첫 부등식은 k/(k+M)≤L/(L+M)를 k w로 적분한 것이다. 마지막 것은 앞선 W 하한을 이용한다. L은 같은 저장 raw maximum_kinetic을 재사용하며 CSV support를 이번 새 계산에서 확인한다. 이것은 유한 support의 근사 bound이며 spectral quadrature의 새로운 physical error bound가 아니다.
++
++M0±u에서는 단조성으로 W(M0−u)≤W(M0)≤W(M0+u). Concavity로
++
++    W(M0+u)−W(M0) ≤ u S(M0)
++    W(M0)−W(M0−u) ≥ u S(M0).
++
++직접 평가한 양 endpoint의 차이를 민감도로 기록한다. 이를 표준불확실성의 통계적 해석 이상으로 승격하지 않는다.
++
++고정 μ에서 m=a X≥0, dm=a dX+X da라 두면
++
++    q_pressure = m W(M)/3,
++    Jv_pressure = dm W(M)/3 + m dM S(M)/3.
++
++a,X≥0, da,dX,dM은 signed finite 방향이다. 질량 입력의 방향 dM은 모델 sensitivity이며 시간 변화하는 전자 질량을 가정하지 않는다. q_flux=0, q_STF=0은 선택 closure 아래 정확한 값이다. Existing public source APIs는 변경하지 않고 새 consumer API를 추가한다.
++
++## 손으로 계산한 판별례
++
++(k,w)=(0,1),(2,3), M=1에서 A=4,K=6,W=8,p_inj=8/3,D=4,S=4/3. a=2,X=3,da=−1,dX=2,dM=3이면 m=6,dm=1, q_pressure=16, Jv_pressure=32/3이다. 이는 실제 HI 입력과 구별되는 구현 control이다. Empty/zero measure에서는 W=S=D=0이고 D/W는 null이다.
++
++## C3: 효율적인 exact enclosure
++
++각 t_j=w_j g(k_j,M)는 exact rational이지만 서로 다른 k_j+M 때문에 전체 Fraction 합의 공통 denominator가 커질 수 있다. 비교한 표현은 (i) 전체 유리수 합, (ii) Decimal 고정정밀도 합, (iii) exact rational term + directed dyadic enclosure다. (iii)를 primary로, 다른 계산식의 Decimal100을 independent numerical reference로 고정한다.
++
++각 유한 signed rational term 목록에서 T=max |t_j|>0, E=floor(log2 T)를 integer bit-length와 exact 비교로 구한다. P∈{128,160}, δ=2^(E−P)로 놓고
++
++    l_j=floor(t_j/δ), u_j=ceil(t_j/δ),
++    lo=δ Σl_j, hi=δ Σu_j.
++
++floor/ceil와 합은 정수 연산이다. 각 t_j∈[δl_j,δu_j]이므로 정확한 합은 [lo,hi]에 있고 hi−lo≤Nδ. 음수에도 floor division 정의를 그대로 쓴다. T=0일 때 [0,0]. 같은 E에서 P160의 dyadic grid는 P128을 세분하므로 interval nesting이 성립한다. 이것은 실행 시 검사한다. 각 항만 Fraction으로 만들고 전체 서로 다른 denominator를 합하지 않는다.
++
++Interval scalar multiplication은 부호에 따라 양 끝을 교환하고, 합/차/나눗셈(양의 3)은 exact endpoint arithmetic으로 한다. 따라서 W에서 W/3, q/Jv, D=2K−W를 계산하면서 enclosure를 보존한다. 두 endpoint의 nearest binary64 round 결과가 같을 때 그 값을 반환하면 monotonicity에 의해 정확한 합의 correctly rounded 값이 증명된다. 양 끝이 서로 다른 float이면 ROUNDING_UNRESOLVED를 반환한다. 자동 precision 확대/허용오차 확대는 하지 않는다. Overflow/nonfinite는 명시적으로 거절한다.
++
++exact_zero는 [0,0]일 때만 확정한다. 비영 interval이 0을 포함하지 않으면서 반환 float가0이면 final_underflow_to_zero, 비영 subnormal이면 subnormal로 표시한다. 0을 걸치는 미해결 enclosure를 exact_zero로 표시하지 않는다. 심한 cancellation에서 고정 P가 불충분할 수 있으며 이것은 API의 명시된 unresolved 상태다.
++
++Decimal100 참조는 각 binary64를 정수 ratio로 받은 뒤 Decimal numerator/denominator로 바꾸고 대체식 2k−k²/(k+M)를 사용한다. Primary enclosure와 알고리즘을 공유하지 않는다. Decimal은 보조 numerical comparison이며 exact interval proof나 fresh model review가 아니다.
++
++## 판정·실행 경계
++
++명목 W,S와 M± endpoint W에 대해 P128/P160 nesting, width bound, stable rounding, Decimal100 containment와 상대차≤2e−15를 고정한다. 원래 L0 gate 2e−12는 그대로다. 실제 μ에 대한 K≤W≤2K, D bound, mass monotonic/concavity를 interval arithmetic으로 확인한다. Hand controls는 exact rational expectations다. 과거22/66/83, ANGTHERM01/02, NCP, HI-summary, pressure/stock/work/native-HI 및 donor quadrature 재실행은0이다.
++
++Fresh native reviewer는 본 유도/구현 diff/raw를 한 pass에서 읽고 현재-task finding만 낸다. CAS는 독립 model review로 표시하지 않는다. Root가 scope admission과 다음 행동을 판정한다. 실제 n_HI/history/IC/geometry/collision supply는 unresolved이며 L4_ready=false, whole_model_completion=null, C23E conditional D43K, HE94 partial window, PHYS85 historical state, ANGTHERM02 read-only를 유지한다.
++
+--- /dev/null
++++ b/authority/AGENTS_CURRENT.md
+@@ -0,0 +1,133 @@
++# Repository operating policy
++
++## Project classification and supported user
++
++`rei_bianchi` is a personal scientific-research codebase. It has one
++developer/owner, and that owner is the only supported operator. The default
++environment is a trusted local account on a trusted local machine; this is not
++a multi-user product, hosted service, or adversarial execution platform.
++
++## Default trust model
++
++Unless the owner explicitly requests a named security task, do not design,
++implement, require, or report blockers for:
++
++- authentication, authorization, roles, account separation, or multi-tenant
++  isolation;
++- hostile same-UID users, malicious local repository configuration, adversarial
++  symlink/path replacement, or deliberate local artifact tampering;
++- anti-tamper ownership seals, signatures, attestations, custody state machines,
++  or redundant hash/manifest layers whose only purpose is adversarial defense;
++- product security reviews, automated security gates, dependency/supply-chain
++  hardening, secret-scanning infrastructure, or security compliance;
++- production-service availability, abuse resistance, or untrusted-input
++  hardening that has no concrete role in the owner's research workflow.
++
++The absence of those mechanisms is not an issue, blocker, promotion gate, or
++acceptance failure for this repository. Do not introduce them speculatively.
++
++## Research-integrity boundary
++
++Retain only controls that directly support scientific correctness,
++reproducibility, recovery, or diagnosis, such as exact model/input/configuration
++identity, deterministic seeds, raw-result preservation, numerical invariants,
++and minimal hashes or manifests needed to detect accidental corruption. Treat
++these as research-integrity tools, not as adversarial security or anti-tamper
++requirements, and keep them proportional to the scientific claim.
++
++Historical receipts, manifests, and audit records remain valid evidence of the
++work that produced them; this policy does not require deleting or rewriting
++them. It does prevent their security-oriented machinery from becoming a
++default requirement for new work.
++
++## Baseline operational safety
++
++Platform/system instructions, explicit user scope, credential privacy,
++non-destructive filesystem practice, and external-service authorization still
++apply. These are execution boundaries for the assistant, not project-level
++product security features. Do not add repository security settings or gates
++unless the owner explicitly asks for them.
++
++Prioritize physics validity, numerical correctness, algorithmic quality,
++reproducibility, performance, and clear scientific claim boundaries.
++
++<!-- BEGIN UNIVERSAL_EXECUTION_TRANSITION_POLICY -->
++## Execution-transition and anti-bureaucracy policy
++
++This policy limits optional process expansion. It does not weaken explicit
++user requirements, destructive-action safeguards, frozen scientific inputs,
++or claim-admission ceilings.
++
++> **Execution-transition rule:** Prevent the permanent-blocker attractor in which repair generates new review surfaces and fresh review continuously discovers adjacent defects without reaching execution. Nonexecution is itself a failure mode: two substantial process-only cycles trigger `PROCESS_STARVATION`. Separate execution permission from claim admission—fail closed on authoritative claims, not on exploratory progress. A blocked state must not leave documentation as the only unlimited action; perform the smallest repair, use a safe exploratory path, defer, or stop. Define a finite trust boundary so verification does not recursively verify its own machinery on every run. Do not mistake contracts, manifests, hashes, reviews, or audit documents for user utility. Every mandatory gate must have a positive `PASS → next executable action` transition and every review loop must have a stopping rule. Distinguish severity from current-task blocking relevance. Real defects receive one targeted repair and regression test; they do not automatically justify new governance layers. If assurance continues increasing while actual implementation, experiment, inference, or scientific progress remains stationary, classify `TRANSITION_POLICY_PATHOLOGY`, freeze optional process work, and resume the shortest safe path to execution.
++<!-- END UNIVERSAL_EXECUTION_TRANSITION_POLICY -->
++
++<!-- BEGIN UNIVERSAL_TYPED_IDENTITY_POLICY -->
++## Byte identity versus semantic identity policy
++
++> **Typed-identity rule:** A SHA or byte mismatch establishes only `BYTE_IDENTITY_MISMATCH`; never promote it automatically to `SCIENTIFIC_INTEGRITY_FAILURE`. First classify the object as immutable source/input, deterministic generated evidence, numerical/scientific output, or packaging/metadata, then apply the identity relation actually required by the claim. Immutable inputs and contractually deterministic evidence are byte-blocking by default. Numerical outputs must normally be judged by justified residuals, invariants, state/observable agreement, convergence, conditioning, and uncertainty—not hashes or equality of secondary error estimates. Packaging metadata mismatches are non-scientific unless byte-identical packaging is explicitly required. Distinguish result validity, provenance validity, and packaging validity. A stricter-than-necessary test that rejects mathematically equivalent outputs is a false-FAIL defect, not extra safety. Repair the smallest defective binding/test and continue; do not create a new audit or provenance layer solely because bytes differ.
++<!-- END UNIVERSAL_TYPED_IDENTITY_POLICY -->
++
++<!-- BEGIN TIERED_SCIENTIFIC_DELEGATION_POLICY -->
++## Tiered scientific delegation and cost policy
++
++For multi-agent scientific work, separate authority from mechanical execution.
++This is a routing rule for cost-effective scientific work; it does not change
++the scope of an approved scientific claim.
++
++- An Astra-tier agent owns problem framing, frozen contracts, source/theory
++  intake, numerical/physical acceptance criteria, independent review, failure
++  classification, repair authorization, and PASS/HOLD/NO-GO decisions.
++- A lower-tier coding agent owns only implementation, targeted tests, bounded
++  builds/runs, raw-result preservation, mechanical evidence assembly, and
++  implementation documentation that merely reports observed facts.
++- Do not assign routine code writing, refactoring, test plumbing, formatting,
++  evidence serialization, or a prescribed bounded execution to Astra when a
++  complete Astra-authored contract is available. Delegate that work to a
++  lower-tier coding agent.
++- A lower-tier agent must stop and return to Astra, rather than inventing an
++  answer, when an immutable input/source identity is missing, an acceptance
++  tolerance or physical convention is ambiguous, a result changes the claim
++  boundary, a substantive failure needs interpretation, or a repair would
++  change model/solver/closure policy.
++- The controller must give the coding agent the frozen base identity, allowed
++  paths, limits, commands, controls, and stopping rule. It must then send the
++  observed diff and raw outcomes to a fresh Astra-tier reviewer before any
++  scoped scientific admission or publication decision.
++- Astra review is read-only unless it explicitly authorizes one bounded
++  targeted repair. The authorized repair returns to the lower-tier coding
++  agent; it is not silently implemented by the reviewer.
++- Do not route a task by package name alone or claim a runtime model identity
++  that was not observed. Record requested and observed execution identities
++  separately when they matter to the evidence.
++
++This rule is satisfied by `Astra contract -> lower-tier execution -> Astra
++independent decision -> lower-tier authorized repair, if any`. It prevents
++both costly Astra implementation and recursive review without execution.
++<!-- END TIERED_SCIENTIFIC_DELEGATION_POLICY -->
++
++<!-- BEGIN AGENT_CAPACITY_RECOVERY_POLICY -->
++## Agent-capacity recovery
++
++After `agent thread limit reached`, do not repeat equivalent spawn attempts.
++Inventory and reuse a completed compatible agent with `followup_task`, retaining
++role separation and independent review of changes it did not implement.
++`interrupt_agent` is not deletion and does not prove capacity was reclaimed.
++Do not assert an internal scheduler cause without evidence or kill unrelated
++processes. Check actual worker progress after request acceptance.
++
++Controller-direct implementation is permitted only with explicit owner approval,
++using the frozen contract, existing task identity and cumulative limits. Record
++the actual executor; a historical requested model is not runtime evidence.
++Missing independent review keeps scientific admission pending, but must not
++prevent authorized safe preparation or the next dependency-safe action.
++<!-- END AGENT_CAPACITY_RECOVERY_POLICY -->
++
++## Repository checkout for new work
++
++Use this repository's existing checkout as the default location for new work.
++Do not create a separate clone or Git worktree unless the owner explicitly
++requests one for that task or an already frozen task identity requires its
++existing worktree. Preserve dirty and untracked files; inspect branch, HEAD,
++remote, and status before changing the checkout. Stage only the paths owned by
++the task. This changes the default for new work and does not rewrite historical
++worktree-bound evidence or remove an existing active worktree.
+--- /dev/null
++++ b/focused_check.py
+@@ -0,0 +1,195 @@
++"""One frozen production/verification pass, executed only by the bounded runner."""
++import csv
++import hashlib
++import json
++import math
++from decimal import Decimal, localcontext
++from fractions import Fraction
++from pathlib import Path
++
++from stress_source import (Interval, enclose, massive_terms, pressure_source,
++                           rational, record, from_record)
++
++HERE = Path(__file__).resolve().parent
++
++
++def require(condition, label):
++    if not condition:
++        raise AssertionError(label)
++
++
++def decimal_reference(atoms, mass):
++    # Alternative algebra and fixed Decimal100; no dyadic accumulation reused.
++    with localcontext() as context:
++        context.prec = 100
++        def dec(value):
++            return Decimal(value.numerator) / Decimal(value.denominator)
++        M = dec(mass)
++        W = S = Decimal(0)
++        for kinetic, weight in atoms:
++            k, w = dec(kinetic), dec(weight)
++            W += w * (2 * k - k * k / (k + M))
++            S += w * k * k / ((k + M) * (k + M))
++        return {"W": W, "S": S}
++
++
++def relative_decimal_check(interval, reference, label):
++    require(interval.contains(Fraction(reference)), label + " Decimal100 containment")
++    rounded = interval.certified()
++    require(rounded["status"] == "CERTIFIED_BINARY64", label + " stable binary64")
++    with localcontext() as context:
++        context.prec = 100
++        relative = (abs(Decimal.from_float(rounded["value"]) - reference) / abs(reference)
++                    if reference else Decimal(0))
++    require(relative <= Decimal("2e-15"), label + " relative <=2e-15")
++    return {"Decimal100": str(reference), "relative": str(relative), "containment": True}
++
++
++def controls():
++    names = []
++    Wterms, Sterms = massive_terms([(0, 1), (2, 3)], "1")
++    W, _ = enclose(Wterms, 160)
++    S, _ = enclose(Sterms, 160)
++    require(W.contains(Fraction(8)) and S.contains(Fraction(4, 3)), "hand W/S")
++    source = pressure_source(W, S, "2", "3", "-1", "2", "3")
++    expectations = {"pressure": Fraction(8, 3), "source": Fraction(16), "jvp": Fraction(32, 3)}
++    for key, value in expectations.items():
++        require(source[key].contains(value), "hand " + key)
++        require(source[key].certified()["value"] == float(value), "hand rounding " + key)
++    require((Interval.point(12) - W).contains(4), "hand D")
++    names.append("hand_exact_W_S_D_pressure_source_mass_amplitude_JVP")
++    for atoms in ([], [(0, 1)], [(1, 0)]):
++        for terms in massive_terms(atoms, 1):
++            zero, _ = enclose(terms, 160)
++            require(zero.certified()["tag"] == "exact_zero", "empty/zero")
++    names.append("empty_zero_measure")
++    signed, _ = enclose([Fraction(1, 3), -Fraction(2, 7)], 160)
++    require(signed.contains(Fraction(1, 21)), "signed direct enclosure")
++    cancel, _ = enclose([Fraction(1), -Fraction(1)], 160)
++    require(cancel.certified()["tag"] == "exact_zero", "exact cancellation")
++    crossed = Interval(-Fraction(1, 2 ** 160), Fraction(1, 2 ** 160)).certified()
++    require(crossed["status"] == "ROUNDING_UNRESOLVED" and not crossed["exact_zero"], "crossed zero")
++    names.append("signed_direct_enclosure_cancellation_zero_classification")
++    tiny_crossed = Interval(-Fraction(1, 2 ** 1100), Fraction(1, 2 ** 1100)).certified()
++    require(tiny_crossed["status"] == "ROUNDING_UNRESOLVED" and not tiny_crossed["exact_zero"],
++            "tiny crossing signed-zero endpoints")
++    negative_tiny = Interval.point(-Fraction(1, 2 ** 1100)).certified()
++    require(negative_tiny["status"] == "CERTIFIED_BINARY64"
++            and negative_tiny["tag"] == "final_underflow_to_zero"
++            and math.copysign(1.0, negative_tiny["value"]) == -1.0
++            and not negative_tiny["exact_zero"], "negative underflow sign retained")
++    names.append("tiny_crossing_unresolved_negative_underflow_sign")
++    adjacent = Interval(Fraction.from_float(1.0), Fraction.from_float(math.nextafter(1.0, math.inf)))
++    require(adjacent.certified()["status"] == "ROUNDING_UNRESOLVED", "adjacent float unresolved")
++    names.append("adjacent_binary64_unresolved")
++    invalid = [([(float('nan'), 1)], 1), ([(float('inf'), 1)], 1),
++               ([(1, float('inf'))], 1), ([(-1, 1)], 1), ([(1, -1)], 1),
++               ([(1, 1)], 0), ([(1, 1)], -1), ([(1, 1)], float('nan'))]
++    for atoms, mass in invalid:
++        try:
++            massive_terms(atoms, mass)
++        except ValueError:
++            pass
++        else:
++            raise AssertionError("invalid input accepted")
++    names.append("nonfinite_negative_nonpositive_guards")
++    try:
++        Interval.point(Fraction(10 ** 400)).certified()
++    except OverflowError:
++        pass
++    else:
++        raise AssertionError("overflow accepted")
++    names.append("overflow_rejected")
++    for weight, expected in [(Fraction(1, 2 ** 1100), "final_underflow_to_zero"),
++                             (Fraction(1, 2 ** 1070), "subnormal")]:
++        tiny_terms, tiny_derivative = massive_terms([(1, weight)], 1)
++        tiny, _ = enclose(tiny_terms, 160)
++        deriv, _ = enclose(tiny_derivative, 160)
++        pressure = pressure_source(tiny, deriv, 1, 1, 0, 0, 0)["pressure"]
++        require(pressure.certified()["tag"] == expected, "new pressure " + expected)
++    names.append("new_pressure_final_underflow_subnormal")
++    return {"groups": names, "hand": {key: source[key].payload() for key in expectations},
++            "signed_direct": signed.payload(), "crossed_zero": crossed,
++            "tiny_crossing": tiny_crossed, "negative_underflow": negative_tiny,
++            "adjacent_unresolved": adjacent.payload()}
++
++
++def main():
++    provenance = json.loads((HERE / "inputs/INPUT_BINDING.json").read_text())
++    for entry in provenance["immutable_files"]:
++        path = HERE / entry["relative_path"]
++        require(hashlib.sha256(path.read_bytes()).hexdigest() == entry["sha256"], "immutable " + str(path))
++    prior = json.loads((HERE / "inputs/prior_moments.json").read_text())
++    old_raw = json.loads((HERE / "inputs/prior_stdout.jsonl").read_text().splitlines()[0])
++    require(prior["moments"] == old_raw["moments"], "verbatim prior fields")
++    atoms = []
++    with (HERE / "inputs/photoelectron_atoms.csv").open(newline="") as stream:
++        for row in csv.DictReader(stream):
++            if row["redshift"] == "2.479" and row["channel"] == "HI":
++                atoms.append((rational(float(row["kinetic_eV"])),
++                              rational(float(row["number_weight_per_target_s"]))))
++    require(len(atoms) == 4368 == prior["moments"]["atom_count"], "4368 selected atoms")
++    L = from_record(prior["moments"]["maximum_kinetic"])
++    K = from_record(prior["moments"]["K"])
++    require(max(k for k, _ in atoms) == L, "saved actual support maximum")
++    mass_source = json.loads((HERE / "inputs/mass_source.json").read_text())
++    masses = [Fraction(m) for m in mass_source["sensitivity_points_eV"]]
++    results = []
++    all_intervals = []
++    for index, mass in enumerate(masses):
++        terms = massive_terms(atoms, mass)
++        intervals = {}
++        raw_intervals = {}
++        for label, values in zip(("W", "S"), terms):
++            coarse, cmeta = enclose(values, 128)
++            fine, fmeta = enclose(values, 160)
++            require(fine.nested_in(coarse), label + " P160 nested P128")
++            coarse_rounding, fine_rounding = coarse.certified(), fine.certified()
++            require(coarse_rounding["status"] == fine_rounding["status"] == "CERTIFIED_BINARY64",
++                    label + " P128/P160 both finite certificates")
++            require(coarse_rounding["value"].hex() == fine_rounding["value"].hex(),
++                    label + " P128/P160 identical binary64")
++            intervals[label] = {"P128": coarse.payload(), "P160": fine.payload(),
++                                "P128_grid": cmeta, "P160_grid": fmeta, "nested": True}
++            raw_intervals[label] = fine
++        W, S = raw_intervals["W"], raw_intervals["S"]
++        D = Interval.point(2 * K) - W
++        ratio = D.divide_positive(W)
++        require(K <= W.lo <= W.hi <= 2 * K, "K<=W<=2K")
++        require(0 <= D.lo <= D.hi <= L * K / (L + mass), "defect support bound")
++        require(ratio.hi <= L / (L + 2 * mass), "relative defect support bound")
++        source = pressure_source(W, S, "2", "3", "-1", "2", "3")
++        for key in ("pressure", "source", "jvp"):
++            require(source[key].certified()["status"] == "CERTIFIED_BINARY64", key + " stable")
++        reference = decimal_reference(atoms, mass)
++        comparison = {key: relative_decimal_check(raw_intervals[key], reference[key], key)
++                      for key in ("W", "S")}
++        results.append({"mass_eV": str(mass_source["sensitivity_points_eV"][index]),
++                        "intervals": intervals, "Decimal100_comparison": comparison,
++                        "pressure_source": {key: source[key].payload() for key in ("pressure", "source", "jvp")},
++                        "flux": source["flux"], "STF": source["STF"], "thermal_heat": None,
++                        "defect": D.payload(), "relative_defect": ratio.payload(),
++                        "support_bounds_certified": True})
++        all_intervals.append(raw_intervals)
++    minus, nominal, plus = all_intervals
++    u = Fraction(mass_source["standard_uncertainty_eV"])
++    require(minus["W"].hi <= nominal["W"].lo <= nominal["W"].hi <= plus["W"].lo, "mass monotonicity")
++    forward = plus["W"] - nominal["W"]
++    backward = nominal["W"] - minus["W"]
++    tangent = nominal["S"].scale(u)
++    require(forward.hi <= tangent.lo, "forward concavity")
++    require(backward.lo >= tangent.hi, "backward concavity")
++    result = {"schema": "REI_HI_MASSIVE_STRESS_RAW_V1", "unit": "HI_NATIVE_MASSIVE_STRESS_20261025",
++              "observed_status": "PASS_SCOPED_FOCUSED_CHECKS", "scientific_admission": "ROOT_PENDING",
++              "primary_rows": len(atoms), "precision_bits": [128, 160], "mass_results": results,
++              "mass_sensitivity": {"forward": forward.payload(), "backward": backward.payload(),
++                                   "uS": tangent.payload(), "monotonicity": True, "concavity": True,
++                                   "interpretation": "standard-uncertainty probes; not confidence bounds"},
++              "controls": controls(), "old_moments": prior["moments"], "old_tests_replayed": 0,
++              "actual_density_history_IC_geometry": "UNRESOLVED", "L4_ready": False,
++              "whole_model_completion": None, "thermal_heat": None}
++    print(json.dumps(result, sort_keys=True, allow_nan=False))
++
++
++if __name__ == "__main__":
++    main()
+--- /dev/null
++++ b/preparation_repair/INDEPENDENT_REVIEW_KO.md
+@@ -0,0 +1,72 @@
++# HI massive-stress 독립 심사 — PREEXECUTION_ONLY
++
++단위: `HI_NATIVE_MASSIVE_STRESS_20261025`  
++검토자: `/root/source_and_review`  
++선택 단계: **R6/C9의 한 번의 독립 pass**. 새 theory/code authoring0, science/CAS/test/render0, 추가 reviewer0, review-of-review0.
++
++## 현재 판정
++
++**PREEXECUTION_ONLY — frozen 이론의 blocker0; 초기 구현에서 현재 certificate finding1을 확인했고 pre-GO 최소 수리 중이다.** 코드·diff는 읽었고 실행 raw는 아직 받지 않았으므로 구현/실행의 최종 PASS를 발행하지 않는다. 부모의 scoped admission과 실행 GO를 대신하지 않는다. 수리된 부분과 raw가 제공되면 이 동일 pass를 완료한다.
++
++## 적용한 skill context
++
++부모가 공급한 PhysMath Research Loop **1.3.0**의 다음 원문을 실제로 전체 읽었다.
++
++- `authority/skill_context/SKILL.md`
++- `authority/skill_context/POLICY_INTEGRATION.md`
++- `authority/skill_context/THEORY_LOOP.md`, R6 정의 적용
++- `authority/skill_context/CODING_LOOP.md`, C9 정의 적용
++- `authority/skill_context/SUBAGENT_MODE.md`
++
++이 범위에서 단위·부호·제한·수치 의미와 현재 변경의 위험을 확인하고, 증거 없는 일반 hardening이나 주변 연구 재실행을 요구하지 않았다. 과거 source intake는 입력 사실을 읽는 역할이었으며 현재 심사 대상 theory/implementation의 작성에 참여하지 않았다. 이 검토는 실제 native child의 독립 pass다. cross-family/실제 실행 model label은 관측 근거가 없으므로 주장하지 않는다.
++
++## 실제 읽은 대상과 source
++
++`theory/THEORY_MASSIVE_STRESS_KO.md`, `authority/IMPLEMENTATION_CONTRACT.json`, `authority/BUDGET_FREEZE.json`, `authority/AGENTS_CURRENT.md`, `theory/LITERATURE_INTAKE.json`을 실제 읽었다. 정확한 byte identity는 같은 폴더의 `REVIEW.json`에 기록한다.
++
++NIST 공식 [2022 CODATA complete table](https://physics.nist.gov/cuu/Constants/Table/allascii.txt)의 electron mass energy equivalent in MeV 행(L104)을 직접 열었다. `0.51099895069 MeV`, 표기 uncertainty `0.00000000016 MeV`는 계약의 decimal nominal `510998.95069 eV`, `u=0.00016 eV`와 일치한다. 명목 decimal을 exact 입력으로 정의하는 것과 물리 참값을 exact라 주장하는 것이 구별되어 있다.
++
++Sarbach–Zannias [arXiv:1303.2899v1](https://arxiv.org/html/1303.2899v1) §7, Eqs.54–58 및 바로 뒤 mean-pressure 정의를 직접 열었다. local orthonormal observer frame의 stress moment를 finite source measure에 적용하는 사용은 해당 식의 범위와 일치한다. 이 확인은 새 물리 source history/geometry를 제공하지 않는다.
++
++## R6 확인 내용
++
++| 항목 | 독립 확인 | 현재 판정 |
++|---|---|---|
++| Kinetic trace | `E=k+M`, `p²c²=k(k+2M)`, `v=pc²/E`에서 `pv=g`. 등방 평균은 대각 trace/3, flux/STF0 | 확인 |
++| 단위·owner | W는 eV/target/proper-second의 source moment. 실제 stock·thermal heat가 아니며 `MA`를 에너지 ledger에 추가하지 않음 | 확인 |
++| M의 의미 | 새 M0는 NIST nominal decimal binding. 과거 미사용 `_ME_EV` 및 native χ를 수정하지 않음. ±u는 sensitivity probe | 확인 |
++| 미분·concavity | `g_k=1+M²/(k+M)²`, `g_M=k²/(k+M)²`; Hessian quadratic form은 `−2(Ma−kb)²/(k+M)³` | 확인 |
++| 범위·극한 | k=0, M→0+, M→∞, finite positive weights에서 `K≤W≤2K`; empty/zero에서 ratio null | 확인 |
++| Support bound | `k/(k+M)≤L/(L+M)`에 `kw`를 곱해 적분하면 D bound. W 하한으로 ratio bound의 방향도 맞음 | 확인 |
++| Mass endpoint | 증가·concavity로 오른쪽 increment≤uS0, 왼쪽 increment≥uS0. M−u>0인 frozen 입력 | 확인 |
++| JVP | 고정 μ에서 `dm=a dX+X da`, `dq=(dm W+m dM S)/3`. dM은 모델 tangent이며 질량 시간진화를 뜻하지 않음 | 확인 |
++| Hand control | `(0,1),(2,3), M=1`에서 W8, S4/3, D4, pressure8/3. m6,dm1,dM3은 source16,JVP32/3 | 확인 |
++
++위 손계산은 식을 읽고 대수적으로 대조한 검토이며 실행된 test/CAS로 기록하지 않았다. actual atom 합은 재계산하지 않았다.
++
++## Directed enclosure의 증명 확인
++
++각 rational term을 양의 dyadic δ로 나눈 floor/ceil은 signed term에도 정확한 하·상계다. 항별 enclosure를 정수로 합하면 실제 합이 그 interval에 있고 각 항의 폭은 δ 이하이므로 총 폭은 Nδ 이하다. `E=floor(log2(max|t|))`가 exact 비교로 고정되고 P만128→160으로 바뀌면 fine dyadic grid가 coarse grid를 세분하므로 두 interval이 nested한다. 서로 다른 일반 분모의 총합을 만들지 않아도 이 결론은 유지된다.
++
++정확한 interval에 부호 있는 scalar를 곱할 때 endpoint 순서를 필요에 따라 교환하고, interval 합/차 및 양의3 나눗셈을 하면 source/JVP/D의 enclosure가 보존된다. 정확한 두 endpoint가 같은 finite binary64로 반올림되면 그 사이 정확한 값도 같은 수치로 반올림된다는 단조성 논증은 맞다. 코드에서는 signed zero를 포함한 출력/분류 의미를 확인해야 한다.
++
++정확한 합이0이라는 보장은 `[0,0]`에서만 발행하고,0을 제외한 interval이0으로 반올림되면 final underflow로 분류하는 설계가 타당하다.0을 포함하는 비퇴화 interval에는 exact-zero 분류를 내지 않는다. 고정 precision이 취소/반올림 경계를 해결하지 못하면 명시적인 unresolved가 정상 결과다. 이 상태를 PASS를 위한 precision/tolerance 변경으로 감추지 않는 계약을 확인했다.
++
++Decimal100은 별도의 유한정밀도 numerical reference이며 정수 interval proof를 대신하지 않는다. 다른 식의 Decimal sum을 exact finite decimal로 파싱하여 interval 안에 있는지 확인하는 acceptance는 numerical agreement 검사로 유효하다. 이 containment만으로 실제 continuum spectrum의 quadrature/physics error가 증명되었다고 하지 않는다.
++
++## 코드·raw를 받으면 같은 pass에서 남아 있는 확인
++
++1. 입력 float ratio/M decimal parse, immutable source의 실제 copy/read identity, saved moments 재사용 경로와 old imports/replays0.
++2. exact E/floor/ceil, P nesting·폭, signed scalar multiplication, final nearest rounding와 overflow·subnormal·zero provenance 구현.
++3. 실제 합에 대한 bound/concavity의 검사가 안전한 endpoint를 쓰는지, nominal/endpoint/reference acceptance가 frozen criterion을 지키는지.
++4. diff 범위, one child command·exit·resource raw, cap debit 및 source-vs-stock/heat output metadata.
++
++현재 이 네 항목은 구현 자료가 아직 없어서 남은 C9 범위이며 새 finding이나 추가 실행 요구가 아니다. 이전22/66/83/ANG/NCP/HI-summary/stock/work/native-HI/donor quadrature를 재생하지 않았다. 원 L0 gate2e−12, 과거 cap 초과·UNKNOWN_NOT_ZERO·NOT_FROZEN, ANGTHERM02 read-only와 전체 모델 완료율null은 그대로다.
++
++## C9 초기 구현 읽기와 R6C9-01
++
++이후 제공된 `stress_source.py`, `focused_check.py`, `run_focused_once.py`, `PRE_EXECUTION_MANIFEST.json`, input JSON과 README를 전체 읽었다. `PATCH.diff`는 새 파일6개의 상대경로 추가만 포함하며 읽은 구현/이론/정책 문서가 그 내용이다. 실제 연구 코드/test 실행은 하지 않았다. floor-log2의 integer 비교, signed floor/ceil, interval endpoint 연산, saved K/L 재사용과 old consumer import 부재, Decimal 대체식, bound/concavity의 보수적인 endpoint 방향, 단일 child와 자원 receipt 경로에는 다른 현재-task finding이 없다.
++
++**R6C9-01 — signed zero를 구별하지 않는 binary64 certificate.** 초기 `stress_source.py`의 `Interval.certified()`는 두 endpoint의 float를 `left != right`만으로 비교했다. 정확한 interval `[-2^-1100,+2^-1100]`의 endpoint는 각각 IEEE `-0.0`, `+0.0`으로 반올림되지만 Python 수치 비교는 같다고 한다. 그 결과 함수는 `value=-0.0`, `tag=zero_in_enclosure`, `status=CERTIFIED_BINARY64`를 반환한다. exact_zero=false는 맞으나 실제 합의 sign bit는 이 interval에서 결정되지 않았다.
++
++이 finding은 **representation/certificate issue, FIX_BEFORE_GO**다. 실제 양의 HI W/S 값이나 유도의 반증은 아니다. 최소 수정은 두 endpoint의 반올림 결과가 sign bit까지 같을 때만 단일 binary64를 확정하고, 위 tiny-crossing 한 control을 기존 focused pass에 넣는 것이다.0을 제외하는 양/음의 interval이 같은 부호의0으로 반올림되는 정상 underflow 분류는 보존한다. 새 reviewer, 광역 test gate, 별도 실행을 요구하지 않는다. 수리한 변경 부분을 이 동일 pass에서 읽어 finding을 닫고, 실제 raw를 받으면 최종 판정한다.
+--- /dev/null
++++ b/run_focused_once.py
+@@ -0,0 +1,91 @@
++"""Root-authorized one-child launcher; measured wait4 receipt, no implicit retry."""
++import hashlib
++import json
++import os
++from pathlib import Path
++import resource
++import signal
++import subprocess
++import sys
++import time
++
++HERE = Path(__file__).resolve().parent
++
++
++def main():
++    if len(sys.argv) != 2:
++        raise SystemExit("usage: python3 run_focused_once.py ROOT_GO.json")
++    go_path = Path(sys.argv[1]).resolve()
++    go = json.loads(go_path.read_text())
++    if go.get("unit") != "HI_NATIVE_MASSIVE_STRESS_20261025" or go.get("science_execution") != "GO":
++        raise SystemExit("explicit matching root GO required")
++    manifest_path = HERE / "PRE_EXECUTION_MANIFEST.json"
++    manifest_bytes = manifest_path.read_bytes()
++    if go.get("manifest_sha256") != hashlib.sha256(manifest_bytes).hexdigest():
++        raise SystemExit("GO must bind actual pre-execution manifest")
++    manifest = json.loads(manifest_bytes)
++    for entry in manifest["files"]:
++        payload = (HERE / entry["path"]).read_bytes()
++        if len(payload) != entry["bytes"] or hashlib.sha256(payload).hexdigest() != entry["sha256"]:
++            raise SystemExit("frozen payload identity changed: " + entry["path"])
++    raw = HERE / "raw"
++    raw.mkdir(exist_ok=True)
++    # Atomic durable duplicate-run guard; all attempts remain visible.
++    with (raw / "ATTEMPT_STARTED.json").open("x") as stream:
++        json.dump({"pid": os.getpid(), "root_GO": str(go_path), "start_wall_time": time.time()}, stream)
++    environment = os.environ.copy()
++    environment.update({"OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1",
++                        "NUMEXPR_NUM_THREADS": "1", "PYTHONHASHSEED": "0", "PYTHONDONTWRITEBYTECODE": "1"})
++    def limits():
++        os.setsid()
++        resource.setrlimit(resource.RLIMIT_CPU, (6, 6))
++        resource.setrlimit(resource.RLIMIT_AS, (512 * 1024 ** 2, 512 * 1024 ** 2))
++        resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
++    started = time.monotonic()
++    timed_out = False
++    with (raw / "stdout.jsonl").open("wb") as stdout, (raw / "stderr.txt").open("wb") as stderr:
++        child = subprocess.Popen([sys.executable, "-B", str(HERE / "focused_check.py")],
++                                 cwd=HERE, env=environment, stdout=stdout, stderr=stderr,
++                                 preexec_fn=limits)
++        while True:
++            observed, status, usage = os.wait4(child.pid, os.WNOHANG)
++            if observed:
++                break
++            if time.monotonic() - started >= 8:
++                timed_out = True
++                os.killpg(child.pid, signal.SIGKILL)
++                observed, status, usage = os.wait4(child.pid, 0)
++                break
++            time.sleep(0.005)
++        child.returncode = os.waitstatus_to_exitcode(status)
++    wall = time.monotonic() - started
++    cpu = usage.ru_utime + usage.ru_stime
++    receipt = {"schema": "REI_HI_MASSIVE_STRESS_RESOURCE_V1", "children": 1,
++               "unit": "HI_NATIVE_MASSIVE_STRESS_20261025", "root_GO": str(go_path),
++               "manifest_sha256": go["manifest_sha256"], "command": [sys.executable, "-B", "focused_check.py"],
++               "exit_code": child.returncode, "user_cpu_s": usage.ru_utime, "system_cpu_s": usage.ru_stime,
++               "cpu_s": cpu, "wall_s": wall, "CPU_cap_s": 6, "wall_cap_s": 8,
++               "wall_timeout": timed_out, "maxrss_kB": usage.ru_maxrss,
++               "resource_pass": cpu <= 6 and wall <= 8 and not timed_out,
++               "retry": 0, "old_tests_replayed": 0, "network_calls_in_child": 0,
++               "historical_known_partial_cpu_before_s": "10.765369",
++               "historical_failed_sequence_cpu_s": "10.110448", "whole_L0": "UNKNOWN_NOT_ZERO",
++               "original_cumulative_cap": "NOT_FROZEN", "historical_cap_reset": 0}
++    for name in ("stdout.jsonl", "stderr.txt"):
++        data = (raw / name).read_bytes()
++        receipt[name] = {"bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
++    (raw / "resource_receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
++    if child.returncode == 0 and receipt["resource_pass"]:
++        result = json.loads((raw / "stdout.jsonl").read_text())
++        summary = {"schema": "REI_HI_MASSIVE_STRESS_RESULT_SUMMARY_V1",
++                   "observed_status": result["observed_status"], "scientific_admission": "ROOT_PENDING",
++                   "primary_rows": result["primary_rows"], "mass_results": result["mass_results"],
++                   "mass_sensitivity": result["mass_sensitivity"], "controls": result["controls"]["groups"],
++                   "resource": receipt, "L4_ready": False, "whole_model_completion": None}
++        (HERE / "RESULT_SUMMARY.json").write_text(json.dumps(summary, indent=2) + "\n")
++    print(json.dumps(receipt, sort_keys=True))
++    return 0 if child.returncode == 0 and receipt["resource_pass"] else 1
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- /dev/null
++++ b/stress_source.py
+@@ -0,0 +1,152 @@
++"""Finite positive HI measure massive-stress consumer; all energies are eV.
++
++No source history, density, rest-energy ledger, or thermal heat is inferred.
++Only individual terms use general rational denominators. Accumulation is integer
++on a dynamic dyadic grid; derived endpoint arithmetic has bounded-size inputs.
++"""
++from fractions import Fraction
++import math
++import sys
++
++
++def rational(value):
++    if isinstance(value, float):
++        if not math.isfinite(value):
++            raise ValueError("nonfinite input")
++        return Fraction.from_float(value)
++    try:
++        return Fraction(value)
++    except (ValueError, OverflowError, ZeroDivisionError) as exc:
++        raise ValueError("invalid finite rational input") from exc
++
++
++def record(value):
++    return {"numerator": str(value.numerator), "denominator": str(value.denominator)}
++
++
++def from_record(value):
++    return Fraction(int(value["numerator"]), int(value["denominator"]))
++
++
++class Interval:
++    def __init__(self, lo, hi):
++        self.lo, self.hi = rational(lo), rational(hi)
++        if self.lo > self.hi:
++            raise ValueError("reversed interval")
++
++    @classmethod
++    def point(cls, value):
++        return cls(value, value)
++
++    def scale(self, scalar):
++        scalar = rational(scalar)
++        a, b = self.lo * scalar, self.hi * scalar
++        return Interval(min(a, b), max(a, b))
++
++    def __add__(self, other):
++        return Interval(self.lo + other.lo, self.hi + other.hi)
++
++    def __sub__(self, other):
++        return Interval(self.lo - other.hi, self.hi - other.lo)
++
++    def divide_positive(self, other):
++        if other.lo <= 0:
++            raise ValueError("positive denominator interval required")
++        products = [a / b for a in (self.lo, self.hi) for b in (other.lo, other.hi)]
++        return Interval(min(products), max(products))
++
++    def contains(self, value):
++        return self.lo <= value <= self.hi
++
++    def nested_in(self, other):
++        return other.lo <= self.lo <= self.hi <= other.hi
++
++    def certified(self):
++        try:
++            left, right = float(self.lo), float(self.hi)
++        except OverflowError as exc:
++            raise OverflowError("binary64 output overflow") from exc
++        if not math.isfinite(left) or not math.isfinite(right):
++            raise OverflowError("binary64 output overflow")
++        exact_zero = self.lo == self.hi == 0
++        # Numeric equality identifies -0.0 with +0.0; a rounding certificate
++        # must retain the sign bit, including a tiny enclosure across zero.
++        if left != right or left.hex() != right.hex():
++            return {"status": "ROUNDING_UNRESOLVED", "value": None,
++                    "tag": "enclosure_unresolved", "exact_zero": False}
++        if exact_zero:
++            tag = "exact_zero"
++        elif left == 0 and (self.hi < 0 or self.lo > 0):
++            tag = "final_underflow_to_zero"
++        elif left == 0:
++            tag = "zero_in_enclosure"
++        elif abs(left) < sys.float_info.min:
++            tag = "subnormal"
++        else:
++            tag = "normal"
++        return {"status": "CERTIFIED_BINARY64", "value": left,
++                "tag": tag, "exact_zero": exact_zero}
++
++    def payload(self):
++        return {"lo": record(self.lo), "hi": record(self.hi),
++                "width": record(self.hi - self.lo), "rounding": self.certified()}
++
++
++def floor_log2(value):
++    if value <= 0:
++        raise ValueError("positive value required")
++    exponent = value.numerator.bit_length() - value.denominator.bit_length()
++    power = Fraction(2 ** exponent) if exponent >= 0 else Fraction(1, 2 ** -exponent)
++    return exponent if value >= power else exponent - 1
++
++
++def enclose(terms, precision):
++    """Direct signed exact-term enclosure; never sum general Fractions."""
++    if precision not in (128, 160):
++        raise ValueError("only frozen P128/P160 allowed")
++    terms = [rational(term) for term in terms]
++    largest = max((abs(term) for term in terms), default=Fraction(0))
++    if largest == 0:
++        return Interval.point(0), {"N": len(terms), "P": precision, "E": None,
++                                   "delta": record(Fraction(0)), "width_bound_pass": True}
++    exponent = floor_log2(largest)
++    shift = exponent - precision
++    delta = Fraction(2 ** shift) if shift >= 0 else Fraction(1, 2 ** -shift)
++    lower_integer = upper_integer = 0
++    for term in terms:
++        numerator = term.numerator * delta.denominator
++        denominator = term.denominator * delta.numerator
++        lower_integer += numerator // denominator
++        upper_integer += -((-numerator) // denominator)
++    interval = Interval(lower_integer * delta, upper_integer * delta)
++    bound_pass = interval.hi - interval.lo <= len(terms) * delta
++    if not bound_pass:
++        raise ArithmeticError("dyadic width bound failed")
++    return interval, {"N": len(terms), "P": precision, "E": exponent,
++                      "delta": record(delta), "width_bound_pass": bound_pass}
++
++
++def massive_terms(atoms, mass):
++    mass = rational(mass)
++    if mass <= 0:
++        raise ValueError("mass must be positive")
++    stress, derivative = [], []
++    for kinetic, weight in atoms:
++        kinetic, weight = rational(kinetic), rational(weight)
++        if kinetic < 0 or weight < 0:
++            raise ValueError("kinetic energy and positive-measure weight must be nonnegative")
++        denominator = kinetic + mass
++        stress.append(weight * kinetic * (kinetic + 2 * mass) / denominator)
++        derivative.append(weight * kinetic * kinetic / (denominator * denominator))
++    return stress, derivative
++
++
++def pressure_source(stress, derivative, a, X, da, dX, dM):
++    a, X, da, dX, dM = map(rational, (a, X, da, dX, dM))
++    if a < 0 or X < 0:
++        raise ValueError("nonnegative source amplitudes required")
++    amplitude, direction = a * X, a * dX + X * da
++    return {"pressure": stress.scale(Fraction(1, 3)),
++            "source": stress.scale(amplitude / 3),
++            "jvp": stress.scale(direction / 3) + derivative.scale(amplitude * dM / 3),
++            "flux": [0, 0, 0], "STF": [0, 0, 0, 0, 0], "thermal_heat": None}

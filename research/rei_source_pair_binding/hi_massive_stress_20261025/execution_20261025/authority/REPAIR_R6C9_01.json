@@ -1,0 +1,32 @@
+{
+  "schema": "REI_TARGETED_REPAIR_AUTHORIZATION_V1",
+  "unit": "HI_NATIVE_MASSIVE_STRESS_20261025",
+  "finding": "R6C9-01",
+  "stage": "PREEXECUTION_C5_C9_SINGLE_PASS",
+  "object": "stress_source.Interval.certified left!=right",
+  "counterexample": "lo=-2^-1100, hi=+2^-1100 => float endpoints -0.0,+0.0; numerical == is true but signed binary64 is unresolved",
+  "classification": "REPRESENTATION_ISSUE_FIX_BEFORE_GO",
+  "impact": "overstated signed binary64 certificate for crossing-zero intervals; actual positive HI W/S not refuted",
+  "authorized_changes": [
+    "Require endpoint binary64 sign-bit identity before CERTIFIED_BINARY64",
+    "Add one tiny crossing-zero regression and signed nonzero underflow retention in existing one-child controls",
+    "Make already-frozen P128/P160 stable rounding criterion explicit for actual W/S"
+  ],
+  "unchanged": [
+    "physics",
+    "M/chi",
+    "input identity",
+    "numerical tolerances",
+    "CPU6/wall8s cap",
+    "old-suite no-replay"
+  ],
+  "science_executed_so_far": 0,
+  "repair_episode": 1,
+  "additional_review_cycle": 0,
+  "predecessor_A": {
+    "sha256": "f6f913349401dc42d6a2d151c53753d7baabb1201230ee6348b80f313a669931",
+    "state": "LOCAL_PREEXECUTION_SNAPSHOT_NO_EXTERNAL_ACK; retained, not final GO source"
+  },
+  "next": "Coder targeted repair, same independent reviewer changed-section read, A2 dual backup then sole primary GO."
+}
+
