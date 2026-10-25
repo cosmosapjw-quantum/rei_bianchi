@@ -1,3 +1,19 @@
+<!-- N5_H1_GROUND_RR_MILNE_20261025 -->
+## 2026-10-25 N5 H1 ground spontaneous RR finite-chain return
+
+Science `bdfd34499153575305871bd68a139e2878f5f49f` / [Draft PR105](https://github.com/cosmosapjw-quantum/bass_cr/pull/105). Child `CR_N5_H1_GROUND_RR_MILNE_FINITE_CHAIN`, consumer `N5_C23D_H1_RR_MILNE_V1`는 root gate `NUMERICALLY_CHECKED_SCOPED_CONDITIONAL_H1_SPONTANEOUS_RR_FINITE_CHAIN`를 따른다. 독립 R6/C9 PASS, blocking0.
+
+PR104 저장8사슬의 대각 RR hazard만 추가해160새RHS,24source행을 계산했다. 기존162 scalar비교와 저장 kinetic-energy 비교18개를 보존한다. 새ODE/source·thermal quadrature/oldscience replay는0이다. H1 ground spontaneous component이며 stationary-heavy-target/zero-recoil, native13.6eV, n_HII=.1cm^-3를 사용한다. 전자제거E, retained photon+(E+I), atomic internal-I를 구분한다. 실제 stimulation/totalRR/PI feedback은null이다.
+
+활성 초기 전자당RR확률1.26101–1.59845e-9, conditional photon17.6258–18.8897eV, stable mean-stop 감소.37017–.45707ms다. 작은 paired신호는 응답식으로 계산했고 원 oldsolution 불확실성을 상속한다. 원 primary bytes, prior4children/PR104, 최신WU90 및 다른owner bytes를 유지한다.
+
+실측 새workerCPU4.84353000s + chargedpreflight0.01989341s = 4.86342341s; knownlineage39.097868524s. Globaltotal/remaining/money는null이다. T0dualR1 ACK와 finalcanonicalpending을 구분하며 과거rejected neutralterminal은별도blocked로유지하고재포장하지않는다.
+
+EXECUTION: scoped component complete. PUBLICATION: ScienceS R1PASS/additiveDraft/no merge. BACKUP: finalcanonical ROOT_PENDING. DAG: N4/N5PARTIAL/OPEN; N6/N7 predecessor-gated.
+
+
+---
+
 ## 최종 delivery 및 이후 owner 수신: PR104
 
 Science S5eb895abbacce1642c451fd3fdfd2f776783871f, Documents D257007cc708d0db403ec2ff0c741e4a10b6207ab, CentralM12354d6e995fde736fffbcad2d0e40473218cb8c4.
