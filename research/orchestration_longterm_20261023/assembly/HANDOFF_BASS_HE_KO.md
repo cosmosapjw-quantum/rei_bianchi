@@ -492,3 +492,16 @@ B1R Drive=1WH-20Vmg9rSaieB3Y3yImFUxNbu0YJqq,Dropbox=id:BSpOijBcT10AAAAAAD_9wQ,SH
 실제업로드완료+별도metadata ACK이며 이번두백업의원격전체GET을 주장하지 않는다. B2/D/E/B3는 뒤따르는 실제영수증에서 확인한다.
 
 전체HE-ANG SOURCE_INPUT_PENDING; 첫물리입력은 source-consistent joint outgoing-electron law 또는 amplitude/event payload와count/spin/exchange/support/frame/recoil 계약이다. Physicalprovider/event_sigma/physical_recoil/HE-X1empiricalcorrection=false,전체완료율null. DDCS20고정window, C9-NB-01,C23E,다른ownerOPEN을 유지한다. 현재ecbb3124b49e75d8a7e948705b3894307d628349의새REI massive-stress leaf와보호branch8d10231b1f0f788164d5eadbe1bcee0b802cceca 예약을 보존한다.
+
+
+## HE-ANG-FINITEMASS-CBA 실제 D와 B2 전달 — C8 OPEN
+
+Actual Science S `9fc8185437f145a6ba4569e1b38aa2e12d15acd9`(당시17/20), 중앙 C `46a102b22b54cc03a91ad92bbd58d68dd82b7964`, Delivery D `28a26f4db951ab9085180e2ecc5d600d981a1f71`가 게시·readback되었다. [Draft PR101](https://github.com/cosmosapjw-quantum/BASS_HE/pull/101)은 unmerged, activation=false다. D의94개 선택 파일 Git blob SHA/크기/mode/type은 mismatch0이며 과학 입력·코드·결과·검토·원장은 S와 동일하다. **R1–R10/C1–C10은19/20, C8 PARTIAL_EXPORT는 OPEN**이다. SVG/producer figure metadata/original repair summary는 없고 두 실제 processFAIL을 PASS로 바꾸지 않았다.
+
+B2 과학 복원본은2732504bytes/SHA256 `0662cb03fd141886e5c77c1661d2fb5314173f46498c27a878bf6571188d4baf`, Drive `15RPRyRzRorUuYA4t5MvUMm2np_Nt7rjR`, Dropbox `id:BSpOijBcT10AAAAAAD_90g`다. 로컬109member byte검증과 실제 dual upload/별도 id·size metadata ACK를 받았다. 새 원격 fullGET를 했다고 주장하지 않는다. 이 중앙 E의 own identity 및 실제 D/E 보충 B3 ACK는 최종 PR101 external tail에서 확정한다.
+
+과학 결과는 finite-M labelled direct C1 model의 두 recoil phase, W/Jacobi/lab 정규화, weighted two-root fold와 고정 유한 수치 검증까지다. 새 science CPU11.882829/wall11.985978921002243(12/35), PR100+이번 CBA lineage16.870803/17.108468335994985(20/60), reserve1사용/0잔여, actual attempts PASS/FAIL/FAIL을 유지한다. 추가 계산·export 재시도·예산초기화·reserve이전은 없다.
+
+전체 HE-ANG은 SOURCE_INPUT_PENDING이며 첫 물리 입력은 source-consistent joint outgoing-electron law 또는 amplitude/event payload와 count/spin/exchange/support/frame/recoil/validity/uncertainty 계약이다. DDCS20 fixed window/비통계적 box, HE-X1/32fixtures, HE-ANG-CONTRACT, HE38, Hex, C9-NB-01, C23E와 다른 owner OPEN/비용/실패/unknown을 보존한다. 전체완료율은null이고 physical provider/event sigma/physical recoil/HE-X1 empirical correction은false다.
+
+Fresh central base `53b2c135a1203a8784b6cc4acdec1d4fe174f166`의 CR PR105 H1 RR scopedchild, fullN4/N5 PARTIAL/OPEN·N6/N7 gated·당시 finalcanonical ROOT_PENDING, WU PHYS90 full153PSD UNRESOLVED/consumerACKnull, REI HI 실제cohort OPEN을 그대로 보존한다. 과거 C의17/20 관측은 당시 기록이며 이 D 전달 관측으로 대체 읽는다. 재개시 [D handoff](https://github.com/cosmosapjw-quantum/BASS_HE/blob/28a26f4db951ab9085180e2ecc5d600d981a1f71/research/he_ang_finitemass_cba_20261025/HANDOFF_RESEARCH_KO.md), 실제 LOOP_PROGRESS/CLAIM_GATE 및 PR101 최종 영수증을 함께 읽는다.
