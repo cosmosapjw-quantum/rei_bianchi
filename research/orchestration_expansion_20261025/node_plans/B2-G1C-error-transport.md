@@ -2,7 +2,7 @@
 
 Lead: cosmosapjw-quantum/bass
 
-Current status: `READY_THEORY`
+Current status: `PARTIAL_CONDITIONAL_TRANSPORT_BOUND`
 
 Source: `authority/numerics/BASS_CONTRACTS.json#/nodes/13`
 
@@ -63,7 +63,7 @@ Source: `authority/numerics/BASS_CONTRACTS.json#/nodes/13`
   ],
   "conditional_dependencies": [],
   "external_prerequisites": [],
-  "current_status": "READY_THEORY",
+  "current_status": "PARTIAL_CONDITIONAL_TRANSPORT_BOUND",
   "claim_gate": [
     "derive interval/domain-valid L or clearly mark conditional; ensure tube closes with resulting bound",
     "feed moment-map uncertainty to B3g without treating tolerance as physical error radius"
@@ -162,6 +162,41 @@ Source: `authority/numerics/BASS_CONTRACTS.json#/nodes/13`
       "source_file": "authority/numerics/BASS_CONTRACTS.json",
       "json_pointer": "/nodes/13/pr_boundary",
       "qualification": "SOURCE_DECLARED"
+    }
+  },
+  "status_observation": {
+    "source_file": "returns/BASS_B3G_ACTUAL_BINDING_20261025.json",
+    "json_pointer": "/observations/B2-G1C-error-transport",
+    "value": {
+      "consumer_repo": "cosmosapjw-quantum/bass",
+      "consumer_lane": "research/bass_b3g_actual_cohort_binding_20261025",
+      "consumer_source_commit": "0e07ea8ca2f11901e0818c9ab9afdeff76352618",
+      "current_scoped_state": "PARTIAL_CONDITIONAL_TRANSPORT_BOUND",
+      "source_commit_binding": "BIND_AFTER_SCIENCE_COMMIT_IS_ACKNOWLEDGED; NEVER_INVENT_SELF_COMMIT_HASH",
+      "admission_release_gate": "ROOT_ACCEPTED_R9_PASS_SCOPED_BLOCKING_ZERO",
+      "admission_release_status": "ROOT_ADMITTED_PASS_SCOPED",
+      "new_execution": {
+        "focused_tests": 13,
+        "births": 512,
+        "endpoints": 514,
+        "algebraic_rhs": 4,
+        "reused_history_queries": 313,
+        "PNGs": 3,
+        "new_IVPs": 0,
+        "new_owner_solves": 0,
+        "new_native_transactions": 0,
+        "child_wall_s": 3.739223223001318,
+        "child_cpu_s": 3.7262999999999997
+      },
+      "admission_scope": "DIAGONAL_DETERMINANT_AND_DUHAMEL_TRANSPORT_SUBBOUNDS_WITH_SEPARATE_PHYSICAL_NUMERICAL_INPUTS",
+      "new_evidence": [
+        "theory/TRANSPORT_AND_GEOMETRY.md",
+        "code/transport.py",
+        "results/CONDITIONAL_TRANSPORT.json",
+        "ADMISSION.json"
+      ],
+      "remaining": "Interval-wide physical mismatch/numerical defect envelopes and nonlinear invariant-tube closure are not supplied; binary64 evaluation is not an outward-rounded interval certificate.",
+      "pass_next_action": "Supply justified selected-domain envelopes/radii; do not treat saved sample residuals or solver tolerances as physical input error."
     }
   }
 }
