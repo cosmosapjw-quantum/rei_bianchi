@@ -1,481 +1,482 @@
 {
-  "id": "REC-HD-ADAPTER",
-  "lead_repo": "cosmosapjw-quantum/rec_bianchi",
-  "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
-  "json_pointer": "",
-  "contract": {
-    "schema_version": 1,
-    "id": "REC-HD-ADAPTER",
-    "parent_id": "REC-EXP-SPECTRAL",
-    "lead_repo": "rec_bianchi",
-    "owner": "rec_bianchi",
-    "consumers": [
-      "WU088_HH species mapping",
-      "BASS_HE collider-data coordination",
-      "rei_bianchi qualified radiative/chemistry assembly"
-    ],
-    "created": "2026-10-25",
-    "current_status": "CONTRACT_PREPARED_IMPLEMENTATION_NOT_RUN",
-    "implementation_status": "NOT_RUN",
-    "budget_status": "UNALLOCATED",
-    "budget": {
-      "cpu_seconds": null,
-      "wall_seconds": null,
-      "memory_bytes": null
-    },
-    "global_physical_completion": null,
-    "objective": "Parse and qualify the pinned LAMDA HD rotational/radiative and p-/o-H2 collision dataset, producing explicit isotope/state/unit/domain objects and bounded thermal line-source consistency checks.",
-    "dependencies": [
-      {
-        "id": "REI-CHEM-LEDGER-01",
-        "type": "internal",
-        "lead_repo": "WU088_HH",
-        "condition": "Reuse independently admitted finite isotope/molecule interface and canonical species schema; do not rerun compiler fixtures."
-      },
-      {
-        "id": "EXTERNAL-LAMDA-HD-20210607",
-        "type": "external_input",
-        "condition": "Pinned 2289-byte HD source fixture with specified SHA256; citation/redistribution decision recorded."
-      }
-    ],
-    "inputs": {
-      "dataset": {
-        "url": "https://home.strw.leidenuniv.nl/~moldata/datafiles/hd.dat",
-        "local_evidence": "authority/molecular/lamda_hd_20261025.dat",
-        "sha256": "0c99fe168235d6d6dac3063093bbbe8b4a2ea15cca53c7e2987763c801fdaefb",
-        "bytes": 2289,
-        "version": "LAMDA HD 2021-06-07; CDMS v2 December2011; Flower1999",
-        "read_status": "Full source read and archived previously; no new download required"
-      },
-      "species": {
-        "target": "1H2H neutral HD",
-        "composition": [
+      "id": "REC-HD-ADAPTER",
+      "lead_repo": "cosmosapjw-quantum/rec_bianchi",
+      "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
+      "json_pointer": "",
+      "contract": {
+        "schema_version": 1,
+        "id": "REC-HD-ADAPTER",
+        "parent_id": "REC-EXP-SPECTRAL",
+        "lead_repo": "rec_bianchi",
+        "owner": "rec_bianchi",
+        "consumers": [
+          "WU088_HH species mapping",
+          "BASS_HE collider-data coordination",
+          "rei_bianchi qualified radiative/chemistry assembly"
+        ],
+        "created": "2026-10-25",
+        "current_status": "CONTRACT_PREPARED_IMPLEMENTATION_NOT_RUN",
+        "implementation_status": "NOT_RUN",
+        "budget_status": "UNALLOCATED",
+        "budget": {
+          "cpu_seconds": null,
+          "wall_seconds": null,
+          "memory_bytes": null
+        },
+        "global_physical_completion": null,
+        "objective": "Parse and qualify the pinned LAMDA HD rotational/radiative and p-/o-H2 collision dataset, producing explicit isotope/state/unit/domain objects and bounded thermal line-source consistency checks.",
+        "dependencies": [
           {
-            "Z": 1,
-            "A": 1,
-            "isomer": "ground",
-            "count": 1
+            "id": "REI-CHEM-LEDGER-01",
+            "type": "internal",
+            "lead_repo": "WU088_HH",
+            "condition": "Reuse independently admitted finite isotope/molecule interface and canonical species schema; do not rerun compiler fixtures."
           },
           {
-            "Z": 1,
-            "A": 2,
-            "isomer": "ground",
-            "count": 1
+            "id": "EXTERNAL-LAMDA-HD-20210607",
+            "type": "external_input",
+            "condition": "Pinned 2289-byte HD source fixture with specified SHA256; citation/redistribution decision recorded."
           }
         ],
-        "charge": 0,
-        "states": "J0–8 exactly as file labels; vibrational label explicitly unspecified pending resolution of webpage v=1 discrepancy",
-        "colliders": [
-          "para-H2",
-          "ortho-H2"
-        ],
-        "collider_ids": [
-          2,
-          3
-        ],
-        "no_equilibrium_ortho_para_ratio_assumed": true
-      },
-      "shape": {
-        "levels": 9,
-        "radiative_lines": 8,
-        "collision_partners": 2,
-        "downward_pairs_per_partner": 9,
-        "downward_pairs_total": 18,
-        "temperature_nodes_K": [
-          50,
-          100,
-          200
-        ],
-        "rate_values": 54
-      },
-      "constants": {
-        "c_m_per_s": "299792458",
-        "h_J_s": "6.62607015e-34",
-        "k_B_J_per_K": "1.380649e-23"
-      },
-      "provenance": "MOLECULAR_AUTHORITY_20261025.md and hd_reference_check.json; primary LAMDA molformat.html/HD.html already read",
-      "licence": "Public-use citation instructions observed; redistribution licence not established; resolve before vendoring dataset publicly. Citation-only/reference-based local ingestion may be planned independently."
-    },
-    "equations": [
-      {
-        "id": "UNITS",
-        "expression": "E_J=h*c*100*E_cm^-1; nu_Hz=1e9*nu_GHz; q_m3_s=1e-6*q_cm3_s",
-        "scope": "Exact unit conversions; preserve source decimal strings."
-      },
-      {
-        "id": "GAP",
-        "expression": "nu_level=c*100*(E_u_cm^-1-E_l_cm^-1)",
-        "scope": "Catalog precision comparison, not physical accuracy estimate."
-      },
-      {
-        "id": "DB",
-        "expression": "q_lu^(a)=q_ul^(a)*(g_u/g_l)*exp[-(E_u-E_l)/(k_B*T)]",
-        "scope": "One Maxwellian collider at temperatureT; p/o identities separate."
-      },
-      {
-        "id": "EINSTEIN",
-        "expression": "g_l*B_lu=g_u*B_ul; A_ul/B_ul=2*h*nu^3/c^2",
-        "scope": "B multiplies profile-averaged mean specific intensity J_nu, not radiation energy density; changing convention requires explicit conversion."
-      },
-      {
-        "id": "EMISSION",
-        "expression": "j_nu=(h*nu/(4*pi))*n_u*A_ul*phi_nu",
-        "scope": "phi integrates to1 over frequency; units J s^-1 m^-3 sr^-1 Hz^-1."
-      },
-      {
-        "id": "ABSORPTION",
-        "expression": "alpha_nu=(h*nu/(4*pi))*(n_l*B_lu-n_u*B_ul)*phi_nu",
-        "scope": "m^-1; includes stimulated emission."
-      },
-      {
-        "id": "LTE",
-        "expression": "n_u/n_l=(g_u/g_l)*exp[-h*nu/(k_B*T)]; j_nu=alpha_nu*B_nu(T)",
-        "scope": "Thermal non-inverted populations only for positive-absorption gate. Use the same line photon energy h*nu in the thermal population ratio, Planck factor and Einstein relations for this algebra test; catalog-level versus catalog-frequency rounding is assessed separately by the35Hz gate. General population inversion may produce negative netalpha; preserve it and label inversion, never clamp."
-      }
-    ],
-    "domain": {
-      "temperatures": "First adapter accepts exact source nodes50/100/200K for collision validation. Off-grid interpolation is explicitly unsupported in this first unit; no implicit extrapolation or endpoint clamping.",
-      "states": "Nine source J-labelled levels and eight supplied lines; missing collision pairs are missing, notzero; no invented vibrational coverage.",
-      "frequency": "Supplied radiative frequencies only; no continuum cross sections.",
-      "not_covered": [
-        "chemical formation/destruction",
-        "other isotopologues or T substitution",
-        "nonthermal differential collision kernels",
-        "population-evolution IVP",
-        "cosmological transport solve",
-        "physical validation of metadata v=1 claim"
-      ]
-    },
-    "outputs": [
-      "Typed immutable HD level/line/collider records with original decimals, SI conversions and canonical WU isotope identity",
-      "Source/state/domain/uncertainty metadata with explicit missing-data flags",
-      "Saved parser/shape/unit/gap/detail-balance/LTE checks and one compact diagnostic artifact from saved results",
-      "REC handoff object for qualified radiative use; source citations and source-specific claims"
-    ],
-    "acceptance": [
-      {
-        "id": "SOURCE",
-        "rule": "SHA256 and2289bytes match frozen input; preserve original bibliography/version."
-      },
-      {
-        "id": "SHAPE",
-        "rule": "Exactly9levels,8lines,2distinctcolliders,18downwardpairs,3temperature nodes and54ratevalues. Every reference resolves to an admitted source level."
-      },
-      {
-        "id": "PARSE",
-        "rule": "Original source decimal values and integer labels round-trip exactly; tolerance0 for identity/shape/decimal-preservation checks."
-      },
-      {
-        "id": "FREQUENCY_PRECISION",
-        "rule": "Use decimal arithmetic for |c*100*(E_u-E_l)-1e9*nu_GHz|<=35Hz for each supplied line.",
-        "justification": "Each printed level has9decimal places in cm^-1, allowing at most2*(0.5e-9)*c*100=29.9792458Hz in a difference; printed frequency8decimal GHz allows5Hz;35Hz covers this catalog rounding. This is not experimental uncertainty. A failure requires source-specific assessment, not tolerance enlargement."
-      },
-      {
-        "id": "UNITS",
-        "rule": "Unit conversion factors exact; compare retained decimals/Decimal or rational forms before optional binary64 output."
-      },
-      {
-        "id": "DETAILED_BALANCE",
-        "rule": "For each supplied pair, collider andT node, construct upward rate with explicit g and gap; independently evaluate the reverse relation. Compare residual normalized by sum of magnitudes of both positive rate terms, tolerance128*binary64epsilon.",
-        "justification": "Numerical algebra check of few positive terms and one exponential, using stable evaluation;128ulp-scale margin is distinct from source physical uncertainty. Implementer must record conditioning and any underflow; no acceptance by clipping."
-      },
-      {
-        "id": "LTE_KIRCHHOFF",
-        "rule": "At declared thermal populations, compare j_nu-alpha_nu*B_nu using residual/(|j_nu|+|alpha_nu*B_nu|)<=128*binary64epsilon; use expm1 for Planck and stable population differences. Check Einstein degeneracy and B-convention explicitly.",
-        "justification": "Roundoff-only identity check; exclude zero/zero with explicit analytic-zero classification. Thermal noninversion scope avoids using positivity as a gate on population-inverted netabsorption."
-      },
-      {
-        "id": "GAPS",
-        "rule": "Unspecified molecular state/collider/temperature/pair yields explicit unqualified/unsupported result; p/o rates never silently averaged; no extrapolation."
-      },
-      {
-        "id": "REUSE",
-        "rule": "Previously checked HD J1→0 reference is retained: E/k=128.37908482940912K; A=5.442e-8s^-1; q10_pH2(100K)=2.7e-11cm3/s; q01=2.243580917662442e-11cm3/s. These are references, not a new test execution in this planning turn."
-      }
-    ],
-    "uncertainties": {
-      "spectroscopy": "Catalog rounding bound separated from experimental/theoretical frequency error; obtain original source uncertainty before precision claims.",
-      "collisions": "No covariance in pinned file; original Flower1999 uncertainty/domain remains explicit.",
-      "metadata": "HD webpage v=1 wording conflicts with J0–8 data labeling; do not resolve by assumption."
-    },
-    "pr_plan": {
-      "title": "Add a pinned HD rotational and collider-data adapter",
-      "problem": "Molecular source contracts currently have literature and scalar evidence but no verified typed adapter preserving isotope/collider/state/domain distinctions.",
-      "allowed_change_scope": "New REC-owned bounded HD adapter, fixture/provenance reference and targeted tests; no existing physical solver modification.",
-      "steps": [
-        "Reuse canonical isotope/molecule schema from WU-led compiler",
-        "Pin source bytes and preserve decimal/state metadata",
-        "Implement parser with exact shape/domain and explicit p/o collision identities",
-        "Derive upward rates and Einstein-consistent line source/absorption helper under thermal test assumptions",
-        "Execute one separately frozen targeted test unit after budget allocation; preserve raw diagnostics",
-        "Independent review and REC handoff of finite admitted coverage"
-      ],
-      "independent_review": "Fresh review of implementation, literal references, raw outputs and diagnostic rendering; reuses prior theory/source evidence.",
-      "failure_disposition": "Report exact source row, field, model assumption or numerical condition. Preserve first failure; smallest targeted repair must retain original input/tolerance. Physical source gaps stay unqualified."
-    },
-    "claim_gate": "IMPLEMENTATION_CHECKED_PINNED_HD_ROTATIONAL_SOURCE_ADAPTER only after targeted execution and independent review; no rate-network/other-species/cosmology completion.",
-    "pass_next_action": "Provide qualified HD level/line/collider object to REC population/emission consumers and REI integration planning; WU maps isotope identity.",
-    "next_action": "REC owner prepares adapter code and source-licence disposition from this contract, freezes a separate explicit finite budget before any test execution.",
-    "execution_this_turn": "NOT_RUN; this file is artifact-only planning from previously obtained source and reference evidence."
-  },
-  "dependencies": [
-    {
-      "id": "REI-CHEM-LEDGER-01",
-      "type": "internal",
-      "lead_repo": "WU088_HH",
-      "condition": "Reuse independently admitted finite isotope/molecule interface and canonical species schema; do not rerun compiler fixtures.",
-      "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
-      "source_field": "dependencies"
-    },
-    {
-      "id": "EXTERNAL-LAMDA-HD-20210607",
-      "type": "external",
-      "condition": "Pinned 2289-byte HD source fixture with specified SHA256; citation/redistribution decision recorded.",
-      "qualification": "SOURCE_DECLARED_EXTERNAL_REFERENCE; PROVIDER_STATUS_NOT_INFERRED",
-      "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
-      "source_field": "dependencies"
-    }
-  ],
-  "conditional_dependencies": [],
-  "external_prerequisites": [],
-  "current_status": "CONTRACT_PREPARED_IMPLEMENTATION_NOT_RUN",
-  "claim_gate": "IMPLEMENTATION_CHECKED_PINNED_HD_ROTATIONAL_SOURCE_ADAPTER only after targeted execution and independent review; no rate-network/other-species/cosmology completion.",
-  "pass_next_action": "Provide qualified HD level/line/collider object to REC population/emission consumers and REI integration planning; WU maps isotope identity.",
-  "budget_status": "UNALLOCATED",
-  "change_class": [
-    "scope_expansion"
-  ],
-  "historical_contract_id": null,
-  "source_fields": {
-    "lead_repo": "lead_repo",
-    "current_status": "current_status",
-    "claim_gate": "claim_gate",
-    "pass_next_action": "pass_next_action",
-    "budget_status": "budget_status"
-  },
-  "parent_containment": "REC-EXP-SPECTRAL",
-  "pr_plan": {
-    "inputs": {
-      "value": {
-        "dataset": {
-          "url": "https://home.strw.leidenuniv.nl/~moldata/datafiles/hd.dat",
-          "local_evidence": "authority/molecular/lamda_hd_20261025.dat",
-          "sha256": "0c99fe168235d6d6dac3063093bbbe8b4a2ea15cca53c7e2987763c801fdaefb",
-          "bytes": 2289,
-          "version": "LAMDA HD 2021-06-07; CDMS v2 December2011; Flower1999",
-          "read_status": "Full source read and archived previously; no new download required"
+        "inputs": {
+          "dataset": {
+            "url": "https://home.strw.leidenuniv.nl/~moldata/datafiles/hd.dat",
+            "local_evidence": "authority/molecular/lamda_hd_20261025.dat",
+            "sha256": "0c99fe168235d6d6dac3063093bbbe8b4a2ea15cca53c7e2987763c801fdaefb",
+            "bytes": 2289,
+            "version": "LAMDA HD 2021-06-07; CDMS v2 December2011; Flower1999",
+            "read_status": "Full source read and archived previously; no new download required"
+          },
+          "species": {
+            "target": "1H2H neutral HD",
+            "composition": [
+              {
+                "Z": 1,
+                "A": 1,
+                "isomer": "ground",
+                "count": 1
+              },
+              {
+                "Z": 1,
+                "A": 2,
+                "isomer": "ground",
+                "count": 1
+              }
+            ],
+            "charge": 0,
+            "states": "J0–8 exactly as file labels; vibrational label explicitly unspecified pending resolution of webpage v=1 discrepancy",
+            "colliders": [
+              "para-H2",
+              "ortho-H2"
+            ],
+            "collider_ids": [
+              2,
+              3
+            ],
+            "no_equilibrium_ortho_para_ratio_assumed": true
+          },
+          "shape": {
+            "levels": 9,
+            "radiative_lines": 8,
+            "collision_partners": 2,
+            "downward_pairs_per_partner": 9,
+            "downward_pairs_total": 18,
+            "temperature_nodes_K": [
+              50,
+              100,
+              200
+            ],
+            "rate_values": 54
+          },
+          "constants": {
+            "c_m_per_s": "299792458",
+            "h_J_s": "6.62607015e-34",
+            "k_B_J_per_K": "1.380649e-23"
+          },
+          "provenance": "MOLECULAR_AUTHORITY_20261025.md and hd_reference_check.json; primary LAMDA molformat.html/HD.html already read",
+          "licence": "Public-use citation instructions observed; redistribution licence not established; resolve before vendoring dataset publicly. Citation-only/reference-based local ingestion may be planned independently."
         },
-        "species": {
-          "target": "1H2H neutral HD",
-          "composition": [
+        "equations": [
+          {
+            "id": "UNITS",
+            "expression": "E_J=h*c*100*E_cm^-1; nu_Hz=1e9*nu_GHz; q_m3_s=1e-6*q_cm3_s",
+            "scope": "Exact unit conversions; preserve source decimal strings."
+          },
+          {
+            "id": "GAP",
+            "expression": "nu_level=c*100*(E_u_cm^-1-E_l_cm^-1)",
+            "scope": "Catalog precision comparison, not physical accuracy estimate."
+          },
+          {
+            "id": "DB",
+            "expression": "q_lu^(a)=q_ul^(a)*(g_u/g_l)*exp[-(E_u-E_l)/(k_B*T)]",
+            "scope": "One Maxwellian collider at temperatureT; p/o identities separate."
+          },
+          {
+            "id": "EINSTEIN",
+            "expression": "g_l*B_lu=g_u*B_ul; A_ul/B_ul=2*h*nu^3/c^2",
+            "scope": "B multiplies profile-averaged mean specific intensity J_nu, not radiation energy density; changing convention requires explicit conversion."
+          },
+          {
+            "id": "EMISSION",
+            "expression": "j_nu=(h*nu/(4*pi))*n_u*A_ul*phi_nu",
+            "scope": "phi integrates to1 over frequency; units J s^-1 m^-3 sr^-1 Hz^-1."
+          },
+          {
+            "id": "ABSORPTION",
+            "expression": "alpha_nu=(h*nu/(4*pi))*(n_l*B_lu-n_u*B_ul)*phi_nu",
+            "scope": "m^-1; includes stimulated emission."
+          },
+          {
+            "id": "LTE",
+            "expression": "n_u/n_l=(g_u/g_l)*exp[-h*nu/(k_B*T)]; j_nu=alpha_nu*B_nu(T)",
+            "scope": "Thermal non-inverted populations only for positive-absorption gate. Use the same line photon energy h*nu in the thermal population ratio, Planck factor and Einstein relations for this algebra test; catalog-level versus catalog-frequency rounding is assessed separately by the35Hz gate. General population inversion may produce negative netalpha; preserve it and label inversion, never clamp."
+          }
+        ],
+        "domain": {
+          "temperatures": "First adapter accepts exact source nodes50/100/200K for collision validation. Off-grid interpolation is explicitly unsupported in this first unit; no implicit extrapolation or endpoint clamping.",
+          "states": "Nine source J-labelled levels and eight supplied lines; missing collision pairs are missing, notzero; no invented vibrational coverage.",
+          "frequency": "Supplied radiative frequencies only; no continuum cross sections.",
+          "not_covered": [
+            "chemical formation/destruction",
+            "other isotopologues or T substitution",
+            "nonthermal differential collision kernels",
+            "population-evolution IVP",
+            "cosmological transport solve",
+            "physical validation of metadata v=1 claim"
+          ]
+        },
+        "outputs": [
+          "Typed immutable HD level/line/collider records with original decimals, SI conversions and canonical WU isotope identity",
+          "Source/state/domain/uncertainty metadata with explicit missing-data flags",
+          "Saved parser/shape/unit/gap/detail-balance/LTE checks and one compact diagnostic artifact from saved results",
+          "REC handoff object for qualified radiative use; source citations and source-specific claims"
+        ],
+        "acceptance": [
+          {
+            "id": "SOURCE",
+            "rule": "SHA256 and2289bytes match frozen input; preserve original bibliography/version."
+          },
+          {
+            "id": "SHAPE",
+            "rule": "Exactly9levels,8lines,2distinctcolliders,18downwardpairs,3temperature nodes and54ratevalues. Every reference resolves to an admitted source level."
+          },
+          {
+            "id": "PARSE",
+            "rule": "Original source decimal values and integer labels round-trip exactly; tolerance0 for identity/shape/decimal-preservation checks."
+          },
+          {
+            "id": "FREQUENCY_PRECISION",
+            "rule": "Use decimal arithmetic for |c*100*(E_u-E_l)-1e9*nu_GHz|<=35Hz for each supplied line.",
+            "justification": "Each printed level has9decimal places in cm^-1, allowing at most2*(0.5e-9)*c*100=29.9792458Hz in a difference; printed frequency8decimal GHz allows5Hz;35Hz covers this catalog rounding. This is not experimental uncertainty. A failure requires source-specific assessment, not tolerance enlargement."
+          },
+          {
+            "id": "UNITS",
+            "rule": "Unit conversion factors exact; compare retained decimals/Decimal or rational forms before optional binary64 output."
+          },
+          {
+            "id": "DETAILED_BALANCE",
+            "rule": "For each supplied pair, collider andT node, construct upward rate with explicit g and gap; independently evaluate the reverse relation. Compare residual normalized by sum of magnitudes of both positive rate terms, tolerance128*binary64epsilon.",
+            "justification": "Numerical algebra check of few positive terms and one exponential, using stable evaluation;128ulp-scale margin is distinct from source physical uncertainty. Implementer must record conditioning and any underflow; no acceptance by clipping."
+          },
+          {
+            "id": "LTE_KIRCHHOFF",
+            "rule": "At declared thermal populations, compare j_nu-alpha_nu*B_nu using residual/(|j_nu|+|alpha_nu*B_nu|)<=128*binary64epsilon; use expm1 for Planck and stable population differences. Check Einstein degeneracy and B-convention explicitly.",
+            "justification": "Roundoff-only identity check; exclude zero/zero with explicit analytic-zero classification. Thermal noninversion scope avoids using positivity as a gate on population-inverted netabsorption."
+          },
+          {
+            "id": "GAPS",
+            "rule": "Unspecified molecular state/collider/temperature/pair yields explicit unqualified/unsupported result; p/o rates never silently averaged; no extrapolation."
+          },
+          {
+            "id": "REUSE",
+            "rule": "Previously checked HD J1→0 reference is retained: E/k=128.37908482940912K; A=5.442e-8s^-1; q10_pH2(100K)=2.7e-11cm3/s; q01=2.243580917662442e-11cm3/s. These are references, not a new test execution in this planning turn."
+          }
+        ],
+        "uncertainties": {
+          "spectroscopy": "Catalog rounding bound separated from experimental/theoretical frequency error; obtain original source uncertainty before precision claims.",
+          "collisions": "No covariance in pinned file; original Flower1999 uncertainty/domain remains explicit.",
+          "metadata": "HD webpage v=1 wording conflicts with J0–8 data labeling; do not resolve by assumption."
+        },
+        "pr_plan": {
+          "title": "Add a pinned HD rotational and collider-data adapter",
+          "problem": "Molecular source contracts currently have literature and scalar evidence but no verified typed adapter preserving isotope/collider/state/domain distinctions.",
+          "allowed_change_scope": "New REC-owned bounded HD adapter, fixture/provenance reference and targeted tests; no existing physical solver modification.",
+          "steps": [
+            "Reuse canonical isotope/molecule schema from WU-led compiler",
+            "Pin source bytes and preserve decimal/state metadata",
+            "Implement parser with exact shape/domain and explicit p/o collision identities",
+            "Derive upward rates and Einstein-consistent line source/absorption helper under thermal test assumptions",
+            "Execute one separately frozen targeted test unit after budget allocation; preserve raw diagnostics",
+            "Independent review and REC handoff of finite admitted coverage"
+          ],
+          "independent_review": "Fresh review of implementation, literal references, raw outputs and diagnostic rendering; reuses prior theory/source evidence.",
+          "failure_disposition": "Report exact source row, field, model assumption or numerical condition. Preserve first failure; smallest targeted repair must retain original input/tolerance. Physical source gaps stay unqualified."
+        },
+        "claim_gate": "IMPLEMENTATION_CHECKED_PINNED_HD_ROTATIONAL_SOURCE_ADAPTER only after targeted execution and independent review; no rate-network/other-species/cosmology completion.",
+        "pass_next_action": "Provide qualified HD level/line/collider object to REC population/emission consumers and REI integration planning; WU maps isotope identity.",
+        "next_action": "REC owner prepares adapter code and source-licence disposition from this contract, freezes a separate explicit finite budget before any test execution.",
+        "execution_this_turn": "NOT_RUN; this file is artifact-only planning from previously obtained source and reference evidence."
+      },
+      "dependencies": [
+        {
+          "id": "REI-CHEM-LEDGER-01",
+          "type": "internal",
+          "lead_repo": "WU088_HH",
+          "condition": "Reuse independently admitted finite isotope/molecule interface and canonical species schema; do not rerun compiler fixtures.",
+          "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
+          "source_field": "dependencies"
+        },
+        {
+          "id": "EXTERNAL-LAMDA-HD-20210607",
+          "type": "external",
+          "condition": "Pinned 2289-byte HD source fixture with specified SHA256; citation/redistribution decision recorded.",
+          "qualification": "SOURCE_DECLARED_EXTERNAL_REFERENCE; PROVIDER_STATUS_NOT_INFERRED",
+          "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
+          "source_field": "dependencies"
+        }
+      ],
+      "conditional_dependencies": [],
+      "external_prerequisites": [],
+      "current_status": "IMPLEMENTATION_VERIFIED_SOURCE_FREQUENCY_GATE_HOLD",
+      "claim_gate": "IMPLEMENTATION_CHECKED_PINNED_HD_ROTATIONAL_SOURCE_ADAPTER only after targeted execution and independent review; no rate-network/other-species/cosmology completion.",
+      "pass_next_action": "Resolve original LAMDA/CDMS provenance for source lines2-8 under the unchanged35Hz gate; retain literal source columns and physical uncertainty gaps.",
+      "budget_status": "Separate new90CPU-second/600execution-wall-second bounded implementation unit completed; original historical allowances preserved; unused allowance transfer0CPU seconds; no borrowing/reset.",
+      "change_class": [
+        "scope_expansion"
+      ],
+      "historical_contract_id": null,
+      "source_fields": {
+        "lead_repo": "lead_repo",
+        "current_status": "current_status",
+        "claim_gate": "claim_gate",
+        "pass_next_action": "pass_next_action",
+        "budget_status": "budget_status"
+      },
+      "parent_containment": "REC-EXP-SPECTRAL",
+      "pr_plan": {
+        "inputs": {
+          "value": {
+            "dataset": {
+              "url": "https://home.strw.leidenuniv.nl/~moldata/datafiles/hd.dat",
+              "local_evidence": "authority/molecular/lamda_hd_20261025.dat",
+              "sha256": "0c99fe168235d6d6dac3063093bbbe8b4a2ea15cca53c7e2987763c801fdaefb",
+              "bytes": 2289,
+              "version": "LAMDA HD 2021-06-07; CDMS v2 December2011; Flower1999",
+              "read_status": "Full source read and archived previously; no new download required"
+            },
+            "species": {
+              "target": "1H2H neutral HD",
+              "composition": [
+                {
+                  "Z": 1,
+                  "A": 1,
+                  "isomer": "ground",
+                  "count": 1
+                },
+                {
+                  "Z": 1,
+                  "A": 2,
+                  "isomer": "ground",
+                  "count": 1
+                }
+              ],
+              "charge": 0,
+              "states": "J0–8 exactly as file labels; vibrational label explicitly unspecified pending resolution of webpage v=1 discrepancy",
+              "colliders": [
+                "para-H2",
+                "ortho-H2"
+              ],
+              "collider_ids": [
+                2,
+                3
+              ],
+              "no_equilibrium_ortho_para_ratio_assumed": true
+            },
+            "shape": {
+              "levels": 9,
+              "radiative_lines": 8,
+              "collision_partners": 2,
+              "downward_pairs_per_partner": 9,
+              "downward_pairs_total": 18,
+              "temperature_nodes_K": [
+                50,
+                100,
+                200
+              ],
+              "rate_values": 54
+            },
+            "constants": {
+              "c_m_per_s": "299792458",
+              "h_J_s": "6.62607015e-34",
+              "k_B_J_per_K": "1.380649e-23"
+            },
+            "provenance": "MOLECULAR_AUTHORITY_20261025.md and hd_reference_check.json; primary LAMDA molformat.html/HD.html already read",
+            "licence": "Public-use citation instructions observed; redistribution licence not established; resolve before vendoring dataset publicly. Citation-only/reference-based local ingestion may be planned independently."
+          },
+          "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
+          "json_pointer": "/inputs",
+          "qualification": "SOURCE_DECLARED"
+        },
+        "equations": {
+          "value": [
             {
-              "Z": 1,
-              "A": 1,
-              "isomer": "ground",
-              "count": 1
+              "id": "UNITS",
+              "expression": "E_J=h*c*100*E_cm^-1; nu_Hz=1e9*nu_GHz; q_m3_s=1e-6*q_cm3_s",
+              "scope": "Exact unit conversions; preserve source decimal strings."
             },
             {
-              "Z": 1,
-              "A": 2,
-              "isomer": "ground",
-              "count": 1
+              "id": "GAP",
+              "expression": "nu_level=c*100*(E_u_cm^-1-E_l_cm^-1)",
+              "scope": "Catalog precision comparison, not physical accuracy estimate."
+            },
+            {
+              "id": "DB",
+              "expression": "q_lu^(a)=q_ul^(a)*(g_u/g_l)*exp[-(E_u-E_l)/(k_B*T)]",
+              "scope": "One Maxwellian collider at temperatureT; p/o identities separate."
+            },
+            {
+              "id": "EINSTEIN",
+              "expression": "g_l*B_lu=g_u*B_ul; A_ul/B_ul=2*h*nu^3/c^2",
+              "scope": "B multiplies profile-averaged mean specific intensity J_nu, not radiation energy density; changing convention requires explicit conversion."
+            },
+            {
+              "id": "EMISSION",
+              "expression": "j_nu=(h*nu/(4*pi))*n_u*A_ul*phi_nu",
+              "scope": "phi integrates to1 over frequency; units J s^-1 m^-3 sr^-1 Hz^-1."
+            },
+            {
+              "id": "ABSORPTION",
+              "expression": "alpha_nu=(h*nu/(4*pi))*(n_l*B_lu-n_u*B_ul)*phi_nu",
+              "scope": "m^-1; includes stimulated emission."
+            },
+            {
+              "id": "LTE",
+              "expression": "n_u/n_l=(g_u/g_l)*exp[-h*nu/(k_B*T)]; j_nu=alpha_nu*B_nu(T)",
+              "scope": "Thermal non-inverted populations only for positive-absorption gate. Use the same line photon energy h*nu in the thermal population ratio, Planck factor and Einstein relations for this algebra test; catalog-level versus catalog-frequency rounding is assessed separately by the35Hz gate. General population inversion may produce negative netalpha; preserve it and label inversion, never clamp."
             }
           ],
-          "charge": 0,
-          "states": "J0–8 exactly as file labels; vibrational label explicitly unspecified pending resolution of webpage v=1 discrepancy",
-          "colliders": [
-            "para-H2",
-            "ortho-H2"
+          "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
+          "json_pointer": "/equations",
+          "qualification": "SOURCE_DECLARED"
+        },
+        "units": {
+          "value": {
+            "id": "UNITS",
+            "expression": "E_J=h*c*100*E_cm^-1; nu_Hz=1e9*nu_GHz; q_m3_s=1e-6*q_cm3_s",
+            "scope": "Exact unit conversions; preserve source decimal strings."
+          },
+          "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
+          "json_pointer": "/equations/0",
+          "qualification": "SOURCE_UNIT_CONVERSION_EQUATION"
+        },
+        "domain": {
+          "value": {
+            "temperatures": "First adapter accepts exact source nodes50/100/200K for collision validation. Off-grid interpolation is explicitly unsupported in this first unit; no implicit extrapolation or endpoint clamping.",
+            "states": "Nine source J-labelled levels and eight supplied lines; missing collision pairs are missing, notzero; no invented vibrational coverage.",
+            "frequency": "Supplied radiative frequencies only; no continuum cross sections.",
+            "not_covered": [
+              "chemical formation/destruction",
+              "other isotopologues or T substitution",
+              "nonthermal differential collision kernels",
+              "population-evolution IVP",
+              "cosmological transport solve",
+              "physical validation of metadata v=1 claim"
+            ]
+          },
+          "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
+          "json_pointer": "/domain",
+          "qualification": "SOURCE_DECLARED"
+        },
+        "outputs": {
+          "value": [
+            "Typed immutable HD level/line/collider records with original decimals, SI conversions and canonical WU isotope identity",
+            "Source/state/domain/uncertainty metadata with explicit missing-data flags",
+            "Saved parser/shape/unit/gap/detail-balance/LTE checks and one compact diagnostic artifact from saved results",
+            "REC handoff object for qualified radiative use; source citations and source-specific claims"
           ],
-          "collider_ids": [
-            2,
-            3
+          "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
+          "json_pointer": "/outputs",
+          "qualification": "SOURCE_DECLARED"
+        },
+        "positive_acceptance": {
+          "value": [
+            {
+              "id": "SOURCE",
+              "rule": "SHA256 and2289bytes match frozen input; preserve original bibliography/version."
+            },
+            {
+              "id": "SHAPE",
+              "rule": "Exactly9levels,8lines,2distinctcolliders,18downwardpairs,3temperature nodes and54ratevalues. Every reference resolves to an admitted source level."
+            },
+            {
+              "id": "PARSE",
+              "rule": "Original source decimal values and integer labels round-trip exactly; tolerance0 for identity/shape/decimal-preservation checks."
+            },
+            {
+              "id": "FREQUENCY_PRECISION",
+              "rule": "Use decimal arithmetic for |c*100*(E_u-E_l)-1e9*nu_GHz|<=35Hz for each supplied line.",
+              "justification": "Each printed level has9decimal places in cm^-1, allowing at most2*(0.5e-9)*c*100=29.9792458Hz in a difference; printed frequency8decimal GHz allows5Hz;35Hz covers this catalog rounding. This is not experimental uncertainty. A failure requires source-specific assessment, not tolerance enlargement."
+            },
+            {
+              "id": "UNITS",
+              "rule": "Unit conversion factors exact; compare retained decimals/Decimal or rational forms before optional binary64 output."
+            },
+            {
+              "id": "DETAILED_BALANCE",
+              "rule": "For each supplied pair, collider andT node, construct upward rate with explicit g and gap; independently evaluate the reverse relation. Compare residual normalized by sum of magnitudes of both positive rate terms, tolerance128*binary64epsilon.",
+              "justification": "Numerical algebra check of few positive terms and one exponential, using stable evaluation;128ulp-scale margin is distinct from source physical uncertainty. Implementer must record conditioning and any underflow; no acceptance by clipping."
+            },
+            {
+              "id": "LTE_KIRCHHOFF",
+              "rule": "At declared thermal populations, compare j_nu-alpha_nu*B_nu using residual/(|j_nu|+|alpha_nu*B_nu|)<=128*binary64epsilon; use expm1 for Planck and stable population differences. Check Einstein degeneracy and B-convention explicitly.",
+              "justification": "Roundoff-only identity check; exclude zero/zero with explicit analytic-zero classification. Thermal noninversion scope avoids using positivity as a gate on population-inverted netabsorption."
+            },
+            {
+              "id": "GAPS",
+              "rule": "Unspecified molecular state/collider/temperature/pair yields explicit unqualified/unsupported result; p/o rates never silently averaged; no extrapolation."
+            },
+            {
+              "id": "REUSE",
+              "rule": "Previously checked HD J1→0 reference is retained: E/k=128.37908482940912K; A=5.442e-8s^-1; q10_pH2(100K)=2.7e-11cm3/s; q01=2.243580917662442e-11cm3/s. These are references, not a new test execution in this planning turn."
+            }
           ],
-          "no_equilibrium_ortho_para_ratio_assumed": true
+          "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
+          "json_pointer": "/acceptance",
+          "qualification": "SOURCE_DECLARED"
         },
-        "shape": {
-          "levels": 9,
-          "radiative_lines": 8,
-          "collision_partners": 2,
-          "downward_pairs_per_partner": 9,
-          "downward_pairs_total": 18,
-          "temperature_nodes_K": [
-            50,
-            100,
-            200
-          ],
-          "rate_values": 54
+        "failure_disposition": {
+          "value": "Report exact source row, field, model assumption or numerical condition. Preserve first failure; smallest targeted repair must retain original input/tolerance. Physical source gaps stay unqualified.",
+          "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
+          "json_pointer": "/pr_plan/failure_disposition",
+          "qualification": "SOURCE_DECLARED"
         },
-        "constants": {
-          "c_m_per_s": "299792458",
-          "h_J_s": "6.62607015e-34",
-          "k_B_J_per_K": "1.380649e-23"
+        "independent_review": {
+          "value": "Fresh review of implementation, literal references, raw outputs and diagnostic rendering; reuses prior theory/source evidence.",
+          "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
+          "json_pointer": "/pr_plan/independent_review",
+          "qualification": "SOURCE_DECLARED"
         },
-        "provenance": "MOLECULAR_AUTHORITY_20261025.md and hd_reference_check.json; primary LAMDA molformat.html/HD.html already read",
-        "licence": "Public-use citation instructions observed; redistribution licence not established; resolve before vendoring dataset publicly. Citation-only/reference-based local ingestion may be planned independently."
-      },
-      "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
-      "json_pointer": "/inputs",
-      "qualification": "SOURCE_DECLARED"
-    },
-    "equations": {
-      "value": [
-        {
-          "id": "UNITS",
-          "expression": "E_J=h*c*100*E_cm^-1; nu_Hz=1e9*nu_GHz; q_m3_s=1e-6*q_cm3_s",
-          "scope": "Exact unit conversions; preserve source decimal strings."
-        },
-        {
-          "id": "GAP",
-          "expression": "nu_level=c*100*(E_u_cm^-1-E_l_cm^-1)",
-          "scope": "Catalog precision comparison, not physical accuracy estimate."
-        },
-        {
-          "id": "DB",
-          "expression": "q_lu^(a)=q_ul^(a)*(g_u/g_l)*exp[-(E_u-E_l)/(k_B*T)]",
-          "scope": "One Maxwellian collider at temperatureT; p/o identities separate."
-        },
-        {
-          "id": "EINSTEIN",
-          "expression": "g_l*B_lu=g_u*B_ul; A_ul/B_ul=2*h*nu^3/c^2",
-          "scope": "B multiplies profile-averaged mean specific intensity J_nu, not radiation energy density; changing convention requires explicit conversion."
-        },
-        {
-          "id": "EMISSION",
-          "expression": "j_nu=(h*nu/(4*pi))*n_u*A_ul*phi_nu",
-          "scope": "phi integrates to1 over frequency; units J s^-1 m^-3 sr^-1 Hz^-1."
-        },
-        {
-          "id": "ABSORPTION",
-          "expression": "alpha_nu=(h*nu/(4*pi))*(n_l*B_lu-n_u*B_ul)*phi_nu",
-          "scope": "m^-1; includes stimulated emission."
-        },
-        {
-          "id": "LTE",
-          "expression": "n_u/n_l=(g_u/g_l)*exp[-h*nu/(k_B*T)]; j_nu=alpha_nu*B_nu(T)",
-          "scope": "Thermal non-inverted populations only for positive-absorption gate. Use the same line photon energy h*nu in the thermal population ratio, Planck factor and Einstein relations for this algebra test; catalog-level versus catalog-frequency rounding is assessed separately by the35Hz gate. General population inversion may produce negative netalpha; preserve it and label inversion, never clamp."
+        "PR_boundary": {
+          "value": {
+            "title": "Add a pinned HD rotational and collider-data adapter",
+            "problem": "Molecular source contracts currently have literature and scalar evidence but no verified typed adapter preserving isotope/collider/state/domain distinctions.",
+            "allowed_change_scope": "New REC-owned bounded HD adapter, fixture/provenance reference and targeted tests; no existing physical solver modification.",
+            "steps": [
+              "Reuse canonical isotope/molecule schema from WU-led compiler",
+              "Pin source bytes and preserve decimal/state metadata",
+              "Implement parser with exact shape/domain and explicit p/o collision identities",
+              "Derive upward rates and Einstein-consistent line source/absorption helper under thermal test assumptions",
+              "Execute one separately frozen targeted test unit after budget allocation; preserve raw diagnostics",
+              "Independent review and REC handoff of finite admitted coverage"
+            ],
+            "independent_review": "Fresh review of implementation, literal references, raw outputs and diagnostic rendering; reuses prior theory/source evidence.",
+            "failure_disposition": "Report exact source row, field, model assumption or numerical condition. Preserve first failure; smallest targeted repair must retain original input/tolerance. Physical source gaps stay unqualified."
+          },
+          "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
+          "json_pointer": "/pr_plan",
+          "qualification": "SOURCE_DECLARED"
         }
-      ],
-      "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
-      "json_pointer": "/equations",
-      "qualification": "SOURCE_DECLARED"
-    },
-    "units": {
-      "value": {
-        "id": "UNITS",
-        "expression": "E_J=h*c*100*E_cm^-1; nu_Hz=1e9*nu_GHz; q_m3_s=1e-6*q_cm3_s",
-        "scope": "Exact unit conversions; preserve source decimal strings."
       },
-      "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
-      "json_pointer": "/equations/0",
-      "qualification": "SOURCE_UNIT_CONVERSION_EQUATION"
-    },
-    "domain": {
-      "value": {
-        "temperatures": "First adapter accepts exact source nodes50/100/200K for collision validation. Off-grid interpolation is explicitly unsupported in this first unit; no implicit extrapolation or endpoint clamping.",
-        "states": "Nine source J-labelled levels and eight supplied lines; missing collision pairs are missing, notzero; no invented vibrational coverage.",
-        "frequency": "Supplied radiative frequencies only; no continuum cross sections.",
-        "not_covered": [
-          "chemical formation/destruction",
-          "other isotopologues or T substitution",
-          "nonthermal differential collision kernels",
-          "population-evolution IVP",
-          "cosmological transport solve",
-          "physical validation of metadata v=1 claim"
-        ]
-      },
-      "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
-      "json_pointer": "/domain",
-      "qualification": "SOURCE_DECLARED"
-    },
-    "outputs": {
-      "value": [
-        "Typed immutable HD level/line/collider records with original decimals, SI conversions and canonical WU isotope identity",
-        "Source/state/domain/uncertainty metadata with explicit missing-data flags",
-        "Saved parser/shape/unit/gap/detail-balance/LTE checks and one compact diagnostic artifact from saved results",
-        "REC handoff object for qualified radiative use; source citations and source-specific claims"
-      ],
-      "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
-      "json_pointer": "/outputs",
-      "qualification": "SOURCE_DECLARED"
-    },
-    "positive_acceptance": {
-      "value": [
-        {
-          "id": "SOURCE",
-          "rule": "SHA256 and2289bytes match frozen input; preserve original bibliography/version."
-        },
-        {
-          "id": "SHAPE",
-          "rule": "Exactly9levels,8lines,2distinctcolliders,18downwardpairs,3temperature nodes and54ratevalues. Every reference resolves to an admitted source level."
-        },
-        {
-          "id": "PARSE",
-          "rule": "Original source decimal values and integer labels round-trip exactly; tolerance0 for identity/shape/decimal-preservation checks."
-        },
-        {
-          "id": "FREQUENCY_PRECISION",
-          "rule": "Use decimal arithmetic for |c*100*(E_u-E_l)-1e9*nu_GHz|<=35Hz for each supplied line.",
-          "justification": "Each printed level has9decimal places in cm^-1, allowing at most2*(0.5e-9)*c*100=29.9792458Hz in a difference; printed frequency8decimal GHz allows5Hz;35Hz covers this catalog rounding. This is not experimental uncertainty. A failure requires source-specific assessment, not tolerance enlargement."
-        },
-        {
-          "id": "UNITS",
-          "rule": "Unit conversion factors exact; compare retained decimals/Decimal or rational forms before optional binary64 output."
-        },
-        {
-          "id": "DETAILED_BALANCE",
-          "rule": "For each supplied pair, collider andT node, construct upward rate with explicit g and gap; independently evaluate the reverse relation. Compare residual normalized by sum of magnitudes of both positive rate terms, tolerance128*binary64epsilon.",
-          "justification": "Numerical algebra check of few positive terms and one exponential, using stable evaluation;128ulp-scale margin is distinct from source physical uncertainty. Implementer must record conditioning and any underflow; no acceptance by clipping."
-        },
-        {
-          "id": "LTE_KIRCHHOFF",
-          "rule": "At declared thermal populations, compare j_nu-alpha_nu*B_nu using residual/(|j_nu|+|alpha_nu*B_nu|)<=128*binary64epsilon; use expm1 for Planck and stable population differences. Check Einstein degeneracy and B-convention explicitly.",
-          "justification": "Roundoff-only identity check; exclude zero/zero with explicit analytic-zero classification. Thermal noninversion scope avoids using positivity as a gate on population-inverted netabsorption."
-        },
-        {
-          "id": "GAPS",
-          "rule": "Unspecified molecular state/collider/temperature/pair yields explicit unqualified/unsupported result; p/o rates never silently averaged; no extrapolation."
-        },
-        {
-          "id": "REUSE",
-          "rule": "Previously checked HD J1→0 reference is retained: E/k=128.37908482940912K; A=5.442e-8s^-1; q10_pH2(100K)=2.7e-11cm3/s; q01=2.243580917662442e-11cm3/s. These are references, not a new test execution in this planning turn."
-        }
-      ],
-      "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
-      "json_pointer": "/acceptance",
-      "qualification": "SOURCE_DECLARED"
-    },
-    "failure_disposition": {
-      "value": "Report exact source row, field, model assumption or numerical condition. Preserve first failure; smallest targeted repair must retain original input/tolerance. Physical source gaps stay unqualified.",
-      "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
-      "json_pointer": "/pr_plan/failure_disposition",
-      "qualification": "SOURCE_DECLARED"
-    },
-    "independent_review": {
-      "value": "Fresh review of implementation, literal references, raw outputs and diagnostic rendering; reuses prior theory/source evidence.",
-      "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
-      "json_pointer": "/pr_plan/independent_review",
-      "qualification": "SOURCE_DECLARED"
-    },
-    "PR_boundary": {
-      "value": {
-        "title": "Add a pinned HD rotational and collider-data adapter",
-        "problem": "Molecular source contracts currently have literature and scalar evidence but no verified typed adapter preserving isotope/collider/state/domain distinctions.",
-        "allowed_change_scope": "New REC-owned bounded HD adapter, fixture/provenance reference and targeted tests; no existing physical solver modification.",
-        "steps": [
-          "Reuse canonical isotope/molecule schema from WU-led compiler",
-          "Pin source bytes and preserve decimal/state metadata",
-          "Implement parser with exact shape/domain and explicit p/o collision identities",
-          "Derive upward rates and Einstein-consistent line source/absorption helper under thermal test assumptions",
-          "Execute one separately frozen targeted test unit after budget allocation; preserve raw diagnostics",
-          "Independent review and REC handoff of finite admitted coverage"
-        ],
-        "independent_review": "Fresh review of implementation, literal references, raw outputs and diagnostic rendering; reuses prior theory/source evidence.",
-        "failure_disposition": "Report exact source row, field, model assumption or numerical condition. Preserve first failure; smallest targeted repair must retain original input/tolerance. Physical source gaps stay unqualified."
-      },
-      "source_file": "authority/molecular/REC_HD_ADAPTER_CONTRACT.json",
-      "json_pointer": "/pr_plan",
-      "qualification": "SOURCE_DECLARED"
+      "current_execution_observation": {"source_file": "observations/REC_HD_H5_20261025.json", "json_pointer": "/REC-HD-ADAPTER", "REC_repository": "cosmosapjw-quantum/rec_bianchi", "REC_commit": "683c3f2ac3cdcc62ad6be9fe983ea39fcd74d1de"}
     }
-  }
-}
