@@ -1,16 +1,19 @@
 <!-- N5_H1_GROUND_RR_MILNE_20261025 -->
-## 2026-10-25 N5 H1 ground spontaneous RR finite-chain return
+## 2026-10-25 N5 H1 ground spontaneous RR — S/D and canonical dual R3 delivery
 
-Science `bdfd34499153575305871bd68a139e2878f5f49f` / [Draft PR105](https://github.com/cosmosapjw-quantum/bass_cr/pull/105). Child `CR_N5_H1_GROUND_RR_MILNE_FINITE_CHAIN`, consumer `N5_C23D_H1_RR_MILNE_V1`는 root gate `NUMERICALLY_CHECKED_SCOPED_CONDITIONAL_H1_SPONTANEOUS_RR_FINITE_CHAIN`를 따른다. 독립 R6/C9 PASS, blocking0.
+Science [S bdfd34499153575305871bd68a139e2878f5f49f](https://github.com/cosmosapjw-quantum/bass_cr/blob/bdfd34499153575305871bd68a139e2878f5f49f/research/cr_n5_rr_milne_20261025/RESULTS_KO.md), Documents [D b1aed87852d4f8994494c2ae41a913afd390eccd](https://github.com/cosmosapjw-quantum/bass_cr/tree/b1aed87852d4f8994494c2ae41a913afd390eccd/research/cr_n5_rr_milne_20261025/delivery), [Draft PR105](https://github.com/cosmosapjw-quantum/bass_cr/pull/105)는 실제 publication/ref readback PASS다. M1 `53b2c135a1203a8784b6cc4acdec1d4fe174f166`을 유지한다. 이번 M2는 fresh expected parent `38ea3bbccc4f62e5e6d579fd1b6fb8c3453ddd30`에 forcefalse로 결속한다. M2 자신의 실제 SHA는 publication 뒤 외부 terminal record에서 기록하며 현재 payload에서 미리 알았다고 주장하지 않는다.
 
-PR104 저장8사슬의 대각 RR hazard만 추가해160새RHS,24source행을 계산했다. 기존162 scalar비교와 저장 kinetic-energy 비교18개를 보존한다. 새ODE/source·thermal quadrature/oldscience replay는0이다. H1 ground spontaneous component이며 stationary-heavy-target/zero-recoil, native13.6eV, n_HII=.1cm^-3를 사용한다. 전자제거E, retained photon+(E+I), atomic internal-I를 구분한다. 실제 stimulation/totalRR/PI feedback은null이다.
+H1 ground spontaneous RR child는 root scoped gate/독립 R6·C9 PASS를 유지한다. PR104 저장8사슬의160새RHS,24source행, 원162 scalar비교와 추가 저장 kinetic-energy18비교를 보존한다. 새ODE/source·thermal quadrature/oldscience replay는0이다. Native13.6eV, n_HII=.1cm^-3, stationary-heavy-target/zero-recoil 성분이며 stimulation/totalRR/PI feedback은null이다. Electron 제거E, retained photon+(E+I), atomic internal-I의 owner를 구분한다. 결과·criteria·budget의 reset이나 science replay는없다.
 
-활성 초기 전자당RR확률1.26101–1.59845e-9, conditional photon17.6258–18.8897eV, stable mean-stop 감소.37017–.45707ms다. 작은 paired신호는 응답식으로 계산했고 원 oldsolution 불확실성을 상속한다. 원 primary bytes, prior4children/PR104, 최신WU90 및 다른owner bytes를 유지한다.
+Canonical `BASS_CR_N5_RR_MILNE_CANONICAL_20261025_V1.zip`은18,232,953bytes, SHA256 `f1afdb40303b28a498a62f9f8d38858b8bea584d0ed8a4e63bd87e4e11d362c5`,164payload/165members다. Library `libfile_5fea72030ce881919506c18d10cafd9e`와 Dropbox `id:BSpOijBcT10AAAAAAD_90Q`는2026-10-25 03:20:54UTC 실제wholeGET의size/SHA/CRC/전체payload R3PASS다. Archive는03:18 S/M1freeze이며 Dbuildsnapshot03:22:55와 구별한다. 후속D/M2 영수증은 frozenZIP bytes를 다시 쓰지 않는다.
 
-실측 새workerCPU4.84353000s + chargedpreflight0.01989341s = 4.86342341s; knownlineage39.097868524s. Globaltotal/remaining/money는null이다. T0dualR1 ACK와 finalcanonicalpending을 구분하며 과거rejected neutralterminal은별도blocked로유지하고재포장하지않는다.
+Drive folder `1V4ZQza59dWVC7apeRz9P1TL66eaVYyJy`에서 exact prequery0, upload1회50s ACK없음, exact postquery0이다. UNKNOWN_NO_ACK/R3NOT_RUN, resend0이고 삼중백업완료가 아니다. 과거unknown과 별도blocked neutralterminal은 그대로이며 그 payload를 재구성·재포장하지 않았다.
 
-EXECUTION: scoped component complete. PUBLICATION: ScienceS R1PASS/additiveDraft/no merge. BACKUP: finalcanonical ROOT_PENDING. DAG: N4/N5PARTIAL/OPEN; N6/N7 predecessor-gated.
+Late HE PR101 Science `9fc8185437f145a6ba4569e1b38aa2e12d15acd9`는 SCOPED_NUMERICS_ADMITTED_C8_PARTIAL이며 actual D `28a26f4db951ab9085180e2ecc5d600d981a1f71`와 central `38ea3bbccc4f62e5e6d579fd1b6fb8c3453ddd30`(03:26:50UTC)에서 현재19/20이다. 이전03:16UTC의17/20은 historical snapshot으로 구분하며 frozen D/canonical을 다시 쓰지 않는다. 실제PASS/FAIL/FAIL 및 reserve0을 유지한다. B2 Drive `15RPRyRzRorUuYA4t5MvUMm2np_Nt7rjR` / Dropbox `id:BSpOijBcT10AAAAAAD_90g`의2,732,504bytes, SHA256 `0662cb03fd141886e5c77c1661d2fb5314173f46498c27a878bf6571188d4baf`는 owner upload+별도metadata ACK이며 R3를 주장하지 않는다. C8 SVG/metadata/repairsummary3파일은미완료이고 HE-ANG SOURCE_INPUT_PENDING, physicalprovider/eventsigma/recoildistributionfalse다. WU90 실제FINAL head `9d32d115c0b8c5d5b2ce3a66ebc4a7f277334fcc`의 scoped final20/20/ownerdualrestore와 nuclear parent PARTIAL_INPUT_DEPENDENCIES, physical confidence interval(CI) false (원자 충돌전리 CI와 별개)/consumerACK null을 함께 보존한다. 다른owner의 원문을 바꾸지 않으며 RR입력변경0이다.
 
+실측 새worker4.843530CPU s + chargedpreflight.01989341s =4.86342341s; inheritedknown34.234445114s를 합친 knownlineage39.097868524s다. Globaltotal/remaining/money는null, 복원·압축·네트워크/serialization비용은별도다. 다음 candidate는 기존 He4 ground RR 공급자의 정확한 source/channel/weight/isotope convention 결속이다. 새물리실행이나 N6/N7 activation을 뜻하지 않는다.
+
+EXECUTION: scoped component complete. PUBLICATION: S/D actual; R10/C10 및20/20 delivery는 이번M2의 실제 expected-SHA update/ref readback 성공으로 완료되며 terminal record는그후pending이다. 준비파일만으로 완료를 선포하지 않는다. BACKUP: Library/Dropbox dualR3; Drive UNKNOWN/R3NOTRUN/resend0. DAG: N4/N5PARTIAL/OPEN; N6/N7 predecessor-gated. Global scientific completion은null이다.
 
 ---
 
