@@ -1,3 +1,10 @@
+# 게시된 중앙 계약 인계
+
+검토 소스 commit: 641a725ada4be27473069c2c35005a94c2ab0248
+정본 DAG: https://github.com/cosmosapjw-quantum/rei_bianchi/blob/641a725ada4be27473069c2c35005a94c2ab0248/research/orchestration_expansion_20261025/DAG.json
+WU canonical compiler commit: 34dd7d1d018abff8a0a4ebd1d3f3579ac46d2fad
+실제 repo별 게시·백업은 research/orchestration_expansion_20261025/delivery/ 및 PUBLICATION_LOCATORS.json을 읽는다.
+
 # REI 확장 계획 인계
 
 기준 repo cosmosapjw-quantum/rei_bianchi, 관측centralbranch research/orchestration-sandbox-20261022, HEAD c5050305f84a051cb797cd84c84768c76bcb18b9. 고정historicalauthority0f9d9df825be1dac9ca9bdf73cdc2e8908bcba17와 AGENTS429a5a13ee75b1222bc50627f8d5973d01dd21c4를 보존한다. 게시 직전 현재HEAD/AGENTS/parallelchanges를 재확인하고 expected-SHA,force=false로 새 ownedpaths만 추가한다. Merge/clone/worktree는 없다.
