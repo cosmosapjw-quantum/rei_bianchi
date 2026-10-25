@@ -1,0 +1,140 @@
+{
+  "unit": "REI-GRID044-ENDPOINT-BINDING-01",
+  "limits": {
+    "science": {
+      "cpu_s": 30.0,
+      "wall_s": 120.0,
+      "memory_MiB": 512
+    },
+    "infrastructure": {
+      "cpu_s": 60.0,
+      "wall_s": 180.0,
+      "memory_MiB": 1024
+    }
+  },
+  "executions": [
+    {
+      "name": "toolchain01",
+      "kind": "infrastructure",
+      "utc_start": "2026-10-25T13:03:21.797183+00:00",
+      "command": [
+        "python3",
+        "prepare_rust.py",
+        "/workspace/scratch/9d364a030876/project_sources/06-rust-1.94.1-x86_64-unknown-linux-gnu.tar.xz",
+        "/workspace/scratch/9d364a030876/rei_endpoint_rust_toolchain"
+      ],
+      "exit_code": 1,
+      "timed_out": false,
+      "cpu_s": 14.406434,
+      "wall_s": 14.41621970900087,
+      "max_rss_KiB": 182628,
+      "stdout": "execution/toolchain01/stdout.log",
+      "stderr": "execution/toolchain01/stderr.log"
+    },
+    {
+      "name": "toolchain02-single-thread-repair",
+      "kind": "infrastructure",
+      "utc_start": "2026-10-25T13:05:59.378758+00:00",
+      "command": [
+        "python3",
+        "probe_rust_repair.py",
+        "/workspace/scratch/9d364a030876/rei_endpoint_rust_toolchain"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "cpu_s": 0.07808,
+      "wall_s": 0.11511705900193192,
+      "max_rss_KiB": 95840,
+      "stdout": "execution/toolchain02-single-thread-repair/stdout.log",
+      "stderr": "execution/toolchain02-single-thread-repair/stderr.log"
+    },
+    {
+      "name": "suite01-python",
+      "kind": "science",
+      "utc_start": "2026-10-25T13:09:18.841208+00:00",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "test_consumer.py"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "cpu_s": 2.504364,
+      "wall_s": 2.521510913000384,
+      "max_rss_KiB": 105888,
+      "stdout": "execution/suite01-python/stdout.log",
+      "stderr": "execution/suite01-python/stderr.log"
+    },
+    {
+      "name": "suite01-rust-build",
+      "kind": "infrastructure",
+      "utc_start": "2026-10-25T13:09:33.882601+00:00",
+      "command": [
+        "/workspace/scratch/9d364a030876/rei_endpoint_rust_toolchain/bin/rustc",
+        "rust/client.rs",
+        "--edition=2021",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "link-arg=-Wl,--threads=1",
+        "-o",
+        "/workspace/scratch/9d364a030876/rei_endpoint_client"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "cpu_s": 0.19761299999999998,
+      "wall_s": 0.2656978489976609,
+      "max_rss_KiB": 137088,
+      "stdout": "execution/suite01-rust-build/stdout.log",
+      "stderr": "execution/suite01-rust-build/stderr.log"
+    },
+    {
+      "name": "suite01-rust-callback",
+      "kind": "science",
+      "utc_start": "2026-10-25T13:09:42.247514+00:00",
+      "command": [
+        "/workspace/scratch/9d364a030876/rei_endpoint_client"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "cpu_s": 0.002073,
+      "wall_s": 0.002853449997928692,
+      "max_rss_KiB": 7372,
+      "stdout": "execution/suite01-rust-callback/stdout.log",
+      "stderr": "execution/suite01-rust-callback/stderr.log"
+    },
+    {
+      "name": "suite01-rust-compare",
+      "kind": "science",
+      "utc_start": "2026-10-25T13:09:42.640956+00:00",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "test_consumer.py",
+        "--rust-output",
+        "execution/suite01-rust-callback/stdout.log"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "cpu_s": 0.39405500000000004,
+      "wall_s": 0.4163179980023415,
+      "max_rss_KiB": 60668,
+      "stdout": "execution/suite01-rust-compare/stdout.log",
+      "stderr": "execution/suite01-rust-compare/stderr.log"
+    }
+  ],
+  "legacy_budget_reset": false,
+  "legacy_budget_transfer": false,
+  "inspection_remote_and_wrapper_overhead": "not measured; not reported as zero",
+  "execution_identity": "inherited completed normalization_review agent reused under documented routing exception",
+  "requested_lower_tier": "gpt-6.1-sol; spawn rejected: agent thread limit reached",
+  "scientific_admission": "pending independent review",
+  "cumulative": {
+    "science": {
+      "cpu_s": 2.900492,
+      "wall_s": 2.940682361000654
+    },
+    "infrastructure": {
+      "cpu_s": 14.682127000000001,
+      "wall_s": 14.797034617000463
+    }
+  }
+}
