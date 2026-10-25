@@ -421,3 +421,39 @@ Fresh survey51repo/2254refs/65pages, 관련6repo×최근5PR, DropboxHH529/DriveH
 Non-tilted LRS Bianchi I, metric(-+++), reacting gas pi=0/DM pi_m 별도. 동일 normal frame signed matter/radiation tensor를 합한 후 norm; Frobenius=sqrt(2)×half-contraction. 같은 trajectory 분해는 species-off 인과 실험이 아니며 sampled residual은 continuum certificate가 아니다.
 
 게시 직전 추가 delta: 중앙 `ecbb3124b49e75d8a7e948705b3894307d628349`는 위 HI science42f598 이후의 전달 파일5개만 갱신했다. 이 최신 HEAD/tree1e13f9f3b951cb2fcd4e9ebb853d6d3b2011ee0a를 parent로 삼는다. Canonical DAG/HH/returns/AGENTS는 그대로다. HI owner workflow20/20, finalC857432bytes/81members/SHA2562fcee29558fc2d2791f814eea2143ed7a8a9c8f889976f80d320e7979a555434, Library+Dropbox 실제ACK를 관측했다. FinalC remote wholeGET는 NOT_RUN이며 finalDriveACK는 공급되지 않았다. 앞선 MAIN의42f598 당시 pending 기록은 역사적 snapshot으로 보존한다. 이 delivery delta는 PHYS90의 source 또는 science identity를 바꾸지 않는다.
+
+
+## PHYS91 FINAL — 전체 PSD 거리의 exact 인증, B1 미결 (2026-10-25)
+
+PHYS91의 완료 과학 판정은 **PASS_SCOPED_EXACT_GLOBAL_PSD_DISTANCE_B1_UNRESOLVED**다. Draft PR148 https://github.com/cosmosapjw-quantum/WU088_HH/pull/148, branch research/hh-phys91-global-psd-20261025, actual FINAL HEAD **2912a315aa39e7293000b7b2b8c7cc7a706fea9e**, tree **b12963377f5654f5bdf7dee56a067cb0fbcf05e0**, expected S2 parent 8895e72057e9448f0d7517531d820349c0e496ac, force=false/exact-ref PASS. Scientific identity **4b7e3ce80c6a96373e4f0f214d63c12738d2ab5f71b9f83bc01cfbaf5bb5c376**. PHYS90 FINAL9d32d115c0b8c5d5b2ce3a66ebc4a7f277334fcc의 additive descendant이며 PHYS82 CRLF 및 PHYS88 완료 ancestry를 보존했다. S2 단독 checkout 대신 FINAL descendant를 사용한다.
+
+### 완료 결과와 주장 범위
+
+Exact closed interval:
+606934757065126340229833497971012560/1044859134592536248071098889705557947 <= t_PSD <= 1210812737265140594067745/1208925819614629174706176.
+Outward decimal **0.5808771124940327 <= t_PSD <=1.0015608216979872**. beta<1<alpha이므로 B1 존재/배제는 **OPEN**이다. Source covariance repair/adoption, formatter guarantee, physical CI, actual consumer ACK는 발급하지 않았다. 원 rawF 결함 원인은 NOT_ESTABLISHED다.
+
+Primary1/4096 projections/16 exact checkpoints, independent reference1/선택된 두 인증서 각각11781 entries PASS. Dual cp4=88열 factor, primal cp13=65열 factor; raw rank 필드는 factor 열수이며 exact matrix rank가 아니다. Primary/reference actual resume각1 SKIP, scientific imports/callbacks/writes0;25 files9110118 bytes unchanged, frozen8/input3 유지. C9 한 pass 종료, blocking0/openfinding0/repair0다.
+
+Child2 CPU14.250358s/wall14.266414499999883s, metadata resumeCPU0.091248s 별도. Wolfram 새context1/evaluator1,55scalarzeros/all_zeroTrue, lineage10. Allowance primary/reference/Wolfram0, budget resetfalse, 전체 역사·원격 CPU/금액/전역 잔여예산null. 새 ODE0/benchmark0/nuclear activation0/fast stopping0이다.
+
+### 실제 전달과 불변 snapshot
+
+FINAL ZIP **PHYS91_FINAL_20261025_2912a315aa39.zip**, **37419031 bytes**, SHA256 **b12f946dabe2f15e242e489977102abebdd58d3ce8acf336ec0753c25c74f2b7**.
+Dropbox **id:BSpOijBcT10AAAAAAD_-EQ**, Drive **1SE8UhYbm3k6TAYAVOyGwrGYKOHnaQ5z7**.
+양쪽 actual wholeGET각1/retry0, CRC113/payloadSHA112/Gitidentity109(97FINAL owned+12pinned inherited)/extraction113/frozen8/input3 PASS. Git raw key GET3을 양쪽 검증에 공유했으며109개 개별 GET가 아니다. Parent PHYS90 whole archive1/nested restore0다.
+
+MAIN **PHYS91_FINAL_DELIVERY_20261025.json**, **165978 bytes**, SHA256 **db754978dd26d1e05941976c7aab56e385e0287fa4f20ab92cb57cda6ee91103**.
+Dropbox **id:BSpOijBcT10AAAAAAD_-Eg**, Drive **1Pm83AR10ZoUsofQKNmqECRKKVyOdSdn-**. 양쪽 actual original GET각1/retry0/rawSHA/parsedidentity PASS.
+
+보고서·MAIN의 **18/20은 작성 시점 불변 snapshot**이다. 이 중앙 커밋의 actual exact-ref, 이후 외부 **PHYS91_FINAL_DELIVERY_TERMINAL_20261025.json** 양쪽 rawGET/identity, **PR148 최종 본문 actual readback**이 모두 결속되면 R10/C10을 포함한 scoped **20/20**이 닫힌다. 전역 물리 목표 완료율은 **null**이다. 이 문서는 그 후속 작업을 이미 실행한 것으로 꾸미지 않는다.
+
+S0/S1/S2는 actual dual ACK+metadata, stage wholeGET0이다. S2 최초714346-byte ZIP/Dropbox binding 실패와 missingEOCD/diagnostic exit1, causeNOT_ESTABLISHED를 보존했다. 단1회 복원으로 원3408955-byte/SHA53201ac31516ba2a5aa1ce7f3977f000d40497b207e56c5dcf8c2af3721e305d bytes를 정확히 회복했다. Dropbox S2 upload2/Drive1과 FINAL GETretry0은 별도다. Bad S2 ZIP은 FINAL에 opaque 원bytes로 보존하며 inner-validity를 주장하지 않는다. PHYS88 PDF shortening/원본복구·PHYS89 첫 reference 실패·PHYS90 WAITchild0·PHYS91 unpublished S0 runtime loss도 유지한다.
+
+### 전체 DAG에서 남은 물리 계약
+
+선택 부모 **NUCLEAR_BARE_KERNEL_SOURCE_AND_CONSUMER_CONTRACT = PARTIAL_INPUT_DEPENDENCIES**를 유지한다. 다음에는 source-qualified current MT102 full precision/formatter/nominal covariance, actual atomic→bare kernel, mass/electron/target state, energy support/tail B0/BA, named thermal/fast/radiation consumer의 measure/clock/density/ownership을 먼저 결속한다. 새 입력·새 계약으로 영향받는 identity에만 sandbox를 구현한다. B1 미결은 동일4096projection/reference/resume 반복이나 budget reset의 허가가 아니다. HH_R10 **OFF**, production **NOT_ISSUED**.
+
+Fresh survey51 accessible repos/2264 refs/65 pages/51terminal collections, 관련6repo×최근5PR. 전체 비공개 대화나 Drive1000cap 밖·모든 branch contents를 전수 확인했다고 주장하지 않는다. 기존40 contracts/planstatus/dependencies,7authorities,17edges,다른39nodes,기존WU19observations,이전HH30594/25081/11893bytes prefix,고정최초인계0f9d9df825be1dac9ca9bdf73cdc2e8908bcba17,HI57+12와 HE/CR/REC/BASS의 과학·백업 한계를 보존한다. BASS manufactured/CR atomicRR/HI instantaneous strain은 HH nuclear consumer binding이 아니다.
+
+상세 return: returns/WU_PHYS91_GLOBAL_PSD_CERTIFICATE_20261025.json.
