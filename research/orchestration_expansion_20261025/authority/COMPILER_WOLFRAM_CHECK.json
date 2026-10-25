@@ -1,0 +1,16 @@
+{
+  "purpose": "Independent exact symbolic checks of conserved rows, energy/reference convention and isotope guard; algebra only",
+  "time_constraint_seconds": 10,
+  "measured_remote_CPU": "UNOBSERVED_NOT_ZERO",
+  "code": "a={{1,1,0,0,1,2,0,1},{0,0,0,0,0,0,1,1}}; q={0,1,-1,-1,-1,0,0,0}; cols={{-1,1,0,1,0,0,0,0},{-1,0,-1,0,1,0,0,0},{-2,0,0,0,0,1,0,0},{1,0,0,0,0,-1,-1,1},{0,0,1,-1,0,0,0,0}}; nu=Transpose[cols]; cons=Join[a,{q}]; eps={-10,0,0,0,-12,-25,-11,-26}; reservoirs={{0,0,0,0,3},{5,0,0,0,-3},{-15,2,5,0,0},{0,0,0,0,0}}; shifted=eps+Transpose[cons].{lambdaH,lambdaD,lambdaQ}; counter={-1,-1,1,1}; counterA=IdentityMatrix[4]; elem={{1,0,1,0},{0,1,0,1}}; b={1,4,2,3}; z={1,2,1,2}; kirchhoff=FullSimplify[(nuPhoton/(4 Pi)*nLower*(gUpper/gLower)*Exp[-x]*aUL)/(nuPhoton/(4 Pi)*(nLower*(gUpper/gLower)*bUL-nLower*(gUpper/gLower)*Exp[-x]*bUL))/.aUL->2 h nuPhoton^3 bUL/c^2,Assumptions->{x>0,c>0,bUL>0,nLower>0,gLower>0,gUpper>0}]; <|\"chemicalIsotopeResidual\"->a.nu,\"chargeResidual\"->q.nu,\"totalElectronResidual\"->(Total[a]-q).nu,\"energyResidual\"->(eps.nu+Total[reservoirs]),\"referenceChangeResidual\"->Simplify[shifted.nu-eps.nu],\"reverseEnergyResidual\"->Simplify[eps.(-nu)+eps.nu],\"isotopeCounterexample\"-><|\"element\"->elem.counter,\"baryon\"->b.counter,\"nuclearCharge\"->z.counter,\"isotope\"->counterA.counter|>,\"kirchhoffResidual\"->FullSimplify[kirchhoff-2 h nuPhoton^3/(c^2 (Exp[x]-1))]|>",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= <|\"chemicalIsotopeResidual\" -> {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}, \"chargeResidual\" -> {0, 0, 0, 0, 0}, \"totalElectronResidual\" -> {0, 0, 0, 0, 0}, \"energyResidual\" -> {0, 0, 0, 0, 0}, \"referenceChangeResidual\" -> {0, 0, 0, 0, 0}, \"reverseEnergyResidual\" -> {0, 0, 0, 0, 0}, \"isotopeCounterexample\" -> <|\"element\" -> {0, 0}, \"baryon\" -> 0, \"nuclearCharge\" -> 0, \"isotope\" -> {-1, -1, 1, 1}|>, \"kirchhoffResidual\" -> 0|>"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

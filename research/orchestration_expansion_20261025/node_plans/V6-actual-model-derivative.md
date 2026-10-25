@@ -1,0 +1,179 @@
+# V6-actual-model-derivative
+
+Lead: cosmosapjw-quantum/vigilode
+
+Current status: `OPEN_INPUT`
+
+Source: `authority/numerics/VIGILODE_CONTRACTS.json#/nodes/11`
+
+```json
+{
+  "id": "V6-actual-model-derivative",
+  "lead_repo": "cosmosapjw-quantum/vigilode",
+  "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+  "json_pointer": "/nodes/11",
+  "contract": {
+    "id": "V6-actual-model-derivative",
+    "status": "OPEN_INPUT",
+    "dependencies": [
+      "D5-callback-boundary",
+      "V1-affine-native"
+    ],
+    "scope": "Bind one current source-qualified BASS/REI physical RHS,analyticJacobian/JVP and domain to existing native hooks.",
+    "evidence": [
+      "D5 finitewrongJ negativecontrol; current BASS parentB3f scopes"
+    ],
+    "source_status": "PINNED_SELECTED_CONTENT_OR_NAMED_REUSED_EVIDENCE",
+    "execution_status": "EXISTING_EVIDENCE_REUSED; NEW_EXECUTION_NOT_RUN",
+    "admission_status": "OPEN_INPUT",
+    "delivery_status": "Pinned Draft/publication and provider receipts separate; production HOLD",
+    "remaining": "Current native reservation/live dirty unavailable; actual physical input/derivative owner must provide exact source. This does not authorize taking over their branch.",
+    "pr_boundary": "Single consumer-only opt-in PR after owner receipt. Allowednewlane research/v6_actual_model_derivative_20261025; core changes minimal andreviewed.",
+    "equations": [
+      "F_reduced=R F_full(b+Lz);J_reduced=R J_full L for fixed affineR,L; include all time/source derivative dependencies explicitly"
+    ],
+    "acceptance": [
+      "Compare exact analytic/JVP where available",
+      " directional finite-difference checks use fixed physical domain,step-convergence androundoff rather than arbitrarytolerance",
+      " derivative correctnotmerelyfinite"
+    ],
+    "pass_action": "Full33/reduced30 RHS,Jacobian,energy/speciesledger agreement; originalphysicaltol; domain-boundary refusal beforecallback; suppliedproviders immutableperstep",
+    "owner": "VigilODE numerical engine authority; physical input/Jacobian supplied by BASS/REI/atomic owner; current native implementer reservation preserved",
+    "inputs": [
+      "Current native source/reservation/dirty/completion receipt before native edits",
+      "Exact physical model RHS/Jacobian/JVP and domain provider SHA",
+      "Full33/reduced30 maps, physical tolerances, source epoch and derivative policy"
+    ],
+    "units": [
+      "Physical state units per component; J_ij units F_i/y_j; time proper s or declared converted clock; reduced/full norm dimensionless with physical endpoint scales"
+    ],
+    "outputs": [
+      "One named actual-model derivative/source binding",
+      "Full/reduced RHS and Jacobian consistency evidence with nuclei/charge/energy ledger",
+      "Typed domain/unsupported-provider outcomes and scoped native-client admission"
+    ],
+    "failure_disposition": "Preserve accepted prefix, all charged work and raw outcome. Missing owner/source/model bound -> named input dependency; unsupported domain/representation -> typed refusal; substantive numerical/derivative failure -> scientific authority, one bounded authorized repair. Never change default policy/tolerance or reset attempts to obtain PASS.",
+    "independent_review": "A distinct Astra-tier reviewer checks exact frozen model/source, changed code/diff, actual raw controls and scientific claim. Finite interface correctness, derivative correctness and continuous error admission remain separate. Review applies to this actual client; no repeat of unchanged norm/D1-D5/V3/NCP campaigns."
+  },
+  "dependencies": [
+    {
+      "type": "internal",
+      "id": "D5-callback-boundary",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "source_field": "dependencies"
+    },
+    {
+      "type": "internal",
+      "id": "V1-affine-native",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "source_field": "dependencies"
+    }
+  ],
+  "conditional_dependencies": [],
+  "external_prerequisites": [],
+  "current_status": "OPEN_INPUT",
+  "claim_gate": [
+    "Compare exact analytic/JVP where available",
+    " directional finite-difference checks use fixed physical domain,step-convergence androundoff rather than arbitrarytolerance",
+    " derivative correctnotmerelyfinite"
+  ],
+  "pass_next_action": "Full33/reduced30 RHS,Jacobian,energy/speciesledger agreement; originalphysicaltol; domain-boundary refusal beforecallback; suppliedproviders immutableperstep",
+  "budget_status": {
+    "source_review_new": true,
+    "scientific_execution_this_audit": "NOT_RUN",
+    "ncp": false,
+    "heavy_runs": false,
+    "completed_campaign_replay": false,
+    "new_allowance_granted": false,
+    "remaining_wall": null,
+    "remaining_cpu": null,
+    "budget_reset": false,
+    "ownership": "Existing native/REC/history/HE/atomic owners retain active work and dirty files. New adapter work only in assigned isolated lane of existing checkout.",
+    "roles": "Astra frames and admits; lower-tier implements frozen contract; a distinct Astra reviews diff/raw. Requested role is not evidence of observed model identity.",
+    "publication": "central plan update only by root; this authority makes no remote mutations"
+  },
+  "change_class": [
+    "scope_expansion"
+  ],
+  "historical_contract_id": null,
+  "source_fields": {
+    "lead_repo": "source_group_repository",
+    "current_status": "status",
+    "claim_gate": "acceptance",
+    "pass_next_action": "pass_action",
+    "budget_status": "policy"
+  },
+  "pr_plan": {
+    "inputs": {
+      "value": [
+        "Current native source/reservation/dirty/completion receipt before native edits",
+        "Exact physical model RHS/Jacobian/JVP and domain provider SHA",
+        "Full33/reduced30 maps, physical tolerances, source epoch and derivative policy"
+      ],
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/11/inputs",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "equations": {
+      "value": [
+        "F_reduced=R F_full(b+Lz);J_reduced=R J_full L for fixed affineR,L; include all time/source derivative dependencies explicitly"
+      ],
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/11/equations",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "units": {
+      "value": [
+        "Physical state units per component; J_ij units F_i/y_j; time proper s or declared converted clock; reduced/full norm dimensionless with physical endpoint scales"
+      ],
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/11/units",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "domain": {
+      "value": "Bind one current source-qualified BASS/REI physical RHS,analyticJacobian/JVP and domain to existing native hooks.",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/11/scope",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "outputs": {
+      "value": [
+        "One named actual-model derivative/source binding",
+        "Full/reduced RHS and Jacobian consistency evidence with nuclei/charge/energy ledger",
+        "Typed domain/unsupported-provider outcomes and scoped native-client admission"
+      ],
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/11/outputs",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "positive_acceptance": {
+      "value": [
+        "Compare exact analytic/JVP where available",
+        " directional finite-difference checks use fixed physical domain,step-convergence androundoff rather than arbitrarytolerance",
+        " derivative correctnotmerelyfinite"
+      ],
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/11/acceptance",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "failure_disposition": {
+      "value": "Preserve accepted prefix, all charged work and raw outcome. Missing owner/source/model bound -> named input dependency; unsupported domain/representation -> typed refusal; substantive numerical/derivative failure -> scientific authority, one bounded authorized repair. Never change default policy/tolerance or reset attempts to obtain PASS.",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/11/failure_disposition",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "independent_review": {
+      "value": "A distinct Astra-tier reviewer checks exact frozen model/source, changed code/diff, actual raw controls and scientific claim. Finite interface correctness, derivative correctness and continuous error admission remain separate. Review applies to this actual client; no repeat of unchanged norm/D1-D5/V3/NCP campaigns.",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/11/independent_review",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "PR_boundary": {
+      "value": "Single consumer-only opt-in PR after owner receipt. Allowednewlane research/v6_actual_model_derivative_20261025; core changes minimal andreviewed.",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/11/pr_boundary",
+      "qualification": "SOURCE_DECLARED"
+    }
+  }
+}
+```

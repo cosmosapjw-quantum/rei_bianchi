@@ -1,0 +1,167 @@
+# B4-production-restart
+
+Lead: cosmosapjw-quantum/bass
+
+Current status: `NOT_RUN`
+
+Source: `authority/numerics/BASS_CONTRACTS.json#/nodes/14`
+
+```json
+{
+  "id": "B4-production-restart",
+  "lead_repo": "cosmosapjw-quantum/bass",
+  "source_file": "authority/numerics/BASS_CONTRACTS.json",
+  "json_pointer": "/nodes/14",
+  "contract": {
+    "id": "B4-production-restart",
+    "status": "NOT_RUN",
+    "dependencies": [
+      "B3i-calibrated-geometry"
+    ],
+    "scope": "Selected-model restart with full state and budgets",
+    "evidence": [],
+    "source_status": "PROPOSED",
+    "execution_status": "NOT_RUN_THIS_AUDIT",
+    "admission_status": "NOT_RUN",
+    "delivery_status": "See cited source/receipt; distinct from scientific admission",
+    "remaining": "Default activation separate; scientific error equivalence, not blanket byte equality.",
+    "pr_boundary": "B4a checkpoint adapter, B4b one authorized interrupted/resumed comparison.",
+    "inputs": [
+      "accepted state/species/frame/grid/tau,source epochs,attempts,h,output prefix,exchange ledger,cumulative budget,pending source transaction"
+    ],
+    "equations": [
+      "checkpoint retains complete continuation state; fixedL throughH=0"
+    ],
+    "acceptance": [
+      "same source/config; conserved signed sector stress and finite inventories",
+      "restore pending/ack and cumulative work; original tolerances; reject incompatible source",
+      "no reinitializing consumed attempts to0"
+    ],
+    "pass_action": "Selected restart admission feeds B5.",
+    "owner": "BASS with vigilode session owner",
+    "units": [
+      "Same state/clock/units as frozen selected B3i client; work counters dimensionless; CPU/wall seconds; no alternate normalization"
+    ],
+    "outputs": [
+      "Complete versioned selected-client checkpoint and restore mapping",
+      "Interrupted/resumed comparison record within original tolerances",
+      "Cumulative budget/source transaction/output-prefix preservation receipt"
+    ],
+    "failure_disposition": "Preserve raw and last admitted state. Missing physical source/radius -> INPUT_DEPENDENT with exact field; unsupported domain -> typed refusal; numerical/implementation failure -> return to scientific authority for one bounded targeted repair. Do not alter tolerance, replace null by zero, reset cumulative debit or replay unchanged evidence.",
+    "independent_review": "A distinct Astra-tier scientific reviewer reads the frozen per-node contract, changed source/diff, raw outputs, controls and claimed domain; prior unchanged evidence is reused. Scope/closure/tolerance changes require an explicit scientific decision. Admission remains pending until this review; safe source/theory preparation may continue."
+  },
+  "dependencies": [
+    {
+      "type": "internal",
+      "id": "B3i-calibrated-geometry",
+      "source_file": "authority/numerics/BASS_CONTRACTS.json",
+      "source_field": "dependencies"
+    }
+  ],
+  "conditional_dependencies": [],
+  "external_prerequisites": [],
+  "current_status": "NOT_RUN",
+  "claim_gate": [
+    "same source/config; conserved signed sector stress and finite inventories",
+    "restore pending/ack and cumulative work; original tolerances; reject incompatible source",
+    "no reinitializing consumed attempts to0"
+  ],
+  "pass_next_action": "Selected restart admission feeds B5.",
+  "budget_status": {
+    "source_review_new": true,
+    "scientific_execution_this_audit": "NOT_RUN",
+    "ncp": false,
+    "heavy_runs": false,
+    "completed_campaign_replay": false,
+    "new_allowance_granted": false,
+    "remaining_wall": null,
+    "remaining_cpu": null,
+    "budget_reset": false,
+    "ownership": "Existing native/REC/history/HE/atomic owners retain active work and dirty files. New adapter work only in assigned isolated lane of existing checkout.",
+    "roles": "Astra frames and admits; lower-tier implements frozen contract; a distinct Astra reviews diff/raw. Requested role is not evidence of observed model identity.",
+    "publication": "central plan update only by root; this authority makes no remote mutations"
+  },
+  "change_class": [
+    "status_correction",
+    "dependency_change"
+  ],
+  "historical_contract_id": "B4-production-restart",
+  "source_fields": {
+    "lead_repo": "source_group_repository",
+    "current_status": "status",
+    "claim_gate": "acceptance",
+    "pass_next_action": "pass_action",
+    "budget_status": "policy"
+  },
+  "pr_plan": {
+    "inputs": {
+      "value": [
+        "accepted state/species/frame/grid/tau,source epochs,attempts,h,output prefix,exchange ledger,cumulative budget,pending source transaction"
+      ],
+      "source_file": "authority/numerics/BASS_CONTRACTS.json",
+      "json_pointer": "/nodes/14/inputs",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "equations": {
+      "value": [
+        "checkpoint retains complete continuation state; fixedL throughH=0"
+      ],
+      "source_file": "authority/numerics/BASS_CONTRACTS.json",
+      "json_pointer": "/nodes/14/equations",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "units": {
+      "value": [
+        "Same state/clock/units as frozen selected B3i client; work counters dimensionless; CPU/wall seconds; no alternate normalization"
+      ],
+      "source_file": "authority/numerics/BASS_CONTRACTS.json",
+      "json_pointer": "/nodes/14/units",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "domain": {
+      "value": "Selected-model restart with full state and budgets",
+      "source_file": "authority/numerics/BASS_CONTRACTS.json",
+      "json_pointer": "/nodes/14/scope",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "outputs": {
+      "value": [
+        "Complete versioned selected-client checkpoint and restore mapping",
+        "Interrupted/resumed comparison record within original tolerances",
+        "Cumulative budget/source transaction/output-prefix preservation receipt"
+      ],
+      "source_file": "authority/numerics/BASS_CONTRACTS.json",
+      "json_pointer": "/nodes/14/outputs",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "positive_acceptance": {
+      "value": [
+        "same source/config; conserved signed sector stress and finite inventories",
+        "restore pending/ack and cumulative work; original tolerances; reject incompatible source",
+        "no reinitializing consumed attempts to0"
+      ],
+      "source_file": "authority/numerics/BASS_CONTRACTS.json",
+      "json_pointer": "/nodes/14/acceptance",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "failure_disposition": {
+      "value": "Preserve raw and last admitted state. Missing physical source/radius -> INPUT_DEPENDENT with exact field; unsupported domain -> typed refusal; numerical/implementation failure -> return to scientific authority for one bounded targeted repair. Do not alter tolerance, replace null by zero, reset cumulative debit or replay unchanged evidence.",
+      "source_file": "authority/numerics/BASS_CONTRACTS.json",
+      "json_pointer": "/nodes/14/failure_disposition",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "independent_review": {
+      "value": "A distinct Astra-tier scientific reviewer reads the frozen per-node contract, changed source/diff, raw outputs, controls and claimed domain; prior unchanged evidence is reused. Scope/closure/tolerance changes require an explicit scientific decision. Admission remains pending until this review; safe source/theory preparation may continue.",
+      "source_file": "authority/numerics/BASS_CONTRACTS.json",
+      "json_pointer": "/nodes/14/independent_review",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "PR_boundary": {
+      "value": "B4a checkpoint adapter, B4b one authorized interrupted/resumed comparison.",
+      "source_file": "authority/numerics/BASS_CONTRACTS.json",
+      "json_pointer": "/nodes/14/pr_boundary",
+      "qualification": "SOURCE_DECLARED"
+    }
+  }
+}
+```

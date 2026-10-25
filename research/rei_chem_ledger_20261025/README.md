@@ -1,0 +1,23 @@
+# Finite isotope/molecule event interface
+
+`REI-CHEM-LEDGER-01` has independent `PASS_SCOPED` admission for `IMPLEMENTATION_CHECKED_FINITE_ISOTOPE_MOLECULAR_EVENT_INTERFACE`. One bounded scientific child passed249 exact checks:12 chemical events and one nuclear bookkeeping event, plus categorized controls and identities. The historical REI leaf name is retained for provenance; WU088_HH leads the atomic/molecular supplier charter and REI consumes qualified interfaces. WU publication is canonical; central identical source is an immutable integration mirror, with final commit identities resolved by separate delivery receipts.
+
+This standard-library compiler retains arbitrary supplied `(Z,A,isomer)` compositions, signed ionic charge, state and electron-pool identity. It checks chemical isotope/charge conservation or explicitly typed nuclear baryon/charge conservation. Separate reaction sides preserve catalysts and event multiplicity. Independently supplied thermal, fast-electron, radiation and external-source increments are compared with exact internal-energy differences. Source/JVP and conserved-reference changes use `Fraction`; no tolerance, ODE, physical rate or empirical threshold is introduced.
+
+The literal fixture catalog has21 baseline nuclear populations, two distinct electron rows and nine synthetic extension species. Positive fixture definitions comprise12 chemical events, including a two-direction carbon-isotope molecular witness, and one nuclear bookkeeping event with unqualified physical energy. `raw/results.json` records46 catalog,12 chemical,27 photon-count,78 source/JVP,26 reference,12 reverse,26 event-identity,2 nuclear/qualification,17 guard and3 guard-residual checks. These are distinct check categories, not a global physical completion fraction.
+
+The synthetic carbon/isomer labels and all supplied energies are manufactured exact algebra witnesses. Unqualified core energies remain `UNQUALIFIED`. A species schema accepting an anion or molecule establishes no physical bound state or rate. Fast electrons never become heat implicitly. Nuclear isotope changes are reported and never subjected to chemical isotope-reference invariance.
+
+The root-authorized R2 appendix makes the case01 photon count explicit: -1 photon/event at independently supplied15eV, with +1 for its case02 reverse. Count, normalized source, reverse and count-times-energy identities are checked separately from material/charge rows. Other events retain unqualified photon counts.
+
+The completed attempt used the following commands after independent preexecution approval and both backup acknowledgments. These document the actual one-shot execution and grant no rerun permission:
+
+```sh
+python3 -m py_compile research/rei_chem_ledger_20261025/chem_ledger.py research/rei_chem_ledger_20261025/run_checks.py research/rei_chem_ledger_20261025/run_bounded.py
+python3 research/rei_chem_ledger_20261025/run_bounded.py --cpu-seconds 30 --wall-seconds 120 --output research/rei_chem_ledger_20261025/raw
+python3 research/rei_chem_ledger_20261025/plot_saved.py --raw research/rei_chem_ledger_20261025/raw --output research/rei_chem_ledger_20261025/figures/exact_residuals.svg
+```
+
+The scientific child exited0 with CPU0.088983s, wall0.092082s and peakRSS14720KiB. Saved-residual SVG generation and successful Inkscape preview bring known measured CPU to0.352458s and wall to0.362115s. A failed optional CairoSVG import has additional `UNMEASURED_NOT_ZERO` overhead; the exact all-process cumulative-cap claim is therefore not established. Both preparatory syntax checks cost0.144212CPU seconds separately. No retry, scientific rerun or fixture recomputation by the renderer occurred. Independent review actually inspected the PNG and admitted its finite diagnostic scope. First raw outputs and their pending-review wording remain unchanged; final admission is a separate record. Historical L0 debit remains known partial11.449628s, whole debit `UNKNOWN_NOT_ZERO`, historical10.110448/10s overrun; no budget is reset or transferred.
+
+`authority/ROOT_COMPILER_ADMISSION.json`, `review/FINAL_C9_REVIEW.json` and `FINAL_LOOP_EVIDENCE.json` bind the final scoped decision to the unchanged code/raw and actual resources. Global physical completion remains null and L4 readiness false. Atomic/molecular owners can now supply species/channel-qualified inputs and REI can reject duplicate-owned events before physical binding. REC-HD-ADAPTER is a prepared next contract with no execution allowance. This unit closes no physical rate-coverage claim and grants no rerun permission. Git publication and final backup acknowledgments are separate delivery states.

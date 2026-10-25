@@ -1,0 +1,164 @@
+# D4-effect-journal
+
+Lead: cosmosapjw-quantum/vigilode
+
+Current status: `COMPLETE_SCOPED_REUSED`
+
+Source: `authority/numerics/VIGILODE_CONTRACTS.json#/nodes/5`
+
+```json
+{
+  "id": "D4-effect-journal",
+  "lead_repo": "cosmosapjw-quantum/vigilode",
+  "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+  "json_pointer": "/nodes/5",
+  "contract": {
+    "id": "D4-effect-journal",
+    "status": "COMPLETE_SCOPED_REUSED",
+    "dependencies": [
+      "D3-dense-certificate"
+    ],
+    "scope": "Owned bounded callback effect journal and exact-ID ACK barrier.",
+    "evidence": [
+      "PR87 3c8877ea0409495752dcfab42426e679e3ba92d3"
+    ],
+    "source_status": "PINNED_SELECTED_CONTENT_OR_NAMED_REUSED_EVIDENCE",
+    "execution_status": "EXISTING_EVIDENCE_REUSED; NEW_EXECUTION_NOT_RUN",
+    "admission_status": "COMPLETE_SCOPED_REUSED",
+    "delivery_status": "Pinned Draft/publication and provider receipts separate; production HOLD",
+    "remaining": "ACK is caller assertion; arbitrary captures/external I/O and crash durability not closed.",
+    "pr_boundary": "Reuse journal; future durable restart in a separate necessary scientific recovery unit.",
+    "equations": [
+      "Accepted pending batch blocks newbegin until explicitACK; payload stable on repeated delivery"
+    ],
+    "acceptance": [
+      "22newcontracts",
+      "16384protocolcases",
+      "65536rows",
+      "3407872fieldcomparisons",
+      " old science replay0"
+    ],
+    "pass_action": "Use only if the chosen scientific callback creates recorded side effects; keep pure callbacks simpler.",
+    "owner": "VigilODE numerical engine authority; physical input/Jacobian supplied by BASS/REI/atomic owner; current native implementer reservation preserved"
+  },
+  "dependencies": [
+    {
+      "type": "internal",
+      "id": "D3-dense-certificate",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "source_field": "dependencies"
+    }
+  ],
+  "conditional_dependencies": [],
+  "external_prerequisites": [],
+  "current_status": "COMPLETE_SCOPED_REUSED",
+  "claim_gate": [
+    "22newcontracts",
+    "16384protocolcases",
+    "65536rows",
+    "3407872fieldcomparisons",
+    " old science replay0"
+  ],
+  "pass_next_action": "Use only if the chosen scientific callback creates recorded side effects; keep pure callbacks simpler.",
+  "budget_status": {
+    "source_review_new": true,
+    "scientific_execution_this_audit": "NOT_RUN",
+    "ncp": false,
+    "heavy_runs": false,
+    "completed_campaign_replay": false,
+    "new_allowance_granted": false,
+    "remaining_wall": null,
+    "remaining_cpu": null,
+    "budget_reset": false,
+    "ownership": "Existing native/REC/history/HE/atomic owners retain active work and dirty files. New adapter work only in assigned isolated lane of existing checkout.",
+    "roles": "Astra frames and admits; lower-tier implements frozen contract; a distinct Astra reviews diff/raw. Requested role is not evidence of observed model identity.",
+    "publication": "central plan update only by root; this authority makes no remote mutations"
+  },
+  "change_class": [
+    "scope_expansion"
+  ],
+  "historical_contract_id": null,
+  "source_fields": {
+    "lead_repo": "source_group_repository",
+    "current_status": "status",
+    "claim_gate": "acceptance",
+    "pass_next_action": "pass_action",
+    "budget_status": "policy"
+  },
+  "pr_plan": {
+    "inputs": {
+      "value": null,
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": null,
+      "qualification": "NOT_DECLARED_SEPARATELY_IN_SOURCE"
+    },
+    "equations": {
+      "value": [
+        "Accepted pending batch blocks newbegin until explicitACK; payload stable on repeated delivery"
+      ],
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/equations",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "units": {
+      "value": null,
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": null,
+      "qualification": "NOT_DECLARED_SEPARATELY_IN_SOURCE"
+    },
+    "domain": {
+      "value": "Owned bounded callback effect journal and exact-ID ACK barrier.",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/scope",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "outputs": {
+      "value": "Owned bounded callback effect journal and exact-ID ACK barrier.",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/scope",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "positive_acceptance": {
+      "value": [
+        "22newcontracts",
+        "16384protocolcases",
+        "65536rows",
+        "3407872fieldcomparisons",
+        " old science replay0"
+      ],
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/acceptance",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "failure_disposition": {
+      "value": null,
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": null,
+      "qualification": "NOT_DECLARED_SEPARATELY_IN_SOURCE"
+    },
+    "independent_review": {
+      "value": "Astra frames and admits; lower-tier implements frozen contract; a distinct Astra reviews diff/raw. Requested role is not evidence of observed model identity.",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/policy/roles",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "PR_boundary": {
+      "value": "Reuse journal; future durable restart in a separate necessary scientific recovery unit.",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/pr_boundary",
+      "qualification": "SOURCE_DECLARED"
+    }
+  },
+  "runnable": false,
+  "missing_contract_fields": [
+    "inputs",
+    "units",
+    "failure_disposition"
+  ],
+  "execution_readiness_guard": {
+    "source_file": "authority/FINAL_ASSEMBLY_MISSING_FIELDS.json",
+    "scope": "Execution-readiness guard only; retain finite past admissions and source object unchanged",
+    "other_nodes_runnable_not_inferred": true
+  }
+}
+```

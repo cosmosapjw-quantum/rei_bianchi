@@ -1,0 +1,7 @@
+# Root-authorized R2 appendix, 2026-10-25
+
+Root instruction: "case01 explicitphoton_count_per_event=-1, independentphoton_energy_eV=15;reversecase02+1; literalcount/source/reverseandenergy=count*energy checks. Keepcount separatefrommaterialcharge; otherreactions count UNQUALIFIED/unspecified, noimplicit0 ornewphysics."
+
+This bounded preexecution clarification adds the explicit single synthetic photon count already described by the frozen case01. Case01 count is -1 and independently supplied photon energy is exactly15eV. The explicit case02 and generated reversed case01 have count+1 and the same15eV. Count times energy must equal the independently supplied radiation increment. Source and signed-tangent count increments use the same declared event normalization as their material event. The exact expected photon count, energy and increment are literal fixture data, separately compared with observed outputs. Reversing sides negates the signed count and keeps the declared photon energy.
+
+Other cases do not acquire a photon count: their count qualification remains `UNQUALIFIED`, with no implicit0. Photon count is a radiation reservoir datum, never a material species, isotope or charge row. No physical spectrum, rate, tolerance, additional run or budget is introduced. The original `FROZEN_COMPILER_CONTRACT.md` and `THEORY.md` copies remain byte-identical and unchanged; this appendix records the additive root-authorized clarification and independent-review finding R2.
