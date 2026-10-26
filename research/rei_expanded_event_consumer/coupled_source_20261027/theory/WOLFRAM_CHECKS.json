@@ -1,0 +1,31 @@
+{
+  "source_clock": {
+    "code": "ClearAll[x3,x4,lam,gam,k,chi,r,h,dx3,dx4,dl,dr,dh]; s=x3+x4; f=lam s {gam,chi gam,k,-(chi gam+k)}; vars={x3,x4,lam,r,h}; dirs={dx3,dx4,dl,dr,dh}; jvp[v_]:=Sum[D[v,vars[[i]]] dirs[[i]],{i,Length[vars]}]; df=(lam (dx3+dx4)+s dl){gam,chi gam,k,-(chi gam+k)}; <|\"energy_identity\"->Simplify[Total[f[[2;;4]]]],\"per_reference_JVP\"->Simplify[jvp[f]-df],\"physical_source_JVP\"->Simplify[jvp[r f]-(r df+dr f)],\"eta_clock_JVP\"->Simplify[jvp[f/h]-(df/h-f dh/h^2)],\"physical_eta_JVP\"->Simplify[jvp[r f/h]-((r df+dr f)/h-r f dh/h^2)],\"energy_JVP\"->Simplify[Total[df[[2;;4]]]]|>",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Out[1]= <|\"energy_identity\" -> 0, \"per_reference_JVP\" -> {0, 0, 0, 0}, \"physical_source_JVP\" -> {0, 0, 0, 0}, \"eta_clock_JVP\" -> {0, 0, 0, 0}, \"physical_eta_JVP\" -> {0, 0, 0, 0}, \"energy_JVP\" -> 0|>"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    },
+    "remote_cpu_s": "UNKNOWN_NOT_ZERO"
+  },
+  "thermal_augmented_source": {
+    "code": "ClearAll[y2,y3,zeta,gam,lam,k,chi,dy2,dy3,dzeta,dl]; vars={y2,y3,zeta,lam}; dirs={dy2,dy3,dzeta,dl}; rhs=lam y2 {-gam,gam,gam,k,-(chi gam+k)}; jac=Table[D[rhs[[i]],vars[[j]]],{i,5},{j,4}]; dj=jac.dirs; <|\"thermal_particle_source\"->Expand[{2,3,-1}.rhs[[1;;3]]],\"thermal_particle_JVP\"->Simplify[{2,3,-1}.dj[[1;;3]]],\"thermal_electron_source\"->Expand[{1,2,-1}.rhs[[1;;3]]],\"energy_source\"->Expand[chi rhs[[2]]+rhs[[4]]+rhs[[5]]],\"energy_JVP\"->Simplify[chi dj[[2]]+dj[[4]]+dj[[5]]]|>",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Out[1]= <|\"thermal_particle_source\" -> 0, \"thermal_particle_JVP\" -> 0, \"thermal_electron_source\" -> 0, \"energy_source\" -> 0, \"energy_JVP\" -> 0|>"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    },
+    "remote_cpu_s": "UNKNOWN_NOT_ZERO",
+    "preceding_query_error": "First exact query erroneously used charge vector {-1,2,-1} rather than {1,2,-1}; returned 2 Gamma lambda yII. That row is arithmetic setup error and not physical counterexample. Corrected only charge row; renamed jac to avoid Wolfram global J warning."
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "unit": "REI-BLOCKER-CLOSURE-20261026",
+  "status": "FROZEN_FINITE_SAVED_SNAPSHOT_REPRESENTATION",
+  "execution": "delegated bounded current-unit job; no run performed by geometry researcher",
+  "donor_path_from_unit": "intake/donor/event_consumer_20261026/runtime_inputs/endpoint/grid044_history.npz",
+  "donor_sha256": "ae20c278239787c020e45028a6d6804cb9f056b75076a1d5ab045c0a7389733b",
+  "epoch": {"source_z": 2.479, "eta_expression": "log(21/3.479)", "a_expression": "1/3.479", "extrapolation": false},
+  "state_reader": {
+    "knots": "eta, shape201, finite strictly increasing",
+    "state": "atomic_abundance_per_Href, shape21x201",
+    "labels": "atomic_state_labels, shape21",
+    "temperature": "temperature_K, shape201",
+    "bracket": "Find unique k with eta[k]<=eta_star<=eta[k+1]; at exact knot use that stored column; record k,k+1,eta endpoints",
+    "theta": "(eta_star-eta[k])/(eta[k+1]-eta[k]); require0<=theta<=1",
+    "interpolation": "x_star=(1-theta)*x[:,k]+theta*x[:,k+1]; T_star=(1-theta)*T[k]+theta*T[k+1]",
+    "qualification": "New explicit convex finite representation of actual saved prescribed-donor state at exact source epoch; instantaneous counterfactual source pairing",
+    "continuum_state_interpolation_error": null,
+    "exclusions": ["No substitution of z2 endpoint", "No use of atomic_scaled as abundances", "No interpolation of all62 Y without component contract", "No re-evolution under PW19", "No new empirical cosmological-state inference", "No clipping or renormalization of donor isotope inventory"]
+  },
+  "label_mapping": {
+    "donor": ["n","H1_0","H1_1","D_0","D_1","T_0","T_1","He3_0","He3_1","He3_2","He4_0","He4_1","He4_2","Li7_0","Li7_1","Li7_2","Li7_3","Li6_0","Li6_1","Li6_2","Li6_3"],
+    "consumer": ["n","H1I","H1II","DI","DII","TI","TII","He3I","He3II","He3III","He4I","He4II","He4III","Li6I","Li6II","Li6III","Li6IV","Li7I","Li7II","Li7III","Li7IV"],
+    "consumer_to_donor": [0,1,2,3,4,5,6,7,8,9,10,11,12,17,18,19,20,13,14,15,16],
+    "rule": "Verify labels actually read and build exact mapping; array position alone is insufficient"
+  },
+  "normalization": {
+    "r_m3": "1e6*nH_ref_cm3[0]*exp(-3*eta_star)",
+    "independent_reference_expression": "0.19078721280843758*(3.479)^3",
+    "reference_mode": "fixed_comoving_bookkeeping_number",
+    "S_ref_m3_s": 0.0,
+    "beta": "A dot x_star in consumer labels",
+    "nb_m3": "beta*r_m3",
+    "Y": "x_star/beta",
+    "ne_m3": "nb*q dot Y == r*q dot x_star",
+    "ordering": "Interpolate physical per-reference abundances first, normalize second; do not interpolate already normalized native states",
+    "variable_inventory_JVP": "dbeta=A dot dx; dY=(dx-Y*dbeta)/beta; dnb=beta*dr+r*dbeta",
+    "projective_jacobian": "D=(I-Y A^T)/beta; A^T D=0; D*x=0; beta*D is idempotent",
+    "reconstruction_JVP": "d(nb*Y)=r*dx+x*dr"
+  },
+  "geometry": {
+    "reader": "Reuse restored SavedBackground H=exp(PCHIP(logH)); b=Hermite(b-b0,s/H); extrapolation disabled",
+    "s": "H*db/deta",
+    "clock": "proper second native callback; per-eta residual=F/H only when requested",
+    "geometry_in_callback": "background parameters held fixed in state JVP; variable-H directions require quotient term separately",
+    "absolute_elapsed_time": "not required for fixed-epoch local proper-time callback; do not equate linear saved elapsed-time interpolation with exact integral1/H"
+  },
+  "allowed_targeted_checks": [
+    "Input hash,required shapes,unique labels,finite strictly increasing eta; no all-history science replay",
+    "Actual z at bracketing knots agrees with21exp(-eta)-1; eta_star inside donor bounds; theta within[0,1]",
+    "Two input x columns finite and nonnegative; two input temperatures positive; interpolated x nonnegative and T positive without clipping",
+    "Record each isotope total at two endpoints and snapshot; assert snapshot total equals convex endpoint total; constant inventory preservation only if endpoint totals agree within roundoff",
+    "beta positive; A dot Y=1; ne reconstruction; nb*Y=r*x; zero-inventory n/T remains zero only if both endpoint columns are zero",
+    "r reference crosscheck against preserved today normalization using inherited2e-12 relative geometry convention; report residual",
+    "Projective derivative symbolic identities and one direction supplied by main callback contract; no additional finite-difference sweep",
+    "Reuse original geometry reader; evaluate only eta_star and preserve fixed-clock/frame semantics"
+  ],
+  "arithmetic_check_policy": "For dimensionless normalization and linear-map identities use128*binary64_epsilon times natural operand scale; retain explicit zero cases. This checks floating arithmetic, not continuum physical error. Main callback science tolerances remain frozen by its own contract.",
+  "failure_action": "Return typed input/domain/mapping failure and raw values to scientific authority; no interpolation-model change, clipping, broader sampling or newIVP",
+  "claim_limit": "Selected finite donor snapshot and actual REC callback binding; globalV6/REC-HISTORY/L4 gates unchanged",
+  "new_source_time_derivative": null,
+  "new_scientific_local_runs_this_lane": 0
+}

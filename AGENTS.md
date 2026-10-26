@@ -131,3 +131,7 @@ existing worktree. Preserve dirty and untracked files; inspect branch, HEAD,
 remote, and status before changing the checkout. Stage only the paths owned by
 the task. This changes the default for new work and does not rewrite historical
 worktree-bound evidence or remove an existing active worktree.
+
+## Temporary budget policy for the REI continuation (2026-10-26)
+
+The owner approved the pending 10 to 11 CPU-second recovery and authorized future temporary budget increases below 50 percent of the original budget. Record the bounded job, original baseline, proposed temporary ceiling, predicted cost, actual debit and restoration. An increase of exactly 50 percent or more requires separate approval. Compare with the original baseline, never a previous temporary ceiling; preserve cumulative spending and historical unknown costs, without resets, transfers or splitting work to evade the threshold. Restore the original policy ceiling after the bounded unit, retaining any over-baseline balance. This does not change scientific claim gates, reserved producer ownership, the existing NO_MORE_IVPs instruction, or the heavy-execution location policy. Backup and publication remain authorized. The active machine-readable record starts at research/rei_expanded_event_consumer/lumina_resume_20261026/BUDGET_POLICY.json.

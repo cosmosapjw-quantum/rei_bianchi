@@ -1,0 +1,66 @@
+{
+  "unit":"GRID044_FIXED_COVARIANT_SOURCE_PROJECTION_20261024",
+  "version":1,
+  "scope":"Snapshot conservative source-column deposition on actual frozen grid044 donor plus continuous total source/proper-time quadrature. No per-cell time-history integration, IVP, opacity, chemistry or new source channel.",
+  "inputs":{
+    "background_path":"pilot/intake_donor/ANGTHERM01_FINAL/research/rei_angular_thermochemistry_20261023/inputs/background/grid044_history.npz",
+    "background_sha256":"ae20c278239787c020e45028a6d6804cb9f056b75076a1d5ab045c0a7389733b",
+    "config_path":"pilot/theory/MODEL_CONFIG.json",
+    "config_sha256":"c680eff7d1eb3c3a0c9a8414135fe506441a59a8dd102dc54be01f1507037d71",
+    "read_only_adapter_sha256":"a2079d3919a40658daad693707e4d3aaeb43c9891ecdcc36e543822efdfdcbb0",
+    "donor_geometry_source_sha256":"8fcbf90b821706fa01b84fa43bb80fd89f7fca71a2b3115ab69ffbb99d2fa1bb",
+    "identity":"Actual model nonbaryonic massive DM moments with gravity already in saved H/shear. Do not import AX03 stress-free background or another thread's source-exchange adapter."
+  },
+  "background":{
+    "domain_eta":[0,1.9459101490553132],
+    "expected_shapes":{"eta":[201],"H":[201],"b":[201],"s":[201],"nH_ref_cm3":[201],"proper_elapsed_s":[201]},
+    "reader":"Read eta,H,b,s,nH_ref_cm3,proper_elapsed_s from pinnedNPZ. H(eta)=exp(PCHIP(eta_nodes,logH_nodes)); b(eta)=CubicHermiteSpline(eta_nodes,b_nodes-b0,s_nodes/H_nodes); nHref=n0exp(-3eta). Match original Background without instantiating Reduced, RHS or provider.",
+    "geometry":"Normalized coordinate scales Aperp=exp(eta-b),Aparallel=exp(eta+2b), V=exp(3eta). These equal1 at reference eta0. Physical cosmological scale factor a=exp(eta)/21; do not insert21^3 into normalized covariant Jacobian. Proper density nHref comes from donor.",
+    "clock":"eta=ln(a/a_ref),dt/deta=1/H. T(eta)=integral_0^eta 1/H(x)dx, elapsed sincez20. CompositeGL16 and32 on every intersected donor interpolation segment. Saved proper_elapsed_s is diagnostic comparison only, not an exact identity for the interpolation quadrature."
+  },
+  "source":{
+    "physical_parameters":"Reuse both MODEL_CONFIG sources and energy support[5,150]eV, exactly their temperatures/powers/cutoffs/amplitudes/envelope/escape fractions. Stellar fesc0.2 once; externalIGM fesc1; same-parcel RR not injected.",
+    "raw_shapes":"stellar:E^2/expm1(E/(kB*40000K)),kB=1.380649e-23/1.602176634e-19 eV/K; IGM:(E/13.6)^(-2)*exp(-E/100)",
+    "normalization":"This isolated continuous-source projection target uses Z_cont=integral_5^150 raw(E)dE and s(E)=raw/Z_cont. ProductionZ uses GL64 on existing spectral split intervals; independentGL96 confirms. Separately compute exact oldGL2 quadrature Z_old and corresponding meanenergy; report Z_old/Z_cont and both meanenergies. Old config/results remain unchanged and finite-discrete target is not called identical to continuous target.",
+    "rate":"q_s(eta)=A_s*fesc_s*.5*(1+tanh((z_on_s-(21exp(-eta)-1))/delta_z_s)) photons/Href/s",
+    "isotropy":"Reflection-even normal-frame emission integrated over folded mu_b in[0,1] with total weight1; azimuth and opposite hemisphere already integrated, no extra2 or4pi factor.",
+    "excluded_source_tail":"Birth energy outside[5,150] is zero by compact-model definition. Projection-domain missing support inside that model is a separate explicit tail ledger."
+  },
+  "projection":{
+    "Q":"Q=c*|P| in eV for normalized reference covariant momentum P, nu=P_parallel/|P| folded[0,1]",
+    "R":"sqrt((1-nu^2)/Aperp^2+nu^2/Aparallel^2)",
+    "birth_map":"E=Q*R; mu_b=(nu/Aparallel)/R",
+    "jacobian":"dE*dmu_b/(dQ*dnu)=1/(V*R^2)",
+    "number_column":"C_Nij=q*integral_nui^nui+1 integral_Qj^Qj+1 s(QR)/(V R^2) dQdnu",
+    "energy_column":"C_Uij=q*integral_nui^nui+1 integral_Qj^Qj+1 QR*s(QR)/(V R^2) dQdnu",
+    "computational_form":"Inner E bounds max(5,Qlo*R) to min(150,Qhi*R); outer multiplier1/(V R^3). Integrate s(E) and E*s(E) separately, never cell-center energy timesnumber. Empty intersections exactly0.",
+    "angular_splits":"Within each nu cell split wherever any finite positive Q boundary timesR equals5 or150. Skip Qedge0 since positive E cannot equal0*R. R^2=alpha+(beta-alpha)nu^2; solve nu^2=((Eedge/Qedge)^2-alpha)/(beta-alpha). At eta0 alpha=beta, no such angular splits. Only retain real interior cuts. Add native nu cell edges.",
+    "Q_edges_eV":[0,5,13.6,24.59,54.42,100,200,400],
+    "nu_edges":[0,0.25,0.5,0.75,1],
+    "projection_tail":"Separate per-angular-bin Q>400 rates computed from birth-energy intersection E>400R up to150, with no infinite-range quadrature. LowerQ<0 tail identically0. Sum all cells plus tail equals q and q*mean_birth_energy.",
+    "time_units":"Per-proper-second columnsC_N,C_U; per-eta columns=C/H exactlyonce. Proper-volume columns=nHref*C with nHref in cm^-3. Physical comoving-volume columns=a_phys^3*nHref*C.",
+    "snapshots_eta":[0,0.9729550745276566,1.9459101490553132],
+    "quadrature_orders":[32,64],
+    "source_resolved":true
+  },
+  "independent_reference":{
+    "coordinates":"Use normal-frame mu_b and E. D0=sqrt((1-mu_b^2)exp(-2b)+mu_b^2 exp(4b)); Q=E exp(eta)D0, nu=mu_b exp(2b)/D0. Map each covariant angular edge to birth mu using independent direct equations, then radial birth-energy intersection with Q edges. No production map/integrands/roots supplied to oracle.",
+    "quadrature":"ReferenceGL48/96 in normal-frame angular coordinate and innerE, split angular domain at support intersections computed in that coordinate. ZreferenceGL96. Compare reference orders first; all outputs scaled by actual positive q or q*meanE. No nested adaptive integral required.",
+    "clock":"Independent scipy.integrate.quad of1/H andq/H on every donor knot segment, epsabs0,epsrel2e-12,limit50. Integrand may share pinnedHinterpolant because this tests integration of that declared representation; no production GL routine reused. Report warning as HOLD.",
+    "source_totals":"For eta endpoints snapshots, continuous count integral q/Hdeta and energy meanE*thatcount. These scalar totals are not claimed as temporally deposited per-cell histories."
+  },
+  "source_JVP":{
+    "amplitude":"Column is linear in amplitudeA. Derivative dC/dA=C/A for current positiveA; more robust unit-amplitude column. Directionv=(0.3*A_stellar,-0.2*A_IGM) gives exact sum ofunitcolumns*v. Independent central finite difference delta=1e-4 onscaledamplitudes confirms.",
+    "gas_state":"Derivative of prescribed source column with respect to all9ionicfractions is exactly0; no chemistry RHS/Jacobian evaluation. This does not certify coupled-opacity JVP."
+  },
+  "frozen_validation":{
+    "accuracy":{"geometry_relative_or_angle_abs":2e-12,"source_normalization_relative":2e-12,"reference48_vs96_relative_to_total_source":2e-10,"GL32_vs64_relative_to_total_source":2e-10,"projection_vs_independent_relative_to_total_source":2e-10,"partition_number_energy_relative":2e-10,"clock_relative":2e-10,"source_time_relative":2e-10,"source_JVP_scaled_relative":2e-8,"positivity_scaled":2e-13},
+    "denominators":"Actual positiveq orq*meanE, nevermax(1,q). Cellwise errors normalized to whole source rate so vanishing cells do not create fabricated floors. q0 source gives exactzeros; relativeerrorsundefined.",
+    "cases":"Exactly3snapshots*2sources on fixedgrid, GL32/64 and independent48/96; clock and integratedsource at3snapshots; readbackall201donorknotfields; geometrychecknu[0,.1,.5,.9,1],Q[5,30,150]; sourceadditivity; onezeroamplitude; onepairedamplitudeJVP; proper/comovingconversion identity; oldnormalizationcomparison; no sweeps.",
+    "resources":{"CPU_s":10,"wall_s":20,"address_space_bytes":1073741824,"workers":1,"all_attempts_charged":true,"IVPs":0},
+    "failure":"Preserve costs/raw/source; targeted diagnosed repair only inremainingbudget; do not relax tolerances or silently enlarge fixtures/referenceorders."
+  },
+  "preserved_gates":"MainN6HOLD, mainCPU595.225063/600NO_MORE_IVPs, priorcontinuousCDFand signedtransportoperator claims remainseparate. Originalphoton-onlyn/Tstructuralzeros andseparateconditionalnuclear/weaklanepreserved; no newnuclearchannel. No production-bin remapping orangular/spectral convergence claim.",
+  "publication_backup":"No externalGit/PRwrites. Root owns actualdurablebackup receipts; localfiles alone are not backupverification.",
+  "next_obligations":["continuous time-resolved per-cell birth measure onactualdonor","threshold-aware transport andnonlinearopacity coupling","original21-state+allrefinementgates","source-resolvedgas/radiation/work/escapeintegration"]
+}
