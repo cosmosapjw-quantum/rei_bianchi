@@ -1,0 +1,11 @@
+# Coupled followup implementation handoff
+
+The single root-authorized changed-dependency child completed with 15/15 groups passing: eight normalized beta client groups and seven moving exchange groups. Code, contracts and the nine exact input bindings remain unchanged after execution. PREEXEC_MANIFEST.json preserves its chronological scientific NOT_RUN preparation state; attempt01/RECEIPT.json and TEST_RESULTS.json are the actual execution evidence.
+
+normalized_beta_client.py provides a six-state proper-clock RHS, exact provided-jet Jacobian/JVP, pre-provider domain checker and restricted lifted-source oracle. moving_exchange.py provides signed same-current finite-volume reservoir exchange, implicit thermal-cutoff Schur coupling including I0+L*theta_dot, and an explicitly tagged native BED energy coordinate. Tests use conservation, physical-density quotient/reference invariance, independent manufactured analytic expressions and frozen rational references. Prior beta source is reused byte-identically; prior25tests are not replayed.
+
+Raw values include the full manufactured6x6Jacobian, three restricted oracle cases, moving3cell exchange, zero/nonzero mesh coupling and tagged-pair energy ledger. All raw logs, input snapshots, results and resource usage are in attempt01/. The command was python implementation/run_bounded_tests.py. It is consumed and must not be rerun without a new controller decision on a diagnosed changed dependency.
+
+Child CPU0.034406s; wrapper CPU including startup/imports0.028315604s; conservative final-tail debit0.01s. New planning debit0.072721604s, within the0.1s reservation. Child-ledger cumulative8.850973CPU s; known planning execution-boundary subtotal9.874926553/10CPU s. The arithmetic remainder0.125073447CPU s is not new authority. Historical, AST/preexec and closeout metadata costs remain UNKNOWN_NOT_ZERO; no exact all-process cap is certified.
+
+C1–C8 are complete for the frozen implementation scope. C9 awaits independent result review and C10 awaits delivery. Empirical rates, full33/reduced30client admission, actual thermal activation, legacy source remapping and heat remain unadmitted or unspecified. No IVP, quadrature, source-atom scan, old suite or external/Git mutation occurred.
