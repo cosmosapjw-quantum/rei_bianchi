@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "unit_id": "REI-H1-EE-BED-NATIVE-COMPONENTS-20261026",
+  "status": "FROZEN_FOR_IMPLEMENTATION_PREEXEC_REVIEW",
+  "objective": "Actual endpoint warm EE coefficient binding plus independently source-qualified native H BED secondary energy kernel and paired number/energy ledger; no old-network activation.",
+  "canonical_nodes": [
+    "HE-EXP-STOPPING",
+    "HE-CLOSURE",
+    "CR_N4_STOPPING_KERNEL",
+    "REI-EXP-EVENT-CONSUMER"
+  ],
+  "source_reuse": {
+    "H1_measure": "../event_consumer_20261026/implementation/attempt01/SOURCE_PAYLOAD.json",
+    "atom_count": 307200,
+    "atom_sha256": "ccf9e34275c7ac71257173e298d25672116e5661b68691a3672c95226d282347",
+    "atom_scan_authorized": false,
+    "endpoint": "../event_consumer_20261026/runtime_inputs/endpoint/ACTUAL_STATE_BINDING.json",
+    "CR59_commit": "029b2122db4f76f5a639e8ae4d58cf552e71b91d",
+    "CR59_provider_path": "research/cr_coulomb_partition_20261014/coulomb_partition.py",
+    "CR59_provider_sha256": "0fae93ddfd555e1d135606eab51cfe010911c7624f661d27317024cf3f54ba86",
+    "CR99_commit": "4a0bbc0ed618ab6eae1b7b2714e366d803186b86",
+    "completed_CR_paths": "reuse theories and source code; do not execute old suites/finite chains/source histories"
+  },
+  "constants": {
+    "k_B": 1.380649e-23,
+    "e_C": 1.602176634e-19,
+    "eV_J": 1.602176634e-19,
+    "m_e_kg": 9.1093837139e-31,
+    "epsilon0_F_m": 8.8541878188e-12,
+    "c_m_s": 299792458,
+    "h_J_s": 6.62607015e-34,
+    "source": "NIST CODATA2022; constants frozen nominal values, physical constant uncertainties not claimed zero"
+  },
+  "EE": {
+    "dilation_reference": {"T0_K": 10000, "ne0_m3": 140000, "lnLambda0": 20, "test_E0_eV": [1, 10]},
+    "T_K": 14994.847774798709,
+    "n_e_thermal_m3": 5.996197830412253,
+    "lnLambda": 20,
+    "screening": "prescribed constant leading Coulomb logarithm inherited as explicit model; no self-consistent screening admission",
+    "bath_closure": "selected Maxwellian perturbative bath at saved gas T; all pre-existing charge-derived electrons assigned thermal; named conditional closure, no claimed measured distribution",
+    "frame": "same normal tetrad, stationary bath; proper seconds",
+    "theta_eV": 1.2921560049057652,
+    "formula": {
+      "Gamma": "4*pi*n_e*(e^2/(4*pi*epsilon0))^2*lnLambda/m_e^2",
+      "b0": "m_e*Gamma/(eV_J*sqrt(2*eV_J*E/m_e))",
+      "F": "erf(sqrt(x))-2*sqrt(x)*exp(-x)/sqrt(pi); x=E/theta",
+      "D": "theta*b0*F in eV^2/s; Var(dE)=2D dt",
+      "A": "b0*(2*sqrt(x)*exp(-x)/sqrt(pi)-F) in eV/s",
+      "flux": "j=-D*(Nprime+(1/theta-1/(2E))*N)",
+      "bath": "minus SAME kinetic moment, never duplicate b0N heat",
+      "dilation": "a=T1/T0; beta=(ne1*L1/(ne0*L0))*a^(-3/2); A1(aE)=beta*a*A0(E); D1(aE)=beta*a^2*D0(E)",
+      "temperature_dilation": 1.499484777479871,
+      "generator_scale_fixed_log20": 0.00002332570750298759,
+      "mapped_old_R80_eV": 103.37248039246121
+    },
+    "domain": {
+      "query_E_eV": [
+        0.011,
+        150
+      ],
+      "actual_source_support_eV": [
+        0.011132743029032,
+        134.47572072132542
+      ],
+      "outside": "reject outside source-query domain; do not interpret reject as physical zero; no evolving/full-continuum implementation claim"
+    },
+    "references": [
+      {
+        "E_eV": 0.011,
+        "A_eV_s": 9.068498165521886e-10,
+        "D_eV2_s": 6.711149879168271e-12
+      },
+      {
+        "E_eV": 1.2921560049057652,
+        "A_eV_s": -1.0178269496326851e-11,
+        "D_eV2_s": 4.504052818056217e-10
+      },
+      {
+        "E_eV": 13.6,
+        "A_eV_s": -2.5122237407290075e-10,
+        "D_eV2_s": 3.246504189186566e-10
+      },
+      {
+        "E_eV": 134.476,
+        "A_eV_s": -7.990845270737457e-11,
+        "D_eV2_s": 1.032541870085624e-10
+      }
+    ],
+    "physical_diagnostics_reused_Wolfram": {
+      "Debye_electron_m": 3450.94999917283,
+      "Debye_electron_sphere_occupancy": 1032239711216.829,
+      "classical_coupling": 3.263560765742101e-9,
+      "degeneracy": 1.352392421793491e-27,
+      "theta_over_mec2": 0.000002528686219720292,
+      "scope": "model applicability numbers, not quantified global error or actual Maxwell distribution verification"
+    }
+  },
+  "BED": {
+    "provider": "NIST BED Hydrogen, Kim-Rudd1994, native energy-sharing source Eq3",
+    "url": "https://physics.nist.gov/PhysRefData/Ionization/intro.html",
+    "native_reference_query": {
+      "url": "https://physics.nist.gov/cgi-bin/Ionization/diff.pl",
+      "method": "POST",
+      "data": "mol=H&T=30&W=",
+      "raw": "source_raw/nist_H_sdcs_T30.html"
+    },
+    "B_eV": 13.6057,
+    "U_eV": 13.6057,
+    "N": 1,
+    "Ni": 0.4343,
+    "Q": 0.5668,
+    "a0_angstrom": 0.52918,
+    "R_eV": 13.6057,
+    "n": 1,
+    "native_normalization": 0.955,
+    "dfdw_coefficients": [
+      -0.0224728,
+      1.177455,
+      -0.4626461,
+      0.08906479
+    ],
+    "formula": "t=E/B,w=W/B,y=1/(1+w),a=1+w,b=t-w,S=4*pi*a0^2*N*(R/B)^2. k=.955*S/[B*(t+2)]*{(2-Ni)*(a^2+b^2-a*b)/(a^2*b^2)+log(t)*[c2*y^2+c3*y^3+c4*y^4+c5*y^5]/a}. k units Angstrom^2/eV; multiply1e-20 for m^2/eV.",
+    "domain": {
+      "incident_eV": [
+        13.6057,
+        150
+      ],
+      "ejected_W_eV": "0<=W<=(E-B)/2",
+      "below_threshold": "total channel zero; query differential with W>0 invalid because interval empty",
+      "threshold": "kernel can be finite at E=B,W=0 but integration interval width0 gives zero cross section; do not invent nonzero threshold event",
+      "target": "stationary heavy ground-state H1, no recoil; moving-target Maxwell convolution remains open"
+    },
+    "weak_operator": "L_phi(E)=n_HI*v(E)*integral_0^((E-B)/2) k(E,W)*[phi(W)+phi(E-B-W)-phi(E)]dW",
+    "paired_event": {
+      "output_energies_eV": [
+        "W",
+        "E-B-W"
+      ],
+      "number_delta": 1,
+      "HI_delta": -1,
+      "HII_delta": 1,
+      "fast_electron_charge_delta": -1,
+      "binding_gain_eV": 13.6057,
+      "kinetic_loss_eV": 13.6057,
+      "thermal_heat": null,
+      "extra_factor_2": false
+    },
+    "positivity_proof": "a+b=t+1; a²+b²−ab>0. On E<=150, y>=2B/(150+B); polynomial/y² >=c2+(c3+c4)*ymin=0.0964164006908072>0, so k>=0.",
+    "reference_T_eV": 30,
+    "reference_W_eV": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      8.19715
+    ],
+    "reference_nist_printed_A2_per_eV": [
+      0.10547,
+      0.087822,
+      0.074557,
+      0.064511,
+      0.0569,
+      0.051188,
+      0.047005,
+      0.044097,
+      0.042298,
+      0.042065
+    ],
+    "reference_Wolfram_printed_parameter_A2_per_eV": [
+      0.10546955768923585,
+      0.08782361004860531,
+      0.07455836279531523,
+      0.0645118781831357,
+      0.05690083965711604,
+      0.05118870290187729,
+      0.047005519418778785,
+      0.04409811891209168,
+      0.0422988876017703,
+      0.04206518075509015
+    ],
+    "old_network_binding_eV": 13.6,
+    "binding_gap_eV": 0.0057,
+    "old_network_activation": false,
+    "energy_gap_policy": "Independent native ledger only. Reject binding to old13.6 ionic-energy ledger; no invented offset reservoir or silent replacement.",
+    "uncertainty": "native BED approximation, published general total-cross-section accuracy not a pointwise SDCS calibrated uncertainty; no covariance/error bars supplied. NIST rounded parameters and printed table consistency separate from physical model error."
+  },
+  "tests": {
+    "paired_cases_E_W_eV": [[30, 0], [30, 8.19715], [150, 20]],
+    "half_support_binary64": "Accept iff W>=0 and 2*W+B<=E, evaluating this form in binary64; no tolerance or clipping. Endpoint test8.19715 represents the exact decimal half range at30eV. Pair energy remains E-B-W.",
+    "EE_high_precision_relative": 2e-12,
+    "EE_dilation_relative": 2e-12,
+    "EE_zero_flux_scaled": 2e-12,
+    "EE_zero_flux_scale": "D*abs(N)/theta",
+    "BED_high_precision_relative": 2e-12,
+    "BED_native_printed_relative": 0.00005,
+    "BED_native_printed_rationale": "NIST visible a0=0.52918 has half-last-digit relative1e-5, squared contributes1.9e-5; visible Ni=.4343 and SDCS five-significant-digit output add parameter/display effects. 5e-5 is only transcription consistency of rounded native source, independent2e-12 checks exact frozen displayed-parameter formula; not physical accuracy.",
+    "paired_energy_absolute_eV": 3e-13,
+    "integer_count_charge_exact": true,
+    "negative_controls": [
+      "cold drag at0.011eV has opposite sign from full warm drift and must fail warm reference",
+      "drop factor ne or cm^-3 conversion must fail EE absolute anchors",
+      "double-count paired SDCS integral/source factor2 must fail exact one-secondary ledger",
+      "bind native B13.6057 into old13.6ledger must reject",
+      "outsideE/W support invalid; negative density/T/log invalid"
+    ],
+    "minimal_checks": "4 EE anchors+dilation at2points+Maxwellzero current at2points;10BED table pairs+exactpairedledger3points+invalid/negative guards; no numerical integration"
+  },
+  "execution": {
+    "authorized_science": false,
+    "root_GO_required": true,
+    "stdlib_only": true,
+    "CPU_s_combined": 0.15,
+    "wall_s": 2,
+    "memory_bytes": 134217728,
+    "attempts": 1,
+    "source_campaign_planning_prior_CPU_s": 9.689830337,
+    "source_campaign_cap_CPU_s": 10,
+    "source_campaign_remaining_CPU_s": 0.310169663,
+    "reset": false,
+    "old_source_scan": false,
+    "IVP": false,
+    "quadrature": false,
+    "repair": "preserve raw; root decides within remaining budget; no retry automatically"
+  },
+  "claim_status": {
+    "EE": "source-derived analytic coefficient model instantiated at actual endpoint conditional Maxwell bath/prescribedlog",
+    "BED": "newly retrieved native secondary-energy law, positive support and paired ledger derived; old-network activation blocked by binding convention",
+    "full_stopping": "PARTIAL_INPUT_DEPENDENCIES",
+    "thermal_deposition": "not computed",
+    "L4_ready": false,
+    "global_physical_completion": null
+  }
+}
