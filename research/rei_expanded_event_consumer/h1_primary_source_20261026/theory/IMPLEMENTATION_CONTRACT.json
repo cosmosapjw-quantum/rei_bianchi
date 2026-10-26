@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "unit_id": "REI-H1-PRIMARY-SOURCE-MEASURE-20261026",
+  "objective": "Expose positive energy-resolved H1 primary source atoms from unchanged admitted continuous photon history at actual GRID044 endpoint.",
+  "status": "frozen_for_implementation_and_preexecution_review",
+  "dag": {
+    "central_head": "a5db4bac9dafadae29685bbea3cec7f43ab990b2",
+    "nodes": 88,
+    "parent": "REI-EXP-EVENT-CONSUMER",
+    "selected_next": "REI-H1-PRIMARY-DEGRADATION-BINDING-01",
+    "subobligation": "same-source energy-resolved primary input",
+    "L4_ready": false,
+    "global_physical_completion": null
+  },
+  "fixed_inputs": {
+    "endpoint_dir": "recovery/endpoint_s1/research/rei_expanded_event_consumer/grid044_endpoint_20261025",
+    "endpoint_commit": "ad9c0e29453fcb6d66637413b51bf42f08688cf1",
+    "opacity_dir": "recovery/opacity_prior/pilot/opacity_response_20261025",
+    "background_loader": "recovery/opacity_prior/pilot/donor_projection_20261024/implementation/donor_projection.py",
+    "background_loader_sha256": "7aa88cd3d9e365b96b824e44d7bca0419f39d9ec8609f2f730234a50ca4aeebd",
+    "background_contract": "recovery/opacity_prior/pilot/donor_projection_20261024/theory/IMPLEMENTATION_CONTRACT.json",
+    "donor_sha256": "ae20c278239787c020e45028a6d6804cb9f056b75076a1d5ab045c0a7389733b",
+    "provider_dir": "recovery/prior/coupled_collision_20261025/runtime_inputs/provider",
+    "normalizers": "endpoint inputs/AGGREGATE_PAYLOAD.json source_normalizers_reused; do not recompute",
+    "reference": "endpoint ACTUAL_STATE_BINDING.json",
+    "actual_target": "H1_0 by exact species label in actual_abundance_per_ref"
+  },
+  "physics": {
+    "event_id": "photo:H1_0->H1_1",
+    "chi_eV": 13.6,
+    "source_names": [
+      "stellar",
+      "external_IGM"
+    ],
+    "frame": "normal_tetrad_stationary_ground_state",
+    "recoil": 0,
+    "angular_law": null,
+    "thermal_heat": null,
+    "r_m3": 5.151254745827818,
+    "c_m_s": 299792458,
+    "ev_to_J": 1.602176634e-19,
+    "observer_eta": 1.9459101490553132,
+    "birth_support_eV": [
+      5,
+      150
+    ],
+    "observer_band_eV": [
+      13.6,
+      150
+    ],
+    "electron_support_eV": [
+      0,
+      136.4
+    ],
+    "orders_birth_angle_energy": [
+      8,
+      12,
+      16
+    ]
+  },
+  "algorithm": {
+    "instruction": "Extract H1-only positive atom emission from existing opacity_response.production loops preserving time roots/angular cuts/log-E mapping exactly. Use original SavedBackground and native atomic sigma. Never call full production or oracle suite.",
+    "atom_base": "A_sj = ((tw*q/H)*mw)_j * raw_shape(Eb_j,source)*dEb_j*sigma_HI(Egamma_j)/Z_s",
+    "energy": "epsilon_j = Egamma_j-chi",
+    "weight": "w_ref_sj=c*r*y_H1*alpha_s*A_sj",
+    "physical": "w_phys_sj=r*w_ref_sj",
+    "derivative": "dw_ref=c*A*(r*alpha*dy+r*y*dalpha+y*alpha*dr); dphysical=r*dw_ref+w_ref*dr",
+    "array_storage": "uncompressed NPZ arrays: E_observer_eV, E_electron_eV, optionally E_birth_eV; per_source_A and per_source_weight_ref; no JSON serialization of all atoms",
+    "outputs": [
+      "source-qualified H1 primary measure with identity/domain/frame/normalization",
+      "per-source moments/count/energy/CDF at 10.2,13.6,24.59,54.42,100eV",
+      "local derivatives in y_H1,alpha_stellar,alpha_IGM,r",
+      "provider readiness packet: stopping unqualified, thermal null",
+      "raw tests/resource receipt"
+    ],
+    "forbidden": [
+      "synthetic GL2 one-second packet",
+      "inverse reconstruction from saved Gamma/P/K",
+      "new IVP",
+      "full six-channel rerun",
+      "WU compiler reimplementation/recompile",
+      "new stopping/heating fraction",
+      "quadrature refinement/sweep",
+      "changed source normalization/threshold"
+    ]
+  },
+  "acceptance": {
+    "same_quadrature_moments_relative": 5e-12,
+    "same_quadrature_moments_scale": "abs(actual-reference)/abs(reference) for each strictly positive source/quantity",
+    "partition_relative": 3e-12,
+    "partition_scale": "positive absorbed power",
+    "complex_step_derivative_scaled": 2e-12,
+    "complex_step_h": 1e-30,
+    "derivative_scale": "max(abs analytic derivative row entries) per output row; exact-zero rows require exact zero; no max(1) for tiny physical units",
+    "inherited_continuum_response_relative": 0.0001,
+    "inherited_continuum_evidence": "prior saved production/fine/oracle; not rerun, applies original moments only",
+    "finite_support": "all E finite, 13.6<=Egamma<=150, epsilon>=0, all A/weights finite nonnegative; no tolerance clipping",
+    "negative_controls": [
+      "drop factor r: same-moment check rejects",
+      "replace observer E with birth E: energy moment check rejects",
+      "omit chi subtraction: kinetic moment check rejects",
+      "duplicate event owner: reject",
+      "unadmitted HE stopping input: no heat output"
+    ],
+    "boundary_controls": [
+      "y=0 gives exact zero weights and finite analytic derivative",
+      "alpha_s=0 gives exact zero selected source weights and finite derivative",
+      "nonpositive r, negative y/amplitude, wrong frame/reference/source IDs rejected"
+    ],
+    "source_extents": "two additive templates, one physical event owner"
+  },
+  "execution": {
+    "CPU_s": 1,
+    "wall_s": 5,
+    "memory_bytes": 1073741824,
+    "workers": 1,
+    "BLAS_threads": 1,
+    "attempts": 1,
+    "cap_includes": "scientific child including imports and array output, wrapper measured separately",
+    "campaign_prior_CPU_s": 8.201436,
+    "campaign_prior_wall_s": 8.23558345200945,
+    "campaign_cap_CPU_s": 10,
+    "campaign_cap_wall_s": 20,
+    "campaign_remaining_CPU_s": 1.798564,
+    "budget_reset": false,
+    "budget_transfer": false,
+    "repair": "No automatic replay. Preserve failed partial; return diagnosis to controller for one bounded explicitly authorized changed-input/code correction within remaining cumulative budget.",
+    "preexecution_review_required": true
+  },
+  "claims": {
+    "admissible": "finite positive energy-only source measure on same physical endpoint/prescribed history; moment/tangent correspondence after tests+review",
+    "not_admitted": [
+      "stopping",
+      "thermal deposition",
+      "angular electron law",
+      "continuum convergence of new CDF",
+      "live coupled trajectory",
+      "L4",
+      "nuclear rates or Q"
+    ]
+  }
+}
