@@ -1,0 +1,62 @@
+{
+ "unit_id":"REI-COUPLED-FOLLOWUP-20261026-STOPPING",
+ "workflow_version":"1.0.0",
+ "status":"FROZEN_DELTA_ONLY_PREEXEC",
+ "canonical_nodes":["CR_N4_STOPPING_KERNEL","HE-EXP-STOPPING","HE-RESERVOIR","HE-CLOSURE"],
+ "scope":"Exact moving finite-volume number/energy reservoir exchange, implicit conditional electron-Maxwell cutoff law, and explicitly tagged native BED energy-coordinate bridge. No population evolution, deposition calculation or old source semantic replacement.",
+ "reuse":{"provider_repository":"cosmosapjw-quantum/bass_cr","provider_commit":"029b2122db4f76f5a639e8ae4d58cf552e71b91d","provider_path":"research/cr_coulomb_partition_20261014/coulomb_partition.py","provider_sha256":"0fae93ddfd555e1d135606eab51cfe010911c7624f661d27317024cf3f54ba86","existing_law":"moving_interface and bath_energy_rate already implemented; do not claim new continuum theorem or rerun old tests","prior_component_contract":"../../blocker_parallel_20261026/stopping/IMPLEMENTATION_CONTRACT.json","prior_unit_immutable":true},
+ "units":{"energy":"physical kinetic eV unless explicitly tagged","number":"particle count per fixed physical volume","time":"proper seconds","density_trace":"count per fixed physical volume per eV","current":"count per fixed physical volume per second","spatial_expansion_work":"excluded from this local collision component; must have separate owner if activated"},
+ "finite_volume_exchange":{
+   "inputs":["ordered centres e_i>cutoff>0","nonnegative counts n_i","signed centre_velocities edot_i","signed edge_fluxes F_i, length m+1, F_m=0","cutoff c"],
+   "definition":"F=j-w*N is increasing-energy current relative to moving cell edge; mesh velocity is already included exactly once",
+   "count_rhs":"ndot_i=F_i-F_(i+1)",
+   "Phi":"-F_0; positive is resolved to reservoir; negative is physical/reclassification backflow",
+   "resolved_Udot":"sum_i(e_i*ndot_i)+sum_i(edot_i*n_i)",
+   "same_current_moment":"I_h=(c-e_0)*Phi+sum_internal_i((e_i-e_(i-1))*F_i)+sum_i(edot_i*n_i)",
+   "reservoir_Ndot":"Phi",
+   "reservoir_Udot":"c*Phi-I_h",
+   "source_terms":"none in frozen API; birth packets remain separately owned count+physical energy sources",
+   "upper_boundary":"only F_m=0 admitted; nonzero upper current must reject rather than disappear",
+   "returned_claims":{"thermal_heat":null,"irreversible_assimilation":false,"moment_conservative":true,"time_step_positivity_proven":false},
+   "fixture":{"centres":[2,4,7],"counts":[5,6,7],"centre_velocities":[0.1,0.2,0.3],"edge_fluxes":[-2,3,-1,0],"cutoff":1,"count_rhs":[-5,4,-1],"Phi":2,"resolved_Udot":2.8,"same_current_moment":4.8,"reservoir_Udot":-2.8,"omitted_mesh_work_defect":3.8}
+ },
+ "electron_thermal_cutoff":{
+   "inputs":["theta>0 in eV","kappa>0","Nthermal>0","Nedge>=0","signed jedge","signed I interpreted as I0","optional finite signed I_theta_dot=L default0"],
+   "closure":"conditional pure-electron Maxwell caloric reservoir U=(3/2)*Nthermal*theta; this selected closure is not demonstrated by conservation",
+   "equations":{"c":"kappa*theta","h":"1.5*theta","C":"1.5*Nthermal","I_actual":"I0+L*theta_dot","Ceff":"C-kappa*(c-h)*Nedge+L","theta_dot":"(-(c-h)*jedge-I0)/Ceff","cutoff_dot":"kappa*theta_dot","Phi":"cutoff_dot*Nedge-jedge","reservoir_Ndot":"Phi","reservoir_Udot":"c*Phi-I_actual"},
+   "moment_dependency":"DefaultL0 assumes supplied current moment independent of unknown theta_dot. A moving-grid moment must supply L; omission is not allowed merely because previous API had no argument.",
+   "affine_FV_source":{"frozen_state":"all e,c,n,j and selected interface reconstruction traces fixed instantaneously","edge_velocity":"w_i=s_i*theta_dot; s_0=kappa","centre_velocity":"edot_i=r_i*theta_dot","I0":"-(c-e0)*j0+sum_internal(Delta_e_i*j_i)","L":"(c-e0)*kappa*Nedge0-sum_internal(Delta_e_i*s_i*Nedge_i)+sum_i(r_i*n_i)","reconstruction_branch":"If upwind trace depends on motion sign, freeze one branch, solve and require sign consistency; no global single-affine claim across switching branches."},
+   "guard":"Ceff<=0 rejects selected closure branch; report C/Ceff conditioning factor for positive branch, no hidden regularization or tolerance",
+   "fixture":{"theta":1,"kappa":2,"Nthermal":10,"Nedge":1,"jedge":3,"I":4,"Ceff":14,"theta_dot_rational":[-11,28],"Phi_rational":[-53,14],"reservoir_Udot_rational":[-81,7]},
+   "affine_fixture":{"same_inputs_as_fixture":true,"I_theta_dot":2,"Ceff":16,"theta_dot_rational":[-11,32],"Phi_rational":[-59,16],"I_actual_rational":[53,16],"reservoir_Udot_rational":[-171,16]},
+   "singular_fixture":{"theta":1,"kappa":2,"Nthermal_rational":[2,3],"Nedge":1,"Ceff":0},
+   "negative_fixture":{"theta":1,"kappa":2,"Nthermal":0.5,"Nedge":1},
+   "actual_endpoint_activation":false,
+   "missing_actual_inputs":["evolved/reconstructed interface density N(c) and derivative/current","matched grid/moment reconstruction","calibrated Maxwell reduction and boundary/domain error"]
+ },
+ "tag_native_bed_pair":{
+   "input_kind_required":"NATIVE_BED_KINETIC_eV",
+   "Bnative_eV":13.6057,"Btag_eV":13.6,"delta_eV":0.0057,
+   "native_domain":"13.6057<E<=150;0<=W<=(E-13.6057)/2; exact binary64 support2W+B<=E, no clipping",
+   "xi_input":"E+delta",
+   "xi_outputs":["W+delta","E-Bnative-W+delta"],
+   "coordinate_kind":"CHARGE_GAUGE_TAGGED_ENERGY_eV",
+   "true_kinetic_rule":"E=xi-delta; velocity, pressure, stopping, cutoff and Maxwell law use true kinetic E",
+   "charge_gauge":"species energy'=species energy-delta*q; free electron q=-1, every ion receives -delta*q. Total shift=-delta*Qnet is constant for charge-conserving reactions.",
+   "cutoff_covariance":"c_tag=c+delta,h_tag=h+delta,e_tag_i=e_i+delta; I_h and Ceff invariant; resolved_Udot_tag=resolved_Udot-delta*Phi,reservoir_Udot_tag=reservoir_Udot+delta*Phi; physical reservoir energy recovered by subtracting delta*N.",
+   "tagged_threshold":"xi>=Bnative+delta, not13.6",
+   "native_to_tagged_SDCS":"k_tag(xi,omega)=k_native(xi-delta,omega-delta), Jacobian1; no differential kernel recomputation in this delta test",
+   "fixture":{"E":30,"W":0,"xi_input":30.0057,"xi_outputs":[0.0057,16.4],"Btag":13.6},
+   "guards":["reject missing/wrong input_kind, including legacy physical source semantics","reject already-tagged packet","reject native domain violations"],
+   "old_source_activation":false,
+   "physical_reconciliation_claim":"Exact tagged representation and all-charge energy ledger only; legacy primary atoms remain immutable physical-kinetic declaration. Adopting new physical spectrum/threshold/cross-section convention requires separate coherent source remap."
+ },
+ "tests":{
+   "delta_only":true,
+   "groups":["moving3cell exact rational reference and count/energy cancellation","discriminating omitted mesh-work and omitted same-current energy terms","conditional thermal Schur rational reference and caloric identity","zero/negative effective capacity guards","native BED tagged pair and recovered physical energies","charge-gauge total-energy invariant for one ionization event","closed-upper/domain/semantic guards"],
+   "roundoff":{"reference_relative":2e-13,"reference_absolute_for_O1_fixtures":2e-13,"conservation_residual":"<=64*binary64_epsilon*sum(abs(contributing terms)); if sum0 demand exact0","rationale":"finite sums/products/division in tiny fixed O(1) rational fixtures; slack covers binary64 rounding only, not model error"},
+   "no_old_checks":true,"no_atoms":true,"no_grid_refinement":true,"no_quadrature":true,"no_IVP":true
+ },
+ "execution":{"authorized":false,"root_GO_required":true,"new_local_scientific_runtime_by_theory_worker":false,"root_combined_delta_CPU_cap_s":0.1,"proposed_science_child_CPU_cap_s":0.05,"attempts":1,"old_planning_CPU_s":9.802204949,"old_lineage_cap_CPU_s":10,"unmeasured_overhead":"UNKNOWN, not zero","no_budget_reset_or_transfer":true},
+ "claim_limits":{"full_stopping_complete":false,"canonical_node_increment":0,"global_L4_ready":false,"thermal_deposition":null,"source_uncertainty_unchanged":true}
+}
