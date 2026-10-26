@@ -2,7 +2,7 @@
 
 Lead: cosmosapjw-quantum/bass_cr
 
-Current status: `SOURCE_INTAKE_PROPOSED`
+Current status: `ADMITTED_SCOPED_SELECTED_INSTANTANEOUS_SOURCE`
 
 Source: `authority/thermal/rec_bianchi/research/program_expansion_20261025/TASK_ASSIGNMENT.json#/tasks/3`
 
@@ -149,3 +149,7 @@ Source: `authority/thermal/rec_bianchi/research/program_expansion_20261025/TASK_
   }
 }
 ```
+
+## Scoped status observation (2026-10-26)
+
+The selected exact PW19 z=2.479 instantaneous He II external source passes the original source gate in this scope. Native finite-support moments, a conservative local residual/JVP, and the SI consumer-facing event/state handoff were independently reviewed. See `research/rei_expanded_event_consumer/lumina_resume_20261026/ADMISSION.json`, `review/VALIDATION.json`, and raw `implementation/run01/MOMENTS.json` (SHA-256 `4856cabb34ee24d3c626b795cb1098b228e752c857dda1dc874fe4583deb936e`). The historical source contract in the JSON block above is unchanged. REC-EXP-SPECTRAL live consumption, L4, thermal heat, and the selected full physical pilot remain open. Next action: couple this selected trace to H6/REC-FIELD under its original interfaces.
