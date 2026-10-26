@@ -2,7 +2,7 @@
 
 Lead: cosmosapjw-quantum/rec_bianchi
 
-Current status: `SOURCE_INPUT_PENDING`
+Current status: `ADMITTED_SCOPED_PW19_HEII_NATIVE_CONTINUUM`
 
 Source: `authority/thermal/rec_bianchi/research/program_expansion_20261025/TASK_ASSIGNMENT.json#/tasks/2`
 
@@ -145,3 +145,7 @@ Source: `authority/thermal/rec_bianchi/research/program_expansion_20261025/TASK_
   }
 }
 ```
+
+## Scoped status observation (2026-10-26)
+
+The actual PW19 z=2.479 He II source was consumed by the unchanged native REC21 rate/evaluate path at a finite adjacent-η GRID044 snapshot. The original 82/84 checks and two failures remain in `implementation/run01/`; only the two hydrogen/electron FD checks were repaired with h=0.01 (from 0.0001) at the same 2e-8 threshold. See `research/rei_expanded_event_consumer/blocker_closure_20261026/ADMISSION.json`, `review/VALIDATION.json`, original raw `implementation/run01/CALLBACK.json` and `CHECKS.json`, and `implementation/repair01/HYDROGEN_REPAIR.json`. Their SHA-256 values are in the adjacent status observation. The original source contract in the JSON block above is unchanged. This is a selected local native continuum/source-energy scope, not a causal source history, gas heat, L4 or final physical pilot.
