@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "unit": "REI-COUPLED-SOURCE-20261027",
+  "authority_head": "413729993919d21895e2196cc65f0c1c007e8614",
+  "execution": "NOT_RUN_ROOT_GO_REQUIRED",
+  "selected_original_node": "REC-COUPLED",
+  "expected_admission": "PARTIAL_SOURCE_ONLY_AUGMENTED_OPERATOR",
+  "completed_before": 32,
+  "total_original": 88,
+  "expected_count_effect": 0,
+  "L4_ready": false,
+  "interfaces": {
+    "provider": "PW19HeIINetwork.evaluate(Y,T_K,lambda,nb)['photo_rhs']",
+    "linearization": "native _Gphoto and source amplitude product",
+    "energy": "PW19HeIINetwork.selected_photo_ledger; admitted per-band moments",
+    "snapshot": "blocker_closure_20261026/implementation/run01/CALLBACK.json#snapshot",
+    "native_state_order": "n,H1I,H1II,DI,DII,TI,TII,He3I,He3II,He3III,He4I,He4II,He4III,Li6I,Li6II,Li6III,Li6IV,Li7I,Li7II,Li7III,Li7IV",
+    "augmented_order": [
+      "Y[21]",
+      "zeta_nonthermal_electrons_per_baryon",
+      "w_nt_J_per_baryon",
+      "w_external_signed_J_per_baryon",
+      "log_T_over_1K"
+    ],
+    "thermal_count": "(1+q).Y-zeta",
+    "electron_count": "q.Y; zeta is subset, never added again",
+    "source_only": true,
+    "full_native_RR_DR_decay_evolution": false,
+    "full63_drop_in": false
+  },
+  "inputs": [
+    {
+      "path": "research/rei_expanded_event_consumer/blocker_closure_20261026/implementation/pw19_rec_callback.py",
+      "sha256": "5cb2601b98639345bca4f6f1a39536ed8924b1c6ad37cb109e974267a4705000"
+    },
+    {
+      "path": "research/rei_expanded_event_consumer/blocker_closure_20261026/implementation/run01/CALLBACK.json",
+      "sha256": "df5d289dac63d01200cbbffb30fb8c52e6760fc06748c3588c7f26c5d1e12e7e"
+    },
+    {
+      "path": "research/rei_expanded_event_consumer/blocker_closure_20261026/intake/rec119/code/atomic_network.py",
+      "sha256": "baecce07aded483fa60006cc576feff67d068c0d70394f7095abacc6d47eaa80"
+    },
+    {
+      "path": "research/rei_expanded_event_consumer/lumina_resume_20261026/implementation/run01/MOMENTS.json",
+      "sha256": "4856cabb34ee24d3c626b795cb1098b228e752c857dda1dc874fe4583deb936e"
+    },
+    {
+      "path": "research/rei_expanded_event_consumer/lumina_resume_20261026/intake/provider/data/z_02.479000.csv",
+      "sha256": "f93db0bb33dc6b7011cc0490f96253a489e5c7cd20cba99005b1461a3e56a5d1"
+    }
+  ],
+  "domain": {
+    "source_z": 2.479,
+    "photon_eV": [
+      54.42,
+      50000
+    ],
+    "primary_electron_eV": [
+      0,
+      49945.58
+    ],
+    "density": "nb>0",
+    "temperature": "T>0",
+    "source_amplitude": "lambda>=0",
+    "state": "Y>=0, A.Y=1",
+    "nonthermal_count": "0<=zeta<=q.Y",
+    "thermal_count": "(1+q).Y-zeta>0",
+    "clock": "proper second; eta quotient optional with H>0",
+    "reference": "fixed comoving reference, S_ref=0",
+    "isotope_model": "ElementalElectronicEquality_He3_He4_conditional",
+    "thermalization": "pre-assimilation source operator; no stopping law",
+    "uncertainties": {
+      "provider": null,
+      "model": null,
+      "isotope": null,
+      "continuum_interpolation": null
+    }
+  },
+  "gates": [
+    {
+      "id": "REC-COUPLED",
+      "original": "Selected source gates,independent oracle,observable error allocation; U5holds retained",
+      "supplied": "admitted selected photo source, exact augmented count/energy operator, explicit per-band component oracle, source arithmetic tests proposed",
+      "remaining": [
+        "actual bounded execution and independent review",
+        "qualified full thermal couplings or explicit admitted selected closure",
+        "physical/provider/interpolation observable error allocation",
+        "separate convergence where required",
+        "original owner admission"
+      ],
+      "status": "PARTIAL"
+    },
+    {
+      "id": "REC-EXP-COUPLED",
+      "depends_on": [
+        "REC-COUPLED"
+      ],
+      "remaining": [
+        "full coupled residual/JVP including selected thermal/history state",
+        "signed matter/radiation stress",
+        "selected source IC/error gates"
+      ],
+      "status": "GATED"
+    },
+    {
+      "id": "REI-EXP-EVENT-CONSUMER",
+      "status": "ALREADY_PASS_SCOPED",
+      "count_effect": 0
+    },
+    {
+      "id": "REI-L2",
+      "status": "OPEN_PHYSICAL_BETA_DAUGHTER_AND_STOPPING_INPUTS",
+      "new_evidence_for_gate": false
+    }
+  ],
+  "tolerances": {
+    "analytic_component_and_conservation": 2e-14,
+    "analytic_scale": "positive event/power or natural operand scale; no max(1,tiny)",
+    "finite_difference_if_used": 2e-8,
+    "centered_step_if_used": 0.01,
+    "physical_error": null,
+    "full_old_suite_replay": false
+  },
+  "budget_proposal": {
+    "target_child_CPU_s": 1,
+    "hard_child_CPU_s": 1.5,
+    "wall_s": 8,
+    "memory_MiB": 512,
+    "workers": 1,
+    "BLAS_threads": 1,
+    "planning_prior_known_CPU_s": 11.766889911,
+    "root_temporary_total_cap_CPU_s": 14,
+    "original_cap_CPU_s": 10,
+    "main_known_CPU_s": 595.225063,
+    "main_cap_CPU_s": 600,
+    "new_IVP": 0,
+    "remote_Wolfram_CPU_s": "UNKNOWN_NOT_ZERO",
+    "authorization": "ROOT_ONLY"
+  },
+  "no_replay": [
+    "prior82 passing native checks",
+    "prior2 repaired H finite differences",
+    "prior83/13/72",
+    "spectral quadrature/moments",
+    "original249 compiler checks",
+    "donor trajectory/interpolation",
+    "ANGTHERM01/02",
+    "C3/localflow/D10",
+    "HE101 reserved work",
+    "full native21/33/63/30 client suites"
+  ],
+  "outputs": [
+    "actual source/JVP arrays and component oracle residuals",
+    "thermal/nonthermal electron count and energy ledger",
+    "bad-allthermal source comparison",
+    "physical density and eta tangent controls",
+    "domain/owner rejection controls",
+    "exact input/output identities and resource receipt"
+  ],
+  "scientific_axes": {
+    "symmetry_gauge": "isotropic normal tetrad; passive rotations; no boost",
+    "invariants": "isotope/baryon/charge plus selected count/energy and JVP",
+    "observable": "instantaneous abundance/electron/power and pre-assimilation thermal response"
+  }
+}
