@@ -13,10 +13,10 @@ https://github.com/cosmosapjw-quantum/rei_bianchi/blob/78f7ac5864d5817ceb79b48cb
 - 기준 PR237 최종 SHA: ee6746ab172f862dddfdec63b59e5e3707b59eaa
 - 이 단위 경로: research/rei_expanded_event_consumer/cr_integrated_return_20261027
 - C5 동결 코드 commit: cae5a309efb432fc2cdfada74a3529fce78de777
-- 최종 source snapshot commit: C10 게시 후 FINAL_DELIVERY_RECEIPT에 기록
-- Source ZIP SHA256: 포장 후 별도 receipt에 기록
-- Source ZIP Drive: 최종 receipt 확인
-- Source ZIP Dropbox: 최종 receipt 확인
+- 최종 source snapshot commit: 73aefa0cc4fcf1bbe428e6bcad84d7eb3c5e3f82
+- Source ZIP SHA256: 7da8a4919f029160434089448c722ca844518d9d5c266d67b8f85f108bd85464
+- Source ZIP Drive: 1F5TfMecJPVsu3a_548k668EJEmaTYDLT
+- Source ZIP Dropbox: id:BSpOijBcT10AAAAAAEDGFg
 - 별도 delivery ZIP SHA256: 자기참조 없는 사후 Git receipt 확인
 - 현 branch HEAD와 AGENTS는 시작할 때 실제로 다시 읽어라. 이 문서의 포함 commit을 HEAD로 추정하지 마라.
 
