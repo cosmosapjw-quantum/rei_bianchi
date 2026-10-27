@@ -1,0 +1,68 @@
+{
+  "schema": "REI_CAUSAL_PREFIX_C5_STATIC_REVIEW_V1",
+  "reviewer": "/root/theory_27c",
+  "independence": "Reviewer did not author or execute consumer, checker, or runner.",
+  "verdict": "GO_BOUNDED_SINGLE_C6_STATIC",
+  "reviewed_files": [
+    "FROZEN_CONTRACT.md",
+    "implementation/consumer.py",
+    "implementation/checker.py",
+    "implementation/run_bounded.py",
+    "implementation/IMPLEMENTATION.md",
+    "implementation/INPUT_MANIFEST.json"
+  ],
+  "scientific_execution_by_reviewer": 0,
+  "concrete_blockers": [],
+  "mathematical_assessment": {
+    "sharpness": "Correct for the interval/monotonicity/cap information polytope only. Source dynamics impose possible additional constraints and are not reconstructed.",
+    "contiguous_windows": "Prefix lower and suffix upper closure, exact sharp gap formula, feasible full-chain extremizers, and all contiguous windows agree with the derived contract.",
+    "variable_normalization": "Feasible rectangle corners plus diagonal endpoints only when their intersection is nonempty correctly enumerate the two-endpoint linear objective extrema.",
+    "independent_oracle": "checker.py derives endpoint bounds directly from original inequalities and enumerates feasible vertices without calling closure/window.",
+    "si_and_ownership": "Raw N_cm3 and E_eV_cm3 convert exactly once to SI before native25, quotient, endpoint and JVP evaluations. One common pair supplies all signed reservoirs; binding plus fast plus retained-photon energy cancels exactly. Native25 stays unchanged and the photon port remains separate.",
+    "quotient_and_endpoint_jvp": "Scalar quotient and reference endpoint JVP formulas include ds, db, dduration, dba and dbb. The reference correction is retained. The repaired clock wrapper now exposes and routes independent ddt and ddeta, checked against existing exact quotient returns.",
+    "fd_nonvacuity": "The named source summaries have strictly positive first nonzero-horizon N and E lower endpoints for all six source alternatives. The a=1,b=6 checks therefore distinguish missing reference corrections and missing dba terms. Centered finite differences use two frozen step sizes and operand-scale residuals.",
+    "information_product": "The N by E product is an outer information set, not a supplied physical correlation or reconstructed history. Cases/source alternatives are never added."
+  },
+  "source_and_runtime_assessment": {
+    "input_manifest": "implementation/INPUT_MANIFEST.json records four raw files whose paths, byte counts, Git blobs and SHA256 values agree with supplier observations.",
+    "immutable_binding_gate": "Root-authorized mechanical assembly freezes current amended contract, preparation INPUT_MANIFEST, three Python files and four raw inputs. Raw source hashes are reused from the verified input manifest and the runner verifies actual bytes before attempt creation. EXECUTION_GO binds PREEXEC_MANIFEST SHA256. Actual start awaits root's C5 publication/backup and explicit start message.",
+    "source_validation": "Canonical IDs, case/source/operator/bath/projection identities, all six disjoint bins, signed rational maps, binary64 endpoint hex and exact large-integer clock ratios are checked.",
+    "nulls": "Missing recipient b leaves the native projection null; missing eta leaves eta average null. Actual source history, recipient density, pointwise RHS and physical state update are not promoted.",
+    "attempt_contract": "One exclusive attempt, .12 child plus .04 wrapper plus .02 held receipt tail equals .18 CPU reserve; wall 5 s, 512 MiB and 1 CPU-second hard failsafe. Resource targets are distinct from the hard failsafe and must be judged from saved receipts.",
+    "rerun_policy": "No automatic replay; raw stdout/stderr and failure observations are preserved. A child science PASS cannot override a resource-target failure.",
+    "contract_snapshot_supersession": {
+      "preparation_contract_sha256": "df40257f7d7edc985eed4d7854b0754691c9372aa22da1b63791985aa77f21d3",
+      "current_amended_contract_sha256": "57218d1d5c8312650aea6b478a11e8200b30197376f170950ae91ea564195b54",
+      "meaning": "Preparation input manifest remains a historical byte-preserved snapshot; current PREEXEC manifest contract binding is authoritative for this attempt."
+    }
+  },
+  "scope_limits": [
+    "Provider PR108 final executed C9 remains publicly unverified at HEAD 2776752de6952f60d8d690a128f33fec4df2c57b.",
+    "No source spectrum, continuous injection history, recipient density, exposure, physical stopping criterion or pointwise RHS is supplied.",
+    "No source alternative aggregation, physical-trajectory completion, global DAG promotion or L4 completion.",
+    "No benchmark, import, compilation or scientific execution was performed by this reviewer."
+  ],
+  "accounting": {
+    "cumulative_reader_process_CPU_s_including_startup": 0.049244357,
+    "accounting_rule": "This replaces earlier partial reader cumulative observations; do not add them.",
+    "separate_R6_named_read_CPU_s": 0.000290754,
+    "unknown_not_zero": [
+      "apply_patch backend",
+      "remote/tool/LLM",
+      "reader output/receipt tail after last observed CPU sample",
+      "functions metadata-only SHA256 assembly",
+      "One rejected apply_patch metadata replacement; no file mutation occurred."
+    ],
+    "reader_session_retained_for_followup": 69938
+  },
+  "next_gate": "Static C5 GO only for one already bounded C6 attempt. Root must complete C5 publication/backup and send explicit start before executor runs. Saved-resource C9 acceptance remains separate; no automatic rerun.",
+  "resolved_findings": [
+    {
+      "id": "C5_CLOCK_DIRECTIONS",
+      "location": "implementation/consumer.py:clock_averages",
+      "finding": "The same **direction, including dduration, is passed to both proper-time dt and dimensionless deta quotient calls. The wrapper therefore cannot represent the frozen independent directions ddt=(17/100)dt and ddeta=-(9/100)deta. checker.py tests each quotient separately, but its wrapper use currently checks only missing eta.",
+      "minimal_repair": "Give clock_averages explicit ddt and ddeta parameters; pass ddt only to the proper-time quotient and ddeta only to the eta quotient. Add one exact wrapper-consistency assertion using the already frozen directions and existing quotient outputs. No new suite or scientific rerun is requested.",
+      "resolution": "Confirmed in named current files: explicit ddt/ddeta parameters route to their respective quotients; one exact wrapper comparison uses the frozen independent directions."
+    }
+  ]
+}
