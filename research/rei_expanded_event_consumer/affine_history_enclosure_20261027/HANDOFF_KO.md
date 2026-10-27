@@ -81,3 +81,14 @@ UNKNOWN_NOT_ZERO는0으로바꾸지않는다.
 
 필요한게시·백업권한은기존승인을유지한다.
 독립검토→expectedSHA/nonforcepush→sourceZIP→Drive/Dropbox완료ACK→DAG/인계를따른다.
+
+## 이번 source의 실제 전달
+
+Source commit: 1cdd07426e8f24abad9de0b9236721ce09c272a9
+Source ZIP: REI_AFFINE_HISTORY_SOURCE_20261027_1cdd07426e8f.zip
+SHA256: 09718fb602784a52750c5a9958a6832f672d13f1897327b2c67d30418df78e35
+Bytes: 73259; payload11files+ARCHIVE_AUTHORITY1.
+Drive: 1B-b_r0lPaAFl_sX2nP9fu7AF13f7dyGj
+Dropbox: id:BSpOijBcT10AAAAAAEDHcA
+양쪽completed ACK 및size일치. Source11fileGitblob/size일치. 새과학실행0.
+최종metadataZIP·최종presentation실측·원래cap복원은delivery/FINAL_DELIVERY_RECEIPT.json에서읽는다.
