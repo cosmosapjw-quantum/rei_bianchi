@@ -1,0 +1,80 @@
+{
+  "schema": "REI_CAUSAL_PREFIX_R6_THEORY_REVIEW_V1",
+  "reviewer": "/root/theory_27c",
+  "role": "Astra independent scientific reviewer; contributed preliminary mathematical proposal; did not author implementation",
+  "reviewed_contract": "FROZEN_CONTRACT.md",
+  "baseline_REI": "c0e76fb13785dd6aab45e056ee54d2b318ca8f41",
+  "provider_containing_commit": "2776752de6952f60d8d690a128f33fec4df2c57b",
+  "decision": "PASS_DERIVED_SCOPED_WITH_C5_CLARIFICATIONS",
+  "mathematical_blocking_findings": [],
+  "implementation_preexec_pending": true,
+  "findings": [
+    {
+      "id": "R6_UNITS",
+      "severity": "preexec_clarification",
+      "status": "root_clarification_requested",
+      "target": "Reference and clock derivatives; generic f=N or E",
+      "detail": "Source F_N is cm^-3 and F_E is eV cm^-3 whereas b is m^-3. The correlated map gives the correct conversions, but the endpoint/JVP APIs must explicitly use SI-converted values or carry c_N=10^6 and c_E=10^6*eV_J in every formula.",
+      "required_resolution": "Root/C5 must specify the unit of every normalized scalar and confirm one-time SI conversion. No source values are changed."
+    },
+    {
+      "id": "R6_DIAGONAL",
+      "severity": "preexec_clarification",
+      "status": "root_clarification_requested",
+      "target": "Clipped two-endpoint polygon vertices",
+      "detail": "Include diagonal vertices only if d_lo=max(l_a,l_b)<=d_hi=min(u_a,u_b). Each included candidate must satisfy both endpoint intervals and x<=y; deduplicate exact degeneracies.",
+      "counterexample": "For [l_a,u_a]=[0,1] and [l_b,u_b]=[2,3], the rectangle has no diagonal intersection. Unconditionally adding (2,2) or (1,1) fabricates a zero gap although the true minimum is1.",
+      "required_resolution": "Explicit conditional diagonal insertion; retain overlapping, disjoint and degenerate exact controls."
+    },
+    {
+      "id": "R6_DIVISOR_DIRECTION",
+      "severity": "validation_requirement",
+      "status": "C5_manifest_required",
+      "target": "Proper/eta average JVP FD direction",
+      "detail": "The contract does not yet state numerical ddt and ddeta. At least one nonzero direction for each divisor is required to exercise the corresponding quotient term; the latent source witness remains frozen.",
+      "required_resolution": "Freeze nonzero divisor directions before the sole scientific attempt, and preserve that these are interface derivatives rather than source horizon sensitivities."
+    }
+  ],
+  "proof_assessment": {
+    "monotone_closure": "Correct. Prefix lower l and suffix upper u are nondecreasing; every feasible chain lies between them. l<=u makes either l or u a feasible chain, including zero horizon and all-time cap.",
+    "contiguous_bounds": "Correct and sharp over the interval-monotonicity information polytope. The stated upper and lower witnesses satisfy every original interval and adjacent ordering.",
+    "upper_witness": "Before b choose l_i; from b choose max(l_i,u_b). Then F_a=l_a,F_b=u_b and the value is u_b-l_a.",
+    "lower_witness": "Let c=min(u_a,l_b). Before a choose min(u_i,c); from a choose max(l_i,c). Since l_a<=c<=u_a, this gives F_a=c,F_b=l_b and value max(0,l_b-u_a).",
+    "endpoint_projection": "Exact. Every feasible chain projects to [l_a,u_a]x[l_b,u_b] intersect x<=y. Conversely, any such pair(x,y) extends by F_i=min(u_i,x) for i<a; F_i=max(l_i,x) for a<=i<b; F_i=max(l_i,y) for i>=b. Hence vertex extrema of the clipped rectangle are exact for the normalized endpoint linear objective.",
+    "endpoint_objective": "At fixed positive b_a,b_b, F_b/b_b-F_a/b_a is linear in the two endpoint latent values. Clipped-rectangle vertices suffice, including degenerate boundaries, subject to R6_DIAGONAL.",
+    "correlated_lift": "Correct for a common N,E pair: charge and thermal-particle changes cancel; binding+fast+retained energy is identically zero. Independent reservoir interval corners are not joint events.",
+    "reference_decomposition": "s(F_b/b_b-F_a/b_a)=s(F_b-F_a)/b_b+sF_a(1/b_b-1/b_a). Full differentials in s,b_a,b_b preserve this identity at a frozen witness.",
+    "clock_average": "Integrated increments are clock invariant. Average_eta=(dt/deta)*average_proper is valid for supplied positive bin widths; an arbitrary endpoint H does not replace dt/deta.",
+    "manufactured_clock": "eta(T)=T/Tstar+(T/Tstar)^2 gives deta=(T_b-T_a)*(1/Tstar+(T_a+T_b)/Tstar^2), positive on the frozen nonnegative horizons.",
+    "nonsmooth_boundary": "No unconditional smooth derivative of an active max/min vertex is established or required. Witness/interface JVP scope is correctly restricted."
+  },
+  "limitations": [
+    "Sharpness applies only to the information polytope, not to the fixed-K semigroup family.",
+    "P_N x P_E is an outer information set; additional true N/E correlations remain unknown.",
+    "Provider final C9 numerical admission is pending in the observed public evidence; conversation claims do not promote it.",
+    "Actual continuous injection/history, recipient nb, exposure, physical pointwise RHS, spectrum and physical stopping remain null.",
+    "Conditional pulse-bin averages are not actual continuous injection rates.",
+    "The six case/source alternatives cannot be summed as one history; cumulative views are not additional events.",
+    "The new .18 CPU single-attempt allocation is an execution contract, not measured success. Actual total cost, exit and raw evidence must be checked at C9 without replay."
+  ],
+  "acceptance_scope": {
+    "working_DAG": "32/88",
+    "central_DAG": "27/88",
+    "original_delta": 0,
+    "L4_ready": false,
+    "global_physical_completion": null,
+    "new_strong_no_go": false,
+    "novelty_claim": false
+  },
+  "actual_work": {
+    "named_contract_read": true,
+    "scientific_execution": false,
+    "code_execution": false,
+    "Wolfram_execution": false,
+    "full_DAG_scan": false,
+    "measured_named_read_CPU_s": 0.0002907540000000007,
+    "patch_write_CPU": "UNKNOWN_NOT_ZERO: apply_patch backend not locally timed",
+    "earlier_process_startup_CPU": "UNKNOWN_NOT_ZERO"
+  },
+  "next": "Root resolves the three C5 clarifications; then independent code-read review and one authorized bounded attempt."
+}
