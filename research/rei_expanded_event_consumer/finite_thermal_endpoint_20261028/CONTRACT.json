@@ -1,0 +1,76 @@
+{
+  "schema": "REI_FINITE_THERMAL_ENDPOINT_CONTRACT_V1",
+  "unit": "finite_thermal_endpoint_20261028",
+  "repository": "cosmosapjw-quantum/rei_bianchi",
+  "branch": "research/rei-causal-prefix-consumer-20261027",
+  "base_commit": "da525e474a1fb583931897e82808c92101f963c3",
+  "base_tree": "b68c97af6a0dcd87b94a33b364683f1dbf1e06dd",
+  "owned_repo_prefix": "research/rei_expanded_event_consumer/finite_thermal_endpoint_20261028/",
+  "question": "Construct an exact finite common-volume caloric endpoint map, residual transport, tangent and interval bounds from separately owned gas energy, particle-count and geometry-work ports.",
+  "new_contribution_relative_to_PR237": "PR237 supplies a differential conditional thermal source/JVP. This unit derives finite endpoint reconstruction, source-defect sensitivity and composition across changes of reference volume. It does not recompute or replace that source.",
+  "source_pins": {
+    "bass_science": "634c3046ffccc5d00f1ab7588b5834a6eb8053ad",
+    "bass_raw_blob": "a9ea559f123da6c8f1fe070139bc80145d4582fc",
+    "bass_raw_sha256": "a0fa9b5237481e66f178f19eb1589607412d9d1188d7fb571e5df03b67fd93ac",
+    "bass_raw_bytes": 3554206,
+    "storage_code_blob": "ee8afb928445e5c32abb2e1477fcfa1cd618f417",
+    "storage_science_snapshot": "d9a1c4c4252f1b7b4c868fb2cb817a879f503cd5",
+    "thermal_PR237_science": "600503e559eb5763a97dad6ae6d661761bc9b02a",
+    "central": "7de02b3e05705ead4eeb313c8487a21d4e6876a6"
+  },
+  "conventions": {
+    "N": "Thermal translational-particle count per common initial reference volume V0; includes ions/atoms and thermal electrons once, excludes fast electrons.",
+    "U": "Gas translational energy J per V0, excluding binding/excitation and radiation stores.",
+    "c": "Specified positive per-particle constant heat capacity in J/K; physical monatomic choice 3*k_B/2 is conditional on matched bath EOS.",
+    "Q": "Signed integrated gas event-energy port per V0, already SI.",
+    "W": "Signed stored gas geometry work per V0, already integrated; no second adiabatic factor.",
+    "R": "Positive Vb/V0; proper endpoint densities U/R and N/R.",
+    "temperature": "T=U/(c*N). Exact rational T and positive log argument; no numerical log evaluation is required for the algebraic implementation.",
+    "count_projection": "For selected H-only transaction dN=dNeutral+dIon+dThermalElectron=sum(dFine)+dContinuum; retain source baryon/count defects.",
+    "normalization": "Integrated events carry no 1/H. R and positive baryon normalization cancel in temperature but remain in individual density/abundance coordinates."
+  },
+  "theorems": [
+    "Finite ideal endpoint: Nhat=Na+dN, Uhat=c*Na*Ta+Q+W, That=Uhat/(c*Nhat), requiring Na,Ta,c,Nhat,Uhat positive.",
+    "Saved route: Nb,Ub authoritative; rN=Nb-Nhat, rE=Ub-Uhat retained, never repaired or clipped; Tb=Ub/(c*Nb). Initial EOS mismatch is separately reported when a saved Ua is supplied.",
+    "Tb-That=(rE*Nhat-Uhat*rN)/(c*Nhat*(Nhat+rN)); conditional absolute bound with supplied eN<Nhat and eE.",
+    "Exact endpoint JVP and logT JVP, with all count, energy, c, volume and normalization directions explicit.",
+    "Positive independent U,N intervals map to [Ulo/(c*Nhi),Uhi/(c*Nlo)]; this is an enclosure without independence and sharp only for the full Cartesian box.",
+    "Two segment composition: convert second local-V1 increments with R1 before adding to the first V0 ledger.",
+    "General differentiable caloric EOS has unique bracketed endpoint if strictly increasing with positive derivative lower bound; inverse error and JVP follow. No unspecified general EOS solver is implemented."
+  ],
+  "implementation": {
+    "language": "Python standard library, fractions.Fraction exact arithmetic",
+    "requested_executor": "existing lower-tier prepare_delivery_repair agent; requested gpt-6.1-sol, observed runtime model not independently measured",
+    "allowed_paths": ["implementation/finite_thermal.py", "implementation/test_finite_thermal.py", "implementation/run_once.py", "implementation/README.md"],
+    "functions": ["finite_endpoint", "saved_endpoint_diagnostics", "endpoint_jvp", "proper_coordinates", "normalized_coordinates", "temperature_interval", "temperature_error_bound", "compose_local_segments", "selected_h_thermal_count"],
+    "acceptance": "Exact Fraction identities for rational fixtures; fixed independent cross-multiplied oracles; no float tolerance, fitting, quadrature, IVP, external provider rerun or existing-suite rerun.",
+    "tests": ["zero event", "positive Q with falling T", "negative Q with rising T", "signed geometry work once", "nonzero source residual preserved", "endpoint/tangent independent identities", "R and nb cancellation including tangents", "source count residual retained", "reference-volume composition", "positive-box enclosure", "inadmissible zero/negative endpoints", "unknown physical radii stay None", "atomic/hidden energy excluded", "missing physical binding yields null native25 and physical temperature"],
+    "runtime_status": "NOT_RUN_PENDING_EXPLICIT_RESEARCH_RESOURCE_CEILING",
+    "default_runner": "Refuse without an explicit authorization JSON bound to this unit and exact command/source identity. Prepare one attempt only, no automatic retry; report full child CPU via wait4 and separately supervisor-prefix/tail/outer-command obligations."
+  },
+  "physical_admission": {
+    "actual_source_matched_bath": null,
+    "actual_recipient_nb": null,
+    "actual_caloric_EOS": null,
+    "actual_native25": null,
+    "actual_temperature_update": null,
+    "physical_error_radii": null,
+    "full_state_update": false,
+    "note": "A matched positive particle count and caloric EOS are needed for physical temperature; nb additionally binds abundance/native25. CR110's distinct 100K bath is not this BASS recipient."
+  },
+  "resource_state": {
+    "new_science_execution_authorized": false,
+    "planning_known_cumulative_cpu_s": "15.929490885",
+    "last_explicit_planning_cap_cpu_s": "16",
+    "presentation_known_measured_reserved_lower_cpu_s": "48.263016494",
+    "last_explicit_presentation_cap_cpu_s": "47",
+    "packaging_proposal_cap_60_reserve_8": "NOT_APPROVED",
+    "original_baseline_planning_presentation": [10, 30],
+    "main_cpu_s": "595.225063/600",
+    "main_policy": "NO_MORE_IVPs",
+    "unknown_cost": "UNKNOWN_NOT_ZERO",
+    "allowed_now": "derivation, source reading, code authoring, static independent review, stage publication and raw UTF8 backups",
+    "no_reset_transfer_or_repack": true
+  },
+  "dag": {"working_complete":33,"central_complete":28,"total":88,"ids":88,"edges":17,"increment":0,"L4_ready":false,"global_physical_completion":null}
+}
