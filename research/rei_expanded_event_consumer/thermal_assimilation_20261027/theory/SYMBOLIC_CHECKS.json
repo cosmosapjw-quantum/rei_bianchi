@@ -1,0 +1,34 @@
+{
+  "scope": "Light exact symbolic derivation checks only; no local scientific runtime; remote cost UNKNOWN_NOT_ZERO",
+  "algebra1": {
+    "command_file": "SYMBOLIC_ALGEBRA1.wl",
+    "timeConstraint_s": 10,
+    "purpose": "assimilation caloric derivative and reference/clock quotient identities",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Symbol::undefined2: Warning: Global symbols \"H, R, Q, B, B, H, B, H, B, H, H, R, H, R, H, Q, H, Q\" are undefined.\nClearAll::wrsym: Symbol C is Protected.\nGeneral::messages: Messages were generated which may indicate errors.\n\nOut[1]= <|\"assimilation_caloric_energy\" -> 0, \"assimilation_number\" -> 0, \"assimilation_total_energy\" -> 0, \"assimilation_directional_derivative\" -> 0, \"compton_regular_quotient_derivative\" -> 0, \"reference_expansion_cancellation\" -> 0|>"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    },
+    "warning_note": "First ClearAll included protected C. Its attempt to clear that symbol issued a warning; no assignment to C was needed. Six exact residuals returned zero. Preserved verbatim; no physical numerical inference."
+  },
+  "algebra2": {
+    "timeConstraint_s": 15,
+    "code": "ClearAll[\"Global`*\"];\nbeff=b+c*Exp[-t2/temp];uu=Sqrt[temp/t0];vv=Sqrt[temp/t1];alpha=aa/(uu*(1+uu)^(1-beff)*(1+vv)^(1+beff));db=c*Exp[-t2/temp]*t2/temp;\nslope=-1/2-(1-beff)*uu/(2*(1+uu))-(1+beff)*vv/(2*(1+vv))+db*(Log[1+uu]-Log[1+vv]);\nad=cc*temp^(-3/2)*Exp[-ed/temp];\nqnet=nu*w+qc-loss;cs=rc+nu*z;fl=(qnet/theta-cs)/chi;\nbc=(8*kk/3)*ur*(tr/temp-1);\nchecks=<|\"joint_energy\"->FullSimplify[(chiph*ep+rb)+(kp-nu*w)+(-chiph*ep-kp-qc+loss-rb)+theta*(chi*fl+cs)],\"joint_thermal_count\"->FullSimplify[(ep+rc)-(ep-nu*z)-cs],\"rr_fit_logT_derivative\"->FullSimplify[temp*D[alpha,temp]-alpha*slope,Assumptions->{temp>0,t0>0,t1>0}],\"dr_fit_logT_derivative\"->FullSimplify[temp*D[ad,temp]-ad*(-3/2+ed/temp),Assumptions->temp>0],\"recombination_thermal_density_JVP\"->FullSimplify[(D[(nb+h*dnb)*(g+h*dg)*(aa+h*da)*(yy+h*dy),h]/.h->0)-(dnb*g*aa*yy+nb*dg*aa*yy+nb*g*da*yy+nb*g*aa*dy)],\"planck_logT_derivative\"->FullSimplify[temp*D[bc,temp]+(8*kk/3)*ur*tr/temp],\"planck_scale_factor_derivative\"->FullSimplify[(D[(8*kk/3)*ur*Exp[-4*h*dlna]*(tr*Exp[-h*dlna]/(temp*Exp[h*dell])-1),h]/.h->0)+(8*kk/3)*ur*((5*tr/temp-4)*dlna+(tr/temp)*dell)],\"moment_control_number_difference\"->(1-(1/2+1/2)),\"moment_control_energy_difference\"->(2-(1/2*1+1/2*3)),\"energy_weighted_rate_control_difference\"->(2^2-(1/2*1^2+1/2*3^2))|>;\nchecks",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Out[1]= <|\"joint_energy\" -> 0, \"joint_thermal_count\" -> 0, \"rr_fit_logT_derivative\" -> 0, \"dr_fit_logT_derivative\" -> 0, \"recombination_thermal_density_JVP\" -> 0, \"planck_logT_derivative\" -> 0, \"planck_scale_factor_derivative\" -> 0, \"moment_control_number_difference\" -> 0, \"moment_control_energy_difference\" -> 0, \"energy_weighted_rate_control_difference\" -> -1|>"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    },
+    "interpretation": "Nine exact zeros and the expected -1 discriminating second-moment difference; no numerical quadrature or IVP."
+  }
+}
