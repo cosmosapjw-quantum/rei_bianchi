@@ -16,7 +16,13 @@
     "metadata_reservation_actual_known": "0.229571720",
     "metadata_reservation_overrun": "0.029571720",
     "new_prospective_closing_metadata_reserve": "0.250000000",
-    "overrun_scope": "Read-only C9 metadata scan; original .20 reservation preserved, actual excess debited; no retroactive within-bound claim; scientific checks unchanged."
+    "overrun_scope": "Read-only C9 metadata scan; original .20 reservation preserved, actual excess debited; no retroactive within-bound claim; scientific checks unchanged.",
+    "closing_reservation_actual_components": {
+      "C9_metadata_writes": 0.001663541,
+      "root_budget_write": 0.000919016,
+      "visual_review": 0.004601956,
+      "DAG_mechanical_update": 0.154160372
+    }
   },
   "presentation": {
     "inherited": "33.948087957",
@@ -29,7 +35,6 @@
     "stage_packing_receipts": [
       {
         "stage": "R1",
-        "packing_CPU_s": 0.0025603339999999974,
         "metadata_CPU_s": 0
       },
       {
@@ -101,9 +106,30 @@
         "stage": "C5",
         "packing_CPU_s": 0.061942558,
         "metadata_CPU_s": 0.021175060000000002
+      },
+      {
+        "stage": "C6",
+        "packing_CPU_s": 0.311947129,
+        "metadata_CPU_s": 0.053166042999999996
+      },
+      {
+        "stage": "C7",
+        "packing_CPU_s": 0.060936149,
+        "metadata_CPU_s": 0.0040275279999999955
+      },
+      {
+        "stage": "C8",
+        "packing_CPU_s": 0.082034028,
+        "metadata_CPU_s": 0.018026352999999995
       }
     ],
-    "helper_authoring_CPU_s": 0.027666807
+    "helper_authoring_CPU_s": 0.027666807,
+    "figure_authoring_CPU_s": 0.035159921,
+    "figure_render_measured_CPU_s": 4.972565719,
+    "figure_render_tail": 0.05,
+    "figure_render_charged_CPU_s": 5.022565719,
+    "known_subtotal_CPU_s": "41.541173227",
+    "through_stage": "C8"
   },
   "main": {
     "used": 595.225063,
@@ -135,5 +161,29 @@
     "wall_s": 0.305686018,
     "RSS_KiB": 12800,
     "reruns": 0
+  },
+  "operational_exceptions": {
+    "source_extraction": {
+      "prospective_CPU_s": 0.15,
+      "actual_CPU_s": 0.184582739
+    },
+    "first_metadata_reservation": {
+      "prospective_CPU_s": 0.2,
+      "actual_known_CPU_s": 0.22957172,
+      "excess_debited": 0.02957172
+    },
+    "figure": {
+      "prospective_CPU_s": 4,
+      "measured_CPU_s": 4.972565719,
+      "charged_CPU_s": 5.022565719,
+      "within_limits": false,
+      "rerender": 0
+    },
+    "DAG_update": {
+      "prospective_CPU_s": 0.06,
+      "measured_CPU_s": 0.154160372,
+      "within_job_estimate": false,
+      "inside_closing_reservation": true
+    }
   }
 }
