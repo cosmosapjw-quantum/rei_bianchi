@@ -92,3 +92,17 @@ Drive: 1B-b_r0lPaAFl_sX2nP9fu7AF13f7dyGj
 Dropbox: id:BSpOijBcT10AAAAAAEDHcA
 양쪽completed ACK 및size일치. Source11fileGitblob/size일치. 새과학실행0.
 최종metadataZIP·최종presentation실측·원래cap복원은delivery/FINAL_DELIVERY_RECEIPT.json에서읽는다.
+
+## 최종 metadata 전달과 한도 복원
+
+Metadata commit: 604ce141ad1175f86b66fd0377c53e450edda65b.
+Metadata ZIP: REI_AFFINE_HISTORY_METADATA_20261027_604ce141ad11.zip.
+SHA256: 6b2f99f9f530b4edc5a022987e8e2ea8ae51e90dee66999e3ea2fb014965ff7c.
+Bytes24100,payload5+authority1. Drive1zUElvDFyTrigaTfiwCBwe-iQISbLGnpW,
+Dropboxid:BSpOijBcT10AAAAAAEDHcQ. 양쪽completed ACK와size일치.
+최종Git는이metadata의자기ACK를기록하는후속commit이다. 실제HEAD를조회하라.
+
+이번presentation실측은sourcehelper.078435+metadatahelper.080408=.158843CPU s.
+기존43.578719494와새finaltail.05를유지한총액43.787562494.
+원래policycapplanning10/presentation30으로복원했고모든누적액과HOLD를보존했다.
+새수치실행0,기존재실행0,원DAG32/88·27/88·증분0,L4false.
