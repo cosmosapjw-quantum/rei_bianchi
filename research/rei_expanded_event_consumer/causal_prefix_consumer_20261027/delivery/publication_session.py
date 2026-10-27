@@ -29,8 +29,14 @@ def execute(request):
         packet={'files':[packet_entry(p) for p in dict.fromkeys(paths)]}
         if request.get('packet_path'):
             path=Path(request['packet_path']);path.parent.mkdir(parents=True,exist_ok=True)
-            path.write_text(json.dumps(packet,ensure_ascii=True,separators=(',',':'))+'\n',encoding='ascii')
+            encoded=json.dumps(packet,ensure_ascii=True,separators=(',',':'))+'\n'
+            path.write_text(encoded,encoding='ascii')
+            if request.get('metadata_only'):
+                return {'packet_path':str(path),'packet_chars':len(encoded),'packet_bytes':len(encoded),
+                        'files':[{k:v for k,v in entry.items() if k!='content'} for entry in packet['files']]}
         return {'packet':packet}
+    if operation=='stop':
+        return {'stopping':True}
     if operation=='pack':
         old_argv,old_stdin=sys.argv,sys.stdin
         output=io.StringIO();errors=io.StringIO();code=0
@@ -71,3 +77,5 @@ for line in sys.stdin:
                   budget_owner='PRESENTATION',report_tail='included in next operation; final tail UNKNOWN_NOT_ZERO')
     last=cumulative
     print(json.dumps(result,ensure_ascii=True,separators=(',',':')),flush=True)
+    if result.get('stopping'):
+        break
