@@ -229,3 +229,12 @@ Scoped physical-input pair-observable reference accepted with event, daughter-co
 ROOT decision: `ACCEPT_SCOPED_PHYSICAL_INPUT_REFERENCE_WITH_WORKFLOW_PARTIAL`. Local DAG: 8 complete + 1 partial + 3 physical open /12; central 28/88, HE delta 0. Validation 14/14 PASS, scientific suite 1. Saved-only plot 1, scientific calls 0; CPU 7.040661/6 s FAIL. Workflow PARTIAL; no all-checks PASS, physical activation, new budget or rerun. Existing owner, dependencies, status, claim gates and budget remain unchanged.
 
 Observation: `status/HE_EXP_KINEMATIC08_20261028.json#/observations/HE-EXP-CLOSURE`; actual source and dual backup identities: `status/HE_EXP_KINEMATIC08_20261028.json#/final_identities`. Central publication flags in that file are a `PRE_CAS_CANDIDATE_SNAPSHOT`; the actual post-CAS external receipt is authoritative.
+
+
+## AZIMUTH09 scoped observation — 2026-10-28
+
+Certified finite-sector paired-event reference accepted with event/count and rest-energy ownership kept explicit. Declared azimuth and manufactured density do not supply actual birth/deposition/thermalization or global species closure.
+
+ROOT decision: `ACCEPT_SCOPED_FINITE_AZIMUTH_REFERENCE`. Local DAG: 9 complete + 1 partial + 3 physical open /13; central 28/88, HE delta0. One validation22/22 PASS; one Wolfram call109/109 literal zeros plus2 true comparisons, remote CPU unknown/null. One saved-data plot PASS CPU2.053974/8 s; scientific imports/calls0. Workflow COMPLETE_SCOPED only for this reference. KINEMATIC08 plot7.040661/6 s FAIL, PARTIAL and reserve0 remain unchanged. Existing current status, owner, dependencies, budgets and physical gates remain unchanged; no new execution or physical activation.
+
+Observation: `status/HE_EXP_AZIMUTH09_20261028.json#/observations/HE-EXP-CLOSURE`; actual source/dual-backup identities: `status/HE_EXP_AZIMUTH09_20261028.json#/final_identities`. Central publication flags are a PRE_CAS_CANDIDATE_SNAPSHOT; later actual post-CAS external receipt is authoritative.

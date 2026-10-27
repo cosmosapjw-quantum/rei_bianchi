@@ -225,3 +225,12 @@ Exact declared A,M,e physical-input conditional preimage reference accepted. Sha
 ROOT decision: `ACCEPT_SCOPED_PHYSICAL_INPUT_REFERENCE_WITH_WORKFLOW_PARTIAL`. Local DAG: 8 complete + 1 partial + 3 physical open /12; central 28/88, HE delta 0. Validation 14/14 PASS, scientific suite 1. Saved-only plot 1, scientific calls 0; CPU 7.040661/6 s FAIL. Workflow PARTIAL; no all-checks PASS, physical activation, new budget or rerun. Existing owner, dependencies, status, claim gates and budget remain unchanged.
 
 Observation: `status/HE_EXP_KINEMATIC08_20261028.json#/observations/HE-CLOSURE`; actual source and dual backup identities: `status/HE_EXP_KINEMATIC08_20261028.json#/final_identities`. Central publication flags in that file are a `PRE_CAS_CANDIDATE_SNAPSHOT`; the actual post-CAS external receipt is authoritative.
+
+
+## AZIMUTH09 scoped observation — 2026-10-28
+
+Scoped finite-azimuth shared-event reference accepted. Distinct-daughter coincidence, hit/count bounds and conditional ratios do not supply physical common-temperature/velocity closure or thermal admission.
+
+ROOT decision: `ACCEPT_SCOPED_FINITE_AZIMUTH_REFERENCE`. Local DAG: 9 complete + 1 partial + 3 physical open /13; central 28/88, HE delta0. One validation22/22 PASS; one Wolfram call109/109 literal zeros plus2 true comparisons, remote CPU unknown/null. One saved-data plot PASS CPU2.053974/8 s; scientific imports/calls0. Workflow COMPLETE_SCOPED only for this reference. KINEMATIC08 plot7.040661/6 s FAIL, PARTIAL and reserve0 remain unchanged. Existing current status, owner, dependencies, budgets and physical gates remain unchanged; no new execution or physical activation.
+
+Observation: `status/HE_EXP_AZIMUTH09_20261028.json#/observations/HE-CLOSURE`; actual source/dual-backup identities: `status/HE_EXP_AZIMUTH09_20261028.json#/final_identities`. Central publication flags are a PRE_CAS_CANDIDATE_SNAPSHOT; later actual post-CAS external receipt is authoritative.
