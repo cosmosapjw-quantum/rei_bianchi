@@ -1,3 +1,13 @@
+# 최종 전달 결속
+
+Source snapshot: `aef787c1e94f8eb41425702c2f0a4118d03a3ca2`
+
+R1–R10/C1–C10의 **20개 단계 체크포인트 모두 Git 게시 및 Drive/Dropbox 완료 ACK**가 있다. 과학적으로 완료된 단계는15/20이며 partial3개·blocked2개다. 원래 DAG는 작업32/88·중앙27/88·증분0이다.
+
+전체97개 owned source file의 복원 가능한 UTF-8 JSON bundle: **369710 bytes**. Drive `1_YNa7hliwoMPplZQ3yEobnFG2uX5svLM`, Dropbox `id:BSpOijBcT10AAAAAAEDHwQ`. Drive original bytes를 원문 UTF-8 bytes와 대조했고 양쪽 metadata 크기가 일치했다. 이 bundle은 ZIP이 아니며, whole-unit ZIP은 자원 승인 대기다.
+
+단계별20개 commit·ACK·상태는 WORKFLOW_RECORD.json, 전체 판정은 FINAL_DECISION.json, 마지막 전달은 delivery/FINAL_DELIVERY_RECEIPT.json과 delivery/FINAL_ACK_INDEX.json에 있다. 마지막 ACK index의 자기 백업 ACK는 최종 대화 전달에만 붙여 무한한 자기참조를 만들지 않는다.
+
 # 다음 대화 인계 — REI finite-cohort enclosure
 
 ## 재개 위치
@@ -42,7 +52,7 @@ test blob:0b7d410fa8cc3543adc5047954e16a9aec300d1d
 
 작업32/88, 중앙27/88, 증분0. 기존88IDs/17edges와 이전 계약·status를 보존한다. L4_ready=false, global_physical_completion=null.
 
-Causal 이전 sole run3189/3189PASS, 재실행0.6source·36canonicalbin·126sourcewindow·252scalarwindow,264interface derivative·528FD를 재사용한다. Max saved FD relative residual2.7094758927889796e-10, 기준2e-8. 원문4개와 PREEXEC를 재사용하고 큰 정수를 다시 직렬화하지 않는다.
+Causal 이전 sole run3189/3189PASS, 재실행 0회. 6 source·36 canonical bin·126 source window·252 scalar window,264 interface derivative·528 FD를 재사용한다. Max saved FD relative residual2.7094758927889796e-10, 기준2e-8. 원문4개와 PREEXEC를 재사용하고 큰 정수를 다시 직렬화하지 않는다.
 
 l=prefix max lower, u=all-time cap을 적용한 suffix min upper, window=[max(0,l_b-u_a),u_b-l_a].
 Sharpness는 interval·monotonicity 정보 polytope 안의 결론이다.
