@@ -17,7 +17,7 @@ https://github.com/cosmosapjw-quantum/rei_bianchi/blob/78f7ac5864d5817ceb79b48cb
 - Source ZIP SHA256: 7da8a4919f029160434089448c722ca844518d9d5c266d67b8f85f108bd85464
 - Source ZIP Drive: 1F5TfMecJPVsu3a_548k668EJEmaTYDLT
 - Source ZIP Dropbox: id:BSpOijBcT10AAAAAAEDGFg
-- 별도 delivery ZIP SHA256: 자기참조 없는 사후 Git receipt 확인
+- 별도 delivery ZIP SHA256: 48520470635208f068b37c88d6f1d50956898166f706ae0af87a9bb29c235c37
 - 현 branch HEAD와 AGENTS는 시작할 때 실제로 다시 읽어라. 이 문서의 포함 commit을 HEAD로 추정하지 마라.
 
 ### 현재 판정과 보존 범위
@@ -54,7 +54,7 @@ PR219 bootstrap, 기존83,GRID044 opacity,PR221conditional,PR233/235/236/237의 
 ### 예산·게시 권한
 사용자는 필요한 백업·게시·자동 실행을 명시적으로 승인했다. 같은 권한을 다시 묻지 마라. 과학 범위와 자원 계약은 별도로 지켜라.
 Main595.225063/600,NO_MORE_IVPs 유지. CR6.988054525/30는별도owner이고 HE101remaining0,V6closedlease를 보존한다.
-Planning known+reserve14.477120760CPU s; presentation최종값은BUDGET_STATUS.json/FINAL_DELIVERY_RECEIPT를 읽어라. 기존누적을 초기화·이체하지마라. Temporary14.9/44.5는본유한단위종료때원cap10/30으로복원하고누적액은남긴다. Remote/tool/LLM/startup미측정비용은UNKNOWN_NOT_ZERO다.
+Planning known+reserve14.477120760CPU s; presentation known+reserve42.140963211CPU s다. 최종 BUDGET_STATUS.json/FINAL_DELIVERY_RECEIPT를 읽어라. 기존누적을 초기화·이체하지마라. 이번 단위의 temporary14.9/44.5는 종료했으며 원래 policy cap10/30으로 복원했다. 누적액은 유지한다. Remote/tool/LLM/startup미측정비용은UNKNOWN_NOT_ZERO다.
 과학실행charge.376458678CPU s,exit0,RSS12800KiB. Renderer4.972565719>4, sourceextract.184582739>.15, 첫metadata.229571720>.20, DAGupdate.154160372>.06 및 independentDAGreview.214802957>.03의초과기록을삭제하거나사후PASS로바꾸지마라. 유효한savedfigure를재렌더링하지마라.
 각 새 노드 전 최신AGENTS·실제HEAD·병렬반환·이전백업ACK를 확인하라. 단일event/energy소유권과실제공급자유효범위를유지하라. 독립검토→expected-SHA/non-forcepush→sourceZIP→Drive/Dropbox이중ACK→DAG/인계갱신 순으로완료하라. 이단위의8개DAG변경은88IDs/17edges와이전nestedcontracts를보존한다. PR239는draft이며merge되지않았다.
 
