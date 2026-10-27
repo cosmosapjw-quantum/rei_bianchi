@@ -1,5 +1,14 @@
 # 다음 대화용 인계 — REI thermal assimilation, 2026-10-27
 
+## 확정된 과학 source와 이중 백업
+
+- Science commit: **600503e559eb5763a97dad6ae6d661761bc9b02a**.
+- Source ZIP: **REI_THERMAL_ASSIMILATION_SOURCE_20261027_600503e5.zip**, 4,329,571 bytes, 475 entries, CRC PASS.
+- SHA256: **61d8e954c661d2c1d2f204bdf81f81414a892514b19464d6a676ec9376ec4122**.
+- [Drive source](https://drive.google.com/file/d/1U-r38TGeJsGGF4xoEd8AewCNkutGUToz/view), Dropbox **id:BSpOijBcT10AAAAAAEC4PQ**. 두 provider ACK와 별도 metadata 크기가 일치한다.
+- 최종 metadata ZIP: **REI_THERMAL_ASSIMILATION_DELIVERY_20261027_600503e5.zip**, 58,759 bytes, SHA256 **8244a2d199759f1f33749585066f01df06480c60161132b85b084008505e7582**. [Drive metadata](https://drive.google.com/file/d/1XjFho8O3A2GIzo0Rk1HH7ReDZaJNIPto/view), Dropbox **id:BSpOijBcT10AAAAAAEC4Tw**, 두 ACK와 별도 크기 확인 완료. 상세 실제 ACK는 delivery/FINAL_DELIVERY_RECEIPT.json을 읽는다. 과학 source/원자료를 다시 실행하지 않는다.
+- 원 cap10/30 복원, 알려진 누적 planning **13.297430367 CPU s**, presentation **33.948087957 CPU s**를 보존한다. 후자는 마지막 metadata packing에 미리 계상한 보수적0.25 CPU s를 포함하며, 미측정 비용은 여전히 UNKNOWN_NOT_ZERO다.
+
 ## 먼저 읽을 권위 자료
 
 Repo는 **cosmosapjw-quantum/rei_bianchi**, 작업 branch는 **research/rei-thermal-assimilation-20261027**, draft [PR237](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/237)이다. 기준 PR236 HEAD는 **ee94bef85b56d879dc38f184856a5c613575e9e1**, 구현 동결 C5 commit은 **20b91606493fb7bad015c62fd62e2faa971faee0**이다.
