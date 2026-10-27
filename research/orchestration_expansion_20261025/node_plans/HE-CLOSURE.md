@@ -209,3 +209,10 @@ Conditional photon+stationary bare alpha to two bare deuterons supplies source-c
 ## Current local observation pointer
 
 See `status/HE_EXP_ANGULAR06_20261027.json#/observations/HE-CLOSURE`. Central publication has not occurred. Current scoped state, budget, lead and dependency gates remain unchanged.
+
+
+## HE-EXP-APERTURE-07 prepared observation (C9 accepted; actual S09/P09 and S10/P10 identities)
+
+Root accepted the scoped conditional finite-aperture preimage enclosure and positive pair-measure reference after the same-pass actual-result C9 review. The admitted domain is continuous measure, fixed stored gamma/a and whole-azimuth annular geometry. Physical common-temperature/velocity closure inputs and the existing conditional ownership state remain unchanged.
+
+See `status/HE_EXP_APERTURE07_20261027.json#/observations/HE-CLOSURE`. S09/P09 science identity is actual; S10/P10 delivery identity is actual in the status record. Current physical status, budget, lead, dependencies and claim gates remain unchanged.

@@ -213,3 +213,10 @@ Photon loss, population rest-energy witness and daughter kinetic energy close on
 ## Current local observation pointer
 
 See `status/HE_EXP_ANGULAR06_20261027.json#/observations/HE-EXP-CLOSURE`. Central publication has not occurred. Current scoped state, budget, lead and dependency gates remain unchanged.
+
+
+## HE-EXP-APERTURE-07 prepared observation (C9 accepted; actual S09/P09 and S10/P10 identities)
+
+Root accepted the scoped conditional finite-aperture pair-observable reference, retaining separate event, daughter-count and energy ownership. The 32/32 validation, separately allocated saved-data plot and same-pass C9 actual-result review passed. Physical reduction, heat capacity and thermal-deposition admission are unchanged.
+
+See `status/HE_EXP_APERTURE07_20261027.json#/observations/HE-EXP-CLOSURE`. S09/P09 science identity is actual; S10/P10 delivery identity is actual in the status record. Current physical status, budget, lead, dependencies and claim gates remain unchanged.

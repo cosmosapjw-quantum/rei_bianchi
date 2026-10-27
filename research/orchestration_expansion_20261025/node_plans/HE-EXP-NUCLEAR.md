@@ -177,3 +177,10 @@ HE consumer-side conditional finite-recoil contribution for EXFOR M0475002 nativ
 ## Current local observation pointer
 
 See `status/HE_EXP_ANGULAR06_20261027.json#/observations/HE-EXP-NUCLEAR`. Central publication has not occurred. Current scoped state, budget, lead and dependency gates remain unchanged.
+
+
+## HE-EXP-APERTURE-07 prepared observation (C9 accepted; actual S09/P09 and S10/P10 identities)
+
+Root accepted the HE consumer-side conditional aperture bounds and pair-coincidence reference under its explicit continuous-measure and fixed-parameter domain. The demonstrated native density is manufactured symmetric Bernstein data, not empirical DCS. WU source/channel/branch ownership and SOURCE_INPUT_PENDING, original experimental normalization, liquid-He projection, complete angular law with actual photon flux, and named deposition consumer remain open.
+
+See `status/HE_EXP_APERTURE07_20261027.json#/observations/HE-EXP-NUCLEAR`. S09/P09 science identity is actual; S10/P10 delivery identity is actual in the status record. Current physical status, budget, lead, dependencies and claim gates remain unchanged.
