@@ -1,0 +1,240 @@
+# CR_N5_ATOMIC_ISOTOPE_COVERAGE
+
+Lead: cosmosapjw-quantum/bass_cr
+
+Current status: `PARTIAL_OPEN`
+
+Source: `authority/atomic/EXPANDED_NODE_CONTRACTS.json#/nodes/8`
+
+```json
+{
+  "id": "CR_N5_ATOMIC_ISOTOPE_COVERAGE",
+  "lead_repo": "cosmosapjw-quantum/bass_cr",
+  "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+  "json_pointer": "/nodes/8",
+  "contract": {
+    "id": "CR_N5_ATOMIC_ISOTOPE_COVERAGE",
+    "legacy_repository": "bass_cr",
+    "owner_repository": "bass_cr",
+    "status": "PARTIAL_OPEN",
+    "legacy_contract_preserved": {
+      "status": "OPEN",
+      "execution": "NOT_RUN",
+      "budget": {
+        "inherited_spend": null,
+        "remaining": null,
+        "currency": null,
+        "policy": "unknown is not zero; retain existing campaign receipt; no new heavy launch"
+      },
+      "publication": {
+        "kind": "separate additive draft",
+        "merge": false
+      },
+      "gate_transition": "OPEN -> DERIVED_SCOPED -> IMPLEMENTATION_VERIFIED -> NUMERICALLY_CHECKED_SCOPED -> CONSUMER_ADMITTED only with named consumer and valid source/domain/owner",
+      "no_replay": "completed identities reused, changes verify only affected obligations",
+      "id": "CR_N5_ATOMIC_ISOTOPE_COVERAGE",
+      "depends_on": [],
+      "equations": [
+        "r_a=n_i*n_j*k_a(T) or n_i*Gamma_a",
+        "S_charge*r defines Ne,all source",
+        "DeltaUbind=sum_i I_i*DeltaN_i"
+      ],
+      "domain": "n,H1,D,T,He3,He4,Li6,Li7 explicit charges; isotope source equivalence separately proved",
+      "input": [
+        "C23B HI/HeI/HeII fits with13.6/24.59/54.42eV thresholds",
+        "WU PHYS81/82/83 completion",
+        "CI/RR/DR/CX data"
+      ],
+      "output": [
+        "source-by-species/rate/energy-domain matrix and unique energy owners"
+      ],
+      "admission_gate": "missing rate=null; source isotope quotient qualified at target accuracy; own source thresholds never silently replaced",
+      "pr_boundary": "Supplier coverage PR; no coupled-science claims"
+    },
+    "equations": [
+      "r_a=n_i*n_j*k_a(T) or n_i*Gamma_a",
+      "S_charge*r defines Ne,all source",
+      "DeltaUbind=sum_i I_i*DeltaN_i"
+    ],
+    "units": {
+      "number_density": "m^-3 internal; cm^-3 accepted only with declared conversion1cm^-3=1e6m^-3",
+      "energy": "J internal; source-native eV kept,1eV=1.602176634e-19J",
+      "cross_section": "m^2;1cm^2=1e-4m^2;1barn=1e-28m^2",
+      "two_body_rate": "m^3 s^-1",
+      "one_body_rate": "s^-1",
+      "volumetric_event_rate": "m^-3 s^-1",
+      "energy_source": "J m^-3 s^-1",
+      "clock": "declared proper seconds, coordinate conversion explicit",
+      "temperature": "K"
+    },
+    "inputs": [
+      "C23B HI/HeI/HeII fits with13.6/24.59/54.42eV thresholds",
+      "WU PHYS81/82/83 completion",
+      "CI/RR/DR/CX data"
+    ],
+    "outputs": [
+      "source-by-species/rate/energy-domain matrix and unique energy owners"
+    ],
+    "domain": "n,H1,D,T,He3,He4,Li6,Li7 explicit charges; isotope source equivalence separately proved",
+    "evidence": "21x8 baseline plus admitted scoped deltas; no whole matrix overwrite",
+    "admission_gate": [
+      "all configured species, not only existing21rows",
+      "H1 groundRR not totalRR; spontaneous not zero photon occupation",
+      "no automatic isotope equality or zero-fill",
+      "CI/PI/RR/DR/CX/elastic/CE energy moment coverage"
+    ],
+    "pass_next": "Pass explicit per-channel source support/isotope/energy closure => affected N6component; otherwise preserve null cells and active owner.",
+    "fail_next": "Preserve raw failure/unknown; classify source,physics,numerics,implementation or environment; repair only changed dependency.",
+    "pr_boundary": "Supplier coverage PR; no coupled-science claims",
+    "budget": {
+      "new_scientific_run_authorized_by_this_audit": false,
+      "heavy_launch": false,
+      "global_remaining": null,
+      "currency": null,
+      "unknown_is_zero": false,
+      "PHYS91_remaining": 0,
+      "CR105_known_lineage_CPU_s": "39.097868524",
+      "CR105_new_CPU_s": "4.86342341",
+      "C23E_separate_lineage_CPU_s": "15.493261114",
+      "sum_lineages_without_overlap_proof": false,
+      "new_unit_limit": "UNBOUND until existing authority budget and actual resource lease are pinned",
+      "completed_identity_replay": false
+    },
+    "claim_ceiling": "Current evidence only; no global physical completion or blanket production admission",
+    "execution_this_audit": "NOT_RUN",
+    "readiness_policy": "conditional on selected model, source domain and actual consumer; do not AND every future catalog channel",
+    "independent_review": "fresh scientific reviewer checks exact changed contracts/source/raw results at proposed claim scope; reuse unchanged prior independent review"
+  },
+  "dependencies": [],
+  "conditional_dependencies": [],
+  "external_prerequisites": [],
+  "current_status": "PARTIAL_OPEN",
+  "claim_gate": [
+    "all configured species, not only existing21rows",
+    "H1 groundRR not totalRR; spontaneous not zero photon occupation",
+    "no automatic isotope equality or zero-fill",
+    "CI/PI/RR/DR/CX/elastic/CE energy moment coverage"
+  ],
+  "pass_next_action": "Pass explicit per-channel source support/isotope/energy closure => affected N6component; otherwise preserve null cells and active owner.",
+  "budget_status": {
+    "new_scientific_run_authorized_by_this_audit": false,
+    "heavy_launch": false,
+    "global_remaining": null,
+    "currency": null,
+    "unknown_is_zero": false,
+    "PHYS91_remaining": 0,
+    "CR105_known_lineage_CPU_s": "39.097868524",
+    "CR105_new_CPU_s": "4.86342341",
+    "C23E_separate_lineage_CPU_s": "15.493261114",
+    "sum_lineages_without_overlap_proof": false,
+    "new_unit_limit": "UNBOUND until existing authority budget and actual resource lease are pinned",
+    "completed_identity_replay": false
+  },
+  "change_class": [
+    "status_correction"
+  ],
+  "historical_contract_id": "CR_N5_ATOMIC_ISOTOPE_COVERAGE",
+  "source_fields": {
+    "lead_repo": "owner_repository",
+    "current_status": "status",
+    "claim_gate": "admission_gate",
+    "pass_next_action": "pass_next",
+    "budget_status": "budget"
+  },
+  "pr_plan": {
+    "inputs": {
+      "value": [
+        "C23B HI/HeI/HeII fits with13.6/24.59/54.42eV thresholds",
+        "WU PHYS81/82/83 completion",
+        "CI/RR/DR/CX data"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/8/inputs",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "equations": {
+      "value": [
+        "r_a=n_i*n_j*k_a(T) or n_i*Gamma_a",
+        "S_charge*r defines Ne,all source",
+        "DeltaUbind=sum_i I_i*DeltaN_i"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/8/equations",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "units": {
+      "value": {
+        "number_density": "m^-3 internal; cm^-3 accepted only with declared conversion1cm^-3=1e6m^-3",
+        "energy": "J internal; source-native eV kept,1eV=1.602176634e-19J",
+        "cross_section": "m^2;1cm^2=1e-4m^2;1barn=1e-28m^2",
+        "two_body_rate": "m^3 s^-1",
+        "one_body_rate": "s^-1",
+        "volumetric_event_rate": "m^-3 s^-1",
+        "energy_source": "J m^-3 s^-1",
+        "clock": "declared proper seconds, coordinate conversion explicit",
+        "temperature": "K"
+      },
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/8/units",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "domain": {
+      "value": "n,H1,D,T,He3,He4,Li6,Li7 explicit charges; isotope source equivalence separately proved",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/8/domain",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "outputs": {
+      "value": [
+        "source-by-species/rate/energy-domain matrix and unique energy owners"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/8/outputs",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "positive_acceptance": {
+      "value": [
+        "all configured species, not only existing21rows",
+        "H1 groundRR not totalRR; spontaneous not zero photon occupation",
+        "no automatic isotope equality or zero-fill",
+        "CI/PI/RR/DR/CX/elastic/CE energy moment coverage"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/8/admission_gate",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "failure_disposition": {
+      "value": "Preserve raw failure/unknown; classify source,physics,numerics,implementation or environment; repair only changed dependency.",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/8/fail_next",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "independent_review": {
+      "value": "fresh scientific reviewer checks exact changed contracts/source/raw results at proposed claim scope; reuse unchanged prior independent review",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/8/independent_review",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "PR_boundary": {
+      "value": "Supplier coverage PR; no coupled-science claims",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/8/pr_boundary",
+      "qualification": "SOURCE_DECLARED"
+    }
+  }
+}
+```
+
+## HeIII ground RR owner return — 2026-10-27
+
+Canonical return: [CR_HEIII_GROUND_RR_20261027.json](../returns/CR_HEIII_GROUND_RR_20261027.json).
+
+Science S: 4e72c89b714431eb4c6ae07def777bbf72a5ae4c; documents D: ec463db0c7e5c7fb5070796071c926caa4db6445.
+
+Child scope: Conditional elemental-He to He4, He4III + tagged fast electron -> He4II(1s) + spontaneous retained photon; exact saved PR106 H1+HeI chain plus one HeII hazard, same K1 competition. Native HeII PI I=54.42 eV and photon support <=50000 eV, Ekin>0; d=1; stationary heavy target/zero recoil, nonrelativistic scalar, frozen T=10000 K, n_HeIII=0.01 cm^-3, closed box/proper seconds. One N5 scoped child, not total RR or physical heating.
+
+Actual scoped decision: PASS_SCOPED_SOURCE_QUALIFIED_CONSUMER_AND_INTEGRATED_RETURN.
+
+Parent N5 remains PARTIAL_OPEN; N6/N7 remain PREDECESSOR_GATED. Original88 deliverable count effect: 0. This child does not promote caloric partition to physical heating.
+
+Next executable action: Qualify one actual external photon/electron/baryon source revision, isotope/state, native energy support, frame, proper volume/clock and finite proper-time history. Bind explicit consistent donor/recipient nb only for per-baryon/native25 use. Construct source->proper injection->integrated N/E->shared RR/native25 plus separate retained-photon return with one clock/volume/density conversion, same-event ownership and changed controls. Missing history/rate/nb remains null; no borrowed PW19 T/nb, no mean-time-as-exposure, no physical cascade/stopping/heating promotion; freeze a separate new-unit budget before new science.
