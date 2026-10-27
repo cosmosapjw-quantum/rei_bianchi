@@ -186,3 +186,26 @@ Source: `authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json#/nodes/4`
   }
 }
 ```
+
+
+## Preserved historical observation context
+
+The following narrative is historical local/unpublished observation context, not a replacement for the latest base contract above. DRIFT02: `status/HE_EXP_FINITE_DRIFT_20261027.json#/observations/HE-CLOSURE`.
+
+
+## HE-EXP-EVENT-03 observation
+
+Conditional reactive population count and centered heat contribution; heat capacity remains separate and no automatic thermalization is assumed. Source is locally prepared and unpublished; physical inputs remain open. See `status/HE_EXP_EVENT03_20261027.json#/observations/HE-CLOSURE`.
+
+## HE-EXP-STATE-04 observation
+
+Population-derived internal energy witness and equal/opposite total material kinetic compensation have one owner; species partition and deposition remain open. Source is locally prepared and unpublished; physical dependencies remain open. See `status/HE_EXP_STATE04_20261027.json#/observations/HE-CLOSURE`.
+
+## HE-EXP-PHOTON-05 observation
+
+Conditional photon+stationary bare alpha to two bare deuterons supplies source-coordinate relativistic recoil and selected-lab q_i q_j/E stress weights. Single rest/binding ownership and explicit external event flux preserve separate thermal ports; the physical common-temperature/velocity closure remains open. Source remains local/unpublished; no physical promotion. See `status/HE_EXP_PHOTON05_20261027.json#/observations/HE-CLOSURE`.
+
+
+## Current local observation pointer
+
+See `status/HE_EXP_ANGULAR06_20261027.json#/observations/HE-CLOSURE`. Central publication has not occurred. Current scoped state, budget, lead and dependency gates remain unchanged.

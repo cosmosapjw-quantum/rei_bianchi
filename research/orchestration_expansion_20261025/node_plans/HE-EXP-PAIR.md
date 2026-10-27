@@ -164,3 +164,22 @@ Source: `authority/thermal/BASS_HE/research/program_expansion_20261025/TASK_ASSI
   }
 }
 ```
+
+
+## Preserved historical observation context
+
+The following narrative is historical local/unpublished observation context, not a replacement for the latest base contract above. DRIFT02: `status/HE_EXP_FINITE_DRIFT_20261027.json#/observations/HE-EXP-PAIR`.
+
+
+## HE-EXP-EVENT-03 observation
+
+WU R4 source-only intake; provider method, spin and state ownership boundaries remain explicit and physical binding remains open. Source is locally prepared and unpublished; physical inputs remain open. See `status/HE_EXP_EVENT03_20261027.json#/observations/HE-EXP-PAIR`.
+
+## HE-EXP-STATE-04 observation
+
+EMAA H+ selected state-edge native thermal downward source, with explicit derived upward closure; native source state identifiers are not global WU bindings. Source is locally prepared and unpublished; physical dependencies remain open. See `status/HE_EXP_STATE04_20261027.json#/observations/HE-EXP-PAIR`.
+
+
+## Current local observation pointer
+
+See `status/HE_EXP_STATE04_20261027.json#/observations/HE-EXP-PAIR`. Central publication has not occurred. Current scoped state, budget, lead and dependency gates remain unchanged.

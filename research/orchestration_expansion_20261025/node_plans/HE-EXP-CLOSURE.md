@@ -190,3 +190,26 @@ Source: `authority/thermal/BASS_HE/research/program_expansion_20261025/TASK_ASSI
   }
 }
 ```
+
+
+## Preserved historical observation context
+
+The following narrative is historical local/unpublished observation context, not a replacement for the latest base contract above. DRIFT02: `status/HE_EXP_FINITE_DRIFT_20261027.json#/observations/HE-EXP-CLOSURE`.
+
+
+## HE-EXP-EVENT-03 observation
+
+Population-derived internal energy witness has a single owner; product birth pool remains UNASSIGNED. Source is locally prepared and unpublished; physical inputs remain open. See `status/HE_EXP_EVENT03_20261027.json#/observations/HE-EXP-CLOSURE`.
+
+## HE-EXP-STATE-04 observation
+
+Named scalar level-edge consumer retains internal energy witness ownership and UNASSIGNED birth pool; Bennett 2008 corrected rate selection supersedes, never adds to, the historical same-owner 2003 table. Source is locally prepared and unpublished; physical dependencies remain open. See `status/HE_EXP_STATE04_20261027.json#/observations/HE-EXP-CLOSURE`.
+
+## HE-EXP-PHOTON-05 observation
+
+Photon loss, population rest-energy witness and daughter kinetic energy close one event ledger; material nucleus count +1 remains distinct from Gamma_thermal, Cv, heating and deposition. Native zero-flux examples do not supply or set a physical rate. Core24 tests PASS; generated plot has a preserved CPU-cap FAIL, so the local workflow is partial. Source remains local/unpublished; no physical promotion. See `status/HE_EXP_PHOTON05_20261027.json#/observations/HE-EXP-CLOSURE`.
+
+
+## Current local observation pointer
+
+See `status/HE_EXP_ANGULAR06_20261027.json#/observations/HE-EXP-CLOSURE`. Central publication has not occurred. Current scoped state, budget, lead and dependency gates remain unchanged.

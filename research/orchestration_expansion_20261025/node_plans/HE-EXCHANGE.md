@@ -138,3 +138,22 @@ Source: `authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json#/nodes/2`
   }
 }
 ```
+
+
+## Preserved historical observation context
+
+The following narrative is historical local/unpublished observation context, not a replacement for the latest base contract above. DRIFT02: `status/HE_EXP_FINITE_DRIFT_20261027.json#/observations/HE-EXCHANGE`.
+
+
+## HE-EXP-EVENT-03 observation
+
+Conditional raw reactive number, momentum, kinetic energy and full second-moment stress contributions for a supplied 2-to-2 event. Source is locally prepared and unpublished; physical inputs remain open. See `status/HE_EXP_EVENT03_20261027.json#/observations/HE-EXCHANGE`.
+
+## HE-EXP-STATE-04 observation
+
+Selected HD local level ID2↔ID1 collision with H+ supports explicitly assumed Maxwellian reciprocity and scalar population exchange; differential momentum/stress remains open. Source is locally prepared and unpublished; physical dependencies remain open. See `status/HE_EXP_STATE04_20261027.json#/observations/HE-EXCHANGE`.
+
+
+## Current local observation pointer
+
+See `status/HE_EXP_STATE04_20261027.json#/observations/HE-EXCHANGE`. Central publication has not occurred. Current scoped state, budget, lead and dependency gates remain unchanged.

@@ -162,3 +162,18 @@ Source: `authority/thermal/BASS_HE/research/program_expansion_20261025/TASK_ASSI
   }
 }
 ```
+
+
+## Preserved historical observation context
+
+The following narrative is historical local/unpublished observation context, not a replacement for the latest base contract above. DRIFT02 historical file: `status/HE_EXP_FINITE_DRIFT_20261027.json` (no observation for this node).
+
+
+## HE-EXP-PHOTON-05 observation
+
+HE consumer-side conditional finite-recoil contribution for EXFOR M0475002 native12 coordinates with NIST2022 bare nuclear masses. This does not promote WU-led source/channel/branch/normalization admission: WU lead, SOURCE_INPUT_PENDING status, original budget and all contract gates remain unchanged. No nuclear Q is assigned to heat. Source remains local/unpublished; no physical promotion. See `status/HE_EXP_PHOTON05_20261027.json#/observations/HE-EXP-NUCLEAR`.
+
+
+## Current local observation pointer
+
+See `status/HE_EXP_ANGULAR06_20261027.json#/observations/HE-EXP-NUCLEAR`. Central publication has not occurred. Current scoped state, budget, lead and dependency gates remain unchanged.
