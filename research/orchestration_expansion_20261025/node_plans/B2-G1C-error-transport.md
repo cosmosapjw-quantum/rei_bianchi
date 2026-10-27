@@ -2,7 +2,7 @@
 
 Lead: cosmosapjw-quantum/bass
 
-Current status: `PARTIAL_CONDITIONAL_TRANSPORT_BOUND`
+Current status: `PARTIAL_FINITE_RK4_RECONSTRUCTION_BOUND`
 
 Source: `authority/numerics/BASS_CONTRACTS.json#/nodes/13`
 
@@ -63,12 +63,12 @@ Source: `authority/numerics/BASS_CONTRACTS.json#/nodes/13`
   ],
   "conditional_dependencies": [],
   "external_prerequisites": [],
-  "current_status": "PARTIAL_CONDITIONAL_TRANSPORT_BOUND",
+  "current_status": "PARTIAL_FINITE_RK4_RECONSTRUCTION_BOUND",
   "claim_gate": [
     "derive interval/domain-valid L or clearly mark conditional; ensure tube closes with resulting bound",
     "feed moment-map uncertainty to B3g without treating tolerance as physical error radius"
   ],
-  "pass_next_action": "Publish a bounded conditional or closed-tube estimate and its honest input requirements.",
+  "pass_next_action": "Reuse this finite remainder; add only the selected continuous-model/source error bounds when available.",
   "budget_status": {
     "source_review_new": true,
     "scientific_execution_this_audit": "NOT_RUN",
@@ -165,38 +165,38 @@ Source: `authority/numerics/BASS_CONTRACTS.json#/nodes/13`
     }
   },
   "status_observation": {
-    "source_file": "returns/BASS_B3G_ACTUAL_BINDING_20261025.json",
+    "source_file": "returns/BASS_B3G_MIDPOINT_TRANSPORT_20261027.json",
     "json_pointer": "/observations/B2-G1C-error-transport",
     "value": {
+      "current_scoped_state": "PARTIAL_FINITE_RK4_RECONSTRUCTION_BOUND",
+      "admission_scope": "EXACT_RK4_COORDINATE_IDENTITY_FINITE_STAGE_INDUCTION_AND_MAP_REMAINDER_EVALUATED_ON_512_ROWS",
+      "remaining": "Physical geometry radii and continuous nonlinear closed tube are not supplied by this finite-stage bound.",
+      "pass_next_action": "Reuse this finite remainder; add only the selected continuous-model/source error bounds when available.",
       "consumer_repo": "cosmosapjw-quantum/bass",
-      "consumer_lane": "research/bass_b3g_actual_cohort_binding_20261025",
-      "consumer_source_commit": "0e07ea8ca2f11901e0818c9ab9afdeff76352618",
-      "current_scoped_state": "PARTIAL_CONDITIONAL_TRANSPORT_BOUND",
-      "source_commit_binding": "BIND_AFTER_SCIENCE_COMMIT_IS_ACKNOWLEDGED; NEVER_INVENT_SELF_COMMIT_HASH",
-      "admission_release_gate": "ROOT_ACCEPTED_R9_PASS_SCOPED_BLOCKING_ZERO",
+      "consumer_lane": "research/bass_b3g_midpoint_transport_20261027",
+      "consumer_source_commit": "af14fc72d99f6d0e396f60aedadcdb5d05213280",
+      "source_commit_binding": "ACKNOWLEDGED_SCIENCE_COMMIT",
       "admission_release_status": "ROOT_ADMITTED_PASS_SCOPED",
+      "admission_evidence": "ADMISSION.json",
+      "prior_evidence": {
+        "source_file": "returns/BASS_B3G_ACTUAL_BINDING_20261025.json",
+        "json_pointer": "/observations/B2-G1C-error-transport",
+        "consumer_source_commit": "0e07ea8ca2f11901e0818c9ab9afdeff76352618"
+      },
       "new_execution": {
-        "focused_tests": 13,
-        "births": 512,
-        "endpoints": 514,
-        "algebraic_rhs": 4,
-        "reused_history_queries": 313,
-        "PNGs": 3,
+        "focused_tests": 10,
+        "midpoint_maps": 512,
+        "algebraic_rhs": 2,
+        "PNGs": 2,
         "new_IVPs": 0,
         "new_owner_solves": 0,
         "new_native_transactions": 0,
-        "child_wall_s": 3.739223223001318,
-        "child_cpu_s": 3.7262999999999997
+        "child_cpu_s": 7.177914,
+        "child_wall_s": 7.245837689002656,
+        "wrapper_cpu_s": 0.130123
       },
-      "admission_scope": "DIAGONAL_DETERMINANT_AND_DUHAMEL_TRANSPORT_SUBBOUNDS_WITH_SEPARATE_PHYSICAL_NUMERICAL_INPUTS",
-      "new_evidence": [
-        "theory/TRANSPORT_AND_GEOMETRY.md",
-        "code/transport.py",
-        "results/CONDITIONAL_TRANSPORT.json",
-        "ADMISSION.json"
-      ],
-      "remaining": "Interval-wide physical mismatch/numerical defect envelopes and nonlinear invariant-tube closure are not supplied; binary64 evaluation is not an outward-rounded interval certificate.",
-      "pass_next_action": "Supply justified selected-domain envelopes/radii; do not treat saved sample residuals or solver tolerances as physical input error."
+      "physical_total_error": null,
+      "L4_ready": false
     }
   }
 }
