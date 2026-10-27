@@ -22,8 +22,8 @@ K_{A,B}(\tau)=G(B-\tau)-G(A-\tau).
 | \(X=\{x:l\le x\le u,\ x_i\le x_{i+1}\}\) | _validate | 0=l0=u0, monotone closed bounds, mandatory all-time cap |
 | \(V=\{0,l_i,u_i\}\) | _optimize | bound-level finite vertices |
 | \(M_k(v)=c_{k-1}v+\operatorname{opt}_{y\le v}(M_{k-1}(y)-c_{k-1}y)\) | prefix best and parents | inclusive y=v, deterministic earliest ties |
-| 单一 window | cohort_bounds | \(0\le A\le B\le t_m\) |
-| signed scalar combination | combined_cohort_bounds | 同一 cumulative chain과 cell 내부 atom 위치 공유 |
+| 단일 window | cohort_bounds | \(0\le A\le B\le t_m\) |
+| signed scalar combination | combined_cohort_bounds | 동일 cumulative chain과 cell 내부 atom 위치 공유 |
 | 원래 F-space의 closure endpoint | BoundsResult | INFIMUM/SUPREMUM, excluded-left location 표시 |
 
 ## 데이터와 단위
