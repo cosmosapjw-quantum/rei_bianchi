@@ -54,3 +54,14 @@ Integrated event는 clock 불변이다. suppliedΔeta가 있어야 ΔT/Δeta로 
 5. reviews/C5_PREEXEC_REVIEW.json, C9_SAVED_RESULT_REVIEW.json, ROOT_RESOURCE_HOLD.json, DAG_TEXT_REVIEW.json.
 6. delivery/DAG_APPLIED_RECEIPT.json, STAGE_BACKUP_RECEIPTS.json, FINAL_DELIVERY_RECEIPT.json, STAGE_LEDGER.json.
 
+## 실제 source 전달 결과
+
+- Source snapshot commit: 31d088bb0923d29147efa0d1b358c546fc7f68d3
+- Source ZIP: REI_CAUSAL_SOURCE_SNAPSHOT_20261027_31d088bb0923.zip
+- SHA256: 70fcb00fab1b5e45904179acc07a8157cb72c3c6b6d20942f05d7b798ad3712d
+- Bytes: 525104; payload77files+archiveauthority1entry.
+- Drive ID: 1w76UK3dfXnc4OQDfvKHye-9ahmnN1jPp
+- Dropbox ID: id:BSpOijBcT10AAAAAAEDHSg
+- Git readback:77file의blob·size일치. CRC는생성후1회결과를재사용했다.
+- 원래20연구단계모두expected-SHA/nonforce게시와Drive/Dropbox완료ACK를확보했다.
+- 최종metadataZIP의자기ACK와원래budgetcap복원은이후Git최종영수증에서확인한다. 새계산과기존attempt재현은중단상태다.
