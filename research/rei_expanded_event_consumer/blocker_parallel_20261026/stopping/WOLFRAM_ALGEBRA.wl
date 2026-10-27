@@ -1,0 +1,23 @@
+ClearAll[x,th,amp,scale,h,z,t,w,bp,npv,c0,kk,coef,ee];
+ff[x_]:=Erf[Sqrt[x]]-2*Sqrt[x]*Exp[-x]/Sqrt[Pi];
+d0[x_]:=th*amp/Sqrt[x]*ff[x/th];
+a0[x_]:=amp/Sqrt[x]*(4*Sqrt[x/th]*Exp[-x/th]/Sqrt[Pi]-Erf[Sqrt[x/th]]);
+checks={FullSimplify[D[d0[x],x]+d0[x]*(1/(2*x)-1/th)-a0[x],Assumptions->x>0&&th>0],
+FullSimplify[(scale*th)*(h*scale^(3/2)*amp)/Sqrt[scale*x]*ff[scale*x/(scale*th)]-h*scale^2*d0[x],Assumptions->x>0&&th>0&&scale>0],
+FullSimplify[(h*scale^(3/2)*amp)/Sqrt[scale*x]*(4*Sqrt[scale*x/(scale*th)]*Exp[-scale*x/(scale*th)]/Sqrt[Pi]-Erf[Sqrt[scale*x/(scale*th)]])-h*scale*a0[x],Assumptions->x>0&&th>0&&scale>0],
+Together[1/z^2+1/(t+1-z)^2-(1/z+1/(t+1-z))/(t+1)-(z^2+(t+1-z)^2-z*(t+1-z))/(z^2*(t+1-z)^2)],
+Expand[w+(t-bp-w)-t+bp],2-1-1};
+coef={-2247280/10^8,1177455/10^6,-4626461/10^7,8906479/10^8};
+poly[y_]:=Sum[coef[[j]]*y^(j+1),{j,1,4}];
+B=136057/10000; ni=4343/10000; norm=955/1000; aa=52918/10^5; s=4*Pi*aa^2;
+sd[en_,out_]:=With[{tt=en/B,ww=out/B},norm*s/(B*(tt+2))*((ni-2)/(tt+1)*(1/(ww+1)+1/(tt-ww))+(2-ni)*(1/(ww+1)^2+1/(tt-ww)^2)+Log[tt]/(ww+1)*poly[1/(ww+1)])];
+wws=Join[Range[0,8],{(30-B)/2}];
+vals=Table[{N[wws[[j]],18],N[sd[30,wws[[j]]],18]},{j,Length[wws]}];
+theta1=(1380649/10^29)/(1602176634/10^28)*(14994847774798709/10^12);
+ascale=(14994847774798709/10^12)/10000;
+n1=5996197830412253/10^15;
+hscale=(n1/140000)*ascale^(-3/2);
+xmin=2*B/(150+B);
+lower=coef[[1]]+(coef[[2]]+coef[[3]])*xmin;
+root=uu/.FindRoot[Erf[uu]-4*uu*Exp[-uu^2]/Sqrt[Pi]==0,{uu,1},WorkingPrecision->40];
+<|"residuals"->checks,"all_zero"->And@@Thread[checks==0],"native_NIST30_SDCS_angstrom2_per_eV"->vals,"poly_positive_lower_on_E_le150"->N[lower,18],"theta_eV"->N[theta1,18],"temperature_dilation"->N[ascale,18],"time_generator_scale_log20"->N[hscale,18],"mapped_R80_eV"->N[80*theta1,18],"zero_drift_energy_eV"->N[root^2*theta1,18]|>

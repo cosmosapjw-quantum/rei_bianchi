@@ -1,0 +1,20 @@
+# Species projection derivation and claim scope
+
+Unit REI-WU-SPECIES-CONSUMER-PROJECTION-01 consumes the actual pinned WU, HE and REC source identities in INPUT_MANIFEST.json. Its purpose is to remove an identity-binding obstacle between existing providers and consumers, with an executable map whose errors cannot silently swap isotopes, electron pools or normalization.
+
+Let the nuclear composition of a canonical record be the finite tuple C=((Z_a,A_a,isomer_a,N_a)) sorted only for comparison, and preserve its original source order in the output. Define the population projection key k=(C,q,pool). Electronic-state label s is retained as a separate typed coordinate; equality of k does not establish equality of (k,s).
+
+For the historical material view H, the seven isotope ladders have Z=(1,1,1,2,2,3,3). Their charge counts sum to 2+2+2+3+3+4+4=20. The bare neutron slot contributes one further material record. The actual WU historical_view contains exactly these21 keys. HE's corresponding21 rec_population_crosswalk rows identify an index0..20 and label in the actual REC species_order. A unique k match and agreement with both crosswalk fields constructs a bijection pi:H→R. Exact data validation must establish these premises, not infer them from matching array lengths.
+
+For values v indexed by H, define (Pv)_pi(i)=v_i. Because pi is a bijection, P^{-1}P=I. The test uses distinct signed integers to expose swaps and omissions; no floating arithmetic or physical population assumption is required. Each paired record has the same nuclear multiplicities, A and q. Therefore for the corresponding weight rows a and q, a_R^T Pv=a_H^T v and q_R^T Pv=q_H^T v. These are number-label compatibility identities. They do not establish equality of masses in kilograms or microscopic rates.
+
+The source state distinction is essential. WU's neutral/bound historical population is population_aggregate_unresolved, while the HE bookkeeping fixture labels ground. In general N_aggregate=sum_s N_s; N_ground=N_aggregate requires a separately supplied population partition. This map makes no such assumption. It returns both state strings, state_equivalence=false and physical_state_partition=null. A request to treat this projection as a full electronic-state equivalence must be refused until a partition map is supplied.
+
+Similarly REC's Y_i=n_i/n_b and the selected REI x_i=n_i/n_ref satisfy x_i=(n_b/n_ref)Y_i. A label permutation alone cannot supply the density ratio or its derivative. Thus the executable map preserves an explicit common normalization and refuses an automatic n_b→n_ref change. Source-declared ElementalElectronicEquality remains provenance of the old conditional rate model; no rate transfer is performed here.
+
+HE e_th and e_fast have no REC material-row indices. Their separate electron-pool identities are retained. REC's derived charge-neutrality electron count cannot be substituted for an independently tracked fast-electron inventory. The nonhistorical WU records remain outside the historical projection; each retains its canonical composition/state/pool, source labels and qualification, with consumer admission UNADMITTED. This also preserves molecular isotope multiplicities and isomers.
+
+The HE source manifest explicitly reports zero qualified full differential providers. Consequently a full joint-law pair-support query over its supplied identities returns INPUT_PENDING and rate=null, even when a scalar PI/RR/CI candidate is available. For synthetic extension witnesses the answer is UNADMITTED_SYNTHETIC_WITNESS. This distinction prevents a missing law from becoming a physical zero, and prevents a scalar total rate from becoming a differential exchange or thermalization law.
+
+The two canonical gates are finite consumer inventory/projection obligations. Once the actual source-identity validation, bijection/invariants, semantic refusals and independent review pass, HE-EXP-SPECIES and REC-EXP-SPECIES can close in this declared scope. No HE collision, REC spectrum, global source registry, thermal stopping, n/T production or L4 parent is completed by that result.
+

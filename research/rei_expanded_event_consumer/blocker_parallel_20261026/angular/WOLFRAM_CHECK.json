@@ -1,0 +1,35 @@
+{
+  "unit": "REI-PARALLEL-BLOCKERS-20261026",
+  "initial": {
+    "code": "Clear[mu,phi]; p=3/(8 Pi) (1-mu^2); u={Sqrt[1-mu^2] Cos[phi],Sqrt[1-mu^2] Sin[phi],mu}; norm=Integrate[p,{mu,-1,1},{phi,0,2 Pi}]; m1=Integrate[p #,{mu,-1,1},{phi,0,2 Pi}]&/@u; m2=Table[Integrate[p u[[i]] u[[j]],{mu,-1,1},{phi,0,2 Pi}],{i,3},{j,3}]; q=Simplify[m2-IdentityMatrix[3]/3]; <|\"normalization\"->norm,\"mean_direction\"->m1,\"second_moment\"->m2,\"STF_second_moment\"->q,\"eigenvalues\"->Eigenvalues[m2],\"quadrupole_P2\"->Integrate[2 Pi p LegendreP[2,mu],{mu,-1,1}],\"residuals\"->{norm-1,Tr[m2]-1,q[[3,3]]+2/15,q[[1,1]]-1/15}|>",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Failure[\"EvaluationTimeExceeded\", <|\"MessageTemplate\" -> \"Evaluation exceeded the `1` second time limit.\", \"MessageParameters\" -> {5}|>]"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    },
+    "classification": "ENVIRONMENT_EVALUATION_TIME_LIMIT",
+    "time_constraint_s": 5
+  },
+  "repair": {
+    "diagnosis": "Reduce azimuthal integration analytically before polynomial marginal integration",
+    "code": "Clear[mu]; p=3(1-mu^2)/4; a=Integrate[p,{mu,-1,1}]; b=Integrate[mu p,{mu,-1,1}]; c=Integrate[mu^2 p,{mu,-1,1}]; d=Integrate[(1-mu^2)p/2,{mu,-1,1}]; l=Integrate[(3mu^2-1)p/2,{mu,-1,1}]; {a,b,c,d,l,{a-1,b,c-1/5,d-2/5,l+1/5}}",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Out[1]= {1, 0, 1/5, 2/5, -1/5, {0, 0, 0, 0, 0}}"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    },
+    "time_constraint_s": 5
+  },
+  "remote_CPU_s": "UNKNOWN_NOT_ZERO",
+  "local_scientific_execution": false
+}
