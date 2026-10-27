@@ -65,3 +65,9 @@ Integrated event는 clock 불변이다. suppliedΔeta가 있어야 ΔT/Δeta로 
 - Git readback:77file의blob·size일치. CRC는생성후1회결과를재사용했다.
 - 원래20연구단계모두expected-SHA/nonforce게시와Drive/Dropbox완료ACK를확보했다.
 - 최종metadataZIP의자기ACK와원래budgetcap복원은이후Git최종영수증에서확인한다. 새계산과기존attempt재현은중단상태다.
+
+## 최종 metadata 전달·예산 복원
+
+2026-10-27 19:26:03 KST에 전달을 닫았다. 별도 metadata commit은157a41919e5503ef8def183769a61167b2bd15b3, ZIP SHA256는615cb1c3e598b2a54e2f4ab1cf103ff1fc12f4f9153e73505a0f2d0096b4c5dd, 크기는37577bytes다. Drive1LeFi_waWp6YEhhcaaW1VILSMG1UOACMX,Dropboxid:BSpOijBcT10AAAAAAEDHTA의완료ACK를확인했다. 최종Git ACK는이metadata commit다음이며실제branchHEAD를조회하라.
+
+Original policycap planning10/presentation30으로복원했다. 누적planning15.077490885와presentation실측·기존예약43.528719494+최종publication/tail예약.05=43.578719494를보존했다. ResourceHOLD이며새localplanning·과학실행을허용하지않는다. OriginalDAG작업32/88·중앙27/88·증분0,L4false다. Source와metadata ZIP을각각이중백업했고,20단계의44개전체archiveupload완료ACK(단계40+source2+metadata2)를확보했다. 수치검사와CRC를재실행하지않았다.
