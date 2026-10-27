@@ -2,7 +2,7 @@
 
 Lead: cosmosapjw-quantum/bass
 
-Current status: `PARTIAL_SCOPED_BIRTH_BOUND_FINAL_TRANSPORT_INPUT_DEPENDENT`
+Current status: `PARTIAL_SCOPED_RECONSTRUCTED_FINAL_TRANSPORT_PHYSICAL_RADII_OPEN`
 
 Source: `authority/numerics/BASS_CONTRACTS.json#/nodes/10`
 
@@ -65,13 +65,13 @@ Source: `authority/numerics/BASS_CONTRACTS.json#/nodes/10`
   ],
   "conditional_dependencies": [],
   "external_prerequisites": [],
-  "current_status": "PARTIAL_SCOPED_BIRTH_BOUND_FINAL_TRANSPORT_INPUT_DEPENDENT",
+  "current_status": "PARTIAL_SCOPED_RECONSTRUCTED_FINAL_TRANSPORT_PHYSICAL_RADII_OPEN",
   "claim_gate": [
     "Reject missing structural input; keep missing physical uncertainty null with conditional output",
     "Recompute source/state number and energy on same represented inventory; no new IVP required for stored endpoints",
     "same frozen2e-8 only when all bound terms are justified; missing radius cannot become0"
   ],
-  "pass_next_action": "Admit named finite cohorts, then B3i coupled model; if radii unavailable derive G1C bound from existing saved geometry instead of repeated intake.",
+  "pass_next_action": "Supply selected physical input radii or consume reconstructed fixed-model moments with explicitly retained uncertainty.",
   "budget_status": {
     "source_review_new": true,
     "scientific_execution_this_audit": "NOT_RUN",
@@ -170,38 +170,38 @@ Source: `authority/numerics/BASS_CONTRACTS.json#/nodes/10`
     }
   },
   "status_observation": {
-    "source_file": "returns/BASS_B3G_ACTUAL_BINDING_20261025.json",
+    "source_file": "returns/BASS_B3G_MIDPOINT_TRANSPORT_20261027.json",
     "json_pointer": "/observations/B3g-actual-cohort-binding",
     "value": {
+      "current_scoped_state": "PARTIAL_SCOPED_RECONSTRUCTED_FINAL_TRANSPORT_PHYSICAL_RADII_OPEN",
+      "admission_scope": "512_ACTUAL_SAVED_COHORT_FINAL_MAPS_WITH_FINITE_RK4_RECONSTRUCTION_BOUND",
+      "remaining": "Physical eS,en,eE and geometry/temporal radii remain null; original midpoint bytes absent; historical floating enclosure not claimed.",
+      "pass_next_action": "Supply selected physical input radii or consume reconstructed fixed-model moments with explicitly retained uncertainty.",
       "consumer_repo": "cosmosapjw-quantum/bass",
-      "consumer_lane": "research/bass_b3g_actual_cohort_binding_20261025",
-      "consumer_source_commit": "0e07ea8ca2f11901e0818c9ab9afdeff76352618",
-      "current_scoped_state": "PARTIAL_SCOPED_BIRTH_BOUND_FINAL_TRANSPORT_INPUT_DEPENDENT",
-      "source_commit_binding": "BIND_AFTER_SCIENCE_COMMIT_IS_ACKNOWLEDGED; NEVER_INVENT_SELF_COMMIT_HASH",
-      "admission_release_gate": "ROOT_ACCEPTED_R9_PASS_SCOPED_BLOCKING_ZERO",
+      "consumer_lane": "research/bass_b3g_midpoint_transport_20261027",
+      "consumer_source_commit": "af14fc72d99f6d0e396f60aedadcdb5d05213280",
+      "source_commit_binding": "ACKNOWLEDGED_SCIENCE_COMMIT",
       "admission_release_status": "ROOT_ADMITTED_PASS_SCOPED",
+      "admission_evidence": "ADMISSION.json",
+      "prior_evidence": {
+        "source_file": "returns/BASS_B3G_ACTUAL_BINDING_20261025.json",
+        "json_pointer": "/observations/B3g-actual-cohort-binding",
+        "consumer_source_commit": "0e07ea8ca2f11901e0818c9ab9afdeff76352618"
+      },
       "new_execution": {
-        "focused_tests": 13,
-        "births": 512,
-        "endpoints": 514,
-        "algebraic_rhs": 4,
-        "reused_history_queries": 313,
-        "PNGs": 3,
+        "focused_tests": 10,
+        "midpoint_maps": 512,
+        "algebraic_rhs": 2,
+        "PNGs": 2,
         "new_IVPs": 0,
         "new_owner_solves": 0,
         "new_native_transactions": 0,
-        "child_wall_s": 3.739223223001318,
-        "child_cpu_s": 3.7262999999999997
+        "child_cpu_s": 7.177914,
+        "child_wall_s": 7.245837689002656,
+        "wrapper_cpu_s": 0.130123
       },
-      "admission_scope": "512_ACTUAL_SAVED_BIRTHS_BOUND_AT_R_IDENTITY_IN_B3C_MANUFACTURED_MODEL",
-      "new_evidence": [
-        "results/BIRTH_ROWS.json",
-        "results/BIRTH_ROWS.csv",
-        "results/SUMMARY.json",
-        "ADMISSION.json"
-      ],
-      "remaining": "Midpoint beta_birth and controlled reconstruction/interpolation error for final R; physical eS, en, eE and transported eR provenance remain null.",
-      "pass_next_action": "Bind the selected stored midpoint geometry or owner-supplied full map/radii; reuse current birth rows and conditional transport theorem."
+      "physical_total_error": null,
+      "L4_ready": false
     }
   }
 }

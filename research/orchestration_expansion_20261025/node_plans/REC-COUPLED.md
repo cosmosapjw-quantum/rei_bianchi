@@ -2,7 +2,7 @@
 
 Lead: cosmosapjw-quantum/rec_bianchi
 
-Current status: `CONSTRUCTIVE_PARTIAL_SELECTED_NATIVE_PW19_PREASSIMILATION_SOURCE`
+Current status: `CONSTRUCTIVE_PARTIAL_CONDITIONAL_NATIVE_THERMAL_JOIN`
 
 Source: `authority/thermal/rec_bianchi_LONGTERM_CONTRACTS.json#/nodes/5`
 
@@ -184,3 +184,20 @@ Reviewed evidence:
 - `runner_precheck_failed_receipt`: `research/rei_expanded_event_consumer/coupled_source_20261027/implementation/attempt02/RESOURCE_RECEIPT.json` (SHA-256 `c725fe304cb55d1ca7578419327f3d9cffabb230228fc15a587ad25b0834263b`)
 
 Scoped owner return: `research/orchestration_expansion_20261025/returns/REI_COUPLED_SOURCE_20261027.json`.
+
+## Conditional thermal assimilation observation, 2026-10-27
+
+Decision: `CONSTRUCTIVE_PARTIAL_CONDITIONAL_NATIVE_THERMAL_JOIN`. The saved native PW19 He II source now has a conditional local 25-state join to prescribed constant-in-energy number and energy relaxation, native RR/DR cooling, Planck-reference Compton and the actual HE caloric helper. Every thermal term uses the same thermal electron subset. The preserved attempt01 produced 118 passing focused checks; the independent C9 review is `PASS_CONDITIONAL_NATIVE_COUPLED_LOCAL_SOURCE` with zero blocking findings.
+
+This observation uses a manufactured fast reservoir on the saved native background. Its prescribed rate is an independent conditional parameter; physical stopping/assimilation rate and physical uncertainty remain null. Local directional-derivative evidence does not certify the full state Jacobian, a whole-domain VigilODE client, a history, or a new IVP. REC-COUPLED and REC-EXP-COUPLED retain their original open gates. Working original finite admissions remain 32/88; this update contributes zero new original-node completions. L4 and full physical completion remain open.
+
+The original fenced source wrapper and prior photo-source observation above are preserved. The separate `thermalAssimilationContract` pointer in the standalone wrapper and DAG resolves to the new frozen contract below; the old `selectedRuntimeContract` remains unchanged.
+
+- Source code commit: `20b91606493fb7bad015c62fd62e2faa971faee0` (pre-execution code only).
+- `admission`: `research/rei_expanded_event_consumer/thermal_assimilation_20261027/ADMISSION.json` (root admission; resolve from the containing publication commit).
+- `frozen_contract`: `research/rei_expanded_event_consumer/thermal_assimilation_20261027/theory/ROOT_FROZEN_CONTRACT.md` (SHA-256 `d6db25daef4c89be9c85c268a5d21cb9aa8a3f34548068f2e76ee95bcd7019b3`).
+- `derivation`: `research/rei_expanded_event_consumer/thermal_assimilation_20261027/theory/THERMAL_JOIN_DERIVATION.md` (SHA-256 `ad8f2ca6b77da92b229aae8bc18906ce264989700aeb9d077005938f839ab480`).
+- `independent_review`: `research/rei_expanded_event_consumer/thermal_assimilation_20261027/review/C9_VALIDATION.json` (SHA-256 `122749e2d50a49d76e6eb0442cc5abd063246ceecf390508d80f1e839c261189`).
+- `raw_result`: `research/rei_expanded_event_consumer/thermal_assimilation_20261027/implementation/attempt01/stdout.json` (SHA-256 `3f6e942336cb18cf1422ce4736984fb5d7f7d85ca1af39aa0f126748a0c66d99`).
+- `forward_raw`: `research/rei_expanded_event_consumer/thermal_assimilation_20261027/implementation/attempt01/FORWARD_RAW.json` (SHA-256 `de1fbe6b125efce45a4999f1e4666b7e8bde1274a4d3b81d6dba854853284149`).
+- `run_receipt`: `research/rei_expanded_event_consumer/thermal_assimilation_20261027/implementation/attempt01/RESOURCE_RECEIPT.json` (SHA-256 `126f716340b1e42a0c90e2a06fdddfe299e3e822c5c382be55f51a1da877575e`).
