@@ -201,3 +201,8 @@ The original fenced source wrapper and prior photo-source observation above are 
 - `raw_result`: `research/rei_expanded_event_consumer/thermal_assimilation_20261027/implementation/attempt01/stdout.json` (SHA-256 `3f6e942336cb18cf1422ce4736984fb5d7f7d85ca1af39aa0f126748a0c66d99`).
 - `forward_raw`: `research/rei_expanded_event_consumer/thermal_assimilation_20261027/implementation/attempt01/FORWARD_RAW.json` (SHA-256 `de1fbe6b125efce45a4999f1e4666b7e8bde1274a4d3b81d6dba854853284149`).
 - `run_receipt`: `research/rei_expanded_event_consumer/thermal_assimilation_20261027/implementation/attempt01/RESOURCE_RECEIPT.json` (SHA-256 `126f716340b1e42a0c90e2a06fdddfe299e3e822c5c382be55f51a1da877575e`).
+
+
+## CR integrated diagnostic consumer — 2026-10-27
+
+PASS_SCOPED_INTEGRATED_DIAGNOSTIC_CONSUMER is recorded separately in `crIntegratedReturnContract` and `crIntegratedReturnObservation`. See `research/rei_expanded_event_consumer/cr_integrated_return_20261027/ADMISSION.json`, C5 code `cae5a309efb432fc2cdfada74a3529fce78de777`, and independent `research/rei_expanded_event_consumer/cr_integrated_return_20261027/review/C9_REVIEW.json`. The24 actual CR alternatives retain their integrated per-proper-volume inputs. Native25 normalization/JVP and retained-photon ports are diagnostic, with explicit consumer b only; no rate/history/spectrum or finite coupled update is supplied. Existing current_status, selectedRuntimeContract, thermalAssimilationContract and prior status_observation remain unchanged. Original count delta0; working32/88 and central27/88 remain distinct. L4 stays false and global physical completion null. The saved figure is retained with its explicit CPU overrun; no rerender or retroactive resource pass.

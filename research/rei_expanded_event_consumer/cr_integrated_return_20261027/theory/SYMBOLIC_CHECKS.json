@@ -1,0 +1,17 @@
+{
+  "schema": "WOLFRAM_SYMBOLIC_DIAGNOSTIC_LIFT_V1",
+  "code": "ClearAll[aa, kk, nb, dAA, dKK, dNB, bb, rr, dBB, dRR, ip, x0, r0, r1, dx0, dr0, dr1, dn, ddn, tau];\nal = aa/nb; kap = kk/nb;\ndal = dAA/nb - aa*dNB/nb^2; dkap = dKK/nb - kk*dNB/nb^2;\nchargeChange = -al; fastCountChange = -al; ionCountChange = 0;\nthermalCountChange = chargeChange-fastCountChange;\nenergyChange = -ip*al-kap+(kap+ip*al);\njump = {al,-al,-al,-kap,0,0,al,kap+ip*al};\ndirec = {dal,-dal,-dal,-dkap,0,0,dal,dkap+ip*dal};\ndirectionResidual = Together[(D[jump /. {aa->aa+tau*dAA,kk->kk+tau*dKK,nb->nb+tau*dNB},tau] /. tau->0)-direc];\nrefConsistency = Together[(bb*jump /. nb->bb*rr) - {aa/rr,-aa/rr,-aa/rr,-kk/rr,0,0,aa/rr,(kk+ip*aa)/rr}];\nendpoint = (r0*x0+dn)/r1;\nendpointFormula = (r0*dx0+x0*dr0+ddn)/r1-endpoint*dr1/r1;\nendpointResidual = Together[(D[endpoint /. {x0->x0+tau*dx0,r0->r0+tau*dr0,r1->r1+tau*dr1,dn->dn+tau*ddn},tau] /. tau->0)-endpointFormula];\n<|\"thermalCountResidual\"->thermalCountChange,\"energyResidual\"->energyChange,\"directionResidual\"->directionResidual,\"referenceConsistency\"->refConsistency,\"endpointQuotientResidual\"->endpointResidual,\"heatOnlyWrongResidual\"->kk/nb,\"duplicatePhotonWrongResidual\"->(kk+ip*aa)/nb|>",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= <|\"thermalCountResidual\" -> 0, \"energyResidual\" -> 0, \"directionResidual\" -> {0, 0, 0, 0, 0, 0, 0, 0}, \"referenceConsistency\" -> {0, 0, 0, 0, 0, 0, 0, 0}, \"endpointQuotientResidual\" -> 0, \"heatOnlyWrongResidual\" -> kk/nb, \"duplicatePhotonWrongResidual\" -> (aa*ip + kk)/nb|>"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "time_constraint_s": 10,
+  "scope": "Symbolic interface algebra only. Photon-energy variable in this call lies on G=K+I*A. Actual adapter should preserve independent supplied G and its residual.",
+  "remote_CPU": "UNKNOWN_NOT_ZERO"
+}
