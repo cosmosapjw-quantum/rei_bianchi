@@ -1,0 +1,9 @@
+{
+  "schema": "ONE_WOLFRAM_SYMBOLIC_CHECK_V1",
+  "scope": "one external symbolic algebra evaluation; no provider recomputation",
+  "timeConstraint_s": 5,
+  "observed_output": "<|\"energyResidual\" -> 0, \"quotientJVPResidual\" -> 0, \"referenceResidual\" -> 0, \"referenceJVPResidual\" -> 0, \"finiteClockResidual\" -> 0, \"omittedReferenceGenerallyNonzero\" -> ((ba - bb)*fa*s)/(ba*bb), \"omittedDbGenerallyNonzero\" -> -((db*f*s)/(b^2*dt))|>",
+  "remote_CPU": "UNKNOWN_NOT_ZERO",
+  "code": "Clear[s,f,b,dt,ds,db,ddt,fa,fb,ba,bb,dba,dbb,eps,ta,tb,ts,ee,ii,nn]; q=s*f/(b*dt); qd=ds*f/(b*dt)-s*f*db/(b^2*dt)-s*f*ddt/(b*dt^2); qp=D[(s+eps*ds)*f/((b+eps*db)*(dt+eps*ddt)),eps]/.eps->0; a=s*(fb/bb-fa/ba); event=s*(fb-fa)/bb; corr=s*fa*(1/bb-1/ba); jexpected=ds*(fb/bb-fa/ba)+s*(-fb*dbb/bb^2+fa*dba/ba^2); jdirect=D[(s+eps*ds)*(fb/(bb+eps*dbb)-fa/(ba+eps*dba)),eps]/.eps->0; eta[t_]:=t/ts+(t/ts)^2; <|\"energyResidual\"->Together[-ee-ii*nn+(ee+ii*nn)],\"quotientJVPResidual\"->Together[qp-qd],\"referenceResidual\"->Together[a-event-corr],\"referenceJVPResidual\"->Together[jdirect-jexpected],\"finiteClockResidual\"->Together[eta[tb]-eta[ta]-(tb-ta)*(1/ts+(ta+tb)/ts^2)],\"omittedReferenceGenerallyNonzero\"->Together[corr],\"omittedDbGenerallyNonzero\"->Together[qd-ds*f/(b*dt)+s*f*ddt/(b*dt^2)]|>"
+}
+
