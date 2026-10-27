@@ -216,3 +216,12 @@ See `status/HE_EXP_ANGULAR06_20261027.json#/observations/HE-CLOSURE`. Central pu
 Root accepted the scoped conditional finite-aperture preimage enclosure and positive pair-measure reference after the same-pass actual-result C9 review. The admitted domain is continuous measure, fixed stored gamma/a and whole-azimuth annular geometry. Physical common-temperature/velocity closure inputs and the existing conditional ownership state remain unchanged.
 
 See `status/HE_EXP_APERTURE07_20261027.json#/observations/HE-CLOSURE`. S09/P09 science identity is actual; S10/P10 delivery identity is actual in the status record. Current physical status, budget, lead, dependencies and claim gates remain unchanged.
+
+
+## KINEMATIC08 scoped observation — 2026-10-28
+
+Exact declared A,M,e physical-input conditional preimage reference accepted. Shared-event count and rational moment bounds do not provide actual common-temperature/velocity closure or thermal admission.
+
+ROOT decision: `ACCEPT_SCOPED_PHYSICAL_INPUT_REFERENCE_WITH_WORKFLOW_PARTIAL`. Local DAG: 8 complete + 1 partial + 3 physical open /12; central 28/88, HE delta 0. Validation 14/14 PASS, scientific suite 1. Saved-only plot 1, scientific calls 0; CPU 7.040661/6 s FAIL. Workflow PARTIAL; no all-checks PASS, physical activation, new budget or rerun. Existing owner, dependencies, status, claim gates and budget remain unchanged.
+
+Observation: `status/HE_EXP_KINEMATIC08_20261028.json#/observations/HE-CLOSURE`; actual source and dual backup identities: `status/HE_EXP_KINEMATIC08_20261028.json#/final_identities`. Central publication flags in that file are a `PRE_CAS_CANDIDATE_SNAPSHOT`; the actual post-CAS external receipt is authoritative.

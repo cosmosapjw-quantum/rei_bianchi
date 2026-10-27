@@ -184,3 +184,12 @@ See `status/HE_EXP_ANGULAR06_20261027.json#/observations/HE-EXP-NUCLEAR`. Centra
 Root accepted the HE consumer-side conditional aperture bounds and pair-coincidence reference under its explicit continuous-measure and fixed-parameter domain. The demonstrated native density is manufactured symmetric Bernstein data, not empirical DCS. WU source/channel/branch ownership and SOURCE_INPUT_PENDING, original experimental normalization, liquid-He projection, complete angular law with actual photon flux, and named deposition consumer remain open.
 
 See `status/HE_EXP_APERTURE07_20261027.json#/observations/HE-EXP-NUCLEAR`. S09/P09 science identity is actual; S10/P10 delivery identity is actual in the status record. Current physical status, budget, lead, dependencies and claim gates remain unchanged.
+
+
+## KINEMATIC08 scoped observation — 2026-10-28
+
+HE consumer-side stationary bare-alpha gamma+alpha->d+d conditional kinematic reference accepted. Manufactured Bernstein examples do not supply empirical DCS, actual photon history or the WU-owned nuclear channel/species/branch source. SOURCE_INPUT_PENDING and ownership remain unchanged.
+
+ROOT decision: `ACCEPT_SCOPED_PHYSICAL_INPUT_REFERENCE_WITH_WORKFLOW_PARTIAL`. Local DAG: 8 complete + 1 partial + 3 physical open /12; central 28/88, HE delta 0. Validation 14/14 PASS, scientific suite 1. Saved-only plot 1, scientific calls 0; CPU 7.040661/6 s FAIL. Workflow PARTIAL; no all-checks PASS, physical activation, new budget or rerun. Existing owner, dependencies, status, claim gates and budget remain unchanged.
+
+Observation: `status/HE_EXP_KINEMATIC08_20261028.json#/observations/HE-EXP-NUCLEAR`; actual source and dual backup identities: `status/HE_EXP_KINEMATIC08_20261028.json#/final_identities`. Central publication flags in that file are a `PRE_CAS_CANDIDATE_SNAPSHOT`; the actual post-CAS external receipt is authoritative.

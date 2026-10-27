@@ -220,3 +220,12 @@ See `status/HE_EXP_ANGULAR06_20261027.json#/observations/HE-EXP-CLOSURE`. Centra
 Root accepted the scoped conditional finite-aperture pair-observable reference, retaining separate event, daughter-count and energy ownership. The 32/32 validation, separately allocated saved-data plot and same-pass C9 actual-result review passed. Physical reduction, heat capacity and thermal-deposition admission are unchanged.
 
 See `status/HE_EXP_APERTURE07_20261027.json#/observations/HE-EXP-CLOSURE`. S09/P09 science identity is actual; S10/P10 delivery identity is actual in the status record. Current physical status, budget, lead, dependencies and claim gates remain unchanged.
+
+
+## KINEMATIC08 scoped observation — 2026-10-28
+
+Scoped physical-input pair-observable reference accepted with event, daughter-count and rest/binding energy ownership separate. Validation passes; plot CPU gate fails, so workflow remains PARTIAL and physical closure inputs remain pending.
+
+ROOT decision: `ACCEPT_SCOPED_PHYSICAL_INPUT_REFERENCE_WITH_WORKFLOW_PARTIAL`. Local DAG: 8 complete + 1 partial + 3 physical open /12; central 28/88, HE delta 0. Validation 14/14 PASS, scientific suite 1. Saved-only plot 1, scientific calls 0; CPU 7.040661/6 s FAIL. Workflow PARTIAL; no all-checks PASS, physical activation, new budget or rerun. Existing owner, dependencies, status, claim gates and budget remain unchanged.
+
+Observation: `status/HE_EXP_KINEMATIC08_20261028.json#/observations/HE-EXP-CLOSURE`; actual source and dual backup identities: `status/HE_EXP_KINEMATIC08_20261028.json#/final_identities`. Central publication flags in that file are a `PRE_CAS_CANDIDATE_SNAPSHOT`; the actual post-CAS external receipt is authoritative.
