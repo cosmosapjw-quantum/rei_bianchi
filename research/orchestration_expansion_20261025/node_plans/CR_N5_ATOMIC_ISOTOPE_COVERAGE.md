@@ -224,3 +224,17 @@ Source: `authority/atomic/EXPANDED_NODE_CONTRACTS.json#/nodes/8`
   }
 }
 ```
+
+## HeIII ground RR owner return — 2026-10-27
+
+Canonical return: [CR_HEIII_GROUND_RR_20261027.json](../returns/CR_HEIII_GROUND_RR_20261027.json).
+
+Science S: 4e72c89b714431eb4c6ae07def777bbf72a5ae4c; documents D: ec463db0c7e5c7fb5070796071c926caa4db6445.
+
+Child scope: Conditional elemental-He to He4, He4III + tagged fast electron -> He4II(1s) + spontaneous retained photon; exact saved PR106 H1+HeI chain plus one HeII hazard, same K1 competition. Native HeII PI I=54.42 eV and photon support <=50000 eV, Ekin>0; d=1; stationary heavy target/zero recoil, nonrelativistic scalar, frozen T=10000 K, n_HeIII=0.01 cm^-3, closed box/proper seconds. One N5 scoped child, not total RR or physical heating.
+
+Actual scoped decision: PASS_SCOPED_SOURCE_QUALIFIED_CONSUMER_AND_INTEGRATED_RETURN.
+
+Parent N5 remains PARTIAL_OPEN; N6/N7 remain PREDECESSOR_GATED. Original88 deliverable count effect: 0. This child does not promote caloric partition to physical heating.
+
+Next executable action: Qualify one actual external photon/electron/baryon source revision, isotope/state, native energy support, frame, proper volume/clock and finite proper-time history. Bind explicit consistent donor/recipient nb only for per-baryon/native25 use. Construct source->proper injection->integrated N/E->shared RR/native25 plus separate retained-photon return with one clock/volume/density conversion, same-event ownership and changed controls. Missing history/rate/nb remains null; no borrowed PW19 T/nb, no mean-time-as-exposure, no physical cascade/stopping/heating promotion; freeze a separate new-unit budget before new science.

@@ -163,6 +163,7 @@ C5는 별도 code-read PASS_SCOPED_PREEXEC, C9는 실제8개 raw identity·crite
 - 그림 processCPU4.972565719, tail포함5.022565719가 지정4CPU cap을 초과했다. 전체 presentation 누적 상한과 별도로 실패를 남겼다. Font-cache 경고가 있었지만 원인별 시간 기여는 측정하지 않았다.
 - 그림 script 작성 중 한 번의 parsing failure는 renderer 시작 전에 발생했다. 미측정 비용은UNKNOWN_NOT_ZERO다.
 - DAG의 단회 metadata 갱신은 .154160372 CPU로 .06 예상치를 초과했다. 실제 비용은 closing .25 reserve에 포함하며, 원88개 노드·17edges 보존 검사를 한 번 수행했다.
+- 독립 DAG 의미검토63/63은 통과했다. 검토 knownCPU.214802957은 .03 예상치를 넘었고, 두 번째 closing metadata 실제합계.380893178이 .25 예약을 넘었다. 초과.130893178만 추가 계상했으며 final root metadata.05를 별도로 예약해 planning known+reserve14.477120760을 유지한다.
 - R3 Dropbox의 async source fetch 실패 후 동일 고정 ZIP을 다시 전송해 completion ACK를 받았다. 과학 source와 계산은 바뀌지 않았다.
 
 최종 알려진 subtotal·explicit reserve와 archive cost는 BUDGET_STATUS.json과 최종 전달 영수증에 있다. 모든 도구·LLM·network·시작/종료·과거 미측정 비용을 포함한 전체 비용이 인증됐다는 뜻은 아니다.

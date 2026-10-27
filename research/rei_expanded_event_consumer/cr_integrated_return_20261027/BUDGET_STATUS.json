@@ -8,7 +8,7 @@
     "implementation_preparation": "0.078589714",
     "R1_read_packet": "0.000192202",
     "precharged_root_and_independent_review_closing_metadata": "0.200000000",
-    "known_plus_reserves_CPU_s": "14.296227582",
+    "known_plus_reserves_CPU_s": "14.477120760",
     "original_cap": 10,
     "temporary_cap": 14.9,
     "temporary_active": true,
@@ -18,11 +18,18 @@
     "new_prospective_closing_metadata_reserve": "0.250000000",
     "overrun_scope": "Read-only C9 metadata scan; original .20 reservation preserved, actual excess debited; no retroactive within-bound claim; scientific checks unchanged.",
     "closing_reservation_actual_components": {
-      "C9_metadata_writes": 0.001663541,
+      "C9_metadata_write_1": 8.178e-06,
+      "C9_metadata_write_2": 0.001655363,
       "root_budget_write": 0.000919016,
       "visual_review": 0.004601956,
-      "DAG_mechanical_update": 0.154160372
-    }
+      "DAG_mechanical_update": 0.154160372,
+      "root_C9_metadata": 0.001070177999999998,
+      "root_handoff_preparation": 0.003675157999999998,
+      "independent_DAG_review_with_correction": 0.214802957
+    },
+    "closing_reservation_actual_known_CPU_s": "0.380893178",
+    "closing_reservation_excess_debited_CPU_s": "0.130893178",
+    "final_root_metadata_reserve_CPU_s": "0.050000000"
   },
   "presentation": {
     "inherited": "33.948087957",
@@ -35,6 +42,7 @@
     "stage_packing_receipts": [
       {
         "stage": "R1",
+        "packing_CPU_s": 0.0025603339999999974,
         "metadata_CPU_s": 0
       },
       {
@@ -121,6 +129,11 @@
         "stage": "C8",
         "packing_CPU_s": 0.082034028,
         "metadata_CPU_s": 0.018026352999999995
+      },
+      {
+        "stage": "C9",
+        "packing_CPU_s": 0.059488044,
+        "metadata_CPU_s": 0.02169889700000001
       }
     ],
     "helper_authoring_CPU_s": 0.027666807,
@@ -128,8 +141,9 @@
     "figure_render_measured_CPU_s": 4.972565719,
     "figure_render_tail": 0.05,
     "figure_render_charged_CPU_s": 5.022565719,
-    "known_subtotal_CPU_s": "41.541173227",
-    "through_stage": "C8"
+    "known_subtotal_CPU_s": "41.624920502",
+    "through_stage": "C9",
+    "intermediate_subtotal_correction": "C8/C9 intermediate subtotal omitted R1 legacy-key CPU_s .002560334; final reduction uses CPU_s_before_receipt_tail ?? CPU_s and includes it exactly once. R1 original measured receipt retained."
   },
   "main": {
     "used": 595.225063,
@@ -184,6 +198,17 @@
       "measured_CPU_s": 0.154160372,
       "within_job_estimate": false,
       "inside_closing_reservation": true
+    },
+    "DAG_independent_review": {
+      "prospective_CPU_s": 0.03,
+      "measured_CPU_s": 0.214802957,
+      "within_job_estimate": false,
+      "scientific_effect": "none; scoped semantic result PASS"
+    },
+    "second_closing_reservation": {
+      "prospective_CPU_s": 0.25,
+      "actual_known_CPU_s": "0.380893178",
+      "excess_debited_CPU_s": "0.130893178"
     }
   }
 }
