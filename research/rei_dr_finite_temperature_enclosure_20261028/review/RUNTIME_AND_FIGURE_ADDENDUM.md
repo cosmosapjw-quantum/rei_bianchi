@@ -133,3 +133,112 @@ No benchmark, import, compilation, test, numerical evaluation, CAS or renderer w
 
 
 
+
+
+## Attempt 03 — actual numerical return after the bounded cache repair
+
+Read and judgment completed at **2026-10-28T12:11:48.209508+00:00** by native reviewer **`/root/current_repo_census`**. The exact pre-return report is preserved as `RUNTIME_BEFORE_ATTEMPT_03_RETURN.md`, SHA256 `881bc58f147e7b669e8e5ad66f80ca7f35d47fae59e75443c886408bc9d9e495`. This section appends a new actual-runtime judgment. It does not rewrite the initial theory/static verdict, the two failed attempts, or the unexecuted preparation decisions.
+
+**Result: the selected numerical return is accepted for C6, C7, the numerical portion of C8, and the numerical portion of C9. The required figure is NOT_RUN; full C8/C9 and complete C10 are not admitted here.** Root reports a separately verified presentation-ledger overrun and owns any further authorization. The successful numerical evidence remains valid independently of that outstanding presentation obligation.
+
+### Complete actual intake and source binding
+
+`RUNTIME_ATTEMPT_03_READ_LEDGER.json` records full text/empty-file reads, line coverage, byte counts, hashes and actual source-identity comparisons. The numerical stdout was read in full, lines1–2103: **95,637 bytes**, SHA256 **`b5548d5c34c3a37423db88485f8feb62568a3102ddcbb5f87020ca0e43e658f8`**. The reviewer also read all six inner stderr lines, all 66 inner receipt lines, all 104 outer receipt lines, all 37 before-identity lines, and both empty outer streams. A transport-truncated part of the first combined read was explicitly reread; it is not treated as unseen evidence.
+
+All seven current source byte identities match the frozen cache manifest, the outer before-invocation identities, and the outer process receipt. The five sources recorded by the inner runner match too. The scientific cache implementation is `be32fe17982ec9d1e9a6d506e37296d11cbe39fd6bc66690e6563ee62e2fb59c`; the original unchanged test suite is `c31699f56af6f83a7758c6607f29ce8e9a611e835a2dfb65c53898f57ad11bee`; coefficient source is `38397e6b560f463f09a5923eaa5902a24312e5246abc158694451c631cd4d6bc`. The final inner/outer wrappers are `e4069c97b9e027bcba1db28353303d0ac4646fc8c8bc52f15dfd457c48e86b00` and `691d8b7af9bf3cad17223ec4cdfc0834601a1f1514d8127f12fc00ff672bae8f`. No scientific source or criterion substitution was found. The preparation manifest's historical PREPARED_NOT_RUN label is retained; the separate actual receipts establish this later run.
+
+This was a source-and-return review with shared filesystem and earlier intake/static context, **not a blind review**. The reviewer ran no scientific code, imports, tests, benchmarks, CAS, recomputation, or figure generation. Previously closed R6 and static reasoning are reused; actual output values below were read and assessed against those references.
+
+### C6: the selected worker completed normally
+
+The inner and outer receipts both record exit 0, raw wait status 0 and watchdog null. Stderr records the selected method completing `ok`, one method in 0.071s, followed by OK. That summary establishes ordinary return, but is not the scientific acceptance criterion; the underlying numerical records were inspected separately.
+
+| Actual process observation | Recorded value | Interpretation |
+|---|---:|---|
+| Outer runner host PID / host SID / namespace PID | 494076 / 494076 / 5 | Own monitored session established |
+| Inner worker host PID / host SID / namespace PID | 494077 / 494076 / 6 | Worker retained the runner's host session |
+| Runner / worker start ticks | 4788798 /4788800 | Distinct observed process births bound to their identities |
+| Outer whole waited command CPU | **0.178144s** | Normally reaped runner and its waited descendant |
+| Outer wall | 0.1805866889990284s | Actual returned duration |
+| Outer supervisor prefix CPU | **0.028516684s** | Separate from whole waited command |
+| Inner worker CPU / supervisor prefix | 0.13549s / 0.003893202999999998s | Already nested in outer whole cost; do not add again |
+| Maximum observed family ticks | 15 at 100 Hz | Sampled live observation, not a replacement whole-cost receipt |
+| Maximum RSS | 14,720KiB | Linux receipt |
+
+The outer final live-family list contains the runner after the child was reaped; the inner handshake separately records the child and common SID. Unlike the aborted second attempt, both normal receipts are present and the runner reaped its scientific child before its own normal return. Thus the outer 0.178144s is the normal whole waited-command charge within the stated OS scope. The separate prefix is not silently omitted and the nested counters are not charged twice. Unknown startup/finalization/model/network costs remain UNKNOWN_NOT_ZERO.
+
+### C7 and C8 numerical evidence: what the values establish
+
+The immutable parameter-image section records the exact represented binary64 constants and all coefficient/energy inputs, including the negative third coefficients for 2:1 and 3:1. Energies are exact integer images. The 3:2 control row is all positive; the phrase “signed rows” does not mean this row contains a negative coefficient. The claim remains the represented real DR sums and the conditional energy-weighted loss, with nominal Decimal precision 60 and independent scalar-oracle precision 90. The independently written higher-precision scalar oracle shares the Decimal/libmpdec backend; it is not a second arithmetic-library verification. The accepted enclosure is not a bound on the entire rounded native callback or physical fit uncertainty.
+
+**Finite-temperature enclosure and positivity.** All 30 saved range records were read: three rows, alpha/L, and five intervals including [100,101], [14000,16000], the interior-peak region [300000,400000], [900000,1000000], and the whole [100,1000000] domain. Every saved lower bound is strictly positive; the saved direct oracle at the stated temperature lies between the recorded endpoints. The signed rows use exact positive rewrite margins, while 3:2 uses positive terms. This is numerical support for the previously proved continuum construction; sampled oracle containment alone is not substituted for that proof.
+
+For example, He+ alpha on [14000,16000] is enclosed by approximately `[3.632820494298700e-30, 1.861653335575842e-28]`; the 15000 K oracle is `2.975054740918015e-29`. On [300000,400000] its enclosure is approximately `[1.964762810521159e-18, 2.057712555093809e-18]`, containing the 350000 K value `2.035188369983457e-18`. The whole-domain He+ alpha lower bound remains `1.143631859914245...e-2024`, despite the negative term. The whole-domain Li+ alpha lower bound is `7.217801951456896...e-2770`, and the Li2+ conditional-loss lower bound is `1.364622905362912...e-3734`. These very small positive endpoints are retained as decimal strings rather than rounded to binary64 zero.
+
+**Interior maximum.** The saved kernel control uses `E=463300` and peak temperature `308866.666...K =2E/3`, which lies inside [300000,400000]. Its peak `1.2998753717685775829...e-9` is larger than the endpoint-only maximum `1.2990404456014165911...e-9`. The interval upper endpoint `1.2998753717685775829...e-9` rounds outward beyond the 90-digit peak. This directly exercises the previously derived interior-critical-point branch; an endpoint-only envelope would miss this observed maximum.
+
+**Signed sums and clipping.** All four actual comparisons at 1,000,000 K show the expected positive bias from removing a negative coefficient. The following values are abbreviated display copies; the full precision is in raw stdout. Alpha has units m^3/s and L has units J m^3/s throughout these tables.
+
+| Row / quantity | Signed result | Clipped result | Positive clipping bias |
+|---|---:|---:|---:|
+|2:1 alpha|1.011133652752769e-18|1.020118153212391e-18|8.984500459622124e-21|
+|2:1 L|6.574534962222602e-36|6.684773234500310e-36|1.102382722777078e-37|
+|3:1 alpha|4.531471076267092e-20|4.565376159744528e-20|3.390508347743585e-22|
+|3:1 L|4.242457570650662e-37|4.281174964960199e-37|3.871739430953750e-39|
+
+The unmodified signed result remains positive. These observations support retaining the actual signed source representation, not clipping its coefficients as a positivity shortcut.
+
+**Underflow and structural absence.** At 100 K, the separately recorded binary64 scalar value is 0.0 for all six row/quantity controls. The high-precision mathematical values remain strictly positive:
+
+| Row | alpha at 100 K | Conditional L at 100 K |
+|---|---:|---:|
+|2:1|1.161542734113526e-2024|7.429862478703350e-2042|
+|3:1|7.413227845667924e-2770|6.494149130746473e-2787|
+|3:2|1.158860765512523e-3717|1.364622905362912e-3734|
+
+Those records explicitly retain `structural_absence:false`. In contrast, source-absent 1:1 has exactly [0,0] for both quantities and `structural_absence:true`. The result therefore distinguishes a small nonzero represented function from an absent source row. It does not infer absent physics from floating-point underflow.
+
+**Directional Taylor return.** All 36 saved Taylor records were read, including signed h intervals, scalar actual h, f0 and derivative endpoint intervals, direct target values, direct residuals, radii and final enclosures. The six targets for each row/quantity stay within the supplied [14000,16000] box. The exact recorded background anchor is `14919.863839279505555168725550174713134765625K`; its provenance remains “interpolation of saved background only.” It is not promoted to an actual recipient temperature.
+
+For each record, the saved 90-digit actual h lies within the directed h interval, the direct value lies within the returned Taylor enclosure, and the positive direct residual is below the recorded remainder radius. The following largest-step pairs show the scale of the margin without relying on a boolean count:
+
+| Row / quantity | Residual at h=-1/128 | Residual at h=+1/128 | Remainder radius, approximately |
+|---|---:|---:|---:|
+|2:1 alpha|6.088406462382708e-31|7.022878771907329e-31|5.483990563669276e-30|
+|2:1 L|3.894891281063742e-48|4.492709617578653e-48|3.508427276059406e-47|
+|3:1 alpha|2.549836571164039e-37|3.124985057636846e-37|5.164119413788057e-36|
+|3:1 L|2.239917579639147e-54|2.745337961406956e-54|4.540985284646007e-53|
+|3:2 alpha|9.625384597821388e-43|1.272602957651808e-42|5.368308540977442e-41|
+|3:2 L|1.133462329828520e-59|1.498588819642681e-59|6.321767785632739e-58|
+
+The saved radii decrease by the expected factor of about four as |h| halves, with outward-rounding differences in the final digits. For He+ alpha the positive-h residuals at 1/128, 1/256, 1/512 are `7.022878771907329e-31`, `1.692733371985544e-31`, `4.156104890063989e-32`, while the respective radii are `5.483990563669276e-30`, `1.370997640917319e-30`, `3.427494102293298e-31`. The negative-h values also contract. This is observed finite-step agreement with the closed quadratic remainder argument, not a new extrapolated error theorem.
+
+Some Taylor enclosures are deliberately broad and cross zero. For example 3:1 alpha at h=-1/128 has a lower endpoint `-1.366012691302504e-36` while its direct value is `4.053090379601957e-36`; 3:2 has similarly broad large-step intervals. This is not a negative actual DR result or a failure of the positive finite-range construction. It limits how tightly the standalone Taylor interval can certify a positive value at that step size. The reviewer does not report every Taylor interval as strictly positive.
+
+**Precision and rejected inputs.** The four 50/70-digit He+ comparisons enclose the same 90-digit alpha/L oracle values and preserve the leading interval endpoints ; 70-digit bounds are visibly consistent with the directed 60-digit and 50-digit results. This checks the recorded precision changes, not every possible Decimal context mutation. All nine saved input-refusal cases identify their intended boundary: unknown key, coefficient hash mismatch, bool, complex, NaN, infinity, lower-domain violation, upper-domain violation and reversed interval. The unchanged previously inspected suite establishes which call raised; raw return records the actual refusal. No selected criterion was relaxed after failure.
+
+### Observed repair closure and its limits
+
+- **F-ZERO — CLOSED_RUNTIME_FOR_THE_SELECTED_COLD_ZERO_STEP.** Both He+ alpha and L at `T0=target=100` return exactly `h.lo=h.hi="0"`, radius `"0"`, and enclosure endpoints identical to f0. The positive f0 intervals are approximately `[1.161542734113525...e-2024,1.161542734113525...e-2024]` and `[7.429862478703349...e-2042,7.429862478703349...e-2042]`; the full endpoint strings differ in their outward final digits and are preserved in stdout. Nonzero derivative intervals are returned normally. The previously identified cold zero-step underflow path no longer prevents the selected run from completing.
+- **F-PIDNS and F-FAMILY — CLOSED_RUNTIME_FOR_THE_OBSERVED_PROCESS_TREE.** Both handshakes now identify the host-visible processes and common host SID while retaining distinct namespace PIDs for fork/wait semantics. The inner worker returns, is reaped, and the outer normal receipt follows. This actual tree supports the bounded interface repair; it is not a claim about every future PID namespace arrangement.
+- **F-RECOMPUTATION/cache — ACCEPTED_EXECUTED_SELECTED_PATH.** The source-bound cached implementation completed the unchanged selected suite within the final prepared target and returned all scientific records. The previously accepted operand/context and fresh-return static reasoning is reused. There is no separate cache-hit counter, adversarial mutation campaign or controlled speedup benchmark in this return, and none is inferred. The earlier aborted execution is preserved, not converted to a completed baseline timing.
+- **F-PLOT1 remains CLOSED_STATIC only.** No actual SVG, PNG or outer presentation receipt exists at the planned paths. Numerical acceptance does not close the visual inspection obligation.
+
+### C9 numerical verdict, remaining figure obligation and accounting boundary
+
+| Stage / portion | Current distinct-author verdict | Remaining limitation |
+|---|---|---|
+|R6 and earlier static preparation|REUSED_CLOSED_EVIDENCE|Original reports unchanged|
+|C6 selected numerical execution|PASS_SCOPED_ACTUAL_EXECUTION|Only the frozen selected DR controls|
+|C7 numerical interpretation and productive repair return|PASS_SCOPED_NUMERICAL_RETURN|Both earlier failures remain classified and charged separately|
+|C8 numerical consistency portion|PASS_SCOPED_NUMERICAL_CONSISTENCY|Actual figure still NOT_RUN|
+|C8 complete stage|INCOMPLETE_FIGURE_NOT_RUN_RESOURCE_BLOCKED|Needs the required saved-data figure and inspection|
+|C9 numerical source/result review|ACCEPTED_SCOPED_NUMERICAL_RETURN|Distinct-author, shared context; not blind|
+|C9 complete stage|INCOMPLETE_FIGURE_REVIEW_PENDING|No full runtime-plus-figure admission|
+|C10 complete handoff|NOT_ADMITTED_BY_THIS_REVIEW|Root owns publication/backups; required figure obligation remains|
+
+The controller reports the reconciled pre-attempt planning view `21.654823051`, replaces the new numerical reservation by actual whole cost `0.178144`, and retains the fresh shared tail `0.05`, yielding **21.882967051**. The separately observed outer prefix `0.028516684` is inside that retained tail and must not be added again to that conservative view. This statement records the controller's reconciliation and the read actual receipt; it is not an independent whole-session cost certification.
+
+Root separately reports that the verified PR248 closeout adds planning 0 and presentation `4.555332`, taking current presentation to **64.673305870>62**; PR249 changes the main ledger only. Those external ledger findings were supplied by the controller and were not remotely reread in this runtime task. Accordingly the planned presentation invocation is **NOT_RUN_RESOURCE_BLOCKED**. The reviewer grants no new allowance and transfers no foreign or closed budget. The existing valid numerical result is retained while the incomplete figure obligation is stated explicitly.
+
+No original gate, EOS/caloric certificate, native recipient coefficient binding, physical temperature or radius is admitted by this review. Raw `physical_fit_uncertainty` and `actual_recipient_T` remain null and `L4_ready` remains false. The accepted domain is the three supplied represented DR rows on the contracted temperature domain, their conditional weighted losses and the selected tested Taylor construction. There is no new science defect found in the returned numerical records and no request for another numerical run.
