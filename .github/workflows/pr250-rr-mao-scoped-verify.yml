@@ -1,0 +1,66 @@
+name: PR250 frozen RR Mao scoped verification
+on:
+  push:
+    branches:
+      - research/rei-rr-mao-finite-temperature-20261028
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-rr-mao:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check frozen source identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd research/rei_rr_mao_finite_temperature_enclosure_20261028
+          cat > /tmp/pr250_expected_sha256.txt <<'HASHES'
+          028b854a68e5d3e2ac64f3e3ff4a5b531416fc00610dbe7901563808f26541e7  code/rr_mao_enclosure.py
+          08bc50acd6a6baca563e3bf7a259ff39f7c86d4c2c13a50f18a58421fc6f48f5  tests/test_rr_mao.py
+          be32fe17982ec9d1e9a6d506e37296d11cbe39fd6bc66690e6563ee62e2fb59c  deps/dr_interval_original.py
+          a2993a05a01aef10f7478467b22d10140366f9798eea71f266779de107b0e76b  code/run_once.py
+          38397e6b560f463f09a5923eaa5902a24312e5246abc158694451c631cd4d6bc  source/atomic_coefficients.json
+          34b5fb8dab049744faa0c6f734ce59f1c72b931b3cf2db298c01156f86d17803  source/mao2017_selected.json
+          HASHES
+          sha256sum --check /tmp/pr250_expected_sha256.txt
+      - name: Execute pinned selected worker once with bounds
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd research/rei_rr_mao_finite_temperature_enclosure_20261028
+          mkdir -p execution/ci_pr250_once
+          export PYTHONPATH="$PWD:$PWD/code"
+          set +e
+          /usr/bin/time -f 'elapsed_wall_s=%e\nuser_cpu_s=%U\nsystem_cpu_s=%S\nmax_rss_kb=%M\nexit_code=%x' -o execution/ci_pr250_once/TIME.txt \
+            /usr/bin/timeout --signal=TERM --kill-after=1s 30s \
+            /usr/bin/prlimit --cpu=3:3 --as=268435456:268435456 -- \
+            python -B -S code/run_once.py --worker \
+            > execution/ci_pr250_once/STDOUT.json \
+            2> execution/ci_pr250_once/STDERR.txt
+          status=$?
+          set -e
+          printf 'ci_worker_status=%s\nscience_gate=NOT_ISSUED\n' "$status" > execution/ci_pr250_once/STATUS.txt
+          cat execution/ci_pr250_once/TIME.txt
+          cat execution/ci_pr250_once/STDERR.txt
+          if [ "$status" -ne 0 ]; then exit "$status"; fi
+          python -B -S - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('execution/ci_pr250_once/STDOUT.json')
+          result=json.loads(p.read_text())
+          assert result['success'] is True
+          assert result['failures']==0 and result['errors']==0
+          print('JSON_RETURN_SUCCESS', result['methods'], 'methods',len(result['results'].get('ranges', [])), 'range controls')
+          PY
+      - name: Preserve raw evidence regardless of outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr250-frozen-rr-mao-once
+          path: research/rei_rr_mao_finite_temperature_enclosure_20261028/execution/ci_pr250_once/
+          if-no-files-found: warn
+          retention-days: 7
