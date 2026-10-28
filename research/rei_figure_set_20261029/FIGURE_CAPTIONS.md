@@ -64,6 +64,6 @@ All panels show the frozen illustrative external-source/escape model with a pres
 (j) Signed open-system conservation residuals. Baryon and heavy-charge/electron residuals for OFF_base, ON_base and ON_refined are divided by the original absolute tolerance 1.0820350005000101 x 10^-8 particles per Href. The baryon inventory includes visible nuclei, fast n/T and hidden Li6, together with the accumulated external baryon ledger; the charge residual subtracts the electron ledger and its initial value. The declining open baryon inventory is distinct from its near-zero signed balance residual. Maximum absolute baryon and charge residuals are 1.3041 x 10^-12 and 6.5361 x 10^-13 particles per Href.
 
 
-Visual inspection status: corrected raster previews of panels (a)–(c) were inspected. Corrected vector panels (d)–(j) have not received new raster visual inspection; the scoped scientific review and complete vector delivery are recorded in review/REVIEW.json.
+Visual inspection status: all10 corrected raster panels (a)–(j) have been inspected. The independent completion review records PASS_SCOPED for the final layout in review/VISUAL_COMPLETION_REVIEW.json. The earlier3/10 partial inspection and bounded failed raster stage are preserved in Git history and the completion receipt.
 
 The early-transient panel resolves n, T I and T II only; early He/Li positive samples excluded from grouped windows remain available in the raw tables and plot_data.json.
