@@ -1,0 +1,9 @@
+# REI UVB tilt-versus-EOS nuisance profile, immutable S0
+
+Unit REI_UVB_TILT_EOS_PROFILE_20261029. Parent F eecd9b2c1c95f9319c1da41951b814855b0feb11, central observed 4824eec8526185b6b866a5e7e0dabdc624b5543c. Canonical DAG28/88 delta0, separate working REI33/88. R1/C1 scoped prepared; R6/C9 distinct-author NOT_RUN. AUTO_NEXT_NODE=false.
+
+New scientific question: in the original BB13 seven correlated log10 GammaHI values and frozen Puchwein2019 template, quantify how the previously predeclared one-redshift tilt kappa changes under the published temperature–density slope nuisance. Use r(theta)=d-m+theta v, theta=(gamma_TDR-1.4)/0.2 in [-1,1], model X=[ones,z-3.6], full C(dex^2). Fit beta(theta),kappa(theta); quantify projected EOS/tilt collinearity and bounded profile Q(theta). Compare at the same theta with the already characterized amplitude-only EOS fit, do not change the data or tune the slope direction after LOO. No new UVB rate, IVP, physical source, or Bianchi tilt.
+
+Source SHA256 BB13 893f97497b9aae41f545b17278082602a06b352c86bdeb1db2d9afb5c1c83de4, amplitude calibration 8ba2652bcf7358319bbdfc83b499a566890fcf6b449fe12ee759a29a6fcfcc7f; previous one-tilt ZIP d54da7fa6f9971d7bebd282802faf48593bc382592c8b41b0eb0e3d9aee513f9, previous science eecd9b2c1c95f9319c1da41951b814855b0feb11. S0 capsule locally6330 bytes SHA256782e74eff0efdfd280b280da4cdcd68493e9d0d07f45e3f4cefb8f1b296935f7, includes exact source bytes. Git projection reuses original blobs.
+
+Fresh allocation for targeted Python numerical tests: child <=8 CPU-seconds, <=25 wall-seconds, one thread; plotting separate <=8/25; one diagnosed repair episode; old budgets closed/nontransferable, current owner totals UNKNOWN. Relative tolerance1e-10, absolute1e-12 and covariance-variance absolute1e-15; unchanged from parent. Independent numeric Decimal80 method separate from Cholesky. Physical F4PARTIAL,L4false, errors null. Source energy/clock owner unchanged.

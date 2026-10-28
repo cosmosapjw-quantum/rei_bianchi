@@ -1,0 +1,5 @@
+# R2-R5/C2-C4 scientific implementation contract
+
+S0 is R1/C1(2/20). This ST stage produces R2 original-source and saved-evidence binding; R3 exact variables and independent claim ceiling; R4 affine/quadratic EOS candidate including the full conditional model; R5 analytic proof of GLS projection and convexity; C2 input-to-math names, C3 stable SPD Cholesky plus independent Decimal80 elimination, C4 bounded child/plot resource contract. Cumulative **9/20** (R6/C9 excluded). Complete theory and exact original input snapshots in immutable ST ZIP (10022 bytes SHA3f0750fefa96500a1939876d7b6f7c5d40f63df87b74f0c69e0e089bd78a1a97).
+
+Numerical science may now execute once within <=8 child CPU and <=25 wall. Expect production vs Decimal80 and original theta0, theta1 controls, theta-profile sign, SPD, slope overlap, envelope and negative synthetic controls. If failure, one diagnosed targeted repair episode, never silent tolerance widening or original UVB recalibration. Independent distinct-author R6/C9 review NOT_RUN at this stage. Do not merge into central or start next unit.
