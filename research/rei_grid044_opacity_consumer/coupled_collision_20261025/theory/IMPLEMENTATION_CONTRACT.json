@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "unit": "GRID044_JOINT_PHOTON_TARGET_COLLISION_20261025",
+  "scope": "Instantaneous finite selected photon-target collision RHS, full 40-state Jacobian and two independent source-amplitude columns; proper reference quotient terms; no IVP.",
+  "definitions": "DERIVATION.md",
+  "dag": {
+    "whole_goal_path": "N0 -> {N1,N2} -> N3 -> N4 -> N5 -> N6 -> N7 -> N8",
+    "current": "N3 selected coupled collision interface -> N4 finite algebra verification",
+    "N6": "HOLD",
+    "whole_goal_complete": false,
+    "physical_completion_fraction": null
+  },
+  "lineage": {
+    "prior_contract_sha256": "a6cf641ef5d45926d729fc3caf80ead324d7eb1ee04dd53851ef73240278b4c0",
+    "prior_payload_sha256": "153091a92207ef2f903597c0c4fd431826bfe9a295fe455b566e4355ed78131c",
+    "prior_core_sha256": "923d267b9823cb9f1c97ceb9101412c8a8582d496ec33c0541be670447e3d302",
+    "WORK_THREAD_sha256": "33f19acabc80b846dd0d228788af695364d132d74d8f53078d027afcc8d992af",
+    "MODEL_CONFIG_sha256": "c680eff7d1eb3c3a0c9a8414135fe506441a59a8dd102dc54be01f1507037d71",
+    "background_sha256": "ae20c278239787c020e45028a6d6804cb9f056b75076a1d5ab045c0a7389733b",
+    "provider_commit": "d870ce943005bf93e332ca32ca8c945798b1331c",
+    "atomic_network_sha256": "6730e3091de918f693e02e40b0bdf1fefc543a5dcc4de23efd885ca098e2ed5f",
+    "provider_core_sha256": "74b2a8c30c62f4a50e7c5c4bcf92cb159549ffcb904a3e423a793169c2f2bb27"
+  },
+  "units": {
+    "signature": "(-,+,+,+)",
+    "observer": "normal tetrad; inherited isotropic ground-state cross sections",
+    "c_m_s": 299792458,
+    "nref": "proper m^-3",
+    "sigma": "m^2 = provider Mb * 1e-22",
+    "energy": "eV",
+    "time": "proper seconds; conversion to eta divides entire RHS by H once",
+    "N_y": "number per reference nucleus",
+    "B_K_Xext": "eV per reference nucleus",
+    "Lambda": "s^-1"
+  },
+  "state": {
+    "dimension": 40,
+    "packet_count": 16,
+    "ordering": [
+      "N[0:16]",
+      "y[0:21]",
+      "B",
+      "K",
+      "Xext"
+    ],
+    "target_labels": [
+      "n",
+      "H1_0",
+      "H1_1",
+      "D_0",
+      "D_1",
+      "T_0",
+      "T_1",
+      "He3_0",
+      "He3_1",
+      "He3_2",
+      "He4_0",
+      "He4_1",
+      "He4_2",
+      "Li6_0",
+      "Li6_1",
+      "Li6_2",
+      "Li6_3",
+      "Li7_0",
+      "Li7_1",
+      "Li7_2",
+      "Li7_3"
+    ],
+    "indices": {
+      "N": [
+        0,
+        16
+      ],
+      "y": [
+        16,
+        37
+      ],
+      "B": 37,
+      "K": 38,
+      "Xext": 39
+    },
+    "electron": "Derived y_e=ionic_charge^T y; no independent electron state",
+    "binding": "Redundant B=epsilon^T y initially; neutral epsilon=0 and cumulative thresholds; count B once",
+    "K": "Primary-electron energy injection ledger; not solved heat or electron thermal distribution",
+    "Xext": "External photon-source energy injection ledger"
+  },
+  "channels": {
+    "names": [
+      "HI",
+      "HeI",
+      "HeII",
+      "LiI",
+      "LiII",
+      "LiIII"
+    ],
+    "chi_eV": [
+      13.6,
+      24.59,
+      54.42,
+      5.392,
+      75.64,
+      122.5
+    ],
+    "edges": 13,
+    "isotope_mapping": "Elemental electronic equality; map names to provider Li7-before-Li6 while preserving WORK_THREAD Li6-before-Li7 output",
+    "LiI": "Unchanged valence PH2 below 64.39 eV; original PH1 outer 2s at and above 64.39 eV. No core/Auger addition or truncation.",
+    "below_threshold": "sigma=0; no clipping of physical state or energy residual"
+  },
+  "fixture": {
+    "source_names": [
+      "stellar",
+      "external_IGM"
+    ],
+    "z": 2,
+    "nref_m3": 5.151254745827818,
+    "main_Lambda_s": 0,
+    "source_amplitudes": [
+      1,
+      1
+    ],
+    "source_parameters": "Unchanged MODEL_CONFIG and prior continuous source formulas; actual saved continuous normalizers reused",
+    "interval_edges_eV": [
+      5,
+      5.392,
+      13.6,
+      24.59,
+      54.42,
+      64.39,
+      75.64,
+      122.5,
+      150
+    ],
+    "quadrature": "GL2 per interval, 16 nodes; source/escape/angle factors once; no renormalization of this finite quadrature",
+    "q_sj": "Frozen MODEL_CONFIG physical amplitude A_s * escape_fraction * time_window(z=2) * spectral_shape(E_j)/saved_continuous_normalizer * quadrature_weight_j; alpha_s is the separate dimensionless source multiplier",
+    "N_j": "1 proper second times sum_s q_sj",
+    "interpretation": "Actual source formula and unchanged atomic provider at a declared finite operator point. Unit exposure is not evolved cosmic radiation; target fixture is conditional, not evolved z2 abundances.",
+    "target_fixture_pointer": "pilot/opacity_response_20261025/implementation/AGGREGATE_PAYLOAD.json -> target_fixture.y_per_Href; exact prior payload SHA in lineage",
+    "target_fixture_provenance": "Exact reused synthetic positive conditional API fixture. Total n=T=1e-20/Href tests supplied positive inputs; no cosmic abundance/history claim.",
+    "target_y_per_Href": [1e-20,0.3333333333333333,0.6666666666666666,8.333333333333334e-6,1.6666666666666667e-5,3.333333333333333e-21,6.666666666666666e-21,1.6666666666666667e-6,3.3333333333333333e-6,5e-6,0.013666666666666667,0.027333333333333334,0.041,1e-15,2e-15,3e-15,4e-15,5.000000000000001e-11,1.0000000000000002e-10,1.5e-10,2.0000000000000003e-10],
+    "nT_zero_face": "Separate copy with target indexes 0,5,6 set to zero; keep other labels and values fixed",
+    "quadrature_accuracy": "No continuum refinement claim for this new finite fixture. Preserve prior continuum rate result separately.",
+    "E_dot": "Optional explicitly supplied frozen normal-observer energy derivative. No packet transport integration."
+  },
+  "equations": {
+    "rate": "r_ej=c*nref*sigma_a(e)(E_j)*y_lower(e)*N_j",
+    "photon": "F_Nj=sum_s alpha_s*q_sj-sum_e r_ej-Lambda*N_j",
+    "target": "F_yi=sum_ej S_ie*r_ej-Lambda*y_i",
+    "binding": "F_B=sum_ej chi_e*r_ej-Lambda*B",
+    "primary": "F_K=sum_ej (E_j-chi_e)*r_ej-Lambda*K",
+    "external_energy": "F_Xext=sum_j E_j*sum_s alpha_s*q_sj-Lambda*Xext",
+    "lambda": "(dot(nref)+3H*nref)/nref",
+    "jacobian": "J=J_collision-Lambda*I-outer(z,grad_z_Lambda), at fixed nref,E,q templates",
+    "rate_partials": "d r_ej/d y_lower = c*nref*sigma*N_j; d r_ej/d N_j = c*nref*sigma*y_lower",
+    "source_columns": "Photon rows q_sj; Xext row sum_j E_j*q_sj; other rows zero; fixed Lambda and nref",
+    "source_gradient_extension": "If Lambda depends on amplitudes, add -z * dLambda/dalpha_s; outside current supplied source columns",
+    "density_parameter": "Optional partial dF/dnref=F_collision/nref at fixed per-reference q,Lambda,E. If proper emissivity held fixed, add -Q/nref.",
+    "normalization_scope": "nref is an independent instantaneous input; supplied Lambda and grad Lambda describe local quotient correction. Algebraic state-dependent nref requires an additional consistent coordinate/chain-rule model.",
+    "reference_test": "nref2=r*nref, z2=z/r, q2=q/r, Lambda2=Lambda+u imply F2=F/r-u*z2; u=dot(r)/r"
+  },
+  "identities": {
+    "isotope": "C_iso*F_y=-Lambda*C_iso*y",
+    "baryons": "A^T F_y=-Lambda*A^T y",
+    "electrons": "q_ion^T F_y=sum_ej r_ej-Lambda*y_e; physical electron source per reference = sum r",
+    "binding_constraint": "F_B-epsilon^T F_y=-Lambda*(B-epsilon^T y)",
+    "photon_electron": "sum F_N+q_ion^T F_y=sum q-Lambda*(sum N+y_e)",
+    "energy": "w^T F=-Lambda*w^T z for w=(E,zeros21,1,1,-1)",
+    "energy_derivative": "w^T J=-Lambda*w^T-(w^T z)*grad_Lambda^T with frozen E",
+    "redshift": "d(E^T N+B+K-Xext)/dt+Lambda*(E^T N+B+K-Xext)=E_dot^T N",
+    "positivity": "Tangent-cone property for nonnegative states/source; full coupled J is not Metzler. Fixed-radiation target block is a generator before quotient terms."
+  },
+  "acceptance": {
+    "complex_step_scaled_max": 2e-12,
+    "centered_FD_scaled_max": 0.00002,
+    "conservation_scaled_max": 3e-12,
+    "reference_equivalence_scaled_max": 3e-12,
+    "scaling": "Use component/subblock characteristic magnitudes with explicitly justified floating-point floors; do not use max(1,abs(derivative)). Conservation uses sum of absolute terms. Report rare isotope block coverage.",
+    "FD": "Injection off for full collision/state FD to prevent source-dominated cancellation; analytical derivative unchanged. Recompute affine Lambda(z) on each perturbation.",
+    "complex_step": "Injection may remain on; evaluator must preserve complex inputs and recompute affine Lambda(z). Check every active analytic Jacobian entry using relative derivative scale, plus explicit structural-zero checks. Per-entry gate must cover rare Li6/Li7 and trace-T crossblocks; aggregate row norm alone is insufficient.",
+    "source_derivative": "Independent amplitude derivative at fixed photon state; do not differentiate N=1s*q during this partial derivative.",
+    "physical_faces": "Zero photons, zero lower target, n/T absent and trace positive T; source off versus radiation off distinguished.",
+    "domain": "Reject nonfinite or negative real physical inputs, nref<=0, dimension mismatch; derivative probe may bypass real-only validation in a declared mathematical kernel."
+  },
+  "execution": {
+    "campaign": "GRID044_CONTINUOUS_SOURCE_CONSTRUCTION_CONTINUATION",
+    "allocation_reset": false,
+    "CPU_cap_s": 10,
+    "wall_cap_s": 20,
+    "carried_CPU_s": 8.001104,
+    "carried_wall_s": 8.029615335010021,
+    "remaining_CPU_s": 1.998896,
+    "remaining_wall_s": 11.97038466498998,
+    "IVPs": 0,
+    "local_theory_science_executions": 0,
+    "remote_Wolfram_CPU": "UNKNOWN",
+    "root_preexec_GO_required": true,
+    "numeric_result_status": "NOT_RUN_AT_CONTRACT_CREATION"
+  },
+  "three_axes": {
+    "symmetry_gauge": "LRS/reflection geometry reused; spatial coordinate rescaling with fixed normal observer. Reference rescaling is a representation change, not a new physical source.",
+    "invariants": "Isotope and baryon census, charge-derived electrons, binding consistency, photon/electron event count and total energy ledger with quotient and redshift terms.",
+    "observables": "Normal-observer photon absorption, ionization event rates, primary electron injection and source power at stated finite conditional point; no observational calibration."
+  },
+  "remaining": [
+    "Dynamic attenuated continuous radiation consumer and transport coupling",
+    "Thermal/secondary-electron deposition closure",
+    "LiI core/Auger rates and outcomes",
+    "Physical n/T production, neutron beta-decay proton feed, cosmic-ray/neutrino/inverse-beta channels",
+    "Main N6 refinement and all-selected physical pilot completion"
+  ],
+  "no_go": {
+    "claimed": false
+  }
+}
