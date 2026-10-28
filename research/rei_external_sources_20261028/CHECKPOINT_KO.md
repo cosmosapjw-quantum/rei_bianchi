@@ -26,3 +26,4 @@ Main595.225063/600, NO_MORE_IVPs는 그대로다.
 
 다음 행동은 검증된 기준에 이 두 파일의 checkpoint commit을 게시한 뒤,
 controller의 고정 계약에 따라 이미 승인된 유한 작업을 수행하는 것이다.
+
