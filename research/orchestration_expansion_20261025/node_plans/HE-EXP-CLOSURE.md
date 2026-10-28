@@ -272,3 +272,14 @@ One primary7PASS0FAIL,12cases,132vertices; Wolfram16zero12True; one saved-onlypl
 Fullpositive free330MeV witness lies outside old sufficient cone; endpointzero330 remains an exact scoped empty outer polytope;258 minimum finitegap retained.
 Current status CONDITIONAL_OWNERSHIP_IMPLEMENTATION_VERIFIED_PHYSICAL_INPUT_PENDING and lead ownership remain unchanged. No new normalized physical source, flux, projection, deposition, globalbinding or productionapproval is supplied.
 Detailed observation: status/HE_EXP_QUARTIC12_20261028.json. In-Git PRE_CAS fields reflect creationtime; actual publication receipt is external POSTPUBLICATION_EXTERNAL_DELIVERY.
+
+
+## TANGENT13 scoped minimum reference — 2026-10-28
+
+Accepted local reference HE-EXP-TANGENT-13: 13 complete + 1 inherited partial + 3 physical open / 17; central 28/88, HE delta 0. Source cosmosapjw-quantum/BASS_HE at 049e79cb453b92ac663c4e0a93577a8364c3cf54 (tree ad7c7dbf7d90159b7b938da61038989b0fc24f16), branch research/he-tangent13-20261028; successful execution pin 3beb35dc7dea7a60642497dc373c98e75ca07536.
+
+At 258 MeV with fixed coordinate ERR-S windows, free endpoints, uniform azimuth and the full nonnegative even-quartic family, exact dual + feasible square bounds close HEMISPHERES minimum to [0.6184085476376238,0.6184085476376327] and CAPS minimum to [0.0607568813452193,0.0607568813452364] (outward decimal displays). These are minimum brackets, not the complete aperture-value range or experimental confidence interval. Actual targeted campaign 8 PASS/0 FAIL, construction 1; initial namespace-monitor failure before controls and one diagnosed repair are retained, reserve 0. One Wolfram evaluator 17 literal zero + 12 True with messages; one saved-only plot PASS/science 0 with documented axis-label overlap.
+
+R1-R10/C1-C10 workproducts 20/20 and S01-S10 source/ref readback/Drive/Dropbox backups plus R01 repair checkpoint are actual. The new status status/HE_EXP_TANGENT13_20261028.json preserves per-surface previous observations. Its PRE_CAS null/false fields are creation-time snapshots; the external CENTRAL_PUBLICATION_RECEIPT and final delivery authorities record later actual ACK.
+
+No physical source input supplied: normalization + liquid-He projection, actual angular/polarization law + photon history, named nonthermal deposition + global species binding remain open. Existing node state, lead repo, contract, deps, budgets, gates and sole binding owner population_rest_energy_witness stay unchanged. Global physical completion null, L4 false, production NOT_APPROVED, activation false. No completed science/test/CAS/plot/ACKed backup is rerun.
