@@ -14,3 +14,7 @@ PR244는 별도 moving-knot caloric derivative 단위다. 확인 HEAD `0da7cac8c
 원래 DAG working33/88, central28/88, delta0; fast4/7을 이어받는다. 새 검증 결과를 얻기 전 추가 과학 수용이나 진전으로 올리지 않는다. 원래 NO_MORE_IVPs 최초 발행자/사용자 원문을 확인했다는 주장은 하지 않는다. 확인한 historical machine-readable 정책은 `research/rei_expanded_event_consumer/lumina_resume_20261026/BUDGET_POLICY.json`, blob `d1998ca467a40bf9f093e48945e06b6fcf693c9f`이며 scope는 “This REI research campaign and continuing bounded work under the same original budget ledger”이다.
 
 다음 행동: 두 파일의 원격 게시·선택 readback을 확인하고 controller가 동결 과학 계약에 따라 이번 non-IVP 실행을 진행한다. Full17 coupled solver는 준비 산출물로 유지하고 실행하지 않는다.
+
+## 첫 tests 전 할당 amendment01
+
+Root는 provider201rate evaluations와 RHS checks의 미측정 비용을 고려하여 첫 tests의 child CPU2→4s, reservation2.3→4.5s를 승인했다. 위 최초 할당 문단은 이력으로 보존한다. Tests wall20s/attempt1, diagnostic child2/reserve2.3/wall20, plot child3/reserve3.5/wall30, worker1/3GiB/자동재시도0은 유지한다. 새 planning reservation 합6.8과 inherited19.204540885의 합26.004540885는 기존 승인30 이내다. 기존 ceiling을 추가로 올린 것이 아니며 main595.225063/600 NO_MORE_IVPs와 new debit0은 불변이다. 이 amendment와 budget 갱신 게시·readback 전 첫 tests를 실행하지 않는다.
