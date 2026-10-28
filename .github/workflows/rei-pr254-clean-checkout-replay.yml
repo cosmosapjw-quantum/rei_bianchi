@@ -1,0 +1,78 @@
+name: REI PR254 clean-checkout frozen tilt replay
+on:
+  push:
+    branches:
+      - research/rei-pr254-clean-checkout-ci-20261029
+permissions:
+  contents: read
+jobs:
+  targeted-replay:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lock verified science source and PR254 replay fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd research/rei_uvb_one_tilt_identifiability_20261028
+          cat > /tmp/expected_git_blobs.txt <<'LOCK'
+          81e83dcb83b2216c7b79a9d40bfc00a37bec756d CONTRACT.json
+          6df57708e30aa3c4e6d18f5b2ede63c59d894991 src/run_bounded.py
+          8e16226e93b2f3973b3e6635eae9ffe7fa4afaf5 src/suite.py
+          a94b5d222d1751b29db497de09c0fddb83d3a058 src/tilt_gls.py
+          a470d36ff7f55be450887d67c2b5b6db1de74f7f src/reference_decimal.py
+          1264f1169bf3af7af4ece025803cad62a47d770c tests/test_tilt.py
+          61c1ecdcb1be05d47bb59165fb4cac8bb14deb52 input/BB13.json
+          abd45812fb38691bcc76b5bddd33c55e2e5e4be3 input/CALIBRATION_RESULT.json
+          2c91b056f2a9fba4a1dc1a10351641c34df3acb5 input/SHAPE_INNOVATION_RESULT.json
+          LOCK
+          while read -r expect file; do
+            got=$(git hash-object "$file")
+            test "$got" = "$expect" || { echo "SOURCE_BLOB_MISMATCH $file $expect $got"; exit 91; }
+            echo "LOCK_PASS $file $got"
+          done < /tmp/expected_git_blobs.txt
+          test ! -e results || { echo "SOURCE_TREE_RESULTS_ALREADY_PRESENT"; exit 92; }
+          echo "CLEAN_CHECKOUT_RESULTS_DIR_ABSENT_PASS"
+      - name: One bounded post-repair 24-unit suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd research/rei_uvb_one_tilt_identifiability_20261028
+          mkdir -p execution/ci_repro_01
+          set +e
+          /usr/bin/time -f 'wall_s=%e\nuser_cpu_s=%U\nsys_cpu_s=%S\nmaxrss_kib=%M\nstatus=%x' -o execution/ci_repro_01/MEASURE.txt \
+            /usr/bin/timeout --signal=TERM --kill-after=1s 30s \
+            /usr/bin/prlimit --cpu=11:11 --as=536870912:536870912 -- \
+            python -I -S src/run_bounded.py --once \
+            > execution/ci_repro_01/OUTER_STDOUT.txt \
+            2> execution/ci_repro_01/OUTER_STDERR.txt
+          rc=$?
+          set -e
+          printf 'CI_EXIT_CODE=%s\n' "$rc" > execution/ci_repro_01/STATUS.txt
+          cat execution/ci_repro_01/MEASURE.txt
+          cat execution/ci_repro_01/OUTER_STDERR.txt
+          if [ "$rc" -ne 0 ]; then exit "$rc"; fi
+          python -I -S - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path('results')
+          result=json.loads((root/'TEST_RESULT.json').read_text())
+          assert result['status']=='SCOPED_NUMERICAL_PASS',result['status']
+          assert result['unit_tests']==24 and result['failures']==0 and result['errors']==0
+          assert all(x['passed'] for x in result['production_vs_reference'].values())
+          sol=json.loads((root/'RESULT.json').read_text())
+          assert abs(sol['kappa']-0.06866173948059068)<1e-12
+          assert abs(sol['Q2']-11.347835208970784)<1e-11
+          print('CLEAN_CHECKOUT_REPLAY_PASS',sol['beta'],sol['kappa'],sol['Q2'])
+          PY
+      - name: Preserve raw output on all outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-pr254-clean-checkout-replay
+          path: |
+            research/rei_uvb_one_tilt_identifiability_20261028/execution/ci_repro_01/
+            research/rei_uvb_one_tilt_identifiability_20261028/results/
+          if-no-files-found: warn
+          retention-days: 14
