@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "unit_id": "rei_uvb_confidence_union_20261029",
+  "status": "PHASE1_FROZEN",
+  "evidence_status": "derived",
+  "execution_status": "not_run",
+  "reviewer": {
+    "task": "/root/uvb_theory_review",
+    "requested_execution_identity": "Astra-tier independent scientific theory reviewer",
+    "observed_execution_identity": null,
+    "observed_identity_reason": "Runtime model identity not exposed; requested routing is not observation.",
+    "blind_phase": "Source-only; no owner result/report/code or other review read before freeze"
+  },
+  "input": {
+    "path": "intake/BLIND_SOURCE.json",
+    "sha256": "6e72099e6d3981ac731d5bed5ed70f6dabaa1514b7283613f3c258c4ec57e224",
+    "declared_original_source_sha256": "13b56a066a81f2be6e1a7835275de509fa56bdf48c6eba3400318a4b60c36b7b",
+    "original_object_opened": false,
+    "observed_checkout_head": "d6657071ea0e36a1b2643cb3df990e4b1faa855a"
+  },
+  "scope": {
+    "n": 7,
+    "coordinate_order": ["b", "kappa"],
+    "x": "z-3.6",
+    "X": "column_stack(ones(7), x)",
+    "response": "r=d-m+theta*v+j",
+    "nuisance_domain": "theta in [-1,1]; each j_i in [lower_i,upper_i], Cartesian outer box",
+    "template": "Fixed saved Puchwein2019 template from intake",
+    "no_new_ivp": true,
+    "no_physical_scope_expansion": true,
+    "no_production_gate_change": true
+  },
+  "prerequisites": [
+    "All inputs finite and dimensionally conforming",
+    "Covariance C symmetric positive definite; check Cholesky without jitter",
+    "X has rank 2; check whitened numerical rank",
+    "lower_i <= upper_i for all nuisance intervals",
+    "No covariance pseudoinverse, diagonalization or dropped correlations"
+  ],
+  "equations": {
+    "W": "inverse(C), mathematical definition; implement using solves",
+    "V": "inverse(X^T W X)",
+    "A": "V X^T W",
+    "a0": "A(d-m)",
+    "g": "A v",
+    "a_hat": "a0+g*theta+A*j",
+    "j_center": "(lower+upper)/2",
+    "j_halfwidth": "(upper-lower)/2",
+    "center": "a0+A*j_center",
+    "generators": "G=[g,A*diag(j_halfwidth)]",
+    "deterministic_set": "Z=center+G*[-1,1]^8",
+    "support_Z": "s^T center+sum(abs(G^T s))",
+    "projection_Z": "[center_k-sum(abs(G[k,:])),center_k+sum(abs(G[k,:]))]",
+    "intercept_residual_precision": "M=W-W*1*(1^T W 1)^(-1)*1^T W",
+    "slope_precision": "T=x^T M x=1/V[kappa,kappa]",
+    "deltaQ": "Q_intercept_min(eta)-Q_affine_min(eta)=kappa_hat(eta)^2/V[kappa,kappa]",
+    "deltaQ_min": "0 if L<=0<=U else min(L^2,U^2)/V[kappa,kappa]",
+    "deltaQ_max": "max(L^2,U^2)/V[kappa,kappa]",
+    "gaussian_set": "E_q={delta:delta^T inverse(V) delta<=q}",
+    "confidence_union": "U_q=union_eta(a_hat(eta)+E_q)=Z+E_q",
+    "support_union": "support_Z(s)+sqrt(q*s^T V s)",
+    "projection_union": "[L_k-sqrt(q*V[k,k]),U_k+sqrt(q*V[k,k])]",
+    "ellipsoid_witness": "sqrt(q)*V*s/sqrt(s^T V s) for nonzero s; zero for s=0 or q=0",
+    "q_95_single_coordinate": "chi2.ppf(0.95,1)=normal.ppf(0.975)^2",
+    "q_95_joint2": "chi2.ppf(0.95,2)=-2*log(0.05)",
+    "positive_sign_scalar95": "L_kappa-sqrt(q_95_single_coordinate*V[kappa,kappa])>0",
+    "positive_sign_joint95": "L_kappa-sqrt(q_95_joint2*V[kappa,kappa])>0"
+  },
+  "witness_rules": {
+    "upper_theta": "sign(s^T g): positive -> +1, negative -> -1, zero -> 0",
+    "upper_j_i": "sign(s^T A[:,i]): positive -> upper_i, negative -> lower_i, zero -> midpoint_i",
+    "lower": "Use upper witness for -s",
+    "confidence_endpoint": "nuisance support witness plus ellipsoid displacement; report both components",
+    "deltaQ_zero_minimum": "Convex combination of lower/upper kappa nuisance witnesses giving kappa=0 when interval straddles zero",
+    "warning": "Different coordinate extrema need not share one nuisance witness"
+  },
+  "gaussian_coverage_contract": {
+    "generative_model": "d=m+X*a_star-theta_star*v-j_star+epsilon, epsilon~N(0,C)",
+    "true_nuisance": "eta_star lies in fixed H",
+    "fixed_inputs": ["C known and fixed", "X", "m", "v", "H"],
+    "conditional_covariance": "Cov(a_hat(eta_star)-a_star)=A C A^T=V",
+    "single_coordinate_claim": "At least 95 percent coverage for one pre-specified coordinate after nuisance union using q_single",
+    "joint2_claim": "At least 95 percent coverage for full (b,kappa) after nuisance union using q_joint2",
+    "proof": "The union contains the true-nuisance Gaussian confidence set for every fixed eta_star in H",
+    "not_implied": [
+      "Exactly 95 percent coverage of the union",
+      "95 percent joint coverage from q_single",
+      "A probabilistic prior on the deterministic nuisance box",
+      "Statistical sign from a positive deterministic kappa interval alone",
+      "Calibrated nuisance-profiled global significance from pointwise DeltaQ",
+      "Validity under estimated covariance, selected template, data-dependent bounds or misspecified mean without further argument"
+    ]
+  },
+  "acceptance": {
+    "relative_tolerance": 1e-10,
+    "absolute_tolerance": 1e-12,
+    "tolerance_rule": "Use scale-aware residuals; report conditioning-driven failures for reviewer interpretation, do not silently relax",
+    "checks": [
+      "A X equals identity",
+      "A C A^T equals V",
+      "GLS normal equations and quadratic completion",
+      "Source-covariance Cholesky and whitened design rank 2",
+      "Exact deterministic support agrees with endpoint-rule witnesses for +/- axes and an oblique direction",
+      "Nested Q difference equals kappa^2/Vkk at identical eta",
+      "DeltaQ interval minimum treats zero-crossing as interior minimum",
+      "Union support equals deterministic support plus Gaussian radius",
+      "Confidence endpoint witnesses attain support and ellipsoid quadratic radius q",
+      "q=0 reduces to deterministic set; s=0 support equals zero; fixed nuisance reduces to ellipse",
+      "Quantile labels and degrees of freedom distinguish single-coordinate from joint2"
+    ],
+    "required_outputs": ["A", "V", "a0", "g", "center", "G", "deterministic coordinate intervals", "conditional scalar95 intervals", "conditional joint2 projections", "endpoint witnesses", "DeltaQ range", "q values and interpretation", "coverage assumptions", "sign criteria and outcomes"],
+    "numerical_checks_executed": false
+  },
+  "phase1_findings": [
+    "GLS nuisance image is an exact zonotope",
+    "Fixed covariance makes confidence union an exact Minkowski sum with one common ellipsoid",
+    "A positive deterministic kappa interval alone does not establish statistical sign",
+    "The supplied covariance does not by itself establish the Gaussian sampling model"
+  ],
+  "next_action": "Freeze file hashes, then await phase2 authorization before owner-result or code comparison"
+}

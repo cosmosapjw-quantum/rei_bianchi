@@ -1,0 +1,114 @@
+{
+  "schema": "REI_C9_NEW_CONFIDENCE_UNION_IMPLEMENTATION_REVIEW_V1",
+  "verdict": "PASS_SCOPED",
+  "scope": "Conditional decimal-rational GLS confidence-union model with rounded binary64 quantiles, radii and outputs",
+  "reported_source_interval_evidence_status": "numerically_checked",
+  "reviewer_task": "/root/uvb_code_review",
+  "reviewer_implemented_code": false,
+  "observed_backend_model": "NOT_EXPOSED",
+  "identities": {
+    "confidence_union.py": "e975ba4a90934a7b0772c1a604c6f73a0b9cc83ef04379b3118692bb9f68f82a",
+    "run_science.py": "cd18484e17f70aeda6077b3bb1b83e0a6dc36fc249107297e9a32579d43584eb",
+    "run_bounded.py": "3b8be9bfc235b3e417bfc4495c1775ed3dd4cb0342c0515190968f3047c9fc1d",
+    "test_confidence_union.py": "75b25469e96ea48a47caa8cf9f7e8dd9a74eab4404f73f847a7e7c3ad95a129c",
+    "FROZEN_SHA256SUMS": "159e96a2ddcbf0cfb34ab04473fd97db1d82acbc5b29e13940f1e32fc525141e",
+    "RESULT.json": "f38b788c3470aac6ec63541c7c9f6c42f89211700b4ee33499f1c5c6c289f6e4",
+    "RUN_RECEIPT.json": "4fbe497e3045428ce7c8bc5041aee37e2fe5c738173bb34a7de4bd3b305656f2",
+    "STDOUT.txt": "27e3600ac7bbaaba66f7f688872b3474ea3f52cce603ee9c5f7914a1c86f69db",
+    "STDERR.txt": "1c6c169c59f7e4fe8d9a1758bbf2ee1671383a8a64f85d5fd16354ade77fe375",
+    "intervals.tsv": "7cd5dcbb69dc7b8f0606e4c306a0dc59fd0a8172e1f3dffcbb40d146da32529c",
+    "all_manifest_entries_freshly_verified": true,
+    "all_receipt_output_hashes_freshly_verified": true
+  },
+  "actual_execution_evidence": {
+    "status": "EXIT_ZERO",
+    "exit_code": 0,
+    "grouped_tests_passed": 8,
+    "test_wall_s_reported": 0.028,
+    "launcher_elapsed_wall_s": 0.1520509799993306,
+    "executed_by_this_reviewer": false,
+    "scientific_rerun_requested": false
+  },
+  "checks": {
+    "source_dimensions_correlations_sign": "PASS",
+    "exact_LDL_and_gls_mapping": "PASS_DECIMAL_INTERPRETATION",
+    "numerical_Cholesky_whitened_rank": "PASS_OBSERVED_AND_REVIEWED",
+    "AX_ACAT_normal_equations_completion": "PASS_EXACT_TEST_EVIDENCE",
+    "zonotope_support_and_source_witness": "PASS",
+    "confidence_support_and_witness": "PASS_SCOPED_ROUNDED",
+    "q1_q2_labels_and_known_C_scaling": "PASS",
+    "deltaQ_pointwise_range_and_zero_branch": "PASS",
+    "source_and_analytic_test_independence": "PASS_SCOPED_WITH_SHARED_SOLVER_LIMITATION",
+    "outward_interval_certification": "NOT_IMPLEMENTED_NOT_CLAIMED",
+    "empirical_sampling_model_validation": "NOT_ESTABLISHED"
+  },
+  "precision": {
+    "new_exact_interpretation": "Fraction(str(parsed value)); decimal pivot 3.6",
+    "original_exact_interpretation": "Fraction.from_float(binary64 image)",
+    "same_exact_rational_problem_as_PR257": false,
+    "representation_difference": "NONBLOCKING_FOR_DECLARED_ROUNDED_OBSERVABLE_SCOPE",
+    "saved_deterministic_comparison": "Kappa displayed endpoints match; beta upper differs about 7e-18, below original tolerance",
+    "original_regression_tolerance_relaxed": false,
+    "quantile_sqrt_output_arithmetic": "rounded binary64",
+    "directed_rounding": false
+  },
+  "observed_kappa_intervals": {
+    "deterministic": [0.053617504767915498, 0.099225339666118351],
+    "conditional_scalar95": [0.0061387152719417776, 0.14670412916209208],
+    "conditional_joint2_95_projection": [-0.0056774911759022301, 0.15852033560993609],
+    "units": "dex per redshift"
+  },
+  "findings": [
+    {
+      "id": "NUMERIC_REPRESENTATION_SCOPE",
+      "severity": "NONBLOCKING_SCOPE_QUALIFICATION",
+      "finding": "New decimal-rational core differs from original binary64-image rational model; confidence outputs are rounded, not outward-certified",
+      "action": "Carry explicit representation and rounded-numerical qualification into final reporting; no replay required"
+    },
+    {
+      "id": "KNOWN_CHILD_CPU_OMISSION",
+      "severity": "ACCOUNTING_METADATA_CORRECTION",
+      "finding": "children_after-minus-before omits 0.001970 seconds of observed prelaunch child CPU from family debit",
+      "action": "Separate RESOURCE_ACCOUNTING_ADDENDUM.json inspected and accepted; raw receipt/code preserved, inclusive snapshot debit and unknown tail/overhead retained",
+      "local_status": "RESOLVED_BY_METADATA_ADDENDUM",
+      "scientific_replay_required": false
+    }
+  ],
+  "blocking_scientific_findings": [],
+  "accounting": {
+    "raw_debit_cpu_s": 0.160679,
+    "omitted_children_before_cpu_s": 0.001970,
+    "inclusive_observed_snapshot_cpu_s": 0.162649,
+    "prior_known_plus_reserves_cpu_s": 608.750604,
+    "sibling_reserve_cpu_s": 70,
+    "corrected_known_plus_reserves_cpu_s": 678.913253,
+    "controller_proposed_tail_reserve_cpu_s": 1,
+    "corrected_total_with_proposed_tail_reserve_cpu_s": 679.913253,
+    "temporary_ceiling_cpu_s": 700,
+    "correction_method_accepted": true,
+    "later_controller_addendum_inspected": true,
+    "addendum_path": "outputs/RESOURCE_ACCOUNTING_ADDENDUM.json",
+    "raw_receipt_preserved": true,
+    "scientific_rerun_needed": false,
+    "global_budget_PASS": false,
+    "unknown_overhead": "UNKNOWN_NOT_ZERO",
+    "reserve_is_measured_tail": false
+  },
+  "test_limitations": [
+    "Exact checks share LDL and model routines; separate analytic tiny-case expectations supplement them",
+    "Explicit executed ellipsoid-radius checks focus on joint2 q, while scalar output uses the same reviewed formula",
+    "Degenerate zero-width DeltaQ witness branch reviewed statically, not separately exercised",
+    "No new independent primary-table or empirical Gaussian coverage validation"
+  ],
+  "boundaries": {
+    "reviewer_scientific_execution": "NOT_RUN",
+    "CAS_or_render": "NOT_RUN",
+    "new_IVP": 0,
+    "physical_claim_promotion": false,
+    "DAG_delta": 0,
+    "source_edits": false,
+    "old_review_files_changed": false,
+    "commit_or_publish": false
+  },
+  "review_markdown": "research/rei_uvb_confidence_union_20261029/review/C9_NEW_IMPLEMENTATION.md"
+}
