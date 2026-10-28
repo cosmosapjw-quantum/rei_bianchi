@@ -1,0 +1,112 @@
+{
+  "schema": "REI_BIANCHI_STOCK_STATIC_IMPLEMENTATION_V1",
+  "unit": "REI_BIANCHI_STOCK_BOUNDS_PREP",
+  "root_authority": "/root Astra; derived theory next_stock/THEORY_KO.md",
+  "fixed_authority_commit": "0f9d9df825be1dac9ca9bdf73cdc2e8908bcba17",
+  "base_central_sha": "9f410bf0f4b5d14d1e6b7c17cd2e23a916f241c9",
+  "allowed_path": "research/rei_source_pair_binding/bianchi_stock_bounds_20261024/",
+  "local_output": "/workspace/scratch/03a65a604d4c/rei_pressure_execute_20261024/work/research/rei_source_pair_binding/bianchi_stock_bounds_20261024/",
+  "authority_files": [
+    "authority/THEORY_KO.md",
+    "authority/IMPLEMENTATION_CONTRACT.json"
+  ],
+  "implementation_files": [
+    "stock_bounds.py",
+    "focused_check.py",
+    "run_focused_once.py",
+    "PROPOSED_EXECUTION.json",
+    "README.md",
+    "SOURCE_BINDING.json"
+  ],
+  "execution_now": {
+    "candidate_imports": 0,
+    "compile": 0,
+    "tests": 0,
+    "scientific_child_invocations": 0,
+    "CAS_evaluations": 0,
+    "render": 0,
+    "status": "STATIC_PREPARATION_ONLY"
+  },
+  "future_execution_proposal": {
+    "scientific_children_max": 1,
+    "cpu_soft_hard_s": 1,
+    "wall_launch_inclusive_s": 5,
+    "automatic_retries": 0,
+    "status": "PROPOSED_NOT_RELEASED",
+    "execution_permission": "Separate root release required; current pressure release already consumed",
+    "command_python": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "command_args": [
+      "-B",
+      "run_focused_once.py"
+    ],
+    "runner_policy": "Adapt existing pressure one-shot runner; exclusive raw/attempt.json, actual resource and launch-inclusive wall, stdlib only. Do not execute now."
+  },
+  "runtime": "Python 3.12 standard library, no installations",
+  "source_inputs": "int, finite float, Fraction; bool invalid; exact represented conversion; no provider fetch or unit conversion",
+  "validation": {
+    "M": ">0",
+    "k": ">=0",
+    "N": ">=0",
+    "U": ">=0 and <=N*L",
+    "L": ">=0",
+    "ratios": "tuple/list of exactly3 strictly positive exact represented values",
+    "bits": "int excluding bool, 1..4096, default128; unit-dependent sqrt resolution, not physical tolerance",
+    "invalid": "ValueError with meaningful input name"
+  },
+  "functions": [
+    {
+      "name": "kinetic_map_interval",
+      "signature": "kinetic_map_interval(k, M, r, bits=128)",
+      "returns": "tuple(F_lower,F_upper), each Fraction",
+      "formula": "x=r*r*k*(k+2*M); sqrt Q=M*M+x enclosure by exact integer isqrt grid; x/(sqrt_upper+M), x/(sqrt_lower+M); x0 exact0 and r1 exactk"
+    },
+    {
+      "name": "stock_bounds",
+      "signature": "stock_bounds(N, U, L, M, ratios, bits=128)",
+      "returns": {
+        "number_density": "D*N Fraction",
+        "dilution": "D Fraction",
+        "energy_interval": "tuple(U_lower,U_upper) Fractions; U_upper=min(upper_energy_bound_enclosure[1],Nt*support_upper_enclosure[1])",
+        "support_upper_enclosure": "enclosure of F_rmax(L)",
+        "lower_energy_bound_enclosure": "enclosure of D*ell_rmin; mathematical sharp lower endpoint",
+        "upper_energy_bound_enclosure": "enclosure of D*u_rmax; mathematical sharp upper endpoint",
+        "pressure_trace_interval": "(U_lower*(L_upper+2*M)/(3*(L_upper+M)), U_upper*(U_upper+2*M*Nt)/(3*(U_upper+M*Nt))) or zero if Nt0",
+        "sqrt_bits": "bits integer",
+        "claim": "conditional_free_streaming_outer_bounds"
+      }
+    },
+    {
+      "name": "_sqrt_interval",
+      "signature": "private exact rational helper",
+      "formula": "Q=p/q>=0; s=2**bits; n=isqrt((p*s*s)//q); lower=n/s upper=(n+1)/s; if n*n*q==p*s*s upper=lower"
+    }
+  ],
+  "branches": "N0/U0/L0 bypass moment divisions; energy lower/upper0, pressure0; support still maps L; r<=1 convex lower=N*F(U/N), upper=(U/L)*F(L); r>=1 reverse; r1 exact; D=r1*r2*r3. Lower branch evaluated at rmin, upper at rmax.",
+  "future_fixture": {
+    "fixture_groups": 1,
+    "oracle": "Exact rational squared inequalities for algebraic endpoints; independent of isqrt production helper. Serialize Fraction numerator/denominator strings.",
+    "cases": [
+      "Identity N=2,U=2,L=2,M=1,r=(1,1,1): Nt2, energy(2,2), support(2,2), pressure(8/9,1)",
+      "Expansion r=(1/2,1/2,1/2), D1/8: sharp energy lower=(sqrt7-2)/8, upper=(sqrt3-1)/8. Check both endpoint enclosures bracket each exact radical independently.",
+      "Contraction r=(2,2,2), D8: sharp lower=8*(sqrt33-1), upper=16*(sqrt13-1)",
+      "Mixed r=(1/2,1,2), D1: lower=sqrt7-2, upper=2*sqrt13-2, support=sqrt33-1",
+      "Tiny k=2^-200,M1,r1/2,bits64: F lower>0 and lower<=upper; independently verify (F_endpoint+M)^2 relative to Q",
+      "N0/U0/L0, invalid U>NL, nonpositive M/r, wrong ratios length, bool input, invalid bits",
+      "Common measure-weight scale7/3 scales Nt, energy endpoint enclosures, actual energy interval, and pressure interval exactly; support unchanged. No bit-exact energy-unit scaling claim."
+    ]
+  },
+  "forbidden": [
+    "old22/66/83 replay",
+    "ANGTHERM mutation/run",
+    "HI donor reintegration",
+    "cosmological IVP",
+    "physical stopping/heat assertion",
+    "pressure isotropy assertion",
+    "global completion percentage",
+    "Git/cloud writes by worker",
+    "new mandatory security gates"
+  ],
+  "claim_ceiling": "Derived conditional sharp energy bounds over unrestricted angular positive measures and conservative pressure trace bounds; static implementation only pending actual bounded run. No physical source history/Einstein closure.",
+  "independent_review": "Astra read-only theory review plus separate static code review. Actual findings only; root owns admission.",
+  "stopping_rule": "Write exact files and implementation diff; return ambiguity or substantive failure to root; do not run or broaden scope."
+}

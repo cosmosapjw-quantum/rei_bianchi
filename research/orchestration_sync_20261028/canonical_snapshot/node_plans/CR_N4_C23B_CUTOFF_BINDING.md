@@ -1,0 +1,226 @@
+# CR_N4_C23B_CUTOFF_BINDING
+
+Lead: cosmosapjw-quantum/bass_cr
+
+Current status: `COMPLETE_SCOPED_CONSUMER_ADMITTED`
+
+Source: `authority/atomic/EXPANDED_NODE_CONTRACTS.json#/nodes/6`
+
+```json
+{
+  "id": "CR_N4_C23B_CUTOFF_BINDING",
+  "lead_repo": "cosmosapjw-quantum/bass_cr",
+  "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+  "json_pointer": "/nodes/6",
+  "contract": {
+    "id": "CR_N4_C23B_CUTOFF_BINDING",
+    "legacy_repository": "bass_cr",
+    "owner_repository": "bass_cr",
+    "status": "COMPLETE_SCOPED_CONSUMER_ADMITTED",
+    "legacy_contract_preserved": {
+      "status": "OPEN",
+      "execution": "NOT_RUN",
+      "budget": {
+        "inherited_spend": null,
+        "remaining": null,
+        "currency": null,
+        "policy": "unknown is not zero; retain existing campaign receipt; no new heavy launch"
+      },
+      "publication": {
+        "kind": "separate additive draft",
+        "merge": false
+      },
+      "gate_transition": "OPEN -> DERIVED_SCOPED -> IMPLEMENTATION_VERIFIED -> NUMERICALLY_CHECKED_SCOPED -> CONSUMER_ADMITTED only with named consumer and valid source/domain/owner",
+      "no_replay": "completed identities reused, changes verify only affected obligations",
+      "id": "CR_N4_C23B_CUTOFF_BINDING",
+      "depends_on": [],
+      "equations": [
+        "Qe=sum_i n_target_i*sum_j w_ij*delta(K-Kij)",
+        "Nth=Nnuc+Ne,all-int_Kc^inf F(K)dK",
+        "Uth=Uall-int_Kc^inf K*F(K)dK",
+        "dT=2*dUth/(3*kB*Nth)-T*dNth/Nth"
+      ],
+      "domain": "C23B bath-frame rest target atoms, three z only; finite count/energy, positive T; cutoff Kc=chi*kBT, chi>=3/2 for inherited atomic branch existence",
+      "input": [
+        "photoelectron_atoms.csv SHA256 f5bcfe477b8a073341a7496c079e6eb2737f6ca578b884376887b04989e57fc3",
+        "Oct13 KC1-KC7 source a5c29ad4070acb931d92d2bec42a927a57f479ca",
+        "declared target density or abundance, never both"
+      ],
+      "output": [
+        "new supplier-to-existing-cutoff compatibility adapter, missing bath fields explicit"
+      ],
+      "admission_gate": "old theorem assumptions mapped; no physical heat from partition alone; cutoff is not FS10eV boundary; atom energy/count exact; unresolved He/H and stopping retained",
+      "pr_boundary": "Small new connector PR; no fresh theorem novelty and no duplicate old cutoff checks"
+    },
+    "equations": [
+      "Qe=sum_i n_target_i*sum_j w_ij*delta(K-Kij)",
+      "Nth=Nnuc+Ne,all-int_Kc^inf F(K)dK",
+      "Uth=Uall-int_Kc^inf K*F(K)dK",
+      "dT=2*dUth/(3*kB*Nth)-T*dNth/Nth"
+    ],
+    "units": {
+      "number_density": "m^-3 internal; cm^-3 accepted only with declared conversion1cm^-3=1e6m^-3",
+      "energy": "J internal; source-native eV kept,1eV=1.602176634e-19J",
+      "cross_section": "m^2;1cm^2=1e-4m^2;1barn=1e-28m^2",
+      "two_body_rate": "m^3 s^-1",
+      "one_body_rate": "s^-1",
+      "volumetric_event_rate": "m^-3 s^-1",
+      "energy_source": "J m^-3 s^-1",
+      "clock": "declared proper seconds, coordinate conversion explicit",
+      "temperature": "K"
+    },
+    "inputs": [
+      "photoelectron_atoms.csv SHA256 f5bcfe477b8a073341a7496c079e6eb2737f6ca578b884376887b04989e57fc3",
+      "Oct13 KC1-KC7 source a5c29ad4070acb931d92d2bec42a927a57f479ca",
+      "declared target density or abundance, never both"
+    ],
+    "outputs": [
+      "new supplier-to-existing-cutoff compatibility adapter, missing bath fields explicit"
+    ],
+    "domain": "C23B bath-frame rest target atoms, three z only; finite count/energy, positive T; cutoff Kc=chi*kBT, chi>=3/2 for inherited atomic branch existence",
+    "evidence": "C23C frozen five-label caloric consumer18saved requests completed and separately admitted",
+    "admission_gate": [
+      "thermal[0,Kc],active(Kc,infinity)",
+      "density/abundance/proper exposure applied once",
+      "finite count+kinetic integral preserved"
+    ],
+    "pass_next": "Pass reuse18requestidentity => stopping operator input; do not reinterpret caloric partition as heat or assimilation.",
+    "fail_next": "Preserve raw failure/unknown; classify source,physics,numerics,implementation or environment; repair only changed dependency.",
+    "pr_boundary": "Small new connector PR; no fresh theorem novelty and no duplicate old cutoff checks",
+    "budget": {
+      "new_scientific_run_authorized_by_this_audit": false,
+      "heavy_launch": false,
+      "global_remaining": null,
+      "currency": null,
+      "unknown_is_zero": false,
+      "PHYS91_remaining": 0,
+      "CR105_known_lineage_CPU_s": "39.097868524",
+      "CR105_new_CPU_s": "4.86342341",
+      "C23E_separate_lineage_CPU_s": "15.493261114",
+      "sum_lineages_without_overlap_proof": false,
+      "new_unit_limit": "UNBOUND until existing authority budget and actual resource lease are pinned",
+      "completed_identity_replay": false
+    },
+    "claim_ceiling": "Current evidence only; no global physical completion or blanket production admission",
+    "execution_this_audit": "NOT_RUN",
+    "readiness_policy": "conditional on selected model, source domain and actual consumer; do not AND every future catalog channel",
+    "independent_review": "fresh scientific reviewer checks exact changed contracts/source/raw results at proposed claim scope; reuse unchanged prior independent review"
+  },
+  "dependencies": [],
+  "conditional_dependencies": [],
+  "external_prerequisites": [],
+  "current_status": "COMPLETE_SCOPED_CONSUMER_ADMITTED",
+  "claim_gate": [
+    "thermal[0,Kc],active(Kc,infinity)",
+    "density/abundance/proper exposure applied once",
+    "finite count+kinetic integral preserved"
+  ],
+  "pass_next_action": "Pass reuse18requestidentity => stopping operator input; do not reinterpret caloric partition as heat or assimilation.",
+  "budget_status": {
+    "new_scientific_run_authorized_by_this_audit": false,
+    "heavy_launch": false,
+    "global_remaining": null,
+    "currency": null,
+    "unknown_is_zero": false,
+    "PHYS91_remaining": 0,
+    "CR105_known_lineage_CPU_s": "39.097868524",
+    "CR105_new_CPU_s": "4.86342341",
+    "C23E_separate_lineage_CPU_s": "15.493261114",
+    "sum_lineages_without_overlap_proof": false,
+    "new_unit_limit": "UNBOUND until existing authority budget and actual resource lease are pinned",
+    "completed_identity_replay": false
+  },
+  "change_class": [
+    "status_correction"
+  ],
+  "historical_contract_id": "CR_N4_C23B_CUTOFF_BINDING",
+  "source_fields": {
+    "lead_repo": "owner_repository",
+    "current_status": "status",
+    "claim_gate": "admission_gate",
+    "pass_next_action": "pass_next",
+    "budget_status": "budget"
+  },
+  "pr_plan": {
+    "inputs": {
+      "value": [
+        "photoelectron_atoms.csv SHA256 f5bcfe477b8a073341a7496c079e6eb2737f6ca578b884376887b04989e57fc3",
+        "Oct13 KC1-KC7 source a5c29ad4070acb931d92d2bec42a927a57f479ca",
+        "declared target density or abundance, never both"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/6/inputs",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "equations": {
+      "value": [
+        "Qe=sum_i n_target_i*sum_j w_ij*delta(K-Kij)",
+        "Nth=Nnuc+Ne,all-int_Kc^inf F(K)dK",
+        "Uth=Uall-int_Kc^inf K*F(K)dK",
+        "dT=2*dUth/(3*kB*Nth)-T*dNth/Nth"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/6/equations",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "units": {
+      "value": {
+        "number_density": "m^-3 internal; cm^-3 accepted only with declared conversion1cm^-3=1e6m^-3",
+        "energy": "J internal; source-native eV kept,1eV=1.602176634e-19J",
+        "cross_section": "m^2;1cm^2=1e-4m^2;1barn=1e-28m^2",
+        "two_body_rate": "m^3 s^-1",
+        "one_body_rate": "s^-1",
+        "volumetric_event_rate": "m^-3 s^-1",
+        "energy_source": "J m^-3 s^-1",
+        "clock": "declared proper seconds, coordinate conversion explicit",
+        "temperature": "K"
+      },
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/6/units",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "domain": {
+      "value": "C23B bath-frame rest target atoms, three z only; finite count/energy, positive T; cutoff Kc=chi*kBT, chi>=3/2 for inherited atomic branch existence",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/6/domain",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "outputs": {
+      "value": [
+        "new supplier-to-existing-cutoff compatibility adapter, missing bath fields explicit"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/6/outputs",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "positive_acceptance": {
+      "value": [
+        "thermal[0,Kc],active(Kc,infinity)",
+        "density/abundance/proper exposure applied once",
+        "finite count+kinetic integral preserved"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/6/admission_gate",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "failure_disposition": {
+      "value": "Preserve raw failure/unknown; classify source,physics,numerics,implementation or environment; repair only changed dependency.",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/6/fail_next",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "independent_review": {
+      "value": "fresh scientific reviewer checks exact changed contracts/source/raw results at proposed claim scope; reuse unchanged prior independent review",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/6/independent_review",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "PR_boundary": {
+      "value": "Small new connector PR; no fresh theorem novelty and no duplicate old cutoff checks",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/6/pr_boundary",
+      "qualification": "SOURCE_DECLARED"
+    }
+  }
+}
+```

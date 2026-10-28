@@ -1,0 +1,184 @@
+{
+  "schema": "REI_HI_MASSIVE_STRESS_IMPLEMENTATION_CONTRACT_V1",
+  "unit": "HI_NATIVE_MASSIVE_STRESS_20261025",
+  "status": "FROZEN_FOR_IMPLEMENTATION_EXECUTION_REQUIRES_EXPLICIT_ROOT_GO",
+  "selected_stages": {
+    "theory": "R1-R10",
+    "coding": "C1-C10",
+    "reason": "User requests next theory loop and implementing coding loop"
+  },
+  "skill_context": {
+    "version": "1.3.0 observed current plugin",
+    "directory": "/workspace/scratch/03a65a604d4c/rei_followup_20261025/authority/skill_context",
+    "historical_1_0_policy": "preserved; not used to replay completed science"
+  },
+  "authority": {
+    "fixed": "0f9d9df825be1dac9ca9bdf73cdc2e8908bcba17",
+    "central_base": "fc159d2b15843bdfe81af0840bc07392a4977680",
+    "agents_blob": "429a5a13ee75b1222bc50627f8d5973d01dd21c4",
+    "protected_branch": "research/rei-coupled-isotope-contract-20261022",
+    "protected_sha": "8d10231b1f0f788164d5eadbe1bcee0b802cceca"
+  },
+  "paths": {
+    "task_root": "/workspace/scratch/03a65a604d4c/rei_followup_20261025",
+    "allowed_work": "/workspace/scratch/03a65a604d4c/rei_followup_20261025/work/research/rei_source_pair_binding/hi_massive_stress_20261025",
+    "git_leaf": "research/rei_source_pair_binding/hi_massive_stress_20261025/",
+    "no_clone_or_worktree": true
+  },
+  "inputs": {
+    "native_csv": "/workspace/scratch/03a65a604d4c/rei_cohort_20261024/work/research/rei_source_pair_binding/hi_native_atoms_20261024/inputs/photoelectron_atoms.csv",
+    "csv_sha256": "f5bcfe477b8a073341a7496c079e6eb2737f6ca578b884376887b04989e57fc3",
+    "prior_raw": "/workspace/scratch/03a65a604d4c/rei_cohort_20261024/work/research/rei_source_pair_binding/hi_native_atoms_20261024/raw/stdout.jsonl",
+    "raw_sha256": "0335abad8879817b5e61b0f5ef7120009c2e18251be4fe82ea3e48c8e7aa5669",
+    "selection": {
+      "redshift": "2.479",
+      "channel": "HI",
+      "expected_rows": 4368
+    },
+    "parse": "CSV float roundtrip then Fraction.from_float; mass decimal exact string",
+    "reuse": "moments.A/K/B/P/maximum_kinetic from saved raw, no old consumer functions/import/test",
+    "mass_eV": "510998.95069",
+    "standard_uncertainty_eV": "0.00016",
+    "mass_sensitivity_points": [
+      "510998.95053",
+      "510998.95069",
+      "510998.95085"
+    ],
+    "mass_interval_claim": "declared standard-uncertainty sensitivity probes, not rigorous confidence interval"
+  },
+  "formulas": {
+    "kernel": "g=k*(k+2M)/(k+M)",
+    "derivative_M": "k^2/(k+M)^2",
+    "pressure": "W/3",
+    "source": "a*X*W/3",
+    "jvp": "(a*dX+X*da)*W/3+a*X*dM*S/3",
+    "defect": "2K-W",
+    "angular_closure": "declared isotropic; flux=0 STF=0",
+    "thermal_heat": null,
+    "no_rest_energy_addition": true
+  },
+  "algorithm": {
+    "primary": "per-term exact rational, dynamic-scale outward dyadic integer accumulation",
+    "precision_bits": [
+      128,
+      160
+    ],
+    "no_global_general_fraction_sum": true,
+    "reference": "Decimal100, alternative kernel 2k-k^2/(k+M), same immutable floats represented by integer ratios",
+    "float_output": "certified only if both exact endpoints map to same finite binary64",
+    "unresolved": "explicit ROUNDING_UNRESOLVED; no precision escalation",
+    "source_parameters": {
+      "a": "2",
+      "X": "3",
+      "da": "-1",
+      "dX": "2",
+      "dM": "3"
+    },
+    "source_parameter_class": "synthetic linearization control, not actual density or initial stock"
+  },
+  "acceptance": {
+    "hand": {
+      "atoms": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "2",
+          "3"
+        ]
+      ],
+      "M": "1",
+      "W": "8",
+      "S": "4/3",
+      "D": "4",
+      "pressure": "8/3",
+      "source": "16",
+      "jvp": "32/3"
+    },
+    "actual": [
+      "4368 selected rows and immutable input hashes match",
+      "W,S,MminusW,MplusW intervals nested P160 within P128",
+      "width <= N*delta",
+      "nominal and endpoint pressure values binary64 certified stable",
+      "Decimal100 exact parsed rational result lies in P160 bounds for W/S/endpoints",
+      "primary vs Decimal100 relative <=2e-15 for nonzero actual quantities",
+      "K<=W<=2K and 0<=D<=L*K/(L+M), D/W<=L/(L+2M) certified via interval endpoints",
+      "Wminus<=W0<=Wplus and two concavity inequalities certified"
+    ],
+    "controls": [
+      "hand rational exact containment/rounding",
+      "zero/empty measure",
+      "direct signed enclosure 1/3-2/7=1/21 and cancellation/zero classification",
+      "explicit unresolved interval spanning adjacent floats",
+      "nonfinite/negative k,w and nonpositive M reject",
+      "overflow reject",
+      "new pressure final-underflow and subnormal tags",
+      "hand source and mass+amplitude JVP"
+    ],
+    "legacy_L0_gate": "2e-12 unchanged",
+    "no_old_tests_replayed": true
+  },
+  "execution": {
+    "executor": "existing lower-tier /root/bounded_coding requested gpt-6.1-sol/high; observed runtime identity not asserted",
+    "one_primary_child": true,
+    "science_cpu_cap_s": 6,
+    "science_wall_cap_s": 8,
+    "concurrency": 1,
+    "threads": 1,
+    "max_memory_mb": 512,
+    "network_in_child": false,
+    "compile_import_tests_outside_child": 0,
+    "render": 0,
+    "repair": "Only actual finding, root authorization, same cumulative new-unit cap; no blind repeat",
+    "cas": {
+      "max_calls": 1,
+      "outer_time_constraint_s": 5,
+      "inner_time_constraint_s": 3,
+      "accounting": "remote actual CPU unknown, separate from local child; no reset of historical cap"
+    }
+  },
+  "budget_history": {
+    "known_partial_cpu_before_s": "10.765369",
+    "historical_increment_cpu_s": "10.110448",
+    "historical_cap_s": "10",
+    "historical_overrun_s": "0.110448",
+    "historical_cap_status": "FAIL_PRESERVED",
+    "cap_reset": 0,
+    "cap_relaxation": 0,
+    "whole_L0_debit": "UNKNOWN_NOT_ZERO",
+    "original_cumulative_cap": "NOT_FROZEN",
+    "prior_model_IO_packaging_CAS_cost": "unmeasured, not zero"
+  },
+  "stop_rule": "After one useful child and one independent R6/C9 review, root closes actual findings or holds affected claims; no next science unit.",
+  "publication": "Root only, after scoped admission fresh AGENTS/HEAD/protected check, allowed new leaf, expected-SHA/non-force; no new PR unless necessary.",
+  "outputs": [
+    "stress_source.py",
+    "focused_check.py",
+    "run_focused_once.py",
+    "inputs/mass_source.json",
+    "inputs/prior_moments.json (verbatim extraction of saved fields, documented)",
+    "inputs/photoelectron_atoms.csv exact copy or existing Git blob reference",
+    "raw/stdout.jsonl",
+    "raw/stderr.txt",
+    "raw/resource_receipt.json",
+    "RESULT_SUMMARY.json",
+    "PATCH.diff",
+    "README.md"
+  ],
+  "completion_limits": {
+    "L4_ready": false,
+    "whole_model_completion": null,
+    "remaining_actual_inputs": [
+      "n_HI/time history",
+      "initial stock",
+      "geometry/time/frame matching",
+      "collision/stopping/photon supply"
+    ],
+    "ANGTHERM02": "READ_ONLY",
+    "C23E": "conditional D43K preserved",
+    "HE94": "partial window preserved",
+    "PHYS85": "historical state preserved"
+  }
+}
+

@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "unit": "GRID044_CONTINUOUS_OPACITY_RESPONSE_20261025",
+  "scope": "Actual z2 continuum sigma-weighted rates for two unchanged sources, six inherited valence electronic channels, and frozen-radiation21state target/source-template response. No IVP.",
+  "definitions": "DERIVATION.md",
+  "conventions": {
+    "signature": "(-,+,+,+)",
+    "observer": "normal tetrad comoving ground-state targets; no atomic Doppler/alignment/polarization correction",
+    "sigma": "m²; unchanged provider Mb multiplied1e-22",
+    "density": "nHref_m^-3",
+    "c_m_s": 299792458,
+    "energy": "eV",
+    "time": "properseconds; etaRHS divides all rates byobserverH once",
+    "Gamma": "s^-1 pertarget",
+    "P_and_K": "eV/s pertarget",
+    "target_y": "n_i/nHref"
+  },
+  "lineage": {
+    "background_sha256": "ae20c278239787c020e45028a6d6804cb9f056b75076a1d5ab045c0a7389733b",
+    "model_config_sha256": "c680eff7d1eb3c3a0c9a8414135fe506441a59a8dd102dc54be01f1507037d71",
+    "provider_commit": "d870ce943005bf93e332ca32ca8c945798b1331c",
+    "provider_manifest": "../intake/provider/PROVIDER_MANIFEST.json",
+    "provider_atomic_network_sha256": "6730e3091de918f693e02e40b0bdf1fefc543a5dcc4de23efd885ca098e2ed5f",
+    "provider_core_sha256": "74b2a8c30c62f4a50e7c5c4bcf92cb159549ffcb904a3e423a793169c2f2bb27",
+    "normalization": "Reuse exact saved prior independent64/96 source normalizers withhashbound priorpayload, no repeat scientific normalization campaign."
+  },
+  "sources": {
+    "names": [
+      "stellar",
+      "external_IGM"
+    ],
+    "actual_amplitude_multipliers": [
+      1,
+      1
+    ],
+    "birth_support_eV": [
+      5,
+      150
+    ],
+    "same_parameters": true,
+    "escape_factor_once": true
+  },
+  "channels": {
+    "names": [
+      "HI",
+      "HeI",
+      "HeII",
+      "LiI",
+      "LiII",
+      "LiIII"
+    ],
+    "chi_eV": [
+      13.6,
+      24.59,
+      54.42,
+      5.392,
+      75.64,
+      122.5
+    ],
+    "LiI": "Adopted valencePH2 below64.39eV plus original PH1outer2s at/above64.39; valid declared fullvalence response through150eV, splitnottruncate.",
+    "LiI_branch_eV": 64.39,
+    "LiI_core_Auger": "Unmodeled additional physicalchannel/outcome; not added tovalencefit",
+    "branch_continuity": "Do not require continuity between separateauthorfitbranches; integrate actual specifiedpiecewise function.",
+    "other_channels_domain_eV_max": 50000
+  },
+  "integrals": {
+    "measure": "dM_s=(q_s/H_b)s_s(E_b)deta_b dE_b dmu_b",
+    "energy": "E_o=gE_b using unchanged directionalray",
+    "I0": "integral sigma(E_o)dM",
+    "IE": "integral E_o sigma(E_o)dM",
+    "IX": "integral (E_o-chi)sigma(E_o)dM computed independentlypositive",
+    "rates": "[Gamma,P,K]=c*nHref*[I0,IE,IX]",
+    "identity": "P=chi*Gamma+K",
+    "support": "E_b∈[max(5,chi/g),150],splitLiI64.39/g wheninterior; noobservercut5"
+  },
+  "operator": {
+    "state_labels": [
+      "n",
+      "H1_0",
+      "H1_1",
+      "D_0",
+      "D_1",
+      "T_0",
+      "T_1",
+      "He3_0",
+      "He3_1",
+      "He3_2",
+      "He4_0",
+      "He4_1",
+      "He4_2",
+      "Li6_0",
+      "Li6_1",
+      "Li6_2",
+      "Li6_3",
+      "Li7_0",
+      "Li7_1",
+      "Li7_2",
+      "Li7_3"
+    ],
+    "edges": "13adjacentchargeedgesinWORK_THREADoutputorderLi6thenLi7;label-basedmappingtorecoveredproviderLi7thenLi6;isotopeelectronicequalityexplicit",
+    "R": "R_e=y_lower*sum_s lambda_s Gamma_channel,s",
+    "F": "S R",
+    "Jy": "sum_e S_ie delta(k,lower_e) Gamma_channel",
+    "Jlambda": "sum_e S_ie y_lower_e Gamma_channel,s",
+    "electron": "sumR=charge^T F",
+    "binding": "sumchiR=cumulativeionizationpotential^T F",
+    "radiation_energy_loss": "sum_e y_lower P_channel",
+    "primary_electron_energy": "sum_e y_lower K_channel",
+    "energy_identity": "-radiation_loss+binding+primary_electron=0",
+    "derivative_scope": "fixedradiationtargets and relativeamplitudesofsameemissiontemplates; notfullcoupledphotondistribution/opacity/thermal/nuclearJacobian",
+    "primary_electron_vs_heat": "Noenergydepositionfractionorinstantthermalizationassumption adopted",
+    "nT": "n hasnoelectronic edge; suppliedpositiveT canphotoionize H-like; physicalproduction/decaycoupling remainsopen"
+  },
+  "numerical": {
+    "observer_eta_fractions": [
+      1
+    ],
+    "sources": 2,
+    "channels": 6,
+    "production_orders": {
+      "birth": 8,
+      "angle": 12,
+      "energy": 16
+    },
+    "fine_orders": {
+      "birth": 12,
+      "angle": 20,
+      "energy": 24
+    },
+    "oracle_orders": {
+      "birth": 12,
+      "observer_energy": 24,
+      "angle": 24
+    },
+    "oracle": "Separateobserverenergyintegration E_b=E_o/g withJacobian1/g, independentlycodedsources/geometryformula; sharesfrozenbackgroundandtimeroothelper. LiIbranchsplitallrequiredintegrationdimensions.",
+    "provider_oracle": "independentlycodedscalarPH2/PH1formula againstunchangedvectorprovider; exactsourcecoefficients shared",
+    "precheck": "sameHermitecontinuousmonotonicity support certificate reused withunchangedinputidentity"
+  },
+  "acceptance": {
+    "each_positive_component_relative": 0.0001,
+    "energy_partition_relative": 3e-12,
+    "provider_scalar_relative": 2e-12,
+    "jacobian_centered_FD_scaled": 2e-05,
+    "jacobian_complex_step_scaled": 2e-12,
+    "nonnegative": "allphysicalratespositiveatnonzeroepoch; structuralsupportzerosretainedwithoutclipping",
+    "conservation": "isotope/baryoncensus,charge/electron,energyidentitiescheckedwithscaleappropriatefloatingtolerance fixedintestdesign",
+    "scope": "endpointfinitefunctionalaccuracyandfrozenradiationJacobian; N6 unchanged"
+  },
+  "execution": {
+    "campaign": "GRID044_CONTINUOUS_SOURCE_CONSTRUCTION_CONTINUATION",
+    "reset": false,
+    "cap_CPU_s": 10,
+    "cap_wall_s": 20,
+    "carried_CPU_s": 6.761298,
+    "carried_wall_s": 6.785563964011089,
+    "remaining_CPU_s": 3.238702,
+    "remaining_wall_s": 13.21443603598891,
+    "IVPs": 0,
+    "workers": 1,
+    "BLAS_threads": 1,
+    "all_imports_and_provider_constructor": "inside measuredchild;GLinitializationscharged",
+    "root_preexec_GO_required": true,
+    "new_attempt_limits": "Root authorization andfixedimplementationdesign; noexecutionfromtheoryagent"
+  },
+  "three_axes": {
+    "symmetry_gauge": "LRS/reflectionfold;constantspatialcoordinate-rescaling withnormalobserverfixed",
+    "invariants": "isotopenucleicensus andbaryoncensus;ion+electroncharge;localcollisionenergytransfer; positivegenerator",
+    "observables": "normal-observerper-targetGamma/P/K andtarget-weightedevent,storedionization,primaryelectronrates; modeledfrozenpilotnotobservationalcalibration"
+  },
+  "no_go": {
+    "claimed": false,
+    "NG1_to_NG7": "Reviewed forscope; constructiveoperator,nouniversalexclusionornovelno-goclaim"
+  },
+  "remaining": [
+    "dynamicattenuatedcontinuousradiationconsumer",
+    "fullycoupledphoton/target/thermalJacobian",
+    "secondaryelectronenergydeposition",
+    "LiIcore/Augerratesandoutcomes",
+    "mainN6refinement",
+    "physicaln/Tproductionandneutrondecayp/CR/neutrinocoupling"
+  ]
+}

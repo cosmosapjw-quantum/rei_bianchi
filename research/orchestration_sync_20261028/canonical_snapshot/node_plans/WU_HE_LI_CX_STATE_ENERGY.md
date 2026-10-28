@@ -1,0 +1,220 @@
+# WU_HE_LI_CX_STATE_ENERGY
+
+Lead: cosmosapjw-quantum/WU088_HH
+
+Current status: `OPEN_SOURCE_DEPENDENCIES`
+
+Source: `authority/atomic/EXPANDED_NODE_CONTRACTS.json#/nodes/2`
+
+```json
+{
+  "id": "WU_HE_LI_CX_STATE_ENERGY",
+  "lead_repo": "cosmosapjw-quantum/WU088_HH",
+  "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+  "json_pointer": "/nodes/2",
+  "contract": {
+    "id": "WU_HE_LI_CX_STATE_ENERGY",
+    "legacy_repository": "WU088_HH",
+    "owner_repository": "WU088_HH",
+    "status": "OPEN_SOURCE_DEPENDENCIES",
+    "legacy_contract_preserved": {
+      "status": "OPEN",
+      "execution": "NOT_RUN",
+      "budget": {
+        "inherited_spend": null,
+        "remaining": null,
+        "currency": null,
+        "policy": "unknown is not zero; retain existing campaign receipt; no new heavy launch"
+      },
+      "publication": {
+        "kind": "separate additive draft",
+        "merge": false
+      },
+      "gate_transition": "OPEN -> DERIVED_SCOPED -> IMPLEMENTATION_VERIFIED -> NUMERICALLY_CHECKED_SCOPED -> CONSUMER_ADMITTED only with named consumer and valid source/domain/owner",
+      "no_replay": "completed identities reused, changes verify only affected obligations",
+      "id": "WU_HE_LI_CX_STATE_ENERGY",
+      "depends_on": [],
+      "equations": [
+        "DeltaEevent=sum(Ebinding_products)-sum(Ebinding_reactants)",
+        "Qthermal+Qphoton+Qrecoil+DeltaEevent=0",
+        "dn/dt=S*r"
+      ],
+      "domain": "state-resolved He/Li CX with explicit projectile/target charge, excited branches, collision energies",
+      "input": [
+        "primary channel cross sections",
+        "branch probabilities, thresholds, photon/recoil owner"
+      ],
+      "output": [
+        "positive incidence columns; level-resolved rates and thermal/photon source"
+      ],
+      "admission_gate": "nuclei and charge exact per event, all included branch energy closure, domain coverage table",
+      "pr_boundary": "One source/branching PR; separate thermal consumer activation"
+    },
+    "equations": [
+      "DeltaEevent=sum(Ebinding_products)-sum(Ebinding_reactants)",
+      "Qthermal+Qphoton+Qrecoil+DeltaEevent=0",
+      "dn/dt=S*r"
+    ],
+    "units": {
+      "number_density": "m^-3 internal; cm^-3 accepted only with declared conversion1cm^-3=1e6m^-3",
+      "energy": "J internal; source-native eV kept,1eV=1.602176634e-19J",
+      "cross_section": "m^2;1cm^2=1e-4m^2;1barn=1e-28m^2",
+      "two_body_rate": "m^3 s^-1",
+      "one_body_rate": "s^-1",
+      "volumetric_event_rate": "m^-3 s^-1",
+      "energy_source": "J m^-3 s^-1",
+      "clock": "declared proper seconds, coordinate conversion explicit",
+      "temperature": "K"
+    },
+    "inputs": [
+      "primary channel cross sections",
+      "branch probabilities, thresholds, photon/recoil owner"
+    ],
+    "outputs": [
+      "positive incidence columns; level-resolved rates and thermal/photon source"
+    ],
+    "domain": "state-resolved He/Li CX with explicit projectile/target charge, excited branches, collision energies",
+    "evidence": "H/D C23E conditional CX reused; He/Li state resolved transfer absent from selected admitted matrix",
+    "admission_gate": [
+      "separate reactant isotope+charge+level",
+      "each branch nuclei/charge/Q/recoil ledger",
+      "reverse pairing and detailed balance only under applicable source conventions"
+    ],
+    "pass_next": "Pass => thermal rates and CR tagged collision adapter; otherwise acquire missing branching/state source.",
+    "fail_next": "Preserve raw failure/unknown; classify source,physics,numerics,implementation or environment; repair only changed dependency.",
+    "pr_boundary": "One source/branching PR; separate thermal consumer activation",
+    "budget": {
+      "new_scientific_run_authorized_by_this_audit": false,
+      "heavy_launch": false,
+      "global_remaining": null,
+      "currency": null,
+      "unknown_is_zero": false,
+      "PHYS91_remaining": 0,
+      "CR105_known_lineage_CPU_s": "39.097868524",
+      "CR105_new_CPU_s": "4.86342341",
+      "C23E_separate_lineage_CPU_s": "15.493261114",
+      "sum_lineages_without_overlap_proof": false,
+      "new_unit_limit": "UNBOUND until existing authority budget and actual resource lease are pinned",
+      "completed_identity_replay": false
+    },
+    "claim_ceiling": "Current evidence only; no global physical completion or blanket production admission",
+    "execution_this_audit": "NOT_RUN",
+    "readiness_policy": "conditional on selected model, source domain and actual consumer; do not AND every future catalog channel",
+    "independent_review": "fresh scientific reviewer checks exact changed contracts/source/raw results at proposed claim scope; reuse unchanged prior independent review"
+  },
+  "dependencies": [],
+  "conditional_dependencies": [],
+  "external_prerequisites": [],
+  "current_status": "OPEN_SOURCE_DEPENDENCIES",
+  "claim_gate": [
+    "separate reactant isotope+charge+level",
+    "each branch nuclei/charge/Q/recoil ledger",
+    "reverse pairing and detailed balance only under applicable source conventions"
+  ],
+  "pass_next_action": "Pass => thermal rates and CR tagged collision adapter; otherwise acquire missing branching/state source.",
+  "budget_status": {
+    "new_scientific_run_authorized_by_this_audit": false,
+    "heavy_launch": false,
+    "global_remaining": null,
+    "currency": null,
+    "unknown_is_zero": false,
+    "PHYS91_remaining": 0,
+    "CR105_known_lineage_CPU_s": "39.097868524",
+    "CR105_new_CPU_s": "4.86342341",
+    "C23E_separate_lineage_CPU_s": "15.493261114",
+    "sum_lineages_without_overlap_proof": false,
+    "new_unit_limit": "UNBOUND until existing authority budget and actual resource lease are pinned",
+    "completed_identity_replay": false
+  },
+  "change_class": [
+    "status_correction"
+  ],
+  "historical_contract_id": "WU_HE_LI_CX_STATE_ENERGY",
+  "source_fields": {
+    "lead_repo": "owner_repository",
+    "current_status": "status",
+    "claim_gate": "admission_gate",
+    "pass_next_action": "pass_next",
+    "budget_status": "budget"
+  },
+  "pr_plan": {
+    "inputs": {
+      "value": [
+        "primary channel cross sections",
+        "branch probabilities, thresholds, photon/recoil owner"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/2/inputs",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "equations": {
+      "value": [
+        "DeltaEevent=sum(Ebinding_products)-sum(Ebinding_reactants)",
+        "Qthermal+Qphoton+Qrecoil+DeltaEevent=0",
+        "dn/dt=S*r"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/2/equations",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "units": {
+      "value": {
+        "number_density": "m^-3 internal; cm^-3 accepted only with declared conversion1cm^-3=1e6m^-3",
+        "energy": "J internal; source-native eV kept,1eV=1.602176634e-19J",
+        "cross_section": "m^2;1cm^2=1e-4m^2;1barn=1e-28m^2",
+        "two_body_rate": "m^3 s^-1",
+        "one_body_rate": "s^-1",
+        "volumetric_event_rate": "m^-3 s^-1",
+        "energy_source": "J m^-3 s^-1",
+        "clock": "declared proper seconds, coordinate conversion explicit",
+        "temperature": "K"
+      },
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/2/units",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "domain": {
+      "value": "state-resolved He/Li CX with explicit projectile/target charge, excited branches, collision energies",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/2/domain",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "outputs": {
+      "value": [
+        "positive incidence columns; level-resolved rates and thermal/photon source"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/2/outputs",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "positive_acceptance": {
+      "value": [
+        "separate reactant isotope+charge+level",
+        "each branch nuclei/charge/Q/recoil ledger",
+        "reverse pairing and detailed balance only under applicable source conventions"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/2/admission_gate",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "failure_disposition": {
+      "value": "Preserve raw failure/unknown; classify source,physics,numerics,implementation or environment; repair only changed dependency.",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/2/fail_next",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "independent_review": {
+      "value": "fresh scientific reviewer checks exact changed contracts/source/raw results at proposed claim scope; reuse unchanged prior independent review",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/2/independent_review",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "PR_boundary": {
+      "value": "One source/branching PR; separate thermal consumer activation",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/2/pr_boundary",
+      "qualification": "SOURCE_DECLARED"
+    }
+  }
+}
+```

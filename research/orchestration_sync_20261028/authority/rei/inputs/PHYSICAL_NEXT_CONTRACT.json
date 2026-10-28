@@ -1,0 +1,20 @@
+{
+  "schema":"REI_PHYSICAL_F4_UVB_CALIBRATION_V1",
+  "skill_version":"user-exact-path built-in1.0.0",
+  "scope":"Physical F4 partial: empirical H I hazard likelihood and sourced UVB moment adapter; no IVP",
+  "inputs":["sources/BECKER_BOLTON_2013.json","sources/PUCHWEIN_2019_FIDUCIAL.json","sources/lumina actual text files and metadata"],
+  "Lumina_history_adapter":{"meaning":"simulation predictions, not observed covariance","fields":["SFRD","volume_weighted_HI_median","HeIII_median","cumulative_tau"],"interpolation":"piecewise-linear in z for all four; no floors","query_z":[20,10,6,4,3],"domains":"read exact endpoints from actual files; reject extrapolation","HeIII_quantile_inversion":"detect labeled ordering failure; median-only allowed; band UNRESOLVED_QUANTILE_LABELS; no sorting","SFRD_to_emissivity_missing":["spectral photon yield","escape fraction","unit conversion","transport and opacity"],"local_gas_mapping":"not inferred from volume-weighted fractions"},
+  "default_future_numerics":{"case":"ON_refined","rtol":2e-8,"scaled_atol":2e-12,"old_case_mutation":false},
+  "domains":{"raw_UVB_z":[0,15.1],"calibrated_overlap_z":[2.4,4.75],"extrapolation":"reject by default","z20_prehistory":"MISSING_INPUT"},
+  "units":{"Gamma":"s^-1 per target","heating":"eV/s per target","data":"log10(Gamma_HI/(1e-12 s^-1))","covariance":"dex^2, already divided100"},
+  "interpolation":{"positive_rates":"linear log10(rate) in z","zero_rate":"exact knot allowed; interval touching zero explicitly linear in rate, no floor","observation_lograte":"piecewise linear in z with covariance w^T C w"},
+  "fit":{"template":"Puchwein2019 fiducial HI rate","parameters":"common log10 amplitude beta","residual":"d-m-beta*1","method":"Cholesky solves full covariance","nominal_statistical_dof":6,"EOS_residual":"d-m+theta*v-beta*1","EOS_theta_domain":[-1,1],"EOS_theta_meaning":"(gamma_EOS-1.4)/0.2","EOS_degenerate_relative_threshold":1e-12,"Jeans_systematic":"preserved NOT_PROFILED"},
+  "partial_adapter_fields":{"available":["Gamma_HI","Gamma_HeI","Gamma_HeII","heating_HI","heating_HeI","heating_HeII"],"missing":["Li_photo_rates","MeV_photon_spectrum","CR_kernel","inverse_weak_bath","stopping","gas_temperature","electron_density","H","shear","initial_populations"],"Compton_column":"EXCLUDED"},
+  "physical_admission":{"HI":"conditional empirical calibration over overlap","He_heating":"template-shape conditional rescaling","Bianchi_observation_mapping":"UNSUPPLIED","full_physical_F4":"PARTIAL","physical_fast_count":4,"physical_fast_total":7,"global_working":33,"global_total":88},
+  "numeric_checks":{"relative_tolerance":1e-11,"absolute_tolerance":1e-13,"IVPs":0,"required_actual_data_fit":true},
+  "budget_advice":{"main_inherited":605.47145,"main_temporary_cap":620,"main_original_cap":600,"presentation_inherited":62.468055494,"presentation_existing_explicit_ceiling":65,"new_render_child_max":2,"new_render_tail":0.5,"presentation_reserved_max":64.968055494,"restore_policy_caps":true,"reset_or_transfer":false},
+  "Wolfram_actual_calls":[
+    {"timeConstraint":20,"code":"Clear[s11,s12,s22,r1,r2,b]; w={{s11,s12},{s12,s22}}; r={r1,r2}; one={1,1}; bh=(one.w.r)/(one.w.one); {FullSimplify[D[(r-b one).w.(r-b one),b]/.b->bh],FullSimplify[(r-bh one).w.(r-bh one)-(r.w.r-(one.w.r)^2/(one.w.one))],FullSimplify[(g/s1)*s1],FullSimplify[(1-u)*(e1-i)+u*(e2-i)-((1-u)*e1+u*e2-i)]}","returned":"{0,0,g,0}"},
+    {"timeConstraint":10,"code":"Clear[u,v,w,r,s,t]; pp={{u,v},{v,w}}; rr={r,s}; vv={1,t}; th=-(vv.pp.rr)/(vv.pp.vv); FullSimplify[D[(rr+x vv).pp.(rr+x vv),x]/.x->th]","returned":"0"}
+  ]
+}

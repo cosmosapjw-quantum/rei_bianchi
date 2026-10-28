@@ -1,0 +1,253 @@
+# WU_SPECTRAL_GEOMETRY_COUPLING
+
+Lead: cosmosapjw-quantum/WU088_HH
+
+Current status: `PARTIAL_REASSIGNED_INTERFACES`
+
+Source: `authority/atomic/EXPANDED_NODE_CONTRACTS.json#/nodes/5`
+
+```json
+{
+  "id": "WU_SPECTRAL_GEOMETRY_COUPLING",
+  "lead_repo": "cosmosapjw-quantum/WU088_HH",
+  "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+  "json_pointer": "/nodes/5",
+  "contract": {
+    "id": "WU_SPECTRAL_GEOMETRY_COUPLING",
+    "legacy_repository": "WU088_HH",
+    "owner_repository": "WU088_HH",
+    "status": "PARTIAL_REASSIGNED_INTERFACES",
+    "legacy_contract_preserved": {
+      "status": "OPEN",
+      "execution": "NOT_RUN",
+      "budget": {
+        "inherited_spend": null,
+        "remaining": null,
+        "currency": null,
+        "policy": "unknown is not zero; retain existing campaign receipt; no new heavy launch"
+      },
+      "publication": {
+        "kind": "separate additive draft",
+        "merge": false
+      },
+      "gate_transition": "OPEN -> DERIVED_SCOPED -> IMPLEMENTATION_VERIFIED -> NUMERICALLY_CHECKED_SCOPED -> CONSUMER_ADMITTED only with named consumer and valid source/domain/owner",
+      "no_replay": "completed identities reused, changes verify only affected obligations",
+      "id": "WU_SPECTRAL_GEOMETRY_COUPLING",
+      "depends_on": [
+        "WU_CE83_OWNER_COMPLETION",
+        "WU_HE_LI_CX_STATE_ENERGY",
+        "WU_D_PI_RR_MATCHED",
+        "WU_NUCLEAR_PARTICLE_OWNERSHIP"
+      ],
+      "equations": [
+        "n_dot=S*r",
+        "Utotal_dot+expansion_work+shear_work=external_supply-escape",
+        "pi_total=sum signed same-frame tensors before norm"
+      ],
+      "domain": "non-tilted LRS; isotropic reacting gas, separate collisionless dark matter; recombination-to-z20 initial charge pinned",
+      "input": [
+        "closed rate/domain/owner contracts",
+        "REC initial charge/line suppliers",
+        "Li inner-shell/Auger branching"
+      ],
+      "output": [
+        "conservative consumer prototype and distinct small new input validation"
+      ],
+      "admission_gate": "photon reabsorption/escape and initial-charge consistency closed; global/production adoption remains separate",
+      "pr_boundary": "Consumer PR only after dependency delivery; HH_R10 stays OFF until original HH gates independently met"
+    },
+    "equations": [
+      "n_dot=S*r",
+      "Utotal_dot+expansion_work+shear_work=external_supply-escape",
+      "pi_total=sum signed same-frame tensors before norm"
+    ],
+    "units": {
+      "number_density": "m^-3 internal; cm^-3 accepted only with declared conversion1cm^-3=1e6m^-3",
+      "energy": "J internal; source-native eV kept,1eV=1.602176634e-19J",
+      "cross_section": "m^2;1cm^2=1e-4m^2;1barn=1e-28m^2",
+      "two_body_rate": "m^3 s^-1",
+      "one_body_rate": "s^-1",
+      "volumetric_event_rate": "m^-3 s^-1",
+      "energy_source": "J m^-3 s^-1",
+      "clock": "declared proper seconds, coordinate conversion explicit",
+      "temperature": "K"
+    },
+    "inputs": [
+      "closed rate/domain/owner contracts",
+      "REC initial charge/line suppliers",
+      "Li inner-shell/Auger branching"
+    ],
+    "outputs": [
+      "conservative consumer prototype and distinct small new input validation"
+    ],
+    "domain": "non-tilted LRS; isotropic reacting gas, separate collisionless dark matter; recombination-to-z20 initial charge pinned",
+    "evidence": "WU retains microscopic source; REC radiation histories; REI coupled geometry",
+    "admission_gate": [
+      "photon source/sink has one owner",
+      "spectral source identity, state and isotope preserved",
+      "same frame signed stress sum before norm; no production HH rate inferred"
+    ],
+    "pass_next": "Pass REC+REI named consumer ACK => component coupling; fail => return precise unbound state/spectrum/energy input.",
+    "fail_next": "Preserve raw failure/unknown; classify source,physics,numerics,implementation or environment; repair only changed dependency.",
+    "pr_boundary": "Consumer PR only after dependency delivery; HH_R10 stays OFF until original HH gates independently met",
+    "budget": {
+      "new_scientific_run_authorized_by_this_audit": false,
+      "heavy_launch": false,
+      "global_remaining": null,
+      "currency": null,
+      "unknown_is_zero": false,
+      "PHYS91_remaining": 0,
+      "CR105_known_lineage_CPU_s": "39.097868524",
+      "CR105_new_CPU_s": "4.86342341",
+      "C23E_separate_lineage_CPU_s": "15.493261114",
+      "sum_lineages_without_overlap_proof": false,
+      "new_unit_limit": "UNBOUND until existing authority budget and actual resource lease are pinned",
+      "completed_identity_replay": false
+    },
+    "claim_ceiling": "Current evidence only; no global physical completion or blanket production admission",
+    "execution_this_audit": "NOT_RUN",
+    "readiness_policy": "conditional on selected model, source domain and actual consumer; do not AND every future catalog channel",
+    "independent_review": "fresh scientific reviewer checks exact changed contracts/source/raw results at proposed claim scope; reuse unchanged prior independent review"
+  },
+  "dependencies": [
+    {
+      "type": "internal",
+      "id": "WU_CE83_OWNER_COMPLETION",
+      "source_file": "historical/baseline/assembly/DAG.json",
+      "source_field": "preserved_baseline_dependencies"
+    },
+    {
+      "type": "internal",
+      "id": "WU_HE_LI_CX_STATE_ENERGY",
+      "source_file": "historical/baseline/assembly/DAG.json",
+      "source_field": "preserved_baseline_dependencies"
+    },
+    {
+      "type": "internal",
+      "id": "WU_D_PI_RR_MATCHED",
+      "source_file": "historical/baseline/assembly/DAG.json",
+      "source_field": "preserved_baseline_dependencies"
+    },
+    {
+      "type": "internal",
+      "id": "WU_NUCLEAR_PARTICLE_OWNERSHIP",
+      "source_file": "historical/baseline/assembly/DAG.json",
+      "source_field": "preserved_baseline_dependencies"
+    }
+  ],
+  "conditional_dependencies": [],
+  "external_prerequisites": [],
+  "current_status": "PARTIAL_REASSIGNED_INTERFACES",
+  "claim_gate": [
+    "photon source/sink has one owner",
+    "spectral source identity, state and isotope preserved",
+    "same frame signed stress sum before norm; no production HH rate inferred"
+  ],
+  "pass_next_action": "Pass REC+REI named consumer ACK => component coupling; fail => return precise unbound state/spectrum/energy input.",
+  "budget_status": {
+    "new_scientific_run_authorized_by_this_audit": false,
+    "heavy_launch": false,
+    "global_remaining": null,
+    "currency": null,
+    "unknown_is_zero": false,
+    "PHYS91_remaining": 0,
+    "CR105_known_lineage_CPU_s": "39.097868524",
+    "CR105_new_CPU_s": "4.86342341",
+    "C23E_separate_lineage_CPU_s": "15.493261114",
+    "sum_lineages_without_overlap_proof": false,
+    "new_unit_limit": "UNBOUND until existing authority budget and actual resource lease are pinned",
+    "completed_identity_replay": false
+  },
+  "change_class": [
+    "status_correction"
+  ],
+  "historical_contract_id": "WU_SPECTRAL_GEOMETRY_COUPLING",
+  "source_fields": {
+    "lead_repo": "owner_repository",
+    "current_status": "status",
+    "claim_gate": "admission_gate",
+    "pass_next_action": "pass_next",
+    "budget_status": "budget"
+  },
+  "pr_plan": {
+    "inputs": {
+      "value": [
+        "closed rate/domain/owner contracts",
+        "REC initial charge/line suppliers",
+        "Li inner-shell/Auger branching"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/inputs",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "equations": {
+      "value": [
+        "n_dot=S*r",
+        "Utotal_dot+expansion_work+shear_work=external_supply-escape",
+        "pi_total=sum signed same-frame tensors before norm"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/equations",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "units": {
+      "value": {
+        "number_density": "m^-3 internal; cm^-3 accepted only with declared conversion1cm^-3=1e6m^-3",
+        "energy": "J internal; source-native eV kept,1eV=1.602176634e-19J",
+        "cross_section": "m^2;1cm^2=1e-4m^2;1barn=1e-28m^2",
+        "two_body_rate": "m^3 s^-1",
+        "one_body_rate": "s^-1",
+        "volumetric_event_rate": "m^-3 s^-1",
+        "energy_source": "J m^-3 s^-1",
+        "clock": "declared proper seconds, coordinate conversion explicit",
+        "temperature": "K"
+      },
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/units",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "domain": {
+      "value": "non-tilted LRS; isotropic reacting gas, separate collisionless dark matter; recombination-to-z20 initial charge pinned",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/domain",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "outputs": {
+      "value": [
+        "conservative consumer prototype and distinct small new input validation"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/outputs",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "positive_acceptance": {
+      "value": [
+        "photon source/sink has one owner",
+        "spectral source identity, state and isotope preserved",
+        "same frame signed stress sum before norm; no production HH rate inferred"
+      ],
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/admission_gate",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "failure_disposition": {
+      "value": "Preserve raw failure/unknown; classify source,physics,numerics,implementation or environment; repair only changed dependency.",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/fail_next",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "independent_review": {
+      "value": "fresh scientific reviewer checks exact changed contracts/source/raw results at proposed claim scope; reuse unchanged prior independent review",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/independent_review",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "PR_boundary": {
+      "value": "Consumer PR only after dependency delivery; HH_R10 stays OFF until original HH gates independently met",
+      "source_file": "authority/atomic/EXPANDED_NODE_CONTRACTS.json",
+      "json_pointer": "/nodes/5/pr_boundary",
+      "qualification": "SOURCE_DECLARED"
+    }
+  }
+}
+```
