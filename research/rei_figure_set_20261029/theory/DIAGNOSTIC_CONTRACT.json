@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "unit_id": "rei_figure_set_20261029",
+  "baseline_supplied": "c5ab42c8673db614e7fb16695ad071c65becb81b",
+  "baseline_local_git_verification": "unavailable: checkout has no .git",
+  "contract": "theory/DIAGNOSTIC_CONTRACT.md",
+  "scope": "saved prescribed-bath illustrative pilot only",
+  "cases": ["OFF_base", "ON_base", "ON_refined"],
+  "ivp_allowed": false,
+  "new_physics_samples_allowed": false,
+  "base_error_control": {"rtol": 1e-7, "atol_scaled": 1e-11},
+  "refined_error_control": {"rtol": 2e-8, "atol_scaled": 2e-12},
+  "physical_error_weight": "atol_scaled*scale_i+rtol*abs(y_i)",
+  "existing_acceptance": {
+    "isotope_normalized_refinement_max": 1e-5,
+    "minimum_scaled_stock": -1e-9,
+    "balance_relative_to_initial_all_heavy_particle_sum": 1e-8
+  },
+  "observational_thresholds_not_new_acceptance": {
+    "rare_ion_conditioning_signal_to_local_weight": 10,
+    "sampled_stationarity_tracking_fraction": 0.01,
+    "neutral_minimum_window_s": [1e12, 1e16]
+  },
+  "metrics": ["signed_ON_minus_OFF", "isotope_normalized_refinement", "rare_ion_relative_refinement", "local_weight_conditioning", "recomputed_augmented_baryon_charge", "n_T_thermal_and_total_rate_balance", "timescales_and_fast_branching", "LiI_local_extrema_and_persistence", "neutral_minimum_bath_knot_mapping"],
+  "claims": {
+    "scalar_physical_atol_1e_minus_15": "contradicted by scaled solver implementation",
+    "n_exact_plateau_at_880_s": "not implied; model mean lifetime878.4s and relaxation includes capture/escape",
+    "T_perfect_equilibrium_at_5_6e8_s": "not implied; approximate mean lifetime, compare production/loss and source drift",
+    "LiI_atol_cause_and_guaranteed_smooth_fix": "unresolved; diagnosis required",
+    "V_minimum_caused_by_bath_knot": "unresolved; continuous bath with derivative knots, co-location insufficient"
+  },
+  "external_source_intake": [
+    {"provider": "Exa", "date": "2026-10-28", "query": "site.docs.scipy.org solve_ivp Radau atol rtol error estimate", "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.Radau.html", "read_scope": "official documentation highlights", "relation": "supports local error-control formula"},
+    {"provider": "SciSpace", "date": "2026-10-28", "query": "Primary experimental measurement of tritium half-life 12.32 years and neutron mean lifetime 878.4 seconds", "doi": "10.1103/PhysRevC.35.752", "read_scope": "primary-paper abstract", "relation": "supports approximate tritium half-life scale, not exact frozen calibration"},
+    {"provider": "SciSpace", "date": "2026-10-28", "doi": "10.1103/PhysRevLett.67.2630", "read_scope": "primary-paper abstract", "relation": "supports approximate tritium half-life scale"}
+  ],
+  "scientific_admission": "pending observed offline metrics and independent controller review",
+  "execution": "not_run by theory lane; source read and contract authoring only"
+}
