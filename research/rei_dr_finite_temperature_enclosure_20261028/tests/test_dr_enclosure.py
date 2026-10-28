@@ -38,7 +38,7 @@ class SelectedControls(unittest.TestCase):
         path=ROOT/'source/atomic_coefficients.json';data=load_source(path);m=DRModel(data)
         records={'parameter_images':parameter_images(data),'finite_ranges':[],
                  'signed_vs_clipped':[],'underflow_vs_absence':[],'taylor':[],
-                 'precision_comparison':[],'rejections':[]}
+                 'precision_comparison':[],'rejections':[],'zero_step':[]}
         for key,row in data['dr'].items():
             for loss in (False,True):
                 cert=m.positivity(key,loss)
@@ -79,6 +79,13 @@ class SelectedControls(unittest.TestCase):
         records['interior_peak']={'T_K':str(peak),'peak':str(actual_peak),
                                   'endpoint_only_max':str(endpoint_max),'enclosure':k.wire()}
         t0=number(14919.863839279506)
+        for loss in (False,True):
+            zero=m.taylor('2:1',100,101,100,100,loss)
+            self.assertEqual((zero['h'].lo,zero['h'].hi,zero['radius']),(0,0,0))
+            self.assertEqual(zero['enclosure'].wire(),zero['f0'].wire())
+            records['zero_step'].append({'key':'2:1','quantity':'L' if loss else 'alpha',
+                'T0_K':100,'target_K':100,'h':zero['h'].wire(),'radius':str(zero['radius']),
+                'f0':zero['f0'].wire(),'d0':zero['d0'].wire(),'enclosure':zero['enclosure'].wire()})
         # Both actual signed rows and positive row, alpha and loss, all six log steps.
         for key,row in data['dr'].items():
             for loss in (False,True):

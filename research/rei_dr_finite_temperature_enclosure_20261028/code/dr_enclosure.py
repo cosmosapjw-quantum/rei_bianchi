@@ -220,9 +220,11 @@ class DRModel:
         domain=self.domain(lo,hi); center=self.domain(t0); point=self.domain(target)
         if not (domain.lo<=center.lo<=domain.hi and domain.lo<=point.lo<=domain.hi):
             raise ValueError('Taylor endpoints outside interval')
-        h=(point/center).transcend('ln')
         f0=self.range(key,t0,t0,loss)
         d0=self.first_log_derivative(key,t0,loss)
+        if point.lo == center.lo:
+            return {'enclosure':f0,'h':self.a.interval(0),'f0':f0,'d0':d0,'radius':D(0)}
+        h=(point/center).transcend('ln')
         radius=(self.second_bound(key,lo,hi,loss)*h.magnitude()*h.magnitude()/2).hi
         linear=f0+d0*h
         enclosure=linear+Interval(self.a,radius.copy_negate(),radius)

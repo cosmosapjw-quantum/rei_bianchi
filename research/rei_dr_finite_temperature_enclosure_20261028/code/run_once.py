@@ -43,7 +43,7 @@ def main():
     argv=[sys.executable,'-B','-S',str(Path(__file__).resolve()),'--worker']
     prefix=time.process_time();start=time.perf_counter();pid=os.fork()
     if pid==0:
-        os.setsid();os.chdir(ROOT)
+        os.chdir(ROOT)  # Leaf remains in the outer supervisor's monitored session.
         resource.setrlimit(resource.RLIMIT_CPU,(1,1))
         resource.setrlimit(resource.RLIMIT_AS,(268435456,268435456))
         for fd,name in [(1,'STDOUT.json'),(2,'STDERR.txt')]:
@@ -61,7 +61,7 @@ def main():
             continue
         if cpu>=.38 or time.perf_counter()-start>=10:
             reason='CPU_watchdog' if cpu>=.38 else 'wall_watchdog'
-            os.killpg(pid,signal.SIGKILL);waited,status,usage=os.wait4(pid,0);break
+            os.kill(pid,signal.SIGKILL);waited,status,usage=os.wait4(pid,0);break
         time.sleep(.002)
     receipt={'argv':argv,'sources':sources,'exit_code':os.waitstatus_to_exitcode(status),
         'raw_wait_status':status,'watchdog_stop':reason,'CPU_s':usage.ru_utime+usage.ru_stime,
