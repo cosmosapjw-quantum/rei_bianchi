@@ -1,0 +1,69 @@
+# Independent source-history and prepared-coupling review
+
+2026-10-28. Requested role: fresh Astra reviewer; actual runtime model identity UNKNOWN. This lane authored neither the source synthesis, frozen contract, implementation nor producer results. It read AGENTS.md and PhysMath Research Loop 1.3.0 SKILL, POLICY_INTEGRATION, R6 and C9. One bounded independent pass and one coherent preexecution repair episode were used. No child reviewer, scientific rerun, IVP, rate calculation or new plot was executed by this reviewer. File reads, raw-evidence inspection and SHA256 checks are the independent activities.
+
+**PASS_SCOPED_QSS_HISTORY** for the declared finite phenomenological history and its evaluated saved-epoch tracking certificate. **READY_NOT_RUN** for the tested 17-visible-state prescribed-bath solver preparation. These are separate decisions: no coupled trajectory has been computed or admitted. Historical physical F4, original working33/88, central28/88 and fast4/7 remain unchanged.
+
+## Mathematical and physical correspondence
+
+The five-stock object is (Bn,BT,n,TI,TII), with particles/Href normalization and proper-second rates. The family matrices are Metzler. Their column sums remove slowing and TI/TII exchange exactly, leaving strictly positive losses and the stated common l1 contraction constants. The variation-of-constants bound retains both the initial mismatch and moving-fixed-point derivative. Zero initial stocks imply initial relative error one in each family; an algebraic fixed-point residual alone would not show this.
+
+The frozen proper-time history is specific: external flux/injection amplitudes are constant, while fast production and neutron capture coefficients interpolate the saved knot values affinely in elapsed proper time. B*=S/L is affine. Thermal neutron equilibrium is an affine numerator divided by a positive affine denominator, so its derivative numerator is constant and its endpoint-minimum denominator bounds the entire interval. The T inverse matrix is constant, making its endpoint difference divided by interval length the exact affine slope, not an unsupported finite-difference approximation to an unspecified history. Separate family norms prevent the larger neutron or tritium stock from masking the other family.
+
+The recurrence uses exp(-c dt) for initial relaxation and -expm1(-c dt) M/c for variation. The mathematical envelope applies to the declared interpolants; the implementation evaluates it in ordinary FP64 and is not a machine-verified interval-arithmetic proof. Extremely small displayed variation values are not a claim of comparable physical or floating-point abundance accuracy. The 1% classification has a large margin at all accepted saved samples.
+
+The clock uses the saved NPZ H, log-H PCHIP, and dt=deta/H. It does not infer a cosmology from density or identify elapsed time with the age of the universe. GL8 versus GL16 checks validate the selected finite reconstruction, not unresolved donor-clock accuracy. H/nHref from the actual M4 geometry provider agree exactly with the saved knots in producer evidence. Old photon/RR hazards use c*nHref*sigma*g and nHref*v_saved*alpha(T_saved), with the correct raw fields and pinned geometry. The alternate AtomicNetwork21 prescribed UV/T RHS is not substituted.
+
+The new coupled solver evolves the 17 visible populations, two fast stocks and two kinetic-energy stocks. Old adjacent atomic transitions exclude n/T and old beta; new beta ownership occurs once. Hidden Li6 remains the prescribed four-state history, with its charge derivative entering the electron ledger and its baryons entering normalization. The old electron abundance is a prescribed rate bath, not the evolving electron ledger. OFF shares this bath with ON, disables external amplitudes and all escape hazards, and retains intrinsic decay/capture and the selected T exchange. It is correctly not claimed to reproduce the nonlinear donor trajectory exactly.
+
+On the nonnegative physical domain, atomic transfer generators have nonnegative off-diagonals; external and daughter production are nonnegative; losses vanish when their own reactant vanishes; capture consumes n and H proportionally to their product. This establishes the reaction-structure positivity argument. It is not proof that Radau returns nonnegative numerical stocks. Actual trajectory positivity and base/refined agreement remain NOT_RUN.
+
+The final solver compiles the exact affine event columns with capture omitted at nref=0, then restores the two quadratic n/H capture events once. This is a smooth polynomial extension for signed Newton trial states, with no clipping. Energy production is affine in heavy targets and the actual dynamic loss is -L U. The physical diagnostic function separately validates B/U consistency and books slowing, escape and retained-beta kinetic power directly as ks U, ke U and (lambda/gamma) U. No production P/S is substituted for the dynamic U/B history. Event A/q identities and dynamic power identity are tested at physical snapshots; no closed bath/temperature energy conservation is claimed.
+
+## Closed findings from this pass
+
+1. The first solver draft called a strict B=0,U!=0 diagnostic inside the numerical RHS. An initial energy-column finite-difference Jacobian probe would therefore fail; negative Newton trials also encountered the inherited physical-state guard. The coder replaced the solver path with the exact polynomial extension above and retained physical validation separately. The targeted test now exercises the energy probe, signed trial, affine B derivative and ON/OFF equivalence to the original physical event operator at a positive snapshot. Closed by selective code readback and the first producer test pass; no IVP was used to test the repair.
+2. OFF originally retained the fast ke terms despite escape=False. The coder now zeros both fast ke coefficients and thermal kesc in physical diagnostics and compilation. The regression checks the OFF fast loss and its difference from ON. Closed in the same episode.
+3. The diagnostic CSV initially omitted loss/contraction/derivative-envelope columns. It now contains the fast/thermal losses and interval c/M, with interval fields blank on the final row and the convention explicitly recorded. This was a nonblocking completeness correction, closed without an extra execution pass.
+
+No current blocking finding remains for these two scoped decisions. No further review cycle is requested.
+
+## Future run packet: static preparation addendum
+
+After the measured tests/diagnostic/plot, the coder authored bounded_case_runner.py and postprocess_cases.py without executing them or changing the tested coupled.py. This reviewer inspected those two scripts within the same pass. Their status is STATICALLY_REVIEWED_NOT_RUN, not an additional test pass. The at-run FROZEN_CONTRACT.md and its input identity remain unchanged.
+
+The runner fixes OFF_base, ON_base and ON_refined in that order, requires each predecessor's successful receipt, and stops on an existing failed case. It sets30 child CPU seconds,120 wall seconds,3GiB address space and one BLAS worker per case, records exclusive attempt markers/raw streams/costs, and performs no retry. Its owner-override receipt records the already-required explicit NO_MORE_IVPs exception; the script neither supplies that exception nor treats the existing non-IVP budget as authority. This is a single-owner research execution record, not a new authentication or review gate.
+
+The postprocessor consumes the actual saved23-variable schema, checks finiteness, scaled minima, the B=0/U consistency condition, common output times including all201knots and initial transient samples, and normalized heavy-isotope ON base/refined differences. It reports fast-stock/energy differences separately. It retains signed/zero data in CSV, masks only the nonpositive log domain in the figure with an explicit signed-sample annotation, includes all17states and LiIV, and includes prescribed Li6 plus Bn+3BT in the total-baryon CSV. The intermediate eta/z labels use interpolation of the matched saved time/eta knots; they are not an additional donor-clock accuracy claim.
+
+The prepared balance test uses the initial heavy-particle stock as a conservative denominator and explicitly reports absolute throughput NOT_MEASURED. This is accepted as a sufficient implementation of the contract criterion: if R<=1e-8 I with positive I equal to or smaller than the contract's initial-stock scale, then R<=1e-8 max(initial stock, absolute boundary throughput). A pass is therefore valid without inferring absolute throughput from a net ledger. A failure of the stricter test is HOLD; it must not be reported as proof that the weaker original criterion failed. No original tolerance is widened. The postprocessor preserves diagnostic tables/figure even when numerical acceptance is HOLD, and leaves scientific admission to the controller.
+
+## Actual producer evidence inspected
+
+The reviewer read the final implementations, tests, README, source synthesis and frozen contract; TEST_RESULT.json, SOURCE_HISTORY_RESULT.json, all three ATTEMPT_RESULT records and test stderr; sampled the actual CSV beginning/end; counted its 201 data rows; and viewed the delivered PNG. Seven new tests passed once with zero failures/errors. Diagnostic and plot stderr are empty. These are producer tests, not independent numerical reruns.
+
+| Evidence | Observed value |
+|---|---:|
+| Maximum interval GL8/GL16 clock relative difference | 4.727601132088829e-15 |
+| Total clock relative difference | 1.6422314193213868e-16 |
+| Final elapsed proper time | 9.742841241346858e16 s |
+| Neutron / tritium certified saved samples | 200 / 200 of 201 |
+| Initial relative bound, both families | 1 |
+| First subsequently all-certified sample | index1, t=8.032547352903345e13 s |
+| Maximum neutron variation bound | 5.241350250517564e-47 perHref |
+| Maximum tritium variation bound | 2.2384235156360114e-35 perHref |
+| Test / diagnostic / plot child CPU | 0.620690 / 0.486800 / 1.191953 s |
+
+Index0 is QSS_NOT_CERTIFIED, not evidence that the contraction theorem is false. With the explicitly zero initial state and nonzero fixed point, the actual initial mismatch is known. Later saved-sample certification does not identify the earliest continuous-time crossing and does not certify every point between samples. Whole-interval certification is explicitly NOT_RUN. The dense initial plot evaluates the analytic first-interval envelope, not a solved physical trajectory.
+
+The four-panel image is legible at delivered size; its stock/error units, relative criterion, source turn-on, no-IVP status and sample-only scope are visible. Initial and variation contributions remain separately available in CSV. The nearly coincident post-initial total/variation curves are expected because the initial term decays far before the next saved epoch; this is not independent evidence for astrophysical stationarity. No plot repair is required.
+
+Input byte identities match the frozen CSV/NPZ and prior model/config in the producer receipt. The eight restored atomic dependencies are recorded in RESTORED_DEPENDENCIES.json; the provider checks its pinned atomic-source identities on import. No prior source formula or raw scientific output was rewritten. Reviewed current file hashes are in DECISION.json. Cumulative accounting and final durable publication are the controller's responsibility; this review does not reset budgets, remove UNKNOWN_NOT_ZERO costs or transfer foreign reservations.
+
+## Positive next action and exact execution boundary
+
+Publish/preserve the admitted history result and prepared solver/run packet. H1/H2 are complete for this illustrative history. H3 is ready as tested solver preparation with a statically reviewed future wrapper/postprocessor. H4 remains unexecuted: actual-stock positivity, convergence, accumulated balance acceptance, full17 trajectory plotting and any trajectory scientific admission require the future raw cases. The solver already advances open-baryon and electron ledgers with its states, and the prepared postprocessor supplies the stricter sufficient balance test just explained. READY_NOT_RUN does not certify those outcomes or astrophysical calibration.
+
+The existing restriction is explicit in theory/FROZEN_CONTRACT.md, section A: **"The main campaign remains595.225063/600 and NO_MORE_IVPs."** It further states **"A new pilot IVP requires a concrete separate authorization; it must not be relabeled algebra or funded by a foreign ledger."** AGENTS.md's temporary-budget policy also preserves the existing NO_MORE_IVPs instruction. This is the reason a finite permission request remains; it is not a new review gate.
+
+The concrete prepared command is `python research/rei_source_history_20261028/implementation/bounded_case_runner.py --case OFF_base --user-override-receipt research/rei_source_history_20261028/OWNER_IVP_OVERRIDE.json`, then the same wrapper with `ON_base` and `ON_refined`, stopping on the first error. The receipt is to contain actual future owner authorization and does not exist as authority now. The controller may request an explicit exception for exactly these three cases, one worker,3GiB, at most30 child CPU seconds and120 wall seconds per case, zero retries and total reserve at most100 CPU seconds, preserving existing cumulative debits. The prepared `postprocess_cases.py` then reads their saved outputs under a fresh finite presentation allocation, using continuing authorization where applicable; its authoring creates no new permission requirement. These are proposed ceilings, not measured pilot performance or an active allocation. If permission is not given, stop at READY_NOT_RUN. No additional calibration, review tree or new no-go claim is required to preserve or deliver the completed work.
