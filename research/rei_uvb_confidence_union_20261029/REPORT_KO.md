@@ -40,3 +40,10 @@ h_U(s)=h_Z(s)+sqrt(q sᵀVs)다.
 조건부 Γ_HI 보정의 통계적 집합과 실제 REI source-rate 오차를 연결하려면 source spectrum/absorber, redshift–proper-time clock, density와 source-to-observable map의 실제 소유 입력을 결속해야 한다. 이를 확보하기 전에는 Γ 오차를 물리적 F4/L4·native25·실제 온도/물리적 반경으로 전환하지 않는다. 다음에는 기존 공급자 branch의 실제 source-to-rate/observable derivative를 읽어 최소 연결을 선택한다. 완료한 수치 실행을 새 환경에서 반복하지 않는다.
 
 원전: [Becker–Bolton2013 Table1/2](https://academic.oup.com/mnras/article/436/2/1023/1118137). 정리의 논증과 적용 조건은 review/PHASE1_THEORY.md, 실제 판정은 SCIENTIFIC_DECISION.json, 재개 지시는 HANDOFF_KO.md에 있다.
+
+## 최종 보존·게시와 상류 갱신
+R1–R10/C1–C10 전체20단계의 소유자 Drive·Dropbox 완료 ACK 및 동일 size를 확인했다. 새 과학 결과32경로/186779 bytes는 Draft PR260에 실제 게시됐으며 source commit ed21c58b44ccabeb5d621628579fe80fea3df180이다. 승인 local tree와 원격 tree가 같고 결과·보고서·C9기록3개는 원격내용과 직접 대조했다. 전체 조사·ZIP·providerACK는 소유자 비공개 보존으로 유지한다. 최종 메타데이터는 별도 후속 commit으로 기록한다.
+
+게시 준비에서 관측된 promisor fetch24.177CPU-s, CLI조회0.041s, APIrequest준비0.637s, stage packaging2.124795674s를 과학 CPU0.162649s와 구별해 보존했다. 예측되지 않은 준비 비용을 지우지 않았고, 다음 게시에는 원 main600 대비25% 임시상한750을 적용한 뒤600/30/10을 복원한다. 알려진 부분합과 reserve만으로 전체 비용 PASS를 선언하지 않는다.
+
+최종 재조회 PR259 HEAD045118543c266f164c4bd177ac0194ee1ba22096은 기존17상태 그림의10/10쪽 시각 검토 완료를 기록한다. owner 승인 completion 비용으로 presentation누적65.980312494가 유지된다. 본 단위의 새render는0이며 해당 업데이트는 본 통계결과·33/88·28/88·F4/L4에 변화를 주지 않는다.
