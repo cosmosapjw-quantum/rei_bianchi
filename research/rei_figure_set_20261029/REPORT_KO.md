@@ -68,10 +68,12 @@ Library 최신3페이지의417 file metadata를 이전 cutoff까지 조사하고
 | 7 | 실제361시각 진단 | frozen RHS·수지·refinement 검사 | 33/88 · 4/7 |
 | 8 | 조언의 전제·인과 주장 교정 | raw 보존·수치 조건·환경 실패 분리 | 33/88 · 4/7 |
 | 9 | 물리 해석·figure caption | 독립 시각검토와 한정 표시 수정 | 33/88 · 4/7 |
-| 10 | 다음 통제 비교 조건·handoff | budget closeout 완료; 게시·두 백업은 영수증 대기 | 33/88 · 4/7 |
+| 10 | 다음 통제 비교 조건·handoff | DELIVERED_SCOPED: draft PR259·두 백업 ACK·budget closeout | 33/88 · 4/7 |
 
 실행 전 CHECKPOINT와 BUDGET_AUTHORIZATION은 Git에 정확히 보존했다. main 진단은1회 exit0, 관측 CPU1.116230 s, IVP0이다. 첫 render의 `/usr/bin/time` 부재는 child 실행 전 환경 실패로 보존하고 한 번의 launcher 수정 후 실제 render를 수행했다. 독립 시각검토의 라벨·범위 지적에 대해 표적 표시 수정을 수행했고 첫 그림과 비용을 보존했다. 수정된 개별 PDF/SVG 10개씩과 통합 PDF는 완성되었다. 표적 repair는 CPU 한도에서 FAILED로 종료되어 corrected PNG는 3/10페이지만 생성·시각 확인되었다. 4–10페이지의 수정본은 새 raster로 확인하지 않았으므로 FINAL_VISUAL_QA_PARTIAL이다. 이번 저장 이력의 과학 진단과 수정 벡터 전달은 PASS_SCOPED이며 전체 publication-ready 판정은 하지 않는다. review/REVIEW.json과 review/INDEPENDENT_REVIEW.md가 권위 있는 최종 범위 판정이다. 원래 물리 노드의 완료 수는 유지한다.
 
-다음 물리 비교는 동일 초기조건·평균팽창·bath·rate·source/escape·오차기준에서 초기 shear만 바꾸는 계약과 일관된 radiation/thermal 연결이 먼저다. 현재 소스 이력으로 anisotropy 효과를 분리했다고 주장하거나 전체 자기일관적 예측의 날짜를 제시하지 않는다.
+다음 통제 비교에서는 초기·경계 복사·열 조건, 미시적 반응 법칙, 평균팽창 이력과 수치 기준을 공통으로 고정하고 초기 전단만 바꾸되, 명시된 기하–복사·열 결합에 의해 진화하는 방향별 스펙트럼과 그로부터 계산되는 반응률은 달라질 수 있도록 한다. 현재 소스 이력으로 anisotropy 효과를 분리했다고 주장하거나 전체 자기일관적 예측의 날짜를 제시하지 않는다.
 
 초기 transient 그림은 n·T I·T II만 보여주며, 그룹 그림에서 범위 밖인 초기 He/Li 양수 표본 모두를 회복하지 않는다. 해당 값은 원시 CSV와 plot_data.json에 남아 있다.
+
+최종 전달: draft PR259 https://github.com/cosmosapjw-quantum/rei_bianchi/pull/259 및 Drive·Dropbox snapshot ACK를 확인했다. DELIVERY_RECEIPT.json이 전달 근거이며, snapshot ZIP의 이전 pending 상태는 이 최종 문서·영수증으로 대체한다. 최종 시각 QA 3/10 및 fully_publication_ready=false는 유지한다.

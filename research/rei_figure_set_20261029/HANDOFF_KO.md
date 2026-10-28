@@ -12,10 +12,14 @@
 
 REPORT_KO.md, FIGURE_CAPTIONS.md, theory/PHYSICAL_FINDINGS_KO.md, outputs/DIAGNOSTICS.json을 함께 읽는다. raw_saved_arrays.csv, signed_differences.csv와 plot_data.json이 실제 값·부호·표시에서 제외된 표본을 보존한다. elapsed proper Myr와 저장 clock의 mean redshift를 사용하며 절대 우주 나이를 추가하지 않았다. ON/OFF는 source와 escape를 함께 바꾸고 refinement는 동결 scale 기준이다.
 
-working33/88, central28/88, physical fast4/7을 유지하며 원본 노드를 더하지 않았다. 다음 물리 비교에는 같은 초기조건·평균팽창·bath·rate·source/escape·시간범위·오차기준에서 초기 shear만 바꾸는 계약과 일관된 radiation/thermal 연결이 필요하다. 폐기된 첨부13개는 재개 의존성이 아니다.
+working33/88, central28/88, physical fast4/7을 유지하며 원본 노드를 더하지 않았다. 다음 통제 비교에서는 초기·경계 복사·열 조건, 미시적 반응 법칙, 평균팽창 이력과 수치 기준을 공통으로 고정하고 초기 전단만 바꾸되, 명시된 기하–복사·열 결합에 의해 진화하는 방향별 스펙트럼과 그로부터 계산되는 반응률은 달라질 수 있도록 한다. 폐기된 첨부13개는 재개 의존성이 아니다.
 
 예산 근거: AGENTS.md 및 research/rei_figure_set_20261029/BUDGET_AUTHORIZATION.json. BUDGET_CLOSEOUT.json에 main608.750604, presentation64.980312494, planning20.819461885 CPU s의 알려진 누적비용·보수적 reserve를 보존했다. 원래 정책 상한600/30/10으로 복원했으며 새 실행 allowance, retry, 원장 이전은 없다. 알 수 없는 host/tool/transport 비용은 UNKNOWN_NOT_ZERO다.
 
-R1–R8/C1–C8의 관측 근거를 재사용하고 R9/C9는 PASS_SCOPED 및 visual partial로 닫았다. R10/C10은 최종 Git draft PR 및 Drive·Dropbox provider acknowledgement가 들어오면 전달 범위에서 닫는다. 현재 전달 영수증은 대기 상태다. 코드를 보존했지만 이 메모는 재실행 명령을 승인하지 않는다.
+R1–R8/C1–C8의 관측 근거를 재사용하고 R9/C9는 PASS_SCOPED 및 visual partial로 닫았다. R10/C10은 DELIVERED_SCOPED로 닫았다. draft PR259와 두 provider snapshot ACK를 DELIVERY_RECEIPT.json에 기록했다. ZIP은 pre-delivery snapshot이고 이 최종 handoff와 영수증이 그 pending 상태를 대체한다. 코드를 보존했지만 이 메모는 재실행 명령을 승인하지 않는다.
 
 초기 transient 그림은 n·T I·T II만 보여주며, 그룹 그림에서 범위 밖인 초기 He/Li 양수 표본 모두를 회복하지 않는다. 해당 값은 원시 CSV와 plot_data.json에 남아 있다.
+
+Draft PR: https://github.com/cosmosapjw-quantum/rei_bianchi/pull/259
+Drive ZIP: https://drive.google.com/file/d/1AtUYJE6AH2DRcf0GocuJ_DLc48Hb9Wy-/view
+Dropbox ZIP: /bianchi/research_backups/rei_bianchi/scientific_figure_set_bundle_predelivery_snapshot_20261029.zip (id:BSpOijBcT10AAAAAAEGpnA)
