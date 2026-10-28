@@ -21,6 +21,7 @@ def main():
  after=resource.getrusage(resource.RUSAGE_CHILDREN)
  cpu=(after.ru_utime+after.ru_stime)-(before.ru_utime+before.ru_stime)
  wall=time.monotonic()-start
+ (R/'results').mkdir(parents=True,exist_ok=True)
  (R/'results/RUN.stdout').write_text(stdout);(R/'results/RUN.stderr').write_text(stderr)
  receipt=dict(exit=exit_code,timeout=timeout,command=cmd,measured_child_CPU_seconds=cpu,measured_child_wall_seconds=wall,child_CPU_limit=10,child_wall_limit=30,wrapper_CPU_seconds='NOT_MEASURED',root_reserve_CPU_seconds=1,old_budget='CLOSED',total_session_model_network_overheads='UNKNOWN_NOT_ZERO',new_IVPs=0)
  (R/'results/RUN_RECEIPT.json').write_text(json.dumps(receipt,indent=2)+'\n')
