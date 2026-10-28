@@ -1,0 +1,52 @@
+{
+  "status": "PROPOSED_NOT_RUN",
+  "budget_status": "NOT_ALLOCATED",
+  "new_execution_authorized": false,
+  "canonical_completion_delta": 0,
+  "physical_completion_delta": 0,
+  "implementation_route": "Astra freezes actual inputs/theory/tolerances -> lower-tier bounded implementation -> different Astra review -> root additive PR/backup",
+  "stop_policy": "Stop on changed owner reservation, missing immutable source, unit/state/clock ambiguity, failed frozen control or unallocated resource; do not auto-widen scope/tolerances/replay.",
+  "id": "REI_UVB_ONE_TILT_IDENTIFIABILITY_NEXT",
+  "repo": "rei_bianchi",
+  "parent_nodes": [
+    "REI-EXP-OBSERVABLE",
+    "REI-EXP-EXTERNAL"
+  ],
+  "base": "c5ab42c8673db614e7fb16695ad071c65becb81b",
+  "pr_title": "Test one predeclared UVB shape correction against correlated observations",
+  "problem": "Normalization-free diagnostics localize residualshape tension; amplitudealonehaschi\u00b219.38/6.",
+  "next_action": "After ownerconfirmsnooverlappingactiveobservationalfit, freeze one redshift tilt x_i=z_i-3.6 over2.4..4.75 with designX=[1,x]. Use sameBB13C andsavedPuchweinmodelvectors to estimatebeta/kappa andcovariance; report conditional \u0394chi\u00b2 andidentifiability. Do not selecttilt direction afterrankingLOOpoints ordeleteobservations.",
+  "dependencies": [
+    "acceptedREIshapeinnovationtable",
+    "ownerobservational-lanereservationcheck",
+    "BB13fullcovariance andsavedtemplatevector",
+    "predeclaredfixedEOS theta0"
+  ],
+  "inputs_units": {
+    "d_m_beta": "dex",
+    "kappa": "dex perunitredshift",
+    "C": "dex\u00b2",
+    "z": "dimensionless"
+  },
+  "equations": [
+    "r=d-m; theta_hat=(X^T C^-1 X)^-1 X^T C^-1 r",
+    "Q2=(r-Xtheta_hat)^T C^-1(r-Xtheta_hat)",
+    "DeltaQ=Q_amplitude-Q2; covariance=(X^T C^-1X)^-1"
+  ],
+  "acceptance": [
+    "rank2design/SPD informationmatrix",
+    "independentQRorDecimalreference; tolerancesfrozenbeforerun",
+    "nestedmodelDeltaQ nonnegativeundertolerance",
+    "no\u03c7\u00b2interpretationasphysicaltruth orheldoutvalidation",
+    "systematicEOS/Jeansuncertainty stillseparate"
+  ],
+  "owner_reservations": [
+    "fullcoupled/observational/sourcehistoryworkownerreserved; ifalreadytiltfitting reusethatresultinstead",
+    "ON_refined remainsdefaultandoldpopulationnotrescaled",
+    "PR247DR/250RR-Mao worknotimported"
+  ],
+  "energy_owner": "Observationconditional radiationmodeldiagnostic; noenergyinjectionand noMeV/CR/nTcalibration",
+  "claim_gate": "Conditionalshape-sensitivity/identifiability only; F4PARTIAL,physicalfast4/7 unchanged",
+  "pass_next": "Ownerchoosesphysicallyjustifiedsourcehistory usingexternaldata/priors; noautomaticforwardrun.",
+  "execution_authorization_note": "false denotes no execution frozen for this prospective node, not missing user authorization; coordinator freezes actual inputs and a fresh cumulative budget within the authorized goal."
+}

@@ -1,0 +1,146 @@
+# V1p-q-r-research
+
+Lead: cosmosapjw-quantum/vigilode
+
+Current status: `COMPLETE_SCOPED_REUSED`
+
+Source: `authority/numerics/VIGILODE_CONTRACTS.json#/nodes/1`
+
+```json
+{
+  "id": "V1p-q-r-research",
+  "lead_repo": "cosmosapjw-quantum/vigilode",
+  "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+  "json_pointer": "/nodes/1",
+  "contract": {
+    "id": "V1p-q-r-research",
+    "status": "COMPLETE_SCOPED_REUSED",
+    "dependencies": [],
+    "scope": "Portable norm, exact integer gate and transactional manufactured trajectories.",
+    "evidence": [
+      "PR81 cc49cfd1017fc0639bf9ef6cc08535ff5a06ff7e;PR82 e41e4721798bba8c46b3256467b3279fafe9918d;PR83 577f350407aceec7e304cf0e66427141886f4c50"
+    ],
+    "source_status": "PINNED_SELECTED_CONTENT_OR_NAMED_REUSED_EVIDENCE",
+    "execution_status": "EXISTING_EVIDENCE_REUSED; NEW_EXECUTION_NOT_RUN",
+    "admission_status": "COMPLETE_SCOPED_REUSED",
+    "delivery_status": "Pinned Draft/publication and provider receipts separate; production HOLD",
+    "remaining": "Actual BASS, native production integration and whole solver speed remain open; V1r1180negative component samples retained.",
+    "pr_boundary": "Keep old evidence. No repeated681/741norm corpus or old trajectories.",
+    "equations": [
+      "Exact E2 bracket: upper<=1 accept,lower>1 reject,otherwise Indeterminate"
+    ],
+    "acceptance": [
+      "Do not equate kernel FP independence with upstream scale/whole solver independence",
+      " old timing unequal obligations/cost distinctions retained"
+    ],
+    "pass_action": "Use as arithmetic and transactional reference for native actual client.",
+    "owner": "VigilODE numerical engine authority; physical input/Jacobian supplied by BASS/REI/atomic owner; current native implementer reservation preserved"
+  },
+  "dependencies": [],
+  "conditional_dependencies": [],
+  "external_prerequisites": [],
+  "current_status": "COMPLETE_SCOPED_REUSED",
+  "claim_gate": [
+    "Do not equate kernel FP independence with upstream scale/whole solver independence",
+    " old timing unequal obligations/cost distinctions retained"
+  ],
+  "pass_next_action": "Use as arithmetic and transactional reference for native actual client.",
+  "budget_status": {
+    "source_review_new": true,
+    "scientific_execution_this_audit": "NOT_RUN",
+    "ncp": false,
+    "heavy_runs": false,
+    "completed_campaign_replay": false,
+    "new_allowance_granted": false,
+    "remaining_wall": null,
+    "remaining_cpu": null,
+    "budget_reset": false,
+    "ownership": "Existing native/REC/history/HE/atomic owners retain active work and dirty files. New adapter work only in assigned isolated lane of existing checkout.",
+    "roles": "Astra frames and admits; lower-tier implements frozen contract; a distinct Astra reviews diff/raw. Requested role is not evidence of observed model identity.",
+    "publication": "central plan update only by root; this authority makes no remote mutations"
+  },
+  "change_class": [
+    "scope_expansion"
+  ],
+  "historical_contract_id": null,
+  "source_fields": {
+    "lead_repo": "source_group_repository",
+    "current_status": "status",
+    "claim_gate": "acceptance",
+    "pass_next_action": "pass_action",
+    "budget_status": "policy"
+  },
+  "pr_plan": {
+    "inputs": {
+      "value": null,
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": null,
+      "qualification": "NOT_DECLARED_SEPARATELY_IN_SOURCE"
+    },
+    "equations": {
+      "value": [
+        "Exact E2 bracket: upper<=1 accept,lower>1 reject,otherwise Indeterminate"
+      ],
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/1/equations",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "units": {
+      "value": null,
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": null,
+      "qualification": "NOT_DECLARED_SEPARATELY_IN_SOURCE"
+    },
+    "domain": {
+      "value": "Portable norm, exact integer gate and transactional manufactured trajectories.",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/1/scope",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "outputs": {
+      "value": "Portable norm, exact integer gate and transactional manufactured trajectories.",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/1/scope",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "positive_acceptance": {
+      "value": [
+        "Do not equate kernel FP independence with upstream scale/whole solver independence",
+        " old timing unequal obligations/cost distinctions retained"
+      ],
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/1/acceptance",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "failure_disposition": {
+      "value": null,
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": null,
+      "qualification": "NOT_DECLARED_SEPARATELY_IN_SOURCE"
+    },
+    "independent_review": {
+      "value": "Astra frames and admits; lower-tier implements frozen contract; a distinct Astra reviews diff/raw. Requested role is not evidence of observed model identity.",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/policy/roles",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "PR_boundary": {
+      "value": "Keep old evidence. No repeated681/741norm corpus or old trajectories.",
+      "source_file": "authority/numerics/VIGILODE_CONTRACTS.json",
+      "json_pointer": "/nodes/1/pr_boundary",
+      "qualification": "SOURCE_DECLARED"
+    }
+  },
+  "runnable": false,
+  "missing_contract_fields": [
+    "inputs",
+    "units",
+    "failure_disposition"
+  ],
+  "execution_readiness_guard": {
+    "source_file": "authority/FINAL_ASSEMBLY_MISSING_FIELDS.json",
+    "scope": "Execution-readiness guard only; retain finite past admissions and source object unchanged",
+    "other_nodes_runnable_not_inferred": true
+  }
+}
+```

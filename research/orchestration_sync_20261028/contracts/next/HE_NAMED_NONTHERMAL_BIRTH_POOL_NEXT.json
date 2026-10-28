@@ -1,0 +1,52 @@
+{
+  "status": "PROPOSED_NOT_RUN",
+  "budget_status": "NOT_ALLOCATED",
+  "new_execution_authorized": false,
+  "canonical_completion_delta": 0,
+  "physical_completion_delta": 0,
+  "implementation_route": "Astra freezes actual inputs/theory/tolerances -> lower-tier bounded implementation -> different Astra review -> root additive PR/backup",
+  "stop_policy": "Stop on changed owner reservation, missing immutable source, unit/state/clock ambiguity, failed frozen control or unallocated resource; do not auto-widen scope/tolerances/replay.",
+  "id": "HE_NAMED_NONTHERMAL_BIRTH_POOL_NEXT",
+  "repo": "BASS_HE",
+  "parent_nodes": [
+    "HE-RESERVOIR",
+    "HE-EXP-NUCLEAR"
+  ],
+  "base": "b3782bc3f778e4486c4874da826b497f4fa62e8e",
+  "pr_title": "Bind a named two-deuteron nonthermal pool to one normalized source event",
+  "problem": "Per-event birth moments are now available; event normalization, flux history and physical pool remain missing.",
+  "next_action": "Obtain one explicit owner-supplied photon-event normalization and flux/bath frame packet for He4(gamma,d)d. Bind daughter count2, retained jointmoment/covariance and one named nonthermal deuteron pool; expose injection source without thermalizing it.",
+  "dependencies": [
+    "accepted HE-BIRTH-MOMENT15",
+    "actual event/inclusive normalization choice",
+    "source angularlaw/fluxidentity and target rest/motion applicability",
+    "named CR/HE consumer pool"
+  ],
+  "inputs_units": {
+    "event_rate": "m^-3 s^-1",
+    "K": "MeV per daughter converted once toJ ifconsumerSI",
+    "joint_covariance": "MeV^2, per-eventdistribution",
+    "pool": "D nuclearconstituents, electroniccharge/birthstate explicitlysupplied ornull"
+  },
+  "equations": [
+    "dotN_D,birth=2*R_event",
+    "dotU_D,birth=R_event*(A+e-2M)",
+    "Cov(Kplus,Kminus)=-VarK; totalKvariance=0 underexistingreference"
+  ],
+  "acceptance": [
+    "event versus inclusivecrosssection multiplicity checked",
+    "single source angularlaw and apertureselection identity",
+    "event/photon energy closure references solepopulation_rest_energy_witness",
+    "birth pool declared before sourceactivation",
+    "depositionfraction/Gamma_thermal/Cv remainnull unlessseparateactualprovider"
+  ],
+  "owner_reservations": [
+    "latest observedHE116refs endsatENDPOINT14; no visible15+ ataudit; recheckbeforeselection",
+    "do not commandeer any later HE successor or rerun endpointpolytope/geometry",
+    "oldHEreserves0/unknownremainclosed"
+  ],
+  "energy_owner": "population_rest_energy_witness owns binding; named nonthermal pool owns birth kineticenergy; thermal bath receives nothing without declared transfer",
+  "claim_gate": "Conditional named injection interface only, not physicalthermalization, fullangularlaw or eventnormalization measurement",
+  "pass_next": "Separate stopping/thermalization kernel integration after actualnonthermalpool andbath supplied.",
+  "execution_authorization_note": "false denotes no execution frozen for this prospective node, not missing user authorization; coordinator freezes actual inputs and a fresh cumulative budget within the authorized goal."
+}

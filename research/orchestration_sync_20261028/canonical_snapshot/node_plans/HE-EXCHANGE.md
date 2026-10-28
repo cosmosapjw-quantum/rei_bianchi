@@ -1,0 +1,159 @@
+# HE-EXCHANGE
+
+Lead: cosmosapjw-quantum/BASS_HE
+
+Current status: `SOURCE_INTAKE_AND_CONDITIONAL_IMPLEMENTATION_VERIFIED_PHYSICAL_BINDING_PENDING`
+
+Source: `authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json#/nodes/2`
+
+```json
+{
+  "id": "HE-EXCHANGE",
+  "lead_repo": "cosmosapjw-quantum/BASS_HE",
+  "source_file": "authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json",
+  "json_pointer": "/nodes/2",
+  "contract": {
+    "id": "HE-EXCHANGE",
+    "status": "PROPOSED_SOURCE_INPUT_PENDING",
+    "depends_on": [],
+    "equations_scope": "Sum species momentum/energy exchange=0; tensor collision rate differs from event frequency",
+    "inputs_domain": "All seven isotope nuclei/allq+e/n and selected molecular partners; e-neutral/e-ion/ion-neutral/ion-ion",
+    "claim_gates": [
+      "One admitted differential pair source,domain/uncertainty,timescale; HE35 conditional pair reused"
+    ],
+    "pass_action": "Coefficients/error to HE-CLOSURE",
+    "budget": "New pair cap pending; oldHE34/35 no replay",
+    "fail_action": "Preserve original failure; one diagnosed affected repair; return substantive scientific ambiguity to authority",
+    "review": "Independent changed-dependency review;source/science/runtime/CI/delivery separate",
+    "tests": "Same-source contract controls and affected derivative/conservation tests only; original tolerance preserved",
+    "conditional_dependencies": []
+  },
+  "dependencies": [],
+  "conditional_dependencies": [],
+  "external_prerequisites": [],
+  "current_status": "SOURCE_INTAKE_AND_CONDITIONAL_IMPLEMENTATION_VERIFIED_PHYSICAL_BINDING_PENDING",
+  "claim_gate": [
+    "One admitted differential pair source,domain/uncertainty,timescale; HE35 conditional pair reused"
+  ],
+  "pass_next_action": "Coefficients/error to HE-CLOSURE",
+  "budget_status": "New pair cap pending; oldHE34/35 no replay",
+  "change_class": [
+    "status_correction"
+  ],
+  "historical_contract_id": "HE-EXCHANGE",
+  "source_fields": {
+    "lead_repo": "source_group_repository",
+    "current_status": "status",
+    "claim_gate": "claim_gates",
+    "pass_next_action": "pass_action",
+    "budget_status": "budget"
+  },
+  "pr_plan": {
+    "inputs": {
+      "value": "All seven isotope nuclei/allq+e/n and selected molecular partners; e-neutral/e-ion/ion-neutral/ion-ion",
+      "source_file": "authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json",
+      "json_pointer": "/nodes/2/inputs_domain",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "equations": {
+      "value": "Sum species momentum/energy exchange=0; tensor collision rate differs from event frequency",
+      "source_file": "authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json",
+      "json_pointer": "/nodes/2/equations_scope",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "units": {
+      "value": null,
+      "source_file": "historical/baseline/thermal/BASS_HE_LONGTERM_CONTRACTS.json",
+      "json_pointer": null,
+      "qualification": "NOT_DECLARED_SEPARATELY_IN_SOURCE"
+    },
+    "domain": {
+      "value": "All seven isotope nuclei/allq+e/n and selected molecular partners; e-neutral/e-ion/ion-neutral/ion-ion",
+      "source_file": "authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json",
+      "json_pointer": "/nodes/2/inputs_domain",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "outputs": {
+      "value": null,
+      "source_file": "historical/baseline/thermal/BASS_HE_LONGTERM_CONTRACTS.json",
+      "json_pointer": null,
+      "qualification": "NOT_DECLARED_SEPARATELY_IN_SOURCE"
+    },
+    "positive_acceptance": {
+      "value": [
+        "One admitted differential pair source,domain/uncertainty,timescale; HE35 conditional pair reused"
+      ],
+      "source_file": "authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json",
+      "json_pointer": "/nodes/2/claim_gates",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "failure_disposition": {
+      "value": "Preserve original failure; one diagnosed affected repair; return substantive scientific ambiguity to authority",
+      "source_file": "authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json",
+      "json_pointer": "/nodes/2/fail_action",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "independent_review": {
+      "value": "Independent changed-dependency review;source/science/runtime/CI/delivery separate",
+      "source_file": "authority/thermal/BASS_HE_LONGTERM_CONTRACTS.json",
+      "json_pointer": "/nodes/2/review",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "PR_boundary": {
+      "value": null,
+      "source_file": "historical/baseline/thermal/BASS_HE_LONGTERM_CONTRACTS.json",
+      "json_pointer": null,
+      "qualification": "NOT_DECLARED_SEPARATELY_IN_SOURCE"
+    }
+  },
+  "runnable": false,
+  "missing_contract_fields": [
+    "units",
+    "outputs",
+    "PR_boundary"
+  ],
+  "execution_readiness_guard": {
+    "source_file": "authority/FINAL_ASSEMBLY_MISSING_FIELDS.json",
+    "scope": "Execution-readiness guard only; retain finite past admissions and source object unchanged",
+    "other_nodes_runnable_not_inferred": true
+  },
+  "status_observation": {
+    "source_file": "status/HE_EXP_INTAKE01_20261025.json",
+    "json_pointer": "/observations/HE-EXCHANGE",
+    "value": {
+      "unit_id": "HE-EXP-INTAKE-01",
+      "current_scoped_state": "SOURCE_INTAKE_AND_CONDITIONAL_IMPLEMENTATION_VERIFIED_PHYSICAL_BINDING_PENDING",
+      "scoped_contribution": "Conditional finite-mass angular-moment map, zero-drift Maxwellian heat and linear-drift drag implementation verified; physical source binding pending.",
+      "source_intake": {
+        "source_file": "status/HE_EXP_INTAKE01_20261025.json",
+        "json_pointer": "/source_intake"
+      },
+      "source_repository": "cosmosapjw-quantum/BASS_HE",
+      "source_commit": "965da72aa7a5e885e12956fafadfb8dc2519b81f",
+      "physical_provider_admitted": false,
+      "production_status": "NOT_APPROVED",
+      "activation": false,
+      "physical_allocation": "UNALLOCATED"
+    }
+  }
+}
+```
+
+
+## Preserved historical observation context
+
+The following narrative is historical local/unpublished observation context, not a replacement for the latest base contract above. DRIFT02: `status/HE_EXP_FINITE_DRIFT_20261027.json#/observations/HE-EXCHANGE`.
+
+
+## HE-EXP-EVENT-03 observation
+
+Conditional raw reactive number, momentum, kinetic energy and full second-moment stress contributions for a supplied 2-to-2 event. Source is locally prepared and unpublished; physical inputs remain open. See `status/HE_EXP_EVENT03_20261027.json#/observations/HE-EXCHANGE`.
+
+## HE-EXP-STATE-04 observation
+
+Selected HD local level ID2↔ID1 collision with H+ supports explicitly assumed Maxwellian reciprocity and scalar population exchange; differential momentum/stress remains open. Source is locally prepared and unpublished; physical dependencies remain open. See `status/HE_EXP_STATE04_20261027.json#/observations/HE-EXCHANGE`.
+
+
+## Current local observation pointer
+
+See `status/HE_EXP_STATE04_20261027.json#/observations/HE-EXCHANGE`. Central publication has not occurred. Current scoped state, budget, lead and dependency gates remain unchanged.

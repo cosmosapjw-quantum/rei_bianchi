@@ -1,0 +1,121 @@
+# REC-C3
+
+Lead: cosmosapjw-quantum/rec_bianchi
+
+Current status: `PROPOSED_NO_NEW_ADMISSION_OBSERVED`
+
+Source: `authority/thermal/rec_bianchi_LONGTERM_CONTRACTS.json#/nodes/2`
+
+```json
+{
+  "id": "REC-C3",
+  "lead_repo": "cosmosapjw-quantum/rec_bianchi",
+  "source_file": "authority/thermal/rec_bianchi_LONGTERM_CONTRACTS.json",
+  "json_pointer": "/nodes/2",
+  "contract": {
+    "id": "REC-C3",
+    "status": "PROPOSED_NO_NEW_ADMISSION_OBSERVED",
+    "depends_on": [],
+    "equations_scope": "Single exact63-state context shares geometry7/network3/thermal2 while keeping independent gas totals/masks",
+    "inputs_domain": "PR126 saved512states",
+    "claim_gates": [
+      "Exact parity/masks then paired identical-workload timing;no rounded key"
+    ],
+    "pass_action": "Refresh own ledger then implement affected context",
+    "budget": "Historical600s cap,81.3665spent at prior baseline; current remainder UNKNOWN",
+    "fail_action": "Preserve original failure; one diagnosed affected repair; return substantive scientific ambiguity to authority",
+    "review": "Independent changed-dependency review;source/science/runtime/CI/delivery separate",
+    "tests": "Same-source contract controls and affected derivative/conservation tests only; original tolerance preserved",
+    "conditional_dependencies": []
+  },
+  "dependencies": [],
+  "conditional_dependencies": [],
+  "external_prerequisites": [],
+  "current_status": "PROPOSED_NO_NEW_ADMISSION_OBSERVED",
+  "claim_gate": [
+    "Exact parity/masks then paired identical-workload timing;no rounded key"
+  ],
+  "pass_next_action": "Refresh own ledger then implement affected context",
+  "budget_status": "Historical600s cap,81.3665spent at prior baseline; current remainder UNKNOWN",
+  "change_class": [
+    "status_correction"
+  ],
+  "historical_contract_id": "REC-C3",
+  "source_fields": {
+    "lead_repo": "source_group_repository",
+    "current_status": "status",
+    "claim_gate": "claim_gates",
+    "pass_next_action": "pass_action",
+    "budget_status": "budget"
+  },
+  "pr_plan": {
+    "inputs": {
+      "value": "PR126 saved512states",
+      "source_file": "authority/thermal/rec_bianchi_LONGTERM_CONTRACTS.json",
+      "json_pointer": "/nodes/2/inputs_domain",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "equations": {
+      "value": "Single exact63-state context shares geometry7/network3/thermal2 while keeping independent gas totals/masks",
+      "source_file": "authority/thermal/rec_bianchi_LONGTERM_CONTRACTS.json",
+      "json_pointer": "/nodes/2/equations_scope",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "units": {
+      "value": null,
+      "source_file": "historical/baseline/thermal/rec_bianchi_LONGTERM_CONTRACTS.json",
+      "json_pointer": null,
+      "qualification": "NOT_DECLARED_SEPARATELY_IN_SOURCE"
+    },
+    "domain": {
+      "value": "PR126 saved512states",
+      "source_file": "authority/thermal/rec_bianchi_LONGTERM_CONTRACTS.json",
+      "json_pointer": "/nodes/2/inputs_domain",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "outputs": {
+      "value": null,
+      "source_file": "historical/baseline/thermal/rec_bianchi_LONGTERM_CONTRACTS.json",
+      "json_pointer": null,
+      "qualification": "NOT_DECLARED_SEPARATELY_IN_SOURCE"
+    },
+    "positive_acceptance": {
+      "value": [
+        "Exact parity/masks then paired identical-workload timing;no rounded key"
+      ],
+      "source_file": "authority/thermal/rec_bianchi_LONGTERM_CONTRACTS.json",
+      "json_pointer": "/nodes/2/claim_gates",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "failure_disposition": {
+      "value": "Preserve original failure; one diagnosed affected repair; return substantive scientific ambiguity to authority",
+      "source_file": "authority/thermal/rec_bianchi_LONGTERM_CONTRACTS.json",
+      "json_pointer": "/nodes/2/fail_action",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "independent_review": {
+      "value": "Independent changed-dependency review;source/science/runtime/CI/delivery separate",
+      "source_file": "authority/thermal/rec_bianchi_LONGTERM_CONTRACTS.json",
+      "json_pointer": "/nodes/2/review",
+      "qualification": "SOURCE_DECLARED"
+    },
+    "PR_boundary": {
+      "value": null,
+      "source_file": "historical/baseline/thermal/rec_bianchi_LONGTERM_CONTRACTS.json",
+      "json_pointer": null,
+      "qualification": "NOT_DECLARED_SEPARATELY_IN_SOURCE"
+    }
+  },
+  "runnable": false,
+  "missing_contract_fields": [
+    "units",
+    "outputs",
+    "PR_boundary"
+  ],
+  "execution_readiness_guard": {
+    "source_file": "authority/FINAL_ASSEMBLY_MISSING_FIELDS.json",
+    "scope": "Execution-readiness guard only; retain finite past admissions and source object unchanged",
+    "other_nodes_runnable_not_inferred": true
+  }
+}
+```
