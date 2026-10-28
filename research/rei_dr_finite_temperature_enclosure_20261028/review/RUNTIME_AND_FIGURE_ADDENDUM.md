@@ -77,4 +77,59 @@ The numerical invocation now creates `execution/attempt_02` and `execution/outer
 
 The controller may publish this bounded repair and issue its already authorized specific dispatch. The reviewer will then assess actual returned values and process identity/CPU records, followed by the actual figure. Until that return, the attempt01 environment failure remains the only execution outcome, and scientific/figure runtime admission remains pending.
 
+### Attempt 02 — actual bounded-resource stop; host mapping now observed
+
+Read completed at **2026-10-28 11:56:56 UTC**. The complete previous report is preserved as `RUNTIME_BEFORE_ATTEMPT_02_RETURN.md`, SHA256 `78cc08c3d3fc123a19b27c2c403d0db11c4932605f5672b28c47bee5112aa3e6`. `RUNTIME_ATTEMPT_02_READ_LEDGER.json` records full reads of outer PROCESS1–105, source identities1–37, all outer streams, and both inner streams, plus the verified absence of inner `PROCESS.json`.
+
+The actual outer handshake records hostPID=hostSID=481633, namespacePID=5 and start_ticks=4710411. Its live-family observation contains host PIDs481633 and481634. The monitor now records36 ticks at100 Hz and terminates with `aggregate_CPU_watchdog` at its unchanged0.36 CPU-s threshold. Thus F-PIDNS's host/session translation is **CLOSED_FOR_THE_OBSERVED_RUNTIME_MAPPING**: the expected runner/leaf family is seen, rather than the empty family in attempt01. The inner handshake receipt did not survive the group abort, so no complete inner runtime receipt is claimed.
+
+All seven attempt02 source identities match the reviewed PIDNS preparation. In particular the original scientific implementation and tests retain their accepted hashes. The inner stderr contains only the selected test method's start line; stdout is empty. Both outer streams are empty. There is no test-return summary, interval record, oracle value or scientific assertion failure.
+
+**Actual attempt02 result: FAILED_BOUNDED_RUNTIME_RESOURCE_LIMIT_BEFORE_RESULT_RETURN.** This is a performance/execution outcome under the specified bound, not a failed physical or mathematical assertion. C6 has not completed; C7/C8 scientific/figure evidence and C9 runtime acceptance remain pending.
+
+The outer process exited−9 after wall0.3537373469953309 s. Its waited-command field is0.065662 CPU-s, with separate outer supervisor prefix0.188753228 s. Because the group kill terminated the intermediate parent before it reaped the scientific worker, the0.065662 field does **not** measure the full job family. The receipt's abort caveat applies. The36-tick family observation must not be added to that overlapping parent counter or mistaken for an exact final whole-family value.
+
+The controller retains the full planned0.4 numerical reserve for attempt02 and accounts for the separately measured supervisor prefix; unknown un-reaped tail remains explicit. The controller-reported conservative pre-next-attempt planning balance is21.654823051, with a prospective0.25 reservation yielding21.904823051 under the current22 ceiling. These are controller accounting/reservation values, not a reviewer whole-session resource certificate. No prior allowance or failed reservation is reopened.
+
+The controller's bounded performance diagnosis identifies repeated kernel and curvature-bound work across the same36 Taylor controls. The proposed correction is per-instance memoization with complete immutable operand/context keys and fresh interval wrappers, retaining all original formulae, precision, input coefficients, tests and acceptance criteria. Separate attempt03 files and the failed artifacts are to be preserved. Poll intervals may change to reduce monitoring overhead, with a smaller numerical target and explicit guards. This is a new diagnosis-driven preparation, not an automatic identical retry.
+
+The reviewer has not executed or benchmarked this optimization. Its actual diff must be inspected for cache purity, key completeness, object aliasing and routing before the controller dispatches it. The closed D1–D5 proof will be reused; no new source census or full theory audit is undertaken.
+
+### F-RECOMPUTATION cache and final control closure — 2026-10-28 12:00:18 UTC
+
+Verdict: **PASS_SCOPED_STATIC_MEMOIZATION_AND_CONTROLS; READY_FOR_CONTROLLER_DISPATCH**. No concrete cache-purity, identity or routing defect was found in the returned bounded change. This does not claim a measured speedup, completed test or runtime PASS.
+
+The pre-cache report is preserved as `RUNTIME_BEFORE_CACHE_REPAIR.md`, SHA256 `755e2a2992e695a5dd761a0b488b1a9e198b96909e42ed635a4a1d013b0b3906`. Initial and final preparation reads are recorded in `CACHE_REPAIR_READ_LEDGER.json` and `CACHE_FINAL_CONTROL_READ_LEDGER.json`. The full original cache diff1–180, finding1–25 and manifest1–48 were read; actual changed source ranges were read in the new model1–9,120–264, runner13–31,75–128, outer wrapper1–6,87–167 and plot1–16. Unchanged code is reused through exact text-diff identity, not re-audited.
+
+Before execution, the controller chose a larger reservation within the same22 cap. I then read the final finding1–27 and full final manifest, plus runner103–124 and outer87–105,124–141. `CACHE_FINAL_RESOURCE_DELTA.diff` contains only the final resource edits relative to the preserved unexecuted draft: numerical target0.25, outer guard0.22 and inner guard0.23. The final complete author diff matches the actual four new files, and all7 final prepared identities match. The prior original and PIDNS sources, scientific tests and coefficient file remain unchanged.
+
+#### Why the cache preserves the computation
+
+The two OrderedDict caches are per model instance and bounded to256 entries each. A kernel key contains the exact energy and both exact temperature endpoints. Its context signature includes precision, Emin, Emax, clamp, rounding, capitals and all trap settings. A second-derivative-bound key additionally contains freshly decoded coefficient and energy tuples, current s and k, both interval endpoints and the loss selector. It therefore identifies the actual operands rather than merely a species name or mutable source-container identity.
+
+Domain/species validation occurs before a second-bound lookup, and the kernel checks the exact Arithmetic instance before lookup. Changing an admitted row, conversion-factor value, domain, precision/exponent setting or trap configuration changes the corresponding key; a different model owns different caches. The unchanged arithmetic uses local context copies, so unrecorded persistent flags are not a numerical input to these cache results.
+
+The stored values are tuples of immutable Decimal endpoints, not mutable Interval objects. Both cache hits and new stores construct fresh Interval wrappers. Changing a caller's returned interval cannot replace the stored endpoint tuple. Eviction only causes a future recomputation and changes no result.
+
+On a miss, the kernel and curvature-bound expressions are textually unchanged apart from storing/returning their results. On a hit, the same endpoint values for the same operands/context are reused. Thus the optimization preserves the represented source function, outward arithmetic, signed coefficients, positive lower-bound construction, curvature bound and zero-step shortcut. The fixed tests and90-digit oracle retain SHA256 `c31699f56af6f83a7758c6607f29ce8e9a611e835a2dfb65c53898f57ad11bee`; no cases, tolerance or precision were relaxed.
+
+#### Final identities and dispatch boundary
+
+| Final source | SHA256 |
+|---|---|
+| `code/dr_enclosure_cached.py` | `be32fe17982ec9d1e9a6d506e37296d11cbe39fd6bc66690e6563ee62e2fb59c` |
+| `code/run_once_cached.py` | `e4069c97b9e027bcba1db28353303d0ac4646fc8c8bc52f15dfd457c48e86b00` |
+| `code/execute_bounded_cached.py` | `691d8b7af9bf3cad17223ec4cdfc0834601a1f1514d8127f12fc00ff672bae8f` |
+| `code/plot_saved_cached.py` | `a6f88d76d4968b5636b64696b69e9705562b612b158ee505795c3729c684a5d7` |
+
+The worker aliases the cached module into the same `code_dr` test dependency and writes only attempt03. The outer wrapper verifies `CACHED_IDENTITIES.json` and writes outer_numerical03. The plot reads only successful attempt03 JSON and retains the first presentation attempt. All failed attempts remain intact.
+
+The PIDNS handshake and namespace kill/wait rules are unchanged. Poll intervals are0.01 s outer and0.005 s inner; presentation target/guard remain1.5/1.4 CPU-s. Numerical target/guards are0.25/0.22/0.23 CPU-s, with hard per-process backstop1 s and unchanged memory/wall limits. These are recorded monitoring targets with the existing tick/poll/abort limitations, not strict whole-host bounds.
+
+The controller's conservative pre-attempt planning view21.654823051 plus the fresh0.25 target and0.05 tail reservation is21.954823051 under22. This final reservation supersedes the earlier unexecuted0.2/0.16/0.18 draft; it is not an additional attempt or a new cumulative ceiling. Old closed reserves are not reused, and UNKNOWN_NOT_ZERO remains.
+
+No benchmark, import, compilation, test, numerical evaluation, CAS or renderer was run by the reviewer. The controller can now publish the exact final preparation and issue the bounded attempt03 dispatch. C6–C9 scientific/runtime acceptance still requires the actual returned data and figure; the previous two execution outcomes remain part of this record.
+
+
+
 
