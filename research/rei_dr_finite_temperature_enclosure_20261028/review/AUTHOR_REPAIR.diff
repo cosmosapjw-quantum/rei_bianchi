@@ -1,0 +1,60 @@
+--- before/code/dr_enclosure.py
++++ after/code/dr_enclosure.py
+@@ -220,9 +220,11 @@
+         domain=self.domain(lo,hi); center=self.domain(t0); point=self.domain(target)
+         if not (domain.lo<=center.lo<=domain.hi and domain.lo<=point.lo<=domain.hi):
+             raise ValueError('Taylor endpoints outside interval')
+-        h=(point/center).transcend('ln')
+         f0=self.range(key,t0,t0,loss)
+         d0=self.first_log_derivative(key,t0,loss)
++        if point.lo == center.lo:
++            return {'enclosure':f0,'h':self.a.interval(0),'f0':f0,'d0':d0,'radius':D(0)}
++        h=(point/center).transcend('ln')
+         radius=(self.second_bound(key,lo,hi,loss)*h.magnitude()*h.magnitude()/2).hi
+         linear=f0+d0*h
+         enclosure=linear+Interval(self.a,radius.copy_negate(),radius)
+--- before/tests/test_dr_enclosure.py
++++ after/tests/test_dr_enclosure.py
+@@ -38,7 +38,7 @@
+         path=ROOT/'source/atomic_coefficients.json';data=load_source(path);m=DRModel(data)
+         records={'parameter_images':parameter_images(data),'finite_ranges':[],
+                  'signed_vs_clipped':[],'underflow_vs_absence':[],'taylor':[],
+-                 'precision_comparison':[],'rejections':[]}
++                 'precision_comparison':[],'rejections':[],'zero_step':[]}
+         for key,row in data['dr'].items():
+             for loss in (False,True):
+                 cert=m.positivity(key,loss)
+@@ -79,6 +79,13 @@
+         records['interior_peak']={'T_K':str(peak),'peak':str(actual_peak),
+                                   'endpoint_only_max':str(endpoint_max),'enclosure':k.wire()}
+         t0=number(14919.863839279506)
++        for loss in (False,True):
++            zero=m.taylor('2:1',100,101,100,100,loss)
++            self.assertEqual((zero['h'].lo,zero['h'].hi,zero['radius']),(0,0,0))
++            self.assertEqual(zero['enclosure'].wire(),zero['f0'].wire())
++            records['zero_step'].append({'key':'2:1','quantity':'L' if loss else 'alpha',
++                'T0_K':100,'target_K':100,'h':zero['h'].wire(),'radius':str(zero['radius']),
++                'f0':zero['f0'].wire(),'d0':zero['d0'].wire(),'enclosure':zero['enclosure'].wire()})
+         # Both actual signed rows and positive row, alpha and loss, all six log steps.
+         for key,row in data['dr'].items():
+             for loss in (False,True):
+--- before/code/run_once.py
++++ after/code/run_once.py
+@@ -43,7 +43,7 @@
+     argv=[sys.executable,'-B','-S',str(Path(__file__).resolve()),'--worker']
+     prefix=time.process_time();start=time.perf_counter();pid=os.fork()
+     if pid==0:
+-        os.setsid();os.chdir(ROOT)
++        os.chdir(ROOT)  # Leaf remains in the outer supervisor's monitored session.
+         resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+         resource.setrlimit(resource.RLIMIT_AS,(268435456,268435456))
+         for fd,name in [(1,'STDOUT.json'),(2,'STDERR.txt')]:
+@@ -61,7 +61,7 @@
+             continue
+         if cpu>=.38 or time.perf_counter()-start>=10:
+             reason='CPU_watchdog' if cpu>=.38 else 'wall_watchdog'
+-            os.killpg(pid,signal.SIGKILL);waited,status,usage=os.wait4(pid,0);break
++            os.kill(pid,signal.SIGKILL);waited,status,usage=os.wait4(pid,0);break
+         time.sleep(.002)
+     receipt={'argv':argv,'sources':sources,'exit_code':os.waitstatus_to_exitcode(status),
+         'raw_wait_status':status,'watchdog_stop':reason,'CPU_s':usage.ru_utime+usage.ru_stime,

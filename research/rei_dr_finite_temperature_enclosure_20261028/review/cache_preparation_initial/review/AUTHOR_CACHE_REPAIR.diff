@@ -1,0 +1,180 @@
+--- code/dr_enclosure.py
++++ code/dr_enclosure_cached.py
+@@ -1,4 +1,5 @@
+ """Signed represented DR fits: Decimal outward enclosures, not fit uncertainty."""
++from collections import OrderedDict
+ import hashlib
+ import json
+ from decimal import (Decimal as D, Context, localcontext, ROUND_FLOOR,
+@@ -121,6 +122,9 @@
+ class DRModel:
+     def __init__(self, data, precision=60):
+         self.data, self.a = data, Arithmetic(precision)
++        self._kernel_cache = OrderedDict()
++        self._second_cache = OrderedDict()
++        self._cache_limit = 256
+         self.s, self.k = number(1e-6), number(1.380649e-23)
+ 
+     def row(self, key):
+@@ -141,9 +145,33 @@
+             raise ValueError('outside runtime temperature domain')
+         return t
+ 
++    def _signature(self):
++        c=self.a.context
++        return (c.prec,c.Emin,c.Emax,c.clamp,c.rounding,c.capitals,
++                tuple(sorted((str(signal),enabled) for signal,enabled in c.traps.items())))
++
++    def _cached(self, cache, key):
++        endpoints=cache.get(key)
++        if endpoints is None:return None
++        cache.move_to_end(key)
++        return Interval(self.a,*endpoints)
++
++    def _store(self, cache, key, value):
++        cache[key]=(value.lo,value.hi)  # Decimal objects are immutable; no Interval alias.
++        cache.move_to_end(key)
++        if len(cache)>self._cache_limit:cache.popitem(last=False)
++        return Interval(self.a,value.lo,value.hi)
++
+     def kernel(self, energy, temperature):
+-        e = self.a.interval(energy)
+-        return (-e/temperature).transcend('exp') / (temperature * temperature.transcend('sqrt'))
++        if not isinstance(temperature,Interval) or temperature.a is not self.a:
++            raise ValueError('kernel temperature must use this arithmetic context')
++        exact_energy=number(energy)
++        key=(self._signature(),exact_energy,temperature.lo,temperature.hi)
++        cached=self._cached(self._kernel_cache,key)
++        if cached is not None:return cached
++        e = self.a.interval(exact_energy)
++        result=(-e/temperature).transcend('exp') / (temperature * temperature.transcend('sqrt'))
++        return self._store(self._kernel_cache,key,result)
+ 
+     def term_range(self, energy, interval):
+         left = self.kernel(energy, self.a.interval(interval.lo))
+@@ -206,7 +234,12 @@
+         t = self.domain(lo,hi); row = self.row(key)
+         if row is None:
+             return self.a.interval(0)
+-        cs,es=row; total=self.a.interval(0)
++        cs,es=row
++        # Actual decoded row and conversion factors are part of the key even if caller mutates source data.
++        key=(self._signature(),cs,es,self.s,self.k,t.lo,t.hi,loss)
++        cached=self._cached(self._second_cache,key)
++        if cached is not None:return cached
++        total=self.a.interval(0)
+         for w,e in zip(self.weights(cs,es,loss),es):
+             x=self.a.interval(e)/t
+             candidates=[self.a.interval(x.lo),self.a.interval(x.hi)]
+@@ -214,7 +247,7 @@
+                 candidates.append(self.a.interval(2))
+             q=max((v*v-4*v+D('2.25')).magnitude() for v in candidates)
+             total=total+self.a.interval(w.magnitude())*self.term_range(e,t).hi*q
+-        return Interval(self.a,D(0),total.hi)
++        return self._store(self._second_cache,key,Interval(self.a,D(0),total.hi))
+ 
+     def taylor(self,key,lo,hi,t0,target,loss=False):
+         domain=self.domain(lo,hi); center=self.domain(t0); point=self.domain(target)
+--- code/run_once_pidns.py
++++ code/run_once_cached.py
+@@ -13,8 +13,8 @@
+ def worker():
+     import importlib.util,unittest
+     sys.path.insert(0,str(ROOT/'code'))
+-    import dr_enclosure
+-    sys.modules['code_dr']=dr_enclosure
++    import dr_enclosure_cached
++    sys.modules['code_dr']=dr_enclosure_cached
+     spec=importlib.util.spec_from_file_location('selected_dr_tests',ROOT/'tests/test_dr_enclosure.py')
+     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+     result=unittest.TextTestRunner(stream=sys.stderr,verbosity=2).run(
+@@ -77,9 +77,9 @@
+         return worker()
+     if sys.argv[1:]!=['--execute-authorized']:
+         raise SystemExit('Prepared only; explicit frozen allowance required')
+-    attempt=ROOT/'execution/attempt_02';attempt.mkdir(parents=True,exist_ok=False)
++    attempt=ROOT/'execution/attempt_03';attempt.mkdir(parents=True,exist_ok=False)
+     files=[ROOT/'THEORY_AND_CONTRACT.md',ROOT/'source/atomic_coefficients.json',
+-           ROOT/'code/dr_enclosure.py',ROOT/'tests/test_dr_enclosure.py',Path(__file__).resolve()]
++           ROOT/'code/dr_enclosure_cached.py',ROOT/'tests/test_dr_enclosure.py',Path(__file__).resolve()]
+     sources=[metadata(p) for p in files]
+     argv=[sys.executable,'-B','-S',str(Path(__file__).resolve()),'--worker']
+     read_fd,write_fd=os.pipe();expected_sid=proc_identity()['host_sid']
+@@ -106,15 +106,15 @@
+                 if fields is not None:cpu=(int(fields[11])+int(fields[12]))/ticks
+             except ValueError:
+                 reason='host_identity_mismatch'
+-        if reason is not None or cpu>=.38 or time.perf_counter()-start>=10:
+-            reason=reason or ('CPU_watchdog' if cpu>=.38 else 'wall_watchdog')
++        if reason is not None or cpu>=.18 or time.perf_counter()-start>=10:
++            reason=reason or ('CPU_watchdog' if cpu>=.18 else 'wall_watchdog')
+             os.kill(pid,signal.SIGKILL);waited,status,usage=os.wait4(pid,0);break
+-        time.sleep(.002)
++        time.sleep(.005)
+     receipt={'host_identity_handshake':host_identity,'argv':argv,'sources':sources,'exit_code':os.waitstatus_to_exitcode(status),
+         'raw_wait_status':status,'watchdog_stop':reason,'CPU_s':usage.ru_utime+usage.ru_stime,
+         'user_CPU_s':usage.ru_utime,'system_CPU_s':usage.ru_stime,'wall_s':time.perf_counter()-start,
+         'maxrss_KiB_Linux':usage.ru_maxrss,'supervisor_prefix_CPU_s':time.process_time()-prefix,
+-        'limits':{'CPU_target_s':.4,'CPU_watchdog_threshold_s':.38,'hard_CPU_s':1,'wall_s':10,'memory_bytes':268435456},
++        'limits':{'CPU_target_s':.2,'CPU_watchdog_threshold_s':.18,'hard_CPU_s':1,'wall_s':10,'memory_bytes':268435456},
+         'environment':{'python':sys.version,'platform':platform.platform()},
+         'accounting':'wait4 whole worker; supervisor prefix separate; do not add nested counters again',
+         'current_budget':'Read root frozen current authority; no old reservation reuse or inferred grant',
+--- code/execute_bounded_pidns.py
++++ code/execute_bounded_cached.py
+@@ -1,8 +1,8 @@
+ """Prepared Linux outer OS supervisor. Never retries; explicit dispatch required.
+ 
+ Commands from unit root, only after root's explicit execution authorization:
+- python -B -S code/execute_bounded_pidns.py numerical --execute-authorized
+- python -B -S code/execute_bounded_pidns.py presentation --execute-authorized
++ python -B -S code/execute_bounded_cached.py numerical --execute-authorized
++ python -B -S code/execute_bounded_cached.py presentation --execute-authorized
+ Targets are bounded job-family accounting targets, not strict whole-host bounds.
+ """
+ import hashlib
+@@ -88,18 +88,18 @@
+     if len(sys.argv)!=3 or sys.argv[1] not in ('numerical','presentation') or sys.argv[2]!='--execute-authorized':
+         raise SystemExit('Prepared supervisor: explicit root dispatch required')
+     job=sys.argv[1]
+-    target,threshold,wall,memory=(.4,.36,12,268435456) if job=='numerical' else (1.5,1.4,15,805306368)
+-    inner=ROOT/('execution/attempt_02' if job=='numerical' else 'figures/attempt_01')
++    target,threshold,wall,memory=(.2,.16,12,268435456) if job=='numerical' else (1.5,1.4,15,805306368)
++    inner=ROOT/('execution/attempt_03' if job=='numerical' else 'figures/attempt_01')
+     if inner.exists():raise SystemExit('Existing inner attempt; no replay permitted')
+-    output=ROOT/'execution'/('outer_'+job+('_02' if job=='numerical' else '_01'));output.mkdir(parents=True,exist_ok=False)
+-    manifest=json.loads((ROOT/'REPAIRED_IDENTITIES.json').read_text())
++    output=ROOT/'execution'/('outer_'+job+('_03' if job=='numerical' else '_01'));output.mkdir(parents=True,exist_ok=False)
++    manifest=json.loads((ROOT/'CACHED_IDENTITIES.json').read_text())
+     for row in manifest['files']:
+         actual=identity(ROOT/row['path'])
+         if actual['sha256']!=row['sha256']:raise SystemExit('Frozen source mismatch: '+row['path'])
+     sources=[identity(ROOT/row['path']) for row in manifest['files']]
+-    if not any(x['path']=='code/execute_bounded_pidns.py' for x in sources):
++    if not any(x['path']=='code/execute_bounded_cached.py' for x in sources):
+         sources.append(identity(Path(__file__).resolve()))
+-    script='code/run_once_pidns.py' if job=='numerical' else 'code/plot_saved_pidns.py'
++    script='code/run_once_cached.py' if job=='numerical' else 'code/plot_saved_cached.py'
+     argv=[sys.executable,'-B','-S',script,'--execute-authorized']
+     envlimits={'OPENBLAS_NUM_THREADS':'1','OMP_NUM_THREADS':'1','MKL_NUM_THREADS':'1'}
+     (output/'SOURCE_IDENTITIES_BEFORE.json').write_text(json.dumps(sources,indent=2)+'\n')
+@@ -138,7 +138,7 @@
+             try:os.killpg(pid,signal.SIGKILL)
+             except ProcessLookupError:pass
+             waited,status,usage=os.wait4(pid,0);break
+-        time.sleep(.002)
++        time.sleep(.01)
+     elapsed=time.perf_counter()-start
+     # In normal completion the runner/plot waits for descendants; aborted orphan
+     # usage can be missing from wait4 and is flagged rather than called zero.
+--- code/plot_saved_pidns.py
++++ code/plot_saved_cached.py
+@@ -11,7 +11,7 @@
+     if sys.argv[1:]!=['--execute-authorized']:
+         raise SystemExit('Prepared only; explicit frozen presentation allowance required')
+     out=ROOT/'figures/attempt_01';out.mkdir(parents=True,exist_ok=False)
+-    start=time.process_time();raw=(ROOT/'execution/attempt_02/STDOUT.json').read_bytes();saved=json.loads(raw)
++    start=time.process_time();raw=(ROOT/'execution/attempt_03/STDOUT.json').read_bytes();saved=json.loads(raw)
+     if saved.get('success') is not True:raise SystemExit('successful saved selected results required')
+     parts=['<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="490" viewBox="0 0 1000 490">',
+         '<rect width="1000" height="490" fill="white"/>',

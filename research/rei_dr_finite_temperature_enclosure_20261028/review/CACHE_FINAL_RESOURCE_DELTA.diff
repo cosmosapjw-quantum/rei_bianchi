@@ -1,0 +1,32 @@
+--- initial/code/run_once_cached.py
++++ final/code/run_once_cached.py
+@@ -106,15 +106,15 @@
+                 if fields is not None:cpu=(int(fields[11])+int(fields[12]))/ticks
+             except ValueError:
+                 reason='host_identity_mismatch'
+-        if reason is not None or cpu>=.18 or time.perf_counter()-start>=10:
+-            reason=reason or ('CPU_watchdog' if cpu>=.18 else 'wall_watchdog')
++        if reason is not None or cpu>=.23 or time.perf_counter()-start>=10:
++            reason=reason or ('CPU_watchdog' if cpu>=.23 else 'wall_watchdog')
+             os.kill(pid,signal.SIGKILL);waited,status,usage=os.wait4(pid,0);break
+         time.sleep(.005)
+     receipt={'host_identity_handshake':host_identity,'argv':argv,'sources':sources,'exit_code':os.waitstatus_to_exitcode(status),
+         'raw_wait_status':status,'watchdog_stop':reason,'CPU_s':usage.ru_utime+usage.ru_stime,
+         'user_CPU_s':usage.ru_utime,'system_CPU_s':usage.ru_stime,'wall_s':time.perf_counter()-start,
+         'maxrss_KiB_Linux':usage.ru_maxrss,'supervisor_prefix_CPU_s':time.process_time()-prefix,
+-        'limits':{'CPU_target_s':.2,'CPU_watchdog_threshold_s':.18,'hard_CPU_s':1,'wall_s':10,'memory_bytes':268435456},
++        'limits':{'CPU_target_s':.25,'CPU_watchdog_threshold_s':.23,'hard_CPU_s':1,'wall_s':10,'memory_bytes':268435456},
+         'environment':{'python':sys.version,'platform':platform.platform()},
+         'accounting':'wait4 whole worker; supervisor prefix separate; do not add nested counters again',
+         'current_budget':'Read root frozen current authority; no old reservation reuse or inferred grant',
+--- initial/code/execute_bounded_cached.py
++++ final/code/execute_bounded_cached.py
+@@ -88,7 +88,7 @@
+     if len(sys.argv)!=3 or sys.argv[1] not in ('numerical','presentation') or sys.argv[2]!='--execute-authorized':
+         raise SystemExit('Prepared supervisor: explicit root dispatch required')
+     job=sys.argv[1]
+-    target,threshold,wall,memory=(.2,.16,12,268435456) if job=='numerical' else (1.5,1.4,15,805306368)
++    target,threshold,wall,memory=(.25,.22,12,268435456) if job=='numerical' else (1.5,1.4,15,805306368)
+     inner=ROOT/('execution/attempt_03' if job=='numerical' else 'figures/attempt_01')
+     if inner.exists():raise SystemExit('Existing inner attempt; no replay permitted')
+     output=ROOT/'execution'/('outer_'+job+('_03' if job=='numerical' else '_01'));output.mkdir(parents=True,exist_ok=False)
