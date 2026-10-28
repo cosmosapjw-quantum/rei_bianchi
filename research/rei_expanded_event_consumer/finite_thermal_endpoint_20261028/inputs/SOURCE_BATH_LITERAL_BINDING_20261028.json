@@ -1,0 +1,70 @@
+{
+  "schema": "REI_FINITE_THERMAL_LITERAL_BINDING_V1",
+  "unit": "finite_thermal_endpoint_20261028",
+  "date_kst": "2026-10-28",
+  "base_commit": "e77bc7ec48ae2aee8ded573e66ac0a1060017c54",
+  "scope": "Source-field transcription and decoder binding only; no numerical temperature, source replay, or executable implementation",
+  "source_repository": "cosmosapjw-quantum/bass",
+  "source_commit": "634c3046ffccc5d00f1ab7588b5834a6eb8053ad",
+  "source_prefix": "research/bass_b3h_qss_channel_completion_20261027/",
+  "sources": {
+    "operands": {"path":"results/SOURCE_OPERANDS.json","git_blob":"aef53bb4770fe9917c22f3cf22fa5edc7c5d75dc","source_declared_sha256":"179784a094091324dd85ba727fddca1a592178099e9067ff254d6c44c60dd7bd"},
+    "tube": {"path":"inputs/reused_incoming_tube/TUBE_RESULT.json","git_blob":"c1b82c1ccbfffe72401ef3315b2f7ee7b08d9626"},
+    "incoming": {"path":"inputs/reused_incoming_tube/FINITE_TUBE_INPUT_SLICE.json","git_blob":"4e7ccf8de05ae1a2e40f5495dc64afc81e42d685"},
+    "decoder": {"path":"code/mp_b.py","git_blob":"928c7905e5fb13e1867a820b0662cf1e47308e32"},
+    "clock": {"path":"code/finite_b.py","git_blob":"acc8431e6ce7d054801d237bc9f16ba50f6a2806"},
+    "binder": {"path":"code/phase_b.py","git_blob":"b954722915fe532211bce124ab1bf98cb95a2efb"},
+    "owner": {"path":"code/owners_b.py","git_blob":"cfe9a7c07f1e3d42c17f86a265cd5cfeffc080fd"}
+  },
+  "literal_readback": [
+    {"name":"NH_reference","source":"tube","pointer":"/nH_reference_m3","lexeme":"250250485.05511948","original_json_kind":"number","decoder":"JSON_NUMBER_VIA_BINARY64","unit":"particles per reference m^3","use":"Clock.NH, not an independently supplied recipient baryon density"},
+    {"name":"fHe_left","source":"operands","pointer":"/source_steady_temperature/0/fHe","lexeme":"0.07951330436486959","original_json_kind":"number","decoder":"JSON_NUMBER_VIA_BINARY64","unit":"He:H nuclei ratio","use":"source inert-He count B=NH_reference*fHe_left"},
+    {"name":"Tm_energy_left","source":"operands","pointer":"/endpoints/0/Tm","lexeme":"0.25884325362029575","original_json_kind":"number","decoder":"JSON_NUMBER_VIA_BINARY64","unit":"eV energy corresponding to k_B T","use":"source driver energy, not kelvin"},
+    {"name":"Tm_K_left","source":"operands","pointer":"/source_steady_temperature/0/Tm_K","lexeme":"3003.7478329491555","original_json_kind":"number","decoder":"JSON_NUMBER_VIA_BINARY64","unit":"K","use":"native driver diagnostic; not an independently reconstructed caloric endpoint"},
+    {"name":"xe_left","source":"operands","pointer":"/endpoints/0/xe","lexeme":"0.1450576323454068","original_json_kind":"number","decoder":"JSON_NUMBER_VIA_BINARY64","unit":"electrons per H nucleus","use":"source driver count; preserve separately saved endpoint electron representation"},
+    {"name":"kBoltz_source","source":"operands","pointer":"/source_constants/kBoltz","lexeme":"8.617343e-05","original_json_kind":"number","decoder":"JSON_NUMBER_VIA_BINARY64","unit":"eV/K","use":"retained native temperature convention"},
+    {"name":"EV_J_source","source":"incoming","pointer":"/native_cosmology/EV_J","lexeme":"1.602176634e-19","original_json_kind":"number","decoder":"JSON_NUMBER_VIA_BINARY64","unit":"J/eV","use":"original source conversion; do not reapply to already-SI U/Q/W"},
+    {"name":"h","source":"incoming","pointer":"/selection/dlna_hex","lexeme":"0x1.6418ae4caf054p-14","original_json_kind":"string","decoder":"BINARY64_HEX_STRING","unit":"dimensionless delta ln a","use":"source Clock.h"},
+    {"name":"endpoint_density_diagnostic","source":"operands","pointer":"/endpoints/0/nH_cm3","lexeme":"250.25048505511995","original_json_kind":"number","decoder":"JSON_NUMBER_VIA_BINARY64","unit":"cm^-3","use":"diagnostic only; do not replace Clock.NH by this value times 10^6"},
+    {"name":"Tm_K_right_driver","source":"operands","pointer":"/source_steady_temperature/1/Tm_K","lexeme":"3003.4927947892816","original_json_kind":"number","decoder":"JSON_NUMBER_VIA_BINARY64","unit":"K","use":"native right driver only; not the finite caloric result"},
+    {"name":"xe_right_driver","source":"operands","pointer":"/source_steady_temperature/1/xe","lexeme":"0.14492999669034545","original_json_kind":"number","decoder":"JSON_NUMBER_VIA_BINARY64","unit":"electrons per H nucleus","use":"native right driver only; not a replacement for saved finite endpoint electrons"}
+  ],
+  "encoding_semantics": {
+    "lexeme_storage": "Packet strings preserve displayed source lexemes plus original JSON kind; they do not declare exact-decimal physics inputs",
+    "JSON_NUMBER_VIA_BINARY64": "Original json.loads parses a noninteger number to float; mp_b.exact then converts that binary64 value to mpf at dps70. A source-faithful rational adapter must recover the binary64 value, not directly interpret the lexical decimal as a rational.",
+    "BINARY64_HEX_STRING": "Producer uses float.fromhex followed by mpf. Preserve the dyadic value and original hexadecimal text.",
+    "SAVED_MP_DECIMAL_STRING": "Producer mp.nstr(...,70) output strings form a separately represented decimal value. The earlier exact consumer preserves those decimal strings as rationals; they are not claimed identical to unprinted MP internals or error-free physical inputs.",
+    "ACTUAL_DECODING_EXECUTED_HERE": false,
+    "actual_binary64_numerators_denominators": null,
+    "pending_targeted_control": "Within the existing source-identity/representation tests, contrast typed binary64 import with direct decimal import; do not weaken the scalar core's accidental-float rejection. This is NOT_RUN."
+  },
+  "binding_formulas": {
+    "source_count": "N_a=sum(initial_fine_stocks)+saved_electrons_initial+NH_reference*fHe_left; N_b uses the same inert-He count and saved final stocks/electrons",
+    "driver_count": "N_a_driver=NH_reference*(1+fHe_left+xe_left); preserve its difference from saved stock assembly",
+    "source_energy_temperature": "T_a_energy=Tm_energy_left*EV_J_source/k_B_SI; cv=3*k_B_SI/2",
+    "finite_map": "D=N_a+deltaN; E=cv*N_a*T_a+Q+W; That=E/(cv*D), on the existing positive domain",
+    "residuals": "r0=U_a-cv*N_a*T_a; rbal=U_b-U_a-Q-W; rE=r0+rbal; rN=N_b-D",
+    "no_new_evaluation": "All formulas are prior direct derivations with newly read field bindings; B, T, residuals, differences and bias were not numerically evaluated"
+  },
+  "unchanged_saved_consumer": {
+    "repository":"cosmosapjw-quantum/rei_bianchi",
+    "ref":"e77bc7ec48ae2aee8ded573e66ac0a1060017c54",
+    "path":"research/rei_expanded_event_consumer/bass_atomic_storage_consumer_20261027/execution/FIRST_RESULT.json",
+    "use":"Read existing num/den representation and original source/control identities; no replay of its 14 tests or 10 source controls",
+    "original_input":{"bytes":3554206,"git_blob":"a9ea559f123da6c8f1fe070139bc80145d4582fc","sha256":"a0fa9b5237481e66f178f19eb1589607412d9d1188d7fb571e5df03b67fd93ac"},
+    "full_input_read_this_turn":"NOT_OBTAINED: fetch_file returned empty content with blob; raw fetch returned HTTP400 size/unsupported error",
+    "substitute_full_source_claim":false
+  },
+  "readback_qualification": {
+    "method":"Manual field transcription from authenticated connector text, source paths and original producer code",
+    "local_raw_source_file_hashes_recomputed":false,
+    "all_source_bytes_retrieved":false,
+    "packet_is_full_original_source":false,
+    "packet_is_executable_adapter":false,
+    "independent_transcription_or_science_review":"NOT_RUN",
+    "reference_volume":"Tube reference_override selects the left reference at exact eta0+5126*h. Older right-reference metadata is not the active override."
+  },
+  "progress":{"R_complete":5,"R_total":10,"C_design_complete":4,"C_total":10,"combined_complete":9,"combined_total":20,"new_completed_stages":0,"working_DAG":"33/88","central_last_count":"28/88","canonical_delta":0},
+  "physical_outputs":{"actual_REI_recipient_bath":null,"actual_native25":null,"actual_temperature_update":null,"physical_radii":null,"full_state_update":false,"L4_ready":false,"global_physical_completion":null},
+  "next":"Use this data packet in the existing authorized implementation scope after executor/resource approval; finish distinct-author review without restarting a census or repackaging the old source bundle."
+}

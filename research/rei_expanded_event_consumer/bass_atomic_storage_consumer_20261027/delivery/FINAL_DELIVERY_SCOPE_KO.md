@@ -1,0 +1,9 @@
+# 최종 전달 형식과 검증 범위
+
+새 science/source snapshot은 d9a1c4c4252f1b7b4c868fb2cb817a879f503cd5이며116개파일이다. 추가된source-text bundle 4699240bytes의Gitblob은 713ac1d7c89b53028f6d63b3051c774f5a621546이다.
+
+Drive 1M2W7SEk-rqwJTvOr9PbLc6jMGNXpBPEu와Dropbox id:BSpOijBcT10AAAAAAEDIIA에실제업로드완료ACK가있고두metadata크기가같다. 큰Gitblob전체readback은Transport closed로실패하여새bundle의full-byte/hashrestore를주장하지않는다.20단계중raw17개의Git/Driveexactcheckpointreadback과ZIP3개의기존localCRC/SHA/dualACK는보존되어있다.
+
+최종sourcebundle은JSON이지ZIP이아니다. Presentation46.331767494/46HOLD이므로추가local압축/해시실행을하지않았다. 미래단일ZIP용source/code/manifest는미리정적으로준비되어있고cap47/reservation0.65는별도미승인gate이다.
+
+모든연구내용과각단계Git/양쪽백업은완료했지만요구된전체ZIP형식과resourcegate까지완료했다고주장하지않는다. 과학scope와physical/L4gate도그대로다.
