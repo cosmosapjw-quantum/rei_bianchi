@@ -1,0 +1,57 @@
+{
+  "schema": "REI_BIANCHI_ANALYTIC_BENCHMARK_V1",
+  "scope": "non-IVP formula checks only; existing chemistry/background immutable",
+  "signature": "-+++",
+  "frame": "non-tilted normal Fermi-propagated orthonormal triad",
+  "tensor_serialization": "full3x3 or compact(xx,yy,zz,xy,xz,yz); compact contraction doubles offdiagonal terms",
+  "existing_donor": {"s_over_H_initial":0.24494897427831772,"Omega_sigma_initial":0.06,"Frobenius_sigma_over_H_initial":0.6,"classification":"substantial-anisotropy stress-test; not calibrated or near-FLRW"},
+  "rho_units": "J/m^3 energy density including rest mass",
+  "stress_units": "J/m^3",
+  "H_sigma_units": "s^-1",
+  "kappa": "8*pi*G/c^2",
+  "equations": {
+    "constraint": "3*H^2-kappa*rho-Lambda*c^2-sigma2=0",
+    "sigma2": "trace(sigma@sigma)/2",
+    "shear": "dot_sigma=-3*H*sigma+kappa*pi_total",
+    "energy": "dot_rho_A=-3*H*(rho_A+p_A)-sum(sigma*pi_A)+Q_A",
+    "raychaudhuri": "dot_H=-H^2-2*sigma2/3-kappa*(rho+3*p)/6+Lambda*c^2/3",
+    "constraint_propagation": "dot_C=-2*H*C when sum(Q_A)=0"
+  },
+  "initial_distribution": {
+    "form": "f=f0(p)*(1+n^T*A*n)",
+    "A": "symmetric tracefree; min_eigenvalue>=-1",
+    "non_tilt": "f(p)=f(-p)",
+    "pi_radiation": "2*rho*A/15",
+    "pi_matter": "2*p*A/5",
+    "independent_orientations": true,
+    "lrs_A": "q/2*R*diag(-1,-1,2)*R^T",
+    "lrs_q_domain": [-1,2]
+  },
+  "initial_geometry": {
+    "S": "sigma/H; arbitrary symmetric tracefree tensor",
+    "Omega_sigma": "trace(S@S)/6 < 1",
+    "H0": "sqrt((kappa*rho0+Lambda*c^2)/(3*(1-Omega_sigma)))",
+    "lrs_metric": "a^2*diag(exp(-2*b),exp(-2*b),exp(4*b))",
+    "lrs_sigma": "s*diag(-1,-1,2); s=dot_b"
+  },
+  "benchmarks": {
+    "x_values": [1,2,7],
+    "background_H_exponents_p": [2,1.5],
+    "stress_exponents_m": [4,5],
+    "F_n": "expm1(n*log(x))/n for n!=0; log(x) for n=0",
+    "forced_sigma": "x^-3*(sigma0+(kappa*pi0/H0)*F_(3+p-m)(x))",
+    "free_sigma": "sigma0*x^-3",
+    "epsilon_shear": 0.001,
+    "q_amplitude": 0.05,
+    "matter_w": 0.000001,
+    "rows_S_qrad_qmatter": [[0,0,0],[0.001,0,0],[-0.001,0,0],[0,0.05,0],[0,-0.05,0],[0,0,0.05],[0,0,-0.05]],
+    "angle_cosines": [1,0,0.5773502691896258],
+    "work_lrs_radiation": "(2/5)*s*rho*q*P2(cos(theta))",
+    "normalization": "report dimensionless response coefficients; do not invent cosmological density fractions"
+  },
+  "checks": ["Hamiltonian consistency", "constraint propagation symbolic identity", "angular normalization and pressure trace", "positive distribution at chosen q", "radiation versus matter stress ratio 3*w", "free shear x^-3", "linear forcing sign antisymmetry", "F_n limit n=0", "relative eigenframe signed work and magic-angle zero"],
+  "numeric_tolerance": {"relative": 1e-12,"absolute": 1e-14},
+  "resource_proposal": {"main_inherited_known_plus_reserve":604.395912,"original_main_cap":600,"temporary_cap":620,"new_child_cpu_max":4,"new_tail_reserve":1,"new_cumulative_reserved_max":609.395912,"workers":1,"attempts":1,"IVPs":0,"plots":0},
+  "acceptance": "bounded formula tests only; no isotope trend admission without an executed sensitivity model",
+  "DAG_global_increment": 0
+}
