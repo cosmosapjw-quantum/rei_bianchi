@@ -1,0 +1,122 @@
+{
+  "schema": "REI_NEXT_SOURCE_TO_OBSERVABLE_DAG_OVERLAY_V1",
+  "date": "2026-10-29",
+  "original_DAG": {
+    "working": "33/88",
+    "central_last": "28/88",
+    "total": 88,
+    "edges": 17,
+    "new_original_nodes": 0,
+    "canonical_mutation": false
+  },
+  "overlay": [
+    {
+      "id": "UVB_RATE6_PORT",
+      "status": "IMPLEMENTATION_VERIFIED_SCOPED_REVIEW_HELD",
+      "runnable": false,
+      "owner": "rei_bianchi PR261",
+      "depends_on": [
+        "PR260_CONFIDENCE_UNION",
+        "PR251_P19_FIDUCIAL",
+        "PR257_BB13_EOS_JEANS"
+      ],
+      "evidence": "21/21 tests; 91/91 P19 numeric cells; conditional rate/Jacobian",
+      "claim_gate": "R6_C9_DIFFERENT_AUTHOR_REQUIRED"
+    },
+    {
+      "id": "UVB_RATE6_INDEPENDENT_REVIEW",
+      "status": "READY_WHEN_NATIVE_REVIEWER_AVAILABLE",
+      "runnable": false,
+      "owner": "distinct-author R6/C9",
+      "depends_on": [
+        "UVB_RATE6_PORT"
+      ],
+      "claim_gate": "source provenance, six-moment common scaling, clock knots, q1/q2 coverage, code tests and resource concern"
+    },
+    {
+      "id": "REI_MEAN_CLOCK_AND_DIRECTIONAL_REDSHIFT",
+      "status": "INPUT_REQUIRED",
+      "runnable": false,
+      "owner": "REI_BASS_GEOMETRY",
+      "depends_on": [
+        "UVB_RATE6_PORT"
+      ],
+      "missing": [
+        "actual H(x) and proper-time identity",
+        "z_mean(x) source binding",
+        "observed direction-dependent redshift tetrad/geodesic map",
+        "source rate interpolation cell mapping"
+      ],
+      "claim_gate": "SOURCE_CLOCK_GEOMETRY_BOUND"
+    },
+    {
+      "id": "REI_CHEMISTRY_RATE_TANGENT",
+      "status": "INPUT_REQUIRED",
+      "runnable": false,
+      "owner": "REI_BASS_REC_HE",
+      "depends_on": [
+        "UVB_RATE6_PORT"
+      ],
+      "missing": [
+        "actual physical J_y and J_R for selected chemistry",
+        "same-source y/ne and nHref density",
+        "energy/ionization storage single ownership",
+        "tangent initial/boundary conditions",
+        "rate-source error and domain"
+      ],
+      "claim_gate": "SOURCE_TANGENT_AND_STATE_BINDING"
+    },
+    {
+      "id": "REI_TAU_TANGENT_CONSUMER",
+      "status": "BLOCKED_ON_DEPENDENCIES",
+      "runnable": false,
+      "owner": "REI_BASS",
+      "depends_on": [
+        "REI_MEAN_CLOCK_AND_DIRECTIONAL_REDSHIFT",
+        "REI_CHEMISTRY_RATE_TANGENT",
+        "BASS_PR234_TAU_SOURCE_ROW_R6_C9"
+      ],
+      "missing": [
+        "physical K binding",
+        "physical D_a ne and D_a H",
+        "whole-path integration and numerical error bound"
+      ],
+      "claim_gate": "PHYSICAL_TAU_TANGENT_CERTIFICATE"
+    },
+    {
+      "id": "REI_CMB_DIRECTIONAL_OBSERVABLE",
+      "status": "BLOCKED_ON_DEPENDENCIES",
+      "runnable": false,
+      "owner": "REI_BASS",
+      "depends_on": [
+        "REI_TAU_TANGENT_CONSUMER"
+      ],
+      "missing": [
+        "directional photon transport and scattering frame",
+        "line-of-sight observables",
+        "CMB EB/source response",
+        "observable covariance and calibration"
+      ],
+      "claim_gate": "OBSERVATIONAL_BRIDGE"
+    },
+    {
+      "id": "REI_PHYSICAL_ERROR_ENCLOSURE",
+      "status": "BLOCKED_ON_DEPENDENCIES",
+      "runnable": false,
+      "owner": "REI_BASS_VIGILODE",
+      "depends_on": [
+        "REI_CMB_DIRECTIONAL_OBSERVABLE"
+      ],
+      "missing": [
+        "validated physical norm",
+        "source/geometry/time uncertainty bounds",
+        "error accumulation and physical radii"
+      ],
+      "claim_gate": "PHYSICAL_L4_GATE"
+    }
+  ],
+  "no_ivp": true,
+  "no_auto_next": true,
+  "no_canonical_promotion": true,
+  "instruction": "Do not infer global Bianchi tilt or Thomson tau from source-rate pointwise envelopes. Wait for real provider input and distinct-author review."
+}
