@@ -213,3 +213,16 @@ ROOT decision: `ACCEPT_SCOPED_SECOND_HARMONIC_REFERENCE`. Local DAG: 10 complete
 Actual S09 science publication: `39dc63b4bf4d60b255ea3ca5323661ccc80ca880`, tree `10ab6a622a4e0101cfffefdef93a8156bfe35c32`. Actual S10 delivery publication: `a73773a9e1056bf18405453a0e88b9d12a15e9ac`, tree `4e308ea37c6907f6b0064951e71d14667831a6a3`; both source and dual backups ACKed. Both validation execution pins and the plot execution pin are retained at `status/HE_EXP_HARMONIC10_20261028.json#/final_identities/execution_sources`.
 
 Three physical inputs remain open; single rest/binding owner population_rest_energy_witness, null thermal quantities, birth_pool UNASSIGNED, global completion null, L4 false, production NOT_APPROVED, activation false. Existing statuses, owners, dependencies, gates, budgets,17 integration edges and prior outcomes remain unchanged. Observation: `status/HE_EXP_HARMONIC10_20261028.json#/observations/HE-EXP-NUCLEAR`; prior observations are preserved by actual source surface in that document. Central publication flags remain a PRE_CAS_CANDIDATE_SNAPSHOT; actual central publication is pending external ACK/readback.
+
+
+## EXFOR11 data-conditioned aperture reference — 2026-10-28
+
+- Scoped decision: ACCEPT_SCOPED_DATA_CONDITIONED_APERTURE_REFERENCE.
+- Source: cosmosapjw-quantum/BASS_HE@1e393c7901d08aaf97c4c3568ef4ab120d43e9c5; tree 7c33ed3f6a9b88402ff9c0ebe7b45840202b7fef.
+- Unit: research/program_expansion_20261025/continuation_exfor_20261028/.
+- Central observation: status/HE_EXP_EXFOR11_20261028.json#/observations/HE-EXP-NUCLEAR.
+- Consumer-side use of12 official DCS rows at213/258/330MeV. Six total-cross-section rows on a disjoint energy grid are kept separate. Degree4/8, endpoint choices, ERR-S coordinate sensitivity windows and uniform azimuth are declared assumptions. Three outer-empty finite families at330MeV are retained; no global no-go.
+- Local11 complete +1 inherited partial +3 physical open /15; Central28/88, HE delta0.
+- Existing current_status, lead, budgets, dependencies and gates are unchanged. All3 physical inputs remain open; global_physical_completion=null, L4_ready=false, production=NOT_APPROVED, activation=false.
+- Validation6PASS/0FAIL in1 new campaign,12cases/274 exact certificate vertices; Wolfram21zero/8True;1saved-only plotPASS. Complete source/Drive/Dropbox stageACKs are bound in the observation record. Historical HARMONIC10 initial24PASS+1FAIL/targeted1PASS/reserve0 and earlier partial workflows remain preserved.
+- This paragraph and in-Git observation are creation-time PRE_CAS snapshots. Actual central publication is established by the external POSTPUBLICATION CENTRAL_PUBLICATION_RECEIPT, not a predicted future commit.
