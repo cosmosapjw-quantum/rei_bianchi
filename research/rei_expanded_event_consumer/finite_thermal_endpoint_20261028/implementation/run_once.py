@@ -81,6 +81,33 @@ def validate_authorization(auth, *, mode, source_hashes, worker_command):
                 parent=float(attempt-worker-tail), wall=float(wall), memory=memory)
 
 
+def classify_outcome(*, exit_code, terminal_usage_observed, supervisor_error_kind,
+                     limit_overrun):
+    """Classify observed process evidence, not the truth of the science.
+
+    A missing observation is not a measured budget overrun. Timer-related
+    worker signals are recorded as signals, without inventing their sender.
+    SIGKILL alone cannot identify CPU exhaustion, OOM, or an external kill.
+    """
+    if supervisor_error_kind not in (None, "resource", "execution", "interrupted"):
+        raise ValueError("unknown supervisor error kind")
+    if limit_overrun or supervisor_error_kind == "resource":
+        return "RESOURCE_STOP_OR_OVERRUN", "runtime_environment/resource_budget"
+    if supervisor_error_kind == "interrupted":
+        return "INTERRUPTED", "execution/operator_interruption"
+    if supervisor_error_kind == "execution":
+        return "EXECUTION_FAILED", "runtime_environment/execution_error"
+    if exit_code is None or not terminal_usage_observed:
+        return "INCOMPLETE_OBSERVATION", "runtime_environment/incomplete_observation"
+    if exit_code < 0:
+        if -exit_code in (signal.SIGALRM, signal.SIGPROF, signal.SIGXCPU):
+            return "WORKER_RESOURCE_SIGNAL", "runtime_environment/resource_signal_cause_unconfirmed"
+        return "EXECUTION_FAILED", "runtime_environment/signal_cause_unconfirmed"
+    if exit_code != 0:
+        return "EXECUTION_FAILED", "execution/nonzero_exit_unadjudicated"
+    return "EXECUTION_EXIT_ZERO_NOT_SCIENTIFIC_ADMISSION", None
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--authorization", required=True, type=Path)
@@ -132,6 +159,8 @@ def main(argv=None):
     (output/"STARTED.json").write_text(json.dumps(record, indent=2), encoding="utf-8")
     pid, usage, wait_status = None, None, None
     stop_reason = None
+    supervisor_error_kind = None
+    supervisor_exception_type = None
 
     def stopped(signum, frame):
         raise BudgetStop("supervisor resource stop signal=" + str(signum))
@@ -183,7 +212,11 @@ def main(argv=None):
                 raise BudgetStop("supervisor CPU/wall limit")
             time.sleep(0.01)
     except BaseException as exc:
-        stop_reason = type(exc).__name__ + ": " + str(exc)
+        supervisor_exception_type = type(exc).__name__
+        stop_reason = supervisor_exception_type + ": " + str(exc)
+        supervisor_error_kind = ("resource" if isinstance(exc, BudgetStop)
+                                 else "interrupted" if isinstance(exc, KeyboardInterrupt)
+                                 else "execution")
     finally:
         signal.setitimer(signal.ITIMER_PROF, 0)
         signal.setitimer(signal.ITIMER_REAL, 0)
@@ -196,21 +229,31 @@ def main(argv=None):
         for sig, handler in handlers.items():
             signal.signal(sig, handler)
 
-    child_cpu = 0.0 if usage is None else usage.ru_utime + usage.ru_stime
+    child_cpu = None if usage is None else usage.ru_utime + usage.ru_stime
     parent_prefix = self_cpu()
-    measured_prefix = parent_prefix + child_cpu
+    measured_prefix = None if child_cpu is None else parent_prefix + child_cpu
     exit_code = None if wait_status is None else os.waitstatus_to_exitcode(wait_status)
-    budget_ok = (stop_reason is None and usage is not None and child_cpu <= limits["worker"]
-                 and parent_prefix <= limits["parent"]
-                 and measured_prefix + limits["tail"] <= limits["attempt"]
-                 and time.monotonic()-_START_WALL <= limits["wall"])
-    if not budget_ok:
-        status = "RESOURCE_STOP_OR_OVERRUN"
-    elif exit_code == 0:
-        status = "EXECUTION_EXIT_ZERO_NOT_SCIENTIFIC_ADMISSION"
-    else:
-        status = "EXECUTION_FAILED"
-    record.update(status=status, exit_code=exit_code, stop_reason=stop_reason,
+    elapsed_prefix = time.monotonic() - _START_WALL
+    overrun_observations = dict(
+        worker_cpu=None if usage is None else child_cpu > limits["worker"],
+        supervisor_cpu_prefix=parent_prefix > limits["parent"],
+        attempt_cpu_prefix_plus_record_reserve=(None if usage is None else
+                                               measured_prefix + limits["tail"] > limits["attempt"]),
+        wall_prefix=elapsed_prefix > limits["wall"],
+    )
+    status, failure_class = classify_outcome(
+        exit_code=exit_code, terminal_usage_observed=usage is not None,
+        supervisor_error_kind=supervisor_error_kind,
+        limit_overrun=any(value is True for value in overrun_observations.values()),
+    )
+    record.update(status=status, failure_class=failure_class,
+                  exit_code=exit_code, raw_wait_status=wait_status,
+                  worker_termination_signal=(-exit_code if exit_code is not None and exit_code < 0 else None),
+                  supervisor_error_kind=supervisor_error_kind,
+                  supervisor_exception_type=supervisor_exception_type,
+                  terminal_usage_observed=usage is not None,
+                  limit_overrun_observations=overrun_observations,
+                  stop_reason=stop_reason,
                   worker_terminal_user_s=None if usage is None else usage.ru_utime,
                   worker_terminal_system_s=None if usage is None else usage.ru_stime,
                   worker_terminal_cpu_s=None if usage is None else child_cpu,
@@ -218,7 +261,7 @@ def main(argv=None):
                   supervisor_pre_serialization_cpu_s=parent_prefix,
                   inclusive_pre_serialization_cpu_s=measured_prefix,
                   unmeasured_final_record_reserve_cpu_s=limits["tail"],
-                  elapsed_since_wrapper_early_clock_s=time.monotonic()-_START_WALL,
+                  elapsed_since_wrapper_early_clock_s=elapsed_prefix,
                   exact_whole_command_cpu_s=None,
                   external_full_command_accounting="REQUIRED; inclusive external total must not be added to worker CPU again",
                   historical_unknown_costs="UNKNOWN_NOT_ZERO",

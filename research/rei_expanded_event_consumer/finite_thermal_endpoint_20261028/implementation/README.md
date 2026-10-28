@@ -46,7 +46,7 @@ CR parent-event species/ionic-charge corrections are not thermal-electron increm
 
 ## Authored controls, not test results
 
-`test_finite_thermal.py` contains21 methods:18 mathematical/representation controls and3 pure execution-authorization controls. They cover the14 C1 acceptance categories, full mixed JVP, inert-He parameter sensitivity, retained count/EOS defects, exact source-decoder contrasts, input rejection, gas ownership and null physical outputs. Independent expected rational values or cross-multiplied identities are used. The authorization fixtures are synthetic dictionaries, not usable execution grants.
+`test_finite_thermal.py` contains27 authored methods:18 mathematical/representation controls,3 pure execution-authorization controls and6 pure outcome-classification controls. They cover the14 C1 acceptance categories, full mixed JVP, inert-He parameter sensitivity, retained count/EOS defects, exact source-decoder contrasts, input rejection, gas ownership and null physical outputs. Independent expected rational values or cross-multiplied identities are used. The authorization fixtures are synthetic dictionaries, not usable execution grants.
 
 These are fixtures, not a reproduction of the actual3554206-byte source transaction. No test outcome, full-source integration success, code syntax success, runtime overhead, convergence or speed measurement is asserted. The first authorized C6 may reveal an implementation defect; preserve that outcome and allow only a specifically approved repair/recheck.
 
@@ -118,3 +118,28 @@ https://docs.python.org/3/library/json.html
 https://docs.python.org/3/library/resource.html
 https://docs.python.org/3/library/os.html#os.wait4
 These document library semantics, not the correctness or physical validity of this code.
+
+## C5 static correction: failure evidence, 2026-10-28
+
+The published original runner at `fc265415b8011863f2cc3e4af851bb27ce8db4c7` conflated
+a captured supervisor exception or missing child usage with a resource overrun.
+For example, a pre-child `fork()` OSError sets `stop_reason`, leaves `usage=None`,
+and unconditionally reaches RESOURCE_STOP_OR_OVERRUN, without a measured limit
+violation. This is a source-level control-flow finding, not an observed run.
+
+`classify_outcome` now separates explicit resource stops or observed overruns,
+supervisor execution errors, operator interruption, incomplete terminal
+observation, worker timer-related signals, and other exits. A negative exit code
+retains the terminating signal. SIGKILL alone does not identify its cause. Even
+SIGALRM/SIGPROF/SIGXCPU are reported as signal evidence without asserting an
+observed timer sender. Ordinary nonzero exits do not prove a physical refutation.
+
+The resulting record preserves the raw wait status, exception type, signal and
+per-limit observations. Missing child accounting remains null, not a measured
+zero or evidence of a cap violation. This is a diagnostic-classification repair;
+the mathematical module, numerical acceptance, execution command, limits,
+one-attempt rule and physical-null boundary are unchanged. Six regression
+controls are authored but NOT_RUN. Total authored methods are27; executed0.
+No new test, source-run, or packaging authorization is supplied by this change.
+The source/test/runner hashes in any future authorization must bind this revised
+source, not the historical C5 hashes.

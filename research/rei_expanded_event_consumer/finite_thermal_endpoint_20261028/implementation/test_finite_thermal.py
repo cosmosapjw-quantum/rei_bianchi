@@ -217,5 +217,56 @@ class AuthorizationTests(unittest.TestCase):
             r.validate_authorization(auth, mode="tests", source_hashes=hashes, worker_command=command)
 
 
+class OutcomeClassificationTests(unittest.TestCase):
+    """Authored pure controls only: no child execution or signal delivery."""
+    def classify(self, **changes):
+        import run_once as r
+        args = dict(exit_code=0, terminal_usage_observed=True,
+                    supervisor_error_kind=None, limit_overrun=False)
+        args.update(changes)
+        return r.classify_outcome(**args)
+
+    def test_supervisor_error_is_not_an_invented_budget_overrun(self):
+        # Static witness: fork raises OSError; no child usage can be observed.
+        self.assertEqual(self.classify(exit_code=None, terminal_usage_observed=False,
+                                       supervisor_error_kind="execution"),
+                         ("EXECUTION_FAILED", "runtime_environment/execution_error"))
+
+    def test_explicit_resource_stop_and_observed_overrun_remain_resource(self):
+        self.assertEqual(self.classify(exit_code=None, terminal_usage_observed=False,
+                                       supervisor_error_kind="resource"),
+                         ("RESOURCE_STOP_OR_OVERRUN", "runtime_environment/resource_budget"))
+        self.assertEqual(self.classify(limit_overrun=True),
+                         ("RESOURCE_STOP_OR_OVERRUN", "runtime_environment/resource_budget"))
+
+    def test_operator_interrupt_remains_separate(self):
+        self.assertEqual(self.classify(exit_code=None, terminal_usage_observed=False,
+                                       supervisor_error_kind="interrupted"),
+                         ("INTERRUPTED", "execution/operator_interruption"))
+
+    def test_worker_timer_signals_do_not_become_ordinary_nonzero_exit(self):
+        import signal
+        for sig in (signal.SIGALRM, signal.SIGPROF, signal.SIGXCPU):
+            with self.subTest(signal=sig):
+                self.assertEqual(self.classify(exit_code=-sig),
+                                 ("WORKER_RESOURCE_SIGNAL", "runtime_environment/resource_signal_cause_unconfirmed"))
+
+    def test_sigkill_and_missing_measurement_do_not_prove_budget_exhaustion(self):
+        import signal
+        self.assertEqual(self.classify(exit_code=-signal.SIGKILL),
+                         ("EXECUTION_FAILED", "runtime_environment/signal_cause_unconfirmed"))
+        for code in (None, 0):
+            with self.subTest(exit_code=code):
+                self.assertEqual(self.classify(exit_code=code, terminal_usage_observed=False),
+                                 ("INCOMPLETE_OBSERVATION", "runtime_environment/incomplete_observation"))
+
+    def test_zero_and_nonzero_exit_do_not_adjudicate_physics(self):
+        self.assertEqual(self.classify(), ("EXECUTION_EXIT_ZERO_NOT_SCIENTIFIC_ADMISSION", None))
+        for code in (1, 125):
+            with self.subTest(exit_code=code):
+                self.assertEqual(self.classify(exit_code=code),
+                                 ("EXECUTION_FAILED", "execution/nonzero_exit_unadjudicated"))
+
+
 if __name__ == "__main__":
     unittest.main()
