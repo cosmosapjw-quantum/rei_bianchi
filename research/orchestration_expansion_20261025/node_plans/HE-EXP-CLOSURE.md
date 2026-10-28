@@ -262,3 +262,13 @@ Three physical inputs remain open; single rest/binding owner population_rest_ene
 - Existing current_status, lead, budgets, dependencies and gates are unchanged. All3 physical inputs remain open; global_physical_completion=null, L4_ready=false, production=NOT_APPROVED, activation=false.
 - Validation6PASS/0FAIL in1 new campaign,12cases/274 exact certificate vertices; Wolfram21zero/8True;1saved-only plotPASS. Complete source/Drive/Dropbox stageACKs are bound in the observation record. Historical HARMONIC10 initial24PASS+1FAIL/targeted1PASS/reserve0 and earlier partial workflows remain preserved.
 - This paragraph and in-Git observation are creation-time PRE_CAS snapshots. Actual central publication is established by the external POSTPUBLICATION CENTRAL_PUBLICATION_RECEIPT, not a predicted future commit.
+
+
+## QUARTIC12 scoped reference return — 2026-10-28
+
+Actual HE source 4c71acfa2b8721a0d0b8f9cec8814f75f1c55739; exact tree 08e11c808d86cdf2a00ceb9feb3de43fc1bf3089.
+Decision ACCEPT_SCOPED_FULL_POSITIVE_QUARTIC_REFERENCE. Local12complete+1inheritedpartial+3physicalopen/16; central28/88,HEdelta0.
+One primary7PASS0FAIL,12cases,132vertices; Wolfram16zero12True; one saved-onlyplotPASS; nonauthorfinalsciencePASS.
+Fullpositive free330MeV witness lies outside old sufficient cone; endpointzero330 remains an exact scoped empty outer polytope;258 minimum finitegap retained.
+Current status CONDITIONAL_OWNERSHIP_IMPLEMENTATION_VERIFIED_PHYSICAL_INPUT_PENDING and lead ownership remain unchanged. No new normalized physical source, flux, projection, deposition, globalbinding or productionapproval is supplied.
+Detailed observation: status/HE_EXP_QUARTIC12_20261028.json. In-Git PRE_CAS fields reflect creationtime; actual publication receipt is external POSTPUBLICATION_EXTERNAL_DELIVERY.
