@@ -1,0 +1,147 @@
+{
+  "schema": "REI_IC_SOURCE_EVIDENCE_V1",
+  "date": "2026-10-28",
+  "scope": "R2/R3/R5 analytical intake",
+  "skill_context": {
+    "package": "c38/physmath-research-loop",
+    "version": "1.3.0",
+    "read": [
+      "SKILL.md",
+      "references/POLICY_INTEGRATION.md",
+      "references/THEORY_LOOP.md R2 R3 R5",
+      "AGENTS.md"
+    ],
+    "reuse": "unchanged skill policy already read in this agent; selected R3 definition read this task",
+    "delegation": "none; parent-dispatched lane"
+  },
+  "queries": [
+    {
+      "service": "SciSpace",
+      "tool": "search_papers",
+      "question": "What primordial post-recombination hydrogen, helium, deuterium and lithium ionization fractions should be used at redshift 20, including residual electron fraction and lithium ionization by hydrogen recombination photons?",
+      "status": "SUCCESS",
+      "use": "found HyRec Ali-Haimoud/Hirata and recombination references; abstracts only, no exact z20 value imported"
+    },
+    {
+      "service": "Exa",
+      "tool": "web_search_exa",
+      "query": "primary paper primordial lithium remains ionized hydrogen recombination photons redshift 20 Switzer Hirata 2005 residual hydrogen electron fraction 2e-4",
+      "status": "SUCCESS"
+    },
+    {
+      "service": "Exa",
+      "tool": "web_search_exa",
+      "query": "Cooke Pettini Steidel 2018 primordial deuterium abundance 2.527 0.030 10-5 precision measures",
+      "status": "SUCCESS"
+    },
+    {
+      "service": "Exa",
+      "tool": "web_search_exa",
+      "query": "Pitrou Coc Uzan Vangioni 2018 precision big bang nucleosynthesis helium 0.24709 3He 1.039 lithium 5.623",
+      "status": "SUCCESS",
+      "limit": "specific He3/Li numbers in search query were not confirmed by retrieved source, therefore not adopted"
+    },
+    {
+      "service": "Exa",
+      "tool": "web_search_exa",
+      "query": "primordial deuterium hydrogen charge exchange 43 K D+ H redshift temperature ionization fraction",
+      "status": "SUCCESS"
+    },
+    {
+      "service": "Exa",
+      "tool": "web_fetch_exa",
+      "urls": [
+        "https://arxiv.org/pdf/astro-ph/0507106",
+        "https://www2.iap.fr/users/pitrou/publi/PhysReptBBN.pdf",
+        "https://ar5iv.labs.arxiv.org/html/astro-ph/0202329"
+      ],
+      "status": "SUCCESS",
+      "limit": "bounded text extraction; no full-paper archive or complete reading claim"
+    },
+    {
+      "service": "Exa",
+      "tool": "web_search_exa",
+      "query": "primordial lithium Li H+ charge transfer rate radiative charge exchange ionization low temperature lithium neutral Switzer Hirata Stancil",
+      "status": "SUCCESS"
+    },
+    {
+      "service": "Exa",
+      "tool": "web_search_exa",
+      "query": "Galli Palla 1998 chemistry early universe residual ionization fraction 2 10-4 temperature redshift 20 8 K",
+      "status": "SUCCESS",
+      "limit": "old cosmology, no precision transplant"
+    }
+  ],
+  "primary_sources": [
+    {
+      "id": "Cooke2018",
+      "url": "https://iopscience.iop.org/article/10.3847/1538-4357/aaab53/pdf",
+      "location": "Section5.1 equations9-10",
+      "read_status": "primary full-text search excerpt",
+      "claim": "D/H=(2.527+/-0.030)e-5 historical observational estimate"
+    },
+    {
+      "id": "Pitrou2018",
+      "url": "https://www2.iap.fr/users/pitrou/publi/PhysReptBBN.pdf",
+      "location": "abstract and introductory prediction discussion",
+      "read_status": "bounded full-text retrieval",
+      "claim": "theoretical Yp=.24709+/-.00017; no new exact He3/Li total adopted"
+    },
+    {
+      "id": "SwitzerHirata2005",
+      "url": "https://arxiv.org/pdf/astro-ph/0507106",
+      "location": "Sections III-IV, equations15-20, Figure3 caption",
+      "read_status": "full text relevant sections read",
+      "claim": "nonthermal H-recombination photons suppress LiI; residual xe few1e-4; Li freezeout nearz20; no exact xLiI=.01 imported"
+    },
+    {
+      "id": "CookePettini2016",
+      "url": "https://academic.oup.com/mnras/article/455/2/1512/1108386",
+      "location": "equations19-20 and surrounding discussion",
+      "read_status": "primary full-text search excerpt",
+      "claim": "D charge-transfer ratio and 42.915K difference; rate-fit caveat"
+    },
+    {
+      "id": "Savin2002",
+      "url": "https://doi.org/10.1086/324218",
+      "location": "abstract; cited primary rate table via CookePettini",
+      "read_status": "primary abstract metadata",
+      "claim": "calculated D-H charge-transfer coefficients over1..2e5K; no new table imported"
+    },
+    {
+      "id": "StancilZygelman1996",
+      "url": "https://doi.org/10.1086/178044",
+      "location": "abstract",
+      "read_status": "primary abstract",
+      "claim": "radiative Li+H+ transfer k300K1.3e-13cm3/s; not a diffuse-gas equilibrium proof"
+    },
+    {
+      "id": "GalliPalla1998",
+      "url": "https://arxiv.org/pdf/astro-ph/9803315",
+      "location": "abstract and standard model discussion",
+      "read_status": "primary search excerpts",
+      "claim": "residual-ionization order and dependence on recombination/cosmology; oldcosmology not reused quantitatively"
+    }
+  ],
+  "local_evidence": [
+    "coupled.py y0 / initial_charge / old_bath / dynamic_new",
+    "history.py baseline and elapsed clock",
+    "external-source config injection/decay/fast energies",
+    "ANGTHERM angular_model.py initial thermal energy300K",
+    "atomic_network.py ISOTOPES and initial_state",
+    "baseline CSV initial17+hidden4 values",
+    "NPZ read temperature_K[0]=300, electron_per_Href[0]=.00020000550001, nHref[0]=.0017668803778189406"
+  ],
+  "claim_status": {
+    "isotope_totals": "measured D historical central plus rounded adopted BBN-like He/Li totals",
+    "ionic_fractions": "illustrative source-onset hypothesis; lithium mechanism literature-supported but numeric fraction nuisance",
+    "D_exchange_equilibrium": "conditional comparison only, not default current equal-electronic-rate IC",
+    "nT_zero": "negligible relic/source-onset approximation; no physical impossibility",
+    "cold_bath": "not compatible with unchanged prescribed donor",
+    "scientific_execution": "NOT_RUN; no scientific CPU debit measured here"
+  },
+  "documents": [
+    "theory/INITIAL_CONDITIONS.md",
+    "theory/INITIAL_PROFILES.json"
+  ]
+}
