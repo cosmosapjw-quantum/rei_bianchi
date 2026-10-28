@@ -1,0 +1,11 @@
+# F-PIDNS — actual watchdog environment diagnosis and bounded preparation repair
+
+Root's actual self-only diagnostic observed os.getpid()=5 while /proc/self/stat and /proc/self symlink identify hostPID474236; NSpid was474236 5. Thus /proc is host-PID addressed while fork/kill/wait use namespace PIDs. The original inner watchdog read /proc/<namespacePID>, an unrelated process; outer session matching against namespaceSID found no family. First failure evidence remains unchanged under execution/attempt_01 and execution/outer_numerical_01.
+
+New files only: code/run_once_pidns.py, code/execute_bounded_pidns.py and code/plot_saved_pidns.py. The originals, scientific module, source coefficients, tests and acceptance thresholds are untouched. The repaired numerical paths are attempt_02 and outer_numerical_02; presentation remains new figures/attempt_01 with outer_presentation_01 and reads only successful execution/attempt_02/STDOUT.json.
+
+Each forked child sends hostPID,hostSID,startticks from /proc/self/stat plus namespacePID through a dedicated inherited pipe before exec. Parent handshake uses a two-second select timeout, checks the namespacePID against fork return, positive hostPID/startticks and expected host session. Subsequent addressed /proc reads validate hostPID/hostSID/startticks to guard PID reuse. The inner leaf remains in the outer session. Outer family aggregation uses the received hostSID. All kill/wait operations retain namespace PID/process-group identifiers.
+
+No threshold, formula, tolerance or memory change: inner0.38CPU-s watchdog, outer numerical0.36CPU-s/0.4target and presentation1.4CPU-s/1.5target retained. Tick/poll/non-atomic/abort-accounting limitations remain explicit. Failed whole command0.041656 and new target0.4 plus shared supervisor/tail0.2 remain inside root's current22/62 allocation; old grants remain closed. Existing failed inner CPU is nested in outer and is not added again. UNKNOWN_NOT_ZERO remains.
+
+The exact diff is AUTHOR_PIDNS_REPAIR.diff; new identities are REPAIRED_IDENTITIES.json. This is source preparation only: no imports, py_compile, tests, numerical evaluation, renderer, plot, or retry was executed. Actual identity/diff review and published authorization plus root's one-time dispatch are still required before attempt_02.

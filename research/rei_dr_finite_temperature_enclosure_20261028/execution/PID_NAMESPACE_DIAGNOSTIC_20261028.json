@@ -1,0 +1,26 @@
+{
+  "schema": "REI_DR_PID_NAMESPACE_DIAGNOSTIC_V1",
+  "method": "Actual root exec_command self-only read; no scientific module import or worker",
+  "observed": {
+    "diagnostic": "self PID identity only; no scientific import or worker",
+    "os_getpid": 5,
+    "proc_self_stat_pid": 474236,
+    "proc_self_link": "474236",
+    "self_namespace": "pid:[4026532279]",
+    "identity_matches": false,
+    "status_pid_lines": [
+      "Pid:\t474236",
+      "PPid:\t474233",
+      "NSpid:\t474236\t5"
+    ]
+  },
+  "source_observation": "os.getpid and fork/kill/wait expose namespace PIDs; mounted /proc/self/stat and NSpid expose host-visible PIDs. The mismatch is observed, not inferred from a test count.",
+  "related_failed_paths": [
+    "execution/attempt_01/PROCESS.json",
+    "execution/outer_numerical_01/PROCESS.json"
+  ],
+  "classification": "IMPLEMENTATION_ENVIRONMENT_INTERFACE_PID_IDENTITY",
+  "scientific_assertion_status": "NOT_REACHED_NO_SCALAR_OUTPUT",
+  "scope": "Repair host-PID/SID observation mapping only; retain namespace PID for wait/kill",
+  "no_other_process_content_read": true
+}
