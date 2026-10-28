@@ -1,0 +1,90 @@
+--- before/code/rr_mao_enclosure.py
++++ after/code/rr_mao_enclosure.py
+@@ -33,6 +33,21 @@
+     lower=D(0) if x.lo<=0<=x.hi else min(a.op('multiply',v,v,ROUND_FLOOR) for v in (x.lo,x.hi))
+     upper=max(a.op('multiply',v,v,ROUND_CEILING) for v in (x.lo,x.hi))
+     return Interval(a,lower,upper)
++
++
++def natural_log(x):
++    """Outward log with exact ln(1)=0 endpoints, avoiding fake subnormals.
++
++    Other endpoints retain correctly-rounded HALF_EVEN plus one outward
++    neighbour, exactly as the pinned primitive. Dependency remains unchanged.
++    """
++    from decimal import localcontext,ROUND_HALF_EVEN
++    if x.lo<=0:raise ValueError('positive log interval required')
++    with localcontext(x.a.context) as c:
++        c.rounding=ROUND_HALF_EVEN
++        lo=D(0) if x.lo==1 else c.ln(x.lo).next_minus(c)
++        hi=D(0) if x.hi==1 else c.ln(x.hi).next_plus(c)
++    return Interval(x.a,lo,hi)
+ 
+ 
+ class RRMao:
+@@ -91,7 +106,7 @@
+         A,B,T0,T1,C,T2=map(self.i,pars)
+         u=(t/T0).transcend('sqrt');v=(t/T1).transcend('sqrt')
+         b=B+C*(-T2/t).transcend('exp')
+-        exponent=-(u.transcend('ln'))-(1-b)*(1+u).transcend('ln')-(1+b)*(1+v).transcend('ln')
++        exponent=-natural_log(u)-(1-b)*natural_log(1+u)-(1+b)*natural_log(1+v)
+         return self.i(self.s)*A*exponent.transcend('exp')
+ 
+     def box(self,key,lo,hi):
+@@ -106,13 +121,13 @@
+         correction=C*(-z).transcend('exp');b=B+correction
+         bp=correction*z;bpp=bp*(z-1)
+         p=u/(1+u);q=v/(1+v)
+-        lam=(1+u).transcend('ln')-(1+v).transcend('ln')
++        lam=natural_log(1+u)-natural_log(1+v)
+         r1=self.i(D('-.5'))-((1-b)*p+(1+b)*q)/2+bp*lam
+         r2=-((1-b)*p*(1-p)+(1+b)*q*(1-q))/4+bp*(p-q)+bpp*lam
+         left=self.alpha_point(rr,self.i(t.lo));right=self.alpha_point(rr,self.i(t.hi))
+         alpha=Interval(self.a,right.lo,left.hi)
+         a0,b0,c0,a1,b1,a2,b2=map(self.i,mao)
+-        ell=(self.i(self.k)*t/self.ev).transcend('ln')
++        ell=natural_log(self.i(self.k)*t/self.ev)
+         U=a1*(-b1*ell).transcend('exp');V=a2*(-b2*ell).transcend('exp')
+         P=U/(1+U);Qv=V/(1+V)
+         factor=a0*(-b0*ell-c0*square(ell)).transcend('exp')*(1+V)/(1+U)
+@@ -150,7 +165,7 @@
+         f0=self.point(key,Tstar,quantity);d0=self.first_derivative(key,Tstar,quantity)
+         if point.lo==center.lo:
+             return {'h':self.i(0),'radius':D(0),'f0':f0,'d0':d0,'B2':self.uniform_second_bound(key,*domain,quantity),'enclosure':f0}
+-        h=(point/center).transcend('ln');B2=self.uniform_second_bound(key,*domain,quantity)
++        h=natural_log(point/center);B2=self.uniform_second_bound(key,*domain,quantity)
+         radius=(self.i(B2)*h.magnitude()*h.magnitude()/2).hi
+         return {'h':h,'radius':radius,'B2':B2,'f0':f0,'d0':d0,
+                 'enclosure':f0+d0*h+Interval(self.a,radius.copy_negate(),radius)}
+--- before/tests/test_rr_mao.py
++++ after/tests/test_rr_mao.py
+@@ -43,7 +43,7 @@
+     def test_selected_actual_rows(self):
+         data=load_sources(ROOT/'source');model=RRMao(data)
+         records={'ranges':[],'point_derivatives':[],'taylor':[],'source_images':{},
+-                 'correction_controls':[],'precision':[],'refusals':[],
++                 'correction_controls':[],'precision':[],'refusals':[],'tiny_steps':[],
+                  'source_embedded_prior_comparisons':'READ_EXPOSURE_NOT_NEW_EVALUATION',
+                  'oracle_library':'separate scalar code, shared Decimal/libmpdec90digits'}
+         for key in KEYS:
+@@ -88,6 +88,20 @@
+                         'requested_h':str(requested_h),'direct':str(val),'residual':str(residual),
+                         'h':result['h'].wire(),'f0':result['f0'].wire(),'d0':result['d0'].wire(),
+                         'B2':str(result['B2']),'radius':str(result['radius']),'enclosure':result['enclosure'].wire(),'contained':True})
++        # Exact decimal tiny steps in both feasible directions inside [100,101].
++        tiny_steps=(('100','100.'+'0'*99+'1'),('101','100.'+'9'*100))
++        for anchor,target in tiny_steps:
++            for quantity in ('alpha','loss'):
++                result=model.taylor('1:1',anchor,target,('100','101'),quantity)
++                if anchor=='100':self.assertGreaterEqual(result['h'].lo,0)
++                else:self.assertLessEqual(result['h'].hi,0)
++                self.assertGreaterEqual(result['radius'],0)
++                with localcontext(Context(prec=180,Emin=-999999,Emax=999999)):
++                    h=(D(target)/D(anchor)).ln()
++                self.assertLessEqual(result['h'].lo,h);self.assertLessEqual(h,result['h'].hi)
++                records['tiny_steps'].append({'key':'1:1','quantity':quantity,'anchor':anchor,'target':target,
++                    'oracle_log_digits':180,'oracle_h':str(h),'h':result['h'].wire(),'radius':str(result['radius']),
++                    'enclosure':result['enclosure'].wire(),'runtime_status':'observed only when authorized suite runs'})
+         for precision in (50,70):
+             m=RRMao(data,precision);direct=scalar_oracle(data,'3:1',D(15000))
+             for quantity in ('alpha','loss'):
