@@ -1,0 +1,9 @@
+2026-10-29 current-turn WolframLanguageEvaluator executed twice (first typed symbols caused an automatic Global symbol warning but returned the expected residuals; second corrected lowercase names and returned without warnings).
+Clean second call uses Module local gmat, rmat, em, pm and a two-isotope x two charge-state nonlinear electron-feedback prototype:
+gmat={{-photo,0},{photo,0}}; rmat={{0,rr},{0,-rr}};
+em={{1,0},{0,1},{rat,0},{0,rat}}; pm={{1,0,0,0},{0,1,0,0}};charges={0,1,0,1};
+f21[xx_]:=(KroneckerProduct[IdentityMatrix[2],gmat]+den (charges.xx) KroneckerProduct[IdentityMatrix[2],rmat]).xx;
+f17[yy_]:=pm.f21[em.yy];j21=D[f21[xvars],{xvars}];j17=D[f17[yvars],{yvars}];
+badmat={{-photo,0,0,0},{photo,0,0,0},{0,0,-(photo+alpha),0},{0,0,photo+alpha,0}};
+Output (actual): {{0, 0, 0, 0}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {0, 0, -(alpha*rat*u), alpha*rat*u}}
+Scope: exact symbolic nonlinear source-structure lemma and a rate-mismatch counterexample; NOT a distinct-author R6/C9 reviewer and NOT native full21 source coefficients.
