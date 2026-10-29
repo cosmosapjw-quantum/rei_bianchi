@@ -1,0 +1,19 @@
+{
+ "schema":"REI_F4_BASS193_PHOTO_ENERGY_REPAIR_HISTORY_V1",
+ "failed_first_attempt":{
+   "kind":"IMPLEMENTATION_BUG",
+   "stage":"first generated source bin matrix",
+   "symptom":"ValueError: operands could not be broadcast together with shapes (13,13) (1,71)",
+   "cause":"Li I 1s cross section source array `site_inner` overwritten by per-epoch integrated inner-event rate vector",
+   "repair":"rename immutable source array to `site_inner_sigma` and preserve separate epoch-local `site_inner` vector",
+   "rate_inputs_or_tolerances_changed":false
+ },
+ "second_repair":{
+   "kind":"TEST_ORACLE_HARDENING",
+   "cause":"remove redundant identity comparison of an array to its reconstructed identical view",
+   "repair":"compare independent native gamma_i * saved population against source-grid summed event fluxes",
+   "rate_inputs_or_tolerances_changed":false
+ },
+ "fresh_tests":{"command":"python -m unittest discover -s tests -v","result":"40/40 PASS","new_IVP":0},
+ "prior_failed_history_retained":true
+}
