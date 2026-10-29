@@ -1,0 +1,1 @@
+"""Source-locked bounded static physical-rate compatibility computation."""
