@@ -8,4 +8,4 @@
 
 presentation4초 reservation/누적 ceiling70은 별도 승인 대기다. 원래 baseline30 대비+133.333%이며 이전66은 재사용할 수 없다. AGENTS의 “An increase of exactly 50 percent or more requires separate approval.”에 근거한다. 승인 전 render/raster 금지, 승인 후1회·자동재시도 없음·기존누적 유지·ceiling30 복원·12쪽 독립검토. 새 IVP는 승인하지 않는다.
 
-DAG working33/88, central28/88, physical-fast4/7 유지. 외부 CAS3초 angle integral은 $Aborted, verified result 없음. transport/tool/authoring/과거 미측정비용 UNKNOWN_NOT_ZERO. 전체 계정 메타데이터는 공개하지 않는다. root GO 전 Git/Drive/Dropbox publication 없음. 공개 파일 allowlist와 선택 PR259 입력만 clean backup에 담는다.
+DAG working33/88, central28/88, physical-fast4/7 유지. 외부 CAS3초 angle integral은 $Aborted, verified result 없음. transport/tool/authoring/과거 미측정비용 UNKNOWN_NOT_ZERO. 전체 계정 메타데이터는 공개하지 않는다. Root GO로 code·data checkpoint를 Git publication commit33ceb18e9c597b4027b2db657c652f32161a7bac에 추가했다. 기존045118543c266f164c4bd177ac0194ee1ba22096의 descendant이며 non-force lease를 사용했다. Drive·Dropbox backup ACK와 size1281603을 확인했다. DELIVERY_RECEIPT.json을 현재 publication 상태의 기준으로 읽는다. ZIP은 prepublication 시점 snapshot이고 후속 영수증을 별도로 보존한다. 공개 파일 allowlist와 선택 PR259 입력만 clean backup에 담는다.
