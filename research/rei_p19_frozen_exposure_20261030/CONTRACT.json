@@ -1,0 +1,48 @@
+{
+  "schema": "REI_P19_FROZEN_EXPOSURE_CONTRACT_V1",
+  "program": "REI_P19_FROZEN_PROPER_TIME_EXPOSURE_20261030",
+  "parent_head": "2a667c23de02f19d973f41174480ed1809918aa2",
+  "source_archive_sha256": "c20b7a776e407c35dff99c32595f394ce0c9426c3469358a8b5d7f2750c68165",
+  "input": {
+    "saved_epoch_count": 7,
+    "scenario_count": 2,
+    "events_per_epoch": 7,
+    "elapsed_proper_unit": "s",
+    "source_unit": "photoionizations Href^-1 s^-1",
+    "heating_unit": "eV Href^-1 s^-1"
+  },
+  "output": {
+    "interval_event_count": 84,
+    "interval_summaries": 12,
+    "two_scenario_totals": 2,
+    "cumulative_knots": 14
+  },
+  "methods": {
+    "loglinear_positive": "I=dt*(b-a)/(ln(b)-ln(a)) for each event rate and separately for each heat rate",
+    "trapezoid": "I=dt*(a+b)/2",
+    "combined_absorption": "I_abs=I_heat+threshold*I_event, not logmean(pointwise absorption)",
+    "log_mean_order": "sqrt(ab)<=L(a,b)<=0.5*(a+b)",
+    "difference_interpretation": "model/interpolant sensitivity only, NOT a guaranteed error bar or physical difference"
+  },
+  "stiffness_rate_native_ode": "NOT_RUN",
+  "new_ivps": 0,
+  "actual_p19_rei_coupled": false,
+  "Thomson_tau": null,
+  "constraints": {
+    "NO_MORE_IVPS": true,
+    "F4": "PARTIAL",
+    "L4_ready": false,
+    "no_merge": true,
+    "no_force_push": true,
+    "original_DAG_working": "33/88",
+    "original_DAG_central": "28/88",
+    "physical_fast": "4/7"
+  },
+  "tests": {
+    "python": 12,
+    "mpmath": 168,
+    "wolfram": "integral identity symbolically zero"
+  },
+  "different_author_R6_C9": "NOT_RUN",
+  "source_pins": "SOURCE_PROVENANCE.json"
+}
