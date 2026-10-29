@@ -1,0 +1,9 @@
+# Prepared, not executed
+
+Frozen base: 045118543c266f164c4bd177ac0194ee1ba22096. Scientific arrays and prior outputs remain read-only. No IVP/model/solver change. This implementation creates 12 pages: overview, five abundance groups, two signed difference pages, conservation, and three early transient pages. Every panel is log-log; signed quantities use positive and negative-magnitude panels with equal limits. Raw signed values and zero positions remain available.
+
+Budget approval requested: original baseline 30 CPU s; current cumulative debit 65.980312494 CPU s; temporary cumulative ceiling 70 CPU s (133.333333333% above baseline). One attempt, full reservation 4 CPU s, predicted combined rendering/raster/check CPU <=3.5 s, memory 512 MiB, wall 60 s. No automatic retry. Restore original ceiling 30 afterward while retaining the full cumulative debit. Main onset diagnostic is a separate bounded unit and is not authorized by this presentation proposal.
+
+Before first render execute PDF skill artifact marker exactly once; then invoke run_bounded.py with --go OWNER_APPROVED_CUMULATIVE_70, --data pointing to preserved plot_data.json, and --out to a new presentation output directory. Controller records external rusage including receipt tail. Independent visual and scientific review remains required before publication.
+
+Initial preparation executed no audit, tests or rendering. Subsequent authorized main unit completed the onset audit and structural/plot contract tests; receipts are in outputs/main_structural_20261029 and independent result review completed PASS_SCOPED in review/FINAL_SCIENTIFIC_REVIEW.md. Presentation rendering, rasterization and publication remain NOT_RUN. start_audit.py accepts preserved plot_data.json, prior FIGURE_METADATA.json, and a new output directory. It reports all cases/states, initial zeros, first positive time/redshift, old first visibility, and below-window causes.
