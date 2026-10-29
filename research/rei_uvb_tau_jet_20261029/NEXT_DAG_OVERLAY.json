@@ -1,0 +1,73 @@
+{
+  "schema": "REI_TAU_JET_NEXT_DAG_OVERLAY_V1",
+  "original": {
+    "working_completed": 33,
+    "central_last_completed": 28,
+    "total": 88,
+    "new_physical_nodes": 0
+  },
+  "nodes": [
+    {
+      "id": "LOCAL_UVB_TAU_JET",
+      "status": "IMPLEMENTATION_VERIFIED_SCOPED_REVIEW_HOLD",
+      "depends_on": [
+        "REI_PR262_SAVED17_UVB_JR",
+        "BASS_PR234_TAU_CONVENTION"
+      ],
+      "claim_gate": "distinct_author_R6_C9"
+    },
+    {
+      "id": "FULL_CHEM_PHYSICAL_JY",
+      "status": "INPUT_REQUIRED",
+      "depends_on": [
+        "actual source qualified chemical Jacobian",
+        "electron feedback",
+        "full H-Li and energy ownership"
+      ],
+      "claim_gate": "source_identity_full_Jy"
+    },
+    {
+      "id": "SOURCE_CONSISTENT_TANGENT",
+      "status": "BLOCKED_NO_IVP_AUTH",
+      "depends_on": [
+        "FULL_CHEM_PHYSICAL_JY",
+        "actual nHref,H,K",
+        "tangent IC/BC",
+        "physical time clock"
+      ],
+      "claim_gate": "actual_D_a_y"
+    },
+    {
+      "id": "TAU_PHYSICAL_RESPONSE",
+      "status": "BLOCKED",
+      "depends_on": [
+        "SOURCE_CONSISTENT_TANGENT",
+        "BASS_PR234 R6/C9",
+        "REI-BASS electron projection"
+      ],
+      "claim_gate": "actual_D_a_tau"
+    },
+    {
+      "id": "DIRECTIONAL_CMB",
+      "status": "BLOCKED",
+      "depends_on": [
+        "TAU_PHYSICAL_RESPONSE",
+        "directional redshift geodesics",
+        "Thomson frame"
+      ],
+      "claim_gate": "observable"
+    },
+    {
+      "id": "PHYSICAL_L4",
+      "status": "BLOCKED",
+      "depends_on": [
+        "DIRECTIONAL_CMB",
+        "physical norm and source/time/rate error enclosure"
+      ],
+      "claim_gate": "production"
+    }
+  ],
+  "no_ivp": true,
+  "no_auto_next": true,
+  "no_canonical_promotion": true
+}
