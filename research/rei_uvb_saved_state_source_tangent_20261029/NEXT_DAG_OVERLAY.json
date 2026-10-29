@@ -1,0 +1,73 @@
+{
+  "schema": "REI_UVB_SAVED17_SOURCE_TANGENT_DAG_OVERLAY_V1",
+  "original": {
+    "working": "33/88",
+    "central_last": "28/88",
+    "delta": 0,
+    "mutated": false
+  },
+  "nodes": [
+    {
+      "id": "SAVED17_UVB_JR",
+      "status": "IMPLEMENTED_SCOPED_REVIEW_HOLD",
+      "depends_on": [
+        "REI_PR261_RATE6_PORT",
+        "REI_PR248_ON_REFINED_SAVED",
+        "REI_EXTERNAL_MODEL_EVENT_TOPOLOGY"
+      ],
+      "claim_gate": "different_author_R6_C9"
+    },
+    {
+      "id": "FULL_CHEM_JY_ACTUAL",
+      "status": "INPUT_REQUIRED",
+      "depends_on": [
+        "SAVED17_UVB_JR",
+        "actual recombination/nuclear/CR and electron-feedback source",
+        "matching physical bath"
+      ],
+      "claim_gate": "source_identity_full_Jy"
+    },
+    {
+      "id": "CHEM_VARIATIONAL_SOLUTION",
+      "status": "INPUT_REQUIRED_NO_IVP_AUTH",
+      "depends_on": [
+        "FULL_CHEM_JY_ACTUAL",
+        "actual tangent IC",
+        "clock and nHref"
+      ],
+      "claim_gate": "physical_D_a_y"
+    },
+    {
+      "id": "TAU_PHYSICAL_RESPONSE",
+      "status": "BLOCKED",
+      "depends_on": [
+        "CHEM_VARIATIONAL_SOLUTION",
+        "BASS_PR234_tau_row",
+        "physical H,K and D_aH"
+      ],
+      "claim_gate": "physical_D_a_tau"
+    },
+    {
+      "id": "CMB_DIRECTIONAL_OBSERVABLE",
+      "status": "BLOCKED",
+      "depends_on": [
+        "TAU_PHYSICAL_RESPONSE",
+        "directional redshift/geodesic map",
+        "Thomson scattering frame"
+      ],
+      "claim_gate": "observational_Bianchi_transfer"
+    },
+    {
+      "id": "PHYSICAL_L4",
+      "status": "BLOCKED",
+      "depends_on": [
+        "CMB_DIRECTIONAL_OBSERVABLE",
+        "physical norm",
+        "source and clock error enclosures"
+      ],
+      "claim_gate": "production"
+    }
+  ],
+  "no_ivp": true,
+  "no_canonical_promotion": true
+}

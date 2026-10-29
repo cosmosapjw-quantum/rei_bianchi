@@ -1,0 +1,92 @@
+{
+  "schema": "REI_UVB_SAVED17_SOURCE_TANGENT_CONTRACT_V1",
+  "unit": "REI_UVB_SAVED17_SOURCE_TANGENT_20261029",
+  "parent_PR": 261,
+  "state_order": "n,H1_0,H1_1,D_0,D_1,T_0,T_1,He3_0,He3_1,He3_2,He4_0,He4_1,He4_2,Li7_0,Li7_1,Li7_2,Li7_3",
+  "state_units": "number per Href",
+  "time": "proper elapsed seconds; source frozen at saved z_mean",
+  "z_domain": [
+    2.4,
+    4.75
+  ],
+  "parameters": [
+    "beta (dex)",
+    "kappa (dex per redshift)"
+  ],
+  "moments_order": [
+    "Gamma_HI_s-1",
+    "heat_HI_eV_s-1",
+    "Gamma_HeI_s-1",
+    "heat_HeI_eV_s-1",
+    "Gamma_HeII_s-1",
+    "heat_HeII_eV_s-1"
+  ],
+  "model": "F_UVB=S diag(E*y) P R6; R6=R6_P19 10**(beta+kappa*(z-3.6))",
+  "jacobians": {
+    "J_y_photo_only": "S diag(P R6) E (17x17)",
+    "J_R_photo_only": "S diag(E*y) P (17x6)",
+    "B_a_photo_only": "ln(10) F_UVB outer (1,z-3.6) (17x2)",
+    "electron_source": "Q^T F_UVB",
+    "electron_source_jac": "Q^T B_a"
+  },
+  "identities": [
+    "A^T S=0",
+    "1^T S=0",
+    "Q^T S=ones(7)",
+    "mu1(J_y_photo_only)=0",
+    "rank(B_a(z))<=1",
+    "rank(stack(B_a(z_i)))=2 if two nonzero blocks and distinct z"
+  ],
+  "energy": {
+    "threshold_eV": [
+      13.6,
+      13.6,
+      13.6,
+      24.6,
+      54.4,
+      24.6,
+      54.4
+    ],
+    "ionization_storage": "sum I_k*y_source,k*Gamma_k",
+    "photoelectron_excess": "sum y_source,k*heat_k",
+    "absorbed_photon": "ionization_storage+photoelectron_excess",
+    "thermalization": "NOT_BOUND_NO_AUTO_DEPOSITION"
+  },
+  "envelopes": {
+    "source": "PR260 conditional Z+Gaussian ellipsoid",
+    "deterministic_q": 0,
+    "joint2_95_q": 5.991464547107982,
+    "interpretation": "pointwise frozen-state source-rate bounds, not physical n_e posterior or trajectory envelope"
+  },
+  "acceptance": {
+    "python_new_tests": "15/15 PASS",
+    "cpp_direct_event_rows": "7/7 PASS",
+    "cpp_max_relative_component_error": 3.251e-16,
+    "max_baryon_B_residual": 4.0666010775736485e-31,
+    "max_rankone_B_residual": 5.217824480366845e-31
+  },
+  "exclusions": [
+    "full J_y chemistry",
+    "full state sensitivity D_a y",
+    "actual D_a n_e",
+    "physical K,nHref,H binding",
+    "Bianchi directional observed redshift",
+    "tau tangent",
+    "source error radii",
+    "new IVP"
+  ],
+  "dag": {
+    "working_completed": 33,
+    "central_last_completed": 28,
+    "total": 88,
+    "new_physical_nodes": 0
+  },
+  "production": {
+    "F4": "PARTIAL",
+    "L4_ready": false,
+    "physical_temperature": null,
+    "native25": null,
+    "physical_radii": null,
+    "no_more_ivps": true
+  }
+}
