@@ -1,0 +1,5 @@
+# REI F4 | 1969 Li II original table verified + 1987 measured Li I 1s spin projection
+
+Run `bash VERIFY.sh` in a clean extracted archive with Python NumPy/SciPy. `THEORY_KO.md` tracks exact physics and prior source, `ADVERSARIAL_AUDIT_KO.md` records actual counterexamples and remaining owner blockers, `results/` contains original 21+13 literature rows and 2,316 original BASS matched source records, 193 epoch sums and complete 8,492-row coverage audit. `source/` bundles four user-provided PDFs and byte-exact immutable PR280/287 source archives. The PDFs are kept in user-private backup archives; do not publish publisher PDFs into a public Git repository.
+
+Original DAG remains Working33/88 Central28/88 Physical-fast4/7 Δ0, one bounded source-scoped unit. `NO_MORE_IVPS=true`, `NO_MERGE=true`, `NO_FORCE_PUSH=true`, `AUTO_NEXT_NODE=false`, `PRODUCTION=HOLD`. This source-qualified Li II table corrects the old OCR blocker, but does not authorize invented Li II production yields or gas heating.
