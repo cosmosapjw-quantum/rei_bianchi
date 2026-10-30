@@ -115,11 +115,13 @@ fn hard_cap_below_threshold_partition_returns_hold_without_mutating_source() {
     ];
     let before: Vec<_> = initial
         .iter()
-        .map(|p| (
-            p.angular_key,
-            p.photon.photons_per_h.to_bits(),
-            p.photon.k_ev.map(f64::to_bits),
-        ))
+        .map(|p| {
+            (
+                p.angular_key,
+                p.photon.photons_per_h.to_bits(),
+                p.photon.k_ev.map(f64::to_bits),
+            )
+        })
         .collect();
     let result = cap_packets(&initial, &g, &gf, policy(1));
     let hold = result.unwrap_err();
