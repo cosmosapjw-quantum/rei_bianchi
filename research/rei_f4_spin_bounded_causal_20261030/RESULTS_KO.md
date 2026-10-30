@@ -1,0 +1,16 @@
+# Actual measured-window source + frozen 2E1 kernel result (2026-10-30)
+Parent Draft [#293](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/293) HEAD `fd9385f131f93dae2868bbb50b6a542f09dd870b`; original PR293 full ZIP SHA256 `2149e9651c393dc9c68520ef81b95ff5b22f94408da9131281466fa108711217`.
+
+- Inputs: original 193 BASS epochs, 1158 original measured native event rows, 18,528 original PR287 flight kernel rows; 192 new arrival-interval rows, no new IVP. Strict native photon energies 81.85233848,86.70882056,91.85344858 eV. Langer original figure read 30 markers and 3 overlap energies but the inferred B,C mixed branch is exploratory.
+- Conditional BASS K-source exposure inside measured range: `7.88182956137745e-12` events/baryon.
+- Potential Li II pure `1s2s 1S` 2E1 source: `[0,2.544374180157812e-12]` pairs/baryon **under marginals Ferrett R31/R32 1-sigma rectangle, alpha=1 and same natural-Li branching for Li6/Li7**. Central-rest all-singlet conditional ceiling `2.4885142761638135e-12`.
+- Original causal first-flight total photoionization: `[0,4.374110632809567e-12]`/baryon, central ceiling `4.278080181819565e-12`. Absorption species (upper): HI `2.678569652103255e-12`, HeI `1.6028839907664327e-12`, HeII `9.265669938712483e-14`, LiI `2.905527545664037e-19`.
+- Primary electron kinematic energy upper `6.749242464433258e-11 eV/baryon`, not deposited heat. 2E1 photon pair E=`60.922559447552125 eV`. Upper energy ledger: input `1.55009787247481e-10`, electron `6.749242464433258e-11`, binding `8.088584374885863e-11`, cosmological redshift `4.675589831108406e-12`, survived at z=2 `1.9559290231811114e-12`, residual `2.5849394142282115e-25` (all eV/baryon).
+- Conditional triplet M1 if complete vacuum decay `4.06741670768556e-12` possible photons/baryon, energy capacity `2.400618775678942e-10 eV/baryon`; **NOT** propagated M1 photons.
+- Experimental-mixing *exploratory only*, from manual Langer Fig3 B,C: `1.8186015904071986e-12` potential singlet pairs/baryon and `3.1264130156167244e-12` ionizations/baryon. Does not prove an experimental singlet lower bound.
+- **DO NOT** treat the selected-window upper relative to prior *all-K* `3.015107560654833e-11` source as a global suppression factor. Excluded bins may contribute. No source-common full operator/heat/CMB/optical depth claim.
+
+## Reproduction
+Full private source-inclusive ZIP `REI_F4_SPIN_BOUNDED_CAUSAL_BRIDGE_20261030_FULL.zip`: 41,999,262 bytes, SHA256 `67661a88ba22e2cd3f88a85daa09212c619449122ecc6d64c45e28c4c98768f1`. Google Drive: https://drive.google.com/file/d/148ZwWwjuiZc4k9e3sX_oO-06KLomz2Em/view (private). ChatGPT Library: `/REI_F4_SPIN_BOUNDED_CAUSAL_BRIDGE_20261030/`. Original saved owner PDFs and complete parents included privately, NOT in public Git.
+
+Clean restored `bash VERIFY.sh`: ZIP CRC PASS, manifest 51/51, new Python tests 12/12, deterministic replay 13/13 physical CSV/JSON/PNG, original PR287 192-arrival replay and source digests PASS. Full ZIP Library/Drive full raw bytes independently redownloaded and `cmp` identical with local SHA above. Additional `spin_projection.py` pure scientific calculator + `test/test_spin_projection.py` (independently locally 6/6 PASS) checked from Git blob identities.
