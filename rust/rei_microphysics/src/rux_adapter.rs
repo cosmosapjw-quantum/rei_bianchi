@@ -20,7 +20,10 @@ impl HydrogenDensity {
     pub fn proper_cm3(self) -> Result<f64, ForwardError> {
         let value = match self {
             Self::ProperCm3(value) => value,
-            Self::ComovingCm3 { value, scale_factor } => {
+            Self::ComovingCm3 {
+                value,
+                scale_factor,
+            } => {
                 if !scale_factor.is_finite() || scale_factor <= 0.0 {
                     return Err(ForwardError::InvalidInput("RUX_SCALE_FACTOR"));
                 }
@@ -106,10 +109,7 @@ pub fn bind_primary(input: ScenarioInput) -> Result<(PrimaryStage, PrimaryState)
     }
     if input.packets.is_empty()
         || input.packets.iter().any(|p| {
-            !p.energy_ev.is_finite()
-                || p.energy_ev <= 0.0
-                || !p.per_h.is_finite()
-                || p.per_h < 0.0
+            !p.energy_ev.is_finite() || p.energy_ev <= 0.0 || !p.per_h.is_finite() || p.per_h < 0.0
         })
     {
         return Err(ForwardError::InvalidInput("RUX_PACKET_STOCK"));
