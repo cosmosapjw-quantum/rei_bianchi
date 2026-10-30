@@ -1,0 +1,12 @@
+# Same-author adversarial audit, single bounded pass
+
+1. **Cross-model source ownership.** A BASS native photon gamma inserted into REI external photo gamma must be a **replacement**, not addition. Rust regression intentionally doubles gamma and per-absorber kinetic source on one epoch and must find doubled native photon events, proving a deliberately wrong composition cannot be silently accepted.
+2. **Absent absorber counterexample.** In early epochs `n_HeII=0` but `Gamma_HeII` remains a potential photo rate. Primary kinetic power per absorber is not identifiable from zero event power. Setting the per-absorber heat to zero is only correct for the tested state, not for a perturbed state with HeII>0. This blocks blind reuse of Jacobian derivatives with this constructed port.
+3. **Cancellation at high ionization.** `1-x_HII` and `1-x_HeII-x_HeIII` lose relative bits. An error near 10^-12 in the reconstructed photon input at one archived epoch was observed during input construction; corrected by an explicitly bounded relative comparison (5e-8 acceptance), never a silently weakened production energy tolerance.
+4. **No common electron bath.** `n_e^HHe` excludes BASS additional isotope charges; native 193-state H/He point parity cannot establish full REI17 and BASS21 F/J parity. The omitted electron pool is preserved in the dataset and plotted.
+5. **Background scope.** `x=ln a` and `dt=dx/H` tested on stored BASS elapsed seconds. The Bianchi K component in PR295 is a sign-checked axisymmetric proxy, not an Einstein-constraint-verified BASS source K or radiation direction-dependent transport.
+6. **Energy ownership.** REI's precise thresholds differ from BASS rounded thresholds. Native result validates REI photon energy bookkeeping under its own constants, not energy identity with the original BASS owner unless defect is explicitly included.
+7. **No evolved gas.** Point thermal RHS and its integral on BASS frozen states are not a solution of coupled chemistry-temperature ODEs, nor deposited secondary-electron heating or CMB tau.
+8. **Independence.** Same author tests + Wolfram algebraic checks are not a distinct-author blind referee. `R6/C9_distinct_author=NOT_RUN`. Native Rust CI adds executable implementation provenance, not a new independent scientific author.
+
+**Admission:** Scoped native H/He point mapping can be reused if all 193 native Rust checks pass at exact Git head. Full REI17 F/J, BASS same-initial-condition clock, Li I branching and fast-electron deposition stay HOLD.
