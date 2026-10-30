@@ -1,0 +1,3 @@
+# F4 source-cone handoff, pre-delivery
+
+Live GitHub PR/HEAD를 우선 읽어라. Original parent PR284 HEAD `661f34c5216aa52402be6f9db5c16ab2e55ecfb3` immutable. Actual new output 193 epoch +4825 channel +7720 generator rows, source spectral-shape 21 knot two cones, no IVP, upstream PR284 original ZIP SHA256 `fa3e5f2a5cc0eaaa458372dbd2d926ad6829451a16a04b1bd220b3abb26747c9`. `bash VERIFY.sh` for reproduce. Source original Drake1969 p.29 Table II not visually verified; CHIANTI derived file not downloaded; real singlet/triplet yield not bound. `R6/C9_distinct_author NOT_RUN`, same-author adversarial audit saved. Original working33/88 central28/88 fast4/7 Δ0; auxiliary only 1/1 scoped; F4 PARTIAL L4_ready false. Do not merge/force/new IVP/budget reset; no automatic next.
