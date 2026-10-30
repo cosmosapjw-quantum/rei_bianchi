@@ -12,7 +12,7 @@ F21(Y,T,UV,nb) = [G0(T,UV) + D + ne*Gne(T)] Y
 J21 = G0 + D + ne*Gne + nb*(Gne Y)*q^T
 ```
 
-The 17-state restriction9 excludes four BASS Li6 states, but it is **not** equivalent to native REI17. If the source generator does not directly move nuclei between this Li6 block and the retained 17 block, and all cross-block terms occur through ne, then
+The 17-state restriction excludes four BASS Li6 states, but it is **not** equivalent to native REI17. If the source generator does not directly move nuclei between this Li6 block and the retained 17 block, and all cross-block terms occur through ne, then
 
 ```
 ΔF17 = nb*(q_Li6·Y_Li6)*(Gne_17,17 Y17)
