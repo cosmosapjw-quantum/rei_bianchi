@@ -113,11 +113,25 @@ fn hard_cap_below_threshold_partition_returns_hold_without_mutating_source() {
         tag(&g, 30., 0.5, 0),
         tag(&g, 70., 0.5, 0),
     ];
+    let before: Vec<_> = initial
+        .iter()
+        .map(|p| {
+            (
+                p.angular_key,
+                p.photon.photons_per_h.to_bits(),
+                p.photon.k_ev.map(f64::to_bits),
+            )
+        })
+        .collect();
     let result = cap_packets(&initial, &g, &gf, policy(1));
     let hold = result.unwrap_err();
     assert_eq!(hold.reason, "HOLD_BUDGET_THRESHOLD_OR_DIRECTION");
-    assert_eq!(initial.len(), 3);
-    assert_eq!(initial[0].photon.energy_at(&g).unwrap(), 15.);
+    assert_eq!(initial.len(), before.len());
+    for (packet, (angular_key, count_bits, k_bits)) in initial.iter().zip(before.iter()) {
+        assert_eq!(packet.angular_key, *angular_key);
+        assert_eq!(packet.photon.photons_per_h.to_bits(), *count_bits);
+        assert_eq!(packet.photon.k_ev.map(f64::to_bits), *k_bits);
+    }
 }
 
 #[test]
