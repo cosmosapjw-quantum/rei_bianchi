@@ -38,7 +38,10 @@ impl<'a> Table<'a> {
     }
 }
 fn same(name: &str, i: usize, a: f64, b: f64) {
-    assert!(a.is_finite() && b.is_finite(), "{name}: nonfinite epoch {i}");
+    assert!(
+        a.is_finite() && b.is_finite(),
+        "{name}: nonfinite epoch {i}"
+    );
     let gap = (a - b).abs();
     let scale = a.abs().max(b.abs());
     assert!(
@@ -96,22 +99,47 @@ fn native_rei_igm_all_193_frozen_bass21_states() {
         ];
         let state = IgmGasState::from_temperature(f, nh, nhe, t.number(i, "T_original_K"))
             .expect("original BASS193 input to unmodified REI Rust EOS");
-        let result = igm_point_rhs(&state, nh, nhe, h, t.number(i, "T_CMB_external_K"), input(&t, &e, i))
-            .expect("native Rust H/He RHS accepts source-matched BASS state");
+        let result = igm_point_rhs(
+            &state,
+            nh,
+            nhe,
+            h,
+            t.number(i, "T_CMB_external_K"),
+            input(&t, &e, i),
+        )
+        .expect("native Rust H/He RHS accepts source-matched BASS state");
         for (j, key) in [
             "REI_source_translated_HII_fraction_dt_per_s",
             "REI_source_translated_HeII_fraction_dt_per_s",
             "REI_source_translated_HeIII_fraction_dt_per_s",
-        ].iter().enumerate() {
+        ]
+        .iter()
+        .enumerate()
+        {
             same(key, i, result.fraction_dt[j], t.number(i, key));
         }
         let matches = [
-            ("REI_HHe_photon_photoevents_per_Href_s", result.photo_events_cm3_s.iter().sum::<f64>()),
-            ("REI_HHe_photo_input_erg_per_Href_s", result.photo_input_erg_cm3_s),
-            ("REI_HHe_thermal_micro_erg_per_Href_s", result.thermal_micro_erg_cm3_s),
-            ("REI_HHe_binding_micro_erg_per_Href_s", result.binding_micro_erg_cm3_s),
+            (
+                "REI_HHe_photon_photoevents_per_Href_s",
+                result.photo_events_cm3_s.iter().sum::<f64>(),
+            ),
+            (
+                "REI_HHe_photo_input_erg_per_Href_s",
+                result.photo_input_erg_cm3_s,
+            ),
+            (
+                "REI_HHe_thermal_micro_erg_per_Href_s",
+                result.thermal_micro_erg_cm3_s,
+            ),
+            (
+                "REI_HHe_binding_micro_erg_per_Href_s",
+                result.binding_micro_erg_cm3_s,
+            ),
             ("REI_HHe_escape_erg_per_Href_s", result.escape_erg_cm3_s),
-            ("REI_HHe_cmb_exchange_erg_per_Href_s", result.cmb_to_gas_erg_cm3_s),
+            (
+                "REI_HHe_cmb_exchange_erg_per_Href_s",
+                result.cmb_to_gas_erg_cm3_s,
+            ),
             ("REI_HHe_dNe_cm3_s", result.species_chemical_cm3_s[5]),
         ];
         for (key, val) in matches {
@@ -122,13 +150,21 @@ fn native_rei_igm_all_193_frozen_bass21_states() {
             };
             same(key, i, val, expected);
         }
-        same("point temperature", i, result.temperature_dt_k_s, t.number(i, "REI_HHe_Tdot_point_K_s"));
+        same(
+            "point temperature",
+            i,
+            result.temperature_dt_k_s,
+            t.number(i, "REI_HHe_Tdot_point_K_s"),
+        );
         let d = result.species_chemical_cm3_s;
         assert!((d[0] + d[1]).abs() <= 1e-12 * (d[0].abs() + d[1].abs()).max(1e-60));
-        assert!((d[2] + d[3] + d[4]).abs()
-            <= 1e-12 * (d[2].abs() + d[3].abs() + d[4].abs()).max(1e-60));
-        assert!((d[5] - d[1] - d[3] - 2.0 * d[4]).abs()
-            <= 1e-12 * (d[5].abs() + d[1].abs() + d[3].abs() + 2.0 * d[4].abs()).max(1e-60));
+        assert!(
+            (d[2] + d[3] + d[4]).abs() <= 1e-12 * (d[2].abs() + d[3].abs() + d[4].abs()).max(1e-60)
+        );
+        assert!(
+            (d[5] - d[1] - d[3] - 2.0 * d[4]).abs()
+                <= 1e-12 * (d[5].abs() + d[1].abs() + d[3].abs() + 2.0 * d[4].abs()).max(1e-60)
+        );
         let energy = result.thermal_micro_erg_cm3_s
             + result.binding_micro_erg_cm3_s
             + result.escape_erg_cm3_s
@@ -139,7 +175,8 @@ fn native_rei_igm_all_193_frozen_bass21_states() {
         assert!(omitted >= 0.0, "other isotope electrons are not zeroed");
         let expected_photo = t.number(i, "REI_HHe_photo_input_erg_per_Href_s") * nh;
         let scale = expected_photo.abs().max(1e-99);
-        max_source_relative = max_source_relative.max((result.photo_input_erg_cm3_s - expected_photo).abs() / scale);
+        max_source_relative =
+            max_source_relative.max((result.photo_input_erg_cm3_s - expected_photo).abs() / scale);
         if i > 0 {
             let dt = t.number(i, "proper_elapsed_s") - t.number(i - 1, "proper_elapsed_s");
             let dx = t.number(i, "x") - t.number(i - 1, "x");
@@ -158,11 +195,16 @@ fn duplicate_bass_photons_cannot_be_admitted_as_separate_rei_source() {
     let nh = t.number(i, "nHref_cm3");
     let nhe = t.number(i, "nHe4_cm3");
     let state = IgmGasState::from_temperature(
-        [t.number(i, "HII_fraction"), t.number(i, "HeII_fraction"), t.number(i, "HeIII_fraction")],
+        [
+            t.number(i, "HII_fraction"),
+            t.number(i, "HeII_fraction"),
+            t.number(i, "HeIII_fraction"),
+        ],
         nh,
         nhe,
         t.number(i, "T_original_K"),
-    ).unwrap();
+    )
+    .unwrap();
     let p = input(&t, &e, i);
     let original = igm_point_rhs(&state, nh, nhe, 0.0, t.number(i, "T_CMB_external_K"), p).unwrap();
     let duplicated = igm_point_rhs(
@@ -175,10 +217,14 @@ fn duplicate_bass_photons_cannot_be_admitted_as_separate_rei_source() {
             gamma_s: p.gamma_s.map(|x| 2.0 * x),
             heat_erg_per_absorber_s: p.heat_erg_per_absorber_s.map(|x| 2.0 * x),
         },
-    ).unwrap();
+    )
+    .unwrap();
     let one = original.photo_events_cm3_s.iter().sum::<f64>();
     let two = duplicated.photo_events_cm3_s.iter().sum::<f64>();
     assert!(one > 0.0);
     same("double photo", i, two, 2.0 * one);
-    assert!(two > 1.5 * one, "additive source double counts the same photons");
+    assert!(
+        two > 1.5 * one,
+        "additive source double counts the same photons"
+    );
 }
