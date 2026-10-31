@@ -1,0 +1,7 @@
+# CCC6 × BASS193 first-inelastic event (Physical Fast source-scoped)
+
+This subtree preserves **original-source-derived physical data** produced in the independent private source-inclusive master. Run `python code/restore_derived_csvs.py` to restore 193×7 mono responses, 192 arrival rows, 3,840 source/first-absorber/band rows, and selected energy grid with SHA-256 checks. The full private source ZIP with original source snapshots/CCC reduced tables and source run environment is required to re-execute `python code/run.py 2100` and `bash VERIFY.sh`. The public Git sources and physical outputs are not equivalent to redistributing original author ZIPs or source PDFs.
+
+Primary physics owner: Bray & Stelbovics (1992), PRA 46,6995; Fursa & Bray (1995), PRA 52,1279, Curtin CCC DB. Numeric source owner: EXHALE pinned commit 7388232fac2c3cdadad613515006de008360f1ab, 6 reduced CCC channels through source PR311, not raw Curtin author archive. Original BASS 21-charge free electron bath, original proper-clock frozen states and conditional Li II two-photon source remain protected.
+
+Scoped model: first one of six selected CCC inelastic channels competing with FS2010 direct e-e Coulomb slowing down until 13.7eV; NOT full collision cascade, HeII targets, true heating, full REI17 F/J, or CMB. The 20 R/C stage files reflect one bounded experiment. Working 33/88; Central 28/88; Fast 4/7; canonical delta 0, production HOLD, no IVP, merge, force push or automatic next node.
