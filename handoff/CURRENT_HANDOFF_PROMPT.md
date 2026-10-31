@@ -1,3 +1,5 @@
+> **2026-11-01 routing correction:** Before following the historical `next exact stage` below, read `docs/roadmap/REI_IGM_EXECUTION_POLICY_20261101.md` and its 15-milestone projection. The August microstep is not a whole interval; read a fresh source-owned HEAD to discover whether a newer *central* accepted node exists. Do not import F4 source-conditional PRs as production or increment central 28/88. `NO_MORE_IVPS` stays scoped to the F4 campaign and does not silently cancel existing core authorizations. No merge, force push or new production owner switch is permitted by this note.
+
 # CURRENT HANDOFF PROMPT — rei_bianchi / BASS
 
 Treat this as a durable continuation of the public `rei_bianchi` repository

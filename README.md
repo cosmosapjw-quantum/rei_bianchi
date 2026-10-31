@@ -1,3 +1,5 @@
+> **2026-11-01 REI IGM process audit.** The older checkpoint below is a 2026-08-11 durable *main* snapshot, not a verified live 2026-11 state. Read [the D0 execution spine](docs/roadmap/REI_IGM_EXECUTION_SPINE_V1.json), [critical-path policy](docs/roadmap/REI_IGM_EXECUTION_POLICY_20261101.md) and [adversarial findings](docs/roadmap/REI_IGM_ADVERSARIAL_PROCESS_AUDIT_20261101.md) before selecting a new central task. The reported central 28/88 and working 33/88 are **not** automatically reconciled or advanced by F4 auxiliary PRs. Science and authorization in `PROJECT_STATE.json` are unchanged.
+
 # rei_bianchi
 
 Durable development and backup repository for extending homogeneous
