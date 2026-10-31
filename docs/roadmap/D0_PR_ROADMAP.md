@@ -1,3 +1,5 @@
+> **2026-11-01 process correction (proposal; no science promotion).** PR 1–12 in the table below are *D0 milestone slots*, not live GitHub PR identifiers. Its `R2A NEXT` row is a **historical snapshot**, superseded within `main` by the 2026-08-11 four-site FLRW microstep checkpoint. The next *candidate from that main snapshot*, if not superseded by a newer accepted core owner, is the complete first canonical BDF interval. See [spine](REI_IGM_EXECUTION_SPINE_V1.json), [policy](REI_IGM_EXECUTION_POLICY_20261101.md), [audit](REI_IGM_ADVERSARIAL_PROCESS_AUDIT_20261101.md). No production authorization or 88-node change is implied.
+
 # D0 and PR roadmap
 
 The adopted target remains D0 with roughly 10--12 PRs. PR 2 has expanded internally because multiple fail-closed physics gates were discovered.
