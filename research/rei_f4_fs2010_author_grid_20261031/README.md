@@ -1,0 +1,7 @@
+# Frozen original-input FS2010 deposition crosswalk (2026-10-31)
+
+First-generation Li II conditional photon absorption source on original BASS193; 192 saved arrival bins, 18,528 old emitted-arrival kernel rows, 4 absorbers×5 energetic intervals -> 3,840 new FS2010 conditional response rows and four scientific figures. **No new IVP, no production source, no native REI17 F/J**.
+
+Inputs are the unmodified author `elec_interp.tar`, exact PR302/PR303 source CSVs (SHA locked), original author table members extracted without resampling. `source_tar/` contains direct extraction. `code/compute.py` implements source-faithful piecewise bilinear interpolation with explicit domain refusal and energy-band marginal bounds, `code/plot_science.py` generates figures. `code/test_physics.py` checks original source identities, energy conservation and mathematical bounds; source C source is preserved and safe derived buffer-fixed copy is supplied for a separate parity comparison. **Do not run original upstream C without first checking its label buffer.**
+
+To replay after restoring the ZIP: `bash VERIFY.sh` from project root. This runs model-only source diagnostics; no cosmological IVP. Source contribution from unmodeled xHII>0.999 bins is not invented, and FS2010 single-xi chemistry does not match native BASS species. See REPORT_KO.md for meaning, ADVERSARIAL_AUDIT_KO.md for blockers and HANDOFF_NEXT_THREAD_KO.txt for next stage.
