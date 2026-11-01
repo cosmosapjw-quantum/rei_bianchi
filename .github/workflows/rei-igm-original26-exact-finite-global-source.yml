@@ -1,0 +1,77 @@
+name: rei-igm-original26-exact-finite-global-source
+on:
+  push:
+    branches: [research/rei-igm-original26-exact-finite-shared-source-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_igm_exact_finite_shared_source_20261101/**'
+      - '.github/workflows/rei-igm-original26-exact-finite-global-source.yml'
+permissions: {contents: read}
+jobs:
+  source-finite-remainder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install pinned original REI source runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Lock original Aug29 source archive and original PR332 owner
+        run: |
+          echo 'a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz' | sha256sum -c -
+          test "$(git hash-object research/rei_igm_tick160_global_photon_20261101/photon_global_feedback.py)" = 91352a54b8d938fe24877925ad8c5fd6ec6e1609
+      - name: Finite rational remainder regression and negative tests
+        run: |
+          python -m py_compile research/rei_igm_exact_finite_shared_source_20261101/finite_source.py research/rei_igm_exact_finite_shared_source_20261101/run_original.py
+          python -m unittest discover -s research/rei_igm_exact_finite_shared_source_20261101/tests -v
+          python -O -m unittest discover -s research/rei_igm_exact_finite_shared_source_20261101/tests -v
+      - name: Compute original source-owned finite nonlinear photon response 46k nodes
+        run: |
+          python research/rei_igm_exact_finite_shared_source_20261101/run_original.py --repo . --out physical_output
+      - name: Verify real physics result and nodewise source rates
+        run: |
+          python - <<'PY'
+          import csv,gzip,hashlib,json,math
+          from pathlib import Path
+          p=Path('physical_output')
+          r=json.loads((p/'RESULT.json').read_text())
+          assert r['original_archive_sha256']=='a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b'
+          assert r['state_array_sha256']=='cc031a04f5b7b13ccb9ffddf95ec0ced4a9274a9ab9999e7e3508a5161edb01'
+          assert r['unique_source_nodes']==46080 and r['new_source_model_node_rows']==46080
+          assert len(r['group_physics'])==4 and r['canonical_delta']==0
+          assert r['original_local_error_gate']==2e-4 and r['old_logT_failure']>2e-4
+          assert r['first_canonical_interval']=='BLOCKED_MINIMUM_STEP'
+          assert all(x['exact_source_operator_inclusion'] for x in (r['original_snapshot_initial'],r['original_snapshot_accepted']))
+          f=p/r['source_csv']; assert hashlib.sha256(f.read_bytes()).hexdigest()==r['source_csv_sha256']
+          with gzip.open(f,'rt',encoding='utf8') as stream:
+              rows=csv.DictReader(stream);n=0
+              for row in rows:
+                  n+=1
+                  assert all(math.isfinite(float(x)) for k,x in row.items() if k!='node')
+              assert n==46080,n
+          print('SOURCE_26EVENT_FINITE_REAL_ROWS',n,'GROUPS',len(r['group_physics']),
+                'EXACT_NONLINEAR_PHOTOHEAT_REMAINDER',r['exact_nonlinear_photoheat_remainder_erg_per_s'],
+                'CANONICAL_DELTA',r['canonical_delta'])
+          PY
+      - name: Preserve original-source data and actual negative receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-igm-exact-finite-source-46080-original
+          path: |
+            physical_output/
+            research/rei_igm_exact_finite_shared_source_20261101/finite_source.py
+            research/rei_igm_exact_finite_shared_source_20261101/run_original.py
+            research/rei_igm_exact_finite_shared_source_20261101/tests/
+            research/rei_igm_exact_finite_shared_source_20261101/THEORY_AND_SCOPE_KO.md
+            research/rei_igm_exact_finite_shared_source_20261101/STAGE_LEDGER.json
+          if-no-files-found: warn
+          retention-days: 90
