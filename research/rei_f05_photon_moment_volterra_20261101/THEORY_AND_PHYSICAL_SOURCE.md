@@ -51,3 +51,16 @@ Thus `S(y)=S_*+V y` is an affine **constant 3×(4N)** population moment map, V c
 **Regularity:** exact derivatives require strictly positive active `D_g,S_s,p_is,T_i`, fixed table/branch cell, and differentiability of local collision/OTS functions. Across a branch kink a smooth-Jacobian theorem is inapplicable without a separate piecewise/one-sided bound; the algebraic finite photon allocation identities below remain valid wherever denominators remain positive. Do not infer the original full nonlinear 26-event flow is differentiable across every accepted parent interval merely because one tick has zero detected table events.
 
 **R3 backup/publish:** exact original coefficient asymmetry and physical state conventions fixed; DAG 28/88 · 33/88 · 4/7, canonical 0. Drift watchdog PASS.
+## R4 | Constructive alternative representations
+
+**Candidate A, all-cell dense continuous Jacobian:** directly differentiate the 4N nonlinear source coordinates (\(N=46080\)). This is mathematically valid but obscures the exact original global photon competition and gives a \(184320\times184320\) nominal matrix; constructing it explicitly adds no physics to the first-tick continuum-obligation question.
+
+**Candidate B, isolate all four photon groups as four global independent state moments:** generally wrong. There are four photon **external currents**, but the endogenous original full-volume denominators depend only on **three** scalar neutral-species sums. Treating \(D_g\) independently as state variables without their 3-moment constraints introduces unphysical tangent directions and can distort cross-group source correlations.
+
+**Candidate C, exact owner-based three-moment factorization:** retain all 26 original event reactions and local electron/OTS/thermal nonlinearities; represent each cell's source as \(f_i(t,y_i,S(y))\) with exactly three source moments. Prove finite-amplitude allocation identities, bound log-opacity changes, derive Jacobian \(A+UV\) and the continuum residual Volterra reduction. **Selected construction.** This is new continuum physics analysis, not a fourth numerical step-doubling estimator.
+
+**Candidate D, full retarded time-dependent radiative transfer:** physically relevant as a separate higher-fidelity model, but not the REI original reduced source owner; substituting it here would violate the current source identity. Leong et al. 2023 shows time-dependent RT can differ materially from an instantaneous approximation in quasar ionization fronts; such model discrepancy is left an explicit separate scientific question, not silently included.
+
+**Minimal proof/work criterion:** exact 3-moment algebra and one 4-group original-source acceptance-tick witness. No physical spectrum synthesis, photon atlas, original worker mutation, further V2 process review or full 131072-step replay.
+
+**R4 backup/publish:** same Draft PR #355; CENTRAL=28/88, WORKING=33/88, FAST=4/7, canonical delta=0. Drift watchdog PASS: choose source-faithful exact physics, not representation bureaucracy.
