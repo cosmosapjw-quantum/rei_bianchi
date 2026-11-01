@@ -1,0 +1,76 @@
+name: rei-original26-parent-temperature-edge-physics
+on:
+  push:
+    branches: [research/rei-igm-original26-parent-temperature-edges-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_igm_original26_temperature_edges_20261101/**'
+      - '.github/workflows/rei-original26-parent-temperature-edge-physics.yml'
+permissions:
+  contents: read
+jobs:
+  original-source-temperature-edge-map:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [LOCAL_NEUTRAL_HAZARD_PRIMARY, RECOMBINATION_WEIGHTED_AUDITOR, SCRIPT_SELF_SHIELDING_AUDITOR]
+        edge: [lower, upper]
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install exact frozen original owner runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Test scope-preserving original source and edge probes
+        run: |
+          python -m py_compile research/rei_igm_original26_temperature_edges_20261101/edge_probe.py
+          python -m unittest discover -s research/rei_igm_original26_temperature_edges_20261101/tests -v
+          python -O -m unittest discover -s research/rei_igm_original26_temperature_edges_20261101/tests -v
+          python -m unittest discover -s research/rei_igm_tick160_nonlinear_point_20261101/tests -v
+      - name: Compute ORIGINAL 26-event frozen tick160 two-temperature-edge nonlinear physics
+        run: |
+          python research/rei_igm_original26_temperature_edges_20261101/edge_probe.py \
+            --repo . \
+            --lane '${{ matrix.lane }}' --temperature-edge '${{ matrix.edge }}' \
+            --output 'source_science/${{ matrix.edge }}/${{ matrix.lane }}'
+      - name: Verify genuine 46080-node seven-field output
+        run: |
+          python - <<'PY'
+          import json, gzip, csv, hashlib, math
+          from pathlib import Path
+          root=Path("source_science/${{ matrix.edge }}/${{ matrix.lane }}")
+          r=json.loads((root/"RESULT.json").read_text())
+          assert r["status"]=="SOURCE_AUTHENTIC_PARENT_TEDGE_NONLINEAR_MAP_CERTIFIED"
+          assert r["nodes"]==46080 and r["canonical_delta"]==0
+          assert r["source_kernel_sha256"]=="579df3cc99987dcce9205166752570bdaf4c7cb3640c525be6da260d94b8e644"
+          assert len(r["summary"])==7
+          p=root/r["csv"]
+          assert hashlib.sha256(p.read_bytes()).hexdigest()==r["csv_sha256"]
+          with gzip.open(p,"rt",newline="") as f:
+              z=csv.DictReader(f)
+              rows=0
+              for line in z:
+                  rows+=1
+                  assert len(line)==(5+4*7), (len(line),rows)
+                  assert all(math.isfinite(float(x)) for k,x in line.items() if k!="node" and k!="parent_temperature_edge")
+              assert rows==46080,rows
+          print("ACTUAL_26EVENT_REAL_ROWS",rows,"EDGE",r["parent_temperature_edge"],"LANE",r["lane"])
+          print("ACTUAL_26EVENT_PHYSICAL_FIELDS",json.dumps(r["summary"],sort_keys=True))
+          PY
+      - name: Preserve actual physics and rejected-event evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: original26-tempedge-${{ matrix.edge }}-${{ matrix.lane }}
+          path: source_science/${{ matrix.edge }}/${{ matrix.lane }}/
+          if-no-files-found: warn
+          retention-days: 90
