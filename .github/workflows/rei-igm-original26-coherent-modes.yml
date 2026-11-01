@@ -1,0 +1,65 @@
+name: rei-igm-original26-coherent-physical-mode-map
+on:
+  push:
+    branches: [research/rei-igm-original26-coherent-modes-20261101]
+  pull_request:
+    paths:
+      - research/rei_igm_original26_coherent_modes_20261101/**
+      - .github/workflows/rei-igm-original26-coherent-modes.yml
+permissions:
+  contents: read
+jobs:
+  physical-mode-lane:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [LOCAL_NEUTRAL_HAZARD_PRIMARY, RECOMBINATION_WEIGHTED_AUDITOR, SCRIPT_SELF_SHIELDING_AUDITOR]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install immutable source original REI runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Check source archive identity and H-He physical perturbation contracts
+        run: |
+          echo 'a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz' | sha256sum -c -
+          python -m py_compile research/rei_igm_original26_coherent_modes_20261101/science.py
+          python -m unittest discover -s research/rei_igm_original26_coherent_modes_20261101/tests -v
+      - name: Generate source-owned real H-He thermodynamic modes and original full-half differences
+        run: |
+          export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+          python research/rei_igm_original26_coherent_modes_20261101/science.py --lane '${{ matrix.lane }}' --out original_mode_physics/
+      - name: Check full physical data CSV and every map output identity
+        run: |
+          python - <<'PY'
+          import pathlib,hashlib,gzip,csv,math,json
+          p=pathlib.Path("original_mode_physics")
+          r=json.loads((p/"MODE_RESULTS.json").read_text())
+          s=p/"ORIGINAL_SOURCE_PHYSICAL_MODES_414720.csv.gz"
+          assert r["canonical_delta"]==0 and r["point_map_cases"]==9
+          assert s.exists() and hashlib.sha256(s.read_bytes()).hexdigest()==r["source_csv_sha256"]
+          with gzip.open(s,"rt") as f:
+              count=0
+              for rec in csv.DictReader(f):
+                  count+=1
+                  assert all(math.isfinite(float(v)) for k,v in rec.items() if k!="mode")
+          assert count==414720
+          if "point_map_csv_sha256" in r:
+              q=p/"ORIGINAL_POINT_DIFF_MAPS.csv.gz"
+              assert q.exists() and hashlib.sha256(q.read_bytes()).hexdigest()==r["point_map_csv_sha256"]
+              with gzip.open(q,"rt") as f:
+                  rows=sum(1 for _ in f)-1
+              assert rows==r["point_map_data_rows"]
+          print("REAL_26EVENT_ROWS",count,"ORIGINAL_POINT_CASES",r["point_map_certified_cases"],"CANONICAL_DELTA",0)
+          PY
+      - name: Preserve original physical data and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei26-original-physical-modes-${{ matrix.lane }}
+          path: original_mode_physics/
+          if-no-files-found: warn
