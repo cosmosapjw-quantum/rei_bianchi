@@ -1,0 +1,65 @@
+name: rei-igm-original26-mprk-predictor-moment-physics
+on:
+  push:
+    branches:
+      - research/rei-igm-original26-predictor-moment-20261101
+  pull_request:
+    paths:
+      - research/rei_igm_original26_predictor_moment_20261101/**
+      - .github/workflows/rei-igm-original26-predictor-moment.yml
+permissions:
+  contents: read
+jobs:
+  original-mprk-predictor-global-photon:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore pinned original 26-event scientific runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Verify frozen original archive and predictor source tests
+        run: |
+          echo "a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz" | sha256sum -c -
+          python -m py_compile research/rei_igm_original26_predictor_moment_20261101/predictor_moments.py
+          python -m unittest discover -s research/rei_igm_original26_predictor_moment_20261101/tests -v
+          python -O -m unittest discover -s research/rei_igm_original26_predictor_moment_20261101/tests -q
+      - name: Compute original frozen 46080-node source coupled MPRK predictor first and second responses
+        run: |
+          export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+          python research/rei_igm_original26_predictor_moment_20261101/predictor_moments.py --repo . --out original_predictor_science/
+      - name: Check actual physical source row identity and conservation evidence
+        run: |
+          python - <<'PY'
+          import pathlib,json,gzip,csv,hashlib,math
+          folder=pathlib.Path("original_predictor_science")
+          result=json.loads((folder/"RESULT.json").read_text())
+          assert result["new_physical_predictor_rows"]==46080
+          assert result["canonical_delta"]==0 and not result["original_full_vs_two_half_entire_X_certificate"]
+          assert result["original_local_error_gate"]==2e-4
+          assert result["original_state_width_gate"]==2e-3
+          assert result["original_krawczyk_predictor_certified"]
+          path=folder/result["source_csv_file"]
+          assert hashlib.sha256(path.read_bytes()).hexdigest()==result["source_csv_sha256"]
+          with gzip.open(path,"rt",newline="",encoding="utf8") as fd:
+              reader=csv.DictReader(fd)
+              assert len(reader.fieldnames)==1+result["physical_model_columns"]
+              count=0
+              for row in reader:
+                  count+=1
+                  assert all(math.isfinite(float(x)) for k,x in row.items() if k!="node")
+          assert count==46080
+          print("ORIGINAL_MPRK_PREDICTOR_PHYSICAL_ROWS",count,
+                "COLUMNS",result["physical_model_columns"],"CENTRAL",result["central_DAG"],"CANONICAL_DELTA",0)
+          PY
+      - name: Preserve original model physical data and typed failures
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rei-original26-mprk-predictor-global-photon-physics
+          path: original_predictor_science/
+          if-no-files-found: warn
