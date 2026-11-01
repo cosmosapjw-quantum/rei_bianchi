@@ -1,0 +1,10 @@
+# REI IGM original 26-event tick160 science
+One bounded central-critical-path science unit, immutable PR321 parent 9afee1ab4a45a7b4b277e183e7e18c59a8d39f4d. Original 46080-node source archive a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b, state array cc031a04f5b7b13ccb9ffddf95ec0ced4a9274a9ab999a9e7e3508a5161edb01. No production/merge/force-push, no tolerance change, no new full cosmological IVP.
+
+Theory: D_h(y,theta) = F_h(y,theta) - F_(h/2)(F_(h/2)(y,theta),theta). The original independent output-box comparison can retain O(parent width) unlike same-parent difference; this experiment evaluates a real 26-event source temperature response and one selected common-point full/two-half map at locked tick [160,161]. The point result DOES NOT prove the required joint all-X enclosure, and successful CI does not certify the full interval.
+
+Independent control: nonlinear positive recombination dx/dt=-k x^2 has backward Euler B_q(x)=2x/(1+sqrt(1+4qx)), q=kh. Exact full-two-half B_q(x)-B_(q/2)(B_(q/2)(x))=q^2 x^3/2 + O(q^3), derivative wrt parent x=3q^2 x^2/2+O(q^3). Wolfram and SymPy cross-check. This is a physical limiting model, NOT the original MPRK/SDIRK map. Real original source unit uses 46,080 archived nodes and source-consistent one-tick physical clock.
+
+Output 1: original 26-event nuclear/photon/energy-preserving source temperature perturbation with actual source numerical 46080 rows, independent of map execution. Output 2: status and if possible physical full/half local map on one source-valid common-point parent. Store both outputs in GitHub Actions and report failures exactly.
+
+Original gate local-error <2e-4, width <2e-3. Interval 160/131072 accepted; [160,161] original FAIL. No central promotion. REI reported 28/88, working 33/88, fast 4/7; canonical delta 0. Need all-X joint source-correlated D_h and one unchanged-gate retry for genuine central acceptance.
