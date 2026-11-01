@@ -1,0 +1,69 @@
+name: rei-igm-original-26event-parent-directions
+on:
+  push:
+    branches: [research/rei-igm-tick160-directional-26event-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_igm_tick160_correlated_directions_20261101/**'
+      - '.github/workflows/rei-igm-original-26event-parent-directions.yml'
+permissions:
+  contents: read
+jobs:
+  original-26event-directions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [LOCAL_NEUTRAL_HAZARD_PRIMARY, RECOMBINATION_WEIGHTED_AUDITOR, SCRIPT_SELF_SHIELDING_AUDITOR]
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install unchanged source-owner pinned runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Test new physics construction and negative controls
+        run: |
+          python -m py_compile research/rei_igm_tick160_correlated_directions_20261101/directional_probe.py
+          python -m unittest discover -s research/rei_igm_tick160_correlated_directions_20261101 -p 'test_*.py' -v
+      - name: Source-authentic nine correlated-direction parent candidates
+        run: |
+          python research/rei_igm_tick160_correlated_directions_20261101/directional_probe.py --repo . --lane '${{ matrix.lane }}' --output 'experiment/${{ matrix.lane }}'
+      - name: Verify sample count and exact input locks, no false global admission
+        run: |
+          python - <<'PY'
+          import json, pathlib, gzip, csv, hashlib
+          for p in pathlib.Path('experiment').glob('*/RESULT.json'):
+              a=json.loads(p.read_text())
+              assert a['overall']=='SCOPED_POINT_SCIENCE_COMPLETE'
+              assert a['original_archive_sha256']=='a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b'
+              assert a['original_kernel_sha256']=='579df3cc99987dcce9205166752570bdaf4c7cb3640c525be6da260d94b8e644'
+              assert a['successful_candidate_points']==9
+              assert a['new_canonical_nodes']==0
+              assert a['new_model_rows']==414720
+              f=p.parent/a['csv_file']
+              assert hashlib.sha256(f.read_bytes()).hexdigest()==a['csv_sha256']
+              with gzip.open(f,'rt',encoding='utf8',newline='') as z:
+                  rr=csv.reader(z)
+                  header=next(rr)
+                  assert header[0]=='case'
+                  count=sum(1 for row in rr if len(row)==len(header))
+              assert count==414720,count
+              print('ORIGINAL_26EVENT_DIRECTIONAL_SCIENCE',a['lane'],count,'CANONICAL_DELTA',0)
+          PY
+      - name: Preserve physical science or precise failed-phase evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-original-26event-parents-${{ matrix.lane }}
+          path: experiment/${{ matrix.lane }}/
+          if-no-files-found: warn
+          retention-days: 90
