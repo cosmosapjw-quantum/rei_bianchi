@@ -1,0 +1,48 @@
+name: rei-igm-tick160-real-26event-point-probe
+on:
+  push:
+    branches: [research/rei-igm-tick160-nonlinear-point-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_igm_tick160_nonlinear_point_20261101/**'
+      - '.github/workflows/rei-igm-tick160-real-26event-point-probe.yml'
+permissions:
+  contents: read
+jobs:
+  frozen-source-map-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [LOCAL_NEUTRAL_HAZARD_PRIMARY, RECOMBINATION_WEIGHTED_AUDITOR, SCRIPT_SELF_SHIELDING_AUDITOR]
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned original source runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Test invariant probes
+        run: |
+          python -m py_compile research/rei_igm_tick160_nonlinear_point_20261101/probe.py
+          python -m unittest discover -s research/rei_igm_tick160_nonlinear_point_20261101/tests -v
+          python -O -m unittest discover -s research/rei_igm_tick160_nonlinear_point_20261101/tests -v
+      - name: Execute unchanged 26-event source-backed full/half map on original tick160 candidate
+        run: |
+          python research/rei_igm_tick160_nonlinear_point_20261101/probe.py --repo . --lane '${{ matrix.lane }}' --output 'source_science/${{ matrix.lane }}'
+      - name: Preserve physical result OR failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tick160-original-26event-${{ matrix.lane }}
+          path: source_science/${{ matrix.lane }}/
+          if-no-files-found: warn
+          retention-days: 90
