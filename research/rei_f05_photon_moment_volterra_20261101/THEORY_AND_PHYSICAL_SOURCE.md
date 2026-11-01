@@ -32,3 +32,22 @@ Ka-Hou Leong, Avery Meiksin, Althea Lai et al., *A comparison of numerical metho
 **Reuse boundary:** original accepted source array and PR354 V2 source/ledger data are previously observed implementation-level evidence. This theory creates neither a new astrophysical photon transport provider nor a validated continuous H/He trajectory. Original-source `c_s`, denominators and `excess_eV` are authoritative model data; a general theorem about that reduced source must not be conflated with full time-retarded radiative transfer.
 
 **R2 backup/publish:** R2 commit pushed to ONE Draft PR #355. DAG 28/88 central, 33/88 working, 4/7 fast, canonical delta 0. Drift watchdog: original physics source/literature directly mapped, no adjacent atlas.
+## R3 | Exact definitions, dimensions and nonlocal dependence
+
+At fixed proper time `t` and spatial node `i=1,…,46080`, define `S_s(t)=Σ_i p_{is}(t)` for absorbing `s∈{HI,HeI,HeII}`, with the nuclei-conserving species counts `p_is` in particles. Let `N_H^Σ=Σ_i N_H,i` and `N_He^Σ=Σ_i N_He,i`. The source coefficients are EXACTLY
+`a_Hg=c_Hg/N_H^Σ, a_HeIg=c_HeIg/N_He^Σ, a_HeIIg=c_HeIIg/N_H^Σ`,
+where `c_Hg=NH0_CM3*(1+zcos)^2*MPC_CM*σ_Hg`, `c_HeIg=YHE*c'_g`, `c_HeIIg=YHE*c''_g`, and `σ` is the original species/group photoionization cross section when owner support is present (else zero). `NH0_CM3 [cm^-3]*MPC_CM [cm]*σ [cm^2]` is dimensionless, so `a_sg` is per-particle, `a_sg S_s` dimensionless, and `D_g=E_g+Σ_s a_sg S_s` dimensionless with `E_g=external_subgrid[g]≥0`.
+
+Let `J_g=forcing.current[g]≥0` denote original resolved+subgrid group current with physical photo-count flux units (particle ionization events/s in original code), and `ε_sg=excess_eV[s,g]*EV_ERG` in erg/absorbed photon. The native source defines
+`r_isg=J_g a_sg p_is/D_g` (particle counts/s) and `Q_i^primary=Σ_{s,g} ε_sg r_isg` (erg/s).
+Here `E_g` is a denominator allocation to an external/subgrid owner, **not** an actual additional independent resolved H/He species. Require `D_g>0` for all active groups; group4 may have extremely small `J_4`, but it is still a syntactically existing group and must not be silently deleted.
+
+The global photon coupling has exactly three input moments `S_s` even though the 4 groups produce different `D_g`. The right-hand side for original reduced physical per-cell variables `y_i=(x_HII,x_HeII,x_HeIII,ln(T_i/K))` can be written `dy_i/dt=f_i(t,y_i,S(y))` with all local electron, OTS, photoheat and cooling physics retained. For fixed H and He nuclei,
+`S_HI=Σ_i N_H,i(1-x_HII,i)`,
+`S_HeI=Σ_i N_He,i(1-x_HeII,i-x_HeIII,i)`,
+`S_HeII=Σ_i N_He,i x_HeII,i`.
+Thus `S(y)=S_*+V y` is an affine **constant 3×(4N)** population moment map, V coefficients in particles. Temperature coordinates do not enter V directly. The temporal source is nonautonomous through `J_g(t), E_g(t), σ_g(t), zcos(t), H(t)` but these are externally prescribed by the original forcing, not extra dynamical global moments. The individual `f_i` has units s^-1 in all dimensionless coordinates.
+
+**Regularity:** exact derivatives require strictly positive active `D_g,S_s,p_is,T_i`, fixed table/branch cell, and differentiability of local collision/OTS functions. Across a branch kink a smooth-Jacobian theorem is inapplicable without a separate piecewise/one-sided bound; the algebraic finite photon allocation identities below remain valid wherever denominators remain positive. Do not infer the original full nonlinear 26-event flow is differentiable across every accepted parent interval merely because one tick has zero detected table events.
+
+**R3 backup/publish:** exact original coefficient asymmetry and physical state conventions fixed; DAG 28/88 · 33/88 · 4/7, canonical 0. Drift watchdog PASS.
