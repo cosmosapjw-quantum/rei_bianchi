@@ -25,6 +25,12 @@ class Tests(unittest.TestCase):
    np.testing.assert_allclose(p[:,:2].sum(axis=1),self.h,atol=1e-14)
    np.testing.assert_allclose(p[:,2:5].sum(axis=1),self.he,atol=1e-14)
    self.assertTrue((t>=self.tlo).all() and (t<=self.thi).all())
+ def test_density_scaled_nuclei_preserved(self):
+  scale=1e9
+  for case in m.CASES:
+   p,t=m.candidate(self.lo*scale,self.hi*scale,self.tlo,self.thi,self.h*scale,self.he*scale,case)
+   np.testing.assert_allclose(p[:,0]+p[:,1],self.h*scale,rtol=3e-15,atol=3e-15)
+   np.testing.assert_allclose(np.sum(p[:,2:5],axis=1),self.he*scale,rtol=3e-15,atol=3e-15)
  def test_thermal_variation_is_nontrivial(self):
   _,tm=m.candidate(self.lo,self.hi,self.tlo,self.thi,self.h,self.he,'logT_minus')
   _,tp=m.candidate(self.lo,self.hi,self.tlo,self.thi,self.h,self.he,'logT_plus')

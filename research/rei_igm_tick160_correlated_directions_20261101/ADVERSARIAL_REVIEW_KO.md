@@ -7,3 +7,7 @@
 5. **Avoid central drift**: A new result is useful only if it discriminates important parent-direction sensitivity and informs the actual joint derivative enclosure. No expansion to E/B or auxiliary atomic rates, no PR chain beyond this bounded experiment.
 6. **Independent review levels**: symbolic algebra and same-context implementation testing are separate from a second author's formal physics review. Distinct author = NOT_RUN.
 7. **Original failure preserved**: `[160,161]` old one-tick cross-box `2.1245050576368385e-4 >2e-4` with 3/131072 accepted endpoints remains true even if point samples are small.
+
+## Observed CI failure and targeted correction (addendum)
+
+First source-owned CI (run `41273828058`) reached all three original lanes but failed in the **new candidate construction**, before any nonlinear map, at `ValueError: not conserving source H/He nuclei`. The new code had mistakenly used an absolute `2e-14` particle-density residual cutoff, unlike the original parent candidate's `atol=rtol=3e-15` scale-aware check. This is an implementation/units issue, not a negative physical result, and the original `<2e-4` science gate is unchanged. The corrected construction uses the same original scale-aware nuclei test and adds a high-density-scaled synthetic regression; local tests 11/11 normal and 11/11 optimized pass. The originally failed CI is kept as negative implementation evidence and requires an actual fresh CI execution before physical acceptance claims.

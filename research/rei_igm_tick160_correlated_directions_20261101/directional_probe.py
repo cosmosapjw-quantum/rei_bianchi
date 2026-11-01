@@ -77,7 +77,10 @@ def candidate(poplo, pophi, tlo, thi, total_h, total_he, case, frac=STRESS_FRACT
         raise ValueError('candidate outside positive marginal parent')
     if np.any(t<tlo-1e-14) or np.any(t>thi+1e-14) or np.any(~np.isfinite(t)):
         raise ValueError('temperature outside parent')
-    if np.max(abs((p[:,0]+p[:,1])-h))>2e-14 or np.max(abs(np.sum(p[:,2:5],axis=1)-he))>2e-14:
+    # Use original 26-event source's scale-aware conservation check rather
+    # than a global absolute 2e-14 cutoff (particle densities are not units).
+    # This is a candidate-construction check, NOT the 2e-4 error acceptance.
+    if not np.allclose(p[:,0]+p[:,1],h,atol=3e-15,rtol=3e-15) or not np.allclose(np.sum(p[:,2:5],axis=1),he,atol=3e-15,rtol=3e-15):
         raise ValueError('not conserving source H/He nuclei')
     return p,t
 
