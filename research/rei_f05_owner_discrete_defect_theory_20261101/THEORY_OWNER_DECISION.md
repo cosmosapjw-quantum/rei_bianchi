@@ -45,3 +45,17 @@ Reported independent original-source three-lane maxima (research-scope implement
 The original owner uses string classification `VALIDATED_LOCAL_ERROR_GATE_FAILURE`, which describes its **chosen sufficient enclosure failing its threshold**; it is not an established inequality that the true difference itself is above the gate. A scientific successor can retain the old row verbatim and make a new `V2_DIRECT_INCREMENT_CANDIDATE` verdict with its own proof identity. Replacing original worker response inside the old version conflicts with source/behavior provenance.
 
 **R3 preservation**: exact map definitions and source-type claim distinctions published on same PR. CENTRAL=28/88; WORKING=33/88; FAST=4/7; canonical Δ0. Drift watchdog PASS: this closes a real false-negative-certification ambiguity.
+
+### R4. Alternatives and chosen constructive route
+
+**Candidate A, exact legacy worker:** preserve `Y_F-Y_G` and the old classification forever, no new admissibility. Correct and backward compatible, but an overwide box can create certificate false negatives; stopping F05 here does not exploit proven original source-native increment information.
+
+**Candidate B, global common-parent Jacobian/Hessian with a uniform remainder:** in principle yields `D_h(x)=D_h(x_*)+J_D(x-x_*)+R_2(x)` over all 46080 cells and all shared source/clock states. Potentially sharp, but requires differentiating all original four source sites, thermal roots, OTS, table paths, and nonlocal photon moments. It is unnecessary **if** a direct all-domain interval inclusion already encloses `D_h`. It is not a scientifically mandatory prerequisite for the existing discrete-map difference predicate.
+
+**Candidate C, native-source common-parent direct increment enclosure:** exact `A δp=-(A-I)p_0` for original H2/He3 corrector and exact `δlnT=log1p(δU/U_0)-log1p(δn_e/Npart_0)`, followed by outward interval `I_D=I_F-I_1-I_2`. Three different independent algorithms (Krawczyk, residual M-matrix, Cramer) have already produced positive results on unchanged source. This is the **selected V2 discrete-difference witness**, conditioned on source validation, full-domain inclusion, and frozen roundoff trust. It is not permission to mutate historical owner outputs.
+
+**Candidate D, continuous-flow validated IVP:** separately construct an a priori trajectory enclosure and a continuous interpolant residual bound or B-series/Taylor remainder for `||Φ_h-F_h||`; potentially certifies continuum-local/global error. It serves a *different stronger assertion* and cannot be inferred from step doubling alone. Later required for a robust continuum physical trajectory claim, but not an invented condition for the original discrete-map gate if that gate only tests numerical map comparison.
+
+**Constructive selection:** C plus an explicit V1/V2 claim separation, with D as an admitted **open physical accuracy obligation**, not A or B as perpetual blockers. The novel useful result is whether this selection is logically permitted by the actual original acceptance semantics, not whether we can invent a fourth estimator. No additional source run scheduled.
+
+**R4 preservation:** four substantive alternatives recorded in one Draft PR and current decision narrowed. CENTRAL=28/88; WORKING=33/88; FAST=4/7; canonical Δ0. Drift watchdog PASS: no new source-only PR, no numeric optimization.
