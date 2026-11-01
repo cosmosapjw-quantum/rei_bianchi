@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Read actual frozen Aug-29 REI FLRW IGM accepted-state bytes, never mutate owners."""
-import argparse, hashlib, json, struct, tarfile
+import argparse, csv, gzip, hashlib, json, struct, tarfile
 from pathlib import Path
 import numpy as np
 
@@ -9,7 +9,7 @@ MAGIC=b"REIADP1\x00"
 N=46080
 KB=1.380649e-16
 
-def inspect_state(data,name):
+def inspect_state(data,name,output_dir=None):
     if not data.startswith(MAGIC):
         return None
     count=struct.unpack_from("<Q",data,len(MAGIC))[0]
@@ -36,7 +36,31 @@ def inspect_state(data,name):
     tl=np.exp(tlo);th=np.exp(thi)
     u_lo=1.5*KB*tl*(low.sum(axis=1)+el)/hh
     u_hi=1.5*KB*th*(high.sum(axis=1)+eh)/hl
+    xe_lo=el/hh;xe_hi=eh/hl
+    xhii_lo=low[:,1]/hh;xhii_hi=high[:,1]/hl
+    xheii_lo=low[:,3]/heh;xheii_hi=high[:,3]/hel
+    xheiii_lo=low[:,4]/heh;xheiii_hi=high[:,4]/hel
+    percentile_bands={}
+    for key,l,h in (("x_HII",xhii_lo,xhii_hi),("x_HeII",xheii_lo,xheii_hi),
+                    ("x_HeIII",xheiii_lo,xheiii_hi),("T_K",tl,th),
+                    ("xe_per_H",xe_lo,xe_hi),("U_thermal_erg_per_H",u_lo,u_hi)):
+        percentile_bands[key]={str(q):[float(np.percentile(l,q)),float(np.percentile(h,q))]
+                               for q in (1,5,25,50,75,95,99)}
+    lane=h.get("metadata",{}).get("lane","UNKNOWN")
+    body_sha256=hashlib.sha256(raw).hexdigest()
+    if output_dir is not None:
+        csvfile=output_dir/("NODEWISE_"+lane+"_46080_PHYSICAL.csv.gz")
+        names=("lane","node","x_HII_lo","x_HII_hi","x_HeII_lo","x_HeII_hi",
+          "x_HeIII_lo","x_HeIII_hi","T_K_lo","T_K_hi",
+          "xe_per_H_lo","xe_per_H_hi","U_thermal_erg_per_H_lo","U_thermal_erg_per_H_hi")
+        with gzip.open(csvfile,"wt",encoding="utf-8",newline="") as gz:
+            writer=csv.writer(gz);writer.writerow(names)
+            for i in range(N):
+                writer.writerow([lane,i,*[format(float(v[i]),".17g") for v in
+                    (xhii_lo,xhii_hi,xheii_lo,xheii_hi,xheiii_lo,xheiii_hi,
+                     tl,th,xe_lo,xe_hi,u_lo,u_hi)]])
     return {"member":name,"sha256":hashlib.sha256(data).hexdigest(),
+        "state_array_sha256":body_sha256,"percentiles":percentile_bands,
         "metadata":h.get("metadata",{}),"nodes":N,
         "x_HII":extrema(low[:,1]/hh,high[:,1]/hl),
         "x_HeII":extrema(low[:,3]/heh,high[:,3]/hel),
@@ -52,6 +76,7 @@ def main():
     digest=hashlib.sha256(x.archive.read_bytes()).hexdigest()
     if digest != EXPECTED_SHA:raise ValueError("IMMUTABLE_ARCHIVE_SHA_MISMATCH:"+digest)
     rows=[];names=[]
+    x.output.parent.mkdir(parents=True,exist_ok=True)
     with tarfile.open(x.archive,"r:gz") as z:
         for member in z:
             if not member.isfile():continue
@@ -60,7 +85,7 @@ def main():
             names.append({"name":member.name,"size":member.size})
             if 9 < member.size < 8000000:
                 data=z.extractfile(member).read()
-                row=inspect_state(data,member.name)
+                row=inspect_state(data,member.name,x.output.parent)
                 if row is not None:rows.append(row)
     output={"schema":"REI_FROZEN_REAL_STATE_READBACK_V1","archive_sha256":digest,
       "original_accepted_tick":160,"original_total_ticks":131072,"original_accepted_endpoints":3,
