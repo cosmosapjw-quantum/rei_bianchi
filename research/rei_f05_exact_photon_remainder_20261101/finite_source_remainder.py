@@ -32,15 +32,6 @@ def outward_positive(a):
     y=float(a)
     if not math.isfinite(y):raise OverflowError("rem bound not representable")
     return float(np.nextafter(y,np.inf))
-def finite_remainder_exact(x0,dx,j,c,e,totals0,deltas):
-    """One source-site cell: exact identity at fixed forcing, all binary64 input as reals."""
-    with localcontext() as ctx:
-        ctx.prec=100
-        J,C,E=D(j),D(c),D(e)
-        s0=[D(v) for v in totals0];sd=[D(v) for v in deltas]
-        d0=E+sum((C0*S for C0,S in zip([D(z) for z in totals0[3:]],s0)),Decimal(0)) if False else None
-        raise RuntimeError("Use source_site() for common multi-species owner")
-
 def algebraic_remainder(x0,dx,v,k):
     """Exact rational identity (1+v)>0: f−f0−f'δ=k(x0 v²−δx v)/(1+v)."""
     if 1+v<=0:raise ValueError("nonpositive owner denominator")
