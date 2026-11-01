@@ -64,3 +64,122 @@ Thus `S(y)=S_*+V y` is an affine **constant 3×(4N)** population moment map, V c
 **Minimal proof/work criterion:** exact 3-moment algebra and one 4-group original-source acceptance-tick witness. No physical spectrum synthesis, photon atlas, original worker mutation, further V2 process review or full 131072-step replay.
 
 **R4 backup/publish:** same Draft PR #355; CENTRAL=28/88, WORKING=33/88, FAST=4/7, canonical delta=0. Drift watchdog PASS: choose source-faithful exact physics, not representation bureaucracy.
+## R5 | Derived original photon-allocation, low-rank Jacobian and continuum error theorem
+
+### Theorem I: exact four-group absorption allocation, finite log shielding and heating
+
+For each active original photon group \(g\in\{0,1,2,3\}\), define \(u_{sg}=a_{sg}S_s\ge0\), \(D_g=E_g+\sum_s u_{sg}>0\), \(q_{sg}=u_{sg}/D_g\), \(q_{0g}=E_g/D_g\). All \(q\)'s are dimensionless, \(\sum_s q_{sg}+q_{0g}=1\). Source photoionization rate of cell \(i\), species \(s\), group \(g\) is \(r_{isg}=J_g a_{sg}p_{is}/D_g\) [events/s]. Exact summation over all physical cells and species gives
+
+\[
+ R_g^{\mathrm{resolved}}=\sum_{i,s}r_{isg}=J_g\sum_s q_{sg}=J_g(1-q_{0g}),\quad
+ R_g^{\mathrm{external}}=J_gq_{0g},\quad
+ R_g^{\mathrm{resolved}}+R_g^{\mathrm{external}}=J_g.
+\]
+
+This identity is an **original model photon-allocation identity**, not a solution of a retarded Boltzmann/radiative transfer equation. The grouped original primary gas heating is \(H_g=\sum_{i,s}\epsilon_{sg}r_{isg}=J_g\bar\epsilon_g\), \(\bar\epsilon_g=\sum_s\epsilon_{sg}q_{sg}\), units erg/s.
+
+Let \(\ell_k=\ln S_k\) for positive three source moments, and keep original group clock and forcing fixed. Derivatives are exactly
+
+\[
+ \frac{\partial\ln D_g}{\partial \ell_k}=q_{kg},\qquad
+ \frac{\partial q_{sg}}{\partial\ell_k}
+ =q_{sg}(\delta_{sk}-q_{kg}),\qquad
+ \nabla^2_{\ell}\ln D_g=\operatorname{diag}(q_g)-q_gq_g^{\mathsf T}\succeq0.
+\]
+
+Proof of PSD: for arbitrary real \(v\in\mathbb R^3\), augment with \(v_0=0\); its quadratic form is the variance \(\sum_{s=0}^3q_{sg}v_s^2-(\sum_{s=0}^3q_{sg}v_s)^2\ge0\). Thus group log-denominator is convex; at fixed positive local numerator the log photo rate is concave in the **three independent log source moments**. If \(E_g=0\), the Hessian has the all-ones null vector, since a common rescaling of all global opacity moments does not change the **relative allocation**.
+
+Further,
+
+\[
+ \frac{\partial R_g^{\mathrm{resolved}}}{\partial\ell_k}
+ =J_g q_{0g}q_{kg}\ge0,\qquad
+ \frac{\partial H_g}{\partial\ell_k}
+ =J_g q_{kg}(\epsilon_{kg}-\bar\epsilon_g).
+\]
+
+The first is a positive monotonic source-total response when external sink \(E_g>0\). For \(E_g=0\), \(R_g^{\mathrm{resolved}}=J_g\) is strictly independent of the moment composition: opacity reallocates an unchanged **resolved total** among HI, HeI and HeII. The **thermal heating generally changes** as the species' excess energies \(\epsilon_{kg}\) differ; common scaling leaves it invariant only for \(E_g=0\) at fixed \(J_g\). No assumption of exact cosmic total energy conservation is introduced.
+
+Finite variation is also exact, not only Taylor-local. If \(S_s'=S_s e^{\delta_s}\) while \(E_g,a_{sg},J_g\) are fixed, then
+
+\[
+ \frac{D_g'}{D_g}=q_{0g}+\sum_s q_{sg}e^{\delta_s},
+ \qquad e^{-M}\le D_g'/D_g\le e^M,\quad
+ M=\|\delta\|_\infty.
+\]
+
+Hence \(|\ln(D_g'/D_g)|\le M\) on the whole positive moment cone, independent of 46,080 spatial nodes. At a supported positive local rate \(r_{isg}>0\), its finite response is \(\ln(r'_{isg}/r_{isg})=\ln(p'_{is}/p_{is})-\ln(D'_g/D_g)\); external clock variation requires another term and is **not** included in this fixed-time identity. If a group current or species channel is zero, use the allocation identity rather than taking an undefined logarithm.
+
+### Theorem II: exact rank-three nonlocal continuous H/He/thermal Jacobian
+
+Use conserved per-cell nuclei \(N_{H,i},N_{He,i}>0\) and dimensionless physical state
+\(y_i=(x_{HII,i},x_{HeII,i},x_{HeIII,i},z_i)\), \(z_i=\ln(T_i/\mathrm K)\). The exact original continuous source can be expressed \(f_i(t,y_i,S(y))\), where all locally resolved photo, 26-event OTS, electron-density, recombination, cooling and expansion terms remain in \(f_i\), and
+
+\[
+ S(y)=S_*+V y,\qquad V_i=
+ \begin{pmatrix}
+ -N_{H,i}&0&0&0\\
+ 0&-N_{He,i}&-N_{He,i}&0\\
+ 0&N_{He,i}&0&0
+ \end{pmatrix}.
+\]
+
+Here \(V\in\mathbb R^{3\times4N}\) has particle-count coefficients. For differentiable source branches with \(D_g>0\),
+
+\[
+ D_yf(t,y)=A(t,y)+U(t,y)V,\quad
+ A=\operatorname{blockdiag}_{i=1}^N\bigl[\partial_{y_i}f_i\bigr]_{S\;\mathrm{fixed}},
+ \quad U_{ik}=\left[\frac{\partial f_i}{\partial S_k}\right]_{y_i\;\mathrm{fixed}},
+\]
+
+with \(U\in\mathbb R^{4N\times3}\). Thus the **entire intercell Jacobian contribution** has rank \(\le3\), not \(\le4\) despite four photon groups, and not \(O(N)\). This is a structural theorem for the original REI instantaneous source and its local 26-event physics, not an assumption of weak coupling. The full Jacobian \(A+UV\) need not have rank three or be stable.
+
+Explicit photon derivatives are \(\partial_{S_k}r_{isg}=-r_{isg}a_{kg}/D_g\) [events/(s·particle)] for fixed local populations. Their contribution to the log-temperature RHS is
+
+\[
+ U_{z_i,k}=\frac{1}{U_i^{\rm gas}}\partial_{S_k}R_i
+ -\frac{1}{N_{{\rm part},i}}\partial_{S_k}\dot N_{{\rm part},i},
+ \quad
+ \partial_{S_k}R_i=
+ -\sum_{s,g} \epsilon_{sg}r_{isg}\frac{a_{kg}}{D_g},
+\]
+
+where the original OTS/cooling/expansion terms depend only locally at fixed \(S\). The particle derivative includes ionization electron creation, so omitting it would incorrectly reduce the thermal nonlocal coupling to direct photoheating alone. \(U_{z_i,k}\) has units \(1/(\mathrm{s}\cdot\mathrm{particle})\); multiplying by \(V\) yields \(1/\mathrm{s}\). Hydrogen and helium nuclear-conservation left-null vectors also annihilate the population rows of each source-coupling column.
+
+### Theorem III: exact three-moment Volterra reduction of continuum error
+
+Let \(y\) be an exact original continuous solution over \([t_0,t_1]\), and \(\hat y\) a piecewise \(C^1\), physically admissible approximate history with residual \(r(t)=\dot{\hat y}(t)-f(t,\hat y(t))\). Assume the segment between \(y(t)\) and \(\hat y(t)\) lies in a smooth single-table-branch physical tube with positive original group denominators; let \(e=y-\hat y\). By the mean-value identity and constant \(V\),
+
+\[
+ \dot e=A(t)e+U(t)Ve-r(t)
+\]
+
+for path-averaged **local block-diagonal** \(A(t)\) and **three-column** \(U(t)\). Let \(\Phi_A(t,s)\) be the fundamental propagator of the unknown local-block \(A(t)\). Define the exact three-vector \(m(t)=Ve(t)\) [particle count]. Variation of constants yields
+
+\[
+ e(t)=\Phi_A(t,t_0)e_0-\int_{t_0}^t\Phi_A(t,s)r(s)\,ds
+       +\int_{t_0}^t\Phi_A(t,s)U(s)m(s)\,ds,
+\]
+
+\[
+ \boxed{m(t)=g(t)+\int_{t_0}^t K(t,s)m(s)\,ds},\quad
+ g(t)=V\Phi_A(t,t_0)e_0-\int_{t_0}^t V\Phi_A(t,s)r(s)\,ds,\quad
+ K(t,s)=V\Phi_A(t,s)U(s)\in\mathbb R^{3\times3}.
+\]
+
+This is exact for the full nonlinear **error dynamics** along the unknown segment, not a closed 3-ODE approximation of the original chemistry. It retains all 46k local 4×4 propagators, yet reduces the only intercell memory kernel to **3×3**. A nonlocal Hessian or a separate global photon IVP is not required to state it.
+
+For a computable error bound, one must actually construct a physically valid tube and outward bounds \(\|r(t)\|\le\rho(t)\), \(\|\Phi_A(t,s)\|\le M_A(t,s)\), \(\|U(s)\|\le u(s)\), and the matching \(V\). Then
+\[
+ \|m(t)\|\le G(t)+\int_{t_0}^t \|V\|M_A(t,s)u(s)\|m(s)\|\,ds,
+\]
+\[
+ G(t)=\|V\|M_A(t,t_0)\|e_0\|+\int_{t_0}^t\|V\|M_A(t,s)\rho(s)\,ds.
+\]
+A logarithmic norm \(\mu_W(A(t))\) can provide \(M_A(t,s)=\exp(\int_s^t\mu_W(A(\tau))\,d\tau)\), with consistent dimensionless weighted population/thermal norm. For any interval where \(G(t)\le G_*\) and kernel norm \(\le\kappa\) (units \(1/\mathrm s\)), the Volterra/Gronwall estimate gives \(\|m(t)\|\le G_*e^{\kappa(t-t_0)}\). An additional small-gain sufficient bound is \(G_* /(1-\kappa h)\) when \(\kappa h<1\); small-gain is *not* required for existence of the Volterra solution.
+
+For numerical conditioning one may use positive fixed reference moment values \(D_*=\operatorname{diag}(S_{*,HI},S_{*,HeI},S_{*,HeII})\) and define \(\tilde m=D_*^{-1}m\), \(\tilde V=D_*^{-1}V\), \(\tilde U=UD_*\), yielding a dimensionless 3×3 kernel \(\tilde V\Phi_A\tilde U\) with the same physical spectrum under fixed similarity. This scaling is **not** a change to the source model or its opacity coefficients.
+
+**Admission boundary:** finite photon allocation and rank-three factorization are **derived exact source theorems**, conditional smooth-branch. The Volterra identity is **derived exact given an exact trajectory and approximate history**, but **no original 46k time-continuous residual, tube, logarithmic norm or continuum error numerical certificate has been run** in this R5 stage. Original tick161 V2 discrete candidate is not a continuum solution certificate.
+
+**R5 backup/publish:** an actual new low-rank physical theorem and conditional continuum validation route, not a new owner gate. CENTRAL=28/88, WORKING=33/88, FAST=4/7, canonical delta0; drift watchdog PASS.
