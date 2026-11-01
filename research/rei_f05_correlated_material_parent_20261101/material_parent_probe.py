@@ -117,7 +117,7 @@ def calculate(repo,lane,out):
     if prior.sha256(worker.KERNEL_PATH)!=prior.SOURCE_KERNEL_SHA256:
         raise ValueError('immutable original 26-event source kernel drift')
     dec,locked=prior.source_state(stage,lane,worker.state_io)
-    if locked['accepted_array_sha256']!=EXPECTED_SOURCE_BODY_SHA:raise ValueError('source parent byte drift')
+    if locked['accepted_array_sha256']!=prior.SOURCE_ACCEPTED_ARRAY_SHA256:raise ValueError('source parent byte drift')
     base,_,_,H,He=worker._context(m,lane)
     samples,path_info=correlated_points(dec.population_lower,dec.population_upper,
                    dec.log_temperature_lower,dec.log_temperature_upper,H,He)
