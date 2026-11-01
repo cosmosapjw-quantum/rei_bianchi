@@ -1,0 +1,75 @@
+name: rei-f05-v2-scoped-source-owner-decision
+on:
+  push:
+    branches: [research/rei-f05-v2-versioned-owner-decision-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_f05_v2_owner_decision_20261101/**'
+      - '.github/workflows/rei-f05-v2-scoped-source-owner-decision.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  scoped-source-owner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install original pinned scientific runtime
+        run: |
+          stage=$(find stages -maxdepth 1 -type d -name '*UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY' -print -quit)
+          test -n "$stage"
+          python -m pip install -r "$stage/requirements-runtime.txt"
+          python -m pip check
+      - name: Fail-closed versioned owner negative tests
+        run: |
+          python -m py_compile research/rei_f05_v2_owner_decision_20261101/versioned_owner.py
+          python -m unittest discover -s research/rei_f05_v2_owner_decision_20261101/tests -v
+          python -O -m unittest discover -s research/rei_f05_v2_owner_decision_20261101/tests -v
+      - name: Retrieve pinned PR354 real 46080-cell source artifact (no extra IVP)
+        uses: actions/download-artifact@v4
+        with:
+          name: rei-original-f05-owner-v2-shadow-46080-hhe-source
+          run-id: 41306708556
+          github-token: '${{ github.token }}'
+          path: upstream_science
+      - name: Locate and verify exact source-native V2 evidence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          files=list(Path('upstream_science').rglob('V2_RECEIPT.json'))
+          assert len(files)==3, (len(files),files)
+          roots={str(x.parent.parent) for x in files}
+          assert len(roots)==1, roots
+          Path('shadow_root.txt').write_text(next(iter(roots)))
+          print('PINNED_SOURCE_ARTIFACT',sorted(str(x) for x in files))
+          PY
+          python research/rei_f05_v2_owner_decision_20261101/versioned_owner.py --repo . --shadow "$(cat shadow_root.txt)" --out scoped_v2_ci
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('scoped_v2_ci/VERSIONED_SOURCE_OWNER_DECISION.json').read_text())
+          assert r['status']=='V2_SOURCE_SCOPED_CHECK_PASS_NO_OFFICIAL_ADMISSION'
+          assert r['pinned_runtime'] and r['canonical_delta']==0
+          assert not r['canonical_tick161_admitted'] and r['original_V1_failure_preserved']
+          assert len(r['shape_lanes'])==3 and r['physical_datasets']==1
+          assert r['first_0_to_64_exact_replay']=='NOT_RUN'
+          assert r['original_correlated_increment_physics']['status']=='NOT_RUN_NO_ORIGINAL_INCREMENT_SOURCE'
+          print('V2_SCOPED_SOURCE_ONLY_NOT_CANONICAL_28_OF_88')
+          PY
+      - name: Preserve pinned scope receipt including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-f05-v2-scoped-versioned-source-owner-receipt
+          path: scoped_v2_ci/
+          if-no-files-found: warn
+          retention-days: 90
