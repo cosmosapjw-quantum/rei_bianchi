@@ -106,7 +106,12 @@ def physics_snapshot(fb,src,mod,model,pop,temp,t,nh,nhe):
             "minimum_eigenvalue":float(np.min(eig)),
             "determinant":float(np.linalg.det(J))
         })
-    original=fb.original_source_interval(model,mod,pop,force)
+    # Original PR332 helper accepts a point ndarray, while run_step supplies an
+    # interval-valued source parent. Evaluate the ORIGINAL source on its whole
+    # interval rather than collapsing it to the selected representative.
+    populations=tuple(mod._I(np.asarray(pop.lo)[:,k],np.asarray(pop.hi)[:,k]) for k in range(5))
+    original_components=model._explicit_photo_fields(populations,force)
+    original=[mod.iv.sum_interval(q) for q in original_components]
     for i in range(3):
         q=float(np.sum(rows[:,i]))
         scale=max(1e-100,abs(q))
