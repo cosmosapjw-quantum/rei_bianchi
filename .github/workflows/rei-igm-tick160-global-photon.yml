@@ -1,0 +1,71 @@
+name: REI original 26-event three-moment photon-source competition
+on:
+  push:
+    branches: [research/rei-igm-tick160-global-photon-susceptibility-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_igm_tick160_global_photon_20261101/**'
+      - '.github/workflows/rei-igm-tick160-global-photon.yml'
+permissions: {contents: read}
+jobs:
+  original-source-moments:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Original REI runtime from immutable owner
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Verify 2026-08-29 original source bytes
+        run: |
+          echo 'a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz' | sha256sum -c -
+      - name: Local-source and analytic structural tests
+        run: |
+          python -m py_compile research/rei_igm_tick160_global_photon_20261101/photon_global_feedback.py
+          python -m unittest discover -s research/rei_igm_tick160_global_photon_20261101/tests -v
+          python -O -m unittest discover -s research/rei_igm_tick160_global_photon_20261101/tests -v
+      - name: Run actual 46,080-node source moment and photon feedback physics
+        run: |
+          python research/rei_igm_tick160_global_photon_20261101/photon_global_feedback.py --repo . --out physical_output
+      - name: Validate generated data before packaging
+        run: |
+          python - <<'PY'
+          import csv,gzip,json,hashlib,math,pathlib
+          root=pathlib.Path('physical_output')
+          x=json.loads((root/'RESULT.json').read_text())
+          assert x['unique_original_physical_nodes']==46080
+          assert x['new_model_node_rows']==46080 and x['source_group_rows']==12
+          assert x['canonical_delta']==0 and x['canonical_dag_reported']=='28/88'
+          assert x['original_160_161_local_error']>x['locked_gate']==2e-4
+          assert x['first_canonical_interval']=='BLOCKED'
+          assert all(y['exact_source_operator_inclusion'] for y in x['snapshots'])
+          assert all(d['same_clock_jacobian_path_error']<5e-13 for d in x['same_clock_material_counterfactual'])
+          f=root/x['nodewise_derivative_csv']
+          assert hashlib.sha256(f.read_bytes()).hexdigest()==x['nodewise_csv_sha256']
+          with gzip.open(f,'rt') as fd:
+            rows=list(csv.DictReader(fd))
+          assert len(rows)==46080
+          assert all(math.isfinite(float(v)) for row in rows for k,v in row.items() if k!='node')
+          print('ACTUAL_26EVENT_NODEWISE_ROWS',len(rows),'SOURCE_GROUP_ROWS',len(x['group_rows']),'CANONICAL_DELTA',0)
+          PY
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-igm-real-46080-global-photon-moment-jacobian
+          path: |
+            physical_output/
+            research/rei_igm_tick160_global_photon_20261101/photon_global_feedback.py
+            research/rei_igm_tick160_global_photon_20261101/tests/
+            research/rei_igm_tick160_global_photon_20261101/THEORY_KO.md
+            research/rei_igm_tick160_global_photon_20261101/STAGE_LEDGER.json
+          if-no-files-found: warn
+          retention-days: 90
