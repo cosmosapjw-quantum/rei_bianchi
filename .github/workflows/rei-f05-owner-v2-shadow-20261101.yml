@@ -1,0 +1,81 @@
+name: rei-f05-original-owner-v2-shadow-20261101
+on:
+  push:
+    branches: [research/rei-f05-owner-v2-shadow-admission-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_f05_owner_v2_shadow_20261101/**'
+      - '.github/workflows/rei-f05-owner-v2-shadow-20261101.yml'
+permissions:
+  contents: read
+jobs:
+  original-native-owner-v2-shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install original 26-event source-owner pinned physical runtime
+        run: |
+          stage=$(find stages -maxdepth 1 -type d -name '*UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY' -print -quit)
+          test -n "$stage" && test -f "$stage/requirements-runtime.txt"
+          python -m pip install -r "$stage/requirements-runtime.txt"
+          python -m pip check
+          python - <<'PY'
+          import numpy,pandas,scipy
+          assert numpy.__version__=="2.3.5"
+          assert pandas.__version__=="2.2.3"
+          assert scipy.__version__=="1.17.0"
+          print("PINNED_SOURCE_RUNTIME",numpy.__version__,pandas.__version__,scipy.__version__)
+          PY
+      - name: Provenance, original source and negative V2 shadow tests
+        run: |
+          python -m py_compile research/rei_f05_owner_v2_shadow_20261101/owner_v2_shadow.py
+          python -m py_compile research/rei_f05_owner_v2_shadow_20261101/audit_v2.py
+          python -m unittest discover -s research/rei_f05_owner_v2_shadow_20261101/tests -v
+          python -O -m unittest discover -s research/rei_f05_owner_v2_shadow_20261101/tests -v
+          python -m unittest discover -s research/rei_f05_mmatrix_residual_20261101/tests -v
+          python -m unittest discover -s research/rei_f05_common_parent_increments_20261101/tests -v
+      - name: Recompute prior real original HHe tick161 physical preview for state agreement
+        run: |
+          python research/rei_f05_original_tick161_preview_20261101/owner_tick161_preview.py --repo . --lane LOCAL_NEUTRAL_HAZARD_PRIMARY --out prior_source/primary
+          python research/rei_f05_original_tick161_preview_20261101/owner_tick161_preview.py --repo . --lane RECOMBINATION_WEIGHTED_AUDITOR --out prior_source/recomb
+          python research/rei_f05_original_tick161_preview_20261101/owner_tick161_preview.py --repo . --lane SCRIPT_SELF_SHIELDING_AUDITOR --out prior_source/shield
+      - name: Execute original 26-event native owner V2 shadow on all three source lanes
+        run: |
+          python research/rei_f05_owner_v2_shadow_20261101/owner_v2_shadow.py --repo . --lane LOCAL_NEUTRAL_HAZARD_PRIMARY --out shadow_v2/primary
+          python research/rei_f05_owner_v2_shadow_20261101/owner_v2_shadow.py --repo . --lane RECOMBINATION_WEIGHTED_AUDITOR --out shadow_v2/recomb
+          python research/rei_f05_owner_v2_shadow_20261101/owner_v2_shadow.py --repo . --lane SCRIPT_SELF_SHIELDING_AUDITOR --out shadow_v2/shield
+      - name: Original 14 raw photon/OTS/energy ledger owner policy, real state and immutable historical failure
+        run: |
+          python research/rei_f05_owner_v2_shadow_20261101/audit_v2.py --root shadow_v2 --pr352 prior_source
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("shadow_v2/V2_INDEPENDENT_AUDIT.json").read_text())
+          assert x["status"]=="PASS_SOURCE_NATIVE_V2_SHADOW_ONLY"
+          assert x["source_datasets"]==1 and x["physical_nodes"]==46080
+          assert len(x["shape_lanes"])==3
+          assert all(z["old_logT_upper"]>2e-4 and z["new_logT_upper"]<2e-4 for z in x["shape_lanes"])
+          assert all(z["original_14_ledger"]=="PASS" for z in x["shape_lanes"])
+          assert x["official_accepted_tick"]=="160/131072" and x["canonical_delta"]==0
+          assert x["original_authoritative_owner_admission"]=="NOT_RUN"
+          print("REAL_ORIGINAL_HHE_F05_V2_SOURCE_SHADOW_PASS_3_LANES_ORIGINAL_DAG_HOLD")
+          PY
+      - name: Preserve all actual original-source HHe physical V2 candidate data or precise failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-original-f05-owner-v2-shadow-46080-hhe-source
+          path: |
+            shadow_v2/
+            prior_source/
+          if-no-files-found: warn
+          retention-days: 90
