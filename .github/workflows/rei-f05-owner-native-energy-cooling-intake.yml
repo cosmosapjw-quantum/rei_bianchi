@@ -1,0 +1,71 @@
+name: REI F05 original H excitation versus photon energy source owner
+on:
+  push:
+    branches:
+      - research/rei-f05-owner-native-energy-cooling-intake-20261102
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-physical-owner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch and SHA-verify original sourced F05 donor results
+        shell: bash
+        run: |
+          set -euo pipefail
+          root=research/rei_f05_owner_cooling_photoenergy_20261102
+          mkdir -p "$root/source_inputs" "$root/results"
+          he=https://raw.githubusercontent.com/cosmosapjw-quantum/BASS_HE/64e121a1980358134e59b303414c2d54964360de/research/rei_f05_native_photon_chemical_energy_20261101/results
+          cr=https://raw.githubusercontent.com/cosmosapjw-quantum/bass_cr/7c6c0c4a9d025dc72a80de6bddf2865cb68690b4/research/cr_rei_f05_2p_legacy_partition_20261101
+          curl -fLsS --retry 3 "$he/NATIVE_REI_T160_FOUR_GROUP_THREE_SPECIES_PHOTOENERGY_12ROWS.csv" -o "$root/source_inputs/he149.csv"
+          curl -fLsS --retry 3 "$he/SCIENCE_RESULT.json" -o "$root/source_inputs/he149.json"
+          curl -fLsS --retry 3 "$cr/ORIGINAL_REI_F05_2P_LEGACY_COOLING_PARTITION_12528.csv.gz" -o "$root/source_inputs/cr162.csv.gz"
+          curl -fLsS --retry 3 "$cr/RESULT.json" -o "$root/source_inputs/cr162.json"
+          printf '%s  %s\n' 73f1c739ab1ea3d940abca44edacca4a54e94e3a937a25a98b63fd065bd8bfc3 "$root/source_inputs/he149.csv" | sha256sum -c -
+          printf '%s  %s\n' d0250b71cc672429ae7da2c043363e8c6b8f0b62c5c59ed8e4f784e40f4c3cf8 "$root/source_inputs/he149.json" | sha256sum -c -
+          printf '%s  %s\n' 0ba8549b289d5d3656afb7957fbc0e585fc6182f070e3ebe839bfc0d24c86e9c "$root/source_inputs/cr162.csv.gz" | sha256sum -c -
+          printf '%s  %s\n' 0ea4e8cb985f018ce35f69fa874638170e7a693d379f61da72935ed381a7a693 "$root/source_inputs/cr162.json" | sha256sum -c -
+      - name: Compute actual source-based selected physical energy comparison
+        shell: bash
+        run: |
+          set -euo pipefail
+          root=research/rei_f05_owner_cooling_photoenergy_20261102
+          owner=research/rei_f05_owner_original64_rust_20261101/results/OWNER_NATIVE_T160_PHOTON_BUDGET.json
+          git hash-object "$owner" | grep -x '166b017439841a6bc604025169a4fdc41afcb3d1'
+          set -- --he-csv "$root/source_inputs/he149.csv" --he-json "$root/source_inputs/he149.json" --cr-csv "$root/source_inputs/cr162.csv.gz" --cr-json "$root/source_inputs/cr162.json" --owner-json "$owner"
+          python3 "$root/consume_original_sources.py" "$@" --output "$root/results/OWNER_T160_PHOTOHEAT_VS_LEGACY_COOLING.json"
+          python3 -O "$root/consume_original_sources.py" "$@" --output "$root/results/OWNER_T160_PHOTOHEAT_VS_LEGACY_COOLING_OPT.json"
+          cmp "$root/results/OWNER_T160_PHOTOHEAT_VS_LEGACY_COOLING.json" "$root/results/OWNER_T160_PHOTOHEAT_VS_LEGACY_COOLING_OPT.json"
+          python3 "$root/independent_decimal_audit.py" "$@" --result "$root/results/OWNER_T160_PHOTOHEAT_VS_LEGACY_COOLING.json" --out "$root/results/OWNER_F05_INDEPENDENT_DECIMAL_AUDIT.json"
+          echo '===SOURCE_PHYSICAL_RESULT_BEGIN==='
+          cat "$root/results/OWNER_T160_PHOTOHEAT_VS_LEGACY_COOLING.json"
+          echo '===SOURCE_PHYSICAL_RESULT_END==='
+          echo '===INDEPENDENT_AUDIT_BEGIN==='
+          cat "$root/results/OWNER_F05_INDEPENDENT_DECIMAL_AUDIT.json"
+          echo '===INDEPENDENT_AUDIT_END==='
+          sha256sum "$root/results/OWNER_T160_PHOTOHEAT_VS_LEGACY_COOLING.json" "$root/results/OWNER_F05_INDEPENDENT_DECIMAL_AUDIT.json"
+      - name: Negative tampered source bytes must be rejected
+        shell: bash
+        run: |
+          set -euo pipefail
+          root=research/rei_f05_owner_cooling_photoenergy_20261102
+          owner=research/rei_f05_owner_original64_rust_20261101/results/OWNER_NATIVE_T160_PHOTON_BUDGET.json
+          cp "$root/source_inputs/he149.csv" "$root/results/tampered.csv"
+          printf '\nTAMPER\n' >> "$root/results/tampered.csv"
+          if python3 -O "$root/consume_original_sources.py" --he-csv "$root/results/tampered.csv" --he-json "$root/source_inputs/he149.json" --cr-csv "$root/source_inputs/cr162.csv.gz" --cr-json "$root/source_inputs/cr162.json" --owner-json "$owner" --output "$root/results/SHOULD_NOT_EXIST.json"; then
+            echo 'FAIL: source corrupt accepted' >&2; exit 1
+          fi
+          test ! -f "$root/results/SHOULD_NOT_EXIST.json"
+          echo 'PASS: invalid source never enters original physical computation'
+      - name: Retain original-source-derived physical output as GitHub Action artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-f05-source-original-photon-vs-cooling-thermal-owner
+          path: |
+            research/rei_f05_owner_cooling_photoenergy_20261102/results/OWNER_T160_PHOTOHEAT_VS_LEGACY_COOLING.json
+            research/rei_f05_owner_cooling_photoenergy_20261102/results/OWNER_F05_INDEPENDENT_DECIMAL_AUDIT.json
+          retention-days: 30
+          if-no-files-found: error
