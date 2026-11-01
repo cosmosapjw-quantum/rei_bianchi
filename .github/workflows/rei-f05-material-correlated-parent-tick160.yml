@@ -1,0 +1,53 @@
+name: rei-f05-material-correlated-parent-tick160
+on:
+  push:
+    branches: [research/rei-f05-source-correlated-material-parent-20261101]
+    paths:
+      - 'research/rei_f05_correlated_material_parent_20261101/material_parent_probe.py'
+      - 'research/rei_f05_correlated_material_parent_20261101/tests/**'
+      - '.github/workflows/rei-f05-material-correlated-parent-tick160.yml'
+  pull_request:
+    paths:
+      - 'research/rei_f05_correlated_material_parent_20261101/**'
+      - '.github/workflows/rei-f05-material-correlated-parent-tick160.yml'
+permissions:
+  contents: read
+jobs:
+  source-correlated-26event-two-points:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [LOCAL_NEUTRAL_HAZARD_PRIMARY, RECOMBINATION_WEIGHTED_AUDITOR, SCRIPT_SELF_SHIELDING_AUDITOR]
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Exact original pinned runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Original source and new material correlation invariants
+        run: |
+          python -m py_compile research/rei_f05_correlated_material_parent_20261101/material_parent_probe.py
+          python -m unittest discover -s research/rei_igm_tick160_nonlinear_point_20261101/tests -v
+          python -m unittest discover -s research/rei_f05_correlated_material_parent_20261101/tests -v
+          python -O -m unittest discover -s research/rei_f05_correlated_material_parent_20261101/tests -v
+      - name: Execute exact original nonlinear source full/half on two conserved physical parent points
+        run: |
+          python research/rei_f05_correlated_material_parent_20261101/material_parent_probe.py --repo . --lane '${{ matrix.lane }}' --out 'source_physics/${{ matrix.lane }}'
+      - name: Archive actual source physics or exact failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-f05-material-correlated-${{ matrix.lane }}
+          path: source_physics/${{ matrix.lane }}/
+          if-no-files-found: warn
+          retention-days: 90
