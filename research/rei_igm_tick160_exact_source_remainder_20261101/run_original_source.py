@@ -63,7 +63,7 @@ def run(repo,out):
         slo[j]=min(slo[j],s0[j]);shi[j]=max(shi[j],s0[j])
     base=mod.trial.fast.base.physical.PhysicalTrialSolver.from_repo(repo_root=repo,lane=orig.LANES[0])
     duration=float(base.forcing.duration_seconds(0))
-    dt=duration/F(orig.NT)
+    dt=F(duration)/F(orig.NT)
     tick0=duration*orig.L/orig.NT
     gam=float(mod.sdirk.GAMMA)
     sites=(('begin',tick0),('quarter_sdirk',tick0+gam*float(dt)/2),
