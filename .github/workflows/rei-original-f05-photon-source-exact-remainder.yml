@@ -1,0 +1,48 @@
+name: rei-original-f05-photon-source-exact-remainder
+on:
+  push:
+    branches: [research/rei-f05-original-photon-exact-remainder-20261101]
+    paths:
+      - 'research/rei_f05_original_photon_remainder_20261101/source_remainder.py'
+      - 'research/rei_f05_original_photon_remainder_20261101/tests/**'
+      - '.github/workflows/rei-original-f05-photon-source-exact-remainder.yml'
+  pull_request:
+    paths:
+      - 'research/rei_f05_original_photon_remainder_20261101/**'
+      - '.github/workflows/rei-original-f05-photon-source-exact-remainder.yml'
+permissions:
+  contents: read
+jobs:
+  original-source-exact-remainder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Original immutable REI runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Exact analytic and software controls
+        run: |
+          python -m py_compile research/rei_f05_original_photon_remainder_20261101/source_remainder.py
+          python -m unittest discover -s research/rei_f05_original_photon_remainder_20261101/tests -v
+          python -O -m unittest discover -s research/rei_f05_original_photon_remainder_20261101/tests -v
+      - name: Execute ORIGINAL 26-event source with ALL 46080 true parent enclosures
+        run: |
+          python research/rei_f05_original_photon_remainder_20261101/source_remainder.py --repo . --out source_original_physics
+      - name: Preserve physical output OR scoped failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-F05-tick160-source-remainder-46080
+          path: source_original_physics/
+          if-no-files-found: warn
+          retention-days: 90

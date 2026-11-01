@@ -1,0 +1,8 @@
+# R6/C9 bounded self-adversarial review
+1. **Novelty conflict**: PR338 exact finite source-bound is essentially the same as PR340 original static computation. Classify PR340 static part REUSED/OVERLAP, not first discovery or extra canonical admission.
+2. **Nonphysical counterfactual if overgeneralized**: Holding local numerator N_is fixed while globally changing S_s is not necessarily achievable by arbitrary real population perturbations. The exact r² expression is a **denominator-only conditional sensitivity**, not total-source map D_h and not proof of observed reionization.
+3. **Parent/source correlations**: 12 real source site values from ONE original point parent, not a rigorous forall X source shared map. No full interval acceptance.
+4. **Heat upper**: Q_site×max_g r_g² is a conditional nonnegative upper at each site assuming positive group excess energies, while sum_g Q_g r_g² is exact group source-only.
+5. **Source ownership**: use J_g p_sg weighting; do not double-count three nearly identical shape-lane labels.
+6. **Implementation failure**: first amended GitHub script used 63-digit source SHA and failed prephysics; fixed by consulting PR337 actual source array, old error log preserved. Remote 12site full-data CI not run: only local clean replay and GitHub source-only CI independently succeeded.
+Result: accept exact source-level algebra/552960 conditional data, HOLD original full 26-event F05. No-go theorem NOT claimed. Distinct-author review NOT_RUN.
