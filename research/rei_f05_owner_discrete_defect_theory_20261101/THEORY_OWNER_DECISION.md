@@ -93,3 +93,19 @@ The outward-computed `U_j=max(|inf(I_D^j)|,|sup(I_D^j)|)` is a sufficient upper 
 **Scientific verdict of hostile pass:** the mathematical direct-enclosure route is not invalidated; the two blocking issues are source/roundoff contract and versioned owner authority if the goal is an **official new PASS**, while a separately certified continuum LTE/global history remains unproved. Do not promote the historical first canonical interval. Stop hostile review recursion here, no fourth or fifth estimator.
 
 **R6 preservation:** counterexample and explicit failure classification published on same PR. CENTRAL=28/88; WORKING=33/88; FAST=4/7; canonical Δ0. Drift watchdog PASS: actual mathematical counterexample, not process-only criticism.
+
+### R7. Independent symbolic and numerical discriminants (Wolfram verified)
+
+Wolfram Language evaluated the following checks directly, without the REI source worker: let `γ=1-1/√2`, `S={0,γ/2,1/2,(1+γ)/2,γ,1}`, and `q(x)=∏_{s∈S}(x-s)^2`. Evaluation gives `{q(s):s∈S}={0,0,0,0,0,0}` and the **exact closed form**
+`∫_0^1 q(x) dx = (17269-12129√2)/46126080 = 2.51492652262516461586×10^-6>0`.
+With `dy/dt=(100/h)q((t-t0)/h)`, the exact flow changes by `0.00025149265226251646` while the discrete full-half difference is zero. Wolfram explicitly returned `100∫q>1/5000` = True. This falsifies without approximation the universal implication `small step doubling ⇒ small continuum LTE`.
+
+Direct algebraic **enclosure false-negative** example using unchanged numerical gates: let original uncertain scalar parent `X=[0,3×10^-4]` and `F(x)=x+10^-6`, two half increments `10^-6/2` each so `G(x)=F(x)`. Exact common-parent defect is identically zero. Independently subtracting the two endpoint intervals yields `[-3×10^-4,+3×10^-4]`, so legacy crossbox `U_legacy=3×10^-4>2×10^-4` while the physical endpoint interval width `3×10^-4<2×10^-3`. Direct increment subtraction yields exactly `U_increment=0`. Wolfram returned True for the first gate failure and 0 for the direct defect. Thus a legacy certificate FAIL and alternative certificate PASS can coexist with **identical** actual physical maps and identical locked gate.
+
+For a general nonnegative H2 rate pair `a,b≥0`, Wolfram also evaluated inverse `[[ (1+b),b ],[a,(1+a)]]/(1+a+b)` and proved its two column sums are both 1. The matrix theorem for 3×3 blocks follows from the nonsingular conservative M-matrix structure, not this two-dimensional CAS check alone. Wolfram simplified the gas-log increment identity to exact zero under positive thermal and particle arguments in the earlier source-native theory check.
+
+Wolfram checked a formal p-order full/two-half difference `C h^(p+1)(1-2^-p)`; for p=2 the leading coefficient is `3/4`, full/defect ratio `4/3`. This **only** validates an asymptotic algebraic relation and does not supply an original 46k-cell uniform Taylor or stiff-error remainder.
+
+No original source-run replay, native acceptance or any new physical model was executed in this theoretical R7 step; source-scoped PR #348/#350/#351 verified rows are reused as historical *implementation-level* inputs with their identity snapshots.
+
+**R7 preservation:** exact symbolic counterexample, explicit interval false-negative toy and conditional order algebra published. CENTRAL=28/88; WORKING=33/88; FAST=4/7; canonical Δ0. Drift watchdog PASS: finite falsifiable tests directly change the research decision.
