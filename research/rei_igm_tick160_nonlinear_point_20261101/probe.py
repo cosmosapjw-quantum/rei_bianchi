@@ -68,7 +68,7 @@ def source_state(stage, lane, io):
     headerlen = struct.unpack_from('<Q',data,8)[0]
     raw_array_sha = hashlib.sha256(data[16+headerlen:]).hexdigest()
     if raw_array_sha != SOURCE_ACCEPTED_ARRAY_SHA256:
-        raise ValueError('IMMUTABLE_ACCEPTED_46080_ARRAY_DRIFT')
+        raise ValueError('IMMUTABLE_ACCEPTED_46080_ARRAY_DRIFT observed='+raw_array_sha+' expected='+SOURCE_ACCEPTED_ARRAY_SHA256+' member='+matches[0].name+' headerlen='+str(headerlen)+' bytes='+str(len(data)))
     decoded = io.decode_state(data)
     md = decoded.metadata
     if md.get('endpoint_tick') != PARENT_TICK or md.get('accepted_index') != 3 or md.get('lane') != lane:
