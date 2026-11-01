@@ -41,17 +41,26 @@ def source_response(n0,n1,accepted_lo,accepted_hi,coefficients,external,current,
     groups=[]
     for g in range(len(c)):
         cg, eg, jg =c[g], e[g], j[g]
-        d0=float(eg+np.dot(cg,s0)); d1=float(eg+np.dot(cg,s1))
+        d0=float(eg+np.dot(cg,s0))
+        dd=float(np.dot(cg,s1-s0))
+        d1=d0+dd
+        direct_d1=float(eg+np.dot(cg,s1))
+        if abs(d1-direct_d1)>64*np.finfo(float).eps*max(1e-300,abs(d1)):
+            raise AssertionError('inconsistent group denominator arithmetic')
         dlo=float(eg+np.dot(cg,slo)); dhi=float(eg+np.dot(cg,shi))
         if d0<=0 or d1<=0 or dlo<=0 or dhi<dlo:raise ValueError('undefined photon competition denominator')
-        dd=d1-d0
         # Linear perturbation about original initial material, same fixed t and source.
         dn=n1-n0
         fg0=(jg*cg/d0)[None,:]*n0
         fg1=(jg*cg/d1)[None,:]*n1
         lg=(jg*cg/d0)[None,:]*(dn-n0*(dd/d0))
         rg=-(dd/d1)*lg
-        delta=fg1-fg0
+        # Correlated, cancellation-safe finite response rather than subtraction of two large rates.
+        delta=lg+rg
+        rawdelta=fg1-fg0
+        fscale=np.maximum(np.maximum(np.abs(fg0),np.abs(fg1)),1e-300)
+        if np.any(np.abs(rawdelta-delta)>128*np.finfo(float).eps*fscale):
+            raise AssertionError('independent source rates and correlated delta incompatible')
         # Analytic all-box outer bound, with shared THREE group neutral moments.
         maxdd=max(abs(dlo-d0),abs(dhi-d0))
         maxdn=np.maximum(abs(lo-n0),abs(hi-n0))
@@ -59,8 +68,6 @@ def source_response(n0,n1,accepted_lo,accepted_hi,coefficients,external,current,
         rbound=lbound*(maxdd/dlo)
         if np.any(np.abs(rg)>rbound+5e-14*np.maximum(1e-150, rbound)):
             raise AssertionError('original finite source outside accepted population outer box')
-        if not np.allclose(delta,lg+rg,rtol=2e-11,atol=5e-30*np.maximum(1,np.abs(delta).max())):
-            raise AssertionError('finite group local source quotient identity')
         fp0+=fg0;fp1+=fg1;lin+=lg;rem+=rg;remB+=rbound
         heat0+=fg0@(q[:,g]*EV_ERG);heat1+=fg1@(q[:,g]*EV_ERG)
         heat_lin+=lg@(q[:,g]*EV_ERG);heat_rem+=rg@(q[:,g]*EV_ERG)
@@ -72,7 +79,8 @@ def source_response(n0,n1,accepted_lo,accepted_hi,coefficients,external,current,
         dlmax=np.maximum(np.abs(slo-s0),np.abs(shi-s0))
         lshareB=(cg*dlmax+p0*maxdd)/d0
         rshareB=(maxdd/dlo)*lshareB
-        if not np.allclose(p1-p0,lshare+rshare,rtol=2e-11,atol=5e-16):
+        fracscale=np.maximum(np.maximum(np.abs(p0),np.abs(p1)),1e-300)
+        if np.any(np.abs((p1-p0)-(lshare+rshare))>128*np.finfo(float).eps*fracscale):
             raise AssertionError('global photon group exact rational remainder')
         if abs((jg*np.sum(p0))+(jg*eg/d0)-jg)>2e-12*max(1,abs(jg)):
             raise AssertionError('original photon conservation')
