@@ -54,6 +54,14 @@ def logmoment_jacobian(p):
         raise ValueError("invalid channel probabilities")
     return np.diag(p)-np.outer(p,p)
 
+def positive_outward_weight(coeff,scale,moment,upper=False):
+    """Preserve exact structural channel zeros under outward IEEE-754 rounding."""
+    c=np.asarray(coeff,dtype=float)
+    a=c*scale*np.asarray(moment,dtype=float)
+    direction=np.inf if upper else -np.inf
+    widened=np.nextafter(a,direction)
+    return np.where(c==0.0,0.0,np.maximum(0.0,widened))
+
 def exact_interval_fraction(a_lo,a_hi,e_lo,e_hi):
     """Monotone, self-dependent fraction bounds for independent positive moment boxes."""
     a_lo=np.asarray(a_lo,dtype=float);a_hi=np.asarray(a_hi,dtype=float)
@@ -167,8 +175,8 @@ def do_case(mod,model,kind,p,plo,phi,t):
         if eig[0]<-2e-13:raise ValueError("source photon susceptibility not PSD")
         det_expected=pe*float(np.prod(pg))
         if abs(np.linalg.det(W)-det_expected)>1e-12:raise ValueError("source determinant identity")
-        lower_a=np.nextafter(vec*scale_ratio_lo*slo,-np.inf)
-        upper_a=np.nextafter(vec*scale_ratio_hi*shi,np.inf)
+        lower_a=positive_outward_weight(vec,scale_ratio_lo,slo,upper=False)
+        upper_a=positive_outward_weight(vec,scale_ratio_hi,shi,upper=True)
         lfrac,hfrac=exact_interval_fraction(lower_a,upper_a,float(forcing.external_subgrid[g].lo),float(forcing.external_subgrid[g].hi))
         if np.any(pg<lfrac-1e-12) or np.any(pg>hfrac+1e-12):
             raise ValueError("point photo distribution not enclosed")

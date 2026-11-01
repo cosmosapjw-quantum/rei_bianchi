@@ -2,7 +2,7 @@ import math,sys,unittest
 from pathlib import Path
 import numpy as np
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from photon_global_feedback import shares,logmoment_jacobian,exact_interval_fraction,exact_fraction_line_integral
+from photon_global_feedback import shares,logmoment_jacobian,exact_interval_fraction,exact_fraction_line_integral,positive_outward_weight
 
 class Physics(unittest.TestCase):
  def test_probability_with_external(self):
@@ -38,6 +38,13 @@ class Physics(unittest.TestCase):
     p,_,_=shares(a,[1,1,1],e)
     self.assertTrue(np.all(p>=lo-1e-15))
     self.assertTrue(np.all(p<=hi+1e-15))
+ def test_structural_zero_source_weight(self):
+  for upper in (False,True):
+   a=positive_outward_weight(np.array([0.,1.,0.]),1.,np.array([2.,4.,7.]),upper)
+   self.assertEqual(float(a[0]),0.)
+   self.assertEqual(float(a[2]),0.)
+   self.assertGreater(float(a[1]),0.)
+
  def test_source_decomposition(self):
   rng=np.random.default_rng(3);x=1+rng.random((9,3));s=x.sum(axis=0)
   j=np.array([10.,20.]);c=np.array([[.1,.2,.3],[.4,.3,.2]]);ex=np.array([.1,.2])
