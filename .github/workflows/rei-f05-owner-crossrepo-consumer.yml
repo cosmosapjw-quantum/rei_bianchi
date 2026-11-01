@@ -1,0 +1,58 @@
+name: REI F05 owner cross-repo source-scoped consumer evidence
+on:
+  push:
+    branches:
+      - research/rei-f05-owner-crossrepo-consumption-20261101
+  pull_request:
+    paths:
+      - "research/rei_f05_owner_crossrepo_20261101/**"
+      - ".github/workflows/rei-f05-owner-crossrepo-consumer.yml"
+permissions:
+  contents: read
+jobs:
+  read-only-evidence-and-negative-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test physical charge, helium energy and source tamper controls
+        run: |
+          python -m unittest discover -s research/rei_f05_owner_crossrepo_20261101/tests -v
+          python -O -m unittest discover -s research/rei_f05_owner_crossrepo_20261101/tests -v
+      - name: Verify published consumer-source identity and scoped owner admission
+        run: |
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          p=Path('research/rei_f05_owner_crossrepo_20261101')
+          o=json.loads((p/'results/OWNER_HHE_ENERGY_CHARGE_THOMSON.json').read_text())
+          i=json.loads((p/'results/SIBLING_BYTE_INTAKE.json').read_text())
+          a=json.loads((p/'OWNER_ADMISSION_DECISION.json').read_text())
+          sha=lambda b:hashlib.sha256(b).hexdigest()
+          assert sha((p/'results/OWNER_HHE_ENERGY_CHARGE_THOMSON.json').read_bytes())=='b936ff21708a8ce0a70785c071fd73333e808837cfaed60e81745f0fb604e2a6'
+          assert sha((p/'results/SIBLING_BYTE_INTAKE.json').read_bytes())=='b84bddc38ed7064898b834e88829fb47bd68bfbad60bb781b21d2776eb96f88f'
+          assert a['physics_owner_result_sha256']==sha((p/'results/OWNER_HHE_ENERGY_CHARGE_THOMSON.json').read_bytes())
+          assert a['physics_source_intake_sha256']==sha((p/'results/SIBLING_BYTE_INTAKE.json').read_bytes())
+          assert a['parent_rei_head']=='cc1929982948265f6d0b0f699353b3170ccd1792'
+          assert i['he_archive_sha256']==o['source_sha256_he_archive']
+          assert i['rec_archive_sha256']==o['source_sha256_rec_archive']
+          assert a['verified_46k_rows']==o['verification']['original_source_rows']==46080
+          assert a['six_independent_cell_channels_without_disjoint_intervals']
+          assert all(n==0 for n in o['verification']['sibling_binding_row_disjoint_counts'].values())
+          assert o['verification']['helium_threshold_correction_direct_vs_global_overlap']
+          assert a['central_dag']=='28/88_REPORTED' and a['canonical_delta']==0
+          assert not a['merge'] and not a['force_push'] and not a['auto_next_node']
+          assert a['original_candidate_tick161']=='NONAUTHORITATIVE'
+          assert a['approval_scope']=='ADMIT_FOR_SOURCE_CONDITIONAL_DERIVED_REI_F05_ANALYSIS_ONLY'
+          assert len(a['sources'])==2 and len(a['not_substituted_into_original_source'])==5
+          print('REI_OWNER_SOURCE_SCOPED_CONSUMPTION_CONTRACT_PASS',a['verified_46k_rows'],
+                'NO_ORIGINAL_OWNER_ACCEPTANCE',a['original_candidate_tick161'])
+          PY
+      - name: Clarify source replay boundary
+        run: |
+          echo "This CI checks immutable published source byte-receipts and exact independent consumer regressions."
+          echo "Source-inclusive 46,080-cell recomputation was executed and byte-replayed on the authorized research host."
+          echo "This CI does NOT contain or replay the two private source-inclusive ZIP archives."
