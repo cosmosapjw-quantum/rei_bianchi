@@ -1,0 +1,21 @@
+name: REI F05 owner original V2 OTS source scientific evidence
+on:
+  pull_request:
+    paths:
+      - "research/rei_f05_owner_v2_ots_20261102/**"
+      - ".github/workflows/rei-f05-owner-v2-ots-source.yml"
+  workflow_dispatch:
+jobs:
+  verify-source-conditional-46k-science:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate published original F05 source-only phys and adverse limits
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/rei_f05_owner_v2_ots_20261102/consume_source_causal_energy.py
+          python3 -m py_compile research/rei_f05_owner_v2_ots_20261102/audit_independent_causal.py
+          python3 -m unittest discover -s research/rei_f05_owner_v2_ots_20261102/tests -v
