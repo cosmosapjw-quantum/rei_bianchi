@@ -1,0 +1,43 @@
+name: REI F08 source angular PSTF physical data
+on:
+  push:
+    branches:
+      - research/rei-owner-f08-physics-multipoles-20261101
+
+permissions:
+  contents: read
+
+jobs:
+  source-multipoles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify donor bytes and execute Rust + independent Python physical auditor
+        shell: bash
+        run: |
+          set -euo pipefail
+          root=research/rei_f08_source_angular_multipoles_20261101
+          src="$root/results"
+          mkdir -p "$src"
+          base=https://raw.githubusercontent.com/cosmosapjw-quantum/bass/c0e965ba21892346feef9ecb2389932c34f3fc82/research/bass_rei_f08_s0_characteristic_photoheating_20261101/results
+          curl --fail --location --silent --show-error --retry 3 "$base/F08_S0_SOURCE_EXACT_CHARACTERISTIC_ANGLE_EVENTS.csv.gz" -o "$src/angles.csv.gz"
+          curl --fail --location --silent --show-error --retry 3 "$base/F08_S0_SOURCE_EXACT_CHARACTERISTIC_PHOTOION_HEAT_HISTORY.csv.gz" -o "$src/history.csv.gz"
+          printf '%s  %s\n' 370abc5b57c25497d8adfb2931428d04fcc84ff29a8621a8348e01d90a9c6a54 "$src/angles.csv.gz" | sha256sum -c -
+          printf '%s  %s\n' df1acb1bf78f2fc0e6d3a852cdfacedf1bc44e0909b870bebbacf8ce1cb302c4 "$src/history.csv.gz" | sha256sum -c -
+          cargo test --offline --manifest-path "$root/Cargo.toml"
+          gzip -dc "$src/angles.csv.gz" | cargo run --release --offline --quiet --manifest-path "$root/Cargo.toml" > "$src/REI_F08_120_ORIGINAL_SOURCE_MULTIPOLES.csv"
+          python3 "$root/audit_original.py" --angles "$src/angles.csv.gz" --history "$src/history.csv.gz" --result "$src/REI_F08_120_ORIGINAL_SOURCE_MULTIPOLES.csv" --json "$src/REI_F08_INDEPENDENT_AUDIT.json"
+          test "$(wc -l < "$src/REI_F08_120_ORIGINAL_SOURCE_MULTIPOLES.csv")" -eq 121
+          sha256sum "$src/REI_F08_120_ORIGINAL_SOURCE_MULTIPOLES.csv" "$src/REI_F08_INDEPENDENT_AUDIT.json"
+          cat "$src/REI_F08_INDEPENDENT_AUDIT.json"
+          echo "Physical source 3840 rays to 120 angular rows, no new native IVP."
+      - name: Save scoped source result and audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-f08-original-source-120-physical-multipoles
+          path: |
+            research/rei_f08_source_angular_multipoles_20261101/results/REI_F08_120_ORIGINAL_SOURCE_MULTIPOLES.csv
+            research/rei_f08_source_angular_multipoles_20261101/results/REI_F08_INDEPENDENT_AUDIT.json
+          retention-days: 30
+          if-no-files-found: error
