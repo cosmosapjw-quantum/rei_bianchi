@@ -1,0 +1,61 @@
+name: rei-igm-original26-physical-parent-jvp
+on:
+  push:
+    branches: [research/rei-igm-global-parent-physics-20261101]
+  pull_request:
+    paths:
+      - research/rei_igm_global_parent_physics_20261101/**
+      - .github/workflows/rei-igm-global-parent-physics.yml
+permissions:
+  contents: read
+jobs:
+  source-authentic-physical-parent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install original pinned REI H-He runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Verify original frozen 26-event physical source and mathematical tests
+        run: |
+          echo 'a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz' | sha256sum -c -
+          python -m py_compile research/rei_igm_global_parent_physics_20261101/physical_parent_jvp.py
+          python -m unittest discover -s research/rei_igm_global_parent_physics_20261101/tests -v
+          python -O -m unittest discover -s research/rei_igm_global_parent_physics_20261101/tests -q
+      - name: Generate actual original 46080-cell H-He nuclei-conserving source JVP
+        run: |
+          export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+          python research/rei_igm_global_parent_physics_20261101/physical_parent_jvp.py --repo . --out science_output
+      - name: Independently verify real original-source CSV and scientific scope
+        run: |
+          python research/rei_igm_global_parent_physics_20261101/audit_science.py science_output
+          python - <<'PY'
+          import csv,gzip,json,hashlib,math,pathlib
+          p=pathlib.Path('science_output')
+          r=json.loads((p/'RESULT.json').read_text())
+          assert r['actual_source_node_rows']==46080 and r['scientific_output_columns']==23
+          assert r['canonical_delta']==0 and r['true_all_X_non_linear_interval_remainder']=='NOT_CONSTRUCTED'
+          assert r['unchanged_strict_gate']==2e-4 and r['unchanged_width_gate']==2e-3
+          q=p/r['science_csv']
+          assert hashlib.sha256(q.read_bytes()).hexdigest()==r['science_csv_sha256']
+          with gzip.open(q,'rt') as inp:
+              f=csv.DictReader(inp)
+              cnt=0
+              for line in f:
+                  cnt+=1
+                  assert all(math.isfinite(float(v)) for k,v in line.items() if k!='node')
+          assert cnt==46080
+          print('ORIGINAL_REI_PHYSICAL_SOURCE_CELLS',cnt,'COLUMNS',23,'CENTRAL_DAG',r['canonical_Central'],'DELTA',0)
+          PY
+      - name: Preserve actual source physics and typed failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-igm-original26-nuclei-conserving-parent-physics
+          path: science_output/
+          if-no-files-found: warn
