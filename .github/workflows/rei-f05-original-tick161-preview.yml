@@ -1,0 +1,67 @@
+name: rei-f05-original-tick161-physics-preview
+on:
+  push:
+    branches: [research/rei-f05-original-tick161-preview-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_f05_original_tick161_preview_20261101/**'
+      - '.github/workflows/rei-f05-original-tick161-preview.yml'
+permissions: {contents: read}
+jobs:
+  original-hhe-real-46080-cell-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify original immutable 26-event runtime dependency lock
+        run: |
+          stage=$(find stages -maxdepth 1 -type d -name '*UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY' -print -quit)
+          test -n "$stage" && test -f "$stage/requirements-runtime.txt"
+          python -m pip install -r "$stage/requirements-runtime.txt"
+          python -m pip check
+      - name: Original physics output negative controls and code tests
+        run: |
+          python -m py_compile research/rei_f05_original_tick161_preview_20261101/owner_tick161_preview.py
+          python -m py_compile research/rei_f05_original_tick161_preview_20261101/audit_preview.py
+          python -m unittest discover -s research/rei_f05_original_tick161_preview_20261101/tests -v
+          python -O -m unittest discover -s research/rei_f05_original_tick161_preview_20261101/tests -v
+          python -m unittest discover -s research/rei_f05_mmatrix_residual_20261101/tests -v
+      - name: Native source owned 46080 HHe T physical state preview on three shape paths
+        run: |
+          python research/rei_f05_original_tick161_preview_20261101/owner_tick161_preview.py --repo . --lane LOCAL_NEUTRAL_HAZARD_PRIMARY --out source_tick161/primary
+          python research/rei_f05_original_tick161_preview_20261101/owner_tick161_preview.py --repo . --lane RECOMBINATION_WEIGHTED_AUDITOR --out source_tick161/recomb
+          python research/rei_f05_original_tick161_preview_20261101/owner_tick161_preview.py --repo . --lane SCRIPT_SELF_SHIELDING_AUDITOR --out source_tick161/shield
+      - name: Standalone 46080 by 27 all-row physical identity and source scope audit
+        run: |
+          python research/rei_f05_original_tick161_preview_20261101/audit_preview.py --root source_tick161
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('source_tick161/INDEPENDENT_FULL_ROW_AUDIT.json').read_text())
+          assert a['status']=='PASS_LOCAL_FULL_ROW_INDEPENDENT_AUDIT'
+          assert a['nodes']==46080 and a['physical_columns']==27
+          assert a['physics_source_datasets']==1 and a['source_shape_lanes']==3
+          assert a['central_DAG']=='28/88_REPORTED' and a['canonical_delta']==0
+          assert a['original_tick161']=='NOT_ACCEPTED' and a['production']=='HOLD'
+          for lane in a['lanes']:
+            assert lane['rows']==46080 and lane['gas_energy_identity']=='PASS'
+            assert lane['physical_electron_identity']=='PASS'
+            assert lane['no_owner_admission']=='PASS'
+          print('SCOPED_REAL_ORIGINAL_TICK161_NONAUTHORITATIVE_SOURCE_PREVIEW_PASS')
+          PY
+      - name: Preserve true original physical science data or exact failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-original-f05-tick161-hhe-thermal-electron-source-preview
+          path: source_tick161/
+          retention-days: 90
+          if-no-files-found: warn
