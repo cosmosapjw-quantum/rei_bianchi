@@ -1,0 +1,71 @@
+name: rei-igm-physical-26event-tick160
+on:
+  push:
+    branches:
+      - research/rei-igm-original-26event-source-at-tick160-20261101
+  pull_request:
+    paths:
+      - research/rei_igm_original_26event_tick160_20261101/**
+      - .github/workflows/rei-igm-physical-26event-tick160.yml
+permissions:
+  contents: read
+
+jobs:
+  source-physical-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned original physical source runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Confirm immutable accepted physical state bytes
+        run: |
+          echo "a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz" | sha256sum -c -
+      - name: Run falsifying physical-source contract tests
+        run: |
+          python -m unittest discover -s research/rei_igm_original_26event_tick160_20261101/tests -p "test_*.py" -v
+          python -m py_compile research/rei_igm_original_26event_tick160_20261101/source_26events.py
+      - name: Generate original 26-event H/He/heat source physics at t0 and tick160
+        run: |
+          export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+          python research/rei_igm_original_26event_tick160_20261101/with_source_import_guard.py --repo . --out 26event_science
+      - name: Check all six genuine source files without inventing canonical admission
+        run: |
+          python - <<'PY'
+          import csv,gzip,glob,hashlib,json,math,pathlib
+          report=json.loads(pathlib.Path("26event_science/ORIGINAL_26EVENT_PHYSICS.json").read_text())
+          assert report["saved_model_diagnostic_rows"]==276480
+          assert report["canonical_new_nodes"]==0
+          assert report["whole_first_interval_closed"] is False
+          assert len(report["rows"])==6
+          total=0
+          for row in report["rows"]:
+              path=pathlib.Path("26event_science")/row["csv_file"]
+              assert hashlib.sha256(path.read_bytes()).hexdigest()==row["csv_sha256"]
+              with gzip.open(path,"rt",encoding="utf8",newline="") as inp:
+                  reader=csv.DictReader(inp)
+                  assert reader.fieldnames is not None
+                  n=0
+                  for record in reader:
+                      n+=1
+                      assert all(math.isfinite(float(v)) for k,v in record.items() if k!="node")
+                      assert float(record["temperature_K"])>0
+                      assert float(record["thermal_erg_per_H"])>0
+                  assert n==46080,(row["lane"],n)
+              total+=n
+              print("SOURCE_ROWS_VERIFIED",row["lane"],row["snapshot"],n)
+          assert total==276480
+          print("SOURCE_AUTHENTIC_PHYSICAL_MODEL_ROWS",total,"CANONICAL_DELTA",0)
+          PY
+      - name: Preserve physical science artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-igm-real-source-26event-tick160-physical-data
+          path: 26event_science/
+          if-no-files-found: warn
