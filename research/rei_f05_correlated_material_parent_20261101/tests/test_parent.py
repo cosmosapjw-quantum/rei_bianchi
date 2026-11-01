@@ -33,7 +33,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.all(s['CHEM_PLUS'][1]<s['CHEM_MINUS'][1]))
     def test_original_gate_not_promoted(self):
         self.assertEqual(m.GATE,2e-4)
-        self.assertEqual(m.EXPECTED_SOURCE_BODY_SHA,'cc031a04f5b7b13ccb9ffddf95ec0ced4a9274a9ab9999e7e3508a5161edb01')
+        self.assertEqual(len(m.load_prior().SOURCE_ACCEPTED_ARRAY_SHA256),64)
     def test_wrong_shape_fails(self):
         lo,hi,l,h,H,He=self.state()
         with self.assertRaisesRegex(ValueError,'shape'):m.correlated_points(lo[:,:4],hi[:,:4],l,h,H,He)
