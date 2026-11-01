@@ -1,0 +1,37 @@
+name: REI F08 original Rust first-step H I physical source
+on:
+  pull_request:
+    paths:
+      - "research/rei_owner_f08_rust_firststep_20261101/**"
+      - ".github/workflows/rei-f08-native-rust-firststep.yml"
+  workflow_dispatch:
+
+jobs:
+  original-source-physical-replay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test historical original Rust atomic source and replay
+        working-directory: research/rei_owner_f08_rust_firststep_20261101
+        run: |
+          set -euo pipefail
+          echo 'b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3  src/original_atomic_provider.rs' | sha256sum -c -
+          echo '30656b520cafad79d118c7f707efc7aacd9ff4d4fc7727ce52e7f2010fe8055e  source_inputs/ORIGINAL_REI_F08_S0_FIRSTSTEP_256_RAYS.csv' | sha256sum -c -
+          export CARGO_TARGET_DIR="${RUNNER_TEMP}/rei_f08_firststep_target"
+          cargo test --offline --locked
+          cargo test --offline --locked --release
+          cargo run --offline --locked --release -- \
+            source_inputs/ORIGINAL_REI_F08_S0_FIRSTSTEP_256_RAYS.csv \
+            results/RUST_ORIGINAL_F08_FIRSTSTEP_HI_256.csv \
+            results/SCIENCE_RESULT.json
+          python3 independent_audit.py
+          python3 - <<'PY'
+          import csv, json
+          with open('results/RUST_ORIGINAL_F08_FIRSTSTEP_HI_256.csv', newline='') as f:
+              assert len(list(csv.DictReader(f))) == 256
+          x = json.load(open('results/SCIENCE_RESULT.json'))
+          assert x['original_full_26event_replayed'] is False
+          assert x['canonical_delta'] == 0
+          assert x['production'] == 'HOLD'
+          assert all(z['ray_count'] == 128 for z in x['branch_results'])
+          PY
