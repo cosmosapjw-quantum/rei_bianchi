@@ -1,0 +1,99 @@
+name: rei-f05-original26-independent-direct-cramer
+on:
+  push:
+    branches: [research/rei-f05-independent-cramer-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_f05_cramer_direct_20261101/**'
+      - '.github/workflows/rei-f05-independent-cramer.yml'
+permissions:
+  contents: read
+jobs:
+  real-46080-cell-original-f05:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [LOCAL_NEUTRAL_HAZARD_PRIMARY, RECOMBINATION_WEIGHTED_AUDITOR, SCRIPT_SELF_SHIELDING_AUDITOR]
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Freeze native source runtime
+        run: |
+          stage=$(find stages -maxdepth 1 -type d -name '*UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY' -print -quit)
+          test -n "$stage" && test -f "$stage/requirements-runtime.txt"
+          python -m pip install -r "$stage/requirements-runtime.txt"
+          python -m pip check
+      - name: Scientific syntax, original baseline tests and negative controls
+        run: |
+          python -m py_compile research/rei_f05_cramer_direct_20261101/direct_cramer_audit.py
+          python -m unittest discover -s research/rei_f05_cramer_direct_20261101/tests -v
+          python -O -m unittest discover -s research/rei_f05_cramer_direct_20261101/tests -v
+          python -m unittest discover -s research/rei_f05_common_parent_increments_20261101/tests -v
+      - name: Execute all original source-owned full plus two half maps
+        run: |
+          python research/rei_f05_cramer_direct_20261101/direct_cramer_audit.py \
+            --repo . --lane '${{ matrix.lane }}' \
+            --out 'source_science/${{ matrix.lane }}'
+      - name: Verify original 46k physical rows, source identity and frozen gate
+        run: |
+          python - <<'PY'
+          import csv,gzip,hashlib,json,math
+          from pathlib import Path
+          p=Path('source_science/${{ matrix.lane }}')
+          r=json.loads((p/'RESULT.json').read_text())
+          assert r['original_shape_lane']=='${{ matrix.lane }}'
+          assert r['original_nodes']==r['source_derived_model_rows']==46080
+          assert r['frozen_original_archive_sha256']=='a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b'
+          assert r['original_state_array_sha256']=='cc031a04f5b7b13ccb9ffddf95ec0ced4a9274a9ab999a9e7e3508a5161edb01'
+          assert r['original_26event_kernel_sha256']=='579df3cc99987dcce9205166752570bdaf4c7cb3640c525be6da260d94b8e644'
+          assert r['independent_linear_method']=='INTERVAL_CRAMER_2x2_3x3_NO_BLAS_INVERSION'
+          assert r['arithmetic_trust']=='INHERITED_IEEE754_NEXTAFTER_NOT_FORMAL_MPFR'
+          assert r['original_local_error_gate']==2e-4 and r['original_public_width_gate']==2e-3
+          assert r['historical_crossbox_logT_check']>2e-4
+          assert r['all_original_4_channel_local_defects_below_gate']
+          assert r['original_set_ledger_pass'] and r['original_set_ledgers']['evaluated_ledgers']==14
+          assert r['original_native_table_event_pass'] and r['original_public_width_pass']
+          assert r['canonical_delta']==0 and r['central_dag']=='28/88_REPORTED'
+          assert r['original_canonical_tick161']=='NOT_ACCEPTED' and r['production']=='HOLD'
+          assert r['original_native_worker_modified'] is False
+          assert not r['full_allX_jacobian_hessian_certificate'] and not r['auto_next_node']
+          for key in ('full','half1','half2'):
+            s=r['steps'][key]
+            assert s['native_certified'] and s['original_population_solves']==3
+            assert s['original_native_table_event_count']==0
+            assert len(s['independent_interval_cramer_blocks'])==2
+            assert all(b['determinant_positive_nodes']==46080 and b['min_det_lower']>0
+                       for b in s['independent_interval_cramer_blocks'])
+          for channel in ('log_T','x_HII','x_HeII','x_HeIII'):
+            c=r['increment_defect_coordinates'][channel]
+            assert c['nodes_below_unchanged_2eMinus4']==46080
+            assert c['max_correlated_increment_defect_upper']<2e-4
+          f=p/r['csv_file']
+          assert hashlib.sha256(f.read_bytes()).hexdigest()==r['csv_sha256']
+          with gzip.open(f,'rt',newline='') as q:
+            reader=csv.DictReader(q)
+            assert len(reader.fieldnames)==r['csv_columns']==30
+            n=0
+            for row in reader:
+              n+=1
+              assert all(math.isfinite(float(v)) for k,v in row.items() if k!='node')
+          assert n==46080
+          print('REI_F05_CRAMER_NATIVE_ROWS',n,'LOGT',r['increment_defect_coordinates']['log_T']['max_correlated_increment_defect_upper'],'DAG',r['central_dag'],'CANONICAL_DELTA',0)
+          PY
+      - name: Preserve original source-derived physical data or typed failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-original-f05-cramer-${{ matrix.lane }}
+          path: source_science/${{ matrix.lane }}/
+          retention-days: 90
+          if-no-files-found: warn
