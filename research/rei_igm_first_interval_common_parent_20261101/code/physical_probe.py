@@ -41,10 +41,10 @@ def inspect_state(data,name,output_dir=None):
     xheii_lo=low[:,3]/heh;xheii_hi=high[:,3]/hel
     xheiii_lo=low[:,4]/heh;xheiii_hi=high[:,4]/hel
     percentile_bands={}
-    for key,l,h in (("x_HII",xhii_lo,xhii_hi),("x_HeII",xheii_lo,xheii_hi),
+    for key,l,upperarr in (("x_HII",xhii_lo,xhii_hi),("x_HeII",xheii_lo,xheii_hi),
                     ("x_HeIII",xheiii_lo,xheiii_hi),("T_K",tl,th),
                     ("xe_per_H",xe_lo,xe_hi),("U_thermal_erg_per_H",u_lo,u_hi)):
-        percentile_bands[key]={str(q):[float(np.percentile(l,q)),float(np.percentile(h,q))]
+        percentile_bands[key]={str(q):[float(np.percentile(l,q)),float(np.percentile(upperarr,q))]
                                for q in (1,5,25,50,75,95,99)}
     lane=h.get("metadata",{}).get("lane","UNKNOWN")
     body_sha256=hashlib.sha256(raw).hexdigest()
