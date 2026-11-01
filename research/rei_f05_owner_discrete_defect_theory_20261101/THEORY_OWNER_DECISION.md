@@ -31,3 +31,17 @@ Primary paper 2: **Stefan Kopecz and Andreas Meister**, "On order conditions for
 Primary paper 3: **Wayne H. Enright and Wayne B. Hayes**, "Robust and reliable defect control for Runge-Kutta methods," *ACM Transactions on Mathematical Software* (2007), DOI 10.1145/1206040.1206041. Their *continuous interpolation defect* and stability/error-control analysis are distinct from the *discrete step-doubling difference* named defect in the F05 notes; this terminological distinction matters.
 
 **R2 preservation**: source/citation audit added and published on the same Draft PR #353. CENTRAL=28/88; WORKING=33/88; FAST=4/7; canonical Δ0. Drift watchdog PASS: no new source atlas or auxiliary simulation.
+
+### R3. Claim and original-acceptance semantics
+
+Fix a physical full-parent candidate `x ∈ X_hist ⊆ X160` and one common original source/forcing history `θ`. Define `F_h(x,θ)` as original full native map and `G_h(x,θ) = F_{h/2}^{t0+h/2}(F_{h/2}^{t0}(x,θ),θ)` as the actual original two-half native composition with the **same** history. Let `D_h(x,θ)=F_h(x,θ)-G_h(x,θ)` in the four original dimensionless coordinates. A valid upper certificate `U_D` must enclose `sup_{(x,θ)∈H}|D_h^j(x,θ)|` for each j, including all source moments, table-event conditions and numerical outward-error assumptions.
+
+Legacy independent endpoint boxes `Y_F ⊇ F_h(H)` and `Y_G ⊇ G_h(H)` produce `D_h(H) ⊆ Y_F-Y_G`; the componentwise legacy reported `U_legacy` bounds all independent endpoint pairings. If `U_legacy=2.1245050576368385e-4 > 2e-4`, **only the sufficiency of that particular interval certificate fails**. It gives no lower bound `sup_H |D_h|>2e-4`; no physical defect theorem is refuted.
+
+Exactly, `F_h(x)=x+δ_F(x)`, `G_h(x)=x+δ_1(x)+δ_2(x)` with `δ_2` calculated from the first-half endpoint using the same original forcing clock. Hence `D_h=δ_F-δ_1-δ_2` for every matched realization, before interval arithmetic. If native interval-algorithm enclosures `I_F,I_1,I_2` each contain their respective increment for every admitted common realization, then `D_h(H) ⊆ I_F-I_1-I_2`. Its maximum modulus `U_increment` is a valid sufficient bound even though the interval calculation may still overestimate correlations. No new Jacobian/Hessian theorem is logically required for this direct-enclosure route.
+
+Reported independent original-source three-lane maxima (research-scope implementation evidence, not formal MPFI): PR348 `U_logT=3.814222131823313e-6`, PR350 `5.387144148931529e-6`, PR351 `3.8632410543996545e-6`. The three enclosure values are not directly exchangeable at byte/algorithm identity. All are < unchanged `2e-4`, and do not convert the historical legacy FAIL into a historical PASS.
+
+The original owner uses string classification `VALIDATED_LOCAL_ERROR_GATE_FAILURE`, which describes its **chosen sufficient enclosure failing its threshold**; it is not an established inequality that the true difference itself is above the gate. A scientific successor can retain the old row verbatim and make a new `V2_DIRECT_INCREMENT_CANDIDATE` verdict with its own proof identity. Replacing original worker response inside the old version conflicts with source/behavior provenance.
+
+**R3 preservation**: exact map definitions and source-type claim distinctions published on same PR. CENTRAL=28/88; WORKING=33/88; FAST=4/7; canonical Δ0. Drift watchdog PASS: this closes a real false-negative-certification ambiguity.
