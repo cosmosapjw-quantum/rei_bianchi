@@ -268,6 +268,8 @@ def actual_original_science(repo,out):
        "original_global_moment_outer_upper":hi.tolist(),
        "source_log_moment_box_lower":dlo.tolist(),
        "source_log_moment_box_upper":dhi.tolist(),
+       "absolute_max_dxe_dlnS":{SPECIES[k]:float(np.max(np.abs(j_e[:,k]))) for k in range(3)},
+       "numerically_active_source_moments":{SPECIES[k]:bool(np.any(j_e[:,k]!=0)) for k in range(3)},
        "source_moment_fixed_local_numerator":True,
        "source_moment_perturbations_are_conditional_counterfactuals":True,
        "original_26event_other_events_frozen_in_matrix":True,
@@ -289,9 +291,9 @@ def actual_original_science(repo,out):
     print("ORIGINAL26_PREDICTOR_PHYSICS",json.dumps({
         "node_rows":N,"columns":len(cols),"median_predictor_xe":stat["one_tick_predictor_xe"]["50"],
         "median_one_tick_delta_xe":stat["one_tick_delta_xe"]["50"],
-        "max_abs_dxe_dlnS_HI":stat["d_predictor_xe_dlnS_HI"]["100"],
-        "max_abs_dxe_dlnS_HeI":stat["d_predictor_xe_dlnS_HeI"]["100"],
-        "max_abs_dxe_dlnS_HeII":stat["d_predictor_xe_dlnS_HeII"]["100"],
+        "max_abs_dxe_dlnS_HI":float(np.max(np.abs(j_e[:,0]))),
+        "max_abs_dxe_dlnS_HeI":float(np.max(np.abs(j_e[:,1]))),
+        "max_abs_dxe_dlnS_HeII":float(np.max(np.abs(j_e[:,2]))),
         "source_outer_moment_box":list(zip(dlo.tolist(),dhi.tolist())),
         "finite_cases":exact_cases,
         "csvsha256":digest,"central":"28/88","canonical_delta":0
