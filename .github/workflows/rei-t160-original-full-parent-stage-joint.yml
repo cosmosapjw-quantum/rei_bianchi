@@ -1,0 +1,79 @@
+name: rei-t160-original-full-parent-stage-joint-diagnostics
+on:
+  push:
+    branches: [research/rei-igm-t160-joint-stage-interval-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_igm_tick160_joint_stage_20261101/**'
+      - '.github/workflows/rei-t160-original-full-parent-stage-joint.yml'
+permissions: {contents: read}
+jobs:
+  original-26event-full-parent-stage-inputs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        lane:
+          - LOCAL_NEUTRAL_HAZARD_PRIMARY
+          - RECOMBINATION_WEIGHTED_AUDITOR
+          - SCRIPT_SELF_SHIELDING_AUDITOR
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install unchanged original owner requirements
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Test source response maths
+        run: |
+          python -m py_compile research/rei_igm_tick160_joint_stage_20261101/joint_stage.py
+          python -m unittest discover -s research/rei_igm_tick160_joint_stage_20261101/tests -v
+          python -O -m unittest discover -s research/rei_igm_tick160_joint_stage_20261101/tests -v
+          python -m unittest discover -s research/rei_igm_original26_temperature_edges_20261101/tests -v
+      - name: Actual original 46080-node fully uncertain parent stage
+        run: |
+          python research/rei_igm_tick160_joint_stage_20261101/joint_stage.py \
+            --repo . --lane '${{ matrix.lane }}' --out 'source_science/${{ matrix.lane }}'
+      - name: Verify true original source and stage readback without admission
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,numpy as np
+          path=Path('source_science/${{ matrix.lane }}')
+          r=json.loads((path/'RESULT.json').read_text())
+          assert r['original_source']=='a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b'
+          assert r['original_array_sha256']=='cc031a04f5b7b13ccb9ffddf95ec0ced4a9274a9ab999a9e7e3508a5161edb01'
+          assert r['kernel_sha256']=='579df3cc99987dcce9205166752570bdaf4c7cb3640c525be6da260d94b8e644'
+          assert r['joint_full_map_jacobian_remainder_certified'] is False
+          assert r['original_gate']==2e-4 and r['original_width_gate']==2e-3
+          assert r['central_dag']=='28/88_REPORTED' and r['canonical_delta']==0
+          assert r['production']=='HOLD' and r['auto_next_node'] is False
+          assert r['status']=='REAL_FULL_PARENT_STAGE_INPUTS_COMPUTED_NO_DH_CERT',r['status']
+          assert set(r['steps'])=={'full','half1','half2'}
+          assert all(q['certified'] and q['site_count']==4 for q in r['steps'].values())
+          assert r['actual_source_site_node_evaluations']==46080*12
+          assert all(all(site['original_owner_inclusion']) for step in r['steps'].values() for site in step['sites'].values())
+          f=path/r['source_site_field_npz']
+          assert hashlib.sha256(f.read_bytes()).hexdigest()==r['source_site_field_sha256']
+          with np.load(f) as arrays:
+              assert len(arrays.files)==12*4
+              assert all(arrays[k].shape==(46080,) and np.isfinite(arrays[k]).all() for k in arrays.files)
+          print('ORIGINAL_FULL_PARENT_SOURCE_STAGE_RESULTS',r['actual_source_site_node_evaluations'],
+                'LOGT_INDEPENDENT_UPPER',r['independent_logT_cross_box_upper'],
+                'CANONICAL_DELTA',r['canonical_delta'])
+          PY
+      - name: Preserve authentic original stage diagnostics, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-t160-full-parent-joint-stage-${{ matrix.lane }}
+          path: source_science/${{ matrix.lane }}/
+          retention-days: 90
+          if-no-files-found: warn
