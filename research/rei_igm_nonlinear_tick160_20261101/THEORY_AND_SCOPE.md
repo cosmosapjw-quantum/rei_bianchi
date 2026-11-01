@@ -1,0 +1,15 @@
+# REI F05: original 46,080-node nonlinear first-interval failing edge
+
+Immutable source: REI PR321 \`9afee1ab4a45a7b4b277e183e7e18c59a8d39f4d\`, parent PR320 \`e5836fc4b8804d1bcdcdcbb97ab33f822703fa46\`, archived blocked first-interval SHA256 \`a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b\`. Original 26-event MPRK22(1) + Alexander SDIRK2 four-site source and all three shape lanes unchanged, with exact f in [0.1,1] and table behavior.
+
+Physical objective: **actually run the original nonlinear map F_h and two half-maps H_h on the first failing interval [160,161]** from (a) immutable original positive parent interval X and (b) one expressly noncanonical, nuclei-conserving representative x0 in X. Compare all 46,080 nodewise ion fractions, free electrons, temperature, public output widths, and the old independent cross-hull distance. The original historical rejection is 2.1245050576368385e-4 with unchanged strict local-error gate 2e-4 and public width gate 2e-3. No native accepted history, table, owner, or tolerance is mutated.
+
+**Mathematical distinction:** The authentic shared-parent map defect is D_h(Y,theta)=F_h(Y,theta)-F_(h/2)(F_(h/2)(Y,theta),theta), and its derivative J_D=J_F-J_(h/2)(Y_mid)J_(h/2)(Y). Four independent source-evaluation sites must stay independent *unless the actual source physics justifies a specific shared theta*. The existing independent-output interval distance E_box=max(|F_lo-H_hi|,|F_hi-H_lo|) retains diam(X) even when F=H. A point-parent evaluation still retains independently enclosed source realizations, so E_box(x0) is NOT a certified joint map defect or a right to accept the interval.
+
+For implicit population A(Y,theta)Z=b, A dZ=db-(dA)Z. For the SDIRK thermal root r(ell,Y,theta)=0, dell=-r_Y/r_ell dY when the root derivative excludes zero. The owner ratio q_i=h_i/(sum_j h_j) has Jacobian delta_ij/H-h_i/H^2, a diagonal plus rank-one reduction. The missing original nonlinear Jacobian/remainder certification remains explicit.
+
+Limiting-case Wolfram proof: positive frozen H equation dx/dt=Gamma(1-x)-R x gives backward-Euler same-parent defect (x-x_eq)q^2/[4(1+q)(1+q/2)^2], q=(Gamma+R)h; symbolic identity and derivative residuals are both zero. In this limit the independent-box floor is 2rho, while the true correlated defect range scales as rho h^2. This proves an *overestimation mechanism*, not success of the full nonlinear original solver.
+
+References: Mullier, Chapoutot, Alexandre dit Sandretto (2018) DOI 10.1080/10556788.2018.1459620 (validated RK/AD); Chapoutot et al. (2016), Reliable Computing 22, 78-103. These do not certify REI.
+
+No new accepted REI central nodes: **28/88 REPORTED (+0)**, working 33/88, BASS CE1 9/15 scoped, production HOLD, no merge, no auto-next. All Git and source archives protected. Full physical acceptance requires genuine correlated source/parent nonlinear remainder and the complete first interval, not a point witness or patched gate. Native subagent NOT_RUN.
