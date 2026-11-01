@@ -253,7 +253,7 @@ def run(repo:Path,lane:str,out:Path):
             n=count[0];count[0]+=1
             site = "parent" if n==0 else "predictor" if n==1 else (
                    "gamma" if n%2==0 else "final")
-            rec,data=source_site(mm,model,p,temp,clock,site,b-a,nh,nhe,event)
+            rec,data=source_site(m,model,p,temp,clock,site,b-a,nh,nhe,event)
             slots[site]=rec
             arrays[label+"_"+site]=data
             return event
