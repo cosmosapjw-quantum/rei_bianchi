@@ -50,6 +50,25 @@ def ratio_safe(x,y):
     if np.any(b<=0):raise ValueError('zero original nuclear total')
     return a/b
 
+def certify_original_nuclei_point(pop,nh,nhe):
+    """Preflight exact H/He element totals, in source units (not absolute 1e-12)."""
+    p=np.asarray(pop,dtype=float);nh=np.asarray(nh,dtype=float);nhe=np.asarray(nhe,dtype=float)
+    if p.ndim!=2 or p.shape[1]!=5 or nh.shape!=(p.shape[0],) or nhe.shape!=nh.shape:
+        raise ValueError('source nuclear shapes mismatch')
+    if np.any(nh<=0) or np.any(nhe<=0):raise ValueError('nonpositive original nuclear total')
+    eps=64*np.finfo(float).eps
+    hrel=np.abs((p[:,0]+p[:,1])-nh)/nh
+    herel=np.abs(np.sum(p[:,2:5],axis=1)-nhe)/nhe
+    if np.max(hrel)>eps or np.max(herel)>eps:
+        raise ValueError(f'original nuclei mismatch: H={np.max(hrel):.7g},He={np.max(herel):.7g}; source-numeric-relative')
+    return {'H_max_relative':float(np.max(hrel)),'He_max_relative':float(np.max(herel)),
+            'threshold_machine_scaled':float(eps)}
+
+def interval_nuclei_includes(lo,hi,total):
+    lo=np.asarray(lo,dtype=float);hi=np.asarray(hi,dtype=float);total=np.asarray(total,dtype=float)
+    eps=64*np.finfo(float).eps*np.maximum(np.abs(total),np.finfo(float).tiny)
+    return bool(np.all(lo<=total+eps) and np.all(hi>=total-eps))
+
 def source_coordinates(p,logt,nh,nhe):
     xh=ratio_safe(p[:,1],nh);xh2=ratio_safe(p[:,3],nhe);xh3=ratio_safe(p[:,4],nhe)
     xe=ratio_safe(p[:,1]+p[:,3]+2*p[:,4],nh)
@@ -130,11 +149,10 @@ def setup(repo,lane):
     pop=src.representative(state['lo'],state['hi'],nh,nhe)
     if pop.shape!=(N,5) or np.any(pop<state['lo']-1e-12) or np.any(pop>state['hi']+1e-12):
         raise ValueError('original population point outside interval')
-    if np.max(np.abs(pop[:,0]+pop[:,1]-nh))>1e-12 or np.max(np.abs(pop[:,2:5].sum(axis=1)-nhe))>1e-12:
-        raise ValueError('original nuclei mismatch')
+    nuclei_cert=certify_original_nuclei_point(pop,nh,nhe)
     duration=float(base.forcing.duration_seconds(0))
     t0=duration*TICK/TOTAL_TICKS;t1=duration*(TICK+1)/TOTAL_TICKS
-    return dict(stage=stage,src=src,m=m,base=base,model=model,pop=pop,
+    return dict(stage=stage,src=src,m=m,base=base,model=model,pop=pop,nuclei_preflight=nuclei_cert,
                 nh=nh,nhe=nhe,tl=state['tl'],th=state['th'],
                 t0=t0,t1=t1,lane=lane)
 
@@ -145,7 +163,7 @@ def run_path(ctx,out):
     rows=[];scores=[]
     receipt=dict(schema='REI_IGM_TICK160_ORIGINAL_26EVENT_PARENT_T_SLICE_V1',lane=ctx['lane'],
       original_archive_sha256=ORIGINAL_ARCHIVE_SHA,original_accepted_array_sha256=ORIGINAL_ARRAY_SHA,
-      original_kernel_sha256=ORIGINAL_KERNEL_SHA,
+      original_kernel_sha256=ORIGINAL_KERNEL_SHA, original_parent_nuclei_numeric_preflight=ctx['nuclei_preflight'],
       tested_tick=[160,161],alpha_values=list(ALPHAS),
       nodes=N,strict_local_error=GATE,strict_public_width=WIDTH_GATE,
       historical_full_parent_error=ORIGINAL_FAILURE,
@@ -205,8 +223,8 @@ def run_path(ctx,out):
           'physical_ionization_change_xHII':quantiles(cols['delta_half_xHII']),
           'physical_temperature_change_K':quantiles(cols['delta_half_T_K']),
           'physical_thermal_energy_change_erg_per_H':quantiles(cols['delta_half_U_th_erg_per_H']),
-          'H_nuclei_interval_includes_initial':bool(np.all(phases['half2'].population.lo[:,0]+phases['half2'].population.lo[:,1]<=nh+1e-14) and np.all(phases['half2'].population.hi[:,0]+phases['half2'].population.hi[:,1]>=nh-1e-14)),
-          'He_nuclei_interval_includes_initial':bool(np.all(np.sum(phases['half2'].population.lo[:,2:5],axis=1)<=nhe+1e-14) and np.all(np.sum(phases['half2'].population.hi[:,2:5],axis=1)>=nhe-1e-14)),
+          'H_nuclei_interval_includes_initial':interval_nuclei_includes(phases['half2'].population.lo[:,0]+phases['half2'].population.lo[:,1],phases['half2'].population.hi[:,0]+phases['half2'].population.hi[:,1],nh),
+          'He_nuclei_interval_includes_initial':interval_nuclei_includes(np.sum(phases['half2'].population.lo[:,2:5],axis=1),np.sum(phases['half2'].population.hi[:,2:5],axis=1),nhe),
           'strict_local_error_pass_for_point_only':bool(all(float(np.max(z['upper']))<GATE for z in allscores))
         }
         receipt['runs'].append(summary);save()

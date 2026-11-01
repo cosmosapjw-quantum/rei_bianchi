@@ -39,6 +39,18 @@ class Tests(unittest.TestCase):
   self.assertEqual(m.GATE,2e-4);self.assertEqual(m.TICK,160)
   self.assertNotEqual(m.ORIGINAL_FAILURE,m.GATE)
   self.assertEqual(m.ALPHAS,(.05,.5,.95))
+ def test_original_nuclei_scale_relative_not_fake_absolute_failure(self):
+  p=np.array([[7e9,3e9+1e-5,1e9,8e8,2e8+1e-5]],dtype=float)
+  cert=m.certify_original_nuclei_point(p,np.array([1e10]),np.array([2e9]))
+  self.assertLess(cert['H_max_relative'],cert['threshold_machine_scaled'])
+  self.assertLess(cert['He_max_relative'],cert['threshold_machine_scaled'])
+ def test_original_nuclei_large_relative_error_rejected(self):
+  p=np.array([[7e9,3e9+1e-2,1e9,8e8,2e8]],dtype=float)
+  with self.assertRaises(ValueError):m.certify_original_nuclei_point(p,np.array([1e10]),np.array([2e9]))
+ def test_interval_sum_f64_tolerance(self):
+  total=np.array([1e10])
+  self.assertTrue(m.interval_nuclei_includes(np.array([1e10+1e-5]),np.array([1e10+1e-4]),total))
+  self.assertFalse(m.interval_nuclei_includes(np.array([1e10+0.01]),np.array([1e10+0.02]),total))
  def test_full_64byte_source_identity(self):
   self.assertEqual(len(m.ORIGINAL_ARRAY_SHA),64)
   self.assertEqual(len(m.ORIGINAL_ARCHIVE_SHA),64)
