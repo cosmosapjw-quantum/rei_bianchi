@@ -1,0 +1,68 @@
+name: rei-f08-s0-original-bianchi-thomson-observer
+on:
+  push:
+    branches:
+      - research/rei-f08-s0-bianchi-thomson-observer-20261101
+  pull_request:
+    paths:
+      - research/rei_f08_s0_bianchi_thomson_20261101/**
+      - .github/workflows/rei-f08-s0-bianchi-thomson-observer.yml
+permissions:
+  contents: read
+jobs:
+  original-f08-s0-thomson-sky:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify immutable source S0 physical electrons and scenario bytes
+        run: |
+          cd research/rei_f08_s0_bianchi_thomson_20261101/source_inputs
+          echo "663911291bea564d314e1d46df9750c03a39fd5d9404eca6a7485776d894f723  S0_BI-electron_density.csv.gz" | sha256sum -c -
+          echo "0b81cae87d6f90888d1d3def1995cd8d029625d1cc1dd11bffab94e8d30e7efa  S0_FLRW-electron_density.csv.gz" | sha256sum -c -
+          echo "c83d2d43adda663707f99af2b45576eb4478cd94d3440a21fd21eaed32b5f2c1  science_scenario_v1.json" | sha256sum -c -
+      - name: Synthetic source, null geodesic, Thomson visibility and sky physics tests
+        run: |
+          python -m py_compile research/rei_f08_s0_bianchi_thomson_20261101/observer_sky.py
+          python -m unittest discover -s research/rei_f08_s0_bianchi_thomson_20261101/tests -v
+          python -O -m unittest discover -s research/rei_f08_s0_bianchi_thomson_20261101/tests -q
+      - name: Calculate actual 10752-row original F08 matched Bianchi observer sky
+        run: |
+          python research/rei_f08_s0_bianchi_thomson_20261101/observer_sky.py --out source_sky/
+      - name: Independently verify numerical sky, original source status, and DAG holds
+        run: |
+          python research/rei_f08_s0_bianchi_thomson_20261101/audit_sky.py source_sky/
+          python - <<'PY'
+          import csv,gzip,hashlib,json,pathlib,math
+          p=pathlib.Path('source_sky')
+          j=json.loads((p/'RESULT.json').read_text())
+          assert j['new_physical_ray_rows']==10752 and j['physical_science_columns']==30
+          assert j['source_original_F08_scientific_admission']=='HOLD'
+          assert j['source_original_F09']=='BLOCKED_EXTERNAL_ATOMIC_PROVIDER_DOMAIN'
+          assert j['canonical_delta']==0 and j['central_DAG']=='28/88_REPORTED'
+          assert j['original_26event_first_canonical_interval']=='BLOCKED_TICK160/131072'
+          assert j['max_time_quadrature_coarsen_relative']<1e-4
+          assert max(j['angular_quadrature_checks_main_vs_fine'].values())<0.04
+          f=p/j['source_sky_csv']
+          assert hashlib.sha256(f.read_bytes()).hexdigest()==j['source_sky_csv_sha256']
+          with gzip.open(f,'rt') as fd:
+              rd=csv.DictReader(fd)
+              assert len(rd.fieldnames)==30
+              count=0
+              for row in rd:
+                  count+=1
+                  assert all(math.isfinite(float(v)) for v in row.values())
+          assert count==10752
+          assert (p/'INDEPENDENT_AUDIT.json').exists()
+          print('ACTUAL_SOURCE_MATCHED_REI_F08_THOMSON_SKY',count,'COLS',30,'CENTRAL',j['central_DAG'],'CANONICAL_DELTA',0)
+          PY
+      - name: Preserve full actual observer sky or typed failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-f08-s0-bianchi-thomson-observer-10752
+          path: source_sky/
+          if-no-files-found: warn
