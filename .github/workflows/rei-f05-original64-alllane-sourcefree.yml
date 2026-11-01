@@ -1,0 +1,22 @@
+name: REI F05 original first64 three-lane source-free physical evidence
+on:
+  pull_request:
+    paths:
+      - "research/rei_f05_original64_alllane_20261102/**"
+      - ".github/workflows/rei-f05-original64-alllane-sourcefree.yml"
+  workflow_dispatch:
+
+jobs:
+  validate-source-conditional-physics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify three historical SHA and scoped scientific claims
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/rei_f05_original64_alllane_20261102/replay_all_lane_original64.py
+          python3 -m py_compile research/rei_f05_original64_alllane_20261102/independent_alllane_audit.py
+          python3 -m unittest discover -s research/rei_f05_original64_alllane_20261102/tests -v
