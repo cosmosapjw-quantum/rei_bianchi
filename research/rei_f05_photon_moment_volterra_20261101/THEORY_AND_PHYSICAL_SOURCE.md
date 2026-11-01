@@ -1,0 +1,19 @@
+# REI F05: original four-group / three-moment continuum source theory
+
+Original source family: `cosmosapjw-quantum/rei_bianchi`, new research cycle 2026-11-01. This document records **one R1–R10 mathematical-physics research unit**, not ten canonical nodes.
+
+## R1 | Original physics question and locked scope
+
+Current highest relevant original F05 evidence is Draft PR #354 HEAD `6574db945a1b96fa5e0b55923e36781b5db0b03b`, with actual source-native 46,080-cell H/He/thermal V2 shadow gate, 14 original ledger checks, and official accepted tick **160/131072** unchanged. Prior theory PR #353 HEAD `2e04037fbc174e71ed1bee313f2b554257ede4b9` established a discrete-map defect enclosure but expressly did **not** bound the error against the exact continuous initial-value problem. This cycle moves to the **physical continuous source operator**, not another correlated-increment local estimator, point-source atlas, approval-protocol debate, or production IVP run.
+
+**Target physical result:** use the exact original four photon groups and three global H/He absorbing populations to derive (i) finite-amplitude photon allocation/shielding stability and gas-heating response, (ii) the exact low-rank global source Jacobian, (iii) a mathematically reproducible reduced Volterra equation for nonautonomous chemical+thermal continuous-flow error. If actual original source data permit, compute only a compact four-group native opacity-fraction witness on the accepted tick160 parent, rather than another 46,080-row atlas. Do not claim the resulting Volterra bound is a certified original continuum solution unless actual trajectory tubes, continuous residual, and stability bounds are evaluated.
+
+**Physical state** per spatial node (i\): particle numbers (p_i=(N_{HI},N_{HII},N_{HeI},N_{HeII},N_{HeIII})), gas (T_i>0) kelvin, (z_i=\ln(T_i/K)), local thermal (U_i=\tfrac32 k_B(N_{H,i}+N_{He,i}+n_{e,i})T_i) erg, (n_e=N_{HII}+N_{HeII}+2N_{HeIII}). Conserved (N_{H,i}=N_{HI}+N_{HII}), (N_{He,i}=N_{HeI}+N_{HeII}+N_{HeIII}). Proper time (t) seconds. Local OTS, electron-density and cooling terms are retained, not replaced by a 3-channel toy.
+
+**Original continuum source authority:** `stages/*VALIDATED_CONTINUOUS_BRANCH_DIFFERENTIAL_INCLUSION_ENCLOSURE_LOCK/analysis/reduced_interval_rhs.py`, SHA256 `b1f3d6d6397ff727b756816165652a44eb373055256adf7af2e7ef6304ed9b36`, method `ReducedIntervalModel._explicit_photo_fields`. Actual original source TAR SHA256 `a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b`, accepted parent arrays SHA256 `cc031a04f5b7b13ccb9ffddf95ec0ced4a9274a9ab999a9e7e3508a5161edb01`; original 26-event discrete native kernel SHA256 `579df3cc99987dcce9205166752570bdaf4c7cb3640c525be6da260d94b8e644`. Distinguish *continuous reduced RHS* authority from *discrete native map* authority, though both use the source-owner photon allocation definitions.
+
+**Invariants:** original [160,161] remains unapproved; V1 original worker, source, stage policies, source archive, accepted histories, main, production, budget, strict local threshold `2e-4`, width `2e-3`, owner table/OTS/14 ledgers unchanged. No merge, force push, tolerance relaxation, automatic next node, tick162 or history restart. Native subagent unavailable in this Chat runtime; use same-author hostile review once, no fabricated distinct-author referee.
+
+**Success** is an exact source-matched theorem with assumptions and one independently checkable physical four-group witness; **stop** if the work becomes duplicate source derivative maps or protocol changes. CENTRAL=**28/88_REPORTED**; WORKING=**33/88_REPORTED**; PHYSICAL_FAST=**4/7_REPORTED**; CANONICAL_DELTA=**0**.
+
+**R1 backup and drift watchdog:** isolated Git worktree and one Draft PR, stage commit and remote push; mission-specific physical continuous source mathematics rather than meta-work.
