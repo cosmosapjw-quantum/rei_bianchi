@@ -146,7 +146,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    fn synthetic(field:fn([f64;3])->f64)->Vec<Ray>{
+    fn synthetic<F: Fn([f64;3])->f64>(field:F)->Vec<Ray>{
         (0..N_RAYS).map(|d|{
             let q=original_qhat(d);
             Ray{direction:d,t_s:DT_S,q,values:[field(q);4]}
