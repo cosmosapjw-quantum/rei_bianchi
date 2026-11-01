@@ -54,6 +54,18 @@ class PhysicalParent(unittest.TestCase):
         np.testing.assert_allclose(A.sum(axis=1)[:,0],np.ones(m.N))
         self.assertLess(np.max(abs(A.sum(axis=1)-1)),3e-16)
         self.assertGreater(np.min(A[:,np.arange(5),np.arange(5)]),0)
+    def test_mprk_flux_and_parent_denominator_tangent(self):
+        p=np.tile([2.,3.,4.,5.,6.],(m.N,1))
+        f=np.zeros((m.N,5,5))
+        f[:,1,0]=0.7;f[:,3,2]=1.1;f[:,4,3]=.2
+        dp=np.zeros_like(p);dp[:,0]=-1e-4;dp[:,1]=1e-4
+        df=np.zeros_like(f);df[:,1,0]=.0003;df[:,3,2]=-.0001
+        eps=1e-4
+        aplus=m.A_from_flux(f+eps*df,p+eps*dp,.1)
+        aminus=m.A_from_flux(f-eps*df,p-eps*dp,.1)
+        exact=m.A_directional_from_flux(f,df,p,dp,.1)
+        np.testing.assert_allclose((aplus-aminus)/(2*eps),exact,rtol=3e-9,atol=3e-12)
+        self.assertLess(np.max(abs(exact.sum(axis=1))),1e-16)
     def test_wrong_shape(self):
         with self.assertRaises(ValueError):
             m.A_from_flux(np.ones((2,5,5)),np.ones((2,5)),1)

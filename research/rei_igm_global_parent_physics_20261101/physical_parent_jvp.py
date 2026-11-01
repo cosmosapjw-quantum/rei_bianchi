@@ -50,6 +50,24 @@ def A_from_flux(flux, population, dt, identity=True):
             A[:,src,src] += rate
     return A
 
+def A_directional_from_flux(flux, dflux, parent, dparent, dt):
+    """Directional derivative of original MPRK column-conservative A.
+
+    Separate the actual flux response and variation of each Patankar denominator.
+    This avoids cancellation of two nearly identical full MPRK matrices.
+    """
+    flux=np.asarray(flux,float);dflux=np.asarray(dflux,float)
+    parent=np.asarray(parent,float);dparent=np.asarray(dparent,float)
+    dA=np.zeros((N,5,5),float)
+    for src in range(5):
+        for dst in range(5):
+            if dst==src:continue
+            slope=dt*(dflux[:,dst,src]/parent[:,src] -
+                      flux[:,dst,src]*dparent[:,src]/(parent[:,src]**2))
+            dA[:,dst,src]-=slope
+            dA[:,src,src]+=slope
+    return dA
+
 def source_point(fb,mod,model,p,temp,t,nh,nhe,dt):
     """Fresh ORIGINAL 26-event positive H/He flux, not surrogate RHS."""
     if np.any(p<=0) or np.any(temp<=0): raise ValueError("Nonpositive original state")
@@ -71,7 +89,8 @@ def physical_direction(p,low,high,src,dst,scale=0.20):
     direction[:,src]=-amp; direction[:,dst]=amp
     for a in (-1.,1.):
         q=p+a*direction
-        if np.any(q<low-2e-12*np.maximum(1.,abs(low))) or np.any(q>high+2e-12*np.maximum(1.,abs(high))):
+        roundoff=16*np.finfo(float).eps*np.maximum.reduce([abs(low),abs(high),abs(q)])
+        if np.any(q<low-roundoff) or np.any(q>high+roundoff):
             raise ValueError("Original marginal source enclosure broken")
         if np.any(q<=0):raise ValueError("Nonpositive physical parent point")
     return direction,amp
@@ -142,7 +161,7 @@ def main(repo,out):
     dt=float(base.forcing.duration_seconds(0))/TOTAL
     A,ev,ref=source_point(fb,mod,model,p,T,t,nh,nhe,dt)
     y=old.batch_solve(A,p)
-    tol=5e-11*np.maximum(np.abs(y),np.abs(p))
+    tol=128*np.finfo(float).eps*np.maximum(np.abs(y),np.abs(p))
     if np.any(y<ref.lower-tol) or np.any(y>ref.upper+tol):
         raise ValueError("Representative original MPRK predictor escapes Krawczyk")
     group,shares,C,current,dens,S=group_source(fb,model,mod,p,t)
@@ -157,10 +176,13 @@ def main(repo,out):
         Aminus,evminus,refminus=source_point(fb,mod,model,neg,T,t,nh,nhe,dt)
         yp=old.batch_solve(Aplus,pos); ym=old.batch_solve(Aminus,neg)
         for q,r in ((yp,refplus),(ym,refminus)):
-            tt=5e-11*np.maximum(abs(q),abs(p))
+            tt=128*np.finfo(float).eps*np.maximum(abs(q),abs(p))
             if np.any(q<r.lower-tt) or np.any(q>r.upper+tt):
                 raise ValueError("Original source Krawczyk rejects physical endpoint")
-        derivA=(Aplus-Aminus)/2.
+        F0=.5*(ev.flux.lo+ev.flux.hi)
+        Fplus=.5*(evplus.flux.lo+evplus.flux.hi)
+        Fminus=.5*(evminus.flux.lo+evminus.flux.hi)
+        derivA=A_directional_from_flux(F0,.5*(Fplus-Fminus),p,d,dt)
         tangent=old.batch_solve(A,d-np.einsum("nij,nj->ni",derivA,y))
         finite=.5*(yp-ym)
         direct,glob,dheatdir,dheatglob,dS=photon_directional_components(
@@ -181,13 +203,16 @@ def main(repo,out):
         for u in (tangent,finite,glob_y,local_y):
             if np.any(~np.isfinite(u)):raise ValueError("Nonfinite original scientific JVP")
             for sl in (slice(0,2),slice(2,5)):
-                resid=np.max(abs(u[:,sl].sum(axis=-1)))
-                if resid>1e-8*max(float(np.max(abs(u))),1e-150):
-                    raise ValueError("H/He nuclei not conserved in source response")
+                # Inspect physically normalized conservation, not residual/small
+                # directional signal, which can be dominated by float cancellation.
+                denom=nh if sl.start==0 else nhe
+                residual_fraction=float(np.max(abs(u[:,sl].sum(axis=-1))/denom))
+                if residual_fraction>1e-12:
+                    raise ValueError(f"H/He nuclei violation: {residual_fraction:.6g}")
         td=charge(tangent,nh);fd=charge(finite,nh);gd=charge(glob_y,nh);ld=charge(local_y,nh)
         he=1.5*KB*T*td
         ch=float(mod.rim.CHI_H_EV);ca=float(mod.rim.CHI_HEI_EV);cb=float(mod.rim.CHI_HEII_EV)
-        bind=EV*(ch*tangent[:,1]+ca*tangent[:,3]+(ca+cb)*tangent[:,4])/nh
+        bind=EV_ERG*(ch*tangent[:,1]+ca*tangent[:,3]+(ca+cb)*tangent[:,4])/nh
         H0=(dheatdir+dheatglob)/nh;Hg=dheatglob/nh
         cols[f"{label}_amplitude_ion_per_H"]=amp/nh
         cols[f"{label}_dxe_total_coupled_MPRK"]=td
