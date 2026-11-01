@@ -39,6 +39,11 @@ class Tests(unittest.TestCase):
   self.assertEqual(m.GATE,2e-4);self.assertEqual(m.TICK,160)
   self.assertNotEqual(m.ORIGINAL_FAILURE,m.GATE)
   self.assertEqual(m.ALPHAS,(.05,.5,.95))
+ def test_full_64byte_source_identity(self):
+  self.assertEqual(len(m.ORIGINAL_ARRAY_SHA),64)
+  self.assertEqual(len(m.ORIGINAL_ARCHIVE_SHA),64)
+  self.assertEqual(len(m.ORIGINAL_KERNEL_SHA),64)
+  self.assertEqual(m.ORIGINAL_ARRAY_SHA,"cc031a04f5b7b13ccb9ffddf95ec0ced4a9274a9ab999a9e7e3508a5161edb01")
  def test_bad_interval(self):
   with self.assertRaises(ValueError):m.interval_separation(Interval([2],[1]),Interval([1],[2]))
  def test_source_rows_46080(self):
