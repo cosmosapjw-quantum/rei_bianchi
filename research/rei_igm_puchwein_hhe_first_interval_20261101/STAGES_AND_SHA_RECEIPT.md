@@ -26,6 +26,6 @@
 | C10 | Reproducible master package and next action | `e3906b183b54ac1c370eec153cddf01dac37ac9455b4637bd279bf40290d4532` | SCOPED |
 
 **Selected local archive identities:**
-- Source master `REI_IGM_PUCHWEIN_HHE_FIRST_INTERVAL_SOURCE_MASTER_20261101.zip`, 1,212,615 bytes, SHA256 `f335e3abcae8f83efb4e3c11db1f8d8942d750f03960aa69c27544b5685202f6`, 66 members CRC PASS.
-- Stage/phase aggregate `REI_IGM_PUCHWEIN_HHE_FIRST_INTERVAL_ALL_STAGES_20261101.zip`, 1,431,829 bytes, SHA256 `fc1d73f857865ec3d4e6babe202552c833b7f567c395d7946e2e1b3e25c6c40d`, 46 members CRC PASS.
+- Source master `REI_IGM_PUCHWEIN_HHE_FIRST_INTERVAL_SOURCE_MASTER_20261101.zip`, 1,212,616 bytes, SHA256 `d5c78244e1518bbb70aa6770a7826bb60102da989f203a4bf34a6b3e071c0060`, 66 members CRC PASS.
+- Stage/phase aggregate `REI_IGM_PUCHWEIN_HHE_FIRST_INTERVAL_ALL_STAGES_20261101.zip`, 1,348,130 bytes, SHA256 `6227f55d96e0e6c3c69a9df947a7aebe232ba9692b9c055a52267e86a96f01a2`, 25 members CRC PASS.
 - 4 phase archives individually CRC PASS. The **full local** ledger `stages/STAGE_LEDGER.csv` and all 20 actual ZIPs are in the aggregate archive, with a SHA manifest in source master. Remote provider upload to Library/Drive/Dropbox: **NOT_DONE**. The GitHub text checkpoint does not constitute independent binary backup.
