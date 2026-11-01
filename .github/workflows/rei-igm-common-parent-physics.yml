@@ -26,10 +26,29 @@ jobs:
           python research/rei_igm_first_interval_common_parent_20261101/code/physical_probe.py \
             --archive 'stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz' \
             --output source_science/ORIGINAL_H_HE_T_ENERGY.json
+      - name: Validate full original nodewise H-He thermochemistry CSVs
+        run: |
+          python - <<'PY'
+          import gzip,csv,glob,hashlib
+          paths=sorted(glob.glob("source_science/NODEWISE_*_46080_PHYSICAL.csv.gz"))
+          assert len(paths)==3, paths
+          for path in paths:
+              with gzip.open(path,mode="rt",newline="",encoding="utf-8") as stream:
+                  reader=csv.DictReader(stream)
+                  n=0
+                  for row in reader:
+                      n+=1
+                      assert 0<=float(row["x_HII_lo"])<=float(row["x_HII_hi"])<=1.0001
+                      assert 0<=float(row["x_HeII_lo"])<=float(row["x_HeII_hi"])<=1.0001
+                      assert float(row["T_K_lo"])>0 and float(row["T_K_hi"])>=float(row["T_K_lo"])
+                      assert float(row["U_thermal_erg_per_H_lo"])>0
+                  assert n==46080,(path,n)
+              print("AUTHENTIC_NODEWISE_VALIDATED",path,n,hashlib.sha256(open(path,"rb").read()).hexdigest())
+          PY
       - name: Preserve actual source physics report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: rei-igm-first-interval-real-partial-history
-          path: source_science/ORIGINAL_H_HE_T_ENERGY.json
+          path: source_science/
           if-no-files-found: warn
