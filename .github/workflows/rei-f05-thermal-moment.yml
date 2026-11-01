@@ -1,0 +1,75 @@
+name: REI F05 source-shared original implicit thermal root derivatives
+on:
+  push:
+    branches:
+      - research/rei-f05-26event-thermal-implicit-moment-20261101
+  pull_request:
+    paths:
+      - research/rei_f05_thermal_moment_20261101/**
+      - .github/workflows/rei-f05-thermal-moment.yml
+permissions: {contents: read}
+jobs:
+  source-thermal-owner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Original REI frozen source runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Verify original accepted frozen archive
+        run: |
+          echo 'a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz' | sha256sum -c -
+      - name: Focused thermal-root implicit derivative validation
+        run: |
+          python -m py_compile research/rei_f05_thermal_moment_20261101/implicit_thermal_moment.py
+          python -m unittest discover -s research/rei_f05_thermal_moment_20261101/tests -v
+          python -O -m unittest discover -s research/rei_f05_thermal_moment_20261101/tests -v
+      - name: Compute 46k original native implicit-root photon-source response
+        run: |
+          python research/rei_f05_thermal_moment_20261101/implicit_thermal_moment.py --repo . --out physical_output
+      - name: Assert original scientific unit completeness and hold
+        run: |
+          python - <<'PY'
+          import json,gzip,csv,pathlib,hashlib,math
+          out=pathlib.Path("physical_output")
+          r=json.loads((out/"RESULT.json").read_text())
+          assert r["status"]=="NATIVE_ROOT_PARTIAL_PHOTON_THERMAL_JACOBIAN_COMPUTED_NOT_FULL_Dh",r["status"]
+          assert r["not_original_full_Dh_certificate"] and r["canonical_delta"]==0
+          assert r["canonical_DAG"]=="28/88_REPORTED"
+          assert r["original_historical_failed_one_tick"]>r["original_historical_logT_gate"]==2e-4
+          assert len(r["map_steps"])==3 and all(x["certified"] for x in r["map_steps"])
+          assert r["new_physical_root_node_rows"]==46080*r["root_site_count"]
+          p=out/r["output_csv"]
+          assert hashlib.sha256(p.read_bytes()).hexdigest()==r["output_sha256"]
+          n=0
+          with gzip.open(p,"rt") as f:
+            for row in csv.DictReader(f):
+              n+=1
+              assert all(math.isfinite(float(v)) for k,v in row.items() if k not in ("map_step","source_site"))
+              assert float(row["native_Fz_derivative_erg_lo"])>0
+              for k in ("HI","HeI","HeII"):
+                assert float(row["conditional_dlogT_dlnS_"+k+"_lo"])<=float(row["conditional_dlogT_dlnS_"+k+"_hi"])
+          assert n==r["new_physical_root_node_rows"]
+          print("REAL_ORIGINAL_THERMAL_ROOT_ROWS",n,"ROOT_CALLS",r["root_site_count"],"CANONICAL_DELTA",0)
+          PY
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-f05-native-thermal-root-photon-source-46080
+          path: |
+            physical_output/
+            research/rei_f05_thermal_moment_20261101/implicit_thermal_moment.py
+            research/rei_f05_thermal_moment_20261101/tests/
+            research/rei_f05_thermal_moment_20261101/THEORY_KO.md
+            research/rei_f05_thermal_moment_20261101/STAGE_LEDGER.json
+          retention-days: 90
+          if-no-files-found: warn
