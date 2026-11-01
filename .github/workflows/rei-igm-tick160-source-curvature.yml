@@ -1,0 +1,67 @@
+name: REI original26 tick160 photon source second-order physical certificate
+on:
+  push:
+    branches: [research/rei-igm-tick160-photon-source-curvature-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_igm_tick160_source_curvature_20261101/**'
+      - '.github/workflows/rei-igm-tick160-source-curvature.yml'
+permissions: {contents: read}
+jobs:
+  real-tick160-source-curvature:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install pinned true original REI source owner environment
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip install matplotlib==3.10.8
+          python -m pip check
+      - name: Strict immutable original source archive and direct math tests
+        run: |
+          echo 'a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz' | sha256sum -c -
+          python -m py_compile research/rei_igm_tick160_source_curvature_20261101/photon_curvature.py
+          python -m unittest discover -s research/rei_igm_tick160_source_curvature_20261101/tests -v
+          python -O -m unittest discover -s research/rei_igm_tick160_source_curvature_20261101/tests -v
+      - name: Execute real original 46080-node photon-source Hessian and full-box source remainder
+        run: |
+          python research/rei_igm_tick160_source_curvature_20261101/photon_curvature.py --repo . --output original_physics
+      - name: Inspect actual physical 46080-node data before publishing artifacts
+        run: |
+          python - <<'PY'
+          import csv,gzip,hashlib,json,pathlib,math
+          p=pathlib.Path('original_physics')
+          o=json.loads((p/'PHYSICS_RESULT.json').read_text())
+          assert o['unique_original_nodes']==46080 and o['new_source_hessian_group_records']==12
+          assert o['nodewise_physical_curvature_rows']==46080
+          assert o['canonical_delta']==0 and o['central_dag']=='28/88_REPORTED'
+          assert o['full_coupled_discrete_map_Dh_rigorous_enclosure']=='NOT_COMPUTED'
+          assert o['original_failed_crossbox_local_error']>o['locked_limit']==2e-4
+          assert o['original_source_interval_enclosure_pass'] is True
+          assert abs(o['source_owned_photoheating_erg_per_s']/8.22713274931762e37-1)<2e-7
+          q=p/'ORIGINAL_26EVENT_NODE_PHOTON_SECOND_ORDER_46080.csv.gz'
+          assert hashlib.sha256(q.read_bytes()).hexdigest()==o['source_crc_row_sha256']
+          with gzip.open(q,'rt') as f:
+            r=list(csv.DictReader(f))
+          assert len(r)==46080 and all(math.isfinite(float(v)) for x in r for k,v in x.items() if k!='node')
+          assert len(list(p.glob('FIG*.png')))==2
+          print('ACTUAL_26EVENT_SECOND_ORDER_PHYSICAL_NODES',len(r),'GROUPS',len(o['group_physics']),'CENTRAL_DAG',o['central_dag'])
+          PY
+      - name: Preserve source-owned physical data, code and stage checkpoints
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-original26-tick160-source-nonlinear-curvature-46080
+          path: |
+            original_physics/
+            research/rei_igm_tick160_source_curvature_20261101/
+          if-no-files-found: warn
+          retention-days: 90
