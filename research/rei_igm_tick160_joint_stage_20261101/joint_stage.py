@@ -47,7 +47,7 @@ def rational_rate_jvp(n, dn, c, dglobal, current, external):
     n = np.asarray(n, float)
     dn = np.asarray(dn, float)
     c = np.asarray(c, float)
-    if n.ndim != 2 or n.shape[1] != 3 or dn.shape != n:
+    if n.ndim != 2 or n.shape[1] != 3 or dn.shape != n.shape:
         raise ValueError("three neutral populations per original node")
     if c.shape != (3,) or np.asarray(dglobal).shape != (3,):
         raise ValueError("exactly three shared moments")
