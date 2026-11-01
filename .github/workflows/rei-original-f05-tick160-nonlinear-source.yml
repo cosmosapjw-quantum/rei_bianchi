@@ -1,0 +1,68 @@
+name: rei-original-f05-tick160-nonlinear-source
+on:
+  push:
+    branches: [research/rei-igm-original-nonlinear-tick160-20261101]
+  pull_request:
+    paths: [research/rei_igm_nonlinear_tick160_20261101/**, .github/workflows/rei-original-f05-tick160-nonlinear-source.yml]
+permissions:
+  contents: read
+jobs:
+  original-nonlinear-26events:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Bind original 2026-08-29 NumPy source runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Read exact frozen source checksum
+        run: |
+          echo "a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz" | sha256sum -c -
+      - name: Verify mathematical boundary tests and Python syntax
+        run: |
+          python -m unittest discover -s research/rei_igm_nonlinear_tick160_20261101/tests -p 'test_*.py' -v
+          python -m py_compile research/rei_igm_nonlinear_tick160_20261101/code/probe_nonlinear.py
+      - name: Execute original 26-event F_h and two half maps at tick160
+        run: |
+          export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONHASHSEED=0
+          python research/rei_igm_nonlinear_tick160_20261101/code/import_guard.py --repo . --output physical_output
+      - name: Check and count newly generated model data without fake acceptance
+        run: |
+          python - <<'PY'
+          import gzip,csv,json,hashlib,math,pathlib
+          root=pathlib.Path('physical_output')
+          r=json.loads((root/'NONLINEAR_MAP_TICK160_RESULT.json').read_text())
+          assert r['original_historical_failure_error']>r['original_strict_gate']==2e-4
+          assert not r['whole_canonical_interval_accepted']
+          assert r['canonical_delta']==0 and r['canonical_DAG_reported']=='28/88'
+          assert len(r['rows'])==6 and len(r['contrasts'])==3
+          total=0
+          for record in r['rows']:
+            if not record.get('csv'):
+              print('ORIGINAL_MAP_UNCERTIFIED',record['lane'],record['mode'],record['status'])
+              continue
+            p=root/record['csv']
+            assert hashlib.sha256(p.read_bytes()).hexdigest()==record['sha256']
+            with gzip.open(p,encoding='utf8') as fp:
+              rows=list(csv.DictReader(fp))
+            assert len(rows)==46080,(record['csv'],len(rows))
+            for row in rows:
+              assert all(math.isfinite(float(v)) for k,v in row.items() if k!='node')
+              assert 0<float(row['T_K_twohalf_lo'])<=float(row['T_K_twohalf_hi'])
+              assert 0<=float(row['x_HII_H_lo'])<=float(row['x_HII_H_hi'])<=1.00001
+            total+=len(rows)
+          assert total==r['model_diagnostic_rows']
+          print('SOURCE_26EVENT_DIAGNOSTIC_MODEL_ROWS',total)
+          print('CANONICAL_DELTA',r['canonical_delta'])
+          PY
+      - name: Preserve physical evidence even when one map fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-original-26event-tick160-nonlinear-map
+          path: physical_output/
+          if-no-files-found: warn
