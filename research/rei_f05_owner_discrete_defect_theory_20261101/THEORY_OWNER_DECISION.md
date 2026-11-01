@@ -109,3 +109,21 @@ Wolfram checked a formal p-order full/two-half difference `C h^(p+1)(1-2^-p)`; f
 No original source-run replay, native acceptance or any new physical model was executed in this theoretical R7 step; source-scoped PR #348/#350/#351 verified rows are reused as historical *implementation-level* inputs with their identity snapshots.
 
 **R7 preservation:** exact symbolic counterexample, explicit interval false-negative toy and conditional order algebra published. CENTRAL=28/88; WORKING=33/88; FAST=4/7; canonical Δ0. Drift watchdog PASS: finite falsifiable tests directly change the research decision.
+
+### R8. Actual science judgment and one owner-contract decision
+
+**Derived mathematical claim, scoped PASS:** the exact same-parent increment identity gives a sufficient inclusion criterion for the original four-channel **discrete full-minus-twohalf map difference**. A legacy endpoint crossbox upper above threshold is an inconclusive sufficient test, not a proof of physical threshold violation. Existing PR #348/#350/#351 source-domain results provide implementation-level evidence of all four new bounds below the unmodified `2e-4` threshold, plus all original fourteen ledgers, no table event, width <2e-3 and original source identity. The independent methods are alternative proofs of the same local object, not three independent cosmological datasets.
+
+**Original-worker admission: HOLD:** the frozen V1 worker `attempt_worker.run_job` and `adaptive_policy.validate_and_decide` currently define their schema and compute their historical local error with legacy final endpoint boxes. **V1 behavior must remain unchanged**. The old `STOP_MINIMUM_STEP` outcome at [160,161] is a historical scientific provenance record and must never be rewritten as PASS. The existing candidate tick161 preview stays NPZ, not original REIADP1 accepted state.
+
+**New versioned theory decision:** ADOPT `V2_COMMON_PARENT_DIRECT_DISCRETE_DIFFERENCE` as the mathematically justified *shadow scientific-evidence predicate for exactly [160,161]*, conditioned on all original-source interval inclusion assumptions. **REJECT** silent promotion of this predicate into the V1 worker; **HOLD** official tick161 acceptance until a source-owner-controlled, versioned implementation and exact associated provenance/negative tests are separately approved. This is a bounded constructive selection, not a demand for another partial photon derivative study.
+
+**Continuum physics not certified:** no a priori enclosure of exact nonautonomous 26-event continuous flow over the full time segment and all uncertain states, no interval continuous residual, no global 131072-tick history bound, no coupling to a self-consistent Bianchi transfer/observational likelihood. For a smooth candidate interpolant `ŷ(t)` of the same physical IVP, residual `r(t)=ŷ'(t)-f(t,ŷ(t))` and an independently justified Lipschitz upper `L(t)` yield the *conditional* Grönwall estimate
+`||y(t1)-ŷ(t1)|| ≤ exp(∫_{t0}^{t1}L) ||y(t0)-ŷ(t0)|| + ∫_{t0}^{t1} exp(∫_s^{t1} L(u)du) ||r(s)|| ds`.
+This is an actionable continuum obligation, not a result established by current residual linear-system tests. A one-sided logarithmic-norm bound may be less pessimistic for stiff conservative chemistry but requires the original global photon/electron/thermal coupling Jacobian and branch regularity. Neither route is claimed completed.
+
+**No gratuitous proof gate:** complete MPFI/CRlibm formalization is **not** added as a novel precondition to an official original-owner implementation if its existing trusted float64+nextafter contract is unchanged and accepted for original V1. Such a formal proof would strengthen scientific confidence, not retroactively redefine the original gate. Formal theorem status remains explicitly below full rounding certification.
+
+**Claim categories:** mathematical direct inclusion DERIVED; 2×2 and counterexample WOLFRAM_CHECKED; original three-lane input results HISTORICAL_IMPLEMENTATION_VERIFIED; original owner V2 implementation NOT_RUN; exact-flow error UNRESOLVED; physical full-interval and production HOLD.
+
+**R8 preservation:** precise adopt-for-shadow/reject-silent-substitution/hold-owner-promotion outcome published. CENTRAL=28/88; WORKING=33/88; FAST=4/7; canonical Δ0. Drift watchdog PASS: one real scientific decision, no new gate or node.
