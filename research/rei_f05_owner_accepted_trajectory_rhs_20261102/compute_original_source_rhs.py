@@ -70,7 +70,7 @@ def sourced_identity(repo,rec,he,stage,worker,states):
     ref=json.loads(recpath.read_text())
     hedata=json.loads(hepath.read_text())
     require(ref["cells_per_epoch"]==N and ref["f05_tick161"]=="NOT_ACCEPTED","REC_ORIGINAL_STATE_SCOPE")
-    require(hedata["source_original_tar_sha256"]==SHA_TAR and hedata["source_original_event_sha256"]==SHA_KERN,"OTS_SOURCE_ORIGINAL_LOCK")
+    require(hedata["source_original_tar_sha256"]==SHA_TAR and hedata["kernel_sha256"]==SHA_KERN and hedata["source_original_event_sha256"]=="b9cb365989149a4368b6a257e15cabf8e07c522419bd2328401c90d2fe49ce5d","OTS_SOURCE_ORIGINAL_LOCK")
     require(hedata["source_original_rhs_sha256"]=="b1f3d6d6397ff727b756816165652a44eb373055256adf7af2e7ef6304ed9b36","OTS_RHS_SOURCE_SHA")
     for tick,p in states.items():
         require(sha(p)==SHA_STATE[tick],"ORIGINAL_STATE_SHA_"+str(tick))
