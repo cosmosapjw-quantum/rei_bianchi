@@ -47,7 +47,7 @@ jobs:
               continue
             p=root/record['csv']
             assert hashlib.sha256(p.read_bytes()).hexdigest()==record['sha256']
-            with gzip.open(p,encoding='utf8') as fp:
+            with gzip.open(p,mode='rt',encoding='utf8') as fp:
               rows=list(csv.DictReader(fp))
             assert len(rows)==46080,(record['csv'],len(rows))
             for row in rows:
