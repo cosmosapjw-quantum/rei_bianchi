@@ -185,6 +185,10 @@ def run(repo:Path,lane:str,out:Path,temperature_edge:str):
                     'nodes_upper_below_gate':int(np.count_nonzero(dmax<GATE)),
                     'max_full_box_width':float(np.max(A[k].hi-A[k].lo)),
                     'max_twohalf_box_width':float(np.max(B[k].hi-B[k].lo))}
+    # Original local error acceptance applies only to xHII, xHeII, xHeIII, lnT.
+    # Never compare electron/atom-energy/thermal-energy numbers to 2e-4.
+    for physical_key in ('xe_per_H','binding_eV_per_H','thermal_erg_per_H'):
+        summary[physical_key].pop('nodes_upper_below_gate',None)
     out.mkdir(parents=True,exist_ok=True)
     csv_path=out/('REAL_26EVENT_PARENT_TEDGE_'+temperature_edge+'_'+lane+'_46080.csv.gz')
     import gzip
