@@ -1,0 +1,109 @@
+name: rei-f05-common-parent-26event-increment-certificate
+on:
+  push:
+    branches: [research/rei-f05-common-parent-increments-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_f05_common_parent_increments_20261101/**'
+      - '.github/workflows/rei-f05-common-parent-increment.yml'
+permissions: {contents: read}
+jobs:
+  original-26event-same-parent-difference-map:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        lane:
+          - LOCAL_NEUTRAL_HAZARD_PRIMARY
+          - RECOMBINATION_WEIGHTED_AUDITOR
+          - SCRIPT_SELF_SHIELDING_AUDITOR
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install exact original frozen 26-event runtime
+        run: |
+          stage=$(find stages -maxdepth 1 -type d -name '*UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY' -print -quit)
+          test -n "$stage" && test -f "$stage/requirements-runtime.txt"
+          python -m pip install -r "$stage/requirements-runtime.txt"
+          python -m pip check
+      - name: Test correlated increments, native physical invariants and signed negative cases
+        run: |
+          python -m py_compile research/rei_f05_common_parent_increments_20261101/increment_certificate.py
+          python -m unittest discover -s research/rei_f05_common_parent_increments_20261101/tests -v
+          python -O -m unittest discover -s research/rei_f05_common_parent_increments_20261101/tests -v
+          python -m unittest discover -s research/rei_igm_original26_temperature_edges_20261101/tests -v
+      - name: Run ORIGINAL 46,080-node 26-event full vs two half native F05 source-cancelled interval
+        run: |
+          python research/rei_f05_common_parent_increments_20261101/increment_certificate.py \
+            --repo . --lane '${{ matrix.lane }}' \
+            --out 'source_science/${{ matrix.lane }}'
+      - name: Verify unchanged original locked gates and all-real original source output
+        run: |
+          python - <<'PY'
+          import json, gzip,csv,hashlib,math
+          from pathlib import Path
+          p=Path('source_science/${{ matrix.lane }}')
+          r=json.loads((p/'RESULT.json').read_text())
+          assert r['status']=='SCOPED_SOURCE_REAL_F05_INCREMENT_GATE_CANDIDATE_PASS',r['status']
+          assert r['original_nodes']==46080
+          assert r['frozen_original_archive_sha256']=='a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b'
+          assert r['original_state_array_sha256']=='cc031a04f5b7b13ccb9ffddf95ec0ced4a9274a9ab999a9e7e3508a5161edb01'
+          assert r['original_26event_kernel_sha256']=='579df3cc99987dcce9205166752570bdaf4c7cb3640c525be6da260d94b8e644'
+          assert r['original_local_error_gate']==2e-4 and r['original_public_width_gate']==2e-3
+          assert r['historical_crossbox_logT_check']>2e-4
+          assert r['all_original_4_channel_local_defects_below_gate']
+          assert r['original_set_ledger_pass'] and r['original_set_ledgers']['evaluated_ledgers']==14
+          assert not r['original_set_ledgers']['failed_ledgers']
+          assert r['original_native_table_event_pass'] and r['original_public_width_pass']
+          assert r['original_output_max_public_width']<2e-3
+          assert r['canonical_delta']==0 and r['central_dag']=='28/88_REPORTED'
+          assert r['fast_dag']=='4/7_REPORTED'
+          assert not r['full_allX_jacobian_hessian_certificate']
+          assert r['original_first_canonical_interval']=='BLOCKED_UNTIL_ORIGINAL_OWNER_ADMISSION'
+          assert r['production']=='HOLD' and not r['auto_next_node'] and r['no_merge']
+          assert set(r['steps'])=={'full','half1','half2'}
+          assert all(s['native_certified'] and s['original_population_solves']==3
+             and s['original_table_event_count']==0
+             and s['logT_consistency_overlap_nodes']==46080
+             and s['x_HII_consistency_overlap_nodes']==46080
+             and all(b['certified_nodes']==46080 and b['max_row_sum']<1
+                     for b in s['increment_krawczyk_blocks'])
+             for s in r['steps'].values())
+          assert set(r['increment_defect_coordinates'])=={'x_HII','x_HeII','x_HeIII','log_T'}
+          assert all(c['all_nodes_below_original_gate']
+                     and c['nodes_below_unchanged_2eMinus4']==46080
+                     and c['max_correlated_increment_defect_upper']<2e-4
+                     for c in r['increment_defect_coordinates'].values())
+          f=p/r['csv_file']
+          assert hashlib.sha256(f.read_bytes()).hexdigest()==r['csv_sha256']
+          with gzip.open(f,'rt',newline='') as q:
+              reader=csv.DictReader(q)
+              assert len(reader.fieldnames)==r['csv_columns']
+              n=0
+              for row in reader:
+                  n+=1
+                  assert len(row)==r['csv_columns']
+                  assert all(math.isfinite(float(v)) for k,v in row.items() if k!='node')
+              assert n==r['source_derived_model_rows']==46080
+          print('REAL_ORIGINAL_F05_CORRELATED_INCREMENT',r['original_shape_lane'],
+                'ROWS',n,'ORIGINAL_CROSSBOX_FAIL',r['historical_crossbox_logT_check'],
+                'NEW_LOGT_FULL_PARENT_BOUND',r['increment_defect_coordinates']['log_T']['max_correlated_increment_defect_upper'],
+                'ORIGINAL_GATE',r['original_local_error_gate'],
+                'SET_LEDGER',r['original_set_ledgers']['evaluated_ledgers'],
+                'CANONICAL_DELTA',r['canonical_delta'])
+          PY
+      - name: Retain actual original physical certification candidate and source failure records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-f05-common-parent-original26-${{ matrix.lane }}
+          path: source_science/${{ matrix.lane }}/
+          retention-days: 90
+          if-no-files-found: warn
