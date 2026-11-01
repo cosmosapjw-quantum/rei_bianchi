@@ -1,0 +1,61 @@
+name: REI F05 exact original source finite nonlinear remainder
+on:
+  push:
+    branches: [research/rei-f05-tick160-exact-global-photon-remainder-20261101]
+  pull_request:
+    paths: ['research/rei_f05_exact_photon_remainder_20261101/**','.github/workflows/rei-f05-source-remainder.yml']
+permissions: {contents: read}
+jobs:
+  exact-global-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - run: |
+          echo 'a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz' | sha256sum -c -
+      - name: Focused source finite-remainder tests
+        run: |
+          python -m py_compile research/rei_f05_exact_photon_remainder_20261101/finite_source_remainder.py
+          python -m unittest discover -s research/rei_f05_exact_photon_remainder_20261101/tests -v
+          python -O -m unittest discover -s research/rei_f05_exact_photon_remainder_20261101/tests -v
+      - name: Actual original 26-event 46k-state source finite remainder
+        run: |
+          python research/rei_f05_exact_photon_remainder_20261101/finite_source_remainder.py --repo . --output physics_output
+      - name: Verify original source physics, files, canonical hold
+        run: |
+          python - <<'PY'
+          import pathlib,json,gzip,csv,hashlib,math
+          p=pathlib.Path('physics_output')
+          r=json.loads((p/'RESULT.json').read_text())
+          assert r['unique_physical_nodes']==46080 and r['new_source_conditioned_rows']==46080
+          assert r['central']=='28/88_REPORTED' and r['canonical_delta']==0
+          assert r['historical_logT_error']>r['strict_gate']==2e-4
+          f=p/r['output_csv']
+          assert hashlib.sha256(f.read_bytes()).hexdigest()==r['output_csv_sha256']
+          with gzip.open(f,'rt') as g: rows=list(csv.DictReader(g))
+          assert len(rows)==46080
+          assert all(math.isfinite(float(x)) for row in rows for k,x in row.items() if k!='node')
+          assert len(r['source_groups'])==4
+          print('SOURCE_ONLY_REMAINDER_ORIGINAL_NODE_ROWS',len(rows),'CENTRAL',r['central'])
+          PY
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-f05-original-46080-tick160-source-remainder
+          path: |
+            physics_output/
+            research/rei_f05_exact_photon_remainder_20261101/finite_source_remainder.py
+            research/rei_f05_exact_photon_remainder_20261101/tests/
+            research/rei_f05_exact_photon_remainder_20261101/THEORY_REPORT_KO.md
+            research/rei_f05_exact_photon_remainder_20261101/STAGE_LEDGER.json
+          retention-days: 90
+          if-no-files-found: warn
