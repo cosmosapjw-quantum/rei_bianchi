@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+"""Source-free current HEAD contract verification. NOT full private-source replay."""
+import hashlib,json,unittest
+from pathlib import Path
+R=Path(__file__).resolve().parents[1]
+def load(n):return json.loads((R/"results"/n).read_text())
+def sha(n):return hashlib.sha256((R/"results"/n).read_bytes()).hexdigest()
+class TestOriginalOwnerScope(unittest.TestCase):
+    def test_first64_source_and_no_false_tick161(self):
+        j=load("ORIGINAL64_PYTHON_PHYSICAL_RESULT.json")
+        self.assertEqual(j["original_source_tar_sha256"],"a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b")
+        self.assertEqual(j["original_kernel_sha256"],"579df3cc99987dcce9205166752570bdaf4c7cb3640c525be6da260d94b8e644")
+        self.assertEqual(j["original_accepted_0_64_sha256"],"aae4607ec1f0eff6669f1c1cb716ec6d6a4af8b789bba14abcd17f1733f83425")
+        self.assertTrue(j["byte_equal_to_historical"])
+        self.assertEqual(j["original_accepted_0_64_sha256"],j["new_unpinned_0_64_sha256"])
+        self.assertEqual(j["physical_rows"],46080)
+        self.assertEqual(j["source_map_full_half_half_certified"],[True,True,True])
+        self.assertTrue(j["recomputed_14_ledgers_include_zero"])
+        self.assertEqual(len(j["recomputed_14_ledger_keys"]),14)
+        self.assertEqual(j["table_event_count"],0)
+        self.assertLess(max(j["recomputed_local_bounds"].values()),2e-4)
+        self.assertLess(max(j["recomputed_widths"].values()),2e-3)
+        self.assertEqual(j["canonical_delta"],0)
+        self.assertEqual(j["production"],"HOLD")
+        self.assertEqual(j["original_accepted_tick"],"160/131072")
+        self.assertEqual(j["scientific_scope"],"EXPLORATORY_UNPINNED_MAP_NOT_WORKER_ACCEPTANCE")
+    def test_original_rust_consumer_result(self):
+        j=load("ORIGINAL64_RUST_SCIENCE.json")
+        self.assertEqual(j["source_rows"],46080)
+        self.assertEqual(j["electron_interval_misses"],0)
+        self.assertEqual(j["thermal_interval_misses"],0)
+        self.assertLess(j["rust_eos_max_rel_discrepancy"],1e-14)
+        self.assertLess(j["delta_ne_mid"],0)
+        self.assertLess(j["delta_B_mid_erg"],0)
+        self.assertLess(j["delta_U_mid_erg"],0)
+        self.assertEqual(j["definitely_decreasing_electron_cells"]+j["definitely_increasing_electron_cells"]+j["sign_ambiguous_cells"],46080)
+        self.assertEqual(j["production"],"HOLD")
+    def test_independent_source_authority(self):
+        j=load("INDEPENDENT_RUST_ORIGINAL64_AUDIT.json")
+        self.assertEqual(j["source_rows"],46080)
+        self.assertTrue(j["exact_original_state_byte_parity"])
+        self.assertEqual(j["rust_rows_sha256"],"2f1df21e75449f71559208767816979dbed412e17b49fadb9d27e8ad991d6110")
+        self.assertLess(max(j["rust_vs_oracle_max_cell_rel_error"].values()),1e-14)
+        self.assertLess(max(j["rust_vs_oracle_global_rel_error"].values()),1e-14)
+        self.assertEqual(j["central_DAG"],"28/88")
+    def test_upstream_photochannels_scoped(self):
+        j=load("OWNER_NATIVE_T160_PHOTON_BUDGET.json")
+        self.assertEqual(j["original_channels_checked"],12)
+        self.assertEqual(j["original_cells"],46080)
+        self.assertEqual(j["original_frozen_tick"],"160/131072")
+        self.assertTrue(j["original_source_times_not_mixed_with_rei_0_to_64"])
+        self.assertEqual(j["source_science_json_sha256"],"d0250b71cc672429ae7da2c043363e8c6b8f0b62c5c59ed8e4f784e40f4c3cf8")
+        self.assertEqual(j["owner_admission"],"PROMOTE_FOR_SPECIFIED_USE_ORIGINAL_F05_T160_PHOTOCHANNEL_DIAGNOSTIC")
+        self.assertGreater(j["consumed_chemical_binding_power_erg_s"][0],0)
+        self.assertGreater(j["consumed_primary_photoelectron_heat_power_erg_s"][0],0)
+        self.assertEqual(j["canonical_delta"],0)
+        self.assertEqual(j["production"],"HOLD")
+    def test_stable_public_result_identity(self):
+        self.assertEqual(sha("ORIGINAL64_PYTHON_PHYSICAL_RESULT.json"),"4be8df5044102ead5f004fc503bff81d9d149fec7075cc7fc768771f791ff5a3")
+        self.assertEqual(sha("ORIGINAL64_RUST_SCIENCE.json"),"dec4edd860141b88866945bb9641c40388e88481b60c486d5908c81670375edd")
+        self.assertEqual(sha("INDEPENDENT_RUST_ORIGINAL64_AUDIT.json"),"96019ec8e202f5261974404a2b937eded0c2c316d42b77d46c738db3ce5c2ff6")
+        self.assertEqual(sha("OWNER_NATIVE_T160_PHOTON_BUDGET.json"),"e9b927df43714abce549b0f0f337fad0327fa53e8dbd7119bab7295fdca56ffb")
+if __name__=="__main__":unittest.main()

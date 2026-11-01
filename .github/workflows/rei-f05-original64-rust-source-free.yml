@@ -1,0 +1,27 @@
+name: REI F05 original-first64 native Rust scientific source-free evidence
+on:
+  pull_request:
+    paths:
+      - "research/rei_f05_owner_original64_rust_20261101/**"
+      - "rust/rei_microphysics/examples/f05_original64_rust_chemthermal.rs"
+      - ".github/workflows/rei-f05-original64-rust-source-free.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scoped-original-science:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Source-free original physics and owner claim guard
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s research/rei_f05_owner_original64_rust_20261101/tests -p 'test_*.py' -v
+      - name: Original historical Rust H/He EOS consumer isolated tests
+        run: |
+          set -euo pipefail
+          rustfmt --check --edition 2021 rust/rei_microphysics/examples/f05_original64_rust_chemthermal.rs
+          cargo test --offline --locked --manifest-path rust/rei_microphysics/Cargo.toml --example f05_original64_rust_chemthermal
