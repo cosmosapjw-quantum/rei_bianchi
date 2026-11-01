@@ -84,3 +84,39 @@ computed from independent BASS_HE/REC global interval endpoints, without assumin
 **Selected exact scientific integration:** A ONLY for new quantitative REI owner consumption; B/D scoped external research references, C/E held from F05 owner source import. Neither an independent spectral UVB substitution (BASS_HE RUX04 Puchwein) nor H/He rate-collider replacement occurs. STOP optional atom/observer atlas proliferation; return to source-native REI F05+Bianchi geometry after one joint budget witness.
 
 **R4 backup:** commit and remote Git push in single PR #357; Central 28/88, Working 33/88, Fast 4/7, canonical Δ0, drift watchdog PASS: select a substantive source-compatible science quantity.
+## R5 · Project-owner physical conservation and joint-bound theorem
+
+For each **original** F05 conserved source cell \(i\), with original \(\chi_H,\chi_{HeI},\chi_{HeII}\), define \(\Delta H_i=\Delta N_{HII,i}\), \(\Delta He2_i=\Delta N_{HeII,i}\), \(\Delta He3_i=\Delta N_{HeIII,i}\). Conservation of H nuclei \(\Delta N_{HI}+\Delta N_{HII}=0\), He nuclei \(\Delta N_{HeI}+\Delta N_{HeII}+\Delta N_{HeIII}=0\) and free charge require exactly
+\[
+ \Delta N_{e,i}=\Delta H_i+\Delta He2_i+2\Delta He3_i
+\]
+with no additional free electron supplied by an optional charge-exchange reaction that merely swaps H and D ionization. The corresponding fixed-ionization-threshold reservoir satisfies
+\[
+ \Delta B_i=\varepsilon\left(
+ \chi_H\Delta H_i+\chi_{HeI}\Delta He2_i+(\chi_{HeI}+\chi_{HeII})\Delta He3_i\right),\quad
+ \varepsilon=1.602176634\times10^{-12}\,\mathrm{erg/eV}.
+\]
+Eliminate \(\Delta H_i\) using charge to obtain
+\[
+ \boxed{\Delta B_i/\varepsilon=
+ \chi_H \Delta N_{e,i}
+ +(\chi_{HeI}-\chi_H)\Delta He2_i
+ +(\chi_{HeI}+\chi_{HeII}-2\chi_H)\Delta He3_i}.
+\]
+Hence a REI operator consuming only a source electron change \(\Delta N_e\) CANNOT reconstruct the energy-reservoir change without helium-ionization information. This is a constructive counterexample to equating “one-electron event” with one fixed thermal/binding energy: two charge-compatible population trajectories with equal \(\Delta N_e\) but different \(\Delta He2,\Delta He3\) have different \(\Delta B\). The same source-lane He stoichiometry and the exact original 0.079 He/H normalization must be retained.
+
+The original Thomson interaction **area** \(\mathcal A_T=\sigma_T N_e\) yields the exact model-consumption identity
+\[
+ \boxed{\Delta\mathcal A_T=\sigma_T\sum_i\Delta N_{e,i}}.
+\]
+Its domain is total particle counts, units \(\mathrm{cm}^2\); a LoS scattering optical depth is \(\tau=\int\sigma_T n_e c\,dt\) dimensionless and requires proper density plus observer path. The loss in reservoir energy per lost electron
+\[
+ \epsilon_{\rm eff}=\frac{-\sum_i\Delta B_i}{-\sum_i\Delta N_{e,i}}
+\]
+is well defined when BOTH global intervals are strictly negative. A conservative interval bound is the ratio of the worst allowed positive magnitudes; even though the original sources are correlated, the Cartesian interval division cannot exclude any physically common parent realization. This is an energy bookkeeping ratio, **not** a rate coefficient, a new emissivity, a gas heating efficiency, or a physical photon number density.
+
+**Wolfram verification:** it returned symbolic helium decomposition residual 0 and \(\sigma_T\) times the REC \(\Delta N_e\) endpoints \([-1.0418636053620605,-1.0334575426058303]\times10^{36}\,\mathrm{cm}^2\), overlapping the actual REC published area interval. Using BASS_HE published \(\Delta B\) and REC \(\Delta N_e\) outward intervals it computed \(\epsilon_{\rm eff}\in[14.810606837425581,15.159984369981002]\ \mathrm{eV}\), contingent only on real source/interval identity already verified at R2.
+
+**R5 execution obligation:** directly recalculate the four physical rowwise intervals from all 46,080 **original REI source** input records and compare with both sibling results independently. Only if the entire source data, underlying signs and SCIENCE CI are sound may owner R8 actually ADMIT this bounded result for research consumption. Do not count a theoretical algebraic identity as an admitted canonical simulation step.
+
+**R5 backup:** mathematical connection and explicit falsifiable R7 target on PR #357. CENTRAL=28/88, WORKING=33/88, FAST=4/7; canonical Δ0, production HOLD.
