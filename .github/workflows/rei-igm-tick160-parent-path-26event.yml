@@ -1,0 +1,66 @@
+name: rei-igm-tick160-parent-path-26event
+on:
+  pull_request:
+    paths:
+      - 'research/rei_igm_tick160_parent_path_20261101/**'
+      - '.github/workflows/rei-igm-tick160-parent-path-26event.yml'
+  push:
+    branches:
+      - 'research/rei-igm-tick160-parent-path-20261101-r1'
+permissions:
+  contents: read
+jobs:
+  source-thermal-path:
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [LOCAL_NEUTRAL_HAZARD_PRIMARY, RECOMBINATION_WEIGHTED_AUDITOR, SCRIPT_SELF_SHIELDING_AUDITOR]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install only pinned original numerical runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Preflight exact original immutable archive and targeted tests
+        run: |
+          echo 'a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz' | sha256sum -c -
+          python -m py_compile research/rei_igm_tick160_parent_path_20261101/parent_path.py
+          python -m unittest discover -s research/rei_igm_tick160_parent_path_20261101/tests -v
+          python -O -m unittest discover -s research/rei_igm_tick160_parent_path_20261101/tests -q
+      - name: Run original 26event same-parent multi-temperature path
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+          MKL_NUM_THREADS: '1'
+        run: |
+          python research/rei_igm_tick160_parent_path_20261101/parent_path.py --repo . --lane '${{ matrix.lane }}' --out 'source_path/${{ matrix.lane }}'
+      - name: Check source-owned science row integrity and original rejection retention
+        run: |
+          python - <<'PY'
+          import csv,gzip,hashlib,json,pathlib,os,math
+          lane='${{ matrix.lane }}';root=pathlib.Path('source_path')/lane
+          d=json.loads((root/'RESULT.json').read_text())
+          assert d['status']=='THREE_SOURCE_CONDITIONAL_POINT_PARENTS_EXECUTED_NOT_ALL_X_CERTIFIED'
+          assert not d['all_X_joint_remainder_certified'] and d['canonical_delta']==0
+          assert d['first_canonical_interval']=='BLOCKED_MINIMUM_STEP' and d['strict_local_error']==2e-4
+          assert len(d['runs'])==3
+          for r in d['runs']:
+            f=root/r['filename'];b=f.read_bytes();assert hashlib.sha256(b).hexdigest()==r['sha256']
+            with gzip.open(f,'rt') as inp:
+              rows=list(csv.DictReader(inp))
+            assert len(rows)==46080
+            assert all(math.isfinite(float(val)) for row in rows for key,val in row.items() if key!='node')
+            print('SCIENTIFIC_26EVENT_ROWS',lane,r['alpha'],len(rows),r['sha256'])
+          PY
+      - name: Preserve result or typed original-map failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-tick160-parent-path-${{ matrix.lane }}
+          path: source_path/${{ matrix.lane }}/
+          if-no-files-found: warn
