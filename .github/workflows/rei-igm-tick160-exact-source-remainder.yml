@@ -1,0 +1,56 @@
+name: rei-igm-tick160-exact-source-finite-remainder
+on:
+  push:
+    branches:
+      - research/rei-igm-tick160-exact-source-finite-remainder-20261101
+  pull_request:
+    paths:
+      - research/rei_igm_tick160_exact_source_remainder_20261101/**
+      - .github/workflows/rei-igm-tick160-exact-source-remainder.yml
+permissions:
+  contents: read
+jobs:
+  original-owner-real-physical-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pin original REI source physics runtime
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Verify immutable original frozen REI archive
+        run: |
+          echo 'a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz' | sha256sum -c -
+      - name: Falsify finite-source interval algebra (exact Fraction)
+        run: |
+          export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+          python -m unittest discover -s research/rei_igm_tick160_exact_source_remainder_20261101/tests -v
+          python -O -m unittest discover -s research/rei_igm_tick160_exact_source_remainder_20261101/tests -v
+      - name: Generate actual 46080-node original source photon remainder
+        run: |
+          export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+          python research/rei_igm_tick160_exact_source_remainder_20261101/run_original_source.py --repo . --out source_science
+      - name: Fail closed on missing source records or unauthorized canonical claims
+        run: |
+          python - <<'PY'
+          import json, pathlib, hashlib
+          p=pathlib.Path('source_science/RESULT.json');r=json.loads(p.read_text())
+          assert r['original_parent_tick']==160 and r['node_count']==46080
+          assert len(r['source_group_rows'])==20
+          assert len(r['clock_site_totals'])==5
+          assert r['canonical_delta']==0 and r['central_dag_reported']=='28/88'
+          assert r['first_interval']=='BLOCKED_MINIMUM_STEP' and r['new_owner_ivps']==0
+          assert all(x['eta_max_abs_upward']>=0 for x in r['source_group_rows'])
+          print('REAL_ORIGINAL_26EVENT_SOURCE_CERTIFICATE',len(r['source_group_rows']),'sha256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - name: Preserve physics result even on scoped failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-igm-tick160-exact-finite-source-remainder
+          path: source_science/
+          if-no-files-found: warn
