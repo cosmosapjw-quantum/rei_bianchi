@@ -58,6 +58,32 @@ class IGMSpineStructuralTests(unittest.TestCase):
         x['reported_progress']['canonical_delta_this_audit'] = 1
         self.assert_rejected(x)
 
+    def test_actual_frozen_blocker_not_misreported_as_ready(self):
+        node = next(n for n in self.payload['nodes'] if n['id'] == 'B2C2_FIRST_INTERVAL')
+        self.assertEqual(node['status'], 'blocked_minimum_step')
+        self.assertEqual((node['observed_blocker']['accepted_tick'], node['observed_blocker']['total_ticks']), (160, 131072))
+        self.assertFalse(node['observed_blocker']['full_first_interval_accepted'])
+
+    def test_blocked_candidate_without_original_source_witness_rejected(self):
+        x = copy.deepcopy(self.payload)
+        x['nodes'][2].pop('observed_blocker', None)
+        self.assert_rejected(x)
+
+    def test_false_runnable_promotion_without_resolution_rejected(self):
+        x = copy.deepcopy(self.payload)
+        x['nodes'][2]['status'] = 'candidate_requires_fresh_source_check'
+        self.assert_rejected(x)
+
+    def test_false_blocker_gate_pass_rejected(self):
+        x = copy.deepcopy(self.payload)
+        x['nodes'][2]['observed_blocker']['observed_logT_full_half_cross_image_errors'][2]['value'] = 1e-5
+        self.assert_rejected(x)
+
+    def test_invalid_blocker_tick_rejected(self):
+        x = copy.deepcopy(self.payload)
+        x['nodes'][2]['observed_blocker']['accepted_tick'] = 131072
+        self.assert_rejected(x)
+
     def test_broken_critical_path_rejected(self):
         x = copy.deepcopy(self.payload)
         x['nodes'][3]['depends_on'] = []

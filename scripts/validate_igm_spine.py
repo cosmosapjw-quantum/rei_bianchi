@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PATH = ROOT / 'docs/roadmap/REI_IGM_EXECUTION_SPINE_V1.json'
 ALLOWED = {
     'historical_scoped_complete', 'candidate_requires_fresh_source_check',
-    'hold', 'pending', 'external_pending', 'optional',
+    'hold', 'blocked_minimum_step', 'pending', 'external_pending', 'optional',
 }
 
 
@@ -75,10 +75,37 @@ def validate(payload: dict) -> dict:
             if before not in index[after].get('depends_on', []):
                 errors.append(f'broken critical-path edge: {before} -> {after}')
     candidate = payload.get('next_candidate_id')
-    if candidate not in index or index[candidate].get('status') != 'candidate_requires_fresh_source_check':
-        errors.append('no evidence-scoped next central candidate')
+    if candidate not in index:
+        errors.append('no evidence-scoped next central target')
+    else:
+        node = index[candidate]
+        state = node.get('status')
+        if state not in ('candidate_requires_fresh_source_check', 'blocked_minimum_step'):
+            errors.append('next central target lacks truthful runnable/blocked status')
+        prior = node.get('observed_blocker')
+        if state == 'blocked_minimum_step':
+            if not isinstance(prior, dict):
+                errors.append('blocked central target lacks pinned original failure witness')
+            else:
+                tick, total = prior.get('accepted_tick'), prior.get('total_ticks')
+                limit = prior.get('inherited_local_error_limit')
+                observations = prior.get('observed_logT_full_half_cross_image_errors')
+                if not (type(tick) is int and type(total) is int and 0 < tick < total):
+                    errors.append('blocked target missing valid frozen tick range')
+                if not (isinstance(limit, (int,float)) and limit > 0 and
+                        isinstance(observations, list) and len(observations) >= 1 and
+                        all(isinstance(q.get('value'), (int,float)) and q['value'] > limit
+                            for q in observations if isinstance(q,dict)) and
+                        all(isinstance(q,dict) for q in observations)):
+                    errors.append('blocked target failure witness inconsistent with inherited strict limit')
+                if (prior.get('full_first_interval_accepted') is not False or
+                        not prior.get('frozen_run_commit') or
+                        not prior.get('archived_original_sha256')):
+                    errors.append('blocked target lacks source-authentic unaccepted-run identity')
+        if state == 'candidate_requires_fresh_source_check' and prior and not node.get('resolution_evidence'):
+            errors.append('unresolved historical blocker cannot be silently relabelled ready')
     if candidate not in chain:
-        errors.append('next candidate lies outside the D0 critical path')
+        errors.append('next central target lies outside the D0 critical path')
     aux = payload.get('auxiliary_science', [])
     for lane in aux:
         if lane.get('canonical_delta') != 0:
