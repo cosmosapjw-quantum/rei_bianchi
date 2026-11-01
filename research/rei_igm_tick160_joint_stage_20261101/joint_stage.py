@@ -72,8 +72,17 @@ def rational_remainder_bound(n0, low, high, c, current, external):
     c = np.asarray(c, float)
     if n0.shape != low.shape or high.shape != low.shape or low.shape[1] != 3:
         raise ValueError("invalid population source-site box")
-    if np.any(low < 0) or np.any(low > n0) or np.any(n0 > high):
+    # Reconstructing conserved H/He complements may change the last few
+    # binary64 bits; reject a genuinely exterior point but outward-widen by
+    # those ulps instead of silently clipping the physical original parent.
+    scale = np.maximum.reduce([abs(low), abs(n0), abs(high),
+                               np.full(low.shape, 1e-40)])
+    tol = 64*np.finfo(float).eps*scale
+    if (np.any(low < 0) or np.any(low > n0+tol)
+            or np.any(n0 > high+tol)):
         raise ValueError("invalid point inside source-site box")
+    low=np.minimum(low,n0)
+    high=np.maximum(high,n0)
     if c.shape != (3,) or np.any(c < 0) or current < 0 or external < 0:
         raise ValueError("negative source group")
     S0 = np.sum(n0, axis=0, dtype=np.longdouble).astype(float)
@@ -105,7 +114,10 @@ def source_site(m, model, pop, temp, t, site, h, nh, nhe, ev):
     point = 0.5*p0+0.5*p1
     point[:,0] = nh-point[:,1]
     point[:,2] = nhe-point[:,3]-point[:,4]
-    if np.any(point <= 0) or np.any(point < p0-1e-12) or np.any(point > p1+1e-12):
+    tol=64*np.finfo(float).eps*np.maximum.reduce(
+        [abs(p0),abs(p1),np.broadcast_to(nh[:,None],p0.shape),
+         np.broadcast_to(nhe[:,None],p0.shape)])
+    if np.any(point <= 0) or np.any(point < p0-tol) or np.any(point > p1+tol):
         raise ValueError("NOT_A_NUCLEI_CONSERVING_INTERVAL_REPRESENTATIVE")
     force = model.forcing_bounds(float(t), float(t))
     z = float((np.asarray(force.z.lo)+np.asarray(force.z.hi))/2)
