@@ -1,0 +1,63 @@
+name: rei-igm-original26-four-site-photon-feedback
+on:
+  push:
+    branches:
+      - research/rei-igm-original26-stage-photon-20261101
+  pull_request:
+    paths:
+      - research/rei_igm_original26_stage_photon_20261101/**
+      - .github/workflows/rei-igm-original26-stage-photon.yml
+permissions:
+  contents: read
+jobs:
+  source-owned-photon-stages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Original 26-event source-only dependencies
+        run: |
+          python -m pip install -r stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/requirements-runtime.txt
+          python -m pip check
+      - name: Frozen source identity, exact stage theory and synthetic Schur controls
+        run: |
+          echo "a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b  stages/Bianchi_Reionization_Stage_P0_5_B2C2B0C_R2C_R1B_R2B_R2A_R2_R1A_R1_R1_R1_R1_R1_R1_UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY/local_results/first_interval_r2_blocked_minimum_step.tar.gz" | sha256sum -c -
+          python -m py_compile research/rei_igm_original26_stage_photon_20261101/stage_photon_audit.py
+          python -m unittest discover -s research/rei_igm_original26_stage_photon_20261101/tests -v
+          python -O -m unittest discover -s research/rei_igm_original26_stage_photon_20261101/tests -q
+      - name: Generate original 26-event nonlinear stage-site H-He photon/heat source data
+        run: |
+          export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+          python research/rei_igm_original26_stage_photon_20261101/stage_photon_audit.py --repo . --out new_original_source_physics/
+      - name: Verify real stage-site physics data and no DAG promotion
+        run: |
+          python - <<'PY'
+          import pathlib,hashlib,gzip,csv,math,json
+          out=pathlib.Path("new_original_source_physics")
+          j=json.loads((out/"RESULT.json").read_text())
+          assert j["canonical_delta"]==0
+          assert j["central_DAG"]=="28/88_REPORTED" and j["original_local_error_limit"]==2e-4
+          assert j["all_X_joint_correlated_remainder_certified"] is False
+          if j["status"]!="ACTUAL_STAGE_PHOTON_SOURCE_CALCULATED_NOT_ALL_X_CERTIFIED":
+              raise AssertionError("Original source map stage is not certified; preserve output")
+          assert len(j["source_group_rows"])==48 and j["original_stage_physics_rows"]==552960
+          p=out/j["source_physics_csv"]
+          assert hashlib.sha256(p.read_bytes()).hexdigest()==j["source_physics_csv_sha256"]
+          with gzip.open(p,"rt",encoding="utf-8",newline="") as f:
+              rows=0
+              for rec in csv.DictReader(f):
+                  rows+=1
+                  assert all(math.isfinite(float(val)) for k,val in rec.items() if k not in ("map_step","source_site"))
+              assert rows==552960
+          print("VERIFIED_REAL_ORIGINAL_STAGE_PHYSICS",rows,"source_groups",len(j["source_group_rows"]),"canonical_delta",0)
+          PY
+      - name: Preserve physical-stage results or scoped original failure
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rei-original26-four-site-photon-stage-data
+          path: new_original_source_physics/
+          if-no-files-found: warn
