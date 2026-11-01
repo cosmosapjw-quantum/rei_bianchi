@@ -53,6 +53,8 @@ jobs:
           assert r["nodes"]==46080 and r["canonical_delta"]==0
           assert r["source_kernel_sha256"]=="579df3cc99987dcce9205166752570bdaf4c7cb3640c525be6da260d94b8e644"
           assert len(r["summary"])==7
+          assert all("nodes_upper_below_gate" not in r["summary"][k]
+                     for k in ("xe_per_H","binding_eV_per_H","thermal_erg_per_H"))
           p=root/r["csv"]
           assert hashlib.sha256(p.read_bytes()).hexdigest()==r["csv_sha256"]
           with gzip.open(p,"rt",newline="") as f:
