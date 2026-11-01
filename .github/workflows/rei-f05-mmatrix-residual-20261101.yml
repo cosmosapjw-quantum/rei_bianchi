@@ -1,0 +1,97 @@
+name: rei-f05-independent-mmatrix-residual-20261101
+on:
+  push:
+    branches: [research/rei-f05-mmatrix-residual-20261101]
+  pull_request:
+    paths:
+      - 'research/rei_f05_mmatrix_residual_20261101/**'
+      - '.github/workflows/rei-f05-mmatrix-residual-20261101.yml'
+permissions: {contents: read}
+jobs:
+  original-26event-independent-population-residual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        lane:
+          - LOCAL_NEUTRAL_HAZARD_PRIMARY
+          - RECOMBINATION_WEIGHTED_AUDITOR
+          - SCRIPT_SELF_SHIELDING_AUDITOR
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install original source-locked runtime
+        run: |
+          stage=$(find stages -maxdepth 1 -type d -name '*UNCERTAINTY_QUALIFIED_FIRST_CANONICAL_INTERVAL_ADAPTIVE_HISTORY' -print -quit)
+          test -n "$stage" && test -f "$stage/requirements-runtime.txt"
+          python -m pip install -r "$stage/requirements-runtime.txt"
+          python -m pip check
+      - name: Independent M-matrix proof regression and bad-BLAS negative control
+        run: |
+          python -m py_compile research/rei_f05_mmatrix_residual_20261101/residual_certificate.py
+          python -m unittest discover -s research/rei_f05_mmatrix_residual_20261101/tests -v
+          python -O -m unittest discover -s research/rei_f05_mmatrix_residual_20261101/tests -v
+          python -m unittest discover -s research/rei_f05_common_parent_increments_20261101/tests -v
+      - name: Original 46080-cell 26-event full and half source with independent residual
+        run: |
+          python research/rei_f05_mmatrix_residual_20261101/residual_certificate.py \
+            --lane '${{ matrix.lane }}' \
+            --out 'source_science/${{ matrix.lane }}'
+      - name: Verify raw derived original physical data and fixed scientific gate
+        run: |
+          python - <<'PY'
+          import json,csv,gzip,hashlib,math
+          from pathlib import Path
+          p=Path("source_science/${{ matrix.lane }}")
+          r=json.loads((p/"RESULT.json").read_text())
+          assert r["independent_certification_method"]=="M_MATRIX_1NORM_RESIDUAL_NO_BLAS_INVERSE_VALIDITY_DEPENDENCE"
+          assert r["status"]=="SCOPED_SOURCE_REAL_F05_M_MATRIX_RESIDUAL_GATE_CANDIDATE_PASS",r["status"]
+          assert r["original_nodes"]==46080 and r["source_derived_model_rows"]==46080
+          assert r["original_26event_kernel_sha256"]=="579df3cc99987dcce9205166752570bdaf4c7cb3640c525be6da260d94b8e644"
+          assert r["frozen_original_archive_sha256"]=="a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b"
+          assert r["original_state_array_sha256"]=="cc031a04f5b7b13ccb9ffddf95ec0ced4a9274a9ab999a9e7e3508a5161edb01"
+          assert r["original_local_error_gate"]==2e-4 and r["original_public_width_gate"]==2e-3
+          assert r["canonical_delta"]==0 and r["central_dag"]=="28/88_REPORTED"
+          assert r["historical_crossbox_logT_check"]>2e-4
+          assert r["all_original_4_channel_local_defects_below_gate"]
+          assert r["original_set_ledger_pass"] and r["original_set_ledgers"]["evaluated_ledgers"]==14
+          assert r["original_native_table_event_pass"] and r["original_public_width_pass"]
+          assert all(x["max_correlated_increment_defect_upper"]<2e-4 for x in r["increment_defect_coordinates"].values())
+          assert all(x["original_population_solves"]==3
+                     and x["original_root_calls"]>=3
+                     and x["original_table_event_count"]==0
+                     and x["native_certified"]
+                     and all(y["certified_nodes"]==46080 and
+                       y["method"]=="EXACT_PHYSICAL_M_MATRIX_1NORM_RESIDUAL"
+                       for y in x["independent_residual_blocks"])
+                     for x in r["steps"].values())
+          f=p/r["csv_file"]
+          assert hashlib.sha256(f.read_bytes()).hexdigest()==r["csv_sha256"]
+          with gzip.open(f,"rt",newline="") as fi:
+              rows=csv.DictReader(fi)
+              assert len(rows.fieldnames)==r["csv_columns"]
+              n=0
+              for row in rows:
+                  n+=1
+                  assert all(math.isfinite(float(v)) for k,v in row.items() if k!="node")
+              assert n==46080
+          print("REI_F05_ORIGINAL_INDEPENDENT_RESIDUAL",r["original_shape_lane"],
+                "ROWS",n, "4_CHANNEL_MAX",
+                {k:v["max_correlated_increment_defect_upper"] for k,v in r["increment_defect_coordinates"].items()},
+                "LOCAL_GATE",2e-4,"CANONICAL_DELTA",r["canonical_delta"])
+          PY
+      - name: Preserve source-derived data and negative cases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rei-f05-independent-mmatrix-${{ matrix.lane }}
+          path: source_science/${{ matrix.lane }}/
+          retention-days: 90
+          if-no-files-found: warn
