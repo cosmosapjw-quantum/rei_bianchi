@@ -25,3 +25,47 @@ Original REI source-owner integrator: native 26-event H/He/OTS/thermal MPRK22(1)
 **Independent source intake executed:** \`source_intake.py\` opened each ZIP, verified its whole-archive SHA256 and 15/14 member CRC, checked six exact member identities, source parent and physical-node constraints and no official tick161 claim. Its small \`results/SIBLING_BYTE_INTAKE.json\` SHA256 is \`b84bddc38ed7064898b834e88829fb47bd68bfbad60bb781b21d2776eb96f88f\`. Private original-source archives are not re-uploaded into the public REI Git repository; REI stores source identity, analysis and a reproducible read-only path.
 
 **R2 decision:** BASS_HE source and REC result qualified for *actual scientific cross-consumption test*. REC is not qualified for unconditional repository-wide PASS. R2 evidence code and bounded status published to one Draft PR #357. Central 28/88, Working 33/88, Fast 4/7, canonical Δ0. Drift watchdog PASS: actual source/data recovery, not PR count inflation.
+## R3 · Exact ionization-energy / electron-charge / Thomson physical accounting
+
+On each original spatial node \(i\), with nucleus inventories \(N_{H,i},N_{He,i}\), fractional states \(x_{HII,i},x_{HeII,i},x_{HeIII,i}\) satisfying \(x_{HeI}+x_{HeII}+x_{HeIII}=1\), define actual source free-electron **number**, NOT density:
+\[
+ N_{e,i}=N_{H,i}x_{HII,i}+N_{He,i}\bigl(x_{HeII,i}+2x_{HeIII,i}\bigr).
+\]
+Define original ionization-potential storage with source identical constants \(\chi_H=13.598434599702\ \mathrm{eV}\), \(\chi_{HeI}=24.587389011\ \mathrm{eV}\), \(\chi_{HeII}=54.417760\ \mathrm{eV}\), \(1\ \mathrm{eV}=1.602176634\times10^{-12}\ \mathrm{erg}\):
+\[
+ B_i=(1\ \mathrm{eV\ in\ erg})\bigl[\chi_H N_{H,i}x_{HII,i}
+ + \chi_{HeI}N_{He,i}(x_{HeII,i}+x_{HeIII,i})
+ + \chi_{HeII}N_{He,i}x_{HeIII,i}\bigr].
+\]
+At the same original tick160 parent and same frozen source clock, exact increments satisfy
+\[
+ \Delta N_{e,i}=\Delta N_{HII,i}+\Delta N_{HeII,i}+2\Delta N_{HeIII,i},
+\]
+\[
+ \Delta B_i=(1\ \mathrm{eV\ in\ erg})
+ [\chi_H\Delta N_{HII,i}+\chi_{HeI}\Delta N_{HeII,i}
+ +(\chi_{HeI}+\chi_{HeII})\Delta N_{HeIII,i}],
+\]
+\[
+ \boxed{\Delta B_i-\chi_H(1\ \mathrm{eV\ in\ erg})\Delta N_{e,i}
+  =(1\ \mathrm{eV\ in\ erg})\bigl[(\chi_{HeI}-\chi_H)\Delta N_{HeII,i}
+  +(\chi_{HeI}+\chi_{HeII}-2\chi_H)\Delta N_{HeIII,i}\bigr]}.
+\]
+The **last relation** isolates the helium threshold-weighted change that a single average electron-count signal cannot determine. It is an exact source-conserving stoichiometric identity, not a net gas thermal energy or a radiative photon escape rate. The helium ratio **0.079** is the original REI model's H/He owner and must not be replaced by the F08 S0 0.083 scenario.
+
+From original REC source-owned Thomson cross-section \(\sigma_T=6.6524587051\times10^{-25}\ \mathrm{cm}^2\), define *total scattering interaction area*
+\[
+ A_T=\sigma_T\sum_i N_{e,i},\quad \Delta A_T=\sigma_T\sum_i\Delta N_{e,i}\quad[\mathrm{cm}^2].
+\]
+No line-of-sight optical depth \(\tau=\int\sigma_Tn_e c\,dt\) follows without proper cell volume, null path and time/geometry source owner. The correct physical conversion to rate for this one tick uses original \(\Delta t=4.87184874916821289\times10^9\ \mathrm s\), without extending a single source interval to a physical Hubble history.
+
+**Primary cross-repository scientific discriminant:** the original REI source-conditioned \(\Delta B_{\rm total}<0\) and \(\Delta N_e<0\) allow an *interval-valued ionization-potential storage loss per lost electron*, positive and not directly gas heating:
+\[
+ E_{\rm lost,e}={-\Delta B_{\rm total}\over-\Delta N_e}
+ \in [14.810606837425581,\ 15.159984369981002]\ \mathrm{eV},
+\]
+computed from independent BASS_HE/REC global interval endpoints, without assuming perfect cross-provider point correlation. Wolfram evaluated the helium decomposition residual to exactly zero and \(\sigma_T\Delta N_e\) to the REC published \([-1.04186360536,-1.03345754261]\times10^{36}\ \mathrm{cm}^2\) up to source rounding. This is a *derived cross-provider range* whose numerical reproduction on all genuine original 46,080 rows remains an explicit R7 obligation, not yet declared complete at R3.
+
+**Physical interpretation:** chemical reservoir depletion neither equals net photoheating nor implies that the same energy is emitted as recombination photons or escapes; original 26-event OTS/thermal/chemical/radiative ledgers distinguish these channels. The source-owned gas thermal energy \(U_{\rm gas}\), \(\Delta B\), and source photon rates cannot be double counted.
+
+**R3 preservation:** exact charge/energy/thomson equations and input-source units published in Draft PR #357; CENTRAL 28/88, WORKING 33/88, FAST 4/7, Δ0; no owner source replacement.
