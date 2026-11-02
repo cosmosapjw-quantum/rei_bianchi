@@ -1,0 +1,24 @@
+name: REI F05 seven-pin versioned V2 source owner contract
+on:
+  pull_request:
+    paths:
+      - "research/rei_f05_v2_full_runtime_owner_20261102/**"
+      - ".github/workflows/rei-f05-owner-v2-sevenpin.yml"
+  workflow_dispatch:
+jobs:
+  verify-versioned-7pin-source-scoped-admission:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Source-free scoped physics verification
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/rei_f05_v2_full_runtime_owner_20261102/versioned_v2_worker.py
+          python3 -m py_compile research/rei_f05_v2_full_runtime_owner_20261102/full_runtime_contract.py
+          python3 -m py_compile research/rei_f05_v2_full_runtime_owner_20261102/independent_v2_audit.py
+          python3 -m py_compile research/rei_f05_v2_full_runtime_owner_20261102/publish_admission.py
+          python3 -m unittest discover -s research/rei_f05_v2_full_runtime_owner_20261102/tests -v
+          python3 -O -m unittest discover -s research/rei_f05_v2_full_runtime_owner_20261102/tests -q
