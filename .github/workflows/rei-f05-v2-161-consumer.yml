@@ -1,0 +1,30 @@
+name: REI F05 actual versioned tick161 causal source Rust consumer
+on:
+  pull_request:
+    paths:
+      - "research/rei_f05_tick161_consumer_20261102/**"
+      - "rust/rei_microphysics/examples/f05_v2_tick161_rust_material.rs"
+      - ".github/workflows/rei-f05-v2-161-consumer.yml"
+  workflow_dispatch:
+jobs:
+  sourcefree-tick161-consumer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify immutable source-scoped F05 next-map evidence and negative admission gate
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/rei_f05_tick161_consumer_20261102/versioned_native_consumer.py
+          python3 -m py_compile research/rei_f05_tick161_consumer_20261102/build_rust_material_input.py
+          python3 -m py_compile research/rei_f05_tick161_consumer_20261102/audit_rust_source.py
+          python3 -m py_compile research/rei_f05_tick161_consumer_20261102/publish_science.py
+          python3 -m unittest discover -s research/rei_f05_tick161_consumer_20261102/tests -v
+      - name: Original historical Rust microphysics example tests
+        working-directory: rust/rei_microphysics
+        run: |
+          set -euo pipefail
+          cargo test --offline --locked --example f05_v2_tick161_rust_material
+          cargo test --offline --locked --release --example f05_v2_tick161_rust_material
