@@ -1,0 +1,19 @@
+# REI F05 | Versioned V2 tick161 actual consumer (research-only)
+
+Date: 2026-11-02 KST. Selected constructive R5/C5 then R6/C9 and R8/C10; one scientific unit, no more static source atlas.
+
+## Physical objective
+Take actually recomputed original [160,161] source V2 candidate on all 46,080 H/He/OTS/thermal cells as a real next-step parent and execute one original [161,162] 26-event full/half1/half2 source map. It is a test of causal consumption of tick161, not an observation or a fabricated accepted original history. Three original shape-lane audit keys represent one physical realization.
+
+Source original first-interval TAR SHA256 a861278201313c55e08ba6323b5c1d2ad97bf5765f429807b4eba0a1c2465d0b; original sealed 26-event kernel SHA256 579df3cc99987dcce9205166752570bdaf4c7cb3640c525be6da260d94b8e644; original t160 accepted arrays SHA256 cc031a04f5b7b13ccb9ffddf95ec0ced4a9274a9ab999a9e7e3508a5161edb01. Original three-lane first64 parity REI #365; reconstructed tick128/tick160 REI source from REC #195/#196. Exact previously recomputed pinned original source candidate t161 NPZ SHA256 c12f339846894a721ad7c6ad810a6b4b90a738a3972f654cfb1f199e6960c823, archived historical V2 shadow NPZ SHA256 eb13b86f86dfdd37ba17a7007640263b7210397be31ead24a05c5d2dbf62f90b. Old versus new V2 candidates have zero disjoint intervals but DO NOT have byte identity; original accepted parent arrays agree exactly.
+
+## Equations, physical and implementation form
+Original full, half1 and half2 state maps are from the unchanged native MPRK22(1)+Alexander-SDIRK2 26-event source and original positive M-matrix correction. Compare correlated-increment difference from a shared original parent for x_HII, x_HeII, x_HeIII, log_T. Original local gate 2e-4, public width gate 2e-3; all 14 original nuclei/photon/energy source ledgers must include zero, no table events, H/He cone preserved. Positivity and source-map pass is not a rigorous continuum ODE global error bound nor independent MPFR roundoff certificate.
+
+For H/He source populations N_e=N_HII+N_HeII+2*N_HeIII; ionization binding B=eV_to_erg[chi_H N_HII+chi_HeI(N_HeII+N_HeIII)+chi_HeII N_HeIII] with chi_H=13.598434599702 eV, chi_HeI=24.587389011 eV, chi_HeII=54.417760 eV, eV_to_erg=1.602176634e-12; translational U=(3/2) k_B (N_H+N_He+N_e) T with k_B=1.380649e-16 erg/K. Explicit original proper cosmic clock, existing source radiation/OTS/thermal, no added photon history or modified four photon groups.
+
+## Versioned worker contract and stop
+Implement an isolated, opt-in V2 research worker with explicit versioned input/output, source SHA, previous V2 t161 parent SHA, raw time ticks 161 to162, exact original 3-lane source keys, and distinct NONPRODUCTION state serialization format. No REIADP1 V1 spoofing. If original [161,162] V2 map passes the original fixed local/width and 14-ledger/event predicates, admit research-scoped causal tick161-to162 derived physical data only. If it fails, retain explicit failure and don't relax or retry blindly. V1 original [160,161] endpoint-box logT >2e-4 remains FAIL, V2 common-parent [160,161] 5.387144148931529e-6 remains PASS_SHADOW_ONLY. None of this automatically advances canonical accepted t160.
+
+## Limits, backups and DAG
+Immutable project source/worker/history/adaptive policy/main, no merge, force push, production advance or tolerance relaxation. Research input/output private; source-free aggregate receipts/witnesses committed. Independently audit full source state and negative hash/tamper case and run Rust recovered H/He EOS consumer if feasible. Native subagent unavailable: NOT_RUN, same-author adversarial check. At every executed stage CENTRAL 28/88, WORKING 33/88, PHYSICAL_FAST 4/7, delta0 unless separately evidenced genuine canonical owner acceptance. Drift STOP after one valid next-step physical unit, not an infinite artificial audit or re-research of known 46k source.
