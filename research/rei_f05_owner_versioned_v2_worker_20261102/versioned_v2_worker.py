@@ -194,11 +194,11 @@ def run(args):
   require(receipt["actual_parent_state_member_sha256"]==expected_meta["full_state_sha256"],"ORIGINAL_LANE_T160_RECEIPT_"+slug)
   for k,v in receipt["original_native_raw_14_ledgers"].items():
    require(len(v)==2 and v[0]<=0<=v[1],"ORIGINAL_SOURCE_LEDGER_ZERO_"+slug+"_"+k)
-  previous={t:lineage[lane][str(t)]["full_state_sha256"] for t in (64,128,160)}
+  previous={str(t):lineage[lane][str(t)]["full_state_sha256"] for t in (64,128,160)}
   job={"schema":"REI_F05_RESEARCH_V2_JOB_V1","version":VERSION,
        "lane":lane,"accepted_index":4,"interval":[160,161],"depth":6,
        "original_history_state_sha256":previous,
-       "accepted_parent_state_sha256":previous[160],
+       "accepted_parent_state_sha256":previous["160"],
        "original_V1_runtime_contract_sha256":expected_meta["runtime_contract_sha256"],
        "new_v2_runtime_sha256":runtime_sha,
        "source_tar_sha256":SOURCE_SHA,"source_kernel_sha256":KERNEL_SHA,
