@@ -26,3 +26,6 @@ PROMOTE_EXPLICIT_VERSIONED_V2_TRANSACTIONAL_RESEARCH_HISTORY_ONLY: actual source
 
 ## Stage results
 R5 original source contract Git branch prereg commit 448c0e8d4 PUSH. C5 actual separate research V2TX transaction writer; C6 actual source t161->162 additional 6 maps and two atomic accepted-research transactions; R6/C9 disjoint 46k source auditor and negative tamper; R8 scope is research-only. C10 backup/CI/provenance readback will be reported only on actual verification. At all stages central 28/88, working 33/88, physical-fast 4/7 and canonical delta0.
+
+## C10: verified cold backup and provider hash
+Science head 881bf5b73ccf40a0e5f756352f7a5cb69ea3d66d; source full ZIP 63,989,115 bytes SHA256 4d3900bc297412eccef634ba6097a9669ff3de67e9af41fc2dad28008a14fc53 and sourcefree Git ZIP 113,517 bytes SHA256 e2a34448a910930f71fe6033ebd2e16d70f981595442808813ae8083e64a1579. Cold ZIP CRC, 72 source members and 40 Git source blobs PASS. Dropbox provider content hashes match local originals and synced copies; cloud cold download NOT_RUN. Exact science CI 41392955483 and repo verify 41392955364 SUCCESS. Complete standalone seven-pin binary venv was not included, only exact lock and available four pure Python wheels. Original production remains HOLD tick160/131072, central DAG 28/88.
