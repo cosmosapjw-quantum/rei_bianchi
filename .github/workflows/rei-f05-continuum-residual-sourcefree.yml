@@ -1,0 +1,37 @@
+name: REI F05 original 26-event continuum source sampled science
+on:
+  push:
+    branches:
+      - research/rei-f05-owner-continuum-residual-20261102
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-free-original-residual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify only public source-free original numeric data and scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          p=research/rei_f05_owner_continuum_residual_20261102
+          python3 -m unittest discover -s "$p/tests" -p 'test_*.py' -v
+          python3 -O -m unittest discover -s "$p/tests" -p 'test_*.py' -q
+          python3 -m json.tool "$p/OWNER_ADMISSION_DECISION.json" >/dev/null
+          python3 -m json.tool "$p/STAGE_LEDGER.json" >/dev/null
+          printf '%s  %s\n' d5474b5c2b8dbb96bad28da2aaca5fcffd78e7c7d91901ec7c4e04d776e5adc5 "$p/results/SCIENCE_RESULT.json" | sha256sum -c -
+          printf '%s  %s\n' b68c2188de1522664116844c42c267dad4e1d086ac058324a087346606fe5b42 "$p/results/INDEPENDENT_AUDIT.json" | sha256sum -c -
+          printf '%s  %s\n' 7deba0e44e8fe4ff84da21f397208b56d636976e77126d1539fa85b08be7f81d "$p/results/QUADRATURE_AND_MOMENT.json" | sha256sum -c -
+          python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path("research/rei_f05_owner_continuum_residual_20261102")
+          s=json.loads((p/"results/SCIENCE_RESULT.json").read_text())
+          d=json.loads((p/"OWNER_ADMISSION_DECISION.json").read_text())
+          assert s["actual_source_cell_site_rows"]==460800 and s["original_source_point_evaluations"]==10
+          assert s["official_tick161"] is False and s["official_tick162"] is False
+          assert d["claim"]["sampled_residual_is_certified_continuum_error"] is False
+          assert d["DAG"]["central"]=="28/88"
+          print("PASS_ORIGINAL_SOURCE_FREE_REPLAY: source-inclusive 46k x 10 native execution remains private")
+          PY
