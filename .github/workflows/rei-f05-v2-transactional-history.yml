@@ -1,0 +1,22 @@
+name: REI F05 original V2 transactional research accepted history
+on:
+  pull_request:
+    paths:
+      - "research/rei_f05_v2_transactional_history_20261102/**"
+      - ".github/workflows/rei-f05-v2-transactional-history.yml"
+  workflow_dispatch:
+jobs:
+  sourcefree-transactional-history-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify published original F05 V2 transaction chain and scope
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/rei_f05_v2_transactional_history_20261102/transactional_v2_history.py
+          python3 -m py_compile research/rei_f05_v2_transactional_history_20261102/independent_transaction_audit.py
+          python3 -m unittest discover -s research/rei_f05_v2_transactional_history_20261102/tests -v
+          python3 -O -m unittest discover -s research/rei_f05_v2_transactional_history_20261102/tests -q
