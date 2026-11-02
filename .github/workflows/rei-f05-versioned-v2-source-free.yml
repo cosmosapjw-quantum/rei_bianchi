@@ -1,0 +1,40 @@
+name: REI F05 versioned V2 worker source-free scope check
+on:
+  push:
+    branches:
+      - research/rei-f05-owner-versioned-v2-worker-20261102
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  v2-scope-and-independent-receipt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify actual source-free research receipts and original V1 FAIL
+        shell: bash
+        run: |
+          set -euo pipefail
+          unit=research/rei_f05_owner_versioned_v2_worker_20261102
+          python3 -m unittest discover -s "$unit/tests" -p 'test_*.py' -v
+          python3 -O -m unittest discover -s "$unit/tests" -p 'test_*.py' -q
+          python3 -m json.tool "$unit/results/VERSIONED_V2_SOURCE_WORKER_RESULT.json" >/dev/null
+          python3 -m json.tool "$unit/results/INDEPENDENT_SOURCE_V2_WORKER_AUDIT.json" >/dev/null
+          python3 -m json.tool "$unit/OWNER_ADMISSION_DECISION.json" >/dev/null
+          python3 -m json.tool "$unit/STAGE_LEDGER.json" >/dev/null
+          printf '%s  %s\n' 872e487c51249609c33037e9bde259884522cf7764bb377e9a7a47a2bb68a58d "$unit/results/VERSIONED_V2_SOURCE_WORKER_RESULT.json" | sha256sum -c -
+          printf '%s  %s\n' 0148b84aa3073fa41d71f9ec3f6c5a7c6136bd431d93d833841284d95d7962f2 "$unit/results/INDEPENDENT_SOURCE_V2_WORKER_AUDIT.json" | sha256sum -c -
+          python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path("research/rei_f05_owner_versioned_v2_worker_20261102")
+          d=json.loads((p/"OWNER_ADMISSION_DECISION.json").read_text())
+          r=json.loads((p/"results/VERSIONED_V2_SOURCE_WORKER_RESULT.json").read_text())
+          assert d["original_candidate_tick161"]=="NOT_ACCEPTED"
+          assert r["original_native_map_evaluations"]==9
+          assert not r["official_accepted_161"]
+          assert d["old_v1_worker"]=="UNCHANGED_V1_ERROR_FAIL"
+          assert r["DAG"]["central"]=="28/88"
+          print("SCOPE_CI_SOURCE_FREE_PASS: original native source execution not replayed in GitHub")
+          PY
+          git diff HEAD^ HEAD --check
