@@ -1,0 +1,26 @@
+{
+  "schema": "rei.axbi.owner.execution-plan.v1",
+  "selected_path": "Restored original high-z abundance and coordinate/milestone consumer",
+  "alternatives": [
+    {"path": "Mix newest F05 and F08 gas histories", "decision": "REJECT_SOURCE_MISMATCH", "reason": "different clock, IC and Case-A/OTS closure"},
+    {"path": "Launch +0.01 continuation immediately", "decision": "NOT_LAUNCHED_IN_THIS_LIGHTWEIGHT_LOOP", "reason": "requires durable last checkpoint, cumulative remaining debit and existing heavy-run binding; do not manufacture by sign parity"},
+    {"path": "Repeat donor root solver campaigns", "decision": "REUSE_VALID_SCOPED_EVIDENCE", "reason": "does not resolve the original high-z abundance comparison"},
+    {"path": "Produce a full polarized sky first", "decision": "SECONDARY_NOT_SELECTED", "reason": "original flagship is abundance, observer tail and full polarization remain absent"}
+  ],
+  "ordered_work": [
+    {"id": "inputs", "depends_on": [], "status": "COMPLETE_BYTE_VERIFIED", "evidence": "INPUT_MANIFEST.json"},
+    {"id": "abundance_coordinates", "depends_on": ["inputs"], "contributes_to": ["AX08", "AX11", "AX13"]},
+    {"id": "milestones", "depends_on": ["inputs"], "contributes_to": ["AX11", "AX13"]},
+    {"id": "rec_segment_consumer", "depends_on": ["inputs"], "contributes_to": ["AX09"], "secondary": true},
+    {"id": "adversarial_review", "depends_on": ["abundance_coordinates", "milestones", "rec_segment_consumer"]},
+    {"id": "publication", "depends_on": ["adversarial_review"]}
+  ],
+  "not_new_canonical_nodes": true,
+  "central_completed": 28,
+  "central_total": 88,
+  "grid": {"mean_scale_samples": 1001, "proper_time_samples": 1001, "full_saved_rows_each": 312238, "milestones": [0.1, 0.5, 0.9]},
+  "budget": {"new_ode_runs": 0, "full_reducer_runs_max": 2, "reducer_wall_s_each": 180, "targeted_audit_runs_max": 1, "audit_wall_s": 90, "figure_runs_max": 2, "figure_wall_s_each": 60, "prior_exploratory_saved_history_scan": 1, "historical_solver_debit": "PRESERVED_UNKNOWN_HERE_NOT_RESET"},
+  "outputs": ["abundances.csv.gz", "comparison_zbar.csv.gz", "comparison_time.csv.gz", "milestones.csv", "thomson_segment.csv.gz", "clock_check.csv", "SUMMARY.json", "ADVERSARIAL_REVIEW.json", "figures", "NEXT_THREAD_HANDOFF.txt"],
+  "stop_conditions": ["source hash mismatch", "missing or nonfinite required field", "nonmonotone proper clock or scale", "coordinate extrapolation", "charge/nuclei failure", "result promoted beyond source scope", "bounded runtime exhausted"],
+  "blind_referee": {"mode": "same_author_separate_formula_and_scalar_reimplementation", "independent_authorship": false, "subagents": 0, "reuse_old_science_checks": true}
+}
