@@ -49,6 +49,8 @@ def sha(path):
 def interp(x, xp, fp):
     """No extrapolation. Only <=8-ulp endpoint roundoff may be clipped."""
     x = np.asarray(x, dtype=float)
+    xp = np.asarray(xp, dtype=float)
+    fp = np.asarray(fp, dtype=float)
     require(np.isfinite(x).all(), 'NONFINITE_COORDINATE')
     require(np.all(np.diff(xp) > 0), 'NONMONOTONE_INTERPOLATION_AXIS')
     tol = 8 * np.finfo(float).eps * max(1.0, abs(xp[0]), abs(xp[-1]))
