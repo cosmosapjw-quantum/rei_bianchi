@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "unit": "AXBI_SAVED_BACKGROUND_AND_IONIZING_STRESS_20261116",
+  "status": "INDEPENDENTLY_REVIEWED_AND_PUBLISHED",
+  "runtime": "PYTHON_PASS",
+  "dependencies": {
+    "reduced_source_sha256": "a568581b7aabbbe3d052d494b283992a90f6ac91ef4e8d289c17632ed99cd3c9",
+    "original_source_commit": "df72fb686a41c3f047bca1a92df8946482948f82"
+  },
+  "executions": [
+    {
+      "command": "python3 background_stress.py --source ../rei_current/research/rei_axbi_owner_loop_20261115/results/abundances.csv.gz --out results",
+      "status": "completed",
+      "exit_code": 0,
+      "evidence": "run.log"
+    },
+    {
+      "command": "python3 full_history_diagnostic.py --inputs /path/to/source_full/private_inputs --out results",
+      "status": "failed",
+      "exit_code": 1,
+      "classification": "IMPLEMENTATION_INPUT_PARSER",
+      "evidence": "FAILURE_REPAIR.json"
+    },
+    {
+      "command": "python3 full_history_diagnostic.py --inputs /path/to/source_full/private_inputs --out results",
+      "status": "completed",
+      "exit_code": 0,
+      "wall_s": 8.079592469001,
+      "evidence": "full_run_repaired.log"
+    },
+    {
+      "command": "python3 -m unittest -v test_background_stress.py",
+      "status": "completed",
+      "exit_code": 0,
+      "evidence": "tests.log",
+      "checks_passed": 10
+    }
+  ],
+  "stages": [
+    {
+      "id": "R1",
+      "status": "complete",
+      "evidence": "CONTRACT.json"
+    },
+    {
+      "id": "R2",
+      "status": "complete",
+      "evidence": "SOURCE_DEFINITIONS.json"
+    },
+    {
+      "id": "R3",
+      "status": "complete",
+      "evidence": "CONTRACT.json"
+    },
+    {
+      "id": "R4",
+      "status": "complete",
+      "evidence": "DERIVATION_AND_RESULT.md"
+    },
+    {
+      "id": "R5",
+      "status": "complete",
+      "evidence": "DERIVATION_AND_RESULT.md"
+    },
+    {
+      "id": "R6",
+      "status": "complete",
+      "evidence": "EXTERNAL_CAS.json"
+    },
+    {
+      "id": "R7",
+      "status": "complete",
+      "evidence": "results/FULL_SUMMARY.json"
+    },
+    {
+      "id": "R8",
+      "status": "complete",
+      "evidence": "results/FULL_SUMMARY.json"
+    },
+    {
+      "id": "R9",
+      "status": "complete",
+      "evidence": "DERIVATION_AND_RESULT.md"
+    },
+    {
+      "id": "R10",
+      "status": "complete",
+      "evidence": "CONTRACT.json"
+    },
+    {
+      "id": "C1",
+      "status": "complete",
+      "evidence": "CONTRACT.json"
+    },
+    {
+      "id": "C2",
+      "status": "complete",
+      "evidence": "SOURCE_DEFINITIONS.json"
+    },
+    {
+      "id": "C3",
+      "status": "complete",
+      "evidence": "DERIVATION_AND_RESULT.md"
+    },
+    {
+      "id": "C4",
+      "status": "complete",
+      "evidence": "CONTRACT.json"
+    },
+    {
+      "id": "C5",
+      "status": "complete",
+      "evidence": "full_history_diagnostic.py"
+    },
+    {
+      "id": "C6",
+      "status": "complete",
+      "evidence": "tests.log"
+    },
+    {
+      "id": "C7",
+      "status": "complete",
+      "evidence": "results/FULL_SUMMARY.json"
+    },
+    {
+      "id": "C8",
+      "status": "complete",
+      "evidence": "results/SUMMARY.json"
+    },
+    {
+      "id": "C9",
+      "status": "complete",
+      "evidence": "reviews/AXBI_REVIEW.json",
+      "scope": "Four-case frozen saved-history approximation diagnostic; independent numerical rerun of SHEAR_MINUS and code review of other cases."
+    },
+    {
+      "id": "C10",
+      "status": "complete",
+      "evidence": "../publication/INITIAL_RECEIPT.json",
+      "requirement": "Parent actual integration and publication receipt; this package does not self-certify publication.",
+      "commit": "e161b8cab84601cee552f8adbe9423bffe19eaef",
+      "publication_scope": "Reviewed four-case package; later fifth-case additions remain separate"
+    }
+  ],
+  "manifest": {
+    "background_stress.py": {
+      "sha256": "8f621e68c42a236b6d520a56eb001b28e43bdbfd7b08271f0754949188f4c010",
+      "bytes": 8042
+    },
+    "full_history_diagnostic.py": {
+      "sha256": "98522a103685243e8a2385e086d57f4f3c04b5e203380d8f2591967bef9706dd",
+      "bytes": 7339
+    },
+    "test_background_stress.py": {
+      "sha256": "4459382cb9e5b601c9f7fe87958b493d41893be18a0756334bfcdcac83be298c",
+      "bytes": 2745
+    },
+    "CONTRACT.json": {
+      "sha256": "4f75e10e15b919c9fd6ecb3b5f21abd57013546da9b746c4194846e88d91fcff",
+      "bytes": 2364
+    },
+    "DERIVATION_AND_RESULT.md": {
+      "sha256": "123bb47aebe05ca821901c7cee0a9456dc87b17d0fad6fd79301cccc5562318a",
+      "bytes": 9664
+    },
+    "SOURCE_DEFINITIONS.json": {
+      "sha256": "9d1025cf787a53522fa183271bb0c51f01f6cf0cf9f77f4e27b4cb7f81d09562",
+      "bytes": 1946
+    },
+    "results/SUMMARY.json": {
+      "sha256": "9d3d1a3c3fb88a05d5c74d270796d22d1df42a335e5d17f79f2b07099ccfa13d",
+      "bytes": 7825
+    },
+    "results/FULL_SUMMARY.json": {
+      "sha256": "7d37d82d0dd090c63097770827e429ae09b0f0d5d4651eea206ed2841cb2c8ef",
+      "bytes": 8318
+    },
+    "results/diagnostic.csv": {
+      "sha256": "71907d052655687ee4e014c40d253da7f40791f3844aadef3ec7e289d1d6bdb1",
+      "bytes": 818118
+    },
+    "results/full_history_diagnostic_sample.csv": {
+      "sha256": "4d24477fccff6df2336fcdf78e03e3424c3dc0c9a5e0bd50a509cbbb43b6f114",
+      "bytes": 1090601
+    },
+    "tests.log": {
+      "sha256": "b93670b00af3e78f6141d492cbf10cf7aa3b8693505aa14183447b1d64d56c7a",
+      "bytes": 1137
+    },
+    "FAILURE_REPAIR.json": {
+      "sha256": "f097589829cdd97cf639a27a032956429d26ade1c6aa52f90d5207e9fcb0e28a",
+      "bytes": 1036
+    },
+    "EXTERNAL_CAS.json": {
+      "sha256": "ce9f21b0059badf34f971c249bf00959d82e34cab5cfef3eed245643c5fc495e",
+      "bytes": 282
+    },
+    "INPUT_MANIFEST_ORIGINAL_FOUR.json": {
+      "sha256": "d51cabcbc8423e512a9a4b46bc99acdaa501fbbc8e07ccd2cac0e4c1a2858302",
+      "bytes": 3235
+    },
+    "ORIGINAL_SCENARIO_LOCK.json": {
+      "sha256": "07aa11d2d3fd47d2ed95e9d9161f6205e4d9ba386c27ad43d2b298fcd86d1696",
+      "bytes": 10389
+    },
+    "PR132_SCENARIO.json": {
+      "sha256": "a8c5148504514bb0f0590c6c86e5f3f74ad89f9dbe969d74a03dc17008970e21",
+      "bytes": 2708
+    },
+    "PR132_THEORY.json": {
+      "sha256": "1e96e5efcad4d6e246cf0360cafe098a018c1c8d725eae57f7556d7d108b86ef",
+      "bytes": 7406
+    },
+    "README.md": {
+      "sha256": "eb11ddb7f2ce48ad26116be06a7d55878879282d53e79d309e4a08af9000d960",
+      "bytes": 1790
+    },
+    "SCISPACE_CONTEXT.json": {
+      "sha256": "ce692720a3b361055353fbb5b566aadebaf4c46cf6370d3041524b1e2bd51666",
+      "bytes": 1276
+    },
+    "SOURCE_ARCHIVE_MANIFEST.json": {
+      "sha256": "78242a7570108da90d04ff68e382d90d3641950f26a30c39d3147ecddb5f37c6",
+      "bytes": 798
+    },
+    "WOLFRAM_SERIES_CHECK.json": {
+      "sha256": "9af4f646d88e0a2f646db88ab17400c792a089e04f9939ff85ec6dd5be46ac82",
+      "bytes": 390
+    },
+    "full_run.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "full_run_repaired.log": {
+      "sha256": "7d37d82d0dd090c63097770827e429ae09b0f0d5d4651eea206ed2841cb2c8ef",
+      "bytes": 8318
+    },
+    "reviews/AXBI_INDEPENDENT_NUMERICS.json": {
+      "sha256": "60cf5541ab4c897405c2f7cb670e64ff09ef41ad877b11263a7c90bf322c90fb",
+      "bytes": 3651
+    },
+    "reviews/AXBI_REVIEW.json": {
+      "sha256": "9d6503857b5809d52db8d6410892f26cd02e12a786461878f130ca1c5d0c8d7a",
+      "bytes": 6787
+    },
+    "reviews/AXBI_REVIEW.md": {
+      "sha256": "31fabff23e930cf87950836c76fd210ea5e0e2aafd250a54f3c433fec92efd66",
+      "bytes": 9632
+    },
+    "reviews/axbi_independent_checks.py": {
+      "sha256": "bd4f55df8b89a2088c105f0d29e21bdc2a03ded1f19afee0d236179762d7fbad",
+      "bytes": 6268
+    },
+    "run.log": {
+      "sha256": "9d3d1a3c3fb88a05d5c74d270796d22d1df42a335e5d17f79f2b07099ccfa13d",
+      "bytes": 7825
+    }
+  },
+  "next_action": "Reuse this closed four-case unit; execute only the already allocated original plus continuation and incremental full-family assessment. AX11/AX12 remain open."
+}

@@ -1,0 +1,13 @@
+VigilODE 기존 스레드에 붙여넣기:
+
+원 REI-AXBI-GOAL-20261014의 zbar20→4 conditional H/He IGM abundance family가 현재 주목표다. owner는 rei_bianchi PR374 / research/rei-axbi-owner-consumption-20261115 @ df72fb686a41c3f047bca1a92df8946482948f82. VigilODE는 실제 원 AXBI numerical execution/refinement의 지원 소유자이며 physical source/IC/closure와 abundance acceptance를 재정의하지 않는다.
+
+현재 source-native F05 PR183 research/vigilode-rei-igm-photon-fusion-20261101 @ 6844c8fe18361f3c2243ee2db95bbf3d68a6ce7b 는 46,080-cell point H/He/nonphoto/thermal RHS 구현 단계다. F05 owner fcc90939b6b7cc842fae65d5a0ffbb69a3ec3120은 별도 model이다. 그 derivative나 interval/native kernels를 원 AXBI full IVP/AX11 완료로 세지 말고 official7/23, successor0/12의 구분을 유지한다. dlnT/dt=Udot/U−dNe/Npart는 이미 source-native 구현에 있으므로 일반 열방정식 재유도를 다음 진전으로 삼지 말 것.
+
+누락 +.01 원 궤적을 실제 source/checkpoint에서 복구했다. 원 full Git base44af42ba60a44a3e9ee23288b766c025c4e0de11 + embedded17file source identity d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185 를 별도 stage에서 재현했다. 현재 main/worktree의 driver/background/rate/thermal은 원 궤적과 다르므로 그 checkout에서 재빌드하여 이어붙이면 안 된다. 새 resource-only wrapper binary c16932bdd7a9fdb86c20d9ea3d8b08f897663874e1f1b6e35ea39fa3f2db3263 native preflight가 실제 PASS했다. 최신 중앙 plus_recovery terminal/composition receipt를 확인해 현재 완료 여부를 갱신하라.
+
+새 allocation은 one process,90k accepted,360k attempts,3M RHS,2700wall/CPU s,1core,2GiB AS/output이다. 이전 interrupted 실행의 실제 최종 비용은 UNKNOWN으로 남고 기존10800s 전액을 보수적으로 debit한다. orphan47rows는 원본 보존하되 checkpoint240480 이후 prefix에서 제외한다. 재시작/비용 reset/자동retry 금지. 런타임 사용 가능성은 현재 턴 실제 probe로 확인한다.
+
+다음 실행 지원 PR은 baseline+2의 원 AX11 TIME(1e-5,2.5e-6,6.25e-7), ENERGY(16,32,64), ANGLE(8,16,32) 행렬을 exact source/config/IC로 수행하는 데 필요한 최소 변경이어야 한다. positive error를 negative/half amplitude로 전이하지 않는다. 비용 때문에 full refinement를 못하면 실제 abundance peak 앞 exact checkpoint로 한정된 sensitivity diagnostic을 설계할 수 있지만 이를 full-history convergence로 부르지 않는다. solver optimization은 측정된 해당 AXBI 비용을 줄여 실제 error test를 가능하게 하는 경우에만 허용한다. generic benchmark, 새 framework, plots는 이 트랙 진전이 아니다.
+
+현재 추가 실행단위는 완료되었다: 2026-11-15T16:09:09Z native exit0, zbar4, +71757accepted,1760.7755solver s. 두 segment join 및 최종 checkpoint가 일치하고 27ledger×312238state의 finite 검사에서 control failure0/nonfinite0이다. AX08의 정확한 최종 admission과 새 science synthesis는 중앙PR375 최종head의 independent review를 읽어 확인하라. AX11/AX12를 AX08 baseline 완료의 추가 선행 gate로 바꾸지 말 것. 현재 세션 이후 새 native process를 자동 재시작하지 않는다.

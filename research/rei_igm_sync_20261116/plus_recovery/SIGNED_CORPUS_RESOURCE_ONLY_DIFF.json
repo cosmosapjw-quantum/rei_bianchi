@@ -1,0 +1,54 @@
+{
+  "original_sha256": "d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185",
+  "comparisons": [
+    {
+      "case": "SHEAR_MINUS_composed_001",
+      "sha256": "4de69c1e68ebd395fe2d0b5580d901b9a82bde86cadbd11bdd07e5ad2042b4a1",
+      "sections": [
+        17,
+        17
+      ],
+      "changed": [
+        {
+          "file": "axbi_driver.rs",
+          "original_sha256": "a614725c153ee21d88554573c15801087d8fb412954fa51d67b781f671475dbf",
+          "candidate_sha256": "92bc6ca1540c927cde7452d218f666882ecdd651558b151b31e9a6a8e2d92c8f",
+          "diff": "--- old/axbi_driver.rs\n+++ new/axbi_driver.rs\n@@ -116,6 +116,7 @@\n         match self.output_budget_mib {\n             256 => Ok(224 * 1024 * 1024),\n             2048 => Ok(1920 * 1024 * 1024),\n+            4096 => Ok(3968 * 1024 * 1024),\n             _ => Err(err(\"AXBI_OUTPUT_ALLOCATION\")),\n         }\n     }\n@@ -123,11 +124,12 @@\n         match self.output_budget_mib {\n             256 => Ok(32 * 1024 * 1024),\n             2048 => Ok(128 * 1024 * 1024),\n+            4096 => Ok(128 * 1024 * 1024),\n             _ => Err(err(\"AXBI_OUTPUT_ALLOCATION\")),\n         }\n     }\n     fn validate(&self) -> Result<(), ForwardError> {\n-        if ![256, 2048].contains(&self.output_budget_mib)\n+        if ![256, 2048, 4096].contains(&self.output_budget_mib)\n             || self.spectra_every_accepted == 0\n             || !self.q_ref.is_finite()\n             || !self.end_zbar.is_finite()\n"
+        }
+      ]
+    },
+    {
+      "case": "SHEAR_HALF_PLUS_composed_002",
+      "sha256": "4de69c1e68ebd395fe2d0b5580d901b9a82bde86cadbd11bdd07e5ad2042b4a1",
+      "sections": [
+        17,
+        17
+      ],
+      "changed": [
+        {
+          "file": "axbi_driver.rs",
+          "original_sha256": "a614725c153ee21d88554573c15801087d8fb412954fa51d67b781f671475dbf",
+          "candidate_sha256": "92bc6ca1540c927cde7452d218f666882ecdd651558b151b31e9a6a8e2d92c8f",
+          "diff": "--- old/axbi_driver.rs\n+++ new/axbi_driver.rs\n@@ -116,6 +116,7 @@\n         match self.output_budget_mib {\n             256 => Ok(224 * 1024 * 1024),\n             2048 => Ok(1920 * 1024 * 1024),\n+            4096 => Ok(3968 * 1024 * 1024),\n             _ => Err(err(\"AXBI_OUTPUT_ALLOCATION\")),\n         }\n     }\n@@ -123,11 +124,12 @@\n         match self.output_budget_mib {\n             256 => Ok(32 * 1024 * 1024),\n             2048 => Ok(128 * 1024 * 1024),\n+            4096 => Ok(128 * 1024 * 1024),\n             _ => Err(err(\"AXBI_OUTPUT_ALLOCATION\")),\n         }\n     }\n     fn validate(&self) -> Result<(), ForwardError> {\n-        if ![256, 2048].contains(&self.output_budget_mib)\n+        if ![256, 2048, 4096].contains(&self.output_budget_mib)\n             || self.spectra_every_accepted == 0\n             || !self.q_ref.is_finite()\n             || !self.end_zbar.is_finite()\n"
+        }
+      ]
+    },
+    {
+      "case": "SHEAR_HALF_MINUS_composed_001",
+      "sha256": "4de69c1e68ebd395fe2d0b5580d901b9a82bde86cadbd11bdd07e5ad2042b4a1",
+      "sections": [
+        17,
+        17
+      ],
+      "changed": [
+        {
+          "file": "axbi_driver.rs",
+          "original_sha256": "a614725c153ee21d88554573c15801087d8fb412954fa51d67b781f671475dbf",
+          "candidate_sha256": "92bc6ca1540c927cde7452d218f666882ecdd651558b151b31e9a6a8e2d92c8f",
+          "diff": "--- old/axbi_driver.rs\n+++ new/axbi_driver.rs\n@@ -116,6 +116,7 @@\n         match self.output_budget_mib {\n             256 => Ok(224 * 1024 * 1024),\n             2048 => Ok(1920 * 1024 * 1024),\n+            4096 => Ok(3968 * 1024 * 1024),\n             _ => Err(err(\"AXBI_OUTPUT_ALLOCATION\")),\n         }\n     }\n@@ -123,11 +124,12 @@\n         match self.output_budget_mib {\n             256 => Ok(32 * 1024 * 1024),\n             2048 => Ok(128 * 1024 * 1024),\n+            4096 => Ok(128 * 1024 * 1024),\n             _ => Err(err(\"AXBI_OUTPUT_ALLOCATION\")),\n         }\n     }\n     fn validate(&self) -> Result<(), ForwardError> {\n-        if ![256, 2048].contains(&self.output_budget_mib)\n+        if ![256, 2048, 4096].contains(&self.output_budget_mib)\n             || self.spectra_every_accepted == 0\n             || !self.q_ref.is_finite()\n             || !self.end_zbar.is_finite()\n"
+        }
+      ]
+    }
+  ],
+  "semantic_conclusion": "All three signed full-history corpus4de69... differ from originald767... only in three axbi_driver output-allocation lines permitting4096MiB. Remaining16 identity sections are byte-identical. Numerical and physical formulas, grids, rates, timestepping and tolerances are unchanged; no claim of entire-corpus byte identity."
+}

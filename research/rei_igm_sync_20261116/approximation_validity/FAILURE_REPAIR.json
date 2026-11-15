@@ -1,0 +1,15 @@
+{
+  "schema": "rei.axbi.approximation-diagnostic.failure-repair.v1",
+  "execution": "first full_history_diagnostic.py attempt",
+  "exit_code": 1,
+  "classification": "IMPLEMENTATION_INPUT_PARSER",
+  "observed_failure": "ValueError: source H does not match locked background",
+  "cause": "pandas 2.2.3 default C decimal parser truncated long fixed-decimal native Rust rate strings; H=0.00000000000000011835693720646417 parsed as 1e-16 and smaller values became zero",
+  "correct_value_Python_float": 1.1835693720646417e-16,
+  "repair": "pd.read_csv(...,float_precision='round_trip')",
+  "source_changed": false,
+  "acceptance_tolerance_changed": false,
+  "success_evidence": "results/FULL_SUMMARY.json source_H_locked_background_max_relative_error and test_native_fixed_decimal_roundtrip",
+  "additional_review_correction": "Compare original extra-energy gate against H_FLRW squared/coupling as emitted by source output_row; retain total H squared energy ratio as separately named statistic.",
+  "failed_original_physics_claim": false
+}
