@@ -1,0 +1,129 @@
+{
+  "schema": "rei.axbi.cost_audit.v1",
+  "status": "SOURCE_INSPECTED_AND_SAVED_HISTORY_CHECKED_NO_NEW_IVP",
+  "physics_source_sha256": "d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185",
+  "native_return_sha256": "41b4949ad493380728455dfe1cf726ab2851c514c7cac0cd324c607a13ae66cb",
+  "scope": "Original AXBI baseline; no F05 donor imported, no scientific tolerance changed.",
+  "observed": {
+    "accepted": 312237,
+    "comparisons": 312256,
+    "rejections": 19,
+    "tentative_trials": 936768,
+    "rhs_evaluations": 6563808,
+    "trial_count_matches_three_per_comparison": true,
+    "rhs_per_trial": 7.006866161098586,
+    "rhs_excess_over_seven_per_trial": 6432,
+    "rejection_fraction": 6.0847509735601556e-05,
+    "accounted_cumulative_wall_s": 9107.876784279,
+    "new_segment_accepted": 71757,
+    "new_segment_wall_s": 1760.7755009640005,
+    "new_segment_steps_per_s": 40.75306588529544,
+    "new_segment_rhs_per_trial": 7.029683101535717,
+    "old_interruption_extra_cost": "UNKNOWN_ACTUAL; full prior reservation and orphan replay cost remain charged separately; cumulative wall is not complete campaign cost"
+  },
+  "step_schedule": {
+    "verified_cases": [
+      "ZERO",
+      "SHEAR_PLUS"
+    ],
+    "same_binned_counts_and_transitions": true,
+    "first_accepted_dln_a": 3.814697265625e-10,
+    "dominant_dln_a": 3.125e-06,
+    "dominant_count": 218659,
+    "dominant_fraction": 0.7002981709406637,
+    "secondary_dln_a": 6.25e-06,
+    "secondary_count": 65666,
+    "evidence_file": "STEP_SCHEDULE.json",
+    "dominant_error_component": "UNRESOLVED: current history records neither per-component local error nor dominant component"
+  },
+  "classification": {
+    "physical_stiffness": "NOT_DIAGNOSED from counters; implicit solver may address stiffness but no stiffness ratio or Jacobian spectrum was measured",
+    "newton_failure": "NOT_SUPPORTED as primary cause; aggregate RHS about7/trial and19 rejected comparisons only",
+    "step_count": "OBSERVED dyadic adaptive controller schedule; long hold-band plateau; changing controller accuracy unvalidated",
+    "per_step_runtime": "STRUCTURAL redundant work demonstrated; no instrumented CPU component shares or speedup claims"
+  },
+  "structural_costs": [
+    {
+      "name": "background clock and anisotropy recomputation",
+      "source_lines": [
+        329,
+        372,
+        574,
+        598,
+        712,
+        1695
+      ],
+      "observation": "point_at_scale recomputes4097 Simpson nodes even for a_ref; nominal56 callsites per fully successful tentative at n_mu8 before optimizer effects",
+      "remedy": "Exact floating-point a-key reuse within trial/state; cache a_ref; preserve quadrature algorithm and source identity of model"
+    },
+    {
+      "name": "discarded spectra",
+      "source_lines": [
+        939,
+        1009,
+        1163,
+        1205
+      ],
+      "observation": "output_row formats every ray-energy row each accepted step; output_batch clears spectrum buffer when save_spectrum false; normal cadence60 plus30s/terminal",
+      "remedy": "Lazy spectrum formatting when due; preserve exact terminal reserve and resource guard"
+    },
+    {
+      "name": "feedback quadrature",
+      "source_lines": [
+        1096,
+        1846
+      ],
+      "observation": "4097 angular nodes every accepted step",
+      "remedy": "First measure share; keep required full-history diagnostic semantics unless owner explicitly changes documented output contract"
+    },
+    {
+      "name": "output accounting",
+      "source_lines": [
+        1115,
+        1163,
+        842
+      ],
+      "observation": "five flushes, recursive directory size walk, checkpoint serialization each output",
+      "remedy": "Measure separately; maintained exact byte ledger may replace directory rescan only with checkpoint/atomic-write safety proved"
+    }
+  ],
+  "budget_mismatch": {
+    "existing_initial_refinement_runs": 12,
+    "existing_total_tentative_cap": 7800000,
+    "baseline_attempts_per_case": 936768,
+    "twelve_baseline_equivalent_attempts": 11241216,
+    "baseline_equivalent_over_cap": 3441216,
+    "interpretation": "Planning contradiction for naive baseline-cost replication; refined cases may have different work, so not a rigorous mathematical lower bound. Rebind allocation from measured finite cases before launch."
+  },
+  "conditional_forecast": {
+    "assumptions": "Same per-step cost; local full-vs-twohalf defect scales as h^2, dyadic controller gives roughly2x/4x steps for tolerance /4,/16; this scaling is unverified and does not assert continuum convergence",
+    "T1_approx_accepted_per_case": 624474,
+    "T2_approx_accepted_per_case": 1248948,
+    "T1_T2_two_sign_cases_total_baseline_equivalents": 12,
+    "T1_T2_two_cases_wall_s_at_cumulative_baseline_rate": 109294.521411348,
+    "forecast_is_allocation": false,
+    "energy_angle_cost": "UNKNOWN until per-kernel timing; angle increases ray-related quadratures and spectral work, energy increases spectral/RHS work; do not multiply all runtime by grid factor blindly"
+  },
+  "next_pr": {
+    "owner": "rei_bianchi AX11; BASS interface only; VigilODE solver advice only",
+    "title": "Expose AXBI local-error components and eliminate exact duplicate geometry/output work",
+    "must_preserve": [
+      "source/IC/atomic scenario",
+      "accepted-state arithmetic and scientific tolerance in first optimization",
+      "all accepted outputs and terminal reserves",
+      "cumulative work counters and no-retry allocation"
+    ],
+    "acceptance": [
+      "Bounded current-checkpoint replay solely as implementation/performance check, explicitly not full AX11",
+      "Report component timings and per-component error maximum, including early zero-photon transient",
+      "Exact accepted states/counters and unchanged diagnostics where arithmetic order preserved; any unavoidable difference gets declared semantic comparison and cannot reuse old scientific admission",
+      "Bind actual T1,T2 full z20 to4 pair before release; compare paired responses to unchanged10% target/floors"
+    ],
+    "stop": "No new atlas, no generic integrator replacement, no resource-only work counted as scientific AX11 completion"
+  },
+  "parity": {
+    "source_check": "geometry_map uses direction-dependent pullback energy and deposits by energy; inject uses solid-angle Jacobian; evaluate uses energy-dependent absorption on per-angle stocks, then sums events",
+    "claim": "Exact scalar sign symmetry not imposed; observed tiny chemical odd response is unresolved, not a theorem"
+  },
+  "canonical_count_delta": 0
+}

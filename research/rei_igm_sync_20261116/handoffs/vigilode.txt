@@ -7,3 +7,5 @@ PROJECT=cosmosapjw-quantum/vigilode
 기존 선택 근거: https://github.com/cosmosapjw-quantum/vigilode/pull/187 @ 569ce02629498fec133db9ce368eb303ba943b69
 
 너는 원 AXBI RHS의 정확도·비용 개선 공급자다. PR183 F05 native source, PR187 negative work-precision, PR188 unified T02 상태를 구분하고 preserve하라. F05 46080 material nodes를 공간 mesh로 읽지 않는다. 첫 작업은 중앙 AX11의 실제 original source profile/error evidence에서 solver 병목을 고르는 것이다. native step-doubling 비용과 adapter overhead를 구분하고, 같은 입력·원 tolerances·동일 scientific error에서 wall/CPU/RHS/accepted/reject를 비교하라. kernel-only speedup으로 production 자격이나 전체 IVP 개선을 주장하지 않는다. baseline을 실패케 하는 정확한 defect가 없으면 새 controller나 추상 gate를 만들지 않는다.
+
+실측 approximation_validity/cost/COST_AUDIT.json: accepted312237, rejection19, RHS/trial7.00687, 70.03%steps의 dyadic plateau. Newton 실패나 stiffness를 원인으로 확정하지 말라. 원 AXBI controller의 dominant error component는 아직 미기록이다. 다음 작은 PR은 이 성분과 native 시간 점유율을 기록하고, bass와 원 point_at_scale의 정확한 중복 제거·lazy spectrum을 검증한다. 원 time tolerances1e−5/2.5e−6/6.25e−7 및 full-IC paired refinement를 유지한다. 구 AX11 780만trial는 실행권이 아니며 측정된 비용으로 재배정해야 한다.

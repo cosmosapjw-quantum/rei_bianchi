@@ -41,3 +41,14 @@
 매 턴은 기존 기록 안에서 **기존 목표/node → 동일 source 입력 → 기대하는 물리량·불확실성 변화 → 실제 변화 → 남은 한 의무**를 비교한다. 마지막에 달라진 것이 그림·메타데이터·재포장뿐이면 그 국소 경로를 종료하고 기존 미완료 계산으로 돌아간다. `DRIFT_WATCHDOG.json`은 이 판단을 기록하며 추가 승인·새 PR·반복 감사를 요구하지 않는다.
 
 이 정책 문서와 구조 검사는 과학 완료로 세지 않는다. 이번 교정은 이 지점에서 끝내고, 지정된 실제 계산과 원 계약의 판정으로 이어간다.
+
+
+## 2026-11-16 비용 근거에 따른 추가 교정
+
+위의 네 사례/복원 준비 설명은 당시 관측을 보존한다. 이후 +0.01 baseline은 완료됐으며, 새 [COST_AUDIT.json](approximation_validity/cost/COST_AUDIT.json)의 실제 누적 값은 accepted 312,237, tentative trial 936,768, rejected comparison 19, RHS 6,563,808이다. 새 continuation 구간 71,757 accepted는 native wall 1760.7755 s를 사용했다. 과거 중단의 미기록 비용·기존 전체 예약·orphan replay debit은 별도로 남으며, 누적 wall counter를 전체 캠페인 비용으로 바꾸지 않는다.
+
+기존 AX11의 12개 refinement에 7,800,000 trial을 자동 배정하는 계획은 폐기해야 한다. 측정 baseline 비용을 단순히 12회 복제해도 11,241,216 trial이며 차이는 3,441,216이다. 이는 계획의 산술 불일치이지 모든 refined trajectory의 비용 하한은 아니다. 650,000 trial/200,000 accepted per-case cap도 현재 baseline을 수용하지 못한다. Refinement의 실제 비용은 아직 측정되지 않았고, h² local-defect 가정에서 얻는 시간 예측은 실행 배정·수렴 근거가 아니다.
+
+정체의 직접 확인 가능한 일부 원인은 정확히 같은 배경점의 반복 4097-node 적분과 저장하지 않을 spectrum 행의 선행 formatting이다. 커널별 시간 비중은 미측정이며, 19회 rejection과 약 7 RHS/trial만으로 Newton 실패나 물리적 stiffness를 원인으로 단정할 수 없다. 다음 AX11 PR은 오차 성분·커널 비용 계측, 동일 배경점의 정확한 재사용, 버릴 spectrum의 지연 formatting으로 한정한다. BASS는 해당 AXBI geometry/clock interface, VigilODE는 같은 source의 controller/solver 비용 진단을 담당한다. 동일 정확도·입력·출력 의무의 baseline/candidate benchmark가 개선을 확인해야 하며, tolerance·quadrature·물리 source를 바꾸지 않는다.
+
+계측 replay부터 유한한 start/시간/step/RHS/byte/memory 한도를 먼저 결속하고, 측정 비용으로 원 zbar=20→4 T1/T2 및 에너지·각도 refinement 배정을 다시 정한다. 현재 계약 자체는 새 runtime 배정이나 자동 실행을 허용하지 않는다. Checkpoint 구간 검증·속도 개선·계약 갱신은 AX11 완료가 아니며, 원 10% paired-response 기준과 fraction 1e-7/Tgas 0.01 K floor를 유지한다. 이 교정은 기존 AX11 안에서 끝내며 새 DAG 노드를 추가하지 않는다.

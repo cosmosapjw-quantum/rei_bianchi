@@ -2,12 +2,14 @@
 
 2026-11-16 KST. 기준 owner는 REI PR374, commit `4554fc34765422f1c67e91c99ecac1bc9559fcce`다. 이 통합은 원래 `REI-AXBI-GOAL-20261014`의 `PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1`을 유지한다. 목표는 homogeneous non-tilted axisymmetric Bianchi I와 matched FLRW의 z̄=20→4 H/He/electron abundance·온도·proper-clock 차이를 계산하고 수치·모델 불확실성에 비추어 해석하는 것이다. 단순 재현 plot, 문서 수, PR 수는 과학적 진전으로 계상하지 않는다.
 
+원 AX08 baseline 5/5를 완료하고 독립 검토 `PASS_SCOPED_CONDITIONAL_FIVE_CASE_BASELINE`를 거쳐 owner가 승인했다. 원 workflow DAG는 **9/17→10/17**이다. 이 수에는 준비 노드가 포함되므로 과학 목표 달성률로 해석하지 않는다. 기존 expansion DAG **28/88은 그대로**다. AX11 수렴성과 AX12 민감도, 전체 과학 목표는 미완료다. 중앙 변경은 [REI PR375](https://github.com/cosmosapjw-quantum/rei_bianchi/pull/375), donor 수정은 [REC PR200](https://github.com/cosmosapjw-quantum/rec_bianchi/pull/200)과 [HE PR155](https://github.com/cosmosapjw-quantum/BASS_HE/pull/155)다.
+
 ## 이번에 실제로 달라진 것
 
 1. 원본 네 trajectory의 1,248,952행을 소비해 누락된 radiation stress의 누적 shear forcing과 추가 에너지 규모를 계산했다. 순간 moment가 원본 solver에 이미 있다는 사실을 확인했고, 그것을 새 발견으로 세지 않았다. 새 결과는 전체 history에서의 누적 응답·극값·기여 분해다.
 2. REC의 Killing-ray label을 순간 tetrad 방향으로 사용하던 오류를 실제 source 정의로 확인하고 고쳤다. 같은 640단계·81,920 photon rows의 Thomson 결과가 바뀌었다. 이 F08 결과는 원래 AXBI baseline abundance의 완료로 세지 않는다.
 3. HE 생산자의 photons 대 erg 비교를 같은 단위의 양 끝점 비교로 고쳤다. 이는 검증 오류의 수정이며 새로운 물리 효과로 세지 않는다.
-4. 누락된 +0.01 원본의 durable checkpoint를 복구했다. 사라진 종료 영수증과 checkpoint 뒤 47행을 성공으로 해석하지 않았고, 이전 비용의 unknown 상태를 보존했다. 새로 한정한 단일 실행의 결과와 endpoint 상태는 `plus_recovery/`와 `CURRENT_OUTCOME.json`에서 확인한다.
+4. 누락된 +0.01 원본을 정확한 durable checkpoint에서 한 번 재개해 a=0.2, z=4, 총312,237 accepted steps에 도달했다. 새71,757steps·1,513,308RHS·wall1,760.80초로 정상 종료했다. 세 segment를 경계 중복2행만 제외해312,238행으로 결합했다. checkpoint 뒤47행은 제외·보존했고 이전 비용 unknown을0으로 바꾸지 않았다. 전체 다섯 history는1,561,190행이며, 독립 reviewer가 composition·source identity·full normalized abundance·clock matching·photon/energy ledger를 검산했다.
 5. 기존 PR318 실행 경로와 PR374 계획을 실제로 고쳤다. 원래 17개 AX 노드가 88개 expansion 노드에서 누락된 문제를 별도 goal view로 복원했다. 기존 28/88은 그대로 보존하며 원래 IGM 성공률로 사용하지 않는다.
 
 ## 새로운 과학 결과와 해석의 한계
@@ -24,7 +26,7 @@ ds^2=-c^2dt^2+a^2e^{-2b}(dx^2+dy^2)+a^2e^{4b}dz^2,\qquad s=\dot b.
 \delta s(a)=a^{-3}\int_{t_i}^{t}a(t')^3\frac{8\pi G}{3c^2}\Delta P(t')\,dt'.
 \]
 
-이 식은 고정된 원래 geometry 위의 perturbative 진단이다. background를 다시 푼 coupled Einstein–radiation 결과는 아니다. 이온화 광자는 ΔP_ion=n_H J₂ eV_J를 사용하며, 원본 J₂에 factor 5나 angular weight를 다시 넣지 않는다. 추가 에너지 비교의 분모는 원래 계약대로 3H_FLRW²c²/(8πG)다.
+이 식은 고정된 원래 geometry 위의 perturbative 진단이다. 완전히 선형화한 coupled 식에는 3sδH와 radiation의 δb 응답도 필요하며 여기서는 풀지 않는다. background를 다시 푼 coupled Einstein–radiation 결과는 아니다. 이온화 광자는 ΔP_ion=n_H J₂ eV_J를 사용하며, 원본 J₂에 factor 5나 angular weight를 다시 넣지 않는다. 추가 에너지 비교의 분모는 원래 계약대로 3H_FLRW²c²/(8πG)다.
 
 | 원본 case | max abs(δs/H) | max abs(δs_ion/H) | max 추가 에너지/원래 기준 에너지 |
 |---|---:|---:|---:|
@@ -32,19 +34,35 @@ ds^2=-c^2dt^2+a^2e^{-2b}(dx^2+dy^2)+a^2e^{4b}dz^2,\qquad s=\dot b.
 | q=+0.005 | 5.08053550×10⁻⁶ | 6.29377658×10⁻¹⁴ | 2.56913088×10⁻⁸ |
 | q=−0.005 | 5.09707434×10⁻⁶ | 6.29483038×10⁻¹⁴ | 2.57471796×10⁻⁸ |
 | q=−0.01 | 1.02104978×10⁻⁵ | 1.25906452×10⁻¹³ | 9.72886130×10⁻⁸ |
+| q=+0.01 | 1.01443448×10⁻⁵ | 1.25864300×10⁻¹³ | 9.68272579×10⁻⁸ |
 
-네 represented case는 원래 두 10⁻⁴ 진단 기준 아래다. 최대 상대 shear 보정 |δs/s|는 약0.8714%다. 이 수치는 작은 paired abundance 효과를 해석할 때 무시할 수 있는지 별도로 확인해야 한다. |δs/H| 기준 통과가 abundance 오차 상한이나 physical detection을 제공하지는 않는다. 모든 극값은 저장된 native nodes 위의 극값이고 연속시간 supremum 증명이 아니다. 전체 effective Ω_r를 massless free-streaming으로 취급한 비교 모델은 arbitrary radiation initial data와 massive species 전체에 대한 엄밀한 upper bound가 아니다.
+다섯 represented case는 원래 두 10⁻⁴ 진단 기준 아래다. 최대 상대 shear 보정 |δs/s|는 약0.8714%다. 이 수치는 작은 paired abundance 효과를 해석할 때 무시할 수 있는지 별도로 확인해야 한다. |δs/H| 기준 통과가 abundance 오차 상한이나 physical detection을 제공하지는 않는다. 모든 극값은 저장된 native nodes 위의 극값이고 연속시간 supremum 증명이 아니다. 전체 effective Ω_r를 massless free-streaming으로 취급한 비교 모델은 arbitrary radiation initial data와 massive species 전체에 대한 엄밀한 upper bound가 아니다.
 
-**실제 결정:** 이 네 history의 결과만으로 새 backreaction solver를 필수 선행조건으로 만들 근거는 없다. 원래 AX11의 dt/dE/dμ refinement와 AX12의 f_esc·초기온도 민감도를 먼저 수행한다. 기존 PR374가 얻은 fixed-a와 equal-proper-time abundance 차이는 재사용하며, 이번 성과로 중복 계산하지 않는다. 새로운 +0.01 endpoint가 승인된 경우의 증분 결과는 별도 파일로 네 case의 고정 검토본과 구분한다.
+**실제 결정:** 다섯 history의 결과만으로 새 backreaction solver를 필수 선행조건으로 만들 근거는 없다. 원래 AX11의 dt/dE/dμ refinement와 AX12의 f_esc·초기온도 민감도를 먼저 수행한다. 기존 PR374가 얻은 fixed-a와 equal-proper-time abundance 차이는 재사용하며, 이번 성과로 중복 계산하지 않는다. 새 +0.01 endpoint와 증분 consumer는 독립 검토·승인됐으며 네 case의 고정 검토본을 수정하지 않고 `approximation_validity/incremental_fifth/`에 추가했다.
 
 독립 reviewer는 다른 초기각 좌표, long-double proper-time 적분과 원본 −0.01 전체312,238행으로 검산했다. 총 shear 극값 차이는 1.064×10⁻¹⁷이다. production의 10개 테스트와 independent 계산을 보존했다. pandas 기본 parser가 미소 고정소수점 H를 잘못 읽던 실제 실패를 검출해 round-trip parsing으로 수정했고 원본 값이나 허용오차는 변경하지 않았다. 자세한 유도·검산·해시는 `approximation_validity/`에 있다.
+
+## 다섯 case의 abundance 반응과 최종 종합
+
+새 +0.01−ZERO의 저장된 비교 sample에서 HII 반응 극값은 고정 a에서 −2.46717566×10⁻⁶, 같은 경과 gas proper time에서 +1.71027170×10⁻⁵다. 비교 좌표가 달라 부호가 바뀌는 것을 보존하며 같은 물리적 slice라고 부르지 않는다. HII odd 성분은 약5.52×10⁻¹⁵로 수치적으로 미분해 상태다. 소스는 실제 directional energy remap·solid-angle Jacobian·energy-dependent absorption을 사용하므로 이를 exact sign-symmetry theorem으로 해석하지 않는다. AX11이 진화 오차를 정량화하기 전 physical detection은 주장하지 않는다.
+
+최신 BASS PR335의 induced-Compton angular kernel을 **방법으로만** 재사용해 원 AXBI의 reflection-even collisionless Planck photons에 적용했다. 독립 유도와 spectral quadrature로
+
+\[
+\frac{T_C}{T_{\rm ref}}=1+\left(\frac{12\pi^2}{35}-\frac65\right)b^2+O(b^3),\qquad
+\frac{U}{U_{\rm ref}}=1+\frac85b^2+O(b^3)
+\]
+
+를 확인했다. T_ref=2.7255K/a이며 계수는2.18386436608778이다. induced 항은 b_l=⟨nP_l⟩에 대해 S=b₀²+b₂²/2이고 실제 photon 에너지만 사용한다. effective Ω_r의 neutrino 성분은 Compton 에너지에 넣지 않는다. 원 history의 leading-order sample peak 근처 a=0.11999226418에서 exact spectral quadrature의 ΔT_C는 +/− case 각각1.23623149/1.24636062mK다. 이는 선택된 한 시점의 spectral 계산이며 전 구간 exact maximum이 아니다.
+
+이 결과는 gas-temperature 오차 한계가 아니다. U도 변해 gas cooling 계수를 바꾸므로 ΔT_C가0.01K보다 작다는 사실만으로 gas error gate를 통과시킬 수 없다. Type-II/HYREC state를 원 IGM에 복사하지 않았고 새 IVP 없이 실제 원 photon field에 대한 새 진단을 얻었다. 유도·고차항/angle/energy quadrature 검산과 독립 계수 검산은 `approximation_validity/incremental_fifth/induced_compton/`에 있다.
 
 ## 저장소별 소비 경계
 
 | 저장소 | 원래 IGM에 대한 소유권 | 이번 소비·수정 | 다음 행동의 조건 |
 |---|---|---|---|
-| rei_bianchi | scenario, IC, geometry 선택, 결합 history, 최종 scientific admission | 원본 결과와 새 stress 진단의 통합; +0.01 복구 | AX08 완료 후 AX11, AX12 |
-| bass | 같은 scenario의 proper clock·geometry·photon characteristic interface | 기존 geometry/clock 결과 재사용, Type-II/HYREC 결과를 AXBI로 대체하지 않음 | 원래 source의 clock/geometry 차이가 실제 수치 gate를 막을 때 |
+| rei_bianchi | scenario, IC, geometry 선택, 결합 history, 최종 scientific admission | 원본 결과와 새 stress 진단의 통합; +0.01 복구 | AX08 완료; 다음 AX11, AX12 |
+| bass | 같은 scenario의 proper clock·geometry·photon characteristic interface | geometry/clock 재사용 및 PR335 induced-Compton 방법을 원 photons에 실제 적용 | 원래 source의 clock/geometry 차이가 실제 수치 gate를 막을 때 |
 | vigilode | 같은 원 RHS의 오차제어·solver 효율 | 기존 native 실패·negative work-precision 보존 | AX11에서 식별한 실제 source hot path만 최적화하고 같은 정확도에서 비용 비교 |
 | WU088_HH | 선택된 종의 reaction rates·threshold·stoichiometry·유효범위 | 원 H/He provider와 source/clock 불일치 판정 재사용 | named AXBI source row나 rate 오차가 있을 때 |
 | rec_bianchi | recombination/opacity·proper-electron collision·Thomson 연산자 | PR200 물리 tetrad·차수4 quadrature 교정 | source-matched 소비자의 실제 요청; optional sky가 abundance를 막지 않음 |
@@ -63,9 +81,15 @@ HE guard는 N_escaped[photons]를 Eα×1.602176634×10⁻¹²[erg/eV]로 변환�
 
 문제는 단순히 계산 시간이 긴 것만이 아니다. (i) 사용자의 원래 목표가 expansion DAG에서 빠져 있었고, (ii) 서로 다른 source의 어려운 조건이 중앙의 선행조건으로 전이되었으며, (iii) donor 결과의 제출이 owner 소비와 완료 결정으로 이어지지 않았고, (iv) 실패·예산 문서가 그 다음 최소 실행을 정하는 대신 같은 감사의 입력으로 반복되었다. 원 REI PR129 이후 census의244개 open/draft는 그 현상을 나타내지만, PR이 draft라는 사실 자체가 과학적 무가치함의 증명은 아니다.
 
+동시에 진행된 다른 owner 스레드에서도 같은 네 history stress 결과가 도출된 것을 발견했다. 극값은 약10⁻¹⁷ 수준에서 일치하며 이를 중복 성과로 세지 않는다. 앞으로는 같은 source·case·claim을 가진 active 작업을 재사용하고 누락 trajectory 및 후속 오차 검증에 계산을 배정한다.
+
 이번 교정은 실제 source에 새로운 결과를 내는 작업과 정확성을 지키는 유지보수, 재사용·유예 결정을 분리한다. 새 proposal을 만들 때 중앙의 어느 입력·함수·history·관측량이 그것을 소비하는지 지정한다. 지정할 수 없으면 이번 경로에서 배정하지 않는다. 기존 결과의 복제, 동일 실패 재문서화, plot 재생성, 관찰대상 시나리오를 바꾸는 연산은 AX 진행으로 세지 않는다. 이를 위한 작은 per-turn watchdog는 `DRIFT_WATCHDOG.json`이며, 새로운 승인 gate나 문서 생산 단계가 아니다.
 
 다음 scientific acceptance는 endpoint와 같은-grid 재현만으로 닫지 않는다. AX11은 원 계약의 baseline+최소 두 refinement 수준, dt/dE/dμ 분리, fixed-a 및 equal-proper-time 비교, 원 fractions/temperature floors와 paired-effect resolution을 요구한다. 원본에 없는 전역 Volterra theorem을 추가하지 않는다. AX12는 FESC_025와 TGAS20K를 유지한다. 실험 비용은 실제 현재 기계의 관측에 근거해 배정하며 이전 unknown 비용을0으로 초기화하지 않는다.
+
+실제 실행 비용도 조사했다. 전체312,237 accepted steps 중70.03%가 Δln a=3.125×10⁻⁶ plateau에 있으며 ZERO와 +0.01의 dyadic schedule이 일치한다. 전체 rejection은19회, trial당 RHS는7.00687회다. Newton 실패가 비용의 주원인이라는 증거는 없다. 원 source에서 같은 배경의4097-node 적분 반복, 저장하지 않을 spectrum의 매-step 직렬화, 반복 directory scan을 확인했지만 CPU 점유율은 아직 계측하지 않았다. 따라서 속도 향상을 이미 달성했다고 주장하지 않는다.
+
+AX11의 기존12-run·780만 tentative-trial 배정은 baseline 비용12회 상당량1,124만1,216trial보다 작다. 이는 naïve cost 계획의 모순이지 refinement 비용의 엄밀한 하한은 아니다. 다음 PR은 error component·component timing을 기록하고 정확히 중복되는 geometry 계산과 폐기되는 출력 작업을 제거한다. 같은 accepted state·원 tolerances·진단을 보존한 제한 replay로 비용을 측정한 뒤 원 IC부터 수행하는 refinement 예산을 다시 묶는다. 이 유지보수 PR 자체를 AX11 완료로 세지 않는다. 원 time tolerance levels1e−5/2.5e−6/6.25e−7, energy16/32/64, angle8/16/32 및 paired10%/absolute-floor 판정은 그대로다.
 
 ## 조사 범위와 미완료 사항
 

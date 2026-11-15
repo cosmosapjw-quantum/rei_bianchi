@@ -60,6 +60,11 @@ assert count==c[0]+1 and float(last['zbar'])==4 and float(last['a'])==.2
 for k,z in zip(['a','time_s','b','x_HII','x_HeII','x_HeIII'],v[:6]):assert float(last[k])==z,(k,last[k],z)
 output_sha=sha(out)
 admission={'status':'COMPLETE_COMPOSED_HISTORY','case_id':'SHEAR_PLUS','q_ref':.01,'zbar_start':20.,'zbar_end':4.,'rows':count,'sha256':output_sha,'bytes':out.stat().st_size,'native_terminal_accepted':c[0],'boundary_checks_passed':True,'terminal_checkpoint_matches':True,'original_physics_identity_verified':True}
+original_root='/home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/axbi_goal_20261014/runs/paired/32d11e733155/'
+original_dropbox='ns:183516487//bianchi/rei_bianchi/research/axbi_goal_20261014/runs/paired/32d11e733155/'
+for i,case,fileid in [(0,'SHEAR_PLUS','id:BSpOijBcT10AAAAAAD5fpw'),(1,'SHEAR_PLUS_continuation_001','id:BSpOijBcT10AAAAAAD7GDw')]:
+    inputs[i].update(source_remote_path=original_root+case+'/history.csv',dropbox_path=original_dropbox+case+'/history.csv',dropbox_file_id=fileid)
+inputs[2].update(source_remote_path=info['source_remote_path']+'/history.csv',dropbox_path='ns:183516487//bianchi/rei_ax08_plus_recovery_20261115/SHEAR_PLUS_continuation_002/history.csv',dropbox_file_id='id:BSpOijBcT10AAAAAAERv1Q')
 report={'schema':'rei.axbi.plus_complete_composition.v1','admission':admission,'inputs':inputs,'output_private_path':str(out),'boundary_checks':boundaries,'orphan47rows':'Original plus_1 rows40482..40528 preserved in immutable input but excluded after durable checkpoint240480; replay costs are charged separately.','native_evidence':info,'terminal':terminal,'checkpoint_counters':c,'composition_only':True,'AX11':'UNRESOLVED_NO_REFINEMENT_IMPLIED','scientific_admission':'BASELINE_SAVED_HISTORY_ONLY_NOT_RESOLVED_SIGNED_RESPONSE','canonical_count_delta':0}
 (ROOT/'PLUS_COMPLETE_COMPOSITION_MANIFEST.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(admission))
