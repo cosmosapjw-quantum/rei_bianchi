@@ -37,6 +37,17 @@ def main():
                  'previous_checkpoint_commit': git('rev-parse','HEAD'),
                  'drift_watchdog': 'WITHIN_ORIGINAL_ABUNDANCE_SCOPE'})
     ledger.write_text(json.dumps(rows, indent=2, ensure_ascii=False)+'\n')
+    if a.stage == 10:
+        payloads = sorted(x for x in HERE.rglob('*') if x.is_file()
+                          and '__pycache__' not in x.parts
+                          and x.name != 'DELIVERY_MANIFEST.json')
+        delivery = {'schema': 'rei.axbi.final-delivery.v1',
+                    'central_completed': 28, 'central_total': 88,
+                    'theory_and_coding_paired_checkpoints': 10,
+                    'publication_readback': 'see PR374 final body and remote backup receipts',
+                    'sha256': {str(x.relative_to(HERE)): hashlib.sha256(x.read_bytes()).hexdigest()
+                               for x in payloads}}
+        (HERE/'DELIVERY_MANIFEST.json').write_text(json.dumps(delivery, indent=2)+'\n')
     git('add','--',str(REL))
     staged = git('diff','--cached','--name-only').splitlines()
     if any(not x.startswith(str(REL)+'/') for x in staged):

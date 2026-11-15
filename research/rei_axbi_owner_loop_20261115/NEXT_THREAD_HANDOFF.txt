@@ -1,0 +1,96 @@
+REI_BIANCHI 원 IGM 연구 handoff — 2026-11-15
+
+스레드/목표
+- rei_bianchi 원 REI-AXBI-GOAL-20261014: zbar20→4 비기울어진 축대칭
+  Bianchi I와 FLRW의 H/He/electron abundance를 proper time/Tgas로 완성.
+- physmath-research-loop 적용. 이번에는 subagent 없이 동일 작성자의
+  별도 판독·보간·고정밀 수식으로 자가 적대적 검증을 수행했다.
+- 중앙 DAG 28/88 유지. working33/88은 별도 비가산 이력이다.
+  완성된 저장 이력은 5개 중 4개이며 전체 AX08/AX11/AX12는 미완료.
+
+게시와 읽기 순서
+- PR: https://github.com/cosmosapjw-quantum/rei_bianchi/pull/374
+- Branch: research/rei-axbi-owner-consumption-20261115
+- 과학결과/owner판정 anchor: d2e19fb582c5a70366c1dc772f320c6b34c9c2c7
+- 최종 R10/C10 게시 head와 각 archive readback 표는 PR 본문을 확인.
+- 작업 디렉터리: research/rei_axbi_owner_loop_20261115/
+- 먼저 SCIENTIFIC_OWNER_DECISION.json, REPORT_KO.md, INPUT_MANIFEST.json,
+  SHEAR_PLUS_RECOVERY_CANDIDATE.json, IMPLEMENTATION_BRIDGE.md를 읽는다.
+- 전수조사를 처음부터 반복하지 말고 pin된 source에서 달라진 부분만 확인.
+
+실제로 완료한 과학 작업
+- ZERO, +0.005, -0.005, -0.01의 원 history.csv 전체 bytes를 과거
+  completed-case SHA와 대조했다. 312238행씩 총1248952행을 소비했다.
+- 새 결과14130행: abundance4004, equal-zbar3003, equal-time3003,
+  milestone12, Thomson4004, clock104. 두 과학그림(PNG/SVG)을 검토했다.
+- q=-0.01 HII 차이는 fixed-a 표본 최대점에서 -2.4671757e-6,
+  fixed-elapsed-time 최대점에서 +1.7102717e-5다. 후자는
+  -2.4563356e-6 + 1.9559053e-5의 고정-a 항+기준 시계 이동으로 분해된다.
+- xHII=.5의 FLRW 경과시간607.75946747Myr, q=-.01 shift=-5710.62yr.
+- 이 값들은 조건부 저장 모델 결과다. AX11 global paired evolution
+  error는 UNKNOWN이며 numerical/observational detection으로 승격하지 않는다.
+- REC proper-electron 소비의 FLRW tau20→4=0.03196818270887343.
+  zbar4 조건부 receiver이며 observer tail/total tau는 null이다.
+
+실제로 수용한 donor
+- BASS331 ea19c11ee3412b9fcbc8d3d07ec7c7eefcf7ddbf: characteristic/
+  source-support 범위. 원 AXBI 배경에서 운동량 경로와 실제 교차검산.
+- REC199 c10e97ab3178c423cc7699684b33e1730d26437a: proper electron
+  collision/양의확률; 원 네 전자 이력 전체에 적용. original GL8 유지.
+- BASS_HE154 09b07147b280448bc05a1d0a7c0508401cf58a0b: F05 OTS
+  ownership을 수용하여 Case-A baseline에 중복 열/이온화를 추가하지 않음.
+- WU199 6e04dcaf448269216330a75f1364b831c41e6c1e: 출처/시계 조건과
+  charge 소비. F08 S0를 원 고적색편이 모델로 잘못 대입하지 않음.
+- CR167 3d6d671474382a019c4aca1c5f331f8a3eabe31f: F05 조건부
+  activation frontier; 원 baseline CR OFF 유지.
+- F05 V1 tick160, V2 published research tick162, tick163 candidate-only.
+  forward166와 productionV2 policy branch의 존재를 실행 증거로 취급하지 않는다.
+
+검증과 실패
+- 별도 stdlib CSV+scalar bisect audit: 모든 원본행 및 same-time3003행;
+  fractions 최대2.0e-15, T 최대1.46e-11K 차이. 12 native crossing 일치.
+- Wolfram 기호식, 60자리 reciprocal clock 적분, GL8 moment 및
+  source/coordinate/comoving-ne 등6개 부정입력 확인.
+- 첫 reducer는 pandas Series[-1] 구현오류로 실패했고 로그를 보존.
+  ndarray 정규화 후 두 번째 -O 실행 성공. 성공한 전체 실행은1회다.
+- 새 coupled ODE0회. 원 source/rates/IC/closure/tolerances/실패 불변.
+- 독립 작성자 blind review 또는 정상/-O 두 성공 실행 byte parity를
+  주장하지 않는다. 검증된 결과를 다시 메타 감사하는 루프를 만들지 않는다.
+
+원본 포함 복구
+- Dropbox 폴더: /bianchi/research_backups/rei_bianchi/REI_AXBI_OWNER_20261115
+- REI374_AXBI_ORIGINAL_FOUR_CASE_SOURCE_FULL_20261115.zip
+- 279069631 bytes, SHA256
+  c8efb1dbde8c51c7356013ad346e97bb0223b64d8a387844d46779d380d7510d
+- Dropbox id:BSpOijBcT10AAAAAAERvDg. 전체 원격 bytes를 다시 읽어 일치 확인.
+- source-full ZIP의 private_inputs/에 원 네 이력이 있고 loop/는R7/C7
+  시점 코드/결과다. 최신 코드는PR374 또는R10/C10 stage archive를 사용.
+- R1–R10/C1–C10의 각 paired checkpoint를 별도 ZIP으로 게시·백업한다.
+  sourcefull과 최종stage를 함께 사용하면 원본+최종결과가 복구된다.
+
+다음에 실행할 실제 원 목표 작업
+1. 실제 SHEAR_PLUS checkpoint를 이어받는 새 복구 segment를 준비한다.
+   원 사용자 checkout은 dirty이므로 보존하고 별도격리경로를 사용한다.
+   경로: /home/cosmosapjw/Dropbox/bianchi/rei_bianchi/research/
+         axbi_goal_20261014/runs/paired/32d11e733155/SHEAR_PLUS_continuation_001
+   checkpoint SHA256:
+   7af4071c8267f349c0a1d106759aa39d5fa47423ecbb76137692d31d1f5f82a2
+   accepted240480, attempts721494, RHS5050500, a=.10752752205956843,
+   누적wall7347.101283315s. CSV tail은 a=.10755911290885205로 더 앞선다.
+2. tail을 checkpoint로 취급하거나 그대로 append하지 않는다. 전체
+   durable state/counters/clock을 복원하고 abandoned tail과 첫실패를
+   보존하며 경계를 한 번만 세는 복구 계획을 고정한다.
+3. 원 source d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185,
+   원 config, 실제 binary와 새 bound run의 identity를 대조한다.
+   old segment는 maximum_new_process_starts=1, automatic_retries=0였다.
+   이 과거 계약을 자동 재시작 허가로 해석하지 않는다. 새 recovery
+   binding과 누적 예산 잔여량/중복기동 방지를 명시한 뒤 단일 기동한다.
+   누적상한: accepted500000, attempts1550054, RHS20000000,
+   wall16976.389416854s, 원본+segment4096MiB. 예산을 초기화하지 않는다.
+4. heavy execution은 REI cloud-first overlay에 맞는 실제 local executor로,
+   연구·코드·가벼운 검증은 cloud에서 수행한다. 다른 worker를 건드리지 않는다.
+5. 실제 zbar4 완료 후 원이력들을 compose하고 새 completed-case hash를
+   소비한다. 그다음 기존 AX11 refinement/AX12 source·IC 변형을 수행.
+   누락 +0.01 이력을 부호대칭으로 만들어 넣지 않는다.
+6. 매 단계 중앙 (완료노드)/(전체노드)=28/88과 원 목표에 기여한 실제
+   결과를 기록하고 백업·게시한다. 정확도/노드승인은 해당 기준에만 부여한다.
