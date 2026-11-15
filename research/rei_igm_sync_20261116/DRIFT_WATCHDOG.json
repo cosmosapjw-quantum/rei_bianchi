@@ -1,0 +1,55 @@
+{
+  "schema": "rei.igm.turn-watchdog.v1",
+  "purpose": "One bounded routing check per turn, integrated into existing run record. No new gate, no additional PR, no repeated independent audit unless inputs/claim change.",
+  "record_fields": [
+    "turn_or_unit_id",
+    "goal_id",
+    "scenario_id",
+    "existing_node_id",
+    "source_identity",
+    "planned_scientific_delta",
+    "actual_scientific_delta",
+    "remaining_obligation",
+    "decision"
+  ],
+  "decisions": [
+    "CONTINUE_EXISTING_SCIENCE",
+    "REDIRECT_TO_EXISTING_BLOCKER",
+    "REUSE_COMPLETED_EVIDENCE",
+    "BLOCKED_EXACT_INPUT"
+  ],
+  "rules": [
+    "A new plot, PR, audit, registry, source-row count or backup alone is not scientific delta.",
+    "If no claim-relevant physical quantity, uncertainty or dependency changes, stop this local line and redirect to an existing unmet science obligation.",
+    "A supplier result enters only when source, clock, IC, model closure and units match, or a documented method-only use is made.",
+    "Do not import a stronger unrelated campaign gate: AX11 is empirical convergence under its own fixed contract.",
+    "Do not manufacture a nonzero canonical delta. Report AX08 cases and AX11/AX12 evidence separately from expansion-DAG 28/88.",
+    "New audits reuse closed findings; policy edits terminate after routing the next actual calculation.",
+    "A complete unresolved/null result with valid uncertainty is acceptable. New positive detection is not required."
+  ],
+  "current_turn_application": {
+    "goal_id": "REI-AXBI-GOAL-20261014",
+    "existing_nodes": [
+      "AX03",
+      "AX08",
+      "AX11",
+      "AX12"
+    ],
+    "actual_scientific_delta": "Integrated actual background+ionizing stress and thermal energy over four native histories; source-defined approximation diagnostics now evaluated.",
+    "direct_blocker_action": "Exact +0.01 durable checkpoint recovered; one new finite allocation bound, execution state requires actual receipt.",
+    "decision": "CONTINUE_EXISTING_SCIENCE",
+    "exclude_as_science": [
+      "new plots",
+      "metadata/backup counts",
+      "structural patch checks",
+      "REC/HE maintenance counted as new IGM node"
+    ]
+  },
+  "parallel_policy_override": {
+    "previous_rule": "research/rei_axbi_owner_loop_20261115/CONTRACT.md: No subagents",
+    "previous_scope": "completed 2026-11-15 saved-history loop",
+    "current_authority": "2026-11-16 user explicitly requests parallel repository/blocker research and independent audit",
+    "replacement": "Use actual agents on disjoint tasks with shared source/model contract; preserve previous same-author review provenance and stage history.",
+    "impact": "Current sync only; original previous-run subagents=0 receipt remains unchanged."
+  }
+}

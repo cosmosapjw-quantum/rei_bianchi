@@ -1,0 +1,49 @@
+{
+  "schema": "rei.axbi.recovery002.independent_review.v1",
+  "reviewer": "source_thermal native agent",
+  "independence": "Distinct from wrapper author, not blind; author supplied paths/scope",
+  "verdict": "PASS_SCOPED_PREPARATION_AND_ONE_START_LAUNCHER",
+  "wrapper_sha256": "3e5d3c9e91cad6b2a5dfcd292ffad730622806bdcf8dfa93598c7c3d0285f4e5",
+  "launcher_sha256": "26c262bd75ebd4f96c29945be8d2edddfd4aa272259c85053bdd4f08f0dd7971",
+  "allocation_sha256": "3d3815257c4258621c6e25480b3935cb4cccba838a44aefc49f4d9bcdad1f72f",
+  "base_commit": "44af42ba60a44a3e9ee23288b766c025c4e0de11",
+  "checkpoint_sha256": "7af4071c8267f349c0a1d106759aa39d5fa47423ecbb76137692d31d1f5f82a2",
+  "source_identity_sha256": "d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185",
+  "static_checks": [
+    "Original17-source corpus and checkpoint bytes actual hashes match",
+    "Original kernel guards attempt/RHS counts before increment",
+    "Counter delta ceilings 90000 accepted 360000 attempts 3000000 RHS 2695 native seconds",
+    "Clock/background/initial-energy readback remains native responsibility",
+    "No original owner output path; strict resolved descendant of isolated stage",
+    "Per-stage exclusive reservation and flock; no automatic retry",
+    "Native scientific aggregate cap plus terminal combined scientific/raw accounting; fsize not misrepresented as aggregate"
+  ],
+  "tests": {
+    "runtime": "PYTHON_PASS",
+    "command": "python3 /workspace/scratch/d38b90b7dc4c/reviews/test_axbi_recovery002_launcher.py -v",
+    "passed": 7,
+    "seconds": 0.007,
+    "solver_executions": 0,
+    "subprocess_execution_mocked": true
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "finding": "Output could be outside isolated stage including original owner repo",
+      "status": "CLOSED",
+      "fix": "Resolved strict descendant check; negative test passes"
+    },
+    {
+      "id": "F2",
+      "finding": "Launcher controlling budget was not byte-bound",
+      "status": "CLOSED",
+      "fix": "launcher_sha256 in manifest verified at bundle_identity; tamper test passes"
+    }
+  ],
+  "outstanding_before_science_launch": [
+    "Actual native build exit0 and new binary receipt",
+    "Actual native --mode check preflight PASS with source/checkpoint pins",
+    "Exactly one authorized launch under unchanged allocation"
+  ],
+  "claim_ceiling": "Bounded baseline continuation only; no AX11/12 accuracy or final signed-response admission"
+}

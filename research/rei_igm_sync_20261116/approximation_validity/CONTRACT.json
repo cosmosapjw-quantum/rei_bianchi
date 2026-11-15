@@ -1,0 +1,23 @@
+{
+  "schema": "rei.axbi.saved-approximation-contract.v1",
+  "unit": "AXBI_SAVED_BACKGROUND_AND_IONIZING_STRESS_20261116",
+  "scenario": "PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1",
+  "goal": "Quantify omitted background and actual ionizing radiation feedback on original represented IGM abundance histories",
+  "dag_mapping": ["AX03 prescribed-background approximation", "AX08 represented-case diagnostic consumption"],
+  "not_mapped_to": "AX10 optional observables",
+  "source_commit": "df72fb686a41c3f047bca1a92df8946482948f82",
+  "source_raw_archive_sha256": "c8efb1dbde8c51c7356013ad346e97bb0223b64d8a387844d46779d380d7510d",
+  "source_cases": ["ZERO", "SHEAR_HALF_PLUS", "SHEAR_HALF_MINUS", "SHEAR_MINUS"],
+  "source_rows": 1248952,
+  "primary_inputs": "Exact original history.csv bytes under each CASE; SHA-256 pins in full_history_diagnostic.PINS",
+  "conventions": {"signature":"(-,+,+,+)","time":"elapsed gas proper seconds from each zbar20 surface","units":"SI in new derived products; input n in cm^-3 and photon energy eV/H converted explicitly","J2":"sum photon_stock_per_H times E_eV times P2(local_mu), no factor 5 or additional angular weights"},
+  "equations": ["u_bg=u_ref <D^-2>", "DeltaP_bg=u_ref <P2 D^-2>", "DeltaP_ion=nH_SI*J2*eV_J", "delta_s=a^-3 integral a^3 (8piG/3c^2) DeltaP dt", "extra=(u_ion+u_thermal+abs(delta_u_bg))/(H_FLRW^2/(8piG/3c^2))"],
+  "unchanged_targets": {"max_abs_delta_s_over_H":0.0001,"max_extra_energy_ratio":0.0001},
+  "numerical_comparison_scope": "actual saved-history node maxima and perturbative quadrature; no original evolution error estimate",
+  "new_coupled_trajectories": 0,
+  "cost_cap_per_reduction_wall_s":30,
+  "result": "SCOPED_APPROXIMATION_DIAGNOSTICS_COMPLETE_FOR_FOUR_REPRESENTED_CASES",
+  "remaining": ["+0.01 original complete history", "AX11 time/energy/angle convergence", "AX12 source/IC robustness", "coupled response if requested by the owner after complete approximation assessment"],
+  "drift_watchdog": {"target":"original z20-to4 HHe abundance validity", "concrete_contribution":"consumes actual native ionizing J2 and thermal states, finishes missing saved-history stress integrals and evaluates original thresholds", "stop_after":"independent review and integration; no new radiation atlas or new coupled model"},
+  "NG1_NG7": "not_applicable: no impossibility/no-go theorem claimed"
+}

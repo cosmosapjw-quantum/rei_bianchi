@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "unit_id": "REI_IGM_HE_CR_SYNCHRONIZATION_20261116",
+  "active_scenario": {
+    "id": "PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1",
+    "radiation": "primary_only",
+    "recombination": "Case_A_escape",
+    "disabled_channels": [
+      "CR",
+      "HH",
+      "RCT",
+      "secondary",
+      "molecules"
+    ],
+    "authority": "current root integration selection"
+  },
+  "scientific_progress": {
+    "new_canonical_nodes": 0,
+    "new_original_IGM_physics_results": 0,
+    "maintenance_verification_only": true
+  },
+  "repositories": [
+    {
+      "repo": "cosmosapjw-quantum/BASS_HE",
+      "pin": "09b07147b280448bc05a1d0a7c0508401cf58a0b",
+      "branch": "research/bass-he-f05-v2-local-ots-feedback-20261115",
+      "pr": 154,
+      "role": "Microscopic heat/degradation/energy partition for source-owned requested channels",
+      "active_baseline_contribution": "NONE_ADDITIONAL_CHANNEL_OFF",
+      "blocker_for_active_baseline": false,
+      "retained_evidence": "F05 research V2 local OTS feedback; not the AXBI Case-A scenario",
+      "current_patch": "Fix count-to-energy representation guard; no RHS/source changes",
+      "inputs_for_future_activation": [
+        "same_scenario_id",
+        "source_spectrum_and_energy_domain",
+        "proper_clock",
+        "population_mapping",
+        "consumer_function",
+        "observable_and_error_budget"
+      ],
+      "outputs_for_future_activation": [
+        "source_owned_thermal_partition",
+        "energy_ledger",
+        "validity_domain",
+        "error_budget"
+      ],
+      "claim_gate": [
+        "same scenario and source identity as consumer",
+        "no local OTS double count",
+        "same proper clock and event energy ownership"
+      ],
+      "next_pr": {
+        "type": "donor_maintenance",
+        "title": "Fix escaped-photon energy check and bind IGM role to selected scenario",
+        "base_sha": "09b07147b280448bc05a1d0a7c0508401cf58a0b",
+        "files": [
+          "capture_original_local_ots.py",
+          "native_v2_lya_ots_feedback.py",
+          "tests/test_escape_energy.py"
+        ],
+        "validation": "Author 6 targeted tests and independent reviewer 9 full tests PASS; published draft PR155",
+        "scientific_result_required_for_future_work": "A same-scenario consumer used in central IGM history or observable",
+        "no_merge": true,
+        "no_force": true
+      }
+    },
+    {
+      "repo": "cosmosapjw-quantum/bass_cr",
+      "pin": "3d6d671474382a019c4aca1c5f331f8a3eabe31f",
+      "branch": "research/cr-rei-f05-cr-materiality-20261115",
+      "pr": 167,
+      "role": "Actual external CR spectrum/injection/transport and deposition when requested",
+      "active_baseline_contribution": "CR_OFF",
+      "blocker_for_active_baseline": false,
+      "retained_evidence": "F05 source-point dual materiality frontier; not an actual CR model",
+      "current_patch": "No code changes; explicit role and scenario separation",
+      "inputs_for_future_activation": [
+        "same_scenario_id",
+        "named_real_CR_source",
+        "spectrum_normalization",
+        "proper_clock",
+        "transport_closure",
+        "consumer_observable",
+        "materiality_error_budget"
+      ],
+      "outputs_for_future_activation": [
+        "CR_source_rate",
+        "deposition_partition",
+        "charge_energy_ledger"
+      ],
+      "claim_gate": [
+        "do not invent spectrum or turn CR on",
+        "keep F05 He OTS separate",
+        "rate/heating source identity is consumer owned"
+      ],
+      "next_pr": {
+        "type": "routing_only_as_part_of_root_sync",
+        "base_sha": "3d6d671474382a019c4aca1c5f331f8a3eabe31f",
+        "scientific_delta": 0,
+        "no_standalone_atlas": true,
+        "no_merge": true,
+        "no_force": true
+      }
+    }
+  ],
+  "watchdog": {
+    "target": "original source-matched rei_bianchi IGM",
+    "check": "Name one actual central consumer, source identity and physical result changed before assigning another donor unit",
+    "action_if_no_consumer": "Do not allocate another donor study; continue central earliest executable step",
+    "no_new_universal_approval_gate": true
+  },
+  "source_checks": {
+    "python": "PYTHON_PASS",
+    "version": "3.12.14",
+    "numpy": "2.3.5",
+    "command": "python3 -m unittest discover -s research/rei_f05_v2_lya_local_reabsorption_20261115/tests -p test_escape_energy.py -v",
+    "tests_passed": 6,
+    "original_public_rows": 92160,
+    "original_csv_sha256": "6acd17f0612738fa2954f3285b92b53d1444d8a4cc020375731d0557c0ba80ae",
+    "max_scaled_representation_error": 1.2733868152902887e-15,
+    "wall_seconds_unittest": 2.766,
+    "original_IVP": "NOT_RUN",
+    "native_original_solver": "NOT_RUN",
+    "source_tolerances_unchanged": true
+  },
+  "publication": {
+    "repo": "cosmosapjw-quantum/BASS_HE",
+    "branch": "research/igm-sync-escaped-energy-guard-20261116",
+    "parent_sha": "09b07147b280448bc05a1d0a7c0508401cf58a0b",
+    "commit_sha": "b8300f57a5c36c109bf9a982769fb7ba76d250eb",
+    "tree_sha": "a35414cb0682b9d40d89a5f413ac0cd8979e6870",
+    "pr_url": "https://github.com/cosmosapjw-quantum/BASS_HE/pull/155",
+    "draft": true,
+    "expected_sha_nonforce_update": true,
+    "remote_files": [
+      {
+        "path": "research/rei_f05_v2_lya_local_reabsorption_20261115/capture_original_local_ots.py",
+        "git_blob_sha": "93202ed88ccb241285427f1ffac09e0d5681b72b",
+        "exact_utf8_content_equal": true
+      },
+      {
+        "path": "research/rei_f05_v2_lya_local_reabsorption_20261115/native_v2_lya_ots_feedback.py",
+        "git_blob_sha": "3bef058036cb3fd1ff0ffe1090a180af816d94ef",
+        "exact_utf8_content_equal": true
+      },
+      {
+        "path": "research/rei_f05_v2_lya_local_reabsorption_20261115/tests/test_escape_energy.py",
+        "git_blob_sha": "6d49da487ed8fb05c765924db13585b70c96f7ad",
+        "exact_utf8_content_equal": true
+      },
+      {
+        "path": "research/rei_f05_v2_lya_local_reabsorption_20261115/IGM_ROLE_AND_GUARD_20261116.md",
+        "git_blob_sha": "3d23bc96b01c0354385a35d395b0ee801007aaf9",
+        "exact_utf8_content_equal": true
+      }
+    ],
+    "source_original_branch_untouched": true,
+    "ci_status": "NOT_QUERIED",
+    "review": "PASS_SCOPED_GUARD_REPAIR; /workspace/scratch/d38b90b7dc4c/reviews/HE_DIMENSIONAL_REVIEW.md",
+    "canonical_delta": 0
+  }
+}

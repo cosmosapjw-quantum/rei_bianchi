@@ -1,0 +1,140 @@
+{
+  "schema": "rei.axbi.independent-stress-review.v1",
+  "reviewer": "/root/axbi_review",
+  "reviewed_utc": "2026-11-15T15:37:41.025151+00:00",
+  "verdict": "ACCEPTED_WITHIN_FOUR_CASE_FROZEN_BACKGROUND_DIAGNOSTIC_SCOPE",
+  "scientific_status": "DERIVED_AND_NUMERICALLY_CHECKED; NOT_COUPLED_EVOLUTION_OR_ABUNDANCE_ERROR_BOUND",
+  "independence": {
+    "parent_history_inherited": false,
+    "production_implementation_authored_by_reviewer": false,
+    "own_derivation": true,
+    "own_numerical_check": true,
+    "native_cases_independently_reprocessed": [
+      "SHEAR_MINUS"
+    ],
+    "shared_dependencies": [
+      "same original history",
+      "NumPy Legendre nodes"
+    ],
+    "distinct_reference_methods": [
+      "adaptive mpmath 50-digit initial-angle integral",
+      "native proper-time longdouble trapezoid accumulation"
+    ],
+    "other_cases": "Read and code-reviewed; not independently rerun"
+  },
+  "runtime": {
+    "Python": "PYTHON_PASS",
+    "python_version": "3.12.14",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "pandas": "2.2.3"
+  },
+  "tests": {
+    "production_unit_suite_review_execution": {
+      "count": 10,
+      "succeeded": 10,
+      "failed": 0,
+      "runs": 1
+    },
+    "independent_native_read_runs": 1,
+    "new_IVPs": 0
+  },
+  "scope": {
+    "authoritative_result": "axbi_science/results/FULL_SUMMARY.json",
+    "represented_cases": 4,
+    "raw_rows_consumed_by_production": 1248952,
+    "DAG_obligation": [
+      "AX03",
+      "AX08"
+    ],
+    "not_AX10_completion": true,
+    "canonical_DAG_delta": 0,
+    "original_targets_changed": false,
+    "max_delta_s_over_H_target": 0.0001,
+    "max_extra_energy_ratio_target": 0.0001
+  },
+  "derived_checks": {
+    "shear_source": "dot(s)+3Hs=(8*pi*G/(3*c^2))*(P_parallel-P_perp)",
+    "local_to_initial_jacobian": "dmu/dv=R^-3; D=R^-2",
+    "energy_identity": "dM/db=-2F; dot(u)+4Hu+2s*DeltaP=0",
+    "isotropic_subtraction": "F=<P2*(D^-2-1)> is exactly equal to <P2*D^-2>",
+    "J2": "sum stock_per_H*E_eV*P2(local_mu); no factor 5 or repeated angular weights",
+    "ion_SI": "nH_cm^-3*1e6*J2_eV/H*1.602176634e-19",
+    "thermal_SI": "(3/2)*kB*T*(nH+nHe+ne)",
+    "energy_gate": "(uion+uth+abs(delta_ubg))/(3*H_FLRW^2*c^2/(8*pi*G))"
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "status": "RESOLVED",
+      "severity": "target_semantics",
+      "finding": "Match original extra energy denominator to H_FLRW^2 rather than H^2.",
+      "resolution": "Final implementation uses source comparator and retains H^2 ratio separately."
+    },
+    {
+      "id": "R2",
+      "status": "RESOLVED",
+      "severity": "claim_scope",
+      "finding": "AX10 is optional observables; approximation diagnostic maps to AX03/AX08.",
+      "resolution": "Final docs/code and full summary now use corrected mapping, without parent closure."
+    },
+    {
+      "id": "R3",
+      "status": "RESOLVED",
+      "severity": "novelty_scope",
+      "finding": "Original source already contained moment/stress/feedback definitions and integration helper.",
+      "resolution": "Final report claims integrated saved-history consumption and extrema, not a new theorem or first physics implementation."
+    },
+    {
+      "id": "R4",
+      "status": "RESOLVED",
+      "severity": "provenance_metadata",
+      "finding": "SOURCE_DEFINITIONS comparator snippet initially captured the constructor rather than output_row.",
+      "resolution": "Final metadata contains literal ion_stress, extra, and H_FLRW denominator; evidence hash refreshed. No numerical change."
+    }
+  ],
+  "numerical_comparison": {
+    "total_max_abs_difference": 1.0640427883408521e-17,
+    "background_max_abs_difference": 1.0652286344670081e-17,
+    "ion_max_abs_difference": 8.601529789073486e-23,
+    "extra_energy_max_abs_difference": 0.0
+  },
+  "native_check_source_sha256": "0c1d2479eebef9b1ec2d4ff56417ee3395ecd122c17326d4a8d827e2ead76d11",
+  "angular_GL16_reference_max_abs_M": 2.220446049250313e-16,
+  "angular_GL16_reference_max_abs_F": 2.6020852139652106e-17,
+  "independent_source_definition_components": {
+    "local_concatenation_path": "geometry_solver/private/source_identity.txt",
+    "local_full_sha256": "d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185",
+    "driver_component_sha256": "a614725c153ee21d88554573c15801087d8fb412954fa51d67b781f671475dbf",
+    "background_component_sha256": "65f10dced178aa85bb1c92da0b35350a0eec2d3d3de05630c900b5df4ec1e254",
+    "identity_scope": "Components match original run receipt; full concatenation not asserted byte-identical to original history identity"
+  },
+  "remaining_unresolved": [
+    "complete q=+0.01 history",
+    "AX11 original time/angle/energy evolution convergence",
+    "AX12 source/IC robustness",
+    "coupled fraction or temperature response/error bound",
+    "continuous supremum between source nodes",
+    "universal bound outside conditional all-massless collisionless initially isotropic model"
+  ],
+  "reviewed_sha256": {
+    "axbi_science/background_stress.py": "8f621e68c42a236b6d520a56eb001b28e43bdbfd7b08271f0754949188f4c010",
+    "axbi_science/full_history_diagnostic.py": "98522a103685243e8a2385e086d57f4f3c04b5e203380d8f2591967bef9706dd",
+    "axbi_science/test_background_stress.py": "4459382cb9e5b601c9f7fe87958b493d41893be18a0756334bfcdcac83be298c",
+    "axbi_science/DERIVATION_AND_RESULT.md": "123bb47aebe05ca821901c7cee0a9456dc87b17d0fad6fd79301cccc5562318a",
+    "axbi_science/results/SUMMARY.json": "9d3d1a3c3fb88a05d5c74d270796d22d1df42a335e5d17f79f2b07099ccfa13d",
+    "axbi_science/results/FULL_SUMMARY.json": "7d37d82d0dd090c63097770827e429ae09b0f0d5d4651eea206ed2841cb2c8ef",
+    "axbi_science/results/full_history_diagnostic_sample.csv": "4d24477fccff6df2336fcdf78e03e3424c3dc0c9a5e0bd50a509cbbb43b6f114",
+    "axbi_science/CONTRACT.json": "4f75e10e15b919c9fd6ecb3b5f21abd57013546da9b746c4194846e88d91fcff",
+    "axbi_science/FAILURE_REPAIR.json": "f097589829cdd97cf639a27a032956429d26ade1c6aa52f90d5207e9fcb0e28a",
+    "rei_current/research/rei_axbi_owner_loop_20261115/ORIGINAL_SCENARIO_LOCK.json": "07aa11d2d3fd47d2ed95e9d9161f6205e4d9ba386c27ad43d2b298fcd86d1696",
+    "rei_current/research/rei_axbi_owner_loop_20261115/INPUT_MANIFEST.json": "d51cabcbc8423e512a9a4b46bc99acdaa501fbbc8e07ccd2cac0e4c1a2858302",
+    "axbi_science/SOURCE_DEFINITIONS.json": "9d1025cf787a53522fa183271bb0c51f01f6cf0cf9f77f4e27b4cb7f81d09562"
+  },
+  "reviewer_evidence_sha256": {
+    "reviews/AXBI_INDEPENDENT_NUMERICS.json": "60cf5541ab4c897405c2f7cb670e64ff09ef41ad877b11263a7c90bf322c90fb",
+    "reviews/axbi_independent_checks.py": "bd4f55df8b89a2088c105f0d29e21bdc2a03ded1f19afee0d236179762d7fbad",
+    "reviews/AXBI_REVIEW.md": "31fabff23e930cf87950836c76fd210ea5e0e2aafd250a54f3c433fec92efd66"
+  },
+  "unresolved_correctness_blockers": []
+}
