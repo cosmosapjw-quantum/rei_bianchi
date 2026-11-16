@@ -27,7 +27,7 @@ components plus original error and consumed work counts, not zero error.
 
 A scalar local frozen-source illustration, dN/dt=S-kappa N, gives
 F=(N0+S dt)/(1+kappa dt), and H is two applications at dt/2. At N0=0,
-F-H= -S*kappa*dt^2/4 + O(dt^3). This is a diagnostic hypothesis for the initial
+F-H= -S*kappa*dt^2/[(1+kappa*dt)(2+kappa*dt)^2]. Its leading term is -S*kappa*dt^2/4 + O(dt^3). For general N0 the exact numerator becomes kappa*(kappa*N0-S)*dt^2. This is a diagnostic hypothesis for the initial
 controller only, not a replacement model for the coupled source history.
 It predicts local defects of second order in dt despite first-order accumulated
 BE error. The controller target reductions by4 and16 may therefore require
