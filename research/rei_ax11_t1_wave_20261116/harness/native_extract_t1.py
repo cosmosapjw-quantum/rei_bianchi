@@ -162,6 +162,7 @@ def consume_case(root, case, grid, records, output):
     headers = None
     recent = deque(maxlen=3)
     milestones = {}
+    all_upward_crossings = {str(level): [] for level in [.1, .5, .9]}
     maximum = {'hydrogen_sum': 0., 'helium_sum': 0.,
                'electron_charge_per_H': 0., 'comoving_hydrogen_relative': 0.}
     numeric_max = {}
@@ -233,9 +234,12 @@ def consume_case(root, case, grid, records, output):
                             'NONMONOTONE_HISTORY')
                     for level in [.1, .5, .9]:
                         label = str(level)
-                        if label not in milestones and previous[keys['x_HII']] < level <= hii:
-                            milestones[label] = {'level': level, 'lower_row': n - 1,
-                                                 'upper_row': n, 'rows': [previous, row]}
+                        if previous[keys['x_HII']] < level <= hii:
+                            crossing = {'level': level, 'lower_row': n - 1,
+                                        'upper_row': n, 'rows': [previous, row]}
+                            all_upward_crossings[label].append(crossing)
+                            if label not in milestones:
+                                milestones[label] = crossing
                 residuals = {
                     'hydrogen_sum': abs(hi + hii - 1.),
                     'helium_sum': abs(hei + heii + heiii - 1.),
@@ -274,7 +278,7 @@ def consume_case(root, case, grid, records, output):
               'first_row': first, 'last_row': previous,
               'endpoint_reached': previous[keys['a']] == .2,
               'nuclei_charge_density_residuals': maximum, 'native_maxima': numeric_max,
-              'milestones': milestones,
+              'milestones': milestones, 'all_upward_crossings': all_upward_crossings,
               'samples': {mode: query.finish(first, previous, recent)
                           for mode, query in queues.items()},
               'grid_sha256': sha(root / 'SAMPLING_GRID.json'),

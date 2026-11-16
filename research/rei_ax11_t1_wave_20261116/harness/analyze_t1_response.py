@@ -176,6 +176,22 @@ def milestone_rows(native):
     return rows
 
 
+def crossing_rows(native):
+    rows = []
+    for case, data in native.items():
+        keys = {key: i for i, key in enumerate(data['headers'])}
+        for label, crossings in data['all_upward_crossings'].items():
+            for ordinal, item in enumerate(crossings, start=1):
+                lo, hi = item['rows']
+                f = (float(label) - lo[keys['x_HII']]) / (hi[keys['x_HII']] - lo[keys['x_HII']])
+                u = (1 - f) * np.log(lo[keys['a']]) + f * np.log(hi[keys['a']])
+                t = (1 - f) * lo[keys['time_s']] + f * hi[keys['time_s']]
+                rows.append({'case': case, 'x_HII_level': float(label), 'upward_crossing': ordinal,
+                             'zbar': float(np.exp(-u) - 1), 'elapsed_time_s': t,
+                             'native_lower_row': item['lower_row'], 'native_upper_row': item['upper_row']})
+    return rows
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('native_input', type=Path)
@@ -206,6 +222,9 @@ def main():
     milestones = milestone_rows(native)
     if milestones:
         write_csv(args.output / 'milestone_T0_T1.csv', milestones)
+    crossings = crossing_rows(native)
+    if crossings:
+        write_csv(args.output / 'all_upward_crossings_T1.csv', crossings)
     result = {
         'status': 'T0_T1_NATIVE_RESPONSE_COMPARISON_COMPLETE_AT_REPRESENTED_SCOPE',
         'baseline_source_pin': contract['source_pin'], 'grid_sha256': grid_sha,
@@ -214,6 +233,9 @@ def main():
                                'endpoint_reached': native[case]['endpoint_reached']}
                           for case in ['ZERO', 'PLUS']},
         'modes': modes, 'milestones': milestones,
+        'upward_crossing_counts': {case: {level: len(items) for level, items in
+                                        data['all_upward_crossings'].items()}
+                                  for case, data in native.items()},
         'scientific_status': 'numerically checked two-level discrepancies; evolution error bound unresolved',
         'T2_full_history_available': False, 'observed_order': None,
         'full_AX11_complete': False, 'original_DAG': '10/17', 'expansion_DAG': '28/88',
