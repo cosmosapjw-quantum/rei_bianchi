@@ -29,12 +29,20 @@ A scalar local frozen-source illustration, dN/dt=S-kappa N, gives
 F=(N0+S dt)/(1+kappa dt), and H is two applications at dt/2. At N0=0,
 F-H= -S*kappa*dt^2/[(1+kappa*dt)(2+kappa*dt)^2]. Its leading term is -S*kappa*dt^2/4 + O(dt^3). For general N0 the exact numerator becomes kappa*(kappa*N0-S)*dt^2. This is a diagnostic hypothesis for the initial
 controller only, not a replacement model for the coupled source history.
-It predicts local defects of second order in dt despite first-order accumulated
-BE error. The controller target reductions by4 and16 may therefore require
-roughly2 and4 times the step count on a smooth resolved interval; actual
-component profiles and short-window refinements must test this, and the forecast
-does not certify whole-history cost or error. Zero source or kappa has zero
+It predicts an absolute local defect of second order in dt, despite first-order
+accumulated BE error. This does not determine the step-count scaling of a
+normalized controller. At N0=0, when the inventory floor is inactive, the relative
+defect is x/[(1+x)(4+x)], where x=kappa*dt. It is approximately x/4 for small x,
+and is nonmonotone with maximum 1/9 at x=2. SymPy independently checks these
+identities in SCALAR_DEFECT_CHECK.json. Zero source or kappa has zero absolute
 defect in this frozen illustrative channel. S has photons/H/s and kappa s^-1.
+
+The completed native preflight supersedes the provisional square-root-of-target
+cost illustration. On the measured common prefix, target reductions by4 and16
+produce median step-density ratios 4.000000001 and15.258789058. Therefore 2x/4x
+step multipliers are not supported for budgeting this source. This scalar
+reduction is not a fitted mechanism for the coupled system, and the measured
+prefix ratios are not global cost or evolution-error bounds.
 
 ## Constructive exact-reuse argument
 
