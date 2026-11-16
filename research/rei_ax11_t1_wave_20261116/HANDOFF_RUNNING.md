@@ -6,7 +6,7 @@ PROJECT=cosmosapjw-quantum/rei_bianchi
 BRANCH=research/rei-ax11-source-profile-20261116
 PR=https://github.com/cosmosapjw-quantum/rei_bianchi/pull/377
 이 파일을 포함한 exact public HEAD를 먼저 읽어라. 직전 public pin은
-91bac9e1c142630e8b4d51a0622cd39e73ae7b2e이며 새 stage가 뒤에 게시될 수 있다.
+a5aea61c738f70af811f3871ca08501c6db3e0c7이며 새 stage가 뒤에 게시될 수 있다.
 
 CENTRAL 원 workflow10/17, expansion28/88, AX08 baseline5/5 승인은 그대로다.
 F05/F08/다른 source·clock·상태를 섞지 않는다. AX12와 full T2/grid는 시작하지 않는다.
@@ -17,10 +17,12 @@ Native device=edd1b263-56a0-4391-8a2a-677dd00eabf5
 ROOT=/home/cosmosapjw/research_backups/rei_ax11_t1_wave_20261116_v1
 현재 full T1 controller session PID=481017. prepare/launch 재시작 금지.
 ROOT/RUN_LEDGER.json과 cases/{ZERO,PLUS}/segment_NNN/progress.json을 확인하라.
-첫 segment000은 각250000accepted,750057trials,5250405RHS로 exit10 정상 종료했다.
-ZERO checkpoint SHA=1b4e3bb670211f84319ce89929035e0439b3623c063320393998f9229c952105
-PLUS checkpoint SHA=ee5c39e83c85a836b6e022429a17ea884b5426f7b41d23e403b59fb7ebdd26ea
-두case segment001이 exact checkpoint에서 이미 시작되었다.
+segment000과001은 각case 누적500000accepted,1500057trials,10500405RHS로
+exit10 정상 경계를 완료했다. 500000의 checkpoint SHA는 다음과 같다.
+ZERO=5d9159a3326e963e6033cbe62023541a040d932faf12899ec3433dedbd0fc728
+PLUS=737c0d9d5103a512738bf1b189fb2f5850f91e113ba803de244361a888dfc0c9
+두case segment002가 exact checkpoint에서 이미 시작되었다.
+여기서 T1 segment002는 원 AX08의 완료된 continuation002와 다른 run이다.
 최초 native zbar4 endpoint는 아직 미확인이다. 카운터/비용을 0으로 초기화하지 말라.
 
 Code/binary/config/preflight identities는
