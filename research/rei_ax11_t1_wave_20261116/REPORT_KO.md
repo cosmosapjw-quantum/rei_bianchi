@@ -178,7 +178,9 @@ PLUS 약83.18%였다. 이 scope는 중첩되며 특정 내부 연산 하나의 �
 9개 manifested archive 및 matching native Dropbox 사본을 만들었다.
 Control/source/preflight/analysis archive는 provider에서 실제 복원하여
 native SHA256 및 Dropbox content hash와 일치를 확인했다.
-나머지 raw archive의 provider 확인 상태는 최종 저장 receipt에서 갱신한다.
+나머지 raw archive도 모두 provider에서 실제 바이트를 읽어 native SHA256 및
+Dropbox content hash와 일치를 확인했다. **9/9 archive, 총1,754,912,733 bytes**다.
+[전체 provider 검증](receipts/PROVIDER_BACKUP_VERIFICATION.json).
 [Native backup receipt](receipts/NATIVE_BACKUP_RECEIPT.json),
 [control 복원 근거](receipts/CONTROL_PROVIDER_RESTORE.json).
 
@@ -189,3 +191,7 @@ native SHA256 및 Dropbox content hash와 일치를 확인했다.
 Energy와 angle의 분리된 의무, 음의 shear와 half-amplitude의 별도
 오차 근거도 유지한다. AX12 FESC_025/TGAS20K는 이 wave에서 시작하지 않았다.
 [재개 지점](HANDOFF.md), [drift watchdog](DRIFT_WATCHDOG.json).
+
+과학 결과 공개 pin: `f75c35360d64420a840df6454c88ef0c7f1f2d4c`,
+tree `ee6c30f63fb2d912bfadb400a33b3d93b746b9db`. 최종 backup/handoff 변경은
+이 과학 자료의 바이트나 수치를 바꾸지 않는다. [게시 receipt](receipts/SCIENCE_PUBLICATION.json).

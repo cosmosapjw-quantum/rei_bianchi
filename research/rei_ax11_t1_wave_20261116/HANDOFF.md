@@ -10,6 +10,8 @@ PROJECT=cosmosapjw-quantum/rei_bianchi
 GOAL=REI-AXBI-GOAL-20261014
 CENTRAL_REVIEW_PIN=56dc609ea9b801c88d3364aed3eee140b3a20d46
 RESULT_BRANCH=research/rei-ax11-source-profile-20261116
+SCIENCE_RESULT_PIN=f75c35360d64420a840df6454c88ef0c7f1f2d4c
+SCIENCE_RESULT_TREE=ee6c30f63fb2d912bfadb400a33b3d93b746b9db
 PR=https://github.com/cosmosapjw-quantum/rei_bianchi/pull/377
 UNIT=research/rei_ax11_t1_wave_20261116
 먼저 이 파일을 포함하는 정확한 branch HEAD/tree와 REPORT_KO.md,
@@ -46,8 +48,8 @@ D01을 어느 수준의 참오차로 배정하거나 Richardson/연속상계/AX1
 AX12는이wave에서시작하지않았다. 새전역Volterra theorem을선행조건으로추가하지마라.
 
 백업: /home/cosmosapjw/Dropbox/bianchi/rei_ax11_t1_wave_20261116_v1_archive
-9개archive, native receipt와SHA256보존. Control archive provider복원PASS.
-최종 provider byte-verification receipt가추가됐는지확인하라.
+9개archive전체1,754,912,733bytes를provider에서실제읽어nativeSHA256및
+Dropboxcontenthash일치확인. receipts/PROVIDER_BACKUP_VERIFICATION.json을재사용하라.
 T1 sample inputs는native_inputs/의두gzip과EXTRACTION_RECEIPT.json이며,
 실제결과표·milestone·그림은results_v1/에있다.
 매turn consumer=rei_bianchi scientific admission owner / AX11와실제진전을확인하라.
