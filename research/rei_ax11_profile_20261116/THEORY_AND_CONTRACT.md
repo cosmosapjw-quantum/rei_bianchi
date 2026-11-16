@@ -34,8 +34,10 @@ accumulated BE error. This does not determine the step-count scaling of a
 normalized controller. At N0=0, when the inventory floor is inactive, the relative
 defect is x/[(1+x)(4+x)], where x=kappa*dt. It is approximately x/4 for small x,
 and is nonmonotone with maximum 1/9 at x=2. SymPy independently checks these
-identities in SCALAR_DEFECT_CHECK.json. Zero source or kappa has zero absolute
-defect in this frozen illustrative channel. S has photons/H/s and kappa s^-1.
+identities in SCALAR_DEFECT_CHECK.json. For the stated N0=0 case, zero source
+gives zero defect. At general N0, the exact-zero cases are kappa=0 or equilibrium
+S=kappa*N0; pure decay with S=0 and N0 nonzero generally has nonzero defect.
+S has photons/H/s and kappa s^-1.
 
 The completed native preflight supersedes the provisional square-root-of-target
 cost illustration. On the measured common prefix, target reductions by4 and16

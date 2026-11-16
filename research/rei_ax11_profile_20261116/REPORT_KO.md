@@ -61,7 +61,7 @@ F-H=\frac{h^2\kappa(\kappa N_0-S)}{(1+\kappa h)(2+\kappa h)^2}.
 \frac{|F-H|}{H}=\frac{x}{(1+x)(4+x)},\qquad x=\kappa h.
 \]
 
-작은 x에서는 x/4이고, x=2에서1/9의 maximum을 가진다. 따라서 절대 defect가 O(h²)라는 사실만으로 normalized controller의 step 수가 target의 제곱근에 반비례한다고 말할 수 없다. S=0 또는κ=0이면 이 고정 계수 문제의 절대 defect는0이다. [직접 검산](SCALAR_DEFECT_CHECK.json). 이 축약식은 coupled AXBI의 mechanism fit이나 진화 오차 정리가 아니다.
+작은 x에서는 x/4이고, x=2에서1/9의 maximum을 가진다. 따라서 절대 defect가 O(h²)라는 사실만으로 normalized controller의 step 수가 target의 제곱근에 반비례한다고 말할 수 없다. N₀=0인 경우 S=0이면 defect는0이다. 일반 N₀에서는 κ=0 또는 평형 S=κN₀일 때0이며, S=0이어도 N₀≠0인 순수 감쇠의 defect는 보통0이 아니다. [직접 검산](SCALAR_DEFECT_CHECK.json). 이 축약식은 coupled AXBI의 mechanism fit이나 진화 오차 정리가 아니다.
 
 원 시간 target은 T0=1e−5, T1=2.5e−6, T2=6.25e−7로 유지했다. T1은 ZERO/PLUS 각각2048 accepted를 완료했다. T2는 원 initial_dln_a=1e−4에서 각각20회 연속 reject 뒤 **AXBI_REJECT_CAP**, accepted0으로 종료했다. 마지막 비교 h=1.9073486328125e−10에서 photon U 성분7.42225319835e−7가 target보다 컸다. 다음 dyadic h=9.5367431640625e−11은 원 minimum1e−10보다 작다. 두 실패의60trial/432RHS씩과 checkpoint를 보존했다.
 
