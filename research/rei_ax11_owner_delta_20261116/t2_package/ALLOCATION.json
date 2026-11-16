@@ -1,0 +1,131 @@
+{
+  "schema": "rei.ax11.t2-native-allocation.v1",
+  "unit": "REI_AX11_T2_WAVE_20261116",
+  "goal": "REI-AXBI-GOAL-20261014",
+  "scenario": "PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1",
+  "status": "PROPOSED_NOT_AUTHORIZED_NOT_RUN",
+  "central_pin": "56dc609ea9b801c88d3364aed3eee140b3a20d46",
+  "reused_AX11_pin": "b06e0c24e73ab2cd4f89d4c9f8bb564e1b39cea0",
+  "named_owner_consumer": "REI owner / AX11 full-IC paired-response evolution-error and cost ledger",
+  "authorization": {
+    "status": "PENDING_SEPARATE_FINITE_T2_APPROVAL",
+    "prior_T1_scope": "ZERO/PLUS T1 only; unused remainder is not new T2 allowance",
+    "next_command_after_approval": "python3 harness/native_executor.py ABSOLUTE_ISOLATED_ROOT prepare; then inspect preflight and launch within this exact allocation"
+  },
+  "caps": {
+    "aggregate_accepted": 8000000,
+    "aggregate_trials": 25000000,
+    "aggregate_RHS": 200000000,
+    "aggregate_CPU_s": 80000,
+    "aggregate_sum_job_wall_s": 80000,
+    "aggregate_scientific_output_bytes": 68719476736,
+    "backup_copy_reserve_bytes": 68719476736,
+    "per_case_accepted": 4000000,
+    "per_case_trials": 12500000,
+    "per_case_RHS": 100000000,
+    "per_case_CPU_s": 39000,
+    "per_case_wall_s": 39000,
+    "per_case_output_bytes": 34359738368,
+    "per_process_memory_bytes": 2147483648,
+    "per_build_memory_bytes": 3221225472,
+    "segment_accepted": 250000,
+    "segment_output_MiB": 2048,
+    "per_case_full_segments": 16,
+    "all_segment_starts_including_preflight": 35,
+    "build_starts": 1,
+    "controller_prepare_and_launch_starts": 2,
+    "native_setup_and_export_starts": 8,
+    "automatic_retries": 0,
+    "max_concurrent_cases": 2,
+    "preparation_CPU_and_wall_cap_s": 600
+  },
+  "preflight": {
+    "cases": [
+      "PLUS8fromIC",
+      "PLUS8fromprevious8",
+      "ZERO16fromIC"
+    ],
+    "accepted_budget": 32,
+    "purpose": "T2 entry + full-state restore vs saved exact original T2 trace; later full runs reuse accepted4096 prefixes",
+    "debit_rule": "All new preflight work charged; full cumulative counter ceilings also include retained4096 prefixes; prior native CPU remains separately retained"
+  },
+  "configs": {
+    "ZERO": {
+      "path": "inputs/ZERO_T2.cfg",
+      "sha256": "8feb68bb92832af563aeb9a7ee828b13dc26047d9b07243123e052aaaf731955",
+      "basis_config_sha256": "9189e259a19e040f0f9dcf1ef4ae69907863a999214838a1d0b3e8c096d189e5",
+      "changes_from_T2_prefix": "Resource fields only; target6.25e-7, initial step1e-10 and physical IC unchanged"
+    },
+    "PLUS": {
+      "path": "inputs/PLUS_T2.cfg",
+      "sha256": "713d94e40b56c6f808718eb4165fc6755a711d7db4f1b7567abe3fe909233cda",
+      "basis_config_sha256": "70d344fe5738f8ccefaadb2196b57530e5554f72e02cdfb46a7db8be1c532565",
+      "changes_from_T2_prefix": "Resource fields only; target6.25e-7, initial step1e-10 and physical IC unchanged"
+    }
+  },
+  "source": {
+    "old_native_root": "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2",
+    "old_package_manifest_sha256": "46efe21c72d24b3dff5ab49a4816d487eb69a0a550b49f3ed4a7438166ce727a",
+    "original_17_file_corpus_sha256": "d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185",
+    "new_entry_sha256": "1d771b1f4cd5420207c18c557b05afdfd32d9c02ff2c28a33208c72d84ce0f91",
+    "cache": "AX11_CACHE=1",
+    "delayed_spectrum": "AX11_LAZY=1",
+    "compiled_library_source_changed": false,
+    "existing_T1_binary_reuse": "FORBIDDEN_T1_PHYSICAL_CONFIG_MISMATCH",
+    "new_build_required": true
+  },
+  "prior_debit": {
+    "bounded_profile": {
+      "trials": 86292,
+      "RHS": 604188,
+      "CPU_s": 135.489285,
+      "native_job_wall_s": 139.1728215769981
+    },
+    "T1": {
+      "CPU_s": 11922.53,
+      "sum_job_wall_s": 13552.735295356993
+    },
+    "older_history": "UNKNOWN retained"
+  },
+  "stop_rules": [
+    "No scientific tolerance or source change",
+    "Only normal accepted-segment boundary allows automatic next segment",
+    "Failure or scientific/resource cap preserves checkpoint and censors that case",
+    "No restart of an already started controller or duplicate case",
+    "No automatic retry or budget increase"
+  ],
+  "original_DAG": "10/17",
+  "expansion_DAG": "28/88",
+  "executor_sha256": "c9eda8029e8c24c13376f9d511fa4901e9a2c10e4f50006d5566d63520280e38",
+  "prefixes": {
+    "ZERO": {
+      "repo_path": "research/rei_ax11_profile_20261116/prefix_results/native_receipts/ZERO_T2_FLOOR_START/checkpoint.end.txt",
+      "sha256": "2a3a7e999c0a020d5a72a41116dcfcf1eb95912c24bdd396e316b1c805108d37",
+      "accepted": 4096,
+      "trials": 12288,
+      "RHS": 85890,
+      "a": 0.04762856104065708,
+      "time_s": 1688129817716.2256,
+      "next_dln_a": 2.048e-07,
+      "native_path": "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_results/ZERO_T2_FLOOR_START/checkpoint.end.txt"
+    },
+    "PLUS": {
+      "repo_path": "research/rei_ax11_profile_20261116/prefix_results/native_receipts/PLUS_T2_FLOOR_START/checkpoint.end.txt",
+      "sha256": "8dcde92e933f2dad9edca33a35ed1c46287d848fff6afd7d270801f019fd443c",
+      "accepted": 4096,
+      "trials": 12288,
+      "RHS": 85890,
+      "a": 0.04762856104065708,
+      "time_s": 1688045442794.0735,
+      "next_dln_a": 2.048e-07,
+      "native_path": "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_results/PLUS_T2_FLOOR_START/checkpoint.end.txt"
+    }
+  },
+  "count_accounting": "Fresh execution debit excludes preexisting prefix cost; finite cumulative count ceilings include both prefixes exactly once. Full histories compose prefix then segments, duplicate boundary once.",
+  "postprocess_reservation": {
+    "CPU_s": 1200,
+    "wall_s": 1200,
+    "within_aggregate_caps": true
+  },
+  "risk": "T1 factor4 estimate is conditional. First T2 native segment updates costs; caps may censor before endpoint. All raw outputs/cadence and original guards remain unchanged."
+}

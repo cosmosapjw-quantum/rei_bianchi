@@ -61,7 +61,7 @@ S_U for injected energy and Q_CMB for signed CMB input, the native invariant is
 
 All terms have units eV/H. For a partition of external source plus initial energy,
 the CMB term is -Q_CMB; a negative input is a positive cooling loss. Retaining
-E_initial prevents a spurious percent-level interpretation of a small residual.
+E_initial prevents a deterministic initial-energy offset from being mistaken for a conservation residual.
 The native original photon/energy acceptance is |r|<=1e-8 max(1,source inventory).
 This invariant tests accounting and supplies a source-qualified physical partition;
 it does not measure the trajectory's discretization error.
