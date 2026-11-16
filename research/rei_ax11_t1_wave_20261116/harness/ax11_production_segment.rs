@@ -125,19 +125,22 @@ fn run(a:Args)->R<i32> {
         || cfg.energy_subdivisions!=baseline.energy_subdivisions || cfg.n_mu!=baseline.n_mu
         || cfg.background_panels!=baseline.background_panels || cfg.spectra_every_accepted!=60
     {return Err(fail("AX11_T1_PHYSICAL_CONFIG_MISMATCH"));}
-    // Only resource fields change. Cumulative native counters and clock remain
-    // exactly those in the original checkpoint; no fresh-case reset is allowed.
-    cfg.max_steps=MAX_ACCEPTED;cfg.max_attempts=MAX_TRIALS;cfg.max_rhs=MAX_RHS;
-    cfg.max_wall_s=MAX_CASE_WALL_S;cfg.output_budget_mib=OUTPUT_MIB;
+    // Honor the launcher's allocated cumulative caps after preparation/preflight
+    // debits. The constants are absolute ceilings, never replacement allocations.
+    if cfg.max_steps==0 || cfg.max_steps>MAX_ACCEPTED || cfg.max_attempts==0 || cfg.max_attempts>MAX_TRIALS
+        || cfg.max_rhs==0 || cfg.max_rhs>MAX_RHS || !cfg.max_wall_s.is_finite() || cfg.max_wall_s<=0.0 || cfg.max_wall_s>MAX_CASE_WALL_S
+    {return Err(fail("AX11_T1_ALLOCATED_CAP_DOMAIN"));}
+    // Native counters/clock stay cumulative. Only output allocation is fixed.
+    cfg.output_budget_mib=OUTPUT_MIB;
     let effective=config_text(&cfg);
     let (driver,mut state)=Driver::new(cfg)?;
     if let Some(path)=&a.checkpoint {state=driver.read_checkpoint(path)?;}
-    if state.accepted>MAX_ACCEPTED || state.attempts>MAX_TRIALS || state.rhs_evaluations>MAX_RHS
-        || state.wall_elapsed_s>MAX_CASE_WALL_S {return Err(fail("AX11_T1_INPUT_EXCEEDS_CASE_CAP"));}
+    if state.accepted>driver.config.max_steps || state.attempts>driver.config.max_attempts || state.rhs_evaluations>driver.config.max_rhs
+        || state.wall_elapsed_s>driver.config.max_wall_s {return Err(fail("AX11_T1_INPUT_EXCEEDS_CASE_CAP"));}
     let start=state.clone();
     let old=Counts::of(&state);
     let prior_wall=state.wall_elapsed_s;
-    let target=state.accepted.checked_add(a.accepted).ok_or(fail("AX11_T1_COUNT_OVERFLOW"))?.min(MAX_ACCEPTED);
+    let target=state.accepted.checked_add(a.accepted).ok_or(fail("AX11_T1_COUNT_OVERFLOW"))?.min(driver.config.max_steps);
     let end=1.0/(1.0+driver.config.end_zbar);
     let start_time=driver.background.point_at_scale(state.a)?.time_s;
     fs::create_dir(&a.out).map_err(io)?;
@@ -174,10 +177,10 @@ fn run(a:Args)->R<i32> {
         loop {
             state.wall_elapsed_s=prior_wall+started.elapsed().as_secs_f64();
             if state.a==end {return Ok(Stop::Endpoint);}
-            if state.accepted>=MAX_ACCEPTED {return Ok(Stop::CaseAccepted);}
-            if state.attempts>=MAX_TRIALS {return Ok(Stop::CaseTrials);}
-            if state.rhs_evaluations>=MAX_RHS {return Ok(Stop::CaseRhs);}
-            if state.wall_elapsed_s>=MAX_CASE_WALL_S {return Ok(Stop::CaseWall);}
+            if state.accepted>=driver.config.max_steps {return Ok(Stop::CaseAccepted);}
+            if state.attempts>=driver.config.max_attempts {return Ok(Stop::CaseTrials);}
+            if state.rhs_evaluations>=driver.config.max_rhs {return Ok(Stop::CaseRhs);}
+            if state.wall_elapsed_s>=driver.config.max_wall_s {return Ok(Stop::CaseWall);}
             if state.accepted>=target {return Ok(Stop::SegmentAccepted);}
             if started.elapsed().as_secs_f64()>=a.fresh_wall_s {return Ok(Stop::SegmentWall);}
             if state.consecutive_rejects>=30 || state.next_dln_a<1e-10 {return Err(fail("AXBI_REJECT_CAP"));}
@@ -188,8 +191,8 @@ fn run(a:Args)->R<i32> {
                 Err(e)=>{
                     writeln!(t.rejects,"{},{},{},{e:?}",state.attempts,state.a,state.next_dln_a).map_err(io)?;
                     t.rejects.flush().map_err(io)?;
-                    if e.code()=="AXBI_TENTATIVE_CAP" || (e.code()=="AXBI_STEP_CAP" && state.attempts>=MAX_TRIALS) {return Ok(Stop::CaseTrials);}
-                    if state.rhs_evaluations>=MAX_RHS {return Ok(Stop::CaseRhs);}
+                    if e.code()=="AXBI_TENTATIVE_CAP" || (e.code()=="AXBI_STEP_CAP" && state.attempts>=driver.config.max_attempts) {return Ok(Stop::CaseTrials);}
+                    if state.rhs_evaluations>=driver.config.max_rhs {return Ok(Stop::CaseRhs);}
                     if state.consecutive_rejects>=30 || state.next_dln_a<1e-10 {return Err(e);}
                     false
                 }
@@ -199,9 +202,9 @@ fn run(a:Args)->R<i32> {
                 if state.consecutive_rejects>=30 || state.next_dln_a<1e-10 {return Err(fail("AXBI_REJECT_CAP"));}
                 continue;
             }
-            let terminal=state.a==end || state.accepted>=target || state.accepted>=MAX_ACCEPTED
-                || state.attempts>=MAX_TRIALS || state.rhs_evaluations>=MAX_RHS
-                || prior_wall+started.elapsed().as_secs_f64()>=MAX_CASE_WALL_S || started.elapsed().as_secs_f64()>=a.fresh_wall_s;
+            let terminal=state.a==end || state.accepted>=target || state.accepted>=driver.config.max_steps
+                || state.attempts>=driver.config.max_attempts || state.rhs_evaluations>=driver.config.max_rhs
+                || prior_wall+started.elapsed().as_secs_f64()>=driver.config.max_wall_s || started.elapsed().as_secs_f64()>=a.fresh_wall_s;
             let checkpoint_due=driver.spectrum_due(state.accepted,last_save.elapsed().as_secs_f64(),terminal);
             if let Err(e)=t.batch(&driver,&state,&a.case,&a.out,checkpoint_due) {
                 let paid=Counts::of(&state);let wall=state.wall_elapsed_s;
@@ -252,12 +255,14 @@ fn run(a:Args)->R<i32> {
         "\"a_start\":{:.17e},\n\"a_end\":{:.17e},\n\"proper_time_start_s\":{:.17e},\n\"proper_time_end_s\":{:.17e},\n",
         "\"proper_time_delta_s\":{:.17e},\n\"prior_wall_s\":{:.17e},\n\"fresh_evolution_wall_s\":{:.17e},\n\"cumulative_wall_s\":{:.17e},\n",
         "\"setup_wall_s\":{:.17e},\n\"process_wall_s_at_summary\":{:.17e},\n\"accepted_increment_requested\":{},\n\"segment_fresh_wall_cap_s\":{:.17e},\n",
-        "\"case_caps\":{{\"accepted\":1800000,\"trials\":5400000,\"rhs\":43200000,\"wall_s\":9000}},\n\"output_budget_mib\":2048,\n",
+        "\"case_caps\":{{\"accepted\":{},\"trials\":{},\"rhs\":{},\"wall_s\":{:.17e}}},\n\"output_budget_mib\":2048,\n",
         "\"next_dln_a\":{:.17e},\n\"last_error\":{:.17e},\n\"max_newton_residual\":{:.17e},\n\"maximum_accepted_local_metric_this_segment\":{},\n",
         "\"scientific_endpoint_reached\":{},\n\"scientific_admission\":\"NOT_ISSUED\",\n\"unknown_unfinished_process_cost\":false\n}}\n"),
         a.case,status,outcome_error,final_code,exit_code,checkpoint_saved,old.json(),counts.json(),counts.deltas(old),
         start.a,state.a,start_time,end_time,end_time-start_time,prior_wall,fresh_evolution_wall_s,state.wall_elapsed_s,
-        setup_wall_s,process_started.elapsed().as_secs_f64(),a.accepted,a.fresh_wall_s,state.next_dln_a,state.last_error,state.max_newton_residual,metric,state.a==end);
+        setup_wall_s,process_started.elapsed().as_secs_f64(),a.accepted,a.fresh_wall_s,
+        driver.config.max_steps,driver.config.max_attempts,driver.config.max_rhs,driver.config.max_wall_s,
+        state.next_dln_a,state.last_error,state.max_newton_residual,metric,state.a==end);
     atomic_text(&a.out.join("segment_summary.json"),&summary)?;
     atomic_text(&a.out.join("RETURN.txt"),&format!("status={status}\nerror={outcome_error}\nfinalization_error={final_code}\nexit_code={exit_code}\ncheckpoint_saved={checkpoint_saved}\na={}\naccepted={}\nattempts={}\ncomparisons={}\nrejections={}\nconsecutive_rejects={}\nrhs_evaluations={}\nprior_wall_s={}\nfresh_wall_s={}\nwall_s={}\nnext_dln_a={}\nmax_newton_residual={}\nlast_error={}\nscientific_admission=NOT_ISSUED\n",state.a,state.accepted,state.attempts,state.comparisons,state.rejects,state.consecutive_rejects,state.rhs_evaluations,prior_wall,fresh_evolution_wall_s,state.wall_elapsed_s,state.next_dln_a,state.max_newton_residual,state.last_error))?;
     let receipt_error=if final_error.is_some(){final_code}else{outcome_error};

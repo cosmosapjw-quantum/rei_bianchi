@@ -23,12 +23,19 @@ each execution, and owns aggregate two-case CPU, disk and segment accounting.
 configuration is the original ZERO/PLUS scenario with T1 local target
 `2.5e-6`, initial proposed step `1e-4`, original temperature/escape/grid/background
 settings, original zbar4 endpoint and 60 accepted-step spectrum cadence. This
-wrapper does not mutate physical fields. It sets only resource fields to the
-approved cumulative case limits: 1,800,000 accepted, 5,400,000 trials,
-43,200,000 RHS, 9,000 wall seconds and 2,048 MiB per segment. Checkpoint counters,
+wrapper does not mutate physical fields. It honors the positive cumulative input
+resource caps, rejecting any allocation above the absolute case ceilings:
+1,800,000 accepted, 5,400,000 trials, 43,200,000 RHS and 9,000 wall seconds.
+The launcher first debits preparation/preflight against the aggregate
+3,600,000 accepted / 10,800,000 trials / 86,400,000 RHS / 18,000 seconds and binds
+the remaining per-case allocations in the full-run config. Lower input caps are
+never raised by this wrapper. Every native cap check, segment target and reported
+`case_caps` uses those actual input allocations. Only the output allocation is
+fixed at 2,048 MiB per segment. Checkpoint counters,
 wall, photons, gas, ledgers and adaptive state are never reset. An accepted
 increment must be between 1 and 250,000. The optional fresh segment wall cap is
-positive and at most 9,000 seconds; cumulative case caps still take precedence.
+positive and at most 9,000 seconds; the actual allocated cumulative case cap
+still takes precedence, even when smaller than the fresh segment wall request.
 
 | Exit | Meaning | Launcher interpretation |
 |---|---|---|
