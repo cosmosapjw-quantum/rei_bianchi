@@ -1,0 +1,214 @@
+{
+  "allocation": {
+    "schema": "rei.ax11.bounded-profile-allocation.v1",
+    "status": "BOUND_BEFORE_NATIVE_START",
+    "goal": "REI-AXBI-GOAL-20261014",
+    "named_owner_consumer": "REI owner / AX11 paired-response evolution-error and cost ledger",
+    "central_review_pin": "56dc609ea9b801c88d3364aed3eee140b3a20d46",
+    "scenario": "PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1",
+    "original_source_identity_sha256": "d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185",
+    "new_allocation_only": true,
+    "historical_cost": "UNKNOWN cumulative prior cost is retained; completed baseline counts and original caps are not reset or replaced",
+    "caps": {
+      "aggregate_native_wall_seconds": 1500,
+      "aggregate_native_cpu_seconds": 1500,
+      "per_window_wall_seconds": 120,
+      "per_window_cpu_seconds": 120,
+      "per_window_memory_bytes": 536870912,
+      "per_build_memory_bytes": 3221225472,
+      "aggregate_output_and_build_bytes": 1073741824,
+      "per_window_output_bytes": 67108864,
+      "source_build_process_starts": 2,
+      "scoped_test_process_starts": 3,
+      "profile_window_process_starts": 16,
+      "all_native_process_starts_including_build_and_tests": 23,
+      "aggregate_new_accepted_steps": 50000,
+      "aggregate_new_tentative_trials": 160000,
+      "aggregate_new_rhs_calls": 1200000,
+      "automatic_process_retries": 0,
+      "job_controller_and_extract_process_starts": 2,
+      "child_build_test_window_process_starts": 21
+    },
+    "windows": {
+      "initial_transient": "Original IC, first 1024 accepted steps, ZERO and SHEAR_PLUS; finite profiling only",
+      "main_plateau": "Exact accepted=199980 checkpoint, next 128 accepted steps; a=0.08873100115616298",
+      "optional_time_refinement_preflight": "If initial matched variants pass, T1/T2 original-IC short common-a endpoints for ZERO/PLUS; max10000 accepted each, same original physical model",
+      "fixed_background": "4096 panels, original summation and no interpolated cache keys",
+      "variants": [
+        "original",
+        "instrumented-only",
+        "exact-cache",
+        "exact-cache-lazy-spectrum"
+      ],
+      "full_history_launches": 0
+    },
+    "immutable_science": {
+      "baseline_local_target": 0.00001,
+      "time_refinement_levels": [
+        0.0000025,
+        6.25e-7
+      ],
+      "strict_ceiling": 0.0002,
+      "baseline_energy_subdivisions": 16,
+      "baseline_GLmu": 8,
+      "spectra": "initial; every60 accepted; each30wall seconds; terminal; exact reserve guard",
+      "disabled": [
+        "CR",
+        "HH",
+        "RCT",
+        "secondary",
+        "molecules"
+      ],
+      "clock": "elapsed proper seconds since zbar20, fixed-a and equal elapsed proper-time responses kept separate"
+    },
+    "checkpoint_pins": {
+      "ZERO_199980": "60b41cc9474cbab47b93e8a32b5d60292d51373b835d649cafb0add12dcfae7b",
+      "PLUS_199980": "4c354974198b20b07a5e8b06385b78414b24508f378dad70ece9bd2854e16f55"
+    },
+    "config_pins": {
+      "ZERO": "b83ac8f4e93704b249f08e2114501db56e3e5de039b99056c7c10efa9a782e41",
+      "PLUS": "b9a8bdeaf61a68839e23486fa8ad0740fe1318c55cbc7f522e11cacbb4ff21c0"
+    },
+    "launch_binding": "SOURCE_PACKAGE_MANIFEST and file-hashed native_job.py must be present before launch. Compiled binaries hashed before any window. No old checkpoint or production checkout mutation.",
+    "terminal_reserve_bytes": 8388608,
+    "stop_conditions": [
+      "Any cap reached",
+      "input/source identity mismatch",
+      "unexpected numerical failure",
+      "same-accuracy state or counter mismatch",
+      "preflight gate failure"
+    ],
+    "original_workflow": "10/17",
+    "expansion": "28/88",
+    "AX11_complete": false
+  },
+  "wall_elapsed_s": 10.535024044991587,
+  "historical_cumulative_cost": "UNKNOWN; unchanged",
+  "records": [
+    {
+      "name": "build_original",
+      "command": [
+        "/home/cosmosapjw/.cargo/bin/cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--offline",
+        "--example",
+        "ax11_profile_window"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": null,
+        "AX11_LAZY": null,
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 180,
+      "memory_cap": 3221225472,
+      "returncode": 0,
+      "wall_s": 4.311513339998783,
+      "cpu_s": 4.175523,
+      "peak_rss_bytes": 18321408,
+      "stdout_log": "build_original.log",
+      "log_sha256": "f9358793350eb45759f4a18618d327cb1db33e1cfb65da0d171a997ac6a70855"
+    },
+    {
+      "name": "build_instrumented",
+      "command": [
+        "/home/cosmosapjw/.cargo/bin/cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--offline",
+        "--example",
+        "ax11_profile_window"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1 --cfg ax11_profile -A unexpected_cfgs",
+        "AX11_CACHE": null,
+        "AX11_LAZY": null,
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 180,
+      "memory_cap": 3221225472,
+      "returncode": 0,
+      "wall_s": 4.791736828003195,
+      "cpu_s": 4.745334999999999,
+      "peak_rss_bytes": 17874944,
+      "stdout_log": "build_instrumented.log",
+      "log_sha256": "c0ec9bad377671c071796db2f3b4e864a1c6ec7583ca5f0b939d9ed6e31398c7"
+    },
+    {
+      "name": "test_0",
+      "command": [
+        "/home/cosmosapjw/.cargo/bin/cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--offline",
+        "--test",
+        "ax11_invariance",
+        "--",
+        "--test-threads=1"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1 --cfg ax11_profile -A unexpected_cfgs",
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 180,
+      "memory_cap": 3221225472,
+      "returncode": 0,
+      "wall_s": 0.4646599700063234,
+      "cpu_s": 0.37644300000000186,
+      "peak_rss_bytes": 17833984,
+      "stdout_log": "test_0.log",
+      "log_sha256": "5e969f9ef77596899de2f1efcd0fae7ab1683f328f124eab18e2d146af590158"
+    },
+    {
+      "name": "test_1",
+      "command": [
+        "/home/cosmosapjw/.cargo/bin/cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--offline",
+        "--test",
+        "axbi_driver",
+        "sparse_full_spectra_keep_each_abundance_and_align_terminal_resume_and_cap",
+        "--",
+        "--test-threads=1"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1 --cfg ax11_profile -A unexpected_cfgs",
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "FAILED",
+      "wall_cap": 180,
+      "memory_cap": 3221225472,
+      "returncode": 101,
+      "wall_s": 0.9289426769973943,
+      "cpu_s": 0.753684999999999,
+      "peak_rss_bytes": 18403328,
+      "stdout_log": "test_1.log",
+      "log_sha256": "1f644762d384a2c42d8e1708ea4389da347ad63dbc7e0889f43b6d98af522048"
+    }
+  ],
+  "binaries": {
+    "original": {
+      "path": "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/original/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+      "sha256": "1ce4bd024ba42c6a55cd1c67aa475ce05758df08dec14bbbee50869ba45a55bd",
+      "bytes": 930760
+    },
+    "instrumented": {
+      "path": "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+      "sha256": "59d94336f308349c9c4647e66e97ed2ce0b32b00d99819a12fb9214ea55eb4bf",
+      "bytes": 975168
+    }
+  }
+}
