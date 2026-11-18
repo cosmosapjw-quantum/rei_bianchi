@@ -1,0 +1,244 @@
+{
+  "schema": "vigilode.fixed-metric-matrix-bounds.owner-return.v1",
+  "unit_id": "V8_FIXED_METRIC_JACOBIAN_LOGNORM_20261028",
+  "status": "PASS_SCOPED",
+  "scientific_admission": {
+    "decision": "PASS_SCOPED",
+    "owner": "ROOT_ASTRA",
+    "scope": [
+      "Reuse the existing fixed physical33 metric and inherited exact support inverse to represent G and Ginv, without a native point-norm/lift evaluator or metric refit.",
+      "For supplied rational30 matrices, exact PSD factor certificates or negative quadratic witnesses including singular pivots, and finite generalized-Rayleigh/Gershgorin brackets with exact PSD refinement.",
+      "For a supplied independent-entry interval family C+[-R,R], sufficient fixed-metric operator and signed lognorm upper bounds from exact center certificates plus a Frobenius perturbation bound.",
+      "Conditional same-metric Jop and mu records feed unchanged residual transfer and piecewise barrier, with source/clock/capsule/cell/global-corridor identities and explicit external whole-path enclosure premises.",
+      "Same-metric PR90 exact-inverse/exact-relaxation reference q bound and separate current resolvent residual factors, without a commutation assumption. q>=1 remains inconclusive."
+    ],
+    "evidence": {
+      "path": "ADMISSION.json",
+      "bytes": 3903,
+      "sha256": "7e225655db7c5be9e0b14700ab25269fdb7ba382f7ce64cc23eb30999fe1940a"
+    },
+    "independent_review": {
+      "path": "reviews/INDEPENDENT_REVIEW.json",
+      "bytes": 9718,
+      "sha256": "bcc8511ea38183c77b50caeae06e5b61044d41cc07fe03dcd9558440e83c1856"
+    }
+  },
+  "source": {
+    "bass_commit": "cc602e209e7deeb511ab2a1f3b2268d55206c43c",
+    "binding_id": "8cb268e8de741e284cf494013f1e0748d27f03c5e77ba0c64413ae92af082d16",
+    "native_norm_blob": "95efe19477aba8efe378a1f5e083c09b2cdffb69",
+    "dimensions": {
+      "reduced": 30,
+      "physical": 33,
+      "query": 31
+    },
+    "clock": "Existing capsule CLOCK object; x=ln(a/a_ref), a_ref=1/21. Matrix units are inverse source-clock; a and a0 use source-clock increments.",
+    "immutable_prior_root": "../vigilode_native_bounds_20261028",
+    "prior_code_sha256": "ea797d68943c7724f19abecb93f815d00c4e24f46ace8bd918de8e6963de5fdb",
+    "prior_source_zip": "../vigilode_bounds_deliverables/VIGILODE_V8_NATIVE_METRIC_BOUNDS_20261028_SOURCE.zip",
+    "prior_source_zip_sha256": "2ab1df80f48ebccfe73029083df50e36416f0ba3fecffd57c6c02de16c1462a5",
+    "prior_source_zip_bytes": 84297190,
+    "prior_science": "CLOSED; no replay or allowance transfer",
+    "reuse": [
+      "native_metric_bounds._metric and _row_terms",
+      "native_metric_bounds.scalar_sqrt_enclosure",
+      "source().dependencies()[0].support_core and fixed_norm_id",
+      "source rational parsing and capsule parser",
+      "generated_residual_transfer",
+      "reused_piecewise_barrier.capsule_chain",
+      "unchanged native norm/lift source and D1-D5"
+    ]
+  },
+  "fixed_metric": {
+    "definition": "G=(1/33) L^T diag(u^-2) L; fixed positive33 scales, no metric optimization",
+    "inverse": "33*w from unchanged inherited support_core(e_i,u,E,precision=0)",
+    "exact_inverse_identity_verified": true,
+    "native_norm_or_lift_reimplemented": false,
+    "native_norm_or_lift_invoked": false
+  },
+  "theorems": {
+    "metric": "G=(1/33) sum_j (L_j^T L_j)/u_j^2, from inherited row terms. G positive definite by inherited full-column-rank L. Build inverse columns as 33*w from inherited support_core(e_i,u,E,precision=0), where w=(L^T diag(u^-2)L)^-1 e_i. Verify G*Ginv=I exactly. This is a matrix representation/dual calculation, not a point-vector norm evaluator.",
+    "center_operator": "T=C^T G C. For s>=0, sG-T PSD iff ||C||_G^2<=s. Bracket true maximum generalized eigenvalue by max_i T_ii/G_ii and max_i[(Ginv*T)_ii+sum_{j!=i}|(Ginv*T)_ij|]. All eigenvalues of Ginv*T are real/nonnegative by similarity to a symmetric PSD matrix.",
+    "center_lognorm": "S=(GC+C^TG)/2. mG-S PSD iff mu_G(C)<=m. Generalized eigenvalue bracket is max_i S_ii/G_ii through max_i[(Ginv*S)_ii+sum_{j!=i}|(Ginv*S)_ij|]. Ginv*S is similar to a real symmetric matrix.",
+    "bracket_refinement": "Use exact midpoint PSD decisions for requested finite steps. PASS sets upper=mid; a verified negative witness sets lower=mid. Initial upper must have an exact PSD certificate, and the final upper must retain one. Default8,max12 steps. Interval width decreases by factor2 per nontrivial step; equal endpoints return immediately. Optional supplied s/m proposals are accepted only after PSD verification, otherwise preserve a negative quadratic witness.",
+    "PSD": "Exact rational symmetric LDL/Schur elimination with no tolerance. Positive pivot: complete square and Schur update. Zero pivot requires the remaining pivot row be zero. A negative pivot yields a negative quadratic witness. If zero pivot has off-diagonal h!=0 at j, choose tail x_j=1, x_k=-(S_jj+1)/(2h), other tail entries0; tail quadratic=-1. Lift through previously stored completed-square coefficients backwards. Return exact negative v^TAv or nonnegative pivots/factor evidence. Handles singular PSD matrices without rounding or hidden epsilon.",
+    "interval_perturbation": "J=C+E with |E_ij|<=R_ij, R>=0. beta_squared=sum_{i,k,j,l}|G_ik| |Ginv_jl| R_ij R_kl bounds tr(E^T G E Ginv)=||G^(1/2) E G^(-1/2)||_F^2 and hence ||E||_G^2. Compute the finite sum using sparse G/Ginv entries. Use inherited scale-aware scalar sqrt enclosure for beta. beta is a sufficient family bound, not a general exact box maximum.",
+    "family_bounds": "Jop=sqrt_upper(s_center)+beta_upper; mu=m_center+beta_upper. Triangle inequality and mu(C+E)<=mu(C)+||E||_G prove simultaneous bounds for every matrix in the declared box. Scalar sqrt precision default40,max128; preserve its existing relative error and exact-square behavior.",
+    "PR90_bridge": "Cached family J0 has mu0<=0, alpha=-mu0. Current family J has independently generated mu1 and alpha_prime=-mu1 when mu1<=0. Difference family center C1-C0, radius R0+R1 generates d_bound. For a0,a>0: omega=2a/(a+a0), qstar=|a-a0|/(a+a0), q=qstar+omega*a0*d_bound/(1+a0*alpha). q<1 certifies only the declared exact-inverse/exact-relaxation reference iteration; q>=1 is inconclusive. No commutation assumption. Native-scaled residual factor a/(1+a*alpha_prime), normalized residual factor1/(1+a*alpha_prime). Current alpha_prime and cached alpha remain distinct. Inverse-action and represented-relaxation errors remain external; native iteration certificate false.",
+    "nonlinear_join": "For C1 vector fields whose Jacobian lies in the declared family throughout the required connecting paths/corridor, generated Jop supplies Lipschitz residual transfer and generated mu supplies the inherited logarithmic comparison. The actual enclosure, path inclusion, C1 regularity, initial/continuation/source inputs remain explicit premises."
+  },
+  "actual_validation": {
+    "primary_suite_invocations": 1,
+    "control_groups": 10,
+    "failures": 0,
+    "errors": 0,
+    "Wolfram_invocations": 1,
+    "exact_checks": 25,
+    "all_true": true,
+    "saved_JSON_figure_invocations": 1,
+    "PNG_root_and_independent_viewed": true,
+    "execution_repairs": 0,
+    "old_campaign_replays": 0
+  },
+  "measured_local": {
+    "CPU_s": 3.960179,
+    "wall_s": 4.001891578998766,
+    "source": "results/EXECUTION_SUMMARY.json"
+  },
+  "Wolfram": {
+    "tool_wall_s": 8.817,
+    "remote_CPU_s": null,
+    "source": "results/wolfram_first_raw.json"
+  },
+  "important_controls": {
+    "PR90_q": "4/9",
+    "cached_alpha": "2",
+    "current_alpha": "3/2",
+    "scaled_residual_factor": "2/7",
+    "normalized_residual_factor": "4/7",
+    "two_affine_piece_outgoing": "1/16000",
+    "outgoing_interpretation": "Manufactured affine supersolution, not actual ODE error or exact exponential endpoint",
+    "nonnormal_k4_operator_squared": "9+4sqrt(5)",
+    "8_step_exact_bracket": [
+      "287/16",
+      "1149/64"
+    ]
+  },
+  "resource_caps": {
+    "dimension": 30,
+    "physical_scales": 33,
+    "max_cells": 16,
+    "refinement_default": 8,
+    "refinement_max": 12,
+    "precision_default": 40,
+    "precision_max": 128,
+    "primary_suite_CPU_s": 30,
+    "primary_suite_wall_s": 90,
+    "figure_CPU_s": 10,
+    "figure_wall_s": 30,
+    "memory_bytes": 805306368,
+    "CAS_time_s": 20,
+    "RHS_Jacobian_ODE_NCP_native_calls": 0
+  },
+  "source_and_raw_evidence": [
+    {
+      "path": "SCIENTIFIC_CONTRACT.json",
+      "bytes": 12325,
+      "sha256": "9fb523a39c0a56dbeb0d7abce101596704180914340201961bc4bfe8d33dda30"
+    },
+    {
+      "path": "theory/THEORY_KO.md",
+      "bytes": 29960,
+      "sha256": "6dfd4afc0b4845ed550b980c8d454ae799cf493cd52baca518c2d9d659f86b5e"
+    },
+    {
+      "path": "theory/EXACT_CHECKS.wl",
+      "bytes": 5934,
+      "sha256": "0f748cd5f9c0739321df6f55de0e88620dd28727c8b465f591121032869f9357"
+    },
+    {
+      "path": "code/matrix_bounds.py",
+      "bytes": 17545,
+      "sha256": "03c754bc4bc2c00e14725533ea921d9352b0d96f375b4a1bf59947115bef6548"
+    },
+    {
+      "path": "code/test_matrix_bounds.py",
+      "bytes": 15822,
+      "sha256": "31e8333d60ecfdd4070c67948ebbb7ea50f865883c02cba81c7d7b4d01c50f91"
+    },
+    {
+      "path": "results/first_suite_data.json",
+      "bytes": 12885455,
+      "sha256": "4815381b42328dee4f8e9749fb901060f852fd53ccafaeb5afc4b4d8274af929"
+    },
+    {
+      "path": "results/suite_first.measurement.json",
+      "bytes": 699,
+      "sha256": "fe94c19aa8795733c1a5b40ebde6e5dd6a4b1b9b78be41d9a91e02d1b6440d68"
+    },
+    {
+      "path": "results/figure_first.measurement.json",
+      "bytes": 699,
+      "sha256": "5949137695dcdf0657cf246dc89e227faceee8fa6d5aa2a7f45ec8900b784354"
+    },
+    {
+      "path": "results/matrix_bounds_reference.png",
+      "bytes": 157300,
+      "sha256": "4f6769227cb5638cd20a46b4044bb69b45fc13bc3d0631ee936cd7b51b6561e3"
+    },
+    {
+      "path": "results/matrix_bounds_reference.svg",
+      "bytes": 87443,
+      "sha256": "e6988439fd4fb1f746ea3120ffe4c6593bff1a9072be51c0f42f0f756adad3ba"
+    },
+    {
+      "path": "results/wolfram_first_raw.json",
+      "bytes": 3407,
+      "sha256": "3ce8e8b3dd8f9a5f6505391534be951a14f7a34dd3134865898a0dac35b3d76d"
+    }
+  ],
+  "execution_budget": {
+    "path": "EXECUTION_BUDGET.json",
+    "bytes": 6229,
+    "sha256": "826bd33ef02ba05f15e454bb2c15102c162e9f43bdf81fd2371149160707cbbb"
+  },
+  "execution_status": "CLOSED_NO_REPLAY_NO_OPTIONAL_RETEST",
+  "physical_calls": {
+    "rhs": 0,
+    "jacobian": 0,
+    "ode": 0,
+    "ncp": 0,
+    "native_norm": 0,
+    "lift": 0,
+    "native_build": 0
+  },
+  "actual_model_enclosure_verified": false,
+  "owner_provenance_verified": false,
+  "actual_owner_capsule_supplied": false,
+  "native_iteration_certificate": false,
+  "not_admitted": [
+    "Actual model Jacobian enclosure on a whole corridor",
+    "Accepted actual BASS capsule or actual application bound",
+    "Truth of owner/source premise solely from matching labels",
+    "Native inverse-action or represented-relaxation errors",
+    "Actual ODE solution enclosure",
+    "Continuous-angle positivity",
+    "Full V8 or L4 completion"
+  ],
+  "ceilings": {
+    "query_rounding_bound": null,
+    "actual_query_rounding_bound": null,
+    "actual_model_enclosure_verified": false,
+    "owner_provenance_verified": false,
+    "whole_domain_certificate": false,
+    "actual_ode_solution_enclosure": false,
+    "VerifiedModelProvider": null,
+    "V7fullrestore": "NOT_RUN",
+    "production": "HOLD",
+    "globalphysicalcompletion": null,
+    "L4": false
+  },
+  "strong_no_go": "NOT_CLAIMED",
+  "central": {
+    "head": "3d8bcdb79a7062459adaad9be6d7fe951f86a17a",
+    "completed": 28,
+    "total": 88,
+    "own_delta": 0
+  },
+  "publication": {
+    "status": "HOLD_TOOL_CALL_REJECTED_NO_ACK",
+    "new_Git_mutations": 0,
+    "commit_created": false,
+    "ref_updated": false,
+    "PR_created": false,
+    "source_reads_and_other_provider_ACK_do_not_recover_Git_write_route": true
+  },
+  "runtime": {
+    "requested_execution_model": "gpt-6.1-sol",
+    "observed_runtime_model": "UNOBSERVED_RUNTIME_METADATA"
+  },
+  "closed_prior_campaigns": "CLOSED_NO_REPLAY",
+  "unknown_owner_dirty_and_reserved_budget": "UNKNOWN_PRESERVED",
+  "next_scientific_obligation": "Obtain or construct a source-owned actual Jacobian interval enclosure on each fixed-binding accepted capsule's full linking paths and R_PLUS_GAMMA corridor, then supply it to this producer alongside actual residual/evaluation/source/initial/continuation premises. Do not invent missing actual input or replay closed validation.",
+  "delivery": "Final source/report/handoff and detached actual receipt pending; scoped scientific admission is separate from remote publication"
+}
