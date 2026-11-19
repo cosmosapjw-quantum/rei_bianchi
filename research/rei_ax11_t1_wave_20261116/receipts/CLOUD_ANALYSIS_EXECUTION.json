@@ -1,0 +1,65 @@
+{
+  "records": [
+    {
+      "name": "analyze_t1_response",
+      "exit_code": 0,
+      "command": [
+        "python3",
+        "research/rei_ax11_t1_wave_20261116/harness/analyze_t1_response.py",
+        "research/rei_ax11_t1_wave_20261116/native_inputs",
+        "research/rei_ax11_t1_wave_20261116/results_v1"
+      ],
+      "measured_script_CPU_s": 4.670853171,
+      "measured_script_wall_s": 4.682206826997572,
+      "evidence": "results_v1/SUMMARY.json"
+    },
+    {
+      "name": "adversarial_audit",
+      "command": [
+        "python3",
+        "research/rei_ax11_t1_wave_20261116/harness/audit_t1_response.py",
+        "research/rei_ax11_t1_wave_20261116/results_v1",
+        "research/rei_ax11_t1_wave_20261116/native_inputs",
+        "research/rei_ax11_t1_wave_20261116/receipts/CLOSED_RUN_LEDGER.json",
+        "research/rei_ax11_t1_wave_20261116/receipts/ADVERSARIAL_AUDIT.json"
+      ],
+      "exit_code": 0,
+      "wall_s": 0.2662807039960171,
+      "child_CPU_s": 0.265086,
+      "stdout": "{\"verdict\": \"ADMIT_T1_TWO_CASE_NATIVE_HISTORY_AND_SAMPLED_D01_ONLY\", \"endpoint_count\": 2, \"original_DAG\": \"10/17\", \"expansion_DAG\": \"28/88\"}\n",
+      "stderr": ""
+    },
+    {
+      "name": "owner_decision",
+      "command": [
+        "python3",
+        "research/rei_ax11_t1_wave_20261116/harness/owner_decision_t1.py",
+        "research/rei_ax11_t1_wave_20261116/results_v1",
+        "research/rei_ax11_t1_wave_20261116/receipts/ADVERSARIAL_AUDIT.json",
+        "research/rei_ax11_t1_wave_20261116/OWNER_ADMISSION.json"
+      ],
+      "exit_code": 0,
+      "wall_s": 0.18337650899775326,
+      "child_CPU_s": 0.18220299999999995,
+      "stdout": "{\"data_admission\": \"ADMIT_T1_TWO_CASE_NATIVE_HISTORY_AND_SAMPLED_D01_ONLY\", \"original_DAG\": \"10/17\", \"expansion_DAG\": \"28/88\"}\n",
+      "stderr": ""
+    },
+    {
+      "name": "plots",
+      "command": [
+        "python3",
+        "research/rei_ax11_t1_wave_20261116/harness/plot_t1_results.py",
+        "research/rei_ax11_t1_wave_20261116/results_v1"
+      ],
+      "exit_code": 0,
+      "wall_s": 2.046627816002001,
+      "child_CPU_s": 2.815561,
+      "stdout": "Rendered actual-data figures; scientific node credit=0\n",
+      "stderr": ""
+    }
+  ],
+  "native_evolution_runs": 0,
+  "scientific_scope": "Two-level sampled differences and data admission; fullAX11 remains open",
+  "original_DAG": "10/17",
+  "expansion_DAG": "28/88"
+}

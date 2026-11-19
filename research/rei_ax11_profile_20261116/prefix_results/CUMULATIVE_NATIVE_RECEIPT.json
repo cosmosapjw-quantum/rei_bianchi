@@ -1,0 +1,1084 @@
+{
+  "allocation": {
+    "schema": "rei.ax11.bounded-profile-allocation.v1",
+    "status": "BOUND_BEFORE_NATIVE_START",
+    "goal": "REI-AXBI-GOAL-20261014",
+    "named_owner_consumer": "REI owner / AX11 paired-response evolution-error and cost ledger",
+    "central_review_pin": "56dc609ea9b801c88d3364aed3eee140b3a20d46",
+    "scenario": "PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1",
+    "original_source_identity_sha256": "d7676b9309ac9b084499bbf599e803baecd661c80765489be45839ef5a7cf185",
+    "new_allocation_only": true,
+    "historical_cost": "UNKNOWN cumulative prior cost is retained; completed baseline counts and original caps are not reset or replaced",
+    "caps": {
+      "aggregate_native_wall_seconds": 1500,
+      "aggregate_native_cpu_seconds": 1500,
+      "per_window_wall_seconds": 120,
+      "per_window_cpu_seconds": 120,
+      "per_window_memory_bytes": 536870912,
+      "per_build_memory_bytes": 3221225472,
+      "aggregate_output_and_build_bytes": 1073741824,
+      "per_window_output_bytes": 67108864,
+      "source_build_process_starts": 2,
+      "scoped_test_process_starts": 3,
+      "profile_window_process_starts": 27,
+      "all_native_process_starts_including_build_and_tests": 41,
+      "aggregate_new_accepted_steps": 50000,
+      "aggregate_new_tentative_trials": 160000,
+      "aggregate_new_rhs_calls": 1200000,
+      "automatic_process_retries": 0,
+      "job_controller_and_extract_process_starts": 8,
+      "child_build_test_window_process_starts": 33
+    },
+    "windows": {
+      "initial_transient": "Original IC, first 1024 accepted steps, ZERO and SHEAR_PLUS; finite profiling only",
+      "main_plateau": "Exact accepted=199980 checkpoint, next 128 accepted steps; a=0.08873100115616298",
+      "optional_time_refinement_preflight": "If initial matched variants pass, T1/T2 original-IC short common-a endpoints for ZERO/PLUS; max10000 accepted each, same original physical model",
+      "fixed_background": "4096 panels, original summation and no interpolated cache keys",
+      "variants": [
+        "original",
+        "instrumented-only",
+        "exact-cache",
+        "exact-cache-lazy-spectrum"
+      ],
+      "full_history_launches": 0
+    },
+    "immutable_science": {
+      "baseline_local_target": 1e-05,
+      "time_refinement_levels": [
+        2.5e-06,
+        6.25e-07
+      ],
+      "strict_ceiling": 0.0002,
+      "baseline_energy_subdivisions": 16,
+      "baseline_GLmu": 8,
+      "spectra": "initial; every60 accepted; each30wall seconds; terminal; exact reserve guard",
+      "disabled": [
+        "CR",
+        "HH",
+        "RCT",
+        "secondary",
+        "molecules"
+      ],
+      "clock": "elapsed proper seconds since zbar20, fixed-a and equal elapsed proper-time responses kept separate"
+    },
+    "checkpoint_pins": {
+      "ZERO_199980": "60b41cc9474cbab47b93e8a32b5d60292d51373b835d649cafb0add12dcfae7b",
+      "PLUS_199980": "4c354974198b20b07a5e8b06385b78414b24508f378dad70ece9bd2854e16f55"
+    },
+    "config_pins": {
+      "ZERO": "b83ac8f4e93704b249f08e2114501db56e3e5de039b99056c7c10efa9a782e41",
+      "PLUS": "b9a8bdeaf61a68839e23486fa8ad0740fe1318c55cbc7f522e11cacbb4ff21c0"
+    },
+    "launch_binding": "SOURCE_PACKAGE_MANIFEST and file-hashed native_job.py must be present before launch. Compiled binaries hashed before any window. No old checkpoint or production checkout mutation.",
+    "terminal_reserve_bytes": 8388608,
+    "stop_conditions": [
+      "Any cap reached",
+      "input/source identity mismatch",
+      "unexpected numerical failure",
+      "same-accuracy state or counter mismatch",
+      "preflight gate failure"
+    ],
+    "original_workflow": "10/17",
+    "expansion": "28/88",
+    "AX11_complete": false
+  },
+  "wall_elapsed_s": 139.1728215769981,
+  "historical_cumulative_cost": "UNKNOWN; unchanged",
+  "records": [
+    {
+      "name": "build_original",
+      "command": [
+        "/home/cosmosapjw/.cargo/bin/cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--offline",
+        "--example",
+        "ax11_profile_window"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": null,
+        "AX11_LAZY": null,
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 180,
+      "memory_cap": 3221225472,
+      "returncode": 0,
+      "wall_s": 4.311513339998783,
+      "cpu_s": 4.175523,
+      "peak_rss_bytes": 18321408,
+      "stdout_log": "build_original.log",
+      "log_sha256": "f9358793350eb45759f4a18618d327cb1db33e1cfb65da0d171a997ac6a70855"
+    },
+    {
+      "name": "build_instrumented",
+      "command": [
+        "/home/cosmosapjw/.cargo/bin/cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--offline",
+        "--example",
+        "ax11_profile_window"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1 --cfg ax11_profile -A unexpected_cfgs",
+        "AX11_CACHE": null,
+        "AX11_LAZY": null,
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 180,
+      "memory_cap": 3221225472,
+      "returncode": 0,
+      "wall_s": 4.791736828003195,
+      "cpu_s": 4.745334999999999,
+      "peak_rss_bytes": 17874944,
+      "stdout_log": "build_instrumented.log",
+      "log_sha256": "c0ec9bad377671c071796db2f3b4e864a1c6ec7583ca5f0b939d9ed6e31398c7"
+    },
+    {
+      "name": "test_0",
+      "command": [
+        "/home/cosmosapjw/.cargo/bin/cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--offline",
+        "--test",
+        "ax11_invariance",
+        "--",
+        "--test-threads=1"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1 --cfg ax11_profile -A unexpected_cfgs",
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 180,
+      "memory_cap": 3221225472,
+      "returncode": 0,
+      "wall_s": 0.4646599700063234,
+      "cpu_s": 0.37644300000000186,
+      "peak_rss_bytes": 17833984,
+      "stdout_log": "test_0.log",
+      "log_sha256": "5e969f9ef77596899de2f1efcd0fae7ab1683f328f124eab18e2d146af590158"
+    },
+    {
+      "name": "test_1",
+      "command": [
+        "/home/cosmosapjw/.cargo/bin/cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--offline",
+        "--test",
+        "axbi_driver",
+        "sparse_full_spectra_keep_each_abundance_and_align_terminal_resume_and_cap",
+        "--",
+        "--test-threads=1"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1 --cfg ax11_profile -A unexpected_cfgs",
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "FAILED",
+      "wall_cap": 180,
+      "memory_cap": 3221225472,
+      "returncode": 101,
+      "wall_s": 0.9289426769973943,
+      "cpu_s": 0.753684999999999,
+      "peak_rss_bytes": 18403328,
+      "stdout_log": "test_1.log",
+      "log_sha256": "1f644762d384a2c42d8e1708ea4389da347ad63dbc7e0889f43b6d98af522048"
+    },
+    {
+      "name": "test_1_corrected_fsize",
+      "command": [
+        "/home/cosmosapjw/.cargo/bin/cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--offline",
+        "--test",
+        "axbi_driver",
+        "sparse_full_spectra_keep_each_abundance_and_align_terminal_resume_and_cap",
+        "--",
+        "--test-threads=1"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1 --cfg ax11_profile -A unexpected_cfgs",
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 180,
+      "memory_cap": 3221225472,
+      "returncode": 0,
+      "wall_s": 0.15594958199653774,
+      "cpu_s": 0.028423999999999998,
+      "peak_rss_bytes": 552960,
+      "stdout_log": "test_1_corrected_fsize.log",
+      "log_sha256": "6cbd2c8034b6b4aae97fb96f1d4a3f976f39b367ee4c5ed7ffec373f750af145"
+    },
+    {
+      "name": "test_2_corrected_fsize",
+      "command": [
+        "/home/cosmosapjw/.cargo/bin/cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--offline",
+        "--test",
+        "axbi_driver",
+        "hard_caps_charge_started_trials_and_resume_without_off_by_one",
+        "--",
+        "--test-threads=1"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1 --cfg ax11_profile -A unexpected_cfgs",
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 180,
+      "memory_cap": 3221225472,
+      "returncode": 0,
+      "wall_s": 0.15981733899388928,
+      "cpu_s": 0.018912000000000005,
+      "peak_rss_bytes": 552960,
+      "stdout_log": "test_2_corrected_fsize.log",
+      "log_sha256": "df76d51b5ab4fe98e93f61bc7dcfd3639787aaf5974ff039049a598855895ef3"
+    },
+    {
+      "name": "PLUS_IC_original_0",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/original/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/PLUS.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/results/PLUS_IC_original_0",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": "0",
+        "AX11_LAZY": "0",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 25.411625513006584,
+      "cpu_s": 25.322516,
+      "peak_rss_bytes": 3346432,
+      "stdout_log": "PLUS_IC_original_0.log",
+      "log_sha256": "8b6c45b10525e47516fde6bb784a73983054996193b8c515d4d99592bc654362"
+    },
+    {
+      "name": "PLUS_IC_instrumented_0",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/PLUS.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/results/PLUS_IC_instrumented_0",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": "0",
+        "AX11_LAZY": "0",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 22.339339778991416,
+      "cpu_s": 22.230691999999998,
+      "peak_rss_bytes": 3489792,
+      "stdout_log": "PLUS_IC_instrumented_0.log",
+      "log_sha256": "5f8c357c889ba3057a2696dc0cbb14061e100499a778c528916a4534ed0287f3"
+    },
+    {
+      "name": "PLUS_IC_cache_0",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/PLUS.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/results/PLUS_IC_cache_0",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "0",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 1.559382025996456,
+      "cpu_s": 1.5449260000000038,
+      "peak_rss_bytes": 3358720,
+      "stdout_log": "PLUS_IC_cache_0.log",
+      "log_sha256": "f85a106234807576c261687c4ccc688d663aff33336751246c3d57535afad704"
+    },
+    {
+      "name": "PLUS_IC_lazy_0",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/PLUS.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/results/PLUS_IC_lazy_0",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 1.4117352079920238,
+      "cpu_s": 1.3976489999999941,
+      "peak_rss_bytes": 3403776,
+      "stdout_log": "PLUS_IC_lazy_0.log",
+      "log_sha256": "0465a6abfd208143343ab9c9528c6eea2927c026c96ac6df9bb48a96f4d2ea03"
+    },
+    {
+      "name": "ZERO_IC_original_0",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/original/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/ZERO.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/results/ZERO_IC_original_0",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "ZERO"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": "0",
+        "AX11_LAZY": "0",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 19.69939213899488,
+      "cpu_s": 19.622537,
+      "peak_rss_bytes": 3350528,
+      "stdout_log": "ZERO_IC_original_0.log",
+      "log_sha256": "07e3d3422d4b0bf06d8dfd30d4f50b1d10ba82ce8696eccc563779bf0b6da373"
+    },
+    {
+      "name": "ZERO_IC_lazy_0",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/ZERO.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/results/ZERO_IC_lazy_0",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "ZERO"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 1.4153259390004678,
+      "cpu_s": 1.270877000000013,
+      "peak_rss_bytes": 3440640,
+      "stdout_log": "ZERO_IC_lazy_0.log",
+      "log_sha256": "84662df41b55199a58dc601f8bd7523b40321b27a5650ea5052e82ad8c37c2e3"
+    },
+    {
+      "name": "PLUS_PLATEAU_original_0",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/original/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/PLUS.cfg",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/PLUS_199980.txt",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/results/PLUS_PLATEAU_original_0",
+        "128",
+        "1000",
+        "10000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": "0",
+        "AX11_LAZY": "0",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 3.3064155580068473,
+      "cpu_s": 3.1859899999999897,
+      "peak_rss_bytes": 3395584,
+      "stdout_log": "PLUS_PLATEAU_original_0.log",
+      "log_sha256": "ed96970957eba23e0ab0e90ca6d945bb6abf4a1a0806214163bd16a2b3b14dba"
+    },
+    {
+      "name": "PLUS_PLATEAU_lazy_0",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/PLUS.cfg",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/PLUS_199980.txt",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/results/PLUS_PLATEAU_lazy_0",
+        "128",
+        "1000",
+        "10000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 0.31948454200755805,
+      "cpu_s": 0.19422999999999035,
+      "peak_rss_bytes": 3342336,
+      "stdout_log": "PLUS_PLATEAU_lazy_0.log",
+      "log_sha256": "47e11e0759138a643cc391125d1ccb1f70a054b03920beaa747df3975515a86f"
+    },
+    {
+      "name": "PLUS_PLATEAU_original_1",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/original/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/PLUS.cfg",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/PLUS_199980.txt",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/results/PLUS_PLATEAU_original_1",
+        "128",
+        "1000",
+        "10000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": "0",
+        "AX11_LAZY": "0",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 3.321663850991172,
+      "cpu_s": 3.2194550000000106,
+      "peak_rss_bytes": 3334144,
+      "stdout_log": "PLUS_PLATEAU_original_1.log",
+      "log_sha256": "4b884dfa92b16e5dcffe5bec331ea91266ccf6a31f326d70ed5322f49c9a284d"
+    },
+    {
+      "name": "PLUS_PLATEAU_lazy_1",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/PLUS.cfg",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/PLUS_199980.txt",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/results/PLUS_PLATEAU_lazy_1",
+        "128",
+        "1000",
+        "10000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 0.3174087770021288,
+      "cpu_s": 0.17062299999999198,
+      "peak_rss_bytes": 3469312,
+      "stdout_log": "PLUS_PLATEAU_lazy_1.log",
+      "log_sha256": "ab31aa91be2b727d7c360a0cf022fabe8ca26961ff2ddfecdf40270714480c82"
+    },
+    {
+      "name": "ZERO_PLATEAU_original_0",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/original/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/ZERO.cfg",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/ZERO_199980.txt",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/results/ZERO_PLATEAU_original_0",
+        "128",
+        "1000",
+        "10000",
+        "120",
+        "NONE",
+        "ZERO"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": "0",
+        "AX11_LAZY": "0",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 2.5256502859992906,
+      "cpu_s": 2.4114859999999965,
+      "peak_rss_bytes": 3305472,
+      "stdout_log": "ZERO_PLATEAU_original_0.log",
+      "log_sha256": "4f5216b741c2ef9260f7b1f74bc6cafef32363addf53949ce3013bc89a8064cc"
+    },
+    {
+      "name": "ZERO_PLATEAU_lazy_0",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/ZERO.cfg",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/inputs/ZERO_199980.txt",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/results/ZERO_PLATEAU_lazy_0",
+        "128",
+        "1000",
+        "10000",
+        "120",
+        "NONE",
+        "ZERO"
+      ],
+      "environment": {
+        "RUSTFLAGS": "-C codegen-units=1",
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 0.1606099409982562,
+      "cpu_s": 0.1579330000000141,
+      "peak_rss_bytes": 577536,
+      "stdout_log": "ZERO_PLATEAU_lazy_0.log",
+      "log_sha256": "156641c4e2608f08fa5b44a62a12463c7b0e7f6082fe8cae0d83be4d87bcdd00"
+    },
+    {
+      "name": "PLUS_T1_ORIGINAL_START",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_inputs/PLUS_T1_ORIGINAL_START.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_results/PLUS_T1_ORIGINAL_START",
+        "2048",
+        "8000",
+        "60000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 3.5611663940071594,
+      "cpu_s": 3.481308,
+      "peak_rss_bytes": 3538944,
+      "stdout_log": "PLUS_T1_ORIGINAL_START.log",
+      "log_sha256": "df36438799bf1426c4d51b07104c1b63f085283696d1d23cd58123a70db48803"
+    },
+    {
+      "name": "ZERO_T1_ORIGINAL_START",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_inputs/ZERO_T1_ORIGINAL_START.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_results/ZERO_T1_ORIGINAL_START",
+        "2048",
+        "8000",
+        "60000",
+        "120",
+        "NONE",
+        "ZERO"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 3.0819387869996717,
+      "cpu_s": 2.9904880000000005,
+      "peak_rss_bytes": 3579904,
+      "stdout_log": "ZERO_T1_ORIGINAL_START.log",
+      "log_sha256": "d2278de26fd25272bf80395ea62f5fdc1b84bc518b8ba03fefbf583eca6ab863"
+    },
+    {
+      "name": "PLUS_T2_ORIGINAL_START",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_inputs/PLUS_T2_ORIGINAL_START.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_results/PLUS_T2_ORIGINAL_START",
+        "4096",
+        "15000",
+        "110000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "FAILED",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 2,
+      "wall_s": 0.16998748999321833,
+      "cpu_s": 0.020589999999999442,
+      "peak_rss_bytes": 503808,
+      "stdout_log": "PLUS_T2_ORIGINAL_START.log",
+      "log_sha256": "99714104ad60bfb7d0c4ea7a26518e0e9394d9c957cf4bdce818057888b57a43"
+    },
+    {
+      "name": "ZERO_T2_ORIGINAL_START",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_inputs/ZERO_T2_ORIGINAL_START.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_results/ZERO_T2_ORIGINAL_START",
+        "4096",
+        "15000",
+        "110000",
+        "120",
+        "NONE",
+        "ZERO"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "FAILED",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 2,
+      "wall_s": 0.16164435000973754,
+      "cpu_s": 0.012665000000000148,
+      "peak_rss_bytes": 512000,
+      "stdout_log": "ZERO_T2_ORIGINAL_START.log",
+      "log_sha256": "80ce2379ec7d637954039577a0d8ae2aec5df44cec85e1ba0483581a72f38efc"
+    },
+    {
+      "name": "PLUS_T2_FLOOR_START",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_inputs/PLUS_T2_FLOOR_START.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_results/PLUS_T2_FLOOR_START",
+        "4096",
+        "15000",
+        "110000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 6.778728389006574,
+      "cpu_s": 6.697885000000001,
+      "peak_rss_bytes": 3563520,
+      "stdout_log": "PLUS_T2_FLOOR_START.log",
+      "log_sha256": "dfa82c3c58fa6f82b026aec1252452672352a0b01888bfd52164b3dff4e1ab76"
+    },
+    {
+      "name": "ZERO_T2_FLOOR_START",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_inputs/ZERO_T2_FLOOR_START.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/time_preflight_results/ZERO_T2_FLOOR_START",
+        "4096",
+        "15000",
+        "110000",
+        "120",
+        "NONE",
+        "ZERO"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 6.451705458996003,
+      "cpu_s": 6.327448999999998,
+      "peak_rss_bytes": 3461120,
+      "stdout_log": "ZERO_T2_FLOOR_START.log",
+      "log_sha256": "b6046c55481d0c9a1bf011a1c4b310e13f06689208019b0c00f86038e32712fe"
+    },
+    {
+      "name": "PLUS_E32",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_inputs/PLUS_E32.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_results/PLUS_E32",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 2.3287992919940734,
+      "cpu_s": 2.267815,
+      "peak_rss_bytes": 3624960,
+      "stdout_log": "PLUS_E32.log",
+      "log_sha256": "2a609d83bc9a1291de6cb0620dee6185da1a77d9026a90af8f555900c78aa80c"
+    },
+    {
+      "name": "PLUS_E64",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_inputs/PLUS_E64.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_results/PLUS_E64",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 3.808622825992643,
+      "cpu_s": 3.6495839999999995,
+      "peak_rss_bytes": 3825664,
+      "stdout_log": "PLUS_E64.log",
+      "log_sha256": "7feafa59c31f16ace9e6b12f6e48a9c96f3e0129c67fa0f89dc1e8a10e4bf006"
+    },
+    {
+      "name": "ZERO_E32",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_inputs/ZERO_E32.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_results/ZERO_E32",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "ZERO"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 2.3176102800061926,
+      "cpu_s": 2.1942710000000005,
+      "peak_rss_bytes": 3543040,
+      "stdout_log": "ZERO_E32.log",
+      "log_sha256": "c5ebef157ae8727536bd0db96e48619db6f1b299bac3ea78a98d2f3742c1839e"
+    },
+    {
+      "name": "ZERO_E64",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_inputs/ZERO_E64.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_results/ZERO_E64",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "ZERO"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 3.651687266989029,
+      "cpu_s": 3.5201139999999995,
+      "peak_rss_bytes": 3874816,
+      "stdout_log": "ZERO_E64.log",
+      "log_sha256": "a0939d804385f46b838464ce5141fb04cf099bab57bd2112a06431dba3a21c81"
+    },
+    {
+      "name": "MINUS_A8",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_inputs/MINUS_A8.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_results/MINUS_A8",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "MINUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 1.5049709800077835,
+      "cpu_s": 1.4841670000000011,
+      "peak_rss_bytes": 3428352,
+      "stdout_log": "MINUS_A8.log",
+      "log_sha256": "de6c366341770e0dfaae60094a3af42f59ade45600b82153db7137855f22eda0"
+    },
+    {
+      "name": "PLUS_A16",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_inputs/PLUS_A16.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_results/PLUS_A16",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 2.324853415993857,
+      "cpu_s": 2.2558729999999994,
+      "peak_rss_bytes": 3543040,
+      "stdout_log": "PLUS_A16.log",
+      "log_sha256": "4d779159463f1805c948d2e3d750670b3fecdec67c1fd089d3892627037ff240"
+    },
+    {
+      "name": "PLUS_A32",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_inputs/PLUS_A32.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_results/PLUS_A32",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "PLUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 3.8868975389923435,
+      "cpu_s": 3.853808000000001,
+      "peak_rss_bytes": 3858432,
+      "stdout_log": "PLUS_A32.log",
+      "log_sha256": "319e7f15dd7365da5d51c5b68eaaadf4e3241be1475ca3d651ae9fc9d022cc04"
+    },
+    {
+      "name": "MINUS_A16",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_inputs/MINUS_A16.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_results/MINUS_A16",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "MINUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 2.366647772010765,
+      "cpu_s": 2.259003,
+      "peak_rss_bytes": 3563520,
+      "stdout_log": "MINUS_A16.log",
+      "log_sha256": "63ae27e5d820fe0aac5b147c1c0210e52316bb22d5d7ef8d9c986dff626011e4"
+    },
+    {
+      "name": "MINUS_A32",
+      "command": [
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_inputs/MINUS_A32.cfg",
+        "IC",
+        "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/grid_preflight_results/MINUS_A32",
+        "1024",
+        "5000",
+        "50000",
+        "120",
+        "NONE",
+        "MINUS"
+      ],
+      "environment": {
+        "RUSTFLAGS": null,
+        "AX11_CACHE": "1",
+        "AX11_LAZY": "1",
+        "CARGO_BUILD_JOBS": "1"
+      },
+      "status": "COMPLETE",
+      "wall_cap": 120,
+      "memory_cap": 536870912,
+      "returncode": 0,
+      "wall_s": 3.7355116740072845,
+      "cpu_s": 3.647029,
+      "peak_rss_bytes": 3887104,
+      "stdout_log": "MINUS_A32.log",
+      "log_sha256": "c684d2c7de230adc3a638eb29ad1081bd88f6bc7d58e216a907fc2020a1e32d4"
+    }
+  ],
+  "binaries": {
+    "original": {
+      "path": "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/original/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+      "sha256": "1ce4bd024ba42c6a55cd1c67aa475ce05758df08dec14bbbee50869ba45a55bd",
+      "bytes": 930760
+    },
+    "instrumented": {
+      "path": "/home/cosmosapjw/research_backups/rei_ax11_profile_20261116_v2/source/instrumented/rust/rei_microphysics/target/release/examples/ax11_profile_window",
+      "sha256": "59d94336f308349c9c4647e66e97ed2ce0b32b00d99819a12fb9214ea55eb4bf",
+      "bytes": 975168
+    }
+  }
+}
