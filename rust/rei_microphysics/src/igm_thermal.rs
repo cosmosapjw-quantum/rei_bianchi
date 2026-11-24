@@ -43,7 +43,7 @@ use crate::{igm_rates::igm_rates, HHeModel};
 // CODATA 2022: https://physics.nist.gov/cuu/pdf/wall_2022.pdf
 // sigma_T and electron mass; a_rad = 4*sigma_SB/c.
 // sigma_SB follows the exact SI kB,h,c blackbody expression (converted to cgs).
-const SIGMA_T_CM2: f64 = 6.6524587051e-25;
+pub(crate) const SIGMA_T_CM2: f64 = 6.6524587051e-25;
 const ELECTRON_MASS_G: f64 = 9.1093837139e-28;
 const PLANCK_ERG_S: f64 = 6.62607015e-27;
 fn invalid() -> ForwardError {

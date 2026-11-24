@@ -152,6 +152,7 @@ pub mod igm_background;
 pub mod igm_state;
 pub mod igm_rates;
 pub mod igm_thermal;
+pub mod thomson;
 pub mod axbi_rates;
 pub mod axbi_background;
 pub mod axbi_sources;
