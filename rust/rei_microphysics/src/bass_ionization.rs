@@ -33,8 +33,7 @@ impl Continuation {
     }
     /// Continuation value at 0 <= z <= z_match from the donor value x_match.
     pub fn xe(&self, z: f64, z_match: f64, x_match: f64) -> Result<f64, String> {
-        if !(self.f_he > 0.0 && self.f_he < 1.0) || !(self.z_heii > 0.0) || !(self.dz_heii > 0.0)
-        {
+        if !(self.f_he > 0.0 && self.f_he < 1.0) || !(self.z_heii > 0.0) || !(self.dz_heii > 0.0) {
             return Err("continuation needs 0 < f_He < 1 and positive z_HeII and width".into());
         }
         if !(z_match > 0.0) || !z_match.is_finite() {
@@ -78,7 +77,7 @@ pub fn merge(
     continuation: Continuation,
     dz: f64,
 ) -> Result<(Vec<Knot>, MergeReport), String> {
-    if !(z_emit > 0.0) || !(dz > 0.0) {
+    if !(z_emit.is_finite() && z_emit > 0.0) || !(dz.is_finite() && dz > 0.0) {
         return Err("z_emit and the continuation step must be positive".into());
     }
     if rec.len() < 2 || rec[0].eta != 0.0 {
@@ -89,7 +88,10 @@ pub fn merge(
             return Err("recombination eta must increase strictly".into());
         }
     }
-    if rec.iter().any(|k| !k.xe.is_finite() || k.xe < 0.0) {
+    if rec
+        .iter()
+        .any(|k| !k.eta.is_finite() || !k.xe.is_finite() || k.xe < 0.0)
+    {
         return Err("recombination x_e must be finite and nonnegative".into());
     }
     let mut rei: Vec<(f64, f64)> = rei.to_vec();
@@ -116,7 +118,9 @@ pub fn merge(
         return Err("recombination table does not reach the REI start".into());
     }
     // Linear-in-eta REC value at z_high.
-    let i = rec.partition_point(|k| k.eta <= eta_high).clamp(1, rec.len() - 1);
+    let i = rec
+        .partition_point(|k| k.eta <= eta_high)
+        .clamp(1, rec.len() - 1);
     let (a, b) = (rec[i - 1], rec[i]);
     let rec_at_high = a.xe + (b.xe - a.xe) * (eta_high - a.eta) / (b.eta - a.eta);
     let mut out: Vec<Knot> = rec.iter().copied().filter(|k| k.eta < eta_high).collect();
@@ -156,6 +160,63 @@ pub fn merge(
             continuation_knots,
         },
     ))
+}
+
+/// Join a supplied low-redshift H/He history, with an exact shared boundary
+/// value and no forced ionization at z=0. Rows use the same mean-scale-factor
+/// redshift clock as REI, not a directional photon redshift. No physical
+/// source model is inferred from these rows; provenance is the caller's duty.
+/// continuation_knots counts supplied tail rows excluding the shared endpoint.
+pub fn merge_with_physical_tail(
+    rec: &[Knot],
+    rei: &[(f64, f64)],
+    tail: &[(f64, f64)],
+    z_emit: f64,
+    f_he: f64,
+) -> Result<(Vec<Knot>, MergeReport), String> {
+    if !(0.0 < f_he && f_he < 1.0) || rei.len() < 2 || tail.len() < 2 {
+        return Err("invalid helium fraction or missing REI/tail coverage".into());
+    }
+    let full = 1.0 + 2.0 * f_he;
+    if rec.iter().any(|k| !(0.0..=full).contains(&k.xe))
+        || rei
+            .iter()
+            .chain(tail)
+            .any(|(z, x)| !z.is_finite() || *z < 0. || !(0.0..=full).contains(x))
+    {
+        return Err("history outside finite H/He electron domain".into());
+    }
+    let mut high = rei.to_vec();
+    let mut low = tail.to_vec();
+    high.sort_by(|a, b| b.0.total_cmp(&a.0));
+    low.sort_by(|a, b| b.0.total_cmp(&a.0));
+    let boundary = *high.last().unwrap();
+    if boundary.0 <= 0.
+        || low[0] != boundary
+        || low.last().unwrap().0 != 0.
+        || low.windows(2).any(|w| w[1].0 >= w[0].0)
+    {
+        return Err(
+            "tail must share the exact REI boundary, descend strictly and end at z=0".into(),
+        );
+    }
+    high.extend_from_slice(&low[1..]);
+    // With z_low=0 the existing merge performs no placeholder continuation.
+    let (rows, mut report) = merge(
+        rec,
+        &high,
+        z_emit,
+        Continuation {
+            f_he,
+            z_heii: 3.5,
+            dz_heii: 0.5,
+        },
+        1.,
+    )?;
+    report.z_low = boundary.0;
+    report.rei_knots = rei.len();
+    report.continuation_knots = low.len() - 1;
+    Ok((rows, report))
 }
 
 #[cfg(test)]
@@ -208,7 +269,11 @@ mod tests {
         assert!((out.last().unwrap().xe - (1.0 + 2.0 * F_HE)).abs() < 1e-15);
         assert_eq!(report.rei_knots, 17);
         assert_eq!(report.continuation_knots, 80);
-        assert!((report.jump_at_z_high - 2e-5).abs() < 1e-12, "{}", report.jump_at_z_high);
+        assert!(
+            (report.jump_at_z_high - 2e-5).abs() < 1e-12,
+            "{}",
+            report.jump_at_z_high
+        );
         assert!(out.windows(2).all(|w| w[1].eta > w[0].eta));
         let bad = vec![Knot { eta: 0.1, xe: 0.1 }, Knot { eta: 0.2, xe: 0.1 }];
         assert!(merge(&bad, &rei, z_emit, cont(), 0.05).is_err());
@@ -224,7 +289,12 @@ mod tests {
             })
             .collect();
         let rei: Vec<(f64, f64)> = (0..=20)
-            .map(|k| (20.0 - k as f64, if k == 20 { 1.0 + 2.0 * F_HE } else { 1.0 }))
+            .map(|k| {
+                (
+                    20.0 - k as f64,
+                    if k == 20 { 1.0 + 2.0 * F_HE } else { 1.0 },
+                )
+            })
             .collect();
         let (out, report) = merge(&rec, &rei, z_emit, cont(), 0.05).unwrap();
         assert_eq!(report.continuation_knots, 0);
