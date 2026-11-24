@@ -37,6 +37,9 @@ impl Continuation {
         {
             return Err("continuation needs 0 < f_He < 1 and positive z_HeII and width".into());
         }
+        if !(z_match > 0.0) || !z_match.is_finite() {
+            return Err("continuation requires positive finite z_match".into());
+        }
         let full = 1.0 + 2.0 * self.f_he;
         if !(1.0..=full).contains(&x_match) {
             return Err(format!(
@@ -125,15 +128,17 @@ pub fn merge(
         });
     }
     let x_match = rei[rei.len() - 1].1;
-    let steps = (z_low / dz).ceil().max(1.0) as usize;
     let mut continuation_knots = 0;
-    for k in 1..=steps {
-        let z = (z_low * (1.0 - k as f64 / steps as f64)).max(0.0);
-        out.push(Knot {
-            eta: if k == steps { end } else { eta_of(z, z_emit) },
-            xe: continuation.xe(z, z_low, x_match)?,
-        });
-        continuation_knots += 1;
+    if z_low > 0.0 {
+        let steps = (z_low / dz).ceil().max(1.0) as usize;
+        for k in 1..=steps {
+            let z = (z_low * (1.0 - k as f64 / steps as f64)).max(0.0);
+            out.push(Knot {
+                eta: if k == steps { end } else { eta_of(z, z_emit) },
+                xe: continuation.xe(z, z_low, x_match)?,
+            });
+            continuation_knots += 1;
+        }
     }
     for w in out.windows(2) {
         if !(w[1].eta > w[0].eta) {
@@ -207,5 +212,25 @@ mod tests {
         assert!(out.windows(2).all(|w| w[1].eta > w[0].eta));
         let bad = vec![Knot { eta: 0.1, xe: 0.1 }, Knot { eta: 0.2, xe: 0.1 }];
         assert!(merge(&bad, &rei, z_emit, cont(), 0.05).is_err());
+    }
+
+    #[test]
+    fn z_low_zero_skips_continuation_without_nan_or_duplicate_eta() {
+        let z_emit = 1100.0;
+        let rec: Vec<Knot> = (0..=110)
+            .map(|k| Knot {
+                eta: eta_of(1100.0 - 10.0 * k as f64, z_emit),
+                xe: 2e-4,
+            })
+            .collect();
+        let rei: Vec<(f64, f64)> = (0..=20)
+            .map(|k| (20.0 - k as f64, if k == 20 { 1.0 + 2.0 * F_HE } else { 1.0 }))
+            .collect();
+        let (out, report) = merge(&rec, &rei, z_emit, cont(), 0.05).unwrap();
+        assert_eq!(report.continuation_knots, 0);
+        assert!((out.last().unwrap().eta - (1101f64).ln()).abs() < 1e-15);
+        assert!(out.iter().all(|k| k.xe.is_finite()));
+        assert!(out.windows(2).all(|w| w[1].eta > w[0].eta));
+        assert!(cont().xe(0.0, 0.0, 1.0 + F_HE).is_err());
     }
 }

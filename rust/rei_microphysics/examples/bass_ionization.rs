@@ -41,10 +41,14 @@ fn read_ax08(path: &str, case: &str) -> Result<Vec<(f64, f64)>> {
     };
     let (c_case, c_z, c_xe) = (col("case")?, col("zbar")?, col("xe_per_H")?);
     let mut rows = Vec::new();
-    for line in lines.filter(|l| !l.trim().is_empty()) {
+    for (idx, line) in lines.filter(|l| !l.trim().is_empty()).enumerate() {
         let f: Vec<&str> = line.split(',').collect();
         if f.get(c_case) == Some(&case) {
-            rows.push((f[c_z].parse()?, f[c_xe].parse()?));
+            let z_s = f.get(c_z).ok_or_else(|| format!("missing zbar column on row {}", idx + 2))?;
+            let xe_s = f
+                .get(c_xe)
+                .ok_or_else(|| format!("missing xe_per_H column on row {}", idx + 2))?;
+            rows.push((z_s.parse()?, xe_s.parse()?));
         }
     }
     if rows.is_empty() {
