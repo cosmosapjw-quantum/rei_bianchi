@@ -35,6 +35,10 @@ pub struct DriverConfig {
     pub end_zbar: f64,
     pub escape_fraction: f64,
     pub initial_temperature_k: f64,
+    pub initial_x_hii: f64,
+    pub initial_x_heii: f64,
+    pub initial_x_heiii: f64,
+    pub initial_state_id: String,
     pub energy_subdivisions: usize,
     pub n_mu: usize,
     pub background_panels: usize,
@@ -58,6 +62,10 @@ impl DriverConfig {
             escape_fraction: 0.2,
             initial_temperature_k: 2.7255 * 21.0_f64.powi(2)
                 / (150.0 * (0.0224_f64 / 0.023).powf(0.4)),
+            initial_x_hii: 2e-4,
+            initial_x_heii: 0.,
+            initial_x_heiii: 0.,
+            initial_state_id: "AX01_CONDITIONAL".into(),
             energy_subdivisions: 16,
             n_mu: 8,
             background_panels: 4096,
@@ -95,6 +103,10 @@ impl DriverConfig {
                 "end_zbar" => number!(end_zbar),
                 "escape_fraction" => number!(escape_fraction),
                 "initial_temperature_k" => number!(initial_temperature_k),
+                "initial_x_hii" => number!(initial_x_hii),
+                "initial_x_heii" => number!(initial_x_heii),
+                "initial_x_heiii" => number!(initial_x_heiii),
+                "initial_state_id" => c.initial_state_id = v.trim().to_owned(),
                 "energy_subdivisions" => number!(energy_subdivisions),
                 "n_mu" => number!(n_mu),
                 "background_panels" => number!(background_panels),
@@ -129,7 +141,29 @@ impl DriverConfig {
         }
     }
     fn validate(&self) -> Result<(), ForwardError> {
-        if ![256, 2048, 4096].contains(&self.output_budget_mib)
+        if !self.initial_temperature_k.is_finite()
+            || self.initial_temperature_k <= 0.
+            || ![
+                self.initial_x_hii,
+                self.initial_x_heii,
+                self.initial_x_heiii,
+            ]
+            .iter()
+            .all(|x| (0.0..=1.0).contains(x))
+            || self.initial_x_heii + self.initial_x_heiii > 1.
+            || self.initial_state_id.is_empty()
+            || self.initial_state_id.len() > 160
+            || !self
+                .initial_state_id
+                .bytes()
+                .all(|c| c.is_ascii_alphanumeric() || c == b'_' || c == b'-')
+            || (self.initial_state_id == "AX01_CONDITIONAL"
+                && [
+                    self.initial_x_hii,
+                    self.initial_x_heii,
+                    self.initial_x_heiii,
+                ] != [2e-4, 0., 0.])
+            || ![256, 2048, 4096].contains(&self.output_budget_mib)
             || self.spectra_every_accepted == 0
             || !self.q_ref.is_finite()
             || !self.end_zbar.is_finite()
@@ -259,7 +293,11 @@ impl Driver {
             })
             .collect::<Result<Vec<_>, ForwardError>>()?;
         let gas = IgmGasState::from_temperature(
-            [2e-4, 0.0, 0.0],
+            [
+                config.initial_x_hii,
+                config.initial_x_heii,
+                config.initial_x_heiii,
+            ],
             n_h0 / a_ref.powi(3),
             n_he0 / a_ref.powi(3),
             config.initial_temperature_k,
@@ -1329,6 +1367,11 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
         fs::write(out.join("config.cfg"), config_text).map_err(ioerr)?;
         fs::write(out.join("source_identity.txt"), compiled_identity()).map_err(ioerr)?;
         fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
+        fs::write(
+            out.join("initial_state_id.txt"),
+            &driver.config.initial_state_id,
+        )
+        .map_err(ioerr)?;
         fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=cell-integrated source deposited to fixed physical-energy nodes; delta-node measures\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
     }
     let mut h=open_output(&out.join("history.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,b,H_per_s,s_per_s,x_HII,x_HeII,x_HeIII,nH_proper_cm3,ne_proper_cm3,temperature_K,Gamma_HI_per_s,Gamma_HeI_per_s,Gamma_HeII_per_s,photon_n_per_H,photon_u_eV_per_H,J0_photon_u_eV_per_H,J1_photon_u_eV_per_H,J2_photon_u_eV_per_H,x_HI,x_HeI")?;
