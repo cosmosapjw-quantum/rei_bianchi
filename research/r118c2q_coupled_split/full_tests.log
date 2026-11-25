@@ -1,0 +1,721 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:366:18
+    |
+366 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+366 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+366 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+warning: value assigned to `s` is never read
+   --> examples/axbi_c2o_budget_late.rs:112:13
+    |
+112 |     let (d, mut s) = Driver::new(config)?;
+    |             ^^^^^ this value is reassigned later and never used
+...
+117 |     s=d.read_checkpoint(old)?;
+    |     - `s` is overwritten here before the previous value is read
+    |
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: `rei_microphysics` (example "axbi_c2o_budget_late") generated 1 warning
+warning: `rei_microphysics` (lib test) generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.51s
+     Running unittests src/lib.rs (target/debug/deps/rei_microphysics-43009b60b31b57d0)
+
+running 3 tests
+test bass_ionization::tests::continuation_is_continuous_and_reaches_full_ionization ... ok
+test bass_ionization::tests::merge_has_single_owners_and_ends_at_z_zero ... ok
+test bass_ionization::tests::z_low_zero_skips_continuation_without_nan_or_duplicate_eta ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/adaptive_history.rs (target/debug/deps/adaptive_history-c85487a546f5309d)
+
+running 3 tests
+test rejected_trial_preserves_all_state_and_parent_bits ... ok
+test actual_uniform_trial_has_strict_gates_and_not_reset_parent ... ok
+test next_step_keeps_previous_enclosure_without_radius_reset ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.29s
+
+     Running tests/atomic_provider.rs (target/debug/deps/atomic_provider-b8e054317d86ad5b)
+
+running 3 tests
+test domain_and_authority ... ok
+test verner_values_and_thresholds ... ok
+test original_c_values ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/axbi_background.rs (target/debug/deps/axbi_background-ed622167b9f1cf42)
+
+running 6 tests
+test feedback_zero_nonzero_and_missing_history ... ok
+test invalid_input_rejected ... ok
+test reflection_even_ray_transport_preserves_parity ... ok
+test initially_isotropic_radiation_stress_small_b_limit ... ok
+test density_constraint_signed_shear_and_refinement ... ok
+test matter_clock_and_flrw_limit ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/axbi_background_cache.rs (target/debug/deps/axbi_background_cache-951c6dd42d286200)
+
+running 5 tests
+test invalid_errors_priority_and_cache_immutability ... ok
+test all_fields_endpoints_adjacent_and_original_arithmetic_match ... ok
+test warming_bypass_clones_independence_and_eviction_are_explicit ... ok
+test concurrent_duplicates_preserve_exact_physics_and_bounded_ring ... ok
+test production_startup_and_adaptive_bits_match_bypass_and_config_is_not_model_key ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.31s
+
+     Running tests/axbi_covariant_driver.rs (target/debug/deps/axbi_covariant_driver-750050129bba7739)
+
+running 7 tests
+test number_only_mutation_is_rejected_instead_of_inventing_spectrum ... ok
+test transport_resolution_is_separate_and_be_stage_has_one_event_owner ... ok
+test output_support_and_moments_use_local_energy ... ok
+test reference_moments_do_not_remap_and_work_uses_actual_energy ... ok
+test actual_run_resume_rejects_changed_config_and_source_before_stepping ... ok
+test checkpoint_v4_roundtrips_all_arrays_and_rejects_projected_v2 ... ok
+test repeated_transport_cannot_create_heii_photo_events_below_threshold ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/axbi_covariant_partition.rs (target/debug/deps/axbi_covariant_partition-898bf1fed281201c)
+
+running 4 tests
+test partition_empty_below_above_and_exact_threshold_delta ... ok
+test mixed_partition_matches_moments_is_idempotent_and_preserves_photo_rates ... ok
+test monotone_two_cut_transfers_keep_total_count_energy_and_redshift_work ... ok
+test merge_inactive_preserves_edge_moments_and_rejects_transactionally ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/axbi_covariant_transport.rs (target/debug/deps/axbi_covariant_transport-d0245e25b01bbe42)
+
+running 7 tests
+test broad_positive_spectrum_uses_threshold_cut_nodes_instead_of_centroid ... ok
+test unsupported_source_and_malformed_support_reject_transactionally ... ok
+test backward_euler_node_survival_number_energy_gamma_and_heat_share_one_owner ... ok
+test near_endpoint_broad_support_stays_positive_and_records_tail_control ... ok
+test exact_fit_threshold_delta_redshifts_without_false_heii_ionization ... ok
+test source_subcells_close_number_energy_and_anisotropic_reflection ... ok
+test redshifted_inert_photons_are_retained_and_history_memory_is_fixed ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running tests/axbi_driver.rs (target/debug/deps/axbi_driver-2e146e889a39eba3)
+
+running 11 tests
+test refinement_output_allocation_4096_preserves_existing_budgets_and_exact_guard ... ok
+test conservative_deposit_exact_number_and_energy ... ok
+test geometry_map_rejects_cold_endpoint_outside_provider_domain ... ok
+test reaction_free_geometry_conserves_count_energy_and_temperature_dilution ... ok
+test cold_absorption_uses_one_event_owner ... ok
+test aggregate_output_guard_counts_nested_bytes_and_atomic_checkpoint_peak ... ok
+test full_resource_allocation_preserves_pilot_default_and_exact_guard ... ok
+test checkpoint_roundtrip_and_registry_normalization ... ok
+test hard_caps_charge_started_trials_and_resume_without_off_by_one ... ok
+test component_step_doubling_and_state_array_metric ... ok
+test sparse_full_spectra_keep_each_abundance_and_align_terminal_resume_and_cap ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running tests/axbi_inactive_driver.rs (target/debug/deps/axbi_inactive_driver-a2a35f73d753d71f)
+
+running 7 tests
+test explicit_variant_defaults_false_and_rejects_nonflrw_activation ... ok
+test split_pool_norm_detects_equal_total_moment_cancellation ... ok
+test false_mode_keeps_retained_inert_baseline_and_rejects_nonzero_passive_state ... ok
+test below_hi_pool_redshifts_without_reactivation_or_boundary_loss ... ok
+test coupled_stage_only_absorbs_active_pool_and_keeps_total_ledger ... ok
+test total_spectrum_envelope_and_pool_ledgers_preserve_output_schema ... ok
+test v4_six_arrays_and_outer_variant_identity_binding ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/axbi_jacobian_parallel.rs (target/debug/deps/axbi_jacobian_parallel-dcf66f933d483b8d)
+
+running 7 tests
+test flag_is_explicit_opt_in_and_rejects_invalid_values ... ok
+test fewer_than_eight_credits_retain_serial_prefix_exact_boundary_is_bounded ... ok
+test failures_return_lowest_column_and_charge_discarded_work ... ok
+test worker_panic_merges_every_started_debit_and_denial_starts_nothing ... ok
+test negative_fallback_stays_inside_each_column_and_matches_bits ... ok
+test positive_columns_preserve_residual_and_jacobian_bits ... ok
+test actual_stage_states_ledgers_decisions_match_and_failure_does_not_commit ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/axbi_plus_resource_continuation.rs (target/debug/deps/axbi_plus_resource_continuation-eae0dd9041fe4e06)
+
+running 4 tests
+test exact_endpoint_is_required_and_resource_wall_is_carried ... ok
+test identity_checks_reject_wrong_config_checkpoint_case_terminal_and_source ... ok
+test cumulative_caps_and_output_failure_rollback_keep_charged_costs ... ok
+test exact_resume_matches_uninterrupted_kernel_and_preserves_prefix ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/axbi_q_capacity.rs (target/debug/deps/axbi_q_capacity-cfc5b68d3b628de4)
+
+running 7 tests
+test a_cap_that_already_fits_must_still_validate_physical_packet_inputs ... ok
+test angular_labels_and_threshold_tube_are_hard_guards ... ok
+test flrw_same_direction_merges_preserve_number_k_and_energy ... ok
+test hard_cap_below_threshold_partition_returns_hold_without_mutating_source ... ok
+test same_local_direction_at_two_lrs_emission_epochs_is_not_same_k_direction ... ok
+test real_signed_background_same_local_emission_direction_only_flrw_merges ... ok
+test actual_source_cohort_cap_is_transactional_and_preserves_energy ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running tests/axbi_q_closure.rs (target/debug/deps/axbi_q_closure-1a12c6bc90339f01)
+
+running 8 tests
+test max_entropy_positive_bin_matches_number_and_first_energy ... ok
+test reconstruction_refuses_unphysical_moments_and_reaction_inputs ... ok
+test split_threshold_reaction_preserves_photons_and_energy ... ok
+test two_moments_do_not_uniquely_fix_threshold_side_population ... ok
+test manufactured_heii_channel_matches_independent_continuum_reference ... ok
+test repeated_frozen_absorption_stays_positive_and_ledger_closes ... ok
+test real_md14_source_helium_rate_improves_over_centroid ... ok
+test parallel_reconstruction_is_cellwise_bitwise_identical ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/axbi_q_event.rs (target/debug/deps/axbi_q_event-9a39df72b7d5807f)
+
+running 6 tests
+test static_exact_exponential_matches_original_constant_step ... ok
+test unsafe_or_unbounded_inputs_are_rejected ... ok
+test threshold_crossing_matches_analytic_residence_for_step_opacity ... ok
+test contiguous_energy_readout_matches_packet_reference ... ok
+test physical_energy_photon_ledger_and_refinement ... ok
+test parallel_and_serial_outputs_are_identical_at_packet_level ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/axbi_q_grid.rs (target/debug/deps/axbi_q_grid-56cae8446943e9a2)
+
+running 9 tests
+test grid_rejects_insufficient_support_and_invalid_layout ... ok
+test inject_rejects_changed_background_with_reference_support_outside_grid ... ok
+test injection_at_ref_preserves_owner_source_number_and_first_energy ... ok
+test frozen_gas_ledger_and_geometry_transport ... ok
+test source_parallel_is_bit_identical_per_cell ... ok
+test frozen_reactions_serial_parallel_are_identical_per_cell ... ok
+test repeated_source_injection_has_fixed_allocation_and_no_cohort_growth ... ok
+test source_shear_family_at_z4_is_count_and_energy_conservative ... ok
+test finite_expanding_step_parallel_is_cellwise_reproducible ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/axbi_q_reference.rs (target/debug/deps/axbi_q_reference-728c5ab4247a5777)
+
+running 5 tests
+test crossing_heii_threshold_has_no_freeflight_leakage ... ok
+test frozen_gas_absorption_owns_photons_binding_and_heat_once ... ok
+test q_packet_exact_freeflight_matches_original_characteristic ... ok
+test physical_invalid_inputs_are_rejected ... ok
+test native_md14_source_packets_preserve_photon_count_and_energy ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/axbi_q_support.rs (target/debug/deps/axbi_q_support-7a05a99e54b0481f)
+
+running 6 tests
+test out_of_domain_source_rejects_without_support_mutation ... ok
+test real_md14_new_source_support_is_subcell_clipped ... ok
+test selected_source_epoch_q_intervals_have_common_positive_overlap ... ok
+test two_ages_same_selected_source_have_connected_common_support ... ok
+test support_bounded_absorption_preserves_photon_energy_and_thread_equivalence ... ok
+test actual_two_age_hi_bias_is_closed_by_two_fixed_age_lanes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/axbi_rates.rs (target/debug/deps/axbi_rates-ff2d10e9b8bea0bc)
+
+running 2 tests
+test campaign_binding_retains_strict_domain_and_endpoint_rules ... ok
+test campaign_binding_preserves_cold_and_reheated_point_model ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/axbi_resource_continuation.rs (target/debug/deps/axbi_resource_continuation-080c7426505fe569)
+
+running 3 tests
+test identity_checks_reject_wrong_config_checkpoint_case_terminal_and_source ... ok
+test cumulative_caps_and_output_failure_rollback_keep_charged_costs ... ok
+test exact_resume_matches_uninterrupted_kernel_and_preserves_prefix ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/axbi_signed_resource_continuation.rs (target/debug/deps/axbi_signed_resource_continuation-92739ec11bda1314)
+
+running 6 tests
+test resource_changes_are_checked_and_rhs_ceiling_retained ... ok
+test strict_templates_and_authority_reject_without_output ... ok
+test adaptive_error_preserves_first_tentative_cap_and_charged_state ... ok
+test exact_endpoint_is_required_and_resource_wall_is_carried ... ok
+test cumulative_caps_and_output_failure_rollback_keep_charged_costs ... ok
+test exact_resume_matches_uninterrupted_kernel_and_preserves_prefix ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests/axbi_sources.rs (target/debug/deps/axbi_sources-1963fcf69c877eb3)
+
+running 2 tests
+test continuous_source_has_one_angle_owner_and_exact_units ... ok
+test photon_weights_energy_moments_and_parity_are_controlled ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/axbi_transport_parallel.rs (target/debug/deps/axbi_transport_parallel-4b7de181f43a1c23)
+
+running 6 tests
+test thread_configuration_is_bounded_explicit_and_defaults_to_one ... ok
+test lowest_index_error_is_deterministic_and_pool_survives_failure ... ok
+test persistent_workers_preserve_index_order_and_reuse_fixed_threads ... ok
+test exact_zero_heii_events_and_invalid_input_priority_do_not_depend_on_width ... ok
+test original_scalar_new_serial_and_parallel_prepare_are_bitwise_equal ... ok
+test production_driver_serial_threaded_states_ledgers_and_decisions_match ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.55s
+
+     Running tests/axisym_contract.rs (target/debug/deps/axisym_contract-b6a0c268db8f8312)
+
+running 6 tests
+test invalid_geometry_and_conventions_fail_structurally ... ok
+test pending_contract_is_geometry_only_and_preserves_absence ... ok
+test physical_request_reports_first_missing_typed_prerequisite_without_mutation ... ok
+test populated_metadata_does_not_admit_physical_history ... ok
+test symmetry_and_unknown_provider_state_are_independent ... ok
+test zero_mean_hubble_and_contracting_direction_are_valid ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/axisym_coupling.rs (target/debug/deps/axisym_coupling-5a29264f6c1647b0)
+
+running 1 test
+test scalar_expansion_has_distinct_conservation_owners ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/axisym_radiation.rs (target/debug/deps/axisym_radiation-07cea0f7d12864dd)
+
+running 3 tests
+test collisionless_transport_preserves_packet_number ... ok
+test face_ledger_preserves_representable_cancellation_residual ... ok
+test highest_edge_uses_inside_tie_convention ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/axisym_sources.rs (target/debug/deps/axisym_sources-c614ca8ce2d7c5d3)
+
+running 2 tests
+test one_primary_and_closed_excess ... ok
+test rejects_invalid_or_duplicate_ownership ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/bianchi_i.rs (target/debug/deps/bianchi_i-64cf4ca969d20a5f)
+
+running 6 tests
+test axisymmetric_flrw_limit_and_domain_errors ... ok
+test axisymmetric_proper_time_background_and_exact_rays ... ok
+test differential_r1_and_background ... ok
+test domain_errors ... ok
+test identity_inverse_and_temperature_coordinates ... ok
+test independent_exact_characteristic_points ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/coupled_primary.rs (target/debug/deps/coupled_primary-b7a5b09702d3c1f2)
+
+running 5 tests
+test identity_and_transaction ... ok
+test tiny_positive_photons_are_not_silently_lost ... ok
+test fixed_energy_gate_with_loose_control ... ok
+test zero_photons_and_invalid_stage ... ok
+test positive_energy_and_owners ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/flrw_three_equations.rs (target/debug/deps/flrw_three_equations-df18feb6bc532d49)
+
+running 21 tests
+test case_b_recycling_changes_sink_without_adding_tracked_photons ... ok
+test c_mpc_photo_bridge_is_same_actual_event_count ... ok
+test actual_event_rate_reduces_to_local_fraction_equation ... ok
+test combined_inventory_cancels_actual_absorption ... ok
+test comoving_no_three_h_and_proper_dilution ... ok
+test conditional_sharp_uniform_density_recovers_standard_q_equation ... ok
+test connected_cell_rejects_wrong_domains ... ok
+test correlated_cells_separate_volume_and_mass_averages ... ok
+test edge_energy_not_bin_center_enters_threshold_flux ... ok
+test externally_modified_ensemble_cannot_bypass_finite_domain_gate ... ok
+test ensemble_weight_normalization_and_background_guard ... ok
+test forged_cell_result_cannot_hide_invalid_inputs_in_positive_aggregate ... ok
+test fraction_has_no_expansion_dilution_term ... ok
+test full_filling_defect_needs_external_geometry_derivative ... ok
+test photon_domain_errors_are_explicit ... ok
+test omitting_photon_storage_is_detected ... ok
+test photon_storage_can_grow_without_instantaneous_h_ionization ... ok
+test recombination_average_does_not_factor_into_means ... ok
+test shared_edges_telescope_and_keep_upper_inflow ... ok
+test sharp_density_drift_is_not_silently_omitted ... ok
+test sharp_phase_rejects_missing_closure_and_endpoints ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/forward.rs (target/debug/deps/forward-9f70d4f751b823c3)
+
+running 26 tests
+test error_precedence_and_nonfinite_inputs ... ok
+test finite_projection_totals_and_signed_reconstruction ... ok
+test four_site_calls_do_not_share_state ... ok
+test full_cubic_on_nonuniform_knots_preserves_coefficient_layout ... ok
+test gamma_group_species_have_separate_atomic_accumulations ... ok
+test gamma_has_one_comoving_factor_and_no_table_dependency ... ok
+test gamma_ignores_all_unused_state_and_thermochemistry_fields ... ok
+test high_group_atomic_owners_remain_explicit ... ok
+test isolated_groups_and_no_emissivity ... ok
+test lift_zero_entries_and_signed_decomposition_preserve_locked_totals ... ok
+test minimal_table_and_each_invalid_constructor_branch ... ok
+test opacity_ignores_photon_count_and_thermal_energy ... ok
+test opacity_ownership_and_proper_units ... ok
+test overflow_is_not_silently_renormalized ... ok
+test pchip_knots_interior_and_domain ... ok
+test pchip_uses_right_interval_at_interior_knot ... ok
+test photon_emission_is_affine_and_not_renormalized ... ok
+test redshift_internal_transfer_telescopes ... ok
+test registry_does_not_admit_missing_physical_sources ... ok
+test specified_mass_and_signed_examples ... ok
+test table_errors_propagate_to_opacity_and_photon_rates ... ok
+test transform_finite_invariants_and_nonfinite_contract ... ok
+test transform_is_max_shifted_without_floors ... ok
+test transform_preserves_extreme_classifications_without_floor ... ok
+test transform_uses_rust_binary64_underflow ... ok
+test zero_support_is_function_specific ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/ft03_controlled.rs (target/debug/deps/ft03_controlled-7f400af8d427727e)
+
+running 8 tests
+test all_event_owners_and_energy_rhs ... ok
+test controlled_initial_and_verner_binding ... ok
+test actual_temperature_feedback_and_implicit_residual ... ok
+test guard_refuses_extrapolation ... ok
+test physical_domain_and_helium_zero_boundary ... ok
+test published_fit_and_moment_point_reference ... ok
+test zero_step_and_transactional_reject ... ok
+test finite_nonlinear_controlled_reference_and_refinement ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.26s
+
+     Running tests/ft03_interval.rs (target/debug/deps/ft03_interval-3c1cc8998cc77c7c)
+
+running 3 tests
+test malformed_or_outside_actual_ft03_domain_rejected ... ok
+test actual_scaled_rhs_contains_production_point ... ok
+test full_mixed_hessian_is_symmetric_enclosed ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/he_flrw02_absorption.rs (target/debug/deps/he_flrw02_absorption-6f785de200236ff8)
+
+running 2 tests
+test flrw02_same_comoving_inventories_fixed_energies_not_free_streaming ... ok
+test flrw02_same_proper_state_changes_only_comoving_representation ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/he_rct.rs (target/debug/deps/he_rct-b03caeb4cb071982)
+
+running 24 tests
+test absent_species_policy_is_zero_rct_fraction_derivative ... ok
+test complete_composed_energy_balance_uses_actual_baseline ... ok
+test disabled_default_is_bit_identical_to_actual_baseline ... ok
+test composed_rhs_adds_event_and_energy_but_preserves_old_event_arrays ... ok
+test disabled_has_no_rct_temperature_constraint ... ok
+test event_rate_and_density_normalizations_follow_reactant_pair ... ok
+test exact_source_endpoints_and_seventeen_fold_alternatives ... ok
+test explicit_mean_energy_allows_signed_heat_and_conserves_energy ... ok
+test ft03_disabled_preserves_actual_successor_bit_identity ... ok
+test ft03_gas_legacy_rhs_is_a_wrong_adapter_negative_control ... ok
+test ft03_domain_intersection_accepts_kf96_and_rejects_gm25 ... ok
+test ft03_wrapper_preserves_nonzero_rr_ci_dr_and_adds_only_rct ... ok
+test missing_reactants_produce_no_rct_events ... ok
+test missing_zero_negative_and_nonfinite_photon_moments_are_not_closed ... ok
+test nuclei_and_free_charge_conserved_event_by_event ... ok
+test overflowing_energy_moment_product_is_rejected ... ok
+test overflowing_event_is_rejected ... ok
+test reaction_q_uses_model_thresholds_and_rejects_nonpositive_release ... ok
+test scalar_only_ledger_does_not_claim_energy_closure ... ok
+test source_conflict_ack_is_mandatory ... ok
+test source_metadata_keeps_provenance_and_missing_moments ... ok
+test state_and_model_validation_are_reused ... ok
+test temperature_window_is_strict_without_switch_clamp_or_extrapolation ... ok
+test zero_event_does_not_bypass_selected_source_temperature_domain ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/hhe_events.rs (target/debug/deps/hhe_events-5f1fa1a3b683d3a0)
+
+running 7 tests
+test equation_of_state_charge_and_rhs_energy ... ok
+test malformed_domains_reject ... ok
+test implicit_residual_and_integrated_event_ledger ... ok
+test rejected_candidate_writes_nothing ... ok
+test pure_event_limits_have_expected_owners ... ok
+test zero_duration_identity ... ok
+test pure_h_and_pure_he_density_limits ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/hhe_fixture.rs (target/debug/deps/hhe_fixture-b267d670eb3165cb)
+
+running 1 test
+test finite_mixed_fixture_converges_to_independent_reference ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running tests/homogeneous_rates.rs (target/debug/deps/homogeneous_rates-2d3d8cadf25fab91)
+
+running 3 tests
+test invalid_and_overflow ... ok
+test species_and_energy_owners ... ok
+test zero_opacity_and_quadrature_linearity ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/hydrogen_step.rs (target/debug/deps/hydrogen_step-29db4218b962e970)
+
+running 6 tests
+test identity_zero_time_and_zero_rates ... ok
+test invalid_inputs_and_finite_overflow_reject ... ok
+test ledger_and_semigroup ... ok
+test limiting_cases ... ok
+test separate_channels_and_equilibrium_balance ... ok
+test tiny_depth_retains_creation_from_initially_ionized_gas ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/igm_foundation.rs (target/debug/deps/igm_foundation-e5190fdf627bacda)
+
+running 9 tests
+test adapters_reject_invalid_and_unrepresentable_values ... ok
+test background_normalization_and_geometry ... ok
+test eos_rejects_subnormal_denominator_before_legacy_rounding ... ok
+test limiting_backgrounds_and_zero_helium ... ok
+test gas_boundaries_eos_and_adiabatic_law ... ok
+test photon_units_and_exact_transport ... ok
+test rejects_bad_background_parameters_and_coordinates ... ok
+test rejects_bad_gas_and_extreme_arithmetic ... ok
+test redshift_roundtrips_declared_coordinate_endpoints ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/igm_rates.rs (target/debug/deps/igm_rates-081a425e8924f309)
+
+running 4 tests
+test overlapping_source_values_match_existing_raw_provider ... ok
+test source_low_temperature_branches_are_explicit ... ok
+test temperature_admission_is_separate_and_strict ... ok
+test independent_original_c_parity_all_selected_channels ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/igm_thermal.rs (target/debug/deps/igm_thermal-c93f6cd616c4a4da)
+
+running 11 tests
+test chemistry_charge_and_energy_close_with_external_photo ... ok
+test cmb_absolute_normalization_and_proper_energy_equivalence ... ok
+test cmb_signed_and_low_temperature_source_artifacts_visible ... ok
+test eos_directional_derivative_includes_changing_particles ... ok
+test forged_states_and_nonfinite_photo_inputs_are_rejected ... ok
+test correct_density_powers_and_single_recombination_owners ... ok
+test helium_simplex_boundary_uses_validated_sum_without_clipping ... ok
+test invalid_inputs_fail_without_state_mutation ... ok
+test pure_species_and_no_helium_are_valid ... ok
+test zero_electrons_is_valid_and_only_expands ... ok
+test recovered_eos_temperature_is_strictly_admitted_without_endpoint_projection ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/interval_math.rs (target/debug/deps/interval_math-f193a2b00c0a8b44)
+
+running 5 tests
+test domain_rejections ... ok
+test mixed_partial_product ... ok
+test outward_basics ... ok
+test elementary_limits ... ok
+test nonlinear_chain_and_constants ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/isotope_state.rs (target/debug/deps/isotope_state-06c6fc2b20b1ad17)
+
+running 5 tests
+test eos_rejects_erased_ion_fraction_and_subnormal_denominator ... ok
+test legacy_hhe_bridge_recovers_existing_electron_and_temperature_coordinates ... ok
+test legacy_hhe_is_explicit_si ... ok
+test metadata_and_domain ... ok
+test moments_and_strict_projection ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/joint_affine_bound.rs (target/debug/deps/joint_affine_bound-49825d7ab8574171)
+
+running 7 tests
+test dyadic_grid_reference_stays_inside_rounded_joint_bound ... ok
+test independently_bounded_remainders_are_not_cancelled ... ok
+test multiple_coordinates_cancel_before_parent_width_is_applied ... ok
+test rejects_invalid_identity_shape_domains_and_overflow ... ok
+test shared_parent_cancels_identical_affine_paths_despite_wide_separate_boxes ... ok
+test strict_failure_preserves_absence_of_candidate_state ... ok
+test tiny_nonzero_product_remains_enclosed_when_binary64_underflows ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/joint_parent_affine.rs (target/debug/deps/joint_parent_affine-2ce437d46f423179)
+
+running 5 tests
+test claimed_range_must_enclose_both_shared_parent_endpoints ... ok
+test coincident_maps_cancel_on_shared_parent_despite_independent_box_separation ... ok
+test invalid_parent_identity_and_intervals_fail_closed ... ok
+test nonzero_joint_difference_rejects_strict_gate_without_candidate_state ... ok
+test overflow_and_out_of_domain_exponents_fail_closed ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r112_physical_tail.rs (target/debug/deps/r112_physical_tail-38d719215d986972)
+
+running 1 test
+test tail_has_single_owner_and_no_forced_ionization ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r118c2g_owned_initial.rs (target/debug/deps/r118c2g_owned_initial-b951465771c827bd)
+
+running 2 tests
+test default_initial_census_retained_and_bad_donor_rejected ... ok
+test independent_donor_initial_state_is_explicit_and_conservative ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r118c2h_packet_stage.rs (target/debug/deps/r118c2h_packet_stage-c87da747b8679252)
+
+running 2 tests
+test external_packet_support_and_vacuum_are_physical ... ok
+test external_packet_stage_matches_original_driver_at_identical_point ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r118c2i_recovered.rs (target/debug/deps/r118c2i_recovered-77940a11ccb0902a)
+
+running 1 test
+test original_fixed_q_driver_live_cold_source_has_no_redshift_remap ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r118c2j_error_profile.rs (target/debug/deps/r118c2j_error_profile-7a0fc3fb83c749c7)
+
+running 4 tests
+test exact_frozen_opacity_birth_integral_and_energy_ledger ... ok
+test decomposed_metric_matches_original_and_zero_on_identical_state ... ok
+test flrw_two_ordinate_symmetry_reduction_preserves_physical_moments ... ok
+test nonmonotone_search_never_accepts_an_unchecked_candidate ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/r118c2m_energy_budget.rs (target/debug/deps/r118c2m_energy_budget-ed38451b098afbdf)
+
+running 2 tests
+test reject_invalid_and_unattainably_small_budget ... ok
+test physical_energy_budget_and_original_residual ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r118c2o_covariant_budget.rs (target/debug/deps/r118c2o_covariant_budget-93628a62a2dd1d2a)
+
+running 3 tests
+test impossible_budget_is_transactional ... ok
+test config_and_direct_chemical_budget ... ok
+test mixed_budget_is_bounded_across_fine_paths ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/r118c2p_heii_split.rs (target/debug/deps/r118c2p_heii_split-7af44e092f3bbd21)
+
+running 2 tests
+test threshold_delta_and_monotone_split ... ok
+test exact_source_partition_and_birth_absorption ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r118c2q_split_driver.rs (target/debug/deps/r118c2q_split_driver-addb1e83e6927212)
+
+running 2 tests
+test invalid_split_mode_rejected ... ok
+test split_checkpoint_and_gas_coupling ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/radiation_conservation.rs (target/debug/deps/radiation_conservation-3e0c6fe134a69d9d)
+
+running 4 tests
+test collisionless_number_volume_and_energy_work ... ok
+test guard_ownership_and_positive_histogram ... ok
+test invalid_grid_and_transaction ... ok
+test declared_midpoint_refinement ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/rux_adapter.rs (target/debug/deps/rux_adapter-8018d1bca6f54271)
+
+running 2 tests
+test explicit_density_and_clock_seams ... ok
+test source_and_event_ownership_require_callbacks ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/thomson_history.rs (target/debug/deps/thomson_history-a40bfe0977673f27)
+
+running 5 tests
+test geometry_pulls_direction_from_terminal_and_velocity_can_vary ... ok
+test nonphysical_beta_density_geometry_and_time_fail ... ok
+test boosts_keep_distinct_density_conventions_and_counterpropagation ... ok
+test probability_integrates_to_one_with_transmission_and_preserves_tiny_cells ... ok
+test original_chemistry_driver_exposes_eos_charge_once ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/eval_fixture.rs (target/debug/examples/eval_fixture-c9b11dd23769ede9)
+
+running 5 tests
+test tests::blank_input_produces_no_record ... ok
+test tests::malformed_payload_and_trailing_tokens_are_rejected ... ok
+test tests::malformed_record_does_not_consume_the_next_record ... ok
+test tests::missing_operation_is_a_per_record_error ... ok
+test tests::nonfinite_tokens_reach_the_library_error_branch ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests rei_microphysics
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,5 +1,5 @@
 // Included in axbi_covariant_transport: reuse its exact moment and source owner.
-// Opt-in spectral owner; the coupled DriverState and checkpoint schema are unchanged.
+// Opt-in spectral owner; C2Q uses separate active pools in the coupled driver.
 #[derive(Clone, Debug, PartialEq)]
 pub struct HeiiPools {
     pub below: PhotonState,
@@ -20,7 +20,7 @@ impl CovariantTransport {
             above: self.empty_state(),
         }
     }
-    fn merge_heii_states(
+    pub(crate) fn merge_heii_states(
         &self,
         a: &PhotonState,
         b: &PhotonState,

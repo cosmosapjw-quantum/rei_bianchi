@@ -1,0 +1,49 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:350:18
+    |
+350 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+350 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+350 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+error[E0609]: no field `heii_above` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+ --> tests/r118c2q_split_driver.rs:9:12
+  |
+9 |  assert!(u.heii_above.as_ref().unwrap().number.iter().sum::<f64>()>0.);
+  |            ^^^^^^^^^^ unknown field
+  |
+  = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 14 others
+
+error[E0609]: no field `heii_above` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c2q_split_driver.rs:15:15
+   |
+15 |  assert_eq!(u.heii_above,t.heii_above);
+   |               ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 14 others
+
+error[E0609]: no field `heii_above` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c2q_split_driver.rs:15:28
+   |
+15 |  assert_eq!(u.heii_above,t.heii_above);
+   |                            ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 14 others
+
+error[E0609]: no field `heii_split` on type `rei_microphysics::axbi_covariant_driver::DriverConfig`
+  --> tests/r118c2q_split_driver.rs:18:18
+   |
+18 |  let mut c0=c;c0.heii_split=false;let(d0,_)=Driver::new(c0).unwrap();
+   |                  ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `q_ref`, `same_h`, `end_zbar`, `escape_fraction`, `initial_x_hii` ... and 24 others
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `rei_microphysics` (test "r118c2q_split_driver") due to 4 previous errors

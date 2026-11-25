@@ -3,7 +3,7 @@
 use crate::axbi_background::{
     isotropic_initial_radiation_moments, AxbiBackground, BackgroundFamily, Cosmology,
 };
-use crate::axbi_covariant_transport::{CovariantTransport, PhotonState, PreparedAbsorption};
+use crate::axbi_covariant_transport::{CovariantTransport, PhotonState, PreparedAbsorption, HeiiPools};
 use crate::axbi_parallel::OrderedWorkerPool;
 use crate::axbi_rates::AxbiProvider;
 use crate::axbi_sources::AxbiSource;
@@ -52,6 +52,8 @@ pub struct DriverConfig {
     pub parallel_jacobian_columns: bool,
     /// FLRW-only passive compartment below the HI fit cutoff; explicit variant.
     pub inactive_hi_split: bool,
+    /// Opt-in HeII active subcells; primary arrays are below the edge.
+    pub heii_split: bool,
     /// Opt-in frozen-opacity exact continuous source/absorption subflow.
     pub continuous_birth: bool,
     pub nonmonotone_search: bool,
@@ -92,6 +94,7 @@ impl DriverConfig {
             transport_threads: 1,
             parallel_jacobian_columns: false,
             inactive_hi_split: false,
+            heii_split:false,
             continuous_birth:false,
             nonmonotone_search:false,
             flrw_two_ordinate:false,
@@ -150,6 +153,7 @@ impl DriverConfig {
                 "flrw_two_ordinate" => c.flrw_two_ordinate=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
                 "nonmonotone_search" => c.nonmonotone_search=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
                 "continuous_birth" => c.continuous_birth=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
+                "heii_split" => c.heii_split=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
                 "inactive_hi_split" => {
                     c.inactive_hi_split = match v.trim() {
                         "true" => true,
@@ -198,6 +202,7 @@ impl DriverConfig {
     fn validate(&self) -> Result<(), ForwardError> {
         if (self.flrw_two_ordinate&&self.q_ref!=0.)||(self.nonmonotone_search&&!self.continuous_birth)||self.initial_state_id.is_empty() || self.initial_state_id.len()>160 || !self.initial_state_id.bytes().all(|b| b.is_ascii_alphanumeric() || b==b'_' || b==b'-')
             || ![256, 2048, 4096, 12288].contains(&self.output_budget_mib)
+            || (self.heii_split && (self.q_ref!=0. || !self.continuous_birth || !self.nonmonotone_search))
             || (self.inactive_hi_split && self.q_ref != 0.0)
             || !(1..=64).contains(&self.transport_threads)
             || !(8..=1024).contains(&self.transport_cells)
@@ -258,6 +263,7 @@ pub struct DriverState {
     pub photon_energy_ref: Vec<f64>,
     pub photon_support_lo: Vec<f64>,
     pub photon_support_hi: Vec<f64>,
+    pub heii_above: Option<PhotonState>,
     /// Passive photons retain their original q cell and both moments.
     pub photon_inactive_number: Vec<f64>,
     pub photon_inactive_energy_ref: Vec<f64>,
@@ -275,6 +281,8 @@ pub struct DriverState {
     pub wall_elapsed_s: f64,
 }
 
+#[derive(Clone)]
+struct StageStocks { primary:PhotonState, above:Option<PhotonState> }
 /// Immutable inputs shared by leaf residual evaluations. This context has no
 /// worker-pool handle and cannot submit nested work or mutate the stage state.
 #[derive(Clone)]
@@ -286,13 +294,15 @@ struct ResidualContext {
     cells: usize,
     prepared: Arc<PreparedAbsorption>,
     birth:Option<Arc<PreparedAbsorption>>,
+    prepared_above:Option<Arc<PreparedAbsorption>>,
+    birth_above:Option<Arc<PreparedAbsorption>>,
 }
 impl ResidualContext {
     fn evaluate(
         &self,
         unknown: [f64; 4],
         dt: f64,
-    ) -> Result<([f64; 4], PhotonState, IgmPointRhs), ForwardError> {
+    ) -> Result<([f64; 4], StageStocks, IgmPointRhs), ForwardError> {
         let gas = IgmGasState::new(
             [unknown[0], unknown[1], unknown[2]],
             w_ev_per_h_to_erg(unknown[3])?,
@@ -307,8 +317,14 @@ impl ResidualContext {
         }else{
             self.prepared.evaluate_for_cell_count(self.cells, absorbers, nh, dt)?
         };
-        let stocks = absorption.state;
-        let photo = absorption.photo;
+        let mut photo = absorption.photo;
+        let above=if let Some(p)=&self.prepared_above{
+            let a=if let Some(b)=&self.birth_above{p.evaluate_continuous_birth(b,absorbers,nh,dt)?}
+                else{p.evaluate_for_cell_count(self.cells,absorbers,nh,dt)?};
+            for k in 0..3{photo.gamma_s[k]+=a.photo.gamma_s[k];photo.heat_erg_per_absorber_s[k]+=a.photo.heat_erg_per_absorber_s[k];}
+            Some(a.state)
+        }else{None};
+        let stocks=StageStocks{primary:absorption.state,above};
         let point = AxbiProvider.point(&gas, nh, nhe, 0.0, 2.7255 / self.a, photo)?;
         let mut residual = [0.0; 4];
         for i in 0..3 {
@@ -488,6 +504,7 @@ impl Driver {
             photon_energy_ref: photon_state.energy_ref,
             photon_support_lo: photon_state.support_lo,
             photon_support_hi: photon_state.support_hi,
+            heii_above:if config.heii_split{Some(transport.empty_state())}else{None},
             photon_inactive_number: vec![0.0; transport.cell_count()],
             photon_inactive_energy_ref: vec![0.0; transport.cell_count()],
             ledgers: Ledgers::default(),
@@ -528,6 +545,23 @@ impl Driver {
         state.photon_energy_ref = photons.energy_ref;
         state.photon_support_lo = photons.support_lo;
         state.photon_support_hi = photons.support_hi;
+    }
+    fn validate_heii_mode(&self,s:&DriverState)->Result<(),ForwardError>{
+        if s.heii_above.is_some()!=self.config.heii_split{return Err(err("AXBI_HEII_MODE"))}
+        if let Some(p)=&s.heii_above{self.transport.validate_state(p)?;}
+        Ok(())
+    }
+    fn move_heii_state(&self,s:&mut DriverState,g:&GeometrySnapshot)->Result<(),ForwardError>{
+        self.validate_heii_mode(s)?;
+        if let Some(p)=&s.heii_above{
+            let a=self.transport.move_heii(&HeiiPools{below:self.photon_state(s),above:p.clone()},g)?;
+            Self::set_photon_state(s,a.below);s.heii_above=Some(a.above);
+        }Ok(())
+    }
+    pub fn endpoint_photo(&self,s:&DriverState)->Result<crate::igm_thermal::IgmPhotoInput,ForwardError>{
+        self.validate_heii_mode(s)?;
+        let g=self.background.point_at_scale(s.a)?.geometry()?;let nh=self.n_h0_cm3/s.a.powi(3);
+        if let Some(p)=&s.heii_above{self.transport.heii_endpoint_photo(&HeiiPools{below:self.photon_state(s),above:p.clone()},&g,nh)}else{Ok(self.transport.prepare(&self.photon_state(s),&g)?.evaluate([0.;3],nh,0.)?.photo)}
     }
     fn validate_inactive(
         &self,
@@ -574,9 +608,9 @@ impl Driver {
         geometry: &GeometrySnapshot,
     ) -> Result<[f64; 4], ForwardError> {
         self.validate_inactive(state, geometry)?;
-        let (n, u) = self
-            .transport
-            .inventory(&self.photon_state(state), geometry)?;
+        self.validate_heii_mode(state)?;
+        let (mut n, mut u) = self.transport.inventory(&self.photon_state(state), geometry)?;
+        if let Some(p)=&state.heii_above{let (a,b)=self.transport.inventory(p,geometry)?;n+=a;u+=b;}
         let rays = self.transport.ray_geometry(geometry)?;
         let pn = state.photon_inactive_number.iter().sum::<f64>();
         let pu = state
@@ -642,9 +676,19 @@ impl Driver {
         q: f64,
         count: f64,
     ) -> Result<(), ForwardError> {
-        let mut photons = self.photon_state(state);
-        self.transport.add_delta(&mut photons, ray, q, count)?;
-        Self::set_photon_state(state, photons);
+        self.validate_heii_mode(state)?;
+        if let Some(p)=&state.heii_above{
+            let g=self.background.point_at_scale(state.a)?.geometry()?;
+            let mut delta=self.transport.empty_state();self.transport.add_delta(&mut delta,ray,q,count)?;
+            let d=self.transport.partition_heii(&delta,&g)?;
+            let low=self.transport.merge_heii_states(&self.photon_state(state),&d.below)?;
+            let high=self.transport.merge_heii_states(p,&d.above)?;
+            Self::set_photon_state(state,low);state.heii_above=Some(high);
+        }else{
+            let mut photons = self.photon_state(state);
+            self.transport.add_delta(&mut photons, ray, q, count)?;
+            Self::set_photon_state(state, photons);
+        }
         Ok(())
     }
     fn binding(&self, gas: &IgmGasState) -> f64 {
@@ -716,6 +760,7 @@ impl Driver {
         let g1 = self.background.point_at_scale(to)?.geometry()?;
         let (_, old_u) = self.inventory_with_geometry(s, &g0)?;
         let (_, new_u) = self.inventory_with_geometry(s, &g1)?;
+        self.move_heii_state(s,&g1)?;
         self.partition_inactive(s, &g1)?;
         s.ledgers.photon_work += old_u - new_u;
         let old_w = w_erg_per_h_to_ev(s.gas.w_erg_per_h)?;
@@ -745,7 +790,7 @@ impl Driver {
         unknown: [f64; 4],
         dt: f64,
         counter: &mut usize,
-    ) -> Result<([f64; 4], PhotonState, IgmPointRhs), ForwardError> {
+    ) -> Result<([f64; 4], StageStocks, IgmPointRhs), ForwardError> {
         if *counter >= self.config.max_rhs {
             return Err(err("AXBI_RHS_CAP"));
         }
@@ -772,45 +817,53 @@ impl Driver {
         if !budget.is_finite() || budget<=0. {return Err(err("AXBI_COVARIANT_BUDGET_DOMAIN"));}
         self.chemical_stage_impl(s,dt,counter,None,Some(budget))
     }
-    fn chemical_stage_impl(&self,s:&mut DriverState,dt:f64,counter:&mut usize,birth:Option<PhotonState>,budget:Option<f64>)->Result<(),ForwardError>{
+    fn chemical_stage_impl(&self,s:&mut DriverState,dt:f64,counter:&mut usize,birth:Option<StageStocks>,budget:Option<f64>)->Result<(),ForwardError>{
         if !dt.is_finite() || dt <= 0.0 {
             return Err(err("AXBI_STAGE_DT"));
         }
         let geometry = self.background.point_at_scale(s.a)?.geometry()?;
         let mut old = s.clone();
+        self.move_heii_state(&mut old,&geometry)?;
         self.partition_inactive(&mut old, &geometry)?;
         // Quadrature reconstruction is fixed across the Newton residual/Jacobian
         // evaluations; only trial absorber densities enter backward Euler.
         let prepared = self
             .transport
             .prepare(&self.photon_state(&old), &geometry)?;
-        let birth_number=birth.as_ref().map_or(0.,|p|p.number.iter().sum::<f64>());
+        let birth_number=birth.as_ref().map_or(0.,|p|p.primary.number.iter().sum::<f64>()+p.above.as_ref().map_or(0.,|a|a.number.iter().sum::<f64>()));
+        let prepared_above=old.heii_above.as_ref().map(|p|self.transport.prepare(p,&geometry)).transpose()?.map(Arc::new);
+        let birth_above=birth.as_ref().and_then(|p|p.above.as_ref()).map(|p|self.transport.prepare(p,&geometry)).transpose()?.map(Arc::new);
         // A continuous-birth input is not yet included in the old photon state.
         // Capture its moments before the immutable prepared absorption is made.
-        let birth_u=if budget.is_some(){birth.as_ref().map(|p|p.energy_ref.clone())}else{None};
+        let birth_u=if budget.is_some(){birth.as_ref().map(|p|p.primary.energy_ref.clone())}else{None};
+        let birth_u_above=if budget.is_some(){birth.as_ref().and_then(|p|p.above.as_ref()).map(|p|p.energy_ref.clone())}else{None};
         let rays=if budget.is_some(){Some(self.transport.ray_geometry(&geometry)?)}else{None};
         let ne=self.energies.len();
         let c=HHeModel::controlled_fixture();
         let nh=self.n_h0_cm3/old.a.powi(3);
         let fhe=self.n_he0_cm3/self.n_h0_cm3;
         let old_w=w_erg_per_h_to_ev(old.gas.w_erg_per_h)?;
-        let defect=|x:[f64;4],stocks:&PhotonState,rhs:&IgmPointRhs|->Result<f64,ForwardError>{
+        let defect=|x:[f64;4],stocks:&StageStocks,rhs:&IgmPointRhs|->Result<f64,ForwardError>{
             let rays=rays.as_ref().ok_or(err("AXBI_BUDGET_RAYS"))?;
             let d=std::array::from_fn::<_,3,_>(|i|x[i]-old.gas.fractions[i]);
             let db=c.threshold_ev[0]*d[0]+fhe*(c.threshold_ev[1]*d[1]+(c.threshold_ev[1]+c.threshold_ev[2])*d[2]);
             let mut sum=0_f64;let mut corr=0_f64;
-            for (j,(&a,&b)) in old.photon_energy_ref.iter().zip(&stocks.energy_ref).enumerate(){
+            for (j,(&a,&b)) in old.photon_energy_ref.iter().zip(&stocks.primary.energy_ref).enumerate(){
                 let du=(a-b+birth_u.as_ref().map_or(0.,|u|u[j]))*rays[j/ne].scale;
                 let y=du-corr;let t=sum+y;corr=(t-sum)-y;sum=t;
+                if let (Some(a),Some(b))=(&old.heii_above,&stocks.above){
+                    let du=(a.energy_ref[j]-b.energy_ref[j]+birth_u_above.as_ref().map_or(0.,|u|u[j]))*rays[j/ne].scale;
+                    let y=du-corr;let t=sum+y;corr=(t-sum)-y;sum=t;
+                }
             }
             let dw=w_erg_per_h_to_ev(w_ev_per_h_to_erg(x[3])?)?-old_w;
             f(dw+db-sum+rhs.escape_erg_cm3_s*dt/(nh*c.ev_erg)-rhs.cmb_to_gas_erg_cm3_s*dt/(nh*c.ev_erg))
         };
-        let merit=|x:[f64;4],r:[f64;4],stocks:&PhotonState,rhs:&IgmPointRhs|->Result<f64,ForwardError>{
+        let merit=|x:[f64;4],r:[f64;4],stocks:&StageStocks,rhs:&IgmPointRhs|->Result<f64,ForwardError>{
             let norm=self.norm(r,old_w,x[3]);
             match budget{Some(b)=>f((norm/1e-11).max(defect(x,stocks,rhs)?.abs()/b)),None=>Ok(norm)}
         };
-        let birth=birth.map(|p|self.transport.prepare(&p,&geometry)).transpose()?.map(Arc::new);
+        let birth=birth.map(|p|self.transport.prepare(&p.primary,&geometry)).transpose()?.map(Arc::new);
         let context = ResidualContext {
             gas: old.gas,
             a: old.a,
@@ -819,6 +872,7 @@ impl Driver {
             cells: self.transport.cell_count(),
             prepared: Arc::new(prepared),
             birth,
+            prepared_above,birth_above,
         };
         let mut x = [
             old.gas.fractions[0],
@@ -833,8 +887,8 @@ impl Driver {
             if score <= if budget.is_some(){1.}else{1e-11} {
                 let nh = self.n_h0_cm3 / old.a.powi(3);
                 let c = HHeModel::controlled_fixture();
-                let nold = old.photons.iter().sum::<f64>()+birth_number;
-                let nnew = stocks.number.iter().sum::<f64>();
+                let nold = old.photons.iter().sum::<f64>()+birth_number+old.heii_above.as_ref().map_or(0.,|p|p.number.iter().sum::<f64>());
+                let nnew = stocks.primary.number.iter().sum::<f64>()+stocks.above.as_ref().map_or(0.,|p|p.number.iter().sum::<f64>());
                 let events = rhs.photo_events_cm3_s.map(|e| e * dt / nh);
                 let event_total = events.iter().sum::<f64>();
                 if (nold - nnew - event_total).abs() > 1e-10 * old.ledgers.source_n.max(1.0) {
@@ -842,7 +896,7 @@ impl Driver {
                 }
                 let mut next = old.clone();
                 next.gas = IgmGasState::new([x[0], x[1], x[2]], w_ev_per_h_to_erg(x[3])?)?;
-                Self::set_photon_state(&mut next, stocks);
+                Self::set_photon_state(&mut next, stocks.primary);next.heii_above=stocks.above;
                 next.ledgers.absorbed_n += event_total;
                 for k in 0..3 {
                     next.ledgers.photo_events[k] += events[k];
@@ -915,8 +969,13 @@ impl Driver {
         self.geometry_map(&mut s, mid)?;
         if self.config.continuous_birth{
             let geometry=self.background.point_at_scale(s.a)?.geometry()?;
-            let mut birth=self.transport.empty_state();
-            let emitted=self.transport.inject(&mut birth,&geometry,1./s.a-1.,dt)?;
+            let (birth,emitted)=if self.config.heii_split{
+                let (p,l)=self.transport.inject_heii(&geometry,1./s.a-1.,dt)?;
+                (StageStocks{primary:p.below,above:Some(p.above)},l)
+            }else{
+                let mut p=self.transport.empty_state();let l=self.transport.inject(&mut p,&geometry,1./s.a-1.,dt)?;
+                (StageStocks{primary:p,above:None},l)
+            };
             s.ledgers.source_n+=emitted.added_photons_per_h;s.ledgers.source_u+=emitted.added_energy_ev_per_h;
             self.chemical_stage_impl(&mut s,dt,counter,Some(birth),chemical_budget)?;
         }else{
@@ -942,6 +1001,17 @@ impl Driver {
         AxbiProvider.rates(eos.temperature_k)?;
         let geometry = self.background.point_at_scale(s.a)?.geometry()?;
         self.inventory_with_geometry(s, &geometry)?;
+        // Active support membership is checked at the actual endpoint, not during
+        // inventory evaluation across a geometry change.
+        if let Some(p)=&s.heii_above{
+            let rays=self.transport.ray_geometry(&geometry)?;
+            for j in 0..self.transport.cell_count(){
+                let scale=rays[j/self.energies.len()].scale;
+                let t=54.42;let tol=16.*f64::EPSILON*t;
+                if (s.photons[j]>0.&&s.photon_support_hi[j]*scale>t+tol)
+                    || (p.number[j]>0.&&p.support_lo[j]*scale<t-tol){return Err(err("AXBI_HEII_ENDPOINT_SUPPORT"))}
+            }
+        }
         for &n in &s.photons {
             if f(n)? < 0.0 {
                 return Err(err("AXBI_STOCK_NEGATIVE"));
@@ -982,7 +1052,7 @@ impl Driver {
         {
             return Err(err("AXBI_PHOTON_SHAPE"));
         }
-        let dn = full
+        let mut dn = full
             .photons
             .iter()
             .zip(&half.photons)
@@ -993,6 +1063,10 @@ impl Driver {
             )
             .map(|((a, b), (pa, pb))| (a - b).abs() + (pa - pb).abs())
             .sum::<f64>();
+        self.validate_heii_mode(full)?;self.validate_heii_mode(half)?;
+        if let (Some(a),Some(b))=(&full.heii_above,&half.heii_above){
+            dn+=a.number.iter().zip(&b.number).map(|(a,b)|(a-b).abs()).sum::<f64>();
+        }
         let mut du = 0.0;
         let ne = self.energies.len();
         let rays = self.transport.ray_geometry(&geometry)?;
@@ -1003,6 +1077,7 @@ impl Driver {
                     + (full.photon_inactive_energy_ref[j] - half.photon_inactive_energy_ref[j])
                         .abs())
                     * ray.scale;
+                if let (Some(a),Some(b))=(&full.heii_above,&half.heii_above){du+=(a.energy_ref[j]-b.energy_ref[j]).abs()*ray.scale;}
             }
         }
         let r=ErrorComponents{gas,shape_n:f(dn/n.max(1e-8))?,shape_u:f(du/u.max(1e-8))?,pool_n:0.,pool_u:0.,gamma:[0.;3],heat:[0.;3]};
@@ -1018,14 +1093,12 @@ impl Driver {
     /// established global error bound.
     pub fn error_components(&self,full:&DriverState,half:&DriverState)->Result<ErrorComponents,ForwardError>{
         let mut out=self.shape_components(full,half)?;
-        let g=self.background.point_at_scale(half.a)?.geometry()?;
         let p=self.photon_pool_inventory(full)?;let q=self.photon_pool_inventory(half)?;
         out.pool_n=((p[0]-q[0]).abs()+(p[2]-q[2]).abs())/(q[0]+q[2]).max(1e-8);
         out.pool_u=((p[1]-q[1]).abs()+(p[3]-q[3]).abs())/(q[1]+q[3]).max(1e-8);
         let nh=self.n_h0_cm3/half.a.powi(3);
         let c=HHeModel::controlled_fixture();
-        let a=self.transport.prepare(&self.photon_state(full),&g)?.evaluate([0.;3],nh,0.)?.photo;
-        let b=self.transport.prepare(&self.photon_state(half),&g)?.evaluate([0.;3],nh,0.)?.photo;
+        let a=self.endpoint_photo(full)?;let b=self.endpoint_photo(half)?;
         let floor=c.c_cm_s*nh*1e-17*1e-8;
         for i in 0..3{
             out.gamma[i]=f((a.gamma_s[i]-b.gamma_s[i]).abs()/b.gamma_s[i].abs().max(floor))?;
@@ -1168,7 +1241,7 @@ impl Driver {
             let mu = ray.mu;
             for i in 0..ne {
                 let j = k * ne + i;
-                let u = (s.photon_energy_ref[j] + s.photon_inactive_energy_ref[j]) * ray.scale;
+                let u = (s.photon_energy_ref[j] + s.photon_inactive_energy_ref[j]+s.heii_above.as_ref().map_or(0.,|p|p.energy_ref[j])) * ray.scale;
                 moments[0] += u;
                 moments[1] += u * mu;
                 moments[2] += u * (3.0 * mu * mu - 1.0) / 2.0;
@@ -1311,7 +1384,8 @@ impl Driver {
         self.transport.validate_state(&self.photon_state(s))?;
         let p = self.background.point_at_scale(s.a)?;
         self.validate_inactive(s, &p.geometry()?)?;
-        let text = format!(
+        self.validate_heii_mode(s)?;
+        let mut text = format!(
             "AXBI_CHECKPOINT_V4\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n",
             list(&[
                 s.a,
@@ -1347,6 +1421,10 @@ impl Driver {
             list(&s.photon_inactive_energy_ref),
             list(&[self.initial_energy])
         );
+        if let Some(p)=&s.heii_above{
+            text=text.replacen("AXBI_CHECKPOINT_V4","AXBI_CHECKPOINT_V5",1);
+            for v in [&p.number,&p.energy_ref,&p.support_lo,&p.support_hi]{text.push_str(&list(v));text.push('\n');}
+        }
         Ok(text)
     }
     pub fn save_checkpoint(&self, path: &Path, s: &DriverState) -> Result<(), ForwardError> {
@@ -1371,7 +1449,7 @@ impl Driver {
     pub fn read_checkpoint(&self, path: &Path) -> Result<DriverState, ForwardError> {
         let text = fs::read_to_string(path).map_err(ioerr)?;
         let lines = text.lines().collect::<Vec<_>>();
-        if lines.len() != 11 || lines[0] != "AXBI_CHECKPOINT_V4" {
+        if (self.config.heii_split && (lines.len()!=15 || lines[0]!="AXBI_CHECKPOINT_V5")) || (!self.config.heii_split && (lines.len()!=11 || lines[0]!="AXBI_CHECKPOINT_V4")) {
             return Err(err("AXBI_CHECKPOINT_VERSION"));
         }
         let v = parse_list(lines[1])?;
@@ -1398,6 +1476,7 @@ impl Driver {
         if p.time_s != v[1] || p.b != v[2] || !(1e-10..=0.005).contains(&v[7]) || v[10] < 0.0 {
             return Err(err("AXBI_CHECKPOINT_CLOCK_OR_STEP"));
         }
+        let heii_above=if self.config.heii_split{Some(PhotonState{number:parse_list(lines[11])?,energy_ref:parse_list(lines[12])?,support_lo:parse_list(lines[13])?,support_hi:parse_list(lines[14])?})}else{None};
         let state = DriverState {
             a: v[0],
             gas: IgmGasState::new([v[3], v[4], v[5]], v[6])?,
@@ -1405,6 +1484,7 @@ impl Driver {
             photon_energy_ref,
             photon_support_lo,
             photon_support_hi,
+            heii_above,
             photon_inactive_number,
             photon_inactive_energy_ref,
             ledgers: l,
@@ -1445,17 +1525,7 @@ impl Driver {
         let ne = self.energies.len();
         // Zero-duration backward Euler leaves photons untouched and yields the
         // instantaneous photo rates using actual local energies and supports.
-        let prepared = self.transport.prepare(&self.photon_state(s), &g)?;
-        let gamma = self
-            .transport
-            .evaluate(
-                &prepared,
-                [nh * (1.0 - x), nhe * (1.0 - y - z), nhe * y],
-                nh,
-                0.0,
-            )?
-            .photo
-            .gamma_s;
+        let gamma=self.endpoint_photo(s)?.gamma_s;
         writeln!(
             history,
             "{case},{},{},{},{},{},{},{},{},{x},{y},{z},{nh},{},{},{},{},{},{n},{u},{},{},{},{},{}",
@@ -1502,24 +1572,26 @@ impl Driver {
         )
         .map_err(ioerr)?;
         let rays = self.transport.ray_geometry(&g)?;
+        let primary=self.photon_state(s);
+        let diagnostic=if let Some(p)=&s.heii_above{self.transport.merge_heii_states(&primary,p)?}else{primary};
         for (k, ray) in rays.iter().enumerate() {
             let mu = ray.mu;
             for i in 0..ne {
                 let j = k * ne + i;
-                let stock = s.photons[j] + s.photon_inactive_number[j];
-                let mut lo = s.photon_support_lo[j] * ray.scale;
-                let mut hi = s.photon_support_hi[j] * ray.scale;
+                let stock = diagnostic.number[j] + s.photon_inactive_number[j];
+                let mut lo = diagnostic.support_lo[j] * ray.scale;
+                let mut hi = diagnostic.support_hi[j] * ray.scale;
                 if s.photon_inactive_number[j] > 0.0 {
                     let plo = self.transport.edges()[i] * ray.scale;
                     let phi = (self.transport.edges()[i + 1] * ray.scale).min(13.6);
-                    lo = if s.photons[j] == 0.0 {
+                    lo = if diagnostic.number[j] == 0.0 {
                         plo
                     } else {
                         lo.min(plo)
                     };
                     hi = hi.max(phi);
                 }
-                let energy = (s.photon_energy_ref[j] + s.photon_inactive_energy_ref[j]) * ray.scale;
+                let energy = (diagnostic.energy_ref[j] + s.photon_inactive_energy_ref[j]) * ray.scale;
                 writeln!(
                     spectra,
                     "{case},{},{},{},{},{},{lo},{hi},{mu},{},{stock},{energy}",
