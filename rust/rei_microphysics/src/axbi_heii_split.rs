@@ -73,6 +73,10 @@ impl CovariantTransport {
         p: &PhotonState,
         g: &GeometrySnapshot,
     ) -> Result<HeiiPools, ForwardError> {
+        self.partition_edge(p,g,2)
+    }
+    pub(crate) fn partition_edge(&self,p:&PhotonState,g:&GeometrySnapshot,edge:usize)->Result<HeiiPools,ForwardError>{
+        if edge>=FIT_THRESHOLDS_EV.len(){return Err(bad("AXBI_EDGE_DOMAIN"))}
         self.validate_state(p)?;
         let rays = self.ray_geometry(g)?;
         let mut out = self.empty_heii();
@@ -87,7 +91,7 @@ impl CovariantTransport {
                 continue;
             }
             let r = rays[k / self.n_energy()].scale;
-            let t = FIT_THRESHOLDS_EV[2];
+            let t = FIT_THRESHOLDS_EV[edge];
             let cut = t / r;
             if hi * r < t {
                 add_support(&mut out.below, k, n, u, lo, hi);

@@ -1,0 +1,68 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:366:18
+    |
+366 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+366 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+366 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+error[E0609]: no field `hei_middle` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c2r_multithreshold.rs:13:13
+   |
+13 |  assert!((s.hei_middle.as_ref().unwrap().number.iter().sum::<f64>()-2e-6...
+   |             ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 15 others
+
+error[E0609]: no field `hei_middle` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c2r_multithreshold.rs:23:15
+   |
+23 |  assert_eq!(u.hei_middle,v.hei_middle);assert_eq!(u.heii_above,v.heii_ab...
+   |               ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 15 others
+
+error[E0609]: no field `hei_middle` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c2r_multithreshold.rs:23:28
+   |
+23 |  assert_eq!(u.hei_middle,v.hei_middle);assert_eq!(u.heii_above,v.heii_ab...
+   |                            ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 15 others
+
+error[E0609]: no field `hei_middle` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c2r_multithreshold.rs:25:67
+   |
+25 | ...u.a,v.a);assert_eq!(u.hei_middle,v.hei_middle);assert_eq!(u.gas.fract...
+   |                          ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 15 others
+
+error[E0609]: no field `hei_middle` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c2r_multithreshold.rs:25:80
+   |
+25 | ...rt_eq!(u.hei_middle,v.hei_middle);assert_eq!(u.gas.fractions,v.gas.fr...
+   |                          ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 15 others
+
+error[E0609]: no field `hei_split` on type `rei_microphysics::axbi_covariant_driver::DriverConfig`
+  --> tests/r118c2r_multithreshold.rs:26:18
+   |
+26 |  let mut c0=c;c0.hei_split=false;let(d0,_)=Driver::new(c0).unwrap();asse...
+   |                  ^^^^^^^^^ unknown field
+   |
+help: a field with a similar name exists
+   |
+26 |  let mut c0=c;c0.heii_split=false;let(d0,_)=Driver::new(c0).unwrap();assert!(d0.read_checkpoint(&f).is_err());
+   |                     +
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `rei_microphysics` (test "r118c2r_multithreshold") due to 6 previous errors
