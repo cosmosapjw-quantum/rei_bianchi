@@ -1135,3 +1135,5 @@ impl CovariantTransport {
 include!("axbi_heii_split.rs");
 
 include!("axbi_multithreshold.rs");
+
+include!("axbi_reactive_bands.rs");

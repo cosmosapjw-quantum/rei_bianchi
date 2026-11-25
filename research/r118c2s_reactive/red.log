@@ -1,0 +1,80 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:379:18
+    |
+379 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+379 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+379 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+error[E0609]: no field `hi_below` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c2s_reactive.rs:14:15
+   |
+14 |  assert_eq!(s.hi_below.as_ref().unwrap().number.iter().sum::<f64>(),2e-6);
+   |               ^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 16 others
+
+error[E0609]: no field `hi_below` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c2s_reactive.rs:18:15
+   |
+18 |  assert_eq!(s.hi_below.as_ref().unwrap().number.iter().sum::<f64>(),0.);
+   |               ^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 16 others
+
+error[E0609]: no field `hi_below` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c2s_reactive.rs:23:15
+   |
+23 |  assert_eq!(s.hi_below,t.hi_below);assert_eq!(s.photons,t.photons);
+   |               ^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 16 others
+
+error[E0609]: no field `hi_below` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c2s_reactive.rs:23:26
+   |
+23 |  assert_eq!(s.hi_below,t.hi_below);assert_eq!(s.photons,t.photons);
+   |                          ^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 16 others
+
+error[E0599]: no method named `partition_four` found for reference `&CovariantTransport` in the current scope
+  --> tests/r118c2s_reactive.rs:37:11
+   |
+37 |  let b=tr.partition_four(&p,&refg).unwrap();
+   |           ^^^^^^^^^^^^^^
+   |
+help: there is a method `partition_heii` with a similar name
+   |
+37 -  let b=tr.partition_four(&p,&refg).unwrap();
+37 +  let b=tr.partition_heii(&p,&refg).unwrap();
+   |
+
+error[E0599]: no method named `move_four` found for reference `&CovariantTransport` in the current scope
+  --> tests/r118c2s_reactive.rs:40:11
+   |
+40 |  let v=tr.move_four(&b,&blue).unwrap();assert_eq!(n(&v.below),0.);assert...
+   |           ^^^^^^^^^ method not found in `&CovariantTransport`
+
+error[E0599]: no method named `move_four` found for reference `&CovariantTransport` in the current scope
+  --> tests/r118c2s_reactive.rs:41:11
+   |
+41 |  let w=tr.move_four(&v,&red).unwrap();let x=tr.move_four(&w,&refg).unwra...
+   |           ^^^^^^^^^ method not found in `&CovariantTransport`
+
+error[E0599]: no method named `move_four` found for reference `&CovariantTransport` in the current scope
+  --> tests/r118c2s_reactive.rs:41:48
+   |
+41 | ...let x=tr.move_four(&w,&refg).unwrap();
+   |             ^^^^^^^^^ method not found in `&CovariantTransport`
+
+Some errors have detailed explanations: E0599, E0609.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `rei_microphysics` (test "r118c2s_reactive") due to 8 previous errors
