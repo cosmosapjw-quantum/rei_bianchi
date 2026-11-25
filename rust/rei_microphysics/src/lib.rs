@@ -167,3 +167,5 @@ pub mod axbi_q_closure;
 pub mod axbi_covariant_transport;
 pub mod axbi_parallel;
 pub mod axbi_covariant_driver;
+
+pub mod general_ray;

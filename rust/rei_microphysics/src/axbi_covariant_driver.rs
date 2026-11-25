@@ -56,6 +56,7 @@ pub struct DriverConfig {
     pub heii_split: bool,
     pub hei_split: bool,
     pub reactive_hi: bool,
+    pub reactive_extra_high_cells:usize,
     /// Opt-in frozen-opacity exact continuous source/absorption subflow.
     pub continuous_birth: bool,
     pub nonmonotone_search: bool,
@@ -99,6 +100,7 @@ impl DriverConfig {
             heii_split:false,
             hei_split:false,
             reactive_hi:false,
+            reactive_extra_high_cells:0,
             continuous_birth:false,
             nonmonotone_search:false,
             flrw_two_ordinate:false,
@@ -157,6 +159,7 @@ impl DriverConfig {
                 "flrw_two_ordinate" => c.flrw_two_ordinate=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
                 "nonmonotone_search" => c.nonmonotone_search=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
                 "continuous_birth" => c.continuous_birth=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
+                "reactive_extra_high_cells" => number!(reactive_extra_high_cells),
                 "reactive_hi" => c.reactive_hi=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
                 "hei_split" => c.hei_split=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
                 "heii_split" => c.heii_split=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
@@ -213,6 +216,8 @@ impl DriverConfig {
             || (self.heii_split && ((!self.reactive_hi && self.q_ref!=0.) || !self.continuous_birth || !self.nonmonotone_search))
             || (self.inactive_hi_split && self.q_ref != 0.0)
             || !(1..=64).contains(&self.transport_threads)
+            || self.reactive_extra_high_cells>1024-self.transport_cells.min(1024)
+            || (self.reactive_extra_high_cells>0 && !self.reactive_hi)
             || !(8..=1024).contains(&self.transport_cells)
             || self.spectra_every_accepted == 0
             || !self.q_ref.is_finite()
@@ -503,8 +508,9 @@ impl Driver {
         let qmin=if config.reactive_hi{6.8}else{13.6};
         let transport =
             CovariantTransport::new(&source, reference, config.transport_cells, qmin, 512.0)?
+                .extend_high_cells(config.reactive_extra_high_cells)?
                 .with_threads(config.transport_threads)?;
-        let energies = (0..config.transport_cells)
+        let energies = (0..transport.n_energy())
             .map(|i| {
                 qmin * (512.0_f64 / qmin).powf((i as f64 + 0.5) / config.transport_cells as f64)
             })
@@ -566,6 +572,29 @@ impl Driver {
         state.photon_energy_ref = photons.energy_ref;
         state.photon_support_lo = photons.support_lo;
         state.photon_support_hi = photons.support_hi;
+    }
+    /// Exact axial extrema for the physical-density-fixed LRS branch, up to
+    /// bisection and the existing background quadrature. Directional energy
+    /// scale is between the two axial scales; |s/H| decreases in expansion.
+    pub fn required_source_q_bounds(&self)->Result<[f64;2],ForwardError>{
+        if self.config.same_h{return Err(err("AXBI_SOURCE_ENVELOPE_SAME_H_UNSUPPORTED"))}
+        let a0=1./21.;let a1=1./(1.+self.config.end_zbar);
+        let g0=self.background.point_at_scale(a0)?.geometry()?;
+        let g1=self.background.point_at_scale(a1)?.geometry()?;
+        let mut min:f64=1.;let mut max:f64=1.;
+        for k in 0..3{
+            let r=g0.scale_factors[k]/g1.scale_factors[k];min=min.min(r);max=max.max(r);
+            if g0.hubble_per_s[k]<0. && g1.hubble_per_s[k]>0.{
+                let(mut l,mut h)=(a0,a1);
+                for _ in 0..64{
+                    let m=(l*h).sqrt();if m==l||m==h{break}
+                    if self.background.point_at_scale(m)?.geometry()?.hubble_per_s[k]<0.{l=m}else{h=m}
+                }
+                let g=self.background.point_at_scale((l*h).sqrt())?.geometry()?;
+                max=max.max(g0.scale_factors[k]/g.scale_factors[k]);
+            }
+        }
+        Ok([13.6/max,100./min])
     }
     fn validate_heii_mode(&self,s:&DriverState)->Result<(),ForwardError>{
         if s.heii_above.is_some()!=self.config.heii_split{return Err(err("AXBI_HEII_MODE"))}

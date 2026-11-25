@@ -374,6 +374,18 @@ impl CovariantTransport {
     pub(crate) fn shared_pool(&self) -> Arc<OrderedWorkerPool> {
         Arc::clone(&self.prepare_pool)
     }
+    /// Append high cells without changing any existing edge bits.
+    pub fn extend_high_cells(mut self,extra:usize)->Result<Self,ForwardError>{
+        let n=self.n_energy();
+        if n+extra>1024{return Err(bad("AXBI_COVARIANT_GRID_RESOLUTION"))}
+        let ratio=(self.edges[n]/self.edges[0]).ln()/n as f64;
+        let top=self.edges[n];
+        for k in 1..=extra{let q=top*(ratio*k as f64).exp();
+            if !q.is_finite()||q>50000.||q<=*self.edges.last().unwrap(){return Err(bad("AXBI_COVARIANT_GRID_DOMAIN"))}
+            self.edges.push(q);
+        }
+        Ok(self)
+    }
     pub fn n_energy(&self) -> usize {
         self.edges.len() - 1
     }
