@@ -1208,6 +1208,7 @@ pub fn compiled_identity() -> String {
     [
         include_str!("axbi_covariant_driver.rs"),
         include_str!("axbi_covariant_transport.rs"),
+        include_str!("axbi_heii_split.rs"),
         include_str!("axbi_parallel.rs"),
         include_str!("../../../research/flrw_jacobian_columns_20261016/CONTRACT.json"),
         include_str!("axbi_q_closure.rs"),

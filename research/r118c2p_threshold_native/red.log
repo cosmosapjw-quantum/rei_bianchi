@@ -1,0 +1,101 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:350:18
+    |
+350 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+350 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+350 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+error[E0599]: no method named `partition_heii` found for struct `CovariantTransport` in the current scope
+  --> tests/r118c2p_heii_split.rs:10:10
+   |
+10 |  let s=c.partition_heii(&p,&g(0.05)).unwrap();
+   |          ^^^^^^^^^^^^^^
+   |
+help: there is a method `partition_below_hi` with a similar name
+   |
+10 -  let s=c.partition_heii(&p,&g(0.05)).unwrap();
+10 +  let s=c.partition_below_hi(&p,&g(0.05)).unwrap();
+   |
+
+error[E0599]: no method named `move_heii` found for struct `CovariantTransport` in the current scope
+  --> tests/r118c2p_heii_split.rs:12:10
+   |
+12 |  let m=c.move_heii(&s,&g(0.06)).unwrap();
+   |          ^^^^^^^^^ method not found in `CovariantTransport`
+
+error[E0599]: no method named `partition_heii` found for struct `CovariantTransport` in the current scope
+  --> tests/r118c2p_heii_split.rs:15:10
+   |
+15 |  let s=c.partition_heii(&p,&g(0.05)).unwrap();
+   |          ^^^^^^^^^^^^^^
+   |
+help: there is a method `partition_below_hi` with a similar name
+   |
+15 -  let s=c.partition_heii(&p,&g(0.05)).unwrap();
+15 +  let s=c.partition_below_hi(&p,&g(0.05)).unwrap();
+   |
+
+error[E0599]: no method named `move_heii` found for struct `CovariantTransport` in the current scope
+  --> tests/r118c2p_heii_split.rs:17:11
+   |
+17 |  let s2=c.move_heii(&s,&g(0.06)).unwrap();
+   |           ^^^^^^^^^ method not found in `CovariantTransport`
+
+error[E0599]: no method named `inject_heii` found for struct `CovariantTransport` in the current scope
+   --> tests/r118c2p_heii_split.rs:26:14
+    |
+ 26 |  let (s,v)=c.inject_heii(&gg,11.5,1e13).unwrap();
+    |              ^^^^^^^^^^^
+    |
+help: there is a method `inject` with a similar name, but with different arguments
+   --> src/axbi_covariant_transport.rs:530:5
+    |
+530 | /     pub fn inject(
+531 | |         &self,
+532 | |         state: &mut PhotonState,
+533 | |         now: &GeometrySnapshot,
+534 | |         zbar: f64,
+535 | |         dt_s: f64,
+536 | |     ) -> Result<SourceLedger, ForwardError> {
+    | |___________________________________________^
+
+error[E0599]: no method named `advance_heii` found for struct `CovariantTransport` in the current scope
+  --> tests/r118c2p_heii_split.rs:30:10
+   |
+30 |  let a=c.advance_heii(&c.partition_heii(&c.empty_state(),&gg).unwrap(),&...
+   |          ^^^^^^^^^^^^ method not found in `CovariantTransport`
+
+error[E0599]: no method named `partition_heii` found for struct `CovariantTransport` in the current scope
+  --> tests/r118c2p_heii_split.rs:30:26
+   |
+30 |  let a=c.advance_heii(&c.partition_heii(&c.empty_state(),&gg).unwrap(),&...
+   |                          ^^^^^^^^^^^^^^
+   |
+help: there is a method `partition_below_hi` with a similar name
+   |
+30 -  let a=c.advance_heii(&c.partition_heii(&c.empty_state(),&gg).unwrap(),&s,&gg,[1e-5,1e-6,1e-7],1e-4,1e13).unwrap();
+30 +  let a=c.advance_heii(&c.partition_below_hi(&c.empty_state(),&gg).unwrap(),&s,&gg,[1e-5,1e-6,1e-7],1e-4,1e13).unwrap();
+   |
+
+error[E0599]: no method named `heii_inventory` found for struct `CovariantTransport` in the current scope
+  --> tests/r118c2p_heii_split.rs:31:14
+   |
+31 |  let (n,w)=c.heii_inventory(&a.state,&gg).unwrap();
+   |              ^^^^^^^^^^^^^^
+   |
+help: there is a method `inventory` with a similar name
+   |
+31 -  let (n,w)=c.heii_inventory(&a.state,&gg).unwrap();
+31 +  let (n,w)=c.inventory(&a.state,&gg).unwrap();
+   |
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `rei_microphysics` (test "r118c2p_heii_split") due to 8 previous errors
