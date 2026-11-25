@@ -1,0 +1,42 @@
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:334:18
+    |
+334 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+334 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+334 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+error[E0599]: no method named `tentative_energy_budget` found for struct `rei_microphysics::axbi_covariant_driver::Driver` in the current scope
+  --> tests/r118c2o_covariant_budget.rs:50:16
+   |
+50 |         sum+=d.tentative_energy_budget(l,m).unwrap().unwrap();
+   |                ^^^^^^^^^^^^^^^^^^^^^^^ method not found in `rei_microphysics::axbi_covariant_driver::Driver`
+
+error[E0599]: no method named `tentative_energy_budget` found for struct `rei_microphysics::axbi_covariant_driver::Driver` in the current scope
+  --> tests/r118c2o_covariant_budget.rs:51:16
+   |
+51 |         sum+=d.tentative_energy_budget(m,r).unwrap().unwrap();
+   |                ^^^^^^^^^^^^^^^^^^^^^^^ method not found in `rei_microphysics::axbi_covariant_driver::Driver`
+
+error[E0689]: can't call method `abs` on ambiguous numeric type `{float}`
+  --> tests/r118c2o_covariant_budget.rs:53:27
+   |
+53 |     assert!((sum/1e-8-1.).abs()<3e-11);
+   |                           ^^^
+
+error[E0599]: no method named `tentative_energy_budget` found for struct `rei_microphysics::axbi_covariant_driver::Driver` in the current scope
+  --> tests/r118c2o_covariant_budget.rs:54:15
+   |
+54 |     assert!(d.tentative_energy_budget(a,a*(1.+1e-10)).unwrap().unwrap()>...
+   |               ^^^^^^^^^^^^^^^^^^^^^^^ method not found in `rei_microphysics::axbi_covariant_driver::Driver`
+
+Some errors have detailed explanations: E0599, E0689.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `rei_microphysics` (test "r118c2o_covariant_budget") due to 4 previous errors

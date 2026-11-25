@@ -1,0 +1,28 @@
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:350:18
+    |
+350 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+350 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+350 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+warning: value assigned to `s` is never read
+   --> examples/axbi_c2o_budget_late.rs:112:13
+    |
+112 |     let (d, mut s) = Driver::new(config)?;
+    |             ^^^^^ this value is reassigned later and never used
+...
+117 |     s=d.read_checkpoint(old)?;
+    |     - `s` is overwritten here before the previous value is read
+    |
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: `rei_microphysics` (example "axbi_c2o_budget_late") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 4.77s

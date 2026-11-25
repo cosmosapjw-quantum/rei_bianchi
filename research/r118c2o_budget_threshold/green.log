@@ -1,0 +1,46 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:334:18
+    |
+334 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+334 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+334 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/axbi_covariant_driver.rs (target/debug/deps/axbi_covariant_driver-750050129bba7739)
+
+running 7 tests
+test number_only_mutation_is_rejected_instead_of_inventing_spectrum ... ok
+test transport_resolution_is_separate_and_be_stage_has_one_event_owner ... ok
+test output_support_and_moments_use_local_energy ... ok
+test checkpoint_v4_roundtrips_all_arrays_and_rejects_projected_v2 ... ok
+test actual_run_resume_rejects_changed_config_and_source_before_stepping ... ok
+test reference_moments_do_not_remap_and_work_uses_actual_energy ... ok
+test repeated_transport_cannot_create_heii_photo_events_below_threshold ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/r118c2o_covariant_budget.rs (target/debug/deps/r118c2o_covariant_budget-93628a62a2dd1d2a)
+
+running 2 tests
+dt=1e4, legacy=0e0, budget=0e0, RHS 7/7
+dt=1e5, legacy=1.7763568394002505e-15, budget=1.7763568394002505e-15, RHS 7/7
+test impossible_budget_is_transactional ... ok
+dt=1e6, legacy=6.217248937900877e-15, budget=6.217248937900877e-15, RHS 7/7
+dt=1e7, legacy=7.194245199571014e-14, budget=0e0, RHS 7/13
+dt=1e8, legacy=8.055778266680136e-13, budget=8.881784197001252e-16, RHS 7/13
+dt=1e9, legacy=8.881784197001252e-16, budget=8.881784197001252e-16, RHS 13/13
+dt=1e10, legacy=0e0, budget=0e0, RHS 13/13
+dt=1e11, legacy=4.440892098500626e-15, budget=4.440892098500626e-15, RHS 13/13
+dt=1e12, legacy=3.6415315207705135e-14, budget=3.6415315207705135e-14, RHS 13/13
+test config_and_direct_chemical_budget ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

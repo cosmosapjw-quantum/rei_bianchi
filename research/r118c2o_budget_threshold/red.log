@@ -1,0 +1,60 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:328:18
+    |
+328 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+328 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+328 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+error[E0599]: no method named `chemical_stage_budgeted` found for struct `rei_microphysics::axbi_covariant_driver::Driver` in the current scope
+   --> tests/r118c2o_covariant_budget.rs:15:11
+    |
+ 15 |         d.chemical_stage_budgeted(&mut new,dt,&mut m,2e-14).unwrap();
+    |           ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a method `chemical_stage` with a similar name, but with different arguments
+   --> src/axbi_covariant_driver.rs:740:5
+    |
+740 | /     pub fn chemical_stage(
+741 | |         &self,
+742 | |         s: &mut DriverState,
+743 | |         dt: f64,
+744 | |         counter: &mut usize,
+745 | |     ) -> Result<(), ForwardError> {
+    | |_________________________________^
+
+error[E0609]: no field `energy_budget_ev_per_h` on type `rei_microphysics::axbi_covariant_driver::DriverConfig`
+  --> tests/r118c2o_covariant_budget.rs:24:75
+   |
+24 | ...1e-8").unwrap().energy_budget_ev_per_h,1e-8);
+   |                    ^^^^^^^^^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `q_ref`, `same_h`, `end_zbar`, `escape_fraction`, `initial_x_hii` ... and 20 others
+
+error[E0599]: no method named `chemical_stage_budgeted` found for struct `rei_microphysics::axbi_covariant_driver::Driver` in the current scope
+   --> tests/r118c2o_covariant_budget.rs:31:15
+    |
+ 31 |     assert!(d.chemical_stage_budgeted(&mut s,1e9,&mut count,1e-40).is_e...
+    |               ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a method `chemical_stage` with a similar name, but with different arguments
+   --> src/axbi_covariant_driver.rs:740:5
+    |
+740 | /     pub fn chemical_stage(
+741 | |         &self,
+742 | |         s: &mut DriverState,
+743 | |         dt: f64,
+744 | |         counter: &mut usize,
+745 | |     ) -> Result<(), ForwardError> {
+    | |_________________________________^
+
+Some errors have detailed explanations: E0599, E0609.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `rei_microphysics` (test "r118c2o_covariant_budget") due to 3 previous errors

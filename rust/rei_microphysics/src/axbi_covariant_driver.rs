@@ -59,6 +59,13 @@ pub struct DriverConfig {
     pub n_mu: usize,
     pub background_panels: usize,
     pub local_target: f64,
+    /// Optional absolute whole-interval budget in eV/H; zero keeps legacy.
+    pub energy_budget_ev_per_h: f64,
+    /// Fraction assigned by the immutable accepted-step cap (two retained halves).
+    pub energy_budget_count_fraction: f64,
+    pub energy_budget_count_cap: usize,
+    /// Reserve the remaining portion for nonchemical ledger roundoff.
+    pub energy_budget_chemical_fraction: f64,
     pub initial_dln_a: f64,
     pub max_steps: usize,
     pub max_attempts: usize,
@@ -91,6 +98,10 @@ impl DriverConfig {
             n_mu: 8,
             background_panels: 4096,
             local_target: 1e-5,
+            energy_budget_ev_per_h: 0.,
+            energy_budget_count_fraction: 0.,
+            energy_budget_count_cap: 0,
+            energy_budget_chemical_fraction: 1.,
             initial_dln_a: 1e-4,
             max_steps: 10000,
             max_attempts: 30000,
@@ -149,6 +160,10 @@ impl DriverConfig {
                 "n_mu" => number!(n_mu),
                 "background_panels" => number!(background_panels),
                 "local_target" => number!(local_target),
+                "energy_budget_ev_per_h" => number!(energy_budget_ev_per_h),
+                "energy_budget_count_fraction" => number!(energy_budget_count_fraction),
+                "energy_budget_count_cap" => number!(energy_budget_count_cap),
+                "energy_budget_chemical_fraction" => number!(energy_budget_chemical_fraction),
                 "initial_dln_a" => number!(initial_dln_a),
                 "max_steps" => number!(max_steps),
                 "max_attempts" => number!(max_attempts),
@@ -192,6 +207,13 @@ impl DriverConfig {
             || !(4.0..20.0).contains(&self.end_zbar)
             || !self.initial_x_hii.is_finite()
             || !(0.0..=1.0).contains(&self.initial_x_hii)
+            || !self.energy_budget_ev_per_h.is_finite()
+            || !(0.0..=1e-8).contains(&self.energy_budget_ev_per_h)
+            || !self.energy_budget_count_fraction.is_finite()
+            || !(0.0..=1.).contains(&self.energy_budget_count_fraction)
+            || (self.energy_budget_count_fraction>0. && (self.energy_budget_count_cap==0 || self.max_steps>self.energy_budget_count_cap))
+            || !self.energy_budget_chemical_fraction.is_finite()
+            || !(0.<self.energy_budget_chemical_fraction && self.energy_budget_chemical_fraction<=1.)
             || !self.local_target.is_finite()
             || self.local_target <= 0.0
             || self.local_target >= 2e-4
@@ -743,9 +765,14 @@ impl Driver {
         dt: f64,
         counter: &mut usize,
     ) -> Result<(), ForwardError> {
-        self.chemical_stage_impl(s,dt,counter,None)
+        self.chemical_stage_impl(s,dt,counter,None,None)
     }
-    fn chemical_stage_impl(&self,s:&mut DriverState,dt:f64,counter:&mut usize,birth:Option<PhotonState>)->Result<(),ForwardError>{
+    /// Explicit isolated stage budget; rejected candidates do not mutate state.
+    pub fn chemical_stage_budgeted(&self,s:&mut DriverState,dt:f64,counter:&mut usize,budget:f64)->Result<(),ForwardError>{
+        if !budget.is_finite() || budget<=0. {return Err(err("AXBI_COVARIANT_BUDGET_DOMAIN"));}
+        self.chemical_stage_impl(s,dt,counter,None,Some(budget))
+    }
+    fn chemical_stage_impl(&self,s:&mut DriverState,dt:f64,counter:&mut usize,birth:Option<PhotonState>,budget:Option<f64>)->Result<(),ForwardError>{
         if !dt.is_finite() || dt <= 0.0 {
             return Err(err("AXBI_STAGE_DT"));
         }
@@ -758,6 +785,31 @@ impl Driver {
             .transport
             .prepare(&self.photon_state(&old), &geometry)?;
         let birth_number=birth.as_ref().map_or(0.,|p|p.number.iter().sum::<f64>());
+        // A continuous-birth input is not yet included in the old photon state.
+        // Capture its moments before the immutable prepared absorption is made.
+        let birth_u=if budget.is_some(){birth.as_ref().map(|p|p.energy_ref.clone())}else{None};
+        let rays=if budget.is_some(){Some(self.transport.ray_geometry(&geometry)?)}else{None};
+        let ne=self.energies.len();
+        let c=HHeModel::controlled_fixture();
+        let nh=self.n_h0_cm3/old.a.powi(3);
+        let fhe=self.n_he0_cm3/self.n_h0_cm3;
+        let old_w=w_erg_per_h_to_ev(old.gas.w_erg_per_h)?;
+        let defect=|x:[f64;4],stocks:&PhotonState,rhs:&IgmPointRhs|->Result<f64,ForwardError>{
+            let rays=rays.as_ref().ok_or(err("AXBI_BUDGET_RAYS"))?;
+            let d=std::array::from_fn::<_,3,_>(|i|x[i]-old.gas.fractions[i]);
+            let db=c.threshold_ev[0]*d[0]+fhe*(c.threshold_ev[1]*d[1]+(c.threshold_ev[1]+c.threshold_ev[2])*d[2]);
+            let mut sum=0_f64;let mut corr=0_f64;
+            for (j,(&a,&b)) in old.photon_energy_ref.iter().zip(&stocks.energy_ref).enumerate(){
+                let du=(a-b+birth_u.as_ref().map_or(0.,|u|u[j]))*rays[j/ne].scale;
+                let y=du-corr;let t=sum+y;corr=(t-sum)-y;sum=t;
+            }
+            let dw=w_erg_per_h_to_ev(w_ev_per_h_to_erg(x[3])?)?-old_w;
+            f(dw+db-sum+rhs.escape_erg_cm3_s*dt/(nh*c.ev_erg)-rhs.cmb_to_gas_erg_cm3_s*dt/(nh*c.ev_erg))
+        };
+        let merit=|x:[f64;4],r:[f64;4],stocks:&PhotonState,rhs:&IgmPointRhs|->Result<f64,ForwardError>{
+            let norm=self.norm(r,old_w,x[3]);
+            match budget{Some(b)=>f((norm/1e-11).max(defect(x,stocks,rhs)?.abs()/b)),None=>Ok(norm)}
+        };
         let birth=birth.map(|p|self.transport.prepare(&p,&geometry)).transpose()?.map(Arc::new);
         let context = ResidualContext {
             gas: old.gas,
@@ -768,7 +820,6 @@ impl Driver {
             prepared: Arc::new(prepared),
             birth,
         };
-        let old_w = w_erg_per_h_to_ev(old.gas.w_erg_per_h)?;
         let mut x = [
             old.gas.fractions[0],
             old.gas.fractions[1],
@@ -778,7 +829,8 @@ impl Driver {
         for _ in 0..50 {
             let (residual, stocks, rhs) = self.evaluate(&context, x, dt, counter)?;
             let norm = self.norm(residual, old_w, x[3]);
-            if norm <= 1e-11 {
+            let score=merit(x,residual,&stocks,&rhs)?;
+            if score <= if budget.is_some(){1.}else{1e-11} {
                 let nh = self.n_h0_cm3 / old.a.powi(3);
                 let c = HHeModel::controlled_fixture();
                 let nold = old.photons.iter().sum::<f64>()+birth_number;
@@ -824,8 +876,8 @@ impl Driver {
             let mut accepted = None;
             for _ in 0..40 {
                 let trial = std::array::from_fn(|i| x[i] + alpha * direction[i]);
-                if let Ok((r, _, _)) = self.evaluate(&context, trial, dt, counter) {
-                    if self.norm(r, old_w, trial[3]) < norm {
+                if let Ok((r, stocks, rhs)) = self.evaluate(&context, trial, dt, counter) {
+                    if merit(trial,r,&stocks,&rhs).is_ok_and(|m|m<score) {
                         accepted = Some(trial);
                         break;
                     }
@@ -836,6 +888,19 @@ impl Driver {
         }
         Err(err("AXBI_NEWTON_ITERATIONS"))
     }
+    /// Bound for one tentative submap. Only the two fine halves are retained.
+    /// The count reserve cannot grow when an execution cap is extended.
+    pub fn tentative_energy_budget(&self,from:f64,to:f64)->Result<Option<f64>,ForwardError>{
+        if self.config.energy_budget_ev_per_h==0.{return Ok(None)}
+        if !from.is_finite()||!to.is_finite()||from<=0.||to<=from{return Err(err("AXBI_COVARIANT_BUDGET_DOMAIN"))}
+        let span=(21./(1.+self.config.end_zbar)).ln();
+        let frac=self.config.energy_budget_count_fraction;
+        let width=(1.-frac)*((to-from)/from).ln_1p()/span;
+        let count=if frac>0.{frac/(2.*self.config.energy_budget_count_cap as f64)}else{0.};
+        let b=self.config.energy_budget_ev_per_h*(width+count);
+        if !b.is_finite()||b<=0.{return Err(err("AXBI_COVARIANT_BUDGET_DOMAIN"))}
+        Ok(Some(b))
+    }
     fn tentative(
         &self,
         old: &DriverState,
@@ -845,21 +910,24 @@ impl Driver {
         let mut s = old.clone();
         let mid = (old.a * to).sqrt();
         let dt = self.background.interval_increment(old.a, to)?.proper_time_s;
+        let budget=self.tentative_energy_budget(old.a,to)?;
+        let chemical_budget=budget.map(|b|b*self.config.energy_budget_chemical_fraction);
         self.geometry_map(&mut s, mid)?;
         if self.config.continuous_birth{
             let geometry=self.background.point_at_scale(s.a)?.geometry()?;
             let mut birth=self.transport.empty_state();
             let emitted=self.transport.inject(&mut birth,&geometry,1./s.a-1.,dt)?;
             s.ledgers.source_n+=emitted.added_photons_per_h;s.ledgers.source_u+=emitted.added_energy_ev_per_h;
-            self.chemical_stage_impl(&mut s,dt,counter,Some(birth))?;
+            self.chemical_stage_impl(&mut s,dt,counter,Some(birth),chemical_budget)?;
         }else{
             self.inject(&mut s, dt)?;
-            self.chemical_stage(&mut s, dt, counter)?;
+            self.chemical_stage_impl(&mut s,dt,counter,None,chemical_budget)?;
         }
         self.geometry_map(&mut s, to)?;
         self.validate(&s, 1e-8)?;
         let (n0, u0) = self.residuals(old)?;
         let (n1, u1) = self.residuals(&s)?;
+        if budget.is_some_and(|b|(u1-u0).abs()>b){return Err(err("AXBI_COVARIANT_TENTATIVE_BUDGET"));}
         if (n1 - n0).abs() > 1e-10 * s.ledgers.source_n.max(1.0)
             || (u1 - u0).abs() > 1e-10 * s.ledgers.source_u.max(1.0)
         {
