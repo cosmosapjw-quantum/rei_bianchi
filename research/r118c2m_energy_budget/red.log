@@ -1,0 +1,29 @@
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:328:18
+    |
+328 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+328 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+328 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+error[E0432]: unresolved import `rei_microphysics::axbi_driver::packet_chemistry_stage_budgeted`
+ --> tests/r118c2m_energy_budget.rs:2:43
+  |
+2 | ...emistry_stage, packet_chemistry_stage_budgeted, PacketStageInput},
+  |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `packet_chemistry_stage_budgeted` in `axbi_driver`
+  |
+help: a similar name exists in the module
+  |
+2 -     axbi_driver::{packet_chemistry_stage, packet_chemistry_stage_budgeted, PacketStageInput},
+2 +     axbi_driver::{packet_chemistry_stage, packet_chemistry_stage, PacketStageInput},
+  |
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `rei_microphysics` (test "r118c2m_energy_budget") due to 1 previous error
