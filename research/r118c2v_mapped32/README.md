@@ -1,0 +1,7 @@
+# R118-C2V REI research return
+
+Parent 7d81bd20dedbc1efcef5e411f0dc991340ef9b46. Fresh mapped32 z20 to z4: 25737 accepted steps. Three 300-s bounded segments, then one explicit supplementary segment capped at 180 s (actual 69.56 s). The generic config wall field was 900 s; the segmented runner checks its explicit per-segment cap. Supplemental decision recorded in SUPPLEMENT.md. No physical tolerance, count cap, source identity, or state migration was changed. Total segment wall 969.61 s.
+
+RESULTS.json preserves all raw paths and identities, same-source handoff checks, full accepted-row gates, independent terminal four-pool moments and prior mapped16 comparison. Terminal J2 relative shift -6.7857e-4; common-grid peak-normalized maximum 6.7903e-4. Compared with C2U frozen-gas J2=1.0695956346584523 eV/H, terminal mapped32 differs by about 9.805e-5 relative. General sphere adapter built and tested separately (GENERAL_ANGULAR.csv). Full Rust suite 342 passed. The adapter does not drive the coupled LRS calculation and does not constitute general coframe gas coupling.
+
+Reproduce: use BINARY.sha256 exact C2U executable with map32.cfg and checkpoint chain, raw output identities in RESULTS.json. Run audit.py from repository root with existing original raw files; it rechecks the chain and preserves compressed checkpoint/config/source receipts. Native angle example command and inputs in angle_run.log and ANGLE_INPUT.sha256. No production promotion or dependency pin changes. Native subagent unavailable.

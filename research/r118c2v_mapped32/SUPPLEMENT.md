@@ -1,0 +1,1 @@
+Ruling: one supplemental 180-second segment for endpoint completion after new 900s campaign; same exact source/config/checkpoint, original step/attempt/RHS/energy caps unchanged. Generic max_wall_s field remains 900; segmented runner uses explicit per-segment wall cap. Total campaign actual wall reported.
