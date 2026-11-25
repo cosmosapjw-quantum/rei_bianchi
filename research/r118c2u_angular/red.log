@@ -1,0 +1,36 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:389:18
+    |
+389 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+389 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+389 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r118c2u_mapped_angle.rs (target/debug/deps/r118c2u_mapped_angle-a63bf71b17a51703)
+
+running 1 test
+test mapped_fixed_reference_angles_reduce_false_birth_quadrupole ... FAILED
+
+failures:
+
+---- mapped_fixed_reference_angles_reduce_false_birth_quadrupole stdout ----
+
+thread 'mapped_fixed_reference_angles_reduce_false_birth_quadrupole' (2563138) panicked at tests/r118c2u_mapped_angle.rs:6:86:
+called `Result::unwrap()` on an `Err` value: InvalidInput("AXBI_CONFIG_KEY")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    mapped_fixed_reference_angles_reduce_false_birth_quadrupole
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test r118c2u_mapped_angle`

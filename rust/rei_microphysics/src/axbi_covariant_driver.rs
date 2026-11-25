@@ -62,6 +62,8 @@ pub struct DriverConfig {
     pub nonmonotone_search: bool,
     pub flrw_two_ordinate:bool,
     pub n_mu: usize,
+    /// Fixed positive reference-angle quadrature map (1 = legacy Gauss).
+    pub angular_map_ratio:f64,
     pub background_panels: usize,
     pub local_target: f64,
     /// Optional absolute whole-interval budget in eV/H; zero keeps legacy.
@@ -105,6 +107,7 @@ impl DriverConfig {
             nonmonotone_search:false,
             flrw_two_ordinate:false,
             n_mu: 8,
+            angular_map_ratio:1.,
             background_panels: 4096,
             local_target: 1e-5,
             energy_budget_ev_per_h: 0.,
@@ -171,6 +174,7 @@ impl DriverConfig {
                     }
                 }
                 "n_mu" => number!(n_mu),
+                "angular_map_ratio" => number!(angular_map_ratio),
                 "background_panels" => number!(background_panels),
                 "local_target" => number!(local_target),
                 "energy_budget_ev_per_h" => number!(energy_budget_ev_per_h),
@@ -214,6 +218,8 @@ impl DriverConfig {
             || (self.reactive_hi && (!self.hei_split || !self.heii_split || self.inactive_hi_split))
             || (self.hei_split && (!self.heii_split || (!self.inactive_hi_split && !self.reactive_hi)))
             || (self.heii_split && ((!self.reactive_hi && self.q_ref!=0.) || !self.continuous_birth || !self.nonmonotone_search))
+            || !self.angular_map_ratio.is_finite() || !(0.25..=4.).contains(&self.angular_map_ratio)
+            || (self.angular_map_ratio!=1. && (!self.reactive_hi || self.flrw_two_ordinate))
             || (self.inactive_hi_split && self.q_ref != 0.0)
             || !(1..=64).contains(&self.transport_threads)
             || self.reactive_extra_high_cells>1024-self.transport_cells.min(1024)
@@ -496,6 +502,15 @@ impl Driver {
             config.energy_subdivisions,
             config.n_mu,
         )?;
+        // Fixed change of reference angular variable. No ray is moved during
+        // the solve, so old ray-major transport and V7 ledger are unchanged.
+        if config.angular_map_ratio!=1.{
+            let r=config.angular_map_ratio;
+            for v in &mut source.angular_cells{
+                let x=v.mu;let d=(1.-x*x+r*r*x*x).sqrt();
+                v.mu=r*x/d;v.count_fraction*=r/d.powi(3);
+            }
+        }
         // Exactly isotropic geometry, empty initial UV, isotropic source.
         // Two equal ordinates integrate all rank <=2 angular moments exactly.
         // Not a generic reduced angular quadrature or anisotropic solver.

@@ -1,0 +1,1 @@
+C2U: fresh extended 35-cell fixed grid, n_mu=16/32, same C2T binary and budget, compare independent moments of terminal V7 pools. Diagnose angular energy concentration, source Jacobian and angular normalization. Keep all failures, bound computation; do not admit radiation stress without angular convergence.
