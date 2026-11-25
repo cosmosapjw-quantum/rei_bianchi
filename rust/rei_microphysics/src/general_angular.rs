@@ -79,6 +79,21 @@ impl GeneralAngular {
         }
         Ok(Self { reference, rays })
     }
+    /// Exact registry identity: reference coframe and ordered direction/weight bits.
+    pub(crate) fn registry_identity(&self) -> String {
+        self.reference
+            .iter()
+            .flatten()
+            .copied()
+            .chain(
+                self.rays
+                    .iter()
+                    .flat_map(|(n, w)| n.iter().copied().chain(std::iter::once(*w))),
+            )
+            .map(|v| format!("{:016x}", v.to_bits()))
+            .collect::<Vec<_>>()
+            .join(" ")
+    }
     pub fn len(&self) -> usize {
         self.rays.len()
     }

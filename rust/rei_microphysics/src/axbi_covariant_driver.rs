@@ -1560,7 +1560,7 @@ fn parse_list(s: &str) -> Result<Vec<f64>, ForwardError> {
 }
 impl Driver {
     fn checkpoint_text(&self, s: &DriverState) -> Result<String, ForwardError> {
-        if self.transport.general_history().is_some(){return Err(err("GENERAL_HISTORY_CHECKPOINT_UNSUPPORTED"));}
+
         self.transport.validate_state(&self.photon_state(s))?;
         let p = self.background.point_at_scale(s.a)?;
         self.validate_inactive(s, &p.geometry()?)?;
@@ -1613,6 +1613,12 @@ impl Driver {
             text=text.replacen("AXBI_CHECKPOINT_V6","AXBI_CHECKPOINT_V7",1);
             for v in [&p.number,&p.energy_ref,&p.support_lo,&p.support_hi]{text.push_str(&list(v));text.push('\n');}
         }
+        if let Some(h)=self.transport.general_history(){
+            self.validate(s,1e-8)?;
+            if s.a!=h.interval()[1]{return Err(err("GENERAL_CHECKPOINT_NOT_ACCEPTED_ENDPOINT"))}
+            text=text.replacen("AXBI_CHECKPOINT_V7","AXBI_CHECKPOINT_V8_GENERAL",1);
+            text.push_str(&format!("{:?}\n{}\n{}\nGENERAL_SOURCE_IDENTITY\n{}",self.config,h.registry_identity(),h.interval_identity(),compiled_identity()));
+        }
         Ok(text)
     }
     pub fn save_checkpoint(&self, path: &Path, s: &DriverState) -> Result<(), ForwardError> {
@@ -1634,11 +1640,35 @@ impl Driver {
         )?;
         write_checkpoint(path, &text)
     }
-    pub fn read_checkpoint(&self, path: &Path) -> Result<DriverState, ForwardError> {
-        if self.transport.general_history().is_some(){return Err(err("GENERAL_HISTORY_CHECKPOINT_UNSUPPORTED"));}
-        let text = fs::read_to_string(path).map_err(ioerr)?;
-        let lines = text.lines().collect::<Vec<_>>();
-        let (version,len)=if self.config.reactive_hi{("AXBI_CHECKPOINT_V7",23)}else if self.config.hei_split{("AXBI_CHECKPOINT_V6",19)}else if self.config.heii_split{("AXBI_CHECKPOINT_V5",15)}else{("AXBI_CHECKPOINT_V4",11)};
+    /// Restore into a freshly constructed driver with exactly the same
+    /// canonical registry/configuration. A rejected load is transactional.
+    pub fn restore_general_checkpoint(&mut self,path:&Path)->Result<DriverState,ForwardError>{
+        let text=fs::read_to_string(path).map_err(ioerr)?;
+        let (head,ident)=text.split_once("\nGENERAL_SOURCE_IDENTITY\n").ok_or(err("GENERAL_CHECKPOINT_SOURCE"))?;
+        if ident!=compiled_identity(){return Err(err("GENERAL_CHECKPOINT_SOURCE"))}
+        let lines=head.lines().collect::<Vec<_>>();
+        if lines.len()!=26||lines[0]!="AXBI_CHECKPOINT_V8_GENERAL"||lines[23]!=format!("{:?}",self.config){return Err(err("GENERAL_CHECKPOINT_CONFIG"))}
+        let old=self.transport.general_history().ok_or(err("GENERAL_CHECKPOINT_MODE"))?.clone();
+        let mut restored=old.clone();restored.restore_interval(lines[24],lines[25])?;
+        self.transport.restore_general_history(restored);
+        let res=self.read_checkpoint_text(&text);
+        if res.is_err(){self.transport.restore_general_history(old);}
+        res
+    }
+    pub fn read_checkpoint(&self,path:&Path)->Result<DriverState,ForwardError>{
+        let text=fs::read_to_string(path).map_err(ioerr)?;
+        self.read_checkpoint_text(&text)
+    }
+    fn read_checkpoint_text(&self,text:&str)->Result<DriverState,ForwardError>{
+        let general=self.transport.general_history();
+        let body=if let Some(h)=general{
+            let (head,ident)=text.split_once("\nGENERAL_SOURCE_IDENTITY\n").ok_or(err("GENERAL_CHECKPOINT_SOURCE"))?;
+            let lines=head.lines().collect::<Vec<_>>();
+            if ident!=compiled_identity()||lines.len()!=26||lines[23]!=format!("{:?}",self.config)||lines[24]!=h.registry_identity()||lines[25]!=h.interval_identity(){return Err(err("GENERAL_CHECKPOINT_IDENTITY"))}
+            lines[..23].join("\n")
+        }else{text.to_string()};
+        let lines=body.lines().collect::<Vec<_>>();
+        let (version,len)=if general.is_some(){("AXBI_CHECKPOINT_V8_GENERAL",23)}else if self.config.reactive_hi{("AXBI_CHECKPOINT_V7",23)}else if self.config.hei_split{("AXBI_CHECKPOINT_V6",19)}else if self.config.heii_split{("AXBI_CHECKPOINT_V5",15)}else{("AXBI_CHECKPOINT_V4",11)};
         if lines.len()!=len || lines[0]!=version {
             return Err(err("AXBI_CHECKPOINT_VERSION"));
         }
@@ -1691,6 +1721,7 @@ impl Driver {
             rhs_evaluations: counts[4],
             comparisons: counts[5],
         };
+        if general.is_some_and(|h|state.a!=h.interval()[1]){return Err(err("GENERAL_CHECKPOINT_NOT_ACCEPTED_ENDPOINT"))}
         self.validate(&state, 1e-8)?;
         Ok(state)
     }

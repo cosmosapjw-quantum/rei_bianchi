@@ -1,0 +1,1 @@
+C2X: explicit general V8 checkpoint, immutable canonical registry/config/source identity and accepted geometry interval. Existing V4-V7 stay unchanged. Exact readback and restart, mismatched source/grid/config rejection. Joint BASS state and counters in independent research bridge. Bounded longer live run, do not claim full z20-4.

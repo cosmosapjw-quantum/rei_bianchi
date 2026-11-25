@@ -452,6 +452,8 @@ impl CovariantTransport {
         self.general_history=Some(Arc::new(h));Ok(self)
     }
     pub fn general_history(&self)->Option<&crate::general_history::GeneralHistory>{self.general_history.as_deref()}
+    pub(crate) fn restore_general_history(&mut self,h:crate::general_history::GeneralHistory){self.general_history=Some(Arc::new(h));}
+
     pub fn set_general_interval(&mut self,p:Vec<crate::general_history::HistoryPoint>)->Result<(),ForwardError>{
         let h=self.general_history.as_mut().ok_or(bad("GENERAL_HISTORY_MODE"))?;
         Arc::make_mut(h).replace_interval(p)

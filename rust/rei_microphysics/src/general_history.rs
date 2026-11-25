@@ -67,6 +67,59 @@ impl GeneralHistory {
         self.p = p;
         Ok(())
     }
+    pub(crate) fn registry_identity(&self) -> String {
+        self.grid.registry_identity()
+    }
+    pub(crate) fn interval_identity(&self) -> String {
+        self.p
+            .iter()
+            .flat_map(|p| [p.a, p.h].into_iter().chain(p.f.into_iter().flatten()))
+            .map(|v| format!("{:016x}", v.to_bits()))
+            .collect::<Vec<_>>()
+            .join(" ")
+    }
+    pub(crate) fn restore_interval(
+        &mut self,
+        registry: &str,
+        encoded: &str,
+    ) -> Result<(), ForwardError> {
+        if registry != self.registry_identity() {
+            return Err(bad());
+        }
+        let v = encoded
+            .split_whitespace()
+            .map(|s| {
+                u64::from_str_radix(s, 16)
+                    .map(f64::from_bits)
+                    .map_err(|_| bad())
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        if v.len() < 22 || v.len() % 11 != 0 {
+            return Err(bad());
+        }
+        let p = v
+            .chunks_exact(11)
+            .map(|r| HistoryPoint {
+                a: r[0],
+                h: r[1],
+                f: std::array::from_fn(|i| std::array::from_fn(|j| r[2 + 3 * i + j])),
+            })
+            .collect::<Vec<_>>();
+        if p.windows(2).any(|w| w[1].a <= w[0].a)
+            || p.iter().any(|x| {
+                x.a <= 0.
+                    || x.h <= 0.
+                    || !x.a.is_finite()
+                    || !x.h.is_finite()
+                    || !x.f.iter().flatten().all(|v| v.is_finite())
+                    || (det(x.f) - 1.).abs() > 1e-7
+            })
+        {
+            return Err(bad());
+        }
+        self.p = p;
+        Ok(())
+    }
     pub fn len(&self) -> usize {
         self.grid.len()
     }
