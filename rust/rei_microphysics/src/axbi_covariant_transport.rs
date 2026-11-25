@@ -301,6 +301,7 @@ pub struct CovariantTransport {
     edges: Vec<f64>,
     source_norms: Vec<f64>,
     prepare_pool: Arc<OrderedWorkerPool>,
+    general_history: Option<Arc<crate::general_history::GeneralHistory>>,
 }
 fn shape(e: f64) -> f64 {
     let m = HHeModel::controlled_fixture();
@@ -360,6 +361,7 @@ impl CovariantTransport {
             edges,
             source_norms,
             prepare_pool: Arc::new(OrderedWorkerPool::new(1)?),
+            general_history: None,
         })
     }
     /// Construct the persistent pool once, before a production run. Clones share
@@ -445,7 +447,21 @@ impl CovariantTransport {
         }
         Ok(())
     }
+    pub fn with_general_history(mut self,h:crate::general_history::GeneralHistory)->Result<Self,ForwardError>{
+        if h.len()!=self.source.angular_cells.len(){return Err(bad("GENERAL_HISTORY_SIZE"))}
+        self.general_history=Some(Arc::new(h));Ok(self)
+    }
+    pub fn general_history(&self)->Option<&crate::general_history::GeneralHistory>{self.general_history.as_deref()}
+    pub fn set_general_interval(&mut self,p:Vec<crate::general_history::HistoryPoint>)->Result<(),ForwardError>{
+        let h=self.general_history.as_mut().ok_or(bad("GENERAL_HISTORY_MODE"))?;
+        Arc::make_mut(h).replace_interval(p)
+    }
+
     pub fn ray_geometry(&self, now: &GeometrySnapshot) -> Result<Vec<RayGeometry>, ForwardError> {
+        if let Some(h)=&self.general_history {
+            if now.scale_factors[0]!=now.scale_factors[1] || now.scale_factors[1]!=now.scale_factors[2]{return Err(bad("GENERAL_HISTORY_CLOCK"))}
+            return Ok(h.rays(now.scale_factors[0])?.0);
+        }
         now.volume_factor()?;
         let isotropic = self
             .reference

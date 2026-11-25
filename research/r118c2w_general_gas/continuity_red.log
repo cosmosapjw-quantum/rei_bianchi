@@ -1,0 +1,36 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:395:18
+    |
+395 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+395 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+395 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.19s
+     Running tests/r118c2w_general_gas.rs (target/debug/deps/r118c2w_general_gas-653fb39bc753f4d2)
+
+running 1 test
+test external_interval_rejects_changed_start ... FAILED
+
+failures:
+
+---- external_interval_rejects_changed_start stdout ----
+
+thread 'external_interval_rejects_changed_start' (3374798) panicked at tests/r118c2w_general_gas.rs:101:2:
+assertion failed: h.replace_interval(vec![HistoryPoint{a,h:50.,f},HistoryPoint{a:a*1.000001,h:49.,f}]).is_err()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    external_interval_rejects_changed_start
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test r118c2w_general_gas`

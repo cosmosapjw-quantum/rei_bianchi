@@ -2,6 +2,7 @@
 //! This is the source/moment adapter, not the LRS gas driver.
 use crate::{general_ray::canonical_ray, ForwardError};
 pub type Coframe = [[f64; 3]; 3];
+#[derive(Clone, Debug)]
 pub struct GeneralAngular {
     reference: Coframe,
     rays: Vec<([f64; 3], f64)>,
@@ -10,6 +11,7 @@ pub struct GeneralAngular {
 pub struct SourceAngles {
     pub raw_area: f64,
     pub weights: Vec<f64>,
+    pub scales: Vec<f64>,
     pub direction: Vec<[f64; 3]>,
     pub dipole: [f64; 3],
     pub pressure: Coframe,
@@ -83,10 +85,12 @@ impl GeneralAngular {
     pub fn source_at(&self, c: Coframe) -> Result<SourceAngles, ForwardError> {
         let mut weights = Vec::new();
         let mut direction = Vec::new();
+        let mut scales = Vec::new();
         for &(n, w) in &self.rays {
             let a = canonical_ray(self.reference, c, n)?;
             weights.push(w * a.jacobian);
             direction.push(a.direction);
+            scales.push(a.energy_scale);
         }
         let raw_area = weights.iter().sum::<f64>();
         if raw_area <= 0. || !raw_area.is_finite() {
@@ -108,6 +112,7 @@ impl GeneralAngular {
         Ok(SourceAngles {
             raw_area,
             weights,
+            scales,
             direction,
             dipole,
             pressure,

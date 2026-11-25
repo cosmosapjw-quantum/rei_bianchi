@@ -574,6 +574,48 @@ impl Driver {
         driver.initial_energy = driver.total_energy(&state)?;
         Ok((driver, state))
     }
+    /// Research path: prescribed general coframes and proper clock, original V7
+    /// chemistry and spectral owner. Ordinary LRS checkpoints are not compatible.
+    pub fn new_general(config:DriverConfig,h:crate::general_history::GeneralHistory)->Result<(Self,DriverState),ForwardError>{
+        let interval=h.interval();
+        if config.q_ref!=0. || config.angular_map_ratio!=1. || !config.reactive_hi || config.flrw_two_ordinate || interval[0]!=1./21. || interval[1]<1./(1.+config.end_zbar){return Err(err("GENERAL_DRIVER_DOMAIN"))}
+        let (mut d,mut s)=Self::new(config)?;
+        let n=h.len();let (r,_)=h.rays(s.a)?;
+        d.source.angular_cells=r.iter().map(|r|crate::axbi_sources::AngularCell{mu:r.mu,count_fraction:r.angular_weight}).collect();
+        let refg=d.background.point_at_scale(s.a)?.geometry()?;
+        d.transport=CovariantTransport::new(&d.source,refg,d.config.transport_cells,6.8,512.)?.extend_high_cells(d.config.reactive_extra_high_cells)?.with_threads(d.config.transport_threads)?.with_general_history(h)?;
+        let p=d.transport.empty_state();Self::set_photon_state(&mut s,p);
+        s.heii_above=Some(d.transport.empty_state());s.hei_middle=Some(d.transport.empty_state());s.hi_below=Some(d.transport.empty_state());
+        s.photon_inactive_number=vec![0.;n*d.energies.len()];s.photon_inactive_energy_ref=s.photon_inactive_number.clone();
+        d.initial_energy=d.total_energy(&s)?;d.validate(&s,1e-8)?;Ok((d,s))
+    }
+    pub fn set_general_interval(&mut self,p:Vec<crate::general_history::HistoryPoint>)->Result<(),ForwardError>{self.transport.set_general_interval(p)}
+    /// Exact endpoint external step; returns the two-half candidate only if the
+    /// existing local metric and all original energy budgets pass. Trial RHS
+    /// count is caller-owned so failed coupling attempts are not hidden.
+    pub fn external_trial(&self,s:&DriverState,to:f64,counter:&mut usize)->Result<DriverState,ForwardError>{
+        if self.transport.general_history().is_none() || to<=s.a || to>1./(1.+self.config.end_zbar) || s.accepted>=self.config.max_steps || s.attempts+3>self.config.max_attempts{return Err(err("GENERAL_EXTERNAL_DOMAIN"))}
+        let mid=(s.a*to).sqrt();
+        let full=self.tentative(s,to,counter)?;
+        let first=self.tentative(s,mid,counter)?;
+        let mut fine=self.tentative(&first,to,counter)?;
+        let comp=self.error_components(&full,&fine)?;
+        let metric=comp.legacy_metric().max(comp.rate_metric());
+        if metric>=self.config.local_target||metric>=2e-4{return Err(err("GENERAL_EXTERNAL_LOCAL_ERROR"))}
+        fine.accepted=s.accepted+1;fine.attempts=s.attempts+3;fine.comparisons=s.comparisons+1;
+        fine.rhs_evaluations=*counter;fine.last_error=metric;Ok(fine)
+    }
+    pub fn gas_energy_components(&self,s:&DriverState)->Result<[f64;2],ForwardError>{
+        Ok([w_erg_per_h_to_ev(s.gas.w_erg_per_h)?,self.binding(&s.gas)])
+    }
+    pub fn general_moments(&self,s:&DriverState)->Result<crate::general_angular::RadiationMoments,ForwardError>{
+        let h=self.transport.general_history().ok_or(err("GENERAL_DRIVER_MODE"))?;
+        let ne=self.energies.len();let mut u=vec![0.;h.len()];
+        for (j,x) in u.iter_mut().enumerate(){for k in j*ne..(j+1)*ne{
+            *x+=s.photon_energy_ref[k]+s.photon_inactive_energy_ref[k]+s.heii_above.as_ref().map_or(0.,|p|p.energy_ref[k])+s.hei_middle.as_ref().map_or(0.,|p|p.energy_ref[k])+s.hi_below.as_ref().map_or(0.,|p|p.energy_ref[k]);
+        }}
+        h.moments(s.a,&u)
+    }
     fn photon_state(&self, state: &DriverState) -> PhotonState {
         PhotonState {
             number: state.photons.clone(),
@@ -592,6 +634,7 @@ impl Driver {
     /// bisection and the existing background quadrature. Directional energy
     /// scale is between the two axial scales; |s/H| decreases in expansion.
     pub fn required_source_q_bounds(&self)->Result<[f64;2],ForwardError>{
+        if self.transport.general_history().is_some(){return Err(err("GENERAL_HISTORY_ENVELOPE_UNSUPPORTED"));}
         if self.config.same_h{return Err(err("AXBI_SOURCE_ENVELOPE_SAME_H_UNSUPPORTED"))}
         let a0=1./21.;let a1=1./(1.+self.config.end_zbar);
         let g0=self.background.point_at_scale(a0)?.geometry()?;
@@ -1066,7 +1109,7 @@ impl Driver {
     ) -> Result<DriverState, ForwardError> {
         let mut s = old.clone();
         let mid = (old.a * to).sqrt();
-        let dt = self.background.interval_increment(old.a, to)?.proper_time_s;
+        let dt = if let Some(h)=self.transport.general_history(){h.dt(old.a,to)?}else{self.background.interval_increment(old.a, to)?.proper_time_s};
         let budget=self.tentative_energy_budget(old.a,to)?;
         let chemical_budget=budget.map(|b|b*self.config.energy_budget_chemical_fraction);
         self.geometry_map(&mut s, mid)?;
@@ -1147,6 +1190,10 @@ impl Driver {
             return Err(err("AXBI_CUMULATIVE_LEDGER"));
         }
         let moments = self.moments(s)?;
+        if self.transport.general_history().is_some(){
+            let p=self.general_moments(s)?;
+            if p.flux.iter().any(|v|v.abs()>1e-12*p.energy.max(1e-30)) || (p.pressure[0][0]+p.pressure[1][1]+p.pressure[2][2]-p.energy).abs()>1e-12*p.energy.max(1e-30){return Err(err("GENERAL_MOMENT_LEDGER"))}
+        }
         if moments[1].abs() > 1e-12 * moments[0].max(1e-30) {
             return Err(err("AXBI_PARITY"));
         }
@@ -1408,6 +1455,9 @@ pub fn compiled_identity() -> String {
     [
         include_str!("axbi_covariant_driver.rs"),
         include_str!("axbi_covariant_transport.rs"),
+        include_str!("general_history.rs"),
+        include_str!("general_angular.rs"),
+        include_str!("general_ray.rs"),
         include_str!("axbi_heii_split.rs"),
         include_str!("axbi_multithreshold.rs"),
         include_str!("axbi_reactive_bands.rs"),
@@ -1510,6 +1560,7 @@ fn parse_list(s: &str) -> Result<Vec<f64>, ForwardError> {
 }
 impl Driver {
     fn checkpoint_text(&self, s: &DriverState) -> Result<String, ForwardError> {
+        if self.transport.general_history().is_some(){return Err(err("GENERAL_HISTORY_CHECKPOINT_UNSUPPORTED"));}
         self.transport.validate_state(&self.photon_state(s))?;
         let p = self.background.point_at_scale(s.a)?;
         self.validate_inactive(s, &p.geometry()?)?;
@@ -1584,6 +1635,7 @@ impl Driver {
         write_checkpoint(path, &text)
     }
     pub fn read_checkpoint(&self, path: &Path) -> Result<DriverState, ForwardError> {
+        if self.transport.general_history().is_some(){return Err(err("GENERAL_HISTORY_CHECKPOINT_UNSUPPORTED"));}
         let text = fs::read_to_string(path).map_err(ioerr)?;
         let lines = text.lines().collect::<Vec<_>>();
         let (version,len)=if self.config.reactive_hi{("AXBI_CHECKPOINT_V7",23)}else if self.config.hei_split{("AXBI_CHECKPOINT_V6",19)}else if self.config.heii_split{("AXBI_CHECKPOINT_V5",15)}else{("AXBI_CHECKPOINT_V4",11)};

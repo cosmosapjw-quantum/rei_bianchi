@@ -1,0 +1,29 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:395:18
+    |
+395 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+395 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+395 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+error[E0599]: no method named `set_general_interval` found for struct `rei_microphysics::axbi_covariant_driver::Driver` in the current scope
+  --> tests/r118c2w_general_gas.rs:63:4
+   |
+63 |  d.set_general_interval(vec![HistoryPoint{a,h:50.,f:id},HistoryPoint{a:a...
+   |    ^^^^^^^^^^^^^^^^^^^^ method not found in `rei_microphysics::axbi_covariant_driver::Driver`
+
+error[E0599]: no method named `external_trial` found for struct `rei_microphysics::axbi_covariant_driver::Driver` in the current scope
+  --> tests/r118c2w_general_gas.rs:64:26
+   |
+64 |  let mut count=0;let x=d.external_trial(&s,a1,&mut count).unwrap();
+   |                          ^^^^^^^^^^^^^^ method not found in `rei_microphysics::axbi_covariant_driver::Driver`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `rei_microphysics` (test "r118c2w_general_gas") due to 2 previous errors

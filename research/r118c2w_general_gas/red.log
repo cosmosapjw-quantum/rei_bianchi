@@ -1,0 +1,30 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:395:18
+    |
+395 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+395 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+395 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+error[E0432]: unresolved import `rei_microphysics::general_history`
+ --> tests/r118c2w_general_gas.rs:1:69
+  |
+1 | ...Driver,DriverConfig},general_history::{GeneralHistory,HistoryPoint}};
+  |                         ^^^^^^^^^^^^^^^ could not find `general_history` in `rei_microphysics`
+
+error[E0599]: no associated function or constant named `new_general` found for struct `rei_microphysics::axbi_covariant_driver::Driver` in the current scope
+ --> tests/r118c2w_general_gas.rs:8:20
+  |
+8 |  let (d,s)=Driver::new_general(cfg,h).unwrap();
+  |                    ^^^^^^^^^^^ associated function or constant not found in `rei_microphysics::axbi_covariant_driver::Driver`
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `rei_microphysics` (test "r118c2w_general_gas") due to 2 previous errors
