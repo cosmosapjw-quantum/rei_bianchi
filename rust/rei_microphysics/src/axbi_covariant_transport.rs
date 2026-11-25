@@ -123,6 +123,13 @@ pub struct PreparedAbsorption {
     nodes: Vec<AbsorptionNode>,
     pub diagnostics: QuadratureDiagnostics,
 }
+// Exact frozen-coefficient propagation of old stock and a uniform source.
+fn exponential_factors(x:f64)->(f64,f64,f64){
+    if x==0.{return (1.,1.,0.5)}
+    let phi=-(-x).exp_m1()/x;
+    let psi=if x<1e-3{0.5-x/6.+x*x/24.-x*x*x/120.+x*x*x*x/720.}else{(1.-phi)/x};
+    ((-x).exp(),phi,psi)
+}
 impl PreparedAbsorption {
     pub(crate) fn evaluate_for_cell_count(
         &self,
@@ -150,6 +157,37 @@ impl PreparedAbsorption {
         n_h_cm3: f64,
         dt_s: f64,
     ) -> Result<AbsorptionResult, ForwardError> {
+        self.evaluate_temporal(absorber_cm3,n_h_cm3,dt_s,0)
+    }
+    /// Old photons decay exponentially and new photons are born uniformly in
+    /// proper time with frozen geometry and trial material opacities.
+    /// Use time-averaged occupations for the integrated reaction ledger.
+    pub fn evaluate_continuous_birth(&self,birth:&Self,absorber_cm3:[f64;3],n_h_cm3:f64,dt_s:f64)->Result<AbsorptionResult,ForwardError>{
+        if self.template.number.len()!=birth.template.number.len()||dt_s<=0.{return Err(bad("AXBI_CONTINUOUS_BIRTH_DOMAIN"))}
+        let mut a=self.evaluate_temporal(absorber_cm3,n_h_cm3,dt_s,1)?;
+        let b=birth.evaluate_temporal(absorber_cm3,n_h_cm3,dt_s,2)?;
+        for j in 0..a.state.number.len(){
+            let n0=a.state.number[j];let n1=b.state.number[j];
+            if n1==0.{continue}
+            if n0==0.{
+                add_support(&mut a.state,j,n1,b.state.energy_ref[j],b.state.support_lo[j],b.state.support_hi[j]);continue
+            }
+            let lo=a.state.support_lo[j].min(b.state.support_lo[j]);let hi=a.state.support_hi[j].max(b.state.support_hi[j]);
+            let n=n0+n1;
+            let lower=(a.state.energy_ref[j]-lo*n0)+(b.state.energy_ref[j]-lo*n1);
+            let upper=(hi*n0-a.state.energy_ref[j])+(hi*n1-b.state.energy_ref[j]);
+            let u=if lower<=upper{lo.mul_add(n,lower)}else{hi.mul_add(n,-upper)};
+            a.state.number[j]=n;a.state.energy_ref[j]=u;a.state.support_lo[j]=lo;a.state.support_hi[j]=hi;
+        }
+        for j in 0..3{
+            a.photo.gamma_s[j]+=b.photo.gamma_s[j];
+            a.photo.heat_erg_per_absorber_s[j]+=b.photo.heat_erg_per_absorber_s[j];
+            a.absorbed_per_h[j]+=b.absorbed_per_h[j];
+        }
+        a.binding_ev_per_h+=b.binding_ev_per_h;a.heat_ev_per_h+=b.heat_ev_per_h;
+        Ok(a)
+    }
+    fn evaluate_temporal(&self,absorber_cm3:[f64;3],n_h_cm3:f64,dt_s:f64,scheme:u8)->Result<AbsorptionResult,ForwardError>{
         if !absorber_cm3.iter().all(|&x| nonnegative(x))
             || !n_h_cm3.is_finite()
             || n_h_cm3 <= 0.0
@@ -183,7 +221,13 @@ impl PreparedAbsorption {
             if !denominator.is_finite() || denominator < 1.0 {
                 return Err(bad("AXBI_COVARIANT_BE_DOMAIN"));
             }
-            let surviving = node.number / denominator;
+            let (surviving,mean_stock)=if scheme==0{
+                let v=node.number/denominator;(v,v)
+            }else{
+                let (e,phi,psi)=exponential_factors(dt_s*model.c_cm_s*opacity);
+                if scheme==1{(node.number*e,node.number*phi)}
+                else{(node.number*phi,node.number*psi)}
+            };
             compensated_add(
                 &mut out.state.number[node.cell],
                 &mut count_correction[node.cell],
@@ -200,10 +244,10 @@ impl PreparedAbsorption {
                 surviving * offset,
             );
             for j in 0..3 {
-                let rate = model.c_cm_s * n_h_cm3 * node.sigma[j] * surviving;
+                let rate = model.c_cm_s * n_h_cm3 * node.sigma[j] * mean_stock;
                 out.photo.gamma_s[j] += rate;
                 out.photo.heat_erg_per_absorber_s[j] += rate * node.excess_ev[j] * model.ev_erg;
-                let event = dt_s * model.c_cm_s * absorber_cm3[j] * node.sigma[j] * surviving;
+                let event = dt_s * model.c_cm_s * absorber_cm3[j] * node.sigma[j] * mean_stock;
                 out.absorbed_per_h[j] += event;
                 out.binding_ev_per_h += event * model.threshold_ev[j];
                 out.heat_ev_per_h += event * node.excess_ev[j];

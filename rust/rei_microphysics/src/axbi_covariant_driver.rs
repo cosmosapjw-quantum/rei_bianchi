@@ -52,6 +52,10 @@ pub struct DriverConfig {
     pub parallel_jacobian_columns: bool,
     /// FLRW-only passive compartment below the HI fit cutoff; explicit variant.
     pub inactive_hi_split: bool,
+    /// Opt-in frozen-opacity exact continuous source/absorption subflow.
+    pub continuous_birth: bool,
+    pub nonmonotone_search: bool,
+    pub flrw_two_ordinate:bool,
     pub n_mu: usize,
     pub background_panels: usize,
     pub local_target: f64,
@@ -81,6 +85,9 @@ impl DriverConfig {
             transport_threads: 1,
             parallel_jacobian_columns: false,
             inactive_hi_split: false,
+            continuous_birth:false,
+            nonmonotone_search:false,
+            flrw_two_ordinate:false,
             n_mu: 8,
             background_panels: 4096,
             local_target: 1e-5,
@@ -129,6 +136,9 @@ impl DriverConfig {
                         _ => return Err(err("AXBI_CONFIG_VALUE")),
                     }
                 }
+                "flrw_two_ordinate" => c.flrw_two_ordinate=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
+                "nonmonotone_search" => c.nonmonotone_search=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
+                "continuous_birth" => c.continuous_birth=match v.trim(){"true"=>true,"false"=>false,_=>return Err(err("AXBI_CONFIG_VALUE"))},
                 "inactive_hi_split" => {
                     c.inactive_hi_split = match v.trim() {
                         "true" => true,
@@ -171,7 +181,7 @@ impl DriverConfig {
         }
     }
     fn validate(&self) -> Result<(), ForwardError> {
-        if self.initial_state_id.is_empty() || self.initial_state_id.len()>160 || !self.initial_state_id.bytes().all(|b| b.is_ascii_alphanumeric() || b==b'_' || b==b'-')
+        if (self.flrw_two_ordinate&&self.q_ref!=0.)||(self.nonmonotone_search&&!self.continuous_birth)||self.initial_state_id.is_empty() || self.initial_state_id.len()>160 || !self.initial_state_id.bytes().all(|b| b.is_ascii_alphanumeric() || b==b'_' || b==b'-')
             || ![256, 2048, 4096, 12288].contains(&self.output_budget_mib)
             || (self.inactive_hi_split && self.q_ref != 0.0)
             || !(1..=64).contains(&self.transport_threads)
@@ -253,6 +263,7 @@ struct ResidualContext {
     n_he0_cm3: f64,
     cells: usize,
     prepared: Arc<PreparedAbsorption>,
+    birth:Option<Arc<PreparedAbsorption>>,
 }
 impl ResidualContext {
     fn evaluate(
@@ -269,9 +280,11 @@ impl ResidualContext {
         let [x, y, z] = gas.fractions;
         let absorbers = [nh * (1.0 - x), nhe * (1.0 - y - z), nhe * y];
         let c = HHeModel::controlled_fixture();
-        let absorption = self
-            .prepared
-            .evaluate_for_cell_count(self.cells, absorbers, nh, dt)?;
+        let absorption = if let Some(b)=&self.birth{
+            self.prepared.evaluate_continuous_birth(b,absorbers,nh,dt)?
+        }else{
+            self.prepared.evaluate_for_cell_count(self.cells, absorbers, nh, dt)?
+        };
         let stocks = absorption.state;
         let photo = absorption.photo;
         let point = AxbiProvider.point(&gas, nh, nhe, 0.0, 2.7255 / self.a, photo)?;
@@ -366,6 +379,17 @@ pub struct Driver {
     pub transport: CovariantTransport,
     initial_energy: f64,
 }
+/// Distinguish finite spectrum shape error from reaction observables.
+#[derive(Clone,Debug)]
+pub struct ErrorComponents {
+    pub gas:[f64;4],pub shape_n:f64,pub shape_u:f64,
+    pub pool_n:f64,pub pool_u:f64,pub gamma:[f64;3],pub heat:[f64;3],
+}
+impl ErrorComponents{
+    pub fn legacy_metric(&self)->f64{self.gas.into_iter().fold(0.,f64::max).max(self.shape_n).max(self.shape_u)}
+    pub fn rate_metric(&self)->f64{self.gas.into_iter().chain(self.gamma).chain(self.heat).fold(0.,f64::max).max(self.pool_n).max(self.pool_u)}
+}
+pub struct StepProbe{pub full:DriverState,pub half:DriverState,pub components:ErrorComponents,pub rhs:usize}
 impl Driver {
     pub fn new(config: DriverConfig) -> Result<(Self, DriverState), ForwardError> {
         config.validate()?;
@@ -405,12 +429,20 @@ impl Driver {
             },
             config.background_panels,
         )?;
-        let source = AxbiSource::new(
+        let mut source = AxbiSource::new(
             n_h0,
             config.escape_fraction,
             config.energy_subdivisions,
             config.n_mu,
         )?;
+        // Exactly isotropic geometry, empty initial UV, isotropic source.
+        // Two equal ordinates integrate all rank <=2 angular moments exactly.
+        // Not a generic reduced angular quadrature or anisotropic solver.
+        if config.flrw_two_ordinate{
+            use crate::axbi_sources::AngularCell;
+            let mu=1./3_f64.sqrt();
+            source.angular_cells=vec![AngularCell{mu:-mu,count_fraction:0.5},AngularCell{mu,count_fraction:0.5}];
+        }
         let reference = bg.point_at_scale(a_ref)?.geometry()?;
         let transport =
             CovariantTransport::new(&source, reference, config.transport_cells, 13.6, 512.0)?
@@ -711,6 +743,9 @@ impl Driver {
         dt: f64,
         counter: &mut usize,
     ) -> Result<(), ForwardError> {
+        self.chemical_stage_impl(s,dt,counter,None)
+    }
+    fn chemical_stage_impl(&self,s:&mut DriverState,dt:f64,counter:&mut usize,birth:Option<PhotonState>)->Result<(),ForwardError>{
         if !dt.is_finite() || dt <= 0.0 {
             return Err(err("AXBI_STAGE_DT"));
         }
@@ -722,6 +757,8 @@ impl Driver {
         let prepared = self
             .transport
             .prepare(&self.photon_state(&old), &geometry)?;
+        let birth_number=birth.as_ref().map_or(0.,|p|p.number.iter().sum::<f64>());
+        let birth=birth.map(|p|self.transport.prepare(&p,&geometry)).transpose()?.map(Arc::new);
         let context = ResidualContext {
             gas: old.gas,
             a: old.a,
@@ -729,6 +766,7 @@ impl Driver {
             n_he0_cm3: self.n_he0_cm3,
             cells: self.transport.cell_count(),
             prepared: Arc::new(prepared),
+            birth,
         };
         let old_w = w_erg_per_h_to_ev(old.gas.w_erg_per_h)?;
         let mut x = [
@@ -743,7 +781,7 @@ impl Driver {
             if norm <= 1e-11 {
                 let nh = self.n_h0_cm3 / old.a.powi(3);
                 let c = HHeModel::controlled_fixture();
-                let nold = old.photons.iter().sum::<f64>();
+                let nold = old.photons.iter().sum::<f64>()+birth_number;
                 let nnew = stocks.number.iter().sum::<f64>();
                 let events = rhs.photo_events_cm3_s.map(|e| e * dt / nh);
                 let event_total = events.iter().sum::<f64>();
@@ -808,8 +846,16 @@ impl Driver {
         let mid = (old.a * to).sqrt();
         let dt = self.background.interval_increment(old.a, to)?.proper_time_s;
         self.geometry_map(&mut s, mid)?;
-        self.inject(&mut s, dt)?;
-        self.chemical_stage(&mut s, dt, counter)?;
+        if self.config.continuous_birth{
+            let geometry=self.background.point_at_scale(s.a)?.geometry()?;
+            let mut birth=self.transport.empty_state();
+            let emitted=self.transport.inject(&mut birth,&geometry,1./s.a-1.,dt)?;
+            s.ledgers.source_n+=emitted.added_photons_per_h;s.ledgers.source_u+=emitted.added_energy_ev_per_h;
+            self.chemical_stage_impl(&mut s,dt,counter,Some(birth))?;
+        }else{
+            self.inject(&mut s, dt)?;
+            self.chemical_stage(&mut s, dt, counter)?;
+        }
         self.geometry_map(&mut s, to)?;
         self.validate(&s, 1e-8)?;
         let (n0, u0) = self.residuals(old)?;
@@ -845,25 +891,23 @@ impl Driver {
         }
         Ok(())
     }
-    pub fn error_metric(
+    fn shape_components(
         &self,
         full: &DriverState,
         half: &DriverState,
-    ) -> Result<f64, ForwardError> {
+    ) -> Result<ErrorComponents, ForwardError> {
         self.transport.validate_state(&self.photon_state(full))?;
         self.transport.validate_state(&self.photon_state(half))?;
         let geometry = self.background.point_at_scale(half.a)?.geometry()?;
         self.validate_inactive(full, &geometry)?;
         self.validate_inactive(half, &geometry)?;
-        let mut e = 0.0_f64;
+        if full.a!=half.a{return Err(err("AXBI_ERROR_CLOCK_MISMATCH"));}
+        let mut gas=[0.;4];
         for i in 0..3 {
-            e = e.max(
-                (full.gas.fractions[i] - half.gas.fractions[i]).abs()
-                    / half.gas.fractions[i].abs().max(1e-5),
-            );
+            gas[i]=(full.gas.fractions[i]-half.gas.fractions[i]).abs()/half.gas.fractions[i].abs().max(1e-5);
         }
-        let w = w_erg_per_h_to_ev(half.gas.w_erg_per_h)?;
-        e = e.max((w_erg_per_h_to_ev(full.gas.w_erg_per_h)? - w).abs() / w.abs().max(1e-6));
+        let w=w_erg_per_h_to_ev(half.gas.w_erg_per_h)?;
+        gas[3]=(w_erg_per_h_to_ev(full.gas.w_erg_per_h)?-w).abs()/w.abs().max(1e-6);
         let (n, u) = self.photon_inventory(half);
         if full.photons.len() != half.photons.len()
             || full.photon_energy_ref.len() != half.photon_energy_ref.len()
@@ -893,9 +937,91 @@ impl Driver {
                     * ray.scale;
             }
         }
-        f(e.max(dn / n.max(1e-8)).max(du / u.max(1e-8)))
+        let r=ErrorComponents{gas,shape_n:f(dn/n.max(1e-8))?,shape_u:f(du/u.max(1e-8))?,pool_n:0.,pool_u:0.,gamma:[0.;3],heat:[0.;3]};
+        Ok(r)
+    }
+    pub fn error_metric(&self,full:&DriverState,half:&DriverState)->Result<f64,ForwardError>{
+        Ok(self.shape_components(full,half)?.legacy_metric())
+    }
+    /// Additional endpoint rate observables on exactly the same geometry.
+    /// Separate active/passive total inventories, not per-cell L1. Floors
+    /// refer to 1e-8 photons/H at a reference cross section 1e-17 cm^2
+    /// and a 1 eV excess scale. These are diagnostic choices, not an
+    /// established global error bound.
+    pub fn error_components(&self,full:&DriverState,half:&DriverState)->Result<ErrorComponents,ForwardError>{
+        let mut out=self.shape_components(full,half)?;
+        let g=self.background.point_at_scale(half.a)?.geometry()?;
+        let p=self.photon_pool_inventory(full)?;let q=self.photon_pool_inventory(half)?;
+        out.pool_n=((p[0]-q[0]).abs()+(p[2]-q[2]).abs())/(q[0]+q[2]).max(1e-8);
+        out.pool_u=((p[1]-q[1]).abs()+(p[3]-q[3]).abs())/(q[1]+q[3]).max(1e-8);
+        let nh=self.n_h0_cm3/half.a.powi(3);
+        let c=HHeModel::controlled_fixture();
+        let a=self.transport.prepare(&self.photon_state(full),&g)?.evaluate([0.;3],nh,0.)?.photo;
+        let b=self.transport.prepare(&self.photon_state(half),&g)?.evaluate([0.;3],nh,0.)?.photo;
+        let floor=c.c_cm_s*nh*1e-17*1e-8;
+        for i in 0..3{
+            out.gamma[i]=f((a.gamma_s[i]-b.gamma_s[i]).abs()/b.gamma_s[i].abs().max(floor))?;
+            out.heat[i]=f((a.heat_erg_per_absorber_s[i]-b.heat_erg_per_absorber_s[i]).abs()/b.heat_erg_per_absorber_s[i].abs().max(floor*c.ev_erg))?;
+        }
+        Ok(out)
+    }
+    pub fn probe_step(&self,s:&DriverState,h:f64)->Result<StepProbe,ForwardError>{
+        if !h.is_finite()||h<=0.{return Err(err("AXBI_PROBE_STEP"))}
+        let to=(s.a*h.exp()).min(1./(1.+self.config.end_zbar));
+        if to<=s.a{return Err(err("AXBI_PROBE_STEP"))}
+        let mid=(s.a*to).sqrt();let mut rhs=0;
+        let full=self.tentative(s,to,&mut rhs)?;
+        let first=self.tentative(s,mid,&mut rhs)?;
+        let half=self.tentative(&first,to,&mut rhs)?;
+        let components=self.error_components(&full,&half)?;
+        Ok(StepProbe{full,half,components,rhs})
+    }
+    /// Error estimator is nonmonotone in the stiff transient. Explicitly
+    /// test a finite set of larger candidates rather than infer their error
+    /// from a failed smaller trial. Each candidate retains all original
+    /// gates and additionally passes endpoint gamma/heat/pool checks.
+    fn search_step(&self,s:&mut DriverState)->Result<bool,ForwardError>{
+        if s.accepted>=self.config.max_steps||s.attempts>=self.config.max_attempts{return Err(err("AXBI_STEP_CAP"))}
+        let end=1./(1.+self.config.end_zbar);if s.a==end{return Ok(true)}
+        let h=s.next_dln_a;
+        let mut candidates=vec![h];
+        if s.accepted%32==0&&s.consecutive_rejects==0{
+            candidates=vec![(128.*h).min(0.005),(32.*h).min(0.005),(8.*h).min(0.005),(2.*h).min(0.005),h];
+            candidates.dedup();
+        }
+        let mut last=None;
+        for step in candidates{
+            let to=(s.a*step.exp()).min(end);if to<=s.a{return Err(err("AXBI_SEARCH_STEP"))}
+            let mid=(s.a*to).sqrt();
+            let mut rhs=s.rhs_evaluations;let mut attempts=s.attempts;
+            let result=(||{
+                let mut trial=|old:&DriverState,a:f64|{
+                    if attempts>=self.config.max_attempts{return Err(err("AXBI_TENTATIVE_CAP"))}
+                    attempts+=1;self.tentative(old,a,&mut rhs)
+                };
+                let full=trial(s,to)?;let first=trial(s,mid)?;let half=trial(&first,to)?;
+                let e=self.error_components(&full,&half)?;
+                Ok::<_,ForwardError>((half,e.legacy_metric().max(e.rate_metric())))
+            })();
+            s.rhs_evaluations=rhs;s.attempts=attempts;s.comparisons+=1;
+            match result{
+                Ok((mut next,e)) if e<self.config.local_target&&e<2e-4=>{
+                    next.accepted=s.accepted+1;next.attempts=s.attempts;next.comparisons=s.comparisons;next.rejects=s.rejects;
+                    next.rhs_evaluations=rhs;next.consecutive_rejects=0;next.last_error=e;
+                    next.next_dln_a=if e<self.config.local_target*0.25{(2.*step).min(0.005)}else{step};
+                    next.wall_elapsed_s=s.wall_elapsed_s;*s=next;return Ok(true)
+                }
+                Ok((_,e))=>{s.last_error=e;last=None;}
+                Err(e)=>{last=Some(e);}
+            }
+            s.rejects+=1;
+        }
+        s.consecutive_rejects+=1;s.next_dln_a*=0.5;
+        if let Some(e)=last{return Err(e)}
+        Ok(false)
     }
     pub fn adaptive_step(&self, s: &mut DriverState) -> Result<bool, ForwardError> {
+        if self.config.nonmonotone_search{return self.search_step(s)}
         if s.accepted >= self.config.max_steps || s.attempts >= self.config.max_attempts {
             return Err(err("AXBI_STEP_CAP"));
         }
@@ -1637,6 +1763,7 @@ pub fn run(config_text: &str, out: &Path, case: &str, resume: bool) -> Result<()
         fs::write(out.join("case_id.txt"), case).map_err(ioerr)?;
         fs::write(out.join("initial_state_id.txt"), &driver.config.initial_state_id).map_err(ioerr)?;
         fs::write(out.join("transport_variant.txt"), format!("inactive_hi_split={}\npassive_scope=q0_forward_monotonic_only\ncheckpoint_version=V4\ntransport_threads={}\nparallel_scope=persistent_cell_prepare_and_opt_in_jacobian_columns\nparallel_jacobian_columns={}\n", driver.config.inactive_hi_split, driver.config.transport_threads, driver.config.parallel_jacobian_columns)).map_err(ioerr)?;
+        fs::write(out.join("c2j_variant.txt"),format!("continuous_birth={}\nnonmonotone_search={}\nflrw_two_ordinate={}\nactual_angular_cells={}\n",driver.config.continuous_birth,driver.config.nonmonotone_search,driver.config.flrw_two_ordinate,driver.source.angular_cells.len())).map_err(ioerr)?;
         fs::write(out.join("metadata.txt"),"clock=elapsed proper seconds since zbar20\nframe=non-tilted normal tetrad\nmethod=binary64 BE split step-doubling empirical\nspectrum=fixed reference-q two-moment transport; total N/U includes active and passive source photons; support columns are conservative active-support/passive-cell envelope union, not a recovered density or exact populated support; Gamma uses active photons only; radiation stress includes both pools; legacy boundary outflow remains zero\nsolid_angle_weight_sr=normalized current quadrature for locally isotropic source; do not multiply stocks again\nspectra_cadence=initial; configured accepted-step interval(default60); each30wallsecondcheckpoint; terminal; fullgrid noaveraging\nuncertainty=no covariance/posterior supplied\ntail_tau=UNKNOWN\nscientific_admission=NOT_ISSUED\n").map_err(ioerr)?;
     }
     let mut h=open_output(&out.join("history.csv"),resume,"case_id,q_ref,Sigma,time_s,a,zbar,b,H_per_s,s_per_s,x_HII,x_HeII,x_HeIII,nH_proper_cm3,ne_proper_cm3,temperature_K,Gamma_HI_per_s,Gamma_HeI_per_s,Gamma_HeII_per_s,photon_n_per_H,photon_u_eV_per_H,J0_photon_u_eV_per_H,J1_photon_u_eV_per_H,J2_photon_u_eV_per_H,x_HI,x_HeI")?;
