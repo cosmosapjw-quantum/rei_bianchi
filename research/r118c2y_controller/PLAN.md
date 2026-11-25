@@ -1,0 +1,1 @@
+Local controller for external full-vs-half metric: target 0.5*local_target, third-root proportional response with safety 0.9 and bounded growth. No physical tolerance change; failed trial does not become accepted. Preserve prior V8 identities. Test monotonic response, zero metric, rejection, invalid inputs. Actual BASS bridge consumes this function.

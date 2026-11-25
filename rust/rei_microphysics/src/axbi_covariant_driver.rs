@@ -1456,6 +1456,7 @@ pub fn compiled_identity() -> String {
         include_str!("axbi_covariant_driver.rs"),
         include_str!("axbi_covariant_transport.rs"),
         include_str!("general_history.rs"),
+        include_str!("external_controller.rs"),
         include_str!("general_angular.rs"),
         include_str!("general_ray.rs"),
         include_str!("axbi_heii_split.rs"),
