@@ -163,3 +163,7 @@ pub mod axbi_q_advance;
 pub mod axbi_q_capacity;
 pub mod axbi_q_grid;
 pub mod axbi_q_closure;
+
+pub mod axbi_covariant_transport;
+pub mod axbi_parallel;
+pub mod axbi_covariant_driver;
