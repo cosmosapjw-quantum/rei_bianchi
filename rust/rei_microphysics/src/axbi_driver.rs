@@ -464,152 +464,23 @@ impl Driver {
         }
         Ok(())
     }
-    fn evaluate(
-        &self,
-        old: &DriverState,
-        unknown: [f64; 4],
-        dt: f64,
-        counter: &mut usize,
-    ) -> Result<([f64; 4], Vec<f64>, IgmPointRhs), ForwardError> {
-        if *counter >= self.config.max_rhs {
-            return Err(err("AXBI_RHS_CAP"));
-        }
-        *counter += 1;
-        let gas = IgmGasState::new(
-            [unknown[0], unknown[1], unknown[2]],
-            w_ev_per_h_to_erg(unknown[3])?,
-        )?;
-        let nh = self.n_h0_cm3 / old.a.powi(3);
-        let nhe = self.n_he0_cm3 / old.a.powi(3);
-        let [x, y, z] = gas.fractions;
-        let absorbers = [nh * (1.0 - x), nhe * (1.0 - y - z), nhe * y];
-        let c = HHeModel::controlled_fixture();
-        let ne = self.energies.len();
-        let mut stocks = Vec::with_capacity(old.photons.len());
-        let mut photo = IgmPhotoInput::default();
-        for (j, &nstar) in old.photons.iter().enumerate() {
-            let i = j % ne;
-            let opacity = (0..3)
-                .map(|k| absorbers[k] * self.signature[i][k])
-                .sum::<f64>();
-            let n = f(nstar / (1.0 + dt * c.c_cm_s * opacity))?;
-            stocks.push(n);
-            for k in 0..3 {
-                let rate = c.c_cm_s * nh * self.signature[i][k] * n;
-                photo.gamma_s[k] += rate;
-                if rate != 0.0 {
-                    if self.energies[i] < c.threshold_ev[k] {
-                        return Err(err("AXBI_THRESHOLD_OWNERSHIP"));
-                    }
-                    photo.heat_erg_per_absorber_s[k] +=
-                        rate * (self.energies[i] - c.threshold_ev[k]) * c.ev_erg;
-                }
-            }
-        }
-        let point = AxbiProvider.point(&gas, nh, nhe, 0.0, 2.7255 / old.a, photo)?;
-        let mut residual = [0.0; 4];
-        for i in 0..3 {
-            residual[i] = unknown[i] - old.gas.fractions[i] - dt * point.rhs.fraction_dt[i];
-        }
-        residual[3] = unknown[3]
-            - w_erg_per_h_to_ev(old.gas.w_erg_per_h)?
-            - dt * point.rhs.w_dt_erg_per_h_s / c.ev_erg;
-        for &r in &residual {
-            f(r)?;
-        }
-        Ok((residual, stocks, point.rhs))
-    }
-    fn norm(&self, residual: [f64; 4], old_w: f64, new_w: f64) -> f64 {
-        residual[0]
-            .abs()
-            .max(residual[1].abs())
-            .max(residual[2].abs())
-            .max(residual[3].abs() / old_w.abs().max(new_w.abs()).max(1e-6))
-    }
     pub fn chemical_stage(
         &self,
         s: &mut DriverState,
         dt: f64,
         counter: &mut usize,
     ) -> Result<(), ForwardError> {
-        if !dt.is_finite() || dt <= 0.0 {
-            return Err(err("AXBI_STAGE_DT"));
-        }
-        let old = s.clone();
-        let old_w = w_erg_per_h_to_ev(old.gas.w_erg_per_h)?;
-        let mut x = [
-            old.gas.fractions[0],
-            old.gas.fractions[1],
-            old.gas.fractions[2],
-            old_w,
-        ];
-        for _ in 0..50 {
-            let (residual, stocks, rhs) = self.evaluate(&old, x, dt, counter)?;
-            let norm = self.norm(residual, old_w, x[3]);
-            if norm <= 1e-11 {
-                let nh = self.n_h0_cm3 / old.a.powi(3);
-                let c = HHeModel::controlled_fixture();
-                let nold = old.photons.iter().sum::<f64>();
-                let nnew = stocks.iter().sum::<f64>();
-                let events = rhs.photo_events_cm3_s.map(|e| e * dt / nh);
-                let event_total = events.iter().sum::<f64>();
-                if (nold - nnew - event_total).abs() > 1e-10 * old.ledgers.source_n.max(1.0) {
-                    return Err(err("AXBI_ABSORPTION_LEDGER"));
-                }
-                s.gas = IgmGasState::new([x[0], x[1], x[2]], w_ev_per_h_to_erg(x[3])?)?;
-                s.photons = stocks;
-                s.ledgers.absorbed_n += event_total;
-                for k in 0..3 {
-                    s.ledgers.photo_events[k] += events[k];
-                    s.ledgers.rr_events[k] += rhs.rr_events_cm3_s[k] * dt / nh;
-                    s.ledgers.ci_events[k] += rhs.ci_events_cm3_s[k] * dt / nh;
-                    s.ledgers.ci_floor_events[k] += rhs.ci_floor_events_cm3_s[k] * dt / nh;
-                }
-                s.ledgers.dr_events += rhs.dr_events_cm3_s * dt / nh;
-                s.ledgers.ce_cap_ev +=
-                    rhs.ce_cap_cooling_erg_cm3_s.iter().sum::<f64>() * dt / (nh * c.ev_erg);
-                s.ledgers.excluded_dr_ev +=
-                    rhs.excluded_dr_cooling_erg_cm3_s * dt / (nh * c.ev_erg);
-                s.ledgers.escaped_u += rhs.escape_erg_cm3_s * dt / (nh * c.ev_erg);
-                s.ledgers.cmb_input += rhs.cmb_to_gas_erg_cm3_s * dt / (nh * c.ev_erg);
-                s.max_newton_residual = s.max_newton_residual.max(norm);
-                return Ok(());
-            }
-            let mut jac = [[0.0; 4]; 4];
-            for j in 0..4 {
-                let delta = 1e-7 * x[j].abs().max(if j == 3 { 1e-6 } else { 1e-4 });
-                let mut xp = x;
-                xp[j] += delta;
-                let trial = self.evaluate(&old, xp, dt, counter);
-                let (rp, sign) = match trial {
-                    Ok((r, _, _)) => (r, 1.0),
-                    Err(_) => {
-                        xp = x;
-                        xp[j] -= delta;
-                        let (r, _, _) = self.evaluate(&old, xp, dt, counter)?;
-                        (r, -1.0)
-                    }
-                };
-                for i in 0..4 {
-                    jac[i][j] = (rp[i] - residual[i]) / (sign * delta);
-                }
-            }
-            let direction = solve4(jac, residual.map(|r| -r))?;
-            let mut alpha = 1.0;
-            let mut accepted = None;
-            for _ in 0..40 {
-                let trial = std::array::from_fn(|i| x[i] + alpha * direction[i]);
-                if let Ok((r, _, _)) = self.evaluate(&old, trial, dt, counter) {
-                    if self.norm(r, old_w, trial[3]) < norm {
-                        accepted = Some(trial);
-                        break;
-                    }
-                }
-                alpha *= 0.5;
-            }
-            x = accepted.ok_or(err("AXBI_NEWTON_LINESEARCH"))?;
-        }
-        Err(err("AXBI_NEWTON_ITERATIONS"))
+        let ctx = PacketStageContext {
+            input: PacketStageInput {
+                n_h_cm3: self.n_h0_cm3 / s.a.powi(3),
+                n_he_cm3: self.n_he0_cm3 / s.a.powi(3),
+                tcmb_k: 2.7255 / s.a,
+            },
+            energies: &self.energies,
+            signature: &self.signature,
+            max_rhs: self.config.max_rhs,
+        };
+        ctx.step(s, dt, counter)
     }
     fn tentative(
         &self,
@@ -764,6 +635,243 @@ impl Driver {
         Ok(moments)
     }
 }
+/// External packet-stage material-frame inputs. The caller owns geometric
+/// work, source births, proper time and CMB reservoir closure. This stage
+/// holds photon energies and proper densities fixed; mean expansion is zero.
+#[derive(Clone, Copy, Debug)]
+pub struct PacketStageInput {
+    pub n_h_cm3: f64,
+    pub n_he_cm3: f64,
+    pub tcmb_k: f64,
+}
+#[derive(Clone, Debug)]
+pub struct PacketStageResult {
+    pub gas: IgmGasState,
+    pub stocks: Vec<f64>,
+    pub ledgers: Ledgers,
+    pub max_residual: f64,
+}
+struct PacketStageContext<'a> {
+    input: PacketStageInput,
+    energies: &'a [f64],
+    signature: &'a [[f64; 3]],
+    max_rhs: usize,
+}
+impl PacketStageContext<'_> {
+    fn evaluate(
+        &self,
+        old: &DriverState,
+        unknown: [f64; 4],
+        dt: f64,
+        counter: &mut usize,
+    ) -> Result<([f64; 4], Vec<f64>, IgmPointRhs), ForwardError> {
+        if *counter >= self.max_rhs {
+            return Err(err("AXBI_RHS_CAP"));
+        }
+        *counter += 1;
+        let gas = IgmGasState::new(
+            [unknown[0], unknown[1], unknown[2]],
+            w_ev_per_h_to_erg(unknown[3])?,
+        )?;
+        let nh = self.input.n_h_cm3;
+        let nhe = self.input.n_he_cm3;
+        let [x, y, z] = gas.fractions;
+        let absorbers = [nh * (1.0 - x), nhe * (1.0 - y - z), nhe * y];
+        let c = HHeModel::controlled_fixture();
+        let ne = self.energies.len();
+        let mut stocks = Vec::with_capacity(old.photons.len());
+        let mut photo = IgmPhotoInput::default();
+        for (j, &nstar) in old.photons.iter().enumerate() {
+            let i = j % ne;
+            let opacity = (0..3)
+                .map(|k| absorbers[k] * self.signature[i][k])
+                .sum::<f64>();
+            let n = f(nstar / (1.0 + dt * c.c_cm_s * opacity))?;
+            stocks.push(n);
+            for k in 0..3 {
+                let rate = c.c_cm_s * nh * self.signature[i][k] * n;
+                photo.gamma_s[k] += rate;
+                if rate != 0.0 {
+                    if self.energies[i] < c.threshold_ev[k] {
+                        return Err(err("AXBI_THRESHOLD_OWNERSHIP"));
+                    }
+                    photo.heat_erg_per_absorber_s[k] +=
+                        rate * (self.energies[i] - c.threshold_ev[k]) * c.ev_erg;
+                }
+            }
+        }
+        let point = AxbiProvider.point(&gas, nh, nhe, 0.0, self.input.tcmb_k, photo)?;
+        let mut residual = [0.0; 4];
+        for i in 0..3 {
+            residual[i] = unknown[i] - old.gas.fractions[i] - dt * point.rhs.fraction_dt[i];
+        }
+        residual[3] = unknown[3]
+            - w_erg_per_h_to_ev(old.gas.w_erg_per_h)?
+            - dt * point.rhs.w_dt_erg_per_h_s / c.ev_erg;
+        for &r in &residual {
+            f(r)?;
+        }
+        Ok((residual, stocks, point.rhs))
+    }
+    fn norm(&self, residual: [f64; 4], old_w: f64, new_w: f64) -> f64 {
+        residual[0]
+            .abs()
+            .max(residual[1].abs())
+            .max(residual[2].abs())
+            .max(residual[3].abs() / old_w.abs().max(new_w.abs()).max(1e-6))
+    }
+    fn step(&self, s: &mut DriverState, dt: f64, counter: &mut usize) -> Result<(), ForwardError> {
+        if !dt.is_finite() || dt <= 0.0 {
+            return Err(err("AXBI_STAGE_DT"));
+        }
+        let old = s.clone();
+        let old_w = w_erg_per_h_to_ev(old.gas.w_erg_per_h)?;
+        let mut x = [
+            old.gas.fractions[0],
+            old.gas.fractions[1],
+            old.gas.fractions[2],
+            old_w,
+        ];
+        for _ in 0..50 {
+            let (residual, stocks, rhs) = self.evaluate(&old, x, dt, counter)?;
+            let norm = self.norm(residual, old_w, x[3]);
+            if norm <= 1e-11 {
+                let nh = self.input.n_h_cm3;
+                let c = HHeModel::controlled_fixture();
+                let nold = old.photons.iter().sum::<f64>();
+                let nnew = stocks.iter().sum::<f64>();
+                let events = rhs.photo_events_cm3_s.map(|e| e * dt / nh);
+                let event_total = events.iter().sum::<f64>();
+                if (nold - nnew - event_total).abs() > 1e-10 * old.ledgers.source_n.max(1.0) {
+                    return Err(err("AXBI_ABSORPTION_LEDGER"));
+                }
+                s.gas = IgmGasState::new([x[0], x[1], x[2]], w_ev_per_h_to_erg(x[3])?)?;
+                s.photons = stocks;
+                s.ledgers.absorbed_n += event_total;
+                for k in 0..3 {
+                    s.ledgers.photo_events[k] += events[k];
+                    s.ledgers.rr_events[k] += rhs.rr_events_cm3_s[k] * dt / nh;
+                    s.ledgers.ci_events[k] += rhs.ci_events_cm3_s[k] * dt / nh;
+                    s.ledgers.ci_floor_events[k] += rhs.ci_floor_events_cm3_s[k] * dt / nh;
+                }
+                s.ledgers.dr_events += rhs.dr_events_cm3_s * dt / nh;
+                s.ledgers.ce_cap_ev +=
+                    rhs.ce_cap_cooling_erg_cm3_s.iter().sum::<f64>() * dt / (nh * c.ev_erg);
+                s.ledgers.excluded_dr_ev +=
+                    rhs.excluded_dr_cooling_erg_cm3_s * dt / (nh * c.ev_erg);
+                s.ledgers.escaped_u += rhs.escape_erg_cm3_s * dt / (nh * c.ev_erg);
+                s.ledgers.cmb_input += rhs.cmb_to_gas_erg_cm3_s * dt / (nh * c.ev_erg);
+                s.max_newton_residual = s.max_newton_residual.max(norm);
+                return Ok(());
+            }
+            let mut jac = [[0.0; 4]; 4];
+            for j in 0..4 {
+                let delta = 1e-7 * x[j].abs().max(if j == 3 { 1e-6 } else { 1e-4 });
+                let mut xp = x;
+                xp[j] += delta;
+                let trial = self.evaluate(&old, xp, dt, counter);
+                let (rp, sign) = match trial {
+                    Ok((r, _, _)) => (r, 1.0),
+                    Err(_) => {
+                        xp = x;
+                        xp[j] -= delta;
+                        let (r, _, _) = self.evaluate(&old, xp, dt, counter)?;
+                        (r, -1.0)
+                    }
+                };
+                for i in 0..4 {
+                    jac[i][j] = (rp[i] - residual[i]) / (sign * delta);
+                }
+            }
+            let direction = solve4(jac, residual.map(|r| -r))?;
+            let mut alpha = 1.0;
+            let mut accepted = None;
+            for _ in 0..40 {
+                let trial = std::array::from_fn(|i| x[i] + alpha * direction[i]);
+                if let Ok((r, _, _)) = self.evaluate(&old, trial, dt, counter) {
+                    if self.norm(r, old_w, trial[3]) < norm {
+                        accepted = Some(trial);
+                        break;
+                    }
+                }
+                alpha *= 0.5;
+            }
+            x = accepted.ok_or(err("AXBI_NEWTON_LINESEARCH"))?;
+        }
+        Err(err("AXBI_NEWTON_ITERATIONS"))
+    }
+}
+
+/// Use the original AXBI nonlinear point-stage operator on arbitrary
+/// positive physical-energy packets. No separate rate implementation,
+/// reference trajectory or borrowed geometric clock. No mutable output
+/// until accepted. Empty radiation is allowed. Source and thermal work are
+/// deliberately not counted here; the host owns them exactly once.
+pub fn packet_chemistry_stage(
+    input: PacketStageInput,
+    gas: IgmGasState,
+    packets: &[crate::coupled_primary::PrimaryPacket],
+    dt: f64,
+    counter: &mut usize,
+    max_rhs: usize,
+) -> Result<PacketStageResult, ForwardError> {
+    if !input.n_h_cm3.is_finite()
+        || input.n_h_cm3 <= 0.
+        || !input.n_he_cm3.is_finite()
+        || input.n_he_cm3 <= 0.
+        || !input.tcmb_k.is_finite()
+        || input.tcmb_k <= 0.
+        || packets.len() > 2_000_000
+        || packets.iter().any(|p| {
+            !p.energy_ev.is_finite() || p.energy_ev <= 0. || !p.per_h.is_finite() || p.per_h < 0.
+        })
+    {
+        return Err(err("AXBI_PACKET_STAGE_DOMAIN"));
+    }
+    gas.eos(input.n_h_cm3, input.n_he_cm3)?;
+    let energies: Vec<_> = packets.iter().map(|p| p.energy_ev).collect();
+    let signature = energies
+        .iter()
+        .map(|&e| {
+            let provider = AtomicProvider::reference();
+            Ok([
+                provider.cross_section(Absorber::HI, e)?,
+                provider.cross_section(Absorber::HeI, e)?,
+                provider.cross_section(Absorber::HeII, e)?,
+            ])
+        })
+        .collect::<Result<Vec<_>, ForwardError>>()?;
+    let mut state = DriverState {
+        a: 1.,
+        gas,
+        photons: packets.iter().map(|p| p.per_h).collect(),
+        ledgers: Ledgers::default(),
+        next_dln_a: 0.,
+        accepted: 0,
+        attempts: 0,
+        comparisons: 0,
+        rejects: 0,
+        consecutive_rejects: 0,
+        rhs_evaluations: 0,
+        max_newton_residual: 0.,
+        last_error: 0.,
+        wall_elapsed_s: 0.,
+    };
+    PacketStageContext {
+        input,
+        energies: &energies,
+        signature: &signature,
+        max_rhs,
+    }
+    .step(&mut state, dt, counter)?;
+    Ok(PacketStageResult {
+        gas: state.gas,
+        stocks: state.photons,
+        ledgers: state.ledgers,
+        max_residual: state.max_newton_residual,
+    })
+}
+
 fn solve4(mut a: [[f64; 4]; 4], mut b: [f64; 4]) -> Result<[f64; 4], ForwardError> {
     for k in 0..4 {
         let pivot = (k..4)
