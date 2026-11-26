@@ -101,7 +101,16 @@ impl FreqRays{
     let x=q*d;
     let k=self.x.partition_point(|v|*v<=x);
     if k==0||k==self.x.len(){
-     if x==self.x[self.x.len()-1]{stock[self.x.len()-1]+=n;continue}
+     // A cell is defined by its log-midpoint edges, not by its center.
+     // Assign within-edge packets to the edge cell by number; explicitly
+     // carry signed energy quadrature defect without changing physical rays.
+     let i=if k==0{0}else{self.x.len()-1};
+     let lo=self.x[0]*(-self.dl/2.).exp();
+     let hi=self.x[self.x.len()-1]*(self.dl/2.).exp();
+     if x>=lo&&x<=hi{
+      stock[i]+=n;let e=n*(x-self.x[i])*KT0/g.a;
+      out[1]+=e;out[3]+=e.abs();continue
+     }
      out[0]+=n;out[1]+=n*x*KT0/g.a;out[2]+=n.abs();out[3]+=(n*x*KT0/g.a).abs();continue
     }
     let t=(x-self.x[k-1])/(self.x[k]-self.x[k-1]);stock[k-1]+=n*(1.-t);stock[k]+=n*t;
@@ -112,6 +121,17 @@ impl FreqRays{
   if (stock.iter().sum::<f64>()+out[0]-n).abs()>1e-12||(en+out[1]-u).abs()>1e-14{return Err("project ledger".into())}
   let occ=stock.iter().zip(&self.x).map(|(n,x)|n/(self.cap*x.powi(3)*self.dl)).collect();
   Ok((occ,out))
+ }
+ pub fn min_full_ratio(&self,s:&[f64],g:&OwnedState)->Result<f64,String>{
+  let rays=self.ray(g)?;let mut min=f64::INFINITY;
+  for (i,(row,(d,_,_))) in s.chunks_exact(self.q.len()).zip(rays).enumerate(){
+   for (&q,&n) in self.q.iter().zip(row){
+    let refn=self.cap*self.w[i]*q.powi(3)*self.dl/(q*d).exp_m1();
+    if !refn.is_finite()||refn<=0.{return Err("reference stock domain".into())}
+    min=min.min(1.+n/refn);
+   }
+  }
+  Ok(min)
  }
  pub fn output(&self,s:&[f64],g:&OwnedState,path:&std::path::Path)->Result<(),String>{
   use std::io::Write;

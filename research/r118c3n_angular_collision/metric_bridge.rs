@@ -123,16 +123,16 @@ fn main()->Result<(),Box<dyn std::error::Error>>{
  if mesh[0]!=g.geometry.a || (mesh.last().unwrap()-end).abs()>1e-15{return Err("mesh endpoints".into())}
  let out=Path::new(&args[1]);fs::create_dir(out)?;
  let mut f=BufWriter::new(fs::File::create(out.join("history.csv"))?);
- writeln!(f,"a,h,S0,S1,S2,S3,S4,T,xHII,xHeII,xHeIII,ne,primary,w,b,cool,spec,source,thermal_work,photon_work,boundary,secondary_work,ledger,gauss,metric,specN,specU,spec_ref,secPxx,secPyy,secPzz,secPxy,secPxz,secPyz,N_dir,N_source,edgeN,edgeU,edgeNabs,edgeUabs,elastic_depth,elastic_moved,elastic_blocked,max_collision_U,max_collision_N,max_depth,accepted,rejected")?;
+ writeln!(f,"a,h,S0,S1,S2,S3,S4,T,xHII,xHeII,xHeIII,ne,primary,w,b,cool,spec,source,thermal_work,photon_work,boundary,secondary_work,ledger,gauss,metric,specN,specU,spec_ref,secPxx,secPyy,secPzz,secPxy,secPxz,secPyz,N_dir,N_source,edgeN,edgeU,edgeNabs,edgeUabs,elastic_depth,elastic_moved,elastic_blocked,max_collision_U,max_collision_N,max_depth,canonical_min_full_ratio,accepted,rejected")?;
  let rejected=0usize;let mut idx=0usize;let mut maxerr=0_f64;let mut maxspec=0_f64;let mut maxledger=0_f64;
  loop{
   let a=g.geometry.a;
   let eos=s.gas.gas.eos(cp.d.n_h0_cm3/a.powi(3),cp.d.n_he0_cm3/a.powi(3))?;
   let m=cp.d.general_moments(&s.gas)?;let [w,b]=cp.d.gas_energy_components(&s.gas)?;
-  let l=&s.gas.ledgers;let ledger=cp.ledger(&s)?;let gauss=owner.constraint_external(&g,&s,&mut cp)?;let ps=cp.sec_pressure(&s,&g.geometry)?;let (_,_,ns)=cp.freq.moments(&s.freq,&g.geometry)?;
+  let l=&s.gas.ledgers;let ledger=cp.ledger(&s)?;let gauss=owner.constraint_external(&g,&s,&mut cp)?;let ps=cp.sec_pressure(&s,&g.geometry)?;let (_,_,ns)=cp.freq.moments(&s.freq,&g.geometry)?;let minratio=cp.freq.min_full_ratio(&s.freq,&g.geometry)?;
   maxledger=maxledger.max(ledger.abs());maxerr=maxerr.max(s.gas.last_error);maxspec=maxspec.max(s.err[0].max(s.err[1]));
   write!(f,"{a:.17e},{:.17e}",g.geometry.h)?;
-  for x in g.geometry.s.into_iter().chain([eos.temperature_k]).chain(s.gas.gas.fractions).chain([eos.electron_density_cm3,m.energy,w,b,s.cool,s.spec,l.source_u,l.thermal_work,l.photon_work,l.boundary_u,s.work,ledger,gauss,s.gas.last_error,s.err[0],s.err[1],s.spec_ref,ps[0][0],ps[1][1],ps[2][2],ps[0][1],ps[0][2],ps[1][2],ns,s.source_n,s.edge[0],s.edge[1],s.edge[2],s.edge[3]]).chain(s.elastic).chain([s.max_depth]){write!(f,",{x:.17e}")?;}
+  for x in g.geometry.s.into_iter().chain([eos.temperature_k]).chain(s.gas.gas.fractions).chain([eos.electron_density_cm3,m.energy,w,b,s.cool,s.spec,l.source_u,l.thermal_work,l.photon_work,l.boundary_u,s.work,ledger,gauss,s.gas.last_error,s.err[0],s.err[1],s.spec_ref,ps[0][0],ps[1][1],ps[2][2],ps[0][1],ps[0][2],ps[1][2],ns,s.source_n,s.edge[0],s.edge[1],s.edge[2],s.edge[3]]).chain(s.elastic).chain([s.max_depth,minratio]){write!(f,",{x:.17e}")?;}
   writeln!(f,",{},{}",s.gas.accepted,rejected)?;
   if idx+1==mesh.len(){if (end-a).abs()>1e-14{return Err("mesh endpoint".into())}break}
   let next=mesh[idx+1];let mut du=(next/a).ln();
