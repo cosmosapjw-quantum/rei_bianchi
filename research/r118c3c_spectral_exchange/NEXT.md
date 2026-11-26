@@ -1,0 +1,2 @@
+# C3D continuation
+Introduce the evolving occupation as an opt-in implicit gas-radiation exchange owner; couple the spectral net energy consistently to gas, radiation and redshift work without double counting legacy Planck absorption. Add paired checkpoint/grid identity and exact restart tests. First compare manufactured cells and actual short history at matched tolerances; then extend the live trajectory. Keep angular transport, Compton redistribution, low-frequency physics and absolute emissivity changes explicitly scoped.
