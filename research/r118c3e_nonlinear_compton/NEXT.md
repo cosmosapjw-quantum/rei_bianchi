@@ -1,0 +1,1 @@
+C3F: varying temperature Compton clock plus conservative implicit gas/FF coupling, physical absolute emissivity and low-frequency boundary account. Preserve actual photon number when no-flux finite domain chosen; do not extrapolate to x=0. Bind actual BASS/REC donor and spectral grid identity. Independent source tests before live activation.
