@@ -1,0 +1,88 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:395:18
+    |
+395 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+395 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+395 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+error[E0599]: no method named `cooling_channels` found for struct `IgmPointRhs` in the current scope
+ --> tests/r118c3a_cooling.rs:6:10
+  |
+6 |  let c=r.cooling_channels().unwrap();
+  |          ^^^^^^^^^^^^^^^^ method not found in `IgmPointRhs`
+
+error[E0609]: no field `cooling_ev` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c3a_cooling.rs:19:12
+   |
+19 |  assert!(x.cooling_ev[7]>0.);
+   |            ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 17 others
+
+error[E0609]: no field `cooling_ev` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c3a_cooling.rs:20:13
+   |
+20 |  assert!((x.cooling_ev.iter().sum::<f64>()/x.ledgers.escaped_u-1.).abs()...
+   |             ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 17 others
+
+error[E0609]: no field `ff_temp_ev_k` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c3a_cooling.rs:21:12
+   |
+21 |  assert!(x.ff_temp_ev_k/x.cooling_ev[7]>0.);
+   |            ^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 17 others
+
+error[E0609]: no field `cooling_ev` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c3a_cooling.rs:21:27
+   |
+21 |  assert!(x.ff_temp_ev_k/x.cooling_ev[7]>0.);
+   |                           ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 17 others
+
+error[E0609]: no field `cooling_ev` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c3a_cooling.rs:24:15
+   |
+24 |  assert_eq!(x.cooling_ev,y.cooling_ev);assert_eq!(x.ff_temp_ev_k,y.ff_te...
+   |               ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 17 others
+
+error[E0609]: no field `cooling_ev` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c3a_cooling.rs:24:28
+   |
+24 |  assert_eq!(x.cooling_ev,y.cooling_ev);assert_eq!(x.ff_temp_ev_k,y.ff_te...
+   |                            ^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 17 others
+
+error[E0609]: no field `ff_temp_ev_k` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c3a_cooling.rs:24:53
+   |
+24 | ...ing_ev);assert_eq!(x.ff_temp_ev_k,y.ff_temp_ev_k);
+   |                         ^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 17 others
+
+error[E0609]: no field `ff_temp_ev_k` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c3a_cooling.rs:24:68
+   |
+24 | ...eq!(x.ff_temp_ev_k,y.ff_temp_ev_k);
+   |                         ^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 17 others
+
+Some errors have detailed explanations: E0599, E0609.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `rei_microphysics` (test "r118c3a_cooling") due to 9 previous errors

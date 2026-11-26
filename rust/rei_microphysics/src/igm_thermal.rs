@@ -40,6 +40,30 @@ pub struct IgmPointRhs {
 }
 
 use crate::{igm_rates::igm_rates, HHeModel};
+impl IgmPointRhs {
+    /// Actual energy sinks of the original point RHS, in erg/cm³/s.
+    /// RR includes ionization binding energy. The DR channel includes HeI
+    /// binding energy. These are bolometric channels, not line spectra.
+    pub fn cooling_channels(&self) -> Result<[f64; 8], ForwardError> {
+        let c = HHeModel::controlled_fixture();
+        let mut v = [0.; 8];
+        for i in 0..3 {
+            v[i] = self.rr_thermal_sink_erg_cm3_s[i]
+                + c.threshold_ev[i] * c.ev_erg * self.rr_events_cm3_s[i];
+            v[i + 4] = self.ce_thermal_sink_erg_cm3_s[i];
+        }
+        v[3] = self.dr_thermal_sink_erg_cm3_s + c.threshold_ev[1] * c.ev_erg * self.dr_events_cm3_s;
+        v[7] = self.freefree_thermal_sink_erg_cm3_s;
+        if v.iter().any(|x| !x.is_finite() || *x < 0.)
+            || (v.iter().sum::<f64>() - self.escape_erg_cm3_s).abs()
+                > 2e-14 * self.escape_erg_cm3_s.max(1e-300)
+        {
+            return Err(invalid());
+        }
+        Ok(v)
+    }
+}
+
 // CODATA 2022: https://physics.nist.gov/cuu/pdf/wall_2022.pdf
 // sigma_T and electron mass; a_rad = 4*sigma_SB/c.
 // sigma_SB follows the exact SI kB,h,c blackbody expression (converted to cgs).

@@ -289,6 +289,11 @@ pub struct DriverState {
     pub photon_inactive_number: Vec<f64>,
     pub photon_inactive_energy_ref: Vec<f64>,
     pub ledgers: Ledgers,
+    /// General-mode accepted integrated radiative channel energies (eV/H).
+    pub cooling_ev:[f64;8],
+    /// Free-free emitted-energy-weighted temperature (eV K/H).
+    pub ff_temp_ev_k:f64,
+
     pub next_dln_a: f64,
     pub accepted: usize,
     pub attempts: usize,
@@ -554,6 +559,7 @@ impl Driver {
             photon_inactive_number: vec![0.0; transport.cell_count()],
             photon_inactive_energy_ref: vec![0.0; transport.cell_count()],
             ledgers: Ledgers::default(),
+            cooling_ev:[0.;8],ff_temp_ev_k:0.,
             next_dln_a: config.initial_dln_a,
             accepted: 0,
             attempts: 0,
@@ -1063,6 +1069,14 @@ impl Driver {
                 next.ledgers.excluded_dr_ev +=
                     rhs.excluded_dr_cooling_erg_cm3_s * dt / (nh * c.ev_erg);
                 next.ledgers.escaped_u += rhs.escape_erg_cm3_s * dt / (nh * c.ev_erg);
+                if self.transport.general_history().is_some(){
+                    let channels=rhs.cooling_channels()?;
+                    let t=next.gas.eos(nh,self.n_he0_cm3/old.a.powi(3))?.temperature_k;
+                    for (v,q) in next.cooling_ev.iter_mut().zip(channels){
+                        *v+=q*dt/(nh*c.ev_erg);
+                    }
+                    next.ff_temp_ev_k+=channels[7]*dt/(nh*c.ev_erg)*t;
+                }
                 next.ledgers.cmb_input += rhs.cmb_to_gas_erg_cm3_s * dt / (nh * c.ev_erg);
                 next.max_newton_residual = next.max_newton_residual.max(norm);
                 *s = next;
@@ -1151,6 +1165,11 @@ impl Driver {
         Ok(s)
     }
     pub fn validate(&self, s: &DriverState, tolerance: f64) -> Result<(), ForwardError> {
+        if self.transport.general_history().is_some(){
+            if s.cooling_ev.iter().chain(std::iter::once(&s.ff_temp_ev_k)).any(|v|!v.is_finite()||*v<0.) ||
+            (s.cooling_ev.iter().sum::<f64>()-s.ledgers.escaped_u).abs()>1e-11*s.ledgers.escaped_u.max(1e-300)
+            {return Err(err("GENERAL_COOLING_LEDGER"))}
+        }
         let eos = s
             .gas
             .eos(self.n_h0_cm3 / s.a.powi(3), self.n_he0_cm3 / s.a.powi(3))?;
@@ -1624,8 +1643,9 @@ impl Driver {
         if let Some(h)=self.transport.general_history(){
             self.validate(s,1e-8)?;
             if s.a!=h.interval()[1]{return Err(err("GENERAL_CHECKPOINT_NOT_ACCEPTED_ENDPOINT"))}
-            text=text.replacen("AXBI_CHECKPOINT_V7","AXBI_CHECKPOINT_V8_GENERAL",1);
-            text.push_str(&format!("{:?}\n{}\n{}\nGENERAL_SOURCE_IDENTITY\n{}",self.config,h.registry_identity(),h.interval_identity(),compiled_identity()));
+            text=text.replacen("AXBI_CHECKPOINT_V7","AXBI_CHECKPOINT_V9_GENERAL",1);
+            let mut cooling=s.cooling_ev.to_vec();cooling.push(s.ff_temp_ev_k);
+            text.push_str(&format!("{:?}\n{}\n{}\n{}\nGENERAL_SOURCE_IDENTITY\n{}",self.config,h.registry_identity(),h.interval_identity(),list(&cooling),compiled_identity()));
         }
         Ok(text)
     }
@@ -1655,7 +1675,7 @@ impl Driver {
         let (head,ident)=text.split_once("\nGENERAL_SOURCE_IDENTITY\n").ok_or(err("GENERAL_CHECKPOINT_SOURCE"))?;
         if ident!=compiled_identity(){return Err(err("GENERAL_CHECKPOINT_SOURCE"))}
         let lines=head.lines().collect::<Vec<_>>();
-        if lines.len()!=26||lines[0]!="AXBI_CHECKPOINT_V8_GENERAL"||lines[23]!=format!("{:?}",self.config){return Err(err("GENERAL_CHECKPOINT_CONFIG"))}
+        if lines.len()!=27||lines[0]!="AXBI_CHECKPOINT_V9_GENERAL"||lines[23]!=format!("{:?}",self.config){return Err(err("GENERAL_CHECKPOINT_CONFIG"))}
         let old=self.transport.general_history().ok_or(err("GENERAL_CHECKPOINT_MODE"))?.clone();
         let mut restored=old.clone();restored.restore_interval(lines[24],lines[25])?;
         self.transport.restore_general_history(restored);
@@ -1669,14 +1689,16 @@ impl Driver {
     }
     fn read_checkpoint_text(&self,text:&str)->Result<DriverState,ForwardError>{
         let general=self.transport.general_history();
+        let mut cooling=[0.;9];
         let body=if let Some(h)=general{
             let (head,ident)=text.split_once("\nGENERAL_SOURCE_IDENTITY\n").ok_or(err("GENERAL_CHECKPOINT_SOURCE"))?;
             let lines=head.lines().collect::<Vec<_>>();
-            if ident!=compiled_identity()||lines.len()!=26||lines[23]!=format!("{:?}",self.config)||lines[24]!=h.registry_identity()||lines[25]!=h.interval_identity(){return Err(err("GENERAL_CHECKPOINT_IDENTITY"))}
+            if ident!=compiled_identity()||lines.len()!=27||lines[23]!=format!("{:?}",self.config)||lines[24]!=h.registry_identity()||lines[25]!=h.interval_identity(){return Err(err("GENERAL_CHECKPOINT_IDENTITY"))}
+            cooling=parse_list(lines[26])?.try_into().map_err(|_|err("GENERAL_COOLING_CHECKPOINT"))?;
             lines[..23].join("\n")
         }else{text.to_string()};
         let lines=body.lines().collect::<Vec<_>>();
-        let (version,len)=if general.is_some(){("AXBI_CHECKPOINT_V8_GENERAL",23)}else if self.config.reactive_hi{("AXBI_CHECKPOINT_V7",23)}else if self.config.hei_split{("AXBI_CHECKPOINT_V6",19)}else if self.config.heii_split{("AXBI_CHECKPOINT_V5",15)}else{("AXBI_CHECKPOINT_V4",11)};
+        let (version,len)=if general.is_some(){("AXBI_CHECKPOINT_V9_GENERAL",23)}else if self.config.reactive_hi{("AXBI_CHECKPOINT_V7",23)}else if self.config.hei_split{("AXBI_CHECKPOINT_V6",19)}else if self.config.heii_split{("AXBI_CHECKPOINT_V5",15)}else{("AXBI_CHECKPOINT_V4",11)};
         if lines.len()!=len || lines[0]!=version {
             return Err(err("AXBI_CHECKPOINT_VERSION"));
         }
@@ -1718,6 +1740,7 @@ impl Driver {
             photon_inactive_number,
             photon_inactive_energy_ref,
             ledgers: l,
+            cooling_ev:cooling[..8].try_into().unwrap(),ff_temp_ev_k:cooling[8],
             next_dln_a: v[7],
             max_newton_residual: v[8],
             last_error: v[9],
