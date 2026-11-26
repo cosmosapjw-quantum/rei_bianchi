@@ -50,6 +50,6 @@ fn accepted_cooling_ledger_roundtrip() {
     assert_eq!(x.ff_temp_ev_k, y.ff_temp_ev_k);
     assert!(std::fs::read_to_string(&path)
         .unwrap()
-        .starts_with("AXBI_CHECKPOINT_V9_GENERAL"));
+        .starts_with("AXBI_CHECKPOINT_V10_GENERAL"));
     std::fs::remove_file(path).unwrap();
 }

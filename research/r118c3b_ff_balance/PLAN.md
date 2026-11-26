@@ -1,0 +1,1 @@
+C3B: test opt-in Planck-bath inverse free-free in implicit chemical stage, preserving original gross cooling and counting absorption separately. Acquire van Hoof NR table; if unavailable, grey balance is a scoped control, never fabricate table. BASS explicit signed isotropic absorbed energy and restart; REC labelled conservative line-face transport.

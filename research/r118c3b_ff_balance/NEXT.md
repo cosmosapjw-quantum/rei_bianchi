@@ -1,0 +1,2 @@
+# R118-C3C
+Use actual frequency-dependent emissivity normalization and transport of signed CMB/free-free perturbations with Kirchhoff absorption of the evolving distribution, not only prescribed Planck. Separate real recombination cascade data from integrated case-A rates. Improve table interpolation via original interpolation oracle if absolute-rate comparison requires it. Preserve V10 source and ledger identity.

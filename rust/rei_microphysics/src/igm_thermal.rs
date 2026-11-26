@@ -32,6 +32,7 @@ pub struct IgmPointRhs {
     pub escape_erg_cm3_s: f64,
     /// Signed INTO gas. CMB reservoir rate is its negative.
     pub cmb_to_gas_erg_cm3_s: f64,
+    pub ff_absorption_erg_cm3_s: f64,
     pub photo_input_erg_cm3_s: f64,
     pub expansion_work_erg_cm3_s: f64,
     pub ci_floor_events_cm3_s: [f64; 3],
@@ -41,6 +42,36 @@ pub struct IgmPointRhs {
 
 use crate::{igm_rates::igm_rates, HHeModel};
 impl IgmPointRhs {
+    /// Add only the inverse free-free term, with the existing gross emission.
+    /// The signed CMB ledger includes this heat, separately identified below.
+    pub fn add_ff_absorption(
+        &mut self,
+        gas: &IgmGasState,
+        nh: f64,
+        nhe: f64,
+        tc: f64,
+        mode: u8,
+    ) -> Result<(), ForwardError> {
+        if mode == 0 {
+            return Ok(());
+        }
+        let [x, y, z] = gas.fractions;
+        let ion = nh * x + nhe * y + 4. * nhe * z;
+        let frac = if ion > 0. { 4. * nhe * z / ion } else { 0. };
+        let eos = gas.eos(nh, nhe)?;
+        let ratio = crate::ff_balance::absorption_ratio(eos.temperature_k, tc, frac, mode)?;
+        let heat = finite(self.freefree_thermal_sink_erg_cm3_s * ratio)?;
+        self.ff_absorption_erg_cm3_s = heat;
+        self.cmb_to_gas_erg_cm3_s = finite(self.cmb_to_gas_erg_cm3_s + heat)?;
+        self.thermal_micro_erg_cm3_s = finite(self.thermal_micro_erg_cm3_s + heat)?;
+        self.w_dt_erg_per_h_s = finite(self.w_dt_erg_per_h_s + heat / nh)?;
+        let c = HHeModel::controlled_fixture();
+        self.temperature_dt_k_s = finite(
+            self.temperature_dt_k_s
+                + 2. * heat / (3. * c.kb_erg_k * (nh + nhe + eos.electron_density_cm3)),
+        )?;
+        Ok(())
+    }
     /// Actual energy sinks of the original point RHS, in erg/cm³/s.
     /// RR includes ionization binding energy. The DR channel includes HeI
     /// binding energy. These are bolometric channels, not line spectra.

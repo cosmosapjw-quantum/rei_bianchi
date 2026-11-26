@@ -1,0 +1,2 @@
+# C3B return
+Original table downloaded with curl from official site; SHA-256 07312b2068393c39acac6fb7478003060210b936b0547e8569749a792b851cf7, original notice preserved. Tests red/green, full Rust suite 353. Quadrature example compares 128/256/512/2048 log grids on 96 physical parameter/mode combinations. BASS live bridge independent histories, actual V10 checkpoint roundtrip and exact matched off baseline. No new production pin or remote push.
