@@ -39,8 +39,9 @@ def run(n,cut,mode,label):
     if ev(lo)[0]*ev(hi)[0]<=0:break
     z0*=2
    else:raise ValueError('unbracketed energy')
-   T=brentq(lambda t:ev(t)[0],lo,hi,xtol=1e-12,rtol=1e-14)
-   res,d,cu,fu,nn,ma,temp,clock=ev(T);neww=cs[k+1]*T
+   Tnew=brentq(lambda t:ev(t)[0],lo,hi,xtol=1e-12,rtol=1e-14)
+   res,d,cu,fu,nn,ma,temp,clock=ev(Tnew);T=Tnew;neww=cs[k+1]*T
+   assert abs(res)<1e-14
    max_g=max(max_g,abs(res));qext+=Q;wg+=w-w_ad
   assert min(s.f0+d/s.c)>=0
   Uold=bb0*15/np.pi**4*(s.x@old);Unew=bb1*15/np.pi**4*(s.x@d)
