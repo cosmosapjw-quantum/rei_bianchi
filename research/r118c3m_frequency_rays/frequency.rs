@@ -1,0 +1,86 @@
+//! Signed canonical photon-number stock. Local isotropic injection, collisionless transport.
+use bianchi_rustcore::kinetic::{owned_vlasov::OwnedState,sphere::SphereGrid};
+const KT0:f64=8.617333262145e-5*2.7255;
+pub struct FreqRays{dir:Vec<[f64;3]>,w:Vec<f64>,q:Vec<f64>,x:Vec<f64>,dl:f64,cap:f64}
+impl FreqRays{
+ pub fn new(x:&[f64],bb:f64,a:f64,nmu:usize)->Result<Self,String>{
+  if x.len()<16||!bb.is_finite()||bb<=0.{return Err("freq grid".into())}
+  let dl=(x[1]/x[0]).ln();let g=SphereGrid::new(nmu,2*nmu);
+  let dir=g.ehat.chunks_exact(3).map(|z|[z[0],z[1],z[2]]).collect();
+  let w=g.w.iter().map(|v|v/(4.*std::f64::consts::PI)).collect();
+  let mut q=Vec::new();for i in -4..(x.len() as isize+4){q.push(x[0]*(i as f64*dl).exp());}
+  let cap=bb*a/KT0*15./std::f64::consts::PI.powi(4);
+  Ok(Self{dir,w,q,x:x.to_vec(),dl,cap})
+ }
+ pub fn empty(&self)->Vec<f64>{vec![0.;self.dir.len()*self.q.len()]}
+ pub fn ray(&self,g:&OwnedState)->Result<Vec<(f64,[f64;3],f64)>,String>{
+  let f=g.f.try_inverse().ok_or("inverse")?.transpose();
+  let mut rays=Vec::new();let mut sum=0.;
+  for (n,w) in self.dir.iter().zip(&self.w){
+   let p:[f64;3]=std::array::from_fn(|i|(0..3).map(|j|f[(i,j)]*n[j]).sum());let d=p.iter().map(|v|v*v).sum::<f64>().sqrt();
+   let wt=w/d.powi(3);sum+=wt;rays.push((d,p.map(|x|x/d),wt));
+  }
+  if (sum-1.).abs()>1e-7{return Err(format!("solid angle quadrature {sum:e}"))}
+  for r in &mut rays{r.2/=sum;}Ok(rays)
+ }
+ pub fn moments(&self,s:&[f64],g:&OwnedState)->Result<(f64,[[f64;3];3],f64),String>{
+  if s.len()!=self.dir.len()*self.q.len()||s.iter().any(|v|!v.is_finite()){return Err("signed stock".into())}
+  let mut u=0.;let mut n=0.;let mut p=[[0.;3];3];let fac=KT0/g.a;
+  for (row,(d,k,_)) in s.chunks_exact(self.q.len()).zip(self.ray(g)?){
+   let v=row.iter().zip(&self.q).map(|(a,b)|a*b).sum::<f64>()*fac*d;
+   u+=v;n+=row.iter().sum::<f64>();for i in 0..3{for j in 0..3{p[i][j]+=v*k[i]*k[j];}}
+  }
+  Ok((u,p,n))
+ }
+ pub fn advance(&self,s:&mut [f64],old:&OwnedState,mid:&OwnedState,end:&OwnedState,delta:&[f64])->Result<(f64,f64,f64,f64),String>{
+  if delta.len()!=self.x.len(){return Err("spectral delta".into())}
+  let (u0,_,n0)=self.moments(s,old)?;let qn:Vec<_>=delta.iter().zip(&self.x).map(|(f,x)|self.cap*x.powi(3)*self.dl*f).collect();
+  let birth_n=qn.iter().sum::<f64>();let birth_u=qn.iter().zip(&self.x).map(|(a,b)|a*b).sum::<f64>()*KT0/mid.a;
+  let m=self.ray(mid)?;let mut before_mid=0.;let mut after_mid=0.;let mut deposited_n=0.;
+  for (row,(d,_,w)) in s.chunks_exact_mut(self.q.len()).zip(m){
+   before_mid+=row.iter().zip(&self.q).map(|(a,b)|a*b).sum::<f64>()*KT0/mid.a*d;
+   for (x,dn) in self.x.iter().zip(&qn){
+    let q=x/d;let k=self.q.partition_point(|x|*x<=q);
+    if k==0||k>=self.q.len(){return Err("canonical padded boundary".into())}
+    let t=(q-self.q[k-1])/(self.q[k]-self.q[k-1]);let n=w*dn;
+    row[k-1]+=n*(1.-t);row[k]+=n*t;deposited_n+=n;
+   }
+   after_mid+=row.iter().zip(&self.q).map(|(a,b)|a*b).sum::<f64>()*KT0/mid.a*d;
+  }
+  let (u1,_,n1)=self.moments(s,end)?;
+  let work=u0-before_mid+after_mid-u1;
+  if (u1-u0+work-birth_u).abs()>1e-14 || (n1-n0-birth_n).abs()>1e-12 || (deposited_n-birth_n).abs()>1e-12{return Err("frequency deposition ledger".into())}
+  Ok((u1,work,birth_n,birth_u))
+ }
+ // Angle-integrated physical frequency spectrum for the scalar reaction operator.
+ // Out-of-grid packet weight is reported, not removed from physical stock.
+ pub fn project(&self,s:&[f64],g:&OwnedState)->Result<(Vec<f64>,[f64;4]),String>{
+  let mut stock=vec![0.;self.x.len()];let mut out=[0.;4];
+  for (row,(d,_,_)) in s.chunks_exact(self.q.len()).zip(self.ray(g)?){
+   for (&q,&n) in self.q.iter().zip(row){
+    if n==0.{continue}
+    let x=q*d;
+    let k=self.x.partition_point(|v|*v<=x);
+    if k==0||k==self.x.len(){
+     if x==self.x[self.x.len()-1]{stock[self.x.len()-1]+=n;continue}
+     out[0]+=n;out[1]+=n*x*KT0/g.a;out[2]+=n.abs();out[3]+=(n*x*KT0/g.a).abs();continue
+    }
+    let t=(x-self.x[k-1])/(self.x[k]-self.x[k-1]);stock[k-1]+=n*(1.-t);stock[k]+=n*t;
+   }
+  }
+  let (u,_,n)=self.moments(s,g)?;
+  let en=stock.iter().zip(&self.x).map(|(n,x)|n*x*KT0/g.a).sum::<f64>();
+  if (stock.iter().sum::<f64>()+out[0]-n).abs()>1e-12||(en+out[1]-u).abs()>1e-14{return Err("project ledger".into())}
+  let occ=stock.iter().zip(&self.x).map(|(n,x)|n/(self.cap*x.powi(3)*self.dl)).collect();
+  Ok((occ,out))
+ }
+ pub fn output(&self,s:&[f64],g:&OwnedState,path:&std::path::Path)->Result<(),String>{
+  use std::io::Write;
+  let mut f=std::io::BufWriter::new(std::fs::File::create(path).map_err(|e|e.to_string())?);
+  writeln!(f,"ray,q,x,N_per_H,nx,ny,nz").map_err(|e|e.to_string())?;
+  for (j,(row,(d,k,_))) in s.chunks_exact(self.q.len()).zip(self.ray(g)?).enumerate(){
+   for (&q,&n) in self.q.iter().zip(row){writeln!(f,"{j},{q:.17e},{:.17e},{n:.17e},{:.17e},{:.17e},{:.17e}",q*d,k[0],k[1],k[2]).map_err(|e|e.to_string())?;}
+  }
+  f.flush().map_err(|e|e.to_string())
+ }
+}
