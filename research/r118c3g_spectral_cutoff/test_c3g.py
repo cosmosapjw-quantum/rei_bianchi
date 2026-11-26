@@ -1,5 +1,5 @@
 import unittest,numpy as np
-from spectral_coupling import SignedKompaneets, FreeFree, candidate, sink_stock, G, birth_scaled
+from spectral_coupling import SignedKompaneets, FreeFree, candidate, sink_stock, G, birth_scaled, electron_fraction, abundance_from_clock, H
 class SpectralCouplingTest(unittest.TestCase):
  def setUp(self):self.s=SignedKompaneets(np.geomspace(1e-6,60,129));self.ff=FreeFree(G,self.s)
  def test_planck_fixed(self):
@@ -15,5 +15,9 @@ class SpectralCouplingTest(unittest.TestCase):
   self.assertAlmostEqual(d.sum()+N,0);self.assertAlmostEqual(2*s.x@d+E,0);self.assertGreaterEqual(min(s.f0+d/s.c),0)
  def test_bad_sink(self):
   with self.assertRaises(ValueError):sink_stock(np.zeros(128),self.s,1.,1.)
+ def test_helium_normalization(self):
+  self.assertAlmostEqual(electron_fraction(1,0,1,.08),1.16)
+  r=np.genfromtxt(H,names=True,delimiter=',');Y=abundance_from_clock(r);self.assertTrue(.08<Y<.083)
+  x=electron_fraction(r['xHII'],r['xHeII'],r['xHeIII'],Y);q=r['ne']*r['a']**3/x;np.testing.assert_allclose(q,q[0],rtol=1e-12,atol=0)
  def test_birth(self):self.assertAlmostEqual(birth_scaled(2.,50.,50.),2.)
 if __name__=='__main__':unittest.main()

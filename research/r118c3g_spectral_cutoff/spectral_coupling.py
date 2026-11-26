@@ -6,9 +6,16 @@ from scipy.optimize import brentq
 D=Path(__file__).resolve().parent
 sys.path.insert(0,str(D.parent/'r118c3f_signed_thermal'))
 from signed import SignedKompaneets,FreeFree
-P=D.parent/'r118c3c_spectral_exchange/table_stages.csv';H=Path.home()/'Downloads/bass_r118c3b_table/history.csv';G=D.parent/'r118c3b_ff_balance/gauntff.dat'
+P=D.parent/'r118c3c_spectral_exchange/table_stages.csv';H=D/'inputs/history.csv';G=D.parent/'r118c3b_ff_balance/gauntff.dat'
 KB=8.617333262145e-5;ME=510998.9499961642;C=299792458.;SIG=6.6524587051e-29;H0=2.1842852410855023e-18
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def electron_fraction(hii,heii,heiii,Y):
+ return hii+Y*(heii+2*heiii)
+def abundance_from_clock(r):
+ u=np.column_stack((r['xHII'],r['xHeII']+2*r['xHeIII']));v=r['ne']*r['a']**3
+ p,_,rank,_=np.linalg.lstsq(u,v,rcond=None)
+ if rank!=2 or np.min(p)<=0 or np.max(abs(u@p-v))/np.max(abs(v))>1e-12:raise ValueError('inconsistent accepted EOS clock')
+ return float(p[1]/p[0])
 def birth_scaled(b,t,tref):
  f=lambda x:1.1+.34*np.exp(-(5.5-np.log10(x))**2/3)
  return b*np.sqrt(t/tref)*f(t)/f(tref)
@@ -26,11 +33,11 @@ def run(n,xmin,mode,label):
  assert len(v)==len(r)-1 and np.array_equal(v['a'],r['a'][1:])
  s=SignedKompaneets(np.geomspace(xmin,60,n+1));ff=FreeFree(G,s)
  dt=np.diff(np.log(r['a']))/(H0*np.sqrt(r['h'][1:]*r['h'][:-1]));ne=(r['ne'][1:]+r['ne'][:-1])/2*1e6
- th=(r['T'][1:]+r['T'][:-1])/2;Y=.245/(4*(1-.245));d=np.zeros(n);T=float(r['T'][0])
+ th=(r['T'][1:]+r['T'][:-1])/2;Y=abundance_from_clock(r);d=np.zeros(n);T=float(r['T'][0])
  uc=uf=work=nc=nf=anal=0.;gres=0.;resid=0.;mx=0.;rows=[]
  for k,z in enumerate(v):
   a,t,tc,f,b,bb0,bbmid,bb1=[float(z[j]) for j in z.dtype.names];scale=bbmid*15/np.pi**4;old=d.copy()
-  xe=(r['xHII'][k]+r['xHII'][k+1]+r['xHeII'][k]+r['xHeII'][k+1]+2*r['xHeIII'][k]+2*r['xHeIII'][k+1])/2
+  xe=electron_fraction((r['xHII'][k]+r['xHII'][k+1])/2,(r['xHeII'][k]+r['xHeII'][k+1])/2,(r['xHeIII'][k]+r['xHeIII'][k+1])/2,Y)
   cv=1.5*KB*(1+Y+xe)
   if mode=='replay':
    temp=th[k];clock=KB*temp/ME*C*SIG*ne[k]*dt[k]
@@ -59,7 +66,7 @@ def run(n,xmin,mode,label):
   if (k+1)%100==0:print(label,k+1,T,flush=True)
  U=float(v['BB1'][-1]*15/np.pi**4*(s.x@d));ledger=float(U+work-uc-uf)
  assert abs(ledger)<1e-14 and gres<1e-14 and abs(nc)<1e-12*max(abs(nf),1e-30)
- out=dict(status='SCOPED_ACTUAL_CLOCK_'+mode.upper(),n=n,xmin=xmin,stages=len(v),terminal_T=T,compton=uc,ff=uf,terminal=U,work=float(work),ledger=ledger,stage_residual=resid,gas_residual=gres,number_compton_error=nc,ff_number=nf,analytic_planck=anal,relative_compton=uc/anal-1,max_tau=mx,source_hashes={str(p):sha(p) for p in (P,H,G)},scope='prescribed accepted H, chemistry, ne; reflecting frequency endpoints; coupled mode adiabatic+spectral only, not production or chemistry feedback')
+ out=dict(status='SCOPED_ACTUAL_CLOCK_'+mode.upper(),n=n,xmin=xmin,stages=len(v),terminal_T=T,helium_number_ratio=Y,compton=uc,ff=uf,terminal=U,work=float(work),ledger=ledger,stage_residual=resid,gas_residual=gres,number_compton_error=nc,ff_number=nf,analytic_planck=anal,relative_compton=uc/anal-1,max_tau=mx,source_hashes={str(p):sha(p) for p in (P,H,G)},scope='prescribed accepted H, chemistry, ne; reflecting frequency endpoints; coupled mode adiabatic+spectral only, not production or chemistry feedback')
  np.savez_compressed(D/(label+'.npz'),x=s.x,delta=d,c=s.c,rows=np.array(rows))
  (D/(label+'.json')).write_text(json.dumps(out,indent=2)+'\n');print(out,flush=True)
 if __name__=='__main__':
