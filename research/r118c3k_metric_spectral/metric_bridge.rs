@@ -64,7 +64,7 @@ fn main()->Result<(),Box<dyn std::error::Error>>{
  if ![2,3].contains(&mode)||cap<=0.{return Err("domain".into())}
  cfg.ff_balance_mode=mode;let target=cfg.local_target;
  let owner=ThomsonOwner::new(0.03,32,8,16,4,8,16)?;
- let mut g=owner.initial(1./21.,[.01,0.,0.,0.,.0075])?;
+ let mut g=owner.initial(1./21.,[0.01,0.,0.,0.,0.0075])?;
  let end=1./(1.+cfg.end_zbar);let mut dummy=p(&g.geometry);dummy.a=end;
  let (d,mut gas)=Driver::new_general(cfg,GeneralHistory::new(vec![p(&g.geometry),dummy],4,8)?)?;
  if mode==3{gas.ff_spectrum=Some(SpectralFf::new(1e-10,60.,bins)?);}
