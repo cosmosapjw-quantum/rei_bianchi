@@ -72,6 +72,38 @@ impl IgmPointRhs {
         )?;
         Ok(())
     }
+    /// Replace only the free-free term by finite spectral exchange at a
+    /// candidate state. Gross represented emission and absorption are separate.
+    pub fn apply_ff_exchange(
+        &mut self,
+        gas: &IgmGasState,
+        nh: f64,
+        nhe: f64,
+        dt: f64,
+        q: crate::spectral_ff::Exchange,
+    ) -> Result<(), ForwardError> {
+        if !dt.is_finite() || dt <= 0. || q.emission < 0. || q.emission - q.net < 0. {
+            return Err(invalid());
+        }
+        let c = HHeModel::controlled_fixture();
+        let fac = nh * c.ev_erg / dt;
+        let em = finite(q.emission * fac)?;
+        let ab = finite((q.emission - q.net) * fac)?;
+        let old = self.freefree_thermal_sink_erg_cm3_s;
+        let heat = finite(old - em + ab)?;
+        self.freefree_thermal_sink_erg_cm3_s = em;
+        self.escape_erg_cm3_s = finite(self.escape_erg_cm3_s - old + em)?;
+        self.ff_absorption_erg_cm3_s = ab;
+        self.cmb_to_gas_erg_cm3_s = finite(self.cmb_to_gas_erg_cm3_s + ab)?;
+        self.thermal_micro_erg_cm3_s = finite(self.thermal_micro_erg_cm3_s + heat)?;
+        self.w_dt_erg_per_h_s = finite(self.w_dt_erg_per_h_s + heat / nh)?;
+        let eos = gas.eos(nh, nhe)?;
+        self.temperature_dt_k_s = finite(
+            self.temperature_dt_k_s
+                + 2. * heat / (3. * c.kb_erg_k * (nh + nhe + eos.electron_density_cm3)),
+        )?;
+        Ok(())
+    }
     /// Actual energy sinks of the original point RHS, in erg/cm³/s.
     /// RR includes ionization binding energy. The DR channel includes HeI
     /// binding energy. These are bolometric channels, not line spectra.

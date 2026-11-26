@@ -1,0 +1,49 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:406:18
+    |
+406 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+406 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+406 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+error[E0609]: no field `ff_spectrum` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c3d_live_ff.rs:11:12
+   |
+11 |  assert!(s.ff_spectrum.as_ref().unwrap().distortion().iter().all(|v|*v==...
+   |            ^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 20 others
+
+error[E0609]: no field `ff_spectrum` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c3d_live_ff.rs:12:12
+   |
+12 |  assert!(x.ff_spectrum.as_ref().unwrap().distortion().iter().any(|v|*v!=...
+   |            ^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 20 others
+
+error[E0609]: no field `ff_spectrum` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c3d_live_ff.rs:16:15
+   |
+16 |  assert_eq!(x.ff_spectrum.as_ref().unwrap().distortion(),y.ff_spectrum.a...
+   |               ^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 20 others
+
+error[E0609]: no field `ff_spectrum` on type `rei_microphysics::axbi_covariant_driver::DriverState`
+  --> tests/r118c3d_live_ff.rs:16:60
+   |
+16 | ...wrap().distortion(),y.ff_spectrum.as_ref().unwrap().distortion());
+   |                          ^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `a`, `gas`, `photons`, `photon_energy_ref`, `photon_support_lo` ... and 20 others
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `rei_microphysics` (test "r118c3d_live_ff") due to 4 previous errors

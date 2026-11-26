@@ -4,6 +4,7 @@ use crate::{ff_balance::gaunt, ForwardError};
 fn bad() -> ForwardError {
     ForwardError::InvalidInput("SPECTRAL_FF_DOMAIN")
 }
+#[derive(Clone, Debug)]
 pub struct SpectralFf {
     x: Vec<f64>,
     delta: Vec<f64>,
@@ -161,4 +162,15 @@ impl SpectralFf {
         self.delta = next;
         Ok(q)
     }
+}
+
+/// Isotropic reference blackbody energy per H in eV, with nH in cm^-3.
+pub fn blackbody_per_h(tc: f64, nh: f64) -> Result<f64, ForwardError> {
+    let a = 8. * std::f64::consts::PI.powi(5) * 1.380649e-23_f64.powi(4)
+        / (15. * 6.62607015e-34_f64.powi(3) * 299792458_f64.powi(3));
+    let e = a * tc.powi(4) / (nh * 1e6) / 1.602176634e-19;
+    if !e.is_finite() || e <= 0. {
+        return Err(bad());
+    }
+    Ok(e)
 }

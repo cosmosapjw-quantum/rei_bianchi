@@ -297,6 +297,7 @@ pub struct DriverState {
     /// Free-free emitted-energy-weighted temperature (eV K/H).
     pub ff_temp_ev_k:f64,
     pub ff_abs_ev:f64,
+    pub ff_spectrum:Option<crate::spectral_ff::SpectralFf>,
 
     pub next_dln_a: f64,
     pub accepted: usize,
@@ -312,7 +313,7 @@ pub struct DriverState {
 }
 
 #[derive(Clone)]
-struct StageStocks { primary:PhotonState, above:Option<PhotonState>, middle:Option<PhotonState> }
+struct StageStocks { primary:PhotonState, above:Option<PhotonState>, middle:Option<PhotonState>, ff:Option<crate::spectral_ff::SpectralFf> }
 /// Immutable inputs shared by leaf residual evaluations. This context has no
 /// worker-pool handle and cannot submit nested work or mutate the stage state.
 #[derive(Clone)]
@@ -323,6 +324,7 @@ struct ResidualContext {
     n_he0_cm3: f64,
     cells: usize,
     ff_balance_mode:u8,
+    ff_spectrum:Option<crate::spectral_ff::SpectralFf>,
     prepared: Arc<PreparedAbsorption>,
     birth:Option<Arc<PreparedAbsorption>>,
     prepared_above:Option<Arc<PreparedAbsorption>>,
@@ -363,9 +365,17 @@ impl ResidualContext {
             for k in 0..3{photo.gamma_s[k]+=a.photo.gamma_s[k];photo.heat_erg_per_absorber_s[k]+=a.photo.heat_erg_per_absorber_s[k];}
             Some(a.state)
         }else{None};
-        let stocks=StageStocks{primary:absorption.state,above,middle};
+        let mut stocks=StageStocks{primary:absorption.state,above,middle,ff:None};
         let mut point = AxbiProvider.point(&gas, nh, nhe, 0.0, 2.7255 / self.a, photo)?;
-        point.rhs.add_ff_absorption(&gas,nh,nhe,2.7255/self.a,self.ff_balance_mode)?;
+        if self.ff_balance_mode==3{
+            let mut sp=self.ff_spectrum.clone().ok_or(err("GENERAL_FF_STATE"))?;
+            let eos=gas.eos(nh,nhe)?;let ion=nh*x+nhe*y+4.*nhe*z;
+            let frac=if ion>0.{4.*nhe*z/ion}else{0.};
+            let tc=2.7255/self.a;let bb=crate::spectral_ff::blackbody_per_h(tc,nh)?;
+            let q=sp.advance(eos.temperature_k,tc,frac,point.rhs.freefree_thermal_sink_erg_cm3_s*dt/(nh*c.ev_erg),bb,false)?;
+            point.rhs.apply_ff_exchange(&gas,nh,nhe,dt,q)?;
+            stocks.ff=Some(sp);
+        }else{point.rhs.add_ff_absorption(&gas,nh,nhe,2.7255/self.a,self.ff_balance_mode)?;}
         let mut residual = [0.0; 4];
         for i in 0..3 {
             residual[i] = unknown[i] - self.gas.fractions[i] - dt * point.rhs.fraction_dt[i];
@@ -565,7 +575,7 @@ impl Driver {
             photon_inactive_number: vec![0.0; transport.cell_count()],
             photon_inactive_energy_ref: vec![0.0; transport.cell_count()],
             ledgers: Ledgers::default(),
-            cooling_ev:[0.;8],ff_temp_ev_k:0.,ff_abs_ev:0.,
+            cooling_ev:[0.;8],ff_temp_ev_k:0.,ff_abs_ev:0.,ff_spectrum:None,
             next_dln_a: config.initial_dln_a,
             accepted: 0,
             attempts: 0,
@@ -603,6 +613,7 @@ impl Driver {
         let p=d.transport.empty_state();Self::set_photon_state(&mut s,p);
         s.heii_above=Some(d.transport.empty_state());s.hei_middle=Some(d.transport.empty_state());s.hi_below=Some(d.transport.empty_state());
         s.photon_inactive_number=vec![0.;n*d.energies.len()];s.photon_inactive_energy_ref=s.photon_inactive_number.clone();
+        if d.config.ff_balance_mode==3{s.ff_spectrum=Some(crate::spectral_ff::SpectralFf::new(1e-10,60.,128)?);}
         d.initial_energy=d.total_energy(&s)?;d.validate(&s,1e-8)?;Ok((d,s))
     }
     pub fn set_general_interval(&mut self,p:Vec<crate::general_history::HistoryPoint>)->Result<(),ForwardError>{self.transport.set_general_interval(p)}
@@ -623,6 +634,9 @@ impl Driver {
         if metric>=self.config.local_target||metric>=2e-4{return Err(err("GENERAL_EXTERNAL_LOCAL_ERROR"))}
         fine.accepted=s.accepted+1;fine.attempts=s.attempts+3;fine.comparisons=s.comparisons+1;
         fine.rhs_evaluations=*counter;fine.last_error=metric;Ok((fine,comp))
+    }
+    pub fn ff_spectral_energy(&self,s:&DriverState)->Result<f64,ForwardError>{
+        match &s.ff_spectrum{Some(p)=>p.energy(crate::spectral_ff::blackbody_per_h(2.7255/s.a,self.n_h0_cm3/s.a.powi(3))?),None=>Ok(0.)}
     }
     pub fn gas_energy_components(&self,s:&DriverState)->Result<[f64;2],ForwardError>{
         Ok([w_erg_per_h_to_ev(s.gas.w_erg_per_h)?,self.binding(&s.gas)])
@@ -976,7 +990,7 @@ impl Driver {
         self.chemical_stage_impl(s,dt,counter,None,Some(budget))
     }
     fn chemical_stage_impl(&self,s:&mut DriverState,dt:f64,counter:&mut usize,birth:Option<StageStocks>,budget:Option<f64>)->Result<(),ForwardError>{
-        if self.config.ff_balance_mode>2 || self.config.ff_balance_mode!=0 && self.transport.general_history().is_none(){return Err(err("GENERAL_FF_BALANCE_MODE"))}
+        if self.config.ff_balance_mode>3 || self.config.ff_balance_mode!=0 && self.transport.general_history().is_none(){return Err(err("GENERAL_FF_BALANCE_MODE"))}
         if !dt.is_finite() || dt <= 0.0 {
             return Err(err("AXBI_STAGE_DT"));
         }
@@ -1037,6 +1051,7 @@ impl Driver {
             n_he0_cm3: self.n_he0_cm3,
             cells: self.transport.cell_count(),
             ff_balance_mode:self.config.ff_balance_mode,
+            ff_spectrum:old.ff_spectrum.clone(),
             prepared: Arc::new(prepared),
             birth,
             prepared_above,birth_above,prepared_middle,birth_middle,
@@ -1063,7 +1078,7 @@ impl Driver {
                 }
                 let mut next = old.clone();
                 next.gas = IgmGasState::new([x[0], x[1], x[2]], w_ev_per_h_to_erg(x[3])?)?;
-                Self::set_photon_state(&mut next, stocks.primary);next.heii_above=stocks.above;next.hei_middle=stocks.middle;
+                Self::set_photon_state(&mut next, stocks.primary);next.heii_above=stocks.above;next.hei_middle=stocks.middle;next.ff_spectrum=stocks.ff;
                 next.ledgers.absorbed_n += event_total;
                 for k in 0..3 {
                     next.ledgers.photo_events[k] += events[k];
@@ -1147,13 +1162,13 @@ impl Driver {
             let geometry=self.background.point_at_scale(s.a)?.geometry()?;
             let (birth,emitted)=if self.config.hei_split{
                 let (p,l)=self.transport.inject_bands(&geometry,1./s.a-1.,dt)?;
-                (StageStocks{primary:p.low,above:Some(p.high),middle:Some(p.middle)},l)
+                (StageStocks{primary:p.low,above:Some(p.high),middle:Some(p.middle),ff:None},l)
             }else if self.config.heii_split{
                 let (p,l)=self.transport.inject_heii(&geometry,1./s.a-1.,dt)?;
-                (StageStocks{primary:p.below,above:Some(p.above),middle:None},l)
+                (StageStocks{primary:p.below,above:Some(p.above),middle:None,ff:None},l)
             }else{
                 let mut p=self.transport.empty_state();let l=self.transport.inject(&mut p,&geometry,1./s.a-1.,dt)?;
-                (StageStocks{primary:p,above:None,middle:None},l)
+                (StageStocks{primary:p,above:None,middle:None,ff:None},l)
             };
             s.ledgers.source_n+=emitted.added_photons_per_h;s.ledgers.source_u+=emitted.added_energy_ev_per_h;
             self.chemical_stage_impl(&mut s,dt,counter,Some(birth),chemical_budget)?;
@@ -1175,6 +1190,8 @@ impl Driver {
     }
     pub fn validate(&self, s: &DriverState, tolerance: f64) -> Result<(), ForwardError> {
         if self.transport.general_history().is_some(){
+            if (self.config.ff_balance_mode==3)!=s.ff_spectrum.is_some(){return Err(err("GENERAL_FF_STATE"))}
+            self.ff_spectral_energy(s)?;
             if s.cooling_ev.iter().chain([&s.ff_temp_ev_k,&s.ff_abs_ev]).any(|v|!v.is_finite()||*v<0.) ||
             (s.cooling_ev.iter().sum::<f64>()-s.ledgers.escaped_u).abs()>1e-11*s.ledgers.escaped_u.max(1e-300)
             {return Err(err("GENERAL_COOLING_LEDGER"))}
@@ -1506,6 +1523,7 @@ pub fn compiled_identity() -> String {
         include_str!("igm_rates.rs"),
         include_str!("igm_thermal.rs"),
         include_str!("ff_balance.rs"),
+        include_str!("spectral_ff.rs"),
         include_str!("../../../research/r118c3b_ff_balance/gauntff.dat"),
         include_str!("igm_state.rs"),
         include_str!("igm_background.rs"),
@@ -1654,9 +1672,10 @@ impl Driver {
         if let Some(h)=self.transport.general_history(){
             self.validate(s,1e-8)?;
             if s.a!=h.interval()[1]{return Err(err("GENERAL_CHECKPOINT_NOT_ACCEPTED_ENDPOINT"))}
-            text=text.replacen("AXBI_CHECKPOINT_V7","AXBI_CHECKPOINT_V10_GENERAL",1);
+            text=text.replacen("AXBI_CHECKPOINT_V7","AXBI_CHECKPOINT_V11_GENERAL",1);
             let mut cooling=s.cooling_ev.to_vec();cooling.push(s.ff_temp_ev_k);cooling.push(s.ff_abs_ev);
-            text.push_str(&format!("{:?}\n{}\n{}\n{}\nGENERAL_SOURCE_IDENTITY\n{}",self.config,h.registry_identity(),h.interval_identity(),list(&cooling),compiled_identity()));
+            let ff=s.ff_spectrum.as_ref().map_or_else(||"NONE".into(),|p|p.distortion().iter().map(|x|format!("{:016x}",x.to_bits())).collect::<Vec<_>>().join(" "));
+            text.push_str(&format!("{:?}\n{}\n{}\n{}\n{}\nGENERAL_SOURCE_IDENTITY\n{}",self.config,h.registry_identity(),h.interval_identity(),list(&cooling),ff,compiled_identity()));
         }
         Ok(text)
     }
@@ -1686,7 +1705,7 @@ impl Driver {
         let (head,ident)=text.split_once("\nGENERAL_SOURCE_IDENTITY\n").ok_or(err("GENERAL_CHECKPOINT_SOURCE"))?;
         if ident!=compiled_identity(){return Err(err("GENERAL_CHECKPOINT_SOURCE"))}
         let lines=head.lines().collect::<Vec<_>>();
-        if lines.len()!=27||lines[0]!="AXBI_CHECKPOINT_V10_GENERAL"||lines[23]!=format!("{:?}",self.config){return Err(err("GENERAL_CHECKPOINT_CONFIG"))}
+        if lines.len()!=28||lines[0]!="AXBI_CHECKPOINT_V11_GENERAL"||lines[23]!=format!("{:?}",self.config){return Err(err("GENERAL_CHECKPOINT_CONFIG"))}
         let old=self.transport.general_history().ok_or(err("GENERAL_CHECKPOINT_MODE"))?.clone();
         let mut restored=old.clone();restored.restore_interval(lines[24],lines[25])?;
         self.transport.restore_general_history(restored);
@@ -1700,16 +1719,21 @@ impl Driver {
     }
     fn read_checkpoint_text(&self,text:&str)->Result<DriverState,ForwardError>{
         let general=self.transport.general_history();
-        let mut cooling=[0.;10];
+        let mut cooling=[0.;10];let mut ff_spectrum=None;
         let body=if let Some(h)=general{
             let (head,ident)=text.split_once("\nGENERAL_SOURCE_IDENTITY\n").ok_or(err("GENERAL_CHECKPOINT_SOURCE"))?;
             let lines=head.lines().collect::<Vec<_>>();
-            if ident!=compiled_identity()||lines.len()!=27||lines[23]!=format!("{:?}",self.config)||lines[24]!=h.registry_identity()||lines[25]!=h.interval_identity(){return Err(err("GENERAL_CHECKPOINT_IDENTITY"))}
+            if ident!=compiled_identity()||lines.len()!=28||lines[23]!=format!("{:?}",self.config)||lines[24]!=h.registry_identity()||lines[25]!=h.interval_identity(){return Err(err("GENERAL_CHECKPOINT_IDENTITY"))}
             cooling=parse_list(lines[26])?.try_into().map_err(|_|err("GENERAL_COOLING_CHECKPOINT"))?;
+            if self.config.ff_balance_mode==3{
+                let mut sp=crate::spectral_ff::SpectralFf::new(1e-10,60.,128)?;
+                let d=lines[27].split_whitespace().map(|x|u64::from_str_radix(x,16).map(f64::from_bits).map_err(|_|err("GENERAL_FF_CHECKPOINT"))).collect::<Result<Vec<_>,_>>()?;
+                sp.restore_distortion(&d)?;ff_spectrum=Some(sp);
+            }else if lines[27]!="NONE"{return Err(err("GENERAL_FF_CHECKPOINT"))}
             lines[..23].join("\n")
         }else{text.to_string()};
         let lines=body.lines().collect::<Vec<_>>();
-        let (version,len)=if general.is_some(){("AXBI_CHECKPOINT_V10_GENERAL",23)}else if self.config.reactive_hi{("AXBI_CHECKPOINT_V7",23)}else if self.config.hei_split{("AXBI_CHECKPOINT_V6",19)}else if self.config.heii_split{("AXBI_CHECKPOINT_V5",15)}else{("AXBI_CHECKPOINT_V4",11)};
+        let (version,len)=if general.is_some(){("AXBI_CHECKPOINT_V11_GENERAL",23)}else if self.config.reactive_hi{("AXBI_CHECKPOINT_V7",23)}else if self.config.hei_split{("AXBI_CHECKPOINT_V6",19)}else if self.config.heii_split{("AXBI_CHECKPOINT_V5",15)}else{("AXBI_CHECKPOINT_V4",11)};
         if lines.len()!=len || lines[0]!=version {
             return Err(err("AXBI_CHECKPOINT_VERSION"));
         }
@@ -1751,7 +1775,7 @@ impl Driver {
             photon_inactive_number,
             photon_inactive_energy_ref,
             ledgers: l,
-            cooling_ev:cooling[..8].try_into().unwrap(),ff_temp_ev_k:cooling[8],ff_abs_ev:cooling[9],
+            cooling_ev:cooling[..8].try_into().unwrap(),ff_temp_ev_k:cooling[8],ff_abs_ev:cooling[9],ff_spectrum,
             next_dln_a: v[7],
             max_newton_residual: v[8],
             last_error: v[9],
