@@ -1,0 +1,59 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:406:18
+    |
+406 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+406 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+406 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+error[E0599]: no method named `distortion` found for struct `SpectralFf` in the current scope
+  --> tests/r118c3c_spectral.rs:25:10
+   |
+25 |  let a=s.distortion().to_vec();let mut t=SpectralFf::new(1e-10,60.,128)....
+   |          ^^^^^^^^^^ method not found in `SpectralFf`
+
+error[E0599]: no method named `restore_distortion` found for struct `SpectralFf` in the current scope
+  --> tests/r118c3c_spectral.rs:26:4
+   |
+26 |  t.restore_distortion(&a).unwrap();
+   |    ^^^^^^^^^^^^^^^^^^ method not found in `SpectralFf`
+
+error[E0599]: no method named `restore_distortion` found for struct `SpectralFf` in the current scope
+  --> tests/r118c3c_spectral.rs:28:12
+   |
+28 |  assert!(t.restore_distortion(&vec![-1e30;128]).is_err());
+   |            ^^^^^^^^^^^^^^^^^^ method not found in `SpectralFf`
+
+error[E0599]: no method named `distortion` found for struct `SpectralFf` in the current scope
+  --> tests/r118c3c_spectral.rs:29:15
+   |
+29 |  assert_eq!(t.distortion(),a);
+   |               ^^^^^^^^^^ method not found in `SpectralFf`
+
+error[E0599]: no method named `restore_distortion` found for struct `SpectralFf` in the current scope
+  --> tests/r118c3c_spectral.rs:30:12
+   |
+30 |  assert!(t.restore_distortion(&vec![f64::NAN;128]).is_err());
+   |            ^^^^^^^^^^^^^^^^^^ method not found in `SpectralFf`
+
+error[E0599]: no method named `distortion` found for struct `SpectralFf` in the current scope
+  --> tests/r118c3c_spectral.rs:33:15
+   |
+33 |  assert_eq!(s.distortion(),t.distortion());
+   |               ^^^^^^^^^^ method not found in `SpectralFf`
+
+error[E0599]: no method named `distortion` found for struct `SpectralFf` in the current scope
+  --> tests/r118c3c_spectral.rs:33:30
+   |
+33 |  assert_eq!(s.distortion(),t.distortion());
+   |                              ^^^^^^^^^^ method not found in `SpectralFf`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `rei_microphysics` (test "r118c3c_spectral") due to 7 previous errors

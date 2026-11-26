@@ -35,7 +35,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("{a:.17e},{net:.17e},{thin:.17e},{emission:.17e},{abs:.17e},{work:.17e},{u:.17e},{peak_tau:.17e},{peak_thick},{:.17e}",q.absolute_ratio);
     }
     let mut out = String::from("x,delta\n");
-    for (x, d) in s.x.iter().zip(s.delta.iter()) {
+    for (x, d) in s.nodes().iter().zip(s.distortion().iter()) {
         out += &format!("{x:.17e},{d:.17e}\n");
     }
     std::fs::write(&args[4], out)?;

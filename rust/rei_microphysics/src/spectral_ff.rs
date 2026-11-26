@@ -5,8 +5,8 @@ fn bad() -> ForwardError {
     ForwardError::InvalidInput("SPECTRAL_FF_DOMAIN")
 }
 pub struct SpectralFf {
-    pub x: Vec<f64>,
-    pub delta: Vec<f64>,
+    x: Vec<f64>,
+    delta: Vec<f64>,
     dl: f64,
 }
 #[derive(Debug, Clone, Copy)]
@@ -56,6 +56,25 @@ impl SpectralFf {
             delta: vec![0.; n],
             dl,
         })
+    }
+    pub fn nodes(&self) -> &[f64] {
+        &self.x
+    }
+    pub fn distortion(&self) -> &[f64] {
+        &self.delta
+    }
+    /// Load a signed distortion only on the same immutable frequency grid.
+    /// The caller binds grid identity; invalid payloads leave state unchanged.
+    pub fn restore_distortion(&mut self, d: &[f64]) -> Result<(), ForwardError> {
+        if d.len() != self.x.len()
+            || d.iter()
+                .zip(&self.x)
+                .any(|(&v, &x)| !v.is_finite() || v + pl(x) < 0. || !(v + pl(x)).is_finite())
+        {
+            return Err(bad());
+        }
+        self.delta.copy_from_slice(d);
+        Ok(())
     }
     fn phase(&self, x: f64, bb: f64) -> f64 {
         bb * 15. / std::f64::consts::PI.powi(4) * x.powi(4) * self.dl
