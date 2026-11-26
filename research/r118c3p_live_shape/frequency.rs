@@ -156,12 +156,18 @@ impl FreqRays{
    for i in 0..nr{reference[i][j]=r[i]*(f0/mean);min=min.min((reference[i][j]+stock[i][j])/f0);}
   }
   if min<0.||!min.is_finite(){return Err("shape input realizability".into())}
+  // Center the pair flux BEFORE forming directional increments. The
+  // constant angle-independent part is exactly annihilated by the
+  // zero-mean projection (the conductance has marginals w).
+  let means:Vec<_>=(0..nx).map(|k|(0..nr).map(|i|w[i]*stock[i][k]).sum::<f64>()).collect();
   let mut step=vec![vec![0.;nx];nr];
   for k in 0..nx-1{
    let x=self.x[k];let y=self.x[k+1];let dd=(y-x)/theta;let q=(-dd).exp();let b=-(-dd).exp_m1();let g=(x*y).powi(2)/(theta*b);
+   let f0=1./x.exp_m1();let f1=1./y.exp_m1();let u0=means[k];let v0=means[k+1];
    for i in 0..nr{for j in 0..nr{
-    let u=stock[i][k];let v=stock[j][k+1];
-    let flux=clock*m[i][j]*g*((1.+b*reference[i][k])*v+(-q+b*reference[j][k+1])*u+b*u*v);
+    let u=stock[i][k];let v=stock[j][k+1];let du=u-u0;let dv=v-v0;
+    let ri=reference[i][k]-f0;let rj=reference[j][k+1]-f1;
+    let flux=clock*m[i][j]*g*((1.+b*f0+b*u0)*dv+(-q+b*f1+b*v0)*du+b*(du*dv+ri*v+rj*u));
     step[i][k]+=flux;step[j][k+1]-=flux;
    }}
   }
