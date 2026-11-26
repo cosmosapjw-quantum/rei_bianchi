@@ -1,0 +1,1 @@
+replace reference-calibrated external forcing with source-owned event-level chemical/thermal ledger and explicit emitted photon channels, same-grid nonlinear spectrum trial under rollback. Independent: physical low-frequency absorption/thermalization flux with equal log-spacing, extending below 1e-10 only inside source table validity. Keep V11 production untouched.
