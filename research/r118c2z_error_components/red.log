@@ -1,0 +1,23 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> src/axbi_covariant_driver.rs:395:18
+    |
+395 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+395 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+395 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    |
+
+warning: `rei_microphysics` (lib) generated 1 warning (run `cargo fix --lib -p rei_microphysics` to apply 1 suggestion)
+   Compiling rei_microphysics v0.1.0 (/home/cosmosapjw/worktrees/rei-htt-thomson-20261124/rust/rei_microphysics)
+error[E0599]: no method named `ordered_values` found for struct `ErrorComponents` in the current scope
+ --> tests/r118c2z_error_report.rs:5:10
+  |
+5 |  let v=c.ordered_values();
+  |          ^^^^^^^^^^^^^^ method not found in `ErrorComponents`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `rei_microphysics` (test "r118c2z_error_report") due to 1 previous error

@@ -453,6 +453,10 @@ pub struct ErrorComponents {
     pub pool_n:f64,pub pool_u:f64,pub gamma:[f64;3],pub heat:[f64;3],
 }
 impl ErrorComponents{
+    /// Stable diagnostic order: four gas, shape N/U, pool N/U, three gamma, three heat.
+    pub fn ordered_values(&self)->[f64;14]{
+        [self.gas[0],self.gas[1],self.gas[2],self.gas[3],self.shape_n,self.shape_u,self.pool_n,self.pool_u,self.gamma[0],self.gamma[1],self.gamma[2],self.heat[0],self.heat[1],self.heat[2]]
+    }
     pub fn legacy_metric(&self)->f64{self.gas.into_iter().fold(0.,f64::max).max(self.shape_n).max(self.shape_u)}
     pub fn rate_metric(&self)->f64{self.gas.into_iter().chain(self.gamma).chain(self.heat).fold(0.,f64::max).max(self.pool_n).max(self.pool_u)}
 }
@@ -594,6 +598,9 @@ impl Driver {
     /// existing local metric and all original energy budgets pass. Trial RHS
     /// count is caller-owned so failed coupling attempts are not hidden.
     pub fn external_trial(&self,s:&DriverState,to:f64,counter:&mut usize)->Result<DriverState,ForwardError>{
+        self.external_trial_report(s,to,counter).map(|(state,_)|state)
+    }
+    pub fn external_trial_report(&self,s:&DriverState,to:f64,counter:&mut usize)->Result<(DriverState,ErrorComponents),ForwardError>{
         if self.transport.general_history().is_none() || to<=s.a || to>1./(1.+self.config.end_zbar) || s.accepted>=self.config.max_steps || s.attempts+3>self.config.max_attempts{return Err(err("GENERAL_EXTERNAL_DOMAIN"))}
         let mid=(s.a*to).sqrt();
         let full=self.tentative(s,to,counter)?;
@@ -603,7 +610,7 @@ impl Driver {
         let metric=comp.legacy_metric().max(comp.rate_metric());
         if metric>=self.config.local_target||metric>=2e-4{return Err(err("GENERAL_EXTERNAL_LOCAL_ERROR"))}
         fine.accepted=s.accepted+1;fine.attempts=s.attempts+3;fine.comparisons=s.comparisons+1;
-        fine.rhs_evaluations=*counter;fine.last_error=metric;Ok(fine)
+        fine.rhs_evaluations=*counter;fine.last_error=metric;Ok((fine,comp))
     }
     pub fn gas_energy_components(&self,s:&DriverState)->Result<[f64;2],ForwardError>{
         Ok([w_erg_per_h_to_ev(s.gas.w_erg_per_h)?,self.binding(&s.gas)])

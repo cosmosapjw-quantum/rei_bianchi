@@ -1,0 +1,2 @@
+# C2Z return
+The new API and stable ordering test plus prior checkpoint/controller tests passed. Full Rust suite run at unchanged production source apart from diagnostic wrapper. Actual BASS bridge is research/r118c2z_odd_magnetic in BASS. New diagnostics are checked against native last_error and checkpoint physical support. See BASS LIVE.json for all actual trajectories, transient and axis comparisons.

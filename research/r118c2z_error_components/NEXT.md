@@ -1,0 +1,2 @@
+# C3A
+Use heat-component local metric evidence to derive physically relevant early UV transient integrator and output sampling; do not lower tolerances purely to satisfy interpolated history residual. Extend general live path from immutable same-config prefixes, and introduce spectral cooling/Compton exchange model only with physical emission/absorption input ownership. No production pin promotion.
