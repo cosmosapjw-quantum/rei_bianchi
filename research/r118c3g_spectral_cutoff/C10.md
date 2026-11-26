@@ -1,0 +1,3 @@
+# C10: bounded closeout
+R1–R10/C1–C9 remotely verified through receipt. Actual-clock signed replay 4096 bins ~0.03343% C-energy discrepancy; corrected EOS-coupled 2048 bins ~0.24132%, prescribed stage composition only. C7/C8 coupled artifacts explicitly superseded. Independent cutoff outflow accounting verified, not physical condensation or absorption. Next: fixed-delta-log-x cutoff comparisons plus 4096/8192 corrected gas cases, then a chemistry-aware conservative total gas+radiation ledger including composition and binding changes, with no duplicated Compton template. Keep V11 production untouched until admissibility demonstrated.
+Active worktree and unrelated preexisting untracked paths retained; accepted C3B clock now source-locked in repository.
