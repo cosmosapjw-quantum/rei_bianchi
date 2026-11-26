@@ -9,7 +9,7 @@ def grid(target,n=8192):
  k=max(0,int(np.floor(np.log(base[0]/target)/h)))
  return np.r_[base[0]*np.exp(-h*np.arange(k,0,-1)),base]
 def ff_step(s,ff,d,t,tc,frac,birth,bb):
- x=s.x;v=x*tc/t;scale=bb*15/np.pi**4
+ x=s.x;v=x*(tc/t);scale=bb*15/np.pi**4
  amp=birth*tc/t*ff.g(v,t,frac)*np.diff(s.edges)/ff.norm(t,frac)
  tau=amp*(-np.expm1(-v))/(scale*x*s.c)
  fe=1/np.expm1(v);inc=(s.c*(fe-s.f0)-d)*(-np.expm1(-tau));dn=d+inc
