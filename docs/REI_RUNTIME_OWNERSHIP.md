@@ -1,4 +1,8 @@
-# REI independent runtime and REC initial condition (R118-C2G)
+# REI material-state ownership
+
+The active integrated branch and its permitted scientific claims are defined in [the November 27 contract](../research/unified_igm_20261127/DAG.json). The native accepted-step observer reads REI-owned photons and thermochemistry. REI owns each new material event in the separate fixed-volume experiments. The original sources, their included byte ranges, and their local roles are listed in [components](../components/README.md).
+
+## Historical REI independent runtime and REC initial condition (R118-C2G)
 
 The existing AXBI solver owns its H/He fractions, gas thermal variable, photon groups, source injection, absorption and collision ledgers. This is not a new fitted xe history. AX01 and historical AX08 conditional admissions are unchanged. The primary-only homogeneous source, non-tilted LRS Bianchi I geometry and finite energy/angular closures remain assumptions.
 

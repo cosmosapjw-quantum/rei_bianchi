@@ -3,7 +3,20 @@
 Durable development and backup repository for extending homogeneous
 reionization and CMB transfer to nonlinear, finite-tilt Bianchi cosmologies.
 
-## Current scientific state
+## Unified IGM development
+
+On this research line, REI owns the integrated H/He/D gas, photon and CR work. The source and test trees for WU088_HH, BASS_HE and bass_cr live under `components/`. The BASS geometry/radiation and REC ionization crates used by the native calculation resolve locally. The original host, donor and data identities are recorded in the [current DAG, PR plan and claim contract](research/unified_igm_20261127/DAG.json).
+
+With Python 3.12+, the project dependencies and Rust/Cargo installed, run:
+
+```bash
+python -m pip install .
+python scripts/run_unified_igm.py results/unified_igm_run
+```
+
+Supply a new output directory. Append `--offline` when the Cargo registry cache is populated. The command computes two bounded native intervals, matched signed-shear accepted-step traces and source-on/off material interventions at five original AXBI states. [Research results and domains](research/unified_igm_20261127/REPORT_KO.md) · [component owners](components/README.md) · [continuation by thread](research/unified_igm_20261127/HANDOFF_KO.md).
+
+## Historical main-branch checkpoint
 
 ```text
 P0.5-B2C2B0C-R2C-R1B-R2B-R2A-R2-R1A-R1-R1-R1-R1-R1-CROSS-SITE-STATE-FEEDBACK-REMAINDER-AND-TABLE-EVENT-LOCK
@@ -43,13 +56,9 @@ Read in order:
 - `archive/full-history`: historical bundles and verified chunks.
 - Failed attempts remain separate and are never overwritten by later success.
 
-## External recombination dependency
+## Recombination provenance
 
-Primordial recombination remains a separate project:
-`https://github.com/cosmosapjw-quantum/rec_bianchi`.
-Run `./scripts/update_rec_bianchi_lock.sh` before a new science stage and follow
-`external/REC_BIANCHI_MONITORING_POLICY.md`. No surrogate or silent replacement
-is allowed.
+The selected native REC source is in `components/bass_rec/rec/`. The independent historical production and monitoring records are in `external/`. The active z=20 HMLA donor retains its source identity in `components/bass_rec/fixtures/REC_HMLA_Z20.json`.
 
 ## Verification
 

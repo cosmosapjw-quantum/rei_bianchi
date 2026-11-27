@@ -1,0 +1,217 @@
+{
+  "schema": "rei.unified-igm.contract.v1",
+  "as_of": "2026-11-27",
+  "owner": "cosmosapjw-quantum/rei_bianchi",
+  "branch": "research/rei-unified-microphysics-20261127",
+  "base": "a3cd7cdc3e7cf7c9059c3c420338bdd1d60d0b15",
+  "canonical_goal": "REI-AXBI-GOAL-20261014",
+  "baseline_scenario": "PLANCKLIKE_MD14_BB50K_CONDITIONAL_HHE_V1",
+  "count": {
+    "original": [
+      10,
+      17
+    ],
+    "central_expansion": [
+      28,
+      88
+    ],
+    "delta_original": 0,
+    "delta_central": 0,
+    "source_baselines": [
+      5,
+      5
+    ]
+  },
+  "counts_are_disjoint": "Loop stages, PRs, component suites, figures and local research units do not enter either original denominator. Nodes below are an execution projection.",
+  "conventions": {
+    "metric": "(-,+,+,+)",
+    "clock": "proper seconds",
+    "gas_input_densities": "cm^-3; Rust number inventory m^-3",
+    "energy": "eV m^-3 in collision cell; native photon ledgers eV per H; F05 envelope in erg",
+    "coordinates": [
+      "same a",
+      "same elapsed proper time"
+    ],
+    "temperature": "K",
+    "frame": "gas rest, LRS-I and non-tilted in original tested scenario"
+  },
+  "nodes": [
+    {
+      "id": "native-owner",
+      "status": "implementation-verified",
+      "depends_on": [],
+      "inputs": [
+        "R118 geometry, HMLA REC and native REI H/He; local crate paths"
+      ],
+      "outputs": [
+        "two native science intervals",
+        "REI state after a single accepted update"
+      ],
+      "claim_gate": "prior selected histories match in 14 scientific output and summary files",
+      "pr_plan": "This integration PR imports the pinned crates, binds local paths and runs the original commands.",
+      "evidence": [
+        "components/bass_rec/validation/PRIOR_PIN_COMPARISON.json",
+        "components/bass_rec/validation/SMOKE.json"
+      ]
+    },
+    {
+      "id": "D/H",
+      "status": "numerically checked",
+      "depends_on": [
+        "native-owner"
+      ],
+      "inputs": [
+        "proper T, n_H, x_HII, y_DII, Savin Maxwellian rates",
+        "prescribed D/H for finite-cell feedback"
+      ],
+      "outputs": [
+        "trace y_DII or signed reaction extent/m3",
+        "equal-opposite gas and binding work"
+      ],
+      "claim_gate": "charge/nuclear closure; nonnegative stocks and invariant boundary; separate fixed-a and equal-time paired resolution",
+      "pr_plan": "This PR implements the accepted tracer and finite-D cell. Next integration PR consumes newly resolved original native gas times; measure paired thinning error below 10% before interpreting the equal-time peak.",
+      "evidence": [
+        "components/wu088_hh/analysis/results/FIVE_CASE_TRACE.json",
+        "components/wu088_hh/validation/RESULTS.json"
+      ]
+    },
+    {
+      "id": "He-energy",
+      "status": "numerically checked",
+      "depends_on": [
+        "native-owner"
+      ],
+      "inputs": [
+        "H/He photons by absorber, owner binding thresholds, F05 joint line branches"
+      ],
+      "outputs": [
+        "per-species heat, binding and escape",
+        "F05 feasible line-energy interval"
+      ],
+      "claim_gate": "reconstruct actual photon loss; intersect branch box with the shared photon budget; no F05 reinjection",
+      "pr_plan": "This PR computes the joint F05 bound and records species work on accepted photons. Extend to transported line photons only after emission, escape and next absorber share event and clock identities.",
+      "evidence": [
+        "components/bass_he/analysis/F05_CONSERVED_ENERGY.json",
+        "components/bass_he/analysis/PORT_VALIDATION.json"
+      ]
+    },
+    {
+      "id": "CR-birth",
+      "status": "numerically checked",
+      "depends_on": [
+        "native-owner"
+      ],
+      "inputs": [
+        "source-normalized proton distribution, gas-frame composition and finite proper exposure, independent PHYS02 fixture"
+      ],
+      "outputs": [
+        "per-target primary event counts/m3, binding, fast birth and threshold offset eV/m3"
+      ],
+      "claim_gate": "source-off zero; window-integrated target counts; prompt plus fast ownership; dedicated transfer precision",
+      "pr_plan": "This PR installs primary collisions and separate fast stock. Next physical PR transports that source spectrum in the actual recipient gas with energy-resolved deposition and feedback.",
+      "evidence": [
+        "components/bass_cr/analysis/AXBI_PRIMARY_SOURCE.json",
+        "components/bass_cr/analysis/VERIFICATION.json"
+      ]
+    },
+    {
+      "id": "matched-material-response",
+      "status": "numerically checked",
+      "depends_on": [
+        "D/H",
+        "He-energy",
+        "CR-birth"
+      ],
+      "inputs": [
+        "five original AXBI rows and matched native R118 finite intervals"
+      ],
+      "outputs": [
+        "fixed-z and equal-time DII responses",
+        "conditional frozen-cell source on/off"
+      ],
+      "claim_gate": "compare clocks and discretizations, prove budget locally on accepted path, identify all active and passive sectors",
+      "pr_plan": "This integration PR runs one central entry and records results. Extend only against a new scientific endpoint.",
+      "evidence": [
+        "research/unified_igm_20261127/results/SECOND_INTEGRATION.json",
+        "components/bass_rec/validation/ACCEPTED_MATERIAL_TRACE.json"
+      ]
+    },
+    {
+      "id": "R118-C3U",
+      "status": "open",
+      "depends_on": [
+        "native-owner"
+      ],
+      "inputs": [
+        "R118-C3T signed N/U moments and actual accepted REI H/He and REC states"
+      ],
+      "outputs": [
+        "coupled directional source on accepted steps; scalar-mean and rollback parity"
+      ],
+      "claim_gate": "changing physical coframe and births, positive spectrum, unique scalar owner, >=32 rays and independent frequency and time refinement",
+      "pr_plan": "Next PR on same REI line. Implement positive reconstruction, apply trial, reject and retry from identical state, compare directional/source-off controls and N,U defects.",
+      "evidence": [
+        "research/r118c3t_cell_moments/NEXT.md"
+      ]
+    },
+    {
+      "id": "AX11",
+      "status": "partial",
+      "depends_on": [
+        "native-owner"
+      ],
+      "inputs": [
+        "original scenario, common initial conditions and full T0/T1/T2 pair; independent E and mu refinements"
+      ],
+      "outputs": [
+        "qualified full-domain H/He/temperature and observer-coordinate paired uncertainty"
+      ],
+      "claim_gate": "recover or finish full T2 original-IC pair with output budget and convergence error on both comparison coordinates; independent frequency and angular axes",
+      "pr_plan": "Parallel PR on REI, original source OFF. Store restartable checkpoints, compact scientific rows, and paired uncertainty. A short tracer run cannot replace this test.",
+      "evidence": [
+        "research/rei_ax11_profile_20261116/GOAL_DAG_DELTA.json",
+        "research/rei_ax11_t1_wave_20261116/results_v1/SUMMARY.json",
+        "research/rei_ax11_t2_wave_20261118/PARTIAL_T2_ANALYSIS_20261119.json"
+      ]
+    },
+    {
+      "id": "material-feedback",
+      "status": "open",
+      "depends_on": [
+        "matched-material-response",
+        "R118-C3U"
+      ],
+      "inputs": [
+        "specified physical D abundance and rates, line source, CR injection and recipient-matched degradation"
+      ],
+      "outputs": [
+        "fully coupled gas and radiation history and differential response relative to stated controls"
+      ],
+      "claim_gate": "same physical IC, charge/energy/momentum closure, no deposition twice, convergence and explicit difference on chosen observable",
+      "pr_plan": "Subsequent REI PRs in order: couple D channels and line transport on accepted intervals; add CR electron degradation; evaluate coupled and disabled scenarios.",
+      "evidence": []
+    },
+    {
+      "id": "AX12",
+      "status": "pending",
+      "depends_on": [
+        "AX11"
+      ],
+      "inputs": [
+        "AX11 admitted uncertainty and observer convention"
+      ],
+      "outputs": [
+        "original goal directional observable with units and error budget"
+      ],
+      "claim_gate": "inherited AX12 criteria and actual AX11 admission",
+      "pr_plan": "Only after AX11 evidence warrants promotion, use qualified original perturbations and matching observational response.",
+      "evidence": []
+    }
+  ],
+  "watchdog_each_research_turn": {
+    "start": "Name one original goal node, physical quantity, scenario, comparison coordinate and discriminator.",
+    "finish": "Record numeric change or counterexample, baseline, numerical error and next missing input. If only a plot or infrastructure changed, award zero science-node credit. Where clock effects dominate, report matched-time control.",
+    "redirect": "If a repeated audit changes neither the physics nor its error bound, use the inherited gate and execute the next physical control."
+  },
+  "run": "python scripts/run_unified_igm.py NEW_OUTPUT [--offline]"
+}
