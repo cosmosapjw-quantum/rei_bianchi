@@ -40,9 +40,10 @@ fn main()->Result<(),Box<dyn std::error::Error>>{
    let mut x=base;if col>=0{x[col as usize]+=e*scale[col as usize];}
    let mut init=s.clone();init.gas=gas(x)?;
    map(d.c4a_rebase_initial(&init))?;
+   let init_before=q(&init)?;
    let mut rhs=0;let next=map(d.external_trial(&init,to,&mut rhs))?;
    let a=q(&next)?;let (pn,pu)=d.photon_inventory(&next);let (nr,ur)=map(d.residuals(&next))?;
-   assert_eq!(next.accepted,1);assert_eq!(q(&init)?,x);assert!(next.last_error<d.config.local_target);
+   assert_eq!(next.accepted,1);assert_eq!(q(&init)?,init_before);assert!(next.last_error<d.config.local_target);
    writeln!(o,"{grid},{col},{e:.17e},{du:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{pn:.17e},{pu:.17e},{ur:.17e},{nr:.17e},{:.17e},{rhs}",x[0],x[1],x[2],x[3],a[0],a[1],a[2],a[3],next.last_error)?;
    Ok(())
   };
