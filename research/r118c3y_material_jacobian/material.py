@@ -85,7 +85,7 @@ def ou():
  rows=[]
  for q0 in [1e-8,1e-6,1e-5,2e-5,5e-5,1e-4]:
   def calc(n):
-   x=np.concatenate([np.linspace(a,b,n,endpoint=False) for a,b in zip(u[:-1],u[1:])]+[u[-1]]);z=(x[1:]+x[:-1])/2;nn,ww,HH,vv,ss=f(z).T
+   x=np.concatenate([np.linspace(a,b,n,endpoint=False) for a,b in zip(u[:-1],u[1:])]+[u[-1:]]);z=(x[1:]+x[:-1])/2;nn,ww,HH,vv,ss=f(z).T
    q=q0*np.exp(-z)*wp[0]/ww;L=1+1/q**2;g=nn/L/HH;eq=ss/L;assert min(g)>=0 and min(eq)>=0
    G=np.r_[0,np.cumsum(g*np.diff(x))];V=np.zeros((len(x),2));V[0,1]=1/(1+1/q0**2)
    for i,(dt,gg,ee) in enumerate(zip(np.diff(x),g,eq)):V[i+1]=V[i]+(-np.expm1(-2*gg*dt))*(ee-V[i])
