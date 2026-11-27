@@ -40,6 +40,7 @@ def collision(y,m):
  o[0,4:9]=di;o[1,4:9]=-de-1j*db;o[2,4:9]=-de+1j*db
  return o.ravel()
 def photon(y,a0,m):
+ # a0 argument is actual endpoint a, not initial a. Exported generator excludes isotropic -4Y.
  # Absolute moment map: native HarmonicSky::moments multiplied by rho; linear before normalization.
  z=y[:m];fac=OG/a0**4/Y00;rho=fac*z[0].real
  t=np.sqrt(16*np.pi/45)*z[6].real/Y00 # native t_zz numerator normalized by Y00; factor OG/a0^4 / Y00? energy = Y00*Y00 coefficient? see below
@@ -65,7 +66,7 @@ def history(name,lmax=4):
    return Lop(s,y)+kk*collision(y,m)
   z=solve_ivp(fun,(u[0],u[-1]),y0,t_eval=u,dense_output=True,rtol=2e-12/ref,atol=1e-16/ref,max_step=max(np.diff(u))/ref,method='DOP853');assert z.success
   return z
- yy=solve_y(ref=4);yr=np.array([photon(y,F[0],m)[0] for y in yy.y.T]);pp=np.array([photon(y,F[0],m)[1] for y in yy.y.T])
+ yy=solve_y(ref=4);yr=np.array([photon(y,aa,m)[0] for y,aa in zip(yy.y.T,F)]);pp=np.array([photon(y,aa,m)[1] for y,aa in zip(yy.y.T,F)])
  trace_reference=np.trace(P-pm,axis1=1,axis2=2)-f*(h['primary']+h['cool']+h['spec']+2*h['thermal'])
  trace_error=float(np.max(abs(yr-trace_reference)/np.maximum(abs(trace_reference),1e-300)))
  assert trace_error<1e-5,(name,trace_error)
@@ -85,10 +86,10 @@ def history(name,lmax=4):
  raw=PchipInterpolator(u,np.c_[S,a['h'],a['rho'],P.reshape(-1,9),pm.reshape(-1,9),force/(hp*fs),J.reshape(len(u),-1),K],axis=0)
  def rhs(t,y,active):
   row=raw(t);s=row[:5];H,rho=row[5:7];pt=row[7:16].reshape(3,3);pma=row[16:25].reshape(3,3);fo=row[25:30];jj=row[30:-1].reshape(10,9);kk=row[-1]
-  ds=y[:5].real;dl=y[5].real;rr=y[6].real;A=y[7:16].real.reshape(3,3);Z=y[16:];Yt=yy.sol(t);_,pga=photon(Yt,F[0],m)
+  ds=y[:5].real;dl=y[5].real;rr=y[6].real;A=y[7:16].real.reshape(3,3);Z=y[16:];Yt=yy.sol(t);_,pga=photon(Yt,F[0]*np.exp(t),m)
   AA=mat(s);dAA=mat(ds);dA=dAA+AA@A-A@AA
   mt=jj@A.ravel();drm=mt[0];dpm=mt[1:].reshape(3,3)
-  drg,dpg=photon(Z,F[0],m) if active else (0.,np.zeros((3,3)))
+  drg,dpg=photon(Z,F[0]*np.exp(t),m) if active else (0.,np.zeros((3,3)))
   rtot=hp*rr+drm+drg;dtr=hp*rr+np.trace(dpm)+drg;pi=stf(pt);dp=hp*fo+stf(dpm+dpg)
   q=s@s/3+(rho+np.trace(pt)-2*OL)/(2*H**2);dq=2*s@ds/3+(rtot+dtr)/(2*H**2)-(rho+np.trace(pt)-2*OL)*dl/H**2
   dds=(q-2)*ds+dq*s+3*(dp-2*pi*dl)/H**2
@@ -111,7 +112,7 @@ def history(name,lmax=4):
  for eps in [.1,.01,.001]:
   vp=solve_y(eps,perturb,4).y[:,-1];vm=solve_y(-eps,perturb,4).y[:,-1]
   fd.append(norm((vp-vm)/(2*eps)-zz.y[:,-1])/norm(zz.y[:,-1]))
- A=yf[:,7:16].real.reshape(-1,3,3);drm=np.einsum('nij,nj->ni',J,A.reshape(-1,9))[:,0];drg=np.array([photon(z,F[0],m)[0] for z in yf[:,16:]]);deltaR=hp*yf[:,6].real+drm+drg
+ A=yf[:,7:16].real.reshape(-1,3,3);drm=np.einsum('nij,nj->ni',J,A.reshape(-1,9))[:,0];drg=np.array([photon(z,aa,m)[0] for z,aa in zip(yf[:,16:],F)]);deltaR=hp*yf[:,6].real+drm+drg
  gauss=-np.sum(S*yf[:,:5].real,axis=1)/3-deltaR/a['h']**2+2*(a['rho']+OL)*yf[:,5].real/a['h']**2
  out=dict(case=name,lmax=lmax,source_sha=sh,matter_sha=sa,identity=identity,primary_trace_reconstruction_relative=trace_error,eos_identity=e0,eos_directional_FD=es,opacity_fraction_derivative_at_last=(dnedx[-1]/ne[-1]).tolist(),binding_derivative_eV_per_H=bindg.tolist(),source_scale=float(fs),terminal_shear_norm=norm(yf[-1,:5])*fs,without_primary_feedback=norm(off.y[:5,-1])*fs,primary_feedback_relative=norm(yf[-1,:5]-off.y[:5,-1])/norm(yf[-1,:5]),harmonic_tangent_norm=norm(yf[-1,16:])*fs,solver_relative=norm(on.y[:,-1]-fine.y[:,-1])/norm(fine.y[:,-1]),frozen_history_FD_relative=fd,gauss_scaled_max=float(max(abs(gauss))),scope='continuous harmonic streaming+rest-electron collision projected l<=L from byte-matched source, actual accepted clock; massive tangent and primary harmonic material response; remaining external sector radiation-like conditional; chemistry algebraic only, not native rate Jacobian nor discrete step tangent')
  assert min(fd)<1e-5,(name,fd)
