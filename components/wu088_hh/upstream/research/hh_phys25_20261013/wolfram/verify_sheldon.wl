@@ -1,0 +1,28 @@
+ClearAll["Global`*"];
+root=CreateDirectory[]; ar=FileNameJoin[{root,"xAct.tgz"}];
+URLDownload["https://xact.es/download/xAct_1.3.0.tgz",ar];
+If[FileHash[ar,"SHA256","HexString"]=!="7a6c5f600868a3922668b020a15c0692f76574ff2a559808c62d460cef1b07be",Return["XACT_HASH_FAILURE"]];
+ExtractArchive[ar,root]; xf=First[Select[FileNames["xTensor.m",root,Infinity],StringEndsQ[#,"/xAct/xTensor/xTensor.m"]&]];
+PrependTo[$Path,DirectoryName[xf,3]];PrependTo[$Path,DirectoryName[xf,2]];Get[xf];
+tensors=ToExpression["$xpermQ=False; DefManifold[ES25,3,{a25,b25,c25,d25}]; DefMetric[1,em25[-a25,-b25],ed25]; DefTensor[r25[],ES25]; DefTensor[f25[],ES25]; DefTensor[g25[],ES25]; DefScalarFunction[F25]; {ToCanonical[Expand[ed25[-a25][ed25[a25][F25[r25[]]]]-F25''[r25[]]ed25[-a25][r25[]]ed25[a25][r25[]]-F25'[r25[]]ed25[-a25][ed25[a25][r25[]]]]],ToCanonical[Expand[ed25[-a25][f25[]ed25[a25][g25[]]-g25[]ed25[a25][f25[]]]-f25[]ed25[-a25][ed25[a25][g25[]]]+g25[]ed25[-a25][ed25[a25][f25[]]]]]}"];
+ph[x_]:=-x/(10(1+x^2)^5)+x/(80(1+x^2)^4)+7x/(480(1+x^2)^3)+7x/(384(1+x^2)^2)+7x/(256(1+x^2))+7ArcTan[x]/256;
+HH[s_,r_]:=-ExpIntegralEi[-s r]+Exp[-s r](2/s+(s r+1)/s^2);
+KK[s_,r_]:=Exp[-s r]((r+1)^2/s+2(r+1)/s^2+2/s^3);
+JJ[s_,r_]:=-ExpIntegralEi[-s r]+Exp[-s r](2(r^2/s+2r/s^2+2/s^3)+4(r/s+1/s^2)+3/s);
+ss[r_]:=(1+1/r)Exp[-2r];
+cc0[r_]:=Exp[-r](7/18-11/(27r))+Exp[-2r](1/9+11/(27r));
+rr[r_]:=Exp[-2r](8/9+16/(27r))+Exp[-r](11/(27r)-7/18);
+a0=18/5;bb=37/25;dep=7/20;B0=27/25;rg=3/2;
+u1[r_]:=dep(Exp[-2B0(r-rg)]-2Exp[-B0(r-rg)]);u3[r_]:=a0 Exp[-bb r];
+r1[e_]:=rg-Log[1+Sqrt[1+e/dep]]/B0;r3[e_]:=Log[a0/e]/bb;
+g1[e_]:=HH[4,r1[e]]-dep/e Exp[2B0 rg]HH[4+2B0,r1[e]]+2dep/e Exp[B0 rg]HH[4+B0,r1[e]]+dep B0/e Exp[2B0 rg]KK[4+2B0,r1[e]]-dep B0/e Exp[B0 rg]KK[4+B0,r1[e]];
+g3[e_]:=HH[4,r3[e]]-a0/e HH[4+bb,r3[e]]+a0 bb/(2e)KK[4+bb,r3[e]];
+aux[t_]:=Exp[-2t](t/2+3/4);
+conv=FullSimplify[(Integrate[x Exp[-x](aux[r-x]-aux[r+x]),{x,0,r},Assumptions->r>0]+Integrate[x Exp[-x](aux[x-r]-aux[x+r]),{x,r,Infinity},Assumptions->r>0])/(4r)-cc0[r],r>0];
+checks={Together[D[ph[x],x]-x^2/(1+x^2)^6],ph[0],Limit[ph[x]/x^3,x->0]-1/3,FullSimplify[D[HH[s,r],r]+(1+r)^2 Exp[-s r]/r,s>0&&r>0],FullSimplify[D[KK[s,r],r]+(1+r)^2 Exp[-s r],s>0&&r>0],FullSimplify[D[JJ[s,r],r]+(2r^2+4r+3+1/r)Exp[-s r],s>0&&r>0],FullSimplify[D[ss[r],{r,2}]+2D[ss[r],r]/r-4Exp[-2r],r>0],Together[(z+8)/((z+1)^2(z+4)^2)-(11/(27(z+4))+4/(9(z+4)^2)-11/(27(z+1))+7/(9(z+1)^2))],FullSimplify[ss[r]-cc0[r]-rr[r],r>0],Limit[cc0[r],r->0]-5/54,conv,FullSimplify[u1[r1[e]]-e,e>0],FullSimplify[u3[r3[e]]-e,e>0],Expand[D[r^2(1-U[r]/e),r]/2-r(1-U[r]/e-r U'[r]/(2e))],FullSimplify[-r^2 D[ss[r]^2,r]/2-Exp[-4r](2r^2+4r+3+1/r),r>0]};
+gold=N[{g1[1],g3[1]},60];
+gnew={NIntegrate[r rr[r]^2(1-u1[r]-r u1'[r]/2),{r,N[r1[1],60],1,2,5,Infinity},WorkingPrecision->60,AccuracyGoal->45,PrecisionGoal->40],NIntegrate[r rr[r]^2(1-u3[r]-r u3'[r]/2),{r,N[r3[1],60],1,2,5,Infinity},WorkingPrecision->60,AccuracyGoal->45,PrecisionGoal->40]};
+rat=N[(gnew.{1,3})/(gold.{1,3}),40];
+aSI=529177210544/10^22;evj=1602176634/10^28;kbSI=1380649/10^29;mh=167262192369/10^38;ir=13605693122990/10^12;theta=kbSI*50000/evj;
+rate=100 Sqrt[8evj/(Pi(mh/2))]theta^(-3/2)(100aSI)^2 ir^2 NIntegrate[256ph[Sqrt[e-1]](g1[e]+3g3[e])/4*e Exp[-ir e/theta],{e,1,11/10,3/2,2},WorkingPrecision->50,AccuracyGoal->40,PrecisionGoal->35,Method->{"GlobalAdaptive","SymbolicProcessing"->0}];
+<|"kernel"->System`$Version,"xTensor_sha256"->FileHash[xf,"SHA256","HexString"],"tensor_residuals"->tensors,"scalar_residuals"->checks,"all_zero"->And@@(TrueQ[#===0]&/@Join[tensors,checks]),"g_source"->gold,"g_restored"->gnew,"unpolarized_threshold_ratio"->rat,"partial_tagged_network_rate_cm3_s"->N[rate,35],"sigma_source_at_2Ry_a02"->N[256ph[1]{g1[2],g3[2],(g1[2]+3g3[2])/4},35]|>

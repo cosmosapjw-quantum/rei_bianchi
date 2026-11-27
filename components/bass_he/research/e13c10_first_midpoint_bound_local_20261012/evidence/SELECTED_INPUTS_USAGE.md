@@ -1,0 +1,7 @@
+# Scope of inherited input metadata
+
+SELECTED_INPUTS.json preserves the E13C9 source-mapping records and adds the actual admitted E13C9 result pins. Fields such as created_utc, task_root, cache_policy and planned_new_prefix_quadrature inside the inherited metadata describe that prior mapping operation. They are historical context, not E13C10 execution instructions. Historical absolute paths can refer to the prior pruned workspace; the E13C10 wrapper uses the recorded restore-relative paths under the explicitly supplied actual restore root.
+
+E13C10 execution is governed by the current SCIENTIFIC_CONTRACT.md (including its evidence-driven same-N amendment), WORK_PLAN.json and SOURCE_LOCK.json. Original complete RESULT SHA pins cover local.midpoint as well as local.signed and local.bounds. The older cached_local_signed_and_bounds_sha256 field provides an additional subtree check; it is not the only identity check and is not represented as covering local.midpoint.
+
+The current method reuses the original midpoint sum only at identical N/P/source/input/segment, retains the original fine-grid bounds, and computes new signed curvature intervals. It does not use the inherited instruction to reuse the old local.signed as the new result. Updated first integrals and current carry feed all subsequent second corrections and remainders. Independent review identified the potentially confusing inherited policy text; this note makes its historical scope explicit while preserving the source identity records.

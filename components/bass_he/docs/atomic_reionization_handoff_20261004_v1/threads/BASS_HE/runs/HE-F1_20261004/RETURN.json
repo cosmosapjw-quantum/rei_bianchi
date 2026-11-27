@@ -1,0 +1,90 @@
+{
+  "task_id": "HE-F1",
+  "state": "completed",
+  "input_identity": {
+    "repository": "cosmosapjw-quantum/BASS_HE",
+    "branch": "research/shared-c64-crossrepo-20260928",
+    "base_commit": "271fa2b89cd37b0d07ab0c07ad7ea5ef2a02a58e",
+    "baseline_scope": "selected B3 paths only; local git snapshot is not remote ancestry",
+    "GM25_core_sha256": "529ae325622718b48292c3b748a7850ccb315733b28bff930388f00915f2d217"
+  },
+  "changed_paths": [
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/CODEX_START_KO.md",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/TASKS.json",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/CLAIMS.json",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/FINAL_TESTS.log",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/HE_F1_REGISTRATION.json",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/INPUT_IDENTITY.json",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/INSTALLATION_IDENTITY.json",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/NEXT_STEP_KO.md",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/README_KO.md",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/data/COMPARISON.json",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/data/GM25_PACKET.json",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/data/GM25_REQUEST.json",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/data/KF96_PACKET.json",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/data/KF96_REQUEST.json",
+    "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-F1_20261004/data/SOURCE_REGISTRY.json",
+    "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/contract/ATOMIC_EXPORT_CONTRACT.json",
+    "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/pyproject.toml",
+    "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/__init__.py",
+    "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/_kf96.py",
+    "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/api.py",
+    "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/registry.py",
+    "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/tests/fixtures/gm25_v010_hashes.json",
+    "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/tests/test_contract_red.py",
+    "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/tests/test_kf96_source.py"
+  ],
+  "commands": [
+    {
+      "command": "cd research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1 && PYTHONPATH=src PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONDONTWRITEBYTECODE=1 python -W error -m pytest -q -p no:cacheprovider tests/test_kf96_source.py tests/test_contract_red.py::test_registry_requires_explicit_source tests/test_contract_red.py::test_roundtrip_keeps_source_meaning tests/test_contract_red.py::test_count_invariants_exact_and_unit_scaling",
+      "exit_code": 0,
+      "evidence_path": "FINAL_TESTS.log"
+    },
+    {
+      "command": "python -m pip wheel --no-deps --no-build-isolation --wheel-dir /mnt/data/he_f1_work/dist .; python -m pip install --no-index --no-deps --target /mnt/data/he_f1_work/installed /mnt/data/he_f1_work/dist/bass_he_atomic_export-0.1.1-py3-none-any.whl",
+      "exit_code": 0,
+      "evidence_path": "artifact:evidence/WHEEL_BUILD.log and WHEEL_INSTALL.log"
+    },
+    {
+      "command": "B3_TEST_INSTALLED=/mnt/data/he_f1_work/installed PYTHONPATH=/mnt/data/he_f1_work/installed PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONDONTWRITEBYTECODE=1 python -W error -m pytest -q -p no:cacheprovider tests/test_kf96_source.py tests/test_contract_red.py::test_registry_requires_explicit_source tests/test_contract_red.py::test_roundtrip_keeps_source_meaning tests/test_contract_red.py::test_count_invariants_exact_and_unit_scaling",
+      "exit_code": 0,
+      "evidence_path": "artifact:evidence/INSTALLED_TESTS.log"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "evidence_path": "artifact:evidence/DIFF_CHECK.log"
+    }
+  ],
+  "artifacts": [
+    "README_KO.md",
+    "NEXT_STEP_KO.md",
+    "CLAIMS.json",
+    "data/GM25_PACKET.json",
+    "data/KF96_PACKET.json",
+    "data/SOURCE_REGISTRY.json",
+    "data/COMPARISON.json",
+    "artifact:dist/bass_he_atomic_export-0.1.1-py3-none-any.whl"
+  ],
+  "claim": {
+    "basis": "fresh pinned B3 source read, provided KF96 original Table1/p206 and plan; exact inherited core bytes; tested provider source/unit/null/domain/packet semantics",
+    "ceiling": "implementation verified opt-in nominal sources; no physical rate uncertainty, default source promotion, photon closure, consumer integration or legacy completion"
+  },
+  "next_task": "HE-F2",
+  "tests": {
+    "new_definitions": 54,
+    "new_initial_failed": 46,
+    "new_preexisting_guards_passed": 8,
+    "affected_original": 3,
+    "total_selected": 57,
+    "installed_selected": 57,
+    "unchanged_full_suite_replayed": false
+  },
+  "unresolved": [
+    "true-rate uncertainty",
+    "source disagreement",
+    "photon-energy/heat/recoil closure",
+    "actual HE-F2 consumer contracts"
+  ],
+  "blocker": null
+}

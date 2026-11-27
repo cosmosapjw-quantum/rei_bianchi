@@ -1,0 +1,64 @@
+{
+  "schema": "bass-he-part002-named-copy-review-v1",
+  "reviewer": "/root/e13c5c_transport_review",
+  "decision": "PASS_SCOPED_CODE_INSPECTION_AND_RECORDED_CONTROLS",
+  "blocking_findings": [],
+  "blocking_count": 0,
+  "scope": "Read the new named-copy helper and the root's six small-byte control results only. Independently checked these two file identities. No source execution, new tests, bulk-part read, restoration, scientific execution or remote mutation by this reviewer.",
+  "reviewed_source": {
+    "path": "code/place_verified_part002.py",
+    "bytes": 6523,
+    "sha256": "978a97f9dcc5c849be57d97a6c3cf26f79ff7ce28a0cdb5f744da8bc7d45d489",
+    "actual_file_identity_matches_control_record": true
+  },
+  "reviewed_control_record": {
+    "path": "controls/RESULTS.json",
+    "bytes": 1091,
+    "sha256": "1dab4ce4e60a28b150a85c3e979fabd0a47e33e61f69c1167788c5af8d44d472",
+    "producer": "Root",
+    "passed": 6,
+    "failed": 0,
+    "cases": [
+      "correct_bin",
+      "wrong_hash",
+      "existing_same",
+      "existing_different",
+      "symlink_source",
+      "race_at_publication"
+    ],
+    "independent_rerun_by_this_reviewer": false,
+    "production_main_with_actual_part_executed": false
+  },
+  "source_inspection_findings": [
+    "Production main binds only the exact canonical part002 name and that exact name plus .bin. It performs no glob, suffix-stripping search or fuzzy candidate selection.",
+    "Production main checks the manifest's exact 1176 bytes/SHA and original restorer's exact 9543 bytes/SHA before reading the record or importing its no-replace primitive. It binds part002 to 40580022 bytes and the fixed SHA.",
+    "Source and target identity checks open with O_NOFOLLOW and require a regular file. Source bytes are never renamed, truncated or deleted by this helper.",
+    "A missing target is copied to an exclusive fresh partial through the pinned full-write primitive, flushed and fsynced, then its persisted bytes/SHA are checked before pinned atomic no-replace publication. The published target is checked afterward.",
+    "Existing equal target is accepted only after an actual exact identity check and performs no copy. Existing different or symlink target fails without replacement. Publication races are rejected by the pinned no-replace primitive.",
+    "Production main rechecks the original .bin source, manifest and original restorer after placement. The placement receipt requires a fresh path outside PARTS_DIR and is created exclusively.",
+    "The helper performs no network operation, ZIP reconstruction, scientific import or budget invocation. Its successful placement status does not claim restoration or numerical parity."
+  ],
+  "adjudication_of_existing_equal_target": {
+    "earlier_proposed_contract": "Reject any existing canonical target.",
+    "reviewed_behavior": "Verify the full exact target identity and report VERIFIED_CANONICAL_ALREADY_PRESENT without copying.",
+    "assessment": "Admissible narrow extension: it preserves the existing file and the original .bin and makes its no-op outcome explicit. It does not weaken manifest identity or overwrite protection.",
+    "prior_corroboration_modified": false
+  },
+  "limitations": [
+    "The six controls are the root's recorded small-file executions; this reviewer did not independently run them or inspect a broader suite.",
+    "Production manifest/restorer gates were read in code, not run here with the actual 40580022-byte input.",
+    "Actual NCP filename placement, original ZIP restoration, scientific source/lock/input checks and semantic/CSV parity remain pending."
+  ],
+  "reviewer_invocations": {
+    "new_control_executions": 0,
+    "actual_part_placement": 0,
+    "archive_restore": 0,
+    "budget": 0,
+    "physics": 0,
+    "full_first2": 0,
+    "N512": 0,
+    "remote_mutations": 0
+  },
+  "actual_NCP_execution": "NOT_RUN",
+  "next_gate": "Use the pinned helper once on the recipient's preserved input with a new receipt. Only then invoke the original sealed restorer with new output/receipt and require its own PASS before core recovery and the separately authorized saved-budget execution."
+}

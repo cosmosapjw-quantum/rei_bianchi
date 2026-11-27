@@ -1,0 +1,160 @@
+{
+  "schema": "he31.prepared_moments.independent_review.v1",
+  "status": "PASS_SCOPED_PHYSICAL_INTERVAL",
+  "reviewer_task": "/root/upstream_inventory",
+  "author_task": "/root/physics_literature",
+  "reviewed_utc": "2026-10-21 13:16:41 UTC",
+  "review_scope": {
+    "files": [
+      "src/prepared_moments.py",
+      "tests/check_prepared_moments.py",
+      "../he29_rei_pilot_20261021/vendor/canonical_fv.py"
+    ],
+    "physical_interval": "0 <= eta <= ln(7), corresponding to a_ref=1/21 and a_end<=1/3",
+    "source_chart": "finite eta>=0, abs(b)<=1; broader numeric domain is accepted but no universal near-underflow relative-parity claim is admitted",
+    "analysis": "Source algebra and structural resource review plus one four-state scalar edge experiment. No full test suite, ODE or benchmark."
+  },
+  "source_sha256_at_review": {
+    "src/prepared_moments.py": "5d2f877b6e511c421ed95fc3fabde29e97998ec40c8d191768fda769cc5e0c37",
+    "tests/check_prepared_moments.py": "71f27b15a7c65e4715942fb0dfbecba5d30a0e4173b66fd532f7b8309001166b",
+    "../he29_rei_pilot_20261021/vendor/canonical_fv.py": "91c1641b851aa9580141d4423e2579ced5f11b95aa716b3fc2cb0137df344cc5"
+  },
+  "findings": [
+    {
+      "id": "P1_NORMALIZED_ALGEBRA",
+      "status": "PASS",
+      "severity": "none",
+      "evidence": "Prepared q_perp²=q²(1-mu²),q_parallel²=q²mu²,w=N/E_ref and s_perp=e^(-2eta+2b),s_parallel=e^(-2eta-4b) give E=sqrt(m²+s_perp q_perp²+s_parallel q_parallel²); rho=e^-3eta sum(wE),P_perp=e^-3eta s_perp sum(wq_perp²/E)/2,P_parallel=e^-3eta s_parallel sum(wq_parallel²/E). These are the original mass-shell sums with rearranged floating-point operations."
+    },
+    {
+      "id": "P2_CACHED_DEPENDENCIES",
+      "status": "PASS_WITH_CALLER_BINDING",
+      "severity": "none",
+      "evidence": "No cross-object or rounded-state memoization is introduced. Each object snapshots mass/amplitude/resolution/order/E_ref, immutable normalized weights and q² components, original number sum and cell masses. Per-state inputs eta,b remain evaluated exactly as supplied. Source SHA authority remains the caller's responsibility; isinstance alone is not a provenance check."
+    },
+    {
+      "id": "P3_IMMUTABILITY",
+      "status": "PASS",
+      "severity": "none",
+      "evidence": "np.frombuffer(bytes) prevents WRITEABLE=True for all six stored arrays; frozen scalar fields reject ordinary reassignment. Independent scalar experiment also reassigned source.mass and source.reference_energy_norm after construction and the prepared output stayed unchanged. This checks detached snapshot ownership rather than merely flags on a shared source view."
+    },
+    {
+      "id": "P4_WORKSPACE_CAP",
+      "status": "PASS_STRUCTURAL",
+      "severity": "none",
+      "evidence": "Two matrices of width*K float64 values are allocated, with width=min(chunk,max_work_bytes//(16*K),N), so declared packet workspace is at most cap. Persistent arrays are 8*(5*K+cells) bytes excluding headers; scalar workspace is2*K*8. O(N) input/output and validation arrays plus O(width) vector temporaries are outside the two-matrix cap. BLAS internals/total process peak were not instrumented. Tests passing a two-state budget demonstrate functional chunk behavior, not measured RSS."
+    },
+    {
+      "id": "P5_INPUT_DOMAIN",
+      "status": "PASS_SCOPED",
+      "severity": "none",
+      "evidence": "Finite eta>=0 and abs(b)<=1, one-dimensional equal-shaped batches, chunk1..256 match the vendor. max_work_bytes additionally requires an integer non-bool large enough for one state. All HE31 epochs lie within the reviewed physical interval."
+    },
+    {
+      "id": "P6_ENERGY_WORK_NUMBER_CHECKS",
+      "status": "PASS",
+      "severity": "none",
+      "evidence": "Test drho is differentiated directly from original q/mu/number arrays rather than from prepared output. Along db/deta=v, rho'=-3rho-(2P_perp+P_parallel)+2v(P_perp-P_parallel), giving rho'+3(rho+pbar)+6v*pi_s=0 with pi_s=(P_parallel-P_perp)/3. The number check independently compares against original total_cell_number. These are algebraic consistency checks of the same canonical discretization, not quadrature/ODE convergence or independent physical admission."
+    },
+    {
+      "id": "P7_SUBNORMAL_ORDERING",
+      "status": "DOCUMENTED_OUTSIDE_PHYSICAL_INTERVAL",
+      "severity": "nonblocking_scope_note",
+      "evidence": "For the vendor-valid extreme eta=245, mass=1e5, amplitude2,4x4Gauss4,b0, original rho=0 while prepared rho=6.217e-320: original computes (r³/E_ref)*N first and underflows earlier. eta240 also fails a universal rtol3e-14,atol0 comparison. This does not affect eta<=ln7. Root accepted explicit docstring/contract scope correction; no arithmetic change or broader tests requested.",
+      "requested_action": "Document no all-eta near-underflow relative-parity claim while retaining accepted finite-input domain."
+    }
+  ],
+  "scalar_edge_experiment": {
+    "parameters": {
+      "mass_over_Tref": 100000,
+      "amplitude": 2,
+      "radial_cells": 4,
+      "angular_cells": 4,
+      "gauss_order": 4
+    },
+    "rows": [
+      {
+        "eta": 1.9459101490553132,
+        "b": -0.1,
+        "original": [
+          0.0029154518932053407,
+          1.2601337894243922e-14,
+          6.888340406111301e-14
+        ],
+        "prepared": [
+          0.0029154518932053407,
+          1.2601337894243919e-14,
+          6.8883404061113e-14
+        ],
+        "max_absolute_error": 1.262177448353619e-29,
+        "allclose_rtol3e14_atol0": true
+      },
+      {
+        "eta": 240,
+        "b": 0,
+        "original": [
+          2.0322204584e-313,
+          0,
+          0
+        ],
+        "prepared": [
+          2.0322308011e-313,
+          0,
+          0
+        ],
+        "max_absolute_error": 1.034267e-318,
+        "allclose_rtol3e14_atol0": false
+      },
+      {
+        "eta": 245,
+        "b": 0,
+        "original": [
+          0,
+          0,
+          0
+        ],
+        "prepared": [
+          6.217e-320,
+          0,
+          0
+        ],
+        "max_absolute_error": 6.217e-320,
+        "allclose_rtol3e14_atol0": false
+      },
+      {
+        "eta": 247,
+        "b": 0,
+        "original": [
+          0,
+          0,
+          0
+        ],
+        "prepared": [
+          1.53e-322,
+          0,
+          0
+        ],
+        "max_absolute_error": 1.53e-322,
+        "allclose_rtol3e14_atol0": false
+      }
+    ],
+    "source_metadata_mutation_does_not_change_snapshot": true,
+    "all_six_arrays_have_immutable_byte_backing": true
+  },
+  "execution": {
+    "new_physical_trajectories": 0,
+    "ode_calls": 0,
+    "benchmark_runs": 0,
+    "full_suite_runs": 0,
+    "scalar_reference_comparisons": 4
+  },
+  "claims_not_made": [
+    "Bitwise parity",
+    "Universal relative parity for subnormal moments at arbitrarily large eta",
+    "Measured runtime speedup or measured total RSS cap",
+    "Quadrature convergence or new physical-result admission"
+  ],
+  "root_decision": "Accepted physical-interval scope correction. Root will add implementation docstring and contract note; leave arithmetic unchanged and do not broaden tests.",
+  "followup": "Ready for a separately requested donor/driver review."
+}
+

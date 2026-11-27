@@ -1,0 +1,43 @@
+name: BASS_HE PW19 spectral native H-He donor physics
+on:
+  push:
+    branches:
+      - research/bass-he-pw19-original-spectrum-intake-20261101
+    paths:
+      - 'research/rei_pw19_spectral_native_bridge_20261101/**'
+      - '.github/workflows/bass-he-pw19-spectral-native-20261101.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-physics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recompute 626-bin original spectral inputs
+        run: python3 research/rei_pw19_spectral_native_bridge_20261101/spectral_physics.py
+      - name: Independent 120k dlnE spectral oracle
+        run: python3 research/rei_pw19_spectral_native_bridge_20261101/independent_audit.py
+      - name: Generate original native tick160 source donor
+        run: python3 research/rei_pw19_spectral_native_bridge_20261101/spectral_native_bridge.py
+      - name: Source native test suite
+        run: python3 research/rei_pw19_spectral_native_bridge_20261101/tests/test_native_bridge.py
+      - name: Python optimized test suite
+        run: python3 -O research/rei_pw19_spectral_native_bridge_20261101/tests/test_native_bridge.py
+      - name: Same-author independent physical audit
+        run: python3 research/rei_pw19_spectral_native_bridge_20261101/audit_native_independent.py
+      - name: Preserve scoping in results
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('research/rei_pw19_spectral_native_bridge_20261101/NATIVE_T160_PW19_SPECTRAL_DONOR_PHYSICS.json')
+          x=json.loads(p.read_text())
+          assert x['central_DAG']=='28/88_REPORTED'
+          assert x['BASS_HE_physical_DAG']=='14/18_REPORTED'
+          assert x['canonical_delta']==0 and x['production']=='HOLD'
+          assert x['source_ownership']['RUX04']=='NOT_ADMITTED'
+          PY

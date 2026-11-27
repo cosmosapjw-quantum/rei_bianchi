@@ -1,0 +1,533 @@
+{
+  "schema": "bass-he-moving-05-claims-v1",
+  "workflow_version": "1.0.0",
+  "unit": "HERE_RUX03_MOVING_GAS_SOURCE_05",
+  "route": "THEORY",
+  "date_kst": "2026-10-13",
+  "status": "author_complete",
+  "independent_adoption": {
+    "decision_ref": "review/DECISION.json",
+    "authority": "Independent reviewer /root/dropbox_checkpoint",
+    "state_owner": "The actual independent decision is recorded only in DECISION.json; author completion is not adoption."
+  },
+  "result_status_meaning": "Author evidence is complete as recorded. The independent decision controls scoped adoption; this registry does not duplicate or issue that decision.",
+  "source_identity": {
+    "parent_unit": "HERE_RUX03_COVARIANT_EXCHANGE_04",
+    "parent_commit": "ca85cfc7353da190613f7fb37a6e0ffed9b51913",
+    "receiver_commit": "a5c958c414dea41216b445c05f58df837f05cacb",
+    "current_source_ref": "source_map/CURRENT_SOURCE.json",
+    "reuse_identity_ref": "source_map/VALID_REUSE_IDENTITY.json"
+  },
+  "assumptions": {
+    "A01": "Fixed local Eulerian tetrad with signature (-+++), x0=c t, homogeneous fixed-volume source substep. Photon lab energies and directions stay fixed in this substep; geometry and spatial transport retain their separate ownership.",
+    "A02": "One common gas velocity with |beta|<1; D=gamma n_H>0 and f=n_He/n_H>0 conserved. Physical H/He fractions, neutral-reference mass constant, r=m_ref c^2+epsilon_eV B>0, rho=n_H(r+epsilon_eV w), p=(2/3)n_H epsilon_eV w, Gamma=5/3. Bound-electron rest masses are already included in m_ref.",
+    "A03": "Finite directional photon nodes have nonnegative lab number densities and nonnegative prescribed lab sources. Node spectral/angular weights are already included. Individual beam directions have unit spatial norm.",
+    "A04": "Retained FT03 Case A CI/RR/two DR/primary absorption and captured kinetic moments; CR/RCT/HH off. Rest T in [30000,110000] K, gas-frame photon energy in [0,50000] eV. Fit cutoffs (13.60,24.59,54.42) eV and binding energies (13.598434599702,24.587389011,54.41776) eV keep distinct roles.",
+    "A05": "All rate, fraction, density, electron closure, temperature and Doppler inputs share one candidate endpoint. Proper event density R' per proper volume and time produces lab event increment h R' per fixed lab volume. Per-H species changes divide by D; the equivalent proper-clock step is h/gamma.",
+    "A06": "Case A escape is a comoving-isotropic emission-moment closure with inherited RR/DR binding plus captured-kinetic power Q'_esc. Its lab energy and scaled momentum increments are h gamma Q'_esc and h gamma Q'_esc beta.",
+    "A07": "The local full-source theorem uses a strict composition/primitive/warm/active-photon-energy interior and C1 rate/source dependence in a neighborhood away from fit cutoffs. A quantitative contraction bound additionally uses a fixed scaled norm and a closed convex ball in that smooth physical domain.",
+    "A08": "Full directional nodes support arbitrary velocity. Existing azimuth-averaged rings reduce exactly to a one-dimensional adapter for axial velocity; transverse velocity uses a positive resolved azimuth quadrature or the corresponding pointwise angular integral."
+  },
+  "reused_evidence": {
+    "primary_theory_03_named_groups": 47,
+    "covariant_theory_04_named_groups": 45,
+    "new_execution_of_reused_groups": 0,
+    "scope": "Shared event/binding/provider ownership, proper/per-H/reference normalization, covariant four-force and isotropic escape moment, constitutive reference, accepted geometry/work and fixed-frame pairing under its original assumptions."
+  },
+  "claims": [
+    {
+      "id": "M01",
+      "statement": "The beam Doppler map E'_q=delta_q E_q, N'_q=delta_q N_q and delta_q=gamma(1-beta.e_q)>0 gives lambda_iq=c D y_i(1-beta.e_q) sigma_i(delta_q E_q). The same invariant event density supplies lab photon removal and h R' species counts.",
+      "assumption_refs": [
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05"
+      ],
+      "basis": [
+        "literature-supported",
+        "derived"
+      ],
+      "status": "DERIVED_AND_ACTUALLY_CHECKED",
+      "contribution": "Project-specific mapping of invariant opacity and number-current projection to the retained H/He event and fixed-D normalization.",
+      "proof": [
+        {
+          "path": "derivations/MOVING_SOURCE_AND_THERMAL_BALANCE.md",
+          "locations": "S7-S9; section 2"
+        }
+      ],
+      "literature": [
+        {
+          "ref": "review/LITERATURE_MAP.md S01",
+          "relation": "supports",
+          "scope": "Invariant opacity and rest-frame frequency; the H/He per-H/event normalization is explicitly derived here."
+        }
+      ],
+      "actual_evidence": [
+        {
+          "path": "evidence/XACT_MOVING_SOURCE_RESULT.json",
+          "groups": [
+            "M01_doppler_contraction",
+            "M01_beam_number_density",
+            "M01_rest_direction_spatial",
+            "M01_rest_direction_unit",
+            "M01_photon_momentum_reconstruction",
+            "M01_lab_absorption_energy",
+            "M01_lab_absorption_momentum",
+            "M01_rest_absorption_energy"
+          ]
+        },
+        {
+          "path": "evidence/MOVING_SOURCE_EXACT_RESULT.json",
+          "groups": [
+            "doppler_target_density_normalization",
+            "species_lab_to_gas_clock"
+          ]
+        }
+      ],
+      "implementation_status": "PENDING_MOVING_SOURCE_ADAPTER",
+      "obligations": [
+        "Implement and consume one Doppler/frame/volume adapter after the retained primary-provider and moment-provider coding dependencies."
+      ]
+    },
+    {
+      "id": "M02",
+      "statement": "At a common candidate endpoint N_q+=(N_q-+h S_q)/(1+h Lambda_q) is nonnegative and the shared photon, chemical, gas and escaped energy-momentum increments obey exact finite total energy and three-momentum balances.",
+      "assumption_refs": [
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A06"
+      ],
+      "basis": [
+        "literature-supported",
+        "derived"
+      ],
+      "status": "DERIVED_AND_ACTUALLY_CHECKED",
+      "contribution": "Retains the established conservative implicit-source structure while supplying the project-specific H/He channel ownership, photon elimination and seven-variable residual.",
+      "scope": "Photon positivity holds conditionally for every physical candidate and h>=0; existence of a coupled endpoint is governed by M05.",
+      "proof": [
+        {
+          "path": "derivations/MOVING_SOURCE_AND_THERMAL_BALANCE.md",
+          "locations": "S10-S15; section 3"
+        }
+      ],
+      "literature": [
+        {
+          "ref": "review/LITERATURE_MAP.md S02",
+          "relation": "supports",
+          "scope": "Conservative local implicit matter/radiation source structure; the source's M1/grey closure is not adopted."
+        }
+      ],
+      "actual_evidence": [
+        {
+          "path": "evidence/XACT_MOVING_SOURCE_RESULT.json",
+          "groups": [
+            "M02_hydrogen_lab_density",
+            "M02_species_lab_density",
+            "M04_eulerian_nucleus_continuity",
+            "M04_eulerian_species_continuity"
+          ]
+        },
+        {
+          "path": "evidence/MOVING_SOURCE_EXACT_RESULT.json",
+          "groups": [
+            "photon_backward_euler_identity",
+            "photon_nonnegative_and_bounded_absorption",
+            "finite_total_energy_three_momentum_balance"
+          ]
+        }
+      ],
+      "implementation_status": "PENDING_COMMON_MOVING_ENDPOINT_CONSUMER",
+      "obligations": [
+        "Preserve full photon energy/momentum and isotropic-escape lab momentum in the actual consumer.",
+        "Return one coherent residual and ledger; diagnostic summaries are not a second source consumption."
+      ]
+    },
+    {
+      "id": "M03",
+      "statement": "At prescribed composition, D>0 and r>0, a unique positive-thermal subluminal gamma-law primitive exists iff E>sqrt((D r)^2+|M|^2). Equality is the unique cold mathematical boundary. A monotone excess-enthalpy scalar provides a positive-term gap, explicit bracket, exact derivatives and a warm-domain energy test.",
+      "assumption_refs": [
+        "A02"
+      ],
+      "basis": [
+        "literature-supported",
+        "derived"
+      ],
+      "status": "DERIVED_AND_ACTUALLY_CHECKED",
+      "contribution": "Specialized rederivation of known gamma-law admissibility, mapped to composition-dependent r and fixed H-nucleus density D; the current implementation handoff includes the explicit excess-energy representation and warm-domain restrictions.",
+      "scope": "The general algebraic cone is broader than the retained warm model. Composition is prescribed for each inverse call. Global primitive uniqueness does not itself assert global uniqueness of the coupled source stage.",
+      "proof": [
+        {
+          "path": "derivations/PRIMITIVE_RECOVERY_AND_EXAMPLES.md",
+          "locations": "P5-P26; sections 2-5"
+        },
+        {
+          "path": "derivations/MOVING_SOURCE_AND_THERMAL_BALANCE.md",
+          "locations": "S16-S18"
+        }
+      ],
+      "literature": [
+        {
+          "ref": "review/LITERATURE_MAP.md S03",
+          "relation": "supports",
+          "scope": "Wu and Tang 2015 Lemma 2.1; energy-unit mapping D_mass -> D r at fixed composition."
+        },
+        {
+          "ref": "review/LITERATURE_MAP.md S04",
+          "relation": "limits",
+          "scope": "Uniqueness of the unsquared physical pressure equation does not justify selecting an arbitrary positive quartic root or unsafeguarded Newton iteration."
+        }
+      ],
+      "actual_evidence": [
+        {
+          "path": "evidence/PRIMITIVE_EXACT_RESULT.json",
+          "groups": [
+            "primitive_forward_recovery",
+            "energy_first_derivative",
+            "energy_second_derivative",
+            "inverse_parameter_derivatives",
+            "positive_term_gap",
+            "gap_boundary_slope_and_rest_limit",
+            "pressure_root_and_derivative",
+            "pressure_upper_bracket_factorization"
+          ]
+        },
+        {
+          "path": "evidence/XACT_MOVING_SOURCE_RESULT.json",
+          "groups": [
+            "M03_conservative_current_from_stress",
+            "M03_conservative_energy",
+            "M03_conservative_momentum",
+            "M03_velocity_spatial",
+            "M03_velocity_norm"
+          ]
+        }
+      ],
+      "implementation_status": "PENDING_PRIMITIVE_RECOVERY_IMPLEMENTATION",
+      "obligations": [
+        "Implement the physical-domain guard and a safeguarded scalar inverse with actual source units.",
+        "Treat unresolved finite-precision conservative-gap signs as unresolved input-domain tests; define the numerical behavior in the future coding contract."
+      ]
+    },
+    {
+      "id": "M04",
+      "statement": "Endpoint projection of the finite lab conservative update is equivalent to the thermal equation Delta w=(h/gamma_+) Q_th^(H)+K_gamma/(D epsilon), where K_gamma includes the exact relative-velocity and pressure correction. Its smooth limit is dot w=Q_th^(H)-(2/3)Theta w.",
+      "assumption_refs": [
+        "A01",
+        "A02",
+        "A04",
+        "A05",
+        "A06"
+      ],
+      "basis": [
+        "derived"
+      ],
+      "status": "DERIVED_AND_ACTUALLY_CHECKED",
+      "formula": "K_gamma=D[(r_-+(5/3)epsilon w_-)(gamma_rel-1)-(2/3)epsilon w_-(gamma_+/gamma_--1)], gamma_rel=gamma_+ gamma_-(1-beta_+.beta_-).",
+      "scope": "Exact identity for this fixed-foliation common-endpoint finite stage. Fixed lab volume does not fix proper density; pressure work persists through n_H=D/gamma.",
+      "proof": [
+        {
+          "path": "derivations/MOVING_SOURCE_AND_THERMAL_BALANCE.md",
+          "locations": "S22-S30; section 5"
+        }
+      ],
+      "actual_evidence": [
+        {
+          "path": "evidence/XACT_MOVING_SOURCE_RESULT.json",
+          "groups": [
+            "M04_endpoint_energy_minus_beta_momentum",
+            "M04_current_endpoint_projection",
+            "M04_old_current_endpoint_projection",
+            "M04_finite_gas_projection",
+            "M04_finite_event_escape_projection",
+            "M04_gas_clock",
+            "M04_source_step_expansion",
+            "M04_rest_pressure_gradient"
+          ]
+        },
+        {
+          "path": "evidence/MOVING_SOURCE_EXACT_RESULT.json",
+          "groups": [
+            "finite_thermal_constitutive_identity",
+            "finite_thermal_binding_elimination",
+            "relative_gamma_and_pressure_work_limit",
+            "covariant_to_eulerian_thermal_clock"
+          ]
+        }
+      ],
+      "implementation_status": "PENDING_FINITE_THERMAL_CONSERVATIVE_COUPLING",
+      "obligations": [
+        "Use the same endpoint event provider in the conservative and thermal residuals.",
+        "Keep the fixed-volume moving pressure correction separate from inherited Bianchi geometry work and the existing instantaneous work counter."
+      ]
+    },
+    {
+      "id": "M05",
+      "statement": "The full retained rate-dependent seven-variable residual has a unique local C1 physical branch through a strict-interior initial state for sufficiently small h. On a supplied compact physical ball, h M0<=r_ball and h L0<1 constructively guarantee a unique endpoint by contraction.",
+      "assumption_refs": [
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A06",
+        "A07"
+      ],
+      "basis": [
+        "derived"
+      ],
+      "status": "DERIVED_WITH_ACTUAL_DIFFERENTIAL_CHECKS",
+      "proof": [
+        {
+          "path": "derivations/MOVING_SOURCE_AND_THERMAL_BALANCE.md",
+          "locations": "S16-S21; local physical-branch theorem and constructive sufficient step bound"
+        },
+        {
+          "path": "derivations/PRIMITIVE_RECOVERY_AND_EXAMPLES.md",
+          "locations": "P20-P26"
+        }
+      ],
+      "actual_evidence": [
+        {
+          "path": "evidence/PRIMITIVE_EXACT_RESULT.json",
+          "groups": [
+            "inverse_parameter_derivatives",
+            "forward_jacobian_positive_factor"
+          ]
+        },
+        {
+          "path": "evidence/MOVING_SOURCE_EXACT_RESULT.json",
+          "groups": [
+            "full_four_by_four_primitive_jacobian",
+            "primitive_jacobian_positive"
+          ]
+        },
+        {
+          "path": "evidence/MOVING_JACOBIAN_POSITIVITY_RESULT.json",
+          "groups": [
+            "primitive_jacobian_positive"
+          ],
+          "role": "Targeted exact polynomial positivity certificate closes the original unresolved assertion; not an additional thirteenth root group."
+        }
+      ],
+      "scope": "The IFT and contraction argument are written proofs. Atomic rate regularity and the physical compact domain are assumptions. No numerical M0/L0 values or large-step continuation certificate are supplied by this unit.",
+      "implementation_status": "PENDING_QUANTITATIVE_BOUNDS_AND_SOLVER",
+      "obligations": [
+        "Next THEORY: fix a full-rate warm and Doppler-energy box and derive certified M0/L0 or residual-Jacobian bounds with a positive admissible step.",
+        "Track branch continuation to an actual domain boundary or loss of invertibility before making a global coupled-stage assertion."
+      ]
+    },
+    {
+      "id": "M06",
+      "statement": "A nonempty exact warm HI-only 23 eV absorption reference produces bulk recoil, consistent binding/electron changes, proper-density dilution and positive endpoint photon inventories. Equal opposite absorption gives zero recoil and an exact warm weighted-average temperature. The full locally unique rest-paired source branch reduces to the inherited scalar stage.",
+      "assumption_refs": [
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A06"
+      ],
+      "basis": [
+        "derived"
+      ],
+      "status": "DERIVED_AND_ACTUALLY_CHECKED",
+      "reference_scope": "The explicit single-channel reference sets other integrated channel increments to zero only for that reference. It does not remove CI/RR/DR from the adopted full FT03 model. The full rest-paired conclusion uses the local branch theorem and matched opposite inputs.",
+      "proof": [
+        {
+          "path": "derivations/PRIMITIVE_RECOVERY_AND_EXAMPLES.md",
+          "locations": "P27-P56; sections 6-8"
+        },
+        {
+          "path": "derivations/MOVING_SOURCE_AND_THERMAL_BALANCE.md",
+          "locations": "section 6"
+        }
+      ],
+      "actual_evidence": [
+        {
+          "path": "evidence/PRIMITIVE_EXACT_RESULT.json",
+          "groups": [
+            "causal_increment_margin",
+            "single_beam_rest_binding_margin",
+            "single_beam_rational_endpoint",
+            "single_beam_norm_doppler_dilution",
+            "single_beam_small_fluence_derivatives",
+            "single_beam_positive_factorization",
+            "endpoint_BE_inventory_event",
+            "paired_exact_energy_temperature",
+            "warm_23ev_exact_margins"
+          ]
+        },
+        {
+          "path": "evidence/MOVING_SOURCE_EXACT_RESULT.json",
+          "groups": [
+            "rest_paired_scalar_thermal_limit"
+          ]
+        }
+      ],
+      "reference_numbers": {
+        "initial_temperature_k": 50000,
+        "lab_photon_energy_ev": 23,
+        "T_exc_k": "72733.757372464264931...",
+        "single_beam_initial_temperature_slope_bracket_ev": "2.9385654536891169248...",
+        "exact_values_ref": "evidence/PRIMITIVE_EXACT_RESULT.json:warm_reference"
+      },
+      "implementation_status": "PENDING_NATIVE_REFERENCE_CONSUMPTION",
+      "obligations": [
+        "Use these analytic references in the future actual consumer with the declared channel scope.",
+        "Maintain full FT03 rates in a separate full-model acceptance path; count those future executions independently."
+      ]
+    },
+    {
+      "id": "M07",
+      "statement": "The mathematical stage defines explicit per-H/proper/fixed-lab-volume and unit adapters, a post-Doppler atomic-domain guard, and a directional-node API. Existing mu rings are exact for axial beta; transverse motion requires a resolved positive azimuth representation.",
+      "assumption_refs": [
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A06",
+        "A08"
+      ],
+      "basis": [
+        "derived"
+      ],
+      "status": "DERIVED_AND_SOURCE_MAPPED",
+      "proof": [
+        {
+          "path": "derivations/MOVING_SOURCE_AND_THERMAL_BALANCE.md",
+          "locations": "S31; sections 1-3 and 7"
+        }
+      ],
+      "actual_evidence": [
+        {
+          "path": "source_map/CURRENT_SOURCE.json",
+          "scope": "Current exact selected heads and source identities."
+        },
+        {
+          "path": "source_map/SOURCE_MAP.md",
+          "scope": "Actual current state variables, time/volume/event ownership, provider guards and absent moving-gas state."
+        },
+        {
+          "path": "evidence/MOVING_SOURCE_EXACT_RESULT.json",
+          "groups": [
+            "doppler_target_density_normalization",
+            "species_lab_to_gas_clock",
+            "finite_total_energy_three_momentum_balance"
+          ]
+        }
+      ],
+      "coding_contract_ref": "dossier/CODING_CONTRACT.md",
+      "implementation_status": "PENDING; CURRENT_RECEIVER_HAS_NO_MOVING_GAS_STATE",
+      "obligations": [
+        "Retain HERE_RUX03_PRIMARY_PROVIDER_03 and HERE_RUX03_COVARIANT_MOMENTS_04 as pending coding dependencies.",
+        "Implement the fixed-volume gas/photons/source adapter and native residual checks in their coding lanes; no such native run occurred in this THEORY unit."
+      ]
+    }
+  ],
+  "actual_check_accounting": {
+    "claim_families": 7,
+    "executed_groups_by_suite": [
+      {
+        "suite": "xAct moving source",
+        "path": "evidence/XACT_MOVING_SOURCE_RESULT.json",
+        "final_pass": 25,
+        "final_total": 25,
+        "method": "Actual xTensor 1.3.0 / Wolfram 15.0.1; pure Wolfram xPerm backend in final run."
+      },
+      {
+        "suite": "primitive author",
+        "path": "evidence/PRIMITIVE_EXACT_RESULT.json",
+        "final_pass": 18,
+        "final_total": 18,
+        "method": "17 exact algebra/derivative groups plus one exact decimal-as-rational warm-fixture inequality group."
+      },
+      {
+        "suite": "root finite/clock/Jacobian",
+        "path": "evidence/MOVING_SOURCE_EXACT_RESULT.json",
+        "final_pass": 12,
+        "final_total": 12,
+        "method": "11 base PASS assertions plus one targeted polynomial positivity certificate. The unchanged 11 groups were not rerun."
+      }
+    ],
+    "sum_of_final_suite_group_observations": 55,
+    "counting_rule": "55 is the raw sum of named group observations across the three suites. Removing one declared duplicate Jacobian target gives 54 target groups; neither count is an inventory of independent mathematical theorems. Other scalar/tensor representations intentionally cross-check the same physics. The targeted positivity completion closes the twelfth root group and does not add a thirteenth.",
+    "failure_history_counting": "Two initial xAct implementation dummy-index failures and one CAS conditional inequality are preserved as execution/method history, not added to passing-group counts. Separate local orchestration syntax/API corrections are not scientific evaluator calls.",
+    "new_native_builds": 0,
+    "new_RHS_or_ODE_runs": 0,
+    "parameter_scans": 0,
+    "target_groups_after_removing_one_declared_Jacobian_overlap": 54
+  },
+  "failure_history": [
+    {
+      "id": "XACT_INPUT_1",
+      "classification": "implementation index-hygiene error: free/dummy-index collision",
+      "observed": "Initial call returned Hold[Throw[Null]] after package load.",
+      "input": "evidence/XACT_MOVING_SOURCE_EXECUTED_v1.wl",
+      "raw": "evidence/XACT_MOVING_SOURCE_RAW_v1.json",
+      "resolution": "Final v3 uses the equivalent expanded current and independently checks -Tp[a,b]normal[-b]-Cp[a] against the stress tensor. All 25 final tensor assertions passed without changing the physics.",
+      "final_result": "evidence/XACT_MOVING_SOURCE_RESULT.json",
+      "cause": "The helper Cp[i_]:=-Tp[i,b]normal[-b] used fixed internal dummy b. A call Cp[b] duplicated the free/dummy index and created an invalid Einstein expression.",
+      "diagnosis_ref": "evidence/EXECUTION_RECORD.md"
+    },
+    {
+      "id": "XACT_INPUT_2",
+      "classification": "implementation index-hygiene error: free/dummy-index collision",
+      "observed": "Diagnostic call progressed through named checks and returned Hold[Throw[Null]].",
+      "input": "evidence/XACT_MOVING_SOURCE_DEBUG_v2.wl",
+      "raw": "evidence/XACT_MOVING_SOURCE_RAW_v2.json",
+      "resolution": "Final v3 uses the equivalent expanded current and independently checks -Tp[a,b]normal[-b]-Cp[a] against the stress tensor. All 25 final tensor assertions passed without changing the physics.",
+      "final_result": "evidence/XACT_MOVING_SOURCE_RESULT.json",
+      "cause": "The helper Cp[i_]:=-Tp[i,b]normal[-b] used fixed internal dummy b. A call Cp[b] duplicated the free/dummy index and created an invalid Einstein expression.",
+      "diagnosis_ref": "evidence/EXECUTION_RECORD.md"
+    },
+    {
+      "id": "CAS_POSITIVITY_UNRESOLVED",
+      "classification": "symbolic method returned conditional inequality",
+      "observed": "FullSimplify retained an unevaluated positivity inequality; TrueQ recorded that unresolved assertion as false. No negative determinant or counterexample was returned.",
+      "original_result": "evidence/MOVING_SOURCE_EXACT_RESULT_v1.json",
+      "original_raw": "evidence/MOVING_SOURCE_WOLFRAM_RAW_RESULT.json",
+      "targeted_input": "derivations/MOVING_JACOBIAN_POSITIVITY_REFINEMENT.wl",
+      "targeted_raw": "evidence/MOVING_JACOBIAN_POSITIVITY_RAW_RESULT.json",
+      "resolution": "All polynomial coefficients nonnegative and ar^3 gg^5 has positive coefficient 1 for ar>0, gg>=1, pp>=0, alpha-2>=0.",
+      "targeted_result": "evidence/MOVING_JACOBIAN_POSITIVITY_RESULT.json",
+      "final_aggregate": "evidence/MOVING_SOURCE_EXACT_RESULT.json"
+    }
+  ],
+  "strong_no_go": {
+    "new_candidate": false,
+    "admitted": false,
+    "reason": "This unit is a constructive finite-source and local-branch derivation; no new strong no-go claim is proposed."
+  },
+  "implementation_and_next": {
+    "original_owner_edges": [
+      [
+        "RUX02",
+        "RUX04"
+      ],
+      [
+        "RUX03",
+        "RUX04"
+      ],
+      [
+        "RUX04",
+        "RUX05"
+      ]
+    ],
+    "owner_completion_changes": [],
+    "coding_pending": [
+      "HERE_RUX03_PRIMARY_PROVIDER_03",
+      "HERE_RUX03_COVARIANT_MOMENTS_04"
+    ],
+    "moving_stage_native_status": "NOT_IMPLEMENTED_BY_THIS_UNIT",
+    "next_theory": "Quantitative M0/L0 or residual-Jacobian continuation certificate on a specified full-rate warm and gas-frame energy box.",
+    "next_dag_ref": "dossier/NEXT_DAG.json",
+    "outside_scope_preserved": "All-Bianchi abundance-source/reference-current/class-B/relative-species-tilt D2.3 thread."
+  },
+  "independent_decision_ref": "review/DECISION.json"
+}

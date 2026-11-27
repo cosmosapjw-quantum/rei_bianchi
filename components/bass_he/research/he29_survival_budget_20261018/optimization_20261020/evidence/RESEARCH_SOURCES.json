@@ -1,0 +1,375 @@
+{
+  "schema_version": 1,
+  "task": "HE29 optimization R2/C3 primary-source and structural design evidence",
+  "observed_at_utc": "2026-10-20T02:55:06Z",
+  "status": "RESEARCH_AND_DERIVATION_COMPLETE_IMPLEMENTATION_PENDING_PARENT",
+  "intake_gate": {
+    "root_confirmed": true,
+    "new_HE29_native_reference_returns": 0,
+    "new_HE29_native_canary_returns": 0,
+    "scope": "Root combined BASS_HE, REI, VigilODE and backup intake before authorizing this research; separate-lane native returns excluded by identity."
+  },
+  "local_source_identity": {
+    "head": "329f838399f24d3952f780d469ad657d8630c4e2",
+    "files": [
+      {
+        "path": "AGENTS.md",
+        "sha256": "32d09d1e6262e1eb3579de1a66e325afd2ba181a8de69313d907b6fb1e8aebfb",
+        "bytes": 2853
+      },
+      {
+        "path": "research/he25_proper_birth_20261016/src/physics.py",
+        "sha256": "6df06662108635b525eea75b1ce2cdbcd91afe64a21ed0076977088c2fe5d63c",
+        "bytes": 8920
+      },
+      {
+        "path": "research/he27_sourcecut_native_20261016/src/sourcecut_v2.py",
+        "sha256": "cc0c077aef4fa0cb11da0142676a91c1bac2d5f630ac38033bf5066a32377ba8",
+        "bytes": 8470
+      },
+      {
+        "path": "research/he27_sourcecut_native_20261016/src/sourcecut_v3.py",
+        "sha256": "ec3496a6df0e63c365801a9f3c4551600f929be3d321940acfe51e9b970484b1",
+        "bytes": 1039
+      },
+      {
+        "path": "research/he27_sourcecut_native_20261016/src/sourcecut_fast.py",
+        "sha256": "9d68f319ad5f5b49526c41368b4ce4a755cf35e4bb152428aa1bba0b587c83f5",
+        "bytes": 5888
+      },
+      {
+        "path": "research/he28_strip_refinement_20261018/src/refined_source.py",
+        "sha256": "853b18752f4f46706da139c0036e7c0db83f5d25a5cb239d676223b6ddfde0a7",
+        "bytes": 9804
+      },
+      {
+        "path": "research/he29_survival_budget_20261018/vigilode_20261019/src/vigilode_callbacks.py",
+        "sha256": "946780ed1f9f42c681ea84e6638763ca3ac4b7fc9551ca160dd1d9e58ed15bac",
+        "bytes": 7787
+      },
+      {
+        "path": "research/he29_survival_budget_20261018/vigilode_20261019/RUST_PACKAGES_AND_SCHUR_KO.md",
+        "sha256": "8f13174c5e1d5b22cae3180451d1bfb872c90f52c84c93f417a63edc18e01b07",
+        "bytes": 12409
+      },
+      {
+        "path": "research/he29_survival_budget_20261018/vigilode_20261019/rust_bridge/Cargo.toml",
+        "sha256": "d9e2d99d70dfa357e8846ea4ee1d3a98597a1e2cddc9ab89b32d1cbfe36541c6",
+        "bytes": 532
+      }
+    ],
+    "memory_derived": [
+      {
+        "r": 2,
+        "K": 512,
+        "n": 535,
+        "nnz_envelope": 8284,
+        "csr_int32_bytes": 101552,
+        "csr_int64_bytes": 136832,
+        "dense_bytes": 2289800,
+        "block_value_bytes": 66272
+      },
+      {
+        "r": 4,
+        "K": 640,
+        "n": 663,
+        "nnz_envelope": 10332,
+        "csr_int32_bytes": 126640,
+        "csr_int64_bytes": 170624,
+        "dense_bytes": 3516552,
+        "block_value_bytes": 82656
+      },
+      {
+        "r": 8,
+        "K": 896,
+        "n": 919,
+        "nnz_envelope": 14428,
+        "csr_int32_bytes": 176816,
+        "csr_int64_bytes": 238208,
+        "dense_bytes": 6756488,
+        "block_value_bytes": 115424
+      }
+    ]
+  },
+  "source_records": [
+    {
+      "id": "S1",
+      "kind": "official_documentation_and_source",
+      "version": "SciPy 1.17.0",
+      "urls": [
+        "https://docs.scipy.org/doc/scipy-1.17.0/reference/generated/scipy.sparse.csr_matrix.html",
+        "https://github.com/scipy/scipy/blob/v1.17.0/scipy/sparse/_lil.py",
+        "https://raw.githubusercontent.com/scipy/scipy/v1.17.0/scipy/sparse/_csparsetools.pyx.in",
+        "https://raw.githubusercontent.com/scipy/scipy/v1.17.0/scipy/integrate/_ivp/radau.py"
+      ],
+      "claims": [
+        "CSR supports direct (data, indices, indptr) construction; canonical rows have sorted indices and no duplicates; nnz includes explicit zeros.",
+        "LIL uses Python row/data lists, can incur linear insertion per item, and its insert implementation deletes x == 0 entries.",
+        "Radau converts sparse callable Jacobians to CSC and selects splu; it does not necessarily run dense LU."
+      ],
+      "application": "Replace only Python insertion/format work while preserving FD calls, numeric values, sorted column order and zero pattern.",
+      "limitations": [
+        "Documentation version is an explicit reviewed reference, not a claim about the installed runtime.",
+        "Keeping explicit structural zeros can change downstream symbolic ordering despite mathematical equality."
+      ]
+    },
+    {
+      "id": "S2",
+      "kind": "official_documentation",
+      "version": "NumPy 2.3",
+      "urls": [
+        "https://numpy.org/doc/2.3/reference/generated/numpy.sum.html"
+      ],
+      "claims": [
+        "Partial pairwise summation depends on axis and memory layout; exact precision also depends on other parameters."
+      ],
+      "application": "Do not use algebraic equivalence alone to claim bitwise equality after transpose, dot/einsum, SIMD or layout changes.",
+      "limitations": [
+        "No blanket claim that all NumPy sums are pairwise or that all dot operations match CSR order."
+      ]
+    },
+    {
+      "id": "S3",
+      "kind": "official_documentation_and_source",
+      "version": "SUNDIALS documentation 7.5.0",
+      "urls": [
+        "https://sundials.readthedocs.io/en/v7.5.0/cvode/Usage/index.html",
+        "https://sundials.readthedocs.io/en/v7.5.0/cvode/Mathematics_link.html",
+        "https://github.com/LLNL/sundials/blob/main/src/cvode/cvode_ls.c"
+      ],
+      "claims": [
+        "CVodeSetJacTimes registers optional setup and Jacobian-vector callbacks with user data.",
+        "CVODE separates saved Jacobian data from the step-coefficient-dependent linear matrix I-gamma*J."
+      ],
+      "api": [
+        "CVodeSetJacTimes(void *cvode_mem, CVLsJacTimesSetupFn jtsetup, CVLsJacTimesVecFn jtimes)",
+        "CVLsJacTimesSetupFn",
+        "CVLsJacTimesVecFn"
+      ],
+      "application": "Separate immutable structure, exact-state numeric blocks, and (Jacobian identity, stage coefficient) factors.",
+      "limitations": [
+        "Use is design precedent only; no CVODE adoption or new approximate Jacobian-reuse schedule.",
+        "The main-branch source is supporting text; the versioned documentation is the stable API reference."
+      ]
+    },
+    {
+      "id": "S4",
+      "kind": "official_package_manifest_and_api",
+      "version": "faer 0.24.4",
+      "license": "MIT",
+      "rust_version": "1.84.0",
+      "urls": [
+        "https://docs.rs/crate/faer/0.24.4/source/Cargo.toml",
+        "https://docs.rs/faer/0.24.4/faer/linalg/solvers/struct.PartialPivLu.html",
+        "https://docs.rs/faer/0.24.4/faer/linalg/solvers/trait.Solve.html",
+        "https://docs.rs/faer/0.24.4/src/faer/linalg/lu/partial_pivoting/solve.rs.html",
+        "https://docs.rs/faer/0.24.4/faer/enum.Par.html"
+      ],
+      "claims": [
+        "PartialPivLu::new accepts a matrix view and exposes L, U and P.",
+        "Solve::solve_in_place writes the solution into the RHS buffer.",
+        "The lower-level LU solve API accepts Par and explicit MemStack scratch.",
+        "Par::Seq is sequential but the documentation does not promise cross-platform bitwise portability; Rayon uses a thread pool."
+      ],
+      "api": [
+        "faer::linalg::solvers::PartialPivLu::<f64>::new",
+        "faer::linalg::solvers::Solve::solve_in_place",
+        "faer::linalg::lu::partial_pivoting::solve::solve_in_place_scratch",
+        "faer::Par::Seq"
+      ],
+      "application": "Reuse the already selected faer version for only the 4x4 gas Schur factor/solve if root wires a compatible optional backend.",
+      "limitations": [
+        "High-level in-place does not promise zero internal allocation; factor/scratch ownership must be measured.",
+        "Existing default-features=false std/linalg/sparse-linalg selection should not be replaced with faer defaults, which include rayon/rand/npy.",
+        "Sequential mode is not a no-FMA or cross-CPU bitwise guarantee; validate residual and physical acceptance separately.",
+        "No dense n x n reconstruction on the hot path."
+      ]
+    },
+    {
+      "id": "S5",
+      "kind": "official_package_manifest_and_api",
+      "version": "Rayon 1.12.0",
+      "license": "MIT OR Apache-2.0",
+      "rust_version": "1.80",
+      "urls": [
+        "https://docs.rs/crate/rayon/1.12.0/source/Cargo.toml",
+        "https://docs.rs/rayon/1.12.0/rayon/struct.ThreadPoolBuilder.html",
+        "https://docs.rs/rayon/1.12.0/rayon/struct.ThreadPool.html",
+        "https://docs.rs/rayon/1.12.0/rayon/slice/trait.ParallelSliceMut.html",
+        "https://raw.githubusercontent.com/rayon-rs/rayon/v1.12.0/src/iter/mod.rs"
+      ],
+      "claims": [
+        "ThreadPoolBuilder::num_threads and build configure a pool; ThreadPool::install runs parallel operations within it.",
+        "par_chunks_mut gives nonoverlapping mutable output chunks.",
+        "Floating-point sum/reduce order is not specified; results need not be deterministic."
+      ],
+      "api": [
+        "rayon::ThreadPoolBuilder::new().num_threads(p).build()",
+        "rayon::ThreadPool::install",
+        "rayon::slice::ParallelSliceMut::par_chunks_mut"
+      ],
+      "application": "Conditional only: independent output rows/chunks with unchanged serial inner reduction. No dependency addition unless measured benefit.",
+      "limitations": [
+        "K 512-896 and eleven long reduction rows do not justify a 64-thread expectation.",
+        "Do not use floating par_iter().sum/reduce, build a pool per callback, or multiply Rayon x faer x BLAS/MPI thread counts.",
+        "No parallel callback into the opaque physical owner unless its ownership/thread safety is independently established."
+      ]
+    },
+    {
+      "id": "P1",
+      "kind": "primary_research_paper",
+      "title": "Using SIMD and SIMT vectorization to evaluate sparse chemical kinetic Jacobian matrices and thermochemical source terms",
+      "authors": [
+        "Nicholas J. Curtis",
+        "Kyle E. Niemeyer",
+        "Chih-Jen Sung"
+      ],
+      "arxiv": "1809.01029v1",
+      "first_submission": "2018-09-04",
+      "journal": "Combustion and Flame 198 (2018), 186-204",
+      "url": "https://arxiv.org/abs/1809.01029",
+      "claims": [
+        "The paper studies source/Jacobian vectorization and data ordering using sparse/dense chemical kinetic Jacobians."
+      ],
+      "application": "Supports profiling Jacobian evaluation and layout independently from integration.",
+      "limitations": [
+        "HE29 has a fixed opaque thermochemical owner; pyJac chemistry reformulation and its reported speedups are not transferred.",
+        "SciSpace indexed date was not used as publication date."
+      ]
+    },
+    {
+      "id": "P2",
+      "kind": "primary_research_paper",
+      "title": "Accelerating finite-rate chemical kinetics with coprocessors: comparing vectorization methods on GPUs, MICs, and CPUs",
+      "authors": [
+        "Christopher P. Stone",
+        "Andrew T. Alferman",
+        "Kyle E. Niemeyer"
+      ],
+      "arxiv": "1608.05794v2",
+      "first_submission": "2016-08-20",
+      "last_revision": "2017-08-29",
+      "journal": "Computer Physics Communications 226 (2018), 18-29",
+      "url": "https://arxiv.org/abs/1608.05794v2",
+      "claims": [
+        "The paper compares SIMD/SIMT RHS and stiff/nonstiff solver work and analyzes divergence due to adaptive step sizes."
+      ],
+      "application": "Separate per-state vectorization from parallel execution of distinct adaptive solves.",
+      "limitations": [
+        "Hardware, kinetic models and many-IVP workload differ from four HE29 reference pairs; no speedup number is adopted."
+      ]
+    },
+    {
+      "id": "P3",
+      "kind": "primary_research_paper",
+      "title": "Self-Consistent Solution of Cosmological Radiation-Hydrodynamics and Chemical Ionization",
+      "authors": [
+        "Daniel R. Reynolds",
+        "John C. Hayes",
+        "Pascal Paschos",
+        "Michael L. Norman"
+      ],
+      "arxiv": "0901.1110",
+      "url": "https://arxiv.org/abs/0901.1110",
+      "claims": [
+        "A fully implicit inexact Newton radiation/ionization/gas system uses a Schur formulation to separate local microphysics from radiation transport, then multigrid-preconditioned CG for its diffusion Schur system."
+      ],
+      "application": "Context for exploiting the actual coupled Jacobian structure, not a copied solver.",
+      "limitations": [
+        "The paper uses spatial FLD/PDE transport; HE29's local finite-donor diagonal photon block yields a different 4x4 gas Schur problem.",
+        "No CG/SPD or global EoR/scalability conclusion follows for HE29."
+      ]
+    }
+  ],
+  "reuse": {
+    "schur_synthetic_checks": 23,
+    "reexecuted": 0,
+    "prior_report": "research/he29_survival_budget_20261018/vigilode_20261019/RUST_PACKAGES_AND_SCHUR_KO.md",
+    "new_contribution": "Passive-ledger elimination, bounded storage/operation counts, CSR zero-pattern/order preservation, exact cache/factor identity, concrete library APIs."
+  },
+  "execution": {
+    "new_implementation_code": 0,
+    "new_scientific_tests": 0,
+    "native_runs": 0,
+    "old_tests_rerun": 0,
+    "benchmark_performed_by_this_agent": false
+  },
+  "decisions": {
+    "adopt_first": [
+      "Same-value canonical CSR construction replacing LIL insertion only",
+      "Exact interval/time geometry and sigma reuse with read-only/owned return semantics",
+      "Exact-state block JVP preserving original CSR column accumulation order"
+    ],
+    "candidate_after_profile": [
+      "faer 0.24.4 4x4 Schur factor/solve in compatible opt-in Rust backend"
+    ],
+    "defer": [
+      "Rayon new direct dependency until measured benefit",
+      "Any global or approximate Jacobian reuse schedule",
+      "New solver package, quadrature/table replacement, AD wrapper around frozen f64 physical owner"
+    ]
+  },
+  "constraints": [
+    "Original four Radau+DOP853 pairs unchanged",
+    "Original model/rates/source table/fraction 1e-11 and tolerances unchanged",
+    "No finite-donor result promoted to continuum spectrum/temperature/EoR/Grackle/Bianchi-CMB claim",
+    "No fastmath/unordered reductions",
+    "Original full-state including passive-ledger error norm retained"
+  ],
+  "skill_context_used": [
+    "Current active standalone physmath-research-loop 1.0.0 SKILL.md; actually read on 2026-10-20 for the independent C9 review and provenance correction",
+    "Current 1.0.0 references/RESEARCH_POLICY.md; actually read",
+    "Current 1.0.0 references/THEORY_LOOP.md R2; actually read",
+    "Current 1.0.0 references/CODING_LOOP.md C3/C9; actually read",
+    "Current 1.0.0 references/EVIDENCE_AND_HANDOFF.md and RUNTIME_AND_LEGACY.md; actually read",
+    "Exa Search 4.0.1 SKILL.md and references/searching.md; inherited actual read",
+    "Current BASS_HE AGENTS.md and HPC_POLICY_KO.md; actual local read"
+  ],
+  "artifact_status": {
+    "scratch": "WRITTEN_BY_THIS_SUBAGENT",
+    "git_publication": "PENDING_PARENT_MERGE",
+    "remote_backup": "PENDING_PARENT_PUBLICATION_BACKUP"
+  },
+  "tool_use": {
+    "exa_search_calls": 4,
+    "exa_fetch_calls": 7,
+    "scispace_search_calls": 2,
+    "scispace_queries": [
+      "Which primary research papers measure sparse analytic Jacobian or Jacobian-vector-product acceleration for stiff chemical-kinetics ODEs, and what do they show about avoiding sparse matrix assembly, preserving reaction-rate arithmetic, and the limits of parallel speedup for small systems?",
+      "Which primary numerical-method papers use Schur-complement elimination or block preconditioning for radiation-matter or thermochemical coupling where many radiation variables interact with only a few material variables, and what are their memory-cost and Jacobian-reuse assumptions?"
+    ],
+    "scispace_candidates_returned": 20,
+    "adoption_evidence": "Official documentation, source/manifests and selected original papers only; no secondary search snippet promoted to a physics result."
+  },
+  "derived_counts": {
+    "status": "DERIVED_NOT_BENCHMARKED",
+    "gas_variables": 4,
+    "passive_ledger_variables": 19,
+    "grid_formula": "K=384+64*r for m8/GL4/q0; n=K+23",
+    "stored_pattern_envelope": "nnz <= 4*(K+23)+12*K = 16*K+92; numerical zeros are pruned for matching canonical CSR",
+    "csr_int32_bytes": "196*K+1200",
+    "csr_int64_bytes": "264*K+1664",
+    "block_value_bytes": "128*K+736",
+    "schur_setup_cost": "O(K*m*m+m*m*m), m=4; sixteen length-K dot products plus diagonal scaling and 4x4 factorization",
+    "one_rhs_solve_cost": "O(K*m+7*K+19*m+m*m); passive ledger restored after active solve",
+    "excludes": [
+      "Object headers, allocator overhead, Python LIL temporary lists",
+      "Source tables and immutable owner/model memory",
+      "Factor workspaces, cached copies, FFI exchange and integration history",
+      "Runtime memory high water mark"
+    ],
+    "source_table_nodes_effect": "512 -> 1024 changes source table storage/interpolation but not K"
+  },
+  "workflow_version": "1.0.0",
+  "historical_skill_context_reused": [
+    "Earlier physmath-research-loop 1.3.0 SKILL/POLICY_INTEGRATION/THEORY_LOOP R2/CODING_LOOP C3 bindings belong to the previous research evidence, including the published 23 Schur checks; they are not the active workflow for this 2026-10-20 turn."
+  ],
+  "provenance_correction": {
+    "scope": "Skill/workflow attribution only",
+    "previous_wording": "The first research-note version described inherited 1.3.0 bindings as current.",
+    "corrected_wording": "Root's active current-turn workflow is standalone 1.0.0. Prior 1.3.0 research artifacts and their checks are reused historical evidence.",
+    "basis": "Parent instruction and actual current standalone SKILL/reference reads on 2026-10-20",
+    "effect_on_scientific_sources_derivations_runs": "None; no search, Schur check, old suite or native run repeated."
+  }
+}
+

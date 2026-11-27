@@ -1,0 +1,29 @@
+{
+  "task_id": "HE-F1",
+  "registered_at": "2026-10-04T09:54:44.111592+00:00",
+  "source_head": "271fa2b89cd37b0d07ab0c07ad7ea5ef2a02a58e",
+  "scope": "extend current B3 rate/count API only, atomic data; no B5C3 or physical runtime",
+  "expected_rate_cgs": "1.00E-14",
+  "domain_K": [
+    "1000",
+    "10000000"
+  ],
+  "common_domain_K": [
+    "1000",
+    "10000"
+  ],
+  "claims": "implementation and nominal literature scenarios; no source-UQ or source admission",
+  "rulings": [
+    "Fastest is a DAG lane on the existing branch, not a new git ref; follow fetched CODEX_START/TASKS.",
+    "Use fresh remote B3 api/_rate layout, not mounted alternative B3 packet/_gm25 layout.",
+    "Packaging version 0.1.1 and exporter label 0.1.1; accept exact legacy 0.1.0 GM25 envelopes, normalize only that exporter label. Original records/source/request remain byte-equivalent under canonical JSON. Document migration explicitly.",
+    "KF96 isotope/state mapping adopts the explicitly requested W82 reaction scenario; the KF96 table does not independently resolve isotope or photon moments.",
+    "No physical OFF source; consumer control stays distinct. No optical solver run or old scientific suite."
+  ],
+  "test_commands": [
+    "PYTHONPATH=src PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONDONTWRITEBYTECODE=1 python -W error -m pytest -q -p no:cacheprovider tests/test_kf96_source.py",
+    "git diff --check"
+  ],
+  "resource_limit": "single-process scalar/reference tests; no MPI or new native kernel",
+  "baseline_fixture_sha256": "2f6e76f3007b411de8ed5318f34ae169b40e560602dcdd2abd858bac567ad4fe"
+}

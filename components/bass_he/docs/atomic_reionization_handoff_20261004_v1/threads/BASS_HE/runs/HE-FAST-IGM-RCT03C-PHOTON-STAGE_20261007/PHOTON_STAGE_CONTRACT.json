@@ -1,0 +1,36 @@
+{
+  "task": "HE-FAST-IGM-RCT03C",
+  "status": "FROZEN_PHOTON_STAGE_OWNER_BINDING_CHECKED__COUPLED_HISTORY_OPEN",
+  "units": {
+    "A_i": "events per H nucleus",
+    "B_i": "erg per H nucleus",
+    "q": "photons per H nucleus per ln(a)",
+    "alpha_i": "opacity per ln(a)",
+    "dt": "proper seconds = dln/H at frozen stage"
+  },
+  "existing_owner_kernel": "v2::kernel from unchanged blob f0a360c2be7f8530a0ed87ce87758c253e7c56a8",
+  "existing_owner_insertion": "material::photo_delta and coupled::evaluate",
+  "selected_residual": "U1-U0-dt*F_nonphoto_plus_RCT(M)-P(Owners[affine(U0,U1)])",
+  "new_native_adapter": "crosscheck integrated moments against actual point provider at positive absorber stage; not full endpoint integration",
+  "forbidden_substitutions": [
+    "exact photon survivor with trapezoid photon-loss recomputation",
+    "B_i replaced by E_mid*epsilon_eV*A_i",
+    "RCT escape count added to primary emissivity",
+    "A/(rho dt) set to zero for rho=0 when radiation exists",
+    "frozen old-candidate Owners inside changing-state residual"
+  ],
+  "zero_absorber_policy": "division-free integrated P recommended; moment-only per-capita reconstruction rejects unless actual photon-free",
+  "source_boundary": "unsplit active cutoff rejects; no tail deletion or new floor",
+  "radiation_scope": "single event-free cell frozen alpha/q, exact E0 exp(-s); not exact evolving physical opacity",
+  "RCT": "OFF/KF96/GM25, source conflict explicitly acknowledged, mean35eV caller specified",
+  "original_sourcefree_gates_changed": false,
+  "roundoff_compare": {
+    "relative": 5e-13,
+    "absolute": 1e-290
+  },
+  "stage_ledger_compare": 1e-10,
+  "full_newton_or_history": false,
+  "source_moments": null,
+  "physical_admission": false,
+  "next": "RCT03D_EXISTING_PHOTON_PATH_RCT_NONPHOTO_INSERTION"
+}

@@ -1,0 +1,152 @@
+{
+  "schema": "he31.receiver_code.independent_review.v1",
+  "status": "PASS_SCOPED_READY",
+  "reviewed_utc": "2026-10-21 13:27:59 UTC",
+  "reviewer_task": "/root/upstream_inventory",
+  "scope": "Independent source review of receiver.py, campaign.py, bindings.py, selected electron_donor.py contracts and reused HE30 shared_runner.py. Scientific execution results require a separate result review.",
+  "source_sha256_at_final_readback": {
+    "src/receiver.py": "b98de4d68155c2a3a679cce3f267fe77facd4ce1ef713d366ba041427a4f7753",
+    "src/campaign.py": "4808ea4474805ade3276d47535c9ad14cced09e9e64680cfbf306f0b06a785ef",
+    "src/bindings.py": "82d6becb04e722aa1aa62c353d93b357bc368f5421ab799dc11211655aa9adcf",
+    "src/electron_donor.py": "3c95da58c074f919f96477a823f8d907bb79dc4810c61e7f19bbca5becc517c6",
+    "src/prepared_moments.py": "ee552a09c9b10e72f82105f071af7c6f9ccfaae64407932b0844f70b1e4328ed",
+    "research/he30_z2_continuation_20261021/src/shared_runner.py": "0b5e4aa0fb125da4c23ac8dfac0c318b00fcb45ea3f9dc957b04f01cf7e5cbca",
+    "evidence/BASELINE_MANIFEST.json": "fadc426bf79b48b590b30ee1592d3342d406c00bfb8025ac97f63dc821f25678"
+  },
+  "execution_by_this_review": {
+    "physical_campaigns": 0,
+    "ode_calls": 0,
+    "benchmarks": 0,
+    "full_suites": 0,
+    "worker_subprocesses_started": 0
+  },
+  "findings": [
+    {
+      "id": "R1_STATE41_AND_TARGET_CLOCK",
+      "status": "PASS",
+      "evidence": "Lmax8 gives original4+4*9=40 physical states. y0 appends tau0; augmented_rhs passes only first40 to original model.rhs and appends GammaT*(Href/H)/Href=GammaT/H. tau does not enter physical RHS. Original model source and reconstructed diagnostics use target H; one moment evaluation per augmented RHS remains structurally valid.",
+      "scope": "Unpolarized scalar Thomson and prescribed one-way electron source, not bidirectional chemistry or polarization."
+    },
+    {
+      "id": "R2_SIGNED_INITIAL_AXES",
+      "status": "PASS",
+      "evidence": "q=Sigma_F/sqrt(6-Sigma_F²), source Sigma_ref=Sigma_F/sqrt2 and positive initial orientation reproduce Frobenius shear magnitude. Radiation A=5*P_r*(1+q²)/(sqrt6*f_r). Matter A=P_m/K_m with the pinned finite-quadrature amplitude1 calibration. This matches the existing D3 component adapter. Negative P_m/P_r are kept; normalization forms P_r=P_gamma+P_nu before abs and Pi_total=abs(P_m+P_r).",
+      "limits": "Initial shear orientation is the positive branch when Sigma_F>0, matching D3; signed evolution is subsequently retained."
+    },
+    {
+      "id": "R3_DONOR_ON_OFF",
+      "status": "PASS",
+      "evidence": "Off returnsNone before reading manifest/path and physical identity has donor_identity=None. On checks manifest bytes, data SHA/content identity through ElectronDonor.load, purpose for manufactured control and actual full interval support. No extrapolation; old20-to4 donor cannot be prepared as20-to2. Frozen donor cache is immutable and keyed by resolvedpath+expectedmanifestSHA."
+    },
+    {
+      "id": "R4_SOURCE_IMPORT_SHADOW",
+      "status": "RESOLVED_BY_AUTHOR_READBACK",
+      "severity_at_detection": "medium",
+      "initial_issue": "If VENDOR already existed later in sys.path, the initial loader did not move it to the front and checked module paths only before import. A different not-yet-imported canonical module could shadow the pinned file.",
+      "resolution": "Current bindings moves VENDOR to index0 and checks canonical_fv/species_hierarchy/lrs_boltzmann __file__ both before and after import. Cached c21k_scheduler/bass_resources provenance and newly resolved resource paths are checked too.",
+      "verification": "Static final source readback; root separately owns a fresh-process shadowed-PYTHONPATH check. Reviewer did not run a worker."
+    },
+    {
+      "id": "R5_SCIENCE_AND_EXECUTION_IDENTITY",
+      "status": "RESOLVED_BY_AUTHOR_READBACK",
+      "severity_at_detection": "nonblocking_reuse_scope",
+      "initial_issue": "All src files plus execution resource dependencies originally entered the scientific identity, invalidating physical results after unrelated plotting/scheduling changes.",
+      "resolution": "Current science digest names bindings.py,receiver.py,electron_donor.py,prepared_moments.py and four canonicalvendor physics/clock files. Runner/resource files remain baseline-verified and are stored separately under execution_resource_sha256. Campaign/plot/report edits are excluded."
+    },
+    {
+      "id": "R6_WORKER_IMPORT_PROTOCOL",
+      "status": "PASS_STRUCTURAL",
+      "evidence": "campaign.run loads the pinned HE30 runner under a distinct module name, api_module='receiver'. HE30 derives api_dir from receiver.__file__, includes HE31src and HE30src in childPYTHONPATH, and passes --_worker-module receiver. Child inherits absolute HE31_CAMPAIGN and thread1 environment, sets owned CPU affinity and imports receiver. API methods case_grid,case_identity,completed_result,write_case match the reused coordinator."
+    },
+    {
+      "id": "R7_NO_CLOBBER_AND_REUSE",
+      "status": "PASS_STRUCTURAL",
+      "evidence": "Completed receipts require canonical payloadSHA, matching scienceidentity/schema/completedstatus, nonempty alltrue gates, finite41x121 state, monotonic121 time points and declared endpoint. Existing invalid/failed/partial target files raise rather than overwrite. Atomic writes use replace=False via link. HE30 globalcase lock and CPUlease govern cooperating launches; invalid prior receipts remain preserved, and busycase does not stop other pending cases.",
+      "limits": "Receipt integrity/identity checks are not an independent numerical-result proof. Unrelated case filenames in the sameoutputdir are preserved; use distinct outputdirs for different prepared campaigns."
+    },
+    {
+      "id": "R8_CAMPAIGN_EXIT_STATUS",
+      "status": "RESOLVED_BY_AUTHOR_READBACK",
+      "severity_at_detection": "medium",
+      "initial_issue": "Initial campaign CLI printed reports but returned implicit0 even forFAILED/DEFERRED/TIMED_OUT states.",
+      "resolution": "Current main returns2 when any real-run terminal status is outside COMPLETE/REUSED_COMPLETE; dryplan andsuccessfulpreparation return0; __main__ uses raiseSystemExit(main())."
+    },
+    {
+      "id": "R9_GLOBAL_REUSE_CONSUMPTION",
+      "status": "DOCUMENTED_DOWNSTREAM_REQUIREMENT",
+      "severity": "informational",
+      "evidence": "HE30 can reuse a completed case at a registry path outside the newly requested outputdirectory. It returns that path without materializing another casefile. Saved-result plotting/analysis must follow RUNNER_REPORT.statuses[case].path rather than assuming every complete case has a newlocalJSON."
+    },
+    {
+      "id": "R10_DONOR_FAST_INTERVAL",
+      "status": "RESOLVED_BY_AUTHOR_READBACK",
+      "evidence": "After the uniform-grid floor estimate, scalar density now confirms x lies in the actual knotinterval and falls back to searchsorted otherwise. This addresses almost-uniform knot and binary64 log boundary selection without extrapolating or changing the physical donor."
+    },
+    {
+      "id": "R11_NUMPY_JSON_PACKAGING",
+      "status": "RESOLVED_BY_AUTHOR_READBACK",
+      "severity_at_detection": "execution_blocking_packaging",
+      "discovery": "The root-owned first actual paired worker attempt failed during canonical JSON payload hashing because a NumPy boolean was not directly JSON serializable. Neither attempt produced a completed case receipt.",
+      "failure_evidence": [
+        "evidence/failed/serialization/CORRECTION.json",
+        "evidence/failed/serialization/a96006ec48a78de955011953dd451bb96ea6a14d3511f769926be39582c9c395_WORKER_FAILURE.json",
+        "evidence/failed/serialization/70e9022ec885c31bd7b6455f3bb4bbec76c1b1f4102ca3c5c9b03973e1b9464e_WORKER_FAILURE.json"
+      ],
+      "resolution": "Current run_case applies plain(result) before computing payload_sha256. NumPy numeric/bool scalar leaves use item(), numeric arrays use tolist(), and dict/list/tuple containers recurse. The actual result domain consists of these numeric/scalar/container types. Canonical JSON retains allow_nan=False; conversion does not admit nonfinite values. The physical RHS, tolerances, normalized axes and acceptance thresholds are unchanged by this correction.",
+      "verification": "Static current-source readback plus reuse of root SERIALIZATION_RECHECK.json, status PASS_SCOPED and ode_calls=0. Source import-order and post-import provenance checks were reread and remain present in unchanged bindings.py. Reviewer ran no new tests, workers or ODE.",
+      "recovery": "Original failures/logs/receipts remain in evidence/failed/serialization. Root chose a distinct corrected output directory, results/light_actual_pair_v2. Numerical admission of that paired attempt remains a separate result-review task."
+    }
+  ],
+  "reused_root_evidence": {
+    "initial_contract_checks": {
+      "path": "evidence/CONTRACT_CHECKS.json",
+      "observed_status": "FAIL",
+      "tests_run": 8,
+      "failures": 1,
+      "errors": 0,
+      "meaning": "Historical initial result retained; not reported as8all-pass."
+    },
+    "affected_clock_recheck": {
+      "path": "evidence/TARGET_CLOCK_RECHECK.json",
+      "observed_status": "PASS_SCOPED",
+      "tests_run": 1,
+      "failures": 0,
+      "errors": 0,
+      "gamma_only_rhs_max_abs_error": 1.0842021724855044e-19,
+      "fv_moment_calls_per_augmented_rhs": 1,
+      "diagnostic_tau_rhs_relative_error": 1.1102230246251565e-16,
+      "meaning": "Root's affected-case check after a documented binary64 rounding criterion correction; reviewer read it and did not rerun."
+    },
+    "independent_prepared_review": "evidence/PREPARED_INDEPENDENT_REVIEW.json",
+    "scope_note": "Code changes after these individual test receipts were reviewed by their changed dependency; no newfullsuite was requested.",
+    "serialization_failure": {
+      "path": "evidence/failed/serialization/CORRECTION.json",
+      "sha256": "0d3fadde40f0e742435d7dc534c9aa8b469c20a373ea3ff3097fa5e9265b779e",
+      "observed_status": "FAILED",
+      "worker_attempts": 2,
+      "completed_receipts": 0,
+      "original_solver_tolerances_changed": false,
+      "meaning": "Historical packaging failure preserved; not counted as completed scientific cases."
+    },
+    "serialization_recheck": {
+      "path": "evidence/SERIALIZATION_RECHECK.json",
+      "sha256": "540f847647c322793054f5edb21e27a0a664011c953fe425242f95af4f5fe3b8",
+      "observed_status": "PASS_SCOPED",
+      "ode_calls": 0,
+      "scope": "NumPy bool, float, int and numeric array conversion before digest and JSON encoding."
+    }
+  },
+  "remaining_scope": {
+    "complete_z2_donor": "Not supplied by recoveredR15 actual donor; its validcoverage isz20-to4.",
+    "actual_paired_run": "The first root-owned attempt failed at serialization; preserved evidence is recorded above. The corrected results/light_actual_pair_v2 paired attempt and its scientific outcomes are not adjudicated by this code review.",
+    "independent_scientific_result_admission": false,
+    "measured_acceleration": false,
+    "memory_RSS_benchmark": false
+  },
+  "decision": "Ready for the bounded actual paired run and prepared-campaign protocol within declared donor coverage, including the corrected NumPy JSON packaging. No outstanding code blocker in reviewed scope. No full campaign, z2 donor completion or independent admission of actual paired results is implied.",
+  "previous_readback": {
+    "reviewed_utc": "2026-10-21 13:24:45 UTC",
+    "receiver_sha256": "efb5460d9d942580ff32a144371da10b3b759a2c606ab0be9cd8dfd2881c62be",
+    "meaning": "Pre-serialization-fix source review retained as historical lineage; superseded by the final readback below."
+  }
+}

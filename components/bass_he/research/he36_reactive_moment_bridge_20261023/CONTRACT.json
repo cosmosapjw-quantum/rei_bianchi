@@ -1,0 +1,56 @@
+{
+  "schema": "he36.reactive_moment_bridge.v1",
+  "workflow_version": "1.0.0",
+  "approval_version": "0.2",
+  "unit_id": "HE36-RMB",
+  "created_utc": "2026-10-22T21:55:15.066016+00:00",
+  "date_label": "20261023 Asia/Seoul; timestamps UTC",
+  "parent_pin": "fd11542ea8236e3c17eeb798bcafa8956e0eb248",
+  "branch": "research/he36-reactive-moment-bridge-20261023",
+  "original_goal": "Calibrated primordial atomic/nuclear kinetics and thermal evolution with baryonic anisotropic pressure and consistent metric/source feedback.",
+  "current_unit": "Derive and implement incoming binary reactive loss moments, common-bulk/common-T linear Grad STF; finite-domain source moments; conservative resolved event/source interface.",
+  "not_completed_by_this_unit": [
+    "Full reactive collision gain operator",
+    "Physical source-qualified D/He/Li full CI/DR/CX coverage",
+    "Nuclear daughter/charge/stopping spectrum providers",
+    "All isotope/anion/molecule inventory",
+    "Variable-temperature full mixture closure",
+    "Coupled gas or metric IVP"
+  ],
+  "conventions": {
+    "metric_signature": "(-+++)",
+    "constants": "c,hbar,k_B explicit; SI code",
+    "theta": "k_B*T [J]",
+    "rate_kernel": "K(g)=g sigma(g), independent of T; alpha=<K>, beta=<E_rel K>, gamma=<E_rel^2 K>",
+    "reaction_pair": "two distinct species, no identical-particle symmetry factor assumed",
+    "kinematics": "common bulk rest frame and common Maxwellian T; finite masses; linear first variation in each STF pressure",
+    "grad_warning": "finite Grad polynomial is not globally positive; derivatives are infinitesimal, not a realizability-certified finite-anisotropy trajectory",
+    "source_output": "R_n [m^-3 s^-1], Q=tr(S)/2 [W/m^3], J=STF(S) [Pa/s]",
+    "stress_ownership": "existing matter is nonbaryonic; HE32 gas pi_b=0 unchanged",
+    "nuclear_source": "Charge-neutral heavy-species/free-electron 21-state inventory, no positrons or negative ions. R_part includes nuclei count plus retained thermal-electron count. All-retained-thermal fixtures use (1+q).nu; a separate fast population requires its number-source subtraction, which dEfast alone does not determine. All energy reservoirs supplied explicitly"
+  },
+  "source_scope": {
+    "CCC": "87-row H1 electron-impact total ionization table, incident lab energy13.6058..968.61eV, sigma in a0^2, positive piecewise-linear interpolation. Actual-data diagnostic uses heavy stationary target (energy mass electron).",
+    "partial_moments": "Only finite tabulated energy support. No extrapolated tail, no physical truncation/interpolation error bound.",
+    "finite_mass_source": "Generic theoretical kernel uses relative energy mu*g^2/2. Actual CCC lab-energy coordinate is NOT silently relabeled as relative energy.",
+    "rate_derivatives": "Moment ladder only for T-independent microscopic K and legal derivative/integral exchange; derivative of an empirical rate fit is not an independently validated cross-section moment.",
+    "event_birth": "Resolved supplied momentum/second moment needed; isotropic photons do not force anisotropic parent-removal J to vanish."
+  },
+  "acceptance": {
+    "symbolic": "independent derivation and exact polynomial/CAS identities; preserve failed tool attempts",
+    "finite_mass": "independent Cartesian Gaussian quadrature at polynomial kernels; relative residual <=2e-11 on dimensionless controls",
+    "finite_source": "positiveGL16 shared moment calculation vs GL32 and independently adaptive finite-bin integral <=2e-9 relative for each moment at selected T in2000..200000K",
+    "moment_feasibility": "alpha>=0, beta>=0, gamma>=0 and alpha*gamma>=beta^2 with normalized roundoff allowance; no silent repair",
+    "event_ledger": "exact integer baryon/charge conservation, declared number source, energy owner sum and frame conversion; unknown product tensors raise explicit missing input",
+    "reproducibility": "immutable input/code hashes, commands/environment/exit/resources, actual PNG inspection, two handoffs",
+    "publication": "each R1-R10/C1-C10 gets Git commit plus separate Dropbox checkpoint with actual ACK; final unit archive and readback"
+  },
+  "execution_budget": {
+    "HE32_replays": 0,
+    "prior_donor_IVP_replays": 0,
+    "new_cosmological_IVP": 0,
+    "new_NCP": 0,
+    "new_work": "bounded algebra/quadrature/finite source controls; only novel scopes",
+    "resource_policy": "binary64; no fastmath; measured cost only; do not claim native rewrite speedup"
+  }
+}

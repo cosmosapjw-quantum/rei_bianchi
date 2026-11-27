@@ -1,0 +1,82 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_newton_must_satisfy_existing_energy_gate_before_stopping _________
+
+    def test_newton_must_satisfy_existing_energy_gate_before_stopping():
+        # Manufactured nonlinear RR with exact binding->escape ownership.
+        # Fraction error below 3e-12 can still exceed the existing energy gate.
+        from he22_contract import NativePoint,solve_midpoint
+        nh=.002;dt=1e11;rate=300/dt
+        def owner(g,gamma,power):
+            rec=rate*g[0]**2
+            binding=-nh*rec*BIND_EV[0]*EV_ERG
+            return NativePoint(np.array([-rec,0.,0.]),0.,8.,np.zeros(3),
+                               0.,binding,-binding,0.,0.)
+>       result=solve_midpoint(np.array([1e-5,1e-5,0.,.001]),np.empty(0),np.empty(0),nh,dt,owner)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+research/he23_density_contract_20261016/tests/test_he23_density.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+gas0 = array([1.e-05, 1.e-05, 0.e+00, 1.e-03])
+photons0 = array([], dtype=float64), energy_eV = array([], dtype=float64)
+nh = 0.002, dt = 100000000000.0
+native = <function test_newton_must_satisfy_existing_energy_gate_before_stopping.<locals>.owner at 0x7598135bf380>
+tolerance = 3e-12, maxiter = 15
+
+    def solve_midpoint(gas0, photons0, energy_eV, nh, dt, native,
+                       tolerance=3e-12, maxiter=15) -> StepResult:
+        """Bounded damped 4x4 Newton using one original native chemical RHS owner.
+    
+        For initial photo-only lower-level unit tests, a stand-in NativePoint can
+        be injected; only actual Rust-owner execution admits native chemical science.
+        """
+        gas0=np.asarray(gas0,dtype=float)
+        if not admissible(gas0): raise ValueError('HE22_INVALID_INITIAL_GAS')
+        g=gas0.copy();calls=0
+        scale=np.array([1.,1.,1.,max(gas0[3],1e-5)])
+        def probe(v):
+            nonlocal calls
+            calls+=1
+            return evaluate(v,gas0,photons0,energy_eV,nh,dt,native)
+        for k in range(maxiter+1):
+            residual,p,point=probe(g)
+            err=float(np.max(np.abs(residual)/scale))
+            if err < tolerance: break
+            if k==maxiter: raise RuntimeError('HE22_NEWTON_ITERATION_CAP')
+            jac=np.empty((4,4))
+            for j in range(4):
+                h=(1e-6*max(abs(g[j]),1e-4)) if j<3 else (2e-6*max(g[j],1e-4))
+                trial=g.copy();trial[j]+=h
+                if not admissible(trial):
+                    h=-h;trial[j]=g[j]+h
+                if not admissible(trial): raise RuntimeError('HE22_NO_ADMISSIBLE_DIFFERENCE')
+                rr,_,_=probe(trial)
+                jac[:,j]=(rr-residual)/h
+            try: direction=np.linalg.solve(jac,-residual)
+            except np.linalg.LinAlgError as e: raise RuntimeError('HE22_SINGULAR_JACOBIAN') from e
+            accepted=False
+            for back in range(24):
+                trial=g+direction*2.0**(-back)
+                if not admissible(trial):continue
+                try: r,_,_=probe(trial)
+                except (ValueError, ArithmeticError):continue
+                trial_err=float(np.max(np.abs(r)/scale))
+                if trial_err<err:
+                    g=trial;accepted=True;break
+            if not accepted:raise RuntimeError('HE22_LINESEARCH_FAILED')
+        # Note: a stiff native Jacobian may need better JVP/SNES; never broaden tolerances silently.
+        escaped=point.escape_erg_cm3_s*dt/(nh*EV_ERG)
+        cmb=point.cmb_to_gas_erg_cm3_s*dt/(nh*EV_ERG)
+        du=float(g[3]-gas0[3]);db=float(binding(g)-binding(gas0))
+        e_after=float(np.dot(p.new_counts,energy_eV))
+        total_energy=(e_after-p.source_energy_eV_per_H+du+db+escaped-cmb)
+        physical_scale=max(abs(p.source_energy_eV_per_H),abs(du)+abs(db)+abs(escaped)+abs(cmb),1e-15)
+        if abs(total_energy)>max(3e-11*physical_scale, 2e-12*abs(g[3])):
+>           raise AssertionError('HE22_TOTAL_ENERGY_LEDGER_FAIL')
+E           AssertionError: HE22_TOTAL_ENERGY_LEDGER_FAIL
+
+research/he23_density_contract_20261016/src/he22_contract.py:192: AssertionError
+=========================== short test summary info ============================
+FAILED research/he23_density_contract_20261016/tests/test_he23_density.py::test_newton_must_satisfy_existing_energy_gate_before_stopping
+1 failed, 4 deselected in 0.17s

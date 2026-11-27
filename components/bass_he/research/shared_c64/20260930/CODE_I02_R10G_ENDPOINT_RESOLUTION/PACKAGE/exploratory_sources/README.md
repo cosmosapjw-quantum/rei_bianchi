@@ -1,0 +1,1 @@
+Historical throwaway diagnostic scripts are preserved for provenance. Their original workspace paths are retained and are not the portable execution entrypoint. Use audit_archived.py and execute_endpoint.py in the package root for the portable tested path.

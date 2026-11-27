@@ -1,0 +1,187 @@
+--- E13C9/restore_transfer.py
++++ E13C10/restore_transfer_e13c10.py
+@@ -1,9 +1,9 @@
+ #!/usr/bin/env python3
+-"""Restore the E13C9 complete backup; this program performs no scientific run.
++"""Restore the E13C10 complete backup; this program performs no scientific run.
+ 
+ Supply the externally published transfer-manifest SHA-256. File names, including
+ an appended .bin suffix, do not establish byte identity. --hydrate invokes only
+-the byte-pinned E13C8 restoration helper, once, to restore its saved dependencies.
++the byte-pinned E13C9 restoration helper, once, to restore its saved dependencies.
+ """
+ import argparse
+ from datetime import datetime, timezone
+@@ -18,35 +18,35 @@
+ import zipfile
+ 
+ 
+-PACKAGE_ROOT = 'BASS_HE_E13C9_SIGNED_VOLTERRA_LOCAL_20261012_v1'
+-TRANSFER_SCHEMA = 'bass-he-e13c9-transfer-manifest-v1'
+-PACKAGE_SCHEMA = 'bass-he-e13c9-complete-manifest-v1'
++PACKAGE_ROOT = 'BASS_HE_E13C10_FIRST_MIDPOINT_BOUND_LOCAL_20261012_v1'
++TRANSFER_SCHEMA = 'bass-he-e13c10-transfer-manifest-v1'
++PACKAGE_SCHEMA = 'bass-he-e13c10-complete-manifest-v1'
+ PART_BYTES = 64 * 1024 ** 2
+ CHUNK_BYTES = 1024 ** 2
+ MAX_MEMBERS = 50000
+ MAX_EXPANDED_BYTES = 2 * 1024 ** 3
+ DEPENDENCIES = {
+-    'E13C8_COMPLETE': {
+-        'relative_archive': 'dependencies/E13C8_COMPLETE.zip',
+-        'bytes': 170991376,
+-        'sha256': 'ba4b1ace541f52bae5dd096d3da75ca9f0bf2d1894d0c3cba40375e40b1eca80',
++    'E13C9_COMPLETE': {
++        'relative_archive': 'dependencies/E13C9_COMPLETE.zip',
++        'bytes': 173671016,
++        'sha256': '41b4bfeae3b6795adbe2e78f5f519ee835ee8921b54bebd7d6c88ab63aae9bcc',
+     },
+-    'E13C8_RECOVERY_KIT': {
+-        'relative_archive': 'dependencies/E13C8_RECOVERY_KIT.zip',
+-        'bytes': 10727,
+-        'sha256': 'cf25ae33079f21189472cafc40403f066651883b7803c44a6d9e56c6f2f73ed3',
++    'E13C9_RECOVERY_KIT': {
++        'relative_archive': 'dependencies/E13C9_RECOVERY_KIT.zip',
++        'bytes': 50071,
++        'sha256': '722fb58d34f8d6eada3819ca4873bcb86f1c598984346fbce1c7ce855a2866bc',
+     },
+ }
+ PRIOR_RECOVERY = {
+     'helper': {
+         'relative_path': 'restore_transfer.py',
+-        'bytes': 9177,
+-        'sha256': 'd061629aa3c689b0f7fd0d70cd14c01946ec688bc0ed8e91c48eaaffee6f1343',
++        'bytes': 19183,
++        'sha256': '0588620bae490bc66ef8ba6daf2b4471627feeba3d5620dca6742cc224283fe9',
+     },
+     'transfer_manifest': {
+-        'relative_path': 'BASS_HE_E13C8_TRANSFER_MANIFEST.json',
+-        'bytes': 2170,
+-        'sha256': 'dd62793a79f35aa4b8358cece38ac02517e75db4b32c45f26b890210b19594b1',
++        'relative_path': 'BASS_HE_E13C9_TRANSFER_MANIFEST.json',
++        'bytes': 2347,
++        'sha256': 'e93f1dbe430bf40147c3b06b3d2e43531db150c3df84763a1a4bb256db66bead',
+     },
+ }
+ 
+@@ -118,7 +118,7 @@
+ 
+ def validate_transfer(manifest):
+     if manifest.get('schema') != TRANSFER_SCHEMA or manifest.get('package_root') != PACKAGE_ROOT:
+-        raise ValueError('unexpected E13C9 transfer schema or package root')
++        raise ValueError('unexpected E13C10 transfer schema or package root')
+     if manifest.get('dependencies') != DEPENDENCIES or manifest.get('prior_recovery') != PRIOR_RECOVERY:
+         raise ValueError('previous complete backup or recovery pins changed')
+     if manifest.get('new_NCP_heavy_tasks') != 0:
+@@ -128,7 +128,7 @@
+     safe_relative(archive['canonical_name'], single=True)
+     helper = manifest['restore_helper']
+     valid_pin(helper)
+-    if helper.get('relative_path') != 'restore_transfer.py':
++    if helper.get('relative_path') != 'restore_transfer_e13c10.py':
+         raise ValueError('unexpected recovery-helper location')
+     valid_pin(manifest['package_manifest'])
+     parts = manifest['parts']
+@@ -272,7 +272,7 @@
+     source.add_argument('--archive', type=Path)
+     source.add_argument('--parts-dir', type=Path)
+     parser.add_argument('--output-dir', type=Path, required=True)
+-    parser.add_argument('--hydrate', action='store_true', help='restore the byte-pinned E13C8 backup and its original inputs/completed return')
++    parser.add_argument('--hydrate', action='store_true', help='restore the byte-pinned E13C9 backup and its original inputs/completed return')
+     args = parser.parse_args()
+     started = time.monotonic()
+     output = args.output_dir
+@@ -299,49 +299,53 @@
+             reassemble(selected, archive, manifest['archive'])
+         stage = 'OUTER_PAYLOADS'
+         required = {item['relative_archive']: item for item in DEPENDENCIES.values()}
+-        required['code/restore_transfer.py'] = manifest['restore_helper']
++        required['code/restore_transfer_e13c10.py'] = manifest['restore_helper']
+         outer = extract_verified(archive, output / 'package', PACKAGE_ROOT + '/PACKAGE_MANIFEST.json',
+                                  PACKAGE_ROOT + '/', PACKAGE_SCHEMA, required, manifest['package_manifest'])
+         package = output / 'package' / PACKAGE_ROOT
+         hydrated = {}
+         if args.hydrate:
+-            stage = 'E13C8_DEPENDENCY_BYTES'
++            stage = 'E13C9_DEPENDENCY_BYTES'
+             actual_dependencies = {name: verify_file(package / item['relative_archive'], item)
+                                    for name, item in DEPENDENCIES.items()}
+-            kit_archive = package / DEPENDENCIES['E13C8_RECOVERY_KIT']['relative_archive']
+-            kit_root = output / 'runtime' / 'E13C8_RECOVERY_KIT'
++            kit_archive = package / DEPENDENCIES['E13C9_RECOVERY_KIT']['relative_archive']
++            kit_root = output / 'runtime' / 'E13C9_RECOVERY_KIT'
+             kit_required = {item['relative_path']: item for item in PRIOR_RECOVERY.values()}
+             kit_extraction = extract_verified(kit_archive, kit_root, 'KIT_MANIFEST.json', '',
+-                                             'bass-he-e13c8-recovery-kit-manifest-v1', kit_required)
++                                             'bass-he-e13c9-recovery-kit-manifest-v1', kit_required)
+             helper = kit_root / PRIOR_RECOVERY['helper']['relative_path']
+             old_manifest = kit_root / PRIOR_RECOVERY['transfer_manifest']['relative_path']
+             verify_file(helper, PRIOR_RECOVERY['helper'])
+             verify_file(old_manifest, PRIOR_RECOVERY['transfer_manifest'])
+-            prior_output = output / 'runtime' / 'E13C8'
++            prior_output = output / 'runtime' / 'E13C9'
+             command = [sys.executable, '-B', str(helper.resolve()), '--manifest', str(old_manifest.resolve()),
+                        '--manifest-sha256', PRIOR_RECOVERY['transfer_manifest']['sha256'], '--archive',
+-                       str((package / DEPENDENCIES['E13C8_COMPLETE']['relative_archive']).resolve()),
++                       str((package / DEPENDENCIES['E13C9_COMPLETE']['relative_archive']).resolve()),
+                        '--output-dir', str(prior_output.resolve()), '--hydrate']
+-            stdout_path = output / 'E13C8_HYDRATE.stdout'
+-            stderr_path = output / 'E13C8_HYDRATE.stderr'
+-            stage = 'PINNED_E13C8_RESTORE'
++            stdout_path = output / 'E13C9_HYDRATE.stdout'
++            stderr_path = output / 'E13C9_HYDRATE.stderr'
++            stage = 'PINNED_E13C9_RESTORE'
+             prior_started = time.monotonic()
+             with stdout_path.open('xb') as stdout, stderr_path.open('xb') as stderr:
+                 prior_invocations += 1
+                 process = subprocess.run(command, stdout=stdout, stderr=stderr, check=False)
+             if process.returncode != 0:
+-                raise RuntimeError('pinned E13C8 restore failed with exit ' + str(process.returncode))
++                raise RuntimeError('pinned E13C9 restore failed with exit ' + str(process.returncode))
+             prior_receipt_path = prior_output / 'RESTORE_RECEIPT.json'
+             prior_receipt = load_json(prior_receipt_path.read_bytes())
+-            if (prior_receipt.get('schema') != 'bass-he-e13c8-restore-receipt-v1'
++            if (prior_receipt.get('schema') != 'bass-he-e13c9-restore-receipt-v1'
+                     or prior_receipt.get('status') != 'PASS_COMPLETE_RESTORE'
+                     or prior_receipt.get('scientific_kernel_calls') != 0
+                     or prior_receipt.get('MPI_invocations') != 0
++                    or prior_receipt.get('NCP_execute_invocations') != 0
++                    or prior_receipt.get('prior_restore_helper_invocations') != 1
+                     or prior_receipt.get('automatic_retries') != 0):
+-                raise ValueError('unexpected pinned E13C8 restore receipt')
+-            expected_prior_package = (prior_output / 'package' / 'BASS_HE_E13C8_FULL_FINITE_REDUCTION_20261011_v1').resolve()
++                raise ValueError('unexpected pinned E13C9 restore receipt')
++            if prior_receipt.get('hydrated_E13C8', {}).get('returncode') != 0:
++                raise ValueError('pinned E13C9 restore did not hydrate its E13C8 predecessor')
++            expected_prior_package = (prior_output / 'package' / 'BASS_HE_E13C9_SIGNED_VOLTERRA_LOCAL_20261012_v1').resolve()
+             if Path(prior_receipt['package_directory']).resolve() != expected_prior_package or not expected_prior_package.is_dir():
+-                raise ValueError('unexpected restored E13C8 package directory')
++                raise ValueError('unexpected restored E13C9 package directory')
+             hydrated = {'dependency_bytes': actual_dependencies, 'kit': kit_extraction,
+                         'command': command, 'returncode': process.returncode,
+                         'elapsed_seconds': time.monotonic() - prior_started,
+@@ -349,12 +353,12 @@
+                         'stdout': {'path': str(stdout_path.resolve()), **pin(stdout_path)},
+                         'stderr': {'path': str(stderr_path.resolve()), **pin(stderr_path)},
+                         'package_directory': str(expected_prior_package),
+-                        'prior_hydrated_dependencies': prior_receipt['hydrated_dependencies']}
++                        'prior_hydrated_E13C8': prior_receipt['hydrated_E13C8']}
+         stage = 'RECEIPT'
+-        receipt = {'schema': 'bass-he-e13c9-restore-receipt-v1', 'status': 'PASS_COMPLETE_RESTORE',
++        receipt = {'schema': 'bass-he-e13c10-restore-receipt-v1', 'status': 'PASS_COMPLETE_RESTORE',
+                    'finished_utc': utc_now(), 'archive': manifest['archive'], 'selected_parts': selected,
+                    'external_transfer_manifest_sha256': args.manifest_sha256, 'outer': outer,
+-                   'hydrated_E13C8': hydrated, 'package_directory': str(package.resolve()),
++                   'hydrated_E13C9': hydrated, 'package_directory': str(package.resolve()),
+                    'scientific_kernel_calls': 0, 'MPI_invocations': 0, 'NCP_execute_invocations': 0,
+                    'prior_restore_helper_invocations': prior_invocations, 'automatic_retries': 0,
+                    'elapsed_seconds': time.monotonic() - started}
+@@ -363,7 +367,7 @@
+         return 0
+     except BaseException as error:
+         save(output / 'FIRST_FAILURE.json', {
+-            'schema': 'bass-he-e13c9-restore-failure-v1', 'status': 'FAIL_PRESERVED_NO_AUTOMATIC_RETRY',
++            'schema': 'bass-he-e13c10-restore-failure-v1', 'status': 'FAIL_PRESERVED_NO_AUTOMATIC_RETRY',
+             'failed_utc': utc_now(), 'stage': stage, 'error_type': type(error).__name__, 'error': str(error),
+             'selected_parts': selected, 'scientific_kernel_calls': 0, 'MPI_invocations': 0,
+             'NCP_execute_invocations': 0, 'prior_restore_helper_invocations': prior_invocations,

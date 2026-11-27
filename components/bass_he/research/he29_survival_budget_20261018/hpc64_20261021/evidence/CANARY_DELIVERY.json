@@ -1,0 +1,86 @@
+{
+  "schema": "he29.hpc64.canary_worker_delivery.v1",
+  "created_utc": "2026-10-20T20:59:22.387334+00:00",
+  "status": "IMPLEMENTED_NEW_BOUNDARY_TESTS_FIRST_PASS",
+  "publication": "PENDING_PARENT_PUBLICATION",
+  "backup": "PENDING_PARENT_BACKUP",
+  "scope": "single pending m8/GL4/q0/r4/table512 packed canary; baseline pairs reused 4, new reference pairs 0, old transport/tests 0",
+  "public_api": {
+    "callable": "preflight(args) -> JSON-serializable dictionary; no CDLL load, native process, table generation",
+    "cli_modes": [
+      "preflight",
+      "worker"
+    ],
+    "required_options": [
+      "packed-root",
+      "baseline-campaign",
+      "binary",
+      "owner-receipt",
+      "library",
+      "bridge-receipt",
+      "data-root",
+      "out",
+      "table-cache",
+      "table-workers",
+      "source-revision"
+    ],
+    "optional_options": {
+      "sync-every": 256
+    },
+    "worker_flag": "HE29_HPC64_PROCESS_GROUP_WORKER=1",
+    "table_workers_range": [
+      1,
+      48
+    ],
+    "sync_every_range": [
+      1,
+      256
+    ],
+    "runtime_environment": "original reference_runner.THREADS plus RAYON_NUM_THREADS=1; launcher owns actual host/affinity/cgroup/memory budget and process-group watchdog",
+    "import_order": "fresh worker loads clean a5 modules before new table/I/O adapters; rejects mixed prior imported module paths"
+  },
+  "identity": {
+    "packed_code_pin": "a5d4711460c09b310b78c9692aa62534b7a843d3",
+    "packed_runner_sha256": "803e192709a1b5ff9a0732c806a7cff91fd8fe3af69d03e3885efaffe4f388ea",
+    "adapter_code_pin": "CLI source-revision must equal separate clean current Git HEAD",
+    "parent_and_input_manifests": "read only from clean a5 Git checkout",
+    "input_data": "22 original INPUT_SHA256 entries verified against external data-root; never imported as source",
+    "source_files": "original a5 reference_runner source manifest retained for exact baseline comparison",
+    "baseline_runtime": "original a5 baseline_contract requires all four Python/NumPy/SciPy cohorts",
+    "binary": "original owner receipt/source/binary SHA gate; baseline qualified same binary reused",
+    "table_sha256": "919ca6f42028bffc37cb208916ee5a9927356eb99344fe467f9b98e30e9fddcd",
+    "bridge": "original verify_build and publication_contract with fixed a5 pin, separate from new adapter code pin"
+  },
+  "execution": {
+    "solver": "unchanged a5 solve_packed/PackedBridge; threads1; all19 ledgers/full-state norm unchanged",
+    "model": "new HPC64RefinedSourceModel; owner BatchedNativeOwner; all source row/reduction/source/table SHA and numerical gates preserved",
+    "output": "create-only case folder; existing paths fail before preflight/native",
+    "paths": "out/cache outside a5/new source checkouts, baseline campaign and data root; cache/output do not overlap",
+    "segments": "flush_evidence(segment_checkpoint), then endpoint write/flush/fsync",
+    "raw_result": "flush_evidence(before_raw_result), then PACKED_RAW create-only publication",
+    "admission": "original check_result then admit_pair against both saved Radau/DOP853 results",
+    "success_receipt": "only after owner close, complete gzip readback, published trace, no trace/owner failure, written=durable=verified record/point counts and owner.calls match",
+    "failure": "HOLD_FIRST_FAILURE; RAW/segment/partial/native telemetry retained; no retry or widening"
+  },
+  "new_verification": {
+    "methods": 10,
+    "first_run": "PASS",
+    "receipt": "evidence/CANARY_TESTS_FIRST/RECEIPT.json",
+    "scope": "manufactured DATA/binary/source fixtures and adapter wiring only; no production physics evidence",
+    "native_processes": 0,
+    "physical_solver_runs": 0,
+    "old_suites_replayed": 0
+  },
+  "not_run": {
+    "production_preflight": "new adapter source not yet published/clean pinned; sandbox Python cohort differs from saved returns",
+    "packed_native_canary": "NCP executor only under parent lease/watchdog",
+    "bridge_build": "parent launcher uses unchanged a5 builder"
+  },
+  "sha256": {
+    "src/hpc_canary.py": "48bb8145ec178f70f030302d212ae3c66411ef786cac08375670bd9c381625c7",
+    "tests/test_hpc_canary.py": "b2091fb060d50922cbeaaa2ff19bb7b2d7e411558547c49ff8bc5969bd81d031",
+    "evidence/CANARY_TESTS_FIRST/RECEIPT.json": "c6c32212e2d2cb6eaadbc3fb1beb677ba28d9d57f8a7bbf6f65d762d52ed8a1d",
+    "evidence/CANARY_TESTS_FIRST/stderr.txt": "61ed99e31a51aee459beca95f2b1a5eefa9a7113937f13df2311ff3cbdfbbb08",
+    "evidence/CANARY_TESTS_FIRST/stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

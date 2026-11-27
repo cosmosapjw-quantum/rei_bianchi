@@ -1,0 +1,33 @@
+{
+  "schema": "he_ang.source_hex_intake.amendment.v1",
+  "unit_id": "HE-ANG-SOURCE-HEX-INTAKE",
+  "id": "A1_NEWLINE_SQL_DIALECT_REPAIR",
+  "authority": "Current user instruction to continue research; physmath-research-loop 1.0.0 diagnosis-based minimal policy correction; root Astra decision",
+  "old_rule": "CONTRACT.json new_budget.max_dataset_catalogues=1; run_bounded.py semicolon SQL reader; actual failed attempt consumed the one slot.",
+  "observed_failure": "02_catalogue failed on 8 MiB statement buffer; no availability inference was made.",
+  "diagnosis": "03_diagnostic read only 65536 decoded bytes: LF937, semicolon0. Source Hex v2.02 hex-db/src/db.cpp::hex_import_ lines150-246 executes each getline chunk even when semicolon absent.",
+  "replacement": "Add explicit hex-lines dialect for observed upstream linewise dump. Preserve default semicolon reader, 128MiB decoded cap, 8MiB statement cap, and no SQL execution. Permit exactly one diagnosed catalogue retry; cumulative catalogue attempt cap becomes2, with the failed first attempt retained.",
+  "scope": "Same unit and same source bytes; only input splitting, line-dialect focused synthetic controls, actual catalogue retry, and previously approved synthetic plot.",
+  "allowed_commands": [
+    "focused synthetic line-dialect tests once",
+    "python -B code/hex_intake.py --dialect hex-lines /workspace/scratch/47d8070ffff8/source_intake/Hex-170210.sql.xz once",
+    "previously approved plot command after valid catalogue"
+  ],
+  "budget": {
+    "cpu_s": 20,
+    "wall_s": 60,
+    "per_invocation_cpu_s": 8,
+    "per_invocation_wall_s": 20,
+    "address_space_MiB": 256,
+    "known_consumed_cpu_s": 0.33480899999999997,
+    "known_consumed_wall_s": 0.4172597059935798,
+    "max_catalogue_attempts": 2,
+    "diagnostic_attempts": 1,
+    "max_algebra_invocations": 3,
+    "max_plot_invocations": 2,
+    "reset": false,
+    "old_ledgers_transferable": false
+  },
+  "stopping_rule": "Preserve any failure, stop without automatic retry, return exact new diagnosis to root; no adjacent repair campaign.",
+  "unchanged_claim_boundary": "Availability only until independently reviewed. No physical calibration or finite-mass provider promotion."
+}

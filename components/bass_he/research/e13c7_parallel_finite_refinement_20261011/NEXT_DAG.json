@@ -1,0 +1,42 @@
+{
+  "failure_branch": "Preserve raw results and first failure; explicit validated resume only, no clipping or silent fallback",
+  "nodes": [
+    {
+      "evidence": "analysis/LOCAL/LOCAL_ADMITTED_CANDIDATE.json",
+      "id": "LOCAL8_ADMISSION",
+      "state": "PROMOTE_SCOPED_LOCAL_FINITE_REFINEMENT"
+    },
+    {
+      "N": 1024,
+      "P": 60,
+      "command": "code/ncp_execute_batch.py",
+      "compute_location": "NCP",
+      "depends_on": [
+        "LOCAL8_ADMISSION"
+      ],
+      "id": "NCP2331_N1024",
+      "new_paths": 2331,
+      "state": "READY_HEAVY_HANDOFF_NOT_RUN"
+    },
+    {
+      "command": "code/reduce_returned_batch.py",
+      "compute_location": "ChatGPT",
+      "depends_on": [
+        "NCP2331_N1024"
+      ],
+      "id": "EXACT_FULL_OFF_REDUCTION",
+      "scientific_kernel_calls": 0,
+      "state": "NOT_RUN"
+    },
+    {
+      "depends_on": [
+        "EXACT_FULL_OFF_REDUCTION"
+      ],
+      "id": "INDEPENDENT_FULL_FINITE_DECISION",
+      "physical_promotion_permitted": false,
+      "state": "NOT_RUN"
+    }
+  ],
+  "physical_continuum_production_receiver": "HOLD",
+  "schema": "bass-he-e13c7-next-dag-v1"
+}

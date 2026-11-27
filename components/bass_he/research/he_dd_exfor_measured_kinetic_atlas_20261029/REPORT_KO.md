@@ -1,0 +1,8 @@
+# BASS_HE EXFOR-M0475 실측 물리 데이터 제품
+이번 산출물은 기존 conditional Lipschitz 기하학의 또 다른 외측 경계가 아니다. 실험 원본 M0475의 실제 18개 측정 좌표(DA12·SIG6)를 원본 3349바이트 SHA-256/Git blob과 일치시켜 재생성한 뒤, 부모의 frozen 핵질량에 따른 상대론적 두 입자 운동학과 단면적 × 생성 쌍 총 운동에너지를 적용했다. 330MeV 총단면적은 원본에 없으므로 생성하지 않았다.
+
+핵물리: Q=23.84647820 MeV, 반동을 포함한 광자 임계 23.9227589403967 MeV, 330 MeV 두-D 총 운동에너지 306.1535218 MeV. 실제 네 CM 측정 각도 46,61,73,87에서 각각 (K+,K−)=(195.890498,110.263024),(182.956933,123.196589),(171.096446,135.057075),(156.302372,149.851150) MeV. 여섯 실측 SIG 지점의 물리적 출처 유지 가중값은 426.939988,259.488043,210.821240,271.599663,180.653648,184.334437 nb MeV; 오차는 원본 통계 ERR-S에 해당 Ksum을 정확 곱한 것이다.
+
+전체 재현 로컬 ZIP은 raw M0475.x4, src/exfor_kinematic_atlas.py, tests/test_exfor_physical_atlas.py, tests/independent_cpp_exfor.cpp, results/ATLAS.json, 12/6 CSV와 실측점 기반 그림 3개를 포함한다. Git에는 원본 source byte, byte-identical tested parser/tests, independent C++, compact result JSON와 보고서가 있다. Python23/23 PASS; C++ 독립 source 파서 12+6 rows/18 PASS, mass-shell max residual 5.6e-103 MeV², Wolfram exact/symbolic consistency, plots directly inspected. Independent R6/C9 not run.
+
+원래 Central28/88 HE14/18 그대로, 새 scoped measured-data-product D1/D2는 source-lock·source-valued-transform 검증에만 해당한다. 실제 detector efficiency, photon polarization, per-event/inclusive distinction, 330 exclusive measured SIG, gamma phase space, helium target, D_fast cooling/stopping and C_V remain unresolved. kappa/R_event/heat_rate=null; activation=false,L4=false,production=HOLD.

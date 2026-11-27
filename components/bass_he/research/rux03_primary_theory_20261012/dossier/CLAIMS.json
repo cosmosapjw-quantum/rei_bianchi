@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "unit": "HERE_RUX03_PRIMARY_THEORY_03",
+  "date": "2026-10-12",
+  "workflow": "physmath-research-loop built-in 1.0.0 THEORY",
+  "source_commit": "a5c958c414dea41216b445c05f58df837f05cacb",
+  "claim_status_note": "Derived project-local constructions. Final independent adoption is in ../review/DECISION.json. Existing algorithms are separately marked reused; global novelty or full physical admission is not claimed.",
+  "claims": [
+    {
+      "id": "R00",
+      "statement": "Existing source-free photon elimination, positive H/He proposal, conservative point variant and four-variable interval/Krawczyk structure are present at the pinned receiver source.",
+      "basis": [
+        "source-inspected",
+        "reused implementation evidence"
+      ],
+      "new_result": false,
+      "evidence": [
+        "../source_map/SOURCE_MAP.md",
+        "../source_map/CURRENT_SOURCE.json"
+      ]
+    },
+    {
+      "id": "T01",
+      "statement": "A nonnegative prescribed stage source folds exactly into the photon numerator in reference/proper/per-H variables, preserving four gas unknowns and the exact reduced Schur derivative.",
+      "basis": [
+        "derived",
+        "exact-symbolically-checked"
+      ],
+      "assumptions": [
+        "prescribed stage/source/cross sections",
+        "nonnegative numerator",
+        "fixed nucleus normalization",
+        "gas dependence of opacity retained"
+      ],
+      "evidence": [
+        "../derivations/PHOTON_ELIMINATION.md §§2–4",
+        "../derivations/SYMBOLIC_CHECK.json",
+        "../derivations/SHARED_RESIDUAL_AND_PROVIDER.md §2"
+      ],
+      "implementation_state": "source-free foundation reused; source-aware contract derived"
+    },
+    {
+      "id": "T02",
+      "statement": "The per-node absorption allocation has the stated competition Jacobian, positive total-response column sums, exact inverse on sum A<W, response eigenvalues and transparent/stiff limits.",
+      "basis": [
+        "derived",
+        "exact-symbolically-checked"
+      ],
+      "assumptions": [
+        "nonnegative channel opacities",
+        "h>0,W>0 for strict signs/inverse",
+        "independent opacity coordinates for inverse; shared fraction chain retained"
+      ],
+      "evidence": [
+        "../derivations/PHOTON_ELIMINATION.md §§5–6",
+        "../derivations/SYMBOLIC_CHECK.json"
+      ],
+      "implementation_state": "derived diagnostic/derivative contract"
+    },
+    {
+      "id": "T03",
+      "statement": "A shared Case A event projection gives the off-root identity F_E=F_w+b_chi dot F_v, its full photon/escape form, a constant residual/Jacobian row transform and equal exact Newton increments.",
+      "basis": [
+        "derived",
+        "exact-symbolically-checked"
+      ],
+      "assumptions": [
+        "same endpoint event rates and captured kinetic moments",
+        "fixed binding coefficients",
+        "photon and escape reconstruction for reduced identity",
+        "nonsingular Jacobian for Newton increment"
+      ],
+      "evidence": [
+        "../derivations/SHARED_RESIDUAL_AND_PROVIDER.md §§1–3",
+        "../evidence/WOLFRAM_EXACT_SUMMARY.json"
+      ],
+      "implementation_state": "new mathematical connection of existing point variants"
+    },
+    {
+      "id": "T04",
+      "statement": "Coefficient-level density factorization supplies boundary-defined event rates, kinetic powers and existing positive chemistry intensities; explicit C2 chain rules give a common point/interval expression contract.",
+      "basis": [
+        "derived",
+        "exact-symbolically-checked",
+        "source-inspected"
+      ],
+      "assumptions": [
+        "current warm Case A factorization",
+        "each rate and moment coefficient has a valid C2 lift on the input box",
+        "outward interval primitive inclusion"
+      ],
+      "evidence": [
+        "../derivations/SHARED_RESIDUAL_AND_PROVIDER.md §§4–5",
+        "../evidence/WOLFRAM_EXACT_SUMMARY.json",
+        "CODING_CONTRACT_KO.md"
+      ],
+      "implementation_state": "contract complete; actual shared Rust provider wiring is next coding unit"
+    },
+    {
+      "id": "T05",
+      "statement": "Endpoint-energy BE microphysics closes the history energy ledger with W_gamma=-sum Delta E N_in; the correction to continuous endpoint work and its derivatives are exact, with O(h^2) smooth-step defect.",
+      "basis": [
+        "derived",
+        "exact-symbolically-checked"
+      ],
+      "assumptions": [
+        "reference-volume history state",
+        "prescribed incoming and endpoint node energies",
+        "all microphysics photon events valued at endpoint energy",
+        "smooth geometry/solution only for O(h^2) expansion"
+      ],
+      "evidence": [
+        "../derivations/PHOTON_ELIMINATION.md §8",
+        "../derivations/SYMBOLIC_CHECK.json"
+      ],
+      "implementation_state": "derived BE history interface; existing continuous RHS unchanged"
+    },
+    {
+      "id": "T06",
+      "statement": "A constant HeIII RR coefficient perturbation fixes the expected single-consumption/population derivative response; a positive T^2 companion additionally discriminates kinetic-coefficient temperature gradients and Hessians.",
+      "basis": [
+        "derived",
+        "exact-symbolically-checked",
+        "independent-review-corrected"
+      ],
+      "assumptions": [
+        "fixed candidate comparison",
+        "same alpha/kappa perturbation in point and interval",
+        "positive rho_star,T_star,eta and interior b,e for strict thermal derivative witness"
+      ],
+      "evidence": [
+        "../derivations/SHARED_RESIDUAL_AND_PROVIDER.md §6",
+        "../evidence/WOLFRAM_EXACT_SUMMARY.json",
+        "../evidence/TEMPERATURE_WITNESS_SUMMARY.json",
+        "../review/R6_REVIEW_INITIAL.json"
+      ],
+      "implementation_state": "manufactured expectations derived; production-path witness to execute in next coding unit"
+    },
+    {
+      "id": "T07",
+      "statement": "Substitution w=c_v dT preserves the native endpoint energy equation; BE applied separately to the continuous T equation has the exact residual difference c_v Delta T Delta d when the same species BE equation is used.",
+      "basis": [
+        "derived",
+        "exact-symbolically-checked"
+      ],
+      "assumptions": [
+        "fixed f",
+        "same species endpoint equation",
+        "native thermal BE map"
+      ],
+      "evidence": [
+        "../derivations/SHARED_RESIDUAL_AND_PROVIDER.md §7",
+        "../evidence/WOLFRAM_EXACT_SUMMARY.json"
+      ],
+      "implementation_state": "native variable contract retained"
+    }
+  ],
+  "next_obligations": [
+    {
+      "id": "O01",
+      "unit": "HERE_RUX03_PRIMARY_PROVIDER_03",
+      "action": "Implement the shared coefficient/event provider across ordinary point, conservative point, endpoint and interval/root, preserving paired caller source ownership; run the actual changed-path witnesses."
+    },
+    {
+      "id": "O02",
+      "unit": "RUX04",
+      "action": "Combine RUX02 source-backed physical inputs with RUX03 provider/rate-domain closure to lock the scenario, then follow the original RUX05 dependency."
+    }
+  ],
+  "new_no_go_claims": [],
+  "new_ncp_work_units": []
+}

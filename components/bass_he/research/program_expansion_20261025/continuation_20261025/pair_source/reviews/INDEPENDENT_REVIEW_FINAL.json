@@ -1,0 +1,117 @@
+{
+  "schema": "he.independent_review.v1",
+  "review_id": "HE-EXP-CONT-R6C9-SOURCE-PAIR-REVIEW-FINAL",
+  "reviewer": "/root/source_pair_research",
+  "status": "APPROVED_SCOPED_AFTER_TARGETED_REPAIR",
+  "initial_record": "pair_source/reviews/INDEPENDENT_REVIEW_INITIAL.json",
+  "authorship_boundary": "Reviewer authored pair_source only; this review covers exchange/ and species/ authored by separate agents. Review of pair_source is separately recorded by the exchange author.",
+  "review_scope": [
+    "Conditional finite-mass elastic angular-moment algebra and conservative-to-centered source conversion",
+    "Caloric, particle-count, binding and nonthermal energy ownership contracts",
+    "Pinned species/source-row intake and quantity applicability boundaries",
+    "Static correction of one finite-positive-mass implementation counterexample and inspection of parent-owned bounded validation receipts"
+  ],
+  "reviewed_inputs_final": [
+    {
+      "path": "exchange/exchange_closure.py",
+      "sha256": "533c49838d03572b106168cd9333a20e1b4a7d06f88d5f3727f8b80c5b96f262"
+    },
+    {
+      "path": "exchange/test_exchange_closure.py",
+      "sha256": "d2a977a52b2abd667b9b69fbc0050e43f0016b4216ebd44996ab9fce9fd42638"
+    },
+    {
+      "path": "exchange/THEORY_KO.md",
+      "sha256": "1244aacb8712eb8b545e04d9eeb6b1e860777e6e58489ab837e185e452c1f4a0"
+    },
+    {
+      "path": "species/consumer_inventory.py",
+      "sha256": "827cb3f6cd387d2c8d4ca6f4666bc1178f003fe08a976eb9b032e32a2479e8fd"
+    },
+    {
+      "path": "species/SPECIES_PROVIDER_REGISTRY.json",
+      "sha256": "377e35532ee3f313160a1e81ca41463f99d223900f56498c999b28a951642761"
+    },
+    {
+      "path": "species/EXPLICIT_TRANSPORT_SOURCE_INVENTORY.json",
+      "sha256": "cd5b7ca27514348d755c78dd6911629b9adee878838a711707ebeedb18495fd6"
+    }
+  ],
+  "finding_disposition": {
+    "id": "EXCHANGE-C9-MASS-SUM-OVERFLOW",
+    "severity": "medium",
+    "class": "implementation",
+    "status": "CLOSED_FOR_REVIEWED_IMPLEMENTATION_SCOPE",
+    "original_counterexample": "ma=mb=1e308, va=(1,0,0), vb=(0,0,0), sigma0=sigma1=sigma2=1e-308: exact mu=5e307 and weighted dp_a,x=-0.5, while direct ma+mb overflow previously returned zero.",
+    "accepted_correction": "The implementation uses max-mass-scaled fractions and reduced mass min(ma,mb)/(1+min(ma,mb)/max(ma,mb)); nonfinite derived velocity, energy and moment outputs are rejected explicitly.",
+    "static_assessment": "The corrected mass map preserves the finite counterexample reduced mass and nonzero exchange without summing the unscaled large masses. The independent exact target is preserved; no physical scattering source was changed.",
+    "actual_edge_control": {
+      "attempt_id": "04_exchange",
+      "method": "test_large_mass_sum_preserves_finite_moments_or_rejects_nonrepresentable_values",
+      "result": "PASS",
+      "receipt": "evidence/validation/04_exchange/stderr.txt"
+    }
+  },
+  "oracle_followup": {
+    "original_attempt": "04_exchange",
+    "original_attempt_status": "FAIL",
+    "original_method_result": "4 PASS / 1 FAIL",
+    "failing_method": "test_finite_mass_isotropic_exchange_in_com",
+    "independent_exact_target": "weighted momentum_a,x = -12",
+    "observed_binary64": "-12.000000000000002",
+    "classification": "one-ULP exact-equality oracle failure after equivalent stable reduced-mass arithmetic",
+    "author_change": "Only the x-component comparison uses delta=8*ulp(12); transverse zero checks remain exact. The implementation hash is unchanged between attempts 04 and 05.",
+    "independent_bound": {
+      "unit_roundoff": "u=2^-53",
+      "operations": "For ma=2, mb=3, the relative speed 3-(-2)=5 and multiplication by sigma1=2 are exact. Rounded operations are r=2/3, s=1+r, mu=2/s, and final multiplication by 5.",
+      "relative_error_expression": "p_hat/p = (1+delta3)(1+delta4) / ((1+(2/5)*delta1)(1+delta2)), with each |delta_i| <= u in the normal binary64 range.",
+      "bound": "|p_hat/p-1| <= gamma4=4u/(1-4u); hence |p_hat-p| <= 12*gamma4 < 4*ulp(12), so the declared 8*ulp(12) bound covers roundoff independently of the observed residual.",
+      "physical_threshold_changed": false,
+      "source_uncertainty_changed": false
+    },
+    "continuation_authority": "VALIDATION_ADDENDUM_01.json explicitly permits one continuation of this same diagnosed repair, for the failed method only, within the unchanged 8 CPU s / 30 wall s allocation. repair_used remains 1; this is not a new repair allocation or an HE101 reserve reset.",
+    "actual_continuation": {
+      "attempt_id": "05_exchange",
+      "method_count": 1,
+      "result": "PASS",
+      "returncode": 0,
+      "receipt": "evidence/validation/05_exchange/FINISH.json",
+      "stderr_sha256": "1afb6a4d9d07610440bf257b1daec2f993539537adc4b13a467d368685db6776"
+    },
+    "original_failure_and_cost_retained": true
+  },
+  "accepted_source_scope": [
+    "20 atomic charge-state records plus one neutron slot are distinct from two electron pools and nine explicit synthetic extension witnesses.",
+    "18 scalar supplier records are not promoted to differential, energy-sharing or angular-joint providers.",
+    "27 explicit selected Mutation++ pairs and 243 thermal-integral expression entries retain their original nested/source-family structure. Defaults and extrapolated or differential values are not fabricated.",
+    "REC-HD source support is limited to the owner contract's collider IDs and temperature nodes; no unprovided molecular mixture or isotope collision calibration is inferred.",
+    "Mass and isotope calibration remain explicit dependencies; mass-number labels are not substituted for measured masses."
+  ],
+  "validation_observations": {
+    "attempt_outcomes_in_order": ["PASS", "PASS", "PASS", "FAIL", "PASS"],
+    "original_observations": "01_exchange: 13 PASS at the original code hash; 02_pair_source: 5 PASS; 03_species: 12 PASS. Their raw receipts are retained.",
+    "repair_observations": "04_exchange: five affected methods, four PASS and one exact-equality FAIL; 05_exchange: only that failed method PASS after the explicitly bounded oracle correction.",
+    "distinct_methods_across_attempts": 31,
+    "method_executions_across_attempts": 36,
+    "final_whole_suite_replay": false,
+    "measured_execution_interval_cpu_s": 0.282464889,
+    "measured_execution_interval_wall_s": 0.280453644998488,
+    "resource_ledger": "evidence/validation/RESOURCE_LEDGER.json",
+    "repair_used": 1,
+    "verification_continuations": 1,
+    "end_to_end_cost_claimed": false,
+    "unmeasured_preparation_and_review_cost": "UNKNOWN_NOT_ZERO"
+  },
+  "limits": {
+    "physical_provider_admitted": false,
+    "global_physical_completion": null,
+    "thermal_integrals_are_differential_sources": false,
+    "finite_drift_heat_or_inelastic_joint_source_validated": false,
+    "HE101_C8": "PARTIAL_EXPORT",
+    "HE101_repair_reserve_remaining": 0,
+    "HE101_START_count": 0,
+    "historical_scientific_suite_replay_count": 0,
+    "physical_campaign_START_count": 0,
+    "reviewer_scientific_runtime_or_test_execution": 0
+  }
+}

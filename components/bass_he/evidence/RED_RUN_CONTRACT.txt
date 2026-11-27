@@ -1,0 +1,52 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____ test_resume_requires_identical_binding_and_fresh_run_refuses_overwrite ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_resume_requires_identical0')
+
+    def test_resume_requires_identical_binding_and_fresh_run_refuses_overwrite(tmp_path):
+>       m=mod();spec={'source':'abc','stage':'pilot','panels':32}
+          ^^^^^
+
+tests/test_run_contract.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def mod():
+        path=Path(__file__).resolve().parents[1]/'scripts'/'run_contract.py'
+>       assert path.exists(), 'immutable research-run binding missing'
+E       AssertionError: immutable research-run binding missing
+E       assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/mnt/data/BASS_HE/scripts/run_contract.py').exists
+
+tests/test_run_contract.py:8: AssertionError
+_______________________ test_resume_missing_run_refused ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_resume_missing_run_refuse0')
+
+    def test_resume_missing_run_refused(tmp_path):
+>       with pytest.raises(FileNotFoundError):mod().bind_run(tmp_path,{},resume=True)
+                                              ^^^^^
+
+tests/test_run_contract.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def mod():
+        path=Path(__file__).resolve().parents[1]/'scripts'/'run_contract.py'
+>       assert path.exists(), 'immutable research-run binding missing'
+E       AssertionError: immutable research-run binding missing
+E       assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/mnt/data/BASS_HE/scripts/run_contract.py').exists
+
+tests/test_run_contract.py:8: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_run_contract.py::test_resume_requires_identical_binding_and_fresh_run_refuses_overwrite - AssertionError: immutable research-run binding missing
+assert False
+ +  where False = exists()
+ +    where exists = PosixPath('/mnt/data/BASS_HE/scripts/run_contract.py').exists
+FAILED tests/test_run_contract.py::test_resume_missing_run_refused - AssertionError: immutable research-run binding missing
+assert False
+ +  where False = exists()
+ +    where exists = PosixPath('/mnt/data/BASS_HE/scripts/run_contract.py').exists
+2 failed in 0.09s

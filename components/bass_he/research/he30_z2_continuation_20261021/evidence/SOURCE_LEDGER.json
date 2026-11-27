@@ -1,0 +1,93 @@
+{
+  "unit": "BASS_HE_HE29_Z2_PHYSICS_REUSE",
+  "date": "2026-10-21",
+  "repo_source_commit": "048a73de4246f609b1bc14854ea5c48757cb82fd",
+  "adopted": [
+    {
+      "id": "CANONICAL_CONTINUATION",
+      "status": "derived",
+      "basis": "spatial Killing covariant momentum constants",
+      "implementation": "existing CanonicalMomentumFV reused; parent implementing extended aend continuation",
+      "primary_source": "https://arxiv.org/abs/1711.07130",
+      "source_scope": "Appendix A, Sections IV-V; massless gas. Massive extension here directly derived from the mass shell."
+    },
+    {
+      "id": "READONLY_PRECOMPUTATION",
+      "status": "derived",
+      "basis": "time-independent quadrature nodes, phase-space weights and Legendre matrices",
+      "implementation": "existing NumPy moment_batch already present; proposed additional q2-perp/q2-parallel readonly precompute",
+      "primary_source": "https://github.com/grackle-project/grackle/blob/6d57fe2c3eb07c34dadb0b0e568cdc12f975146d/src/clib/initialize_rates.c",
+      "source_scope": "general architectural reuse of invariant coefficients; no Grackle rate functions imported"
+    }
+  ],
+  "sources": [
+    {
+      "id": "DASH_JAISWAL2018",
+      "url": "https://arxiv.org/abs/1711.07130",
+      "doi": "10.1103/PhysRevD.97.104005",
+      "sections": "IV Eqs.19-27; V Eqs.32-35 and subsequent characteristic solution; Appendix A",
+      "supports": "collisionless momentum constants and stress moments",
+      "limits": "author uses +--- and natural units, primarily massless isotropic initial distribution; our massive and anisotropic initial distribution treated by explicit derivation"
+    },
+    {
+      "id": "FRIEDRICH2012",
+      "url": "https://academic.oup.com/mnras/article/421/3/2232/1077406",
+      "arxiv": "https://arxiv.org/abs/1201.0602",
+      "doi": "10.1111/j.1365-2966.2012.20449.x",
+      "sections": "3.1 and Appendices A,B,G",
+      "supports": "coupled H/He non-equilibrium rate equations and species-coupled OTS; atomic/cooling rate provenance",
+      "limits": "interpolation scheme and thermal timescale constraints separate from pure ion fractions; does not close anisotropic stresses"
+    },
+    {
+      "id": "HYREC2",
+      "url": "https://arxiv.org/abs/2007.14114",
+      "doi": "10.1103/PhysRevD.102.083517",
+      "sections": "II-III; Appendix A",
+      "supports": "precompute effective atomic rates and tabulated RT corrections with derivatives",
+      "limits": "tabulated near-Planck primordial recombination RT correction is not a z20-2 anisotropic reionization prescription"
+    },
+    {
+      "id": "HYREC2_SOURCE",
+      "url": "https://github.com/nanoomlee/HYREC-2",
+      "files": [
+        "hydrogen.h",
+        "README.md"
+      ],
+      "github_license": null,
+      "license_status": "No license detected by GitHub metadata; no source copied",
+      "supports": "Alpha_inf.dat/R_inf.dat table design, T_r and T_m/T_r domain constants"
+    },
+    {
+      "id": "GRACKLE",
+      "url": "https://github.com/grackle-project/grackle",
+      "commit": "6d57fe2c3eb07c34dadb0b0e568cdc12f975146d",
+      "commit_date": "2026-09-15T13:08:54Z",
+      "files": [
+        "src/clib/rate_functions.c",
+        "src/clib/initialize_rates.c",
+        "LICENSE"
+      ],
+      "license": "Enzo Public License (NCSA/BSD conditions), inspected official LICENSE",
+      "supports": "one-time log-temperature rate tabulation; six-species H/He network; OpenMP worker configuration",
+      "limits": "choosing alternate rate fits changes physical source identity; UVB tables have redshift domain and equilibrium assumptions; do not silently replace locked coefficients"
+    },
+    {
+      "id": "GRACKLE_PARAMETERS",
+      "url": "https://grackle.readthedocs.io/en/latest/Parameters.html",
+      "supports": "primordial_chemistry=1 six-species H/He and omp_nthreads",
+      "limits": "FG2011 UVB ends z10.6; HM2012 UVB ends z15.13; default above-range equilibrium assumption unsuitable as silent z20 pilot substitution"
+    }
+  ],
+  "evidence": {
+    "symbolic": "TOOL_EVIDENCE.json",
+    "numeric": "CANONICAL_MOMENT_CHECKS.json",
+    "full_derivation": "PHYSICS_REUSE_KO.md"
+  },
+  "integrations_performed": 0,
+  "performance_benchmarks_performed": 0,
+  "source_imported": false,
+  "unresolved": [
+    "Full finite-resolution and L-truncation convergence over extended interval remains separate from algebraic invariant checks.",
+    "Native H/He chemistry response and radiation UV coupling are a separate model from current ne_source=None collisionless pilot."
+  ]
+}

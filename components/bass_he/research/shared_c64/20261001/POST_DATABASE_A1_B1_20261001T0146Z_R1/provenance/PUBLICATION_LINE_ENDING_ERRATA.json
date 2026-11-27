@@ -1,0 +1,44 @@
+{
+  "schema": "bass_he.publication.transport_erratum.v1",
+  "status": "FIRST_PUBLICATION_SUPERSEDED",
+  "first_commit": "be33cd566d838200d7e7163e4938628836e2089c",
+  "first_tree": "33b58e25ab15e1184f246956552d4a74de350be4",
+  "first_namespace": "research/shared_c64/20261001/POST_DATABASE_A1_B1_20261001T0146Z",
+  "corrected_namespace": "research/shared_c64/20261001/POST_DATABASE_A1_B1_20261001T0146Z_R1",
+  "classification": "IMPLEMENTATION_ERROR_TEXT_READ_NEWLINE_NORMALIZATION",
+  "cause": "Python Path.read_text converted CRLF to LF while building Git inline-content payload. Four CSV files retained identical values but did not match delivered byte hashes.",
+  "evidence": "For all four files, local CRLF-to-LF normalized Git blob hashes exactly equal observed remote hashes.",
+  "mismatches": [
+    {
+      "path": "B1/BENCHMARK_MATRIX.csv",
+      "local_sha1": "a582487a3a1928b6924c07926fdfc97ca48067e4",
+      "local_bytes": 13244,
+      "remote_sha1": "4a45498b48e1370370fdc5446fbf5c2bce62fb83",
+      "remote_bytes": 13230
+    },
+    {
+      "path": "B1/EXACT_SOURCE_CELLS.csv",
+      "local_sha1": "5903e71c447136bdcc7e0dd7851621d0cec6c67f",
+      "local_bytes": 757328,
+      "remote_sha1": "65aee5c76f1e9f70df4c016d1487415dd257292b",
+      "remote_bytes": 756196
+    },
+    {
+      "path": "BASS_HE_BENCHMARK_MATRIX.csv",
+      "local_sha1": "a582487a3a1928b6924c07926fdfc97ca48067e4",
+      "local_bytes": 13244,
+      "remote_sha1": "4a45498b48e1370370fdc5446fbf5c2bce62fb83",
+      "remote_bytes": 13230
+    },
+    {
+      "path": "BASS_HE_COUPLING_DATABASE.csv",
+      "local_sha1": "dd3432503958d720bdc0ddb6cef3e5cb076cc619",
+      "local_bytes": 582,
+      "remote_sha1": "15ba05d08f751b2b0461dbef897c16bf0adee484",
+      "remote_bytes": 578
+    }
+  ],
+  "repair": "Rebuild content via read_bytes().decode('utf-8'); publish complete corrected package in a new append-only namespace and add supersession marker. Preserve original commit and namespace. Non-force only.",
+  "scientific_values_changed": false,
+  "tests_rerun": false
+}

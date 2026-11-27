@@ -1,0 +1,31 @@
+name: BASS_HE REI F05 V2 native local HeII Lya H/He OTS feedback source
+on:
+  push:
+    branches:
+      - research/bass-he-f05-v2-local-ots-feedback-20261115
+    paths:
+      - research/rei_f05_v2_lya_local_reabsorption_20261115/**
+      - .github/workflows/bass-he-f05-v2-local-ots-feedback.yml
+  pull_request:
+    paths:
+      - research/rei_f05_v2_lya_local_reabsorption_20261115/**
+      - .github/workflows/bass-he-f05-v2-local-ots-feedback.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-free-92160-native-local-ots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify immutable derived local H/He OTS source and full independent audit
+        run: python3 research/rei_f05_v2_lya_local_reabsorption_20261115/verify_published_receipt.py
+      - name: Optimized Python still rejects false admission and invalid source data
+        run: python3 -O research/rei_f05_v2_lya_local_reabsorption_20261115/verify_published_receipt.py
+      - name: Source-free unit tests normal and optimized
+        run: |
+          python3 -m unittest discover -s research/rei_f05_v2_lya_local_reabsorption_20261115/tests -p 'test_*.py'
+          python3 -O -m unittest discover -s research/rei_f05_v2_lya_local_reabsorption_20261115/tests -p 'test_*.py'

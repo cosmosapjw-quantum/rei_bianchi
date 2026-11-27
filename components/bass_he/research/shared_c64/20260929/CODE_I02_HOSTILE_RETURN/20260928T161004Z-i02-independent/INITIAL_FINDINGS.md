@@ -1,0 +1,17 @@
+# Outcome-blind initial findings (Phase 1)
+
+Target: PR15 ac04d2a9e62120a0da4377ddf92451fde0c44431, tree 5697bfb7b2ceae5854499a8132b44e573672df85. This note was prepared from the target AGENTS.md and source modules only, before opening the hostile packet, its test, report, or evidence.
+
+## Source trace and domain
+
+- `spectral.py:31-55` constructs a binding from exact integral state labels and depth, excluding Python and NumPy booleans. It rejects floating point labels even when integral-valued. Complex endpoint coordinates and scalar policy parameters are represented by finite hexadecimal float components. The SHA256 at lines 59-61 covers this binding dictionary.
+- `find_exceptional_point` at `spectral.py:224-258` first solves a discriminant candidate, requires a simple fold, computes a two-state finite-CF membership comparison, requires `passed`, and then returns a dictionary carrying the certificate. The code itself explicitly limits this to finite-CF numerical membership, not all exact spectral branches.
+- `sturm_geometry.contour_geometry` at lines 18-20 checks `simple_fold` and calls `validate_pair_membership_certificate` before validating geometry inputs, building real anchors, or advancing sheets. Anchor labels are independently validated by `sturm_anchor.py:38-42,183-190`; that is downstream of the certificate gate.
+- `geometry.py:108-165` has JSON conversion and an immutable hash-checked cache. Hashing verifies stored payload integrity against its cache record; it does not independently certify a restored exceptional-point payload. A direct caller can also supply a dictionary to the contour consumer.
+
+## Independent findings
+
+1. **Important, high confidence: full external certificate is not fail-closed.** `validate_pair_membership_certificate` checks binding identity and a SHA over inputs/policy parameters, but not the measured `passed`, `max_scaled_matching_error`, `permutation`, distance matrix, local sheet gap, or probe values against a stored authenticated record or recomputation. It accepts any truthy `passed` value (`spectral.py:65-67`) and the max error gate uses only `float(value)>tolerance` (`:84-85`); a non-finite NaN comparison is false, as is a negative error. `sturm_geometry.py:18` similarly accepts truthy `simple_fold` without recomputing its numerical predicates. An externally supplied or restored dictionary can therefore retain a matching input binding while replacing numerical certificate claims. Ordinary constructor output has a stronger provenance assumption because it generated these fields immediately; that assumption does not extend to arbitrary payloads. Smallest repair direction: define and verify the full accepted certificate contract, including finite bounded diagnostics and provenance or recomputation, before the contour consumer.
+2. **No finding from source inspection on lossy integer repair.** The binding constructor refuses floats, strings, and booleans for state labels and depth (`spectral.py:31-55`); the validator reconstructs the expected binding from endpoint fields and compares it and its digest (`:73-83`). This supports exact identity checks for these fields under ordinary Python/NumPy scalar representations. It does not itself authenticate the unbound numerical observations above.
+
+These are source-derived claims. Official and hostile tests have not run at this seal point. No physical production or Eq55 claim follows.

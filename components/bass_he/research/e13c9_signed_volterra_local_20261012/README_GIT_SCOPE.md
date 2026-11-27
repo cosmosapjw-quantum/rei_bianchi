@@ -1,0 +1,13 @@
+# Scope of this Git projection
+
+This directory keeps the final E13C9 source, scientific contract, state, work plan, derivation, complete independent decision and review, final portable analysis, figures, execution comparisons, and receipts. Original selected files keep their names, relative directory structure, and exact bytes. Start with the original [README](README.md), [report](REPORT_KO.md), [independent decision](review/independent/INDEPENDENT_DECISION.json), and [reproduction guide](REPRODUCIBILITY.md).
+
+The [complete package manifest](PACKAGE_MANIFEST.json) is also preserved verbatim. It describes the **complete backup**, which includes additional payloads. Applying that full manifest's completeness check to this smaller Git directory will correctly report missing files.
+
+The [raw evidence index](RAW_EVIDENCE_INDEX.json) gives each omitted file's original path, byte length, SHA-256, exact archive member, reason for omission, and the sealed complete backup identity. Large `RESULT.json` files, manufactured `CONTROL_RESULTS.json`, and original dependency archives are preserved in that backup. Duplicate initial analysis, console output, and transport fixtures are also indexed there. References from copied comparison/receipt files to raw results should be resolved after restoring the complete package at those original relative paths.
+
+The original first association failure and its source snapshot remain in `evidence/FIRST_ASSOCIATION_FINDING`, with the original M32 comparison and completion receipt. Analysis portability changes, the targeted M256 amendment, transport repair provenance, and their receipts remain available. Omission of the bulky raw arrays from Git does not delete or replace any failed or superseded evidence.
+
+[GIT_PROJECTION_INDEX.json](GIT_PROJECTION_INDEX.json) records original and projected bytes/SHA-256 and the Git blob SHA-1 for every copied file. The index identifies its own digest exclusion explicitly; the detached projection build receipt and Git tree entry index bind the generated index itself. No source file was rewritten to adjust line endings, absolute provenance paths, JSON formatting, or links.
+
+For actual raw-result inspection and reproduction, recover the complete backup identified by filename, bytes, and SHA-256 in the raw evidence index. Its final handoff and delivery receipt identify the approved backup locations. The complete archive and inherited source are the execution input closure. This Git projection is the review-facing source and evidence selection. Creating it executes no science, launches no NCP work, and does not change the final scientific decision.

@@ -1,0 +1,90 @@
+{
+  "schema": "he34_scr.independent_scientific_review.v1",
+  "unit": "HE34-SCR",
+  "unit_path": "/tmp/he32_resume_20261022/repos/BASS_HE/research/he34_sandbox_certified_relaxation_20261022",
+  "recorded_utc": "2026-10-22T17:52:18.823114+00:00",
+  "workflow_version": "1.0.0",
+  "approval_version": "0.2",
+  "verdict": "pass_within_stated_scope",
+  "open_blockers": 0,
+  "reviewer_role": "Independent of theory/implementation authors and saved-background execution",
+  "author_files_modified_by_reviewer": 0,
+  "stages_in_review_order": [
+    {
+      "stage": "physics_and_primary_source_audit",
+      "status": "passed"
+    },
+    {
+      "stage": "mathematics_code_and_normalization_audit",
+      "status": "passed"
+    },
+    {
+      "stage": "saved_output_receipt_and_timing_readback",
+      "status": "passed"
+    },
+    {
+      "stage": "actual_image_and_plot_provenance_review",
+      "status": "passed"
+    }
+  ],
+  "findings": [
+    {
+      "id": "SCR-R1",
+      "severity": "medium",
+      "status": "resolved_before_first_saved_background_execution",
+      "evidence": "Initial driver did not gate the separately computed quadrature convergence and finite numerical budget; the solver continuum flag was correctly scoped.",
+      "fix": "Revised driver records and requires approximation availability, quadrature convergence, and finite estimate-plus-tail <= 1e-9, separately from continuum acceptance.",
+      "minimal_test": "Valid result accepted; nonconverged, unavailable, over-budget, and nonfinite results rejected.",
+      "verification": "CONTROL_GUARD_READBACK.json",
+      "fixed_source_sha256": "891f08aefadfb45929e3c8a6891f16e1983dead02e3016bb095fa5f954eff370"
+    },
+    {
+      "id": "SCR-R2",
+      "severity": "low",
+      "status": "resolved_before_first_saved_background_execution",
+      "evidence": "Initial benchmark always ran the reduced lane before the selected implicit lane.",
+      "fix": "Alternate execution order over five trials and preserve actual order and all raw times.",
+      "minimal_test": "Inspect alternating trial-order metadata and both timed branches in saved receipt.",
+      "verification": "MECHANICAL_OUTPUT_REVIEW.json",
+      "fixed_source_sha256": "891f08aefadfb45929e3c8a6891f16e1983dead02e3016bb095fa5f954eff370"
+    }
+  ],
+  "mechanical_decisions_at_fixed_1e_6": {
+    "chi_10": "reject",
+    "chi_100": "reject",
+    "chi_1000": "accept_continuum_bound",
+    "chi_10000": "accept_continuum_bound"
+  },
+  "qualifications": [
+    "Analytic continuum certification is distinct from binary64 evaluation, finite reference evidence, and quadrature estimates; outward-rounded arithmetic is not provided.",
+    "The mechanical source is the prescribed saved piecewise-linear signed shear; no self-consistent background or full cosmological IVP was solved.",
+    "Neutral H1/He4 viscosity uses the stated mass-number convention and common temperature; physical fit and kinetic truncation uncertainties are outside the mechanical certificate.",
+    "nu_match=p/eta is hydrodynamic matching and is not an exact transient Boltzmann relaxation eigenvalue or fluid-validity certificate.",
+    "Timing ratios are bounded host measurements with retained scatter; the selected implicit baseline is more accurate than the target and is not shown to be accuracy-optimized."
+  ],
+  "reviewer_execution_scope": {
+    "old_HE32_background_runs": 0,
+    "old_HE33_suite_runs": 0,
+    "new_full_cosmological_IVPs": 0,
+    "new_synthetic_reference_histories": 2,
+    "new_synthetic_reference_source_intervals": 6,
+    "new_figure_renders": 0,
+    "benchmark_reruns": 0
+  },
+  "review_artifacts_sha256": {
+    "PHYSICS_AND_CODE_REVIEW.md": "5e456ee1712b692dbaba08a8b61b3745d50dd3971322851c25bf7d2512d1c2e9",
+    "INDEPENDENT_CHECKS.json": "5a349452fe13d305d5fe253e735c094ba2b30541843409269ec44858947272c0",
+    "IMPLEMENTATION_CHECKS.json": "36eda0c0e7f30c8171a98074cf2dce42d7e56024a1476df83ca611f9049de32f",
+    "VARYING_SOURCE_CHECKS.json": "008e6325ffcd589b97138b7008d8712d38dbb31dd15a924fd52053b042265967",
+    "CONTROL_GUARD_READBACK.json": "0e1f44bba9aef817ba424cb23f0e948b6785ff4bd60c5aac0c7c8dc9a9b82183",
+    "TRANSPORT_OUTPUT_REVIEW.json": "cd43458b53dd1620763b85ff94b7f948c3d6d5fb5a9e55cf705dafb38180f45f",
+    "MECHANICAL_OUTPUT_REVIEW.json": "05c46edde03926156d193224dbe807a8f7a33026ceaaaaeed8ed8f9135052087",
+    "VISUAL_REVIEW.json": "b6eb07b726c92542c19d207048998a6c8865aab316a377ed7d305c80297d629a",
+    "REVIEWED_SOURCE_HASHES_INITIAL.json": "2fc9dd85e6538de76feff7b13935624f04427b3d1be733c0d4914db64a67f4b8",
+    "FINAL_SOURCE_HASHES.json": "40cff5bd5a7f789dc5f42064ff52b53fe188baaacf0bdeba2535186a5f6a20f2",
+    "independent_checks.py": "89cdf40afce85b1259632cf3cc3993481d8aab4fadfaf9e017daa415fa2f4626",
+    "implementation_checks.py": "c0aad8f3eec8b6492530714c3c280d9fed640529e4a76ecb3a6daf67c62e7789",
+    "varying_source_checks.py": "e9b56f3a881fd52c329df5da7ce2ce70148fbdfb5d3c6eee33babae79b4fc4ac",
+    "finalize_review.py": "4ec570fc56fcd016f6bcea722a1bdd091dc7ac505cd76d3359f0b086796902ce"
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "schema": "bass_he.ncp_c64g3_design.v1",
+  "artifact_kind": "DESIGN_TARGET_NOT_EXECUTABLE_RUNNER_CONFIG",
+  "status": "PROPOSED_NOT_DEPLOYED",
+  "source": {
+    "repository": "cosmosapjw-quantum/BASS_HE",
+    "correctness_branch": "audit10/dr11g-pair-membership",
+    "commit": "ac09160bae74f051e5e2e17d8a1cde4084576c16",
+    "tree": "43e6fb8a7bb88234031542de835fd1e2615974d5",
+    "parent": "85fcd7507bc9db0cdc06bf917b702d998abb43b3",
+    "default_branch_is_not_execution_baseline": true,
+    "accelerator_payload_status": "RECOVERY_REQUIRED_NOT_INCLUDED_IN_CORRECTNESS_COMMIT"
+  },
+  "target": {
+    "provider": "NAVER Cloud Platform",
+    "instance": "c64-g3",
+    "vcpus_advertised": 64,
+    "memory_advertised_GB": 128,
+    "hypervisor": "KVM",
+    "cpu_vendor_by_spec_code": "Intel",
+    "cpu_model": "MEASURE_ON_HOST",
+    "physical_core_count": "DO_NOT_INFER_FROM_VCPU",
+    "os_proposal": "Ubuntu 24.04 LTS, supported KVM image",
+    "proposed_boot_GB_range": [
+      50,
+      100
+    ],
+    "proposed_data_disk_GB": 200,
+    "proposed_data_volume": "CB2 SSD if available; otherwise evaluate CB1",
+    "filesystem": "ext4 on attached block storage"
+  },
+  "execution": {
+    "architecture": "single_controller_persistent_supervised_process_workers",
+    "start_method": "spawn",
+    "initial_worker_cap": 32,
+    "sweep_workers": [
+      1,
+      8,
+      16,
+      24,
+      32,
+      48,
+      56,
+      64
+    ],
+    "cap_by_affinity_cgroup_memory_and_ready_tasks": true,
+    "worker_selection": "smallest valid count within 95 percent of measured best throughput",
+    "calibration_repeats_minimum": 3,
+    "calibration_order": "randomized seeded",
+    "calibration_budget_seconds": 900,
+    "pilot_dispatch_budget_seconds": 3600,
+    "individual_numerical_call_budget_seconds": 120,
+    "timeout_grace_counted_in_cost": true,
+    "scientific_retry_default": 0,
+    "runtime_retry_default": 0,
+    "normal_completion_auto_restart": false,
+    "threads_per_worker": {
+      "OPENBLAS_NUM_THREADS": 1,
+      "OMP_NUM_THREADS": 1,
+      "MKL_NUM_THREADS": 1,
+      "NUMEXPR_NUM_THREADS": 1,
+      "NUMBA_NUM_THREADS": 1
+    },
+    "verify_actual_backend_per_worker": true
+  },
+  "memory": {
+    "effective_ram_source": "minimum of OS-visible RAM and effective cgroup limit",
+    "job_soft_fraction": 0.65,
+    "job_hard_fraction": 0.75,
+    "scope": "controller plus all workers and charged cache",
+    "rss_estimate_is_not_cloud_measurement": true
+  },
+  "dag": {
+    "barriers": [
+      "source_env",
+      "wrong_pair_rejection_and_Q12_control",
+      "seven_endpoints",
+      "D0_14_actions_and_gate",
+      "finite_rho_42_actions",
+      "deterministic_closeout",
+      "independent_re_review"
+    ],
+    "geometry_task_fields": [
+      "branch",
+      "rho",
+      "CF_depth",
+      "panel_count",
+      "backend",
+      "source_model_identity",
+      "endpoint_and_certificate_identity"
+    ],
+    "cf_depth": 160,
+    "rho_over_ReRc": [
+      0,
+      0.25,
+      0.5,
+      0.75
+    ],
+    "panels": [
+      32,
+      64
+    ],
+    "action_count": 56,
+    "same_contour_sequential": true,
+    "derive_32_panel_from_64_samples": false
+  },
+  "validation": {
+    "source_control_relative_tolerance": 0.0001,
+    "endpoint_reference_distance_max": 1e-08,
+    "pair_membership_policy": "inherit unchanged from pinned scientific source",
+    "panel_relative_tolerance_rho0": 0.0001,
+    "panel_relative_tolerance_finite_rho": 0.0005,
+    "complex_residual_max": 5e-09,
+    "normalized_sheet_gap_strict_min": 1e-06,
+    "backend_parity_tolerance": "recover original accelerator tests; if unavailable preregister before measurements",
+    "fresh_cloud_migration_replay_required_once": true,
+    "repeat_successful_cases_on_unchanged_resume": false
+  },
+  "persistence": {
+    "metadata": "SQLite local filesystem, controller single writer",
+    "events": "append-only JSONL",
+    "results": "immutable per-task payload with digest and semantic validation",
+    "commit_order": [
+      "attempt_unique_temporary_write",
+      "file_fsync",
+      "controller_validate",
+      "atomic_publication_on_same_filesystem",
+      "directory_fsync",
+      "database_committed"
+    ],
+    "resume": "validate final file before reusing; reconcile file/DB crashes",
+    "old_worker_epoch_results": "REJECT",
+    "cross_machine_result_cache": "imported evidence until scoped compatibility admission",
+    "jit_cache": "disposable per CPU/environment/source namespace",
+    "checkpoint_seconds": 900,
+    "object_storage_as_live_database": false
+  },
+  "permissions": {
+    "cloud_provisioning_performed": false,
+    "ssh_performed": false,
+    "paid_jobs_launched": false,
+    "remote_repository_mutation_performed": false,
+    "server_stop_or_delete_automatic": false
+  },
+  "gates": {
+    "correctness_candidate_independently_reapproved": false,
+    "PROMOTE": "HOLD_PENDING_RE_REVIEW",
+    "Eq55": "NOT_RUN",
+    "P_rot": "NOT_RUN",
+    "Eq50": "NOT_RUN",
+    "Eq54": "NOT_RUN",
+    "continuum_ionization": "NOT_ADMITTED"
+  }
+}

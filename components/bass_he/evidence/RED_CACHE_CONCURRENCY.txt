@@ -1,0 +1,26 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_parallel_cache_same_key_is_immutable ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_parallel_cache_same_key_i0')
+
+    def test_parallel_cache_same_key_is_immutable(tmp_path):
+        from concurrent.futures import ThreadPoolExecutor
+        import threading
+        mod=api();store=mod.EvidenceCache(tmp_path);barrier=threading.Barrier(8)
+        def writer(i):
+            barrier.wait()
+            try:
+                store.put({'source':'fixed'}, {'delta':i,'padding':'x'*200000})
+                return True
+            except ValueError:return False
+        with ThreadPoolExecutor(max_workers=8) as pool: result=list(pool.map(writer,range(8)))
+>       assert sum(result)==1
+E       assert 7 == 1
+E        +  where 7 = sum([True, True, True, True, False, True, ...])
+
+tests/test_geometry_pipeline.py:56: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_geometry_pipeline.py::test_parallel_cache_same_key_is_immutable - assert 7 == 1
+ +  where 7 = sum([True, True, True, True, False, True, ...])
+1 failed in 0.17s

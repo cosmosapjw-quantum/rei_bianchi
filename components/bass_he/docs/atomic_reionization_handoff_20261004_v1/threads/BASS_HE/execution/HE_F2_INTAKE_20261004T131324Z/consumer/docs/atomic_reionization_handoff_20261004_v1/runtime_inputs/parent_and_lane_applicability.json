@@ -1,0 +1,59 @@
+{
+  "schema": "rei.parent-lane-applicability.v1",
+  "task_id": "REI-F00",
+  "model_id": "R1HomogeneousSuccessor_SYNTHETIC_HHE_3GROUP_V1",
+  "selected": "R1HomogeneousSuccessor",
+  "independent_state_dimension": 7,
+  "state_coordinates": [
+    "x_HII",
+    "x_HeII",
+    "x_HeIII",
+    "u_th_erg_cm3",
+    "N0_proper_cm3",
+    "N1_proper_cm3",
+    "N2_proper_cm3"
+  ],
+  "derived": [
+    "x_HI=1-x_HII",
+    "x_HeI=1-x_HeII-x_HeIII",
+    "n_e=n_H*x_HII+n_He*(x_HeII+2*x_HeIII)",
+    "T=2*u_th/(3*k_B*(n_H+n_He+n_e))"
+  ],
+  "fixed_parameters": [
+    "n_H_cm3",
+    "n_He_cm3",
+    "fixture constants and coefficients"
+  ],
+  "spatial_cells": 1,
+  "angular_distribution": "ISOTROPIC_SINGLE_HOMOGENEOUS_CELL",
+  "applicable_lanes": [
+    "CONTROLLED_STATIC_ISOTROPIC"
+  ],
+  "inherited_node_history": {
+    "node_count": 46080,
+    "shape_lanes": 3,
+    "applies_to_selected_model": false,
+    "gates_closed_by_successor": false
+  },
+  "source_sites": {
+    "future_implicit_map": [
+      "population_t0",
+      "population_t1_predictor",
+      "thermal_tgamma",
+      "thermal_t1_final"
+    ],
+    "independent_site_values_tied": false,
+    "parent_rule": "Union of actual full/half1/half2 coordinates; share only mathematically identical dependencies; unused coefficient zero.",
+    "actual_solver_binding": "NOT_IMPLEMENTED_F03_F04",
+    "uniform_remainder_certified": false
+  },
+  "strict_gates": {
+    "local_error_less_than": 0.0002,
+    "public_width_less_than": 0.002,
+    "positivity": true,
+    "structural_ledgers": true,
+    "table_event_restart": true,
+    "rejected_candidate_commits": 0
+  },
+  "claim_ceiling": "Design only; no physical interval or historical gate admission"
+}

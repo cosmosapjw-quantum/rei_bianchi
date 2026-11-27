@@ -1,0 +1,56 @@
+--- a/src/wu088_hh/hardware.py
++++ b/src/wu088_hh/hardware.py
+@@ -63,9 +63,23 @@
+ 
+ def inspect_host(*, requested_workers: int=12,kernel_threads: int=1,use_smt: bool=False) -> dict:
+     allowed=set(os.sched_getaffinity(0)); topology={}
++    # Sandboxed Linux may expose package/core IDs through /proc but mask sysfs.
++    # Use only reported IDs, preserving the same (package, core) tuple semantics.
++    cpuinfo=Path('/proc/cpuinfo').read_text()
++    proc_topology={}
++    for stanza in cpuinfo.strip().split('\n\n'):
++        fields={k.strip():v.strip() for k,v in
++                (line.split(':',1) for line in stanza.splitlines() if ':' in line)}
++        if {'processor','physical id','core id'} <= fields.keys():
++            proc_topology[int(fields['processor'])]=(int(fields['physical id']),int(fields['core id']))
+     for cpu in sorted(allowed):
+         base=Path(f'/sys/devices/system/cpu/cpu{cpu}/topology')
+-        topology[cpu]=(int((base/'physical_package_id').read_text()),int((base/'core_id').read_text()))
++        try:
++            topology[cpu]=(int((base/'physical_package_id').read_text()),int((base/'core_id').read_text()))
++        except FileNotFoundError:
++            if cpu not in proc_topology:
++                raise ValueError(f'No reported package/core topology for allowed CPU {cpu}')
++            topology[cpu]=proc_topology[cpu]
+     quota,sources=read_cpu_quota()
+     r=select_resources(topology,allowed,quota,requested_workers=requested_workers,
+                        kernel_threads=kernel_threads,use_smt=use_smt)
+@@ -77,7 +91,6 @@
+     for key in ('memory.max','memory.current'):
+         f=Path('/sys/fs/cgroup')/key
+         if f.exists(): mem['cgroup_'+key]=f.read_text().strip()
+-    cpuinfo=Path('/proc/cpuinfo').read_text()
+     model=next((x.split(':',1)[1].strip() for x in cpuinfo.splitlines() if x.startswith('model name')),'unknown')
+     meta=read_linux_cpu_metadata(Path('/sys/devices/system/cpu'),allowed)
+     r.update(cpu_model=model,platform=platform.platform(),quota_sources=sources,memory=mem,
+@@ -108,7 +121,7 @@
+         if l3_by_cpu is None:
+             l3=('NO_L3',core[0])
+         else:
+-            vals={l3_by_cpu[c] for c in chosen}
++            vals={l3_by_cpu.get(c,('NO_L3',core[0])) for c in chosen}
+             if len(vals)!=1:
+                 raise ValueError('physical core spans multiple L3 groups')
+             l3=next(iter(vals))
+@@ -175,9 +188,8 @@
+                         found=','.join(str(x) for x in vals);break
+                 except OSError:
+                     continue
+-        if found is None:
+-            found=f'cpu{cpu}'
+-        l3_by_cpu[cpu]=found
++        if found is not None:
++            l3_by_cpu[cpu]=found
+     unique={tuple(_parse_cpu_list(v)) for v in l3_by_cpu.values()}
+     return dict(thread_siblings=siblings,l3_by_cpu=l3_by_cpu,l3_groups=[list(x) for x in sorted(unique)])
+ 

@@ -1,0 +1,29 @@
+(* PHYS49 actual Dirichlet collar [20,27] infinite angular-sector source. *)
+ClearAll["Global`*"];
+bb49=20; tt49=27; rr49=7/10; kap49=7/10;
+bar49[r_,ell_]:=ell(ell+1)/r^2-2/r-kap49^2;
+bmin49=FullSimplify[bar49[tt49,21]];
+lmin49=FullSimplify[9/(tt49-bb49)^2+bmin49];
+der49=FullSimplify[D[bar49[x,ell],x]-2(x-ell(ell+1))/x^3];
+u49[x_]:=Sin[Pi(x-bb49)/(tt49-bb49)];
+modeNorm49=FullSimplify[
+ Integrate[D[u49[x],x]^2,{x,bb49,tt49}]/
+ Integrate[u49[x]^2,{x,bb49,tt49}]];
+Print["PHYS49_EXACT_BARRIER_AND_POI=",{bmin49,lmin49,der49,FullSimplify[modeNorm49-Pi^2/49]}];
+If[!TrueQ[{bmin49,lmin49,der49,FullSimplify[modeNorm49-Pi^2/49]}==={1693/24300,301657/1190700,0,0}],Quit[2]];
+smax49=(1+1/(bb49-rr49))Exp[-2(bb49-rr49)];
+delta49=2smax49;
+q49=delta49/lmin49;
+alpha49=delta49/(lmin49-delta49);
+shift49=814075000000000/103221346017681;
+eps49=4(1+1/(bb49-shift49))Exp[-2(bb49-shift49)]/(17*18^20);
+lt49=9/(tt49-bb49)^2+bar49[tt49,41];
+tail49=FullSimplify[(eps49+delta49*alpha49)/(lt49-delta49)];
+vals49=N[{delta49,q49,alpha49,eps49,tail49},46];
+Print["PHYS49_INDEPENDENT_SCREENED_MATH_VALUES=",vals49];
+gate49=And@@{TrueQ[0<delta49<lmin49],TrueQ[q49<1/10^12],
+             TrueQ[0<tail49<3/10^33],TrueQ[0<eps49<7/10^37]};
+Print["PHYS49_INFINITE_HIGH_SCHUR_GATES=",gate49];
+If[!gate49,Quit[3]];
+Print["PHYS49_LOCAL_WOLFRAM_PASS=True"];
+Quit[];

@@ -1,0 +1,11 @@
+#pragma once
+#include "assembly.hpp"
+// SYNTHETIC ZERO PRIMITIVE FIXTURE. No HH integral/coverage receipt.
+#define WU088_PRIMITIVE_COVERAGE_SHA256 "3df2eb4f15bc0728d89dfb025ab62ad39c621459db849fd18d6ea0eeba03f84d"
+#define WU088_PRIMITIVE_EXECUTION_SHA256 "fb1e5d46bb099a074636c0d01e1c457a85cbeb7e11aa41be393e0538b6cb305f"
+#define WU088_PRIMITIVE_ARCHIVE_SHA256 "8482d2854ab620c58bb1d7a7a45cf88eb71fd75081242263a9ef48927f0a282c"
+#define WU088_PRIMITIVE_RECORD_SHA256 "2439151399b049bb83597eb9a80ea7ea0c2922c4a8b9a3c8e0b0f2ba22efee18"
+#define WU088_ASSEMBLER_SOURCE_SHA256 "a6ca3e7bab454f3db247346f9787b5b408930bbe0e48e2f81930dc2a6a31d8f7"
+inline void load_real_domain_primitives(wu088::RealDomainPrimitiveIntegrals& raw,slong) {
+ for(auto& cell:raw.unnormalized_real_domain_integrals) acb_zero(cell.value);
+}

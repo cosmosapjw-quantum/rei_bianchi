@@ -1,0 +1,31 @@
+{
+  "fixes": [
+    {
+      "type": "environment",
+      "issue": "apt default dropped-user/cache mapping unavailable",
+      "resolution": "official packages downloaded and extracted inside scratch; system package installation not completed; Fortran13.3/OpenMPI4.1.6 actual execution works"
+    },
+    {
+      "type": "implementation",
+      "issue": "launcher version guard omitted standard OpenRTE label from OpenMPI4.1.6",
+      "evidence": "evidence/MPI_VERSION_PREFLIGHT_FAILURE.txt",
+      "before_any_MPI_physical_tasks": true,
+      "resolution": "accept historical OpenRTE label; actual linked MPI runtime still independently checked"
+    },
+    {
+      "type": "runtime_environment",
+      "issue": "OpenMPI hwloc_set_cpubind fails in restricted execution host before target application launch",
+      "evidence": "evidence/MPI_BINDING_ENVIRONMENT_FAILURE.txt",
+      "resolution": "strict NCP binding launcher unchanged; local MPI functional comparison uses explicit --bind-to none",
+      "binding_verified": false,
+      "not_claimed": "NCP64 execution or bound-core throughput"
+    },
+    {
+      "type": "implementation",
+      "issue": "OpenMPI4 host localhost without slots declares only1 slot; 3 ranks fail before application",
+      "evidence": "evidence/MPI_SLOT_DECLARATION_FAILURE.txt",
+      "resolution": "explicit localhost:ranks*threads after host resource check; no oversubscription enabled",
+      "verification": "existing serial4-task output reused because only launcher host-slot spelling changed; exact worker/scheduler/solver/native unchanged verified; no additional serial science rerun"
+    }
+  ]
+}

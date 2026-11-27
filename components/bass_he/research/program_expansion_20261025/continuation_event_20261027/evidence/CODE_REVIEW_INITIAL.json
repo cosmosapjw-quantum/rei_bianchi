@@ -1,0 +1,83 @@
+{
+  "schema": "HE_EVENT03_INDEPENDENT_CODE_REVIEW_V1",
+  "unit_id": "HE-EXP-EVENT-03",
+  "reviewer": "/root/backup_preflight",
+  "decision": "PASS_SCOPED_PRE_EXECUTION",
+  "recorded_utc": "2026-10-27T08:29:01.609707+00:00",
+  "decision_timing": "The pre-execution decision and reviewed hashes were communicated before the first bounded run; this file persists that conversation decision after the run and does not invent a pre-run file timestamp.",
+  "review_base_local_HEAD": "59ec5d0709b075ab585c1d1af42c62a3a56bd944",
+  "AGENTS_sha256": "32d09d1e6262e1eb3579de1a66e325afd2ba181a8de69313d907b6fb1e8aebfb",
+  "scope": "Static independent review of conditional nonrelativistic 2-to-2 number/energy/momentum/stress algebra, single internal-energy ownership and prepared new validation; not an execution PASS.",
+  "reviewed_sha256": {
+    "src/reactive_event.py": "89bbcb99cb1487b7e3c132ab6b6d6d0093fbeed2479b112078f6c94f81542ce7",
+    "tests/test_reactive_event.py": "03ca6cf1543aeec917e535a324780a85cb751281c268c9a716baf75c6a7d9189",
+    "THEORY_KO.md": "72d4574ae3ccfcfa6f307b50303da12ba9f3ebdbf43a55fe74d370116b6dea69",
+    "MODEL_CONTRACT.json": "3aa75f7ea8e88694f6e14003494b9636ec1b955d3abf79cb9227776db112cf02",
+    "VALIDATION_CONTRACT.json": "3b3f11dba1e565015bfb57f47f12641bbab409d26fa60067ab2d74242b95cd57",
+    "run_validation.py": "b4f2e37711a62b13762fb0ff3ede729d264f11bf4d7755190e89f40196ba58de"
+  },
+  "reused_exchange_sha256": "533c49838d03572b106168cd9333a20e1b4a7d06f88d5f3727f8b80c5b96f262",
+  "review_points": [
+    "Fixed compositional total inertial mass and explicit nonrelativistic state-energy assumptions are stated; observed mass-sum roundoff residual is retained.",
+    "Number, mass, momentum, kinetic energy and raw second moments are formed from the same four event legs, then aggregated by exact species/state ID.",
+    "Axisymmetric full-CM angular moments L1=sigma0-sigma1 and N=(sigma2/3)I+(sigma0-sigma2)ee^T give the declared product momentum, energy and stress; trace(S)=2K.",
+    "Raw source centering includes +0.5*m*u^2*Gamma and its Galilean mass-source terms.",
+    "The flux is explicit; there is no automatic event rate, identical-pair factor, thermal-pool assignment or instantaneous thermalization.",
+    "Internal state energy has one population-derived witness owner and no independent duplicate internal-energy RHS.",
+    "Prepared controls use independently accumulated finite cosine/azimuth event velocities, an unchanged elastic reference at new synthetic inputs, exact hand-checkable control, threshold and closed branch, finite mass partition, rotations, product relabelling and domain/ownership rejection.",
+    "The inherited runner implementation is hash checked and directed to the new unit ROOT/OUT and fresh bounded allocation; old suites and allocations are not replayed or transferred."
+  ],
+  "findings": [
+    {
+      "id": "EVENT03-REVIEW-01",
+      "finding": "Zero-flux short circuit could conceal a nonfinite or bool population internal-energy witness on a replaced event object.",
+      "disposition": "FIXED_BEFORE_FIRST_SCIENTIFIC_START",
+      "correction": "Validate population_internal_witness_j_m2 with finite() before flux products, then use the validated value.",
+      "regression": "test_explicit_flux_no_default_zero_and_finite_guards: zero flux with NaN, infinity and bool witness",
+      "reviewer_executions": 0,
+      "execution_repair_reserve_consumed": false
+    }
+  ],
+  "remaining_blocking_findings": 0,
+  "independent_hand_control": {
+    "inputs": "m=(1,3,2,2), va=(4,0,0), vb=(0,0,0), eps=(2,0,0,0), angular=(1,0.75,1), flux=1, u=(1,0,0)",
+    "Ein": 6,
+    "Eout": 8,
+    "Delta": -2,
+    "expected_stored_output": {
+      "Gamma_m3_s": {
+        "a": -1.0,
+        "b": -1.0,
+        "c": 1.0,
+        "d": 1.0
+      },
+      "centered_heat_w_m3": {
+        "a": -4.5,
+        "b": -1.5,
+        "c": 4.0,
+        "d": 4.0
+      },
+      "kinetic_j_m2": {
+        "a": -8.0,
+        "b": 0.0,
+        "c": 6.0,
+        "d": 4.0
+      },
+      "momentum_x_kg_m3_s": {
+        "a": -4.0,
+        "b": 0.0,
+        "c": 3.0,
+        "d": 1.0
+      },
+      "physical_admitted": false,
+      "population_internal_witness_w_m3": -2.0,
+      "scope": "synthetic exact reactive sanity control"
+    }
+  },
+  "reviewer_scientific_execution_count": 0,
+  "reviewer_test_execution_count": 0,
+  "historical_suite_replay_count": 0,
+  "science_code_edits_by_reviewer": 0,
+  "physical_provider_admitted": false,
+  "condition_for_final_decision": "Read actual START, FINISH and raw stdout/stderr and compare every reviewed dependency identity without rerunning science."
+}

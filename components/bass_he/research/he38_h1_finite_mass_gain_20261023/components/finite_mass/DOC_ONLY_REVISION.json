@@ -1,0 +1,40 @@
+{
+  "schema": "he38.doc_only_revision.v1",
+  "timestamp_utc": "2026-10-23T04:09:46.446182+00:00",
+  "reason": "independent reviewer tiny-STF probe: wrapper direct J preserved while legacy nested donor trace projection can round to zero",
+  "authority_fields": [
+    "H1FiniteMassSource.J",
+    "H1FiniteMassSource.species.total_J_Pa_s"
+  ],
+  "audit_field": "H1FiniteMassSource.event_tensor_source; nested J is legacy HE36 trace projection",
+  "changed_files": [
+    {
+      "path": "README_KO.md",
+      "before_sha256": "171aa9709e13190faa5e258d1699ef093705a00e4fa78691ffa6dfcb40bd621c",
+      "after_sha256": "e3988a89e500ed954f45214873401e503ba286a5679d42aded0075c5ff4982f6",
+      "unified_diff": "--- before/README_KO.md\n+++ after/README_KO.md\n@@ -31,6 +31,8 @@\n \n `physical_abundance_jacobian_s`는 고정T,nb에서 ne(Yp)를 미분한다. Pure-H normalized manifold에서는 dYH+dYp=0 방향만 사용할 수 있다. `frozen_ne_abundance_jacobian_s` 및 `event_row_frozen_ne['jacobian']`는 unary donor의 고정ne Jacobian이다. Temperature와 STF derivative는 이 Jacobian에 포함되지 않는다.\n \n+**과학적 STF 출력의 기준 필드는 wrapper `J` 또는 `species.total_J_Pa_s`다.** `event_tensor_source`는 변경하지 않은 donor의 audit snapshot을 보존한다. 그 안의 `event_tensor_source.J`는 기존 HE36의 trace subtraction으로 얻은 값이므로, isotropic 부분보다 매우 작은 STF가 roundoff로0이 될 수 있다. STF를 사용하는 계산·검증·그림은 wrapper의 direct `J` 또는 `species.total_J_Pa_s`를 읽어야 한다. Nested donor output은 rate/energy/tensor 연결과 기존 projection roundoff를 확인하는 audit 자료로 유지한다.\n+\n `species.total_Q_W_m3`, wrapper `Q`, donor reservoir `dEth`는 같은 물리량의 표현이다. 합하여 두 번 가산하면 안 된다. 직접 식과 donor 로그 rate 사이의 binary64 roundoff를 비교하여 일치 gate를 검사한다. Scalar heat를 STF projection에서 재구성하지 않으며 tinySTF는 direct `J`를 사용한다. Common retained thermal pool이라는 명시적 조건에서만 reaction dotT를 제공한다.\n \n ## 보존과 입력 계약\n"
+    },
+    {
+      "path": "h1_finite_mass/bridge.py",
+      "before_sha256": "cd60fe2ae2b622e01d9aa3f7b9f55f8c7927cb8e5f24311c352e7b94f9f68167",
+      "after_sha256": "26318415ed6b018675c17e3d33ea9bb6e39658b96f70399a1fce78297eae807e",
+      "unified_diff": "--- before/h1_finite_mass/bridge.py\n+++ after/h1_finite_mass/bridge.py\n@@ -44,6 +44,14 @@\n \n @dataclass(frozen=True,slots=True)\n class H1FiniteMassSource:\n+    \"\"\"Immutable physical result plus an unchanged donor audit snapshot.\n+\n+    ``J`` and ``species.total_J_Pa_s`` are the authoritative scientific STF\n+    fields, evaluated directly without subtracting an isotropic trace.\n+    ``event_tensor_source`` retains the donor audit output. Its nested ``J``\n+    uses the legacy HE36 trace projection and may round a tiny STF to zero;\n+    scientific STF consumers must use the wrapper/direct species fields.\n+    \"\"\"\n     species: SpeciesSources\n     Y21: np.ndarray\n     nb_m3: float\n@@ -56,7 +64,7 @@\n     physical_rate_gradient_s: np.ndarray\n     frozen_ne_abundance_jacobian_s: np.ndarray\n     event_row_frozen_ne: Mapping|None\n-    event_tensor_source: object|None\n+    event_tensor_source: object|None  # donor audit; nested J is legacy trace projection\n     reservoir_sources_W_m3: Mapping\n     thermal_particle_density_m3: float\n     dot_T_reaction_K_s: float|None\n"
+    }
+  ],
+  "prior_controls": {
+    "path": "attempts/attempt_20261023T035118251745Z",
+    "status": "PASS",
+    "bridge_source_sha256_at_run": "cd60fe2ae2b622e01d9aa3f7b9f55f8c7927cb8e5f24311c352e7b94f9f68167",
+    "model_source_sha256_at_run": "9aacb807baa43e1fb6d3ae4dc28d0d19400142b7f46288a7cc80459ba3022353",
+    "result_sha256": "879ebf9103e930ddddc8116c5dfba61257b9f4c48e4a07e11b23b6861910de93"
+  },
+  "static_verification": {
+    "bridge_AST_equal_after_docstring_removal": true,
+    "model_bytes_equal_control_input": true,
+    "all_six_donor_files_unchanged": true
+  },
+  "numerical_semantics_changed": false,
+  "new_science_executions": 0,
+  "test_replays": 0,
+  "donor_modifications": 0
+}

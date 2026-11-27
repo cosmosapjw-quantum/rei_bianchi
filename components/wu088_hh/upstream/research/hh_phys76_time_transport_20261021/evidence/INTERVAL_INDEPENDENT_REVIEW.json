@@ -1,0 +1,83 @@
+{
+  "verdict": "PASS_SCOPED",
+  "basis": "independent proof audit plus exact switched-coefficient, switched-signed-source one-cell control",
+  "new_ode_integrations": 0,
+  "new_benchmarks": 0,
+  "checks": [
+    {
+      "name": "initial_memory",
+      "interval": [
+        "-3.46712269707658036255800044949677497948912178648965475351012",
+        "-0.0635025673025887523626205540557840268032460199405816085861212"
+      ],
+      "reference160": "-0.7736196426529533373681954785431726677571830363162631031550043026086775767233580120924003232795240575430419843397808711753076143001721050914048232098302153638261",
+      "contained": true
+    },
+    {
+      "name": "matter_memory",
+      "interval": [
+        "-7.90606484879022960730857271284792851282606224711329929574320",
+        "1.97651621219755740182714317821198212820651556177832482393580"
+      ],
+      "reference160": "-1.199392403250296729817658586904450023392922095857740491341912164866214737211370690380416240747235198326802455210022649587943571132178839867603860943060980660886",
+      "contained": true
+    },
+    {
+      "name": "radiation_memory",
+      "interval": [
+        "-1.97651621219755740182714317821198212820651556177832482393580",
+        "3.95303242439511480365428635642396425641303112355664964787160"
+      ],
+      "reference160": "0.5007911449152482168894050000598293430020782772905999402953375238346794882340791367499951600930438100573044061810893087424081753957778516874429224371758823683046",
+      "contained": true
+    },
+    {
+      "name": "total_signed_shear",
+      "interval": [
+        "-13.3497037580643673716937163405566856205216995953812788731892",
+        "5.86604606929008345311880898058016235781630066539439286322128"
+      ],
+      "reference160": "-1.472220900988001850296449065387793348148026854883403654201578943640212825700649565722821403933715445812540033368714212020843010036573093271565761715715313656407",
+      "contained": true
+    }
+  ],
+  "claim": "conditional on independently valid whole-cell enclosures; no real-trajectory input witness verified",
+  "final_source_sha256": "c8b21a2dfdb7ec5810710d2fda6d98922656ecf6d6ae86c82632caab3e227ce6",
+  "original_control_source_sha256": "17af1f08742309ea829bb12290895a95b083b333a57de200525a8d21e4d49fca",
+  "finding": {
+    "id": "PHYS76_INTERVAL_NEXT_MINUS_SUBNORMAL",
+    "severity": "P2",
+    "category": "IMPLEMENTATION_CONTRACT",
+    "status": "CLOSED",
+    "target": "interval_transport.py:_Arithmetic.exp",
+    "claim": "Underflow/subnormal operations fail closed through traps",
+    "observation": "next_minus quietly constructs a subnormal lower endpoint at Emin boundary",
+    "reproducer": "with localcontext() as c: c.prec=160; x=-(Decimal(10).ln()*Decimal(999999)); a=_Arithmetic(60); r=a.exp(_Interval(x,x)); r.lo.is_subnormal(context=a.down)",
+    "actual": {
+      "returned_lower": "9.9999999999999999999999999999999999999999999999999999999999E-1000000",
+      "returned_upper": "1.00000000000000000000000000000000000000000000000000000000001E-999999",
+      "lower_is_subnormal": true,
+      "raised": false
+    },
+    "impact": "Outward inclusion remains valid; stated rejection of subnormal arithmetic is incomplete",
+    "minimal_fix": "Explicitly reject subnormal exp endpoints after next_minus/next_plus, or narrow documented arithmetic domain policy; add boundary control",
+    "source_sha256": "17af1f08742309ea829bb12290895a95b083b333a57de200525a8d21e4d49fca",
+    "resolution": {
+      "action": "Explicit endpoint is_subnormal check added in exp",
+      "verification": {
+        "type": "ArithmeticError",
+        "message": "EXP_ENCLOSURE_OUTSIDE_REPRESENTABLE_RANGE"
+      },
+      "source_sha256": "c8b21a2dfdb7ec5810710d2fda6d98922656ecf6d6ae86c82632caab3e227ce6"
+    }
+  },
+  "proof_review": [
+    "Variation-of-constants kernel is positive for all real bounded A",
+    "Response Phi decreases in A and has h limit at A=0",
+    "Positive kernel weighted mean bounds signed species forcing; ordinary signed interval products remain valid",
+    "phi1 geometric-tail indexing and directed rounding denominator are valid",
+    "Nearest correctly rounded Decimal.exp plus adjacent representable numbers encloses exp; explicit subnormal rejection now enforces stated arithmetic policy"
+  ],
+  "remaining_obligation": "Independent physical whole-cell input enclosure producer; raw samples do not satisfy that premise",
+  "reviewer": "protocol_audit independent of implementation author"
+}

@@ -1,0 +1,135 @@
+{
+  "schema": "HE_PHOTON05_LOCAL_DAG_V1",
+  "unit_id": "HE-EXP-PHOTON-05",
+  "scope": "Local conditional product DAG; neither a global completion fraction nor promotion of WU nuclear owner.",
+  "nodes": [
+    {
+      "id": "PHOTON05-SOURCE",
+      "status": "COMPLETE_SCOPED_SOURCE_ONLY",
+      "artifact": "sources/SOURCE_MANIFEST.json",
+      "claim": "NIST bare nuclear rest-energy inputs and 12 reused EXFOR native energy/angle coordinates, with unchanged DCS and statistical errors.",
+      "dependencies": []
+    },
+    {
+      "id": "PHOTON05-RELATIVISTIC-RECOIL",
+      "status": "COMPLETE_SCOPED_CONDITIONAL",
+      "artifact": "src/photon_dd.py",
+      "claim": "Exact conditional photon plus stationary target to identical finite-mass daughters; threshold recoil and event four-vectors.",
+      "dependencies": [
+        "PHOTON05-SOURCE"
+      ]
+    },
+    {
+      "id": "PHOTON05-STRESS",
+      "status": "COMPLETE_SCOPED_CONDITIONAL",
+      "artifact": "src/photon_dd.py",
+      "claim": "Selected lab equal-time q_i q_j/E stress weights, photon loss and both daughter contributions; no angular integration.",
+      "dependencies": [
+        "PHOTON05-RELATIVISTIC-RECOIL"
+      ]
+    },
+    {
+      "id": "PHOTON05-OWNERSHIP",
+      "status": "COMPLETE_SCOPED_CONDITIONAL",
+      "artifact": "MODEL_CONTRACT.json",
+      "claim": "Single population-rest binding owner, separately recorded photon/kinetic energy and material count +1; thermal ports unassigned.",
+      "dependencies": [
+        "PHOTON05-RELATIVISTIC-RECOIL"
+      ]
+    },
+    {
+      "id": "PHOTON05-VALIDATED-REFERENCE",
+      "status": "PARTIAL_PLOT_RESOURCE_GATE_FAILED",
+      "artifact": "review/RESULT_REVIEW.json",
+      "claim": "24 bounded numerical tests PASS and conditional reference accepted; generated figure read by root, but plot CPU4.40726504s exceeds4s cap. Preserved FAIL with no replay.",
+      "dependencies": [
+        "PHOTON05-SOURCE",
+        "PHOTON05-RELATIVISTIC-RECOIL",
+        "PHOTON05-STRESS",
+        "PHOTON05-OWNERSHIP"
+      ]
+    },
+    {
+      "id": "PHOTON05-EXPERIMENT-GLOBAL-BINDING",
+      "status": "OPEN_PHYSICAL_INPUT",
+      "artifact": null,
+      "claim": "Global species identities and liquid-He electronic/target-motion projection, beam response, acceptance, polarization and identical-daughter particle/event normalization.",
+      "dependencies": [
+        "PHOTON05-SOURCE"
+      ]
+    },
+    {
+      "id": "PHOTON05-FULL-DIFFERENTIAL-FLUX",
+      "status": "OPEN_PHYSICAL_INPUT",
+      "artifact": null,
+      "claim": "Complete differential angular law and photon encounter distribution, with actual event flux and physical covariance.",
+      "dependencies": [
+        "PHOTON05-EXPERIMENT-GLOBAL-BINDING"
+      ]
+    },
+    {
+      "id": "PHOTON05-NAMED-DEPOSITION",
+      "status": "OPEN_NAMED_CONSUMER",
+      "artifact": null,
+      "claim": "Named birth-pool and nonthermal slowing/deposition consumer connecting resolved daughter sources to thermal count, Cv and heating.",
+      "dependencies": [
+        "PHOTON05-FULL-DIFFERENTIAL-FLUX",
+        "PHOTON05-OWNERSHIP",
+        "PHOTON05-STRESS"
+      ]
+    }
+  ],
+  "preceding_scoped_unit": {
+    "unit_id": "HE-EXP-STATE-04",
+    "source": "2addfab8c8975febd69d2c88eecc09afea508fbe",
+    "delivery": "30924d902187777fbff02687639c91d65cf53191",
+    "scoped_products_complete": 5,
+    "physical_dependencies_open": 3,
+    "unchanged": true
+  },
+  "global_physical_completion": null,
+  "L4_ready": false,
+  "physical_provider_admitted": false,
+  "activation": false,
+  "production": "NOT_APPROVED",
+  "protected": {
+    "HE101_C8": "PARTIAL_EXPORT",
+    "HE101_delivery": "19/20",
+    "HE101_reserve": 0,
+    "historical_scientific_replays": 0
+  },
+  "accounting": {
+    "complete_scoped_nodes": 4,
+    "partial_validation_node": 1,
+    "open_physical_inputs": 3,
+    "total_nodes": 8,
+    "no_global_fraction": true
+  },
+  "plot_resource_gate": {
+    "status": "FAIL_CPU_CAP_EXCEEDED",
+    "cpu_s": 4.4072650399999995,
+    "cap_s": 4,
+    "rerenders": 0,
+    "cap_reset_or_transfer": false
+  },
+  "delivery_overlay": {
+    "source_commit": "251c6baa6c3359b1d6997dbce51cea65500b53d6",
+    "source_tree": "80c880cc3881e1e539156d8e077d443f7bd945a5",
+    "source_archive_dual_backup": "PASS_UPLOAD_ACK_AND_METADATA_ID_SIZE",
+    "source_archive_receipt": "delivery/SOURCE_ARCHIVE_RECEIPT.json",
+    "source_backup_receipt": "delivery/BACKUP_ACK.json",
+    "remote_full_download_sha256_verified": false,
+    "central_candidate": "APPROVED_LOCAL_METADATA_DELTA_ONLY",
+    "central_expected_base": "1a38f94fa50c763bb9df6ccc8ba569f287fe97d5",
+    "central_review": "delivery/central/INDEPENDENT_REVIEW.json",
+    "central_review_sha256": "628dca1183886e548851c01b1b0cd2a29dfdf63abf5acd6f90fc4b726038f6a1",
+    "source_published": false,
+    "central_published": false,
+    "source_publication": "BLOCKED_AT_CREATE_TREE",
+    "plot_resource_failure": "PRESERVED_FAIL_CPU_CAP_EXCEEDED",
+    "workflow": "PARTIAL",
+    "tail_finalization": "Final D05 commit identity, source-to-D05 ZIP/bundle and dual backup ACKs are recorded in external BASS_HE_PHOTON05_CLOSEOUT_20261027.json after D05 exists.",
+    "tail_archive_or_backup_pre_certified": false,
+    "publication_block": "delivery/PUBLICATION_BLOCK.json"
+  }
+}

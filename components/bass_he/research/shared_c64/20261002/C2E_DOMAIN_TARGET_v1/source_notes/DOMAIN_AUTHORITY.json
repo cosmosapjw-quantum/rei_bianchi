@@ -1,0 +1,203 @@
+{
+  "schema": "bass_he.c2e.domain_authority.v1",
+  "node": "C2E_COLLISION_DOMAIN_AND_SPECTRAL_TARGET_CONTRACT",
+  "status": "SOURCE_DOMAIN_AUTHORITY_RECOVERED_WITH_EXPLICIT_UNSPECIFIED_PARAMETERS",
+  "evidence_state": "SOURCE_CONTENT_CHECKED_NOT_NEW_PHYSICAL_VALIDATION",
+  "source_manifest": "source_notes/domain_inputs/INPUT_MANIFEST.json",
+  "source_manifest_sha256": "838df6b01673e8583743f61c5d649989d075f73bafb1b0156daf2e7fdc6802be",
+  "repository_revision": "67ba38b0e8665543840fcb674bb8310fd47f7266",
+  "original_user_contract": {
+    "path": "source_notes/domain_inputs/USER_CONTRACT_ORIGINAL.txt",
+    "line_count": 1528,
+    "read_scope": "ALL_LINES_READ_IN_SEGMENTS_AND_TARGETED_KEYWORD_SEARCH",
+    "authority": "USER_MANDATE",
+    "notation": "line references refer to exact preserved local source"
+  },
+  "explicit_user_mandates": {
+    "priority_energies": {
+      "tokens": ["0.5", "5"],
+      "unit": "keV/u",
+      "continuous_energy_interval": null,
+      "surrounding_grid": "source-native energies; exact values not enumerated",
+      "source_lines": [886, 891]
+    },
+    "trajectory_comparison": {
+      "candidates": ["STRAIGHT_LINE", "COULOMB_RUTHERFORD", "CLASSICAL_COUPLED_NUCLEAR_MOTION"],
+      "precondition": "electronic model frozen",
+      "optional_reference": "fully quantum nuclear benchmark on a small source-native energy subset when available",
+      "parameter_retuning_allowed": false,
+      "selected_production_trajectory": null,
+      "source_lines": [873, 893]
+    },
+    "R_coverage_requirement": {
+      "requirement": "all collision-relevant R; coarse to adaptive refinement",
+      "named_regions": ["small_R", "hidden_crossing_relevant_R", "closest_approach", "large_R_tail"],
+      "finite_endpoints": null,
+      "source_lines": [573, 582]
+    },
+    "impact_integration": {
+      "formula": "sigma_f = 2*pi*integral b*P_f(b) db",
+      "limits_written_in_original_formula": false,
+      "b_min": null,
+      "b_max": null,
+      "sample_grid": null,
+      "head_on_propagation_selected": null,
+      "required_checks": ["oscillations", "support_boundaries", "long_tails", "small_b", "cancellation", "interpolation", "dense_reference", "adaptive_refinement", "tail_estimate"],
+      "legacy_GK_reuse_scope": "legacy stochastic path only; new validation on new coherent integrand",
+      "source_lines": [710, 745]
+    },
+    "time_integration": {
+      "finite_time_window": null,
+      "longitudinal_window": null,
+      "tail_error_budget": null,
+      "required_issue": "long propagation tails",
+      "source_lines": [699, 708]
+    },
+    "minimal_D1_basis": {
+      "states": ["g = 1s_sigma", "e = 2p_sigma / incoming-like", "b = bright 2p_pi"],
+      "fourth_state": "allowed only with bounded justification",
+      "claim": "minimal model target; not full rank-five or continuum closure",
+      "source_lines": [625, 644]
+    },
+    "channel_expansion_outputs": {
+      "Nmax_sequence": [3, 4, 5],
+      "larger_Nmax_when_needed": true,
+      "upper_shell_return": "coherent reversible",
+      "outputs": ["sigma_n1", "sigma_n2", "dominant_subshells"],
+      "stated_2_percent_and_5_percent": "EXAMPLES_NOT_FROZEN_C2_TOLERANCES",
+      "source_lines": [760, 798]
+    },
+    "trajectory_comparison_outputs": {
+      "quantities": ["R_min", "theta_dot(t)", "R_dot(t)", "interaction_time", "phase_accumulation", "channel_probabilities", "integrated_cross_sections"],
+      "source_lines": [895, 903]
+    },
+    "support_policy": {
+      "REAL": "rho <= Re(Rc)",
+      "EXTENDED": "rho <= Re(Rc)+Im(Rc)",
+      "authority": "DIAGNOSTIC_ONLY",
+      "choose_from_benchmark_allowed": false,
+      "production_b_or_R_cutoff_authorized": false,
+      "source_lines": [938, 946]
+    },
+    "frame_source_requirements": {
+      "per_source_fields": ["energy_frame", "isotope", "target_initial_state", "final_shell_subshell", "trajectory"],
+      "interpolation_allowed": false,
+      "source_lines": [443, 459],
+      "silent_frame_or_energy_changes_forbidden_lines": [1486, 1487]
+    }
+  },
+  "static_electronic_conventions": {
+    "authority": "INHERITED_C1B_CONVENTIONS",
+    "source": "source_notes/domain_inputs/C1B_CONVENTIONS.json",
+    "charges": [1, 2],
+    "length_unit": "a_A = hbar^2/(m_e*kappa_A_physical_H)",
+    "energy_unit": "E_A = hbar^2/(m_e*a_A^2)",
+    "origin": "charge center O; A negative z, B positive z",
+    "electronic_frame": "static charge-center electronic problem; no collision ETF propagation",
+    "nuclear_repulsion_in_electronic_energy": false,
+    "collision_energy_frame_defined": false,
+    "charge_center_equals_nuclear_COM_assumed": false
+  },
+  "historical_implementation_defaults": {
+    "pilot": {
+      "source": "source_notes/domain_inputs/run_research.py",
+      "source_lines": [211, 248],
+      "rho_samples": [0.0, 0.3],
+      "energies_keV_u": [0.5, 5.0],
+      "classification": "LEGACY_PILOT_NOT_PRODUCTION_DOMAIN"
+    },
+    "formal_impact_integral": {
+      "source": "source_notes/domain_inputs/cross_section.py",
+      "source_lines": [5, 10],
+      "formal_lower": 0,
+      "formal_upper": "infinity",
+      "finite_grid_owner": "caller",
+      "tail_validation_provided_by_formula": false
+    },
+    "legacy_velocity": {
+      "source": "source_notes/domain_inputs/cross_section.py",
+      "source_lines": [23, 27],
+      "formula": "sqrt(2*E_keV_per_amu/(27.07*1.836153))",
+      "fresh_mass_frame_adapter_verified": false,
+      "silently_modified": false
+    },
+    "Eq54_state_and_support": {
+      "source": "source_notes/domain_inputs/eq54.py",
+      "state_lines": [52, 54],
+      "support_lines": [84, 89],
+      "initial_index_zero_based": 2,
+      "initial_label": "united-atom 2p sigma; paper Eq49 j=3",
+      "Nmax": 3,
+      "support_splits": "0 + rotational matching boundaries + branch cutoffs",
+      "scope": "finite indexed-state off-diagonal area in legacy stochastic lane"
+    },
+    "R10L_V2_lanes": {
+      "source": "source_notes/domain_inputs/V2_MODEL_CONTRACT.json",
+      "common": {"energies_keV_u": [0.5, 5.0], "Nmax": 3, "exponent": "exp(-2 Delta/v)"},
+      "A": {"trajectory": "Coulomb", "support": "REAL", "authority": "AUTHOR_IMPLEMENTATION_REPRODUCTION_ONLY_NOT_PHYSICAL_VALIDATION"},
+      "B": {"trajectory": "straight", "support": "EXTENDED", "authority": "LOCKED_LEGACY_COMPARISON"},
+      "C": {"trajectory": "straight", "support": "REAL", "authority": "PRECOMMITTED_SUPPORT_ONLY_COMPARISON_IN_THIS_HISTORICAL_CONTRACT"},
+      "used_as_current_execution_status": false,
+      "used_to_select_production_trajectory": false
+    },
+    "DR9A_proxy": {
+      "source": "source_notes/domain_inputs/DR9A_TRAJECTORY_GATE.json",
+      "source_keys": ["current_audit2_energies", "claim", "rutherford_like_accessibility_proxy"],
+      "energies_keV_u": [0.5, 5.0],
+      "H_Rmin_a0": [0.13, 0.013],
+      "authority": "SOURCE_ANCHORED_DIAGNOSTIC_NOT_REALISTIC_TRAJECTORY_CALCULATION",
+      "production_Rmin_import_allowed": false,
+      "bare_nuclear_Coulomb_turning_point_equivalence_assumed": false
+    }
+  },
+  "benchmark_frame_inventory": {
+    "source": "source_notes/domain_inputs/BASS_HE_BENCHMARK_MATRIX.csv",
+    "evidence_state": "INHERITED_SOURCE_LEDGER_NOT_NEW_PRIMARY_PDF_REVIEW",
+    "P03": "center_of_mass_eV; no native keV/u row; no adapter run",
+    "P04": "native_keV/u; lab_vs_COM_not_explicit; exact5_native; no0.5_native",
+    "P07": "relative_nuclear_velocity_au; no native energy column",
+    "P08": "alpha_projectile_laboratory_keV; 20keV_to5keV/u conditional_A4_adapter_not_run",
+    "P09": "relative_impact_velocity_in_target_rest_representation; adapter_not_run",
+    "P10": "explicit_projectile_incident_keV/amu; 10_to1000; source_z_window_minus150_to150_au_not_adopted",
+    "P22": "3He_total_laboratory_keV; preserve isotope equal_velocity convention",
+    "D_LIU24": "raw_CSV_frame_isotope_and_sigma_units_unresolved; requested_exact_rows_absent",
+    "cross_source_frame_unification_performed": false,
+    "interpolation_performed": false,
+    "production_isotope_selected": false
+  },
+  "channel_mapping_boundary": {
+    "source": "source_notes/domain_inputs/SOURCE_MAPPING_DECISION.json",
+    "source_key": "decisions.C_S_AT_for_subshell_output",
+    "subshell_mapping": "REMAINS_REQUIRED",
+    "inherit_all_matrix_rows_as_same_incident_state": false,
+    "main_existing_context": "He2+ projectile + H(1s) target; separate H(2s) and excluded wrong-projectile rows retained",
+    "sink_identified_with_physical_ionization": false
+  },
+  "production_parameters_not_recovered": {
+    "energy_frame": null,
+    "nuclear_isotopes_and_masses": null,
+    "selected_collision_trajectory": null,
+    "b_min": null,
+    "b_max": null,
+    "finite_propagation_window": null,
+    "production_R_endpoints": null,
+    "collision_tail_error_budget": null,
+    "status": "UNSPECIFIED_IN_ORIGINAL_CONTRACT_AND_NOT_SUPPLIED_BY_RETRIEVED_INHERITED_AUTHORITIES"
+  },
+  "interpretation_guards": [
+    "rho=0 electronic axis regularity at original line510 is not nuclear head-on selection",
+    "legacy b=0 sample does not authorize propagation through R=0",
+    "legacy support cutoff does not define production impact domain",
+    "large-R point convergence is not a collision tail remainder bound",
+    "charge center O is not the nuclear center of mass",
+    "source-native keV/u label alone does not fix common collision velocity or nuclear masses",
+    "static electronic target definitions and conditional domain formulas can proceed without inventing missing production numbers"
+  ],
+  "not_run": ["NEW_EIGENSOLVE", "NEW_CONTINUATION", "TIME_PROPAGATION", "CROSS_SECTION", "MASS_FRAME_ENERGY_ADAPTER", "PRODUCTION_TRAJECTORY_SELECTION", "EQ55"],
+  "gates": {
+    "full_C2_closed": false,
+    "scientific_PROMOTE": "HOLD",
+    "Eq55": "NOT_RUN",
+    "production_default_change": "NOT_AUTHORIZED"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "PHYS76_STITCH_INDEPENDENT_REVIEW_V1",
+  "status": "PASS_SCOPED",
+  "reviewer": "theory_literature_independent_of_analyze_saved_author",
+  "source_sha256": "f97d0f7d5122bd7361d39957a7a0fe41b093c0308adaec859c7021e0880aa060",
+  "proof": {
+    "G": "exp(-3*(x-x_star))*H_star/H(x)",
+    "D_global": "G*D_old_star",
+    "J_species_global": "G*J_species_old_star + J_species_tail_local",
+    "residual_global": "residual_tail_local + G*residual_old_star",
+    "normalization": "all memories retain signed half-contraction coordinates; norms taken after summation and sqrt(2) converts to Frobenius",
+    "quadrature": "uniform Simpson on each segment separately; concatenation only for display"
+  },
+  "independent_manufactured_control": {
+    "cases": 2,
+    "old_samples": 9,
+    "tail_samples": 7,
+    "lambda": 0.7,
+    "construction": "I=exp(lambda*x); weighted species sources are quadratic with analytic cubic primitives; observed S includes nonzero old and tail residual; H prefactors 2 and37; opposite signed sector scalings",
+    "old_step": 0.175,
+    "tail_step": 0.08333333333333326,
+    "comparison": "analytic primitives; no calls to endpoint reference or manufactured test helper",
+    "max_abs_errors": {
+      "initial_memory": 5.551115123125783e-17,
+      "matter_memory": 1.1102230246251565e-15,
+      "radiation_memory": 2.220446049250313e-16,
+      "predicted_signed_shear": 1.1102230246251565e-15,
+      "closure_defect": 1.201296007113939e-15,
+      "transport_factor": 4.440892098500626e-16,
+      "tail_local_defect": 9.367506770274758e-16,
+      "tail_transported_old_defect": 5.204170427930421e-17,
+      "stitch_identity_defect": 3.0617869350990645e-16
+    },
+    "tolerance": 5e-15,
+    "old_samples_preserved": true,
+    "combined_grid_nonuniform": true
+  },
+  "scope_limits": [
+    "sampled quadrature only, not a continuum certificate",
+    "no counterfactual species-off interpretation",
+    "actual tail identity and source-lock verification remains runner responsibility"
+  ],
+  "new_ode_integrations": 0,
+  "benchmarks": 0,
+  "HH_R10": "OFF",
+  "production_admission": "NOT_ISSUED"
+}

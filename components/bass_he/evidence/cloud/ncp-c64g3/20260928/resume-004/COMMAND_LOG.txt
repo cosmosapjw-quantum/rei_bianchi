@@ -1,0 +1,23 @@
+Execution cwd: /srv/bass-he/source/dr11h-exec-6ddc (detached, clean at identity gate)
+git rev-parse HEAD HEAD^{tree} -> 6ddc4ff821ab5d1397fbd08493dd3954a89750f1 / e80a9218d9d275546132110605da35160a878bb0
+python -m pytest -q --junitxml=FULL_TESTS.xml -> 216 passed
+python -m pytest -q tests/cloud --junitxml=CLOUD_TESTS.xml -> 75 passed
+python -m compileall -q src scripts tests -> PASS
+git diff --check -> PASS
+python -m pip wheel . --no-deps -> PASS
+isolated venv pip install wheel scipy==1.17.0 threadpoolctl pytest -> PASS
+isolated venv import bass_he -> PASS; pip check -> PASS
+stale_cert_repro.py depth=160 -> normal PASS; 7/7 stale mutations rejected before geometry
+scripts/run_cloud_replay.py preflight --env-out ENV_PROVENANCE.json -> PASS
+scripts/run_cloud_replay.py calibrate-memory --storage-mode root_backed_host --case control -> PASS
+science_tracer.py -> PASS; imported_evidence=0
+perf_prepare.py -> 7 endpoints, 42 finite-rho cases PASS
+scripts/benchmark_cloud_workers.py --profile profile.json --cases PERF_CASES.json -> 15/15 COMPLETE; selected=32
+scripts/run_cloud_replay.py run --profile profile.json --out replay --workers 32 -> PASS; completed=65; imported_evidence=0; no --reuse-evidence
+verify_replay.py -> 56 geometry actions; 28 complete pairs; all gates PASS
+scripts/run_cloud_replay.py export --out replay -> checkpoint-067235861c9b45ebbe6be29b0b05f70d.tar.gz
+restore_checkpoint.py -> 69 artifact hashes PASS; 65 committed results; restored result hashes equal replay
+pytest fresh 52 fault cases under /tmp/BASS_HE_NCP_C64G3_FAULT_RESUME_004 -> PASS; production hashes unchanged
+package_archive.py -> ZIP CRC PASS; 18 manifest entries PASS; sha256 3312547628cc83c6d8fe79e5bc1e46aa9768134e0a2ef5848f8481bb3d552132
+Google Drive upload -> ACK; metadata size 263569; remote readback SHA256 match
+Dropbox upload -> ACK; metadata size 263569; remote content hash match

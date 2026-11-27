@@ -1,0 +1,16 @@
+{
+  "schema": "BASS_HE_EXFOR_PHOTON_DFAST_BRIDGE_V1",
+  "parent_head": "9328ebc6f4601ec437054aeb1f60315abc8b00a4",
+  "compatibility": "DEFINITION_ONLY_NOT_WIRED_NO_PHYSICAL_SOURCE",
+  "dependency_order": ["original_event_efficiency_and_polarization", "source_qualified_event_cross_section", "photon_distribution_target_rest", "target_density_and_four_velocity", "daughter_energy_angle_spectrum", "D_fast_transport_stopping", "thermal_deposition_Cv"],
+  "formal_rate": "R_event(x,t)=n_alpha(x,t)*c*integral[dE dOmega n_gamma^(alpha)(x,t;E,Omega) sigma_event(E,Omega;polarization,source)]",
+  "frame": {"signature": "(-,+,+,+)", "photon_target_energy": "E_gamma^(alpha)=-p_gamma^mu U_alpha_mu [J], U_alpha_mu U_alpha^mu=-c^2", "reference": "alpha target rest frame", "beam_and_target_direction_resolved": true},
+  "units": {"n_alpha": "m^-3", "n_gamma_per_energy_solid_angle": "m^-3 J^-1 sr^-1", "c": "m s^-1", "sigma_event": "m^2", "R_event": "m^-3 s^-1", "note": "Energy may be tabulated in MeV only after Jacobian consistent with distribution density; 1 nb=10^-37 m^2"},
+  "daughter_energy_distribution": "S_D_fast(t,x;p_D)=2 R_event times normalized single-daughter event-spectrum only after explicit angular kernel and lab boost; no assumption of isotropic emission",
+  "stopping_deposition": "G_stop(E_D,t->E',t') and heating kernel K_dep(t,t';E_D,medium), distinguish kinetic injection from deposited heat and heat-capacity response",
+  "existing_related_provider": {"path": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/runs/HE-FAST-IGM-RCT03C-PHOTON-STAGE_20261007/PHOTON_STAGE_CONTRACT.json", "owner_status": "FROZEN_PHOTON_STAGE_OWNER_BINDING_CHECKED__COUPLED_HISTORY_OPEN", "units": "q photons per H per ln(a), A_i events per H, B_i erg per H", "radiation_scope": "single event-free cell frozen alpha/q, not exact evolving physical opacity", "full_history_available": false, "high_energy_photon_target_rest_spectrum_verified": false},
+  "target_related_provider": {"path": "research/he23_density_contract_20261016/README_KO.md", "owner_status": "per-total-H density provenance and physical state controls, NOT helium beam-target photo-breakup normalization", "compatibility_not_automatically_assumed": true},
+  "required_data": ["source-qualified sigma_event(E,theta,polarization)", "actual n_gamma(E,Omega,x,t) with correct energy units and frame", "alpha target n_alpha and U_alpha and its state", "physical D daughter energy-angle kernel", "nonthermal D stopping/transport with material model", "deposition time kernel and C_V"],
+  "forbidden_shortcuts": ["constant photon 330MeV flux inserted without history", "EXFOR detector coincidence as event multiplicity", "kappa=1 or 2 without original paper semantics", "electron/IGM photon channel renamed as 330 MeV nuclear photon field", "instant deposition assumed for >100 MeV daughter deuterons", "completed IVP or old suite replay"],
+  "R_event": null, "physical_activation": false, "L4": false, "production": "HOLD"
+}

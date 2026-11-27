@@ -1,0 +1,25 @@
+# R8/C8 — 판정 범위, 수치 정밀도와 재현성
+
+## 이번 실행이 해결한 질문
+330MeV의고정EXFORM0475002네민감도창과endpointzero를유지한fullnonnegativeevensextic가족은비어있지않다. 수기선정유리수증인,exactpositivity,네실제각도interval검증이이를구성적으로확인했다. QUARTIC12의동일창·동일endpoint조건하degree<=4 EMPTY와대비되어배제의차수의존성을보인다.
+
+고정N1,4,16의sixpolytope열거로fullT6의apertureminimum/maximum을엄밀히감쌌다. N4와N16에서각geometry의저장된inner/outervertices및extremumbrackets가일치했다. 이는관측된유한결과이며보편적finite-Ncompleteness/convergence정리로확장하지않는다. 이번실제outervertices는모두strictlypositiver를가졌고,선택된data-constrained계수영역에서는positivity가수치적으로문제되는경계가나타나지않았다.
+
+## 정확도와표시
+권위값은SAVED_PLOT_DATA.json의exactfractions다. 최종보고서의확률range는12자리바깥방향반올림이며정확한각extremumbracket폭은약4.38e-15에서1.42e-14다. 이폭은same-eventmoment/nominalrowenclosure와inner/outercertificate사이의계산오차다. 전체허용probability범위0.74705…–0.78354…또는0.31708…–0.40446…의폭과구별한다.
+
+N1CAPSmaximumbracket의넓은폭0.012228846675262136은사전정한N4/N16에서감소했다. 그외추가mesh,비선형optimizer,새각도·energy표본,숨긴tolerance완화는없었다. 모든polytope와extremalwitness는exactsignedcoefficient연산으로저장했다. 기존moment재구성6성분은exactequalityTrue이며oldgeometry실행0이다.
+
+## Plot 검토와표의권위
+Saved-onlyrender1회가PASS했다. WholeCPU1.635101s/wall1.5717367499964894s/RSS66088KiB. Plotter의scienceimports/calls0,저장inputSHA256749561b17b70411a83dcc773c286a98041bf1f4003f5eefc40585401e5f9966c와일치한다.
+Root는실제PNG를보았다. 왼쪽은고정증인의대칭곡선과네nominalDCS민감도창이다. 주황점은관측중심,bar는선언한ERR-S창이며통계적jointconfidence를뜻하지않는다. 오른쪽음영은각N의outerrange,끝의가는표식은min/maxbracket을표시한다. Ordinaryaxis는읽을수있다.
+오른쪽상단legend가N16HEMISPHERES상한표식의아주작은부분과겹친다. 같은값의N4표식과정확한수치표는읽을수있으며,정량권위는savedcertificate와본문표다. 이국소표시제약을보존하고독립figure판정에연결한다. 새render/science를자동추가하지않는다.
+
+## 재현·비용·실패분류
+ActualS05commit/tree와source9개/input2개를externalexecutionpin에고정했다. Python3.12.14와시작명령·threads·AS/CPU/wallcaps·코드/입력hash·namespace정보를기록했다. 호스트probe에는platform,cgroupCPU/memorylimits가있다. 미기록matplotlibversion이나전환경dump를실제포착했다고주장하지않는다.
+PrimarywholeCPU2.020525s/wall1.9446278749965131s,8PASS0FAIL,oneconstruction이다. Wolframoneevaluator14zeros16True,remoteCPU/wallnull이다. 새science실패/targetedrepair0이며이전단위의소진reserve와실패를변경하지않았다.
+S04Dropbox두FETCH_FAILED는외부전송실패다. SealedZIP의byte-identicalcopy에새fileparameter를부여해3차upload가완료됐다. 동일sourcecommit/archive/science를재생성하지않았고원응답을단계receipts에보존했다. 배포성공은과학타당성의대체근거가아니며,과학PASS도업로드성공을미리뜻하지않는다.
+
+## NG1–NG7와최종의무
+대상함수공간/degree/endpoint/windows와양화를고정했고,증명·구성·실제실행·비저자검토를연결한다. 새성과는구성적가능성과조건부aperture범위이며새strongno-go나물리적법칙추정을채택하지않는다. 원전비교에서degree6를actual330MeVspinlaw로확정할자료는확보하지못했다.
+과학수용은review/ACTUAL_RESULT_REVIEW,CAS_REVIEW,PLOT_REVIEW및FINAL_LOCAL_REVIEW로확정한다. 이후S09/S10실제게시와중앙HE관찰9경로갱신,최종sealedpackage운송ACK가요청완료의남은의무다. 완료science/test/CAS/plot은재실행하지않는다.

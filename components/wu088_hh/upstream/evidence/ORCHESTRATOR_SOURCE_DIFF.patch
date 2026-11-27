@@ -1,0 +1,125 @@
+--- frozen/wide_hybrid_orchestrator_v2.py
++++ scripts/wide_hybrid_orchestrator_cost.py
+@@ -21,6 +21,9 @@
+ 
+ for _k in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
+     os.environ[_k] = "1"
++
++REPO_ROOT = Path(__file__).resolve().parents[1]
++sys.path[:0] = [str(REPO_ROOT/"src"), str(REPO_ROOT/"vendor/orchestration")]
+ 
+ from heavy_numerics_v2 import (
+     LeaseBusyError,
+@@ -38,7 +41,10 @@
+     should_handoff_local,
+ )
+ 
+-POLICY = "HEAVY_NUMERICS_V2"
++from wu088_hh.scheduler import order_tasks, predict_costs, verify_profile
++from wu088_hh.hardware import inspect_host
++
++POLICY = "HEAVY_NUMERICS_V2_COST_ORDER_V1"
+ PAIR_INTERVAL = 8
+ SECONDS_INTERVAL = 180.0
+ LOCAL_HANDOFF_CPU_SECONDS = 600.0
+@@ -77,8 +83,9 @@
+ 
+ 
+ def _policy_description(requested_workers: int | None) -> dict:
+-    quota = detect_cpu_quota_cores()
+-    affinity = detect_affinity_count()
++    hw = inspect_host(requested_workers=requested_workers or 12)
++    quota = hw["quota_cores"]
++    affinity = len(hw["cpus"])
+     effective = choose_worker_count(
+         requested_workers,
+         cpu_count=os.cpu_count() or 1,
+@@ -87,6 +94,7 @@
+     )
+     return {
+         "policy": POLICY,
++        "hardware": hw,
+         "requested_workers": requested_workers,
+         "effective_workers": effective,
+         "cpu_count": os.cpu_count(),
+@@ -172,6 +180,7 @@
+     ap.add_argument("--legacy-runner", type=Path, default=Path(__file__).with_name("wide_hybrid_run.py"))
+     ap.add_argument("--describe", action="store_true")
+     ap.add_argument("--policy-describe", action="store_true")
++    ap.add_argument("--cost-profile", type=Path, default=REPO_ROOT / "data/pair_cost_profile.json")
+     return ap
+ 
+ 
+@@ -184,11 +193,14 @@
+         return 0
+     if args.n is None or args.z is None:
+         raise SystemExit("--n and --z are required unless --policy-describe is used")
+-    if args.max_new_pairs < 1 or args.max_wall_seconds <= 0:
++    if not 1 <= args.max_new_pairs <= 12 or not math.isfinite(args.max_wall_seconds) or args.max_wall_seconds <= 0:
+         raise SystemExit("invalid bounded-checkpoint settings")
+     if not args.legacy_runner.exists():
+         raise SystemExit(f"legacy runner not found: {args.legacy_runner}")
+ 
++    # Restrict only this process and its children, not the user desktop.
++    os.sched_setaffinity(0, policy["hardware"]["cpus"])
++    requested = policy["effective_workers"]
+     legacy = _load_legacy(args.legacy_runner.resolve())
+     legacy.provider_gate()
+     folder = legacy.folder_for(args.n, args.g, args.z, args.gamma_scale)
+@@ -274,6 +286,22 @@
+                     else:
+                         tasks.append((ia, ib, str(p)))
+ 
++            if not tasks and (folder / "RESULTS.json").is_file():
++                saved = json.loads((folder / "RESULTS.json").read_text())
++                if saved["identity_sha256"] != sha256_file(ip) or saved["sha256"] != sha256_file(folder / "ASSEMBLED.npz"):
++                    raise RuntimeError("completed source identity changed")
++                print(json.dumps({"status": "SOURCE_COMPLETE_REUSED_NOT_REASSEMBLED", "result": saved}))
++                return 0
++
++            profile = json.loads(args.cost_profile.read_text())
++            verify_profile(profile, driver_sha=identity["driver"], model_sha=identity["model_sha256"],
++                           g=args.g, gamma_scale=args.gamma_scale)
++            costs, prediction = predict_costs(profile, n=args.n, z=args.z)
++            tasks = order_tasks(tasks, costs)
++            scheduling = {"scheduler": "MEASURED_COST_DESCENDING_CANONICAL_TIES", "profile_sha256": sha256_file(args.cost_profile),
++                          "prediction": prediction, "ordered_pairs": [[x[0],x[1]] for x in tasks],
++                          "kernel_changed": False, "max_unacked_new_pairs": args.max_new_pairs}
++            _write_json_atomic(folder / "SCHEDULE_PLAN.json", scheduling)
+             estimated_cpu = estimate_remaining_cpu_seconds(rows, len(tasks))
+             if (
+                 args.execution_lane in ("auto", "cloud")
+@@ -323,6 +351,8 @@
+                 batch_size = min(workers, remaining_budget, len(tasks))
+                 batch, tasks = tasks[:batch_size], tasks[batch_size:]
+                 batch_rows: list[dict] = []
++                batch_started = time.monotonic()
++                first_completed = None
+                 with ProcessPoolExecutor(
+                     max_workers=batch_size,
+                     initializer=legacy.init,
+@@ -331,6 +361,8 @@
+                     futs = [pool.submit(legacy.pair, task) for task in batch]
+                     for fut in as_completed(futs):
+                         row = fut.result()
++                        if first_completed is None:
++                            first_completed = time.monotonic()
+                         row.update(
+                             completed_this_invocation=len(new_rows) + len(batch_rows) + 1,
+                             elapsed_wall_seconds=time.monotonic() - start,
+@@ -343,6 +375,15 @@
+                             committed_pairs_this_invocation=len(new_rows) + len(batch_rows),
+                         )
+                         print(json.dumps(row), flush=True)
++                batch_finished = time.monotonic()
++                _append_event(folder / "ORCHESTRATION_TELEMETRY.jsonl", {
++                    "phase": "COMPUTE_WAVE", "worker_slots": batch_size, "pairs": len(batch_rows),
++                    "wave_wall_seconds": batch_finished-batch_started,
++                    "first_completion_seconds": None if first_completed is None else first_completed-batch_started,
++                    "drain_tail_seconds": 0 if first_completed is None else batch_finished-first_completed,
++                    "sum_pair_cpu_seconds": sum(float(r.get("cpu_seconds",0)) for r in batch_rows),
++                    "timestamp_unix": time.time(), "profile_sha256": scheduling["profile_sha256"],
++                })
+                 new_rows.extend(batch_rows)
+                 elapsed = time.monotonic() - start
+                 if tasks and should_checkpoint(

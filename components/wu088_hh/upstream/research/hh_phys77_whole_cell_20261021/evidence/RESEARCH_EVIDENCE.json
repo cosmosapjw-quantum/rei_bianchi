@@ -1,0 +1,319 @@
+{
+  "schema": "PHYS77_THEORY_RESEARCH_EVIDENCE_V1",
+  "date_utc": "2026-10-21",
+  "agent": "/root/theory_literature",
+  "scope": "Constructive derivation and primary-source/code-license research only. No ODE integration, benchmark, or NCP.",
+  "dag_obligation": "FINITE_OWNER_WHOLE_CELL_SOURCE_OR_RESIDUAL_ENCLOSURE",
+  "artifact": "theory/THEOREM_KO.md",
+  "new_ode_integrations": 0,
+  "benchmarks": 0,
+  "ncp_runs": 0,
+  "selected_construction": {
+    "method": "Strict first-exit affine-predictor defect tube",
+    "condition": "E_init + [0,h] * D is strictly inside R, where D contains F#(X,P(X)+R)-Pprime(X)",
+    "endpoint": "p(x1)+E_init+h*D",
+    "scope": "Finite captured-owner real-lift IVP, exact initial point or certified inherited interval",
+    "not_assumed": [
+      "Saved sample extrema enclose actual path",
+      "Ideal monopole row replaces captured matrix",
+      "Contraction of the full-step Picard map",
+      "Continuum momentum/angular accuracy"
+    ]
+  },
+  "tool_calls": [
+    {
+      "tool": "Exa web_search_exa",
+      "name": "validated_ode",
+      "numResults": 6,
+      "query": "category:research paper rigorous a posteriori ordinary differential equation numerical solution residual Picard operator interval tube existence validation Lohner Nedialkov Jackson",
+      "status": "SUCCESS"
+    },
+    {
+      "tool": "Exa web_search_exa",
+      "name": "software",
+      "numResults": 6,
+      "query": "official CAPD validated ODE solver Picard interval inclusion TaylorModels IntervalArithmetic Julia GitHub license",
+      "status": "SUCCESS"
+    },
+    {
+      "tool": "SciSpace search_papers",
+      "searchQuestion": "How can a numerical solution of a nonlinear ordinary differential equation be rigorously enclosed over each whole time step using a residual or defect, a Picard contraction, and interval bounds on the vector field Jacobian, without assuming sampled extrema bound the true solution?",
+      "returned_papers": 10,
+      "status": "SUCCESS"
+    },
+    {
+      "tool": "Wolfram wolframcontext",
+      "status": "ERROR_PRESERVED",
+      "result": "tool call error: tool call failed for `codex_apps/wolfram.WolframContext`\n\nCaused by:\n    Mcp error: -32603: Internal error"
+    },
+    {
+      "tool": "Wolfram wolframlanguageevaluator",
+      "name": "positive_packet_derivatives",
+      "code": "Clear[x,b,m,q,vmu]; u=q^2 Exp[-2 x+2 b](1-vmu); v=q^2 Exp[-2 x-4 b]vmu; en=Sqrt[m^2+u+v]; rho=Exp[-3 x]en; pp=Exp[-3 x]u/(2 en); pa=Exp[-3 x]v/en; FullSimplify[{D[rho,x]+3 rho+2 pp+pa,D[rho,b]-2 pp+2 pa},Assumptions->{m>0,q>0,0<vmu<1,Element[{x,b},Reals]}]",
+      "result": "Out[1]= {0, 0}",
+      "isError": false
+    },
+    {
+      "tool": "Wolfram wolframlanguageevaluator",
+      "name": "full_monopole_row_A",
+      "code": "Clear[c,d,r,mu,rho,pp,pa,lam,hr,q,h,E0,E2,g0]; v=hr q/h; pi=(pa-pp)/3; pb=(2pp+pa)/3; tt=c(d+mu rho+r E0+lam)+(hr q)^2; rp=-3(rho+pb)-6v pi; qp=-3q+3c(mu pi+r E2/3)/(hr h); tp=c(-3d+mu rp-4r E0+r v g0)+2hr^2 q qp; tpc=c(-3d-3mu(rho+pb)-4r E0+r v(g0+2E2))-6(hr q)^2; aa=c((3/2)d+(3/2)mu(rho-pb)+r E0+3lam+(r v/2)(g0+2E2))/tt; FullSimplify[{tp-tpc,3+tp/(2tt)-aa}]",
+      "result": "Symbol::undefined2: Warning: Global symbols \"E0, E2, E0, E2, E0, E0, E2, E0, E2\" are undefined.\nGeneral::messages: Messages were generated which may indicate errors.\n\nOut[1]= {0, 0}",
+      "isError": false,
+      "warning_interpretation": "Undefined E0/E2 messages preserved. The symbolic output is {0,0}; the self-contained derivation in THEOREM_KO.md is the proof."
+    }
+  ],
+  "sources": [
+    {
+      "id": "NJP2001",
+      "kind": "primary_publisher_page",
+      "title": "An Effective High-Order Interval Method for Validating Existence and Uniqueness of the Solution of an IVP for an ODE",
+      "authors": [
+        "Nedialko S. Nedialkov",
+        "Kenneth R. Jackson",
+        "John D. Pryce"
+      ],
+      "doi": "10.1023/A:1014798618404",
+      "url": "https://link.springer.com/article/10.1023/A:1014798618404",
+      "read_scope": "Publisher abstract and bibliography; full text subscription wall",
+      "used_for": "Existence/uniqueness and whole-step a-priori enclosure are separate parts of validated IVP computation.",
+      "not_claimed": "The full paper's detailed algorithm or theorem was read."
+    },
+    {
+      "id": "BREHARD2021",
+      "kind": "primary_author_deposited_manuscript",
+      "title": "A Symbolic-Numeric Validation Algorithm for Linear ODEs with Newton-Picard Method",
+      "url": "https://hal.science/hal-03161118",
+      "document_url": "https://hal.science/hal-03161118/document",
+      "read_scope": "Intro, a-posteriori validation background, Banach theorem and algorithm scope from Exa search plus fetch",
+      "used_for": "Approximate polynomial generation can be separated from rigorous validation.",
+      "not_adopted": "Linear Newton-Picard resolvent method is not directly assumed valid for the nonlinear owner."
+    },
+    {
+      "id": "TAYLORMODELS",
+      "kind": "primary_official_code_and_docs",
+      "repository": "JuliaIntervals/TaylorModels.jl",
+      "commit": "9f3d2a669bfac0fba04d084744d9886bba06c452",
+      "code_path": "src/valid_integ/validated_integ3.jl",
+      "code_blob_sha": "107828ee8aad4bb5b7bcd5c05e869c1b3ada0ff5",
+      "code_url": "https://github.com/JuliaIntervals/TaylorModels.jl/blob/9f3d2a669bfac0fba04d084744d9886bba06c452/src/valid_integ/validated_integ3.jl",
+      "doc_url": "https://juliaintervals.github.io/TaylorModels.jl/dev/api/",
+      "functions_examined": [
+        "_picard_pass!",
+        "_validation3!",
+        "picard_lindelof!",
+        "_guess_rem"
+      ],
+      "license": "MIT Expat",
+      "license_path": "LICENSE.md",
+      "license_blob_sha": "abd3306fdfa5f13c7e2ebbab781464ab70711d8c",
+      "license_url": "https://github.com/JuliaIntervals/TaylorModels.jl/blob/9f3d2a669bfac0fba04d084744d9886bba06c452/LICENSE.md",
+      "license_source": "Actual pinned LICENSE.md fetched from GitHub; Exa repository metadata NOASSERTION corrected.",
+      "reuse_decision": "Conceptual algorithm reference only; no code copied, translated, installed, or run in this task. Any later code reuse should preserve its notice."
+    },
+    {
+      "id": "CAPD",
+      "kind": "primary_official_code_and_docs",
+      "repository": "CAPDGroup/CAPD",
+      "commit": "37057e5899bccaa6cd5701057b7e6ea5e232ef8b",
+      "doc_url": "http://capd.ii.uj.edu.pl/html/odes_rigorous.html",
+      "license": "GPLv3",
+      "license_path": "COPYING",
+      "license_blob_sha": "94a9ed024d3859793618152ea559a168bbcbb5e2",
+      "license_read_scope": "Repository metadata and first 25 lines of COPYING",
+      "capabilities_read": [
+        "interval initial sets",
+        "Taylor and Hermite-Obreshkov methods",
+        "doubleton and tripleton sets",
+        "functional solution curve"
+      ],
+      "reuse_decision": "Not adopted or installed for the minimal Python finite-cell kernel."
+    },
+    {
+      "id": "DECIMAL",
+      "kind": "primary_official_documentation",
+      "url": "https://docs.python.org/3/library/decimal.html",
+      "used_for": "Correctly rounded decimal arithmetic, explicit context, rounding and exception semantics; existing PHYS76 outward engine is reusable."
+    }
+  ],
+  "scispace_candidates": [
+    {
+      "title": "Rigorous defect control and the numerical solution of ordinary differential equations",
+      "doi": null,
+      "unique_id": "4bwz63p6ka",
+      "year": "2017",
+      "primary_urls": {
+        "Pdf": [
+          "https://macsphere.mcmaster.ca/bitstream/11375/22733/2/ernsthausen_john_m_finalsubmission2017october_msc.pdf"
+        ],
+        "Html": [
+          "https://macsphere.mcmaster.ca/handle/11375/22733"
+        ]
+      }
+    },
+    {
+      "title": "Advances in Reachability Analysis for Nonlinear Dynamic Systems",
+      "doi": null,
+      "unique_id": "udstneikxu",
+      "year": "2019",
+      "primary_urls": {
+        "Pdf": [
+          "https://tigerprints.clemson.edu/cgi/viewcontent.cgi?article=3384&context=all_dissertations"
+        ],
+        "Html": [
+          "https://tigerprints.clemson.edu/all_dissertations/2380/"
+        ]
+      }
+    },
+    {
+      "title": "Global, rigorous and realistic bounds for the solution of dissipative differential equations. Part I: Theory",
+      "doi": "10.1007/BF02276880",
+      "unique_id": "3t9mmmyy2r",
+      "year": "1994",
+      "primary_urls": {
+        "Html": [
+          "https://link.springer.com/article/10.1007/BF02276880",
+          "https://dblp.uni-trier.de/db/journals/computing/computing52.html#Neumaier94"
+        ],
+        "Pdf": [
+          "https://www.mat.univie.ac.at/~neum/ms/ode.pdf",
+          "https://solon.cma.univie.ac.at/ms/ode.pdf"
+        ],
+        "Others": [
+          "https://link.springer.com/content/pdf/10.1007/BF02276880.pdf"
+        ]
+      }
+    },
+    {
+      "title": "Periodic solutions: enclosure, verification, and applications",
+      "doi": "10.1016/B978-0-12-708245-5.50016-6",
+      "unique_id": "3rw4a99fts",
+      "year": "1990",
+      "primary_urls": {
+        "Html": [
+          "https://www.sciencedirect.com/science/article/pii/B9780127082455500166",
+          "https://dblp.uni-trier.de/db/books/collections/U1990.html#Adams90"
+        ]
+      }
+    },
+    {
+      "title": "Bounding the Solutions of Parameter Dependent Nonlinear Ordinary Differential Equations",
+      "doi": "10.1137/040604388",
+      "unique_id": "5gkh8q0ukh",
+      "year": "2005",
+      "primary_urls": {
+        "Html": [
+          "https://dblp.uni-trier.de/db/journals/siamsc/siamsc27.html#SingerB06",
+          "https://epubs.siam.org/doi/abs/10.1137/040604388"
+        ]
+      }
+    },
+    {
+      "title": "An Interval Hermite-Obreschkoff Method for Computing Rigorous Bounds on the Solution of an Initial Value Problem for an Ordinary Differential Equation",
+      "doi": "10.1007/978-94-017-1247-7_23",
+      "unique_id": "1my8i7u3zk",
+      "year": "1999",
+      "primary_urls": {
+        "Html": [
+          "https://link.springer.com/chapter/10.1007/978-94-017-1247-7_23",
+          "https://rd.springer.com/chapter/10.1007/978-94-017-1247-7_23"
+        ],
+        "Others": [
+          "https://link.springer.com/10.1007/978-94-017-1247-7_23"
+        ]
+      }
+    },
+    {
+      "title": "Rigorous Numerics for Nonlinear Differential Equations Using Chebyshev Series",
+      "doi": "10.1137/13090883X",
+      "unique_id": "1wb0je8zwu",
+      "year": "2014",
+      "primary_urls": {
+        "Pdf": [
+          "https://archimede.mat.ulaval.ca/jplessard/Publications_files/chebyshev.pdf",
+          "https://corpus.ulaval.ca/jspui/bitstream/20.500.11794/1261/1/13090883x.pdf"
+        ],
+        "Html": [
+          "https://epubs.siam.org/doi/abs/10.1137/13090883X",
+          "https://doi.org/10.1137/13090883X"
+        ],
+        "Others": [
+          "http://doi.org/10.1137/13090883X",
+          "http://dx.doi.org/10.1137/13090883X"
+        ]
+      }
+    },
+    {
+      "title": "Global methods for the construction of convergent sequences of bounds for systems of ordinary initial value problems",
+      "doi": "10.1007/BFB0087359",
+      "unique_id": "1aupp3yzkn",
+      "year": "1976",
+      "primary_urls": {
+        "Html": [
+          "https://link.springer.com/chapter/10.1007/BFb0087359",
+          "https://rd.springer.com/chapter/10.1007/BFb0087359"
+        ],
+        "Others": [
+          "https://link.springer.com/content/pdf/10.1007%2FBFb0087359.pdf"
+        ]
+      }
+    },
+    {
+      "title": "Error bounds for numerical solutions of ordinary differential equations",
+      "doi": "10.1007/BF01436325",
+      "unique_id": "4cj55qe7bv",
+      "year": "1971",
+      "primary_urls": {
+        "Html": [
+          "https://link.springer.com/article/10.1007/BF01436325"
+        ]
+      }
+    },
+    {
+      "title": "An Interval Hermite-Obreschkoff Method for Computing Rigorous Bounds on the Solution of an Initial Value Problem for an Ordinary Differential Equation.",
+      "doi": null,
+      "unique_id": "3zfrmy523f",
+      "year": "1998",
+      "primary_urls": {
+        "Html": [
+          "https://dblp.uni-trier.de/db/conf/scan/scan1998.html#NedialkovJ98"
+        ],
+        "Others": [
+          "http://dblp.uni-trier.de/db/conf/scan/scan1998.html#NedialkovJ98"
+        ]
+      }
+    }
+  ],
+  "fetch_failures_preserved": [
+    {
+      "url": "https://www.mat.univie.ac.at/~neum/ms/ode.pdf",
+      "error": "CRAWL_HTTP_502"
+    },
+    {
+      "url": "https://solon.cma.univie.ac.at/ms/ode.pdf",
+      "error": "CRAWL_UNKNOWN_ERROR"
+    },
+    {
+      "url": "https://macsphere.mcmaster.ca/handle/11375/22733",
+      "error": "CRAWL_UNKNOWN_ERROR"
+    }
+  ],
+  "counts": {
+    "exa_search_queries": 2,
+    "exa_requested_results": 12,
+    "scispace_searches": 1,
+    "wolfram_context_calls": 1,
+    "wolfram_context_errors": 1,
+    "wolfram_symbolic_evaluations": 2,
+    "software_installs": 0,
+    "code_copied": 0
+  },
+  "remaining": [
+    "Actual source capture and interval implementation",
+    "Bounded first-cell inclusion run receipt",
+    "Independent implementation review",
+    "Whole-history certified endpoint propagation remains open unless executed",
+    "Momentum quadrature and angular continuum errors remain separate"
+  ],
+  "HH_R10": "OFF",
+  "production_admission": "NOT_ISSUED"
+}

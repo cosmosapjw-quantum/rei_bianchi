@@ -1,0 +1,152 @@
+{
+  "schema": "WU088_HH_OBSERVABLE_CONTRACTS_V1",
+  "status": "PLANNING_CONTRACT_NO_NEW_SCIENCE_RESULT",
+  "base_science_commit": "328372568144c4cdb6cdecd94c9c9bff984e103e",
+  "channels": [
+    {
+      "id": "HH_LCS_EFFECTIVE_IONIZATION",
+      "source": "PHYS01-PHYS11 selected LCS family",
+      "q": "nH_proper*(1-x_HII)^2*k_LCS(T)",
+      "q_units": "per H nucleus per proper second",
+      "extra_pair_half_factor": false,
+      "future_source_direction": [
+        "q",
+        "0",
+        "0",
+        "-chiH*q",
+        "0_photon"
+      ],
+      "chiH_eV": "13.598434599702",
+      "lambda": "dimensionless multiplier of future selected LCS source only",
+      "off_control": "Same COMMON, pre-existing photons, historical HH and compensation retained"
+    },
+    {
+      "id": "HH_SINGLET_ION_PAIR",
+      "source": "frozen107/CP1 C3B-C4A",
+      "products": [
+        "H+",
+        "H-"
+      ],
+      "immediate_free_electron_increment_per_event": 0,
+      "same_population_unordered_events_per_volume_time": "n*n*k/2",
+      "different_population_cross_events_per_volume_time": "na*nb*k",
+      "spin": "singlet only; not unpolarized",
+      "physical_rate_status": "SOURCE_UNAVAILABLE",
+      "distribution_status": "Must be specified; temperature or homogeneity does not imply Maxwellian",
+      "required_species_retained": [
+        "H-"
+      ],
+      "is_replacement_for_LCS_k": false
+    }
+  ],
+  "native_lanes": [
+    {
+      "id": "NATIVE_ATOMIC_FROZEN107",
+      "scope": "C++ atomic integral/trajectory provider; original basis/source/input/numerical gates retained"
+    },
+    {
+      "id": "NATIVE_FT03_BE",
+      "scope": "Rust BE root/distribution/escape implementation binding; PHYS11 original strict DAG retained"
+    }
+  ],
+  "next_local_observables": {
+    "status": "PLANNED_NOT_EXECUTED",
+    "id": "HH_FIXED_FAMILY_ABSOLUTE_RESPONSE",
+    "channel": "HH_LCS_EFFECTIVE_IONIZATION",
+    "observables": [
+      {
+        "name": "D_HH_x_HII",
+        "unit": "dimensionless HII fraction"
+      },
+      {
+        "name": "D_HH_w",
+        "unit": "eV per H nucleus"
+      }
+    ],
+    "definition": "D_HH O(b_amp) = O(lambda=1,b_amp)-O(lambda=0,b_amp)",
+    "fixed_b_amp": 1,
+    "b_amp_identity": "PHYS11 dimensionless normalized photon-birth amplitude b, not PHYS01 birth-time b",
+    "theta_domain": {
+      "lambda": [
+        0,
+        1
+      ],
+      "b_amp": [
+        0,
+        1
+      ]
+    },
+    "controls": [
+      "same COMMON",
+      "same fixed alpha",
+      "same source and coefficient domain",
+      "same stage and proper clock",
+      "existing photons and historical HH retained"
+    ],
+    "stages_seconds": {
+      "full": 1250000000,
+      "first_half": 625000000
+    },
+    "chronology": "Both are first stages from COMMON; no actual carried second_half",
+    "candidate_reuse": "research/r31ao_unequal_ladder/hh_phys11_joint_carry_20261011_v1/inputs/phys09/PROJECTED_RESULTS.json",
+    "method": "Confirm applicable inherited same-alpha root-family and uniform-U premises; use D_HH O(1)=integral_0^1 U_O(lambda,1) d lambda",
+    "mixed_relationship": "I_O = D_HH O(1)-D_HH O(0); not the absolute HH contribution",
+    "first_completion_criterion": "Valid inherited-premise enclosure with units and sign class; zero-containing is a reportable unresolved sign, not an instruction for endless refinement",
+    "numerical_tolerance_override": false,
+    "consumer_significance_absolute_threshold": null,
+    "consumer_significance_status": "NOT_SPECIFIED; no cosmological negligibility or absolute efficiency claim",
+    "claim_ceiling": "Conditional finite response in archived local source family; not actual native root or continuous cosmological history"
+  },
+  "consumer_interface": {
+    "status": "DEFINITION_CONTRACT_NOT_AN_IMPLEMENTED_REI_INTERFACE",
+    "hydrogen_fraction": "x_HII = n_HII / n_H_nuclei",
+    "electron_fraction": "x_e = n_e_proper / n_H_nuclei_proper; helium electrons included where present",
+    "electron_density": "n_e_proper = n_H_nuclei_proper * x_e",
+    "positive_path_optical_depth": "d tau_path = c*sigma_T*n_e_proper*dt_proper",
+    "observer_optical_depth": "tau_to_observer(t)=integral(t,t0)c*sigma_T*n_e_proper dt; derivative with respect to t is negative",
+    "conformal_time_seconds": "dt=a*deta; positive opacity coefficient=a*c*sigma_T*n_e_proper",
+    "conformal_time_length": "If eta_length=c*eta_seconds, dt=a*deta_length/c; declare this before omitting c",
+    "mean_redshift": "z_a=1/a_mean-1 is distinct from direction-dependent observed photon redshift in Bianchi",
+    "J_E": "Angular mean energy specific intensity per unit energy; J_E=(1/4pi)*integral I_E dOmega",
+    "photoionization_per_target": "Gamma_s=4pi*integral_(E_s,infinity) J_E*sigma_s(E)/E dE",
+    "photoheating_per_target": "H_s=4pi*integral_(E_s,infinity) J_E*sigma_s(E)*(E-E_s)/E dE",
+    "photoheating_per_volume": "n_s_proper*H_s; consistent energy unit throughout",
+    "photon_variable": "P=photons/H is not photon number density and must not be divided by nH again",
+    "moment_tail": "Bound omitted photoionization and heating moments separately before reducing the high-energy tail"
+  },
+  "error_budget_policy": {
+    "fixed_original_physics_and_tolerances": true,
+    "distinct_columns": [
+      "numerical error",
+      "input/coefficient enclosure dependence",
+      "closure difference",
+      "astrophysical scenario difference"
+    ],
+    "future_quantitative_budget_before_result_affecting_run": [
+      "observable/norm/domain",
+      "absolute error allowance",
+      "relative allowance only where meaningful",
+      "near-zero criterion",
+      "decision threshold if claiming negligibility",
+      "stopping rule"
+    ],
+    "audit_delta_tau_example": {
+      "response_magnitude_approx": 2.6e-05,
+      "relative_response_goal_example": 0.1,
+      "absolute_response_error_example": 2.6e-06,
+      "scope": "Illustrative paired response numerical budget; not total tau relative error or adopted HH tolerance"
+    },
+    "scenario_is_posterior": false,
+    "small_difference_method": "Response equation, valid interval projection or matched high-precision controls; independent binary64 subtraction alone does not certify tiny mixed effects"
+  },
+  "preserved_open": [
+    "actual_native_root_U_V_W_I",
+    "actual_carried_second_half",
+    "time_remainder",
+    "continuum_remainder",
+    "global_transport_guard_redshift_escape_conservation",
+    "full49",
+    "production"
+  ],
+  "new_scientific_runs": 0
+}

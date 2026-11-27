@@ -1,0 +1,125 @@
+{
+  "unit": "HE-EXP-EXFOR-11",
+  "review_pass": "single_independent_nonauthor_review",
+  "phase": "PREEXEC_SOURCE_CHECK",
+  "created_utc": "2026-10-28T05:19:42.557973+00:00",
+  "reviewer_task": "/root/survey_github",
+  "reviewer_authored_new_theory_or_implementation": false,
+  "actual_runtime_model_identity": null,
+  "review_method": "Static source and mathematical inspection; literal source comparison; metadata hashes only. No imports, scientific evaluations, tests, CAS or plots executed by reviewer.",
+  "implementation_edits_by_reviewer": 0,
+  "science_executions_by_reviewer": 0,
+  "status": "PREEXEC_PASS_WITH_TWO_LOW_SEVERITY_CLARIFICATIONS",
+  "science_execution_gate": "Core mathematics and implementation admit the one contracted bounded campaign after source publication and actual execution pin. Correct the contract wording before pin and plot wording before the single plot invocation.",
+  "blocking_scientific_findings": 0,
+  "findings": [
+    {
+      "id": "EXFOR11-REV-001",
+      "severity": "LOW",
+      "category": "scientific_presentation",
+      "target": "scripts/plot_saved.py:35; inner objective values from src/exfor_aperture.py:108-112",
+      "evidence": "The footer calls the black interval an inner family range. Its endpoints are min_v c_lower.v/(d.v) and max_v c_upper.v/(d.v). Geometry uncertainty remains in c_lower/c_upper, as CONTRACT.md:49 explicitly states.",
+      "impact": "The black interval encloses the inner-family objective range; its displayed endpoints need not be physically attained. The current caption can overstate attainability.",
+      "minimal_repair": "Replace black: inner family range with black: inner family enclosure. No scientific calculation change.",
+      "required_before": "single_plot_invocation",
+      "status": "OPEN_AT_REVIEW_SNAPSHOT"
+    },
+    {
+      "id": "EXFOR11-REV-002",
+      "severity": "LOW",
+      "category": "mathematical_scope_wording",
+      "target": "CONTRACT.md:62",
+      "evidence": "The contract says energy-dependent response does not cancel. Every implemented objective is evaluated separately at fixed e. A common positive scalar eta(e), multiplying the entire angular distribution at that energy, cancels from its numerator and denominator.",
+      "impact": "The wording excludes a valid invariance; computed acceptance intervals are unaffected.",
+      "minimal_repair": "State that a common positive scale cancels separately at each fixed energy; angle-dependent response, or energy-dependent weighting inside an energy-integrated observable, does not generally cancel.",
+      "required_before": "execution_pin",
+      "status": "OPEN_AT_REVIEW_SNAPSHOT"
+    }
+  ],
+  "checks": [
+    {
+      "id": "SOURCE",
+      "result": "STATIC_PASS",
+      "evidence": "Official M0475.x4 full-byte SHA256 matches the frozen digest. The 12 M0475002 DCS/ERR-S literals, angle and energy ordering, and 6 separate M0475003 totals match the code and contract. DCS and total energy grids are disjoint. Parser verifies both digest and literal tables."
+    },
+    {
+      "id": "SCOPE",
+      "result": "STATIC_PASS_WITH_REV002",
+      "evidence": "ERR-S is a declared sensitivity window, not confidence or likelihood. Nominal recorded angles are exact coordinates; cosine enclosures are arithmetic uncertainty, not experimental angle uncertainty. Evenness, finite nonnegative Bernstein cone, uniform azimuth and endpoint-zero extrapolation are declared assumptions. Primary Arends normalization remains unresolved; Rice summary is not promoted to that original convention."
+    },
+    {
+      "id": "BASIS_AND_PRIMITIVE",
+      "result": "STATIC_PASS",
+      "evidence": "Pairing j and n-j with a single middle basis is correct. Endpoint-zero removes j=0. The full integral is 4/(n+1) for pairs and 2/(n+1) for the middle. Inherited harmonic._power expands the same x=(mu+1)/2 Bernstein polynomial in mu, and new exact primitives integrate that polynomial. The independent manufactured-cap control expands directly in x."
+    },
+    {
+      "id": "COSINE_AND_ROWS",
+      "result": "STATIC_PASS",
+      "evidence": "harmonic.sincos_turn computes phase 4*pi*t, so theta/720 supplies cos(theta*pi/180). Positive Bernstein interval products and outward rational 2^-60 rounding conservatively enclose basis rows despite dependency loss. The inherited cosine output lies in [-1,1]. Actual interior-row lower bounds are guarded positive before enumeration."
+    },
+    {
+      "id": "POLYTOPE_INCLUSION",
+      "result": "STATIC_PASS",
+      "evidence": "For a>=0, l.a<=psi.a<=u.a. Therefore inner conditions u.a<=U and l.a>=L imply true feasibility; true feasibility implies outer l.a<=U and u.a>=L. Nonnegative variable constraints are included. Positive lower rows and finite U bound coordinates; at least one positive L excludes zero, giving d.a>0."
+    },
+    {
+      "id": "EXACT_ENUMERATION_AND_RATIO",
+      "result": "STATIC_PASS",
+      "evidence": "All dimension-sized active constraint subsets are enumerated without tolerance, singular exact systems skipped, exact feasible solutions retained and deduplicated. Every vertex of a bounded nonempty polytope has a full-rank active subset even for lower-dimensional polytopes. Positive-denominator linear-fractional values are denominator-weighted convex combinations of vertex values. Outward geometry coefficients therefore give valid outer-family bounds on every true feasible member."
+    },
+    {
+      "id": "GEOMETRY",
+      "result": "STATIC_PASS",
+      "evidence": "The unchanged same-event Boolean coincidence set is used. Integrating nonnegative basis functions over inner/outer sets preserves coefficient order. Full sphere gives c=d and acceptance one; new manufactured rational-map controls independently check cap integrals. No independent-daughter product or absolute event-rate interpretation is introduced."
+    },
+    {
+      "id": "CERTIFICATE_READER",
+      "result": "STATIC_PASS_WITH_STATED_LIMIT",
+      "evidence": "The saved-data reader does not invoke enumeration, ratio or integration functions; it independently rechecks stored vertex inequalities, positive denominators, inner-to-outer feasibility, coefficient ordering, witness membership and objective extrema over stored vertices. It does not independently prove vertex-list completeness: that obligation is supplied by reviewed exhaustive enumeration plus small known-polytope controls, not a falsely claimed second optimizer."
+    },
+    {
+      "id": "FINITE_RESOURCE_BOUND",
+      "result": "STATIC_PASS_ACTUAL_USE_PENDING",
+      "evidence": "The four dimensions are 3,2,5,4 with 8+d constraints. Inner and outer enumeration totals 2*(C(11,3)+C(10,2)+C(13,5)+C(12,4))=3984 candidate matrix inversions, shared across three RHS vectors, with at most11952 candidate RHS solutions before singular skips. This is a static finite-work count, not measured timing. Contracted CPU60s/wall180s/address-space768MiB, single threads and one campaign are implemented by bounded wrappers with recorded cumulative use; actual success and timing remain unobserved."
+    },
+    {
+      "id": "EXECUTION_PIN",
+      "result": "STATIC_PASS_PUBLICATION_PENDING",
+      "evidence": "run_bounded verifies exact current owned source/scripts/tests/CONTRACT plus four inherited modules against a supplied manifest, compares requested published commit to the pin, and validates input bytes. The actual published commit and pin were not yet provided for this preexecution check; final continuation must inspect them."
+    },
+    {
+      "id": "FIGURE_AND_OUTCOME_INTERPRETATION",
+      "result": "PENDING_ACTUAL_RESULT_AND_IMAGE",
+      "evidence": "Plotter reads saved JSON only and has no scientific imports. Empty outer family excludes only this finite model/window combination; empty inner with nonempty outer does not decide true feasibility. Outer extremizing vectors need not be true-feasible fits. Inner fits are nominally feasible, but their geometric objective endpoints remain enclosures. Caption finding REV001 must be corrected."
+    }
+  ],
+  "preserved_boundaries": {
+    "harmonic10_reruns": 0,
+    "central_completed": 28,
+    "central_total": 88,
+    "HE_physical_delta": 0,
+    "physical_open_nodes": 3,
+    "global_physical_completion": null,
+    "L4": false,
+    "production": "NOT_APPROVED"
+  },
+  "reviewed_sha256": {
+    "BASS_HE/research/program_expansion_20261025/continuation_exfor_20261028/CONTRACT.md": "771bc968658a07073baba6540b9818a71592551e2b904823d59ce5516b76c143",
+    "BASS_HE/research/program_expansion_20261025/continuation_exfor_20261028/src/exfor_aperture.py": "de3cc78852998114e0958f6c5c757c0c7789159e66ba55df1c04e5f74d629404",
+    "BASS_HE/research/program_expansion_20261025/continuation_exfor_20261028/tests/test_exfor_aperture.py": "b942370e934bc17238d3d0c4ba04d2b7e801949108833410c56be56542c83290",
+    "BASS_HE/research/program_expansion_20261025/continuation_exfor_20261028/scripts/measure_execution.py": "769dea4bd1ac6ae9fc2f7e07d11916fcf732cc3e36a1ac4ecad6b71c941ee47b",
+    "BASS_HE/research/program_expansion_20261025/continuation_exfor_20261028/scripts/plot_saved.py": "4b2487809239ecda1359ee967fe12c862b20398b101143b89b63f20dc9abb62e",
+    "BASS_HE/research/program_expansion_20261025/continuation_exfor_20261028/scripts/run_bounded.py": "0ee65489f9d69bd86a23390ddcbf74f0c5fa882a4d7fb1eef16fbc1a9a9932e3",
+    "BASS_HE/research/program_expansion_20261025/continuation_exfor_20261028/scripts/validate_once.py": "745d6d8bc06603e56985a4c6d1bc4d50a1f12c4b7c1306a8c08c620265f903a0",
+    "survey/literature/M0475.x4": "b2c1c52931e813dd63fb0e98edfc90088bc2eca497fd9142277e748f0935a82f",
+    "survey/literature/PUBLICATION_SAFE/R2_PRIMARY_LITERATURE.md": "2bea32896f3076d8f25ab431e223e15f6be67f6c2ee311827ae4b955b590772e",
+    "survey/literature/PUBLICATION_SAFE/EXFOR_M0475_PROVENANCE_AND_DATA.json": "dbb629184ccec50a9c9cd8f491057a901c4f0d0d400365c152104dbaa8395c49"
+  },
+  "continuation_required_in_same_pass": [
+    "Confirm the two small wording corrections and pin identity.",
+    "Read the actual one-campaign validation and resource receipts, exact saved result and stdout/stderr.",
+    "Inspect actual rendered PNG and its saved-input hash.",
+    "Inspect final scoped result/admission and HE-only central publication metadata if supplied."
+  ],
+  "admission_at_this_phase": null
+}

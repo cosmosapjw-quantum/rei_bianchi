@@ -1,0 +1,237 @@
+{
+  "schema": "he29.continuation.code_review.v1",
+  "reviewed_at_utc": "2026-10-20T06:42:58Z",
+  "status": "PASS_SCOPED_READ_ONLY_REVIEW",
+  "selected_stage": "C9",
+  "reviewer": "rust_literature",
+  "task_lane": "research/he29_survival_budget_20261018/continuation_20261020T0557Z",
+  "review_scope": {
+    "objective": "One split independent review of exact linear-budget core and partial-return semantic admission.",
+    "production_source_read": [
+      "src/linear_budget.py",
+      "src/partial_returns.py"
+    ],
+    "test_source_read": [
+      "tests/test_linear_budget.py",
+      "tests/test_partial_returns.py"
+    ],
+    "predecessor_source_read_for_contract": [
+      "../src/reference_runner.py",
+      "../src/reference_contract.py",
+      "../src/analyze_references.py",
+      "../src/analyze_return.py",
+      "../../he25_proper_birth_20261016/src/reference.py metadata construction"
+    ],
+    "cli_scope": "analyze_budget.py integration is outside this review's assigned source surface; parent owns integration acceptance.",
+    "scientific_scope": "Saved finite method candidates only; pair agreement is not a true-solution error radius.",
+    "mutation_scope": "Only this new CODE_REVIEW.json; no production code or earlier theory artifacts changed.",
+    "no_recursive_review": true,
+    "fresh_review_pass_index": 1,
+    "pass_is_split_by_subject": true
+  },
+  "skill_context_used": {
+    "current_version": "1.3.0",
+    "current_skill": "physmath-research-loop",
+    "current_source_root": "/root/.codex/plugins/cache/created-by-me-remote/physmath-research-loop/1.3.0/skills/physmath-research-loop",
+    "actually_read": [
+      "SKILL.md",
+      "references/CODING_LOOP.md",
+      "references/POLICY_INTEGRATION.md",
+      "references/SUBAGENT_MODE.md"
+    ],
+    "selected_definition": "C9: Review changed surfaces and dangerous assumptions; fix highest-risk findings then selectively recheck affected portions.",
+    "policy_application": [
+      "single bounded split review",
+      "reuse completed production verification",
+      "actual object/evidence/impact/minimum repair for findings",
+      "preserve typed source/result/packaging identity",
+      "no additional solver, gates, or review tree"
+    ],
+    "earlier_theory_review": "THEORY_REVIEW.json remains an earlier standalone 1.0.0 receipt; its 20 checks are reused without relabelling or rerunning."
+  },
+  "reviewed_source_and_evidence_identities": [
+    {
+      "path": "research/he29_survival_budget_20261018/continuation_20261020T0557Z/src/linear_budget.py",
+      "bytes": 7192,
+      "sha256": "bcf564826b3999af457fa0527166316c23a06e7d36421b4913c0a359da6af31c"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/continuation_20261020T0557Z/src/partial_returns.py",
+      "bytes": 24501,
+      "sha256": "53456cf3fc2abc0b8dfff42289f0a81f14008eddcdca84ff6c10449d8caee9b4"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/continuation_20261020T0557Z/tests/test_linear_budget.py",
+      "bytes": 5456,
+      "sha256": "e4ee5192581ce28a2cdbe89b198967b3c73090753306fbe419bff75fff397c82"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/continuation_20261020T0557Z/tests/test_partial_returns.py",
+      "bytes": 17081,
+      "sha256": "ab1a63f0ee7f233954f7c7661c19ea7af84521cd1805f3996311d92ee864f26e"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/continuation_20261020T0557Z/evidence/LINEAR_BUDGET_CHECKS/RECEIPT.json",
+      "bytes": 250,
+      "sha256": "da6d7566a102f7e7fa0ae443ddf494391c52fddd856a6fe0dba24c72685b81f1"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/continuation_20261020T0557Z/evidence/LINEAR_BUDGET_CHECKS/SCOPE.json",
+      "bytes": 622,
+      "sha256": "c079e7e7b07cd170682501a6d56bf9ad8ea87cf692ca381e80ac1ba8c84b5513"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/continuation_20261020T0557Z/evidence/PARTIAL_RETURN_CHECKS/RECEIPT.json",
+      "bytes": 251,
+      "sha256": "466fd86169357fab6339bd07ddfbe148d6fc708256744fc27d6cb5a1228f8a01"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/continuation_20261020T0557Z/evidence/PARTIAL_RETURN_CHECKS/SCOPE.json",
+      "bytes": 825,
+      "sha256": "d2890793978b1e96e15fa1ade131eddb4ca2ebe0ea6309bf6c44521c4088b95a"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/continuation_20261020T0557Z/evidence/THEORY_REVIEW.json",
+      "bytes": 27224,
+      "sha256": "ea248bc74aa798cf46e036ea545f179075fa4b66318e4ea87dab8183d62278f5"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/continuation_20261020T0557Z/evidence/WOLFRAM_BUDGET.json",
+      "bytes": 1809,
+      "sha256": "8ab392ce34d2dbb4eb7ac983aa1f9d3201e49829fbf8dc9223473cf3ca905b4e"
+    }
+  ],
+  "decisions": [
+    {
+      "object": "src/linear_budget.py::exact and LinearForm.__init__/operators",
+      "status": "ACCEPT",
+      "evidence": "Finite float inputs are individually converted with Fraction.from_float; exact integer/Fraction inputs remain exact; bool and nonfinite values are rejected. Duplicate keys are accumulated as exact Fractions and exactly zero terms removed before projection.",
+      "consequence": "Signed decomposition can preserve shared-reference cancellation without intermediate binary64 subtraction.",
+      "new_execution": false
+    },
+    {
+      "object": "src/linear_budget.py::product_hull, coherent_values, coherent_hull",
+      "status": "ACCEPT",
+      "evidence": "Product extrema use sign-correct coefficient times candidate endpoints. Coherent values use the intersection of method labels and one label over all active keys. Empty common labels raise explicitly. Candidate counts are labelled assignments, not probabilities.",
+      "consequence": "Product and coherent finite choice sets remain distinct; absent candidates cannot fabricate a common-method result.",
+      "boundary": "Constant forms may project without candidate values as symbolic algebra, not native admission."
+    },
+    {
+      "object": "src/linear_budget.py::outward, Hull.as_dict, rational_record",
+      "status": "ACCEPT",
+      "evidence": "Float bounds are compared back to exact Fractions and adjusted by one nextafter only if inward. exact_width and display_width are separate. Finite-display overflow preserves exact strings and returns null display fields. true_solution_error_bound remains false.",
+      "consequence": "Representable exact points are unpadded; a nonrepresentable exact point can correctly have zero exact width and a nonzero display enclosure."
+    },
+    {
+      "object": "src/partial_returns.py::load_trusted_identity/_check_identity",
+      "status": "ACCEPT_SCOPED",
+      "evidence": "Published science hashes, pinned parent/input manifests, six-point qualification identity, owner/build/table/thread metadata and exact runtime/binary/source cohorts are checked before admission. Optional returned binary byte readback is distinct from recorded identity.",
+      "consequence": "A case has to retain the frozen model/source/table contract; differing admitted cohorts do not make one complete campaign.",
+      "boundary": "This read-only review reused manufactured verification. It did not invoke a native process or repeat old DATA/source suites."
+    },
+    {
+      "object": "src/partial_returns.py::_classify_case physical versus consistency admission",
+      "status": "ACCEPT",
+      "evidence": "check_result and admit_pair are imported unchanged. The final admitted predicate additionally requires all six completion files, no admission-affecting errors, a valid cohort and pair PASS. A method-only or two-method/no-RESULT record cannot satisfy that predicate.",
+      "consequence": "Partial method results remain available as diagnostics while completed-pair selection remains false."
+    },
+    {
+      "object": "src/partial_returns.py::_classify_case process observations",
+      "status": "ACCEPT",
+      "evidence": "Timeout, return code, failure file, stream hashes and process wall time are retained separately. Process observation errors are marked affects_admission=False. Complete scientific files may coexist with a later process timeout. Missing method/case times start as null.",
+      "consequence": "Completed scientific evidence is not discarded because process cleanup failed, and missing methods are not synthesized."
+    },
+    {
+      "object": "src/partial_returns.py::classify_campaign",
+      "status": "ACCEPT",
+      "evidence": "All four frozen jobs are classified individually; malformed cases are retained as INVALID without discarding other cases. Complete requires four admitted cases and exactly one admitted cohort; cross-cohort contrasts are HOLD.",
+      "consequence": "The reader cannot silently promote a partial or mixed-cohort campaign to a completed reference campaign."
+    }
+  ],
+  "critical_findings": [],
+  "current_task_blockers": [],
+  "code_repairs_requested": [],
+  "verification_reused": {
+    "linear_core": {
+      "test_methods": 10,
+      "status": "PASS",
+      "receipt": "evidence/LINEAR_BUDGET_CHECKS/RECEIPT.json",
+      "source_scope": "evidence/LINEAR_BUDGET_CHECKS/SCOPE.json",
+      "source_sha256_match": true,
+      "returncode": 0,
+      "timed_out": false,
+      "reviewer_reran": false
+    },
+    "partial_classifier": {
+      "test_methods": 12,
+      "status": "PASS",
+      "receipt": "evidence/PARTIAL_RETURN_CHECKS/RECEIPT.json",
+      "source_scope": "evidence/PARTIAL_RETURN_CHECKS/SCOPE.json",
+      "source_sha256_match": true,
+      "returncode": 0,
+      "timed_out": false,
+      "reviewer_reran": false
+    },
+    "earlier_independent_theory": {
+      "unique_cases": 20,
+      "receipt": "evidence/THEORY_REVIEW.json",
+      "skill_version_at_execution": "1.0.0",
+      "status": "PASS_REUSED",
+      "reviewer_reran": false
+    },
+    "wolfram": {
+      "receipt": "evidence/WOLFRAM_BUDGET.json",
+      "output_actually_read": true,
+      "signed_closure": 0,
+      "shared_reference_level_cancellation": 0,
+      "product_hull": [
+        9,
+        11
+      ],
+      "coherent_hull": [
+        10,
+        10
+      ],
+      "native_calls": 0,
+      "status": "PASS_REUSED",
+      "reviewer_reran": false
+    },
+    "prior_method_source": {
+      "source": "Stolfi and de Figueiredo, An Introduction to Affine Arithmetic, TEMA 4(3), 2003",
+      "doi": "10.5540/TEMA.2003.04.03.0297",
+      "author_url": "https://lhf.impa.br/ftp/papers/tema.pdf",
+      "basis": "Actually read during the earlier 1.0.0 theory unit; established dependency handling reused.",
+      "new_literature_searches": 0
+    },
+    "log_receipt_hashes": "MATCH_ACTUAL_SAVED_LOG_BYTES"
+  },
+  "caller_contract": {
+    "native_candidate_registry": "Only admitted cases may enter actual paired-reference analysis; same reference key must denote the same validated case/table identity.",
+    "cross_case_contrast": "Require the same cohort_id before constructing a contrast.",
+    "shared_key": "Include cohort identity and case key; retain table identity in the admitted case.",
+    "partial_methods": "Diagnostic/performance display only until final pair admission.",
+    "old_mixed_difference": "Reuse stored audit values; do not recompute or count as a new native result.",
+    "coordination": "handoff_review stated it is implementing these boundaries in analyze_budget.py; that source was not reviewed here."
+  },
+  "activity": {
+    "tests_executed_by_this_C9_reviewer": 0,
+    "manufactured_theory_checks_repeated": 0,
+    "old_scientific_tests_executed": 0,
+    "native_runs": 0,
+    "solver_calls": 0,
+    "remote_writes": 0,
+    "rust_pin_changed": false,
+    "equations_rates_or_tolerances_changed": false
+  },
+  "stage_status": {
+    "C9_assigned_split": "COMPLETE",
+    "earlier_theory_pending_core_review": "Closed for the assigned core/semantic-admission surfaces by this receipt.",
+    "parent_integration_and_release": "Parent-owned remaining work; no additional independent review layer requested."
+  },
+  "publication": {
+    "status": "LOCAL_CODE_REVIEW_RECEIPT_WRITTEN_PARENT_PUBLISH_PENDING"
+  },
+  "backup": {
+    "status": "PARENT_BACKUP_RECEIPT_REQUIRED_FOR_NEW_ARTIFACT"
+  }
+}

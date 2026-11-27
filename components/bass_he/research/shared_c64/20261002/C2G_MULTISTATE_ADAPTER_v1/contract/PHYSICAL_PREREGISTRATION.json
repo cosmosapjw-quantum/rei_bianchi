@@ -1,0 +1,240 @@
+{
+  "schema": "bass-he.c2g.reference-preregistration.v1",
+  "node": "C2G_MULTISTATE_EIGENSOLVER_ADAPTER_AND_REFERENCE_PREREGISTRATION",
+  "status": "FROZEN_BEFORE_PHYSICAL_EXECUTION_PENDING_INDEPENDENT_REVIEW",
+  "question": "Can the multistate finite-Galerkin provider preserve selected+guard eigenvectors, reconstruct ±m, and compare a rank-5 ordinal candidate at R=4 and 4.25 in one exact finite-basis mass embedding?",
+  "not_claimed": [
+    "atomic-correlation identity at finite R",
+    "continuum isolation",
+    "full-H spectral gap lower bound",
+    "physical PDE residual",
+    "collision trajectory dynamics",
+    "full C2 closure",
+    "production accuracy"
+  ],
+  "physical_model": {
+    "Hamiltonian": "-0.5 Laplacian - ZA/|x-zA| - ZB/|x-zB|",
+    "ZA": 1.0,
+    "ZB": 2.0,
+    "R_set": [
+      4.0,
+      4.25
+    ],
+    "units": {
+      "length": "a_A",
+      "energy": "E_A",
+      "hbar": 1.0,
+      "electron_mass": 1.0
+    },
+    "origin": "fixed charge-center O axes, zA=-ZB R/(ZA+ZB), zB=ZA R/(ZA+ZB)",
+    "symmetries": "real spinless static axial; no rotating-frame/ETF term",
+    "nuclear_repulsion": "omitted",
+    "energy_zero": "electron at infinity",
+    "box": "common r<20 Dirichlet radial sphere in O coordinates; zero extension outside"
+  },
+  "selection": {
+    "kind": "large_R_rank5_ordinal_candidate_only",
+    "zero_based_ordinals": {
+      "0": [
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0
+      ],
+      "-1": [
+        0
+      ]
+    },
+    "guards": {
+      "0": [
+        0,
+        4,
+        5
+      ],
+      "1": [
+        1,
+        2
+      ],
+      "-1": [
+        1,
+        2
+      ]
+    },
+    "ground": "m0 ordinal0 retained as excluded guard",
+    "independent_sectors": [
+      0,
+      1
+    ],
+    "omitted_sectors": "all |m|>=2 and all unreturned roots; continuum not enclosed",
+    "full_gap_certificate": false,
+    "cross_R_labels": "source ordinal provenance only; polar-transported output columns are mixed frames"
+  },
+  "basis": {
+    "levels": [
+      {
+        "name": "coarse",
+        "lmax": 12,
+        "base_elements": 24
+      },
+      {
+        "name": "medium",
+        "lmax": 20,
+        "base_elements": 32
+      },
+      {
+        "name": "fine",
+        "lmax": 28,
+        "base_elements": 40
+      }
+    ],
+    "degree": 4,
+    "radial_assembly_quadrature": 14,
+    "rmax": 20.0,
+    "radial_knots": "explicit task boundaries frozen in manifest; exp(alpha=4) base plus exact nuclear radii",
+    "nested": false,
+    "variational_monotonicity_claim": false,
+    "same_workload_backend_parity": true
+  },
+  "eigensolver": {
+    "nroots": {
+      "0": 6,
+      "1": 3
+    },
+    "tol": 1e-11,
+    "maxiter": 2000,
+    "sigma": -5.5,
+    "which": "LM",
+    "mode": "normal shift-invert",
+    "v0": "cos(arange(N)*0.271)+0.25 deterministic",
+    "phase": "largest absolute coefficient chosen positive for every root",
+    "residual": "||Hc-E Mc||_2 / (||Hc||_2+|E| ||Mc||_2); finite generalized matrix only"
+  },
+  "common_embedding": {
+    "coordinate": "O-centered spherical r,eta=cos(theta),phi",
+    "mesh": "exact union of all 12 frozen source task radial knot arrays plus r=16 observable discontinuity",
+    "radial_GL_order": 7,
+    "eta_GL_order": 32,
+    "phi_points": 5,
+    "positive_weight": "r^2 dr d_eta d_phi",
+    "refinement_check": {
+      "radial_GL_order": 9,
+      "eta_GL_order": 40,
+      "phi_points": 7
+    },
+    "azimuth": "psi_±1=G exp(±i phi)/sqrt(2pi), psi0=G/sqrt(2pi); no-CS angular basis",
+    "operator": "H_emb=E M^-1 H M^-1 E† W on each finite embedded span; measured C†HC, no pointwise PDE claim",
+    "extra_radial_knots": [
+      16.0
+    ]
+  },
+  "gates": {
+    "implementation": {
+      "relative_algebraic_residual_max": 1e-10,
+      "all_column_Gram_max_entry_error": 2e-10,
+      "finite_mass_isometry_max_entry_error": 2e-10,
+      "partner_energy_abs_error": 1e-12,
+      "backend_energy_max_abs_error": 2e-09,
+      "backend_projector_operator_distance_max": 2e-07,
+      "quadrature_overlap_max_abs_delta": 2e-10,
+      "quadrature_trace_r2_max_abs_delta": 2e-08,
+      "projected_H_hermitian_max_entry_error": 2e-10,
+      "all_column_Gram_operator_norm_error": 2e-10,
+      "projected_H_hermitian_operator_norm_error": 1e-12
+    },
+    "candidate_transport": {
+      "observed_supplied_guard_spacing_min": 0.0001,
+      "principal_overlap_sigma_min": 0.5,
+      "scope": "reject known sampled guard collision only, never a full-spectrum lower bound"
+    },
+    "finite_basis_exploration": {
+      "medium_to_fine_energy_max_abs_delta": 0.005,
+      "medium_to_fine_selected_projector_operator_distance_max": 0.05,
+      "medium_to_fine_trace_r2_relative_delta_max": 0.02,
+      "fine_selected_outer_layer_probability_max": 1e-06,
+      "outer_layer": [
+        16.0,
+        20.0
+      ],
+      "scope": "exploratory fixed-box discretization screens; not absolute true-error bounds, no outside-box tail bound"
+    },
+    "failure_policy": "record all values and failed gates unchanged; never loosen thresholds after observing; finite-basis screen failure does not erase implementation result; known guard collision blocks transport",
+    "C2f_validation_parameters": {
+      "gram_atol": 2e-10,
+      "degeneracy_atol": 1e-12,
+      "residual_max": 1e-10,
+      "external_gap_min": 0.0001,
+      "semantics": "Gram and Hermitian checks use matrix spectral norm, not max entry; residual is dimensionless relative generalized finite-matrix norm"
+    }
+  },
+  "observables": {
+    "trace_r2": "sum_selected <psi|r^2|psi>, frame invariant on normalized selected span",
+    "outer_layer_probability": "max eigenvalue of selected projected indicator[16<=r<=20]; basis-invariant concentration diagnostic, no exterior-tail bound",
+    "projector": "operator norm ||P1-P2|| within common positive quadrature metric"
+  },
+  "campaign": {
+    "layouts": [
+      {
+        "id": "numpy_serial_1x1",
+        "execution": "serial",
+        "backend": "numpy",
+        "ranks": 1,
+        "threads": 1,
+        "binding": "none"
+      },
+      {
+        "id": "native_mpi_2x1",
+        "execution": "mpi",
+        "backend": "native",
+        "ranks": 2,
+        "threads": 1,
+        "binding": "none"
+      }
+    ],
+    "tasks_per_layout": 12,
+    "independent_roots_per_layout": 54,
+    "represented_columns_per_layout_after_pm_reconstruction": 72,
+    "max_layouts": 2,
+    "max_total_sector_solves": 24,
+    "max_total_independent_roots": 108,
+    "per_layout_wall_seconds": 300.0,
+    "max_total_layout_wall_seconds": 600.0,
+    "per_layout_sampled_memory_gib": 4.0,
+    "postprocess_wall_seconds": 120.0,
+    "postprocess_sampled_memory_gib": 4.0,
+    "rank_thread_ceiling": [
+      2,
+      4
+    ],
+    "expected_host": "recheck effective CPU and cgroup before eachlaunch; NCP64 not presumed",
+    "cross_output_global_quota": "root execution ledger; runtime enforces per-launch limits only",
+    "failed_attempts": "consume planned launch budget unless explicit reviewed amended contract justifies retry; retain logs"
+  },
+  "optimization": {
+    "native": "inherited validated Fortran ABI3 element assembly; binary64 O3 OpenMP SIMD independent entries, no reassociation/fastmath/FMA contraction",
+    "parallel": "OpenMPI rank-strided independent R/level/m tasks, summary-only gather",
+    "BLAS_threads": 1,
+    "backend_choice": "record whole-workload and assembly/eigensolve timings; two layouts confound backend and parallelism, no pure backend speedup claim",
+    "timing_repetitions": 1,
+    "NCP64_actual_measurement": false
+  },
+  "global_gates": {
+    "full_C2_closed": false,
+    "scientific_PROMOTE": "HOLD",
+    "full_certificate_fail_closed": true,
+    "Eq55_next_node_authorized": false,
+    "Eq55": "NOT_RUN",
+    "production_default_change": "NOT_AUTHORIZED"
+  },
+  "primary_sources": [
+    {
+      "url": "https://docs.scipy.org/doc/scipy-1.17.0/reference/generated/scipy.sparse.linalg.eigsh.html",
+      "supports": "generalized eigenproblem, shift-invert and k<N; tol stopping condition distinct from measured residual"
+    },
+    {
+      "url": "https://dlmf.nist.gov/14.30",
+      "supports": "azimuthal and phase convention reference; our chosen ± phase is explicitly rephased relative to standard Y_lm"
+    }
+  ]
+}

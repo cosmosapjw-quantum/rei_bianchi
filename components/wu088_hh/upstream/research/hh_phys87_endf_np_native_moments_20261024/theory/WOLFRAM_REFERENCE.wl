@@ -1,0 +1,25 @@
+TimeConstrained[Module[{x,ph,a,b,c,be,ga,w,q,m,z,t,nu,f,i1,r,pol,pp1,pp2,vnum,tm,vals},
+tm=AbsoluteTiming[
+nu=c*x+Sqrt[1-c^2]*Sqrt[1-x^2]*Cos[ph];
+f=(1+3*a*x+5*b*(3*x^2-1)/2)/2;
+r=Table[FullSimplify[Integrate[Integrate[nu^j*f/(2*Pi),{ph,0,2*Pi}],{x,-1,1}],-1<c<1],{j,0,2}];
+i1=BesselK[1,z]/z;
+pol[n_]:=Sum[Product[4*n^2-(2*j-1)^2,{j,1,k}]*t^k/(k!*8^k),{k,0,6}];
+pp1=pol[1];pp2=pol[2];
+vnum=Expand[pp1^2+3*t*pp2*pp1-pp2^2];
+vals={
+FullSimplify[r[[1]]-1],
+FullSimplify[r[[2]]-a*c],
+FullSimplify[r[[3]]-(1-b+3*b*c^2)/3],
+FullSimplify[Integrate[a*c/2,{c,-1,1}]],
+FullSimplify[Integrate[(1-b+3*b*c^2)/6,{c,-1,1}]-1/3],
+FullSimplify[ga*q*(2*w-q)/(2*w)*(1+be*x)+ga*(w-q+q^2/(2*w)-be*q*(2*w-q)/(2*w)*x)-(w-q)-(ga*w-m)-(m-(w-q))],
+FullSimplify[-D[i1,z]/i1-BesselK[2,z]/BesselK[1,z],z>0],
+FullSimplify[D[i1,{z,2}]/i1-1-3*BesselK[2,z]/(z*BesselK[1,z]),z>0],
+Coefficient[vnum,t,0],
+Coefficient[vnum,t,1],
+Coefficient[vnum,t,2]-3/2,
+FullSimplify[(4*(1+3*q)/3-1/3)-1-4*q]
+};];
+ExportString[<|"schema"->"PHYS87_SYMBOLIC_REFERENCE_V1","residuals"->(ToString[#,InputForm]&/@vals),"count"->Length[vals],"all_zero"->And@@(TrueQ[#==0]&/@vals),"body_wall_s"->tm[[1]],"domain"->"formal source moments and Bessel identities only; no thermal source execution or continuum error bound"|>,"RawJSON"]
+],55,"PHYS87_SYMBOLIC_TIMEOUT"]

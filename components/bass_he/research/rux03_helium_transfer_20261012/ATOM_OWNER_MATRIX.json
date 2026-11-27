@@ -1,0 +1,360 @@
+{
+  "schema": "bass-he.atom-owner-matrix.v1",
+  "created_utc": "2026-10-12T11:31:18.212959+00:00",
+  "status": "LOCAL_SOURCE_BOUND_OWNER_RECORD_COMPLETE_REVIEW_PENDING",
+  "selected_scenario": "PR96_HM12_WARM_HHE_PRIMARY_CASE_A_ESCAPE_EXTENDED_10_50000_EV",
+  "global_RUX03_owner_injection": "PENDING_UPSTREAM_REI_IMPLEMENTATION",
+  "scope": "Actual retained native route and separately identified existing alternatives. Owner records do not implement/inject upstream code.",
+  "owner_plan_commit": "3904f9e2791e75db3a3229e5f489bf7d566fe189",
+  "owner_plan_source": "current_rei:docs/fastest_track_chat/REI-ATOMIC-REUSE-RESET-20261012/ASSET_OWNER_MAP_KO.md",
+  "recombination_closure_choices": [
+    {
+      "id": "CASE_A_EXPLICIT_TRANSPORT",
+      "valid_upstream_choice": true,
+      "selected_for_retained_scenario": false,
+      "required_ownership": "Case-A recombination plus explicitly transported diffuse photon source, primary absorption, spectrum/multiplicity and consistent gas binding/thermal ledger"
+    },
+    {
+      "id": "CASE_A_ESCAPE",
+      "valid_upstream_choice": true,
+      "selected_for_retained_scenario": true,
+      "required_ownership": "FT03 Case-A RR/DR energy escape once; no diffuse photon inventory or reabsorption"
+    },
+    {
+      "id": "CASE_B_OTS",
+      "valid_upstream_choice": true,
+      "selected_for_retained_scenario": false,
+      "required_ownership": "Case-B rates with consistent local absorption/thermal convention; no duplicate full Case-A sink, extra diffuse source or escape energy"
+    }
+  ],
+  "rows": [
+    {
+      "id": "BACKGROUND_TIME_DENSITY",
+      "process": "prescribed LRS geometry, proper epoch and nuclear density",
+      "owner": "rei_bianchi physical input adapter",
+      "implementation": [
+        "BianchiBackground.at",
+        "BianchiBackground.time_of_redshift"
+      ],
+      "selected_warm_active": true,
+      "inputs": "elapsed proper seconds in [0,1e11]; selected z_a=5.807 origin",
+      "outputs": "a_rel,b,H,s,nH,nHe,z_a",
+      "single_owner_rule": "One time map and proper-density conversion; ln(a) is not seconds.",
+      "source_ids": [
+        "physical_v2:research/physical_provider_20261010/background.py"
+      ],
+      "domain_id": "WARM_INTERVAL"
+    },
+    {
+      "id": "INITIAL_HM12_FIELD",
+      "process": "initial radiation number inventory",
+      "owner": "rei_bianchi HM12 intake",
+      "implementation": [
+        "HM12Table.photon_number_log",
+        "Interval.__init__"
+      ],
+      "selected_warm_active": true,
+      "inputs": "author UVB J_nu at initial E=q and z_a=5.807",
+      "outputs": "n_lnE=4*pi*J_nu/(c*h); weighted initial N_rel",
+      "single_owner_rule": "Use UVB only for t=0; do not impose later UVB/PI-rate tables on evolving photons.",
+      "source_ids": [
+        "physical_v2:research/physical_provider_20261010/hm12_data.py",
+        "physical_v2:research/physical_provider_20261010/run_interval.py",
+        "physical_v2:research/physical_provider_20261010/sources/UVB.out"
+      ],
+      "domain_id": "HM12_RETAINED_FINITE_BAND"
+    },
+    {
+      "id": "HM12_EMISSIVITY",
+      "process": "stage-local primary photon source",
+      "owner": "rei_bianchi HM12/source adapter",
+      "implementation": [
+        "HM12Table.photon_emission_log",
+        "Interval.rhs"
+      ],
+      "selected_warm_active": true,
+      "inputs": "comoving epsilon_nu(E,z_a), source_scale=1",
+      "outputs": "S_lnE=epsilon_nu*(1+z_a)^3/(h*Mpc_cm^3); fixed-q cell S_lnE*w/R^3",
+      "single_owner_rule": "Emission is injected once; no c factor and no invented additional escape fraction.",
+      "source_ids": [
+        "physical_v2:research/physical_provider_20261010/hm12_data.py",
+        "physical_v2:research/physical_provider_20261010/run_interval.py",
+        "physical_v2:research/physical_provider_20261010/sources/emissivity.out"
+      ],
+      "domain_id": "HM12_RETAINED_FINITE_BAND"
+    },
+    {
+      "id": "THERMAL_RR_CI_DR",
+      "process": "H/He RR, electron-impact ionization, HeII two-term DR and energy moments",
+      "owner": "rei_bianchi FT03 family; BASS_HE role is atomic/source semantics",
+      "implementation": [
+        "ft03_coefficients",
+        "ft03_rhs"
+      ],
+      "selected_warm_active": true,
+      "inputs": "same-stage gas T, ne and proper nuclear species densities",
+      "outputs": "cm^-3 s^-1 events; erg cm^-3 s^-1 thermal and escape terms",
+      "single_owner_rule": "Native thermo photon state is zero; custom evolving-node PI owns photon events. Raw Grackle functions are a different path.",
+      "source_ids": [
+        "physical_v2:rust/rei_microphysics/src/ft03_rates.rs",
+        "physical_v2:rust/rei_microphysics/src/ft03_controlled.rs",
+        "physical_v2:research/physical_provider_20261010/native/src/main.rs"
+      ],
+      "domain_id": "FT03_CASE_A",
+      "recombination_case": "A",
+      "emission_closure": "CASE_A_ESCAPE"
+    },
+    {
+      "id": "GROUND_STATE_SIGMA",
+      "process": "HI/HeI/HeII ground-state photoionization cross sections",
+      "owner": "BASS_HE atomic-data/domain contract; existing rei AtomicProvider evaluator",
+      "implementation": [
+        "AtomicProvider::cross_section"
+      ],
+      "selected_warm_active": true,
+      "inputs": "gas-frame energy in eV and absorber species",
+      "outputs": "sigma in cm^2 with three independent fit cutoffs",
+      "single_owner_rule": "Sigma has no density/time/radiation normalization. Fit cutoffs are not binding energies.",
+      "source_ids": [
+        "physical_v2:rust/rei_microphysics/src/atomic_provider.rs",
+        "current_rei:rust/rei_microphysics/src/atomic_provider.rs"
+      ],
+      "domain_ids": [
+        "VERNER_HI",
+        "VERNER_HeI",
+        "VERNER_HeII"
+      ]
+    },
+    {
+      "id": "PRIMARY_ABSORPTION",
+      "process": "photon loss, ionization, binding and primary photoheat",
+      "owner": "selected rei physical native rhs",
+      "implementation": [
+        "rhs(&Input) node/species loop",
+        "AxisymLocalSources assembly"
+      ],
+      "selected_warm_active": true,
+      "inputs": "proper lower-state populations, evolving weighted photon nodes, sigma, c, binding chi",
+      "outputs": "event=c*sigma*n_gamma*n_abs; Gamma; photon loss; ion/electron source; chi binding; (E-chi) heat",
+      "single_owner_rule": "Exactly one event owns all four ledgers. Do not add homogeneous_photo_rates or a second primary-stage sink on top.",
+      "source_ids": [
+        "physical_v2:research/physical_provider_20261010/native/src/main.rs",
+        "physical_v2:rust/rei_microphysics/src/hhe_events.rs"
+      ],
+      "domain_ids": [
+        "VERNER_HI",
+        "VERNER_HeI",
+        "VERNER_HeII"
+      ],
+      "hard_particle_CR_enabled": false
+    },
+    {
+      "id": "RECOMBINATION_ESCAPE",
+      "process": "RR/DR total recombination-radiation escape energy",
+      "owner": "selected FT03 native thermo",
+      "implementation": [
+        "ft03_rhs::escaped_energy_rate"
+      ],
+      "selected_warm_active": true,
+      "inputs": "Case-A RR kinetic and binding energy; two DR captured-energy moments",
+      "outputs": "escaped energy in erg cm^-3 s^-1",
+      "single_owner_rule": "No photon count or spectrum is inferred from scalar recombination/escape energy. Choose one of the upstream closure alternatives before switching.",
+      "source_ids": [
+        "physical_v2:rust/rei_microphysics/src/ft03_controlled.rs",
+        "physical_v2:rust/rei_microphysics/src/ft03_rates.rs",
+        "current_rei:docs/fastest_track_chat/REI-ATOMIC-REUSE-RESET-20261012/ASSET_OWNER_MAP_KO.md"
+      ],
+      "closure_id": "CASE_A_ESCAPE",
+      "photon_spectrum_available": false,
+      "emitted_photon_count_specified": false
+    },
+    {
+      "id": "GAS_EXPANSION_WORK",
+      "process": "gas expansion work in retained native route",
+      "owner": "axisym_coupled_derivative",
+      "implementation": [
+        "axisym_coupled_derivative",
+        "native rhs wdot density-coordinate conversion"
+      ],
+      "selected_warm_active": true,
+      "inputs": "H and proper thermal energy, local species/electron source",
+      "outputs": "u_dot=-5*H*u+local_power; corresponding T and w evolution",
+      "single_owner_rule": "No separate outer -2H*T term. If using coupled_primary instead, its existing thermal-work owner replaces this owner.",
+      "source_ids": [
+        "physical_v2:rust/rei_microphysics/src/axisym_coupling.rs",
+        "physical_v2:research/physical_provider_20261010/native/src/main.rs",
+        "current_rei:rust/rei_microphysics/src/coupled_primary.rs"
+      ],
+      "alternative_route_owner": "coupled_primary::PrimaryEvents::thermal_work_ev_per_h"
+    },
+    {
+      "id": "PHOTON_GEOMETRY",
+      "process": "directional characteristic and photon redshift/shear work",
+      "owner": "rei physical history/geometry",
+      "implementation": [
+        "characteristic(q,mu0,geom)",
+        "axisym_coupled_derivative photon-moment consistency"
+      ],
+      "selected_warm_active": true,
+      "inputs": "q,mu0,metric geometry and evolving N_rel",
+      "outputs": "E=qR,mu,N_rel=a_rel^3*n; photon energy/shear-work ledger",
+      "single_owner_rule": "One characteristic/Jacobian mapping; fixed-q photon state is not redshifted a second time by moment accounting.",
+      "source_ids": [
+        "physical_v2:research/physical_provider_20261010/run_interval.py",
+        "physical_v2:rust/rei_microphysics/src/axisym_coupling.rs",
+        "physical_v2:research/physical_provider_20261010/native/src/main.rs"
+      ],
+      "support_policy": "finite initial q=10..50000 eV; no excluded-q boundary inflow"
+    },
+    {
+      "id": "HOMOGENEOUS_LEDGER_REUSE",
+      "process": "existing primary-only evaluator and opacity-owner decomposition",
+      "owner": "rei_bianchi homogeneous_rates, reusable bass_cr-derived stock",
+      "implementation": [
+        "homogeneous_opacity",
+        "homogeneous_photo_rates"
+      ],
+      "selected_warm_active": false,
+      "inputs": "proper absorber cm^-3; bin-integrated comoving cMpc^-3 photons; mean scale factor",
+      "outputs": "Gamma,event,primary heat,binding,comoving photon-loss and species opacity fractions",
+      "single_owner_rule": "An alternate adapter or comparator; never add its sink/heat to the already counted native/primary event.",
+      "source_ids": [
+        "current_rei:rust/rei_microphysics/src/homogeneous_rates.rs",
+        "current_rei:docs/fastest_track_chat/REI-ATOMIC-REUSE-RESET-20261012/ASSET_OWNER_MAP_KO.md"
+      ],
+      "hard_particle_CR_enabled": false,
+      "effective_MFP_included": false
+    },
+    {
+      "id": "EXISTING_IMPLICIT_PRIMARY",
+      "process": "conservative gas-primary implicit step/root machinery",
+      "owner": "rei_bianchi coupled_primary",
+      "implementation": [
+        "primary_stage_step_conservative",
+        "primary_stage_root"
+      ],
+      "selected_warm_active": false,
+      "inputs": "PrimaryStage(n_h_cm3,f_he,h_mean_per_s), PrimaryState fractions/w/packets",
+      "outputs": "implicit gas, positive photon state, event and energy ledger",
+      "single_owner_rule": "Preserve its existing gas-work owner; chosen source/rate/domain injection must cover both point and root/interval routes.",
+      "source_ids": [
+        "current_rei:rust/rei_microphysics/src/coupled_primary.rs",
+        "current_rei:docs/fastest_track_chat/REI-ATOMIC-REUSE-RESET-20261012/ASSET_OWNER_MAP_KO.md"
+      ],
+      "global_RUX03_injection": "PENDING",
+      "current_atomic_path": "Ft03Model::controlled -> ft03_rhs; signatures -> AtomicProvider::reference cross sections"
+    },
+    {
+      "id": "RCT_RATE_COUNT_ONLY",
+      "process": "HI + HeIII -> HII + HeII + gamma",
+      "owner": "BASS_HE selected rate packet; rei opt-in RCT adapter",
+      "implementation": [
+        "bass_he_atomic_export.api.export_packet",
+        "RctProvider::coefficient_cm3_s",
+        "RctProvider::events"
+      ],
+      "selected_warm_active": false,
+      "inputs": "one explicit KF96 or GM25 source, common-T Maxwell zero-drift W82 ground-state scenario, proper HI and HeIII",
+      "outputs": "k nHI nHeIII events, species [-1,+1,0,+1,-1,0], direct delta ne=0, one event photon under stated scenario",
+      "single_owner_rule": "Alternative rates are never additive or averaged; source conflict acknowledgment is not physical admission.",
+      "source_ids": [
+        "current_he:research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/api.py",
+        "current_he:research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/registry.py",
+        "current_he:research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/_rate.py",
+        "current_he:research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/_kf96.py",
+        "current_rei:rust/rei_microphysics/src/he_rct.rs"
+      ],
+      "domain_ids": [
+        "KF96_RCT",
+        "GM25_RCT"
+      ],
+      "physical_admission": false,
+      "spectrum_available": false,
+      "heat_moment_available": false
+    },
+    {
+      "id": "RCT_CALLER_CLOSURE",
+      "process": "optional RCT escaping mean photon energy and thermal split",
+      "owner": "caller-defined research closure; rei RCT adapter",
+      "implementation": [
+        "EscapingMeanPhotonEnergy::research_input_ev",
+        "RctProvider::closed_events",
+        "combined_ft03_rhs"
+      ],
+      "selected_warm_active": false,
+      "inputs": "positive caller-supplied mean escaped photon energy mu; chosen k and gas model chi",
+      "outputs": "q=chiHeII-chiHI; binding=-q*R, heat=(q-mu)*R, escape=mu*R",
+      "single_owner_rule": "No physical energy moment is predicted by a count rate. combined_ft03_rhs preserves FT03 thermo; do not call combined_hhe_rhs on Ft03Model.gas whose generic coefficients are zero.",
+      "source_ids": [
+        "current_rei:rust/rei_microphysics/src/he_rct.rs",
+        "physical_v2:rust/rei_microphysics/src/ft03_controlled.rs"
+      ],
+      "physical_closure_admission": false,
+      "implicit_stepper_injection": false,
+      "default_selection": "RctSelection::Disabled"
+    },
+    {
+      "id": "HE_EXCITED_SPECTRA",
+      "process": "584 Angstrom, 2^1P<->2^1S, 2^1S two-photon and excited bound-free spectral source",
+      "owner": "BASS_HE separate MICRO-2/WU29-WU44/T4-T5 precision lane",
+      "implementation": [],
+      "selected_warm_active": false,
+      "inputs": "separately selected differential emission model and excited-state population/source contract",
+      "outputs": "potential emitted spectrum/multiplicity/moments; not supplied by selected warm baseline",
+      "single_owner_rule": "Do not reinterpret MICRO-0 ground-state rate or a total transition rate as an unresolved differential spectrum. This optional lane does not block the selected warm baseline.",
+      "source_ids": [
+        "drive_document:BASS_HE_EOR_T0",
+        "current_rei:docs/fastest_track_chat/REI-ATOMIC-REUSE-RESET-20261012/ASSET_OWNER_MAP_KO.md"
+      ],
+      "retained_source_branch": "D86_TABLE_V_LENGTH_LINEAR_B (historical T0 authority; no source amendment in this work unit)",
+      "current_runtime_mapping": "NOT_SELECTED_OR_INJECTED",
+      "physical_accuracy_in_this_work_unit": "NOT_ASSESSED"
+    },
+    {
+      "id": "RAW_GRACKLE_REFERENCE",
+      "process": "raw rate/cooling expressions and branch/floor/cap parity",
+      "owner": "rei AtomicProvider reference path",
+      "implementation": [
+        "AtomicProvider::record",
+        "AtomicProvider::raw_coefficient"
+      ],
+      "selected_warm_active": false,
+      "inputs": "RawProcess,T,RecombinationCase",
+      "outputs": "source raw coefficient with explicit density prefactor, units and species-change metadata",
+      "single_owner_rule": "Implementation guard is not physical temperature support or thermal closure; current warm stage still calls FT03.",
+      "source_ids": [
+        "current_rei:rust/rei_microphysics/src/atomic_provider.rs",
+        "P02A:research/physical_provider_20261010/p02a/CONTRACT.json",
+        "P02A:research/physical_provider_20261010/p02a/RETURN_IDENTITY.json"
+      ],
+      "domain_id": "GRACKLE_RAW_REFERENCE",
+      "consumer_admission": false,
+      "physical_support_resolved": false
+    },
+    {
+      "id": "OPTIONAL_HH_CR",
+      "process": "HH reactions and hard-particle CR/secondary deposition",
+      "owner": "separate declared optional physics owners",
+      "implementation": [],
+      "selected_warm_active": false,
+      "inputs": "requires a future named reaction/source/domain and closure",
+      "outputs": "no contribution in selected warm primary-only model",
+      "single_owner_rule": "Reusing photon-absorption/heat tools does not enable hard-particle CR. HH/RCT/CR OFF is this baseline choice, not a restriction on independent research.",
+      "source_ids": [
+        "current_rei:docs/fastest_track_chat/REI-ATOMIC-REUSE-RESET-20261012/ASSET_OWNER_MAP_KO.md"
+      ],
+      "new_scientific_admission": false
+    }
+  ],
+  "global_rules": {
+    "same_absorber_effective_MFP_and_local_opacity": "one owner; a disjoint-population decomposition requires an explicit photon/energy attribution",
+    "selected_baseline_effective_MFP": "none separately imposed",
+    "source_null_is_zero": false,
+    "recombination_case_B_globally_forbidden": false,
+    "new_physical_input_absence_blocker": false,
+    "single_rate_per_reaction": true,
+    "global_injection_complete": false
+  },
+  "evidence_map": "evidence/BOUND_SOURCE_MAP.json",
+  "new_science_executions": 0
+}

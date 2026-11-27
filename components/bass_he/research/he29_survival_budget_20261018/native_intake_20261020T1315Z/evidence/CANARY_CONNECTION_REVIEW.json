@@ -1,0 +1,119 @@
+{
+  "schema": "he29.packed_native_connection.review.v1",
+  "status": "PATHS_COMPATIBLE_EXECUTION_BOUNDARY_WRAPPER_REQUIRED",
+  "scope": "Read-only connection review; no source edit/build/test/solver execution",
+  "repository": "cosmosapjw-quantum/BASS_HE",
+  "raw_return_publication": "089d6afba06bb35f303fc704163d75f5761ec9df",
+  "fixed_source": {
+    "packed": "a5d4711460c09b310b78c9692aa62534b7a843d3",
+    "vigilode": "a21d573980f66fe02891bd216153443b5352f921",
+    "baseline": "1569f3718cd4b17a16936ad3d72bc7d5ed9b0f4f",
+    "owner": "f7830e2f55e7a1938bc3c98f61b60651f8dae474",
+    "corrected_controller": "ed5adca43f474553a9bce7f5de45d464be5905cb"
+  },
+  "read_sources": [
+    "BASS_HE/AGENTS.md",
+    "BASS_HE/research/he29_survival_budget_20261018/optimization_20261020/NCP_HANDOFF_KO.md",
+    "BASS_HE/research/he29_survival_budget_20261018/optimization_20261020/src/run_packed.py",
+    "BASS_HE/research/he29_survival_budget_20261018/optimization_20261020/src/packed_reference.py",
+    "BASS_HE/research/he29_survival_budget_20261018/optimization_20261020/ncp/build_bridge.py",
+    "BASS_HE/research/he29_survival_budget_20261018/vigilode_20261019/src/run_vigilode.py",
+    "BASS_HE/research/he29_survival_budget_20261018/src/reference_runner.py",
+    "BASS_HE/research/he29_survival_budget_20261018/src/analyze_references.py",
+    "pinned Git a5: research/he28_strip_refinement_20261018/src/execution.py",
+    "pinned Git ed5: research/he29_survival_budget_20261018/orchestration_20261020/src/continue_missing_references.py",
+    "native_return/HE29_RETURN_STAGE_20261020T123700Z/provenance/EXECUTION_COMMAND.json",
+    "native_return/HE29_RETURN_STAGE_20261020T123700Z/execution/build/RECEIPT.json",
+    "native_return/HE29_RETURN_STAGE_20261020T123700Z/execution/references/m8_r4_table512/{IDENTITY,TABLE}.json"
+  ],
+  "reported_NCP_paths": {
+    "work_root": "/root/HE29_REFERENCE_20261020T120000Z",
+    "baseline_checkout": "/root/HE29_NCP_20261020T105630Z/checkouts/baseline1569",
+    "analysis_checkout": "/root/HE29_NCP_20261020T105630Z/checkouts/analysis_09929b0",
+    "controller_checkout": "/root/HE29_NCP_20261020T105630Z/checkouts/controller_ed5adca",
+    "references": "/root/HE29_REFERENCE_20261020T120000Z/references",
+    "owner_binary": "/root/HE29_REFERENCE_20261020T120000Z/build/he29_owner_server",
+    "owner_receipt": "/root/HE29_REFERENCE_20261020T120000Z/build/RECEIPT.json",
+    "python_expected": "/root/HE29_REFERENCE_20261020T120000Z/venv/bin/python",
+    "input_archive": "/root/HE29_NCP_20261020T105630Z/incoming/BASS_HE_HE29_RESUME_COMPLETE_20261018_a70d320c.tar.gz",
+    "current_host_path_existence": "UNOBSERVED_IN_THIS_HOST",
+    "current_NCP_processes": "UNOBSERVED",
+    "active_process_gate": "Before any NCP canary, current authorized executor reads prior canary paths/processes. No invocation of Remote Desktop Commander."
+  },
+  "cohort_required": {
+    "binary_sha256": "a82e540797322027deaab6e6bcb2bde746de737adeedbf144313598c65f5b7e9",
+    "owner_source": "f7830e2f55e7a1938bc3c98f61b60651f8dae474",
+    "python": "3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "table_sha256": "919ca6f42028bffc37cb208916ee5a9927356eb99344fe467f9b98e30e9fddcd",
+    "case": {
+      "m": 8,
+      "r": 4,
+      "angles": 4,
+      "q": 0,
+      "table_nodes": 512,
+      "packed_threads": 1
+    },
+    "initial_state": "Regenerated original model initial state via validate_model; saved reference endpoints supply comparisons, not the canary initial condition.",
+    "state_norm": "All gas, photons and original 19 ledger variables remain in original full-state norm."
+  },
+  "findings": [
+    {
+      "id": "HE29-PACKED-WATCHDOG-REUSE-01",
+      "category": "implementation execution boundary",
+      "status": "MINIMAL_WIRING_REPAIR_REQUIRED",
+      "target": [
+        "optimization_20261020/src/run_packed.py::run_process",
+        "optimization_20261020/ncp/build_bridge.py::run_process"
+      ],
+      "evidence": "Both bindings import the original he28 execution.py helper (876e43d...) which sends SIGKILL only when its leader remains alive after TERM. PR79 already independently diagnosed/corrected this exact helper behavior (HE29-WATCHDOG-01).",
+      "impact": "A canary/compile timeout can return while a TERM-resistant descendant survives. The original claimed entire-created-group cleanup is not established for these old entrypoints.",
+      "minimal_repair": "Add an external wrapper that imports the pinned a5 target unchanged and replaces its process-call binding with functools.partial(pinned_ed5.run_process_group, execution=pinned_original_execution). Call the original main; keep generated _worker argv pointing to the unchanged a5 runner.",
+      "existing_evidence_to_reuse": "PR79 independent review PASS_SCOPED and 14 focused test methods; do not repeat old descendant diagnostic/tests.",
+      "science_effect": "No change to a5 science/bridge files, source/table/runtime checks, solver, full-state norm, tolerances, output or admission."
+    }
+  ],
+  "wrapper_design": {
+    "file_role": "New additive external entrypoint; stored outside a5 checkout so original publication_contract remains byte/HEAD-clean.",
+    "corrected_controller_relative_path": "research/he29_survival_budget_20261018/orchestration_20261020/src/continue_missing_references.py",
+    "corrected_controller_sha256": "70d38312c288533b829eadbab8037cc09b4218247ebd6262318fc25cb9f0baad",
+    "corrected_controller_signature": "run_process_group(argv, destination, timeout_s, *, execution)",
+    "original_execution_relative_path": "research/he28_strip_refinement_20261018/src/execution.py",
+    "original_execution_sha256": "876e43d76f0773a8d2c38e262902442c614a68334561f5e2a78024c659edb1c4",
+    "original_execution_role": "Provide unchanged atomic_json and digest to corrected watchdog; do not mutate the pinned helper file.",
+    "target_modes": [
+      "build",
+      "preflight",
+      "canary"
+    ],
+    "forbidden_direct_mode": "_worker",
+    "target_entrypoints": {
+      "build": "optimization_20261020/ncp/build_bridge.py::main",
+      "preflight": "optimization_20261020/src/run_packed.py::main (preflight)",
+      "canary": "optimization_20261020/src/run_packed.py::main (canary)"
+    },
+    "wiring": "Import target with its normal source directory present in sys.path; module.run_process = functools.partial(corrected_controller.run_process_group, execution=original_execution); invoke target.main with original arguments. Record wrapper/controller/target hashes and source pins outside a5 checkout.",
+    "fixed_source_checks": "Verify a5 and ed5 exact Git HEADs and allowed file hashes before imports. Wrapper source is a separately recorded new publication identity; it does not replace the a5 physics/bridge pin.",
+    "delegated_admission": "Existing a5 preflight remains required: all four original results via original_baseline_contract; same source/input/parent/binary/thread across four; exact Python/NumPy/SciPy matching; rebuilt canary table equals r4/table512.",
+    "worker_argument_contract": "Original run_packed.py main builds argv [same sys.executable, same a5 run_packed.py, '_worker', ...same source-revision,binary,receipt,baseline-campaign,library...]. Corrected outer watchdog is the only substituted execution primitive.",
+    "no_new_solver": "Wrapper must not invoke original reference_runner case/campaign, START_REFERENCES, BOOTSTRAP_REFERENCES, PUBLISH, direct _worker CLI, test or benchmark modes."
+  },
+  "changed_scope_checks_proposed": [
+    "Import/wiring fake-target probe: corrected watchdog invoked with original argv,destination,timeout and same original atomic_json/digest provider.",
+    "Fixed source/path and direct _worker rejection.",
+    "Canary argv remains m8/r4/GL4/q0/table512 only; no baseline case/campaign subprocess emitted.",
+    "Original four-pair preflight rejection passes through unchanged when a pair is incomplete or a cohort differs.",
+    "Create-only outer evidence and failure preservation.",
+    "Reuse prior watchdog descendant test results; no native binary launch or old 28/50/96-suite replay in changed wiring tests."
+  ],
+  "new_activity": {
+    "source_changes": 0,
+    "tests": 0,
+    "builds": 0,
+    "solver_calls": 0,
+    "native_calls": 0,
+    "NCP_submissions": 0
+  },
+  "next": "Parent chooses a new additive lane path, implements wrapper only, verifies changed wiring, publishes and records execution-ready canary. Current NCP duplicate check remains executor input dependency."
+}

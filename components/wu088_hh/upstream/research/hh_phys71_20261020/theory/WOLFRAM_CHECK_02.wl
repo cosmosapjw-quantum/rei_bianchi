@@ -1,0 +1,1 @@
+Clear[x,v,r,t,R,f,p,q,Q]; scalar=Integrate[Exp[-2*x]*(1-Exp[-2*x])^2,{x,0,Infinity}]; mu=(r^2+R^2-(r+t)^2)/(2*r*R); transform=FullSimplify[-D[mu,t]*2*(1+1/(r+t))-2/R*(1+(t+1)/r),Assumptions->{r>R>0,-R<t<R}]; <|"radialIntegral"->scalar,"D3Scalar"->v^3*scalar/16,"angularTransformZero"->transform|>

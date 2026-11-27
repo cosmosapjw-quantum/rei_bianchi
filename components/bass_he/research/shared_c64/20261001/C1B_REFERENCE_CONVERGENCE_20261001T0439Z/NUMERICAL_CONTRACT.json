@@ -1,0 +1,49 @@
+{
+  "recorded_before_execution": true,
+  "R": 2,
+  "charges": [
+    1,
+    2
+  ],
+  "units": [
+    "a_A",
+    "E_A",
+    "hbar"
+  ],
+  "preregistered_core_tolerances": {
+    "independent_energy_absolute": 1e-05,
+    "independent_L_O_absolute": 1e-05,
+    "refinement_energy_and_L_absolute": 2e-06,
+    "same_state_direct_torque_absolute": 1e-07,
+    "same_state_momentum_commutator_absolute": 1e-07,
+    "force_quadrature_absolute": 1e-08,
+    "norm_error": 1e-10,
+    "algebraic_residual_relative": 1e-09
+  },
+  "stage_A": {
+    "O_center_diagnostic": "lmax24 elements56 degree4 rmax24 q14 one pair; compare C1 l18",
+    "B_center_angular_sequence": "lmax8,12,18,24 at elements56 degree4 rmax24 q14; if needed 32,40 capped at 40"
+  },
+  "stage_B": "On smallest B-centered level satisfying comparison plus successive angular increment, independently refine h elements80, p degree5, quadrature22, and outer domain by appending cells from24 to32 while preserving inner mesh. At most four pairs. If angular not closed, radial audit still may diagnose but no false closure.",
+  "prolate_scope": "reuse C1 refined reference; new tail-only extension with inner knots preserved and optional quadrature if needed; no old whole pilot rerun",
+  "operator_scope": "independent partial-wave direct angular+momentum translation, dipole, singular torque via transformed quadrature; preserve phase",
+  "isolation_scope": "compute first two Ritz roots in each sector where needed; empirical gap only; no continuum-certified gap",
+  "budget": {
+    "max_physical_pairs": 14,
+    "max_single_pair_wall_seconds": 90,
+    "max_total_main_wall_seconds": 600,
+    "max_RSS_GiB": 4,
+    "blas_threads": 1,
+    "concurrent_physical_workers": 1
+  },
+  "stop": "retain failures; no fitting/extrapolation to replace actual convergence; no tolerance relaxation; numeric convergence only when all scoped critical checks satisfy contract",
+  "continuum_certificate": "NOT_CLAIMED; convergence evidence is empirical independent-discretization validation",
+  "not_run": [
+    "broad C2 R grid",
+    "A2 scaled asymptotic sequences",
+    "collision",
+    "cross sections",
+    "Eq55",
+    "old unaffected scientific suites"
+  ]
+}

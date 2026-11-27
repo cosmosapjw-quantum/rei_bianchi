@@ -1,0 +1,173 @@
+{
+  "schema": "HE30_C9_CHANGED_SURFACE_REVIEW_V1",
+  "reviewed_at_utc": "2026-10-21T11:19:21.210731+00:00",
+  "reviewer": "/root/backup_context",
+  "independence": "Reviewer did not author or modify the four reviewed implementation/test files. Earlier role was source/backup recovery and evidence-ledger preparation.",
+  "decision": "PASS_SCOPED_CHANGED_CODE_REVIEW",
+  "blocking_findings": [],
+  "nonblocking_findings": [],
+  "scope": "Pinned completed D3 consumer and cooperative shared runner; one static pass plus one focused compact-catalogue/receipt readback.",
+  "reviewed_root": "/workspace/scratch/39bb8df06b79/repos/BASS_HE/research/he30_z2_continuation_20261021",
+  "reviewed_files": [
+    {
+      "path": "src/analyze_saved.py",
+      "bytes": 20085,
+      "sha256": "c32620222f95a8a6a33d029f1e9c9ee1d866efdb98073f35c6dd6ba58f19c16a"
+    },
+    {
+      "path": "src/continuation.py",
+      "bytes": 3507,
+      "sha256": "b008c60139e08c189bda1b917745a5fbd19970c58db5fb597dbba442dcf8ee48"
+    },
+    {
+      "path": "src/shared_runner.py",
+      "bytes": 20314,
+      "sha256": "0b5e4aa0fb125da4c23ac8dfac0c318b00fcb45ea3f9dc957b04f01cf7e5cbca"
+    },
+    {
+      "path": "tests/test_runner.py",
+      "bytes": 6812,
+      "sha256": "d20e1f6190b18e2a8888bbef639db48dbf5596974a4d1ce6f02c5b52e37519cd"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C9_IDENTITY",
+      "status": "PASS_SCOPED",
+      "symbols": [
+        "analyze_saved.extract",
+        "continuation.catalogue",
+        "continuation.case_identity",
+        "continuation.receipt"
+      ],
+      "evidence": "Source commit/vendor digests, per-result raw/tail/prefix identities, common-grid/full-state shape, compact NPZ hash/index alignment and exact receipt membership. Original archive pin is supplied by the already verified restore/authority receipt; this review does not redownload the archive."
+    },
+    {
+      "id": "C9_CASES_AND_ZERO_AXIS",
+      "status": "PASS",
+      "symbols": [
+        "analyze_saved.axes",
+        "analyze_saved.extract",
+        "continuation.catalogue"
+      ],
+      "evidence": "Missing original P_m_i becomes 0, P_r_i falls back to original Pi_F_signed_i. Exact 237 unique IDs, 175 joint, 91 baseline, 6 guards and joint Cartesian grid are enforced. Current compact catalogue readback: 237 unique, 6 guards, 94 zero-matter rows including 3 guards."
+    },
+    {
+      "id": "C9_PARTIAL_PRESERVATION",
+      "status": "PASS_SCOPED",
+      "symbols": [
+        "continuation.write_case",
+        "shared_runner.atomic_json",
+        "shared_runner.classify",
+        "shared_runner.run"
+      ],
+      "evidence": "Completed receipt requires exact equality; conflicting local result raises and is preserved. Global invalid/prior/partial receipts are terminal preservation states. Immutable case/attempt writes use atomic link without replacement; mutable run reports/registry pointers are separate. Source full raw is opened read-only by the consumer."
+    },
+    {
+      "id": "C9_CPU_LEASE_AND_CAPACITY",
+      "status": "PASS_SCOPED",
+      "symbols": [
+        "shared_runner.capacity",
+        "shared_runner.acquire_job",
+        "shared_runner.select_cpu",
+        "shared_runner.run",
+        "c21k_scheduler.acquire_cpu"
+      ],
+      "evidence": "Per-case identity and shared cpu_<id>.lock use flock LOCK_NB. Busy case skips to others. CPU/case descriptors pass to the owned child. Affinity, quota and observed physical/cgroup headroom, reserved CPU/RAM and worker ceiling constrain admission; current available RAM is not debited for existing worker usage twice."
+    },
+    {
+      "id": "C9_SIGNALS",
+      "status": "PASS_SCOPED",
+      "symbols": [
+        "shared_runner.run.finally"
+      ],
+      "evidence": "Only Popen objects created by this coordinator enter active. terminate/kill target those direct children. No process-name sweep, pkill, or signalling of discovered external jobs. Existing current run receipt has zero starts and zero other-job signals."
+    },
+    {
+      "id": "C9_INNER_THREADS",
+      "status": "PASS_SCOPED",
+      "symbols": [
+        "shared_runner.run",
+        "shared_runner._worker",
+        "c21k_scheduler.THREAD_ENV"
+      ],
+      "evidence": "OMP/OpenBLAS/MKL/BLIS/NumExpr/VECLIB/Rayon are set to 1; nested OpenMP disabled. Environment is applied before API import in runner/worker and passed to Popen. CPU affinity is assigned for each owned child."
+    },
+    {
+      "id": "C9_CURRENT_PENDING_ZERO",
+      "status": "PASS",
+      "symbols": [
+        "continuation.case_grid",
+        "continuation.completed_result",
+        "shared_runner.classify"
+      ],
+      "evidence": "One focused read-only check against current compact catalogue and local completion receipts returned REUSED_COMPLETE=237 and pending=0. It did not invoke runner.run, observe resources, acquire locks, start workers, or import original scientific model/solver."
+    },
+    {
+      "id": "C9_EXISTING_TEST_BINDING",
+      "status": "PASS_REUSED",
+      "symbols": [
+        "tests/test_runner.py"
+      ],
+      "evidence": "The existing eight-test PASS receipt hashes exactly match current shared_runner.py and test_runner.py. Tests cover resource caps, active-memory accounting, lease conflict independence, immutable writes, invalid registry preservation, real file-only toy workers and cross-output-root reuse. No broad test rerun."
+    }
+  ],
+  "reused_test_receipt": {
+    "path": "/workspace/scratch/39bb8df06b79/investigation/upstream/RUNNER_CHECK.json",
+    "sha256": "587a4340a361ad84d49366307bbf431d79c68b934bcd76846bd70afc64179386",
+    "result": "PASS",
+    "tests": 8,
+    "current_source_hashes_match": true,
+    "rerun_in_this_review": false
+  },
+  "targeted_current_check": {
+    "cases": 237,
+    "unique_ids": 237,
+    "guards": 6,
+    "zero_matter_rows_including_guards": 94,
+    "classification_counts": {
+      "REUSED_COMPLETE": 237
+    },
+    "pending": 0,
+    "command_kind": "Import continuation/shared_runner; call case_grid and classify on current compact outputs only",
+    "original_full_raw_reread": false,
+    "runner_run_called": false,
+    "locks_acquired": false
+  },
+  "current_parent_run_receipt": {
+    "path": "results/cases/RUNNER_REPORT.json",
+    "sha256": "38ecb08eda604049d67d0e97ac19bbd4ade40e0ce1d2e57b98288c43e4914471",
+    "campaign_id": "20261021T111338_cb0184da0da7",
+    "final": true,
+    "worker_starts": 0,
+    "pending": [],
+    "active": [],
+    "other_jobs_signalled": 0,
+    "state_counts": {
+      "REUSED_COMPLETE": 237
+    }
+  },
+  "current_artifacts": [
+    {
+      "path": "results/CATALOG.json",
+      "sha256": "434b86965887b104ee88ec518f2de96b4d57ea44f1b1af2b0813909b86afbbd1"
+    },
+    {
+      "path": "results/histories.npz",
+      "sha256": "d4258bc58948b318df2b9d5ea7ceca6258eac62147aececc6ec10068987b6c6c"
+    }
+  ],
+  "review_execution": {
+    "new_workers": 0,
+    "new_ivps": 0,
+    "new_ODE_calls": 0,
+    "benchmark_runs": 0,
+    "source_edits": 0,
+    "other_process_signals": 0
+  },
+  "scope_limits": [
+    "No repeated full raw/model physics audit; prior source-matched recovery and independent physical result review remain the authority.",
+    "No measured NCP scaling or generalized solver-production admission.",
+    "Review is bound to the four exact source hashes above; publication/backup status is recorded separately by the parent."
+  ]
+}

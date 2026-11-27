@@ -1,0 +1,26 @@
+--- pretest_frozen_v4/source/run_source.py
++++ pretest_frozen_v5/source/run_source.py
+@@ -58,7 +58,7 @@
+                     'identity_SHA256':sha(ident_bytes),'result_SHA256':sha(rb),
+                     'result_bytes':len(rb),'row_count':16}
+         rows = json.loads(rb)
+-        if ib != ident_bytes or complete != expected or encoded(complete) != complete_bytes or not isinstance(rows,list) or len(rows)!=16:
++        if ib != ident_bytes or complete != expected or complete_bytes != encoded(expected) or not isinstance(rows,list) or len(rows)!=16:
+             raise ValueError('CORRUPTED_OR_MISMATCHED_COMPLETION')
+         # Canonical byte representation prevents semantically similar byte edits.
+         if encoded(rows) != rb:
+--- pretest_frozen_v4/verification/verify_source.py
++++ pretest_frozen_v5/verification/verify_source.py
+@@ -215,6 +215,12 @@
+         # COMPLETE whitespace is a byte corruption too: result/identity compare is exact,
+         # and the completion must also retain its original canonical bytes.
+         refused(lambda case=case:run_source.persist(case,ident,callback,resume=True),'corrupt_refusal:'+file)
++    numeric_type=work/'MOCK_ONLY_numeric_type_completion'
++    shutil.copytree(out,numeric_type)
++    completion=json.loads((numeric_type/'COMPLETE.json').read_bytes())
++    completion['row_count']=16.0
++    (numeric_type/'COMPLETE.json').write_bytes(run_source.encoded(completion))
++    refused(lambda:run_source.persist(numeric_type,ident,callback,resume=True),'completion_numeric_type_corruption_refusal')
+     incomplete=work/'MOCK_ONLY_incomplete'
+     incomplete.mkdir()
+     refused(lambda:run_source.persist(incomplete,ident,callback,resume=True),'incomplete_refusal')

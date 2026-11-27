@@ -1,0 +1,27 @@
+[package]
+name = "wu088-hh-phys70-optimized"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.94.1"
+license = "MIT"
+description = "Structured O(L) RODAS5P stages for original HH with deterministic angular SIMD"
+
+[workspace]
+
+[dependencies]
+wu088-hh-phys69-vigilode = { path = "../phys69_vigilode" }
+rodas5p-core = { git = "https://github.com/cosmosapjw-quantum/vigilode.git", rev = "a21d573980f66fe02891bd216153443b5352f921" }
+rodas5p-integrators = { git = "https://github.com/cosmosapjw-quantum/vigilode.git", rev = "a21d573980f66fe02891bd216153443b5352f921", default-features = false }
+num-complex = "=0.4.6"
+gauss-quad = { version = "=0.3.2", default-features = false, features = ["std"] }
+wide = "=1.7.1"
+rayon = "=1.12.0"
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = { version = "=1.0.151", features = ["float_roundtrip"] }
+sha2 = "=0.10.9"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = "debuginfo"

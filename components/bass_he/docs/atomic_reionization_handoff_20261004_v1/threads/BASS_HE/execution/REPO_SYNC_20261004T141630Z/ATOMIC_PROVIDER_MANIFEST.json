@@ -1,0 +1,2333 @@
+{
+  "schema": "rei.atomic-provider-manifest.v1",
+  "task_id": "REI-F01",
+  "source_parent_commit": "5f3bfe2fc8fe275ab6a054ca9082f03c5b91427a",
+  "runtime_policy": "CODEX_ONLY",
+  "records": [
+    {
+      "provider_id": "GRACKLE341_RAW_K1",
+      "process_id": "k1",
+      "observable_kind": "thermal_rate",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "k1",
+          "start_line": 36,
+          "end_line": 54,
+          "body_sha256": "470f5a995204862760e6a1fda5cd0f20c297b1f6a04664a2b8c352832418500d"
+        }
+      },
+      "units": "cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 1,
+        "HI": 1
+      },
+      "species_out": {
+        "HII": 1,
+        "e": 2
+      },
+      "density_prefactor": "n_e * n_HI",
+      "density_powers": {
+        "e": 1,
+        "HI": 1
+      },
+      "branches_and_floors": [
+        {
+          "T_K": 9284,
+          "guard": "T/11605<=0.8 activates max(tiny,exp(P)/units)",
+          "event_condition": "floor/value crossing or nonmatching active sides",
+          "floor_surface": "P(log(T/11605)) = log(tiny*units)",
+          "units1_root_estimate_K": 5660.607975995525,
+          "root_certified": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [],
+      "literature_source": "equation-specific range not established in this bounded loop",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": null,
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_K3",
+      "process_id": "k3",
+      "observable_kind": "thermal_rate",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "k3",
+          "start_line": 57,
+          "end_line": 75,
+          "body_sha256": "07047149eb09880d2d0492baaca1578fac280d35903e772f9a70dca13fb6aa35"
+        }
+      },
+      "units": "cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 1,
+        "HeI": 1
+      },
+      "species_out": {
+        "HeII": 1,
+        "e": 2
+      },
+      "density_prefactor": "n_e * n_HeI",
+      "density_powers": {
+        "e": 1,
+        "HeI": 1
+      },
+      "branches_and_floors": [
+        {
+          "T_K": 9284,
+          "left_and_at": "tiny",
+          "right": "exp(P)/units",
+          "classification": "finite jump for chosen units1 macro profile"
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [],
+      "literature_source": "equation-specific range not established in this bounded loop",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": null,
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_K4",
+      "process_id": "k4",
+      "observable_kind": "thermal_rate",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "k4",
+          "start_line": 78,
+          "end_line": 95,
+          "body_sha256": "88377af9dc3aff94a5cf86ad6e938cb38ac7d1766becfb22208ad0fca57647de"
+        }
+      },
+      "units": "cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 1,
+        "HeII": 1
+      },
+      "species_out": {
+        "HeI": 1,
+        "photon_cascade": "closure_required"
+      },
+      "density_prefactor": "n_e * n_HeII",
+      "density_powers": {
+        "e": 1,
+        "HeII": 1
+      },
+      "branches_and_floors": [
+        {
+          "T_K": 9284,
+          "case": "A",
+          "left_and_at": "radiative only",
+          "right": "radiative plus dielectronic",
+          "classification": "nonzero jump; smaller than binary64 resolution at this point"
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [
+        {
+          "case": "B only",
+          "T_K": [
+            5000,
+            500000
+          ],
+          "paper_fit_accuracy": "approximately10%",
+          "match": "same displayed formula; caseA is a different fit"
+        }
+      ],
+      "literature_source": "https://arxiv.org/pdf/astro-ph/9612232",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": null,
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_K2",
+      "process_id": "k2",
+      "observable_kind": "thermal_rate",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "k2",
+          "start_line": 98,
+          "end_line": 127,
+          "body_sha256": "a153b191def849585c667516b834f7f2356b20b8f7685d85dc338cba9a8ee3f7"
+        }
+      },
+      "units": "cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 1,
+        "HII": 1
+      },
+      "species_out": {
+        "HI": 1,
+        "photon": 1
+      },
+      "density_prefactor": "n_e * n_HII",
+      "density_powers": {
+        "e": 1,
+        "HII": 1
+      },
+      "branches_and_floors": [
+        {
+          "T_K": 5500,
+          "case": "A",
+          "left_and_at": "k4_rate",
+          "right": "polynomial exponential",
+          "classification": "1.04495725949 percent jump at units1"
+        },
+        {
+          "T_K": 1000000000.0,
+          "case": "B",
+          "at_and_above": "tiny"
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [
+        {
+          "case": "B only",
+          "T_K": [
+            1,
+            1000000000.0
+          ],
+          "upper_open_in_code": true,
+          "paper_fit_accuracy": "0.7%",
+          "match": "algebraic family with rounded transformed constants; assessed separately"
+        }
+      ],
+      "literature_source": "https://arxiv.org/pdf/astro-ph/9612232",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": null,
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_K5",
+      "process_id": "k5",
+      "observable_kind": "thermal_rate",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "k5",
+          "start_line": 130,
+          "end_line": 150,
+          "body_sha256": "d657ae895b721f496c2eea7de6aa1ed21ba16d163791a3a3a4238c4608dd8c91"
+        }
+      },
+      "units": "cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 1,
+        "HeII": 1
+      },
+      "species_out": {
+        "HeIII": 1,
+        "e": 2
+      },
+      "density_prefactor": "n_e * n_HeII",
+      "density_powers": {
+        "e": 1,
+        "HeII": 1
+      },
+      "branches_and_floors": [
+        {
+          "T_K": 9284,
+          "left_and_at": "tiny",
+          "right": "exp(P)/units",
+          "classification": "finite jump for chosen units1 macro profile"
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [],
+      "literature_source": "equation-specific range not established in this bounded loop",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": null,
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_K6",
+      "process_id": "k6",
+      "observable_kind": "thermal_rate",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "k6",
+          "start_line": 153,
+          "end_line": 169,
+          "body_sha256": "89e3ddcbabe20a00fc5cacfa7e44ac1d703e50dea4b2a2780812732728d0a2a0"
+        }
+      },
+      "units": "cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 1,
+        "HeIII": 1
+      },
+      "species_out": {
+        "HeII": 1,
+        "photon": 1
+      },
+      "density_prefactor": "n_e * n_HeIII",
+      "density_powers": {
+        "e": 1,
+        "HeIII": 1
+      },
+      "branches_and_floors": [
+        {
+          "T_K": 1000000000.0,
+          "case": "B",
+          "at_and_above": "tiny"
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [
+        {
+          "case": "B only",
+          "T_K": [
+            3,
+            1000000000.0
+          ],
+          "upper_open_in_code": true,
+          "paper_fit_accuracy": "0.7% inherited H-like fit statement",
+          "match": "algebraic family with rounded transformed constants; assessed separately"
+        }
+      ],
+      "literature_source": "https://arxiv.org/pdf/astro-ph/9612232",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": null,
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_CEHI",
+      "process_id": "ceHI",
+      "observable_kind": "cooling_coefficient",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "ceHI",
+          "start_line": 756,
+          "end_line": 764,
+          "body_sha256": "4c271d06ff7eda40824b4f05b7b211b1c755fd27536f28e83036b52315aa924c"
+        }
+      },
+      "units": "erg cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 1,
+        "HI": 1
+      },
+      "species_out": {},
+      "density_prefactor": "n_e * n_HI",
+      "density_powers": {
+        "e": 1,
+        "HI": 1
+      },
+      "branches_and_floors": [
+        {
+          "B_K": 118348,
+          "T_event_K": 1713.2627781428682,
+          "surface": "B/T=log(dhuge)",
+          "classification": "continuous, derivative kink; no physical zero-temperature extrapolation"
+        },
+        {
+          "flag_off": "returns tiny without units division",
+          "physical_zero": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [
+        {
+          "case": "all",
+          "T_K": [
+            5000,
+            500000
+          ],
+          "paper_fit_accuracy": "approximately10%",
+          "match": "same family but B=118348 vs paper0.75*157807; no exact identity"
+        }
+      ],
+      "literature_source": "https://arxiv.org/pdf/astro-ph/9612232",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/cool1d_multi_g.F",
+        "git_blob": "d8762b3fd2d672bdd507ff1c9c2363db5f16d3d0",
+        "line_range": [
+          437,
+          480
+        ]
+      },
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_CEHEI",
+      "process_id": "ceHeI",
+      "observable_kind": "cooling_coefficient",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "ceHeI",
+          "start_line": 767,
+          "end_line": 775,
+          "body_sha256": "77a6ab72f23d045f954fb62bbcabdb5bc0a575789e238204715df33fa195591e"
+        }
+      },
+      "units": "erg cm^6 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 2,
+        "HeII": 1
+      },
+      "species_out": {},
+      "density_prefactor": "n_e^2 * n_HeII",
+      "density_powers": {
+        "e": 2,
+        "HeII": 1
+      },
+      "branches_and_floors": [
+        {
+          "B_K": 13179,
+          "T_event_K": 190.78556590009853,
+          "surface": "B/T=log(dhuge)",
+          "classification": "continuous, derivative kink; no physical zero-temperature extrapolation"
+        },
+        {
+          "flag_off": "returns tiny without units division",
+          "physical_zero": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [],
+      "literature_source": "equation-specific range not established in this bounded loop",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/cool1d_multi_g.F",
+        "git_blob": "d8762b3fd2d672bdd507ff1c9c2363db5f16d3d0",
+        "line_range": [
+          437,
+          480
+        ]
+      },
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "scope_note": "Effective metastable-related cooling with n_e^2*n_HeII. No new ground-state reaction inferred from function name.",
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_CEHEII",
+      "process_id": "ceHeII",
+      "observable_kind": "cooling_coefficient",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "ceHeII",
+          "start_line": 778,
+          "end_line": 786,
+          "body_sha256": "95e5f19ae4b26e89eff2a5e599c2459e777a8fd5785a18beddbf337f1222fdb7"
+        }
+      },
+      "units": "erg cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 1,
+        "HeII": 1
+      },
+      "species_out": {},
+      "density_prefactor": "n_e * n_HeII",
+      "density_powers": {
+        "e": 1,
+        "HeII": 1
+      },
+      "branches_and_floors": [
+        {
+          "B_K": 473638,
+          "T_event_K": 6856.61232732308,
+          "surface": "B/T=log(dhuge)",
+          "classification": "continuous, derivative kink; no physical zero-temperature extrapolation"
+        },
+        {
+          "flag_off": "returns tiny without units division",
+          "physical_zero": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [
+        {
+          "case": "all",
+          "T_K": [
+            5000,
+            500000
+          ],
+          "paper_fit_accuracy": "approximately10%",
+          "match": "same family but B=473638 vs paper0.75*631515; no exact identity"
+        }
+      ],
+      "literature_source": "https://arxiv.org/pdf/astro-ph/9612232",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/cool1d_multi_g.F",
+        "git_blob": "d8762b3fd2d672bdd507ff1c9c2363db5f16d3d0",
+        "line_range": [
+          437,
+          480
+        ]
+      },
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_CIHEIS",
+      "process_id": "ciHeIS",
+      "observable_kind": "cooling_coefficient",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "ciHeIS",
+          "start_line": 789,
+          "end_line": 797,
+          "body_sha256": "f76cb6f82a438904320ff5941f30ccb2239e855082dbff5f9a9a1abf6db7c703"
+        }
+      },
+      "units": "erg cm^6 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 2,
+        "HeII": 1
+      },
+      "species_out": {},
+      "density_prefactor": "n_e^2 * n_HeII",
+      "density_powers": {
+        "e": 2,
+        "HeII": 1
+      },
+      "branches_and_floors": [
+        {
+          "B_K": 55338,
+          "T_event_K": 801.0996013187383,
+          "surface": "B/T=log(dhuge)",
+          "classification": "continuous, derivative kink; no physical zero-temperature extrapolation"
+        },
+        {
+          "flag_off": "returns tiny without units division",
+          "physical_zero": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [],
+      "literature_source": "equation-specific range not established in this bounded loop",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/cool1d_multi_g.F",
+        "git_blob": "d8762b3fd2d672bdd507ff1c9c2363db5f16d3d0",
+        "line_range": [
+          437,
+          480
+        ]
+      },
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "scope_note": "Effective metastable-related cooling with n_e^2*n_HeII. No new ground-state reaction inferred from function name.",
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_CIHI",
+      "process_id": "ciHI",
+      "observable_kind": "cooling_coefficient",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "ciHI",
+          "start_line": 800,
+          "end_line": 808,
+          "body_sha256": "b17817ea36090291c2039bfe8bb6c0007b3e4e98de3424965c5bf78e5a0b06d1"
+        }
+      },
+      "units": "erg cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 1,
+        "HI": 1
+      },
+      "species_out": {},
+      "density_prefactor": "n_e * n_HI",
+      "density_powers": {
+        "e": 1,
+        "HI": 1
+      },
+      "branches_and_floors": [
+        {
+          "inherited": "k1",
+          "inner_units": 1,
+          "outer_units": "declared units"
+        },
+        {
+          "flag_off": "returns tiny without units division",
+          "physical_zero": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [],
+      "literature_source": "equation-specific range not established in this bounded loop",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/cool1d_multi_g.F",
+        "git_blob": "d8762b3fd2d672bdd507ff1c9c2363db5f16d3d0",
+        "line_range": [
+          437,
+          480
+        ]
+      },
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_CIHEI",
+      "process_id": "ciHeI",
+      "observable_kind": "cooling_coefficient",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "ciHeI",
+          "start_line": 811,
+          "end_line": 819,
+          "body_sha256": "7dea9b2d5436fdcca22d2fd9bdd78d08f4e6e332815b0d46a901ce0a0340d490"
+        }
+      },
+      "units": "erg cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 1,
+        "HeI": 1
+      },
+      "species_out": {},
+      "density_prefactor": "n_e * n_HeI",
+      "density_powers": {
+        "e": 1,
+        "HeI": 1
+      },
+      "branches_and_floors": [
+        {
+          "inherited": "k3",
+          "inner_units": 1,
+          "outer_units": "declared units"
+        },
+        {
+          "flag_off": "returns tiny without units division",
+          "physical_zero": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [],
+      "literature_source": "equation-specific range not established in this bounded loop",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/cool1d_multi_g.F",
+        "git_blob": "d8762b3fd2d672bdd507ff1c9c2363db5f16d3d0",
+        "line_range": [
+          437,
+          480
+        ]
+      },
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_CIHEII",
+      "process_id": "ciHeII",
+      "observable_kind": "cooling_coefficient",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "ciHeII",
+          "start_line": 822,
+          "end_line": 830,
+          "body_sha256": "084c2ab12b3d1e390854c17cc5a89caa61b6ed868829f334e6d9e11e8f1ef047"
+        }
+      },
+      "units": "erg cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 1,
+        "HeII": 1
+      },
+      "species_out": {},
+      "density_prefactor": "n_e * n_HeII",
+      "density_powers": {
+        "e": 1,
+        "HeII": 1
+      },
+      "branches_and_floors": [
+        {
+          "inherited": "k5",
+          "inner_units": 1,
+          "outer_units": "declared units"
+        },
+        {
+          "flag_off": "returns tiny without units division",
+          "physical_zero": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [],
+      "literature_source": "equation-specific range not established in this bounded loop",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/cool1d_multi_g.F",
+        "git_blob": "d8762b3fd2d672bdd507ff1c9c2363db5f16d3d0",
+        "line_range": [
+          437,
+          480
+        ]
+      },
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_REHII",
+      "process_id": "reHII",
+      "observable_kind": "cooling_coefficient",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "reHII",
+          "start_line": 833,
+          "end_line": 852,
+          "body_sha256": "266254c4794737264096273cc4bb793f627765fe2067b287d8f571393c988f3d"
+        }
+      },
+      "units": "erg cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": 3,
+        "maximum": 1000000000.0,
+        "status": "source_supported"
+      },
+      "species_in": {
+        "e": 1,
+        "HII": 1
+      },
+      "species_out": {},
+      "density_prefactor": "n_e * n_HII",
+      "density_powers": {
+        "e": 1,
+        "HII": 1
+      },
+      "branches_and_floors": [
+        {
+          "flag_off": "returns tiny without units division",
+          "physical_zero": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [
+        {
+          "case": "A",
+          "T_K": [
+            3,
+            1000000000.0
+          ],
+          "paper_fit_accuracy": "2%",
+          "match": "same displayed coefficient formula"
+        },
+        {
+          "case": "B",
+          "T_K": [
+            1,
+            1000000000.0
+          ],
+          "paper_fit_accuracy": "2%",
+          "match": "same displayed coefficient formula"
+        }
+      ],
+      "literature_source": "https://arxiv.org/pdf/astro-ph/9612232",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/cool1d_multi_g.F",
+        "git_blob": "d8762b3fd2d672bdd507ff1c9c2363db5f16d3d0",
+        "line_range": [
+          437,
+          480
+        ]
+      },
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_REHEII1",
+      "process_id": "reHeII1",
+      "observable_kind": "cooling_coefficient",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "reHeII1",
+          "start_line": 855,
+          "end_line": 872,
+          "body_sha256": "58dad65e201f8fd1702a81c48a25c7f86e81fc9612703113cdcebd3c5519c63c"
+        }
+      },
+      "units": "erg cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": 5000,
+        "maximum": 500000,
+        "status": "source_supported"
+      },
+      "species_in": {
+        "e": 1,
+        "HeII": 1
+      },
+      "species_out": {},
+      "density_prefactor": "n_e * n_HeII",
+      "density_powers": {
+        "e": 1,
+        "HeII": 1
+      },
+      "branches_and_floors": [
+        {
+          "flag_off": "returns tiny without units division",
+          "physical_zero": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [
+        {
+          "case": "A/B",
+          "T_K": [
+            5000,
+            500000
+          ],
+          "paper_fit_accuracy": "approximately10%",
+          "match": "same displayed thermal formula"
+        }
+      ],
+      "literature_source": "https://arxiv.org/pdf/astro-ph/9612232",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/cool1d_multi_g.F",
+        "git_blob": "d8762b3fd2d672bdd507ff1c9c2363db5f16d3d0",
+        "line_range": [
+          437,
+          480
+        ]
+      },
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_REHEII2",
+      "process_id": "reHeII2",
+      "observable_kind": "cooling_coefficient",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "reHeII2",
+          "start_line": 875,
+          "end_line": 886,
+          "body_sha256": "d2ea10c5ca6d9f00d18d865cf235c76979f643e60a8b1745bff07b4d9196f5b5"
+        }
+      },
+      "units": "erg cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {
+        "e": 1,
+        "HeII": 1
+      },
+      "species_out": {},
+      "density_prefactor": "n_e * n_HeII",
+      "density_powers": {
+        "e": 1,
+        "HeII": 1
+      },
+      "branches_and_floors": [
+        {
+          "B_K": 470000,
+          "T_event_K": 6803.946883150946,
+          "surface": "B/T=log(dhuge)",
+          "classification": "continuous, derivative kink; no physical zero-temperature extrapolation"
+        },
+        {
+          "B_K": 94000,
+          "T_event_K": 1360.789376630189,
+          "surface": "B/T=log(dhuge)",
+          "classification": "continuous, derivative kink; no physical zero-temperature extrapolation"
+        },
+        {
+          "flag_off": "returns tiny without units division",
+          "physical_zero": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [],
+      "literature_source": "equation-specific range not established in this bounded loop",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/cool1d_multi_g.F",
+        "git_blob": "d8762b3fd2d672bdd507ff1c9c2363db5f16d3d0",
+        "line_range": [
+          437,
+          480
+        ]
+      },
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_REHEIII",
+      "process_id": "reHeIII",
+      "observable_kind": "cooling_coefficient",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "reHeIII",
+          "start_line": 889,
+          "end_line": 908,
+          "body_sha256": "65aaba95a0b79dd5ec23308560ba94e99e6fb0f507ed3e1e993d52fa737163f7"
+        }
+      },
+      "units": "erg cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": 3,
+        "maximum": 1000000000.0,
+        "status": "source_supported"
+      },
+      "species_in": {
+        "e": 1,
+        "HeIII": 1
+      },
+      "species_out": {},
+      "density_prefactor": "n_e * n_HeIII",
+      "density_powers": {
+        "e": 1,
+        "HeIII": 1
+      },
+      "branches_and_floors": [
+        {
+          "flag_off": "returns tiny without units division",
+          "physical_zero": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [
+        {
+          "case": "A",
+          "T_K": [
+            1,
+            1000000000.0
+          ],
+          "paper_fit_accuracy": "2%",
+          "match": "same displayed formula including factor8; physical hydrogenic scaling not established by this match"
+        },
+        {
+          "case": "B",
+          "T_K": [
+            3,
+            1000000000.0
+          ],
+          "paper_fit_accuracy": "2%",
+          "match": "same displayed formula including factor8"
+        }
+      ],
+      "literature_source": "https://arxiv.org/pdf/astro-ph/9612232",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/cool1d_multi_g.F",
+        "git_blob": "d8762b3fd2d672bdd507ff1c9c2363db5f16d3d0",
+        "line_range": [
+          437,
+          480
+        ]
+      },
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "GRACKLE341_RAW_BREM",
+      "process_id": "brem",
+      "observable_kind": "cooling_coefficient",
+      "source_identity": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/rate_functions.c",
+        "version": "af7939494ce65007887ada7b98d1813df6843346",
+        "sha256": "a900e726413da39bb24fc506846a09f7e0e4addbd5152197ca76d0e22ad02cea",
+        "read_status": "EXACT_SOURCE_BYTES_AND_SELECTED_BODY_PARITY_CHECKED",
+        "selected_body": {
+          "name": "brem",
+          "start_line": 911,
+          "end_line": 920,
+          "body_sha256": "94d48f43602ea4629f54cdeb40bb2a7b1ef77f1c9be50fee7616fc4579bb442b"
+        }
+      },
+      "units": "erg cm^3 s^-1",
+      "frame": "local gas rest frame; proper number densities; no tilt transform performed",
+      "particle_distribution": "thermal Maxwellian electrons for fitted coefficients; scalar source reference",
+      "domain": {
+        "variable": "T",
+        "units": "K",
+        "minimum": null,
+        "maximum": null,
+        "status": "unresolved"
+      },
+      "species_in": {},
+      "species_out": {},
+      "density_prefactor": "n_e*(n_HII+n_HeII+4*n_HeIII)",
+      "density_powers": null,
+      "branches_and_floors": [
+        {
+          "flag_off": "returns tiny without units division",
+          "physical_zero": false
+        }
+      ],
+      "uncertainty": {
+        "kind": "published empirical fit statements where matched; not a rigorous physical bound",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03; species/thermal/photon common ledger"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "RAW_SOURCE_REFERENCE_ONLY_NO_PHYSICAL_ADMISSION",
+      "numerical_test_domain": {
+        "temperature_points_K": [
+          100,
+          1000,
+          4800,
+          5000,
+          5500,
+          5500.01,
+          9000,
+          9284,
+          9284.01,
+          10000,
+          30000,
+          36000,
+          100000,
+          1000000,
+          1000000000
+        ],
+        "physical_validity_implied": false
+      },
+      "literature_subdomains": [],
+      "literature_source": "equation-specific range not established in this bounded loop",
+      "derivative_contract": {
+        "coordinate": "theta=ln(T/Tref)",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "fixed branch interior; constants flags and units fixed",
+        "formula_source": "research/provider_oracle.py",
+        "uniform_bound_verified": false
+      },
+      "source_assembly": {
+        "url": "https://github.com/grackle-project/grackle/blob/af7939494ce65007887ada7b98d1813df6843346/src/clib/cool1d_multi_g.F",
+        "git_blob": "d8762b3fd2d672bdd507ff1c9c2363db5f16d3d0",
+        "line_range": [
+          437,
+          480
+        ]
+      },
+      "unresolved_admission_items": [
+        "raw tiny/code-unit policy",
+        "event-energy and photon closure",
+        "actual Rust residual and source-site binding"
+      ],
+      "charge_weights": {
+        "HII": 1,
+        "HeII": 1,
+        "HeIII": 4
+      },
+      "evaluation_guard": {
+        "minimum_K": 100.0,
+        "maximum_K": 1000000000.0,
+        "meaning": "Raw source evaluation only; does not change unresolved physical-source applicability",
+        "branches": "All enabled original source branches/floors preserved at units=1; no disabled-channel adapter"
+      },
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "VERNER96_HI",
+      "process_id": "photoionization_HI",
+      "observable_kind": "cross_section",
+      "source_identity": {
+        "url": "https://www.pa.uky.edu/~verner/dima/photo//photo.dat",
+        "version": "Verner1996 author table pinned20261004",
+        "sha256": "a53e73b0af4cc6b801aef67b84bd964e3ed8c9c4992f214e4a69dc7e4443f389",
+        "read_status": "PINNED_PARAMETER_ROWS_READ; scalar formula and derivatives checked"
+      },
+      "units": "cm^2",
+      "frame": "local absorber rest frame",
+      "particle_distribution": "ground-state targets; angle-independent total cross section; photon spectrum supplied by consumer",
+      "domain": {
+        "variable": "E",
+        "units": "eV",
+        "minimum": 13.6,
+        "maximum": 50000.0,
+        "status": "source_supported"
+      },
+      "species_in": {
+        "HI": 1,
+        "photon": 1
+      },
+      "species_out": {
+        "ion": 1,
+        "e": 1
+      },
+      "density_prefactor": "c*n_HI*integral[n_gamma(E,Omega)*sigma(E) dE dOmega]",
+      "branches_and_floors": [
+        {
+          "below_fit_Eth": "zero",
+          "at_fit_Eth": "right finite value; not two-sided differentiable"
+        },
+        {
+          "above_Emax": "DOMAIN_ERROR"
+        },
+        {
+          "negative_nonfinite": "INPUT_ERROR"
+        }
+      ],
+      "uncertainty": {
+        "kind": "smoothed ground-state cross-section fit; no rigorous physical bound provided",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03 threshold/primary-secondary closure"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "FIT_THRESHOLD_AND_PHYSICAL_BINDING_DISTINCT",
+      "parameters": {
+        "Z": "1",
+        "N_electrons": "1",
+        "E_th_eV": "1.360E+01",
+        "E_max_eV": "5.000E+04",
+        "E0_eV": "4.298E-01",
+        "sigma0_Mb": "5.475E+04",
+        "y_a": "3.288E+01",
+        "P": "2.963E+00",
+        "y_w": "0.000E+00",
+        "y0": "0.000E+00",
+        "y1": "0.000E+00"
+      },
+      "derivative_contract": {
+        "coordinate": "E in eV",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "Eth<E<Emax",
+        "uniform_bound_verified": false
+      },
+      "threshold_policy": "Do not move fit threshold to binding chi or silently continue fit below Eth.",
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "VERNER96_HeI",
+      "process_id": "photoionization_HeI",
+      "observable_kind": "cross_section",
+      "source_identity": {
+        "url": "https://www.pa.uky.edu/~verner/dima/photo//photo.dat",
+        "version": "Verner1996 author table pinned20261004",
+        "sha256": "a53e73b0af4cc6b801aef67b84bd964e3ed8c9c4992f214e4a69dc7e4443f389",
+        "read_status": "PINNED_PARAMETER_ROWS_READ; scalar formula and derivatives checked"
+      },
+      "units": "cm^2",
+      "frame": "local absorber rest frame",
+      "particle_distribution": "ground-state targets; angle-independent total cross section; photon spectrum supplied by consumer",
+      "domain": {
+        "variable": "E",
+        "units": "eV",
+        "minimum": 24.59,
+        "maximum": 50000.0,
+        "status": "source_supported"
+      },
+      "species_in": {
+        "HeI": 1,
+        "photon": 1
+      },
+      "species_out": {
+        "ion": 1,
+        "e": 1
+      },
+      "density_prefactor": "c*n_HeI*integral[n_gamma(E,Omega)*sigma(E) dE dOmega]",
+      "branches_and_floors": [
+        {
+          "below_fit_Eth": "zero",
+          "at_fit_Eth": "right finite value; not two-sided differentiable"
+        },
+        {
+          "above_Emax": "DOMAIN_ERROR"
+        },
+        {
+          "negative_nonfinite": "INPUT_ERROR"
+        }
+      ],
+      "uncertainty": {
+        "kind": "smoothed ground-state cross-section fit; no rigorous physical bound provided",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03 threshold/primary-secondary closure"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "FIT_THRESHOLD_AND_PHYSICAL_BINDING_DISTINCT",
+      "parameters": {
+        "Z": "2",
+        "N_electrons": "2",
+        "E_th_eV": "2.459E+01",
+        "E_max_eV": "5.000E+04",
+        "E0_eV": "1.361E+01",
+        "sigma0_Mb": "9.492E+02",
+        "y_a": "1.469E+00",
+        "P": "3.188E+00",
+        "y_w": "2.039E+00",
+        "y0": "4.434E-01",
+        "y1": "2.136E+00"
+      },
+      "derivative_contract": {
+        "coordinate": "E in eV",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "Eth<E<Emax",
+        "uniform_bound_verified": false
+      },
+      "threshold_policy": "Do not move fit threshold to binding chi or silently continue fit below Eth.",
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    },
+    {
+      "provider_id": "VERNER96_HeII",
+      "process_id": "photoionization_HeII",
+      "observable_kind": "cross_section",
+      "source_identity": {
+        "url": "https://www.pa.uky.edu/~verner/dima/photo//photo.dat",
+        "version": "Verner1996 author table pinned20261004",
+        "sha256": "a53e73b0af4cc6b801aef67b84bd964e3ed8c9c4992f214e4a69dc7e4443f389",
+        "read_status": "PINNED_PARAMETER_ROWS_READ; scalar formula and derivatives checked"
+      },
+      "units": "cm^2",
+      "frame": "local absorber rest frame",
+      "particle_distribution": "ground-state targets; angle-independent total cross section; photon spectrum supplied by consumer",
+      "domain": {
+        "variable": "E",
+        "units": "eV",
+        "minimum": 54.42,
+        "maximum": 50000.0,
+        "status": "source_supported"
+      },
+      "species_in": {
+        "HeII": 1,
+        "photon": 1
+      },
+      "species_out": {
+        "ion": 1,
+        "e": 1
+      },
+      "density_prefactor": "c*n_HeII*integral[n_gamma(E,Omega)*sigma(E) dE dOmega]",
+      "branches_and_floors": [
+        {
+          "below_fit_Eth": "zero",
+          "at_fit_Eth": "right finite value; not two-sided differentiable"
+        },
+        {
+          "above_Emax": "DOMAIN_ERROR"
+        },
+        {
+          "negative_nonfinite": "INPUT_ERROR"
+        }
+      ],
+      "uncertainty": {
+        "kind": "smoothed ground-state cross-section fit; no rigorous physical bound provided",
+        "rigorous_physical_bound": null
+      },
+      "energy_photon_closure": {
+        "status": "unresolved",
+        "owner": "rei_bianchi FT03 threshold/primary-secondary closure"
+      },
+      "implementation_status": "RUST_F01_SOURCE_VALUES_CHECKED__PHYSICAL_ADMISSION_OPEN",
+      "consumer_admission": false,
+      "closure_id": "FIT_THRESHOLD_AND_PHYSICAL_BINDING_DISTINCT",
+      "parameters": {
+        "Z": "2",
+        "N_electrons": "1",
+        "E_th_eV": "5.442E+01",
+        "E_max_eV": "5.000E+04",
+        "E0_eV": "1.720E+00",
+        "sigma0_Mb": "1.369E+04",
+        "y_a": "3.288E+01",
+        "P": "2.963E+00",
+        "y_w": "0.000E+00",
+        "y0": "0.000E+00",
+        "y1": "0.000E+00"
+      },
+      "derivative_contract": {
+        "coordinate": "E in eV",
+        "orders": [
+          1,
+          2
+        ],
+        "domain": "Eth<E<Emax",
+        "uniform_bound_verified": false
+      },
+      "threshold_policy": "Do not move fit threshold to binding chi or silently continue fit below Eth.",
+      "adapter_scope": "raw reference only; standalone coefficients are not an admitted thermal closure"
+    }
+  ],
+  "physical_provider_admitted": false,
+  "homogeneous_adapter": {
+    "closure_id": "HOMOGENEOUS_BOUND_FREE_R1",
+    "species_order": [
+      "HI",
+      "HeI",
+      "HeII"
+    ],
+    "binding_chi_eV": [
+      13.598434599702,
+      24.587389011,
+      54.41776
+    ],
+    "binding_source": "Exact FT03 closure_model.py CHI; separate from rounded Verner fit thresholds",
+    "photon_input": "Quadrature-weighted comoving photon count per cMpc3 at each energy node",
+    "proper_conversion": "N_comoving/(a_mean*MPC_CM)^3, exactly once",
+    "absorber_density": "proper cm^-3",
+    "model": "primary-only absorption event; excess energy heat, binding energy once",
+    "not_owned": [
+      "effective MFP",
+      "thermal/recombination cooling source terms",
+      "secondary deposition",
+      "expansion/redshift/angular transport"
+    ],
+    "numerical_domain": "Reject nonfinite/negative/overflow, zero/subnormal positive intermediate products and photon conversion; no clipping/scaled extreme-input arithmetic"
+  },
+  "limitations": [
+    "All enabled raw Grackle coefficients are reference values; disabled source tiny policy is not modeled by this API",
+    "k4 CaseA combines radiative and DR above9284K",
+    "raw reHeIII keeps literal8*T; FT03 model cooling remains distinct",
+    "Unknown physical-domain/rate-moment errors stay unresolved; source parity is not atomic accuracy"
+  ],
+  "inherited_records_sha256": "95c10bd75235615143cd4472f3f4c581809afe6984b8bb5366ff8ad98e6cdcd0",
+  "latest_chat_reconciliation": {
+    "handoff": "REI-CHAT-FT06-20261004",
+    "observed_commit": "dc931a67cd5ed25046a96eb5deb42186d72176da",
+    "input_impact": "Docs-only addition; no original source/provider/fixture bytes changed"
+  }
+}

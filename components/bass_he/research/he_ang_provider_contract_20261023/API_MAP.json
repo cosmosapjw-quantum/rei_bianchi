@@ -1,0 +1,43 @@
+{
+  "schema": "he_ang.equation_api_map.v1",
+  "notation": {
+    "N": "inclusive species count or signed reaction count",
+    "P": "sum momentum",
+    "R": "sum qq^T/m, pressure-type; K=tr(R)/2",
+    "C12": "sum(q1q2^T+q2q1^T)",
+    "Z": "1 conditional or sigma cross_section_weighted"
+  },
+  "interfaces": [
+    {
+      "name": "Event/integrate_events",
+      "obligation": "positive weights; one event law; exact momentum/energy shell; Ne=2,Np=1"
+    },
+    {
+      "name": "EventMoments",
+      "obligation": "common Z; Kp=Z(E-I)-Ke; Rp=(m/M)Re+C12/M"
+    },
+    {
+      "name": "cross_section_weighted/zero_cross_section",
+      "obligation": "one sigma conversion or explicit zero moments with no conditional density"
+    },
+    {
+      "name": "RawMoments/transform_raw",
+      "obligation": "q'=O(q-mU); signed species N retained; no realizability certification"
+    },
+    {
+      "name": "precheck_provider",
+      "obligation": "same law/frame/preparation/units/payload hashes; physical uncertainties separate; all states preserve no empirical admission"
+    },
+    {
+      "name": "CLI validate_fixture_bindings",
+      "obligation": "actual event bytes match metadata mass/threshold/domain/frame/normalization/identities"
+    }
+  ],
+  "review_dependencies": [
+    "theory/DERIVATION.md",
+    "evidence/review/THEORY_REVIEW_FINAL.json",
+    "CODING_CONTRACT.md"
+  ],
+  "root_jacobian_scope": "references and coordinate declarations checked structurally; physical transformed source requires independent content review",
+  "exact_fixture_scope": "manufactured finite law only, no empirical angular amplitude"
+}

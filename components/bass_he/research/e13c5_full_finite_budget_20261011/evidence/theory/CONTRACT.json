@@ -1,0 +1,244 @@
+{
+  "schema": "bass-he-e13c5b-finite-budget-theory-contract-v1",
+  "status": "DERIVED_THEORY_CONTRIBUTION_NOT_FINAL_SCIENTIFIC_DECISION",
+  "node": "E13C5_SELECTED_SUBSET_BUDGET_AND_MISSING_NODE_COMPLEMENT_CONTRACT",
+  "updated_frontier": "FULL_FINITE_BUDGET_AND_TWO_OFF_SAVED_REFINEMENT",
+  "basis": {
+    "pr20_source_head": "0633ec2c9aed37593b9f1c05abc7156727408583",
+    "inherited_scientific_scope": "All fixed-capture first-two-step nodes; no continuum or physical admission",
+    "modes": [
+      "OFF",
+      "KF",
+      "GM"
+    ],
+    "node_range_inclusive": [
+      0,
+      2439
+    ],
+    "paths_per_mode": 2440,
+    "total_paths": 7320,
+    "total_segments": 14652,
+    "selected_nodes_per_mode": [
+      0,
+      700,
+      1620,
+      2344
+    ],
+    "selected_paths": 12,
+    "selected_segments": 36,
+    "complement_nodes_per_mode": 2436,
+    "complement_paths": 7308,
+    "complement_segments": 14616,
+    "special_path_segments": 3,
+    "ordinary_path_segments": 2,
+    "replacement_paths": [
+      [
+        "OFF",
+        0
+      ],
+      [
+        "OFF",
+        700
+      ]
+    ],
+    "replacement_resolution": {
+      "N": 512,
+      "decimal_precision": 60,
+      "source": "existing reviewed saved result"
+    },
+    "full_base_resolution": {
+      "N": 128,
+      "decimal_precision": 60
+    }
+  },
+  "execution": {
+    "this_contribution": "Exact Fraction theory controls and source reads only",
+    "actual_coefficient_evaluations": 0,
+    "actual_ODE_invocations": 0,
+    "actual_native_invocations": 0,
+    "actual_gas_advances": 0,
+    "actual_NCP_scientific_invocations": 0,
+    "prepared_NCP_work": "One saved-only exact full-budget streaming postprocessing parity job",
+    "repeat_N512_solver": false,
+    "repeat_PR20_full_solver": false,
+    "automatic_precision_changes": false
+  },
+  "definitions": {
+    "exact_path_target": "x[m,p,X]: fixed capture gas/source/mask/seam/initial-condition time-continuous output",
+    "full_finite": "Q[m,X]=sum_{p in G[m]}w[m,p]*x[m,p,X]",
+    "selected": "Q_S[m,X]=sum_{p in S[m]}w[m,p]*x[m,p,X]",
+    "complement": "Q_R[m,X]=sum_{p in G[m]\\S[m]}w[m,p]*x[m,p,X]",
+    "captured_baseline": "c[m,p,X]: exact-lift same step/endpoint/transaction captured reference",
+    "correction": "delta[m,p,X]=x[m,p,X]-c[m,p,X]",
+    "correction_total": "Delta[m,X]=Delta_S[m,X]+Delta_R[m,X]",
+    "native_bridge": "Q-C_native=Delta+R_segment_to_node+R_node_to_aggregate",
+    "continuum_conditional": "M[m,X]=integral_D f[m,X](eta)deta",
+    "spectral_quadrature_error": "E_spec=M-Q; NOT_CERTIFIED by full finite node cover",
+    "model_error": "Actual physical model minus frozen-capture continuum; separate, NOT_CERTIFIED"
+  },
+  "admission": {
+    "required": [
+      "Pinned PR20 source, contract, START, PATHS hash and previous input pins",
+      "Exact unique mode/node and ordered segment coverage",
+      "Fixed gas stages and exact capture rows",
+      "Same initial stock, keyed incoming carry, source branches and species masks",
+      "All signed energy seams retained",
+      "Same zero-outflow model and inherited coefficient/cross-section definitions",
+      "Same constants, Verner fit, normalization, eta and weight",
+      "Finite ordered interval endpoints and inherited certificate validity",
+      "Same absolute/correction/reference target; bridge continuous-minus-frozen to continuous-minus-captured",
+      "Per-step endpoint separated from per-step and whole-path transactions",
+      "Dedicated totals separated from species-summed intervals"
+    ],
+    "point_positive_weights_required": true,
+    "unexpected_weight_action": "FAIL_ADMISSION; do not silently replace with approximate or absolute weights",
+    "overlap_is_validity_proof": false,
+    "mismatched_target_action": "FAIL_ADMISSION",
+    "full_cover_reaudit": "No repeat of inherited complete science review; inspect only imported identities and new aggregation mapping"
+  },
+  "primary_reduction": {
+    "arithmetic": "Exact Fraction parsing of decimal endpoints and exact-lift point weights",
+    "method": "Direct per-path Minkowski sums by mode",
+    "weight_applied_once": true,
+    "ordinary_interval_subtraction": "Valid but dependency-inflated; diagnostic only when per-path data exist",
+    "canonical_endpoint_subtraction": "Allowed only after exact endpoint-decomposition equality; not generic interval subtraction",
+    "published_aggregate_slack": "Record containment and lower/upper outward excess separately",
+    "mode_mixing": false,
+    "current_N512_route": "Replace exactly OFF0 and OFF700 after same-target admission",
+    "optional_intersection": {
+      "separate_output_required": true,
+      "conditions": [
+        "Both certificates valid for same exact scalar target",
+        "Intersection nonempty"
+      ],
+      "statistical_independence_required": false,
+      "empty_action": "FAIL_AND_INSPECT; no hull/average/tolerance repair"
+    }
+  },
+  "budget_equations": {
+    "point_weighted_width": "b_p=w_p*(U_p-L_p)",
+    "already_weighted_width": "b_p=U_weighted_p-L_weighted_p; do not multiply w twice",
+    "full_width": "W_all=sum_G b_p",
+    "selected_width": "W_S=sum_S b_p",
+    "complement_width": "W_R=sum_R b_p",
+    "dependency_subtraction_width": "W(I_full-I_selected)=W_R+2*W_S for identical canonical decomposition",
+    "actual_gain": "G_K=sum_K(b_old_p-b_new_p)",
+    "new_full_width": "W_new=W_old-G_K",
+    "maximal_gain": "G_K<=B_K=sum_K b_old_p",
+    "unchanged_floor": "F_K=W_old-B_K=sum_{p outside K} b_old_p",
+    "ratio_ceiling": "W_old/W_new<=W_old/F_K when F_K>0",
+    "floor_scope": "Fixed independent per-path interval-sum route with unmodified outside terms",
+    "floor_not_claims": [
+      "Natural physical uncertainty",
+      "Lower bound over all algorithms",
+      "Continuum quadrature error floor"
+    ],
+    "zero_cases": {
+      "floor_zero": "No finite ratio ceiling from this formula",
+      "old_width_zero": "Ratio diagnostic undefined or noninformative"
+    },
+    "negative_gain": "Report as observed for nonnested replacement; do not clamp",
+    "decomposition_unavailable": "NOT_IDENTIFIABLE_FROM_SAVED_FIELDS"
+  },
+  "sign_classification": [
+    {
+      "condition": "L>0",
+      "label": "STRICTLY_POSITIVE"
+    },
+    {
+      "condition": "U<0",
+      "label": "STRICTLY_NEGATIVE"
+    },
+    {
+      "condition": "L==U==0",
+      "label": "EXACT_ZERO"
+    },
+    {
+      "condition": "L==0 and U>0",
+      "label": "NONNEGATIVE_NOT_STRICT"
+    },
+    {
+      "condition": "L<0 and U==0",
+      "label": "NONPOSITIVE_NOT_STRICT"
+    },
+    {
+      "condition": "L<0 and U>0",
+      "label": "UNDETERMINED"
+    }
+  ],
+  "precision_claims": {
+    "absolute_tolerance": "max(abs(L),abs(U))<=tau_X, with independently selected physical tau_X",
+    "relative_condition": "Fixed meaningful denominator with certified positive distance from zero",
+    "physical_tolerances_supplied": false,
+    "automatic_posthoc_tolerance": false,
+    "width_is_statistical_interval": false,
+    "width_is_physical_effect_size": false,
+    "cross_unit_width_summation": false
+  },
+  "continuum_counterexample": {
+    "domain": [
+      "0",
+      "1"
+    ],
+    "nodes": [
+      "0",
+      "1"
+    ],
+    "weights": [
+      "1/2",
+      "1/2"
+    ],
+    "family": "f_A(eta)=A*eta^2*(1-eta)^2 with A>0",
+    "exact_nodal_quadrature": "0",
+    "exact_continuum_integral": "A/30",
+    "consequence": "Arbitrarily precise finite nodal enclosures do not bound continuum error without quantitative inter-node constraints",
+    "generalization": "A*product_p(eta-eta_p)^2"
+  },
+  "continuum_required_inputs": [
+    "Actual spectral coordinate and integration measure",
+    "Exact domain, boundary and tail policy",
+    "Actual quadrature nodes, weights and rule",
+    "Node-to-continuum model extension for gas/source/mask and initial spectrum",
+    "Event and threshold branch partition",
+    "Verified derivative bounds or whole-cell ranges",
+    "Source identity linking spectral bounds to time-enclosure target"
+  ],
+  "conditional_continuum_bound": {
+    "rule": "Actual composite midpoint, smooth within every cell",
+    "hypothesis": "abs(f''(eta))<=M_j throughout cell j of width h_j",
+    "bound": "abs(M-Q_midpoint)<=sum_j M_j*h_j^3/24",
+    "automatically_applies_to_PR20": false
+  },
+  "required_budget_output": [
+    "Per-mode/node/observable target ID, baseline, point weight, interval endpoints, exact weighted width and provenance",
+    "Segment count plus source/mask/event class",
+    "Full/selected/complement interval widths and signed correction enclosures",
+    "Exactly two OFF replacement terms; ten original selected and 7308 original complement path records preserved",
+    "Actual gain, maximal-gain ceiling and unchanged-term floor",
+    "Per-observable weighted-width ranking with top-k cumulative contributions",
+    "Published-aggregate rounding excess versus exact constituent sum",
+    "Any unavailable subbudget decomposition explicitly marked",
+    "Costs labeled by host, mode/class, N/P and actual reuse/new work",
+    "Scope-limited numeric projection for one saved-only NCP host replay"
+  ],
+  "selection_policy": {
+    "without_tolerance": "Per-mode per-observable raw budget and Pareto rankings",
+    "with_independent_tolerance": "Optional score s_p=max_X b[p,X]/tau_X",
+    "weighted_not_unweighted": true,
+    "cost_prediction_is_guarantee": false,
+    "if_current_ceiling_large": "Consider bounded targeted refinement using measured gain and resource contract",
+    "if_current_ceiling_small": "Prioritize dominant complement terms or reduction dependency",
+    "if_scientific_question_is_continuum": "Define continuum source/branch/error contract before further finite precision spending",
+    "automatic_new_solver": false
+  },
+  "scientifically_strong_next_goal": {
+    "immediate": "Compute and review actual full finite source-bound budgets, complement correction signs, two-OFF gain/floor and dominant paths",
+    "subsequent_conditional": "Choose finite-budget refinement or spectral-continuum contract from measured results and intended physical target",
+    "not_selected_automatically": [
+      "E13C6",
+      "another full-first2 solver job",
+      "physical/production admission",
+      "receiver adoption"
+    ]
+  }
+}

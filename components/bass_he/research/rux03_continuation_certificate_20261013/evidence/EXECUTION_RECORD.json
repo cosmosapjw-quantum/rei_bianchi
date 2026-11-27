@@ -1,0 +1,149 @@
+{
+  "schema": "bass-he-theory06-execution-record-v1",
+  "unit": "HERE_RUX03_MOVING_GAS_CONTINUATION_CERTIFICATE_06",
+  "workflow_version": "1.0.0",
+  "route": "THEORY",
+  "authors": [
+    "/root",
+    "/root/drive_checkpoint",
+    "/root/github_checkpoint"
+  ],
+  "independent_reviewer": "/root/dropbox_checkpoint",
+  "science_evaluator_calls": 5,
+  "final_named_groups": 57,
+  "counting_rule": "17 primitive +20 actual rate envelopes +12 full-source certificate +8 xAct groups. The xAct residual count 17 is nested inside its 8 groups. Counts do not identify independent theorems.",
+  "batches": [
+    {
+      "id": "primitive",
+      "evaluator_calls": 1,
+      "result": "evidence/PRIMITIVE_DIFFERENTIAL_RESULT.json",
+      "input": "evidence/PRIMITIVE_DIFFERENTIAL_CALL_INPUT.json",
+      "raw": "evidence/PRIMITIVE_DIFFERENTIAL_RAW_RESULT.json",
+      "groups": 17,
+      "passed": 17,
+      "kernel_seconds": 0.068243,
+      "kernel_version": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)"
+    },
+    {
+      "id": "rate",
+      "evaluator_calls": 1,
+      "result": "evidence/RATE_ENVELOPE_RESULT.json",
+      "input": "evidence/RATE_ENVELOPE_CALL_INPUT.json",
+      "raw": "evidence/RATE_ENVELOPE_WOLFRAM_RAW_RESULT.json",
+      "groups": 20,
+      "passed": 20,
+      "kernel_seconds": null,
+      "kernel_version": null,
+      "metadata_details": "evidence/RATE_ENVELOPE_EXECUTION_RECORD.json"
+    },
+    {
+      "id": "xAct",
+      "evaluator_calls": 2,
+      "failed_incomplete_input": "evidence/XACT_CONTINUATION_CALL_INPUT_v1.json",
+      "failed_incomplete_raw": "evidence/XACT_CONTINUATION_RAW_v1.json",
+      "result": "evidence/XACT_CONTINUATION_RESULT.json",
+      "input": "evidence/XACT_CONTINUATION_CALL_INPUT_v2.json",
+      "raw": "evidence/XACT_CONTINUATION_RAW_v2.json",
+      "groups": 8,
+      "passed": 8,
+      "tensor_residuals": 17,
+      "all_tensor_residuals_zero": true,
+      "kernel_seconds": null,
+      "kernel_version": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+      "xTensor_version": "1.3.0 (2025-12-29)",
+      "xPerm_external_backend": false
+    },
+    {
+      "id": "full_source",
+      "evaluator_calls": 1,
+      "result": "evidence/FULL_SOURCE_CERTIFICATE_RESULT.json",
+      "input": "evidence/FULL_SOURCE_CERTIFICATE_CALL_INPUT.json",
+      "raw": "evidence/FULL_SOURCE_CERTIFICATE_RAW.json",
+      "groups": 12,
+      "passed": 12,
+      "kernel_seconds": 0.00676,
+      "kernel_version": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)"
+    }
+  ],
+  "failures_and_capture_limits": [
+    {
+      "id": "EX01",
+      "class": "implementation_index_hygiene",
+      "observed": "xAct v1 returned package-loading messages and Hold[Throw[Null]], without a completed scientific result.",
+      "diagnosis": "A scalar ds held a fixed dummy a, then entered a helper called with free a.",
+      "correction": "Use the equivalent projection scalar ds=gdot-vdotray, add its exact defining residual and per-group progress diagnostics.",
+      "resolution": "Actual v2 returned 8 groups PASS and 17 zero tensor residuals.",
+      "v1_pass_count": null,
+      "assumptions_weakened": false
+    },
+    {
+      "id": "EX02",
+      "class": "implementation_metadata_capture",
+      "observed": "Rate batch produced AssociateTo::argrx after the scientific result was complete.",
+      "resolution": "20 complete results retained; runtime/version/system unavailable and recorded null; original code/raw retained.",
+      "science_reexecuted": false
+    },
+    {
+      "id": "EX03",
+      "class": "implementation_metadata_capture",
+      "observed": "The xAct v2 program passed the archive-hash guard and returned loaded tensor results. Its intended final archive/source-hash and elapsed-time fields were not received. The raw response contains no AssociateTo warning.",
+      "diagnosis": "Executed final wrapper uses AssociateTo with multiple separate rule arguments, rather than its two-argument rule-list form.",
+      "package_url": "https://xact.es/download/xAct_1.3.0.tgz",
+      "input_archive_hash_guard": "7a6c5f600868a3922668b020a15c0692f76574ff2a559808c62d460cef1b07be",
+      "returned_archive_hash": null,
+      "returned_xTensor_source_hash": null,
+      "returned_kernel_seconds": null,
+      "science_reexecuted": false,
+      "future_metadata_form": "AssociateTo[result, {rule1, rule2, rule3}] or Join[result, metadataAssociation]."
+    },
+    {
+      "id": "EX04",
+      "class": "tool_output_capture",
+      "observed": "Full-source long JSON returned one literal middle ellipsis with a truncated component-displacement key.",
+      "core_certificate_received": true,
+      "exact_received": [
+        "H",
+        "HB",
+        "HL_H",
+        "seven b rows",
+        "seven ell0 rows",
+        "seven ell1 rows",
+        "seven ellH rows",
+        "all 12 acceptance outcomes"
+      ],
+      "normalization": "Only the ellipsis/key boundary was repaired according to the executed source; every received value preserved. Four omitted redundant exact scalar fields are null.",
+      "details": "evidence/FULL_SOURCE_CERTIFICATE_RESULT.json: capture_provenance",
+      "science_reexecuted": false
+    }
+  ],
+  "review_corrections": [
+    {
+      "scope": "root continuation consequence",
+      "change": "finite endpoint -> finite nonextendible (maximal) endpoint",
+      "kind": "quantifier clarification preserving the extension proof"
+    },
+    {
+      "scope": "LaTeX literal representation",
+      "change": "Repair actual carriage-return bytes in intended \\rm macros; no mathematical input or output changed.",
+      "kind": "display-only"
+    },
+    {
+      "scope": "Doppler bound notation S14",
+      "change": "State the norm of D_X delta on the left, and allow a valid declared or direct enclosure L_delta.",
+      "kind": "notation clarification"
+    }
+  ],
+  "prohibited_route_activity": {
+    "native_builds": 0,
+    "native_tests": 0,
+    "chemical_RHS_calls": 0,
+    "ODE_integrations": 0,
+    "nonlinear_stage_solve_runs": 0,
+    "parameter_trajectory_scans": 0,
+    "scientific_Python_or_CPP_runs": 0
+  },
+  "python_role": "Text, exact input transport, JSON normalization, file hashes/manifests and packaging only.",
+  "parent_successful_groups_rerun": 0,
+  "new_no_go_claim": false,
+  "time_policy": "Report only kernel metadata actually received; no rate/xAct runtime reconstructed from another batch."
+}

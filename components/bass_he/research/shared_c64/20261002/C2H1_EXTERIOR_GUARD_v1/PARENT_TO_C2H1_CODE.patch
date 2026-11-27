@@ -1,0 +1,182 @@
+--- a/code/common_embedding.py
++++ b/code/common_embedding.py
+@@ -41,8 +41,7 @@
+         raise EmbeddingError("only unshifted charge-center O states are supported")
+     if state.metadata.get("units") != "a_A,E_A":
+         raise EmbeddingError("requires explicit a_A,E_A units")
+-    if isinstance(state.m, (bool, np.bool_)) or state.m not in (0, 1):
+-        raise EmbeddingError("only real static spinless m=0 and |m|=1 providers are supported")
++    _positive_integer(state.m, "provider |m|", 0)
+     scalars = np.asarray([state.R, state.ZA, state.ZB, state.energy, state.residual], dtype=float)
+     if (not np.isfinite(scalars).all() or state.R < 0 or state.ZA < 0 or state.ZB < 0
+             or state.ZA + state.ZB <= 0 or state.residual < 0):
+@@ -180,7 +179,7 @@
+             or not np.isin(mesh, grid.boundaries).all()):
+         raise EmbeddingError("state is not represented by this common physical grid")
+     m_signed = state.m if m_signed is None else m_signed
+-    if isinstance(m_signed, (bool, np.bool_)) or m_signed not in ((0,) if state.m == 0 else (-1, 1)):
++    if isinstance(m_signed, (bool, np.bool_)) or (not isinstance(m_signed, (int, np.integer)) or m_signed not in ((0,) if state.m == 0 else (-state.m, state.m))):
+         raise EmbeddingError("requested m must equal the provider |m| sector")
+     radial = state.radial(grid.r)
+     angular_table = np.stack([angular(int(l), state.m, grid.eta) for l in state.ls])
+@@ -237,7 +236,7 @@
+ def _binding_bytes(archives, source_id):
+     if not isinstance(source_id, str) or not source_id.strip():
+         raise EmbeddingError("nonempty source binding ID required")
+-    obj = {"schema": "C2g_sector_source_binding_v1", "source_id": source_id,
++    obj = {"schema": "C2h_sector_source_binding_v2", "source_id": source_id,
+            "archives": _archive_binding(archives)}
+     return (json.dumps(obj, sort_keys=True, indent=2, allow_nan=False)+"\n").encode()
+ 
+@@ -278,14 +277,15 @@
+ 
+     m=0 roots 1,2,3 and |m|=1 root 0 are the default selected ordinals. This
+     ordering is a declared finite-R candidate, not established atomic tracking.
+-    Every m=1 root (selected or guard) obtains explicit +m and -m partners.
++    Every m>0 root obtains explicit +m and -m partners; added m>=2 are guards only.
+     """
+     archives = _verified_archives(tuple(archives))
+     if (isinstance(gram_identity_atol, (bool, np.bool_)) or not np.isfinite(gram_identity_atol)
+             or not 0 < gram_identity_atol <= 1e-6):
+         raise EmbeddingError("explicit gram_identity_atol in (0,1e-6] required")
+-    if len(archives) != 2 or {a.result.states[0].m for a in archives} != {0, 1}:
+-        raise EmbeddingError("exactly one m=0 and one |m|=1 sector archive required")
++    sectors = [a.result.states[0].m for a in archives]
++    if len(set(sectors)) != len(sectors) or not {0, 1}.issubset(sectors):
++        raise EmbeddingError("one m=0 and one |m|=1 archive required; extras must have unique |m|")
+     archives = tuple(sorted(archives, key=lambda a: a.result.states[0].m))
+     binding_path = Path(source_binding_path)
+     binding = binding_path.read_bytes()
+@@ -306,7 +306,7 @@
+     for archive in archives:
+         states = archive.result.states
+         m = states[0].m
+-        chosen = tuple(selected_roots[m])
++        chosen = tuple(selected_roots.get(m, ()))
+         if (len(set(chosen)) != len(chosen) or any(isinstance(j, (bool, np.bool_))
+                 or not isinstance(j, (int, np.integer)) or j < 0 or j >= len(states) for j in chosen)):
+             raise EmbeddingError("invalid selected root ordinals")
+@@ -324,7 +324,7 @@
+         if gram_error > gram_identity_atol:
+             raise EmbeddingError("embedded Gram disagrees with provider finite mass form")
+         gram_errors.append({"m_abs": m, "max_abs_error": gram_error})
+-        for signed_m in ((0,) if m == 0 else (1, -1)):
++        for signed_m in ((0,) if m == 0 else (m, -m)):
+             start = len(columns)
+             for j, state in enumerate(states):
+                 sid = StateID(archive.state_ids[j]+f":m={signed_m:+d}")
+@@ -348,12 +348,12 @@
+         raise EmbeddingError("finite Galerkin selected operator is not Hermitian within registered tolerance")
+     representation = Representation(grid.embedding_id, grid.metric_id, grid.hilbert_space_id,
+         "electronic_Coulomb_E_A_zero_at_electron_infinity_nuclear_repulsion_omitted", "E_A", "a_A",
+-        source_id, hashlib.sha256(binding).hexdigest(), "finite_sector_subset", (0, 1, -1), True, 0.)
++        source_id, hashlib.sha256(binding).hexdigest(), "finite_sector_subset", tuple(sorted({record.m for record in records})), True, 0.)
+     snapshot = Snapshot(float(next(iter(coordinates))[0]), frame, grid.weights, tuple(records),
+                         representation, selected_projected_operator=hsmall)
+     hsmall = np.array(hsmall, copy=True)
+     hsmall.setflags(write=False)
+-    provenance = {"schema": "C2g_common_embedding_provenance_v1", "source_binding_path": str(binding_path),
++    provenance = {"schema": "C2h_common_embedding_provenance_v2", "source_binding_path": str(binding_path),
+         "source_binding_sha256": representation.source_sha256, "source_binding_bytes": len(binding),
+         "states": source_map, "grid_shape": list(grid.shape), "point_count": grid.point_count,
+         "radial_order": grid.radial_order, "eta_order": grid.eta_order, "phi_count": grid.phi_count,
+--- a/code/multistate_provider.py
++++ b/code/multistate_provider.py
+@@ -20,7 +20,8 @@
+ 
+ from optimized_solver import MultiStateResult, PartialWaveState, RESIDUAL_DEFINITION
+ 
+-SCHEMA = "bass-he-c2g-finite-sector-v1"
++SCHEMA = "bass-he-c2h-finite-sector-v2"
++LEGACY_SCHEMA = "bass-he-c2g-finite-sector-v1"
+ _ARRAY_NAMES = {"metadata_json", "ls", "boundaries", "coefficients", "energies",
+                 "residuals", "mass_norms", "phase_probes", "projected_operator",
+                 "mass_gram", "coefficient_vectors"}
+@@ -65,8 +66,8 @@
+         raise TypeError("result must be MultiStateResult")
+     states = result.states
+     first = states[0]
+-    if first.m not in (0, 1) or isinstance(first.m, bool):
+-        raise ValueError("archive sector must be m=0 or real cosine m=1")
++    if isinstance(first.m, (bool, np.bool_)) or not isinstance(first.m, (int, np.integer)) or first.m < 0:
++        raise ValueError("archive sector must be a nonnegative integer |m|")
+     if first.degree < 2 or int(first.degree) != first.degree:
+         raise ValueError("invalid FEM polynomial degree")
+     ls = np.asarray(first.ls)
+@@ -214,8 +215,10 @@
+         raise ValueError("metadata must be a UTF-8 uint8 vector")
+     doc = _json_load(arrays["metadata_json"].tobytes().decode("utf-8"))
+     expected_doc = {"schema", "source_id", "state_ids", "R", "ZA", "ZB", "m", "degree", "metadata", "state_metadata", "archive_writer_sha256"}
+-    if not isinstance(doc, dict) or set(doc) != expected_doc or doc["schema"] != SCHEMA:
++    if not isinstance(doc, dict) or set(doc) != expected_doc or doc["schema"] not in (SCHEMA, LEGACY_SCHEMA):
+         raise ValueError("unsupported archive schema")
++    if doc["schema"] == LEGACY_SCHEMA and (type(doc["m"]) is not int or doc["m"] not in (0, 1)):
++        raise ValueError("legacy C2g schema cannot describe an added |m|>=2 sector")
+     source_id = _source_id(doc["source_id"])
+     k = len(arrays["energies"])
+     if tuple(doc["state_ids"]) != _state_ids(source_id, k) or len(doc["state_metadata"]) != k:
+--- a/code/optimized_solver.py
++++ b/code/optimized_solver.py
+@@ -1,7 +1,7 @@
+ """Accuracy-preserving HPC spherical hp-FEM fork (research prototype).
+ 
+ Computational units a_A=E_A=hbar=m_e=1.  Nuclear repulsion is omitted.
+-psi_0=G(r,eta)/sqrt(2*pi), psi_1=G(r,eta)*cos(phi)/sqrt(pi).
++psi_0=G(r,eta)/sqrt(2*pi); real m>0 representative G*cos(m*phi)/sqrt(pi).
+ G=sum_l u_l(r) A_lm(eta)/r; A_lm has no Condon--Shortley sign.
+ No Coulomb softening, interpolation of external data, or production claims.
+ """
+@@ -41,18 +41,25 @@
+     Derivative is evaluated only for |eta|<1 (m=1 eta derivative is
+     coordinate-singular on the axis).  Values themselves allow both axes.
+     """
++    m = _integer(m, "m", 0)
++    l = _integer(l, "l", m)
+     eta = np.asarray(eta, dtype=float)
+-    if m not in (0, 1) or l < m or np.any(~np.isfinite(eta)):
+-        raise ValueError("requires l>=m and m in {0,1}, finite eta")
++    if np.any(~np.isfinite(eta)):
++        raise ValueError("finite eta required")
+     if np.any(np.abs(eta) > 1) or (derivative and np.any(np.abs(eta) >= 1)):
+         raise ValueError("eta outside angular domain")
+     norm = np.exp(0.5*(np.log((2*l+1)/2)+gammaln(l-m+1)-gammaln(l+m+1)))
+-    p = lpmv(m, l, eta)
+-    if not derivative:
+-        return (-1)**m * norm * p
+-    prev = lpmv(m, l-1, eta) if l > m else np.zeros_like(eta)
+-    dp = (l*eta*p-(l+m)*prev)/(eta*eta-1)
+-    return (-1)**m * norm * dp
++    # lpmv includes Condon--Shortley; cancel it for the inherited no-CS chart.
++    # Reject overflow instead of silently returning inf*0/NaN at extreme m.
++    with np.errstate(over="ignore", invalid="ignore", under="ignore"):
++        p = lpmv(m, l, eta)
++        if derivative:
++            prev = lpmv(m, l-1, eta) if l > m else np.zeros_like(eta)
++            p = (l*eta*p-(l+m)*prev)/(eta*eta-1)
++        out = (-1)**m * norm * p
++    if not np.all(np.isfinite(out)) or norm == 0:
++        raise ArithmeticError("associated-Legendre binary64 evaluation overflow/underflow; no fallback")
++    return out
+ 
+ 
+ @lru_cache(maxsize=12)
+@@ -179,8 +186,6 @@
+     if np.any(~np.isfinite(vals)) or R < 0 or ZA < 0 or ZB < 0 or ZA+ZB <= 0 or rmax <= 0 or not 0 < tol < 1:
+         raise ValueError("invalid physical or solver parameter")
+     m = _integer(m, "m", 0)
+-    if m not in (0, 1):
+-        raise ValueError("only m=0 and m=1 are implemented")
+     lmax = _integer(lmax, "lmax", m)
+     elements = _integer(elements, "elements", 4)
+     degree = _integer(degree, "degree", 2)
+@@ -326,8 +331,8 @@
+ class MultiStateResult:
+     """Finite-sector Ritz data; no complete-spectrum or continuum certificate.
+ 
+-    Columns use real azimuth-independent meridional coefficients. m=1 is the
+-    normalized cosine representative; +/-m construction belongs to embedding.
++    Columns use real azimuth-independent meridional coefficients. Every m>0
++    is a normalized cosine representative; +/-m belongs to embedding.
+     Arrays of the result are owned read-only copies. PartialWaveState remains
+     compatible with the previous evaluator API.
+     """

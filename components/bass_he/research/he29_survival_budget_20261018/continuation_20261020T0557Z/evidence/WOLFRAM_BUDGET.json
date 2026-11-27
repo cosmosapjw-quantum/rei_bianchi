@@ -1,0 +1,16 @@
+{
+  "schema": "he29.symbolic_budget.v1",
+  "scope": "New symbolic signed decomposition and exact finite-candidate example; no physical solver and no recomputation of the saved HE28 audit",
+  "input": "Module[{ta, tb, thetaa, thetab, n32a, n32b, n64a, n64b,\n  decomposition, closure, levelCancellation, candidates, corners, coherent},\n decomposition = Expand[(thetab-thetaa) + (tb-thetab) - (ta-thetaa)];\n closure = Expand[decomposition - (tb-ta)];\n levelCancellation = Expand[((n64b-thetab)-(n64a-thetaa)) -\n   ((n32b-thetab)-(n32a-thetaa)) - ((n64b-n64a)-(n32b-n32a))];\n candidates = {{1, 2}, {11, 12}};\n corners = (#[[2]]-#[[1]]) & /@ Tuples[candidates];\n coherent = (#[[2]]-#[[1]]) & /@ Transpose[candidates];\n ExportString[<|\"scope\" -> \"symbolic_signed_decomposition_and_manufactured_finite_candidates\",\n   \"signedClosure\" -> closure, \"sharedReferenceLevelCancellation\" -> levelCancellation,\n   \"productHull\" -> {Min[corners], Max[corners]},\n   \"coherentHull\" -> {Min[coherent], Max[coherent]},\n   \"productChoices\" -> Length[corners], \"coherentChoices\" -> Length[coherent],\n   \"nativeCalls\" -> 0, \"trueSolutionErrorBound\" -> False|>, \"RawJSON\"]\n]\n",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= \"{\\n\\t\\\"scope\\\":\\\"symbolic_signed_decomposition_and_manufactured_finite_candidates\\\",\\n\\t\\\"signedClosure\\\":0,\\n\\t\\\"sharedReferenceLevelCancellation\\\":0,\\n\\t\\\"productHull\\\":[\\n\\t\\t9,\\n\\t\\t11\\n\\t],\\n\\t\\\"coherentHull\\\":[\\n\\t\\t10,\\n\\t\\t10\\n\\t],\\n\\t\\\"productChoices\\\":4,\\n\\t\\\"coherentChoices\\\":2,\\n\\t\\\"nativeCalls\\\":0,\\n\\t\\\"trueSolutionErrorBound\\\":false\\n}\""
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "old_tests_rerun": 0
+}

@@ -1,0 +1,102 @@
+{
+  "schema": "BASS_HE_EXFOR_EVENT_NORMALIZATION_V1",
+  "date": "2026-10-29",
+  "repository": "cosmosapjw-quantum/BASS_HE",
+  "base_commit": "89325f8510d2af3abe675326720068d0693845b8",
+  "source": {
+    "repo": "IAEA-NDS/exfor_master",
+    "commit": "939a14d7bba1ddce51975cb5e8711ce96b3b0871",
+    "path": "exforall/M04/M0475.x4",
+    "git_blob": "c49433293921dbb012d7f1b0387745732a598efa",
+    "sha256": "b2c1c52931e813dd63fb0e98edfc90088bc2eca497fd9142277e748f0935a82f",
+    "DA": "M0475002",
+    "SIG": "M0475003"
+  },
+  "input_contract": {
+    "energy_MeV": "330 exact",
+    "angles_deg_cm": [
+      46,
+      61,
+      73,
+      87
+    ],
+    "DA_nb_sr": [
+      "0.14",
+      "0.16",
+      "0.07",
+      "0.19"
+    ],
+    "ERR_S_nb_sr": [
+      "0.03",
+      "0.05",
+      "0.05",
+      "0.05"
+    ],
+    "L_nb_sr_per_deg": "positive exact rational >=1/700",
+    "statistic": "coordinatewise sensitivity, not simultaneous CI",
+    "symmetry": "declared identical-D polar symmetry, azimuthal average",
+    "event_multiplicity": "unresolved, hypothetical kappa in {1,2}"
+  },
+  "theory": {
+    "Lmin": "1/700",
+    "Lcentral": "3/350",
+    "envelopes": "f_minus=max(0,max_i(lo_i-L|theta-theta_i|)), f_plus=min_i(hi_i+L|theta-theta_i|)",
+    "integral": "I=4*pi*(pi/180)*int_0^90 f(theta) sin(pi*theta/180)dtheta",
+    "sharp_in_declared_class": true
+  },
+  "implementation": {
+    "source": "src/exfor_envelope.py",
+    "tests": "tests/test_exfor_envelope.py",
+    "source_file": "source/M0475.x4",
+    "numeric_rounding_certified": false,
+    "piecewise_geometry_exact": true,
+    "rate_provider_admitted": false,
+    "physical_activation": false
+  },
+  "tests": {
+    "new_tests": 19,
+    "passed": 19,
+    "failed": 0,
+    "source_byte_identity": true,
+    "independent_mpmath_quad": "difference <1e-45 nb",
+    "wolfram": "exact Lmin/primitive; independent NIntegrate ~1e-20 nb",
+    "scipy": "~1e-16 nb",
+    "old_science_replays": 0,
+    "new_physical_IVPs": 0
+  },
+  "gates": {
+    "R6": "PASS_SCOPED_CAS_NOT_DISTINCT_AGENT",
+    "C9": "PARTIAL_SELF_REVIEW_ONLY",
+    "L4": false,
+    "production": "HOLD",
+    "R_event": null,
+    "photon_history": null,
+    "named_fast_D_pool": null,
+    "Gamma_thermal": null,
+    "Cv": null
+  },
+  "acceptance_tests": [
+    "source SHA256 and Git blob identical",
+    "four 330 MeV DA and zero 330 MeV SIG",
+    "exact Lmin 1/700 and central 3/350",
+    "sharp envelopes feasible at Lmin",
+    "piecewise analytic vs independent pointwise quadrature",
+    "float/bool/source mutation rejected",
+    "no physical event rate from missing flux/convention",
+    "no false simultaneous confidence or outward-rounding claim"
+  ],
+  "failure_modes": [
+    "no angular L provider: unbounded integral from pointwise DA alone",
+    "kappa source convention unresolved",
+    "no full azimuth/polarization and target response",
+    "statistical ERR-S covariance/systematics unknown",
+    "no physical photon history",
+    "nonthermal stopping/deposition absent",
+    "independent C9 reviewer not exposed"
+  ],
+  "resource_policy": "bounded new tests only; old HE campaigns/IVPs not rerun",
+  "central_DAG": "28/88",
+  "inherited_HE_DAG": "14/18",
+  "predecessor_conditional_DAG": "2/2",
+  "new_conditional_DAG": "2/2"
+}

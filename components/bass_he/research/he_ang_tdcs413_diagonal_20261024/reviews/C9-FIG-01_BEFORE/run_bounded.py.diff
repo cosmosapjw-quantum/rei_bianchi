@@ -1,0 +1,53 @@
+--- before/run_bounded.py
++++ after/run_bounded.py
+@@ -50,6 +50,7 @@
+ def main():
+     p=argparse.ArgumentParser()
+     p.add_argument('run_id',choices=[x[0] for x in PLAN])
++    p.add_argument('--repair-reason',choices=['C9-FIG-01'],help='root-authorized footer-only saved-output repair reserve')
+     args=p.parse_args()
+     EXEC.mkdir(parents=True,exist_ok=True)
+     lock=EXEC/'RUN.lock'
+@@ -60,12 +61,20 @@
+         ledger=json.loads(LEDGER.read_text())
+         attempts=ledger['attempts']
+         if any(a['status']=='START' for a in attempts):raise RuntimeError('incomplete START: UNKNOWN_NOT_ZERO blocks launch')
+-        if any(a['status']!='PASS' for a in attempts):
+-            raise RuntimeError('prior substantive failure blocks automatic continuation; return to root')
+-        index=len(attempts)
+-        if index>=len(PLAN) or PLAN[index][0]!=args.run_id:
+-            raise RuntimeError('three planned sequential runs only; repair needs new explicit root diagnosis')
++        repair=None
++        if args.repair_reason:
++            if args.run_id!='03_plot' or len(attempts)!=3 or any(a['status']!='PASS' or a.get('repair') for a in attempts):
++                raise RuntimeError('footer repair follows exactly the three retained planned PASS children')
++            if ledger['diagnosed_repair_reserve']['used']:
++                raise RuntimeError('diagnosed repair reserve already consumed')
++            repair={'reason':'C9-FIG-01','authority':'root native task and evidence/C9_FIGURE_REPAIR_AUTHORIZATION.json',
++                    'scope':'footer wrapping only; saved analysis unchanged; tests/analysis not rerun'}
++        else:
++            if any(a['status']!='PASS' for a in attempts):raise RuntimeError('failure blocks automatic continuation; return to root')
++            index=len(attempts)
++            if index>=len(PLAN) or PLAN[index][0]!=args.run_id:raise RuntimeError('planned order required; no automatic repair')
+         _,script,cap_cpu,cap_wall=next(x for x in PLAN if x[0]==args.run_id)
++        if repair:cap_cpu,cap_wall=3,14
+         if len(attempts)>=4 or ledger['cumulative_cpu_s']+cap_cpu>10 or ledger['cumulative_wall_s']+cap_wall>40:
+             raise RuntimeError('fresh unit cumulative budget would be exceeded')
+         identity=f'{len(attempts)+1:02d}_{args.run_id}'
+@@ -77,11 +86,15 @@
+         command=[sys.executable,'-B','code/'+script]
+         start_wall=time.monotonic();start_parent=cpu(resource.RUSAGE_SELF);start_child=cpu(resource.RUSAGE_CHILDREN)
+         row={'attempt_id':identity,'run_id':args.run_id,'command':command,'started_utc':stamp(),
+-             'status':'START','repair':None,'caps':{'cpu_s':cap_cpu,'wall_s':cap_wall,'memory_bytes':536870912,'threads':1},
++             'status':'START','repair':repair,'caps':{'cpu_s':cap_cpu,'wall_s':cap_wall,'memory_bytes':536870912,'threads':1},
+              'remaining_before_cpu_s':10-ledger['cumulative_cpu_s'],'remaining_before_wall_s':40-ledger['cumulative_wall_s'],
+              'incomplete_START_accounting':'UNKNOWN_NOT_ZERO; blocks replay',
+              'preparation_manifest_sha256':digest(manifest)['sha256'], 'current_input_identities':current_inputs,
+              'authority':'Astra root explicit native task GO after TDCS413 B1 dual-provider ACK and R7; no additional authorization gate'}
++        if repair:
++            ledger['diagnosed_repair_reserve']['used']=1
++            ledger['diagnosed_repair_reserve']['remaining']=0
++        ledger['state']='ACTUAL_CHILD_START'
+         attempts.append(row);atomic(outdir/'START.json',row);atomic(LEDGER,ledger)
+         def limits():
+             resource.setrlimit(resource.RLIMIT_CPU,(cap_cpu,cap_cpu))

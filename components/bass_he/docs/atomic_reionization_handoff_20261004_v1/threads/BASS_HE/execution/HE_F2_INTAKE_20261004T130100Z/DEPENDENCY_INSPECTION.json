@@ -1,0 +1,151 @@
+{
+  "observed_at": "2026-10-04T13:03:14.103349+00:00",
+  "repository": "cosmosapjw-quantum/rei_bianchi",
+  "branch": "forward/rust-reion-kernels-20260922",
+  "commit": "64bc3aa0871bb324817afd3d36db018dd34181cf",
+  "observations": [
+    {
+      "path": "docs/atomic_reionization_handoff_20261004_v1/threads/rei_bianchi/TASKS.json",
+      "url": "https://raw.githubusercontent.com/cosmosapjw-quantum/rei_bianchi/64bc3aa0871bb324817afd3d36db018dd34181cf/docs/atomic_reionization_handoff_20261004_v1/threads/rei_bianchi/TASKS.json",
+      "status": 200,
+      "sha256": "d11fd40febd9ca608fb60eba2c8982ccae62d49b1d912b01cb16daf79278c5da",
+      "selected_tasks": [
+        {
+          "id": "REI-F00",
+          "title": "SSOT 채택과 source/closure successor contract",
+          "lane": "FASTEST",
+          "status": "CODEX_READY_NOT_EXECUTED",
+          "dependencies": [],
+          "inputs": [
+            "REPO_SNAPSHOT.json",
+            "PREWORK_KO.md",
+            "CONTROLLED_FIXTURE.json",
+            "legacy_sources/MANIFEST.json"
+          ],
+          "outputs": [
+            "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/rei_model_lock.json",
+            "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/closure_process_decision.json",
+            "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/parent_and_lane_applicability.json"
+          ],
+          "proposed_paths": [
+            "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/rei_model_lock.json",
+            "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/closure_process_decision.json",
+            "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/parent_and_lane_applicability.json"
+          ],
+          "steps": [
+            "기존 branch HEAD 차이는 docs-only 여부부터 확인; source 차이만 bounded diff review",
+            "InheritedEffectiveMfp와 HomogeneousBoundFree를 distinct IDs로 고정",
+            "그룹/각도/threshold/units/case selection/secondary approximation을 명시",
+            "provider candidate와 admitted 상태를 분리",
+            "parent/model manifest fixes either InheritedNodeHistory(46080 nodes, all3 shape lanes) or R1HomogeneousSuccessor(actual state dimensions); certify selected map, never transfer old pass/fail across models"
+          ],
+          "verification": [
+            "git status --short",
+            "git rev-parse HEAD",
+            "git diff 0100b1dfa023928d67602877876b586fea319d13 -- rust/rei_microphysics",
+            "python scripts/verify_repo.py"
+          ],
+          "acceptance": [
+            "source snapshot와 local HEAD 차이가 기록됨",
+            "case/opacity/process flags에 암묵적 기본값 없음"
+          ],
+          "failure_branches": [
+            "SOURCE_DRIFT: 바뀐 crate와 관련 lock만 읽고 task patch",
+            "MISSING_REQUIRED_SOURCE: 해당 provider만 중단, 원자 ab-initio 자동재개 금지"
+          ],
+          "claim_ceiling": "설계와 후보만 잠금; scientific gate 변화 없음"
+        },
+        {
+          "id": "REI-F01",
+          "title": "정의된 AtomicProvider와 R1 homogeneous opacity 구현",
+          "lane": "FASTEST",
+          "status": "CODEX_READY_NOT_EXECUTED",
+          "dependencies": [
+            "REI-F00"
+          ],
+          "inputs": [
+            "Grackle3.4.1 af7939494ce65007887ada7b98d1813df6843346",
+            "Verner published parameters/source receipt",
+            "legacy source equation map"
+          ],
+          "outputs": [
+            "provider manifest",
+            "source-domain rate wrapper",
+            "homogeneous photo owner adapter"
+          ],
+          "proposed_paths": [
+            "rust/rei_microphysics/src/atomic_provider.rs",
+            "rust/rei_microphysics/src/homogeneous_rates.rs",
+            "rust/rei_microphysics/tests/atomic_provider.rs",
+            "rust/rei_microphysics/tests/homogeneous_rates.rs",
+            "rust/rei_microphysics/src/lib.rs"
+          ],
+          "steps": [
+            "ProcessId/species initial-final/frame/domain/units/error semantics typed contract 구현",
+            "Grackle formula transport는 selected reaction/cooling 함수와 notices만, 전체 solver를 dependency로 넣지 않음",
+            "Verner fit threshold/eV/Mb conversion 및 quadrature 동일함수에서 σ/heat 산출",
+            "proper n and photon N_comoving 변환을 한곳에서 수행",
+            "기존 opacity API 의미와 oldsource refusal는 유지; 새 provider admission path만 추가"
+          ],
+          "verification": [
+            "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test atomic_provider --locked",
+            "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test homogeneous_rates --locked",
+            "cargo test --manifest-path rust/rei_microphysics/Cargo.toml --test forward --locked"
+          ],
+          "acceptance": [
+            "independent C/original formula point values selected domain에서 일치",
+            "domain 밖 return error, no clamp",
+            "κ=Σnσ owner합=1, zero-opacity absorption0",
+            "기존 seven APIs tests unchanged"
+          ],
+          "failure_branches": [
+            "SOURCE_LICENSE_UNRESOLVED: third-party file vendor하지 말고 출판식 implementation+source manifest",
+            "DOMAIN_FAIL: scenario를 silent truncate하지 말고 domain coverage task"
+          ],
+          "claim_ceiling": "함수 값·units implementation 검증; physical accuracy/derivative enclosure 아님"
+        }
+      ]
+    },
+    {
+      "path": "docs/atomic_reionization_handoff_20261004_v1/EXECUTION_STATE.json",
+      "url": "https://raw.githubusercontent.com/cosmosapjw-quantum/rei_bianchi/64bc3aa0871bb324817afd3d36db018dd34181cf/docs/atomic_reionization_handoff_20261004_v1/EXECUTION_STATE.json",
+      "status": 200,
+      "sha256": "8f670dbddeb26ae6d7047388ca044993e55005f83a26d9a0b9581ae65dffe4b5",
+      "content": {
+        "schema": "task_execution_state.v1",
+        "completed_task_ids": [
+          "HE-P0",
+          "HH-F0"
+        ],
+        "activated_decisions": [],
+        "runtime_results": [],
+        "note": "Prework completion is scoped; consumer code/atomic scientific gates are not promoted. Later completion requires a RETURN_CONTRACT-conforming evidence receipt."
+      }
+    },
+    {
+      "path": "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/rei_model_lock.json",
+      "url": "https://raw.githubusercontent.com/cosmosapjw-quantum/rei_bianchi/64bc3aa0871bb324817afd3d36db018dd34181cf/docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/rei_model_lock.json",
+      "status": 404,
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "path": "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/closure_process_decision.json",
+      "url": "https://raw.githubusercontent.com/cosmosapjw-quantum/rei_bianchi/64bc3aa0871bb324817afd3d36db018dd34181cf/docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/closure_process_decision.json",
+      "status": 404,
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "path": "docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/parent_and_lane_applicability.json",
+      "url": "https://raw.githubusercontent.com/cosmosapjw-quantum/rei_bianchi/64bc3aa0871bb324817afd3d36db018dd34181cf/docs/atomic_reionization_handoff_20261004_v1/runtime_inputs/parent_and_lane_applicability.json",
+      "status": 404,
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "path": "rust/rei_microphysics/src/atomic_provider.rs",
+      "url": "https://raw.githubusercontent.com/cosmosapjw-quantum/rei_bianchi/64bc3aa0871bb324817afd3d36db018dd34181cf/rust/rei_microphysics/src/atomic_provider.rs",
+      "status": 404,
+      "error": "HTTP Error 404: Not Found"
+    }
+  ],
+  "ceiling": "Selected published paths only; absence here does not exclude private or unpublished consumer work."
+}

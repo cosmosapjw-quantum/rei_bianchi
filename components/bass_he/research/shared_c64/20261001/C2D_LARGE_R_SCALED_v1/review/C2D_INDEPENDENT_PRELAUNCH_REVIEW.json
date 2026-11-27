@@ -1,0 +1,50 @@
+{
+  "schema": "bass-he-c2d-independent-prelaunch-review-v1",
+  "created_at_utc": "2026-10-01T13:37:36.712460+00:00",
+  "status": "NO_REMAINING_PRELAUNCH_BLOCKER_IN_REVIEWED_SCOPE",
+  "new_physical_evaluations": 0,
+  "reviewed_identities": {
+    "code/task_worker.py": "fe49b4fc9aee69f92d2b6bb7b7bfef12c2fdd14343763ccc0dbaf0f6b46cef59",
+    "code/scaled_audit.py": "ee5b738b504db721c39bb15f47f8baf0be5ae1d63fa366aede708f85986ab75d",
+    "code/force_integral.py": "735062d863f92ebbd152ae08ed022e29cd323f00dc3fb2c68858a41d5e42a51d",
+    "code/sphere_adapter.py": "c82baf9c162ed43a7add305405f73b1475012362d1622039f9049fe7018fbcc9",
+    "reference/spheroidal_tail.py": "b641e80ebcf80b443af3a4dca15a6116fd22294fe6368dbb695be09717532758",
+    "CONTRACT.json": "e43372481ba1ddc4a556a5eb199ec0fe9479247fbda59bea650681bcac1dee54",
+    "inputs/MAIN_TASKS.json": "c240743a76420ea57a98cfc806df26e8bc88182ecb7dcb111af40681a8c45b15",
+    "evidence/PRELAUNCH_AFFECTED_TESTS_LOG.txt": "46f098416032737c8ac7508548ad9438f2da6f458752334ce4fa915c6a236cf2"
+  },
+  "resolved_findings": [
+    {
+      "id": "C2D-PRE-001",
+      "resolution": "Initial contract preserved; explicit force geometry cap raised to100000 before physics; source diff changes cap constants/messages only; geometry-only maximum92212 cells/depth7."
+    }
+  ],
+  "contract_review": {
+    "signed_QO_QB_and_force_lanes": "consistent",
+    "raw_and_scaled_independent_gates": "consistent",
+    "momentum_and_origin_propagation": "correct distinct x and x^3 factors",
+    "endpoint_profiles_tail_prefix_phase": "consistent",
+    "independent_anchor": "finite-domain representation check only",
+    "initial_selected_states": 64,
+    "maximum_selected_states": 84,
+    "initial_tasks": 34,
+    "initial_overlap_order_tasks": 144,
+    "total_active_science_wall_seconds": 3600,
+    "per_task_wall_seconds": 300,
+    "fallback": "limited to registered scopes/counts and remaining wall; no posthoc tolerance relaxation"
+  },
+  "implementation_review": {
+    "task_worker": "Registered configuration check, positive sampled phase, preserved atomic state/data/result identity; execution PASS distinguished from science.",
+    "scaled_audit": "Independent QO/QB raw/scaled q/spatial/operator checks; both q increments and all nine terminal direct/force pairings; signed brightness and exact tail knot prefix; malformed/nonfinite inputs fail closed.",
+    "phase": "Max-absolute interior regular sample avoids exponentially small first-cell tail phase; negative weighted L2 fraction diagnostic retained.",
+    "sphere_adapter": "Explicit requested mesh exact equality; QO/QB added without changing inherited L_O_scaled semantics."
+  },
+  "test_evidence": {
+    "tests": 23,
+    "status": "PASS",
+    "kind": "manufactured/synthetic scalar and archive checks; no physical computation",
+    "rerun_by_reviewer": false,
+    "reviewer_action": "Read actual persisted test log and source; no unchanged suite replay."
+  },
+  "remaining": "Scientific results and launch/resource integrity require independent post-execution review. This source review does not assert numerical convergence."
+}

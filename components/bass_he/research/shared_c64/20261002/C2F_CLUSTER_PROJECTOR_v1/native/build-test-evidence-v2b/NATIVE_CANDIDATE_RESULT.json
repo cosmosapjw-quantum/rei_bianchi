@@ -1,0 +1,93 @@
+{
+  "schema": "bass-he.c2f.native-candidate-decision.v1",
+  "created_utc": "2026-10-01T22:43:52.627324+00:00",
+  "candidate": "eight-lane-neumaier-v2b",
+  "native_status": "IMPLEMENTATION_VERIFIED_IN_MANUFACTURED_SCOPE",
+  "tests": {
+    "count": 17,
+    "status": "PASS",
+    "report": "native/build-test-evidence-v2b/TEST_REPORT.json"
+  },
+  "actual_simd": "16-byte vectors in GNU Fortran strict build report",
+  "benchmark_inputs": [
+    {
+      "path": "runs/BENCHMARK_V2B_OMP1.json",
+      "sha256": "65babbc25e109e8b9888f172388d781cc859412016c62beeeaf44c61382f315d",
+      "bytes": 9024
+    },
+    {
+      "path": "runs/BENCHMARK_V2B_OMP4.json",
+      "sha256": "31d2e477458149d75ca05d7a8c031b0f5d1abcf7e172cbb7d05132e900a0c356",
+      "bytes": 9025
+    }
+  ],
+  "same_run_medians": [
+    {
+      "threads": 1,
+      "N": 4096,
+      "rank": 5,
+      "reference_ms": 0.30104300822131336,
+      "native_ms": 0.7377409929176793,
+      "max_abs_parity_error": 4.002101426321446e-17,
+      "faster_observed_backend": "reference"
+    },
+    {
+      "threads": 1,
+      "N": 65536,
+      "rank": 5,
+      "reference_ms": 3.6381339887157083,
+      "native_ms": 7.43030000012368,
+      "max_abs_parity_error": 2.5033568429418485e-17,
+      "faster_observed_backend": "reference"
+    },
+    {
+      "threads": 1,
+      "N": 131072,
+      "rank": 6,
+      "reference_ms": 9.956030989997089,
+      "native_ms": 23.45680999860633,
+      "max_abs_parity_error": 1.4784956187926718e-17,
+      "faster_observed_backend": "reference"
+    },
+    {
+      "threads": 4,
+      "N": 4096,
+      "rank": 5,
+      "reference_ms": 0.29132800409570336,
+      "native_ms": 0.6319410022115335,
+      "max_abs_parity_error": 4.002101426321446e-17,
+      "faster_observed_backend": "reference"
+    },
+    {
+      "threads": 4,
+      "N": 65536,
+      "rank": 5,
+      "reference_ms": 4.747583996504545,
+      "native_ms": 6.847393000498414,
+      "max_abs_parity_error": 2.5033568429418485e-17,
+      "faster_observed_backend": "reference"
+    },
+    {
+      "threads": 4,
+      "N": 131072,
+      "rank": 6,
+      "reference_ms": 11.633575006271712,
+      "native_ms": 17.563147004693747,
+      "max_abs_parity_error": 1.4784956187926718e-17,
+      "faster_observed_backend": "reference"
+    }
+  ],
+  "decision": "KEEP_ACCURACY_VERIFIED_NATIVE_AVAILABLE; EXPLICIT_REFERENCE_SELECTION_IS_FASTEST_IN_THIS_LOCAL_WORKLOAD",
+  "production_default_changed": false,
+  "implicit_backend_fallback": false,
+  "NCP64_actual_scaling": "NOT_RUN",
+  "physical_evaluations": 0,
+  "baseline_preserved": "native/baseline_v1/MANIFEST.json",
+  "stopping_rule": "one measured optimized candidate; no more optimization/testing after adequate correctness and same-workload timing evidence",
+  "limits": [
+    "no universal native speed advantage",
+    "no strong v1-v2 speedup claim from separate benchmark episodes with varying reference times",
+    "public API includes validation identity checks and any column-major copies",
+    "no certified scientific error bound from manufactured tests"
+  ]
+}

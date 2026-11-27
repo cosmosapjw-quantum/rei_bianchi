@@ -1,0 +1,81 @@
+{
+  "schema": "he36.finite_ccc_diagnostic_contract.v1",
+  "workflow": "workflow1.0.0",
+  "approval": "approval0.2",
+  "frozen_module_sha256": "644260261b82d6a528fd049b2bb20702e4c66de087406c7868a395a41ec99c2c",
+  "source_sha256": "7a87a2c9f2116ee36c0786b379dac08e1f4d92a49504fe542e6aa71cbb279bae",
+  "source_rows": 87,
+  "source_interval_eV": [
+    13.6058,
+    968.61
+  ],
+  "source_sigma_units": "a0^2 (no pi or multiplicity factor)",
+  "mapping": "heavy_fixed_target_incident_electron; mu=m_e",
+  "grid": {
+    "construction": "geomspace(2000,200000,129); overwrite middle node with exact 20000.0 K",
+    "row_count": 129,
+    "unique_count": 129,
+    "minimum_K": 2000.0,
+    "maximum_K": 200000.0
+  },
+  "quadrature": {
+    "method": "positive piecewise-linear sigma; GL16 per source interval",
+    "order": 16,
+    "batch_size": 129,
+    "computed_moments": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "definitions": {
+    "theta": "k_B T [J]",
+    "alpha": "M0 [m^3/s]",
+    "beta": "M1 [J m^3/s]",
+    "gamma": "M2 [J^2 m^3/s]",
+    "kappa1": "2 beta/(3 theta) [m^3/s]",
+    "kappa2": "4 gamma/(15 theta^2) [m^3/s]",
+    "energy_selection_ratio": "beta/(theta alpha)",
+    "C_moment": "1 - 2 kappa1/alpha + kappa2/alpha",
+    "feasibility_margin": "kappa2/alpha - (3/5)(kappa1/alpha)^2 = 4 Var_reaction(E)/(15 theta^2)"
+  },
+  "benchmark": {
+    "pairs": 5,
+    "alternating_order": true,
+    "warmups_per_path": 1,
+    "baseline": "scalar-temperature loop using the same prepared evaluate and quadrature weights",
+    "optimized": "one vector-temperature evaluate using the same prepared kernel",
+    "timed_outputs": "Full MomentEvaluation payload (four moments, logarithms, derivatives, slopes, mean energies and flags); scalar list assembly included, final concatenation excluded",
+    "parity_relative_gate": 3e-13,
+    "parity_flag_gate": "exact",
+    "speedup_scope": "same-kernel temperature batching only",
+    "new_ODE_runs": 0
+  },
+  "physical_scope": {
+    "finite_source_partial": true,
+    "high_energy_tail": "UNMODELED",
+    "physical_tail_error_bound": false,
+    "physical_interpolation_error": "UNQUANTIFIED",
+    "kappa2_scope": "incoming-electron STF loss coefficient only; not the net CI pressure relaxation frequency",
+    "isotope_substitution": false,
+    "outgoing_secondary_moments_supplied": false,
+    "closure_activation": false
+  },
+  "plot": {
+    "formats": [
+      "png",
+      "svg"
+    ],
+    "panels": [
+      "alpha_finite",
+      "kappa2_over_alpha_incoming_loss",
+      "reaction_weighted_mean_energy_eV"
+    ],
+    "physical_errorbars": false,
+    "cache_identity": "script + plot contract + data + numerical source + runtime versions",
+    "expected_new_renders": 1
+  },
+  "source_accuracy_witness_reused": "/tmp/he36_moment_implementation/attempts/attempt_001.json; unchanged alpha..delta path, GL16/GL32 and independent SI quadrature already passed; no replay",
+  "stopping_rule": "One bounded new diagnostic, one five-pair timing experiment, one render plus an identity/hash cache-hit check; stop after gates and visual inspection."
+}

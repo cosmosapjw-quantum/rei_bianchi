@@ -1,0 +1,223 @@
+{
+  "schema": "he31.ncp_packaging_review.v1",
+  "status": "PASS_SCOPED_PREPUBLICATION",
+  "reviewed_utc": "2026-10-21T13:43:37.343774+00:00",
+  "reviewer_task": "/root/upstream_inventory",
+  "scope": "Bounded read-only packaging review of the NCP shell entry point, requirements, prepared18/175 configurations and handoffs; only this evidence file is written.",
+  "files_at_review": {
+    "run_ncp.sh": "c05c86b70fe03f12ca4eace1f32c931eb0ac7d3aed01bad3790167ca6de86eae",
+    "requirements.txt": "f31f3d63b089c28554da9325061559dcaaaec85328c09efaf0ff16ce8b89e690",
+    "configs/pilot18_on.json": "5a5cb270aad002ef983340d2f12944f3fd430e99c13a3172a9ad9068a8d812a9",
+    "configs/joint175_on.json": "eaab702183c6ca123a31b9ab0ef3e9cad4a532cd49799fa988695d313ceda71c",
+    "README.md": "6cc3a4976c17200a52166bd743531f03372e150265fdb691a9bea095e9fd8760",
+    "CODEX_HANDOFF.md": "9a30cdf40b082640956a02624b09f86a9bd682b113c9998734f5bbc0b93f6439",
+    "NEXT_THREAD_HANDOFF.md": "be70af06aad65a56f331137b1edc036dcaf67a40d208944a15a3b8e69c899116"
+  },
+  "concrete_open_code_or_documentation_blockers": [],
+  "resolved_findings": [
+    {
+      "id": "NCP_DOC_CLI_ZEND",
+      "original_issue": "NEXT_THREAD_HANDOFF showed --z-end2, which is not the campaign parser argument.",
+      "resolution": "Author changed the text to --z-end 2.",
+      "readback": true
+    },
+    {
+      "id": "NCP_DOC_RETRY_BOUNDARY",
+      "original_issue": "Same-command resume wording could be read to include already started timed-out/failed cases, but the pinned HE30 classify() preserves their registry receipt.",
+      "resolution": "README and CODEX_HANDOFF now restrict same-command resume to unstarted DEFERRED; TIMED_OUT/FAILED remains PRIOR_ATTEMPT_PRESERVED and requires a source-bound correction or explicit retry handling after preserving evidence.",
+      "readback": true
+    }
+  ],
+  "entrypoint": {
+    "portable_path_basis": "BASH_SOURCE directory -> unit absolute path -> repo root; quoted paths; campaign and default output paths independent of the caller working directory.",
+    "script_invocation": "bash research/he31_electron_donor_20261021/run_ncp.sh pilot18_on",
+    "accepted_grids": [
+      "pilot18_on",
+      "joint175_on",
+      "light_actual_pair"
+    ],
+    "cli_args_match_current_campaign_parser": [
+      "--campaign",
+      "--out",
+      "--max-workers",
+      "--seconds",
+      "--reserve-cpus",
+      "--reserve-gib",
+      "--lease-dir"
+    ],
+    "python_override": "HE31_PYTHON is an executable path; default python3.",
+    "relative_custom_output_note": "A custom relative output path is interpreted from the repo root after cd; the documented default path is absolute.",
+    "execution_resource_contract": "64 requested maximum, reserve2CPU/16GiB, numeric threads1, shared /tmp/cosmosapjw_hpc64_cpu_leases, observed headroom and exact-case leases.",
+    "time_budget": "default1800 seconds; pinned runner requires (0,3600].",
+    "partial_exit": "set -e stops plotting when campaign exits2 for failed/deferred/preserved cases, so incomplete scientific cases are not rendered.",
+    "saved_render_command": "analyze_saved.py --campaign same_config --results same_output --out same_output/plots; follows reused result paths.",
+    "bash_syntax": "Root reported bash -n PASS; not repeated by this review."
+  },
+  "requirements": {
+    "declared": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "matplotlib": "3.10.8",
+      "python_context": "3.12.14"
+    },
+    "saved_runtime_evidence": {
+      "path": "results/light_actual_pair_v2/he31_s0_m0_r0_on.json",
+      "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+      "numpy": "2.3.5",
+      "scipy": "1.17.0"
+    },
+    "matplotlib_saved_evidence": "plots/time_evolution.svg creator metadata: Matplotlib v3.10.8",
+    "scope": "Exact versions used in the existing verification, not a claim that current online documentation has the same version. No package install performed."
+  },
+  "prepared_configurations": [
+    {
+      "path": "configs/pilot18_on.json",
+      "schema": "he31.campaign.v1",
+      "declared_status": "prepared_not_executed",
+      "case_count": 18,
+      "unique_case_ids": 18,
+      "unique_initial_axis_tuples": 18,
+      "axes": {
+        "Sigma_F": [
+          0.0,
+          0.003
+        ],
+        "P_m": [
+          -0.0003,
+          0.0,
+          0.0003
+        ],
+        "P_r": [
+          -0.001,
+          0.0,
+          0.001
+        ]
+      },
+      "z_start": 20,
+      "z_end": 4.0,
+      "all_opacity": "on",
+      "all_backend": "prepared",
+      "donor_identity": "96661134c04f69c67188863e585d831f61e090ac0fdc05dda7e977f1810d9eaa",
+      "manifest_path_is_unit_relative": true,
+      "manifest_sha_matches": true,
+      "frozen_numerics": {
+        "angular_cells": 12,
+        "atol": 3e-13,
+        "ellmax": 8,
+        "gauss_order": 3,
+        "radial_cells": 24,
+        "rtol": 3e-11,
+        "samples": 121
+      },
+      "executed_in_this_review": false
+    },
+    {
+      "path": "configs/joint175_on.json",
+      "schema": "he31.campaign.v1",
+      "declared_status": "prepared_not_executed",
+      "case_count": 175,
+      "unique_case_ids": 175,
+      "unique_initial_axis_tuples": 175,
+      "axes": {
+        "Sigma_F": [
+          0.0,
+          0.0003,
+          0.001,
+          0.003,
+          0.01,
+          0.03,
+          0.1
+        ],
+        "P_m": [
+          -0.0003,
+          -0.0001,
+          0.0,
+          0.0001,
+          0.0003
+        ],
+        "P_r": [
+          -0.001,
+          -0.0003,
+          0.0,
+          0.0003,
+          0.001
+        ]
+      },
+      "z_start": 20,
+      "z_end": 4.0,
+      "all_opacity": "on",
+      "all_backend": "prepared",
+      "donor_identity": "96661134c04f69c67188863e585d831f61e090ac0fdc05dda7e977f1810d9eaa",
+      "manifest_path_is_unit_relative": true,
+      "manifest_sha_matches": true,
+      "frozen_numerics": {
+        "angular_cells": 12,
+        "atol": 3e-13,
+        "ellmax": 8,
+        "gauss_order": 3,
+        "radial_cells": 24,
+        "rtol": 3e-11,
+        "samples": 121
+      },
+      "executed_in_this_review": false
+    }
+  ],
+  "pin_readback": {
+    "ACCEL02_fetched_head": {
+      "pin": "d669298f05286728453840da46cae958a3709456",
+      "evidence": "evidence/context/NCP_TARGET_DELTA_SANITIZED.json:fetched_head",
+      "handoff_matches": true,
+      "upstream_matches": true
+    },
+    "ACCEL02_executed_source": {
+      "pin": "231df3ab717dbc112f63b77953f64def08e9bcb5",
+      "evidence": "evidence/context/NCP_TARGET_DELTA_SANITIZED.json:source_commit",
+      "handoff_matches": true
+    },
+    "PR199_delta_head": {
+      "pin": "eb8042b729051f4700bd5d88d6781c4620009bcb",
+      "evidence": "evidence/upstream/UPSTREAM_DELTA.json",
+      "handoff_matches": true,
+      "upstream_matches": true
+    },
+    "PR216_D8_head": {
+      "pin": "1f32cc442ebde284bbb944455ba96066c9e0e055",
+      "evidence": "evidence/upstream/UPSTREAM_DELTA.json",
+      "handoff_matches": true,
+      "upstream_matches": true
+    }
+  },
+  "donor_identity_readback": {
+    "identity_sha256": "96661134c04f69c67188863e585d831f61e090ac0fdc05dda7e977f1810d9eaa",
+    "source_sha256": "93d16f478d2cc28b1f7b3d5287f07432b0e17107b3dd3f684890e77f6133cfa4",
+    "matches_handoffs": true,
+    "source_hash_matches_next_thread": true
+  },
+  "scientific_scope": "Actual R15/HG97B reduced Q donor z20to4, HII+HeII, HeIII0, no residual electrons, one-way background prescription; original40 physics + diagnostic target-clock tau1, photons alone receive unpolarized Thomson. HE30 completed237 z20to2 results remain separate. Prepared18/175 NCP sweeps are not claimed executed.",
+  "publication_pin": {
+    "state": "EXPECTED_METADATA_BINDING_PENDING",
+    "placeholder": "@HE31_EXECUTION_COMMIT@",
+    "placeholder_occurrences": {
+      "CODEX_HANDOFF.md": 2,
+      "NEXT_THREAD_HANDOFF.md": 1
+    },
+    "required_final_step": "After the source publication commit is created, the subsequent metadata commit must replace every execution placeholder with that exact immutable40-hex source commit and bind it in delivery/PUBLICATION.json. A metadata commit is not a new physical execution.",
+    "evidence_basis": "evidence/EXECUTED_SOURCE_MANIFEST.json content identities remain authoritative for the already executed uncommitted scientific source; source and final metadata commit roles must stay distinct.",
+    "not_claimed": "This prepublication review does not claim that placeholder replacement or final remote publication has already occurred."
+  },
+  "execution_by_this_review": {
+    "ncp_script_invocations": 0,
+    "worker_starts": 0,
+    "ode_calls": 0,
+    "tests": 0,
+    "benchmarks": 0,
+    "package_installs": 0,
+    "remote_mutations": 0
+  },
+  "limitations": [
+    "Read-only local package inspection; no NCP host execution or dependency installation.",
+    "Prior HE30 history/pin evidence was reused; no new full branch audit.",
+    "Future multi-case endpoint projection remains source-reviewed only until real completed sweep cases exist.",
+    "Source pin replacement is the known metadata publication step, not an approval request or a new science gate."
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "new_IVPs": 0,
+  "new_benchmark_experiments": 1,
+  "new_diagnostic_runs": 1,
+  "new_render_invocations": 2,
+  "render_cache_hits": 2,
+  "root_aggregation_note": "Count render invocations rather than unique scientific plot pairs: two attempts, one final PNG/SVG pair. Benchmark uses one warmup per path plus five measured pairs.",
+  "runs": [
+    {
+      "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python run_diagnostic.py",
+      "exit_code": 0,
+      "role": "new diagnostic plus one five-pair timing experiment",
+      "wall_seconds": 0.702625994
+    },
+    {
+      "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python render_diagnostic.py",
+      "exit_code": 0,
+      "observed_warning": "Default Matplotlib config directory was unwritable; Matplotlib automatically used /tmp/matplotlib-xned57ov. No render failure.",
+      "role": "first render, visually revised",
+      "wall_seconds": 9.40341203
+    },
+    {
+      "command": "MPLCONFIGDIR=/tmp/matplotlib-xned57ov OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python render_diagnostic.py",
+      "exit_code": 0,
+      "role": "first-render identity/hash cache-hit probe",
+      "wall_seconds": 2.59792918
+    },
+    {
+      "command": "MPLCONFIGDIR=/tmp/matplotlib-xned57ov OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python render_diagnostic.py",
+      "exit_code": 0,
+      "role": "display-only corrected render",
+      "wall_seconds": 3.279887178
+    },
+    {
+      "command": "MPLCONFIGDIR=/tmp/matplotlib-xned57ov OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python render_diagnostic.py",
+      "exit_code": 0,
+      "role": "final-render identity/hash cache-hit probe",
+      "wall_seconds": 0.708005056
+    }
+  ],
+  "schema": "he36.exec_transport_readback.v1",
+  "source": "Observed exec_command results, copied after execution; these outer process times include interpreter/import overhead.",
+  "timing_pairs": 5
+}

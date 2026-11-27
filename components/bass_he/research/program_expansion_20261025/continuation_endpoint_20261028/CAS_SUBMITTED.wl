@@ -1,0 +1,38 @@
+Module[{a0,a1,a2,z,t,l,h,u,i,j,g,k,r,bern,d,aa,bb,candidate,lower,upper,ziv,rows,bounds,winchecks,restA,restM,energy,ss,hh,rr,kk,zeroes,checks},
+ r[x_]:=a0+a1*x+a2*x^2;
+ d={4/3,4/15,4/35};
+ aa={1411/10000,-1/4,33/25};
+ bb={a0,a1-a0,a2-a1,-a2};
+ candidate[x_]:=1411/10000-x/4+33*x^2/25;
+ bern=r[l]*(1-t)^2+2*(a0+a1*(l+h)/2+a2*l*h)*t*(1-t)+r[h]*t^2;
+ zeroes=Flatten[{
+  Expand[(1-z)*r[z]-bb.{1,z,z^2,z^3}],
+  Table[Integrate[(1-u^2)*u^(2*j),{u,-1,1}]-d[[j+1]],{j,0,2}],
+  Table[Expand[D[2*((1-t^(2*j+1))/(2*j+1)-(1-t^(2*j+3))/(2*j+3)),t]+2*(1-t^2)*t^(2*j)],{j,0,2}],
+  Expand[r[l+(h-l)*t]-bern],
+  Expand[candidate[z]-(33/25*(z-25/264)^2+170627/1320000)],
+  aa.d-14297/52500,
+  (7/50)^2/(36*160)-49/14400000,
+  Expand[(1-u^2+g^2*(u+k)^2)-(u+k)*(-u+g^2*(u+k))-(1+k*u)],
+  Total[bb],
+  Together[r[-a1/(2*a2)]-(a0-a1^2/(4*a2))]
+ }];
+ ziv={{278171281089644465/576460752303423488,556342562179288931/1152921504606846976},{270983094583473505/1152921504606846976,135491547291736753/576460752303423488},{12319141192567515/144115188075855872,98553129540540121/1152921504606846976},{789478079300505/288230376151711744,3157912317202021/1152921504606846976}};
+ bounds={{11/100,17/100},{11/100,21/100},{1/50,3/25},{7/50,6/25}};
+ rows=Table[lower=Table[ziv[[i,1]]^j*(1-ziv[[i,2]]),{j,0,2}];upper=Table[ziv[[i,2]]^j*(1-ziv[[i,1]]),{j,0,2}];{(lower+upper)/2,160*Total[upper-lower]/2},{i,1,4}];
+ winchecks=Table[bounds[[i,1]]<=aa.rows[[i,1]]-rows[[i,2]]&&aa.rows[[i,1]]+rows[[i,2]]<=bounds[[i,2]],{i,1,4}];
+ restA=37273794118/10000000;restM=187561294500/100000000;energy=330;
+ ss=restA^2+2*restA*energy;hh=ss-4*restM^2;rr=hh/ss;kk=energy^2-(restA+energy)^2*rr;
+ checks=Flatten[{
+  170627/1320000>0,
+  0<25/264<1,
+  aa[[3]]!=0,
+  aa.d>49/14400000,
+  And@@Thread[{1411/10000,161/10000,12111/10000}>0],
+  hh>0,kk<0,
+  winchecks,
+  Table[2*((1-(1/2)^(2*j+1))/(2*j+1)-(1-(1/2)^(2*j+3))/(2*j+3))=={5/12,47/240,233/2240}[[j+1]],{j,0,2}],
+  1/100>0,-1/100<0
+ }];
+ <|"zeroes"->zeroes,"checks"->checks,"zero_count"->Length[zeroes],"true_count"->Length[checks],"all_literal_zero"->And@@Map[#===0&,zeroes],"all_literal_true"->And@@Map[#===True&,checks],"scope"->"ENDPOINT14 generic algebra and fixed rational witness; one bounded evaluator"|>
+]

@@ -1,0 +1,75 @@
+{
+  "ids": [
+    "R14-F02",
+    "R14-F03"
+  ],
+  "status": "AUTHORED_BEFORE_FREEZE_NOT_EXECUTED",
+  "finding_origin": "Independent preflight reviewer /root/repo_census_r14 and root finite-parser/runtime-policy decisions",
+  "preserved_before": [
+    {
+      "path": "revisions/R14_F02_F03_before_bounded_text/independent_reference.py",
+      "bytes": 72754,
+      "sha256": "81b681a9641c3864108a8ec0310b6f71c765bd771833c7c80df474af65c85aba"
+    },
+    {
+      "path": "revisions/R14_F02_F03_before_bounded_text/REFERENCE_AUTHORING_RECORD.json",
+      "bytes": 4320,
+      "sha256": "e5d78e8116076d8f2b46b074954efe2cc1b33693a7896dc8cdc52b925b1c2f20"
+    }
+  ],
+  "corrected": [
+    {
+      "path": "independent_reference.py",
+      "bytes": 75031,
+      "sha256": "205c8ea4450ffdd7201c9d00b410d847b5f03927c799ff6ddecd085a71535453"
+    },
+    {
+      "path": "REFERENCE_AUTHORING_RECORD.json",
+      "bytes": 6347,
+      "sha256": "c8d97455e3fd7d4dcfdf0ca6fedc800873894fda97840a6c4fb76d110841600a"
+    }
+  ],
+  "changes": [
+    {
+      "id": "R14-F02",
+      "scope": [
+        "Independent ASCII character grammar before integer/Fraction conversion.",
+        "Only signed integer or signed p/q; reject whitespace, decimal, exponent and non-ASCII digits.",
+        "Input length<=2048 and reduced bits<=256 retained.",
+        "Saved rational total length<=10000 and reduced derived bits<=16384.",
+        "Frozen numeric-policy metadata 1e-80 checked by exact string equality, separate from scientific rational input parser."
+      ],
+      "mathematical_formula_changes": 0
+    },
+    {
+      "id": "R14-F03",
+      "scope": [
+        "Finite runtime sys.set_int_max_str_digits(6000) at standalone main.",
+        "Numerator and denominator each at most6000 digits before int conversion.",
+        "Effective runtime digit limit checked and recorded; output serialization occurs under the same policy.",
+        "No unlimited zero setting."
+      ],
+      "mathematical_formula_changes": 0
+    }
+  ],
+  "fixture_identity": {
+    "cases_sha256": "030390b2af748fa663fe6992595e5c7a458dbe6a3e11dd3f4e3dafd117755efc",
+    "valid_cases": 31,
+    "guards": 46,
+    "original_fixture_source_sha256": "f3e81086f10012aeaf8f390aca22589b8e55172aeb14e840c665592c99e21f0b",
+    "numerical_targets_changed": false,
+    "added_invalid_guards": [
+      "huge zero exponent text",
+      "decimal rational text",
+      "whitespace rational text"
+    ],
+    "compatibility": "New rows use existing invalid-input guard schema; independent Model input parser rejects before expansion. This is a static authoring assessment, not an executed result."
+  },
+  "original_bytes_and_sha_verified": true,
+  "scientific_python_runs": 0,
+  "scientific_imports": 0,
+  "compile_runs": 0,
+  "CAS_runs": 0,
+  "ODE_runs": 0,
+  "no_review_PASS_claim": true
+}

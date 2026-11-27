@@ -1,0 +1,365 @@
+{
+  "schema": "bass-he.eor-design-dag.v1",
+  "authority": "User-authorized T4 continuation from T3B1; original 16 IDs/requires and physical gates preserved.",
+  "nodes": [
+    {
+      "id": "EOR_C0",
+      "package": "W0",
+      "deliverable": "Reaction/domain/observable budget lock",
+      "requires": [],
+      "owner": "HERE_THEORY_DESIGN",
+      "status": "CONTRACT_READY_FOR_THEORY__PHYSICAL_DOMAIN_BLOCKED",
+      "whole_complete": false,
+      "theory_contract_ready": true,
+      "physical_ready": false,
+      "evidence": [
+        "contract/EOR_SCOPE_LOCK.json",
+        "evidence/FINAL_CONTRACT_AUDIT.json",
+        "math/C0_DERIVATIONS_KO.md"
+      ]
+    },
+    {
+      "id": "EOR_T1",
+      "package": "W1",
+      "deliverable": "Selected-state independent discretization and observable-error theory",
+      "requires": [
+        "EOR_C0"
+      ],
+      "owner": "HERE_THEORY",
+      "status": "CONDITIONAL_THEORY_CONTRACT_AND_CHECKER_READY__PHYSICAL_CERTIFICATION_NOT_RUN",
+      "theory_contract_ready": true,
+      "independent_review": "NOT_RUN",
+      "physical_validation": false,
+      "evidence": [
+        "math/T1_THEOREMS_KO.md",
+        "math/INDEPENDENT_PROVIDER_KO.md",
+        "evidence/FINAL_VERIFICATION.json"
+      ]
+    },
+    {
+      "id": "EOR_T2",
+      "package": "W1",
+      "deliverable": "Coherent frame/ETF/PQ and propagation theory",
+      "requires": [
+        "EOR_C0"
+      ],
+      "owner": "HERE_THEORY",
+      "status": "CONDITIONAL_DYNAMICAL_ERROR_CONTRACT_AND_REFERENCE_KERNELS_READY",
+      "theory_contract_ready": true,
+      "independent_review": "NOT_RUN",
+      "physical_ready": false,
+      "evidence": [
+        "math/T2_DERIVATION_KO.md",
+        "contract/T2_COUPLING_CONTRACT.json",
+        "evidence/MANUFACTURED_RESULTS.json"
+      ]
+    },
+    {
+      "id": "EOR_T3",
+      "package": "W1",
+      "deliverable": "In-domain trajectory/channel/continuum/tail closure",
+      "requires": [
+        "EOR_T1",
+        "EOR_T2"
+      ],
+      "owner": "HERE_THEORY",
+      "status": "PARTIAL_T3B1_FINITE_MODEL_TAIL_DERIVED__FULLSPACE_HIGHN_CONTINUUM_OPEN",
+      "whole_complete": false,
+      "applicability_contract_ready": true,
+      "physical_ready": false,
+      "independent_review": "NOT_RUN",
+      "substeps": [
+        {
+          "id": "T3A",
+          "status": "INHERITED_CONDITIONAL_APPLICABILITY"
+        },
+        {
+          "id": "T3B1",
+          "status": "FINITE_A1B6_CAPTURE_TAIL_DERIVED_AND_REFERENCE_TESTED"
+        }
+      ],
+      "evidence": [
+        "math/T3B1_DERIVATION_KO.md",
+        "contract/T3B1_FINITE_BUNDLE_CONTRACT.json",
+        "evidence/FINAL_VERIFICATION.json"
+      ],
+      "finite_bundle_contract_ready": true
+    },
+    {
+      "id": "EOR_T4",
+      "package": "W1",
+      "deliverable": "Rate functionals, event/energy ownership, Bianchi interface",
+      "requires": [
+        "EOR_C0"
+      ],
+      "owner": "HERE_THEORY",
+      "status": "CONDITIONAL_RATE_EVENT_FRAME_CONTRACT_AND_REFERENCE_ASSEMBLER_READY",
+      "readiness_basis": "Original EOR_C0 dependency consumes theory_contract_ready, not physical_ready or whole_complete.",
+      "theory_contract_ready": true,
+      "whole_complete": false,
+      "physical_ready": false,
+      "independent_review": "NOT_RUN",
+      "evidence": [
+        "math/T4_DERIVATION_KO.md",
+        "contract/T4_SOURCE_CONTRACT.json",
+        "evidence/FINAL_TESTS.log",
+        "evidence/MANUFACTURED_RESULTS.json"
+      ]
+    },
+    {
+      "id": "EOR_THEORY_GATE",
+      "package": "W1",
+      "deliverable": "Included theory closure, exclusions separately justified",
+      "requires": [
+        "EOR_T1",
+        "EOR_T2",
+        "EOR_T3",
+        "EOR_T4"
+      ],
+      "owner": "HERE_REVIEW",
+      "status": "NOT_SATISFIED"
+    },
+    {
+      "id": "EOR_I1",
+      "package": "W2",
+      "deliverable": "Electronic and independent provider implementation",
+      "requires": [
+        "EOR_THEORY_GATE"
+      ],
+      "owner": "HERE_IMPLEMENTATION",
+      "status": "PROPOSED"
+    },
+    {
+      "id": "EOR_I2",
+      "package": "W2",
+      "deliverable": "Coherent scattering and weighted cross-section implementation",
+      "requires": [
+        "EOR_I1"
+      ],
+      "owner": "HERE_IMPLEMENTATION",
+      "status": "PROPOSED"
+    },
+    {
+      "id": "EOR_I3",
+      "package": "W2",
+      "deliverable": "Rates, admitted source providers and network event assembly",
+      "requires": [
+        "EOR_THEORY_GATE"
+      ],
+      "owner": "HERE_IMPLEMENTATION",
+      "status": "PROPOSED"
+    },
+    {
+      "id": "EOR_I4",
+      "package": "W2",
+      "deliverable": "Complete packaging, typed schema, failure and replay contracts",
+      "requires": [
+        "EOR_I2",
+        "EOR_I3"
+      ],
+      "owner": "HERE_IMPLEMENTATION",
+      "status": "PROPOSED"
+    },
+    {
+      "id": "EOR_V_LOCAL",
+      "package": "W3",
+      "deliverable": "Focused analytic/manufactured/optional registered tiny physics verification",
+      "requires": [
+        "EOR_I4"
+      ],
+      "owner": "HERE_BOUNDED_RUNTIME",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "EOR_READY",
+      "package": "W3",
+      "deliverable": "Theory and functional product-code handoff ready",
+      "requires": [
+        "EOR_V_LOCAL"
+      ],
+      "owner": "HERE_RELEASE_REVIEW",
+      "status": "NOT_SATISFIED"
+    },
+    {
+      "id": "NCP_OPT",
+      "package": "W3",
+      "deliverable": "Host compatibility and accuracy-preserving optimization",
+      "requires": [
+        "EOR_READY"
+      ],
+      "owner": "NCP_LOCAL_CODEX",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "NCP_DOMAIN",
+      "package": "W3",
+      "deliverable": "Frozen physical domain convergence and independent comparison",
+      "requires": [
+        "EOR_READY"
+      ],
+      "owner": "NCP_LOCAL_CODEX",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "NCP_R2N",
+      "package": "W3",
+      "deliverable": "Actual R2-N consumer integration",
+      "requires": [
+        "NCP_DOMAIN"
+      ],
+      "owner": "NCP_LOCAL_CODEX_RECEIVER",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "NCP_R2T",
+      "package": "W3",
+      "deliverable": "Actual R2-T finite-tilt integration and energy/bulk ledger",
+      "requires": [
+        "NCP_R2N"
+      ],
+      "owner": "NCP_LOCAL_CODEX_RECEIVER",
+      "status": "NOT_RUN"
+    }
+  ],
+  "edges": [
+    {
+      "from": "EOR_C0",
+      "to": "EOR_T1",
+      "kind": "theory_or_implementation_readiness",
+      "consumes": "theory_contract_ready; not whole_C0_complete or physical_ready"
+    },
+    {
+      "from": "EOR_C0",
+      "to": "EOR_T2",
+      "kind": "theory_or_implementation_readiness",
+      "consumes": "theory_contract_ready; not whole_C0_complete or physical_ready"
+    },
+    {
+      "from": "EOR_T1",
+      "to": "EOR_T3",
+      "kind": "theory_or_implementation_readiness",
+      "consumes": "conditional theory_contract_ready outputs for further formulation; not physical certification or independent review"
+    },
+    {
+      "from": "EOR_T2",
+      "to": "EOR_T3",
+      "kind": "theory_or_implementation_readiness",
+      "consumes": "conditional theory_contract_ready outputs for further formulation; not physical certification or independent review"
+    },
+    {
+      "from": "EOR_C0",
+      "to": "EOR_T4",
+      "kind": "theory_or_implementation_readiness",
+      "consumes": "theory_contract_ready; not whole_C0_complete or physical_ready"
+    },
+    {
+      "from": "EOR_T1",
+      "to": "EOR_THEORY_GATE",
+      "kind": "theory_or_implementation_readiness",
+      "consumes": "conditional derivation/contract; independent reviewed closure and physical admission require separate evidence"
+    },
+    {
+      "from": "EOR_T2",
+      "to": "EOR_THEORY_GATE",
+      "kind": "theory_or_implementation_readiness"
+    },
+    {
+      "from": "EOR_T3",
+      "to": "EOR_THEORY_GATE",
+      "kind": "theory_or_implementation_readiness"
+    },
+    {
+      "from": "EOR_T4",
+      "to": "EOR_THEORY_GATE",
+      "kind": "theory_or_implementation_readiness"
+    },
+    {
+      "from": "EOR_THEORY_GATE",
+      "to": "EOR_I1",
+      "kind": "theory_or_implementation_readiness"
+    },
+    {
+      "from": "EOR_I1",
+      "to": "EOR_I2",
+      "kind": "theory_or_implementation_readiness"
+    },
+    {
+      "from": "EOR_THEORY_GATE",
+      "to": "EOR_I3",
+      "kind": "theory_or_implementation_readiness"
+    },
+    {
+      "from": "EOR_I2",
+      "to": "EOR_I4",
+      "kind": "theory_or_implementation_readiness"
+    },
+    {
+      "from": "EOR_I3",
+      "to": "EOR_I4",
+      "kind": "theory_or_implementation_readiness"
+    },
+    {
+      "from": "EOR_I4",
+      "to": "EOR_V_LOCAL",
+      "kind": "theory_or_implementation_readiness"
+    },
+    {
+      "from": "EOR_V_LOCAL",
+      "to": "EOR_READY",
+      "kind": "theory_or_implementation_readiness"
+    },
+    {
+      "from": "EOR_READY",
+      "to": "NCP_OPT",
+      "kind": "external_validation_dependency"
+    },
+    {
+      "from": "EOR_READY",
+      "to": "NCP_DOMAIN",
+      "kind": "external_validation_dependency"
+    },
+    {
+      "from": "NCP_DOMAIN",
+      "to": "NCP_R2N",
+      "kind": "external_validation_dependency"
+    },
+    {
+      "from": "NCP_R2N",
+      "to": "NCP_R2T",
+      "kind": "external_validation_dependency"
+    }
+  ],
+  "parent_pilot_nonblocking_for_theory": true,
+  "optional_performance_optimization_not_prerequisite_for_accuracy_validation": true,
+  "readiness_amendment": {
+    "id": "C0_TYPED_READINESS_20261002",
+    "basis": "parent DESIGN_KO §5 distinguishes theory dependency, implementation dependency, runtime admission and physical promotion",
+    "original_nodes_and_requires_unchanged": true,
+    "whole_C0_completion_claim": false,
+    "physical_campaign_needs": "separate source/domain/budget binding; all current physical launch gates false"
+  },
+  "next_single_theory_node": "EOR_T3B2_WEIGHTED_FULLSPACE_TRANSFER_AND_INCLUSIVE_CHANNEL_CLOSURE",
+  "open_C0_completion_node": "EOR_C0_PHYSICAL_DOMAIN_BINDING_NOT_DONE",
+  "preserved_parent_gates": {
+    "CODE_I02_CLOSED": true,
+    "Eq55": "NOT_RUN",
+    "Eq55_next_node_authorized": false,
+    "NCP64_actual_measurement": false,
+    "atomic_correlation_established": false,
+    "continuum_certificate": false,
+    "full_C2_closed": false,
+    "full_H_gap_certificate": false,
+    "full_certificate_fail_closed": true,
+    "production_default_change": "NOT_AUTHORIZED",
+    "scientific_PROMOTE": "HOLD"
+  },
+  "T2_update_scope": "No existing node IDs or requires changed. Conditional theory contract is not reviewed whole-node physical closure.",
+  "next_after_T3": "EOR_T4_RATE_EVENT_ENERGY_AND_BIANCHI_INTERFACE",
+  "current_bounded_substep": "T4A_RATE_SOURCE_ASSEMBLY",
+  "remote_sibling_public_record": {
+    "commit": "f391ab9330e1753fa010be814ac9fa5d7d3e4bac",
+    "raw_archive_imported": false,
+    "next_in_that_record": "EOR_T4_RATE_EVENT_ENERGY_AND_BIANCHI_INTERFACE"
+  },
+  "T4_note": "No original edge deleted. Full-Q/high-n/continuum and independent theory review still prevent whole-theory closure."
+}

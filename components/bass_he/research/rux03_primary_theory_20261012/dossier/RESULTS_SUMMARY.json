@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "unit": "HERE_RUX03_PRIMARY_THEORY_03",
+  "date": "2026-10-12",
+  "basis": "direct derivations plus exact symbolic corroboration; source-bound evidence reuse",
+  "new_executions": [
+    {
+      "id": "EX01",
+      "executor": "/root",
+      "kind": "exact symbolic algebra",
+      "tool": "Wolfram Language evaluator",
+      "engine": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+      "input": "../evidence/shared_provider_exact.wl",
+      "raw": "../evidence/WOLFRAM_RAW_RESULT.json",
+      "summary": "../evidence/WOLFRAM_EXACT_SUMMARY.json",
+      "groups": 19,
+      "passed": 19,
+      "failed": 0
+    },
+    {
+      "id": "EX02",
+      "executor": "/root/drive_checkpoint",
+      "kind": "exact symbolic algebra",
+      "tool": "Wolfram Language evaluator",
+      "input": "../derivations/PHOTON_EXACT_CHECK.wl",
+      "raw": "../derivations/WOLFRAM_PHOTON_RAW_RESULT.json",
+      "summary": "../derivations/SYMBOLIC_CHECK.json",
+      "groups": 19,
+      "passed": 19,
+      "failed": 0
+    },
+    {
+      "id": "EX03",
+      "executor": "/root",
+      "kind": "exact symbolic algebra; temperature-dependent perturbation construction",
+      "tool": "Wolfram Language evaluator",
+      "engine": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+      "input": "../evidence/temperature_witness_exact.wl",
+      "raw": "../evidence/WOLFRAM_TEMPERATURE_WITNESS_RAW.json",
+      "summary": "../evidence/TEMPERATURE_WITNESS_SUMMARY.json",
+      "groups": 9,
+      "passed": 9,
+      "failed": 0
+    }
+  ],
+  "symbolic_group_total": 47,
+  "symbolic_group_passed": 47,
+  "count_interpretation": "Groups are expression-level checks across three scripts, including reused identities in different derivations. They are not a count of new theorems or native test cases.",
+  "environment_events": [
+    {
+      "classification": "environment_dependency",
+      "observed": "SymPy import failed before any algebraic check",
+      "record": "../derivations/SYMPY_ENVIRONMENT_FAILURE.json",
+      "disposition": "resolved by evaluating the formulas with the available Wolfram evaluator; no package installation and no new polynomial engine"
+    }
+  ],
+  "review_repairs": [
+    {
+      "id": "R6-F01",
+      "classification": "claim_scope",
+      "observation": "Constant alpha/kappa perturbation discriminates multiplicity and density dependence, but not kinetic-coefficient T derivatives.",
+      "minimal_correction": "Restrict the constant witness explanation to its demonstrated dependencies.",
+      "constructive_extension": "Add positive rho(T)=rho_star(T/T_star)^2 and matching kappa perturbation, yielding nonzero thermal w and ww derivative expectations.",
+      "execution": "EX03",
+      "initial_review": "../review/R6_REVIEW_INITIAL.json"
+    }
+  ],
+  "new_native_builds": 0,
+  "new_native_tests": 0,
+  "new_ode_integrations": 0,
+  "new_history_campaigns": 0,
+  "reused": [
+    {
+      "unit": "HERE_RUX03_EVENT_BRIDGE_02",
+      "source_commit": "a5c958c414dea41216b445c05f58df837f05cacb",
+      "scope": "unchanged conditional Case A event-consumer contract and its evidence",
+      "prior_native_test_count": 176,
+      "prior_decision_sha256": "4df64a70f77ccf698ca31a1e7e4f95a5704a1ee70e5450162649c2bb4953d153"
+    },
+    {
+      "kind": "source identity survey",
+      "record": "../source_map/CURRENT_SOURCE.json",
+      "current_heads_checked": 4,
+      "mapped_source_file_hashes": 11,
+      "retained_build_source_hashes_matched": 34
+    }
+  ],
+  "independent_review": {
+    "reviewer": "/root/dropbox_checkpoint",
+    "literature": "../review/LITERATURE_MAP.md",
+    "initial_review": "../review/R6_REVIEW_INITIAL.json",
+    "final_decision": "../review/DECISION.json"
+  },
+  "ncp_work_units": []
+}

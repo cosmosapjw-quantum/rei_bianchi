@@ -1,0 +1,22 @@
+{
+  "schema": "WU088_HH_PHYS54_EXECUTION_RECEIPT_V1",
+  "status": "PARTIAL_CONDITIONAL_REDUCTION_COMPLETE",
+  "initial_failure": {
+    "command": "PYTHONPATH=src python3 scripts/phys54_weighted_dtn.py --output results/WEIGHTED_DTN_REDUCTION.json",
+    "failure": "ModuleNotFoundError: No module named 'mpmath'",
+    "classification": "diagnostic dependency failure, not a physical or numerical acceptance failure",
+    "repair": "implemented the native Rust scaled f64 continued-fraction arithmetic directly for the explicitly noncertifying diagnostic; no physical constants or acceptance tolerances changed"
+  },
+  "final_checks": {
+    "python_compile": "PASS",
+    "targeted_assertions": "PASS",
+    "rust_crosscheck": "exact f64 equality at ell=21,29,128,256 against returned NCP r=27 depth=1152 CSV",
+    "pytest": "NOT_RUN_pytest_not_installed"
+  },
+  "result_sha256": "90f2060f8fb2df383329bf552f0a00f70ae2ab41c4ed53ecb3f95e2d772b5d2d",
+  "claims": {
+    "proved": "conditional form inequality given three named prerequisites",
+    "open": ["all-ell central weighted DtN existence/bound", "noncentral P-Q high-block Schur/compression definition", "uniform weighted screened exterior perturbation bound"],
+    "HH_R10": "OFF"
+  }
+}

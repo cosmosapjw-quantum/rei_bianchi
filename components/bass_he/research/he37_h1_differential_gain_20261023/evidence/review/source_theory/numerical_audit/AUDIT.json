@@ -1,0 +1,111 @@
+{
+  "scope": "Independent numerical/static/hash audit only; source interpretation and net bridge excluded",
+  "author_files_modified": false,
+  "new_small_check": "check_transfer_endpoint.py: four transfer_u calls; suspected finite maximum endpoint overflow not reproduced",
+  "old_suite_replays": 0,
+  "new_IVPs": 0,
+  "new_benchmarks": 0,
+  "new_renders": 0,
+  "binding_checks": [
+    {
+      "path": "/tmp/he37_source_implementation/README.md",
+      "sha256": "c6202e6006e9dbf0df229bfafe30629e8cd155d8f2a7774677ecf47ae61c5efd",
+      "bytes": 3933,
+      "sha256_match": true,
+      "bytes_match": true
+    },
+    {
+      "path": "/tmp/he37_source_implementation/attempts/attempt_20261023T020616442395Z/RESULT.json",
+      "sha256": "b5e171015434afc04334ec547bb31032cf7e7fbed59a497b93f8b8a391587faf",
+      "bytes": 6802,
+      "sha256_match": true,
+      "bytes_match": true
+    },
+    {
+      "path": "/tmp/he37_source_implementation/attempts/attempt_20261023T020616442395Z/START.json",
+      "sha256": "b967708c075e518f95612c140ff6c123ae54c464a5578a97e31dbf4a2542e401",
+      "bytes": 1230,
+      "sha256_match": true,
+      "bytes_match": true
+    },
+    {
+      "path": "/tmp/he37_source_implementation/lc_ionization.py",
+      "sha256": "9d40436fbebd2e99666cf15ed069ba4041693de32da843dc23b9672d59b12a16",
+      "bytes": 9082,
+      "sha256_match": true,
+      "bytes_match": true
+    },
+    {
+      "path": "/tmp/he37_source_implementation/verify_provider.py",
+      "sha256": "aeec5c1fe813cfc9df5e796ba17085a484714e52c16862e5077733496b234997",
+      "bytes": 13526,
+      "sha256_match": true,
+      "bytes_match": true
+    },
+    {
+      "path": "/tmp/he37_gain_theory/CHECKS.json",
+      "sha256": "6f51e6337171ace7e18b58a708d9bf5c186a90b274be2dba0995ec2c73648033",
+      "bytes": 7443,
+      "sha256_match": true,
+      "bytes_match": true
+    },
+    {
+      "path": "/tmp/he37_gain_theory/DERIVATION.md",
+      "sha256": "6930fb76b645144e8baef87cb927554a3dbc75495590f843c607c5715f8eba21",
+      "bytes": 12853,
+      "sha256_match": true,
+      "bytes_match": true
+    },
+    {
+      "path": "/tmp/he37_gain_theory/check_gain_derivation.py",
+      "sha256": "dbdb0fbc8f9950509fa737c226dae931e64ad3e88f6b4dfaa16a62877d8a08ec",
+      "bytes": 9174,
+      "sha256_match": true,
+      "bytes_match": true
+    }
+  ],
+  "receipt_execution_identity_recomputed": "9f4874b0ec077126b707cd536a019d57d0c85585cc02452b369b2b627ff8369d",
+  "receipt_execution_identity_match": true,
+  "provider_source_sha256": "9d40436fbebd2e99666cf15ed069ba4041693de32da843dc23b9672d59b12a16",
+  "provider_verifier_sha256": "aeec5c1fe813cfc9df5e796ba17085a484714e52c16862e5077733496b234997",
+  "claims": [
+    {
+      "claim": "Current provider receipt applies to current source and verifier bytes",
+      "verdict": "confirmed",
+      "evidence": "FILE_MANIFEST rows, START/RESULT identity inputs, recomputed execution identity; all matched"
+    },
+    {
+      "claim": "Theory saved controls and postprocessing summary apply to current check script and derivation bytes",
+      "verdict": "confirmed",
+      "evidence": "CHECKS script_sha256 and CHECK_SUMMARY payload hashes match; no re-execution"
+    },
+    {
+      "claim": "The finite numerical temperature contract avoids positivity, underflow, and cancellation failure in the implemented moments",
+      "verdict": "confirmed",
+      "evidence": "Static expn(2,x) positive representation; x spans about 0.789 to 78.911; saved normal positive moments and direct 80-digit quadrature maximum relative discrepancy 2.1974065901747693e-14 at three temperatures",
+      "limit": "Three-temperature numeric evidence is not a uniform error proof across all temperatures or physical calibration"
+    },
+    {
+      "claim": "transfer_u overflows at q=1 for the tested largest finite binary64 inputs",
+      "verdict": "rejected",
+      "evidence": "TRANSFER_ENDPOINT_OBSERVATIONS.json: four calls returned finite exact endpoints including max binary64"
+    },
+    {
+      "claim": "Every boolean input element is rejected by _real",
+      "verdict": "rejected",
+      "evidence": "_real starts with np.asarray(values), so a mixed sequence such as [True,0.5] becomes a float array before dtype checking",
+      "limit": "Pure boolean inputs and boolean-typed arrays are rejected; this is a narrow guard-description/API issue and does not invalidate existing numerical evidence"
+    }
+  ],
+  "findings": [
+    {
+      "id": "N1",
+      "severity": "low",
+      "object": "lc_ionization.py:_real",
+      "evidence": "dtype checking occurs after np.asarray coercion; mixed bool/numeric containers lose boolean identity",
+      "impact": "The docstring promise to reject bool is stronger than the actual element-level input guard. Example transfer_u(20.0,[True,0.5]) is accepted by static NumPy coercion reasoning. No demonstrated impact on the saved physical calculations.",
+      "minimal_correction": "Either document rejection as boolean-typed arrays only or validate mixed input elements before NumPy coercion; add only one affected guard case if strict element rejection is required."
+    }
+  ],
+  "overall": "No blocking numerical defect established in the admitted scalar-moment implementation or its saved evidence. One low-severity input-guard wording/behavior mismatch. No claims about the separately authored net bridge."
+}

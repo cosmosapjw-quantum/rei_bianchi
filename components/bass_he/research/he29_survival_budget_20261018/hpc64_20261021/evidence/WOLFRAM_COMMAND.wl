@@ -1,0 +1,14 @@
+Clear[f,p,a,b,n,k];
+amdahl=1/(1-f+f/p);
+tableFraction=4513946915100678/10^14/(1190317610485974/10^12);
+<|
+"AmdahlDerivative"->FullSimplify[D[amdahl,p],Assumptions->0<f<1&&p>=1],
+"InfiniteWorkerBound"->FullSimplify[Limit[amdahl,p->Infinity],Assumptions->0<f<1],
+"PriorR4TableFraction"->N[tableFraction,18],
+"PriorR4TableOnlyBound"->N[1/(1-tableFraction),18],
+"IndependentRows"->17*513,
+"BatchFsyncUpperCountWithoutBoundaryFlushes"->Ceiling[1161446/256],
+"MaxUncommittedSuccessfullyReturnedPointRecords"->256-1,
+"ChunkOverheadStationaryWorkers"->Solve[D[a*p+b/p,p]==0&&p>0,p,Reals],
+"ChunkReassemblyExample"->(Flatten[Partition[Array[x,12],3]][[Ordering[Range[12]]]]===Array[x,12])
+|>

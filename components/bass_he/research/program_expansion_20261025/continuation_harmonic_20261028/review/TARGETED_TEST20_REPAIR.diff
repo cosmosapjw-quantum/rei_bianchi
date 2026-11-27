@@ -1,0 +1,11 @@
+--- a/tests/test_harmonic.py
++++ b/tests/test_harmonic.py
+@@ -197,6 +197,8 @@
+ 
+     def test_20_manual_and_default_width_budgets(self):
+         A=det((0,F(4,5)),(0,F(1,3)));B=det((-F(4,5),0),(F(1,2),F(1,3)))
++        self.assert_exact(response(A,B,delta=F(1,16))['coincidence'],0)
++        A=det((0,1),(0,F(1,3)));B=det((-1,0),(F(1,2),F(1,3)))
+         for delta in (None,F(1,16)):
+             r=response(A,B,delta=delta)
+             for key in h.EVENTS:

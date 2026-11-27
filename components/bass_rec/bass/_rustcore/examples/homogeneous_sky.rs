@@ -1,0 +1,1596 @@
+//! Generate a deterministic all-m homogeneous CMB template in an observer tetrad.
+use bianchi_rustcore::geom::group::BianchiGroup;
+use bianchi_rustcore::geom::lie::{invariants, photon_potentials, POTENTIAL_MODES};
+use bianchi_rustcore::homogeneous_sky::{
+    field::Route,
+    frames::{combine, energy_frame, relative_velocity},
+    frequency::{
+        self,
+        dual::{self, DualSky, Redistribution},
+        FrequencyGrid, FrequencyMethod, FrequencySky, Line, LineHistory, VelocityNode,
+    },
+    ionization::Ionization,
+    material::Material,
+    observed_sky,
+    replay::los_sky,
+    solve::{
+        solve_general, solve_general_species_sdirk, solve_general_species_sdirk_on_grid,
+        solve_general_species_thermal, MatchedRecombination, Settings, Solution, SolveOptions,
+    },
+    spectral::{self, Sample as SpectralSample, SpectralSky},
+    CollisionScheme,
+};
+use bianchi_rustcore::kinetic::lie_hierarchy::lie_data;
+use bianchi_rustcore::kinetic::lie_history::{initial_lie_node, required_flux, LieInitial};
+use bianchi_rustcore::kinetic::radiation_feedback::{ExpansionEquation, LieUpdate};
+use bianchi_rustcore::kinetic::sky_spectrum::{analyze, products, Mode};
+use rec_microphysics::species_thermal::ReferenceHistory;
+use std::{
+    collections::BTreeMap,
+    env, fs,
+    io::{BufWriter, Write},
+    path::{Path, PathBuf},
+};
+
+const HELP:&str="homogeneous_sky --out NEW_DIRECTORY [--family I|II|III|IV|V|VI0|VIh[:h]|VIstar|VII0|VIIh[:h]|VIII|IX|FLRW] [--shear 0.08 --duration 0.2 --steps 16 --nmu 10 --nphi 24 --lmax 4] [--tau 0.06 --electron-beta 0.1,0,0 | --material TSV] [--observer-beta 0,0,0] [--feedback auto|active|tracer|recoil] [--expansion-equation raychaudhuri|gauss-reduced] [--dust-fraction 0.2 --baryon-fraction 0.157 --dust-beta 0.12,0,0]. Clock eta=ln(a/a_emit). A material TSV has eta rate_per_eta beta_x beta_y beta_z. Dust fractions refer to initial total matter energy. --lie-ic FILE replaces --family/--shear: three whitespace rows shear/n (11 22 33 12 13 23) and a (1 2 3), Hubble normalized. A nonzero Codazzi flux determines the two streams' coflow.  --ionization FILE --n-h-emit-m3 VALUE --h-emit-s VALUE replace --tau/--material/--electron-beta in recoil mode; FILE has eta xe_per_H. --collision backward-euler|sdirk2 selects the Thomson cell integrator. --lie-update additive|congruence selects the active structure-constant step (congruence preserves Jacobi and h exactly). --omega-lambda X sets Lambda/(3H^2) on the initial slice (active feedback). --los-lmax L [--los-ntheta NT --los-nphi NP] replays the recorded solution along backward characteristics on an observer Gauss-Legendre grid (defaults NT=L+1, NP=2L+2) and writes los_modes.tsv/los_cl.tsv to multipole L. R113: --route rays|harmonic|harmonic-continuum selects the photon representation (harmonic = Lie-generated spin-harmonic PSTF hierarchy; --harmonic-lmax L, default 12, --harmonic-ntheta/--harmonic-nphi collision grid, defaults L+3, 2L+6). --route harmonic-continuum uses grid-free cold Thomson with --harmonic-work-lmax W (explicit W >= harmonic-lmax, <=256; angular grid retained only for diagnostics/REC/output). --neutrino-fraction F puts F of the initial radiation energy in collisionless massless neutrinos (active feedback). --observer-frame normal|host|spectator|radiation|radiation-total chooses the observer velocity on the final slice instead of --observer-beta. lie_constants.tsv lists the Y_LM type constants of the photon generator; run.txt reports the radiation energy frames, stream velocities, local boost and global tilt. --recombination matched --t-unit-k T (T_CMB0 (1+z_emit) in K) corrects the --ionization table by the implicit matched hydrogen TLA response of the transported sky (REC matched_history; writes recombination.tsv); --recombination-stop-eta E holds the offset after eta = E (e.g. where an REI bass_ionization table hands over to reionization). R116-B: --recombination species-thermal --species-reference TSV enables source-owned H/He/W matched history, replaces --ionization and its anchors, requires recoil. One helium owner phase only; tracer thermal ledger, lagged opacity. R117: --recombination species-sdirk with --collision sdirk2 uses partitioned stage-consistent bare opacity and two-stage SDIRK chemistry; writes coupled_stages.tsv. Optional --species-step-grid TSV (eta header, steps+1 edges from 0 to duration). R118: --spectral-moments harmonic|rays replays accepted geometry and collision depths/velocities with independent cold spectral carriers; optional --spectral-lmax L --spectral-ntheta N --spectral-nphi N. Writes spectral_history.tsv, spectral_normal.tsv, spectral_observer.tsv and harmonic spectral_modes.tsv. No spectral feedback. R118-B: --frequency-bins N enables moving log-frequency grid cold occupation replay; --frequency-collision union|projected|dual selects union resolvent, projected constant generator, or positive number-energy nodal generator BE/SDIRK; --frequency-redistribution diffusion,theta (dual only, requires frequency-line and velocity; dilute reversible model, not atomic kernel); --frequency-log-min LO --frequency-log-max HI --frequency-nmu N --frequency-nphi N. Optional --frequency-line center,width,strength,source (log h nu/kB T_emit; Gaussian prescribed true absorption/emission), --frequency-line-velocity host|TSV (eta beta_x beta_y beta_z), --frequency-line-substeps N. No new feedback. R118-C2E: --temperature-mixture EVEN_BINS [--temperature-log-extent 2 --temperature-nmu 4 --temperature-nphi 8] evolves a cold Planck temperature measure on accepted records, outputs material-frame temperature_nodes.tsv and independent B3/B4 receipts. Not a resonance collision solver.";
+type Error = Box<dyn std::error::Error>;
+fn args() -> Result<BTreeMap<String, String>, Error> {
+    let mut args = env::args().skip(1);
+    let mut output = BTreeMap::new();
+    while let Some(k) = args.next() {
+        let key = k.strip_prefix("--").ok_or("expected named option")?;
+        if ![
+            "out",
+            "family",
+            "lie-ic",
+            "ionization",
+            "n-h-emit-m3",
+            "h-emit-s",
+            "shear",
+            "duration",
+            "steps",
+            "nmu",
+            "nphi",
+            "lmax",
+            "tau",
+            "electron-beta",
+            "material",
+            "observer-beta",
+            "feedback",
+            "expansion-equation",
+            "dust-fraction",
+            "baryon-fraction",
+            "dust-beta",
+            "collision",
+            "lie-update",
+            "omega-lambda",
+            "los-lmax",
+            "los-ntheta",
+            "los-nphi",
+            "route",
+            "recombination",
+            "species-reference",
+            "species-step-grid",
+            "spectral-moments",
+            "spectral-lmax",
+            "spectral-ntheta",
+            "spectral-nphi",
+            "temperature-mixture",
+            "temperature-log-extent",
+            "temperature-nmu",
+            "temperature-nphi",
+            "frequency-bins",
+            "frequency-collision",
+            "frequency-redistribution",
+            "frequency-log-min",
+            "frequency-log-max",
+            "frequency-nmu",
+            "frequency-nphi",
+            "frequency-line",
+            "frequency-line-velocity",
+            "frequency-line-substeps",
+            "t-unit-k",
+            "recombination-stop-eta",
+            "harmonic-lmax",
+            "harmonic-work-lmax",
+            "harmonic-ntheta",
+            "harmonic-nphi",
+            "neutrino-fraction",
+            "observer-frame",
+        ]
+        .contains(&key)
+        {
+            return Err(format!("unknown option {k}").into());
+        }
+        let v = args.next().ok_or("missing option value")?;
+        if output.insert(key.to_string(), v).is_some() {
+            return Err(format!("repeated {k}").into());
+        }
+    }
+    Ok(output)
+}
+fn vector(s: &str) -> Result<[f64; 3], Error> {
+    let v: Vec<f64> = s.split(',').map(str::parse).collect::<Result<_, _>>()?;
+    let v: [f64; 3] = v
+        .try_into()
+        .map_err(|_| "expected three comma-separated beta components")?;
+    if !(v.iter().map(|a| a * a).sum::<f64>() < 1.) {
+        return Err("velocity must be finite and subluminal".into());
+    }
+    Ok(v)
+}
+fn read_lie(path: &Path) -> Result<LieInitial, Error> {
+    let source = fs::read_to_string(path)?;
+    let mut rows = BTreeMap::new();
+    for (i, line) in source.lines().enumerate() {
+        let mut fields = line.split('#').next().unwrap_or("").split_whitespace();
+        let Some(label) = fields.next() else { continue };
+        let size = match label {
+            "shear" | "n" => 6,
+            "a" => 3,
+            _ => return Err(format!("unknown Lie IC row {label} on line {}", i + 1).into()),
+        };
+        let values = fields
+            .map(str::parse::<f64>)
+            .collect::<Result<Vec<_>, _>>()?;
+        if values.len() != size || !values.iter().all(|v| v.is_finite()) {
+            return Err(format!("Lie IC {label} needs {size} finite entries").into());
+        }
+        if rows.insert(label, values).is_some() {
+            return Err(format!("repeated Lie IC row {label}").into());
+        }
+    }
+    let tensor = |v: &[f64]| [[v[0], v[3], v[4]], [v[3], v[1], v[5]], [v[4], v[5], v[2]]];
+    let a = &rows.get("a").ok_or("missing Lie IC a")?;
+    Ok(LieInitial {
+        shear: tensor(rows.get("shear").ok_or("missing Lie IC shear")?),
+        n: tensor(rows.get("n").ok_or("missing Lie IC n")?),
+        a: [a[0], a[1], a[2]],
+    })
+}
+fn writer(path: &Path) -> Result<BufWriter<fs::File>, Error> {
+    Ok(BufWriter::new(fs::File::create_new(path)?))
+}
+fn write_modes(dir: &Path, modes: &[Mode], lmax: usize) -> Result<(), Error> {
+    write_modes_as(dir, modes, lmax, "modes.tsv", "cl.tsv")
+}
+fn write_modes_as(
+    dir: &Path,
+    modes: &[Mode],
+    lmax: usize,
+    modes_name: &str,
+    cl_name: &str,
+) -> Result<(), Error> {
+    let mut f = writer(&dir.join(modes_name))?;
+    write!(f, "ell\tm\tT_re\tT_im\tE_re\tE_im\tB_re\tB_im")?;
+    for name in ["TT", "TE", "TB", "EE", "EB", "BB"] {
+        write!(f, "\t{name}_re\t{name}_im")?;
+    }
+    writeln!(f)?;
+    let mut sums = vec![[0.; 6]; lmax + 1];
+    for mode in modes {
+        write!(f, "{}\t{}", mode.ell, mode.m)?;
+        for a in &mode.alm {
+            write!(f, "\t{:.16e}\t{:.16e}", a[0], a[1])?;
+        }
+        for (i, x) in products(mode, mode).iter().enumerate() {
+            write!(f, "\t{:.16e}\t{:.16e}", x[0], x[1])?;
+            sums[mode.ell][i] += x[0];
+        }
+        writeln!(f)?;
+    }
+    f.flush()?;
+    let mut c = writer(&dir.join(cl_name))?;
+    writeln!(c, "ell\tTT\tTE\tTB\tEE\tEB\tBB")?;
+    for (ell, row) in sums.iter().enumerate() {
+        write!(c, "{ell}")?;
+        for x in row {
+            write!(c, "\t{:.16e}", x / (2 * ell + 1) as f64)?;
+        }
+        writeln!(c)?;
+    }
+    c.flush()?;
+    Ok(())
+}
+fn diagnostics(dir: &Path, sol: &Solution) -> Result<(), Error> {
+    let mut f = writer(&dir.join("diagnostics.tsv"))?;
+    writeln!(f,"eta\thubble_ratio\tomega_radiation\tomega_dust\tgauss\tcodazzi_x\tcodazzi_y\tcodazzi_z\tjacobi_norm\tsolid_angle\tenergy_integral\tflux_x_over_E\tflux_y_over_E\tflux_z_over_E\tmin_screen_eigenvalue\tmax_screen_leak\tproper_depth\tcollision_energy_defect\thost_beta_x\thost_beta_y\thost_beta_z")?;
+    for snap in &sol.history {
+        let n = &snap.node;
+        let r = &snap.radiation;
+        let vals = [
+            n.eta,
+            n.hubble_ratio,
+            n.omega_radiation,
+            snap.omega_dust,
+            n.gauss_residual,
+            n.codazzi_residual[0],
+            n.codazzi_residual[1],
+            n.codazzi_residual[2],
+            n.jacobi_residual.iter().map(|x| x * x).sum::<f64>().sqrt(),
+            r.area,
+            r.energy,
+            r.flux[0],
+            r.flux[1],
+            r.flux[2],
+            r.minimum_screen_eigenvalue,
+            r.max_screen_leak,
+            snap.proper_depth,
+            snap.collision_energy_defect,
+            snap.host_beta[0],
+            snap.host_beta[1],
+            snap.host_beta[2],
+        ];
+        for (i, x) in vals.iter().enumerate() {
+            if i > 0 {
+                write!(f, "\t")?;
+            }
+            write!(f, "{x:.16e}")?;
+        }
+        writeln!(f)?;
+    }
+    f.flush()?;
+    Ok(())
+}
+/// Exact frame velocities of the final slice in the normal tetrad (R113 THEORY D8).
+struct Frames {
+    /// Energy frame of the photons.
+    photon: [f64; 3],
+    /// Energy frame of photons plus neutrinos (equal to `photon` without neutrinos).
+    total: [f64; 3],
+    host: Option<[f64; 3]>,
+    spectator: Option<[f64; 3]>,
+}
+fn frame_report(sol: &Solution) -> Result<Frames, Error> {
+    let last = sol.history.last().ok_or("empty history")?;
+    let photon = energy_frame(last.radiation.flux, last.radiation.pressure)?;
+    let total = match &last.neutrino {
+        Some(nu) => {
+            let (_, f, p) = combine(&[
+                (sol.photon_scale, &last.radiation),
+                (sol.neutrino_scale, nu),
+            ])?;
+            energy_frame(f, p)?
+        }
+        None => photon,
+    };
+    let (host, spectator) = match &sol.final_dust {
+        Some(d) => (Some(d.beam(0)?.beta), Some(d.beam(1)?.beta)),
+        None => (None, None),
+    };
+    Ok(Frames {
+        photon,
+        total,
+        host,
+        spectator,
+    })
+}
+/// Y_LM type constants (L <= 2) of the photon generator on the first and last slice.
+fn lie_constants(dir: &Path, sol: &Solution) -> Result<(), Error> {
+    let mut f = writer(&dir.join("lie_constants.tsv"))?;
+    writeln!(
+        f,
+        "slice\tL\tM\tR_re\tR_im\tU_re\tU_im\tZ_re\tZ_im\tomega_re\tomega_im"
+    )?;
+    let first = &sol.history[0].node;
+    let last = &sol.history.last().ok_or("empty history")?.node;
+    for (name, node) in [("initial", first), ("final", last)] {
+        let p = photon_potentials(&lie_data(node));
+        for k in 0..POTENTIAL_MODES {
+            let l = (k as f64).sqrt().floor() as i64;
+            let m = k as i64 - l * l - l;
+            write!(f, "{name}\t{l}\t{m}")?;
+            for c in [p.r[k], p.u[k], p.z[k], p.omega[k]] {
+                write!(f, "\t{:.16e}\t{:.16e}", c.re, c.im)?;
+            }
+            writeln!(f)?;
+        }
+    }
+    f.flush()?;
+    Ok(())
+}
+/// Matched recombination: tabulated total electron fraction x_e, matched offset,
+/// and corrected total electron fraction (including helium).
+fn recombination_history(dir: &Path, sol: &Solution, ion: &Ionization) -> Result<(), Error> {
+    let mut f = writer(&dir.join("recombination.tsv"))?;
+    writeln!(f, "eta\txe_table\tdelta_xe\txe")?;
+    for snap in &sol.history {
+        let table = ion.xe_at(snap.node.eta)?;
+        writeln!(
+            f,
+            "{:.16e}\t{:.16e}\t{:.16e}\t{:.16e}",
+            snap.node.eta,
+            table,
+            snap.delta_xe,
+            table + snap.delta_xe
+        )?;
+    }
+    f.flush()?;
+    Ok(())
+}
+/// Species-resolved thermal ledger. Initial interval diagnostics are empty.
+fn thermochemistry_history(
+    dir: &Path,
+    sol: &Solution,
+    reference: &ReferenceHistory,
+) -> Result<(), Error> {
+    let mut f = writer(&dir.join("thermochemistry.tsv"))?;
+    writeln!(f,"eta	xp	x_hi	x_heii	x_heiii	x_hei	xe	tm_k	w_k	xp_ref	x_heii_ref	x_heiii_ref	xe_ref	tm_ref_k	delta_xe	delta_tm_k	n_h_m3	h_s	gamma	expansion_ratio	endpoint_expansion_ratio	compton_temperature_k	iterations	scaled_residual	adiabatic_j_per_h	compton_j_per_h	external_j_per_h	matched_thermal_correction_j_per_h	thermal_defect_j_per_h	binding_change_j_per_h")?;
+    let fhe = reference.f_he();
+    let opt = |v: Option<f64>| v.map(|v| format!("{v:.17e}")).unwrap_or_default();
+    for s in &sol.thermochemistry {
+        let y = s.state;
+        let r = s.reference;
+        let d = s.diagnostics;
+        let base = [
+            s.eta,
+            y.xp(),
+            y.x_hi,
+            y.x_heii,
+            y.x_heiii,
+            y.x_hei(fhe),
+            y.xe(),
+            y.tm(fhe),
+            y.w_k,
+            r.xp(),
+            r.x_heii,
+            r.x_heiii,
+            r.xe(),
+            r.tm(fhe),
+            y.xe() - r.xe(),
+            y.tm(fhe) - r.tm(fhe),
+            s.n_h_m3,
+            s.h_s,
+            s.gamma,
+        ];
+        let mut values = base.iter().map(|v| format!("{v:.17e}")).collect::<Vec<_>>();
+        values.extend([
+            opt(s.expansion_ratio),
+            opt(s.endpoint_expansion_ratio),
+            opt(s.compton_temperature_k),
+            d.iterations.to_string(),
+        ]);
+        values.extend(
+            [
+                d.scaled_residual,
+                d.physical_adiabatic_j_per_h,
+                d.physical_compton_j_per_h,
+                d.physical_external_j_per_h,
+                d.matched_thermal_correction_j_per_h,
+                d.thermal_balance_defect_j_per_h,
+                d.binding_change_j_per_h,
+            ]
+            .iter()
+            .map(|v| format!("{v:.17e}")),
+        );
+        writeln!(f, "{}", values.join("\t"))?;
+    }
+    f.flush()?;
+    Ok(())
+}
+/// Accepted internal stages only; no predictor or rejected trial is emitted.
+fn coupled_stage_history(dir: &Path, sol: &Solution) -> Result<(), Error> {
+    let mut f = writer(&dir.join("coupled_stages.tsv"))?;
+    writeln!(f,"macro_step\tstage\teta\txe\tx_heii\ttm_k\tn_h_m3\th_s\tgamma\tbeta_prime_x\tbeta_prime_y\tbeta_prime_z\texpansion_ratio\trate_left\trate_used\trate_rebuilt\trelative_residual\tdepth\titerations\tchemistry_iterations\tchemistry_residual")?;
+    for (i, s) in sol.coupled_stages.iter().enumerate() {
+        let mut v = vec![(i / 2 + 1).to_string(), s.stage.to_string()];
+        v.extend(
+            [
+                s.eta,
+                s.xe,
+                s.x_heii,
+                s.tm_k,
+                s.n_h_m3,
+                s.h_s,
+                s.gamma,
+                s.beta_prime[0],
+                s.beta_prime[1],
+                s.beta_prime[2],
+                s.expansion_ratio,
+                s.rate_left,
+                s.rate_used,
+                s.rate_rebuilt,
+                s.relative_residual,
+                s.depth,
+            ]
+            .iter()
+            .map(|x| format!("{x:.17e}")),
+        );
+        v.extend([
+            s.iterations.to_string(),
+            s.chemistry_iterations.to_string(),
+            format!("{:.17e}", s.chemistry_residual),
+        ]);
+        writeln!(f, "{}", v.join("\t"))?;
+    }
+    f.flush()?;
+    Ok(())
+}
+/// Dimensionless centered spectral carriers; tensor components are in
+/// the propagation tetrad, never HEALPix temperature/E/B coefficients.
+fn write_spectral_samples(path: &Path, samples: &[SpectralSample]) -> Result<(), Error> {
+    let mut f = writer(path)?;
+    write!(f,"e_x\te_y\te_z\tweight\tb3\tb4\tm0\tmean_log_t\tvariance\ty_m\tmin_primary_eigenvalue\tmin_log_gram_eigenvalue")?;
+    for name in spectral::CARRIERS {
+        for ij in ["xx", "yy", "zz", "xy", "xz", "yz"] {
+            write!(f, "\t{name}_{ij}")?;
+        }
+    }
+    writeln!(f)?;
+    for q in samples {
+        let mut values = vec![
+            q.direction[0],
+            q.direction[1],
+            q.direction[2],
+            q.weight,
+            q.b3,
+            q.b4,
+            q.m0,
+            q.mean_log_t,
+            q.variance,
+            q.y_m,
+            q.min_primary_eigenvalue,
+            q.min_log_gram_eigenvalue,
+        ];
+        for m in q.screens {
+            for (i, j) in [(0, 0), (1, 1), (2, 2), (0, 1), (0, 2), (1, 2)] {
+                values.push(m[i][j]);
+            }
+        }
+        writeln!(
+            f,
+            "{}",
+            values
+                .iter()
+                .map(|v| format!("{v:.17e}"))
+                .collect::<Vec<_>>()
+                .join("\t")
+        )?;
+    }
+    f.flush()?;
+    Ok(())
+}
+fn write_spectral(dir: &Path, sp: &SpectralSky, observer: [f64; 3]) -> Result<(), Error> {
+    write_spectral_samples(&dir.join("spectral_normal.tsv"), &sp.samples()?)?;
+    write_spectral_samples(
+        &dir.join("spectral_observer.tsv"),
+        &sp.observer_samples(observer)?,
+    )?;
+    let mut f = writer(&dir.join("spectral_history.tsv"))?;
+    writeln!(f,"eta\tnumber_comoving\tenergy_comoving\tnumber_flux_x\tnumber_flux_y\tnumber_flux_z\tmean_variance\tmin_variance\tmax_variance\tmean_y_m\tmin_y_m\tmax_m0_defect\tmin_primary_eigenvalue\tmin_log_gram_eigenvalue")?;
+    for s in &sp.history {
+        let v = [
+            s.eta,
+            s.number_comoving,
+            s.energy_comoving,
+            s.number_flux_comoving[0],
+            s.number_flux_comoving[1],
+            s.number_flux_comoving[2],
+            s.mean_variance,
+            s.min_variance,
+            s.max_variance,
+            s.mean_y_m,
+            s.min_y_m,
+            s.max_m0_defect,
+            s.min_primary_eigenvalue,
+            s.min_log_gram_eigenvalue,
+        ];
+        writeln!(
+            f,
+            "{}",
+            v.iter()
+                .map(|x| format!("{x:.17e}"))
+                .collect::<Vec<_>>()
+                .join("\t")
+        )?;
+    }
+    f.flush()?;
+    if let Some(coef) = &sp.coefficients {
+        let mut f = writer(&dir.join("spectral_modes.tsv"))?;
+        writeln!(f, "carrier\tspin\tell\tm\tre\tim")?;
+        for (k, slots) in coef.iter().enumerate() {
+            for (i, slot) in slots.iter().enumerate() {
+                for (j, z) in slot.iter().enumerate() {
+                    let l = (j as f64).sqrt().floor() as i64;
+                    let m = j as i64 - l * l - l;
+                    writeln!(
+                        f,
+                        "{}\t{}\t{}\t{}\t{:.17e}\t{:.17e}",
+                        spectral::CARRIERS[k],
+                        [0, 2, -2][i],
+                        l,
+                        m,
+                        z.re,
+                        z.im
+                    )?;
+                }
+            }
+        }
+        f.flush()?;
+    }
+    Ok(())
+}
+fn frequency_velocity_file(path: &Path) -> Result<Vec<VelocityNode>, Error> {
+    let txt = fs::read_to_string(path)?;
+    let mut lines = txt
+        .lines()
+        .filter(|l| !l.trim().is_empty() && !l.trim_start().starts_with('#'));
+    if !lines.next().is_some_and(|l| {
+        l.split_whitespace()
+            .eq(["eta", "beta_x", "beta_y", "beta_z"])
+    }) {
+        return Err("frequency line velocity table needs eta beta_x beta_y beta_z header".into());
+    }
+    let mut out = Vec::new();
+    for l in lines {
+        let v = l
+            .split_whitespace()
+            .map(str::parse::<f64>)
+            .collect::<Result<Vec<_>, _>>()?;
+        if v.len() != 4 {
+            return Err("frequency line velocity row must contain four values".into());
+        }
+        out.push(VelocityNode {
+            eta: v[0],
+            beta: [v[1], v[2], v[3]],
+        });
+    }
+    Ok(out)
+}
+fn write_frequency(
+    dir: &Path,
+    s: &FrequencySky,
+    g: &FrequencyGrid,
+    obs: [f64; 3],
+    velocity: Option<&[VelocityNode]>,
+) -> Result<(), Error> {
+    let mut f = writer(&dir.join("frequency_history.tsv"))?;
+    writeln!(f,"eta\tnumber_centered\tenergy_centered\tnumber_flux_x\tnumber_flux_y\tnumber_flux_z\tescaped_number_centered\tescaped_energy_centered\tline_number_centered\tline_normal_energy_centered\tline_material_energy_centered\tline_projection_energy_centered\tthomson_projection_energy_centered\tline_normal_projection_energy_centered\tthomson_normal_energy_centered\tthomson_normal_projection_energy_centered\tgeometric_energy_centered\tmin_screen_relative")?;
+    for r in &s.history {
+        let vals = [
+            r.eta,
+            r.number_centered,
+            r.energy_centered,
+            r.number_flux[0],
+            r.number_flux[1],
+            r.number_flux[2],
+            r.escaped_number_centered,
+            r.escaped_energy_centered,
+            r.line_number_centered,
+            r.line_normal_energy_centered,
+            r.line_material_energy_centered,
+            r.line_projection_energy_centered,
+            r.thomson_projection_energy_centered,
+            r.line_normal_projection_energy_centered,
+            r.thomson_normal_energy_centered,
+            r.thomson_normal_projection_energy_centered,
+            r.geometric_energy_centered,
+            r.min_screen_relative,
+        ];
+        writeln!(
+            f,
+            "{}",
+            vals.iter()
+                .map(|v| format!("{v:.17e}"))
+                .collect::<Vec<_>>()
+                .join("\t")
+        )?;
+    }
+    f.flush()?;
+    let mut f = writer(&dir.join("frequency_rays.tsv"))?;
+    writeln!(f,"ray\te_x\te_y\te_z\tweight\tlog_shift\tobserver_e_x\tobserver_e_y\tobserver_e_z\tobserver_weight\tobserver_log_shift")?;
+    let mut c = writer(&dir.join("frequency_cells.tsv"))?;
+    writeln!(c,"ray\tbin\tu_lo\tu_hi\tf_xx\tf_yy\tf_zz\tf_xy\tf_xz\tf_yz\tobserver_f_xx\tobserver_f_yy\tobserver_f_zz\tobserver_f_xy\tobserver_f_xz\tobserver_f_yz")?;
+    let pairs = [(0, 0), (1, 1), (2, 2), (0, 1), (0, 2), (1, 2)];
+    for (i, (r, o)) in s.samples().iter().zip(s.observer_samples(obs)?).enumerate() {
+        let vals = [
+            r.direction[0],
+            r.direction[1],
+            r.direction[2],
+            r.weight,
+            r.log_shift,
+            o.direction[0],
+            o.direction[1],
+            o.direction[2],
+            o.weight,
+            o.log_shift,
+        ];
+        writeln!(
+            f,
+            "{i}\t{}",
+            vals.iter()
+                .map(|v| format!("{v:.17e}"))
+                .collect::<Vec<_>>()
+                .join("\t")
+        )?;
+        for j in 0..g.bins() {
+            write!(
+                c,
+                "{i}\t{j}\t{:.17e}\t{:.17e}",
+                g.edges()[j],
+                g.edges()[j + 1]
+            )?;
+            for m in [&r.occupation[j], &o.occupation[j]] {
+                for (a, b) in pairs {
+                    write!(c, "\t{:.17e}", m[a][b])?;
+                }
+            }
+            writeln!(c)?;
+        }
+    }
+    f.flush()?;
+    c.flush()?;
+    if let Some(vel) = velocity {
+        let mut f = writer(&dir.join("frequency_line_velocity.tsv"))?;
+        writeln!(f, "eta\tbeta_x\tbeta_y\tbeta_z")?;
+        for v in vel {
+            writeln!(
+                f,
+                "{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}",
+                v.eta, v.beta[0], v.beta[1], v.beta[2]
+            )?;
+        }
+        f.flush()?;
+    }
+    Ok(())
+}
+enum FrequencyOutput {
+    Cells(FrequencySky),
+    Dual(DualSky),
+}
+fn write_dual_frequency(
+    dir: &Path,
+    s: &DualSky,
+    g: &FrequencyGrid,
+    obs: [f64; 3],
+    velocity: Option<&[VelocityNode]>,
+) -> Result<(), Error> {
+    let mut f = writer(&dir.join("frequency_history.tsv"))?;
+    writeln!(f,"eta\tnumber_centered\tenergy_centered\tnumber_flux_x\tnumber_flux_y\tnumber_flux_z\tescaped_number_centered\tescaped_energy_centered\tline_number_centered\tline_normal_energy_centered\tline_material_energy_centered\tline_projection_energy_centered\tthomson_projection_energy_centered\tline_normal_projection_energy_centered\tthomson_normal_energy_centered\tthomson_normal_projection_energy_centered\tgeometric_energy_centered\tmin_screen_relative\tredistribution_normal_energy_centered\tredistribution_material_energy_centered")?;
+    for (r, d) in s.history.iter().zip(&s.redistribution) {
+        let vals = [
+            r.eta,
+            r.number_centered,
+            r.energy_centered,
+            r.number_flux[0],
+            r.number_flux[1],
+            r.number_flux[2],
+            r.escaped_number_centered,
+            r.escaped_energy_centered,
+            r.line_number_centered,
+            r.line_normal_energy_centered,
+            r.line_material_energy_centered,
+            r.line_projection_energy_centered,
+            r.thomson_projection_energy_centered,
+            r.line_normal_projection_energy_centered,
+            r.thomson_normal_energy_centered,
+            r.thomson_normal_projection_energy_centered,
+            r.geometric_energy_centered,
+            r.min_screen_relative,
+            d.normal_energy,
+            d.material_energy,
+        ];
+        writeln!(
+            f,
+            "{}",
+            vals.iter()
+                .map(|v| format!("{v:.17e}"))
+                .collect::<Vec<_>>()
+                .join("\t")
+        )?;
+    }
+    f.flush()?;
+    let mut f = writer(&dir.join("frequency_rays.tsv"))?;
+    writeln!(f,"ray\te_x\te_y\te_z\tweight\tlog_shift\tobserver_e_x\tobserver_e_y\tobserver_e_z\tobserver_weight\tobserver_log_shift")?;
+    let mut c = writer(&dir.join("frequency_nodes.tsv"))?;
+    writeln!(c,"ray\tnode\tu\tn_xx\tn_yy\tn_zz\tn_xy\tn_xz\tn_yz\tobserver_n_xx\tobserver_n_yy\tobserver_n_zz\tobserver_n_xy\tobserver_n_xz\tobserver_n_yz")?;
+    let pairs = [(0, 0), (1, 1), (2, 2), (0, 1), (0, 2), (1, 2)];
+    for (i, (r, o)) in s.samples().iter().zip(s.observer_samples(obs)?).enumerate() {
+        let vals = [
+            r.direction[0],
+            r.direction[1],
+            r.direction[2],
+            r.weight,
+            r.log_shift,
+            o.direction[0],
+            o.direction[1],
+            o.direction[2],
+            o.weight,
+            o.log_shift,
+        ];
+        writeln!(
+            f,
+            "{i}\t{}",
+            vals.iter()
+                .map(|v| format!("{v:.17e}"))
+                .collect::<Vec<_>>()
+                .join("\t")
+        )?;
+        for j in 0..g.edges().len() {
+            write!(c, "{i}\t{j}\t{:.17e}", g.edges()[j])?;
+            for m in [&r.number_mass[j], &o.number_mass[j]] {
+                for (a, b) in pairs {
+                    write!(c, "\t{:.17e}", m[a][b])?;
+                }
+            }
+            writeln!(c)?;
+        }
+    }
+    f.flush()?;
+    c.flush()?;
+    if let Some(vel) = velocity {
+        let mut f = writer(&dir.join("frequency_line_velocity.tsv"))?;
+        writeln!(f, "eta\tbeta_x\tbeta_y\tbeta_z")?;
+        for v in vel {
+            writeln!(
+                f,
+                "{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}",
+                v.eta, v.beta[0], v.beta[1], v.beta[2]
+            )?;
+        }
+        f.flush()?;
+    }
+    Ok(())
+}
+/// Neutrino density, flux and anisotropic stress pi/rho along the history.
+fn species(dir: &Path, sol: &Solution) -> Result<(), Error> {
+    if sol.neutrinos.is_none() {
+        return Ok(());
+    }
+    let mut f = writer(&dir.join("species.tsv"))?;
+    writeln!(
+        f,
+        "eta\tomega_neutrino\tflux_x\tflux_y\tflux_z\tpi_xx\tpi_yy\tpi_zz\tpi_xy\tpi_xz\tpi_yz"
+    )?;
+    for snap in &sol.history {
+        let nu = snap.neutrino.as_ref().ok_or("missing neutrino moments")?;
+        let p = nu.pressure;
+        let third = (p[0][0] + p[1][1] + p[2][2]) / 3.0;
+        let vals = [
+            snap.node.eta,
+            snap.omega_neutrino,
+            nu.flux[0],
+            nu.flux[1],
+            nu.flux[2],
+            p[0][0] - third,
+            p[1][1] - third,
+            p[2][2] - third,
+            p[0][1],
+            p[0][2],
+            p[1][2],
+        ];
+        for (i, x) in vals.iter().enumerate() {
+            if i > 0 {
+                write!(f, "\t")?;
+            }
+            write!(f, "{x:.16e}")?;
+        }
+        writeln!(f)?;
+    }
+    f.flush()?;
+    Ok(())
+}
+fn run() -> Result<(), Error> {
+    let a = args()?;
+    let opt = |k: &str, d: &'static str| a.get(k).map(String::as_str).unwrap_or(d);
+    let out = PathBuf::from(a.get("out").ok_or("missing --out")?);
+    if out.exists() {
+        return Err("output directory already exists".into());
+    }
+    let dur: f64 = opt("duration", "0.2").parse()?;
+    let lmax = opt("lmax", "4").parse::<usize>()?;
+    let (nmu, nphi) = (
+        opt("nmu", "10").parse::<usize>()?,
+        opt("nphi", "24").parse::<usize>()?,
+    );
+    let route = match opt("route", "rays") {
+        "rays" => {
+            if [
+                "harmonic-lmax",
+                "harmonic-ntheta",
+                "harmonic-nphi",
+                "harmonic-work-lmax",
+            ]
+            .iter()
+            .any(|k| a.contains_key(*k))
+            {
+                return Err("--harmonic-* options require --route harmonic".into());
+            }
+            if nmu < lmax.saturating_add(1) || nphi < lmax.saturating_mul(2).saturating_add(1) {
+                return Err("sampling is below nominal harmonic resolution".into());
+            }
+            Route::Rays
+        }
+        "harmonic" | "harmonic-continuum" => {
+            let continuum = opt("route", "rays") == "harmonic-continuum";
+            if !continuum && a.contains_key("harmonic-work-lmax") {
+                return Err("--harmonic-work-lmax requires --route harmonic-continuum".into());
+            }
+            let l: usize = opt("harmonic-lmax", "12").parse()?;
+            let nt = match a.get("harmonic-ntheta") {
+                Some(x) => x.parse::<usize>()?,
+                None => l + 3,
+            };
+            let np = match a.get("harmonic-nphi") {
+                Some(x) => x.parse::<usize>()?,
+                None => 2 * l + 6,
+            };
+            if nt < lmax.saturating_add(1) || np < lmax.saturating_mul(2).saturating_add(1) {
+                return Err("harmonic collision grid is below nominal resolution of --lmax".into());
+            }
+            if nmu < 4 || nphi < 4 || nphi % 2 != 0 {
+                return Err("seed --nmu/--nphi must be >= 4 with even --nphi".into());
+            }
+            if continuum {
+                let work: usize = a
+                    .get("harmonic-work-lmax")
+                    .ok_or("harmonic-continuum requires --harmonic-work-lmax")?
+                    .parse()?;
+                if work < l || work > 256 {
+                    return Err("invalid continuum work band".into());
+                }
+                Route::HarmonicContinuum {
+                    lmax: l,
+                    n_theta: nt,
+                    n_phi: np,
+                    work_lmax: work,
+                }
+            } else {
+                Route::Harmonic {
+                    lmax: l,
+                    n_theta: nt,
+                    n_phi: np,
+                }
+            }
+        }
+        _ => return Err("unknown route (rays, harmonic or harmonic-continuum)".into()),
+    };
+    let lie = if let Some(path) = a.get("lie-ic") {
+        if a.contains_key("family") || a.contains_key("shear") {
+            return Err("--lie-ic replaces --family and --shear".into());
+        }
+        let initial = read_lie(Path::new(path))?;
+        if a.contains_key("dust-beta")
+            && required_flux(&initial_lie_node(&initial)?)
+                .iter()
+                .map(|x| x * x)
+                .sum::<f64>()
+                .sqrt()
+                > 1e-12
+        {
+            return Err("--dust-beta is fixed by Codazzi for this Lie initial slice".into());
+        }
+        Some(initial)
+    } else {
+        None
+    };
+    let species_sdirk = opt("recombination", "table") == "species-sdirk";
+    let species_edges = if let Some(path) = a.get("species-step-grid") {
+        if !species_sdirk {
+            return Err("--species-step-grid requires species-sdirk".into());
+        }
+        let txt = fs::read_to_string(path)?;
+        let mut lines = txt
+            .lines()
+            .filter(|l| !l.trim().is_empty() && !l.trim_start().starts_with('#'));
+        if lines.next().map(str::trim) != Some("eta") {
+            return Err("species-step-grid needs eta header".into());
+        }
+        Some(
+            lines
+                .map(|l| l.trim().parse::<f64>())
+                .collect::<Result<Vec<_>, _>>()?,
+        )
+    } else {
+        None
+    };
+
+    let species_reference = if matches!(
+        opt("recombination", "table"),
+        "species-thermal" | "species-sdirk"
+    ) {
+        if [
+            "ionization",
+            "n-h-emit-m3",
+            "h-emit-s",
+            "material",
+            "tau",
+            "electron-beta",
+            "t-unit-k",
+            "recombination-stop-eta",
+        ]
+        .iter()
+        .any(|k| a.contains_key(*k))
+        {
+            return Err(
+                "species-thermal replaces optical and recombination anchors; one source owner only"
+                    .into(),
+            );
+        }
+        if opt("feedback", "auto") != "recoil" {
+            return Err("species-thermal requires recoil".into());
+        }
+        let path = a
+            .get("species-reference")
+            .ok_or("missing --species-reference")?;
+        Some(
+            ReferenceHistory::parse(&fs::read_to_string(path)?)
+                .map_err(|e| format!("species reference: {e:?}"))?,
+        )
+    } else {
+        if a.contains_key("species-reference") {
+            return Err("--species-reference requires --recombination species-thermal".into());
+        }
+        None
+    };
+    let ionization = if let Some(path) = a.get("ionization") {
+        if a.contains_key("material") || a.contains_key("tau") || a.contains_key("electron-beta") {
+            return Err(
+                "--ionization replaces prescribed optical depth and electron motion inputs".into(),
+            );
+        }
+        if opt("feedback", "auto") != "recoil" {
+            return Err("--ionization requires --feedback recoil".into());
+        }
+        Some(Ionization::load(
+            Path::new(path),
+            a.get("n-h-emit-m3")
+                .ok_or("missing --n-h-emit-m3 for --ionization")?
+                .parse()?,
+            a.get("h-emit-s")
+                .ok_or("missing --h-emit-s for --ionization")?
+                .parse()?,
+        )?)
+    } else {
+        if a.contains_key("n-h-emit-m3") || a.contains_key("h-emit-s") {
+            return Err("density and Hubble anchors require --ionization".into());
+        }
+        None
+    };
+    let material = if let Some(path) = a.get("material") {
+        if a.contains_key("tau") || a.contains_key("electron-beta") {
+            return Err("--material already specifies rate and velocity".into());
+        }
+        Material::load(Path::new(path))?
+    } else {
+        Material::constant(
+            dur,
+            opt("tau", "0").parse()?,
+            vector(opt("electron-beta", "0,0,0"))?,
+        )?
+    };
+    let active = match opt("feedback", "auto") {
+        "active" | "recoil" => true,
+        "tracer" => false,
+        "auto" => !material.has_scattering(),
+        _ => return Err("unknown feedback setting".into()),
+    };
+    let expansion = match opt("expansion-equation", "raychaudhuri") {
+        "raychaudhuri" => ExpansionEquation::Raychaudhuri,
+        "gauss-reduced" => ExpansionEquation::GaussReduced,
+        _ => return Err("unknown expansion equation (raychaudhuri or gauss-reduced)".into()),
+    };
+    if a.contains_key("expansion-equation") && !active {
+        return Err("--expansion-equation is an active feedback setting".into());
+    }
+    let cfg = Settings {
+        family: opt("family", "I"),
+        shear: opt("shear", "0.08").parse()?,
+        duration: dur,
+        steps: opt("steps", "16").parse()?,
+        nmu,
+        nphi,
+        active,
+        recoil: opt("feedback", "auto") == "recoil",
+        dust_fraction: opt("dust-fraction", "0").parse()?,
+        dust_beta: vector(opt("dust-beta", "0,0,0"))?,
+        collision: CollisionScheme::parse(opt("collision", "backward-euler"))?,
+        omega_lambda: opt("omega-lambda", "0").parse()?,
+        lie_update: LieUpdate::parse(opt("lie-update", "additive"))?,
+    };
+    let los = match a.get("los-lmax") {
+        Some(v) => {
+            let l: usize = v.parse()?;
+            let nt = match a.get("los-ntheta") {
+                Some(x) => x.parse::<usize>()?,
+                None => l + 1,
+            };
+            let np = match a.get("los-nphi") {
+                Some(x) => x.parse::<usize>()?,
+                None => 2 * l + 2,
+            };
+            if nt < l + 1 || np < 2 * l + 1 {
+                return Err("line-of-sight grid is below nominal resolution of --los-lmax".into());
+            }
+            Some((l, nt, np))
+        }
+        None => {
+            if a.contains_key("los-ntheta") || a.contains_key("los-nphi") {
+                return Err("--los-ntheta/--los-nphi require --los-lmax".into());
+            }
+            None
+        }
+    };
+    let recombination = match opt("recombination", "table") {
+        "table" => {
+            if a.contains_key("t-unit-k") || a.contains_key("recombination-stop-eta") {
+                return Err(
+                    "--t-unit-k/--recombination-stop-eta require --recombination matched".into(),
+                );
+            }
+            None
+        }
+        "matched" => {
+            if ionization.is_none() {
+                return Err("--recombination matched corrects an --ionization table".into());
+            }
+            Some(MatchedRecombination {
+                t_unit_k: a
+                    .get("t-unit-k")
+                    .ok_or("missing --t-unit-k for --recombination matched")?
+                    .parse()?,
+                n_h_emit_m3: opt("n-h-emit-m3", "").parse()?,
+                h_emit_s: opt("h-emit-s", "").parse()?,
+                stop_eta: a
+                    .get("recombination-stop-eta")
+                    .map(|v| v.parse::<f64>())
+                    .transpose()?,
+            })
+        }
+        "species-thermal" | "species-sdirk" => None,
+        other => return Err(format!("unknown --recombination {other}").into()),
+    };
+    let options = SolveOptions {
+        route,
+        neutrino_fraction: opt("neutrino-fraction", "0").parse()?,
+        recombination,
+    };
+    if a.contains_key("observer-frame") && a.contains_key("observer-beta") {
+        return Err("--observer-frame replaces --observer-beta".into());
+    }
+    let baryon_fraction: f64 = opt("baryon-fraction", "0.5").parse()?;
+    let sol = if let Some(reference) = &species_reference {
+        if let Some(edges) = &species_edges {
+            solve_general_species_sdirk_on_grid(
+                &cfg,
+                &material,
+                lie.as_ref(),
+                expansion,
+                baryon_fraction,
+                &options,
+                reference,
+                edges,
+            )?
+        } else {
+            let solver = if species_sdirk {
+                solve_general_species_sdirk
+            } else {
+                solve_general_species_thermal
+            };
+            solver(
+                &cfg,
+                &material,
+                lie.as_ref(),
+                expansion,
+                baryon_fraction,
+                &options,
+                reference,
+            )?
+        }
+    } else {
+        solve_general(
+            &cfg,
+            &material,
+            lie.as_ref(),
+            ionization.as_ref(),
+            expansion,
+            baryon_fraction,
+            &options,
+        )?
+    };
+    let frames = frame_report(&sol)?;
+    let observer_frame = a
+        .get("observer-frame")
+        .map(String::as_str)
+        .unwrap_or("explicit_beta");
+    let obs = match observer_frame {
+        "explicit_beta" => vector(opt("observer-beta", "0,0,0"))?,
+        "normal" => [0.; 3],
+        "host" => frames
+            .host
+            .ok_or("--observer-frame host needs massive streams")?,
+        "spectator" => frames
+            .spectator
+            .ok_or("--observer-frame spectator needs massive streams")?,
+        "radiation" => frames.photon,
+        "radiation-total" => frames.total,
+        other => return Err(format!("unknown observer frame {other}").into()),
+    };
+    let sky = observed_sky(&sol.photons, obs)?;
+    let modes = analyze(&sky, lmax)?;
+    let los_result = match los {
+        Some((l, nt, np)) => {
+            let clock = std::time::Instant::now();
+            let s = los_sky(&sol.records, obs, nt, np)?;
+            let m = s.modes(l)?;
+            Some((l, nt, np, s, m, clock.elapsed().as_secs_f64()))
+        }
+        None => None,
+    };
+    let spectral_result = if let Some(route) = a.get("spectral-moments") {
+        let (l0, nt0, np0) = match &sol.route {
+            Route::Harmonic {
+                lmax,
+                n_theta,
+                n_phi,
+            }
+            | Route::HarmonicContinuum {
+                lmax,
+                n_theta,
+                n_phi,
+                ..
+            } => (*lmax, *n_theta, *n_phi),
+            Route::Rays => (lmax.max(2), nmu, nphi),
+        };
+        let l = a
+            .get("spectral-lmax")
+            .map(|v| v.parse::<usize>())
+            .transpose()?
+            .unwrap_or(l0);
+        let nt = a
+            .get("spectral-ntheta")
+            .map(|v| v.parse::<usize>())
+            .transpose()?
+            .unwrap_or(if route == "rays" { nmu } else { nt0.max(l + 1) });
+        let np = a
+            .get("spectral-nphi")
+            .map(|v| v.parse::<usize>())
+            .transpose()?
+            .unwrap_or(if route == "rays" {
+                nphi
+            } else {
+                np0.max(2 * l + 1)
+            });
+        if route == "rays" && a.contains_key("spectral-lmax") {
+            return Err("--spectral-lmax requires harmonic spectral moments".into());
+        }
+        // Bound the opt-in research route before allocating (not a science gate).
+        if l > 128 || nt > 512 || np > 1024 {
+            return Err("spectral research mesh exceeds bounded implementation".into());
+        }
+        let clock = std::time::Instant::now();
+        let sp = match route.as_str() {
+            "harmonic" => spectral::replay_harmonic(&sol.records, l, nt, np)?,
+            "rays" => spectral::replay_rays(&sol.records, nt, np)?,
+            _ => return Err("unknown --spectral-moments route".into()),
+        };
+        let elapsed = clock.elapsed().as_secs_f64();
+        Some((route, l, nt, np, sp, elapsed))
+    } else {
+        if ["spectral-lmax", "spectral-ntheta", "spectral-nphi"]
+            .iter()
+            .any(|k| a.contains_key(*k))
+        {
+            return Err("spectral mesh requires --spectral-moments".into());
+        }
+        None
+    };
+    let temperature_result = if let Some(n) = a.get("temperature-mixture") {
+        let nt: usize = opt("temperature-nmu", "4").parse()?;
+        let np: usize = opt("temperature-nphi", "8").parse()?;
+        let start = std::time::Instant::now();
+        let sky = dual::replay_temperature_mixture(
+            &sol.records,
+            nt,
+            np,
+            n.parse()?,
+            opt("temperature-log-extent", "2").parse()?,
+        )?;
+        let reference = spectral::replay_rays(&sol.records, nt, np)?;
+        let material = frames.host.unwrap_or([0.; 3]);
+        Some((
+            sky,
+            reference,
+            material,
+            nt,
+            np,
+            start.elapsed().as_secs_f64(),
+        ))
+    } else {
+        if [
+            "temperature-log-extent",
+            "temperature-nmu",
+            "temperature-nphi",
+        ]
+        .iter()
+        .any(|k| a.contains_key(*k))
+        {
+            return Err("temperature mesh requires temperature-mixture".into());
+        }
+        None
+    };
+    let frequency_result = if let Some(n) = a.get("frequency-bins") {
+        let g = FrequencyGrid::new(
+            opt("frequency-log-min", "-12").parse()?,
+            opt("frequency-log-max", "5").parse()?,
+            n.parse()?,
+        )?;
+        let nt: usize = opt("frequency-nmu", "4").parse()?;
+        let np: usize = opt("frequency-nphi", "8").parse()?;
+        let (line, velocity, line_owner) = if let Some(spec) = a.get("frequency-line") {
+            let v = spec
+                .split(',')
+                .map(str::parse::<f64>)
+                .collect::<Result<Vec<_>, _>>()?;
+            if v.len() != 4 {
+                return Err("frequency-line needs center,width,strength,source".into());
+            }
+            let model = Line::new(v[0], v[1], v[2], v[3])?;
+            let owner = a
+                .get("frequency-line-velocity")
+                .ok_or("frequency-line requires explicit velocity owner")?;
+            let vel = if owner == "host" {
+                if !cfg.recoil || sol.records.len() + 1 != sol.history.len() {
+                    return Err("host frequency-line requires actual recoil macro records (not internal species-SDIRK stages)".into());
+                }
+                sol.history
+                    .iter()
+                    .map(|s| VelocityNode {
+                        eta: s.node.eta,
+                        beta: s.host_beta,
+                    })
+                    .collect()
+            } else {
+                frequency_velocity_file(Path::new(owner))?
+            };
+            let line = LineHistory::new(
+                model,
+                vel.clone(),
+                opt("frequency-line-substeps", "1").parse()?,
+            )?;
+            (
+                Some(line),
+                Some(vel),
+                if owner == "host" {
+                    "accepted_host_endpoint_linear"
+                } else {
+                    "prescribed_table_linear"
+                },
+            )
+        } else {
+            if a.contains_key("frequency-line-velocity")
+                || a.contains_key("frequency-line-substeps")
+            {
+                return Err("frequency line velocity/substeps require frequency-line".into());
+            }
+            (None, None, "none")
+        };
+        let start = std::time::Instant::now();
+        let method = opt("frequency-collision", "projected");
+        let red = if let Some(v) = a.get("frequency-redistribution") {
+            if method != "dual" || line.is_none() {
+                return Err(
+                    "frequency-redistribution requires dual and explicit line history".into(),
+                );
+            }
+            let q = v
+                .split(',')
+                .map(str::parse::<f64>)
+                .collect::<Result<Vec<_>, _>>()?;
+            if q.len() != 2 {
+                return Err("frequency-redistribution needs diffusion,theta".into());
+            }
+            Some(Redistribution::new(q[0], q[1])?)
+        } else {
+            None
+        };
+        let f = match method {
+            "dual" => FrequencyOutput::Dual(dual::replay_dual_frequency(
+                &sol.records,
+                nt,
+                np,
+                &g,
+                line.as_ref(),
+                red.as_ref(),
+            )?),
+            "union" | "projected" => {
+                let m = if method == "union" {
+                    FrequencyMethod::UnionProjection
+                } else {
+                    FrequencyMethod::Projected
+                };
+                FrequencyOutput::Cells(frequency::replay_frequency_with_method(
+                    &sol.records,
+                    nt,
+                    np,
+                    &g,
+                    line.as_ref(),
+                    m,
+                )?)
+            }
+            _ => return Err("frequency-collision must be union, projected or dual".into()),
+        };
+        Some((
+            g,
+            f,
+            velocity,
+            line_owner,
+            nt,
+            np,
+            start.elapsed().as_secs_f64(),
+        ))
+    } else {
+        if [
+            "frequency-collision",
+            "frequency-redistribution",
+            "frequency-log-min",
+            "frequency-log-max",
+            "frequency-nmu",
+            "frequency-nphi",
+            "frequency-line",
+            "frequency-line-velocity",
+            "frequency-line-substeps",
+        ]
+        .iter()
+        .any(|k| a.contains_key(*k))
+        {
+            return Err("frequency options require frequency-bins".into());
+        }
+        None
+    };
+    if let Some(parent) = out.parent().filter(|p| !p.as_os_str().is_empty()) {
+        fs::create_dir_all(parent)?;
+    }
+    fs::create_dir(&out)?;
+    write_modes(&out, &modes, lmax)?;
+    if let Some((l, _, _, _, m, _)) = &los_result {
+        write_modes_as(&out, m, *l, "los_modes.tsv", "los_cl.tsv")?;
+    }
+    diagnostics(&out, &sol)?;
+    if let Some((_, _, _, _, sp, _)) = &spectral_result {
+        write_spectral(&out, sp, obs)?;
+    }
+
+    if let Some((g, s, vel, _, _, _, _)) = &frequency_result {
+        match s {
+            FrequencyOutput::Cells(s) => write_frequency(&out, s, g, obs, vel.as_deref())?,
+            FrequencyOutput::Dual(s) => write_dual_frequency(&out, s, g, obs, vel.as_deref())?,
+        }
+    }
+    if let Some((s, reference, beta, _, _, _)) = &temperature_result {
+        let mut f = writer(&out.join("temperature_nodes.tsv"))?;
+        writeln!(
+            f,
+            "ray\tnode\tlog_temperature\tweight\tq_xx\tq_yy\tq_zz\tq_xy\tq_xz\tq_yz"
+        )?;
+        let mut r = writer(&out.join("temperature_rays.tsv"))?;
+        writeln!(r,"ray\te_x\te_y\te_z\tangular_weight\tb3\tb4\tref_b3\tref_b4\tref_m0\tref_mean_log_t\tref_variance")?;
+        let q = s.samples(*beta)?;
+        let exact = reference.observer_samples(*beta)?;
+        for (i, (v, w)) in q.iter().zip(exact).enumerate() {
+            let b = v.moments(s.eta);
+            writeln!(r,"{i}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}",v.direction[0],v.direction[1],v.direction[2],v.angular_weight,b.0,b.1,w.b3,w.b4,w.m0,w.mean_log_t,w.variance)?;
+            for (k, c) in v.components.iter().enumerate() {
+                let m = &c.screen;
+                writeln!(f,"{i}\t{k}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}\t{:.17e}",c.log_temperature,c.weight,m[0][0],m[1][1],m[2][2],m[0][1],m[0][2],m[1][2])?;
+            }
+        }
+        f.flush()?;
+        r.flush()?;
+    }
+    lie_constants(&out, &sol)?;
+    species(&out, &sol)?;
+    if options.recombination.is_some() {
+        recombination_history(&out, &sol, ionization.as_ref().ok_or("missing ionization")?)?;
+    }
+    if let Some(reference) = &species_reference {
+        thermochemistry_history(&out, &sol, reference)?;
+        if species_sdirk {
+            coupled_stage_history(&out, &sol)?;
+        }
+    }
+    let mut f = writer(&out.join("run.txt"))?;
+    writeln!(f,"schema=bass.homogeneous_sky.v2\ncodazzi_convention=(D_b sigma^b_a + kappa q_a)/H^2 in the propagation tetrad\nfamily={}\nfeedback={}\nduration={}\nsteps={}\nnmu={}\nnphi={}\nlmax={}\nshear={}\ndust_fraction={}\ndust_beta={:?}\nobserver_beta={:?}",if lie.is_some(){"custom_lie"}else{cfg.family},if cfg.recoil{"active_photons_dust_Thomson_recoil"}else if active{"active_photons_and_optional_dust"}else{"polarized_tracer_on_native_scalar_radiation"},dur,cfg.steps,nmu,nphi,lmax,if lie.is_some(){"custom_tensor".into()}else{cfg.shear.to_string()},cfg.dust_fraction,if sol.initial_dust_mode=="codazzi_coflow"{sol.history[0].host_beta}else{cfg.dust_beta},obs)?;
+    writeln!(
+        f,
+        "initial_dust_mode={}\ninitial_host_beta={:?}\nopacity_source={}",
+        sol.initial_dust_mode,
+        sol.history[0].host_beta,
+        if species_sdirk {
+            "species_sdirk_stage_linear_bare_rate"
+        } else if species_reference.is_some() {
+            "species_reference_plus_lagged_delta_xe_times_host_proper_density_over_H"
+        } else if ionization.is_some() {
+            "xe_times_evolved_host_rest_density_over_H"
+        } else {
+            "prescribed_rate_per_eta"
+        }
+    )?;
+    if a.contains_key("baryon-fraction") {
+        writeln!(f, "initial_baryon_normal_mass_fraction={baryon_fraction}")?;
+    }
+    if let Some(ic) = &lie {
+        writeln!(
+            f,
+            "lie_shear={:?}\nlie_n={:?}\nlie_a={:?}\nrequired_initial_q_over_E={:?}",
+            ic.shear,
+            ic.n,
+            ic.a,
+            required_flux(&sol.history[0].node)
+        )?;
+    }
+    writeln!(
+        f,
+        "expansion_equation={}",
+        if active {
+            expansion.name()
+        } else {
+            "native_qstate"
+        }
+    )?;
+    let first = &sol.history[0].node;
+    let last = &sol.history.last().ok_or("empty history")?.node;
+    let class = |n: &bianchi_rustcore::kinetic::lie_history::RayNode| {
+        let g = BianchiGroup::new(
+            [
+                n.n[0][0], n.n[1][1], n.n[2][2], n.n[0][1], n.n[0][2], n.n[1][2],
+            ],
+            n.a,
+        );
+        let c = g.classify();
+        (c.name, c.kappa)
+    };
+    let (type0, kappa0) = class(first);
+    let (type1, kappa1) = class(last);
+    writeln!(
+        f,
+        "lie_update={}\ncollision_scheme={}\nomega_lambda_initial={}\nomega_lambda_final={}\nlie_type_initial={}\nlie_type_final={}\nlie_kappa_inverse_h_initial={:?}\nlie_kappa_inverse_h_final={:?}\nrecorded_steps={}\nrecorded_collision_events={}",
+        cfg.lie_update.name(),
+        cfg.collision.name(),
+        first.omega_lambda,
+        last.omega_lambda,
+        type0,
+        type1,
+        kappa0,
+        kappa1,
+        sol.records.len(),
+        sol.records
+            .iter()
+            .map(|r| r.first.len() + r.second.len())
+            .sum::<usize>()
+    )?;
+    if let Some((l, nt, np, s, _, seconds)) = &los_result {
+        writeln!(
+            f,
+            "los_lmax={l}\nlos_grid=gauss_legendre_{nt}_x_uniform_phi_{np}\nlos_max_landing_error={:e}\nlos_min_intensity={:e}\nlos_min_screen_eigenvalue={:e}\nlos_seconds={seconds:.3}\nlos_threads={}",
+            s.max_landing_error,
+            s.min_intensity,
+            s.min_screen_eigenvalue,
+            rayon::current_num_threads()
+        )?;
+    }
+    let inv0 = invariants(&first.n, &first.a);
+    let inv1 = invariants(&last.n, &last.a);
+    let relative = |frame: [f64; 3], object: [f64; 3]| relative_velocity(frame, object);
+    writeln!(
+        f,
+        "route={}\nneutrino_fraction={}\nlie_h_initial={:?}\nlie_h_final={:?}\nlie_trace_n_initial={:e}\nlie_a_norm_initial={:e}\nobserver_frame={observer_frame}\nobserver_beta_used={:?}\nframe_photon_energy_beta={:?}\nframe_radiation_energy_beta={:?}\nframe_host_beta={:?}\nframe_spectator_beta={:?}\nlocal_boost_observer_vs_radiation={:?}\nglobal_tilt_host_vs_normal={:?}\nglobal_tilt_host_vs_radiation={:?}\nrecombination={}\ndelta_xe_final={:e}",
+        sol.route.name(),
+        options.neutrino_fraction,
+        inv0.h,
+        inv1.h,
+        inv0.trace_n,
+        inv0.a_norm,
+        obs,
+        frames.photon,
+        frames.total,
+        frames.host,
+        frames.spectator,
+        relative(frames.total, obs)?,
+        frames.host,
+        frames.host.map(|h| relative(frames.total, h)).transpose()?,
+        if species_sdirk {"species-sdirk"}
+        else if species_reference.is_some() {"species-thermal"}
+        else if options.recombination.is_some() {"matched"} else {"table"},
+        sol.history.last().ok_or("empty history")?.delta_xe,
+    )?;
+    if let Some(r) = &species_reference {
+        let a = r.nodes()[0];
+        writeln!(f,"species_helium_model={:?}\nspecies_f_he={:.17e}\nspecies_reference_n_h_emit_m3={:.17e}\nspecies_reference_h_emit_s={:.17e}\nspecies_reference_tr_emit_k={:.17e}\nspecies_thermal_energy_feedback=tracer_only\nspecies_coupling={}",r.helium(),r.f_he(),a.n_h_m3,a.h_s,a.tr_k,if species_sdirk{"partitioned_SDIRK2_stage_consistent_linear_bare_rate"}else{"lagged_opacity_BE"})?;
+    }
+    if let Some((s, _, beta, nt, np, elapsed)) = &temperature_result {
+        writeln!(f,"temperature_scope=positive_cold_Planck_mixture_accepted_history_no_frequency_reconstruction\ntemperature_grid={nt}x{np}\ntemperature_material_beta={beta:?}\ntemperature_escape_number={:.17e}\ntemperature_escape_energy={:.17e}\ntemperature_number_defect={:.17e}\ntemperature_material_energy_defect={:.17e}\ntemperature_projection_energy_defect={:.17e}\ntemperature_stage_residual={:.17e}\ntemperature_second_moment_spread={:.17e}\ntemperature_events={}\ntemperature_tail_number_bound={:.17e}\ntemperature_tail_energy_bound={:.17e}\ntemperature_tail_count={}\ntemperature_wall_s={elapsed:.9}",s.escape_number,s.escape_energy,s.max_number_defect,s.max_material_energy_defect,s.max_projection_energy_defect,s.max_stage_residual,s.numerical_second_temperature_moment,s.collision_events,s.discarded_tail_number_bound,s.discarded_tail_energy_bound,s.discarded_tail_count)?;
+    }
+    if let Some((route, l, nt, np, sp, elapsed)) = &spectral_result {
+        let checks = sp.sampled_necessary_checks(1e-9)?;
+        writeln!(
+            f,
+            "spectral_sampled_necessary_checks={}\nspectral_sampled_absolute_tolerance=1e-9",
+            if checks { "PASS_SCOPED" } else { "UNRESOLVED" }
+        )?;
+        let q = sp.history.last().ok_or("empty spectral output")?;
+        let e = sol
+            .history
+            .last()
+            .ok_or("empty bolometric output")?
+            .radiation
+            .energy;
+        let gap =
+            (q.energy_comoving * (-4. * q.eta).exp() * 4. * std::f64::consts::PI / e - 1.).abs();
+        let mesh_gap = sp
+            .bolometric_gap(&sol.photons)
+            .map(|v| format!("{v:.17e}"))
+            .unwrap_or_else(|_| "unavailable_different_mesh".into());
+        writeln!(f,"spectral_route={route}\nspectral_lmax={}\nspectral_grid={}x{}\nspectral_scope=cold_fixed_accepted_history_independent_gain_normalization_no_feedback\nspectral_center=log(T/T_emit)+eta\nspectral_collision_events={}\nspectral_number_collision_defect={:.17e}\nspectral_rest_energy_collision_defect={:.17e}\nspectral_number_continuity_trapezoid_defect={:.17e}\nspectral_bolometric_integral_relative_gap={gap:.17e}\nspectral_bolometric_screen_relative_gap={mesh_gap}\nspectral_wall_s={elapsed:.9}",if route.as_str()=="rays"{0}else{*l},nt,np,sp.collision_events,sp.max_collision_number_defect,sp.max_collision_rest_energy_defect,sp.number_continuity_defect(&sol.records)?)?;
+    }
+    if let Some((g, FrequencyOutput::Cells(s), _, owner, nt, np, seconds)) = &frequency_result {
+        let last = s.history.last().ok_or("empty frequency history")?;
+        let e = sol
+            .history
+            .last()
+            .ok_or("empty bolometric history")?
+            .radiation
+            .energy;
+        let gap = if *owner == "none" {
+            format!(
+                "{:.17e}",
+                (last.energy_centered * (-4. * last.eta).exp() * 4. * std::f64::consts::PI / e
+                    - 1.)
+                    .abs()
+            )
+        } else {
+            "not_applicable_prescribed_line".into()
+        };
+        let optional = |v: Option<f64>| {
+            v.map(|v| format!("{v:.17e}"))
+                .unwrap_or_else(|| "not_applicable".into())
+        };
+        writeln!(f,"frequency_method={}\nfrequency_max_fv_stage_residual={:.17e}\nfrequency_max_fv_stage_iterations={}",opt("frequency-collision","projected"),s.max_fv_stage_residual,s.max_fv_stage_iterations)?;
+        writeln!(f,"frequency_scope=cold_ray_number_conservative_projection_prescribed_true_line_no_feedback\nfrequency_grid={}x{}x{}\nfrequency_log_range={:.17e},{:.17e}\nfrequency_line_owner={owner}\nfrequency_collision_events={}\nfrequency_collision_subcells={}\nfrequency_line_cells={}\nfrequency_turning_rays={}\nfrequency_min_drift={}\nfrequency_max_drift={}\nfrequency_number_collision_defect={:.17e}\nfrequency_material_energy_preprojection_defect={:.17e}\nfrequency_material_energy_projection_defect={:.17e}\nfrequency_line_number_defect={:.17e}\nfrequency_number_continuity_trapezoid_defect={:.17e}\nfrequency_normal_energy_balance_defect={:.17e}\nfrequency_b4_relative_gap={gap}\nfrequency_wall_s={seconds:.9}",
+            nt,np,g.bins(),g.edges()[0],g.edges().last().unwrap(),s.collision_events,s.collision_subcells,s.line_cells,s.turning_rays,optional(s.min_drift),optional(s.max_drift),s.max_number_defect,s.max_material_energy_defect,s.max_projection_energy_defect,s.max_line_number_defect,s.number_continuity_defect(&sol.records)?,s.normal_energy_balance_defect())?;
+    }
+    if let Some((g, FrequencyOutput::Dual(s), _, owner, nt, np, seconds)) = &frequency_result {
+        let last = s.history.last().ok_or("empty dual frequency history")?;
+        let e = sol
+            .history
+            .last()
+            .ok_or("empty bolometric history")?
+            .radiation
+            .energy;
+        let gap = if *owner == "none" {
+            format!(
+                "{:.17e}",
+                (last.energy_centered * (-4. * last.eta).exp() * 4. * std::f64::consts::PI / e
+                    - 1.)
+                    .abs()
+            )
+        } else {
+            "not_applicable_prescribed_line".into()
+        };
+        let optional = |v: Option<f64>| {
+            v.map(|v| format!("{v:.17e}"))
+                .unwrap_or_else(|| "not_applicable".into())
+        };
+        let a = &s.stats;
+        writeln!(
+            f,
+            "frequency_numerical_second_energy_moment={:.17e}",
+            a.numerical_second_energy_moment
+        )?;
+        writeln!(f,"frequency_method=dual\nfrequency_scope=positive_nodal_number_energy_measure_cold_Thomson_prescribed_true_line_no_feedback\nfrequency_grid={}x{}x{}\nfrequency_nodes_per_ray={}\nfrequency_log_range={:.17e},{:.17e}\nfrequency_line_owner={owner}\nfrequency_collision_events={}\nfrequency_collision_subcells={}\nfrequency_line_cells={}\nfrequency_turning_rays={}\nfrequency_min_drift={}\nfrequency_max_drift={}\nfrequency_number_collision_defect={:.17e}\nfrequency_material_energy_preprojection_defect={:.17e}\nfrequency_material_energy_projection_defect={:.17e}\nfrequency_line_number_defect={:.17e}\nfrequency_number_continuity_trapezoid_defect={:.17e}\nfrequency_normal_energy_balance_defect={:.17e}\nfrequency_max_fv_stage_residual={:.17e}\nfrequency_max_fv_stage_iterations={}\nfrequency_b4_relative_gap={gap}\nfrequency_wall_s={seconds:.9}\nfrequency_redistribution_scope=prescribed_dilute_angle_coherent_Wien_reversible_model_not_calibrated_atomic\nfrequency_redistribution_cells={}\nfrequency_redistribution_number_defect={:.17e}\nfrequency_redistribution_energy_defect={:.17e}\nfrequency_pair_balance_defect={:.17e}",
+            nt,np,g.bins(),g.edges().len(),g.edges()[0],g.edges().last().unwrap(),a.collision_events,a.collision_subcells,a.line_cells,a.turning_rays,optional(a.min_drift),optional(a.max_drift),a.max_number_defect,a.max_material_energy_defect,a.max_projection_energy_defect,a.max_line_number_defect,s.number_continuity_defect(&sol.records)?,s.normal_energy_balance_defect(),a.max_fv_stage_residual,a.max_fv_stage_iterations,a.redistribution_cells,a.max_redistribution_number_defect,a.max_redistribution_energy_defect,a.max_pair_balance_defect)?;
+    }
+    writeln!(f,"basis=outward sky opposite photon propagation, HEALPix spin convention\nT=I^(1/4)/angular_mean(I^(1/4))-1\nQ,U=bolometric Stokes/(4 angular_mean(I))\nC_lm=a_lm^X conjugate(a_lm^Y)\ndiagnostics_flux=normal-frame photon propagation\nargv={:?}",env::args().skip(1).collect::<Vec<_>>())?;
+    f.flush()?;
+    Ok(())
+}
+fn main() {
+    if env::args().any(|s| s == "--help" || s == "-h") {
+        println!("{HELP}");
+        return;
+    }
+    if let Err(e) = run() {
+        eprintln!("{e}");
+        std::process::exit(1);
+    }
+}

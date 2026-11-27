@@ -1,0 +1,25 @@
+{
+  "initial": {
+    "code": "ClearAll[\"Global`*\"];\ns=A^2+2 A e; qs=s/4-M^2; E0=(A+e)/2; b2=e^2 qs/s;\ng=(A+e)/Sqrt[s]; beta=e/(A+e);\nep=E0+Sqrt[b2] mu;\nqz=e/2+g Sqrt[qs] mu; qt2=qs(1-mu^2);\nmassShell=FullSimplify[ep^2-qz^2-qt2-M^2,Assumptions->{A>0,e>0,M>0,qs>0,-1<=mu<=1}];\nClear[r,x,Nn];\nremainder=FullSimplify[1/(1-r x)-(1+r x+r^2 x^2+r^3 x^3)-r^4 x^4/(1-r x)];\nwidth=FullSimplify[(2 E0-D (S+v))-(2 E0-D (S+v/(1-r)))-D v r/(1-r)];\nc={a0,a1-a0,a2-a1,-a2};\nZ=4 a0/3+4 a1/15+4 a2/35;\nq=(1-mu^2)(a0+a1 mu^2+a2 mu^4)/Z;\nnumber=Together[Integrate[2q,{mu,-1,1}]-2];\nodd=Integrate[2mu q,{mu,-1,1}];\nmoment=FullSimplify[Integrate[mu^2 q,{mu,-1,1}]/. {a0->1411/10000,a1->-1/4,a2->33/25}];\n{massShell,remainder,width,number,odd,moment,moment-24377/71485}",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Symbol::undefined2: Warning: Global symbols \"A, A, M, E0, A, A, A, E0, M, A, M, Nn, E0, S, E0, S, Z, Z\" are undefined.\nGeneral::messages: Messages were generated which may indicate errors.\n\nOut[1]= {(e*(A + e)*(-Sqrt[A*(A + 2*e)*(A^2 + 2*A*e - 4*M^2)] + 2*e*Sqrt[A*(A - (4*M^2)/(A + 2*e))] + Sqrt[A^3*(A - (4*M^2)/(A + 2*e))])*mu)/(2*A*(A + 2*e)), 0, 0, 0, 0, 24377/71485, 0}"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  },
+  "corrected": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= {0, 0, 0}"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

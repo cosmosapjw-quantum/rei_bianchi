@@ -1,0 +1,9 @@
+# S08 — 저장값 plot과 자원 판정
+
+새 validation 한 번에서 만든SAVED_PLOT_DATA.json만 읽어SVG와PNG를 한 번 생성했다. 과학 함수 호출0, 입력SHA256은73a2f33e651ec87890a48e8a4f10ff4a5362efce30555409718ff3d99d19e7ae다. source pin은LocalS07 cc84f0816ba640c97ef05348d8a7fb5c2893b833다.
+
+실제 whole-process CPU7.040661s가6s를 초과했다. Wall7.286283305002144s는15s이하이나최종plot gate는FAIL_CPU_CAP_EXCEEDED다. child는exit0으로두그림을만들었고상위budget판정은exit1이다. 원receipt와실패를보존하며재실행·예산증가·다른예산의이전은없다. Outer bookkeeping CPU0.035214637s는별도로보고한다.
+
+Root는이미생성된PNG를열어네패널의가독성과범위를확인했다. 독립Decimal80방향곡선,제조밀도에서의Y와hit,default/manual실제width비교,shared-event pairenergy/Y=G가보인다. 이는그림과저장값의일치확인이며CPU한도PASS로바꾸는근거가아니다. SVG는source에보존하고원PNG는S08backup의external_evidence및최종전달에포함한다.
+
+동일한validation실행에서얻은14개timing은관측값으로그대로보존한다. 짧은test의CPU0은계측해상도이며zero-cost나speedup주장을하지않는다. 새localnode는partial_scoped,전체8complete+1partial+3physicalopen/12다. 중앙28/88,HEdelta0이며이론·구현PASS와workflowPARTIAL을분리한다.

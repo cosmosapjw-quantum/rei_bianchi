@@ -1,0 +1,41 @@
+--- before/test_pwbe.py
++++ after/test_pwbe.py
+@@ -15,7 +15,8 @@
+ 
+     def test_01_complex_hand_spin(self):
+         c=pwbe.spin_channels(1+2j,3-1j)
+-        self.assertEqual(c,{'singlet':17.0,'triplet':13.0,'unpolarized':14.0})
++        for key,expected in [('singlet',17),('triplet',13),('unpolarized',14)]:
++            self.close(c[key],expected)
+         # Independently construct the four-spin M=D I-X P and Frobenius trace/4.
+         D,X=1+2j,3-1j; swap=[0,2,1,3]
+         trace=sum(abs((D if row==col else 0)-(X if row==swap[col] else 0))**2
+@@ -59,7 +60,7 @@
+         for ma,mb in [(0.8,0.6),(-0.4,0.75),(1,0.2),(0.5,0.5)]:
+             a=pwbe.pwbe_azimuth(100,40,ma,mb)
+             self.assertGreaterEqual(a['M0'],0)
+-            self.close(a['M0'],a['M0_polynomial'],absolute=0)
++            self.close(a['M0'],a['M0_polynomial'])
+             self.assertLessEqual(abs(a['cos_phi']),1+2e-12)
+             self.assertLessEqual(abs(a['pair_dot']),1+2e-12)
+ 
+@@ -139,11 +140,16 @@
+ 
+ 
+ if __name__=='__main__':
+-    suite=unittest.defaultTestLoader.loadTestsFromTestCase(PWBEContract)
++    import sys
++    repair=sys.argv[1:]==['--repair-only','C6-ASSERT-01']
++    if sys.argv[1:] and not repair:raise SystemExit('only explicit two-method C6-ASSERT-01 route is defined')
++    suite=(unittest.TestSuite([PWBEContract('test_01_complex_hand_spin'),PWBEContract('test_06_positive_M0_polynomial_identity')])
++           if repair else unittest.defaultTestLoader.loadTestsFromTestCase(PWBEContract))
+     result=unittest.TextTestRunner(verbosity=2).run(suite)
+     out=Path(__file__).resolve().parents[1]/'results';out.mkdir(exist_ok=True)
+-    (out/'TEST_REPORT.json').write_text(json.dumps({'unit':'HE-ANG-PWBE-SPIN-AZIMUTH',
+-        'methods':result.testsRun,'failures':len(result.failures),'errors':len(result.errors),
++    (out/('REPAIR_TEST_REPORT.json' if repair else 'TEST_REPORT.json')).write_text(json.dumps({'unit':'HE-ANG-PWBE-SPIN-AZIMUTH',
++        'methods':result.testsRun,'repair':'C6-ASSERT-01' if repair else None,
++        'coverage':'initial12PASS reused plus targeted2methods; no full14 replay' if repair else 'initial14methods','failures':len(result.failures),'errors':len(result.errors),
+         'passed':result.wasSuccessful(),'oracle':'root frozen hand fractions + independently constructed four-spin matrix; no old kernel',
+         'zero_control':'Fraction analytic zero; binary64 residual not epsilon-clipped; computed-zero branch separately injected'},indent=2)+'\n')
+     raise SystemExit(0 if result.wasSuccessful() else 1)

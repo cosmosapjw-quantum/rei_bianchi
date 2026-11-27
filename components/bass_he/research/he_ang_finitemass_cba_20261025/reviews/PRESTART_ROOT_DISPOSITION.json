@@ -1,0 +1,36 @@
+{
+  "unit_id": "HE-ANG-FINITEMASS-CBA",
+  "authority": "root Astra",
+  "stage": "C9 static findings before first scientific START",
+  "findings": [
+    {
+      "id": "C9-STATIC-01",
+      "observation": "Using parent cba._direction on finite components (1.7e308,1.7e308,0) can normalize by an infinite norm and produce a zero vector.",
+      "impact": "A direction can leave the required on-shell Jacobi channel.",
+      "action": "Use unchanged parent shell.normalize_direction in the new wrapper; reject nonfinite/unrepresentable norm. Add targeted nq/nk assertions."
+    },
+    {
+      "id": "C9-STATIC-02",
+      "observation": "lab_tdcs originally checked Delta0 only after no-positive-root early return.",
+      "impact": "The explicitly excluded Delta0 cross-section input could return zero density instead of rejection.",
+      "action": "Check Delta0 immediately after the p_A=0 endpoint rule and before solver/early exits. Add targeted assertion."
+    }
+  ],
+  "unchanged": [
+    "Hamiltonian and derivation",
+    "parent modules",
+    "tolerances and resource caps",
+    "physical claim gates"
+  ],
+  "scientific_START_before_changes": 0,
+  "scientific_repair_reserve_used": 0,
+  "finite_mass_surrogate_acceptance": {
+    "test": "test_14_infinite_mass_link",
+    "inputs": {"E0": 3, "Er": 0.2, "M": 1000000000000, "n_q": [0.1, 0, 1], "n_k": [0.4, 0, 1]},
+    "comparison": "parent100 fixed-centre TDCS at the same specified energy and directions",
+    "criterion": "abs(finite-parent)/max(1,abs(parent)) < 1e-10",
+    "status": "ADOPTED before first START",
+    "meaning": "Finite-M approximation difference, including a real finite-mass model correction; separate from binary64 evaluation error tolerance2e-12. No uniform-in-angle or exact-limit numerical claim. The exact limiting derivation remains R6/R7."
+  },
+  "independent_final_C9": "PENDING actual outputs and verification"
+}

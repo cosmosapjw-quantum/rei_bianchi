@@ -1,0 +1,28 @@
+Module[{aa,mm,dd,hh,v,w,dirResidual,wResidual,intervalA,intervalD,intervalM,
+ detBounds,vBounds,wBounds,axisConcave,indefinite,oppositeDirections},
+ hh={{aa,mm},{mm,dd}};v={1,-1/24};w={1,0};
+ dirResidual=Expand[v.hh.v-(aa-mm/12+dd/576)];
+ wResidual=Expand[w.hh.w-aa];
+ intervalA={-4510292217171/10^26,-3084478303660/10^26};
+ intervalD={-4912098573204/10^23,-4450662359403/10^23};
+ intervalM={-2668505746423/10^24,-2118796636045/10^24};
+ detBounds={intervalA[[2]]*intervalD[[2]]-intervalM[[1]]^2,
+ intervalA[[1]]*intervalD[[1]]-intervalM[[2]]^2};
+ vBounds={intervalA[[1]]-intervalM[[2]]/12+intervalD[[1]]/576,
+ intervalA[[2]]-intervalM[[1]]/12+intervalD[[2]]/576};
+ wBounds=intervalA;
+ axisConcave=intervalA[[2]]<0&&intervalD[[2]]<0;
+ indefinite=detBounds[[2]]<0;
+ oppositeDirections=vBounds[[1]]>0&&wBounds[[2]]<0;
+ <|"Status"->If[dirResidual===0&&wResidual===0&&axisConcave&&indefinite&&oppositeDirections,"Completed","Unresolved"],
+ "WolframVersion"->$Version,
+ "Direction"->v,"OppositeSignDirection"->w,
+ "GenericDirectionResidual"->dirResidual,"GenericAxisResidual"->wResidual,
+ "InputIntervalsExact"-><|"Fll"->intervalA,"Fbb"->intervalD,"Flb"->intervalM|>,
+ "DeterminantBoundsExact_K2"->detBounds,"DeterminantBoundsDecimal_K2"->N[detBounds,20],
+ "PositiveDirectionCurvatureBoundsExact_K"->vBounds,"PositiveDirectionCurvatureBoundsDecimal_K"->N[vBounds,20],
+ "NegativeAxisCurvatureBoundsExact_K"->wBounds,"NegativeAxisCurvatureBoundsDecimal_K"->N[wBounds,20],
+ "BothCoordinateAxesStrictlyConcave"->axisConcave,"HessianStrictlyIndefinite"->indefinite,
+ "OppositeSignedDirectionsUniformlyResolved"->oppositeDirections,
+ "Scope"->"Exact rational interval arithmetic conditional on the three explicitly supplied decimal curvature enclosures. Dimensionless parameters give directional curvatures in K and determinant in K^2. No physical source, inverse or root is evaluated."|>
+]

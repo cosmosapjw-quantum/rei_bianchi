@@ -1,0 +1,36 @@
+{
+  "schema": "bass-he.interactive-repo-sync.v1",
+  "requested": "2026-10-04",
+  "mode": "LIVE_READ_AT_EACH_RESEARCH_LOOP_AND_PUBLICATION_BOUNDARY",
+  "background_daemon": false,
+  "scope_repositories": [
+    {
+      "repo": "cosmosapjw-quantum/BASS_HE",
+      "branch": "research/shared-c64-crossrepo-20260928",
+      "permission": "authorized additive research publication"
+    },
+    {
+      "repo": "cosmosapjw-quantum/rei_bianchi",
+      "branch": "forward/rust-reion-kernels-20260922",
+      "permission": "read-only from this BASS_HE loop"
+    }
+  ],
+  "start": [
+    "Read actual branch refs; compare last observed commit to current",
+    "Read only changed scientific dependencies, owner contracts and relevant instructions",
+    "Pin immutable commit/path/blob/hash before deriving or running; skip unchanged suites"
+  ],
+  "before_publication": [
+    "Re-read both heads",
+    "If supplier advanced, compare changed paths and reconcile actual overlap; base new tree on current head, never reset or force",
+    "If consumer dependency changed, do not mark older binding current; inspect changed dependency once before final publication"
+  ],
+  "after_publication": [
+    "Confirm branch ref and tree/blob identity against intended changed files",
+    "Record input pins separately from resulting publication commit",
+    "End validation once selected identity tier closes; no automatic re-download"
+  ],
+  "no_change_rule": "No new atomic calculation or wrapper merely because the user asks to continue; report waiting state when no dependency trigger changed",
+  "source_policy": "No auto source ranking, clamp, null-to-zero, RCT opt-in or closure choice",
+  "remote_changes_are_not_scientific_approval": true
+}

@@ -1,0 +1,11 @@
+--- evidence/execution/A1_before/pre_A3_test_literal_a2.py	2026-10-24 06:45:09.860088413 +0900
++++ tests/test_literal_a2.py	2026-10-24 06:45:11.775221503 +0900
+@@ -43,7 +43,7 @@
+     def test_schema_integer_finite_and_word_boundary_gates(self):
+         row = 'INSERT INTO tmat VALUES(1,0,0,1,0,0,0,0,0.65,0,1,2)'
+         self.assertEqual(self.catalogue(row)['status'], 'SOURCE_INPUT_PENDING')
+-        for bad in [row.replace('(1,0,0,', '(1.0,0,0,'), row.replace('0.65', '1e309'), row.replace(',1,2)', ',1)'), row.replace('VALUES', '(ni,mi,li,nf,lf,mf,L,S,Ei,ell,Re_T_ell,Im_T_ell) VALUES'), 'INSERTfoo VALUES(1)', row+';'+row, row.replace('VALUES(', 'VALUES(\n')]:
++        for bad in [row.replace('(1,0,0,', '(1.0,0,0,'), row.replace('0.65', '1e309'), row.replace(',1,2)', ',1)'), row.replace('VALUES', '(ni,mi,li,nf,lf,mf,L,S,Ei,ell,Re_T_ell,Im_T_ell) VALUES'), 'INSERTfoo VALUES(1)', 'INSERT(foo)', 'INSERT;', 'INSERT/*x*/INTO tmat VALUES(1)', row+';'+row, row.replace('VALUES(', 'VALUES(\n')]:
+             with self.assertRaises(ValueError): self.catalogue(bad)
+ 
+ 

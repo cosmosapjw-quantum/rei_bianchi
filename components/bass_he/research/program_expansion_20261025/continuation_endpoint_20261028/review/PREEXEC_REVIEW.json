@@ -1,0 +1,150 @@
+{
+  "schema": "ENDPOINT14_NONAUTHOR_PREEXEC_REVIEW_V1",
+  "unit": "HE-EXP-ENDPOINT-14",
+  "reviewer": "/root/repo_delta14",
+  "decision": "PASS_SCOPED_PREEXEC",
+  "review_scope": "Static read-only scientific implementation and contract review. No current campaign, tests, CAS, plot, or scientific imports executed by the reviewer. This admits the prescribed pinned execution, not its future scientific claims.",
+  "independence": {
+    "current_theory_author": false,
+    "current_implementation_author": false,
+    "source_intake_author": true,
+    "parent_context_inherited": true,
+    "blind_review_claim": false,
+    "requested_tier": "inherited_Astra",
+    "runtime_model_id": null,
+    "producer_and_reader_same_lower_tier_author": true,
+    "independent_reader_claim": "Separate producer-free code path; independent scientific judgment is this nonauthor review."
+  },
+  "identities": {
+    "contract_sha256": "f55b5030c8e060f7cf88ae915832133f74361765d83d73d6649663d94a616f1a",
+    "theory_sha256": "9001eeabac3271076bab8dd097ce7cba7f5c55fa040a0961b5bd6a3a5e44088e",
+    "implementation_doc_sha256": "d8639d7e715f319cf3f4c51a051ad4e1dbf143de23e8ce057d6448f71810de5d",
+    "execution_plan_sha256": "49270f823680da8c5626db4f8124be0e289be2c7864034fa2194cdbac737a10d",
+    "official_source_sha256": "b2c1c52931e813dd63fb0e98edfc90088bc2eca497fd9142277e748f0935a82f",
+    "saved_quartic_input_sha256": "a8fbe269d3941706a510796963f059d7404f3f4655a6a3163042e85011aa0d45",
+    "reviewed_python_sha256": {
+      "src/endpoint14.py": "ffafae3414616b706329cd39b4676cb000d66c796447a75c9c397000aadb8496",
+      "src/verify_certificate.py": "a773084effed96fff74a50901a22bb8703a9002f347f4ce5cf87ef57a2566ecc",
+      "scripts/campaign.py": "2d0bd0644587b41d54de0ef1af53b13287dd43843f6b0c4f18f21e684dd401ef",
+      "scripts/plot_saved.py": "cc250b63cdaa9cc80b8140b12f8646e35f76b48dde1870bdf9b9efe0087a18ed",
+      "scripts/run_once.py": "5abdfd0bd1136a8adc3b8fede30434e399d864c663f92ebe2eaf16bf421e3571",
+      "tests/test_endpoint14.py": "57a84b1abf0eb36af1fd617018bf4148f5f3597da5272878e22e0cf746d71c9c"
+    },
+    "static_syntax_record": "Read six SYNTAX_PASS entries and matched their hashes; syntax compilation was performed by implementer, not rerun by reviewer."
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocking_before_correction",
+      "subject": "Missing actual saved-mu containment control for the denominator-floor proof",
+      "location": "src/endpoint14.py:containing_control; src/verify_certificate.py:verify",
+      "original_issue": "The proof requires the full interval around the true 87-degree nominal mu to stay within [-1,1]. The original implementation did not save or check this necessary control.",
+      "authorization": "Root authorized one targeted preexecution correction by the lower-tier implementer.",
+      "status": "CLOSED_STATIC_DELTA_PASS",
+      "actual_correction": "Producer retains saved mu, constructs delta=(7/50)/(36B), asserts [mu_lo-delta,mu_hi+delta] subset [-1,1], and saves Lstar, 18B, delta, expanded interval and Dmin. The reader reconstructs every field directly from immutable old rows, checks containment, compares the complete field set and values, and independently verifies the coefficient-box separation conditions.",
+      "science_repair_allowance_consumed": false
+    },
+    {
+      "id": "F2",
+      "severity": "nonblocking_documentation",
+      "subject": "Derivative-sign wording in a test comment",
+      "location": "tests/test_endpoint14.py:identities comment immediately before the weighted endpoint checks",
+      "status": "CLOSED_COMMENT_ONLY_DELTA_PASS",
+      "observation": "The comment says 2*t^(2j)-2*t^(2j+2). The tail moment G_j used by the code has derivative -2*t^(2j)+2*t^(2j+2). The implementation, contract and THEORY use the correct decreasing tail-moment formula; this comment does not affect an executed assertion or scientific result.",
+      "recommended_correction": "Clarify the comment to use the tail-moment derivative sign. No extra science run or optional review cycle is warranted.",
+      "actual_correction": "Root-authorized lower-tier comment correction is present: -2*t^(2j)+2*t^(2j+2). Read the changed line and actual file hash; no test or science execution was performed.",
+      "hash_delta": {
+        "path": "tests/test_endpoint14.py",
+        "previous_sha256": "d18e4e79ed987b9c11a13b2a1a22a6bb1f974d520be6d0878beeb86d825eb516",
+        "current_sha256": "57a84b1abf0eb36af1fd617018bf4148f5f3597da5272878e22e0cf746d71c9c",
+        "scope": "One derivative-sign comment; other five Python source hashes unchanged. Existing S02 review snapshot remains historical; S03 carries this closure."
+      },
+      "science_repair_allowance_consumed": false
+    }
+  ],
+  "checks": [
+    {
+      "id": "P1",
+      "status": "PASS_STATIC",
+      "subject": "Scientific model, basis and fixed scope",
+      "evidence": "Endpoint factorization, D=(4/3,4/15,4/35), Dmin=49/14400000, B=160, exact quadratic minimum and the fixed candidate match the contract. Only N=1,4,16 are used. New THEORY supports full-family box, floor, geometry topology and vertex bounds."
+    },
+    {
+      "id": "P2",
+      "status": "PASS_STATIC",
+      "subject": "Changed input and moment construction",
+      "evidence": "Official and saved immutable hashes are required. All three positive basis intervals contribute to the signed-coefficient row epsilon. Saved zeroth monomial bounds invert into a threshold interval; decreasing weighted tails produce the new moment bounds. K<0 and old-moment overlap/equality are explicit controls. No inherited science module or geometry/trigonometric search is imported."
+    },
+    {
+      "id": "P3",
+      "status": "PASS_STATIC",
+      "subject": "Exhaustive exact vertex producer",
+      "evidence": "Every triple of complete deduplicated constraints is attempted; exact determinant/Cramer arithmetic rejects singular systems, checks every inequality and deduplicates exact vertices. Active independent triples and exhausted counts are preserved. The containing box makes the bounded-polytope completeness argument applicable."
+    },
+    {
+      "id": "P4",
+      "status": "PASS_STATIC",
+      "subject": "Feasible witness and extremum bounds",
+      "evidence": "Fixed candidate and inner vertices receive exact minimum, data, box and floor checks. Signed moment enclosure divided by positive D is correct. Outer concave/convex numerator bounds and feasible inner/candidate witnesses produce the prescribed extremum brackets. Outward decimal rounding uses exact floor/ceiling. FULL has exact unity moments."
+    },
+    {
+      "id": "P5",
+      "status": "PASS_STATIC",
+      "subject": "Independent certificate reader",
+      "evidence": "Reader imports no producer and performs no second basis enumeration. It independently reconstructs rows, moments, constraints and the new denominator-floor control, checks all recorded vertex constraints/active witnesses/minima, recalculates extrema and decimals, and verifies nesting, candidate, input binding, prior comparison and saved curve values. Enumeration completeness also rests on the inspected exhaustive producer loop, not on a vertex list alone."
+    },
+    {
+      "id": "P6",
+      "status": "PASS_STATIC",
+      "subject": "Manufactured and actual affected controls",
+      "evidence": "Eight test groups cover factorization/normalization, positive and negative quadratic examples, all coefficient signs in the interval row, exact tail values, cube/simplex enumeration and singular rejection, signed ratios/outward display, actual six certificates and four corruption cases. The actual independent reader is called once directly and again by the actual-certificate test; this is recorded as repeated reading, not a second scientific construction."
+    },
+    {
+      "id": "P7",
+      "status": "PASS_STATIC",
+      "subject": "Mandatory actual execution pin",
+      "evidence": "Before input loading or construction the campaign requires POSTPUBLICATION_EXECUTION_PIN, correct unit/repository, actual source commit/tree syntax, nonempty branch, all listed code/input SHA256 matches, every own Python source plus CONTRACT, and both actual inputs. The pin is saved into output with its hash. Actual S05 publication/readback and pin assembly remain controller actions."
+    },
+    {
+      "id": "P8",
+      "status": "PASS_STATIC",
+      "subject": "Failure preservation and exactly one construction",
+      "evidence": "Candidate outcome is written before the sole actual construct call. Primary results precede reader/test reporting. Exceptions preserve failure text and FINISH. No automatic retry, mesh expansion, candidate fitting or predecessor campaign execution is present."
+    },
+    {
+      "id": "P9",
+      "status": "PASS_STATIC",
+      "subject": "Resource accounting and inherited runner",
+      "evidence": "The runner is byte-identical to the repaired namespace-aware T13 runner. Child host/local PID and PGID handshake, namespace mapping, group monitoring, caps and failure handling are retained. Final CPU is runner self plus waited children relative to the start, with wall, RSS and exit details. Validation cap is CPU120s/wall300s; plot cap CPU10s/wall30s; AS768MiB and thread1. No old diagnostic rerun is required."
+    },
+    {
+      "id": "P10",
+      "status": "PASS_STATIC",
+      "subject": "Saved-only plot semantics",
+      "evidence": "Plotter reads only saved curve/window/bracket data, converts exact serialized values for display and renders ordinary-scale PNG/SVG. It imports no producer or scientific geometry and performs no new model computation. It records saved/output hashes and render count. Actual rendering and image QA remain later actions."
+    }
+  ],
+  "blocking_findings": 0,
+  "nonblocking_open_findings": 0,
+  "closed_findings": 2,
+  "stopping_rule": "Static review is complete; F1 and F2 are closed. Do not broaden this review or rerun completed predecessor evidence. The comment-only F2 correction was recorded as a hash delta without repeating the scientific review.",
+  "next_transition": "PASS -> publish/read back actual S05 source, prepare the mandatory immutable execution pin, then controller GO to the lower-tier executor for the single bounded validation campaign. Admission of actual results remains pending nonauthor result review.",
+  "scientific_admission": "PENDING_ACTUAL_EXECUTION_AND_RESULT_REVIEW",
+  "execution_observations": {
+    "reviewer_science_executions": 0,
+    "reviewer_tests_executed": 0,
+    "reviewer_scientific_imports": 0,
+    "reviewer_geometry_calls": 0,
+    "reviewer_optimizer_calls": 0,
+    "reviewer_CAS_calls": 0,
+    "reviewer_plot_calls": 0,
+    "remote_mutations": 0,
+    "local_writes": "Only review artifacts"
+  },
+  "resource_measurements": {
+    "CPU_s": null,
+    "wall_s": null,
+    "scope": "Review/read/metadata-hash costs not measured; zero science execution does not mean zero review cost."
+  }
+}
+

@@ -1,0 +1,50 @@
+{
+  "schema": "he29.optimized.python.independent-readonly-review.v1",
+  "reviewer_role": "backup_intake; independent reader, not implementation author",
+  "closed_utc": "2026-10-20T03:15:22.521698+00:00",
+  "scope": "Two new Python modules, original Model.jac/geometry/rates, inherited one-sided source masks and bounded callbacks; corresponding changed tests and Rust packed boundary read for consistency.",
+  "decision": "PASS_SCOPED_STATIC_REVIEW",
+  "confirmed_actionable_defects": [],
+  "blocking_findings": 0,
+  "reviewed_sources": {
+    "optimization_20261020/src/optimized_model.py": "5cecbb265563a175181b34d6c8fdebd5b3775240bf0ace24a86c8e41f6d8fb81",
+    "optimization_20261020/src/packed_reference.py": "dbc532614502059694ef2bb09b905fb322c5ae5151d98fbf4b4c73f8ff52db7d",
+    "optimization_20261020/tests/test_optimized_model.py": "20fffbeae1a3f4a060f34ab925c2e0d42f641a88088b19508458861aef19191a",
+    "optimization_20261020/rust_bridge/tests/smoke_wrapper.py": "0e4434b4985e57b72352f35260ac246aeb6bcdba0aa6cb6a42d21a339845d732",
+    "optimization_20261020/rust_bridge/src/packed.rs": "dc4280e3ffdf095fc3d79a79934759b8f8982517c40e86130671c216788fdea1",
+    "vigilode_20261019/src/vigilode_callbacks.py": "946780ed1f9f42c681ea84e6638763ca3ac4b7fc9551ca160dd1d9e58ed15bac"
+  },
+  "confirmed": [
+    "Packed gas[n,4] and photon[12,K] map to original gas rows, photon diagonal, and ledgers2..7/10; zero pruning and row/column ordering match the original LIL-to-CSR structure.",
+    "Gas finite-difference step, admissibility direction flip, five RHS evaluations, thermal np.dot, and three-component photon loss summation retain the original operation paths.",
+    "Geometry and sigma caches use exact t.hex, interval epoch, q, and grid object identity; all set_interval calls invalidate before and after the parent one-sided-mask update.",
+    "Caches are disabled during original source-table construction; no native owner point-evaluation result is cached.",
+    "Packed payload owns contiguous copies and rejects wrong shape or nonfinite coefficients; native side rejects partial/unwritten or nonfinite preparation payload.",
+    "Physical and scaled callbacks reuse bounded represented-time rules and retain all19 ledgers and the original tolerances.",
+    "ABI2 callback signatures and pointer lengths agree with Rust; Python callback exceptions are contained, first failure is preserved, and failed or malformed-telemetry endpoints are rejected.",
+    "Bridge checks library digest and exact five bridge-source path digests before loading, then requires ABI2.",
+    "Successful Rust-packed admission verifies requested thread count, packed mode, zero foreign JVP calls, and per-segment preparation count equality; deltas are distinct from lifetime counters."
+  ],
+  "nonblocking_scope_notes": [
+    {
+      "topic": "frozen model lifetime",
+      "note": "Cache correctness assumes the advertised fixed model during a solve. Direct replacement/mutation of private _clock, t_end, or masks is not part of the supported contract; no such mutation exists in the reviewed solve path."
+    },
+    {
+      "topic": "legacy telemetry symmetry",
+      "note": "The python_csr branch calls the verified legacy function directly, but its acceptance predicate does not additionally assert telemetry jvp_mode=legacy-foreign-per-vector and threads=1. No wrong-mode execution path was found; adding these assertions would only tighten comparison provenance."
+    },
+    {
+      "topic": "test scope",
+      "note": "The Python model regression class uses a manufactured owner and tabulate=False; wrapper smoke covers an analytical case. These changed-path checks do not establish actual tabulated HE29 transport or any of the four Radau/DOP853 reference results."
+    }
+  ],
+  "executed_tests": 0,
+  "executed_scientific_runs": 0,
+  "code_modified": false,
+  "manifest_repair_review_repeated": false,
+  "limitations": [
+    "Static review only; existing recorded test outputs were not reproduced.",
+    "No claim of end-to-end native speedup, new physical validity, or continuous-spectrum error bound."
+  ]
+}

@@ -1,0 +1,764 @@
+{
+  "schema": "he34_scr.prospective_physics_dependencies.v1",
+  "workflow_version": "1.0.0",
+  "approval_version": "0.2",
+  "unit_id": "HE34-SCR",
+  "document_role": "Prospective B1-B5 dependency design; does not mark those nodes complete or execute them",
+  "status": "PLANNED_DEPENDENCIES_NOT_EXECUTED",
+  "created_utc": "2026-10-22T17:48:56.254707+00:00",
+  "original_goal": "Connect calibrated primordial species/reaction/thermal evolution and baryonic pressure tensor to consistent metric stress-energy feedback; preserve gaps beyond the admitted inventory/processes",
+  "current_scope": "HE32 completed8-nuclide/21-state prescribed-UV photo+caseA RR fixed-T gas-pi_b=0 pilot; HE33 prescribed-rate mechanics; HE34-SCR constant-chi reduction plus separate H1/He4 neutral viscosity diagnostic",
+  "namespace_separation": {
+    "current": "HE34-SCR: research/he34_sandbox_certified_relaxation_20261022",
+    "parallel_PR87": "HE34 Lorentz: research/he34_lorentz_transport_20261022",
+    "parallel_pin": "0868889acebeb4d9b70d38313a9a694d12bf8766",
+    "donor_workflow_is_not_imported": true
+  },
+  "stress_ownership": {
+    "existing_matter": "collisionless nonbaryonic massive component, f_m=0.1",
+    "gas": "separate baryonic pi_b=q_b D; HE32 set pi_b=0 explicitly",
+    "non_tilt_implies_isotropy": false,
+    "signed_sum": "q_m+q_gamma+q_nu+q_b before Frobenius normalization/norm",
+    "baryon_scaled_stress": "P_b=(8*pi*G/c^2)*sqrt(6)*q_b/H^2"
+  },
+  "rate_definitions": {
+    "prescribed_mechanical_nu_pi": {
+      "definition": "C2_STF=-nu_pi*pi supplied as a model input",
+      "current_SCR_contract": "constant chi=nu_pi/H, Q=j=0",
+      "calibration_claim": false
+    },
+    "lorentz_grad": {
+      "definition": "n_t*v_T/Gamma(7/2)*integral_0^inf x^3 exp(-x) sigma2(v_T sqrt(x)) dx",
+      "meaning": "instantaneous initial Grad pressure projection",
+      "domain_model": "stationary infinite-mass target, Maxwellian projectile reference, small STF perturbation",
+      "exact_single_exponential_generally": false,
+      "evidence_ref": "evidence/PARALLEL_LORENTZ_DELTA.json"
+    },
+    "neutral_viscosity_match": {
+      "definition": "p_neutral/eta_neutral",
+      "meaning": "low-frequency first-Sonine neutral viscosity matching",
+      "species": [
+        "H1_q0",
+        "He4_q0"
+      ],
+      "physical_transient_eigenvalue_claim": false,
+      "used_as_current_mechanical_chi": false,
+      "evidence_ref": "results/NEUTRAL_TRANSPORT.json"
+    },
+    "prohibited_implicit_substitutions": [
+      "reaction number-rate as tensor relaxation",
+      "event cross section or l1 momentum-transfer as l2",
+      "sigma2(v) as Maxwellian Qbar(T) without normalization/mass adapter",
+      "Grad initial projection as exact finite-time closure",
+      "neutral p/eta as full mixture nu_pi"
+    ]
+  },
+  "existing_evidence_nodes": [
+    {
+      "id": "E_HE32",
+      "status": "COMPLETE_SCOPED_REUSE",
+      "pin": "16a424b7290f484c57e97c8ed74f81e6d2043782",
+      "scope": "8 nuclides/21 charge states, prescribed UV, fixed20000K, photo+caseA RR, gas pi_b=0; retained nonbaryonic massive/photon/neutrino sectors",
+      "new_replay_required": false
+    },
+    {
+      "id": "E_HE33",
+      "status": "COMPLETE_MECHANICAL_SUBPROBLEM_REUSE",
+      "pin": "bb1259b21c7b83b0376a5f7fcbb0c6321918ec90",
+      "science_pin": "1d7dab57becc5829f0282b88a7516360ccad718a",
+      "scope": "Pressure/thermal-ledger definitions; prescribed-rate Q=j=0 operator; no calibrated mixture closure",
+      "node_smoke": "evidence/HE33_NODE_SMOKE.json: actual17/17, historical environment gap closed",
+      "new_replay_required": false
+    },
+    {
+      "id": "E_SCR_MECHANICS",
+      "status": "SCOPED_METHOD_ARTIFACTS_AVAILABLE",
+      "scope": "Prescribed constant chi, Q=j=0, declared piecewise-linear S=s/H; numerical-method resource only",
+      "evidence_refs": [
+        "theory/CERTIFIED_REDUCTION.md",
+        "src/certified_relaxation.py",
+        "evidence/REDUCTION_UNIT_CHECKS.json"
+      ],
+      "does_not_complete": [
+        "B3",
+        "B4"
+      ]
+    },
+    {
+      "id": "E_SCR_NEUTRAL",
+      "status": "COMPLETE_NEUTRAL_SUBSET_DIAGNOSTIC",
+      "scope": "First-Sonine H1_q0/He4_q0 viscosity; saved201 epochs at20000K; nu_match=p_neutral/eta",
+      "evidence_refs": [
+        "theory/NEUTRAL_TRANSPORT_KO.md",
+        "results/NEUTRAL_TRANSPORT.json",
+        "evidence/TRANSPORT_VALIDATION.json"
+      ],
+      "matrix_parity_relative": 6.465314623214752e-16,
+      "new_replay_required": false,
+      "full_B1_complete": false
+    },
+    {
+      "id": "E_PR87_LORENTZ",
+      "status": "SCOPED_DONOR_FUNCTIONAL_AVAILABLE",
+      "PR": 87,
+      "pin": "0868889acebeb4d9b70d38313a9a694d12bf8766",
+      "unit": "research/he34_lorentz_transport_20261022",
+      "scope": "Instantaneous Grad projection in elastic stationary infinite-target-mass Lorentz limit; manufactured controls",
+      "donor_passed_groups": 11,
+      "physical_rate_rows_adopted": 0,
+      "evidence_refs": [
+        "evidence/PARALLEL_LORENTZ_DELTA.json"
+      ],
+      "new_replay_required": false,
+      "full_B1_complete": false
+    },
+    {
+      "id": "E_PHYS79",
+      "status": "PARTIAL_EXECUTABLE_PROVIDER_SUBSET",
+      "pin": "3304d16db1dc9bf868c185a8eeb6cc9dbc270e50",
+      "science_pin": "338fb7728e8b41f49551200b1f1ba73c047fb90c",
+      "scope": "Domain-guarded CI and declared ground-state D/H CX energy/number ledger",
+      "not_supplied": [
+        "elastic tensor relaxation",
+        "interspecies energy equilibration",
+        "all low-T/high-stage CI",
+        "He/Li CX final-state/radiative moments",
+        "D PI/RR energy adapter"
+      ],
+      "evidence_refs": [
+        "evidence/DELTA_INTAKE.json",
+        "evidence/DELTA_READBACK_MANIFEST.json"
+      ],
+      "new_replay_required": false
+    },
+    {
+      "id": "E_THERM01",
+      "status": "SCOPED_THERMAL_PROVIDER_AVAILABLE",
+      "pin": "d562d03415e37488cd4b5444488c77555260e0fb",
+      "scope": "Fit-derivative Maxwellian RR/DR kinetic cooling, per-baryon thermal coordinate and declared continuum photon moments",
+      "donor_state_at_pin": "C science review complete; C10 delivery in progress",
+      "source_domain": {
+        "T_K": [
+          100,
+          1000000
+        ],
+        "E_eV": [
+          5,
+          60
+        ]
+      },
+      "scope_correction": "Direct Li1s photoionization absent below60eV; in-band resonant core excitation is omitted, not physically zero",
+      "not_supplied": [
+        "empirical cooling accuracy",
+        "CI/CX completion",
+        "reactive STF source",
+        "baryon nu_pi",
+        "complete in-band ionic yields"
+      ],
+      "evidence_refs": [
+        "evidence/DELTA_INTAKE.json",
+        "evidence/DELTA_READBACK_MANIFEST.json"
+      ],
+      "new_replay_required": false
+    },
+    {
+      "id": "E_REI221",
+      "status": "CONTRACT_AVAILABLE_PROVIDERS_PENDING",
+      "pin": "c1714f82ea7de15fee230a1a995365970ee6dc02",
+      "scope": "Per-conserved-baryon event/charge/energy contract and source-alignment condition; selected C1 readback only",
+      "not_supplied": [
+        "daughter branches",
+        "neutral-plasma nuclear rates",
+        "stopping/thermalization closure",
+        "nu_pi"
+      ],
+      "evidence_refs": [
+        "evidence/DELTA_INTAKE.json"
+      ],
+      "new_replay_required": false
+    }
+  ],
+  "nodes": [
+    {
+      "id": "B1",
+      "title_ko": "수송 보정과 종별 운동량·에너지·압력 교환 연산자",
+      "status": "PARTIAL_NEUTRAL_SUBSET_ONLY_FULL_NODE_OPEN",
+      "depends_on": [
+        "E_HE33",
+        "E_SCR_NEUTRAL",
+        "E_PR87_LORENTZ"
+      ],
+      "already_solved_subset": [
+        "Source-derived common-T H1/He4 first-Sonine viscosity and exact2x2 algebraic reduction",
+        "Pinned saved-background neutral diagnostic",
+        "Lorentz l=2 instantaneous Grad functional with manufactured controls, separately owned by PR87"
+      ],
+      "entry_conditions": [
+        "Freeze intended species/process inventory and temperature/density/source envelope",
+        "Keep angular sigma2, Maxwellian collision integrals, instantaneous Grad rate, viscosity matching and actual transient modes distinct"
+      ],
+      "pending_work": [
+        {
+          "id": "B1.1",
+          "status": "PENDING",
+          "action": "Create pair/provider table for retained neutral, charged and electron species; source units, mass model, moment definition, domain, uncertainty and Coulomb screening assumptions"
+        },
+        {
+          "id": "B1.2",
+          "status": "PENDING",
+          "action": "Source finite-mass/recoil momentum and energy exchange, charged transport, and the species-resolved pressure relaxation matrix"
+        },
+        {
+          "id": "B1.3",
+          "status": "PENDING",
+          "action": "Derive normalization adapters between differential/angular cross sections and Maxwellian Qbar integrals; quantify finite-domain tails instead of extrapolating"
+        },
+        {
+          "id": "B1.4",
+          "status": "PENDING",
+          "action": "Validate conserved total momentum/energy and relaxation/dissipation structure near the selected equilibrium; qualify any one-rate time-dependent reduction"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "B1-A1",
+          "criterion": "Every admitted pair has a pinned primary source, exact quantity/unit/mass convention and a covered state domain; missing required pairs remain unknown",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B1-A2",
+          "criterion": "Elastic total momentum/energy conservation and equilibrium identities pass independent algebra and affected numerical controls",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B1-A3",
+          "criterion": "Matrix relaxation and energy/momentum exchange are distinguished; any scalar effective transient rate has a separately stated approximation/error justification",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B1-A4",
+          "criterion": "No out-of-domain evaluation; missing tails are either bounded by an independently justified bound within the frozen budget or retained as PARTIAL_DOMAIN",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B1-A5",
+          "criterion": "Numerical parity is kept distinct from source/fit and kinetic-truncation uncertainty; inherited5e-13 neutral matrix parity is not physical calibration accuracy",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        }
+      ],
+      "outputs": [
+        "pair/provider inventory",
+        "species-resolved transport/exchange operator contract",
+        "normalization/domain/uncertainty records",
+        "affected independent checks"
+      ],
+      "full_node_blockers": [
+        "charged/electron transport not calibrated here",
+        "finite-mass mixture momentum/energy exchange missing outside neutral viscosity subset",
+        "physical mixture tensor matrix missing",
+        "reactive species transfer tensor sources owned by B2 remain unconnected"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "B2",
+      "title_ko": "반응 Q/J/R_part와 동위원소·에너지 adapter",
+      "status": "PARTIAL_DONORS_AVAILABLE_HE_INTEGRATION_PENDING",
+      "depends_on": [
+        "E_HE32",
+        "E_HE33",
+        "E_PHYS79",
+        "E_THERM01",
+        "E_REI221"
+      ],
+      "entry_conditions": [
+        "Select retained reaction and species inventory explicitly",
+        "Freeze per-reference-H versus per-baryon normalization, frame, SI conversion, energy zero and source owners"
+      ],
+      "pending_work": [
+        {
+          "id": "B2.1",
+          "status": "PENDING",
+          "action": "Map reaction stoichiometry and event moments into proper-volume R_part, kinetic Q and traceless pressure source J; distinguish event flux J_r from tensor J"
+        },
+        {
+          "id": "B2.2",
+          "status": "PENDING",
+          "action": "Connect one global ionic-potential vector to PI/RR/CI/CX and radiation reservoirs, including the D43K defect consistently across D channels"
+        },
+        {
+          "id": "B2.3",
+          "status": "PENDING",
+          "action": "Derive/source reactive STF birth/removal moments and species exchange; isotropic incident radiation alone does not erase anisotropic sink moments"
+        },
+        {
+          "id": "B2.4",
+          "status": "PENDING",
+          "action": "Verify isotope lift/source alignment and thermal projection; use an expanded state when isotope-specific kinetics/nuclear sources break exact grouping"
+        },
+        {
+          "id": "B2.5",
+          "status": "PENDING",
+          "action": "Keep unsupported CI/CX final states, in-band resonances, nuclear daughters and thermalization/stopping as explicit provider gaps or scope exclusions"
+        }
+      ],
+      "definitions": {
+        "Q": "0.5*trace(S_kin), W m^-3",
+        "J": "S_kin-(2Q/3)I, Pa s^-1, trace0; LRS J=jD",
+        "R_part": "sum heavy-particle number sources plus free-electron source, m^-3 s^-1",
+        "particle_count_guard": "R_part=R_e only when heavy nucleus count is conserved",
+        "thermal_per_baryon": "d epsilon_th/dt=-2H epsilon_th+(Q-sigma:pi)/n_b",
+        "normalization_adapter": "Y_per_baryon=Y_per_Href/baryons_per_H for the fixed conserved reference",
+        "source_units": "Q_SI=n_Href_m3*q_eV_per_Href_s*1.602176634e-19"
+      },
+      "acceptance": [
+        {
+          "id": "B2-A1",
+          "criterion": "Exact stoichiometry conserves baryon number/charge and the admitted atomic isotope counts; electron-rest-mass bookkeeping has one owner",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B2-A2",
+          "criterion": "Each admitted event has explicit kinetic+ionic+radiative disposition and a consistent global ionic-potential zero; no threshold or particle-count double counting",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B2-A3",
+          "criterion": "All Q/J/R_part terms are sourced or conditionally modeled with declared error; missing moments are not filled with zero",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B2-A4",
+          "criterion": "Restriction/lift commutes with the full source on the declared invariant subspace, including thermal/source moments; otherwise the state is enlarged",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B2-A5",
+          "criterion": "Donor UV/temperature/initial-charge differences and THERM01 resonance correction are preserved; new adapter checks cover changed dependencies only",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        }
+      ],
+      "outputs": [
+        "SI source adapter contract/module",
+        "energy/source ownership table",
+        "conservation and projection checks",
+        "admitted domain intersection and explicit gaps"
+      ],
+      "full_node_blockers": [
+        "reactive tensor moments not supplied by current scalar donor ledgers",
+        "D PI/RR potential adapter pending when D43K is active",
+        "He/Li CX/radiative final-state gaps and low-T/high-stage CI outside current subset",
+        "nuclear daughter/stopping providers pending if those processes are selected"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "B3",
+      "title_ko": "물리적 closure 선택과 유효성",
+      "status": "PENDING_B1_B2",
+      "depends_on": [
+        "B1",
+        "B2",
+        "E_SCR_MECHANICS"
+      ],
+      "entry_conditions": [
+        "Selected-scope B1/B2 operators and provider domain/uncertainty records exist",
+        "Freeze species/state/source/time envelope and physical accuracy goals"
+      ],
+      "pending_work": [
+        {
+          "id": "B3.1",
+          "status": "PENDING",
+          "action": "Select species-resolved versus effective tensor and common-velocity/common-T assumptions from exchange-mode evidence"
+        },
+        {
+          "id": "B3.2",
+          "status": "PENDING",
+          "action": "Compare each relevant relaxation, momentum and energy exchange mode with H, |s| and source/composition/temperature variation; account for initial layers and near-Maxwellian/nonrelativistic validity"
+        },
+        {
+          "id": "B3.3",
+          "status": "PENDING",
+          "action": "Freeze physical source/fit/closure errors separately from discretization, saved-background interpolation, quadrature and roundoff budgets"
+        },
+        {
+          "id": "B3.4",
+          "status": "PENDING",
+          "action": "For varying chi or nonzero Q,j, derive a new residual/error contract or use a separately validated full solver; do not inherit the constant-chi certificate"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "B3-A1",
+          "criterion": "Common velocity and common T each pass their own mode/time-scale gate across the admitted domain; failures trigger a resolved state or explicit scope restriction",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B3-A2",
+          "criterion": "Any replacement of sum(nu_s*pi_s) by nu_eff*sum(pi_s) has a stated approximation and an accepted error budget",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B3-A3",
+          "criterion": "Pressure cone, nonrelativistic condition, initial-layer treatment and all source domains are checked without clipping",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B3-A4",
+          "criterion": "All chosen physical and numerical tolerances are explicit numeric values before execution; unset thresholds keep the execution gate closed",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B3-A5",
+          "criterion": "The solver/reference and source/input identities match the selected equations; current prescribed constant chi reduction is not B3 completion",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        }
+      ],
+      "outputs": [
+        "new physical closure contract",
+        "mode/time-scale and uncertainty report",
+        "solver/reference and numeric acceptance budget",
+        "immutable source/input identity"
+      ],
+      "inherited_method_limits": {
+        "current_chi": "positive prescribed constant",
+        "current_sources": "Q=j=0",
+        "current_S": "declared piecewise-linear saved source",
+        "current_certification": "continuum approximation bound; quadrature/roundoff and background error remain separate"
+      },
+      "tolerance_policy": {
+        "current_method_only": {
+          "ratio_abs": 1e-06,
+          "log_pressure_abs": 1e-06
+        },
+        "new_coupled_physics_budget_status": "NOT_YET_FROZEN",
+        "automatic_transfer_of_current_method_tolerances": false
+      },
+      "completion_evidence": []
+    },
+    {
+      "id": "B4",
+      "title_ko": "기존 한 배경 위의 새 coupled gas pilot",
+      "status": "PENDING_B3_NOT_SATISFIED_BY_MECHANICAL_CONTROL",
+      "depends_on": [
+        "B3",
+        "E_HE32"
+      ],
+      "entry_conditions": [
+        "B3 physics/source/initial-state/numerical contract frozen",
+        "B1 operator and B2 source adapter admitted in that contract",
+        "One saved background is verified by identity/hash and interpolation convention"
+      ],
+      "saved_background_candidate": {
+        "case": "s07_m03_r03",
+        "sha256": "c97ffa6a793c092b6b559b32581a7996a82b85a8e725b0e5893be9ae1e7bf30a",
+        "saved_epochs": 201,
+        "reuse_only": true
+      },
+      "pending_work": [
+        {
+          "id": "B4.1",
+          "status": "PENDING",
+          "action": "Couple new chemistry, thermal energy, pressure tensors and source moments on the frozen H/s history under an explicit test-background approximation"
+        },
+        {
+          "id": "B4.2",
+          "status": "PENDING",
+          "action": "Run one new nominal pilot plus the smallest independent reference/refinement or discriminating control required by the frozen contract"
+        },
+        {
+          "id": "B4.3",
+          "status": "PENDING",
+          "action": "Evaluate independent integrated kinetic/ionic/radiative/work ledgers, source-domain histories and pressure/species invariants; preserve all outcomes"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "B4-A1",
+          "criterion": "Same-equation independent reference or tolerance refinement meets frozen pressure, thermal, abundance and source-ledger error targets",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B4-A2",
+          "criterion": "Accepted populations and pressure eigenvalues are admissible without clipping/renormalization; charge/nucleus checks remain within their frozen budget",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B4-A3",
+          "criterion": "Independent integrated energy/source/work ledger passes; an algebraically zero RHS identity alone is insufficient",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B4-A4",
+          "criterion": "Trial and accepted path domains remain admitted; out-of-domain failures are recorded and are not bypassed by a fresh output identity",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B4-A5",
+          "criterion": "Actual raw trajectory, config/source hashes, command/output/exit/resources and limitation report are present; prescribed-chi controls and instantaneous postprocessing do not satisfy this node",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        }
+      ],
+      "outputs": [
+        "one new physical gas trajectory",
+        "independent accuracy/domain/conservation evidence",
+        "raw execution/resource receipts",
+        "test-background scope report"
+      ],
+      "execution_status": "NOT_RUN",
+      "planned_nominal_count": 1,
+      "additional_control_count": "minimal discriminating set; exact cases, tolerances and execution identity not yet defined",
+      "automatic_sweep": false,
+      "old_HE32_IVP_replay": false,
+      "completion_evidence": []
+    },
+    {
+      "id": "B5",
+      "title_ko": "바리온 기체의 metric feedback pilot",
+      "status": "PENDING_B4",
+      "depends_on": [
+        "B4"
+      ],
+      "entry_conditions": [
+        "B4 physical gas state and source ledger passed",
+        "Stress-energy/reservoir ownership and Einstein/shear normalization fixed",
+        "Specify the domain and accuracy of the feedback approximation"
+      ],
+      "pending_work": [
+        {
+          "id": "B5.1",
+          "status": "PENDING",
+          "action": "Assign baryon rest/thermal/ionic energies exactly once; distinguish replaced background dust from new gas energy and preserve existing nonbaryonic massive-sector ownership"
+        },
+        {
+          "id": "B5.2",
+          "status": "PENDING",
+          "action": "Couple gas e_b,p_b,q_b, charge-dependent photon coupling and admitted energy/momentum reservoirs to the same Einstein budget"
+        },
+        {
+          "id": "B5.3",
+          "status": "PENDING",
+          "action": "Execute one isolated new feedback control; inspect signed shear budget, Einstein constraint, integrated energy exchange and a feedback-off limit using saved references"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "B5-A1",
+          "criterion": "Gas trace energy/pressure and q_b enter consistently; no baryon rest-mass or binding/radiation double count",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B5-A2",
+          "criterion": "Independent Einstein/Friedmann constraint, signed shear-source and total stress-energy exchange checks satisfy predeclared budgets",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B5-A3",
+          "criterion": "Photon Thomson coupling uses the new n_e with explicit ownership; daughter radiation/escaping energy is either modeled or retained as an external-reservoir limitation",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B5-A4",
+          "criterion": "Feedback-off operator/saved-reference limit is consistent without replaying completed HE32 IVPs",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B5-A5",
+          "criterion": "A prescribed external UV bath is labeled as an open-system condition; a closed cosmological claim requires its source/reservoir closure",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        },
+        {
+          "id": "B5-A6",
+          "criterion": "Physical uncertainty and remaining species/source/parameter gaps are reported; this pilot is not automatic production or sweep admission",
+          "scope": "selected physical scope",
+          "status": "NOT_EVALUATED_FOR_FULL_NODE"
+        }
+      ],
+      "outputs": [
+        "one new coupled metric/gas pilot",
+        "independent constraint/energy/shear evidence",
+        "source and closure uncertainty report",
+        "remaining original-goal coverage"
+      ],
+      "execution_status": "NOT_RUN",
+      "automatic_sweep": false,
+      "completion_evidence": []
+    }
+  ],
+  "execution_policy": {
+    "new_science_runs_in_this_design": 0,
+    "new_HE32_IVPs": 0,
+    "new_old_renders": 0,
+    "new_donor_checks": 0,
+    "broad_scan_performed": false,
+    "data_reuse": "Readback of existing local files and hashes only",
+    "old_completed_or_failed_identity_bypass_allowed": false,
+    "no_automatic_sweep": true,
+    "no_automatic_production": true,
+    "numeric_budgets_must_be_frozen_before_new_physical_execution": true
+  },
+  "next_minimal_work": {
+    "status": "PLANNED_NOT_EXECUTED",
+    "parallel_ready_design_tasks": [
+      "B1.1 pair/domain/moment inventory",
+      "B2.1 SI and normalization adapter contract",
+      "B2.2 one energy-owner/global-potential ledger"
+    ],
+    "blocked_scientific_execution_nodes": [
+      "B3",
+      "B4",
+      "B5"
+    ],
+    "reason": "Calibrated selected-scope transport/exchange and reactive source moments are not yet both connected"
+  },
+  "source_manifest": [
+    {
+      "id": "HE32",
+      "repository_relative_path": "research/he32_sandbox_primordial_20261021/README.md",
+      "sha256": "f9f4c095ba74d201bf52536ade2adebd015737bc0ff080d6999c7c48e6b42f5a"
+    },
+    {
+      "id": "HE32_PHYSICS",
+      "repository_relative_path": "research/he32_sandbox_primordial_20261021/evidence/physics/PHYSICS_CONTRACT.json",
+      "sha256": "e3a372b509c7922006771d227849b49b1c9b2df112558c54655e161c641d559a"
+    },
+    {
+      "id": "HE33_THEORY",
+      "repository_relative_path": "research/he33_baryon_moment_foundation_20261022/THEORY_KO.md",
+      "sha256": "c86b65bc057357c10205a99ea3d6c9ae9a2e75af591f204a21fad6c3ca5927f4"
+    },
+    {
+      "id": "HE33_CONTRACT",
+      "repository_relative_path": "research/he33_baryon_moment_foundation_20261022/CONTRACT.json",
+      "sha256": "0f622b82018fc89c3efc2f14762c4127e8d0e3243c2c34b4b1d07d1b3bd19be8"
+    },
+    {
+      "id": "SCR_MECHANICS",
+      "repository_relative_path": "research/he34_sandbox_certified_relaxation_20261022/theory/CERTIFIED_REDUCTION.md",
+      "sha256": "6abdf9caebcc97da0cb7f5b2f33f0a97d810ad02b5500bb09f6c9e628fd8c74b"
+    },
+    {
+      "id": "SCR_NEUTRAL_THEORY",
+      "repository_relative_path": "research/he34_sandbox_certified_relaxation_20261022/theory/NEUTRAL_TRANSPORT_KO.md",
+      "sha256": "4f2643a8536ca58316ed11b8d567b730d0d09b6161bc1ce90637f6babc63d89c"
+    },
+    {
+      "id": "SCR_NEUTRAL_RESULT",
+      "repository_relative_path": "research/he34_sandbox_certified_relaxation_20261022/results/NEUTRAL_TRANSPORT.json",
+      "sha256": "eb8503ee40eb9d2a417af0cb10bde58d3d0a5e97d18541c2f2cb95212938f67c"
+    },
+    {
+      "id": "PARALLEL_LORENTZ",
+      "repository_relative_path": "research/he34_sandbox_certified_relaxation_20261022/evidence/PARALLEL_LORENTZ_DELTA.json",
+      "sha256": "9474bb489c3ffeac070967537cf69660b80b5380b7df746b38511adeb16689f5"
+    },
+    {
+      "id": "DELTA_INTAKE",
+      "repository_relative_path": "research/he34_sandbox_certified_relaxation_20261022/evidence/DELTA_INTAKE.json",
+      "sha256": "44692effdbf10fc7e9d7ce1a83187edb15aec43ea4f4a1878028048829363e37"
+    },
+    {
+      "id": "DELTA_READBACK",
+      "repository_relative_path": "research/he34_sandbox_certified_relaxation_20261022/evidence/DELTA_READBACK_MANIFEST.json",
+      "sha256": "f5de84403565a053b7e63e7856252ae1df5c714099ce2226fe769cf3c44f874a"
+    }
+  ],
+  "definition_readback_validation": {
+    "method": "Existing local source bytes and PR87 stored UTF-8 content only; no numerical science rerun",
+    "provider_files": [
+      {
+        "name": "PHYS79_collisional.py",
+        "sha256": "7fca190029597888692d770f9641c6c325c921b0fb67da927f5f06db75f2f2cd",
+        "git_blob": "246dca21196deae39f4cfda7d10376d0bf80bfc7",
+        "matches_saved_manifest": true
+      },
+      {
+        "name": "PHYS79_THERMAL_CLOSURE_KO.md",
+        "sha256": "15673cfbcebe2dcb8935b4ff0e94e0fb41e76785260f8daf2a70ab711c7c48f4",
+        "git_blob": "471d123357425b473749ddf3adf42ab6da956f03",
+        "matches_saved_manifest": true
+      },
+      {
+        "name": "THERM01_thermal.py",
+        "sha256": "72bee3c0dad1f2e3acbe05dadbcb5e8beef7ca79acdd33423f31ad21c8a6b2ed",
+        "git_blob": "7b74f0407b7bfeeba56cec0beb4ebcc30aba71f9",
+        "matches_saved_manifest": true
+      },
+      {
+        "name": "THERM01_FROZEN_CONTRACT.md",
+        "sha256": "114a93148b2b54ac1c41e90e2f0d776c66937b94db837abfea8947970b5ccc26",
+        "git_blob": "16dc5e39abf4a631588b3b35f5d0815a1e961b5f",
+        "matches_saved_manifest": true
+      },
+      {
+        "name": "THERM01_SOURCE_SCOPE_CLARIFICATION.md",
+        "sha256": "7150db57095473d7421e3d23f5a8bb7d0ca41e94baaa680f7a1c8be404224477",
+        "git_blob": "3614bd33db2b6d7cfffdc567d2a06740634a0dcb",
+        "matches_saved_manifest": true
+      }
+    ],
+    "parallel_PR87_files": [
+      {
+        "path": "README.md",
+        "sha256": "1a99ce8df134741d871c1d288ca3eaf7ff28b497833e49cb57a3f11650bd53a2",
+        "git_blob": "6ea2808896535e776256eafb499ebe8888a9e764",
+        "matches_saved_blob": true
+      },
+      {
+        "path": "THEORY.md",
+        "sha256": "042abd93be9ea07ab7a668c067f6d4916e9a2a83e830724ffbd78f4588c1c04d",
+        "git_blob": "c2222d578ee3f48663c82383a13f9cdb3eeee6d6",
+        "matches_saved_blob": true
+      },
+      {
+        "path": "DAG.json",
+        "sha256": "7a2f2ac64801b1f4ff4f29823f748698f8701b3c119eb652e6224cabe7c78ba1",
+        "git_blob": "3b4fdc4f894d690a968e04631c1c2daea85c9605",
+        "matches_saved_blob": true
+      },
+      {
+        "path": "evidence/TRANSPORT_VALIDATION.json",
+        "sha256": "53153f302e6784c76c0b14cc8e1baade8f3615066eb04f130e2d706f68c0ad1d",
+        "git_blob": "26c5292cb7643d5cbf09c3e9e62ca014bc576d40",
+        "matches_saved_blob": true
+      }
+    ],
+    "DAG_acyclic": true,
+    "all_dependency_ids_resolve": true,
+    "all_B_nodes_have_empty_completion_evidence": true,
+    "science_execution_count": 0,
+    "source_manifest_matches_final_readback": true,
+    "companion_document_hash_matches": true,
+    "local_document_links_resolve": true,
+    "local_document_link_count": 16
+  },
+  "companion_document": {
+    "path": "theory/SCOPE_AND_DEPENDENCIES_KO.md",
+    "sha256": "9382d4ac96e32ab347f287437195c610307b8aa46fad21cdca9e4060cd9742cb"
+  }
+}

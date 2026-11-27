@@ -1,0 +1,10 @@
+# Independent-blind-referee style self-adversarial pass (not distinct author)
+
+- SOURCE: Rice 2000 Eq.(1) explicitly includes finite geometric factors Q_k in author fit. It is **incorrect** to use every a2 as the true event-level Legendre moment, or to treat 8 rows as independent experiments. **Correction:** restrict to the constrained zero-endpoint P0+P2 shape (1-mu^2) within a conditional *per-photon-energy* model; keep measured DA and author fitted totals separately.
+- IDENTIFIABILITY: Rice Table I is two broad photon-energy bins, not twelve monochromatic E values. Invariant under arbitrary nonnegative ν(E) within each bin only after imposing the unmeasured per-energy sin² angular law (M1). Change A to 0.19: high-bin universal negative covariance fails; implementation negative test confirms the sign change. No observed covariance admitted.
+- MATHEMATICS: Mean-conditioned convexity proof uses exact g''>0 for A in [0,1], fixes mean and shows chord dominates g. Endpoint mixtures prove the upper bound is not merely numerical. Strict negative sign iff A>Acrit; the paper author never measured A(E)=0.2 at each E.
+- COUNTS: K+ and K- come from one γ+He4->dd event; multiplying sigma_event by 2 for daughter count is okay, not multiplying the nuclear reaction event rate itself by 2. 1998 thesis and 2000 paper are same experimental campaign.
+- PHYSICS: Pair covariance (MeV²) and tail daughter multiplicities are not heat deposition (MeV s^-1 m^-3). Actual nγ(He rest,150-250MeV,x,t,Ω), alpha U, nalpha, per-E exclusive σ with Rice acceptance and time-resolved fast-D stopping, escape, inelastic channels are all missing.
+- EXTERNAL: Asbury/Loeffler 1965 (DOI 10.1103/PhysRev.137.B1214) is an independent 221,265MeV experiment but no numeric source rows ingested. CEA-R-3042 (Williamson et al.) explicitly reports deuteron H/He stopping including erratum but is elemental matter, not the ionized primordial plasma; exact tables not read.
+
+Reviewer type: same-parent serial adversarial, not blind distinct-author. Positive disposition: scoped conditional lemma + code; negative disposition: no universal empirical covariance/rate/heat/DAG advancement.

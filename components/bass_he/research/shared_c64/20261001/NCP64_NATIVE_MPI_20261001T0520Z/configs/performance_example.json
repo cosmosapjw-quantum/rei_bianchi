@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "kind": "LAYOUT_BENCHMARK_GUIDANCE_NOT_PHYSICS_TASK_AUTHORIZATION",
+  "host_target": {"advertised_cpu_count": 64, "advertised_memory_gib": 128, "physical_core_interpretation": "UNKNOWN_UNTIL_HOST_PROBE"},
+  "layouts": [
+    {"ranks": 1, "threads": 1, "workers": 1},
+    {"ranks": 8, "threads": 1, "workers": 7},
+    {"ranks": 16, "threads": 1, "workers": 15},
+    {"ranks": 32, "threads": 1, "workers": 31},
+    {"ranks": 64, "threads": 1, "workers": 63},
+    {"ranks": 32, "threads": 2, "workers": 31},
+    {"ranks": 16, "threads": 4, "workers": 15}
+  ],
+  "selection": "MEASURE_FIXED_TASK_SET_THROUGHPUT_AND_PEAK_RSS_THEN_SELECT_FASTEST_PASSING_LAYOUT",
+  "memory": {"minimum_headroom_fraction": 0.2, "per_worker_memory": "TASK_MANIFEST_CONFIGURED_RLIMIT_AS; REPLACE_ESTIMATE_ONLY_WITH_MEASURED_ENVELOPE", "example_l96_gib": 4, "example_warning": "31 workers times 4 GiB exceeds 80% of 128 GiB; launcher must reject that layout"},
+  "threads": {"blas": 1, "openmp": "threads field", "omp_dynamic": false},
+  "comparison_contract": {"inputs": "IDENTICAL_EXACT_MANIFEST_TASKS", "solver_tolerances": "UNCHANGED", "states": "UNCHANGED", "warmups": "RECORD_SEPARATELY", "repeats": "3_OR_MORE_WITH_MEDIAN_AND_RANGE", "single_task_speedup": "SEPARATE_FROM_BATCH_THROUGHPUT", "mpi_worker_count": "RANKS_MINUS_CONTROLLER_FOR_RANKS_GT_1"},
+  "scientific_scope": "No R grid or new research node is authorized by this performance layout file."
+}

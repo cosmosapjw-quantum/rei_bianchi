@@ -1,0 +1,106 @@
+--- pretest_frozen_v2/source/leased_call.py
++++ pretest_frozen_v4/source/leased_call.py
+@@ -6,10 +6,14 @@
+ import importlib.util
+ import json
+ import os
++import platform
+ import resource
+ import subprocess
+ import sys
+ import time
++
++# Protect the preserved lease source even when the outer caller omits its env.
++sys.dont_write_bytecode=True
+ 
+ UNIT=Path(__file__).resolve().parents[1]
+ LEASE_SHA='76ff57ba687fd9830b84c3fcff69eb8ed0e9f6ceab4551e61c67c84d3ea65124'
+@@ -40,6 +44,8 @@
+          'cpu_limit_s':cpu,'wall_limit_s':wall,'workers':1,'threads':1,'memory_lease_GiB':0.5,
+          'old_science_runner_called':False,'old_rate_callbacks':0,'old_population_callbacks':0,
+          'old_ODE_callbacks':0,'other_processes_terminated':0,
++         'runtime_diagnostic':{'python_implementation':platform.python_implementation(),
++                               'python_version':platform.python_version()},
+          'budget':{'inherited_spend':None,'remaining':None,'currency':None}}
+     a.receipt.parent.mkdir(parents=True,exist_ok=True)
+     start=time.monotonic()
+--- pretest_frozen_v2/source/run_source.py
++++ pretest_frozen_v4/source/run_source.py
+@@ -7,7 +7,6 @@
+ import argparse
+ import hashlib
+ import json
+-import platform
+ import sys
+ 
+ from source_adapter import SavedSource, UNIT, PARENT, PINS, CONTRACT_SHA, ROUTES, sha
+@@ -37,8 +36,7 @@
+     return {'schema':'PHYS84_APPLICATION_IDENTITY_V1','adapter_contract_SHA256':CONTRACT_SHA,
+             'code_SHA256':code,'fixture_SHA256':sha((UNIT/'source/fixtures.json').read_bytes()),
+             'parent_input_SHA256':PINS,'lease_source_SHA256':LEASE_SHA,
+-            'dependency_pins':{'python_implementation':platform.python_implementation(),
+-                               'python_version':platform.python_version(),'libraries':'stdlib only'},
++            'dependency_pins':{'libraries':'stdlib only; binary64 Python float and math.fsum'},
+             'constructed_states':8,'routes_per_state':2,'expected_rows':16,
+             'old_scientific_callbacks':0,'new_rate_evaluations':0,'new_population_solves':0,'new_ODE':0}
+ 
+--- pretest_frozen_v2/verification/verify_source.py
++++ pretest_frozen_v4/verification/verify_source.py
+@@ -11,9 +11,11 @@
+ import hashlib
+ import json
+ import math
++import platform
+ import shutil
+ import sys
+ import traceback
++from unittest.mock import patch
+ 
+ UNIT=Path(__file__).resolve().parents[1]
+ sys.path.insert(0,str(UNIT/'source'))
+@@ -25,6 +27,7 @@
+ CASES=[]
+ MAXIMA={}
+ REAL_APPLICATION_CALLBACK_CALLS=[0]
++FIXTURE_INTERFACE_EVALUATIONS=[0]
+ OWNER={'radiative_owner':'detached_own_spontaneous',
+        'excited_state_owner':'explicit_1S_2S_2P','native_radiative_owner_active':False}
+ 
+@@ -88,6 +91,7 @@
+         ref=oracle(exact_state,rates[exact_state['T_K']])
+         for route in ('immediate_escape','emissivity_handoff'):
+             label=name+'/'+route
++            FIXTURE_INTERFACE_EVALUATIONS[0]+=1
+             actual=source.evaluate(state,radiation_route=route,**OWNER)
+             observed[(name,route)]=actual
+             CASES.append(label)
+@@ -183,6 +187,10 @@
+ 
+ def persistent_controls(work):
+     CASES.append('mock_only_persistence')
++    baseline_identity=run_source.build_identity()
++    with patch.object(platform,'python_version',return_value='999.0.RUNTIME_ONLY_DIAGNOSTIC'), \
++         patch.object(platform,'python_implementation',return_value='MOCK_RUNTIME'):
++        check(run_source.build_identity()==baseline_identity,'runtime_version_does_not_change_scientific_identity')
+     callback_count=[0]
+     def callback():
+         callback_count[0]+=1
+@@ -246,7 +254,7 @@
+                   for folder in ('source','verification') for p in sorted((UNIT/folder).glob('*.py'))}
+     report={'schema':'PHYS84_INDEPENDENT_SOURCE_VERIFICATION_V1','source_SHA256':source_files,
+             'real_application_callback_calls':0,'old_rate_callbacks':0,'old_population_callbacks':0,
+-            'old_ODE_callbacks':0,'historical_replays':0,'fixture_interface_evaluations':16,
++            'old_ODE_callbacks':0,'historical_replays':0,'expected_fixture_interface_evaluations':16,
+             'persistent_callback_kind':'MOCK_ONLY','inherited_budget_remaining':None}
+     def forbidden_real_callback():
+         REAL_APPLICATION_CALLBACK_CALLS[0]+=1
+@@ -266,7 +274,8 @@
+     finally:
+         report.update(cases=CASES,case_count=len(CASES),assertion_count=len(CHECKS),
+                       assertions=CHECKS,max_normalized_errors=MAXIMA,
+-                      real_application_callback_calls=REAL_APPLICATION_CALLBACK_CALLS[0])
++                      real_application_callback_calls=REAL_APPLICATION_CALLBACK_CALLS[0],
++                      fixture_interface_evaluations=FIXTURE_INTERFACE_EVALUATIONS[0])
+         with (a.attempt/'REPORT.json').open('x') as stream:json.dump(report,stream,indent=2);stream.write('\n')
+         print(json.dumps({k:report[k] for k in ('status','case_count','assertion_count','max_normalized_errors')},sort_keys=True))
+ 

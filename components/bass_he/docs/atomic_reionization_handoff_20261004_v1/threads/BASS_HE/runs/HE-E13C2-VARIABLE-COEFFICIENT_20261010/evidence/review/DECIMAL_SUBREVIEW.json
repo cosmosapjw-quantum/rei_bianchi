@@ -1,0 +1,248 @@
+{
+  "schema_version": "1.0",
+  "task": "E13C2 Decimal oracle independent sub-review",
+  "reviewer": "/root/e13c2_independent_review/decimal_audit",
+  "created_utc": "2026-10-10 10:56:20 UTC",
+  "candidate_root": "/workspace/scratch/7fd51143e473/BASS_HE_E13C2_VARIABLE_COEFFICIENT_20261010_v1",
+  "role": "Independent findings and evidence for parent decision reviewer; no decision or promotion judgment.",
+  "independence": {
+    "contributed_to_candidate": false,
+    "candidate_mutated": false,
+    "producer_pass_labels_used_as_evidence": false
+  },
+  "scope": {
+    "reviewed": [
+      "Decimal oracle equations and arithmetic",
+      "exact binary64 input semantics",
+      "pinned physical constants/source and absorber support",
+      "Gauss-Legendre tableau and photon/energy quadrature",
+      "analytic frozen control",
+      "agreement with primary local captured-f0 controls",
+      "saved evidence identities and arithmetic"
+    ],
+    "selected_local_keys": [
+      [
+        "OFF",
+        1,
+        0,
+        0
+      ],
+      [
+        "OFF",
+        1,
+        1162,
+        0
+      ],
+      [
+        "OFF",
+        1,
+        1976,
+        0
+      ],
+      [
+        "GM",
+        2,
+        1727,
+        0
+      ],
+      [
+        "GM",
+        2,
+        2333,
+        0
+      ],
+      [
+        "OFF",
+        2,
+        700,
+        1
+      ]
+    ],
+    "executions": {
+      "photon_ODE_runs": 0,
+      "full_path_runs": 0,
+      "native_runs": 0,
+      "old_suite_runs": 0,
+      "tableaus_generated_only": [
+        12,
+        20
+      ]
+    },
+    "limitations": [
+      "Only six finite local controls; all source_on=1 and positive total opacity.",
+      "No global carry/seam, KF-specific local control, source-off, zero-opacity, threshold-event construction, gas advancement, interval enclosure, or physical-accuracy certification.",
+      "Saved ledgers were inspected and their maxima recomputed; the ODE producing them was not replayed.",
+      "Number ledger uses the same quadrature, and degree convergence is diagnostic rather than a rigorous error bound.",
+      "Parent's later verifier gate revision and pending portable-path documentation remediation were not re-reviewed in this note."
+    ]
+  },
+  "identities": {
+    "code": {
+      "path": "code/decimal_collocation.py",
+      "sha256": "6ca9de462ac24e3a559a5f8de7df01c04b79ed9172b5474546103eedcb2385a5",
+      "matches_saved_oracle_code_identity": true
+    },
+    "oracle_evidence": {
+      "path": "evidence/ORACLE_RESULTS.json",
+      "sha256": "0f719a1c24ef36dbb9248bf386989a0028ba84b913235be80d57ad437cad4d85"
+    },
+    "primary_evidence": {
+      "path": "evidence/defect_rtol_2e11/RESULTS.json",
+      "sha256": "e531947d900810756e5394fa69fdf57b18efa67fad52719e0dfea5dc57212f6b"
+    },
+    "recorded_sources": [
+      {
+        "path": "/workspace/scratch/7fd51143e473/intake_drive/physics/BASS_HE_E13C_PHOTON_PHYSICS_20261010_v1/evidence/capture/OFF/SEGMENTS.csv",
+        "bytes": 3962990,
+        "sha256": "2a43dae808a0ca262dd175d2a1b74eeecc2c674d537f524bdba08e9d709076f7",
+        "verified_bundled_path": "inputs/upstream_e13c1/evidence/capture/OFF/SEGMENTS.csv",
+        "byte_count_matches": true,
+        "sha256_matches": true
+      },
+      {
+        "path": "/workspace/scratch/7fd51143e473/intake_drive/physics/BASS_HE_E13C_PHOTON_PHYSICS_20261010_v1/inputs/OFF_STAGES.csv",
+        "bytes": 2571,
+        "sha256": "d8a363f47781bcea8e33f193f9828e1bb04eb27bbf3821ab487de8238458d661",
+        "verified_bundled_path": "inputs/upstream_e13c1/inputs/OFF_STAGES.csv",
+        "byte_count_matches": true,
+        "sha256_matches": true
+      },
+      {
+        "path": "/workspace/scratch/7fd51143e473/intake_drive/physics/BASS_HE_E13C_PHOTON_PHYSICS_20261010_v1/evidence/capture/GM/SEGMENTS.csv",
+        "bytes": 3958106,
+        "sha256": "adc0585ed09f6b647fceb8e90932aa4d851ebd07dba8c466c29eaf0c9b293410",
+        "verified_bundled_path": "inputs/upstream_e13c1/evidence/capture/GM/SEGMENTS.csv",
+        "byte_count_matches": true,
+        "sha256_matches": true
+      },
+      {
+        "path": "/workspace/scratch/7fd51143e473/intake_drive/physics/BASS_HE_E13C_PHOTON_PHYSICS_20261010_v1/inputs/GM_STAGES.csv",
+        "bytes": 2581,
+        "sha256": "653392c36e2b1bf35d037bdcc0da0ede150daa7cb85ff50803e7e2ebf1de5b1e",
+        "verified_bundled_path": "inputs/upstream_e13c1/inputs/GM_STAGES.csv",
+        "byte_count_matches": true,
+        "sha256_matches": true
+      },
+      {
+        "path": "/workspace/scratch/7fd51143e473/intake_drive/physics/BASS_HE_E13C_PHOTON_PHYSICS_20261010_v1/code/photon_green.py",
+        "bytes": 2823,
+        "sha256": "54f065d1f65c6443b6ce9062c93b0609c7adc6f3701434e06f6907c86ca36c6e",
+        "verified_bundled_path": "inputs/upstream_e13c1/code/photon_green.py",
+        "byte_count_matches": true,
+        "sha256_matches": true
+      }
+    ]
+  },
+  "static_review_results": [
+    {
+      "check": "exact binary64 lift",
+      "location": "code/decimal_collocation.py:34",
+      "result": "Decimal.from_float(float(value)) preserves input binary64 exactly before 70-digit operations."
+    },
+    {
+      "check": "scientific constants and formula identity",
+      "locations": [
+        "code/decimal_collocation.py:168",
+        "code/decimal_collocation.py:180",
+        "code/decimal_collocation.py:202"
+      ],
+      "result": "Matches bundled photon_green.py, native igm_background.rs, atomic_provider.rs, radiation.rs and e9_common_domain.cfg; no source/threshold/unit mismatch found."
+    },
+    {
+      "check": "collocation equation and mapped Gauss weights",
+      "locations": [
+        "code/decimal_collocation.py:104",
+        "code/decimal_collocation.py:214"
+      ],
+      "result": "Correct matrix delta_ij + h I_ij Lambda_j and RHS P0 + h sum_j I_ij q_j."
+    },
+    {
+      "check": "photon and energy integrals",
+      "location": "code/decimal_collocation.py:220",
+      "result": "Correct A, B_eV, Z_eV, QN, QE_eV; positive Z term in the energy ledger follows from dE/ds=-E."
+    },
+    {
+      "check": "analytic frozen control",
+      "location": "code/decimal_collocation.py:256",
+      "result": "J formulas match integration of P_f(u)=P0 exp(-L u)+q(1-exp(-L u))/L for selected positive-L controls."
+    },
+    {
+      "check": "local initial condition agreement",
+      "locations": [
+        "code/decimal_collocation.py:208",
+        "code/continuous_defect.py:276"
+      ],
+      "result": "Both start at each record's captured f0; primary local signed-defect initial value is zero."
+    }
+  ],
+  "focused_check_results": {
+    "embedded_selected_rows_and_stages_match_bundled_csv": 6,
+    "selected_h_equals_exact_lifted_b_minus_a": 6,
+    "source_interval_endpoints_within_lifted_13_7_to_100_eV": 6,
+    "open_segment_absorber_support_consistent": true,
+    "threshold_detail": "OFF/2/700/1 starts exactly at lifted HeI cutoff and moves below it; captured open-segment HeI=false is consistent.",
+    "saved_degree_and_signed_difference_arithmetic_max_disagreement": "0E-75",
+    "max_degree_difference_number": "3.063326481501562826973697180853833E-42",
+    "max_degree_difference_energy_eV": "4.196754109782184731397774561484278E-41",
+    "max_saved_number_ledger": "3E-75",
+    "max_saved_continuous_energy_ledger_eV": "2.9472E-69",
+    "direct_decimal_comparison_to_saved_primary": {
+      "method": "Exact Decimal.from_float lift of saved primary binary64 compared directly to Decimal oracle strings; no intermediate rounding of oracle to binary64.",
+      "max_absolute_P_A": "7.63412171709490753644013283303280725736309955709629317821502685546875E-24",
+      "max_absolute_B_eV": "5.10488710150903297886703443974780687202764725224358385016632080078125E-23",
+      "declared_absolute_P_A_threshold": "1E-22",
+      "declared_absolute_B_eV_threshold": "1E-20",
+      "below_both_declared_thresholds": true
+    },
+    "tableau_only": [
+      {
+        "points": 12,
+        "full_stage_moment_max_residual": "1.961172E-64",
+        "symplectic_identity_max_residual": "1.6299056E-65"
+      },
+      {
+        "points": 20,
+        "full_stage_moment_max_residual": "7.130450921490E-58",
+        "symplectic_identity_max_residual": "4.219840314249E-60"
+      }
+    ]
+  },
+  "findings": [
+    {
+      "severity": "LOW",
+      "category": "documentation_reproducibility",
+      "locations_at_review": [
+        "ORACLE_METHOD_KO.md:149",
+        "ORACLE_METHOD_KO.md:119"
+      ],
+      "finding": "Reproduction command refers to producer scratch layout (oracle_work and intake_drive); delivered paths are code/decimal_collocation.py and inputs/upstream_e13c1. Contract is named TASK_CONTRACT.json rather than evidence/ORACLE_TASK_CONTRACT.json.",
+      "action": "Retain historical provenance and add portable package-root command with output outside sealed candidate; correct contract reference.",
+      "status": "Parent reported remediation pending; not rechecked here."
+    }
+  ],
+  "numerical_or_mathematical_defects_found": {
+    "high": 0,
+    "medium": 0
+  },
+  "commands_actually_executed": [
+    {
+      "id": "identity_saved_numeric_and_tableau_checks",
+      "cwd": "/workspace/scratch/7fd51143e473/BASS_HE_E13C2_VARIABLE_COEFFICIENT_20261010_v1",
+      "command": "python3 - <<'PY'\nfrom pathlib import Path\nfrom decimal import Decimal, getcontext\nimport hashlib, json, runpy\nroot=Path('.')\ndata=json.loads((root/'evidence/ORACLE_RESULTS.json').read_text())\ngetcontext().prec=90\nD=Decimal\ncode=root/'code/decimal_collocation.py'\nprint('oracle_code_identity', hashlib.sha256(code.read_bytes()).hexdigest()==data['oracle_code_sha256'])\nfor rec in data['source_identity']:\n    suffix=rec['path'].split('BASS_HE_E13C_PHOTON_PHYSICS_20261010_v1/',1)[1]\n    p=root/'inputs/upstream_e13c1'/suffix\n    print('source_identity',suffix,p.stat().st_size==rec['bytes'],hashlib.sha256(p.read_bytes()).hexdigest()==rec['sha256'])\nnumber=[];energy=[];ledger_n=[];ledger_e=[];reported_errors=[]\nfor r in data['results']:\n    high=r['calculated_by_degree']['20'];low=r['calculated_by_degree']['12'];frozen=r['frozen_exact_captured_coefficients']\n    for name in ('P1','A','B_eV','Z_eV','QN','QE_eV'):\n        arr=lambda x:[D(v) for v in x] if isinstance(x,list) else [D(x)]\n        exact_degree=[x-y for x,y in zip(arr(high[name]),arr(low[name]))]\n        recorded=arr(r['degree20_minus_degree12'][name])\n        reported_errors += [abs(x-y) for x,y in zip(exact_degree,recorded)]\n        target=number if name in ('P1','A','QN') else energy\n        target.extend(map(abs,exact_degree))\n        exact_delta=[x-y for x,y in zip(arr(high[name]),arr(frozen[name]))]\n        reported_errors += [abs(x-y) for x,y in zip(exact_delta,arr(r['signed_continuous_minus_frozen'][name]))]\n    ledger_n.extend(abs(D(v['number_ledger'])) for v in (low,high,frozen))\n    ledger_e.extend(abs(D(v['energy_ledger_eV'])) for v in (low,high))\nprint('recomputed_max_degree_number',max(number))\nprint('recomputed_max_degree_energy',max(energy))\nprint('max_saved_ledger_number',max(ledger_n))\nprint('max_saved_continuous_ledger_energy',max(ledger_e))\nprint('recomputed_difference_rounding_max',max(reported_errors))\nhi=json.loads((root/'evidence/defect_rtol_2e11/RESULTS.json').read_text())\nmax_n=max_b=D(0)\nfor local in hi['local_oracle_controls']:\n    reference=next(r for r in data['results'] if r['key']==local['id'])['signed_continuous_minus_frozen']\n    err_n=max(abs(D.from_float(local['delta_P'])-D(reference['P1'])),*[abs(D.from_float(x)-D(y)) for x,y in zip(local['delta_A'],reference['A'])])\n    err_b=max(abs(D.from_float(x)-D(y)) for x,y in zip(local['delta_B_eV'],reference['B_eV']))\n    max_n=max(max_n,err_n);max_b=max(max_b,err_b)\n    print('local_comparison',local['id'],str(err_n),str(err_b))\nprint('local_comparison_max',max_n,max_b)\n# Tableau-only probe; no ODE or local/full path is integrated.\nnamespace=runpy.run_path(str(code))\ngetcontext().prec=70\nfor n in (12,20):\n    c,b,m=namespace['gauss_rule'](n)\n    A=namespace['integrated_lagrange'](c)\n    stage_moment=max(abs(sum((A[i][j]*c[j]**k for j in range(n)),D(0))-c[i]**(k+1)/D(k+1)) for i in range(n) for k in range(n))\n    symplectic=max(abs(b[i]*A[i][j]+b[j]*A[j][i]-b[i]*b[j]) for i in range(n) for j in range(n))\n    print('tableau_full_stage_moment_and_symplectic',n,stage_moment,symplectic)\nPY",
+      "exit_code": 0
+    },
+    {
+      "id": "embedded_input_and_support_checks",
+      "cwd": "/workspace/scratch/7fd51143e473/BASS_HE_E13C2_VARIABLE_COEFFICIENT_20261010_v1",
+      "command": "python3 - <<'PY'\nfrom pathlib import Path\nimport csv,json\nfrom decimal import Decimal,getcontext\nroot=Path('.')\ndata=json.loads((root/'evidence/ORACLE_RESULTS.json').read_text())\ngetcontext().prec=90\nD=Decimal\nlift=lambda x:D.from_float(float(x))\nfor mode in ('OFF','GM'):\n    base=root/'inputs/upstream_e13c1'\n    with (base/'evidence/capture'/mode/'SEGMENTS.csv').open() as f:\n        rows={(r['mode'],int(r['step']),int(r['node']),int(r['segment'])):r for r in csv.DictReader(f)}\n    with (base/'inputs'/(mode+'_STAGES.csv')).open() as f:\n        stages={int(r['step']):r for r in csv.DictReader(f)}\n    for r in data['results']:\n        if r['key'][0]!=mode:continue\n        k=tuple(r['key']);native=rows[k]\n        assert native==r['input_row_exact_csv_strings']\n        assert stages[k[1]]==r['stage_input_exact_csv_strings']\n        a,b,h,e0=[lift(native[x]) for x in ('a','b','h','e0')]\n        e1=e0*(-h).exp()\n        support=[]\n        for cut in map(lift,(13.6,24.59,54.42)):\n            support.append((e0>=cut,e1>=cut))\n        print('embedded_row_and_stage_match',k,'h_equals_b_minus_a',h==b-a,'E_support_endpoints',support,'source_endpoints_in_support',e0<=lift(100.) and e1>=lift(13.7),'Lh',r['frozen_exact_captured_coefficients']['lambda_h'])\nPY",
+      "exit_code": 0
+    },
+    {
+      "id": "note_identity_metadata_collection",
+      "cwd": "/workspace/scratch/7fd51143e473",
+      "command": "python3 - <<'PY'\nfrom pathlib import Path\nimport hashlib,json\nroot=Path('/workspace/scratch/7fd51143e473/BASS_HE_E13C2_VARIABLE_COEFFICIENT_20261010_v1')\nout=Path('/workspace/scratch/7fd51143e473/review_work/DECIMAL_SUBREVIEW.json')\nprint(json.dumps({'output_exists':out.exists(),'source_identity':json.loads((root/'evidence/ORACLE_RESULTS.json').read_text())['source_identity'],'oracle_code_sha256':hashlib.sha256((root/'code/decimal_collocation.py').read_bytes()).hexdigest(),'oracle_results_sha256':hashlib.sha256((root/'evidence/ORACLE_RESULTS.json').read_bytes()).hexdigest(),'primary_evidence_sha256':hashlib.sha256((root/'evidence/defect_rtol_2e11/RESULTS.json').read_bytes()).hexdigest()}))\nPY",
+      "exit_code": 0
+    }
+  ],
+  "note": "This records checks already performed and their observations. Creating this note did not rerun an ODE/path. Static source inspection used nl/sed/rg reads; the executable focused-check commands are reproduced exactly above."
+}

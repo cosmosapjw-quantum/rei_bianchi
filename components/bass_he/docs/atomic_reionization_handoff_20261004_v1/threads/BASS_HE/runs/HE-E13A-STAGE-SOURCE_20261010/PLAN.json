@@ -1,0 +1,29 @@
+{
+  "schema":"bass-he.e13.accepted-step-balance-plan.v1",
+  "date":"2026-10-10",
+  "input_archive":"BASS_HE_E12_NCP_RUNTIME_20261008T165053Z_4179815c983d.zip",
+  "input_archive_sha256":"a7ee2893289119e10741afb9e4e80e701dbcd2c95e987cb41a11218eefe320e7",
+  "scope":"Separate exact-binary64 accepted-step balance from missing algorithmically independent stage RHS audit",
+  "input_files":["full/{OFF,KF,GM}/OWNER_NATIVE_41.csv", "full/{OFF,KF,GM}/OWNER_INTERNAL_5.csv", "full/{OFF,KF,GM}/OWNER_SELECTED_RCT.csv", "full/{OFF,KF,GM}/STEPS.csv"],
+  "source_definitions": {
+    "fHe":"Y/[4(1-Y)] with source-declared Y=.24; verify against ne_per_h every step",
+    "chi_eV":[13.598434599702,24.587389011,54.41776],
+    "erg_per_eV":1.602176634e-12,
+    "normalization":[1e-14,1e-14,1e-14,1e-26],
+    "time_coordinate":"ln a; accumulated owners are per hydrogen nucleus",
+    "RCT_mean_eV":35.0
+  },
+  "formulae": {
+    "Hx":"Dx-DA_H-(DCI_H-DRR_H)-DRCT",
+    "HeII":"Dy-[(DA_HeI-DA_HeII)+DCI_HeI-DRR_HeII-DDR-DCI_HeII+DRR_HeIII+DRCT]/fHe",
+    "HeIII":"Dz-[DA_HeII+DCI_HeII-DRR_HeIII-DRCT]/fHe",
+    "thermal":"Dw-[D(BH+BY+BZ)-ev_erg sum(chi_i DA_i)]-D(thermalMicro)"
+  },
+  "source_interpretation":"Parse stored .17e decimal as float then Fraction.from_float for exact-binary64 arithmetic; not exact decimal literals",
+  "anticipated_observability":"Cumulative owner subtraction may differ in least significant bits from the producer's per-transaction RHS and native r; no new tolerance is introduced",
+  "inherited_gate":"Each reconstructed residual divided by source TOL_i <=1; any failure retained, not relaxed",
+  "negative_controls":["clock/row tamper","missing source column","double RCT events","wrong He ratio","wrong threshold","omit thermal term","invent stage certificate from Summary"],
+  "claim_ceiling": "Independent arithmetic assembly of native-output finite-step balance; shared native event data; NOT independent stage RHS, photon geodesic, interval or physical true-error proof",
+  "new_native_scope": "At most 3 modes x 2 accepted steps pilot if Rust compiler is usable; no 3x384 rerun",
+  "historical_gate_status":{"baseline_RCT":"OFF","actual_atomic_moments":null,"physical":"HOLD","HE_F2_F09":"OPEN","Gamma_endpoint_parity":"FAIL_3.543295_RETAINED"}
+}

@@ -1,0 +1,66 @@
+{
+  "node": "NCP64_NATIVE_MPI_OPTIMIZATION",
+  "created_before_native_runs": true,
+  "created_at_utc": "2026-10-01T05:21:56.077982+00:00",
+  "parent_commit": "6197eacb246aee855d53946279cdb1f777236e6b",
+  "namespace": "research/shared_c64/20261001/NCP64_NATIVE_MPI_20261001T0520Z",
+  "task": "Accuracy-preserving OpenMPI/Fortran/OpenMP/SIMD infrastructure for subsequent BASS_HE research",
+  "scope": "Optimize existing spherical assembly and direct operators; preserve eigenproblem, mesh/quadrature, tolerance, state definitions, physical origins and C1b scientific gate. New performance/equivalence fixtures only; C2 broad grid NOT_RUN.",
+  "accuracy": {
+    "precision": "IEEE binary64 throughout",
+    "fast_math": false,
+    "same_matrix_max_abs": 2e-11,
+    "same_matrix_relative_frobenius": 2e-13,
+    "energy_abs": 2e-10,
+    "direct_observables_abs": 2e-10,
+    "phase_aligned_state_L2": 2e-08,
+    "norm_error": 1e-10,
+    "algebraic_residual": 1e-09,
+    "mpi_serial_agreement_abs": 2e-10
+  },
+  "performance_acceptance": "Retain as default only kernels with repeatable measured gain and numerical parity; otherwise explicit opt-in. Actual 64-core/128GB NCP speedup unverified until host sweep. No assumed linear scaling.",
+  "execution_caps": {
+    "local_effective_cpus": 8,
+    "local_memory_gib": 8,
+    "local_max_mpi_ranks": 4,
+    "native_equivalence_physical_pairs_max": 8,
+    "benchmark_kernel_frozen_states": true,
+    "no_repetition_of_unaffected_closed_suites": true,
+    "all_new_eigenstates_including_performance_max": 40,
+    "equivalence_pair_budget_note": "8 pairs reserved for native/reference parity; bounded serial/MPI performance fixtures included in overall 40 eigenstate cap."
+  },
+  "target_host": {
+    "user_reported_cores": 64,
+    "user_reported_memory_gb": 128,
+    "physical_core_vs_vcpu": "must detect",
+    "rank_thread_candidates": [
+      [
+        64,
+        1
+      ],
+      [
+        32,
+        2
+      ],
+      [
+        16,
+        4
+      ]
+    ],
+    "memory_reserve_fraction": 0.2
+  },
+  "gates": {
+    "CODE_I02_CLOSED": true,
+    "full_certificate_fail_closed": true,
+    "scientific_PROMOTE": "HOLD",
+    "Eq55_next_node_authorized": false,
+    "Eq55": "NOT_RUN",
+    "production_default_change": "NOT_AUTHORIZED"
+  },
+  "routing": {
+    "host_label": "generic Codex/GPT",
+    "route": "UNMAPPED_GENERIC_GPT",
+    "model_specific_harness_loaded": false
+  },
+  "publication_policy": "same existing branch new namespace, non-force only, no merge, original frozen artifacts unchanged"
+}

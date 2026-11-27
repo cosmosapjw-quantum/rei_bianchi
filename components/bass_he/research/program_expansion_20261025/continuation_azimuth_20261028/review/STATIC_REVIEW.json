@@ -1,0 +1,137 @@
+{
+  "schema": "HE09_STATIC_REVIEW_V1",
+  "review_pass": 1,
+  "reviewer": "/root/he09_code_review",
+  "recorded_utc": "2026-10-27 21:00:34 UTC",
+  "review_scope": "Independent static math-to-code continuation after PRECONTRACT_REVIEW_KO.md; no science/test/plot/Wolfram execution",
+  "baseline_local": "b3ac835c3fa0b1aa09606ab6e8cfdc08699bab25",
+  "baseline_tree": "0bc4f06d711fd30e8d7d71e2dc2d69ec2bf2e363",
+  "new_unit": "research/program_expansion_20261025/continuation_azimuth_20261028",
+  "verdict": "PASS_SCOPED_STATIC",
+  "prior_verdict": "HOLD_TARGETED_TEST_ORACLE_CORRECTION",
+  "closure_utc": "2026-10-27 21:17:06 UTC",
+  "scientific_algorithm_findings": 0,
+  "preexecution_test_findings": 1,
+  "blocking_open_findings": 0,
+  "preexecution_findings_closed": 1,
+  "executions": {
+    "science": 0,
+    "tests": 0,
+    "plot": 0,
+    "wolfram": 0,
+    "old_suite_reruns": 0
+  },
+  "source_sha256": {
+    "src/azimuth.py": "3230b6ec029b5eb2b40acd3f2dfc603930b470e59e85e6693fd326fb01335ccf",
+    "tests/test_azimuth.py": "5a8b4f8cec55723e4aa2f10d7c496a3d645fefa62a6a52de4b7bf17a9cbecc2e",
+    "scripts/validate_once.py": "5d825d18f1b4ed8aa8886ddbddf62fd53a90acac6b3edd2d0e6b28a5a2044a1d",
+    "scripts/run_bounded.py": "ada739582fcf35106c4f638eee57efe822f4ecd0ff0ac1d0b314061873f4efc9",
+    "scripts/measure_execution.py": "db6b5451b9ff1f786793601800aa3a531a152b577f4c31e4acafb67cedb46c03",
+    "scripts/plot_saved.py": "82ae064999d588b1f5f99976019a2451d701a6e07aa52b6328baf684e27be4d5"
+  },
+  "inherited": {
+    "kinematic_sha256": "7bec25c47c23cabd20a985aad8e194dcd2754814d3f38e0db5f580282b0e4bd9",
+    "aperture_sha256": "1ac8ab886623178283c62910f132a364827763b8a08b417f55702fa416516b0c",
+    "git_diff_from_baseline": "EMPTY for both inherited continuation directories",
+    "KINEMATIC08": {
+      "tests": "14/14 PASS inherited",
+      "plot_cpu_s": 7.040661,
+      "plot_cap_s": 6,
+      "workflow": "PARTIAL",
+      "reserve_remaining": 0
+    }
+  },
+  "checks": [
+    {
+      "id": "S01",
+      "subject": "A,M,e physical model, transverse antipode, F(-mu)",
+      "result": "PASS_STATIC",
+      "evidence": "CONTRACT_KO.md; src/azimuth.py membership reflection; inherited kinematic.py unchanged"
+    },
+    {
+      "id": "S02",
+      "subject": "Declared uniform azimuth, even Bernstein density, measure normalization",
+      "result": "PASS_STATIC",
+      "evidence": "required azimuth_law UNIFORM_DECLARED; density.symmetric guard; no empirical 2pi/factorial conversion"
+    },
+    {
+      "id": "S03",
+      "subject": "Rational arc full/empty/seam and halfturn",
+      "result": "PASS_STATIC",
+      "evidence": "turn_arc and shifted; endpoints include original and halfturn intervals"
+    },
+    {
+      "id": "S04",
+      "subject": "Exact azimuth sweep and inner/outer union/intersection",
+      "result": "PASS_STATIC",
+      "evidence": "every open strip has constant sector mask; rational midpoint only selects mask; inherited SetBounds operations"
+    },
+    {
+      "id": "S05",
+      "subject": "Distinct daughters, hit vs count, OR vs assignments",
+      "result": "PASS_STATIC",
+      "evidence": "C=q1.union(q2), both_detectors_hit=ha.intersection(hb), inclusive and assignments are additive outputs"
+    },
+    {
+      "id": "S06",
+      "subject": "Event uncertainty area,10NBdelta,default epsilon,max50",
+      "result": "PASS_STATIC",
+      "evidence": "global uncertainty union proof; actual area bounds; N<=8; degree<=8 => delta>=1/(360*2^40)"
+    },
+    {
+      "id": "S07",
+      "subject": "Count/energy scaling and label exchange symmetry",
+      "result": "PASS_STATIC",
+      "evidence": "C invariant under J(mu,t)=(-mu,t+1/2); rho even => first mu moment0;2Y,GY,GY/2 scales"
+    },
+    {
+      "id": "S08",
+      "subject": "Conditional denominator statuses and subset ratio",
+      "result": "PASS_STATIC",
+      "evidence": "zero upper undefined; zero lower unresolved; positive lower divides and uses subset upper1"
+    },
+    {
+      "id": "S09",
+      "subject": "Independent exact grid/analytic oracles and invariance tests",
+      "result": "PASS_STATIC_F01_CLOSED",
+      "evidence": "direct_grid independent of production set/integrator; exact11/204,91/204 and11/36; F01"
+    },
+    {
+      "id": "S10",
+      "subject": "Source pin, identity and protected prior sources",
+      "result": "PASS_STATIC",
+      "evidence": "exact HEAD,tree and newcodehashes; trackedclean guard; olddirectories gitdiffempty"
+    },
+    {
+      "id": "S11",
+      "subject": "New bounded execution and honest resource scope",
+      "result": "PASS_STATIC",
+      "evidence": "12CPU/40wall and8CPU/20wall, AS512MiB perprocess, singlethread; whole runner lifetime measured and outer bookkeeping separate"
+    },
+    {
+      "id": "S12",
+      "subject": "Same-run saved payload, diagnostic controls and saved-only plot",
+      "result": "PASS_STATIC",
+      "evidence": "validate_once creates payload with suite; plot imports no science; controls are explicit counterfactuals, not mutation campaign"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "P1_PREEXECUTION_FALSE_FAIL",
+      "status": "CLOSED_PREEXECUTION",
+      "target": "tests/test_azimuth.py::test_19_fold_stopped_and_direct_lorentz_geometry",
+      "observation": "The assertion compares two independently reduced [0,2pi) atan2 coordinates as ordinary real values. The actual declared strip partition includes midpoint t=1/2, where floating transverse sin(pi) and atan2 rounding can put equivalent directions on opposite 0/2pi sides.",
+      "impact": "A periodic-coordinate representation difference can reject a physically identical transverse antipode; this is a test-oracle defect, not an error in the rational certification API.",
+      "minimal_correction": "Compare math.remainder(atan2(-y,-x)-atan2(y,x)-math.pi,2*math.pi) to0 using the existing places=12. Preserve tests, tolerances, scientific code and runtime budgets.",
+      "actual_failure_run": false,
+      "repair_class": "preexecution_test_oracle",
+      "scientific_execution_reserve_consumed": 0,
+      "closure": "Read the actual math.remainder assertion with unchanged places=12 and verified that reversing only this replacement reproduces the original recorded test-file SHA256. The main scientific source hash is unchanged. No science/test/plot/Wolfram run; same review pass1.",
+      "old_test_sha256": "cd7ab85b69d60535c871b2b5c682b1ea539c150958f5921addc545b15c3ee851",
+      "new_test_sha256": "5a8b4f8cec55723e4aa2f10d7c496a3d645fefa62a6a52de4b7bf17a9cbecc2e",
+      "only_authorized_assertion_changed": true
+    }
+  ],
+  "next_action": "Root pins the reviewed source and authorizes the new bounded validation suite. Numerical/plot acceptance remains NOT_RUN; no extra static review pass or unchanged prior suite rerun is required."
+}

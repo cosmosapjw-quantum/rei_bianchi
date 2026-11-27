@@ -1,0 +1,5 @@
+# R4 two admissible within-bin constructions
+Measured Fermi numbers are INTEGRALS over 200-280 and 280-400 MeV; no 230 or 330 MeV measured differential flux is implied.
+Candidate A: Fermi Ackermann 2015 model A global best-fit shape g(E)=(E/100 MeV)^(-2.32)exp(-E/279000 MeV), normalized independently on EACH measured energy bin to that bin's published IGRB/EGB integral. Original Table 4 provides index/cutoff. This is conditional spectral redistribution, not direct Fermi differential measurements.
+Candidate B: g(E)=1 within each bin, normalized to bin width, as falsifiable source-data shape sensitivity. EXFOR SIG(E) is piecewise linear only BETWEEN 201,225,253,285,320,359 MeV measured coordinates; do not extrapolate outside [201,359].
+Photon isotropy and He comoving rest frame at the 2015 observer are explicit assumptions, not inferred cosmic history. EGB (includes resolved sources) is a separate scenario, not summed with IGRB. Real E_gamma>=330 photon count in the Fermi 280-400 bin cannot be inferred without the within-bin shape choice.

@@ -1,0 +1,145 @@
+{
+  "assumptions": [
+    "Finite positive segment length and fixed captured branch.",
+    "Lambda_f>=0, Lambda>=0, nonnegative frozen P_f for the saved B_r construction.",
+    "Integrable coefficient defects and bounded E/heat weights on the finite segment.",
+    "Initial uncertainty |e|<=eta is carried; quadrature and representation errors are not silently removed."
+  ],
+  "automated_saved_scalar_checks_failed": 0,
+  "automated_saved_scalar_checks_passed": 16435,
+  "blocking_findings": [],
+  "candidate_modules_imported": 0,
+  "checks": {
+    "endpoint_scalar_remainder_Hh_D_S": {
+      "failed": 0,
+      "passed": 4694
+    },
+    "formal_direct_ratio_arithmetic": {
+      "failed": 0,
+      "passed": 2
+    },
+    "no_second_candidate_claim": {
+      "failed": 0,
+      "passed": 1
+    },
+    "norm_distribution_order_statistics": {
+      "failed": 0,
+      "passed": 1
+    },
+    "observed_D_less_than_one": {
+      "failed": 0,
+      "passed": 1
+    },
+    "parameter_rows_complete_unique": {
+      "failed": 0,
+      "passed": 1
+    },
+    "parameter_source_script_identity": {
+      "failed": 0,
+      "passed": 1
+    },
+    "path_scalar_sums_and_maxima": {
+      "failed": 0,
+      "passed": 2345
+    },
+    "reviewed_document_identity": {
+      "failed": 0,
+      "passed": 1
+    },
+    "saved_scalar_bounds_nonnegative": {
+      "failed": 0,
+      "passed": 4694
+    },
+    "uniform_scalar_remainder_D_squared_S": {
+      "failed": 0,
+      "passed": 4694
+    }
+  },
+  "current_finite_decision_unchanged": {
+    "bytes": 13274,
+    "path": "review/INDEPENDENT_DECISION.json",
+    "sha256": "d555458ad40b92005d6968897ce2dd21e5bbb91acbc77a58029e19d66f8ed551"
+  },
+  "elapsed_seconds": 0.471739536995301,
+  "evidence": {
+    "analysis/RESIDUAL/ACTUAL/SECOND_VARIATION_PARAMETERS.json": {
+      "bytes": 20031,
+      "sha256": "59291217f8424ad6c265e0661982e5c6228bdb6f4354c18600173cb37ba0ba18"
+    },
+    "analysis/RESIDUAL/ACTUAL/SECOND_VARIATION_SEGMENT_PARAMETERS.json": {
+      "bytes": 8860103,
+      "sha256": "552a28cd34926644b005d45a304c412880652f3196ed0dfe3fd1982255c505ea"
+    },
+    "analysis/RESIDUAL/RESIDUAL_AND_NEXT_METHOD_KO.md": {
+      "bytes": 15005,
+      "sha256": "5e2181c8d66139d85236208c395a018b4e60cbe92e8981f6220aec3a46265a23"
+    },
+    "analysis/RESIDUAL/second_variation_parameters.py": {
+      "bytes": 5761,
+      "sha256": "8fbbac6cd64ac78aabdea03b2851ba8c6877d3335090462052f5f8d29204c6d6"
+    }
+  },
+  "failures": [],
+  "mathematical_review": {
+    "finite_second_correction_identity": {
+      "derivation": "delta1=(I+K)delta-F e; delta-(I-K)delta1=delta-(I-K)(I+K)delta+(I-K)F e=K^2 delta+(I-K)F e. No infinite-series convergence assumption is used.",
+      "status": "DERIVED_AND_REVIEWED"
+    },
+    "implementation_status": {
+      "limitations": [
+        "No enclosed prefix delta1(v) or signed K delta1 integral has been computed.",
+        "Existing endpoint sums cannot reconstruct all prefixes or justify multiplying the old full interval width by D.",
+        "The displayed formal TDS/TS factors exclude propagated incoming uncertainty, midpoint quadrature, representation and centering.",
+        "No cost, whole-width improvement factor, O(N) implementation or new heavy allocation is established."
+      ],
+      "status": "NOT_IMPLEMENTED"
+    },
+    "special_cases_and_units": {
+      "checks": [
+        "eta term remains on later segments",
+        "DeltaLambda=0 kills photon K but need not kill separate species DeltaLambda_i moment correction",
+        "D=0 and all species variations=0 remove coupling corrections",
+        "r=c=eta=0 gives delta=0",
+        "t is the dimensionless log-scale-factor displacement, so D is dimensionless",
+        "T_i carries the weight units; H_h D S has photon-stock units",
+        "Z has no direct DeltaLambda_i term; QN/QE have no photon-coupling remainder",
+        "selected heat triangle bounds retain inherited active heat-weight positivity and fixed captured branch assumptions"
+      ],
+      "status": "DERIVED_AND_REVIEWED"
+    },
+    "species_moment_identity": {
+      "derivation": "Expand lambda_i(P_f+delta); substitute delta-delta1=F e-K delta in the lambda_fi term. Absolute integrability on the finite segment permits Fubini: -integral w lambda_fi K delta=-integral Q_i DeltaLambda delta, producing k_i=w DeltaLambda_i-Q_i DeltaLambda and the separate G_i e term.",
+      "status": "DERIVED_AND_REVIEWED"
+    },
+    "species_second_correction_bound": {
+      "derivation": "After adding integral k_i delta1 the residual is G_i e+integral k_i(F e-K delta); |F|<=1, integral|k_i|<=T_i and ||K delta||<=D*S give (|G_i|+T_i)*eta+T_i*D*S.",
+      "status": "DERIVED_AND_REVIEWED"
+    },
+    "true_defect_sup_bound": {
+      "derivation": "delta'=r-Lambda*delta, Lambda>=0 imply |delta(t)|<=|c|+eta+integral|r|<=S. This avoids an unnecessary 1/(1-D) factor and does not require D<1.",
+      "status": "DERIVED_AND_REVIEWED"
+    },
+    "uniform_and_terminal_bounds": {
+      "qualification": "Bounds concern the exact second-correction function; integration, representation and centering radii must be added by a future implementation.",
+      "status": "DERIVED_AND_REVIEWED",
+      "terminal": "(F(h)+H_h)*eta+H_h*D*S",
+      "uniform": "(1+D)*eta+D^2*S"
+    },
+    "variation_of_constants": {
+      "statement": "delta=delta1+F*e-K*delta follows from delta'=r-Lambda_f*delta-DeltaLambda*delta and delta(0)=c+e.",
+      "status": "DERIVED_AND_REVIEWED"
+    },
+    "whole_operator_norm": {
+      "derivation": "0<F<=1 gives ||K z||inf<=D||z||inf with D>=integral|DeltaLambda|. Saved D_L integrates a whole-cell interval upper bound. Endpoint-only H_h is not substituted for this uniform operator norm.",
+      "status": "DERIVED_AND_REVIEWED"
+    }
+  },
+  "new_enclosure_admission": "NOT_RUN",
+  "new_heavy_tasks": 0,
+  "new_second_variation_integrals": 0,
+  "observed_utc": "2026-10-11T10:41:59.080616+00:00",
+  "reviewer": "e13c8_intake",
+  "schema": "bass-he-e13c8-independent-second-variation-proposal-review-v1",
+  "scientific_kernel_calls": 0,
+  "status": "PASS_DERIVED_PROPOSAL_ONLY_NOT_NUMERICAL_ADMISSION"
+}

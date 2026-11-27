@@ -1,0 +1,11 @@
+# RCT03C: sourcefree採택 뒤 photon/source 연결
+
+먼저README/RETURN/INPUT_PIN을읽고DELIVERY_RECEIPT의전체ZIP에서실제source,NUMERICAL_CONTRACT,evidence/SUMMARY를읽는다. 이미존재하는RCT03A와이번sourcefree midpoint를처음부터다시구현하지않는다. 실제receiver변경은owner예약을확인한뒤에수행한다.
+
+N1600의7고정case는기존state/T/J및ledger기준을통과했다. N100의7FAIL,N400의GM30/GM35FAIL과원BE21FAIL은지우지않는다. 같은finitegate나23reference를단순수신때문에반복하지않는다. 새buildcontext가달라질때해당검사만수행한다.
+
+Delta patch와combinedpatch는서로다른base다. 둘을연속적용하지않는다. 최종RK출력과actualM의event/residual을세트로이식한다. stage_estimate(Y)와actualcollocation(M)를혼동하거나이전반사버전의h/2장부를fullstep에그대로쓰지않는다. 배경과nH정규화는proper중간시간이다.
+
+새photon/source연장은기존owner midpoint radiation transaction과동일stage소유권을결속하는별도단위다. 이sourcefreeAPI에는packet/source인자가없다. 기존small-dtenergy실패,분광경계/장기이력/원midpointpartial은이번결과로닫지않는다. baselineOFF,source모멘트null,physicalHOLD,HE-F2globalfalse,HE-F3/F09미완료를유지한다. 원자이론09B2를새선행조건으로추가하지않는다.
+
+재현은ZIP의bash run_checks.sh /absolute/new/output이며기존evidence를덮어쓰지않는다. 구성명령실행과syntax는확인했고전체wrapper추가replay는미수행이다. Rust1.94.1/numpy/sympy가필요하며GPG인증은이패키지가제공하지않는다.

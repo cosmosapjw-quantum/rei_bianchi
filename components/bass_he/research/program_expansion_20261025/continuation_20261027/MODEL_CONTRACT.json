@@ -1,0 +1,64 @@
+{
+  "schema": "HE_FINITE_DRIFT_MODEL_CONTRACT_V1",
+  "unit_id": "HE-EXP-DRIFT-02",
+  "status": "DERIVED_IMPLEMENTATION_VERIFIED_CONDITIONAL",
+  "assumptions": [
+    "two distinct nonrelativistic elastic species",
+    "rotation-invariant temperature-independent collision law at fixed internal state and mass convention",
+    "separate Maxwellians with isotropic temperatures; relative mean drift U",
+    "finite required radial moments and justified Taylor expansion",
+    "same sigma_1(g) underlies Q11 and Q12; provenance string is a hypothesis, not an admission"
+  ],
+  "definitions": {
+    "a": "m_a/(m_a+m_b)",
+    "b": "m_b/(m_a+m_b)",
+    "mu": "m_a*m_b/(m_a+m_b)",
+    "T_star": "b*T_a+a*T_b",
+    "s_squared": "k_B*T_star/mu",
+    "beta": "mu*(T_a-T_b)/((m_a+m_b)*T_star)",
+    "r": "Q12/Q11",
+    "K": "(4/3)*n_a*n_b*mu*sqrt(8*k_B*T_star/(pi*mu))*Q11",
+    "G": "3*k_B*K/(m_a+m_b)"
+  },
+  "moments": {
+    "R_a": "-K*U + O(|U|^3)",
+    "R_b": "-R_a",
+    "Q_a": "G*(T_b-T_a)+K*(b+beta*(5/2-3*r))*|U|^2+O(|U|^4)",
+    "Q_b": "G*(T_a-T_b)+K*(a-beta*(5/2-3*r))*|U|^2+O(|U|^4)",
+    "raw_E_s": "Q_s+u_s dot R_s",
+    "truncated_energy_identity": "Q_a+Q_b=K*|U|^2=-U dot R_a; raw_E_a+raw_E_b=0"
+  },
+  "ownership": {
+    "drift_dissipation": "already included once across Q_a,Q_b; never add K|U|^2 again",
+    "thermal_particle_sources": [
+      0,
+      0
+    ],
+    "heat_capacity": "species translational C_V=(3/2)*n*k_B; separate from thermal particle count",
+    "binding_energy_source": 0,
+    "nonthermal_energy_source": 0,
+    "neutral_mass": "Ar*m_u already includes bound-electron/nuclear rest-mass convention; no additional binding correction",
+    "absent_population": "temperature RHS is null; no invented temperature"
+  },
+  "scope_limits": {
+    "q11_q12_source_domain_K": [
+      50,
+      50000
+    ],
+    "actual_source_selected_T_K": 20000,
+    "drift_cutoff": "caller-supplied 0<eta_max<1; an operational domain restriction, not a certified remainder bound",
+    "unequal_T_quadratic_parts": "signed; do not clamp each species to positive",
+    "same_law_residual": "D=dlnQ11/dlnT-3*(Q12/Q11-1)",
+    "row_minus_derivative_heat_a": "K*beta*D*|U|^2",
+    "explicit_T_dependent_law": "requires extra derivative term; no automatic Coulomb/screening extension",
+    "fit_identity_residual_is_calibrated_uncertainty": false,
+    "full_DCS_or_joint_law_reconstructed": false
+  },
+  "physical_provider_admitted": false,
+  "source_calibrated_uncertainty": null,
+  "physical_campaign_allocation": "UNALLOCATED",
+  "production": "NOT_APPROVED",
+  "activation": false,
+  "global_physical_completion": null,
+  "L4_ready": false
+}

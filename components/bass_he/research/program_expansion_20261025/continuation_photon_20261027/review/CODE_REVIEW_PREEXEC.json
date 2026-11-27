@@ -1,0 +1,306 @@
+{
+  "schema": "HE_PHOTON05_INDEPENDENT_CODE_PREEXEC_V1",
+  "unit_id": "HE-EXP-PHOTON-05",
+  "reviewer": "/root/state04_code_review",
+  "independence": {
+    "prior_role": "Primary-source investigator; gathered NIST/EXFOR input observations and bounded leaf proposal",
+    "theory_author": "/root",
+    "implementation_author": "/root/delivery_completion",
+    "code_or_theory_authorship_by_reviewer": false,
+    "review_method": "Read actual implementation/tests/runners and fixed contracts; independent static physical/numerical reasoning; no execution"
+  },
+  "base_commit": "30924d902187777fbff02687639c91d65cf53191",
+  "recorded_utc": "2026-10-27T11:41:22.745441+00:00",
+  "verdict": "PASS_PRE_EXECUTION_CONDITIONAL_PHOTON_RECOIL",
+  "blocking_findings": 0,
+  "initial_review_baseline": {
+    "preparation_record": {
+      "bytes": 2106,
+      "sha256": "40d4bd01ee31f4212910f77aa299237a61c502f02cb83e6e38ccc20a4c649b08"
+    },
+    "prepared_code_bindings": [
+      {
+        "path": "scripts/plot_saved.py",
+        "bytes": 1303,
+        "sha256": "63e022665d2c9c8c904e65235696fdad0987972389082c76eed90b1d0f3ef516"
+      },
+      {
+        "path": "scripts/run_plot.py",
+        "bytes": 2454,
+        "sha256": "c16a271442f23a86cd2a641f88704f0a20366fe65d8b8b4d18b1b6048323a8c1"
+      },
+      {
+        "path": "scripts/run_validation.py",
+        "bytes": 2013,
+        "sha256": "488de1f13c2ada78af757e0deb4ece141f1c9f39cd3119b6eceb2f3bf4950077"
+      },
+      {
+        "path": "src/photon_dd.py",
+        "bytes": 7166,
+        "sha256": "1ab133e4cd2dec1d1f7fe0a976e4eaaa7414468b21f31b0152e94398fbd2c59a"
+      },
+      {
+        "path": "tests/test_photon_dd.py",
+        "bytes": 9162,
+        "sha256": "1e5666a07382b160b4d389c6f71c2edf3bbb687e3607e2fbd187c1beb48fb118"
+      }
+    ],
+    "note": "Initial findings correspond to the static-ready files shown by the preparation record. Subsequent corrected bindings will be recorded separately when reviewed."
+  },
+  "contract_bindings": {
+    "THEORY_KO.md": {
+      "bytes": 8989,
+      "sha256": "4b61b537368484e59bd56611a2234fa2b85aa6d7893eb453922ac0f53e0bfa20"
+    },
+    "MODEL_CONTRACT.json": {
+      "bytes": 4462,
+      "sha256": "85980c8500774ad153e27a2953141b9e3339ba93a1aebca8f0fb5052aa800c38"
+    },
+    "VALIDATION_CONTRACT.json": {
+      "bytes": 5449,
+      "sha256": "32e223650ad99a7c2771268ef8c83246f9524e0b912e4fd6895c282721ac9ceb"
+    },
+    "sources/SOURCE_MANIFEST.json": {
+      "bytes": 1821,
+      "sha256": "3e27790bfc157c4bad1b8a843331f2da3ce5db901f7279cf4449044c2d263454"
+    },
+    "review/THEORY_REVIEW.json": {
+      "bytes": 14040,
+      "sha256": "d2f9b5b986c2565c955f7adb106710ff771a8c7eeb1eb7a5b08b21e460c3f906"
+    }
+  },
+  "findings": [
+    {
+      "id": "P1",
+      "status": "RESOLVED_BEFORE_FIRST_START",
+      "target": "tests/test_photon_dd.py:test_06_conservation",
+      "observation": "Uses generic approx with 5e-13 relative plus64epsilon fixed4000 scale instead of the frozen256epsilon sum-absolute-participating-components residual bound.",
+      "impact": "The planned run would not directly enforce its stated four-momentum conservation criterion.",
+      "minimum_correction": "Use the frozen componentwise residual bound in the existing method, with explicitly formed participating contributions.",
+      "resolution": "test06 now compares each energy and momentum component residual with256epsilon times the sum of absolute participating terms. Exactly zero components have exactly zero bound; no tolerance expansion.",
+      "resolved_utc": "2026-10-27T11:43:55.947749+00:00"
+    },
+    {
+      "id": "P2",
+      "status": "RESOLVED_BEFORE_FIRST_START",
+      "target": "tests/test_photon_dd.py:test_07_rotation and test_19_stress_reference",
+      "observation": "Rotation currently checks two momentum entries and one stress entry of one daughter.",
+      "impact": "A wrong untested off-diagonal or second-daughter transformation could pass despite full vector/tensor covariance being in the frozen scope.",
+      "minimum_correction": "Use one nontrivial3D rotation and compare all daughter momentum components and all stress entries; retain the existing method count and tolerances.",
+      "resolution": "Existing test07 and test19 exercise a proper cyclic spatial rotation with non-axis-aligned n=(0.6,0.8,0) and u=(0,0.6,0.8), checking both daughter energies, all3 momentum components and all9 stress entries. Independent Decimal80 stress checks still cover all12 native rows.",
+      "resolved_utc": "2026-10-27T11:43:55.947749+00:00"
+    },
+    {
+      "id": "P3",
+      "status": "RESOLVED_BEFORE_FIRST_START",
+      "target": "tests/test_photon_dd.py:test_10_threshold",
+      "observation": "Exact synthetic threshold checks threshold3 and kappa0 but not the remaining lab recoil.",
+      "impact": "Threshold control would not directly expose a zero-lab-recoil implementation at zero CM momentum.",
+      "minimum_correction": "Within the existing method assert each daughter E2.5, parallelq1.5, K0.5 and the corresponding exact event ledger for A=M=2,e3.",
+      "resolution": "test10 now asserts each threshold daughter E=2.5,q=(0,0,1.5),K=0.5, total lab momentum3, rest deficit2 and threshold3; nextafter-below and deficit-only energies are rejected. These explicit values also fix the per-event energy ledger.",
+      "resolved_utc": "2026-10-27T11:43:55.947749+00:00"
+    },
+    {
+      "id": "P4",
+      "status": "RESOLVED_BEFORE_FIRST_START",
+      "target": "existing tests for conservation, threshold, counts and energy ownership",
+      "observation": "Contract-named omitted-photon-momentum, omitted-threshold-recoil, missing-second-daughter and duplicated-binding-term discriminants are not explicit.",
+      "impact": "The recorded mutation-control claim would exceed the directly constructed discriminating checks.",
+      "minimum_correction": "Add the four explicit wrong-model residual witnesses within the corresponding existing24methods, without new processes or methods.",
+      "resolution": "Existing test06 contains omitted-photon-momentum and missing-daughter residual witnesses, test10 distinguishes threshold recoil from the rest deficit, and test16 detects a duplicated population rest/binding contribution.",
+      "resolved_utc": "2026-10-27T11:43:55.947749+00:00"
+    },
+    {
+      "id": "P5",
+      "status": "RESOLVED_BEFORE_FIRST_START",
+      "target": "src/photon_dd.py:kernel raw A/2,e/2 and gamma/eta divisions",
+      "observation": "Raw binary64 halving can round a positive subnormal input to zero before scaled product sees it; boost divisions also bypass the explicit product/divisor error boundary.",
+      "impact": "Representation failure could silently erase a nonzero contribution or escape the declared ContractError boundary.",
+      "minimum_correction": "Use explicit guarded/scaled halving and division, or reject the nonrepresentable intermediate; add a targeted subnormal rejection control within existing method14. Do not widen the scientific domain or relax tolerances.",
+      "resolution": "A_half and e_half use the pinned scaled product helper; gamma and eta use its guarded divisors. Positive underflow and invalid division use ContractError instead of becoming silent zero. Existing test14 includes min-subnormal halving controls and extreme flux products.",
+      "resolved_utc": "2026-10-27T11:43:55.947749+00:00"
+    },
+    {
+      "id": "P6",
+      "status": "RESOLVED_BEFORE_FIRST_START",
+      "target": "src/photon_dd.py:adapter return metadata",
+      "observation": "The explicit SYNTHETIC_CONTROL input branch is constrained to A=M=2 but returned source dictionaries do not identify mass_convention or synthetic provenance.",
+      "impact": "A detached synthetic result could be mistaken for canonical bare-nuclear input even though both physical admission flags are false.",
+      "minimum_correction": "Return the mass convention and an unmistakable synthetic-control indicator; preserve canonical mass checks and native wrapper rejection of the synthetic channel.",
+      "resolution": "Returned adapter dictionaries now carry mass_convention and synthetic_control. SYNTHETIC_CONTROL remains restricted to A=M=2, both physical admission flags remain false, and test22 explicitly rejects that convention through the native wrapper; test23 distinguishes native and synthetic output provenance.",
+      "resolved_utc": "2026-10-27T11:43:55.947749+00:00"
+    }
+  ],
+  "already_confirmed": [
+    "Canonical native wrapper fixes A and M to the selected NIST central values and uses one-based integer rows1..12; bool row IDs are rejected.",
+    "Native wrapper cannot route source masses into SYNTHETIC_CONTROL: its fixed canonical A/M fail that branch. No silent native bypass observed.",
+    "Adapter validates mass convention, flux and kernel inputs before returning zero-flux outputs.",
+    "Native EXFOR DATA-CM and ERR-S are copied, never used as event flux; no half factor or angular integration.",
+    "Energy/stress equations match the stated CM boost and per-event stress weights; heating, deposition, Cv, thermal count and independent binding RHS remain null.",
+    "Independent Decimal80 reference forms literal masses, direct CM energy/momentum and Lorentz boost with separate Decimal trigonometric series.",
+    "Wrappers reuse the pinned old runner and product helpers without calling old suites or the EVENT03 fixed-mass kernel; no contract adaptation/PolicyAdapter.",
+    "Plot code reads saved values only and copies exact data bytes; no science-module import or rate reevaluation."
+  ],
+  "authorized_correction_scope": "Root approved these six concrete pre-START corrections, preserving24methods, one test process, frozen tolerances, caps and historical budgets.",
+  "review_history": [
+    {
+      "time_utc": "2026-10-27T11:41:22.745441+00:00",
+      "verdict": "HOLD_PRE_EXECUTION_FOR_TARGETED_CORRECTIONS",
+      "finding_ids": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "scientific_START_count_observed": 0
+    },
+    {
+      "time_utc": "2026-10-27T11:43:55.947749+00:00",
+      "verdict": "PASS_PRE_EXECUTION_CONDITIONAL_PHOTON_RECOIL",
+      "finding_ids_resolved": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "scientific_START_count_observed": 0,
+      "prior_hold_record_sha256": "dc16241d53075e22a17e5e0bb5afd513b282ef290c431081965e45c811933d15",
+      "scope": "Authorized targeted corrections only; initial observations and identities retained above."
+    }
+  ],
+  "planned_test_methods": 24,
+  "planned_test_processes": 1,
+  "test_allocation": {
+    "cpu_s": 4,
+    "wall_s": 15,
+    "memory_bytes": 268435456,
+    "threads": 1,
+    "targeted_repair_reserve": 1
+  },
+  "plot_allocation": {
+    "cpu_s": 4,
+    "wall_s": 15,
+    "memory_bytes": 536870912,
+    "threads": 1,
+    "planned_processes": 1,
+    "scientific_function_calls": 0
+  },
+  "reviewer_executions": {
+    "scientific": 0,
+    "tests": 0,
+    "plots": 0,
+    "old_source_evaluations": 0,
+    "fits": 0,
+    "archives": 0,
+    "publication": 0
+  },
+  "physical_global_admission": false,
+  "next_step": "Root owns current preflight and execution go. After the authorized bounded test and saved-data-only render, this reviewer will inspect their actual receipts/dependency identities/saved results without rerunning them and write review/RESULT_REVIEW.json.",
+  "final_static_review_utc": "2026-10-27T11:43:55.947749+00:00",
+  "previous_review_record_sha256": "dc16241d53075e22a17e5e0bb5afd513b282ef290c431081965e45c811933d15",
+  "reviewed_final_files": {
+    "src/photon_dd.py": {
+      "bytes": 7421,
+      "sha256": "996f7cecc6de67ff428290f08258434717e97c7a40a3e169785431f73bdfebb9"
+    },
+    "tests/test_photon_dd.py": {
+      "bytes": 12133,
+      "sha256": "a0fbbc8ad7be8b461ff1fda35018ab01709ba19a3282dba3fdd0854c4d74be04"
+    },
+    "scripts/run_validation.py": {
+      "bytes": 2013,
+      "sha256": "488de1f13c2ada78af757e0deb4ece141f1c9f39cd3119b6eceb2f3bf4950077"
+    },
+    "scripts/plot_saved.py": {
+      "bytes": 1303,
+      "sha256": "63e022665d2c9c8c904e65235696fdad0987972389082c76eed90b1d0f3ef516"
+    },
+    "scripts/run_plot.py": {
+      "bytes": 2454,
+      "sha256": "c16a271442f23a86cd2a641f88704f0a20366fe65d8b8b4d18b1b6048323a8c1"
+    },
+    "THEORY_KO.md": {
+      "bytes": 8989,
+      "sha256": "4b61b537368484e59bd56611a2234fa2b85aa6d7893eb453922ac0f53e0bfa20"
+    },
+    "MODEL_CONTRACT.json": {
+      "bytes": 4462,
+      "sha256": "85980c8500774ad153e27a2953141b9e3339ba93a1aebca8f0fb5052aa800c38"
+    },
+    "VALIDATION_CONTRACT.json": {
+      "bytes": 5449,
+      "sha256": "32e223650ad99a7c2771268ef8c83246f9524e0b912e4fd6895c282721ac9ceb"
+    },
+    "sources/SOURCE_MANIFEST.json": {
+      "bytes": 1821,
+      "sha256": "3e27790bfc157c4bad1b8a843331f2da3ce5db901f7279cf4449044c2d263454"
+    },
+    "sources/NIST_CODATA_2022_allascii.txt": {
+      "bytes": 40801,
+      "sha256": "77fb90e66c40db3e6eb16630bc9c88e4c7c8beddbe5e71be406f2f26e3f67e67"
+    },
+    "sources/PHOTON05_SOURCE_OBSERVATIONS.json": {
+      "bytes": 17050,
+      "sha256": "b3160ea21959a999498ca936331cb668d25d2b140faca2c394228aa38816acb7"
+    },
+    "review/THEORY_REVIEW.json": {
+      "bytes": 14040,
+      "sha256": "d2f9b5b986c2565c955f7adb106710ff771a8c7eeb1eb7a5b08b21e460c3f906"
+    },
+    "evidence/PRE_EXECUTION_INPUTS.json": {
+      "bytes": 385,
+      "sha256": "d276ccb9390b9e14550b972074dc3e645c976489c1e2ed5186cf0147c8d30aba"
+    },
+    "evidence/IMPLEMENTATION_PREPARATION.json": {
+      "bytes": 2106,
+      "sha256": "40d4bd01ee31f4212910f77aa299237a61c502f02cb83e6e38ccc20a4c649b08"
+    },
+    "evidence/PRE_START_CORRECTIONS.json": {
+      "bytes": 1412,
+      "sha256": "7da89fb53ab9c06c3120c2c22df55c9343b641415e1485ba6dddd76fa10a853e"
+    }
+  },
+  "unchanged_inherited_dependency_bindings": {
+    "../continuation_event_20261027/src/reactive_event.py": {
+      "bytes": 12607,
+      "sha256": "89bbcb99cb1487b7e3c132ab6b6d6d0093fbeed2479b112078f6c94f81542ce7"
+    },
+    "../continuation_20261025/exchange/exchange_closure.py": {
+      "bytes": 20536,
+      "sha256": "533c49838d03572b106168cd9333a20e1b4a7d06f88d5f3727f8b80c5b96f262"
+    },
+    "../continuation_20261025/run_validation.py": {
+      "bytes": 7946,
+      "sha256": "b0f36cb3ee2f79d4fc29fa6596be37b829d299694f3fd167bf40460a3b976e8f"
+    },
+    "../continuation_20261027/sources/r3_update/raw/PROVIDER_ROWS.json": {
+      "bytes": 71517,
+      "sha256": "d8b0b92f0374f73fa7f838db5ca07be45bd448696654b07c6db71c5847235ac2"
+    }
+  },
+  "source_manifest_identity_checks": {
+    "declared_files": 10,
+    "all_declared_bytes_and_sha256_match": true,
+    "scientific_recomputation": 0
+  },
+  "correction_limits_preserved": {
+    "test_methods": 24,
+    "new_test_processes_before_review": 0,
+    "contract_or_tolerance_changes": false,
+    "budget_changes": false,
+    "repair_reserve_used": 0,
+    "test21_native_literal_crosscheck": "All12 copied source observations versus pinned packet plus native wrapper row labels/units; within existing method."
+  },
+  "scope_limits": [
+    "Static approval of a conditional bare-ground-nuclear central-mass kinematic and per-event moment supplier; the first measured24-method run and its independent saved-result review remain pending.",
+    "No EXFOR DCS-to-event-rate mapping, full angular law, detector-arm label, polarization/azimuth inference or liquid-He electronic-spectator/response binding.",
+    "No physical mass covariance propagation, uniform relative kappa accuracy at a rounded physical threshold, automatic thermalization, Cv or species heating allocation.",
+    "Population rest energy owns binding energy once; the canonical physical-rest-mass representation is not mixed with EVENT03 compositional-mass/internal-energy bookkeeping.",
+    "The raw general kernel rejects explicitly unrepresentable intermediate operations; no arbitrary all-finite-input success or production-kernel certification is claimed."
+  ],
+  "stop_rule_satisfied": "All six concrete static findings resolved within the existing contract; no adjacent optional review or repeat validation requested."
+}

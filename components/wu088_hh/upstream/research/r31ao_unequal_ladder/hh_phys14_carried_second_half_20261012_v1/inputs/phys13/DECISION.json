@@ -1,0 +1,189 @@
+{
+  "schema": "WU088_HH_PHYS13_INDEPENDENT_DECISION_V1",
+  "decision": "PROMOTE_SCOPED",
+  "decided_at_utc": "2026-10-12T11:51:22.518122+00:00",
+  "reviewer": "/root/hh_phys13_decision_review",
+  "independence": {
+    "candidate_generation": false,
+    "candidate_validation_design": false,
+    "decision_review_only": true,
+    "candidate_code_modified": false,
+    "candidate_module_imported": false,
+    "candidate_program_reexecuted": false,
+    "independent_posthoc_arithmetic": true
+  },
+  "reviewed_candidate_root": "/workspace/scratch/b826cbaab54f/HH_PHYS13_20261012_v1",
+  "reviewed_final_input_sha256": {
+    "SCIENTIFIC_CONTRACT.md": "2e403eb13d2d1688d6421be173089bfd5d29cf32b3cd6152a7ec48acfb785400",
+    "src/thermo_response.py": "45c6b076ce4e90b5a00a26c39503bbcbe862f814ba960782248a8737787dfeaa",
+    "inputs/phys09/PROJECTED_RESULTS.json": "c6329fed8c411e1592bd1a0c63ebd9ca6151e81500ed1f46fb6b40f4b7758444",
+    "results/thermo_v2/THERMO_RESULTS.json": "0943234c6a15f6238803cbc4ec0c61df12bc218523678210f1095b9c0588c6ea",
+    "results/thermo_v2/SUMMARY.json": "15377bd2ec330251c6daebf9378646f9434f22c2215465eeefcf70f637bf12d7",
+    "evidence/thermo_v2/EXECUTION.json": "fdc5c44641a70f5cc068c5a7c0653ac5063ceb897b5040f3595276f09466c62a",
+    "inputs/ncp07/results/full/NATIVE_CONSTANT_LEAVES.json": "9fac898db23a8556267c976aacd6f810583d608abb8c6f49afa67a690ddc7d3e",
+    "inputs/ncp07/results/full/SOURCE_BOX.json": "cf1b48df2c299187a03ab501b1169e2d559c5959bf50892d7b749c65f81ff64d",
+    "inputs/ncp07/results/first_half/SOURCE_BOX.json": "36247ef5ac3bce4b114aac41fe5d85c2015488183ba32b77f9051cc7d25b77b4",
+    "theory/THERMODYNAMIC_RESPONSE_THEOREM_KO.md": "ec4d3ed67130683f5d1529d6802db67780a5aa7bf514637f4f757670ef88ef8b",
+    "inputs/phys09/PROJECTED_ENERGY_THEOREM_KO.md": "7ed752a4244e1b5d413eff1b4da26486e3a11e0bb758f0e68728cb113422b613",
+    "inputs/phys12/ABSOLUTE_THEOREM_KO.md": "89550bafbf26628fa0538fb4e24e34246baa902df09831a15f3e67c22fcb1b6e",
+    "inputs/ncp07/candidate/src/ft03_interval.rs": "886580a810b8ec29c8f0b6199c0e35d82fde1f46d984a5f8f1da304326a42a42",
+    "inputs/ncp07/candidate/src/coupled_primary.rs": "2c528f1e7dcf44622374f8421a192f75ce8cff8b1c311bbff508f9ed863d7dcc"
+  },
+  "decision_scope": "Same fixed-alpha, source-aligned, unit-parameter finite first-stage responses for full and first_half only; conditional on the inherited PHYS09 whole-box source/C2/root inclusion premises.",
+  "claim_status": [
+    {
+      "claim": "source-aligned fhat temperature/electron definition",
+      "status": [
+        "established_from_read_source",
+        "derived"
+      ],
+      "finding": "Exact stored nHe/nH and separately lifted kB/eV leaves match the FT03 Jet source; f and fhat remain distinct."
+    },
+    {
+      "claim": "Banach image root enclosure gc +/- (beta + B r)",
+      "status": [
+        "derived",
+        "numerically_checked",
+        "implementation_verified"
+      ],
+      "finding": "Fixed-point image bound is valid inside inherited Y; all actual strict margins are positive and exact root-image endpoints reproduce."
+    },
+    {
+      "claim": "finite HH Delta e > 0, Delta T < 0, Delta n_e > 0",
+      "status": [
+        "derived",
+        "numerically_checked",
+        "implementation_verified"
+      ],
+      "finding": "Whole-rectangle U inclusion transfers by FTC along one fixed-alpha lambda path; no corner/root solve is claimed."
+    },
+    {
+      "claim": "thermal/particle cooling components and finite particle share",
+      "status": [
+        "derived",
+        "numerically_checked",
+        "implementation_verified"
+      ],
+      "finding": "Both pathwise chain-rule components are negative. The finite share is a positive (-U_T)-weighted average of the pointwise share, not an unweighted integral."
+    },
+    {
+      "claim": "new strictly negative first gas-energy response and chi_eff interval",
+      "status": [
+        "derived",
+        "numerically_checked",
+        "implementation_verified"
+      ],
+      "finding": "Exact ell_f U = dt*(E_g U + E_lambda) includes all stored gradient slots required by the chain rule and retains lambda tails. R and chi_eff identities are correct; finite -Delta w/Delta e inherits the local interval by positive U_e weighting."
+    },
+    {
+      "claim": "positive mixed temperature and finite cooling suppression ratio",
+      "status": [
+        "reused_PHYS09",
+        "derived",
+        "numerically_checked",
+        "implementation_verified"
+      ],
+      "finding": "The positive W_T input is copied exactly from PHYS09 and is not a new source computation. Absolute HH cooling plus that mixed interval gives the new ratio. Electron mixed sign is computed; equation (29) electron ratios are derived but not separately numerically emitted."
+    },
+    {
+      "claim": "photon birth increases thermal energy while reducing temperature",
+      "status": [
+        "derived",
+        "numerically_checked",
+        "implementation_verified"
+      ],
+      "finding": "Actual V_w and V_e are positive while the uniform upper bound of V_w/V_e lies below the uniform lower bound of w/Pi. The same fixed-lambda unit-b finite temperature difference is negative."
+    },
+    {
+      "claim": "same-g f/fhat readout bridge",
+      "status": [
+        "derived",
+        "numerically_checked",
+        "implementation_verified"
+      ],
+      "finding": "Factored delta=f-fhat formula and its lambda derivative are algebraically correct. The finite response bound compares output definitions on the same gas family only."
+    }
+  ],
+  "actual_checks": {
+    "independent_script": "independent_check.py",
+    "script_sha256": "adaaf030aabd00b36b466de177c8798ddb83e8058755a54ca0a71a85e75acddf",
+    "receipt": "INDEPENDENT_ARITHMETIC.json",
+    "receipt_sha256": "c7fc62a7a07f8cc9fc8fad4fef491959a77228807c3d147431bc92f7ea59c384",
+    "assertions": 196,
+    "outward_decimal_assertions": 86,
+    "actual_scientific_families": 2,
+    "small_exact_rational_and_Jet_cases": 8,
+    "assertions_are_distinct_scientific_cases": false,
+    "result": "PASS",
+    "wall_s": 0.03885641900706105,
+    "method": "Independent Fraction tuple arithmetic reproduced exact core endpoints from source inputs without importing the candidate. A separate exact four-slot Jet checked quotient/normalization/mixed-derivative cases. General FTC, source-energy identities and positive-weighted finite ratios were reviewed algebraically."
+  },
+  "read_scope": [
+    {
+      "source": "harness PROJECT_INSTRUCTIONS.md; state/RESEARCH_STATE.md; inputs/current/AGENTS.md; SCIENTIFIC_CONTRACT.md",
+      "scope": "Entire files. Harness state is the uninitialized package template, not evidence of project execution."
+    },
+    {
+      "source": "src/thermo_response.py",
+      "scope": "Entire first version plus final v2 changed calculation/output sections; final code SHA256 bound."
+    },
+    {
+      "source": "theory/THERMODYNAMIC_RESPONSE_THEOREM_KO.md",
+      "scope": "Entire theory across candidate and final additions; final editorial correction in section 9 read explicitly."
+    },
+    {
+      "source": "inputs/phys09/PROJECTED_ENERGY_THEOREM_KO.md",
+      "scope": "Sections 1-5 and 7 directly; headings and source/result pointers in remaining sections. No full historical suite rerun."
+    },
+    {
+      "source": "inputs/phys12/ABSOLUTE_THEOREM_KO.md",
+      "scope": "Entire file: fixed-family quantifiers, finite transfer, inherited premises and chronology."
+    },
+    {
+      "source": "inputs/ncp07/candidate/src/ft03_interval.rs",
+      "scope": "ft03_interval_rhs density, particles, temperature and electron graph, lines 35-95, plus matching-symbol search."
+    },
+    {
+      "source": "inputs/ncp07/candidate/src/coupled_primary.rs",
+      "scope": "model and valid, lines 60-120, plus normalization/energy/electron matching-symbol search; no complete native solver review."
+    },
+    {
+      "source": "PROJECTED_RESULTS, SOURCE_BOX, constant leaves, THERMO_RESULTS/SUMMARY and execution receipts",
+      "scope": "Full JSON parse; arithmetic consumed stored U/V/W, root enclosure metadata, first energy gradient, mixed temperature, exact scalar words and relevant source hashes. Retained source Hessian construction itself was not independently regenerated."
+    }
+  ],
+  "resolved_findings": [
+    {
+      "id": "R13-EDITORIAL-1",
+      "finding": "Section 9 previously listed an electron suppression ratio among new numerical outputs although JSON did not emit one.",
+      "resolution": "Final theory explicitly distinguishes the computed temperature ratios and electron mixed sign from the derived-only equation (29) electron ratios.",
+      "resolved_in_theory_sha256": "ec4d3ed67130683f5d1529d6802db67780a5aa7bf514637f4f757670ef88ef8b"
+    }
+  ],
+  "remaining_blocking_findings": [],
+  "inherited_premises": [
+    "One permitted alpha remains fixed through each (lambda,b) rectangle.",
+    "Stored source/energy Jets enclose the same source and required derivatives on the whole original domain.",
+    "The open C2 real-lift and original uniform root/Neumann enclosures remain valid."
+  ],
+  "claim_ceiling": {
+    "native_certificate": false,
+    "new_native_root": false,
+    "source_kernel_revalidated": false,
+    "carried_second_half": false,
+    "history_or_time_convergence": false,
+    "continuum_or_full49": false,
+    "general_anisotropic_scan": false,
+    "consumer_admission": false,
+    "cosmological_negligibility": false,
+    "global_DAG_nodes_completed": [],
+    "chronology": "full and first_half start separately from the same COMMON; their alpha tuples differ. Do not add them into a history or infer a convergence order from their ratio.",
+    "energy_interpretation": "Delta Egas is the selected HH ON/OFF response of gas thermal-plus-ionization energy. It is not the total temporal energy loss or the complete gas/photon/escape ledger.",
+    "bridge_interpretation": "Same-g readout difference only, not a changed-source solution error or a native floating-point discrepancy bound."
+  },
+  "review_environment_events": [
+    "ENVIRONMENT_FAILURES.json",
+    "REVIEW_ENVIRONMENT_EVENTS.md"
+  ],
+  "stop_reason": "All material claim risks in this bounded new postprocessing are resolved; no further historical or broad test replay is required."
+}

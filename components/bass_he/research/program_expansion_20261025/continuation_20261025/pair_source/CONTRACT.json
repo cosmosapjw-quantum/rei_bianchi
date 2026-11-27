@@ -1,0 +1,94 @@
+{
+  "schema": "he.selected_pair_contract.v1",
+  "unit": "HE-EXP-PAIR-H-HE-MOMENT-INTAKE",
+  "phase": "THEORY_AND_SOURCE_INTAKE",
+  "base_sha": "c456b05e0f1c53faa3ae36720826f43e57c06a91",
+  "nodes": [
+    "HE-EXP-PAIR",
+    "HE-EXCHANGE",
+    "HE-EXP-CLOSURE"
+  ],
+  "source_pair": [
+    "H",
+    "He"
+  ],
+  "source_identity": {
+    "repository": "mutationpp/Mutationpp",
+    "commit": "58678c0e038eb2f078fed3b45640741fdaf167dc",
+    "git_blob": "d86bf74e05e6bcac9db67cfc03055621ebed2f8c",
+    "sha256": "25e0ac6affa33361e9652d3fd3f43760f40f1a500c0a4993b1ace82c5ce501c2",
+    "raw_path": "../sources/raw/mutationpp_collisions.xml"
+  },
+  "temperature_domain_K": [
+    50,
+    50000
+  ],
+  "domain_argument": "T_star=(m_b*T_a+m_a*T_b)/(m_a+m_b)",
+  "allow_extrapolation": false,
+  "accepted_source_quantities": [
+    "Qbar11",
+    "Qbar22"
+  ],
+  "new_intake_quantities": [
+    "Qbar12",
+    "Qbar13",
+    "Qbar14",
+    "Qbar15",
+    "Qbar23",
+    "Qbar24",
+    "Qbar33"
+  ],
+  "new_fit_evaluation": false,
+  "physical_provider_admitted": false,
+  "full_differential_law": false,
+  "assumptions": [
+    "distinct neutral H/He source labels",
+    "elastic rotation-invariant differential law",
+    "classical nonrelativistic independent Maxwellians",
+    "no relative drift for heat formula",
+    "first order in relative drift for momentum formula",
+    "fixed species particle counts and internal identity",
+    "explicit caller isotope/mass-source binding"
+  ],
+  "formulas": {
+    "Q_a": "4*k_B*n_a*n_b*(mu/M)*gbar*Qbar11(T_star)*(T_b-T_a)",
+    "Q_b": "-Q_a",
+    "K_ab": "(4/3)*n_a*n_b*mu*gbar*Qbar11(T_star)",
+    "R_a": "-K_ab*(u_a-u_b)+O(|u_a-u_b|^3)",
+    "gbar": "sqrt(8*k_B*T_star/(pi*mu))"
+  },
+  "error_status": {
+    "source": null,
+    "model": "elastic+Maxwellian+small-drift restrictions",
+    "fit": "inherited source approximation; not recalibrated",
+    "quadrature": "not run",
+    "floating": "implementation contracts only; parent validation receipt"
+  },
+  "ownership": {
+    "lead_repo": "cosmosapjw-quantum/BASS_HE",
+    "thermal_pair_signs": [
+      "Q_a",
+      "-Q_a"
+    ],
+    "species_counts": "unchanged by this elastic channel",
+    "binding_energy": "unchanged by this elastic channel",
+    "nonthermal_energy": "requires CR distribution-dependent collision moment",
+    "nuclear_Q": "not an input to this elastic channel"
+  },
+  "retained_HE101": {
+    "C8": "PARTIAL_EXPORT",
+    "repair_reserve_remaining": 0,
+    "replays": 0,
+    "new_starts": 0
+  },
+  "verification": {
+    "test_file": "test_h_he_intake.py",
+    "status": "PREPARED_FOR_PARENT_BOUNDED_VALIDATION",
+    "scientific_grid_or_fit_eval": false
+  },
+  "next_input": [
+    "WU isotope/state/mass mapping with actual source scope",
+    "one source-valid Qbar11(T_star) value with evidence and uncertainty",
+    "independent derivation/code review"
+  ]
+}

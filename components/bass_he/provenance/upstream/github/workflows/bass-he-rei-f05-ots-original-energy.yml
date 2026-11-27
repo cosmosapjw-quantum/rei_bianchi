@@ -1,0 +1,40 @@
+name: BASS_HE REI F05 original 26-event HHe OTS energy source receipt
+on:
+  push:
+    branches:
+      - research/bass-he-rei-f05-original-ots-stoichiometric-closure-20261102
+    paths:
+      - research/rei_f05_native_ots_stoichiometric_energy_20261102/**
+      - .github/workflows/bass-he-rei-f05-ots-original-energy.yml
+  pull_request:
+    paths:
+      - research/rei_f05_native_ots_stoichiometric_energy_20261102/**
+      - .github/workflows/bass-he-rei-f05-ots-original-energy.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-free-physical-receipt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify derived 46080-cell original-source receipt only
+        run: python3 research/rei_f05_native_ots_stoichiometric_energy_20261102/verify_published_receipt.py
+      - name: Verify same receipt in optimized python
+        run: python3 -O research/rei_f05_native_ots_stoichiometric_energy_20261102/verify_published_receipt.py
+      - name: Forbid false original REI admission
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('research/rei_f05_native_ots_stoichiometric_energy_20261102/results/SCIENCE_RESULT.json')
+          d=json.loads(p.read_text())
+          assert d['canonical_delta']==0
+          assert d['official_tick161'] is False
+          assert d['photon_spectral_emissivity_admitted'] is False
+          assert d['production']=='HOLD'
+          print('PASS_DERIVED_SOURCE_ONLY_NO_OFFICIAL_IVP_OR_CAUSAL_PHOTON_OWNERSHIP')
+          PY

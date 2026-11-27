@@ -1,0 +1,29 @@
+[package]
+name = "he29-optimized-bridge"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.94.1"
+license = "MIT"
+publish = false
+
+[workspace]
+
+[lib]
+name = "he29_optimized_bridge"
+crate-type = ["cdylib"]
+
+[dependencies]
+rodas5p-core = { path = "../vigilode/crates/rodas5p-core" }
+rodas5p-integrators = { path = "../vigilode/crates/rodas5p-integrators", default-features = false }
+serde_json = "=1.0.151"
+rayon = "=1.12.0"
+
+[profile.dev]
+opt-level = 1
+panic = "unwind"
+
+[profile.release]
+opt-level = 2
+lto = false
+codegen-units = 16
+panic = "unwind"

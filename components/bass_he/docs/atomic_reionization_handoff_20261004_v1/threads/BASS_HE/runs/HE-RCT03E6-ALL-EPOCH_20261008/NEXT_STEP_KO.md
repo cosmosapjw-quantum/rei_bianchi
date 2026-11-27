@@ -1,0 +1,13 @@
+# 다음: RCT03E7_OWNER_READOUT_ADOPTION_AND_CONDITIONAL_ERROR_CONTRACT
+
+READ REPORT_KO.md,PLAN.json,RETURN.json,INPUT_PIN.json,evidence/analysis01/RESULTS.json,inputs/SELECTED_HISTORIES.json.
+
+현재 N384 385출력시각의Endpoint rate와N192의193개공통시간,동일N384의panel256/512와Gauss2/4를비교한9개세축합은모두1이하다. 최대GM-HI .9645971372385901이며여유가넓지는않다. 같은8heldout검사나전체5199행을owner수신의새기본조건으로반복하지않는다. 원E3legacyrateFAIL은별도정의의과거기록이다.
+
+newnative는read-onlyexporter이고receiverphysics3files,E4관측기512,E5cache,기존gas/cfg/35eVclosure는불변이다. P256geometry는기존정의의base256확장이고positiveGauss2/4/cap4096을유지했다. cachecap32768은보관항목수이며activegridcap과혼동하지않는다. 현재union최대20940이므로eviction이필요없었다. 새모형이나새출력집합에서는union/clock/sourceidentity를다시확인한다.
+
+다음실제동작은기존observer호출부또는consumer후처리에선택형export를연결하고현재입력SHA/clock/단위/positiveparent정의를보존하는것이다. 모든시각의물리참해·장기F09·원자스펙트럼을이결과에서추론하지않는다. 새Gamma를물질RHS나흡수transaction에되먹임하는변경은이번범위밖이다. observerNph/Eph를기존producer누적장부에덮어쓰지않는다.
+
+기본재현 python -B reproduce.py --output NEW_DIRECTORY 는봉인payload검사와저장CSV/witness의분석만한다. --native는명시적새출력디렉터리에서5199observerrow와135uncachedwitness를재생하는선택이다. E5/E4이전campaign은호출하지않는다. Rust1.94.1/Pythonstdlib필요,compiler/binary는제공하지않고GPGauthenticity미확인이다.
+
+원sourcefreeowner채택에추가이론gate를삽입하지않는다. baselineRCTOFF,sourcephoton/heat/recoilnull,physicalHOLD,HE-F2/F09globalOPEN을보존한다. 실제게시/백업영수증과입력archive복원은다른검증수준이다.

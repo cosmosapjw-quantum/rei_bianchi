@@ -1,0 +1,64 @@
+{
+  "schema": "bass-he-e13c5-full-finite-budget-contract-v1",
+  "node": "HE_E13C5_FULL_FINITE_BUDGET_AND_COMPLEMENT01",
+  "execution_kind": "SAVED_RESULT_EXACT_POSTPROCESSING_ONLY",
+  "decision_basis": "PR20 already completed all 2440 finite captured nodes in each alternative mode. This job reuses that complete finite result and replaces only the two already reviewed OFF N512 terms.",
+  "limits": {
+    "processes": 1,
+    "threads": 1,
+    "memory_MiB": 1024,
+    "wall_seconds": 300,
+    "stream_passes": 1,
+    "coefficient_evaluations": 0,
+    "ODE_solves": 0,
+    "native_runs": 0,
+    "gas_advances": 0,
+    "automatic_retries": 0
+  },
+  "pinned_inputs": {
+    "paths": {"bytes": 292932850, "sha256": "175d8aa96d50965127ac61840991fc69e348e1acbb21e21cfed5eb7947441c94"},
+    "full_results": {"bytes": 37367, "sha256": "29dfaa5408cee99ccbefd25039f42bec80fec8268784cb81fa50920ce3449271"},
+    "full_start": {"bytes": 5069, "sha256": "a913afb21384d219da34daeaac13e4e48bd92e5fca0499c627ac7fc5081a9403"},
+    "full_code": {"bytes": 11898, "sha256": "1f383e81d928d1afa3ecd5d22391d2a3ea82a289799dd54c9d4a18b741162ff8"},
+    "prior": {"bytes": 950019, "sha256": "418dcac9280947abc227c69f9178c0163bbdb00fa34bff1f9e34ab9eea35ece4"},
+    "prior_code": {"bytes": 12327, "sha256": "aaae27a0d053d42ce6727593df676352697dd042486aa448d1e9104b16f979f6"},
+    "current": {"bytes": 417016, "sha256": "5a3b9f17c6d250afed0e4270e4cce71d22d930a482084bc12c3e7dcc66cb68d7"},
+    "lineage_result": {"bytes": 870091, "sha256": "2fd04e6c6f300bbe19344fcf7d0e000174241ebd719716f897f8f6c5104d6bd9"},
+    "lineage_code": {"bytes": 28050, "sha256": "dd8796ae232d3d72384df14263658d1e48e87a8fad6982f64a6ab811ce2eb985"}
+  },
+  "coverage": {
+    "modes": ["OFF", "KF", "GM"],
+    "nodes_per_mode": 2440,
+    "paths": 7320,
+    "segments": 14652,
+    "selected_nodes_per_mode": [0, 700, 1620, 2344],
+    "complement_nodes_per_mode": 2436,
+    "replacement_keys": [["OFF", 0], ["OFF", 700]],
+    "segments_per_ordinary_path": 2,
+    "segments_per_selected_path": 3,
+    "mode_mixing": false
+  },
+  "absolute_observables": ["P_final", "anchor", "Z_eV", "QN", "QE_eV", "A_HI", "B_HI_eV", "H_HI_eV", "A_HeI", "B_HeI_eV", "H_HeI_eV", "A_HeII", "B_HeII_eV", "H_HeII_eV"],
+  "correction_observables": ["P_final", "energy_eV", "Z_eV", "QN", "QE_eV", "A_HI", "B_HI_eV", "H_HI_eV", "A_HeI", "B_HeI_eV", "H_HeI_eV", "A_HeII", "B_HeII_eV", "H_HeII_eV"],
+  "species_sum_diagnostics": ["A_total", "B_total_eV", "H_total_eV"],
+  "arithmetic": "Exact Fraction arithmetic on serialized finite decimal endpoints; spectral weights are positive exact point intervals. Energy correction uses the exact binary64 lift of 1.602176634e-12 erg/eV once. No candidate/helper imports, Decimal, coefficient calls, exp, or solver calls.",
+  "semantics": {
+    "absolute": "Saved PR20 weighted_reduction already contains the positive spectral weight. P_final is final absolute photon stock; anchor is the signed cumulative energy seam; moment entries are cumulative absolute physical moments.",
+    "correction": "Spectral weight times saved cumulative_correction for moments; weight times final segment DP for photons; weight times final energy_endpoint_minus_captured_erg divided once by epsilon for energy stock. All are continuous-minus-captured-segment baselines, not native full aggregate corrections.",
+    "replacement": "Use saved N512 track true_moment_enclosures, final_photon.true_absolute_interval and summed_true_anchor_eV for absolute quantities, and native-captured correction fields for corrections. Check the same 14 absolute terms against the reviewed exact prior lineage reducer. Reused twelve PR20 paths must equal PR19 paths in all fields except segment origin.",
+    "direct_sum": "Build full, selected S4, missing-selected complement R2436, selected replacement K2, and all terms retained outside K2 directly from individual intervals in each mode. Never form a replacement by subtracting a rounded aggregate.",
+    "width_budget": "Width is hi-lo. Widths sum under the stated per-path Minkowski interval route. Retained width is a floor only while those retained per-path intervals are fixed; it is not a universal limit for correlated or conservation-based global certificates.",
+    "sign": "A correction has strictly positive sign only if lo>0, strictly negative sign only if hi<0, exact zero only if both endpoints are zero; all other cases are unresolved.",
+    "ranking": "Rank nonnegative path widths separately for each mode, metric, and original/hybrid variant; break ties by node. Concentrations use top 1,2,4,10,100 and divide by the matching full width. Zero-width denominator yields null and an explicit zero-width status.",
+    "intersection": "This implementation does not use intersections. Same-target old/new overlap and containment are reported as consistency and narrowing checks.",
+    "finite_vs_continuum": "Full finite captured-node coverage closes the missing finite-node obligation. It does not bound continuous spectral quadrature error, evolve gas, certify arbitrary time extension, or admit physical/global/production/receiver behavior.",
+    "species_totals": "A/B/H totals are exact interval sums across the three species within each path and mode. Never substitute the newer dedicated total certificate for the older species-sum definition."
+  },
+  "verification": {
+    "primary": "One streaming pass over PATHS.jsonl with SHA256 computed while parsing; exact complete ordered keyed coverage, positive weights, segment identities, reused path equality, source/reviewed-reducer bridges, direct partition identities, width floors and mode isolation.",
+    "source_identity": "All nine input bytes/SHA pins are mandatory. Small sources and contract are checked before and after. Raw PATHS is hashed during the one parse pass with stable stat metadata checked before and after; no second scientific pass.",
+    "controls": "Focused exact toys and rejecting negative controls for duplicate/gap/mixed mode coverage, nonpositive/nonpoint weights, metric swaps, baseline confusion, direct sum versus interval subtraction and sign rules.",
+    "failure": "Preserve fresh output, START, checkpoint, error and resource receipt. Stop without automatic rerun or changes to resolution/precision/tolerances."
+  },
+  "claim_ceiling": "PASS_SCOPED_SAVED_FULL_FINITE_BUDGET, conditional on the already reviewed constituent path enclosures and their exact identities. New numerical analysis and exact bookkeeping only."
+}

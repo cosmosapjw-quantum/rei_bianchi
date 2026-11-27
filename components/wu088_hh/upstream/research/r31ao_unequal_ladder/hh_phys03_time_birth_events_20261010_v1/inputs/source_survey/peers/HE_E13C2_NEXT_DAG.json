@@ -1,0 +1,89 @@
+{
+  "schema": "bass-he-research-dag-e13c2-v1",
+  "completed_node": "E13C2_VARIABLE_COEFFICIENT_BIAS_ON_FIXED_GAS_PATH",
+  "completion_scope": "six fixed affine first2 gas transactions, continuous coefficient defect; independent review in paired artifact",
+  "next_node": "E13C3_EXPONENTIAL_DEFECT_CORRECTION_ON_FIXED_GAS_PATH",
+  "nodes": [
+    {
+      "id": "E13C2_VARIABLE_COEFFICIENT_BIAS_ON_FIXED_GAS_PATH",
+      "status": "COMPLETE_PASS_SCOPED",
+      "evidence": [
+        "PHYSICAL_RESULT.json",
+        "evidence/VERIFICATION_FINAL.json",
+        "INDEPENDENT_REVIEW.json"
+      ]
+    },
+    {
+      "id": "E13C3_EXPONENTIAL_DEFECT_CORRECTION_ON_FIXED_GAS_PATH",
+      "status": "READY_FOR_NEXT_LOOP",
+      "depends_on": [
+        "E13C2_VARIABLE_COEFFICIENT_BIAS_ON_FIXED_GAS_PATH"
+      ],
+      "question": "Can a first coefficient-variation correction with exact frozen damping recover the observed number and heat defects at lower cost, and provide a useful separate continuum error diagnostic?",
+      "fixed_inputs": [
+        "same 24 pinned input files",
+        "saved E13C2 full and six-local continuous references"
+      ],
+      "minimal_action": "derive e1 and moment remainder from THEORY; implement for the same six local controls with existing event masks and source law; compare against saved oracle without rerunning it",
+      "candidate_method": "e1=G_f*e_a + convolution(G_f,delta_q-delta_Lambda*P_f); weighted direct term plus frozen-opacity field response; retain source/redshift/seam terms",
+      "research_diagnostic_acceptance": {
+        "claim": "candidate approximation only, not physical accuracy admission",
+        "local_total_heat_nonzero_relative_error_max": 0.01,
+        "positive_endpoints": true,
+        "separate_direct_feedback_terms": true,
+        "report_counts_and_heat_signed_errors": true,
+        "preserve_reference_and_first_failure": true,
+        "near_zero_policy": "use declared absolute arithmetic floor and label unresolved relative error; never divide by a near-zero defect"
+      },
+      "expand_only_if": "local implementation and identities pass; then evaluate current first2 path correction against existing saved E13C2 reference, with no new gas advance",
+      "rigorous_bound_claim_requires": "outward coefficient/integral enclosures for D_Lambda and B_r plus weighted remainder and anchor/outflow terms",
+      "stop_conditions": [
+        "first sign/ledger/domain failure preserved and classified",
+        "unsupported nonzero outflow -> explicit scoped stop",
+        "candidate misses1percent diagnostic -> report failure, no post-hoc tolerance relaxation",
+        "no broad old full3x384 campaigns"
+      ],
+      "carried_incoming_defect_bound": "for nonzero e_a, sup|e-e1| <= D_Lambda*(|e_a|+B_r); include incoming correction and its uncertainty, not the e_a=0-only bound"
+    },
+    {
+      "id": "LATE_K7_K59_PHOTON_STOCK",
+      "status": "OPEN_SEPARATE_INPUT",
+      "depends_on": [],
+      "action": "resolve the parallel PHOTON_HEATING draft actual input identity before any computation"
+    },
+    {
+      "id": "HE_F2_F09_RECEIVER_ADOPTION",
+      "status": "OPEN_OWNER_GATE",
+      "depends_on": [],
+      "action": "receiver owner defines physical/continuum budget and adoption; this packet is evidence only"
+    },
+    {
+      "id": "ACTUAL_ATOMIC_RCT_MOMENTS",
+      "status": "OPEN",
+      "depends_on": [],
+      "action": "provider-bound photon spectrum, heat and recoil moments required separately"
+    }
+  ],
+  "protected": {
+    "baseline_RCT": "OFF",
+    "actual_atomic_photon_heat_recoil": null,
+    "physical": "HOLD",
+    "production": "HOLD",
+    "HE_F2": "OPEN",
+    "F09": "OPEN",
+    "receiver_adoption": "SEPARATE",
+    "legacy_Gamma_alias": {
+      "value": 3.543295,
+      "status": "FAIL"
+    },
+    "uniform_interval_certificate": false
+  },
+  "forbidden_automatic_actions": [
+    "new gas/coupled Newton advancement",
+    "repeat historical full3x384 campaign",
+    "change baseline RCT",
+    "substitute algebraic TOL for continuum tolerance",
+    "import parallel draft as canonical",
+    "merge PR or change production defaults"
+  ]
+}

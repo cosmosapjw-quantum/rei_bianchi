@@ -1,0 +1,52 @@
+name: BASS_HE original REI F05 tick161 H He ionization-storage science
+on:
+  push:
+    branches:
+      - research/bass-he-rei-f05-tick161-atomic-binding-20261101
+  pull_request:
+    paths:
+      - 'research/rei_f05_tick161_atomic_binding_20261101/**'
+      - '.github/workflows/bass-he-rei-f05-tick161-latent-energy.yml'
+jobs:
+  source-authentic-46k-energy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Original physical source integrity plus negative tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=research/rei_f05_tick161_atomic_binding_20261101
+          python -m unittest discover -s "$P/tests" -p 'test_*.py' -v
+          python -O -m unittest discover -s "$P/tests" -p 'test_*.py' -v
+          python "$P/audit_independent.py"
+      - name: Recompute all original 46080 actual H He latent source cells
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=research/rei_f05_tick161_atomic_binding_20261101
+          python "$P/latent_energy.py" --out "$RUNNER_TEMP/rei_f05_he_replay"
+          python - "$P/results/RESULT.json" "$RUNNER_TEMP/rei_f05_he_replay/RESULT.json" <<'PY'
+          import json,sys
+          ref=json.load(open(sys.argv[1]))
+          got=json.load(open(sys.argv[2]))
+          assert ref["source_increment_csv_sha256"]==got["source_increment_csv_sha256"]
+          assert ref["source_preview_csv_sha256"]==got["source_preview_csv_sha256"]
+          assert ref["sampled_original_physical_cells"]==got["sampled_original_physical_cells"]==46080
+          assert ref["canonical_delta"]==got["canonical_delta"]==0
+          assert got["official_tick161"]=="NOT_ACCEPTED"
+          for name in ("dB_H","dB_He","dB_total","dNe","B161","U161"):
+              for s in ("lower","upper"):
+                  x=ref["global_intervals"][name][s]
+                  y=got["global_intervals"][name][s]
+                  assert abs(x-y)<=max(1e-12*abs(x),1e-260),(name,s,x,y)
+          for name in ("lower","upper"):
+              x=ref["helium_share_of_global_ionization_storage_decline"][name]
+              y=got["helium_share_of_global_ionization_storage_decline"][name]
+              assert abs(x-y)<=2e-12
+          print("REAL_ORIGINAL_46K_ATOMIC_STORAGE_SCIENCE_REPLAY_PASS")
+          PY

@@ -1,0 +1,27 @@
+--- evidence/execution/A1_before/pre_A2_hex_intake.py	2026-10-24 06:41:57.237286274 +0900
++++ code/hex_intake.py	2026-10-24 06:41:58.203061003 +0900
+@@ -25,7 +25,9 @@
+ INSERT = re.compile(r'^INSERT\s+(?:OR\s+REPLACE\s+)?INTO\s+('+IDENT+r')\s*(?:\(([^)]*)\))?\s*VALUES\s*\((.*)\)\s*;?$', re.I | re.S)
+ TABLE = re.compile(r'^(?:CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?|INSERT\s+(?:OR\s+REPLACE\s+)?INTO\s+)('+IDENT+r')', re.I)
+ SPECIAL = re.compile(rb"['\"`;#/-]")
+-NUMERIC_LITERAL = re.compile(r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?')
++NUMBER_PATTERN = r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?'
++NUMERIC_LITERAL = re.compile(NUMBER_PATTERN)
++NUMERIC_ROW = re.compile(r'\s*'+NUMBER_PATTERN+r'(?:\s*,\s*'+NUMBER_PATTERN+r')*\s*')
+ HEX_LITERAL = re.compile(r"[xX]'(?:[0-9a-fA-F]{2})*'")
+ 
+ 
+@@ -41,9 +43,10 @@
+     table, columns, body = match.groups()
+     # Actual source fields are numeric literals or hex BLOB, never expressions.
+     tokens = tuple(t.strip() for t in body.split(','))
+-    for token in tokens:
+-        if not (NUMERIC_LITERAL.fullmatch(token) or HEX_LITERAL.fullmatch(token) or token.upper() == 'NULL'):
+-            raise ValueError('unsupported or malformed VALUES literal')
++    if not NUMERIC_ROW.fullmatch(body):
++        for token in tokens:
++            if not (NUMERIC_LITERAL.fullmatch(token) or HEX_LITERAL.fullmatch(token) or token.upper() == 'NULL'):
++                raise ValueError('unsupported or malformed VALUES literal')
+     return identifier(table), (tuple(identifier(c) for c in columns.split(',')) if columns else None), tokens
+ 
+ 

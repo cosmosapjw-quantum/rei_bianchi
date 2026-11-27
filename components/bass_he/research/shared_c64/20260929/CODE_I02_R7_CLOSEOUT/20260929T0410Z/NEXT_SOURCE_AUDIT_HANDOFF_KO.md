@@ -1,0 +1,7 @@
+# Next independent source-normalization audit handoff
+
+Start from the published R7 closeout namespace and its `SCIENCE_SCOPE_DECISION.json`, `SOURCE_NORMALIZATION_INVENTORY.md`, `RECOVERY_MANIFEST.json`, and byte-exact raw reviewer files. Preserve CODE-I02 scoped runtime closure; do not repeat the prior 24-case hostile matrix or 57/3 focused tests without an affected dependency.
+
+Target only the CPC 2023 Eq.(52)/(55)/(56) source normalization. Locate the authorized attachment `1-s2.0-S0010465523000073-main.pdf` and verify its SHA256 `1367f5ab3239cad1b3ea377edb28a9b9e6975f4cec27fb6d289fdb1d601b1c55`, edition and exact pages. Do not redistribute the PDF. Compare necessary symbols and definitions around Eq.(50), Eq.(52), Eq.(55), Eq.(56) and Appendix A, recording SOURCE, DERIVED, BENCHMARK and OPEN separately. Identify whether the paper explicitly maps elementary p to Q-series single-pass P or gives a different Delta definition; mark absence as unresolved. Compare the printed convention with the two code lanes without changing code.
+
+Return source page anchors, narrow quotations or paraphrases within copyright limits, hash identity, exact mapping or unresolved alternatives, and a decision request. No Eq.(55) numerical calculation, production Eq.(50)/(54), physical tolerance/default change, Nmax/channel reinterpretation, replay, cloud job, or L2 interval implementation is authorized. Keep `scientific_PROMOTE=HOLD`, `Eq55_next_node_authorized=false`, and `Eq55=NOT_RUN` until a separately authorized decision.

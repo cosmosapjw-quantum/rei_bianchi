@@ -1,0 +1,2 @@
+# R01 | source-first physical question
+Original BASS_HE PR120 frozen at 83596b913a08dd31496b7abbb7d5a9972fff5cc1. Target independent real experimental inverse reaction dd->He4 gamma, not more model-dependent Fermi points or solver optimization. Preserve exact 4 EXFOR sources and distinguish REL DA, PAR DA, polarized observables. Source unit S1 0/2 until C0122+A1256 obtained; S2 energy and observable atlas after tests. Central28/88 HE14/18 unchanged. Branch isolated, physical delta zero, production HOLD; native subagent NOT_RUN.

@@ -1,0 +1,96 @@
+   Compiling rei_microphysics v0.1.0 (/root/WU088_HH_PHYS07_NCP_20261011/research/r31ao_unequal_ladder/ncp_energy06e_certificate_20261010_v1/original_owner_dependency)
+   Compiling hh_phys04_candidate v0.1.0 (/root/WU088_HH_PHYS07_NCP_20261011/research/r31ao_unequal_ladder/ncp_phys07_local_20261011_v1/candidate)
+warning: unused imports: `hh_return_enclosure`, `hh_stage_root`, and `hh_stage_step_conservative`
+ --> candidate/src/hh_paired_extension.rs:5:37
+  |
+5 | use crate::coupled_primary::{HhMode,hh_stage_step_conservative,hh_stage_root,hh_return_enclosure};
+  |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `hh_endpoint` is never used
+   --> candidate/src/hh_primary_extension.rs:589:4
+    |
+589 | fn hh_endpoint(stage:&PrimaryStage,m:&Ft03Model,old:&PrimaryState,s:&PrimaryState,sigma:&[[f64;3]],dt:f64)->Result<(f64,PrimaryEven...
+    |    ^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `hh_source_endpoint` is never used
+  --> candidate/src/hh_paired_extension.rs:89:4
+   |
+89 | fn hh_source_endpoint(c:&PairedConfig,h:[f64;3],s:&PairedState,dt:f64,nodes:&[f64])->Result<(PairedState,String,f64,[f64;2]),Forward...
+   |    ^^^^^^^^^^^^^^^^^^
+
+warning: associated function `new` is never used
+  --> candidate/src/phys04_receipt.rs:19:5
+   |
+18 | impl EndpointIdentity {
+   | --------------------- associated function in this implementation
+19 |  fn new(c:&PairedConfig,h:[f64;3],old:&PairedState,dt:f64)->Self{Self::amplitude(c,h,old,dt,1.0,1.0)}
+   |     ^^^
+
+warning: multiple fields are never read
+  --> candidate/src/phys04_receipt.rs:29:2
+   |
+27 | struct SameEndpointReturn {
+   |        ------------------ fields in this struct
+28 |  next:PairedState,audit:String,ledger:f64,events:[f64;2],
+29 |  point:crate::coupled_primary::HhStep,root:crate::coupled_primary::HhRoot,
+   |  ^^^^^                                ^^^^
+30 |  carry:PrimaryBox,stage:PrimaryStage,prebe:PrimaryState,parent:PrimaryBox,control:StepControl,
+   |  ^^^^^            ^^^^^              ^^^^^              ^^^^^^            ^^^^^^^
+31 |  identity:EndpointIdentity,history:Option<([f64;4],[f64;4])>,
+   |  ^^^^^^^^
+
+warning: struct `AcceptedHalf1` is never constructed
+  --> candidate/src/phys04_receipt.rs:34:8
+   |
+34 | struct AcceptedHalf1 {returned:SameEndpointReturn,history:[f64;4]}
+   |        ^^^^^^^^^^^^^
+
+warning: function `accepted_half1_receipt` is never used
+  --> candidate/src/phys04_receipt.rs:35:4
+   |
+35 | fn accepted_half1_receipt(returned:SameEndpointReturn,c:&PairedConfig,h:[f64;3],old:&PairedState,history:[f64;4])->Result<AcceptedHa...
+   |    ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `accepted_half1_amplitude_receipt` is never used
+  --> candidate/src/phys04_receipt.rs:38:4
+   |
+38 | fn accepted_half1_amplitude_receipt(returned:SameEndpointReturn,c:&PairedConfig,h:[f64;3],old:&PairedState,history:[f64;4],lambda:f6...
+   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `resolve_half2_predecessor` is never used
+  --> candidate/src/phys04_receipt.rs:53:4
+   |
+53 | fn resolve_half2_predecessor(receipt:&AcceptedHalf1,c:&PairedConfig,h:[f64;3],old:&PairedState,history:[f64;4])->Result<PairedState,...
+   |    ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `Phys04ExactPermit` is never constructed
+  --> candidate/src/phys04_receipt.rs:59:8
+   |
+59 | struct Phys04ExactPermit{_sealed:()}
+   |        ^^^^^^^^^^^^^^^^^
+
+warning: function `accepted_half1_producer` is never used
+  --> candidate/src/phys04_receipt.rs:60:4
+   |
+60 | fn accepted_half1_producer(_permit:&Phys04ExactPermit,c:&HhRunConfig,old:&HhPairedState)->Result<AcceptedHalf1,ForwardError>{
+   |    ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `accepted_half1_amplitude_producer` is never used
+  --> candidate/src/phys04_receipt.rs:65:4
+   |
+65 | fn accepted_half1_amplitude_producer(_permit:&Phys04ExactPermit,c:&HhRunConfig,old:&HhPairedState,lambda:f64,b:f64)->Result<Accepted...
+   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `resolve_half2_hh_predecessor` is never used
+  --> candidate/src/phys04_receipt.rs:73:4
+   |
+73 | fn resolve_half2_hh_predecessor(receipt:&AcceptedHalf1,c:&HhRunConfig,old:&HhPairedState)->Result<HhPairedState,ForwardError>{
+   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `hh_phys04_candidate` (lib) generated 13 warnings (run `cargo fix --lib -p hh_phys04_candidate` to apply 1 suggestion)
+   Compiling hh_phys07_local v0.1.0 (/root/WU088_HH_PHYS07_NCP_20261011/research/r31ao_unequal_ladder/ncp_phys07_local_20261011_v1)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 12.85s

@@ -1,0 +1,517 @@
+{
+  "additional_scientific_runs_required_for_this_review": false,
+  "catalogue": {
+    "H1_initial_100": {
+      "ionf": {
+        "Ei_max_Ry": null,
+        "Ei_min_Ry": null,
+        "rows": 0
+      },
+      "tmat": {
+        "Ei_max_Ry": 0.9374,
+        "Ei_min_Ry": 1e-07,
+        "rows": 86457
+      }
+    },
+    "compressed_bytes": 7880672,
+    "compressed_sha256": "afa8d83ada688ecf91c40340da669e204885ec5c52d04fc55b48837b52135101",
+    "compression": "xz",
+    "dialect": "hex-lines",
+    "input_path": "/workspace/scratch/47d8070ffff8/source_intake/Hex-170210.sql.xz",
+    "insert_row_counts": {
+      "tmat": 948557
+    },
+    "ionf_rows": 0,
+    "physical_provider_values_inferred": false,
+    "sql_executed": false,
+    "statement_counts": {
+      "BEGIN": 1,
+      "COMMIT": 1,
+      "INSERT": 948557
+    },
+    "status": "SOURCE_INPUT_PENDING",
+    "table_statement_counts": {
+      "tmat": 948557
+    },
+    "uncompressed_bytes": 69441007,
+    "uncompressed_sha256": "82def29890bba56bb31f31524dcbea58bd0a0f5b39441ee7b6594bd28fc54896"
+  },
+  "checks": [
+    {
+      "finding": "The complete successful A2 stream matches the acquisition pin, including 7880672 compressed bytes and its SHA256. Output records 69441007 decoded bytes through EOF. Neither prefix diagnostic is used as a full availability result.",
+      "id": "C9-01",
+      "status": "PASS_SCOPED",
+      "topic": "Source and prepared-payload identity"
+    },
+    {
+      "finding": "Default semicolon lexer preserves quote, comment and chunk-boundary behavior. Explicit hex-lines follows source db.cpp linewise import/dump framing and rejects unsupported/multiline records. The successful statement tally contains only BEGIN, COMMIT and literal INSERT records; no malformed INSERT verb was silently counted on that payload.",
+      "id": "C9-02",
+      "status": "PASS_SCOPED",
+      "topic": "Explicit input dialect and completeness"
+    },
+    {
+      "finding": "One compiled all-numeric-row match uses the same NUMBER_PATTERN; fallback BLOB/NULL token validation, field count/order and H1 integer/finite-energy checks remain. The 262144-byte diagnostic compared 3627 completed INSERT rows with exact parsed-output equality. Synthetic positive and negative grammar controls passed.",
+      "id": "C9-03",
+      "status": "PASS_SCOPED",
+      "topic": "A2 grammar-preserving cost repair"
+    },
+    {
+      "finding": "Reviewer found INSERTfoo and punctuation-adjacent INSERT prefixes could bypass parse_insert through a non-INSERT verb. The final guard requires whitespace or EOF after INSERT. A3 ran exactly the affected existing method, with punctuation negatives, and passed. Final core differs from the catalogue-executed A2 core only in this fail-closed guard; no catalogue replay was needed.",
+      "id": "C9-04",
+      "status": "PASS_SCOPED",
+      "topic": "A3 independent finding closure"
+    },
+    {
+      "finding": "Generic ionf decoding requires an explicit little/big endian and binary64 real-imag layout, a positive multiple of 16 BLOB bytes and finite coefficients. Source native endian/precision cannot be inferred from apparent values. Catalogue separately matches initial (1,0,0); non-H1 rows cannot admit H1. Missing/empty payload is not a physical zero.",
+      "id": "C9-05",
+      "status": "PASS_SCOPED",
+      "topic": "ABI and H1 separation"
+    },
+    {
+      "finding": "C0/2 and full-coefficient default agree with source convention. exact_tail sums every omitted represented binary64 real/imaginary magnitude as an exact Fraction. select_terms uses the full nonnegative suffix. Independent forward-recurrence controls and the late nonzero (2,0,2) counterexample support the scoped omission bound.",
+      "id": "C9-06",
+      "status": "PASS_SCOPED",
+      "topic": "Chebyshev convention and exact remainder"
+    },
+    {
+      "finding": "The exact suffix bound covers coefficient omission for the represented finite polynomial on x in [0,1]. It excludes floating roundoff, source fitting/dynamics/convergence, endpoint radial division and physical/model uncertainty. No radial normalization, spin/flux weighting, physical TDCS or event law is computed by this intake.",
+      "id": "C9-07",
+      "status": "PASS_SCOPED",
+      "topic": "Numerical and physical claim boundaries"
+    },
+    {
+      "finding": "The pinned dataset has 948557 tmat rows, including 86457 H1 rows with Ei 1e-7..0.9374 Ry, and zero ionf rows. This establishes the selected dataset input gap only. Source-code capability does not supply missing numerical amplitudes or an empirical angular law. Fixed-nucleus source is not finite-mass dynamics; ionf/tdcs radial normalization remains unresolved.",
+      "id": "C9-08",
+      "status": "PASS_SCOPED",
+      "topic": "Actual absence and source-model hold"
+    },
+    {
+      "finding": "All ten actual child invocations, including both failed catalogues and two diagnostics, are retained. Aggregate CPU18.434312000000002 and wall18.739398924000852 are below20/60. A1/A2 catalogue measured CPU8.349479/8.144439 exceeds the configured8-second setting; per-invocation numerical compliance is not claimed. A1 SIGKILL exact kernel reason is unconfirmed.",
+      "id": "C9-09",
+      "status": "PASS_AGGREGATE_WITH_RECORDED_PER_INVOCATION_OVERSHOOT",
+      "topic": "Failure retention and resources"
+    },
+    {
+      "finding": "Earlier HE-X1/HE38/HE-ANG-CONTRACT evidence is reused without scientific replay. The plot is synthetic and was generated once; root visual review is reused. This reviewer authored no implementation, imported no project module, and launched no scientific test, catalogue, profile or plot. Administrative file hashing and receipt arithmetic only were performed.",
+      "id": "C9-10",
+      "status": "PASS_SCOPED",
+      "topic": "Reuse, figure and independence"
+    }
+  ],
+  "code_identities": {
+    "A1_execution_core": {
+      "bytes": 16509,
+      "sha256": "012809cd4d2141c9e505dfd8a43aa0fc0d754d79d980403384c3a44fa54da0f7"
+    },
+    "A2_catalogue_execution_core": {
+      "bytes": 16679,
+      "sha256": "2196134dbfd7b757eaef3a83618af86c66332a550d9008166d13ac88e8b4935d"
+    },
+    "A3_final_core": {
+      "bytes": 16685,
+      "sha256": "3552737bcd6cd488756f3ae5c70d1e28882bb6163d8fc4f48606689c6ef6f93e"
+    },
+    "final_README": {
+      "bytes": 9883,
+      "sha256": "fb51143c2eb87b31d20e68f8bc664b4c57a99ce7b31b39108c80f45812b65ac8"
+    },
+    "initial_execution_core": {
+      "bytes": 14360,
+      "sha256": "8c2a510e9d34f4a54a6035d851b32aa629b77c8ebd89c35eb331abeedb87c4c8"
+    }
+  },
+  "decision": "PASS_SCOPED",
+  "delivery_scope": "Expected-SHA publication, central overlay preservation and Dropbox/Drive receipts are handled separately by root; this review does not assert that those actions already succeeded.",
+  "execution_freeze_manifests": {
+    "evidence/execution/A1/source_freeze.json": "860461297e8eee26c6e1c6c9084be4b13dd30816a0f6463a620324490c24d8b5",
+    "evidence/execution/A2/source_freeze.json": "72208681854e40aadbdfccb25d517daebd827572f291ac600d71b141523f687d",
+    "evidence/execution/A3/source_freeze.json": "a04be48ce904dc24f97dcead3c18d56015d7a8a0b397ec377b2c654ad80a1d24",
+    "evidence/execution/source_freeze.json": "55fafb88a25585aaef45bdcbdb7607d3ac5ff9e3d575dc7058713309327f62a7"
+  },
+  "findings": [
+    {
+      "code_sha256": "3552737bcd6cd488756f3ae5c70d1e28882bb6163d8fc4f48606689c6ef6f93e",
+      "description": "Malformed INSERT prefixes could bypass literal validation in explicit line dialect.",
+      "fix": "INSERT followed by whitespace or EOF",
+      "id": "C9-F1",
+      "status": "CLOSED",
+      "verification": "evidence/execution/A3/06_algebra.FINISH.json"
+    }
+  ],
+  "identity_checks": {
+    "A2_full_raw_matches_acquisition": true,
+    "aggregate_cost_and_counts_match_saved_actual_receipts": true,
+    "all_actual_stdout_stderr_match_receipts": true,
+    "all_execution_manifest_internal_hashes_match": true,
+    "all_linked_prior_ledgers_match_hashes": true,
+    "final_core_matches_A3_receipt": true
+  },
+  "independence": {
+    "administrative_hash_and_receipt_checks": true,
+    "implementation_author": false,
+    "new_catalogues": 0,
+    "new_plots": 0,
+    "old_suite_replays": 0,
+    "project_module_imports": 0,
+    "scientific_executions": 0
+  },
+  "no_activation": true,
+  "open_blocking_code_findings": 0,
+  "parent_HE_ANG_SOURCE_status": "SOURCE_INPUT_PENDING",
+  "physical_provider_approved": false,
+  "prefix_comparison": {
+    "availability_inference": false,
+    "completed_INSERT_rows": 3627,
+    "decoded_bytes": 262144,
+    "exact_output_equality": true,
+    "parsed_output_sha256": "852a0dd3c17cfc0e6b62d534283b350d3dcd2cfc782de979bd70ec2cd458708a"
+  },
+  "recommended_unit_status": "COMPLETE_SCOPED_FOR_SOURCE_INTAKE_AND_REPRESENTED_COEFFICIENT_TOOLS",
+  "resource_accounting": {
+    "D10_unknown_cost": "UNKNOWN_NOT_ZERO",
+    "HE_X1_failed_prelaunch_cpu": "UNKNOWN_NOT_ZERO",
+    "actual_invocations": 10,
+    "aggregate_caps": {
+      "cpu_s": 20,
+      "wall_s": 60
+    },
+    "aggregate_limits_satisfied": true,
+    "authority": "evidence/execution/RESOURCE_LEDGER.json",
+    "authority_identity": {
+      "bytes": 29519,
+      "sha256": "b1eb4cf0e367f46260997f1e4cebf33228d5e9b7376329370bd91d323ef52450"
+    },
+    "counts_amendments": "A1/A2 frozen amendments plus root-authorized A3 recorded in RESOURCE_LEDGER; original contract preserved.",
+    "cumulative_cpu_s": 18.434312000000002,
+    "cumulative_wall_s": 18.739398924000852,
+    "every_child_nominal_cpu_bound_satisfied": false,
+    "failed_catalogue_attempts": 2,
+    "historical_budget_transfer": false,
+    "invocation_counts": {
+      "algebra": 4,
+      "catalogue": 3,
+      "diagnostic": 2,
+      "plot": 1
+    },
+    "measured_overshoots": [
+      {
+        "configured_cpu_s": 8,
+        "measured_cpu_s": 8.349479,
+        "receipt": "evidence/execution/A1/03_catalogue.FAIL.json",
+        "status": "FAIL_SIGKILL"
+      },
+      {
+        "configured_cpu_s": 8,
+        "measured_cpu_s": 8.144438999999998,
+        "receipt": "evidence/execution/A2/04_catalogue.FINISH.json",
+        "status": "FINISH"
+      }
+    ],
+    "remaining_cpu_s": 1.565687999999998,
+    "remaining_wall_s": 41.26060107599915
+  },
+  "retained_holds": [
+    "No H1 numerical ionf payload in the selected published dataset.",
+    "Actual producer BLOB ABI is unconfirmed because no actual ionf coefficient was admitted.",
+    "Source ionf/tdcs radial normalization and differential-energy convention require separate physical qualification.",
+    "Source numerical convergence, omitted support and model uncertainty remain unproved.",
+    "Fixed-nucleus source cannot be promoted to finite-mass joint event law by a frame boost or appended recoil.",
+    "No empirical angular calibration, X1 promotion, CCC hybridization, kinetic activation or new IVP."
+  ],
+  "review_stage": "C9",
+  "reviewed_file_manifest": {
+    "CONTRACT.json": {
+      "bytes": 3655,
+      "sha256": "89b8acddb1d50ecac4fdf668056a9cb4c8a8c211b677aa499408d73904c1cba1"
+    },
+    "POLICY_AMENDMENT_A1.json": {
+      "bytes": 2215,
+      "sha256": "38a18973371205e1b210a212aab3747d3348117886f906e3c40f9b843510aa20"
+    },
+    "POLICY_AMENDMENT_A2.json": {
+      "bytes": 2191,
+      "sha256": "7dc8084d230300104cb4c79505821af595bf7d03df7d046bb73d5b66ca084720"
+    },
+    "code/README.md": {
+      "bytes": 9883,
+      "sha256": "fb51143c2eb87b31d20e68f8bc664b4c57a99ce7b31b39108c80f45812b65ac8"
+    },
+    "code/diagnose_input_format.py": {
+      "bytes": 1283,
+      "sha256": "97182742b058d8802a2609ee23d3d0edfdc1a319b6b7985f2caa166fb062ed42"
+    },
+    "code/hex_intake.py": {
+      "bytes": 16685,
+      "sha256": "3552737bcd6cd488756f3ae5c70d1e28882bb6163d8fc4f48606689c6ef6f93e"
+    },
+    "code/plot_synthetic_tail.py": {
+      "bytes": 1809,
+      "sha256": "e43b73eeadceebeb3df911bd2c7c9900dbbb2f47367eb86144d1f67d9a95419d"
+    },
+    "code/profile_literal_a2.py": {
+      "bytes": 2010,
+      "sha256": "19006a3af3cd2bb6d5961d9c80be285bf41b90657a0930427a9ad985f39415b1"
+    },
+    "code/run_amendment_a1.py": {
+      "bytes": 10110,
+      "sha256": "02e4c5054f25ffe15fd05fc1047dd9b0be2e447359cb0678854449612e999ce8"
+    },
+    "code/run_bounded.py": {
+      "bytes": 8304,
+      "sha256": "b81dd7092553ac97c26c08d9ac6541ba21b72f05e70ee776297ff9d673d2c9ee"
+    },
+    "code/run_diagnostic_once.py": {
+      "bytes": 4944,
+      "sha256": "c058738dcc7b1a19685cba1946edc9b051c90055ea666a75054ffc16ffff2df9"
+    },
+    "evidence/execution/01_algebra.FINISH.json": {
+      "bytes": 1095,
+      "sha256": "0a9b292462b441a8d864b8649d6cb15da23ad333f53577f0ce7e94011d5c2ac1"
+    },
+    "evidence/execution/01_algebra.stderr.txt": {
+      "bytes": 2003,
+      "sha256": "45c690bd3b2a2c825bbed98569a505ab850bc31e2b7221d85cec2eb3a66284b8"
+    },
+    "evidence/execution/01_algebra.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/execution/02_catalogue.FAIL.json": {
+      "bytes": 1180,
+      "sha256": "9c764687604c1501b9330ce812a4f32be9276a78ae684556c4cc32a7f57792e8"
+    },
+    "evidence/execution/02_catalogue.stderr.txt": {
+      "bytes": 1023,
+      "sha256": "8f55b67322ac350c4a4c3ea954966294f9bfff5b0151e86ba251e2b10fcf281e"
+    },
+    "evidence/execution/02_catalogue.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/execution/03_diagnostic.FINISH.json": {
+      "bytes": 2079,
+      "sha256": "d30cb52ee1e42e0d172201e9daa85fabe9e44d65acae533bc9ce948fbef20f22"
+    },
+    "evidence/execution/03_diagnostic.receipt.json": {
+      "bytes": 2079,
+      "sha256": "d30cb52ee1e42e0d172201e9daa85fabe9e44d65acae533bc9ce948fbef20f22"
+    },
+    "evidence/execution/03_diagnostic.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/execution/03_diagnostic.stdout.txt": {
+      "bytes": 6611,
+      "sha256": "4d473dace527e1b2297fad0f2e742207ce232be4ca558fea65890a5c02f3d6e1"
+    },
+    "evidence/execution/A1/02_algebra.FINISH.json": {
+      "bytes": 1102,
+      "sha256": "802c0de469a529bf842848fa8d105243fb19edeeefe61a6e667f4f8169ea8d66"
+    },
+    "evidence/execution/A1/02_algebra.stderr.txt": {
+      "bytes": 746,
+      "sha256": "23207bbc3494129709c3d1989a35911f9532fd06bc2b862784aefb5935b6fde9"
+    },
+    "evidence/execution/A1/02_algebra.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/execution/A1/03_catalogue.FAIL.json": {
+      "bytes": 1205,
+      "sha256": "8eedb21f6c0cf6fe0b93fe3edc828c223cf77fcc8438063d0a6e29306f7bd6ff"
+    },
+    "evidence/execution/A1/03_catalogue.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/execution/A1/03_catalogue.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/execution/A1/source_freeze.json": {
+      "bytes": 1541,
+      "sha256": "1f13c72774d999de8136977e0c6156194ea29c4e0a111589cbbb5ed700fe4039"
+    },
+    "evidence/execution/A1_before/hex_intake.py": {
+      "bytes": 14360,
+      "sha256": "8c2a510e9d34f4a54a6035d851b32aa629b77c8ebd89c35eb331abeedb87c4c8"
+    },
+    "evidence/execution/A1_before/pre_A2_hex_intake.py": {
+      "bytes": 16509,
+      "sha256": "1f7c52a8f2728dc9fc62385b76e0551102e89d3be8d948a120eb5c94d87f8a58"
+    },
+    "evidence/execution/A1_before/pre_A3_hex_intake.py": {
+      "bytes": 16679,
+      "sha256": "2196134dbfd7b757eaef3a83618af86c66332a550d9008166d13ac88e8b4935d"
+    },
+    "evidence/execution/A1_before/pre_A3_test_literal_a2.py": {
+      "bytes": 2452,
+      "sha256": "7eb22ed558fc95aa34adf9b0fc51aa15acfa38c1355ee456f86daa00ef4251cc"
+    },
+    "evidence/execution/A1_before/retry_executed_hex_intake.py": {
+      "bytes": 16509,
+      "sha256": "012809cd4d2141c9e505dfd8a43aa0fc0d754d79d980403384c3a44fa54da0f7"
+    },
+    "evidence/execution/A1_code.diff": {
+      "bytes": 8339,
+      "sha256": "7ec848e93d0cd8384c6b9ab04d038083710e366db9c5972bde04c4b44fa8f6ae"
+    },
+    "evidence/execution/A1_ledger.json": {
+      "bytes": 5412,
+      "sha256": "5036955144e1b2ed60d1da87393f31404ff2d220e9f8f8a61704e800f12a6f1d"
+    },
+    "evidence/execution/A1_postexecution_guard.diff": {
+      "bytes": 604,
+      "sha256": "330a5e07ecc8c0c08e3ce2a0ecdc79607c5ace95d06935c88956c1113e5e71f3"
+    },
+    "evidence/execution/A2/02_diagnostic.FINISH.json": {
+      "bytes": 1183,
+      "sha256": "7c88abfe530e523156eb8e6cb62d91c47d096f63c3fc175dd8ce01b1d75e1a2c"
+    },
+    "evidence/execution/A2/02_diagnostic.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/execution/A2/02_diagnostic.stdout.txt": {
+      "bytes": 3121,
+      "sha256": "ab2c18a428a366ac39adb08d0f883b14a7736d4ee421f8cf7fb9bdbd97f12c90"
+    },
+    "evidence/execution/A2/03_algebra.FINISH.json": {
+      "bytes": 1100,
+      "sha256": "ce2501fbed3fd88d65049c7317803f5a381bcac12935f2f0b736b5a352e7eadf"
+    },
+    "evidence/execution/A2/03_algebra.stderr.txt": {
+      "bytes": 443,
+      "sha256": "dfb1b6f9d03f21b25abbe832f443ed237e1fe6f8a46b7c0de2a852099276915e"
+    },
+    "evidence/execution/A2/03_algebra.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/execution/A2/04_catalogue.FINISH.json": {
+      "bytes": 1551,
+      "sha256": "4e0053b78f02222a6d8b92768a999d2943220a63a0501519ba82cc9ed76037c6"
+    },
+    "evidence/execution/A2/04_catalogue.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/execution/A2/04_catalogue.stdout.txt": {
+      "bytes": 902,
+      "sha256": "9e8b8a1e77a1b230153f7b403318c92c66e2751da431ce829ff8ebce3137be92"
+    },
+    "evidence/execution/A2/05_plot.FINISH.json": {
+      "bytes": 1392,
+      "sha256": "3ce2a235a87e3b42e78132ed63ea7b38a9b6ac7d66be48b822b0148bda7319d9"
+    },
+    "evidence/execution/A2/05_plot.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/execution/A2/05_plot.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/execution/A2/source_freeze.json": {
+      "bytes": 1833,
+      "sha256": "539daf89a4d512a0185cabb31e8673240e1ddc3b22b2aec78d332b8743df7eab"
+    },
+    "evidence/execution/A2_code.diff": {
+      "bytes": 1592,
+      "sha256": "26fafd3d0be2e6c67782cbe04a79ebb450a12511a7ae1205cdb3e505e1972498"
+    },
+    "evidence/execution/A3/06_algebra.FINISH.json": {
+      "bytes": 1172,
+      "sha256": "52bec575f342a0ed1e49937a40b1d9494a5b5a5683fa06d4bc1d147d35d4a249"
+    },
+    "evidence/execution/A3/06_algebra.stderr.txt": {
+      "bytes": 232,
+      "sha256": "ec82a787744c94c9d12427a40b1478c1602b9b3e7181fc3bde5e705233b0cd00"
+    },
+    "evidence/execution/A3/06_algebra.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/execution/A3/source_freeze.json": {
+      "bytes": 1834,
+      "sha256": "276822850ff066ebaffe7dbf8c9f2b1595dfe152d3c15235b40d5c93fe0a645e"
+    },
+    "evidence/execution/A3_code.diff": {
+      "bytes": 602,
+      "sha256": "a087f780751867750a9a62c041865c219ba550d6c9b12f6ebc808c4e553a30bf"
+    },
+    "evidence/execution/A3_test.diff": {
+      "bytes": 1074,
+      "sha256": "bc41e94bf7b320ffd86182b3d4720ce294cffed659fee32543cb1fa5fa36a4ef"
+    },
+    "evidence/execution/RESOURCE_LEDGER.json": {
+      "bytes": 29519,
+      "sha256": "b1eb4cf0e367f46260997f1e4cebf33228d5e9b7376329370bd91d323ef52450"
+    },
+    "evidence/execution/bounded_ledger.json": {
+      "bytes": 4216,
+      "sha256": "9e7475bbb17684b3bbfeb3abf31b3585bfb843750dc943cddaa0cc66490f732d"
+    },
+    "evidence/execution/source_freeze.json": {
+      "bytes": 951,
+      "sha256": "2a2976d0e8a475acee1c66dc59ec5c35a59a031461dbbf80b98fd84c99539326"
+    },
+    "evidence/intake/ACQUISITION.json": {
+      "bytes": 787,
+      "sha256": "be5dad57c8071d86af742919eea135244f0a58f5a0b3bf61fc878a35a6df45b8"
+    },
+    "evidence/review/FIGURE_REVIEW.json": {
+      "bytes": 698,
+      "sha256": "07ef8adfa88c2ebd3c7307849e02901cd35224fabac5b485a3e4c4c449247ee6"
+    },
+    "figures/synthetic_tail.png": {
+      "bytes": 119767,
+      "sha256": "ad4d0c340146f440b9f4d3495162859b93dd62a53aa466cb9723f79b195b8735"
+    },
+    "tests/test_hex_intake.py": {
+      "bytes": 9372,
+      "sha256": "b3c118a592f052e6675105d5fc49441080de30527290d7ed61ef88f71aa847ce"
+    },
+    "tests/test_hex_lines_a1.py": {
+      "bytes": 3302,
+      "sha256": "8a8f50c62d26ed11d473f6270eeaa2e57d0da31f1a1d8d03d4b7dfa196e86f59"
+    },
+    "tests/test_literal_a2.py": {
+      "bytes": 2512,
+      "sha256": "daf2e6e6087f78f4f9ba5e3a1cb49d33bce173f47a693dcde2032de266232d1f"
+    }
+  },
+  "reviewed_file_manifest_sha256": "574d56182e0fe6cae42f66a415e5a170d6c467602d368b5845a1a48ed22e2838",
+  "reviewed_utc": "2026-10-23T21:49:06.903114+00:00",
+  "reviewer": "/root/state_backup",
+  "schema": "he_ang.source_hex_intake.independent_code_review.v1",
+  "scope": "Independent read-only review of new Hex source-bound intake, scoped A1/A2/A3 changes, their saved raw execution receipts, exact coefficient-tail claim and aggregate accounting.",
+  "tests": [
+    {
+      "methods_executed": 15,
+      "receipt": "evidence/execution/01_algebra.FINISH.json",
+      "scope": "New-unit synthetic algebra/ABI/semicolon catalogue controls",
+      "status": "PASS"
+    },
+    {
+      "methods_executed": 5,
+      "receipt": "evidence/execution/A1/02_algebra.FINISH.json",
+      "scope": "A1 explicit line-dialect controls",
+      "status": "PASS"
+    },
+    {
+      "methods_executed": 3,
+      "receipt": "evidence/execution/A2/03_algebra.FINISH.json",
+      "scope": "A2 numeric grammar equivalence and then-current guard controls",
+      "status": "PASS"
+    },
+    {
+      "full_catalogue_replayed": false,
+      "methods_executed": 1,
+      "receipt": "evidence/execution/A3/06_algebra.FINISH.json",
+      "scope": "A3 one changed-dependency method with punctuation negatives",
+      "status": "PASS"
+    }
+  ],
+  "unit_id": "HE-ANG-SOURCE-HEX-INTAKE"
+}

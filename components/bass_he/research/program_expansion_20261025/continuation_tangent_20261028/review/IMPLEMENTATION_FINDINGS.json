@@ -1,0 +1,119 @@
+{
+  "schema": "HE_TANGENT13_REVIEW_FINDINGS_V1",
+  "reviewer": "/root/repo_survey",
+  "pass": "Same single nonauthor preexecution-to-closeout pass",
+  "checkpoint": "FINAL_LOCAL_SCIENTIFIC_ADMISSION",
+  "findings": [
+    {
+      "id": "F1",
+      "status": "CLOSED_PREEXEC",
+      "domain": "implementation/display",
+      "severity": "medium",
+      "object": "src/tangent13.py construct: outward_decimal_endpoints built from str(outward(...))",
+      "observed_defect": "Directed binary64 rounding followed by shortest-roundtrip decimal formatting does not guarantee directed decimal rounding.",
+      "concrete_counterexample": {
+        "exact_x": "3602879701896397/36028797018963968",
+        "binary_upper": "exact binary64 0.1 equals x",
+        "emitted_string": "0.1",
+        "decimal_value": "1/10",
+        "violation": "1/10 < x, so purported decimal upper endpoint is inward"
+      },
+      "impact": "Exact rational scientific bracket is unchanged, but user-facing outward decimal guarantee is unsupported for this formatting method.",
+      "minimum_correction": "Compute decimal floor/ceil on a fixed exact decimal grid or independently parse output strings as Fractions and outward-adjust. Keep float-bracket fields separately typed.",
+      "required_check": "Use the above exact binary64 rational boundary and its lower counterpart to verify decimal direction; certificate reader should compare decimal-string values against exact endpoints.",
+      "execution": "Counterexample by exact arithmetic reasoning; reviewer performed no scientific run.",
+      "closure": "CLOSED_PREEXEC: src/tangent13.py outward_decimal uses exact integer floor/ceiling at16 decimal places; verifier parses decimal strings as Fractions and checks endpoint containment. Mathematical floor/ceiling proof resolves the binary64 shortest-string counterexample; actual output reader remains part of the one campaign."
+    },
+    {
+      "id": "F2",
+      "status": "CLOSED_PREEXEC",
+      "domain": "resource-accounting",
+      "severity": "medium",
+      "object": "scripts/run_once.py self0 baseline and final PASS predicate",
+      "observed_defect": "RUSAGE_SELF baseline is sampled after imports/argument parsing/preparation and subtracted from the final claimed whole-runner CPU; final PASS also omits explicit elapsed-wall comparison.",
+      "impact": "Reported whole runner+waited child CPU excludes startup, and a completion between polls can pass with elapsed wall above cap.",
+      "minimum_correction": "Use full cumulative RUSAGE_SELF CPU plus waited children; retain a separately described preexisting-child baseline only if needed. Evaluate final CPU and final wall against their caps.",
+      "required_check": "Static inspection of accounting formula and actual execution receipt; no extra scientific run needed before the first campaign.",
+      "closure": "CLOSED_PREEXEC: launcher monitor/final total include full cumulative RUSAGE_SELF (startup included) plus waited-child CPU; final passed predicate also enforces elapsed wall<=cap. Wall scope is the explicit prelaunch checkpoint through child completion, not whole-session wall."
+    },
+    {
+      "id": "F3",
+      "status": "CLOSED_PREEXEC",
+      "domain": "display",
+      "severity": "low",
+      "object": "scripts/plot_saved.py label Exact width using .3e display_width_float",
+      "observed_defect": "The plotted three-significant-digit floating rendering is labelled exact.",
+      "impact": "A numerical display approximation is described as the exact certificate width.",
+      "minimum_correction": "Label it Bracket width approximately (or equivalent) and retain exact fraction in saved certificate.",
+      "required_check": "Inspect saved plot text/source and resulting image in the authorized single render.",
+      "closure": "CLOSED_PREEXEC: plot label is Bracket width approximately; exact fraction remains in saved certificate."
+    },
+    {
+      "id": "F4",
+      "status": "CLOSED_PREEXEC",
+      "domain": "evidence-binding",
+      "severity": "medium",
+      "object": "DAG.json inherited QUARTIC12-FULL-POSITIVE-QUARTIC-REFERENCE evidence paths",
+      "observed_defect": "Self-relative predecessor paths THEORY.md/RESULT.json/evidence/... were copied into the new TANGENT13 DAG directory and resolve to the new unit rather than their original QUARTIC12 evidence.",
+      "impact": "The inherited completed node can resolve to wrong or not-yet-created evidence despite its valid predecessor decision.",
+      "minimum_correction": "Prefix that node evidence with ../continuation_quartic_20261028/ or attach an explicit original evidence_base while preserving status,decision,node identity.",
+      "required_check": "Static relative-path inspection against the original QUARTIC12 DAG; no old scientific execution.",
+      "closure": "CLOSED_PREEXEC: all7 inherited QUARTIC12 evidence links now have ../continuation_quartic_20261028/ prefix; predecessor state/decision and local counts unchanged."
+    },
+    {
+      "id": "F5",
+      "status": "CLOSED_REPAIR_PREEXEC",
+      "domain": "implementation-environment-interface",
+      "severity": "blocking-for-execution",
+      "object": "scripts/run_once.py group_cpu(child.pid) namespace assumption",
+      "observed_defect": "Initial launch reported monitor711.220077CPU-s but RUSAGE_SELF+waitedchildren0.045071s/wall0.006065s and child-9. Local child PID was used as a host /proc process-group ID. Parent/coding agent current-turn diagnostics report differing local/host PIDs.",
+      "impact": "Unrelated host process-group CPU was attributed to the owned worker, causing premature SIGKILL before controls. No numerical or physical exclusion follows.",
+      "evidence": [
+        "evidence/validation/initial/RESOURCE_RESULT.json",
+        "evidence/validation/initial/START.json"
+      ],
+      "minimum_correction": "Bind the owned local child to its verified host PID/PGID using owned parent children+NSpid or childself-report handshake, then monitor that host PGID. Preserve killpg using the correct caller namespace.",
+      "required_check": "Read minimal corrected runner and one authorized tiny science-free regression; root republish repair sourcepin before authorized repair1 campaign.",
+      "authorization": "Root explicitly authorized one diagnosed targeted runner repair and tiny regression in the current task.",
+      "original_failure_preserved": true,
+      "science_reexecution_by_reviewer": 0,
+      "closure": "The owned child writes its local and host PID/PGID from /proc/self in single-threaded preexec after setsid. Parent validates local PID against Popen child.pid, local new-session PGID, host PID=PGID and NSpid, and monitors the reported host PGID. killpg retains caller-local child.pid. Independent executed-child stdout confirms host298233/local7 mapping. One successful tiny science-free regression follows the preserved missing-children-interface diagnostic failure. Scientific retry has not yet run; actual published repair pin remains required.",
+      "closure_evidence": [
+        "scripts/run_once.py",
+        "evidence/runner_repair1/STATIC_REPAIR1_HANDSHAKE.json",
+        "evidence/runner_repair1/NAMESPACE_REGRESSION_HANDSHAKE.json",
+        "evidence/runner_repair1/regression_handshake_child_stdout.log",
+        "evidence/runner_repair1/NAMESPACE_REGRESSION_FAILURE.json",
+        "evidence/runner_repair1/PROC_PATH_DIAGNOSIS.json",
+        "evidence/REPAIR1_DIAGNOSIS.json"
+      ]
+    },
+    {
+      "id": "F6",
+      "status": "ACCEPTED_DOCUMENTED_DISPLAY_LIMITATION",
+      "domain": "presentation",
+      "severity": "nonblocking",
+      "object": "evidence/plot/initial/TANGENT13.png and .svg x-axis ticks/offset",
+      "observed_defect": "At approximately1e-14 horizontal spans, numeric x tick labels and offset text overlap heavily; numeric axes are not cleanly readable.",
+      "evidence": "Reviewer directly viewed actual PNG298f6fbd961f76148b1eadd7323b9576303832ea7944b359dbba216df52d6e2a. Exact outward decimal bracket labels, objective names and approximate widths are readable.",
+      "impact": "Figure cannot serve as the sole precise quantitative presentation. Exact rational saved certificate and readable table in VALIDATION_KO.md remain authoritative; no scientific result changes.",
+      "minimum_correction": "Document visual limitation and use exact table/labels for quantitative delivery. No extra render within the frozen one-render contract.",
+      "science_or_render_rerun_requested": false,
+      "final_scientific_blocking": false
+    },
+    {
+      "id": "F7",
+      "status": "CLOSED_DOCUMENTATION",
+      "domain": "reproducibility-metadata",
+      "severity": "low",
+      "object": "APPRAISAL_AND_REPRODUCIBILITY_KO.md runtime-record paragraph",
+      "observed_defect": "Earlier wording attributed Python version,platform and full thread environment to START.json; actual START contains executable path,threads,limits and hashes.",
+      "minimum_correction": "Cite runtime_probe for Python version and frozen runner source for thread settings; disclose uncaptured platform/matplotlib/full environment details.",
+      "closure": "Corrected paragraph read:Python3.12.14 from sources/runtime_probe.json,thread variables from scripts/run_once.py,platform/matplotlibversion/full environment not separately captured. No execution.",
+      "final_scientific_blocking": false
+    }
+  ],
+  "open_blocking_for_final_display": 0,
+  "open_preexecution_findings": 0,
+  "accepted_nonblocking_display_limitations": 1
+}

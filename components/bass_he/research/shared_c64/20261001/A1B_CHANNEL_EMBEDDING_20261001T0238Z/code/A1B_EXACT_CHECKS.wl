@@ -1,0 +1,17 @@
+ClearAll["Global`*"];
+s1 = Integrate[8 Sqrt[2] u^2 Exp[-3 u], {u,0,Infinity}];
+s2 = Integrate[4 u^2 (1-u) Exp[-2 u], {u,0,Infinity}];
+norm2s = Integrate[4 u^2 (1-u)^2 Exp[-2 u],{u,0,Infinity}];
+norm2p = Integrate[(4/3) u^4 Exp[-2 u],{u,0,Infinity}];
+orth12 = Integrate[8 Sqrt[2] u^2 (1-u) Exp[-3 u],{u,0,Infinity}];
+delta = FullSimplify[1-s1^2-s2^2];
+dipoleOverA = Integrate[(8 Sqrt[2]/3) u^4 Exp[-3 u],{u,0,Infinity}];
+rho=x-q[t];
+phase=mass v[t] rho+jkin[t]-eps t+jcoul[t];
+chi=Exp[I phase/hbar] f[rho];
+res=Exp[-I phase/hbar] (-(hbar^2/(2 mass)) D[chi,{x,2}]+(vself+vother) chi-I hbar D[chi,t]);
+res=res/.{q'[t]->v[t],v'[t]->acc,jkin'[t]->mass v[t]^2/2,jcoul'[t]->kappaOther/rsep};
+expected=-(hbar^2/(2 mass)) f''[rho]+(vself-eps+vother+kappaOther/rsep+mass acc rho) f[rho];
+etfResidual=FullSimplify[Expand[res-expected],Assumptions->{mass>0,hbar>0,rsep>0}];
+asinhResidual=FullSimplify[D[ArcSinh[speed t/impact]/speed,t]-1/Sqrt[impact^2+speed^2 t^2],Assumptions->{speed>0,impact>0,Element[t,Reals]}];
+Print[InputForm[<|"H1sHe1s"->s1,"H1sHe2s"->s2,"He2sNorm"->norm2s,"He2pNorm"->norm2p,"He1sHe2s"->orth12,"SchurDelta"->delta,"He1sHe2pxDipoleOverA"->dipoleOverA,"ETFResidual"->etfResidual,"StraightLinePhaseDerivativeResidual"->asinhResidual|>]];

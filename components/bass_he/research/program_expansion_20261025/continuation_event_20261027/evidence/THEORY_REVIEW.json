@@ -1,0 +1,122 @@
+{
+  "schema": "he.event03.independent_theory_review.v1",
+  "unit_id": "HE-EXP-EVENT-03",
+  "reviewed_UTC": "2026-10-27 08:25:19 UTC",
+  "reviewer": "/root/source_inventory",
+  "theory_author": "/root",
+  "independence": "Reviewer supplied source-only intake but did not author the reactive-moment theory, model contract or production implementation. Derivation below was reconstructed from event conservation.",
+  "review_mode": "READ_ONLY_INDEPENDENT_ANALYTIC_REVIEW; no numerical or symbolic tool execution and no scientific suite replay",
+  "decision": "PASS_SCOPED_CONDITIONAL_NR2TO2_THEORY",
+  "reviewed_files": [
+    {
+      "path": "THEORY_KO.md",
+      "bytes": 7960,
+      "sha256": "72d4574ae3ccfcfa6f307b50303da12ba9f3ebdbf43a55fe74d370116b6dea69"
+    },
+    {
+      "path": "MODEL_CONTRACT.json",
+      "bytes": 4168,
+      "sha256": "3aa75f7ea8e88694f6e14003494b9636ec1b955d3abf79cb9227776db112cf02"
+    }
+  ],
+  "preflight": {
+    "local_HE_HEAD": "59ec5d0709b075ab585c1d1af42c62a3a56bd944",
+    "local_AGENTS_sha256": "32d09d1e6262e1eb3579de1a66e325afd2ba181a8de69313d907b6fb1e8aebfb",
+    "WU_current_HEAD": "f949c21cca6e2534b725241068bd6c6e06158495",
+    "WU_priority": "# Current priority: molecular provider state lift R4, 2026-10-27 UTC",
+    "parallel_ownership": "Root authors theory/model/acceptance criteria; lower-tier central_delta authors src/reactive_event.py, tests and runner; backup_preflight independently reviews code and run results; source_inventory owns source intake and this independent analytic theory review.",
+    "immutable_old_DRIFT02_source_unchanged": true
+  },
+  "independent_derivation": [
+    {
+      "id": "T1_CM_kinematics",
+      "conclusion": "PASS",
+      "derivation": "With M=ma+mb=mc+md and V=(ma*va+mb*vb)/M, incoming kinetic energy is M*V^2/2+mu_in*g^2/2. Taking vc=V+(p/mc)n and vd=V-(p/md)n cancels the cross terms and gives M*V^2/2+p^2/(2*mu_out). Thus p^2=2*mu_out*(Ein-Delta) produces Kout-Kin=-Delta for every direction, while mc*vc+md*vd=ma*va+mb*vb.",
+      "boundary": "Requires equal conserved compositional inertial mass sums and fixed branch internal-energy offsets. An actual physical mass defect cannot be inserted into this common-CM law."
+    },
+    {
+      "id": "T2_angle_moments",
+      "conclusion": "PASS",
+      "derivation": "For an axisymmetric nonnegative measure around e, int(n)d_sigma=L1*e. Write z=<cos^2 chi>=(1+2*L2/s0)/3. The perpendicular second moment is s0*(1-z)/2=s2/3 and the longitudinal increment is L2; hence int(nn^T)d_sigma=(s2/3)I+L2*ee^T. Its trace is s0.",
+      "notation_check": "Existing AngularTransport defines sigma_l=int(1-P_l)d_sigma and checks mean=1-s1/s0, second=1-2*s2/(3*s0); these agree with the theory's h and z."
+    },
+    {
+      "id": "T3_product_c_raw_moments",
+      "conclusion": "PASS",
+      "derivation": "Expanding mc*vc, mc*|vc|^2/2 and mc*vc*vc^T before angle integration gives Pc=s0*mc*V+p*L1*e; Kc=s0*(mc*V^2/2+p^2/(2*mc))+p*L1*(V.e); Sc=s0*mc*VV^T+p*L1*(Ve^T+eV^T)+(p^2/mc)*[(s2/3)I+L2*ee^T]. Thus tr(Sc)=2*Kc."
+    },
+    {
+      "id": "T4_product_d_and_incoming",
+      "conclusion": "PASS",
+      "derivation": "vd contains -p*n/md, so both linear-p terms reverse sign for d while quadratic terms stay positive. Incoming a,b raw moments are independent of the scattering angle and therefore subtract s0 times their unscattered number, mass, momentum, kinetic energy and second tensor. This is the correct gain-minus-loss event construction."
+    },
+    {
+      "id": "T5_conservation_and_exact_ID_composition",
+      "conclusion": "PASS",
+      "derivation": "Summing products minus incoming yields sum(m_s*DeltaN_s)=0, sum(DeltaP_s)=0 and sum(DeltaK_s)=-s0*Delta. Fixed exact-ID energies give sum(epsilon_s*DeltaN_s)=s0*Delta. Accumulating repeated exact IDs is linear and preserves these identities when each ID has one consistent mass/energy record.",
+      "identical_particle_boundary": "Cross sections and encounter flux use the declared labelled-pair-once convention; event/inclusive or identical-pair factors must be resolved once by the external source owner, not added by this kernel."
+    },
+    {
+      "id": "T6_heat_and_boost",
+      "conclusion": "PASS",
+      "derivation": "For number source Gamma, momentum source R and kinetic source E, subtracting the source derivative of bulk kinetic energy gives Q=E-u.R+(m*u^2/2)*Gamma and F=R-m*u*Gamma. Under u'=u-w, R'=R-m*w*Gamma and E'=E-w.R+(m*w^2/2)*Gamma, direct expansion cancels every w term in Q.",
+      "boundary": "The algebra does not assign a birth particle to a thermal pool or determine a temperature. The declared consumer must supply that closure and its caloric chain rule."
+    },
+    {
+      "id": "T7_single_internal_owner",
+      "conclusion": "PASS",
+      "derivation": "When internal energy is defined from populations, U_int=sum(epsilon_s*n_s), its event derivative is already sum(epsilon_s*Gamma_s). The same quantity is a witness of population energy transfer and must not be added again as an independent internal-energy or heating RHS. The reviewed contract explicitly fixes population_derived_internal_witness."
+    },
+    {
+      "id": "T8_threshold_and_zero_measure",
+      "conclusion": "PASS",
+      "assessment": "Eout>=0 is the open-branch condition and p=0 at threshold. A zero measure produces no event moments. At g=0 the chosen interface allows only isotropic moments and leaves any physical g*sigma limit to the source; this is a stated interface restriction, not a claimed cross-section limit."
+    },
+    {
+      "id": "T9_units_and_scope",
+      "conclusion": "PASS",
+      "assessment": "Raw number, momentum, kinetic and second moments have m^2, (kg m/s)m^2, J m^2 and J m^2 units. A prescribed encounter flux n_a*n_b*|g| has m^-5 s^-1 units. Multiplication produces volumetric/time sources without computing a rate law or velocity integral."
+    }
+  ],
+  "R4_applicability_review": {
+    "pinned_source": "f949c21cca6e2534b725241068bd6c6e06158495",
+    "source_rows": "6 variants; 77 native theoretical coefficient cells; saved results reused.",
+    "material_2to2_variant_rows": 5,
+    "material_2to2_distinct_source_ownership_groups": 4,
+    "radiative_association_variant_rows": 1,
+    "RA_exclusion": "Bennett Li+H radiative association has two material reactants, one material product and a primary photon; it is outside the two-massive-product NR kernel.",
+    "mass_state_binding": "R4 declared isotope/state number records do not supply the actual composition-mass map, state energies, covariance or source-state transfer. The theory correctly keeps these as supplied conditional inputs.",
+    "aggregate_state_binding": "Bovino unresolved initial v,j and final spin sums, Honvault unresolved HD products, and GL thermal HD/product sums require a qualified branch/state lift before use as fixed-Delta events.",
+    "method_ownership": "Honvault TIQM and SQM share one physical-event/ownership key; source variants cannot be summed as two physical channels. Bovino ortho/para normalization remains unbound.",
+    "energy_boundary": "Bovino2.258eV is a source estimated exothermicity and GL405K is a fit activation parameter. Neither is automatically the model's Delta or a physically admitted Q.",
+    "differential_boundary": "Thermal rates and native formula samples do not determine energy-resolved sigma0/L1/L2, outgoing angular/branch correlations or deposition. No physical DCS adoption follows from this review.",
+    "population_inventory_boundary": "14 R4 records contain existing H+ and D+ IDs. The source-only union has104 IDs/138 variants/155 event references, with no population coevolution or physical activation admission."
+  },
+  "findings": [],
+  "blocking_findings": 0,
+  "concrete_changes_required": [],
+  "accepted_scope": "Conditional analytic NR a+b->c+d event moment identities under the reviewed equal-compositional-mass, fixed internal-energy, full-angle axisymmetric and counting assumptions; source-consumer boundaries are stated correctly.",
+  "not_admitted": [
+    "Physical R4 rates or DCS",
+    "State/branch populations or isotope transfer",
+    "Physical Q or deposition",
+    "Thermal pool assignment",
+    "Actual parameter uncertainty or physical accuracy",
+    "Uniform floating-point implementation correctness",
+    "New universal no-go or novelty claim"
+  ],
+  "separate_verification_remaining": "Root's changed-input implementation and bounded independent event-average checks remain separate. This analytic review does not replace their execution receipt.",
+  "executions": {
+    "numerical_scientific_runs": 0,
+    "symbolic_tool_calls": 0,
+    "WU_compiler_calls": 0,
+    "native_fit_evaluations": 0,
+    "old_DRIFT02_or_WU249_suite_replays": 0
+  },
+  "preservation": {
+    "HE101_C8": "OPEN",
+    "HE101_budget_changed": false,
+    "physical_campaign_allocation": "UNALLOCATED",
+    "global_physical_completion": null
+  }
+}

@@ -1,0 +1,274 @@
+{
+  "schema": "he_ang.pwbe_spin_azimuth.contract.v1",
+  "workflow": "physmath-research-loop 1.0.0 user-provided full R1-R10/C1-C10",
+  "unit_id": "HE-ANG-PWBE-SPIN-AZIMUTH",
+  "status": "FROZEN_ROOT_CONTRACT_R6_FINAL_PENDING_EXECUTION_NOT_AUTHORIZED_YET",
+  "repository": "cosmosapjw-quantum/BASS_HE",
+  "base": "32f9227a9abef814bb009a87272c44be74941163",
+  "base_tree": "8cc5f2e029b8172231b6073e9817ef8cff42088b",
+  "branch": "research/he-ang-pwbe-spin-azimuth-20261024",
+  "allowed_path": "research/he_ang_pwbe_spin_azimuth_20261024/",
+  "central_observed_head": "9f410bf0f4b5d14d1e6b7c17cd2e23a916f241c9",
+  "objective": "Construct source-derived exact-swapped PWBE spin-averaged joint TDCS and closed relative-azimuth conditional moments; implement a positive variance formulation and verify finite source/model identities.",
+  "source": {
+    "primary": "Weigold et al FIAS-R-39 June1978 pp6,18 Eqs19-20",
+    "pdf_sha256": "aaa750d5d5f0652ba7e6090878f938174fc26268265c256022c4d9437c3a96a8",
+    "adopted": "transition amplitudes D,X and explicit neglect of recoil energy",
+    "not_adopted": "Printed Eq21 -2DX as unpolarized cross section",
+    "spin_trace": "independently derived M=D I-X P; TrP=2; unpolarized coefficient -Re(DX*)",
+    "crosscheck": "Buica arxiv2306.08573v1 Eq46; later erratum body unavailable and nonessential to proof",
+    "BO_exchange": "different from exact-swapped PWBE; no silent substitution",
+    "source_tables": "relative Weigold table found but not transcribed or used",
+    "source_PDF_redistribution": false
+  },
+  "physics": {
+    "species": "H(1s)",
+    "kinematics": "nonrelativistic infinite proton mass, fixed center",
+    "energy_unit": "Hartree Eh=hbar^2/(m_e a0^2)",
+    "momentum_unit": "hbar/a0",
+    "binding_energy_hartree": "1/2 exact model",
+    "output_TDCS_physical_scaling": "a0^2/Eh per sr^2",
+    "measure": "dE_B dOmega_A dOmega_B; dOmega=dmu dphi",
+    "ordered_domain": "E_B in (0,(E0-1/2)/2); equal-sharing boundary for pointwise diagnostics",
+    "count": "ordered energy sector factor1; full labeled energy integral factor1/2; neither integral performed",
+    "frame": "beam +z; azimuth_A=0, relative azimuth phi_B-phi_A",
+    "accuracy": "first Born/plane-wave high-energy model; actual physical error envelope uncalibrated",
+    "finite_mass_recoil_law": false,
+    "physical_provider_admitted": false
+  },
+  "equations": "THEORY_KO.md Eqs1-12",
+  "implementation": {
+    "language": "Python stdlib scalar reference plus NumPy for diagnostic arrays and matplotlib figures",
+    "APIs": [
+      {
+        "name": "spin_channels",
+        "input": "finite complex D,X",
+        "output": "raw singlet |D+X|^2, triplet |D-X|^2, 1/4+3/4 unpolarized; no extra weights"
+      },
+      {
+        "name": "pwbe_point",
+        "input": "E0,EB,muA,muB,phi; ordered=True default",
+        "output": "kinematics, reduced d/x, source T amplitudes, spin channels and K; physical scaling metadata"
+      },
+      {
+        "name": "azimuth_integrals",
+        "input": "a>|b|, b>=0; stable optional a_minus_b/a_plus_b from geometry",
+        "output": "I2,I4,J2,J4,var_t; b0 explicitly"
+      },
+      {
+        "name": "pwbe_azimuth",
+        "input": "E0,EB,muA,muB; ordered=True",
+        "output": "Kbar,Cbar,cos_phi and pair-dot conditional moments, M0/M1, conditioning flags"
+      },
+      {
+        "name": "conditional_azimuth_pdf",
+        "input": "same geometry plus phi",
+        "output": "K(phi)/(2pi Kbar); explicit undefined if computed Kbar==0"
+      }
+    ],
+    "domain_validation": "finite real scalars; reject bool/nonfinite/invalid E0,EB/mu, ordered violation; reject overflow/invalid arithmetic rather than silently clip; any float phi periodic",
+    "cancellation": "Delta^2 via positive gap; rho via positive a±b geometry; M0 uses Eq10; no abs/epsilon-clipping density",
+    "scope": "pointwise model and relative-azimuth integration only; no global angle/energy integral or sampler/consumer",
+    "production_changes": false
+  },
+  "oracles": {
+    "complex_spin": {
+      "D": [
+        1,
+        2
+      ],
+      "X": [
+        3,
+        -1
+      ],
+      "singlet": 17,
+      "triplet": 13,
+      "unpolarized": 14
+    },
+    "equal_complex_spin": {
+      "D": [
+        2,
+        1
+      ],
+      "X": [
+        2,
+        1
+      ],
+      "unpolarized": 5,
+      "triplet": 0
+    },
+    "azimuth_a5_b3": {
+      "I2": "5/64",
+      "I4": "385/32768",
+      "J2": "-3/64",
+      "J4": "-327/32768",
+      "var_t": "185/32768"
+    },
+    "vector_fixture": {
+      "k0": [
+        0,
+        0,
+        5
+      ],
+      "kA": [
+        0,
+        0,
+        4
+      ],
+      "kB": [
+        2,
+        0,
+        2
+      ],
+      "E0": "25/2",
+      "EB": "4",
+      "muA": 1,
+      "muB": "1/sqrt(2)",
+      "phi": 0,
+      "q2": 5,
+      "DeltaA2": 1,
+      "DeltaB2": 13,
+      "d": "5/324",
+      "x": "253/135252"
+    },
+    "algebraic_node": "E0=9/14,EA=EB=1/14,muA=muB=1; exact q^2=kA^2=kB^2=1/7; no conditional law"
+  },
+  "fixtures": [
+    {
+      "id": "G1",
+      "E0": 100,
+      "EB": 40,
+      "muA": 1,
+      "muB": 0.2
+    },
+    {
+      "id": "G2",
+      "E0": 100,
+      "EB": 40,
+      "muA": 0.8,
+      "muB": 0.6
+    },
+    {
+      "id": "G3",
+      "E0": 100,
+      "EB": 40,
+      "muA": -0.4,
+      "muB": 0.75
+    },
+    {
+      "id": "G4",
+      "E0": 100,
+      "EB": 40,
+      "muA": "239/(2sqrt(23800))",
+      "muB": "161/(2sqrt(16000))"
+    },
+    {
+      "id": "G5",
+      "E0": 100,
+      "EB": 49.75,
+      "muA": 0.5,
+      "muB": 0.5
+    },
+    {
+      "id": "G6",
+      "E0": 100,
+      "EB": 49.75,
+      "muA": 1,
+      "muB": -1
+    }
+  ],
+  "acceptance": {
+    "source_and_hand_algebra": "independent exact/oracle identities, binary64 relative2e-13 plus absolute2e-15 where appropriate; geometry abs2e-13",
+    "periodic_quadrature_N": [
+      64,
+      256,
+      1024,
+      2048
+    ],
+    "final_Kbar_relative_error_max": 1e-10,
+    "final_conditional_cos_absolute_error_max": 1e-10,
+    "normalization_error_max": 1e-10,
+    "exchange_symmetry_relative_tolerance": 2e-12,
+    "cos_moment_bound_slack": 2e-12,
+    "triplet_equal_source_symmetry": "zero within finite arithmetic; normalized residual2e-13",
+    "source_spin_difference": "preserve literal Eq21 vs independently averaged law, including D=X counterexample",
+    "must_cover": [
+      "original nuclear subtraction and exact exchange permutation",
+      "transition/scattering normalization 32/pi^2",
+      "complex spin oracle and equal amplitude triplet zero",
+      "positive M0 vs polynomial identity and direct quadrature",
+      "b=0 constant azimuth and J=0",
+      "phi reflection/periodicity and outgoing exchange",
+      "correct 2pi conditional denominator",
+      "zero-density conditional undefined and no clipping",
+      "energy and angle validation",
+      "six finite convergence results and actual residuals"
+    ],
+    "no_empirical_fit": true,
+    "new_strong_no_go": false
+  },
+  "execution": {
+    "new_request_distinct_source_increment_cpu_s": 8,
+    "new_request_distinct_source_increment_wall_s": 30,
+    "allocation_basis": "Current user explicitly requests next full loop; new primary-amplitude/azimuth work only. Prior allowances are not transferred/reset and old cumulative ledgers remain separately preserved.",
+    "old_budget_reset_or_transfer": false,
+    "planned_children": [
+      {
+        "id": "01_tests",
+        "cpu_s": 2,
+        "wall_s": 5
+      },
+      {
+        "id": "02_azimuth_analysis",
+        "cpu_s": 2,
+        "wall_s": 5
+      },
+      {
+        "id": "03_plot",
+        "cpu_s": 2,
+        "wall_s": 10
+      }
+    ],
+    "diagnosed_repair_reserve": {
+      "children": 1,
+      "cpu_s": 2,
+      "wall_s": 10
+    },
+    "memory_bytes": 536870912,
+    "threads": 1,
+    "old_suite_runs": 0,
+    "new_IVP": 0,
+    "full_CCC_or_Hex_solve": 0,
+    "global_energy_or_solid_angle_integral": 0,
+    "all_started_failed_children_charged": true,
+    "host_orchestration_CPU": "UNKNOWN_NOT_ZERO",
+    "end_to_end_cpu_cap_established": false,
+    "remote_symbolic": "one Wolframcontext + one Wolframevaluator timeConstraint5; actual toolwall/bodyCPU/wall record; total remoteCPU UNKNOWN_NOT_ZERO",
+    "execution_gate": "root explicit GO after R6, implementation checkpoint dual backup ACK and R7 check",
+    "stop": "preserve all START/FINISH/raw/partial on cap or substantive failure; no blind retry; root authorizes only changed-dependency repair"
+  },
+  "delegation": {
+    "contract": "root Astra",
+    "implementation": "existing intake_ops requested gpt-6.1-sol; runtime backend not independently observed",
+    "independent_review": "separate independent_review requested Astra, read-only R6/C9"
+  },
+  "publication": {
+    "after_independent_review": true,
+    "expected_sha_required": true,
+    "force": false,
+    "draft": true,
+    "merge": false,
+    "activation": false
+  },
+  "backup": "B1 prepared theory+code before new science; B2 exact S/C; B3 actual D/E delivery overlay; shared stage checkpoints with actual ACKs, not fictitious 20 archives",
+  "preserved_open": [
+    "HE-ANG-SOURCE-PAYLOAD calibrated full physical joint law and recoil contract",
+    "C9-NB-01 partial mu_window theta metadata",
+    "C23E and other-owner OPEN/scoped states",
+    "REC PR225 independent unmerged observation",
+    "PHYS85 incomplete raw and PHYS84 WAIT",
+    "ANGTHERM02 READ_ONLY"
+  ],
+  "parent_status": "SOURCE_INPUT_PENDING",
+  "overall_physical_goal_completion_percent": null
+}

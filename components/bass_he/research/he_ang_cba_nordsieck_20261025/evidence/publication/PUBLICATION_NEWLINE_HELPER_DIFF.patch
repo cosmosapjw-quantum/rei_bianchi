@@ -1,0 +1,11 @@
+--- unit_delivery.py.before_newline_fix
++++ unit_delivery.py.after_newline_fix
+@@ -202,7 +202,7 @@
+     inv=inventory(target)
+     put(OUT,args.phase+'_UNIT_FILE_INVENTORY.json',jb(inv))
+     entries=[{'path':UNIT+'/'+row['path'],'mode':'100644','type':'blob',
+-              'content':(target/row['path']).read_text()} for row in inv
++              'content':(target/row['path']).read_bytes().decode('utf-8')} for row in inv
+              if (target/row['path']).suffix not in {'.png','.jpg','.jpeg'}]
+     binary=[row for row in inv if (target/row['path']).suffix in {'.png','.jpg','.jpeg'}]
+     packet=jb(entries)

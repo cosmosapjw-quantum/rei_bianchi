@@ -1,0 +1,1 @@
+ClearAll[tt,x,y];sol=NDSolveValue[{x'[tt]==(-5(1/5+tt/10)+2(1/7-tt/20)-(2/3+tt^2/5)/3)x[tt]+(2/3+tt^2/5)y[tt]/3,y'[tt]==2(2/3+tt^2/5)x[tt]/3+(-5(1/5+tt/10)-4(1/7-tt/20)-2(2/3+tt^2/5)/3)y[tt],x[0]==3/2,y[0]==4/5},{x,y},{tt,0,1},WorkingPrecision->60,AccuracyGoal->45,PrecisionGoal->45,MaxSteps->100000];N[Through[sol[1]],40]

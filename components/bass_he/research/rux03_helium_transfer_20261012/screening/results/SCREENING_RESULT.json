@@ -1,0 +1,218 @@
+{
+  "task": "BASS_HE_RUX03_WARM_SAVED_RR_AND_FROZEN_ABSORPTION",
+  "status": "NUMERICALLY_CHECKED_CANDIDATE",
+  "independent_decision": "PENDING_PARENT_REVIEW",
+  "selected_input": {
+    "path": "inputs/extended_dataset.npz",
+    "sha256": "3cbf35cf7910c37083de4c5b9db443c71b272f3877a48f74fb9f852fd70fe2be",
+    "original_path": "recovery_drive/physical_v2/research/physical_provider_20261010/evidence/extended_dataset.npz",
+    "nodes": 2904,
+    "epochs": 17,
+    "time_s": [
+      0,
+      100000000000.0
+    ],
+    "initial_xHeIII": 0.029861279382071514,
+    "input_selection_correction": "base_dataset.npz is historical 10-200eV/1984-node input; selected extended dataset is 10-50000eV/2904-node P01 input. No narrow-band calculation performed."
+  },
+  "retained_PR113": {
+    "commit": "efb63623c4ed0f6c270a677fab3eb0a81ce80e34",
+    "path": "research/rct_rate_only_p01_20261011",
+    "event_rates": "per_epoch.json retained; converted from m^-3 s^-1 to cm^-3 s^-1",
+    "saved_grid_piecewise_linear_rate_exposure": {
+      "label": "SAVED_GRID_PIECEWISE_LINEAR_RATE_EXPOSURE_DIAGNOSTIC",
+      "comoving_events_per_initial_m3": 2.0370151617099794e-13,
+      "fraction_exposures_xHII_xHeII_xHeIII": [
+        3.4318478685512853e-15,
+        4.347007300164961e-14,
+        -4.347007300164961e-14
+      ],
+      "integration_error": "NOT_ESTIMATED"
+    },
+    "old_provider_campaign_reexecuted": false
+  },
+  "new_work": {
+    "HeIII_RR_point_evaluations": 17,
+    "frozen_absorption_energy_points": 6,
+    "ODE_runs": 0,
+    "transport_runs": 0,
+    "native_builds": 0,
+    "actual_KF96_scalar_provider_calls": 1,
+    "actual_GM25_domain_probe_calls": 1
+  },
+  "coefficient_evaluation": {
+    "KF96": "Original Python provider function called at 50000K; retained rate table consumed",
+    "HeIII_RR": "Source-pinned FT03 CaseA a=2 transcription of inputs/ft03_rates.rs, not raw Grackle K6",
+    "Verner": "Source-pinned transcription of inputs/atomic_provider.rs::cross_section",
+    "new_native_parity": "NOT_RUN"
+  },
+  "summary": {
+    "RCT_over_HeIII_RR_min": 3.097824900175699e-07,
+    "RCT_over_HeIII_RR_max": 3.097839361031057e-07,
+    "initial_HeIII_RR_alpha_cm3_s": 7.321868393221611e-13,
+    "initial_HeIII_RR_rate_cm3_s": 6.5756246126874794e-24,
+    "initial_RCT_rate_cm3_s_retained": 2.0370228748547873e-30,
+    "GM25_50000K_expected_error": "OUTSIDE_REPORTED_FIT_DOMAIN_NO_EXTRAPOLATION",
+    "RCT_direct_free_electron_per_event": 0
+  },
+  "frozen_absorption_assumptions": {
+    "densities_cm3": {
+      "HI": 1.4557392884814121e-09,
+      "HeI": 2.5687893879712515e-10,
+      "HeII": 4.5458299950944e-06
+    },
+    "clock": "proper elapsed seconds",
+    "photon_energy": "Fixed local gas-frame energy at each named probe; no redshift or evolved opacity",
+    "birth_models": [
+      "all photons born at t=0",
+      "constant birth rate from0 to dt, normalized per total born"
+    ],
+    "angular_dependence": "none for frozen isotropic ground-state absorption at fixed gas-frame E",
+    "energy_points_are_a_spectrum": false,
+    "Q_reference_eV": 40.819325400298,
+    "cross_section_cutoffs_eV": {
+      "HI": 13.6,
+      "HeI": 24.59,
+      "HeII": 54.42
+    },
+    "native_binding_energies_eV": {
+      "HI": 13.598434599702,
+      "HeI": 24.587389011,
+      "HeII": 54.41776
+    },
+    "c_cm_s": 29979245800.0,
+    "eV_erg": 1.602176634e-12,
+    "kB_erg_K": 1.380649e-16,
+    "relation_to_P03A": "Retained P03A uses time-varying 17-epoch opacity and existing2904 nodes; not rerun. Current constant-initial-state six monoenergy responses add uniform-birth integration."
+  },
+  "numerical_validation": {
+    "checks": {
+      "selected_inputs_and_source_sha256": true,
+      "prior_PR113_gas_points_exactly_match_selected_extended_reference": true,
+      "selected_wide_band_2904_nodes_17_epochs": true,
+      "probe_energies_distinct_from_retained_P03A_quadrature_nodes": true,
+      "GM25_50000K_domain_rejected": true,
+      "FT03_alpha3_vs_Decimal80": true,
+      "retained_RCT_rate_unit_arithmetic_vs_Decimal80": true,
+      "new_RCT_RR_ratio_vs_Decimal80": true,
+      "saved_EOS_compatibility": true,
+      "Verner_transcription_vs_Decimal80": true,
+      "impulse_uniform_response_vs_Decimal80": true,
+      "species_absorption_sum_and_positive": true,
+      "binding_heat_surviving_energy_identity": true,
+      "fit_cutoffs_distinct_from_native_binding_thresholds": true,
+      "RCT_Q_reference_below_HeII_fit_cutoff": true,
+      "zero_thin_intermediate_thick_response_limits": true
+    },
+    "max_alpha3_relative_Decimal80": 5.516300926083173e-16,
+    "max_retained_RCT_arithmetic_relative_Decimal80": 3.439608375372211e-16,
+    "max_rho_relative_Decimal80": 6.83567811230006e-16,
+    "max_Verner_relative_Decimal80": 2.637267706433227e-15,
+    "max_absorption_fraction_relative_Decimal80": 2.1537236756070704e-16,
+    "max_energy_ledger_relative": 1.740701809233998e-16,
+    "max_saved_EOS_relative": 1.4551923338441098e-16,
+    "limit_checks": [
+      {
+        "x": 1e-12,
+        "impulse_relative": 0.0,
+        "uniform_relative": 2.0194839173664632e-16
+      },
+      {
+        "x": 1e-08,
+        "impulse_relative": 1.6543612333778617e-16,
+        "uniform_relative": 0.0
+      },
+      {
+        "x": 0.01,
+        "impulse_relative": 0.0,
+        "uniform_relative": 0.0
+      },
+      {
+        "x": 0.049,
+        "impulse_relative": 0.0,
+        "uniform_relative": 0.0
+      },
+      {
+        "x": 0.05,
+        "impulse_relative": 0.0,
+        "uniform_relative": 9.87703134660596e-16
+      },
+      {
+        "x": 1.0,
+        "impulse_relative": 0.0,
+        "uniform_relative": 0.0
+      },
+      {
+        "x": 100.0,
+        "impulse_relative": 0.0,
+        "uniform_relative": 0.0
+      }
+    ]
+  },
+  "limits": [
+    "Sampled OFF-trajectory competition, not an RCT-ON history or feedback/error bound.",
+    "Retained trapezoid exposure has no estimated interpolation error or uniform continuous-time bound.",
+    "Frozen absorption is an exact constant-coefficient response under the named assumptions, not evolving Bianchi transport.",
+    "No RCT photon spectrum, mean photon energy, atomic uncertainty, heat moment or physical escaping/reabsorption closure is supplied.",
+    "One small local ratio does not establish global EoR or other initial-state materiality."
+  ],
+  "input_identity": [
+    {
+      "path": "inputs/extended_dataset.npz",
+      "sha256": "3cbf35cf7910c37083de4c5b9db443c71b272f3877a48f74fb9f852fd70fe2be",
+      "bytes": 188284
+    },
+    {
+      "path": "inputs/extended.json",
+      "sha256": "f1ef5e09495df872e705656ff8d1252376c230e860ccbb882e3527b17e41a24b",
+      "bytes": 17879
+    },
+    {
+      "path": "inputs/CONTRACT.json",
+      "sha256": "2f5f118b856a47fa339a510a58e7221e7d7ab3ea3a38625d2c61e9b93380ed6d",
+      "bytes": 4664
+    },
+    {
+      "path": "inputs/ft03_rates.rs",
+      "sha256": "1a97cd7a3555deeb4d8700376cd84580c5102127773bc3a235a29c33b0c1542f",
+      "bytes": 2755
+    },
+    {
+      "path": "inputs/atomic_provider.rs",
+      "sha256": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3",
+      "bytes": 12939
+    },
+    {
+      "path": "inputs/hhe_events.rs",
+      "sha256": "c100b08e034089c2d67b2102769ccdd51f1d29a2f388d6bb2dfe7984af93b290",
+      "bytes": 9447
+    },
+    {
+      "path": "inputs/bass_he_atomic_export/_kf96.py",
+      "sha256": "0e7c8a846112e14ec8d761fe7b9d978e65b4c30456e0d31829c52724e91a4ff6",
+      "bytes": 5525
+    },
+    {
+      "path": "inputs/bass_he_atomic_export/_rate.py",
+      "sha256": "529ae325622718b48292c3b748a7850ccb315733b28bff930388f00915f2d217",
+      "bytes": 8113
+    },
+    {
+      "path": "inputs/prior_PR113/per_epoch.json",
+      "sha256": "079f31c7574d6eebd05ca207ff5fcd75e8e1a78a58e0733c1ff901c6124d6b36",
+      "bytes": 17680
+    },
+    {
+      "path": "inputs/prior_PR113/VALIDATION.json",
+      "sha256": "03143655066edf7c92c3ae250dcb33d8ac4624f45b3fc368a716e9feb63e26b9",
+      "bytes": 3027
+    }
+  ],
+  "source_sha256": "f01fef6f2c7e8a31d71faa689b3a30efb64f213188d357ca19d99f4e5c703f54",
+  "runtime": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "wall_seconds": 0.03094178500759881,
+    "maxrss_KiB": 26308
+  }
+}

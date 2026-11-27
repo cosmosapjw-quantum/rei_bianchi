@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/independent_he_review",
+  "date": "2026-10-29",
+  "scope": "HE-NONTHERMAL-D-BIRTH-01 frozen target-rest source-only ledger and moment trace",
+  "method": [
+    "independent two-body Lorentz-boost and stress-moment derivation",
+    "independent convexity/concavity proof and sharpness constructions",
+    "read-only line-by-line implementation and tests review",
+    "all15 manifest byte hashes and sizes verified",
+    "targeted reproducer only after new exact-input bug diagnosis"
+  ],
+  "source_identity": {
+    "repo": "cosmosapjw-quantum/BASS_HE",
+    "remote_checkpoint": "9044ef53762f1985eb0be1aaa4127cc11dfc094c",
+    "parent_commit": "ffe384d06e6b300d2a7ef2adbaa7a50351c4e6ce",
+    "local_package": "BASS_HE_NONTHERMAL_D_BIRTH_20261029_SOURCE_HANDOFF.zip",
+    "source_manifest_sha256": "02523cad5ecd20d25db58bec570dcc59fd1a4499cb83376f08115888b48f0f05",
+    "manifest_entries": 15,
+    "manifest_mismatches": []
+  },
+  "R6": {
+    "result": "pass_scoped",
+    "basis": [
+      "derived",
+      "independent review"
+    ],
+    "evidence": "INDEPENDENT_DERIVATION.md",
+    "conclusion": "Conservation and universal trace-moment interval are correct under the frozen two-body target-rest event and nonnegative normalized angular measure. K0 denotes mean daughter lab kinetic energy, not individual fixed daughter energy.",
+    "remaining_physical_inputs": [
+      "exclusive330MeV event cross section and normalized angular law with uncertainty",
+      "incident photon field/history",
+      "physical named fast-D admission and stopping/deposition"
+    ]
+  },
+  "C9": {
+    "result": "partial",
+    "reason": "Two exact-input acceptance paths violate intended provenance rejection; mathematical outputs remain conditional and physical flags remain false.",
+    "findings": [
+      "C9-F1",
+      "C9-F2"
+    ],
+    "full_suite_executed": false,
+    "old28_tests_reexecuted": false
+  },
+  "findings": [
+    {
+      "id": "R6-D1",
+      "severity": "P2",
+      "domain": "documentation",
+      "location": "THEORY_AND_CONTRACT.md:5",
+      "observed": "Per-event daughter energy K0 is described without mean qualification, although lines19-21 correctly use energy splitting E0 +/- B mu.",
+      "impact": "Can be read as monoenergetic daughter assumption; false except mu=0 or event mean.",
+      "minimal_fix": "Use mean per-daughter lab kinetic energy K0; state K_plus/minus=K0 +/- B mu and pair kinetic total2K0."
+    },
+    {
+      "id": "C9-F1",
+      "severity": "P2",
+      "domain": "implementation",
+      "location": "src/named_d_birth_min.py:19",
+      "observed": "Raw Fraction(direction component) accepts native float and bool. Diagnosed probes direction=(1.0,0.0,0.0) and (True,False,False) both return accepted momentum. Main module rejects these inputs.",
+      "impact": "Duplicated public lane silently accepts numerical provenance that main exact contract rejects.",
+      "minimal_fix": "Route every exact numeric input through one shared strict helper, or remove minimal duplicate from supported API while preserving historical bytes. Add affected direction rejection tests."
+    },
+    {
+      "id": "C9-F2",
+      "severity": "P2",
+      "domain": "implementation",
+      "location": "src/nonthermal_d_birth.py:22-26",
+      "observed": "type(x) in (float,bool) rejects only exact classes; class FloatAlias(float) passes. Diagnosed birth_source(FloatAlias(0.5), source_class=MANUFACTURED_TEST_ONLY) accepts1/2.",
+      "impact": "Stated rejection of rounded float input can be bypassed through normal numeric subclassing.",
+      "minimal_fix": "Use isinstance(x,(float,bool)) or explicit allowlist supported exact classes; keep Decimal/Fraction/int/text accepted as documented; add affected float subclass test."
+    }
+  ],
+  "test_independence": {
+    "source_count": "baryon and charge tests have explicit independent stoichiometry; mean energy equations match source definition",
+    "SI_test": "test_exact_SI duplicates source constant construction, so this test alone supplies no independent unit oracle; independent eV definition gives1MeV=1.602176634e-13J",
+    "trace_tests": "endpoint and constant-mu2 checks verify algebraic API behavior; independent concavity proof here supports universal scope",
+    "duplicate_minimal": "same algebra in another module is not an independent physical model"
+  },
+  "executions": [
+    {
+      "kind": "packaging",
+      "command": "hash/size comparison of EVIDENCE_MANIFEST.json entries",
+      "exit_code": 0,
+      "result": "15/15 exact"
+    },
+    {
+      "kind": "targeted diagnosed implementation probe",
+      "command": "import source modules; call FloatAlias rate and float/bool direction cases",
+      "exit_code": 0,
+      "result": "All three invalid-provenance cases accepted, reproducing C9-F1/F2"
+    }
+  ],
+  "scientific_scope": {
+    "new_physical_IVPs": 0,
+    "event_rate": null,
+    "production": "HOLD",
+    "L4": false,
+    "physical_activation": false,
+    "central_dag_delta": 0,
+    "local_physical_dag_delta": 0,
+    "strong_no_go_admitted": false
+  },
+  "next_source_research": {
+    "decision": "useful conditional weak kinetic-gain pushforward",
+    "reason": "Separates exclusive event normalization from normalized angular marks, resolves2R number and stress-moment ownership, and prevents duplicate daughter symmetry factor. It supplies an actual computational interface for future named pool binding while rate, cross section and physical admission stay unresolved.",
+    "formula": "Integral psi(p) C_gain(p) d3p = R Integral [psi(p_plus(Omega))+psi(p_minus(Omega))] W(dOmega), Integral W=1.",
+    "conditions": "f_D is defined per d3p in local target-rest frame; exclusive event R counts unordered2D events once; any identical-particle factor already belongs to the cross-section convention; arbitrary oriented CM mark law may be symmetrized with no change to unordered-pair pushforward.",
+    "physical_admission": "unresolved until qualified event R and CM shape/uncertainty/frame are supplied"
+  }
+}
