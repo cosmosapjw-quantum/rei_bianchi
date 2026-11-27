@@ -1,0 +1,92 @@
+//! C3V signed two moment canonical owner. No nodal compression.
+use bianchi_rustcore::kinetic::{owned_vlasov::OwnedState,sphere::{gauss_legendre,SphereGrid}};
+const KT0:f64=8.617333262145e-5*2.7255;
+#[link(name="dg_rhs",kind="static")]
+extern "C" {
+ fn dg_rhs(nr:i32,nc:i32,e:*const f64,d:*const f64,n:*const f64,w:*const f64,w0:*const f64,a:*const f64,b:*const f64,ymin:f64,ymax:f64,theta:f64,tr:f64,ngh:i32,zh:*const f64,wh:*const f64,ngl:i32,zl:*const f64,wl:*const f64,outn:*mut f64,outv:*mut f64,diag:*mut f64)->i32;
+}
+#[derive(Clone,Debug,PartialEq)]
+pub struct Stock{pub n:Vec<f64>,pub v:Vec<f64>,pub dn:Vec<f64>,pub dv:Vec<f64>}
+pub struct Grid{pub e:Vec<f64>,pub c:Vec<f64>,pub half:Vec<f64>,x:Vec<f64>,xe:Vec<f64>,dl:f64,dir:Vec<[f64;3]>,w0:Vec<f64>,pub cap:f64,gram:Vec<[f64;3]>,z:Vec<f64>,wg:Vec<f64>,pub fine:bool}
+impl Grid{
+ pub fn new(x:&[f64],bb:f64,a:f64,nmu:usize,nc:usize,fine:bool)->Result<Self,String>{
+  if x.len()<16||nmu<4||nc<16{return Err("DG grid domain".into())}
+  let dl=(x[1]/x[0]).ln();let xe:Vec<_>=(0..=x.len()).map(|i|x[0]*((i as f64-0.5)*dl).exp()).collect();
+  // Fix canonical extent to original 512-bin owner across scalar grids.
+  let pad=4.5*(60_f64/1e-10).ln()/511.;
+  let l=x[0].ln()-pad;let r=x[x.len()-1].ln()+pad;
+  let e:Vec<_>=(0..=nc).map(|i|(l+(r-l)*i as f64/nc as f64).exp()).collect();
+  let c:Vec<_>=e.windows(2).map(|x|0.5*(x[0]+x[1])).collect();let half:Vec<_>=e.windows(2).map(|x|0.5*(x[1]-x[0])).collect();
+  let (z,wg)=gauss_legendre(32);let mut gram=Vec::new();
+  for (&c,&h) in c.iter().zip(&half){let mut m=[0.;3];for (&z,&w) in z.iter().zip(&wg){let q=c+h*z;let v=q*q/q.exp_m1()*h*w;for k in 0..3{m[k]+=v*z.powi(k as i32);}}if m[0]*m[2]-m[1]*m[1]<=0.{return Err("DG gram".into())}gram.push(m);}
+  let s=SphereGrid::new(nmu,2*nmu);let dir=s.ehat.chunks_exact(3).map(|n|[n[0],n[1],n[2]]).collect();let w0:Vec<_>=s.w.iter().map(|w|w/(4.*std::f64::consts::PI)).collect();
+  Ok(Self{e,c,half,x:x.to_vec(),xe,dl,dir,w0,cap:bb*a/KT0*15./std::f64::consts::PI.powi(4),gram,z,wg,fine})
+ }
+ fn nr(&self)->usize{self.dir.len()}
+ fn nc(&self)->usize{self.c.len()}
+ pub fn empty(&self)->Stock{let v=vec![0.;self.nr()*self.nc()];Stock{n:v.clone(),v:v.clone(),dn:v.clone(),dv:v}}
+ pub fn rays(&self,g:&OwnedState)->Result<(Vec<f64>,Vec<f64>,Vec<f64>),String>{
+  let f=g.f.try_inverse().ok_or("DG inverse")?.transpose();let mut d=Vec::new();let mut n=Vec::new();let mut w=Vec::new();
+  for (q,wi) in self.dir.iter().zip(&self.w0){let p:[f64;3]=std::array::from_fn(|i|(0..3).map(|j|f[(i,j)]*q[j]).sum());let v=p.iter().map(|v|v*v).sum::<f64>().sqrt();d.push(v);n.extend(p.map(|x|x/v));w.push(wi/v.powi(3));}
+  let sum=w.iter().sum::<f64>();if (sum-1.).abs()>1e-7{return Err("DG ray weight".into())}for v in &mut w{*v/=sum}
+  Ok((d,n,w))
+ }
+ pub fn coefficients(&self,s:&Stock)->Result<(Vec<f64>,Vec<f64>,f64),String>{
+  let nc=self.nc();let mut a=Vec::new();let mut b=Vec::new();let mut margin:f64=1.;
+  for i in 0..self.nr(){for j in 0..nc{let k=i*nc+j;let [m0,m1,m2]=self.gram[j].map(|m|m*self.w0[i]);let det=m0*m2-m1*m1;
+   let n=s.n[k]+s.dn[k];let v=(s.v[k]+s.dv[k])/self.half[j];let aa=(m2*n-m1*v)/det;let bb=(m0*v-m1*n)/det;
+   margin=margin.min(1.+aa-bb.abs());if !aa.is_finite()||!bb.is_finite(){return Err("DG coefficient nonfinite".into())}a.push(aa);b.push(bb);
+  }}
+  if margin<=0.||!margin.is_finite(){return Err(format!("DG positivity {margin:e}"))}
+  Ok((a,b,margin))
+ }
+ pub fn moments(&self,s:&Stock,g:&OwnedState)->Result<(f64,[[f64;3];3],f64),String>{
+  let (d,n,_)=self.rays(g)?;let nc=self.nc();let mut u=0.;let mut num=0.;let mut p=[[0.;3];3];
+  for i in 0..self.nr(){let mut ue=0.;let mut nu=0.;let mut uc=0.;let mut nn=0.;for j in 0..nc{let k=i*nc+j;ue+=s.v[k]+self.c[j]*s.n[k];uc+=s.dv[k]+self.c[j]*s.dn[k];nu+=s.n[k];nn+=s.dn[k];}let a=(ue+uc)*d[i]*self.cap*KT0/g.a;u+=a;num+=(nu+nn)*self.cap;for k in 0..3{for l in 0..3{p[k][l]+=a*n[3*i+k]*n[3*i+l];}}}
+  Ok((u,p,num))
+ }
+ pub fn corr(&self,s:&Stock,g:&OwnedState)->Result<(f64,[[f64;3];3],f64),String>{
+  let mut v=self.empty();v.n.clone_from(&s.dn);v.v.clone_from(&s.dv);self.moments(&v,g)
+ }
+ pub fn birth(&self,s:&mut Stock,g:&OwnedState,delta:&[f64])->Result<(f64,f64),String>{
+  let(d,_,w)=self.rays(g)?;if delta.len()!=self.x.len(){return Err("DG source grid".into())}
+  let src:Vec<_>=delta.iter().zip(&self.x).map(|(v,x)|v*x.powi(3)*self.dl).collect();let nc=self.nc();
+  for i in 0..self.nr(){for (j,(&x,&dn)) in self.x.iter().zip(&src).enumerate(){let l=self.xe[j]/d[i];let r=self.xe[j+1]/d[i];if l<self.e[0]||r>self.e[nc]{return Err("DG source outside padded support".into())}
+   let c=(l+r)/2.;let h=r-l;let n=dn*w[i];let v=n*(x/d[i]-c);let aa=n/h;let bb=12.*v/h.powi(3);
+   let mut k=self.e.partition_point(|x|*x<=l).saturating_sub(1);
+   while k<nc&&self.e[k]<r{let l0=l.max(self.e[k]);let r0=r.min(self.e[k+1]);let h0=(r0-l0).max(0.);let m=(l0+r0)/2.;let nn=h0*(aa+bb*(m-c));let vv=(m-self.c[k])*nn+bb*h0.powi(3)/12.;
+    s.n[i*nc+k]+=nn;s.v[i*nc+k]+=vv;k+=1;}
+  }}
+  self.coefficients(s)?;
+  Ok((src.iter().sum::<f64>()*self.cap,src.iter().zip(&self.x).map(|(a,b)|a*b).sum::<f64>()*self.cap*KT0/g.a))
+ }
+ pub fn project(&self,s:&Stock,g:&OwnedState)->Result<(Vec<f64>,[f64;4]),String>{
+  let (d,_,_)=self.rays(g)?;let (a,b,_)=self.coefficients(s)?;let nc=self.nc();let nx=self.x.len();let mut stock=vec![0.;nx];let mut tail=[0.;4];
+  // Integrate the reconstructed signed density on q intervals split by
+  // the scalar nodes. Between nodes deposit the exact N and first x moment.
+  for i in 0..self.nr(){for j in 0..nc{let k=i*nc+j;let mut l=self.e[j];let hi=self.e[j+1];while l<hi{
+   let x=l*d[i];let mut kk=self.x.partition_point(|v|*v<=x);
+   if kk<nx && self.x[kk]/d[i]<=l{kk+=1}
+   let r=if kk<nx{hi.min(self.x[kk]/d[i])}else{hi};if r<=l{return Err("DG projection progress".into())}
+   let m=(r+l)/2.;let h=(r-l)/2.;let mut N=0.;let mut U=0.;
+   for (&z,&w) in self.z.iter().zip(&self.wg){let q=m+h*z;let n=self.w0[i]*q*q/q.exp_m1()*(a[k]+b[k]*(q-self.c[j])/self.half[j])*h*w;N+=n;U+=n*q*d[i];}
+   if kk==0||kk==nx{let k0=if kk==0{0}else{nx-1};if (r*d[i]<=self.xe[0])||(l*d[i]>=self.xe[nx]){tail[0]+=N*self.cap;tail[1]+=U*self.cap*KT0/g.a;tail[2]+=N.abs()*self.cap;tail[3]+=U.abs()*self.cap*KT0/g.a;}else{stock[k0]+=N;let u=(U-N*self.x[k0])*self.cap*KT0/g.a;tail[1]+=u;tail[3]+=u.abs();}}
+   else{let v=(U-N*self.x[kk-1])/(self.x[kk]-self.x[kk-1]);stock[kk-1]+=N-v;stock[kk]+=v;}
+   l=r;
+  }}}
+  let (u,_,n)=self.moments(s,g)?;let un=stock.iter().zip(&self.x).map(|(n,x)|n*x).sum::<f64>()*self.cap*KT0/g.a;
+  if (stock.iter().sum::<f64>()*self.cap+tail[0]-n).abs()>1e-12 || (un+tail[1]-u).abs()>1e-14{return Err(format!("DG scalar projection ledger {u:e} {un:e} {:?}",tail))}
+  let out=stock.iter().zip(&self.x).map(|(n,x)|n/(x.powi(3)*self.dl)).collect();Ok((out,tail))
+ }
+ pub fn collide(&self,s:&mut Stock,g:&OwnedState,theta:f64,tr:f64,depth:f64)->Result<[f64;6],String>{
+  if depth==0.{return Ok([0.;6])}
+  let(d,n,w)=self.rays(g)?;let(a,b,_)=self.coefficients(s)?;
+  let (zh,wh):(&[f64],&[f64])=if self.fine{(&[-2.930637420257244,-1.981656756695843,-1.15719371244678,-0.381186990207322,0.381186990207322,1.15719371244678,1.981656756695843,2.930637420257244],&[0.000112614538375,0.009635220120788,0.117239907661759,0.373012257679077,0.373012257679077,0.117239907661759,0.009635220120788,0.000112614538375])}else{(&[-1.6506801238857846,-0.5246476232752903,0.5246476232752903,1.6506801238857846],&[0.0458758547680685,0.4541241452319315,0.4541241452319315,0.0458758547680685])};
+  let(zl,wl)=gauss_legendre(if self.fine{4}else{2});let mut dn=vec![0.;a.len()];let mut dv=dn.clone();let mut diag=[0.;6];
+  let rc=unsafe{dg_rhs(self.nr()as i32,self.nc()as i32,self.e.as_ptr(),d.as_ptr(),n.as_ptr(),w.as_ptr(),self.w0.as_ptr(),a.as_ptr(),b.as_ptr(),self.xe[0].ln(),self.xe[self.xe.len()-1].ln(),theta,tr,zh.len()as i32,zh.as_ptr(),wh.as_ptr(),zl.len()as i32,zl.as_ptr(),wl.as_ptr(),dn.as_mut_ptr(),dv.as_mut_ptr(),diag.as_mut_ptr())};
+  if rc!=0||diag[0]>1e-10||diag[1]>1e-10{return Err(format!("DG collision error {rc} {:?}",diag))}
+  for i in 0..dn.len(){s.dn[i]+=depth*dn[i];s.dv[i]+=depth*dv[i];}self.coefficients(s)?;Ok(diag)
+ }
+ pub fn rollback_test(&self,s:&Stock)->bool{let before=s.clone();let mut bad=s.clone();bad.n[0]-=2.*self.gram[0][0]*self.w0[0];self.coefficients(&bad).is_err()&&*s==before}
+ pub fn corr_diff(&self,a:&Stock,b:&Stock)->(f64,f64){let dn=a.dn.iter().zip(&b.dn).map(|(a,b)|(a-b).abs()).sum::<f64>()*self.cap;let dv=a.dv.iter().zip(&b.dv).map(|(a,b)|(a-b).abs()).sum::<f64>()*self.cap;(dn,dv)}
+}
