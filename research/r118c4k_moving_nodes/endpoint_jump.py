@@ -26,4 +26,8 @@ for h in [1e-3,1e-4]:
  rr=np.divide(abs(jump-pred),abs(pred),out=np.zeros_like(pred),where=pred!=0)
  rows.append(dict(h=h,nodes=[r['count'],up['count'],dn['count']],native_one_sided_gap=jump.tolist(),physical_jump=pred.tolist(),relative_by_component=rr.tolist(),number_balance=float((jump[0]+jump[8])/r['n']),survival_relative=float(rr[0]),HI_events_relative=float(rr[8]),binding_relative=float(rr[11]),excess_relative=float(rr[12])))
 out=dict(source_sha256=hashlib.sha256((D/'1024_4_base.log').read_bytes()).hexdigest(),kappa=float(kap),threshold_eV=float(E),binding_eV=binding,density_per_H_per_eV=float(density_at_lo),sigma_cm2=float(sig),optical_depth=float(X),rows=rows,scope='Continuum exponential support endpoint one-sided boundary term at fixed mean, evaluated on one actual represented-cell probe. Native quadrature comparison only; no general production branch derivative implemented.')
+a,b=rows; extrap=(10*np.array(b['native_one_sided_gap'])-np.array(a['native_one_sided_gap']))/9
+rr=np.divide(abs(extrap-pred),abs(pred),out=np.zeros_like(pred),where=pred!=0)
+out['linear_extrapolation']=dict(jump=extrap.tolist(),relative_by_component=rr.tolist(),scope='Two-stencil extrapolation removes leading O(h) one-sided error; not an independent new native run or a certified limit.')
+assert max(rr[[0,1,2,8,11]])<1e-6 and rr[12]<1e-3
 (D/'ENDPOINT_JUMP.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out,indent=2))
