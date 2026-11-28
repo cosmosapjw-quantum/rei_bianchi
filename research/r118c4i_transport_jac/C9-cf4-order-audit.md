@@ -1,0 +1,3 @@
+# C9-cf4-order-audit | R118-C4I REI
+
+Corrected written R5 product ordering; implementation C8 already used rightmost early-weighted exponential. Exact linear-A Magnus commutator coefficient and BCH agree. No rerun needed for unchanged implementation. {"earliest_exponent_A1_weight": "1/12", "latest_exponent_A1_weight": "5/12", "BCH_commutator_coefficient": "-1/12", "exact_Magnus_commutator_coefficient": "-1/12", "scope": "A(t)=A0+t A1; chronological product e^V e^U, U=h(b A(t1)+a A(t2)), V=h(a A(t1)+b A(t2)); check O(h^3) commutator sign, not full general proof"}
