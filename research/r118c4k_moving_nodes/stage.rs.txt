@@ -1,0 +1,27 @@
+                // C4K: one actual prepared cell, controlled local geometry/mean probes.
+                if std::env::var_os("R118C4K_MOVING").is_some(){
+                    static C4K_COUNT:std::sync::atomic::AtomicUsize=std::sync::atomic::AtomicUsize::new(0);
+                    let ci=C4K_COUNT.fetch_add(1,std::sync::atomic::Ordering::Relaxed);
+                    if ci==0{
+                        let a=[nh*(1.-x[0]),self.n_he0_cm3/old.a.powi(3)*(1.-x[1]-x[2]),self.n_he0_cm3/old.a.powi(3)*x[1]];
+                        let ray=self.transport.ray_geometry(&geometry)?;let scales:Vec<_>=ray.iter().map(|v|v.scale).collect();
+                        if let Some(p)=&context.birth{
+                            let cell=p.c4j_cells(&scales,ne).into_iter().find(|x|x.6==0).ok_or(err("C4K_CELL"))?;
+                            let(k,n,lo,hi,mean,beta,_)=cell;let width=hi-lo;
+                            eprintln!("C4K_SOURCE,{k},{n:.17e},{lo:.17e},{hi:.17e},{mean:.17e},{beta:.17e},{:.17e}",scales[k/ne]);
+                            let targets=[(mean,scales[k/ne]),(mean,13.60/mean),(hi-width/100.,13.60/(hi-width/100.)),(mean,13.60/lo),(hi-width/60.,13.60/mean)];
+                            for (id,(m0,r0)) in targets.into_iter().enumerate(){
+                                let ms=(m0-lo).min(hi-m0);let b=p.c4j_local_cell(k,r0,m0-mean,0.)?;b.c4k_dump(id,0,0.,r0,m0,a,nh,dt,2)?;
+                                for mode in [0,1]{
+                                    for h in [0.001,0.0001,-0.001,-0.0001]{
+                                        let m=m0+if mode==0{h*ms}else{0.};let r=r0*f64::exp(if mode==1{h}else{0.});
+                                        match p.c4j_local_cell(k,r,m-mean,0.){
+                                            Ok(q)=>q.c4k_dump(id,mode,h,r,m,a,nh,dt,2)?,
+                                            Err(e)=>eprintln!("C4K_INVALID,{id},{mode},{h:.17e},{e:?}"),
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }

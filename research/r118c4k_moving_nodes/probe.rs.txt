@@ -1,0 +1,9 @@
+    // C4K: export the actual re-prepared nodes and native output of a bounded represented-cell probe.
+    pub(crate) fn c4k_dump(&self,id:usize,mode:usize,eps:f64,r:f64,mean:f64,a:[f64;3],nh:f64,dt:f64,scheme:u8)->Result<(),ForwardError>{
+        let out=self.c4i_summary(a,nh,dt,scheme)?;
+        let mut line=format!("C4K_CASE,{id},{mode},{eps:.17e},{r:.17e},{mean:.17e},{scheme},{nh:.17e},{dt:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{}",a[0],a[1],a[2],self.template.number[0],self.template.support_lo[0],self.template.support_hi[0],self.nodes.len());
+        for v in out{line.push_str(&format!(",{v:.17e}"));}eprintln!("{line}");
+        for (i,n) in self.nodes.iter().enumerate(){
+            eprintln!("C4K_NODE,{id},{mode},{eps:.17e},{i},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e}",n.q,n.number,n.sigma[0],n.sigma[1],n.sigma[2],n.excess_ev[0],n.excess_ev[1],n.excess_ev[2]);
+        }Ok(())
+    }
