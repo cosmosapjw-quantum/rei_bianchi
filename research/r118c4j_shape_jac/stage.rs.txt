@@ -1,0 +1,39 @@
+                // C4J: selected actual cells; no state mutation.
+                if std::env::var_os("R118C4J_SHAPE").is_some(){
+                    static C4J_COUNT:std::sync::atomic::AtomicUsize=std::sync::atomic::AtomicUsize::new(0);
+                    let ci=C4J_COUNT.fetch_add(1,std::sync::atomic::Ordering::Relaxed);
+                    if ci<3{
+                        let a=[nh*(1.-x[0]),self.n_he0_cm3/old.a.powi(3)*(1.-x[1]-x[2]),self.n_he0_cm3/old.a.powi(3)*x[1]];
+                        let ray=self.transport.ray_geometry(&geometry)?;let scales:Vec<_>=ray.iter().map(|v|v.scale).collect();
+                        let mut pools:Vec<(usize,&PreparedAbsorption,u8)>=vec![(0,&context.prepared,if context.birth.is_some(){1}else{0})];
+                        if let Some(b)=&context.birth{pools.push((1,b,2));}
+                        for (pool,p,scheme) in pools{
+                            for(k,n,lo,hi,mean,beta,category)in p.c4j_cells(&scales,ne){
+                                let rr=scales[k/ne];let ms=(mean-lo).min(hi-mean);
+                                let base=p.c4j_local_cell(k,rr,0.,0.)?;
+                                let(shape,geom,dn,du)=base.c4j_fixed_score(rr,ms,a,nh,dt,scheme)?;
+                                let v=base.c4i_summary(a,nh,dt,scheme)?;
+                                let mut line=format!("C4J_SHAPE,base,{ci},{pool},{category},{k},{n:.17e},{lo:.17e},{hi:.17e},{mean:.17e},{beta:.17e},{rr:.17e},{dn:.17e},{du:.17e},{}",base.node_count());
+                                for w in v.into_iter().chain(shape).chain(geom){line.push_str(&format!(",{w:.17e}"));}eprintln!("{line}");
+                                for j in 0..2{
+                                    let h=if j==0{1e-3}else{1e-4};
+                                    for mode in 0..2{
+                                        let (sm,sg)=if mode==0{(h*ms,0.)}else{(0.,h)};
+                                        let plus=p.c4j_local_cell(k,rr,sm,sg)?;let minus=p.c4j_local_cell(k,rr,-sm,-sg)?;
+                                        let vp=plus.c4i_summary(a,nh,dt,scheme)?;let vm=minus.c4i_summary(a,nh,dt,scheme)?;
+                                        let mut line=format!("C4J_SHAPE,col,{ci},{pool},{category},{k},{mode},{j},{},{}",plus.node_count(),minus.node_count());for i in 0..13{line.push_str(&format!(",{:.17e}",(vp[i]-vm[i])/(2.*h)));}eprintln!("{line}");
+                                        if j==0 && category==0{
+                                            let residual=|q:&PreparedAbsorption,z:[f64;4]|->Result<([f64;4],[f64;6]),ForwardError>{
+                                                let mut cc=context.clone();let q=Arc::new(p.c4j_replace_cell(k,q));if pool==0{cc.prepared=q;}else{cc.birth=Some(q);}
+                                                let (r,_,v)=cc.evaluate(z,dt)?;Ok((r,[dt*v.fraction_dt[0],dt*v.fraction_dt[1],dt*v.fraction_dt[2],dt*v.w_dt_erg_per_h_s/c.ev_erg,dt*v.cmb_to_gas_erg_cm3_s/(nh*c.ev_erg),dt*v.escape_erg_cm3_s/(nh*c.ev_erg)]))
+                                            };
+                                            let (_,rp)=residual(&plus,x)?;let (_,rm)=residual(&minus,x)?;let z=std::array::from_fn::<_,6,_>(|i|(rp[i]-rm[i])/(2.*h));
+                                            let mut line=format!("C4J_SHAPE,gas,{ci},{pool},{category},{k},{mode}");
+                                            for v in z{line.push_str(&format!(",{v:.17e}"));}eprintln!("{line}");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
