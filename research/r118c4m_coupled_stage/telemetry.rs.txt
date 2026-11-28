@@ -1,0 +1,11 @@
+        // C4M read-only exact accepted full external step telemetry.
+        let (nm,nne)=self.external_matter(&next, &xn, x)?;
+        if std::env::var_os("R118C4M_TRACE").is_some(){
+            for (role,g,m,ne) in [(0,&t.geometry,&m,ne),(1,&half.geometry,&hm,nem),(2,&next.geometry,&nm,nne)]{
+                let mut line=format!("C4M_GEOM,{role},{du:.17e},{:.17e},{:.17e}",g.a,g.h);
+                for v in g.s{line.push_str(&format!(",{v:.17e}"));}
+                for i in 0..3{for j in 0..3{line.push_str(&format!(",{:.17e}",g.f[(i,j)]));}}
+                for v in [m.rho,m.pressure[(0,0)],m.pressure[(1,1)],m.pressure[(2,2)],m.pressure[(0,1)],m.pressure[(0,2)],m.pressure[(1,2)],ne,m.photon_rho]{line.push_str(&format!(",{v:.17e}"));}
+                eprintln!("{line}");
+            }
+        }
