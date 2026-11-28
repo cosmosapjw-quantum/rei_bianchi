@@ -1,0 +1,155 @@
+{
+  "status": "PASS_SCOPED_RUNNER_REPAIR_DIAGNOSTIC",
+  "initial_execution": {
+    "exit_code": -9,
+    "limits": {
+      "AS_bytes": 805306368,
+      "CPU_seconds": 120,
+      "threads": 1,
+      "wall_seconds": 300
+    },
+    "max_child_rss_KiB": 11904,
+    "max_observed_group_plus_runner_CPU_seconds": 711.220077,
+    "rerun_count": 0,
+    "status": "FAIL",
+    "termination_reason": "whole process group CPU cap",
+    "wall_seconds": 0.0060649999941233546,
+    "whole_runner_waited_children_CPU_seconds": 0.045071
+  },
+  "initial_controls_executed": 0,
+  "initial_scientific_worker_output": "none",
+  "diagnosis": "namespace-local child PID was compared to host /proc PGID, incorrectly attributing unrelated host CPU",
+  "authorized_patch_scope": "runner only: single-threaded preexec child self-report /proc/self host PID/PGID after setsid; parent validates local child PID/new session and uses host PGID for accounting; overrides bounded <=original mode caps; full final RUSAGE_SELF+waited children independent of monitor",
+  "runner_sha256": "5abdfd0bd1136a8adc3b8fede30434e399d864c663f92ebe2eaf16bf421e3571",
+  "static": "runner_repair1/STATIC_REPAIR1_HANDSHAKE.json",
+  "diagnostic_regression": {
+    "status": "PASS",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+      "-c",
+      "import json,os,pathlib,resource,time; print(json.dumps({'local_pid':os.getpid(),'local_pgrp':os.getpgrp(),'proc_self_status':pathlib.Path('/proc/self/status').read_text(),'proc_self_stat':pathlib.Path('/proc/self/stat').read_text(),'own_user_CPU':resource.getrusage(resource.RUSAGE_SELF).ru_utime,'own_system_CPU':resource.getrusage(resource.RUSAGE_SELF).ru_stime}),flush=True);time.sleep(.1)"
+    ],
+    "entry_command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+      "/workspace/scratch/980916233f52/work/BASS_HE/research/program_expansion_20261025/continuation_tangent_20261028/evidence/runner_repair1/namespace_regression_handshake.py"
+    ],
+    "namespace": {
+      "child_host_pgrp": 298233,
+      "child_host_pid": 298233,
+      "child_local_pgrp": 7,
+      "child_local_pid": 7,
+      "child_namespace": {
+        "NSpgid": [
+          298233,
+          7
+        ],
+        "NSpid": [
+          298233,
+          7
+        ],
+        "PPid": [
+          298228
+        ],
+        "Pid": [
+          298233
+        ]
+      },
+      "identity_method": "child preexec /proc/self handshake after setsid",
+      "parent_local_pid": 2,
+      "parent_host_pid": 298228,
+      "parent_namespace": {
+        "Pid": [
+          298228
+        ],
+        "PPid": [
+          298227
+        ],
+        "NSpid": [
+          298228,
+          2
+        ],
+        "NSpgid": [
+          298227,
+          1
+        ]
+      }
+    },
+    "child_reported_local_pid": 7,
+    "child_reported_local_pgrp": 7,
+    "child_reported_host_pid": 298233,
+    "child_reported_host_pgrp": 298233,
+    "observed_group_CPU_seconds": 0.0,
+    "whole_regression_runner_waited_child_CPU_seconds": 0.067687,
+    "wall_seconds": 0.13149636599700898,
+    "exit_code": 0,
+    "limits": {
+      "CPU_seconds": 2,
+      "wall_seconds": 5,
+      "AS_bytes": 805306368,
+      "threads": 1
+    },
+    "scientific_imports_calls": 0,
+    "diagnostic_child_count": 1
+  },
+  "proc_path_diagnosis": "runner_repair1/PROC_PATH_DIAGNOSIS.json",
+  "scientific_retry": "NOT_RUN",
+  "remaining_action": "Root remote repair pin publication and nonauthor review, then explicit GO for one targeted scientific retry at evidence/validation/repair1 with CPU119/wall299; no retry yet.",
+  "previous_diagnostic_snapshot": {
+    "status": "BLOCKED_DIAGNOSTIC_ENVIRONMENT",
+    "initial_execution": {
+      "exit_code": -9,
+      "limits": {
+        "AS_bytes": 805306368,
+        "CPU_seconds": 120,
+        "threads": 1,
+        "wall_seconds": 300
+      },
+      "max_child_rss_KiB": 11904,
+      "max_observed_group_plus_runner_CPU_seconds": 711.220077,
+      "rerun_count": 0,
+      "status": "FAIL",
+      "termination_reason": "whole process group CPU cap",
+      "wall_seconds": 0.0060649999941233546,
+      "whole_runner_waited_children_CPU_seconds": 0.045071
+    },
+    "initial_controls_executed": 0,
+    "initial_scientific_worker_output": "none",
+    "diagnosis": "namespace-local child PID was compared to host /proc PGID, incorrectly attributing unrelated host CPU",
+    "authorized_patch_scope": "runner only: resolve host parent PID and children/NSpid match then host process group; bounded CPU/wall override <= original mode caps; preserve independent full RUSAGE_SELF+waited-child final accounting",
+    "runner_sha256": "247992a21c999a84fdaf6966aa9cf544f9c30f46b3cefed85959ff650bc61455",
+    "static": "runner_repair1/STATIC_REPAIR1.json",
+    "diagnostic_regression": {
+      "status": "FAIL",
+      "phase": "resolve_host_group before child communicate",
+      "exception": "FileNotFoundError",
+      "reason": "/proc/self/task/297564/children is not exposed by this host",
+      "diagnostic_child_count": 1,
+      "scientific_imports_calls": 0,
+      "exit_code": 1,
+      "whole_regression_CPU_seconds": null,
+      "wall_seconds": null,
+      "child_raw_namespace_report": "not captured because parent failed at missing children file before communicate; no success claimed",
+      "entry_command": [
+        "python3",
+        "work/BASS_HE/research/program_expansion_20261025/continuation_tangent_20261028/evidence/runner_repair1/namespace_regression.py"
+      ]
+    },
+    "proc_path_diagnosis": "runner_repair1/PROC_PATH_DIAGNOSIS.json",
+    "scientific_retry": "NOT_RUN",
+    "remaining_action": "root authorization for child self-report handshake alternative and further diagnostic check before repair pin; no autonomous retry"
+  },
+  "input_environment_fact": "Host does not expose /proc task children files; failed first diagnostic retained without scientific inference.",
+  "evidence_sha256": {
+    "evidence/runner_repair1/NAMESPACE_REGRESSION_FAILURE.json": "6f230db695bc1c9173d23e669618791d2ca13d3e1b536043bbd917b1fa49571a",
+    "evidence/runner_repair1/NAMESPACE_REGRESSION_HANDSHAKE.json": "db921153d5bb29e1dfbca583bcf1d954f8374860a781e53c581b53159e21891a",
+    "evidence/runner_repair1/PROC_PATH_DIAGNOSIS.json": "831e32ee321b327103a3db92d131d8539bab972c52dd11f2918a1758343202a6",
+    "evidence/runner_repair1/REGRESSION_MONITOR_IDENTITY.json": "68fe224e7ab37ff4d66b6c93d17afc490a3f7ee1e3c30d1d8b9cb36866e0e52b",
+    "evidence/runner_repair1/STATIC_REPAIR1.json": "3f91d2d9e854f52938f0fe3f22e719b309d1d8c46e72355adc2fe1482b795d56",
+    "evidence/runner_repair1/STATIC_REPAIR1_HANDSHAKE.json": "dc016ec823208ee10312be04cb0e251cab6f34cf880c76970b373a9361c5c279",
+    "evidence/runner_repair1/namespace_regression.py": "0cf97b19061c593877783bb4e21fad9c66c3f7e168e049c1e0b5ff2952e5a9c9",
+    "evidence/runner_repair1/namespace_regression_children_probe.py": "0cf97b19061c593877783bb4e21fad9c66c3f7e168e049c1e0b5ff2952e5a9c9",
+    "evidence/runner_repair1/namespace_regression_handshake.py": "44bc26157d4b08656bb8c15c59a5d112cc7d1dde3548ad39e3437cef2f9721cc",
+    "evidence/runner_repair1/regression_handshake_child_stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/runner_repair1/regression_handshake_child_stdout.log": "f8944b50aa185b5def00f9bf6a1bc1007b709f8821fdba19bd449d72a997c29b"
+  }
+}

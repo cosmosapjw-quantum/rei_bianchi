@@ -1,0 +1,102 @@
+{
+  "schema": "HE_STATE04_LOCAL_DAG_V1",
+  "unit_id": "HE-EXP-STATE-04",
+  "scope": "Local scoped products and dependencies; no global completion fraction or central promotion.",
+  "nodes": [
+    {
+      "id": "STATE04-SOURCE",
+      "status": "COMPLETE_SCOPED_SOURCE_ONLY",
+      "artifact": "sources/HD.Rovibration.805a7aa5.radex",
+      "claim": "Native 52 levels/368 radiative/171 collision rows/25 temperatures, 4275 cells; source identity, not global species expansion.",
+      "dependencies": []
+    },
+    {
+      "id": "STATE04-THERMAL-PAIR",
+      "status": "COMPLETE_SCOPED_CONDITIONAL",
+      "artifact": "src/state_edge.py",
+      "claim": "Selected HD local level ID2↔ID1 collisional transition with H+ collider; native downward and explicitly assumed thermal reciprocity upward at 24 allowed source temperatures.",
+      "dependencies": [
+        "STATE04-SOURCE"
+      ]
+    },
+    {
+      "id": "STATE04-POPULATION-ENERGY",
+      "status": "COMPLETE_SCOPED_CONDITIONAL",
+      "artifact": "src/state_edge.py",
+      "claim": "Named scalar population consumer, internal energy witness single ownership and unallocated total material kinetic compensation.",
+      "dependencies": [
+        "STATE04-THERMAL-PAIR"
+      ]
+    },
+    {
+      "id": "STATE04-LIH-CORRECTION",
+      "status": "COMPLETE_SCOPED_SOURCE_ONLY",
+      "artifact": "sources/BENNETT2008_CORRECTION.json",
+      "claim": "Explicit 2008 corrected 27-row selection supersedes old rate, without addition or RA branching.",
+      "dependencies": []
+    },
+    {
+      "id": "STATE04-VALIDATED-REFERENCE",
+      "status": "COMPLETE_SCOPED_CONDITIONAL",
+      "artifact": "evidence/CODE_REVIEW_POST_EXECUTION.json",
+      "claim": "19 measured tests PASS; saved-data plot PASS and independent theory and code/result reviews PASS.",
+      "dependencies": [
+        "STATE04-SOURCE",
+        "STATE04-THERMAL-PAIR",
+        "STATE04-POPULATION-ENERGY",
+        "STATE04-LIH-CORRECTION"
+      ]
+    },
+    {
+      "id": "STATE04-EXACT-GLOBAL-STATE-MASS-BINDING",
+      "status": "OPEN_PHYSICAL_INPUT",
+      "artifact": null,
+      "claim": "Exact global identity, state and mass binding remain open.",
+      "dependencies": [
+        "STATE04-SOURCE",
+        "STATE04-LIH-CORRECTION"
+      ]
+    },
+    {
+      "id": "STATE04-DIFFERENTIAL-BRANCH-INPUT",
+      "status": "OPEN_PHYSICAL_INPUT",
+      "artifact": null,
+      "claim": "Energy-resolved differential and angular inputs and branch specification remain open.",
+      "dependencies": [
+        "STATE04-EXACT-GLOBAL-STATE-MASS-BINDING"
+      ]
+    },
+    {
+      "id": "STATE04-NAMED-DEPOSITION",
+      "status": "OPEN_NAMED_CONSUMER",
+      "artifact": null,
+      "claim": "Species kinetic partition and named deposition/thermalization consumer remain open.",
+      "dependencies": [
+        "STATE04-DIFFERENTIAL-BRANCH-INPUT",
+        "STATE04-POPULATION-ENERGY"
+      ]
+    }
+  ],
+  "global_physical_completion": null,
+  "L4_ready": false,
+  "physical_provider_admitted": false,
+  "activation": false,
+  "production": "NOT_APPROVED",
+  "delivery_overlay": {
+    "source_commit": "2addfab8c8975febd69d2c88eecc09afea508fbe",
+    "source_tree": "af0f52ee8885e1a5f31aa933ed5efb730d7dc3bf",
+    "source_archive_dual_backup": "PASS_UPLOAD_ACK_AND_METADATA_ID_SIZE",
+    "source_backup_receipt": "delivery/BACKUP_ACK.json",
+    "remote_full_download_sha256_verified": false,
+    "central_candidate": "APPROVED_LOCAL_METADATA_DELTA_ONLY",
+    "central_expected_base": "55202663275cd0607c968129b33de805d06f5d8b",
+    "source_published": false,
+    "central_published": false,
+    "tail_archive_built": false,
+    "tail_backup_verified": false,
+    "publication_block": "delivery/PUBLICATION_BLOCK.json",
+    "central_review": "delivery/central/INDEPENDENT_REVIEW.json",
+    "final_preflight": "delivery/FINAL_PREFLIGHT.json",
+    "WU_observed_head": "eb59de011f7cc67d465cda8e84b598a5d17251d6"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "schema": "WU088_HH_PHYS06_DENSITY_LEAF_CORRECTION_V1",
+  "status": "SOURCE_EXACT_NORMALIZATION_CORRECTION",
+  "failure_layer": "THEORY_OR_MATH",
+  "initial_owner_statement": "ell(stage.fHe) F_np = -L_escape - 2H w exactly",
+  "corrected_statement": "ell(stage.fHe) F_np = -L_escape - 2H w + (stage.fHe - exact(nHe_binary64)/exact(nH_binary64)) * [chiHeI F0_y1 + (chiHeI+chiHeII) F0_y2]",
+  "reason": "model(stage) stores nHe=binary64(nH*stage.fHe), whereas ft03_interval constructs fhe through interval nHe/nH; photo rows and energy ledger use stage.fHe",
+  "scope": "Exact algebra with fixed binary64 leaves; decimal displays only; no model renormalization or root/trajectory computation",
+  "input_sha256": "1f462e7fa7c1d4251c5004194c42b0e471fe5c42303962f1a40d5d5062f1923d",
+  "source_commit": "4b9231a0eff113701e7178ad98624233f387dd15",
+  "source_bindings": [
+    "candidate/src/coupled_primary.rs L60-75",
+    "candidate/src/ft03_interval.rs L55-59, output helium division",
+    "candidate/src/phys04_mixed.rs lower and photo helium normalization",
+    "candidate/src/coupled_primary.rs L216-221 energy"
+  ],
+  "rows": [
+    {
+      "label": "archived_t0",
+      "time_s": 160000000000.0,
+      "nH_binary64": 9.952115015900972e-05,
+      "nHe_rounded_binary64": 8.260255463197807e-06,
+      "f_stage_binary64": 0.083,
+      "f_tilde_exact": {
+        "numerator": "4875994192418275",
+        "denominator": "58746917980943072"
+      },
+      "delta_f_exact": {
+        "numerator": "518739254785749",
+        "denominator": "132286298964070155145850814201856"
+      },
+      "delta_f_decimal": "3.92133772618918045415042864166536152387348954280550294274156E-18",
+      "delta_f_positive": true
+    },
+    {
+      "label": "proposed_dt_6.25e+08",
+      "time_s": 160625000000.0,
+      "nH_binary64": 9.951928415493808e-05,
+      "nHe_rounded_binary64": 8.26010058485986e-06,
+      "f_stage_binary64": 0.083,
+      "f_tilde_exact": {
+        "numerator": "2437951384192135",
+        "denominator": "29372908243278736"
+      },
+      "delta_f_exact": {
+        "numerator": "969088477952539",
+        "denominator": "132283818619217885719133270573056"
+      },
+      "delta_f_decimal": "7.32582781528316176267261488283733832043849489567214441411211E-18",
+      "delta_f_positive": true
+    },
+    {
+      "label": "proposed_dt_1.25e+09",
+      "time_s": 161250000000.0,
+      "nH_binary64": 9.951741818585369e-05,
+      "nHe_rounded_binary64": 8.259945709425857e-06,
+      "f_stage_binary64": 0.083,
+      "f_tilde_exact": {
+        "numerator": "2437905673032225",
+        "denominator": "29372357506412348"
+      },
+      "delta_f_exact": {
+        "numerator": "201373658400253",
+        "denominator": "529125353283486566110759781138432"
+      },
+      "delta_f_decimal": "3.80578358513023563263416916781993596883259312772764355474707E-19",
+      "delta_f_positive": true
+    }
+  ],
+  "native_counts": {
+    "endpoint": 0,
+    "root": 0,
+    "IVP": 0
+  },
+  "introduced_by": "energy theory independent source audit; independently confirmed by NCP source intake"
+}

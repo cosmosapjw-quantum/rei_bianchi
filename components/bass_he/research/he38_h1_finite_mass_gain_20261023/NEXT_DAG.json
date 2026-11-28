@@ -1,0 +1,269 @@
+{
+  "schema": "he38.next_science_dependencies.v1",
+  "workflow_version": "1.0.0",
+  "approval_version": "0.2",
+  "current_unit": "HE38-FMG",
+  "current_science_status": "complete_within_explicit_source_model",
+  "current_delivery_authority": "DAG.json and delivery/FINAL_ACK.json",
+  "original_goal": "Calibrated primordial atomic/nuclear kinetics and thermal evolution with baryonic anisotropic pressure and consistent metric/source feedback.",
+  "original_model_reused": "8nuclides21states,prescribedUV photo+caseA RR,fixedT,gas pi_b=0;392nominal+2angularguard,394savedNPZ/receipts and6figurepairs remain complete",
+  "matter_stress_sector": "nonbaryonic",
+  "overall_goal_percentage": null,
+  "reason": "Additional species/process/provider/closure domains are not fixed; unit-stage completion is not a percentage of the original physical goal.",
+  "delta_intake": {
+    "cutoff_utc": "2026-10-23T03:46:44.729Z",
+    "source_snapshot_started_utc": "2026-10-23T03:35:17.784Z",
+    "mode": "changes_since_saved_HE38_intake",
+    "conversation_access": "PersonalContext unavailable in actual HE38 request; no full private-conversation census claim",
+    "backups": "Selected metadata was checked; old whole archives not redownloaded"
+  },
+  "resolved_parent_dependencies": [
+    "N0 delta intake",
+    "N1 selected finite-mass source gate",
+    "N1M finite-mass gain within explicit model",
+    "N2 H1 species net source within commonT/u/linearSTF pureH scope"
+  ],
+  "nodes": [
+    {
+      "id": "N0",
+      "name": "HE37 snapshot 이후 변경분 intake",
+      "depends_on": [],
+      "status": "complete_within_HE38_declared_scope",
+      "acceptance": "2026-10-23T02:05:02.183087Z 이후 branch/PR/source/backup identity 변경만 확인하고 같은 identity의 저장 근거를 재사용한다.",
+      "evidence_policy": "Personal/private discussions unavailable was recorded; do not infer their contents or claim all conversations were reviewed.",
+      "completion_evidence": "HE38 CONTRACT.json,theory/DERIVATION.md,RESULTS_KO.md",
+      "scope": "originalJacobi uniformG finiteM H1,commonT/u,linear independent electron/H STF; calibrated angular and closedgas remain open"
+    },
+    {
+      "id": "N1",
+      "name": "다음 H1 source track과 증거 수준 선택",
+      "depends_on": [
+        "N0"
+      ],
+      "status": "complete_within_HE38_declared_scope",
+      "acceptance": "Angular 또는 finite-mass gain 중 하나를 선택하고 원전/데이터·종·에너지·각도·질량·normalization·불확실도 범위를 명시한다.",
+      "decision": "Selected finite_mass after delta intake; source gate admitted_explicit_physical_approximation.",
+      "source_gate_outcomes": [
+        "admitted_calibrated_source",
+        "admitted_explicit_physical_approximation",
+        "no_new_source_admitted"
+      ],
+      "gate_failure_policy": "자료 gate가 닫히지 않으면 새로 얻은 유도/명시적 모형조건부 결과만 기록한다. Calibrated provider는 open으로 유지하고 coupled IVP를 시작하지 않는다. HE37 unchanged 결과를 새 성과로 다시 세지 않는다.",
+      "ccc_total_normalization_hybrid_allowed": false,
+      "completion_evidence": "HE38 CONTRACT.json,theory/DERIVATION.md,RESULTS_KO.md",
+      "scope": "originalJacobi uniformG finiteM H1,commonT/u,linear independent electron/H STF; calibrated angular and closedgas remain open"
+    },
+    {
+      "id": "N1A",
+      "name": "H1 energy-weighted angular gain",
+      "depends_on": [
+        "N1"
+      ],
+      "status": "open_calibrated_provider",
+      "activation": "separate future angular-calibration track",
+      "acceptance": "같은 사건 단면적과 frame의 inclusive electron measure가 count2를 공급해야 한다. Heavy-target track은 electron energy 합 E-I와 D(E)=integral epsilon*P2(coschi)를 검증한다. Finite-mass track은 count2 electron measure와 ion momentum/energy/STF를 함께 공급하여 total outgoing COM kinetic energy E-I를 검증하고, electron D(E)도 같은 frame에서 정의한다. DDCS의 labels/exchange/slow-electron support와 lab/relative-energy convention을 대조한다.",
+      "insufficient_inputs": [
+        "total sigma only",
+        "energy-only SDCS without outgoing angular data",
+        "unmatched CCCtotal times Le-Cambier energy/angular partition"
+      ],
+      "closure_scope": "Heavy-target limit may be retained only if explicit; calibrated angular coverage is restricted to the actual supplied domain.",
+      "note": "FiniteM coordinates now supplied; numerical angular provider must preserve original energy/frame/inclusive normalization or rederive changed moments."
+    },
+    {
+      "id": "N1M",
+      "name": "H1 finite-mass gain",
+      "depends_on": [
+        "N1"
+      ],
+      "status": "complete_within_HE38_declared_scope",
+      "activation": "selected_track == finite_mass (selected and completed in HE38)",
+      "acceptance": "선정 질량과 반응 전후 종에 대해 target motion,recoil,product momentum/energy/STF를 같은 차등 kernel/frame에서 유도하고 number/charge/energy를 보존한다.",
+      "prohibited_shortcuts": [
+        "replacing me by reduced mass in a lab-energy table without an admitted energy mapping",
+        "using the recoil-energy bound as a calibrated tensor-error certificate",
+        "claiming an assumed isotropic finite-mass model is measured H1 angular calibration"
+      ],
+      "scope_policy": "원전이 근사모형만 제공하면 그 범위의 model-conditional 결과로 완료한다. 실제 finite-mass/angle calibration은 별도 open 항목이다.",
+      "completion_evidence": "HE38 CONTRACT.json,theory/DERIVATION.md,RESULTS_KO.md",
+      "scope": "originalJacobi uniformG finiteM H1,commonT/u,linear independent electron/H STF; calibrated angular and closedgas remain open"
+    },
+    {
+      "id": "N2",
+      "name": "선정 H1 gain과 기존 loss의 net source",
+      "depends_on": [
+        "N1"
+      ],
+      "status": "complete_within_HE38_declared_scope",
+      "conditional_depends_on": [
+        {
+          "when": "selected_track == angular",
+          "nodes": [
+            "N1A"
+          ]
+        },
+        {
+          "when": "selected_track == finite_mass",
+          "nodes": [
+            "N1M"
+          ]
+        },
+        {
+          "when": "additional_atomic_process_selected",
+          "nodes": [
+            "N4A"
+          ]
+        }
+      ],
+      "acceptance": "동일 kernel로 입사/생성 number,momentum,heat,STF를 합하고 모든 energy owner와 species/charge census를 대조한다. HE37 pi_e를 totalgas pi_b로 대체하지 않는다.",
+      "jacobian_policy": "Any ne(Y),temperature or source dependence must be included in the explicitly scoped physical Jacobian; frozen donor Jacobians stay labelled.",
+      "completion_evidence": "HE38 CONTRACT.json,theory/DERIVATION.md,RESULTS_KO.md",
+      "scope": "originalJacobi uniformG finiteM H1,commonT/u,linear independent electron/H STF; calibrated angular and closedgas remain open"
+    },
+    {
+      "id": "N3",
+      "name": "열·UV·photon·deposition provider",
+      "depends_on": [
+        "N0"
+      ],
+      "status": "pending",
+      "acceptance": "선정 T,z,species와 spectrum에 대해 evolving/prescribed UV,retained/escaped photon,Compton 및 electron deposition의 독립 방정식·경계와 energy owner를 정한다.",
+      "donor_reuse": "Read latest C23B fixedpin54477b285e0c712610453bca1408a076af43521d, REC LINE01 and REI ANGTHERM01 within admitted source/frame/domain; earlier-z and thermal/fast membership remain independent gates.",
+      "redshift_gate": "C23A UVB is0<=z<=15.1; HE32 begins at meanz20. Do not extrapolate that provider to z20. Supply an admitted earlier-z provider or explicitly choose a later starting domain with matching initial data.",
+      "spectrum_gate": "Gamma/excess-heating totals do not uniquely supply a primary electron/photon spectrum; finite deposition domain and thermal/fast number require their own inputs."
+    },
+    {
+      "id": "N4A",
+      "name": "추가 원자과정·동위원소·종 admission",
+      "depends_on": [
+        "N0"
+      ],
+      "status": "pending",
+      "activation": "additional_atomic_process_selected",
+      "acceptance": "RR,DR,CX와 추가 isotope/atom/anion/molecule마다 원전,threshold/rate/gain,units,energy/frame owner와 적용범위를 별도 확정한다.",
+      "donor_reuse": "PHYS82 Li conditional threshold-gap and finite-source registry are latest selected donor; H1 calibration and extra species still require their own admission.",
+      "not_automatically_included": [
+        "radiative recombination from a three-body recombination paper",
+        "isotope replacement in an unchanged cross-section energy axis",
+        "additional species set to a source zero because no provider was supplied"
+      ]
+    },
+    {
+      "id": "N4",
+      "name": "선택 핵채널 daughter·spectrum·열화",
+      "depends_on": [
+        "N0"
+      ],
+      "status": "pending",
+      "activation": "nuclear_channel_selected",
+      "acceptance": "daughter isotope/charge,differential kinetic spectrum,recoil/stopping과 thermal/fast particle number 및 energy source를 함께 공급한다.",
+      "scope_gate": "Cold-COM Q/photon/recoil ledger or supplied energy fraction does not determine finiteT parent-energy weighting,normal-frame angle or thermal number membership.",
+      "donor_reuse": "C23B Lorentz electron marginal/proper clock/finite deposition contraction preserves its own assumptions; no automatic correlated CI recoil or instant thermalization."
+    },
+    {
+      "id": "N5",
+      "name": "종별 수송·열화와 stress 교환",
+      "depends_on": [
+        "N0"
+      ],
+      "status": "pending",
+      "acceptance": "선정 중성/charged 종의 finite-mass momentum/heat/STF exchange를 같은 T/domain에서 보정하고 source/Hubble times와 비교할 계수를 제공한다.",
+      "not_implied": "An elastic pseudo-Maxwell method or supplied relaxation rate alone does not calibrate the physical mixture.",
+      "note": "HE38 forward-CI sources are available. Elastic e-H/e-p/ion-neutral energy/momentum/quadrupole exchange coefficients and validity timescales remain open."
+    },
+    {
+      "id": "N6",
+      "name": "전자→전체gas stress와 commonT/u closure",
+      "depends_on": [
+        "N2",
+        "N3",
+        "N5"
+      ],
+      "status": "pending",
+      "conditional_depends_on": [
+        {
+          "when": "nuclear_channel_selected",
+          "nodes": [
+            "N4"
+          ]
+        }
+      ],
+      "acceptance": "종별 stress partition과 별도 thermal/fast census를 정하고 공통T/u,finite anisotropy 및 반응가중 tail의 타당성을 시간척도·오차예산으로 확인한다.",
+      "mandatory_distinction": "Instantaneous source algebra is distinct from thermalization and closed total-gas dynamics."
+    },
+    {
+      "id": "N7",
+      "name": "source-aware reduction과 보존 검사",
+      "depends_on": [
+        "N2",
+        "N6"
+      ],
+      "status": "pending",
+      "conditional_depends_on": [
+        {
+          "when": "nuclear_channel_selected",
+          "nodes": [
+            "N4"
+          ]
+        }
+      ],
+      "acceptance": "선정 species/process/thermal/frame에서 population lift와 number/heat/STF projection이 commute하거나 명시적으로 추정한 defect를 gate에 넣는다. 깨진 quotient를 자동 재사용하지 않는다."
+    },
+    {
+      "id": "N8",
+      "name": "저장 배경 하나의 새 결합 gas IVP",
+      "depends_on": [
+        "N2",
+        "N3",
+        "N5",
+        "N6",
+        "N7"
+      ],
+      "status": "blocked_by_unselected_closure_source_dependencies",
+      "conditional_depends_on": [
+        {
+          "when": "nuclear_channel_selected",
+          "nodes": [
+            "N4"
+          ]
+        },
+        {
+          "when": "additional_atomic_process_selected",
+          "nodes": [
+            "N4A"
+          ]
+        }
+      ],
+      "acceptance": "선택 scope manifest의 모든 의존성이 완료된 뒤에만 초기조건/오차/비용/출력 identity를 고정한 bounded populations/T/stress IVP를 새로 수행한다.",
+      "execution_gate": "coupled_IVP_gate",
+      "new_IVP_scheduled_now": false,
+      "existing_HE32_394_replays": 0
+    },
+    {
+      "id": "N9",
+      "name": "바리온 source/metric feedback",
+      "depends_on": [
+        "N8"
+      ],
+      "status": "pending",
+      "acceptance": "nonbaryonic matter stress와 baryon stress를 분리하고 Einstein/source-reservoir energy/pressure/STF 보존과 background 반응을 검증한다."
+    }
+  ],
+  "next_unit_priority": {
+    "numeric_HE_label": null,
+    "label_policy": "Check current branches/PRs before assigning a fresh numeric label.",
+    "recommended_tracks": [
+      "source-qualified H1 energy-weighted angular gain/calibration",
+      "source-qualified H1 mixture elastic momentum/heat/quadrupole exchange and closure-timescale assessment"
+    ],
+    "selection_policy": "Choose one bounded primary-source-admitted track after delta intake; explicitly approximate inputs stay labelled. Do not treat scalar rates as differential tensor calibration.",
+    "execution_policy": "No unchanged HE38 diagnostic/oracle/IVP replay; a new coupledIVP begins only after all selected source/closure/reduction dependencies are closed within the declared scope.",
+    "theory_stage_count": 10,
+    "coding_stage_count": 10
+  },
+  "completed_work_not_to_replay": [
+    "HE32 394 savedIVPs and6figurepairs",
+    "HE33–HE37 unchanged component/suite evidence",
+    "HE38 exact/Wick/affected/raw/129Tdiagnostic/sharingbenchmark/finalfigure"
+  ]
+}

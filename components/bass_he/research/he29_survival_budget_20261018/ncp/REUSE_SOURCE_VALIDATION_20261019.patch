@@ -1,0 +1,20 @@
+--- a/research/he29_survival_budget_20261018/ncp/BOOTSTRAP_REFERENCES.sh
++++ b/research/he29_survival_budget_20261018/ncp/BOOTSTRAP_REFERENCES.sh
+@@ -29,7 +29,16 @@
+   "$PY" -m pip install -r "$HERE/requirements.txt" > "$WORK/logs/DEPENDENCIES.log" 2>&1
+ fi
+ "$PY" -m pip freeze > "$WORK/logs/PYTHON_FREEZE.txt"
+-(cd "$HERE"; PYTHONPATH=src "$PY" -m pytest -q tests) > "$WORK/logs/TESTS.log" 2>&1
++# Reuse the unchanged source-only validation; native qualification below still runs.
++{
++  printf '%s\n' 'status=REUSED_SOURCE_VALIDATION' 'tests_executed_this_run=0'
++  printf '%s\n' 'execution_revision=1569f3718cd4b17a16936ad3d72bc7d5ed9b0f4f'
++  printf '%s\n' 'evidence_revision=3f16fe525d726aaebbe9262e0e869540321209eb'
++  printf '%s\n' 'evidence=research/he29_survival_budget_20261018/results/publication_retry/CLOSEOUT_RECEIPT.json'
++} > "$WORK/logs/TESTS.log"
++sha256sum "${BASH_SOURCE[0]}" > "$WORK/logs/EXECUTION_BOOTSTRAP.sha256"
++git -C "$(dirname "$RESEARCH")" diff -- "$HERE/ncp/BOOTSTRAP_REFERENCES.sh" > "$WORK/logs/EXECUTION_OVERLAY.patch"
++git -C "$(dirname "$RESEARCH")" rev-parse HEAD > "$WORK/logs/EXECUTION_SOURCE_REVISION.txt"
+ "$PY" "$HERE/src/reference_runner.py" preflight --out "$WORK/preflight" > "$WORK/logs/PREFLIGHT.log" 2>&1
+ OWNER="$WORK/owner"
+ if [[ -n "${HE29_OWNER_REPO:-}" ]]; then

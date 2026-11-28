@@ -1,0 +1,62 @@
+--- before/run_bounded.py
++++ after/run_bounded.py
+@@ -50,6 +50,7 @@
+ def main():
+     p=argparse.ArgumentParser()
+     p.add_argument('run_id',choices=[x[0] for x in PLAN])
++    p.add_argument('--repair-reason',choices=['C6-ASSERT-01'],help='explicit root-authorized two-method assertion repair')
+     args=p.parse_args()
+     EXEC.mkdir(parents=True,exist_ok=True)
+     lock=EXEC/'RUN.lock'
+@@ -60,12 +61,27 @@
+         ledger=json.loads(LEDGER.read_text())
+         attempts=ledger['attempts']
+         if any(a['status']=='START' for a in attempts):raise RuntimeError('incomplete START: UNKNOWN_NOT_ZERO blocks launch')
+-        if any(a['status']!='PASS' for a in attempts):
+-            raise RuntimeError('prior substantive failure blocks automatic continuation; return to root')
+-        index=len(attempts)
+-        if index>=len(PLAN) or PLAN[index][0]!=args.run_id:
+-            raise RuntimeError('three planned sequential runs only; repair needs new explicit root diagnosis')
++        repair=None
++        if args.repair_reason:
++            if args.run_id!='01_tests' or len(attempts)!=1 or attempts[0]['run_id']!='01_tests' or attempts[0]['status']!='FAIL':
++                raise RuntimeError('C6-ASSERT-01 is the sole two-method reserve immediately after initial test FAIL')
++            if ledger['diagnosed_repair_reserve']['used']:
++                raise RuntimeError('reserve already consumed')
++            repair={'reason':'C6-ASSERT-01','authority':'root explicit task; evidence/C6_ASSERT_REPAIR_AUTHORIZATION.json',
++                    'scope':'test01 existing close comparison and test06 remove absolute0 override; two methods only; core/source/analysis unchanged'}
++        else:
++            if len(attempts)>=2 and attempts[0]['status']=='FAIL' and attempts[1].get('repair') and attempts[1]['status']=='PASS':
++                if any(a['status']!='PASS' for a in attempts[2:]):
++                    raise RuntimeError('post-repair failure blocks automatic continuation')
++                index=len(attempts)-1
++            else:
++                if any(a['status']!='PASS' for a in attempts):
++                    raise RuntimeError('failure requires explicit root diagnosis')
++                index=len(attempts)
++            if index>=len(PLAN) or PLAN[index][0]!=args.run_id:
++                raise RuntimeError('planned sequential order required; no full suite replay')
+         _,script,cap_cpu,cap_wall=next(x for x in PLAN if x[0]==args.run_id)
++        if repair:cap_cpu,cap_wall=2,10
+         if len(attempts)>=4 or ledger['cumulative_cpu_s']+cap_cpu>8 or ledger['cumulative_wall_s']+cap_wall>30:
+             raise RuntimeError('fresh unit cumulative budget would be exceeded')
+         identity=f'{len(attempts)+1:02d}_{args.run_id}'
+@@ -75,13 +91,17 @@
+              'PYTHONDONTWRITEBYTECODE':'1','MPLCONFIGDIR':str(UNIT.parents[2]/'pwbe_ops/mplconfig')}
+         Path(env['MPLCONFIGDIR']).mkdir(parents=True,exist_ok=True)
+         command=[sys.executable,'-B','code/'+script]
++        if repair:command+=['--repair-only','C6-ASSERT-01']
+         start_wall=time.monotonic();start_parent=cpu(resource.RUSAGE_SELF);start_child=cpu(resource.RUSAGE_CHILDREN)
+         row={'attempt_id':identity,'run_id':args.run_id,'command':command,'started_utc':stamp(),
+-             'status':'START','repair':None,'caps':{'cpu_s':cap_cpu,'wall_s':cap_wall,'memory_bytes':536870912,'threads':1},
++             'status':'START','repair':repair,'caps':{'cpu_s':cap_cpu,'wall_s':cap_wall,'memory_bytes':536870912,'threads':1},
+              'remaining_before_cpu_s':8-ledger['cumulative_cpu_s'],'remaining_before_wall_s':30-ledger['cumulative_wall_s'],
+              'incomplete_START_accounting':'UNKNOWN_NOT_ZERO; blocks replay',
+              'preparation_manifest_sha256':digest(manifest)['sha256'], 'current_input_identities':current_inputs,
+              'authority':'Astra root explicit native task GO after PWBE B1 dual-provider ACK and R7; no additional authorization gate'}
++        if repair:
++            ledger['diagnosed_repair_reserve']['used']=1
++            ledger['diagnosed_repair_reserve']['remaining']=0
+         attempts.append(row);atomic(outdir/'START.json',row);atomic(LEDGER,ledger)
+         def limits():
+             resource.setrlimit(resource.RLIMIT_CPU,(cap_cpu,cap_cpu))

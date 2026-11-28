@@ -1,0 +1,175 @@
+{
+  "action": "EXECUTE",
+  "command_argv": [
+    "/workspace/scratch/0b54847633d9/ncp_build_deps/root/usr/bin/mpirun.openmpi",
+    "--host",
+    "localhost",
+    "--np",
+    "1",
+    "--map-by",
+    "slot:PE=1",
+    "--bind-to",
+    "core",
+    "--nooversubscribe",
+    "--report-bindings",
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+    "/workspace/scratch/0b54847633d9/BASS_HE_NCP64_OPTIMIZATION_20261001_v1/code/mpi_batch.py",
+    "--manifest",
+    "/workspace/scratch/0b54847633d9/BASS_HE_NCP64_OPTIMIZATION_20261001_v1/configs/MPI_PARITY_TASKS.json",
+    "--output-dir",
+    "/workspace/scratch/0b54847633d9/BASS_HE_NCP64_OPTIMIZATION_20261001_v1/evidence/MPI_SERIAL",
+    "--backend",
+    "native",
+    "--python",
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12"
+  ],
+  "environment": {
+    "BLIS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "OMP_DYNAMIC": "FALSE",
+    "OMP_NUM_THREADS": "1",
+    "OMP_PLACES": "cores",
+    "OMP_PROC_BIND": "close",
+    "OPENBLAS_NUM_THREADS": "1"
+  },
+  "host": {
+    "affinity_cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "allowed_logical_cpu_count": 9,
+    "allowed_logical_cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "cgroup_memory_limit_bytes": 8589934592,
+    "cgroup_status": "V2_VISIBLE_ANCESTRY_INSPECTED",
+    "cgroup_v2": [
+      {
+        "cpu.max": "800000 100000",
+        "cpuset.cpus.effective": "0-8",
+        "memory.current": 5587742720,
+        "memory.max": 8589934592,
+        "path": "/sys/fs/cgroup"
+      }
+    ],
+    "core_binding_cpu_budget": 8,
+    "cpu_quota_cores": 8.0,
+    "host_memory_available_bytes": 9245081600,
+    "host_memory_total_bytes": 10451464192,
+    "logical_cpu_budget": 8,
+    "logical_cpu_count_os": 9,
+    "memory_available_budget_bytes": 3002191872,
+    "memory_evidence": "SNAPSHOT_NOT_RESERVATION",
+    "observed_physical_core_count": 9,
+    "schema": 1,
+    "topology": [
+      {
+        "core_id": "0",
+        "logical_cpu": 0,
+        "package_id": "0"
+      },
+      {
+        "core_id": "1",
+        "logical_cpu": 1,
+        "package_id": "0"
+      },
+      {
+        "core_id": "2",
+        "logical_cpu": 2,
+        "package_id": "0"
+      },
+      {
+        "core_id": "3",
+        "logical_cpu": 3,
+        "package_id": "0"
+      },
+      {
+        "core_id": "4",
+        "logical_cpu": 4,
+        "package_id": "0"
+      },
+      {
+        "core_id": "5",
+        "logical_cpu": 5,
+        "package_id": "0"
+      },
+      {
+        "core_id": "6",
+        "logical_cpu": 6,
+        "package_id": "0"
+      },
+      {
+        "core_id": "7",
+        "logical_cpu": 7,
+        "package_id": "0"
+      },
+      {
+        "core_id": "8",
+        "logical_cpu": 8,
+        "package_id": "0"
+      }
+    ],
+    "topology_evidence": "GUEST_OS_REPORTED_NOT_NCP_PHYSICAL_HARDWARE_CERTIFICATE"
+  },
+  "layout": {
+    "controller_memory_budget_bytes": 0,
+    "controller_rank": null,
+    "core_slot_budget": 8,
+    "estimated_worker_memory_bytes": 805306368,
+    "maximum_workers_from_memory": 2,
+    "memory_headroom_fraction": 0.2,
+    "per_worker_memory_bytes": 805306368,
+    "per_worker_memory_evidence": "CONFIGURED_RLIMIT_AS_NOT_MEASURED_PEAK_RSS",
+    "ranks": 1,
+    "reserved_core_slots": 1,
+    "threads_per_rank": 1,
+    "usable_memory_bytes": 2401753497,
+    "workers": 1
+  },
+  "manifest_sha256": "332bc4bbd4ff1a34afc978ecf872db8e079f3e27d582888be54b766fb99d95e1",
+  "openmpi_version": "mpirun.openmpi (OpenRTE) 4.1.6\n\nReport bugs to http://www.open-mpi.org/community/help/",
+  "schema": 1,
+  "scope": "SINGLE_HOST; rank0 is controller when ranks>1; no physical 64-core assumption"
+}
+--------------------------------------------------------------------------
+Sorry!  You were supposed to get help about:
+    unavailable
+But I couldn't open the help file:
+    /usr/lib/x86_64-linux-gnu/pmix2/share/pmix/help-pcompress.txt: No such file or directory.  Sorry!
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+Open MPI tried to bind a new process, but something went wrong.  The
+process was killed without launching the target application.  Your job
+will now abort.
+
+  Local host:        da124105cd49
+  Application name:  /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12
+  Error message:     hwloc_set_cpubind returned "Error" for bitmap "0"
+  Location:          ../../../../../../orte/mca/rtc/hwloc/rtc_hwloc.c:382
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+mpirun.openmpi was unable to start the specified application as it encountered an
+error:
+
+Error code: -125
+Error name: The specified application failed to start
+Node: da124105cd49
+
+when attempting to start process rank 0.
+--------------------------------------------------------------------------

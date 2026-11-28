@@ -1,0 +1,72 @@
+{
+  "status": "DETACHED_RUNTIME_DELIVERY_REVIEW_CONFIRMED",
+  "archive": {
+    "name": "BASS_HE_E12_NCP_RUNTIME_20261008T165053Z_4179815c983d.zip",
+    "bytes": 6298776,
+    "sha256": "a7ee2893289119e10741afb9e4e80e701dbcd2c95e987cb41a11218eefe320e7",
+    "payloads": 652,
+    "CRC_manifest": "PASS"
+  },
+  "checks": [
+    {
+      "command": "python3 local archive SHA256/size/zipfile.testzip/root manifest652/rootSHA256SUMS653/noPDF",
+      "exit": 0
+    },
+    {
+      "command": "gh api repos/cosmosapjw-quantum/BASS_HE/git/commits/61983052c2df53d3ceac46f3464b7f2eb5f271a6 --jq commit/tree",
+      "exit": 0,
+      "output": {
+        "sha": "61983052c2df53d3ceac46f3464b7f2eb5f271a6",
+        "tree": "0d19277caddc1c58d7270e6bbbb4fe39c31430c3"
+      }
+    },
+    {
+      "command": "python3 actual captured Drive metadata/DropBox completed ACK equality against DELIVERY_RECEIPT",
+      "exit": 0
+    }
+  ],
+  "findings": [
+    {
+      "criterion": "local_immutable_archive",
+      "verdict": "confirmed",
+      "evidence": "6298776bytes SHAa7ee2893289119e10741afb9e4e80e701dbcd2c95e987cb41a11218eefe320e7;654ZIPmembersCRC;652payloadshashesbytes;653SHA256SUMS;archivedpresealreviewpresent;noPDF"
+    },
+    {
+      "criterion": "Git_preseal_publication",
+      "verdict": "confirmed",
+      "evidence": "independent gh remote commit/tree readback exact;25publicfiles noPDF; scientific/report scope bounded"
+    },
+    {
+      "criterion": "both_provider_upload_ACK",
+      "verdict": "confirmed",
+      "evidence": "captured actual upload success/Drive metadata and Dropbox completed ACK exact name,size,parent/path,IDs agree detached receipt",
+      "claim_limit": "metadata upload ACK; remote content bytes not independently restored"
+    },
+    {
+      "criterion": "restore_verification",
+      "verdict": "inconclusive",
+      "required_status": "NOT_RUN",
+      "reason": "no remote byte restore claimed or executed"
+    }
+  ],
+  "preserved_limitations": [
+    "host cgroup actual lookup after OFF launch remains rejected preflight timing finding",
+    "raw delivered consumer failure retained; derived sentinel view only",
+    "independent stage numerical certificate NOT_EVALUATED; physical HOLD"
+  ],
+  "native_science_tests_reruns": 0,
+  "owned_mutation": "review/DELIVERY_REVIEW.json",
+  "pending": [
+    "final Git/capsule followup"
+  ],
+  "review_check_failures": [
+    {
+      "exit": 1,
+      "reason": "initial wrong detached receipt path; located root"
+    },
+    {
+      "exit": 1,
+      "reason": "root manifest uses payloads list not files dict; corrected read-only parser"
+    }
+  ]
+}

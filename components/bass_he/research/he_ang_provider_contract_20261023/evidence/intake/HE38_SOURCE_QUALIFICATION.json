@@ -1,0 +1,235 @@
+{
+  "schema": "he38.source_qualification.v1",
+  "workflow_version": "1.0.0",
+  "approval_version": "0.2",
+  "task": "source_only_finite_mass_H1_followup",
+  "decision": "admitted_explicit_physical_approximation",
+  "selected_track": "finite_mass_original_LeCambier_Jacobi",
+  "completion_scope": "Exact Newtonian kinematics for the stated source model; no calibrated physical angular provider admitted.",
+  "execution": {
+    "science_model_calls": 0,
+    "tests": 0,
+    "IVP": 0,
+    "benchmarks": 0,
+    "science_renders": 0,
+    "old_HE37_replays": 0,
+    "old_CCC_downloads": 0,
+    "remote_mutations": 0
+  },
+  "primary_source": {
+    "title": "Modeling of Inelastic Collisions in a Multifluid Plasma: Ionization and Recombination",
+    "authors": [
+      "Hai P. Le",
+      "Jean-Luc Cambier"
+    ],
+    "journal": "Physics of Plasmas 23, 063505 (2016)",
+    "doi": "10.1063/1.4953050",
+    "url": "https://arxiv.org/pdf/1605.06545",
+    "reused_private_pdf": "/tmp/he37_sources/raw/le_cambier_2016.pdf",
+    "pdf_sha256": "5ee591cde0cb90c03b5fc47a8ad439bae93bcc36bd05a4cbb4e1943fec93fc68",
+    "reused_private_text": "/tmp/he37_sources/raw/le_cambier_2016.txt",
+    "text_sha256": "34f495db1eefa34bdf1104117f8546b2a539ccc2b3f4ba303365d2c673cc18e5",
+    "page_convention": "Printed page number; zero-based PDF page index is printed page minus one.",
+    "new_read_scope": [
+      "II Eq2 p4 mass/momentum/energy",
+      "II Eq3-7 p5 exact coordinates and energies",
+      "III.A Eq9-12 pp6-7 differential measure and normalized angular G",
+      "III.A TableI common-temperature COM/relative factorization",
+      "III.D Eq39-41 p12 and Eq42-48 pp13-14 energy signs",
+      "III.E p15 isotropy and small-mass-ratio reduction",
+      "VI.A Eq85 p25 ground-state hydrogen cross-section model"
+    ],
+    "public_pdf_redistribution": false
+  },
+  "notation": {
+    "electron_mass": "m",
+    "proton_mass": "p",
+    "neutral_kinetic_mass": "h=p+m",
+    "total_mass": "M=p+2m",
+    "reduced_incident_mass": "mu=m*h/M",
+    "reduced_final_subsystem_mass": "mu_t=m*p/h",
+    "ionization_energy": "I=13.6 eV"
+  },
+  "source_equations": [
+    {
+      "id": "LC2",
+      "page": 4,
+      "status": "direct_source",
+      "meaning": "m_t=m_i+m_e; incoming momentum equals outgoing momentum; incoming kinetic energy equals outgoing kinetic energy plus I."
+    },
+    {
+      "id": "LC3_4",
+      "page": 5,
+      "status": "direct_source",
+      "meaning": "g1 is scattered electron relative to the center of mass of ejected electron plus ion; g2 is ejected electron relative to ion."
+    },
+    {
+      "id": "LC6_7",
+      "page": 5,
+      "status": "direct_source",
+      "formula": "E=mu*g0^2/2=mu*g1^2/2+mu_t*g2^2/2+I; Upsilon=E-mu*g1^2/2; I<=Upsilon<=E"
+    },
+    {
+      "id": "LC11_12",
+      "page": 7,
+      "status": "direct_source",
+      "formula": "d3sigma/(dUpsilon dOmega1 dOmega2); angular coordinates are directions of g1 and g2."
+    },
+    {
+      "id": "LC_isotropy",
+      "page": 15,
+      "status": "published_assumption_adopted_before_mass_reduction",
+      "formula": "G=1/(16*pi^2) with independently uniform directions g1 and g2",
+      "limitation": "Not independent laboratory outgoing-electron angles, not measured/calibrated angular distribution."
+    },
+    {
+      "id": "LC85",
+      "page": 25,
+      "status": "direct_source_cross_section_law",
+      "formula": "d_sigma/d_Upsilon=4*pi*a0^2*I_H^2/(E*Upsilon^2); sigma=4*pi*a0^2*I_H^2*(E-I)/(I*E^2); ground n=1 has I=I_H=13.6eV",
+      "energy_owner": "E is the relative collision energy defined by Eq7, not an unrelated laboratory table."
+    }
+  ],
+  "adopted_joint_model": {
+    "energy_law": "p(Upsilon|E)=I*E/((E-I)*Upsilon^2), I<=Upsilon<=E; cross section vanishes for E<=I",
+    "reconstruction": [
+      "v_s=V+(h/M)*g1",
+      "v_e=V-(m/M)*g1+(p/h)*g2",
+      "v_p=V-(m/M)*g1-(m/h)*g2"
+    ],
+    "mass_convention": "Newtonian additive kinetic masses with a separate internal ionization energy; h is not the physical neutral rest mass including binding-energy mass defect.",
+    "labels": "s and e are source bookkeeping labels. Inclusive electron observables sum both products once; optional label exchange does not double the event rate.",
+    "energy_partition": "At finite mass Upsilon-I is relative Jacobi energy of ejected electron and ion. It is not the laboratory kinetic energy of the ejected electron.",
+    "temperature_convention": "Paper omits Boltzmann constant; use theta=k_B*T in SI implementation.",
+    "symmetric_electron_pair_jacobi_warning": "A uniform angular density in a different Jacobi system is a different model. Do not transport the same Upsilon law and isotropy unchanged and call it source equivalent.",
+    "exactness": "Pointwise mass/momentum/kinetic-plus-I conservation is exact for these adopted Newtonian masses. Angular/source calibration, physical recoil distribution and relativistic binding-mass effects remain outside admission."
+  },
+  "constants": [
+    {
+      "symbol": "m_p",
+      "value": 1.67262192595e-27,
+      "unit": "kg",
+      "standard_uncertainty": 5.2e-37,
+      "source": "NIST SP959 May2024, CODATA2022, wallet page2",
+      "url": "https://physics.nist.gov/cuu/pdf/wallet_2022.pdf",
+      "new": true
+    },
+    {
+      "symbol": "m_e",
+      "value": 9.1093837139e-31,
+      "unit": "kg",
+      "standard_uncertainty": 2.8e-40,
+      "source": "same official table; retain HE37 numerical value",
+      "new": false
+    },
+    {
+      "symbol": "a_0",
+      "value": 5.29177210544e-11,
+      "unit": "m",
+      "standard_uncertainty": 8.2e-21,
+      "source": "same official table; retain prior documented modern Bohr-radius refinement",
+      "new": false
+    },
+    {
+      "symbol": "eV_in_J",
+      "value": 1.602176634e-19,
+      "unit": "J/eV",
+      "exact": true,
+      "source": "same official table"
+    },
+    {
+      "symbol": "k_B",
+      "value": 1.380649e-23,
+      "unit": "J/K",
+      "exact": true,
+      "source": "same official table"
+    },
+    {
+      "symbol": "I",
+      "value": 13.6,
+      "unit": "eV",
+      "source": "Le-Cambier Eq85 ground-state source convention",
+      "is_high_precision_H_spectroscopic_threshold": false
+    }
+  ],
+  "source_sign_caution": {
+    "location": "Eq48 printed p14 of reused arXiv PDF",
+    "observed": "+Gamma_ion*epsilon_star appears as sum of kinetic energy source terms",
+    "comparison": "Eq2c p4 fixes outgoing-minus-incoming kinetic change -epsilon_star. Eq39 p12 has an overall negative sign multiplying incoming-minus-outgoing scattered-electron energy; Eq40-41 give scattered-electron loss. Eq43 has target loss and Eq47 product gain.",
+    "classification": "localized sign inconsistency candidate under the published kinetic-source definitions; no claim that other versions or entire paper have been corrected",
+    "implementation_authority": "Use event invariant Eq2c and independent species sum; do not import the sign of Eq48 without checking conventions.",
+    "review": "Parent independently checks PDF and algebra before final scientific claim."
+  },
+  "angular_provider_gate": {
+    "status": "open_no_domain_complete_calibrated_numeric_provider_admitted",
+    "required_measure": "Same event kernel must supply inclusive count 2, outgoing energy E-I (heavy frame) or exact finite-mass momentum/energy census, and energy-weighted P2 over full admitted energy/angular support.",
+    "new_candidates": [
+      {
+        "doi": "10.1103/PhysRevA.63.030704",
+        "route": "ECS ab initio DDCS",
+        "energies_eV": [
+          17.6,
+          25,
+          30
+        ],
+        "primary_url": "https://journals.aps.org/pra/abstract/10.1103/PhysRevA.63.030704",
+        "read_scope": "Primary APS abstract retrieved via Exa; full text subscription limited",
+        "disposition": "candidate_for_future_numeric_table_admission; no table/dataset admitted"
+      },
+      {
+        "doi": "10.1103/PhysRevA.74.012713",
+        "route": "TDCC DDCS/TDCS",
+        "energies_eV": [
+          15.6,
+          17.6
+        ],
+        "primary_url": "https://journals.aps.org/pra/abstract/10.1103/PhysRevA.74.012713",
+        "read_scope": "Primary APS abstract and figure captions retrieved via Exa",
+        "disposition": "selected energy/angle/energy-sharing comparisons; no complete provider admitted"
+      },
+      {
+        "doi": "10.1103/PhysRevA.90.022710",
+        "route": "CCC amplitude interpolation from sufficiently dense pseudostates",
+        "primary_url": "https://journals.aps.org/pra/abstract/10.1103/PhysRevA.90.022710",
+        "read_scope": "Primary APS abstract retrieved via Exa",
+        "disposition": "future algorithm/source route; no runnable calibrated amplitude dataset admitted"
+      },
+      {
+        "doi": "10.1103/PhysRevA.68.030702",
+        "route": "Absolute experimental DDCS plus CCC/ECS comparison",
+        "published_energies_eV": [
+          15.6,
+          17.6,
+          25,
+          40
+        ],
+        "experimental_study_energy_range_eV": [
+          14.6,
+          40
+        ],
+        "reported_angles_degrees": [
+          10,
+          120
+        ],
+        "primary_url": "https://researchportal.murdoch.edu.au/view/pdfCoverPage?download=true&filePid=13136894710007891&instCode=61MUN_INST",
+        "read_scope": "Primary published version, all four article pages plus institutional cover; Eq1 and Figures2-5 descriptions",
+        "normalization": "H(n=2) excitation DCS, CCC normalization independently compared with experiment",
+        "disposition": "useful future validation source; incomplete angular support for direct all-angle P2 integral; no numeric provider table admitted"
+      }
+    ],
+    "claim_limit": "Bounded updated search; not proof that complete data do not exist. Preserve open gate rather than global no-go.",
+    "ccc_reuse": "Previously inspected CCC archive identity reused; no ZIP redownload, no CCCtotal times unmatched Le-Cambier partition hybrid."
+  },
+  "search_receipts": {
+    "scispace": "raw/search_3.json",
+    "exa_search": "raw/search_2.json",
+    "exa_primary_aps_fetch": "raw/he38src_candidates_0.json",
+    "nist_and_primary_access": "raw/he38src_check_0.json",
+    "additional_primary_childers": "raw/he38src_childers.json",
+    "access_limits": [
+      "Direct link.aps.org opens returned unavailable/403; standard publisher abstract URLs were retrieved with Exa.",
+      "No paywall authentication/bypass attempted; restricted full text not presumed reviewed."
+    ]
+  },
+  "reuse_policy": "Existing HE37 provider/execution/source archive retained. This task newly qualifies source sections and constants and does not count earlier science as new execution."
+}

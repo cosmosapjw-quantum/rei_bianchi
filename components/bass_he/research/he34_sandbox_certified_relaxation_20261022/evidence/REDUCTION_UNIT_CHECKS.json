@@ -1,0 +1,417 @@
+{
+  "schema": "he34.certified_relaxation_unit_checks.v1",
+  "status": "pass_scoped",
+  "scope": "New implementation interface, constant-source matrix oracle, edge regimes, and invalid inputs only",
+  "versions": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0"
+  },
+  "existing_independent_controls": {
+    "path": "/tmp/he34_reduction_theory/CONTROL_RESULTS.json",
+    "sha256": "18ae87b7b1fcb0a038dbeb4d5facc9e8935dbfe8a16e4b4b848d36a618b05c8c",
+    "run_count": 8,
+    "replayed": false
+  },
+  "old_HE32_IVPs_replayed": 0,
+  "HE32_background_comparisons_run_here": 0,
+  "qualification": "Analytic continuum approximation certificate only; binary64 evaluation, numerical quadrature estimates, analytic tail evaluation and finite oracle checks are not an outward-rounded machine proof.",
+  "attempts": [
+    {
+      "started_utc": "2026-10-22T17:33:44.663144+00:00",
+      "source_sha256": "68f8baefff94b324eab8a05ffff375a7bc5c71758ccdc20f0e6419365c126c47",
+      "checks_sha256": "0b8368dd90eeac24c9b230a87744dcd85cfc18d292caddcd87d52e2bfaf0c32b",
+      "checks": [
+        {
+          "name": "check_package_interface_and_dense",
+          "status": "pass",
+          "detail": {
+            "intervals": 2,
+            "status": "accepted_continuum_bound",
+            "max_ratio_bound": 1.1000944815536546e-08,
+            "final_logp_bound": 8.238040329423512e-10,
+            "quadrature_error_estimate": 2.410671872056783e-15,
+            "omitted_layer_tail_bound": 7.296606602882641e-31
+          },
+          "wall_seconds": 0.00785563699901104
+        },
+        {
+          "name": "check_constant_source_against_eigenpressure_expm",
+          "status": "pass",
+          "detail": {
+            "reference": "scipy.linalg.expm of independent full eigenpressure matrix",
+            "cases": [
+              {
+                "chi": 7.0,
+                "S": 0.0,
+                "r0": 0.4,
+                "max_ratio_error": 8.673617379884035e-16,
+                "max_logp_error": 0.0
+              },
+              {
+                "chi": 10.0,
+                "S": 0.1,
+                "r0": 0.0,
+                "max_ratio_error": 1.6306400674181987e-16,
+                "max_logp_error": 2.0426368929626904e-16
+              },
+              {
+                "chi": 10.0,
+                "S": -0.3,
+                "r0": 0.0,
+                "max_ratio_error": 4.163336342344337e-16,
+                "max_logp_error": 3.885780586188048e-16
+              },
+              {
+                "chi": 7.0,
+                "S": 0.2,
+                "r0": -0.5,
+                "max_ratio_error": 1.1102230246251565e-15,
+                "max_logp_error": 2.0122792321330962e-16
+              },
+              {
+                "chi": 7.0,
+                "S": -0.2,
+                "r0": 1.0,
+                "max_ratio_error": 1.2351231148954867e-15,
+                "max_logp_error": 2.7755575615628914e-16
+              },
+              {
+                "chi": 20.0,
+                "S": -0.4,
+                "r0": 0.7,
+                "max_ratio_error": 1.3739009929736312e-15,
+                "max_logp_error": 1.7069679003611782e-15
+              }
+            ],
+            "max_ratio_error": 1.3739009929736312e-15,
+            "max_logp_error": 1.7069679003611782e-15
+          },
+          "wall_seconds": 0.04634380099741975
+        },
+        {
+          "name": "check_invalid_inputs",
+          "status": "pass",
+          "detail": {
+            "rejected_solver_inputs": 20,
+            "rejected_dense_inputs": 4,
+            "policy": "ValueError for malformed inputs; no clipping"
+          },
+          "wall_seconds": 0.0010573489998932928
+        },
+        {
+          "name": "check_unavailable_and_excessive_certificates",
+          "status": "pass",
+          "detail": {
+            "noncontractive": [
+              "interval 0: kappa_nonpositive_or_nonfinite"
+            ],
+            "cone": [
+              "interval 0: candidate_cone_not_proved"
+            ],
+            "denominator": [
+              "interval 0: kappa_nonpositive_or_nonfinite",
+              "interval 0: denominator_nonpositive_or_nonfinite"
+            ],
+            "unrepresentable_denominator": [
+              "interval 0: kappa_nonpositive_or_nonfinite",
+              "interval 0: denominator_nonpositive_or_nonfinite",
+              "interval 0: approximation_unavailable: initial-layer denominator is nonpositive on the interval"
+            ],
+            "bound_not_met": {
+              "status": "bound_not_met",
+              "failures": [
+                "ratio_tolerance_not_met",
+                "logp_tolerance_not_met"
+              ],
+              "max_ratio_bound": 0.002496959750145968,
+              "final_logp_bound": 0.0017708726041241387
+            }
+          },
+          "wall_seconds": 0.0004966900014551356
+        },
+        {
+          "name": "check_small_kappa_h_and_pressure_cancellation",
+          "status": "pass",
+          "detail": {
+            "reference": "standard-library Decimal, 90 digits",
+            "moment_checks": [
+              {
+                "kappa": 1e-12,
+                "h": 1e-08,
+                "max_relative_error": 0.0
+              },
+              {
+                "kappa": 1.0,
+                "h": 1e-16,
+                "max_relative_error": 0.0
+              },
+              {
+                "kappa": 100000000.0,
+                "h": 1e-18,
+                "max_relative_error": 1.6704779438633046e-16
+              },
+              {
+                "kappa": 1.0,
+                "h": 0.0001,
+                "max_relative_error": 1.355320479372038e-16
+              },
+              {
+                "kappa": 1.0,
+                "h": 0.001,
+                "max_relative_error": 1.9488252247235048e-13
+              },
+              {
+                "kappa": 2.0,
+                "h": 0.1,
+                "max_relative_error": 0.0
+              },
+              {
+                "kappa": 1.0,
+                "h": 40.0,
+                "max_relative_error": 0.0
+              }
+            ],
+            "tiny_constant_logp": 3.9999999999970666e-26,
+            "tiny_constant_logp_relative_error": 1.434929627469665e-16
+          },
+          "wall_seconds": 0.0023597319959662855
+        },
+        {
+          "name": "check_large_chi_h_rescaled_layer",
+          "status": "pass",
+          "detail": {
+            "chi_h": 100000000000000.0,
+            "layer_x_cap": 48.0,
+            "layer_increment": -8.000000067199763e-10,
+            "layer_reference": -8.000000067199761e-10,
+            "layer_absolute_error": 2.0679515313825692e-25,
+            "quadrature_error_estimate": 3.732027202606863e-15,
+            "analytic_omitted_layer_tail_bound": 2.2802625524518162e-30,
+            "quadrature_evaluations": 84
+          },
+          "wall_seconds": 0.000320625003951136
+        },
+        {
+          "name": "check_scaled_root_and_unavailable_numeric_range",
+          "status": "pass",
+          "detail": {
+            "scaled_constant_ratio_error": 5.551115123125783e-17,
+            "scaled_constant_logp_error": 6.938893903907228e-17,
+            "explicit_numeric_range_failure": [
+              "interval 0: kappa_nonpositive_or_nonfinite",
+              "interval 0: approximation_unavailable: stable-root rate is outside the finite binary64 range"
+            ]
+          },
+          "wall_seconds": 0.0007471170029020868
+        }
+      ],
+      "status": "pass_scoped",
+      "wall_seconds": 0.061678512996877544
+    },
+    {
+      "started_utc": "2026-10-22T17:36:17.186147+00:00",
+      "source_sha256": "1b1c717c630aed08afe3a8e39a33395f74cd6684ea355ef126fbdfcb31c90e12",
+      "checks_sha256": "00d2fa3c96e4aa8311f6e02ea6fadce25979045522f033ed4f6135df6d1336a6",
+      "checks": [
+        {
+          "name": "check_package_interface_and_dense",
+          "status": "pass",
+          "detail": {
+            "intervals": 2,
+            "status": "accepted_continuum_bound",
+            "max_ratio_bound": 1.1000944815536546e-08,
+            "final_logp_bound": 8.238040329423512e-10,
+            "quadrature_error_estimate": 2.410671872056783e-15,
+            "omitted_layer_tail_bound": 7.296606602882641e-31
+          },
+          "wall_seconds": 0.0014248980005504563
+        },
+        {
+          "name": "check_constant_source_against_eigenpressure_expm",
+          "status": "pass",
+          "detail": {
+            "reference": "scipy.linalg.expm of independent full eigenpressure matrix",
+            "cases": [
+              {
+                "chi": 7.0,
+                "S": 0.0,
+                "r0": 0.4,
+                "max_ratio_error": 8.673617379884035e-16,
+                "max_logp_error": 0.0
+              },
+              {
+                "chi": 10.0,
+                "S": 0.1,
+                "r0": 0.0,
+                "max_ratio_error": 1.6306400674181987e-16,
+                "max_logp_error": 2.0426368929626904e-16
+              },
+              {
+                "chi": 10.0,
+                "S": -0.3,
+                "r0": 0.0,
+                "max_ratio_error": 4.163336342344337e-16,
+                "max_logp_error": 3.885780586188048e-16
+              },
+              {
+                "chi": 7.0,
+                "S": 0.2,
+                "r0": -0.5,
+                "max_ratio_error": 1.1102230246251565e-15,
+                "max_logp_error": 2.0122792321330962e-16
+              },
+              {
+                "chi": 7.0,
+                "S": -0.2,
+                "r0": 1.0,
+                "max_ratio_error": 1.2351231148954867e-15,
+                "max_logp_error": 2.7755575615628914e-16
+              },
+              {
+                "chi": 20.0,
+                "S": -0.4,
+                "r0": 0.7,
+                "max_ratio_error": 1.3739009929736312e-15,
+                "max_logp_error": 1.7069679003611782e-15
+              }
+            ],
+            "max_ratio_error": 1.3739009929736312e-15,
+            "max_logp_error": 1.7069679003611782e-15
+          },
+          "wall_seconds": 0.0485482790027163
+        },
+        {
+          "name": "check_invalid_inputs",
+          "status": "pass",
+          "detail": {
+            "rejected_solver_inputs": 20,
+            "rejected_dense_inputs": 4,
+            "policy": "ValueError for malformed inputs; no clipping"
+          },
+          "wall_seconds": 0.006005369999911636
+        },
+        {
+          "name": "check_unavailable_and_excessive_certificates",
+          "status": "pass",
+          "detail": {
+            "noncontractive": [
+              "interval 0: kappa_nonpositive_or_nonfinite"
+            ],
+            "cone": [
+              "interval 0: candidate_cone_not_proved"
+            ],
+            "denominator": [
+              "interval 0: kappa_nonpositive_or_nonfinite",
+              "interval 0: denominator_nonpositive_or_nonfinite"
+            ],
+            "unrepresentable_denominator": [
+              "interval 0: kappa_nonpositive_or_nonfinite",
+              "interval 0: denominator_nonpositive_or_nonfinite",
+              "interval 0: approximation_unavailable: initial-layer denominator is nonpositive on the interval"
+            ],
+            "bound_not_met": {
+              "status": "bound_not_met",
+              "failures": [
+                "ratio_tolerance_not_met",
+                "logp_tolerance_not_met"
+              ],
+              "max_ratio_bound": 0.002496959750145968,
+              "final_logp_bound": 0.0017708726041241387
+            }
+          },
+          "wall_seconds": 0.006629944997257553
+        },
+        {
+          "name": "check_small_kappa_h_and_pressure_cancellation",
+          "status": "pass",
+          "detail": {
+            "reference": "standard-library Decimal, 90 digits",
+            "moment_checks": [
+              {
+                "kappa": 1e-12,
+                "h": 1e-08,
+                "max_relative_error": 0.0
+              },
+              {
+                "kappa": 1.0,
+                "h": 1e-16,
+                "max_relative_error": 0.0
+              },
+              {
+                "kappa": 100000000.0,
+                "h": 1e-18,
+                "max_relative_error": 1.6704779438633046e-16
+              },
+              {
+                "kappa": 1.0,
+                "h": 0.0001,
+                "max_relative_error": 1.355320479372038e-16
+              },
+              {
+                "kappa": 1.0,
+                "h": 0.001,
+                "max_relative_error": 1.9488252247235048e-13
+              },
+              {
+                "kappa": 2.0,
+                "h": 0.1,
+                "max_relative_error": 0.0
+              },
+              {
+                "kappa": 1.0,
+                "h": 40.0,
+                "max_relative_error": 0.0
+              }
+            ],
+            "tiny_constant_logp": 3.9999999999970666e-26,
+            "tiny_constant_logp_relative_error": 1.434929627469665e-16
+          },
+          "wall_seconds": 0.0023839409986976534
+        },
+        {
+          "name": "check_large_chi_h_rescaled_layer",
+          "status": "pass",
+          "detail": {
+            "chi_h": 100000000000000.0,
+            "layer_x_cap": 48.0,
+            "layer_increment": -8.000000067199763e-10,
+            "layer_reference": -8.000000067199761e-10,
+            "layer_absolute_error": 2.0679515313825692e-25,
+            "quadrature_error_estimate": 3.732027202606863e-15,
+            "analytic_omitted_layer_tail_bound": 2.2802625524518162e-30,
+            "quadrature_evaluations": 84
+          },
+          "wall_seconds": 0.006349294002575334
+        },
+        {
+          "name": "check_scaled_root_and_unavailable_numeric_range",
+          "status": "pass",
+          "detail": {
+            "scaled_constant_ratio_error": 5.551115123125783e-17,
+            "scaled_constant_logp_error": 6.938893903907228e-17,
+            "explicit_numeric_range_failure": [
+              "interval 0: kappa_nonpositive_or_nonfinite",
+              "interval 0: approximation_unavailable: stable-root rate is outside the finite binary64 range"
+            ]
+          },
+          "wall_seconds": 0.001645764998102095
+        },
+        {
+          "name": "check_exact_zero_residual_with_huge_finite_interval",
+          "status": "pass",
+          "detail": {
+            "h": 1e+160,
+            "kappa_h": 1e-40,
+            "status": "accepted_continuum_bound",
+            "two_rate_exponential_maximum": 1.839397205857213e-309,
+            "two_rate_exponential_maximum_reference": 1.839397205857213e-309
+          },
+          "wall_seconds": 0.003453575998719316
+        }
+      ],
+      "status": "pass_scoped",
+      "wall_seconds": 0.07720013899961486
+    }
+  ]
+}

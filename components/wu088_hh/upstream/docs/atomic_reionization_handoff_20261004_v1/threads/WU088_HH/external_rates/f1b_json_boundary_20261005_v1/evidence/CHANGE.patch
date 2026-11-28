@@ -1,0 +1,27 @@
+--- original/hh_f03_binding.py
++++ candidate/hh_f03_binding.py
+@@ -127,12 +127,23 @@
+         'full_BE_invertibility_claim':False,'consumer_admission':False,
+         'direction_units':'same as state coordinates; direction need not be a finite admissible step'}
+ 
++def _unique_json_object(pairs):
++    """Refuse ambiguous provider/model identity at every JSON object level."""
++    result={}
++    for key,value in pairs:
++        if key in result:
++            raise ProviderError('DUPLICATE_JSON_FIELD:'+key)
++        result[key]=value
++    return result
++
+ def main():
+     p=argparse.ArgumentParser(description=__doc__)
+     p.add_argument('--input',required=True,type=Path);p.add_argument('--output',required=True,type=Path)
+     args=p.parse_args()
+     try:
+-        data=json.loads(args.input.read_text())
++        data=json.loads(args.input.read_text(),object_pairs_hook=_unique_json_object)
++        if not isinstance(data,dict):
++            raise ProviderError('JSON_OBJECT_INPUT_REQUIRED')
+         result=evaluate(data['model'],data['state'],data['provider'])
+         if 'direction' in data:
+             result['direction']=direction(data['model'],data['state'],data['provider'],data['direction'],data.get('dt_s','0'))

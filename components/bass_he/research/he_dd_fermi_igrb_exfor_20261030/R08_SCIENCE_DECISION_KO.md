@@ -1,0 +1,5 @@
+# R8 scientific conclusion and classification
+Established literature: Fermi 2015 integrated IGRB/EGB flux in two published bands, EXFOR M0475003 six reported SIG points from Arends 1976; both retain their own measurement error and provenance.
+Derived: same-observer isotropic photon number density from measured binned intensity, reported-sigma-weighted local benchmark on EXFOR 201-359 MeV support, pair-produced K(E)=(E-Q) weights.
+Numerically checked: test suite 12/12 and alternative Wolfram analytic flat quadrature. Conjectural/conditional: Fermi global best-fit intra-bin photon spectral shape reweighting, piecewise-linear SIG(E), isotropic target coframe, unknown detector event calibration.
+Unresolved: actual photon field throughout cosmic history, exclusive-event normalization, dynamic He phase-space and angular polarization, gamma attenuation, coupled nonthermal D stopping and heat capacity. No actual κ, R_event or heat rate. New auxiliary observed gamma bridge D1 of D4 complete; D2 diagnostic passed only after runtime implementation. Original Central28/88 HE14/18 unchanged and production HOLD.

@@ -1,0 +1,123 @@
+{
+  "schema": "HE08_INDEPENDENT_REVIEW_V1",
+  "review_pass": 1,
+  "reviewer_task": "/root/backup_context_survey",
+  "reviewer_independence": "Reviewer did not author KINEMATIC08 theory, implementation, tests, or run scripts. Earlier role surveyed unrelated input/backup provenance only.",
+  "stage": "STATIC_PREEXECUTION_HALF",
+  "observed_utc": "2026-10-27 15:50:51 UTC",
+  "repository_HEAD_observed": "018e58bec9e50ba88eddaf4b09201b3a9657145f",
+  "scientific_executions_by_reviewer": 0,
+  "test_executions_by_reviewer": 0,
+  "plot_executions_by_reviewer": 0,
+  "prior_suite_replays": 0,
+  "reviewed_paths": [
+    "BASS_HE/AGENTS.md",
+    "BASS_HE/research/program_expansion_20261025/continuation_kinematic_20261028/CONTRACT_KO.md",
+    "BASS_HE/research/program_expansion_20261025/continuation_kinematic_20261028/THEORY_KO.md",
+    "BASS_HE/research/program_expansion_20261025/continuation_kinematic_20261028/CODING_CONTRACT.md",
+    "BASS_HE/research/program_expansion_20261025/continuation_kinematic_20261028/RESOURCE_CONTRACT.json",
+    "he08_draft/src/kinematic.py",
+    "he08_draft/tests/test_kinematic.py",
+    "he08_draft/scripts/validate_once.py",
+    "he08_draft/scripts/run_bounded.py",
+    "he08_draft/scripts/plot_saved.py",
+    "BASS_HE/research/program_expansion_20261025/continuation_aperture_20261027/src/aperture.py"
+  ],
+  "draft_sha256": {
+    "src/kinematic.py": "7bec25c47c23cabd20a985aad8e194dcd2754814d3f38e0db5f580282b0e4bd9",
+    "tests/test_kinematic.py": "7b404763d155b285d75309a57036694b14351875e02f6b967fa55c32631413c5",
+    "scripts/run_bounded.py": "631bb163255af374fa4e979d381aef76f9c849308369940db0c615656b39fa12",
+    "scripts/plot_saved.py": "103cf2861ea6af4173ee8ecd67c26254e524d7cee5bca85230df808eaf14953a",
+    "scripts/validate_once.py": "5f33b2919e32b37c3ce285a63e8a5ff9ac10dfcc48d4727edff3042b06a2ef84"
+  },
+  "baseline_preservation": {
+    "aperture_source_diff_from_D10": "empty",
+    "D10": "8e8c962d46ec66640ddfbd7d7b6b7e8f9c887bf3"
+  },
+  "reviewed_aspects": [
+    {
+      "id": "MASS_SHELL",
+      "result": "STATIC_CONSISTENT",
+      "basis": "G²-e²=s, R=H/s. Lorentz boost gives E=(G+eμ√R)/2 and qz=(e+Gμ√R)/2. 4(E²-qz²-qperp²)=s-H=4M²; both daughter energies positive."
+    },
+    {
+      "id": "SURD_SIGN",
+      "result": "STATIC_CONSISTENT",
+      "basis": "For opposite nonzero p,q, sign(p+q√R)=sign(p)sign(p²-q²R); R=0 and zero coefficients handled before squaring."
+    },
+    {
+      "id": "DIRECTION_COMPARISON",
+      "result": "STATIC_CONSISTENT",
+      "basis": "Separate sign(L),sign(nu) first. Equal nonzero signs reduce comparison to sign(L)sign((1-nu²)L²-nu²T); P,Q expansion correct."
+    },
+    {
+      "id": "TOPOLOGY_STOP",
+      "result": "STATIC_CONSISTENT",
+      "basis": "K and a-1 share sign since e,G,√R positive. dF/dμ has sign(G√R+eμ); fold=-G√R/e. At K=0 μ=-1 is only zero3momentum; public compare rejects; private limit0 is correct."
+    },
+    {
+      "id": "FOLD_PREIMAGE",
+      "result": "STATIC_CONSISTENT",
+      "basis": "Fold bracket sign(μ+(G/e)√R) is increasing, gives rational enclosure. Branchs outside bracket remain monotone. Four root-bracket contributions plus fold strip imply uncertain length<=5delta. Singleton/FULL results are modulo null endpoints."
+    },
+    {
+      "id": "SHARED_EVENT_PAIR",
+      "result": "STATIC_CONSISTENT",
+      "basis": "C=(A∩reflectB)∪(B∩reflectA), indicator uncertainty contained in four one-window uncertainties; <=20delta."
+    },
+    {
+      "id": "EPSILON",
+      "result": "STATIC_CONSISTENT",
+      "basis": "Bernstein partition unity gives density<=B. sigma=2sum(b)/(n+1), so20Bdelta=sigma2^-40. n<=8 gives delta>=2^-40/90 and <=48 bisections from length2. Zero shortcut and manual delta semantics retained."
+    },
+    {
+      "id": "ENERGY_SIGNED_MOMENT",
+      "result": "STATIC_CONSISTENT",
+      "basis": "C reflection symmetric and even density imply integral μrho overC=0. PairGY and labelG/2Y valid; arbitrary detector-specific physical energy not certified. Generic rational w0+w1μ uses inherited exact signed integral enclosure."
+    },
+    {
+      "id": "NEW_TEST_DESIGN",
+      "result": "STATIC_REVIEWED_NOT_EXECUTED",
+      "basis": "14 unittest methods cover surds/domains/stopped/sign/rational and irrational folds/Decimal80 independent boost/scale/windows/signedmoments/guards/shared-event/defaultmanual/nativeNIST. Test control records are explicit counterfactual-oracle diagnostics, not executed mutation-testing campaign."
+    },
+    {
+      "id": "SOURCE_AND_SAVED_PLOT",
+      "result": "STATIC_REVIEWED_NOT_EXECUTED",
+      "basis": "Runner requires exact HEAD and no tracked dirt, records hashes; NIST raw hash checked by newtest. validate_once creates payload in same test process, plot_saved imports no science and requires saved validation success. No old suites called."
+    },
+    {
+      "id": "RESOURCES",
+      "result": "FINDING",
+      "basis": "Bounded childRLIMIT + measured child/controller accounting exists, but measurement starts after setup and excludes final serialization/reporting."
+    }
+  ],
+  "findings": [
+    {
+      "id": "HE08-STATIC-01",
+      "severity": "MEDIUM",
+      "domain": "RESOURCE_ACCOUNTING",
+      "target": "he08_draft/scripts/run_bounded.py measurement boundary",
+      "evidence": "cpu0/wall0 are set after two git subprocesses, source hashing, output mkdir and START.json/fsync. total_observed_cpu_s excludes those and final RESOURCE_RESULT/fsync/print. Contract validationcpu10/plotcpu6 does not specify this narrower scope.",
+      "impact": "Reported total and cap_met cannot by themselves certify whole-run CPU/wall allocation including controller setup/tail.",
+      "minimum_correction": "Use an outer whole-process CPU/wall receipt for final cap admission, or explicitly scope measured values and account omitted work without claiming whole-unit cap. Keep child/controller values separately and avoid aggregate hard preventive cap claims.",
+      "status": "STATIC_CORRECTION_DESIGN_ACCEPTED_ACTUAL_OUTER_RECEIPT_PENDING",
+      "followup": "Readback of current draft puts cpu0/wall0 and child baseline before git/hash/START. Root specifies one finite outer process measurement including runner imports/final writes and descendants, with outer bookkeeping reported separately. This resolves the static accounting design; actual receipt is reviewed in the same pass after the one authorized run."
+    },
+    {
+      "id": "HE08-STATIC-02",
+      "severity": "LOW",
+      "domain": "NOTATION",
+      "target": "THEORY_KO.md section3 first sentence",
+      "evidence": "'유리수 p,q,R≥0' conflicts with arbitrary signed p,q in same paragraph and implementation.",
+      "impact": "Ambiguous theorem domain despite correct following argument.",
+      "minimum_correction": "Write p,q in Q and R in Q_{>=0}.",
+      "status": "CLOSED_READBACK",
+      "followup": "THEORY section3 now reads 유리수 p,q와 R≥0 and explicitly arbitrary signs; observed correction accepted."
+    }
+  ],
+  "mathematical_blocking_findings": 0,
+  "static_decision": "STATIC_ACCEPTED_FOR_SINGLE_BOUNDED_EXECUTION; ACTUAL_RESULTS_AND_OUTER_RESOURCE_RECEIPT_PENDING",
+  "snapshot_note": "Initial source-content read and later sha256 read were non-atomic while authoring continued. Current runner hash631bb... belongs to updated content with measurement before git/hash/START; earlier omitted-setup observation is retained only as historical finding, not attributed to the updated hash. Immutable S05 source pin will bind the final result review.",
+  "final_decision": "PENDING_S06_RESULTS_AND_S08_PLOT_SAME_PASS",
+  "next_review_action": "Continue this same review_pass1 with actual immutable source S05, S06 raw test/resource/saved results, Wolfram evidence, S08 saved-data plot and accounting corrections. No second scientific review pass or automatic extra execution."
+}

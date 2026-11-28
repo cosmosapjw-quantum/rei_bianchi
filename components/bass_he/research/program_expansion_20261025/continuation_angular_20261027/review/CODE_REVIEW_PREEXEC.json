@@ -1,0 +1,94 @@
+{
+  "schema": "HE_ANGULAR06_INDEPENDENT_PREEXEC_CODE_REVIEW_V1",
+  "reviewer": "/root/photon06_sources_theory",
+  "authored_implementation": false,
+  "scope": "Static read and independent algebra only; no scientific executions or tests by reviewer.",
+  "reviewed_snapshot": {
+    "code": "src/angular_pushforward.py",
+    "sha256": "9b7cc263545a5d5ae2aada57d9f41a80c8a4dcec40ceb481f031d364ad8d1930",
+    "model_sha256": "3e90f59fce8ce0b417e7862b90a8541613e641d76f3ed8294f60a0fecdb1514f",
+    "validation_sha256": "bd0387579e8466d0513473ba5037f15ca59ee381bfd9c8ac06cd0e8a62a92a04",
+    "theory_sha256": "9668be2c615b6e295b508053137254ea0bdda0dc3be557d06d965e7b163dd30a",
+    "test_sha256": "f854e66fee82f6e6d0a8ccbea9f04bebcf1601287d002f7814ec0c7100396c54",
+    "validation_adapter_sha256": "264a697ad2f3e8fd42d2d1273383f56136f98b3dbd3aaee767d6849ccf790929",
+    "plot_runner_sha256": "ce1b9d276888a64a4ef2e06850fd81013a5cc13bbe6bf4158765c9c1f9df8604"
+  },
+  "decision": "PASS_SCOPED_STATIC_PREEXEC_REVIEW",
+  "scientific_execution_count": 0,
+  "tests_executed": 0,
+  "static_confirmations": [
+    "Signed Jacobian gamma(1+a*mu)/D^3 agrees with independent differentiation.",
+    "Stable quadratic pair q/L and constant/q has original-sign and [-1,1] domain filtering.",
+    "a=1 uses the nonspurious inverse and excludes the stopped mu=-1 direction.",
+    "from_masses now compares exact rational stored-input threshold and transition.",
+    "weighted_density sums resolved branch contributions rather than replacing the two energies by a single angular energy.",
+    "Declared normalization enum has event/pair/single factors with explicit hemisphere pair summation.",
+    "Nonnegative scalar density and finite signed weight are checked; folds return undefined point density, not fake finite values.",
+    "Native12 saved data hash matches original and git diff against D05 is empty for PHOTON05 and STATE04 directories.",
+    "Root main THEORY_KO.md was read and agrees with independent derivation.",
+    "26 planned new tests were read: independent vector derivative and Decimal bisection references, exact rational threshold control, fold-bin mass and declared discrete quotient controls.",
+    "Validation adapter pins the existing runner identity and only targets new angular tests; plot runner reads saved angular output and has one-start guard."
+  ],
+  "findings": [
+    {
+      "id": "PREEXEC-01",
+      "severity": "major",
+      "status": "CLOSED_BY_CODE_CHANGE",
+      "target": "from_masses threshold admission",
+      "observed_initial_sha": "7dbe73f3a102fbdb442d9f763c83e5af058f31dd5b29bbebda1ca2757d5dddb6",
+      "issue": "Rounded display threshold equality was initially classified as exact physical threshold atom, conflicting with stored-real input semantics.",
+      "correction": "Fraction.from_float forms exact threshold, compares admission and equality rationally, and forms exact excess before Decimal conversion.",
+      "closure_sha": "de42375d1e6c3a27ac177f08f3fcc42dd9cc140227ee2ba38ba0039834d58973",
+      "basis": "static reviewed"
+    },
+    {
+      "id": "PREEXEC-02",
+      "severity": "major",
+      "status": "CLOSED_BY_CODE_CHANGE",
+      "target": "weighted_density and normalization_weights",
+      "issue": "Initial implementation omitted model-specified weighted branch pushforward and declaration-specific event/particle factors.",
+      "correction": "Explicit branch-resolved weighted_density and normalization_weights functions added.",
+      "closure_sha": "de42375d1e6c3a27ac177f08f3fcc42dd9cc140227ee2ba38ba0039834d58973",
+      "basis": "static reviewed"
+    },
+    {
+      "id": "PREEXEC-03",
+      "severity": "minor",
+      "status": "CLOSED_BY_CONTRACT_CHANGE",
+      "target": "MODEL_CONTRACT.json implementation_domain",
+      "issue": "precision says binary64 forward although forward uses Decimal80; 'exact computed fold' should explicitly describe a binary64 sentinel distinct from the mathematical fold.",
+      "correction": "State Decimal80 intermediates for forward/inverse, rational threshold/transition admission, and declared computed fold sentinel; note representability failures.",
+      "closure": "Model now explicitly specifies Fraction admission, Decimal80 forward/inverse, binary64 critical sentinels and representability rejection.",
+      "closure_sha": "3e90f59fce8ce0b417e7862b90a8541613e641d76f3ed8294f60a0fecdb1514f"
+    },
+    {
+      "id": "PREEXEC-04",
+      "severity": "major",
+      "status": "CLOSED_BY_CODE_CHANGE",
+      "target": "AngularMap.forward and AngularMap.inverse fold rounding",
+      "issue": "Regular forward outputs can round onto the declared nu-fold sentinel while retaining REGULAR, so inverse returns FOLD. Regular inverse branches can likewise round onto mu-fold sentinel while remaining distinct, so duplicate-root guard alone does not resolve the conflict.",
+      "analytic_examples": [
+        "gamma=1,a=2,mu=nextafter(-0.5,0): nu-nu_fold is quadratic in one mu ulp and rounds to the same nu-fold float, but mu is not the mu-fold sentinel.",
+        "Candidate (not executed): gamma=1e6,a=1+2^-52,nu approximately0.02125 can return one branch rounded to mu-fold and another distinct branch."
+      ],
+      "impact": "Declared critical-point status and regular inverse/forward contract become inconsistent at unresolved support boundaries.",
+      "correction": "Reject regular forward nu that rounds onto computed fold sentinel; reject any regular inverse branch whose returned mu equals computed fold_mu; exercise affected boundary controls in root's first bounded suite.",
+      "test_execution": "NOT_RUN_BY_REVIEWER",
+      "closure": "Regular forward values rounding onto fold sentinel and regular inverse roots rounding onto fold_mu now raise AngularResolutionError. Forward fold guard applies only to interior mu, preserving genuine poles even when interior cone is unresolved. Test23 includes the forward fold sentinel and both large-parameter poles.",
+      "closure_sha": "9b7cc263545a5d5ae2aada57d9f41a80c8a4dcec40ceb481f031d364ad8d1930",
+      "related_temporary_regression": "A first guard accessed nu_min at poles and rejected valid endpoints for gamma=a=1e6; author narrowed guard to -1<mu<1 before execution."
+    }
+  ],
+  "protected_evidence": {
+    "saved_photon05_data_sha256": "923c9349019d7061a4d6e71343ef6930b9db6b95b82f16085f725f18b618d755",
+    "PHOTON05_DAG_sha256": "7512fd484260ae2bc60896cbfaa8fc673b5d805c618d713add3abfb6a442aab9",
+    "PHOTON05_MODEL_sha256": "85980c8500774ad153e27a2953141b9e3339ba93a1aebca8f0fb5052aa800c38",
+    "PHOTON05_kernel_sha256": "996f7cecc6de67ff428290f08258434717e97c7a40a3e169785431f73bdfebb9",
+    "PHOTON05_relative_D05_git_diff": "empty",
+    "STATE04_relative_D05_git_diff": "empty",
+    "PHOTON05_plot": "FAIL_CPU_CAP_EXCEEDED preserved",
+    "HE101": "C8 PARTIAL_EXPORT19/20 reserve0 PASS/FAIL/FAIL preserved"
+  },
+  "remaining_obligation": "Root executes the already allocated bounded new validation and saved-data plot, followed by result review. This static approval does not claim that either run has passed.",
+  "blocking_findings_remaining": 0
+}

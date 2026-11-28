@@ -1,0 +1,11 @@
+--- before
++++ after
+@@ -59,7 +59,7 @@
+     if result.get("status") != lock["expected_budget_status"]:
+         raise ValueError("BUDGET_STATUS_FAILURE")
+     for key, value in projection.items():
+-        if result.get(key) != value:
++        if key not in result or result[key] != value:
+             raise ValueError("FRESH_RESULT_PROJECTION_BINDING_FAILURE: " + key)
+     ranking_evidence = None
+     if "expected_ranking_content" in lock:

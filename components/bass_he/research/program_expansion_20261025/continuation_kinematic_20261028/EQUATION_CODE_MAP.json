@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "scope": "Root frozen implementation contract; equations are specified derivations, not attributed quotations from external sources",
+  "equations": [
+    {"equation": "s=A^2+2Ae; H=s-4M^2; G=A+e; R=H/s", "implementation": "src/kinematic.py:PhysicalAngularMap.__init__", "validation": "test_02_scalar_and_domain_guards; test_14_native_nist_manufactured_density"},
+    {"equation": "sign(p+q sqrt(R)) uses signs and p^2-q^2 R", "implementation": "src/kinematic.py:sign_surds", "validation": "test_01_surds"},
+    {"equation": "L=e+G mu sqrt(R); T=H(1-mu^2); F=L/sqrt(L^2+T)", "implementation": "src/kinematic.py:PhysicalAngularMap._compare", "validation": "test_04_exact_increasing_and_sign_control; test_07_independent_decimal80_boost"},
+    {"equation": "P=(1-nu^2)(e^2+G^2 mu^2 R)-nu^2 H(1-mu^2); Q=2eG mu(1-nu^2)", "implementation": "src/kinematic.py:PhysicalAngularMap._compare", "validation": "test_07_independent_decimal80_boost; test_08_common_energy_scale"},
+    {"equation": "K=e^2-G^2 R; mu_c=-(G/e)sqrt(R)", "implementation": "src/kinematic.py:PhysicalAngularMap.__init__, _fold, preimage", "validation": "test_03_stopped; test_05_rational_fold; test_06_irrational_fold_strip_control"},
+    {"equation": "preimage uncertain length <= 5 delta; pair boolean uncertain length <=20 delta", "implementation": "src/kinematic.py:PhysicalPreimage.uncertainty_length_bound, PhysicalAngularMap.preimage, physical_pair_response", "validation": "test_06_irrational_fold_strip_control; test_13_default_and_manual_actual_bounds"},
+    {"equation": "delta_default=sigma/(20 maximum 2^40)", "implementation": "src/kinematic.py:default_delta", "validation": "test_13_default_and_manual_actual_bounds"},
+    {"equation": "C=(PA intersect reflection(PB)) union (PB intersect reflection(PA))", "implementation": "src/kinematic.py:physical_pair_response", "validation": "test_12_shared_event_and_physical_energy_controls"},
+    {"equation": "pair energy=G Y; selected plus=selected minus=(G/2)Y; coincidence daughters=2Y", "implementation": "src/kinematic.py:physical_pair_response", "validation": "test_12_shared_event_and_physical_energy_controls; test_14_native_nist_manufactured_density"},
+    {"equation": "CM E*=sqrt(s)/2, p*=sqrt(s-4M^2)/2; beta=e/G; gamma=G/sqrt(s); pz=gamma(p*mu+beta E*)", "implementation": "tests/test_kinematic.py:boost_cosine (independent Decimal80 oracle only)", "validation": "test_07_independent_decimal80_boost; test_14_native_nist_manufactured_density"},
+    {"equation": "positive Bernstein integration, signed linear weight root splitting, normalized set algebra", "implementation": "immutable inherited continuation_aperture_20261027/src/aperture.py", "validation": "test_10_normalization_and_signed_moment (new dependency use only)"}
+  ],
+  "source_identity": "NIST existing byte receipt and rest energy field identity are in INPUTS.json; no measurement uncertainty or empirical rate inferred",
+  "physical_ports": {"rest_binding_owner": "population_rest_energy_witness", "thermal_ports": null, "birth_pool": "UNASSIGNED", "L4_ready": false, "production_status": "NOT_APPROVED"}
+}

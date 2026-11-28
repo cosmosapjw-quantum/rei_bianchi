@@ -1,0 +1,39 @@
+name: BASS_HE original REI F05 V2 tick160-162 HeII Lyalpha source receipt
+on:
+  push:
+    branches:
+      - research/bass-he-f05-v2-original-lya-t160-t162-20261102
+    paths:
+      - research/rei_f05_v2_lya_causal_parent_source_20261102/**
+      - .github/workflows/bass-he-f05-v2-original-lya.yml
+  pull_request:
+    paths:
+      - research/rei_f05_v2_lya_causal_parent_source_20261102/**
+      - .github/workflows/bass-he-f05-v2-original-lya.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-free-physical-receipt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify full original research V2 derived 92k-row source receipt
+        run: python3 research/rei_f05_v2_lya_causal_parent_source_20261102/verify_published_receipt.py
+      - name: Verify identical frozen receipt under optimized Python
+        run: python3 -O research/rei_f05_v2_lya_causal_parent_source_20261102/verify_published_receipt.py
+      - name: Explicitly forbid official tick161, causal transfer or canonical advancement
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('research/rei_f05_v2_lya_causal_parent_source_20261102/results/SCIENCE_RESULT.json').read_text())
+          assert d['source_ticks161_162_official'] is False
+          assert d['source_spatial_photon_transport_owned'] is False
+          assert d['canonical_delta']==0
+          assert d['production']=='HOLD'
+          print('PASS_SOURCE_DERIVED_RECEIPT_ONLY_NO_OFFICIAL_TICK161_ADMISSION')
+          PY

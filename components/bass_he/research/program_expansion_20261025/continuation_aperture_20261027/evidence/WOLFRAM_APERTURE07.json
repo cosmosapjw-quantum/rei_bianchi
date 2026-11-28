@@ -1,0 +1,20 @@
+{
+  "schema": "HE_APERTURE07_SYMBOLIC_CHECK_V1",
+  "provider": "Wolfram Language evaluator",
+  "invocations": 1,
+  "timeConstraint_s": 15,
+  "remote_cpu_s": null,
+  "local_validation_CPU_included": false,
+  "code": "b[n_,k_,t_] := Binomial[n,k] t^k (1-t)^(n-k);\nmass=Flatten[Table[FullSimplify[Integrate[2 b[n,k,t],{t,0,1}]-2/(n+1)],{n,0,8},{k,0,n}]];\nlinear=Flatten[Table[FullSimplify[Integrate[2 b[n,k,t] ((w0-w1)+2 w1 t),{t,0,1}]-2/(n+1) (w0+w1(2(k+1)/(n+2)-1))],{n,0,8},{k,0,n}]];\nroots={-9/20-Sqrt[7]/5,-9/20+Sqrt[7]/5};\nfold=FullSimplify[((# +5/4)^2-(16/25)(1-#^2+(# +5/4)^2))]& /@ roots;\nsupport=FullSimplify[-1<#<1 && # +5/4>0]& /@ roots;\nsigned={Integrate[mu/2,{mu,-1/2,-1/4}],Integrate[mu/2,{mu,1/4,1/2}]};\ny=Integrate[1/2,{mu,-1,-1/2}]+Integrate[1/2,{mu,1/2,1}];\n<|\"mass_residuals\"->mass,\"linear_weight_residuals\"->linear,\"fold_squared_residuals\"->fold,\"original_sign_and_domain\"->support,\"signed_uncertainty_bounds\"->signed,\"coincidence\"->y,\"hit_product\"->(1/2)^2,\"pair_energy_for_E0_3\"->6y,\"zero_residual_count\"->Count[Join[mass,linear,fold],0]|>",
+  "actual_result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= <|\"mass_residuals\" -> {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, \"linear_weight_residuals\" -> {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, \"fold_squared_residuals\" -> {0, 0}, \"original_sign_and_domain\" -> {True, True}, \"signed_uncertainty_bounds\" -> {-3/64, 3/64}, \"coincidence\" -> 1/2, \"hit_product\" -> 1/4, \"pair_energy_for_E0_3\" -> 3, \"zero_residual_count\" -> 92|>"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "classification": "Actual independent symbolic evaluation of new Bernstein/linear-moment identities and exact manufactured controls; not empirical DCS/flux validation"
+}

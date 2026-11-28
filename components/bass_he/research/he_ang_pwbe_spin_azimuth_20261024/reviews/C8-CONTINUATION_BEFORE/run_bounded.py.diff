@@ -1,0 +1,67 @@
+--- before/run_bounded.py
++++ after/run_bounded.py
+@@ -51,9 +51,19 @@
+     p=argparse.ArgumentParser()
+     p.add_argument('run_id',choices=[x[0] for x in PLAN])
+     p.add_argument('--repair-reason',choices=['C6-ASSERT-01'],help='explicit root-authorized two-method assertion repair')
++    p.add_argument('--saved-plot-continuation',action='store_true',help='root-authorized one saved-output-only C8 continuation in same allocation')
+     args=p.parse_args()
++    if args.saved_plot_continuation and (args.run_id!='03_plot' or args.repair_reason):
++        raise RuntimeError('continuation is plot-only and is not another repair reserve')
+     EXEC.mkdir(parents=True,exist_ok=True)
+     lock=EXEC/'RUN.lock'
++    stale_cleanup=None
++    if args.saved_plot_continuation and lock.exists():
++        prior=json.loads(LEDGER.read_text())
++        if lock.stat().st_size!=0 or len(prior['attempts'])!=4 or any(x['status']=='START' for x in prior['attempts']):
++            raise RuntimeError('unexpected task lock or unfinished ledger; return to root')
++        stale_cleanup={'path':str(lock),'bytes':0,'reason':'root native continuation GO; four known finished attempts; task-owned empty transient lock only','process_absence_claim':False}
++        lock.unlink()
+     fd=os.open(lock,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600);os.close(fd)
+     try:
+         manifest=UNIT/'evidence/preparation/PREPARATION_MANIFEST.json'
+@@ -62,7 +72,13 @@
+         attempts=ledger['attempts']
+         if any(a['status']=='START' for a in attempts):raise RuntimeError('incomplete START: UNKNOWN_NOT_ZERO blocks launch')
+         repair=None
+-        if args.repair_reason:
++        if args.saved_plot_continuation:
++            if len(attempts)!=4 or [x['status'] for x in attempts]!=['FAIL','PASS','PASS','FAIL'] or ledger['diagnosed_repair_reserve']['used']!=1:
++                raise RuntimeError('sole saved-output continuation requires the preserved four-attempt state')
++            for name,expected in [('code/plot_results.py','bac815be2cacb9ed69a067a491b297e848c0f9ee5647f5402226ec9396395d68'),('results/AZIMUTH_ANALYSIS.json','fe6c23f3475ba9c50dd4c295ce0687f61db666babc04198a4a4faf7e35ae21e5')]:
++                current_inputs[name]=digest(UNIT/name)
++                if current_inputs[name]['sha256']!=expected:raise RuntimeError('saved-output continuation input identity changed')
++        elif args.repair_reason:
+             if args.run_id!='01_tests' or len(attempts)!=1 or attempts[0]['run_id']!='01_tests' or attempts[0]['status']!='FAIL':
+                 raise RuntimeError('C6-ASSERT-01 is the sole two-method reserve immediately after initial test FAIL')
+             if ledger['diagnosed_repair_reserve']['used']:
+@@ -82,7 +98,8 @@
+                 raise RuntimeError('planned sequential order required; no full suite replay')
+         _,script,cap_cpu,cap_wall=next(x for x in PLAN if x[0]==args.run_id)
+         if repair:cap_cpu,cap_wall=2,10
+-        if len(attempts)>=4 or ledger['cumulative_cpu_s']+cap_cpu>8 or ledger['cumulative_wall_s']+cap_wall>30:
++        if args.saved_plot_continuation:cap_cpu,cap_wall=3,10
++        if (len(attempts)>=4 and not args.saved_plot_continuation) or ledger['cumulative_cpu_s']+cap_cpu>8 or ledger['cumulative_wall_s']+cap_wall>30:
+             raise RuntimeError('fresh unit cumulative budget would be exceeded')
+         identity=f'{len(attempts)+1:02d}_{args.run_id}'
+         outdir=EXEC/identity;outdir.mkdir()
+@@ -94,7 +111,8 @@
+         if repair:command+=['--repair-only','C6-ASSERT-01']
+         start_wall=time.monotonic();start_parent=cpu(resource.RUSAGE_SELF);start_child=cpu(resource.RUSAGE_CHILDREN)
+         row={'attempt_id':identity,'run_id':args.run_id,'command':command,'started_utc':stamp(),
+-             'status':'START','repair':repair,'caps':{'cpu_s':cap_cpu,'wall_s':cap_wall,'memory_bytes':536870912,'threads':1},
++             'status':'START','repair':repair,
++             'continuation':{'id':'C8-SAVED-OUTPUT-01','authority':'root current native followup GO after fresh survey; renewed explicit user request; evidence/C8_SAVED_OUTPUT_CONTINUATION.json','old_no_fifth_rule':'historical four-attempt snapshot; prospectively amended for one saved-output-only render','new_budget_or_reserve':False,'stale_task_lock_cleanup':stale_cleanup} if args.saved_plot_continuation else None,'caps':{'cpu_s':cap_cpu,'wall_s':cap_wall,'memory_bytes':536870912,'threads':1},
+              'remaining_before_cpu_s':8-ledger['cumulative_cpu_s'],'remaining_before_wall_s':30-ledger['cumulative_wall_s'],
+              'incomplete_START_accounting':'UNKNOWN_NOT_ZERO; blocks replay',
+              'preparation_manifest_sha256':digest(manifest)['sha256'], 'current_input_identities':current_inputs,
+@@ -102,6 +120,9 @@
+         if repair:
+             ledger['diagnosed_repair_reserve']['used']=1
+             ledger['diagnosed_repair_reserve']['remaining']=0
++        if args.saved_plot_continuation:
++            ledger['state']='C8_ONE_SAVED_OUTPUT_CONTINUATION_START_SAME_ALLOCATION'
++            ledger['prospective_continuation']={'id':'C8-SAVED-OUTPUT-01','additional_render_max':1,'used':1,'cpu_s':3,'wall_s':10,'same_cumulative_allocation':[8,30],'reserve_used_remains':1,'reserve_remaining':0,'authority':'root current native followup GO; evidence/C8_SAVED_OUTPUT_CONTINUATION.json'}
+         attempts.append(row);atomic(outdir/'START.json',row);atomic(LEDGER,ledger)
+         def limits():
+             resource.setrlimit(resource.RLIMIT_CPU,(cap_cpu,cap_cpu))

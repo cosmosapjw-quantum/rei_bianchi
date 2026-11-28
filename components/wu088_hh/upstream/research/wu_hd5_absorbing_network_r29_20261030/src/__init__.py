@@ -1,0 +1,1 @@
+"""Source-qualified HD physical research, not production."""

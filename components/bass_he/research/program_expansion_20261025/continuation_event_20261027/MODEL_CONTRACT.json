@@ -1,0 +1,62 @@
+{
+  "unit_id": "HE-EXP-EVENT-03",
+  "schema": "HE_REACTIVE_TWO_BODY_CONTRACT_V1",
+  "status": "FROZEN_FOR_IMPLEMENTATION_AND_INDEPENDENT_REVIEW",
+  "base_local_commit": "59ec5d0709b075ab585c1d1af42c62a3a56bd944",
+  "remote_expected_base": "ac6042a6b0610b09d0576538767ee0299389a5eb",
+  "WU_R4_source": "f949c21cca6e2534b725241068bd6c6e06158495",
+  "new_question": "Conservative finite-mass raw number, momentum, kinetic-energy and second moments for a declared nonrelativistic a+b -> c+d internal-state reaction, consuming supplied angular moments.",
+  "reuse": {
+    "module": "../continuation_20261025/exchange/exchange_closure.py",
+    "sha256": "533c49838d03572b106168cd9333a20e1b4a7d06f88d5f3727f8b80c5b96f262",
+    "objects": ["AngularTransport", "ConservativeSource", "CaloricSpecies", "temperature_rhs", "monatomic_caloric"],
+    "old_suites_replayed": false
+  },
+  "model": {
+    "process": "two massive reactants and two massive products; full CM angle, axisymmetric about incoming relative velocity",
+    "count": "labelled_pair_once; no automatic identical-pair factor",
+    "mass_convention": "constant_compositional_inertial_mass",
+    "mass_equality_relative_roundoff_guard": "16 * sys.float_info.epsilon; reject physical mass defect rather than insert it in momentum conservation",
+    "state_energy_convention": "explicit_nonrel_internal_energy_separate_from_inertial_mass",
+    "internal_owner": "population_derived_internal_witness",
+    "Delta_definition": "epsilon_c + epsilon_d - epsilon_a - epsilon_b; positive is endothermic",
+    "unassigned_birth_pool": true,
+    "zero_relative_speed": "only isotropic angular moments permitted; actual g*sigma limit remains provider-owned",
+    "zero_sigma": "zero event moments; no fictitious outgoing event",
+    "closed_branch": "positive sigma0 and Eout<0 raises ContractError",
+    "binary64_domain": "finite scalars/vectors/moments; no overflow or nonzero positive-scale underflow silently accepted",
+    "units": "SI; cross-section weighted moments precede flux/distribution integration"
+  },
+  "interface": {
+    "source_fields": ["source_id", "immutable_locator", "incoming_ids", "outgoing_ids", "energy_min_j", "energy_max_j", "full_com_angular_support", "axisymmetric_about_relative_velocity", "count_convention", "mass_convention", "internal_energy_convention", "internal_energy_owner"],
+    "inputs": ["four exact species/state IDs", "mass map in kg", "internal-energy map in J", "two incoming velocities in m/s", "existing AngularTransport object", "explicit conditional_algebra purpose"],
+    "outputs": ["per-ID number_m2", "per-ID mass_kg_m2", "per-ID momentum_kg_m3_s", "per-ID kinetic_j_m2", "per-ID second_j_m2", "derived internal-energy witness_j_m2", "E_in/E_out/Delta", "mass_sum_roundoff_residual_kg", "physical_admitted=false"],
+    "flux_adapter": "explicit nonnegative finite encounter_flux_m5_s multiplies weighted moments to reused ConservativeSource and separate Gamma; no rate default or thermal-pool assignment",
+    "physical_evaluation": "not implemented/admitted by this unit; reject a request for physical_evaluation"
+  },
+  "source_intake": {
+    "prior_IDs": 92,
+    "R4_records": 14,
+    "shared_exact_IDs": 2,
+    "new_unique_IDs": 12,
+    "union_IDs": 104,
+    "provider_references": 138,
+    "saved_event_column_references": 155,
+    "population_coevolution_admitted": false,
+    "R4_rates_or_DCS_admitted": false
+  },
+  "acceptance": {
+    "moment_residual_relative_to_sum_absolute_contributions": 5e-13,
+    "energy_momentum_conservation_relative_to_sum_absolute_contributions": 5e-13,
+    "direct_event_average_reference": "weighted finite CM cosine/azimuth velocities; independent accumulation of number, m*v, m*v*v and m*v^2/2",
+    "elastic_reference": "reused INTAKE01 elastic_moment_kernel at unchanged inputs",
+    "data_identity": "exact source bytes and same-ID compiler-record equality",
+    "no_physical_uncertainty_claim_from_tolerances": true
+  },
+  "physical_campaign_allocation": "UNALLOCATED",
+  "physical_provider_admitted": false,
+  "production": "NOT_APPROVED",
+  "activation": false,
+  "global_physical_completion": null,
+  "L4_ready": false
+}

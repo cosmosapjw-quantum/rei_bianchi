@@ -1,0 +1,17 @@
+# Reference only; render_service() emits host-measured MemoryHigh/MemoryMax before installation.
+[Unit]
+Description=BASS HE replay %i
+RequiresMountsFor=/srv/bass-he
+After=local-fs.target
+[Service]
+Type=exec
+User=bass-he
+Group=bass-he
+WorkingDirectory=/srv/bass-he/source/current
+ExecStart=/srv/bass-he/env/current/bin/python scripts/run_cloud_replay.py resume --out /srv/bass-he/runs/%i
+Restart=no
+KillMode=control-group
+TimeoutStopSec=15s
+NoNewPrivileges=yes
+[Install]
+WantedBy=multi-user.target

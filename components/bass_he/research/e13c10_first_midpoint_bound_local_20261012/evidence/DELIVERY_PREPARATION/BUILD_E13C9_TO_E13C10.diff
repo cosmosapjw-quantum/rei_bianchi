@@ -1,0 +1,108 @@
+--- E13C9/build_delivery.py
++++ E13C10/build_complete_e13c10.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Seal an actual E13C9 package, verify archived bytes, and create 64 MiB parts.
++"""Seal an actual E13C10 package, verify archived bytes, and create 64 MiB parts.
+ 
+ This is an evidence-transport builder. It neither imports scientific code nor
+ decides scientific admission. Wait for the owner to finish reports and review
+@@ -10,12 +10,13 @@
+ import hashlib
+ import json
+ import os
++import re
+ from pathlib import Path
+ import stat
+ import time
+ import zipfile
+ 
+-from restore_transfer import (CHUNK_BYTES, DEPENDENCIES, PACKAGE_ROOT, PACKAGE_SCHEMA,
++from restore_transfer_e13c10 import (CHUNK_BYTES, DEPENDENCIES, PACKAGE_ROOT, PACKAGE_SCHEMA,
+                               PART_BYTES, PRIOR_RECOVERY, TRANSFER_SCHEMA, pin,
+                               safe_relative, save, validate_transfer, verify_file)
+ 
+@@ -93,11 +94,16 @@
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('--package', type=Path, required=True)
+     parser.add_argument('--output-dir', type=Path, required=True)
++    parser.add_argument('--stamp', default=None, help='optional fixed UTC filename stamp YYYYMMDDTHHMMSSZ; ZIP payload timestamps are always fixed')
+     args = parser.parse_args()
+     started = time.monotonic()
++    stamp = args.stamp or datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
++    if not re.fullmatch(r'\d{8}T\d{6}Z', stamp):
++        raise ValueError('canonical UTC stamp required')
++    datetime.strptime(stamp, '%Y%m%dT%H%M%SZ')
+     root = args.package.resolve()
+     if not root.is_dir() or root.name != PACKAGE_ROOT or args.package.is_symlink():
+-        raise ValueError('actual regular E13C9 package root required')
++        raise ValueError('actual regular E13C10 package root required')
+     output = args.output_dir.resolve()
+     if output.exists() or args.output_dir.is_symlink():
+         raise FileExistsError('fresh delivery output directory required')
+@@ -111,14 +117,17 @@
+             raise FileExistsError('package is already sealed; preserve prior package and attempt')
+         for item in DEPENDENCIES.values():
+             verify_file(root / item['relative_archive'], item)
+-        helper = root / 'code/restore_transfer.py'
+-        verify_file(helper, pin(Path(__file__).with_name('restore_transfer.py')))
++        helper = root / 'code/restore_transfer_e13c10.py'
++        verify_file(helper, pin(Path(__file__).with_name('restore_transfer_e13c10.py')))
+         paths = payload_paths(root)
+         payload_pins = {path.relative_to(root).as_posix(): pin(path) for path in paths}
+-        if 'code/build_delivery.py' not in payload_pins or 'code/restore_transfer.py' not in payload_pins:
+-            raise ValueError('package must include its actual build and restore helpers')
++        for required_name in ('restore_transfer_e13c10.py', 'build_complete_e13c10.py', 'build_recovery_kit_e13c10.py'):
++            relative = 'code/' + required_name
++            if relative not in payload_pins:
++                raise ValueError('package must include its actual delivery tools: ' + relative)
++            verify_file(root / relative, pin(Path(__file__).with_name(required_name)))
+         manifest = {'schema': PACKAGE_SCHEMA, 'package_root': PACKAGE_ROOT, 'files': payload_pins,
+-                    'self_contained_E13C8_complete_and_recovery_kit': True,
++                    'self_contained_E13C9_complete_and_recovery_kit': True,
+                     'dependency_pins': DEPENDENCIES,
+                     'scientific_admission': 'SEE_RECORDED_INDEPENDENT_DECISION_IN_PACKAGE',
+                     'new_NCP_heavy_tasks': 0, 'scientific_kernel_calls_by_builder': 0,
+@@ -128,13 +137,12 @@
+         manifest_identity = pin(manifest_path)
+         paths.append(manifest_path)
+         paths.sort()
+-        stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+-        temporary = output / ('BASS_HE_E13C9_COMPLETE_' + stamp + '.building.zip')
++        temporary = output / ('BASS_HE_E13C10_COMPLETE_' + stamp + '.building.zip')
+         stage = 'ARCHIVE_WRITE_AND_VERIFY'
+         create_archive(root, paths, temporary)
+         members = verify_archived_payloads(temporary, PACKAGE_ROOT, payload_pins, manifest_identity)
+         identity = pin(temporary)
+-        archive = output / ('BASS_HE_E13C9_COMPLETE_' + stamp + '_sha_' + identity['sha256'][:12] + '.zip')
++        archive = output / ('BASS_HE_E13C10_COMPLETE_' + stamp + '_sha_' + identity['sha256'][:12] + '.zip')
+         os.link(temporary, archive)
+         temporary.unlink()
+         stage = 'PARTS_AND_TRANSFER_MANIFEST'
+@@ -143,14 +151,14 @@
+                     'archive': {'canonical_name': archive.name, **identity}, 'parts': parts,
+                     'package_manifest': manifest_identity, 'dependencies': DEPENDENCIES,
+                     'prior_recovery': PRIOR_RECOVERY,
+-                    'restore_helper': {'relative_path': 'restore_transfer.py', **pin(helper)},
++                    'restore_helper': {'relative_path': 'restore_transfer_e13c10.py', **pin(helper)},
+                     'name_policy': 'Select actual bytes/SHA regardless of download suffix; preserve source names and concatenate in manifest order.',
+                     'new_NCP_heavy_tasks': 0}
+         validate_transfer(transfer)
+-        transfer_path = output / 'BASS_HE_E13C9_TRANSFER_MANIFEST.json'
++        transfer_path = output / 'BASS_HE_E13C10_TRANSFER_MANIFEST.json'
+         save(transfer_path, transfer)
+         transfer_identity = pin(transfer_path)
+-        report = {'schema': 'bass-he-e13c9-delivery-build-receipt-v1',
++        report = {'schema': 'bass-he-e13c10-delivery-build-receipt-v1',
+                   'status': 'PASS_ALL_ARCHIVED_PAYLOAD_BYTES', 'finished_utc': datetime.now(timezone.utc).isoformat(),
+                   'archive_path': str(archive), 'archive': identity, 'archive_members': members,
+                   'payload_files': len(payload_pins), 'payload_raw_bytes': sum(p['bytes'] for p in payload_pins.values()),
+@@ -165,7 +173,7 @@
+         return 0
+     except BaseException as error:
+         save(output / 'FIRST_FAILURE.json', {
+-            'schema': 'bass-he-e13c9-delivery-build-failure-v1', 'status': 'FAIL_PRESERVED_NO_AUTOMATIC_RETRY',
++            'schema': 'bass-he-e13c10-delivery-build-failure-v1', 'status': 'FAIL_PRESERVED_NO_AUTOMATIC_RETRY',
+             'stage': stage, 'error_type': type(error).__name__, 'error': str(error),
+             'scientific_kernel_calls': 0, 'MPI_invocations': 0, 'NCP_execute_invocations': 0,
+             'automatic_retries': 0, 'elapsed_seconds': time.monotonic() - started})

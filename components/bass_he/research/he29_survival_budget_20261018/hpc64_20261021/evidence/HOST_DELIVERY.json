@@ -1,0 +1,94 @@
+{
+  "schema": "he29.hpc64.host_delivery.v1",
+  "created_utc": "2026-10-20T21:33:08.466568+00:00",
+  "status": "IMPLEMENTED_FIRST_SCOPE_AND_TARGETED_C9_TESTS_PASS",
+  "publication": "PENDING_PARENT_PUBLICATION",
+  "backup": "PENDING_PARENT_BACKUP",
+  "api": {
+    "observe_host": "JSON UTC/hostname/PID/kernel, affinity, MemTotal/MemAvailable, visible cgroup v2 mount/member/ancestor controls, physical core map",
+    "choose_resources": "execution_allowed, hold_reasons, cpu_ids, table_workers, build_jobs; explicit extra estimates/observations",
+    "active_he29_processes": "execution_allowed, hold_reasons, matches, other_scientific_matches, permission_denied, vanished_pids, read_errors; actual cmdline/cwd/selected exe reads, self/ancestor exclusion",
+    "host_execution_lease": "contextmanager(path=/tmp/BASS_HE_HE29_NATIVE.lock); stable inode, flock EX|NB, no pre-lock truncation or unlink"
+  },
+  "resource_contract": {
+    "table_workers_max": 48,
+    "build_jobs_max": 8,
+    "reserve_cpus_default": 8,
+    "protected_cpu55_excluded_if_present": true,
+    "memory_reserve": "max(16 GiB, ceil(effective memory capacity/5))",
+    "fixed_parent_overhead_estimate_bytes": 2147483648,
+    "table_worker_estimate_default_bytes": 1073741824,
+    "build_job_estimate_bytes": 2147483648,
+    "memory_available": "min(MemAvailable, each finite ancestor memory.max-memory.current)",
+    "cpu_limit": "min(eligible affinity count, floor(each visible ancestor quota/period)) then explicit CPU reserve",
+    "physical_core_priority": "one observed core before SMT siblings",
+    "unobserved_required_quota_or_headroom": "HOLD",
+    "process_admission_separate": "parent must require process execution_allowed AND resource execution_allowed inside same lease before setting affinity",
+    "rss_bound_measured": false
+  },
+  "c9_root_fix": {
+    "actual_global_root_signature": [
+      "mountpoint cgroup.controllers OBSERVED",
+      "mountpoint cgroup.type NOT_FOUND",
+      "mountpoint cpu.max and memory.max both NOT_FOUND"
+    ],
+    "global_root_only": "absent max interpreted unlimited at that mountpoint; descendant limits still applied",
+    "nonroot_namespace_or_permission": "missing controls stay HOLD; permission/read errors never relabeled NOT_FOUND",
+    "reviewer_primary_sources": [
+      "https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html",
+      "https://github.com/torvalds/linux/blob/v6.8/kernel/cgroup/cgroup.c"
+    ],
+    "reviewer_source_blob": "a66c088c851cfb87036ccc93317f7357769cb268"
+  },
+  "process_scope": {
+    "relative_commands": "actual proc cwd namespace read when argv lacks it; unreadable cwd HOLD",
+    "namespace_suffixes": "BASS_HE83 recognized; bass_cr retained as specific namespace",
+    "other_live_scientific_or_build_candidate": "HOLD, no automatic kill",
+    "complete_remote_or_history_absence_claim": false,
+    "unknown_owner_binary_path": "caller should supply actual owner binary; None scan is explicitly narrower"
+  },
+  "verification": {
+    "first_scope_methods": 12,
+    "first_scope_status": "PASS",
+    "cwd_new_targeted_methods": 2,
+    "cwd_status": "PASS",
+    "c9_root_new_targeted_methods": 4,
+    "c9_root_status": "PASS",
+    "distinct_new_methods": 18,
+    "old_methods_replayed": 0,
+    "actual_local_observation": "one read-only sandbox observation at initial source; raw original bytes/source SHA preserved, no second scan",
+    "NCP_host_observation": false,
+    "native_processes_started": 0,
+    "physical_solver_runs": 0,
+    "network_calls": 0,
+    "affinity_changes": 0,
+    "signal_or_kill_calls": 0,
+    "actual_flock_test": "temporary fixture paths only"
+  },
+  "local_initial_observation": {
+    "source_sha256": "88cc4757ea42b7e4cd73156dde79412831bdbfbe68aaac6c5c8d953dd4463e1f",
+    "scope": "before cwd/root corrections; explicit local sandbox limited observation, not current-code NCP process absence",
+    "affinity_count": 9,
+    "cpu_quota_cores": 8,
+    "memory_max_bytes": 8589934592,
+    "memory_current_bytes": 8027791360,
+    "memory_headroom_bytes": 562143232,
+    "resource_status": "HOLD",
+    "record": "evidence/HOST_LOCAL_OBSERVATION_FIRST.json"
+  },
+  "files_sha256": {
+    "src/host_plan.py": "1431bcc581f1fac40d3f6d2ad03a4925d9e8de0985b00639f19a0b55059b79bc",
+    "tests/test_host_plan.py": "bde2b47b7621389eb5064b00f2d2fd0e95c007ced0aebcdaef1b239b2f166259",
+    "evidence/HOST_CWD_TARGETED_FIRST/RECEIPT.json": "5cead27d79d5b9d2198c93ea117154e1ccff409b6ab3ec15bd6f50811e674be2",
+    "evidence/HOST_CWD_TARGETED_FIRST/stderr.txt": "854535ddf412aa745b5ce519d0b7cc02dfb51f5a5b67806a79508d1d6e94d34c",
+    "evidence/HOST_CWD_TARGETED_FIRST/stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/HOST_LOCAL_OBSERVATION_FIRST.json": "7f6efc1b5aaa7688ccf67969bb32493ad5c658222c335d68078da668eee00502",
+    "evidence/HOST_POLICY_KO.md": "8774af798d3b40d1d2d692c8d9e217ec0f2c5c5f4527c9317e5e2b8de0d62649",
+    "evidence/HOST_ROOT_TARGETED_FIRST/RECEIPT.json": "3da9501f5c3288196ad92069111b4e7c6831810c3a0c50b485da32f999de6f57",
+    "evidence/HOST_ROOT_TARGETED_FIRST/stderr.txt": "9d39168dba026ec8ba672d1a260f3c2e56e19cf64bd095ffb0b64b82dce617a6",
+    "evidence/HOST_ROOT_TARGETED_FIRST/stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/HOST_TESTS_FIRST/RECEIPT.json": "656cdf203e64e2b85024aa69b8b34fe87407db066fa5e8b9ba0de6631dbd6421",
+    "evidence/HOST_TESTS_FIRST/stderr.txt": "04c2c62412520e6f97e4c0e571f0807d1c03b3744c25cae03236cc70d2bb8153",
+    "evidence/HOST_TESTS_FIRST/stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

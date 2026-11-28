@@ -1,0 +1,11 @@
+{
+  "schema": "BASS_HE_SIG_DA_ENERGY_COMPAT_V1",
+  "science_scope": "Conditional 330 MeV DA/SIG compatibility, no actual event normalization or physical rate",
+  "source": {"repository": "IAEA-NDS/exfor_master", "commit": "939a14d7bba1ddce51975cb5e8711ce96b3b0871", "path": "exforall/M04/M0475.x4", "sha256": "b2c1c52931e813dd63fb0e98edfc90088bc2eca497fd9142277e748f0935a82f", "git_blob": "c49433293921dbb012d7f1b0387745732a598efa"},
+  "parent": {"pr": 105, "head": "88a85c859744a0930b1cb776b4d9e8fa0794976d", "angular_endpoints": "evidence/PR105_ANGULAR_BOUNDS.json", "rounding_certified": false},
+  "conventions": {"energy": "MeV", "total_cross_section": "nb", "differential_cross_section": "nb/sr", "L_theta": "nb/sr/degree", "K_energy": "nb/MeV", "ERR-S": "coordinatewise sensitivity not joint confidence", "kappa": "explicit hypothesis 1 or 2, not source-admitted"},
+  "theorems": {"K_SIG": "max_(i!=j) (a_i-b_j)_+ / |E_i-E_j|", "S_K_330": "[max(0,max_i(a_i-K|330-E_i|)),min_i(b_i+K|330-E_i|)]", "J": "S_K_330 intersect [I_-/kappa,I_+/kappa]", "Kcrit": "max(K_SIG,max_i((a_i-I_+/kappa)_+/|330-E_i|),max_i((I_-/kappa-b_i)_+/|330-E_i|))"},
+  "code": {"src": "src/sig_da_bridge.py", "tests": "tests/test_sig_da_bridge.py", "independent_LP": "evidence/independent_lp.py", "independent_angular": "evidence/independent_angular.py", "plots": "make_figures.py"},
+  "acceptance": ["exact EXFOR SHA256 and Git blob", "K_SIG=19/800 exactly", "S_K(330)=[17/80,403/400] at K=19/800", "LP endpoint agreement <1e-8 nb for six cases", "constructive nonnegative global Lipschitz witness", "float/bool, duplicate/empty, source mutation rejected", "no physical rate or false joint-CI/outward-rounding claim"],
+  "claim_gate": {"new_conditional_nodes": "1/2 admitted, 1/2 review pending", "central_DAG": "28/88", "inherited_HE_DAG": "14/18", "physical_delta": 0, "R_event": null, "physical_activation": false, "L4": false, "production": "HOLD", "native_independent_review": "NOT_RUN"}
+}

@@ -1,0 +1,39 @@
+name: BASS_HE original REI F05 PW19 native proper photo-opacity receipt
+on:
+  push:
+    branches:
+      - research/bass-he-rei-f05-native-pw19-photo-opacity-20261101
+    paths:
+      - research/rei_f05_pw19_native_photo_opacity_20261101/**
+      - .github/workflows/bass-he-rei-f05-pw19-native-opacity.yml
+  pull_request:
+    paths:
+      - research/rei_f05_pw19_native_photo_opacity_20261101/**
+      - .github/workflows/bass-he-rei-f05-pw19-native-opacity.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-free-receipt-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Explicit published derived receipt ONLY
+        run: python3 research/rei_f05_pw19_native_photo_opacity_20261101/verify_published_receipt.py
+      - name: Prohibit false canonical or original-source admission
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("research/rei_f05_pw19_native_photo_opacity_20261101/results/SCIENCE_RESULT.json")
+          a=json.loads(p.read_text())
+          assert a["central_DAG"]=="28/88_REPORTED"
+          assert a["BASS_HE_physical_DAG"]=="14/18_REPORTED"
+          assert a["canonical_delta"]==0
+          assert a["production"]=="HOLD" and not a["official_tick161"]
+          assert a["photon_transport"]=="NOT_ADMITTED_NOT_COMPUTED"
+          print("PASS_DERIVED_RECEIPT_SCOPE_ONLY_NOT_ORIGINAL_SOURCE_REPLAY")
+          PY

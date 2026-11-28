@@ -1,0 +1,68 @@
+{
+  "schema": "WU088_HH_PHYS53_C6_LOCAL_EXECUTION_RECEIPT_V1",
+  "created_utc": "2026-10-15T23:12:09Z",
+  "branch_base_head": "53916f7c22be6bc684f7c2cac3a8ce43929938a7",
+  "parent_phys53": "8fe647d4e836204f783e91024f81a3f2c8f46b60",
+  "source_identity": {
+    "frozen_npz_sha256": "f1bd3074950163960cc2011682d013af60f9b17c471bea72ecbc2ffb19e6855d",
+    "rust_source_sha256": "c49679cc5d487aa1d360dc2fadce3a1d0f3ae5a4ea00663437eaf643484e1189",
+    "handoff_manifest_prior_rust_sha256": "0c0539045878984c2325424b54aaf2deabc152fc7e7e57a6bece0b6f73abfef8",
+    "disposition": "CORRECTED_MANIFEST_TO_EXACT_HANDOFF_COMMIT_BYTES",
+    "native_source_modified": false
+  },
+  "preflight": {
+    "command": "bash research/hh_phys53_ncp_handoff_20261016/scripts/launch_from_local.sh --preflight-only",
+    "exit_code": 2,
+    "status": "BLOCKED",
+    "first_failure": "authorized private key not available",
+    "required_path": "/home/cosmosapjw/.ssh/ncp_key",
+    "host": "root@49.50.142.2:22",
+    "host_key_verification_weakened": false,
+    "alternative_key_used": false
+  },
+  "local_rust": {
+    "status": "PASS_LOCAL_ONLY",
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+    "compile_flags": "rustc --edition=2021 -C opt-level=3 native/phys53_coulomb_cf.rs",
+    "test_flags": "rustc --edition=2021 --test -C opt-level=2 native/phys53_coulomb_cf.rs",
+    "unit_tests": {"passed": 2, "failed": 0},
+    "compile_wall_s": 0.36,
+    "compile_peak_rss_KiB": 143360
+  },
+  "local_reference_parity": {
+    "status": "PASS_LOCAL_ONLY",
+    "command": "verify_ncp.py --skip-bench against locally compiled Rust output",
+    "radii": [27, 30, 43],
+    "ell_range": [21, 256],
+    "depths": [768, 1152],
+    "workers_compared": [1, 8],
+    "highest_normalized_real_error": 5.692647338605944e-16,
+    "highest_normalized_depth_difference": 0.0,
+    "csv_sha256": {
+      "r27": "1b93e18ce221e6ff135e87b8cdc067daf6f738e3b708dd56c3a6413608daa338",
+      "r30": "ef41db0d31b9f426e8ae64e59f4c561bbf577b27aa0f025f6726cbc87d462489",
+      "r43": "a20defcd660d8817d1517615004dfe95971bcaea607c7eab33dc4660f7118576"
+    },
+    "verification_json_sha256": "ca5dbe37f1566a842a08a3903d2971bacbd01e8939edea2fd6aeffa04e68b9ac",
+    "benchmark": "NOT_RUN_LOCAL_RESULT_NOT_SUBSTITUTED_FOR_NCP"
+  },
+  "ncp": {"status": "NOT_RUN_BLOCKED_BY_MISSING_AUTHORIZED_LOCAL_KEY", "scientific_jobs": 0},
+  "python_verifier_tests": {"status": "NOT_RUN", "reason": "pytest is not installed in this execution runtime"},
+  "publication": {
+    "status": "BLOCKED_GIT_TRANSPORT_AND_NCP_EXECUTION_INCOMPLETE",
+    "branch": "research/hh-phys53-ncp-c6-execution-20261016",
+    "local_commit_before_transport_receipt": "694f5aea70fe0b870a02a67f0c4fdbd5377f266b",
+    "push_command": "git push -u origin research/hh-phys53-ncp-c6-execution-20261016",
+    "push_exit_code": 128,
+    "push_first_failure": "could not read Username for https://github.com: No such device or address",
+    "draft_pr": "NOT_RUN_NO_AUTHENTICATED_GIT_TRANSPORT"
+  },
+  "backup": {
+    "git_bundle": "NOT_RUN_NCP_EXECUTION_INCOMPLETE",
+    "dropbox": "NOT_RUN_NCP_EXECUTION_INCOMPLETE",
+    "google_drive": "NOT_RUN_NCP_EXECUTION_INCOMPLETE"
+  },
+  "science_scope": "CENTRAL_COULOMB_REFERENCE_ONLY",
+  "not_established": ["screened_noncentral_infinite_ell_DtN", "driven_xi", "sigma_E", "Maxwellian_k_HH_T", "HH_R10"]
+}

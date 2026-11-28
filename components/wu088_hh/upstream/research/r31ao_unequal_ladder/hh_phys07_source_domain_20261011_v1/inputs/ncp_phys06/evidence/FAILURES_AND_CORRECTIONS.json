@@ -1,0 +1,62 @@
+[
+  {
+    "order": 1,
+    "layer": "IMPLEMENTATION_BUILD",
+    "log": "evidence/build_first.stderr",
+    "exit": 101,
+    "cause": "E0624: external Interval.valid is crate-private in two sites",
+    "correction": "Use public Interval::new endpoint validation; no frozen source change",
+    "recheck": "evidence/build_repair.json",
+    "recheck_status": "Reached next compile error"
+  },
+  {
+    "order": 2,
+    "layer": "IMPLEMENTATION_BUILD",
+    "log": "evidence/build_repair.stderr",
+    "exit": 101,
+    "cause": "E0284: array::from_fn const length not inferred for projected Jets",
+    "correction": "Explicit [R<Jet>;4] shape",
+    "recheck": "evidence/build_shape_repair.json",
+    "recheck_status": "PASS"
+  },
+  {
+    "order": 3,
+    "layer": "STATIC_PROVENANCE_REVIEW",
+    "execution_failure": false,
+    "cause": "Initial mixed API accepted separate Partials argument after root validation",
+    "correction": "Store Partials privately in RootBounds and consume same source-data object",
+    "build": "evidence/build_binding_fix.json"
+  },
+  {
+    "order": 4,
+    "layer": "INDEPENDENT_IMPLEMENTATION_REVIEW",
+    "execution_failure": false,
+    "review": "review/DECISION.json",
+    "finding": "R1",
+    "correction": "Seal consumed LinearBounds/MixedBounds and RootBounds reports with readonly accessors",
+    "builds": [
+      "evidence/build_review_repair.json",
+      "evidence/build_review_seal.json"
+    ]
+  },
+  {
+    "order": 5,
+    "layer": "INDEPENDENT_MANUFACTURED_FIXTURE_REVIEW",
+    "execution_failure": false,
+    "review": "review/DECISION.json",
+    "finding": "R2",
+    "correction": "Use theta=[0,1/128]^2; Gc_i=[-1/64,0] for y_i=center_i+lambda+b; finite observable area=1/16384",
+    "recheck": "evidence/finite_observable_coverage_review_recheck.json",
+    "recheck_status": "PASS"
+  },
+  {
+    "order": 6,
+    "layer": "SAME_FINDING_PREMISE_CLOSURE",
+    "execution_failure": false,
+    "finding": "R2",
+    "correction": "Widen O_y0 from centre-only zero to [-.5,.5], containing whole-X gradient; same Hessian2",
+    "build": "evidence/build_observable_gradient.json",
+    "post_widening_target_execution": null,
+    "reason": "One target repair/recheck consumed. Read-only algebraic inclusion: new gradient*W term contains0, so old witness range is contained in widened range. No second target rerun."
+  }
+]

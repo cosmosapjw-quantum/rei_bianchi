@@ -1,0 +1,49 @@
+{
+  "schema": "WU088_HH_PHYS53_C6_C8_NCP_DIRECT_EXECUTION_V1",
+  "status": "PASS_SCOPE_CENTRAL_COULOMB_RUST_REFERENCE",
+  "execution_mode": "DIRECT_NCP_NO_SSH",
+  "workdir": "/root/wu088_hh_phys53_m1C8p7Io",
+  "start_utc": "2026-10-15T23:54:14Z",
+  "end_utc": "2026-10-15T23:54:16Z",
+  "worker_command": "bash /root/wu088_hh_phys53_m1C8p7Io/worker_on_ncp.sh /root/wu088_hh_phys53_m1C8p7Io",
+  "worker_exit_code": 0,
+  "worker_exit_evidence": "NCP_PAYLOAD_READY sentinel was emitted after all set -e worker steps, archive creation, and checksum creation.",
+  "host": {"hostname": "s1a0e5abed09", "nproc": 64, "memory": "125GiB", "kernel": "Linux 6.8.0-124-generic"},
+  "toolchain": {
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+    "compile": "rustc --edition=2021 -C opt-level=3",
+    "unit_test_compile": "rustc --edition=2021 --test -C opt-level=2",
+    "unit_tests": "2_PASS_EXIT0"
+  },
+  "resource_contract": {"threads_max": 8, "vmem_GiB": 16, "nice": 10, "timeout_seconds_per_job": 180},
+  "source": {
+    "rust_sha256": "c49679cc5d487aa1d360dc2fadce3a1d0f3ae5a4ea00663437eaf643484e1189",
+    "frozen_npz_sha256": "f1bd3074950163960cc2011682d013af60f9b17c471bea72ecbc2ffb19e6855d"
+  },
+  "verification": {
+    "exit_code": 0,
+    "sha256": "796f72750dd183540939df8fd98474ab12d12850b889dfb3e1f5ff75713cc610",
+    "highest_normalized_real_error": 5.692647338605944e-16,
+    "highest_normalized_depth_difference": 0.0,
+    "highest_low_l_imag_abs_error": 1.8111597291370352e-16,
+    "reference_grid": "r=27,30,43; ell=21..256; depth=768/1152; w1/w8 byte identical",
+    "benchmark": "ell=21..4096 depth=2048; 12 CSV byte identical",
+    "median_wall_s": {"1": 0.19, "2": 0.10, "4": 0.05, "8": 0.03},
+    "observed_rounded_speedup_over_1": {"1": 1.0, "2": 1.9, "4": 3.8, "8": 6.333333333333334},
+    "benchmark_peak_rss_KiB": 2048,
+    "timing_caveat": "0.01-second timing resolution and a short benchmark prevent a stable scaling claim."
+  },
+  "outgoing_phase_and_current": {
+    "convention": "H_l^(+)=G_l+iF_l; Im Z_l^(+)=k/|H_l^(+)|^2 follows from the positive Coulomb Wronskian.",
+    "acceptance": "f64 imaginary part is checked only for ell<=29; high-ell f64 imaginary values are not a positivity gate.",
+    "reused_high_ell_oracle": {"radius_Bohr": 27, "ell": 256, "log10_current": -510.144639403908},
+    "status": "POSITIVE_WRONSKIAN_CONVENTION_AND_LOG_CURRENT_REUSED; NOT_AN_INFINITE_SCREENED_DTN_PROOF"
+  },
+  "archive": {
+    "results_tar_sha256": "91fe436aa66fc0b96f3e970ed2367d6ebc3e5607e18f522adc897c6b16179df8",
+    "files_manifest_sha256": "cba36d70e5c686a7047ca55a7dd23c73eb02216bf1f3511c2e0fbb899f2f1dee",
+    "restored_files_sha256": "PASS"
+  },
+  "not_established": ["finite_CF_rigorous_remainder", "noncentral_screened_infinite_angular_DtN", "driven_xi", "sigma_E", "k_HH_T", "HH_R10"]
+}

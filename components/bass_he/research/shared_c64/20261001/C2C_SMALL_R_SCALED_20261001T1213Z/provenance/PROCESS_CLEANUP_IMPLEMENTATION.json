@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "utc": "2026-10-01T12:12:31.890076+00:00",
+  "classification": "IMPLEMENTATION_ERROR_FOUND_AND_REPAIRED_BEFORE_PHYSICS",
+  "initial_test_attempt": {
+    "tests": 7,
+    "failures": 1,
+    "errors": 5,
+    "passed": 1,
+    "exit_code": 1,
+    "cause": "Popen and pidfd syscalls see inner PID namespace, but /proc is mounted in an outer PID namespace. Numeric /proc/<local PID> resolved an unrelated outer process. Strict session identity validation rejected registration before signaling.",
+    "example": {
+      "local_child_PID": 6,
+      "syscall_PGID": 6,
+      "syscall_SID": 6,
+      "wrong_proc_entry_name": "caas-prefix-tra",
+      "wrong_proc_entry_SID": 0
+    },
+    "unrelated_process_signals": 0,
+    "scientific_workloads": 0,
+    "MPI_workloads": 0,
+    "representative_error": "RuntimeError: task must be a live independent session leader",
+    "passing_case": "parent-death SIGKILL guard"
+  },
+  "repair": {
+    "proc_mapping": "Require /proc/<outer>/ns/pid inode equal to /proc/self/ns/pid; map local NSpid/NSpgid/NSsid; keep outer procfs_pid for stat/environ reads.",
+    "signal_identity": "PID namespace inode + local PID/PGID/session + procfs PID + Linux start_time_ticks + batch/task token checked; pidfd_open(local PID), repeated identity before pidfd_send_signal.",
+    "spawn_race": "Child PR_SET_PDEATHSIG(SIGKILL) and expected-parent checks before/after registration; child waits pipe gate until atomic fsynced ownership registry; rank blocks termination over spawn/registry then handles SIGTERM with finally cleanup.",
+    "batch_scope": "Only expected manifest task IDs under this create-only batch, matching random batch owner token. No global numeric killpg.",
+    "runtime_guards_preserved": "Per-task wall limit, whole-batch wall limit, memory limits, source and DATA/STATE identity checks, all three native-library pins."
+  },
+  "verification": {
+    "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m unittest discover -s BASS_HE_C2C_SMALL_R_SCALED_20261001_v1/tests -p test_process_cleanup.py -v",
+    "test_count": 7,
+    "exit_code": 0,
+    "status": "PASS",
+    "last_run_seconds": 0.927,
+    "cases": [
+      "Own child/grandchild killed, unrelated control remains alive",
+      "PID start-time mismatch rejects without signal",
+      "Wrong batch token and unlisted task skipped",
+      "Registry gate blocks payload until release",
+      "Supervisor death kills guarded worker",
+      "Per-task timeout removes independent session and descendants",
+      "Rank SIGTERM invokes active-task cleanup"
+    ],
+    "scientific_workloads": 0,
+    "MPI_workloads": 0,
+    "final_log": {
+      "path": "evidence/PROCESS_CLEANUP_TEST_LOG.txt",
+      "sha256": "302b8f98f69082325a48679f17760133a91a62c6e55386d5b993641d2539ca50",
+      "bytes": 1146,
+      "exit_code": 0
+    }
+  },
+  "sources": [
+    {
+      "url": "https://www.man7.org/linux/man-pages/man5/proc_pid_status.5.html",
+      "supports": "Namespace-relative NSpid/NSpgid/NSsid mapping"
+    },
+    {
+      "url": "https://www.man7.org/linux/man-pages/man2/pidfd_open.2.html",
+      "supports": "PID file descriptor identifies process for later signaling"
+    },
+    {
+      "url": "https://www.man7.org/linux/man-pages/man2/pidfd_send_signal.2.html",
+      "supports": "PID namespace permissions and pidfd signaling identity"
+    }
+  ],
+  "source_sha256": {
+    "code/process_guard.py": "418bf0893da397de722b5d3d45783b01889b5c9193cdd2d0465b68e155ea0e13",
+    "code/mpi_batch.py": "14f343ad1af8408159a686fb915833ac64ac294b6d53db01d69f68b41aec354c",
+    "code/run_bounded.py": "8fa726d07bed1345a6ac78705d3b231a254203210d98a8ac1d00aa549fd3ac4e",
+    "tests/test_process_cleanup.py": "1cab4d0f74dbfb197b8a44ed6ac9bac6b3b34ecad0afd090b336f8dfca9d3efc"
+  },
+  "scope_limit": "Trusted Python/Fortran workers do not create new PID namespaces or alter task tokens; inaccessible identities are never signaled. This is bounded owned-session cleanup, not an arbitrary malicious descendant sandbox."
+}

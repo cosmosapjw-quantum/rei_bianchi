@@ -1,0 +1,391 @@
+{
+  "schema": "low-cost-llm-tasks.v1",
+  "thread": "BASS_HE",
+  "first_task": "HE-F2",
+  "selection_rule": "Execute one first pending task whose local and external dependencies are actually satisfied. Skip completed HE-P0. Parked tasks need explicit recorded trigger. Do not infer scientific PASS from task status.",
+  "branch": "research/shared-c64-crossrepo-20260928",
+  "new_branch": false,
+  "publication_root": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE",
+  "tasks": [
+    {
+      "id": "HE-P0",
+      "title": "Latest-state source research and derived precursor contract",
+      "depends_on": [],
+      "external_dependencies": [],
+      "status": "COMPLETE_IN_DECLARED_SCOPE",
+      "inputs": [
+        "current selected branch",
+        "GM25 AppendixB.3",
+        "KF96 Table1"
+      ],
+      "outputs": [
+        "PREWORK_KO.md",
+        "evidence/PREWORK_CHECKS.json",
+        "LEGACY_SOURCE_MANIFEST.json"
+      ],
+      "paths": [],
+      "steps": [
+        "read source and current B3",
+        "derive species/energy/frame contract",
+        "preserve legacy originals"
+      ],
+      "commands": [
+        "python docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/evidence/prework_checks.py"
+      ],
+      "acceptance": [
+        "three conservation dots=0",
+        "GM25/KF96=17",
+        "source conflict retained",
+        "no molecular runtime executed"
+      ],
+      "failure": [
+        "source inaccurate: retain record and correct bounded statement"
+      ],
+      "claims": {
+        "allowed": [
+          "literature-supported source parameters",
+          "derived conservation and units",
+          "implementation result only after recorded execution"
+        ],
+        "forbidden": [
+          "rigorous true-rate uncertainty from source spread",
+          "full atomic programme complete",
+          "physical source admission from packet validator",
+          "photon moment inferred from scalar rate"
+        ]
+      }
+    },
+    {
+      "id": "HE-F1",
+      "title": "Extend existing B3 with explicit KF96 alternative",
+      "depends_on": [
+        "HE-P0"
+      ],
+      "external_dependencies": [],
+      "status": "COMPLETE_IN_DECLARED_SCOPE",
+      "inputs": [
+        "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/registry.py",
+        "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/api.py",
+        "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/_rate.py",
+        "PROVIDER_FAMILY_DRAFT.json"
+      ],
+      "outputs": [
+        "two-source B3-compatible packets",
+        "focused test report",
+        "changed source identity manifest"
+      ],
+      "paths": [
+        "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/registry.py",
+        "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/api.py",
+        "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/src/bass_he_atomic_export/_kf96.py",
+        "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/tests/test_kf96_source.py",
+        "research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1/contract/ATOMIC_EXPORT_CONTRACT.json"
+      ],
+      "steps": [
+        "preserve GM25 _rate.py bytes; no edits to inherited core hash",
+        "add KF96 provider as separate implementation from cited equation",
+        "select explicit source_id with declared domain and conflict acknowledgment",
+        "preserve no density/geometry and unavailable moment nulls",
+        "validate one provider per reaction, never additive scenarios"
+      ],
+      "commands": [
+        "cd research/shared_c64/20261003/EOR_B3_ATOMIC_EXPORT_v1 && PYTHONPATH=src PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONDONTWRITEBYTECODE=1 python -W error -m pytest -q -p no:cacheprovider tests/test_kf96_source.py",
+        "git diff --check"
+      ],
+      "acceptance": [
+        "old GM25 byte/semantic identity retained",
+        "KF96=1e-14cm3/s=1e-20m3/s",
+        "two-source common range1000–10000K recorded",
+        "unknown source/domain/nonMaxwell/drift/species fail explicitly",
+        "fit_error_bound and true-sourceUQ remainnull",
+        "existing GM25 selected packet remains compatible or explicit schema migration supplied"
+      ],
+      "failure": [
+        "FAIL_IMPLEMENTATION: source/unit/provenance mismatch",
+        "BLOCKED_SOURCE_DOMAIN: no extrapolation",
+        "FAIL_SEMANTICS: alternative sources summed"
+      ],
+      "claims": {
+        "allowed": [
+          "literature-supported source parameters",
+          "derived conservation and units",
+          "implementation result only after recorded execution"
+        ],
+        "forbidden": [
+          "rigorous true-rate uncertainty from source spread",
+          "full atomic programme complete",
+          "physical source admission from packet validator",
+          "photon moment inferred from scalar rate"
+        ]
+      },
+      "completed_evidence": "runs/HE-F1_20261004/RETURN.json"
+    },
+    {
+      "id": "HE-F2",
+      "title": "Bind atom-to-consumer ledger and photon closure",
+      "depends_on": [
+        "HE-F1"
+      ],
+      "external_dependencies": [
+        "REI_SCOPE_LOCK",
+        "REI_PROVIDER_CONTRACT"
+      ],
+      "status": "PARTIAL_LOCAL_RHS_BINDING_ACCEPTED",
+      "inputs": [
+        "B3 source packet",
+        "PREWORK_KO.md sections2–4",
+        "rei chosen energy/transport model"
+      ],
+      "outputs": [
+        "REACTION_BINDING.json",
+        "CONSUMER_LEDGER_ACCEPTANCE.json"
+      ],
+      "paths": [
+        "consumer adapter path resolved by rei plan; no edit outside BASS_HE from this task"
+      ],
+      "steps": [
+        "bind same reaction_id/stoichiometry/units",
+        "consumer multiplies density exactly once",
+        "declare full transport or coupledOTS or explicit limitedclosure",
+        "refuse null-to-zero promotion; no duplicate microscopic/effective opacity",
+        "record approximate photon closure separately from rate source"
+      ],
+      "commands": [],
+      "acceptance": [
+        "event nuclei/charge conserved",
+        "direct electronCX=0",
+        "photon birth1 not primaryabsorption",
+        "chemical/radiation/thermal ownership sums correctly",
+        "rei owns geometry/density/opacities",
+        "missing domain/closure yields explicit status"
+      ],
+      "failure": [
+        "BLOCKED_CONSUMER_CONTRACT: missing closure orphysicalscope",
+        "FAIL_LEDGER: double heating/photon absorption"
+      ],
+      "claims": {
+        "allowed": [
+          "literature-supported source parameters",
+          "derived conservation and units",
+          "implementation result only after recorded execution"
+        ],
+        "forbidden": [
+          "rigorous true-rate uncertainty from source spread",
+          "full atomic programme complete",
+          "physical source admission from packet validator",
+          "photon moment inferred from scalar rate"
+        ]
+      },
+      "latest_evidence": "docs/atomic_reionization_handoff_20261004_v1/threads/BASS_HE/execution/HE_F2C_20261005T001658KST/RETURN.json",
+      "acceptance_scope": "EXPLICIT_CONDITIONAL_LOCAL_RHS_ONLY; default OFF; no time-integrator/physical admission",
+      "remaining_scope": "changed stepper contract and actual paired campaign remain consumer work; no new atomic source calculation"
+    },
+    {
+      "id": "HE-F3",
+      "title": "One paired sensitivity campaign and application-role closure",
+      "depends_on": [
+        "HE-F2"
+      ],
+      "external_dependencies": [
+        "REI_ATOMIC_SENSITIVITY_RESULT"
+      ],
+      "status": "WAITING_DEPENDENCIES",
+      "inputs": [
+        "REI-F09 combined paired atomic sensitivity result",
+        "off/KF96/GM25 scenario provenance",
+        "preregistered observable tolerance"
+      ],
+      "outputs": [
+        "PAIRED_SENSITIVITY.json",
+        "APPLICATION_CLOSEOUT_KO.md"
+      ],
+      "paths": [
+        "rei output namespace specified by consumer plan"
+      ],
+      "steps": [
+        "consume REI-F09 results; do not launch a separate HE campaign",
+        "verify same source scenario applied to paired FLRW/Bianchi",
+        "record source/model uncertainty separately from numeric certificate",
+        "review robustness and close HE supply role while keeping legacy exact gates"
+      ],
+      "commands": [],
+      "acceptance": [
+        "all outputs identify source+closure",
+        "paired difference uses shared source perturbation",
+        "no spread-as-confidence claim",
+        "onebounded campaign decides robust/notrobust",
+        "remaininguncertaintyandtriggers recorded"
+      ],
+      "failure": [
+        "NOT_ROBUST: reopen one affectedprocess",
+        "BLOCKED_RUNTIME: preserve logs, notphysicalfailure",
+        "NUMERICAL_GATE_FAIL: do notclaim scientific result"
+      ],
+      "claims": {
+        "allowed": [
+          "literature-supported source parameters",
+          "derived conservation and units",
+          "implementation result only after recorded execution"
+        ],
+        "forbidden": [
+          "rigorous true-rate uncertainty from source spread",
+          "full atomic programme complete",
+          "physical source admission from packet validator",
+          "photon moment inferred from scalar rate"
+        ]
+      }
+    },
+    {
+      "id": "HE-L1",
+      "title": "Thermal RCT B5C3 extension",
+      "depends_on": [],
+      "external_dependencies": [
+        "EXPLICIT_REOPEN_TRIGGER"
+      ],
+      "status": "PARKED_OPEN",
+      "inputs": [
+        "LEGACY_LANE.json",
+        "sensitivity/domain/moment need"
+      ],
+      "outputs": [
+        "new scoped provider or unresolved record"
+      ],
+      "paths": [],
+      "steps": [
+        "read only matched legacy route",
+        "preserve existing open gates and originalDAG",
+        "complete one bounded node",
+        "test replacement against providercontract"
+      ],
+      "commands": [],
+      "acceptance": [
+        "trigger recorded",
+        "old source remainsreproducible",
+        "provider replacement explicit",
+        "new claim scoped to actualevidence"
+      ],
+      "failure": [
+        "legacy gatefails: preserve failure, no impactonindependent externalprovider"
+      ],
+      "claims": {
+        "allowed": [
+          "literature-supported source parameters",
+          "derived conservation and units",
+          "implementation result only after recorded execution"
+        ],
+        "forbidden": [
+          "rigorous true-rate uncertainty from source spread",
+          "full atomic programme complete",
+          "physical source admission from packet validator",
+          "photon moment inferred from scalar rate"
+        ]
+      }
+    },
+    {
+      "id": "HE-L2",
+      "title": "Public fast-ion population extension",
+      "depends_on": [],
+      "external_dependencies": [
+        "EXPLICIT_REOPEN_TRIGGER"
+      ],
+      "status": "PARKED_OPEN",
+      "inputs": [
+        "LEGACY_LANE.json",
+        "nonthermal projectile need"
+      ],
+      "outputs": [
+        "new scoped provider or unresolved record"
+      ],
+      "paths": [],
+      "steps": [
+        "read only matched legacy route",
+        "preserve existing open gates and originalDAG",
+        "complete one bounded node",
+        "test replacement against providercontract"
+      ],
+      "commands": [],
+      "acceptance": [
+        "trigger recorded",
+        "old source remainsreproducible",
+        "provider replacement explicit",
+        "new claim scoped to actualevidence"
+      ],
+      "failure": [
+        "legacy gatefails: preserve failure, no impactonindependent externalprovider"
+      ],
+      "claims": {
+        "allowed": [
+          "literature-supported source parameters",
+          "derived conservation and units",
+          "implementation result only after recorded execution"
+        ],
+        "forbidden": [
+          "rigorous true-rate uncertainty from source spread",
+          "full atomic programme complete",
+          "physical source admission from packet validator",
+          "photon moment inferred from scalar rate"
+        ]
+      }
+    },
+    {
+      "id": "HE-L3",
+      "title": "Original coherent/continuum extension",
+      "depends_on": [],
+      "external_dependencies": [
+        "EXPLICIT_REOPEN_TRIGGER"
+      ],
+      "status": "PARKED_OPEN",
+      "inputs": [
+        "LEGACY_LANE.json",
+        "phase/state/continuum observable need"
+      ],
+      "outputs": [
+        "new scoped provider or unresolved record"
+      ],
+      "paths": [],
+      "steps": [
+        "read only matched legacy route",
+        "preserve existing open gates and originalDAG",
+        "complete one bounded node",
+        "test replacement against providercontract"
+      ],
+      "commands": [],
+      "acceptance": [
+        "trigger recorded",
+        "old source remainsreproducible",
+        "provider replacement explicit",
+        "new claim scoped to actualevidence"
+      ],
+      "failure": [
+        "legacy gatefails: preserve failure, no impactonindependent externalprovider"
+      ],
+      "claims": {
+        "allowed": [
+          "literature-supported source parameters",
+          "derived conservation and units",
+          "implementation result only after recorded execution"
+        ],
+        "forbidden": [
+          "rigorous true-rate uncertainty from source spread",
+          "full atomic programme complete",
+          "physical source admission from packet validator",
+          "photon moment inferred from scalar rate"
+        ]
+      }
+    }
+  ],
+  "cross_repo_dependency_resolution": "External symbolic keys must be mapped to the root global DAG; they are not fulfilled by this JSON.",
+  "execution_this_chat": "PREWORK_CHECKS only; implementation and physical runtime future",
+  "return_schema": "../../common/RETURN_CONTRACT.schema.json",
+  "external_dependency_aliases": {
+    "REI_ATOMIC_SENSITIVITY_RESULT": "REI-F09"
+  },
+  "nonblocking_baseline_rule": "HE-F2 incompleteness blocks only optional REI-F09 atomic sensitivity; REI-F08 baseline may continue under its explicit scope",
+  "initial_first_task": "HE-F1",
+  "latest_execution": {
+    "task_id": "HE-F1",
+    "state": "completed",
+    "result_path": "runs/HE-F1_20261004/RETURN.json",
+    "physical_runtime": false
+  }
+}

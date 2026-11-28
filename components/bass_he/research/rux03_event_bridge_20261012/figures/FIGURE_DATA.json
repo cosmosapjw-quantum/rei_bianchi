@@ -1,0 +1,242 @@
+{
+  "task": "HERE_RUX03_EVENT_BRIDGE_02",
+  "artifact": "Existing actual result scientific figure",
+  "source_files": {
+    "probe_validation": {
+      "path": "event_bridge_02_work/evidence/probe_v2_complete_inputs/VALIDATION.json",
+      "sha256": "14ac2d2b528b188c45bf156487d5a55773603ee3668c16e6257cd2c5da1040b7",
+      "bytes": 34346
+    },
+    "initial_native_events": {
+      "path": "event_bridge_02_work/evidence/probe_v2_complete_inputs/initial_IC/EVENTS.response.json",
+      "sha256": "f1a1d498be397c3cc65988d7b656ce7908cdd6053c027a660a85de7f8c76e795",
+      "bytes": 1157
+    },
+    "production_interval": {
+      "path": "event_bridge_02_work/evidence/production_interval_v2/production_interval.json",
+      "sha256": "94da6a47431c03c5f969ae2bd33ebee29dec3a443b48e67834272df5af30f2c0",
+      "bytes": 26995
+    },
+    "production_dataset": {
+      "path": "event_bridge_02_work/evidence/production_interval_v2/production_dataset.npz",
+      "sha256": "3cbf35cf7910c37083de4c5b9db443c71b272f3877a48f74fb9f852fd70fe2be",
+      "bytes": 188284
+    },
+    "independent_decimal60_oracle": {
+      "path": "event_bridge_preparation_02/EVENT_REFERENCE_1STAGE.json",
+      "sha256": "57c0ad93cc2cfe8edebf4728bb4405e2457ca5f77e90137896c0132222d7522f",
+      "bytes": 11311
+    }
+  },
+  "figure_files": [
+    {
+      "path": "event_bridge_02_work/dossier/figures/EVENT_BRIDGE_SCIENTIFIC_SUMMARY.png",
+      "sha256": "997278150c7bf0ad85476ec3236b5fbf4ee0b823819d5162da1b9402df0b97d4",
+      "bytes": 324572
+    },
+    {
+      "path": "event_bridge_02_work/dossier/figures/EVENT_BRIDGE_SCIENTIFIC_SUMMARY.svg",
+      "sha256": "1d3781566805376923cc6d9f2865036700d71657ef9965a6dc7be1f52d762919",
+      "bytes": 54187
+    },
+    {
+      "path": "event_bridge_02_work/dossier/figures/EVENT_BRIDGE_SCIENTIFIC_SUMMARY.pdf",
+      "sha256": "f20a9d4a91a6ec731a7df7f2d34e00d0d89ac547b9046283873dde3ad05cf135",
+      "bytes": 34093
+    }
+  ],
+  "generator": {
+    "path": "event_bridge_02_work/dossier/figures/make_figure.py",
+    "sha256": "60531cec7fde8dee238df473ffd4b71281a3b1af5b3d14a5ddcb9eef835d4d95",
+    "bytes": 12274
+  },
+  "scientific_scope": {
+    "closure": "HOMOGENEOUS_PRIMARY_ONLY_CASE_A_ESCAPE",
+    "scenario": "Selected retained warm extended 10..50000 eV interval, T0=50000 K",
+    "photon_nodes": 2904,
+    "q_eV_band": [
+      10,
+      50000
+    ],
+    "meaning": "Initial native gross events and component agreement with a separately prepared Decimal60 source-formula oracle; temperature is from the actual newly integrated production interval.",
+    "limits": "Agreement preserves the selected finite discrete model; it does not establish physical accuracy, continuum convergence, global admission, or a cold-temperature scenario.",
+    "production_validation_scope": "Production consumer agreement with the frozen discretization; historical empirical refinement reused; no continuum/global admission",
+    "presentation_execution": "Read existing JSON/NPZ and render only; no Rust execution, integration, oracle replay, or candidate modification.",
+    "final_admission_review": "Separate independent review; this figure supplies numerical evidence only."
+  },
+  "panels": {
+    "a": {
+      "quantity": "Initial proper gross event rates",
+      "units": "cm^-3 s^-1",
+      "edge_order": [
+        "HI<->HII",
+        "HeI<->HeII",
+        "HeII<->HeIII"
+      ],
+      "direction": {
+        "CI": "lower->upper",
+        "PI": "lower->upper",
+        "RR": "upper->lower",
+        "DR": "HeII->HeI"
+      },
+      "rates": {
+        "CI": [
+          5.799170187923744e-23,
+          2.968365607054261e-25,
+          1.3067815323299463e-24
+        ],
+        "RR": [
+          4.821300917710254e-22,
+          4.302161116644341e-23,
+          6.575624612687481e-24
+        ],
+        "PI": [
+          4.241383898932613e-22,
+          4.707427854136463e-23,
+          5.26884308035756e-24
+        ],
+        "DR": [
+          null,
+          4.349503935724545e-24,
+          null
+        ]
+      },
+      "DR_uncombined_channels": [
+        4.159085584304681e-24,
+        1.9041835141986339e-25
+      ],
+      "null_semantics": "The selected primitive bundle defines DR only for HeII->HeI; other edges are not plotted."
+    },
+    "b": {
+      "quantity": "Recorded maximum component relative error within each primitive group",
+      "formula": "max_j abs(native_j-oracle_j)/abs(oracle_j), within each displayed group",
+      "primitive_count": 22,
+      "group_order": [
+        "CI",
+        "RR",
+        "DR",
+        "PI",
+        "RR_kinetic",
+        "DR_kinetic",
+        "PI_heat",
+        "PI_absorbed_energy"
+      ],
+      "maximum_relative_errors": [
+        1.0942794551292369e-12,
+        1.9505015279246358e-16,
+        1.4131644167870725e-15,
+        1.0928581777113793e-12,
+        1.5192101981966613e-16,
+        1.2677259482159772e-15,
+        1.0883723862341763e-12,
+        1.091669871763885e-12
+      ],
+      "tolerance": 3e-11,
+      "comparison_stage": "initial_IC only",
+      "precision_scope": "Decimal equations on decimal representations of saved float data and published implementation constants, not bitwise Rust parity or physical accuracy. Use componentwise/absolute-event scales for cancellation-sensitive checks."
+    },
+    "c": {
+      "quantity": "Temperature change of the actual new production integration",
+      "time_s": [
+        0.0,
+        6250000000.0,
+        12500000000.0,
+        18750000000.0,
+        25000000000.0,
+        31250000000.0,
+        37500000000.0,
+        43750000000.0,
+        50000000000.0,
+        56250000000.0,
+        62500000000.0,
+        68750000000.0,
+        75000000000.0,
+        81250000000.0,
+        87500000000.0,
+        93750000000.0,
+        100000000000.0
+      ],
+      "temperature_K": [
+        50000.0,
+        49999.98606698422,
+        49999.972134012605,
+        49999.95820108513,
+        49999.9442682018,
+        49999.93033536262,
+        49999.91640256756,
+        49999.90246981668,
+        49999.88853710992,
+        49999.874604447316,
+        49999.860671828814,
+        49999.84673925447,
+        49999.832806724255,
+        49999.81887423817,
+        49999.80494179623,
+        49999.791009398396,
+        49999.7770770447
+      ],
+      "delta_temperature_K": [
+        0.0,
+        -0.013933015783550218,
+        -0.02786598739476176,
+        -0.041798914870014414,
+        -0.05573179820203222,
+        -0.06966463738353923,
+        -0.0835974324363633,
+        -0.0975301833168487,
+        -0.11146289008320309,
+        -0.12539555268449476,
+        -0.13932817118620733,
+        -0.15326074553013314,
+        -0.167193275745376,
+        -0.18112576183193596,
+        -0.1950582037679851,
+        -0.20899060160445515,
+        -0.22292295529769035
+      ],
+      "plotting_rule": "Straight line joins between the 17 saved integration outputs; no fitted trajectory or new solve.",
+      "dataset_shapes": {
+        "q_eV": [
+          2904
+        ],
+        "mu0": [
+          2904
+        ],
+        "weights": [
+          2904
+        ],
+        "initial_state": [
+          2913
+        ],
+        "times_s": [
+          17
+        ],
+        "states": [
+          2913,
+          17
+        ]
+      }
+    }
+  },
+  "derived_displayed_numbers": {
+    "initial_temperature_K": 50000.0,
+    "final_temperature_K": 49999.7770770447,
+    "final_delta_temperature_K": -0.22292295529769035,
+    "delta_temperature_label": "-0.2229 K",
+    "maximum_component_relative_error": 1.0942794551292369e-12,
+    "maximum_error_label": "1.094e-12",
+    "component_tolerance": 3e-11,
+    "DR_sum_cm3_s": 4.349503935724545e-24,
+    "saved_output_count": 17,
+    "time_start_s": 0.0,
+    "time_end_s": 100000000000.0
+  },
+  "additional_context_not_shown_as_physical_certificate": {
+    "production_status": "PASS_SCOPED",
+    "probe_status": "PASS_SCOPED",
+    "reported_preserved_solution_state_scaled_max": 0.0,
+    "reported_preserved_observable_max_error": 0.0,
+    "relative_temperature_change": -4.458459105953807e-06,
+    "tolerance_over_maximum_component_error": 27.41530041469794
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "he_ang.ccc_exchange.contract.v1",
+  "unit_id": "HE-ANG-CCC-EXCHANGE",
+  "workflow": "physmath-research-loop 1.0.0 user-selected built-in",
+  "base": "c8f5818c61d14872837abf7e9bc1a73c670ae25c",
+  "repository": "cosmosapjw-quantum/BASS_HE",
+  "branch": "research/he-ang-ccc-exchange-20261024",
+  "objective": "Implement the source-specific equal-sharing CCC amplitude/phase/normalization intake algebra and preserve a real primary TP table's already-applied normalization.",
+  "scope": "Conditional arithmetic adapter and source-convention audit; genuine full H1 joint payload remains absent.",
+  "parent_status": "SOURCE_INPUT_PENDING",
+  "next_physical_input": "HE-ANG-SOURCE-PAYLOAD",
+  "allowed_path": "research/he_ang_ccc_exchange_20261024/",
+  "equations": "THEORY_KO.md Eqs.(1)-(6)",
+  "unit_inputs": ["source/PRIMARY_SOURCES.json", "source/Stelbovics1999_TableI.json"],
+  "implementation": {
+    "language": "Python stdlib scalar kernel; matplotlib only for plotting",
+    "functions": ["raw_pair_diagnostics(a,b,spin): stable scaled U,C,D and eta", "phase_intensity_interval(A,B): exact free-relative-phase range", "coherent_disk_interval(a,b,spin,error_a,error_b): deterministic complex-disc enclosure", "admit_equal_sharing_record(record): tagged raw_amplitudes or coherent_density or incoherent_intensities", "spin_average(records): exactly-once unpolarized weighting with common units/measure"],
+    "source_profile": "CCC_RAW_EQUAL_SHARING only; source unit and differential measure required; explicit exact equal outgoing energies required for profile admission; physical_provider_admitted remains false",
+    "representations": ["raw_amplitudes: two complex values plus common phase provenance, unweighted spin", "coherent_density: already composed density, explicit spin_weight_applied boolean, no new factor2/4", "incoherent_intensities: two nonnegative squared amplitudes, interval only; no exact C"],
+    "no_automatic_operations": ["source phase reconstruction", "relative phase rephasing", "new energy interpolation", "full-event normalization", "extra 2!", "finite-mass recoil", "DDCS window recomputation", "zero-density conditional division"],
+    "numerics": "scale by maximum absolute real/imag component; compute coherent square directly; retain nonnegative quadratic values as frexp/ldexp mantissa/exponent; ordinary float null with status outside range; eta null at all-zero input; finite real/complex inputs only",
+    "table_intake": "Table I is already 4CCC, unweighted singlet TP energy DCS, pi*a0^2/Ry; preserve original strings and N/Npos; report comparisons to printed BRM only"
+  },
+  "acceptance": {
+    "scaled_numeric_tolerance": 5e-13,
+    "oracle": "independent Fraction or Decimal exact/precision controls; no oracle imported from kernel",
+    "must_cover": ["Eq26 sign counterexample", "both spins", "swap/common-phase invariance", "destructive and zero amplitudes", "extreme scales with representation flags", "weights once and weighted/unweighted equivalence", "free-phase sharp bounds", "complex-disc endpoints", "unequal-sharing and unit/measure mismatch rejected", "actual table unchanged normalization"],
+    "scientific_claim": "DERIVED / IMPLEMENTATION_VERIFIED / NUMERICALLY_CHECKED_SCOPED after actual results and independent C9",
+    "physical_provider_admitted": false,
+    "new_strong_no_go": false
+  },
+  "execution": {
+    "fresh_distinct_scope_allocation_cpu_s": 8,
+    "fresh_distinct_scope_allocation_wall_s": 30,
+    "old_allocations_transferred_or_reset": false,
+    "planned_children": [{"id":"01_tests","cpu_s":2,"wall_s":5},{"id":"02_source_analysis","cpu_s":2,"wall_s":5},{"id":"03_plot","cpu_s":2,"wall_s":10}],
+    "diagnosed_repair_reserve": {"children":1,"cpu_s":2,"wall_s":10},
+    "memory_bytes": 536870912,
+    "threads": 1,
+    "old_suite_runs": 0,
+    "new_IVP": 0,
+    "full_CCC_or_Hex_solve": 0,
+    "all_failures_and_started_children_charged": true,
+    "stop": "Stop at cap or substantive physical/convention ambiguity; retain incomplete START and raw output; repair only root-authorized changed dependency.",
+    "remote_symbolic": "One bounded Wolfram algebra call, timeConstraint=5; toolwall measured; total remote CPU UNKNOWN_NOT_ZERO unless actually observed; no old budget transfer."
+  },
+  "delegation": "Astra root owns equations/contract; gpt-6.1-sol requested for implementation/execution; separate Astra requested for R6/C9. Requested model and actual observed metadata recorded separately.",
+  "publication": {"after_independent_review":true,"expected_sha_required":true,"force":false,"draft":true,"merge":false,"activation":false},
+  "backup": "Create-only Dropbox and Drive checkpoints in existing dossier destinations; actual ACK/size readback; stage records reference checkpoints; no false future/self-SHA claim.",
+  "reused_without_replay": ["HE-X1 theory/32 fixtures/review", "HE-ANG-CONTRACT", "HE38", "HE-ANG-SOURCE-HEX-INTAKE", "HE-ANG-DDCS20-WINDOW"],
+  "preserved_open": ["C9-NB-01 partial mu_window theta metadata", "C23E central obligations", "other owner scoped results/OPEN contracts", "full H1 amplitude/event payload", "count/support/frame/recoil/uncertainty calibration"],
+  "total_physical_goal_completion_percent": null
+}

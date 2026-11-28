@@ -1,0 +1,1167 @@
+{
+  "schema": "bass-c2d-runtime-recovery-v1",
+  "utc": "2026-10-01T13:25:08.967534+00:00",
+  "status": "RECOVERED_MANUFACTURED_CHECKS_PASS",
+  "scope": "USER_OWNED_PREFIX; SINGLE_HOST_MPI_OB1_SELF_VADER; ZERO_PHYSICAL_CALCULATIONS",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "modules": {
+    "numpy": {
+      "version": "2.3.5",
+      "path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/numpy/__init__.py"
+    },
+    "scipy": {
+      "version": "1.17.0",
+      "path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/__init__.py"
+    },
+    "mpi4py": {
+      "version": "4.1.2",
+      "path": "/root/.local/lib/python3.12/site-packages/mpi4py/__init__.py"
+    }
+  },
+  "environment": {
+    "LD_LIBRARY_PATH": "/workspace/scratch/0b54847633d9/ncp_build_deps/root/usr/lib/x86_64-linux-gnu:/workspace/scratch/0b54847633d9/ncp_build_deps/root/usr/lib/x86_64-linux-gnu/openmpi/lib",
+    "OPAL_PREFIX": "/workspace/scratch/0b54847633d9/ncp_build_deps/root/usr",
+    "OMPI_ALLOW_RUN_AS_ROOT": "1",
+    "OMPI_ALLOW_RUN_AS_ROOT_CONFIRM": "1",
+    "OMPI_MCA_pml": "ob1",
+    "OMPI_MCA_btl": "self,vader",
+    "OMPI_MCA_btl_vader_single_copy_mechanism": "none",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "PMIX_MCA_mca_base_component_path": "/workspace/scratch/0b54847633d9/ncp_build_deps/root/usr/lib/x86_64-linux-gnu/pmix2/lib/pmix",
+    "OMPI_MCA_osc": "pt2pt"
+  },
+  "checks": [
+    {
+      "command": [
+        "/workspace/scratch/0b54847633d9/ncp_build_deps/gfortran",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+      "stderr": "",
+      "pass": true
+    },
+    {
+      "command": [
+        "/workspace/scratch/0b54847633d9/ncp_build_deps/root/usr/bin/mpirun.openmpi",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "mpirun.openmpi (OpenRTE) 4.1.6\n\nReport bugs to http://www.open-mpi.org/community/help/\n",
+      "stderr": "",
+      "pass": true
+    },
+    {
+      "command": [
+        "/workspace/scratch/0b54847633d9/ncp_build_deps/manufactured"
+      ],
+      "returncode": 0,
+      "stdout": " MANUFACTURED_SUM_PASS   204.00000000000000                1\n",
+      "stderr": "",
+      "pass": true
+    },
+    {
+      "command": [
+        "/workspace/scratch/0b54847633d9/ncp_build_deps/root/usr/bin/mpirun.openmpi",
+        "--host",
+        "localhost:2",
+        "--np",
+        "2",
+        "--map-by",
+        "slot:PE=1",
+        "--bind-to",
+        "none",
+        "--nooversubscribe",
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "/workspace/scratch/0b54847633d9/ncp_build_deps/manufactured_mpi.py"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\": \"MANUFACTURED_MPI_PASS\", \"rank\": 0, \"size\": 2, \"integer_sum\": 3}\n{\"status\": \"MANUFACTURED_MPI_PASS\", \"rank\": 1, \"size\": 2, \"integer_sum\": 3}\n",
+      "stderr": "",
+      "pass": true
+    },
+    {
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-c",
+        "from mpi4py import MPI; print(MPI.Get_library_version())"
+      ],
+      "returncode": 0,
+      "stdout": "Open MPI v4.1.6, package: Debian OpenMPI, ident: 4.1.6, repo rev: v4.1.6, Sep 30, 2023\u0000\n",
+      "stderr": "",
+      "pass": true
+    }
+  ],
+  "native_identity": {
+    "backend": "native",
+    "libraries": {
+      "prolate": {
+        "library": "/workspace/scratch/0b54847633d9/BASS_HE_C2C_SMALL_R_SCALED_20261001_v1/native/build/libbass_prolate.so",
+        "library_sha256": "fe8125cc860c627cd114ad2291154490b352796f491a787db8b6c7e4f377cfa3",
+        "build_manifest": "/workspace/scratch/0b54847633d9/BASS_HE_C2C_SMALL_R_SCALED_20261001_v1/native/build/libbass_prolate.build.json",
+        "build": {
+          "schema": "bass-prolate-build-v1",
+          "built_utc": "2026-10-01T07:05:32.648656+00:00",
+          "mode": "strict",
+          "native_cpu_isa": false,
+          "compiler_path": "/workspace/scratch/0b54847633d9/ncp_build_deps/gfortran",
+          "compiler_version": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+          "compiler_target": "x86_64-linux-gnu",
+          "compiler_sha256": "8bde49bb6dc881215709ffec926081b9f6942d3c5916e9daae1b1789c24028d6",
+          "compiler_sha256_scope": "invoked compiler path; may be a toolchain wrapper",
+          "fortran_frontend_path": "/workspace/scratch/0b54847633d9/ncp_build_deps/root/usr/libexec/gcc/x86_64-linux-gnu/13/f951",
+          "fortran_frontend_sha256": "9c86153267d3b556b4c74c204f775737b39e2bdd611c62a39c71714cde6acb1d",
+          "flags": [
+            "-O3",
+            "-std=f2008",
+            "-fPIC",
+            "-shared",
+            "-fopenmp",
+            "-fno-fast-math",
+            "-ffp-contract=off",
+            "-fno-associative-math",
+            "-Wall",
+            "-Wextra"
+          ],
+          "command": [
+            "/workspace/scratch/0b54847633d9/ncp_build_deps/gfortran",
+            "-O3",
+            "-std=f2008",
+            "-fPIC",
+            "-shared",
+            "-fopenmp",
+            "-fno-fast-math",
+            "-ffp-contract=off",
+            "-fno-associative-math",
+            "-Wall",
+            "-Wextra",
+            "-fopt-info-vec-optimized=/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/build/bass-native-krkn8wwz/vectorization.txt",
+            "-J",
+            "/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/build/bass-native-krkn8wwz",
+            "/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/prolate_observables.f90",
+            "-o",
+            "/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/build/bass-native-krkn8wwz/libbass_prolate.so"
+          ],
+          "source": "prolate_observables.f90",
+          "source_sha256": "860aca39f84bcbbfbdcc9d72f2a533075489a1538d0ee1b64cbeaf73f1604856",
+          "library_sha256": "fe8125cc860c627cd114ad2291154490b352796f491a787db8b6c7e4f377cfa3",
+          "library_bytes": 16048,
+          "machine": "x86_64",
+          "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+          "build_stdout": "",
+          "build_stderr": "",
+          "vectorization_report": "/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/prolate_observables.f90:93:36: optimized: loop vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/prolate_observables.f90:96:24: optimized: basic block part vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/prolate_observables.f90:96:24: optimized: basic block part vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/prolate_observables.f90:52:36: optimized: loop vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/prolate_observables.f90:55:24: optimized: basic block part vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/prolate_observables.f90:55:24: optimized: basic block part vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/prolate_observables.f90:55:24: optimized: basic block part vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/prolate_observables.f90:103:34: optimized: loop vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/prolate_observables.f90:62:34: optimized: loop vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2_FINITE_R_AUDIT_20261001_v1/native/prolate_observables.f90:26:86: optimized: basic block part vectorized using 16 byte vectors\n",
+          "arithmetic_contract": "binary64; fixed point/patch order; no reassociation/FMA contraction; SIMD independent entries",
+          "abi": 1
+        }
+      },
+      "inner": {
+        "library": "/workspace/scratch/0b54847633d9/BASS_HE_C2C_SMALL_R_SCALED_20261001_v1/native/build/libbass_inner.so",
+        "library_sha256": "5c58a3be92c554d1d9e2a85f6953670d892def0c84d670af0d9a1f014e903ca6",
+        "build_manifest_sha256": "89a8da001628a502337dff6dd7f8e7242c1a258074dfdc0ef030f3811731c10f",
+        "build": {
+          "schema": "bass-inner-build-v1",
+          "built_utc": "2026-10-01T11:01:07.301137+00:00",
+          "mode": "strict",
+          "native_cpu_isa": false,
+          "compiler_path": "/workspace/scratch/0b54847633d9/ncp_build_deps/gfortran",
+          "compiler_version": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+          "compiler_target": "x86_64-linux-gnu",
+          "compiler_sha256": "8bde49bb6dc881215709ffec926081b9f6942d3c5916e9daae1b1789c24028d6",
+          "compiler_sha256_scope": "invoked compiler path; may be a toolchain wrapper",
+          "fortran_frontend_path": "/workspace/scratch/0b54847633d9/ncp_build_deps/root/usr/libexec/gcc/x86_64-linux-gnu/13/f951",
+          "fortran_frontend_sha256": "9c86153267d3b556b4c74c204f775737b39e2bdd611c62a39c71714cde6acb1d",
+          "flags": [
+            "-O3",
+            "-std=f2008",
+            "-fPIC",
+            "-shared",
+            "-fopenmp",
+            "-fno-fast-math",
+            "-ffp-contract=off",
+            "-fno-associative-math",
+            "-Wall",
+            "-Wextra"
+          ],
+          "command": [
+            "/workspace/scratch/0b54847633d9/ncp_build_deps/gfortran",
+            "-O3",
+            "-std=f2008",
+            "-fPIC",
+            "-shared",
+            "-fopenmp",
+            "-fno-fast-math",
+            "-ffp-contract=off",
+            "-fno-associative-math",
+            "-Wall",
+            "-Wextra",
+            "-fopt-info-vec-optimized=/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/build/bass-native-4xg_tk4v/vectorization.txt",
+            "-J",
+            "/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/build/bass-native-4xg_tk4v",
+            "/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/inner_product.f90",
+            "-o",
+            "/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/build/bass-native-4xg_tk4v/libbass_inner.so"
+          ],
+          "source": "inner_product.f90",
+          "source_sha256": "25996c72f96822e34c5ca82bee0c79e0583b9900eba18265e92399321f7e8245",
+          "library_sha256": "5c58a3be92c554d1d9e2a85f6953670d892def0c84d670af0d9a1f014e903ca6",
+          "library_bytes": 16768,
+          "machine": "x86_64",
+          "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+          "build_stdout": "",
+          "build_stderr": "",
+          "vectorization_report": "/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/inner_product.f90:31:11: optimized: loop vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/inner_product.f90:25:34: optimized: loop vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/inner_product.f90:23:43: optimized: basic block part vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/inner_product.f90:23:43: optimized: basic block part vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/inner_product.f90:23:43: optimized: basic block part vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/inner_product.f90:23:43: optimized: basic block part vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/inner_product.f90:23:43: optimized: basic block part vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/inner_product.f90:23:43: optimized: basic block part vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/inner_product.f90:23:43: optimized: basic block part vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_C2B_INTEGRATION_CLOSURE_20261001_v1/native/inner_product.f90:23:43: optimized: basic block part vectorized using 16 byte vectors\n",
+          "arithmetic_contract": "binary64; fixed point/patch order; no reassociation/FMA contraction; SIMD independent entries",
+          "abi": 1
+        }
+      },
+      "element": {
+        "library": "/workspace/scratch/0b54847633d9/BASS_HE_C2C_SMALL_R_SCALED_20261001_v1/native/build/libbass_element.so",
+        "library_sha256": "fbbdfdaacd2a452966ef6e23a0a37a537fd1eaaf17dec82c68885f05f1066aa6",
+        "build": {
+          "schema": "bass-native-build-v1",
+          "built_utc": "2026-10-01T05:33:40.115032+00:00",
+          "mode": "strict",
+          "native_cpu_isa": false,
+          "compiler_path": "/workspace/scratch/0b54847633d9/ncp_build_deps/gfortran",
+          "compiler_version": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+          "compiler_target": "x86_64-linux-gnu",
+          "compiler_sha256": "8bde49bb6dc881215709ffec926081b9f6942d3c5916e9daae1b1789c24028d6",
+          "compiler_sha256_scope": "invoked compiler path; may be a toolchain wrapper",
+          "fortran_frontend_path": "/workspace/scratch/0b54847633d9/ncp_build_deps/root/usr/libexec/gcc/x86_64-linux-gnu/13/f951",
+          "fortran_frontend_sha256": "9c86153267d3b556b4c74c204f775737b39e2bdd611c62a39c71714cde6acb1d",
+          "flags": [
+            "-O3",
+            "-std=f2008",
+            "-fPIC",
+            "-shared",
+            "-fopenmp",
+            "-fno-fast-math",
+            "-ffp-contract=off",
+            "-fno-associative-math",
+            "-Wall",
+            "-Wextra"
+          ],
+          "command": [
+            "/workspace/scratch/0b54847633d9/ncp_build_deps/gfortran",
+            "-O3",
+            "-std=f2008",
+            "-fPIC",
+            "-shared",
+            "-fopenmp",
+            "-fno-fast-math",
+            "-ffp-contract=off",
+            "-fno-associative-math",
+            "-Wall",
+            "-Wextra",
+            "-fopt-info-vec-optimized=/workspace/scratch/0b54847633d9/BASS_HE_NCP64_OPTIMIZATION_20261001_v1/native/build/bass-native-g4bpne82/vectorization.txt",
+            "-J",
+            "/workspace/scratch/0b54847633d9/BASS_HE_NCP64_OPTIMIZATION_20261001_v1/native/build/bass-native-g4bpne82",
+            "/workspace/scratch/0b54847633d9/BASS_HE_NCP64_OPTIMIZATION_20261001_v1/native/element_assembly.f90",
+            "-o",
+            "/workspace/scratch/0b54847633d9/BASS_HE_NCP64_OPTIMIZATION_20261001_v1/native/build/bass-native-g4bpne82/libbass_element.so"
+          ],
+          "source": "element_assembly.f90",
+          "source_sha256": "81a106b6f46731e7a16bf70c73236c9c410348ef066f38c3a1b7ece3709b6659",
+          "library_sha256": "fbbdfdaacd2a452966ef6e23a0a37a537fd1eaaf17dec82c68885f05f1066aa6",
+          "library_bytes": 20464,
+          "machine": "x86_64",
+          "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+          "build_stdout": "",
+          "build_stderr": "",
+          "vectorization_report": "/workspace/scratch/0b54847633d9/BASS_HE_NCP64_OPTIMIZATION_20261001_v1/native/element_assembly.f90:87:82: optimized: loop vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_NCP64_OPTIMIZATION_20261001_v1/native/element_assembly.f90:77:52: optimized: loop vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_NCP64_OPTIMIZATION_20261001_v1/native/element_assembly.f90:43:72: optimized: loop vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_NCP64_OPTIMIZATION_20261001_v1/native/element_assembly.f90:43:72: optimized: loop vectorized using 16 byte vectors\n/workspace/scratch/0b54847633d9/BASS_HE_NCP64_OPTIMIZATION_20261001_v1/native/element_assembly.f90:29:88: optimized: basic block part vectorized using 16 byte vectors\n",
+          "arithmetic_contract": "binary64; fixed k/q order; no reassociation/FMA contraction; SIMD independent entries",
+          "abi": 3
+        },
+        "abi": 3
+      }
+    }
+  },
+  "host": {
+    "schema": 1,
+    "logical_cpu_count_os": 9,
+    "affinity_cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "allowed_logical_cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "allowed_logical_cpu_count": 9,
+    "observed_physical_core_count": 9,
+    "cpu_quota_cores": 8.0,
+    "logical_cpu_budget": 8,
+    "core_binding_cpu_budget": 8,
+    "topology": [
+      {
+        "logical_cpu": 0,
+        "package_id": "0",
+        "core_id": "0"
+      },
+      {
+        "logical_cpu": 1,
+        "package_id": "0",
+        "core_id": "1"
+      },
+      {
+        "logical_cpu": 2,
+        "package_id": "0",
+        "core_id": "2"
+      },
+      {
+        "logical_cpu": 3,
+        "package_id": "0",
+        "core_id": "3"
+      },
+      {
+        "logical_cpu": 4,
+        "package_id": "0",
+        "core_id": "4"
+      },
+      {
+        "logical_cpu": 5,
+        "package_id": "0",
+        "core_id": "5"
+      },
+      {
+        "logical_cpu": 6,
+        "package_id": "0",
+        "core_id": "6"
+      },
+      {
+        "logical_cpu": 7,
+        "package_id": "0",
+        "core_id": "7"
+      },
+      {
+        "logical_cpu": 8,
+        "package_id": "0",
+        "core_id": "8"
+      }
+    ],
+    "cgroup_v2": [
+      {
+        "path": "/sys/fs/cgroup",
+        "cpuset.cpus.effective": "0-8",
+        "cpu.max": "800000 100000",
+        "memory.max": 8589934592,
+        "memory.current.before": 2326077440,
+        "memory.current.after": 2326077440,
+        "memory.current": 2326077440,
+        "memory.accounting": {
+          "policy": "raw-headroom",
+          "raw_headroom_bytes": 6263857152,
+          "clean_file_candidate_bytes": 0,
+          "credited_bytes": 0,
+          "available_estimate_bytes": 6263857152,
+          "credit_reason": "RAW_HEADROOM_DEFAULT",
+          "memory.stat.raw": "anon 322256896\nfile 1806282752\nkernel 196202496\nkernel_stack 2998272\npagetables 12750848\nsec_pagetables 0\npercpu 10604\nsock 0\nvmalloc 4096\nshmem 262144\nfile_mapped 1597440\nfile_dirty 74035200\nfile_writeback 0\nswapcached 0\nanon_thp 0\nfile_thp 127926272\nshmem_thp 0\ninactive_anon 322019328\nactive_anon 299008\ninactive_file 492687360\nactive_file 1313333248\nunevictable 0\nslab_reclaimable 175159480\nslab_unreclaimable 3263152\nslab 178422632\nworkingset_refault_anon 0\nworkingset_refault_file 5744771\nworkingset_activate_anon 0\nworkingset_activate_file 1659978\nworkingset_restore_anon 0\nworkingset_restore_file 556931\nworkingset_nodereclaim 0\npgdemote_kswapd 0\npgdemote_direct 0\npgdemote_khugepaged 0\npgdemote_proactive 0\npgscan 9187258\npgsteal 8708872\npswpin 0\npswpout 0\npgscan_kswapd 0\npgscan_direct 9187258\npgscan_khugepaged 0\npgscan_proactive 0\npgsteal_kswapd 0\npgsteal_direct 8708872\npgsteal_khugepaged 0\npgsteal_proactive 0\npgfault 342712944\npgmajfault 3091\npgrefill 4350523\npgactivate 6213660\npgdeactivate 4207691\npglazyfree 410\npglazyfreed 0\nswpin_zero 0\nswpout_zero 0\nthp_fault_alloc 36998\nthp_collapse_alloc 95\nthp_swpout 0\nthp_swpout_fallback 0",
+          "memory.stat": {
+            "anon": 322256896,
+            "file": 1806282752,
+            "kernel": 196202496,
+            "kernel_stack": 2998272,
+            "pagetables": 12750848,
+            "sec_pagetables": 0,
+            "percpu": 10604,
+            "sock": 0,
+            "vmalloc": 4096,
+            "shmem": 262144,
+            "file_mapped": 1597440,
+            "file_dirty": 74035200,
+            "file_writeback": 0,
+            "swapcached": 0,
+            "anon_thp": 0,
+            "file_thp": 127926272,
+            "shmem_thp": 0,
+            "inactive_anon": 322019328,
+            "active_anon": 299008,
+            "inactive_file": 492687360,
+            "active_file": 1313333248,
+            "unevictable": 0,
+            "slab_reclaimable": 175159480,
+            "slab_unreclaimable": 3263152,
+            "slab": 178422632,
+            "workingset_refault_anon": 0,
+            "workingset_refault_file": 5744771,
+            "workingset_activate_anon": 0,
+            "workingset_activate_file": 1659978,
+            "workingset_restore_anon": 0,
+            "workingset_restore_file": 556931,
+            "workingset_nodereclaim": 0,
+            "pgdemote_kswapd": 0,
+            "pgdemote_direct": 0,
+            "pgdemote_khugepaged": 0,
+            "pgdemote_proactive": 0,
+            "pgscan": 9187258,
+            "pgsteal": 8708872,
+            "pswpin": 0,
+            "pswpout": 0,
+            "pgscan_kswapd": 0,
+            "pgscan_direct": 9187258,
+            "pgscan_khugepaged": 0,
+            "pgscan_proactive": 0,
+            "pgsteal_kswapd": 0,
+            "pgsteal_direct": 8708872,
+            "pgsteal_khugepaged": 0,
+            "pgsteal_proactive": 0,
+            "pgfault": 342712944,
+            "pgmajfault": 3091,
+            "pgrefill": 4350523,
+            "pgactivate": 6213660,
+            "pgdeactivate": 4207691,
+            "pglazyfree": 410,
+            "pglazyfreed": 0,
+            "swpin_zero": 0,
+            "swpout_zero": 0,
+            "thp_fault_alloc": 36998,
+            "thp_collapse_alloc": 95,
+            "thp_swpout": 0,
+            "thp_swpout_fallback": 0
+          },
+          "memory.stat.error": null,
+          "memory.min": "0",
+          "memory.low": "0"
+        }
+      }
+    ],
+    "cgroup_status": "V2_VISIBLE_ANCESTRY_INSPECTED",
+    "host_memory_total_bytes": 10451464192,
+    "host_memory_available_bytes": 9349263360,
+    "cgroup_memory_limit_bytes": 8589934592,
+    "memory_available_budget_bytes": 6263857152,
+    "memory_raw_headroom_budget_bytes": 6263857152,
+    "memory_accounting_policy": "raw-headroom",
+    "memory_evidence": "SNAPSHOT_NOT_RESERVATION",
+    "topology_evidence": "GUEST_OS_REPORTED_NOT_NCP_PHYSICAL_HARDWARE_CERTIFICATE"
+  },
+  "layout_checks": [
+    {
+      "ranks": 2,
+      "status": "PASS",
+      "layout": {
+        "ranks": 2,
+        "threads_per_rank": 1,
+        "workers": 1,
+        "controller_rank": 0,
+        "reserved_core_slots": 2,
+        "core_slot_budget": 8,
+        "per_worker_memory_bytes": 1610612736,
+        "per_worker_memory_evidence": "CONFIGURED_RLIMIT_AS_NOT_MEASURED_PEAK_RSS",
+        "controller_memory_budget_bytes": 536870912,
+        "usable_memory_bytes": 5011085721,
+        "memory_headroom_fraction": 0.2,
+        "maximum_workers_from_memory": 2,
+        "estimated_worker_memory_bytes": 1610612736
+      }
+    },
+    {
+      "ranks": 3,
+      "status": "PASS",
+      "layout": {
+        "ranks": 3,
+        "threads_per_rank": 1,
+        "workers": 2,
+        "controller_rank": 0,
+        "reserved_core_slots": 3,
+        "core_slot_budget": 8,
+        "per_worker_memory_bytes": 1610612736,
+        "per_worker_memory_evidence": "CONFIGURED_RLIMIT_AS_NOT_MEASURED_PEAK_RSS",
+        "controller_memory_budget_bytes": 536870912,
+        "usable_memory_bytes": 5011085721,
+        "memory_headroom_fraction": 0.2,
+        "maximum_workers_from_memory": 2,
+        "estimated_worker_memory_bytes": 3221225472
+      }
+    },
+    {
+      "ranks": 4,
+      "status": "FAIL",
+      "reason": "3 workers exceed memory cap 2; reduce ranks or establish a smaller measured per-worker envelope"
+    }
+  ],
+  "compiler_wrapper": {
+    "path": "/workspace/scratch/0b54847633d9/ncp_build_deps/gfortran",
+    "bytes": 323,
+    "sha256": "005876624a40c83047d773d7b33a8312a00d79df3b74e64bb61de331f1d64f6b"
+  },
+  "fortran_frontend": {
+    "path": "/workspace/scratch/0b54847633d9/ncp_build_deps/root/usr/libexec/gcc/x86_64-linux-gnu/13/f951",
+    "bytes": 31989288,
+    "sha256": "9c86153267d3b556b4c74c204f775737b39e2bdd611c62a39c71714cde6acb1d"
+  },
+  "recovery_script": {
+    "path": "/workspace/scratch/0b54847633d9/ncp_build_deps/recover_toolchain.py",
+    "bytes": 2591,
+    "sha256": "6600bce54c0cdc019ebe237b458f31879519eabdd6f40bfccf3e28c30fa34d1b"
+  },
+  "package_manifest": [
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/main/libe/libevent/libevent-core-2.1-7t64_2.1.12-stable-9ubuntu2_amd64.deb",
+      "filename": "libevent-core-2.1-7t64_2.1.12-stable-9ubuntu2_amd64.deb",
+      "bytes": 91272,
+      "sha512": "64c9ee9a4f5ed72f02db232fbd55b29d4c7c2bf1627ca9838686630a54543d56bef5200da081257ef7911e98371bcf33959c44dc77466363394691246a68c69e",
+      "sha256": "3da51e864e4067779a2ba3a87daf5e4d8030c0aaa6291a1ce12483d4f73bf752",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/main/libe/libevent/libevent-pthreads-2.1-7t64_2.1.12-stable-9ubuntu2_amd64.deb",
+      "filename": "libevent-pthreads-2.1-7t64_2.1.12-stable-9ubuntu2_amd64.deb",
+      "bytes": 7982,
+      "sha512": "617779fd751a3530d73666df6c6af14015745640710b9c4c092db102e2d18f9fa81c6b290590da8334015068cd67fea8d4608b983ba30aca55c646fb29913902",
+      "sha256": "f9bf6e3681179df772eea7d04b98b597560c428c39b7fca05bfaf64691c327b1",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/universe/libf/libfabric/libfabric1_1.17.0-3build2_amd64.deb",
+      "filename": "libfabric1_1.17.0-3build2_amd64.deb",
+      "bytes": 656666,
+      "sha512": "f6efe15b435f54c418bbdfa40f24252ac6ef8219c27588a6a78b2400001e02067a44ffa68333b36d4e403fbf23169f5847afdd4b58947f692ff2dde153f1d1b3",
+      "sha256": "804fe1206ed62d370bc5f5b1714ddb75264012c4181fb46e493e262d3102f5ca",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/universe/h/hwloc/libhwloc-plugins_2.10.0-1build1_amd64.deb",
+      "filename": "libhwloc-plugins_2.10.0-1build1_amd64.deb",
+      "bytes": 15664,
+      "sha512": "15fa3bd575c5e05b3e509566c0526353063e25582c3a24c09c7c5d3628c3baf382d4b182e7577b903dc06feb87b597e913c4173c31a9df11ba0a8803750a5c50",
+      "sha256": "64ef2b2cdf1d657ee491583931648bd805e8dfb4097de8072946cb94efc6f352",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/universe/h/hwloc/libhwloc15_2.10.0-1build1_amd64.deb",
+      "filename": "libhwloc15_2.10.0-1build1_amd64.deb",
+      "bytes": 172340,
+      "sha512": "28f840bc204356269294c8e945bddd139ead21a614803e4d36ef98726556838954b81e1787af7cba85a4b25cb3dd7c65c05cde28f9d99d197cb1ff3c3cf67b03",
+      "sha256": "45acb4e6676f968d0f32ff1c5115cad0b61165931afa1a59282bda6f00d13c3b",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/universe/o/openmpi/libopenmpi3t64_4.1.6-7ubuntu2_amd64.deb",
+      "filename": "libopenmpi3t64_4.1.6-7ubuntu2_amd64.deb",
+      "bytes": 2563070,
+      "sha512": "983687e90a044d7193789b45ff0d6c3b45b4a3e2621d443dbb354671774fa6e385cff68f54f66a4b1496d76479969896000b895123bb607318ebf549b87ed109",
+      "sha256": "4709aa89fd1064c6df3b8e7e460f530d8f2df24937a1d8df8fbf4948b391e99b",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/universe/p/pmix/libpmix2t64_5.0.1-4.1build1_amd64.deb",
+      "filename": "libpmix2t64_5.0.1-4.1build1_amd64.deb",
+      "bytes": 697360,
+      "sha512": "3551616b6132d6e6f5c394faa59bf3a2fd8c3c5fc97cf020132a65911a8b60f02e6b1288483ab38f88161557fbf73507daa8cf2a122135ddb6b1d57b38ca11af",
+      "sha256": "54874f3e936e9862c2fdc2785a61e6e7220739228f911c150d41dffd788bedd0",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/universe/i/infinipath-psm/libpsm-infinipath1_3.3%2b20.604758e7-6.3build1_amd64.deb",
+      "filename": "libpsm-infinipath1_3.3+20.604758e7-6.3build1_amd64.deb",
+      "bytes": 178148,
+      "sha512": "e1edb2bb44a10a2df634d3799d5f55774fba280878bdd08a93829c90dad2cf3c55b6dcc59e13c945ac5248f284dce02c81d7ff34969a57c29913e918ffde27fe",
+      "sha256": "56e190ab22563014ed60bf9c15e20a46949dda21284ff32a5e5354addde6c6bc",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/universe/libp/libpsm2/libpsm2-2_11.2.185-2build1_amd64.deb",
+      "filename": "libpsm2-2_11.2.185-2build1_amd64.deb",
+      "bytes": 193594,
+      "sha512": "005a16472348b5332a256aff8cb41654c6331d06aa786f3bf5f376aa94cf267d51f136cffd0a3db9b58da6882cddd31b59a54ad755db32fce4c20b1cae6d9e94",
+      "sha256": "ff1c78b8feda2bb3537a8a2e93d5266be76c0c172b9e52dddc98509b7e18c420",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/universe/u/ucx/libucx0_1.16.0%2bds-5ubuntu1_amd64.deb",
+      "filename": "libucx0_1.16.0+ds-5ubuntu1_amd64.deb",
+      "bytes": 1139558,
+      "sha512": "958234812da56a01e30b0d918add4b8cba2c5fc919c45c3dec06118704a4ed2af15df488e13a37c7fe33e5d26fa42daaf2b4807ed73a140327d9b7cd1e9d8851",
+      "sha256": "1138ee6dd436a0111a7d5dbbad38ec4d82f3245bf3b32782973426ebf9b05e15",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/universe/o/openmpi/openmpi-bin_4.1.6-7ubuntu2_amd64.deb",
+      "filename": "openmpi-bin_4.1.6-7ubuntu2_amd64.deb",
+      "bytes": 113584,
+      "sha512": "758731eaa23b12df7232743333750668ea4b8a4186d4522afbf8d48b9d75bab4512da3a60b1f300aeb03063950ddba124f324d3c626d570862d8a24b81370d0a",
+      "sha256": "b99dc4516afc262ad59b52128784565bda9ef16bbe8de4500699d87ec67b1f34",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/universe/o/openmpi/openmpi-common_4.1.6-7ubuntu2_all.deb",
+      "filename": "openmpi-common_4.1.6-7ubuntu2_all.deb",
+      "bytes": 169738,
+      "sha512": "77341f77ced268b3597134f4ac2ba00cc96382c33a5ecfb33153eae666201f10e82c29662fb648d6c168203e245718b8b29f1661d221714f5110f4eb61f3e359",
+      "sha256": "1246554675cd86baa4e7e2e4195bed0f7a16d6538d484c347e2379f82791f821",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/main/g/gcc-13/gfortran-13-x86-64-linux-gnu_13.3.0-6ubuntu2%7e24.04.1_amd64.deb",
+      "filename": "gfortran-13-x86-64-linux-gnu_13.3.0-6ubuntu2~24.04.1_amd64.deb",
+      "bytes": 11408640,
+      "sha512": "1188224a7c27485b939874eca3a02ad86c9a5d0d134538ead20ea24d1119bf1c53c210b13f5fab214dc1c997f7b80377293ac0c19a2d4f02dd7148e64273f9c5",
+      "sha256": "82382cb8506616ef7df5b9927694bfaacf97bdfb317b1f995453cc17c96aa071",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/main/g/gcc-13/libgfortran-13-dev_13.3.0-6ubuntu2%7e24.04.1_amd64.deb",
+      "filename": "libgfortran-13-dev_13.3.0-6ubuntu2~24.04.1_amd64.deb",
+      "bytes": 928110,
+      "sha512": "d61a4559035db7290568fc0ed63a75bab7030169f6f2043dcb0a422989fa4f5ff2fc8534f9fb9df47ede9e09999cf94063fa978e4265271b82e2f9f361965fc8",
+      "sha256": "ce0fdf0d9e7eadb33947ca7cdd0fc3477b570603cb721b108c96ebdfbb7cd80a",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/main/r/rdma-core/libibverbs1_50.0-2ubuntu0.2_amd64.deb",
+      "filename": "libibverbs1_50.0-2ubuntu0.2_amd64.deb",
+      "bytes": 67960,
+      "sha512": "65db8e4b9aa85f36bb96f08d2a8b32fe7091b26baa0d9e44671483752e32cf30dbfafb90b6e361ad1be0a35863779929b20ab7ad8b92bf5b5daac5706e8a6895",
+      "sha256": "8489558105ee1d1c65ae6e0f1bac0e9b15f314a68f106ee9a63c89821242bd8e",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/main/libn/libnl3/libnl-route-3-200_3.7.0-0.3build1.1_amd64.deb",
+      "filename": "libnl-route-3-200_3.7.0-0.3build1.1_amd64.deb",
+      "bytes": 189094,
+      "sha512": "24826130770d398e0fe29116c3d7a5a98ddcbbd030e0101417c5ff6958a476ff3405409dfe6f663c01cc12db1760ec546f6241d5d64e0570debf87093bef915b",
+      "sha256": "c9dbd29cb7fdcf1a0587726cbc5432a7d3e81242108dfcfa2dd6716c44c74d4d",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/main/r/rdma-core/librdmacm1t64_50.0-2ubuntu0.2_amd64.deb",
+      "filename": "librdmacm1t64_50.0-2ubuntu0.2_amd64.deb",
+      "bytes": 70698,
+      "sha512": "e829302a2fea54f8bccfbbfe9f13caa4954118a8f8ff5b08ca09bd3939189f8e59b4f496a8e64d6f17cf8883ee60f078164354b3cb236ef737e5897d00406d89",
+      "sha256": "7b7cc2fa16564bf301751b43d05d16f0846288b080d9a25a92a691d0df33fc68",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    },
+    {
+      "url": "https://snapshot.ubuntu.com/ubuntu/20260828T000000Z/pool/universe/m/munge/libmunge2_0.5.15-4ubuntu0.1_amd64.deb",
+      "filename": "libmunge2_0.5.15-4ubuntu0.1_amd64.deb",
+      "bytes": 14846,
+      "sha512": "c333f2531e435a1dd5ab2ba808112026d330251118f34f23633227057f80b38b1b455459e7159bfedf0e01c179f66f6a47bd1f898731a3fbf35b5ff5dcb48cba",
+      "sha256": "1cd371adfbe0cb19bb2479a0fe2340a12b09d42bffbcb85d2beb9bb2d4ef09ca",
+      "identity": "APT_INDEX_SHA512_MATCH"
+    }
+  ],
+  "parent_sources_modified": false,
+  "parent_native_binaries_rebuilt": false,
+  "source_identity_impact": "No scientific source or native binary changed. Newly reconstructed compiler wrapper has its own SHA256; old build manifests retain historical wrapper identity.",
+  "preserved_incidents": [
+    {
+      "kind": "RUNTIME_PERMISSION",
+      "action": "apt-get download",
+      "outcome": "FAILED before transfer: _apt setgroups/setegid/seteuid unavailable",
+      "resolution": "No privilege or sandbox change. Download same apt-indexed public HTTPS package URLs through normal urllib/curl; validate indexed SHA512; dpkg-deb extract only."
+    },
+    {
+      "kind": "RUNTIME_DEPENDENCY",
+      "action": "Initial MPI singleton smoke",
+      "outcome": "FAILED missing libmunge.so.2",
+      "resolution": "Extract indexed libmunge2 into the same user-owned prefix."
+    },
+    {
+      "kind": "RUNTIME_CONFIGURATION",
+      "action": "Initial successful MPI smoke",
+      "outcome": "Nonfatal PMIx plugin-path and UCX network-enumeration warnings",
+      "resolution": "Explicit PMIX component directory; explicit OMPI osc=pt2pt. Final smoke stderr empty."
+    },
+    {
+      "kind": "REPORTING_ONLY_IMPLEMENTATION",
+      "action": "Inspector console summary",
+      "outcome": "After successful JSON write and all checks, KeyError accessing ABI field for prolate/inner",
+      "resolution": "Use build.abi fallback in console summary. No scientific source/result impact; no physical rerun."
+    }
+  ],
+  "limitations": [
+    "No physical NCP host accessed; no 64-core performance claim.",
+    "This verifies the selected local transport only, not every OpenMPI component or remote-network transport.",
+    "Memory probe is a snapshot, not a reservation; scientific launcher must freshly gate before executing.",
+    "gfortran wrapper uses host GCC 13 support objects and system libgfortran5 through one prefix-local symlink."
+  ],
+  "fresh_layout_preflight": {
+    "utc": "2026-10-01T13:25:41.081496+00:00",
+    "physical_workloads": 0,
+    "scope": "READ_ONLY_PREFLIGHT_SNAPSHOT",
+    "results": [
+      {
+        "policy": "raw-headroom",
+        "host": {
+          "schema": 1,
+          "logical_cpu_count_os": 9,
+          "affinity_cpus": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "allowed_logical_cpus": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "allowed_logical_cpu_count": 9,
+          "observed_physical_core_count": 9,
+          "cpu_quota_cores": 8.0,
+          "logical_cpu_budget": 8,
+          "core_binding_cpu_budget": 8,
+          "topology": [
+            {
+              "logical_cpu": 0,
+              "package_id": "0",
+              "core_id": "0"
+            },
+            {
+              "logical_cpu": 1,
+              "package_id": "0",
+              "core_id": "1"
+            },
+            {
+              "logical_cpu": 2,
+              "package_id": "0",
+              "core_id": "2"
+            },
+            {
+              "logical_cpu": 3,
+              "package_id": "0",
+              "core_id": "3"
+            },
+            {
+              "logical_cpu": 4,
+              "package_id": "0",
+              "core_id": "4"
+            },
+            {
+              "logical_cpu": 5,
+              "package_id": "0",
+              "core_id": "5"
+            },
+            {
+              "logical_cpu": 6,
+              "package_id": "0",
+              "core_id": "6"
+            },
+            {
+              "logical_cpu": 7,
+              "package_id": "0",
+              "core_id": "7"
+            },
+            {
+              "logical_cpu": 8,
+              "package_id": "0",
+              "core_id": "8"
+            }
+          ],
+          "cgroup_v2": [
+            {
+              "path": "/sys/fs/cgroup",
+              "cpuset.cpus.effective": "0-8",
+              "cpu.max": "800000 100000",
+              "memory.max": 8589934592,
+              "memory.current.before": 2290176000,
+              "memory.current.after": 2290176000,
+              "memory.current": 2290176000,
+              "memory.accounting": {
+                "policy": "raw-headroom",
+                "raw_headroom_bytes": 6299758592,
+                "clean_file_candidate_bytes": 0,
+                "credited_bytes": 0,
+                "available_estimate_bytes": 6299758592,
+                "credit_reason": "RAW_HEADROOM_DEFAULT",
+                "memory.stat.raw": "anon 285257728\nfile 1807777792\nkernel 196354048\nkernel_stack 2768896\npagetables 12349440\nsec_pagetables 0\npercpu 9900\nsock 0\nvmalloc 4096\nshmem 262144\nfile_mapped 1585152\nfile_dirty 16826368\nfile_writeback 0\nswapcached 0\nanon_thp 0\nfile_thp 127926272\nshmem_thp 0\ninactive_anon 284938240\nactive_anon 307200\ninactive_file 473382912\nactive_file 1334132736\nunevictable 0\nslab_reclaimable 175921248\nslab_unreclaimable 3277392\nslab 179198640\nworkingset_refault_anon 0\nworkingset_refault_file 5744771\nworkingset_activate_anon 0\nworkingset_activate_file 1659978\nworkingset_restore_anon 0\nworkingset_restore_file 556931\nworkingset_nodereclaim 0\npgdemote_kswapd 0\npgdemote_direct 0\npgdemote_khugepaged 0\npgdemote_proactive 0\npgscan 9187258\npgsteal 8708872\npswpin 0\npswpout 0\npgscan_kswapd 0\npgscan_direct 9187258\npgscan_khugepaged 0\npgscan_proactive 0\npgsteal_kswapd 0\npgsteal_direct 8708872\npgsteal_khugepaged 0\npgsteal_proactive 0\npgfault 343107911\npgmajfault 3091\npgrefill 4350523\npgactivate 6218885\npgdeactivate 4207691\npglazyfree 410\npglazyfreed 0\nswpin_zero 0\nswpout_zero 0\nthp_fault_alloc 36998\nthp_collapse_alloc 95\nthp_swpout 0\nthp_swpout_fallback 0",
+                "memory.stat": {
+                  "anon": 285257728,
+                  "file": 1807777792,
+                  "kernel": 196354048,
+                  "kernel_stack": 2768896,
+                  "pagetables": 12349440,
+                  "sec_pagetables": 0,
+                  "percpu": 9900,
+                  "sock": 0,
+                  "vmalloc": 4096,
+                  "shmem": 262144,
+                  "file_mapped": 1585152,
+                  "file_dirty": 16826368,
+                  "file_writeback": 0,
+                  "swapcached": 0,
+                  "anon_thp": 0,
+                  "file_thp": 127926272,
+                  "shmem_thp": 0,
+                  "inactive_anon": 284938240,
+                  "active_anon": 307200,
+                  "inactive_file": 473382912,
+                  "active_file": 1334132736,
+                  "unevictable": 0,
+                  "slab_reclaimable": 175921248,
+                  "slab_unreclaimable": 3277392,
+                  "slab": 179198640,
+                  "workingset_refault_anon": 0,
+                  "workingset_refault_file": 5744771,
+                  "workingset_activate_anon": 0,
+                  "workingset_activate_file": 1659978,
+                  "workingset_restore_anon": 0,
+                  "workingset_restore_file": 556931,
+                  "workingset_nodereclaim": 0,
+                  "pgdemote_kswapd": 0,
+                  "pgdemote_direct": 0,
+                  "pgdemote_khugepaged": 0,
+                  "pgdemote_proactive": 0,
+                  "pgscan": 9187258,
+                  "pgsteal": 8708872,
+                  "pswpin": 0,
+                  "pswpout": 0,
+                  "pgscan_kswapd": 0,
+                  "pgscan_direct": 9187258,
+                  "pgscan_khugepaged": 0,
+                  "pgscan_proactive": 0,
+                  "pgsteal_kswapd": 0,
+                  "pgsteal_direct": 8708872,
+                  "pgsteal_khugepaged": 0,
+                  "pgsteal_proactive": 0,
+                  "pgfault": 343107911,
+                  "pgmajfault": 3091,
+                  "pgrefill": 4350523,
+                  "pgactivate": 6218885,
+                  "pgdeactivate": 4207691,
+                  "pglazyfree": 410,
+                  "pglazyfreed": 0,
+                  "swpin_zero": 0,
+                  "swpout_zero": 0,
+                  "thp_fault_alloc": 36998,
+                  "thp_collapse_alloc": 95,
+                  "thp_swpout": 0,
+                  "thp_swpout_fallback": 0
+                },
+                "memory.stat.error": null,
+                "memory.min": "0",
+                "memory.low": "0"
+              }
+            }
+          ],
+          "cgroup_status": "V2_VISIBLE_ANCESTRY_INSPECTED",
+          "host_memory_total_bytes": 10451464192,
+          "host_memory_available_bytes": 9399001088,
+          "cgroup_memory_limit_bytes": 8589934592,
+          "memory_available_budget_bytes": 6299758592,
+          "memory_raw_headroom_budget_bytes": 6299758592,
+          "memory_accounting_policy": "raw-headroom",
+          "memory_evidence": "SNAPSHOT_NOT_RESERVATION",
+          "topology_evidence": "GUEST_OS_REPORTED_NOT_NCP_PHYSICAL_HARDWARE_CERTIFICATE"
+        },
+        "layouts": [
+          {
+            "ranks": 2,
+            "status": "PASS",
+            "layout": {
+              "ranks": 2,
+              "threads_per_rank": 1,
+              "workers": 1,
+              "controller_rank": 0,
+              "reserved_core_slots": 2,
+              "core_slot_budget": 8,
+              "per_worker_memory_bytes": 1610612736,
+              "per_worker_memory_evidence": "CONFIGURED_RLIMIT_AS_NOT_MEASURED_PEAK_RSS",
+              "controller_memory_budget_bytes": 536870912,
+              "usable_memory_bytes": 5039806873,
+              "memory_headroom_fraction": 0.2,
+              "maximum_workers_from_memory": 2,
+              "estimated_worker_memory_bytes": 1610612736
+            }
+          },
+          {
+            "ranks": 3,
+            "status": "PASS",
+            "layout": {
+              "ranks": 3,
+              "threads_per_rank": 1,
+              "workers": 2,
+              "controller_rank": 0,
+              "reserved_core_slots": 3,
+              "core_slot_budget": 8,
+              "per_worker_memory_bytes": 1610612736,
+              "per_worker_memory_evidence": "CONFIGURED_RLIMIT_AS_NOT_MEASURED_PEAK_RSS",
+              "controller_memory_budget_bytes": 536870912,
+              "usable_memory_bytes": 5039806873,
+              "memory_headroom_fraction": 0.2,
+              "maximum_workers_from_memory": 2,
+              "estimated_worker_memory_bytes": 3221225472
+            }
+          },
+          {
+            "ranks": 4,
+            "status": "FAIL",
+            "reason": "3 workers exceed memory cap 2; reduce ranks or establish a smaller measured per-worker envelope"
+          }
+        ]
+      },
+      {
+        "policy": "clean-file-half-v1",
+        "host": {
+          "schema": 1,
+          "logical_cpu_count_os": 9,
+          "affinity_cpus": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "allowed_logical_cpus": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "allowed_logical_cpu_count": 9,
+          "observed_physical_core_count": 9,
+          "cpu_quota_cores": 8.0,
+          "logical_cpu_budget": 8,
+          "core_binding_cpu_budget": 8,
+          "topology": [
+            {
+              "logical_cpu": 0,
+              "package_id": "0",
+              "core_id": "0"
+            },
+            {
+              "logical_cpu": 1,
+              "package_id": "0",
+              "core_id": "1"
+            },
+            {
+              "logical_cpu": 2,
+              "package_id": "0",
+              "core_id": "2"
+            },
+            {
+              "logical_cpu": 3,
+              "package_id": "0",
+              "core_id": "3"
+            },
+            {
+              "logical_cpu": 4,
+              "package_id": "0",
+              "core_id": "4"
+            },
+            {
+              "logical_cpu": 5,
+              "package_id": "0",
+              "core_id": "5"
+            },
+            {
+              "logical_cpu": 6,
+              "package_id": "0",
+              "core_id": "6"
+            },
+            {
+              "logical_cpu": 7,
+              "package_id": "0",
+              "core_id": "7"
+            },
+            {
+              "logical_cpu": 8,
+              "package_id": "0",
+              "core_id": "8"
+            }
+          ],
+          "cgroup_v2": [
+            {
+              "path": "/sys/fs/cgroup",
+              "cpuset.cpus.effective": "0-8",
+              "cpu.max": "800000 100000",
+              "memory.max": 8589934592,
+              "memory.current.before": 2290176000,
+              "memory.current.after": 2290176000,
+              "memory.current": 2290176000,
+              "memory.accounting": {
+                "policy": "clean-file-half-v1",
+                "raw_headroom_bytes": 6299758592,
+                "clean_file_candidate_bytes": 1788841984,
+                "credited_bytes": 894420992,
+                "available_estimate_bytes": 7194179584,
+                "credit_reason": "HALF_CLEAN_FILE_ESTIMATE_NOT_RECLAIM_GUARANTEE",
+                "memory.stat.raw": "anon 285257728\nfile 1807777792\nkernel 196354048\nkernel_stack 2768896\npagetables 12349440\nsec_pagetables 0\npercpu 9900\nsock 0\nvmalloc 4096\nshmem 262144\nfile_mapped 1585152\nfile_dirty 16826368\nfile_writeback 0\nswapcached 0\nanon_thp 0\nfile_thp 127926272\nshmem_thp 0\ninactive_anon 284938240\nactive_anon 307200\ninactive_file 473382912\nactive_file 1334132736\nunevictable 0\nslab_reclaimable 175921248\nslab_unreclaimable 3277392\nslab 179198640\nworkingset_refault_anon 0\nworkingset_refault_file 5744771\nworkingset_activate_anon 0\nworkingset_activate_file 1659978\nworkingset_restore_anon 0\nworkingset_restore_file 556931\nworkingset_nodereclaim 0\npgdemote_kswapd 0\npgdemote_direct 0\npgdemote_khugepaged 0\npgdemote_proactive 0\npgscan 9187258\npgsteal 8708872\npswpin 0\npswpout 0\npgscan_kswapd 0\npgscan_direct 9187258\npgscan_khugepaged 0\npgscan_proactive 0\npgsteal_kswapd 0\npgsteal_direct 8708872\npgsteal_khugepaged 0\npgsteal_proactive 0\npgfault 343107911\npgmajfault 3091\npgrefill 4350523\npgactivate 6218885\npgdeactivate 4207691\npglazyfree 410\npglazyfreed 0\nswpin_zero 0\nswpout_zero 0\nthp_fault_alloc 36998\nthp_collapse_alloc 95\nthp_swpout 0\nthp_swpout_fallback 0",
+                "memory.stat": {
+                  "anon": 285257728,
+                  "file": 1807777792,
+                  "kernel": 196354048,
+                  "kernel_stack": 2768896,
+                  "pagetables": 12349440,
+                  "sec_pagetables": 0,
+                  "percpu": 9900,
+                  "sock": 0,
+                  "vmalloc": 4096,
+                  "shmem": 262144,
+                  "file_mapped": 1585152,
+                  "file_dirty": 16826368,
+                  "file_writeback": 0,
+                  "swapcached": 0,
+                  "anon_thp": 0,
+                  "file_thp": 127926272,
+                  "shmem_thp": 0,
+                  "inactive_anon": 284938240,
+                  "active_anon": 307200,
+                  "inactive_file": 473382912,
+                  "active_file": 1334132736,
+                  "unevictable": 0,
+                  "slab_reclaimable": 175921248,
+                  "slab_unreclaimable": 3277392,
+                  "slab": 179198640,
+                  "workingset_refault_anon": 0,
+                  "workingset_refault_file": 5744771,
+                  "workingset_activate_anon": 0,
+                  "workingset_activate_file": 1659978,
+                  "workingset_restore_anon": 0,
+                  "workingset_restore_file": 556931,
+                  "workingset_nodereclaim": 0,
+                  "pgdemote_kswapd": 0,
+                  "pgdemote_direct": 0,
+                  "pgdemote_khugepaged": 0,
+                  "pgdemote_proactive": 0,
+                  "pgscan": 9187258,
+                  "pgsteal": 8708872,
+                  "pswpin": 0,
+                  "pswpout": 0,
+                  "pgscan_kswapd": 0,
+                  "pgscan_direct": 9187258,
+                  "pgscan_khugepaged": 0,
+                  "pgscan_proactive": 0,
+                  "pgsteal_kswapd": 0,
+                  "pgsteal_direct": 8708872,
+                  "pgsteal_khugepaged": 0,
+                  "pgsteal_proactive": 0,
+                  "pgfault": 343107911,
+                  "pgmajfault": 3091,
+                  "pgrefill": 4350523,
+                  "pgactivate": 6218885,
+                  "pgdeactivate": 4207691,
+                  "pglazyfree": 410,
+                  "pglazyfreed": 0,
+                  "swpin_zero": 0,
+                  "swpout_zero": 0,
+                  "thp_fault_alloc": 36998,
+                  "thp_collapse_alloc": 95,
+                  "thp_swpout": 0,
+                  "thp_swpout_fallback": 0
+                },
+                "memory.stat.error": null,
+                "memory.min": "0",
+                "memory.low": "0"
+              }
+            }
+          ],
+          "cgroup_status": "V2_VISIBLE_ANCESTRY_INSPECTED",
+          "host_memory_total_bytes": 10451464192,
+          "host_memory_available_bytes": 9399001088,
+          "cgroup_memory_limit_bytes": 8589934592,
+          "memory_available_budget_bytes": 7194179584,
+          "memory_raw_headroom_budget_bytes": 6299758592,
+          "memory_accounting_policy": "clean-file-half-v1",
+          "memory_evidence": "SNAPSHOT_NOT_RESERVATION",
+          "topology_evidence": "GUEST_OS_REPORTED_NOT_NCP_PHYSICAL_HARDWARE_CERTIFICATE"
+        },
+        "layouts": [
+          {
+            "ranks": 2,
+            "status": "PASS",
+            "layout": {
+              "ranks": 2,
+              "threads_per_rank": 1,
+              "workers": 1,
+              "controller_rank": 0,
+              "reserved_core_slots": 2,
+              "core_slot_budget": 8,
+              "per_worker_memory_bytes": 1610612736,
+              "per_worker_memory_evidence": "CONFIGURED_RLIMIT_AS_NOT_MEASURED_PEAK_RSS",
+              "controller_memory_budget_bytes": 536870912,
+              "usable_memory_bytes": 5755343667,
+              "memory_headroom_fraction": 0.2,
+              "maximum_workers_from_memory": 3,
+              "estimated_worker_memory_bytes": 1610612736
+            }
+          },
+          {
+            "ranks": 3,
+            "status": "PASS",
+            "layout": {
+              "ranks": 3,
+              "threads_per_rank": 1,
+              "workers": 2,
+              "controller_rank": 0,
+              "reserved_core_slots": 3,
+              "core_slot_budget": 8,
+              "per_worker_memory_bytes": 1610612736,
+              "per_worker_memory_evidence": "CONFIGURED_RLIMIT_AS_NOT_MEASURED_PEAK_RSS",
+              "controller_memory_budget_bytes": 536870912,
+              "usable_memory_bytes": 5755343667,
+              "memory_headroom_fraction": 0.2,
+              "maximum_workers_from_memory": 3,
+              "estimated_worker_memory_bytes": 3221225472
+            }
+          },
+          {
+            "ranks": 4,
+            "status": "PASS",
+            "layout": {
+              "ranks": 4,
+              "threads_per_rank": 1,
+              "workers": 3,
+              "controller_rank": 0,
+              "reserved_core_slots": 4,
+              "core_slot_budget": 8,
+              "per_worker_memory_bytes": 1610612736,
+              "per_worker_memory_evidence": "CONFIGURED_RLIMIT_AS_NOT_MEASURED_PEAK_RSS",
+              "controller_memory_budget_bytes": 536870912,
+              "usable_memory_bytes": 5755343667,
+              "memory_headroom_fraction": 0.2,
+              "maximum_workers_from_memory": 3,
+              "estimated_worker_memory_bytes": 4831838208
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "recommended_layout": {
+    "ranks": 4,
+    "workers": 3,
+    "threads_per_rank": 1,
+    "per_worker_memory_gib": 1.5,
+    "memory_accounting": "clean-file-half-v1",
+    "condition": "Fresh validated launcher gate before every scientific batch; if rejected use ranks3 only after fresh gate."
+  }
+}

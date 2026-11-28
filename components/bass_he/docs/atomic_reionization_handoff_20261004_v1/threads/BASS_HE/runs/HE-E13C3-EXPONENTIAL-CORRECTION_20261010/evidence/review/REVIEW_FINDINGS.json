@@ -1,0 +1,45 @@
+{
+  "reviewer": "/root/e13c3_independent_review",
+  "recorded_utc": "2026-10-10T11:30:16.923501+00:00",
+  "findings": [
+    {
+      "id": "THEORY-01",
+      "classification": "THEORY_OR_MATH",
+      "severity": "REQUIRED_DOCUMENT_CORRECTION",
+      "observed": "After captured binary64 midpoint constants were defined explicitly, the illustrative derivative bound still omitted the frozen/mathematical midpoint mismatch. D_L <= ||Lambda_prime||_infinity h^2/4 alone does not follow for captured L.",
+      "required_correction": "Add h*abs(Lambda(m)-L); remove it only when frozen L equals the exact midpoint value.",
+      "disposition": "RESOLVED_BY_OWNER_BEFORE_FINAL_FREEZE",
+      "verified_current_text": "THEORY.md section 7 contains D_L <= ||Lambda_prime||_infinity h^2/4 + h|Lambda(m)-L| and the exact-midpoint qualification.",
+      "numerical_dependency_changed": false,
+      "numerical_rerun_needed": false,
+      "execution_failure": false
+    },
+    {
+      "id": "REPORT-01",
+      "classification": "EVIDENCE_AUTHORITY",
+      "severity": "CLAIM_SCOPE_CLARIFICATION",
+      "observed": "The report opening could be read as a maximum over individual event segments; the actual 1.6479380e-8 metric is the maximum over six macro aggregate total-heat defects.",
+      "required_correction": "State the six-macro aggregation unit in the opening and next-loop handoff.",
+      "disposition": "RESOLVED_BY_OWNER_BEFORE_FINAL_FREEZE",
+      "verified_current_text": "REPORT_KO.md opening and NEXT_CODEX_PROMPT_KO.md both explicitly define the maximum as six macro total-heat defects.",
+      "numerical_dependency_changed": false,
+      "numerical_rerun_needed": false,
+      "execution_failure": false
+    },
+    {
+      "id": "REPRO-01",
+      "classification": "EVIDENCE_AUTHORITY",
+      "severity": "REPRODUCTION_VERDICT_SCOPE_CLARIFICATION",
+      "observed": "Optional --recompute executes new correction outputs and internal checks but does not compare those fresh outputs with the saved reference; PASS_SCOPED could overstate fresh numerical validation.",
+      "required_correction": "Declare saved-evidence-only verdict scope, new_output_parity_checked=false, and new_output_accuracy_verdict=NOT_EVALUATED; align README/report.",
+      "disposition": "RESOLVED_BY_OWNER_BEFORE_FINAL_FREEZE",
+      "verified_current_text": "code/reproduce.py now emits all three explicit scope fields; README.md and REPORT_KO.md describe optional recomputation as execution, not a new parity/accuracy decision.",
+      "numerical_dependency_changed": false,
+      "numerical_rerun_needed": false,
+      "execution_failure": false
+    }
+  ],
+  "open_blockers": [],
+  "scope": "Historical review finding retained; this is not a failed solver run.",
+  "final_findings_verified_utc": "2026-10-10T11:37:20.191707+00:00"
+}

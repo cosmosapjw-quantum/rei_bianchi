@@ -1,0 +1,107 @@
+{
+  "schema": "bass_he.r8.source_normalization_decision.v1",
+  "source_pdf": {
+    "schema": "bass_he.r8.authorized_source_identity.v1",
+    "file_name": "1-s2.0-S0010465523000073-main.pdf",
+    "materialized_name": "authorized_CPC_2023_108662.pdf",
+    "bytes": 961962,
+    "sha256": "1367f5ab3239cad1b3ea377edb28a9b9e6975f4cec27fb6d289fdb1d601b1c55",
+    "expected_sha256": "1367f5ab3239cad1b3ea377edb28a9b9e6975f4cec27fb6d289fdb1d601b1c55",
+    "identity_match": true,
+    "bibliography": {
+      "authors": ["Alexander A. Gusev", "Evgeni A. Solov'ev", "Sergue I. Vinitsky"],
+      "journal": "Computer Physics Communications",
+      "volume": 286,
+      "year": 2023,
+      "article": "108662",
+      "doi": "10.1016/j.cpc.2023.108662"
+    },
+    "distribution_policy": "DO_NOT_REDISTRIBUTE_SOURCE_PDF; preserve metadata/hash/page anchors only"
+  },
+  "source_findings": [
+    {
+      "id": "EQ52",
+      "status": "SOURCE_VERIFIED",
+      "page_pdf": 12,
+      "statement": "Eq.(52) defines p_k=exp(-Delta_k(rho)/v) and calls it the probability of elementary transition; p_k is used as a stochastic matrix entry in Eq.(51)."
+    },
+    {
+      "id": "EQ50",
+      "status": "SOURCE_VERIFIED",
+      "page_pdf": 12,
+      "statement": "Eq.(50) applies hidden-crossing probability matrices on approach and receding sides of P_rot."
+    },
+    {
+      "id": "EQ55",
+      "status": "SOURCE_VERIFIED",
+      "page_pdf": 13,
+      "statement": "Eq.(55) calls P^Q_{beta,alpha}=exp(-2 Delta_{beta,alpha}/v) the associated single-pass transition probability."
+    },
+    {
+      "id": "EQ56",
+      "status": "SOURCE_VERIFIED",
+      "page_pdf": 13,
+      "statement": "Eq.(56) defines Delta_{beta,alpha} as the absolute value of a complex contour/action integral."
+    },
+    {
+      "id": "PROGRAM_PIPELINE",
+      "status": "SOURCE_VERIFIED",
+      "page_pdf": 15,
+      "statement": "STCKLBR2 computes the Eq.(56) Stueckelberg parameter; program documentation says the resulting parameter file is used in subsequent calculations."
+    },
+    {
+      "id": "APPENDIX_ALIAS",
+      "status": "SOURCE_VERIFIED",
+      "page_pdf": [18, 19],
+      "statement": "At Nmax=3, printed charge-exchange shell n=3 equals printed ionization at both 0.5 and 5 keV/amu."
+    },
+    {
+      "id": "EQ43",
+      "status": "SOURCE_VERIFIED_SUSPECT",
+      "page_pdf": 10,
+      "statement": "CPC Eq.(43) prints Delta = pi DeltaE_min/(4 DeltaF) without a square on DeltaE_min."
+    }
+  ],
+  "cross_source_findings": [
+    {
+      "id": "RICHTER1993",
+      "status": "LITERATURE_SUPPORTED_PRIMARY_EQUATION",
+      "statement": "Richter & Solov'ev 1993 uses factor-two transition probability and prints Delta = pi (DeltaE_min)^2/(4 DeltaF)."
+    },
+    {
+      "id": "EQ43_CONFLICT",
+      "status": "STRONG_SOURCE_INCONSISTENCY",
+      "statement": "CPC 2023 Eq.(43) differs from the 1993 advanced-adiabatic Landau-Zener/Stueckelberg formula by a missing square on the minimum gap. Do not silently correct the CPC source before author-code audit."
+    },
+    {
+      "id": "EQ52_EQ55",
+      "status": "OPEN_SOURCE_NORMALIZATION_CONFLICT",
+      "statement": "CPC Eq.(52) and Eq.(55) both use Stueckelberg-parameter language but differ by factor two in the exponent; inspected pages do not explicitly state Delta_k(Eq52)=Delta_betaalpha(Eq56) nor Delta_k=2 Delta_betaalpha."
+    }
+  ],
+  "derived_checks": [
+    {
+      "id": "MODULUS_SQUARE",
+      "status": "WOLFRAM_VERIFIED",
+      "statement": "A complex-action amplitude with imaginary action Delta yields probability exp(-2 Delta/v)."
+    },
+    {
+      "id": "DOUBLE_MATRIX",
+      "status": "WOLFRAM_VERIFIED",
+      "statement": "Two uses of the reversible Eq.(51)-type stochastic block yield off-diagonal 2p(1-p), not p^2 in general; repeated encounter does not explain Eq.(55) factor two."
+    }
+  ],
+  "decision": {
+    "CODE_I02_CLOSED": true,
+    "full_certificate_fail_closed": true,
+    "scientific_PROMOTE": "HOLD",
+    "Eq55": "NOT_RUN",
+    "Eq55_next_node_authorized": false,
+    "Eq55_formula_source_status": "DIRECTLY_VERIFIED_IN_AUTHORIZED_PDF",
+    "Eq55_standalone_theory_lane": "ADMITTED_FOR_ANALYSIS_NOT_NUMERICAL_PRODUCTION",
+    "Eq50_factor2_substitution": "NOT_AUTHORIZED",
+    "production_default_change": "NOT_AUTHORIZED",
+    "next_node": "ARSENY_AUTHOR_CODE_NORMALIZATION_AUDIT"
+  },
+  "next_decisive_evidence": "Static trace of public author ARSENY program package DOI 10.17632/n43srxwdnm.1 from Eq.(56)/STCKLBR2 data to CR_SECTION/transition probability exponent."
+}

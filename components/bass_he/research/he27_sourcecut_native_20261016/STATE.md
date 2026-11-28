@@ -1,0 +1,4 @@
+# HE27 source-cut native integration
+Authority: HE25 eb4952af1f3d9ca99aad300ddf6db6f2b2fe1233; HE26 PR73 98b31fbd779ed1ade8848580c2836f32259e3ef3. Immutable Rust source f7830e2f55e7a1938bc3c98f61b60651f8dae474. Original HE25 model/transport/reference remain unchanged. Stage C5 source injection implementation; C6/C7 source gates then pilot, bounded dynamic A/B and independent Radau/DOP853; scoped finite spectral/angular/time controls. Existing production/dirty worktrees untouched. Two actual delegated tasks own new sourcecut adapter and independent source acceptance respectively. A third fresh read-only review is reserved for actual implementation. No EoR/CMB admission.
+
+Execution budget: native NCP already; max2 workers, per-worker address-space ceiling4GiB, disk2GiB campaign cap. Source/binary identity validated before scientific calls; first failure append-only. Existing HE25 venv and fixed original owner binary are read-only dependencies.

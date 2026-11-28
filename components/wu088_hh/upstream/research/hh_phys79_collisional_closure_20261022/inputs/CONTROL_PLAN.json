@@ -1,0 +1,109 @@
+{
+  "schema": "PHYS79_ISOLATED_CONTROL_PLAN_V1",
+  "scope": "two new isolated proper-time parcels and one distinct numerical refinement",
+  "physics": {
+    "proper_density_constant": true,
+    "expansion": false,
+    "external_thermal_bath": false,
+    "photoionization": false,
+    "radiative_recombination": false,
+    "initial_isotope_inventory": "byte-pinned PHYS78 DEFAULT_INVENTORY",
+    "ionic_potential": "PHYS78 rounded elemental potential plus D43K correction",
+    "d_cx_closure": "detailed_balance",
+    "strict_nonnegative_stages": true,
+    "projection": "NONE"
+  },
+  "solver": {
+    "method": "DOP853",
+    "samples": 161,
+    "time_variable": "theta=nH_cm3*k_ref_cm3_s*proper_time_s",
+    "coordinate_scaling": "each ionic slot by its fixed isotope inventory; absent isotope by1; thermal energy by initial u",
+    "baseline": {
+      "rtol": 2e-08,
+      "atol_scaled": 2e-11
+    },
+    "refinement": {
+      "rtol": 2e-10,
+      "atol_scaled": 2e-13,
+      "max_step_factor": 0.25
+    }
+  },
+  "controls": [
+    {
+      "id": "C01",
+      "ci_rows": [
+        0,
+        1,
+        3
+      ],
+      "d_cx": true,
+      "T_initial_K": 25370.66308424773,
+      "nH_cm3": 0.001,
+      "H_initial_ion_fraction": 0.1,
+      "D_initial_ion_fraction": "declared detailed-balance equilibrium at T_initial and H_initial",
+      "other_populated_initial_singly_ion_fraction": 0.01,
+      "higher_initial_ionic_fractions": 0,
+      "reference_rate": "HI_CI_at_initial_T",
+      "theta_end": 0.1,
+      "max_step_theta": "0.05*min(1,k_ref/k_CX_reverse_initial)"
+    },
+    {
+      "id": "C02",
+      "ci_rows": [],
+      "d_cx": true,
+      "T_initial_K": 300.0,
+      "nH_cm3": 1.0,
+      "H_initial_ion_fraction": 0.5,
+      "D_initial_ion_fraction": 1e-06,
+      "other_populated_initial_singly_ion_fraction": 0,
+      "higher_initial_ionic_fractions": 0,
+      "reference_rate": "D_CX_reverse_at_initial_T",
+      "theta_end": 20.0,
+      "max_step_theta": 0.1
+    }
+  ],
+  "tasks_in_order": [
+    {
+      "id": "C01_BASE",
+      "control": "C01",
+      "numerics": "baseline"
+    },
+    {
+      "id": "C02_BASE",
+      "control": "C02",
+      "numerics": "baseline"
+    },
+    {
+      "id": "C01_REFINED",
+      "control": "C01",
+      "numerics": "refinement"
+    }
+  ],
+  "acceptance_fixed_before_execution": {
+    "isotope_relative": 1e-10,
+    "absent_isotope_absolute": 0,
+    "saved_species_minimum": 0,
+    "total_u_plus_binding_relative": 2e-10,
+    "C01_refinement_max_scaled_state_difference": 1e-06,
+    "C02_final_equilibrium_distance_over_D_inventory": 1e-06,
+    "C02_equilibrium_oracle": "brentq scalar extent root including closed-energy temperature relation; no extra ODE",
+    "event_energy_residual": "construction diagnostic only; saved total energy and scalar equilibrium are substantive checks",
+    "C02_extent_temperature_absolute_error_K": 1e-09
+  },
+  "execution": {
+    "requires_explicit_execute_flag": true,
+    "workers": 1,
+    "threads_per_process": 1,
+    "lease": "byte-pinned PHYS78 LeasePool; no lease means WAITING with no launch",
+    "completed_identity": "verify NPZ and receipt bytes then skip",
+    "failed_or_partial_identity": "preserve and refuse automatic retry",
+    "one_marker_before_every_solve_ivp_call": true,
+    "automatic_retry": false,
+    "old_completed_ODE_replays": 0,
+    "new_cosmological_ODE": 0,
+    "NCP": 0,
+    "benchmark": 0
+  },
+  "HH_R10": "OFF",
+  "production_admission": "NOT_ISSUED"
+}

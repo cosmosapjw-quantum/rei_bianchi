@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "unit_id": "HE-ANG-CBA-NORDSIECK",
+  "stage": "R7_DIAGNOSTIC_REVIEW",
+  "decision": "PASS_SCOPED_CLOSED",
+  "reviewer": {
+    "agent": "/root/cba_independent_review",
+    "requested_model": "gpt-6-astra",
+    "observed_runtime_model": "NOT_OBSERVABLE",
+    "method": "Read-only inspection of actual evaluator code, raw diagnostic output and authorization; independent algebra from R6 reused",
+    "new_science_execution": false
+  },
+  "evidence": [
+    "evidence/wolfram/CBA_SYMBOLIC.wl",
+    "evidence/wolfram/ACTUAL_EVALUATOR_RESULT.json",
+    "evidence/wolfram/DIAGNOSTIC.wl",
+    "evidence/wolfram/DIAGNOSTIC_AUTHORIZATION.json",
+    "evidence/wolfram/ACTUAL_DIAGNOSTIC_RESULT.json",
+    "reviews/R6_REVIEW.md"
+  ],
+  "original_result_preserved": {
+    "true": 12,
+    "false": 5,
+    "unevaluated": 1,
+    "rewritten_as_original_pass": false
+  },
+  "diagnostic_observation": {
+    "checks": ["common_numerator", "orthogonality_factor", "matched_numerator", "parabolic_prefactor", "parabolic_branch_argument", "small_transfer_generic_slope"],
+    "all_six_Together_residuals": "0",
+    "all_six_FullSimplify_residuals": 0,
+    "all_six_exact_rational_controls": 0,
+    "five_original_Cancel_outputs": "Uncombined algebraically cancelling sums, explicitly preserved in raw output",
+    "slope_residual": "0 under raw subtraction and every diagnostic method",
+    "explicit_domain": "l>0, p>0, h>=0; q2,qp,z,u,d2,dp,v real",
+    "interpretation": "The symbolic reductions establish the six rational identities on their nonsingular domains; the single exact rational control per identity is supplementary evidence rather than a general proof. The intended physical domain's nonzero denominators were checked in R6."
+  },
+  "failure_classification": {
+    "class": "symbolic_test_harness_false_FAIL",
+    "mechanism": "Cancel retained sums in nonzero syntactic form; structural SameQ against literal zero returned False. The original Equal slope check remained unevaluated although its difference is identically zero.",
+    "theory_defect": false,
+    "theory_changed": false,
+    "acceptance_changed": false,
+    "tolerances_changed": false
+  },
+  "resolved_identity_count": {
+    "original_true": 12,
+    "diagnostically_resolved": 6,
+    "total": 18,
+    "meaning": "18 identities resolved through the original and diagnostic evidence together; the original evaluator output remains unchanged"
+  },
+  "actual_diagnostic_cost": {
+    "extra_evaluator_calls": 1,
+    "body_CPU_s": 0.044191,
+    "body_wall_s": 0.043939,
+    "toolwall_s": 8.2,
+    "remote_total_CPU": "UNKNOWN_NOT_ZERO",
+    "local_repair_reserve_consumed": 0,
+    "prior_costs_reset": false
+  },
+  "scope": "Symbolic checks supporting the already reviewed analytic fixed-centre direct model; numerical implementation and physical provider admission remain separate",
+  "stopping_rule": "Diagnostic finding closed; no third evaluator call requested or performed",
+  "next_action": "Continue contracted lower-tier bounded work; independent C9 inspects changed code, raw results and actual generated PNGs"
+}

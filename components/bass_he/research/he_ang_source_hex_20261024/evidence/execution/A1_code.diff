@@ -1,0 +1,163 @@
+--- evidence/execution/A1_before/hex_intake.py	2026-10-24 06:38:17.969745659 +0900
++++ code/hex_intake.py	2026-10-24 06:40:03.428459173 +0900
+@@ -25,6 +25,8 @@
+ INSERT = re.compile(r'^INSERT\s+(?:OR\s+REPLACE\s+)?INTO\s+('+IDENT+r')\s*(?:\(([^)]*)\))?\s*VALUES\s*\((.*)\)\s*;?$', re.I | re.S)
+ TABLE = re.compile(r'^(?:CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?|INSERT\s+(?:OR\s+REPLACE\s+)?INTO\s+)('+IDENT+r')', re.I)
+ SPECIAL = re.compile(rb"['\"`;#/-]")
++NUMERIC_LITERAL = re.compile(r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?')
++HEX_LITERAL = re.compile(r"[xX]'(?:[0-9a-fA-F]{2})*'")
+ 
+ 
+ def identifier(token):
+@@ -39,9 +41,8 @@
+     table, columns, body = match.groups()
+     # Actual source fields are numeric literals or hex BLOB, never expressions.
+     tokens = tuple(t.strip() for t in body.split(','))
+-    numeric = r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?'
+     for token in tokens:
+-        if not (re.fullmatch(numeric, token) or re.fullmatch(r"[xX]'(?:[0-9a-fA-F]{2})*'", token) or token.upper() == 'NULL'):
++        if not (NUMERIC_LITERAL.fullmatch(token) or HEX_LITERAL.fullmatch(token) or token.upper() == 'NULL'):
+             raise ValueError('unsupported or malformed VALUES literal')
+     return identifier(table), (tuple(identifier(c) for c in columns.split(',')) if columns else None), tokens
+ 
+@@ -278,13 +279,85 @@
+         return block
+ 
+ 
+-def catalogue(path, *, max_bytes=MAX_BYTES):
++class HexLinesStream:
++    """Explicit upstream hex_import_ getline dialect; one record per line.
++
++    Only literal INSERTs, full-line comments, source transaction markers and
++    one-line known-table CREATE TABLE records are admitted. No multiline SQL.
++    """
++    def __init__(self):
++        self.buffer = bytearray()
++
++    def line(self, raw):
++        text = raw.decode('utf-8').strip()
++        if not text or text.startswith(('#', '--')):
++            return None
++        if re.match(r'INSERT\b', text, re.I):
++            # The catalogue's parse_insert performs the literal/schema check.
++            return text
++        if re.fullmatch(r'(?:BEGIN(?:\s+TRANSACTION)?|COMMIT|END(?:\s+TRANSACTION)?)\s*;?', text, re.I):
++            return text
++        match = TABLE.match(text)
++        if (text.upper().startswith('CREATE TABLE') and match
++                and identifier(match[1]) in ('tmat', 'ionf')
++                and text.rstrip(';').rstrip().endswith(')')
++                and ';' not in text.rstrip(';')
++                and text.count('(') == text.count(')')):
++            return text
++        raise ValueError('unsupported/multiline hex-lines record')
++
++    def feed(self, chunk):
++        parts = chunk.split(b'\n')
++        for index, part in enumerate(parts):
++            if len(self.buffer)+len(part) > MAX_STATEMENT:
++                raise ValueError('line exceeds bounded parser capacity')
++            self.buffer.extend(part)
++            if index < len(parts)-1:
++                statement = self.line(bytes(self.buffer))
++                self.buffer.clear()
++                if statement is not None:
++                    yield statement
++
++    def finish(self):
++        if self.buffer:
++            statement = self.line(bytes(self.buffer))
++            self.buffer.clear()
++            if statement is not None:
++                yield statement
++
++
++def catalogue(path, *, max_bytes=MAX_BYTES, dialect='semicolon'):
+     """One raw catalogue. Availability decision is specifically H1 initial 100."""
+     if not 0 < max_bytes <= MAX_BYTES:
+         raise ValueError('invalid decompressed byte cap')
++    if dialect not in ('semicolon', 'hex-lines'):
++        raise ValueError('unsupported SQL dialect')
+     statements, tables, insert_rows = Counter(), Counter(), Counter()
+     h1 = {name: {'rows': 0, 'Ei_min_Ry': None, 'Ei_max_Ry': None} for name in ('tmat', 'ionf')}
+-    parser, digest, count = StatementStream(), hashlib.sha256(), 0
++    parser = StatementStream() if dialect == 'semicolon' else HexLinesStream()
++    digest, count = hashlib.sha256(), 0
++
++    def record(statement):
++        verb = statement.split(None, 1)[0].upper().rstrip(';')
++        statements[verb] += 1
++        table_match = TABLE.match(statement)
++        if table_match:
++            tables[identifier(table_match[1])] += 1
++        if verb != 'INSERT':
++            return
++        table, columns, values = parse_insert(statement)
++        insert_rows[table] += 1
++        if table not in h1:
++            return
++        expected = IONF_COLUMNS if table == 'ionf' else TMAT_COLUMNS
++        if len(values) != len(expected) or (columns and columns != tuple(c.lower() for c in expected)):
++            raise ValueError('unexpected '+table+' source schema')
++        if tuple(integer(v) for v in values[:3]) == (1, 0, 0):
++            energy = finite_real(values[5 if table == 'ionf' else 8])
++            stats = h1[table]
++            stats['rows'] += 1
++            stats['Ei_min_Ry'] = energy if stats['Ei_min_Ry'] is None else min(energy, stats['Ei_min_Ry'])
++            stats['Ei_max_Ry'] = energy if stats['Ei_max_Ry'] is None else max(energy, stats['Ei_max_Ry'])
+     with open(path, 'rb') as raw:
+         source = HashReader(raw)
+         plain = lzma.LZMAFile(source, 'rb') if str(path).endswith('.xz') else source
+@@ -298,32 +371,16 @@
+                     raise ValueError('decompressed input exceeds 128 MiB/caller cap')
+                 digest.update(block)
+                 for statement in parser.feed(block):
+-                    verb = statement.split(None, 1)[0].upper().rstrip(';')
+-                    statements[verb] += 1
+-                    table_match = TABLE.match(statement)
+-                    if table_match:
+-                        tables[identifier(table_match[1])] += 1
+-                    if verb != 'INSERT':
+-                        continue
+-                    table, columns, values = parse_insert(statement)
+-                    insert_rows[table] += 1
+-                    if table not in h1:
+-                        continue
+-                    expected = IONF_COLUMNS if table == 'ionf' else TMAT_COLUMNS
+-                    if len(values) != len(expected) or (columns and columns != tuple(c.lower() for c in expected)):
+-                        raise ValueError('unexpected '+table+' source schema')
+-                    if tuple(integer(v) for v in values[:3]) == (1, 0, 0):
+-                        energy = finite_real(values[5 if table == 'ionf' else 8])
+-                        stats = h1[table]
+-                        stats['rows'] += 1
+-                        stats['Ei_min_Ry'] = energy if stats['Ei_min_Ry'] is None else min(energy, stats['Ei_min_Ry'])
+-                        stats['Ei_max_Ry'] = energy if stats['Ei_max_Ry'] is None else max(energy, stats['Ei_max_Ry'])
+-            parser.finish()
++                    record(statement)
++            final = parser.finish()
++            if final is not None:
++                for statement in final:
++                    record(statement)
+         finally:
+             if plain is not source:
+                 plain.close()
+     return {'status': 'RAW_H1_IONF_PRESENT_ABI_UNCONFIRMED' if h1['ionf']['rows'] else 'SOURCE_INPUT_PENDING',
+-            'input_path': str(Path(path).resolve()), 'compression': 'xz' if str(path).endswith('.xz') else 'none',
++            'input_path': str(Path(path).resolve()), 'dialect': dialect, 'compression': 'xz' if str(path).endswith('.xz') else 'none',
+             'compressed_sha256': source.digest.hexdigest(), 'compressed_bytes': source.count,
+             'uncompressed_sha256': digest.hexdigest(), 'uncompressed_bytes': count,
+             'statement_counts': dict(statements), 'table_statement_counts': dict(tables),
+@@ -335,11 +392,12 @@
+ def main():
+     ap = argparse.ArgumentParser(description=__doc__)
+     ap.add_argument('sql_path', type=Path)
++    ap.add_argument('--dialect', choices=('semicolon', 'hex-lines'), default='semicolon')
+     args = ap.parse_args()
+     import resource
+     resource.setrlimit(resource.RLIMIT_AS, (256*1024**2, 256*1024**2))
+     resource.setrlimit(resource.RLIMIT_CPU, (8, 8))
+-    print(json.dumps(catalogue(args.sql_path), indent=2, sort_keys=True))
++    print(json.dumps(catalogue(args.sql_path, dialect=args.dialect), indent=2, sort_keys=True))
+ 
+ 
+ if __name__ == '__main__':

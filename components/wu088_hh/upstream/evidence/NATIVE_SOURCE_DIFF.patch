@@ -1,0 +1,125 @@
+--- native/reference/r31a/hybrid12_wide_h_v2.cpp
++++ native/candidate/r31a/hybrid12_wide_h_v2.cpp
+@@ -211,27 +211,46 @@
+  out[0]=value.real();out[1]=value.imag();return rc;
+ }
+ 
+-// R30 H-level bridge: unchanged wide batching body follows.
+-// Parent scalar algorithms included unchanged; only geometry/batching is new.
++
++// R31K-B candidate. Scalar algorithms and analytic even-power kernel above remain unchanged.
++// Independent gamma planes are evaluated in parallel, then merged in canonical h order.
++#include <omp.h>
++static thread_local int hh_threads=1;
++static thread_local int hh_used_threads=1;
++extern "C" int hh_set_num_threads(int n) { if(n<1||n>1024)return -1;hh_threads=n;return 0; }
++extern "C" int hh_last_team_size() { return hh_used_threads; }
++
+ extern "C" int mh_wide_foreign(std::size_t n,std::size_t ngamma,const double*tt,const double*gs,const double*gw,const double*ww,const double*pars,long double*oo,long double*aa) noexcept {
+  using namespace foreign_new;
+  if(!n||!ngamma||!tt||!gs||!gw||!ww||!pars||!oo||!aa)return -301;
+  if(std::fegetround()!=FE_TONEAREST)return -303;
+  const R a=pars[0],b=pars[1],z=pars[2],q=pars[3],pi=acosl(-1.L),rr=4+z*z;
+  if(a<=0||b<=0)return -306;
++ if(ngamma>std::size_t(PTRDIFF_MAX))return -302;
+  const std::size_t nn=n*n;Z*out=reinterpret_cast<Z*>(oo);
+  try {
+   std::vector<Z> packed(13*nn),raw(30*nn);std::vector<double>we(5*nn);Z ev[36];R ea[36];
++  // Hoist only identical subexpressions, without changing multiplication association.
++  std::vector<R> pa(n),pb(n);std::vector<Z> phase(n);
++  std::vector<std::size_t> active;active.reserve(nn);
++  for(std::size_t i=0;i<n;i++){
++   R t=tt[i],A=a+t,B=b+t;
++   pa[i]=powl(pi/A,1.5L);pb[i]=powl(pi/B,1.5L);
++   phase[i]=std::exp(Z(-b*t*rr/B-q*q/(4*B),-q*z*b/B));
++  }
+   for(std::size_t i=0;i<n;i++)for(std::size_t j=0;j<n;j++){
+    std::size_t k=i*n+j;R t=tt[i],u=tt[j],A=a+t,B=b+u;
+    Z m1[3]={0,0,0},m2[3]={-2*b/B,0,Z(-z*b/B,q/(2*B))};
+    Z n1[3]={0,0,0},n2[3]={2*u/B,0,Z(z*u/B,q/(2*B))};
+-   Z base=powl(pi/A,1.5L)*powl(pi/B,1.5L)*std::exp(Z(-b*u*rr/B-q*q/(4*B),-q*z*b/B));
++   Z base=(pa[i]*pb[j])*phase[j];
+    packed[k]=A;packed[nn+k]=B;packed[2*nn+k]=base;
+    packed[3*nn+k]=n1[0];packed[4*nn+k]=n1[2];packed[5*nn+k]=n2[0];packed[6*nn+k]=n2[2];
+    for(int d=0;d<3;d++)packed[(7+d)*nn+k]=m1[d]-m2[d];
+    for(int p=0;p<5;p++)we[p*nn+k]=ww[2*p*nn+k];
++   bool needed=false;for(int p=0;p<4;p++)needed=needed||(ww[(2*p+1)*nn+k]!=0);
++   if(needed)active.push_back(k); // exact zeros only; no physical screening or tolerance.
+   }
++  struct GammaPlane { Z value[6]{};R absolute[6]{};int status=0; };
+   for(int side=1;side<=2;side++){
+    for(std::size_t i=0;i<n;i++)for(std::size_t j=0;j<n;j++){
+     std::size_t k=i*n+j;R B=b+tt[j];
+@@ -241,31 +260,48 @@
+    int status=fg_even(nn,side,reinterpret_cast<R*>(packed.data()),26*nn,we.data(),5*nn,reinterpret_cast<R*>(raw.data()),60*nn,reinterpret_cast<R*>(ev),72,ea,36);if(status)return status;
+    Sum total[6];R absolute[6]{};
+    for(int c=0;c<6;c++){total[c].add(ev[30+c]);absolute[c]=ea[30+c];}
++   std::vector<GammaPlane> planes(ngamma);
++   const int team=hh_threads;int used=1;
++   #pragma omp parallel for schedule(dynamic,1) num_threads(team) if(team>1) reduction(max:used)
++   for(std::ptrdiff_t ih=0;ih<static_cast<std::ptrdiff_t>(ngamma);ih++){
++    used=omp_get_num_threads();std::size_t h=static_cast<std::size_t>(ih);
++    // Exceptions and FP environment failures must not escape an OpenMP region.
++    try {
++     auto compute_plane=[&]() -> int {
++      if(std::fegetround()!=FE_TONEAREST)return -303;
++      R e=R(gs[h])*R(gs[h]),e1=side==1?e:0,e2=side==2?e:0;Sum plane[6];R planeabs[6]{};
++      std::vector<R> av(n),bv(n),n1xv(n),n1zv(n),n2xv(n),dz1v(n),dz2v(n),imv(n),base1(n);std::vector<Z> n2zv(n),base2(n);
++      for(std::size_t i=0;i<n;i++){
++       R t=tt[i],A=a+t+e1,B=b+t+e2;av[i]=A;bv[i]=B;
++       n1xv[i]=-2*e1/A;n1zv[i]=-z*e1/A;n2xv[i]=2*t/B;n2zv[i]=Z(z*t/B,q/(2*B));
++       dz1v[i]=-z*e1/A;dz2v[i]=z*(b+e2)/B;imv[i]=-q/(2*B);
++       base1[i]=powl(pi/A,1.5L)*expl(-e1*(t+a)*rr/A);
++       base2[i]=powl(pi/B,1.5L)*std::exp(Z(-(b+e2)*t*rr/B-q*q/(4*B),-q*z*(b+e2)/B));
++      }
++      for(std::size_t k:active){
++       std::size_t i=k/n,j=k%n;
++       R A=av[i],B=bv[j],v=.5L/A+.5L/B;
++       Z n1x=n1xv[i],n1z=n1zv[i],n2x=n2xv[j],n2z=n2zv[j];
++       Z dx=n1xv[i]+2*(b+e2)/B,dz(dz1v[i]+dz2v[j],imv[j]),s=dx*dx+dz*dz;
++       Z base=base1[i]*base2[j];if(base==Z(0))continue;
++       Z M[4],D[4];int st=oddmom(v,s,M,D);if(st)return st;
++       for(int p=0;p<4;p++){
++        R weight=ww[(2*p+1)*nn+k];Z f=base*M[p]*weight,df=base*D[p]*weight;
++        Z vals[6]={f,n1x*f+dx/A*df,n1z*f+dz/A*df,f,n2x*f-dx/B*df,n2z*f-dz/B*df};
++        for(int c=0;c<6;c++){if(!good(vals[c]))return -307;plane[c].add(vals[c]);planeabs[c]+=std::abs(vals[c]);}
++       }
++      }
++      for(int c=0;c<6;c++){planes[h].value[c]=plane[c].get();planes[h].absolute[c]=planeabs[c];}
++      return 0;
++     };
++     planes[h].status=compute_plane();
++    }catch(const std::bad_alloc&){planes[h].status=-304;}catch(...){planes[h].status=-305;}
++   }
++   hh_used_threads=used;
+    for(std::size_t h=0;h<ngamma;h++){
+-    R e=R(gs[h])*R(gs[h]),e1=side==1?e:0,e2=side==2?e:0,gweight=gw[h];Sum plane[6];R planeabs[6]{};
+-    std::vector<R> av(n),bv(n),n1xv(n),n1zv(n),n2xv(n),dz1v(n),dz2v(n),imv(n),base1(n);std::vector<Z> n2zv(n),base2(n);
+-    for(std::size_t i=0;i<n;i++){
+-     R t=tt[i],A=a+t+e1,B=b+t+e2;av[i]=A;bv[i]=B;
+-     n1xv[i]=-2*e1/A;n1zv[i]=-z*e1/A;n2xv[i]=2*t/B;n2zv[i]=Z(z*t/B,q/(2*B));
+-     dz1v[i]=-z*e1/A;dz2v[i]=z*(b+e2)/B;imv[i]=-q/(2*B);
+-     base1[i]=powl(pi/A,1.5L)*expl(-e1*(t+a)*rr/A);
+-     base2[i]=powl(pi/B,1.5L)*std::exp(Z(-(b+e2)*t*rr/B-q*q/(4*B),-q*z*(b+e2)/B));
+-    }
+-    for(std::size_t i=0;i<n;i++)for(std::size_t j=0;j<n;j++){
+-     std::size_t k=i*n+j;bool needed=false;for(int p=0;p<4;p++)needed=needed||(ww[(2*p+1)*nn+k]!=0);if(!needed)continue;
+-     R A=av[i],B=bv[j],v=.5L/A+.5L/B;
+-     Z n1x=n1xv[i],n1z=n1zv[i],n2x=n2xv[j],n2z=n2zv[j];
+-     Z dx=n1xv[i]+2*(b+e2)/B,dz(dz1v[i]+dz2v[j],imv[j]),s=dx*dx+dz*dz;
+-     Z base=base1[i]*base2[j];
+-     if(base==Z(0))continue;
+-     Z M[4],D[4];status=oddmom(v,s,M,D);if(status)return status;
+-     for(int p=0;p<4;p++){
+-      R weight=ww[(2*p+1)*nn+k];Z f=base*M[p]*weight,df=base*D[p]*weight;
+-      Z vals[6]={f,n1x*f+dx/A*df,n1z*f+dz/A*df,f,n2x*f-dx/B*df,n2z*f-dz/B*df};
+-      for(int c=0;c<6;c++){if(!good(vals[c]))return -307;plane[c].add(vals[c]);planeabs[c]+=std::abs(vals[c]);}
+-     }
+-    }
+-    for(int c=0;c<6;c++){total[c].add(gweight*plane[c].get());absolute[c]+=std::abs(gweight)*planeabs[c];}
++    if(planes[h].status)return planes[h].status;
++    R gweight=gw[h];
++    for(int c=0;c<6;c++){total[c].add(gweight*planes[h].value[c]);absolute[c]+=std::abs(gweight)*planes[h].absolute[c];}
+    }
+    for(int c=0;c<6;c++){out[(side-1)*6+c]=total[c].get();aa[(side-1)*6+c]=absolute[c];}
+   }

@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "unit_id": "HE-ANG-FINITEMASS-CBA",
+  "objective": "Derive and implement one finite-mass Jacobi direct-CBA channel consistently from Hamiltonian through normalized invariant measure, Jacobi/lab densities and weighted fold bridge.",
+  "base": {
+    "repo": "cosmosapjw-quantum/BASS_HE",
+    "commit": "8e0fb28fea520364d8794bac32840621dd150f95",
+    "central_at_freeze": "a28ba343bb85addf1a7e9e58e75816ed3b75cd3b",
+    "branch": "research/he-ang-finitemass-cba-20261025",
+    "path": "research/he_ang_finitemass_cba_20261025",
+    "local_state": "restored plain snapshot; no local git HEAD"
+  },
+  "authority": {
+    "theory_contract_and_admission": "root Astra",
+    "implementation": "requested lower-tier gpt-6.1-sol",
+    "independent_R6_C9": "separate requested gpt-6-astra",
+    "observed_runtime_model": "NOT_OBSERVABLE"
+  },
+  "source": {
+    "parent99": "bec636ffa3014035292c1078a758c7aa1827174d",
+    "parent100": "8e0fb28fea520364d8794bac32840621dd150f95",
+    "kadyrov_pdf_sha256": "c7627a718193fc1ab0181d1c7fbabdc334bcf53a28e3a0870c45cd9827da9165",
+    "cba_pdf_sha256": "b14f054de037722bb21ab8911b0b3917f0978b18dab9c916427d02115ccceda1"
+  },
+  "assumptions": {
+    "mass_M": "positive finite nucleus/electron mass ratio; synthetic low masses explicitly labelled",
+    "mu": "M/(M+1)",
+    "nu": "(M+1)/(M+2)",
+    "a": "mu",
+    "b": "1/(M+1)",
+    "lambda": "mu",
+    "binding": "mu/2 only",
+    "eta": "mu/|k|",
+    "frame": "target initially lab rest; beam +z; A spectator, (B,N) Coulomb pair",
+    "closure": "initial plane projectile and finite-mass Coulomb1s; final plane projectile in R times attractive Coulomb pair; first Born V once",
+    "spin": "labelled direct spin diagonal factor1",
+    "exchange": false,
+    "units": "explicit a0,p0,Eh scaling; TDCS a0²/Eh"
+  },
+  "required_api": [
+    "finite_mass_parameters(M)",
+    "finite_form_factor(M,Delta,kvec) with two stable parent overlaps and Nc",
+    "jacobi_tdcs(E0,Er,M,n_q,n_k)",
+    "invariant_weight(E0,M,p_A,p_B)",
+    "lab_tdcs(E0,M,p_A,n_B) using parent shell all positive branches and unresolved propagation"
+  ],
+  "allowed_paths": [
+    "research/he_ang_finitemass_cba_20261025",
+    "next5_ops_20261025"
+  ],
+  "immutable_reuse": [
+    {
+      "path": "BASS_HE/research/he_ang_cba_nordsieck_20261025/code/cba.py",
+      "from": "PR100 D; verify bytes from restored manifest"
+    },
+    {
+      "path": "BASS_HE/research/he_ang_finitemass_shell_20261024/code/shell.py",
+      "git_blob_sha1": "b4090ea4e8b70205f8353a5ed0665f749c176149"
+    },
+    {
+      "path": "finitemass_ops/dependencies/mpmath-1.3.0-py3-none-any.whl",
+      "sha256": "a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c"
+    }
+  ],
+  "analysis": {
+    "generic": {
+      "masses": [
+        1,
+        2,
+        10,
+        1836.152673426
+      ],
+      "geometries": [
+        {
+          "Delta": [
+            0.3,
+            0.1,
+            0.2
+          ],
+          "k": [
+            0,
+            0,
+            0.7
+          ]
+        },
+        {
+          "Delta": [
+            0.8,
+            -0.2,
+            0.4
+          ],
+          "k": [
+            0.2,
+            0.3,
+            0.5
+          ]
+        },
+        {
+          "Delta": [
+            -0.4,
+            0.2,
+            0.6
+          ],
+          "k": [
+            0.1,
+            -0.3,
+            0.9
+          ]
+        }
+      ],
+      "mp_digits": [
+        50,
+        80
+      ],
+      "binary64_scaled_tolerance": 2e-12,
+      "mp_precision_scaled_tolerance": 1e-40
+    },
+    "quadrature": {
+      "cases": [
+        {
+          "M": 1,
+          "Delta": [
+            0.3,
+            0.1,
+            0.2
+          ],
+          "k": [
+            0,
+            0,
+            0.7
+          ]
+        },
+        {
+          "M": 2,
+          "Delta": [
+            0.4,
+            0.2,
+            0.3
+          ],
+          "k": [
+            0,
+            0,
+            0.6
+          ]
+        },
+        {
+          "M": 1836.152673426,
+          "Delta": [
+            0.2,
+            0.1,
+            0.3
+          ],
+          "k": [
+            0,
+            0,
+            0.8
+          ]
+        }
+      ],
+      "digits": 50,
+      "method": "independent parabolic original K integral for both shifted q; no closed-form integrand",
+      "scaled_tolerance": 1e-35
+    },
+    "tiny": {
+      "masses": [
+        2,
+        1836.152673426
+      ],
+      "t": [
+        0.01,
+        1e-8,
+        1e-14
+      ],
+      "directions": [
+        "parallel z",
+        "transverse x"
+      ],
+      "k": [
+        0,
+        0,
+        0.7
+      ],
+      "true_relative_tolerance": 2e-12,
+      "reference_digits": 80
+    },
+    "fold": {
+      "M": 1,
+      "E0": 1,
+      "p_A": "P/10",
+      "binding": 0.25,
+      "gauss_orders": [
+        24,
+        48,
+        96
+      ],
+      "fine_chart_relative_tolerance": 1e-9,
+      "fine_refinement_relative_tolerance": 1e-9,
+      "method": "regular pair sphere vs independently transformed h two-positive-root sum; use model W per branch"
+    },
+    "illustration": {
+      "E0": "250/27.2",
+      "Er": "5/27.2",
+      "q_direction_degrees": 3,
+      "k_oriented_angles_degrees": "-180..180 step5",
+      "masses": [
+        2,
+        1836.152673426,
+        "infinite parent100"
+      ],
+      "units": "Jacobi dEr dOmega_k dOmega_q; Er not lab EB",
+      "mass_trend": [
+        2,
+        10,
+        100,
+        1000,
+        1836.152673426,
+        10000,
+        100000,
+        1000000
+      ],
+      "trend_k_angle_degrees": -50
+    },
+    "kinematics_scaled_tolerance": 2e-13,
+    "normalization_scaled_tolerance": 5e-13,
+    "error_definition": "scaled=abs(value-ref)/max(1,abs(ref)); tiny nonzero cases use true relative; exact symmetry zero uses absolute"
+  },
+  "resources": {
+    "new_science_cpu_cap_s": 12,
+    "new_science_wall_cap_s": 35,
+    "memory_bytes": 536870912,
+    "threads": 1,
+    "planned_children": [
+      {
+        "id": "01_tests",
+        "cpu_cap_s": 2,
+        "wall_cap_s": 5
+      },
+      {
+        "id": "02_analysis",
+        "cpu_cap_s": 6,
+        "wall_cap_s": 18
+      },
+      {
+        "id": "03_plot",
+        "cpu_cap_s": 3,
+        "wall_cap_s": 10
+      }
+    ],
+    "new_targeted_repair_reserve": 1,
+    "repair_requires_root_diagnosis": true,
+    "prior100_science_cpu_s": 4.987974,
+    "prior100_science_wall_s": 5.122489414992742,
+    "additional_lineage_science_cpu_ceiling_s": 20,
+    "additional_lineage_science_wall_ceiling_s": 60,
+    "prior100_remaining_reserve": "untouched; not transferred",
+    "other_inherited_ledgers": "preserve all exact references/costs/failures/unknown; no reset",
+    "end_to_end_cap_established": false,
+    "provider_model_IO_CPU": "UNKNOWN_NOT_ZERO"
+  },
+  "execution_gate": "Implementation and syntax-only preparation permitted now. Scientific START only root GO after R6/R7 and actual B1 dual ACK; no silent reruns.",
+  "publication_gate": "Independent C9 and root admission, fresh HEAD/AGENTS/parallel owners; expected SHA force=false; draft PR, no merge/activation.",
+  "claim_gate": {
+    "HE_ANG": "SOURCE_INPUT_PENDING",
+    "physical_provider_admitted": false,
+    "event_sigma": false,
+    "physical_recoil_distribution": false,
+    "HE_X1_empirical_correction": false,
+    "global_completion_percent": null
+  },
+  "stop_condition": "Complete this next defined R1-R10/C1-C10 science+delivery unit; preserve open larger goals and copyable next handoff. No automatic additional new scientific unit."
+}

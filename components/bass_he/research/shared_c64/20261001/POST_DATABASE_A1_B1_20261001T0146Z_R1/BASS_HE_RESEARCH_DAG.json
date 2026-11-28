@@ -1,0 +1,281 @@
+{
+  "schema": "bass_he.first_loop.research_dag.v1",
+  "scope": "FIRST_BOUNDED_A1_B1_LOOP",
+  "program_complete": false,
+  "nodes": [
+    {
+      "id": "A1",
+      "name": "FRAME_ETF_CONNECTION_DERIVATION",
+      "lane": "A",
+      "status": "FRAME_CONNECTION_GAP_IDENTIFIED",
+      "formal_status": "DERIVED_AND_INDEPENDENTLY_REVIEWED_IN_SCOPE",
+      "physical_closed": false,
+      "can_release_downstream": false,
+      "evidence": [
+        "A1/RESULT.json",
+        "review/A1_INDEPENDENT_REVIEW.json"
+      ]
+    },
+    {
+      "id": "A1b",
+      "name": "ASYMPTOTIC_CHANNEL_EMBEDDING_AND_ETF_CHOICE",
+      "lane": "A",
+      "status": "NOT_RUN_NEXT_SINGLE_HANDOFF",
+      "physical_closed": false,
+      "purpose": "Refinement of open A1, not bypass of A1 closure.",
+      "can_release_downstream": false,
+      "evidence": [
+        "NEXT_HANDOFF_KO.md"
+      ]
+    },
+    {
+      "id": "B1",
+      "name": "PRIMARY_NUMERIC_AUTHORITY_COMPLETION",
+      "lane": "B",
+      "status": "PRIMARY_NUMERIC_AUTHORITY_MATRIX_PARTIAL",
+      "authority_status": "SOURCE_AUTHORITY_UNRESOLVED",
+      "closed": false,
+      "can_release_G1": false,
+      "evidence": [
+        "B1/RESULT.json",
+        "B1/BENCHMARK_MATRIX.csv",
+        "review/B1_INDEPENDENT_RECORD_REVIEW.json"
+      ],
+      "independent_record_review": "PASS_BOUNDED_RECORD_REVIEW"
+    },
+    {
+      "id": "A2",
+      "name": "SMALL_R_LARGE_R_ANALYTIC_STRUCTURE",
+      "lane": "A",
+      "status": "NOT_RUN_BLOCKED_A1_CLOSURE",
+      "closed": false,
+      "immediate_predecessors": [
+        "A1"
+      ],
+      "current_root_blockers": [
+        "A1"
+      ]
+    },
+    {
+      "id": "C1",
+      "name": "TWO_CENTER_ELECTRONIC_STRUCTURE_NUMERICAL_DESIGN",
+      "lane": "C",
+      "status": "NOT_RUN_BLOCKED_A1_CLOSURE",
+      "closed": false,
+      "immediate_predecessors": [
+        "A2"
+      ],
+      "current_root_blockers": [
+        "A1"
+      ]
+    },
+    {
+      "id": "C2",
+      "name": "FINITE_R_COUPLING_NUMERICAL_AUDIT",
+      "lane": "C",
+      "status": "NOT_RUN_BLOCKED_A1_CLOSURE",
+      "closed": false,
+      "immediate_predecessors": [
+        "C1"
+      ],
+      "current_root_blockers": [
+        "A1"
+      ]
+    },
+    {
+      "id": "D1",
+      "name": "MINIMAL_COHERENT_THREE_CHANNEL_MODEL",
+      "lane": "D",
+      "status": "NOT_RUN_BLOCKED_A1_CLOSURE",
+      "closed": false,
+      "immediate_predecessors": [
+        "C2"
+      ],
+      "current_root_blockers": [
+        "A1"
+      ]
+    },
+    {
+      "id": "D2",
+      "name": "IMPACT_PARAMETER_AND_TIME_NUMERICS",
+      "lane": "D",
+      "status": "NOT_RUN_BLOCKED_A1_CLOSURE",
+      "closed": false,
+      "immediate_predecessors": [
+        "D1"
+      ],
+      "current_root_blockers": [
+        "A1"
+      ]
+    },
+    {
+      "id": "E1",
+      "name": "UPPER_SHELL_RETURN_CONVERGENCE",
+      "lane": "E",
+      "status": "NOT_RUN_BLOCKED_A1_CLOSURE",
+      "closed": false,
+      "immediate_predecessors": [
+        "D2"
+      ],
+      "current_root_blockers": [
+        "A1"
+      ]
+    },
+    {
+      "id": "E2",
+      "name": "CONTINUUM_AND_IONIZATION_CLOSURE",
+      "lane": "E",
+      "status": "NOT_RUN_BLOCKED_A1_CLOSURE",
+      "closed": false,
+      "immediate_predecessors": [
+        "E1"
+      ],
+      "current_root_blockers": [
+        "A1"
+      ]
+    },
+    {
+      "id": "F1",
+      "name": "NUCLEAR_TRAJECTORY_CAUSAL_AUDIT",
+      "lane": "F",
+      "status": "NOT_RUN_BLOCKED_A1_CLOSURE",
+      "closed": false,
+      "immediate_predecessors": [
+        "E2"
+      ],
+      "current_root_blockers": [
+        "A1"
+      ]
+    },
+    {
+      "id": "F2",
+      "name": "SUPPORT_AND_STOKES_DERIVATION",
+      "lane": "F",
+      "status": "NOT_RUN_BLOCKED_A1_CLOSURE",
+      "closed": false,
+      "immediate_predecessors": [
+        "F1"
+      ],
+      "current_root_blockers": [
+        "A1"
+      ]
+    },
+    {
+      "id": "G1",
+      "name": "FROZEN_BENCHMARK_DISCRIMINATION",
+      "lane": "G",
+      "status": "NOT_RUN_BLOCKED_A1_CLOSURE",
+      "closed": false,
+      "immediate_predecessors": [
+        "F2",
+        "B1"
+      ],
+      "current_root_blockers": [
+        "A1",
+        "B1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "A1",
+      "to": "A1b",
+      "kind": "gap_refinement",
+      "condition": "Open A1 formulation requires explicit embedding; current handoff allowed."
+    },
+    {
+      "from": "A1",
+      "to": "A2",
+      "kind": "closure_dependency",
+      "condition": "Predecessor required closure."
+    },
+    {
+      "from": "A2",
+      "to": "C1",
+      "kind": "closure_dependency",
+      "condition": "Predecessor required closure."
+    },
+    {
+      "from": "C1",
+      "to": "C2",
+      "kind": "closure_dependency",
+      "condition": "Predecessor required closure."
+    },
+    {
+      "from": "C2",
+      "to": "D1",
+      "kind": "closure_dependency",
+      "condition": "Predecessor required closure."
+    },
+    {
+      "from": "D1",
+      "to": "D2",
+      "kind": "closure_dependency",
+      "condition": "Predecessor required closure."
+    },
+    {
+      "from": "D2",
+      "to": "E1",
+      "kind": "closure_dependency",
+      "condition": "Predecessor required closure."
+    },
+    {
+      "from": "E1",
+      "to": "E2",
+      "kind": "closure_dependency",
+      "condition": "Predecessor required closure."
+    },
+    {
+      "from": "E2",
+      "to": "F1",
+      "kind": "closure_dependency",
+      "condition": "Predecessor required closure."
+    },
+    {
+      "from": "F1",
+      "to": "F2",
+      "kind": "closure_dependency",
+      "condition": "Predecessor required closure."
+    },
+    {
+      "from": "F2",
+      "to": "G1",
+      "kind": "closure_dependency",
+      "condition": "Predecessor required closure; F1/F2 may use only explicitly admitted scoped STOP at G1."
+    },
+    {
+      "from": "B1",
+      "to": "G1",
+      "kind": "closure_dependency",
+      "condition": "Benchmark authority matrix frozen before exact-cell discrimination."
+    }
+  ],
+  "parallel_start": [
+    "A1",
+    "B1"
+  ],
+  "B1_parallel_permitted_with": [
+    "A1",
+    "A2",
+    "C1",
+    "C2"
+  ],
+  "next_single_node": "A1b",
+  "after_A1b": "Return evidence to A1 physical-closure decision; A2 remains blocked until A1 closes.",
+  "G1_required_gates": [
+    "A1 physical closure",
+    "C2 closure",
+    "D1 and D2 closure",
+    "E1 and E2 closure",
+    "F1 and F2 closure or explicitly admitted scoped STOP",
+    "B1 matrix frozen"
+  ],
+  "gates": {
+    "CODE_I02_CLOSED": true,
+    "full_certificate_fail_closed": true,
+    "scientific_PROMOTE": "HOLD",
+    "Eq55_next_node_authorized": false,
+    "Eq55": "NOT_RUN",
+    "production_default_change": "NOT_AUTHORIZED"
+  }
+}

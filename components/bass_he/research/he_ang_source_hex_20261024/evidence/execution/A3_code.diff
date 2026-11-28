@@ -1,0 +1,11 @@
+--- evidence/execution/A1_before/pre_A3_hex_intake.py	2026-10-24 06:45:09.858921565 +0900
++++ code/hex_intake.py	2026-10-24 06:45:11.147208564 +0900
+@@ -295,7 +295,7 @@
+         text = raw.decode('utf-8').strip()
+         if not text or text.startswith(('#', '--')):
+             return None
+-        if re.match(r'INSERT\b', text, re.I):
++        if re.match(r'INSERT(?:\s|$)', text, re.I):
+             # The catalogue's parse_insert performs the literal/schema check.
+             return text
+         if re.fullmatch(r'(?:BEGIN(?:\s+TRANSACTION)?|COMMIT|END(?:\s+TRANSACTION)?)\s*;?', text, re.I):

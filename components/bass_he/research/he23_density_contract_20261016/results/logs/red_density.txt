@@ -1,0 +1,30 @@
+FF.s                                                                     [100%]
+=================================== FAILURES ===================================
+_____________________ test_native_density_interface_exists _____________________
+
+    def test_native_density_interface_exists():
+>       assert hasattr(client,'NativeDensityProvider'), 'missing source-bound total-nuclei provider'
+E       AssertionError: missing source-bound total-nuclei provider
+E       assert False
+E        +  where False = hasattr(client, 'NativeDensityProvider')
+
+research/he23_density_contract_20261016/tests/test_he23_density.py:14: AssertionError
+___________________ test_coupler_uses_injected_total_density ___________________
+
+    def test_coupler_uses_injected_total_density():
+        seen=[]
+        def factory(a,x):
+            nh=N_H_Z20*1.25*math.exp(-3*x)
+            seen.append(nh)
+            return PhotoOnlyTestDouble(nh)
+        def density(a,x):return N_H_Z20*1.25*math.exp(-3*x)
+        # A mismatch in the volume event check exposes a coupler still using old N_H_Z20.
+>       r=run_coupled(factory,m=4,steps=2,q=0.,density_provider=density)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: run_coupled() got an unexpected keyword argument 'density_provider'
+
+research/he23_density_contract_20261016/tests/test_he23_density.py:25: TypeError
+=========================== short test summary info ============================
+FAILED research/he23_density_contract_20261016/tests/test_he23_density.py::test_native_density_interface_exists
+FAILED research/he23_density_contract_20261016/tests/test_he23_density.py::test_coupler_uses_injected_total_density
+2 failed, 1 passed, 1 skipped in 0.18s

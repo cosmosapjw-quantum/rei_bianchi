@@ -1,0 +1,27 @@
+# R10E Wolfram Richardson check
+
+For an order-p one-step method with asymptotic error e(h)=C h^p:
+
+    [e(h)-e(h/2)] / [e(h/2)-e(h/4)] = 2^p.
+
+The error of the finest approximation relative to the last successive
+difference is
+
+    |e(h/4)| / |e(h/2)-e(h/4)| = 1/(2^p-1).
+
+For p=4:
+    successive-difference ratio = 16,
+    fine-error factor = 1/15.
+
+Using the original R10D worst 128->256 difference
+    D = 4.6718423847291746e-6,
+
+pure fourth-order asymptotic scaling projects
+
+    256->512 : D/16  = 2.919901490455734e-7,
+    512->1024: D/256 = 1.8249384315348338e-8.
+
+This explains why the original 128/256 endpoint was too coarse for the unchanged
+1e-7 gate while a 512/1024 comparison is a natural next resolution check.
+
+This is an asymptotic diagnostic, not an a priori rigorous error bound.

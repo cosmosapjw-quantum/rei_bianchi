@@ -1,0 +1,21 @@
+{
+  "unit": "HE-ANG-DDCS20-WINDOW",
+  "date_utc": "2026-10-24",
+  "nodes": [
+    {"id":"HE-X1","status":"COMPLETE_SCOPED","science_sha":"eb03981d15ad291375dd6d574a9c28809f85fc02","reuse":"theory,32 fixtures,independent review; no replay","depends_on":[]},
+    {"id":"HE-ANG-CONTRACT","status":"COMPLETE_SCOPED","science_sha":"896e5427100ad48d017deff2697b6f992ba029cd","depends_on":["HE-X1"]},
+    {"id":"HE-ANG-SOURCE-HEX-INTAKE","status":"COMPLETE_SCOPED","science_sha":"15053fe4445a32e0544d644e864fe27780d08743","depends_on":["HE-ANG-CONTRACT"],"reuse":"source/schema/catalogue and scoped Chebyshev operator; no replay"},
+    {"id":"HE-ANG-DDCS20-WINDOW","status":"COMPLETE_SCOPED","depends_on":["HE-ANG-CONTRACT","HE-ANG-SOURCE-HEX-INTAKE"],"source":"Childers2004 TableIV,20eV,primary32 cells","claim":"conditional measured-input window moments; no full event provider","review":"R6 PASS, C9 PASS_SCOPED"},
+    {"id":"HE-ANG-SOURCE-PAYLOAD","status":"INPUT_DEPENDENT","depends_on":["HE-ANG-CONTRACT"],"available_observation":"HE-ANG-DDCS20-WINDOW provides finite-domain detected-electron marginal only","next_input":"source-consistent joint outgoing electron angular/momentum law or amplitude/event sampler, with normalization/spin/exchange/support/frame/recoil metadata","original_contract":"../he_ang_source_hex_20261024/NEXT_SOURCE_CONTRACT.json","completion_test":"one positive raw payload and matching convention permit same-event electron+ion moments; absence in one file is not a no-go"},
+    {"id":"HE-ANG","status":"SOURCE_INPUT_PENDING","depends_on":["HE-X1","HE-ANG-SOURCE-PAYLOAD"],"physical_provider_admitted":false},
+    {"id":"HE-EXCHANGE","status":"PROPOSED","depends_on":[],"ownership":"original author contract preserved"},
+    {"id":"HE-RESERVOIR","status":"PROPOSED","depends_on":[],"ownership":"original author contract preserved"},
+    {"id":"HE-CLOSURE","status":"PROPOSED","depends_on":["HE-ANG","HE-EXCHANGE","HE-RESERVOIR"]},
+    {"id":"HE-FEEDBACK","status":"PROPOSED","depends_on":["HE-CLOSURE"]}
+  ],
+  "before_each_new_node":["read applicable AGENTS","read actual HEAD and parallel owner changes","verify last backup ACK/identity","preserve all cumulative costs and failures"],
+  "next_execution":"source admission first; no full solve/new IVP in the completed unit allocation",
+  "physical_goal_completion_percent":null,
+  "no_merge":true,
+  "no_activation":true
+}

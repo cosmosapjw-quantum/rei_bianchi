@@ -1,0 +1,132 @@
+{
+  "schema": "HE_EXP_LOCAL_PROGRESS_DAG_V1",
+  "central_base": {
+    "repo": "cosmosapjw-quantum/rei_bianchi",
+    "sha": "78f7ac5864d5817ceb79b48cb5e298cc30006510",
+    "path": "research/orchestration_expansion_20261025/DAG.json",
+    "central_nodes": 87
+  },
+  "unit_id": "HE-EXP-INTAKE-01",
+  "local_nodes": [
+    {
+      "id": "HEI-SPECIES",
+      "central_nodes": [
+        "HE-EXP-SPECIES"
+      ],
+      "role": "HEconsumer/WUlead",
+      "state": "COMPLETE_SCOPED_SOURCE_INTAKE",
+      "depends_on": [],
+      "evidence": "species/SPECIES_PROVIDER_REGISTRY.json"
+    },
+    {
+      "id": "HEI-TRANSPORT",
+      "central_nodes": [
+        "HE-EXP-PAIR"
+      ],
+      "role": "HEsupplier",
+      "state": "COMPLETE_SCOPED_SOURCE_INTAKE",
+      "depends_on": [],
+      "evidence": "species/EXPLICIT_TRANSPORT_SOURCE_INVENTORY.json"
+    },
+    {
+      "id": "HEI-HHE-PAIR",
+      "central_nodes": [
+        "HE-EXP-PAIR",
+        "HE-EXCHANGE"
+      ],
+      "role": "HEsupplier",
+      "state": "DERIVED_IMPLEMENTATION_VERIFIED_CONDITIONAL",
+      "depends_on": [
+        "HEI-TRANSPORT"
+      ],
+      "evidence": "pair_source/THEORY_KO.md"
+    },
+    {
+      "id": "HEI-ELASTIC-MOMENTS",
+      "central_nodes": [
+        "HE-EXCHANGE"
+      ],
+      "role": "HEsupplier",
+      "state": "DERIVED_IMPLEMENTATION_VERIFIED_CONDITIONAL",
+      "depends_on": [],
+      "evidence": "exchange/THEORY_KO.md"
+    },
+    {
+      "id": "HEI-CALORIC-OWNERSHIP",
+      "central_nodes": [
+        "HE-CLOSURE",
+        "HE-EXP-CLOSURE",
+        "HE-RESERVOIR",
+        "HE-EXP-PHOTON-PAIR"
+      ],
+      "role": "HEconsumer_interface",
+      "state": "DERIVED_IMPLEMENTATION_VERIFIED_CONDITIONAL",
+      "depends_on": [
+        "HEI-SPECIES",
+        "HEI-ELASTIC-MOMENTS"
+      ],
+      "evidence": "exchange/THEORY_KO.md"
+    },
+    {
+      "id": "HEI-PHYSICAL-BINDING",
+      "central_nodes": [
+        "HE-EXP-PAIR",
+        "HE-EXCHANGE"
+      ],
+      "role": "source_binding",
+      "state": "SOURCE_INPUT_PENDING",
+      "depends_on": [
+        "HEI-SPECIES",
+        "HEI-HHE-PAIR"
+      ],
+      "needs": [
+        "WUactual isotope/state/mass mapping",
+        "one selectedTstar Qbar11 value and source uncertainty",
+        "selected physical-domain admission and own numeric allocation"
+      ]
+    },
+    {
+      "id": "HEI-REDUCTION",
+      "central_nodes": [
+        "HE-CLOSURE",
+        "HE-EXP-CLOSURE"
+      ],
+      "role": "HEmodel_reduction",
+      "state": "INPUT_DEPENDENT",
+      "depends_on": [
+        "HEI-PHYSICAL-BINDING",
+        "HEI-CALORIC-OWNERSHIP"
+      ],
+      "needs": [
+        "timescale and observable-error evidence for commonT/u",
+        "CRstopping payload only when selectedmodel includes nonthermal injection"
+      ]
+    },
+    {
+      "id": "HEI-FEEDBACK",
+      "central_nodes": [
+        "HE-FEEDBACK"
+      ],
+      "role": "coupled_consumer",
+      "state": "INPUT_DEPENDENT_NOT_SCHEDULED",
+      "depends_on": [
+        "HEI-REDUCTION"
+      ]
+    }
+  ],
+  "owner_rules": {
+    "species_elementary_WU": "consumer progress does not change owner readiness",
+    "levels_REC": "HDownerparser not duplicated",
+    "nonthermal_CR": "distribution/cascade/stopping remainCRlead"
+  },
+  "retained_global_nodes": {
+    "HE-ANG": "SOURCE_INPUT_PENDING",
+    "HE-EXP-JOINT": "SOURCE_INPUT_PENDING",
+    "HE-EXP-NUCLEAR": "WU_SOURCE_INPUT_PENDING",
+    "HE101-EXPORT": "OPEN_RESERVED_EXISTING_OWNER;C8PARTIAL_EXPORT;reserve0"
+  },
+  "conditional_input_binding": "Selected channel dependencies only; all-species completion is not required before one pair proceeds",
+  "global_physical_completion": null,
+  "L4_ready": false,
+  "physical_provider_admitted": false
+}

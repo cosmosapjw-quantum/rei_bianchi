@@ -1,0 +1,20 @@
+{
+  "request": {
+    "code": "Clear[\"Global`*\"]; left=Table[FullSimplify[Integrate[x^r (b-x)/(b-a),{x,a,b},Assumptions->Element[{a,b},Reals]&&a<b]-(b-a) Switch[r,0,1/2,1,(2a+b)/6,2,(3a^2+2a b+b^2)/12],Assumptions->Element[{a,b},Reals]&&a<b],{r,0,2}]; right=Table[FullSimplify[Integrate[x^r (x-a)/(b-a),{x,a,b},Assumptions->Element[{a,b},Reals]&&a<b]-(b-a) Switch[r,0,1/2,1,(a+2b)/6,2,(a^2+2a b+3b^2)/12],Assumptions->Element[{a,b},Reals]&&a<b],{r,0,2}]; halfLeft=FullSimplify[Integrate[Sqrt[x](b-x)/(b-a),{x,a,b},Assumptions->0<a<b]-(2b(b^(3/2)-a^(3/2))/3-2(b^(5/2)-a^(5/2))/5)/(b-a),Assumptions->0<a<b]; ratioResidual=Together[D[(bb+bk z)/(aa+ak z),z]-(bk aa-ak bb)/(aa+ak z)^2]; varianceResidual=Together[(w1 x1^2+w2 x2^2)/(w1+w2)-((w1 x1+w2 x2)/(w1+w2))^2-w1 w2(x1-x2)^2/(w1+w2)^2]; <|\"leftHatResiduals\"->left,\"rightHatResiduals\"->right,\"sqrtEnergyLeftResidual\"->halfLeft,\"ratioDerivativeResidual\"->ratioResidual,\"twoPointVarianceResidual\"->varianceResidual|>",
+    "timeConstraint": 10,
+    "start_utc": "2026-10-24T02:03:18.781Z",
+    "remote_cpu": "UNKNOWN_NOT_ZERO"
+  },
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= <|\"leftHatResiduals\" -> {0, 0, 0}, \"rightHatResiduals\" -> {0, 0, 0}, \"sqrtEnergyLeftResidual\" -> 0, \"ratioDerivativeResidual\" -> 0, \"twoPointVarianceResidual\" -> 0|>"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "observed_tool_wall_seconds": 13.307,
+  "end_utc": "2026-10-24T02:03:32.088Z"
+}

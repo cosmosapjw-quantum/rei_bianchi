@@ -1,0 +1,363 @@
+{
+  "schema": "WU088_HH_PHYS14_NEXT_DAG_V1",
+  "date_KST": "2026-10-12",
+  "change_type": "append admitted carried-second-half provider and concrete correlated endpoint-defect successor",
+  "global_source_dag": "baseline/REI_ATOMIC_REUSE_DAG_20261012.json",
+  "global_source_sha256": "2508158361442bba6c828b3a02141c56051d80bbe4546cb31a07544f5c0b79fa",
+  "global_nodes_newly_completed": [],
+  "retained_science": "../hh_atomic_reuse_plan_20261012_v2/HH_RETAINED_RESULTS.json",
+  "nodes": [
+    {
+      "id": "HH_REUSE",
+      "title": "PHYS12 보존 결과 등록",
+      "depends_on": [],
+      "lane": "RETAINED",
+      "owner": "WU088_HH",
+      "status": "RETAINED_RESULT_REGISTERED",
+      "artifact": [
+        "HH_RETAINED_RESULTS.json",
+        "SOURCE_REGISTRY.json"
+      ],
+      "acceptance": [
+        "Actual source/result/decision identity linked",
+        "PHYS12 scope and prior mixed attribution retained",
+        "No scientific rerun"
+      ],
+      "global_links": [
+        "RUX00",
+        "RUX01",
+        "RUX14"
+      ],
+      "route": "HERE"
+    },
+    {
+      "id": "HH_EXPORT",
+      "title": "HH 제공 계약과 사건 owner 행",
+      "depends_on": [
+        "HH_REUSE"
+      ],
+      "lane": "PRODUCER_INTERFACE",
+      "owner": "WU088_HH",
+      "status": "CONTRACT_PREPARED_NOT_RUNTIME_BOUND",
+      "artifact": [
+        "contracts/HH_REI_EXPORT_CONTRACT.json",
+        "contracts/HH_PROCESS_OWNER_ROWS.json",
+        "contracts/HH_CONSUMER_REQUEST_TEMPLATE.json"
+      ],
+      "acceptance": [
+        "LCS/singlet and species/thermal units separated",
+        "Source-family and switch semantics explicit",
+        "Unknown consumer/runtime binding remains null"
+      ],
+      "global_links": [
+        "RUX03",
+        "RUX14"
+      ],
+      "route": "HERE"
+    },
+    {
+      "id": "HH_DOMAIN_SCREEN",
+      "title": "실제 소비 계열의 적용성 판정",
+      "depends_on": [
+        "HH_EXPORT"
+      ],
+      "lane": "OPTIONAL_EOR_PREPARATION",
+      "owner": "WU088_HH",
+      "status": "WAIT_FOR_NAMED_CONSUMER_INPUT",
+      "required_inputs": [
+        "Actual filled consumer request",
+        "Source/scenario input identity and domain"
+      ],
+      "artifact": [
+        "HH_CONSUMER_ADMISSION.json"
+      ],
+      "acceptance": [
+        "Full source/fixed-coefficient/COMMON/operator comparison; box overlap alone insufficient",
+        "Match, proven coverage or exact mismatch recorded",
+        "Smallest required transfer/source input identified when mismatched"
+      ],
+      "global_links": [
+        "RUX02",
+        "RUX03",
+        "RUX04",
+        "RUX14"
+      ],
+      "may_precede_RUX11": true,
+      "route": "HERE"
+    },
+    {
+      "id": "HH_MATERIALITY",
+      "title": "관측량별 HH 기여와 허용오차 판정",
+      "depends_on": [
+        "HH_DOMAIN_SCREEN"
+      ],
+      "lane": "OPTIONAL_EOR_PREPARATION",
+      "owner": "WU088_HH",
+      "status": "CONDITIONAL_NOT_EXECUTED",
+      "required_inputs": [
+        "Named observable/unit/domain/norm",
+        "Predeclared absolute HH budget for an omission/materiality decision, or explicit response question",
+        "Valid source-to-observable transfer"
+      ],
+      "artifact": [
+        "HH_MATERIALITY_DECISION.json"
+      ],
+      "acceptance": [
+        "Follow HH_OBSERVABLE_EFFECT_POLICY",
+        "Use absolute HH effect rather than mixed correction as total scale",
+        "No history bound from summing independent first stages"
+      ],
+      "global_links": [
+        "RUX14"
+      ],
+      "may_precede_RUX11": true,
+      "route": "HERE"
+    },
+    {
+      "id": "HH_MATCHED_HISTORY",
+      "title": "필요한 실제 HH ON/OFF 이력 비교",
+      "depends_on": [
+        "HH_MATERIALITY"
+      ],
+      "external_dependencies": [
+        "RUX11"
+      ],
+      "lane": "OPTIONAL_EOR_RUX14",
+      "owner": "WU088_HH",
+      "runtime_owner": "rei_bianchi",
+      "status": "CONDITIONAL_NOT_EXECUTED",
+      "activation": "A concrete effect/uncertainty question calls for actual histories; actual RUX11 baseline evidence and HH process/domain admission bound",
+      "artifact": [
+        "HH_EFFECT_ON_EOR.json",
+        "MATCHED_HH_EFFECT_ERROR_LEDGER.json"
+      ],
+      "acceptance": [
+        "Match physical source/IC/closure within each geometry ON/OFF pair",
+        "Geometry contrasts prespecified",
+        "Retain all time carry and nuclei/charge/photon/energy owners",
+        "Reuse matching cached logical cases; compute only missing cases",
+        "BASS receiver bound for tau/visibility claims"
+      ],
+      "global_links": [
+        "RUX14"
+      ],
+      "route": "HERE_FIRST_NCP_IF_MEASURED_HEAVY"
+    },
+    {
+      "id": "HH_RESULT_RELEASE",
+      "title": "범위가 명시된 HH 소비 결과 전달",
+      "depends_on": [
+        "HH_MATCHED_HISTORY"
+      ],
+      "lane": "OPTIONAL_EOR_RUX14",
+      "owner": "WU088_HH",
+      "status": "CONDITIONAL_NOT_EXECUTED",
+      "artifact": [
+        "HH_EFFECT_CLAIM_DECISION.json",
+        "HH_EFFECT_FIGURES"
+      ],
+      "acceptance": [
+        "Independent scoped effect review",
+        "Separate numerical, atomic, source, geometry and spatial closure uncertainty",
+        "No automatic global RUX16/production promotion"
+      ],
+      "global_links": [
+        "RUX14",
+        "RUX16"
+      ],
+      "route": "HERE"
+    },
+    {
+      "id": "HH_STRICT_NATIVE",
+      "title": "FT03 strict native 연구 보존",
+      "depends_on": [
+        "HH_REUSE"
+      ],
+      "external_dependencies": [],
+      "lane": "FT03_NATIVE",
+      "owner": "WU088_HH",
+      "status": "OPEN_OPTIONAL_RESEARCH",
+      "artifact": [
+        "Original strict-native outputs if selected"
+      ],
+      "acceptance": [
+        "Named strict-certificate question",
+        "Preserve PHYS11 source/native/ray/guard/root/carry and next-stage coverage requirements"
+      ],
+      "inherited_dag": "baseline/PHYS12_NEXT_DAG.json",
+      "is_REI_baseline_prerequisite": false,
+      "route": "LANE_SPECIFIC_ADMISSION"
+    },
+    {
+      "id": "HH_SINGLET",
+      "title": "독립 singlet 이온쌍 충돌 연구",
+      "depends_on": [],
+      "external_dependencies": [],
+      "lane": "ATOMIC_MICROSCOPIC",
+      "owner": "WU088_HH",
+      "status": "OPEN_INDEPENDENT_RESEARCH",
+      "artifact": [
+        "Named original microscopic collision observable if selected"
+      ],
+      "acceptance": [
+        "Original source/basis/raw inputs and atomic obligations",
+        "Channel/spin/velocity/impact/energy/tail gates",
+        "New work selected for its own physical question",
+        "No LCS substitution or free-electron relabeling"
+      ],
+      "is_REI_baseline_prerequisite": false,
+      "requires_REI_completion": false,
+      "route": "LANE_SPECIFIC_ADMISSION"
+    },
+    {
+      "id": "HH_THERMODYNAMIC_RESPONSE",
+      "title": "PHYS13 유한 온도·전자 응답과 냉각 기여",
+      "depends_on": [
+        "HH_REUSE"
+      ],
+      "external_dependencies": [],
+      "lane": "INDEPENDENT_PROVIDER_OBSERVABLE",
+      "owner": "WU088_HH",
+      "status": "PROMOTE_SCOPED_WITH_INHERITED_PREMISES",
+      "artifact": [
+        "results/thermo_v2/THERMO_RESULTS.json",
+        "theory/THERMODYNAMIC_RESPONSE_THEOREM_KO.md",
+        "review/DECISION.json"
+      ],
+      "acceptance": [
+        "Same fixed-alpha source and C2 root premises retained",
+        "Actual source fhat temperature and electron normalization",
+        "Finite temperature/electron bounds and correlated cooling contribution",
+        "Independent scoped review"
+      ],
+      "global_links": [
+        "RUX14"
+      ],
+      "route": "HERE",
+      "is_REI_baseline_prerequisite": false,
+      "review": "review/DECISION.json"
+    },
+    {
+      "id": "HH_ISOTROPIC_JOINT_ADVANCE",
+      "title": "PHYS14 공동 carry의 실제 두 번째 half와 광자 기억",
+      "depends_on": [
+        "HH_THERMODYNAMIC_RESPONSE"
+      ],
+      "external_dependencies": [],
+      "lane": "INDEPENDENT_PROVIDER_OBSERVABLE",
+      "owner": "WU088_HH",
+      "status": "PROMOTE_SCOPED_WITH_INHERITED_PREMISES",
+      "artifact": [
+        "results/advance01/ADVANCE_RESULTS.json",
+        "theory/THEORY_CANDIDATE_KO.md",
+        "review/DECISION.json"
+      ],
+      "required_inherited_evidence": [
+        "PHYS09 first-half U/V/W",
+        "PHYS11 first-half joint photon carry",
+        "PHYS13 first-half root image",
+        "NCP07 Full source and original ray/guard payload"
+      ],
+      "acceptance": [
+        "Same global lambda,b through actual two-half history",
+        "Geometric isotropic subfamily bound to original ray enclosures",
+        "New self-map/contraction and U/V/W with explicit tail",
+        "Temperature/electron finite responses and photon-memory sign",
+        "Independent scoped decision"
+      ],
+      "global_links": [
+        "RUX14"
+      ],
+      "is_REI_baseline_prerequisite": false,
+      "route": "HERE",
+      "review": "review/DECISION.json"
+    },
+    {
+      "id": "HH_CORRELATED_ENDPOINT_DEFECT",
+      "title": "같은 COMMON의 Full 대 two-half endpoint 결함",
+      "depends_on": [
+        "HH_ISOTROPIC_JOINT_ADVANCE"
+      ],
+      "external_dependencies": [],
+      "lane": "INDEPENDENT_PROVIDER_OBSERVABLE",
+      "owner": "WU088_HH",
+      "status": "READY_FOR_SCOPED_DERIVATION_NOT_EXECUTED",
+      "required_inputs": [
+        "Existing Full and PHYS14 two-half coefficients bound to identical geometric subfamily",
+        "Shared COMMON and correlated gas/photon difference representation",
+        "Named T/e/w endpoint observables"
+      ],
+      "artifact": [
+        "Next-loop correlated defect derivation and result if selected"
+      ],
+      "acceptance": [
+        "Preserve common-input dependence before interval subtraction",
+        "Separate transport splitting, intermediate absorption and source/birth chronology",
+        "Use existing source and carry; add only missing source/domain evidence",
+        "Independent decision on actual defect result"
+      ],
+      "global_links": [
+        "RUX14"
+      ],
+      "is_REI_baseline_prerequisite": false,
+      "route": "HERE_FIRST_NCP_IF_MEASURED_HEAVY"
+    }
+  ],
+  "execution_edge_semantics": {
+    "depends_on": "Required local predecessor for this node only",
+    "external_dependencies": "Actual external evidence required only for the named node; proposed snapshot is not a PASS receipt",
+    "global_links": "Contribution/crosswalk only; not a dependency or claim of global completion",
+    "may_precede_RUX11": "Preparation can occur when required concrete inputs exist, without waiting for final EoR figures"
+  },
+  "next_HH_action": "Derive and enclose same-COMMON Full versus actual two-half endpoint defect while preserving input correlations.",
+  "immediate_HH_scientific_job_assigned": true,
+  "global_critical_path_owned_elsewhere": [
+    "RUX00",
+    "RUX02",
+    "RUX03",
+    "RUX04",
+    "RUX05",
+    "RUX06",
+    "RUX07",
+    "RUX08",
+    "RUX09",
+    "RUX10",
+    "RUX11",
+    "RUX16"
+  ],
+  "global_critical_path_requires_HH_optional_completion": false,
+  "active_heavy_queue": [],
+  "active_launch": false,
+  "forbidden_implicit_edges": [
+    "HH_SINGLET -> RUX04/05/07/08/09/11/16",
+    "HH_STRICT_NATIVE -> REI baseline",
+    "RUX11 -> HH_EXPORT",
+    "RUX04/RUX07/RUX11 -> HH_SINGLET",
+    "PHYS12 -> global RUX14 PASS",
+    "old N2 HOLD -> current input absence"
+  ],
+  "closed_prior_tasks": [
+    "PHYS12 L0",
+    "PHYS12 L1",
+    "PHYS12 L2",
+    "PHYS12 L3 stop"
+  ],
+  "new_physical_question_completed": "Actual carried second-half finite T/e/w and mixed response; negative photon-memory temperature contribution; exact original-grid remap split operator.",
+  "dag_update_note": "All nine preceding node JSON values are unchanged. Append one admitted provider result and one explicitly unexecuted local successor; original global DAG bytes and RUX statuses are preserved.",
+  "inherited_artifact_roots": {
+    "source_commit": "36f9669b117fe7537b3fa59d4cc80f5e12154be5",
+    "path_basis": "repository-relative roots; each preserved inherited node artifact/review/inherited_dag path is relative to its original root, not PHYS14",
+    "nodes": {
+      "HH_REUSE": "research/r31ao_unequal_ladder/hh_atomic_reuse_plan_20261012_v2",
+      "HH_EXPORT": "research/r31ao_unequal_ladder/hh_atomic_reuse_plan_20261012_v2",
+      "HH_DOMAIN_SCREEN": "research/r31ao_unequal_ladder/hh_atomic_reuse_plan_20261012_v2",
+      "HH_MATERIALITY": "research/r31ao_unequal_ladder/hh_atomic_reuse_plan_20261012_v2",
+      "HH_MATCHED_HISTORY": "research/r31ao_unequal_ladder/hh_atomic_reuse_plan_20261012_v2",
+      "HH_RESULT_RELEASE": "research/r31ao_unequal_ladder/hh_atomic_reuse_plan_20261012_v2",
+      "HH_STRICT_NATIVE": "research/r31ao_unequal_ladder/hh_atomic_reuse_plan_20261012_v2",
+      "HH_SINGLET": "research/r31ao_unequal_ladder/hh_atomic_reuse_plan_20261012_v2",
+      "HH_THERMODYNAMIC_RESPONSE": "research/r31ao_unequal_ladder/hh_phys13_thermodynamic_response_20261012_v1"
+    },
+    "planned_artifact_semantics": "Unexecuted node artifact fields remain prospective; this mapping is not a completion receipt."
+  }
+}

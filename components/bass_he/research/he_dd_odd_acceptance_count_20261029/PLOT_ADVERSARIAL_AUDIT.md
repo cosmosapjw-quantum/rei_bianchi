@@ -1,0 +1,7 @@
+# C8/C9 bounded plot-based adversarial and code-risk audit (2026-10-29)
+Rendered two local PNGs using Git-blob-identical plot_from_results.py, sourced from exact PR110 fractions and new stage RESULTS:
+1. mean_leakage: all three L curves vanish at response delta=0 and grow as delta grows; labels explicitly say arm-labelled, no intrinsic birth asymmetry.
+2. variance_bounds: existing distinct source-L intervals present already at delta=0, lower envelopes decline and upper envelopes rise monotonically with positive response-shape uncertainty. No experimental calibration points.
+Checks: sign reversal mu→-mu changes signed m but not b,m²,V; exact zero eta when q exchange-even; Poisson N gives positive cross cov for frozen K0²>Delta², deterministic N gives nonpositive crosscov; finite integer N with E[N]=1/2 and Var=0 rejected; q/r/floats invalid rejected. All 20 Python tests normal and optimized; C++20 exact rational 1089 cases; compileall and Wolfram symbols PASS.
+Known high-priority representational limitation: exact rational marked_event_moments(k0,delta,...) expects rational delta. The frozen physical Delta is generally sqrt(rational), so for actual 330MeV use delta²-based exact bounds, not a rounded delta passed as exact. The event-count process is *observed arm-labelled records*, not measured unlabelled exclusive event rate. Two cloud log ACK are text-only.
+Independent nonauthor R6/C9 NOT_RUN; this self code review does not close new local 2/2. No whole-suite or physical source.

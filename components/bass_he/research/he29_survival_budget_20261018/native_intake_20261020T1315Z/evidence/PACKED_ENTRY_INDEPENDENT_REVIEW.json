@@ -1,0 +1,196 @@
+{
+  "schema": "he29.packed_entry_independent_review.v1",
+  "created_utc": "2026-10-20T17:26:20.057570+00:00",
+  "reviewer": "independent child agent /root/context_executor",
+  "research_phase": "C9",
+  "status": "PASS_SCOPED",
+  "scope": "New external packed-entry wrapper, its manufactured seam tests, and NCP handoff; not a repeat of the prior native-return, scientific-code, or watchdog review.",
+  "decision": "No actionable major or minor defect found in the new wrapper or execution recipe. Prepared code is eligible for publication and for the already authorized optional single r4/table512 packed canary, subject to fresh executor-side process/result observation and the unchanged preflight gates.",
+  "findings": [],
+  "finding_counts": {
+    "major": 0,
+    "minor": 0
+  },
+  "reviewed_inputs": [
+    {
+      "path": "ncp/packed_entry.py",
+      "bytes": 9190,
+      "sha256": "befd6740a09811ae2f2c61cb7bd0ee54fc96740d17d21f83282f7453c143ccfe"
+    },
+    {
+      "path": "tests/test_packed_entry.py",
+      "bytes": 12817,
+      "sha256": "b0403fd2baa66909b56b38192050ffd3704a3949bd9ebf5e70c6edd84d015953"
+    },
+    {
+      "path": "NCP_HANDOFF_KO.md",
+      "bytes": 16523,
+      "sha256": "ac870ed8b46a2254ceef8571e084015655d88114a3df4ad77519fd44fc3d40b4"
+    }
+  ],
+  "pinned_dependency_reads": {
+    "method": "Actual read-only GitHub fetches at exact commit revisions; file contents inspected and raw-content SHA256 compared with wrapper constants. No dependency code was executed.",
+    "raw_evidence": "PINNED_DEPENDENCY_READBACK.json",
+    "raw_evidence_sha256": "5a00bcb6cf1a724780f834296b6ad234854162062c10e2ad710f80c2c591ded1",
+    "matches": 4,
+    "files": [
+      {
+        "role": "build target",
+        "revision": "a5d4711460c09b310b78c9692aa62534b7a843d3",
+        "path": "research/he29_survival_budget_20261018/optimization_20261020/ncp/build_bridge.py",
+        "sha256": "0f1012c0b550c04d35455450c46acb3931d48b0e5b54f1cc0a19dafddbfbe708",
+        "match": true
+      },
+      {
+        "role": "preflight/canary target",
+        "revision": "a5d4711460c09b310b78c9692aa62534b7a843d3",
+        "path": "research/he29_survival_budget_20261018/optimization_20261020/src/run_packed.py",
+        "sha256": "803e192709a1b5ff9a0732c806a7cff91fd8fe3af69d03e3885efaffe4f388ea",
+        "match": true
+      },
+      {
+        "role": "process-group watchdog",
+        "revision": "ed5adca43f474553a9bce7f5de45d464be5905cb",
+        "path": "research/he29_survival_budget_20261018/orchestration_20261020/src/continue_missing_references.py",
+        "sha256": "70d38312c288533b829eadbab8037cc09b4218247ebd6262318fc25cb9f0baad",
+        "match": true
+      },
+      {
+        "role": "original execution helper",
+        "revision": "a5d4711460c09b310b78c9692aa62534b7a843d3",
+        "path": "research/he28_strip_refinement_20261018/src/execution.py",
+        "sha256": "876e43d76f0773a8d2c38e262902442c614a68334561f5e2a78024c659edb1c4",
+        "match": true
+      }
+    ]
+  },
+  "review_matrix": [
+    {
+      "area": "Exact source and import identity",
+      "status": "PASS",
+      "evidence": "Both dependency checkout roots must be actual Git top-level paths, exact pinned HEADs and tracked-clean. Each imported target/helper has a fixed path, no direct symlink, containment check and exact SHA before import. The a5 target retains its original __file__; inserting the original target directory reproduces direct-script sibling import resolution."
+    },
+    {
+      "area": "Corrected process-group seam",
+      "status": "PASS",
+      "evidence": "Only target.run_process is rebound to functools.partial(ed5.run_process_group, execution=original_execution). The actual ed5 signature accepts the three positional arguments used by both a5 targets. Original target and worker argv construction remains in the a5 code; no solver or worker substitution occurs."
+    },
+    {
+      "area": "Entry arguments and bounded work",
+      "status": "PASS",
+      "evidence": "Strict non-abbreviating parsers allow only build/preflight/canary and the existing public options. Direct worker mode, extra case or physics arguments, wrong source pin and invalid or non-finite wall budgets are rejected before target import. The recipe chooses one r4/table512 canary, thread1, 900 seconds, without automatic grid expansion."
+    },
+    {
+      "area": "Create-only output boundary",
+      "status": "PASS",
+      "evidence": "Boundary and target output paths are resolved, must be disjoint, and must lie outside both dependency checkouts. Existing target output is rejected. Boundary creation and atomic link-based JSON publication do not replace existing artifacts. Failure records are separate from native scientific results."
+    },
+    {
+      "area": "Target failure propagation",
+      "status": "PASS",
+      "evidence": "Exceptions and nonzero SystemExit from the actual a5 main functions propagate after a boundary failure receipt. Success receipts describe only target return. sys.argv and sys.path are restored. The actual target main implementations do not encode failure solely as an ignored integer return."
+    },
+    {
+      "area": "Scientific and full-state boundary",
+      "status": "PASS",
+      "evidence": "No edits to a5/ed5 legacy source bytes are part of this wrapper. The original packed target continues to enforce the single-case contract, full state including all 19 ledger components, original full-state norm, source/input/parent/binary/runtime/bridge qualification, tolerances and positivity/admission gates. The wrapper introduces no new numerical transform or solver."
+    },
+    {
+      "area": "Build and DATA restoration order",
+      "status": "PASS",
+      "evidence": "The handoff reuses an exact previously qualified bridge or invokes the unchanged a5 builder before DATA restoration, respecting its clean-source requirement. Actual a5 manifest and RESTORE_VERIFIED_INPUTS.py reads confirm the repaired input hash and --root option. Only the 22 verified DATA files are restored; baseline1569 patches are not applied again to a5."
+    },
+    {
+      "area": "Original baseline and cohort reuse",
+      "status": "PASS",
+      "evidence": "The handoff keeps the already returned four native reference pairs, original owner binary and qualification, exact runtime cohort and original initial state. The a5 preflight remains the gate for the new packed canary. Reusing old reference analysis and running this necessary new preflight are described separately."
+    },
+    {
+      "area": "Duplicate-work and reporting limits",
+      "status": "PASS",
+      "evidence": "The recipe explicitly requires a permitted executor to observe current processes and stored results before any canary. Historical paths are not represented as current process observations. An unobserved duplicate state remains HOLD. Wrapper success is not represented as native admission or a measured HE29 speedup. Watchdog grace/cleanup semantics are not represented as a hard total-wall or escaped-descendant guarantee."
+    }
+  ],
+  "reused_validation": {
+    "author_tests": {
+      "receipt_path": "evidence/PACKED_ENTRY_TESTS_FIRST.json",
+      "receipt_sha256": "75f9b99a763b9c15b3cb9a1d8fafa58d99e15c9ee71a9cafdd5ade0b6346f36e",
+      "receipt": {
+        "status": "PASS",
+        "started_utc": "2026-10-20T13:26:35.654939+00:00",
+        "command": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+          "-B",
+          "/workspace/scratch/a269f21fcbff/BASS_HE/research/he29_survival_budget_20261018/native_intake_20261020T1315Z/tests/test_packed_entry.py"
+        ],
+        "cwd": "/workspace/scratch/a269f21fcbff/BASS_HE",
+        "returncode": 0,
+        "wall_s": 0.15481191799335647,
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "scope": "new external packed entry wiring only; all targets, watchdogs, Git query responses are manufactured",
+        "test_method_count": 9,
+        "old_test_methods_replayed": 0,
+        "scientific_modules_imported": 0,
+        "solver_runs": 0,
+        "native_executions": 0,
+        "builds": 0,
+        "source_sha256": {
+          "research/he29_survival_budget_20261018/native_intake_20261020T1315Z/ncp/packed_entry.py": "befd6740a09811ae2f2c61cb7bd0ee54fc96740d17d21f83282f7453c143ccfe",
+          "research/he29_survival_budget_20261018/native_intake_20261020T1315Z/tests/test_packed_entry.py": "b0403fd2baa66909b56b38192050ffd3704a3949bd9ebf5e70c6edd84d015953"
+        }
+      },
+      "interpretation": "Nine first-run PASS methods exercise only the new external entry seam using manufactured Git responses, target modules and watchdogs. This is not a native run or an independent validation of the old watchdog implementation.",
+      "stderr_path": "evidence/PACKED_ENTRY_TESTS_FIRST.stderr.txt",
+      "stderr_sha256": "ab790d784fa553f5d8102d8492576cf4752a4d78c94cd6ce9e707f752200452e",
+      "rerun_by_reviewer": false
+    },
+    "handoff_syntax": {
+      "receipt_path": "evidence/NCP_HANDOFF_SYNTAX.json",
+      "receipt_sha256": "17c3c9b5280ff2bed20c141f9adae10efa6c86cad326de881ad6ad9d2876cec0",
+      "receipt": {
+        "status": "PASS",
+        "scope": "new handoff bash syntax only; no commands executed",
+        "bash_blocks": 4,
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "handoff_sha256": "ac870ed8b46a2254ceef8571e084015655d88114a3df4ad77519fd44fc3d40b4",
+        "script_sha256": "28ddcc6b3a541369281b01baad9a5ebff87fde12d399a25c0ed9c6b78c6e6c2a"
+      },
+      "interpretation": "The original four-block bash syntax check is reused; it did not execute the handoff commands.",
+      "rerun_by_reviewer": false
+    }
+  },
+  "runtime_recovery": {
+    "observation": "The initially requested scratch repository and earlier review paths returned ENOENT after an execution-environment transition. Author recovered the unpublished wrapper, test and handoff from preserved tool records; the three original file SHA256 identities match. The original test and syntax receipts were restored without rerunning checks.",
+    "evidence": "evidence/PACKED_ENTRY_RECOVERY.json",
+    "status": "EXACT_INPUTS_RECOVERED",
+    "distinction": "PINNED_DEPENDENCY_READBACK.json was newly obtained by this reviewer through read-only Git fetches and is not a recovered old artifact.",
+    "review_output_location": "intake_canary_recovered/evidence/",
+    "integration": "Parent reports that the main repository became available again and that the exact recovered inputs were copied into the new lane. Parent handles review integration and Git publication."
+  },
+  "new_review_activity": {
+    "static_source_review": true,
+    "new_manufactured_tests": 0,
+    "old_test_methods_replayed": 0,
+    "scientific_modules_executed": 0,
+    "analyzer_cli_runs": 0,
+    "native_executions": 0,
+    "builds": 0,
+    "ncp_submissions": 0,
+    "ncp_starts": 0,
+    "rdc_calls": 0,
+    "source_edits_by_reviewer": 0
+  },
+  "remaining_conditions": [
+    "Publish the reviewed wrapper, tests, handoff and receipts with the exact code-publication identity required by the recipe.",
+    "A permitted NCP executor must inspect current live processes and saved results before deciding the optional single canary is still missing. Current process state is not observed by this review.",
+    "Use the exact original cohort/binary/qualification and an exact accepted bridge; let the unchanged a5 preflight and canary gates determine actual eligibility and result status.",
+    "Preserve returned raw receipts and results before reporting a packed native outcome or speed. No native HE29 speed has been measured by this wrapper review."
+  ],
+  "limits": [
+    "PASS_SCOPED is an independent static integration review plus reuse of the first manufactured seam tests and syntax check; it is not a complete execution test.",
+    "The earlier four-pair native admission and prior scientific/watchdog reviews are reused, not recounted as new checks.",
+    "No claim is made about absence of every remote process or unpublished conversation/result."
+  ]
+}

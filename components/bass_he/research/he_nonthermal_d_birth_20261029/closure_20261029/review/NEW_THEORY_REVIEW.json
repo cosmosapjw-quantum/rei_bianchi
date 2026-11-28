@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/independent_he_review",
+  "date": "2026-10-29",
+  "source_path": "/workspace/scratch/4a7ea9deca9b/BASS_HE/research/he_nonthermal_d_birth_20261029/closure_20261029/THEORY.md",
+  "source_sha256": "86b6e7a40e3517382a5dc493ca7eac55a797a3934170d437027f0b5701065ce5",
+  "scope": "Independent mathematical review before implementation: target-rest two-body weak gain, sextic energy bins and full-law finite-mass stress trace. No actual event rate or physical admission.",
+  "execution": "Read and independent algebra only; no scientific runtime or previous suite rerun.",
+  "decision": "pass_scoped_with_P2_claim_precision_fix",
+  "verified": [
+    {
+      "id": "V1",
+      "topic": "Lorentz map",
+      "derivation": "Write q_perp=q*(u-mu*n), q_parallel=q*mu. Boost gives E_plus/minus=gamma(E* +/- beta*q_parallel)=E0 +/- B*mu and c*p_plus/minus=+/-q_perp+(epsilon/2 +/- gamma*q_parallel)n. Sum and each on-shell identity follow directly."
+    },
+    {
+      "id": "V2",
+      "topic": "Weak gain multiplicity and oriented-mark alias",
+      "derivation": "For test function psi the pair mark H(u)=psi(p_plus(u))+psi(p_minus(u)) obeys H(-u)=H(u). Thus the measure may be replaced by its symmetrization without changing gain, even if W is not even. IntegralW=1 and exclusive event R give count2R, energy(A+epsilon)R and momentum epsilon*R*n/c. There is no further1/2 after unordered event normalization."
+    },
+    {
+      "id": "V3",
+      "topic": "Inclusive energy density",
+      "derivation": "Change variables K=K0+B*mu in each daughter term. First contributes q(x)/B, second q(-x)/B; even law gives2q(x)/B. Azimuth marginal alone suffices for this scalar energy law."
+    },
+    {
+      "id": "V4",
+      "topic": "Sextic normalization and binned moments",
+      "derivation": "Expand(1-mu^2)(a0+a1*mu^2+a2*mu^4)=c0+c2*mu^2+c4*mu^4+c6*mu^6. Integrating2q(x)x^k on each bin yields the stated G expression. Telescoping the partition gives sumG0=2,sumG1=0,sumG2=2m2. K0G0+BG1 is exact bin kinetic gain; midpoint count weighting does not preserve this in general."
+    },
+    {
+      "id": "V5",
+      "topic": "Frozen witness",
+      "derivation": "For(a0,a1,a2)=(1411/10000,-1/4,33/25), Z=14297/52500 and integral mu^2 numerator=24377/262500, so m2=24377/71485. The quadratic vertex lies at z=25/264 in[0,1] and its value is170627/1320000>0, proving selected-law nonnegativity."
+    },
+    {
+      "id": "V6",
+      "topic": "Full-law exact remainder",
+      "derivation": "The finite geometric identity (1-rx)^-1=sum0toN(r*x)^k+(r*x)^(N+1)/(1-rx) is pointwise. Nonnegative W gives remainder in[r^(N+1)m_(2N+2),r^(N+1)m_(2N+2)/(1-r)]. Multiplication by negative-D reverses endpoints and produces stated LN/UN and width."
+    },
+    {
+      "id": "V7",
+      "topic": "Nested intervals",
+      "derivation": "Let Mj=E[x^j]. SN+1=SN+r^(N+1)M_(N+1). Substitution gives L_(N+1)-LN=D*r^(N+2)*(M_(N+1)-M_(N+2))/(1-r)>=0 and UN-U_(N+1)=D*r^(N+2)*M_(N+2)>=0. Width_(N+1)<=r*width_N follows from0<=x<=1, including zero-width cases without dividing by a zero moment."
+    }
+  ],
+  "findings": [
+    {
+      "id": "NT-P2-1",
+      "severity": "P2",
+      "location": "Full-law section final paragraph: new narrower interval",
+      "observed": "The raw truncation family is nested in N, but it is not contained in the m2-only Jensen/secant interval for every N.",
+      "counterexample": "At N=0, L0 equals the universal secant lower bound. U0=2E0-D(1+r*m2) exceeds the universal Jensen upper bound by D*r^2*m2^2/(1-r*m2)>0 for0<r,m2<1. This applies to the frozen witness.",
+      "minimal_fix": "Qualify narrowing by the actual chosen N and an exact containment check. Alternatively return intersection[max(LN,L_JensenSecant),min(UN,U_JensenSecant)] while retaining raw bounds and remainder identities."
+    },
+    {
+      "id": "NT-DOMAIN-1",
+      "severity": "P3",
+      "location": "Definition of S_N and implementation contract",
+      "observed": "N domain is implicit; thresholds require a separate branch.",
+      "minimal_fix": "State N is a nonnegative integer. For r=0/B=0 use delta energy law and constant trace; frozen330MeV path has B>0. Validate exact nonnegative sextic polynomial, Z>0, and strict partition spanning[-1,1]."
+    }
+  ],
+  "implementation_conditions": [
+    "exact input guard shared across all numeric entry points",
+    "full quadratic positivity on[0,1], including interior vertex when a2>0",
+    "partition endpoints exactly-1,+1 and strictly increasing",
+    "N nonnegative integer, not bool",
+    "retain rational reduced moments; physical B irrational may be displayed as approximation without redefining exact conservation",
+    "never use R=None as zero; manufactured pathway labelled explicitly",
+    "record whether output bounds are raw remainder interval or intersection"
+  ],
+  "physical_scope": {
+    "event_rate": null,
+    "physical_activation": false,
+    "L4": false,
+    "production": "HOLD",
+    "new_physical_IVPs": 0,
+    "central_dag_delta": 0
+  },
+  "literature_verification": "This review assessed mathematics, not the newly cited EXFOR source identity or numerical data. Parent source survey must ground those claims independently."
+}

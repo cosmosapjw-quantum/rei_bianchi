@@ -1,0 +1,32 @@
+"use strict";
+function runChecks(core) {
+  const tests=[];
+  function add(name,fn){try{tests.push({name,status:"PASS",...fn()});}catch(e){tests.push({name,status:"FAIL",error:String(e)});}}
+  function close(a,b,tol=3e-13){const err=Math.max(...a.map((x,i)=>Math.abs(x-b[i]))),scale=Math.max(1,...a.map(Math.abs),...b.map(Math.abs));if(err>tol*scale)throw Error("scaled error "+err/scale);return {max_absolute_error:err,scaled_error:err/scale};}
+  function relative(a,b,tol=3e-13){const e=Math.max(...a.map((x,i)=>Math.abs((x-b[i])/b[i])));if(e>tol)throw Error("relative error "+e);return {maximum_relative_error:e};}
+  add("CAS_general_40digit",()=>close(core.step([1.5,.8],.2,1/7,2/3,.7),[.8393648122688855258608227154124660971,.3726855389518281835455890464912571448],3e-14));
+  add("CAS_stiff_40digit",()=>close(core.step([1,1],.2,.14,1e8,.1),[.9048374207113828295423215424039159917,.9048374131107485381302579253339166467],3e-14));
+  add("isotropic_collisionless_a_minus5",()=>close(core.step([.8,2.1],.2,0,0,2),[.8,2.1].map(x=>x*Math.exp(-2))));
+  add("pure_collision_trace_and_exact_decay",()=>{const e=Math.exp(-.7*3),out=core.step([.5,2],0,0,.7,3);const r=close(out,[1-.5*e,1+e]);const te=Math.abs(2*out[0]+out[1]-3);if(te>3e-13)throw Error("trace drift");return {...r,trace_error:te};});
+  add("collisionless_directional_redshift_both_signs",()=>{let max=0;for(const s of[-.3,0,.3]){const out=core.step([.7,1.2],.11,s,0,.4),ref=[.7*Math.exp((-5*.11+2*s)*.4),1.2*Math.exp((-5*.11-4*s)*.4)];max=Math.max(max,close(out,ref).max_absolute_error);}return {max_absolute_error:max};});
+  add("identity_and_vacuum",()=>{close(core.step([2,3],.2,.3,1,0),[2,3],0);close(core.step([0,0],-1e9,1e9,1e200,1),[0,0],0);if(core.invariants([0,0]).anisotropy!==null)throw Error("vacuum ratio");return {};});
+  add("cone_boundaries_and_stiff_grid",()=>{let min=Infinity,count=0;for(const H of[-.2,0,.2])for(const s of[-1,0,1])for(const nu of[0,1e-14,1,1e8,1e12])for(const P of[[0,1],[1,0],[1,1]]){const out=core.step(P,H,s,nu,.1);min=Math.min(min,...out);if(out.some(x=>x<0))throw Error("negative");count++;}return {controls:count,minimum_pressure:min};});
+  add("constant_semigroup",()=>{let max=0,count=0;for(const H of[-.1,0,.2])for(const s of[-.4,0,.2])for(const nu of[0,1e-12,1,1e8])for(const P of[[.3,1],[0,1],[1,0]]){const one=core.step(P,H,s,nu,.3),two=core.step(core.step(P,H,s,nu,.1),H,s,nu,.2);max=Math.max(max,close(one,two).scaled_error);count++;}return {controls:count,max_scaled_error:max};});
+  add("energy_and_ratio_rhs",()=>{let em=0,rm=0;for(const P of[[.3,1],[1,.2],[1,1]])for(const s of[-.3,.2]){const H=.17,nu=.8,{p,q,anisotropy:r}=core.invariants(P),d=core.rhs(P,H,s,nu),pd=(2*d[0]+d[1])/3,qd=(d[1]-d[0])/3;em=Math.max(em,Math.abs(1.5*pd+7.5*H*p+6*s*q));rm=Math.max(rm,Math.abs((qd*p-q*pd)/p**2-(4*s*r*r-(nu+2*s)*r-2*s)));}if(em>3e-14||rm>3e-14)throw Error("moment residual");return {energy_residual:em,ratio_residual:rm};});
+  add("thermal_particle_and_shear_ledger",()=>{const P=[3e-17,4e-17],H=2e-17,s=-1e-19,T=20000,R=3e-18,dT=2e-16,l=core.thermalLedger(P,H,s,T,R,dT),p=(2*P[0]+P[1])/3,q=(P[1]-P[0])/3,k=1.380649e-23,n=p/(k*T),ref=1.5*(k*T*(-3*H*n+R)+k*n*dT)+7.5*H*p+6*s*q,err=Math.abs(l.Q-ref)/Math.abs(l.Q);if(err>3e-14)throw Error("ledger mismatch");return {relative_error:err,Q_W_m3:l.Q};});
+  add("midpoint_manufactured_variable_drift",()=>{const ref=[.7*Math.exp(-5*(.2+.1/3)+2*(.1-.05/2)),1.2*Math.exp(-5*(.2+.1/3)-4*(.1-.05/2))],n=[8,16,32,64],errors=n.map(k=>{const p=core.advance([.7,1.2],0,1,k,t=>({H:.2+.1*t*t,s:.1-.05*t,nu:0}));return Math.max(...p.map((x,i)=>Math.abs(x-ref[i])));}),orders=errors.slice(1).map((e,i)=>Math.log2(errors[i]/e));if(orders.some(x=>x<1.98||x>2.02))throw Error("order "+orders);return {n,errors,observed_orders:orders};});
+  add("midpoint_noncommuting_independent_CAS",()=>{const ref=[.48030662787278965695536266823586563,.23781760453676236123647126941331376],n=[8,16,32,64],errors=n.map(k=>{const p=core.advance([1.5,.8],0,1,k,t=>({H:.2+t/10,s:1/7-t/20,nu:2/3+t*t/5}));return Math.max(...p.map((x,i)=>Math.abs(x-ref[i])));}),orders=errors.slice(1).map((e,i)=>Math.log2(errors[i]/e));if(orders.some(x=>x<1.97||x>2.03))throw Error("order "+orders);return {n,errors,observed_orders:orders};});
+  add("F1_small_projector_60digit_CAS",()=>{const out=core.step([0,1],0,100,1e-8,1);return {...relative(out,[4.0144298577772365405e75,4.460477619727704614e64]),output:out};});
+  add("F2_fast_mode_no_premature_underflow",()=>{const out=core.step([1e-100,1e100],0,130,0,1);return {...relative(out,[Math.exp(260-100*Math.log(10)),Math.exp(-520+100*Math.log(10))]),output:out};});
+  add("log_scaled_pressure_range",()=>{const out=core.step([1e300,1e300],150,0,0,1),ref=Math.exp(-750+300*Math.log(10));const r=relative(out,[ref,ref]);const min=core.invariants([Number.MIN_VALUE,Number.MIN_VALUE]);if(min.p!==Number.MIN_VALUE||min.q!==0||min.anisotropy!==0)throw Error("subnormal invariant");return {...r,subnormal_pressure:min.p};});
+  add("stiff_ratio_vs_Strang_counterexample",()=>{const H=.2,s=.14,nu=1e8,dt=.1,P=[1,1],exact=core.step(P,H,s,nu,dt);let a=core.step(P,H,s,0,dt/2);a=core.step(a,0,0,nu,dt);a=core.step(a,H,s,0,dt/2);const r=core.invariants(exact).anisotropy,rs=core.invariants(a).anisotropy,ref=-2.799999992159999978e-9;if(Math.abs(r-ref)>2e-15)throw Error("stiff asymptotic");if(Math.abs(rs+0.01390065209951806)>3e-14)throw Error("split oracle");return {exact_ratio:r,reference_ratio:ref,strang_ratio:rs,exact_pressure:exact,strang_pressure:a};});
+  add("invalid_inputs_fail_explicitly",()=>{const bad=[()=>core.step([-1,1],0,0,1,1),()=>core.step([1,1],0,0,-1,1),()=>core.step([1,1],0,0,1,-1),()=>core.step([1,1],NaN,0,1,1),()=>core.step([1,1],Infinity,0,1,1),()=>core.advance([1,1],1,0,4,()=>({})),()=>core.advance([1,1],0,1,0,()=>({})),()=>core.thermalLedger([1,1],0,0,0,0),()=>core.step([1,1],-1000,0,0,1),()=>core.step([1,1],1000,0,0,1)];let count=0;for(const f of bad){try{f();}catch(e){count++;}}if(count!==bad.length)throw Error("accepted bad input");return {rejected:count};});
+  return {schema:"he33.core_checks.v1",groups:tests.length,passed:tests.filter(x=>x.status==="PASS").length,failed:tests.filter(x=>x.status==="FAIL").length,tests};
+}
+if(typeof module!=="undefined"&&module.exports)module.exports={runChecks};
+if(typeof require!=="undefined"&&typeof module!=="undefined"&&require.main===module){
+  const core=require("../src/lrs_baryon_moments.js");
+  const result=runChecks(core);
+  console.log(JSON.stringify(result,null,2));
+  if(result.failed)process.exitCode=1;
+}

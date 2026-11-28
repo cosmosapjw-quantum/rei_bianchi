@@ -1,0 +1,82 @@
+{
+  "schema": "bass_he.r10c.exact_consumed_node_contract.v1",
+  "basis": {
+    "pr15_head": "b8b2fe47a367459f6faf6796eb2f251feacbbd7c",
+    "pr17_review_head": "7bda18fafe9a800a13146b38276bef204584c079",
+    "r10a_evidence_commit": "5954d5d31d1c4536b41e13b4868aa5fa97cd2924",
+    "r10b_review_publication": "7bda18fafe9a800a13146b38276bef204584c079",
+    "r10b_review_verdict": "PASS_BOUNDED_RESEARCH_VIEW",
+    "r10b_query_contract_sha256": "97ee706c2765cac40cb001592fe5c543053ed5457b3ee4776e282a742238f215",
+    "r10a_source_sha256": "496a1d9be062e074e72f4d2d8033dd865c4671b65f95daaeaeafa2fcde4eb4a"
+  },
+  "scope": {
+    "coordinates": 105,
+    "active_branch_rho_pairs": 360,
+    "branches": ["S23","Qother","Q12","Q23","Qm1"],
+    "energies_keV_u": [0.5,5.0],
+    "depth": 96,
+    "contour_panels": 32,
+    "quadrature_rule": "support-split GK15/GK7 embedded pair",
+    "rtol": 0.0002,
+    "atol": 1e-10,
+    "adaptive_refinement": false
+  },
+  "phase_A_exact_geometry": {
+    "goal": "compute or identity-authoritatively reuse exact 32-panel Delta at every active consumed GK15 branch/rho pair",
+    "reuse": "only exact source+environment+cache-key identity",
+    "candidate_exact_overlap_from_R10B_archive": 1,
+    "candidate_overlap": {
+      "branch": "Q23",
+      "rho_hex": "0x1.a48d0b9cfad3cp+2",
+      "delta_64_cached": 0.5023163509308193
+    },
+    "max_new_32_panel_calls": 360,
+    "expected_new_if_candidate_reuse_is_authorized": 359,
+    "stop_conditions": [
+      "source/input/environment identity mismatch for a reused record",
+      "missing or invalid branch endpoint authority",
+      "nonfinite or negative Delta",
+      "geometry/certificate failure"
+    ],
+    "surrogate_comparison_gate": 0.0002,
+    "surrogate_comparison_is": "diagnostic classification; exact-node replay does not depend on surrogate PASS"
+  },
+  "phase_B_exact_node_transport": {
+    "precondition": "complete exact-node table for all 360 active pairs",
+    "lanes": {
+      "F2_RHO": "exp(-2 Delta_exact(rho)/v)",
+      "F2_FROZEN": "exp(-2 Delta_exact(0)/v) inside unchanged branch support",
+      "F1_RHO": "exp(-Delta_exact(rho)/v)"
+    },
+    "node_set": "exactly the fixed 105 GK15 coordinates from the pinned query contract",
+    "no_new_queries": true,
+    "quadrature_execution": "use same support splits and GK15/GK7 pair with max_intervals fixed to mandatory split count; any requested refinement is a STOP",
+    "admission": "all component embedded errors <= atol + rtol*abs(total)",
+    "success_claim": "EXACT_NODE_FIXED_GK15_REPLAY_PASS_NOT_GLOBAL_CONTINUUM_BOUND",
+    "appendix_label": "AUTHOR_IMPLEMENTATION_REPRODUCTION_ONLY_NOT_PHYSICAL_VALIDATION"
+  },
+  "phase_C_error_accounting": {
+    "probability": "p=exp(-f Delta/v), f in {1,2}",
+    "exact_ratio": "p(Delta+d)/p(Delta)=exp(-f d/v)",
+    "event_matrix_induced_1norm": "2 |delta p| for reversible and absorbing crossing blocks",
+    "eq50_two_traversal_state_l1_bound": "||delta y||_1 <= 4 sum_e |delta p_e| for unchanged column-stochastic rotation and other factors",
+    "purpose": "separate surrogate/model discrepancy from embedded quadrature estimator"
+  },
+  "forbidden": [
+    "production Eq55 or Eq50/54 default changes",
+    "additional adaptive refinement",
+    "new interpolation family or loosened tolerance",
+    "CODE-I02 rerun",
+    "56-action replay or worker sweep",
+    "author FORTRAN execution",
+    "L2/Krawczyk",
+    "new physical channels"
+  ],
+  "gate_after_authoring": {
+    "CODE_I02_CLOSED": true,
+    "full_certificate_fail_closed": true,
+    "scientific_PROMOTE": "HOLD",
+    "Eq55_next_node_authorized": false,
+    "Eq55": "NOT_RUN"
+  }
+}

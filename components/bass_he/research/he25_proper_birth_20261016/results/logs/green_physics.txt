@@ -1,0 +1,88 @@
+.FFF                                                                     [100%]
+=================================== FAILURES ===================================
+____________ test_source_clock_killing_and_energy_identity[-0.005] _____________
+
+q = -0.005
+
+    @pytest.mark.parametrize('q',[-.005,0.,.005])
+    def test_source_clock_killing_and_energy_identity(q):
+        with NativeOwner(BIN) as owner:
+            model=Model(owner,m=4,angles=4,q=q)
+            for t in [0.,model.t_end*.37,model.t_end]:
+                x=model.x(t);E,mu,dEdt=model.geometry(t)
+                assert abs(sum(model.source(t))/(model.H(t)*model.source_per_x)-1)<2e-14
+                assert np.all(model.source(t)>=0)
+                assert np.all(model.source(t)[(E<13.6)|(E>100.)]==0.)
+                assert np.max(abs(mu))<1 and np.all(dEdt<0)
+            ta=model.t_end*.2;tb=model.t_end*.8
+            Ea,mua,_=model.geometry(ta);Eb,_,_=model.geometry(tb)
+            dx=model.x(tb)-model.x(ta)
+            from he21_photo import redshift_vector
+            np.testing.assert_allclose(Eb/Ea,redshift_vector(dx,mua,q),rtol=8e-15)
+            y=model.initial_state();y[4:4+model.K]=model.scale[4:4+model.K]*.01
+            f=model.rhs(ta,y);r=model.conservation_rate(ta,y,f)
+            assert abs(r['number'])<1e-25
+>           assert abs(r['energy'])<1e-25
+E           assert np.float64(8.30169606276391e-23) < 1e-25
+E            +  where np.float64(8.30169606276391e-23) = abs(np.float64(8.30169606276391e-23))
+
+research/he25_proper_birth_20261016/tests/test_transport.py:36: AssertionError
+______________ test_source_clock_killing_and_energy_identity[0.0] ______________
+
+q = 0.0
+
+    @pytest.mark.parametrize('q',[-.005,0.,.005])
+    def test_source_clock_killing_and_energy_identity(q):
+        with NativeOwner(BIN) as owner:
+            model=Model(owner,m=4,angles=4,q=q)
+            for t in [0.,model.t_end*.37,model.t_end]:
+                x=model.x(t);E,mu,dEdt=model.geometry(t)
+                assert abs(sum(model.source(t))/(model.H(t)*model.source_per_x)-1)<2e-14
+                assert np.all(model.source(t)>=0)
+                assert np.all(model.source(t)[(E<13.6)|(E>100.)]==0.)
+                assert np.max(abs(mu))<1 and np.all(dEdt<0)
+            ta=model.t_end*.2;tb=model.t_end*.8
+            Ea,mua,_=model.geometry(ta);Eb,_,_=model.geometry(tb)
+            dx=model.x(tb)-model.x(ta)
+            from he21_photo import redshift_vector
+            np.testing.assert_allclose(Eb/Ea,redshift_vector(dx,mua,q),rtol=8e-15)
+            y=model.initial_state();y[4:4+model.K]=model.scale[4:4+model.K]*.01
+            f=model.rhs(ta,y);r=model.conservation_rate(ta,y,f)
+            assert abs(r['number'])<1e-25
+>           assert abs(r['energy'])<1e-25
+E           assert np.float64(8.301696073857267e-23) < 1e-25
+E            +  where np.float64(8.301696073857267e-23) = abs(np.float64(8.301696073857267e-23))
+
+research/he25_proper_birth_20261016/tests/test_transport.py:36: AssertionError
+_____________ test_source_clock_killing_and_energy_identity[0.005] _____________
+
+q = 0.005
+
+    @pytest.mark.parametrize('q',[-.005,0.,.005])
+    def test_source_clock_killing_and_energy_identity(q):
+        with NativeOwner(BIN) as owner:
+            model=Model(owner,m=4,angles=4,q=q)
+            for t in [0.,model.t_end*.37,model.t_end]:
+                x=model.x(t);E,mu,dEdt=model.geometry(t)
+                assert abs(sum(model.source(t))/(model.H(t)*model.source_per_x)-1)<2e-14
+                assert np.all(model.source(t)>=0)
+                assert np.all(model.source(t)[(E<13.6)|(E>100.)]==0.)
+                assert np.max(abs(mu))<1 and np.all(dEdt<0)
+            ta=model.t_end*.2;tb=model.t_end*.8
+            Ea,mua,_=model.geometry(ta);Eb,_,_=model.geometry(tb)
+            dx=model.x(tb)-model.x(ta)
+            from he21_photo import redshift_vector
+            np.testing.assert_allclose(Eb/Ea,redshift_vector(dx,mua,q),rtol=8e-15)
+            y=model.initial_state();y[4:4+model.K]=model.scale[4:4+model.K]*.01
+            f=model.rhs(ta,y);r=model.conservation_rate(ta,y,f)
+            assert abs(r['number'])<1e-25
+>           assert abs(r['energy'])<1e-25
+E           assert np.float64(8.301696059066125e-23) < 1e-25
+E            +  where np.float64(8.301696059066125e-23) = abs(np.float64(8.301696059066125e-23))
+
+research/he25_proper_birth_20261016/tests/test_transport.py:36: AssertionError
+=========================== short test summary info ============================
+FAILED research/he25_proper_birth_20261016/tests/test_transport.py::test_source_clock_killing_and_energy_identity[-0.005]
+FAILED research/he25_proper_birth_20261016/tests/test_transport.py::test_source_clock_killing_and_energy_identity[0.0]
+FAILED research/he25_proper_birth_20261016/tests/test_transport.py::test_source_clock_killing_and_energy_identity[0.005]
+3 failed, 1 passed in 0.75s

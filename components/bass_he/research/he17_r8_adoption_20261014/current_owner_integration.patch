@@ -1,0 +1,201 @@
+--- a/research/axbi_goal_20261014/convergence/compare_histories.py
++++ b/research/axbi_goal_20261014/convergence/compare_histories.py
+@@ -6,6 +6,8 @@
+ Sampled differences are not continuous suprema or numerical accuracy admission.
+ """
+ import argparse,array,bisect,csv,hashlib,json,math,pathlib,sys,tempfile
++from source_pair_guard import require_source_relation, SourceRelationHold
++from reconstruction_support import reconstruction_norm
+ A0=1/21;A1=1/5;L0=math.log(A0);L1=math.log(A1)
+ SPECIES=('H_I','H_II','He_I','He_II','He_III','electron')
+ FIELDS={'x_HI':'x_HI','x_HII':'x_HII','x_HeI':'x_HeI','x_HeII':'x_HeII','x_HeIII':'x_HeIII','ne_cm3':'ne_proper_cm3','Tgas_K':'temperature_K','U0_eV_per_H':'J0_photon_u_eV_per_H','U2_eV_per_H':'J2_photon_u_eV_per_H'}
+@@ -123,6 +125,26 @@
+         return 1e-7*(h+3*he if species=='electron' else h if species.startswith('H_') else he)
+     return None
+ 
++def exact_reconstruction_summaries(reference,candidate,summary):
++    """Reuse CR62's exact union-knot PL norm, never a true-IVP error bound.
++
++    The coordinate numbers are the already stored binary64 ln(a) values. This
++    optional path is O(observables * total knots); it is not enabled silently
++    for large historical files. Existing sampled metrics remain alongside it.
++    """
++    for row in summary:
++        name=row['observable']
++        witness=reconstruction_norm(
++            zip(reference['series']['L'],reference['series'][name]),
++            zip(candidate['series']['L'],candidate['series'][name]),'LN_A')
++        row.update(reconstruction_sup_exact=str(witness['sup_absolute_difference']),
++            reconstruction_argmax_exact=str(witness['coordinate_at_sup']),
++            reconstruction_signed_at_sup_exact=str(witness['signed_difference_at_sup']),
++            reconstruction_union_knots=witness['union_knots'],
++            reconstruction_norm_kind=witness['status'],
++            reconstruction_coordinate='LN_A_STORED_BINARY64',
++            true_ivp_error=witness['true_ivp_error'])
++
+ def compare(reference,candidate):
+     if max(abs(x-y) for x,y in zip(reference['factors'],candidate['factors']))>1e-12:raise InputHold('HOLD_UNMATCHED_BARYON_INVENTORY',candidate['id'])
+     coords=grid();observables=[k for k in reference['series'] if k not in ['L','time_s']];rows=[];summary=[]
+@@ -151,7 +173,13 @@
+     try:
+         manifest=json.loads(pathlib.Path(manifest_path).read_text());kind=kind_override or manifest.get('comparison_kind','PAIRED')
+         if kind not in ['PAIRED','REFINEMENT','SOURCE','IC']:raise InputHold('HOLD_COMPARISON_KIND',kind)
++        norm_mode=manifest.get('reconstruction_norm','SAMPLED_ONLY')
++        if norm_mode not in ['SAMPLED_ONLY','EXACT_UNION']:raise InputHold('HOLD_RECONSTRUCTION_NORM_MODE',str(norm_mode))
++        base['reconstruction_norm_mode']=norm_mode
+         ref=load_case(manifest['reference']);candidate=load_case(manifest['candidate'])
++        if kind in ['PAIRED','REFINEMENT']:
++            try:base['source_relation_status']=require_source_relation(ref,candidate,manifest)
++            except SourceRelationHold as exc:raise InputHold(str(exc),'compiled_source_pair') from exc
+         def config_value(value):
+             if value in ['true','false']:return value=='true'
+             try:return float(value)
+@@ -166,7 +194,9 @@
+             allowed={'escape_fraction'} if kind=='SOURCE' else {'initial_temperature_k'}
+             if not changed<=allowed|resource or not changed&allowed:raise InputHold('HOLD_ROBUSTNESS_OTHER_INPUTS_CHANGED',str(sorted(changed)))
+             if not manifest.get('assumption_reference'):raise InputHold('HOLD_ROBUSTNESS_ASSUMPTION_REFERENCE_MISSING',kind)
+-        rows,summary,milestones=compare(ref,candidate);write_csv(output/'sampled_comparisons.csv',rows);write_csv(output/'comparison_summary.csv',summary)
++        rows,summary,milestones=compare(ref,candidate)
++        if norm_mode=='EXACT_UNION':exact_reconstruction_summaries(ref,candidate,summary)
++        write_csv(output/'sampled_comparisons.csv',rows);write_csv(output/'comparison_summary.csv',summary)
+         write_csv(output/'milestones.csv',[{k:v for k,v in row.items() if k not in ['reference_crossings','candidate_crossings']} for row in milestones])
+         base.update(status='DIAGNOSTIC_REDUCTION_COMPLETE_RESPONSE_UNRESOLVED',comparison_kind=kind,metrics=summary,milestones=milestones,immutable_input_descriptors={'reference':manifest['reference'],'candidate':manifest['candidate']},assumption_reference=manifest.get('assumption_reference'),robustness_semantics='Namedmodel sensitivity, notposterior orsignedshearrobustness' if kind in ['SOURCE','IC'] else None)
+     except InputHold as e:base.update(status=e.status,missing_or_invalid_field=e.field,metrics=None,milestones=None,scientific_integrity_failure='NOT_ESTABLISHED_BY_THIS_SIGNAL')
+--- /dev/null
++++ b/research/axbi_goal_20261014/convergence/source_pair_guard.py
+@@ -0,0 +1,30 @@
++"""Bind source relation before labelling a comparison as paired/refinement.
++
++Equal byte identities are a sufficient common-source witness, not the definition
++of semantic identity. A different implementation can be admitted only via an
++explicit, source-pair-bound reviewed semantic-equivalence record. This helper
++checks the record binding; it does NOT prove that equivalence.
++"""
++from __future__ import annotations
++import re
++
++class SourceRelationHold(ValueError):
++    pass
++
++def require_source_relation(reference: dict, candidate: dict, manifest: dict) -> str:
++    left=reference.get('spec',reference).get('source_identity',{}).get('sha256')
++    right=candidate.get('spec',candidate).get('source_identity',{}).get('sha256')
++    valid=lambda x:isinstance(x,str) and re.fullmatch(r'[0-9a-f]{64}',x) is not None
++    if not valid(left) or not valid(right):
++        raise SourceRelationHold('HOLD_SOURCE_IDENTITY_MISSING')
++    if left==right:
++        return 'BYTE_IDENTICAL_COMPILED_SOURCE'
++    relation=manifest.get('source_relation') or {}
++    if not isinstance(relation,dict):
++        raise SourceRelationHold('HOLD_SOURCE_RELATION_UNBOUND')
++    if (relation.get('reference_sha256')==left and relation.get('candidate_sha256')==right
++        and relation.get('relation')=='REVIEWED_SAME_PHYSICAL_MODEL'
++        and relation.get('status')=='ACCEPTED_SCOPED'
++        and isinstance(relation.get('evidence'),str) and relation['evidence'].strip()):
++        return 'DECLARED_REVIEWED_SEMANTIC_RELATION_NOT_PROVED_BY_REDUCER'
++    raise SourceRelationHold('HOLD_SOURCE_RELATION_UNBOUND')
+--- /dev/null
++++ b/research/axbi_goal_20261014/convergence/reconstruction_support.py
+@@ -0,0 +1,102 @@
++"""Read-only exact arithmetic support for REI history comparisons.
++
++No ODE, mutation, launch authorization or source-specific curvature is inferred.
++Fraction values are exact; float inputs mean their stored binary64 values.
++LN_A knots are the supplied numbers, not an assertion about exact transcendental
++logarithms. A norm of reconstructions is not an IVP error certificate.
++"""
++from fractions import Fraction
++from math import isfinite
++from typing import Iterable, Sequence
++
++
++def q(value) -> Fraction:
++    if isinstance(value, bool): raise ValueError('boolean is not a numeric witness')
++    if isinstance(value, float):
++        if not isfinite(value): raise ValueError('finite number required')
++        return Fraction.from_float(value)
++    try: return Fraction(value)
++    except (TypeError, ValueError, ZeroDivisionError) as e:
++        raise ValueError('finite rational-compatible number required') from e
++
++
++def interpolation_envelope(a,b,x,curvature,eps_left,eps_right,jumps=()):
++    """Peano/Green bound conditional on a genuine SAME-SOURCE whole-cell witness.
++
++    curvature bounds |d^2 O/d coordinate^2| away from the explicitly listed
++    slope jumps. (location,magnitude) jump entries are nonnegative upper bounds.
++    Missing node errors or curvature remain UNKNOWN, never silently zero.
++    """
++    a,b,x=map(q,(a,b,x))
++    if not a<b or not a<=x<=b:raise ValueError('ordered cell, no extrapolation')
++    if curvature is None:return {'status':'UNKNOWN_MISSING_CURVATURE_WITNESS','radius':None,'cell_integral_radius':None}
++    if eps_left is None or eps_right is None:return {'status':'UNKNOWN_MISSING_NODE_WITNESS','radius':None,'cell_integral_radius':None}
++    M,el,er=map(q,(curvature,eps_left,eps_right))
++    if min(M,el,er)<0:raise ValueError('negative upper bound')
++    h=b-a;t=(x-a)/h
++    radius=(1-t)*el+t*er+M*(x-a)*(b-x)/2
++    integrated=h*(el+er)/2+M*h**3/12
++    for location,magnitude in jumps:
++        s,J=q(location),q(magnitude)
++        if not a<s<b or J<0:raise ValueError('jump must be interior with nonnegative bound')
++        radius+=J*(min(x,s)-a)*(b-max(x,s))/h
++        integrated+=J*(s-a)*(b-s)/2
++    return {'status':'CONDITIONAL_SAME_SOURCE_WITNESS_BOUND','radius':radius,'cell_integral_radius':integrated}
++
++
++def curvature_in_ln_a(max_abs_Ott,max_abs_Ot,min_H,max_abs_Ht):
++    """H=d ln(a)/dt; output conditional bound in ln(a), no change of age origin."""
++    if any(v is None for v in (max_abs_Ott,max_abs_Ot,min_H,max_abs_Ht)):return None
++    ott,ot,h,ht=map(q,(max_abs_Ott,max_abs_Ot,min_H,max_abs_Ht))
++    if h<=0 or min(ott,ot,ht)<0:raise ValueError('H>0 and nonnegative bounds required')
++    return ott/h**2+ot*ht/h**3
++
++
++def _points(points):
++    out=[(q(x),q(y)) for x,y in points]
++    if len(out)<2 or any(x1>=x2 for (x1,_),(x2,_) in zip(out,out[1:])):
++        raise ValueError('at least two strictly increasing knots required')
++    return out
++
++
++def reconstruction_norm(reference:Sequence, candidate:Sequence, coordinate:str):
++    """Exact sup of two PL reconstructions over equal represented endpoints.
++
++    The extremum occurs at the union of the knots, so a 1001-point sampling grid
++    is unnecessary. Runtime O(n+m), output does not duplicate full input arrays.
++    Caller owns actual file hashes, completion, source/clock identity and species
++    normalization. This helper never substitutes for those owner validations.
++    """
++    if coordinate not in ('LN_A','PROPER_TIME'):
++        raise ValueError('choose one explicit coordinate: LN_A or PROPER_TIME')
++    r,c=_points(reference),_points(candidate)
++    if r[0][0]!=c[0][0] or r[-1][0]!=c[-1][0]:
++        raise ValueError('same represented endpoints required; no extrapolation or silent overlap')
++    i=j=0;nr=nc=0;maximum=Fraction(-1);arg=None;signed=None;visited=0
++    while nr<len(r) or nc<len(c):
++        xr=r[nr][0] if nr<len(r) else None;xc=c[nc][0] if nc<len(c) else None
++        x=xc if xr is None else xr if xc is None else min(xr,xc)
++        if xr==x:nr+=1
++        if xc==x:nc+=1
++        while i+1<len(r)-1 and r[i+1][0]<x:i+=1
++        while j+1<len(c)-1 and c[j+1][0]<x:j+=1
++        def interp(p,k):
++            a,u=p[k];b,v=p[k+1]
++            if not a<=x<=b:raise ArithmeticError('internal bracket failure')
++            return u+(v-u)*(x-a)/(b-a)
++        delta=interp(c,j)-interp(r,i);visited+=1
++        if abs(delta)>maximum:maximum,arg,signed=abs(delta),x,delta
++    return dict(status='EXACT_DYADIC_RECONSTRUCTION_NORM_ONLY',coordinate=coordinate,
++        sup_absolute_difference=maximum,coordinate_at_sup=arg,signed_difference_at_sup=signed,
++        endpoint_difference=c[-1][1]-r[-1][1],union_knots=visited,
++        true_ivp_error=None,interpolation_error=None,solver_launch_authorized=False)
++
++
++def readiness(owner_snapshot:dict):
++    """Availability of this supplier is not permission to change an owner DAG."""
++    blockers=[]
++    if owner_snapshot.get('live_owner_or_workers') is not False:blockers.append('OWNER_LIFECYCLE_NOT_CLOSED')
++    if owner_snapshot.get('five_baselines_complete') is not True:blockers.append('BASELINE_FAMILY_INCOMPLETE')
++    if owner_snapshot.get('owner_execution_authorized') is not True:blockers.append('OWNER_EXECUTION_AUTHORIZATION_ABSENT')
++    return dict(supplier_interface_ready=True,owner_dispatch_ready=not blockers,blockers=blockers,
++                owner_state_mutated=False,launch_performed=False)

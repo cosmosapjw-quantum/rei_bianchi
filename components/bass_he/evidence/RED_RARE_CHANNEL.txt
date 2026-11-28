@@ -1,0 +1,33 @@
+.....F                                                                   [100%]
+=================================== FAILURES ===================================
+____________ test_exact_swap_does_not_erase_a_tiny_positive_channel ____________
+
+    def test_exact_swap_does_not_erase_a_tiny_positive_channel():
+        mod=api(); initial=np.array([[1.],[1e-80]])
+        y=mod.apply_eq50(np.array([[1.]]),[(0,1,False)],np.eye(2)[None],initial)
+        # Two exact swaps must restore both channels, not round the rare one to zero.
+>       np.testing.assert_array_equal(y[0],initial)
+E       AssertionError: 
+E       Arrays are not equal
+E       
+E       Mismatched elements: 1 / 2 (50%)
+E       Max absolute difference among violations: 1.e-80
+E       Max relative difference among violations: 1.
+E        ACTUAL: array([[1.],
+E              [0.]])
+E        DESIRED: array([[1.e+00],
+E              [1.e-80]])
+
+tests/test_transport_upgrade.py:60: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_transport_upgrade.py::test_exact_swap_does_not_erase_a_tiny_positive_channel - AssertionError: 
+Arrays are not equal
+
+Mismatched elements: 1 / 2 (50%)
+Max absolute difference among violations: 1.e-80
+Max relative difference among violations: 1.
+ ACTUAL: array([[1.],
+       [0.]])
+ DESIRED: array([[1.e+00],
+       [1.e-80]])
+1 failed, 5 passed in 0.15s

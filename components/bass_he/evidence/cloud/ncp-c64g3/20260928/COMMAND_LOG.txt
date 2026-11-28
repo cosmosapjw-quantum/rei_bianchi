@@ -1,0 +1,155 @@
+# Sanitized command evidence
+Raw stdout is retained outside the repository; SHA256 binds each raw log.
+
+[1] h0_identity | 2026-09-28T05:23:23.081272+00:00 -> 2026-09-28T05:23:23.083947+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: git rev-parse HEAD 'HEAD^{tree}'
+raw_stdout_sha256: ba0fc0be5e5a6a03c2374a6b29f19f07fabb99a2faac6dab48708efdc66f1181
+decisive: ad12eec6023c41b7791eb3958fc00b0adcd5bc14 | bdf79f93d54baac022e776f124033a623bad3a52
+
+[2] h0_status | 2026-09-28T05:23:35.723987+00:00 -> 2026-09-28T05:23:35.727384+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: git status --short
+raw_stdout_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+decisive: (no stdout)
+
+[3] h1_full_pytest | 2026-09-28T05:23:42.887693+00:00 -> 2026-09-28T05:24:35.633984+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: /tmp/BASS_HE_ncp_c64g3_state/venv/bin/python -m pytest -q --junitxml=/tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/FULL_TESTS.xml
+raw_stdout_sha256: 544ae18d2fe0cce5b786a67b6867405112bd98823558698096ede41e0ca031da
+artifact: {"bytes": 23839, "exists": true, "path": "/tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/FULL_TESTS.xml", "sha256": "e810c52f67491454be98b55d28911662aa5a133b6deab4313a5f7f6a8f6e15f4"}
+decisive: .................................................                        [100%] | 193 passed in 52.43s
+
+[4] h1_compileall | 2026-09-28T05:24:45.613365+00:00 -> 2026-09-28T05:24:45.710222+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: /tmp/BASS_HE_ncp_c64g3_state/venv/bin/python -m compileall -q src scripts tests
+raw_stdout_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+decisive: (no stdout)
+
+[5] h1_diff_check | 2026-09-28T05:24:45.798377+00:00 -> 2026-09-28T05:24:45.800824+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: git diff --check
+raw_stdout_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+decisive: (no stdout)
+
+[6] h1_build | 2026-09-28T05:24:45.908964+00:00 -> 2026-09-28T05:24:50.482887+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: /tmp/BASS_HE_ncp_c64g3_state/venv/bin/python -m build --outdir /tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/dist
+raw_stdout_sha256: b9365fa04fd8c9dfc2670ad86110bff4a623c70e036c1a067c1790c1b89d8820
+decisive: removing build/bdist.linux-x86_64/wheel | Successfully built bass_he-0.2.0.tar.gz and bass_he-0.2.0-py3-none-any.whl
+
+[7] h1_venv | 2026-09-28T05:25:00.342002+00:00 -> 2026-09-28T05:25:04.215858+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: python3 -m venv /tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/venv
+raw_stdout_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+decisive: (no stdout)
+
+[8] h1_install | 2026-09-28T05:25:04.305581+00:00 -> 2026-09-28T05:25:13.786646+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: /tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/venv/bin/python -m pip install '/tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/dist/bass_he-0.2.0-py3-none-any.whl[cloud]'
+raw_stdout_sha256: 22f285fdc75ba5d5fcd32dcea9f5308b9fa58e21343ec9ae50c3f5938d268388
+decisive: Installing collected packages: threadpoolctl, numpy, scipy, bass-he | Successfully installed bass-he-0.2.0 numpy-2.3.5 scipy-1.17.0 threadpoolctl-3.7.0
+
+[9] h1_import | 2026-09-28T05:25:13.881881+00:00 -> 2026-09-28T05:25:13.897349+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: /tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/venv/bin/python -c 'import bass_he; import bass_he.cloud; print('"'"'BASS_HE_IMPORT_PASS'"'"')'
+raw_stdout_sha256: 369e353ab34efd2ca9636d10385f9770f00f8b23dd6e5623bca6a7e3a5a552b4
+decisive: BASS_HE_IMPORT_PASS | BASS_HE_IMPORT_PASS
+
+[10] h1_pip_check | 2026-09-28T05:25:14.008176+00:00 -> 2026-09-28T05:25:14.490777+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: /tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/venv/bin/python -m pip check
+raw_stdout_sha256: 9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09
+decisive: No broken requirements found. | No broken requirements found.
+
+[11] h2_hostnamectl | 2026-09-28T05:26:20.894479+00:00 -> 2026-09-28T05:26:20.966394+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: hostnamectl
+raw_stdout_sha256: e44aae3972c2a2e30e0823b5f733b727b5ca765288639b7912d92a4432cdf574
+decisive: Virtualization: kvm; Operating System: Ubuntu 24.04.1 LTS; Hardware Vendor: NAVERCloud; Hardware Model: c64-g3_HIGH_CPU
+
+[12] h2_uname | 2026-09-28T05:26:21.078988+00:00 -> 2026-09-28T05:26:21.080343+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: uname -a
+raw_stdout_sha256: a867dd194085533ea7a51ac9c9a3f87a760595529206f7b4e37db6846780c202
+decisive: Linux <hostname redacted> 6.8.0-124-generic x86_64
+
+[13] h2_lscpu | 2026-09-28T05:26:21.189974+00:00 -> 2026-09-28T05:26:21.211090+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: lscpu
+raw_stdout_sha256: 4b21cf68627e1328a2339fd13552e14537aa723f9ef1ec7d645621dd6efd42f0
+decisive: 64 CPUs; GenuineIntel; Intel Xeon Gold 5220; 1 thread/core; 1 socket (see HOST_INVENTORY.json)
+
+[14] h2_nproc | 2026-09-28T05:26:21.322194+00:00 -> 2026-09-28T05:26:21.323488+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: nproc
+raw_stdout_sha256: 913f5d1da2feaf4deeccc9e55cbb350a20f12b3f507e87be85dbb77fdd3cb9bc
+decisive: 64 | 64
+
+[15] h2_free | 2026-09-28T05:26:21.431545+00:00 -> 2026-09-28T05:26:21.434663+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: free -h
+raw_stdout_sha256: 7fcc2cefddae9c067667ca25e81ae276f8bde99a781939d5cc9876726ae27e6d
+decisive: Mem:           125Gi       2.4Gi       117Gi       1.2Mi       6.8Gi       123Gi | Swap:             0B          0B          0B
+
+[16] h2_lsblk | 2026-09-28T05:26:21.542090+00:00 -> 2026-09-28T05:26:21.546274+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: lsblk -f
+raw_stdout_sha256: 5aaed9e5e17b25451194882fa3e2debd2a025991cf8775759d93b8a0f734ca96
+decisive: vda2 ext4 mounted at /; no additional data volume shown (UUID redacted)
+
+[17] h2_findmnt | 2026-09-28T05:26:21.659462+00:00 -> 2026-09-28T05:26:21.661801+00:00 | exit=1
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: findmnt /srv/bass-he
+raw_stdout_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+decisive: findmnt /srv/bass-he returned exit 1 with no mount record
+
+[18] h2_cgroup_path | 2026-09-28T05:26:21.768918+00:00 -> 2026-09-28T05:26:21.770151+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: cat /proc/self/cgroup
+raw_stdout_sha256: e4163f3a71c4780dddf964b26531f7ed65cea17da8d36b007aa9664f7dad2770
+decisive: 0::/user.slice/user-0.slice/session-2.scope | 0::/user.slice/user-0.slice/session-2.scope
+
+[19] h2_cpu_max | 2026-09-28T05:26:21.885226+00:00 -> 2026-09-28T05:26:21.886368+00:00 | exit=1
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: cat /sys/fs/cgroup/cpu.max
+raw_stdout_sha256: 0af9723465c21e6529b3ecd896c0f2a252c6168c99def46fcf1570b73db93452
+decisive: cat: /sys/fs/cgroup/cpu.max: No such file or directory | cat: /sys/fs/cgroup/cpu.max: No such file or directory
+
+[20] h2_memory_max | 2026-09-28T05:26:21.996844+00:00 -> 2026-09-28T05:26:21.998196+00:00 | exit=1
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: cat /sys/fs/cgroup/memory.max
+raw_stdout_sha256: 0cf85679688a0b961877a4c95893aa2c727420407626e8d76801eb2022c144b8
+decisive: cat: /sys/fs/cgroup/memory.max: No such file or directory | cat: /sys/fs/cgroup/memory.max: No such file or directory
+
+[21] h2_memory_current | 2026-09-28T05:26:22.109886+00:00 -> 2026-09-28T05:26:22.111135+00:00 | exit=1
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: cat /sys/fs/cgroup/memory.current
+raw_stdout_sha256: 7198f0e01cc9dd41341828ebfa575630613aa9b3af58e5489ac2f7f88bd7142d
+decisive: cat: /sys/fs/cgroup/memory.current: No such file or directory | cat: /sys/fs/cgroup/memory.current: No such file or directory
+
+[22] h2_python_version | 2026-09-28T05:26:22.220513+00:00 -> 2026-09-28T05:26:22.221874+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: /tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/venv/bin/python --version
+raw_stdout_sha256: 5b3e43dc38ca01e3f5a7854ba50d4330864b0c1e0f646650b2c78cf072acc366
+decisive: Python 3.12.3 | Python 3.12.3
+
+[23] h2_preflight_tmp | 2026-09-28T05:26:52.808296+00:00 -> 2026-09-28T05:26:53.045100+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: /tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/venv/bin/python scripts/run_cloud_replay.py preflight --env-out /tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/ENV_PROVENANCE.json
+raw_stdout_sha256: 49aaf61d7dfea8fec3e1b157d71a30aba0462560de7bd563a1d116b0653fd71f
+artifact: {"bytes": 5757, "exists": true, "path": "/tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/ENV_PROVENANCE.json", "sha256": "64e3d15ccf0a0f159e97952d9d734dc31b330a751f12a2ab219315ee7a748810"}
+decisive: {"accelerator": "ACCELERATOR_PAYLOAD_UNAVAILABLE", "binding": "75a57d4d183175821343f3ce67a9c50e9bd0bc9ddeba39553a90955f5c98250b", "source_commit": "ad12eec6023c41b7791eb3958fc00b0adcd5bc14", "source_tree": "bdf79f93d54baac022e776f124033a623bad3a52", "status": "PASS"} | {"accelerator": "ACCELERATOR_PAYLOAD_UNAVAILABLE", "binding": "75a57d4d183175821343f3ce67a9c50e9bd0bc9ddeba39553a90955f5c98250b", "source_commit": "ad12eec6023c41b7791eb3958fc00b0adcd5bc14", "source_tree": "bdf79f93d54baac022e776f124033a623bad3a52", "status": "PASS"}
+
+[24] h2_host_probe | 2026-09-28T05:27:12.270198+00:00 -> 2026-09-28T05:27:12.425203+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: /tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/venv/bin/python /tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/host_probe.py
+raw_stdout_sha256: 91d19d5f54ed28db88581280fcc60be2480071efb600a5342f10d421b265db0f
+artifact: {"bytes": 1608, "exists": true, "path": "/tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/HOST_PROBE.json", "sha256": "e41f710c0cfc765790881bb65e9653a0b2188b8d07f2f8f63c9d75e7e24f5bbc"}
+decisive: HOST_PROBE.json SHA256 e41f710c0cfc765790881bb65e9653a0b2188b8d07f2f8f63c9d75e7e24f5bbc
+
+[25] h2_science_identity | 2026-09-28T05:28:51.132217+00:00 -> 2026-09-28T05:28:51.231069+00:00 | exit=0
+cwd: /tmp/BASS_HE_ncp_c64g3_validation_20260928
+command: /tmp/BASS_HE_NCP_C64G3_VALIDATION_EVIDENCE/venv/bin/python -c 'from pathlib import Path; from bass_he.cloud.runtime import scientific_source_identity; print(scientific_source_identity(Path.cwd()))'
+raw_stdout_sha256: 7543b464af131174bdfb5fb10415104afa1477ac27473c2cdf0bfc8620579064
+decisive: bd1acfb4ba6685ddd2cd1207023d5f7fadf9d37bfd1bee73f9d02a20713c8ae3 | bd1acfb4ba6685ddd2cd1207023d5f7fadf9d37bfd1bee73f9d02a20713c8ae3

@@ -1,0 +1,77 @@
+Module[{dir,arc,xf,timed,tensorResult,scalarChecks,vars,gv,base,sub,chainExpected,chainActual,pi2,t2,tf,ft,pf,ftMixed,ftCovector,t2Mixed,rr,rfull,aa1,aa,af,ll1,ll,lf,tau,c1,c2,z0,jbirth,q1,pdirect,sectors,valueDifference,mixedDifference,prod,jetInv,jetProduct,mixedSource},
+ dir=CreateDirectory[];
+ arc=FileNameJoin[{dir,"xAct_1.3.0.tgz"}];
+ URLDownload["https://xact.es/download/xAct_1.3.0.tgz",arc];
+ If[FileHash[arc,"SHA256","HexString"] =!= "7a6c5f600868a3922668b020a15c0692f76574ff2a559808c62d460cef1b07be",Return[<|"Status"->"ArchiveIdentityMismatch"|>]];
+ ExtractArchive[arc,dir];
+ xf=First[Select[FileNames["xTensor.m",dir,Infinity],StringEndsQ[#,"/xAct/xTensor/xTensor.m"]&]];
+ PrependTo[$Path,DirectoryName[xf,3]];PrependTo[$Path,DirectoryName[xf,2]];Get[xf];
+ timed=AbsoluteTiming[
+ tensorResult=ToExpression["
+ $xpermQ=False;
+ DefManifold[HHState18,4,{ia18,ib18,ic18,id18,ie18,if18}];
+ DefTensor[U18[ia18],HHState18];DefTensor[V18[ia18],HHState18];
+ DefTensor[UF18[ia18],HHState18];DefTensor[VF18[ia18],HHState18];
+ DefTensor[U118[ia18],HHState18];DefTensor[V118[ia18],HHState18];
+ DefTensor[W18[ia18],HHState18];DefTensor[WD18[ia18],HHState18];
+ DefTensor[J18[ia18,-ib18],HHState18];DefTensor[L18[ia18,-ib18],HHState18];
+ DefTensor[H18[ia18,-ib18,-ic18],HHState18,System`Symmetric[{-ib18,-ic18}]];
+ DefTensor[DH18[ia18,-ib18,-ic18],HHState18,System`Symmetric[{-ib18,-ic18}]];
+ DefTensor[H118[ia18,-ib18,-ic18],HHState18,System`Symmetric[{-ib18,-ic18}]];
+ DefTensor[GL18[ia18,-ib18],HHState18];DefTensor[GB18[ia18,-ib18],HHState18];
+ DefTensor[DGL18[ia18,-ib18],HHState18];DefTensor[DGB18[ia18,-ib18],HHState18];
+ DefTensor[HM18[ia18],HHState18];DefTensor[DHM18[ia18],HHState18];
+ DefTensor[N18[-ia18],HHState18];DefTensor[Z18[-ia18],HHState18];
+ rMixed18=(J18[ia18,-ib18]+L18[ia18,-ib18])W18[ib18]+(H18[ia18,-ib18,-ic18]+DH18[ia18,-ib18,-ic18])U18[ib18]V18[ic18]+(GL18[ia18,-ib18]+DGL18[ia18,-ib18])V18[ib18]+(GB18[ia18,-ib18]+DGB18[ia18,-ib18])U18[ib18]+HM18[ia18]+DHM18[ia18];
+ direct18=J18[ia18,-ib18]W18[ib18]+H18[ia18,-ib18,-ic18]UF18[ib18]VF18[ic18]+GL18[ia18,-ib18]VF18[ib18]+GB18[ia18,-ib18]UF18[ib18]+HM18[ia18];
+ correlated18=rMixed18-L18[ia18,-ib18]W18[ib18]-DH18[ia18,-ib18,-ic18]U18[ib18]V18[ic18]-H18[ia18,-ib18,-ic18](U18[ib18]-UF18[ib18])V18[ic18]-H18[ia18,-ib18,-ic18]UF18[ib18](V18[ic18]-VF18[ic18])-DGL18[ia18,-ib18]V18[ib18]-GL18[ia18,-ib18](V18[ib18]-VF18[ib18])-DGB18[ia18,-ib18]U18[ib18]-GB18[ia18,-ib18](U18[ib18]-UF18[ib18])-DHM18[ia18];
+ tensorChecks18=<|
+ \"M4MixedDefectCancellation\"->ToCanonical[Expand[direct18-correlated18]],
+ \"MixedBilinearDifference\"->ToCanonical[Expand[H18[ia18,-ib18,-ic18](U18[ib18]V18[ic18]-UF18[ib18]VF18[ic18]-(U18[ib18]-UF18[ib18])V18[ic18]-UF18[ib18](V18[ic18]-VF18[ic18]))]],
+ \"BalancedBilinearDifference\"->ToCanonical[Expand[H18[ia18,-ib18,-ic18]((U18[ib18]-UF18[ib18])V18[ic18]+UF18[ib18](V18[ic18]-VF18[ic18])-(U18[ib18]-UF18[ib18])(V18[ic18]+VF18[ic18])/2-(U18[ib18]+UF18[ib18])(V18[ic18]-VF18[ic18])/2)]],
+ \"StageHessianContractionM10\"->ToCanonical[Expand[H118[ia18,-ib18,-ic18]U118[ib18]V118[ic18]-H18[ia18,-ib18,-ic18]U18[ib18]V18[ic18]-(H118[ia18,-ib18,-ic18]-H18[ia18,-ib18,-ic18])U118[ib18]V118[ic18]+H18[ia18,-ib18,-ic18](U18[ib18]-U118[ib18])V118[ic18]+H18[ia18,-ib18,-ic18]U18[ib18](V18[ic18]-V118[ic18])]],
+ \"HessianMixedSymmetry\"->ToCanonical[H18[ia18,-ib18,-ic18]U18[ib18]V18[ic18]-H18[ia18,-ib18,-ic18]V18[ib18]U18[ic18]],
+ \"CommonMixedAdjoint\"->ToCanonical[Expand[N18[-ia18]WD18[ia18]-Z18[-ib18]J18[ib18,-ic18]WD18[ic18]-(N18[-ia18]-Z18[-id18]J18[id18,-ia18])WD18[ia18]]],
+ \"MixedAdjointHessianSymmetry\"->ToCanonical[Z18[-ia18]H18[ia18,-ib18,-ic18]U18[ib18]V18[ic18]-Z18[-ib18]H18[ib18,-ic18,-ia18]V18[ic18]U18[ia18]]
+ |>;
+ <|\"Backend\"->\"xAct xTensor with xPerm Wolfram Language group algorithms\",\"ExternalCanonicalizerUsed\"->$xpermQ,\"TensorChecks\"->tensorChecks18,\"TensorAllZero\"->And@@(#===0& /@ Values[tensorChecks18]),\"Messages\"->$MessageList|>
+ "];
+ vars={gx18,gy18};gv={g118[la18,be18],g218[la18,be18]};base=HH18[gx18,gy18,la18,be18];sub=Thread[vars->gv];
+ chainActual=D[base/.sub,la18,be18];
+ chainExpected=(D[base,{vars}]/.sub).D[gv,la18,be18]+D[gv,la18].(D[base,{vars,2}]/.sub).D[gv,be18]+(D[D[base,la18],{vars}]/.sub).D[gv,be18]+(D[D[base,be18],{vars}]/.sub).D[gv,la18]+(D[base,la18,be18]/.sub);
+ pi2=p18[la18,be18];t2=ct18*w18[la18,be18]/pi2;
+ pf=pi2-de18[la18,be18];tf=ct18*(w18[la18,be18]-dw18[la18,be18])/pf;ft=t2-tf;
+ ftMixed=(ct18*D[dw18[la18,be18],la18,be18]-t2*D[de18[la18,be18],la18,be18]-D[t2,la18,be18]*de18[la18,be18]-D[t2,la18]*D[de18[la18,be18],be18]-D[t2,be18]*D[de18[la18,be18],la18]-D[ft,la18]*D[pf,be18]-D[ft,be18]*D[pf,la18]-ft*D[pf,la18,be18])/pf;
+ ftCovector=(ct18*D[dw18[la18,be18],la18,be18]-tf*D[de18[la18,be18],la18,be18]-D[t2,la18,be18]*de18[la18,be18]-D[t2,la18]*D[de18[la18,be18],be18]-D[t2,be18]*D[de18[la18,be18],la18]-D[ft,la18]*D[pf,be18]-D[ft,be18]*D[pf,la18]-ft*D[pi2,la18,be18])/pf;
+ t2Mixed=(ct18*D[w18[la18,be18],la18,be18]-t2*D[pi2,la18,be18]-D[t2,la18]*D[pi2,be18]-D[t2,be18]*D[pi2,la18])/pi2;
+ prod=(av+au*la18+ab*be18+aw*la18*be18)*(bv+bu*la18+bb*be18+bw*la18*be18);
+ jetProduct=av*bw+au*bb+ab*bu+aw*bv;
+ jetInv=-aw/av^2+2*au*ab/av^3;
+ mixedSource=D[(B18[g118[la18,be18],g218[la18,be18]]+la18*q18[g118[la18,be18],g218[la18,be18]]),la18,be18]-(D[B18[gx18,gy18]+la18*q18[gx18,gy18],{vars}]/.sub).D[gv,la18,be18]-D[gv,la18].(D[B18[gx18,gy18]+la18*q18[gx18,gy18],{vars,2}]/.sub).D[gv,be18]-(D[q18[gx18,gy18],{vars}]/.sub).D[gv,be18];
+ rr={{r11,r12},{r21,r22}};rfull={{rf11,rf12},{rf21,rf22}};
+ aa1=DiagonalMatrix[{a118[la18,be18],a218[la18,be18]}];
+ aa=DiagonalMatrix[{a318[la18,be18],a418[la18,be18]}];
+ tau=Inverse[aa]-IdentityMatrix[2];af=Inverse[IdentityMatrix[2]+2*tau];
+ ll1=IdentityMatrix[2]-aa1;ll=IdentityMatrix[2]-aa;lf=IdentityMatrix[2]-af;
+ c1=tau.aa.aa.af;c2=tau.tau.aa.aa.af;z0={z01,z02};jbirth={j01,j02};q1=rr.z0+be18*jbirth;
+ pdirect=ll1.q1+ll.(rr.aa1.q1+be18*jbirth)-lf.(rfull.z0+2*be18*jbirth);
+ sectors={-(IdentityMatrix[2]-ll.rr).(aa1-aa).q1,ll.(rr.aa-aa.rr).q1,ll.(IdentityMatrix[2]-rr).rr.z0,c2.rr.rr.z0,lf.(rr.rr-rfull).z0,be18*ll.aa.(rr-IdentityMatrix[2]).jbirth,-be18*c1.jbirth};
+ valueDifference=Together /@ (pdirect-Total[sectors]);
+ mixedDifference=Together /@ (D[pdirect,la18,be18]-Total[D[#,la18,be18]& /@ sectors]);
+ scalarChecks=<|
+ "C2MixedImplicitChain"->Expand[chainActual-chainExpected],
+ "M8MixedGasSource"->Expand[mixedSource],
+ "M5HessianRationalDifference"->Together[2*ell18^2*qf18*((dy18+ell18*dx18)^(-3)-dy18^(-3))+2*ell18^3*qf18*dx18*((dy18+ell18*dx18)^2+(dy18+ell18*dx18)*dy18+dy18^2)/(dy18^3*(dy18+ell18*dx18)^3)],
+ "M6BirthMixedRationalDifference"->Together[2*ell18*j18*(dy18^(-2)-(dy18+ell18*dx18)^(-2))-2*ell18^2*j18*dx18*(2*dy18+ell18*dx18)/(dy18^2*(dy18+ell18*dx18)^2)],
+ "M12AbsorptionMixedPrimitive"->Together[D[1/(1+k18*(1-x18[la18,be18])),la18,be18]-k18*D[x18[la18,be18],la18,be18]/(1+k18*(1-x18[la18,be18]))^2-2*k18^2*D[x18[la18,be18],la18]*D[x18[la18,be18],be18]/(1+k18*(1-x18[la18,be18]))^3],
+ "MixedJetProduct"->Expand[(D[prod,la18,be18]/.{la18->0,be18->0})-jetProduct],
+ "MixedJetInverse"->Together[(D[1/(av+au*la18+ab*be18+aw*la18*be18),la18,be18]/.{la18->0,be18->0})-jetInv],
+ "M14FiniteTemperatureMixed"->Together[D[ft,la18,be18]-ftMixed],
+ "M15CommonMixedTemperatureCovector"->Together[ftMixed-ftCovector],
+ "M16EndpointMixedTemperature"->Together[D[t2,la18,be18]-t2Mixed],
+ "PhotonSevenSectorValue"->valueDifference,
+ "PhotonSevenSectorMixedDerivative"->mixedDifference
+ |>;
+ ];
+ <|"Status"->"Completed","WolframVersion"->$Version,"ArchiveSHA256"->FileHash[arc,"SHA256","HexString"],"xTensorSHA256"->FileHash[xf,"SHA256","HexString"],"AlgebraWallSeconds"->First[timed],"TensorResult"->tensorResult,"ScalarChecks"->scalarChecks,"ScalarAllZero"->And@@(#===0& /@ Flatten[Values[scalarChecks]]),"Scope"->"Exact mixed symbolic identities. Arbitrary two-slot noncommuting remap is an algebraic check; original physical 35-slot mixed interval execution is archived separately."|>
+]

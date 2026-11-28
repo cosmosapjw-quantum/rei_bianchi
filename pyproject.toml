@@ -9,5 +9,20 @@ description="Durable Bianchi reionization research harness"
 requires-python=">=3.12"
 dependencies=["numpy>=2.3","scipy>=1.17","pandas>=2.2","sympy>=1.13","mpmath>=1.3"]
 
-[tool.setuptools.packages.find]
-where=["src"]
+[project.scripts]
+rei-igm = "rei_bianchi.microphysics.cli:main"
+
+[tool.setuptools]
+packages = ["rei_bianchi", "rei_bianchi.microphysics", "rei_bianchi.microphysics.cr_sources", "wu088_hh", "bass_he", "bass_he.cloud", "arseny_reimpl", "cr_repro", "vendor_w1r"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+wu088_hh = "components/wu088_hh/upstream/src/wu088_hh"
+bass_he = "components/bass_he/src/bass_he"
+arseny_reimpl = "components/bass_he/src/arseny_reimpl"
+cr_repro = "components/bass_cr/charge_exchange/cr_repro"
+vendor_w1r = "components/bass_cr/charge_exchange/vendor_w1r"
+
+[tool.setuptools.package-data]
+"rei_bianchi.microphysics" = ["data/*.csv"]
+"rei_bianchi.microphysics.cr_sources" = ["*.npz", "*.json", "*.txt", "*.md"]

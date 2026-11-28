@@ -1,0 +1,5 @@
+# Targeted validation correction
+
+Historical THEORY_KO.md checkpoint was published after the first 32/32 tests. A bounded C6 packaging defect was then found: the default source loader assumed a sibling PR106 repository path and failed in standalone ZIP extraction. The smallest repair adds a local `source/M0475.x4` fallback only when the pinned sibling path does not exist, with exact SHA256 and Git-blob identity checks unchanged. New test `test_packaged_default_source` passes. **Current final scoped test count 33/33 PASS**. Historical checkpoint 32/32 remains a truthful earlier snapshot; final RESULTS.json and code are authoritative. Independent Decimal80 oracle eight cases max error 2e-73 after correcting the comparison harness's default Decimal28 context to Decimal95. This is a validation harness precision defect, not a physics or implementation failure.
+
+No original BASS_HE full suite, production IVP, or physical rate computation was performed. Native independent R6/C9 NOT_RUN. Numeric decimal strings are not directed-rounding certificates.

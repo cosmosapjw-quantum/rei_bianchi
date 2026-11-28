@@ -1,0 +1,12 @@
+--- a/research/axbi_goal_20261014/convergence/compare_histories.py
++++ b/research/axbi_goal_20261014/convergence/compare_histories.py
+@@ -1,5 +1,8 @@
+ def floor(name,case):
+-    if name.startswith('x_') or name=='xe':return 1e-7
++    if name=='xe':
++        h,he=case['factors']
++        return 1e-7*(h+3*he)/h
++    if name.startswith('x_'):return 1e-7
+     if name=='Tgas_K':return .01
+     if name.startswith('Y_'):
+         species=name[2:];h,he=case['factors']

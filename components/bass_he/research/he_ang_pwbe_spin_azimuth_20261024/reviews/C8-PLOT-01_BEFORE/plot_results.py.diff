@@ -1,0 +1,17 @@
+--- before/plot_results.py
++++ after/plot_results.py
+@@ -27,11 +27,11 @@
+     ax=axes[1];heat=np.array(d['heat_Kbar']);mus=d['heat_mu']
+     im=ax.imshow(heat,origin='lower',extent=[mus[0],mus[-1],mus[0],mus[-1]],aspect='auto',
+                  cmap='viridis',norm=LogNorm(vmin=float(heat.min()),vmax=float(heat.max())))
+-    ax.set(xlabel=r'$\mu_A$',ylabel=r'$\mu_B$',title=r'Pointwise $\overline K$: $E_0=100, E_B=40$')
++    ax.set(xlabel=r'$\mu_A$',ylabel=r'$\mu_B$',title=r'Pointwise $\overline{K}$: $E_0=100, E_B=40$')
+     cb=fig.colorbar(im,ax=ax,fraction=.047,pad=.035);cb.set_label(r'$a_0^2/E_h$ per sr$^2$',fontsize=9)
+     ax=axes[2];e=np.array(d['equal_phi'])/np.pi;scale=max(d['equal_K'])
+-    ax.plot(e,np.array(d['equal_weighted_singlet'])/scale,color='#0072B2',label=r'$\frac14 |D+X|^2$ (scaled TDCS)')
+-    ax.plot(e,np.array(d['equal_weighted_triplet'])/scale,color='#D55E00',ls='--',label=r'$\frac34 |D-X|^2=0$')
++    ax.plot(e,np.array(d['equal_weighted_singlet'])/scale,color='#0072B2',label=r'$\frac{1}{4} |D+X|^2$ (scaled TDCS)')
++    ax.plot(e,np.array(d['equal_weighted_triplet'])/scale,color='#D55E00',ls='--',label=r'$\frac{3}{4} |D-X|^2=0$')
+     ax.set(xlabel=r'Relative azimuth $\phi/\pi$',ylabel='Weighted channel / max unpolarized TDCS',title='G5: equal-share triplet node')
+     ax.legend(loc='upper right',fontsize=8,frameon=False)
+     for ax in axes:ax.grid(alpha=.15)

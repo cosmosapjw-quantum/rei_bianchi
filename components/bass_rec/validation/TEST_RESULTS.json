@@ -1,0 +1,48 @@
+{
+  "schema": "rei.unified.component-tests.v1",
+  "rust_toolchain": "1.94.1",
+  "BASS": {
+    "command": "cargo test --offline --locked --config 'profile.test.package.bianchi_rustcore.opt-level=2' --config 'profile.test.package.bianchi_rustcore.debug=0' --manifest-path components/bass_rec/bass/_rustcore/Cargo.toml --lib --tests",
+    "exit_status": 0,
+    "test_harness_groups": 39,
+    "passed": 302,
+    "failed": 0,
+    "ignored": 0,
+    "archived_log_sha256": "5f5eebdd6161214eac64b8017b08e871f66c2ee43e4856d2fa15dea3129b706d"
+  },
+  "REC": {
+    "command": "cargo test --offline --locked --manifest-path components/bass_rec/rec/rust/rec_microphysics/Cargo.toml --lib --tests",
+    "exit_status": 0,
+    "test_harness_groups": 18,
+    "passed": 145,
+    "failed": 0,
+    "ignored": 0,
+    "archived_log_sha256": "ea1cdb1a046891cd099767e7f7aacc16748cd3da5197423e8f195e8d58535ca5"
+  },
+  "native_smoke_and_comparison": {
+    "science_and_summary_files_identical_at_prior_BASS_pins": 14,
+    "coverage": "native matched REC and live BASS/REI, finite two-era intervals",
+    "metadata_only_differences": 2
+  },
+  "accepted_material_observer": {
+    "entry": "python3 components/bass_rec/run_material_trace.py --offline <output>",
+    "matched_redshift_cases": 15,
+    "additional_matched_proper_time_cases": 2,
+    "accepted_step_comparisons": 468,
+    "science_file_parity_original_cli_with_and_without_observer": 8,
+    "summary_sha256": "d38a56487a6a2b52749ee2385982b397d681e51e6d917a031741ef405019f9fe"
+  },
+  "wheel_validation": {
+    "build": "python -m pip wheel --no-deps --no-build-isolation --no-index .",
+    "isolated_import_and_exercise": [
+      "rei_bianchi.microphysics.hh.savin_rates(9.3)",
+      "rei_bianchi.microphysics.he.BINDING_EV",
+      "rei_bianchi.microphysics.cli:main --help",
+      "wu088_hh",
+      "bass_he",
+      "cr_repro",
+      "vendor_w1r (PEP 420 namespace)"
+    ],
+    "cargo_native_runners": "source checkout"
+  }
+}

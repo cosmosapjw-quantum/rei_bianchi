@@ -1,0 +1,43 @@
+{
+  "schema": "bass-he-c2d-independent-recovery-implementation-review-v1",
+  "created_at_utc": "2026-10-01T14:10:09.182889+00:00",
+  "status": "NO_REMAINING_CONCRETE_BLOCKER_IN_STAGED_RECOVERY_IMPLEMENTATION",
+  "contract_sha256": "e43372481ba1ddc4a556a5eb199ec0fe9479247fbda59bea650681bcac1dee54",
+  "staged_manifest_sha256": "de15378d4d53da6880592f5a5509079defbc55e2d77981723bfdd7db122a1817",
+  "staged_source_sha256": {
+    "code/mpi_batch.py": "52e3d2749bf544a3976d83b1c098d358814e1d6b8f3c910cae4562326bec3928",
+    "code/launch_ncp.py": "2026e1d3bfa61dd3c30e179f3101780ceadc29a7cc86fbce5059023dd11ec540",
+    "code/recovery_support.py": "f743d2ceb4347938eca04cd2825bf80d32b33eccaec3e9e4a7bf70d6ec512737",
+    "code/prepare_recovery.py": "e762802e84760e6246f6529d7f523603292ad0e5be4263533bfa67363f1aea1d",
+    "code/analyze_states.py": "3b9ceba0c5ff2930c6eeaf922538674cbf76512c1ecf462a62a94793256c4408",
+    "code/analyze_all.py": "9ea0acc68507e66cb3cecbfd4a3ed62c2f3d3e1e94d88683f7a074571b0866b3"
+  },
+  "unchanged_worker_and_wrapper_sha256": {
+    "code/task_worker.py": "fe49b4fc9aee69f92d2b6bb7b7bfef12c2fdd14343763ccc0dbaf0f6b46cef59",
+    "code/run_bounded.py": "8fa726d07bed1345a6ac78705d3b231a254203210d98a8ac1d00aa549fd3ac4e"
+  },
+  "resolved_review_points": [
+    "Final verifier recomputes exact bijection from original unfinished task rows; completed result replay prohibited.",
+    "Final total wall derives from unchanged CONTRACT, and copied prior wall agrees with actual SHA-bound launch receipts.",
+    "Historical launch set must exactly match final inventory excluding the one recovery launcher; duplicate or omitted receipts fail.",
+    "Execution-boundary code changes are restricted to exact reviewed MPI/launcher SHAs; all scientific source, worker and native bytes remain pinned."
+  ],
+  "binding_review": {
+    "local_unbound": "Explicit --bind-to none sets marker1/OMP_PROC_BIND=FALSE before mpirun and preserves it in nested workers.",
+    "NCP_default": "Explicit/default core resets even a stale local marker to0 and OMP_PROC_BIND=close.",
+    "partial_evidence": "Preserves absent original BATCH_SUMMARY; separate derived partial sidecar admits only actual fully validated WORKER_RESULT_PASS tasks.",
+    "recovery": "Only exact original interrupted/unstarted overlap,sphere_observe,parity tasks; no eigensolve; create-only attempts; task and total/count limits unchanged.",
+    "final_collector": "Calls strict verify_recovered before collecting; exception limited to the exact original timed-out folder with return124; all other failed launches remain failures.",
+    "ledger": "Counts any task directory conservatively as a started attempt; preserves full-manifest count upper bound; failed preflight elapsed is also charged."
+  },
+  "manufactured_evidence": {
+    "affinity_json_sha256": "2b29f2bcc79227832b2cd1108300145bac3dc4e6a5c6193f80534ed7bb3d9e08",
+    "old_close_mask": "0..8 to0 after ABI library load",
+    "local_false_mask": "0..8 retained after ABI library load",
+    "MPI_probe": "three ranks all retain0..8, ABI3, threads1, empty stderr",
+    "test_coverage": "Final recovery10 tests PASS; prior unchanged affinity4 tests PASS. Read actual persisted logs and source, no duplicate test replay.",
+    "physics_evaluations": 0,
+    "benchmark_evaluations": 0
+  },
+  "remaining": "After original timeout, verify actual partial classification and recovery ledger, source identities and own-worker effective affinity. This staged review does not claim recovery executed or scientific closure."
+}

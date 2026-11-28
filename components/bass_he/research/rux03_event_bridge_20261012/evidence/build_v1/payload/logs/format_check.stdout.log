@@ -1,0 +1,29 @@
+Diff in /home/runner/work/rei_bianchi/rei_bianchi/rust/rei_microphysics/src/axisym_conditional.rs:234:
+                 .chain(t.dr_kinetic.iter())
+                 .chain(self.photo_by_node.iter().flatten())
+                 .any(|x| !x.is_finite() || *x < 0.)
+-            || t.rr.iter().zip(t.rr_kinetic).any(|(r, p)| *r == 0. && p != 0.)
+-            || t.dr.iter().zip(t.dr_kinetic).any(|(r, p)| *r == 0. && p != 0.)
++            || t.rr
++                .iter()
++                .zip(t.rr_kinetic)
++                .any(|(r, p)| *r == 0. && p != 0.)
++            || t.dr
++                .iter()
++                .zip(t.dr_kinetic)
++                .any(|(r, p)| *r == 0. && p != 0.)
+         {
+             return Err("CASE_A_EVENT_BUNDLE_DOMAIN".into());
+         }
+Diff in /home/runner/work/rei_bianchi/rei_bianchi/rust/rei_microphysics/src/axisym_conditional.rs:280:
+             absorbed_number_ref += absorbed_ref;
+             absorbed_energy_ref += absorbed_ref * node.energy_ev * gas.ev_erg;
+         }
+-        let mut net_edge = std::array::from_fn::<_, 3, _>(|a| {
+-            t.ci[a] - t.rr[a] + summary.photo_per_cm3_s[a]
+-        });
++        let mut net_edge =
++            std::array::from_fn::<_, 3, _>(|a| t.ci[a] - t.rr[a] + summary.photo_per_cm3_s[a]);
+         net_edge[1] -= t.dr.iter().sum::<f64>();
+         let internal_power = (0..3)
+             .map(|a| net_edge[a] * gas.threshold_ev[a] * gas.ev_erg)

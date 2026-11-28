@@ -1,0 +1,38 @@
+--- /root/WU088_HH_PHYS06_NCP_20261011/repo/research/r31ao_unequal_ladder/ncp_phys04_local_20261011_v2/candidate/src/phys04_mixed.rs	2026-10-11 09:26:18.461619544 +0900
++++ /root/WU088_HH_PHYS06_NCP_20261011/repo/research/r31ao_unequal_ladder/ncp_phys06_local_20261011_v1/candidate/src/phys04_mixed.rs	2026-10-11 09:27:59.771977845 +0900
+@@ -21,7 +21,7 @@
+  }Ok(out)
+ }
+ #[derive(Clone,Debug)]
+-pub struct Phys04DerivativeExport {pub residual:[Jet;4],pub photons:Vec<Jet>,pub denominators:Vec<Jet>,pub rhs:[Jet;4],pub native_root_certified:bool}
++pub struct Phys04DerivativeExport {pub residual:[Jet;4],pub photons:Vec<Jet>,pub denominators:Vec<Jet>,pub rhs:[Jet;4],pub native_root_certified:bool,pub nonphoto:[Jet;4],pub photo_rates:Vec<[Jet;3]>,pub source_stage:PrimaryStage,pub energy_leaves:Vec<f64>,pub stored_n_he:f64,pub dt:f64}
+ pub fn phys04_reduced_residual(stage:&PrimaryStage,old:&[Jet;4],gas:&[Jet;4],incoming:&[Jet],energies:&[f64],lambda:&Jet,dt:f64)->Result<Phys04DerivativeExport,ForwardError>{
+  PHYS04_DERIVATIVES.fetch_add(1,std::sync::atomic::Ordering::SeqCst);
+  if !dt.is_finite()||dt<=0.0||incoming.len()!=energies.len()||lambda.value.lo<0.0||lambda.value.hi>1.0||incoming.iter().any(|j|j.value.lo<0.0){return Err(fail("PHYS04_PARAMETER_OR_LAYOUT"));}
+@@ -30,10 +30,11 @@
+  PHYS04_SOURCE_RHS.fetch_add(1,std::sync::atomic::Ordering::SeqCst);
+  let raw=ft03_interval_rhs(&m,&[bx[0],bx[1],bx[2],bx[3],dummy,dummy,dummy])?;
+  let mut f=[phys04_compose(&raw[0],gas)?,phys04_compose(&raw[1],gas)?,phys04_compose(&raw[2],gas)?,phys04_compose(&raw[3],gas)?];
++ let nonphoto=f.clone();
+  let q=phys04_compose(&hh_rate_jet(stage,&bx)?,gas)?;
+  f[0]=jadd(&f[0],&jmul(lambda,&q)?)?;f[3]=jsub(&f[3],&jprod(&[ic(CHI[0])?,lambda.clone(),q])?)?;
+  let lower=[jsub(&ic(1.0)?,&gas[0])?,jmul(&ic(stage.f_he)?,&jsub(&jsub(&ic(1.0)?,&gas[1])?,&gas[2])?)?,jmul(&ic(stage.f_he)?,&gas[1])?];
+- let provider=AtomicProvider::reference();let mut photons=Vec::new();let mut denominators=Vec::new();
++ let provider=AtomicProvider::reference();let mut photons=Vec::new();let mut denominators=Vec::new();let mut photo_rates=Vec::new();
+  for (n,e) in incoming.iter().zip(energies){
+   let sigma=[provider.cross_section(Absorber::HI,*e)?,provider.cross_section(Absorber::HeI,*e)?,provider.cross_section(Absorber::HeII,*e)?];
+   let mut opacity=ic(0.0)?;for a in 0..3 {opacity=jadd(&opacity,&jprod(&[ic(m.gas.c_cm_s)?,ic(stage.n_h_cm3)?,lower[a].clone(),ic(sigma[a])?])?)?;}
+@@ -43,11 +44,11 @@
+   let ph=jdiv(n,&den)?;let mut rates=[ic(0.0)?,ic(0.0)?,ic(0.0)?];
+   for a in 0..3 {rates[a]=jprod(&[ic(m.gas.c_cm_s)?,ic(stage.n_h_cm3)?,lower[a].clone(),ic(sigma[a])?,ph.clone()])?;f[3]=jadd(&f[3],&jmul(&rates[a],&ic(*e-CHI[a])?)?)?;}
+   f[0]=jadd(&f[0],&rates[0])?;f[1]=jadd(&f[1],&jdiv(&jsub(&rates[1],&rates[2])?,&ic(stage.f_he)?)?)?;f[2]=jadd(&f[2],&jdiv(&rates[2],&ic(stage.f_he)?)?)?;
+-  photons.push(ph);denominators.push(den);
++  photo_rates.push(rates);photons.push(ph);denominators.push(den);
+  }
+  f[3]=jsub(&f[3],&jprod(&[ic(2.0)?,ic(stage.h_mean_per_s)?,gas[3].clone()])?)?;
+  let residual=[jsub(&jsub(&gas[0],&old[0])?,&jmul(&ic(dt)?,&f[0])?)?,jsub(&jsub(&gas[1],&old[1])?,&jmul(&ic(dt)?,&f[1])?)?,jsub(&jsub(&gas[2],&old[2])?,&jmul(&ic(dt)?,&f[2])?)?,jsub(&jsub(&gas[3],&old[3])?,&jmul(&ic(dt)?,&f[3])?)?];
+- Ok(Phys04DerivativeExport{residual,photons,denominators,rhs:f,native_root_certified:false})
++ Ok(Phys04DerivativeExport{residual,photons,denominators,rhs:f,native_root_certified:false,nonphoto,photo_rates,source_stage:stage.clone(),energy_leaves:energies.to_vec(),stored_n_he:m.gas.n_he_cm3,dt})
+ }
+ #[derive(Clone,Debug)]
+ pub struct Phys04MixedArithmetic {pub u:[Interval;4],pub v:[Interval;4],pub w:[Interval;4],pub photons:Vec<Jet>,pub matrix:[[Interval;4];4],pub fixed_c:[[f64;4];4],pub contraction:f64,pub native_root_certified:bool}

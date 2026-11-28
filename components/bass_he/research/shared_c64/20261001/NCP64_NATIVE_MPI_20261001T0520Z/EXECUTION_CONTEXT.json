@@ -1,0 +1,30 @@
+{
+  "final_native_library": "native/build-native/libbass_element.so",
+  "sha256": "df8bc1c16184423ab01537a738bb85c4717625fe205907a77373f9c94f7e2d65",
+  "build_flags": [
+    "-O3",
+    "-std=f2008",
+    "-fPIC",
+    "-shared",
+    "-fopenmp",
+    "-fno-fast-math",
+    "-ffp-contract=off",
+    "-fno-associative-math",
+    "-Wall",
+    "-Wextra",
+    "-march=native"
+  ],
+  "environment": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1"
+  },
+  "final_solver_benchmark": "tests/benchmark_solver.py; 3 alternating fresh-process solves per reference/native/numpy; no other physical compute run concurrently",
+  "local_MPI_command": "mpirun.openmpi --host localhost:3 --np 3 --bind-to none --nooversubscribe python code/mpi_batch.py --manifest configs/MPI_PARITY_TASKS.json --output-dir <new> --backend native",
+  "local_MPI_only_environment": {
+    "OMPI_MCA_pml": "ob1",
+    "OMPI_MCA_btl": "self,vader",
+    "OPAL_PREFIX": "workspace-extracted OpenMPI prefix",
+    "root_container_allow_flag": true
+  },
+  "NCP_command": "code/launch_ncp.py uses validated CPU count, explicit localhost slots, binding and nooversubscribe; do not copy local sandbox unbound/container overrides into NCP defaults"
+}

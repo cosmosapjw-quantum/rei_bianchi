@@ -1,0 +1,917 @@
+
+
+     
+     
+
+     
+     
+     
+
+
+     
+     
+ 
+
+ 
+    li {
+        margin: 10px 0;
+    }
+
+    pre {
+        line-height: 120%;
+        font-size: 11pt;
+        color: #222;
+    }
+
+    .mainlbl {
+        font-size: 18pt;
+        font-weight: bold;
+        color: #444;
+        margin-bottom: 10px;
+        margin-top: 40px;
+    }
+
+    .section {
+        font-weight: bold;
+        color: #212529;
+    }
+
+    .subsection {
+        font-size: 11pt;
+        font-weight: bold;
+        color: #212529;
+    }
+
+    .radsection {
+        font-size: 14pt;
+        font-weight: bold;
+        color: #3e454d;
+    }
+
+    .nds {
+        font-family: monospace;
+        color: #333;
+        font-weight: bold;
+        font-size: 14pt;
+    }
+
+    .param {
+        font-family: monospace;
+        color: green;
+        font-weight: bold;
+        font-size: 14pt;
+    }
+
+    .subparam {
+        font-family: monospace;
+        color: brown;
+        font-weight: bold;
+        font-size: 14pt;
+    }
+
+    .values {
+        font-family: monospace;
+        color: rgb(63, 63, 226);
+        font-weight: bold;
+        font-size: 14pt;
+    }
+
+    .tryit {
+        background-color: lightgray;
+        padding-right: 2px;
+    }
+
+    .separ {
+        height: 6px
+    }
+
+    .code {
+        background-color: #f8f8f8;
+        padding-left: 2px;
+        padding-right: 2px;
+        border: 1px solid lightgray;
+        margin-bottom: 0px;
+        margin-top: 16px;
+    }
+
+    .notetitle {
+        padding-left: 5px;
+        background-color: rgba(135, 206, 250, 0.705);
+        font-weight: bold;
+
+    }
+
+    .notebody {
+        padding-left: 5px;
+        background-color: rgba(135, 206, 250, 0.212);
+
+    }
+
+    .apimain {
+        background-color: #eee;
+        padding-left: 2px;
+
+    }
+
+    .menu {
+        margin-bottom: 20px;
+        font-weight: bold;
+        line-height: 140%;
+    }
+
+    .menu_link {
+        font-weight: normal;
+        padding-left: 10px
+    }
+
+    .menu_link:hover {
+        font-weight: bold;
+        color: #666
+    }
+
+    .mya {
+        text-decoration: underline
+    }
+
+    .narrowli li {
+        margin: 0px;
+    }
+ 
+ 
+
+ 
+
+
+     
+
+         Introduction
+              Examples 
+         
+
+         Jupyter lab
+              Notebook 
+         
+
+         API description
+             Service URL 
+
+         
+
+         API parameters
+             fields 
+              nuclides 
+              parents 
+              products 
+              rad_types 
+         
+
+         Fields content
+              Notes 
+              Data sources 
+             Field groups
+             ground_states 
+             levels 
+             gammas 
+             decay_rads 
+             bin_beta 
+             fission_yelds 
+
+         
+
+         Feedback
+              Contact 
+         
+
+         Errors
+              Return codes 
+         
+
+     
+     
+
+         Livechart Data Download API 
+        This API allows the direct download of data.
+        At the moment the format provided is CSV (comma separated values). Future developments will
+        include more formats, and more options to build custom queries.
+
+         
+
+         Examples 
+         
+        The service URL is  nds.iaea.org/relnsd/v1/data?  followed by request parameters.
+          (please note that using 'v0' is the same as using 'v1' )
+          Here some
+        examples of data request parameters:
+
+         
+             fields = levels & nuclides = 135xe 
+                try it »
+             
+         
+         Xe-135 levels 
+         
+
+
+         
+             fields = gammas & nuclides = 135xe 
+                try it »
+             
+         
+         Xe-135 gamma transitions 
+         
+
+
+         
+             fields = ground_states & nuclides = all 
+                try it
+                »
+             
+         
+         all ground states in the database 
+
+         
+         
+             fields = cumulative_fy & parents = 233u 
+               
+                try
+                it »
+             
+         
+         U-233 cumulative fission yields 
+
+
+         
+         
+             fields = cumulative_fy & products = 135xe 
+               
+                try
+                it »
+             
+         
+         cumulative fission yields producing Xe-135 
+         
+         
+             fields = decay_rads & nuclides = 135xe & rad_types = e 
+               
+                try it » 
+         electrons (Auger and conversion) from Xe-135 decays 
+         
+         
+             fields = bin_beta & nuclides = 135xe & rad_types = bm 
+               
+                try it » 
+         Beta and (anti)neutrino energy distributions from Xe-135 G.S. decays 
+
+         
+
+         
+             
+            Attention
+         
+         
+
+             
+                 When importing into a spreadsheet, if you want to keep track of the  trailing zeros , avoid the
+                    automatic conversion of data types :
+                    0.10 would become 0.1
+                 
+                 "Gamma transitions" and "gamma decay radiations"  are different: 
+                    - "Gamma transitions" are the electromagnetic transitions between energy levels of the given
+                    nuclide
+                     
+                    - "Gamma decay radiations" are the gammas emitted, during the decay process, by the daughter(s) of
+                    the given
+                    nuclide
+                 
+                 
+                    Data do not have a flag for  metastable  states. Use the fields  "energy"  or
+                     "p_energy" 
+                    to distinguish between Ground State and Metastable.
+                 
+                 
+                    When calling "fields=decay_rads&rad_types=g&nuclides...", be aware of the fields  "p_energy" and
+                        "decay" . For
+                    the same nuclide there can
+                    be more than one decay mode, and, in case of metastable states, more states than the simple ground
+                    state. This might result in gamma lines having the
+                    same energy, but emitted by different decays
+                 
+             
+
+         
+
+         Jupyter lab 
+        The  Livechart API  works very effectively with
+        Python data analysis libraries ( pandas  and
+         plotly  in
+        these examples),
+        the first step to build models for Machine Learning.
+         
+        Many examples, including 3D plotting, are detailed in this  Notebook 
+         
+
+         
+             
+            Attention
+         
+         
+            There have been cases in which the service returns an  HTTP Error 403: Forbidden 
+             
+            The workaround is to add an user agent to the request. 
+            In  Python :
+
+             
+def lc_read_csv(url):
+    req = urllib.request.Request(url)
+    req.add_header('User-Agent', 
+        'Livechart/1.0')
+    content = urllib.request.urlopen(req)
+    return content
+
+ 
+            in  Java :
+             
+protected String lc_read_csv(url){
+
+    URL murl = new URL(url);
+    URLConnection conn = murl.openConnection();
+    conn.setRequestProperty("User-Agent",
+    "Livechart/1.0");
+       
+    BufferedReader br = new BufferedReader(
+                   new InputStreamReader(conn.getInputStream()));
+
+    String inputLine;
+    StringBuffer sb = new StringBuffer();
+    while ((inputLine = br.readLine()) != null) {
+        sb.append(inputLine);
+    }
+    br.close();
+    return sb.toString();
+  }
+
+ 
+
+            For other languages, add the suggested user agent to the request using the avaliable function
+         
+
+         API description 
+         Service URL 
+        The URL of the service is  nds.iaea.org/relnsd/v1/data?  followed by a
+        chain of parameters linked by  & . A parameter is specified as
+         name = value 
+         
+         Parameters 
+
+         
+         
+         fields   
+         
+         
+
+             mandatory 
+             
+            Specifies which fields are fetched. At the moment, a predefined group of fields is avaliable.
+            Further development will allow the user to specify the list of fields.
+             Values 
+             
+             ground_states  or  levels  or  gammas  or  decay_rads  or
+             cumulative_fy  or  independent_fy  or  bin_beta 
+             
+             Example 
+             
+             fields = cumulative_fy 
+             
+            See below for the description of the fields included in each group.
+         
+         
+
+         nuclides 
+         
+         
+
+
+            Is  mandatory 
+            for  ground_states ,  levels ,  gammas ,  decay_rads , and  bin_beta 
+             It has  no effect  on  cumulative_fy  or  independent_fy 
+             
+
+            Restricts the retrieval to the specified nuclide
+             
+            In this version of the API, only one nuclide can be specified
+             
+             Values 
+             
+             nuclides = 135xe  (mass+element)
+             
+            or
+             
+             nuclides = all 
+              allowed only  for  ground_states .
+            All ground states are returned
+             
+
+         
+         
+
+         parents 
+         
+         
+
+            Valid only for  cumulative_fy  and  independent_fy 
+
+            All the products for the specified parent are returned.
+             
+            In this API version only one parent can be specified
+             
+             Values 
+             
+             parents =   232th 
+            or  233u  or  235u  or  238u 
+            or  237np  or  239pu  or  241pu  or  
+                241am 
+             
+             
+
+
+         
+         
+         products 
+         
+            Valid only for  cumulative_fy  and  independent_fy 
+            All the fission yields of this product, for any parent, are returned
+             
+            In this API version only one product can be specified
+             
+
+               Values 
+             
+             products = 135xe  (mass+element)
+             
+         
+
+
+
+         
+           rad_types 
+         
+         
+             Only  for, and  mandatory  for,
+             decay_rads , and  bin_beta 
+             
+            Only  one value  is allowed 
+            Data are returned only for the specified type of radiation
+             
+            In this API version only one radiation can be specified
+
+             Values  for  decay_rads 
+             
+             a bp bm g e x  (α,
+            β - , β + , γ,
+            Auger and conversion electron, X-ray)
+             Values  for  bin_beta 
+             
+             bp bm  (
+            β - , β + )
+             
+
+             Full Example 
+               fields = decay_rads & nuclides = 135xe & rad_types = e 
+         
+
+
+
+         
+           metastable_seqno 
+         
+         
+             Only  for
+             bin_beta 
+             
+            Only  one value  is allowed 
+             Optional , specifies the sequential number for an excited
+            state  
+             Values 
+             
+             1 2 3 ...   (first metastable state, second, third, ... )
+               Full Example 
+               fields = bin_beta & nuclides = 135xe & rad_types = bm 
+             metastable_seqno = 1 
+             
+            This would retrieve the spectra for the decay of the 526.5 keV level of Xe-135
+         
+
+
+
+         
+         Fields content 
+
+         
+             Blank space " " means value not given or not known 
+             
+                Energies are in keV, and intensities in %
+                 Energies with +X shift 
+                 
+                    Level energies might include an unknown shift, e.g.  X+120 .
+                    To handle these cases, the energy is split in three fields:
+                       energy_shift  the X (or Y, Z, ...) part,
+                     
+                     energy  the numerical part,
+                     ripl_shift  the value of X assigned by  RIPL 
+                    (Reference Input Parameter Library - levels segment) using data from  
+                        Nubase  (or blank " " when no assignment is made)
+                    For example:
+                     
+                         energy_shift, energy, unc, ripl_shift
+           X,   1440,    ,   1200 
+                     
+                    means that the ENSDF energy is X+1440 , that the uncertainity is left blank, and that RIPL assigns
+                    X=1200. The absolute energy considering RIPL is 2640 keV
+                     
+                     ripl_shift  is empty when Ripl does not provide any value, then the level
+                    energy cannot be assigned
+                     
+                    The above is done for  levels  and  ground_states 
+                 
+             
+             The  operator  field contains AP for approximate, GT for greater than, LT ,...
+             
+             The  operator ,  unc , and  unit 
+                fields contain
+                the operator, uncertainty, and units of the previous field, respectively: e.g.
+                 half-life, operator_hl, unc_hl, unit_hl 
+             
+
+             
+                For  levels  and  ground_states , the three most
+                probable
+                decay modes are given
+                   decay_1,decay_1_%,unc_1, ..._2, ..._3 
+             
+             
+                The  gammas  set contains summary information on the start and end level of
+                the
+                transition.
+                 
+                The  start_level_idx  and  start_level_idx  fields
+                contain a sequential integer, providing a unique identifier for these levels
+                 
+                 start_level_idx  and  start_level_idx  can
+                be matched with
+                the  idx  field of the  levels  set, for the same
+                nuclide,
+                to obtain further data about the start and end levels.
+             
+             
+                For traceability, each file has at the end the field  extraction date 
+             
+         
+
+         Data sources 
+
+
+        In the following
+         
+             
+                ENSDF: Evaluated Nuclear Strucure Data Files, April 2022 snapshot 
+                The  ENSDF_publication_cut-off  and  ENSDF_authors 
+                fields contain the cut-off date for the publications considered in the ENSDF evaluation, and the authors
+                of the
+                ENSDF evaluation, respectively
+             
+             
+                RIPL:  Reference Input Parameters Library (levels segment) 
+             
+             
+                AM: I.Angeli, K.P. Marinova,  Atomic Data and Nuclear Data Tables   99  (2013)  DOI:10.1016/j.adt.2011.12.006 
+             
+             
+                AME: 2020 Atomic Mass Evaluation  AME20 
+             
+             
+                N: 2020 Nubase Evaluation  NUBASE20 
+             
+             
+                NS: Table of Recommended Nuclear Magnetic Dipole Moments: Part I - Long-lived States  indc-nds-0794 , and
+                Table of Recommended Nuclear Magnetic Dipole Moments - Part II, Short-lived States
+                 indc-nds-0816 , and
+                Table of Nuclear Electric Quadrupole Moments  indc-nds-0833 
+             
+             
+                Beta spectra are otained using  Betashape 2.2 
+                 
+                X. Mougeot,  Applied Radiation and Isotopes
+                    154 (2019) 108884 
+
+                X. Mougeot,  Physical Review C 91,
+                    055504 
+                and Erratum  Phys. Rev. C 92, 059902
+                    (2015) 
+             
+             
+            JEFF 3.1.1:   Joint Evaluated Fission and Fusion Nuclear Data Library 
+        
+             
+         
+         
+            .field_desc td {
+                padding: 4px;
+            }
+
+            .field_desc tr {
+                border-bottom: 1px solid lightgray;
+            }
+         
+         Uncertainties 
+        Half-life uncertainity is given in ENSDF notation, referring to the significant digits. 
+        For example  12.1 h 11  means 12.1 h ± 1.1 and  12.1 h 1  means 12.1 h ± 0.1
+          The Uncertainity of the Half-life in seconds is symmetrised
+         Field groups 
+         ENSDF_publication_cut-off ,  ENSDF_authors , and  extraction date  are at the end of each row
+         ground_states 
+        Properties on the nuclide and its ground state level
+         
+            var gs_fields = ("z,n,symbol,radius,unc_r,abundance,unc_a,energy_shift,energy,unc_e,ripl_shift,jp,half_life,operator_hl,unc_hl,unit_hl,half_life_sec,unc_hls,decay_{1 2 3},decay_{1 2 3}_%, unc_{1 2 3},isospin,magnetic_dipole,unc_md,electric_quadrupole,unc_eq"
+                + ",qbm,unc_qb,qbm_n,unc_qbmn,qa, unc_qa, qec, unc_qec,sn,unc_sn, sp,unc_sp,binding,unc_ba,atomic_mass, unc_am, mass excess,unc_me,me_systematics,discovery").split(",");
+            var gs_expl = ['number of protons', 'number of neutrons', 'element symbol', 'charge radius', '', 'Abundance', '', 'unknown energy shift', 'energy', ''
+                , 'energy shift from RIPL', 'J<sup>&pi;</sup>', 'Half-life', 'limits on H-l value', 'H-l unc in ENSDF style', 'H-l units', 'H-l in seconds', 'H-l unc, symmetrized'
+                , '1<sup>st</sup>, 2<sup>nd</sup>, 3<sup>rd</sup> decay mode', 'branching for 100 decays', '', 'isospin', 'magnetic dipole', '', 'electric quadrupole', ''
+                , 'Q-value for &beta;<sup>-</sup> decay', '', '&beta;<sup>-</sup> n', '', '&alpha;', '', 'electron capture', '', 'neutron separation energy', ''
+                , 'proton separation energy', '', 'binding energy / A', '', 'atomic mass', '', 'mass excess', '', 'mass excess from systematics', 'year of discovery'];
+            var gs_un = ['', '', '', 'fm', '', 'Mole fraction %', '', 'X, Y, ...', 'keV', '', 'keV', '', '', 'AP, GT, LT, ...', '', '', 'seconds', '', '', '%', '', '', '&mu;<sub>N</sub>', '', 'barn', ''
+                , 'keV', '', 'keV', '', 'keV', '', 'keV', '', 'keV', '', 'keV', '', 'keV', '', '&mu;AMU', '', 'keV', '', '', '']
+            var gs_src = ['', '', '', 'AM', '', 'N', '', 'ENSDF', '&rdquo;', '&rdquo;', 'RIPL', 'ENSDF', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', 'S', '&rdquo;', '&rdquo;', '&rdquo;'
+                , 'AME', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', '&rdquo;', 'N']
+
+            document.write('<table class=field_desc><tr><th>name</th><th>content</th><th>units</th><th>source</th></tr>');
+            for (var i = 0; i < gs_fields.length; i++) {
+                document.write('<tr><td><b>' + gs_fields[i] + '</b></td><td>' + gs_expl[i] + '</td><td>' + gs_un[i] + '</td><td style=" text-align: center">' + gs_src[i] + '</td></tr>');
+            }
+            document.write('</table>');
+            document.write('<br><br>');
+         
+         levels 
+        Properties of the excited energy levels of a nuclide 
+        The meaning and source of the fields are the same as the ground_state set. Additional fields are:
+         
+               jp_order :  1 indicates the 1 st  occurrence of that J π  value, 2 the
+                2 nd  occurrence,
+                etc...
+             
+             idx :  a sequential integer can that can be matched with  start_level_idx  and
+                 end_level_idx  in the gamma set
+             
+         
+         
+            var lv_fields = ("z,n,symbol,idx,energy_shift,energy, unc_e,ripl_shift,jp,jp_order,half_life,operator_hl,unc_hl,unit_hl,half_life_sec,unc_hls, "
+                + "decay_{1 2 3},decay_{1 2 3}_%, unc_{1 2 3},"
+                + "isospin,magnetic_dipole,unc_mn,electric_quadrupole,unc_eq").split(",");
+
+
+
+            var lv_expl = ['number of protons', 'number of neutrons', 'element symbol', '', 'unknown energy shift', 'energy', ''
+                , 'energy shift from RIPL', 'J<sup>&pi;</sup>', '', 'Half-life', 'limits on H-l value', 'H-l unc in ENSDF style', 'H-l units', 'H-l in seconds', 'H-l unc, symmetrized'
+                , '1<sup>st</sup>, 2<sup>nd</sup>, 3<sup>rd</sup> decay mode', 'branching for 100 decays', '', 'isospin', 'magnetic dipole', '',
+                'electric quadrupole', ''];
+
+            var lv_un = ['', '', '', '', 'X, Y, ...', 'keV', '', 'keV', '', '', '', 'AP, GT, LT, ...', '', '', 'seconds', '', '', '%', '', '', '&mu;<sub>N</sub>', '', 'barn', '']
+            document.write('<table class=field_desc><tr><th>name</th><th>content</th><th>units</th><th>source</th></tr>');
+            for (var i = 0; i < lv_fields.length; i++) {
+
+                document.write('<tr><td><b>' + lv_fields[i] + '</b></td><td>' + lv_expl[i] + '</td><td>' + lv_un[i] + '</td><td style=" text-align: center">' + (i == 0 ? "ENSDF" : "&rdquo;") + '</td></tr>');
+
+            }
+            document.write('</table>');
+            document.write('<br><br>');
+
+         
+         gammas 
+        Properties of the electromagnetic transitions between energy levels of the nuclide 
+        In the following :
+         
+             RTPW stands for Reduced Electric (Magnetic) Transition Probabilities in Weisskopf Units
+             
+             
+                Energies are in keV
+             
+             intensities are in %
+             
+             the source is ENSDF
+             
+         
+         
+            var gm_fields = ("z,n,symbol,start_level_idx,start_level_energy,unc_sle,start_level_jp,end_level_idx,end_level_energy,unc_ele,end_level_jp,gamma_idx,energy,unc_en,relative_intensity,unc_ri,multipolarity,mixing_ratio,unc_mr,b_e1,unc_be1,b_e2,unc_be2,b_m1,unc_bm1,b_m2,unc_bm2").split(",");
+            var gm_expl = ['number of protons', 'number of neutrons', 'element symbol', 'start level index', 'start level energy', '', 'start level J<sup>&pi;</sup>',
+                'end level index', 'end level energy', '', 'end level J<sup>&pi;</sup>', '&gamma; index (within the start level)', 'energy', '', 'relative intensity', '', 'multipolarity', 'mixing ratio', ''
+                , 'RTPW - E1 multipolarity', '', 'RTPW - E2 multipolarity', '', 'RTPW - M1 multipolarity', '', 'RTPW - M2 multipolarity', ''];
+
+
+            document.write('<table class=field_desc><tr><th>name</th><th>content</th></tr>');
+            for (var i = 0; i < gm_fields.length; i++) {
+                document.write('<tr><td><b>' + gm_fields[i] + '</b></td><td>' + gm_expl[i] + '</td><td>' +
+                    '</td></tr>');
+            }
+            document.write('</table>');
+            document.write('<br><br>');
+
+         
+         decay_rads 
+        Properties of the radiations emitted by the daughter(s) of the nuclide that decays 
+        In the following :
+         
+             
+                Energies are in keV
+             
+             intensities are in %
+             
+             the source is ENSDF
+             
+         
+        Fields common to all decay radiation types
+         
+         
+            var dr_fields = ("energy,unc_en,intensity,unc_i,p_z,p_n,p_symbol,p_energy_shift,p_energy,unc_pe,jp," +
+                "half_life,operator_hl,unc_hl,unit_hl,half_life_sec,unc_hls,decay,decay_%,unc_d,q,unc_q,d_z,d_n,d_symbol").split(",");
+            var dr_expl = ['radiation energy', '', 'radiation intensity', '', 'z of the parent', 'n of the parent', 'element of the parent', 'energy shift of the parent', 'energy of the parent', ''
+                , ' J<sup>&pi;</sup> of the parent', 'half-life of the parent', 'limits on H-l', 'H-l unc in ENSDF style', 'H-l units', 'H-l seconds', 'H-l unc, symmetrized', 'decay mode', 'branching', ''
+                , 'Q-value', '', 'z of the daughter', 'n of the daughter', 'element of the daughter'];
+
+            document.write('<table class=field_desc><tr><th>name</th><th>content</th></tr>');
+            for (var i = 0; i < dr_fields.length; i++) {
+                document.write('<tr><td><b>' + dr_fields[i] + '</b></td><td>' + dr_expl[i] + '</td><td>' +
+                    '</td></tr>');
+            }
+            document.write('</table>');
+            document.write('<br><br>');
+         
+
+         
+             
+             
+                 •  α 
+                    radiations 
+                   
+                 
+                    var a_fields = "daughter_level_hl,daughter_level_energy,hindrance_factor,unc_hf".split(",");
+                    var a_expl = ['fed level H-l [s]', 'fed level energy', 'hindrance factor', ''];
+                    document.write('<table class=field_desc><tr><th>name</th><th>content</th></tr>');
+                    for (var i = 0; i < a_fields.length; i++) {
+                        document.write('<tr><td><b>' + a_fields[i] + '</b></td><td>' + a_expl[i] + '</td><td>' +
+                            '</td></tr>');
+                    }
+                    document.write('</table>');
+                    document.write('<br><br>');
+
+                 
+             
+
+             
+                 • X-ray, electrons 
+                   
+                 
+                    var a_fields = "type,shell".split(",");
+                    var a_expl = ['X for X-ray, AU for Auger, or CE for conversion', 'Siegbahn notation'];
+                    document.write('<table class=field_desc><tr><th>name</th><th>content</th></tr>');
+                    for (var i = 0; i < a_fields.length; i++) {
+                        document.write('<tr><td><b>' + a_fields[i] + '</b></td><td>' + a_expl[i] + '</td><td>' +
+                            '</td></tr>');
+                    }
+                    document.write('</table>');
+                    document.write('<br><br>');
+
+                 
+             
+
+             
+                 
+                 • β radiations 
+                   
+
+                 
+                    var b_fields = "mean_energy,unc_me,intensity_beta,unc_ib, daughter_level_hl,daughter_level_energy,max_energy,unc_me,energy_EC,unc_eec,intensity_EC,unc_ie,log_ft,unc_lf,transition_type,(anti_)nu_mean_energy,unc_(ame)nme".split(",");
+                    var b_expl = ['mean energy', '', 'intensity for e<sup>-</sup> (e<sup>+</sup>) emission', '', 'daughter\'s excited state Half-life [s]', 'daughter\'s excited state energy', 'only for &beta;<sup>-</sup>, end-point energy', '',
+                        'only for &beta;<sup>+</sup>, energy available for Electron Capture', '', 'only for &beta;<sup>+</sup>, intensity of EC ', '', 'log ft', , '', 'transition type', '(anti) neutrino mean energy', ''];
+                    document.write('<table class=field_desc><tr><th>name</th><th>content</th></tr>');
+                    for (var i = 0; i < b_fields.length; i++) {
+                        document.write('<tr><td><b>' + b_fields[i] + '</b></td><td>' + b_expl[i] + '</td><td>' +
+                            '</td></tr>');
+                    }
+                    document.write('</table>');
+                    document.write('<br><br>');
+
+                 
+             
+
+             
+                 
+                 • γ radiations 
+                   
+
+                 
+                    var g_fields = "start_level_hl,start_level_energy,end_level_energy,multipolarity,mixing_ratio,unc_mr,conversion_coeff,unc_cc".split(",");
+                    var g_expl = ['Half-life of the initial level', 'energy of the initial level', 'energy of the final level', 'multipolarity of the transition', 'mixing ratio', '', 'conversion coefficient (total)', ''];
+                    document.write('<table class=field_desc><tr><th>name</th><th>content</th></tr>');
+                    for (var i = 0; i < g_fields.length; i++) {
+                        document.write('<tr><td><b>' + g_fields[i] + '</b></td><td>' + g_expl[i] + '</td><td>' +
+                            '</td></tr>');
+                    }
+                    document.write('</table>');
+                    document.write('<br><br>');
+
+                 
+             
+
+
+         
+
+         
+         
+
+
+         bin_beta 
+         
+             •  β +/-   
+                and ν / anti ν spectra 
+               
+            Spectra are obtained using  Betashape  code
+             
+             
+
+                var bin_fields = ("p_z,p_n,p_symbol,p_energy,d_z,d_n,d_symbol,bin_en,dn_de,unc_dn_de,dn_de_nu,unc_dn_de_nu,extraction_date").split(",");
+                var bin_expl = ['z of the parent', 'n of the parent', 'element of the parent', 'energy of the parent', 'z of the daughter', 'n of the daughter', 'element of the daughter',
+                    'bin energy', 'dn/de', 'uncertainty', 'dn/de nu or anti nu', 'uncertainty', 'date of retrieval'];
+
+                document.write('<table class=field_desc><tr><th>name</th><th>content</th></tr>');
+                for (var i = 0; i < bin_fields.length; i++) {
+                    document.write('<tr><td><b>' + bin_fields[i] + '</b></td><td>' + bin_expl[i] + '</td><td>' +
+                        '</td></tr>');
+                }
+                document.write('</table>');
+                document.write('<br><br>');
+
+             
+         
+
+    
+         Fission Yields (Cumulative or Independent) 
+         
+           
+             Source: JEFF 3.1.1 * stands for cumulative or independent 
+             
+
+                var fy_fields = ("z_daughter,a_daughter,element_daughter,z_parent,a_parent,element_parent,daughter_level_idx"
+			+ ", *_thermal_fy,unc_ct, *_fast_fy,unc_cf, *_14mev_fy,unc_c14").split(",");
+                var fy_expl = ['z of the daughter', 'a of the daughter', 'element of the daughter', 'z of the parent', 'a of the parent', 'element of the parent',
+                    'idx of the level of the daughter (0 = GS)', 'thermal fy', 'uncertainty', 'fast_fy', 'uncertainty', '14 Mev','uncertainty'];
+
+                document.write('<table class=field_desc><tr><th>name</th><th>content</th></tr>');
+                for (var i = 0; i < fy_fields.length; i++) {
+                    document.write('<tr><td><b>' + fy_fields[i] + '</b></td><td>' + fy_expl[i] + '</td><td>' +
+                        '</td></tr>');
+                }
+                document.write('</table>');
+                document.write('<br><br>');
+
+             
+         
+
+         
+         Error codes 
+         
+             
+            When no data are retrieved, a numeric code is returned
+               
+
+             
+                var b_fields = "0,1,2,3,4,5,6".split(",");
+                var b_expl = ['the request is vaild, but there are no data fufilling the conditions', '"fields" parameter is not given', '"nuclides" parameter is not given but is required for the given "fields"', '"fields" parameter is misspelled', '"parents" o "products" not given for fission yields', '"rad_types" not valid', 'unknown error'];
+                document.write('<table class=field_desc><tr><th>code</th><th>meaning</th></tr>');
+                for (var i = 0; i < b_fields.length; i++) {
+                    document.write('<tr><td><b>' + b_fields[i] + '</b></td><td>' + b_expl[i] + '</td><td>' +
+                        '</td></tr>');
+                }
+                document.write('</table>');
+                document.write('<br><br>');
+
+             
+         
+
+         Feedback 
+        Please address any feedback to  NDS contact point 
+         
+     
+
+     
+         IAEA - Nuclear Data Section Vienna
+            International Centre, PO Box 100 A-1400 Vienna, Austria Telephone: (+431) 2600-0 
+         email: nds.contact-point © 2009-
+             document.write((new Date).getFullYear()) 
+            IAEA Nuclear Data Section    Terms of use 
+             
+             
+                 
+             
+         
+     
+
+

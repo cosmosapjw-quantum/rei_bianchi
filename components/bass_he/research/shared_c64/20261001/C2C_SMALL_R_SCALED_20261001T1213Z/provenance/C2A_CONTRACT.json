@@ -1,0 +1,161 @@
+{
+  "node": "C2_FINITE_R_COUPLING_NUMERICAL_AUDIT",
+  "iteration": "C2a bounded finite-R grid audit",
+  "registered_utc": "2026-10-01T07:03:29.497714+00:00",
+  "recorded_before_new_eigensolves": true,
+  "parent_git_head": "21cf2b42ce05ece0b63626b04bac354daddbb503",
+  "charges": [
+    1,
+    2
+  ],
+  "units": [
+    "a_A",
+    "E_A",
+    "hbar"
+  ],
+  "scientific_grid": [
+    0.25,
+    0.5,
+    1.0,
+    2.0,
+    4.0,
+    8.0,
+    16.0
+  ],
+  "continuation_grid": [
+    0.25,
+    0.5,
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    7.0,
+    8.0,
+    9.0,
+    10.0,
+    11.0,
+    12.0,
+    13.0,
+    14.0,
+    15.0,
+    16.0
+  ],
+  "state_selection": "lowest fixed m=0 and |m|=1 separated Sturm-Liouville states; common-O physical overlaps; no rank5 cluster claim",
+  "base": {
+    "degree": 7,
+    "radial_elements": 64,
+    "angular_elements": 40,
+    "quadrature_order": 12,
+    "radial_extent": 30.0,
+    "root_xtol": 2e-12
+  },
+  "refinements": {
+    "h": {
+      "radial_elements": 96,
+      "angular_elements": 60
+    },
+    "p": {
+      "degree": 9,
+      "quadrature_order": 14
+    },
+    "tail": {
+      "radial_elements": 80,
+      "radial_extent": 40.0,
+      "explicit_edges": "preserve 64 inner radial cells to extent30, append16uniformcells30to40"
+    }
+  },
+  "orders": {
+    "direct": [
+      16,
+      24
+    ],
+    "torque": [
+      20,
+      28
+    ],
+    "dark_phi": [
+      32,
+      64
+    ],
+    "overlap": [
+      24,
+      32,
+      48
+    ]
+  },
+  "criteria": {
+    "energy_refinement_abs": 1e-08,
+    "L_O_refinement_abs": 2e-06,
+    "L_B_refinement_abs": 2e-06,
+    "direct_torque_abs": 1e-07,
+    "momentum_gap_dipole_abs": 1e-07,
+    "origin_identity_abs": 1e-10,
+    "operator_quadrature_abs": 1e-08,
+    "norm_error_abs": 1e-10,
+    "algebraic_residual_relative": 1e-09,
+    "overlap_delta_abs": 1e-07,
+    "overlap_self_norm_error_abs": 1e-07,
+    "overlap_transport_min": 0.5,
+    "native_reference_operator_abs": 1e-11,
+    "dark_abs": 1e-12,
+    "independent_spherical_energy_abs": 1e-05,
+    "independent_spherical_L_O_abs": 1e-05,
+    "independent_spherical_increment_abs": 2e-06
+  },
+  "independent_spherical_anchors": {
+    "new_R": [
+      0.5,
+      8.0
+    ],
+    "lmax": [
+      72,
+      96
+    ],
+    "elements": 56,
+    "degree": 4,
+    "rmax": 24.0,
+    "quadrature": 14,
+    "nroots": 2,
+    "center": "B",
+    "tol": 1e-11,
+    "frozen_R2": "C1b l96 reused"
+  },
+  "budget": {
+    "new_prolate_pairs": 39,
+    "new_prolate_ritz_states": 78,
+    "new_spherical_pairs": 4,
+    "new_spherical_selected_states": 8,
+    "new_spherical_requested_roots": 16,
+    "max_concurrent_workers": 3,
+    "per_worker_address_space_gib": 1.5,
+    "per_task_wall_seconds": 120,
+    "overall_science_wall_cap_seconds": 1800,
+    "blas_threads": 1,
+    "omp_threads": 1,
+    "overlap_max_order": 48,
+    "no_unregistered_eigensolves": true
+  },
+  "implementation": "pinned C1b prolate eigensolver, accelerated scalar BSpline evaluation and real64 Fortran contractions, OpenMPI independent tasks, native/reference explicit, no fastmath or precision reduction",
+  "acceptance": "all scientific7points h/p/tail/operator gates plus all18point continuation steps and three independent anchors required for scoped finite-grid convergence; any failure remains unresolved without threshold change",
+  "claim_ceiling": "empirical finite grid only, not collision-relevant whole range or hidden crossing certificate, not continuum enclosure; A2 scaled diagnostics at R=.25,.5,1 and4,8,16 only, no asymptotic closure",
+  "not_run": [
+    "collision range certification",
+    "rank5 H1s+He n2 cluster",
+    "finite-difference connection derivative",
+    "collision evolution",
+    "cross sections",
+    "Eq55",
+    "NCP64 actual scaling"
+  ],
+  "gates": {
+    "CODE_I02_CLOSED": true,
+    "full_certificate_fail_closed": true,
+    "scientific_PROMOTE": "HOLD",
+    "Eq55_next_node_authorized": false,
+    "Eq55": "NOT_RUN",
+    "production_default_change": "NOT_AUTHORIZED"
+  },
+  "stop_rule": "FINITE_R_MAGNITUDE_UNRESOLVED, DIRECT_COMMUTATOR_MISMATCH, STATE_TRACKING_AMBIGUOUS or SCOPED_FINITE_GRID_CONVERGED; no D1 before full C2 closure"
+}

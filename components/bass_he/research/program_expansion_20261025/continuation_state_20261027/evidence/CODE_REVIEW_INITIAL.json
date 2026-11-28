@@ -1,0 +1,88 @@
+{
+  "schema": "HE_STATE04_INDEPENDENT_CODE_REVIEW_INITIAL_V1",
+  "reviewer": "/root/state04_code_review",
+  "role": "Independent code/numerical review; did not author theory, implementation, tests or execution wrappers",
+  "reviewed_utc": "2026-10-27T09:51:33.861716+00:00",
+  "base_commit": "abf6e277d9a369b5ea412f96d304ff844f32516b",
+  "decision": "HOLD_FOR_ONE_TARGETED_PRE_EXECUTION_CORRECTION",
+  "scope": "Static source/equation/contract/implementation/wrapper review before the first measured test run",
+  "reviewed_files": {
+    "src/state_edge.py": {
+      "bytes": 5037,
+      "sha256": "f531846b08895bffd170ab80dfcf41e7dd21c31e31d722d780ebc8535e682429"
+    },
+    "tests/test_state_edge.py": {
+      "bytes": 6736,
+      "sha256": "8a55171a594d2936241e805591cee9c890df1f00e3472e8bebe4d5dcc055a7ff"
+    },
+    "scripts/run_validation.py": {
+      "bytes": 1968,
+      "sha256": "f774026333efa9cf65ce89ea58927d305c32c95fbc45ca8f2068cd4a33d9b794"
+    },
+    "scripts/plot_saved.py": {
+      "bytes": 1402,
+      "sha256": "2ef62862bd1c2bf17255beb35c736daecaf93e75d1ccf3479c6279349b808081"
+    },
+    "scripts/run_plot.py": {
+      "bytes": 2454,
+      "sha256": "c16a271442f23a86cd2a641f88704f0a20366fe65d8b8b4d18b1b6048323a8c1"
+    },
+    "THEORY_KO.md": {
+      "bytes": 8212,
+      "sha256": "8bed3ea8a653dac36ebd30f5e5e223fb9d4c381b00e8e661a3f84018cab2a0bd"
+    },
+    "MODEL_CONTRACT.json": {
+      "bytes": 4449,
+      "sha256": "9ec2f2864c1c985f47f13c6eabfc7f139ab19c8a48a56406e0ec392efd1e2b9a"
+    },
+    "VALIDATION_CONTRACT.json": {
+      "bytes": 4616,
+      "sha256": "ea1aca0a460d69a15449682eb423b22a228fbf214ff5d2d2e89b652dcd49a574"
+    }
+  },
+  "findings": [
+    {
+      "id": "C1",
+      "severity": "P2",
+      "kind": "verification_gap",
+      "status": "OPEN_TARGETED_PRE_EXECUTION",
+      "path": "tests/test_state_edge.py",
+      "method": "test_14_entropy",
+      "observation": "The control checks an independently recomputed (a-b)*log(a/b) sign but never asserts the implemented entropy_production_over_kB field. A wrong returned diagnostic could pass.",
+      "minimal_action": "Within this existing test method compare the returned field with independently composed Decimal80 positive-flux reference; require finite/nonnegative output and include one representable extreme positive-flux contrast for which direct a/b overflows. No extra process or broad scan."
+    },
+    {
+      "id": "C2",
+      "severity": "P3",
+      "kind": "unnecessary_runtime_contract_override",
+      "status": "OPEN_TARGETED_PRE_EXECUTION",
+      "path": "scripts/run_validation.py",
+      "observation": "PolicyAdapter.loads rewrites implementation_validation_cap in memory even though the frozen contract now directly supplies the existing runner field vocabulary. Current numerical caps are identical, and the contract file is not written.",
+      "minimal_action": "Remove the PolicyAdapter/r.json substitution; keep actual runner ROOT/OUT adaptation and read the frozen implementation_validation_cap directly. No cap or tolerance change."
+    }
+  ],
+  "additional_targeted_control": "Optional small extension of existing test_12: zero collider plus NaN/bool lower or upper density, confirming the current all-input finite validation runs before zero products.",
+  "nonblocking_limits": [
+    "Near-equilibrium subtraction of two rounded logarithms can round a very small positive entropy diagnostic to zero; claim the specified flux-normalized equilibrium and sign checks, not new uniform relative accuracy for entropy in that limit.",
+    "Pinned selected-edge source constants are intentionally specific to HD levels2 and1; the function is not a general arbitrary-level adapter.",
+    "3005K source row remains present while native execution rejects it until support binding."
+  ],
+  "static_observations": [
+    "Correct exact SI unit factors and source state energy/weight binding for the selected edge.",
+    "Explicit thermal reciprocity closure required; no DCS or velocity distribution inferred from the table.",
+    "All three density arguments are validated before products; zero collider currently does not mask invalid other densities.",
+    "Exponent-separated product is reused from unchanged EVENT03 dependency; flow differences use fsum.",
+    "Count/internal witness/aggregate material kinetic compensation are separated from species heat, momentum, stress and radiation.",
+    "Bennett2008 is an explicit source-version selection with historical2003 retained and no additive interpretation.",
+    "Plot code reads saved data and does not import the scientific source module.",
+    "Existing bounded runner discovers only new-unit tests after ROOT/OUT replacement; historical suites are not called."
+  ],
+  "planned_test_methods_observed": 19,
+  "reviewer_scientific_executions": 0,
+  "reviewer_test_executions": 0,
+  "reviewer_plot_executions": 0,
+  "reviewer_archive_verifications": 0,
+  "reviewer_external_writes": 0,
+  "physical_global_admission": false,
+  "next_action": "Root authorizes one minimal pre-execution correction; reviewer reads only affected changes and then gives a finite pre-execution decision. Actual scientific acceptance still requires the recorded run and final result review."
+}

@@ -1,0 +1,47 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Action completed."
+    }
+  ],
+  "structuredContent": {
+    "url": "https://github.com/cosmosapjw-quantum/BASS_HE/pull/90",
+    "number": 90,
+    "state": "open",
+    "merged": false,
+    "mergeable": true,
+    "draft": true,
+    "body": "## 문제와 결과\n\nHE36의 incoming-loss moment만으로는 이온화 생성 전자가 돌려주는 에너지와 net pressure source가 정해지지 않습니다. 이 PR은 Le–Cambier2016 Eq85 + §III.E의 명시적 heavy-target/isotropic H1 CI 모형을 채택하고, 같은 차등 kernel에서 gain과 loss를 합쳐 number/heat/electron-STF source를 구현합니다. 기존 HE36/REI 장부 코드는 그대로 재사용했습니다.\n\n**workflow1.0.0 / approval0.2. R1–R10 → C1–C10, 20/20 완료; 단계별20 archive ACK와20 단계 commit 확인.** 마지막 추가 commit은 delivery metadata만 포함합니다.\n\n## 실제 과학 결과\n\n- r=ne*nH*alpha, Qnet=-I*r, Jnet=-nH*kappa2*pi_e; I=13.6eV. Q와 donor dEth는 한 energy owner입니다.\n- Source-native analytic moments를 positive expn(2,x)와 세 다항식으로 계산합니다. Physical abundance Jacobian의 ne(Yp) 미분을 donor frozen-ne Jacobian과 구별합니다.\n- 새129T(2000–200000K) 진단 및 실제 PNG/SVG1쌍 저장. 20000K alpha=9.39264787331677e-18m³/s, kappa2/alpha=25.62744167910542.\n- 같은 kernel에서 GL64→GL96 계획 refinement; GL96 최대상대차2.2426505097428162e-14, analytic omitted-tail bound4.617226718601215e-24. GL128미실행.\n- 공유 sandbox의 동일129T/4moment workload에서 paired median GL96/analytic=4.482508× (3.892765–8.538839×). 전체 network/IVP speedup 주장이 아닙니다.\n- Native/HE36 saved-CCC rate비는20000K에서3.4227965. 서로 다른 kernel/domain의 model-dependence이며 CCC normalization hybrid나 calibration으로 쓰지 않습니다.\n\n## 검증과 실행 기록\n\nProvider6/6groups, 독립 theory11controls, bridge7/7groups PASS. 비저자 source/theory/code/plot review PASS_SCOPED, 문서검토 PASS_DOCS_SCOPED. 작은 STF1targeted bridge call은 direct J 보존을 확인했습니다. Quantile4targeted calls도 RUN_RECORD에 포함합니다. Provider 원본에는 process exit_code 필드가 없고 그 한계를 null로 보존합니다.\n\n최종 stdlib 저장 검증:117 science payload, component5/13/22, 저장 native129+CCC129행,20/20 ACK와 final ACK 확인. Git 원격 unit169blob의 SHA1와 byte count가 현재 로컬169파일과 모두 일치합니다.\n\nHE32–HE36 완료 IVP/suite/CCC 진단 replay0; 이번 새IVP0. Render2회 중 첫 layout을 보존하고 동일CSV의 margin/annotation만 수정했습니다.\n\n## 물리적 완료 범위와 다음 의존성\n\n이번 완료는 stationary-heavy-target, source-isotropic, infinitesimal **electron** Grad 모형입니다. 실제 H1angular calibration, finite-mass recoil/target motion, pi_e→totalgas pi_b 분배, commonT/u 및 finite-anisotropy closure, evolvingUV/thermal, RR/DR/CX·추가종·nuclear daughters/stopping과 coupledIVP는 별도 DAG에서 열려 있습니다. HE32의 gaspi_b=0/nonbaryonic matterstress 해석은 유지합니다. 전체목표 완료%는 미정입니다.\n\n변경분 intake:7repo, branch1281rows, updatedPR9, pinned Gittexts19, selectednewcomments5, backupADD29. Personal Context는 unavailable였으며 모든 역사 대화/백업 전수 재조사로 보고하지 않습니다. 다음 intake cutoff:2026-10-23T02:05:02.183087Z.\n\n## 고정 identity와 백업\n\n- Science basis: `a5a670968cb1326375f394faa867c6b260c5840d`\n- Final publication: `b97bccaabc246af5672b2ead8dfa9f08d169da6d`\n- Parent HE36: `6403055c3d574ec0bd1ece80147f9711315902e7`\n- Science manifest SHA256: `e5902f8604479ff79d9973e62ab41fca88eba7bc7be41ab8256e5630ffac45e7`\n- Final archive: `BASS_HE_HE37_H1DG_FINAL_20261023T024743Z.tar.gz`\n- Archive SHA256: `cf386010413b17169b3fab5fe63ca829138f0d0cdbc61b2c70fed1eee88e0797`\n- Archive bytes / payload: 909896 / 166 (+1internalmanifest)\n- Dropbox: `id:BSpOijBcT10AAAAAAD_v2g`\n- 로컬166payload hash 검증 + provider completed/size ACK; 원격 재다운로드 복원은 미수행.\n\n[결과 보고서](https://github.com/cosmosapjw-quantum/BASS_HE/blob/b97bccaabc246af5672b2ead8dfa9f08d169da6d/research/he37_h1_differential_gain_20261023/RESULTS_KO.md) · [단계별 백업/게시/진척](https://github.com/cosmosapjw-quantum/BASS_HE/blob/b97bccaabc246af5672b2ead8dfa9f08d169da6d/research/he37_h1_differential_gain_20261023/STAGE_LEDGER_KO.md) · [실행 기록](https://github.com/cosmosapjw-quantum/BASS_HE/blob/b97bccaabc246af5672b2ead8dfa9f08d169da6d/research/he37_h1_differential_gain_20261023/RUN_RECORD.json) · [최종 ACK](https://github.com/cosmosapjw-quantum/BASS_HE/blob/b97bccaabc246af5672b2ead8dfa9f08d169da6d/research/he37_h1_differential_gain_20261023/delivery/FINAL_ACK.json) · [다음 DAG](https://github.com/cosmosapjw-quantum/BASS_HE/blob/b97bccaabc246af5672b2ead8dfa9f08d169da6d/research/he37_h1_differential_gain_20261023/NEXT_DAG.json) · [연구 handoff](https://github.com/cosmosapjw-quantum/BASS_HE/blob/b97bccaabc246af5672b2ead8dfa9f08d169da6d/research/he37_h1_differential_gain_20261023/HANDOFF_CHAT_KO.md) · [executor handoff](https://github.com/cosmosapjw-quantum/BASS_HE/blob/b97bccaabc246af5672b2ead8dfa9f08d169da6d/research/he37_h1_differential_gain_20261023/HANDOFF_CODEX.md)\n\n단원 디렉터리에서 `python verify_saved.py --require-delivery`는 저장 근거만 읽고 scientific execution을 수행하지 않습니다.\n\n\n## 고정 handoff와 최종 전달 receipt\n\n최종 publication SHA를 포함한 두 pinned handoff, Git169blob readback, PRhead/body readback, sealed archive 이후10metadata-file overlay를 별도 receipt에 보존했습니다.\n\n- Receipt archive: `BASS_HE_HE37_H1DG_DELIVERY_RECEIPT_20261023T025249Z.tar.gz`\n- SHA256: `a000059e6a61acb31b3c9c7f3a4061d75a16e745aa1492d99ce3af600cfd81ed`\n- Bytes / payload: 33730 / 16 (+1internalmanifest)\n- Dropbox: `id:BSpOijBcT10AAAAAAD_v3Q`\n- 로컬16payload hash 확인 + provider completed/size ACK. 새 scientific execution0.\n",
+    "title": "HE37: source-defined H1 gain and conserved net moments — 20/20",
+    "base": "research/he36-reactive-moment-bridge-20261023",
+    "base_sha": "6403055c3d574ec0bd1ece80147f9711315902e7",
+    "head": "research/he37-h1-differential-gain-20261023",
+    "head_sha": "b97bccaabc246af5672b2ead8dfa9f08d169da6d",
+    "head_repo_id": 1389057513,
+    "head_repo_full_name": "cosmosapjw-quantum/BASS_HE",
+    "merge_commit_sha": "e03576c5eb4a27d420987e242febdeb9ca658c67",
+    "user": {
+      "login": "cosmosapjw-quantum",
+      "name": "cosmosapjw-quantum",
+      "email": null,
+      "avatar_url": "https://avatars.githubusercontent.com/u/58155957?v=4",
+      "id": 58155957
+    },
+    "requested_reviewers": null,
+    "requested_team_reviewers": null,
+    "diff": null,
+    "comments": null,
+    "created_at": "2026-10-23T02:13:40Z",
+    "updated_at": "2026-10-23T02:53:09Z",
+    "closed_at": null,
+    "merged_at": null,
+    "commits": 21,
+    "changed_files": 169,
+    "additions": 30300,
+    "deletions": 0,
+    "display_url": "https://github.com/cosmosapjw-quantum/BASS_HE/pull/90",
+    "display_title": "HE37: source-defined H1 gain and conserved net moments — 20/20"
+  },
+  "isError": false
+}

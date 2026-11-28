@@ -1,0 +1,94 @@
+{
+  "schema": "HE_STATE04_INDEPENDENT_CODE_PRE_EXECUTION_V1",
+  "reviewer": "/root/state04_code_review",
+  "role": "Independent Astra-tier static code/numerical review; no implementation or execution authorship",
+  "reviewed_utc": "2026-10-27T09:53:56.539912+00:00",
+  "decision": "PASS_PRE_EXECUTION_SOURCE_BOUND_STATE_ADAPTER",
+  "remaining_blocking_findings": 0,
+  "base_commit": "abf6e277d9a369b5ea412f96d304ff844f32516b",
+  "initial_review": "evidence/CODE_REVIEW_INITIAL.json",
+  "correction_record": "evidence/PRE_EXECUTION_ADJUSTMENT.json",
+  "reviewed_changed_scope": [
+    "scripts/run_validation.py",
+    "tests/test_state_edge.py"
+  ],
+  "pre_correction_code_bindings_from_preparation_record": {
+    "scripts/plot_saved.py": "2ef62862bd1c2bf17255beb35c736daecaf93e75d1ccf3479c6279349b808081",
+    "scripts/run_plot.py": "c16a271442f23a86cd2a641f88704f0a20366fe65d8b8b4d18b1b6048323a8c1",
+    "scripts/run_validation.py": "ffc9ea52c72f446cb5bd67562cca3d020e56d566392a803e939e33cf675630d6",
+    "src/state_edge.py": "f531846b08895bffd170ab80dfcf41e7dd21c31e31d722d780ebc8535e682429",
+    "tests/test_state_edge.py": "93de4046abe8c5b71c94dc7b0892a3d2f991c79bb756229952fa2fb86585e0de"
+  },
+  "identity_collection_timing_note": {
+    "observation": "The initial review prose reports the pre-correction source read. Its reviewed_files hashes were collected when the authorized lower-tier correction had already landed, so they identify the corrected files. They are not pre-correction hashes.",
+    "resolution": "Preserve the initial record; this final pre-execution record binds the corrected files explicitly and identifies the original prepared code hashes from IMPLEMENTATION_PREPARATION.json.",
+    "mechanical_recording_attempt": "A first finalization guard expecting two changes relative to the initial hash list stopped before writing any record because it found zero. Comparing to the original preparation record resolves the timing issue. No scientific/test/plot execution occurred."
+  },
+  "resolved_findings": [
+    {
+      "id": "C1",
+      "status": "RESOLVED_BEFORE_FIRST_TEST_START",
+      "evidence": "test_14 now asserts the returned entropy_production_over_kB field is finite/nonnegative and agrees with independent Decimal80 (a-b)*(ln(a)-ln(b)); includes native1005K with n_p=1e6,n_lower=1e200,n_upper=1e-200 as a representation-only extreme contrast."
+    },
+    {
+      "id": "C2",
+      "status": "RESOLVED_BEFORE_FIRST_TEST_START",
+      "evidence": "PolicyAdapter and r.json reassignment removed; the unchanged inherited runner reads the frozen implementation_validation_cap. Only ROOT and OUT execution-location adaptation remains."
+    }
+  ],
+  "additional_approved_control": "Existing test_12 checks invalid lower and upper densities with a zero collider. It adds no method or process.",
+  "reviewed_files": {
+    "src/state_edge.py": {
+      "bytes": 5037,
+      "sha256": "f531846b08895bffd170ab80dfcf41e7dd21c31e31d722d780ebc8535e682429"
+    },
+    "tests/test_state_edge.py": {
+      "bytes": 6736,
+      "sha256": "8a55171a594d2936241e805591cee9c890df1f00e3472e8bebe4d5dcc055a7ff"
+    },
+    "scripts/run_validation.py": {
+      "bytes": 1968,
+      "sha256": "f774026333efa9cf65ce89ea58927d305c32c95fbc45ca8f2068cd4a33d9b794"
+    },
+    "scripts/plot_saved.py": {
+      "bytes": 1402,
+      "sha256": "2ef62862bd1c2bf17255beb35c736daecaf93e75d1ccf3479c6279349b808081"
+    },
+    "scripts/run_plot.py": {
+      "bytes": 2454,
+      "sha256": "c16a271442f23a86cd2a641f88704f0a20366fe65d8b8b4d18b1b6048323a8c1"
+    },
+    "THEORY_KO.md": {
+      "bytes": 8212,
+      "sha256": "8bed3ea8a653dac36ebd30f5e5e223fb9d4c381b00e8e661a3f84018cab2a0bd"
+    },
+    "MODEL_CONTRACT.json": {
+      "bytes": 4449,
+      "sha256": "9ec2f2864c1c985f47f13c6eabfc7f139ab19c8a48a56406e0ec392efd1e2b9a"
+    },
+    "VALIDATION_CONTRACT.json": {
+      "bytes": 4616,
+      "sha256": "ea1aca0a460d69a15449682eb423b22a228fbf214ff5d2d2e89b652dcd49a574"
+    }
+  },
+  "unchanged_prior_static_review_reused": true,
+  "acceptance_tolerances_or_caps_changed": false,
+  "new_methods_added_by_correction": 0,
+  "planned_test_methods": 19,
+  "planned_processes": 1,
+  "test_allocation": {
+    "cpu_s": 4,
+    "wall_s": 15,
+    "memory_bytes": 268435456,
+    "threads": 1,
+    "repair_reserve": 1
+  },
+  "boundary": "Pre-execution approval only. Measured first run, saved outputs, separate saved-data plot and final result review are still required for scoped scientific acceptance. Root owns execution authorization.",
+  "reviewer_scientific_executions": 0,
+  "reviewer_test_executions": 0,
+  "reviewer_plot_executions": 0,
+  "reviewer_archive_verifications": 0,
+  "reviewer_external_writes": 0,
+  "physical_global_admission": false,
+  "stop_rule_satisfied": "Approved minimal correction reviewed; no adjacent optional review or validation expansion."
+}

@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/independent_he_review",
+  "date": "2026-10-29",
+  "review": "C9 final independent static implementation review",
+  "result": "pass_scoped",
+  "scope": "Frozen above-threshold330MeV exact rational source ledger, historical key compatibility, validated even sextic law, inclusive energy-bin moments, raw/intersected stress-trace enclosure. No physical exclusive-rate or phase-space tensor provider.",
+  "method": [
+    "read all4 active source files and new13-method test module",
+    "compare theory/implementation contract with independent R6 derivation",
+    "inspect existing test stdout and resource ledger",
+    "recompute byte hashes only to bind static review to tested source; no suite or scientific computation rerun"
+  ],
+  "source_root": "/workspace/scratch/4a7ea9deca9b/BASS_HE/research/he_nonthermal_d_birth_20261029/closure_20261029",
+  "tested_code_hashes_match_reviewed_bytes": true,
+  "source_sha256": {
+    "src/conditional_pressure_trace.py": "92cdd66c7a0b1a133f767322ce58b1a973a021db2f7c3f0ced4b4e1dfdd48869",
+    "src/energy_gain.py": "26d1820ff52b2c96c63129211104fba4f7d51301b135843f9afdd72f520100da",
+    "src/named_d_birth_min.py": "afb2477b8e65be3d8535c8548f751eac34d31f9c3a33a51e0b4ced8f16717c38",
+    "src/nonthermal_d_birth.py": "05208319c51598f2f0ad4b6c93e6d1eef5588de8c6d5f96d8c9e8705041d031d"
+  },
+  "test_file_sha256": "d0406eed102f4750c3e7730d817938f2d8a5101690d88c53510e83e58bde7bfa",
+  "theory_sha256": "eaa888e90219c6ad502c7467b28fca27aef5ca6d0fa8bbdbac95418ea866a2cb",
+  "closed_findings": [
+    {
+      "id": "C9-F1",
+      "evidence": "src/named_d_birth_min.py delegates all rate and direction processing to birth_source; no raw Fraction conversion remains. test_both_direction_paths_reject_inexact covers native floats,bools,float subclass on both public paths.",
+      "decision": "closed"
+    },
+    {
+      "id": "C9-F2",
+      "evidence": "src/nonthermal_d_birth.py exact uses isinstance(x,(float,bool)); rate and direction all pass through it. test_rate_subclass_rejected and direction subclass case address the diagnosed bypass.",
+      "decision": "closed"
+    },
+    {
+      "id": "NT-P2-1",
+      "evidence": "THEORY.md explicitly retains N0 raw counterexample. trace_enclosure preserves raw endpoints/width and returns max/min intersection with universal m2 bounds. test_zero_order_review_finding_retained preserves exact inequality and final equality.",
+      "decision": "closed"
+    },
+    {
+      "id": "NT-DOMAIN-1",
+      "evidence": "N nonnegative integer specified in theory; code restricts integer orders0..32, rejects bool. Fixed above-threshold input explicitly scoped; no unsupported variable-threshold API advertised.",
+      "decision": "closed"
+    }
+  ],
+  "mapping_checks": [
+    {
+      "target": "SexticLaw.__init__",
+      "result": "pass_scoped",
+      "reason": "Quadratic positivity requires endpoints and the interior vertex if convex; for concave or affine quadratic endpoints suffice. Positive exact Z excludes zero law. All numeric coefficients use shared exact guard."
+    },
+    {
+      "target": "SexticLaw.even_moment",
+      "result": "pass_scoped",
+      "reason": "Expanded even monomials integrate to2*c_j/(2j+2k+1)/Z. Bounds0..33 support maximum trace order32 remainder moment33."
+    },
+    {
+      "target": "SexticLaw.bins",
+      "result": "pass_scoped",
+      "reason": "Exact antiderivatives integrate inclusive2q times x^k for k0,1,2. Endpoint and strict-monotonicity checks imply all internal edges in(-1,1). Reduced moments retain multiplicity2 and energy splitting with no extra symmetry factor."
+    },
+    {
+      "target": "SexticLaw.trace_enclosure",
+      "result": "pass_scoped",
+      "reason": "Series, positive remainder, sign-reversed trace endpoints and raw width follow independent R6. Intersection with universal interval is exact, nested and nonempty for validated law. No floating conversion in acceptance algebra."
+    },
+    {
+      "target": "source semantics and units",
+      "result": "pass_scoped",
+      "reason": "Source ledger retains target-rest/source-class checks; None rate remains unresolved; physical flags remain false/HOLD. Pressure trace is per event and becomes collision stress derivative only after multiplying exclusive event rate. New scalar energy marginal does not purport to implement full vector/angular tensor."
+    }
+  ],
+  "test_independence": {
+    "result": "adequate_scoped",
+    "independent_oracles": [
+      "SI conversion checked against explicit independent decimal1.602176634e-13J",
+      "frozen Z and m2 use explicit rational reference values",
+      "beta-polynomial law a=(1,0,0) has analytic moments3/[(2k+1)(2k+3)]",
+      "asymmetric midpoint mutation detects a real energy-conservation error",
+      "N0 counterexample arose from independent review rather than implementation formula"
+    ],
+    "structural_checks": [
+      "partition additivity and count/first/second sums",
+      "raw exact widths and nested/intersected endpoints",
+      "coefficient interior-negative case(1,-5,5)",
+      "strict partitions and invalid order/type cases"
+    ],
+    "limits": "Existing13 test methods establish changed exact algebra and guards at stated inputs; they do not supply physical cross-section validation or actual event-rate admission. Numerical quadrature is separately owned C8 evidence."
+  },
+  "observed_execution_evidence": {
+    "path": "evidence/RESOURCE_LEDGER.json",
+    "mode": "unit",
+    "exit_code": 0,
+    "cpu_s": 0.050538999999999994,
+    "wall_s": 0.051932105999185296,
+    "peak_child_rss_KiB": 12672,
+    "log": "evidence/unit_stderr.txt",
+    "methods_passed": 13,
+    "old_science_replays": 0,
+    "new_physical_IVPs": 0,
+    "reviewer_reran_tests": false
+  },
+  "findings": [],
+  "remaining_obligations": [
+    "separate C8 numerical-reference evidence if claimed",
+    "qualified exclusive330MeV event normalization/shape uncertainty and photon history",
+    "physical named fast-D pool, target state/frame, stopping/deposition",
+    "current source is an exact reference lane; no full BASS_HE production/build claim"
+  ],
+  "physical_admission": {
+    "event_rate": null,
+    "activation": false,
+    "L4": false,
+    "production": "HOLD",
+    "central_dag_delta": 0
+  }
+}

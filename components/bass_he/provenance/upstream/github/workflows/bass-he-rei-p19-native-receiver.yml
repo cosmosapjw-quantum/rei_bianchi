@@ -1,0 +1,41 @@
+name: BASS_HE P19 to REI native receiver published evidence checks
+on:
+  push:
+    branches:
+      - research/bass-he-rei-p19-native-receiver-20261101
+  pull_request:
+    paths:
+      - 'research/rei_igm_p19_native_receiver_20261101/**'
+      - '.github/workflows/bass-he-rei-p19-native-receiver.yml'
+permissions: {contents: read}
+jobs:
+  published-source-receipts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Parse source-science code (full 46k replay is in source-backed Drive ZIP)
+        run: |
+          python -m py_compile research/rei_igm_p19_native_receiver_20261101/crosswalk.py
+          python -m py_compile research/rei_igm_p19_native_receiver_20261101/independent_audit.py
+          python -m py_compile research/rei_igm_p19_native_receiver_20261101/PUBLISHED_RECEIPT_TEST.py
+      - name: Verify published original-source summaries normal and optimized
+        run: |
+          python research/rei_igm_p19_native_receiver_20261101/PUBLISHED_RECEIPT_TEST.py -v
+          python -O research/rei_igm_p19_native_receiver_20261101/PUBLISHED_RECEIPT_TEST.py -v
+      - name: Keep original HE and REI canonical physics on HOLD
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib
+          root=pathlib.Path('research/rei_igm_p19_native_receiver_20261101')
+          r=json.loads((root/'results/SCIENCE_RESULTS.json').read_text())
+          assert r['REI_central_reported']=='28/88' and r['BASS_HE_physical_reported']=='14/18'
+          assert r['canonical_delta']==0 and r['RUX04']=='NOT_ADMITTED'
+          assert r['NO_LOCAL_UVB_RATE_SUBSTITUTION'] is True
+          original=pathlib.Path('research/rei_igm_p19_highz_20261101/data/P19_D1_ORIGINAL_HIGHZ_13.csv')
+          assert hashlib.sha256(original.read_bytes()).hexdigest()==r['source_table_projection_sha256']
+          print('PUBLISHED_ONLY_CHECK_PASS: original source-conditioned full 46k physics is separately archived')
+          PY

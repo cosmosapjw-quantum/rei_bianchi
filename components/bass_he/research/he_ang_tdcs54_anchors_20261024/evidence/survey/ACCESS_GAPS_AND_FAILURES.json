@@ -1,0 +1,30 @@
+{
+  "read_only_failures": [
+    {
+      "operation": "Dropbox list_folder",
+      "input_path": "/BASS_DERIVATION_DOSSIERS_20260912/",
+      "error": "[INVALID_ARGUMENT] Invalid path (reason: INVALID_PATH)",
+      "resolution": "Remove trailing slash; corrected exact folder enumeration completed6pages3403entries"
+    },
+    {
+      "operation": "Drive list_folder top_k10000",
+      "error": "HTTPError: 400: \n\n\n\nBad Request\n\nContent:\n{'code': 400,\n 'errors': [{'domain': 'global',\n             'location': 'page_size',\n             'locationType': 'parameter',\n             'message': \"Invalid value '10000'. Values must be within the \"\n                        'range: [value: 1\\n'\n                        ', value: 1000\\n'\n                        ']',\n             'reason': 'invalidParameter'}],\n 'message': \"Invalid value '10000'. Values must be within the range: [value: \"\n            '1\\n'\n            ', value: 1000\\n'\n            ']'}\n\nRequest URL:\nhttps://www.googleapis.com/drive/v3/files?q=%271pkohlay5eIfFJsBwPZ_yn2jIZONZjesI%27+in+parents+and+trashed%3Dfalse&fields=nextPageToken%2C+files%28id%2C+name%2C+mimeType%2C+size%2C+createdTime%2C+modifiedTime%2C+viewedByMeTime%2C+sharedWithMeTime%2C+capabilities%2C+webViewLink%2C+parents%2C+shared%2C+driveId%29&includeItemsFromAllDrives=True&supportsAllDrives=True&corpora=allDrives&pageSize=10000&orderBy=modifiedTime+desc%2Cname_natural (Response: {'error': {'code': 400, 'message': \"Invalid value '10000'. Values must be within the range: [value: 1\\n, value: 1000\\n]\", 'errors': [{'message': \"Invalid value '10000'. Values must be within the range: [value: 1\\n, value: 1000\\n]\", 'domain': 'global', 'reason': 'invalidParameter', 'location': 'page_size', 'locationType': 'parameter'}]}})",
+      "resolution": "Supported maximum1000; corrected list returns1000 and no pagination interface, remains partial"
+    },
+    {
+      "operation": "Drive keyword HEANG folder search",
+      "result": "0 despite direct archive metadata and folder listing showing B2/B3",
+      "interpretation": "Search coverage gap for gzip archives, not absence proof; name-filter search returned7documentrecords"
+    }
+  ],
+  "scientific_execution": false,
+  "read_only_API_CPU_and_wall": "not measured as scientific computation; no zero-cost claim",
+  "unavailable_or_partial": [
+    "All branch file contents not read:43selected owner documents exactread",
+    "Private conversations handled by parent only; not independently available here",
+    "Drive archive-folder metadata capped1000, no exposed cursor; document-only926records terminal",
+    "Dropbox dossier immediate children exhaustive;59 subfolder descendants not globally scanned",
+    "Attachment PDF full contents and15archivedPDF bodies notread; no extraction",
+    "No source raw amplitude/joint-event binary payload downloaded in this survey"
+  ]
+}

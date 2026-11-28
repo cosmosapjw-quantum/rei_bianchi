@@ -1,0 +1,17 @@
+..F...                                                                   [100%]
+=================================== FAILURES ===================================
+____________ test_l1_collapse_distinguishes_even_author_column_one _____________
+
+    def test_l1_collapse_distinguishes_even_author_column_one():
+        t = 0.3
+        u = np.array([[np.sqrt(1-t), -np.sqrt(t)], [np.sqrt(t), np.sqrt(1-t)]])
+        collapsed = collapsed_from_parity(u, np.array([[1.0]]))
+        np.testing.assert_allclose(collapsed, [[1-t, t/2], [t, 1-t/2]], atol=1e-15)
+>       assert abs(u[0, 1])**2 == t
+E       assert (np.float64(0.5477225575051661) ** 2) == 0.3
+E        +  where np.float64(0.5477225575051661) = abs(np.float64(-0.5477225575051661))
+
+tests/test_reduced_parity.py:22: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_reduced_parity.py::test_l1_collapse_distinguishes_even_author_column_one
+1 failed, 5 passed in 0.70s

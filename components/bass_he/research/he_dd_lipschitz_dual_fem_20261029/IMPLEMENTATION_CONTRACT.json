@@ -1,0 +1,98 @@
+{
+  "schema": "BASS_HE_DD_DUAL_FE_CERTIFICATE_CONTRACT_V1",
+  "base_sha": "11b3cfdb987137323d8ebd220e74063b0ed6db22",
+  "source": {
+    "repository": "IAEA-NDS/exfor_master",
+    "commit": "939a14d7bba1ddce51975cb5e8711ce96b3b0871",
+    "path": "exforall/M04/M0475.x4",
+    "previous_sha256": "b2c1c52931e813dd63fb0e98edfc90088bc2eca497fd9142277e748f0935a82f",
+    "git_blob": "c49433293921dbb012d7f1b0387745732a598efa",
+    "identity_status": "pinned GitHub source / parent transcript, no fresh local EXFOR raw bytes"
+  },
+  "environment": {
+    "python": "3.13.5",
+    "compiled_native_independent_reviewer": "NOT_RUN"
+  },
+  "input": {
+    "gamma_E_MeV": "330",
+    "angle_degree": "[0,90]",
+    "source_rows": [
+      {
+        "angle_deg": 46,
+        "da_lower": "11/100",
+        "da_upper": "17/100"
+      },
+      {
+        "angle_deg": 61,
+        "da_lower": "11/100",
+        "da_upper": "21/100"
+      },
+      {
+        "angle_deg": 73,
+        "da_lower": "1/50",
+        "da_upper": "3/25"
+      },
+      {
+        "angle_deg": 87,
+        "da_lower": "7/50",
+        "da_upper": "6/25"
+      }
+    ],
+    "L": "[1/700,infinity) nb/(sr degree)",
+    "target_L": [
+      "1/700",
+      "1/200",
+      "1/100"
+    ],
+    "grid_h_deg": "1/50",
+    "event_normalization": null,
+    "beam_polarization": null
+  },
+  "equations": {
+    "g_t": "(1/4-t)sin(pi theta/180)+(1/4)sin(3pi theta/180)",
+    "Dmin": "integral f_minus*(theta/90)dtheta",
+    "interpolation_error": "45 L h in degree-integral units",
+    "quadrature_error": "90 B (3*(22/(7*180))^2) h²/8",
+    "trigonometric_error": "90 B epsilon+90 L h² epsilon/12; epsilon=1e-8",
+    "dual_upper": "b dot lambda+B sum(nu)+B sum max(0,c-A^Tlambda-nu)",
+    "extremal_bounds": "outer_min<=min b<=verified_min_witness_upper; verified_max_witness_lower<=max b<=outer_max"
+  },
+  "algorithm": {
+    "source": "src/lipschitz_lp_certificate.py",
+    "targeted_tests": "tests/test_lipschitz_lp_certificate.py",
+    "data": "RESULTS.json",
+    "figures": [
+      "figures/certified_extrema.png",
+      "figures/continuum_budget.png"
+    ],
+    "rounding": "directed Decimal polynomial enclosure and rational Taylor/Machin budgets, exact rational LP dual postcheck",
+    "LP": "SciPy HiGHS, not trusted as certifier",
+    "dual_residual": "exact Fraction computed from numeric proposal",
+    "feasible_witness": "rational McShane envelope plus f_minus/f_plus clipping"
+  },
+  "admission": {
+    "theorem": "DERIVED_NUMERICALLY_CHECKED_SCOPED",
+    "physical_rate": "BLOCKED_SOURCE_MISSING",
+    "native_R6_C9": "NOT_RUN",
+    "old_science_suite": "NOT_RUN"
+  },
+  "DAG": {
+    "central": "28/88",
+    "HE": "14/18",
+    "PR105": "2/2",
+    "PR106": "1/2",
+    "reciprocity": "1/2",
+    "birth_ledger": "1/2",
+    "PR109_angular": "1/2",
+    "new_certified_FE": "1/2_SCOPED_CONDITIONAL_ONLY",
+    "physical_delta": 0
+  },
+  "gates": {
+    "kappa": null,
+    "R_event": null,
+    "heat_rate": null,
+    "physical_activation": false,
+    "L4": false,
+    "production": "HOLD"
+  }
+}

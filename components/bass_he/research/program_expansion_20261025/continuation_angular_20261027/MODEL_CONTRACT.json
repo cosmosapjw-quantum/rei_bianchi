@@ -1,0 +1,89 @@
+{
+  "schema": "HE_ANGULAR06_MODEL_V1",
+  "unit_id": "HE-EXP-ANGULAR-06",
+  "base_commit": "4db5ce7297a7ded4624b93721873aacc9b4ebf30",
+  "objective": "Conditional finite-mass angular pushforward with branch-resolved inverse and explicit identical-daughter normalization; reuse native12 saved events.",
+  "conventions": {
+    "metric": "(-,+,+,+)",
+    "A": "m_target*c^2 [MeV]",
+    "M": "m_daughter*c^2 [MeV]",
+    "e": "incident photon energy [MeV]",
+    "q": "c*p [MeV]",
+    "mu": "CM polar cosine relative to incident photon",
+    "nu": "lab polar cosine",
+    "azimuth": "unchanged at regular directions; no imposed azimuthal distribution"
+  },
+  "equations": {
+    "D2": "1-mu^2+gamma^2*(mu+a)^2",
+    "nu": "gamma*(mu+a)/sqrt(D2)",
+    "jacobian_signed": "gamma*(1+a*mu)/D2^(3/2)",
+    "a": "e/(2*gamma*kappa)",
+    "threshold": "(2M-A)+(2M-A)^2/(2A)",
+    "transition": "A*(2M-A)/(2*(A-M)) if A>M; none otherwise",
+    "inverse": "G=gamma^2*(1-nu^2), L=G+nu^2, B=L-a^2*G; roots=(-aG +/- abs(nu)*sqrt(B))/L plus original-sign/domain filter",
+    "density": "sum_i f_CM(mu_i,phi)/abs(J_i)",
+    "weighted_density": "sum_i f_CM(mu_i,phi)*W(mu_i,phi)/abs(J_i)"
+  },
+  "implementation_domain": {
+    "generic": "finite nonbool binary64 1<=gamma<=1e6,0<=a<=1e6; mu,nu in[-1,1]",
+    "mass_adapter": "0<A<2M, e>=threshold; above-threshold map must lie in explicit generic domain",
+    "precision": "Exact Fraction admission for binary64 mass/energy inputs; Decimal80 intermediate forward and inverse; binary64 outputs. Not interval-certified; unresolved output raises AngularResolutionError.",
+    "critical_points": "Exact rational threshold is an atom; exact stopped daughter has no direction; computed binary64 fold coordinates are declared boundary sentinels, not assertions that stored mu equals the exact real fold. No finite fake caustic density.",
+    "representability": "Intermediate/output W,gamma,kappa,threshold,transition,density must be representable; additional explicit rejection may occur inside the mathematical domain."
+  },
+  "source_inputs": {
+    "saved_photon05_data": "../continuation_photon_20261027/evidence/validation/SAVED_PLOT_DATA.json",
+    "saved_data_sha256": "923c9349019d7061a4d6e71343ef6930b9db6b95b82f16085f725f18b618d755",
+    "native_rows": 12,
+    "DCS_and_ERR_S": "preserve literal values; no physical-rate interpretation, no factor1/2 without convention",
+    "native_J_use": "conditional coordinate weights only; no source DCS normalization binding"
+  },
+  "normalization": {
+    "EVENT_SYMMETRIC_FULL_SPHERE": "f even; integral f = sigma_event",
+    "INCLUSIVE_DAUGHTER_FULL_SPHERE": "h=2f; integral h=2sigma_event",
+    "EVENT_REPRESENTATIVE_HEMISPHERE": "H=h on a single representative domain; integral H=sigma_event",
+    "pair_vs_single": "pair observable integrated with inclusive h needs1/2; single-daughter inclusive observable does not",
+    "unknown_source_convention": "unresolved; reject automatic physical conversion"
+  },
+  "energy_and_population": {
+    "reuse_owner": "population_rest_energy_witness includes binding once",
+    "independent_binding_rhs": null,
+    "Gamma_thermal": null,
+    "Cv": null,
+    "species_heating": null,
+    "thermal_deposition": null,
+    "birth_pool": "UNASSIGNED"
+  },
+  "claim_ceiling": {
+    "physical_provider_admitted": false,
+    "physical_global_consumer_admitted": false,
+    "physical_rate_admitted": false,
+    "global_physical_completion": null,
+    "production": "NOT_APPROVED",
+    "activation": false,
+    "L4_ready": false
+  },
+  "protected": {
+    "PHOTON05": {
+      "source": "251c6baa6c3359b1d6997dbce51cea65500b53d6",
+      "delivery": "4db5ce7297a7ded4624b93721873aacc9b4ebf30",
+      "DAG": "4 complete + 1 partial + 3 physical open / 8",
+      "plot_cpu_s": 4.40726504,
+      "plot_cap_s": 4,
+      "plot_status": "FAIL_CPU_CAP_EXCEEDED",
+      "workflow": "PARTIAL"
+    },
+    "HE101": {
+      "C8": "PARTIAL_EXPORT",
+      "delivery": "19/20",
+      "reserve": 0,
+      "outcomes": [
+        "PASS",
+        "FAIL",
+        "FAIL"
+      ]
+    },
+    "historical_replays": 0,
+    "budget_reset_or_transfer": false
+  }
+}

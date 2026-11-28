@@ -1,0 +1,10 @@
+--- a/src/harmonic.py
++++ b/src/harmonic.py
+@@ -105,6 +105,7 @@
+ def harmonic_integrals(lo,hi):
+     lo,hi=rational(lo),rational(hi)
+     if not 0<=lo<=hi<=1:raise ContractError('strip outside circle')
++    if (2*(hi-lo))%1==0:return Interval.point(ZERO),Interval.point(ZERO)
+     sl,cl=sincos_turn(lo);sh,ch=sincos_turn(hi)
+     c=(sh-sl)/(4*pi_interval())
+     s=(cl-ch)/(4*pi_interval())

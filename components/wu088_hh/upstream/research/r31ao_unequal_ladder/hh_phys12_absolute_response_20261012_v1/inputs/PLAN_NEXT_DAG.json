@@ -1,0 +1,157 @@
+{
+  "schema": "WU088_HH_OBSERVABLE_FIRST_DAG_V1",
+  "change_type": "Output-specific planning; no new scientific completion",
+  "active_ncp_heavy_queue": [],
+  "active_ncp_launch": false,
+  "nodes": [
+    {
+      "id": "BASELINE_REUSE",
+      "status": "REUSED_EXISTING_COMPLETE",
+      "source_commit": "328372568144c4cdb6cdecd94c9c9bff984e103e",
+      "replay": false
+    },
+    {
+      "id": "L0_FIXED_FAMILY_CONTRACT",
+      "lane": "LCS_LOCAL",
+      "depends_on": [
+        "BASELINE_REUSE"
+      ],
+      "status": "READY_HERE_NEXT_STUDY",
+      "owner": "HERE",
+      "goal": "Bind same-alpha COMMON, b_amp=1 and uniform U premises for absolute HH x/w response"
+    },
+    {
+      "id": "L1_ABSOLUTE_HH_RESPONSE",
+      "lane": "LCS_LOCAL",
+      "depends_on": [
+        "L0_FIXED_FAMILY_CONTRACT"
+      ],
+      "status": "PLANNED_NOT_EXECUTED",
+      "owner": "HERE",
+      "goal": "Reuse stored U and valid FTC projection for separate full and first_half; no native replay"
+    },
+    {
+      "id": "L2_SCOPED_PHYSICS_RESULT",
+      "lane": "LCS_LOCAL",
+      "depends_on": [
+        "L1_ABSOLUTE_HH_RESPONSE"
+      ],
+      "status": "PLANNED_NOT_EXECUTED",
+      "owner": "HERE",
+      "goal": "Report absolute HH contribution, existing mixed response, enclosure/sign/units and source-family limit"
+    },
+    {
+      "id": "L3_COST_DECISION",
+      "lane": "LCS_LOCAL",
+      "depends_on": [
+        "L2_SCOPED_PHYSICS_RESULT"
+      ],
+      "status": "FUTURE_DECISION",
+      "owner": "HERE",
+      "goal": "Stop if the bounded question is answered; select further work only for a concrete decision"
+    },
+    {
+      "id": "D1_FT03_STRICT_CERTIFICATE",
+      "lane": "FT03_NATIVE",
+      "depends_on": [
+        "BASELINE_REUSE"
+      ],
+      "status": "OPEN_OPTIONAL_RESEARCH",
+      "owner": "HH",
+      "frozen_dag": "research/r31ao_unequal_ladder/hh_phys11_joint_carry_20261011_v1/NEXT_DAG.json",
+      "requirements": "Preserve source/native graphs, actual ray/guard carry, same-family root/derivatives, normalized history and next-stage coverage for this strict claim"
+    },
+    {
+      "id": "D2_SINGLET_ION_PAIR",
+      "lane": "ATOMIC_MICROSCOPIC",
+      "status": "OPEN_INDEPENDENT_RESEARCH",
+      "owner": "HH",
+      "requirements": "Concrete collision observable and original source/input/atomic gates; not contingent on rei consumer"
+    },
+    {
+      "id": "A_REI_REDUCED",
+      "status": "EXTERNAL_EXISTING_SCOPED_RESULT",
+      "owner": "rei_bianchi_READ_ONLY_REFERENCE",
+      "head": "f66929c23ea3fa6e39dd4808e5b27d136c568a03",
+      "requires_complete_HH": false
+    },
+    {
+      "id": "B_BIANCHI_PRESCRIBED",
+      "status": "EXTERNAL_PLAN_INTERFACE_ONLY",
+      "owner": "rei_or_Bianchi_NO_MUTATION",
+      "requires_complete_HH": false,
+      "inputs": [
+        "prescribed xe/Tb",
+        "background/time map/tetrad",
+        "radiation initial conditions"
+      ]
+    },
+    {
+      "id": "C_MINIMAL_COUPLING",
+      "status": "EXTERNAL_PLAN_INTERFACE_ONLY",
+      "owner": "rei_bianchi_NO_MUTATION",
+      "depends_on": [
+        "A_REI_REDUCED",
+        "B_BIANCHI_PRESCRIBED"
+      ],
+      "requires_complete_HH": false,
+      "initial_HH": "OFF or explicitly declared effective closure"
+    },
+    {
+      "id": "HEAVY_WORK_SELECTION",
+      "status": "NOT_READY",
+      "selection_candidates_any_of": [
+        "L3_COST_DECISION",
+        "D1_FT03_STRICT_CERTIFICATE",
+        "D2_SINGLET_ION_PAIR"
+      ],
+      "meaning": "Choose one scientifically needed task from its own lane; not all lanes required",
+      "tasks": []
+    },
+    {
+      "id": "NECESSARY_PILOT_AND_MANIFEST",
+      "status": "NOT_READY",
+      "depends_on": [
+        "HEAVY_WORK_SELECTION"
+      ],
+      "owner": "HERE_IF_SHORT",
+      "reuse_completed_pilot": true,
+      "tasks": []
+    },
+    {
+      "id": "NCP_ADMISSION",
+      "status": "NOT_READY",
+      "depends_on": [
+        "NECESSARY_PILOT_AND_MANIFEST"
+      ],
+      "policy": "NCP_TASKS.json#/future_admission"
+    },
+    {
+      "id": "NCP_HEAVY_EXECUTION",
+      "status": "NO_HEAVY_JOB_READY",
+      "depends_on": [
+        "NCP_ADMISSION"
+      ],
+      "owner": "NCP",
+      "launch": false,
+      "tasks": []
+    }
+  ],
+  "edge_semantics": {
+    "depends_on": "Required for this node only",
+    "selection_candidates_any_of": "Optional alternative source lanes for an actual future task, never an all-lanes completion gate"
+  },
+  "excluded_implicit_edges": [
+    "D1 FT03 certificate -> every LCS local result",
+    "D2 full49 -> every LCS local result",
+    "whole HH proof -> rei A/B/C",
+    "rei consumer completion -> independent HH microscopic research",
+    "PHYS11 mixed response -> absolute HH efficiency",
+    "same-COMMON first_half -> actual second_half",
+    "source-only carry -> actual native root/derivative authority",
+    "energy groups -> independent coupled gas histories",
+    "64core capacity -> invented task manifest"
+  ],
+  "frozen_science_dag_unchanged": "research/r31ao_unequal_ladder/hh_phys11_joint_carry_20261011_v1/NEXT_DAG.json",
+  "future_nodes_are_current_execution_authorization": false
+}

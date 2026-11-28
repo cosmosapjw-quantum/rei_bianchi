@@ -24,6 +24,7 @@ mod hydrogen_step;
 mod interval_ad;
 mod interval_math;
 pub mod isotope_state;
+pub mod material_transfer;
 mod joint_affine;
 mod lift;
 mod microstep;

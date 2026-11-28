@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "unit_id": "HE-ANG-FINITEMASS-CBA",
+  "stage": "C9_STATIC_PRE_EXECUTION",
+  "decision": "PENDING_ACTUAL_CHILD_RESULTS_AND_FIGURE",
+  "reviewer": {"agent": "/root/fm_cba_review5", "requested_model": "gpt-6-astra", "observed_runtime_model": "NOT_OBSERVABLE", "separate_from_implementer": true},
+  "execution": "NO_SCIENCE_OR_WOLFRAM_EXECUTED",
+  "recovery": {
+    "old_workspace": "/workspace/scratch/4c25ee00380c",
+    "new_workspace": "/tmp/heang_finitemass_cba_resume_20261025",
+    "event": "Old directory observed empty before first C9 code read; root confirmed runtime loss",
+    "reviewer_restored_files_exact": {
+      "THEORY_KO.md": "20ff07606d1428e5bdbf28eec55f5bca5540a81578b44ceaa5e5d442813cd636",
+      "CONTRACT_ADDENDUM_01.json": "e1ae4de66d121b70e767334b34663cb10ab134ea30682dd6265067d895c5cd1f",
+      "reviews/R6_REPORT.json": "0204834a41e86e75d1270b981504a37a0e7537f8a8d120644dc2f26e2280a9c6",
+      "reviews/R6_REVIEW.md": "3f986773c8e84b707600e1f29d91b0e1ece71e1995112b16e30ff0383506df16",
+      "reviews/R7_REVIEW.json": "e020c1616d57ae1037cbd15f71dc2c7f41681a9ed9ab301d42642ac5d17aec39"
+    },
+    "authority": "Root explicitly readopts exact reviewed 20ff theory; historical 791e paragraph reorder does not replace recovered reviewed identity",
+    "old_preparation_manifest": "Historical only; new recovered manifest required before START"
+  },
+  "code_read": ["code/fm_cba.py", "code/reference.py", "code/test_fm_cba.py", "code/run_analysis.py", "code/run_bounded.py", "code/plot_results.py", "code/io_utils.py"],
+  "static_assessment": {
+    "core_equations": "Consistent with accepted finite-M two-shift amplitude and invariant/Jacobi/lab coefficients",
+    "reference": "mp50/80 preserves higher-precision values and original-integral quadrature uses hypergeometric/exponential integrand, not closed K",
+    "analysis": "Frozen 12 generic, three two-term quadrature, 12 tiny, kinematic/normalization, 24/48/96 weighted fold and 73-angle/trend fixtures represented",
+    "fold": "Independent pair-sphere and transformed h charts evaluate branch-dependent model weights correctly",
+    "runner": "Requires bound manifest/root GO and unchanged inputs before START; preserves failed/incomplete attempts and refuses replay; CPU/wall/memory/thread limits explicit",
+    "plot": "Reads saved accepted analysis only; relative-pair energy labels and direct model scope are explicit; actual figure review pending"
+  },
+  "findings": [
+    {
+      "id": "C9-STATIC-01",
+      "reviewer_early_message_alias": "C9-01",
+      "status": "FIX_VERIFIED_STATIC_PENDING_FIRST_TEST_OUTPUT",
+      "target": "jacobi_tdcs direction normalization",
+      "defect": "Inherited cba._direction can turn finite components whose hypot overflows into zero direction; wrapper can then silently return off-shell vectors and a nominal density",
+      "concrete_input": "n_q or n_k = (1.7e308,1.7e308,0)",
+      "minimal_fix": "Use immutable parent shell.normalize_direction and its unit result for n_q/n_k; it rejects nonfinite norm; leave parent files unchanged",
+      "test": "Add overflowed finite direction rejection assertions to existing affected test method before first START",
+      "root_authorization": "Confirmed in parent message; no model/tolerance/budget change and no scientific repair-reserve use"
+    },
+    {
+      "id": "C9-STATIC-02",
+      "reviewer_early_message_alias": "C9-02",
+      "status": "FIX_VERIFIED_STATIC_PENDING_FIRST_TEST_OUTPUT",
+      "target": "lab_tdcs Delta0 guard order",
+      "defect": "No-branches early return occurs before Delta0 rejection, so p_A=P returns density0 despite theory requiring Delta0 rejection for TDCS APIs",
+      "minimal_fix": "After p_A=0 endpoint rule, reject exact Delta0 before radial solver and early returns",
+      "test": "Add lab p_A=P rejection assertion to existing affected test method before first START",
+      "root_authorization": "Confirmed in parent message; no model/tolerance/budget change and no scientific repair-reserve use"
+    },
+    {
+      "id": "C9-STATIC-03",
+      "reviewer_early_message_alias": "C9-03",
+      "status": "CLOSED_PRE_START_ROOT_CRITERION_ADOPTION",
+      "target": "test_14 finite-M surrogate of infinite-M limit",
+      "observation": "Code uses M=1e12 and scaled difference <1e-10; this finite-M approximation criterion is explicit in code but was not a separate frozen JSON criterion",
+      "resolution": "Reviewer reread PRESTART_ROOT_DISPOSITION.json: exact E0=3,Er=.2,M=1e12,nq(.1,0,1),nk(.4,0,1) fixture and abs(finite-parent)/max(1,abs(parent))<1e-10 were explicitly adopted by root before first START",
+      "distinct_from": "Generic binary64 kernel error target 2e-12 and exact pointwise analytical limit"
+    }
+  ],
+  "final_C9_gate": "No final PASS before actual three-child records, raw scientific output, repaired-code inspection and actual generated figure review"
+}

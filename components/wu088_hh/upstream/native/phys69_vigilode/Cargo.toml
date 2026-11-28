@@ -1,0 +1,24 @@
+[package]
+name = "wu088-hh-phys69-vigilode"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.94.1"
+license = "MIT"
+description = "Pinned VigilODE binary64 cross-check of original HH radial Born coefficients"
+
+[workspace]
+
+[dependencies]
+rodas5p-core = { git = "https://github.com/cosmosapjw-quantum/vigilode.git", rev = "a21d573980f66fe02891bd216153443b5352f921" }
+rodas5p-integrators = { git = "https://github.com/cosmosapjw-quantum/vigilode.git", rev = "a21d573980f66fe02891bd216153443b5352f921", default-features = false }
+num-complex = "=0.4.6"
+gauss-quad = { version = "=0.3.2", default-features = false, features = ["std"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = { version = "=1.0.151", features = ["float_roundtrip"] }
+sha2 = "=0.10.9"
+
+[profile.release]
+opt-level = 3
+lto = false
+codegen-units = 16
+

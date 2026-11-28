@@ -1,0 +1,75 @@
+{
+  "schema": "he29.packed_entry.external_api_evidence.v1",
+  "recorded_utc": "2026-10-20T17:21:57.691943+00:00",
+  "recovery": {
+    "status": "DERIVED_SUMMARY_RECONSTRUCTED_FROM_EXACT_SAVED_TOOL_RETURNS",
+    "original_summary_recorded_utc": "NOT_CAPTURED_IN_TOOL_OUTPUT",
+    "original_summary_exact_bytes": "UNAVAILABLE",
+    "fresh_exa_calls": 0
+  },
+  "scope": "new external wrapper connection only; reuse published ed5 watchdog algorithm and PR79 diagnostic/14 tests",
+  "provider": "Exa",
+  "calls": [
+    {
+      "operation": "web_fetch_exa",
+      "urls": [
+        "https://docs.python.org/3.12/library/subprocess.html#subprocess.Popen",
+        "https://docs.python.org/3.12/library/os.html#os.killpg"
+      ],
+      "maxCharacters": 18000,
+      "status": "RETURNED_BUT_TRUNCATED_BEFORE_TARGET_SECTIONS"
+    },
+    {
+      "operation": "web_search_exa",
+      "query": "Official Python 3.12 subprocess documentation Popen.wait timeout child is not killed start_new_session setsid and os.killpg process group signal",
+      "numResults": 3,
+      "status": "RETURNED",
+      "version_note": "top doc redirected to 3.15; not used for runtime-specific validation; CPython source and issue not used for new algorithm claims"
+    },
+    {
+      "operation": "web_fetch_exa",
+      "urls": [
+        "https://docs.python.org/3.12/library/subprocess.html",
+        "https://docs.python.org/3.12/library/os.html"
+      ],
+      "maxCharacters": 210000,
+      "status": "REQUIRED_SECTIONS_OBSERVED",
+      "observed_document_version": "3.12.13"
+    }
+  ],
+  "api_mapping": [
+    {
+      "url": "https://docs.python.org/3.12/library/subprocess.html#subprocess.Popen",
+      "section": "start_new_session",
+      "observed_meaning": "On POSIX the child calls setsid before exec when start_new_session is true."
+    },
+    {
+      "url": "https://docs.python.org/3.12/library/subprocess.html#subprocess.Popen.wait",
+      "section": "Popen.wait",
+      "observed_meaning": "Wait returns the child returncode; expiry raises TimeoutExpired; the application can retry the wait."
+    },
+    {
+      "url": "https://docs.python.org/3.12/library/os.html#os.killpg",
+      "section": "os.killpg",
+      "observed_meaning": "The signal is sent to the specified process group."
+    }
+  ],
+  "connection_decision": "Import exact ed5 run_process_group and provide unchanged a5 execution module; do not reimplement process cleanup. Original a5 target creates the same worker argv.",
+  "limits": [
+    "This API lookup is not a new process watchdog test or a hard total wall-time certificate.",
+    "Actual NCP Python3.12.3 exact build remains a separate unchanged runtime gate.",
+    "No new scientific question: prior SciSpace/Wolfram theory/CAS evidence reused without another call."
+  ],
+  "raw_observation_files": [
+    {
+      "path": "/workspace/scratch/a269f21fcbff/intake_canary/EXA_OFFICIAL_FETCH_RAW.json",
+      "sha256": "35744b62772aaeff2a46aa987deabebc37653bfdaddc36ce8d30a2fe4106eac9",
+      "bytes": 37392
+    },
+    {
+      "path": "/workspace/scratch/a269f21fcbff/intake_canary/EXA_OFFICIAL_COMPLETE_RAW.json",
+      "sha256": "29c8000ca716d363b21e25feea5ac3f68c089a63ce07a97c08074bce06f03eea",
+      "bytes": 230727
+    }
+  ]
+}

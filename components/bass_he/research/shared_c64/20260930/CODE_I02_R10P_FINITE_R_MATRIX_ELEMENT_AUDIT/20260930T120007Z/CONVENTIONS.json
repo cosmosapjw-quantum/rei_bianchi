@@ -1,0 +1,58 @@
+{
+  "schema": "bass_he.r10p.conventions.v1",
+  "scope": "snapshot unboosted exact Born-Oppenheimer electronic eigenstates; verification of delivered R10O operator definitions, not new dynamics",
+  "axes": {
+    "internuclear": "z",
+    "collision_plane": "xz",
+    "normal_rotation_axis": "y",
+    "right_handed": true,
+    "CPC_mapping": "(x_CPC,y_CPC,z_CPC)=(z_audit,x_audit,y_audit); proper cyclic rotation"
+  },
+  "origin": {
+    "definition": "instantaneous center of nuclear charge O=(Z1 R1+Z2 R2)/(Z1+Z2)",
+    "Z1": 1,
+    "Z2": 2,
+    "positions_body": "z1=-Z2*R/(Z1+Z2), z2=Z1*R/(Z1+Z2)",
+    "meaning": "O-centered clamped-nuclei snapshot; origin translation in time is not part of audited angular term",
+    "source_status": "declared audit convention; CPC Sec2.6 does not explicitly fix this translational/ETF origin"
+  },
+  "rotation": "U(theta)=exp(-i theta L_y/hbar), states=U(theta)states_at_zero",
+  "angular_operator": "L_y=-i*hbar*(z*d_x-x*d_z)",
+  "electronic_H": "p²/(2me)-sum_A kappa_A/sqrt(x²+y²+(z-zA)²); kappa_A=ZA e²/(4pi epsilon0)",
+  "phase": {
+    "real_basis": "away from degeneracy choose real sigma and real pi meridional factors with smooth local R continuation; overall sign remains gauge",
+    "complex_covariance": "L_gr -> exp(i(chi_r-chi_g))*L_gr",
+    "allowed_gauge": "chi_a(R) independent of theta in the specified rotation section; radial connection transforms including diagonal derivative",
+    "no_global_sign_claim": true
+  },
+  "state_names": {
+    "g": "lowest sigma branch with UA1s and outgoing He+1s correlation as supplied source context",
+    "e": "UA2p_sigma / incoming H1s branch",
+    "r_bright": "pi_x real collision-plane combination (m+1,m-1 cosine)",
+    "r_dark": "pi_y real out-of-plane combination (sine)",
+    "at_degeneracy": "use projector/subspace; no arbitrary scalar continuation or gap division"
+  },
+  "cylindrical_phi": "x=rho*cos(phi),y=rho*sin(phi); rho is electronic transverse radius, not collision impact parameter",
+  "normalizations": "sigma=G(rho,z)/sqrt(2pi); pi_x=A(rho,z)cos(phi)/sqrt(pi); pi_y=A(rho,z)sin(phi)/sqrt(pi); integral rho drho dz |G|²=integral rho drho dz |A|²=1",
+  "ETF_translation": {
+    "in_this_overlap": "unboosted stationary orbitals; no electron translation factor",
+    "time_dependent_translation": "a moving O frame requires its own -Odot·p connection and corresponding Galilean/ETF accounting",
+    "origin_shift": "L_(O+a)=L_O-a cross p",
+    "authority_limit": "no physical missing-edge amplitude inferred solely by choosing a convenient origin or dropping translational contributions"
+  },
+  "CPC_sign_binding": {
+    "published_equation": "i*dA/dt=(epsilon*R²*L_xCPC²+omega*L_zCPC)A in atomic units",
+    "audit_connection": "-theta_dot*L_y from active U",
+    "comparison": "axes alone do not flip sign; mapping omega=-theta_dot would reconcile coefficients only if opposite angular/passive convention is adopted explicitly",
+    "verified_author_omega_orientation": "NOT_ESTABLISHED; no production sign change"
+  },
+  "units": {
+    "R": "length",
+    "L": "action; keep hbar",
+    "radial_connection_F": "1/length",
+    "angular_connection": "energy -theta_dot*L",
+    "commutator": "energy*action"
+  },
+  "leading_R_power": "UNESTABLISHED_NOT_FILLED",
+  "UA_limit_conditions": "At R=0 spherical H preserves l. A limiting-zero overlap claim additionally requires state convergence controlling the L_y domain; plain L2 continuity is insufficient. Such convergence is not proved here."
+}

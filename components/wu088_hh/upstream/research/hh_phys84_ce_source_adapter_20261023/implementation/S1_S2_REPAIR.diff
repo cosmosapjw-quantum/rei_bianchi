@@ -1,0 +1,58 @@
+--- first_written_v1/source/run_source.py
++++ pretest_frozen_v2/source/run_source.py
+@@ -54,12 +54,13 @@
+             raise ValueError('INCOMPLETE_OR_EXTRA_OUTPUT_FILES')
+         ib = (output/'IDENTITY.json').read_bytes()
+         rb = (output/'source_rows.json').read_bytes()
+-        complete = json.loads((output/'COMPLETE.json').read_bytes())
++        complete_bytes = (output/'COMPLETE.json').read_bytes()
++        complete = json.loads(complete_bytes)
+         expected = {'schema':'PHYS84_COMPLETE_V1','status':'COMPLETE',
+                     'identity_SHA256':sha(ident_bytes),'result_SHA256':sha(rb),
+                     'result_bytes':len(rb),'row_count':16}
+         rows = json.loads(rb)
+-        if ib != ident_bytes or complete != expected or not isinstance(rows,list) or len(rows)!=16:
++        if ib != ident_bytes or complete != expected or encoded(complete) != complete_bytes or not isinstance(rows,list) or len(rows)!=16:
+             raise ValueError('CORRUPTED_OR_MISMATCHED_COMPLETION')
+         # Canonical byte representation prevents semantically similar byte edits.
+         if encoded(rows) != rb:
+--- first_written_v1/verification/verify_source.py
++++ pretest_frozen_v2/verification/verify_source.py
+@@ -24,6 +24,7 @@
+ CHECKS=[]
+ CASES=[]
+ MAXIMA={}
++REAL_APPLICATION_CALLBACK_CALLS=[0]
+ OWNER={'radiative_owner':'detached_own_spontaneous',
+        'excited_state_owner':'explicit_1S_2S_2P','native_radiative_owner_active':False}
+ 
+@@ -233,7 +234,7 @@
+             if isinstance(node,ast.Import):imports.extend(a.name for a in node.names)
+             if isinstance(node,ast.ImportFrom):imports.append(node.module or '')
+         check(not any(any(x in imp for x in forbidden) for imp in imports),'no_parent_science_import:'+name)
+-    check(run_source.real_callback not in (), 'real_callback_is_uninvoked_by_persistence_tests')
++    check(REAL_APPLICATION_CALLBACK_CALLS==[0], 'real_callback_zero_invocations')
+ 
+ 
+ def main():
+@@ -247,6 +248,10 @@
+             'real_application_callback_calls':0,'old_rate_callbacks':0,'old_population_callbacks':0,
+             'old_ODE_callbacks':0,'historical_replays':0,'fixture_interface_evaluations':16,
+             'persistent_callback_kind':'MOCK_ONLY','inherited_budget_remaining':None}
++    def forbidden_real_callback():
++        REAL_APPLICATION_CALLBACK_CALLS[0]+=1
++        raise AssertionError('REAL_APPLICATION_CALLBACK_FORBIDDEN_IN_VERIFICATION')
++    run_source.real_callback=forbidden_real_callback
+     try:
+         source=SavedSource()
+         numerical(source)
+@@ -260,7 +265,8 @@
+         raise
+     finally:
+         report.update(cases=CASES,case_count=len(CASES),assertion_count=len(CHECKS),
+-                      assertions=CHECKS,max_normalized_errors=MAXIMA)
++                      assertions=CHECKS,max_normalized_errors=MAXIMA,
++                      real_application_callback_calls=REAL_APPLICATION_CALLBACK_CALLS[0])
+         with (a.attempt/'REPORT.json').open('x') as stream:json.dump(report,stream,indent=2);stream.write('\n')
+         print(json.dumps({k:report[k] for k in ('status','case_count','assertion_count','max_normalized_errors')},sort_keys=True))
+ 

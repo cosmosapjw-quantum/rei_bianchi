@@ -1,0 +1,15 @@
+ClearAll["Global`*"];
+path=FileNameJoin[{CreateDirectory[],"phys22_result.json"}];
+URLDownload["https://raw.githubusercontent.com/cosmosapjw-quantum/WU088_HH/0f976b842fbf847a6c94a0c16a487077e4a26b17/research/hh_phys22_20261013/results/interval_result_v3.json",path];
+If[FileHash[path,"SHA256","HexString"]=!="9b6b44acee637ac8adde1ca114e258c38747d48b3a750146614742786d8444ed",Return["INPUT_HASH_FAILURE"]];
+data=Import[path,"RawJSON"];
+rat[s_String]:=If[StringMatchQ[s,RegularExpression["-?[0-9]+(/[0-9]+)?"]],ToExpression[s],Abort[]];
+p=Map[rat,data["gain_upper"],{2}];nu={1,0,0,13598434599702/10^12};ell={1,3/38,6/38,0};
+ww=LinearSolve[IdentityMatrix[4]-p,nu];vv=p.ww;
+ct=2*(1602176634/10^21)/(3*(1380649/10^22));chi=nu[[4]];
+{tl,th}=rat/@data["temperature_box"];{pl,ph}=rat/@data["particle_box"];
+aa=1-ell.vv;bb=1+ell.vv;
+at=(ct chi+tl-ct vv[[4]]-th ell.vv)/ph;
+bt=(ct chi+th+ct vv[[4]]+th ell.vv)/pl;
+res=(IdentityMatrix[4]-p).ww-nu;
+Print[ExportString[<|"kernel"->System`$Version,"input_sha256"->FileHash[path,"SHA256","HexString"],"exact_residuals"->res,"all_zero"->And@@(TrueQ[#===0]&/@res),"positive_cones"->TrueQ[aa>0&&at>0],"constants"->N[{ell.vv,aa,bb,at,bt},25],"nonnegative_resolvent"->And@@(TrueQ[#>=0]&/@Flatten[Inverse[IdentityMatrix[4]-p]])|>,"RawJSON"]];

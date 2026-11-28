@@ -1,0 +1,59 @@
+{
+  "schema": "bass_he.r10d.rotation_crosswalk.v1",
+  "author_source": {
+    "dataset_doi": "10.17632/n43srxwdnm.1",
+    "version": 1,
+    "arseny_f_sha256": "96827045654428cff9a32930415a9f6c39615b0b41677d00d377edf7c37d6f78",
+    "input_DMP": 0.8,
+    "input_Z1": 1.0,
+    "input_Z2": 2.0,
+    "static_lines": {
+      "impact_grid": "1888-1889",
+      "rotation_cutoff_and_coulomb_gate": "1919-1922",
+      "WRN_call": "1931-1942",
+      "WRN_scattering_angle_and_endpoints": "2013-2029",
+      "DERIVS_coulomb_trajectory": "2033-2055",
+      "DERIVS_rotation_ode": "2056-2069"
+    }
+  },
+  "paper_source": {
+    "cpc_pdf_sha256": "1367f5ab3239cad1b3ea377edb28a9b9e6975f4cec27fb6d289fdb1d601b1c55",
+    "global_nuclear_motion": "straight-line R=(vt,rho,0), CPC p.3",
+    "Eq36_m0_real_part": "((l+1/2)^2-1/2)/(Z1+Z2)",
+    "Eq47": "i dA/dt = [epsilon R(t)^2 Lx^2 + omega(t) Lz] A"
+  },
+  "clean_room": {
+    "current_rotation": "straight-line exact gauge/parity Magnus",
+    "current_cutoff": "((l+1/2)^2-1/2)/(Z1+Z2)",
+    "source_file": "src/bass_he/rotation.py"
+  },
+  "author_rotation": {
+    "a": "Z1*Z2/(DM*v^2)",
+    "T0": "atan(a/rho)",
+    "Rmin": "a + sqrt(a^2+rho^2)",
+    "Rtheta": "rho^2/(-a + sqrt(a^2+rho^2)*cos(theta))",
+    "author_cutoff": "(l+1/2)^2/(Z1+Z2)",
+    "rotation_gate": "Rmin < author_cutoff",
+    "endpoint_cos_theta": "(a + rho^2/Rcut)/sqrt(a^2+rho^2)"
+  },
+  "wolfram_numeric": {
+    "author_Rcut": {"l1": 0.75, "l2": 2.0833333333333335},
+    "clean_Rcut": {"l1": 0.5833333333333334, "l2": 1.9166666666666667},
+    "author_over_clean": {"l1": 1.2857142857142858, "l2": 1.0869565217391304},
+    "a_a0": {"0.5_keV_u": 0.067675, "5_keV_u": 0.0067675},
+    "author_accessible_area_fraction": {
+      "0.5_keV_u": {"l1": 0.8195333333333334, "l2": 0.935032},
+      "5_keV_u": {"l1": 0.9819533333333333, "l2": 0.9935032}
+    },
+    "clean_cut_accessible_area_fraction": {
+      "0.5_keV_u": {"l1": 0.7679714285714286, "l2": 0.9293826086956521},
+      "5_keV_u": {"l1": 0.9767971428571429, "l2": 0.9929382608695653}
+    }
+  },
+  "interpretation": {
+    "trajectory_discrepancy": "paper/clean-room straight-line versus distributed author Coulomb-bent rotational propagation",
+    "cutoff_discrepancy": "paper Eq36 m=0 real-part boundary versus larger distributed author RMAX",
+    "claim": "STATIC_SOURCE_AND_ALGEBRAIC_CROSSWALK_NOT_RUNTIME_AGREEMENT",
+    "production_change_authorized": false
+  }
+}

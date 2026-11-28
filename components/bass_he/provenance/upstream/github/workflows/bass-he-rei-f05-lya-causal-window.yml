@@ -1,0 +1,40 @@
+name: BASS_HE REI F05 original HeII Ly-alpha frozen causal-window capacity receipt
+on:
+  push:
+    branches:
+      - research/bass-he-rei-f05-lya-causal-window-20261102
+    paths:
+      - research/rei_f05_lya_firstflight_causal_window_20261102/**
+      - .github/workflows/bass-he-rei-f05-lya-causal-window.yml
+  pull_request:
+    paths:
+      - research/rei_f05_lya_firstflight_causal_window_20261102/**
+      - .github/workflows/bass-he-rei-f05-lya-causal-window.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-free-conditional-physics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify source-free public physical capacity receipt (not original REI)
+        run: python3 research/rei_f05_lya_firstflight_causal_window_20261102/verify_published_receipt.py
+      - name: Verify source-free receipt with optimized Python
+        run: python3 -O research/rei_f05_lya_firstflight_causal_window_20261102/verify_published_receipt.py
+      - name: Forbid false source admission and invented geometry
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('research/rei_f05_lya_firstflight_causal_window_20261102/results/SCIENCE_RESULT.json')
+          d=json.loads(p.read_text())
+          assert d['original_causal_geometry_not_identified']
+          assert d['original_line_transported']=='NO_SOURCE_RAY_PATHS'
+          assert d['original_tick161']=='NOT_ACCEPTED'
+          assert d['canonical_delta']==0 and d['production']=='HOLD'
+          print('PASS_DERIVED_CONDITIONAL_CAPACITY_ONLY')
+          PY

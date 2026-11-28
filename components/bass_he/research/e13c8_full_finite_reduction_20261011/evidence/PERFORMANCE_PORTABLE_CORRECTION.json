@@ -1,0 +1,24 @@
+{
+  "failure_evidence": "STATIC_SOURCE_DIAGNOSIS; failing analysis deliberately not re-executed",
+  "finding": "Original identity creation tried to hash output_dir/analyze_telemetry.py, which only succeeds when the script is present in the output directory. A fresh independent output directory would fail after analysis/notes serialization.",
+  "fix": "Preserve original script and historical outputs; new portable copy pins Path(__file__) separately and pins only actual generated output files under output_dir.",
+  "historical_performance_outputs_mutated": false,
+  "kernel_or_MPI_calls": 0,
+  "original_source": {
+    "bytes": 30698,
+    "sha256": "dcbaf4517d388675198431ec8daed5a528ebb36e8c50c2127a12668bdad0df52"
+  },
+  "portable_source": {
+    "bytes": 30726,
+    "sha256": "db417d97132fff95b9ae7e6cd4f20d67f9dbe4451d83b7fa346dfd66b7970c32"
+  },
+  "schema": "bass-he-e13c8-performance-portability-correction-v1",
+  "scientific_data_or_method_change": false,
+  "unified_diff": "--- analysis/PERFORMANCE/analyze_telemetry.py\n+++ code/analyze_telemetry_portable.py\n@@ -386,7 +386,8 @@\n \"\"\"\n     write_new(out / \"PERFORMANCE_NOTES_KO.md\", notes)\n     write_new(out / \"PERFORMANCE_IDENTITY.json\", {\"schema\": \"bass-he-e13c8-performance-identity-v1\",\n-              \"files\": {name: pin(out / name) for name in (\"analyze_telemetry.py\", \"PERFORMANCE_ANALYSIS.json\", \"PERFORMANCE_NOTES_KO.md\")},\n+              \"source_script\": pin(Path(__file__)),\n+              \"files\": {name: pin(out / name) for name in (\"PERFORMANCE_ANALYSIS.json\", \"PERFORMANCE_NOTES_KO.md\")},\n               \"completed_analysis_wall_seconds\": time.perf_counter() - start_clock,\n               \"scientific_kernel_calls\": 0, \"MPI_launches\": 0, \"actual_exit\": 0})\n     print(json.dumps({\"status\": \"COMPLETE_SAVED_TELEMETRY_ANALYSIS\", \"paths\": len(path_rows), \"ranks\": ranks,\n",
+  "validation_pin": {
+    "bytes": 3438,
+    "sha256": "65f171b30523b39a8bcfc6eec3af7425f2be16c1527f6368f2a42742a71806e0"
+  },
+  "validation_receipt": "tests/PERFORMANCE_PORTABLE_EXECUTION_RECEIPT.json",
+  "validation_status": "PASS_PORTABLE_SAVED_TELEMETRY_REPLAY"
+}

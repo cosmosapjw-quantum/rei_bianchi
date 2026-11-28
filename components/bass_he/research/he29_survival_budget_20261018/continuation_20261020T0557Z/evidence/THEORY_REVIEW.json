@@ -1,0 +1,449 @@
+{
+  "schema": "HE29_SHARED_REFERENCE_THEORY_REVIEW_V1",
+  "created_at_utc": "2026-10-20T06:20:18Z",
+  "task_lane": "research/he29_survival_budget_20261018/continuation_20261020T0557Z",
+  "status": "THEORY_PASS_ROOT_IMPLEMENTATION_REVIEW_PENDING",
+  "reviewer": "rust_literature",
+  "skill_context_used": {
+    "active_skill": "physmath-research-loop",
+    "active_version": "1.0.0",
+    "package": "skill://flora-user-skills/root/.codex/skills/remote-skills/skill-6aa0657100b08191b7d67482d1f97c1d",
+    "references_read": [
+      "SKILL.md",
+      "references/RESEARCH_POLICY.md",
+      "references/THEORY_LOOP.md",
+      "references/CODING_LOOP.md",
+      "references/EVIDENCE_AND_HANDOFF.md",
+      "references/RUNTIME_AND_LEGACY.md"
+    ],
+    "external_search_skill": "Exa Search 4.0.1 (previously read; reused)",
+    "historical_physmath_1_3_0": "reused evidence only; not active skill",
+    "historical_schur_checks": "not rerun and not counted"
+  },
+  "scope": {
+    "intake_completed_before_research": true,
+    "new_he29_native_reference_pairs": 0,
+    "expected_pairs": 4,
+    "new_native_runs": 0,
+    "old_tests_run": 0,
+    "old_scientific_suites_run": 0,
+    "old_mixed_difference_recalculated": false,
+    "new_solver": false,
+    "rust_pin_changed": false,
+    "runtime_pipeline_executed": false,
+    "physical_equations_rates_or_gates_changed": false,
+    "source_revision": "1569f3718cd4b17a16936ad3d72bc7d5ed9b0f4f",
+    "owner_revision": "f7830e2f55e7a1938bc3c98f61b60651f8dae474",
+    "vigilode_revision": "a21d573980f66fe02891bd216153443b5352f921"
+  },
+  "source_files": [
+    {
+      "path": "research/he29_survival_budget_20261018/src/reference_runner.py",
+      "bytes": 10058,
+      "sha256": "dabb4968e5247815b8d19c31d792187bad497b23bf2028ce2539613ed527ff7e",
+      "action": "read_source_not_executed"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/src/analyze_references.py",
+      "bytes": 3232,
+      "sha256": "31ca4a81e0da032338f2a560710df45058bfafcdfe02a31a22f4554c29affaa6",
+      "action": "read_source_not_executed"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/src/analyze_return.py",
+      "bytes": 3409,
+      "sha256": "f8b2e3ad3388d499b23e06ca68c21ddd12a0584dcd000ecc728448196d29fb66",
+      "action": "read_source_not_executed"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/src/reference_contract.py",
+      "bytes": 1967,
+      "sha256": "d5d595ea71134b24e0d17ee8a0c89b7f1176d40c98c06086d296846921ca9cdb",
+      "action": "read_source_not_executed"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/continuation_20261020T0557Z/evidence/reused/NATIVE_RETURN_AUDIT.json",
+      "bytes": 1934,
+      "sha256": "2bcd94edde08854599597ea8b962683a86cb5ca4af1ad0e1c3bec09b9e3c20cc",
+      "action": "reused_evidence_hash_read_not_recomputed"
+    },
+    {
+      "path": "research/he29_survival_budget_20261018/continuation_20261020T0557Z/evidence/reused/PROVENANCE.json",
+      "bytes": 1172,
+      "sha256": "5a0cccea4dc065122daa8c50b12b3de7a6e73eb3f3ad105e4a5edae782519841",
+      "action": "reused_evidence_hash_read_not_recomputed"
+    }
+  ],
+  "observations": [
+    {
+      "id": "OR1",
+      "source": "src/reference_runner.py::parent_comparisons",
+      "fact": "Stored temperature_error_K is absolute; signed residual must use original transport/reference endpoint values."
+    },
+    {
+      "id": "OR2",
+      "source": "src/reference_runner.py::run_case",
+      "fact": "Method JSON is saved before final pair admission and RESULT; method-only presence does not establish completed pair."
+    },
+    {
+      "id": "OR3",
+      "source": "src/analyze_references.py",
+      "fact": "Existing admission checks case/owner/thread/table/qualification and cross-case binary/source/input/thread identity; reuse it."
+    },
+    {
+      "id": "OR4",
+      "source": "src/reference_contract.py",
+      "fact": "Method temperature difference gate is 1e-9 K; absolute fraction gate is 1e-11; error_radius_certified remains false."
+    },
+    {
+      "id": "OR5",
+      "source": "src/analyze_return.py",
+      "fact": "Mixed differences were already computed in existing work; no new values recomputed here."
+    }
+  ],
+  "theory": {
+    "signed_residual": "e[r,n,m] = T[r,n] - theta[r,512,m]",
+    "identity": "T[b,n]-T[a,n] = (theta[b]-theta[a]) + (T[b,n]-theta[b]) - (T[a,n]-theta[a])",
+    "exactness_domain": "Exact rational arithmetic on each individually decoded finite binary64 stored value; not exact ODE trajectory.",
+    "aggregate_before_hull": "a[key] = exact sum of all coefficients belonging to the same validated reference key; remove exactly zero coefficients.",
+    "product_domain": "Cartesian product of nonempty finite per-key candidate sets; same key shares one value at every occurrence.",
+    "product_lower": "c + sum(a*l for a>0) + sum(a*u for a<0)",
+    "product_upper": "c + sum(a*u for a>0) + sum(a*l for a<0)",
+    "product_claim": "Exact closed interval hull of finite candidate expression values; extrema attained by allowed product choices.",
+    "coherent_domain": "One common method label chosen across all active keys.",
+    "coherent_claim": "Hull of the complete same-method joint candidate values; subset of product hull.",
+    "no_common_method": "UNAVAILABLE, not a fabricated zero interval.",
+    "missing_cancelled_key": "Can prove a symbolic constant independent of that value; does not admit native case or establish candidate coverage.",
+    "exact_width_vs_display_width": "An exact point may need neighboring binary64 display endpoints when not representable; exact width remains zero.",
+    "final_rounding": "Convert exact endpoint to float, compare back using Fraction.from_float, step once outward only if rounded inward.",
+    "overflow_policy_in_review_checker": "Retain exact rational and mark FINITE_FLOAT_DISPLAY_UNAVAILABLE.",
+    "method_agreement_is_true_solution_radius": false,
+    "statistical_independence_assumed": false,
+    "new_general_affine_arithmetic_method_claimed": false,
+    "table512_parent_contract_preserved": true
+  },
+  "literature": {
+    "app_usage": {
+      "scispace": "ACTUALLY_CALLED_TWO_SEARCHES",
+      "exa": "ACTUALLY_CALLED_SEARCH_AND_FETCH",
+      "web_primary": "ACTUALLY_OPENED_AUTHOR_LIST_AND_TEMA_PDF"
+    },
+    "queries": [
+      {
+        "tool": "SciSpace.search_papers",
+        "question": "Which primary papers on affine arithmetic and interval dependency explain how to preserve repeated occurrences of the same uncertain variable when evaluating affine expressions, and how dependency differs from treating separate intervals independently? In particular, identify the original de Figueiredo and Stolfi work and author-hosted full papers.",
+        "selected_title": "Generalized Intervals and the Dependency Problem"
+      },
+      {
+        "tool": "SciSpace.search_papers",
+        "question": "How do Jorge Stolfi and Luiz Henrique de Figueiredo's original 2003 paper 'An Introduction to Affine Arithmetic' and their 2004 paper 'Affine Arithmetic: Concepts and Applications' define shared noise symbols and exact affine operations to handle repeated-variable interval dependency?",
+        "selected_title": "An Introduction to Affine Arithmetic"
+      },
+      {
+        "tool": "Exa.web_search_exa",
+        "question": "Author-hosted original paper Affine arithmetic concepts and applications Luiz Henrique de Figueiredo Jorge Stolfi 2004 interval dependency cancellation PDF"
+      },
+      {
+        "tool": "Exa.web_search_exa",
+        "question": "Find the author-hosted journal full paper Affine arithmetic: concepts and applications on lhf.impa.br or ic.unicamp.br, by de Figueiredo and Stolfi, 2004, rather than oral presentation slides."
+      }
+    ],
+    "primary_papers": [
+      {
+        "id": "P1",
+        "authors": [
+          "Jorge Stolfi",
+          "Luiz Henrique de Figueiredo"
+        ],
+        "year": 2003,
+        "title": "An Introduction to Affine Arithmetic",
+        "journal": "TEMA",
+        "volume": "4",
+        "issue": "3",
+        "pages": "297-312",
+        "doi": "10.5540/TEMA.2003.04.03.0297",
+        "url": "https://lhf.impa.br/ftp/papers/tema.pdf",
+        "author_listing": "https://lhf.impa.br/publications.html",
+        "actual_read": "Full author-hosted 16-page PDF via Exa; web source also opened.",
+        "sections_used": [
+          "3.2 joint range/shared noise symbols",
+          "3.3.1 affine operations and cancellation",
+          "3.3.2 roundoff correlation warning"
+        ],
+        "source_claim": "Shared symbols preserve dependencies and affine operations combine coefficients; generic floating-point affine arithmetic requires separate rounding control.",
+        "our_inference": "Apply the established dependency principle to exact rational linear expressions of finite stored method candidates, without implementing general nonlinear affine arithmetic."
+      },
+      {
+        "id": "P2",
+        "authors": [
+          "Walter Krämer"
+        ],
+        "year": 2006,
+        "title": "Generalized Intervals and the Dependency Problem",
+        "journal": "PAMM",
+        "doi": "10.1002/PAMM.200610322",
+        "preprint": "BUW-WRSWT 2006/4",
+        "url": "http://www2.math.uni-wuppertal.de/~xsc/preprints/prep_06_4.pdf",
+        "actual_read": "University-hosted preprint full text fetched by Exa; separate web-open backend returned unavailable.",
+        "source_claim": "Repeated interval occurrences can discard dependence; generalized interval forms retain coefficient relationships.",
+        "our_inference": "Supports the dependency distinction only; no HE29 generalized-interval implementation claimed."
+      }
+    ],
+    "api_primary_sources": [
+      {
+        "id": "D1",
+        "url": "https://docs.python.org/3.12/library/fractions.html",
+        "fact": "float-to-Fraction preserves the actual float value; decimal-looking float can differ from a decimal rational."
+      },
+      {
+        "id": "D2",
+        "url": "https://docs.python.org/3.12/library/math.html#math.nextafter",
+        "fact": "nextafter takes the neighboring floating-point value in a specified direction."
+      }
+    ],
+    "retrieval_limitations": [
+      "2004 Numerical Algorithms metadata and author listing were read; full article click failed in web backend, so it is not used as core full-text evidence.",
+      "SCAN2002 oral slides are distinct from the 2004 journal article.",
+      "Exa and web exposed different Python 3.12 documentation patch versions; API semantics used are common and checked in local CPython 3.12.14.",
+      "No full copyrighted paper text copied into this public receipt; selected bibliography and short paraphrases only."
+    ]
+  },
+  "checks": {
+    "checks": [
+      {
+        "case": "repeated_reference_cancellation",
+        "detail": {
+          "enumerated_assignments": 2,
+          "exact_lower": "7",
+          "exact_upper": "7"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "decomposition_shared_reference_cancellation",
+        "detail": {
+          "enumerated_assignments": 4,
+          "exact_lower": "7/4",
+          "exact_upper": "7/4"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "signed_coefficient_product_extrema",
+        "detail": {
+          "enumerated_assignments": 4,
+          "exact_lower": "131",
+          "exact_upper": "136"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "duplicate_coefficient_aggregation",
+        "detail": {
+          "enumerated_assignments": 4,
+          "exact_lower": "-13",
+          "exact_upper": "-11"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "zero_coefficient_unused_missing_key",
+        "detail": {
+          "enumerated_assignments": 1,
+          "exact_lower": "0",
+          "exact_upper": "0"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "coherent_hull_strict_subset",
+        "detail": {
+          "coherent": [
+            "10",
+            "10"
+          ],
+          "methods": [
+            "DOP853",
+            "Radau"
+          ],
+          "product": [
+            "9",
+            "11"
+          ]
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "coherent_hull_can_equal_product",
+        "detail": {
+          "product_equals_coherent": true
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "missing_common_method_unavailable",
+        "detail": {
+          "coherent_status": "UNAVAILABLE",
+          "pair_admission_claim": false
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "stored_binary64_three_key_extrema",
+        "detail": {
+          "enumerated_assignments": 8,
+          "exact_lower": "-2563624312150687503067639822768166226209059035274605422450137957249871735032932555119912748239341709703905492090726513366213251575018414571287749085061413099852346827941302429567518975984426426792282146854707351389866146302624348749997360285298916715254225515081762200928915776932135539495286626578632539815353809325/1508014301265110212210531135789433919262563062937126445449153766240405586123431823342743394534566435927056356253600209291203385124994765794776479899441737755548338772926974008712671009764769795099197087276523896072521861519103442867235119310387667688286379400732806098106007386857498456032472308789536403591243235328",
+          "exact_upper": "-3468432892909753387630289688603136675389046695380221084401352564959157150232294283967898764466741318894881605411793781907767199766880446466691033235061555250405764414932901433152570433481805040405578878276275505860979823809127215623560075032028189815881698127212989201538850011460913627058156638472586133718261363545/3016028602530220424421062271578867838525126125874252890898307532480811172246863646685486789069132871854112712507200418582406770249989531589552959798883475511096677545853948017425342019529539590198394174553047792145043723038206885734470238620775335376572758801465612196212014773714996912064944617579072807182486470656"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "conversion_before_arithmetic_is_material",
+        "detail": {
+          "equal": false,
+          "operands_first_diff": "32425917317067571/36028797018963968",
+          "rounded_diff_then_fraction": "8106479329266893/9007199254740992"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "display_exact_zero",
+        "detail": {
+          "exact": "0",
+          "high_hex": "0x0.0p+0",
+          "low_hex": "0x0.0p+0",
+          "status": "FINITE_OUTWARD_DISPLAY"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "display_exact_binary64",
+        "detail": {
+          "exact": "3602879701896397/36028797018963968",
+          "high_hex": "0x1.999999999999ap-4",
+          "low_hex": "0x1.999999999999ap-4",
+          "status": "FINITE_OUTWARD_DISPLAY"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "display_rational_tenth",
+        "detail": {
+          "exact": "1/10",
+          "high_hex": "0x1.999999999999ap-4",
+          "low_hex": "0x1.9999999999999p-4",
+          "status": "FINITE_OUTWARD_DISPLAY"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "display_negative_tenth",
+        "detail": {
+          "exact": "-1/10",
+          "high_hex": "-0x1.9999999999999p-4",
+          "low_hex": "-0x1.999999999999ap-4",
+          "status": "FINITE_OUTWARD_DISPLAY"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "display_positive_half_min_subnormal",
+        "detail": {
+          "exact": "1/404804506614621236704990693437834614099113299528284236713802716054860679135990693783920767402874248990374155728633623822779617474771586953734026799881477019843034848553132722728933815484186432682479535356945490137124014966849385397236206711298319112681620113024717539104666829230461005064372655017292012526615415482186989568",
+          "high_hex": "0x0.0000000000001p-1022",
+          "low_hex": "0x0.0p+0",
+          "status": "FINITE_OUTWARD_DISPLAY"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "display_negative_half_min_subnormal",
+        "detail": {
+          "exact": "-1/404804506614621236704990693437834614099113299528284236713802716054860679135990693783920767402874248990374155728633623822779617474771586953734026799881477019843034848553132722728933815484186432682479535356945490137124014966849385397236206711298319112681620113024717539104666829230461005064372655017292012526615415482186989568",
+          "high_hex": "-0x0.0p+0",
+          "low_hex": "-0x0.0000000000001p-1022",
+          "status": "FINITE_OUTWARD_DISPLAY"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "display_exact_max_finite",
+        "detail": {
+          "exact": "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368",
+          "high_hex": "0x1.fffffffffffffp+1023",
+          "low_hex": "0x1.fffffffffffffp+1023",
+          "status": "FINITE_OUTWARD_DISPLAY"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "display_nonrepresentable_exact_point",
+        "detail": {
+          "exact": "32425917317067571/36028797018963968",
+          "high_hex": "0x1.ccccccccccccdp-1",
+          "low_hex": "0x1.cccccccccccccp-1",
+          "status": "FINITE_OUTWARD_DISPLAY"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "finite_exact_overflow_rejected_for_float_display",
+        "detail": {
+          "exact_numerator_preserved": true,
+          "status": "FINITE_FLOAT_DISPLAY_UNAVAILABLE"
+        },
+        "status": "PASS"
+      },
+      {
+        "case": "nonfinite_and_nonfloat_stored_value_rejection",
+        "detail": {
+          "rejected_inputs": 5
+        },
+        "status": "PASS"
+      }
+    ],
+    "float_mant_dig": 53,
+    "float_radix": 2,
+    "he29_numeric_results_recomputed": 0,
+    "implementation": "CPython",
+    "independent_theory_checks": 20,
+    "native_runs": 0,
+    "old_tests_run": 0,
+    "runtime": "3.12.14",
+    "status": "PASS",
+    "definition": "20 unique manufactured theory cases. Repeated confirmation is not counted as new cases.",
+    "oracle_independence": "Product extrema use the coefficient-sign formula; the enumeration oracle evaluates original uncombined terms with one assignment per distinct key.",
+    "checker_source": "import itertools, json, math, platform, sys\nfrom fractions import Fraction as F\n\ndef exact_float(v):\n    if type(v) is not float or not math.isfinite(v):\n        raise ValueError(\"finite stored float required\")\n    return F.from_float(v)\n\ndef combined(terms):\n    acc={}\n    for key,a in terms:\n        acc[key]=acc.get(key,F(0))+a\n    return {k:a for k,a in acc.items() if a}\n\ndef product_hull(c,terms,candidates):\n    coeff=combined(terms)\n    lower=upper=c\n    for key,a in sorted(coeff.items()):\n        values=list(candidates[key].values())\n        if not values:\n            raise ValueError(\"missing active candidate\")\n        low,high=min(values),max(values)\n        lower+=a*(low if a>0 else high)\n        upper+=a*(high if a>0 else low)\n    return lower,upper\n\ndef oracle_product(c,terms,candidates):\n    keys=sorted({key for key,a in terms if a})\n    missing={key for key in keys if key not in candidates}\n    for key in missing:\n        assert sum((a for k,a in terms if k==key),F(0))==0\n    keys=[key for key in keys if key not in missing]\n    # Oracle evaluates original, uncombined terms using one value per shared key.\n    values=[]\n    for choices in itertools.product(*(list(candidates[k].values()) for k in keys)):\n        assignment=dict(zip(keys,choices))\n        values.append(c+sum((a*assignment[k] for k,a in terms if k not in missing),F(0)))\n    return min(values),max(values),len(values)\n\ndef coherent_hull(c,terms,candidates):\n    coeff=combined(terms)\n    if not coeff:\n        return c,c,[\"SYMBOLIC_CONSTANT\"]\n    labels=set.intersection(*(set(candidates[k]) for k in coeff))\n    if not labels:\n        return None,None,[]\n    values=[c+sum((a*candidates[k][label] for k,a in coeff.items()),F(0)) for label in sorted(labels)]\n    return min(values),max(values),sorted(labels)\n\ndef display(q):\n    try:\n        f=float(q)\n    except OverflowError:\n        return {\"status\":\"FINITE_FLOAT_DISPLAY_UNAVAILABLE\",\"exact\":str(q)}\n    if not math.isfinite(f):\n        return {\"status\":\"FINITE_FLOAT_DISPLAY_UNAVAILABLE\",\"exact\":str(q)}\n    low=math.nextafter(f,-math.inf) if F.from_float(f)>q else f\n    high=math.nextafter(f,math.inf) if F.from_float(f)<q else f\n    if not math.isfinite(low) or not math.isfinite(high):\n        return {\"status\":\"FINITE_FLOAT_DISPLAY_UNAVAILABLE\",\"exact\":str(q)}\n    assert F.from_float(low)<=q<=F.from_float(high)\n    assert low==high or math.nextafter(low,math.inf)==high\n    return {\"status\":\"FINITE_OUTWARD_DISPLAY\",\"low_hex\":low.hex(),\"high_hex\":high.hex(),\"exact\":str(q)}\n\nA={\"a\":{\"Radau\":F(100),\"DOP853\":F(101)},\n   \"b\":{\"Radau\":F(110),\"DOP853\":F(111)}}\ntests=[]\ndef record(name,action):\n    detail=action()\n    tests.append({\"case\":name,\"status\":\"PASS\",\"detail\":detail})\ndef check_hull(c,terms,candidates,expected=None):\n    actual=product_hull(c,terms,candidates)\n    oracle=oracle_product(c,terms,candidates)\n    assert actual==oracle[:2],(actual,oracle)\n    if expected is not None: assert actual==expected\n    return {\"exact_lower\":str(actual[0]),\"exact_upper\":str(actual[1]),\"enumerated_assignments\":oracle[2]}\n\nrecord(\"repeated_reference_cancellation\",lambda:check_hull(F(7),[(\"a\",F(1)),(\"a\",F(-1))],A,(F(7),F(7))))\nrecord(\"decomposition_shared_reference_cancellation\",lambda:check_hull(exact_float(10.25)-exact_float(8.5),[(\"b\",F(1)),(\"a\",F(-1)),(\"b\",F(-1)),(\"a\",F(1))],A,(F(7,4),F(7,4))))\nrecord(\"signed_coefficient_product_extrema\",lambda:check_hull(F(3),[(\"a\",F(-2)),(\"b\",F(3))],A,(F(131),F(136))))\nrecord(\"duplicate_coefficient_aggregation\",lambda:check_hull(F(-2),[(\"a\",F(3,2)),(\"a\",F(-1,2)),(\"b\",F(-1))],A,(F(-13),F(-11))))\nrecord(\"zero_coefficient_unused_missing_key\",lambda:check_hull(F(0),[(\"absent\",F(3)),(\"absent\",F(-3))],{},(F(0),F(0))))\ndef coherent_strict():\n    p=product_hull(F(0),[(\"b\",F(1)),(\"a\",F(-1))],A)\n    h=coherent_hull(F(0),[(\"b\",F(1)),(\"a\",F(-1))],A)\n    assert p==(F(9),F(11)) and h[:2]==(F(10),F(10))\n    return {\"product\":[str(v) for v in p],\"coherent\":[str(v) for v in h[:2]],\"methods\":h[2]}\nrecord(\"coherent_hull_strict_subset\",coherent_strict)\ndef coherent_anti():\n    candidates={\"a\":{\"Radau\":F(100),\"DOP853\":F(101)},\"b\":{\"Radau\":F(111),\"DOP853\":F(110)}}\n    terms=[(\"b\",F(1)),(\"a\",F(-1))]\n    p=product_hull(F(0),terms,candidates); h=coherent_hull(F(0),terms,candidates)\n    assert p==h[:2]==(F(9),F(11))\n    return {\"product_equals_coherent\":True}\nrecord(\"coherent_hull_can_equal_product\",coherent_anti)\ndef no_common():\n    candidates={\"a\":{\"Radau\":F(1)},\"b\":{\"DOP853\":F(2)}}\n    h=coherent_hull(F(0),[(\"a\",F(1)),(\"b\",F(1))],candidates)\n    assert h==(None,None,[])\n    return {\"coherent_status\":\"UNAVAILABLE\",\"pair_admission_claim\":False}\nrecord(\"missing_common_method_unavailable\",no_common)\ndef three_key():\n    candidates={\"a\":{\"Radau\":exact_float(0.1),\"DOP853\":exact_float(0.2)},\"b\":{\"Radau\":exact_float(-0.4),\"DOP853\":exact_float(-0.3)},\"c\":{\"Radau\":exact_float(1e-300),\"DOP853\":exact_float(math.nextafter(1e-300,math.inf))}}\n    return check_hull(exact_float(0.1),[(\"a\",F(-3)),(\"b\",F(7,2)),(\"c\",F(-2)),(\"a\",F(1))],candidates)\nrecord(\"stored_binary64_three_key_extrema\",three_key)\ndef early_rounding():\n    a=exact_float(1.0); b=exact_float(0.1)\n    exact=a-b; rounded=exact_float(1.0-0.1)\n    assert exact!=rounded\n    assert b!=F(1,10)\n    return {\"operands_first_diff\":str(exact),\"rounded_diff_then_fraction\":str(rounded),\"equal\":False}\nrecord(\"conversion_before_arithmetic_is_material\",early_rounding)\nfor label,q in [\n    (\"display_exact_zero\",F(0)),\n    (\"display_exact_binary64\",exact_float(0.1)),\n    (\"display_rational_tenth\",F(1,10)),\n    (\"display_negative_tenth\",F(-1,10)),\n    (\"display_positive_half_min_subnormal\",F(1,2**1075)),\n    (\"display_negative_half_min_subnormal\",F(-1,2**1075)),\n    (\"display_exact_max_finite\",exact_float(sys.float_info.max)),\n    (\"display_nonrepresentable_exact_point\",exact_float(1.0)-exact_float(0.1))\n]:\n    record(label,lambda q=q:display(q))\ndef overflow():\n    d=display(exact_float(sys.float_info.max)*2)\n    assert d[\"status\"]==\"FINITE_FLOAT_DISPLAY_UNAVAILABLE\"\n    return {\"status\":d[\"status\"],\"exact_numerator_preserved\":True}\nrecord(\"finite_exact_overflow_rejected_for_float_display\",overflow)\ndef bad_inputs():\n    rejected=0\n    for v in [float(\"nan\"),float(\"inf\"),float(\"-inf\"),True,\"1.0\"]:\n        try: exact_float(v)\n        except ValueError: rejected+=1\n    assert rejected==5\n    return {\"rejected_inputs\":rejected}\nrecord(\"nonfinite_and_nonfloat_stored_value_rejection\",bad_inputs)\nprint(json.dumps({\"status\":\"PASS\",\"independent_theory_checks\":len(tests),\"runtime\":sys.version.split()[0],\"implementation\":platform.python_implementation(),\"float_radix\":sys.float_info.radix,\"float_mant_dig\":sys.float_info.mant_dig,\"native_runs\":0,\"old_tests_run\":0,\"he29_numeric_results_recomputed\":0,\"checks\":tests},sort_keys=True))\n",
+    "rerun_command": "python -c \"import json,pathlib; d=json.loads(pathlib.Path('research/he29_survival_budget_20261018/continuation_20261020T0557Z/evidence/THEORY_REVIEW.json').read_text()); exec(compile(d['checks']['checker_source'],'THEORY_REVIEW_checker','exec'))\"",
+    "first_failure_observed": false,
+    "checker_source_sha256": "e5fad1e5eaf5b03a2004d0ae8ea647dcca7b2b3509214a3e0220ef9ef8ca960a"
+  },
+  "implementation_review": {
+    "status": "PENDING_ROOT_IMPLEMENTATION",
+    "actual_new_root_source_read": [],
+    "required_items": [
+      "same-model and cross-case identity admission",
+      "original signed endpoints and exact conversion order",
+      "shared-key coefficient aggregation",
+      "product versus coherent method labels",
+      "exact width versus display enclosure",
+      "partial method/timeout/missing wall-time classification",
+      "old mixed difference evidence reuse"
+    ]
+  },
+  "holds": [
+    "continuous spectrum certification",
+    "global gas-temperature error bound",
+    "whole EoR",
+    "full upstream Grackle equivalence",
+    "observational Bianchi/CMB"
+  ],
+  "publication": {
+    "status": "LOCAL_REVIEW_ARTIFACT_ROOT_PUBLISH_PENDING",
+    "remote_write_by_this_reviewer": false
+  },
+  "backup": {
+    "status": "ROOT_BACKUP_RECEIPT_REQUIRED_FOR_NEW_ARTIFACT",
+    "provider_upload_by_this_reviewer": false
+  }
+}

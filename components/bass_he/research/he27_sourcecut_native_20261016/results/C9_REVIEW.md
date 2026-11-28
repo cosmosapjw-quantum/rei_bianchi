@@ -1,0 +1,8 @@
+# Actual bounded independent scientific review
+Native child `/root/he27_review`, bass_reviewer, read-only pass completed. No source edits, native calls or evolution solves by reviewer. Frozen source470ab942 and original HE25/HE23/native identities checked. No BLOCK_NOW for bounded native A/B; current reference stall subsequently prevents convergence admission.
+
+Reproduced FIX_SOON: source_moments ignores inherited interval masks. At q0,m4,GL4 first crossing x6.613164551015428e-6, normalized left/right source L1 jump1.6897612561510153e-4; first HI source mode5.094141321325857e-6→0, but choosing left/right interval at exact crossing returns same source vector. Endpoint one-sided source selection does not match inherited reference contract; require correct handling in a future opt-in revision or independent reference stability.
+
+Moment compression conserves source N/U/species sigma/heat by angular direction and active threshold band, but not all future nonlinear attenuation kernels. Narrow strips still use4nodes; continuous spectral convergence HOLD. Manufactured shell0.00515 is not EoR. Resource4GiB process cap is enforced, parent must measure2GiB disk cap. Case source identities omit driver/HE21 but complete C5_SOURCE_MANIFEST contains them: final execution binding must explicitly link it.
+
+Pilot n16 delta9.42625e-9K cannot certify source bias before new-RHS adaptive reference and time refinement: baseline n16 reference error5.514e-9K is comparable. Parent preserved first reference failure and commenced one source-regularity repair with unchanged physics/moment gates. No recursive review requested.

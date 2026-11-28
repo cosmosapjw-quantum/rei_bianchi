@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>ENDF Releases: Changelog</title>
+	<link rel="icon" type="image/svg+xml" href="/common/images/NNDC_Barn_Logomark_RGB.svg">
+	<link rel="alternate icon" href="/common/images/favicon.ico">
+	<link rel="stylesheet" href="/common/styles/style.css">
+	<link rel="stylesheet" href="/common/styles/lib/all.min.css">
+	<link rel="stylesheet" href="../../styles/style.css">
+	<!-- TODO: Google Analytics -->
+</head>
+
+<body>
+	<header id="header"></header>
+	<main>
+        <div id="mdContainer"></div>
+	</main>
+	<footer id="footer"></footer>
+</body>
+<script src="/common/js/nndcMenu.js"></script>
+<script src="../../js/lib/marked.min.js"></script>
+<script>
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    let sublibrary = urlParams.get("sublibrary");
+    fetch(`./${sublibrary}/CHANGELOG.md`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`File not found: ${response.status}`);
+        }
+        return response.text();
+    })
+    .then(data => {
+        let markdown = data;
+
+        let container = document.getElementById("mdContainer");
+        container.innerHTML = marked.parse(data);
+    })
+    .catch(error => {
+        let countdown = 5;
+        let container = document.getElementById("mdContainer");
+        container.innerHTML = `<p>Changelog not found.<br>Redirecting to ENDF Releases in <span>${countdown}...</span></p>`;
+        const interval = setInterval(() => {
+            countdown--;
+            container.innerHTML = `<p>Changelog not found.<br>Redirecting to ENDF Releases in <span>${countdown}...</span></p>`;
+            if (countdown <= 0) {
+                clearInterval(interval);
+                window.location.href = "/endf-releases";
+            }
+        }, 1000);
+    });
+
+ 
+</script>
+
+</html>

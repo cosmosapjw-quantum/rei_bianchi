@@ -1,0 +1,145 @@
+{
+  "schema": "HE_DRIFT02_LOCAL_DAG_V1",
+  "unit_id": "HE-EXP-DRIFT-02",
+  "central_baseline": "a5db4bac9dafadae29685bbea3cec7f43ab990b2",
+  "central_node_count": 88,
+  "local_nodes": [
+    {
+      "id": "HED-SOURCE92",
+      "state": "COMPLETE_SCOPED_SOURCE_PROJECTION",
+      "depends_on": [],
+      "evidence": "sources/CONSUMER_PROJECTION.json",
+      "owner": "HE consumer; WU authority",
+      "latest_source_refresh": "sources/r3_update/OVERLAY.json",
+      "current_source_counts": {
+        "species_identities": 92,
+        "roles": {
+          "anion": 1,
+          "atomic": 70,
+          "electron": 3,
+          "molecular": 17,
+          "neutron": 1
+        },
+        "provider_variants": {
+          "R1": 102,
+          "R2": 26,
+          "R3": 4,
+          "total": 132
+        },
+        "saved_event_columns": {
+          "R1": 125,
+          "R2": 24,
+          "total": 149
+        },
+        "new_species": 0,
+        "new_compiled_columns": 0,
+        "original_target_IDs": 19,
+        "original_directions": 28,
+        "directions_with_primary_source_references": 28,
+        "directions_without_primary_source_references": [],
+        "new_native_numerical_rows": 36,
+        "SIG_rows": 24,
+        "DA_CM_rows": 12,
+        "auxiliary_E2_rows": 7
+      }
+    },
+    {
+      "id": "HED-MASS2",
+      "state": "VERIFIED_SOURCE_FIELD_CONVERSION",
+      "depends_on": [
+        "HED-SOURCE92"
+      ],
+      "evidence": "evidence/NEUTRAL_MASS_CONVERSION.json",
+      "owner": "HE selected consumer"
+    },
+    {
+      "id": "HED-SAME-LAW",
+      "state": "DERIVED_IMPLEMENTATION_VERIFIED_CONDITIONAL",
+      "depends_on": [],
+      "evidence": "THEORY_KO.md",
+      "owner": "HE"
+    },
+    {
+      "id": "HED-FIT-DIAGNOSTIC",
+      "state": "COMPLETE_SCOPED_NONZERO_RESIDUAL",
+      "depends_on": [
+        "HED-SAME-LAW"
+      ],
+      "evidence": "evidence/SOURCE_DIAGNOSTIC.json",
+      "owner": "HE"
+    },
+    {
+      "id": "HED-ENERGY-OWNERSHIP",
+      "state": "DERIVED_IMPLEMENTATION_VERIFIED_CONDITIONAL",
+      "depends_on": [
+        "HED-SAME-LAW"
+      ],
+      "evidence": "MODEL_CONTRACT.json",
+      "owner": "HE"
+    },
+    {
+      "id": "HED-PHYSICAL-PAIR",
+      "state": "SOURCE_INPUT_PENDING",
+      "depends_on": [
+        "HED-MASS2",
+        "HED-FIT-DIAGNOSTIC",
+        "HED-ENERGY-OWNERSHIP"
+      ],
+      "needs": [
+        "same-law compatible source moments or an explicit joint fit/potential model with quantified error",
+        "calibrated transport source uncertainty and parameter/input covariance",
+        "actual isotope/state validity beyond a conditional classical fixed-potential inference"
+      ],
+      "owner": "HE"
+    },
+    {
+      "id": "HED-ALL-TARGET-JOINT-DEPOSITION",
+      "state": "CHANNEL_DEPENDENT_SOURCE_INPUT_PENDING",
+      "depends_on": [
+        "HED-SOURCE92"
+      ],
+      "needs": [
+        "full angular and joint final-state law for selected inelastic/recoil channels",
+        "channel-qualified degradation/deposition; CR retains external distribution/cascade/stopping ownership"
+      ],
+      "owner": "HE consumer / WU REC CR lead boundaries retained"
+    },
+    {
+      "id": "HED-REDUCTION-FEEDBACK",
+      "state": "INPUT_DEPENDENT_NOT_SCHEDULED",
+      "depends_on": [
+        "HED-PHYSICAL-PAIR"
+      ],
+      "needs": [
+        "common-temperature/common-velocity reduction requires timescale and observable-error evidence"
+      ],
+      "owner": "HE / REI selected consumer"
+    }
+  ],
+  "scoped_progress": {
+    "complete_or_conditional_verified": 5,
+    "local_nodes_total": 8,
+    "meaning": "local work products; not physical species coverage or parent completion"
+  },
+  "HE101_C8": "PARTIAL_EXPORT",
+  "HE101_delivery": "19/20",
+  "HE101_new_STARTs": 0,
+  "physical_provider_admitted": false,
+  "global_physical_completion": null,
+  "L4_ready": false,
+  "current_central_observed_head": "5abe0d19df95db730e3e33bae0373c81ba37ce89",
+  "central_prepared_changes": {
+    "nodes": [
+      "HE-EXCHANGE",
+      "HE-EXP-PAIR",
+      "HE-CLOSURE",
+      "HE-EXP-CLOSURE"
+    ],
+    "changed_fields": [
+      "status_observation"
+    ],
+    "other_nodes_unchanged": 84,
+    "remote_published": false,
+    "candidate": "delivery/central/result/"
+  }
+}

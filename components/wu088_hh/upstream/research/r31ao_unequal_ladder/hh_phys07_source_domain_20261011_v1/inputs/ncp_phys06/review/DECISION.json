@@ -1,0 +1,60 @@
+{
+  "review_cycle": "ONE_FOCUSED_REVIEW_WITH_SAME_FINDING_CLOSURE",
+  "initial_decision": "REQUEST_CHANGES",
+  "final_decision": "APPROVE_SCOPED_IMPLEMENTATION",
+  "scope": "Conditional nonnative arithmetic and implementation; no native or physical promotion",
+  "reviewer": {
+    "identity": "/root/phys06_ncp_decision",
+    "candidate_generation": false,
+    "test_design": false,
+    "source_modifications": 0,
+    "build_test_native_executions": 0,
+    "additional_reviewers": 0,
+    "runtime_model_attestation": null
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "status": "CLOSED",
+      "original_issue": "Validated LinearBounds/MixedBounds payloads publicly mutable; downstream finite/observable/paired could consume replaced W",
+      "resolution": "RootBounds reporting fields and LinearBounds/MixedBounds consumed derivative payloads private with readonly accessors"
+    },
+    {
+      "id": "R2",
+      "status": "CLOSED",
+      "original_issue": "Unit-Theta ga=gb=-1 inconsistent with small X/Gc; centre-only observable gradient did not cover whole X",
+      "resolution": "Theta=[0,1/128]^2, Gc=[-1/64,0] for y_i=center_i+lambda+b; gradient[0]=[-.5,.5] whole-X enclosure",
+      "closure_basis": "Source inspection and interval monotonicity: widening adds interval containing zero, preserving previous containment witnesses"
+    }
+  ],
+  "execution_evidence": {
+    "six_original_targets": "PASS retained as original-version evidence",
+    "finite_observable_coverage_review_recheck": "PASS before final gradient widening",
+    "build_observable_gradient_exit": 0,
+    "post_gradient_widening_target_execution": null
+  },
+  "limitations": [
+    "Final widened fixture built, not executed again",
+    "Observable partials and paired joint enclosures are supplied conditional premises",
+    "Actual source enclosures/adapter runtime unresolved",
+    "Actual uniform root/tube, W, finite I, paired defect, continuous error null/HOLD"
+  ],
+  "chronology": [
+    {
+      "phase": "initial focused review",
+      "decision": "REQUEST_CHANGES",
+      "findings": [
+        "R1",
+        "R2"
+      ]
+    },
+    {
+      "phase": "same-cycle source resolution",
+      "status": "R1 closed; small Theta/Gc closed; whole observable gradient bound still needed"
+    },
+    {
+      "phase": "same R2 detail closure",
+      "status": "Gradient widened; build PASS; source-only interval inclusion verified; no extra target execution"
+    }
+  ]
+}

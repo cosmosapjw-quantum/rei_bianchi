@@ -1,0 +1,86 @@
+{
+  "schema": "he_ang.coding_execution_plan.v1",
+  "frozen_contract": "CONTRACT.json",
+  "frozen_budget": "BUDGET.json",
+  "ledger": "RESOURCE_LEDGER.json",
+  "known_before_C6": {
+    "cpu_s": 0.211275,
+    "wall_s": 0.1680309520015726,
+    "remaining_cpu_s": 9.788725,
+    "remaining_wall_s": 29.831969047998427
+  },
+  "nodes": [
+    {
+      "id": "C5",
+      "action": "Copy exact author manifest identity; preserve independent review input, source control is root-owned"
+    },
+    {
+      "id": "C6",
+      "depends_on": [
+        "C5"
+      ],
+      "action": "Run new affected controls once via run_bounded.py",
+      "command": [
+        "python",
+        "run_bounded.py",
+        "--label",
+        "C6_affected_controls",
+        "--",
+        "python",
+        "code/controls.py"
+      ],
+      "expected": "zero failed controls; raw expected/actual outcomes and child/wrapper resource receipt"
+    },
+    {
+      "id": "C7",
+      "depends_on": [
+        "C6"
+      ],
+      "action": "Compare exact output to saved R7 oracle/hand theory; no prior suite replay"
+    },
+    {
+      "id": "C8",
+      "depends_on": [
+        "C7"
+      ],
+      "action": "Saved hashes, source/execution input identities, cumulative ledger and archive verifier; no timing rerun"
+    },
+    {
+      "id": "C9",
+      "depends_on": [
+        "C8"
+      ],
+      "action": "Independent final review of actual code/results/receipts; preserve failed attempts if present"
+    },
+    {
+      "id": "C10",
+      "depends_on": [
+        "C9"
+      ],
+      "action": "20-stage scope verdict, human/executor handoff, reviewed expected-SHA publication and final dual backup"
+    }
+  ],
+  "per_invocation": {
+    "cpu_s": 2,
+    "wall_s": 5,
+    "address_space_bytes": 268435456
+  },
+  "roles": {
+    "author": "heang_event_contract",
+    "reviewer": "heang_independent_review",
+    "resource_auditor": "heang_x1_dependency",
+    "controller_executor": "root"
+  },
+  "counter_scope": {
+    "new_IVP": 0,
+    "provider_scan": 0,
+    "old_X1_suite": 0,
+    "old_HE38_suite": 0,
+    "old_HE32_suite": 0,
+    "benchmark": 0,
+    "render": 0
+  },
+  "failure_policy": "Preserve failed raw output and cost; fix only affected dependency; never reset ledger; no unresolved START permitted at completion",
+  "model_identity": "Agents inherit current parent; no separate model provenance inferred from requested aliases",
+  "publication": "No scientific Git ref move until independent accepted review. Each stage dual archive ACK precedes next node."
+}

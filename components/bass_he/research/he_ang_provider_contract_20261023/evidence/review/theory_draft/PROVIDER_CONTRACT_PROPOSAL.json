@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "schema": "heang.provider_contract.proposal.v1",
+  "workflow_version": "1.0.0",
+  "approval_version": "0.2",
+  "unit_id": "HE-ANG",
+  "artifact_status": "CONTRACT_DERIVED_SOURCE_PENDING",
+  "scope": "Finite-mass H1 ionization source/frame/event-correlation admission contract; no empirical source selected here.",
+  "source_identity": {
+    "provider_id": null,
+    "source_class": null,
+    "source_class_allowed": [
+      "measured",
+      "primary_theory_calculation",
+      "literature_approximation",
+      "manufactured_fixture"
+    ],
+    "primary_url_or_doi": null,
+    "version": null,
+    "content_sha256": null,
+    "license_or_reuse_basis": null,
+    "source_model_id": null,
+    "differential_law_id": null,
+    "same_event_measure_id": null,
+    "required_shared_identity_members": [
+      "total_sigma",
+      "electron_inclusive",
+      "ion_or_pair_correlation",
+      "moments"
+    ],
+    "source_preparation": {
+      "target_state": "H1 ground-state only in current scope",
+      "target_velocity_distribution": null,
+      "spin_polarization": null,
+      "instrument_convolution": null
+    },
+    "empirical_calibration_status": "UNKNOWN"
+  },
+  "physical_convention": {
+    "process": "e + H -> e + e + p",
+    "kinetic_masses": {
+      "electron": "m",
+      "proton": "M",
+      "neutral_H": "h=M+m",
+      "total": "L=M+2m"
+    },
+    "threshold": {
+      "symbol": "I",
+      "units": "J",
+      "value": null,
+      "source": null
+    },
+    "constants_explicit": [
+      "c_light",
+      "hbar",
+      "k_B"
+    ],
+    "mass_defect_policy": "I/c_light^2 belongs to internal-energy convention; kinetic h=M+m as inherited HE38.",
+    "approximation": "Nonrelativistic Galilean kinetic model; same mass convention in every channel.",
+    "incoming_energy": "E=(m*(M+m)/(M+2*m))*|v_e-v_H|^2/2",
+    "available_energy": "W=E-I",
+    "beam_axis": "a=(v_e-v_H)/|v_e-v_H|",
+    "signature_if_covariant_extension": "(-,+,+,+)"
+  },
+  "units": {
+    "system": "SI",
+    "energy": "J",
+    "mass": "kg",
+    "momentum": "kg*m/s",
+    "cross_section": "m^2",
+    "inclusive_ddcs": "m^2/(J*sr)",
+    "conditional_inclusive_ddcs": "1/(J*sr)",
+    "conditional_N": "1/event",
+    "conditional_P": "kg*m/s/event",
+    "conditional_R": "J/event",
+    "source_wavenumber_conversion": "q=hbar*k"
+  },
+  "representation": {
+    "type": null,
+    "allowed": [
+      "joint_event_measure",
+      "joint_moment_certificate",
+      "inclusive_electron_marginal"
+    ],
+    "normalization": null,
+    "normalization_allowed": [
+      "conditional_event",
+      "cross_section_weighted"
+    ],
+    "total_measure": "1 if conditional_event and sigma>0; sigma if cross_section_weighted",
+    "zero_sigma_policy": "Cross-section moments vanish; conditional probability undefined and never divided by zero.",
+    "coordinate_density": null,
+    "coordinate_density_allowed": [
+      "momentum_measure",
+      "energy_solid_angle",
+      "fivefold_joint_shell_density",
+      "discrete_events",
+      "moment_certificate"
+    ],
+    "fivefold_root_convention": "All nonnegative physical roots of A*r^2+B*r+C=0; source owns Jacobian and degenerate-root treatment.",
+    "sigma_is_relative_flux_normalized": null
+  },
+  "electrons": {
+    "label_convention": null,
+    "label_convention_allowed": [
+      "unordered_physical_events",
+      "ordered_exchange_symmetric_lift",
+      "energy_ordered_domain_with_partner_rule"
+    ],
+    "exchange_factor_already_in_source": null,
+    "quantum_exchange_interference_source_reference": null,
+    "inclusive_count": 2,
+    "slow_electron_support": null,
+    "partner_reconstruction": null,
+    "detector_cuts": null
+  },
+  "frame": {
+    "source_frame": null,
+    "required_output_frame": "common incident-pair COM",
+    "source_energy_coordinate": null,
+    "source_axis_definition": null,
+    "source_target_motion": null,
+    "basis_rotation": null,
+    "boost_velocity": null,
+    "source_to_contract_map_reference": null,
+    "stationary_target_energy_map": "E=zeta*E_lab, zeta=(M+m)/(M+2*m)",
+    "total_sigma_parameter_map": "sigma_lab(E_lab)=sigma_COM(zeta*E_lab); no density Jacobian for parameter relabeling.",
+    "joint_event_boost": "q_i'=O*(q_i-m_i*U)",
+    "energy_angle_density_pushforward": "d^3q=m*|q|*dE*dOmega; transform full measure and coverage.",
+    "axis_map": "a'=O*a for relative incident axis",
+    "frame_uncertainty": null
+  },
+  "domain": {
+    "incident_energy_J": null,
+    "outgoing_energy_J": null,
+    "solid_angle_support": null,
+    "energy_sharing": null,
+    "ion_recoil": null,
+    "source_preparation_domain": null,
+    "interpolation_rule": null,
+    "extrapolation": "NONE unless separately source-qualified and budgeted",
+    "uncovered_region": null,
+    "uncovered_region_bound_reference": null
+  },
+  "event_support": {
+    "momentum": "q1+q2+qp=0",
+    "energy": "(|q1|^2+|q2|^2)/(2*m)+|qp|^2/(2*M)=E-I",
+    "positivity": "nonnegative physical event measure",
+    "support_certificate_kind": null,
+    "support_certificate_reference": null,
+    "common_law_compatibility_reference": null,
+    "aggregate_cone_alone_sufficient": false,
+    "root_polynomial": {
+      "A": "1/(2*m)+1/(2*M)",
+      "B": "dot(q1,n2)/M",
+      "C": "A*|q1|^2-(E-I)",
+      "radial_delta_jacobian": "r^2/abs(2*A*r+B)"
+    }
+  },
+  "moment_interface": {
+    "species": [
+      "electron_gain",
+      "proton_gain"
+    ],
+    "required_raw_fields": [
+      "N",
+      "P[3]",
+      "R[3,3]"
+    ],
+    "definitions": {
+      "N": "<sum 1>",
+      "P": "<sum q>",
+      "R": "<sum q*q^T/m_s>",
+      "K": "trace(R)/2",
+      "S": "R/2",
+      "J": "R-trace(R)*Id/3",
+      "D": "(3*a^T*S*a-K)/2"
+    },
+    "normalization_tag_required": true,
+    "ion_reconstruction": {
+      "P_p": "-P_e",
+      "K_p": "E-I-K_e",
+      "R_p": "(m/M)*R_e+C12/M",
+      "C12": "<q1*q2^T+q2*q1^T>",
+      "trace_C12": "2*M*(E-I-K_e)-2*m*K_e",
+      "additional_information_for_ion_STF": "C12 STF or equivalent same-law ion second tensor"
+    },
+    "boost": {
+      "N_prime": "N",
+      "P_prime": "O*(P-m_s*N*U)",
+      "R_prime": "O*(R-U*P^T-P*U^T+m_s*N*U*U^T)*O^T",
+      "K_prime_before_rotation": "K-dot(U,P)+m_s*N*|U|^2/2"
+    },
+    "central": "R_c=R-u_s*P^T-P*u_s^T+m_s*N*u_s*u_s^T",
+    "signed_reactive_count_term_mandatory": true,
+    "gain_PSD_does_not_require_net_source_PSD": true,
+    "output_covariance_or_error_enclosure": null
+  },
+  "uncertainty_ledger": {
+    "physical": {
+      "status": "UNKNOWN",
+      "normalization": null,
+      "shape_and_bin_covariance": null,
+      "electron_ion_cross_covariance": null,
+      "preparation_and_frame": null,
+      "missing_domain": null,
+      "correlation_model_discrepancy": null,
+      "interpolation": null,
+      "confidence_or_bound_semantics": null,
+      "calibration_reference": null
+    },
+    "numerical": {
+      "quadrature": null,
+      "floating_point": null,
+      "representation": null,
+      "norm": null,
+      "absolute_near_zero_scale": null,
+      "calibration_or_proof_reference": null
+    },
+    "HE38_raw_1e_minus_8": "Prior model-numerics gate only; not populated as physical uncertainty.",
+    "unknown_physical_uncertainty_is_zero": false,
+    "target_observable_allocations": []
+  },
+  "imported_HE_X1": {
+    "status": "COMPLETE_SCOPED_REUSED",
+    "central_snapshot": "0f9d9df825be1dac9ca9bdf73cdc2e8908bcba17",
+    "science_commit": "eb03981d15ad291375dd6d574a9c28809f85fc02",
+    "completed_fixtures": 32,
+    "fixture_replays_in_child": 0,
+    "decision_enum_unchanged": [
+      "PASS",
+      "FAIL",
+      "INDETERMINATE"
+    ],
+    "qualifications_preserved": [
+      "represented_input_only",
+      "source_uncertainty"
+    ],
+    "empirical_admission_from_X1_pass": false
+  },
+  "admission_proposal": {
+    "overall": "CANDIDATE_RECORDED",
+    "overall_allowed": [
+      "CANDIDATE_RECORDED",
+      "PARTIAL_SCOPED",
+      "ADMITTED_SCOPED",
+      "DEFERRED_DEPENDENCY",
+      "REJECTED_INCONSISTENT"
+    ],
+    "capability_status_allowed": [
+      "AVAILABLE_DERIVED",
+      "ADMITTED_SCOPED",
+      "MISSING"
+    ],
+    "capabilities": [
+      {
+        "id": "event_measure_contract",
+        "status": "AVAILABLE_DERIVED",
+        "evidence": "ANGULAR_PROVIDER_DERIVATION.md"
+      },
+      {
+        "id": "same_marginal_different_ion_STF_witness",
+        "status": "AVAILABLE_DERIVED",
+        "evidence": "ANGULAR_PROVIDER_DERIVATION.md section 5"
+      },
+      {
+        "id": "empirical_electron_marginal",
+        "status": "MISSING",
+        "obligation": "Select and admit source, actual domain and uncertainty."
+      },
+      {
+        "id": "empirical_ion_second_tensor",
+        "status": "MISSING",
+        "obligation": "Same-law joint correlation or equivalent recoil certificate."
+      },
+      {
+        "id": "physical_error_budget",
+        "status": "MISSING",
+        "obligation": "Source-calibrated uncertainty allocations."
+      },
+      {
+        "id": "runtime_activation",
+        "status": "MISSING",
+        "obligation": "Separate parent claim gate; preserved no_activation."
+      }
+    ]
+  },
+  "execution_boundary": {
+    "scientific_execution_in_child": "NOT_RUN",
+    "new_IVP": 0,
+    "new_provider_scans": 0,
+    "new_literature_scans": 0,
+    "new_numeric_tests": 0,
+    "old_suite_replays": 0,
+    "new_benchmarks": 0,
+    "remote_mutations": 0,
+    "inherited_budget_policy": "Preserve consumed allocations; do not reset.",
+    "parent_new_verification_budget": "Parent freezes before new execution; no amount invented in this proposal.",
+    "no_merge": true,
+    "no_activation": true
+  },
+  "dependency_invalidation": [
+    {
+      "change": "angular law",
+      "reusable": "Finite-mass kinematics and conservation under same convention",
+      "affected": "Angular gain moments, source law identity and dependent coefficients"
+    },
+    {
+      "change": "energy-sharing law",
+      "reusable": "Event ledger and frame definitions",
+      "affected": "HE38 energy-partition compression and moment identities using that law"
+    },
+    {
+      "change": "total cross section",
+      "reusable": "Event normalization conventions and kinematics",
+      "affected": "Rate/radial moments and sigma-partition covariance"
+    },
+    {
+      "change": "frame or target preparation",
+      "reusable": "Raw moment transformation algebra",
+      "affected": "All transformed source moments, coverage and rate flux"
+    }
+  ],
+  "next_dependencies": [
+    "Source selection under its bounded admission budget",
+    "Independent scoped review",
+    "HE-EXCHANGE and HE-RESERVOIR before HE-CLOSURE"
+  ]
+}

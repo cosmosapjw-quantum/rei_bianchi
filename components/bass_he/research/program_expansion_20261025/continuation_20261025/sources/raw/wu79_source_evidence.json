@@ -1,0 +1,233 @@
+{
+  "schema": "phys79.atomic-source-evidence.v1",
+  "assembled_utc": "2026-10-22T01:40:29Z",
+  "acquisition_contract": {
+    "methods": [
+      "Exa web search",
+      "Exa web fetch",
+      "SciSpace search_papers",
+      "search_service open/search"
+    ],
+    "remote_original_bytes_retained": false,
+    "remote_original_sha256_verified": false,
+    "numeric_excerpts_are": "Extracted web text, selected and normalized where explicitly indicated; NOT original file bytes.",
+    "local_hashes_scope": "Local report/extraction bytes only; not original publisher or dataset bytes.",
+    "limitations": [
+      "PDF text extraction contains OCR artifacts.",
+      "Savin 2.7 K lower fit bound appears in OCR as merged subscript 2 + 2.7.",
+      "He ground-state branch full primary text not confirmed.",
+      "Kimura 1995 erratum retrieval returned unrelated content."
+    ]
+  },
+  "sources": [
+    {
+      "id": "VORONOV1997",
+      "doi": "10.1006/adnd.1997.0732",
+      "urls": [
+        "https://www.pa.uky.edu/~verner/dima/col/cfit.dat",
+        "https://www.pa.uky.edu/~verner/dima/col/cfit.txt",
+        "https://www.pa.uky.edu/~verner/dima/col/cfit.f"
+      ],
+      "evidence_type": "Author-hosted ASCII data/readme/subroutine, served as extracted text.",
+      "numeric_excerpt_verbatim": [
+        "H 1 1 13.6 0 0.291E-07 0.2320 0.39 1 20",
+        "He 2 2 24.6 0 0.175E-07 0.1800 0.35 1 20",
+        "He 1+ 2 1 54.4 1 0.205E-08 0.2650 0.25 3 20",
+        "Li 3 3 5.4 0 0.139E-06 0.4380 0.41 1 20",
+        "Li 1+ 3 2 75.6 1 0.201E-08 0.2090 0.23 4 20",
+        "Li 2+ 3 1 122.4 1 0.960E-09 0.5820 0.17 5 20"
+      ],
+      "columns": [
+        "ion label",
+        "Z",
+        "N electrons",
+        "dE eV",
+        "P",
+        "A cm^3/s",
+        "X",
+        "K",
+        "Tmin eV",
+        "Tmax keV"
+      ],
+      "formula": "A*(1+P*sqrt(U))*U^K*exp(-U)/(X+U); U=dE/(k_B*T in eV)",
+      "domain_guard": "Inclusive Tmin_eV <= k_B_eV_per_K*T <= 1000*Tmax_keV; otherwise reject evaluation for scientific execution.",
+      "isotope_reuse": "H1,D,T share H row; He3,He4 each share HeI/HeII; Li6,Li7 each share LiI/LiII/LiIII. This is an explicit elemental electron-impact isotope approximation.",
+      "channel_count": 13,
+      "author_subroutine_note": "T_e uses 8.617385e-5 eV/K and U>80 returns zero; keep numerical convention distinct from source domain."
+    },
+    {
+      "id": "SAVIN2002",
+      "doi": "10.1086/324218",
+      "urls": [
+        "http://user.astro.columbia.edu/~savin/papers/54551.web.pdf",
+        "https://iopscience.iop.org/article/10.1086/324218/pdf"
+      ],
+      "evidence_type": "Primary author-hosted PDF, Exa extracted text.",
+      "equation": 6,
+      "table": 2,
+      "raw_extracted_numeric_rows": [
+        "2.00E[10 | 0.402 | 37.1 | [3.31E[17 | 1.48",
+        "2.06E[10 | 0.396 | 33.0 | 2.03E[09 | [0.332"
+      ],
+      "normalization_note": "OCR '[' in numeric exponents/signs normalized to '-' by table structure and corroborating author table in Glover/Savin 2009.",
+      "formula": "a*T^b*exp(-c/T)+d*T^e",
+      "rate_unit": "cm^3/s",
+      "temperature_unit": "K",
+      "table_rows": [
+        {
+          "direction": "D(1s)+H+ -> D+ + H(1s)",
+          "a": 2e-10,
+          "b": 0.402,
+          "c": 37.1,
+          "d": -3.31e-17,
+          "e": 1.48
+        },
+        {
+          "direction": "D+ + H(1s) -> D(1s)+H+",
+          "a": 2.06e-10,
+          "b": 0.396,
+          "c": 33,
+          "d": 2.03e-9,
+          "e": -0.332
+        }
+      ],
+      "data_range_K": [
+        1,
+        200000
+      ],
+      "fit_range_K": [
+        2.7,
+        200000
+      ],
+      "fit_relative_error_bound": [
+        0.06,
+        0.04
+      ],
+      "endothermic_forward_rounded_defect": "3.7 meV (43 K)",
+      "ground_state_scope": "Only capture from/into 1s. The source states the ground-state channel dominates excited capture by >10^4 for T<3e4 K.",
+      "selected_new_model": {
+        "name": "reverse_fit_derived_balance_43K",
+        "source_reverse": "Original reverse fit",
+        "new_forward": "k_reverse(T)*exp(-43/T)",
+        "qualifier": "This forward is DERIVED, not the Savin independent forward fit.",
+        "assumptions": [
+          "Equal neutral/ion masses A*m_p per isotope in translational factors",
+          "Electronic degeneracy ratio 1",
+          "Nuclear spin cancels",
+          "No hyperfine partitioning",
+          "Consistent chemical-energy defect k_B*43 K"
+        ],
+        "raw_pair_role": "Comparison profile only, with detailed-balance residual reported."
+      }
+    },
+    {
+      "id": "KINGDON_FERLAND1996_HE_NR",
+      "doi": "10.1086/192335",
+      "urls": [
+        "https://articles.adsabs.harvard.edu/pdf/1996ApJS..106..205K",
+        "https://data.nublado.org/doxygen/c17.03/atmdat__char__tran_8cpp_source.html"
+      ],
+      "equation": 7,
+      "table": 1,
+      "evidence_type": "Primary PDF extracted numerical row plus independently inspected author-owned Cloudy source.",
+      "row_normalized": {
+        "a_in_1e9_cm3_s": 0.00000747,
+        "b": 2.06,
+        "c": 9.93,
+        "d": -3.89,
+        "Tmin_K": 6000,
+        "Tmax_K": 100000
+      },
+      "formula": "7.47e-15*(T/1e4)^2.06*(1+9.93*exp(-3.89*T/1e4)) cm^3/s",
+      "direction": "He+ + H -> He + H+",
+      "source_domain_status": "Coefficients/domain confirmed",
+      "energy_branch_status": "OPEN: full primary ground-state channel text not confirmed",
+      "execution_recommendation": "Quarantine He NR from the admitted conservative parcel pending channel-level energy verification.",
+      "underlying_primary_doi": "10.1103/PhysRevA.40.2340",
+      "derived_reverse_if_ground_state_closed": "4*(m_He+*m_H/(m_He*m_H+))^(3/2)*exp(-(I_He-I_H)/(k_B*T))*k_forward"
+    },
+    {
+      "id": "LITHIUM_NONRADIATIVE",
+      "primary_doi": "10.1086/174418",
+      "erratum_doi": "10.1086/176506",
+      "urls": [
+        "https://articles.adsabs.harvard.edu/pdf/1994ApJ...430..435K",
+        "https://articles.adsabs.harvard.edu/pdf/1995ApJ...454..545K",
+        "https://arxiv.org/pdf/astro-ph/9803315"
+      ],
+      "secondary_primary_model_table": "Galli & Palla 1998 Table4 Li7",
+      "formula_as_reported_GP98": "2.5e-40*T^7.9*exp(-T/1210) cm^3/s",
+      "direction": "Li(2s)+H+ -> Li+(1s2)+H(1s)",
+      "original_table_domain_K": [
+        100,
+        10000
+      ],
+      "corrected_fit_domain_status": "OPEN: original erratum not obtained correctly",
+      "observed_Tmax_domain_status": "Unsupported",
+      "execution_recommendation": "QUARANTINE"
+    },
+    {
+      "id": "STANCIL_ZYGELMAN1996_LI_RCT",
+      "doi": "10.1086/178044",
+      "url": "https://articles.adsabs.harvard.edu/pdf/1996ApJ...472..102S",
+      "evidence_type": "Primary PDF extracted text, OCR poor for Eq14 prefactor; range and Table1 values legible.",
+      "direction": "Li(2s)+H+ -> Li+(1s2)+H(1s)+photon",
+      "data_range_K": [
+        10,
+        40000
+      ],
+      "fit_range_K": [
+        20,
+        10000
+      ],
+      "fit_relative_error_bound": 0.05,
+      "GP98_formula": "1.7e-13*T^-0.051*exp(-T/282000) cm^3/s",
+      "table_tail_T_K": [
+        20000,
+        30000,
+        40000
+      ],
+      "table_tail_k_cm3_s": [
+        1.03e-13,
+        1.04e-13,
+        1.05e-13
+      ],
+      "spectrum_peak_nm": 158,
+      "asymptotic_defect_nm": 150.8,
+      "energy_moment_status": "OPEN; number rate cannot establish mean emitted photon energy.",
+      "execution_recommendation": "QUARANTINE from thermal closure"
+    },
+    {
+      "id": "GRACKLE_CODE",
+      "urls": [
+        "https://raw.githubusercontent.com/grackle-project/grackle/main/src/clib/rate_functions.c",
+        "https://raw.githubusercontent.com/grackle-project/grackle/main/LICENSE"
+      ],
+      "revision": "main inspected; not commit-pinned; do not import without pinning",
+      "license": "Enzo Public License / University of Illinois-NCSA copyright and disclaimer terms",
+      "observed_low_temperature_behavior": "k3/k5 tiny at Te<=0.8eV; k1 max(tiny, polynomial) in low regime",
+      "domain_inference": "Numerical floors are not a physical low-temperature fit certificate.",
+      "code_reuse_recommendation": "Independently implement published mathematical fits; if code copied, preserve actual pinned license notice."
+    }
+  ],
+  "search_execution": {
+    "Exa": {
+      "executed": true,
+      "queries_topic": "H/He/Li ionization and charge transfer primary sources, Voronov table, Savin D-H, Kingdon-Ferland, Kimura lithium, Stancil-Zygelman, Grackle/Janev"
+    },
+    "SciSpace": {
+      "executed": true,
+      "query": "What are the primary sources and validated temperature ranges for hydrogen, helium and lithium charge-exchange and electron-impact ionization rate coefficients in primordial gas at temperatures up to 30000 kelvin?",
+      "returned_paper_count": 10,
+      "role": "Discovery; primary coefficients taken from original sources, not synthesized search summaries."
+    }
+  },
+  "scientific_execution": {
+    "ODE_runs": 0,
+    "existing_trajectory_reruns": 0,
+    "scalar_checks": "Fresh Python checks only; values in companion report",
+    "remote_mutations": 0,
+    "production_admission": "NOT_ISSUED",
+    "HH_R10": "OFF"
+  }
+}

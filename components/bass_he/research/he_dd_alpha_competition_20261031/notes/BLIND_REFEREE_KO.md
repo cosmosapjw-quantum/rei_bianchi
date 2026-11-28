@@ -1,0 +1,14 @@
+# BASS_HE α-competition self-blind review, one bounded pass
+
+**Independence:** same-author adversarial review only, not independent external author/subagent.
+
+1. **Finding:** The three new Cyburt 2003 α photoreaction fits are published source equations but their 150–250 MeV use is an **extrapolation beyond data-supported high-energy validity**. Direct consequence: `P_npD / (2P_DD)~343` is a **conditional model contrast**, not an experimental ratio, no absolute source and no R_event. **Disposition:** BLOCK_PRODUCTION; all table/figure captions and output fields label extrapolation. No source switch.
+2. **Finding:** Rice 2000 DD input 8.29/4.34 nb is broad energy-bin angular-fit surrogate; real excitation function and flux/stat source issues remain. The Cyburt alternative at E=220 MeV is ~4,173 lower, but not an independent high-energy measurement. **Disposition:** sensitivity only, no substitution; exact Rice source remains locked.
+3. **Finding:** BW and BH are terminal in the executable, but real pairs IC-return gamma photons, and all photons crossing 150 MeV may still photodisintegrate D or He in the wider cascade. **Disposition:** the generated probabilities cannot be promoted to full gamma/DD yield or rigorous upper/lower full-cascade bounds. No net heat claims.
+4. **Finding:** The numerical particle-number bookwork is not the full plasma energy-momentum tensor: BW draws thermal background energy; photon momentum changes, baryon recoil, electron thermalization and plasma equations absent. **Disposition:** rename energy closure `PROJECTILE ledger`, explicitly exclude thermal heat.
+5. **Finding:** Existing PR132 `he_dd_rate_per_photon` considers 250 MeV endpoint nominally valid but Python `<hi+1e-14` evaluation can exclude E=250 due floating representation. **Disposition:** new source domain is `150<=E<250`, no parent mutation; test invalid top endpoint, avoid silent data loss.
+6. **Finding:** Self-test against identical formulas is not independent physical validation. **Disposition:** Wolfram independently evaluates high-energy algebra, separate original KN angular integral compares QED; R6 distinct author and C9 distinct author remain NOT_RUN.
+
+**Checks executed**: full per-photon total exit probability and projectile-energy ledger, channel thresholds and positivity, KN differential-to-total, charge/baryon conservation, source alternative and energy-grid refinement. All 15/15 tests pass normal and -O. No 3-body kinetic-spectrum model or D stopping is used; cannot claim kinetic D heat.
+
+**Decision:** Scoped source-conditional 7-channel reference calculation acceptable as *exploratory physics data*. Central DAG 28/88 and HE 14/18 unchanged, production and publication-grade source-gate HOLD. Next productive work: high-E EXFOR source-owned pT/nHe3/npD data or independent ACROPOLIS full cascade with pinned version and complete cosmological source, not re-audit loops.

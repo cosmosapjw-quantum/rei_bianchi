@@ -1,0 +1,57 @@
+{
+  "schema": "bass-he.rct.theory-moment.v1",
+  "task": "HE-RCT-THEORY07-MOMENT-ENVELOPE",
+  "status": "CONDITIONAL_THEORY_AND_FINITE_CHECKS_PASS__SPECTRAL_VALUES_OPEN",
+  "assumptions": [
+    "single ground-state HeIII+HI radiative charge-transfer channel",
+    "spontaneous single photon",
+    "dilute common-T Maxwellian zero relative drift",
+    "fixed internal states and temperature-independent nonnegative sigma(E)",
+    "nonrelativistic Maxwell average; frames and recoil kept distinct",
+    "required integrals finite",
+    "total kinetic energy used for heat only after local thermalization"
+  ],
+  "definitions": {
+    "k0": "thermal rate, volume/time",
+    "incoming_energy_mean": "k_B*T*(3/2+d log(k0)/d log(T))",
+    "photon_mean": "k1_gamma/k0; NOT incoming_energy_mean",
+    "heat_per_event": "Q-photon_mean",
+    "photon_energy": "hbar*omega in declared frame"
+  },
+  "conditional_bounds": {
+    "photon_mean": [0,"Q+incoming_energy_mean"],
+    "heat_mean": ["-incoming_energy_mean","Q"],
+    "photon_second_moment": [0,"Q^2+2*Q*incoming_energy_mean+incoming_energy_second_moment"],
+    "pair_recoil_nonrel_upper": "photon_second_upper/(2*M_final*c^2)"
+  },
+  "source_admission": {
+    "kf96_zero_derivative": "prescription derivative only, not physical slope",
+    "gm25_fit_uncertainty": null,
+    "current_physical_slope_bound": null,
+    "current_physical_rate_enclosures": null,
+    "actual_photon_mean": null,
+    "actual_heat_mean": null,
+    "actual_recoil_mean": null,
+    "actual_spectrum": null
+  },
+  "resolved_theory": [
+    "incident event-weighted moments from exact rate temperature dependence",
+    "single-photon kinematic bounds and total energy bookkeeping",
+    "constructive nonidentifiability of photon mean even from all total rates",
+    "same-source neighboring-temperature bounds including conditional rate enclosures",
+    "isotropic event momentum tensor structure"
+  ],
+  "not_resolved": [
+    "physical photon/heat/recoil moment numerical values",
+    "exact energy-resolved HeH2+ radiative transition kernel",
+    "physical rate-fit slope or uncertainty",
+    "species-resolved recoil partition",
+    "source group spectrum and absorption coupling",
+    "HE-F3 common temperature domain"
+  ],
+  "runtime_change": false,
+  "physical_admission": false,
+  "baseline_RCT": "OFF",
+  "next_theory": "HE-RCT-THEORY08_SPECTRAL_FIRST_MOMENT_OPERATOR",
+  "new_owner_integration_prerequisite": false
+}

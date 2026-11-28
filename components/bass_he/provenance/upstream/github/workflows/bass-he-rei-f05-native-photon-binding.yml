@@ -1,0 +1,37 @@
+name: BASS_HE original REI F05 native photon chemical binding source receipt
+on:
+  push:
+    branches:
+      - research/bass-he-rei-f05-original-photon-binding-20261101
+    paths:
+      - research/rei_f05_native_photon_chemical_energy_20261101/**
+      - .github/workflows/bass-he-rei-f05-native-photon-binding.yml
+  pull_request:
+    paths:
+      - research/rei_f05_native_photon_chemical_energy_20261101/**
+      - .github/workflows/bass-he-rei-f05-native-photon-binding.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-source-free-receipt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Source-free published receipt only
+        run: python3 research/rei_f05_native_photon_chemical_energy_20261101/verify_published_receipt.py
+      - name: Optimized Python receipt check only
+        run: python3 -O research/rei_f05_native_photon_chemical_energy_20261101/verify_published_receipt.py
+      - name: No false owner admission
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("research/rei_f05_native_photon_chemical_energy_20261101/results/SCIENCE_RESULT.json").read_text())
+          if data["canonical_delta"]!=0 or data["production"]!="HOLD" or data["photon_transport_admitted"] or data["official_tick161"]:
+              raise SystemExit("FALSE_ORIGINAL_SOURCE_OWNER_ADMISSION")
+          print("PASS_RECEIPT_ONLY_NO_CAUSAL_PHOTON_OR_OFFICIAL_IVP_CLAIM")
+          PY

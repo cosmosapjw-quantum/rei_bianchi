@@ -1,0 +1,1564 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "task": "both",
+  "unit_id": "HE36-RMB",
+  "objective": "Derive and implement incoming binary reactive loss moments, common-bulk/common-T linear Grad STF; finite-domain source moments; conservative resolved event/source interface.",
+  "scope": "Common-bulk common-T infinitesimal incoming loss; finite-table partial moments; supplied net event tensor and local source-lift interfaces. No new IVP or completed donor replay.",
+  "status": "complete",
+  "dependencies": [
+    {
+      "id": "contract",
+      "identity": "2c089b41b2bd200b5d3ea5dd852271f4c2124c8d17bb0d36a40ff72c8812e2de",
+      "description": "Final reviewed HE36 scope, units, gates, thermal census"
+    },
+    {
+      "id": "theory",
+      "identity": "65dcdef05882b04d6329372d2804566cd799f929853e7de8163826250acdb68a",
+      "description": "Reviewed common-T common-bulk infinitesimal incoming projection"
+    },
+    {
+      "id": "moment_code",
+      "identity": "644260261b82d6a528fd049b2bb20702e4c66de087406c7868a395a41ec99c2c",
+      "description": "Frozen final finite quadrature code"
+    },
+    {
+      "id": "pair_code",
+      "identity": "49104bb9244af92f707f83b489f217a0573566b2d9f3e5154366b7d35eaaab89",
+      "description": "Frozen finite-mass incoming and centralization code"
+    },
+    {
+      "id": "event_code",
+      "identity": "aab6ebe84f8c2bbf685f3813c03cc49e2e32178b7ddb113de6f02422eaa40d33",
+      "description": "Supplied net tensor and all-thermal census adapter"
+    },
+    {
+      "id": "CCC",
+      "identity": "7a87a2c9f2116ee36c0786b379dac08e1f4d92a49504fe542e6aa71cbb279bae",
+      "description": "Original87-row incident electron finite table"
+    },
+    {
+      "id": "REI",
+      "identity": "d0998261323609901f0cf9636d71282e7848bac6c00c1e5f7240ed7fc540e88a",
+      "description": "Byte-identical resolved scalar event donor at9620e1"
+    },
+    {
+      "id": "HE32",
+      "identity": "16a424b7290f484c57e97c8ed74f81e6d2043782",
+      "description": "Completed394 trajectories and recovery hash evidence reused"
+    },
+    {
+      "id": "HE34",
+      "identity": "fd11542ea8236e3c17eeb798bcafa8956e0eb248",
+      "description": "Completed20-stage parent publication"
+    },
+    {
+      "id": "HE35",
+      "identity": "96338b7d3c04b18e31a080e56b34985d31921104",
+      "description": "Parallel elastic pair reference; no replay"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "intake",
+      "kind": "source",
+      "locator": "evidence/intake/INTAKE_SUMMARY.json",
+      "scope": "Complete accessible metadata enumeration and selected source readback",
+      "dependency_ids": [
+        "HE32",
+        "HE34",
+        "HE35"
+      ],
+      "sha256": "caf2d6bf566d1bfa3a3efc9f716a4a387566eb5ccf8109d7cf20112aca73924e"
+    },
+    {
+      "id": "sources",
+      "kind": "source",
+      "locator": "SOURCES.md",
+      "scope": "Primary literature/source links and their actual reading scope",
+      "dependency_ids": [],
+      "sha256": "3a6d483977147abd665ee1ccc5daf40932b58f90ed04d8281141661f14944a3f"
+    },
+    {
+      "id": "derivation",
+      "kind": "derivation",
+      "locator": "theory/THEORY_KO.md",
+      "scope": "Finite-mass loss, moments, thermal/frame equations",
+      "dependency_ids": [
+        "contract",
+        "theory"
+      ],
+      "sha256": "65dcdef05882b04d6329372d2804566cd799f929853e7de8163826250acdb68a"
+    },
+    {
+      "id": "exact",
+      "kind": "calculation",
+      "locator": "theory/independent_CHECKS.json",
+      "scope": "Exact rational determinant and constructive counterexample",
+      "dependency_ids": [
+        "theory"
+      ],
+      "sha256": "d8e8f128e2fb281901a81d70acc861cef1f3f213bd64ad1deb66ba09970bc92e"
+    },
+    {
+      "id": "sympy_failure",
+      "kind": "calculation",
+      "locator": "theory/independent_OPTIONAL_SYMPY_FAILURE.json",
+      "scope": "Missing optional environment; no scientific result",
+      "dependency_ids": [],
+      "sha256": "d0e3cc62b10568dbfd3d182027271bed407f806c4590d0f248dbff6e11760101"
+    },
+    {
+      "id": "wolfram_initial",
+      "kind": "calculation",
+      "locator": "evidence/WOLFRAM_INITIAL.json",
+      "scope": "First identities plus protected-symbol determinant failure",
+      "dependency_ids": [],
+      "sha256": "7a54f9950bf998dcf2546f97dec01ac1d0c5127ee8c6cfbc34f1037776b0c437"
+    },
+    {
+      "id": "wolfram_corrected",
+      "kind": "calculation",
+      "locator": "evidence/WOLFRAM_CORRECTED.json",
+      "scope": "Corrected determinant CAS residual0",
+      "dependency_ids": [
+        "theory"
+      ],
+      "sha256": "db77993977f2db6545b9e3e99323967feb5a9a430995a15f1c9379e7122f8c84"
+    },
+    {
+      "id": "moment_baseline",
+      "kind": "calculation",
+      "locator": "components/moments/attempts/attempt_001.json",
+      "scope": "Eight initial finite moment groups",
+      "dependency_ids": [
+        "CCC"
+      ],
+      "sha256": "c5a1beb68e3a72344033a65d604e3bbc63167c1c7b7045508293707903e3823b"
+    },
+    {
+      "id": "mean_fail",
+      "kind": "calculation",
+      "locator": "components/moments/attempts/extreme_mean_before_fix.json",
+      "scope": "Preserved1.1364percent arithmetic-order failure",
+      "dependency_ids": [],
+      "sha256": "621cfc2fbd39f27bbeef9ef2a967d986cbea0b16c2e222bfc3310fb93d4b47f9"
+    },
+    {
+      "id": "mean_fix",
+      "kind": "calculation",
+      "locator": "components/moments/attempts/extreme_mean_after_fix.json",
+      "scope": "One affected fixture passes after divide-first change",
+      "dependency_ids": [
+        "moment_code"
+      ],
+      "sha256": "3dbd8a6ae7242c50754df4e0b396036a9f1a76f3b9a49ee5d219680c4b2ee88f"
+    },
+    {
+      "id": "moment_final",
+      "kind": "implementation",
+      "locator": "components/moments/FINAL_VERIFICATION.json",
+      "scope": "Changed-path mapping;9unique groups /10attempts",
+      "dependency_ids": [
+        "moment_code"
+      ],
+      "sha256": "7d69c77d4c2d8eece211376aff14edbdde6f31a4168b38c205e845715c9d4118"
+    },
+    {
+      "id": "pair_checks",
+      "kind": "calculation",
+      "locator": "components/pair/attempts/attempt_20261022T222801Z/RESULT.json",
+      "scope": "Ten new implementation groups",
+      "dependency_ids": [
+        "pair_code"
+      ],
+      "sha256": "7c7b22ca2bf174306f57075e7bb1f69049c0793bfc4a505d39c590fe4f784663"
+    },
+    {
+      "id": "cartesian",
+      "kind": "calculation",
+      "locator": "evidence/review/CARTESIAN_LOSS_RESULT.json",
+      "scope": "Six independent6D raw velocity controls",
+      "dependency_ids": [
+        "pair_code",
+        "theory"
+      ],
+      "sha256": "8c864fb9cbd183865fb47faa00332e9e8dac1a30203e1aa3ce10a45cfd8c791d"
+    },
+    {
+      "id": "bridge_checks",
+      "kind": "calculation",
+      "locator": "components/event_bridge/attempts/attempt_001/RESULT.json",
+      "scope": "Seven new supplied-source/lift/finite identity groups",
+      "dependency_ids": [
+        "event_code",
+        "moment_code",
+        "pair_code",
+        "REI"
+      ],
+      "sha256": "9d022bc16bb6fe822513c5ede27dc9df56a93a5a1ff6234900feccd300668370"
+    },
+    {
+      "id": "diagnostic",
+      "kind": "calculation",
+      "locator": "components/diagnostic/outputs/DIAGNOSTIC.json",
+      "scope": "One129T finite source diagnostic",
+      "dependency_ids": [
+        "CCC",
+        "moment_code"
+      ],
+      "sha256": "ce44700692b2f8e67ccfeab41668c246259611684f1caa04ec9912425c8ae905"
+    },
+    {
+      "id": "benchmark",
+      "kind": "resource",
+      "locator": "components/diagnostic/outputs/BENCHMARK.json",
+      "scope": "One same-kernel five-pair batching experiment",
+      "dependency_ids": [
+        "CCC",
+        "moment_code"
+      ],
+      "sha256": "61938ca5294523b0aa7bc0569d0c3c9415f15033d4f2bc2ea72ec79913411c18"
+    },
+    {
+      "id": "render",
+      "kind": "artifact",
+      "locator": "components/diagnostic/plots/RENDER_RECEIPT.json",
+      "scope": "Final savedPNG/SVG render identity",
+      "dependency_ids": [
+        "CCC",
+        "moment_code"
+      ],
+      "sha256": "db05b3a21d7ee383db7859b1a899f0cc4dc1f268d41f98b598727a96bd4f6220"
+    },
+    {
+      "id": "visual",
+      "kind": "review",
+      "locator": "components/diagnostic/plots/VISUAL_INSPECTION.json",
+      "scope": "Actual finalPNG inspected",
+      "dependency_ids": [],
+      "sha256": "ec7e7edd1970dfada1612d0bb5725bd244d19fdab1dd5e66c2fe602caf3ee6ee"
+    },
+    {
+      "id": "transport",
+      "kind": "resource",
+      "locator": "components/diagnostic/receipts/PROCESS_TRANSPORT.json",
+      "scope": "Observed process commands/exits;two renders,two cachehits",
+      "dependency_ids": [],
+      "sha256": "e9288a5428e9e03ace2066a2514174ac909343ede487d4fb0857811187afaec5"
+    },
+    {
+      "id": "theory_review",
+      "kind": "review",
+      "locator": "evidence/theory_review/nonauthor_THEORY_REVIEW.json",
+      "scope": "Non-author derivation/scope review with3closed findings",
+      "dependency_ids": [
+        "contract",
+        "theory"
+      ],
+      "sha256": "9a08478dc1931a3d24a220f4b0980c7dd8eccead76c497a0b84251990b80ba16"
+    },
+    {
+      "id": "code_review",
+      "kind": "review",
+      "locator": "evidence/review/FINAL_BRIDGE_PLOT_REVIEW.json",
+      "scope": "Independent bridge,diagnostic,timing,actualplot review",
+      "dependency_ids": [
+        "event_code",
+        "moment_code",
+        "pair_code"
+      ],
+      "sha256": "9ae6e53b543f3d8e5d3d8449ce3acf44737f6086c351f61fd3b0e0df96c4cb63"
+    },
+    {
+      "id": "import",
+      "kind": "implementation",
+      "locator": "evidence/PACKAGE_IMPORT.json",
+      "scope": "New-path package import only;zero science",
+      "dependency_ids": [
+        "event_code"
+      ],
+      "sha256": "74ac932e64e6143c38a66f6aaca2e222ccfabf965d8ab12d594b1287d4cc89b1"
+    },
+    {
+      "id": "docfix",
+      "kind": "review",
+      "locator": "evidence/docfix/CORRECTION.json",
+      "scope": "README literalCR fix; unchanged code/test identities",
+      "dependency_ids": [],
+      "sha256": "bc3f9dadf69aea4d52f66c166bb91c07428f13602c5dc452ad828ce2c2e31705"
+    },
+    {
+      "id": "results",
+      "kind": "artifact",
+      "locator": "RESULTS_KO.md",
+      "scope": "Complete scoped scientific report",
+      "dependency_ids": [],
+      "sha256": "12596f14a0a735166c95b0a1e9ea8532334cf6079a23895b39de8f2a93434d62"
+    },
+    {
+      "id": "next",
+      "kind": "decision",
+      "locator": "NEXT_DAG.json",
+      "scope": "Explicit differential-gain next unit and whole-goal dependencies",
+      "dependency_ids": [],
+      "sha256": "dfe8144af9ab17304a4f6af495c23d9c1a51407dbefd2bfc444798048fadfa96"
+    },
+    {
+      "id": "chat_handoff",
+      "kind": "artifact",
+      "locator": "HANDOFF_CHAT_KO.md",
+      "scope": "Copyable research-thread handoff",
+      "dependency_ids": [],
+      "sha256": "ae22275e99d9b87a57bd3b9f7928d9dfc56b12b35c379896911aad3646c00d68"
+    },
+    {
+      "id": "codex_handoff",
+      "kind": "artifact",
+      "locator": "HANDOFF_CODEX.md",
+      "scope": "Read-only resume and changed-dependency executor contract",
+      "dependency_ids": [],
+      "sha256": "f67af50ac44c89dc7132bb8d1ba12bf7923ce1235cee69454fe5f8b84ea7054a"
+    },
+    {
+      "id": "stage_R1",
+      "kind": "decision",
+      "locator": "stages/R1.md",
+      "scope": "연구 위치·계약",
+      "dependency_ids": [],
+      "sha256": "346bf0458fca8c2e8420c351e56553263f8c49587b116404045a9cb1917405e2"
+    },
+    {
+      "id": "stage_R2",
+      "kind": "decision",
+      "locator": "stages/R2.md",
+      "scope": "근거·재사용",
+      "dependency_ids": [],
+      "sha256": "eee58364c6ed8f88f495bb695ca895c729586511783e36b614ff1364128d0f48"
+    },
+    {
+      "id": "stage_R3",
+      "kind": "decision",
+      "locator": "stages/R3.md",
+      "scope": "주장·전제 정렬",
+      "dependency_ids": [],
+      "sha256": "2b1d09387b7d3e74378df21a71a9e13bb6b8d7c8c902a74b17a7e4b872ee587b"
+    },
+    {
+      "id": "stage_R4",
+      "kind": "decision",
+      "locator": "stages/R4.md",
+      "scope": "가설·표현 탐색",
+      "dependency_ids": [],
+      "sha256": "b0c95c5cec5a8342290dc548c3906acdd70c60a633282b5566c8c2c7da614df9"
+    },
+    {
+      "id": "stage_R5",
+      "kind": "decision",
+      "locator": "stages/R5.md",
+      "scope": "구성적 유도",
+      "dependency_ids": [],
+      "sha256": "c28cc491c447214b7dab481202c5ae82a83be3d99163e9b387af6469530d3652"
+    },
+    {
+      "id": "stage_R6",
+      "kind": "decision",
+      "locator": "stages/R6.md",
+      "scope": "독립 검증",
+      "dependency_ids": [],
+      "sha256": "7911342ad8c570fa909e405816d819241342080978d8abce3c918b5ec04a6e4e"
+    },
+    {
+      "id": "stage_R7",
+      "kind": "decision",
+      "locator": "stages/R7.md",
+      "scope": "판별 검증",
+      "dependency_ids": [],
+      "sha256": "1a6f8de0d3bec1c5352fd72c0cafb20776047bdc807e48a7609ae296152b3713"
+    },
+    {
+      "id": "stage_R8",
+      "kind": "decision",
+      "locator": "stages/R8.md",
+      "scope": "결과 판정",
+      "dependency_ids": [],
+      "sha256": "f39527abc2282cbf295b4e35b4ea11f1ca20dbc7c97779717a02967174051e58"
+    },
+    {
+      "id": "stage_R9",
+      "kind": "decision",
+      "locator": "stages/R9.md",
+      "scope": "정식 결과·코딩 연결",
+      "dependency_ids": [],
+      "sha256": "a50cff6ceeed98a268ba44be5b004a9368126362e8ba8473ce3cf08cba1f9b41"
+    },
+    {
+      "id": "stage_R10",
+      "kind": "decision",
+      "locator": "stages/R10.md",
+      "scope": "종료·재개",
+      "dependency_ids": [],
+      "sha256": "5b8b5ba336a883b22c4eca664a65d99996d90b2dd93a54817cac2dd20896b428"
+    },
+    {
+      "id": "stage_C1",
+      "kind": "decision",
+      "locator": "stages/C1.md",
+      "scope": "목표·baseline",
+      "dependency_ids": [],
+      "sha256": "8da35b1c7080326438e838d3b43a660dec9b6509d5a4bcedd07569836b2fc730"
+    },
+    {
+      "id": "stage_C2",
+      "kind": "decision",
+      "locator": "stages/C2.md",
+      "scope": "식–데이터–코드",
+      "dependency_ids": [],
+      "sha256": "2365b72005eb543c484d65ed39ae3a0d89f591db6cf376c875a7e522bf9fbc40"
+    },
+    {
+      "id": "stage_C3",
+      "kind": "decision",
+      "locator": "stages/C3.md",
+      "scope": "수치 설계",
+      "dependency_ids": [],
+      "sha256": "21f21c4c52a7678ca350cfd695fc7034fe30abd5e76973298cfd70a228e4d590"
+    },
+    {
+      "id": "stage_C4",
+      "kind": "decision",
+      "locator": "stages/C4.md",
+      "scope": "실행 DAG·자원",
+      "dependency_ids": [],
+      "sha256": "2048a7be0c0ca52fe8deb045ce211549ff45f44ba81676d8cf145cf0ade211e8"
+    },
+    {
+      "id": "stage_C5",
+      "kind": "decision",
+      "locator": "stages/C5.md",
+      "scope": "구현",
+      "dependency_ids": [],
+      "sha256": "71fc824d2a4589ccd6a1531c627ab2d4ec30f2795ced5afe2e2b2850ad965e99"
+    },
+    {
+      "id": "stage_C6",
+      "kind": "decision",
+      "locator": "stages/C6.md",
+      "scope": "구현 검증",
+      "dependency_ids": [],
+      "sha256": "9e3ba1296704be0d6612d9c6ff768d2e6f827407c31063431cebf32f1fa8ffc8"
+    },
+    {
+      "id": "stage_C7",
+      "kind": "decision",
+      "locator": "stages/C7.md",
+      "scope": "과학 검증",
+      "dependency_ids": [],
+      "sha256": "eca3a16d89a5d849be05b0ec2d69c75b61860d54e2829e79b9076c9c50f6d197"
+    },
+    {
+      "id": "stage_C8",
+      "kind": "decision",
+      "locator": "stages/C8.md",
+      "scope": "수치·재현성",
+      "dependency_ids": [],
+      "sha256": "14e3fda4a736bdc56e8918067a8f4806a893de979ea6412b7a4b881cfb9f3b44"
+    },
+    {
+      "id": "stage_C9",
+      "kind": "decision",
+      "locator": "stages/C9.md",
+      "scope": "독립 검토",
+      "dependency_ids": [],
+      "sha256": "c61ef73aab4527e2107c6aeb864d41f55ee83672b876f9ed89a29b4db78f3951"
+    },
+    {
+      "id": "stage_C10",
+      "kind": "decision",
+      "locator": "stages/C10.md",
+      "scope": "판정·인계",
+      "dependency_ids": [],
+      "sha256": "05d7f692cef384227a35a2daf0e93c3b6f76d1d5ded8441500cbe4c434a72cfc"
+    }
+  ],
+  "stages": [
+    {
+      "id": "R1",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_R1"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "R2",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_R2"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "R3",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_R3"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "R4",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_R4"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "R5",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_R5"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "R6",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_R6"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "R7",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_R7"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "R8",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_R8"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "R9",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_R9"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "R10",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_R10"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "C1",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_C1"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "C2",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_C2"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "C3",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_C3"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "C4",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_C4"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "C5",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_C5"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "C6",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_C6"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "C7",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_C7"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "C8",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_C8"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "C9",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_C9"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    },
+    {
+      "id": "C10",
+      "status": "complete",
+      "evidence_refs": [
+        "stage_C10"
+      ],
+      "dependency_ids": [],
+      "reason": "Logical dependency acceptance; actual component execution timestamps are preserved separately",
+      "reuse": null
+    }
+  ],
+  "claims": [
+    {
+      "id": "incoming_projection",
+      "statement": "Three Maxwellian moments determine the derived finite-mass2x2 instantaneous reactive incoming STF loss under the declared common-T/common-bulk assumptions.",
+      "scope": "Infinitesimal Grad direction; removed parents only",
+      "basis": [
+        "derived",
+        "numerically checked",
+        "implementation-verified"
+      ],
+      "evidence_refs": [
+        "derivation",
+        "exact",
+        "cartesian",
+        "pair_checks",
+        "theory_review"
+      ],
+      "obligations": [
+        "physical outgoing/gain tensor",
+        "finite-anisotropy closure validity"
+      ]
+    },
+    {
+      "id": "finite_source",
+      "statement": "The87-row fixed-target CCC table yields the saved129-temperature partial incoming moments with stable shared quadrature.",
+      "scope": "13.6058–968.61eV positive piecewise-linear model;2000–200000K numerical domain",
+      "basis": [
+        "numerically checked",
+        "implementation-verified"
+      ],
+      "evidence_refs": [
+        "diagnostic",
+        "moment_final",
+        "code_review"
+      ],
+      "obligations": [
+        "source interpolation error",
+        "unmeasured tail",
+        "finite-mass source qualification"
+      ]
+    },
+    {
+      "id": "tensor_attachment",
+      "statement": "A supplied complete net J/event tensor is consistently attached to the unchanged per-baryon event ledger, including nuclear and electron thermal counts.",
+      "scope": "Declared charge-neutral21-state no-positron/no-anion all-retained-thermal inventory",
+      "basis": [
+        "derived",
+        "implementation-verified"
+      ],
+      "evidence_refs": [
+        "bridge_checks",
+        "code_review"
+      ],
+      "obligations": [
+        "physical tensor and daughter/stopping providers",
+        "separate fast-particle number source when activated"
+      ]
+    },
+    {
+      "id": "scalar_counterexample",
+      "statement": "At one temperature the two explicitly constructed positive kernels have equal alpha,beta and different gamma/STF loss.",
+      "scope": "Constructive one-temperature adapter counterexample; no literature novelty or global no-go claim",
+      "basis": [
+        "derived",
+        "numerically checked"
+      ],
+      "evidence_refs": [
+        "derivation",
+        "exact",
+        "pair_checks"
+      ],
+      "obligations": []
+    },
+    {
+      "id": "global_goal",
+      "statement": "B1/B2 remain partial and B3→B4→B5 depend on qualified transport,source and closure data.",
+      "scope": "Whole physical project; no total percentage denominator",
+      "basis": [
+        "unresolved"
+      ],
+      "evidence_refs": [
+        "next",
+        "results"
+      ],
+      "obligations": [
+        "NEXT_DAG N0–N9"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "exact_identities",
+      "domain": "math",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "exact",
+        "wolfram_corrected"
+      ],
+      "execution_ref": null,
+      "reason": ""
+    },
+    {
+      "id": "moment_initial",
+      "domain": "numerics",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "moment_baseline"
+      ],
+      "execution_ref": "moment_initial",
+      "reason": ""
+    },
+    {
+      "id": "extreme_mean_failure",
+      "domain": "numerics",
+      "result": "fail",
+      "evidence_refs": [
+        "mean_fail"
+      ],
+      "execution_ref": "mean_initial",
+      "reason": ""
+    },
+    {
+      "id": "extreme_mean_corrected",
+      "domain": "numerics",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "mean_fix",
+        "moment_final"
+      ],
+      "execution_ref": "mean_corrected",
+      "reason": ""
+    },
+    {
+      "id": "pair_checks",
+      "domain": "implementation",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "pair_checks"
+      ],
+      "execution_ref": "pair",
+      "reason": ""
+    },
+    {
+      "id": "cartesian_oracle",
+      "domain": "physics",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "cartesian"
+      ],
+      "execution_ref": "cartesian",
+      "reason": ""
+    },
+    {
+      "id": "event_bridge",
+      "domain": "implementation",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "bridge_checks"
+      ],
+      "execution_ref": "bridge",
+      "reason": ""
+    },
+    {
+      "id": "finite_diagnostic",
+      "domain": "numerics",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "diagnostic"
+      ],
+      "execution_ref": "diagnostic_process_0",
+      "reason": ""
+    },
+    {
+      "id": "timing",
+      "domain": "numerics",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "benchmark"
+      ],
+      "execution_ref": "diagnostic_process_0",
+      "reason": ""
+    },
+    {
+      "id": "independent_review",
+      "domain": "physics",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "code_review",
+        "theory_review"
+      ],
+      "execution_ref": null,
+      "reason": ""
+    },
+    {
+      "id": "new_location_import",
+      "domain": "packaging",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "import"
+      ],
+      "execution_ref": "package_import",
+      "reason": ""
+    }
+  ],
+  "executions": [
+    {
+      "id": "moment_initial",
+      "status": "completed",
+      "command": "python /tmp/he36_moment_implementation/check_moments.py --table /tmp/he35_survey/nuclear_donors/readbacks/bass_cr/research/cr_c22d_cold_ci_20261022/sources/CCC_TICS_1S.txt --output /tmp/he36_moment_implementation/attempts/attempt_001.json",
+      "environment": {
+        "Python": "3.12.14",
+        "NumPy": "2.3.5",
+        "SciPy": "1.17.0",
+        "mpmath": "1.4.1"
+      },
+      "evidence_refs": [
+        "moment_baseline"
+      ],
+      "exit_code": 0,
+      "reason": "",
+      "command_capture": "Equivalent script/arguments from executed receipt and frozen test API; original outer shell command not copied verbatim"
+    },
+    {
+      "id": "mean_initial",
+      "status": "failed",
+      "command": "python /tmp/he36_moment_implementation/check_extreme_mean.py --output /tmp/he36_moment_implementation/attempts/extreme_mean_before_fix.json",
+      "environment": {
+        "cgroup_cpu_max": "1600000 200000",
+        "cgroup_memory_max": "8589934592",
+        "clock": {
+          "adjustable": false,
+          "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+          "monotonic": true,
+          "resolution": 1e-09
+        },
+        "cpu_count": 9,
+        "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "machine": "x86_64",
+        "numpy": "2.3.5",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+        "processor_affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "python_executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "thread_environment": {
+          "MKL_NUM_THREADS": "1",
+          "NUMEXPR_NUM_THREADS": null,
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": null
+        },
+        "threadpools": [
+          {
+            "architecture": "SkylakeX",
+            "filepath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/numpy.libs/libscipy_openblas64_-fdde5778.so",
+            "internal_api": "openblas",
+            "num_threads": 1,
+            "prefix": "libscipy_openblas",
+            "threading_layer": "pthreads",
+            "user_api": "blas",
+            "version": "0.3.30"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "mean_fail"
+      ],
+      "exit_code": 1,
+      "reason": "Multiply-before-divide underflow in conditional mean; preserved old code/receipt",
+      "command_capture": "Equivalent script/arguments for recorded attempt"
+    },
+    {
+      "id": "mean_corrected",
+      "status": "completed",
+      "command": "python /tmp/he36_moment_implementation/check_extreme_mean.py --output /tmp/he36_moment_implementation/attempts/extreme_mean_after_fix.json",
+      "environment": {
+        "cgroup_cpu_max": "1600000 200000",
+        "cgroup_memory_max": "8589934592",
+        "clock": {
+          "adjustable": false,
+          "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+          "monotonic": true,
+          "resolution": 1e-09
+        },
+        "cpu_count": 9,
+        "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "machine": "x86_64",
+        "numpy": "2.3.5",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+        "processor_affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "python_executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "thread_environment": {
+          "MKL_NUM_THREADS": "1",
+          "NUMEXPR_NUM_THREADS": null,
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": null
+        },
+        "threadpools": [
+          {
+            "architecture": "SkylakeX",
+            "filepath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/numpy.libs/libscipy_openblas64_-fdde5778.so",
+            "internal_api": "openblas",
+            "num_threads": 1,
+            "prefix": "libscipy_openblas",
+            "threading_layer": "pthreads",
+            "user_api": "blas",
+            "version": "0.3.30"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "mean_fix"
+      ],
+      "exit_code": 0,
+      "reason": "",
+      "command_capture": "Equivalent script/arguments for affected-only correction"
+    },
+    {
+      "id": "pair",
+      "status": "completed",
+      "command": "python /tmp/he36_pair_implementation/check_implementation.py",
+      "environment": {
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "numpy": "2.3.5",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39"
+      },
+      "evidence_refs": [
+        "pair_checks"
+      ],
+      "exit_code": 0,
+      "reason": ""
+    },
+    {
+      "id": "bridge",
+      "status": "completed",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "/tmp/he36_event_bridge/check_bridge.py",
+        "--output",
+        "/tmp/he36_event_bridge/attempts/attempt_001"
+      ],
+      "environment": {
+        "Python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "NumPy": "2.3.5",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39"
+      },
+      "evidence_refs": [
+        "bridge_checks"
+      ],
+      "exit_code": 0,
+      "reason": ""
+    },
+    {
+      "id": "package_import",
+      "status": "completed",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-c",
+        "import sys;sys.dont_write_bytecode=True;sys.path.insert(0,'/tmp/he32_resume_20261022/repos/BASS_HE/research/he36_reactive_moment_bridge_20261023/components');import event_bridge;from event_bridge.reactive_moments import RawMoments,binary_loss;from event_bridge.maxwellian_moments import PreparedMaxwellianMoments;print('PORTABLE_UNIT_IMPORT_PASS; no science execution')"
+      ],
+      "environment": {
+        "Python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "NumPy": "2.3.5",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39"
+      },
+      "evidence_refs": [
+        "import"
+      ],
+      "exit_code": 0,
+      "reason": ""
+    },
+    {
+      "id": "cartesian",
+      "status": "completed",
+      "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python /tmp/he36_review/check_cartesian_loss.py",
+      "environment": {
+        "cgroup_cpu_max": "1600000 200000",
+        "cgroup_memory_max": "8589934592",
+        "clock": {
+          "adjustable": false,
+          "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+          "monotonic": true,
+          "resolution": 1e-09
+        },
+        "cpu_count": 9,
+        "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "machine": "x86_64",
+        "numpy": "2.3.5",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+        "processor_affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "python_executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "thread_environment": {
+          "MKL_NUM_THREADS": "1",
+          "NUMEXPR_NUM_THREADS": null,
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": null
+        },
+        "threadpools": [
+          {
+            "architecture": "SkylakeX",
+            "filepath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/numpy.libs/libscipy_openblas64_-fdde5778.so",
+            "internal_api": "openblas",
+            "num_threads": 1,
+            "prefix": "libscipy_openblas",
+            "threading_layer": "pthreads",
+            "user_api": "blas",
+            "version": "0.3.30"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "cartesian"
+      ],
+      "exit_code": 0,
+      "reason": ""
+    },
+    {
+      "id": "diagnostic_process_0",
+      "status": "completed",
+      "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python run_diagnostic.py",
+      "environment": {
+        "cgroup_cpu_max": "1600000 200000",
+        "cgroup_memory_max": "8589934592",
+        "clock": {
+          "adjustable": false,
+          "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+          "monotonic": true,
+          "resolution": 1e-09
+        },
+        "cpu_count": 9,
+        "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "machine": "x86_64",
+        "numpy": "2.3.5",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+        "processor_affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "python_executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "thread_environment": {
+          "MKL_NUM_THREADS": "1",
+          "NUMEXPR_NUM_THREADS": null,
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": null
+        },
+        "threadpools": [
+          {
+            "architecture": "SkylakeX",
+            "filepath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/numpy.libs/libscipy_openblas64_-fdde5778.so",
+            "internal_api": "openblas",
+            "num_threads": 1,
+            "prefix": "libscipy_openblas",
+            "threading_layer": "pthreads",
+            "user_api": "blas",
+            "version": "0.3.30"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "diagnostic",
+        "benchmark"
+      ],
+      "exit_code": 0,
+      "reason": "new diagnostic plus one five-pair timing experiment",
+      "cwd": "/tmp/he36_diagnostic",
+      "outer_wall_s": 0.702625994
+    },
+    {
+      "id": "diagnostic_process_1",
+      "status": "completed",
+      "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python render_diagnostic.py",
+      "environment": {
+        "cgroup_cpu_max": "1600000 200000",
+        "cgroup_memory_max": "8589934592",
+        "clock": {
+          "adjustable": false,
+          "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+          "monotonic": true,
+          "resolution": 1e-09
+        },
+        "cpu_count": 9,
+        "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "machine": "x86_64",
+        "numpy": "2.3.5",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+        "processor_affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "python_executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "thread_environment": {
+          "MKL_NUM_THREADS": "1",
+          "NUMEXPR_NUM_THREADS": null,
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": null
+        },
+        "threadpools": [
+          {
+            "architecture": "SkylakeX",
+            "filepath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/numpy.libs/libscipy_openblas64_-fdde5778.so",
+            "internal_api": "openblas",
+            "num_threads": 1,
+            "prefix": "libscipy_openblas",
+            "threading_layer": "pthreads",
+            "user_api": "blas",
+            "version": "0.3.30"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "render",
+        "transport"
+      ],
+      "exit_code": 0,
+      "reason": "first render, visually revised",
+      "cwd": "/tmp/he36_diagnostic",
+      "outer_wall_s": 9.40341203
+    },
+    {
+      "id": "diagnostic_process_2",
+      "status": "completed",
+      "command": "MPLCONFIGDIR=/tmp/matplotlib-xned57ov OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python render_diagnostic.py",
+      "environment": {
+        "cgroup_cpu_max": "1600000 200000",
+        "cgroup_memory_max": "8589934592",
+        "clock": {
+          "adjustable": false,
+          "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+          "monotonic": true,
+          "resolution": 1e-09
+        },
+        "cpu_count": 9,
+        "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "machine": "x86_64",
+        "numpy": "2.3.5",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+        "processor_affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "python_executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "thread_environment": {
+          "MKL_NUM_THREADS": "1",
+          "NUMEXPR_NUM_THREADS": null,
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": null
+        },
+        "threadpools": [
+          {
+            "architecture": "SkylakeX",
+            "filepath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/numpy.libs/libscipy_openblas64_-fdde5778.so",
+            "internal_api": "openblas",
+            "num_threads": 1,
+            "prefix": "libscipy_openblas",
+            "threading_layer": "pthreads",
+            "user_api": "blas",
+            "version": "0.3.30"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "render",
+        "transport"
+      ],
+      "exit_code": 0,
+      "reason": "first-render identity/hash cache-hit probe",
+      "cwd": "/tmp/he36_diagnostic",
+      "outer_wall_s": 2.59792918
+    },
+    {
+      "id": "diagnostic_process_3",
+      "status": "completed",
+      "command": "MPLCONFIGDIR=/tmp/matplotlib-xned57ov OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python render_diagnostic.py",
+      "environment": {
+        "cgroup_cpu_max": "1600000 200000",
+        "cgroup_memory_max": "8589934592",
+        "clock": {
+          "adjustable": false,
+          "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+          "monotonic": true,
+          "resolution": 1e-09
+        },
+        "cpu_count": 9,
+        "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "machine": "x86_64",
+        "numpy": "2.3.5",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+        "processor_affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "python_executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "thread_environment": {
+          "MKL_NUM_THREADS": "1",
+          "NUMEXPR_NUM_THREADS": null,
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": null
+        },
+        "threadpools": [
+          {
+            "architecture": "SkylakeX",
+            "filepath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/numpy.libs/libscipy_openblas64_-fdde5778.so",
+            "internal_api": "openblas",
+            "num_threads": 1,
+            "prefix": "libscipy_openblas",
+            "threading_layer": "pthreads",
+            "user_api": "blas",
+            "version": "0.3.30"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "render",
+        "transport"
+      ],
+      "exit_code": 0,
+      "reason": "display-only corrected render",
+      "cwd": "/tmp/he36_diagnostic",
+      "outer_wall_s": 3.279887178
+    },
+    {
+      "id": "diagnostic_process_4",
+      "status": "completed",
+      "command": "MPLCONFIGDIR=/tmp/matplotlib-xned57ov OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python render_diagnostic.py",
+      "environment": {
+        "cgroup_cpu_max": "1600000 200000",
+        "cgroup_memory_max": "8589934592",
+        "clock": {
+          "adjustable": false,
+          "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+          "monotonic": true,
+          "resolution": 1e-09
+        },
+        "cpu_count": 9,
+        "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "machine": "x86_64",
+        "numpy": "2.3.5",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+        "processor_affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "python_executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "thread_environment": {
+          "MKL_NUM_THREADS": "1",
+          "NUMEXPR_NUM_THREADS": null,
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": null
+        },
+        "threadpools": [
+          {
+            "architecture": "SkylakeX",
+            "filepath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/numpy.libs/libscipy_openblas64_-fdde5778.so",
+            "internal_api": "openblas",
+            "num_threads": 1,
+            "prefix": "libscipy_openblas",
+            "threading_layer": "pthreads",
+            "user_api": "blas",
+            "version": "0.3.30"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "render",
+        "transport"
+      ],
+      "exit_code": 0,
+      "reason": "final-render identity/hash cache-hit probe",
+      "cwd": "/tmp/he36_diagnostic",
+      "outer_wall_s": 0.708005056
+    }
+  ],
+  "decisions": [
+    {
+      "id": "no_replay",
+      "statement": "Reuse completed HE32–HE35 and donor IVPs/tests; this unit has zero new IVPs and no old suite replay."
+    },
+    {
+      "id": "partial_source",
+      "statement": "Do not interpret table truncation as physical zero or numerical underflow as support zero."
+    },
+    {
+      "id": "no_novelty_promotion",
+      "statement": "Retain scoped formulas/counterexample without new strong no-go or literature-first claim."
+    },
+    {
+      "id": "parallel_execution",
+      "statement": "Logical stage publications are sequential; actual component receipts retain parallel execution chronology."
+    }
+  ],
+  "overrides": [
+    {
+      "id": "HPC_scoping",
+      "statement": "AGENTS native/HPC direction is applied as measured,accuracy-preserving sandbox reference work under current user request; no global policy mutation,fast-math or heavy job.",
+      "evidence_refs": [
+        "stage_C1",
+        "stage_C4"
+      ]
+    },
+    {
+      "id": "thermal_census",
+      "statement": "Review clarified all-retained-thermal census and missing fast number dependency,without coefficient change.",
+      "evidence_refs": [
+        "theory_review",
+        "code_review"
+      ]
+    },
+    {
+      "id": "render_count",
+      "statement": "Initial planned single render superseded by actual two attempts; first preserved,science not replayed.",
+      "evidence_refs": [
+        "transport",
+        "visual"
+      ]
+    }
+  ],
+  "failures": [
+    {
+      "id": "mean_arithmetic",
+      "class": "numerics",
+      "evidence_refs": [
+        "mean_fail",
+        "mean_fix",
+        "moment_final"
+      ],
+      "execution_ref": "mean_initial",
+      "next_action": "Closed by divide-before-conversion affected-only fixture;old suite reused"
+    },
+    {
+      "id": "optional_sympy",
+      "class": "environment",
+      "evidence_refs": [
+        "sympy_failure",
+        "exact"
+      ],
+      "next_action": "Closed using standard-library exact rational calculation"
+    },
+    {
+      "id": "wolfram_symbol",
+      "class": "implementation",
+      "evidence_refs": [
+        "wolfram_initial",
+        "wolfram_corrected"
+      ],
+      "next_action": "Closed by unprotected symbol names;initial outputs retained"
+    },
+    {
+      "id": "README_encoding",
+      "class": "implementation",
+      "evidence_refs": [
+        "docfix",
+        "code_review"
+      ],
+      "next_action": "Closed by text-onlyCR correction;executed sources unchanged"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "delta_intake",
+      "statement": "Inspect only changed dependencies since this comprehensive accessible snapshot.",
+      "evidence_refs": [
+        "intake",
+        "next"
+      ]
+    },
+    {
+      "id": "differential_gain",
+      "statement": "NEXT_DAG N1 selects one source-qualified H1 differential gain provider and matched number/heat/STF moments.",
+      "evidence_refs": [
+        "next"
+      ]
+    }
+  ],
+  "approval_version": "0.2",
+  "actual_execution_counts": {
+    "new_IVP": 0,
+    "old_HE32_donor_IVP_replays": 0,
+    "old_scientific_suite_replays": 0,
+    "new_moment_unique_groups": 9,
+    "new_moment_group_attempts": 10,
+    "preserved_failed_moment_group_attempts": 1,
+    "new_pair_groups": 10,
+    "new_independent_6D_controls": 6,
+    "new_bridge_groups": 7,
+    "new_finite_CCC_diagnostic": 1,
+    "new_benchmark_experiments": 1,
+    "measured_timing_pairs": 5,
+    "new_render_invocations": 2,
+    "final_scientific_figure_pairs": 1,
+    "render_cache_hits": 2,
+    "new_location_import_checks": 1
+  },
+  "delivery_axes": {
+    "stage_completed": 20,
+    "stage_published": 20,
+    "stage_backed_up": 20,
+    "final_archive_locator": "delivery/FINAL_ACK.json",
+    "overall_goal_complete": false
+  }
+}

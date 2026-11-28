@@ -1,0 +1,1423 @@
+{
+  "schema_version": 1,
+  "workflow_version": "1.0.0",
+  "approval_version": "0.2",
+  "task": "both",
+  "unit_id": "HE34-SCR",
+  "objective": "Derive and implement a certified stiff LRS gas-moment reduction with an exact neutral-H/He viscosity reduction; execute only new bounded diagnostics in the sandbox.",
+  "scope": "Q=j=0 prescribed-constant-chi mechanics; separate neutral-H1/He4 common-T viscosity diagnostic",
+  "status": "complete",
+  "dependencies": [
+    {
+      "id": "HE32",
+      "identity": "16a424b7290f484c57e97c8ed74f81e6d2043782",
+      "description": "HE32"
+    },
+    {
+      "id": "HE33",
+      "identity": "bb1259b21c7b83b0376a5f7fcbb0c6321918ec90",
+      "description": "HE33"
+    },
+    {
+      "id": "background_NPZ",
+      "identity": "c97ffa6a793c092b6b559b32581a7996a82b85a8e725b0e5893be9ae1e7bf30a",
+      "description": "background_NPZ"
+    },
+    {
+      "id": "background_interpolant",
+      "identity": "299f95f94c3803977d1b0f23cdc63af37069ac5c274ba831d35d370d8e767f67",
+      "description": "background_interpolant"
+    },
+    {
+      "id": "contract",
+      "identity": "a998d4fd84892888296b1ba5ed6d30ed3aba6daf9290cfbfc4624f2338236e81",
+      "description": "contract"
+    },
+    {
+      "id": "reduction_code",
+      "identity": "1b1c717c630aed08afe3a8e39a33395f74cd6684ea355ef126fbdfcb31c90e12",
+      "description": "reduction_code"
+    },
+    {
+      "id": "neutral_code",
+      "identity": "40cf77034e077adb77ae145ec747de168d7674b55307dd7f722dada60e1e61d9",
+      "description": "neutral_code"
+    },
+    {
+      "id": "driver",
+      "identity": "891f08aefadfb45929e3c8a6891f16e1983dead02e3016bb095fa5f954eff370",
+      "description": "driver"
+    },
+    {
+      "id": "collision_data",
+      "identity": "699114aa23d13d38bd1d67fd74358fb52d06c25e8d3c87aa8d282de82dc26542",
+      "description": "collision_data"
+    },
+    {
+      "id": "render_code",
+      "identity": "fc67ec6acdc07b86c57c07f1fff5fc79e02aa5ad20cb18ab7d2903af9d39fe0c",
+      "description": "render_code"
+    },
+    {
+      "id": "environment",
+      "identity": "Python3.12.14;NumPy2.3.5;SciPy1.17.0;Matplotlib3.10.8;binary64;nativeBLAS1thread",
+      "description": "environment"
+    },
+    {
+      "id": "parallel_Lorentz",
+      "identity": "0868889acebeb4d9b70d38313a9a694d12bf8766",
+      "description": "parallel_Lorentz"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E_59d6b34a584e",
+      "kind": "artifact",
+      "locator": "CODEX_HANDOFF.md",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "a982b55d42793357fa7caed9ecdaaf29abc352c3d9933fb98d33c85e688f0977"
+    },
+    {
+      "id": "E_fc05482d60fa",
+      "kind": "artifact",
+      "locator": "CONTRACT.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "a998d4fd84892888296b1ba5ed6d30ed3aba6daf9290cfbfc4624f2338236e81"
+    },
+    {
+      "id": "E_cd7fac9a9f54",
+      "kind": "artifact",
+      "locator": "NEXT_DAG.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "4608c7d0d497fddb0e0b332104337a2ce3b3ff8a857641111bd4627948dea3c9"
+    },
+    {
+      "id": "E_e96115c09946",
+      "kind": "artifact",
+      "locator": "NEXT_THREAD_HANDOFF.md",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "2edc4e5f8a1f693f3b4e8fb586bad385020ac4f0aad9929549f023351b486a89"
+    },
+    {
+      "id": "E_e15b4a47957f",
+      "kind": "artifact",
+      "locator": "RESULTS_KO.md",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "7fdca2937396b0e2eb6d74cb0edaa0889cedc78f052744243e55a887121c8f77"
+    },
+    {
+      "id": "E_3ad8a0433e9f",
+      "kind": "source",
+      "locator": "data/NEUTRAL_H_HE_TRANSPORT_SUBSET.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "HE32",
+        "collision_data"
+      ],
+      "sha256": "699114aa23d13d38bd1d67fd74358fb52d06c25e8d3c87aa8d282de82dc26542"
+    },
+    {
+      "id": "E_586c24801b9a",
+      "kind": "source",
+      "locator": "data/SAVED_BACKGROUND.csv",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "HE32",
+        "collision_data"
+      ],
+      "sha256": "299f95f94c3803977d1b0f23cdc63af37069ac5c274ba831d35d370d8e767f67"
+    },
+    {
+      "id": "E_3a5abe31761c",
+      "kind": "storage",
+      "locator": "delivery/S1_ACK.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "ab7544cca0097d0499d579136bdd178850e0286bc21d090d7d5132c61f9ed238"
+    },
+    {
+      "id": "E_5b63a8cd3311",
+      "kind": "storage",
+      "locator": "delivery/S2_ACK.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "229158165c839aa0e62a767fcea60693d70ff320c0f79da2b8c347339809a080"
+    },
+    {
+      "id": "E_39eab4b8fa9c",
+      "kind": "storage",
+      "locator": "delivery/S2_REMOTE_READBACK.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "58067af8ff13b5e6701ae8908739168f2958259c65fd2e42887f073ec0b99120"
+    },
+    {
+      "id": "E_13537b0ef08a",
+      "kind": "artifact",
+      "locator": "evidence/BACKGROUND_INPUT.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "790aa812416a2014eff0e7ea8f8dba28359d971ce2d09d99959f2d33ed62c0b2"
+    },
+    {
+      "id": "E_12c6295fbebc",
+      "kind": "artifact",
+      "locator": "evidence/CONTROL_NUMERICAL_GUARD.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "0b77ad326c89572812f5cc47ae74013cbaf4120970bf8127f208460ba6ed3b16"
+    },
+    {
+      "id": "E_18d88159ff92",
+      "kind": "artifact",
+      "locator": "evidence/DELTA_INTAKE.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "44692effdbf10fc7e9d7ce1a83187edb15aec43ea4f4a1878028048829363e37"
+    },
+    {
+      "id": "E_0af476ddb42f",
+      "kind": "artifact",
+      "locator": "evidence/HE33_NODE_SMOKE.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "25da1cf67feb062772372dfb1b3c44f830de784a1d5fd9021b0b21d2683609dc"
+    },
+    {
+      "id": "E_9b8b6b0d3dcb",
+      "kind": "artifact",
+      "locator": "evidence/LOCAL_WORKSPACE_STATUS.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "74b075f33f37a37a9adf47b2fd87a90d62ecc6945ed2c9271e6866c634842613"
+    },
+    {
+      "id": "E_2b759965bf3e",
+      "kind": "calculation",
+      "locator": "evidence/MECHANICAL_EXECUTION.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "sha256": "ad0a9e4b890f4228a700815a290a4a61558513783e9d54c14ce149fe82acf104"
+    },
+    {
+      "id": "E_43fcb16d2f95",
+      "kind": "artifact",
+      "locator": "evidence/PACKAGE_VERIFICATION.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "9f367cd0031368966c769310bd1fbf1053296d3ace187ae734da82452ee9672d"
+    },
+    {
+      "id": "E_e14ecd78d132",
+      "kind": "calculation",
+      "locator": "evidence/PLOT_EXECUTION.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "sha256": "cf21afb6862176340bb99ac5beeb4269bdfa8206c4f77ce7cabdc04f522b58a2"
+    },
+    {
+      "id": "E_458257e8b3e3",
+      "kind": "calculation",
+      "locator": "evidence/REDUCTION_EXECUTION_COMMANDS.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "sha256": "9a044a8472a50b8f1746fecbb9f7f3eb4272dab4dbaa6f5191831de5b216bfad"
+    },
+    {
+      "id": "E_6193dbbe2812",
+      "kind": "calculation",
+      "locator": "evidence/REDUCTION_UNIT_CHECKS.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "sha256": "532459038a7b9f592ebfa83243dbe2703d93e624ed189c23818ca9b4843966b5"
+    },
+    {
+      "id": "E_8551f018e706",
+      "kind": "calculation",
+      "locator": "evidence/TRANSPORT_VALIDATION.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "sha256": "7ae5cb1e2171830d1b5574340845e87c26dc5c27c403dea9d9a40b24f62b713f"
+    },
+    {
+      "id": "E_ec2c70ec20ab",
+      "kind": "calculation",
+      "locator": "evidence/prototypes/REDUCTION_CONTROLS.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "sha256": "18ae87b7b1fcb0a038dbeb4d5facc9e8935dbfe8a16e4b4b848d36a618b05c8c"
+    },
+    {
+      "id": "E_a3ec85029906",
+      "kind": "artifact",
+      "locator": "evidence/prototypes/REDUCTION_MANIFEST.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "eed13bf1da4bae6d4d4089ed7984b3ec3e2a644733f8a187b494f3a17ce4320b"
+    },
+    {
+      "id": "E_161aa10842f0",
+      "kind": "artifact",
+      "locator": "evidence/prototypes/REDUCTION_WOLFRAM.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "20fc2d41abca5b5081ea6773350ff4c9ce5065e97e0a3102e3fe6b3d0fad6e60"
+    },
+    {
+      "id": "E_fe4d95397996",
+      "kind": "artifact",
+      "locator": "evidence/prototypes/SERIALIZATION_FAILURE.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "2a0c026c399ea1541bcd2d3a428c501c04cba6d56932ca31867906d2f3ef159d"
+    },
+    {
+      "id": "E_72b64aa08b8f",
+      "kind": "calculation",
+      "locator": "evidence/prototypes/TRANSPORT_EXECUTION.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "sha256": "a42c52ede9e6a116e3721dd5e35b90e54a5d51e54f79fb6509a96cd0f8bf8446"
+    },
+    {
+      "id": "E_9b7a729ccfd7",
+      "kind": "artifact",
+      "locator": "evidence/prototypes/TRANSPORT_WOLFRAM.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "229c6e85cdc0bfa0bf991bf6ef59bc5ce9274e34314e96b4c73561e72a18896f"
+    },
+    {
+      "id": "E_55003391164d",
+      "kind": "review",
+      "locator": "evidence/review/FINALIZATION_EXECUTION.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "reduction_code",
+        "neutral_code",
+        "driver",
+        "background_interpolant"
+      ],
+      "sha256": "06bfda6d13c75d2eba3ac963e554fc3fc5626c018d58db8174e56bb154ad79cd"
+    },
+    {
+      "id": "E_84bee07586e7",
+      "kind": "review",
+      "locator": "evidence/review/INDEPENDENT_CHECKS.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "reduction_code",
+        "neutral_code",
+        "driver",
+        "background_interpolant"
+      ],
+      "sha256": "5a349452fe13d305d5fe253e735c094ba2b30541843409269ec44858947272c0"
+    },
+    {
+      "id": "E_f282eafaaa35",
+      "kind": "review",
+      "locator": "evidence/review/INDEPENDENT_REVIEW.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "reduction_code",
+        "neutral_code",
+        "driver",
+        "background_interpolant"
+      ],
+      "sha256": "311ed2f29655ba34bd73d13ca2aaf480f02beab1c4322d129a87da1e2ce08836"
+    },
+    {
+      "id": "E_9c7fa5fe17a4",
+      "kind": "review",
+      "locator": "evidence/review/PHYSICS_AND_CODE_REVIEW.md",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "reduction_code",
+        "neutral_code",
+        "driver",
+        "background_interpolant"
+      ],
+      "sha256": "5e456ee1712b692dbaba08a8b61b3745d50dd3971322851c25bf7d2512d1c2e9"
+    },
+    {
+      "id": "E_883ae96488ef",
+      "kind": "review",
+      "locator": "evidence/review/PHYSICS_AND_CODE_REVIEW_PRE_OUTPUT.md",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "reduction_code",
+        "neutral_code",
+        "driver",
+        "background_interpolant"
+      ],
+      "sha256": "7ff0d9a58e8b887aeaa44a58424b2ae9b17a73f26231fe8cb512a1c5dfd33f71"
+    },
+    {
+      "id": "E_1b2e02dd4e5e",
+      "kind": "review",
+      "locator": "evidence/review/VISUAL_REVIEW.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "reduction_code",
+        "neutral_code",
+        "driver",
+        "background_interpolant"
+      ],
+      "sha256": "b6eb07b726c92542c19d207048998a6c8865aab316a377ed7d305c80297d629a"
+    },
+    {
+      "id": "E_5e2189ff8140",
+      "kind": "calculation",
+      "locator": "results/MECHANICAL_CONTROLS.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "sha256": "3665e1aaa1af955e54575faae2b56762caabb3fda8a61b0a81c92601c33cd158"
+    },
+    {
+      "id": "E_17ccbc78abfb",
+      "kind": "artifact",
+      "locator": "results/MECHANICAL_RECEIPT.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "fe548fa834793f29577de82a0616da4d13ac3c33e0c063b17c027bd0b2f96d47"
+    },
+    {
+      "id": "E_e66304514c4b",
+      "kind": "artifact",
+      "locator": "results/NEUTRAL_TRANSPORT.json",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "eb8503ee40eb9d2a417af0cb10bde58d3d0a5e97d18541c2f2cb95212938f67c"
+    },
+    {
+      "id": "E_2be3f1183b3a",
+      "kind": "implementation",
+      "locator": "run_control.py",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "891f08aefadfb45929e3c8a6891f16e1983dead02e3016bb095fa5f954eff370"
+    },
+    {
+      "id": "E_96a77ce44869",
+      "kind": "implementation",
+      "locator": "src/certified_relaxation.py",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "1b1c717c630aed08afe3a8e39a33395f74cd6684ea355ef126fbdfcb31c90e12"
+    },
+    {
+      "id": "E_90c5282f1cf1",
+      "kind": "implementation",
+      "locator": "src/neutral_transport.py",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract"
+      ],
+      "sha256": "40cf77034e077adb77ae145ec747de168d7674b55307dd7f722dada60e1e61d9"
+    },
+    {
+      "id": "E_f6bff9d93e9e",
+      "kind": "derivation",
+      "locator": "theory/CERTIFIED_REDUCTION.md",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "HE33",
+        "collision_data"
+      ],
+      "sha256": "6abdf9caebcc97da0cb7f5b2f33f0a97d810ad02b5500bb09f6c9e628fd8c74b"
+    },
+    {
+      "id": "E_cef9304ca940",
+      "kind": "derivation",
+      "locator": "theory/EQUATION_CODE_MAP.md",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "HE33",
+        "collision_data"
+      ],
+      "sha256": "9e59e9724af9d62f4ee1352becb469bf4fcdc3e9752f412f300527b285cf9984"
+    },
+    {
+      "id": "E_242cd4d7bd2f",
+      "kind": "derivation",
+      "locator": "theory/NEUTRAL_TRANSPORT_KO.md",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "HE33",
+        "collision_data"
+      ],
+      "sha256": "4f2643a8536ca58316ed11b8d567b730d0d09b6161bc1ce90637f6babc63d89c"
+    },
+    {
+      "id": "E_58d22236692b",
+      "kind": "derivation",
+      "locator": "theory/SCOPE_AND_DEPENDENCIES_KO.md",
+      "scope": "Scoped evidence as defined in the referenced artifact; not an all-physics completion claim",
+      "dependency_ids": [
+        "contract",
+        "HE33",
+        "collision_data"
+      ],
+      "sha256": "9382d4ac96e32ab347f287437195c610307b8aa46fad21cdca9e4060cd9742cb"
+    }
+  ],
+  "stages": [
+    {
+      "id": "R1",
+      "status": "complete",
+      "evidence_refs": [
+        "E_fc05482d60fa",
+        "E_18d88159ff92",
+        "E_0af476ddb42f"
+      ],
+      "dependency_ids": [
+        "contract"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S0",
+      "backup_record": "delivery/S0_ACK.json",
+      "next_stage_ids": [
+        "R2"
+      ]
+    },
+    {
+      "id": "R2",
+      "status": "complete",
+      "evidence_refs": [
+        "E_fc05482d60fa",
+        "E_18d88159ff92",
+        "E_0af476ddb42f"
+      ],
+      "dependency_ids": [
+        "contract"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S0",
+      "backup_record": "delivery/S0_ACK.json",
+      "next_stage_ids": [
+        "R3"
+      ]
+    },
+    {
+      "id": "R3",
+      "status": "complete",
+      "evidence_refs": [
+        "E_fc05482d60fa",
+        "E_18d88159ff92",
+        "E_0af476ddb42f"
+      ],
+      "dependency_ids": [
+        "contract"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S0",
+      "backup_record": "delivery/S0_ACK.json",
+      "next_stage_ids": [
+        "R4"
+      ]
+    },
+    {
+      "id": "R4",
+      "status": "complete",
+      "evidence_refs": [
+        "E_fc05482d60fa",
+        "E_18d88159ff92",
+        "E_0af476ddb42f"
+      ],
+      "dependency_ids": [
+        "contract"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S0",
+      "backup_record": "delivery/S0_ACK.json",
+      "next_stage_ids": [
+        "R5"
+      ]
+    },
+    {
+      "id": "R5",
+      "status": "complete",
+      "evidence_refs": [
+        "E_f6bff9d93e9e",
+        "E_242cd4d7bd2f",
+        "E_161aa10842f0",
+        "E_9b7a729ccfd7"
+      ],
+      "dependency_ids": [
+        "HE33",
+        "collision_data",
+        "contract"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "R6"
+      ]
+    },
+    {
+      "id": "R6",
+      "status": "complete",
+      "evidence_refs": [
+        "E_84bee07586e7",
+        "E_883ae96488ef"
+      ],
+      "dependency_ids": [
+        "background_interpolant",
+        "contract",
+        "driver",
+        "neutral_code",
+        "reduction_code"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "R7"
+      ]
+    },
+    {
+      "id": "R7",
+      "status": "complete",
+      "evidence_refs": [
+        "E_ec2c70ec20ab",
+        "E_72b64aa08b8f",
+        "E_5e2189ff8140"
+      ],
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "R8"
+      ]
+    },
+    {
+      "id": "R8",
+      "status": "complete",
+      "evidence_refs": [
+        "E_5e2189ff8140",
+        "E_e66304514c4b",
+        "E_fc05482d60fa"
+      ],
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "R9"
+      ]
+    },
+    {
+      "id": "R9",
+      "status": "complete",
+      "evidence_refs": [
+        "E_cef9304ca940",
+        "E_96a77ce44869",
+        "E_90c5282f1cf1"
+      ],
+      "dependency_ids": [
+        "HE33",
+        "collision_data",
+        "contract"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "R10",
+        "C1"
+      ]
+    },
+    {
+      "id": "R10",
+      "status": "complete",
+      "evidence_refs": [
+        "E_e15b4a47957f",
+        "E_59d6b34a584e",
+        "E_e96115c09946",
+        "E_cd7fac9a9f54",
+        "E_5b63a8cd3311",
+        "E_39eab4b8fa9c"
+      ],
+      "dependency_ids": [
+        "contract"
+      ],
+      "reason": "Scientific payload and both handoffs published at S2; full79-payload archive and remote blob identities verified; provider acknowledgement completed.",
+      "reuse": null,
+      "checkpoint": "S2",
+      "backup_record": "delivery/S2_ACK.json",
+      "next_stage_ids": []
+    },
+    {
+      "id": "C1",
+      "status": "complete",
+      "evidence_refs": [
+        "E_fc05482d60fa",
+        "E_13537b0ef08a"
+      ],
+      "dependency_ids": [
+        "contract"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "C2"
+      ]
+    },
+    {
+      "id": "C2",
+      "status": "complete",
+      "evidence_refs": [
+        "E_cef9304ca940",
+        "E_3ad8a0433e9f",
+        "E_586c24801b9a"
+      ],
+      "dependency_ids": [
+        "HE32",
+        "HE33",
+        "collision_data",
+        "contract"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "C3"
+      ]
+    },
+    {
+      "id": "C3",
+      "status": "complete",
+      "evidence_refs": [
+        "E_f6bff9d93e9e",
+        "E_96a77ce44869",
+        "E_12c6295fbebc"
+      ],
+      "dependency_ids": [
+        "HE33",
+        "collision_data",
+        "contract"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "C4"
+      ]
+    },
+    {
+      "id": "C4",
+      "status": "complete",
+      "evidence_refs": [
+        "E_fc05482d60fa",
+        "E_e66304514c4b",
+        "E_2b759965bf3e"
+      ],
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "C5"
+      ]
+    },
+    {
+      "id": "C5",
+      "status": "complete",
+      "evidence_refs": [
+        "E_96a77ce44869",
+        "E_90c5282f1cf1",
+        "E_2be3f1183b3a"
+      ],
+      "dependency_ids": [
+        "contract"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "C6"
+      ]
+    },
+    {
+      "id": "C6",
+      "status": "complete",
+      "evidence_refs": [
+        "E_6193dbbe2812",
+        "E_8551f018e706",
+        "E_12c6295fbebc"
+      ],
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "C7"
+      ]
+    },
+    {
+      "id": "C7",
+      "status": "complete",
+      "evidence_refs": [
+        "E_5e2189ff8140",
+        "E_e66304514c4b"
+      ],
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "C8"
+      ]
+    },
+    {
+      "id": "C8",
+      "status": "complete",
+      "evidence_refs": [
+        "E_17ccbc78abfb",
+        "E_2b759965bf3e",
+        "E_8551f018e706"
+      ],
+      "dependency_ids": [
+        "contract",
+        "environment"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S1",
+      "backup_record": "delivery/S1_ACK.json",
+      "next_stage_ids": [
+        "C9"
+      ]
+    },
+    {
+      "id": "C9",
+      "status": "complete",
+      "evidence_refs": [
+        "E_f282eafaaa35",
+        "E_9c7fa5fe17a4",
+        "E_1b2e02dd4e5e",
+        "E_43fcb16d2f95"
+      ],
+      "dependency_ids": [
+        "background_interpolant",
+        "contract",
+        "driver",
+        "neutral_code",
+        "reduction_code"
+      ],
+      "reason": "",
+      "reuse": null,
+      "checkpoint": "S2",
+      "backup_record": "delivery/S2_ACK.json",
+      "next_stage_ids": [
+        "C10"
+      ]
+    },
+    {
+      "id": "C10",
+      "status": "complete",
+      "evidence_refs": [
+        "E_e15b4a47957f",
+        "E_59d6b34a584e",
+        "E_e96115c09946",
+        "E_cd7fac9a9f54",
+        "E_5b63a8cd3311",
+        "E_39eab4b8fa9c"
+      ],
+      "dependency_ids": [
+        "contract"
+      ],
+      "reason": "Scientific payload and both handoffs published at S2; full79-payload archive and remote blob identities verified; provider acknowledgement completed.",
+      "reuse": null,
+      "checkpoint": "S2",
+      "backup_record": "delivery/S2_ACK.json",
+      "next_stage_ids": []
+    }
+  ],
+  "claims": [
+    {
+      "id": "CL_CONTINUUM",
+      "statement": "Initial-layer reduction has a residual/contraction continuum bound for the specified constant-chi piecewise-linear source contract.",
+      "scope": "Q=j=0; contractive/cone prerequisites; not an outward-rounded machine proof",
+      "basis": [
+        "derived",
+        "numerically checked",
+        "implementation-verified"
+      ],
+      "evidence_refs": [
+        "E_f6bff9d93e9e",
+        "E_cef9304ca940",
+        "E_5e2189ff8140",
+        "E_f282eafaaa35"
+      ],
+      "obligations": [
+        "New residual required for variable chi or Q/J; background and physical fit uncertainty are separate"
+      ]
+    },
+    {
+      "id": "CL_ACCEPT",
+      "statement": "Fixed1e-6 bounds accept chi1000/10000 and reject chi10/100 on one saved input.",
+      "scope": "Four discrete prescribed controls, r0=0, 201 saved knots; separate numerical gate passes",
+      "basis": [
+        "numerically checked",
+        "implementation-verified"
+      ],
+      "evidence_refs": [
+        "E_5e2189ff8140",
+        "E_2b759965bf3e"
+      ],
+      "obligations": []
+    },
+    {
+      "id": "CL_NEUTRAL",
+      "statement": "Positive scalar expression is algebraically identical to the stated neutral H1/He4 first-Sonine2x2 viscosity system;201-epoch parity6.4653e-16.",
+      "scope": "Common T20000K diagnostic; source fit domain50-50000K; A*m_u convention",
+      "basis": [
+        "literature-supported",
+        "derived",
+        "numerically checked",
+        "implementation-verified"
+      ],
+      "evidence_refs": [
+        "E_242cd4d7bd2f",
+        "E_e66304514c4b",
+        "E_9b7a729ccfd7"
+      ],
+      "obligations": [
+        "Physical fit uncertainty and all-mixture exchange remain outside this parity check"
+      ]
+    },
+    {
+      "id": "CL_TIMING",
+      "statement": "Measured median ratios are10.6899 against selected segmented Radau and1.29005 against batched neutral matrix evaluation.",
+      "scope": "This shared host/workload; raw scatter retained; no optimized or universal speedup claim",
+      "basis": [
+        "numerically checked"
+      ],
+      "evidence_refs": [
+        "E_5e2189ff8140",
+        "E_e66304514c4b"
+      ],
+      "obligations": []
+    },
+    {
+      "id": "CL_FULL_PHYSICS",
+      "statement": "Calibrated baryonic closure, reactive/thermal/source coupling, additional species and metric feedback remain open.",
+      "scope": "B1+B2 to B3 to B4 to B5; original goal gap explicit",
+      "basis": [
+        "unresolved"
+      ],
+      "evidence_refs": [
+        "E_cd7fac9a9f54",
+        "E_58d22236692b"
+      ],
+      "obligations": [
+        "Complete or explicitly narrow the required B1-B5 dependencies in separate units"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "CK_MATH",
+      "domain": "math",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "E_f282eafaaa35",
+        "E_f6bff9d93e9e"
+      ],
+      "reason": "Independent constructive proof and algebra review",
+      "execution_ref": null
+    },
+    {
+      "id": "CK_PHYSICS",
+      "domain": "physics",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "E_f282eafaaa35",
+        "E_58d22236692b"
+      ],
+      "reason": "Scope, definitions, primary normalizations; full gas closure excluded",
+      "execution_ref": null
+    },
+    {
+      "id": "CK_REDUCTION",
+      "domain": "implementation",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "E_6193dbbe2812"
+      ],
+      "reason": "Eight final affected groups",
+      "execution_ref": "EX_REDUCTION_2"
+    },
+    {
+      "id": "CK_MECHANICAL",
+      "domain": "numerics",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "E_5e2189ff8140"
+      ],
+      "reason": "Fixed target, tighter independent reference, numerical gate and mutations",
+      "execution_ref": "EX_MECHANICAL"
+    },
+    {
+      "id": "CK_NEUTRAL",
+      "domain": "numerics",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "E_e66304514c4b"
+      ],
+      "reason": "26affected checks and201-epoch independent2x2 parity",
+      "execution_ref": "EX_NEUTRAL"
+    },
+    {
+      "id": "CK_PACKAGE",
+      "domain": "packaging",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "E_43fcb16d2f95",
+        "E_e14ecd78d132"
+      ],
+      "reason": "19current receipt-linked files; two PNG/SVG pairs and visual review",
+      "execution_ref": "EX_PACKAGE"
+    },
+    {
+      "id": "CK_STORAGE",
+      "domain": "storage",
+      "result": "pass_scoped",
+      "evidence_refs": [
+        "E_5b63a8cd3311"
+      ],
+      "reason": "Provider completed acknowledgement and Git commit/tree identities; archive payload hashes locally verified",
+      "execution_ref": null
+    }
+  ],
+  "executions": [
+    {
+      "id": "EX_NODE",
+      "status": "completed",
+      "command": "node research/he33_baryon_moment_foundation_20261022/checks/check_core.cjs",
+      "environment": "Node v24.19.0",
+      "evidence_refs": [
+        "E_0af476ddb42f"
+      ],
+      "exit_code": 0,
+      "reason": ""
+    },
+    {
+      "id": "EX_MECHANICAL",
+      "status": "completed",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "/tmp/he32_resume_20261022/repos/BASS_HE/research/he34_sandbox_certified_relaxation_20261022/run_control.py"
+      ],
+      "environment": {
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "numpy": "2.3.5",
+        "scipy": "1.17.0",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+        "cpu_count_reported": 9
+      },
+      "evidence_refs": [
+        "E_2b759965bf3e",
+        "E_5e2189ff8140"
+      ],
+      "exit_code": 0,
+      "reason": ""
+    },
+    {
+      "id": "EX_NEUTRAL",
+      "status": "completed",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/tmp/he32_resume_20261022/repos/BASS_HE/research/he34_sandbox_certified_relaxation_20261022/checks/check_transport.py",
+        "--background",
+        "/tmp/he32_resume_20261022/restored/research/he32_sandbox_primordial_20261021/results/cases/s07_m03_r03.npz",
+        "--he32-unit",
+        "/tmp/he32_resume_20261022/repos/BASS_HE/research/he32_sandbox_primordial_20261021",
+        "--repeats",
+        "200",
+        "--worker"
+      ],
+      "environment": {
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "numpy": "2.3.5",
+        "scipy": "1.17.0",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+        "topology": {
+          "Architecture": "x86_64",
+          "CPU(s)": "9",
+          "Model name": "INTEL(R) XEON(R) PLATINUM 8573C",
+          "Thread(s) per core": "1",
+          "Core(s) per socket": "9",
+          "Socket(s)": "1",
+          "NUMA node(s)": "1"
+        },
+        "logical_cpus": 9,
+        "affinity_cpu_count": 9,
+        "memory": {
+          "MemTotal": "10230288 kB",
+          "MemAvailable": "9399568 kB",
+          "SwapTotal": "0 kB"
+        },
+        "cgroup_limits": {
+          "memory.max": "8589934592",
+          "memory.current": "5427716096",
+          "cpu.max": "1600000 200000",
+          "cpuset.cpus.effective": "0-8"
+        },
+        "threadpools": [
+          {
+            "user_api": "blas",
+            "internal_api": "openblas",
+            "num_threads": 1,
+            "prefix": "libscipy_openblas",
+            "filepath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/numpy.libs/libscipy_openblas64_-fdde5778.so",
+            "version": "0.3.30",
+            "threading_layer": "pthreads",
+            "architecture": "SkylakeX"
+          }
+        ],
+        "thread_environment": {
+          "OPENBLAS_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "NUMEXPR_NUM_THREADS": "1"
+        },
+        "timer": {
+          "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+          "resolution_s": 1e-09
+        },
+        "arithmetic": "binary64; no fast-math or mixed precision"
+      },
+      "evidence_refs": [
+        "E_8551f018e706",
+        "E_e66304514c4b"
+      ],
+      "exit_code": 0,
+      "reason": ""
+    },
+    {
+      "id": "EX_REDUCTION_1",
+      "status": "completed",
+      "command": "python -u research/he34_sandbox_certified_relaxation_20261022/checks/check_relaxation.py",
+      "environment": {
+        "python": "3.12.14",
+        "numpy": "2.3.5",
+        "scipy": "1.17.0"
+      },
+      "evidence_refs": [
+        "E_458257e8b3e3",
+        "E_6193dbbe2812"
+      ],
+      "exit_code": 0,
+      "reason": ""
+    },
+    {
+      "id": "EX_REDUCTION_2",
+      "status": "completed",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python -u research/he34_sandbox_certified_relaxation_20261022/checks/check_relaxation.py",
+      "environment": {
+        "python": "3.12.14",
+        "numpy": "2.3.5",
+        "scipy": "1.17.0"
+      },
+      "evidence_refs": [
+        "E_458257e8b3e3",
+        "E_6193dbbe2812"
+      ],
+      "exit_code": 0,
+      "reason": ""
+    },
+    {
+      "id": "EX_PLOT_1",
+      "status": "completed",
+      "command": "PYTHONDONTWRITEBYTECODE=1 MPLBACKEND=Agg MPLCONFIGDIR=/tmp/he34_scr_plot_mplconfig_20261022 python -u research/he34_sandbox_certified_relaxation_20261022/plot_results.py",
+      "environment": {
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+        "matplotlib": "3.10.8",
+        "numpy": "2.3.5",
+        "pillow": "12.3.0",
+        "backend": "Agg",
+        "font": {
+          "family": "DejaVu Sans",
+          "path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf",
+          "sha256": "3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+        },
+        "font_size_pt": 10.5,
+        "png_dpi": 300
+      },
+      "evidence_refs": [
+        "E_e14ecd78d132"
+      ],
+      "exit_code": 0,
+      "reason": ""
+    },
+    {
+      "id": "EX_PLOT_2",
+      "status": "completed",
+      "command": "PYTHONDONTWRITEBYTECODE=1 MPLBACKEND=Agg MPLCONFIGDIR=/tmp/he34_scr_plot_mplconfig_20261022 python -u research/he34_sandbox_certified_relaxation_20261022/plot_results.py",
+      "environment": {
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+        "matplotlib": "3.10.8",
+        "numpy": "2.3.5",
+        "pillow": "12.3.0",
+        "backend": "Agg",
+        "font": {
+          "family": "DejaVu Sans",
+          "path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf",
+          "sha256": "3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+        },
+        "font_size_pt": 10.5,
+        "png_dpi": 300
+      },
+      "evidence_refs": [
+        "E_e14ecd78d132"
+      ],
+      "exit_code": 0,
+      "reason": ""
+    },
+    {
+      "id": "EX_PROTOTYPE_1",
+      "status": "failed",
+      "command": "python3 /tmp/he34_reduction_theory/check_reduction.py",
+      "environment": {
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "numpy": "2.3.5",
+        "scipy": "1.17.0"
+      },
+      "evidence_refs": [
+        "E_a3ec85029906",
+        "E_fe4d95397996"
+      ],
+      "exit_code": 1,
+      "reason": "numerical controls returned; serialization failed"
+    },
+    {
+      "id": "EX_PROTOTYPE_2",
+      "status": "completed",
+      "command": "python3 /tmp/he34_reduction_theory/check_reduction.py",
+      "environment": {
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "numpy": "2.3.5",
+        "scipy": "1.17.0"
+      },
+      "evidence_refs": [
+        "E_a3ec85029906",
+        "E_fe4d95397996"
+      ],
+      "exit_code": 0,
+      "reason": "bound comparisons and serialization passed"
+    },
+    {
+      "id": "EX_PACKAGE",
+      "status": "completed",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "research/he34_sandbox_certified_relaxation_20261022/verify_saved.py"
+      ],
+      "environment": "Python3.12.14 standard library; read-only hashes",
+      "evidence_refs": [
+        "E_43fcb16d2f95"
+      ],
+      "exit_code": 0,
+      "reason": ""
+    }
+  ],
+  "decisions": [
+    {
+      "id": "DEC1",
+      "text": "Adopt bounded reduction only when both fixed continuum thresholds and separate numerical gate pass; retain rejected controls",
+      "evidence_refs": [
+        "E_5e2189ff8140"
+      ]
+    },
+    {
+      "id": "DEC2",
+      "text": "Keep viscosity matching separate from prescribed mechanics and Lorentz Grad projection",
+      "evidence_refs": [
+        "E_cd7fac9a9f54",
+        "E_58d22236692b"
+      ]
+    }
+  ],
+  "overrides": [
+    {
+      "id": "VERSION",
+      "text": "User explicitly keeps workflow1.0.0/approval0.2; no migration to installed plugin1.3.0 or parallel unit workflow"
+    }
+  ],
+  "failures": [
+    {
+      "id": "F_JSON",
+      "class": "implementation",
+      "evidence_refs": [
+        "E_fe4d95397996",
+        "E_a3ec85029906"
+      ],
+      "next_action": "Resolved NumPy bool serialization; preserve both8-control attempts and320interval solves",
+      "execution_ref": "EX_PROTOTYPE_1"
+    },
+    {
+      "id": "F_GIT",
+      "class": "environment",
+      "evidence_refs": [
+        "E_9b8b6b0d3dcb"
+      ],
+      "next_action": "Resolved by exact connector reads and Git-data API publication; local HEAD remainsHE32"
+    },
+    {
+      "id": "F_REVIEW_ID",
+      "class": "input_dependency",
+      "evidence_refs": [
+        "E_55003391164d"
+      ],
+      "next_action": "Reviewed explicit numerical-budget contract addition and completed final hash audit; no science replay"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "NEXT",
+      "text": "NEXT_DAG B1 transport pair/domain/moment inventory and B2 SI/normalization/energy-owner adapter in parallel; then B3-B5 gates",
+      "evidence_refs": [
+        "E_cd7fac9a9f54"
+      ]
+    }
+  ],
+  "counts": {
+    "old_HE32_IVP_render_benchmark_replays": [
+      0,
+      0,
+      0
+    ],
+    "new_full_cosmological_IVPs": 0,
+    "saved_background_reference_histories": 11,
+    "saved_background_reference_interval_solves": 2200,
+    "prototype_synthetic_executions": 16,
+    "prototype_interval_solves": 320,
+    "independent_new_synthetic_histories": 2,
+    "independent_new_synthetic_source_intervals": 6,
+    "new_figure_pairs": 2,
+    "NCP_jobs": 0
+  }
+}

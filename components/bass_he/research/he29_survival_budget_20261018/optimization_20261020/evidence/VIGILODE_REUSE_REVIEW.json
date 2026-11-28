@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "unit_id": "HE29_VIGILODE_REUSE_REVIEW_20261020",
+  "review_completed_utc": "2026-10-20 02:48:27 UTC",
+  "reviewer": "/root/handoff_review",
+  "status": "COMPLETE_SCOPED_SOURCE_AND_PUBLISHED_RESULT_INTAKE",
+  "scope": "Latest upstream result census and exact reuse/operator API feasibility; no source mutation, builds or rerun of existing tests/science.",
+  "execution_pin": "a21d573980f66fe02891bd216153443b5352f921",
+  "active_alternative": {
+    "branch": "claude/nice-dijkstra-208xq0",
+    "sha": "c03ca90f19a9e64ba7751c069325a48b54b39c2e",
+    "ahead": 16,
+    "library_delta": "Only rodas5p-core/src/operator.rs changed among production library sources in this compare: ShiftedOperator explicit M-hgammaJ construction now returns typed error instead of expect panic.",
+    "commit": "604a91e703da062cd2445bc2cd9468f991a3ab43",
+    "HE29_relevance": "Protected HE29 JVP-only linearization has no explicit matrix; this particular explicit() error path is not reached there. No observed need to change HE29 execution pin."
+  },
+  "no_HE29_return": {
+    "status": "NONE_OBSERVED_IN_SELECTED_NATIVE_RESULTS",
+    "recursive_trees": [
+      {
+        "id": "pr71",
+        "url": "https://api.github.com/repos/cosmosapjw-quantum/vigilode/git/trees/64b9852124b67eedbb8575b42c01127e4b86283b?recursive=1",
+        "sha": "64b9852124b67eedbb8575b42c01127e4b86283b",
+        "total": 6444,
+        "truncated": false,
+        "HE29_paths": []
+      },
+      {
+        "id": "pr73",
+        "url": "https://api.github.com/repos/cosmosapjw-quantum/vigilode/git/trees/3c0157910076ce552283c831c2be000c66671fab?recursive=1",
+        "sha": "3c0157910076ce552283c831c2be000c66671fab",
+        "total": 6285,
+        "truncated": false,
+        "HE29_paths": []
+      },
+      {
+        "id": "pr74",
+        "url": "https://api.github.com/repos/cosmosapjw-quantum/vigilode/git/trees/15c43ce76734d0a560fcec5909ac49f1e6f2d347?recursive=1",
+        "sha": "15c43ce76734d0a560fcec5909ac49f1e6f2d347",
+        "total": 6248,
+        "truncated": false,
+        "HE29_paths": []
+      },
+      {
+        "id": "pr75",
+        "url": "https://api.github.com/repos/cosmosapjw-quantum/vigilode/git/trees/6c945b6c6e0e024d8f733c21da8d35fbcc3c5f2a?recursive=1",
+        "sha": "6c945b6c6e0e024d8f733c21da8d35fbcc3c5f2a",
+        "total": 6400,
+        "truncated": false,
+        "HE29_paths": []
+      },
+      {
+        "id": "midcheck",
+        "url": "https://api.github.com/repos/cosmosapjw-quantum/vigilode/git/trees/6f1c17a9fc3dd801087ce729ffb6fdc3c17f3348?recursive=1",
+        "sha": "6f1c17a9fc3dd801087ce729ffb6fdc3c17f3348",
+        "total": 6418,
+        "truncated": false,
+        "HE29_paths": []
+      }
+    ],
+    "scope": "PR71,73,74,75 and latest midcheck branch trees contain no HE29/BASS_HE-named paths; inspected native result manifests identify generic VigilODE cases. Full branch/PR/Actions inventory is in vigilode_census.json."
+  },
+  "findings": [
+    {
+      "id": "API_CUSTOM_PC",
+      "object": "a21 sequential_matrix_free_step / sequential_stages_refined / make_pc",
+      "evidence": [
+        "crates/rodas5p-core/src/solver_types.rs",
+        "crates/rodas5p-integrators/src/sequential.rs",
+        "crates/rodas5p-integrators/src/problem.rs"
+      ],
+      "observation": "LinearSolverConfig.preconditioner is only None/Jacobi/Direct. The strict matrix-free step rejects both assembled preconditioners. make_pc is private. OdeProblem JVP is wrapped internally as ClosureOperator; it supplies no custom preconditioner or LinearOperator factory.",
+      "impact": "A Schur custom preconditioner cannot be passed to the existing HE29 adaptive entry point through these public arguments.",
+      "minimum_action": "Preserve upstream integrator and use an opt-in Rust exact-state JVP implementation/cached payload behind supplied JvpFn. A separate low-level core Preconditioner implementation is possible in principle but would require a different driver connection; not the current minimal implementation."
+    },
+    {
+      "id": "CACHE73",
+      "object": "PR73 private ExactBandCache and BandState::factor_with_policy",
+      "head": "3c0157910076ce552283c831c2be000c66671fab",
+      "observation": "Exact cache records all finite Jacobian entry bits and rounded inverse shift bits. Any changed bit/shape/invalid factorization invalidates the key. J and f continue to be evaluated at fresh states. FixedWidth2 falls back to Slices outside lower=upper=2. Cache is private pub(super), attached to BandState.",
+      "impact": "HE29 arrowhead couples gas and many photon bins and is not bandwidth-2. No public exact-cache object for a custom Schur factorization exists.",
+      "minimum_action": "Reuse exact-key/invalidation principle and fresh-J requirement for a model-side cache; do not label reused matrix values at merely nearby states as exact."
+    },
+    {
+      "id": "COUPLED74_SCOPE",
+      "object": "PR74 solver::validate and coupled_step",
+      "head": "15c43ce76734d0a560fcec5909ac49f1e6f2d347",
+      "observation": "Requires autonomous identity-mass problem and supplied JVP; returns one raw-U coupled operational candidate. It has no adaptive integration loop. Config defaults atol1e-10/rtol1e-6. Candidate presence indicates the full-space residual gate passed, while embedded_test_passes remains a separate flag.",
+      "impact": "Cannot replace the existing HE29 nonautonomous segment integration call unchanged. Existing a21 OdeProblem::time_augmented_clone is a concrete augmentation API but does not supply the missing coupled adaptive driver or physical acceptance.",
+      "minimum_action": "Keep the current four SciPy reference pairs and sequential optional bridge. Retain coupled module as a separately identified future experimental lane only if its new driver/clock/error acceptance becomes necessary."
+    },
+    {
+      "id": "RESIDUAL75",
+      "object": "PR75 residual_first.rs and fallback.rs",
+      "head": "6c945b6c6e0e024d8f733c21da8d35fbcc3c5f2a",
+      "observation": "At each projected iterate, evaluate all 8 residual RHS tasks first; if projected residual already passes, omit 8*basis_dimension stage JVPs. Otherwise compute stage derivatives at the saved states. Basis JVP and full-space checks remain. Avoided JVP counter is counterfactual work, distinct from actual attempted/completed counts. Callback ordering and dispatch count change.",
+      "impact": "Useful exact-output work avoidance in that coupled correction algorithm; cannot be transplanted as a residual-first switch into the a21 sequential driver.",
+      "minimum_action": "Reuse accounting distinction and avoid unnecessary recomputation where exact state identity is established; do not infer a speed gain for HE29 from generic coupled benchmark ratios."
+    },
+    {
+      "id": "PARALLEL_CALLBACK",
+      "object": "Existing HE29 bridge CallbackState and RUN_LOCK",
+      "observation": "Foreign Python callbacks and single NativeOwner stdio were deliberately restricted to sequential use. PR74/75 ParallelExecution invokes up to 8 same-iterate tasks through a bounded pool.",
+      "impact": "Existing callback pointer Send+Sync storage is not permission to run the physical callbacks concurrently.",
+      "minimum_action": "Keep sequential callback execution; move repeated arithmetic behind Rust JVP with a sequential preparation callback before considering task parallelism."
+    }
+  ],
+  "published_results": [
+    {
+      "pr": 71,
+      "head": "64b9852124b67eedbb8575b42c01127e4b86283b",
+      "status": "COMPLETE_SCOPED",
+      "numerical_source": "a21d573980f66fe02891bd216153443b5352f921",
+      "screening_source": "87df9b071c3a3a7828e999e553a088af5860d274",
+      "matched_source": "9c6a6d9145795e35b978652a567b806ddc84a6bd",
+      "runs": [
+        39257390707,
+        39261895983,
+        39263860973
+      ],
+      "screening_cells": 756,
+      "matched_pairs": 42,
+      "initial_bit_identity": "FAIL_PRESERVED for 18 Diffsol initial rows, maximum abs discrepancy 2.220446049250313e-16",
+      "scope": "Fresh generic three-solver benchmark; exact binary/source metadata retained. No HE29 native return."
+    },
+    {
+      "pr": 73,
+      "head": "3c0157910076ce552283c831c2be000c66671fab",
+      "measured_source": "f8e89b70528da8490fbe1febf0b0ede9ff84a01e",
+      "binary_sha256": "d7876d922e8aab19b75c41e8df63ab348b491070df495abab75752a2fecdca1f",
+      "run": 39304607635,
+      "status": "COMPLETE_SCOPED",
+      "saved_checks": {
+        "accuracy_rows": 432,
+        "bit_parity": 324,
+        "timing_processes": 576,
+        "existing_correctness_regressions": 9,
+        "existing_internal_tests": 17,
+        "whole_workspace": "timeout 660s, not PASS"
+      },
+      "actual_work": "linear diffusion dyadic129 cases: 134 attempts, 8 factorizations,126 exact hits,134 Jacobian evaluations. Nonlinear Brusselator and diffusion endpoint: zero exact hits.",
+      "ratios": "Exact-cache vs parent-slices paired ratios 1.11647\u20131.11830 on three dyadic129 diffusion cases; fixed2-only 1.04553\u20131.05757 across reported cases. Shared-runner diagnostic.",
+      "promotion": "HOLD_GENERAL_PERFORMANCE",
+      "baseline_binding": "Parent numerical source with common current benchmark driver; source binding explicitly says not a clean full historical-source build."
+    },
+    {
+      "pr": 74,
+      "head": "15c43ce76734d0a560fcec5909ac49f1e6f2d347",
+      "measured_source": "1e4a993874d6930ea2bb41bb0ff7392f21c33df7",
+      "binary_sha256": "b590f7e0048a89a22ec2e076d15547b58d162cf2440b34b98807f0e3aec9bc61",
+      "run": 39349031422,
+      "status": "COMPLETE_BOUNDED",
+      "saved_checks": {
+        "accuracy_rows": 80,
+        "reference_admitted": 77,
+        "root_and_embedded_test_passes": 20,
+        "timing_processes": 800,
+        "admitted_timing_processes": 770,
+        "existing_tests": 19,
+        "whole_workspace": false
+      },
+      "reference": "Independent Python/Rust frozen raw-U step recurrence, output-WRMS and embedded-difference gates 0.1; fixed input atol1e-10/rtol1e-6; not HE29 tolerances or full physical trajectory.",
+      "baseline": "Existing sequential GMRES; not claimed strongest U-form/other-library solver."
+    },
+    {
+      "pr": 75,
+      "head": "6c945b6c6e0e024d8f733c21da8d35fbcc3c5f2a",
+      "measured_source": "f08d152a35fb2db748692570969cb1723c287c26",
+      "binary_sha256": "d912b6c50c35aeee6e47b7b1063085b4bb839a4c76da2af98118958c92b40a89",
+      "run": 39355449893,
+      "status": "COMPLETE_BOUNDED",
+      "saved_checks": {
+        "accuracy_rows": 80,
+        "reference_admitted": 76,
+        "root_and_embedded_admitted": 48,
+        "exact_output_parity_pairs": 27,
+        "timing_processes": 640,
+        "admitted_timing_processes": 608,
+        "existing_tests": 33,
+        "whole_workspace": false
+      },
+      "actual_work": "Representative few-mode n12288 eps1 h0.001: eager59 JVP, lazy35,24 omitted; diffusion n96 h0.001:348\u2192188,160 omitted.",
+      "ratios": "Same-output eager1/lazy1 paired ratios for successful raw-U cases 1.2073\u20131.4682; lazy4 can be slower for small n96. Broad-case 1.8108 is failed-attempt cost, not solver speed. cap64 forces fallback and causes pronounced extra total work in chain/diffusion cases.",
+      "reuse_decision": "Take the exact work-avoidance pattern and complete failed-work accounting; no automatic routing threshold or HE29 speed projection."
+    },
+    {
+      "branch": "research/midcheck-three-solver-20261020",
+      "head": "6f1c17a9fc3dd801087ce729ffb6fdc3c17f3348",
+      "run": 39359950752,
+      "status": "FAILED_AT_SOURCE_PINNING",
+      "exit_code": 128,
+      "new_numerical_result": false
+    }
+  ],
+  "recommended_current_implementation": {
+    "baseline": "Keep VigilODE a21, existing sequential matrix-free adaptive integrator, normalized u endpoints [0,1], original outer and linear tolerances, original HE29 scientific admission.",
+    "opt_in_change": "Profile confirmed JVP boundary costs, then add an exact-state native JVP arithmetic cache behind supplied JvpFn, with one preparation callback for changed u/state and exact finite payload checks.",
+    "cache_identity": "Per-solve/per-segment ownership, u.to_bits, full z element bits and immutable callback/model identity; invalidate before failed refresh; no approximate Jacobian reuse. Preserve signed-zero conservatism.",
+    "boundary_validation": "Only new payload and callback/cache invariants plus tiny analytic or saved real-state comparisons; inherited suites and completed HE28/HE29 source-only results are reused."
+  },
+  "execution": {
+    "builds": 0,
+    "solver_runs": 0,
+    "test_suites": 0,
+    "remote_attempts": 0
+  },
+  "evidence_files": [
+    "vigilode_census.json",
+    "vigilode_source_samples.json"
+  ]
+}

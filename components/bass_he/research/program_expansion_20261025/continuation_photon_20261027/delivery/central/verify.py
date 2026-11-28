@@ -1,0 +1,23 @@
+"""One mechanical comparison against the captured base and HE history."""
+import hashlib,json,pathlib
+h=pathlib.Path(__file__).resolve().parent;u=h.parents[1];base=h.parent/'preflight/central_base';prior=u.parent/'continuation_state_20261027/delivery/central/result';result=h/'result';plan=json.loads((h/'PLAN.json').read_text());ids=set(plan['affected_total_ids']);carry=set(plan['carry_STATE04_observation_unchanged']);new=set(plan['new_PHOTON05_observations'])
+def load(p):return json.loads(p.read_text())
+b=load(base/'DAG.json');r=load(result/'DAG.json');o=load(prior/'DAG.json');bi={n['id']:n for n in b['nodes']};ri={n['id']:n for n in r['nodes']};oi={n['id']:n for n in o['nodes']};bc={x['id']:x for x in load(base/'status/CURRENT_STATUS.json')};rc={x['id']:x for x in load(result/'status/CURRENT_STATUS.json')};ph=load(result/'status/HE_EXP_PHOTON05_20261027.json');files=sorted(p.relative_to(result) for p in result.rglob('*') if p.is_file());pointer={'resolved':0,'external':0,'invalid':[]}
+def scan(value):
+ if isinstance(value,dict):
+  if isinstance(value.get('source_file'),str) and value['source_file'].startswith('status/') and isinstance(value.get('json_pointer'),str):
+   p=result/value['source_file'];ref=value['json_pointer']
+   if p.exists():
+    try:
+     obj=load(p)
+     if ref:
+      for part in ref.lstrip('/').split('/'):obj=obj[part.replace('~1','/').replace('~0','~')]
+     pointer['resolved']+=1
+    except (KeyError,IndexError,TypeError,ValueError) as e:pointer['invalid'].append({'file':value['source_file'],'pointer':ref,'error':str(e)})
+   else:pointer['external']+=1
+  for x in value.values():scan(x)
+ elif isinstance(value,list):
+  for x in value:scan(x)
+for name in ('HE_EXP_PHOTON05_20261027.json','HE_EXP_STATE04_20261027.json','HE_EXP_EVENT03_20261027.json','HE_EXP_FINITE_DRIFT_20261027.json'):scan(load(result/'status'/name))
+checks={'88_nodes_preserved':len(bi)==88 and bi.keys()==ri.keys(),'five_nodes_only':{i for i in bi if bi[i]!=ri[i]}==ids,'observation_only':all({k:v for k,v in bi[i].items() if k!='status_observation'}=={k:v for k,v in ri[i].items() if k!='status_observation'} for i in ids),'83_other_nodes_and_rows_unchanged':all(bi[i]==ri[i] and bc[i]==rc[i] for i in bi if i not in ids),'five_rows_observation_only':all({k:v for k,v in bc[i].items() if k!='observation'}=={k:v for k,v in rc[i].items() if k!='observation'} for i in ids),'top_level_unchanged':{k:v for k,v in b.items() if k!='nodes'}=={k:v for k,v in r.items() if k!='nodes'},'carry_two_STATE04_exact':all(ri[i]['status_observation']==oi[i]['status_observation'] for i in carry),'two_closure_previous_STATE04_exact':all(ph['previous_observations'][i]==oi[i]['status_observation'] for i in ('HE-CLOSURE','HE-EXP-CLOSURE')),'all_base_observations_preserved':all(ph['base_observations'][i]==bi[i].get('status_observation') for i in ids),'historical_status_bytes_exact':all((result/'status'/x).read_bytes()==(prior/'status'/x).read_bytes() for x in ('HE_EXP_STATE04_20261027.json','HE_EXP_EVENT03_20261027.json','HE_EXP_FINITE_DRIFT_20261027.json')),'four_plan_prefixes_preserved':all((result/('node_plans/'+i+'.md')).read_bytes().startswith((prior/('node_plans/'+i+'.md')).read_bytes()) for i in ids if i!='HE-EXP-NUCLEAR'),'two_carry_plans_exact':all((result/('node_plans/'+i+'.md')).read_bytes()==(prior/('node_plans/'+i+'.md')).read_bytes() for i in carry),'nuclear_plan_base_prefix':(result/'node_plans/HE-EXP-NUCLEAR.md').read_bytes().startswith((base/'node_plans/HE-EXP-NUCLEAR.md').read_bytes()),'contracts_match_dag':all(load(result/('contracts/'+i+'.json'))==ri[i] for i in ids),'16_payloads':len(files)==16,'history_internal_pointers_resolve':not pointer['invalid'],'global_claims_unchanged':r['global_physical_completion'] is None and r['L4_ready'] is False,'plot_failure_preserved':ph['source_intake']['plot']['status']=='FAIL_CPU_CAP_EXCEEDED' and ph['source_intake']['workflow_status']=='PARTIAL'}
+report={'schema':'HE_PHOTON05_CENTRAL_MECHANICAL_VALIDATION_V1','status':'PASS' if all(checks.values()) else 'FAIL','base':plan['base'],'source_commit':plan['source_commit'],'source_tree':plan['source_tree'],'checks':checks,'affected_ids':sorted(ids),'other_nodes_unchanged':83,'pointer_counts':pointer,'payload_count':len(files),'payload_sha256':{str(p):hashlib.sha256((result/p).read_bytes()).hexdigest() for p in files},'assembly_count':1,'verification_count':1,'reapply_count':0,'scientific_executions':0,'external_writes':0,'executor_requested':'lower-tier mechanical','runtime_model_identity':'not independently observable'};(h/'MECHANICAL_VALIDATION.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2));raise SystemExit(0 if report['status']=='PASS' else 1)

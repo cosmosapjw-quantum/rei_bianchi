@@ -1,0 +1,35 @@
+{
+  "workflow_version": "1.0.0",
+  "approval_version": "0.2",
+  "source": "Le-Cambier Eq85 semiclassical isotropic ground-H1 heavy-target model",
+  "new_grid": "exact saved HE36 129 temperatures,2000..200000K",
+  "model_error": "not calibrated; CCC comparison includes threshold/support/kernel differences",
+  "new_quadrature": {
+    "variable": "t=(E-I)/(kB*T)",
+    "finite_t_support": [
+      0.0,
+      64.0
+    ],
+    "positive_GL_candidate_orders": [
+      64,
+      96,
+      128
+    ],
+    "max_relative_error_gate": 3e-12,
+    "stop_at_first_passing_order": true,
+    "tail_bound": "analytic positive integral bound per moment at t=64"
+  },
+  "benchmark": {
+    "workload": "same native source,129 temperatures,4SI Maxwell moments",
+    "reference": "positive raw sigma*v*Maxwell GL integration",
+    "candidate": "source-native exact analytic moments using expn2",
+    "warmup_pairs": 2,
+    "alternating_paired_trials": 5,
+    "batches_per_trial": 64,
+    "setup_included": false,
+    "model_runs_not_IVPs": true
+  },
+  "no_old_model_evaluations": true,
+  "new_IVP": 0,
+  "no_fast_math": true
+}

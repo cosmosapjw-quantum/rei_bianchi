@@ -1,0 +1,435 @@
+{
+  "schema": "bass-he.eor-c0.reactions.v1",
+  "species_order": [
+    "HI",
+    "HII",
+    "HeI",
+    "HeII",
+    "HeIII",
+    "e"
+  ],
+  "invariant_rows": {
+    "H_nuclei": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "He_nuclei": [
+      0,
+      0,
+      1,
+      1,
+      1,
+      0
+    ],
+    "charge_e": [
+      0,
+      1,
+      0,
+      1,
+      2,
+      -1
+    ]
+  },
+  "reactions": [
+    {
+      "id": "NR_CX",
+      "classification": "REQUIRED",
+      "stoichiometry": [
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        0
+      ],
+      "mechanism": "nonradiative charge transfer",
+      "event_owner": "ion_collision:NR_CX",
+      "required_moments": [
+        "bound_inclusive_count",
+        "state_weighted_internal_energy",
+        "product_kinetic_transfer"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "target": "HI:1s",
+      "projectile": "HeIII",
+      "final_set": "all admitted HeII bound states; explicit omitted-state remainder",
+      "provider_route": "native_BASS_HE_or_explicit_comparator",
+      "free_electrons": 0,
+      "photon_primary_absorptions": 0,
+      "direct_photon_births": 0
+    },
+    {
+      "id": "R_CX",
+      "classification": "REQUIRED",
+      "stoichiometry": [
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        0
+      ],
+      "mechanism": "radiative charge transfer",
+      "event_owner": "ion_collision:R_CX",
+      "required_moments": [
+        "radiative_bound_inclusive_count",
+        "primary_emitted_photon_spectrum_or_receiver_weighted_functionals",
+        "product_kinetic_transfer"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "target": "HI:1s",
+      "projectile": "HeIII",
+      "final_set": "HeII bound + HII + emitted photon; state completeness not inherited from ground-only table",
+      "provider_route": "source_pinned_external_provider_not_automatic_fallback",
+      "free_electrons": 0,
+      "photon_primary_absorptions": 0,
+      "direct_photon_births": 1,
+      "requirement_evidence": "WEST1982",
+      "could_be_excluded_only_by": "consumer-weighted upper bound"
+    },
+    {
+      "id": "ION",
+      "classification": "REQUIRED",
+      "stoichiometry": [
+        -1,
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      "mechanism": "ion impact ionization",
+      "event_owner": "ion_collision:ION",
+      "required_moments": [
+        "inclusive_continuum_count",
+        "secondary_electron_deposition_weighted_spectrum",
+        "recoil_and_projectile_kinetic_transfer"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "target": "HI:1s",
+      "projectile": "HeIII",
+      "final_set": "HeIII + HII + continuum e; bound truncation loss not continuum",
+      "provider_route": "native_BASS_HE_or_explicit_comparator",
+      "free_electrons": 1,
+      "photon_primary_absorptions": 0,
+      "direct_photon_births": 0
+    },
+    {
+      "id": "EXC",
+      "classification": "CONDITIONAL_WITH_ERROR_BOUND",
+      "stoichiometry": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mechanism": "bound excitation of target",
+      "event_owner": "ion_collision:EXC",
+      "required_moments": [
+        "state_weighted_excitation_energy",
+        "cascade_radiation"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "target": "HI:1s",
+      "projectile": "HeIII",
+      "final_set": "HI excited bound states excluding unchanged ground state",
+      "provider_route": "native_BASS_HE_or_admitted_provider",
+      "free_electrons": 0,
+      "photon_primary_absorptions": 0,
+      "direct_photon_births": 0,
+      "default_when_bound_missing": "THERMAL_FULL_SOURCE_BLOCKED"
+    },
+    {
+      "id": "REV_NR_CX",
+      "classification": "CONDITIONAL_WITH_ERROR_BOUND",
+      "stoichiometry": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0
+      ],
+      "mechanism": "inverse nonradiative charge transfer",
+      "event_owner": "ion_collision:REV_NR_CX",
+      "required_moments": [
+        "state_resolved_reverse_flux",
+        "internal_and_kinetic_energy"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "target": "HII",
+      "projectile": "HeII:nl",
+      "final_set": "HeIII + HI:1s",
+      "provider_route": "microscopic_reciprocity_with_matching_channel_mass_and_degeneracy",
+      "free_electrons": 0,
+      "photon_primary_absorptions": 0,
+      "direct_photon_births": 0,
+      "default_when_bound_missing": "STATE_POPULATION_RELEVANCE_BLOCKED"
+    },
+    {
+      "id": "ELASTIC_TRANSFER",
+      "classification": "CONDITIONAL_WITH_ERROR_BOUND",
+      "stoichiometry": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mechanism": "elastic momentum and interspecies energy transfer",
+      "event_owner": "ion_collision:ELASTIC_TRANSFER",
+      "required_moments": [
+        "differential_or_transport_moments"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "target": "HI:1s",
+      "projectile": "HeIII",
+      "final_set": "unchanged internal states",
+      "provider_route": "external_or_explicit_kernel_extension",
+      "free_electrons": 0,
+      "photon_primary_absorptions": 0,
+      "direct_photon_births": 0,
+      "default_when_bound_missing": "MULTITEMPERATURE_OR_DRIFT_FEEDBACK_BLOCKED"
+    },
+    {
+      "id": "PI_HI",
+      "classification": "IMPORTED_BASELINE",
+      "stoichiometry": [
+        -1,
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      "mechanism": "photoionization",
+      "event_owner": "receiver:PI_HI",
+      "required_moments": [
+        "count",
+        "owned_energy"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "provider_route": "existing_receiver_exact_source_code_binding_required",
+      "free_electrons": 1,
+      "photon_primary_absorptions": 1
+    },
+    {
+      "id": "PI_HEI",
+      "classification": "IMPORTED_BASELINE",
+      "stoichiometry": [
+        0,
+        0,
+        -1,
+        1,
+        0,
+        1
+      ],
+      "mechanism": "photoionization",
+      "event_owner": "receiver:PI_HEI",
+      "required_moments": [
+        "count",
+        "owned_energy"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "provider_route": "existing_receiver_exact_source_code_binding_required",
+      "free_electrons": 1,
+      "photon_primary_absorptions": 1
+    },
+    {
+      "id": "PI_HEII",
+      "classification": "IMPORTED_BASELINE",
+      "stoichiometry": [
+        0,
+        0,
+        0,
+        -1,
+        1,
+        1
+      ],
+      "mechanism": "photoionization",
+      "event_owner": "receiver:PI_HEII",
+      "required_moments": [
+        "count",
+        "owned_energy"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "provider_route": "existing_receiver_exact_source_code_binding_required",
+      "free_electrons": 1,
+      "photon_primary_absorptions": 1
+    },
+    {
+      "id": "EI_HI",
+      "classification": "IMPORTED_BASELINE",
+      "stoichiometry": [
+        -1,
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      "mechanism": "electron impact ionization",
+      "event_owner": "receiver:EI_HI",
+      "required_moments": [
+        "count",
+        "owned_energy"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "provider_route": "existing_receiver_exact_source_code_binding_required",
+      "free_electrons": 1,
+      "photon_primary_absorptions": 0
+    },
+    {
+      "id": "EI_HEI",
+      "classification": "IMPORTED_BASELINE",
+      "stoichiometry": [
+        0,
+        0,
+        -1,
+        1,
+        0,
+        1
+      ],
+      "mechanism": "electron impact ionization",
+      "event_owner": "receiver:EI_HEI",
+      "required_moments": [
+        "count",
+        "owned_energy"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "provider_route": "existing_receiver_exact_source_code_binding_required",
+      "free_electrons": 1,
+      "photon_primary_absorptions": 0
+    },
+    {
+      "id": "EI_HEII",
+      "classification": "IMPORTED_BASELINE",
+      "stoichiometry": [
+        0,
+        0,
+        0,
+        -1,
+        1,
+        1
+      ],
+      "mechanism": "electron impact ionization",
+      "event_owner": "receiver:EI_HEII",
+      "required_moments": [
+        "count",
+        "owned_energy"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "provider_route": "existing_receiver_exact_source_code_binding_required",
+      "free_electrons": 1,
+      "photon_primary_absorptions": 0
+    },
+    {
+      "id": "RR_HII",
+      "classification": "IMPORTED_BASELINE",
+      "stoichiometry": [
+        1,
+        -1,
+        0,
+        0,
+        0,
+        -1
+      ],
+      "mechanism": "radiative recombination",
+      "event_owner": "receiver:RR_HII",
+      "required_moments": [
+        "count",
+        "owned_energy"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "provider_route": "existing_receiver_exact_source_code_binding_required",
+      "free_electrons": -1,
+      "photon_primary_absorptions": 0
+    },
+    {
+      "id": "RR_HEII",
+      "classification": "IMPORTED_BASELINE",
+      "stoichiometry": [
+        0,
+        0,
+        1,
+        -1,
+        0,
+        -1
+      ],
+      "mechanism": "radiative recombination",
+      "event_owner": "receiver:RR_HEII",
+      "required_moments": [
+        "count",
+        "owned_energy"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "provider_route": "existing_receiver_exact_source_code_binding_required",
+      "free_electrons": -1,
+      "photon_primary_absorptions": 0
+    },
+    {
+      "id": "DR_HEII",
+      "classification": "IMPORTED_BASELINE",
+      "stoichiometry": [
+        0,
+        0,
+        1,
+        -1,
+        0,
+        -1
+      ],
+      "mechanism": "dielectronic recombination",
+      "event_owner": "receiver:DR_HEII",
+      "required_moments": [
+        "count",
+        "owned_energy"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "provider_route": "existing_receiver_exact_source_code_binding_required",
+      "free_electrons": -1,
+      "photon_primary_absorptions": 0
+    },
+    {
+      "id": "RR_HEIII",
+      "classification": "IMPORTED_BASELINE",
+      "stoichiometry": [
+        0,
+        0,
+        0,
+        1,
+        -1,
+        -1
+      ],
+      "mechanism": "radiative recombination",
+      "event_owner": "receiver:RR_HEIII",
+      "required_moments": [
+        "count",
+        "owned_energy"
+      ],
+      "physical_admission": "NOT_ADMITTED",
+      "provider_route": "existing_receiver_exact_source_code_binding_required",
+      "free_electrons": -1,
+      "photon_primary_absorptions": 0
+    }
+  ],
+  "baseline_energy_families": [
+    "primordial_excitation_cooling",
+    "free_free",
+    "Compton",
+    "adiabatic_expansion"
+  ],
+  "baseline_double_count_rule": "Replace only exact matched provider owner; do not add RR+DR if total HeII recombination already includes DR.",
+  "exclusions_by_bound": [],
+  "rate_availability_does_not_imply_relevance": true,
+  "inverse_process_policy": {
+    "nonradiative": "Use channel-resolved two-body microscopic reciprocity with threshold, degeneracy, momentum and flux normalization. No unvalidated Maxwell equilibrium assumption.",
+    "radiative": "Inverse radiative charge transfer requires incident photon phase space and a distinct channel operator, not the ordinary two-body reverse coefficient. It is not silently added as REV_NR_CX."
+  }
+}

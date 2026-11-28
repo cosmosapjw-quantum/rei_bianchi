@@ -1,0 +1,16 @@
+{
+  "schema": "he29.vigilode.schur_symbolic.v1",
+  "code": "m=4; n=2; ell=2;\ngg=Array[g,{m,m}]; bb=Array[b,{m,n}]; cc=Array[c,{n,m}];\nkg=DiagonalMatrix[Array[k,n]];\nlg=Array[l,{ell,m}]; lp=Array[p,{ell,n}];\ndd=IdentityMatrix[n]+a kg;\ndi=DiagonalMatrix[1/(1+a #)&/@Array[k,n]];\nss=IdentityMatrix[m]-a gg-a^2 bb.di.cc;\nug=Array[u,m]; bp=Array[r,n]; bl=Array[s,ell];\nun=di.(bp+a cc.ug); ul=bl+a(lg.ug+lp.un);\nbg=ss.ug-a bb.di.bp;\njj=ArrayFlatten[{{gg,bb,ConstantArray[0,{m,ell}]},{cc,-kg,ConstantArray[0,{n,ell}]},{lg,lp,ConstantArray[0,{ell,ell}]}}];\nres=Together /@ ((IdentityMatrix[m+n+ell]-a jj).Join[ug,un,ul]-Join[bg,bp,bl]);\n<|\"gas_dimension\"->m,\"photon_dimension\"->n,\"ledger_dimension\"->ell,\"all_stage_residuals_exact_zero\"->And@@(TrueQ[#==0]&/@res),\"D_positive_under_nonnegative_rates\"->FullSimplify[And@@Thread[Diagonal[dd]>0],Assumptions->a>=0&&And@@Thread[Array[k,n]>=0]],\"conclusion\"->\"Algebraic stage identity only; gas Schur invertibility and numerical conditioning are required; no positivity or physical error-bound claim.\"|>",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= <|\"gas_dimension\" -> 4, \"photon_dimension\" -> 2, \"ledger_dimension\" -> 2, \"all_stage_residuals_exact_zero\" -> True, \"D_positive_under_nonnegative_rates\" -> True, \"conclusion\" -> \"Algebraic stage identity only; gas Schur invertibility and numerical conditioning are required; no positivity or physical error-bound claim.\"|>"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "scope": "4 gas, 2 photon, 2 passive ledger symbolic identity; no physical/native result",
+  "executed": true
+}

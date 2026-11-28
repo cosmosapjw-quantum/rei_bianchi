@@ -1,0 +1,222 @@
+{
+  "schema": "rei.he-rct-post-ft03-review.v1",
+  "timestamp_utc": "2026-10-04T16:07:21.379235+00:00",
+  "reviewer": "he_rct_review",
+  "verdict": "confirmed",
+  "open_blockers": 0,
+  "review_kind": "BOUNDED_CONCRETE_UPSTREAM_DELTA_ONLY",
+  "previous_review": "FINAL_REVIEW.json",
+  "previous_review_preserved": true,
+  "source_parent": "6279036f06c9ba4d47574beab90b48fc2c6f9ba7",
+  "trigger": "Concurrent actual Ft03Model has zero legacy alpha/beta in gas. Generic hhe_rhs(gas) is not its RR/CI/DR RHS.",
+  "implementation_scope": "Typed combined_ft03_rhs calls actual crate::ft03_rhs, then adds the previously reviewed RCT fractional/thermal/escape increments; no RCT stepper integration.",
+  "delta_checks": [
+    "Typed Ft03Model input cannot accidentally pass as HHeModel without caller explicitly extracting gas",
+    "Actual ft03_rhs is called before both OFF and enabled composition",
+    "Nonzero RR/CI/DR and photo arrays are copied unchanged from actual baseline",
+    "OFF derivative/escape parity uses identical baseline copy",
+    "Closed RCT increment uses gas solely for validated RCT density/T/threshold conventions",
+    "KF96 remains within active FT03 temperature window; GM25 is rejected, no clamp/switch",
+    "Finite composed output checks retained",
+    "Four added native tests include the wrong generic gas adapter as a negative control"
+  ],
+  "misuse_guard_scope": "The typed API and regression detect/document the wrong adapter. Public Ft03Model.gas can still be extracted by a caller; runtime prevention of that explicit misuse is not claimed.",
+  "execution": {
+    "combined_crate_tests": 116,
+    "count_breakdown": {
+      "original_crate": 84,
+      "concurrent_upstream_FT03": 8,
+      "RCT_total": 24,
+      "RCT_delta_new": 4
+    },
+    "E2_rebound_to_final_binary": {
+      "status": "PASS",
+      "assertions": 12789,
+      "native_calls": 422
+    },
+    "E2X": {
+      "classification": "exploratory predeclared before execution",
+      "assertions": 212,
+      "native_calls": 12,
+      "closed_points": 9,
+      "GM25_rejections": 3,
+      "max_gross_scaled_error": "4.180035169685130059616136137361252890026693958850448479116614187736477E-16",
+      "tolerance": "2E-12"
+    },
+    "reviewer_extra_scientific_runs": 0
+  },
+  "numeric_contract_limit": "Upstream FT03 checked_product rejects nonzero-product underflow. The RCT increment retains ordinary binary64 products plus nonfinite-output guards; it does not inherit FT03 underflow rejection or claim representability over arbitrary tiny densities. Confirmed E2/E2X scopes are their recorded finite grids, not uniform relative-error or underflow certificates.",
+  "source_inheritance_limit": "Upstream actual FT03 rates and integration are preserved by identity; this delta reviews RCT composition, not new physical certification of upstream fits or stepper.",
+  "nonclaims": [
+    "RCT active in ft03_implicit_step or original implicit_hhe_step",
+    "source physical accuracy or photon spectrum/heat moment prediction",
+    "F04 full interval/Jacobian/remainder certificate",
+    "cosmological RCT history",
+    "blanket rejection of every explicit wrong-wrapper call",
+    "source-uniform numerical representability"
+  ],
+  "source_identity_matches": [
+    {
+      "path": "coding/rei_crate/src/lib.rs",
+      "sha256": "395dbb35c1a3296741d3578c624eafeeaf617b5b82ac6360ece9340a2e9aed61",
+      "matches_execution_record": true
+    },
+    {
+      "path": "coding/rei_crate/src/he_rct.rs",
+      "sha256": "e2e461d17c47f207108dc0b4f28b9a551ffd61f4fb1a061e35c94a2a5ad12173",
+      "matches_execution_record": true
+    },
+    {
+      "path": "coding/rei_crate/tests/he_rct.rs",
+      "sha256": "485cec72c31a71a1221807bfed4433b8e29bf2be49d81c1299d1313d3609c940",
+      "matches_execution_record": true
+    },
+    {
+      "path": "coding/rei_crate/examples/he_rct_probe.rs",
+      "sha256": "d5556f188e9e45d276ed301d348d09f7f6b507130ee27574ac47f435846fc917",
+      "matches_execution_record": true
+    },
+    {
+      "path": "coding/rei_crate/target/debug/examples/he_rct_probe",
+      "sha256": "beb0ee6a31bd0cd57d8eb81a8cf3a2c3dfdc36f091b835d1fe22c71bf9ffad01",
+      "matches_execution_record": true
+    },
+    {
+      "path": "research/independent_rct_check.py",
+      "sha256": "a482396436a17cc822d96f60c0b9d0c3e2119ff9a473b34b2c330c04a97abb47",
+      "matches_execution_record": true
+    },
+    {
+      "path": "research/independent_ft03_rct_check.py",
+      "sha256": "081e0f7b42f3ae11fed5b566c57473c36add1040e58817669dc9f288cf387258",
+      "matches_execution_record": true
+    },
+    {
+      "path": "coding/rei_crate/src/ft03_controlled.rs",
+      "sha256": "61e11471482bb49d99e5d0eb79504d3f67538fbe6361653a0462d1abb0b672db",
+      "matches_execution_record": true
+    },
+    {
+      "path": "coding/rei_crate/src/ft03_rates.rs",
+      "sha256": "1a97cd7a3555deeb4d8700376cd84580c5102127773bc3a235a29c33b0c1542f",
+      "matches_execution_record": true
+    }
+  ],
+  "upstream_files_unchanged": [
+    {
+      "path": "src/ft03_controlled.rs",
+      "sha256": "61e11471482bb49d99e5d0eb79504d3f67538fbe6361653a0462d1abb0b672db",
+      "git_blob": "370fd2fa60521f2dc121ee81c7d24013a3b0d1e5",
+      "equal_to_pinned_intake": true
+    },
+    {
+      "path": "src/ft03_rates.rs",
+      "sha256": "1a97cd7a3555deeb4d8700376cd84580c5102127773bc3a235a29c33b0c1542f",
+      "git_blob": "b8a85ff37de160ecc576a168e4259ed23920a499",
+      "equal_to_pinned_intake": true
+    },
+    {
+      "path": "examples/ft03_fixture.rs",
+      "sha256": "259f661ecaa8795d80ffc5822f89095367780df1f594cfb071368d486de86faf",
+      "git_blob": "00c48dee0d66ad6064b8c55f003b84ba8c74d9df",
+      "equal_to_pinned_intake": true
+    },
+    {
+      "path": "tests/ft03_controlled.rs",
+      "sha256": "dea4d4dab4afdc3e80ce3efd20c1cf1e032e0cc67e4b8e430c27c19ecfabfc60",
+      "git_blob": "146e9b68ef537a8e547f2d10a2e2b6eae64162d6",
+      "equal_to_pinned_intake": true
+    }
+  ],
+  "reviewed_files": [
+    {
+      "path": "review/FINAL_REVIEW.json",
+      "sha256": "dc64cd1f74aad4e6e4b5d38880910dc91aaded015d783301b55be298a8734f81"
+    },
+    {
+      "path": "review/INDEPENDENT_REVIEW_KO.md",
+      "sha256": "3f1e67e0fd44270ec51887fc134b2ce5b65894c86cacd325c3db70128c42a0c9"
+    },
+    {
+      "path": "research/CONCURRENT_INTEGRATION_PLAN.json",
+      "sha256": "2db5bd014124cf2b8de487ffbb95b70a0df320c7f14621e369606f7576ab16b4"
+    },
+    {
+      "path": "research/CONCURRENT_FT03_ADAPTER_PLAN.json",
+      "sha256": "7d9469724586bf5cd642ca0b8d7ffbee2a64faffd0cd6bce3998a3aacef1ad4f"
+    },
+    {
+      "path": "research/independent_ft03_rct_check.py",
+      "sha256": "081e0f7b42f3ae11fed5b566c57473c36add1040e58817669dc9f288cf387258"
+    },
+    {
+      "path": "survey/FINAL_DELTA.json",
+      "sha256": "858c01ed420e91e730fc935f3950fcb43716af80bbc72a676142b635c80446ee"
+    },
+    {
+      "path": "survey/FINAL_DELTA_IDENTITY.json",
+      "sha256": "4ed18660a5e6455a355423f638d4a22c06c3e58224268272aba169ee71618a30"
+    },
+    {
+      "path": "survey/FINAL_DELTA_KO.md",
+      "sha256": "95683c27612ad60b67dd4afdc653cb8ffaacc221485fb4156ae65deba59b5717"
+    },
+    {
+      "path": "coding/rei_crate/src/he_rct.rs",
+      "sha256": "e2e461d17c47f207108dc0b4f28b9a551ffd61f4fb1a061e35c94a2a5ad12173"
+    },
+    {
+      "path": "coding/rei_crate/src/lib.rs",
+      "sha256": "395dbb35c1a3296741d3578c624eafeeaf617b5b82ac6360ece9340a2e9aed61"
+    },
+    {
+      "path": "coding/rei_crate/src/ft03_controlled.rs",
+      "sha256": "61e11471482bb49d99e5d0eb79504d3f67538fbe6361653a0462d1abb0b672db"
+    },
+    {
+      "path": "coding/rei_crate/src/ft03_rates.rs",
+      "sha256": "1a97cd7a3555deeb4d8700376cd84580c5102127773bc3a235a29c33b0c1542f"
+    },
+    {
+      "path": "coding/rei_crate/tests/he_rct.rs",
+      "sha256": "485cec72c31a71a1221807bfed4433b8e29bf2be49d81c1299d1313d3609c940"
+    },
+    {
+      "path": "coding/rei_crate/examples/he_rct_probe.rs",
+      "sha256": "d5556f188e9e45d276ed301d348d09f7f6b507130ee27574ac47f435846fc917"
+    },
+    {
+      "path": "coding/NATIVE_IMPLEMENTATION_STATUS.json",
+      "sha256": "5e4e1768638203d7b735b1c0dd13c7de1b1ef45c70b02c008932b9010941b65c"
+    },
+    {
+      "path": "evidence/FINAL_INTEGRATION.json",
+      "sha256": "74d3c523071ac637345f7895285b7cb6e39d338c5def311206179ce5a87fd1d3"
+    },
+    {
+      "path": "evidence/FINAL_INTEGRATION.json.pre_ft03",
+      "sha256": "ad71e8892bc0f780a1ea1a43b7801ed0b16e3d2e5092dfe94b861f2bfc76e608"
+    },
+    {
+      "path": "evidence/final_crate.log",
+      "sha256": "5a37d3c16a2f8c4097fbf3226de9b7c1eaf269a86d1f13df8fb6a5d51104eaff"
+    },
+    {
+      "path": "evidence/INDEPENDENT_RESULT.json",
+      "sha256": "14d6bcc702f633620b8effa13f608cda6d819b751aa82dc565bf0cc83899b4bb"
+    },
+    {
+      "path": "evidence/FT03_INDEPENDENT_RESULT.json",
+      "sha256": "a2f54fe508ca97cc80452d70f49a1833886e04bf3fd7ce4ebaeb3e589f9f25d8"
+    },
+    {
+      "path": "evidence/FT03_INDEPENDENT_CASES.json",
+      "sha256": "7629b9bb8e0232c8af0f34eace271bf4b6349636d17b61a0c07cb25008147f28"
+    },
+    {
+      "path": "evidence/independent_ft03_rct.log",
+      "sha256": "a2f54fe508ca97cc80452d70f49a1833886e04bf3fd7ce4ebaeb3e589f9f25d8"
+    }
+  ],
+  "final_claim_KO": "실제 FT03 RHS를 보존하는 typed RCT 합성이 명시된 유한점 검증 범위에서 확인되었다. OFF 기본값과 원자/물리 admission 제한은 유지된다."
+}

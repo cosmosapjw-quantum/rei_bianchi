@@ -1,0 +1,17 @@
+--- final_check.py
++++ final_check_preserving_receipt.py
+@@ -1,5 +1,6 @@
+ """Verify saved execution evidence without replaying old native suites."""
+ from pathlib import Path
++from receipt_output import write_receipt
+ import hashlib,json,sys,subprocess
+ ROOT=Path(__file__).resolve().parents[1]
+ SUP=ROOT/'intake/runner_adapter/supplier/rei_chat_flrw06_20261005'
+@@ -55,6 +56,6 @@
+          'scope':'finite native point/stage only; no full-crate build/history/physical/interval promotion',
+          'no_production_mutation':True,'signature_authenticity':'UNVERIFIED_NO_TRUSTED_PUBLIC_KEY',
+          'input_receipt_sha256':{p:sha(ROOT/p) for p in ['results/native_once/NATIVE_EXECUTION_RECEIPT.json','results/STAGE_EXECUTION.json','results/STAGE_INDEPENDENT_CHECK.json','SOURCE_BINDING.json','toolchain/installed_selected.json','toolchain/signature_verification.json']}}
+-    (ROOT/'results/FINAL_VERIFICATION.json').write_text(json.dumps(out,indent=2)+'\n')
++    write_receipt(Path(sys.argv[1]),out)
+     print(json.dumps(out,indent=2))
+ if __name__=='__main__':main()

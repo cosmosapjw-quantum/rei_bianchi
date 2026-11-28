@@ -1,0 +1,22 @@
+Module[{startCPU=TimeUsed[],startWall=AbsoluteTime[],stoich,ledger,piVec,states,rates,dx,uu,vv,ww,xx,rr,pp,aa,kf,d1,d2,ku,kd,pdot,eta,ub,vb,wb,xb,dbar,x1,x2,rExpected,rDirect,etaDirect,etaExpected,bnil,gnil,hh,s,nilExp,nilQ,residuals,lateValue,lateClaim,result},
+ stoich={{-1,-1,1,1},{-1,-1,1,1},{1,1,-1,-1},{1,0,-1,0},{0,1,0,-1}};
+ ledger={{2,0,1,1,1},{0,1,0,1,1},{0,1,1,0,0}};
+ residuals=Flatten[ledger.stoich];
+ x1=pp*xx+rr;x2=(1-pp)*xx-rr;dbar=pp*d1+(1-pp)*d2;
+ rDirect=(-ku*x1+kd*x2-ww*d1*x1+aa*kf*uu*vv)-pp*(kf*uu*vv-ww*(d1*x1+d2*x2))-pdot*xx;
+ rExpected=(-ku-kd-ww*((1-pp)*d1+pp*d2))*rr+(-ku*pp+kd*(1-pp)-pdot-ww*pp*(1-pp)*(d1-d2))*xx+(aa-pp)*kf*uu*vv;
+ AppendTo[residuals,Expand[rDirect-rExpected]];
+ etaDirect=(kf*uu*vv-dbar*ww*xx-ww*(d1-d2)*rr)-(kf*ub*vb-dbar*wb*xb);
+ etaExpected=-(kf*(uu+vv+ub+vb)/2+dbar*(ww+xx+wb+xb)/2)*eta-ww*(d1-d2)*rr;
+ AppendTo[residuals,Expand[(etaDirect-etaExpected)/.{uu->ub-eta,vv->vb-eta,ww->wb+eta,xx->xb+eta}]];
+ AppendTo[residuals,Expand[(uu*vv-ub*vb+(uu+vv+ub+vb)*eta/2)/.{uu->ub-eta,vv->vb-eta}]];
+ AppendTo[residuals,Expand[(ww*xx-wb*xb-(ww+xx+wb+xb)*eta/2)/.{ww->wb+eta,xx->xb+eta}]];
+ bnil={{0,2},{0,0}};gnil={3,5};nilExp=IdentityMatrix[2]+hh*bnil;nilQ=hh*gnil+hh^2/2*bnil.gnil;
+ residuals=Join[residuals,Flatten[Expand[MatrixExp[hh*bnil]-nilExp]],Flatten[Expand[Integrate[(IdentityMatrix[2]+s*bnil).gnil,{s,0,hh}]-nilQ]]];
+ AppendTo[residuals,Limit[(1-Exp[-d1*hh])/d1,d1->0]-hh];
+ AppendTo[residuals,Expand[D[kf*uu*vv,uu]-kf*vv]];
+ lateValue=2*(1-Exp[-1/2]);lateClaim=FullSimplify[lateValue>Exp[-2]];
+ residuals=FullSimplify[residuals];
+ result=<|"schema"->"WU_R7_NEW_SYMBOLIC_CHECKS_V1","residual_count"->Length[residuals],"zero_residuals"->Count[residuals,0],"residuals"->(ToString[#,InputForm]& /@ residuals),"all_zero"->And@@((#===0)& /@ residuals),"late_forcing_correct"->ToString[lateValue,InputForm],"late_forcing_wrong_rho_bound"->ToString[Exp[-2],InputForm],"late_forcing_strict_violation"->lateClaim,"CPU_seconds"->(TimeUsed[]-startCPU),"wall_seconds"->(AbsoluteTime[]-startWall),"scope"->"New R7 identities only; old science replay0"|>;
+ ExportString[result,"RawJSON"]
+]

@@ -1,0 +1,234 @@
+{
+  "schema": "WU088_HH_PHYS07_SOURCE_PORT_INPUT_AND_LEAF_CONTRACT_V1",
+  "creator_status": "PORT_AND_DRIVER_WRITTEN_AND_SYNTAX_PARSED_NO_SCIENCE_EXECUTED_BY_CREATOR",
+  "reference_model": "same FT03, LCS91, reduced photo and expansion equations on explicitly declared reference scalar/transport leaves",
+  "source_commit_from_parent_intake": "927019cff541e8a4a1f0d2c8846f1466d6b70533",
+  "source_sha256": {
+    "ft03_interval.rs": "886580a810b8ec29c8f0b6199c0e35d82fde1f46d984a5f8f1da304326a42a42",
+    "hh_primary_extension.rs": "f47d910abb096f96b829e3392fdfbf55d079ba2fbb09a45416c97c76a4f4a647",
+    "phys04_mixed.rs": "95c1ecb757b32abd1fd5d5e7ef5195cc8a3ee67ca54de0b1f6e5b87bb58d3cd8",
+    "phys04_transport.rs": "566a68cf4111d8586b5fee7bd0750f39ec98b2e3f2b6217a656b270deda5ce78",
+    "coupled_primary.rs": "2c528f1e7dcf44622374f8421a192f75ce8cff8b1c311bbff508f9ed863d7dcc",
+    "atomic_provider.rs": "b0b572d3940a7a1f740e09d5f43c60236ec61511e8bdbcc68e60395ec7e107d3",
+    "paired_runtime.rs": "5cfa65e67e4843ae6ae3ae3eb3d1d5a47e23c01db14eaf26feceb4692fe2e4db",
+    "hhe_events.rs": "c100b08e034089c2d67b2102769ccdd51f1d29a2f388d6bb2dfe7984af93b290",
+    "interval_ad.rs": "b14a16a24ba55d1d915fc890348bbafccf3c9df4566c04bbf06d38cdac2ef2dd",
+    "interval_math.rs": "e4639a4386feee536dbe7e7ffb1260f26fa00697b6b05477083c182ddf03de18"
+  },
+  "implementation_mapping": [
+    {
+      "python": "ft03_nonphoto",
+      "rust": "ft03_interval.rs::ft03_interval_rhs",
+      "notes": [
+        "sigma=0 photon loops omitted as exact-zero algebra; no native interval-width match claimed",
+        "temperature, electron density and helium normalization use stored nHe/nH",
+        "FT03 fit powers are exact binary64 exponent leaves",
+        "DR coefficients use source from_bits values"
+      ]
+    },
+    {
+      "python": "temperature/hh_q",
+      "rust": "hh_primary_extension.rs::hh_rate_jet",
+      "notes": [
+        "T range 35000..60000 K required across whole supplied box",
+        "neutral hydrogen square uses two copies, no division by neutral fraction",
+        "powf(1.2) is exp(log(T)*exact binary64 exponent)"
+      ]
+    },
+    {
+      "python": "reduced_residual",
+      "rust": "phys04_mixed.rs::phys04_reduced_residual",
+      "notes": [
+        "source operation order c*nH*lower*sigma, then reduced photon quotient, preserved",
+        "heat energy difference is pre-rounded binary64 e-CHI[a]",
+        "old gas is parameter-independent fixed archived point",
+        "incoming derivatives are N_b=B, N_lambda=N_lambdab=0 for first stage only",
+        "lambda multiplies only LCS91 HH source",
+        "thermal expansion is -2*Hmean*w"
+      ]
+    },
+    {
+      "python": "isotropic_reference_family",
+      "rust": "phys04_transport.rs::phys04_prepare_family; paired_runtime.rs::g_box/source_weights/hat_box",
+      "notes": [
+        "analytic exact-real cancellation of common isotropic q norm in g-ratio",
+        "normalized angular birth sums to one; aggregated B at index24 is source dt*SOURCE binary64 leaf",
+        "old input uses exact sums of directional stock, not stored primary packets",
+        "all shifted nodes must remain on fixed guard/hat branch",
+        "not native widened preBE interval tuple and not native qhat/libm replication"
+      ]
+    },
+    {
+      "python": "reference_cross_section",
+      "rust": "atomic_provider.rs::cross_section",
+      "notes": [
+        "explicit binary64 scalar arithmetic order",
+        "each sqrt/pow leaf accepted only if rigorous rational endpoints round to the same binary64",
+        "correct-rounding reference only; native provider not called"
+      ]
+    },
+    {
+      "python": "ScalarChart/op/transcendental",
+      "rust": "coupled_primary.rs::model; phys04_transport.rs::phys04_prepare_family scalar stage construction",
+      "notes": [
+        "t0+dt and sumH iteration are explicit nearest-even binary64 operations",
+        "density exp argument is pre-rounded as in scalar source",
+        "correctly-rounded reference exp leaf is independently delimited from native libm result",
+        "nH=fl(nH0*reference_exp); stored nHe=fl(nH*fHe); fhat correction retained"
+      ]
+    }
+  ],
+  "literal_leaf_examples": {
+    "c_cm_s": {
+      "binary64_hex": "0x1.beb9bf3a00000p+34",
+      "numerator": "29979245800",
+      "denominator": "1"
+    },
+    "kb_erg_K": {
+      "binary64_hex": "0x1.3e5b21cc8f74fp-53",
+      "numerator": "5600577707374415",
+      "denominator": "40564819207303340847894502572032"
+    },
+    "ev_erg": {
+      "binary64_hex": "0x1.c2f8fe5409db9p-40",
+      "numerator": "7933594420944313",
+      "denominator": "4951760157141521099596496896"
+    },
+    "fHe": {
+      "binary64_hex": "0x1.53f7ced916873p-4",
+      "numerator": "5980780305148019",
+      "denominator": "72057594037927936"
+    },
+    "CHI_HI_ev": {
+      "binary64_hex": "0x1.b3266051507a6p+3",
+      "numerator": "3827619062252499",
+      "denominator": "281474976710656"
+    },
+    "CHI_HeI_ev": {
+      "binary64_hex": "0x1.8965f20504658p+4",
+      "numerator": "865091843655883",
+      "denominator": "35184372088832"
+    },
+    "CHI_HeII_ev": {
+      "binary64_hex": "0x1.b357928e0c9dap+5",
+      "numerator": "3829309432161517",
+      "denominator": "70368744177664"
+    },
+    "HH_A": {
+      "binary64_hex": "0x1.bab8cbabb6581p-57",
+      "numerator": "7788445287802241",
+      "denominator": "649037107316853453566312041152512"
+    },
+    "HH_power": {
+      "binary64_hex": "0x1.3333333333333p+0",
+      "numerator": "5404319552844595",
+      "denominator": "4503599627370496"
+    },
+    "HH_activation_K": {
+      "binary64_hex": "0x1.3434000000000p+17",
+      "numerator": "157800",
+      "denominator": "1"
+    },
+    "SOURCE_per_H_s": {
+      "binary64_hex": "0x1.6849b86a12b9bp-48",
+      "numerator": "6338253001141147",
+      "denominator": "1267650600228229401496703205376"
+    },
+    "BIRTH_ev": {
+      "binary64_hex": "0x1.b666666666666p+3",
+      "numerator": "3856207180935987",
+      "denominator": "281474976710656"
+    },
+    "nH0_cm3": {
+      "binary64_hex": "0x1.a36e2eb1c432dp-14",
+      "numerator": "7378697629483821",
+      "denominator": "73786976294838206464"
+    }
+  },
+  "coordinate_contract": {
+    "gas_order": [
+      "x_HII",
+      "x_HeII",
+      "x_HeIII",
+      "w_eV_per_H"
+    ],
+    "derivative_slots": [
+      "x_HII",
+      "x_HeII",
+      "x_HeIII",
+      "w_eV_per_H",
+      "lambda",
+      "b"
+    ],
+    "gas_box_exact_decimal_endpoints": [
+      [
+        ".90",
+        ".93"
+      ],
+      [
+        ".29",
+        ".31"
+      ],
+      [
+        ".59",
+        ".61"
+      ],
+      [
+        "13",
+        "14"
+      ]
+    ],
+    "theta_exact": [
+      [
+        "0",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "dt_candidates_s": [
+      625000000.0,
+      1250000000.0
+    ],
+    "old_gas": "archived gas_point.values; fixed for every lambda,b",
+    "geometry": "frozen h=(1e-14,1e-14,1e-14) s^-1 and t0=1.6e11 s",
+    "current_stage_scope": "full or first-half only; no second-half incoming derivative family is claimed"
+  },
+  "units": {
+    "gas_fractions": "dimensionless",
+    "w": "eV per hydrogen nucleus",
+    "T": "K",
+    "nH_nHe_ne": "cm^-3",
+    "sigma": "cm^2",
+    "c": "cm/s",
+    "source_N_B": "photons per hydrogen nucleus",
+    "dt": "s",
+    "rhs_fractions": "s^-1",
+    "rhs_w": "eV/H/s",
+    "residual_first3": "dimensionless",
+    "residual_w": "eV/H",
+    "partial_lambda_b": "parameters dimensionless, so same output units",
+    "jacobian_y": "output unit / input coordinate unit",
+    "hessian_y_y": "output unit / product of input coordinate units"
+  },
+  "implementation_limits": [
+    "No actual native source tuple/interval-byte binding.",
+    "No NCP libm/compiler/build identity attestation.",
+    "No native endpoint, BE point, native root, IVP, heavy atomic or historical suite call.",
+    "A reference source enclosure and strict arithmetic margin are not native root authority.",
+    "No actual HH W or finite mixed interaction from this source export alone.",
+    "Interval projection of correlated cancelling source terms may widen; exact identity is an algebraic claim, not zero-width interval equality.",
+    "Provider physical admission and continuous-time/time-discretization remainder remain separate."
+  ],
+  "creator_static_check": {
+    "method": "Python ast.parse only",
+    "files": [
+      "src/hh_source_box.py",
+      "diagnostics/run_source_box.py"
+    ],
+    "status": "PASS",
+    "scientific_execution": false
+  }
+}

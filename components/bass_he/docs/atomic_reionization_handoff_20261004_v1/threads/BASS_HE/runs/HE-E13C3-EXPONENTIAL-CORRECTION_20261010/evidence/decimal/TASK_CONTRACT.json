@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0",
+  "task": "BASS_HE E13C3 independent Decimal first coefficient-variation numerical contribution",
+  "role": "NUMERICAL_CONTRIBUTOR_NOT_DECISION_REVIEWER",
+  "declared_utc": "2026-10-10T11:15:39.804064+00:00",
+  "status_before_execution": "NOT_EVALUATED",
+  "objective": "Compute the new local first variation using independently implemented damped response and moment kernels, and compare with the SAVED E13C2 continuous-minus-frozen Decimal reference.",
+  "original_motivation": "Test whether photon coefficient-variation error on captured fixed gas paths admits a cheap signed correction while preserving photon number and energy ownership.",
+  "source_root": "/workspace/scratch/7fd51143e473/BASS_HE_E13C2_VARIABLE_COEFFICIENT_20261010_v1",
+  "source_pins": {
+    "evidence/ORACLE_RESULTS.json": "0f719a1c24ef36dbb9248bf386989a0028ba84b913235be80d57ad437cad4d85",
+    "code/decimal_collocation.py": "6ca9de462ac24e3a559a5f8de7df01c04b79ed9172b5474546103eedcb2385a5"
+  },
+  "selection_fixed_before_execution": [
+    ["OFF", 1, 0, 0],
+    ["OFF", 1, 1162, 0],
+    ["OFF", 1, 1976, 0],
+    ["GM", 2, 1727, 0],
+    ["GM", 2, 2333, 0],
+    ["OFF", 2, 700, 1]
+  ],
+  "scope": {
+    "in": [
+      "Six previously selected local captured segments only; each correction has e_a=0 and each frozen field starts at captured f0.",
+      "70-digit Decimal quadrature at degrees 12 and 20 for the NEW first coefficient variation.",
+      "Signed endpoint, absorber number, absorber energy, primary heat, redshift energy, and source differences.",
+      "Input identity, new code as-run identity, raw logs, actual command, runtime versions and actual exit."
+    ],
+    "out": [
+      "Rerunning E13C2 continuous ODE/collocation or any old oracle main.",
+      "Gas, Newton, native, coupled, campaign or globally carried photon execution.",
+      "Atomic RCT emission, owner adoption, production admission, interval enclosure or global error bound."
+    ]
+  },
+  "mathematical_contract": {
+    "independent_variable": "u=s-a, 0<=u<=h; coefficients helper takes t=u/h",
+    "energy": "E(u)=e0*exp(-u), eV",
+    "frozen": "P_f(u)=f0*exp(-Lf*u)+qf*J(Lf,u), Lf=sum(lambda_f)",
+    "residual": "r(u)=delta_q(u)-delta_Lambda(u)*P_f(u)",
+    "field_correction": "e1(h)=integral_0^h exp(-Lf*(h-v))*r(v) dv, e1(0)=0",
+    "J": "J(a,t)=(1-exp(-a*t))/a for a!=0; J(0,t)=t exactly",
+    "number_response_moment": "I0=integral_0^h J(Lf,h-v)*r(v) dv",
+    "energy_response_moment": "IE=integral_0^h E(v)*J(Lf+1,h-v)*r(v) dv",
+    "absorption_number": "delta_A_i=integral_0^h delta_lambda_i*P_f dv+lambda_f_i*I0",
+    "absorption_energy": "delta_B_i=integral_0^h E*delta_lambda_i*P_f dv+lambda_f_i*IE",
+    "redshift": "delta_Z=IE",
+    "sources": "delta_QN=integral delta_q dv; delta_QE=integral E*delta_q dv",
+    "number_ledger": "e1(h)+sum(delta_A)-delta_QN=0",
+    "energy_ledger": "E(h)*e1(h)+sum(delta_B)+delta_Z-delta_QE=0",
+    "primary_heat": "delta_H_i=delta_B_i-chi_i*delta_A_i; total=sum_i(delta_H_i)",
+    "chi_eV_binary64_exact_lift": [13.598434599702, 24.587389011, 54.41776],
+    "chi_is_not_fit_threshold": true,
+    "full_equation_remainder": "The first-variation equation omits -delta_Lambda*e1; finite first-variation ledgers do not eliminate this second-order remainder."
+  },
+  "numerics": {
+    "decimal_digits": 70,
+    "degrees": [12, 20],
+    "input_lift": "CSV text -> Python binary64 -> Decimal.from_float exactly, matching E13C2",
+    "optional_positivity_sample_fractions": ["0", "0.25", "0.5", "0.75", "1"],
+    "positivity_claim_limit": "Sampled values only; no minimum enclosure or global positivity proof."
+  },
+  "predeclared_gates": {
+    "input_identity": "All pins, exact saved six keys, original captured CSV/stage hashes and embedded-row equality must pass.",
+    "finite": "All calculated Decimal numerical outputs must be finite.",
+    "quadrature_polynomial_moment_abs": "1e-50",
+    "degree12_20_number_abs": "1e-25",
+    "degree12_20_energy_eV_abs": "1e-24",
+    "number_first_variation_ledger_abs": "1e-45",
+    "energy_first_variation_ledger_eV_abs": "1e-45",
+    "zero_rate_J_limit": "J(0,t)=t exactly at t in {0,1e-7,1}; zero duration gives zero for nonzero rates.",
+    "initial_correction": "e1(0)=0 exactly by zero duration.",
+    "heat_defect_accuracy_research_diagnostic": {
+      "criterion": "abs(delta_H_first-delta_H_saved)/abs(delta_H_saved)<=0.01 when abs(delta_H_saved)>=1e-24 eV",
+      "energy_floor_eV": "1e-24",
+      "number_floor": "1e-25",
+      "below_floor_policy": "Relative status UNRESOLVED_BELOW_ABSOLUTE_FLOOR; separately report absolute error<=floor and error/max(abs(reference),floor).",
+      "production_tolerance": false,
+      "scope": "Local total signed heat DEFECT; not total baseline heat, not the complete E13C2 data set."
+    }
+  },
+  "independence": {
+    "reused_unchanged": "E13C2 Decimal Coefficients physical definitions and Gauss-Legendre rule helper, including their dependencies.",
+    "newly_implemented": "Exact captured frozen field, J response kernel, first-variation endpoint and one-dimensional Fubini moments, heat/ledger/error calculations.",
+    "forbidden_calls": ["collocate", "integrated_lagrange", "solve_decimal", "frozen_exact", "read_and_select", "main"],
+    "comparison": "Parent will independently implement a longdouble GL8/12 formula. This contributor shares physical definitions with the saved E13C2 reference and does not claim independence of the atomic/source model."
+  },
+  "protected_state": {
+    "baseline_RCT": "OFF",
+    "actual_photon_heat_recoil": "null",
+    "physical_production": "HOLD",
+    "HE-F2_F09": "OPEN",
+    "Gamma_alias3.543295": "FAIL",
+    "owner_gate_changes": "NONE"
+  },
+  "failure_policy": "Preserve first failed execution and diagnose it. No post hoc threshold relaxation. Numerical-gate failure is separate from research approximation-diagnostic failure.",
+  "completion_bar": "Six completed local calculations with two new quadrature degrees, saved-reference defect comparisons, first-variation ledgers, disclosed shared definitions, and execution provenance. Final acceptance belongs to a separate decision reviewer."
+}

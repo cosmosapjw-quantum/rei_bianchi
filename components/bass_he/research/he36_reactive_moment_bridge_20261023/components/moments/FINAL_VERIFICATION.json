@@ -1,0 +1,53 @@
+{
+  "schema": "he36.moment_verification_final.v1",
+  "observed_utc": "2026-10-22T22:00:16.017250+00:00",
+  "status": "PASS_SCOPED_WITH_AFFECTED_MEAN_FIX",
+  "final_source_sha256": "644260261b82d6a528fd049b2bb20702e4c66de087406c7868a395a41ec99c2c",
+  "baseline_all_8_groups_receipt": "attempts/attempt_001.json",
+  "baseline_source_sha256": "d73fe4588c8ca81c87421c5dadea479e2d93c38a3b17c27fddc8873cb22ec518",
+  "affected_error": "preconversion of tiny scaled numerator caused1.1364percent conditional-mean loss",
+  "preserved_failure": "attempts/extreme_mean_before_fix.json",
+  "affected_fix_receipt": "attempts/extreme_mean_after_fix.json",
+  "affected_fix_relative_error": 0.0,
+  "unchanged_numerical_paths": [
+    "quadrature nodes and positive interpolation",
+    "alpha beta gamma delta values and logarithms",
+    "temperature derivative recurrence",
+    "mass and temperature and source domain guards",
+    "zero-table semantics",
+    "moment-underflow flags"
+  ],
+  "affected_path": "conditional_mean_energy_J only; divide scaled moments before converting eV toJ",
+  "old_checks_not_replayed": true,
+  "new_science_IVPs": 0,
+  "new_benchmarks": 0,
+  "new_renders": 0,
+  "pass_groups_unique": 9,
+  "attempts": {
+    "baseline": 1,
+    "affected_extreme_mean": 2
+  },
+  "final_diff": "--- before\n+++ after\n@@ -277,7 +277,9 @@\n                 slopes[start:stop] = chunk_slopes\n                 deriv_logs[start:stop] = chunk_deriv_logs\n                 deriv[start:stop] = np.sign(chunk_slopes) * np.exp(chunk_deriv_logs)\n-                means[start:stop] = EV_J * sums[:, 1] / sums[:, 0]\n+                # Divide first: the scaled sums may be tiny although their\n+                # ratio is an ordinary finite energy inside the source band.\n+                means[start:stop] = EV_J * (sums[:, 1] / sums[:, 0])\n         underflow = (values == 0) & np.isfinite(logs)\n         subnormal = (values != 0) & (logs < _LOG_TINY)\n         derivative_underflow = (deriv == 0) & np.isfinite(deriv_logs)\n",
+  "files": [
+    {
+      "path": "maxwellian_moments.py",
+      "sha256": "644260261b82d6a528fd049b2bb20702e4c66de087406c7868a395a41ec99c2c",
+      "bytes": 14689
+    },
+    {
+      "path": "check_moments.py",
+      "sha256": "d2dbf17d201f17672faf087f3be69a0972be94e55bc54e1f2106b9020dd6a44d",
+      "bytes": 14885
+    },
+    {
+      "path": "check_extreme_mean.py",
+      "sha256": "467c2997af357d935e65a5642ddd605372fb537a96eb7609ad7bf52187f692bf",
+      "bytes": 1555
+    },
+    {
+      "path": "CHECK_CONTRACT.json",
+      "sha256": "d54d8f299c6588e026464d6407788ae43d295985f0d44a07f2b633d01603425c",
+      "bytes": 1956
+    }
+  ]
+}

@@ -1,0 +1,257 @@
+{
+  "schema": "bass-he.c2f.independent-review.v1",
+  "created_utc": "2026-10-01T22:48:45.986552+00:00",
+  "verdict": "PASS_IN_DEFINED_C2F_IMPLEMENTATION_SCOPE",
+  "blockers": [],
+  "reviewer": "c2f_math_review; separate from core/native/runtime code authors",
+  "independence_disclosure": "Reviewer contributed the mathematical design note and wrote independent matrix tests; this is independent implementation/evidence review, not an independent second proof of the reviewer-authored mathematical text.",
+  "model_metadata": "Generic GPT/Codex supplied; exact model and external harness versions not inferred.",
+  "review_scope": [
+    "weighted finite-Hilbert cluster geometry and polar transport",
+    "explicit Gram normalization and residual-based principal-angle/projector diagnostics",
+    "full-energy versus symmetry-block target semantics and guard limitations",
+    "small projected-H transformation and nominal-energy distinction",
+    "inspection of strict native algorithm, flags/vectorization evidence and reported tests",
+    "inspection of runtime ownership/identity gates and actual integration evidence",
+    "source/receipt identities and retained scientific claim boundaries"
+  ],
+  "accepted_math": [
+    "Common positive metric and explicit physical embedding are required; matching coefficient shapes are insufficient.",
+    "After explicit Gram normalization, M=Uhat^dagger W Vhat=A Sigma B^dagger and Q=B A^dagger yield U(k)-covariant alignment.",
+    "Equal-rank projector operator distance is the largest singular value of W^(1/2)(Vhat-Uhat M); atan2 of residual/overlap singular values preserves tiny-angle information within roundoff limits.",
+    "Transported columns need a rotated small operator; supplied V^dagger W H V is transformed by the complete nonunitary normalization and unitary polar map.",
+    "Without the projected H form, Q^dagger diag(E) Q is explicitly nominal on the normalized frame and is not a recomputed physical H projection.",
+    "Internal degeneracy is compatible with isolated cluster transport; omitted exact partners close a full-energy boundary.",
+    "Positive sampled guard spacing does not enclose unprovided spectrum, continuum, or L_y matrix-element error."
+  ],
+  "independent_checks": {
+    "count": 13,
+    "status": "PASS",
+    "record": "review/INDEPENDENT_CHECKS.json",
+    "author_tests_imported": false,
+    "scientific_suite_replayed": false
+  },
+  "reviewed_author_and_integration_evidence": {
+    "integrated_unit_tests": {
+      "count": 61,
+      "status": "PASS",
+      "includes_native_17_core_28_runtime_15_workflow_1": true
+    },
+    "manufactured_integration": {
+      "distinct_cases": 12,
+      "layouts": 4,
+      "case_executions": 48,
+      "status": "PASS",
+      "layouts_description": [
+        "serial reference, 1 thread",
+        "serial native, 1 OpenMP thread",
+        "Open MPI reference, 2 ranks x 1 thread",
+        "Open MPI native, 2 ranks x 4 OpenMP threads"
+      ],
+      "max_analytic_error": 3.824832315146507e-15,
+      "max_scalar_error_difference": 1.5658416504019806e-15,
+      "same_input_source_ids": true,
+      "exact_unique_rank_ownership": true
+    },
+    "native_validation": {
+      "count": 17,
+      "status": "PASS",
+      "threads": [
+        1,
+        4
+      ],
+      "source": "native/build-test-evidence-v2b/TEST_REPORT.json",
+      "vectorization": "compiler report shows 16-byte SIMD for eight compensated lanes"
+    },
+    "runtime_seams": {
+      "count": 15,
+      "status": "PASS",
+      "source": "review/RUNTIME_SEAM_TEST_EVIDENCE_v2.json",
+      "scope": "mock callback/seam tests plus separately reviewed real Open MPI integrations"
+    },
+    "counts_are_not_a_sum_of_distinct_scientific_tests": true
+  },
+  "selective_identity_readback": {
+    "matched_identity_bindings": 35,
+    "all_matched": true,
+    "method": "local file size/SHA binding to saved test, integration launch/worker and benchmark receipts; no unchanged suite rerun",
+    "recomputed_saved_max_error": 3.824832315146507e-15,
+    "checked_actual_worker_code_identity": true
+  },
+  "performance_assessment": {
+    "status": "NO_NATIVE_SPEEDUP_CLAIM",
+    "decision": "reference BLAS public API was faster in every measured local workload",
+    "native": "strict SIMD compensated v2b retained as explicit tested backend",
+    "actual_host": "8 effective CPU cores; 8 GiB cgroup memory cap",
+    "NCP64_actual_scaling": "NOT_RUN",
+    "no_v1_to_v2b_controlled_speedup_claim": true,
+    "production_default_changed": false
+  },
+  "resolved_findings": [
+    {
+      "finding": "Raw near-orthonormal frames do not define UU^dagger W as an exact projector.",
+      "resolution": "Explicit symmetric Gram whitening, spectral-norm defect gate and positive-definite Gram check."
+    },
+    {
+      "finding": "sqrt(1-sigma^2) and arccos lose very small principal angles.",
+      "resolution": "Residual SVD for distance and atan2 for angles; independent theta=1e-10 case passed."
+    },
+    {
+      "finding": "Energy-only metadata cannot reconstruct the true projected H after nonunitary normalization.",
+      "resolution": "Optional actual projected form and explicit nominal-energy semantics; actual_ritz_residual_certified remains false."
+    },
+    {
+      "finding": "Incomplete synthetic frame H has unprovided zero-energy complement.",
+      "resolution": "Reports distinguish observed guard spacing .7 from ideal complete finite gap .5; no continuum certificate."
+    },
+    {
+      "finding": "Independent tester initially used old 2-field tolerance constructor.",
+      "resolution": "Preserved 5 TypeErrors and original tester SHA as API synchronization failure; final explicit 4-field tester passed 13 checks."
+    }
+  ],
+  "remaining_unresolved": [
+    "actual multi-state molecular eigensolver adapter",
+    "cross-R physical common embedding/quadrature error",
+    "exact finite R reference task and thresholds",
+    "bound/exterior/continuum spectrum enclosures",
+    "observable-specific weighted derivative and tail errors",
+    "production collision domain and trajectories",
+    "NCP64 measured layout/performance"
+  ],
+  "limitations": [
+    "Review does not independently rerun author native/runtime suites; it inspects their source-bound results and actual integration records.",
+    "Runtime memory accounting is a sampled owned-process RSS watchdog, not an allocation cap or rigorous true-peak bound.",
+    "Input state IDs, sector labels, energy/residual values and source SHA are declared metadata until independently tied to a physical provider.",
+    "Actual physical operator residuals, continuum certificates, Ly observables, D1 and Eq55 remain unapproved.",
+    "The 13 reviewer tests overlap conceptually with author tests and must not be added into a count of independent physical validations."
+  ],
+  "next_node": "C2G_MULTISTATE_EIGENSOLVER_ADAPTER_AND_REFERENCE_PREREGISTRATION",
+  "next_scope": "implementation and concrete reference preregistration; physical launch remains disabled with null execution fields",
+  "preserved_gates": {
+    "CODE_I02_CLOSED": true,
+    "full_C2_closed": false,
+    "scientific_PROMOTE": "HOLD",
+    "full_certificate_fail_closed": true,
+    "Eq55_next_node_authorized": false,
+    "Eq55": "NOT_RUN",
+    "production_default_change": "NOT_AUTHORIZED",
+    "physical_launch_enabled": false
+  },
+  "reviewed_file_identity": [
+    {
+      "path": "math/PROJECTOR_TRANSPORT_DERIVATION_KO.md",
+      "bytes": 15808,
+      "sha256": "e9fb884d600e566ddad32bb05d838f90cd4f95c9aa652c88c5c216baa4d2f6a2"
+    },
+    {
+      "path": "code/projector.py",
+      "bytes": 23445,
+      "sha256": "6a0c34d778bf0b7c12be1e6f35cc59896e8296b827b99a3395ed68b3515d8725"
+    },
+    {
+      "path": "code/README_API.md",
+      "bytes": 9620,
+      "sha256": "3cd23f70b433fa5dc34e7dd0b0256b113fc4f19073c2064b45257fb71b86a7f5"
+    },
+    {
+      "path": "code/native_overlap.py",
+      "bytes": 7195,
+      "sha256": "6ba94b06a69d834bb409884bd6aa56eae9b47b14ff038d0c1b5a92b5221aa8cd"
+    },
+    {
+      "path": "code/manufactured_cases.py",
+      "bytes": 5443,
+      "sha256": "1ced4acdb9cf1bef008bd509ec1e71ffa286e3d769b346d1b89edec7b5a2c931"
+    },
+    {
+      "path": "code/runtime_support.py",
+      "bytes": 10204,
+      "sha256": "550a55a1ca92bf56cb3733f2c017b432259a63579042121754b763e72d3b3cf0"
+    },
+    {
+      "path": "code/launch_manufactured.py",
+      "bytes": 14379,
+      "sha256": "c83aacc70fa3c5c46d3e56048768b3e4695030f98638247dc1a56c2c1f933185"
+    },
+    {
+      "path": "code/run_manufactured.py",
+      "bytes": 9606,
+      "sha256": "f81aabb1f17786a6f2b7dc43dff93758e52bbddb19ea4f712fce4f931899820a"
+    },
+    {
+      "path": "native/weighted_overlap.f90",
+      "bytes": 5123,
+      "sha256": "ba54ae9e943a49cedb4aa7039691a846faf45a7df5e59434488cc9b88e3ecdc4"
+    },
+    {
+      "path": "native/build_overlap.py",
+      "bytes": 6507,
+      "sha256": "d1a79015efa2648e6b9077d1ff46e8e36b4b4c3e3259bebb2dc1adf35b67cda5"
+    },
+    {
+      "path": "native/build-v2b/libbass_overlap.build.json",
+      "bytes": 3631,
+      "sha256": "5aaad4227020de2fe4a384cefc3d12176ccfe2986b5374957b8c38db672bda9f"
+    },
+    {
+      "path": "native/build-v2b/vectorization.txt",
+      "bytes": 33695,
+      "sha256": "94fb27f9f2d7aa9dec8b0f431f425b78789adb01caf379e7d043af20a3e742f3"
+    },
+    {
+      "path": "contract/C2F_IMPLEMENTATION_CONTRACT.json",
+      "bytes": 2356,
+      "sha256": "22c0c88773354e5cfa923855408137580b0ea096874069f5bffe54d37bd0417a"
+    },
+    {
+      "path": "contract/C2G_PHYSICAL_REFERENCE_DRAFT.json",
+      "bytes": 1231,
+      "sha256": "1a5bbd4db5fc35b35e1a6ad2c88c9d7a3d01d4cfd42189a5015c25f5b024b108"
+    },
+    {
+      "path": "review/INDEPENDENT_CHECKS.py",
+      "bytes": 11336,
+      "sha256": "6408384498e61254b07f448b3572d746ac78339c8c0ec9f8b28eec068360a52d"
+    },
+    {
+      "path": "review/INDEPENDENT_CHECKS.json",
+      "bytes": 2698,
+      "sha256": "5756b495688b2d2b5ca4a2acbab3efa1384597e7bb46c91376163b8a1451454b"
+    },
+    {
+      "path": "review/INDEPENDENT_CHECKS_API_ADAPTATION_FAILURE.json",
+      "bytes": 6683,
+      "sha256": "f6494943c5a18247bc9cdce44b53cfd74c60535450dba27f365eaa6c904dc9af"
+    },
+    {
+      "path": "review/INDEPENDENT_CHECKS_API_V0.py",
+      "bytes": 10111,
+      "sha256": "d72cb84d056054b7b592be47f202e586830e0e0e1d46f752d34d8eed4d4ae40a"
+    },
+    {
+      "path": "review/INTEGRATED_UNIT_TESTS.json",
+      "bytes": 14017,
+      "sha256": "7c3ece937fc0fb6fc20443105d23181a5ffd651561880b6099f39cd9fb2593bd"
+    },
+    {
+      "path": "review/INTEGRATION_COMPARISON.json",
+      "bytes": 60742,
+      "sha256": "2c206e6933c8b882b14ca0387695840e6a7a94e6a0b69bcb710b1ec8e2bd0a25"
+    },
+    {
+      "path": "native/build-test-evidence-v2b/TEST_REPORT.json",
+      "bytes": 2009,
+      "sha256": "34742c2c3b917658f2d8c18beda7cc7c309db74594aec4e6f24bb6835ba7b339"
+    },
+    {
+      "path": "review/PERFORMANCE_DECISION.json",
+      "bytes": 6585,
+      "sha256": "62de53a25ae61063dca29274d1796c8ff5fb21e9bff3844f9a2af69aea163bfc"
+    },
+    {
+      "path": "review/RUNTIME_SEAM_TEST_EVIDENCE_v2.json",
+      "bytes": 1880,
+      "sha256": "2520ed5581e275da4092cb9df8930c2bf9c38365ba51067c8610367c0a21c7da"
+    }
+  ]
+}

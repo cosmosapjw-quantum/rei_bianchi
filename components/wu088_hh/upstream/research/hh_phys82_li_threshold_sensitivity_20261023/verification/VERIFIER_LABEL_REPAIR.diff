@@ -1,0 +1,30 @@
+--- verify_threshold_attempt01.py
++++ tests/verify_threshold.py
+@@ -492,12 +492,16 @@
+                  exceptions=(TypeError, AttributeError), category="immutability")
+     audit.reject(lambda: setattr(gap, "K_cm3_s", 0.0), "frozen_rate",
+                  exceptions=(FrozenInstanceError, AttributeError), category="immutability")
++
++
++def verify_api_guards(audit, models, baseline, gap):
++    """Input rejection and algebraic helper checks; no valid rate evaluation."""
+     for bad in (True, False, "255", None, math.nan, math.inf, -1.0, 0.0, 254.99, 50000.01):
+-        audit.reject(lambda b=bad: models["L0"].evaluate(b), "temperature:" + repr(b))
++        audit.reject(lambda b=bad: models["L0"].evaluate(b), "temperature:" + repr(bad))
+     for bad in (True, "6", None, math.nan, math.inf, -0.1, [], [[6.0]], [True, 6.0], [5.8, math.nan]):
+-        audit.reject(lambda b=bad: models["L0"].cross_section(b), "energy:" + repr(b))
++        audit.reject(lambda b=bad: models["L0"].cross_section(b), "energy:" + repr(bad))
+     for bad in (True, "1", None, math.nan, math.inf, -1.0):
+-        audit.reject(lambda b=bad: gapmod.fixed_exposure(baseline, gap, b), "exposure:" + repr(b))
++        audit.reject(lambda b=bad: gapmod.fixed_exposure(baseline, gap, b), "exposure:" + repr(bad))
+     for flag in (True, 0, 1, "false", None):
+         audit.reject(lambda b=flag: models["L0"].evaluate(255.0, full_physical_rate=b),
+                      "full_flag_evaluate:" + repr(flag))
+@@ -755,6 +759,7 @@
+         models = gapmod.named_models()
+         base_rate, gap_rate = verify_numeric(audit, profile, saved, baseline, models)
+         verify_guards_and_join(audit, models, base_rate, gap_rate)
++        verify_api_guards(audit, models, base_rate, gap_rate)
+         verify_runner(audit, profile, saved, fixtures)
+     except Exception:
+         error = traceback.format_exc()

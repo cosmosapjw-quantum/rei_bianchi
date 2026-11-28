@@ -1,0 +1,47 @@
+name: BASS_HE REI-F08 source-matched H/He Thomson science
+on:
+  push:
+    branches:
+      - research/bass-he-rei-f08-source-species-thomson-20261101
+  pull_request:
+    paths:
+      - 'research/rei_f08_h_he_thomson_decomposition_20261101/**'
+      - '.github/workflows/bass-he-rei-f08-source-species-thomson.yml'
+jobs:
+  native-source-science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify original source-pinned science and negative tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=research/rei_f08_h_he_thomson_decomposition_20261101
+          python -m unittest discover -s "$P/tests" -p 'test_*.py' -v
+          python -O -m unittest discover -s "$P/tests" -p 'test_*.py' -v
+          python "$P/audit_independent.py"
+      - name: Rerun actual original 16001-step histories to 10752 sky rows
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=research/rei_f08_h_he_thomson_decomposition_20261101
+          python "$P/science.py" --out "$RUNNER_TEMP/hei_source_run"
+          python - "$P/results/RESULT.json" "$RUNNER_TEMP/hei_source_run/RESULT.json" <<'PY'
+          import json,sys
+          original=json.load(open(sys.argv[1]))
+          new=json.load(open(sys.argv[2]))
+          for k in ("source_pair_id","source_history_rows","source_sky_rows",
+                    "electron_identity_max_relative","canonical_delta",
+                    "new_cosmological_IVPs","new_astronomical_observations"):
+              assert original[k]==new[k],k
+          assert len(original["quad_summary"])==len(new["quad_summary"])==12
+          for a,b in zip(original["quad_summary"],new["quad_summary"]):
+              for k in ("tau_BI_H_mean","tau_BI_He_mean",
+                        "He_tau_fraction_of_mean","He_geometry_Qxx_fraction"):
+                  assert abs(a[k]-b[k])<=max(1e-17,abs(a[k])*2e-12),(k,a[k],b[k])
+          print("ORIGINAL_SOURCE_REAL_SCIENCE_RECOMPUTED_32002_PLUS_10752_PASS")
+          PY

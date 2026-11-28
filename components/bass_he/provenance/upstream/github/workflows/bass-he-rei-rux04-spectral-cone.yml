@@ -1,0 +1,40 @@
+name: BASS_HE REI IGM native fourgroup/P19 sixmoment source-cone
+on:
+  push:
+    branches: [research/rei-rux04-p19-native-sixmoment-source-cone-20261101]
+  pull_request:
+    paths:
+      - research/rei_rux04_p19_native_source_cone_20261101/**
+      - .github/workflows/bass-he-rei-rux04-spectral-cone.yml
+permissions: {contents: read}
+jobs:
+  published-source-cone:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Source-pinned exact rational H/He spectral-cone tests
+        run: |
+          python -m py_compile research/rei_rux04_p19_native_source_cone_20261101/source_cone_verifier.py
+          python -m unittest discover -s research/rei_rux04_p19_native_source_cone_20261101/tests -v
+          python -O -m unittest discover -s research/rei_rux04_p19_native_source_cone_20261101/tests -v
+      - name: Construct original source cone witness, preserving RUX04 HOLD
+        run: |
+          python research/rei_rux04_p19_native_source_cone_20261101/source_cone_verifier.py --repo . --output native_cone_output/RESULT.json
+          python - <<'PY'
+          import json
+          r=json.load(open('native_cone_output/RESULT.json'))
+          assert r['central_rei']=='28/88_REPORTED' and r['BASS_HE_physical']=='14/18_REPORTED'
+          assert r['canonical_delta']==0 and r['rux04']=='NOT_ADMITTED'
+          assert all(v['rate_relative_minimax_lower_bound']>0.88 for v in r['cases'].values())
+          assert all(not v['six_moment_feasible'] for v in r['cases'].values())
+          print('REI_RUX04_CONE_EXCLUSION_SUCCESS',r['r_min_HeI_per_HI'])
+          PY
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bass-he-rei-rux04-sixmoment-source-cone
+          path: native_cone_output/RESULT.json
+          if-no-files-found: warn

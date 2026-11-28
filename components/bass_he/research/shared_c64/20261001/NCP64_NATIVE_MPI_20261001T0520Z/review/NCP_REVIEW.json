@@ -1,0 +1,741 @@
+{
+  "schema": 1,
+  "reviewed_at_utc": "2026-10-01T05:44:26.516247+00:00",
+  "reviewer": "independent ncp_accuracy_review agent",
+  "verdict": "ACCEPT_SCOPED_ACCURACY_PRESERVING_HPC_IMPLEMENTATION",
+  "scope": "Static numerical/ABI/execution review; recorded local parity and performance; independent no-solve operator/runtime tests and MPI artifact comparison. No NCP host execution or new physical convergence claim.",
+  "reviewer_eigensolves": 0,
+  "reviewer_tests": [
+    {
+      "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python tests/test_observables.py",
+      "count": 5,
+      "status": "PASS",
+      "seconds": 0.21
+    },
+    {
+      "command": "python -m unittest discover -s tests -p test_runtime.py -v",
+      "count": 14,
+      "status": "PASS",
+      "seconds": 0.362,
+      "scope_note": "Executed after identity/localhost fixes, before final localhost:slots spelling-only launcher change; final spelling/test assertions statically reviewed. No repeated physics needed."
+    },
+    {
+      "action": "independent SHA/size verification of reference and frozen fixtures; serial/parallel source delta; all 8 MPI STATE.npz sizes/hashes; compare all arrays of 4 state pairs; native ABI3 binary/build/source agreement",
+      "status": "PASS"
+    }
+  ],
+  "producer_evidence_reviewed": {
+    "native_portable_strict_tests": 7,
+    "native_local_ISA_strict_tests": 7,
+    "native_debug_tests": 7,
+    "all_native_test_logs": "PASS",
+    "matrix_parity_max_abs": 7.105427357601002e-15,
+    "matrix_parity_max_relative_frobenius": 1.868677780690865e-19,
+    "l96_max_energy_abs": 3.552713678800501e-15,
+    "l96_max_state_L2": 3.713260524293975e-15,
+    "l96_max_operator_abs": 9.992007221626409e-16,
+    "MPI_serial_vs_3ranks": "4 tasks, 2 parallel workers; energies exactly equal and state arrays bitwise equal"
+  },
+  "scientific_checks": [
+    "Reference and optimized Coulomb Hamiltonians, units, positive associated-Legendre phase, finite sphere and Dirichlet endpoints agree. No precision, quadrature, tolerance or eigenproblem relaxation.",
+    "Mass matrix Kronecker construction equals repeated identical radial blocks; sparse preallocation/index-width changes preserve degrees of freedom.",
+    "ABI3 C basis(nq,na) is Fortran basis(na,nq); C gaunt(k,i,j) maps gaunt(j,i,k); C blocks(i,a,j,b) maps blocks(b,j,a,i). Asymmetric fixture exercises orientation.",
+    "OpenMP assigns disjoint i blocks, private scratch per thread. SIMD across distinct outputs retains increasing k and q sums; no floating MPI science reduction. NumPy/BLAS versus Fortran bitwise equivalence is not claimed.",
+    "Sparse operator selection l=k or |l-k|=1 and union radial partition preserve physical forms. L_O = L_B + Z_A R/(Z_A+Z_B) p_x remains explicit. No energy-gap substitution or force identity supplies direct operators."
+  ],
+  "findings": [
+    {
+      "id": "NCP-R01",
+      "issue": "Initial MPI worker did not bind returned source, state and native identities to preflight snapshot.",
+      "resolution": "Closed: before/after identity checks, expected library SHA passed to child; reported Python map, NPZ bytes/hash and native build identity checked. Tamper regressions pass.",
+      "status": "CLOSED"
+    },
+    {
+      "id": "NCP-R02",
+      "issue": "Single-host declaration not enforced in launcher; later localhost only implied one slot.",
+      "resolution": "Closed in delivered launcher: --host localhost:ranks*threads after host resource validation, --nooversubscribe and core binding retained. Final bound-core execution remains environment-blocked.",
+      "status": "CLOSED_IMPLEMENTATION_ENVIRONMENT_LIMIT_RETAINED"
+    },
+    {
+      "id": "NCP-R03",
+      "issue": "Standalone native backend permitted absent build manifest; worker finiteness checks incomplete.",
+      "resolution": "Closed: required ABI/library build manifest and explicit finite energy, norm, residual and coefficients.",
+      "status": "CLOSED"
+    },
+    {
+      "id": "NCP-R04",
+      "issue": "Original eigenstate cap terminology conflated target solves and additional Ritz roots.",
+      "resolution": "Explicit dated operational count clarification before remaining runs; total 36 target calls and 64 Ritz roots, within amended 40/80 envelope. Earlier contract reconstruction is expressly not independent original-byte proof. Accuracy thresholds unchanged.",
+      "status": "DISCLOSED_OPERATIONAL_AMENDMENT"
+    },
+    {
+      "id": "NCP-R05",
+      "issue": "Initial native and contention-affected benchmarks cannot support final native gain.",
+      "resolution": "Initial failures and executed source/binaries retained; final ABI3 isolated evidence separate. Native and optimized NumPy end-to-end differences are within observed spread.",
+      "status": "CLOSED_BY_SCOPED_REPORTING"
+    }
+  ],
+  "performance": {
+    "operator_warm_median_speedup": 16.43931139752506,
+    "operator_cold_speedup": 3.4864404580620607,
+    "operator_all_warm_candidate_faster": true,
+    "final_native_vs_reference_solver_median_speedup": 1.137292538076481,
+    "native_peak_RSS_median_reduction_fraction": 0.2862719043268831,
+    "native_vs_numpy_unique_winner": "NOT_ESTABLISHED; NumPy slightly lower median, ranges overlap",
+    "actual_NCP64_speedup": "NOT_RUN",
+    "native_OMP4_3_34x_scope": "synthetic element contraction only, not full solver or 64-core host"
+  },
+  "residual_limits": [
+    "Actual 64-core/128GB NCP rank/thread/NUMA throughput and bound-core behavior unverified. Local hwloc affinity failure preserved; functional MPI comparison explicitly unbound.",
+    "Host memory values are snapshots, RLIMIT_AS is virtual address-space cap; configured reserves do not prove RSS reservation or NCP-wide peak memory.",
+    "Local -march=native binary belongs to this build host; rebuild and validate on NCP. No portable-NCP performance claim.",
+    "MPI serial evidence predates a launcher host-slot spelling-only fix; exact unchanged scheduler/worker/solver/native identities verified. Direct test commands do not invoke changed launcher.",
+    "Numerical equality on bounded fixtures is implementation evidence, not continuum error enclosure or C2 closure.",
+    "No remote publication, backup restore or final delivery archive verified by this review."
+  ],
+  "gates": {
+    "CODE_I02_CLOSED": true,
+    "full_certificate_fail_closed": true,
+    "scientific_PROMOTE": "HOLD",
+    "Eq55_next_node_authorized": false,
+    "Eq55": "NOT_RUN",
+    "production_default_change": "NOT_AUTHORIZED"
+  },
+  "reviewed_files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 961,
+      "sha256": "5b6303665681a98eedf7c3d4700560a2058855d992b9e8759e64188de93193a5"
+    },
+    {
+      "path": "CONTRACT.json",
+      "bytes": 2959,
+      "sha256": "45054b5d975c72bb0c4de452d8002b1fb36d9676af24eccabb5ac9eeda17c44a"
+    },
+    {
+      "path": "HPC_POLICY_KO.md",
+      "bytes": 2926,
+      "sha256": "3a4f7cfb662dc3e8f6531f09c8345f3ca86f7c6c6040288bd9f652df6be0669a"
+    },
+    {
+      "path": "OPERATIONAL_COUNT_CLARIFICATION.json",
+      "bytes": 1320,
+      "sha256": "432aaca6db205a01d3566b49f9b6552ed74b3fc6e0739f78d831c2f0811e6b03"
+    },
+    {
+      "path": "code/benchmark_layouts.py",
+      "bytes": 8549,
+      "sha256": "865af5c6900a077104fcc25a46c60125e2030667a846783333a26c9b1ef0fa82"
+    },
+    {
+      "path": "code/fast_observables.py",
+      "bytes": 6536,
+      "sha256": "c7b4afbf4e91eff148c9f9692b98bd8f062ac2fc3e5076ab5c9bbe0730ebf0b1"
+    },
+    {
+      "path": "code/host_probe.py",
+      "bytes": 5960,
+      "sha256": "664d948cd06e77c6b4bd996c48d38530a01bf530b993322f0d0f55272e61f403"
+    },
+    {
+      "path": "code/launch_ncp.py",
+      "bytes": 6348,
+      "sha256": "bc02f669f885856444bcabcd85d53d606c37a90f1be1ef33fdc4cec74d03d221"
+    },
+    {
+      "path": "code/mpi_batch.py",
+      "bytes": 17708,
+      "sha256": "446b753aca7ba4fb27158798daded3970aefff8608311414ff6985e34047a5d0"
+    },
+    {
+      "path": "code/native_backend.py",
+      "bytes": 6741,
+      "sha256": "995dcbba88d69c9d910d071a3420281336e4a436b66ec9ad6c3eff307233a213"
+    },
+    {
+      "path": "code/optimized_solver.py",
+      "bytes": 18189,
+      "sha256": "6f8c07685cff1c5ed1005adf3d15962f4947974456ec9d4c098d5a221a3a5678"
+    },
+    {
+      "path": "code/task_worker.py",
+      "bytes": 2903,
+      "sha256": "cc41c6bf29b5da5dba84cb0350263642ab96ab609ace8068bfac5bd2fe911302"
+    },
+    {
+      "path": "docs/MPI_RUNTIME_KO.md",
+      "bytes": 9152,
+      "sha256": "da51c0303c9e6b967c0a64d1e304245848a25efd0e997f4c0702d48f6b1a0d12"
+    },
+    {
+      "path": "evidence/L96_NATIVE_RESULT.json",
+      "bytes": 17038,
+      "sha256": "d37112f170842bc8265d380ad6240305d411d8eb5ae53f3e4cbca2c0d5a2206d"
+    },
+    {
+      "path": "evidence/MPI_BINDING_ENVIRONMENT_FAILURE.txt",
+      "bytes": 5127,
+      "sha256": "cd89f5b359989500254bb99c3c256036e7bcbf04323632ca684aa2b1d9911eb2"
+    },
+    {
+      "path": "evidence/MPI_EQUIVALENCE.json",
+      "bytes": 1381,
+      "sha256": "120509084f369fcf11e07fa3316d36cc066c931838d25de2aeaff7bfc44aff24"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/BATCH_SUMMARY.json",
+      "bytes": 29129,
+      "sha256": "104d1081a92aac26dd27b8a9f03ac56e7f77890a258f97b99d96371a9bb0a9c8"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/MANIFEST_INPUT.json",
+      "bytes": 1225,
+      "sha256": "332bc4bbd4ff1a34afc978ecf872db8e079f3e27d582888be54b766fb99d95e1"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/RUN_IDENTITY.json",
+      "bytes": 26065,
+      "sha256": "538c7a038b49d1d42d6171830491a5c36d2b16238a3f5c95b66f77160b16d074"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_0/RESULT.json",
+      "bytes": 13320,
+      "sha256": "9996a42bf89ec4f6299917d6022bee69b0ec3e7963b435210e90f59e5b5635f7"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_0/STATE.npz",
+      "bytes": 14139,
+      "sha256": "cdad8234dfb5d52101106327d6780063ce384b505adaab9ccc66f494d7cc99a3"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_0/STDERR.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_0/STDOUT.txt",
+      "bytes": 104,
+      "sha256": "d982db300e27ecee1237efba5c3a0a532fadd91ccc88ec85d470a7eef966b80a"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_0/TASK_EXECUTION.json",
+      "bytes": 6684,
+      "sha256": "2fe42eef69d152fde36b32bfd77a6267762a27b79f7b8ac71ef94b11b0570846"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_0/TASK_INPUT.json",
+      "bytes": 216,
+      "sha256": "c06e5efe081bd5de80eac06336e36210fa8ab76ea031837d1bbf3a1dd2fee3e1"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_1/RESULT.json",
+      "bytes": 13318,
+      "sha256": "7bf59d03ad84d7ba4ce010780a1a3f8b3377974308e831395ecc5ea0e29477f7"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_1/STATE.npz",
+      "bytes": 13331,
+      "sha256": "61a4172c171fa93e317c50f4706dd7cc831e20b32f7dee97fb3c850f8fafa37a"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_1/STDERR.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_1/STDOUT.txt",
+      "bytes": 104,
+      "sha256": "210e452fb5c8548e4e83427db00842ccadc8512898fe2c828c12533caea1d54f"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_1/TASK_EXECUTION.json",
+      "bytes": 6685,
+      "sha256": "ab3af61e9c9db457eed950feac0acabfea3adccec40c2c42537e21b86762c5d4"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_1/TASK_INPUT.json",
+      "bytes": 216,
+      "sha256": "b7c59aa348449f57530a48b6259fa88287992c20dbee9e92c2ccfbb303494eac"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_2/RESULT.json",
+      "bytes": 13320,
+      "sha256": "7a880da71fa0a82337ac8b76b48f1c5b197e9767104edff464b10d5d9c8e404e"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_2/STATE.npz",
+      "bytes": 20449,
+      "sha256": "9574182343f4b9fe90d3e3456163268dbb376e991a45be24199c6a1ebbad5769"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_2/STDERR.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_2/STDOUT.txt",
+      "bytes": 105,
+      "sha256": "ec4d14bbd3efb7b293224c736e750c1252b34e896b99a0e88b1e1c124bd2ebb0"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_2/TASK_EXECUTION.json",
+      "bytes": 6685,
+      "sha256": "a95c75f6bb075674a3339b4b3aa4587dfa18e1add64ab4846bef02e95fc107e9"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_2/TASK_INPUT.json",
+      "bytes": 216,
+      "sha256": "1342d51fc23041d8426ca4ad5f58a8390bb0e80e3693831d12e33f34279f96bb"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_3/RESULT.json",
+      "bytes": 13334,
+      "sha256": "945a36b8935c1ee3acbe019b03f86183900e7d90f25d3ee62628a2aed4f1aa1d"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_3/STATE.npz",
+      "bytes": 19660,
+      "sha256": "28d4086c01d67eb4f6bc92d678df1ac8c8645a1499e32cdff387ffe3125e04a4"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_3/STDERR.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_3/STDOUT.txt",
+      "bytes": 105,
+      "sha256": "ac720c2978683ac3eca593b9ed890255058796326d2955f738363c19e3c73fb4"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_3/TASK_EXECUTION.json",
+      "bytes": 6684,
+      "sha256": "965cb7eae2537d59aaa175ecd3c3e1f71f47d4604b4c075c365883183f55a030"
+    },
+    {
+      "path": "evidence/MPI_PARALLEL/parity_3/TASK_INPUT.json",
+      "bytes": 216,
+      "sha256": "fcefce1812940fbcae457f32105af7e4cd40d6a537ca186f221ee7da3506ad8b"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/BATCH_SUMMARY.json",
+      "bytes": 29112,
+      "sha256": "748c4b3d9b376f95112052a4078e6143a4b6e7365d7a6d370e32abaeb9c579c5"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/MANIFEST_INPUT.json",
+      "bytes": 1225,
+      "sha256": "332bc4bbd4ff1a34afc978ecf872db8e079f3e27d582888be54b766fb99d95e1"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/RUN_IDENTITY.json",
+      "bytes": 14905,
+      "sha256": "a3c6955cbf57c40762180b59083a3753e381814628353c172ccfa1376955126e"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_0/RESULT.json",
+      "bytes": 13321,
+      "sha256": "256916337e4c2f7c54a6c9928170ce6eb073739683c902ff1eca5885b807cdc3"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_0/STATE.npz",
+      "bytes": 14139,
+      "sha256": "cdad8234dfb5d52101106327d6780063ce384b505adaab9ccc66f494d7cc99a3"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_0/STDERR.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_0/STDOUT.txt",
+      "bytes": 105,
+      "sha256": "1ee13509cfa2b6afbf612668192f5f56ebb8689baff78006ae3cb5631913b00f"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_0/TASK_EXECUTION.json",
+      "bytes": 6680,
+      "sha256": "77ed87c1dfe3fdfb92205bd401cfd555365a27951f568b3179c9d7e9b0ff8d07"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_0/TASK_INPUT.json",
+      "bytes": 216,
+      "sha256": "c06e5efe081bd5de80eac06336e36210fa8ab76ea031837d1bbf3a1dd2fee3e1"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_1/RESULT.json",
+      "bytes": 13320,
+      "sha256": "9396f7156647e66f7d2e1adde13e520595321fbfe11cce907615704538a39e14"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_1/STATE.npz",
+      "bytes": 13331,
+      "sha256": "61a4172c171fa93e317c50f4706dd7cc831e20b32f7dee97fb3c850f8fafa37a"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_1/STDERR.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_1/STDOUT.txt",
+      "bytes": 105,
+      "sha256": "bea1de60c304d8f1da4b4937db165f80a2494fac0b78c2b4e9fd988d24a49506"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_1/TASK_EXECUTION.json",
+      "bytes": 6680,
+      "sha256": "b551163fb964df133cdea8a98b7931ea57ec41dad9c9b2be5e3baa0d1a979b3c"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_1/TASK_INPUT.json",
+      "bytes": 216,
+      "sha256": "b7c59aa348449f57530a48b6259fa88287992c20dbee9e92c2ccfbb303494eac"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_2/RESULT.json",
+      "bytes": 13319,
+      "sha256": "a37fd45dfdf69755afc64e473d024d0354db04e7ed98a8aa8e199104cf8dab5b"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_2/STATE.npz",
+      "bytes": 20449,
+      "sha256": "9574182343f4b9fe90d3e3456163268dbb376e991a45be24199c6a1ebbad5769"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_2/STDERR.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_2/STDOUT.txt",
+      "bytes": 105,
+      "sha256": "b7b190698515a08d08b85ceda5ad8ad530c0ca74407b6cd1325e64901289fac4"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_2/TASK_EXECUTION.json",
+      "bytes": 6681,
+      "sha256": "d2ad086fc9a666816cdec2cac075bb43214eb79b1ef4f569e1727da07a9f4f21"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_2/TASK_INPUT.json",
+      "bytes": 216,
+      "sha256": "1342d51fc23041d8426ca4ad5f58a8390bb0e80e3693831d12e33f34279f96bb"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_3/RESULT.json",
+      "bytes": 13336,
+      "sha256": "25f2bf3ae7760180904cd938679f8607f66e934ec2a29a748fa354f5e116de7e"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_3/STATE.npz",
+      "bytes": 19660,
+      "sha256": "28d4086c01d67eb4f6bc92d678df1ac8c8645a1499e32cdff387ffe3125e04a4"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_3/STDERR.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_3/STDOUT.txt",
+      "bytes": 105,
+      "sha256": "919d5db38d98c99fbcef3e2e5446fecd23368aca97bed38b3762f90c01310699"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_3/TASK_EXECUTION.json",
+      "bytes": 6680,
+      "sha256": "8aead016b0eeeaf066dbe9b36e251bcdc6f6fba8ac2e3cbd9b1c3c8e615542a4"
+    },
+    {
+      "path": "evidence/MPI_SERIAL/parity_3/TASK_INPUT.json",
+      "bytes": 216,
+      "sha256": "fcefce1812940fbcae457f32105af7e4cd40d6a537ca186f221ee7da3506ad8b"
+    },
+    {
+      "path": "evidence/OPERATOR_BENCHMARK.json",
+      "bytes": 3087,
+      "sha256": "fad6bf5a9eabda0a5763defc1420b0baeffae599b3a6cf208ba9ccd4da1f4410"
+    },
+    {
+      "path": "evidence/SOLVER_BENCHMARK.json",
+      "bytes": 3615,
+      "sha256": "ce654353bd74160f1a058836a187023bd9cbc3df847b6dcf2b271b2fdf364305"
+    },
+    {
+      "path": "evidence/SOLVER_EQUIVALENCE.json",
+      "bytes": 6316,
+      "sha256": "84960e63b3d69cea48839edb354606acfebfef54c898148b4f26b874ac7c3d91"
+    },
+    {
+      "path": "fixtures/C1B_B_l96/B_l96.json",
+      "bytes": 9052,
+      "sha256": "e59eac53d4d33d41befb0abaaebf1b29cf0272c1ce8c5ecc85eb66411cfb071a"
+    },
+    {
+      "path": "fixtures/C1B_B_l96/B_l96_m0.npz",
+      "bytes": 174135,
+      "sha256": "8acab2398ff345a1bc1a4114c4e86ffe4f70cd5824b3d25ef33496db922841e3"
+    },
+    {
+      "path": "fixtures/C1B_B_l96/B_l96_m1.npz",
+      "bytes": 171385,
+      "sha256": "32f1fdf29ca6e07ad1b63935b691a9596fe61fd730c4fc95b8ed001d5ddc901b"
+    },
+    {
+      "path": "native/DEBUG_TEST_LOG.txt",
+      "bytes": 3758,
+      "sha256": "a31c96ba147da933c61c2342683a0caca2a4e17a91a6976cc8a86e92be96ab96"
+    },
+    {
+      "path": "native/DEBUG_V2_TEST_LOG.txt",
+      "bytes": 3758,
+      "sha256": "9fd5914b857dfc7d030bc509ecc7893a2b9122ea89ab4f8651decc8317a3395a"
+    },
+    {
+      "path": "native/DEBUG_V3_TEST_LOG.txt",
+      "bytes": 3622,
+      "sha256": "dc8229bb24df84101c06b682004d19e1788eb2bcba4317148ca1c53ee60e6fdb"
+    },
+    {
+      "path": "native/Makefile",
+      "bytes": 287,
+      "sha256": "b164ef4c1b3b29869f52e748f98dc983e2b8add8fd8b23abfc07a109858329a3"
+    },
+    {
+      "path": "native/NATIVE_ISA_V3_TEST_LOG.txt",
+      "bytes": 4932,
+      "sha256": "e536c0141e3c4ea9658738e9924da50dcc9ef5858b6debfe8d54f4c364ebaaae"
+    },
+    {
+      "path": "native/README.md",
+      "bytes": 3543,
+      "sha256": "0ed069ccdbba3c28715f58657e0567367ab1f77c14b8e74264da662ab45c611e"
+    },
+    {
+      "path": "native/STRICT_TEST_LOG.txt",
+      "bytes": 4227,
+      "sha256": "705d71c6b3e3adcb37b414d0eafb3c0aa9584dd922103f0285a5cac27a8ad38b"
+    },
+    {
+      "path": "native/STRICT_V2_TEST_LOG.txt",
+      "bytes": 4227,
+      "sha256": "39652f554823d0f658ec31bf60af1b3edb73d7de1f34fceece4af6de9edf85a4"
+    },
+    {
+      "path": "native/STRICT_V3_TEST_LOG.txt",
+      "bytes": 4247,
+      "sha256": "e271f359993af6ad0d5d3032ecbd6dbd316abb8b94acef8b942aba9bb6c9eefe"
+    },
+    {
+      "path": "native/SYNTHETIC_BENCHMARK_OMP1.json",
+      "bytes": 5429,
+      "sha256": "28a60f1ec57a9043cbc8db30bdb2bbcde205ea6bc28977a83c0966315ca15b66"
+    },
+    {
+      "path": "native/SYNTHETIC_BENCHMARK_OMP4.json",
+      "bytes": 5436,
+      "sha256": "654b32f7cc7667acd407f05f35abca68c586774d96b18e4b4c9403d9ac0dc186"
+    },
+    {
+      "path": "native/SYNTHETIC_BENCHMARK_V2_NATIVE_OMP1.json",
+      "bytes": 5975,
+      "sha256": "2bce6df2a03a2ae1e7eb1235ff8a88dbdd1a61489f00f035c0eaeb84b7b25998"
+    },
+    {
+      "path": "native/SYNTHETIC_BENCHMARK_V2_OMP1.json",
+      "bytes": 5431,
+      "sha256": "88935d050d419ed067da26dd83527386ef9fdc235a4823de28091e3d350a3a80"
+    },
+    {
+      "path": "native/SYNTHETIC_BENCHMARK_V2_OMP4.json",
+      "bytes": 5437,
+      "sha256": "9080771ad0404a37e118f077bdf89a5f4541ea894d96f6cc3d2767a1535f3ca9"
+    },
+    {
+      "path": "native/SYNTHETIC_BENCHMARK_V3_NATIVE_OMP1.json",
+      "bytes": 6054,
+      "sha256": "ba8aa8c59b34b096d88856bee0ea223bfb0d3761d3e4fe698e33b49d363f76e6"
+    },
+    {
+      "path": "native/SYNTHETIC_BENCHMARK_V3_NATIVE_OMP4.json",
+      "bytes": 6065,
+      "sha256": "417de53c250c10bff8fc222c763e658071761066eb1327147fe3e18257442f91"
+    },
+    {
+      "path": "native/SYNTHETIC_BENCHMARK_V3_OMP1.json",
+      "bytes": 5349,
+      "sha256": "7b7167fc7e53bcb27eda0a55c545bd578d8e49f200ad1e6978d694b1ee28da0f"
+    },
+    {
+      "path": "native/benchmark_native.py",
+      "bytes": 2605,
+      "sha256": "a3547ab2b1606c59d449274a23210712bae1345ef89b42d7745c257cd4790c7a"
+    },
+    {
+      "path": "native/build/libbass_element.build.json",
+      "bytes": 3212,
+      "sha256": "4a2d97a8feb1cf471c1fd9e9f534f99a2afe233a9cb770484533cc521254bd8a"
+    },
+    {
+      "path": "native/build/libbass_element.so",
+      "bytes": 20464,
+      "sha256": "fbbdfdaacd2a452966ef6e23a0a37a537fd1eaaf17dec82c68885f05f1066aa6"
+    },
+    {
+      "path": "native/build-debug/libbass_element.build.json",
+      "bytes": 2613,
+      "sha256": "6281b6c7b20f1fea2cb58430ec95a05ca1993f6aa8d1db0d641884ae3c215ba0"
+    },
+    {
+      "path": "native/build-debug/libbass_element.so",
+      "bytes": 35960,
+      "sha256": "24010122894e5f86a3551db34af94425a4d536da4b07ce01d5e3ab6f453b8e2a"
+    },
+    {
+      "path": "native/build-native/libbass_element.build.json",
+      "bytes": 3898,
+      "sha256": "740feb00b27b3f6a69d488dca4467e30ec10582a83ebde1b81bd6bf5de37703e"
+    },
+    {
+      "path": "native/build-native/libbass_element.so",
+      "bytes": 20464,
+      "sha256": "df8bc1c16184423ab01537a738bb85c4717625fe205907a77373f9c94f7e2d65"
+    },
+    {
+      "path": "native/build.py",
+      "bytes": 4253,
+      "sha256": "b03b65df9dabe9500d093276cc4ede73ffe5ae3686721b8583175642d6cf6fc1"
+    },
+    {
+      "path": "native/element_assembly.f90",
+      "bytes": 3780,
+      "sha256": "81a106b6f46731e7a16bf70c73236c9c410348ef066f38c3a1b7ece3709b6659"
+    },
+    {
+      "path": "native/executed_v1/build.py",
+      "bytes": 4253,
+      "sha256": "87328e94b9cd14a1718618c8fbe4967b5376f2af96c155519e4d0aa9b3490d56"
+    },
+    {
+      "path": "native/executed_v1/element_assembly.f90",
+      "bytes": 3292,
+      "sha256": "c3533bd460f54702ec281fb22d212d288a1ca16218788f3d5fddfd7b15b6ec9c"
+    },
+    {
+      "path": "native/executed_v1/libbass_element.build.json",
+      "bytes": 3296,
+      "sha256": "8681c5de37e66592a216400a9699c67e91b36fa77fed8edf9dd93ffd7bb63a37"
+    },
+    {
+      "path": "native/executed_v1/libbass_element.so",
+      "bytes": 16184,
+      "sha256": "bc796b943165f1ad06aebb5235bfd4df5e65bf5f2cf5e51e0c71460e79507b68"
+    },
+    {
+      "path": "native/executed_v1/native_backend.py",
+      "bytes": 6615,
+      "sha256": "219c7109d383262ee68dc9fd816df154cb9a996ed5893f0ecce1588119c768f2"
+    },
+    {
+      "path": "native/executed_v2/build.py",
+      "bytes": 4253,
+      "sha256": "7fb5a34863a1dc3fba2f27de1f90180e770ac9ac4e034ca4cfa23fae72a58209"
+    },
+    {
+      "path": "native/executed_v2/element_assembly.f90",
+      "bytes": 3731,
+      "sha256": "7a303922027b32cf4e9160a1cbdcde508560186e07c5261eea31612e1d273133"
+    },
+    {
+      "path": "native/executed_v2/libbass_element.build.json",
+      "bytes": 3296,
+      "sha256": "34451e58427f9c0a3aa536bc98a6d61f040548f6d745954efd4d278bfab76415"
+    },
+    {
+      "path": "native/executed_v2/libbass_element.so",
+      "bytes": 16368,
+      "sha256": "a34b159538cd50972b7a3060bf80445732a06df9e4cbca84c814f1125a06373a"
+    },
+    {
+      "path": "native/executed_v2/native_backend.py",
+      "bytes": 6615,
+      "sha256": "60d378921eef882f505be19a8e32903851a66afe6277a596d1b7158aafa1250e"
+    },
+    {
+      "path": "native/test_native.py",
+      "bytes": 5774,
+      "sha256": "59f53990eb58e850875b9678eb9704fdb707140116f7fa76295ff4442db99f89"
+    },
+    {
+      "path": "provenance/AGENTS_PARENT.md",
+      "bytes": 2001,
+      "sha256": "62ce1714c2a5fb3dae6f31ea7ba538f146b46d53f0ca06359b6d4a5e7caaad6d"
+    },
+    {
+      "path": "provenance/AGENTS_PROPOSED.md",
+      "bytes": 2853,
+      "sha256": "32d09d1e6262e1eb3579de1a66e325afd2ba181a8de69313d907b6fb1e8aebfb"
+    },
+    {
+      "path": "provenance/FROZEN_FIXTURE_IDENTITY.json",
+      "bytes": 583,
+      "sha256": "1d70af970d86a0361ddb60093a066448d08a0ba6e9bdbaa66b8023b2510aa42b"
+    },
+    {
+      "path": "provenance/INPUT_IDENTITY.json",
+      "bytes": 688,
+      "sha256": "5db5dd7675854d73e4a92cbd351245e757bbb86969c6901f4aec7307b644b718"
+    },
+    {
+      "path": "provenance/ROOT_POLICY_APPEND.json",
+      "bytes": 621,
+      "sha256": "9f990ff45b9dab74b81f35c1b1d010f72815429e91d9b070138ad3bb2a65defc"
+    },
+    {
+      "path": "provenance/RUNTIME_FIXES.json",
+      "bytes": 1634,
+      "sha256": "c697e5c8ca8f499f81ec9c99e8321f55b2778eff7d6924764f44ea65487a1cf2"
+    },
+    {
+      "path": "reference/coupling.py",
+      "bytes": 4009,
+      "sha256": "6006810fa3ca7d8912051e1331f909f5be03830a49c43f3a5dcff35a5c158a96"
+    },
+    {
+      "path": "reference/force_projected.py",
+      "bytes": 3943,
+      "sha256": "86a25f70d38c2ef55a874d044abf760c63028e0a45a717cd1c1b1f0a92e14222"
+    },
+    {
+      "path": "reference/partialwave_centered.py",
+      "bytes": 16147,
+      "sha256": "b026db5b137d62aba36549fc020788f04f3ded242e7ef5d2e5127544f4f691b5"
+    },
+    {
+      "path": "tests/benchmark_solver.py",
+      "bytes": 2721,
+      "sha256": "5705bf654baa49b72af1ab535c92d1d51255cf268debc7574c51c99f388c9830"
+    },
+    {
+      "path": "tests/test_l96_fixture.py",
+      "bytes": 2152,
+      "sha256": "af7139f517fd453501604a2c518c09299f932b601b23be7fa38b35396ed52374"
+    },
+    {
+      "path": "tests/test_observables.py",
+      "bytes": 9062,
+      "sha256": "57e03f80bda63a0f68c25aa5aa35591ed322bc99c386c750beb9407e9102c8a6"
+    },
+    {
+      "path": "tests/test_runtime.py",
+      "bytes": 11036,
+      "sha256": "4eb71cb14401bcd82554a4f025e75c8373f439bc2f2ee997b0682a4e2bba5f01"
+    },
+    {
+      "path": "tests/test_solver_equivalence.py",
+      "bytes": 2696,
+      "sha256": "1b2538fa3d01e3ea60203ba5a271dfecfb28de0a37ed731b6504fb50bccded50"
+    }
+  ]
+}

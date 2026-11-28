@@ -1,0 +1,19 @@
+R2 researcher execution log. This is not independent decision review.
+
+CWD: /mnt/data/shared_c64_crossrepo_R2_20260928/R2
+RED and GREEN identical command:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m pytest -q test_error_envelopes.py
+
+RED: exit=1; 12 failed in 0.11s; expected failure: R2 error-envelope implementation missing.
+Raw TEST_RED.txt SHA256 b7e7bf768208053d793b598140ad262ad7d7949e00eb1de0886cad2d5443c28e.
+GREEN: exit=0; 12 passed in 0.35s.
+Raw TEST_GREEN.txt SHA256 e80a7853f8913d445e06d3e00386c262f54f51ea10822b88d3b6d976025843ba.
+
+DATA command:
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python evaluate_r2.py --r1-root ../R1/shared_c64_research_20260928 --out RESULT_SUMMARY.json
+exit=0; 14 saved traces, 7970 interior comparisons, 2000 synthetic chains. No new spectral solve, no cloud run.
+Raw RESEARCH_RUN.txt SHA256 5b84e85234389397eb3631920812e5ea45be868faa7a17c342626a796bb3ce81.
+
+Actual three Python files parsed with ast.parse successfully. Original scientific tests were not rerun for unchanged kernels. NumPy2.3.5, SymPy1.14.0, Python3.13.5.
+Raw logs and full per-branch data are preserved in the R2 archive. Per-command start/end UTC was not captured; aggregate record timestamp is retained, not fabricated.
+WolframContext initially failed network; subsequent evaluator returned {0,0,0,9/4096}. First two entries verify derivative identities; the third is a trivial unused-variable derivative, not substantive evidence; fourth confirms the finite-node counterexample.

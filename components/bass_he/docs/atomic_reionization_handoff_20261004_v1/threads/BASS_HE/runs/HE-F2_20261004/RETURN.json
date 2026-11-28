@@ -1,0 +1,59 @@
+{
+  "task_id": "HE-F2",
+  "state": "blocked",
+  "input_identity": {
+    "BASS_HE_commit": "cbc654cf6037a4a0dad2f60fb138964cfff62ada",
+    "rei_bianchi_commit": "64bc3aa0871bb324817afd3d36db018dd34181cf",
+    "rei_bianchi_tree": "8ffe43af6debb54a95b4ab7d213c34bd1e1876d4",
+    "input_manifest": "INPUT_LOCK.json"
+  },
+  "changed_paths": [
+    "he_f2_binding.py",
+    "tests/test_binding.py",
+    "tests/conftest.py",
+    "DERIVATION_KO.md",
+    "REPORT_KO.md",
+    "README_KO.md",
+    "STATE_DELTA.json",
+    "handoff/REI_CONSUMER_DECISION_KO.md",
+    "data/PROVIDER_CANDIDATES.json",
+    "data/REACTION_BINDING.json",
+    "data/SOURCE_DOMAIN_ASSESSMENT.json",
+    "data/CONSUMER_LEDGER_ACCEPTANCE.json"
+  ],
+  "commands": [
+    {
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONDONTWRITEBYTECODE=1 python -W error -m pytest -q -p no:cacheprovider tests",
+      "exit_code": 0,
+      "evidence_path": "evidence/FINAL_TESTS.log"
+    },
+    {
+      "command": "python -W error -B he_f2_binding.py --out data",
+      "exit_code": 0,
+      "evidence_path": "evidence/BUILD_PRODUCTS.log"
+    }
+  ],
+  "artifacts": [
+    "data/PROVIDER_CANDIDATES.json",
+    "data/REACTION_BINDING.json",
+    "data/CONSUMER_LEDGER_ACCEPTANCE.json",
+    "handoff/REI_CONSUMER_DECISION_KO.md"
+  ],
+  "claim": {
+    "basis": "Fresh pinned supplier and consumer reads, recovered FT03 archive hash and selected actual policy/schema/code, exact event/normalization/chemical algebra, 27 changed-scope tests",
+    "ceiling": "Atomic candidate record adaptation and explicit nonacceptance; no actual consumer provider admission, no energy closure selection, no source accuracy or cosmological sensitivity claim"
+  },
+  "next_task": "HE-F2_WAIT_REI_OWNER_SCOPE_AND_RCT_CLOSURE",
+  "completed_component": "HE-F2A_ATOMIC_OFFER_AND_ACTUAL_CONSUMER_COMPATIBILITY",
+  "new_tests": 27,
+  "parent_suite_replayed": false,
+  "consumer_writes": 0,
+  "new_scientific_campaigns": 0,
+  "NCP64_required": false,
+  "blockers": [
+    "RCT explicitly disabled in current FT03",
+    "GM25/KF96 common temperature interval disjoint from FT03 guard",
+    "RCT energy/photon closure not selected",
+    "canonical REI-F00/F01 instances not recovered at expected pinned paths"
+  ]
+}

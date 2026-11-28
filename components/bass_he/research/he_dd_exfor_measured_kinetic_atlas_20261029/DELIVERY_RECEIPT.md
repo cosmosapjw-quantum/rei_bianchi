@@ -1,0 +1,20 @@
+# BASS_HE HE-DD EXFOR measured kinetic atlas: final delivery receipt
+
+Date: 2026-10-29 KST. This is an add-only source-bound successor to BASS_HE Draft PR112 frozen HEAD `a03c1eee365c9b796fef137b81a4347ad44008d1`. Separate Draft PR descendant only; parent/main/production unchanged. Check actual HEAD after this file is committed, never predict its own SHA.
+
+## Actual new physical evidence
+Pinned IAEA-NDS EXFOR `exfor_master@939a14d7bba1ddce51975cb5e8711ce96b3b0871:exforall/M04/M0475.x4`, original raw 3349 bytes SHA256 `b2c1c52931e813dd63fb0e98edfc90088bc2eca497fd9142277e748f0935a82f`, Git blob `c49433293921dbb012d7f1b0387745732a598efa`. Locally source byte hash and Git blob matched original; remote source copy also matched original Git blob. M0475002 12 measured DA (213,258,330 MeV × CM 46,61,73,87 degrees), M0475003 6 measured SIG (201,225,253,285,320,359 MeV). No measured 330 MeV SIG.
+
+Physical data product `results/MEASURED_KINETIC_COORDINATES.json`: all 18 original values, original coordinate-specific ERR-S, frozen parent-rest-energy Q and exact-rational product with event pair kinetic energy E−Q; 12 lab daughter K plus/minus approximate values and 6 SIG(E)(E−Q) energy weights. This is existing experiment transformed by exact two-body kinematics, not a new measurement, exclusive-event rate or heat deposition. Full 90-digit `ATLAS.json`, two CSV and three actual plot images in verified downloadable local archive; Git hosts script to regenerate those, not the standalone full 90-digit/CSV binary assets. No invented 330 SIG, no angular integration/interpolation.
+
+Current local Python3.13.5 scoped 23/23 PASS; compileall PASS; independent C++20 Boost 100dps original source DA=12,SIG=6, max mass shell residual 5.58564432804270825e-103 MeV², pair K residual zero; Wolfram checked Q/threshold, one 330MeV 46° pair and both mass-shell identities; three source-marker figures generated and directly inspected. Git code/test/source blobs verified: Python source `de016ce560d98a3cbce4f1595e1af168fde44349`; tests `28bcd174070e4a83aeb79a3b9188d4b887bc1347`; raw original `c49433293921dbb012d7f1b0387745732a598efa`; C++ source `090cd119207c151180a432003b9b263ad396e816`. Plot source Git blob `f0aadafeb1edb1bef0b287032d731a6711bc5a36`, local plot script differs by four source bytes (semantic output tested locally only); do not claim plot-script exact byte identity.
+
+## Actual stage source/publication
+Source Git `STAGE_LEDGER.json` blob `79f43f6b92e23bfcd4ac3fa147fad33da02e0a80`: 20 exact individual Git stage commits; theory 9/10 scoped, coding 9/10 scoped; R06 and C09 distinct-author native independent NOT_RUN. Google Docs stage log `1d_ODAc6bSKtnnKwXaIcKT3ZQLrCTMF7C4sWF8PSxoEQ` revision `AHj4eMS1zIQNAFkiAJ8vfYnQqFbkqUCSlh9DxemaXzHu6-hAhKJw5NSymtpbAU0MKPTHIBIwMu48ipAhOk_4amEBSHP7J8Fh-F_Ewo9ZW78`, 20 rows ACK and readback. Dropbox Paper stage log `id:BSpOijBcT10AAAAAAEHVyQ` revision `20`, 20 rows ACK/readback. Two text logs 20/20 exactly equal in order and content, Git SHA and DAG counts. **Not** full binary ZIP uploaded to both providers or remotely restored.
+
+## Admission
+New independent data-product DAG D1 original-source byte match and D2 original measured coordinate physical transformation: **2/2 SCOPED**. Original physical Central28/88 and HE14/18, physical delta 0. `kappa=null;R_event=null;heat_rate=null;physical_activation=false;L4=false;production=HOLD`.
+
+Remaining source/physics blockers: original Arends/Silverman detector efficiency, polarization, event-vs-particle counting, same-s inverse numeric DA; actual 330 exclusive event SIG if to calibrate E330 event source; real 330 MeV incident photon phase-space/He proper target and D_fast nonthermal slowing/redistribution/deposition + C_V. No prior original IVP/full suite/4501 LP rerun. No merge or force push.
+
+The next thread resumes via `HANDOFF_NEXT_THREAD_KO.md`. User archive bytes must be verified locally via manifest, ZIP CRC, original source SHA and exact source/target test return; cloud text ACKs do not verify cloud binary restoration.

@@ -1,0 +1,71 @@
+--- pretest_frozen_v2/source/leased_call.py
++++ pretest_frozen_v3/source/leased_call.py
+@@ -6,10 +6,14 @@
+ import importlib.util
+ import json
+ import os
++import platform
+ import resource
+ import subprocess
+ import sys
+ import time
++
++# Protect the preserved lease source even when the outer caller omits its env.
++sys.dont_write_bytecode=True
+ 
+ UNIT=Path(__file__).resolve().parents[1]
+ LEASE_SHA='76ff57ba687fd9830b84c3fcff69eb8ed0e9f6ceab4551e61c67c84d3ea65124'
+@@ -40,6 +44,8 @@
+          'cpu_limit_s':cpu,'wall_limit_s':wall,'workers':1,'threads':1,'memory_lease_GiB':0.5,
+          'old_science_runner_called':False,'old_rate_callbacks':0,'old_population_callbacks':0,
+          'old_ODE_callbacks':0,'other_processes_terminated':0,
++         'runtime_diagnostic':{'python_implementation':platform.python_implementation(),
++                               'python_version':platform.python_version()},
+          'budget':{'inherited_spend':None,'remaining':None,'currency':None}}
+     a.receipt.parent.mkdir(parents=True,exist_ok=True)
+     start=time.monotonic()
+--- pretest_frozen_v2/source/run_source.py
++++ pretest_frozen_v3/source/run_source.py
+@@ -7,7 +7,6 @@
+ import argparse
+ import hashlib
+ import json
+-import platform
+ import sys
+ 
+ from source_adapter import SavedSource, UNIT, PARENT, PINS, CONTRACT_SHA, ROUTES, sha
+@@ -37,8 +36,7 @@
+     return {'schema':'PHYS84_APPLICATION_IDENTITY_V1','adapter_contract_SHA256':CONTRACT_SHA,
+             'code_SHA256':code,'fixture_SHA256':sha((UNIT/'source/fixtures.json').read_bytes()),
+             'parent_input_SHA256':PINS,'lease_source_SHA256':LEASE_SHA,
+-            'dependency_pins':{'python_implementation':platform.python_implementation(),
+-                               'python_version':platform.python_version(),'libraries':'stdlib only'},
++            'dependency_pins':{'libraries':'stdlib only; binary64 Python float and math.fsum'},
+             'constructed_states':8,'routes_per_state':2,'expected_rows':16,
+             'old_scientific_callbacks':0,'new_rate_evaluations':0,'new_population_solves':0,'new_ODE':0}
+ 
+--- pretest_frozen_v2/verification/verify_source.py
++++ pretest_frozen_v3/verification/verify_source.py
+@@ -11,9 +11,11 @@
+ import hashlib
+ import json
+ import math
++import platform
+ import shutil
+ import sys
+ import traceback
++from unittest.mock import patch
+ 
+ UNIT=Path(__file__).resolve().parents[1]
+ sys.path.insert(0,str(UNIT/'source'))
+@@ -183,6 +185,10 @@
+ 
+ def persistent_controls(work):
+     CASES.append('mock_only_persistence')
++    baseline_identity=run_source.build_identity()
++    with patch.object(platform,'python_version',return_value='999.0.RUNTIME_ONLY_DIAGNOSTIC'), \
++         patch.object(platform,'python_implementation',return_value='MOCK_RUNTIME'):
++        check(run_source.build_identity()==baseline_identity,'runtime_version_does_not_change_scientific_identity')
+     callback_count=[0]
+     def callback():
+         callback_count[0]+=1

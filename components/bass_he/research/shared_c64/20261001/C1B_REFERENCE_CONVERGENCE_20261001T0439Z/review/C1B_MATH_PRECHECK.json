@@ -1,0 +1,47 @@
+{
+  "review": "C1b independent mathematical precheck",
+  "status": "DESIGN_VALID_WITH_EXPLICIT_NUMERICAL_AND_DOMAIN_LIMITS",
+  "physical_runtime_executed": false,
+  "new_sources_added": false,
+  "scope": "R=2 fixed-sector spherical reference centered at B, physical L_y about O unchanged",
+  "checked": {
+    "axial_translation_preserves_m_sector": "DERIVED",
+    "origin_shift_sign": "L_y(O)=L_y(B)+z_B p_x",
+    "direct_projected_momentum": "DERIVED; delta_l=plus_or_minus_1, radial derivative independent of energy gap",
+    "direct_projected_dipole": "DERIVED; delta_l=plus_or_minus_1",
+    "offcenter_force_projection": "DERIVED; plus prefactor 1/(sqrt(2)*Z_C*a), with signed a",
+    "force_corner_boundary_term": "QV tends to zero even at r=abs(a); Qprime*V integrable",
+    "finite_force_multipoles": "Qprime polynomial degree at most l+k; no force multipole model truncation within finite angular state",
+    "central_force_branch": "DERIVED; separate a=0 expression required",
+    "finite_box_torque_surface_sign": "plus z_B/(2*Delta) times integral n_x dn(psi_g) dn(psi_b)",
+    "momentum_dipole_dirichlet_domain": "x psi_b preserves Dirichlet domain; no analogous surface term",
+    "local_s_cusp_legendre_tail": "DERIVED for one fixed-r sqrt(1+eta) term only; normalized coefficient O(l^(-5/2))",
+    "independence_vs_prolate": "different coordinates, basis, coupled assembly and eigensolve; accepted as independent representation"
+  },
+  "risks": [
+    "B centering leaves A offcenter cusp; no exponential angular convergence or finite-lmax sufficiency claim",
+    "B-origin projected direct/force commutator can close algebraically inside finite common angular/radial space without angular completeness",
+    "Force moments share potential multipoles with Hamiltonian; separate spatial kernel spot-check is useful for common-error detection",
+    "Finite B-centered Dirichlet sphere permits O-origin torque surface stress; approximate FEM additionally has spatial residual",
+    "Algebraic residual is not full-space residual",
+    "Second-minus-first Ritz roots do not certify a lower bound on exact spectral gap",
+    "Energy convergence does not by itself certify derivative or singular force accuracy",
+    "Changing numerical center also changes finite trial space and finite box geometry"
+  ],
+  "hard_checks_recommended": [
+    "analytic hydrogenic direct momentum/dipole and origin shift fixture",
+    "angular selection and signed alpha/beta coefficients",
+    "offcenter force kernel tests for both signs of center plus separate central limit branch",
+    "independent prolate comparison and separate l,h,p,quadrature,tail refinements",
+    "boundary surface diagnostic with inner-mesh-preserving domain extension",
+    "fail-closed convention and input mismatch checks"
+  ],
+  "tolerance_changes": false,
+  "numerical_convergence_decision": "DEFERRED_TO_EXECUTION_AND_INDEPENDENT_REVIEW",
+  "continuum_certificate": "NOT_CLAIMED",
+  "gates": {
+    "scientific_PROMOTE": "HOLD",
+    "Eq55": "NOT_RUN",
+    "production_default_change": "NOT_AUTHORIZED"
+  }
+}

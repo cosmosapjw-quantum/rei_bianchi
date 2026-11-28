@@ -1,0 +1,102 @@
+{
+  "schema": "he.independent_review.v1",
+  "review_id": "HE-EXP-CONT-R6C9-SOURCE-PAIR-REVIEW-INITIAL",
+  "reviewer": "/root/source_pair_research",
+  "authorship_boundary": "Reviewer authored pair_source only; reviewed exchange/ and species/ authored by separate agents",
+  "status": "CHANGES_REQUESTED_SCOPED",
+  "review_methods": [
+    "Independent derivation of conservative-to-central kinetic source and elastic angular first/second moments",
+    "Read full exchange theory/code and focused tests",
+    "Read species parser, registry schema and pinned raw source conventions",
+    "Read actual saved parent unittest raw logs; no scientific runtime or replay by reviewer"
+  ],
+  "reviewed_inputs": [
+    {
+      "path": "exchange/exchange_closure.py",
+      "sha256": "f1a3b957f86bbed15754524361a77ee42ebcfe225a3253ed40ab6f473a06d751"
+    },
+    {
+      "path": "exchange/THEORY_KO.md",
+      "sha256": "1244aacb8712eb8b545e04d9eeb6b1e860777e6e58489ab837e185e452c1f4a0"
+    },
+    {
+      "path": "exchange/test_exchange_closure.py",
+      "sha256": "220e3c6ebedaa75949db82777e91e0b8d6c91abab3a0335ce8a1f169172c4d27"
+    },
+    {
+      "path": "species/consumer_inventory.py",
+      "sha256": "827cb3f6cd387d2c8d4ca6f4666bc1178f003fe08a976eb9b032e32a2479e8fd"
+    },
+    {
+      "path": "species/SPECIES_PROVIDER_REGISTRY.json",
+      "sha256": "377e35532ee3f313160a1e81ca41463f99d223900f56498c999b28a951642761"
+    },
+    {
+      "path": "species/EXPLICIT_TRANSPORT_SOURCE_INVENTORY.json",
+      "sha256": "cd5b7ca27514348d755c78dd6911629b9adee878838a711707ebeedb18495fd6"
+    }
+  ],
+  "accepted_derivations": [
+    "Q=E-u dot R+0.5*u^2*S for raw conservative R; equivalent minus mass term with F=R-u*S",
+    "Finite-mass pair integrated raw momentum, energy and tensor increments have opposite momentum/energy signs and correct total STF",
+    "Temperature chain rule separates caloric derivative, particle-count source and expansion; binding/nonthermal reservoirs are not inserted as heat capacity",
+    "Common bulk stress retains mass-weighted drift tensor",
+    "Canonical energy transfer ID and physical component ID enforce one representation and one owner for supplied receipts"
+  ],
+  "accepted_source_scope": [
+    "20 initial atomic charge states plus one neutron slot are distinguished from electron pools and9synthetic extension witnesses",
+    "Source scalar rate coefficients cannot satisfy differential quantities",
+    "27explicit selected Mutation++ pairs carry thermal-integral expression trees; defaults/clipping/differential law not inferred",
+    "REC-HD collider/node checks only consume owner contract; no p/o mixture or source extrapolation"
+  ],
+  "existing_execution_observed": {
+    "exchange_methods": 13,
+    "exchange_result": "PASS",
+    "species_methods": 12,
+    "species_result": "PASS",
+    "scope": "parent bounded test raw logs only; physical source calibration not tested"
+  },
+  "findings": [
+    {
+      "id": "EXCHANGE-C9-MASS-SUM-OVERFLOW",
+      "severity": "medium",
+      "class": "implementation",
+      "target": "exchange/exchange_closure.py:elastic_moment_kernel mass normalization",
+      "observation": "total=ma+mb can overflow to infinity for individually finite positive masses; aa,bb,mu then become zero and a zero exchange is returned silently",
+      "counterexample": {
+        "mass_a_kg": "1e308",
+        "mass_b_kg": "1e308",
+        "velocity_a_m_s": [
+          1,
+          0,
+          0
+        ],
+        "velocity_b_m_s": [
+          0,
+          0,
+          0
+        ],
+        "sigma0_m2": "1e-308",
+        "sigma1_m2": "1e-308",
+        "sigma2_m2": "1e-308",
+        "source_energy_max_j": "1e308",
+        "exact_reduced_mass_kg": "5e307",
+        "exact_weighted_momentum_a_x": "-0.5",
+        "old_computed_weighted_momentum_a_x": "0"
+      },
+      "evidence_method": "Static binary64 overflow reasoning, not scientific numerical execution",
+      "impact": "Violates finite-positive API domain; current nuclear-mass controls and original13PASS observations are unaffected",
+      "minimal_correction": "Normalize masses by max(ma,mb), form reduced mass as min/(1+min/max); reject nonfinite derived outputs; add one affected edge regression",
+      "disposition": "Parent accepted; repair remains under existing new8CPU/30wall validation allowance; no HE101 budget transfer",
+      "status": "OPEN_PENDING_AUTHOR_REPAIR_AND_TARGETED_PARENT_CHECK"
+    }
+  ],
+  "historical_retention": {
+    "HE101_C8": "PARTIAL_EXPORT",
+    "HE101_repair_reserve_remaining": 0,
+    "old_scientific_suite_replay": 0
+  },
+  "physical_provider_admitted": false,
+  "global_physical_completion": null,
+  "independent_review_of_pair_source": "separate exchange author/parent; not self-reviewed here"
+}

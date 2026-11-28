@@ -1,0 +1,13 @@
+--- before
++++ after
+@@ -277,7 +277,9 @@
+                 slopes[start:stop] = chunk_slopes
+                 deriv_logs[start:stop] = chunk_deriv_logs
+                 deriv[start:stop] = np.sign(chunk_slopes) * np.exp(chunk_deriv_logs)
+-                means[start:stop] = EV_J * sums[:, 1] / sums[:, 0]
++                # Divide first: the scaled sums may be tiny although their
++                # ratio is an ordinary finite energy inside the source band.
++                means[start:stop] = EV_J * (sums[:, 1] / sums[:, 0])
+         underflow = (values == 0) & np.isfinite(logs)
+         subnormal = (values != 0) & (logs < _LOG_TINY)
+         derivative_underflow = (deriv == 0) & np.isfinite(deriv_logs)

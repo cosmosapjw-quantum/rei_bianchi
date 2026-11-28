@@ -1,0 +1,85 @@
+{
+  "schema": "WU088_HH_PHYS02_NEXT_DAG_V1",
+  "nodes": [
+    {
+      "id": "HH-PHYS01",
+      "status": "INHERITED",
+      "result": "negative cubic same-IC response",
+      "rerun": false
+    },
+    {
+      "id": "HH-PHYS02",
+      "status": "PROMOTE_SCOPED",
+      "depends_on": [
+        "HH-PHYS01"
+      ],
+      "result": "finite frozen source sign for all0<lambda,b<=1 and0<t<=1.25e9s",
+      "decision": "independent/DECISION.json"
+    },
+    {
+      "id": "HH-PHYS03-A",
+      "status": "READY_FOR_THEORY",
+      "depends_on": [
+        "HH-PHYS02"
+      ],
+      "task": "explicit-time mixed sensitivity and source drift comparison within smooth cells",
+      "requires_for_numerical_specialization": [
+        "immutable actual nH/nHe/H/E/time source history"
+      ],
+      "no_manufactured_history": true
+    },
+    {
+      "id": "HH-PHYS03-B",
+      "status": "READY_FOR_THEORY",
+      "depends_on": [
+        "HH-PHYS02"
+      ],
+      "task": "threshold/hat/birth/reset event tangent and mixed map",
+      "special_case": "selected active bin16 at13.6eV, no global smooth crossing assumption"
+    },
+    {
+      "id": "ENERGY06E-CONTRACT",
+      "status": "INHERITED_IMPLEMENTED",
+      "commit": "4071666330d46df1b1965465ae2697c3a10aeb01",
+      "rerun": false
+    },
+    {
+      "id": "ACTUAL-OWNER-FAMILY",
+      "status": "OPEN_SOURCE_BOUND_ROOT_FAMILY",
+      "depends_on": [
+        "ENERGY06E-CONTRACT"
+      ],
+      "missing": [
+        "accepted half1",
+        "actual coupled root",
+        "full chain derivative enclosure",
+        "uniform theta/lambda family",
+        "exact execution authority for applicable native unit"
+      ]
+    },
+    {
+      "id": "HH-PHYS03-C",
+      "status": "DEPENDENT",
+      "depends_on": [
+        "HH-PHYS03-A",
+        "HH-PHYS03-B",
+        "ACTUAL-OWNER-FAMILY"
+      ],
+      "task": "minimal source-bound actual macro mixed/remainder comparison"
+    }
+  ],
+  "global_gates": {
+    "physical_admission": false,
+    "production_admission": false,
+    "canonical_S0_HH": "OFF_CONTROL",
+    "legacy_accepted": 24,
+    "legacy_total": 289,
+    "legacy_unbounded": 265,
+    "epsilon_C": null,
+    "epsilon_R": null,
+    "B22": "OPEN_UNDETERMINED",
+    "ON06G_macros": 256,
+    "ON06G_time_s": 320000000000.0,
+    "consumed_scopes": "PRESERVED"
+  }
+}

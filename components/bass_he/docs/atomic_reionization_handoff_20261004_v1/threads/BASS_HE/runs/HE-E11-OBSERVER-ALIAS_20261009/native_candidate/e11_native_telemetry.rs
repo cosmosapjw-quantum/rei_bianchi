@@ -1,0 +1,85 @@
+//! E11 additive telemetry on the exact E10 shadow source. Native admission remains unchanged.
+//! NCP compile+first2 test required; NOT compiled in the ChatGPT analytical runtime.
+//! The 41-column owner readout is unchanged; the RCT sidecar is separate.
+use std::{fs::{self,File,OpenOptions},io::Write,path::Path};
+use rei_microphysics::{
+    he_rct::{EscapingMeanPhotonEnergy,RctProvider,RctScenario,RctSelection,RctSource},
+    igm_config::{parse_config,HistoryConfig},
+};
+use short_hhe_control::{coupled,material,output,radiation};
+fn clock(c:&HistoryConfig,k:usize)->Result<f64,String>{
+    if k>384{return Err("N384_INDEX_OUT_OF_RANGE".into())}
+    let s=c.start+c.max_dln_a*(k as f64/16.0)/24.0;
+    if !s.is_finite(){return Err("NONFINITE_CLOCK".into())}
+    Ok(s)
+}
+fn selection(mode:&str)->Result<RctSelection,String>{
+    if mode=="OFF"{return Ok(RctSelection::Disabled)}
+    let src=match mode{"KF"=>RctSource::Kf96Nominal,"GM"=>RctSource::Gm25Constant,_=>return Err("UNDECLARED_RCT_MODE".into())};
+    Ok(RctSelection::Escaping{
+        provider:RctProvider::new(src,RctScenario::W82GroundStateCommonTemperatureZeroDrift,true).map_err(|e|format!("{e:?}"))?,
+        closure:EscapingMeanPhotonEnergy::research_input_ev(35.).map_err(|e|format!("{e:?}"))?,
+    })
+}
+fn checked_file(dir:&Path,name:&str)->Result<File,String>{
+    OpenOptions::new().write(true).create_new(true).open(dir.join(name)).map_err(|e|e.to_string())
+}
+fn sync(f:&mut File)->Result<(),String>{f.flush().map_err(|e|e.to_string())?;f.sync_all().map_err(|e|e.to_string())}
+fn run()->Result<(),String>{
+    let args=std::env::args().collect::<Vec<_>>();
+    if args.len()!=5&&args.len()!=6{return Err("USAGE: e10_native_select CONFIG MODE NEW_DIR 2|384 [--authorized-full]".into())}
+    let mode=args[2].as_str(); let sel=selection(mode)?;
+    let count:usize=args[4].parse().map_err(|_|"UNSUPPORTED_STEP_LIMIT".to_string())?;
+    if ![2,384].contains(&count){return Err("UNSUPPORTED_STEP_LIMIT".into())}
+    if count==384 && (args.len()!=6||args[5]!="--authorized-full") {return Err("FULL384_EXPLICIT_OPT_IN_REQUIRED".into())}
+    if count==2 && args.len()!=5 {return Err("PREFIX_NO_FULL_FLAG".into())}
+    let cfg=parse_config(&fs::read_to_string(&args[1]).map_err(|e|e.to_string())?).map_err(|e|format!("{e:?}"))?;
+    let output_dir=Path::new(&args[3]);
+    fs::create_dir(output_dir).map_err(|e|format!("NEW_OUTPUT_DIRECTORY_REQUIRED: {e}"))?;
+    let grid=radiation::Grid::new(&cfg,512,4)?;
+    if grid.nodes.len()>4096{return Err("ACTIVE_GRID_LIMIT".into())}
+    let mut state=if mode=="OFF"{coupled::State::new(&cfg,&grid)?}else{coupled::State::with_rct(&cfg,&grid,sel)?};
+    let p0=cfg.background.at_ln_a(cfg.start).map_err(|e|format!("{e:?}"))?;
+    let initial=state.y[3]+material::binding(state.y,p0.n_he_cm3/p0.n_h_cm3);
+    let mut original=checked_file(output_dir,"OWNER_NATIVE_41.csv")?;
+    let mut side=checked_file(output_dir,"OWNER_SELECTED_RCT.csv")?;
+    let mut trace=checked_file(output_dir,"STEPS.csv")?;
+    let mut internal=checked_file(output_dir,"OWNER_INTERNAL_5.csv")?;
+    let mut stages=checked_file(output_dir,"OWNER_ACCEPTED_STAGES.csv")?;
+    writeln!(original,"{}",output::HEADER).map_err(|e|e.to_string())?;
+    writeln!(side,"step,s,x,y,z,w,RCT,RCT_heat,RCT_chem,RCT_escape").map_err(|e|e.to_string())?;
+    writeln!(trace,"step,iterations,norm,Nratio,Eratio").map_err(|e|e.to_string())?;
+    writeln!(internal,"step,s,BH,BY,BZ,bindMicro,thermalMicro").map_err(|e|e.to_string())?;
+    writeln!(stages,"step,stage,count,min,max,any,all,continuity_checks,continuity_max_relative").map_err(|e|e.to_string())?;
+    for k in 0..=count{
+        if k>0{
+            state=coupled::advance(&cfg,&grid,&state,clock(&cfg,k)?,initial)?;
+            if !(state.norm<=1.&&state.n_ratio<=1.&&state.e_ratio<=1.) {return Err(format!("NATIVE_ACCEPTANCE_GATE_STEP_{k}"))}
+        }
+        let before=state.clone();
+        let row=output::row(&cfg,&grid,&state,initial)?;
+        if state!=before {return Err("OWNER_READOUT_MUTATED_STATE".into())}
+        if row.len()!=41 {return Err("OWNER_41_SCHEMA_CHANGE".into())}
+        output::write_row(&mut original,&row)?;
+        writeln!(side,"{k},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e}",state.s,state.y[0],state.y[1],state.y[2],state.y[3],state.rct.events,state.rct.heat,state.rct.chemical,state.rct.escape).map_err(|e|e.to_string())?;
+        writeln!(trace,"{k},{},{:.17e},{:.17e},{:.17e}",state.iterations,state.norm,state.n_ratio,state.e_ratio).map_err(|e|e.to_string())?;
+        writeln!(internal,"{k},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e}",
+            state.s,state.radiation.be[0],state.radiation.be[1],state.radiation.be[2],
+            state.material.nonphoto_binding,state.material.nonphoto_thermal
+        ).map_err(|e|e.to_string())?;
+        for (j,t) in state.accepted_trace.stages.iter().enumerate() {
+            writeln!(stages,"{k},{j},{},{:.17e},{:.17e},{},{},{},{:.17e}",
+                t.count,t.min,t.max,t.any,t.all,
+                state.accepted_trace.continuity_checks,
+                state.accepted_trace.continuity_max_relative
+            ).map_err(|e|e.to_string())?;
+        }
+        for f in [&mut original,&mut side,&mut trace,&mut internal,&mut stages] {sync(f)?}
+        eprintln!("E10_ACCEPTED mode={mode} N=384 k={k} nodes={} norm={:.9e} nr={:.9e} er={:.9e}",grid.nodes.len(),state.norm,state.n_ratio,state.e_ratio);
+    }
+    let mut ready=checked_file(output_dir,"READY.json")?;
+    writeln!(ready,"{{\"task\":\"E11_SHADOW_INTERNAL_TELEMETRY\",\"mode\":\"{mode}\",\"N\":384,\"steps\":{count},\"rows\":{},\"owner_remote_adopted\":false,\"checkpoint_resumable\":false,\"RCT_mean_energy_eV\":{},\"photo_heating_true_moment\":null,\"physical_admission\":false,\"telemetry\":\"OWNER_INTERNAL_5.csv\",\"accepted_stage_diagnostic\":\"OWNER_ACCEPTED_STAGES.csv\"}}",count+1,if mode=="OFF"{"null"}else{"35.0"}).map_err(|e|e.to_string())?;
+    sync(&mut ready)?;
+    Ok(())
+}
+fn main(){if let Err(e)=run(){eprintln!("E10_NATIVE_SHADOW_FAIL: {e}");std::process::exit(2)}}

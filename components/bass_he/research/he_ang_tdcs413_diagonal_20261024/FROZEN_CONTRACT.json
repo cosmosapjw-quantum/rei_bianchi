@@ -1,0 +1,181 @@
+{
+  "schema": "HEANG_TDCS413_DIAGONAL_FROZEN_V1",
+  "unit_id": "HE-ANG-TDCS413-DIAGONAL",
+  "workflow": "physmath-research-loop 1.0.0",
+  "authority": {
+    "theory": "Astra root",
+    "implementation": "intake_ops lower-tier gpt-6.1-sol requested; runtime identity unknown unless tool observed",
+    "independent_review": "independent_review Astra role; no authoring",
+    "current_user_authorization": "Next theory and coding loop + exhaustive survey + publish/backups; no merge or activation"
+  },
+  "base": {
+    "repo": "cosmosapjw-quantum/BASS_HE",
+    "head": "e3b2f786c7597ffa65aa6439194e7cbcae6103e7",
+    "branch_to_create": "research/he-ang-tdcs413-diagonal-20261024",
+    "central_observed_head": "a814dab41a8f3f543dec71cde59f17e0d497fcda",
+    "AGENTS_blob": "8119a57e3c9f7b8c22a3532c9f88e430df1cebbf",
+    "central_AGENTS_blob": "429a5a13ee75b1222bc50627f8d5973d01dd21c4",
+    "backup_predecessor": "PR97 B3 both provider metadata confirmed 2026-10-24T09:33Z"
+  },
+  "paths": {
+    "unit": "research/he_ang_tdcs413_diagonal_20261024",
+    "prior_c8": "research/he_ang_pwbe_spin_azimuth_20261024; only explicitly authorized continuation additions/status updates",
+    "ops": "tdcs413_ops",
+    "checkout": "Existing BASS_HE snapshot; no separate clone/worktree"
+  },
+  "source": {
+    "report": "FIAS-R-39 1978-06 Table1 reportp30 PDFp33",
+    "PDF_sha256": "aaa750d5d5f0652ba7e6090878f938174fc26268265c256022c4d9437c3a96a8",
+    "input_candidate": "heang_next2_source_20261024/WEIGOLD413_DIAGONAL_CANDIDATE.json",
+    "selected_rows": 13,
+    "total_rows": 16,
+    "excluded_degrees": [
+      45,
+      46,
+      48
+    ],
+    "exclusion_reason": "ambiguous scan before model evaluation; no guessed cells",
+    "observed_zero_retained": "60deg 0(1)",
+    "published_source_decimals": {
+      "E0": "413.6",
+      "EA": "200",
+      "EB": "200"
+    },
+    "normalization": "unknown common relative scale; selected diagonal reference sigma_N0",
+    "point_errors": "source1sigma; used only as deterministic numerical weights, covariance unknown",
+    "geometry": "thetaA=thetaB=theta, phiA-phiB=pi, beam+z",
+    "measure": "dEA dOmegaA dOmegaB",
+    "spin": "unpolarized is adopted model assumption, not a table-measured spin density"
+  },
+  "model": {
+    "nominal_energy_unit_eV": "27.2",
+    "nominal_binding_eV": "13.6",
+    "epsilon": "125/17",
+    "epsilon0": "517/34",
+    "k_squared": "250/17",
+    "r_squared": "517/17",
+    "scope": "fixed-center nonrelativistic H1s PWBE exact swap, finite nominal point comparison",
+    "conventions": "reuse PR97 spin trace, no point count multiplier, full provider false",
+    "reference_theta_deg": 44,
+    "shape": "K(theta)/K(44)",
+    "fit": "min_a>=0 max_i abs(a*f_i-y_i)/s_i; actual optimal a positive",
+    "peak": "unique root N(z)=0 on [-1/2,0], analytic uniqueness on full theta[32,60]"
+  },
+  "theory": "THEORY_KO.md",
+  "new_work": {
+    "code": [
+      "tdcs413.py",
+      "test_tdcs413.py",
+      "run_analysis.py",
+      "plot_results.py",
+      "run_bounded.py"
+    ],
+    "reuse_kernel": "../he_ang_pwbe_spin_azimuth_20261024/code/pwbe.py",
+    "reuse_kernel_sha256": "9485f9a97689d14b819de2bdb3005643e7b1b12b2b321df7695129fa699c4c37",
+    "required_tests": [
+      "Exact source13/excluded3/zero row and data schema; reject nonfinite or f<=0,s<=0,y<0 in minimax API; at least one positive y",
+      "Exact rational toy 2/3,8/3, active2/3; exactly proportional case kappa0; sourcezero y supported",
+      "Scale invariance under common model factor7 and data/errors common factor3; no false exact-float equality tests",
+      "All13 closed equal-share values vs reused PR97 point kernel and independently built source vector amplitudes; no prior suite replay",
+      "Minimax pair solution vs interval bisection; objective all rows and active opposite-sign residuals",
+      "Peak bracket/slope signs and uniqueness assumptions at fixed nominal constants; binary64 vs80digits"
+    ],
+    "analysis_outputs": [
+      "All13 K,f,y,s,predicted,residuals",
+      "minimax kappa,a,active pair,feasible scale intervals for1 and optimum",
+      "80digit references and measured errors",
+      "peak theta,z,theta_q0,analytic residual",
+      "plot-only dense model grid721points on[32,60] and allinputmetadata"
+    ],
+    "numerical_ceilings": {
+      "relative_K_and_shape": 1e-11,
+      "absolute_minimax_and_a": 1e-10,
+      "absolute_peak_deg": 1e-9,
+      "root_residual": 1e-11
+    },
+    "precision": "binary64 primary; mpmath80 reference, no fastmath/mixedprecision; source exact decimal parsing",
+    "source_data_is_finite_window_integral": false,
+    "statistical_pvalue": false,
+    "global_nogo": false
+  },
+  "budget": {
+    "allocation_cpu_s": 10,
+    "allocation_wall_s": 40,
+    "memory_bytes": 536870912,
+    "threads": 1,
+    "planned_children": [
+      {
+        "id": "01_tests",
+        "cpu_s": 2,
+        "wall_s": 6
+      },
+      {
+        "id": "02_analysis",
+        "cpu_s": 2,
+        "wall_s": 8
+      },
+      {
+        "id": "03_plot",
+        "cpu_s": 3,
+        "wall_s": 12
+      }
+    ],
+    "diagnosed_repair_reserve": {
+      "invocations": 1,
+      "cpu_s": 3,
+      "wall_s": 14,
+      "automatic": false
+    },
+    "prior_allowance_transferred": false,
+    "prior_costs_reset": false,
+    "old_PWBE_C8": "same old ledger5thcontinuation; never charge newunit",
+    "Wolfram": {
+      "planned_evaluator_calls": 1,
+      "timeConstraint_s": 15,
+      "body_TimeConstrained_s": 10,
+      "remote_total_CPU": "UNKNOWN_NOT_ZERO",
+      "body_CPU_and_wall": "measure actual ifreturned"
+    },
+    "orchestration": "measure preparation/packaging samples; model/provider/IO unknown preserved; no global endtoend capclaim"
+  },
+  "acceptance": {
+    "R6": "Independent theory/source contract review before science execution",
+    "B1": "preexecution source/theory/code/survey checkpoint dual-provider ACK before children",
+    "C9": "separate independent review of actual diff/raw metrics/figures",
+    "publish": "after review, create science S then central C, dual B2, delivery D then central E, dual B3; expected SHA force=false with current parallel preservation",
+    "classification": "Numerical implementation PASS is distinct from physical model agreement",
+    "stop": "Return substantive ambiguity/failure to root; preserve START/FINISH/failures; diagnose changed dependency only; no unchanged suite replay"
+  },
+  "gate": {
+    "parent_HE_ANG": "SOURCE_INPUT_PENDING",
+    "full_physical_provider": false,
+    "event_total_sigma": false,
+    "finite_M_ion_recoil_law": false,
+    "HE_X1_empirical_correction": false,
+    "activation": false,
+    "merge": false,
+    "global_completion_percent": null
+  },
+  "progress": {
+    "R1": "COMPLETE",
+    "R2": "COMPLETE_SOURCE13_PENDING_INDEPENDENT_CHECK",
+    "R3": "COMPLETE",
+    "R4": "COMPLETE",
+    "R5": "COMPLETE_DERIVATION",
+    "R6": "PENDING",
+    "R7": "PENDING",
+    "R8": "PENDING",
+    "R9": "PENDING_REVIEW",
+    "R10": "PENDING",
+    "C1": "BASELINE_IDENTIFIED",
+    "C2": "FORMULA_MAPPING_DEFINED",
+    "C3": "ALGORITHM_DEFINED",
+    "C4": "RESOURCES_DEFINED",
+    "C5": "NOT_STARTED",
+    "C6": "NOT_RUN",
+    "C7": "NOT_RUN",
+    "C8": "NOT_RUN",
+    "C9": "PENDING",
+    "C10": "PENDING"
+  }
+}

@@ -1,0 +1,18 @@
+--- base/research/rei_expanded_event_consumer/finite_thermal_endpoint_20261028/review/R6_SOURCE_BATH_RECONCILIATION_20261028.md
++++ head/research/rei_expanded_event_consumer/finite_thermal_endpoint_20261028/review/R6_SOURCE_BATH_RECONCILIATION_20261028.md
+@@ -69,9 +69,13 @@
+ 
+ ## 4. Source energy encoding and the three different temperatures
+ 
+-native.py reconstructs Tm_eV=kBoltz_src*Tm_K. With the source EV conversion,
++native.py reconstructs Tm_eV=kBoltz_src*Tm_K in the unrounded model. Let theta, k and t denote the separately decoded represented values of Tm_eV, kBoltz_src and Tm_K, respectively, and define rho_theta=theta-k*t. With the source EV conversion, the represented bridge is
+ 
+-T_a^E/Tm_K = kBoltz_src*EV/k_B^SI.
++T_a^E/t = k*EV/k_B^SI + rho_theta*EV/(k_B^SI*t).
++
++The unrounded-model relation T_a^E/t = k*EV/k_B^SI holds conditionally on rho_theta=0.
++
++Correction provenance (2026-10-28): actual distinct-author native review, review/native_blind_20261028/PHASE1_PRE_EVIDENCE.md finding F1 (actual reviewer task /root/finite_thermal_blind_reviewer), identified the missing separately decoded binary64 multiplication residual; preserved C7 raw temperature_bridge records supply its represented value. This paragraph corrects the displayed bridge only; the production implementation already retains this residual.
+ 
+ Even when this is close to one, its exact represented equality cannot be assumed. Preserve the original binary64 lift, stored decimal lexemes and any convention discrepancy. The already-SI Q, W and U must not be multiplied by EV a second time. The source helium mass ratio3.97153 is not a baryon-count multiplier for an unprovided native25 normalization.
+ 

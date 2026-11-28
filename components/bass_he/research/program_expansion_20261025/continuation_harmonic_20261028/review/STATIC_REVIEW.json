@@ -1,0 +1,69 @@
+{
+  "schema": "HARMONIC10_INDEPENDENT_STATIC_REVIEW_V1",
+  "unit_id": "HE-EXP-HARMONIC-10",
+  "review_pass": 1,
+  "reviewer": "/root/he10_review_resume",
+  "reviewer_handover": {
+    "previous_reviewer": "/root/he10_central_intake",
+    "previous_completed_artifact": "THEORY_PREEXEC_REVIEW.json",
+    "reason": "Prior agent process was unavailable after interruption; this reviewer continues the recorded pass from preserved theory results and performs the pending static/result inspection.",
+    "same_process_identity_claimed": false,
+    "requested_tier": "Astra inherited parent",
+    "observed_runtime_model_identity": null
+  },
+  "verdict": "PASS_SCOPED_PREEXECUTION",
+  "initial_verdict": "HOLD_ONE_PREEXECUTION_IMPLEMENTATION_FIX",
+  "reviewed_utc": "2026-10-28T00:14:07Z",
+  "method": "Read-only source and contract inspection, direct symbolic reasoning; no scientific import, suite, CAS or plot invocation.",
+  "contract_sha256": "cb2c83dd449100761e564efbc3a44fe1dc9ac4a915e3ab5006cb9c03da012cec",
+  "harmonic_source_before_authorized_fix_sha256": "c44544b9819c5a55d41af72577630627a7cf22c0b3e2c7dcae310bd535d2a93d",
+  "reviewed_source_sha256": {
+    "src/harmonic.py": "eb55f6e897f252f9e9591ff5741ca3bfbe299fcab46a6869ba00e5e2bf17f48e",
+    "tests/test_harmonic.py": "eeaba95480956fd4872ebae06f7e470e7ba1762485a4a5ec062d783cdc320d5c",
+    "scripts/measure_execution.py": "403ee9c49f6cff73129fc32d07fe955b9cde48f4c99e47c83ea6b42618778cc9",
+    "scripts/run_bounded.py": "8294a802c083d7e8655262ddf5e576dc2d8d07612ebcfd3ca43a2a6c76d3a4b1",
+    "scripts/validate_once.py": "737e06f55976eff6a6240d4917e8ea93117d68eb5b6524cabdbca95b1d85d232",
+    "scripts/plot_saved.py": "6d61340de3a84b1c728e60da36d04f9549db4be9e9f49f7a24671c0fd7a70cc6"
+  },
+  "checks": [
+    {"id":"S01","result":"PASS","subject":"Exact input domain and sufficient coefficient cone","basis":"Rational conversion rejects bool/nonfinite values. Equal lengths 1..9, all three reflection-even arrays, b0>=0 and b0²>=bc²+bs² are required; signed bc/bs are allowed. Positive law outside sufficient cone is deliberately rejected."},
+    {"id":"S02","result":"PASS","subject":"Bernstein normalization and exact signed primitives","basis":"Power expansion of ((mu+1)/2)^k((1-mu)/2)^(n-k) is exact; Horner primitive integrates signed coefficients, with sigma=2sum(b0)/(n+1)."},
+    {"id":"S03","result":"PASS","subject":"Machin rational enclosure and outward rounding","basis":"Finite alternating atan partials bracket each value; interval subtraction is sign-aware; 96-bit outward rounding preserves inclusion and pi-width assertion."},
+    {"id":"S04","result":"PASS","subject":"Range reduction, Taylor and quadrant conversion","basis":"u=(2t)mod1, r in[0,1/4), exact cardinal points; 20-term series with correct degree41/40 remainder plus phase error, outward88-bit rounding, signed quadrant swaps and exact rational cache keys."},
+    {"id":"S05","result":"PASS","subject":"Full/half-turn harmonic primitive exact zero","basis":"Original lines108–110 subtracted identical non-cardinal interval endpoints independently. Authorized lower-tier repair now returns exact point-zero C,S after strip validation whenever2*(hi-lo) is an integer. This is precisely the zero/full/half-period condition in the validated domain and closes F01 by diff inspection; prepared test06 remains unchanged for actual regression."},
+    {"id":"S06","result":"PASS","subject":"Inherited same-event finite geometry","basis":"Only geometry/SetBounds from inherited explicit UNIFORM_DECLARED call are reused. Nonzero harmonic outputs replace all13 EVENTS/PARTS; minus daughter retains reflected mu and half-turn phi. Patch union and active-window limits are inherited."},
+    {"id":"S07","result":"PASS","subject":"Signed strip integral and nonnegative combined measure","basis":"Whole signed component integrals multiply interval primitives without component clipping; lower-inner/upper-outer sums are clipped only against proven event range[0,sigma]."},
+    {"id":"S08","result":"PASS","subject":"Polar plus arithmetic error","basis":"Area sums actual outer-minus-inner polar length times strip width; arithmetic sum is inner.width+outer.width. MeasureBounds checks actual width; Boolean bounds checked against10NBdelta+4sigmaP2^-84."},
+    {"id":"S09","result":"PASS","subject":"Default/manual delta, zero/empty/uniform branches","basis":"Default sigma/(20NB2^40), exact zero/empty shortcut via inherited geometry, uniform numerical reduction at explicit same delta; manual delta does not inherit unconditional default epsilon."},
+    {"id":"S10","result":"PASS","subject":"Event, count, conditional and energy meanings","basis":"Distinct-daughter coincidence, assignment multiplicity, overlap and inclusive counts remain separate. Ratio denominator policies inherited. Paired J symmetry supports2Y/GY/GY/2; rest energy not reclassified as heating."},
+    {"id":"S11","result":"PASS","subject":"Independent prepared oracle coverage","basis":"25 unique test methods include independent115-digit Decimal series/decimal pi, closed-form orientation and nonseparable mixed-polar formulas, naive marginal diagnostic, signed inputs, rotation, overlap, unresolved ratios and manual widths. They are prepared methods, not yet runtime PASS."},
+    {"id":"S12","result":"PASS","subject":"Changed-dependency stress and native inputs","basis":"Degree8/N8 test demands actual nonzero boundary iterations and max52 for this increasing case. Native source SHA and stored masses checked before213/258/330MeV manufactured-law results; uncertainty and empirical DCS remain outside scope."},
+    {"id":"S13","result":"PASS","subject":"Immutable execution pin and preserved raw output","basis":"Runner compares HEAD to source pin and rejects tracked dirt; creates unique output directory and exclusive logs/JSON receipts. No prior suite discovery or silent old-suite rerun."},
+    {"id":"S14","result":"PASS","subject":"Cumulative finite execution budget","basis":"Outer20CPU/60wall validation cap and10/30plot cap; previous receipt subtraction for one targeted validation reserve; no plot reserve; AS512MiB/process, thread variables1. Whole subprocess CPU includes waited children; outer metadata and lack of aggregate descendant preemption stated separately."},
+    {"id":"S15","result":"PASS","subject":"Saved-only plot boundary","basis":"Plotter reads saved JSON, imports plotting libraries only, writes one PNG/SVG rendering, records source SHA/font-cache state/actual own timing. Parent and reviewer must inspect original result without rerender."}
+  ],
+  "findings": [
+    {
+      "id": "F01",
+      "status": "CLOSED_PREEXECUTION",
+      "severity_at_discovery": "BLOCKING_FOR_FIRST_SUITE",
+      "path": "src/harmonic.py",
+      "original_lines": [108,110],
+      "counterexample": "lo=2/13, hi=9/13 have identical non-cardinal harmonic phase. Equal interval objects subtracted as independent quantities produce [-width,+width], not exact0.",
+      "claim_impact": "The enclosure remains conservative, but the frozen exact full/half-turn contract and already prepared test06 are violated.",
+      "requested_minimal_fix": "After validating0<=lo<=hi<=1, return exact-zero C and S whenever2*(hi-lo) is an integer. Retain existing test06 non-cardinal half-turn regression.",
+      "authorized_repair": "Lower-tier added one line108: if (2*(hi-lo))%1==0:return Interval.point(ZERO),Interval.point(ZERO).",
+      "repair_evidence": ["../he10_implementation/PREEXECUTION_REPAIR.json","../he10_implementation/PREEXECUTION_REPAIR.diff"],
+      "closure_method": "Read the exact one-line diff and revised source; phase-period equivalence proves the shortcut. No test execution used for static closure; actual test06 regression remains in the first suite.",
+      "closed_utc": "2026-10-28T00:14:07Z",
+      "execution_repair_reserve_consumed": false,
+      "implementation_by_reviewer": false
+    }
+  ],
+  "blocking_findings": 0,
+  "closed_findings": 1,
+  "prepared_unique_test_methods": 25,
+  "execution_counts_by_reviewer": {"science":0,"test_suites":0,"CAS":0,"plots":0,"provider_writes":0},
+  "scientific_admission": "PENDING_ACTUAL_SUITE_CAS_PLOT_AND_SAME_PASS_RESULT_REVIEW",
+  "next_action": "After prescribed S01-S05 publication/backup sequence and immutable S05 source pin, lower-tier may execute the first new suite under the existing20CPU/60wall cumulative budget; same-pass actual-result review remains pending."
+}

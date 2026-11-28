@@ -1,0 +1,27 @@
+{
+  "initial": {
+    "code": "Module[{s, inv, bind, rct, ns, ne, rr, kin, chi, abs, emit, energySum, loss, dt, q, n, expected, lam, beta, aa, bb}, s={{-1,0,0},{1,0,0},{0,-1,0},{0,1,-1},{0,0,1},{1,1,1}}; inv={{1,1,0,0,0,0},{0,0,1,1,1,0},{0,1,0,1,2,-1}}; chi={ch,che1,che2}; bind={0,ch,0,che1,che1+che2,0}; rct=s[[All,1]]-s[[All,3]]; rr={r1,r2,r3}; kin={k1,k2,k3}; abs={a1,a2,a3}; emit=chi.rr+kin.rr; energySum=Expand[bind.s.(abs-rr)+(e1+e2+e3-chi.abs-kin.rr)+(emit-e1-e2-e3)]; loss=ll; n=q/loss (1-Exp[-loss dt]); expected=q dt-n; <|\"nuclei_charge_null\"->inv.s,\"binding_projection\"->bind.s,\"rct_vector\"->rct,\"rct_charge\"->rct[[6]],\"rct_binding\"->bind.rct,\"source_energy_sum\"->energySum,\"uniform_birth_ledger\"->FullSimplify[n+expected-q dt],\"uniform_birth_fraction_series\"->Series[1-(1-Exp[-tau])/tau,{tau,0,4}],\"case_B_limit\"->Simplify[-(IdentityMatrix[3]-DiagonalMatrix[{1-bh/ah,1-bhe1/ahe1,1-bhe2/ahe2}])).{ah, ahe1, ahe2}]|>]",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "ToExpression::sntx: Invalid syntax in or before \"                       ...                     ^\".\"\\n\"\nGeneral::messages: Messages were generated which may indicate errors.\n\nOut[1]= $Failed"
+        }
+      ],
+      "isError": false
+    },
+    "status": "SYNTAX_FAILURE"
+  },
+  "corrected": {
+    "code": "Module[{s,inv,bind,rct,rr,kin,chi,ab,emit,en,loss,dt,q,n,aa,bb,br},s={{-1,0,0},{1,0,0},{0,-1,0},{0,1,-1},{0,0,1},{1,1,1}};inv={{1,1,0,0,0,0},{0,0,1,1,1,0},{0,1,0,1,2,-1}};chi={ch,che1,che2};bind={0,ch,0,che1,che1+che2,0};rct=s[[All,1]]-s[[All,3]];rr={r1,r2,r3};kin={k1,k2,k3};ab={a1,a2,a3};emit=chi.rr+kin.rr;en=Expand[bind.s.(ab-rr)+(e1+e2+e3-chi.ab-kin.rr)+(emit-e1-e2-e3)];loss=ll;n=q/loss*(1-Exp[-loss*dt]);aa={ah,ahe1,ahe2};bb={bh,bhe1,bhe2};br=DiagonalMatrix[1-bb/aa];<|\"nuclei_charge_null\"->inv.s,\"binding_projection\"->bind.s,\"rct_vector\"->rct,\"rct_electron_change\"->rct[[6]],\"rct_binding\"->bind.rct,\"source_energy_sum\"->en,\"uniform_birth_ledger\"->FullSimplify[n+(q*dt-n)-q*dt],\"uniform_birth_fraction_series\"->Series[1-(1-Exp[-tau])/tau,{tau,0,4}],\"case_B_limit\"->FullSimplify[-(IdentityMatrix[3]-br).aa]|>]",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Out[1]= <|\"nuclei_charge_null\" -> {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, \"binding_projection\" -> {ch, che1, che2}, \"rct_vector\" -> {-1, 1, 0, 1, -1, 0}, \"rct_electron_change\" -> 0, \"rct_binding\" -> ch - che2, \"source_energy_sum\" -> 0, \"uniform_birth_ledger\" -> 0, \"uniform_birth_fraction_series\" -> SeriesData[tau, 0, {1/2, -1/6, 1/24, -1/120}, 1, 5, 1], \"case_B_limit\" -> {-bh, -bhe1, -bhe2}|>"
+        }
+      ],
+      "isError": false
+    }
+  }
+}

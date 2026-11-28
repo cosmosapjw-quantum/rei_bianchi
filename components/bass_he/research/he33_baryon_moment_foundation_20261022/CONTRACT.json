@@ -1,0 +1,83 @@
+{
+  "schema": "he33.baryon_moment_foundation.v1",
+  "workflow_version": "1.0.0",
+  "approval_version": "0.2",
+  "unit": "HE33",
+  "parent": {
+    "repo": "cosmosapjw-quantum/BASS_HE",
+    "branch": "research/he32-sandbox-primordial-pilot-20261021",
+    "PR": 85,
+    "pin": "16a424b7290f484c57e97c8ed74f81e6d2043782",
+    "completed_stages": 30,
+    "new_replay_required": 0,
+    "executor_sha256": "99f4a0e248d853d641393d78bcc330c4b3913ad1da1b326219e3fa3f60375314"
+  },
+  "question": "derive and verify the homogeneous baryonic pressure-moment mechanical subproblem needed before replacing pi_b=0",
+  "conventions": {
+    "metric": "(-,+,+,+)",
+    "frame": "normal spatial orthonormal, no triad rotation",
+    "D": [
+      -1,
+      -1,
+      2
+    ],
+    "sigma": "s D",
+    "pressure": "P=p I+q D; SI Pa=J/m^3",
+    "H_s_nu": "s^-1",
+    "time": "proper seconds",
+    "rate": "nu=nu_pi pressure-anisotropy relaxation rate",
+    "c_hbar_kB": "not set to one"
+  },
+  "assumptions": [
+    "homogeneous nonrelativistic gas",
+    "single species or frozen mixture represented by one effective pressure tensor",
+    "zero peculiar bulk velocity",
+    "no magnetic/electric fields",
+    "vanishing spatial heat-flux divergence",
+    "prescribed H(t),s(t),nu_pi(t)>=0",
+    "zero heat/reaction source in implemented propagator"
+  ],
+  "deliverables": [
+    "Boltzmann second-moment derivation",
+    "trace/STF/LRS and isothermal particle-number heat ledger",
+    "positive exact constant-coefficient 2x2 propagator",
+    "midpoint-frozen variable-coefficient solver with scoped convergence checks",
+    "independent CAS and analytic/stiff/edge controls",
+    "separate coupled-physics DAG and two handoffs"
+  ],
+  "acceptance": {
+    "oracle_absolute": "<=3e-14 times max(1,pressure scale)",
+    "analytic_relative": "<=3e-13 on declared controls",
+    "semigroup_scaled": "<=3e-13",
+    "positivity": "no negative eigenpressure; no state clipping",
+    "energy_algebra": "exact symbolic zero",
+    "variable_coefficient_refinement": "observed order near2 on declared smooth manufactured case",
+    "invalid_inputs": "explicit error",
+    "stiff_case": "nu_pi/s=1e8, fixed dt; anisotropy matches full exponential"
+  },
+  "excluded_from_completion": [
+    "calibrated H/He/Li multispecies transport rates",
+    "new HE32 background or chemistry histories",
+    "thermal or radiation source evolution",
+    "CI/DR/CX low-temperature rate completion",
+    "additional nuclear/molecular species",
+    "Einstein feedback from gas pressure",
+    "full reactive nuclear production",
+    "runtime speedup benchmark"
+  ],
+  "execution_policy": {
+    "completed_HE32_IVPs_replayed": 0,
+    "HE32_renders_repeated": 0,
+    "NCP_jobs": 0,
+    "other_jobs_stopped": 0,
+    "execution_target": "portable pure ECMAScript core evaluated in current V8; independent Wolfram CAS",
+    "shell_runtime": "current-turn SERVICE_ERROR, explicit /tmp probe also failed"
+  },
+  "policy_binding": {
+    "provided_skill": "user supplied workflow1.0.0 main",
+    "installed_skill": "1.3.0 inspected only to retrieve common references",
+    "selected_scope": "new standalone theory R1-R10 and coding C1-C10 for fixed mechanical model",
+    "no_migration": true,
+    "reference_gap": "user package reference resources failed to read; matching common original policy/R-C stage tables read from installed package; later stage-selection and schema defaults not adopted"
+  }
+}

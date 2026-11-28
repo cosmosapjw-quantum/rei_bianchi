@@ -1,0 +1,65 @@
+{
+  "unit_id": "HE-ANG-PWBE-SPIN-AZIMUTH",
+  "id": "C6-ASSERT-01",
+  "classification": "IMPLEMENTATION_ASSERTION_CONTRACT_MISMATCH_FALSE_FAIL",
+  "observed": {
+    "first_attempt": "evidence/execution/01_01_tests",
+    "methods": 14,
+    "initial_pass": 12,
+    "failures": 2,
+    "charged_CPU_s": 0.09388400000000001,
+    "charged_wall_s": 0.11865653000040766,
+    "examples": [
+      {
+        "method": "test_01_complex_hand_spin",
+        "expected": [
+          17,
+          13,
+          14
+        ],
+        "observed": [
+          17,
+          12.999999999999998,
+          13.999999999999998
+        ],
+        "defect": "exact dictionary equality conflicts with frozen floating-point oracle tolerance"
+      },
+      {
+        "method": "test_06_positive_M0_polynomial_identity",
+        "M0": 1.564313391312208e-13,
+        "polynomial_M0": 1.564313391312724e-13,
+        "absolute_difference": 5.159781408869594e-26,
+        "defect": "absolute=0 override removes frozen absolute allowance when comparing cancellation-prone polynomial and positive representation"
+      }
+    ]
+  },
+  "authority": "root Astra after actual code/raw read; R6 math unchanged",
+  "authorized_change": {
+    "test_01": "compare each of the three numeric scalar outputs using existing close() with frozen rel2e-13/abs2e-15; retain independent matrix trace",
+    "test_06": "remove absolute=0 override; use unchanged existing close() frozen rel2e-13/abs2e-15; retain positivity/moment bound checks",
+    "runner": "add one narrowly selected two-method repair child using remaining reserve; new distinct REPAIR_TEST_REPORT.json; preserve original test file and initial raw/results",
+    "kernel": "UNCHANGED",
+    "theory": "UNCHANGED",
+    "source": "UNCHANGED",
+    "frozen_contract": "UNCHANGED",
+    "analysis_relative_targets": "UNCHANGED: six cases <=1e-10 relative Kbar and absolute conditional cosine, required after repair"
+  },
+  "execution": {
+    "reserve_children": 1,
+    "CPU_cap_s": 2,
+    "wall_cap_s": 10,
+    "run_only": [
+      "test_01_complex_hand_spin",
+      "test_06_positive_M0_polynomial_identity"
+    ],
+    "original_12_passed_methods": "reuse unchanged evidence; do not rerun",
+    "continue_after_repair_PASS": [
+      "02_azimuth_analysis",
+      "03_plot"
+    ],
+    "stop_on_failure": "preserve and return; no auto retry"
+  },
+  "new_tolerance_selected": false,
+  "old_budget_reset_or_transfer": false,
+  "status": "AUTHORIZED_NOT_YET_EXECUTED"
+}

@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "solver_commit": "a21d573980f66fe02891bd216153443b5352f921",
+  "upstream_files": 130,
+  "upstream_bytes": 3686433,
+  "source_provenance_sha256": "edd118aad1625e6ed7b196b7d476ccd48a8c54147151cd84e5583d6ba3a63412",
+  "toolchain": {
+    "cargo": "cargo 1.94.1 (29ea6fb6a 2026-03-24)",
+    "rustc": "rustc 1.94.1 (e408947bf 2026-03-25)"
+  },
+  "checked_on": "2026-11-27",
+  "build_options": {
+    "jobs": 4,
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_PROFILE_TEST_OPT_LEVEL": "0"
+  },
+  "registry": "local vendored packages checked against experiment Cargo.lock checksums",
+  "experiments": {
+    "he29": {
+      "command": "cargo check --locked --offline --manifest-path <experiment>/rust_bridge/Cargo.toml",
+      "status": "implementation-verified",
+      "resolved_packages": 94,
+      "path_solver_libraries": [
+        "rodas5p-core",
+        "rodas5p-integrators",
+        "rodas5p-krylov"
+      ],
+      "staged_lock_sha256": "63742249c024867d02882ae7855b37064a2f3b5051d30e103db6cf79f9c6ed20",
+      "passed_tests": []
+    },
+    "he29_packed": {
+      "command": "cargo test --lib --locked --offline --manifest-path <experiment>/rust_bridge/Cargo.toml",
+      "status": "implementation-verified",
+      "resolved_packages": 94,
+      "path_solver_libraries": [
+        "rodas5p-core",
+        "rodas5p-integrators",
+        "rodas5p-krylov"
+      ],
+      "staged_lock_sha256": "2cb2487d924d0c02e6756bc6346338f0abae628832ceeab11be7c5da6b31c97d",
+      "passed_tests": [
+        "boundary_tests::serialization_failure_literal_has_valid_json",
+        "packed::tests::direction_overflow_fails_before_preparation",
+        "packed::tests::exact_key_uses_u_and_every_state_bit_but_not_direction",
+        "packed::tests::final_scaling_overflow_is_reported",
+        "packed::tests::invalid_dimension_scale_dt_and_threads_are_rejected",
+        "packed::tests::packed_matches_full_matrix_order_for_all_rows_and_threads",
+        "packed::tests::preparation_failure_is_preserved_and_cache_cannot_revive",
+        "packed::tests::unwritten_payload_is_rejected"
+      ]
+    },
+    "hh69": {
+      "command": "cargo test --lib --locked --offline --manifest-path <experiment>/phys69_vigilode/Cargo.toml",
+      "status": "implementation-verified",
+      "resolved_packages": 109,
+      "path_solver_libraries": [
+        "rodas5p-core",
+        "rodas5p-integrators",
+        "rodas5p-krylov"
+      ],
+      "staged_lock_sha256": "bdc306a1b872d3ffd3c0b6a0e2c114ea53f5343a5f11dc543f8e5eefddcfbe87",
+      "passed_tests": [
+        "tests::analytic_jvp_matches_independent_centered_difference",
+        "tests::analytic_time_partial_matches_centered_difference",
+        "tests::crate_gaussian_moments_and_harmonic_orthonormality",
+        "tests::exact_power_of_two_scaling_preserves_bilinear_relation",
+        "tests::quadrature_cache_is_bitwise_radial_and_state_independent",
+        "tests::time_reversal_and_bilinear_d2_sign",
+        "tests::zero_denominator_and_bad_shapes_are_rejected"
+      ]
+    },
+    "hh70": {
+      "command": "cargo test --test contract --locked --offline --manifest-path <experiment>/phys70_optimized/Cargo.toml",
+      "status": "implementation-verified",
+      "resolved_packages": 110,
+      "path_solver_libraries": [
+        "rodas5p-core",
+        "rodas5p-integrators",
+        "rodas5p-krylov"
+      ],
+      "staged_lock_sha256": "52e879ca401ca84f60ce0fdf418cda75d48fd12644dd5cc991ec35608fdf6471",
+      "passed_tests": [
+        "all_raw_u_stages_satisfy_original_non_autonomous_equations",
+        "cache_reuse_requires_actual_time_state_and_kernel_config",
+        "failed_public_freeze_invalidates_previous_operator",
+        "failed_refresh_does_not_poison_later_valid_attempt",
+        "fixed_step_and_shape_limits_are_enforced",
+        "full_structured_inverse_checked_by_unmodified_original_jvp",
+        "ordered_scalar_simd_callbacks_match_original_bits",
+        "overflow_in_residual_normalizer_cannot_pass_as_zero",
+        "shared_external_channel_has_both_derivative_terms"
+      ]
+    }
+  },
+  "scientific_scope": "Historical numerical and interface checks only. REI production endpoint and active admission gates require independent trajectory evidence."
+}

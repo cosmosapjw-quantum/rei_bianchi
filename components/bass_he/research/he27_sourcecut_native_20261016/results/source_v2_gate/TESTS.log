@@ -1,0 +1,28 @@
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+___________ test_cut_crossing_has_correct_one_sided_source_and_sigma ___________
+
+models = {-0.005: <sourcecut_v2.SourceCutModel object at 0x78ba399f34d0>, 0.0: <sourcecut_v2.SourceCutModel object at 0x78bada1...urcecut_v2.SourceCutModel object at 0x78ba38c2f590>, 'q0_1024': <sourcecut_v2.SourceCutModel object at 0x78ba38c2e240>}
+
+    def test_cut_crossing_has_correct_one_sided_source_and_sigma(models):
+        model = models[0.]
+        crossing = model.breakpoints[0]
+        gap = min(crossing, model.breakpoints[1]-crossing)
+        delta = gap*1e-3
+        model.set_interval(crossing-delta, crossing)
+        left_source = model.source(crossing)
+        left_sigma = model.sigma(crossing)
+        model.set_interval(crossing, crossing+delta)
+        right_source = model.source(crossing)
+        right_sigma = model.sigma(crossing)
+        assert np.all(left_source >= 0) and np.all(right_source >= 0)
+        assert abs(left_source.sum()/right_source.sum()-1) < 2e-15
+>       assert np.count_nonzero(left_sigma != right_sigma) > 0
+E       assert np.int64(0) > 0
+E        +  where np.int64(0) = <function count_nonzero at 0x78bb7fe0ddb0>(array([[6.34629636e-18, 0.00000000e+00, 0.00000000e+00],\n       [6.34587317e-18, 0.00000000e+00, 0.00000000e+00],\n    ...19],\n       [1.93944979e-20, 3.93775035e-19, 2.96033141e-19],\n       [1.93930123e-20, 3.93749265e-19, 2.96012357e-19]]) != array([[6.34629636e-18, 0.00000000e+00, 0.00000000e+00],\n       [6.34587317e-18, 0.00000000e+00, 0.00000000e+00],\n    ...19],\n       [1.93944979e-20, 3.93775035e-19, 2.96033141e-19],\n       [1.93930123e-20, 3.93749265e-19, 2.96012357e-19]]))
+E        +    where <function count_nonzero at 0x78bb7fe0ddb0> = np.count_nonzero
+
+research/he27_sourcecut_native_20261016/tests/test_source_v2.py:107: AssertionError
+=========================== short test summary info ============================
+FAILED research/he27_sourcecut_native_20261016/tests/test_source_v2.py::test_cut_crossing_has_correct_one_sided_source_and_sigma
+1 failed, 3 passed in 48.82s

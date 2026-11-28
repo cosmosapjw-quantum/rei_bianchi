@@ -1,0 +1,70 @@
+{
+  "schema": "PHYS80_REDUCED_CONTROLS_PLAN_V1",
+  "fixed_before_ODE_utc": "2026-10-22T06:45:09.601278+00:00",
+  "parent_head": "3304d16db1dc9bf868c185a8eeb6cc9dbc270e50",
+  "scope": "exact fixed-inventory isolated reduction; no QSS, no cosmological source activation",
+  "solver": {
+    "method": "Radau",
+    "analytic_jacobian": true,
+    "max_step": "unbounded_solver_controlled",
+    "t_eval": null,
+    "dense_output": true,
+    "saved_samples": 161,
+    "strict_nonnegative_all_RHS_and_Jacobian_trials": true,
+    "accepted_mesh_validation": true,
+    "projection": "NONE",
+    "baseline": {
+      "rtol": 2e-08,
+      "atol_scaled": 2e-11
+    },
+    "refinement": {
+      "rtol": 2e-10,
+      "atol_scaled": 2e-13
+    }
+  },
+  "tasks": [
+    {
+      "id": "C01_REDUCED_BASE",
+      "parent_task": "C01_BASE",
+      "tolerance": "baseline"
+    },
+    {
+      "id": "C02_REDUCED_BASE",
+      "parent_task": "C02_BASE",
+      "tolerance": "baseline"
+    },
+    {
+      "id": "C01_REDUCED_REFINED",
+      "parent_task": "C01_REFINED",
+      "tolerance": "refinement"
+    }
+  ],
+  "acceptance_fixed_before_execution": {
+    "parent_trajectory_max_scaled_error": 1e-06,
+    "reduced_refinement_max_scaled_error": 1e-06,
+    "isotope_relative": 1e-10,
+    "absent_isotope_absolute": 0,
+    "minimum_species": 0,
+    "total_u_plus_binding_relative": 2e-10,
+    "C02_extent_temperature_absolute_error_K": 1e-09,
+    "C02_equilibrium_distance_over_D": 1e-06,
+    "RHS_lift_scaled_error": 1e-10,
+    "Jacobian_normalized_error": 2e-06
+  },
+  "execution": {
+    "workers": 1,
+    "threads": 1,
+    "requires_execute_flag": true,
+    "cooperative_lease": "/tmp/rei-bianchi-cooperative-leases",
+    "no_lease": "WAITING_NO_LAUNCH",
+    "completed_identity": "verify receipt and NPZ bytes then skip",
+    "failed_partial": "preserve and block automatic replay",
+    "marker_before_each_solve": true,
+    "old_completed_replays": 0,
+    "new_cosmological_ODE": 0,
+    "NCP": 0,
+    "benchmark": 0
+  },
+  "HH_R10": "OFF",
+  "production_admission": "NOT_ISSUED"
+}

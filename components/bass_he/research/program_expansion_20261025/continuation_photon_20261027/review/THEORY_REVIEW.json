@@ -1,0 +1,183 @@
+{
+  "schema": "HE_PHOTON05_INDEPENDENT_THEORY_REVIEW_V1",
+  "unit_id": "HE-EXP-PHOTON-05",
+  "recorded_utc": "2026-10-27T10:45:20.525Z",
+  "reviewer": "/root/backup_preflight",
+  "theory_author": "/root",
+  "verdict": "PASS_SCOPED_PHOTON_THEORY",
+  "blocking_findings": [],
+  "required_corrections": [],
+  "independence": {
+    "role": "Independent theory reviewer; author of the resume05 parallel-owner preflight, not the PHOTON05 theory, model contract or validation contract.",
+    "source_inquiry_author": "/root/state04_code_review",
+    "method": "Read the exact local documents and selected pinned primary-source rows; independently reconstruct invariant threshold, Lorentz boost/inverse, on-shell energy and stress identities, population conservation and sole energy-owner accounting by analytic reasoning.",
+    "scientific_code_authorship_in_this_unit": false,
+    "scientific_code_or_tests_imported": false,
+    "source_or_theory_documents_edited": false,
+    "only_write": "review/THEORY_REVIEW.json",
+    "runtime_or_numerical_result_review": false
+  },
+  "review_scope": {
+    "process": "Photon + stationary bare ground-state alpha -> two bare ground-state deuterons, conditional on literal central MeV rest energies and supplied directions.",
+    "frame": "Selected target-rest lab; energy-unit four-vector q=(E,c*p); metric (-,+,+,+).",
+    "products": "Per-event four-vectors, lab kinetic stress moment weights, counts, rest/kinetic/photon energy ledger, optional caller-supplied event-flux scaling.",
+    "source_use": "Native EXFOR energy and CM polar-angle coordinates only; DCS and ERR-S preserved without rate, interpolation, integration, acceptance or identical-particle normalization admission.",
+    "base_HE_delivery": "30924d902187777fbff02687639c91d65cf53191",
+    "current_owner_preflight_reused": true
+  },
+  "read_identities": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 2853,
+      "sha256": "32d09d1e6262e1eb3579de1a66e325afd2ba181a8de69313d907b6fb1e8aebfb",
+      "read_scope": "Full current checkout text; matches observed HE/HE101 owner policy."
+    },
+    {
+      "path": "research/program_expansion_20261025/continuation_photon_20261027/THEORY_KO.md",
+      "bytes": 8989,
+      "sha256": "4b61b537368484e59bd56611a2234fa2b85aa6d7893eb453922ac0f53e0bfa20",
+      "read_scope": "Full theory text, equations, source boundary and planned validation."
+    },
+    {
+      "path": "research/program_expansion_20261025/continuation_photon_20261027/MODEL_CONTRACT.json",
+      "bytes": 4462,
+      "sha256": "85980c8500774ad153e27a2953141b9e3339ba93a1aebca8f0fb5052aa800c38",
+      "read_scope": "Full contract."
+    },
+    {
+      "path": "research/program_expansion_20261025/continuation_photon_20261027/VALIDATION_CONTRACT.json",
+      "bytes": 5449,
+      "sha256": "32e223650ad99a7c2771268ef8c83246f9524e0b912e4fd6895c282721ac9ceb",
+      "read_scope": "Full contract; adequacy of planned finite validation, no execution."
+    },
+    {
+      "path": "research/program_expansion_20261025/continuation_photon_20261027/sources/SOURCE_MANIFEST.json",
+      "bytes": 1821,
+      "sha256": "3e27790bfc157c4bad1b8a843331f2da3ce5db901f7279cf4449044c2d263454",
+      "read_scope": "Full manifest, observed copies and source scope."
+    },
+    {
+      "path": "research/program_expansion_20261025/continuation_photon_20261027/sources/PHOTON05_SOURCE_OBSERVATIONS.json",
+      "bytes": 17050,
+      "sha256": "b3160ea21959a999498ca936331cb668d25d2b140faca2c394228aa38816acb7",
+      "read_scope": "Full pinned source inquiry record; primary-paper/LEXFOR access limits retained."
+    },
+    {
+      "path": "research/program_expansion_20261025/continuation_photon_20261027/sources/NIST_CODATA_2022_allascii.txt",
+      "bytes": 40801,
+      "sha256": "77fb90e66c40db3e6eb16630bc9c88e4c7c8beddbe5e71be406f2f26e3f67e67",
+      "read_scope": "Whole local byte identity; selected 2022 edition header and alpha/deuteron MeV rows read. No refetch."
+    },
+    {
+      "path": "research/program_expansion_20261025/continuation_20261027/sources/r3_update/raw/PROVIDER_ROWS.json",
+      "bytes": 71517,
+      "sha256": "d8b0b92f0374f73fa7f838db5ca07be45bd448696654b07c6db71c5847235ac2",
+      "read_scope": "Whole local byte identity; selected EXFOR_M0475002 record including BIB, all 12 literal rows, units, provenance, normalization and state-resolution fields. Other providers not audited."
+    },
+    {
+      "path": "research/program_expansion_20261025/continuation_photon_20261027/preflight/PREFLIGHT.json",
+      "bytes": 25803,
+      "sha256": "1b9d0f8a2c89cded4e30e6ddb0ff6f8252946158a7bb01110b8452e5219b4c96",
+      "read_scope": "Reused this reviewer's completed actual-owner preflight, observed 10:28:28-10:32:14 UTC; copied identity and observation window read. No repeated network preflight."
+    }
+  ],
+  "analytic_checks": [
+    {
+      "id": "T01_INVARIANT_THRESHOLD",
+      "result": "PASS_SCOPED",
+      "derivation": "q_total=(A+e,e*n), |n|=1 gives -eta(q_total,q_total)=(A+e)^2-e^2=A^2+2*A*e. Two equal future-directed daughter masses require W>=2*M. Solving equality gives e_th=(4*M^2-A^2)/(2*A)=Delta+Delta^2/(2*A), Delta=2*M-A>0. Thus kappa^2=(s-4*M^2)/4=(A/2)*(e-e_th).",
+      "meaning": "Photon momentum requires a positive recoil correction above the rest deficit. Equality is admitted as kinematics; no nonzero physical reaction probability at threshold is asserted.",
+      "numeric_scope": "The computed binary64 threshold is a numerical boundary. The contract explicitly avoids a uniform relative-kappa guarantee at a rounded physical threshold and includes exact synthetic boundary/near-boundary controls."
+    },
+    {
+      "id": "T02_LORENTZ_MAP",
+      "result": "PASS_SCOPED",
+      "derivation": "gamma=(A+e)/W, eta=e/W satisfy gamma^2-eta^2=1 and beta=e/(A+e)<1. Applying E=gamma*E_star+eta*q_star_parallel and q=q_star+[(gamma-1)*q_star_parallel+eta*E_star]*n to E_star=W/2, q_star=+/-kappa*u yields the stated E_plus/minus and q_plus/minus. The sign-reversed boost yields the written inverse.",
+      "invariants": "Each daughter obeys E^2-|q|^2=M^2 and is future-directed; pair sums are A+e and e*n. Spatial rotations act on n,u,q and stress in the expected way. u -> -u interchanges identical daughters.",
+      "scope": "Lorentz-covariant four-vector construction is established analytically for the selected lab mapping. No arbitrary-moving-target API or independently completed global relativistic transport solver is claimed."
+    },
+    {
+      "id": "T03_STABLE_KINETIC_AND_NR_DIAGNOSTIC",
+      "result": "PASS_SCOPED",
+      "derivation": "Mass shell implies |q|^2=(E-M)*(E+M), so K=|q|^2/(E+M)=E-M. Then |q|^2/(2*M)=K+K^2/(2*M). The g=eta^2/(gamma+1) formula follows from gamma^2-eta^2=1.",
+      "scope": "The NR curve compares energy formulas at the same exact relativistic momentum; it is not a new NR dynamics solve. Representation failures remain explicit errors rather than relaxed physical thresholds."
+    },
+    {
+      "id": "T04_SPATIAL_STRESS",
+      "result": "PASS_SCOPED",
+      "derivation": "With q_i=c*p_i and v_i=c*q_i/E, the equal-time kinetic moment weight p_i*v_j equals q_i*q_j/E. Its trace is |q|^2/E=E-M^2/E. For the incoming photon the trace is e and weight is e*n_i*n_j; the stationary target has zero spatial stress.",
+      "sign_and_rotation": "Each massive-particle weight is positive semidefinite. Subtracting the photon weight need not leave a positive semidefinite net event source. Under spatial rotation, S transforms as R*S*R^T.",
+      "interpretation": "The stated T00=E, T0i=q_i and Tij=q_i*q_j/E are equal-time per-particle lab moment weights. A weight q_mu*q_nu/E by itself is not asserted to be a standalone Lorentz tensor under a boost; covariance of the full kinetic T requires the appropriate phase-space/population measure. The stationary-lab per-event contract is consistent with this interpretation."
+    },
+    {
+      "id": "T05_COUNTS_AND_SOLE_REST_OWNER",
+      "result": "PASS_SCOPED",
+      "derivation": "Per event: photon -1, alpha -1, deuteron +2. Baryon number changes by -4+2*2=0 and nuclear charge by -2+2*1=0; material nucleus count changes by +1. Pair kinetic energy is A+e-2*M=e-Delta. Therefore -e+(2*M-A)+(K_plus+K_minus)=0.",
+      "ownership": "Physical nuclear rest energies already contain nuclear binding. The population_rest_energy_witness is the sole rest/binding owner in this representation; an additional binding RHS would double count. EVENT03's different compositional-mass/internal-energy representation is not mixed into these values.",
+      "identical_particles": "Counting two produced nuclei is independent of experimental DCS particle/event normalization. No 1/2 is applied to the per-event count identity."
+    },
+    {
+      "id": "T06_FLUX_AND_THERMAL_PORTS",
+      "result": "PASS_SCOPED",
+      "derivation": "Multiplication by a finite nonnegative caller-supplied event flux produces number sources in m^-3 s^-1, energy sources after MeV-to-J conversion and momentum sources after cp-to-SI conversion. The exact conversion factors in the contract have the correct dimensions.",
+      "thermal_scope": "Material count source J does not determine Gamma_thermal. Daughter kinetic energy is not assigned as species heating or thermal deposition. Gamma_thermal, Cv, heating, deposition and independent binding RHS remain null; birth_pool remains UNASSIGNED.",
+      "zero_flux": "The contract requires source convention, directions, finite inputs and representation checks before any zero-flux shortcut."
+    },
+    {
+      "id": "T07_PINNED_SOURCE_AND_LITERAL_MASSES",
+      "result": "PASS_SCOPED",
+      "evidence": "The NIST 2022 raw local byte identity and selected MeV rows match A=3727.3794118, M=1875.61294500 and their printed uncertainties. The reused EXFOR_M0475002 record has the stated 12 EN/ANG-CM/DATA-CM/ERR-S rows and MEV/ADEG/NB/SR/NB/SR units.",
+      "boundary": "The source's liquid-He target, electronic spectators, target-motion/energy-response details, angular acceptance, polarization/azimuth, arm labeling and particle/event normalization are unresolved for physical consumer binding. The theory explicitly defines a conditional bare-nuclear projection and mathematical +/- labels. phi=0 is a representative plane, not a measured azimuth distribution.",
+      "data_ownership": "Original DATA-CM and statistical ERR-S are retained. No DCS-derived flux, total angular cross section, interpolation, half factor, electronic projection or source-uncertainty certificate is admitted.",
+      "primary_read_scope": "The local NIST table and pinned EXFOR packet rows were read. The full original journal paper was not independently fetched or read in this audit; the source-inquiry record preserves that limit."
+    },
+    {
+      "id": "T08_MASS_UNCERTAINTY",
+      "result": "PASS_SCOPED",
+      "derivation": "For Delta=2*M-A, Var(Delta)=4*Var(M)+Var(A)-4*Cov(A,M). For e_th=2*M^2/A-A/2, partial_M=4*M/A and partial_A=-2*M^2/A^2-1/2, as written.",
+      "boundary": "Missing covariance is retained as null. Literal central-value kinematic identities and exact SI conversion constants are distinguished from uncertain nuclear masses. Separately rounded kg/J rows are not simultaneous exact constraints."
+    },
+    {
+      "id": "T09_FINITE_VALIDATION_DESIGN",
+      "result": "PASS_SCOPED_PLAN_NOT_EXECUTED",
+      "basis": "Independent Decimal80 literal inputs and direct Lorentz matrix calculations, native-row preservation, exact synthetic threshold/near-threshold controls, mass shell, four-momentum, rotation, identical-daughter exchange, stress trace, count/energy ledger, invalid/representation and zero-flux cases address the actual new assumptions.",
+      "allocation_preserved": "Exactly the existing planned 24-method single test process with 4 CPU s / 15 wall s, plus the separately contracted saved-data plot, is retained. No new test group, scan, fit, old suite or physical campaign is requested.",
+      "pending": "Static implementation review and the actual bounded execution/result review remain future gates. This theory PASS does not certify implementation or numerical results."
+    }
+  ],
+  "scope_adjudication": {
+    "physical_provider_global_admission": false,
+    "physical_global_consumer_admission": false,
+    "physical_rate_admitted": false,
+    "global_physical_completion": null,
+    "production": "NOT_APPROVED",
+    "activation": false,
+    "L4_ready": false,
+    "HE101_C8": "PARTIAL_EXPORT",
+    "HE101_delivery": "19/20",
+    "HE101_reserve": 0,
+    "old_budget_reset_or_transfer": false,
+    "new_global_count_adoptions": 0,
+    "new_strong_no_go_or_novelty_claim": false,
+    "unresolved_inputs": [
+      "Experimental electronic and response projection to the selected bare-nuclear model",
+      "Complete differential angular law with source-specific event normalization",
+      "Actual photon encounter distribution and event flux",
+      "Named kinetic/thermal deposition consumer",
+      "Mass covariance if a combined physical uncertainty is required"
+    ]
+  },
+  "execution_accounting": {
+    "scientific_formula_evaluations_in_tools": 0,
+    "scientific_runtime_executions": 0,
+    "test_executions": 0,
+    "old_suite_replays": 0,
+    "archive_verifications": 0,
+    "network_reads_in_this_audit": 0,
+    "external_writes": 0,
+    "git_mutations": 0,
+    "metadata_activity": "Read-only local text/JSON extraction and SHA256 identities, skill policy reads, and this authorized review record only. Analytic reconstruction performed by the reviewer without scientific code execution."
+  },
+  "decision": "Theory-before-execution gate passes for the stated conditional source-coordinate relativistic recoil and moment supplier. No blocking correction or expansion of the finite validation contract is required.",
+  "stop_rule": "This independent theory audit is complete. Reuse the reviewed identities; proceed to the already planned independent code gate and one bounded execution under root authorization."
+}

@@ -1,0 +1,2 @@
+#pragma once
+#define FD2_CANDIDATE_SOURCE_SHA256 "e508057f4a1dfb9422a0bb7b678072b08f77dcff54f4466c0fce1d57d375e14a"

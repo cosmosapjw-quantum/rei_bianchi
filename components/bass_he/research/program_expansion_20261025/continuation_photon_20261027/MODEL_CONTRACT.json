@@ -1,0 +1,71 @@
+{
+  "schema": "HE_PHOTON05_MODEL_V1",
+  "unit_id": "HE-EXP-PHOTON-05",
+  "owner": "/root",
+  "base_commit": "30924d902187777fbff02687639c91d65cf53191",
+  "process": "photon + stationary bare ground-state alpha -> two bare ground-state deuterons",
+  "metric": "(-,+,+,+); energy-unit q=(E,c*p), s=-eta(qtot,qtot)",
+  "source_mass_convention_required": "NIST2022_BARE_NUCLEAR_GROUND",
+  "canonical_mass_inputs": {
+    "source": "sources/NIST_CODATA_2022_allascii.txt",
+    "source_sha256": "77fb90e66c40db3e6eb16630bc9c88e4c7c8beddbe5e71be406f2f26e3f67e67",
+    "alpha_rest_MeV": "3727.3794118",
+    "alpha_printed_standard_uncertainty_MeV": "0.0000012",
+    "deuteron_rest_MeV": "1875.61294500",
+    "deuteron_printed_standard_uncertainty_MeV": "0.00000058",
+    "covariance": null,
+    "MeV_is_canonical": true,
+    "independently_rounded_kg_J_rows_not_simultaneous_exact_constraints": true,
+    "mass_values_are_exact_physical_constants": false
+  },
+  "constants_exact": {"c_m_s": "299792458", "eV_J": "1.602176634e-19", "MeV_J": "1.602176634e-13"},
+  "source_coordinates": {
+    "packet_dependency": "../continuation_20261027/sources/r3_update/raw/PROVIDER_ROWS.json",
+    "packet_sha256": "d8b0b92f0374f73fa7f838db5ca07be45bd448696654b07c6db71c5847235ac2",
+    "provider_id": "EXFOR_M0475002", "native_rows": 12,
+    "incident_energy_MeV": [213,258,330], "CM_angle_degrees": [46,61,73,87],
+    "DATA_CM_and_ERR_S_units": "NB/SR", "ERR_S_meaning": "statistical only",
+    "native_plot_phi_rad": 0,
+    "phi_scope": "explicit representative plane, not observed azimuthal distribution",
+    "DCS_or_ERROR_used_as_event_flux": false,
+    "interpolation_or_full_angular_integration": false,
+    "automatic_identical_particle_half_factor": false,
+    "experimental_electronic_response_normalization_binding": false
+  },
+  "kernel": {
+    "inputs": ["A=m_target*c^2 MeV", "M=m_daughter*c^2 MeV", "photon energy e MeV", "unit photon direction n", "unit CM positive daughter direction u"],
+    "domain": "finite binary64 numbers, no booleans; 0<A<2M; e>0 and e>=computed threshold; unit3-vectors within32epsilon norm tolerance; nonrepresentable output raises explicit error",
+    "threshold": "Delta=fsum(M,M,-A); eth=Delta+Delta^2/(2A)",
+    "cm": "W=sqrt(A*(A+2e)); kappa=sqrt((A/2)*(e-eth)); gamma=(A+e)/W; eta=e/W; g=eta^2/(gamma+1)",
+    "energy": "Eplus/minus=(A+e)/2 +/- eta*kappa*(n dot u)",
+    "cp_vector": "qplus/minus=+/-kappa*u + (+/-g*kappa*(n dot u)+e/2)*n",
+    "kinetic": "q_squared/(E+M)",
+    "stress_weight": "q_i*q_j/E, energy units; separate from raw momentum second moment",
+    "direction_roundoff": "No silent normalization. Dot products beyond1+64epsilon reject; within last-roundoff range may clamp to[-1,1] with documented numerical purpose.",
+    "below_threshold": "reject, no physical tolerance clip",
+    "synthetic_controls": "Explicit synthetic A=2,M=2,eth=3 and near-threshold3+2^-20; not source nuclear masses"
+  },
+  "source_adapter": {
+    "consumer": "HE_PHOTON_ALPHA_DD_EXPLICIT_EVENT_RECOIL",
+    "event_flux": "finite nonnegative caller-supplied m^-3 s^-1, not inferred from EXFOR",
+    "count_per_event": {"photon": -1, "alpha_bare_ground": -1, "deuteron_bare_ground": 2},
+    "material_count_per_event": 1,
+    "population_rest_energy_owner": "population_rest_energy_witness includes nuclear binding via physical rest masses",
+    "independent_binding_rhs": null,
+    "energy_identity": "photon(-e)+material_rest(2M-A)+material_kinetic(e-(2M-A))=0",
+    "global_species_ID_mapping": null,
+    "Gamma_thermal": null, "Cv": null, "species_heating": null, "thermal_deposition": null,
+    "birth_pool": "UNASSIGNED",
+    "physical_rate_admitted": false,
+    "physical_global_consumer_admitted": false
+  },
+  "numerical_design": {
+    "reuse_ContractError_and_scaled_product": "../continuation_event_20261027/src/reactive_event.py, unchanged",
+    "event03_fixed_mass_kernel_is_not_called": true,
+    "input_validation_before_zero_flux": true,
+    "no_old_source_mutation": true,
+    "NR_diagnostic": "at same exact relativistic momentum: K_NR-K=K^2/(2M); no approximate solver promotion"
+  },
+  "claim_ceiling": {"physical_provider_global_admission": false, "global_physical_completion": null, "production": "NOT_APPROVED", "activation": false, "L4_ready": false},
+  "protected": {"HE101_C8": "PARTIAL_EXPORT", "HE101_delivery": "19/20", "HE101_reserve": 0, "old_scientific_replays": 0, "old_budget_reset_or_transfer": false}
+}

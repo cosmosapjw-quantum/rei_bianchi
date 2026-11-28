@@ -1,0 +1,61 @@
+{
+  "node": "AUDIT6_DR10C_COHERENT_TOPOLOGY_VALIDATION",
+  "source": {
+    "citation": "R. K. Janev, J. Pop-Jordanov, E. A. Solov'ev, J. Phys. B 30, L353-L360 (1997), DOI 10.1088/0953-4075/30/10/005",
+    "Eq14": "P_2ppi=(1-p23)(1-p12)(1-pS)(1-p_2ppi_3dpi) p_rot",
+    "Eq15": "P_2psigma=p12(1-p12)(1-p23)|exp[i(chi1'+gamma)]+(1-pS)sqrt(1-p_rot)exp[i(chi2'-gamma)]|^2",
+    "Eq15_uniform_phase_average": "p12(1-p12)(1-p23)[1+(1-pS)^2(1-p_rot)]"
+  },
+  "current_scoped_topology": {
+    "branch_order": [
+      "S23",
+      "Qother",
+      "Q12",
+      "Qm1",
+      "Q23"
+    ],
+    "inverse_initial": "1s-sigma",
+    "inverse_final": "2p-sigma",
+    "inverse_phase_average_identity": "EXACT",
+    "inverse_irrelevant_branches": [
+      "Qother",
+      "Qm1"
+    ],
+    "forward_initial": "2p-sigma",
+    "forward_final": "2p-pi",
+    "forward_Eq14_identity": "EXACT",
+    "forward_irrelevant_branches": [
+      "Qother"
+    ]
+  },
+  "symbolic_checks": {
+    "wolfram_Eq15_phase_average_difference": 0,
+    "wolfram_markov_topology_difference": 0
+  },
+  "numerical_stress": {
+    "random_cases": 1000,
+    "max_abs_Eq15_identity_error": 5.551115123125783e-17,
+    "max_abs_Qother_Qm1_independence_error": 0
+  },
+  "verification": {
+    "targeted_tests": "4 passed",
+    "local_compatibility_suite": "36 passed on audit1 reconstruction with exact current transport.py and eq50_scoped.py blobs",
+    "package_build_install_import": "PASS",
+    "compileall": "PASS",
+    "wheel_sha256": "8658ec2c4d1536d9d8cf6a62b495477bd17124641c584d1cc42465eb5986203b",
+    "parent_audit5_full_suite_authority": "76 passed previously recorded on audit5",
+    "limitation": "full audit5 checkout could not be recloned in sandbox because raw github.com DNS remains unavailable"
+  },
+  "scope_boundary": {
+    "Eq13_3dsigma": "NOT_VALIDATED",
+    "reason": "source Eq.(13) includes additional 3d-sigma->4f-sigma, 3d-sigma->4d-sigma and rotational paths beyond the scoped Nmax=3 absorbing model"
+  },
+  "verdicts": [
+    "JANE97_EQ14_FORWARD_2PPI_TOPOLOGY__EXACT_MATCH",
+    "JANE97_EQ15_INVERSE_2PSIGMA_UNIFORM_PHASE_AVERAGE__EXACT_MATCH",
+    "CURRENT_SCOPED_EQ50_NONABSORBING_TOPOLOGY__SAME_SYSTEM_SOURCE_VALIDATED",
+    "FULL_COHERENT_NETWORK_EQUIVALENCE__NOT_ESTABLISHED",
+    "EQ13_UPPER_SHELL_CHANNEL__OUT_OF_SCOPE",
+    "PRODUCTION_CT2__CLOSED_NOT_STARTED"
+  ]
+}
