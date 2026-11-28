@@ -1,0 +1,41 @@
+                // C4I: diagnostic only, fixed prepared context and local gas response.
+                if std::env::var_os("R118C4I_TRANSPORT").is_some(){
+                    static C4I_COUNT:std::sync::atomic::AtomicUsize=std::sync::atomic::AtomicUsize::new(0);
+                    let ci=C4I_COUNT.fetch_add(1,std::sync::atomic::Ordering::Relaxed);
+                    if ci<3{
+                        let a=[nh*(1.-x[0]),self.n_he0_cm3/old.a.powi(3)*(1.-x[1]-x[2]),self.n_he0_cm3/old.a.powi(3)*x[1]];
+                        let mut pools:Vec<(&PreparedAbsorption,u8,usize)>=Vec::new();
+                        pools.push((&context.prepared,if context.birth.is_some(){1}else{0},0));
+                        if let Some(b)=&context.birth{pools.push((b,2,1));}
+                        if let Some(b)=&context.prepared_above{pools.push((b,if context.birth_above.is_some(){1}else{0},0));}
+                        if let Some(b)=&context.birth_above{pools.push((b,2,1));}
+                        if let Some(b)=&context.prepared_middle{pools.push((b,if context.birth_middle.is_some(){1}else{0},0));}
+                        if let Some(b)=&context.birth_middle{pools.push((b,2,1));}
+                        let combine=|a:[f64;3]|->Result<[f64;13],ForwardError>{
+                            let mut v=[0.;13];for &(p,scheme,_) in &pools{let q=p.c4i_summary(a,nh,dt,scheme)?;for i in 0..13{v[i]+=q[i];}}Ok(v)
+                        };
+                        if let Ok(base)=combine(a){
+                            let mut j=[[0.;3];13];let mut oldstock=[0.;13];let mut birthstock=[0.;13];
+                            for &(p,scheme,k) in &pools{
+                                let d=p.c4i_tangent(a,nh,dt,scheme);let q=p.c4i_summary(a,nh,dt,scheme)?;
+                                for i in 0..13{for l in 0..3{j[i][l]+=d[i][l];}if k==0{oldstock[i]+=q[i];}else{birthstock[i]+=q[i];}}
+                            }
+                            let mut line=format!("C4I_TRANS,base,{ci},{:.17e},{:.17e},{:.17e},{:.17e}",nh,a[0],a[1],a[2]);for v in base.into_iter().chain(oldstock).chain(birthstock){line.push_str(&format!(",{v:.17e}"));}eprintln!("{line}");
+                            for l in 0..3{
+                                let h=nh*1e-4;let mut b=a;b[l]+=h;let p=combine(b)?;
+                                let (fd,mode)=if a[l]>=h{b[l]=a[l]-h;let m=combine(b)?;(std::array::from_fn::<_,13,_>(|i|(p[i]-m[i])/(2.*h)),0)}
+                                else{b[l]=a[l]+2.*h;let q=combine(b)?;(std::array::from_fn::<_,13,_>(|i|(4.*(p[i]-base[i])-(q[i]-base[i]))/(2.*h)),1)};
+                                let mut line=format!("C4I_TRANS,col,{ci},{l},{mode}");for i in 0..13{line.push_str(&format!(",{:.17e}",j[i][l]));}for v in fd{line.push_str(&format!(",{v:.17e}"));}eprintln!("{line}");
+                            }
+                            // Scaling a prepared pool keeps reconstruction/geometry fixed, and exposes incoming amplitude derivative.
+                            let amp=|k:usize,f:f64,z:[f64;4]|->Result<([f64;4],[f64;6]),ForwardError>{
+                                let mut cc=context.clone();let scaled=|p:&Arc<PreparedAbsorption>|Arc::new(p.c4i_scaled(f));
+                                if k==0{cc.prepared=scaled(&cc.prepared);cc.prepared_above=cc.prepared_above.as_ref().map(scaled);cc.prepared_middle=cc.prepared_middle.as_ref().map(scaled);}
+                                else{cc.birth=cc.birth.as_ref().map(scaled);cc.birth_above=cc.birth_above.as_ref().map(scaled);cc.birth_middle=cc.birth_middle.as_ref().map(scaled);}
+                                let (r,_,v)=cc.evaluate(z,dt)?;Ok((r,[dt*v.fraction_dt[0],dt*v.fraction_dt[1],dt*v.fraction_dt[2],dt*v.w_dt_erg_per_h_s/c.ev_erg,dt*v.cmb_to_gas_erg_cm3_s/(nh*c.ev_erg),dt*v.escape_erg_cm3_s/(nh*c.ev_erg)]))
+                            };
+                            for k in 0..2{for m in 0..2{let h=if m==0{1e-3}else{2e-3};let (_,p)=amp(k,1.+h,x)?;let (_,n)=amp(k,1.-h,x)?;let mut line=format!("C4I_TRANS,amp,{ci},{k},{m}");let d=std::array::from_fn::<_,6,_>(|i|(p[i]-n[i])/(2.*h));for v in d{line.push_str(&format!(",{v:.17e}"));}eprintln!("{line}");
+                                if m==0{if let Some(j)=c4i_local_jac{if let Ok(v)=solve4(j,[d[0],d[1],d[2],d[3]]){let eps=0.01;let z=std::array::from_fn(|i|x[i]+eps*v[i]);if let (Ok((r0,_)),Ok((r1,_)))=(amp(k,1.,x),amp(k,1.+eps,z)){let err=(0..4).map(|i|(r1[i]-r0[i]).abs()/eps).fold(0_f64,f64::max);eprintln!("C4I_TRANS,check,{ci},{k},{err:.17e}");}}}} }}
+                        }
+                    }
+                }

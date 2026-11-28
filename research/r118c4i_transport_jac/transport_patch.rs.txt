@@ -1,0 +1,27 @@
+    // C4I diagnostic: exact derivatives of frozen prepared quadrature node sums.
+    // Output: N,Uref,Gamma[3],heat rate[3],events[3],binding,heat.
+    pub(crate) fn c4i_summary(&self,a:[f64;3],nh:f64,dt:f64,scheme:u8)->Result<[f64;13],ForwardError>{
+        let v=self.evaluate_temporal(a,nh,dt,scheme)?;
+        let mut out=[0.;13];out[0]=sum(v.state.number.iter().copied());out[1]=sum(v.state.energy_ref.iter().copied());
+        out[2..5].copy_from_slice(&v.photo.gamma_s);out[5..8].copy_from_slice(&v.photo.heat_erg_per_absorber_s);out[8..11].copy_from_slice(&v.absorbed_per_h);out[11]=v.binding_ev_per_h;out[12]=v.heat_ev_per_h;Ok(out)
+    }
+    pub(crate) fn c4i_scaled(&self,f:f64)->Self{
+        assert!(f>=0.&&f.is_finite());let mut s=self.clone();
+        for v in &mut s.template.number{*v*=f;}for v in &mut s.template.energy_ref{*v*=f;}for v in &mut s.nodes{v.number*=f;}s
+    }
+    pub(crate) fn c4i_tangent(&self,a:[f64;3],nh:f64,dt:f64,scheme:u8)->[[f64;3];13]{
+        let model=HHeModel::controlled_fixture();let mut out=[[0.;3];13];let mut corr=[[0.;3];13];let cd=model.c_cm_s*dt;
+        for n in &self.nodes{
+            let x=cd*sum((0..3).map(|i|a[i]*n.sigma[i]));let (e,phi,psi)=exponential_factors(x);
+            let (dp,dpsi)=if x<0.05{
+                let mut f=0.;let mut g=0.;let mut p=1.;let mut fact=1.;
+                for k in 1..=14{fact*= (k+1) as f64;let sign=if k%2==0{1.}else{-1.};f+=sign*k as f64*p/fact;g+=sign*k as f64*p/(fact*(k+2) as f64);p*=x;}(f,g)
+            }else{let dp=(e-phi)/x;(dp,(-dp-psi)/x)};
+            let (ds,mean,dm)=match scheme{0=>{let p=1./(1.+x);(-p*p,p,-p*p)},1=>(-e,phi,dp),_=>(dp,psi,dpsi)};
+            for j in 0..3{
+                let dx=cd*n.sigma[j];let dn=n.number*ds*dx;let dmean=n.number*dm*dx;let mut v=[0.;13];v[0]=dn;v[1]=n.q*dn;
+                for i in 0..3{v[2+i]=model.c_cm_s*nh*n.sigma[i]*dmean;v[5+i]=v[2+i]*n.excess_ev[i]*model.ev_erg;let event=cd*n.sigma[i]*(a[i]*dmean+if i==j{n.number*mean}else{0.});v[8+i]=event;v[11]+=event*model.threshold_ev[i];v[12]+=event*n.excess_ev[i];}
+                for i in 0..13{compensated_add(&mut out[i][j],&mut corr[i][j],v[i]);}
+            }
+        }out
+    }
