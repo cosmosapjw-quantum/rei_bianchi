@@ -1,0 +1,81 @@
+                // C4L research-only controlled local implicit stage with moving reconstruction.
+                if std::env::var_os("R118C4L_IMPLICIT").is_some(){
+                    static C4L_COUNT:std::sync::atomic::AtomicUsize=std::sync::atomic::AtomicUsize::new(0);
+                    if C4L_COUNT.fetch_add(1,std::sync::atomic::Ordering::Relaxed)==0{
+                        let probe=||->Result<(),ForwardError>{
+                            let ray=self.transport.ray_geometry(&geometry)?;let scales:Vec<_>=ray.iter().map(|v|v.scale).collect();
+                            let p=context.birth.as_ref().ok_or(err("C4L_NO_BIRTH"))?;
+                            let cell=p.c4j_cells(&scales,ne).into_iter().find(|v|v.6==0).ok_or(err("C4L_NO_CELL"))?;
+                            let (k,n,lo,hi,mean,beta,_)=cell;
+                            eprintln!("C4L_SOURCE,{k},{n:.17e},{lo:.17e},{hi:.17e},{mean:.17e},{beta:.17e},{:.17e}",scales[k/ne]);
+                            let norm=|v:[f64;4]|->f64{let scale=[x[0].abs().max(1e-5),1e-8,1e-12,x[3].abs().max(1e-5)];(0..4).map(|i|v[i].abs()/scale[i]).fold(0.,f64::max)};
+                            let jac=|cc:&ResidualContext,z:[f64;4],r:[f64;4]|->Result<[[f64;4];4],ForwardError>{
+                                let mut a=[[0.;4];4];
+                                for j in 0..4 {
+                                    let h=(1e-5*z[j].abs()).max(if j==3{1e-9}else{1e-10});let mut p=z;let mut m=z;p[j]+=h;m[j]-=h;
+                                    let rp=cc.evaluate(p,dt)?.0;let rm=cc.evaluate(m,dt);
+                                    for i in 0..4 {a[i][j]=if let Ok((rr,_,_))=&rm{(rp[i]-rr[i])/(2.*h)}else{(rp[i]-r[i])/h};}
+                                }Ok(a)
+                            };
+                            let root=|cc:&ResidualContext,mut z:[f64;4]|->Result<([f64;4],f64,usize),ForwardError>{
+                                for it in 0..16{
+                                    let r=cc.evaluate(z,dt)?.0;let v=norm(r);
+                                    if v<5e-15{return Ok((z,v,it))}
+                                    let direction=solve4(jac(cc,z,r)?,r.map(|v|-v))?;
+                                    let mut alpha=1.;let mut moved=false;
+                                    for _ in 0..30{
+                                        let zz=std::array::from_fn(|i|z[i]+alpha*direction[i]);
+                                        if let Ok((r1,_,_))=cc.evaluate(zz,dt){
+                                            if norm(r1)<v{z=zz;moved=true;break;}
+                                        }alpha*=0.5;
+                                    }
+                                    if !moved{if v<1e-12{return Ok((z,v,it))}return Err(err("C4L_LOCAL_LINESEARCH"))}
+                                }Err(err("C4L_LOCAL_ITERATIONS"))
+                            };
+                            let observables=|cc:&ResidualContext,local:&PreparedAbsorption,z:[f64;4]|->Result<([f64;4],[f64;21]),ForwardError>{
+                                let (r,s,v)=cc.evaluate(z,dt)?;let a=[nh*(1.-z[0]),self.n_he0_cm3/old.a.powi(3)*(1.-z[1]-z[2]),self.n_he0_cm3/old.a.powi(3)*z[1]];
+                                let q=local.c4i_summary(a,nh,dt,2)?;
+                                let mut out=[0.;21];
+                                out[0]=s.primary.number.iter().sum::<f64>()+s.above.as_ref().map_or(0.,|x|x.number.iter().sum::<f64>())+s.middle.as_ref().map_or(0.,|x|x.number.iter().sum::<f64>());
+                                out[1]=s.primary.energy_ref.iter().sum::<f64>()+s.above.as_ref().map_or(0.,|x|x.energy_ref.iter().sum::<f64>())+s.middle.as_ref().map_or(0.,|x|x.energy_ref.iter().sum::<f64>());
+                                for i in 0..3{out[2+i]=dt*v.photo_events_cm3_s[i]/nh;}
+                                out[5]=dt*v.w_dt_erg_per_h_s/c.ev_erg;out[6]=dt*v.cmb_to_gas_erg_cm3_s/(nh*c.ev_erg);out[7]=dt*v.escape_erg_cm3_s/(nh*c.ev_erg);
+                                out[8..].copy_from_slice(&q);Ok((r,out))
+                            };
+                            for (scenario,r0) in [13.60/mean,13.60/lo].into_iter().enumerate(){
+                                for (ampid,amp) in [1.,1e4].into_iter().enumerate(){
+                                    let make=|ep:f64|->Result<(ResidualContext,PreparedAbsorption),ForwardError>{
+                                        let q=p.c4j_local_cell(k,r0,0.,ep)?.c4i_scaled(amp);
+                                        let mut cc=context.clone();cc.birth=Some(Arc::new(p.c4l_replace_cell(k,&q)));Ok((cc,q))
+                                    };
+                                    let (cc,b)=make(0.)?;let (z,rnorm,it)=root(&cc,x)?;
+                                    let (r0,o0)=observables(&cc,&b,z)?;let a=jac(&cc,z,r0)?;
+                                    // Independent gas-output Jacobian. Use the same admissible one-sided fallback at abundance boundary.
+                                    let mut jx=[[0.;4];21];
+                                    for j in 0..4{
+                                        let h=(1e-5*z[j].abs()).max(if j==3{1e-9}else{1e-10});let mut zp=z;let mut zm=z;zp[j]+=h;zm[j]-=h;
+                                        let op=observables(&cc,&b,zp)?.1;let om=observables(&cc,&b,zm);
+                                        for i in 0..21{jx[i][j]=if let Ok((_,ref q))=om{(op[i]-q[i])/(2.*h)}else{(op[i]-o0[i])/h};}
+                                    }
+                                    let mut line=format!("C4L_BASE,{scenario},{ampid},{amp:.17e},{rnorm:.17e},{it},{}",b.node_count());for v in z.into_iter().chain(r0).chain(o0).chain(a.into_iter().flatten()).chain(jx.into_iter().flatten()){line.push_str(&format!(",{v:.17e}"));}eprintln!("{line}");
+                                    for sign in [1.,-1.]{
+                                        for h in [0.001,0.0001]{
+                                            let (cc1,b1)=make(sign*h)?;
+                                            let (rp,op)=observables(&cc1,&b1,z)?;
+                                            let rp=std::array::from_fn::<_,4,_>(|i|(rp[i]-r0[i])/h);
+                                            let d=solve4(a,rp.map(|v|-v))?;
+                                            let (z1,res,it1)=root(&cc1,z)?;
+                                            let (_,o1)=observables(&cc1,&b1,z1)?;
+                                            let pred=std::array::from_fn::<_,21,_>(|i|(op[i]-o0[i])/h+(0..4).map(|j|jx[i][j]*d[j]).sum::<f64>());
+                                            let fd=std::array::from_fn::<_,4,_>(|i|(z1[i]-z[i])/h);
+                                            let fo=std::array::from_fn::<_,21,_>(|i|(o1[i]-o0[i])/h);
+                                            let mut line=format!("C4L_DIR,{scenario},{ampid},{sign:.0},{h:.17e},{res:.17e},{it1},{}",b1.node_count());
+                                            for v in d.into_iter().chain(fd).chain(pred).chain(fo).chain(rp){line.push_str(&format!(",{v:.17e}"));}eprintln!("{line}");
+                                        }
+                                    }
+                                }
+                            }Ok(())
+                        };
+                        if let Err(e)=probe(){eprintln!("C4L_ERROR,{e:?}");}
+                    }
+                }
