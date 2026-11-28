@@ -1,0 +1,8 @@
+impl Driver {
+    /// C4C research-only: rebase the initial energy after a fresh admissible gas perturbation.
+    pub fn c4c_rebase_initial(&mut self,s:&DriverState)->Result<(),ForwardError>{
+        if s.accepted!=0 || s.a!=1./21. || s.ledgers.source_n!=0. || s.ledgers.source_u!=0. || self.photon_inventory(s)!=(0.,0.){return Err(err("C4C_INITIAL_REBASE_DOMAIN"))}
+        self.initial_energy=self.total_energy(s)?;
+        self.validate(s,1e-8)
+    }
+    pub fn new(config: DriverConfig)
