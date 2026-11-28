@@ -1,0 +1,32 @@
+                // C4H research-only accepted chemical-substage diagnostic. No counter or state changes.
+                if std::env::var_os("R118C4H_STAGE").is_some() {
+                    static C4H_COUNT: std::sync::atomic::AtomicUsize=std::sync::atomic::AtomicUsize::new(0);
+                    let ci=C4H_COUNT.fetch_add(1,std::sync::atomic::Ordering::Relaxed);
+                    if ci<3 {
+                        let c4eval=|z:[f64;4]|->Result<([f64;6],[f64;4]),ForwardError>{
+                            let (r,_,v)=context.evaluate(z,dt)?;
+                            let w=dt*v.w_dt_erg_per_h_s/c.ev_erg;
+                            Ok(([dt*v.fraction_dt[0],dt*v.fraction_dt[1],dt*v.fraction_dt[2],w,dt*v.cmb_to_gas_erg_cm3_s/(nh*c.ev_erg),dt*v.escape_erg_cm3_s/(nh*c.ev_erg)],r))
+                        };
+                        if let Ok((v0,r0))=c4eval(x) {
+                            eprintln!("C4H_STAGE,base,{ci},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e},{:.17e}",old.a,dt,x[0],x[1],x[2],x[3]);
+                            let mut jac=[[0.;4];4];let mut ok=true;
+                            for j in 0..4 {for k in 0..2 {
+                                let h=(if j==3{1e-8}else{1e-7})*(1+k) as f64;
+                                let eval=|a:f64|{let mut z=x;z[j]+=a*h;c4eval(z)};
+                                let p=eval(1.);let m=eval(-1.);
+                                let q=match (p,m){
+                                    (Ok((p,rp)),Ok((m,rm)))=>Some((0,std::array::from_fn::<_,6,_>(|i|(p[i]-m[i])/(2.*h)),std::array::from_fn::<_,4,_>(|i|(rp[i]-rm[i])/(2.*h)))),
+                                    (Ok((p,rp)),Err(_))=>eval(2.).ok().map(|(p2,r2)|(1,std::array::from_fn(|i|(4.*(p[i]-v0[i])-(p2[i]-v0[i]))/(2.*h)),std::array::from_fn(|i|(4.*(rp[i]-r0[i])-(r2[i]-r0[i]))/(2.*h)))),
+                                    (Err(_),Ok((m,rm)))=>eval(-2.).ok().map(|(m2,r2)|(-1,std::array::from_fn(|i|(-4.*(m[i]-v0[i])+(m2[i]-v0[i]))/(2.*h)),std::array::from_fn(|i|(-4.*(rm[i]-r0[i])+(r2[i]-r0[i]))/(2.*h)))),
+                                    _=>None};
+                                if let Some((sg,d,rr))=q{let mut line=format!("C4H_STAGE,col,{ci},{j},{k},{sg}");for v in d.into_iter().chain(rr){line.push_str(&format!(",{v:.17e}"));}eprintln!("{line}");if k==1{for i in 0..4{jac[i][j]=(if i==j{1.}else{0.})-d[i];}}}
+                                else{ok=false;eprintln!("C4H_STAGE,invalid,{ci},{j},{k}");}
+                            }}
+                            if ok { if let Ok(v)=solve4(jac,[1.,0.,0.,0.]) {
+                                let eps=1e-7;let z=std::array::from_fn(|i|x[i]+eps*v[i]);
+                                if let Ok((_,rr))=c4eval(z){let err=(0..4).map(|i|(rr[i]-r0[i]-if i==0{eps}else{0.}).abs()/eps).fold(0_f64,f64::max);eprintln!("C4H_STAGE,check,{ci},{err:.17e}");}
+                            }}
+                        }
+                    }
+                }
