@@ -25,10 +25,10 @@ for k in [0,2]:
     accepted+=1;est_sum+=er;mx=max(mx,q);sizes.append(r-l);return fine
    rejected+=1;return adapt(m,r,adapt(l,m,y,depth+1),depth+1)
   for l,r in zip(grid[:-1],grid[1:]):y=adapt(l,r,y)
-  err=rel(y,ref);row=dict(dim=len(p),tol=tol,accepted=accepted,rejected=rejected,trial_steps=trials,exponential_actions=6*trials,estimated_sum=est_sum.tolist(),reference_relative=err.tolist(),max_accepted_ratio=mx,min_step=min(sizes),max_step=max(sizes),max_depth=maxdepth,seconds=time.monotonic()-t0)
+  err=rel(y,ref);row=dict(dim=len(p),tol=tol,accepted=accepted,rejected=rejected,trial_steps=trials,exponential_actions=6*trials,estimated_sum=est_sum.tolist(),reference_relative=err.tolist(),max_accepted_ratio=mx,min_step=float(min(sizes)),max_step=float(max(sizes)),max_depth=maxdepth,seconds=time.monotonic()-t0)
   rows.append(row);vals[f'{k}_{tol:g}']=y;print(row,flush=True)
 # Same adaptive tolerance, compare reduced vs full to separate hierarchy truncation.
 for row in rows:
  if row['dim']==48:row['matched_tolerance_hierarchy_gap']=rel(vals[f"0_{row['tol']:g}"],vals[f"2_{row['tol']:g}"]).tolist()
 np.savez_compressed(D/'ADAPTIVE_CF4.npz',ref=ref,**vals)
-(D/'ADAPTIVE_CF4.json').write_text(json.dumps(dict(rows=rows,clock_sha=hashlib.sha256((I/'CLOCK_CF4.npz').read_bytes()).hexdigest(),reference_steps=json.loads((I/'CLOCK_CF4.json').read_text())['reference_steps'],source_intervals=len(grid)-1,tau=float(tau[-1]),scale_floor=floor.tolist(),scope='actual C4I prescribed REC opacity/BASS shear; CF4 step-doubling estimator 1/15, knot-aligned, finite reference scaling; reduced 48 vs full lmax6, no rigorous global certificate or full self-consistent REI'),indent=2)+'\n')
+(D/'ADAPTIVE_CF4.json').write_text(json.dumps(dict(rows=rows,clock_sha=hashlib.sha256((I/'CLOCK_CF4.npz').read_bytes()).hexdigest(),reference_steps=json.loads((I/'CLOCK_CF4.json').read_text())['reference_steps'],source_intervals=len(grid)-1,tau=float(tau[-1]),scale_floor=[float(x) for x in floor],scope='actual C4I prescribed REC opacity/BASS shear; CF4 step-doubling estimator 1/15, knot-aligned, finite reference scaling; reduced 48 vs full lmax6, no rigorous global certificate or full self-consistent REI'),indent=2)+'\n')
